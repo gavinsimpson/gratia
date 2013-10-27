@@ -3,3 +3,6 @@
 
 # Example code in package build process
 *-Ex.R
+
+# no backup files
+*~
