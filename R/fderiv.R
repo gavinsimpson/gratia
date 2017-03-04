@@ -2,7 +2,6 @@
 ##'
 ##' The first derivative of the smooth functions of a GAM model calculated using finite differences.
 ##'
-##' .. content for \details{} ..
 ##' @param model A fitted GAM. Currently only models fitted by [mgcv::gam()] and [mgcv::gamm()] are supported.
 ##' @param ... Arguments that are passed to other methods.
 ##'
@@ -23,9 +22,12 @@
 ##' @param eps numeric; the value of the finite difference used to approximate the first derivative.
 ##' @param unconditional logical; if `TRUE`, the smoothing parameter uncertainty corrected covariance matrix is used, *if available*, otherwise the uncorrected Bayesian posterior covariance matrix is used.
 ##'
+##' @importFrom stats coef model.frame predict terms vcov
+##' @import mgcv
+##'
 ##' @export
 `fderiv.gam` <- function(model, newdata, term, n = 200, eps = 1e-7,
-                         unconditional = FALSE) {
+                         unconditional = FALSE, ...) {
     m.terms <- attr(terms(model), "term.labels")
     if(missing(newdata)) {
         newdata <- sapply(model.frame(model)[, m.terms, drop = FALSE],

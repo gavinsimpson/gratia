@@ -9,7 +9,7 @@
 fderiv(model, ...)
 
 \method{fderiv}{gam}(model, newdata, term, n = 200, eps = 1e-07,
-  unconditional = FALSE)
+  unconditional = FALSE, ...)
 
 \method{fderiv}{gamm}(model, ...)
 }
@@ -33,9 +33,6 @@ An object of class \code{"fderiv"} is returned.
 }
 \description{
 The first derivative of the smooth functions of a GAM model calculated using finite differences.
-}
-\details{
-.. content for \details{} ..
 }
 \author{
 Gavin L. Simpson
