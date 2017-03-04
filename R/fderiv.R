@@ -23,9 +23,20 @@
 ##' @param unconditional logical; if `TRUE`, the smoothing parameter uncertainty corrected covariance matrix is used, *if available*, otherwise the uncorrected Bayesian posterior covariance matrix is used.
 ##'
 ##' @importFrom stats coef model.frame predict terms vcov
-##' @import mgcv
 ##'
 ##' @export
+##'
+##' @examples
+##' library("mgcv")
+##' set.seed(2)
+##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+##'
+##' ## first derivatives of all smooths...
+##' fd <- fderiv(mod)
+##'
+##' ## ...and a selected smooth
+##' fd2 <- fderiv(mod, term = "x1")
 `fderiv.gam` <- function(model, newdata, term, n = 200, eps = 1e-7,
                          unconditional = FALSE, ...) {
     m.terms <- attr(terms(model), "term.labels")
