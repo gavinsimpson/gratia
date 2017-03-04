@@ -13,26 +13,13 @@ addons:
       - qpdf
 
 r_packages:
-  - ade4
-  - cclust
-  - bipartite
-  - labdsv
-  - car
-  - ellipse
-  - smacof
-  - coda
-  - maptools
-  - ape
-  - picante
+  - mgcv
 
 r_github_packages:
   - jimhester/covr
 
 after_success:
   - Rscript -e 'covr::codecov()'
-
-before_install:
-  - tlmgr install sidecap
 
 r_build_args: " --compact-vignettes=gs+qpdf"
 
