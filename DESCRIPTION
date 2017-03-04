@@ -1,6 +1,6 @@
 Package: tsgam
 Version: 0.0-1
-Date: 27 October 2013
+Date: 03 March 2017
 Title: Time series analysis via GAMs
 Authors@R: c(person(given = "Gavin", family = "Simpson",
                     middle = "L", email = "ucfagls@gmail.com",
@@ -12,3 +12,4 @@ Description: Utility functions for fitting, testing, working with and evaluating
 Licence: MIT
 URL: https://github.com/gavinsimpson/tsgam
 BugReports: https://github.com/gavinsimpson/tsgam/issues
+Roxygen: list(markdown = TRUE)
