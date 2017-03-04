@@ -7,7 +7,7 @@ Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     role = c("aut","cre")))
 Author: Gavin L. Simpson
 Maintainer: Gavin L. Simpson <ucfagls@gmail.com>
-Enhances: mgcv
+Suggests: mgcv
 Description: Utility functions for fitting, testing, working with and evaluating time series models using generalized additive models.
 License: MIT
 URL: https://github.com/gavinsimpson/tsgam
