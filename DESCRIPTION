@@ -13,3 +13,4 @@ Licence: MIT
 URL: https://github.com/gavinsimpson/tsgam
 BugReports: https://github.com/gavinsimpson/tsgam/issues
 Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.0.1
