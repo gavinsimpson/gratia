@@ -76,7 +76,7 @@
         Xi[, want] <- Xp[, want]              # fill in 0-matrix with Lp data
         df <- Xi %*% coef(model)              # predict derive given model coefs
         df.sd <- rowSums(Xi %*% Vb * Xi)^.5   # standard error of predictions
-        lD[[i]] <- list(deriv = df, se.deriv = df.sd)
+        lD[[i]] <- list(deriv = df, se.deriv = df.sd, Xi = Xi)
     }
     class(lD) <- "fderiv"
     lD$model <- model
