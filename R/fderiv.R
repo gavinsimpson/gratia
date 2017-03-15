@@ -78,12 +78,10 @@
         df.sd <- rowSums(Xi %*% Vb * Xi)^.5   # standard error of predictions
         lD[[i]] <- list(deriv = df, se.deriv = df.sd, Xi = Xi)
     }
-    class(lD) <- "fderiv"
-    lD$model <- model
-    lD$eps <- eps
-    lD$eval <- newdata
-    lD$unconditional
-    lD
+    out <- structure(list(derivatives = lD, terms = t.labs, model = model,
+                          eps = eps, eval = newdata, unconditional = unconditional),
+                     class = "fderiv")
+    out
 }
 
 ##' @rdname fderiv
