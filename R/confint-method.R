@@ -1,3 +1,40 @@
+##' Confidence and simultaneous intervals for derivatives of smooths
+##'
+##' Calculates confidence or simultaneous intervals for derivatives of smooth terms in a GAM.
+##'
+##' @param object an object of class `"fderiv"` containing the estimated derivatives.
+##' @param parm which parameters (smooth terms) are to be given intervals as a vector of terms. If missing, all parameters are considered.
+##' @param level numeric, `0 < level < 1`; the confidence level of the point-wise or simultaneous interval. The default is `0.95` for a 95\% interval.
+##' @param type character; the type of interval to compute. One of `"confidence"` for point-wise intervals, or `"simultaneous"` for simultaneous intervals.
+##' @param nsim integer; the number of simulations used in computing the simultaneous intervals.
+##' @param ... additional arguments for methods
+##'
+##' @return a data frame with components:
+##' 1. `term`; factor indicating to which term each row relates,
+##' 2. `lower`; lower limit of the confidence or simultaneous interval,
+##' 3. `est`; estimated derivative
+##' 4. `upper`; upper limit of the confidence or simultaneous interval.
+##'
+##' @author Gavin L. Simpson
+##'
+##' @export
+##'
+##' @examples
+##' library("mgcv")
+##' set.seed(2)
+##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+##'
+##' ## first derivatives of all smooths...
+##' fd <- fderiv(mod)
+##'
+##' ## point-wise interval
+##' ci <- confint(fd, type = "confidence")
+##' head(ci)
+##'
+##' ## simultaneous interval for smooth term of x1
+##' x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
+##' head(x1.sint)
 `confint.fderiv` <- function(object, parm, level = 0.95,
                              type = c("confidence", "simultaneous"), nsim = 10000, ...) {
     ## Process arguments
@@ -21,10 +58,10 @@
         level <- rep(level, length.out = 1L)
     }
     if (!is.numeric(level)) {
-        stop(paste("`level` should be numeric, but supplied:" level))
+        stop(paste("`level` should be numeric, but supplied:", level))
     }
-    if ((0 < level) && (level < 1)) {
-        stop(paste("`level` should lie in interval [0,1], but supplied:" level))
+    if (! (0 < level) && (level < 1)) {
+        stop(paste("`level` should lie in interval [0,1], but supplied:", level))
     }
 
     ## which type of interval is required
@@ -38,9 +75,10 @@
     }
 
     ## return
-    intervals
+    interval
 }
 
+##' @importFrom stats quantile vcov
 ##' @importFrom MASS mvrnorm
 `simultaneous` <- function(x, terms, level, nsim) {
     ## wrapper the computes each interval
@@ -62,7 +100,7 @@
     ## simulate un-biased deviations given bayesian covar matrix
     buDiff <- MASS::mvrnorm(n = nsim, mu = rep(0, nrow(Vb)), Sigma = Vb)
     ## apply wrapper to compute simultaneous interval critical value and
-    ## corresponding simultaneous interval
+    ## corresponding simultaneous interval for each term
     res <- lapply(x[["derivatives"]][terms], FUN = simInt,
                   Vb = Vb, bu = buDiff, level = level, nsim = nsim)
     ## how many values per term - currently all equal
@@ -73,6 +111,25 @@
     res                                                # return
 }
 
+##' @importFrom stats qnorm
 `confidence` <- function(x, terms, level) {
-    ##
+    ## wrapper the computes each interval
+    `confInt` <- function(x, level) {
+        se <- x[["se.deriv"]]     # std err of deriv for current term
+        d  <- x[["deriv"]]        # deriv for current term
+        ## confidence interval critical value
+        crit <- qnorm(1 - ((1 - level) / 2))
+        ## return as data frame
+        data.frame(lower = d - (crit * se), est = d, upper = d + (crit * se))
+    }
+
+    ## apply wrapper to compute confidence interval critical value and
+    ## corresponding confidence interval for each term
+    res <- lapply(x[["derivatives"]][terms], FUN = confInt, level = level)
+    ## how many values per term - currently all equal
+    lens <- vapply(res, FUN = NROW, FUN.VALUE = integer(1))
+    res <- do.call("rbind", res)        # row-bind each component of res
+    res <- cbind(term = rep(terms, times = lens), res) # add on term ID
+    rownames(res) <- NULL                              # tidy up
+    res                                                # return
 }

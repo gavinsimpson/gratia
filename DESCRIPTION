@@ -1,14 +1,18 @@
 Package: tsgam
 Version: 0.0-1
-Date: 03 March 2017
+Date: 15 March 2017
 Title: Time series analysis via GAMs
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     email = "ucfagls@gmail.com",
                     role = c("aut","cre")))
 Author: Gavin L. Simpson
 Maintainer: Gavin L. Simpson <ucfagls@gmail.com>
-Suggests: mgcv
-Description: Utility functions for fitting, testing, working with and evaluating time series models using generalized additive models.
+Imports:
+    MASS, stats
+Suggests:
+    mgcv
+Description: Utility functions for fitting, testing, working with and evaluating
+    time series models using generalized additive models.
 License: MIT
 URL: https://github.com/gavinsimpson/tsgam
 BugReports: https://github.com/gavinsimpson/tsgam/issues
