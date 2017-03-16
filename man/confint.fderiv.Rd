@@ -2,7 +2,7 @@
 % Please edit documentation in R/confint-method.R
 \name{confint.fderiv}
 \alias{confint.fderiv}
-\title{Confidence and simultaneous intervals for derivatives of smooths}
+\title{Point-wise and simultaneous confidence intervals for derivatives of smooths}
 \usage{
 \method{confint}{fderiv}(object, parm, level = 0.95, type = c("confidence",
   "simultaneous"), nsim = 10000, ...)
@@ -30,7 +30,7 @@ a data frame with components:
 }
 }
 \description{
-Calculates confidence or simultaneous intervals for derivatives of smooth terms in a GAM.
+Calculates point-wise confidence or simultaneous intervals for the first derivatives of smooth terms in a fitted GAM.
 }
 \examples{
 library("mgcv")

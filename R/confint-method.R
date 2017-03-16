@@ -1,6 +1,6 @@
-##' Confidence and simultaneous intervals for derivatives of smooths
+##' Point-wise and simultaneous confidence intervals for derivatives of smooths
 ##'
-##' Calculates confidence or simultaneous intervals for derivatives of smooth terms in a GAM.
+##' Calculates point-wise confidence or simultaneous intervals for the first derivatives of smooth terms in a fitted GAM.
 ##'
 ##' @param object an object of class `"fderiv"` containing the estimated derivatives.
 ##' @param parm which parameters (smooth terms) are to be given intervals as a vector of terms. If missing, all parameters are considered.

@@ -30,7 +30,8 @@ Type 'q()' to quit R.
 > flush(stderr()); flush(stdout())
 > 
 > ### Name: confint.fderiv
-> ### Title: Confidence and simultaneous intervals for derivatives of smooths
+> ### Title: Point-wise and simultaneous confidence intervals for derivatives
+> ###   of smooths
 > ### Aliases: confint.fderiv
 > 
 > ### ** Examples
@@ -106,7 +107,7 @@ Gu & Wahba 4 term additive model
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  2.629 0.027 2.667 0 0 
+Time elapsed:  2.604 0.027 2.642 0 0 
 > grDevices::dev.off()
 null device 
           1 
