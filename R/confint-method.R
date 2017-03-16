@@ -33,6 +33,7 @@
 ##' head(ci)
 ##'
 ##' ## simultaneous interval for smooth term of x1
+##' set.seed(42)
 ##' x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
 ##' head(x1.sint)
 `confint.fderiv` <- function(object, parm, level = 0.95,
