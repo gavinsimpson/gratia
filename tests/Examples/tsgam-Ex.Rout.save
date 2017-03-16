@@ -1,0 +1,118 @@
+
+R version 3.3.3 Patched (2017-03-06 r72321) -- "Another Canoe"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "tsgam"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> library('tsgam')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("confint.fderiv")
+> ### * confint.fderiv
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: confint.fderiv
+> ### Title: Confidence and simultaneous intervals for derivatives of smooths
+> ### Aliases: confint.fderiv
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.8-17. For overview type 'help("mgcv-package")'.
+> set.seed(2)
+> dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+Gu & Wahba 4 term additive model
+> mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> ## first derivatives of all smooths...
+> fd <- fderiv(mod)
+> 
+> ## point-wise interval
+> ci <- confint(fd, type = "confidence")
+> head(ci)
+  term      lower      est    upper
+1   x0 -0.8496032 4.112256 9.074116
+2   x0 -0.8489453 4.112287 9.073519
+3   x0 -0.8448850 4.112468 9.069821
+4   x0 -0.8329612 4.112988 9.058936
+5   x0 -0.8108548 4.113933 9.038721
+6   x0 -0.7769721 4.115360 9.007693
+> 
+> ## simultaneous interval for smooth term of x1
+> set.seed(42)
+> x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
+> head(x1.sint)
+  term     lower      est    upper
+1   x1 -5.331866 1.423165 8.178197
+2   x1 -5.330710 1.423211 8.177132
+3   x1 -5.325374 1.423425 8.172225
+4   x1 -5.314660 1.423860 8.162379
+5   x1 -5.297090 1.424591 8.146271
+6   x1 -5.271289 1.425697 8.122684
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
+> nameEx("fderiv")
+> ### * fderiv
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: fderiv
+> ### Title: First derivatives of fitted GAM functions
+> ### Aliases: fderiv fderiv.gam fderiv.gamm
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.8-17. For overview type 'help("mgcv-package")'.
+> set.seed(2)
+> dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+Gu & Wahba 4 term additive model
+> mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> ## first derivatives of all smooths...
+> fd <- fderiv(mod)
+> 
+> ## ...and a selected smooth
+> fd2 <- fderiv(mod, term = "x1")
+> 
+> 
+> 
+> ### * <FOOTER>
+> ###
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  2.629 0.027 2.667 0 0 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')
