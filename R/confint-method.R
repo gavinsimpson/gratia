@@ -87,7 +87,7 @@
         Xi <- x[["Xi"]]           # derivative Lp, zeroed except for this term
         se <- x[["se.deriv"]]     # std err of deriv for current term
         d  <- x[["deriv"]]        # deriv for current term
-        simDev <- Xi %*% t(buDiff)      # simulate deviations from expected
+        simDev <- Xi %*% t(bu)      # simulate deviations from expected
         absDev <- abs(sweep(simDev, 1, se, FUN = "/")) # absolute deviations
         masd <- apply(absDev, 2L, max)  # & maxabs deviation per sim
         ## simultaneous interval critical value
