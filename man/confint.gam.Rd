@@ -6,7 +6,7 @@
 \usage{
 \method{confint}{gam}(object, parm, level = 0.95, newdata = NULL,
   type = c("confidence", "simultaneous"), nsim = 10000, shift = FALSE,
-  transform = TRUE, ...)
+  transform = TRUE, unconditional = FALSE, ...)
 }
 \arguments{
 \item{object}{an object of class \code{"gam"} or \code{"gamm"}.}
@@ -24,6 +24,8 @@
 \item{shift}{logical; should the constant term be add to the smooth?}
 
 \item{transform}{logical; should the smooth be evaluated on a transformed scale? For generalised models, this involves applying the inverse of the link function used to fit the model. Alternatively, the name of, or an actual, function can be supplied to transform the smooth and it's confidence interval.}
+
+\item{unconditional}{logical; if \code{TRUE} (and \code{freq == FALSE}) then the Bayesian smoothing parameter uncertainty corrected covariance matrix is returned, if available.}
 
 \item{...}{additional arguments for methods}
 }
