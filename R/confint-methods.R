@@ -185,7 +185,7 @@
     if (missing(parm)) {
         stop("Currently 'parm' must be specified for 'confint.gam()'")
     } else {
-        terms <- object$terms
+        terms <- unlist(smooth_terms(object))
         want <- parm %in% terms
         if (any(!want)) {
             msg <- paste("Terms:", paste(parm[!want], collapse = ", "), "not found in `object`")
@@ -225,7 +225,7 @@
                           est   = ilink(fit),
                           upper = ilink(fit + (crit * se.fit)))
     } else {
-        Vb <- vcov(m, unconditional = unconditional)
+        Vb <- vcov(object, unconditional = unconditional)
         pred <- predict(object, newdata = newdata, se.fit = TRUE, type = "terms")
         se.fit <- pred$se.fit
     }
