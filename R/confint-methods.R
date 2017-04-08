@@ -147,6 +147,7 @@
 ##' @param nsim integer; the number of simulations used in computing the simultaneous intervals.
 ##' @param shift logical; should the constant term be add to the smooth?
 ##' @param transform logical; should the smooth be evaluated on a transformed scale? For generalised models, this involves applying the inverse of the link function used to fit the model. Alternatively, the name of, or an actual, function can be supplied to transform the smooth and it's confidence interval.
+##' @param unconditional logical; if `TRUE` (and `freq == FALSE`) then the Bayesian smoothing parameter uncertainty corrected covariance matrix is returned, if available.
 ##' @param ... additional arguments for methods
 ##'
 ##' @return a data frame with components:
@@ -178,10 +179,19 @@
 ##' #head(x1.sint)
 `confint.gam` <- function(object, parm, level = 0.95, newdata = NULL,
                           type = c("confidence", "simultaneous"), nsim = 10000,
-                          shift = FALSE, transform = TRUE, ...) {
+                          shift = FALSE, transform = TRUE, unconditional = FALSE,
+                          ...) {
     ## for now, insist on a single term
     if (missing(parm)) {
         stop("Currently 'parm' must be specified for 'confint.gam()'")
+    } else {
+        terms <- object$terms
+        want <- parm %in% terms
+        if (any(!want)) {
+            msg <- paste("Terms:", paste(parm[!want], collapse = ", "), "not found in `object`")
+            stop(msg)
+        }
+        parm[want]
     }
 
     ## try to recover newdata from model if not supplied
@@ -215,7 +225,9 @@
                           est   = ilink(fit),
                           upper = ilink(fit + (crit * se.fit)))
     } else {
-
+        Vb <- vcov(m, unconditional = unconditional)
+        pred <- predict(object, newdata = newdata, se.fit = TRUE, type = "terms")
+        se.fit <- pred$se.fit
     }
 
     ## return
