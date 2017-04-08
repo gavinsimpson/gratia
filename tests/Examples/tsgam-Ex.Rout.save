@@ -1,5 +1,5 @@
 
-R version 3.3.3 Patched (2017-03-06 r72321) -- "Another Canoe"
+R version 3.3.3 Patched (2017-03-15 r72392) -- "Another Canoe"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -76,6 +76,47 @@ Gu & Wahba 4 term additive model
 
 detaching ‘package:mgcv’, ‘package:nlme’
 
+> nameEx("confint.gam")
+> ### * confint.gam
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: confint.gam
+> ### Title: Point-wise and simultaneous confidence intervals for smooths
+> ### Aliases: confint.gam
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.8-17. For overview type 'help("mgcv-package")'.
+> set.seed(2)
+> dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+Gu & Wahba 4 term additive model
+> mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> ## point-wise interval
+> ci <- confint(mod, parm = "x1", type = "confidence")
+> head(ci)
+  term          x      lower        est      upper
+1   x1 0.61714216 -0.1167448  0.1497709  0.4162866
+2   x1 0.56906413 -0.4231273 -0.1585083  0.1061107
+3   x1 0.15397045 -2.0298892 -1.7097611 -1.3896329
+4   x1 0.03483322 -2.3999003 -1.8960482 -1.3921961
+5   x1 0.99795346  2.6856714  3.2762346  3.8667978
+6   x1 0.83557368  1.5276652  1.8029003  2.0781354
+> 
+> ## simultaneous interval for smooth term of x1
+> #set.seed(42)
+> #x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
+> #head(x1.sint)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
 > nameEx("fderiv")
 > ### * fderiv
 > 
@@ -103,11 +144,58 @@ Gu & Wahba 4 term additive model
 > 
 > 
 > 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
+> nameEx("simulate")
+> ### * simulate
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: simulate.gam
+> ### Title: Simulate from the posterior distribution of a GAM
+> ### Aliases: simulate.gam simulate.gamm
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.8-17. For overview type 'help("mgcv-package")'.
+> set.seed(2)
+> dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+Gu & Wahba 4 term additive model
+> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> sims <- simulate(m1, nsim = 5, seed = 42)
+> head(sims)
+       [,1]      [,2]      [,3]      [,4]      [,5]
+1  8.828755  8.679923  8.611305  8.935278  8.534200
+2  7.887799  7.759394  7.259533  7.728766  7.087292
+3  3.661001  3.296680  3.111549  4.011219  3.631686
+4 10.776641 11.015563 10.507717 11.401415 11.379825
+5 13.503265 13.911328 14.592527 13.857895 13.984892
+6  5.420158  6.389244  6.281523  5.897233  6.274121
+> 
+> m2 <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> sims <- simulate(m2, nsim = 5, seed = 42)
+> head(sims)
+       [,1]      [,2]      [,3]      [,4]      [,5]
+1  9.193509  8.985326  8.736781  8.756294  8.657009
+2  7.872967  8.045755  8.152656  7.541446  7.162234
+3  3.034404  2.541947  3.972337  3.144517  3.573273
+4 10.763275 11.052720 11.787978 10.467712 10.804028
+5 14.275839 14.270367 13.750903 14.626213 13.947849
+6  6.412593  5.661864  6.043120  5.667794  6.153577
+> 
+> 
+> 
 > ### * <FOOTER>
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  2.604 0.027 2.642 0 0 
+Time elapsed:  3.81 0.034 3.861 0 0 
 > grDevices::dev.off()
 null device 
           1 
