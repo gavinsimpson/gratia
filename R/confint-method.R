@@ -134,3 +134,90 @@
     rownames(res) <- NULL                              # tidy up
     res                                                # return
 }
+
+##' Point-wise and simultaneous confidence intervals for smooths
+##'
+##' Calculates point-wise confidence or simultaneous intervals for the smooth terms of a fitted GAM.
+##'
+##' @param object an object of class `"gam"` or `"gamm"`.
+##' @param parm which parameters (smooth terms) are to be given intervals as a vector of terms. If missing, all parameters are considered, although this is not currently implemented.
+##' @param level numeric, `0 < level < 1`; the confidence level of the point-wise or simultaneous interval. The default is `0.95` for a 95\% interval.
+##' @param newdata data frame; containing new values of the covariates used in the model fit. The selected smooth(s) wil be evaluated at the supplied values.
+##' @param type character; the type of interval to compute. One of `"confidence"` for point-wise intervals, or `"simultaneous"` for simultaneous intervals.
+##' @param nsim integer; the number of simulations used in computing the simultaneous intervals.
+##' @param shift logical; should the constant term be add to the smooth?
+##' @param transform logical; should the smooth be evaluated on a transformed scale? For generalised models, this involves applying the inverse of the link function used to fit the model. Alternatively, the name of, or an actual, function can be supplied to transform the smooth and it's confidence interval.
+##' @param ... additional arguments for methods
+##'
+##' @return a data frame with components:
+##' 1. `term`; factor indicating to which term each row relates,
+##' 2. `parm`; the vector of values at which the smooth was evaluated,
+##' 3. `lower`; lower limit of the confidence or simultaneous interval,
+##' 4. `est`; estimated value of the smooth
+##' 5. `upper`; upper limit of the confidence or simultaneous interval.
+##'
+##' @author Gavin L. Simpson
+##'
+##' @importFrom stats family
+##'
+##' @export
+##'
+##' @examples
+##' library("mgcv")
+##' set.seed(2)
+##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+##'
+##' ## point-wise interval
+##' ci <- confint(mod, parm = "x1", type = "confidence")
+##' head(ci)
+##'
+##' ## simultaneous interval for smooth term of x1
+##' #set.seed(42)
+##' #x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
+##' #head(x1.sint)
+`confint.gam` <- function(object, parm, level = 0.95, newdata = NULL,
+                          type = c("confidence", "simultaneous"), nsim = 10000,
+                          shift = FALSE, transform = TRUE, ...) {
+    ## for now, insist on a single term
+    if (missing(parm)) {
+        stop("Currently 'parm' must be specified for 'confint.gam()'")
+    }
+
+    ## try to recover newdata from model if not supplied
+    if (missing(newdata) || is.null(newdata)) {
+        newdata <- object$model
+    }
+
+    type <- match.arg(type)
+
+    ilink <- if (isTRUE(transform)) {
+        family(object)$linkinv
+    } else if (!is.null(transform)) {
+        match.fun(transform)
+    } else {
+        function(eta) { eta }
+    }
+
+    if (isTRUE(type == "confidence")) {
+        p <- predict(object, newdata = newdata, se.fit = TRUE, type = "terms")
+        const <- attr(p, "constant")
+        smooth.parm <- paste0("s(", parm, ")")
+        fit <- p[["fit"]][, smooth.parm]
+        if (shift) {
+            fit + const
+        }
+        se.fit <- p[["se.fit"]][, smooth.parm]
+        crit <- qnorm(1 - ((1 - level) / 2))
+        out <- data.frame(term  = parm,
+                          x     = newdata[, parm],
+                          lower = ilink(fit - (crit * se.fit)),
+                          est   = ilink(fit),
+                          upper = ilink(fit + (crit * se.fit)))
+    } else {
+
+    }
+
+    ## return
+    out
+}
