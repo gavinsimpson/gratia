@@ -4,9 +4,9 @@
 \alias{confint.gam}
 \title{Point-wise and simultaneous confidence intervals for smooths}
 \usage{
-\method{confint}{gam}(object, parm, level = 0.95, newdata = NULL,
+\method{confint}{gam}(object, parm, level = 0.95, newdata = NULL, n = 200,
   type = c("confidence", "simultaneous"), nsim = 10000, shift = FALSE,
-  transform = TRUE, unconditional = FALSE, ...)
+  transform = FALSE, unconditional = FALSE, ...)
 }
 \arguments{
 \item{object}{an object of class \code{"gam"} or \code{"gamm"}.}
@@ -16,6 +16,8 @@
 \item{level}{numeric, \code{0 < level < 1}; the confidence level of the point-wise or simultaneous interval. The default is \code{0.95} for a 95\% interval.}
 
 \item{newdata}{data frame; containing new values of the covariates used in the model fit. The selected smooth(s) wil be evaluated at the supplied values.}
+
+\item{n}{numeric; the number of points to evaluate smooths at.}
 
 \item{type}{character; the type of interval to compute. One of \code{"confidence"} for point-wise intervals, or \code{"simultaneous"} for simultaneous intervals.}
 

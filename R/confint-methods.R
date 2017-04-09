@@ -143,6 +143,7 @@
 ##' @param parm which parameters (smooth terms) are to be given intervals as a vector of terms. If missing, all parameters are considered, although this is not currently implemented.
 ##' @param level numeric, `0 < level < 1`; the confidence level of the point-wise or simultaneous interval. The default is `0.95` for a 95\% interval.
 ##' @param newdata data frame; containing new values of the covariates used in the model fit. The selected smooth(s) wil be evaluated at the supplied values.
+##' @param n numeric; the number of points to evaluate smooths at.
 ##' @param type character; the type of interval to compute. One of `"confidence"` for point-wise intervals, or `"simultaneous"` for simultaneous intervals.
 ##' @param nsim integer; the number of simulations used in computing the simultaneous intervals.
 ##' @param shift logical; should the constant term be add to the smooth?
@@ -160,6 +161,7 @@
 ##' @author Gavin L. Simpson
 ##'
 ##' @importFrom stats family
+##' @importFrom mgcv PredictMat
 ##'
 ##' @export
 ##'
@@ -177,22 +179,12 @@
 ##' #set.seed(42)
 ##' #x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
 ##' #head(x1.sint)
-`confint.gam` <- function(object, parm, level = 0.95, newdata = NULL,
+`confint.gam` <- function(object, parm, level = 0.95, newdata = NULL, n = 200,
                           type = c("confidence", "simultaneous"), nsim = 10000,
-                          shift = FALSE, transform = TRUE, unconditional = FALSE,
+                          shift = FALSE, transform = FALSE, unconditional = FALSE,
                           ...) {
-    ## for now, insist on a single term
-    if (missing(parm)) {
-        stop("Currently 'parm' must be specified for 'confint.gam()'")
-    } else {
-        terms <- unlist(smooth_terms(object))
-        want <- parm %in% terms
-        if (any(!want)) {
-            msg <- paste("Terms:", paste(parm[!want], collapse = ", "), "not found in `object`")
-            stop(msg)
-        }
-        parm[want]
-    }
+
+    parm <- select_terms(object, parm)
 
     ## try to recover newdata from model if not supplied
     if (missing(newdata) || is.null(newdata)) {
@@ -201,35 +193,46 @@
 
     type <- match.arg(type)
 
-    ilink <- if (isTRUE(transform)) {
-        family(object)$linkinv
-    } else if (!is.null(transform)) {
+    ilink <- if (is.logical(transform)) { # transform is logical
+                 if (isTRUE(transform)) { # transform == TRUE
+                     family(object)$linkinv
+                 } else {               # transform == FALSE
+                     function(eta) { eta }
+                 }
+    } else if (!is.null(transform)) {   # transform is a fun
         match.fun(transform)
-    } else {
-        function(eta) { eta }
     }
+
+    out <- vector("list", length = length(parm))
+    for (i in seq_along(out)) {
+        out[[i]] <- evaluate_smooth(object, parm[i], n = n)
+    }
+
+    const <- coef(object)
+    nms <- names(const)
+    test <- grep("Intercept", nms)
+    const <- ifelse(length(test) == 0L, 0, const[test])
 
     if (isTRUE(type == "confidence")) {
-        p <- predict(object, newdata = newdata, se.fit = TRUE, type = "terms")
-        const <- attr(p, "constant")
-        smooth.parm <- paste0("s(", parm, ")")
-        fit <- p[["fit"]][, smooth.parm]
-        if (shift) {
-            fit + const
-        }
-        se.fit <- p[["se.fit"]][, smooth.parm]
-        crit <- qnorm(1 - ((1 - level) / 2))
-        out <- data.frame(term  = parm,
-                          x     = newdata[, parm],
-                          lower = ilink(fit - (crit * se.fit)),
-                          est   = ilink(fit),
-                          upper = ilink(fit + (crit * se.fit)))
+        crit <- rep(qnorm(1 - ((1 - level) / 2)), length(parm))
     } else {
-        Vb <- vcov(object, unconditional = unconditional)
-        pred <- predict(object, newdata = newdata, se.fit = TRUE, type = "terms")
-        se.fit <- pred$se.fit
+        stop("simultaneous intervals not yet implemented")
+        ## Vb <- vcov(object, unconditional = unconditional)
+        ## pred <- predict(object, newdata = newdata, se.fit = TRUE, type = "terms")
+        ## se.fit <- pred$se.fit
+        ## BUdiff <- rmvn(N, mu = rep(0, nrow(Vb)), sig = Vb)
+        ## Cg <- predict(m, newd, type = "lpmatrix")
+        ## simDev <- Cg %*% t(BUdiff)
+        ## absDev <- abs(sweep(simDev, 1, se.fit, FUN = "/"))
+        ## masd <- apply(absDev, 2L, max)
+        ## crit <- quantile(masd, prob = 0.95, type = 8)
     }
 
-    ## return
-    out
+    for (i in seq_along(out)) {
+        out[[i]] <- cbind(out[[i]],
+                          lower = out[[i]][, "est"] - (crit * out[[i]][, "se"]),
+                          upper = out[[i]][, "est"] + (crit * out[[i]][, "se"]))
+    }
+    out <- do.call("rbind", out)
+    out                                 # return
 }
