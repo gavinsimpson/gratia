@@ -1,5 +1,5 @@
 ^\.travis\.yml$
-LICENSE
+^LICENSE\.md$
 \.Rproj$
 ^\.Rproj\.user$
 Makefile
