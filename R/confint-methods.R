@@ -232,10 +232,12 @@
 
     for (i in seq_along(out)) { ## adding const is not efficient here
         out[[i]] <- cbind(out[[i]],
-                          lower = (out[[i]][, "est"] + const) - (crit * out[[i]][, "se"]),
-                          upper = (out[[i]][, "est"] + const) + (crit * out[[i]][, "se"]))
+                          lower = out[[i]][, "est"] - (crit * out[[i]][, "se"]),
+                          upper = out[[i]][, "est"] + (crit * out[[i]][, "se"]))
     }
     out <- do.call("rbind", out)
+    out <- transform(out, est = est + const, lower = lower + const,
+                     upper = upper + const)
     out                                 # return
 }
 
