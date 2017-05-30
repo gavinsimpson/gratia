@@ -2,11 +2,14 @@
 % Please edit documentation in R/confint-methods.R
 \name{confint.gam}
 \alias{confint.gam}
+\alias{confint.gamm}
 \title{Point-wise and simultaneous confidence intervals for smooths}
 \usage{
 \method{confint}{gam}(object, parm, level = 0.95, newdata = NULL, n = 200,
   type = c("confidence", "simultaneous"), nsim = 10000, shift = FALSE,
   transform = FALSE, unconditional = FALSE, ...)
+
+\method{confint}{gamm}(object, ...)
 }
 \arguments{
 \item{object}{an object of class \code{"gam"} or \code{"gamm"}.}

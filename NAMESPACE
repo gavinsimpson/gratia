@@ -2,6 +2,7 @@
 
 S3method(confint,fderiv)
 S3method(confint,gam)
+S3method(confint,gamm)
 S3method(datagen,gam)
 S3method(datagen,gamm)
 S3method(datagen,mgcv.smooth)

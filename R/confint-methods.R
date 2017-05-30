@@ -162,6 +162,8 @@
 ##'
 ##' @importFrom stats family
 ##' @importFrom mgcv PredictMat
+##' @importFrom stats quantile vcov
+##' @importFrom MASS mvrnorm
 ##'
 ##' @export
 ##'
@@ -216,23 +218,30 @@
     if (isTRUE(type == "confidence")) {
         crit <- rep(qnorm(1 - ((1 - level) / 2)), length(parm))
     } else {
-        stop("simultaneous intervals not yet implemented")
-        ## Vb <- vcov(object, unconditional = unconditional)
-        ## pred <- predict(object, newdata = newdata, se.fit = TRUE, type = "terms")
-        ## se.fit <- pred$se.fit
-        ## BUdiff <- rmvn(N, mu = rep(0, nrow(Vb)), sig = Vb)
-        ## Cg <- predict(m, newd, type = "lpmatrix")
-        ## simDev <- Cg %*% t(BUdiff)
-        ## absDev <- abs(sweep(simDev, 1, se.fit, FUN = "/"))
-        ## masd <- apply(absDev, 2L, max)
-        ## crit <- quantile(masd, prob = 0.95, type = 8)
+        Vb <- vcov(object, unconditional = unconditional)
+        pred <- predict(object, newdata = newdata, se.fit = TRUE)
+        se.fit <- pred$se.fit
+        ## simulate un-biased deviations given bayesian covar matrix
+        buDiff <- MASS::mvrnorm(n = nsim, mu = rep(0, nrow(Vb)), Sigma = Vb)
+        Cg <- predict(object, newdata = newdata, type = "lpmatrix")
+        simDev <- Cg %*% t(buDiff)
+        absDev <- abs(sweep(simDev, 1L, se.fit, FUN = "/"))
+        masd <- apply(absDev, 2L, max)
+        crit <- quantile(masd, probs = level, type = 8)
     }
 
-    for (i in seq_along(out)) {
+    for (i in seq_along(out)) { ## adding const is not efficient here
         out[[i]] <- cbind(out[[i]],
-                          lower = out[[i]][, "est"] - (crit * out[[i]][, "se"]),
-                          upper = out[[i]][, "est"] + (crit * out[[i]][, "se"]))
+                          lower = (out[[i]][, "est"] + const) - (crit * out[[i]][, "se"]),
+                          upper = (out[[i]][, "est"] + const) + (crit * out[[i]][, "se"]))
     }
     out <- do.call("rbind", out)
     out                                 # return
+}
+
+##' @rdname confint.gam
+##'
+##' @export
+`confint.gamm` <- function(object, ...) {
+    confint(object$gam, ...)
 }
