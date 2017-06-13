@@ -68,3 +68,35 @@
     simulate(object$gam, nsim = nsim, seed = seed, newdata = newdata,
              freq = freq, unconditional = unconditional, ...)
 }
+
+##' @rdname simulate
+##'
+##' @export
+##'
+##' @param parametrized logical; use parametrized coefficients and covariance matrix, which respect the linear inequality constraints of the model.
+`simulate.scam` <- function(object, nsim = 1, seed = NULL, newdata = NULL,
+                           freq = FALSE, parametrized = TRUE, ...) {
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+        runif(1)
+    }
+    if (is.null(seed)) {
+        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+    } else {
+        R.seed <- get(".Random.seed", envir = .GlobalEnv)
+        set.seed(seed)
+        RNGstate <- structure(seed, kind = as.list(RNGkind()))
+        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+    }
+
+    if (missing(newdata) || is.null(newdata)) {
+        newdata <- object$model
+    }
+
+    V <- vcov(object, freq = freq, parametrized = parametrized)
+    B <- coef(object, parametrized = TRUE) # object$coefficients.t
+    Rbeta <- MASS::mvrnorm(n = nsim, mu = B, Sigma = V)
+    Xp <- predict(object, newdata = newdata, type = "lpmatrix")
+    sims <- Xp %*% t(Rbeta)
+    attr(sims, "seed") <- RNGstate
+    sims
+}

@@ -3,6 +3,7 @@
 \name{simulate.gam}
 \alias{simulate.gam}
 \alias{simulate.gamm}
+\alias{simulate.scam}
 \title{Simulate from the posterior distribution of a GAM}
 \usage{
 \method{simulate}{gam}(object, nsim = 1, seed = NULL, newdata = NULL,
@@ -10,6 +11,9 @@
 
 \method{simulate}{gamm}(object, nsim = 1, seed = NULL, newdata = NULL,
   freq = FALSE, unconditional = FALSE, ...)
+
+\method{simulate}{scam}(object, nsim = 1, seed = NULL, newdata = NULL,
+  freq = FALSE, parametrized = TRUE, ...)
 }
 \arguments{
 \item{object}{a fitted GAM, typically the result of a call to \code{gam()} or \code{gamm()}.}
@@ -25,6 +29,8 @@
 \item{unconditional}{logical; if \code{TRUE} (and \code{freq == FALSE}) then the Bayesian smoothing parameter uncertainty corrected covariance matrix is returned, if available.}
 
 \item{...}{arguments passed to methods}
+
+\item{parametrized}{logical; use parametrized coefficients and covariance matrix, which respect the linear inequality constraints of the model.}
 }
 \value{
 (Currently) A matrix with \code{nsim} columns.
