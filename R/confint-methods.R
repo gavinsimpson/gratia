@@ -243,6 +243,8 @@
 
 ##' @rdname confint.gam
 ##'
+##' @importFrom stats confint
+##'
 ##' @export
 `confint.gamm` <- function(object, ...) {
     confint(object$gam, ...)
