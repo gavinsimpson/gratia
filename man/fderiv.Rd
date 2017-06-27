@@ -45,6 +45,17 @@ fd <- fderiv(mod)
 
 ## ...and a selected smooth
 fd2 <- fderiv(mod, term = "x1")
+
+## Models with factors
+set.seed(2)
+dat <- gamSim(4, n = 400, dist = "normal", scale = 2)
+mod <- gam(y ~ s(x0) + s(x1) + fac, data = dat, method = "REML")
+
+## first derivatives of all smooths...
+fd <- fderiv(mod)
+
+## ...and a selected smooth
+fd2 <- fderiv(mod, term = "x1")
 }
 \author{
 Gavin L. Simpson

@@ -37,48 +37,103 @@
 ##'
 ##' ## ...and a selected smooth
 ##' fd2 <- fderiv(mod, term = "x1")
+##'
+##' ## Models with factors
+##' set.seed(2)
+##' dat <- gamSim(4, n = 400, dist = "normal", scale = 2)
+##' mod <- gam(y ~ s(x0) + s(x1) + fac, data = dat, method = "REML")
+##'
+##' ## first derivatives of all smooths...
+##' fd <- fderiv(mod)
+##'
+##' ## ...and a selected smooth
+##' fd2 <- fderiv(mod, term = "x1")
 `fderiv.gam` <- function(model, newdata, term, n = 200, eps = 1e-7,
                          unconditional = FALSE, ...) {
-    m.terms <- attr(terms(model), "term.labels")
-    if(missing(newdata)) {
-        newdata <- sapply(model.frame(model)[, m.terms, drop = FALSE],
-                       function(x) seq(min(x), max(x), length = n))
-        names(newdata) <- m.terms
+    ## any factors used in the model?
+    facs <- attr(model$terms, "dataClasses") == "factor"
+
+    ## where to predict/evaluate derivatives at
+    if (missing(newdata)) {
+        ## all model terms
+        m.terms <- attr(model$terms, "term.labels")
+        ## model.frame used to fit model
+        mf <- model.frame(model)
+
+        ## remove response
+        respvar <- attr(model$terms, "response")
+        if (!identical(respvar, 0)) {
+            mf <- mf[, -respvar, drop = FALSE]
+            ff <- facs[-respvar]
+        }
+
+        if (any(ff)) {
+            ## need to supply something for each factor
+            rep_first_factor_value <- function(f, n) {
+                stopifnot(is.factor(f))
+                levs <- levels(f)
+                factor(rep(f[1], length.out = n), levels = levs)
+            }
+            f.mf <- sapply(mf[, ff, drop = FALSE],
+                           rep_first_factor_value, n = n)
+
+            ## remove factors
+            mf <- mf[, !ff, drop = FALSE]
+        }
+
+        ## generate newdata at `n` locations
+        newdata <- sapply(mf,
+                          function(x) seq(min(x), max(x), length = n))
+
+        if (any(ff)) {
+            newdata <- cbind(mf, f.mf)
+        }
+        colnames(newdata) <- c(m.terms[!ff], m.terms[ff])
     }
-    X0 <- predict(model, data.frame(newdata), type = "lpmatrix")
-    X1 <- predict(model, data.frame(newdata + eps), type = "lpmatrix")
+
+    ## re-arrange
+    newdata <- newdata[, m.terms, drop = FALSE]
+
+    ## copy into newdata2
+    newdata2 <- newdata
+
+    if (any(ff)) {
+        newdata2[, !ff] <- newdata2[, !ff, drop = FALSE] + eps
+    } else {
+        newdata2 <- newdata2 + eps
+    }
+
+    ## compute Xp for evaluation points
+    X0 <- predict(model, as.data.frame(newdata), type = "lpmatrix")
+    X1 <- predict(model, as.data.frame(newdata2), type = "lpmatrix")
     Xp <- (X1 - X0) / eps
     Xp.r <- NROW(Xp)
     Xp.c <- NCOL(Xp)
-    ## dims of bs
-    bs.dims <- sapply(model$smooth, "[[", "bs.dim") - 1
+
     ## number of smooth terms
-    t.labs <- attr(model$terms, "term.labels")
+    ## t.labs <- attr(model$terms, "term.labels")
+
     ## match the term with the the terms in the model
     if(!missing(term)) {
-        want <- grep(term, t.labs)
-        if(!identical(length(want), length(term))) {
-            stop("One or more 'term's not found in model!")
-        }
-        t.labs <- t.labs[want]
+        m.terms <- select_terms(model, term)
     }
-    nt <- length(t.labs)
+    nt <- length(m.terms)
     ## list to hold the derivatives
     lD <- vector(mode = "list", length = nt)
-    names(lD) <- t.labs
+    names(lD) <- m.terms
     ## Bayesian covar
     Vb <- vcov(model, unconditional = unconditional)
     ## loop over terms, selecting the columns of Xp for the ith
     ## smooth
     for(i in seq_len(nt)) {
         Xi <- Xp * 0 # create new matrix with dim(Xp) but filled with 0
-        want <- grep(t.labs[i], colnames(X1)) # which columns in Lp are for current term
+        want <- grep(m.terms[i], colnames(X1)) # which columns in Lp are for current term
         Xi[, want] <- Xp[, want]              # fill in 0-matrix with Lp data
         df <- Xi %*% coef(model)              # predict derive given model coefs
         df.sd <- rowSums(Xi %*% Vb * Xi)^.5   # standard error of predictions
         lD[[i]] <- list(deriv = df, se.deriv = df.sd, Xi = Xi)
     }
-    out <- structure(list(derivatives = lD, terms = t.labs, model = model,
+    out <- structure(list(derivatives = lD, terms = m.terms, model = model,
                           eps = eps, eval = newdata, unconditional = unconditional),
                      class = "fderiv")
     out
