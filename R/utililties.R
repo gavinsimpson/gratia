@@ -69,3 +69,19 @@
     terms <- unlist(smooth_terms(object))
     which(terms %in% term)
 }
+
+`get_vcov` <- function(object, unconditional = FALSE, frequentist = FALSE) {
+    V <- if (frequentist) {
+        object$Ve
+    } else if (unconditional) {
+        if (is.null(object$Vc)) {
+            warning("Covariance corrected for smoothness uncertainty not available.\nUsing uncorrected covariance.")
+            object$Vp     # Bayesian vcov of parameters
+        } else {
+            object$Vc     # Corrected Bayesian vcov of parameters
+        }
+    } else {
+        object$Vp         # Bayesian vcov of parameters
+    }
+    V
+}
