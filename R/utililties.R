@@ -70,7 +70,8 @@
     which(terms %in% term)
 }
 
-`get_vcov` <- function(object, unconditional = FALSE, frequentist = FALSE) {
+`get_vcov` <- function(object, unconditional = FALSE, frequentist = FALSE,
+                       term = NULL) {
     V <- if (frequentist) {
         object$Ve
     } else if (unconditional) {
@@ -82,6 +83,21 @@
         }
     } else {
         object$Vp         # Bayesian vcov of parameters
+    }
+
+    ## extract selected term if requested
+    if (!is.null(term)) {
+        ## to keep this simple, only evaluate a single term
+        if (length(term) > 1L) {
+            message("Supplied more than 1 'term'; using only the first")
+            term <- term[1L]
+        }
+        term <- select_terms(object, term)
+        smooth <- get_smooth(object, term)
+        start <- smooth$first.para
+        end <- smooth$last.para
+        para.seq <- start:end
+        V <- V[para.seq, para.seq, drop = FALSE]
     }
     V
 }
