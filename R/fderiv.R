@@ -54,7 +54,7 @@
     m.terms <- attr(model$terms, "term.labels")
 
     ## any factors used in the model?
-    facs <- attr(model$terms, "dataClasses") == "factor"
+    ff <- attr(model$terms, "dataClasses") == "factor"
 
     ## where to predict/evaluate derivatives at
     if (missing(newdata)) {
@@ -65,7 +65,7 @@
         respvar <- attr(model$terms, "response")
         if (!identical(respvar, 0)) {
             mf <- mf[, -respvar, drop = FALSE]
-            ff <- facs[-respvar]
+            ff <- ff[-respvar]
         }
 
         if (any(ff)) {
