@@ -38,10 +38,11 @@
 a data frame with components:
 \enumerate{
 \item \code{term}; factor indicating to which term each row relates,
-\item \code{parm}; the vector of values at which the smooth was evaluated,
+\item \code{x}; the vector of values at which the smooth was evaluated,
 \item \code{lower}; lower limit of the confidence or simultaneous interval,
 \item \code{est}; estimated value of the smooth
-\item \code{upper}; upper limit of the confidence or simultaneous interval.
+\item \code{upper}; upper limit of the confidence or simultaneous interval,
+\item \code{crit}; critical value for the \code{100 * level}% confidence interval.
 }
 }
 \description{
