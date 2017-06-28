@@ -1,6 +1,6 @@
 Package: tsgam
-Version: 0.0-1
-Date: 2017-03-15
+Version: 0.0-2
+Date: 2017-06-27
 Title: Utilities for Working with GAMs Fitted to Time Series
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     email = "ucfagls@gmail.com",
