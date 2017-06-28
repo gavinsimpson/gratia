@@ -50,13 +50,14 @@
 ##' fd2 <- fderiv(mod, term = "x1")
 `fderiv.gam` <- function(model, newdata, term, n = 200, eps = 1e-7,
                          unconditional = FALSE, ...) {
+    ## all model terms
+    m.terms <- attr(model$terms, "term.labels")
+
     ## any factors used in the model?
     facs <- attr(model$terms, "dataClasses") == "factor"
 
     ## where to predict/evaluate derivatives at
     if (missing(newdata)) {
-        ## all model terms
-        m.terms <- attr(model$terms, "term.labels")
         ## model.frame used to fit model
         mf <- model.frame(model)
 
