@@ -4,19 +4,24 @@
 \alias{evaluate_smooth}
 \title{Evaluate a smooth}
 \usage{
-evaluate_smooth(object, term, n = 200, inc.mean = FALSE)
+evaluate_smooth(object, term, n = 200, newdata = NULL,
+  unconditional = FALSE, inc.mean = FALSE)
 }
 \arguments{
-\item{object}{an object of class \code{"gam"} or \code{"gamm"}}
+\item{object}{an object of class \code{"gam"} or \code{"gamm"}.}
 
-\item{term}{character; a single term to evaluate}
+\item{term}{character; a single term to evaluate.}
 
-\item{n}{numeric; the number of points over the range of the covariate at which to evaluate the smooth}
+\item{n}{numeric; the number of points over the range of the covariate at which to evaluate the smooth.}
+
+\item{newdata}{a vector or data frame of points at which to evaluate the smooth.}
+
+\item{unconditional}{logical; should confidence intervals include the uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian covariance matrix will be used.}
 
 \item{inc.mean}{logical; should the uncertainty in the model constant term be included in the standard error of the evaluate values of the smooth? Currently not implemented.}
 }
 \description{
-Evaluate a smooth at a grid of evenly spaced value over the range of the covariate associated with the smooth.
+Evaluate a smooth at a grid of evenly spaced value over the range of the covariate associated with the smooth. Alternatively, a set of points at which the smooth should be evaluated can be supplied.
 }
 \examples{
 library("mgcv")
