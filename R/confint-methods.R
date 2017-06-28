@@ -179,9 +179,9 @@
 ##' head(ci)
 ##'
 ##' ## simultaneous interval for smooth term of x1
-##' #set.seed(42)
-##' #x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
-##' #head(x1.sint)
+##' set.seed(42)
+##' si <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)
+##' head(si)
 `confint.gam` <- function(object, parm, level = 0.95, newdata = NULL, n = 200,
                           type = c("confidence", "simultaneous"), nsim = 10000,
                           shift = FALSE, transform = FALSE, unconditional = FALSE,

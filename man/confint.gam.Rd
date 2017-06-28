@@ -59,9 +59,9 @@ ci <- confint(mod, parm = "x1", type = "confidence")
 head(ci)
 
 ## simultaneous interval for smooth term of x1
-#set.seed(42)
-#x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
-#head(x1.sint)
+set.seed(42)
+si <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)
+head(si)
 }
 \author{
 Gavin L. Simpson
