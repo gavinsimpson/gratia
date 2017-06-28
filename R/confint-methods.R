@@ -153,16 +153,17 @@
 ##'
 ##' @return a data frame with components:
 ##' 1. `term`; factor indicating to which term each row relates,
-##' 2. `parm`; the vector of values at which the smooth was evaluated,
+##' 2. `x`; the vector of values at which the smooth was evaluated,
 ##' 3. `lower`; lower limit of the confidence or simultaneous interval,
 ##' 4. `est`; estimated value of the smooth
-##' 5. `upper`; upper limit of the confidence or simultaneous interval.
+##' 5. `upper`; upper limit of the confidence or simultaneous interval,
+##' 6. `crit`; critical value for the `100 * level`% confidence interval.
 ##'
 ##' @author Gavin L. Simpson
 ##'
 ##' @importFrom stats family
 ##' @importFrom mgcv PredictMat
-##' @importFrom stats quantile vcov
+##' @importFrom stats quantile vcov setNames
 ##' @importFrom MASS mvrnorm
 ##'
 ##' @export
@@ -188,9 +189,9 @@
 
     parm <- select_terms(object, parm)
 
-    ## try to recover newdata from model if not supplied
-    if (missing(newdata) || is.null(newdata)) {
-        newdata <- object$model
+    ## how many data points if newdata supplied
+    if (!is.null(newdata)) {
+        n <- NROW(newdata)
     }
 
     type <- match.arg(type)
@@ -205,9 +206,34 @@
         match.fun(transform)
     }
 
-    out <- vector("list", length = length(parm))
+    out <- vector("list", length = length(parm)) # list for results
+    if (isTRUE(type == "simultaneous")) {
+        ## need VCOV for simultaneous intervals
+        V <- get_vcov(object, unconditional = unconditional)
+        ## simulate un-biased deviations given bayesian covar matrix
+        buDiff <- MASS::mvrnorm(n = nsim, mu = rep(0, nrow(V)), Sigma = V)
+    }
+
     for (i in seq_along(out)) {
-        out[[i]] <- evaluate_smooth(object, parm[i], n = n)
+        out[[i]] <- evaluate_smooth(object, parm[i], n = n, newdata = newdata)
+        crit <- if (isTRUE(type == "confidence")) {
+            qnorm(1 - ((1 - level) / 2))
+        } else {
+            smooth <- get_smooth(object, parm[i])
+            start <- smooth$first.para
+            end <- smooth$last.para
+            para.seq <- start:end
+            newx <- setNames(data.frame(out[[i]][, "x"]), parm[i])
+            Cg <- PredictMat(smooth, newx)
+            simDev <- Cg %*% t(buDiff[, para.seq])
+            absDev <- abs(sweep(simDev, 1L, out[[i]][, "se"], FUN = "/"))
+            masd <- apply(absDev, 2L, max)
+            quantile(masd, probs = level, type = 8)
+        }
+        out[[i]] <- cbind(out[[i]],
+                          lower = out[[i]][, "est"] - (crit * out[[i]][, "se"]),
+                          upper = out[[i]][, "est"] + (crit * out[[i]][, "se"]),
+                          crit  = rep(crit, length.out = nrow(out[[i]])))
     }
 
     const <- coef(object)
@@ -215,29 +241,11 @@
     test <- grep("Intercept", nms)
     const <- ifelse(length(test) == 0L, 0, const[test])
 
-    if (isTRUE(type == "confidence")) {
-        crit <- rep(qnorm(1 - ((1 - level) / 2)), length(parm))
-    } else {
-        Vb <- vcov(object, unconditional = unconditional)
-        pred <- predict(object, newdata = newdata, se.fit = TRUE)
-        se.fit <- pred$se.fit
-        ## simulate un-biased deviations given bayesian covar matrix
-        buDiff <- MASS::mvrnorm(n = nsim, mu = rep(0, nrow(Vb)), Sigma = Vb)
-        Cg <- predict(object, newdata = newdata, type = "lpmatrix")
-        simDev <- Cg %*% t(buDiff)
-        absDev <- abs(sweep(simDev, 1L, se.fit, FUN = "/"))
-        masd <- apply(absDev, 2L, max)
-        crit <- quantile(masd, probs = level, type = 8)
-    }
-
-    for (i in seq_along(out)) { ## adding const is not efficient here
-        out[[i]] <- cbind(out[[i]],
-                          lower = out[[i]][, "est"] - (crit * out[[i]][, "se"]),
-                          upper = out[[i]][, "est"] + (crit * out[[i]][, "se"]))
-    }
+    ## simplify to a data frame for return
     out <- do.call("rbind", out)
-    out <- transform(out, est = est + const, lower = lower + const,
-                     upper = upper + const)
+    out[, "est"]   <- out[, "est"] + const
+    out[, "lower"] <- out[, "lower"] + const
+    out[, "upper"] <- out[, "upper"] + const
     out                                 # return
 }
 
