@@ -12,7 +12,7 @@ test_that("fderiv() can create newdata with factors in model", {
     dat <- gamSim(4, n = 401, dist = "normal", scale = 2)
     mod <- gam(y ~ s(x0) + s(x1) + fac, data = dat, method = "REML")
     fd <- fderiv(mod)                   # shouldn't thrown an error
-    expect_is(fd, "fderiv")
+    expect_s3_class(fd, "fderiv")
 })
 
 test_that("fderiv() can handle factors in user-supplied newdata", {
@@ -21,5 +21,5 @@ test_that("fderiv() can handle factors in user-supplied newdata", {
     mod <- gam(y ~ s(x0) + s(x1) + fac, data = dat, method = "REML")
     newd <- dat[1,]
     fd <- fderiv(mod, newdata = newd)   # shouldn't thrown an error
-    expect_is(fd, "fderiv")
+    expect_s3_class(fd, "fderiv")
 })
