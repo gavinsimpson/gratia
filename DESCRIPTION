@@ -8,6 +8,8 @@ Authors@R: c(person(given = "Gavin L.", family = "Simpson",
 Maintainer: Gavin L. Simpson <ucfagls@gmail.com>
 Imports:
     mgcv, MASS, stats
+Suggests:
+    testthat
 Description: Utility functions for fitting, testing, working with, and evaluating time series models using generalized additive models.
 License: MIT + file LICENSE
 URL: https://github.com/gavinsimpson/tsgam
