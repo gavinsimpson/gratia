@@ -49,13 +49,14 @@
     if (d == 1L) {                      # 1-d smooths
         xvals <- data[[term]]
         newvals <- seq(min(xvals), max(xvals), length.out = n)
-        out <- data.frame(term = rep(term, n), x = newvals)
+        out <- data.frame(term = rep(smooth_label(x), n), x = newvals)
     } else {                            # 2-d smooths
         xvals <- data[[term[1]]]
         zvals <- data[[term[2]]]
         newx <- seq(min(xvals), max(xvals), length.out = n)
         newz <- seq(min(zvals), max(zvals), length.out = n)
-        out <- setNames(expand.grid(x = newx, z = newz), term)
+        out <- expand.grid(x1 = newx, x2 = newz)
+        out <- cbind(smooth = rep(smooth_label(x), n^2), out)
     }
 
     ## return
