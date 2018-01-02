@@ -75,19 +75,21 @@
                 levs <- levels(f)
                 factor(rep(f[1], length.out = n), levels = levs)
             }
-            f.mf <- sapply(mf[, ff, drop = FALSE],
+            f.mf <- lapply(mf[, ff, drop = FALSE],
                            rep_first_factor_value, n = n)
+            f.mf <- do.call("cbind.data.frame", f.mf)
 
             ## remove factors
             mf <- mf[, !ff, drop = FALSE]
         }
 
         ## generate newdata at `n` locations
-        newdata <- sapply(mf,
+        newdata <- lapply(mf,
                           function(x) seq(min(x), max(x), length = n))
+        newdata <- do.call("data.frame", newdata)
 
         if (any(ff)) {
-            newdata <- cbind(mf, f.mf)
+            newdata <- cbind(newdata, f.mf)
         }
         colnames(newdata) <- c(m.terms[!ff], m.terms[ff])
     }
