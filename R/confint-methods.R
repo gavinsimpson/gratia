@@ -51,6 +51,7 @@
         }
         parm[want]
     }
+    ## parm <- add_s(parm)
 
     ## level should be length 1, numeric and 0 < level < 1
     if ((ll <- length(level)) > 1L) {
@@ -97,7 +98,7 @@
     }
 
     ## bayesian covar matrix, possibly accounting for estimating smooth pars
-    Vb <- vcov(x$model, unconditional = x$unconditional)
+    Vb <- vcov(x[["model"]], unconditional = x$unconditional)
     ## simulate un-biased deviations given bayesian covar matrix
     buDiff <- MASS::mvrnorm(n = nsim, mu = rep(0, nrow(Vb)), Sigma = Vb)
     ## apply wrapper to compute simultaneous interval critical value and
@@ -186,8 +187,8 @@
                           type = c("confidence", "simultaneous"), nsim = 10000,
                           shift = FALSE, transform = FALSE, unconditional = FALSE,
                           ...) {
-
-    parm <- select_terms(object, parm)
+    parm <- add_s(parm)
+    parm <- select_smooth(object, parm) # select_terms(object, parm)
 
     ## how many data points if newdata supplied
     if (!is.null(newdata)) {
@@ -223,7 +224,7 @@
             start <- smooth$first.para
             end <- smooth$last.para
             para.seq <- start:end
-            newx <- setNames(data.frame(out[[i]][, "x"]), parm[i])
+            newx <- setNames(data.frame(out[[i]][, "x"]), smooth_variable(smooth))
             Cg <- PredictMat(smooth, newx)
             simDev <- Cg %*% t(buDiff[, para.seq])
             absDev <- abs(sweep(simDev, 1L, out[[i]][, "se"], FUN = "/"))
@@ -255,5 +256,5 @@
 ##'
 ##' @export
 `confint.gamm` <- function(object, ...) {
-    confint(object$gam, ...)
+    confint(object[["gam"]], ...)
 }

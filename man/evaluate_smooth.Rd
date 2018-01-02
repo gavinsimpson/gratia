@@ -4,13 +4,13 @@
 \alias{evaluate_smooth}
 \title{Evaluate a smooth}
 \usage{
-evaluate_smooth(object, term, n = 200, newdata = NULL,
+evaluate_smooth(object, smooth, n = 200, newdata = NULL,
   unconditional = FALSE, inc.mean = FALSE)
 }
 \arguments{
 \item{object}{an object of class \code{"gam"} or \code{"gamm"}.}
 
-\item{term}{character; a single term to evaluate.}
+\item{smooth}{character; a single smooth to evaluate.}
 
 \item{n}{numeric; the number of points over the range of the covariate at which to evaluate the smooth.}
 
@@ -29,5 +29,5 @@ set.seed(2)
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
-head(evaluate_smooth(mod, "x1"))
+head(evaluate_smooth(mod, "s(x1)"))
 }

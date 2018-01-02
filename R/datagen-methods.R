@@ -51,12 +51,12 @@
 ##' @export
 ##' @rdname datagen
 `datagen.gam` <- function(x, n = 200, ...) {
-    out <- lapply(x$smooth, datagen, n = n, data = x$model)
+    out <- lapply(x[["smooth"]], datagen, n = n, data = x[["model"]])
     do.call("rbind", out)
 }
 
 ##' @export
 ##' @rdname datagen
 `datagen.gamm` <- function(x, ...) {
-    datagen(x$gam)
+    datagen(x[["gam"]])
 }
