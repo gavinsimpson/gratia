@@ -15,25 +15,35 @@
 ##'
 ##' @examples
 ##' library("mgcv")
+##'
+##' ## 1d example
 ##' set.seed(2)
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 ##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##' df <- datagen(m1)
 ##' head(df)
 ##'
+##' ## 2d example
+##' dat <- gamSim(2, n = 400, dist = "normal", scale = 2)
+##' m2 <- gam(y ~ s(x, z), data = dat$data, method = "REML")
+##' df <- datagen(m2)
+##' head(df)
+##' ## alternative showing using the mgcv.smooth method for a single smooth
+##' df2 <- datagen(m2[["smooth"]][[1L]], data = dat$data)
+##' head(df2)
 `datagen` <- function(x, ...) {
     UseMethod("datagen")
 }
 
 ##' @export
 ##' @rdname datagen
-`datagen.mgcv.smooth` <- function(x, n = 200, data, ...) {
-    d <- x$dim          # how many dimensions in smooth
-    term <- smooth_terms(x)      # what term are we dealing with
+`datagen.mgcv.smooth` <- function(x, n = 100, data, ...) {
+    d <- smooth_dim(x)                 # how many dimensions in smooth
+    term <- smooth_terms(x)            # what term are we dealing with
 
     ## some smooths can't be plotted, esp n-d ones where n > 2
-    if (!x$plot.me || d > 2) {
-        out <- data.frame()             # or should we throw error
+    if (!x$plot.me || d > 2L) {
+        out <- data.frame()  # FIXME: or should we throw error/message
     }
 
     if (d == 1L) {                      # 1-d smooths
@@ -41,7 +51,11 @@
         newvals <- seq(min(xvals), max(xvals), length.out = n)
         out <- data.frame(term = rep(term, n), x = newvals)
     } else {                            # 2-d smooths
-        stop("Currently, 2-d smooths are not supported")
+        xvals <- data[[term[1]]]
+        zvals <- data[[term[2]]]
+        newx <- seq(min(xvals), max(xvals), length.out = n)
+        newz <- seq(min(zvals), max(zvals), length.out = n)
+        out <- setNames(expand.grid(x = newx, z = newz), term)
     }
 
     ## return
@@ -52,7 +66,7 @@
 ##' @rdname datagen
 `datagen.gam` <- function(x, n = 200, ...) {
     out <- lapply(x[["smooth"]], datagen, n = n, data = x[["model"]])
-    do.call("rbind", out)
+    do.call("rbind", out)               # FIXME: this can't possibly be right for multiple smooths
 }
 
 ##' @export
