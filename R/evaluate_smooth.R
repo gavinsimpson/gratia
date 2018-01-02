@@ -32,7 +32,6 @@ evaluate_smooth <- function(object, smooth, n = 200, newdata = NULL,
         message("Supplied more than 1 'smooth'; using only the first")
         smooth <- smooth[1L]
     }
-
     smooth_ids <- which_smooth(object, smooth) # which smooths match 'smooth'
     smooth_labels <- select_smooth(object, smooth)
 
@@ -41,26 +40,44 @@ evaluate_smooth <- function(object, smooth, n = 200, newdata = NULL,
     ## SMOOTHS <- object[["smooth"]][smooth_ids]  # take matched smooths
     SMOOTHS <- get_smooths_by_id(smooth_ids, object) # extract the mgcv.smooth object
 
+    ## if 2d smooth, call separate fun
+    if (smooth_dim(SMOOTHS[[1]]) == 1L) {
+        evaluated <- evaluate_1d_smooth(SMOOTHS, n = n, model = object,
+                                        newdata = newdata, inc.mean = inc.mean,
+                                        unconditional = unconditional)
+    } else if (smooth_dim(SMOOTHS[[1]]) == 2L) {
+        evaluated <- evaluate_2d_smooth(SMOOTHS)
+    } else {
+        stop("Only univariate and bivariate smooths are currently supported.")
+    }
+
+    evaluated
+}
+
+`evaluate_1d_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
+                                 unconditional = FALSE, inc.mean = FALSE) {
     ## If more than one smooth, these should be by variables smooths
-    is.by <- vapply(SMOOTHS, FUN = is_by_smooth, FUN.VALUE = logical(1L))
-    if (length(smooth_ids) > 1L) {
+    is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
+    if (length(object) > 1L) {
         if (!all(is.by)) {
             msg <- paste("Hmm, something went wrong identifying the requested smooth. Found:\n",
-                         paste(smooth_labels, collapse = ', '),
+                         paste(vapply(object, FUN = smooth_label,
+                                      FUN.VALUE = character(1)),
+                               collapse = ', '),
                          "\nNot all of these are 'by' variable smooths. Contact Maintainer.")
             stop(msg)
         }
     }
 
     ## get by variable info
-    by_var <- unique(vapply(SMOOTHS, FUN = by_variable, FUN.VALUE = character(1)))
+    by_var <- unique(vapply(object, FUN = by_variable, FUN.VALUE = character(1)))
 
     ## get variable for this smooth
-    smooth_var <- unique(vapply(SMOOTHS, FUN = smooth_variable, FUN.VALUE = character(1)))
+    smooth_var <- unique(vapply(object, FUN = smooth_variable, FUN.VALUE = character(1)))
 
     newx <- if (is.null(newdata)) {
-                setNames(datagen(SMOOTHS[[1]], n = n,
-                                 data = object[["model"]])[, "x", drop = FALSE],
+                setNames(datagen(object[[1]], n = n,
+                                 data = model[["model"]])[, "x", drop = FALSE],
                          smooth_var)
     } else if (is.data.frame(newdata)) { # data frame; select out smooth
         if (!smooth_var %in% names(newdata)) {
@@ -81,16 +98,16 @@ evaluate_smooth <- function(object, smooth, n = 200, newdata = NULL,
     }
 
     ## loop over smooths and predict
-    predFun <- function(smooth, newdata, unconditional, object, term) {
+    predFun <- function(smooth, newdata, unconditional, model, term) {
         X <- PredictMat(smooth, newdata)   # prediction matrix
         start <- smooth[["first.para"]]
         end <- smooth[["last.para"]]
         para.seq <- start:end
-        coefs <- coef(object)[para.seq]
+        coefs <- coef(model)[para.seq]
         fit <- X %*% coefs
 
         label <- smooth_label(smooth)
-        V <- get_vcov(object, unconditional = unconditional,
+        V <- get_vcov(model, unconditional = unconditional,
                       term = label)
         if (isTRUE(inc.mean)) {
             stop("'inc.mean == TRUE' situation not currently supported")
@@ -103,20 +120,16 @@ evaluate_smooth <- function(object, smooth, n = 200, newdata = NULL,
                    se = se.fit)
     }
 
-    ## evaluated <- lapply(seq_along(SMOOTHS), FUN = predFun, smooth = SMOOTHS,
-    ##                     newdata = newx, unconditional = unconditional,
-    ##                     object = object, term = smooth_var)
-
-    evaluated <- vector("list", length(smooth_ids))
+    evaluated <- vector("list", length(object))
     for (i in seq_along(evaluated)) {
         ind <- seq_len(NROW(newx))
         if (any(is.by)) {
             ind <- newx[, by_var] == levs[i]
         }
-        evaluated[[i]] <- predFun(SMOOTHS[[i]],
+        evaluated[[i]] <- predFun(object[[i]],
                                   newdata = newx[ind, , drop = FALSE],
                                   unconditional = unconditional,
-                                  object = object, term = smooth_var)
+                                  model = model, term = smooth_var)
     }
 
     evaluated <- do.call("rbind", evaluated)
@@ -128,4 +141,9 @@ evaluate_smooth <- function(object, smooth, n = 200, newdata = NULL,
     }
 
     evaluated
+}
+
+`evaluate_2d_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
+                                 unconditional = FALSE, inc.mean = FALSE) {
+
 }
