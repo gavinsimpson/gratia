@@ -56,16 +56,20 @@
     ## any factors used in the model?
     ff <- attr(model$terms, "dataClasses") == "factor"
 
+    ## remove response
+    respvar <- attr(model$terms, "response")
+    if (!identical(respvar, 0)) {
+        ff <- ff[-respvar]
+    }
+
     ## where to predict/evaluate derivatives at
     if (missing(newdata)) {
         ## model.frame used to fit model
         mf <- model.frame(model)
 
         ## remove response
-        respvar <- attr(model$terms, "response")
         if (!identical(respvar, 0)) {
             mf <- mf[, -respvar, drop = FALSE]
-            ff <- ff[-respvar]
         }
 
         if (any(ff)) {
