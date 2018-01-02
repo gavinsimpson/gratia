@@ -1,33 +1,50 @@
+## smooth_terms should be removed
 `smooth_terms` <- function(obj, ...) {
     UseMethod("smooth_terms")
 }
 
-`smooth_terms.gam` <- function(obj, ...) {
-    lapply(obj[["smooth"]], `[[`, "term")
+`smooth_terms.gam` <- function(object, ...) {
+    lapply(object[["smooth"]], `[[`, "term")
 }
 
-`smooth_terms.gamm` <- function(obj, ...) {
-    smooth_terms(obj[["gam"]], ...)
+`smooth_terms.gamm` <- function(object, ...) {
+    smooth_terms(object[["gam"]], ...)
 }
 
-`smooth_terms.mgcv.smooth` <- function(obj, ...) {
-    obj[["term"]]
+`smooth_terms.mgcv.smooth` <- function(object, ...) {
+    object[["term"]]
 }
 
-`smooth_dim` <- function(obj) {
+##' Extracts the dimension of an estimated smooth.
+##'
+##' This is a generic function with methods for objects of class
+##'   \code{"gam"}, \code{"gamm"}, and \code{"mgcv.smooth"}.
+##' @title Dimension of a smooth
+##' @param object an R object. See Details for list of supported objects.
+##' @return A numeric vector of dimensions for each smooth.
+##' @author Gavin L. Simpson
+##' @rdname smooth_dim
+##' @export
+`smooth_dim` <- function(object) {
     UseMethod("smooth_dim")
 }
 
-`smooth_dim.gam` <- function(obj) {
-    vapply(obj[["smooth"]], FUN = `[[`, FUN.VALUE = integer(1), "dim")
+##' @rdname smooth_dim
+##' @export
+`smooth_dim.gam` <- function(object) {
+    vapply(object[["smooth"]], FUN = `[[`, FUN.VALUE = integer(1), "dim")
 }
 
-`smooth_dim.gamm` <- function(obj) {
-    smooth_dim(obj[["gam"]])
+##' @rdname smooth_dim
+##' @export
+`smooth_dim.gamm` <- function(object) {
+    smooth_dim(object[["gam"]])
 }
 
-`smooth_dim.mgcv.smooth` <- function(obj) {
-    obj[["dim"]]
+##' @rdname smooth_dim
+##' @export
+`smooth_dim.mgcv.smooth` <- function(object) {
+    object[["dim"]]
 }
 
 `select_terms` <- function(object, terms) {
