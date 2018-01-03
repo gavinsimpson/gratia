@@ -4,8 +4,8 @@
 \alias{evaluate_smooth}
 \title{Evaluate a smooth}
 \usage{
-evaluate_smooth(object, smooth, n = 200, newdata = NULL,
-  unconditional = FALSE, inc.mean = FALSE)
+evaluate_smooth(object, smooth, n = 100, newdata = NULL,
+  unconditional = FALSE, inc.mean = FALSE, dist = 0.1)
 }
 \arguments{
 \item{object}{an object of class \code{"gam"} or \code{"gamm"}.}
@@ -18,7 +18,19 @@ evaluate_smooth(object, smooth, n = 200, newdata = NULL,
 
 \item{unconditional}{logical; should confidence intervals include the uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian covariance matrix will be used.}
 
-\item{inc.mean}{logical; should the uncertainty in the model constant term be included in the standard error of the evaluate values of the smooth? Currently not implemented.}
+\item{inc.mean}{logical; should the uncertainty in the model constant term be
+included in the standard error of the evaluate values of the smooth?
+Currently not implemented.}
+
+\item{dist}{numeric; if greater than 0, this is used to determine when
+a location is too far from data to be plotted when plotting 2-D smooths.
+The data are scaled into the unit square before deciding what to exclude,
+and \code{dist} is a distance within the unit square. See
+\code{\link[mgcv]{exclude.too.far}} for further details.}
+}
+\value{
+An object of class \code{evaluated_smooth}, which inherits from class
+\code{data.frame}.
 }
 \description{
 Evaluate a smooth at a grid of evenly spaced value over the range of the covariate associated with the smooth. Alternatively, a set of points at which the smooth should be evaluated can be supplied.
@@ -27,7 +39,14 @@ Evaluate a smooth at a grid of evenly spaced value over the range of the covaria
 library("mgcv")
 set.seed(2)
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
-mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
-head(evaluate_smooth(mod, "s(x1)"))
+head(evaluate_smooth(m1, "s(x1)"))
+
+## 2d example
+set.seed(2)
+dat <- gamSim(2, n = 400, dist = "normal", scale = 2)
+m2 <- gam(y ~ s(x, z), data = dat$data, method = "REML")
+
+head(evaluate_smooth(m2, "s(x,z)", n = 100))
 }

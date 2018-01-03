@@ -7,9 +7,19 @@
 ##' @param n numeric; the number of points over the range of the covariate at which to evaluate the smooth.
 ##' @param newdata a vector or data frame of points at which to evaluate the smooth.
 ##' @param unconditional logical; should confidence intervals include the uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian covariance matrix will be used.
-##' @param inc.mean logical; should the uncertainty in the model constant term be included in the standard error of the evaluate values of the smooth? Currently not implemented.
+##' @param inc.mean logical; should the uncertainty in the model constant term be
+##'  included in the standard error of the evaluate values of the smooth?
+##'  Currently not implemented.
+##' @param dist numeric; if greater than 0, this is used to determine when
+##'   a location is too far from data to be plotted when plotting 2-D smooths.
+##'   The data are scaled into the unit square before deciding what to exclude,
+##'   and \code{dist} is a distance within the unit square. See
+##'   \code{\link[mgcv]{exclude.too.far}} for further details.
 ##'
-##' @importFrom mgcv PredictMat
+##' @return An object of class \code{evaluated_smooth}, which inherits from class
+##'   \code{data.frame}.
+##'
+##' @importFrom mgcv PredictMat exclude.too.far
 ##' @importFrom stats setNames
 ##'
 ##' @export
@@ -18,11 +28,19 @@
 ##' library("mgcv")
 ##' set.seed(2)
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
-##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
-##' head(evaluate_smooth(mod, "s(x1)"))
-evaluate_smooth <- function(object, smooth, n = 200, newdata = NULL,
-                            unconditional = FALSE, inc.mean = FALSE) {
+##' head(evaluate_smooth(m1, "s(x1)"))
+##'
+##' ## 2d example
+##' set.seed(2)
+##' dat <- gamSim(2, n = 400, dist = "normal", scale = 2)
+##' m2 <- gam(y ~ s(x, z), data = dat$data, method = "REML")
+##'
+##' head(evaluate_smooth(m2, "s(x,z)", n = 100))
+evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
+                            unconditional = FALSE, inc.mean = FALSE,
+                            dist = 0.1) {
     ## simplify GAMM objects
     if (is.gamm(object)) {
         object <- object[["gam"]]
@@ -46,11 +64,15 @@ evaluate_smooth <- function(object, smooth, n = 200, newdata = NULL,
                                         newdata = newdata, inc.mean = inc.mean,
                                         unconditional = unconditional)
     } else if (smooth_dim(SMOOTHS[[1]]) == 2L) {
-        evaluated <- evaluate_2d_smooth(SMOOTHS)
+        evaluated <- evaluate_2d_smooth(SMOOTHS, n = n, model = object,
+                                        newdata = newdata, inc.mean = inc.mean,
+                                        unconditional = unconditional,
+                                        dist = dist)
     } else {
         stop("Only univariate and bivariate smooths are currently supported.")
     }
 
+    class(evaluate) <- c("evaluated_smooth", "data.frame")
     evaluated
 }
 
@@ -62,7 +84,7 @@ evaluate_smooth <- function(object, smooth, n = 200, newdata = NULL,
         if (!all(is.by)) {
             msg <- paste("Hmm, something went wrong identifying the requested smooth. Found:\n",
                          paste(vapply(object, FUN = smooth_label,
-                                      FUN.VALUE = character(1)),
+                                      FUN.VALUE = character(1L)),
                                collapse = ', '),
                          "\nNot all of these are 'by' variable smooths. Contact Maintainer.")
             stop(msg)
@@ -97,39 +119,17 @@ evaluate_smooth <- function(object, smooth, n = 200, newdata = NULL,
         names(newx)[NCOL(newx)] <- by_var
     }
 
-    ## loop over smooths and predict
-    predFun <- function(smooth, newdata, unconditional, model, term) {
-        X <- PredictMat(smooth, newdata)   # prediction matrix
-        start <- smooth[["first.para"]]
-        end <- smooth[["last.para"]]
-        para.seq <- start:end
-        coefs <- coef(model)[para.seq]
-        fit <- X %*% coefs
-
-        label <- smooth_label(smooth)
-        V <- get_vcov(model, unconditional = unconditional,
-                      term = label)
-        if (isTRUE(inc.mean)) {
-            stop("'inc.mean == TRUE' situation not currently supported")
-        } else {
-            rs <- rowSums((X %*% V) * X)
-            se.fit <- sqrt(pmax(0, rs))
-        }
-        ## Return
-        data.frame(smooth = rep(label, n), x = newdata[,1L], est = fit,
-                   se = se.fit)
-    }
-
     evaluated <- vector("list", length(object))
     for (i in seq_along(evaluated)) {
         ind <- seq_len(NROW(newx))
         if (any(is.by)) {
             ind <- newx[, by_var] == levs[i]
         }
-        evaluated[[i]] <- predFun(object[[i]],
-                                  newdata = newx[ind, , drop = FALSE],
-                                  unconditional = unconditional,
-                                  model = model, term = smooth_var)
+        evaluated[[i]] <- spline_values(object[[i]],
+                                        newdata = newx[ind, , drop = FALSE],
+                                        unconditional = unconditional,
+                                        model = model, inc.mean = inc.mean,
+                                        term = smooth_var)
     }
 
     evaluated <- do.call("rbind", evaluated)
@@ -144,6 +144,111 @@ evaluate_smooth <- function(object, smooth, n = 200, newdata = NULL,
 }
 
 `evaluate_2d_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
-                                 unconditional = FALSE, inc.mean = FALSE) {
+                                 unconditional = FALSE, inc.mean = FALSE, dist = 0.1) {
+    ## If more than one smooth, these should be by variables smooths
+    is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
+    if (length(object) > 1L) {
+        if (!all(is.by)) {
+            msg <- paste("Hmm, something went wrong identifying the requested smooth. Found:\n",
+                         paste(vapply(object, FUN = smooth_label,
+                                      FUN.VALUE = character(2L)),
+                               collapse = ', '),
+                         "\nNot all of these are 'by' variable smooths. Contact Maintainer.")
+            stop(msg)
+        }
+    }
 
+    ## get by variable info
+    by_var <- unique(vapply(object, FUN = by_variable, FUN.VALUE = character(1)))
+
+    ## get variable for this smooth
+    smooth_var <- unique(vapply(object, FUN = smooth_variable, FUN.VALUE = character(2L)))
+
+    newx <- if (is.null(newdata)) {
+                setNames(datagen(object[[1]], n = n,
+                                 data = model[["model"]])[, c("x1", "x2"), drop = FALSE],
+                         smooth_var)
+    } else if (is.data.frame(newdata)) { # data frame; select out smooth
+        if (!smooth_var %in% names(newdata)) {
+            stop(paste("Variable", smooth_var, "not found in 'newdata'."))
+        }
+        newdata[, smooth_var, drop = FALSE]
+    } else if (is.numeric(newdata)) {   # vector; coerce to data frame
+        setNames(data.frame(newdata), smooth_var)
+    } else {                            # object we can't handle; bail out
+        stop("'newdata', if supplied, must be a numeric vector or a data frame.")
+    }
+
+    ## if we have a by variable, repeat newx for each level of that variable
+    if (any(is.by)) {
+        levs <- levels(object[["model"]][[by_var]])
+        newx <- cbind(newx, by_var = rep(levs, each = n))
+        names(newx)[NCOL(newx)] <- by_var
+    }
+
+    evaluated <- vector("list", length(object))
+    for (i in seq_along(evaluated)) {
+        ind <- seq_len(NROW(newx))
+        if (any(is.by)) {
+            ind <- newx[, by_var] == levs[i]
+        }
+        evaluated[[i]] <- spline_values(object[[i]],
+                                        newdata = newx[ind, , drop = FALSE],
+                                        unconditional = unconditional,
+                                        model = model, inc.mean = inc.mean,
+                                        term = smooth_var)
+    }
+
+    evaluated <- do.call("rbind", evaluated)
+
+    if (any(is.by)) {
+        evaluated <- cbind(evaluated,
+                           by_var = rep(levels(object[["model"]][[by_var]]), each = n))
+        names(evaluated)[NCOL(evaluated)] <- by_var
+    }
+
+    ## exclude values too far from data
+    if (dist > 0) {
+        ind <- mgcv::exclude.too.far(newx[, smooth_var[1L]],
+                                     newx[, smooth_var[2L]],
+                                     model[["model"]][, smooth_var[1L]],
+                                     model[["model"]][, smooth_var[2L]],
+                                     dist = dist)
+        evaluated[ind, c("est", "se")] <- NA
+    }
+
+    ## return
+    evaluated
+}
+
+## loop over smooths and predict
+`spline_values` <- function(smooth, newdata, model, unconditional,
+                            inc.mean = FALSE, term) {
+    X <- PredictMat(smooth, newdata)   # prediction matrix
+    start <- smooth[["first.para"]]
+    end <- smooth[["last.para"]]
+    para.seq <- start:end
+    coefs <- coef(model)[para.seq]
+    fit <- X %*% coefs
+
+    label <- smooth_label(smooth)
+    V <- get_vcov(model, unconditional = unconditional,
+                  term = label)
+    if (isTRUE(inc.mean)) {
+        stop("'inc.mean == TRUE' situation not currently supported")
+    } else {
+        rs <- rowSums((X %*% V) * X)
+        se.fit <- sqrt(pmax(0, rs))
+    }
+    d <- smooth_dim(smooth)
+    ## Return
+    out <- if (d == 1L) {
+               data.frame(smooth = rep(label, nrow(X)), x = newdata[, 1L],
+                          est = fit, se = se.fit)
+           } else {
+               data.frame(smooth = rep(label, nrow(X)),
+                          x1 = newdata[, 1L], x2 = newdata[, 2L],
+                          est = fit, se = se.fit)
+           }
+    out
 }
