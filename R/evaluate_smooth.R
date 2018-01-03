@@ -72,7 +72,6 @@ evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
         stop("Only univariate and bivariate smooths are currently supported.")
     }
 
-    class(evaluate) <- c("evaluated_smooth", "data.frame")
     evaluated
 }
 
@@ -139,6 +138,8 @@ evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
                            by_var = rep(levels(object[["model"]][[by_var]]), each = n))
         names(evaluated)[NCOL(evaluated)] <- by_var
     }
+
+    class(evaluated) <- c("evaluated_1d_smooth", "evaluated_smooth", "data.frame")
 
     evaluated
 }
@@ -216,6 +217,8 @@ evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
                                      dist = dist)
         evaluated[ind, c("est", "se")] <- NA
     }
+
+    class(evaluated) <- c("evaluated_2d_smooth", "evaluated_smooth", "data.frame")
 
     ## return
     evaluated
