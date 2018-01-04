@@ -12,6 +12,7 @@ Suggests:
     testthat
 Description: Utility functions for fitting, testing, working with, and evaluating time series models using generalized additive models.
 License: MIT + file LICENSE
+LazyData: true
 URL: https://github.com/gavinsimpson/tsgam
 BugReports: https://github.com/gavinsimpson/tsgam/issues
 Roxygen: list(markdown = TRUE)
