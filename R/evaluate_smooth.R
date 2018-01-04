@@ -13,11 +13,10 @@
 ##' @param dist numeric; if greater than 0, this is used to determine when
 ##'   a location is too far from data to be plotted when plotting 2-D smooths.
 ##'   The data are scaled into the unit square before deciding what to exclude,
-##'   and \code{dist} is a distance within the unit square. See
-##'   \code{\link[mgcv]{exclude.too.far}} for further details.
+##'   and `dist` is a distance within the unit square. See
+##'   [mgcv::exclude.too.far()] for further details.
 ##'
-##' @return An object of class \code{evaluated_smooth}, which inherits from class
-##'   \code{data.frame}.
+##' @return A data frame, which is of class `"evaluated_1d_smooth"` or `evaluated_2d_smooth`, which inherit from classes `"evaluated_smooth"` and `"data.frame"`.
 ##'
 ##' @importFrom mgcv PredictMat exclude.too.far
 ##' @importFrom stats setNames
@@ -34,8 +33,8 @@
 ##'
 ##' ## 2d example
 ##' set.seed(2)
-##' dat <- gamSim(2, n = 400, dist = "normal", scale = 2)
-##' m2 <- gam(y ~ s(x, z), data = dat$data, method = "REML")
+##' dat <- gamSim(2, n = 4000, dist = "normal", scale = 1)
+##' m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
 ##'
 ##' head(evaluate_smooth(m2, "s(x,z)", n = 100))
 evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
@@ -162,7 +161,7 @@ evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
     ## get by variable info
     by_var <- unique(vapply(object, FUN = by_variable, FUN.VALUE = character(1)))
 
-    ## get variable for this smooth
+    ## get variables for this smooth
     smooth_var <- unique(vapply(object, FUN = smooth_variable, FUN.VALUE = character(2L)))
 
     newx <- if (is.null(newdata)) {
@@ -218,6 +217,7 @@ evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
         evaluated[ind, c("est", "se")] <- NA
     }
 
+    names(evaluated)[2:3] <- smooth_var
     class(evaluated) <- c("evaluated_2d_smooth", "evaluated_smooth", "data.frame")
 
     ## return

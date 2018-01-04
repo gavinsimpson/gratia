@@ -26,11 +26,10 @@ Currently not implemented.}
 a location is too far from data to be plotted when plotting 2-D smooths.
 The data are scaled into the unit square before deciding what to exclude,
 and \code{dist} is a distance within the unit square. See
-\code{\link[mgcv]{exclude.too.far}} for further details.}
+\code{\link[mgcv:exclude.too.far]{mgcv::exclude.too.far()}} for further details.}
 }
 \value{
-An object of class \code{evaluated_smooth}, which inherits from class
-\code{data.frame}.
+A data frame, which is of class \code{"evaluated_1d_smooth"} or \code{evaluated_2d_smooth}, which inherit from classes \code{"evaluated_smooth"} and \code{"data.frame"}.
 }
 \description{
 Evaluate a smooth at a grid of evenly spaced value over the range of the covariate associated with the smooth. Alternatively, a set of points at which the smooth should be evaluated can be supplied.
@@ -45,8 +44,8 @@ head(evaluate_smooth(m1, "s(x1)"))
 
 ## 2d example
 set.seed(2)
-dat <- gamSim(2, n = 400, dist = "normal", scale = 2)
-m2 <- gam(y ~ s(x, z), data = dat$data, method = "REML")
+dat <- gamSim(2, n = 4000, dist = "normal", scale = 1)
+m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
 
 head(evaluate_smooth(m2, "s(x,z)", n = 100))
 }
