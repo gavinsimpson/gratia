@@ -221,8 +221,8 @@
             qnorm(1 - ((1 - level) / 2))
         } else {
             smooth <- get_smooth(object, parm[i])
-            start <- smooth$first.para
-            end <- smooth$last.para
+            start <- smooth[["first.para"]]
+            end <- smooth[["last.para"]]
             para.seq <- start:end
             newx <- setNames(data.frame(out[[i]][, "x"]), smooth_variable(smooth))
             Cg <- PredictMat(smooth, newx)
@@ -244,9 +244,9 @@
 
     ## simplify to a data frame for return
     out <- do.call("rbind", out)
-    out[, "est"]   <- out[, "est"] + const
-    out[, "lower"] <- out[, "lower"] + const
-    out[, "upper"] <- out[, "upper"] + const
+    out[, "est"]   <- ilink(out[, "est"] + const)
+    out[, "lower"] <- ilink(out[, "lower"] + const)
+    out[, "upper"] <- ilink(out[, "upper"] + const)
     out                                 # return
 }
 
