@@ -224,7 +224,7 @@
             start <- smooth[["first.para"]]
             end <- smooth[["last.para"]]
             para.seq <- start:end
-            newx <- setNames(data.frame(out[[i]][, "x"]), smooth_variable(smooth))
+            newx <- setNames(data.frame(out[[i]][, 2L]), smooth_variable(smooth))
             Cg <- PredictMat(smooth, newx)
             simDev <- Cg %*% t(buDiff[, para.seq])
             absDev <- abs(sweep(simDev, 1L, out[[i]][, "se"], FUN = "/"))
