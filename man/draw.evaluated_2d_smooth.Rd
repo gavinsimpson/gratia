@@ -4,14 +4,32 @@
 \alias{draw.evaluated_2d_smooth}
 \title{Plot a 2D smooth}
 \usage{
-\method{draw}{evaluated_2d_smooth}(object, contour = TRUE, xlab, ylab,
-  title = NULL, subtitle = NULL, caption = NULL, ...)
+\method{draw}{evaluated_2d_smooth}(object, what = c("estimate", "se"),
+  contour = TRUE, xlab, ylab, title = NULL, subtitle = NULL,
+  caption = NULL, ...)
 }
 \arguments{
 \item{object}{an object, the result of a call to \code{\link[tsgam:evaluate_smooth]{tsgam::evaluate_smooth()}}.}
 
+\item{what}{character; plot the estimated smooth (\code{"estimate"}) or its
+standard error (\code{"se"}).}
+
 \item{contour}{logical; should contours be draw on the plot using
 \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+
+\item{xlab}{character or expression; the label for the x axis. If not
+supplied, a suitable label will be generated from \code{object}.}
+
+\item{ylab}{character or expression; the label for the y axis. If not supplied, a suitable label will be generated from \code{object}.}
+
+\item{title}{character or expression; the title for the plot. See
+\code{ggplot2::labs()}.}
+
+\item{subtitle}{character or expression; the subtitle for the plot. See
+\code{ggplot2::labs()}.}
+
+\item{caption}{character or expression; the plot caption. See
+\code{ggplot2::labs()}.}
 
 \item{...}{arguments passed to other methods.}
 }
@@ -38,6 +56,9 @@ m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
 
 sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 draw(sm)
+
+## how the standard error the smooth instead
+draw(sm, what = "se")
 }
 \author{
 Gavin L. Simpson
