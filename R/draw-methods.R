@@ -6,7 +6,7 @@
 ##' @param object and R object to plot.
 ##' @param ... arguments passed to other methods.
 ##'
-##' @return A `ggplot2` object
+##' @return A [ggplot2::ggplot()] object.
 ##'
 ##' @author Gavin L. Simpson
 ##'
@@ -25,14 +25,14 @@
 ##' @param ylab character or expression; the label for the y axis. If not
 ##'   supplied, a suitable label will be generated from `object`.
 ##' @param title character or expression; the title for the plot. See
-##'   `ggplot2::labs()`.
+##'   [ggplot2::labs()].
 ##' @param subtitle character or expression; the subtitle for the plot. See
-##'   `ggplot2::labs()`.
+##'   [ggplot2::labs()].
 ##' @param caption character or expression; the plot caption. See
-##'    `ggplot2::labs()`.
+##'   [ggplot2::labs()].
 ##' @param ... arguments passed to other methods.
 ##'
-##' @return A `ggplot2` object
+##' @return A [ggplot2::ggplot()] object.
 ##'
 ##' @author Gavin L. Simpson
 ##'

@@ -12,7 +12,7 @@ draw(object, ...)
 \item{...}{arguments passed to other methods.}
 }
 \value{
-A \code{ggplot2} object
+A \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object.
 }
 \description{
 Generic plotting via \code{ggplot2}

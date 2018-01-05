@@ -23,13 +23,13 @@ supplied, a suitable label will be generated from \code{object}.}
 supplied, a suitable label will be generated from \code{object}.}
 
 \item{title}{character or expression; the title for the plot. See
-\code{ggplot2::labs()}.}
+\code{\link[ggplot2:labs]{ggplot2::labs()}}.}
 
 \item{subtitle}{character or expression; the subtitle for the plot. See
-\code{ggplot2::labs()}.}
+\code{\link[ggplot2:labs]{ggplot2::labs()}}.}
 
 \item{caption}{character or expression; the plot caption. See
-\code{ggplot2::labs()}.}
+\code{\link[ggplot2:labs]{ggplot2::labs()}}.}
 
 \item{...}{arguments passed to other methods.}
 
@@ -40,7 +40,7 @@ standard error (\code{"se"}).}
 \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
 }
 \value{
-A \code{ggplot2} object
+A \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object.
 }
 \description{
 Plots estimated univariate and bivariate smooths using ggplot2.
