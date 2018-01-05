@@ -15,6 +15,9 @@ draw(object, ...)
 A \code{ggplot2} object
 }
 \description{
+Generic plotting via \code{ggplot2}
+}
+\details{
 Generic function for plotting of R objects that uses the \code{ggplot2} package.
 }
 \author{

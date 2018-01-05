@@ -1,3 +1,5 @@
+##' Generic plotting via `ggplot2`
+##'
 ##' Generic function for plotting of R objects that uses the `ggplot2` package.
 ##'
 ##' @title Generic plotting via `ggplot2`
@@ -13,14 +15,11 @@
     UseMethod("draw")
 }
 
-##' Plots an estimated 2D smooth using ggplot2.
+##' Plot estimated smooths
 ##'
-##' @title Plot a 2D smooth
+##' Plots estimated univariate and bivariate smooths using ggplot2.
+##'
 ##' @param object an object, the result of a call to [tsgam::evaluate_smooth()].
-##' @param what character; plot the estimated smooth (`"estimate"`) or its
-##'   standard error (`"se"`).
-##' @param contour logical; should contours be draw on the plot using
-##'   [ggplot2::geom_contour()].
 ##' @param xlab character or expression; the label for the x axis. If not
 ##'   supplied, a suitable label will be generated from `object`.
 ##' @param ylab character or expression; the label for the y axis. If not supplied, a suitable label will be generated from `object`.
@@ -36,22 +35,23 @@
 ##'
 ##' @author Gavin L. Simpson
 ##'
-##' @importFrom ggplot2 ggplot aes_string geom_raster geom_contour labs guides guide_colourbar scale_fill_distiller theme
+##' @importFrom ggplot2 ggplot aes_string labs geom_line geom_ribbon
 ##' @importFrom grid unit
 ##'
 ##' @export
+##' @name draw.evaluated_smooth
+##' @alias draw.evaluated_1d_smooth
 ##'
 ##' @examples
 ##' library("mgcv")
-##' library("ggplot2")
+##'
 ##' set.seed(2)
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 ##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
-##' sm <- evaluate_smooth(m1, "s(x1)")
-##' ## draw(sm)
+##' sm <- evaluate_smooth(m1, "s(x2)")
+##' draw(sm)
 ##'
-##' ## 2d example
 ##' set.seed(2)
 ##' dat <- gamSim(2, n = 4000, dist = "normal", scale = 1)
 ##' m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
@@ -59,8 +59,50 @@
 ##' sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 ##' draw(sm)
 ##'
-##' ## how the standard error the smooth instead
+##' ## now the standard error the smooth instead
 ##' draw(sm, what = "se")
+`draw.evaluated_1d_smooth` <- function(object,
+                                       xlab, ylab,
+                                       title = NULL, subtitle = NULL,
+                                       caption = NULL,
+                                       ...) {
+    smooth_var <- names(object)[2L]
+
+    ## Add confidence interval
+    object[["upper"]] <- object[["est"]] + (2 * object[["se"]])
+    object[["lower"]] <- object[["est"]] - (2 * object[["se"]])
+
+    plt <- ggplot(object, aes_string(x = smooth_var, y = "est")) +
+        geom_ribbon(mapping = aes_string(ymin = "lower",
+                                         ymax = "upper"),
+                    alpha = 0.2) +
+        geom_line()
+
+    ## default axis labels if none supplied
+    if (missing(xlab)) {
+        xlab <- smooth_var
+    }
+    if (missing(ylab)) {
+        ylab <- levels(object[["smooth"]])
+    }
+
+    ## add labelling to plot
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+                      caption = caption)
+
+    plt
+}
+
+##' @param what character; plot the estimated smooth (`"estimate"`) or its
+##'   standard error (`"se"`).
+##' @param contour logical; should contours be draw on the plot using
+##'   [ggplot2::geom_contour()].
+##'
+##' @importFrom ggplot2 ggplot aes_string geom_raster geom_contour labs guides guide_colourbar scale_fill_distiller theme
+##' @importFrom grid unit
+##'
+##' @export
+##' @rdname draw.evaluated_smooth
 `draw.evaluated_2d_smooth` <- function(object, what = c("estimate","se"),
                                        contour = TRUE,
                                        xlab, ylab,
@@ -95,7 +137,7 @@
     }
 
     ## add labelling to plot
-    plt <- plt + labs(xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
                       caption = caption)
 
     ## Set the palette
