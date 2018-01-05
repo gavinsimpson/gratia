@@ -138,6 +138,7 @@ evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
         names(evaluated)[NCOL(evaluated)] <- by_var
     }
 
+    names(evaluated)[2] <- smooth_var
     class(evaluated) <- c("evaluated_1d_smooth", "evaluated_smooth", "data.frame")
 
     evaluated
