@@ -19,10 +19,11 @@
 ##'
 ##' Plots estimated univariate and bivariate smooths using ggplot2.
 ##'
-##' @param object an object, the result of a call to [tsgam::evaluate_smooth()].
+##' @param object an object, the result of a call to [evaluate_smooth()].
 ##' @param xlab character or expression; the label for the x axis. If not
 ##'   supplied, a suitable label will be generated from `object`.
-##' @param ylab character or expression; the label for the y axis. If not supplied, a suitable label will be generated from `object`.
+##' @param ylab character or expression; the label for the y axis. If not
+##'   supplied, a suitable label will be generated from `object`.
 ##' @param title character or expression; the title for the plot. See
 ##'   `ggplot2::labs()`.
 ##' @param subtitle character or expression; the subtitle for the plot. See

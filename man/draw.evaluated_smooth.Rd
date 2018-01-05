@@ -14,12 +14,13 @@
   caption = NULL, ...)
 }
 \arguments{
-\item{object}{an object, the result of a call to \code{\link[tsgam:evaluate_smooth]{tsgam::evaluate_smooth()}}.}
+\item{object}{an object, the result of a call to \code{\link[=evaluate_smooth]{evaluate_smooth()}}.}
 
 \item{xlab}{character or expression; the label for the x axis. If not
 supplied, a suitable label will be generated from \code{object}.}
 
-\item{ylab}{character or expression; the label for the y axis. If not supplied, a suitable label will be generated from \code{object}.}
+\item{ylab}{character or expression; the label for the y axis. If not
+supplied, a suitable label will be generated from \code{object}.}
 
 \item{title}{character or expression; the title for the plot. See
 \code{ggplot2::labs()}.}
