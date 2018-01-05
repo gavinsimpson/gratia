@@ -36,7 +36,8 @@
 ##'
 ##' @author Gavin L. Simpson
 ##'
-##' @importFrom ggplot2 ggplot aes_string geom_raster geom_contour labs guides guide_colourbar scale_fill_distiller
+##' @importFrom ggplot2 ggplot aes_string geom_raster geom_contour labs guides guide_colourbar scale_fill_distiller theme
+##' @importFrom grid unit
 ##'
 ##' @export
 ##'
@@ -102,7 +103,12 @@
                                       limits = guide_limits)
 
     ## add guide
-    plt <- plt + guides(fill = guide_colourbar(title = guide_title))
+    plt <- plt + guides(fill = guide_colourbar(title = guide_title,
+                                               direction = "horizontal",
+                                               barwidth = grid::unit(0.5, "npc")))
+
+    ## position legend at the
+    plt <- plt + theme(legend.position = "top")
 
     plt
 }

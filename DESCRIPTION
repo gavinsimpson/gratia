@@ -7,7 +7,7 @@ Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     role = c("aut","cre")))
 Maintainer: Gavin L. Simpson <ucfagls@gmail.com>
 Imports:
-    mgcv, ggplot2, MASS, stats
+    mgcv, ggplot2, grid, MASS, stats
 Suggests:
     testthat
 Description: Utility functions for fitting, testing, working with, and evaluating time series models using generalized additive models.
