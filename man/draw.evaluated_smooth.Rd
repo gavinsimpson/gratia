@@ -9,7 +9,7 @@
 \method{draw}{evaluated_1d_smooth}(object, xlab, ylab, title = NULL,
   subtitle = NULL, caption = NULL, ...)
 
-\method{draw}{evaluated_2d_smooth}(object, what = c("estimate", "se"),
+\method{draw}{evaluated_2d_smooth}(object, show = c("estimate", "se"),
   contour = TRUE, xlab, ylab, title = NULL, subtitle = NULL,
   caption = NULL, ...)
 }
@@ -33,7 +33,7 @@ supplied, a suitable label will be generated from \code{object}.}
 
 \item{...}{arguments passed to other methods.}
 
-\item{what}{character; plot the estimated smooth (\code{"estimate"}) or its
+\item{show}{character; plot the estimated smooth (\code{"estimate"}) or its
 standard error (\code{"se"}).}
 
 \item{contour}{logical; should contours be draw on the plot using
@@ -63,7 +63,7 @@ sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 draw(sm)
 
 ## now the standard error the smooth instead
-draw(sm, what = "se")
+draw(sm, show = "se")
 }
 \author{
 Gavin L. Simpson

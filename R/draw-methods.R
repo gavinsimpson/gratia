@@ -61,7 +61,7 @@
 ##' draw(sm)
 ##'
 ##' ## now the standard error the smooth instead
-##' draw(sm, what = "se")
+##' draw(sm, show = "se")
 `draw.evaluated_1d_smooth` <- function(object,
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
@@ -94,7 +94,7 @@
     plt
 }
 
-##' @param what character; plot the estimated smooth (`"estimate"`) or its
+##' @param show character; plot the estimated smooth (`"estimate"`) or its
 ##'   standard error (`"se"`).
 ##' @param contour logical; should contours be draw on the plot using
 ##'   [ggplot2::geom_contour()].
@@ -104,15 +104,15 @@
 ##'
 ##' @export
 ##' @rdname draw.evaluated_smooth
-`draw.evaluated_2d_smooth` <- function(object, what = c("estimate","se"),
+`draw.evaluated_2d_smooth` <- function(object, show = c("estimate","se"),
                                        contour = TRUE,
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
                                        ...) {
     smooth_vars <- names(object)[2:3]
-    what <- match.arg(what)
-    if (isTRUE(identical(what, "estimate"))) {
+    show <- match.arg(show)
+    if (isTRUE(identical(show, "estimate"))) {
         guide_title <- levels(object[["smooth"]])
         plot_var <- "est"
         guide_limits <- c(-1, 1) * max(abs(object[[plot_var]]))
