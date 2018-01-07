@@ -111,16 +111,22 @@ evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
     }
 
     ## if we have a by variable, repeat newx for each level of that variable
+    is.factor.by     <- vapply(object, FUN = is_factor_by_smooth,     FUN.VALUE = logical(1L))
+    is.continuous.by <- vapply(object, FUN = is_continuous_by_smooth, FUN.VALUE = logical(1L))
     if (any(is.by)) {
-        levs <- levels(model[["model"]][[by_var]])
-        newx <- cbind(newx, by_var = rep(levs, each = n))
+        if (any(is.factor.by)) { # (is.factor(model[["model"]][[by_var]])) {
+            levs <- levels(model[["model"]][[by_var]])
+            newx <- cbind(newx, .by_var = rep(levs, each = n))
+        } else {                        # continuous by
+            newx <- cbind(newx, .by_var = mean(model[["model"]][[by_var]]))
+        }
         names(newx)[NCOL(newx)] <- by_var
     }
 
     evaluated <- vector("list", length(object))
     for (i in seq_along(evaluated)) {
         ind <- seq_len(NROW(newx))
-        if (any(is.by)) {
+        if (any(is.factor.by)) {
             ind <- newx[, by_var] == levs[i]
         }
         evaluated[[i]] <- spline_values(object[[i]],
@@ -132,7 +138,7 @@ evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
 
     evaluated <- do.call("rbind", evaluated)
 
-    if (any(is.by)) {
+    if (any(is.factor.by)) {
         evaluated <- cbind(evaluated,
                            by_var = rep(levels(model[["model"]][[by_var]]), each = n))
         names(evaluated)[NCOL(evaluated)] <- by_var
@@ -181,16 +187,22 @@ evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
     }
 
     ## if we have a by variable, repeat newx for each level of that variable
+    is.factor.by     <- vapply(object, FUN = is_factor_by_smooth,     FUN.VALUE = logical(1L))
+    is.continuous.by <- vapply(object, FUN = is_continuous_by_smooth, FUN.VALUE = logical(1L))
     if (any(is.by)) {
-        levs <- levels(model[["model"]][[by_var]])
-        newx <- cbind(newx, by_var = rep(levs, each = n))
+        if (any(is.factor.by)) { # (is.factor(model[["model"]][[by_var]])) {
+            levs <- levels(model[["model"]][[by_var]])
+            newx <- cbind(newx, .by_var = rep(levs, each = n))
+        } else {                        # continuous by
+            newx <- cbind(newx, .by_var = mean(model[["model"]][[by_var]]))
+        }
         names(newx)[NCOL(newx)] <- by_var
     }
 
     evaluated <- vector("list", length(object))
     for (i in seq_along(evaluated)) {
         ind <- seq_len(NROW(newx))
-        if (any(is.by)) {
+        if (any(is.factor.by)) {
             ind <- newx[, by_var] == levs[i]
         }
         evaluated[[i]] <- spline_values(object[[i]],
@@ -202,7 +214,7 @@ evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
 
     evaluated <- do.call("rbind", evaluated)
 
-    if (any(is.by)) {
+    if (any(is.factor.by)) {
         evaluated <- cbind(evaluated,
                            by_var = rep(levels(model[["model"]][[by_var]]), each = n))
         names(evaluated)[NCOL(evaluated)] <- by_var

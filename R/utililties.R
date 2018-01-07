@@ -81,9 +81,39 @@
     vapply(object[["smooth"]], FUN  = `[[`, FUN.VALUE = character(1), "label")
 }
 
+##' Tests for by variable smooths
+##'
+##' Functions to check if a smooth is a by-variable one and to test of the type
+##' of by-variable smooth is a factor-smooth or a continous-smooth interaction.
+##'
+##' @param smooth an object of class `"mgcv.smooth"`
+##'
+##' @return A logical vector.
+##'
+##' @author Gavin L. Simpson
+##'
+##' @export
+##' @rdname is_by_smooth
 `is_by_smooth` <- function(smooth) {
     check_is_mgcv_smooth(smooth)
-    !is.null(smooth[["by.level"]])
+    is_factor_by_smooth(smooth) | is_continuous_by_smooth(smooth)
+}
+
+##' @export
+##' @rdname is_by_smooth
+`is_factor_by_smooth` <- function(smooth) {
+    check_is_mgcv_smooth(smooth)
+    by.level <- smooth[["by.level"]]
+    !is.null(by.level)
+}
+
+##' @export
+##' @rdname is_by_smooth
+`is_continuous_by_smooth` <- function(smooth) {
+    check_is_mgcv_smooth(smooth)
+    by.level <- smooth[["by.level"]]
+    by.var <- smooth[["by"]]
+    !(is.null(by.level) & by.var == "NA")
 }
 
 `by_variable` <- function(smooth) {
