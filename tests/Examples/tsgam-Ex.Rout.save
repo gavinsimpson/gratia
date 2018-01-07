@@ -254,6 +254,12 @@ Bivariate smoothing example
 > 
 > draw(m2)
 > 
+> dat <- gamSim(4)
+Factor `by' variable example
+> m3 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
+> 
+> draw(m3, scales = "fixed")
+> 
 > 
 > 
 > cleanEx()
@@ -399,7 +405,7 @@ Gu & Wahba 4 term additive model
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  25.867 0.099 26.087 0 0 
+Time elapsed:  29.954 0.108 30.215 0 0 
 > grDevices::dev.off()
 null device 
           1 

@@ -59,6 +59,11 @@ dat <- gamSim(2, n = 4000, dist = "normal", scale = 1)
 m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
 
 draw(m2)
+
+dat <- gamSim(4)
+m3 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
+
+draw(m3, scales = "fixed")
 }
 \author{
 Gavin L. Simpson

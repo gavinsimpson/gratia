@@ -196,6 +196,11 @@
 ##' m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
 ##'
 ##' draw(m2)
+##'
+##' dat <- gamSim(4)
+##' m3 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
+##'
+##' draw(m3, scales = "fixed")
 `draw.gam` <- function(object,
                        select, # ignored for now; but used for subsetting which smooths
                        scales = c("free", "fixed"),
