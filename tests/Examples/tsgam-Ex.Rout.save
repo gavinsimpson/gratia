@@ -1,5 +1,5 @@
 
-R version 3.3.3 Patched (2017-03-15 r72392) -- "Another Canoe"
+R version 3.4.3 Patched (2017-12-21 r73940) -- "Kite-Eating Tree"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -38,7 +38,7 @@ Type 'q()' to quit R.
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-17. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-22. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -83,13 +83,13 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### Name: confint.gam
 > ### Title: Point-wise and simultaneous confidence intervals for smooths
-> ### Aliases: confint.gam
+> ### Aliases: confint.gam confint.gamm
 > 
 > ### ** Examples
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-17. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-22. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -98,18 +98,210 @@ Gu & Wahba 4 term additive model
 > ## point-wise interval
 > ci <- confint(mod, parm = "x1", type = "confidence")
 > head(ci)
-  term          x      lower        est      upper
-1   x1 0.61714216 -0.1167448  0.1497709  0.4162866
-2   x1 0.56906413 -0.4231273 -0.1585083  0.1061107
-3   x1 0.15397045 -2.0298892 -1.7097611 -1.3896329
-4   x1 0.03483322 -2.3999003 -1.8960482 -1.3921961
-5   x1 0.99795346  2.6856714  3.2762346  3.8667978
-6   x1 0.83557368  1.5276652  1.8029003  2.0781354
+  smooth           x1      est        se    lower    upper     crit
+1  s(x1) 0.0006632213 5.888546 0.3134611 5.274174 6.502919 1.959964
+2  s(x1) 0.0056813456 5.895688 0.3045623 5.298757 6.492619 1.959964
+3  s(x1) 0.0106994698 5.902830 0.2958458 5.322983 6.482677 1.959964
+4  s(x1) 0.0157175940 5.909974 0.2873297 5.346818 6.473130 1.959964
+5  s(x1) 0.0207357183 5.917121 0.2790332 5.370226 6.464016 1.959964
+6  s(x1) 0.0257538425 5.924272 0.2709761 5.393169 6.455376 1.959964
 > 
 > ## simultaneous interval for smooth term of x1
-> #set.seed(42)
-> #x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
-> #head(x1.sint)
+> set.seed(42)
+> si <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)
+> head(si)
+  smooth           x1      est        se    lower    upper     crit
+1  s(x1) 0.0006632213 5.888546 0.3134611 5.020500 6.756592 2.769231
+2  s(x1) 0.0056813456 5.895688 0.3045623 5.052285 6.739091 2.769231
+3  s(x1) 0.0106994698 5.902830 0.2958458 5.083565 6.722095 2.769231
+4  s(x1) 0.0157175940 5.909974 0.2873297 5.114292 6.705656 2.769231
+5  s(x1) 0.0207357183 5.917121 0.2790332 5.144413 6.689828 2.769231
+6  s(x1) 0.0257538425 5.924272 0.2709761 5.173877 6.674668 2.769231
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
+> nameEx("datagen")
+> ### * datagen
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: datagen
+> ### Title: Generate data over the range of variables used in smooths
+> ### Aliases: datagen datagen.mgcv.smooth datagen.gam datagen.gamm
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.8-22. For overview type 'help("mgcv-package")'.
+> 
+> ## 1d example
+> set.seed(2)
+> dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+Gu & Wahba 4 term additive model
+> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> df <- datagen(m1)
+> head(df)
+   term           x
+1 s(x0) 0.007109038
+2 s(x0) 0.012087246
+3 s(x0) 0.017065454
+4 s(x0) 0.022043662
+5 s(x0) 0.027021870
+6 s(x0) 0.032000078
+> 
+> ## 2d example
+> dat <- gamSim(2, n = 400, dist = "normal", scale = 2)
+Bivariate smoothing example
+> m2 <- gam(y ~ s(x, z), data = dat$data, method = "REML")
+> df <- datagen(m2)
+> head(df)
+  smooth          x1          x2
+1 s(x,z) 0.001867117 0.002381104
+2 s(x,z) 0.006878970 0.002381104
+3 s(x,z) 0.011890823 0.002381104
+4 s(x,z) 0.016902676 0.002381104
+5 s(x,z) 0.021914529 0.002381104
+6 s(x,z) 0.026926382 0.002381104
+> ## alternative showing using the mgcv.smooth method for a single smooth
+> df2 <- datagen(m2[["smooth"]][[1L]], data = dat$data)
+> head(df2)
+  smooth          x1          x2
+1 s(x,z) 0.001867117 0.002381104
+2 s(x,z) 0.011941448 0.002381104
+3 s(x,z) 0.022015779 0.002381104
+4 s(x,z) 0.032090110 0.002381104
+5 s(x,z) 0.042164441 0.002381104
+6 s(x,z) 0.052238771 0.002381104
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
+> nameEx("draw.evaluated_smooth")
+> ### * draw.evaluated_smooth
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: draw.evaluated_smooth
+> ### Title: Plot estimated smooths
+> ### Aliases: draw.evaluated_smooth draw.evaluated_1d_smooth
+> ###   draw.evaluated_2d_smooth
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.8-22. For overview type 'help("mgcv-package")'.
+> 
+> set.seed(2)
+> dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+Gu & Wahba 4 term additive model
+> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> sm <- evaluate_smooth(m1, "s(x2)")
+> draw(sm)
+> 
+> set.seed(2)
+> dat <- gamSim(2, n = 4000, dist = "normal", scale = 1)
+Bivariate smoothing example
+> m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
+> 
+> sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
+> draw(sm)
+> 
+> ## now the standard error the smooth instead
+> draw(sm, show = "se")
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
+> nameEx("draw.gam")
+> ### * draw.gam
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: draw.gam
+> ### Title: Plot estimated smooths from a fitted GAM
+> ### Aliases: draw.gam
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.8-22. For overview type 'help("mgcv-package")'.
+> 
+> set.seed(2)
+> dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+Gu & Wahba 4 term additive model
+> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> draw(m1)
+> 
+> set.seed(2)
+> dat <- gamSim(2, n = 4000, dist = "normal", scale = 1)
+Bivariate smoothing example
+> m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
+> 
+> draw(m2)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
+> nameEx("evaluate_smooth")
+> ### * evaluate_smooth
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: evaluate_smooth
+> ### Title: Evaluate a smooth
+> ### Aliases: evaluate_smooth
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.8-22. For overview type 'help("mgcv-package")'.
+> set.seed(2)
+> dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+Gu & Wahba 4 term additive model
+> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> head(evaluate_smooth(m1, "s(x1)"))
+  smooth           x1       est        se
+1  s(x1) 0.0006632213 -1.944733 0.3134611
+2  s(x1) 0.0107501579 -1.930377 0.2957587
+3  s(x1) 0.0208370945 -1.916014 0.2788680
+4  s(x1) 0.0309240311 -1.901632 0.2629466
+5  s(x1) 0.0410109677 -1.887206 0.2481575
+6  s(x1) 0.0510979043 -1.872698 0.2346391
+> 
+> ## 2d example
+> set.seed(2)
+> dat <- gamSim(2, n = 4000, dist = "normal", scale = 1)
+Bivariate smoothing example
+> m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
+> 
+> head(evaluate_smooth(m2, "s(x,z)", n = 100))
+  smooth            x            z       est        se
+1 s(x,z) 2.298248e-05 4.321919e-05 0.1226246 0.1149179
+2 s(x,z) 1.012240e-02 4.321919e-05 0.1218180 0.1124405
+3 s(x,z) 2.022182e-02 4.321919e-05 0.1208805 0.1099417
+4 s(x,z) 3.032124e-02 4.321919e-05 0.1198083 0.1074268
+5 s(x,z) 4.042066e-02 4.321919e-05 0.1185977 0.1049027
+6 s(x,z) 5.052008e-02 4.321919e-05 0.1172456 0.1023753
 > 
 > 
 > 
@@ -130,11 +322,23 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-17. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-22. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> ## first derivatives of all smooths...
+> fd <- fderiv(mod)
+> 
+> ## ...and a selected smooth
+> fd2 <- fderiv(mod, term = "x1")
+> 
+> ## Models with factors
+> set.seed(2)
+> dat <- gamSim(4, n = 400, dist = "normal", scale = 2)
+Factor `by' variable example
+> mod <- gam(y ~ s(x0) + s(x1) + fac, data = dat, method = "REML")
 > 
 > ## first derivatives of all smooths...
 > fd <- fderiv(mod)
@@ -155,13 +359,13 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### Name: simulate.gam
 > ### Title: Simulate from the posterior distribution of a GAM
-> ### Aliases: simulate.gam simulate.gamm
+> ### Aliases: simulate.gam simulate.gamm simulate.scam
 > 
 > ### ** Examples
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-17. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-22. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -195,7 +399,7 @@ Gu & Wahba 4 term additive model
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  3.81 0.034 3.861 0 0 
+Time elapsed:  25.867 0.099 26.087 0 0 
 > grDevices::dev.off()
 null device 
           1 
