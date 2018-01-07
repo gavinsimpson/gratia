@@ -16,6 +16,11 @@ test_that("draw() works with continuous by", {
     expect_s3_class(plt, "ggplot")
 })
 
+test_that("draw() works with continuous by and fixed scales", {
+    plt <- draw(mod, scales = "fixed")
+    expect_s3_class(plt, "ggplot")
+})
+
 test_that("evaluate_smooth() works with continuous by", {
     sm  <- evaluate_smooth(mod, "s(x2)")
     expect_s3_class(sm, "evaluated_1d_smooth")
