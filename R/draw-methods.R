@@ -155,3 +155,90 @@
 
     plt
 }
+
+##' Plot estimated smooths from a fitted GAM
+##'
+##' Plots estimated smooths from a fitted GAM model in a similar way to
+##' `mgcv::plot.gam()` but instead of using base graphics, [ggplot2::ggplot()]
+##' is used instead.
+##'
+##' @param object a fitted GAM, the result of a call to [mgcv::gam()].
+##' @param select character;
+##' @param scales character; should all univariate smooths be plotted with the
+##'   same y-axis scale? The default, `scales = "fixed"`, ensures this is done.
+##'   If `scales = "free"` each univariate smooth has its own y-axis scale.
+##' @param align characer; see argument `align` in `cowplot::plot_grid()`.
+##'   Defaults to `"hv"` so that plots are nicely aligned.
+##' @param ... arguments passed to `cowplot::plot_grid()`. Any arguments to
+##'   `plot_grid()` may be supplied, except for: `plotlist` and `align`.
+##'
+##' @inheritParams evaluate_smooth
+##'
+##' @return A [ggplot2::ggplot()] object.
+##'
+##' @author Gavin L. Simpson
+##'
+##' @importFrom ggplot2 lims
+##' @importFrom cowplot plot_grid
+##' @export
+##'
+##' @examples
+##' library("mgcv")
+##'
+##' set.seed(2)
+##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+##'
+##' draw(m1)
+##'
+##' set.seed(2)
+##' dat <- gamSim(2, n = 4000, dist = "normal", scale = 1)
+##' m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
+##'
+##' draw(m2)
+`draw.gam` <- function(object,
+                       select, # ignored for now; but used for subsetting which smooths
+                       scales = c("free", "fixed"),
+                       align = "hv",
+                       n = 100, unconditional = FALSE, inc.mean = FALSE,
+                       dist = 0.1, ...) {
+    scales <- match.arg(scales)
+    S <- smooths(object)                # vector of smooth labels - "s(x)"
+
+    ## can only plot 1 or 2d smooths - get smooth dimensions & prune list `s`
+    d <- smooth_dim(object)
+    S <- S[d <= 2L]
+    d <- d[d <= 2L]
+
+    is_by <- vapply(object[["smooth"]], is_by_smooth, logical(1L))
+    if (any(is_by)) {
+        S <- vapply(strsplit(S, ":"), `[[`, character(1L), 1L)
+    }
+
+    l <- g <- vector("list", length = length(S))
+
+    for (i in unique(S)) {
+        eS <- evaluate_smooth(object, smooth = i, n = n,
+                                  unconditional = unconditional,
+                              inc.mean = inc.mean, dist = dist)
+        l[S == i] <- split(eS, eS[["smooth"]])
+    }
+
+    for (i in seq_along(l)) {
+        g[[i]] <- draw(droplevels(l[[i]]))
+    }
+
+    if (isTRUE(identical(scales, "fixed"))) {
+        wrapper <- function(x) {
+            range(x[["est"]] + (2 * x[["se"]]),
+                  x[["est"]] - (2 * x[["se"]]))
+        }
+        ylims <- range(unlist(lapply(l, wrapper)))
+
+        for (i in seq_along(S)[d == 1L]) { # only the univariate smooths
+            g[[i]] <- g[[i]] + lims(y = ylims)
+        }
+    }
+
+    plot_grid(plotlist = g, align = align, ...)
+}
