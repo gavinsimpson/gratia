@@ -112,7 +112,7 @@ evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
 
     ## if we have a by variable, repeat newx for each level of that variable
     if (any(is.by)) {
-        levs <- levels(object[["model"]][[by_var]])
+        levs <- levels(model[["model"]][[by_var]])
         newx <- cbind(newx, by_var = rep(levs, each = n))
         names(newx)[NCOL(newx)] <- by_var
     }
@@ -134,7 +134,7 @@ evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
 
     if (any(is.by)) {
         evaluated <- cbind(evaluated,
-                           by_var = rep(levels(object[["model"]][[by_var]]), each = n))
+                           by_var = rep(levels(model[["model"]][[by_var]]), each = n))
         names(evaluated)[NCOL(evaluated)] <- by_var
     }
 
@@ -182,7 +182,7 @@ evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
 
     ## if we have a by variable, repeat newx for each level of that variable
     if (any(is.by)) {
-        levs <- levels(object[["model"]][[by_var]])
+        levs <- levels(model[["model"]][[by_var]])
         newx <- cbind(newx, by_var = rep(levs, each = n))
         names(newx)[NCOL(newx)] <- by_var
     }
@@ -204,7 +204,7 @@ evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
 
     if (any(is.by)) {
         evaluated <- cbind(evaluated,
-                           by_var = rep(levels(object[["model"]][[by_var]]), each = n))
+                           by_var = rep(levels(model[["model"]][[by_var]]), each = n))
         names(evaluated)[NCOL(evaluated)] <- by_var
     }
 
