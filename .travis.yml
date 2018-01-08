@@ -17,6 +17,7 @@ r_packages:
   - testthat
   - ggplot2
   - cowplot
+  - vdiffr
 
 r_github_packages:
   - jimhester/covr
