@@ -247,6 +247,8 @@
     out[, "est"]   <- ilink(out[, "est"] + const)
     out[, "lower"] <- ilink(out[, "lower"] + const)
     out[, "upper"] <- ilink(out[, "upper"] + const)
+
+    class(out) <- c("confint.gam", "data.frame")
     out                                 # return
 }
 
