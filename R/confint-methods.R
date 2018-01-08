@@ -76,6 +76,8 @@
         simultaneous(object, terms = parm, level = level, nsim = nsim)
     }
 
+    class(interval) <- c("confint.fderiv", "data.frame")
+
     ## return
     interval
 }
