@@ -15,14 +15,19 @@
     object[["term"]]
 }
 
+##' Dimension of a smooth
+##'
 ##' Extracts the dimension of an estimated smooth.
 ##'
 ##' This is a generic function with methods for objects of class
 ##'   \code{"gam"}, \code{"gamm"}, and \code{"mgcv.smooth"}.
-##' @title Dimension of a smooth
+##
 ##' @param object an R object. See Details for list of supported objects.
+##'
 ##' @return A numeric vector of dimensions for each smooth.
+##'
 ##' @author Gavin L. Simpson
+##'
 ##' @rdname smooth_dim
 ##' @export
 `smooth_dim` <- function(object) {
