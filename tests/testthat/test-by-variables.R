@@ -4,16 +4,18 @@
 library("testthat")
 library("tsgam")
 library("mgcv")
+library("ggplot2")
+theme_set(theme_grey())
 
-context("Testing `by` variables")
+context("test-by-variables")
 
 ## simulate date from y = f(x2)*x1 + error
-dat <- gamSim(3, n = 400)
+set.seed(42)
+dat <- gamSim(3, n = 400, verbose = FALSE)
 mod <- gam(y ~ s(x2, by = x1), data = dat)
 
 test_that("draw() works with continuous by", {
-    plt <- draw(mod)
-    expect_s3_class(plt, "ggplot")
+    vdiffr::expect_doppelganger("continuous by-variable smmoth", draw(mod))
 })
 
 test_that("draw() works with continuous by and fixed scales", {

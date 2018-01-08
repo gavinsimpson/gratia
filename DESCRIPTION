@@ -7,9 +7,15 @@ Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     role = c("aut","cre")))
 Maintainer: Gavin L. Simpson <ucfagls@gmail.com>
 Imports:
-    mgcv, ggplot2, cowplot, grid, MASS, stats
+    mgcv,
+    ggplot2,
+    cowplot,
+    grid,
+    MASS,
+    stats
 Suggests:
-    testthat
+    testthat,
+    vdiffr
 Description: Utility functions for fitting, testing, working with, and evaluating time series models using generalized additive models.
 License: MIT + file LICENSE
 LazyData: true
