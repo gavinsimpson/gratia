@@ -4,6 +4,7 @@
 \alias{draw.evaluated_smooth}
 \alias{draw.evaluated_1d_smooth}
 \alias{draw.evaluated_2d_smooth}
+\alias{draw.evaluated_2d_smooth}
 \title{Plot estimated smooths}
 \usage{
 \method{draw}{evaluated_1d_smooth}(object, xlab, ylab, title = NULL,

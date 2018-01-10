@@ -41,7 +41,7 @@
 ##'
 ##' @export
 ##' @name draw.evaluated_smooth
-##' @alias draw.evaluated_1d_smooth
+##' @aliases draw.evaluated_1d_smooth draw.evaluated_2d_smooth
 ##'
 ##' @examples
 ##' library("mgcv")
