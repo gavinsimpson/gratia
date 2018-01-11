@@ -1,4 +1,3 @@
-tsgam
-=====
+# isaac
 
-Functions for using GAMs to model time series
+Isaac provides ggplot-based graphics and useful functions for GAMs fitted using the mgcv package
