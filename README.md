@@ -4,7 +4,7 @@ The *schoenburg* package for R provides ggplot-based graphics and useful functio
 
 ## Build status
 
-[![Build Status](https://travis-ci.org/gavinsimpson/schoenberg.svg?branch=master)](https://travis-ci.org/gavinsimpson/schoenberg)
+[![Build Status](https://travis-ci.org/gavinsimpson/schoenberg.svg?branch=master)](https://travis-ci.org/gavinsimpson/schoenberg) [![Build status](https://ci.appveyor.com/api/projects/status/w7pj8773t5b8fxkb/branch/master?svg=true)](https://ci.appveyor.com/project/gavinsimpson/schoenberg/branch/master)
 
 ## Features
 
