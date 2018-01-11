@@ -2,6 +2,16 @@
 
 The *schoenburg* package for R provides ggplot-based graphics and useful functions for GAMs fitted using the mgcv package.
 
+The main features of *schoenberg* are currently
+
+* A *ggplot2*-based replacement for `mgcv:::plot.gam()`: `draw(gam_model)`.
+
+    Note specialist smoothers (`bs %in% c("mrf","fs","so")`) are not supported, but univariate, *factor* and *continuous* `by`-variable smooths, and bivariate tensor product smooths are supported,
+
+* Estimatation of derivatives of fitted smoothers: `fderiv(gam_model)`,
+
+* Estimation of point-wise across-the-function confidence intervals and simultaneous intervals for smooths: `confint(gam_model)`.
+
 ## Installing *schoenberg*
 
 *schoenberg* is under active development and has not yet had its first release to CRAN. The easiest way to install the package is via the `install_github()` function from package *devtools*. Make sure you have *devtools* installed, then run
