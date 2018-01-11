@@ -1,7 +1,7 @@
-Package: tsgam
+Package: schoenberg
 Version: 0.0-4
 Date: 2018-01-06
-Title: Utilities for Working with GAMs Fitted to Time Series
+Title: Ggplot-based graphics and other useful functions for GAMs fitted using mgcv
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     email = "ucfagls@gmail.com",
                     role = c("aut","cre")))
