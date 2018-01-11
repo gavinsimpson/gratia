@@ -2,6 +2,12 @@
 
 The *schoenburg* package for R provides ggplot-based graphics and useful functions for GAMs fitted using the mgcv package.
 
+## Build status
+
+[![Build Status](https://travis-ci.org/gavinsimpson/schoenberg.svg?branch=master)](https://travis-ci.org/gavinsimpson/schoenberg)
+
+## Features
+
 The main features of *schoenberg* are currently
 
 * A *ggplot2*-based replacement for `mgcv:::plot.gam()`: `draw(gam_model)`.
