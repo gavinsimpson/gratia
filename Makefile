@@ -8,23 +8,23 @@ docs:
 
 build: docs
 	cd ..;\
-	R CMD build tsgam
+	R CMD build schoenberg
 
 check: build
 	cd ..;\
-	R CMD check tsgam_$(PKGVERS).tar.gz
+	R CMD check schoenberg_$(PKGVERS).tar.gz
 
 check-cran: build
 	cd ..;\
-	R CMD check --as-cran tsgam_$(PKGVERS).tar.gz
+	R CMD check --as-cran schoenberg_$(PKGVERS).tar.gz
 
 install: build
 	cd ..;\
-	R CMD INSTALL tsgam_$(PKGVERS).tar.gz
+	R CMD INSTALL schoenberg_$(PKGVERS).tar.gz
 
 move: check
-	cp ../tsgam.Rcheck/tsgam-Ex.Rout ./tests/Examples/tsgam-Ex.Rout.save
+	cp ../schoenberg.Rcheck/schoenberg-Ex.Rout ./tests/Examples/schoenberg-Ex.Rout.save
 
 clean:
 	cd ..;\
-	rm -r tsgam.Rcheck/
+	rm -r schoenberg.Rcheck/
