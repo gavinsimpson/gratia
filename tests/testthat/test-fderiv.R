@@ -1,11 +1,11 @@
-## Test `analog()` function
+## Test `fderiv()` function
 
 ## load packages
 library("testthat")
-library("tsgam")
+library("schoenberg")
 library("mgcv")
 
-context("Testing fedriv()")
+context("Testing fderiv()")
 
 test_that("fderiv() can create newdata with factors in model", {
     ## Example from https://github.com/scottkosty/tsgam/commit/a964ef3fcfc6847f737bd54e4d831b97d9d8b280

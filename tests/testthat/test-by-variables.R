@@ -2,7 +2,7 @@
 
 ## load packages
 library("testthat")
-library("tsgam")
+library("schoenberg")
 library("mgcv")
 library("ggplot2")
 theme_set(theme_grey())

@@ -2,7 +2,7 @@
 
 ## load packages
 library("testthat")
-library("tsgam")
+library("schoenberg")
 library("mgcv")
 
 context("confint methods")
