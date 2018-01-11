@@ -16,10 +16,10 @@ Imports:
 Suggests:
     testthat,
     vdiffr
-Description: Utility functions for fitting, testing, working with, and evaluating time series models using generalized additive models.
+Description: Ggplot-based graphics and utility functions for working with GAMs fitted using the mgcv package.
 License: MIT + file LICENSE
 LazyData: true
-URL: https://github.com/gavinsimpson/tsgam
-BugReports: https://github.com/gavinsimpson/tsgam/issues
+URL: https://github.com/gavinsimpson/schoenberg
+BugReports: https://github.com/gavinsimpson/schoenberg/issues
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.0.1
