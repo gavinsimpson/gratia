@@ -62,6 +62,28 @@ test_that("draw() works with continuous by", {
 })
 
 test_that("draw() works with continuous by and fixed scales", {
-    vdiffr::expect_doppelganger("draw AM with continuous by-variable smooth with fixed scale",
+    vdiffr::expect_doppelganger("draw AM with continuous by-var fixed scale",
                                 draw(mod, scales = "fixed"))
+})
+
+test_that("draw() works with random effect smooths (bs = 're')", {
+    ## simulate example... from ?mgcv::random.effects
+    dat <- gamSim(1, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
+
+    fac <- as.factor(sample(1:20, 400, replace = TRUE))
+    dat$X <- model.matrix(~ fac - 1)
+    b <- rnorm(20) * 0.5
+    dat <- transform(dat, y = y + X %*% b)
+
+    rm1 <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) +
+                   s(x3), data = dat, method = "ML")
+
+    sm <- evaluate_smooth(rm1, "s(fac)")
+    expect_s3_class(sm, "evaluated_re_smooth")
+    vdiffr::expect_doppelganger("draw.evaluated_re_smooth",
+                                draw(sm))
+    vdiffr::expect_doppelganger("draw.gam model with ranef smooth",
+                                draw(rm1, ncol = 3))
+    vdiffr::expect_doppelganger("draw.gam model with ranef smooth fixed scales",
+                                draw(rm1, ncol = 3, scales = "fixed"))
 })
