@@ -2,13 +2,21 @@
 % Please edit documentation in R/evaluate_smooth.R
 \name{evaluate_smooth}
 \alias{evaluate_smooth}
+\alias{evaluate_smooth.gam}
+\alias{evaluate_smooth.gamm}
 \title{Evaluate a smooth}
 \usage{
-evaluate_smooth(object, smooth, n = 100, newdata = NULL,
-  unconditional = FALSE, inc.mean = FALSE, dist = 0.1)
+evaluate_smooth(object, ...)
+
+\method{evaluate_smooth}{gam}(object, smooth, n = 100, newdata = NULL,
+  unconditional = FALSE, inc.mean = FALSE, dist = 0.1, ...)
+
+\method{evaluate_smooth}{gamm}(object, ...)
 }
 \arguments{
 \item{object}{an object of class \code{"gam"} or \code{"gamm"}.}
+
+\item{...}{arguments passed to other methods.}
 
 \item{smooth}{character; a single smooth to evaluate.}
 

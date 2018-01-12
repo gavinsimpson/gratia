@@ -15,6 +15,7 @@
 ##'   The data are scaled into the unit square before deciding what to exclude,
 ##'   and `dist` is a distance within the unit square. See
 ##'   [mgcv::exclude.too.far()] for further details.
+##' @param ... arguments passed to other methods.
 ##'
 ##' @return A data frame, which is of class `"evaluated_1d_smooth"` or `evaluated_2d_smooth`, which inherit from classes `"evaluated_smooth"` and `"data.frame"`.
 ##'
@@ -37,9 +38,15 @@
 ##' m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
 ##'
 ##' head(evaluate_smooth(m2, "s(x,z)", n = 100))
-evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
-                            unconditional = FALSE, inc.mean = FALSE,
-                            dist = 0.1) {
+`evaluate_smooth` <- function(object, ...) {
+    UseMethod("evaluate_smooth")
+}
+
+##' @export
+##' @rdname evaluate_smooth
+`evaluate_smooth.gam` <- function(object, smooth, n = 100, newdata = NULL,
+                                  unconditional = FALSE, inc.mean = FALSE,
+                                  dist = 0.1, ...) {
     ## simplify GAMM objects
     if (is.gamm(object)) {
         object <- object[["gam"]]
@@ -72,6 +79,12 @@ evaluate_smooth <- function(object, smooth, n = 100, newdata = NULL,
     }
 
     evaluated
+}
+
+##' @export
+##' @rdname evaluate_smooth
+`evaluate_smooth.gamm` <- function(object, ...) {
+    evaluate_smooth(object[["gam"]])
 }
 
 `evaluate_1d_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
