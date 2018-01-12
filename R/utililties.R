@@ -175,3 +175,8 @@
     terms[take] <- paste("s(", terms[take], ")", sep = "")
     terms
 }
+
+`is_re_smooth` <- function(smooth) {
+    check_is_mgcv_smooth(smooth)
+    inherits(smooth, "random.effect")
+}
