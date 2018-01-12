@@ -64,8 +64,12 @@
     ## SMOOTHS <- object[["smooth"]][smooth_ids]  # take matched smooths
     SMOOTHS <- get_smooths_by_id(smooth_ids, object) # extract the mgcv.smooth object
 
-    ## if 2d smooth, call separate fun
-    if (smooth_dim(SMOOTHS[[1]]) == 1L) {
+    ## choose how to evaluate the smooth
+    if (inherits(SMOOTHS[[1]], "random.effect")) { # FIXME: bs = "re" can also have `by`
+        evaluated <- evaluate_re_smooth(SMOOTHS[[1L]], model = object,
+                                        newdata = newdata,
+                                        unconditional = unconditional)
+    } else if (smooth_dim(SMOOTHS[[1]]) == 1L) { # if 2d smooth, call separate fun
         evaluated <- evaluate_1d_smooth(SMOOTHS, n = n, model = object,
                                         newdata = newdata, inc.mean = inc.mean,
                                         unconditional = unconditional)
@@ -85,6 +89,37 @@
 ##' @rdname evaluate_smooth
 `evaluate_smooth.gamm` <- function(object, ...) {
     evaluate_smooth(object[["gam"]])
+}
+
+## Random effect smooth
+`evaluate_re_smooth` <- function(object, model = NULL, newdata = NULL,
+                                 unconditional = FALSE) {
+    start <- object[["first.para"]]
+    end   <- object[["last.para"]]
+    para_seq <- seq(from = start, to = end, by = 1L)
+    coefs <- coef(model)[para_seq]
+    smooth_var <- smooth_variable(object)
+
+    if (!is.null(newdata)) {
+        stop("Not yet implemented: user-supplied data in 're' smooth")
+    }
+
+    levs <- levels(model[["model"]][[smooth_var]])
+
+    labels <- paste0(smooth_var, levs)
+
+    se <- diag(vcov(model, unconditional = unconditional))[para_seq]
+
+    evaluated <- data.frame(smooth = rep(smooth_label(object), length(coefs)),
+                            ..var  = levs,
+                            est = coefs,
+                            se = se,
+                            row.names = NULL)
+
+    names(evaluated)[2] <- smooth_var
+    class(evaluated) <- c("evaluated_re_smooth", "evaluated_smooth", "data.frame")
+
+    evaluated
 }
 
 `evaluate_1d_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,

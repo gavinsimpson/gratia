@@ -5,6 +5,7 @@
 \alias{draw.evaluated_1d_smooth}
 \alias{draw.evaluated_2d_smooth}
 \alias{draw.evaluated_2d_smooth}
+\alias{draw.evaluated_re_smooth}
 \title{Plot estimated smooths}
 \usage{
 \method{draw}{evaluated_1d_smooth}(object, xlab, ylab, title = NULL,
@@ -13,6 +14,9 @@
 \method{draw}{evaluated_2d_smooth}(object, show = c("estimate", "se"),
   contour = TRUE, xlab, ylab, title = NULL, subtitle = NULL,
   caption = NULL, ...)
+
+\method{draw}{evaluated_re_smooth}(object, qq_line = TRUE, xlab, ylab,
+  title = NULL, subtitle = NULL, caption = NULL, ...)
 }
 \arguments{
 \item{object}{an object, the result of a call to \code{\link[=evaluate_smooth]{evaluate_smooth()}}.}
@@ -39,6 +43,9 @@ standard error (\code{"se"}).}
 
 \item{contour}{logical; should contours be draw on the plot using
 \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+
+\item{qq_line}{logical; draw a reference line through the lower and upper
+theoretical quartiles.}
 }
 \value{
 A \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object.

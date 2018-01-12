@@ -215,6 +215,9 @@
     S <- S[d <= 2L]
     d <- d[d <= 2L]
 
+    ## FIXME: Exclude "re" smooths from "fixed" scales?
+    is_re <- vapply(object[["smooth"]], is_re_smooth, logical(1L))
+
     is_by <- vapply(object[["smooth"]], is_by_smooth, logical(1L))
     if (any(is_by)) {
         S <- vapply(strsplit(S, ":"), `[[`, character(1L), 1L)
@@ -240,10 +243,52 @@
         }
         ylims <- range(unlist(lapply(l, wrapper)))
 
-        for (i in seq_along(S)[d == 1L]) { # only the univariate smooths
+        for (i in seq_along(S)[d == 1L]) { # only the univariate smooths; FIXME: "re" smooths too?
             g[[i]] <- g[[i]] + lims(y = ylims)
         }
     }
 
     plot_grid(plotlist = g, align = align, ...)
+}
+
+##' @param qq_line logical; draw a reference line through the lower and upper
+##'   theoretical quartiles.
+##'
+##' @importFrom ggplot2 geom_abline geom_point labs
+##' @importFrom stats quantile qnorm
+##'
+##' @export
+##' @rdname draw.evaluated_smooth
+`draw.evaluated_re_smooth` <- function(object, qq_line = TRUE, xlab, ylab,
+                                       title = NULL, subtitle = NULL,
+                                       caption = NULL, ...) {
+    smooth_var <- names(object)[2L]
+
+    ## base plot with computed QQs
+    plt <- ggplot(object, aes_string(sample = "est")) +
+        geom_point(stat = "qq")
+
+    ## add a QQ reference line
+    if (isTRUE(qq_line)) {
+        sampq <- quantile(object[["est"]], c(0.25, 0.75))
+        gaussq <- qnorm(c(0.25, 0.75))
+        slope <- diff(sampq) / diff(gaussq)
+        intercept <- sampq[1L] - slope * gaussq[1L]
+
+        plt <- plt + geom_abline(slope = slope, intercept = intercept)
+    }
+
+    ## default axis labels if none supplied
+    if (missing(xlab)) {
+        xlab <- "Gaussian quantiles"
+    }
+    if (missing(ylab)) {
+        ylab <- paste("Effects:", smooth_var)
+    }
+
+    ## add labelling to plot
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+                      caption = caption)
+
+    plt
 }
