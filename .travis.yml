@@ -20,7 +20,7 @@ r_packages:
   - vdiffr
 
 r_github_packages:
-  - jimhester/covr
+  - r-lib/covr
 
 after_success:
   - Rscript -e 'covr::codecov()'
