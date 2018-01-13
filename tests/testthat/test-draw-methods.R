@@ -87,3 +87,28 @@ test_that("draw() works with random effect smooths (bs = 're')", {
     vdiffr::expect_doppelganger("draw.gam model with ranef smooth fixed scales",
                                 draw(rm1, ncol = 3, scales = "fixed"))
 })
+
+test_that("draw() with random effect smooths (bs = 're') & factor by variable ", {
+    ## simulate example...
+    set.seed(1)
+    dat1 <- gamSim(4, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
+
+    ## random effects
+    ranef <- as.factor(sample(1:20, 400, replace = TRUE))
+    dat1$X <- model.matrix(~ ranef - 1)
+    b <- rnorm(20) * 0.5
+    da1 <- transform(dat1, y = y + X %*% b)
+
+    ## fit model
+    rm2 <- gam(y ~ fac + s(ranef, bs = "re", by = fac) + s(x0) + s(x1) + s(x2),
+               data = dat1, method = "ML")
+
+    sm <- evaluate_smooth(rm2, "s(ranef)")
+    expect_s3_class(sm, "evaluated_re_smooth")
+    ## vdiffr::expect_doppelganger("draw.evaluated_re_smooth with factor by",
+    ##                             draw(sm))
+    vdiffr::expect_doppelganger("draw.gam model with ranef smooth factor by",
+                                draw(rm2, ncol = 3))
+    vdiffr::expect_doppelganger("draw.gam model with ranef smooth factor by fixed scales",
+                                draw(rm2, ncol = 3, scales = "fixed"))
+})
