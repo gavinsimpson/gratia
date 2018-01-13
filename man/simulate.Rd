@@ -46,11 +46,6 @@ m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 sims <- simulate(m1, nsim = 5, seed = 42)
 head(sims)
-
-m2 <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-
-sims <- simulate(m2, nsim = 5, seed = 42)
-head(sims)
 }
 \author{
 Gavin L. Simpson
