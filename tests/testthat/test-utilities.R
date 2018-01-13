@@ -1,4 +1,4 @@
-## Test draw() methods
+## Test Utilties
 
 ## load packages
 library("testthat")
