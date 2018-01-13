@@ -29,11 +29,6 @@
 ##'
 ##' sims <- simulate(m1, nsim = 5, seed = 42)
 ##' head(sims)
-##'
-##' m2 <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-##'
-##' sims <- simulate(m2, nsim = 5, seed = 42)
-##' head(sims)
 `simulate.gam` <- function(object, nsim = 1, seed = NULL, newdata = NULL,
                            freq = FALSE, unconditional = FALSE, ...) {
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
