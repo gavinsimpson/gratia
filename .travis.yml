@@ -18,6 +18,8 @@ r_packages:
   - ggplot2
   - cowplot
   - vdiffr
+  - scam
+  - MASS
 
 r_github_packages:
   - r-lib/covr
