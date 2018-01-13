@@ -66,7 +66,7 @@
 
     ## choose how to evaluate the smooth
     if (inherits(SMOOTHS[[1]], "random.effect")) { # FIXME: bs = "re" can also have `by`
-        evaluated <- evaluate_re_smooth(SMOOTHS[[1L]], model = object,
+        evaluated <- evaluate_re_smooth(SMOOTHS, model = object,
                                         newdata = newdata,
                                         unconditional = unconditional)
     } else if (smooth_dim(SMOOTHS[[1]]) == 1L) { # if 2d smooth, call separate fun
@@ -94,27 +94,57 @@
 ## Random effect smooth
 `evaluate_re_smooth` <- function(object, model = NULL, newdata = NULL,
                                  unconditional = FALSE) {
-    start <- object[["first.para"]]
-    end   <- object[["last.para"]]
-    para_seq <- seq(from = start, to = end, by = 1L)
-    coefs <- coef(model)[para_seq]
-    smooth_var <- smooth_variable(object)
+    ## If more than one smooth, these should be by variables smooths
+    is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
+    if (length(object) > 1L) {
+        if (!all(is.by)) {
+            msg <- paste("Hmm, something went wrong identifying the requested smooth. Found:\n",
+                         paste(vapply(object, FUN = smooth_label,
+                                      FUN.VALUE = character(1L)),
+                               collapse = ', '),
+                         "\nNot all of these are 'by' variable smooths. Contact Maintainer.")
+            stop(msg)
+        }
+    }
+
+    ## get by variable info
+    by_var <- unique(vapply(object, FUN = by_variable, FUN.VALUE = character(1)))
 
     if (!is.null(newdata)) {
         stop("Not yet implemented: user-supplied data in 're' smooth")
     }
 
+    ## get variable for this smooth
+    smooth_var    <- unique(vapply(object, FUN = smooth_variable, FUN.VALUE = character(1)))
+    smooth_labels <- vapply(object, FUN = smooth_label, FUN.VALUE = character(1))
     levs <- levels(model[["model"]][[smooth_var]])
-
     labels <- paste0(smooth_var, levs)
 
-    se <- diag(vcov(model, unconditional = unconditional))[para_seq]
+    ## if we have a by variable
+    is.factor.by <- vapply(object, FUN = is_factor_by_smooth, FUN.VALUE = logical(1L))
 
-    evaluated <- data.frame(smooth = rep(smooth_label(object), length(coefs)),
-                            ..var  = levs,
-                            est = coefs,
-                            se = se,
-                            row.names = NULL)
+    evaluated <- vector("list", length(object))
+    for (i in seq_along(evaluated)) {
+        start <- object[[i]][["first.para"]]
+        end   <- object[[i]][["last.para"]]
+        para_seq <- seq(from = start, to = end, by = 1L)
+        coefs <- coef(model)[para_seq]
+        se <- diag(vcov(model, unconditional = unconditional))[para_seq]
+        evaluated[[i]] <- data.frame(smooth = rep(smooth_labels[i], length(coefs)),
+                                     ..var  = levs,
+                                     est = coefs,
+                                     se = se,
+                                     row.names = NULL)
+    }
+
+    evaluated <- do.call("rbind", evaluated)
+
+    if (any(is.factor.by)) {
+        evaluated <- cbind(evaluated,
+                           by_var = rep(levels(model[["model"]][[by_var]]),
+                                        each = length(levs)))
+        names(evaluated)[NCOL(evaluated)] <- by_var
+    }
 
     names(evaluated)[2] <- smooth_var
     class(evaluated) <- c("evaluated_re_smooth", "evaluated_smooth", "data.frame")
