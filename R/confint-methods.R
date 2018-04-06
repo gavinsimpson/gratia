@@ -194,7 +194,7 @@
     S <- smooths(object)            # vector of smooth labels - "s(x)"
 
     ## which --- ie index --- smooths match parm
-    take <- grep(parm, S, fixed = TRUE)
+    take <- which_smooth(object, parm)
     S <- S[take]
 
     ## can only do confints for 1d smooths currently --- get smooth dimensions & prune list `S`
@@ -239,6 +239,8 @@
 
     for (i in seq_along(out)) {
         out[[i]] <- evaluate_smooth(object, uS[i], n = n, newdata = newdata)
+
+        ## what type of confidence interval do we want?
         crit <- if (isTRUE(type == "confidence")) {
             qnorm(1 - ((1 - level) / 2))
         } else {
