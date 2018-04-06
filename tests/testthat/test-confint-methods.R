@@ -58,4 +58,6 @@ test_that("Point-wise confidence interval for a GAM with factor by variable work
     expect_s3_class(ci, "data.frame")
     expect_named(ci, expected = c("smooth", "x2", "est", "se", "fac",
                                   "lower", "upper", "crit"))
+    expect_equal(paste0("s(x2):fac", levels(dat[["fac"]])),
+                 levels(ci[["smooth"]]))
 })
