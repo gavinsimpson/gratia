@@ -164,7 +164,7 @@
 ##'
 ##' @author Gavin L. Simpson
 ##'
-##' @importFrom stats family
+##' @importFrom stats family qnorm
 ##' @importFrom mgcv PredictMat
 ##' @importFrom stats quantile vcov setNames
 ##' @importFrom MASS mvrnorm
@@ -202,9 +202,12 @@
     S <- S[d <= 1L]
 
     ## look to see if smooth is a by variable
+    by_levs <- NULL
     is_by <- vapply(object[["smooth"]][take], is_by_smooth, logical(1L))
     if (any(is_by)) {
         S <- vapply(strsplit(S, ":"), `[[`, character(1L), 1L)
+        by_levs <- vapply(object[["smooth"]][take], by_level, character(1L))
+        by_var <- vapply(object[["smooth"]][take], by_variable, character(1L))
     }
     ## unique smooths (counts all levels of a by factor as a single smooth)
     uS <- unique(S)
@@ -213,8 +216,6 @@
     if (!is.null(newdata)) {
         n <- NROW(newdata)
     }
-
-    type <- match.arg(type)
 
     ilink <- if (is.logical(transform)) { # transform is logical
                  if (isTRUE(transform)) { # transform == TRUE
@@ -225,7 +226,9 @@
     } else if (!is.null(transform)) {   # transform is a fun
         match.fun(transform)
     }
-    
+
+    ## which type of confidence interval
+    type <- match.arg(type)
     if (isTRUE(type == "simultaneous")) {
         ## need VCOV for simultaneous intervals
         V <- get_vcov(object, unconditional = unconditional)
@@ -233,32 +236,54 @@
         ## simulate un-biased deviations given bayesian covar matrix
         buDiff <- MASS::mvrnorm(n = nsim, mu = rep(0, nrow(V)), Sigma = V)
     }
-
     ## list to hold results
     out <- vector("list", length = length(uS)) # list for results
 
-    for (i in seq_along(out)) {
-        out[[i]] <- evaluate_smooth(object, uS[i], n = n, newdata = newdata)
-
-        ## what type of confidence interval do we want?
-        crit <- if (isTRUE(type == "confidence")) {
-            qnorm(1 - ((1 - level) / 2))
-        } else {
-            smooth <- get_smooth(object, parm[i])
+    if (isTRUE(type == "confidence")) {
+        for (i in seq_along(out)) {
+            out[[i]] <- evaluate_smooth(object, uS[i], n = n, newdata = newdata)
+            out[[i]][["crit"]] <- qnorm((1 - level) / 2, lower.tail = FALSE)
+        }
+    } else {
+        ## function to do simultaneous intervals for a smooth
+        ## this should be outlined as an actual function...
+        ## @param smooth list; the individual smooth to work on
+        ## @param level numeric; the confidence level
+        ## @param newdata dataframe; values to compute confidence interval at
+        sim_interval <- function(smooth, level, newdata) {
             start <- smooth[["first.para"]]
             end <- smooth[["last.para"]]
             para.seq <- start:end
-            newx <- setNames(data.frame(out[[i]][, 2L]), smooth_variable(smooth))
-            Cg <- PredictMat(smooth, newx)
+            Cg <- PredictMat(smooth, newdata)
             simDev <- Cg %*% t(buDiff[, para.seq])
-            absDev <- abs(sweep(simDev, 1L, out[[i]][, "se"], FUN = "/"))
+            absDev <- abs(sweep(simDev, 1L, newdata[["se"]], FUN = "/"))
             masd <- apply(absDev, 2L, max)
             quantile(masd, probs = level, type = 8)
         }
-        out[[i]] <- cbind(out[[i]],
-                          lower = out[[i]][, "est"] - (crit * out[[i]][, "se"]),
-                          upper = out[[i]][, "est"] + (crit * out[[i]][, "se"]),
-                          crit  = rep(crit, length.out = nrow(out[[i]])))
+        ## need VCOV for simultaneous intervals
+        V <- get_vcov(object, unconditional = unconditional)
+        ## simulate un-biased deviations given bayesian covar matrix
+        buDiff <- MASS::mvrnorm(n = nsim, mu = rep(0, nrow(V)), Sigma = V)
+        ## loop over smooths
+        for (i in seq_along(out)) {
+            ## evaluate smooth
+            out[[i]] <- evaluate_smooth(object, uS[i], n = n, newdata = newdata)
+
+            ## if this is a by var smooth, we need to do this for each level of by var
+            if (is.null(by_levs)) {        # not by variable smooth
+                smooth <- get_smooth(object, parm) # get the specific smooth
+                crit <- sim_interval(smooth, level = level, newdata = out[[i]])
+                out[[i]][["crit"]] <- crit # add on the critical value for this smooth
+            } else {                       # is a by variable smooth
+                out[[i]][["crit"]] <- 0    # fill in a variable crit
+                smooth <- get_smooth(object, parm)
+                for (l in seq_along(by_levs)) {
+                    ind <- out[[i]][[5L]] == by_levs[l] # which rows in evaulated smooth contain this levels data?
+                    crit <- sim_interval(smooth[[l]], level = level, newdata = out[[i]][ind, ])
+                    out[[i]][["crit"]][ind] <- crit # add on the critical value for this smooth
+                }
+            }
+        }
     }
 
     const <- coef(object)
@@ -268,10 +293,18 @@
 
     ## simplify to a data frame for return
     out <- do.call("rbind", out)
+
+    ## using se and crit, compute the lower and upper intervals
+    out <- cbind(out,
+                 lower = out[["est"]] - (out[["crit"]] * out[["se"]]),
+                 upper = out[["est"]] + (out[["crit"]] * out[["se"]]))
+
+    ## transform
     out[, "est"]   <- ilink(out[, "est"] + const)
     out[, "lower"] <- ilink(out[, "lower"] + const)
     out[, "upper"] <- ilink(out[, "upper"] + const)
 
+    ## prepare for return
     class(out) <- c("confint.gam", "data.frame")
     out                                 # return
 }
