@@ -51,7 +51,10 @@
 `fderiv.gam` <- function(model, newdata, term, n = 200, eps = 1e-7,
                          unconditional = FALSE, ...) {
     ## all model terms
-    m.terms <- attr(model$terms, "term.labels")
+    ## m.terms <- attr(model$terms, "term.labels")
+    m.terms <- names(attr(model$terms, "dataClasses"))
+    ## Do we want to handle ofsets?
+    ## Or just bail and get user to supply newdata?
 
     ## any factors used in the model?
     ff <- attr(model$terms, "dataClasses") == "factor"
@@ -59,6 +62,7 @@
     ## remove response
     respvar <- attr(model$terms, "response")
     if (!identical(respvar, 0)) {
+        m.terms <- m.terms[-respvar]
         ff <- ff[-respvar]
     }
 
@@ -90,7 +94,7 @@
         ## generate newdata at `n` locations
         newdata <- lapply(mf,
                           function(x) seq(min(x), max(x), length = n))
-        newdata <- do.call("data.frame", newdata)
+        newdata <- do.call("data.frame", list(newdata, check.names = FALSE))
 
         if (any(ff)) {
             newdata <- cbind(newdata, f.mf)
@@ -100,6 +104,14 @@
 
     ## re-arrange
     newdata <- newdata[, m.terms, drop = FALSE]
+
+    ## FIXME: handle offsets - do I want to?
+    ## FIXME: if yes, I do want to handle them, this needs to be in
+    ## a separate internal function as I need to do this elsewhere
+    p.terms <- attr(terms(model[["pred.formula"]]), "term.labels")
+    ind <- m.terms %in% p.terms
+    names(newdata)[!ind] <- p.terms[!ind]
+    ## FIXME: set offset var to 1L
 
     ## copy into newdata2
     newdata2 <- newdata
