@@ -116,11 +116,39 @@
     inherits(object, "gam")
 }
 
-`get_smooth` <- function(object, term) {
+`get_smooth` <- function(object, term, level) {
     if (is.gamm(object)) {
         object <- object[["gam"]]
     }
-    object[["smooth"]][[which_smooth(object, term)]]
+
+    ## which smooth match the term?
+    take <- which_smooth(object, term)
+    S <- object[["smooth"]][take]
+    
+    ## if there are multiple, then suggests a factor by smooth
+    is_by <- vapply(S, is_factor_by_smooth, logical(1L))
+
+    ## if any are factor by variable smooths, get the levels
+    if (any(is_by)) {
+        if (missing(level)) {
+            stop("No value provided for argument 'level':\n  Getting a factor by-variable smooth requires a 'level' be supplied.")
+        }
+        level <- as.character(level)    # explicit coerce to character for later comparison
+        levs <- vapply(S, by_level, character(1L))
+        take <- match(level, levs)
+        if (is.na(take)) {
+            msg <- paste0("Invalid 'level' for smooth '", term, "'. Possible levels are:\n")
+            msg <- paste(msg, paste(strwrap(paste0(shQuote(levs), collapse = ", "),
+                                            prefix = " ", initial = ""),
+                                    collapse = "\n"))
+            stop(msg)
+        }
+
+        S <- S[[take]]
+    }
+
+    ## return a single smooth object
+    S
 }
 
 `get_smooths_by_id` <- function(id, object) {
