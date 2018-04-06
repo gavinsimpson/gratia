@@ -190,8 +190,25 @@
                           shift = FALSE, transform = FALSE, unconditional = FALSE,
                           ...) {
     parm <- add_s(parm)
-    parm <- select_smooth(object, parm) # select_terms(object, parm)
+    ## parm <- select_smooth(object, parm) # select_terms(object, parm)
+    S <- smooths(object)            # vector of smooth labels - "s(x)"
 
+    ## which --- ie index --- smooths match parm
+    take <- grep(parm, S, fixed = TRUE)
+    S <- S[take]
+
+    ## can only do confints for 1d smooths currently --- get smooth dimensions & prune list `S`
+    d <- smooth_dim(object)[take]
+    S <- S[d <= 1L]
+
+    ## look to see if smooth is a by variable
+    is_by <- vapply(object[["smooth"]][take], is_by_smooth, logical(1L))
+    if (any(is_by)) {
+        S <- vapply(strsplit(S, ":"), `[[`, character(1L), 1L)
+    }
+    ## unique smooths (counts all levels of a by factor as a single smooth)
+    uS <- unique(S)
+    
     ## how many data points if newdata supplied
     if (!is.null(newdata)) {
         n <- NROW(newdata)
@@ -208,17 +225,20 @@
     } else if (!is.null(transform)) {   # transform is a fun
         match.fun(transform)
     }
-
-    out <- vector("list", length = length(parm)) # list for results
+    
     if (isTRUE(type == "simultaneous")) {
         ## need VCOV for simultaneous intervals
         V <- get_vcov(object, unconditional = unconditional)
+
         ## simulate un-biased deviations given bayesian covar matrix
         buDiff <- MASS::mvrnorm(n = nsim, mu = rep(0, nrow(V)), Sigma = V)
     }
 
+    ## list to hold results
+    out <- vector("list", length = length(uS)) # list for results
+
     for (i in seq_along(out)) {
-        out[[i]] <- evaluate_smooth(object, parm[i], n = n, newdata = newdata)
+        out[[i]] <- evaluate_smooth(object, uS[i], n = n, newdata = newdata)
         crit <- if (isTRUE(type == "confidence")) {
             qnorm(1 - ((1 - level) / 2))
         } else {
