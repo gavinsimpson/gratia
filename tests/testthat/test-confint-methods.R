@@ -46,3 +46,16 @@ test_that("Simultaneous interval for a GAM works", {
     expect_s3_class(si, "data.frame")
     expect_named(si, expected = c("smooth", "x1", "est", "se", "lower", "upper", "crit"))
 })
+
+## confint methods for by variables
+set.seed(2)
+dat <- gamSim(4, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+mod <- gam(y ~ fac + s(x2, by = fac), data = dat, method = "REML")
+
+test_that("Point-wise confidence interval for a GAM with factor by variable works", {
+    ci <- confint(mod, parm = "x2", type = "confidence")
+    expect_s3_class(ci, "confint.gam")
+    expect_s3_class(ci, "data.frame")
+    expect_named(ci, expected = c("smooth", "x2", "est", "se", "fac",
+                                  "lower", "upper", "crit"))
+})
