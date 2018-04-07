@@ -21,6 +21,7 @@
 ##' @param n integer; if `newdata` is missing the original data can be reconstructed from `model` and then `n` controls the number of values over the range of each covariate with which to populate `newdata`.
 ##' @param eps numeric; the value of the finite difference used to approximate the first derivative.
 ##' @param unconditional logical; if `TRUE`, the smoothing parameter uncertainty corrected covariance matrix is used, *if available*, otherwise the uncorrected Bayesian posterior covariance matrix is used.
+##' @param offset numeric; value of offset to use in generating predictions.
 ##'
 ##' @importFrom stats coef model.frame predict terms vcov
 ##'
@@ -49,7 +50,7 @@
 ##' ## ...and a selected smooth
 ##' fd2 <- fderiv(mod, term = "x1")
 `fderiv.gam` <- function(model, newdata, term, n = 200, eps = 1e-7,
-                         unconditional = FALSE, ...) {
+                         unconditional = FALSE, offset = NULL, ...) {
     ## all model terms
     ## m.terms <- attr(model$terms, "term.labels")
     m.terms <- names(attr(model$terms, "dataClasses"))
@@ -105,13 +106,8 @@
     ## re-arrange
     newdata <- newdata[, m.terms, drop = FALSE]
 
-    ## FIXME: handle offsets - do I want to?
-    ## FIXME: if yes, I do want to handle them, this needs to be in
-    ## a separate internal function as I need to do this elsewhere
-    p.terms <- attr(terms(model[["pred.formula"]]), "term.labels")
-    ind <- m.terms %in% p.terms
-    names(newdata)[!ind] <- p.terms[!ind]
-    ## FIXME: set offset var to 1L
+    ## handle offsets - do I want to?
+    newdata <- fix_offset(model, newdata, offset_value = NULL)
 
     ## copy into newdata2
     newdata2 <- newdata

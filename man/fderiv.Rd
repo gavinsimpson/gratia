@@ -9,7 +9,7 @@
 fderiv(model, ...)
 
 \method{fderiv}{gam}(model, newdata, term, n = 200, eps = 1e-07,
-  unconditional = FALSE, ...)
+  unconditional = FALSE, offset = NULL, ...)
 
 \method{fderiv}{gamm}(model, ...)
 }
@@ -27,6 +27,8 @@ fderiv(model, ...)
 \item{eps}{numeric; the value of the finite difference used to approximate the first derivative.}
 
 \item{unconditional}{logical; if \code{TRUE}, the smoothing parameter uncertainty corrected covariance matrix is used, \emph{if available}, otherwise the uncorrected Bayesian posterior covariance matrix is used.}
+
+\item{offset}{numeric; value of offset to use in generating predictions.}
 }
 \value{
 An object of class \code{"fderiv"} is returned.

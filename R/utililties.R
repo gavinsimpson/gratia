@@ -180,3 +180,30 @@
     check_is_mgcv_smooth(smooth)
     inherits(smooth, "random.effect")
 }
+
+## identify which variable is the offset, and fix the name such that
+## "offset(foo(var))" -> "var", and possibly set that data to
+## `offset_value`
+`fix_offset` <- function(model, newdata, offset_value = NULL) {
+    m.terms <- names(newdata)
+    p.terms <- attr(terms(model[["pred.formula"]]), "term.labels")
+
+    ## is there an offset?
+    off <- grepl("offset\\(", m.terms)
+    if (any(off)) {
+        ## which cleaned terms not in model terms
+        ind <- m.terms %in% p.terms
+        ## for the cleaned terms not in model terms, match with the offset
+        off_var <- grepl(p.terms[!ind], m.terms[off])
+        if (any(off_var)) {
+            names(newdata)[off] <- p.terms[!ind][off_var]
+        }
+    }
+
+    ## change offset?
+    if (!is.null(offset_value)) {
+        newdata[, off] <- offset_value
+    }
+
+    newdata                        # return
+}
