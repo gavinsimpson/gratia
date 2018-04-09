@@ -170,8 +170,12 @@
     V
 }
 
+`has_s` <- function(terms) {
+    grepl("^s\\(.+\\)$", terms)
+}
+
 `add_s` <- function(terms) {
-    take <- grepl("^s\\(.+\\)$", terms)
+    take <- ! has_s(terms)
     terms[take] <- paste("s(", terms[take], ")", sep = "")
     terms
 }
@@ -181,15 +185,46 @@
     inherits(smooth, "random.effect")
 }
 
-## identify which variable is the offset, and fix the name such that
-## "offset(foo(var))" -> "var", and possibly set that data to
-## `offset_value`
+##' Fix the names of a data frame containing an offset variable.
+##'
+##' Identifies which variable, if any, is the model offset, and fixed the name
+##' such that `"offset(foo(var))" is converted `"var"`, and possibly sets that
+##' data to `offset_value`.
+##
+##' @param model a fitted GAM.
+##'
+##' @param newdata data frame; new values at which to predict at.
+##'
+##' @param offset_value numeric, optional; if provided, then the offset variable in `newdata` is set to this constant value before returning `newdata`
+##'
+##' @return The original `newdata` is returned with fixed names and possibly modified offset variable.
+##'
+##' @author Gavin L. Simpson
+##'
+##' @export
+##'
+##' @examples
+##' ##\testonly{set.seed(2)}
+##' library("mgcv")
+##' set.seed(2)
+##' df <- gamSim(1, n = 400, dist = "normal")
+##' m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = df, method = "REML")
+##' names(model.frame(m))
+##' names(fix_offset(m, model.frame(m), offset_value = 1L))
 `fix_offset` <- function(model, newdata, offset_value = NULL) {
     m.terms <- names(newdata)
     p.terms <- attr(terms(model[["pred.formula"]]), "term.labels")
 
+    ## remove repsonse from m.terms if it is in there
+    tt <- terms(model)
+    resp <- names(attr(tt, "dataClasses"))[attr(tt, "response")]
+    Y <- m.terms == resp
+    if (any(Y)) {
+        m.terms <- m.terms[!Y]
+    }
+
     ## is there an offset?
-    off <- grepl("offset\\(", m.terms)
+    off <- is_offset(m.terms)
     if (any(off)) {
         ## which cleaned terms not in model terms
         ind <- m.terms %in% p.terms
@@ -206,4 +241,26 @@
     }
 
     newdata                        # return
+}
+
+##' Is a model term an offset?
+##'
+##' Given a character vector of model terms, checks to see which, if any, is the model offset.
+##'
+##' @param terms character vector of model terms.
+##'
+##' @return A logical vector of the same length as `terms`.
+##'
+##' @author Gavin L. Simpson
+##'
+##' @export
+##'
+##' @examples
+##' df <- gamSim(1, n = 400, dist = "normal")
+##' m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = dat, method = "REML")
+##' nm <- names(model.frame(m))
+##' nm
+##' is_offset(nm)
+`is_offset` <- function(terms) {
+    grepl("offset\\(", terms)
 }

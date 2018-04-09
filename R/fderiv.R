@@ -51,21 +51,6 @@
 ##' fd2 <- fderiv(mod, term = "x1")
 `fderiv.gam` <- function(model, newdata, term, n = 200, eps = 1e-7,
                          unconditional = FALSE, offset = NULL, ...) {
-    ## all model terms
-    ## m.terms <- attr(model$terms, "term.labels")
-    m.terms <- names(attr(model$terms, "dataClasses"))
-    ## Do we want to handle ofsets?
-    ## Or just bail and get user to supply newdata?
-
-    ## any factors used in the model?
-    ff <- attr(model$terms, "dataClasses") == "factor"
-
-    ## remove response
-    respvar <- attr(model$terms, "response")
-    if (!identical(respvar, 0)) {
-        m.terms <- m.terms[-respvar]
-        ff <- ff[-respvar]
-    }
 
     ## where to predict/evaluate derivatives at
     if (missing(newdata)) {
@@ -73,9 +58,22 @@
         mf <- model.frame(model)
 
         ## remove response
+        respvar <- attr(model$terms, "response")
         if (!identical(respvar, 0)) {
             mf <- mf[, -respvar, drop = FALSE]
         }
+
+        ## remove offset() var; model.frame returns both `offset(foo(var))` and `var`,
+        ## so we can just remove the former, but we also want to set the offset
+        ## variable `var` to something constant. FIXME
+        if (is.null(offset)) {
+            offset <- 1L
+        }
+        mf <- fix_offset(model, mf, offset_value = offset)
+
+        ff <- vapply(mf, is.factor, logical(1L))
+
+        m.terms <- names(mf)
 
         if (any(ff)) {
             ## need to supply something for each factor
@@ -84,8 +82,7 @@
                 levs <- levels(f)
                 factor(rep(f[1], length.out = n), levels = levs)
             }
-            f.mf <- lapply(mf[, ff, drop = FALSE],
-                           rep_first_factor_value, n = n)
+            f.mf <- lapply(mf[, ff, drop = FALSE], rep_first_factor_value, n = n)
             f.mf <- do.call("cbind.data.frame", f.mf)
 
             ## remove factors
@@ -101,21 +98,28 @@
             newdata <- cbind(newdata, f.mf)
         }
         colnames(newdata) <- c(m.terms[!ff], m.terms[ff])
-    }
 
-    ## re-arrange
-    newdata <- newdata[, m.terms, drop = FALSE]
+        ## re-arrange
+        newdata <- newdata[, m.terms, drop = FALSE]
 
-    ## handle offsets - do I want to?
-    newdata <- fix_offset(model, newdata, offset_value = NULL)
+        ## copy into newdata2
+        newdata2 <- newdata
 
-    ## copy into newdata2
-    newdata2 <- newdata
-
-    if (any(ff)) {
-        newdata2[, !ff] <- newdata2[, !ff, drop = FALSE] + eps
+        if (any(ff)) {
+            newdata2[, !ff] <- newdata2[, !ff, drop = FALSE] + eps
+        } else {
+            newdata2 <- newdata2 + eps
+        }
     } else {
-        newdata2 <- newdata2 + eps
+        ff <- vapply(newdata, is.factor, logical(1L))
+        ## copy into newdata2
+        newdata2 <- newdata
+        ## handle factors when shifting by eps
+        if (any(ff)) {
+            newdata2[, !ff] <- newdata2[, !ff, drop = FALSE] + eps
+        } else {
+            newdata2 <- newdata2 + eps
+        }
     }
 
     ## compute Xp for evaluation points
@@ -125,30 +129,34 @@
     Xp.r <- NROW(Xp)
     Xp.c <- NCOL(Xp)
 
-    ## number of smooth terms
-    ## t.labs <- attr(model$terms, "term.labels")
-
     ## match the term with the the terms in the model
     if(!missing(term)) {
-        m.terms <- select_terms(model, term)
+        S <- select_terms(model, term)
+        S <- add_s(S)
+    } else {
+        S <- smooths(model)             # model smooths
     }
-    nt <- length(m.terms)
+
+    nt <- length(S)      # how many smooths do we need derivatives for
+
     ## list to hold the derivatives
     lD <- vector(mode = "list", length = nt)
-    names(lD) <- m.terms
+    names(lD) <- S
+
     ## Bayesian covar
     Vb <- vcov(model, unconditional = unconditional)
-    ## loop over terms, selecting the columns of Xp for the ith
-    ## smooth
+
+    ## loop over smooth terms, selecting the columns of Xp for the
+    ## ith smooth
     for(i in seq_len(nt)) {
         Xi <- Xp * 0 # create new matrix with dim(Xp) but filled with 0
-        want <- grep(m.terms[i], colnames(X1)) # which columns in Lp are for current term
+        want <- grep(S[i], colnames(X1)) # which columns in Lp are for current term
         Xi[, want] <- Xp[, want]              # fill in 0-matrix with Lp data
         df <- Xi %*% coef(model)              # predict derive given model coefs
         df.sd <- rowSums(Xi %*% Vb * Xi)^.5   # standard error of predictions
         lD[[i]] <- list(deriv = df, se.deriv = df.sd, Xi = Xi)
     }
-    out <- structure(list(derivatives = lD, terms = m.terms, model = model,
+    out <- structure(list(derivatives = lD, terms = S, model = model,
                           eps = eps, eval = newdata, unconditional = unconditional),
                      class = "fderiv")
     out
