@@ -150,7 +150,7 @@
     ## ith smooth
     for(i in seq_len(nt)) {
         Xi <- Xp * 0 # create new matrix with dim(Xp) but filled with 0
-        want <- grep(S[i], colnames(X1)) # which columns in Lp are for current term
+        want <- grep(S[i], colnames(X1), fixed = TRUE) # which columns in Lp are for current term
         Xi[, want] <- Xp[, want]              # fill in 0-matrix with Lp data
         df <- Xi %*% coef(model)              # predict derive given model coefs
         df.sd <- rowSums(Xi %*% Vb * Xi)^.5   # standard error of predictions

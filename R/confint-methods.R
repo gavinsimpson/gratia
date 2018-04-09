@@ -41,16 +41,18 @@
     ## Process arguments
     ## parm is one of the terms in object
     parm <- if(missing(parm)) {
-        object$terms
-    } else {
-        terms <- object$terms
-        want <- parm %in% terms
-        if (any(!want)) {
-            msg <- paste("Terms:", paste(parm[!want], collapse = ", "), "not found in `object`")
-            stop(msg)
-        }
-        parm[want]
-    }
+                object$terms
+            } else {
+                parm <- add_s(parm)
+                terms <- object$terms
+                want <- parm %in% terms
+                if (any(!want)) {
+                    msg <- paste("Terms:", paste(parm[!want], collapse = ", "),
+                                 "not found in `object`")
+                    stop(msg)
+                }
+                parm[want]
+            }
     ## parm <- add_s(parm)
 
     ## level should be length 1, numeric and 0 < level < 1
@@ -176,11 +178,11 @@
 ##' set.seed(2)
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 ##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-##'
+##' ##'
 ##' ## point-wise interval
 ##' ci <- confint(mod, parm = "x1", type = "confidence")
 ##' head(ci)
-##'
+##' ##'
 ##' ## simultaneous interval for smooth term of x1
 ##' set.seed(42)
 ##' si <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)
@@ -211,7 +213,7 @@
     }
     ## unique smooths (counts all levels of a by factor as a single smooth)
     uS <- unique(S)
-    
+
     ## how many data points if newdata supplied
     if (!is.null(newdata)) {
         n <- NROW(newdata)

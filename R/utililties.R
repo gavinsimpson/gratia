@@ -142,7 +142,7 @@
     ## which smooth match the term?
     take <- which_smooth(object, term)
     S <- object[["smooth"]][take]
-    
+
     ## if there are multiple, then suggests a factor by smooth
     is_by <- vapply(S, is_factor_by_smooth, logical(1L))
 
@@ -295,8 +295,9 @@
 ##' @export
 ##'
 ##' @examples
+##' library("mgcv")
 ##' df <- gamSim(1, n = 400, dist = "normal")
-##' m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = dat, method = "REML")
+##' m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = df, method = "REML")
 ##' nm <- names(model.frame(m))
 ##' nm
 ##' is_offset(nm)
