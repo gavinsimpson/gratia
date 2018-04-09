@@ -1,6 +1,6 @@
 Package: schoenberg
-Version: 0.0-5
-Date: 2018-01-12
+Version: 0.0-6
+Date: 2018-04-08
 Title: Ggplot-based graphics and other useful functions for GAMs fitted using mgcv
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     email = "ucfagls@gmail.com",
