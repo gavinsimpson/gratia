@@ -1,5 +1,5 @@
 Package: gratia
-Version: 0.0-6
+Version: 0.1-0
 Date: 2018-08-16
 Title: Ggplot-based graphics and other useful functions for GAMs fitted using mgcv
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
