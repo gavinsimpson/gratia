@@ -2,7 +2,7 @@
 
 ## load packages
 library("testthat")
-library("schoenberg")
+library("gratia")
 library("mgcv")
 
 context("Testing Utility Functions")

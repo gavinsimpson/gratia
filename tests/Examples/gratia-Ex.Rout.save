@@ -1,5 +1,5 @@
 
-R version 3.4.4 Patched (2018-03-17 r74422) -- "Someone to Lean On"
+R version 3.4.3 Patched (2018-01-16 r74126) -- "Kite-Eating Tree"
 Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -17,10 +17,10 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
-> pkgname <- "schoenberg"
+> pkgname <- "gratia"
 > source(file.path(R.home("share"), "R", "examples-header.R"))
 > options(warn = 1)
-> library('schoenberg')
+> library('gratia')
 > 
 > base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
 > cleanEx()
@@ -38,7 +38,7 @@ Type 'q()' to quit R.
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-23. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -53,22 +53,22 @@ Gu & Wahba 4 term additive model
    term      lower      est    upper
 1 s(x0) -0.8496033 4.112256 9.074116
 2 s(x0) -0.8489453 4.112287 9.073519
-3 s(x0) -0.8448851 4.112468 9.069821
+3 s(x0) -0.8448849 4.112468 9.069821
 4 s(x0) -0.8329611 4.112988 9.058936
 5 s(x0) -0.8108549 4.113933 9.038721
-6 s(x0) -0.7769722 4.115360 9.007693
+6 s(x0) -0.7769721 4.115360 9.007693
 > 
 > ## simultaneous interval for smooth term of x1
 > set.seed(42)
 > x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
 > head(x1.sint)
    term     lower      est    upper
-1 s(x1) -5.249863 1.423165 8.096193
-2 s(x1) -5.248720 1.423211 8.095142
-3 s(x1) -5.243447 1.423425 8.090297
-4 s(x1) -5.232857 1.423860 8.080577
-5 s(x1) -5.215491 1.424591 8.064672
-6 s(x1) -5.189990 1.425697 8.041385
+1 s(x1) -5.301868 1.423165 8.148199
+2 s(x1) -5.300717 1.423211 8.147139
+3 s(x1) -5.295404 1.423425 8.142255
+4 s(x1) -5.284735 1.423860 8.132455
+5 s(x1) -5.267240 1.424591 8.116421
+6 s(x1) -5.241549 1.425697 8.092944
 > 
 > 
 > 
@@ -89,7 +89,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-23. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -111,12 +111,12 @@ Gu & Wahba 4 term additive model
 > si <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)
 > head(si)
   smooth           x1      est        se     crit    lower    upper
-1  s(x1) 0.0006632213 5.888546 0.3134611 2.772397 5.019507 6.757585
-2  s(x1) 0.0056813456 5.895688 0.3045623 2.772397 5.051320 6.740056
-3  s(x1) 0.0106994698 5.902830 0.2958458 2.772397 5.082628 6.723032
-4  s(x1) 0.0157175940 5.909974 0.2873297 2.772397 5.113382 6.706566
-5  s(x1) 0.0207357183 5.917121 0.2790332 2.772397 5.143530 6.690712
-6  s(x1) 0.0257538425 5.924272 0.2709761 2.772397 5.173019 6.675526
+1  s(x1) 0.0006632213 5.888546 0.3134611 2.627469 5.064937 6.712156
+2  s(x1) 0.0056813456 5.895688 0.3045623 2.627469 5.095460 6.695916
+3  s(x1) 0.0106994698 5.902830 0.2958458 2.627469 5.125504 6.680156
+4  s(x1) 0.0157175940 5.909974 0.2873297 2.627469 5.155024 6.664924
+5  s(x1) 0.0207357183 5.917121 0.2790332 2.627469 5.183970 6.650272
+6  s(x1) 0.0257538425 5.924272 0.2709761 2.627469 5.212291 6.636254
 > 
 > 
 > 
@@ -137,7 +137,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-23. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
 > 
 > ## 1d example
 > set.seed(2)
@@ -192,14 +192,13 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > ### Name: draw.evaluated_smooth
 > ### Title: Plot estimated smooths
 > ### Aliases: draw.evaluated_smooth draw.evaluated_1d_smooth
-> ###   draw.evaluated_2d_smooth draw.evaluated_2d_smooth
-> ###   draw.evaluated_re_smooth
+> ###   draw.evaluated_2d_smooth draw.evaluated_re_smooth
 > 
 > ### ** Examples
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-23. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
 > 
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
@@ -239,7 +238,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-23. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
 > 
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
@@ -280,7 +279,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-23. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -329,7 +328,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-23. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -373,7 +372,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > ##\testonly{set.seed(2)}
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-23. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > df <- gamSim(1, n = 400, dist = "normal")
 Gu & Wahba 4 term additive model
@@ -402,7 +401,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-23. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
 > df <- gamSim(1, n = 400, dist = "normal")
 Gu & Wahba 4 term additive model
 > m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = df, method = "REML")
@@ -431,7 +430,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-23. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -440,12 +439,12 @@ Gu & Wahba 4 term additive model
 > sims <- simulate(m1, nsim = 5, seed = 42)
 > head(sims)
        [,1]      [,2]      [,3]      [,4]      [,5]
-1  8.470111  8.502529  9.243253  8.583744  8.888660
-2  7.135076  7.166169  7.436497  7.447073  8.036909
-3  3.632465  2.544824  3.083198  2.639840  2.612815
-4 10.686483 10.415981 11.873220 10.799256 10.865970
-5 14.077964 14.273323 14.646527 14.000525 13.707774
-6  6.300381  6.205313  6.094017  5.697613  5.943234
+1  8.463643  8.484913  9.281669  7.932456  8.990212
+2  7.251423  7.633566  7.507079  7.216222  7.024481
+3  2.279659  2.200594  2.890054  2.216336  2.748218
+4 11.425815 10.953418 10.565366 10.945019 11.165367
+5 14.124534 14.400417 14.269158 13.717802 13.865250
+6  6.196114  5.807008  6.476156  5.895773  6.026671
 > 
 > 
 > 
@@ -453,7 +452,7 @@ Gu & Wahba 4 term additive model
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  24.859 0.097 25.019 0 0 
+Time elapsed:  37.975 0.732 38.98 0 0 
 > grDevices::dev.off()
 null device 
           1 

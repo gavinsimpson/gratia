@@ -9,11 +9,11 @@
 \method{simulate}{gam}(object, nsim = 1, seed = NULL, newdata = NULL,
   freq = FALSE, unconditional = FALSE, ...)
 
-\method{simulate}{gamm}(object, nsim = 1, seed = NULL, newdata = NULL,
-  freq = FALSE, unconditional = FALSE, ...)
+\method{simulate}{gamm}(object, nsim = 1, seed = NULL,
+  newdata = NULL, freq = FALSE, unconditional = FALSE, ...)
 
-\method{simulate}{scam}(object, nsim = 1, seed = NULL, newdata = NULL,
-  freq = FALSE, parametrized = TRUE, ...)
+\method{simulate}{scam}(object, nsim = 1, seed = NULL,
+  newdata = NULL, freq = FALSE, parametrized = TRUE, ...)
 }
 \arguments{
 \item{object}{a fitted GAM, typically the result of a call to \code{gam()} or \code{gamm()}.}

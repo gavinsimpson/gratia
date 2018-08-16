@@ -2,7 +2,7 @@
 
 ## load packages
 library("testthat")
-library("schoenberg")
+library("gratia")
 library("mgcv")
 library("ggplot2")
 library("vdiffr")

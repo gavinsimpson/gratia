@@ -4,7 +4,6 @@
 \alias{draw.evaluated_smooth}
 \alias{draw.evaluated_1d_smooth}
 \alias{draw.evaluated_2d_smooth}
-\alias{draw.evaluated_2d_smooth}
 \alias{draw.evaluated_re_smooth}
 \title{Plot estimated smooths}
 \usage{

@@ -8,23 +8,23 @@ docs:
 
 build: docs
 	cd ..;\
-	R CMD build schoenberg
+	R CMD build gratia
 
 check: build
 	cd ..;\
-	R CMD check schoenberg_$(PKGVERS).tar.gz
+	R CMD check gratia_$(PKGVERS).tar.gz
 
 check-cran: build
 	cd ..;\
-	R CMD check --as-cran schoenberg_$(PKGVERS).tar.gz
+	R CMD check --as-cran gratia_$(PKGVERS).tar.gz
 
 install: build
 	cd ..;\
-	R CMD INSTALL schoenberg_$(PKGVERS).tar.gz
+	R CMD INSTALL gratia_$(PKGVERS).tar.gz
 
 move: check
-	cp ../schoenberg.Rcheck/schoenberg-Ex.Rout ./tests/Examples/schoenberg-Ex.Rout.save
+	cp ../gratia.Rcheck/gratia-Ex.Rout ./tests/Examples/gratia-Ex.Rout.save
 
 clean:
 	cd ..;\
-	rm -r schoenberg.Rcheck/
+	rm -r gratia.Rcheck/

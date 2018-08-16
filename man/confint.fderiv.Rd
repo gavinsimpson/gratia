@@ -4,8 +4,8 @@
 \alias{confint.fderiv}
 \title{Point-wise and simultaneous confidence intervals for derivatives of smooths}
 \usage{
-\method{confint}{fderiv}(object, parm, level = 0.95, type = c("confidence",
-  "simultaneous"), nsim = 10000, ...)
+\method{confint}{fderiv}(object, parm, level = 0.95,
+  type = c("confidence", "simultaneous"), nsim = 10000, ...)
 }
 \arguments{
 \item{object}{an object of class \code{"fderiv"} containing the estimated derivatives.}
