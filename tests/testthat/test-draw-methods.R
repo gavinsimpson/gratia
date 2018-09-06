@@ -126,3 +126,21 @@ test_that("draw() with random effect smooths (bs = 're') & factor by variable ",
     p3 <- draw(rm2, ncol = 3, scales = "fixed")
     expect_doppelganger("draw.gam model with ranef smooth factor by fixed scales", p3)
 })
+
+test_that("draw() can handle non-standard names -- a function call as a name", {
+    
+    df <- data.frame(y = c(0.15,0.17,0.07,0.17,0.01,0.15,0.18,0.04,-0.06,-0.08,
+                           0, 0.03,-0.27,-0.93,0.04,0.12,0.08,0.15,0.04,0.15,
+                           0.03,0.09,0.11,0.13,-0.11,-0.32,-0.7,-0.78,0.07,0.04,
+                           0.06,0.12,-0.15,0.05,-0.08,0.14,-0.02,-0.14,-0.24,
+                           -0.32,-0.78,-0.81,-0.04,-0.25,-0.09,0.02,-0.13,-0.2,
+                           -0.04,0,0.02,-0.05,-0.19,-0.37,-0.57,-0.81),
+                     time =  rep(2^c(-1, 0, 1, 1.58,2, 2.58, 3, 3.32, 3.58, 4.17,
+                                     4.58, 5.58, 6.17, 7.39), 4))
+    ## the smooth is of `log2(time)` but this needs special handling
+    ## in the `ggplot()` to avoid `ggplot()` looking incorrectly for `time` and
+    ## not the correct `log2(time)`
+    fit <- gam(y ~ s(log2(time)), data = df, method = "REML")
+    p1 <- draw(fit)
+    expect_doppelganger("draw.gam model with non-standard names", p1)
+})
