@@ -1,6 +1,6 @@
 Package: gratia
-Version: 0.1-0
-Date: 2018-08-16
+Version: 0.1-1
+Date: 2018-09-06
 Title: Ggplot-based graphics and other useful functions for GAMs fitted using mgcv
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     email = "ucfagls@gmail.com",
@@ -24,3 +24,4 @@ URL: https://github.com/gavinsimpson/gratia
 BugReports: https://github.com/gavinsimpson/gratia/issues
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.0
+Encoding: UTF-8
