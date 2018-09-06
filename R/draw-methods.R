@@ -36,7 +36,7 @@
 ##'
 ##' @author Gavin L. Simpson
 ##'
-##' @importFrom ggplot2 ggplot aes_string labs geom_line geom_ribbon
+##' @importFrom ggplot2 ggplot aes_ aes_string labs geom_line geom_ribbon
 ##' @importFrom grid unit
 ##'
 ##' @export
@@ -73,7 +73,7 @@
     object[["upper"]] <- object[["est"]] + (2 * object[["se"]])
     object[["lower"]] <- object[["est"]] - (2 * object[["se"]])
 
-    plt <- ggplot(object, aes_string(x = smooth_var, y = "est")) +
+    plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est)) +
         geom_ribbon(mapping = aes_string(ymin = "lower",
                                          ymax = "upper"),
                     alpha = 0.2) +
