@@ -69,6 +69,10 @@
         evaluated <- evaluate_re_smooth(SMOOTHS, model = object,
                                         newdata = newdata,
                                         unconditional = unconditional)
+    } else if (inherits(SMOOTHS[[1]], "fs.interaction")) {
+        evaluated <- evaluate_fs_smooth(SMOOTHS, n = n, model = object,
+                                        newdata = newdata,
+                                        unconditional = unconditional)
     } else if (smooth_dim(SMOOTHS[[1]]) == 1L) { # if 2d smooth, call separate fun
         evaluated <- evaluate_1d_smooth(SMOOTHS, n = n, model = object,
                                         newdata = newdata, inc.mean = inc.mean,
@@ -314,6 +318,85 @@
     ## return
     evaluated
 }
+`evaluate_fs_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
+                                 unconditional = FALSE, inc.mean = FALSE) {
+    ## If more than one smooth, these should be by variables smooths
+    is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
+    if (length(object) > 1L) {
+        if (!all(is.by)) {
+            msg <- paste("Hmm, something went wrong identifying the requested smooth. Found:\n",
+                         paste(vapply(object, FUN = smooth_label,
+                                      FUN.VALUE = character(1L)),
+                               collapse = ', '),
+                         "\nNot all of these are 'by' variable smooths. Contact Maintainer.")
+            stop(msg)
+        }
+    }
+
+    ## get by variable info
+    by_var <- unique(vapply(object, FUN = by_variable, FUN.VALUE = character(1)))
+
+    ## get variable for this smooth
+    smooth_var <- unique(vapply(object, FUN = smooth_variable, FUN.VALUE = character(2L)))
+    smooth_fac <- unique(vapply(object, FUN = smooth_factor_variable,
+                                FUN.VALUE = character(1L)))
+    smooth_var <- smooth_var[smooth_var != smooth_fac]
+
+    newx <- if (is.null(newdata)) {
+        ## no need to setNames here as we know these are right from datagen
+        datagen(object[[1]], n = n, data = model[["model"]])[, c(smooth_var, smooth_fac),
+                                                             drop = FALSE]
+    } else if (is.data.frame(newdata)) { # data frame; select out smooth
+        if (!smooth_var %in% names(newdata)) {
+            stop(paste("Variable", smooth_var, "not found in 'newdata'."))
+        }
+        newdata[, c(smooth_var, smooth_fac), drop = FALSE]
+    } else {                            # object we can't handle; bail out
+        stop("'newdata', if supplied, must be a data frame.")
+    }
+
+    ## n is now n * nlevels(factor)
+    n <- nrow(newx)
+
+    ## if we have a by variable, repeat newx for each level of that variable
+    is.factor.by     <- vapply(object, FUN = is_factor_by_smooth,     FUN.VALUE = logical(1L))
+    is.continuous.by <- vapply(object, FUN = is_continuous_by_smooth, FUN.VALUE = logical(1L))
+    if (any(is.by)) {
+        if (any(is.factor.by)) {
+            levs <- levels(model[["model"]][[by_var]])
+            newx <- cbind(newx, .by_var = rep(levs, each = n))
+        } else {                        # continuous by
+            newx <- cbind(newx, .by_var = mean(model[["model"]][[by_var]]))
+        }
+        names(newx)[NCOL(newx)] <- by_var
+    }
+
+    evaluated <- vector("list", length(object))
+    for (i in seq_along(evaluated)) {
+        ind <- seq_len(NROW(newx))
+        if (any(is.factor.by)) {
+            ind <- newx[, by_var] == levs[i]
+        }
+        evaluated[[i]] <- spline_values(object[[i]],
+                                        newdata = newx[ind, , drop = FALSE],
+                                        unconditional = unconditional,
+                                        model = model, inc.mean = inc.mean,
+                                        term = smooth_var)
+    }
+
+    evaluated <- do.call("rbind", evaluated)
+
+    if (any(is.factor.by)) {
+        evaluated <- cbind(evaluated,
+                           by_var = rep(levels(model[["model"]][[by_var]]), each = n))
+        names(evaluated)[NCOL(evaluated)] <- by_var
+    }
+
+    names(evaluated)[2] <- smooth_var
+    class(evaluated) <- c("evaluated_fs_smooth", "evaluated_smooth", "data.frame")
+
+    evaluated
+}
 
 ## loop over smooths and predict
 `spline_values` <- function(smooth, newdata, model, unconditional,
@@ -337,8 +420,14 @@
     d <- smooth_dim(smooth)
     ## Return
     out <- if (d == 1L) {
-               data.frame(smooth = rep(label, nrow(X)), x = newdata[, 1L],
-                          est = fit, se = se.fit)
+               if (is_fs_smooth(smooth)) {
+                   data.frame(smooth = rep(label, nrow(X)),
+                              x = newdata[, 1L], f = newdata[, 2L],
+                              est = fit, se = se.fit)
+               } else {
+                   data.frame(smooth = rep(label, nrow(X)), x = newdata[, 1L],
+                              est = fit, se = se.fit)
+               }
            } else {
                data.frame(smooth = rep(label, nrow(X)),
                           x1 = newdata[, 1L], x2 = newdata[, 2L],
