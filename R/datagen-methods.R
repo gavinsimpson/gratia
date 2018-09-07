@@ -65,6 +65,37 @@
 
 ##' @export
 ##' @rdname datagen
+`datagen.fs.interaction` <- function(x, n = 100, data, ...) {
+    d <- smooth_dim(x)                 # how many dimensions in smooth
+    term <- smooth_variable(x)         # what term are we dealing with
+    fterm <- smooth_factor_variable(x) # get factor associated with smooth
+
+    ## term should be length 2, which is the smooth variable
+    term <- term[term != fterm]
+
+    ## some smooths can't be plotted, esp n-d ones where n > 2
+    if (!x$plot.me || d > 2L) {
+        out <- data.frame()  # FIXME: or should we throw error/message
+    }
+
+    ## get new values of continuous var
+    xvals <- data[[term]]
+    newx <- seq(min(xvals), max(xvals), length.out = n)
+
+    ## get the factor var and its levels
+    f <- data[[fterm]]
+    fvals <- levels(f)
+    nlevs <- nlevels(f)
+
+    out <- setNames(expand.grid(x = newx, f = fvals),
+                    c(term, fterm))
+    out <- cbind(smooth = rep(smooth_label(x), n * nlevs), out)
+
+    out                                 # return
+}
+
+##' @export
+##' @rdname datagen
 `datagen.gam` <- function(x, n = 200, ...) {
     out <- lapply(x[["smooth"]], datagen, n = n, data = x[["model"]])
     do.call("rbind", out)               # FIXME: this can't possibly be right for multiple smooths

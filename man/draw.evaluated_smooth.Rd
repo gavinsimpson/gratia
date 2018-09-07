@@ -5,6 +5,7 @@
 \alias{draw.evaluated_1d_smooth}
 \alias{draw.evaluated_2d_smooth}
 \alias{draw.evaluated_re_smooth}
+\alias{draw.evaluated_fs_smooth}
 \title{Plot estimated smooths}
 \usage{
 \method{draw}{evaluated_1d_smooth}(object, xlab, ylab, title = NULL,
@@ -16,6 +17,10 @@
 
 \method{draw}{evaluated_re_smooth}(object, qq_line = TRUE, xlab, ylab,
   title = NULL, subtitle = NULL, caption = NULL, ...)
+
+\method{draw}{evaluated_fs_smooth}(object, xlab, ylab, title = NULL,
+  subtitle = NULL, caption = NULL,
+  colour_scale = scale_colour_discrete, ...)
 }
 \arguments{
 \item{object}{an object, the result of a call to \code{\link[=evaluate_smooth]{evaluate_smooth()}}.}
@@ -45,6 +50,8 @@ standard error (\code{"se"}).}
 
 \item{qq_line}{logical; draw a reference line through the lower and upper
 theoretical quartiles.}
+
+\item{colour_scale}{function; an appropriate discrete colour scale from \code{ggplot2}.}
 }
 \value{
 A \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object.

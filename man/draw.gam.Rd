@@ -5,8 +5,8 @@
 \title{Plot estimated smooths from a fitted GAM}
 \usage{
 \method{draw}{gam}(object, select, scales = c("free", "fixed"),
-  align = "hv", n = 100, unconditional = FALSE, inc.mean = FALSE,
-  dist = 0.1, ...)
+  align = "hv", axis = "lrtb", n = 100, unconditional = FALSE,
+  inc.mean = FALSE, dist = 0.1, ...)
 }
 \arguments{
 \item{object}{a fitted GAM, the result of a call to \code{\link[mgcv:gam]{mgcv::gam()}}.}
@@ -19,6 +19,9 @@ If \code{scales = "free"} each univariate smooth has its own y-axis scale.}
 
 \item{align}{characer; see argument \code{align} in \code{cowplot::plot_grid()}.
 Defaults to \code{"hv"} so that plots are nicely aligned.}
+
+\item{axis}{characer; see argument \code{axis} in \code{cowplot::plot_grid()}.
+Defaults to \code{"lrtb"} so that plots are nicely aligned.}
 
 \item{n}{numeric; the number of points over the range of the covariate at which to evaluate the smooth.}
 

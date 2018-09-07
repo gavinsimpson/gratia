@@ -15,6 +15,10 @@
     object[["term"]]
 }
 
+`smooth_terms.fs.interaction` <- function(object, ...) {
+    object[["term"]]
+}
+
 ##' Dimension of a smooth
 ##'
 ##' Extracts the dimension of an estimated smooth.
@@ -89,6 +93,11 @@
 `smooth_variable` <- function(smooth) {
     check_is_mgcv_smooth(smooth)
     smooth[["term"]]
+}
+
+`smooth_factor_variable` <- function(smooth) {
+    check_is_mgcv_smooth(smooth)
+    smooth[["fterm"]]
 }
 
 `smooth_label` <- function(smooth) {
@@ -222,6 +231,11 @@
 `is_re_smooth` <- function(smooth) {
     check_is_mgcv_smooth(smooth)
     inherits(smooth, "random.effect")
+}
+
+`is_fs_smooth` <- function(smooth) {
+    check_is_mgcv_smooth(smooth)
+    inherits(smooth, "fs.interaction")
 }
 
 ##' Fix the names of a data frame containing an offset variable.

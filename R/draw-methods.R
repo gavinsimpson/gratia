@@ -169,6 +169,8 @@
 ##'   If `scales = "free"` each univariate smooth has its own y-axis scale.
 ##' @param align characer; see argument `align` in `cowplot::plot_grid()`.
 ##'   Defaults to `"hv"` so that plots are nicely aligned.
+##' @param axis characer; see argument `axis` in `cowplot::plot_grid()`.
+##'   Defaults to `"lrtb"` so that plots are nicely aligned.
 ##' @param ... arguments passed to `cowplot::plot_grid()`. Any arguments to
 ##'   `plot_grid()` may be supplied, except for: `plotlist` and `align`.
 ##'
@@ -204,7 +206,7 @@
 `draw.gam` <- function(object,
                        select, # ignored for now; but used for subsetting which smooths
                        scales = c("free", "fixed"),
-                       align = "hv",
+                       align = "hv", axis = "lrtb",
                        n = 100, unconditional = FALSE, inc.mean = FALSE,
                        dist = 0.1, ...) {
     scales <- match.arg(scales)
@@ -248,7 +250,7 @@
         }
     }
 
-    plot_grid(plotlist = g, align = align, ...)
+    plot_grid(plotlist = g, align = align, axis = axis, ...)
 }
 
 ##' @param qq_line logical; draw a reference line through the lower and upper
@@ -284,6 +286,39 @@
     }
     if (missing(ylab)) {
         ylab <- paste("Effects:", smooth_var)
+    }
+
+    ## add labelling to plot
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+                      caption = caption)
+
+    plt
+}
+
+##' @param colour_scale function; an appropriate discrete colour scale from `ggplot2`.
+##'
+##' @importFrom ggplot2 geom_line theme scale_colour_discrete
+##' @export
+##' @rdname draw.evaluated_smooth
+`draw.evaluated_fs_smooth` <- function(object,
+                                       xlab, ylab,
+                                       title = NULL, subtitle = NULL,
+                                       caption = NULL,
+                                       colour_scale = scale_colour_discrete,
+                                       ...) {
+    smooth_var <- names(object)[2L]
+
+    plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est, colour = ~ f)) +
+        geom_line() +
+        colour_scale() +
+        theme(legend.position = "none")
+
+    ## default axis labels if none supplied
+    if (missing(xlab)) {
+        xlab <- smooth_var
+    }
+    if (missing(ylab)) {
+        ylab <- levels(object[["smooth"]])
     }
 
     ## add labelling to plot
