@@ -3,6 +3,7 @@
 \name{datagen}
 \alias{datagen}
 \alias{datagen.mgcv.smooth}
+\alias{datagen.fs.interaction}
 \alias{datagen.gam}
 \alias{datagen.gamm}
 \title{Generate data over the range of variables used in smooths}
@@ -10,6 +11,8 @@
 datagen(x, ...)
 
 \method{datagen}{mgcv.smooth}(x, n = 100, data, ...)
+
+\method{datagen}{fs.interaction}(x, n = 100, data, ...)
 
 \method{datagen}{gam}(x, n = 200, ...)
 
