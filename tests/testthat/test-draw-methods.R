@@ -128,7 +128,7 @@ test_that("draw() with random effect smooths (bs = 're') & factor by variable ",
 })
 
 test_that("draw() can handle non-standard names -- a function call as a name", {
-    
+
     df <- data.frame(y = c(0.15,0.17,0.07,0.17,0.01,0.15,0.18,0.04,-0.06,-0.08,
                            0, 0.03,-0.27,-0.93,0.04,0.12,0.08,0.15,0.04,0.15,
                            0.03,0.09,0.11,0.13,-0.11,-0.32,-0.7,-0.78,0.07,0.04,
@@ -143,4 +143,41 @@ test_that("draw() can handle non-standard names -- a function call as a name", {
     fit <- gam(y ~ s(log2(time)), data = df, method = "REML")
     p1 <- draw(fit)
     expect_doppelganger("draw.gam model with non-standard names", p1)
+})
+
+test_that("draw() works with random effect smooths (bs = 're')", {
+    ## simulate example... from ?mgcv::factor.smooth.interaction
+    set.seed(0)
+    ## simulate data...
+    f0 <- function(x) 2 * sin(pi * x)
+    f1 <- function(x, a=2, b=-1) exp(a * x)+b
+    f2 <- function(x) 0.2 * x^11 * (10 * (1 - x))^6 + 10 *
+                          (10 * x)^3 * (1 - x)^10
+    n <- 500
+    nf <- 10
+    fac <- sample(1:nf, n, replace=TRUE)
+    x0 <- runif(n)
+    x1 <- runif(n)
+    x2 <- runif(n)
+    a <- rnorm(nf) * .2 + 2;
+    b <- rnorm(nf) * .5
+    f <- f0(x0) + f1(x1, a[fac], b[fac]) + f2(x2)
+    fac <- factor(fac)
+    y <- f + rnorm(n) * 2
+
+    df <- data.frame(y = y, x0 = x0, x1 = x1, x2 = x2, fac = fac)
+    mod <- gam(y~s(x0) + s(x1, fac, bs="fs", k=5) + s(x2, k=20),
+               method = "ML")
+
+    sm <- evaluate_smooth(mod, "s(x1,fac)")
+    expect_s3_class(sm, "evaluated_fs_smooth")
+
+    p1 <- draw(sm)
+    expect_doppelganger("draw.evaluated_fs_smooth", p1)
+
+    p2 <- draw(mod, ncol = 2)
+    expect_doppelganger("draw.gam model with fs smooth", p2)
+
+    p3 <- draw(mod, ncol = 2, scales = "fixed")
+    expect_doppelganger("draw.gam model with fs smooth fixed scales", p3)
 })
