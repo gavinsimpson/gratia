@@ -25,7 +25,7 @@
 
 \method{draw}{evaluated_parametric_term}(object, xlab, ylab,
   title = NULL, subtitle = NULL, caption = NULL, rug = TRUE,
-  jitter = TRUE, ...)
+  position = "identity", ...)
 }
 \arguments{
 \item{object}{an object, the result of a call to \code{\link[=evaluate_smooth]{evaluate_smooth()}}.}
