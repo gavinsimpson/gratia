@@ -6,6 +6,7 @@
 \alias{draw.evaluated_2d_smooth}
 \alias{draw.evaluated_re_smooth}
 \alias{draw.evaluated_fs_smooth}
+\alias{draw.evaluated_parametric_term}
 \title{Plot estimated smooths}
 \usage{
 \method{draw}{evaluated_1d_smooth}(object, xlab, ylab, title = NULL,
@@ -21,6 +22,10 @@
 \method{draw}{evaluated_fs_smooth}(object, xlab, ylab, title = NULL,
   subtitle = NULL, caption = NULL,
   colour_scale = scale_colour_discrete, ...)
+
+\method{draw}{evaluated_parametric_term}(object, xlab, ylab,
+  title = NULL, subtitle = NULL, caption = NULL, rug = TRUE,
+  jitter = TRUE, ...)
 }
 \arguments{
 \item{object}{an object, the result of a call to \code{\link[=evaluate_smooth]{evaluate_smooth()}}.}
