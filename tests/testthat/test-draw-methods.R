@@ -232,8 +232,10 @@ test_that("draw() works with parametric terms", {
     expect_s3_class(e2, "evaluated_parametric_term")
 
     expect_warning(evaluate_parametric_term(mod, term = c("x0","x0")),
-                   regexp = "More than one `term` requested", fixed = TRUE)
+                   regexp = "More than one `term` requested; using the first only.",
+                   fixed = TRUE)
 
     expect_error(evaluate_parametric_term(mod, term = "x1"),
-                 regexp = "is not part of model fit.", fixed = TRUE)
+                 regexp = "The requested term: x1 is not part of model fit.",
+                 fixed = TRUE)
 })
