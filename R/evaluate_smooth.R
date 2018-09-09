@@ -398,8 +398,23 @@
     evaluated
 }
 
-`evaluate_parametric_term` <- function(model, term) {
-    tt <- model$pterms        # get parametric terms
+##' @rdname evaluate_smooth
+##'
+##' @export
+`evaluate_parametric_term` <- function(object, ...) {
+    UseMethod("evaluate_parametric_term")
+}
+
+##' @param term character; which parametric term whose effects are evaulated
+##'
+##' @rdname evaluate_smooth
+##'
+##' @importFrom stats delete.response
+##'
+##' @export
+`evaluate_parametric_term.gam` <- function(object, term, unconditional = FALSE,
+                                           ...) {
+    tt <- object$pterms       # get parametric terms
     tt <- delete.response(tt) # remove response so easier to work with
     vars <- labels(tt)        # names of all parametric terms
 
@@ -408,14 +423,15 @@
         term <- term[1L]
     }
     if (isFALSE(term %in% vars)) {
-        stop(sprintf("The requested term: %s is not part of model fit", term))
+        stop(sprintf("The requested term: %s is not part of model fit.", term))
     }
 
-    mf <- model.frame(model)  # data used to fit model
+    mf <- model.frame(object)  # data used to fit model
     is_fac <- is.factor(mf[[term]]) # is term a factor?
 
-    evaluated <- as.data.frame(predict(model, newdata = mf, type = 'terms',
-                                  terms = term, se = TRUE))
+    evaluated <- as.data.frame(predict(object, newdata = mf, type = 'terms',
+                                       terms = term, se = TRUE,
+                                       unconditional = unconditional))
     evaluated <- setNames(evaluated, c("partial", "se"))
 
     if (is_fac) {
@@ -430,9 +446,8 @@
     }
 
     ## add confidence interval
-    evaluated <- transform(evaluated,
-                      lower = partial - (2 * se),
-                      upper = partial + (2 * se))
+    evaluated[["upper"]] <- evaluated[["partial"]] + (2 * evaluated[["se"]])
+    evaluated[["lower"]] <- evaluated[["partial"]] - (2 * evaluated[["se"]])
 
     class(evaluated) <- c("evaluated_parametric_term", "data.frame")
     evaluated                           # return
