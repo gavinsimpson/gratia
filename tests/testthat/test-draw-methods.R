@@ -145,7 +145,7 @@ test_that("draw() can handle non-standard names -- a function call as a name", {
     expect_doppelganger("draw.gam model with non-standard names", p1)
 })
 
-test_that("draw() works with random effect smooths (bs = 're')", {
+test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
     ## simulate example... from ?mgcv::factor.smooth.interaction
     set.seed(0)
     ## simulate data...
@@ -180,4 +180,60 @@ test_that("draw() works with random effect smooths (bs = 're')", {
 
     p3 <- draw(mod, ncol = 2, scales = "fixed")
     expect_doppelganger("draw.gam model with fs smooth fixed scales", p3)
+})
+
+test_that("draw() works with parametric terms", {
+    set.seed(0)
+    ## fake some data...
+    f1 <- function(x) {exp(2 * x)}
+    f2 <- function(x) {
+        0.2*x^11*(10*(1-x))^6+10*(10*x)^3*(1-x)^10
+    }
+    f3 <- function(x) {x*0}
+
+    n <- 200
+    sig2 <- 4
+    x0 <- rep(1:4,50)
+    x1 <- runif(n, 0, 1)
+    x2 <- runif(n, 0, 1)
+    x3 <- runif(n, 0, 1)
+    e <- rnorm(n, 0, sqrt(sig2))
+    y <- 2*x0 + f1(x1) + f2(x2) + f3(x3) + e
+    df <- data.frame(x0 = x0, x1 = x1, x2 = x2, x3 = x3, y = y)
+
+    ## fit
+    mod <- gam(y ~ x0 + s(x1) + s(x2) + s(x3), data = df)
+
+    ## evaluate parametric terms directly
+    e1 <- evaluate_parametric_term(mod, term = "x0")
+    expect_s3_class(e1, "evaluated_parametric_term")
+    expect_equal(ncol(e1), 7L)
+    expect_equal(names(e1), c("term", "type", "value", "partial", "se",
+                              "upper", "lower"))
+    p1 <- draw(e1)
+    expect_doppelganger("draw.evaluated_parametric_term with linear parametric term", p1)
+
+    ## check evaluate_parametric_term works
+    p2 <- draw(mod)
+    expect_doppelganger("draw.gam with linear parametric term", p2)
+
+    ## factor parametric terms
+    x0 <- factor(x0)
+    df <- data.frame(x0 = x0, x1 = x1, x2 = x2, x3 = x3, y = y)
+    ## fit
+    mod <- gam(y ~ x0 + s(x1) + s(x2) + s(x3), data = df)
+
+    ## check evaluate_parametric_term works
+    p3 <- draw(mod)
+    expect_doppelganger("draw.gam with factor parametric term", p3)
+
+    ## evaluate parametric terms directly
+    e2 <- evaluate_parametric_term(mod, term = "x0")
+    expect_s3_class(e2, "evaluated_parametric_term")
+
+    expect_warning(evaluate_parametric_term(mod, term = c("x0","x0")),
+                   regexp = "More than one `term` requested", fixed = TRUE)
+
+    expect_error(evaluate_parametric_term(mod, term = "x1"),
+                 regexp = "is not part of model fit.", fixed = TRUE)
 })
