@@ -4,6 +4,8 @@
 \alias{evaluate_smooth}
 \alias{evaluate_smooth.gam}
 \alias{evaluate_smooth.gamm}
+\alias{evaluate_parametric_term}
+\alias{evaluate_parametric_term.gam}
 \title{Evaluate a smooth}
 \usage{
 evaluate_smooth(object, ...)
@@ -12,6 +14,11 @@ evaluate_smooth(object, ...)
   unconditional = FALSE, inc.mean = FALSE, dist = 0.1, ...)
 
 \method{evaluate_smooth}{gamm}(object, ...)
+
+evaluate_parametric_term(object, ...)
+
+\method{evaluate_parametric_term}{gam}(object, term,
+  unconditional = FALSE, ...)
 }
 \arguments{
 \item{object}{an object of class \code{"gam"} or \code{"gamm"}.}
@@ -35,6 +42,8 @@ a location is too far from data to be plotted when plotting 2-D smooths.
 The data are scaled into the unit square before deciding what to exclude,
 and \code{dist} is a distance within the unit square. See
 \code{\link[mgcv:exclude.too.far]{mgcv::exclude.too.far()}} for further details.}
+
+\item{term}{character; which parametric term whose effects are evaulated}
 }
 \value{
 A data frame, which is of class \code{"evaluated_1d_smooth"} or \code{evaluated_2d_smooth}, which inherit from classes \code{"evaluated_smooth"} and \code{"data.frame"}.

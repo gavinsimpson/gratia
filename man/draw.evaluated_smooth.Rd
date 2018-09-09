@@ -57,6 +57,11 @@ standard error (\code{"se"}).}
 theoretical quartiles.}
 
 \item{colour_scale}{function; an appropriate discrete colour scale from \code{ggplot2}.}
+
+\item{rug}{logical; draw a rug plot of the data}
+
+\item{position}{Position adjustment, either as a string, or the result of a
+call to a position adjustment function.}
 }
 \value{
 A \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object.
