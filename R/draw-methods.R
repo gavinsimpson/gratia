@@ -351,7 +351,11 @@
     plt
 }
 
-##' @importFrom ggplot2 ggplot geom_pointrange geom_rug geom_ribbon geom_line aes
+##' @param rug logical; draw a rug plot of the data
+##' @param position Position adjustment, either as a string, or the result of a
+##'   call to a position adjustment function.
+##'
+##' @importFrom ggplot2 ggplot geom_pointrange geom_rug geom_ribbon geom_line aes_string
 ##' @export
 ##' @rdname draw.evaluated_smooth
 `draw.evaluated_parametric_term` <- function(object,
@@ -364,15 +368,15 @@
     is_fac <- object[["type"]][1L] == "factor"
     term_label <- object[["term"]][1L]
 
-    plt <- ggplot(object, aes(x = value, y = partial))
+    plt <- ggplot(object, aes_string(x = "value", y = "partial"))
 
     if (is_fac) {
-        plt <- plt + geom_pointrange(aes(ymin = lower, ymax = upper))
+        plt <- plt + geom_pointrange(aes_string(ymin = "lower", ymax = "upper"))
     } else {
         if (isTRUE(rug)) {
             plt <- plt + geom_rug(sides = "b", position = position)
         }
-        plt <- plt + geom_ribbon(aes(ymin = lower, ymax = upper),
+        plt <- plt + geom_ribbon(aes_string(ymin = "lower", ymax = "upper"),
                                  alpha = 0.2) +
             geom_line()
     }
