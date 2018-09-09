@@ -18,6 +18,10 @@ test_that("Point-wise confidence interval for a first derivatives of a GAM works
     expect_s3_class(ci, "confint.fderiv")
     expect_s3_class(ci, "data.frame")
     expect_named(ci, expected = c("term", "lower", "est", "upper"))
+
+    expect_warning(confint(fd, level = c(0.95, 0.8), type = "confidence"))
+
+    expect_error(confint(fd, parm = "x4", type = "confidence"))
 })
 
 test_that("Simultaneous interval for a first derivatives of a GAM works", {
