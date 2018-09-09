@@ -163,10 +163,13 @@
 ##' is used instead.
 ##'
 ##' @param object a fitted GAM, the result of a call to [mgcv::gam()].
+##' @param parametric logical; plot parametric terms also? Default is `TRUE`.
 ##' @param select character;
 ##' @param scales character; should all univariate smooths be plotted with the
 ##'   same y-axis scale? The default, `scales = "fixed"`, ensures this is done.
 ##'   If `scales = "free"` each univariate smooth has its own y-axis scale.
+##'   Currently does not affect the y-axis scale of plots of the parametric
+##'   terms.
 ##' @param align characer; see argument `align` in `cowplot::plot_grid()`.
 ##'   Defaults to `"hv"` so that plots are nicely aligned.
 ##' @param axis characer; see argument `axis` in `cowplot::plot_grid()`.
@@ -204,6 +207,7 @@
 ##'
 ##' draw(m3, scales = "fixed")
 `draw.gam` <- function(object,
+                       parametric = TRUE,
                        select, # ignored for now; but used for subsetting which smooths
                        scales = c("free", "fixed"),
                        align = "hv", axis = "lrtb",
@@ -225,7 +229,19 @@
         S <- vapply(strsplit(S, ":"), `[[`, character(1L), 1L)
     }
 
-    l <- g <- vector("list", length = length(S))
+    npara <- 0
+    nsmooth <- length(S)
+
+    ## are we doing parametric terms?
+    if (isTRUE(parametric)) {
+        terms <- parametric_terms(object)
+        npara <- length(terms)
+        p <- vector("list", length = npara)
+    }
+
+    l <- vector("list", length = nsmooth)
+    g <- vector("list", length = nsmooth + npara)
+
 
     for (i in unique(S)) {
         eS <- evaluate_smooth(object, smooth = i, n = n,
@@ -236,6 +252,13 @@
 
     for (i in seq_along(l)) {
         g[[i]] <- draw(droplevels(l[[i]]))
+    }
+
+    if (isTRUE(parametric)) {
+        for (i in seq_along(terms)) {
+            p[[i]] <- evaluate_parametric_term(object, term = terms[i])
+            g[[i + nsmooth]] <- draw(p[[i]])
+        }
     }
 
     if (isTRUE(identical(scales, "fixed"))) {
@@ -319,6 +342,51 @@
     }
     if (missing(ylab)) {
         ylab <- levels(object[["smooth"]])
+    }
+
+    ## add labelling to plot
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+                      caption = caption)
+
+    plt
+}
+
+##' @param rug logical; draw a rug plot of the data
+##' @param position Position adjustment, either as a string, or the result of a
+##'   call to a position adjustment function.
+##'
+##' @importFrom ggplot2 ggplot geom_pointrange geom_rug geom_ribbon geom_line aes_string
+##' @export
+##' @rdname draw.evaluated_smooth
+`draw.evaluated_parametric_term` <- function(object,
+                                             xlab, ylab,
+                                             title = NULL, subtitle = NULL,
+                                             caption = NULL,
+                                             rug = TRUE,
+                                             position = "identity",
+                                             ...) {
+    is_fac <- object[["type"]][1L] == "factor"
+    term_label <- object[["term"]][1L]
+
+    plt <- ggplot(object, aes_string(x = "value", y = "partial"))
+
+    if (is_fac) {
+        plt <- plt + geom_pointrange(aes_string(ymin = "lower", ymax = "upper"))
+    } else {
+        if (isTRUE(rug)) {
+            plt <- plt + geom_rug(sides = "b", position = position)
+        }
+        plt <- plt + geom_ribbon(aes_string(ymin = "lower", ymax = "upper"),
+                                 alpha = 0.2) +
+            geom_line()
+    }
+
+    ## default axis labels if none supplied
+    if (missing(xlab)) {
+        xlab <- term_label
+    }
+    if (missing(ylab)) {
+        ylab <- sprintf("Partial effect of %s", term_label)
     }
 
     ## add labelling to plot

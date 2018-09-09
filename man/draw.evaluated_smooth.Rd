@@ -6,6 +6,7 @@
 \alias{draw.evaluated_2d_smooth}
 \alias{draw.evaluated_re_smooth}
 \alias{draw.evaluated_fs_smooth}
+\alias{draw.evaluated_parametric_term}
 \title{Plot estimated smooths}
 \usage{
 \method{draw}{evaluated_1d_smooth}(object, xlab, ylab, title = NULL,
@@ -21,6 +22,10 @@
 \method{draw}{evaluated_fs_smooth}(object, xlab, ylab, title = NULL,
   subtitle = NULL, caption = NULL,
   colour_scale = scale_colour_discrete, ...)
+
+\method{draw}{evaluated_parametric_term}(object, xlab, ylab,
+  title = NULL, subtitle = NULL, caption = NULL, rug = TRUE,
+  position = "identity", ...)
 }
 \arguments{
 \item{object}{an object, the result of a call to \code{\link[=evaluate_smooth]{evaluate_smooth()}}.}
@@ -52,6 +57,11 @@ standard error (\code{"se"}).}
 theoretical quartiles.}
 
 \item{colour_scale}{function; an appropriate discrete colour scale from \code{ggplot2}.}
+
+\item{rug}{logical; draw a rug plot of the data}
+
+\item{position}{Position adjustment, either as a string, or the result of a
+call to a position adjustment function.}
 }
 \value{
 A \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object.

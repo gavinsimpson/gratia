@@ -4,18 +4,23 @@
 \alias{draw.gam}
 \title{Plot estimated smooths from a fitted GAM}
 \usage{
-\method{draw}{gam}(object, select, scales = c("free", "fixed"),
-  align = "hv", axis = "lrtb", n = 100, unconditional = FALSE,
-  inc.mean = FALSE, dist = 0.1, ...)
+\method{draw}{gam}(object, parametric = TRUE, select,
+  scales = c("free", "fixed"), align = "hv", axis = "lrtb",
+  n = 100, unconditional = FALSE, inc.mean = FALSE, dist = 0.1,
+  ...)
 }
 \arguments{
 \item{object}{a fitted GAM, the result of a call to \code{\link[mgcv:gam]{mgcv::gam()}}.}
+
+\item{parametric}{logical; plot parametric terms also? Default is \code{TRUE}.}
 
 \item{select}{character;}
 
 \item{scales}{character; should all univariate smooths be plotted with the
 same y-axis scale? The default, \code{scales = "fixed"}, ensures this is done.
-If \code{scales = "free"} each univariate smooth has its own y-axis scale.}
+If \code{scales = "free"} each univariate smooth has its own y-axis scale.
+Currently does not affect the y-axis scale of plots of the parametric
+terms.}
 
 \item{align}{characer; see argument \code{align} in \code{cowplot::plot_grid()}.
 Defaults to \code{"hv"} so that plots are nicely aligned.}

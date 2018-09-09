@@ -318,3 +318,9 @@
 `is_offset` <- function(terms) {
     grepl("offset\\(", terms)
 }
+
+`parametric_terms` <- function(model) {
+    tt <- model$pterms        # get parametric terms
+    tt <- delete.response(tt) # remove response so easier to work with
+    labels(tt)                # names of all parametric terms
+}
