@@ -105,8 +105,20 @@
     smooth[["label"]]
 }
 
+##' @title Check if objects are smooths or are a particular type of smooth
+##'
+##' @param smooth an R object, typically a list
+##'
+##' @export
+##' @rdname is_mgcv_smooth
 `is_mgcv_smooth` <- function(smooth) {
     inherits(smooth, "mgcv.smooth")
+}
+
+## @export
+## @rdname is_mgcv_smooth
+`is_mrf_smooth` <- function(smooth) {
+  inherits(smooth, what= "mrf.smooth")
 }
 
 `check_is_mgcv_smooth` <- function(smooth) {
