@@ -190,6 +190,12 @@
     S
 }
 
+##' @title Identify a smooth term by it's label
+##'
+##' @param object a fitted GAM.
+##' @param term character; the (partial) term label with which to identify the required smooth.
+##'
+##' @export
 `which_smooth` <- function(object, term) {
     if (is.gamm(object)) {
         object <- object[["gam"]]
