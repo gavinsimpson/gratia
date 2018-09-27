@@ -2,9 +2,12 @@
 % Please edit documentation in R/utililties.R
 \name{is_mgcv_smooth}
 \alias{is_mgcv_smooth}
+\alias{is_mrf_smooth}
 \title{Check if objects are smooths or are a particular type of smooth}
 \usage{
 is_mgcv_smooth(smooth)
+
+is_mrf_smooth(smooth)
 }
 \arguments{
 \item{smooth}{an R object, typically a list}
