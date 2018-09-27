@@ -115,8 +115,8 @@
     inherits(smooth, "mgcv.smooth")
 }
 
-## @export
-## @rdname is_mgcv_smooth
+##' @export
+##' @rdname is_mgcv_smooth
 `is_mrf_smooth` <- function(smooth) {
   inherits(smooth, what= "mrf.smooth")
 }
