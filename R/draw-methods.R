@@ -86,6 +86,9 @@
     if (missing(ylab)) {
         ylab <- levels(object[["smooth"]])
     }
+    if (is.null(title)) {
+        title <- levels(object[["smooth"]])
+    }
 
     ## add labelling to plot
     plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
