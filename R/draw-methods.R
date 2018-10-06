@@ -211,7 +211,7 @@
                        select, # ignored for now; but used for subsetting which smooths
                        scales = c("free", "fixed"),
                        align = "hv", axis = "lrtb",
-                       n = 100, unconditional = FALSE, inc.mean = FALSE,
+                       n = 100, unconditional = FALSE, inc_mean = FALSE,
                        dist = 0.1, ...) {
     scales <- match.arg(scales)
     S <- smooths(object)                # vector of smooth labels - "s(x)"
@@ -246,7 +246,7 @@
     for (i in unique(S)) {
         eS <- evaluate_smooth(object, smooth = i, n = n,
                                   unconditional = unconditional,
-                              inc.mean = inc.mean, dist = dist)
+                              inc_mean = inc_mean, dist = dist)
         l[S == i] <- split(eS, eS[["smooth"]])
     }
 
