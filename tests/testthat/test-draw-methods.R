@@ -6,11 +6,11 @@ library("gratia")
 library("mgcv")
 library("ggplot2")
 library("vdiffr")
-theme_set(theme_grey())
 
 context("draw-methods")
 
 test_that("draw.evaluated_1d_smooth() plots the smooth", {
+    theme_set(theme_grey())
     set.seed(1)
     dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
     m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
@@ -20,6 +20,7 @@ test_that("draw.evaluated_1d_smooth() plots the smooth", {
 })
 
 test_that("draw.evaluated_2d_smooth() plots the smooth & SE", {
+    theme_set(theme_grey())
     set.seed(1)
     dat <- gamSim(2, n = 4000, dist = "normal", scale = 1, verbose = FALSE)
     m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
@@ -31,6 +32,7 @@ test_that("draw.evaluated_2d_smooth() plots the smooth & SE", {
 })
 
 test_that("draw.gam() plots a simple multi-smooth AM", {
+    theme_set(theme_grey())
     set.seed(1)
     dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
     m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
@@ -43,6 +45,7 @@ test_that("draw.gam() plots a simple multi-smooth AM", {
 })
 
 test_that("draw.gam() plots an AM with a single 2d smooth", {
+    theme_set(theme_grey())
     set.seed(1)
     dat <- gamSim(2, n = 4000, dist = "normal", scale = 1, verbose = FALSE)
     m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
@@ -52,6 +55,7 @@ test_that("draw.gam() plots an AM with a single 2d smooth", {
 })
 
 test_that("draw.gam() plots an AM with a single factor by-variable smooth", {
+    theme_set(theme_grey())
     set.seed(1)
     dat <- gamSim(4, verbose = FALSE)
     m3 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
@@ -68,16 +72,19 @@ dat <- gamSim(3, n = 400, verbose = FALSE)
 mod <- gam(y ~ s(x2, by = x1), data = dat)
 
 test_that("draw() works with continuous by", {
+    theme_set(theme_grey())
     plt <- draw(mod)
     expect_doppelganger("draw AM with continuous by-variable smooth", plt)
 })
 
 test_that("draw() works with continuous by and fixed scales", {
+    theme_set(theme_grey())
     plt <- draw(mod, scales = "fixed")
     expect_doppelganger("draw AM with continuous by-var fixed scale", plt)
 })
 
 test_that("draw() works with random effect smooths (bs = 're')", {
+    theme_set(theme_grey())
     ## simulate example... from ?mgcv::random.effects
     dat <- gamSim(1, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
 
@@ -103,6 +110,7 @@ test_that("draw() works with random effect smooths (bs = 're')", {
 })
 
 test_that("draw() with random effect smooths (bs = 're') & factor by variable ", {
+    theme_set(theme_grey())
     ## simulate example...
     set.seed(1)
     dat1 <- gamSim(4, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
@@ -128,6 +136,7 @@ test_that("draw() with random effect smooths (bs = 're') & factor by variable ",
 })
 
 test_that("draw() can handle non-standard names -- a function call as a name", {
+    theme_set(theme_grey())
 
     df <- data.frame(y = c(0.15,0.17,0.07,0.17,0.01,0.15,0.18,0.04,-0.06,-0.08,
                            0, 0.03,-0.27,-0.93,0.04,0.12,0.08,0.15,0.04,0.15,
@@ -146,6 +155,7 @@ test_that("draw() can handle non-standard names -- a function call as a name", {
 })
 
 test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
+    theme_set(theme_grey())
     ## simulate example... from ?mgcv::factor.smooth.interaction
     set.seed(0)
     ## simulate data...
@@ -183,6 +193,7 @@ test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
 })
 
 test_that("draw() works with parametric terms", {
+    theme_set(theme_grey())
     set.seed(0)
     ## fake some data...
     f1 <- function(x) {exp(2 * x)}
@@ -238,4 +249,17 @@ test_that("draw() works with parametric terms", {
     expect_error(evaluate_parametric_term(mod, term = "x1"),
                  regexp = "The requested term: x1 is not part of model fit.",
                  fixed = TRUE)
+})
+
+test_that("component-wise CIs work with seWithMean", {
+    theme_set(theme_grey())
+    set.seed(1)
+    dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+    m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+    sm <- evaluate_smooth(m1, "s(x3)", inc_mean = TRUE)
+    plt <- draw(sm)
+    expect_doppelganger("draw 1d smooth for selected smooth with inc_mean true", plt)
+
+    plt <- draw(m1, inc_mean = TRUE)
+    expect_doppelganger("draw gam with inc_mean true", plt)
 })
