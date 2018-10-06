@@ -151,15 +151,15 @@
 
 ##' @title Extract an mgcv smooth given its position in the model object
 ##'
-##' @param id numeric; the position of the smooth in the model object
 ##' @param object a fitted GAM model object.
+##' @param id numeric; the position of the smooth in the model object
 ##'
 ##' @export
-`get_smooths_by_id` <- function(id, object) {
+`get_smooths_by_id` <- function(object, id) {
     if (is.gamm(object)) {
         object <- object[["gam"]]
     }
-    object[["smooth"]][id]
+    object[["smooth"]][[id]]
 }
 
 `get_by_smooth` <- function(object, term, level) {

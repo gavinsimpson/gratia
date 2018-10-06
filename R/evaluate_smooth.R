@@ -62,7 +62,7 @@
     ## Need to handle by smooths here
     ## use get_smooth() on each smooth
     ## SMOOTHS <- object[["smooth"]][smooth_ids]  # take matched smooths
-    SMOOTHS <- get_smooths_by_id(smooth_ids, object) # extract the mgcv.smooth object
+    SMOOTHS <- get_smooths_by_id(object, smooth_ids) # extract the mgcv.smooth object
 
     ## choose how to evaluate the smooth
     if (inherits(SMOOTHS[[1]], "random.effect")) { # FIXME: bs = "re" can also have `by`
