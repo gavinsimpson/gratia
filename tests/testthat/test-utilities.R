@@ -175,14 +175,14 @@ test_that("get_smooth works for a GAMM", {
 
 test_that("get_smooths_by_id works for a GAM", {
     sm <- get_smooths_by_id(m1, 2L)
-    expect_is(sm, "mgcv.smooth")
-    expect_true(is_mgcv_smooth(sm))
-    expect_equal(sm, get_smooth(m1, "s(x1)"))
+    expect_is(sm, "list")
+    expect_true(is_mgcv_smooth(sm[[1L]]))
+    expect_equal(sm[[1L]], get_smooth(m1, "s(x1)"))
 })
 
 test_that("get_smooths_by_id works for a GAMM", {
     sm <- get_smooths_by_id(m2, 2L)
-    expect_is(sm, "mgcv.smooth")
-    expect_true(is_mgcv_smooth(sm))
-    expect_equal(sm, get_smooth(m2, "s(x1)"))
+    expect_is(sm, "list")
+    expect_true(is_mgcv_smooth(sm[[1L]]))
+    expect_equal(sm[[1L]], gratia:::get_smooth(m2, "s(x1)"))
 })
