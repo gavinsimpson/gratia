@@ -137,6 +137,15 @@
     inherits(object, "gam")
 }
 
+##' @title Extract an mgcv smooth by name
+##'
+##' @param object a fitted GAM model object.
+##' @param term character; the name of a smooth term to extract
+##'
+##' @return A single smooth object, or a list of smooths if several match the
+##'   named term.
+##'
+##' @export
 `get_smooth` <- function(object, term) {
     if (is.gamm(object)) {
         object <- object[["gam"]]
@@ -148,20 +157,29 @@
     smooth
 }
 
-
 ##' @title Extract an mgcv smooth given its position in the model object
 ##'
 ##' @param object a fitted GAM model object.
-##' @param id numeric; the position of the smooth in the model object
+##' @param id numeric; the position of the smooth in the model object.
 ##'
 ##' @export
 `get_smooths_by_id` <- function(object, id) {
     if (is.gamm(object)) {
         object <- object[["gam"]]
     }
-    object[["smooth"]][[id]]
+    object[["smooth"]][id]
 }
 
+##' @title Extract an factor-by smooth by name
+##'
+##' @param object a fitted GAM model object.
+##' @param term character; the name of a smooth term to extract.
+##' @param level character; which level of the factor to exrtact the smooth for..
+##'
+##' @return A single smooth object, or a list of smooths if several match the
+##'   named term.
+##'
+##' @export
 `get_by_smooth` <- function(object, term, level) {
     if (is.gamm(object)) {
         object <- object[["gam"]]
@@ -176,11 +194,11 @@
 
     ## if any are factor by variable smooths, get the levels
     if (any(is_by)) {
-        if (missing(by_level)) {
+        if (missing(level)) {
             stop("No value provided for argument 'level':\n  Getting a factor by-variable smooth requires a 'level' be supplied.")
         }
         level <- as.character(level)    # explicit coerce to character for later comparison
-        levs <- vapply(S, level, character(1L))
+        levs <- vapply(S, `[[`, character(1L), "by.level")
         take <- match(level, levs)
         if (is.na(take)) {
             msg <- paste0("Invalid 'level' for smooth '", term, "'. Possible levels are:\n")
@@ -191,6 +209,8 @@
         }
 
         S <- S[[take]]
+    } else {
+        stop("The requested smooth '", term, "' is not a by smooth.")
     }
 
     ## return a single smooth object
