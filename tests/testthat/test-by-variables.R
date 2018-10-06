@@ -46,22 +46,22 @@ mf <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
 mfgamm <- gamm(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
 
 test_that("get_by_smooth works", {
-    sm <- gratia:::get_by_smooth(mf, "s(x2)", level = "1")
+    sm <- get_by_smooth(mf, "s(x2)", level = "1")
     expect_is(sm, "mgcv.smooth")
     expect_equal(sm, mf[["smooth"]][[1L]])
 
-    sm <- gratia:::get_by_smooth(mfgamm, "s(x2)", level = "1")
+    sm <- get_by_smooth(mfgamm, "s(x2)", level = "1")
     expect_is(sm, "mgcv.smooth")
     expect_equal(sm, mfgamm[["gam"]][["smooth"]][[1L]])
 
-    expect_error(gratia:::get_by_smooth(mf, "s(x4)", level = "1"),
+    expect_error(get_by_smooth(mf, "s(x4)", level = "1"),
                  "The requested smooth 's(x4)' is not a by smooth.",
                  fixed = TRUE)
 
-    expect_error(gratia:::get_by_smooth(mf, "s(x2)"),
+    expect_error(get_by_smooth(mf, "s(x2)"),
                  "No value provided for argument 'level':", fixed = TRUE)
 
-    expect_error(gratia:::get_by_smooth(mf, "s(x2)", level = "4"),
+    expect_error(get_by_smooth(mf, "s(x2)", level = "4"),
                  "Invalid 'level' for smooth 's(x2)'.",
                  fixed = TRUE)
 })
