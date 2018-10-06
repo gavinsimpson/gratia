@@ -94,11 +94,21 @@ test_that("is_mrf_smooth returns false for an none MRF smooth", {
 
 test_that("is_mgcv_smooth returns false for objects that aren't smooths", {
     expect_false(is_mgcv_smooth(1:10))
-}
+})
 
 test_that("check_is_mgcv_smooth throws error for objects that aren't smooths", {
     expect_error(check_is_mgcv_smooth(1:10),
                  "Object passed to 'smooth' is not a 'mgcv.smooth'.",
                  fixed = TRUE)
-}
+})
 
+test_that("is.gam returns TRUE for a GAM", {
+    expect_true(is.gam(mrf_mod))
+    expect_true(is.gam(m1))
+    expect_true(is.gam(m2))
+})
+
+test_that("is.gam returns FALSE for a none GAM", {
+    expect_true(is.gam(1:10))
+    expect_true(is.gam(data.frame(x = 1:10)))
+})
