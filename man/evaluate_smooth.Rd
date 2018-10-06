@@ -11,7 +11,7 @@
 evaluate_smooth(object, ...)
 
 \method{evaluate_smooth}{gam}(object, smooth, n = 100, newdata = NULL,
-  unconditional = FALSE, inc.mean = FALSE, dist = 0.1, ...)
+  unconditional = FALSE, inc_mean = FALSE, dist = 0.1, ...)
 
 \method{evaluate_smooth}{gamm}(object, ...)
 
@@ -33,7 +33,7 @@ evaluate_parametric_term(object, ...)
 
 \item{unconditional}{logical; should confidence intervals include the uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian covariance matrix will be used.}
 
-\item{inc.mean}{logical; should the uncertainty in the model constant term be
+\item{inc_mean}{logical; should the uncertainty in the model constant term be
 included in the standard error of the evaluate values of the smooth?
 Currently not implemented.}
 

@@ -6,7 +6,7 @@
 \usage{
 \method{draw}{gam}(object, parametric = TRUE, select,
   scales = c("free", "fixed"), align = "hv", axis = "lrtb",
-  n = 100, unconditional = FALSE, inc.mean = FALSE, dist = 0.1,
+  n = 100, unconditional = FALSE, inc_mean = FALSE, dist = 0.1,
   ...)
 }
 \arguments{
@@ -32,7 +32,7 @@ Defaults to \code{"lrtb"} so that plots are nicely aligned.}
 
 \item{unconditional}{logical; should confidence intervals include the uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian covariance matrix will be used.}
 
-\item{inc.mean}{logical; should the uncertainty in the model constant term be
+\item{inc_mean}{logical; should the uncertainty in the model constant term be
 included in the standard error of the evaluate values of the smooth?
 Currently not implemented.}
 
