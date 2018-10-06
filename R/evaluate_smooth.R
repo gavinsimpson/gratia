@@ -7,7 +7,7 @@
 ##' @param n numeric; the number of points over the range of the covariate at which to evaluate the smooth.
 ##' @param newdata a vector or data frame of points at which to evaluate the smooth.
 ##' @param unconditional logical; should confidence intervals include the uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian covariance matrix will be used.
-##' @param inc.mean logical; should the uncertainty in the model constant term be
+##' @param inc_mean logical; should the uncertainty in the model constant term be
 ##'  included in the standard error of the evaluate values of the smooth?
 ##'  Currently not implemented.
 ##' @param dist numeric; if greater than 0, this is used to determine when
@@ -45,7 +45,7 @@
 ##' @export
 ##' @rdname evaluate_smooth
 `evaluate_smooth.gam` <- function(object, smooth, n = 100, newdata = NULL,
-                                  unconditional = FALSE, inc.mean = FALSE,
+                                  unconditional = FALSE, inc_mean = FALSE,
                                   dist = 0.1, ...) {
     ## simplify GAMM objects
     if (is.gamm(object)) {
@@ -75,11 +75,11 @@
                                         unconditional = unconditional)
     } else if (smooth_dim(SMOOTHS[[1]]) == 1L) { # if 2d smooth, call separate fun
         evaluated <- evaluate_1d_smooth(SMOOTHS, n = n, model = object,
-                                        newdata = newdata, inc.mean = inc.mean,
+                                        newdata = newdata, inc_mean = inc_mean,
                                         unconditional = unconditional)
     } else if (smooth_dim(SMOOTHS[[1]]) == 2L) {
         evaluated <- evaluate_2d_smooth(SMOOTHS, n = n, model = object,
-                                        newdata = newdata, inc.mean = inc.mean,
+                                        newdata = newdata, inc_mean = inc_mean,
                                         unconditional = unconditional,
                                         dist = dist)
     } else {
@@ -157,7 +157,7 @@
 }
 
 `evaluate_1d_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
-                                 unconditional = FALSE, inc.mean = FALSE) {
+                                 unconditional = FALSE, inc_mean = FALSE) {
     ## If more than one smooth, these should be by variables smooths
     is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
     if (length(object) > 1L) {
@@ -214,7 +214,7 @@
         evaluated[[i]] <- spline_values(object[[i]],
                                         newdata = newx[ind, , drop = FALSE],
                                         unconditional = unconditional,
-                                        model = model, inc.mean = inc.mean,
+                                        model = model, inc_mean = inc_mean,
                                         term = smooth_var)
     }
 
@@ -233,7 +233,7 @@
 }
 
 `evaluate_2d_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
-                                 unconditional = FALSE, inc.mean = FALSE, dist = 0.1) {
+                                 unconditional = FALSE, inc_mean = FALSE, dist = 0.1) {
     ## If more than one smooth, these should be by variables smooths
     is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
     if (length(object) > 1L) {
@@ -290,7 +290,7 @@
         evaluated[[i]] <- spline_values(object[[i]],
                                         newdata = newx[ind, , drop = FALSE],
                                         unconditional = unconditional,
-                                        model = model, inc.mean = inc.mean,
+                                        model = model, inc_mean = inc_mean,
                                         term = smooth_var)
     }
 
@@ -319,7 +319,7 @@
     evaluated
 }
 `evaluate_fs_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
-                                 unconditional = FALSE, inc.mean = FALSE) {
+                                 unconditional = FALSE, inc_mean = FALSE) {
     ## If more than one smooth, these should be by variables smooths
     is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
     if (length(object) > 1L) {
@@ -380,7 +380,7 @@
         evaluated[[i]] <- spline_values(object[[i]],
                                         newdata = newx[ind, , drop = FALSE],
                                         unconditional = unconditional,
-                                        model = model, inc.mean = inc.mean,
+                                        model = model, inc_mean = inc_mean,
                                         term = smooth_var)
     }
 
@@ -455,7 +455,7 @@
 
 ## loop over smooths and predict
 `spline_values` <- function(smooth, newdata, model, unconditional,
-                            inc.mean = FALSE, term) {
+                            inc_mean = FALSE, term) {
     X <- PredictMat(smooth, newdata)   # prediction matrix
     start <- smooth[["first.para"]]
     end <- smooth[["last.para"]]
@@ -464,14 +464,31 @@
     fit <- X %*% coefs
 
     label <- smooth_label(smooth)
-    V <- get_vcov(model, unconditional = unconditional,
-                  term = label)
-    if (isTRUE(inc.mean)) {
-        stop("'inc.mean == TRUE' situation not currently supported")
+    ## want full vcov for component-wise CI
+    V <- get_vcov(model, unconditional = unconditional)
+
+    ## variables for component-wise CIs for smooths
+    column_means <- model[["cmX"]]
+    lcms <- length(column_means)
+    nc <- ncol(V)
+    meanL1 <- smooth[["meanL1"]]
+
+    if (isTRUE(inc_mean) && attr(smooth, "nCons") > 0L) {
+        if (lcms < nc) {
+            column_means <- c(column_means, rep(0, nc - lcms))
+        }
+        Xcm <- matrix(column_means, nrow = nrow(X), ncol = nc, byrow = TRUE)
+        if (!is.null(meanL1)) {
+            Xcm <- Xcm / meanL1
+        }
+        Xcm[, para.seq] <- X
+        rs <- rowSums((Xcm %*% V) * Xcm)
     } else {
-        rs <- rowSums((X %*% V) * X)
-        se.fit <- sqrt(pmax(0, rs))
+        rs <- rowSums((X %*% V[para.seq, para.seq]) * X)
     }
+
+    se.fit <- sqrt(pmax(0, rs))
+
     d <- smooth_dim(smooth)
     ## Return
     out <- if (d == 1L) {
