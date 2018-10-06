@@ -112,3 +112,14 @@ test_that("is.gam returns FALSE for a none GAM", {
     expect_false(is.gam(data.frame(x = 1:10)))
     expect_false(is.gam(m2))
 })
+
+test_that("is.gamm returns TRUE for a GAMM", {
+    expect_true(is.gamm(m2))
+})
+
+test_that("is.gam returns FALSE for a none GAMM", {
+    expect_false(is.gamm(1:10))
+    expect_false(is.gamm(data.frame(x = 1:10)))
+    expect_false(is.gamm(m1))
+    expect_false(is.gamm(mrf_mod))
+})
