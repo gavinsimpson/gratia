@@ -105,10 +105,10 @@ test_that("check_is_mgcv_smooth throws error for objects that aren't smooths", {
 test_that("is.gam returns TRUE for a GAM", {
     expect_true(is.gam(mrf_mod))
     expect_true(is.gam(m1))
-    expect_true(is.gam(m2))
 })
 
 test_that("is.gam returns FALSE for a none GAM", {
-    expect_true(is.gam(1:10))
-    expect_true(is.gam(data.frame(x = 1:10)))
+    expect_false(is.gam(1:10))
+    expect_false(is.gam(data.frame(x = 1:10)))
+    expect_false(is.gam(m2))
 })
