@@ -11,6 +11,7 @@ set.seed(1)
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 m2 <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+m1gcv <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 
 test_that("smooth_terms() methods work", {
     st <- smooth_terms(m1)
@@ -122,4 +123,40 @@ test_that("is.gam returns FALSE for a none GAMM", {
     expect_false(is.gamm(data.frame(x = 1:10)))
     expect_false(is.gamm(m1))
     expect_false(is.gamm(mrf_mod))
+})
+
+test_that("get_vcov with frequentist TRUE works", {
+    V <- get_vcov(m1, frequentist = TRUE)
+    expect_is(V, "matrix")
+    expect_equal(V, m1[["Ve"]])
+})
+
+test_that("get_vcov with unconditional = TRUE throws warning if not available", {
+    expect_warning(V <- get_vcov(m1gcv, unconditional = TRUE),
+                   "Covariance corrected for smoothness uncertainty not available.")
+    expect_is(V, "matrix")
+    expect_equal(V, m1gcv[["Vp"]])
+})
+
+test_that("get_vcov with unconditional = TRUE returns Vp", {
+    V <- get_vcov(m1, unconditional = TRUE)
+    expect_is(V, "matrix")
+    expect_equal(V, m1[["Vc"]])
+})
+
+test_that("get_vcov with term specified works", {
+    V <- get_vcov(m1, term = "s(x1)")
+    expect_is(V, "matrix")
+    smooth <- m1[["smooth"]][[2L]]
+    ind <- smooth$first.para:smooth$last.para
+    expect_equal(V, m1[["Vp"]][ind, ind, drop = FALSE])
+
+    V <- get_vcov(m1, frequentist = TRUE, term = "s(x1)")
+    expect_equal(V, m1[["Ve"]][ind, ind, drop = FALSE])
+
+    V <- get_vcov(m1, unconditional = TRUE, term = "s(x1)")
+    expect_equal(V, m1[["Vc"]][ind, ind, drop = FALSE])
+
+    expect_message(get_vcov(m1, term = c("s(x1)", "s(x2)")),
+                   "Supplied more than 1 'term'; using only the first")
 })
