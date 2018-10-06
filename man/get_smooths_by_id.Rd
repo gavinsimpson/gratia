@@ -4,12 +4,12 @@
 \alias{get_smooths_by_id}
 \title{Extract an mgcv smooth given its position in the model object}
 \usage{
-get_smooths_by_id(id, object)
+get_smooths_by_id(object, id)
 }
 \arguments{
-\item{id}{numeric; the position of the smooth in the model object}
-
 \item{object}{a fitted GAM model object.}
+
+\item{id}{numeric; the position of the smooth in the model object.}
 }
 \description{
 Extract an mgcv smooth given its position in the model object
