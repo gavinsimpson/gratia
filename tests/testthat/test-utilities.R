@@ -91,3 +91,8 @@ test_that("is_mrf_smooth returns true for an MRF smooth", {
 test_that("is_mrf_smooth returns false for an none MRF smooth", {
     expect_false(is_mrf_smooth(get_smooth(m1, "s(x0)")))
 })
+
+test_that("is_mgcv_smooth returns false for objects that aren't smooths", {
+    expect_false(is_mgcv_smooth(1:10))
+}
+
