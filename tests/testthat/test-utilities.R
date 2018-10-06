@@ -160,3 +160,15 @@ test_that("get_vcov with term specified works", {
     expect_message(get_vcov(m1, term = c("s(x1)", "s(x2)")),
                    "Supplied more than 1 'term'; using only the first")
 })
+
+test_that("get_smooth works for a GAM", {
+    sm <- get_smooth(m1, "s(x1)")
+    expect_is(sm, "mgcv.smooth")
+    expect_true(is_mgcv_smooth(sm))
+})
+
+test_that("get_smooth works for a GAMM", {
+    sm <- get_smooth(m2, "s(x1)")
+    expect_is(sm, "mgcv.smooth")
+    expect_true(is_mgcv_smooth(sm))
+})
