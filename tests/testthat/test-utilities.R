@@ -76,3 +76,18 @@ test_that("select_smooth() works", {
     expect_identical(sm, "s(x1)")
 
 })
+
+data(columb)       ## data frame
+data(columb.polys) ## district shapes list
+xt <- list(polys = columb.polys) ## neighbourhood structure info for MRF
+## First a full rank MRF...
+mrf_mod <- gam(crime ~ s(district, bs="mrf", xt=xt), data = columb,
+               method = "REML")
+
+test_that("is_mrf_smooth returns true for an MRF smooth", {
+    expect_true(is_mrf_smooth(get_smooth(mrf_mod, "s(district)")))
+})
+
+test_that("is_mrf_smooth returns false for an none MRF smooth", {
+    expect_false(is_mrf_smooth(get_smooth(m1, "s(x0)")))
+})
