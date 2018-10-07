@@ -1,4 +1,4 @@
 template:
   params:
-    bootswatch: cosmo
+    bootswatch: simplex
 
