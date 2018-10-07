@@ -98,12 +98,7 @@
     is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
     if (length(object) > 1L) {
         if (!all(is.by)) {
-            msg <- paste("Hmm, something went wrong identifying the requested smooth. Found:\n",
-                         paste(vapply(object, FUN = smooth_label,
-                                      FUN.VALUE = character(1L)),
-                               collapse = ', '),
-                         "\nNot all of these are 'by' variable smooths. Contact Maintainer.")
-            stop(msg)
+            stop(by_smooth_failure(object))
         }
     }
 
@@ -158,12 +153,7 @@
     is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
     if (length(object) > 1L) {
         if (!all(is.by)) {
-            msg <- paste("Hmm, something went wrong identifying the requested smooth. Found:\n",
-                         paste(vapply(object, FUN = smooth_label,
-                                      FUN.VALUE = character(1L)),
-                               collapse = ', '),
-                         "\nNot all of these are 'by' variable smooths. Contact Maintainer.")
-            stop(msg)
+            stop(by_smooth_failure(object))
         }
     }
 
@@ -234,12 +224,7 @@
     is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
     if (length(object) > 1L) {
         if (!all(is.by)) {
-            msg <- paste("Hmm, something went wrong identifying the requested smooth. Found:\n",
-                         paste(vapply(object, FUN = smooth_label,
-                                      FUN.VALUE = character(2L)),
-                               collapse = ', '),
-                         "\nNot all of these are 'by' variable smooths. Contact Maintainer.")
-            stop(msg)
+            stop(by_smooth_failure(object))
         }
     }
 
@@ -320,12 +305,7 @@
     is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
     if (length(object) > 1L) {
         if (!all(is.by)) {
-            msg <- paste("Hmm, something went wrong identifying the requested smooth. Found:\n",
-                         paste(vapply(object, FUN = smooth_label,
-                                      FUN.VALUE = character(1L)),
-                               collapse = ', '),
-                         "\nNot all of these are 'by' variable smooths. Contact Maintainer.")
-            stop(msg)
+            stop(by_smooth_failure(object))
         }
     }
 

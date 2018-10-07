@@ -369,3 +369,13 @@
     tt <- delete.response(tt) # remove response so easier to work with
     labels(tt)                # names of all parametric terms
 }
+
+## Internal functions
+`by_smooth_failure` <- function(object) {
+    msg <- paste("Hmm, something went wrong identifying the requested smooth. Found:\n",
+                 paste(vapply(object, FUN = smooth_label,
+                              FUN.VALUE = character(1L)),
+                       collapse = ', '),
+                 "\nNot all of these are 'by' variable smooths. Contact Maintainer.")
+    msg
+}
