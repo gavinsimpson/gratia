@@ -113,3 +113,13 @@ test_that("evaluate_2d_smooth fails if newdata is not data frame or numeric", {
                  "'newdata', if supplied, must be a numeric vector or a data frame.",
                  fixed = TRUE)
 })
+
+test_that("evaluate_2d_smooth works for a 2d factor by smooth", {
+    set.seed(42)
+    dat <- gamSim(4, n = 400, verbose = FALSE)
+    mf <- gam(y ~ fac + s(x0, x1, by = fac), data = dat)
+    sm <- evaluate_smooth(mf, "s(x0,x1)")
+    expect_is(sm, "evaluated_2d_smooth")
+    expect_is(sm, "evaluated_smooth")
+    expect_is(sm, "data.frame")
+})
