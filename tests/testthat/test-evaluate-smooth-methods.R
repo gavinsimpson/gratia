@@ -53,3 +53,9 @@ test_that("evaluate_re_smooth fails with multiple smooths that aren't by factor 
                  "Not all of these are 'by' variable smooths")
 })
 
+test_that("evaluate_smooth fails with a trivariate smooth", {
+    m <- gam(y ~ s(x0, x1, x2), data = dat, method = "REML")
+    expect_error(evaluate_smooth(m, "s(x0,x1,x2)"))
+    m <- gam(y ~ te(x0, x1, x2), data = dat, method = "REML")
+    expect_error(evaluate_smooth(m, "s(x0,x1,x2)"))
+})
