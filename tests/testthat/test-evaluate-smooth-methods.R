@@ -87,6 +87,8 @@ test_that("evaluate_1d_smooth fails if smooth var not in newdata", {
 
 test_that("evaluate_1d_smooth works with vector newdata", {
     m <- gam(y ~ s(x0), data = dat, method = "REML")
-    expect_is(evaluate_smooth(m, "s(x0)", newdata = dat[, "x0"]),
-              "evaluated_1d_smooth")
+    sm1 <- evaluate_smooth(m, "s(x0)", newdata = dat[, "x0"])
+    sm2 <- evaluate_smooth(m, "s(x0)", newdata = dat)
+    expect_is(sm1, "evaluated_1d_smooth")
+    expect_equal(sm1, sm2)
 })
