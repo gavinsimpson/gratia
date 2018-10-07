@@ -47,10 +47,6 @@
 `evaluate_smooth.gam` <- function(object, smooth, n = 100, newdata = NULL,
                                   unconditional = FALSE, inc_mean = FALSE,
                                   dist = 0.1, ...) {
-    ## simplify GAMM objects
-    if (is.gamm(object)) {
-        object <- object[["gam"]]
-    }
     ## to keep this simple, only evaluate a single smooth at a time
     if (length(smooth) > 1L) {
         message("Supplied more than 1 'smooth'; using only the first")
@@ -92,7 +88,7 @@
 ##' @export
 ##' @rdname evaluate_smooth
 `evaluate_smooth.gamm` <- function(object, ...) {
-    evaluate_smooth(object[["gam"]])
+    evaluate_smooth(object[["gam"]], ...)
 }
 
 ## Random effect smooth
