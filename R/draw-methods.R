@@ -139,6 +139,9 @@
     if (missing(ylab)) {
         ylab <- smooth_vars[2L]
     }
+    if (is.null(title)) {
+        title <- guide_title
+    }
 
     ## add labelling to plot
     plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
@@ -150,11 +153,11 @@
 
     ## add guide
     plt <- plt + guides(fill = guide_colourbar(title = guide_title,
-                                               direction = "horizontal",
-                                               barwidth = grid::unit(0.5, "npc")))
+                                               direction = "vertical",
+                                               barheight = grid::unit(0.25, "npc")))
 
     ## position legend at the
-    plt <- plt + theme(legend.position = "top")
+    plt <- plt + theme(legend.position = "right")
 
     plt
 }
