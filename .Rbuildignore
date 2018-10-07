@@ -6,3 +6,5 @@ Makefile
 appveyor.yml
 .gitattributes
 .gitignore
+_pkgdown.yml
+
