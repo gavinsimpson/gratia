@@ -76,3 +76,11 @@ test_that("evaluate_re_smooth throws error when passed newdata", {
     expect_error(evaluate_smooth(rm1, smooth = "s(fac)", newdata = model.frame(rm1))
                  "Not yet implemented: user-supplied data in 're' smooth")
 })
+
+test_that("evaluate_1d_smooth fails if smooth var not in newdata", {
+    m <- gam(y ~ s(x0), data = dat, method = "REML")
+    id <- which(names(dat) == "x0")
+    expect_error(evaluate_smooth(m, "s(x0)", newdata = dat[, -id]),
+                 "Variable x0 not found in 'newdata'.",
+                 fixed = TRUE)
+})
