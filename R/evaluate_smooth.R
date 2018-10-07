@@ -232,14 +232,14 @@
     by_var <- unique(vapply(object, FUN = by_variable, FUN.VALUE = character(1)))
 
     ## get variables for this smooth
-    smooth_var <- unique(vapply(object, FUN = smooth_variable, FUN.VALUE = character(2L)))
+    smooth_var <- unique(vapply(object, FUN = smooth_variable, FUN.VALUE = character(2L))[,1])
 
     newx <- if (is.null(newdata)) {
                 setNames(datagen(object[[1]], n = n,
                                  data = model[["model"]])[, c("x1", "x2"), drop = FALSE],
                          smooth_var)
     } else if (is.data.frame(newdata)) { # data frame; select out smooth
-        if (!smooth_var %in% names(newdata)) {
+        if (!all(smooth_var %in% names(newdata))) {
             stop(paste("Variable", smooth_var, "not found in 'newdata'."))
         }
         newdata[, smooth_var, drop = FALSE]
