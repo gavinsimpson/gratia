@@ -21,6 +21,11 @@ test_that("evaluate_smooth works for a GAM", {
     expect_is(sm, "data.frame")
 })
 
+test_that("evaluate_smooth throws a message with more than one term", {
+    expect_message(evaluate_smooth(m1, c("s(x1)", "s(x2)")),
+                   "Supplied more than 1 'smooth'; using only the first")
+})
+
 test_that("evaluate_smooth works for a GAMM", {
     sm <- evaluate_smooth(m2, "s(x2)")
     expect_is(sm, "evaluated_1d_smooth")
