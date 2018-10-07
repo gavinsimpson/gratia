@@ -59,3 +59,20 @@ test_that("evaluate_smooth fails with a trivariate smooth", {
     m <- gam(y ~ te(x0, x1, x2), data = dat, method = "REML")
     expect_error(evaluate_smooth(m, "s(x0,x1,x2)"))
 })
+
+test_that("evaluate_re_smooth throws error when passed newdata", {
+    ## simulate example... from ?mgcv::random.effects
+    set.seed(1)
+    dat <- gamSim(1, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
+
+    fac <- as.factor(sample(1:20, 400, replace = TRUE))
+    dat$X <- model.matrix(~ fac - 1)
+    b <- rnorm(20) * 0.5
+    dat <- transform(dat, y = y + X %*% b)
+
+    rm1 <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) +
+                   s(x3), data = dat, method = "ML")
+
+    expect_error(evaluate_smooth(rm1, smooth = "s(fac)", newdata = model.frame(rm1))
+                 "Not yet implemented: user-supplied data in 're' smooth")
+})
