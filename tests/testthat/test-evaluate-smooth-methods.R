@@ -92,3 +92,10 @@ test_that("evaluate_1d_smooth works with vector newdata", {
     expect_is(sm1, "evaluated_1d_smooth")
     expect_equal(sm1, sm2)
 })
+
+test_that("evaluate_1d_smooth fails if newdata is not data frame or numeric", {
+    expect_error(evaluate_smooth(m1, "s(x0)", newdata = list(x0 = dat[, "x0"])),
+                 "'newdata', if supplied, must be a numeric vector or a data frame.",
+                 fixed = TRUE)
+})
+
