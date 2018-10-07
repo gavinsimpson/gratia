@@ -316,6 +316,9 @@
     if (missing(ylab)) {
         ylab <- paste("Effects:", smooth_var)
     }
+    if(is.null(title)) {
+        title <- smooth_var
+    }
 
     ## add labelling to plot
     plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
@@ -348,6 +351,9 @@
     }
     if (missing(ylab)) {
         ylab <- levels(object[["smooth"]])
+    }
+    if (is.null(title)) {
+        title <- unique(object[["smooth"]])
     }
 
     ## add labelling to plot
