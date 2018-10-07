@@ -4,7 +4,8 @@ Date: 2018-09-06
 Title: Ggplot-based graphics and other useful functions for GAMs fitted using mgcv
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     email = "ucfagls@gmail.com",
-                    role = c("aut","cre")))
+                    role = c("aut","cre"),
+		    comment = c(ORCID = "0000-0002-9084-8413")))
 Maintainer: Gavin L. Simpson <ucfagls@gmail.com>
 Imports:
     mgcv,
