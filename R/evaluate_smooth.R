@@ -255,7 +255,7 @@
     if (any(is.by)) {
         if (any(is.factor.by)) { # (is.factor(model[["model"]][[by_var]])) {
             levs <- levels(model[["model"]][[by_var]])
-            newx <- cbind(newx, .by_var = rep(levs, each = n))
+            newx <- cbind(newx, .by_var = rep(levs, each = n*n))
         } else {                        # continuous by
             newx <- cbind(newx, .by_var = mean(model[["model"]][[by_var]]))
         }
