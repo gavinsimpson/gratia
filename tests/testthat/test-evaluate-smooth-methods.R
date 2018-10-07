@@ -14,16 +14,37 @@ dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 m2 <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
-test_that("valuate_smooth works for a GAM", {
+test_that("evaluate_smooth works for a GAM", {
     sm <- evaluate_smooth(m1, "s(x2)")
     expect_is(sm, "evaluated_1d_smooth")
     expect_is(sm, "evaluated_smooth")
     expect_is(sm, "data.frame")
 })
 
-test_that("valuate_smooth works for a GAMM", {
+test_that("evaluate_smooth works for a GAMM", {
     sm <- evaluate_smooth(m2, "s(x2)")
     expect_is(sm, "evaluated_1d_smooth")
     expect_is(sm, "evaluated_smooth")
     expect_is(sm, "data.frame")
 })
+
+test_that("evaluate_1d_smooth fails with multiple smooths that aren't by factor smooths", {
+    expect_error(gratia:::evaluate_1d_smooth(m1[["smooth"]]),
+                 "Not all of these are 'by' variable smooths")
+})
+
+test_that("evaluate_2d_smooth fails with multiple smooths that aren't by factor smooths", {
+    expect_error(gratia:::evaluate_2d_smooth(m1[["smooth"]]),
+                 "Not all of these are 'by' variable smooths")
+})
+
+test_that("evaluate_fs_smooth fails with multiple smooths that aren't by factor smooths", {
+    expect_error(gratia:::evaluate_fs_smooth(m1[["smooth"]]),
+                 "Not all of these are 'by' variable smooths")
+})
+
+test_that("evaluate_re_smooth fails with multiple smooths that aren't by factor smooths", {
+    expect_error(gratia:::evaluate_re_smooth(m1[["smooth"]]),
+                 "Not all of these are 'by' variable smooths")
+})
+
