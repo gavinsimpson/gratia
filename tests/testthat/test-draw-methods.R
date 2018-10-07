@@ -52,6 +52,10 @@ test_that("draw.gam() plots an AM with a single 2d smooth", {
 
     plt <- draw(m2)
     expect_doppelganger("draw AM with 2d smooth", plt)
+
+    sm <- evaluate_smooth(m2, smooth = "s(x,z)")
+    plt <- draw(sm, show = "se")
+    expect_doppelganger("draw evaulated 2d smooth standard errors", plt)
 })
 
 test_that("draw.gam() plots an AM with a single factor by-variable smooth", {
