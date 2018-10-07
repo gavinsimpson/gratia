@@ -21,7 +21,7 @@ Suggests:
 Description: Ggplot-based graphics and utility functions for working with GAMs fitted using the mgcv package.
 License: MIT + file LICENSE
 LazyData: true
-URL: https://github.com/gavinsimpson/gratia
+URL: https://gavinsimpson.github.io/gratia/
 BugReports: https://github.com/gavinsimpson/gratia/issues
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.0
