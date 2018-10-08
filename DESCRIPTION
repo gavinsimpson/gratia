@@ -13,7 +13,8 @@ Imports:
     cowplot,
     grid,
     MASS,
-    stats
+    stats,
+    tools
 Suggests:
     testthat,
     vdiffr,
