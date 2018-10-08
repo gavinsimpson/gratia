@@ -1,4 +1,5 @@
 # Get the version info for later
+.PHONY: docs
 PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
 
 all: docs check clean
