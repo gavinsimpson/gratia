@@ -18,7 +18,7 @@ The original \code{newdata} is returned with fixed names and possibly modified o
 }
 \description{
 Identifies which variable, if any, is the model offset, and fixed the name
-such that \code{"offset(foo(var))" is converted}"var"\code{, and possibly sets that data to}offset_value`.
+such that \code{"offset(foo(var))" is converted }"var"\code{, and possibly sets that data to }offset_value`.
 }
 \examples{
 ##\\testonly{set.seed(2)}
