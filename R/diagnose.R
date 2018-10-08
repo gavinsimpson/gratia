@@ -23,7 +23,7 @@
 ##' @param n_uniform numeric; number of times to randomize uniform quantiles
 ##'   in the direct computation method (`method = "direct"`).
 ##'
-##' @inheritParams draw.evaluated_1d_smooth
+##' @inheritParams draw.evaluated_smooth
 ##'
 ##' @rdname qq_plot
 ##'
@@ -36,7 +36,8 @@
                           type = c("deviance","response","pearson"),
                           n_uniform = 10,
                           ylab = NULL, xlab = NULL,
-                          title = NULL, subtitle = NULL, caption = NULL) {
+                          title = NULL, subtitle = NULL, caption = NULL,
+                          ...) {
     method <- match.arg(method)         # what method for the QQ plot?
 
     ## for now, bail if method not "uniform"
@@ -91,6 +92,11 @@
     plt
 }
 
+##
+`qq_simulate` <- function(model, type = c("deviance","response","pearson")) {
+
+}
+
 ##' @importFrom stats ppoints qnorm
 `qq_normal` <- function(model, type = c("deviance","response","pearson")) {
     type <- match.arg(type)
@@ -98,7 +104,7 @@
     nr <- length(r)
     ord <- order(order(r))
 
-    out <- qnorm(ppoints(n))[ord]
+    out <- qnorm(ppoints(nr))[ord]
     out
 }
 
