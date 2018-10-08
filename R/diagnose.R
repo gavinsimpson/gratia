@@ -22,6 +22,10 @@
 ##'   `"response"`, and `"pearson"` residuals are allowed.
 ##' @param n_uniform numeric; number of times to randomize uniform quantiles
 ##'   in the direct computation method (`method = "direct"`).
+##' @param xlab character or expression; the label for the y axis. If not
+##'   supplied, a suitable label will be generated
+##' @param ylab character or expression; the label for the y axis. If not
+##'   supplied, a suitable label will be generated
 ##'
 ##' @inheritParams draw.evaluated_smooth
 ##'
