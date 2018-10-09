@@ -23,9 +23,9 @@
 ##' @param n_uniform numeric; number of times to randomize uniform quantiles
 ##'   in the direct computation method (`method = "direct"`).
 ##' @param xlab character or expression; the label for the y axis. If not
-##'   supplied, a suitable label will be generated
+##'   supplied, a suitable label will be generated.
 ##' @param ylab character or expression; the label for the y axis. If not
-##'   supplied, a suitable label will be generated
+##'   supplied, a suitable label will be generated.
 ##'
 ##' @inheritParams draw.evaluated_smooth
 ##'
@@ -223,4 +223,231 @@
     }
     ## compute pearson residuals
     (y - fit) * sqrt(weights) / sqrt(var_fun(fit))
+}
+
+##' @title Plot of residuals versus linear predictor values
+##'
+##' @param model a fitted model. Currently only class `"gam"`.
+##' @param type character; type of residuals to use. Only `"deviance"`,
+##'   `"response"`, and `"pearson"` residuals are allowed.
+##' @param xlab character or expression; the label for the y axis. If not
+##'   supplied, a suitable label will be generated.
+##' @param ylab character or expression; the label for the y axis. If not
+##'   supplied, a suitable label will be generated.
+##' @param title character or expression; the title for the plot. See
+##'   [ggplot2::labs()].
+##' @param subtitle character or expression; the subtitle for the plot. See
+##'   [ggplot2::labs()].
+##' @param caption character or expression; the plot caption. See
+##'   [ggplot2::labs()].
+##'
+##' @export
+##'
+##' @importFrom stats napredict residuals
+##' @importFrom tools toTitleCase
+##' @importFrom ggplot2 ggplot aes_string geom_point geom_hline labs
+`residuals_linpred_plot` <- function(model,
+                                     type = c("deviance", "pearson","response"),
+                                     ylab = NULL, xlab = NULL, title = NULL,
+                                     subtitle = NULL, caption = NULL) {
+    type <- match.arg(type)
+    r <- residuals(model, type = type)
+    eta <- model[["linear.predictors"]]
+
+    na_action <- na.action(model)
+    if (is.matrix(eta) && !is.matrix(r)) {
+               eta <- eta[, 1]
+    }
+    eta <- napredict(na_action, eta)
+
+    df <- data.frame(eta = eta, residuals = r)
+    plt <- ggplot(df, aes_string(x = "eta", y = "residuals")) +
+        geom_hline(yintercept = 0, col = "red")
+
+    ## add point layer
+    plt <- plt + geom_point()
+
+    ## add labels
+    if (is.null(xlab)) {
+        xlab <- "Linear predictor"
+    }
+    if (is.null(ylab)) {
+        ylab <- paste(toTitleCase(type), "residuals")
+    }
+    if (missing(title)) {
+        title <- "Residuals vs linear predictor"
+    }
+    if (missing(subtitle)) {
+        subtitle <- paste("Family:", family(model)[["family"]])
+    }
+
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+                      caption = caption)
+
+    plt
+}
+
+##' @title Plot of fitted against observed response values
+##'
+##' @inheritParams residuals_linpred_plot
+##'
+##' @export
+##'
+##' @importFrom ggplot2 ggplot aes_string geom_point labs
+`observed_fitted_plot` <- function(model,
+                                   ylab = NULL, xlab = NULL, title = NULL,
+                                   subtitle = NULL, caption = NULL) {
+    ## extract data for plot
+    fit <- fitted(model)
+    obs <- model[["y"]]
+
+    df <- data.frame(observed = obs, fitted = fit)
+
+    ## base plot
+    plt <- ggplot(df, aes_string(x = "fitted", y = "observed"))
+
+    ## add point layer
+    plt <- plt + geom_point()
+
+    ## add labels
+    if (is.null(xlab)) {
+        xlab <- "Fitted values"
+    }
+    if (is.null(ylab)) {
+        ylab <- "Response"
+    }
+    if (missing(title)) {
+        title <- "Observed vs fitted values"
+    }
+    if (missing(subtitle)) {
+        subtitle <- paste("Family:", family(model)[["family"]])
+    }
+
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+                      caption = caption)
+
+    plt
+}
+
+##' @title Histogram of model residuals
+##'
+##' @param n_bins character or numeric; either the number of bins or a string
+##'   indicating how to calculate the number of bins.
+##'
+##' @inheritParams residuals_linpred_plot
+##'
+##' @export
+##'
+##' @importFrom ggplot2 ggplot aes_string geom_histogram labs
+##' @importFrom tools toTitleCase
+##' @importFrom stats residuals
+##' @importFrom grDevices nclass.Sturges nclass.scott nclass.FD
+`residuals_hist_plot` <- function(model,
+                                  type = c("deviance", "pearson", "response"),
+                                  n_bins = c("sturges", "scott", "fd"),
+                                  ylab = NULL, xlab = NULL, title = NULL,
+                                  subtitle = NULL, caption = NULL) {
+    ## extract data for plot
+    type <- match.arg(type)
+    df <- data.frame(residuals = residuals(model, type = type))
+
+    ## work out number of bins
+    if (is.character(n_bins)) {
+        n_bins <- match.arg(n_bins)
+        n_bins <- switch(n_bins,
+                         sturges = nclass.Sturges(df[["residuals"]]),
+                         scott   = nclass.scott(df[["residuals"]]),
+                         fd      = nclass.FD(df[["residuals"]]))
+        n_bins <- n_bins + 2
+    }
+    ## now n_bins should be numeric, if not bail
+    if (!is.numeric(n_bins)) {
+        stop("'n_bins' must be a number or one of: ",
+             paste(dQuote(c("sturges", "scott", "fd")),
+                   collapse = ", "))
+    }
+
+    ## base plot
+    plt <- ggplot(df, aes_string(x = "residuals"))
+
+    ## add point layer
+    plt <- plt + geom_histogram(bins = n_bins, colour = "black", fill = "grey80")
+
+    ## add labels
+    if (is.null(xlab)) {
+        xlab <- paste(toTitleCase(type), "residuals")
+    }
+    if (is.null(ylab)) {
+        ylab <- "Frequency"
+    }
+    if (missing(title)) {
+        title <- "Histogram of residuals"
+    }
+    if (missing(subtitle)) {
+        subtitle <- paste("Family:", family(model)[["family"]])
+    }
+
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+                      caption = caption)
+
+    plt
+}
+
+##' @title Model diagnostic plots
+##'
+##' @param model a fitted model. Currently only class `"gam"`.
+##' @param method character; method used to generate theoretical quantiles.
+##' @param n_uniform numeric; number of times to randomize uniform quantiles
+##'   in the direct computation method (`method = "direct"`).
+##' @param type character; type of residuals to use. Only `"deviance"`,
+##'   `"response"`, and `"pearson"` residuals are allowed.
+##' @param n_bins character or numeric; either the number of bins or a string
+##'   indicating how to calculate the number of bins.
+##' @param ncol numeric; number of columns to draw plots in. See
+##'   [cowplot::plot_grid()].
+##' @param ... arguments passed to [cowplot::plot_grid()], except for `align`
+##'   and `axis`, which are set internally.
+##'
+##' @importFrom cowplot plot_grid
+##'
+##' @seealso [gratia::qq_plot()] [gratia::residuals_linpred_plot()]
+##'   [gratia::residuals_hist_plot()] [gratia::observed_fitted_plot()]
+##'
+##' @export
+##'
+##' @examples
+##' library(mgcv)
+##' \dontshow{set.seed(2)}
+##' ## simulate some data...
+##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
+##' ## run some basic model checks, including checking
+##' ## smoothing basis dimensions...
+##' appraise(mod)
+`appraise` <- function(model,
+                       method = c("direct", "simulate", "normal"),
+                       n_uniform = 10,
+                       type = c("deviance", "pearson", "response"),
+                       n_bins = c("sturges", "scott", "fd"),
+                       ncol = 2,
+                       ...) {
+    ## process args
+    method <- match.arg(method)
+    type <- match.arg(type)
+    if (is.character(n_bins)) {
+        n_bins <- match.arg(n_bins)
+    } else if (!is.numeric(n_bins)) {
+        stop("'n_bins' must be a number or one of: ",
+             paste(dQuote(c("sturges", "scott", "fd")),
+                   collapse = ", "))
+    }
+
+    plt1 <- qq_plot(model, method = method, type = type, n_uniform = n_uniform)
+    plt2 <- residuals_linpred_plot(model, type = type)
+    plt3 <- residuals_hist_plot(model, type = type, n_bins = n_bins,
+                                subtitle = NULL)
+    plt4 <- observed_fitted_plot(model, subtitle = NULL)
+
+    plot_grid(plt1, plt2, plt3, plt4, ncol = ncol, align = "hv",
+              axis = "lrtb", ...)
 }
