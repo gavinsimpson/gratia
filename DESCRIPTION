@@ -14,7 +14,8 @@ Imports:
     grid,
     MASS,
     stats,
-    tools
+    tools,
+    grDevices
 Suggests:
     testthat,
     vdiffr,

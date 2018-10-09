@@ -26,10 +26,10 @@ qq_plot(model, ...)
 in the direct computation method (\code{method = "direct"}).}
 
 \item{ylab}{character or expression; the label for the y axis. If not
-supplied, a suitable label will be generated}
+supplied, a suitable label will be generated.}
 
 \item{xlab}{character or expression; the label for the y axis. If not
-supplied, a suitable label will be generated}
+supplied, a suitable label will be generated.}
 
 \item{title}{character or expression; the title for the plot. See
 \code{\link[ggplot2:labs]{ggplot2::labs()}}.}
