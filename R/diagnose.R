@@ -138,7 +138,7 @@
     family <- family(model)                 # extract family
     family <- fix.family.qf(family)         # add quantile fun to family
     dev_resid_fun <- family[["dev.resids"]] # deviance residuals function
-    var_fun <- family[["var"]]              # variance function
+    var_fun <- family[["variance"]]         # variance function
     q_fun <- family[["qf"]]
     if (is.null(q_fun)) {
         stop("Quantile function for family <", family[["family"]], "> not available.")
