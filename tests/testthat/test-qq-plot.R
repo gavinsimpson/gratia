@@ -13,7 +13,7 @@ theme_set(theme_grey())
 ## simulate binomial data...
 set.seed(0)
 n.samp <- 200
-dat <- gamSim(1, n = n.samp, dist = "binary", scale = .33)
+dat <- gamSim(1, n = n.samp, dist = "binary", scale = .33, verbose = FALSE)
 p <- binomial()$linkinv(dat$f)               # binomial p
 n <- sample(c(1, 3), n.samp, replace = TRUE) # binomial n
 dat <- transform(dat, y = rbinom(n, n, p), n = n)
@@ -29,9 +29,29 @@ test_that("qq_plot() direct method works", {
     expect_doppelganger("qq_plot direct randomisation", plt)
 })
 
+test_that("qq_plot() direct method works with response residuals", {
+    plt <- qq_plot(m, type = "response")
+    expect_doppelganger("qq_plot direct randomisation response residuals", plt)
+})
+
+test_that("qq_plot() direct method works with pearson residuals", {
+    plt <- qq_plot(m, type = "pearson")
+    expect_doppelganger("qq_plot direct randomisation pearson residuals", plt)
+})
+
 test_that("qq_plot() normal method works", {
     plt <- qq_plot(m, method = "normal") # normality assumption
     expect_doppelganger("qq_plot normality assumption", plt)
+})
+
+test_that("qq_plot() normal method works", {
+    plt <- qq_plot(m, method = "normal", type = "response")
+    expect_doppelganger("qq_plot normality assumption response residuals", plt)
+})
+
+test_that("qq_plot() normal method works", {
+    plt <- qq_plot(m, method = "normal", type = "pearson")
+    expect_doppelganger("qq_plot normality assumption pearson residuals", plt)
 })
 
 test_that("qq_plot() fails if unsupported residuals requested", {
