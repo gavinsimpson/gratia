@@ -66,6 +66,12 @@ test_that("qq_plot() fails if unsupported method requested", {
                  fixed = TRUE)
 })
 
+test_that("qq_plot() fails if simulate method requested", {
+    expect_error(qq_plot(m, method = "simulate"),
+                 "QQ plot method <simulate> not yet available.",
+                 fixed = TRUE)
+})
+
 test_that("qq_plot.default fails with error", {
     expect_error(qq_plot(dat),
                  "Unable to produce a Q-Q plot for <data.frame>")
