@@ -174,8 +174,6 @@
 
 `qq_uniform_quantiles` <- function(qs, q_fun, fit, weights, sigma2, dev_resid_fun,
                                    var_fun, type, na_action) {
-    ## permute the uniforms
-    ## qs <- sample(qs)
     ## generate quantiles for uniforms from q_fun
     qq <- q_fun(qs, fit, weights, sigma2)
     ## new residuals
