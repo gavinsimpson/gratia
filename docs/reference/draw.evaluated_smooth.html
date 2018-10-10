@@ -61,7 +61,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.1</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2</span>
       </span>
     </div>
 
@@ -209,9 +209,7 @@ call to a position adjustment function.</p></td>
 <span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gamSim'>gamSim</a></span>(<span class='fl'>2</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>4000</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt; Bivariate smoothing example</div><div class='input'><span class='no'>m2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gam'>gam</a></span>(<span class='no'>y</span> ~ <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x</span>, <span class='no'>z</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>40</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>$<span class='no'>data</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
 
 <span class='no'>sm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='evaluate_smooth.html'>evaluate_smooth</a></span>(<span class='no'>m2</span>, <span class='st'>"s(x,z)"</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>)
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>sm</span>)</div><div class='img'><img src='draw.evaluated_smooth-2.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'>## now the standard error the smooth instead</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>sm</span>, <span class='kw'>show</span> <span class='kw'>=</span> <span class='st'>"se"</span>)</div><div class='img'><img src='draw.evaluated_smooth-3.png' alt='' width='700' height='433' /></div></pre>
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>sm</span>)</div><div class='img'><img src='draw.evaluated_smooth-2.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

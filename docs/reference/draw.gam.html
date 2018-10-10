@@ -63,7 +63,7 @@ is used instead." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.1</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2</span>
       </span>
     </div>
 
@@ -186,14 +186,7 @@ and <code>dist</code> is a distance within the unit square. See
 <span class='fu'>set.seed</span>(<span class='fl'>2</span>)
 <span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gamSim'>gamSim</a></span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>m1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gam'>gam</a></span>(<span class='no'>y</span> ~ <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x0</span>) + <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x1</span>) + <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x2</span>) + <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x3</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
 
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m1</span>)</div><div class='img'><img src='draw.gam-1.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='fu'>set.seed</span>(<span class='fl'>2</span>)
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gamSim'>gamSim</a></span>(<span class='fl'>2</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>4000</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt; Bivariate smoothing example</div><div class='input'><span class='no'>m2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gam'>gam</a></span>(<span class='no'>y</span> ~ <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x</span>, <span class='no'>z</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>30</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>$<span class='no'>data</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
-
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m2</span>)</div><div class='img'><img src='draw.gam-2.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gamSim'>gamSim</a></span>(<span class='fl'>4</span>)</div><div class='output co'>#&gt; Factor `by' variable example</div><div class='input'><span class='no'>m3</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gam'>gam</a></span>(<span class='no'>y</span> ~ <span class='no'>fac</span> + <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x2</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='no'>fac</span>) + <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x0</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>)
-
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m3</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='st'>"fixed"</span>)</div><div class='img'><img src='draw.gam-3.png' alt='' width='700' height='433' /></div></pre>
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m1</span>)</div><div class='img'><img src='draw.gam-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
