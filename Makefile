@@ -12,11 +12,15 @@ build: docs
 	R CMD build gratia
 
 check: build
-	cd ..;\
+	cd ..; \
+	export NOT_CRAN="true"; \
+	echo "$${NOT_CRAN}"; \
 	R CMD check gratia_$(PKGVERS).tar.gz
 
 check-cran: build
 	cd ..;\
+	export NOT_CRAN="false"; \
+	echo "$${NOT_CRAN}"; \
 	R CMD check --as-cran gratia_$(PKGVERS).tar.gz
 
 install: build
