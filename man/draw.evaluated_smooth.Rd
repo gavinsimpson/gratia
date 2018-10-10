@@ -85,9 +85,6 @@ m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
 
 sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 draw(sm)
-
-## now the standard error the smooth instead
-draw(sm, show = "se")
 }
 \author{
 Gavin L. Simpson
