@@ -59,9 +59,6 @@
 ##'
 ##' sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 ##' draw(sm)
-##'
-##' ## now the standard error the smooth instead
-##' draw(sm, show = "se")
 `draw.evaluated_1d_smooth` <- function(object,
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
@@ -201,17 +198,6 @@
 ##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
 ##' draw(m1)
-##'
-##' set.seed(2)
-##' dat <- gamSim(2, n = 4000, dist = "normal", scale = 1)
-##' m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
-##'
-##' draw(m2)
-##'
-##' dat <- gamSim(4)
-##' m3 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
-##'
-##' draw(m3, scales = "fixed")
 `draw.gam` <- function(object,
                        parametric = TRUE,
                        select, # ignored for now; but used for subsetting which smooths
