@@ -364,8 +364,7 @@
 
     if (any(is.factor.by)) {
         evaluated <- cbind(evaluated,
-                           by_var = rep(levels(model[["model"]][[by_var]]), each = n))
-        names(evaluated)[NCOL(evaluated)] <- by_var
+                           by_variable = rep(levels(model[["model"]][[by_var]]), each = n))
     }
 
     names(evaluated)[2] <- smooth_var
