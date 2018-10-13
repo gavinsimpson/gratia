@@ -136,8 +136,8 @@
 
     if (any(is.factor.by)) {
         evaluated <- cbind(evaluated,
-                           by_var = rep(levels(model[["model"]][[by_var]]),
-                                        each = length(levs)))
+                           by_variable = rep(levels(model[["model"]][[by_var]]),
+                                             each = length(levs)))
         names(evaluated)[NCOL(evaluated)] <- by_var
     }
 
@@ -208,7 +208,7 @@
 
     if (any(is.factor.by)) {
         evaluated <- cbind(evaluated,
-                           by_var = rep(levels(model[["model"]][[by_var]]), each = n))
+                           by_variable = rep(levels(model[["model"]][[by_var]]), each = n))
         names(evaluated)[NCOL(evaluated)] <- by_var
     }
 
@@ -279,7 +279,7 @@
 
     if (any(is.factor.by)) {
         evaluated <- cbind(evaluated,
-                           by_var = rep(levels(model[["model"]][[by_var]]), each = n))
+                           by_variable = rep(levels(model[["model"]][[by_var]]), each = n))
         names(evaluated)[NCOL(evaluated)] <- by_var
     }
 
@@ -365,6 +365,7 @@
     if (any(is.factor.by)) {
         evaluated <- cbind(evaluated,
                            by_variable = rep(levels(model[["model"]][[by_var]]), each = n))
+        names(evaluated)[NCOL(evaluated)] <- by_var
     }
 
     names(evaluated)[2] <- smooth_var
