@@ -92,6 +92,7 @@
 }
 
 ## Random effect smooth
+##' @importFrom tibble add_column
 `evaluate_re_smooth` <- function(object, model = NULL, newdata = NULL,
                                  unconditional = FALSE) {
     ## If more than one smooth, these should be by variables smooths
@@ -125,28 +126,37 @@
         para_seq <- seq(from = start, to = end, by = 1L)
         coefs <- coef(model)[para_seq]
         se <- diag(vcov(model, unconditional = unconditional))[para_seq]
-        evaluated[[i]] <- data.frame(smooth = rep(smooth_labels[i], length(coefs)),
+        evaluated[[i]] <- data_frame(smooth = rep(smooth_labels[i], length(coefs)),
                                      ..var  = levs,
                                      est = coefs,
-                                     se = se,
-                                     row.names = NULL)
+                                     se = se)
     }
 
     evaluated <- do.call("rbind", evaluated)
 
     if (any(is.factor.by)) {
-        evaluated <- cbind(evaluated,
-                           by_variable = rep(levels(model[["model"]][[by_var]]),
-                                             each = length(levs)))
-        names(evaluated)[NCOL(evaluated)] <- by_var
+        evaluated <- add_by_var_info_to_smooth(evaluated,
+                                               by_name = by_var,
+                                               by_data = model[["model"]][[by_var]],
+                                               n = length(levs))
+        ## evaluated <- add_column(evaluated, by_variable = rep(by_var, NCOL(evaluated)),
+        ##                         .after = 1L)
+        ## evaluated <- add_column(evaluated,
+        ##                         by_var = rep(levels(model[["model"]][[by_var]]),
+        ##                                      each = length(levs)))
+        ## names(evaluated)[NCOL(evaluated)] <- by_var
+    } else {
+        evaluated <- add_missing_by_info_to_smooth(evaluated)
     }
 
-    names(evaluated)[2] <- smooth_var
-    class(evaluated) <- c("evaluated_re_smooth", "evaluated_smooth", "data.frame")
+    names(evaluated)[3] <- smooth_var
+    class(evaluated) <- c("evaluated_re_smooth", "evaluated_smooth", class(evaluated))
 
     evaluated
 }
 
+##' @importFrom tibble add_column
+##' @importFrom dplyr bind_rows
 `evaluate_1d_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
                                  unconditional = FALSE, inc_mean = FALSE) {
     ## If more than one smooth, these should be by variables smooths
@@ -204,20 +214,29 @@
                                         term = smooth_var)
     }
 
-    evaluated <- do.call("rbind", evaluated)
+    ## evaluated <- do.call("rbind", evaluated)
+    evaluated <- do.call("bind_rows", evaluated)
 
     if (any(is.factor.by)) {
-        evaluated <- cbind(evaluated,
-                           by_variable = rep(levels(model[["model"]][[by_var]]), each = n))
-        names(evaluated)[NCOL(evaluated)] <- by_var
+        evaluated <- add_by_var_info_to_smooth(evaluated,
+                                               by_name = by_var,
+                                               by_data = model[["model"]][[by_var]],
+                                               n = n)
+        ## evaluated <- cbind(evaluated,
+        ##                    by_variable = rep(by_var, NCOL(evaluated)),
+        ##                    by_var = rep(levels(model[["model"]][[by_var]]), each = n))
+        ## names(evaluated)[NCOL(evaluated)] <- by_var
+    } else {
+        evaluated <- add_missing_by_info_to_smooth(evaluated)
     }
 
-    names(evaluated)[2] <- smooth_var
-    class(evaluated) <- c("evaluated_1d_smooth", "evaluated_smooth", "data.frame")
+    names(evaluated)[3] <- smooth_var
+    class(evaluated) <- c("evaluated_1d_smooth", "evaluated_smooth", class(evaluated))
 
     evaluated
 }
 
+##' @importFrom tibble add_column
 `evaluate_2d_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
                                  unconditional = FALSE, inc_mean = FALSE, dist = 0.1) {
     ## If more than one smooth, these should be by variables smooths
@@ -278,9 +297,16 @@
     evaluated <- do.call("rbind", evaluated)
 
     if (any(is.factor.by)) {
-        evaluated <- cbind(evaluated,
-                           by_variable = rep(levels(model[["model"]][[by_var]]), each = n))
-        names(evaluated)[NCOL(evaluated)] <- by_var
+        evaluated <- add_by_var_info_to_smooth(evaluated,
+                                               by_name = by_var,
+                                               by_data = model[["model"]][[by_var]],
+                                               n = n*n)
+        ## evaluated <- cbind(evaluated,
+        ##                    by_variable = rep(by_var, NCOL(evaluated)),
+        ##                    by_var = rep(levels(model[["model"]][[by_var]]), each = n))
+        ## names(evaluated)[NCOL(evaluated)] <- by_var
+    } else {
+        evaluated <- add_missing_by_info_to_smooth(evaluated)
     }
 
     ## exclude values too far from data
@@ -293,12 +319,14 @@
         evaluated[ind, c("est", "se")] <- NA
     }
 
-    names(evaluated)[2:3] <- smooth_var
-    class(evaluated) <- c("evaluated_2d_smooth", "evaluated_smooth", "data.frame")
+    names(evaluated)[3:4] <- smooth_var # names(evaluated)[2:3] <- smooth_var
+    class(evaluated) <- c("evaluated_2d_smooth", "evaluated_smooth", class(evaluated))
 
     ## return
     evaluated
 }
+
+##' @importFrom tibble add_column
 `evaluate_fs_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
                                  unconditional = FALSE, inc_mean = FALSE) {
     ## If more than one smooth, these should be by variables smooths
@@ -363,13 +391,20 @@
     evaluated <- do.call("rbind", evaluated)
 
     if (any(is.factor.by)) {
-        evaluated <- cbind(evaluated,
-                           by_variable = rep(levels(model[["model"]][[by_var]]), each = n))
-        names(evaluated)[NCOL(evaluated)] <- by_var
+        evaluated <- add_by_var_info_to_smooth(evaluated,
+                                               by_name = by_var,
+                                               by_data = model[["model"]][[by_var]],
+                                               n = n)
+        ## evaluated <- cbind(evaluated,
+        ##                    by_variable = rep(by_var, NCOL(evaluated)),
+        ##                    by_var = rep(levels(model[["model"]][[by_var]]), each = n))
+        ## names(evaluated)[NCOL(evaluated)] <- by_var
+    } else {
+        evaluated <- add_missing_by_info_to_smooth(evaluated)
     }
 
-    names(evaluated)[2] <- smooth_var
-    class(evaluated) <- c("evaluated_fs_smooth", "evaluated_smooth", "data.frame")
+    names(evaluated)[3] <- smooth_var
+    class(evaluated) <- c("evaluated_fs_smooth", "evaluated_smooth", class(evaluated))
 
     evaluated
 }
@@ -386,6 +421,7 @@
 ##' @rdname evaluate_smooth
 ##'
 ##' @importFrom stats delete.response
+##' @importFrom tibble data_frame add_column
 ##'
 ##' @export
 `evaluate_parametric_term.gam` <- function(object, term, unconditional = FALSE,
@@ -418,7 +454,7 @@
                       newd, do.call("rbind", spl))
     } else {
         evaluated <- cbind(term = term, type = ifelse(is_fac, "factor", "numeric"),
-                      value = mf[, term], evaluated)
+                           value = mf[, term], evaluated)
     }
 
     ## add confidence interval
@@ -430,6 +466,7 @@
 }
 
 ## loop over smooths and predict
+##' @importFrom tibble data_frame
 `spline_values` <- function(smooth, newdata, model, unconditional,
                             inc_mean = FALSE, term) {
     X <- PredictMat(smooth, newdata)   # prediction matrix
@@ -437,7 +474,7 @@
     end <- smooth[["last.para"]]
     para.seq <- start:end
     coefs <- coef(model)[para.seq]
-    fit <- X %*% coefs
+    fit <- drop(X %*% coefs)
 
     label <- smooth_label(smooth)
     ## want full vcov for component-wise CI
@@ -469,15 +506,16 @@
     ## Return
     out <- if (d == 1L) {
                if (is_fs_smooth(smooth)) {
-                   data.frame(smooth = rep(label, nrow(X)),
+                   data_frame(smooth = rep(label, nrow(X)),
                               x = newdata[, 1L], f = newdata[, 2L],
                               est = fit, se = se.fit)
                } else {
-                   data.frame(smooth = rep(label, nrow(X)), x = newdata[, 1L],
+                   data_frame(smooth = rep(label, nrow(X)),
+                              x = newdata[, 1L],
                               est = fit, se = se.fit)
                }
            } else {
-               data.frame(smooth = rep(label, nrow(X)),
+               data_frame(smooth = rep(label, nrow(X)),
                           x1 = newdata[, 1L], x2 = newdata[, 2L],
                           est = fit, se = se.fit)
            }

@@ -10,9 +10,11 @@ Maintainer: Gavin L. Simpson <ucfagls@gmail.com>
 Imports:
     mgcv,
     ggplot2,
+    tibble,
+    dplyr,
     cowplot,
     grid,
-    MASS,
+    mvtnorm,
     stats,
     tools,
     grDevices

@@ -64,7 +64,7 @@
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
                                        ...) {
-    smooth_var <- names(object)[2L]
+    smooth_var <- names(object)[3L]
 
     ## Add confidence interval
     object[["upper"]] <- object[["est"]] + (2 * object[["se"]])
@@ -81,10 +81,10 @@
         xlab <- smooth_var
     }
     if (missing(ylab)) {
-        ylab <- levels(object[["smooth"]])
+        ylab <- unique(object[["smooth"]])
     }
     if (is.null(title)) {
-        title <- levels(object[["smooth"]])
+        title <- unique(object[["smooth"]])
     }
 
     ## add labelling to plot
@@ -110,14 +110,14 @@
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
                                        ...) {
-    smooth_vars <- names(object)[2:3]
+    smooth_vars <- names(object)[3:4]
     show <- match.arg(show)
     if (isTRUE(identical(show, "estimate"))) {
-        guide_title <- levels(object[["smooth"]])
+        guide_title <- unique(object[["smooth"]])
         plot_var <- "est"
         guide_limits <- c(-1, 1) * max(abs(object[[plot_var]]))
     } else {
-        guide_title <- bquote(SE * (.(levels(object[["smooth"]]))))
+        guide_title <- bquote(SE * (.(unique(object[["smooth"]]))))
         plot_var <- "se"
         guide_limits <- range(object[["se"]])
     }
@@ -243,7 +243,8 @@
     }
 
     for (i in seq_along(l)) {
-        g[[i]] <- draw(droplevels(l[[i]]))
+        ##l[[i]][["smooth"]] <- droplevels(l[[i]][["smooth"]])
+        g[[i]] <- draw(l[[i]])
     }
 
     if (isTRUE(parametric)) {
@@ -279,7 +280,7 @@
 `draw.evaluated_re_smooth` <- function(object, qq_line = TRUE, xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL, ...) {
-    smooth_var <- names(object)[2L]
+    smooth_var <- names(object)[3L]
 
     ## base plot with computed QQs
     plt <- ggplot(object, aes_string(sample = "est")) +
@@ -324,7 +325,7 @@
                                        caption = NULL,
                                        colour_scale = scale_colour_discrete,
                                        ...) {
-    smooth_var <- names(object)[2L]
+    smooth_var <- names(object)[3L]
 
     plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est, colour = ~ f)) +
         geom_line() +
@@ -336,7 +337,7 @@
         xlab <- smooth_var
     }
     if (missing(ylab)) {
-        ylab <- levels(object[["smooth"]])
+        ylab <- unique(object[["smooth"]])
     }
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
