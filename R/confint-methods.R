@@ -299,7 +299,12 @@
     ## simplify to a data frame for return
     out <- do.call("bind_rows", out)
 
-    class(out) <- class(out)[-(1:2)]
+    ## This was needed with `[.evaluated_smooth` before switching to
+    ## NextMethod() to call the next S3 `[` method.
+    ##   See: https://github.com/tidyverse/tibble/issues/511#issuecomment-431225229
+    ## Note needed, it seems now that NextMethod() is used but extending tibbles
+    ## is not currently well documented.
+    ## class(out) <- class(out)[-(1:2)]
 
     ## using se and crit, compute the lower and upper intervals
     out <- add_column(out,
