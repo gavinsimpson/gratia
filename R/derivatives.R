@@ -25,17 +25,14 @@
 ##' @param newdata a data frame containing the values of the model covariates
 ##'   at which to evaluate the first derivatives of the smooths.
 ##' @param order numeric; the order of derivative.
-##' @param type character; the type of finite difference used. One of `"left"`,
-##'   `"right"`, or `"centre"` (or `"center"`).
+##' @param type character; the type of finite difference used. One of
+##'   `"forward"`, `"backward"`, or `"central"`.
 ##'
 ##' @export
 `derivatives.gam` <- function(object, newdata, order = c(1, 2),
-                              type = c("left", "right", "centre", "center"),
+                              type = c("forward", "backward", "central"),
                               n = 200, eps = 1e-7, ...) {
     type <- match.arg(type)
-    if (type == "center") {
-        type <- "centre"
-    }
 }
 
 ##' @rdname derivatives
