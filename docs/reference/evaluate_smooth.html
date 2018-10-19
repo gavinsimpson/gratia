@@ -175,24 +175,28 @@ and <code>dist</code> is a distance within the unit square. See
 <span class='fu'>set.seed</span>(<span class='fl'>2</span>)
 <span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gamSim'>gamSim</a></span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>m1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gam'>gam</a></span>(<span class='no'>y</span> ~ <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x0</span>) + <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x1</span>) + <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x2</span>) + <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x3</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
 
-<span class='fu'>head</span>(<span class='fu'>evaluate_smooth</span>(<span class='no'>m1</span>, <span class='st'>"s(x1)"</span>))</div><div class='output co'>#&gt;   smooth           x1       est        se
-#&gt; 1  s(x1) 0.0006632213 -1.944733 0.3134611
-#&gt; 2  s(x1) 0.0107501579 -1.930377 0.2957587
-#&gt; 3  s(x1) 0.0208370945 -1.916014 0.2788680
-#&gt; 4  s(x1) 0.0309240311 -1.901632 0.2629466
-#&gt; 5  s(x1) 0.0410109677 -1.887206 0.2481575
-#&gt; 6  s(x1) 0.0510979043 -1.872698 0.2346391</div><div class='input'>
+<span class='fu'>head</span>(<span class='fu'>evaluate_smooth</span>(<span class='no'>m1</span>, <span class='st'>"s(x1)"</span>))</div><div class='output co'>#&gt; # A tibble: 6 x 5
+#&gt;   smooth by_variable       x1   est    se
+#&gt;   &lt;chr&gt;  &lt;fct&gt;          &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1 s(x1)  &lt;NA&gt;        0.000663 -1.94 0.313
+#&gt; 2 s(x1)  &lt;NA&gt;        0.0108   -1.93 0.296
+#&gt; 3 s(x1)  &lt;NA&gt;        0.0208   -1.92 0.279
+#&gt; 4 s(x1)  &lt;NA&gt;        0.0309   -1.90 0.263
+#&gt; 5 s(x1)  &lt;NA&gt;        0.0410   -1.89 0.248
+#&gt; 6 s(x1)  &lt;NA&gt;        0.0511   -1.87 0.235</div><div class='input'>
 <span class='co'>## 2d example</span>
 <span class='fu'>set.seed</span>(<span class='fl'>2</span>)
 <span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gamSim'>gamSim</a></span>(<span class='fl'>2</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>4000</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt; Bivariate smoothing example</div><div class='input'><span class='no'>m2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gam'>gam</a></span>(<span class='no'>y</span> ~ <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x</span>, <span class='no'>z</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>30</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>$<span class='no'>data</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
 
-<span class='fu'>head</span>(<span class='fu'>evaluate_smooth</span>(<span class='no'>m2</span>, <span class='st'>"s(x,z)"</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>))</div><div class='output co'>#&gt;   smooth            x            z       est        se
-#&gt; 1 s(x,z) 2.298248e-05 4.321919e-05 0.1226246 0.1149179
-#&gt; 2 s(x,z) 1.012240e-02 4.321919e-05 0.1218180 0.1124405
-#&gt; 3 s(x,z) 2.022182e-02 4.321919e-05 0.1208805 0.1099417
-#&gt; 4 s(x,z) 3.032124e-02 4.321919e-05 0.1198083 0.1074268
-#&gt; 5 s(x,z) 4.042066e-02 4.321919e-05 0.1185977 0.1049027
-#&gt; 6 s(x,z) 5.052008e-02 4.321919e-05 0.1172456 0.1023753</div></pre>
+<span class='fu'>head</span>(<span class='fu'>evaluate_smooth</span>(<span class='no'>m2</span>, <span class='st'>"s(x,z)"</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>))</div><div class='output co'>#&gt; # A tibble: 6 x 6
+#&gt;   smooth by_variable         x         z   est    se
+#&gt;   &lt;chr&gt;  &lt;fct&gt;           &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1 s(x,z) &lt;NA&gt;        0.0000230 0.0000432 0.123 0.115
+#&gt; 2 s(x,z) &lt;NA&gt;        0.0101    0.0000432 0.122 0.112
+#&gt; 3 s(x,z) &lt;NA&gt;        0.0202    0.0000432 0.121 0.110
+#&gt; 4 s(x,z) &lt;NA&gt;        0.0303    0.0000432 0.120 0.107
+#&gt; 5 s(x,z) &lt;NA&gt;        0.0404    0.0000432 0.119 0.105
+#&gt; 6 s(x,z) &lt;NA&gt;        0.0505    0.0000432 0.117 0.102</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
