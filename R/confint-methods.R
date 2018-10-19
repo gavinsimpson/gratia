@@ -85,7 +85,7 @@
 }
 
 ##' @importFrom stats quantile vcov
-##' @importFrom MASS mvrnorm
+##' @importFrom mvtnorm rmvnorm
 `simultaneous` <- function(x, terms, level, nsim) {
     ## wrapper the computes each interval
     `simInt` <- function(x, Vb, bu, level, nsim) {
@@ -104,7 +104,7 @@
     ## bayesian covar matrix, possibly accounting for estimating smooth pars
     Vb <- vcov(x[["model"]], unconditional = x$unconditional)
     ## simulate un-biased deviations given bayesian covar matrix
-    buDiff <- MASS::mvrnorm(n = nsim, mu = rep(0, nrow(Vb)), Sigma = Vb)
+    buDiff <- rmvnorm(n = nsim, mean = rep(0, nrow(Vb)), sigma = Vb)
     ## apply wrapper to compute simultaneous interval critical value and
     ## corresponding simultaneous interval for each term
     res <- lapply(x[["derivatives"]][terms], FUN = simInt,
@@ -169,7 +169,9 @@
 ##' @importFrom stats family qnorm
 ##' @importFrom mgcv PredictMat
 ##' @importFrom stats quantile vcov setNames
-##' @importFrom MASS mvrnorm
+##' @importFrom mvtnorm rmvnorm
+##' @importFrom dplyr bind_rows
+##' @importFrom tibble add_column
 ##'
 ##' @export
 ##'
@@ -236,7 +238,7 @@
         V <- get_vcov(object, unconditional = unconditional)
 
         ## simulate un-biased deviations given bayesian covar matrix
-        buDiff <- MASS::mvrnorm(n = nsim, mu = rep(0, nrow(V)), Sigma = V)
+        buDiff <- rmvnorm(n = nsim, mean = rep(0, nrow(V)), sigma = V)
     }
     ## list to hold results
     out <- vector("list", length = length(uS)) # list for results
@@ -265,7 +267,7 @@
         ## need VCOV for simultaneous intervals
         V <- get_vcov(object, unconditional = unconditional)
         ## simulate un-biased deviations given bayesian covar matrix
-        buDiff <- MASS::mvrnorm(n = nsim, mu = rep(0, nrow(V)), Sigma = V)
+        buDiff <- rmvnorm(n = nsim, mean = rep(0, nrow(V)), sigma = V)
         ## loop over smooths
         for (i in seq_along(out)) {
             ## evaluate smooth
@@ -280,7 +282,8 @@
                 out[[i]][["crit"]] <- 0    # fill in a variable crit
                 smooth <- get_smooth(object, parm)
                 for (l in seq_along(by_levs)) {
-                    ind <- out[[i]][[5L]] == by_levs[l] # which rows in evaulated smooth contain this levels data?
+                    ## the 6L should really refer to the by_variable column...
+                    ind <- out[[i]][[6L]] == by_levs[l] # which rows in evaulated smooth contain this levels data?
                     crit <- sim_interval(smooth[[l]], level = level, newdata = out[[i]][ind, ])
                     out[[i]][["crit"]][ind] <- crit # add on the critical value for this smooth
                 }
@@ -294,20 +297,22 @@
     const <- ifelse(length(test) == 0L, 0, const[test])
 
     ## simplify to a data frame for return
-    out <- do.call("rbind", out)
+    out <- do.call("bind_rows", out)
+
+    class(out) <- class(out)[-(1:2)]
 
     ## using se and crit, compute the lower and upper intervals
-    out <- cbind(out,
-                 lower = out[["est"]] - (out[["crit"]] * out[["se"]]),
-                 upper = out[["est"]] + (out[["crit"]] * out[["se"]]))
+    out <- add_column(out,
+                      lower = out$est - (out$crit * out$se),
+                      upper = out$est + (out$crit * out$se))
 
     ## transform
-    out[, "est"]   <- ilink(out[, "est"] + const)
-    out[, "lower"] <- ilink(out[, "lower"] + const)
-    out[, "upper"] <- ilink(out[, "upper"] + const)
+    out[["est"]]   <- ilink(out[["est"]] + const)
+    out[["lower"]] <- ilink(out[["lower"]] + const)
+    out[["upper"]] <- ilink(out[["upper"]] + const)
 
     ## prepare for return
-    class(out) <- c("confint.gam", "data.frame")
+    class(out) <- c("confint.gam", class(out))
     out                                 # return
 }
 

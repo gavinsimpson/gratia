@@ -132,7 +132,7 @@ test_that("draw() with random effect smooths (bs = 're') & factor by variable ",
     sm <- evaluate_smooth(rm2, "s(ranef)")
     expect_s3_class(sm, "evaluated_re_smooth")
     p1 <- draw(sm)
-    ## vdiffr::expect_doppelganger("draw.evaluated_re_smooth with factor by", p1)
+    expect_doppelganger("draw.evaluated_re_smooth with factor by", p1)
     p2 <- draw(rm2, ncol = 3)
     expect_doppelganger("draw.gam model with ranef smooth factor by", p2)
     p3 <- draw(rm2, ncol = 3, scales = "fixed")

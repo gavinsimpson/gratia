@@ -15,7 +15,7 @@
 ##' @author Gavin L. Simpson
 ##'
 ##' @importFrom stats simulate runif
-##' @importFrom MASS mvrnorm
+##' @importFrom mvtnorm rmvnorm
 ##'
 ##' @export
 ##'
@@ -48,7 +48,7 @@
     }
 
     V <- vcov(object, freq = freq, unconditional = unconditional)
-    Rbeta <- mvrnorm(n = nsim, mu = coef(object), Sigma = V)
+    Rbeta <- rmvnorm(n = nsim, mean = coef(object), sigma = V)
     Xp <- predict(object, newdata = newdata, type = "lpmatrix")
     sims <- Xp %*% t(Rbeta)
     attr(sims, "seed") <- RNGstate
@@ -65,6 +65,8 @@
 }
 
 ##' @rdname simulate
+##' 
+##' @importFrom mvtnorm rmvnorm
 ##'
 ##' @export
 ##'
@@ -89,7 +91,7 @@
 
     V <- vcov(object, freq = freq, parametrized = parametrized)
     B <- coef(object, parametrized = TRUE) # object$coefficients.t
-    Rbeta <- MASS::mvrnorm(n = nsim, mu = B, Sigma = V)
+    Rbeta <- rmvnorm(n = nsim, mean = B, sigma = V)
     Xp <- predict(object, newdata = newdata, type = "lpmatrix")
     sims <- Xp %*% t(Rbeta)
     attr(sims, "seed") <- RNGstate
