@@ -51,7 +51,7 @@
 ##' @importFrom tibble add_column
 `add_missing_by_info_to_smooth` <- function(smooth) {
     smooth <- add_column(smooth,
-                         by_variable = factor(rep(NA_character_, nrow(smooth))),
+                         fs_variable = factor(rep(NA_character_, nrow(smooth))),
                          .after = 1L)
 }
 
@@ -60,7 +60,7 @@
     nc <- NCOL(smooth)
     nr <- NROW(smooth)
     smooth <- add_column(smooth,
-                         by_variable = factor(rep(by_name, NROW(smooth))),
+                         fs_variable = factor(rep(by_name, NROW(smooth))),
                          .after = 1L)
     smooth <- add_column(smooth,
                          by_var = factor(rep(levels(by_data), each = n)))

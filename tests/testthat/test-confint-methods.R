@@ -40,7 +40,7 @@ test_that("Point-wise confidence interval for a GAM works", {
     ci <- confint(mod, parm = "x1", type = "confidence")
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "data.frame")
-    expect_named(ci, expected = c("smooth", "by_variable", "x1", "est", "se", "crit", "lower", "upper"))
+    expect_named(ci, expected = c("smooth", "fs_variable", "x1", "est", "se", "crit", "lower", "upper"))
 })
 
 test_that("Simultaneous interval for a GAM works", {
@@ -48,7 +48,7 @@ test_that("Simultaneous interval for a GAM works", {
     si <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)
     expect_s3_class(si, "confint.gam")
     expect_s3_class(si, "data.frame")
-    expect_named(si, expected = c("smooth", "by_variable", "x1", "est", "se", "crit", "lower", "upper"))
+    expect_named(si, expected = c("smooth", "fs_variable", "x1", "est", "se", "crit", "lower", "upper"))
 })
 
 ## confint methods for by variables
@@ -60,7 +60,7 @@ test_that("Point-wise confidence interval for a GAM with factor by variable work
     ci <- confint(mod, parm = "x2", type = "confidence")
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "data.frame")
-    expect_named(ci, expected = c("smooth", "by_variable", "x2", "est", "se", "fac",
+    expect_named(ci, expected = c("smooth", "fs_variable", "x2", "est", "se", "fac",
                                   "crit", "lower", "upper"))
     expect_equal(paste0("s(x2):fac", levels(dat[["fac"]])),
                  unique(ci[["smooth"]]))
@@ -70,7 +70,7 @@ test_that("Simultaneous confidence interval for a GAM with factor by variable wo
     ci <- confint(mod, parm = "x2", type = "simultaneous")
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "data.frame")
-    expect_named(ci, expected = c("smooth", "by_variable", "x2", "est", "se", "fac",
+    expect_named(ci, expected = c("smooth", "fs_variable", "x2", "est", "se", "fac",
                                   "crit", "lower", "upper"))
     expect_equal(paste0("s(x2):fac", levels(dat[["fac"]])),
                  unique(ci[["smooth"]]))
