@@ -26,10 +26,10 @@ test_that("Point-wise confidence interval for a first derivatives of a GAM works
 
 test_that("Simultaneous interval for a first derivatives of a GAM works", {
     set.seed(42)
-    si <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
-    expect_s3_class(si, "confint.fderiv")
-    expect_s3_class(si, "data.frame")
-    expect_named(si, expected = c("term", "lower", "est", "upper"))
+    ci <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
+    expect_s3_class(ci, "confint.fderiv")
+    expect_s3_class(ci, "data.frame")
+    expect_named(ci, expected = c("term", "lower", "est", "upper"))
 })
 
 set.seed(2)
@@ -39,16 +39,33 @@ mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 test_that("Point-wise confidence interval for a GAM works", {
     ci <- confint(mod, parm = "x1", type = "confidence")
     expect_s3_class(ci, "confint.gam")
-    expect_s3_class(ci, "data.frame")
+    expect_s3_class(ci, "tbl_df")
     expect_named(ci, expected = c("smooth", "fs_variable", "x1", "est", "se", "crit", "lower", "upper"))
 })
 
 test_that("Simultaneous interval for a GAM works", {
     set.seed(42)
-    si <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)
-    expect_s3_class(si, "confint.gam")
-    expect_s3_class(si, "data.frame")
-    expect_named(si, expected = c("smooth", "fs_variable", "x1", "est", "se", "crit", "lower", "upper"))
+    ci <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)
+    expect_s3_class(ci, "confint.gam")
+    expect_s3_class(ci, "tbl_df")
+    expect_named(ci, expected = c("smooth", "fs_variable", "x1", "est", "se", "crit", "lower", "upper"))
+})
+
+mod <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+
+test_that("Point-wise confidence interval for a GAMM works", {
+    ci <- confint(mod, parm = "x1", type = "confidence")
+    expect_s3_class(ci, "confint.gam")
+    expect_s3_class(ci, "tbl_df")
+    expect_named(ci, expected = c("smooth", "fs_variable", "x1", "est", "se", "crit", "lower", "upper"))
+})
+
+test_that("Simultaneous interval for a GAMM works", {
+    set.seed(42)
+    ci <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)
+    expect_s3_class(ci, "confint.gam")
+    expect_s3_class(ci, "tbl_df")
+    expect_named(ci, expected = c("smooth", "fs_variable", "x1", "est", "se", "crit", "lower", "upper"))
 })
 
 ## confint methods for by variables
@@ -59,7 +76,7 @@ mod <- gam(y ~ fac + s(x2, by = fac), data = dat, method = "REML")
 test_that("Point-wise confidence interval for a GAM with factor by variable works", {
     ci <- confint(mod, parm = "x2", type = "confidence")
     expect_s3_class(ci, "confint.gam")
-    expect_s3_class(ci, "data.frame")
+    expect_s3_class(ci, "tbl_df")
     expect_named(ci, expected = c("smooth", "fs_variable", "x2", "est", "se", "fac",
                                   "crit", "lower", "upper"))
     expect_equal(paste0("s(x2):fac", levels(dat[["fac"]])),
@@ -69,7 +86,7 @@ test_that("Point-wise confidence interval for a GAM with factor by variable work
 test_that("Simultaneous confidence interval for a GAM with factor by variable works", {
     ci <- confint(mod, parm = "x2", type = "simultaneous")
     expect_s3_class(ci, "confint.gam")
-    expect_s3_class(ci, "data.frame")
+    expect_s3_class(ci, "tbl_df")
     expect_named(ci, expected = c("smooth", "fs_variable", "x2", "est", "se", "fac",
                                   "crit", "lower", "upper"))
     expect_equal(paste0("s(x2):fac", levels(dat[["fac"]])),
