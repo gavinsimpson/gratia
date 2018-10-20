@@ -182,3 +182,20 @@ test_that("derivatives() throws errors if order == 2L in a factor by GAM", {
     expect_error( derivatives(mod, order = 2, type = "central"),
                  "2nd derivatives not yet implemented.", fixed = TRUE)
 })
+
+test_that("internal finite diff functions fail for all factor vars", {
+    df <- data.frame(a = rep(letters[1:3], 10),
+                     b = rep(LETTERS[1:3], 10))
+
+    expect_error( forward_finite_diff1(mod, df),
+                 "Can't compute finite differences for all non-numeric data.",
+                 fixed = TRUE)
+
+    expect_error( backward_finite_diff1(mod, df),
+                 "Can't compute finite differences for all non-numeric data.",
+                 fixed = TRUE)
+
+    expect_error( central_finite_diff1(mod, df),
+                 "Can't compute finite differences for all non-numeric data.",
+                 fixed = TRUE)
+})
