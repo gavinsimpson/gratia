@@ -218,12 +218,12 @@ test_that("data_class works for a data frame", {
     expect_identical(actual, result)
 })
 
-test_that("n_smooths works for gam models" {
+test_that("n_smooths works for gam models", {
     expect_silent( result <- n_smooths(m_gam) )
     expect_identical(result, 4L)
 })
 
-test_that("n_smooths works for gamm models" {
+test_that("n_smooths works for gamm models", {
     expect_silent( result <- n_smooths(m_gamm) )
     expect_identical(result, 4L)
 })
