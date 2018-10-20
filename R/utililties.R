@@ -231,8 +231,13 @@
 ##'
 ##' @export
 `which_smooths` <- function(object, terms) {
-    unique(unlist(lapply(terms, function(x, object) { which_smooth(object, x) },
-                         object = object)))
+    ids <- unique(unlist(lapply(terms, function(x, object) { which_smooth(object, x) },
+                                object = object)))
+    if (identical(length(ids), 0L)) {
+        stop("None of the terms matched a smooth.")
+    }
+
+    ids
 }
 
 `which_smooth` <- function(object, term) {
@@ -501,7 +506,7 @@
     FUN <- match.fun(FUN)
     result <- df
     if (any(i)) {
-        result[, !i, drop = FALSE] <- FUN(result[, !i, drop = FALSE], h)
+        result[, !i] <- FUN(result[, !i], h)
     } else {
         result <- FUN(result, h)
     }
