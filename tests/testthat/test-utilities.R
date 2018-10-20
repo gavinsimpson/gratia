@@ -238,3 +238,12 @@ test_that("n_smooths, fails for objects with no smooth component", {
                  "Don't know how to identify smooths for <data.frame>",
                  fixed = TRUE)
 })
+
+test_that("which_smooths throws error if no smooths match the supplied term", {
+    expect_error(which_smooths(m_gam, "foo"),
+                 "None of the terms matched a smooth.", fixed = TRUE)
+    expect_error(which_smooths(m_gamm, "foo"),
+                 "None of the terms matched a smooth.", fixed = TRUE)
+    expect_error(which_smooths(m_bam, "foo"),
+                 "None of the terms matched a smooth.", fixed = TRUE)
+})
