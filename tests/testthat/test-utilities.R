@@ -196,3 +196,23 @@ test_that("seq_min_max works as intended", {
     expect_identical(length(s1), length(s2))
     expect_identical(length(s1), n)
 })
+
+set.seed(42)
+dat <- gamSim(4, n = 400, verbose = FALSE)
+
+test_that("factor_var_names works", {
+    expect_silent( result <- factor_var_names(dat))
+    expect_identical("fac", result)
+
+    expect_null( factor_var_names(dat[,1:2]) )
+})
+
+test_that("data_class works for a data frame", {
+    expect_silent( result <- data_class(dat) )
+
+    expect_named( result, names(dat) )
+
+    actual <- c(rep("numeric", 4L), "factor", rep("numeric", 3L))
+    names(actual) <- names(dat)
+    expect_identical(actual, result)
+})
