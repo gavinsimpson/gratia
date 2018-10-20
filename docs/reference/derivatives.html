@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fix the names of a data frame containing an offset variable. — fix_offset • gratia</title>
+<title>Derivatives of estimated smooths via finite differences — derivatives • gratia</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,10 +30,9 @@
 
 
 
-<meta property="og:title" content="Fix the names of a data frame containing an offset variable. — fix_offset" />
+<meta property="og:title" content="Derivatives of estimated smooths via finite differences — derivatives" />
 
-<meta property="og:description" content="Identifies which variable, if any, is the model offset, and fixed the name
-such that &quot;offset(foo(var))&quot; is converted &quot;var&quot;, and possibly sets that data to offset_val`." />
+<meta property="og:description" content="Derivatives of estimated smooths via finite differences" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -93,58 +92,91 @@ such that &quot;offset(foo(var))&quot; is converted &quot;var&quot;, and possibl
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Fix the names of a data frame containing an offset variable.</h1>
+    <h1>Derivatives of estimated smooths via finite differences</h1>
     
-    <div class="hidden name"><code>fix_offset.Rd</code></div>
+    <div class="hidden name"><code>derivatives.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Identifies which variable, if any, is the model offset, and fixed the name
-such that <code>"offset(foo(var))" is converted </code>"var"<code>, and possibly sets that data to </code>offset_val`.</p>
+    <p>Derivatives of estimated smooths via finite differences</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>fix_offset</span>(<span class='no'>model</span>, <span class='no'>newdata</span>, <span class='kw'>offset_val</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>derivatives</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for default</span>
+<span class='fu'>derivatives</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for gamm</span>
+<span class='fu'>derivatives</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for gam</span>
+<span class='fu'>derivatives</span>(<span class='no'>object</span>, <span class='no'>term</span>, <span class='no'>newdata</span>, <span class='kw'>order</span> <span class='kw'>=</span> <span class='fl'>1L</span>,
+  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"forward"</span>, <span class='st'>"backward"</span>, <span class='st'>"central"</span>), <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>1e-07</span>,
+  <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>frequentist</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>offset</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>model</th>
-      <td><p>a fitted GAM.</p></td>
+      <th>object</th>
+      <td><p>an R object to compute derivatives for.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>arguments passed to other methods.</p></td>
+    </tr>
+    <tr>
+      <th>term</th>
+      <td><p>character; vector of one or more smooth terms for which
+derivatives are required. If missing, derivatives for all smooth terms
+will be returned. Can be a partial match to a smooth term.</p></td>
     </tr>
     <tr>
       <th>newdata</th>
-      <td><p>data frame; new values at which to predict at.</p></td>
+      <td><p>a data frame containing the values of the model covariates
+at which to evaluate the first derivatives of the smooths.</p></td>
     </tr>
     <tr>
-      <th>offset_val</th>
-      <td><p>numeric, optional; if provided, then the offset variable in <code>newdata</code> is set to this constant value before returning <code>newdata</code></p></td>
+      <th>order</th>
+      <td><p>numeric; the order of derivative.</p></td>
+    </tr>
+    <tr>
+      <th>type</th>
+      <td><p>character; the type of finite difference used. One of
+<code>"forward"</code>, <code>"backward"</code>, or <code>"central"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>n</th>
+      <td><p>numeric; the number of points to evaluate the derivative at.</p></td>
+    </tr>
+    <tr>
+      <th>eps</th>
+      <td><p>numeric; the finite difference.</p></td>
+    </tr>
+    <tr>
+      <th>unconditional</th>
+      <td><p>logical; use smoothness selection-corrected Bayesian
+covariance matrix?</p></td>
+    </tr>
+    <tr>
+      <th>frequentist</th>
+      <td><p>logical; use the frequentist covariance matrix?</p></td>
+    </tr>
+    <tr>
+      <th>offset</th>
+      <td><p>numeric; a value to use for any offset term</p></td>
     </tr>
     </table>
     
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The original <code>newdata</code> is returned with fixed names and possibly modified offset variable.</p>
-    
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>##\testonly{set.seed(2)}</span>
-<span class='fu'>library</span>(<span class='st'>"mgcv"</span>)
-<span class='fu'>set.seed</span>(<span class='fl'>2</span>)
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gamSim'>gamSim</a></span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>m</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gam'>gam</a></span>(<span class='no'>y</span> ~ <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x0</span>) + <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x1</span>) + <span class='fu'>offset</span>(<span class='no'>x0</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>df</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
-<span class='fu'>names</span>(<span class='fu'>model.frame</span>(<span class='no'>m</span>))</div><div class='output co'>#&gt; [1] "y"          "offset(x0)" "x0"         "x1"        </div><div class='input'><span class='fu'>names</span>(<span class='fu'>fix_offset</span>(<span class='no'>m</span>, <span class='fu'>model.frame</span>(<span class='no'>m</span>), <span class='kw'>offset_val</span> <span class='kw'>=</span> <span class='fl'>1L</span>))</div><div class='output co'>#&gt; [1] "x0"         "offset(x0)" "x0"         "x0"        </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
+                </ul>
 
     <h2>Author</h2>
     

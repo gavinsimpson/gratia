@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fix the names of a data frame containing an offset variable. — fix_offset • gratia</title>
+<title>Create a sequence of evenly-spaced values — seq_min_max • gratia</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,10 +30,10 @@
 
 
 
-<meta property="og:title" content="Fix the names of a data frame containing an offset variable. — fix_offset" />
+<meta property="og:title" content="Create a sequence of evenly-spaced values — seq_min_max" />
 
-<meta property="og:description" content="Identifies which variable, if any, is the model offset, and fixed the name
-such that &quot;offset(foo(var))&quot; is converted &quot;var&quot;, and possibly sets that data to offset_val`." />
+<meta property="og:description" content="Creates a sequence of n evenly-spaced values over the range
+min(x) -- max(x)." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -93,48 +93,43 @@ such that &quot;offset(foo(var))&quot; is converted &quot;var&quot;, and possibl
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Fix the names of a data frame containing an offset variable.</h1>
+    <h1>Create a sequence of evenly-spaced values</h1>
     
-    <div class="hidden name"><code>fix_offset.Rd</code></div>
+    <div class="hidden name"><code>seq_min_max.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Identifies which variable, if any, is the model offset, and fixed the name
-such that <code>"offset(foo(var))" is converted </code>"var"<code>, and possibly sets that data to </code>offset_val`.</p>
+    <p>Creates a sequence of <code>n</code> evenly-spaced values over the range
+<code>min(x)</code> -- <code>max(x)</code>.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>fix_offset</span>(<span class='no'>model</span>, <span class='no'>newdata</span>, <span class='kw'>offset_val</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>seq_min_max</span>(<span class='no'>x</span>, <span class='no'>n</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>model</th>
-      <td><p>a fitted GAM.</p></td>
+      <th>x</th>
+      <td><p>numeric; vector over which evenly-spaced values are returned</p></td>
     </tr>
     <tr>
-      <th>newdata</th>
-      <td><p>data frame; new values at which to predict at.</p></td>
-    </tr>
-    <tr>
-      <th>offset_val</th>
-      <td><p>numeric, optional; if provided, then the offset variable in <code>newdata</code> is set to this constant value before returning <code>newdata</code></p></td>
+      <th>n</th>
+      <td><p>numeric; the number of evenly-spaced values to return</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The original <code>newdata</code> is returned with fixed names and possibly modified offset variable.</p>
+    <p>A numeric vector of length <code>n</code>.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>##\testonly{set.seed(2)}</span>
-<span class='fu'>library</span>(<span class='st'>"mgcv"</span>)
-<span class='fu'>set.seed</span>(<span class='fl'>2</span>)
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gamSim'>gamSim</a></span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>m</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gam'>gam</a></span>(<span class='no'>y</span> ~ <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x0</span>) + <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x1</span>) + <span class='fu'>offset</span>(<span class='no'>x0</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>df</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
-<span class='fu'>names</span>(<span class='fu'>model.frame</span>(<span class='no'>m</span>))</div><div class='output co'>#&gt; [1] "y"          "offset(x0)" "x0"         "x1"        </div><div class='input'><span class='fu'>names</span>(<span class='fu'>fix_offset</span>(<span class='no'>m</span>, <span class='fu'>model.frame</span>(<span class='no'>m</span>), <span class='kw'>offset_val</span> <span class='kw'>=</span> <span class='fl'>1L</span>))</div><div class='output co'>#&gt; [1] "x0"         "offset(x0)" "x0"         "x0"        </div></pre>
+    <pre class="examples"><div class='input'><span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'>rnorm</span>(<span class='fl'>10</span>)
+<span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>10L</span>
+<span class='fu'>seq_min_max</span>(<span class='no'>x</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='no'>n</span>)</div><div class='output co'>#&gt;  [1] -0.83562861 -0.56552757 -0.29542652 -0.02532547  0.24477557  0.51487662
+#&gt;  [7]  0.78497766  1.05507871  1.32517976  1.59528080</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -145,10 +140,6 @@ such that <code>"offset(foo(var))" is converted </code>"var"<code>, and possibly
       
       <li><a href="#examples">Examples</a></li>
     </ul>
-
-    <h2>Author</h2>
-    
-Gavin L. Simpson
 
   </div>
 </div>

@@ -181,7 +181,7 @@
 <span class='co'>## point-wise interval</span>
 <span class='no'>ci</span> <span class='kw'>&lt;-</span> <span class='fu'>confint</span>(<span class='no'>mod</span>, <span class='kw'>parm</span> <span class='kw'>=</span> <span class='st'>"x1"</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"confidence"</span>)
 <span class='fu'>head</span>(<span class='no'>ci</span>)</div><div class='output co'>#&gt; # A tibble: 6 x 8
-#&gt;   smooth by_variable       x1   est    se  crit lower upper
+#&gt;   smooth fs_variable       x1   est    se  crit lower upper
 #&gt;   &lt;chr&gt;  &lt;fct&gt;          &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 #&gt; 1 s(x1)  &lt;NA&gt;        0.000663  5.89 0.313  1.96  5.27  6.50
 #&gt; 2 s(x1)  &lt;NA&gt;        0.00568   5.90 0.305  1.96  5.30  6.49
@@ -193,7 +193,7 @@
 <span class='fu'>set.seed</span>(<span class='fl'>42</span>)
 <span class='no'>si</span> <span class='kw'>&lt;-</span> <span class='fu'>confint</span>(<span class='no'>mod</span>, <span class='kw'>parm</span> <span class='kw'>=</span> <span class='st'>"x1"</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"simultaneous"</span>, <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>100</span>)
 <span class='fu'>head</span>(<span class='no'>si</span>)</div><div class='output co'>#&gt; # A tibble: 6 x 8
-#&gt;   smooth by_variable       x1   est    se  crit lower upper
+#&gt;   smooth fs_variable       x1   est    se  crit lower upper
 #&gt;   &lt;chr&gt;  &lt;fct&gt;          &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 #&gt; 1 s(x1)  &lt;NA&gt;        0.000663  5.89 0.313  2.60  5.07  6.70
 #&gt; 2 s(x1)  &lt;NA&gt;        0.00568   5.90 0.305  2.60  5.10  6.69
