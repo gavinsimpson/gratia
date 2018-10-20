@@ -186,3 +186,13 @@ test_that("get_smooths_by_id works for a GAMM", {
     expect_true(is_mgcv_smooth(sm[[1L]]))
     expect_equal(sm[[1L]], get_smooth(m2, "s(x1)"))
 })
+
+test_that("seq_min_max works as intended", {
+    x <- rnorm(10)
+    n <- 50L
+    s1 <- seq_min_max(x, n = n)
+    s2 <- seq(min(x), max(x), length.out = n)
+    expect_equal(s1, s2)
+    expect_identical(length(s1), length(s2))
+    expect_identical(length(s1), n)
+})

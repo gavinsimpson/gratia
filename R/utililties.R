@@ -86,6 +86,12 @@
     SMOOTHS[want]
 }
 
+##' Names of smooths in a GAM
+##'
+##' @param object a fitted GAM or related model. Typically the result of a call
+##'   to [mgcv::gam()], [mgcv::bam()], or [mgcv::gamm()].
+##'
+##' @export
 `smooths` <- function(object) {
     vapply(object[["smooth"]], FUN  = `[[`, FUN.VALUE = character(1), "label")
 }
@@ -220,15 +226,53 @@
 ##' @title Identify a smooth term by it's label
 ##'
 ##' @param object a fitted GAM.
-##' @param term character; the (partial) term label with which to identify the required smooth.
+##' @param terms character; one or more (partial) term labels with which to identify
+##'   required smooths.
 ##'
 ##' @export
+`which_smooths` <- function(object, terms) {
+    unique(unlist(lapply(terms, function(x, object) { which_smooth(object, x) },
+                         object = object)))
+}
+
 `which_smooth` <- function(object, term) {
     if (is.gamm(object)) {
         object <- object[["gam"]]
     }
     smooths <- smooths(object)
     grep(term, smooths, fixed = TRUE)
+}
+
+##' How many smooths in a fitted model
+##'
+##' @inheritParams smooths
+##'
+##' @export
+`n_smooths` <- function(object) {
+    UseMethod("n_smooths")
+}
+
+##' @export
+##' @rdname n_smooths
+`n_smooths.default` <- function(object) {
+    if (!is.null(object[["smooth"]])) {
+        return(length(object[["smooth"]]))
+    }
+
+    stop("Don't know how to identify smooths for <", class(object)[[1L]], ">",
+         call. = FALSE)           # don't show the call, simpler error
+}
+
+##' @export
+##' @rdname n_smooths
+`n_smooths.gam` <- function(object) {
+    length(object[["smooth"]])
+}
+
+##' @export
+##' @rdname n_smooths
+`n_smooths.gamm` <- function(object) {
+    length(object[["gam"]][["smooth"]])
 }
 
 `get_vcov` <- function(object, unconditional = FALSE, frequentist = FALSE,
@@ -287,13 +331,13 @@
 ##'
 ##' Identifies which variable, if any, is the model offset, and fixed the name
 ##' such that `"offset(foo(var))" is converted `"var"`, and possibly sets that
-##' data to `offset_value`.
+##' data to `offset_val`.
 ##
 ##' @param model a fitted GAM.
 ##'
 ##' @param newdata data frame; new values at which to predict at.
 ##'
-##' @param offset_value numeric, optional; if provided, then the offset variable in `newdata` is set to this constant value before returning `newdata`
+##' @param offset_val numeric, optional; if provided, then the offset variable in `newdata` is set to this constant value before returning `newdata`
 ##'
 ##' @return The original `newdata` is returned with fixed names and possibly modified offset variable.
 ##'
@@ -308,8 +352,8 @@
 ##' df <- gamSim(1, n = 400, dist = "normal")
 ##' m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = df, method = "REML")
 ##' names(model.frame(m))
-##' names(fix_offset(m, model.frame(m), offset_value = 1L))
-`fix_offset` <- function(model, newdata, offset_value = NULL) {
+##' names(fix_offset(m, model.frame(m), offset_val = 1L))
+`fix_offset` <- function(model, newdata, offset_val = NULL) {
     m.terms <- names(newdata)
     p.terms <- attr(terms(model[["pred.formula"]]), "term.labels")
 
@@ -334,8 +378,8 @@
     }
 
     ## change offset?
-    if (!is.null(offset_value)) {
-        newdata[, off] <- offset_value
+    if (!is.null(offset_val)) {
+        newdata[, off] <- offset_val
     }
 
     newdata                        # return
@@ -378,4 +422,88 @@
                        collapse = ', '),
                  "\nNot all of these are 'by' variable smooths. Contact Maintainer.")
     msg
+}
+
+##' @title Repeat the first level of a factor n times
+##'
+##' @description Function to repeat the first level of a factor n times and
+##'   return this vector as a factor with the original levels intact
+##'
+##' @param f a factor
+##' @param n numeric; the number of times to repeat the first level of `f`
+##'
+##' @return A factor of length `n` with the levels of `f`, but whose elements
+##'   are all the first level of `f`.
+`rep_first_factor_value` <- function(f, n) {
+    stopifnot(is.factor(f))
+    levs <- levels(f)
+    factor(rep(levs[1L], length.out = n), levels = levs)
+}
+
+##' @title Create a sequence of evenly-spaced values
+##'
+##' @description Creates a sequence of `n` evenly-spaced values over the range
+##'   `min(x)` -- `max(x)`.
+##'
+##' @param x numeric; vector over which evenly-spaced values are returned
+##' @param n numeric; the number of evenly-spaced values to return
+##'
+##' @return A numeric vector of length `n`.
+##'
+##' @export
+##'
+##' @examples
+##' \dontshow{set.seed(1)}
+##' x <- rnorm(10)
+##' n <- 10L
+##' seq_min_max(x, n = n)
+`seq_min_max` <- function(x, n) {
+    seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
+        length.out = n)
+}
+
+##' Vectorized version of `data.class`
+##'
+##' @param df a data frame or tibble
+`data_class` <- function(df) {
+    vapply(df, data.class, character(1L))
+}
+
+##' Names of any factor variables in model data
+##'
+##' @param df a data frame or tibble
+`factor_var_names` <- function(df) {
+    ind <- is_factor_var(df)
+    result <- if (any(ind)) {
+        names(df)[ind]
+    } else {
+        NULL
+    }
+    result
+}
+
+##' Are variables in a data frame factors?
+##'
+##' @param df a data frame or tibble
+`is_factor_var` <- function(df) {
+    result <- vapply(df, is.factor, logical(1L))
+    result
+}
+
+##' Shift numeric values in a data frame by an amount `eps`
+##'
+##' @param df a data frame or tibble.
+##' @param h numeric; the amount to shift values in `df` by.
+##' @param i logical; a vector indexing columns of `df` that should not be
+##'   included in the shift.
+##' @param FUN function; a function to applut the shift. Typically `+` or `-`.
+`shift_values` <- function(df, h, i, FUN = '+') {
+    FUN <- match.fun(FUN)
+    result <- df
+    if (any(i)) {
+        result[, !i, drop = FALSE] <- FUN(result[, !i, drop = FALSE], h)
+    } else {
+        result <- FUN(result, h)
+    }
+    result
 }

@@ -69,7 +69,7 @@
         if (is.null(offset)) {
             offset <- 1L
         }
-        mf <- fix_offset(model, mf, offset_value = offset)
+        mf <- fix_offset(model, mf, offset_val = offset)
 
         ff <- vapply(mf, is.factor, logical(1L))
 
