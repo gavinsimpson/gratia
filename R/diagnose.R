@@ -401,7 +401,7 @@
     }
     ## now n_bins should be numeric, if not bail
     if (!is.numeric(n_bins)) {
-        stop("'n_bins' must be a number or one of: ",
+        stop("'n_bins' should be a number or one of: ",
              paste(dQuote(c("sturges", "scott", "fd")),
                    collapse = ", "))
     }
@@ -479,7 +479,7 @@
     }
 
     if (!is.character(n_bins) && !is.numeric(n_bins)) {
-        stop("'n_bins' must be a number or one of: ",
+        stop("'n_bins' should be a number or one of: ",
              paste(dQuote(c("sturges", "scott", "fd")), collapse = ", "))
     }
 
