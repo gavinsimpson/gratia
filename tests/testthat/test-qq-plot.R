@@ -90,4 +90,4 @@ test_that("pearson_residuals fails if no var_fun available", {
     expect_error(pearson_residuals(var_fun = NULL),
                  "Pearson residuals are not available for this family.",
                  fixed = TRUE)
-}
+})
