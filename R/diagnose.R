@@ -22,6 +22,8 @@
 ##'   `"response"`, and `"pearson"` residuals are allowed.
 ##' @param n_uniform numeric; number of times to randomize uniform quantiles
 ##'   in the direct computation method (`method = "direct"`).
+##' @param n_simulate numeric; number of data sets to simulate from the estimated
+##'   model when using the simulation method (`method = "simulate"`).
 ##' @param xlab character or expression; the label for the y axis. If not
 ##'   supplied, a suitable label will be generated.
 ##' @param ylab character or expression; the label for the y axis. If not
@@ -57,17 +59,17 @@
 `qq_plot.gam` <- function(model,
                           method = c("direct", "simulate", "normal"),
                           type = c("deviance","response","pearson"),
-                          n_uniform = 10,
+                          n_uniform = 10, n_simulate = 50,
                           ylab = NULL, xlab = NULL,
                           title = NULL, subtitle = NULL, caption = NULL,
                           ...) {
     method <- match.arg(method)         # what method for the QQ plot?
 
     ## for now, bail if method not "uniform"
-    if (!method %in% c("direct", "normal")) {
-        stop("QQ plot method <", method, "> not yet available.",
-             call. = FALSE)
-    }
+    ## if (!method %in% c("direct", "normal")) {
+    ##     stop("QQ plot method <", method, "> not yet available.",
+    ##          call. = FALSE)
+    ## }
 
     type <- match.arg(type)       # what type of residuals
     r <- residuals(model, type = type)  # model residuals
@@ -75,7 +77,7 @@
     ## generate theoretical quantiles
     rq <- switch(method,
                  direct = qq_uniform(model, n = n_uniform, type = type),
-                 simulate = qq_simulate(),
+                 simulate = qq_simulate(model, n = n_simulate, type = type),
                  normal = qq_normal(model))
 
     ## add labels if not supplied
@@ -115,9 +117,46 @@
     plt
 }
 
-##
-`qq_simulate` <- function(model, type = c("deviance","response","pearson")) {
+##' @importFrom mgcv fix.family.rd
+##' @importFrom stats weights
+`qq_simulate` <- function(model, n = 50, type = c("deviance","response","pearson")) {
+    type <- match.arg(type)
+    family <- family(model)
+    family <- fix.family.rd(family)
+    rd_fun <- family[["rd"]]
 
+    if (is.null(rd_fun)) {
+        stop("Random deviate function for family <", family[["family"]],
+             "> not available.")
+    }
+
+    dev_resid_fun <- family[["dev.resids"]] # deviance residuals function
+    var_fun <- family[["variance"]]         # variance function
+    fit <- fitted(model)
+    prior_w <- weights(model, type = "prior")
+    sigma2 <- model[["sig2"]]
+    na_action <- na.action(model)
+
+    sims <- replicate(n = n,
+                      qq_simulate_data(rd_fun, fit = fit, weights = prior_w,
+                                       sigma2 = sigma2, dev_resid_fun = dev_resid_fun,
+                                       var_fun = var_fun, type = type,
+                                       na_action = na_action))
+    n_obs <- length(fit)
+    out <- quantile(sims, probs = (seq_len(n_obs) - 0.5) / n_obs)
+    out
+}
+
+`qq_simulate_data` <- function(rd_fun, fit, weights, sigma2, dev_resid_fun,
+                               var_fun, type, na_action) {
+    ## simulate data
+    ysim <- rd_fun(fit, weights, sigma2)
+    ## new residuals
+    r <- compute_residuals(ysim, fit = fit, weights = weights, type = type,
+                           dev_resid_fun = dev_resid_fun, var_fun = var_fun,
+                           na_action = na_action)
+    ## sort residuals & return
+    sort(r)
 }
 
 ##' @importFrom stats ppoints qnorm
