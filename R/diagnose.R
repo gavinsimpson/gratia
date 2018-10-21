@@ -476,10 +476,11 @@
     type <- match.arg(type)
     if (is.character(n_bins)) {
         n_bins <- match.arg(n_bins)
-    } else if (!is.numeric(n_bins)) {
+    }
+
+    if (!is.character(n_bins) && !is.numeric(n_bins)) {
         stop("'n_bins' must be a number or one of: ",
-             paste(dQuote(c("sturges", "scott", "fd")),
-                   collapse = ", "))
+             paste(dQuote(c("sturges", "scott", "fd")), collapse = ", "))
     }
 
     plt1 <- qq_plot(model, method = method, type = type, n_uniform = n_uniform)
