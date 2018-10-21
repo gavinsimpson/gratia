@@ -108,8 +108,8 @@
 <span class='co'># S3 method for gam</span>
 <span class='fu'>qq_plot</span>(<span class='no'>model</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"direct"</span>, <span class='st'>"simulate"</span>, <span class='st'>"normal"</span>),
   <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"deviance"</span>, <span class='st'>"response"</span>, <span class='st'>"pearson"</span>), <span class='kw'>n_uniform</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>ylab</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>xlab</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
+  <span class='kw'>n_simulate</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='kw'>ylab</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>xlab</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -135,6 +135,11 @@
       <th>n_uniform</th>
       <td><p>numeric; number of times to randomize uniform quantiles
 in the direct computation method (<code>method = "direct"</code>).</p></td>
+    </tr>
+    <tr>
+      <th>n_simulate</th>
+      <td><p>numeric; number of data sets to simulate from the estimated
+model when using the simulation method (<code>method = "simulate"</code>).</p></td>
     </tr>
     <tr>
       <th>ylab</th>
