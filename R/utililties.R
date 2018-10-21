@@ -228,11 +228,49 @@
 ##' @param object a fitted GAM.
 ##' @param terms character; one or more (partial) term labels with which to identify
 ##'   required smooths.
+##' @param ... arguments passed to other methods.
 ##'
 ##' @export
-`which_smooths` <- function(object, terms) {
+`which_smooths` <- function(object, ...) {
+    UseMethod("which_smooths")
+}
+
+##' @export
+##' @rdname which_smooths
+`which_smooths.default` <- function(object, ...) {
+    stop("Don't know how to identify smooths for <", class(object)[[1L]], ">",
+         call. = FALSE)           # don't show the call, simpler error
+}
+
+##' @export
+##' @rdname which_smooths
+`which_smooths.gam` <- function(object, terms, ...) {
     ids <- unique(unlist(lapply(terms, function(x, object) { which_smooth(object, x) },
                                 object = object)))
+    if (identical(length(ids), 0L)) {
+        stop("None of the terms matched a smooth.")
+    }
+
+    ids
+}
+
+##' @export
+##' @rdname which_smooths
+`which_smooths.bam` <- function(object, terms, ...) {
+    ids <- unique(unlist(lapply(terms, function(x, object) { which_smooth(object, x) },
+                                object = object)))
+    if (identical(length(ids), 0L)) {
+        stop("None of the terms matched a smooth.")
+    }
+
+    ids
+}
+
+##' @export
+##' @rdname which_smooths
+`which_smooths.gamm` <- function(object, terms, ...) {
+    ids <- unique(unlist(lapply(terms, function(x, object) { which_smooth(object, x) },
+                                object = object[["gam"]])))
     if (identical(length(ids), 0L)) {
         stop("None of the terms matched a smooth.")
     }
@@ -278,6 +316,12 @@
 ##' @rdname n_smooths
 `n_smooths.gamm` <- function(object) {
     length(object[["gam"]][["smooth"]])
+}
+
+##' @export
+##' @rdname n_smooths
+`n_smooths.bam` <- function(object) {
+    length(object[["smooth"]])
 }
 
 `get_vcov` <- function(object, unconditional = FALSE, frequentist = FALSE,
