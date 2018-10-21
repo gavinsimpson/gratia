@@ -587,7 +587,9 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > library("mgcv")
 Loading required package: nlme
 This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+> ## Don't show: 
 > set.seed(2)
+> ## End(Don't show)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
@@ -612,7 +614,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  17.628 0.107 17.813 0 0 
+Time elapsed:  17.062 0.115 17.236 0 0 
 > grDevices::dev.off()
 null device 
           1 
