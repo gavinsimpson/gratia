@@ -51,7 +51,7 @@ Derivatives of estimated smooths via finite differences
 \examples{
 
 library("mgcv")
-set.seed(42)
+\dontshow{set.seed(42)}
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 

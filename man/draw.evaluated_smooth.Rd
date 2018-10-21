@@ -72,14 +72,14 @@ Plots estimated univariate and bivariate smooths using ggplot2.
 \examples{
 library("mgcv")
 
-set.seed(2)
+\dontshow{set.seed(2)}
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 sm <- evaluate_smooth(m1, "s(x2)")
 draw(sm)
 
-set.seed(2)
+\dontshow{set.seed(2)}
 dat <- gamSim(2, n = 4000, dist = "normal", scale = 1)
 m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
 

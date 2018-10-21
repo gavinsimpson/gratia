@@ -11,10 +11,12 @@ fix_offset(model, newdata, offset_val = NULL)
 
 \item{newdata}{data frame; new values at which to predict at.}
 
-\item{offset_val}{numeric, optional; if provided, then the offset variable in \code{newdata} is set to this constant value before returning \code{newdata}}
+\item{offset_val}{numeric, optional; if provided, then the offset variable
+in \code{newdata} is set to this constant value before returning \code{newdata}}
 }
 \value{
-The original \code{newdata} is returned with fixed names and possibly modified offset variable.
+The original \code{newdata} is returned with fixed names and possibly
+modified offset variable.
 }
 \description{
 Identifies which variable, if any, is the model offset, and fixed the name
