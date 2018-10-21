@@ -45,6 +45,19 @@
 ##' @export
 ##'
 ##' @rdname derivatives
+##'
+##' @examples
+##'
+##' library("mgcv")
+##' set.seed(42)
+##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+##'
+##' ## first derivative of all smooths
+##' derivatives(mod)
+##'
+##' ## second derivative of smooth of x2 only using central finite difference
+##' derivatives(mod, "s(x2)", order = 2, type = "central")
 `derivatives.gam` <- function(object, term, newdata, order = 1L,
                               type = c("forward", "backward", "central"),
                               n = 200, eps = 1e-7,
@@ -70,42 +83,35 @@
     ## handle type
     type <- match.arg(type)
 
+    ## generate list of finite difference predictions for the first or second
+    ##   derivatives or the required type
     fd <- finite_diff_lpmatrix(object, type = type, order = order,
                                newdata = newdata, h = eps)
 
-    ## if (isTRUE(order == 1L)) {
-    ##     xf <- fd[["xf"]]
-    ##     xb <- fd[["xb"]]
-    ##     X  <- (xf - xb) / eps
-    ## } else {
-    ##     xf <- fd[["xf"]]
-    ##     xb <- fd[["xb"]]
-    ##     x  <- fd[["x"]]
-    ##     X  <- switch(type,
-    ##                  forward  = (xb - (2*xf) + x) / eps^2,
-    ##                  backward = (x - (2*xf) + xb) / eps^2,
-    ##                  central  = (xf - (2*x) + xb) / eps^2)
-    ## }
-
+    ## compute the finite differences
     X <- finite_difference(fd, order, type, eps)
 
+    ## get the required covariance matrix
     Vb <- get_vcov(object, unconditional = unconditional,
                    frequentist = frequentist)
+    ## extract model coefs
     betas <- coef(object)
 
     ## how many smooths need working on
     ns <- length(smooth_ids)
     result <- vector(mode = "list", length = ns)
 
+    ## loop over the smooths and compute derivatives from finite differences
     for (i in smooth_ids) {
         result[[i]] <- compute_derivative(i, lpmatrix = X, betas = betas,
                                           Vb = Vb, model = object,
                                           newdata = newdata)
     }
+    ## results in a list of tibbles that we need to bind row-wise
     result <- do.call("bind_rows", result)
 
-    class(result) <- c("derivatives", class(result))
-    result
+    class(result) <- c("derivatives", class(result)) # add class
+    result                                           # return
 }
 
 ## fd is a list of predicted values returned by the various foo_finite_diffX

@@ -221,6 +221,66 @@ Bivariate smoothing example
 
 detaching ‘package:mgcv’, ‘package:nlme’
 
+> nameEx("derivatives")
+> ### * derivatives
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: derivatives
+> ### Title: Derivatives of estimated smooths via finite differences
+> ### Aliases: derivatives derivatives.default derivatives.gamm
+> ###   derivatives.gam
+> 
+> ### ** Examples
+> 
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+> set.seed(42)
+> dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+> mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> ## first derivative of all smooths
+> derivatives(mod)
+# A tibble: 800 x 5
+   smooth var       data derivative    se
+   <chr>  <chr>    <dbl>      <dbl> <dbl>
+ 1 s(x0)  x0    0.000239       7.41  3.33
+ 2 s(x0)  x0    0.00525        7.41  3.33
+ 3 s(x0)  x0    0.0103         7.40  3.33
+ 4 s(x0)  x0    0.0153         7.40  3.31
+ 5 s(x0)  x0    0.0203         7.39  3.30
+ 6 s(x0)  x0    0.0253         7.38  3.27
+ 7 s(x0)  x0    0.0303         7.36  3.24
+ 8 s(x0)  x0    0.0353         7.34  3.20
+ 9 s(x0)  x0    0.0403         7.32  3.15
+10 s(x0)  x0    0.0453         7.29  3.10
+# ... with 790 more rows
+> 
+> ## second derivative of smooth of x2 only using central finite difference
+> derivatives(mod, "s(x2)", order = 2, type = "central")
+# A tibble: 200 x 5
+   smooth var      data derivative    se
+   <chr>  <chr>   <dbl>      <dbl> <dbl>
+ 1 s(x2)  x2    0.00359      -9.06 12.0 
+ 2 s(x2)  x2    0.00860      20.1  12.8 
+ 3 s(x2)  x2    0.0136       -1.64  6.94
+ 4 s(x2)  x2    0.0186       19.5  18.6 
+ 5 s(x2)  x2    0.0236       21.7  29.9 
+ 6 s(x2)  x2    0.0286       34.8  36.2 
+ 7 s(x2)  x2    0.0336       66.7  54.7 
+ 8 s(x2)  x2    0.0386       66.1  66.1 
+ 9 s(x2)  x2    0.0436       90.1  80.3 
+10 s(x2)  x2    0.0486       83.2  86.5 
+# ... with 190 more rows
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
 > nameEx("draw.evaluated_smooth")
 > ### * draw.evaluated_smooth
 > 
@@ -544,7 +604,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  16.455 0.112 16.612 0 0 
+Time elapsed:  17.329 0.112 17.497 0 0 
 > grDevices::dev.off()
 null device 
           1 
