@@ -379,16 +379,18 @@
 ##' Fix the names of a data frame containing an offset variable.
 ##'
 ##' Identifies which variable, if any, is the model offset, and fixed the name
-##' such that `"offset(foo(var))" is converted `"var"`, and possibly sets that
-##' data to `offset_val`.
+##'   such that `"offset(foo(var))" is converted `"var"`, and possibly sets that
+##'   data to `offset_val`.
 ##
 ##' @param model a fitted GAM.
 ##'
 ##' @param newdata data frame; new values at which to predict at.
 ##'
-##' @param offset_val numeric, optional; if provided, then the offset variable in `newdata` is set to this constant value before returning `newdata`
+##' @param offset_val numeric, optional; if provided, then the offset variable
+##'   in `newdata` is set to this constant value before returning `newdata`
 ##'
-##' @return The original `newdata` is returned with fixed names and possibly modified offset variable.
+##' @return The original `newdata` is returned with fixed names and possibly
+##'   modified offset variable.
 ##'
 ##' @author Gavin L. Simpson
 ##'
