@@ -249,6 +249,12 @@ test_that("which_smooths throws error if no smooths match the supplied term", {
     expect_error(which_smooths(m_gam, "foo"), err_msg, fixed = TRUE)
     expect_error(which_smooths(m_gamm, "foo"), err_msg, fixed = TRUE)
     expect_error(which_smooths(m_bam, "foo"), err_msg, fixed = TRUE)
+
+    expect_identical(2L, which_smooths(m_gam, "x1"))
+    expect_identical(2L, which_smooths(m_gamm, "x1"))
+    expect_identical(2L, which_smooths(m_bam, "x1"))
+
+    expect_identical(2L, which_smooth(m_gamm, "x1"))
 })
 
 test_that("which_smooths throws error for objects It can't handle", {
