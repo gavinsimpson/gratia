@@ -106,3 +106,21 @@
 `datagen.gamm` <- function(x, ...) {
     datagen(x[["gam"]])
 }
+
+##' Prepare a data slice through covariates
+##'
+##' @export
+`data_slice` <- function(object, ...) {
+    UseMethod("data_slice")
+}
+
+##' @export
+`data_slice.default` <- function(object, ...) {
+    stop("Don't know how to create a data slice from <", class(object)[[1L]],
+         ">", call. = FALSE)
+}
+
+##' @export
+`data_slice.gam` <- function(object, var_1, var_2, ...) {
+
+}
