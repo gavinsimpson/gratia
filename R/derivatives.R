@@ -72,9 +72,22 @@
 
     fd <- finite_diff_lpmatrix(object, type = type, order = order,
                                newdata = newdata, h = eps)
-    xf <- fd[["xf"]]
-    xb <- fd[["xb"]]
-    X  <- (xf - xb) / eps
+
+    ## if (isTRUE(order == 1L)) {
+    ##     xf <- fd[["xf"]]
+    ##     xb <- fd[["xb"]]
+    ##     X  <- (xf - xb) / eps
+    ## } else {
+    ##     xf <- fd[["xf"]]
+    ##     xb <- fd[["xb"]]
+    ##     x  <- fd[["x"]]
+    ##     X  <- switch(type,
+    ##                  forward  = (xb - (2*xf) + x) / eps^2,
+    ##                  backward = (x - (2*xf) + xb) / eps^2,
+    ##                  central  = (xf - (2*x) + xb) / eps^2)
+    ## }
+
+    X <- finite_difference(fd, order, type, eps)
 
     Vb <- get_vcov(object, unconditional = unconditional,
                    frequentist = frequentist)
@@ -85,8 +98,9 @@
     result <- vector(mode = "list", length = ns)
 
     for (i in smooth_ids) {
-        result[[i]] <- finite_difference(i, lpmatrix = X, betas = betas, Vb = Vb,
-                                         model = object, newdata = newdata)
+        result[[i]] <- compute_derivative(i, lpmatrix = X, betas = betas,
+                                          Vb = Vb, model = object,
+                                          newdata = newdata)
     }
     result <- do.call("bind_rows", result)
 
@@ -94,8 +108,28 @@
     result
 }
 
+## fd is a list of predicted values returned by the various foo_finite_diffX
+## functions below
+`finite_difference` <- function(fd, order, type, eps) {
+    if (isTRUE(order == 1L)) {
+        xf <- fd[["xf"]]
+        xb <- fd[["xb"]]
+        X  <- (xf - xb) / eps
+    } else {
+        xf <- fd[["xf"]]
+        xb <- fd[["xb"]]
+        x  <- fd[["x"]]
+        X  <- switch(type,
+                     forward  = (xb - (2*xf) + x) / eps^2,
+                     backward = (x - (2*xf) + xb) / eps^2,
+                     central  = (xf - (2*x) + xb) / eps^2)
+    }
+
+    X
+}
+
 ##' @importFrom tibble data_frame
-`finite_difference` <- function(id, lpmatrix, betas, Vb, model, newdata) {
+`compute_derivative` <- function(id, lpmatrix, betas, Vb, model, newdata) {
     sm <- get_smooths_by_id(model, id)[[1L]]
     sm_var <- smooth_variable(sm)
     sm_lab <- smooth_label(sm)
@@ -184,15 +218,72 @@
 }
 
 `forward_finite_diff2` <- function(model, newdata, h = 1e-7) {
-    stop("2nd derivatives not yet implemented.")
+    ind <- is_factor_var(newdata)       # exclude factors
+    if (all(ind)) {
+        stop("Can't compute finite differences for all non-numeric data.")
+    }
+
+    ## create newdata as newdata + h
+    newdata1 <- shift_values(newdata, h = h, i = ind, FUN = '+')
+    ## create newdata2 as newdata + 2h
+    newdata2 <- shift_values(newdata, h = 2*h, i = ind, FUN = '+')
+
+    ## predict for x + h
+    x0 <- predict(model, newdata1, type = "lpmatrix")
+
+    ## predict for x + 2h
+    x1 <- predict(model, newdata2, type = "lpmatrix")
+
+    ## predict for x
+    x2 <- predict(model, newdata, type = "lpmatrix")
+
+    list(xf = x0, xb = x1, x = x2)
 }
 
 `backward_finite_diff2` <- function(model, newdata, h = 1e-7) {
-    stop("2nd derivatives not yet implemented.")
+    ind <- is_factor_var(newdata)       # exclude factors
+    if (all(ind)) {
+        stop("Can't compute finite differences for all non-numeric data.")
+    }
+
+    ## create newdata as newdata - h
+    newdata1 <- shift_values(newdata, h = h, i = ind, FUN = '-')
+    ## create newdata2 as newdata - 2h
+    newdata2 <- shift_values(newdata, h = 2*h, i = ind, FUN = '-')
+
+    ## predict for x - h
+    x0 <- predict(model, newdata1, type = "lpmatrix")
+
+    ## predict for x - 2h
+    x1 <- predict(model, newdata2, type = "lpmatrix")
+
+    ## predict for x
+    x2 <- predict(model, newdata, type = "lpmatrix")
+
+    list(xf = x0, xb = x1, x = x2)
 }
 
 `central_finite_diff2` <- function(model, newdata, h = 1e-7) {
-    stop("2nd derivatives not yet implemented.")
+    ind <- is_factor_var(newdata)       # exclude factors
+    if (all(ind)) {
+        stop("Can't compute finite differences for all non-numeric data.")
+    }
+
+    ## create newdata as newdata + h
+    newdata1 <- shift_values(newdata, h = h, i = ind, FUN = '+')
+    ## create newdata2 as newdata - h
+    newdata2 <- shift_values(newdata, h = h, i = ind, FUN = '-')
+
+    ## predict for x + h
+    x0 <- predict(model, newdata1, type = "lpmatrix")
+
+    ## predict for x - h
+    x1 <- predict(model, newdata2, type = "lpmatrix")
+
+    ## predict for x
+    x2 <- predict(model, newdata, type = "lpmatrix")
+
+    list(xf = x0, xb = x1, x = x2)
 }
 
 ##' @importFrom dplyr bind_cols
