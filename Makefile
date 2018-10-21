@@ -25,7 +25,7 @@ check-cran: build
 
 check-devel: build
 	cd ..;\
-	R-devel CMD check --as-cran gratia_$(PKGVERS).tar.gz
+	R-devel CMD check gratia_$(PKGVERS).tar.gz
 
 install: build
 	cd ..;\
