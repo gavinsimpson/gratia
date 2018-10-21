@@ -9,8 +9,8 @@ qq_plot(model, ...)
 
 \method{qq_plot}{gam}(model, method = c("direct", "simulate", "normal"),
   type = c("deviance", "response", "pearson"), n_uniform = 10,
-  ylab = NULL, xlab = NULL, title = NULL, subtitle = NULL,
-  caption = NULL, ...)
+  n_simulate = 50, ylab = NULL, xlab = NULL, title = NULL,
+  subtitle = NULL, caption = NULL, ...)
 }
 \arguments{
 \item{model}{a fitted model. Currently only class \code{"gam"}.}
@@ -24,6 +24,9 @@ qq_plot(model, ...)
 
 \item{n_uniform}{numeric; number of times to randomize uniform quantiles
 in the direct computation method (\code{method = "direct"}).}
+
+\item{n_simulate}{numeric; number of data sets to simulate from the estimated
+model when using the simulation method (\code{method = "simulate"}).}
 
 \item{ylab}{character or expression; the label for the y axis. If not
 supplied, a suitable label will be generated.}
