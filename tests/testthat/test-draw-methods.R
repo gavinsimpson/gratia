@@ -246,13 +246,13 @@ test_that("draw() works with parametric terms", {
     e2 <- evaluate_parametric_term(mod, term = "x0")
     expect_s3_class(e2, "evaluated_parametric_term")
 
-    expect_warning(evaluate_parametric_term(mod, term = c("x0","x0")),
-                   regexp = "More than one `term` requested; using the first only.",
-                   fixed = TRUE)
-
     expect_error(evaluate_parametric_term(mod, term = "x1"),
-                 regexp = "The requested term: x1 is not part of model fit.",
+                 "Term is not in the parametric part of model: <x1>",
                  fixed = TRUE)
+
+    expect_warning(evaluate_parametric_term(mod, term = c('x0', 'x1')),
+                   "More than one `term` requested; using the first <x0>",
+                   fixed = TRUE)
 })
 
 test_that("component-wise CIs work with seWithMean", {
