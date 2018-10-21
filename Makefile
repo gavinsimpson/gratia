@@ -23,6 +23,10 @@ check-cran: build
 	echo "$${NOT_CRAN}"; \
 	R CMD check --as-cran gratia_$(PKGVERS).tar.gz
 
+check-devel: build
+	cd ..;\
+	R-devel CMD check --as-cran gratia_$(PKGVERS).tar.gz
+
 install: build
 	cd ..;\
 	R CMD INSTALL gratia_$(PKGVERS).tar.gz
