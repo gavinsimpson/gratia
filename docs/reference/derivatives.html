@@ -171,12 +171,51 @@ covariance matrix?</p></td>
     </table>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'>
+<span class='fu'>library</span>(<span class='st'>"mgcv"</span>)
+<span class='fu'>set.seed</span>(<span class='fl'>42</span>)
+<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gamSim'>gamSim</a></span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='no'>mod</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/gam'>gam</a></span>(<span class='no'>y</span> ~ <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x0</span>) + <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x1</span>) + <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x2</span>) + <span class='fu'><a href='http://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x3</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
+
+<span class='co'>## first derivative of all smooths</span>
+<span class='fu'>derivatives</span>(<span class='no'>mod</span>)</div><div class='output co'>#&gt; # A tibble: 800 x 5
+#&gt;    smooth var       data derivative    se
+#&gt;    &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt;      &lt;dbl&gt; &lt;dbl&gt;
+#&gt;  1 s(x0)  x0    0.000239       7.41  3.33
+#&gt;  2 s(x0)  x0    0.00525        7.41  3.33
+#&gt;  3 s(x0)  x0    0.0103         7.40  3.33
+#&gt;  4 s(x0)  x0    0.0153         7.40  3.31
+#&gt;  5 s(x0)  x0    0.0203         7.39  3.30
+#&gt;  6 s(x0)  x0    0.0253         7.38  3.27
+#&gt;  7 s(x0)  x0    0.0303         7.36  3.24
+#&gt;  8 s(x0)  x0    0.0353         7.34  3.20
+#&gt;  9 s(x0)  x0    0.0403         7.32  3.15
+#&gt; 10 s(x0)  x0    0.0453         7.29  3.10
+#&gt; # ... with 790 more rows</div><div class='input'>
+<span class='co'>## second derivative of smooth of x2 only using central finite difference</span>
+<span class='fu'>derivatives</span>(<span class='no'>mod</span>, <span class='st'>"s(x2)"</span>, <span class='kw'>order</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"central"</span>)</div><div class='output co'>#&gt; # A tibble: 200 x 5
+#&gt;    smooth var      data derivative    se
+#&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;      &lt;dbl&gt; &lt;dbl&gt;
+#&gt;  1 s(x2)  x2    0.00359      -9.06 12.0 
+#&gt;  2 s(x2)  x2    0.00860      20.1  12.8 
+#&gt;  3 s(x2)  x2    0.0136       -1.64  6.94
+#&gt;  4 s(x2)  x2    0.0186       19.5  18.6 
+#&gt;  5 s(x2)  x2    0.0236       21.7  29.9 
+#&gt;  6 s(x2)  x2    0.0286       34.8  36.2 
+#&gt;  7 s(x2)  x2    0.0336       66.7  54.7 
+#&gt;  8 s(x2)  x2    0.0386       66.1  66.1 
+#&gt;  9 s(x2)  x2    0.0436       90.1  80.3 
+#&gt; 10 s(x2)  x2    0.0486       83.2  86.5 
+#&gt; # ... with 190 more rows</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-                </ul>
+            
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
     <h2>Author</h2>
     
