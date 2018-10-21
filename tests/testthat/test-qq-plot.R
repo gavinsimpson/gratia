@@ -54,6 +54,21 @@ test_that("qq_plot() normal method works", {
     expect_doppelganger("qq_plot normality assumption pearson residuals", plt)
 })
 
+test_that("qq_plot() simulate method works", {
+    plt <- qq_plot(m, method = "simulate") # simulate data to get quantiles
+    expect_doppelganger("qq_plot data simulation", plt)
+})
+
+test_that("qq_plot() simulate method works", {
+    plt <- qq_plot(m, method = "simulate", type = "response")
+    expect_doppelganger("qq_plot data simulation response residuals", plt)
+})
+
+test_that("qq_plot() simulate method works", {
+    plt <- qq_plot(m, method = "simulate", type = "pearson")
+    expect_doppelganger("qq_plot data simulation pearson residuals", plt)
+})
+
 test_that("qq_plot() fails if unsupported residuals requested", {
     expect_error(qq_plot(m, type = "scaled.pearson"),
                  paste("'arg' should be one of", paste(types, collapse = ', ')),
@@ -63,12 +78,6 @@ test_that("qq_plot() fails if unsupported residuals requested", {
 test_that("qq_plot() fails if unsupported method requested", {
     expect_error(qq_plot(m, method = "foo"),
                  paste("'arg' should be one of", paste(methods, collapse = ', ')),
-                 fixed = TRUE)
-})
-
-test_that("qq_plot() fails if simulate method requested", {
-    expect_error(qq_plot(m, method = "simulate"),
-                 "QQ plot method <simulate> not yet available.",
                  fixed = TRUE)
 })
 
