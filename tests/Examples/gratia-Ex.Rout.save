@@ -237,7 +237,9 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > library("mgcv")
 Loading required package: nlme
 This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+> ## Don't show: 
 > set.seed(42)
+> ## End(Don't show)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
@@ -298,7 +300,9 @@ detaching ‘package:mgcv’, ‘package:nlme’
 Loading required package: nlme
 This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
 > 
+> ## Don't show: 
 > set.seed(2)
+> ## End(Don't show)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
@@ -306,7 +310,9 @@ Gu & Wahba 4 term additive model
 > sm <- evaluate_smooth(m1, "s(x2)")
 > draw(sm)
 > 
+> ## Don't show: 
 > set.seed(2)
+> ## End(Don't show)
 > dat <- gamSim(2, n = 4000, dist = "normal", scale = 1)
 Bivariate smoothing example
 > m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
@@ -335,7 +341,9 @@ detaching ‘package:mgcv’, ‘package:nlme’
 Loading required package: nlme
 This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
 > 
+> ## Don't show: 
 > set.seed(2)
+> ## End(Don't show)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
@@ -604,7 +612,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  17.329 0.112 17.497 0 0 
+Time elapsed:  17.628 0.107 17.813 0 0 
 > grDevices::dev.off()
 null device 
           1 
