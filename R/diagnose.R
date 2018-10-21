@@ -410,8 +410,9 @@
 ##'
 ##' @importFrom cowplot plot_grid
 ##'
-##' @seealso [gratia::qq_plot()] [gratia::residuals_linpred_plot()]
-##'   [gratia::residuals_hist_plot()] [gratia::observed_fitted_plot()]
+##' @seealso The plots are produced by functions [gratia::qq_plot()],
+##'   [gratia::residuals_linpred_plot()], [gratia::residuals_hist_plot()],
+##'   and [gratia::observed_fitted_plot()].
 ##'
 ##' @export
 ##'
