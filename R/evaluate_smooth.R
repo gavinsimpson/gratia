@@ -139,12 +139,6 @@
                                                by_name = by_var,
                                                by_data = model[["model"]][[by_var]],
                                                n = length(levs))
-        ## evaluated <- add_column(evaluated, by_variable = rep(by_var, NCOL(evaluated)),
-        ##                         .after = 1L)
-        ## evaluated <- add_column(evaluated,
-        ##                         by_var = rep(levels(model[["model"]][[by_var]]),
-        ##                                      each = length(levs)))
-        ## names(evaluated)[NCOL(evaluated)] <- by_var
     } else {
         evaluated <- add_missing_by_info_to_smooth(evaluated)
     }
@@ -214,7 +208,6 @@
                                         term = smooth_var)
     }
 
-    ## evaluated <- do.call("rbind", evaluated)
     evaluated <- do.call("bind_rows", evaluated)
 
     if (any(is.factor.by)) {
@@ -222,10 +215,6 @@
                                                by_name = by_var,
                                                by_data = model[["model"]][[by_var]],
                                                n = n)
-        ## evaluated <- cbind(evaluated,
-        ##                    by_variable = rep(by_var, NCOL(evaluated)),
-        ##                    by_var = rep(levels(model[["model"]][[by_var]]), each = n))
-        ## names(evaluated)[NCOL(evaluated)] <- by_var
     } else {
         evaluated <- add_missing_by_info_to_smooth(evaluated)
     }
@@ -237,6 +226,7 @@
 }
 
 ##' @importFrom tibble add_column
+##' @importFrom mgcv exclude.too.far
 `evaluate_2d_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
                                  unconditional = FALSE, inc_mean = FALSE, dist = 0.1) {
     ## If more than one smooth, these should be by variables smooths
@@ -301,10 +291,6 @@
                                                by_name = by_var,
                                                by_data = model[["model"]][[by_var]],
                                                n = n*n)
-        ## evaluated <- cbind(evaluated,
-        ##                    by_variable = rep(by_var, NCOL(evaluated)),
-        ##                    by_var = rep(levels(model[["model"]][[by_var]]), each = n))
-        ## names(evaluated)[NCOL(evaluated)] <- by_var
     } else {
         evaluated <- add_missing_by_info_to_smooth(evaluated)
     }
@@ -312,14 +298,16 @@
     ## exclude values too far from data
     if (dist > 0) {
         ind <- mgcv::exclude.too.far(newx[, smooth_var[1L]],
-                                     newx[, smooth_var[2L]],
-                                     model[["model"]][, smooth_var[1L]],
-                                     model[["model"]][, smooth_var[2L]],
-                                     dist = dist)
-        evaluated[ind, c("est", "se")] <- NA
+                               newx[, smooth_var[2L]],
+                               model[["model"]][, smooth_var[1L]],
+                               model[["model"]][, smooth_var[2L]],
+                               dist = dist)
+        if (any(ind)) {
+            evaluated[ind, c("est", "se")] <- NA
+        }
     }
 
-    names(evaluated)[3:4] <- smooth_var # names(evaluated)[2:3] <- smooth_var
+    names(evaluated)[3:4] <- smooth_var
     class(evaluated) <- c("evaluated_2d_smooth", "evaluated_smooth", class(evaluated))
 
     ## return
