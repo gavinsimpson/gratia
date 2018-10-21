@@ -61,7 +61,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.3</span>
       </span>
     </div>
 
@@ -103,7 +103,19 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>which_smooths</span>(<span class='no'>object</span>, <span class='no'>terms</span>)</pre>
+    <pre class="usage"><span class='fu'>which_smooths</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for default</span>
+<span class='fu'>which_smooths</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for gam</span>
+<span class='fu'>which_smooths</span>(<span class='no'>object</span>, <span class='no'>terms</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for bam</span>
+<span class='fu'>which_smooths</span>(<span class='no'>object</span>, <span class='no'>terms</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for gamm</span>
+<span class='fu'>which_smooths</span>(<span class='no'>object</span>, <span class='no'>terms</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -111,6 +123,10 @@
     <tr>
       <th>object</th>
       <td><p>a fitted GAM.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>arguments passed to other methods.</p></td>
     </tr>
     <tr>
       <th>terms</th>
