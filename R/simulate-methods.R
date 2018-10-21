@@ -1,13 +1,23 @@
 ##' Simulate from the posterior distribution of a GAM
 ##'
-##' Simulations from the posterior distribution of a fitted GAM model involve making random draws from a multivariate normal with mean vector equal to the estimated model coefficients and covariance matrix equal to the covariance matrix of the coefficients.
+##' Simulations from the posterior distribution of a fitted GAM model involve
+##'   making random draws from a multivariate normal with mean vector equal to
+##'   the estimated model coefficients and covariance matrix equal to the
+##'   covariance matrix of the coefficients.
 ##'
-##' @param object a fitted GAM, typically the result of a call to `gam()` or `gamm()`.
+##' @param object a fitted GAM, typically the result of a call to [mgcv::gam]`
+##'   or [mgcv::gamm()].
 ##' @param nsim numeric; the number of posterior simulations to return.
 ##' @param seed numeric; a random seed for the simulations.
-##' @param newdata data frame; new observations at which the posterior draws from the model should be evaluated. If not supplied, the data used to fit the model will be used for `newdata`, if available in `object`.
-##' @param freq logical; `TRUE` to return the frequentist covariance matrix of the parameter estimators, `FALSE` to return the Bayesian posterior covariance matrix of the parameters.
-##' @param unconditional logical; if `TRUE` (and `freq == FALSE`) then the Bayesian smoothing parameter uncertainty corrected covariance matrix is returned, if available.
+##' @param newdata data frame; new observations at which the posterior draws
+##'   from the model should be evaluated. If not supplied, the data used to fit
+##'   the model will be used for `newdata`, if available in `object`.
+##' @param freq logical; `TRUE` to return the frequentist covariance matrix of
+##'   the parameter estimators, `FALSE` to return the Bayesian posterior
+##'   covariance matrix of the parameters.
+##' @param unconditional logical; if `TRUE` (and `freq == FALSE`) then the
+##'   Bayesian smoothing parameter uncertainty corrected covariance matrix is
+##'   returned, if available.
 ##' @param ... arguments passed to methods
 ##'
 ##' @return (Currently) A matrix with `nsim` columns.
@@ -23,7 +33,7 @@
 ##'
 ##' @examples
 ##' library("mgcv")
-##' set.seed(2)
+##' \dontshow{set.seed(2)}
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 ##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
@@ -65,12 +75,13 @@
 }
 
 ##' @rdname simulate
-##' 
+##'
 ##' @importFrom mvtnorm rmvnorm
 ##'
 ##' @export
 ##'
-##' @param parametrized logical; use parametrized coefficients and covariance matrix, which respect the linear inequality constraints of the model.
+##' @param parametrized logical; use parametrized coefficients and covariance
+##'   matrix, which respect the linear inequality constraints of the model.
 `simulate.scam` <- function(object, nsim = 1, seed = NULL, newdata = NULL,
                            freq = FALSE, parametrized = TRUE, ...) {
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {

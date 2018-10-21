@@ -16,31 +16,42 @@
   newdata = NULL, freq = FALSE, parametrized = TRUE, ...)
 }
 \arguments{
-\item{object}{a fitted GAM, typically the result of a call to \code{gam()} or \code{gamm()}.}
+\item{object}{a fitted GAM, typically the result of a call to \link[mgcv:gam]{mgcv::gam}`
+or \code{\link[mgcv:gamm]{mgcv::gamm()}}.}
 
 \item{nsim}{numeric; the number of posterior simulations to return.}
 
 \item{seed}{numeric; a random seed for the simulations.}
 
-\item{newdata}{data frame; new observations at which the posterior draws from the model should be evaluated. If not supplied, the data used to fit the model will be used for \code{newdata}, if available in \code{object}.}
+\item{newdata}{data frame; new observations at which the posterior draws
+from the model should be evaluated. If not supplied, the data used to fit
+the model will be used for \code{newdata}, if available in \code{object}.}
 
-\item{freq}{logical; \code{TRUE} to return the frequentist covariance matrix of the parameter estimators, \code{FALSE} to return the Bayesian posterior covariance matrix of the parameters.}
+\item{freq}{logical; \code{TRUE} to return the frequentist covariance matrix of
+the parameter estimators, \code{FALSE} to return the Bayesian posterior
+covariance matrix of the parameters.}
 
-\item{unconditional}{logical; if \code{TRUE} (and \code{freq == FALSE}) then the Bayesian smoothing parameter uncertainty corrected covariance matrix is returned, if available.}
+\item{unconditional}{logical; if \code{TRUE} (and \code{freq == FALSE}) then the
+Bayesian smoothing parameter uncertainty corrected covariance matrix is
+returned, if available.}
 
 \item{...}{arguments passed to methods}
 
-\item{parametrized}{logical; use parametrized coefficients and covariance matrix, which respect the linear inequality constraints of the model.}
+\item{parametrized}{logical; use parametrized coefficients and covariance
+matrix, which respect the linear inequality constraints of the model.}
 }
 \value{
 (Currently) A matrix with \code{nsim} columns.
 }
 \description{
-Simulations from the posterior distribution of a fitted GAM model involve making random draws from a multivariate normal with mean vector equal to the estimated model coefficients and covariance matrix equal to the covariance matrix of the coefficients.
+Simulations from the posterior distribution of a fitted GAM model involve
+making random draws from a multivariate normal with mean vector equal to
+the estimated model coefficients and covariance matrix equal to the
+covariance matrix of the coefficients.
 }
 \examples{
 library("mgcv")
-set.seed(2)
+\dontshow{set.seed(2)}
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
