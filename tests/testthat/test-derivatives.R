@@ -72,18 +72,47 @@ test_that("derivatives() returns derivatives for all smooths in a GAM", {
     expect_named(df, c("smooth","var","data","derivative","se"))
 })
 
-test_that("derivatives() throws errors if order == 2L", {
-    expect_error( derivatives(mod, order = 2),
-                 "2nd derivatives not yet implemented.", fixed = TRUE)
 
-    expect_error( derivatives(mod, order = 2, type = "forward"),
-                 "2nd derivatives not yet implemented.", fixed = TRUE)
+test_that("derivatives() returns second derivatives for all smooths in a GAM", {
+    expect_silent(df <- derivatives(mod, order = 2))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
 
-    expect_error( derivatives(mod, order = 2, type = "backward"),
-                 "2nd derivatives not yet implemented.", fixed = TRUE)
+    expect_silent(df <- derivatives(mod, order = 2, type = "forward"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
 
-    expect_error( derivatives(mod, order = 2, type = "central"),
-                 "2nd derivatives not yet implemented.", fixed = TRUE)
+    expect_silent(df <- derivatives(mod, order = 2, type = "backward"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
+
+    expect_silent(df <- derivatives(mod, order = 2, type = "central"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
+
+    expect_silent(df <- derivatives(mod, "x1", order = 2))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
+
+    expect_silent(df <- derivatives(mod, "x1", order = 2, type = "forward"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
+
+    expect_silent(df <- derivatives(mod, "x1", order = 2, type = "backward"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
+
+    expect_silent(df <- derivatives(mod, "x1", order = 2, type = "central"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
 })
 
 mod <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
@@ -105,6 +134,28 @@ test_that("derivatives() returns derivatives for all smooths in a GAMM", {
     expect_named(df, c("smooth","var","data","derivative","se"))
 
     expect_silent(df <- derivatives(mod, type = "central"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
+})
+
+test_that("derivatives() returns second derivatives for all smooths in a GAMM", {
+    expect_silent(df <- derivatives(mod, order = 2))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
+
+    expect_silent(df <- derivatives(mod, order = 2, type = "forward"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
+
+    expect_silent(df <- derivatives(mod, order = 2, type = "backward"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
+
+    expect_silent(df <- derivatives(mod, order = 2, type = "central"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
     expect_named(df, c("smooth","var","data","derivative","se"))
@@ -169,18 +220,46 @@ test_that("derivatives() returns derivatives for all smooths in a factor by GAM"
     expect_named(df, c("smooth","var","data","derivative","se"))
 })
 
-test_that("derivatives() throws errors if order == 2L in a factor by GAM", {
-    expect_error( derivatives(mod, order = 2),
-                 "2nd derivatives not yet implemented.", fixed = TRUE)
+test_that("derivatives() returns derivatives for all smooths in a factor by GAM", {
+    expect_silent(df <- derivatives(mod, order = 2))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
 
-    expect_error( derivatives(mod, order = 2, type = "forward"),
-                 "2nd derivatives not yet implemented.", fixed = TRUE)
+    expect_silent(df <- derivatives(mod, order = 2, type = "forward"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
 
-    expect_error( derivatives(mod, order = 2, type = "backward"),
-                 "2nd derivatives not yet implemented.", fixed = TRUE)
+    expect_silent(df <- derivatives(mod, order = 2, type = "backward"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
 
-    expect_error( derivatives(mod, order = 2, type = "central"),
-                 "2nd derivatives not yet implemented.", fixed = TRUE)
+    expect_silent(df <- derivatives(mod, order = 2, type = "central"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
+
+    expect_silent(df <- derivatives(mod, order = 2, "x2"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
+
+    expect_silent(df <- derivatives(mod, "x2", order = 2, type = "forward"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
+
+    expect_silent(df <- derivatives(mod, "x2", order = 2, type = "backward"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
+
+    expect_silent(df <- derivatives(mod, "x2", order = 2, type = "central"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se"))
 })
 
 test_that("internal finite diff functions fail for all factor vars", {
@@ -196,6 +275,18 @@ test_that("internal finite diff functions fail for all factor vars", {
                  fixed = TRUE)
 
     expect_error( central_finite_diff1(mod, df),
+                 "Can't compute finite differences for all non-numeric data.",
+                 fixed = TRUE)
+
+    expect_error( forward_finite_diff2(mod, df),
+                 "Can't compute finite differences for all non-numeric data.",
+                 fixed = TRUE)
+
+    expect_error( backward_finite_diff2(mod, df),
+                 "Can't compute finite differences for all non-numeric data.",
+                 fixed = TRUE)
+
+    expect_error( central_finite_diff2(mod, df),
                  "Can't compute finite differences for all non-numeric data.",
                  fixed = TRUE)
 })
