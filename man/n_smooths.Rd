@@ -5,6 +5,7 @@
 \alias{n_smooths.default}
 \alias{n_smooths.gam}
 \alias{n_smooths.gamm}
+\alias{n_smooths.bam}
 \title{How many smooths in a fitted model}
 \usage{
 n_smooths(object)
@@ -14,6 +15,8 @@ n_smooths(object)
 \method{n_smooths}{gam}(object)
 
 \method{n_smooths}{gamm}(object)
+
+\method{n_smooths}{bam}(object)
 }
 \arguments{
 \item{object}{a fitted GAM or related model. Typically the result of a call
