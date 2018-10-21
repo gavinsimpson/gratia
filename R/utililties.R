@@ -400,7 +400,7 @@
 ##' library("mgcv")
 ##' \dontshow{set.seed(2)}
 ##' df <- gamSim(1, n = 400, dist = "normal")
-##' m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = df, method = "REML")
+##' m <- gam(y ~ s(x0) + s(x1) + offset(x2), data = df, method = "REML")
 ##' names(model.frame(m))
 ##' names(fix_offset(m, model.frame(m), offset_val = 1L))
 `fix_offset` <- function(model, newdata, offset_val = NULL) {
@@ -421,15 +421,15 @@
         ## which cleaned terms not in model terms
         ind <- m.terms %in% p.terms
         ## for the cleaned terms not in model terms, match with the offset
-        off_var <- grepl(p.terms[!ind], m.terms[off])
+        off_var <- grep(p.terms[!ind], m.terms[off])
         if (any(off_var)) {
-            names(newdata)[off] <- p.terms[!ind][off_var]
+            names(newdata)[which(names(newdata) %in% m.terms)][off] <- p.terms[!ind][off_var]
         }
-    }
 
-    ## change offset?
-    if (!is.null(offset_val)) {
-        newdata[, off] <- offset_val
+        ## change offset?
+        if (!is.null(offset_val)) {
+            newdata[, p.terms[!ind][off_var]] <- offset_val
+        }
     }
 
     newdata                        # return

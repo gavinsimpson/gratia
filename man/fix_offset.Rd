@@ -27,7 +27,7 @@ values of that variable to \code{offset_val}.
 library("mgcv")
 \dontshow{set.seed(2)}
 df <- gamSim(1, n = 400, dist = "normal")
-m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = df, method = "REML")
+m <- gam(y ~ s(x0) + s(x1) + offset(x2), data = df, method = "REML")
 names(model.frame(m))
 names(fix_offset(m, model.frame(m), offset_val = 1L))
 }

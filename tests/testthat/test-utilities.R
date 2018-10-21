@@ -265,3 +265,18 @@ test_that("which_smooths throws error for objects It can't handle", {
                  "Don't know how to identify smooths for <data.frame>",
                  fixed = TRUE)
 })
+
+test_that("fix_offset can replace and offset only if there is one", {
+    df <- gamSim(1, n = 100, dist = "normal", verbose = FALSE)
+    m <- gam(y ~ s(x0) + s(x1) + offset(x2), data = df, method = "REML")
+    off_val <- 1L
+
+    expect_silent(fixed <- fix_offset(m, model.frame(m),
+                                      offset_val = off_val))
+    expect_identical(c("y","x2","x0","x1"), names(fixed))
+    expect_true(all(fixed[["x2"]] == off_val))
+
+    m <- gam(y ~ s(x0) + s(x1), data = df, method = "REML")
+    expect_identical(model.frame(m),
+                     fix_offset(m, model.frame(m), offset_val = off_val))
+})
