@@ -228,9 +228,14 @@ test_that("n_smooths works for gamm models", {
     expect_identical(result, 4L)
 })
 
-test_that("n_smooths, works for objects with a smooth component", {
+test_that("n_smooths works for bam models", {
     expect_silent( result <- n_smooths(m_bam) )
-    expect_identical( result, 4L)
+    expect_identical(result, 4L)
+})
+
+test_that("n_smooths, works for objects with a smooth component", {
+    expect_silent( result <- n_smooths(list(smooth = 1:10)) )
+    expect_identical( result, 10L)
 })
 
 test_that("n_smooths, fails for objects with no smooth component", {
@@ -240,10 +245,17 @@ test_that("n_smooths, fails for objects with no smooth component", {
 })
 
 test_that("which_smooths throws error if no smooths match the supplied term", {
-    expect_error(which_smooths(m_gam, "foo"),
-                 "None of the terms matched a smooth.", fixed = TRUE)
-    expect_error(which_smooths(m_gamm, "foo"),
-                 "None of the terms matched a smooth.", fixed = TRUE)
-    expect_error(which_smooths(m_bam, "foo"),
-                 "None of the terms matched a smooth.", fixed = TRUE)
+    err_msg <- "None of the terms matched a smooth."
+    expect_error(which_smooths(m_gam, "foo"), err_msg, fixed = TRUE)
+    expect_error(which_smooths(m_gamm, "foo"), err_msg, fixed = TRUE)
+    expect_error(which_smooths(m_bam, "foo"), err_msg, fixed = TRUE)
+})
+
+test_that("which_smooths throws error for objects It can't handle", {
+    expect_error(which_smooths(dat, terms = "foo"),
+                 "Don't know how to identify smooths for <data.frame>",
+                 fixed = TRUE)
+    expect_error(which_smooths(dat),
+                 "Don't know how to identify smooths for <data.frame>",
+                 fixed = TRUE)
 })
