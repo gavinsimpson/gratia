@@ -379,8 +379,8 @@
 ##' Fix the names of a data frame containing an offset variable.
 ##'
 ##' Identifies which variable, if any, is the model offset, and fixed the name
-##'   such that `"offset(foo(var))" is converted `"var"`, and possibly sets that
-##'   data to `offset_val`.
+##'   such that `offset(foo(var))` is converted to `var`, and possibly sets the
+##'   values of that variable to `offset_val`.
 ##
 ##' @param model a fitted GAM.
 ##'
@@ -397,9 +397,8 @@
 ##' @export
 ##'
 ##' @examples
-##' ##\testonly{set.seed(2)}
 ##' library("mgcv")
-##' set.seed(2)
+##' \dontshow{set.seed(2)}
 ##' df <- gamSim(1, n = 400, dist = "normal")
 ##' m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = df, method = "REML")
 ##' names(model.frame(m))

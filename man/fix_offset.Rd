@@ -20,12 +20,12 @@ modified offset variable.
 }
 \description{
 Identifies which variable, if any, is the model offset, and fixed the name
-such that \code{"offset(foo(var))" is converted }"var"\code{, and possibly sets that data to }offset_val`.
+such that \code{offset(foo(var))} is converted to \code{var}, and possibly sets the
+values of that variable to \code{offset_val}.
 }
 \examples{
-##\\testonly{set.seed(2)}
 library("mgcv")
-set.seed(2)
+\dontshow{set.seed(2)}
 df <- gamSim(1, n = 400, dist = "normal")
 m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = df, method = "REML")
 names(model.frame(m))
