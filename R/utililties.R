@@ -513,7 +513,13 @@
 
 ##' Vectorized version of `data.class`
 ##'
-##' @param df a data frame or tibble
+##' @param df a data frame or tibble.
+##'
+##' @return A named character vector of data classes.
+##'
+##' @seealso The underlying functionality is provided by [data.class()].
+##'
+##' @export
 `data_class` <- function(df) {
     vapply(df, data.class, character(1L))
 }
