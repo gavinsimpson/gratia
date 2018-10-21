@@ -431,11 +431,13 @@
     vars <- labels(tt)        # names of all parametric terms
 
     if (length(term) > 1L) {
-        warning("More than one `term` requested; using the first only.")
         term <- term[1L]
+        warning(sprintf("More than one `term` requested; using the first <%s>",
+                        term))
     }
     if (isFALSE(term %in% vars)) {
-        stop(sprintf("The requested term: %s is not part of model fit.", term))
+        stop(sprintf("Term is not in the parametric part of model: <%s>",
+                     term))
     }
 
     mf <- model.frame(object)  # data used to fit model
