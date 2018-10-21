@@ -7,8 +7,14 @@
 data_class(df)
 }
 \arguments{
-\item{df}{a data frame or tibble}
+\item{df}{a data frame or tibble.}
+}
+\value{
+A named character vector of data classes.
 }
 \description{
 Vectorized version of \code{data.class}
+}
+\seealso{
+The underlying functionality is provided by \code{\link[=data.class]{data.class()}}.
 }
