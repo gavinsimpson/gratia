@@ -10,7 +10,6 @@ library("vdiffr")
 context("diagnostic-plots")
 theme_set(theme_grey())
 
-library(mgcv)
 set.seed(2)
 ## simulate some data...
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
