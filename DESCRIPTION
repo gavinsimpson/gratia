@@ -12,6 +12,7 @@ Imports:
     ggplot2,
     tibble,
     dplyr,
+    tidyr,
     cowplot,
     grid,
     mvtnorm,

@@ -106,3 +106,4 @@
 `datagen.gamm` <- function(x, ...) {
     datagen(x[["gam"]])
 }
+
