@@ -1,4 +1,4 @@
-## Test data_lice() methods
+## Test data_slice() methods
 
 ## load packages
 library("testthat")
