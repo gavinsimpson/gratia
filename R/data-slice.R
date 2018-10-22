@@ -15,7 +15,6 @@
          ">", call. = FALSE)
 }
 
-
 ##' @param var1 character;
 ##' @param var2 character;
 ##' @param var3 character; ignored currently.
