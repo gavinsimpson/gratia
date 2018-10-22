@@ -4,8 +4,6 @@
 library("testthat")
 library("gratia")
 library("mgcv")
-## library("ggplot2")
-## library("vdiffr")
 
 context("data-slice-methods")
 
