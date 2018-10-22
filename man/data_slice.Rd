@@ -2,14 +2,37 @@
 % Please edit documentation in R/data-slice.R
 \name{data_slice}
 \alias{data_slice}
+\alias{data_slice.default}
+\alias{data_slice.gam}
 \title{Prepare a data slice through covariates}
 \usage{
 data_slice(object, ...)
+
+\method{data_slice}{default}(object, ...)
+
+\method{data_slice}{gam}(object, var1, var2, var3 = NULL, var4 = NULL,
+  data = NULL, n = 50, offset = NULL, ...)
 }
 \arguments{
 \item{object}{an R model object.}
 
 \item{...}{arguments passed to other methods.}
+
+\item{var1}{character;}
+
+\item{var2}{character;}
+
+\item{var3}{character; ignored currently.}
+
+\item{var4}{character; ignored currently.}
+
+\item{data}{a 1-row data frame or tibble containing values for variables in
+the fitted model that are not varying in the slice.}
+
+\item{n}{numeric; the number of values to create for each of \code{var1} and
+\code{var2}in the slice.}
+
+\item{offset}{numeric; value to use for an offset term in the model.}
 }
 \description{
 Prepare a data slice through covariates

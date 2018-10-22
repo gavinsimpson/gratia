@@ -9,6 +9,7 @@
 }
 
 ##' @export
+##' @rdname data_slice
 `data_slice.default` <- function(object, ...) {
     stop("Don't know how to create a data slice from <", class(object)[[1L]],
          ">", call. = FALSE)
@@ -26,6 +27,7 @@
 ##' @param offset numeric; value to use for an offset term in the model.
 ##'
 ##' @export
+##' @rdname data_slice
 ##'
 ##' @importFrom tidyr crossing
 ##' @importFrom tibble as_tibble
