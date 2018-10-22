@@ -1,5 +1,8 @@
 ##' Prepare a data slice through covariates
 ##'
+##' @param object an R model object.
+##' @param ... arguments passed to other methods.
+##'
 ##' @export
 `data_slice` <- function(object, ...) {
     UseMethod("data_slice")
@@ -11,6 +14,17 @@
          ">", call. = FALSE)
 }
 
+
+##' @param var1 character;
+##' @param var2 character;
+##' @param var3 character; ignored currently.
+##' @param var4 character; ignored currently.
+##' @param data a 1-row data frame or tibble containing values for variables in
+##'   the fitted model that are not varying in the slice.
+##' @param n numeric; the number of values to create for each of `var1` and
+##'   `var2`in the slice.
+##' @param offset numeric; value to use for an offset term in the model.
+##'
 ##' @export
 ##'
 ##' @importFrom tidyr crossing
@@ -103,7 +117,7 @@
 
     if (!all(is_tib, is_df, is_list)) {
         stop("'data' should be a tibble, data frame, or list. Supplied <",
-             class(x)[[1L]], call. = FALSE)
+             class(data)[[1L]], call. = FALSE)
     }
 
     if (is_tib || is_df) {
