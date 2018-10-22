@@ -103,7 +103,14 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>data_slice</span>(<span class='no'>object</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>data_slice</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for default</span>
+<span class='fu'>data_slice</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for gam</span>
+<span class='fu'>data_slice</span>(<span class='no'>object</span>, <span class='no'>var1</span>, <span class='no'>var2</span>, <span class='kw'>var3</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>var4</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='kw'>offset</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -115,6 +122,36 @@
     <tr>
       <th>...</th>
       <td><p>arguments passed to other methods.</p></td>
+    </tr>
+    <tr>
+      <th>var1</th>
+      <td><p>character;</p></td>
+    </tr>
+    <tr>
+      <th>var2</th>
+      <td><p>character;</p></td>
+    </tr>
+    <tr>
+      <th>var3</th>
+      <td><p>character; ignored currently.</p></td>
+    </tr>
+    <tr>
+      <th>var4</th>
+      <td><p>character; ignored currently.</p></td>
+    </tr>
+    <tr>
+      <th>data</th>
+      <td><p>a 1-row data frame or tibble containing values for variables in
+the fitted model that are not varying in the slice.</p></td>
+    </tr>
+    <tr>
+      <th>n</th>
+      <td><p>numeric; the number of values to create for each of <code>var1</code> and
+<code>var2</code>in the slice.</p></td>
+    </tr>
+    <tr>
+      <th>offset</th>
+      <td><p>numeric; value to use for an offset term in the model.</p></td>
     </tr>
     </table>
     
