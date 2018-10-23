@@ -19,6 +19,30 @@ test_that("data_slice works for a GAM", {
                  "Variable <foo> not found in data.", fixed = TRUE)
 })
 
+test_that("process_slice_data works when passed a 1-row data frame, tibble, or list", {
+    expect_silent( result1 <- process_slice_data(dat[1, ]) )
+    expect_silent( result2 <- process_slice_data(tibble::as_tibble(dat[1, ])))
+    expect_silent( result3 <- process_slice_data(as.list(dat[1, ])))
+    expect_equal(NROW(result1), 1L)
+    expect_equal(NROW(result2), 1L)
+    expect_equal(NROW(result3), 1L)
+    expect_equal(result1, result2)
+    expect_equal(result1, result3)
+    expect_equal(result2, result3)
+})
+
+test_that("process_slice_data fails when passed a data frame with > 1 rows", {
+    expect_error(process_slice_data(dat),
+                 "'data' should have 1 row only. Supplied <200>",
+                 fixed = TRUE)
+})
+
+test_that("process_slice_data fails when passed a matrix", {
+    expect_error(process_slice_data(as.matrix(dat)),
+                 "'data' should be a tibble, data frame, or list. Supplied <matrix>",
+                 fixed = TRUE)
+})
+
 set.seed(42)
 dat <- gamSim(4, n = 400, verbose = FALSE)
 mf <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
