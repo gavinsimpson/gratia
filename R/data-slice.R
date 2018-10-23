@@ -116,9 +116,9 @@
     is_df <- is.data.frame(data)
     is_list <- is.list(data)
 
-    if (!all(is_tib, is_df, is_list)) {
+    if (!any(is_tib, is_df, is_list)) {
         stop("'data' should be a tibble, data frame, or list. Supplied <",
-             class(data)[[1L]], call. = FALSE)
+             class(data)[[1L]], ">", call. = FALSE)
     }
 
     if (is_tib || is_df) {
@@ -135,7 +135,7 @@
         }
     }
 
-    data
+    as_tibble(data)
 }
 
 `process_slice_var` <- function(x, data, n) {
