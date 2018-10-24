@@ -58,3 +58,20 @@ test_that("default data_slice method fails gracefully", {
                  "Don't know how to create a data slice from <data.frame>",
                  fixed = TRUE)
 })
+
+test_that("value_closest_to_median fails for character vectors", {
+    expect_error(value_closest_to_median(LETTERS),
+                 "'x' must be a factor or numeric vector. Supplied <character>",
+                 fixed = TRUE)
+})
+
+test_that("value_closest_to_median fails for logical vectors", {
+    expect_error(value_closest_to_median(sample(c(TRUE, FALSE), 50, replace = TRUE)),
+                 "'x' must be a factor or numeric vector. Supplied <logical>",
+                 fixed = TRUE)
+})
+
+test_that("value_closest_to_median works with a factor", {
+    expect_silent( result <- gratia:::value_closest_to_median(dat[["fac"]]) )
+    expect_identical(factor(3, levels = c(1,2,3)), result)
+})
