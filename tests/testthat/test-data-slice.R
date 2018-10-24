@@ -52,3 +52,9 @@ test_that("data_slice works for a GAM with factor by", {
     expect_s3_class(ds, "tbl_df")
     expect_named(ds, c("x2", "fac", "x0"))
 })
+
+test_that("default data_slice method fails gracefully", {
+    expect_error(data_slice(dat),
+                 "Don't know how to create a data slice from <data.frame>",
+                 fixed = TRUE)
+})
