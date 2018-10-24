@@ -43,6 +43,14 @@ test_that("process_slice_data fails when passed a matrix", {
                  fixed = TRUE)
 })
 
+test_that("process_slice_data fails when passed a list with elements of length > 1", {
+    expect_error(process_slice_data(as.list(dat[1:2, ])),
+                 "If 'data' is a list, it should be a list of length-1 vectors",
+                 fixed = TRUE)
+})
+
+
+
 test_that("process_slice_var fails when passed a logical variable", {
     dat2 <- cbind(dat, foo = sample(c(TRUE,FALSE), nrow(dat), replace = TRUE))
     expect_error( process_slice_var("foo", dat2),
@@ -55,6 +63,10 @@ test_that("process_slice_var fails when `x` is not character", {
     expect_error( process_slice_var(bar, dat2),
                  "Supplied 'x' is not character.",
                  fixed = TRUE)
+})
+
+test_that("process_slice_var returns NULL when `x` is NULL", {
+    expect_identical( process_slice_var(NULL, dat2), NULL)
 })
 
 set.seed(42)

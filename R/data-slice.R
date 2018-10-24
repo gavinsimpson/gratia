@@ -131,7 +131,7 @@
 
     if (is_list) {
         if (!all(lengths(data) == 1L)) {
-            stop("'data' should be a list of length-1 vectors")
+            stop("If 'data' is a list, it should be a list of length-1 vectors")
         }
     }
 
