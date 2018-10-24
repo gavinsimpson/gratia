@@ -160,7 +160,7 @@
 
     ## if supplied something other than numeric or factor, bail
     if(!is_fac && !is_num) {
-        stop("'x' must be a factor or numeric vector. Supplied <",
+        stop("Variable <", x, "> must be a factor or numeric vector. Found <",
              class(x)[[1L]], ">", call. = FALSE)
     }
 

@@ -43,6 +43,20 @@ test_that("process_slice_data fails when passed a matrix", {
                  fixed = TRUE)
 })
 
+test_that("process_slice_var fails when passed a logical variable", {
+    dat2 <- cbind(dat, foo = sample(c(TRUE,FALSE), nrow(dat), replace = TRUE))
+    expect_error( process_slice_var("foo", dat2),
+                 "Variable <foo> must be a factor or numeric vector. Found <character>",
+                 fixed = TRUE)
+})
+
+test_that("process_slice_var fails when `x` is not character", {
+    bar <- 1
+    expect_error( process_slice_var(bar, dat2),
+                 "Supplied 'x' is not character.",
+                 fixed = TRUE)
+})
+
 set.seed(42)
 dat <- gamSim(4, n = 400, verbose = FALSE)
 mf <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
