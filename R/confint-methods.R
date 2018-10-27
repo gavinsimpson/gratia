@@ -1,12 +1,19 @@
 ##' Point-wise and simultaneous confidence intervals for derivatives of smooths
 ##'
-##' Calculates point-wise confidence or simultaneous intervals for the first derivatives of smooth terms in a fitted GAM.
+##' Calculates point-wise confidence or simultaneous intervals for the first
+##'   derivatives of smooth terms in a fitted GAM.
 ##'
-##' @param object an object of class `"fderiv"` containing the estimated derivatives.
-##' @param parm which parameters (smooth terms) are to be given intervals as a vector of terms. If missing, all parameters are considered.
-##' @param level numeric, `0 < level < 1`; the confidence level of the point-wise or simultaneous interval. The default is `0.95` for a 95\% interval.
-##' @param type character; the type of interval to compute. One of `"confidence"` for point-wise intervals, or `"simultaneous"` for simultaneous intervals.
-##' @param nsim integer; the number of simulations used in computing the simultaneous intervals.
+##' @param object an object of class `"fderiv"` containing the estimated
+##'   derivatives.
+##' @param parm which parameters (smooth terms) are to be given intervals as a
+##'   vector of terms. If missing, all parameters are considered.
+##' @param level numeric, `0 < level < 1`; the confidence level of the
+##'   point-wise or simultaneous interval. The default is `0.95` for a 95%
+##'   interval.
+##' @param type character; the type of interval to compute. One of `"confidence"`
+##'   for point-wise intervals, or `"simultaneous"` for simultaneous intervals.
+##' @param nsim integer; the number of simulations used in computing the
+##'   simultaneous intervals.
 ##' @param ... additional arguments for methods
 ##'
 ##' @return a data frame with components:

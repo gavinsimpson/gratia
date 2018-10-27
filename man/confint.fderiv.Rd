@@ -8,15 +8,21 @@
   type = c("confidence", "simultaneous"), nsim = 10000, ...)
 }
 \arguments{
-\item{object}{an object of class \code{"fderiv"} containing the estimated derivatives.}
+\item{object}{an object of class \code{"fderiv"} containing the estimated
+derivatives.}
 
-\item{parm}{which parameters (smooth terms) are to be given intervals as a vector of terms. If missing, all parameters are considered.}
+\item{parm}{which parameters (smooth terms) are to be given intervals as a
+vector of terms. If missing, all parameters are considered.}
 
-\item{level}{numeric, \code{0 < level < 1}; the confidence level of the point-wise or simultaneous interval. The default is \code{0.95} for a 95\% interval.}
+\item{level}{numeric, \code{0 < level < 1}; the confidence level of the
+point-wise or simultaneous interval. The default is \code{0.95} for a 95%
+interval.}
 
-\item{type}{character; the type of interval to compute. One of \code{"confidence"} for point-wise intervals, or \code{"simultaneous"} for simultaneous intervals.}
+\item{type}{character; the type of interval to compute. One of \code{"confidence"}
+for point-wise intervals, or \code{"simultaneous"} for simultaneous intervals.}
 
-\item{nsim}{integer; the number of simulations used in computing the simultaneous intervals.}
+\item{nsim}{integer; the number of simulations used in computing the
+simultaneous intervals.}
 
 \item{...}{additional arguments for methods}
 }
@@ -30,7 +36,8 @@ a data frame with components:
 }
 }
 \description{
-Calculates point-wise confidence or simultaneous intervals for the first derivatives of smooth terms in a fitted GAM.
+Calculates point-wise confidence or simultaneous intervals for the first
+derivatives of smooth terms in a fitted GAM.
 }
 \examples{
 library("mgcv")
