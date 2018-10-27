@@ -290,3 +290,13 @@ test_that("internal finite diff functions fail for all factor vars", {
                  "Can't compute finite differences for all non-numeric data.",
                  fixed = TRUE)
 })
+
+test_that("derivatives() returns derivatives with simultaneous intervals for all smooths", {
+    set.seed(1)
+    dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+    mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+    expect_silent(df <- derivatives(mod, interval = "simultaneous"))
+    expect_s3_class(df, "derivatives")
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("smooth","var","data","derivative","se","crit","lower","upper"))
+})
