@@ -15,7 +15,9 @@ derivatives(object, ...)
 
 \method{derivatives}{gam}(object, term, newdata, order = 1L,
   type = c("forward", "backward", "central"), n = 200, eps = 1e-07,
-  unconditional = FALSE, frequentist = FALSE, offset = NULL, ...)
+  interval = c("confidence", "simultaneous"), n_sim = 10000,
+  level = 0.95, unconditional = FALSE, frequentist = FALSE,
+  offset = NULL, ...)
 }
 \arguments{
 \item{object}{an R object to compute derivatives for.}
@@ -37,6 +39,17 @@ at which to evaluate the first derivatives of the smooths.}
 \item{n}{numeric; the number of points to evaluate the derivative at.}
 
 \item{eps}{numeric; the finite difference.}
+
+\item{interval}{character; the type of interval to compute. One of
+\code{"confidence"} for point-wise intervals, or \code{"simultaneous"} for
+simultaneous intervals.}
+
+\item{n_sim}{integer; the number of simulations used in computing the
+simultaneous intervals.}
+
+\item{level}{numeric; \code{0 < level < 1}; the confidence level of the
+point-wise or simultaneous interval. The default is \code{0.95} for a 95%
+interval.}
 
 \item{unconditional}{logical; use smoothness selection-corrected Bayesian
 covariance matrix?}

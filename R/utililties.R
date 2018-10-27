@@ -563,3 +563,19 @@
     }
     result
 }
+
+##' @importFrom stats qnorm
+`coverage_normal` <- function(level) {
+    if (level <= 0 || level >= 1 ) {
+         stop("Invalid 'level': must be 0 < level < 1", call. = FALSE)
+     }
+     qnorm((1 - level) / 2, lower.tail = FALSE)
+}
+
+##' @importFrom stats qt
+`coverage_t` <- function(level, df) {
+    if (level <= 0 || level >= 1 ) {
+         stop("Invalid 'level': must be 0 < level < 1", call. = FALSE)
+     }
+     qt((1 - level) / 2, df = df, lower.tail = FALSE)
+}

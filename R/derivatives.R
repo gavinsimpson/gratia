@@ -37,6 +37,14 @@
 ##'   `"forward"`, `"backward"`, or `"central"`.
 ##' @param n numeric; the number of points to evaluate the derivative at.
 ##' @param eps numeric; the finite difference.
+##' @param interval character; the type of interval to compute. One of
+##'   `"confidence"` for point-wise intervals, or `"simultaneous"` for
+##'   simultaneous intervals.
+##' @param n_sim integer; the number of simulations used in computing the
+##'   simultaneous intervals.
+##' @param level numeric; `0 < level < 1`; the confidence level of the
+##'   point-wise or simultaneous interval. The default is `0.95` for a 95%
+##'   interval.
 ##' @param unconditional logical; use smoothness selection-corrected Bayesian
 ##'   covariance matrix?
 ##' @param frequentist logical; use the frequentist covariance matrix?
@@ -61,6 +69,8 @@
 `derivatives.gam` <- function(object, term, newdata, order = 1L,
                               type = c("forward", "backward", "central"),
                               n = 200, eps = 1e-7,
+                              interval = c("confidence", "simultaneous"),
+                              n_sim = 10000, level = 0.95,
                               unconditional = FALSE, frequentist = FALSE,
                               offset = NULL, ...) {
     ## handle term
@@ -83,6 +93,9 @@
     ## handle type
     type <- match.arg(type)
 
+    ## handle interval
+    interval <- match.arg(interval)
+
     ## generate list of finite difference predictions for the first or second
     ##   derivatives or the required type
     fd <- finite_diff_lpmatrix(object, type = type, order = order,
@@ -99,19 +112,65 @@
 
     ## how many smooths need working on
     ns <- length(smooth_ids)
-    result <- vector(mode = "list", length = ns)
+    result <- Xis <- vector(mode = "list", length = ns)
 
     ## loop over the smooths and compute derivatives from finite differences
-    for (i in smooth_ids) {
-        result[[i]] <- compute_derivative(i, lpmatrix = X, betas = betas,
-                                          Vb = Vb, model = object,
-                                          newdata = newdata)
+    for (i in seq_along(smooth_ids)) {
+        d <- compute_derivative(smooth_ids[[i]], lpmatrix = X, betas = betas,
+                                Vb = Vb, model = object, newdata = newdata)
+        if (identical(interval, "confidence")) {
+            result[[i]] <- derivative_pointwise_int(d[["deriv"]], level = level,
+                                                    distrib = "normal")
+        } else {
+            result[[i]] <- derivative_simultaneous_int(d[["deriv"]], d[["Xi"]],
+                                                       level = level, Vb = Vb,
+                                                       n_sim = n_sim)
+        }
     }
+
+    ## confidence/simultaneous intervals
+
     ## results in a list of tibbles that we need to bind row-wise
     result <- do.call("bind_rows", result)
 
     class(result) <- c("derivatives", class(result)) # add class
     result                                           # return
+}
+
+##' @importFrom tibble add_column
+`derivative_pointwise_int` <- function(x, level, distrib = c("normal", "t"),
+                                       df) {
+    distrib <- match.arg(distrib)
+    crit <- if (distrib == "normal") {
+        coverage_normal(level = level)
+    } else{
+        coverage_t(level = level, df = df)
+    }
+    adj <- (crit * x[["se"]])
+    derivative <- add_column(x,
+                             crit  = rep(crit, nrow(x)),
+                             lower = x[["derivative"]] - adj,
+                             upper = x[["derivative"]] + adj)
+    derivative
+}
+
+##' @importFrom tibble add_column
+##' @importFrom stats quantile
+##' @importFrom mvtnorm rmvnorm
+`derivative_simultaneous_int` <- function(x, Xi, level, Vb, n_sim) {
+    ## simulate un-biased deviations given bayesian covariance matrix
+    buDiff <- rmvnorm(n = n_sim, mean = rep(0, nrow(Vb)), sigma = Vb)
+    simDev <- tcrossprod(Xi, buDiff) # Xi %*% t(bu) # simulate deviations from expected
+    absDev <- abs(sweep(simDev, 1L, x[["se"]], FUN = "/")) # absolute deviations
+    masd <- apply(absDev, 2L, max)  # & max abs deviation per sim
+    ## simultaneous interval critical value
+    crit <- quantile(masd, prob = level, type = 8)
+    adj <- (crit * x[["se"]])
+    derivative <- add_column(x,
+                             crit  = rep(crit, nrow(x)),
+                             lower = x[["derivative"]] - adj,
+                             upper = x[["derivative"]] + adj)
+    derivative
 }
 
 ## fd is a list of predicted values returned by the various foo_finite_diffX
@@ -144,10 +203,13 @@
     Xi[, want] <- lpmatrix[, want]      # copy bits of Xp we need
     d <- drop(Xi %*% betas)             # estimate derivative
     se <- rowSums(Xi %*% Vb * Xi)^0.5   # standard errors
-    data_frame(smooth = rep(sm_lab, length(d)),
-               var = rep(sm_var, length(d)),
-               data = newdata[[sm_var]],
-               derivative = d, se = se)
+    result <- list(deriv = data_frame(smooth = rep(sm_lab, length(d)),
+                                      var = rep(sm_var, length(d)),
+                                      data = newdata[[sm_var]],
+                                      derivative = d,
+                                      se = se),
+                   Xi = Xi)
+    result
 }
 
 `finite_diff_lpmatrix` <- function(object, type, order, newdata = NULL, h = 1e-7) {
