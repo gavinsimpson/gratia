@@ -245,36 +245,36 @@ This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
 > 
 > ## first derivative of all smooths
 > derivatives(mod)
-# A tibble: 800 x 5
-   smooth var       data derivative    se
-   <chr>  <chr>    <dbl>      <dbl> <dbl>
- 1 s(x0)  x0    0.000239       7.41  3.33
- 2 s(x0)  x0    0.00525        7.41  3.33
- 3 s(x0)  x0    0.0103         7.40  3.33
- 4 s(x0)  x0    0.0153         7.40  3.31
- 5 s(x0)  x0    0.0203         7.39  3.30
- 6 s(x0)  x0    0.0253         7.38  3.27
- 7 s(x0)  x0    0.0303         7.36  3.24
- 8 s(x0)  x0    0.0353         7.34  3.20
- 9 s(x0)  x0    0.0403         7.32  3.15
-10 s(x0)  x0    0.0453         7.29  3.10
+# A tibble: 800 x 8
+   smooth var       data derivative    se  crit lower upper
+   <chr>  <chr>    <dbl>      <dbl> <dbl> <dbl> <dbl> <dbl>
+ 1 s(x0)  x0    0.000239       7.41  3.33  1.96 0.874  13.9
+ 2 s(x0)  x0    0.00525        7.41  3.33  1.96 0.875  13.9
+ 3 s(x0)  x0    0.0103         7.40  3.33  1.96 0.884  13.9
+ 4 s(x0)  x0    0.0153         7.40  3.31  1.96 0.902  13.9
+ 5 s(x0)  x0    0.0203         7.39  3.30  1.96 0.929  13.8
+ 6 s(x0)  x0    0.0253         7.38  3.27  1.96 0.965  13.8
+ 7 s(x0)  x0    0.0303         7.36  3.24  1.96 1.01   13.7
+ 8 s(x0)  x0    0.0353         7.34  3.20  1.96 1.07   13.6
+ 9 s(x0)  x0    0.0403         7.32  3.15  1.96 1.14   13.5
+10 s(x0)  x0    0.0453         7.29  3.10  1.96 1.21   13.4
 # ... with 790 more rows
 > 
 > ## second derivative of smooth of x2 only using central finite difference
 > derivatives(mod, "s(x2)", order = 2, type = "central")
-# A tibble: 200 x 5
-   smooth var      data derivative    se
-   <chr>  <chr>   <dbl>      <dbl> <dbl>
- 1 s(x2)  x2    0.00359      -9.06 12.0 
- 2 s(x2)  x2    0.00860      20.1  12.8 
- 3 s(x2)  x2    0.0136       -1.64  6.94
- 4 s(x2)  x2    0.0186       19.5  18.6 
- 5 s(x2)  x2    0.0236       21.7  29.9 
- 6 s(x2)  x2    0.0286       34.8  36.2 
- 7 s(x2)  x2    0.0336       66.7  54.7 
- 8 s(x2)  x2    0.0386       66.1  66.1 
- 9 s(x2)  x2    0.0436       90.1  80.3 
-10 s(x2)  x2    0.0486       83.2  86.5 
+# A tibble: 200 x 8
+   smooth var      data derivative    se  crit  lower upper
+   <chr>  <chr>   <dbl>      <dbl> <dbl> <dbl>  <dbl> <dbl>
+ 1 s(x2)  x2    0.00359      -9.06 12.0   1.96 -32.5   14.4
+ 2 s(x2)  x2    0.00860      20.1  12.8   1.96  -5.05  45.2
+ 3 s(x2)  x2    0.0136       -1.64  6.94  1.96 -15.2   12.0
+ 4 s(x2)  x2    0.0186       19.5  18.6   1.96 -17.0   55.9
+ 5 s(x2)  x2    0.0236       21.7  29.9   1.96 -36.9   80.2
+ 6 s(x2)  x2    0.0286       34.8  36.2   1.96 -36.1  106. 
+ 7 s(x2)  x2    0.0336       66.7  54.7   1.96 -40.4  174. 
+ 8 s(x2)  x2    0.0386       66.1  66.1   1.96 -63.4  196. 
+ 9 s(x2)  x2    0.0436       90.1  80.3   1.96 -67.3  247. 
+10 s(x2)  x2    0.0486       83.2  86.5   1.96 -86.4  253. 
 # ... with 190 more rows
 > 
 > 
@@ -615,7 +615,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  17.018 0.125 17.192 0 0 
+Time elapsed:  17.855 0.12 18.043 0 0 
 > grDevices::dev.off()
 null device 
           1 
