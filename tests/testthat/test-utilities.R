@@ -280,3 +280,12 @@ test_that("fix_offset can replace and offset only if there is one", {
     expect_identical(model.frame(m),
                      fix_offset(m, model.frame(m), offset_val = off_val))
 })
+
+## test coverage_ functions
+test_that("coverage_normal works for given level", {
+    expect_silent(coverage_normal(0.95))
+})
+
+test_that("coverage_t works for given level", {
+    expect_silent(coverage_t(0.95, df = 5))
+})
