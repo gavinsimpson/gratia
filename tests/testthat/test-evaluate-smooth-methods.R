@@ -157,3 +157,38 @@ test_that("evaluate_parametric_terms() works with parametric terms", {
                    "More than one `term` requested; using the first <x0>",
                    fixed = TRUE)
 })
+
+test_that("evaluate_fs_smooth() ", {
+    ## simulate example... from ?mgcv::factor.smooth.interaction
+    set.seed(0)
+    ## simulate data...
+    f0 <- function(x) 2 * sin(pi * x)
+    f1 <- function(x, a=2, b=-1) exp(a * x)+b
+    f2 <- function(x) 0.2 * x^11 * (10 * (1 - x))^6 + 10 *
+                          (10 * x)^3 * (1 - x)^10
+    n <- 500
+    nf <- 10
+    fac <- sample(1:nf, n, replace=TRUE)
+    x0 <- runif(n)
+    x1 <- runif(n)
+    x2 <- runif(n)
+    a <- rnorm(nf) * .2 + 2;
+    b <- rnorm(nf) * .5
+    f <- f0(x0) + f1(x1, a[fac], b[fac]) + f2(x2)
+    fac <- factor(fac)
+    y <- f + rnorm(n) * 2
+
+    df <- data.frame(y = y, x0 = x0, x1 = x1, x2 = x2, fac = fac)
+    mod <- gam(y ~ s(x1, fac, bs="fs", k=5), method = "ML")
+
+    newdf <- data.frame(x4 = 1:10, fac = factor(2, levels = 1:10))
+
+    expect_error( evaluate_smooth(mod, "x1", newdata = newdf),
+                 "Variable x1 not found in 'newdata'.", fixed = TRUE)
+
+    expect_error( evaluate_smooth(mod, "x1", newdata = newdf$x4),
+                 "'newdata', if supplied, must be a data frame.", fixed = TRUE)
+
+    newdf <- data.frame(x1 = x1, fac = fac)
+    expect_silent( evaluate_smooth(mod, "x1", newdata = newdf) )
+})
