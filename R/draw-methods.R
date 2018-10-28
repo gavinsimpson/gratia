@@ -394,3 +394,55 @@
 
     plt
 }
+
+##' Plot derivatives of smooths
+##'
+##' @param alpha numeric; alpha transparency for confidence or simultaneous
+##'   interval.
+##' @inheritParams draw.gam
+##'
+##' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_line labs
+##' @importFrom cowplot plot_grid
+##' @export
+##'
+##' @examples
+##'
+##' library("mgcv")
+##' \dontshow{set.seed(42)}
+##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+##'
+##' ## first derivative of all smooths
+##' df <- derivatives(mod)
+##' draw(df)
+`draw.derivatives` <- function(object,
+                               select, # ignored for now; but used for subsetting which smooths
+                               scales = c("free", "fixed"), alpha = 0.2,
+                               align = "hv", axis = "lrtb", ...) {
+    scales <- match.arg(scales)
+
+    ## how many smooths
+    sm <- unique(object[["smooth"]])
+    xvar <- unique(object[["var"]])
+    plotlist <- vector("list", length = length(sm))
+
+    for (i in seq_along(sm)) {
+        take <- object[["smooth"]] == sm[i]
+        df <- object[take, ]
+        plotlist[[i]] <- ggplot(df, aes_string(x = "data", y = "derivative")) +
+            geom_ribbon(aes_string(ymin = "lower", ymax = "upper", y = NULL),
+                        alpha = alpha) +
+            geom_line() +
+            labs(title = sm[i], x = xvar[i], y = "Derivative")
+    }
+
+    if (isTRUE(identical(scales, "fixed"))) {
+        ylims <- range(object[["lower"]], object[["upper"]])
+
+        for (i in seq_along(plotlist)) {
+            plotlist[[i]] <- plotlist[[i]] + lims(y = ylims)
+        }
+    }
+
+    plot_grid(plotlist = plotlist, align = align, axis = axis, ...)
+}

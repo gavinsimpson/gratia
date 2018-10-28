@@ -283,6 +283,37 @@ This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
 
 detaching ‘package:mgcv’, ‘package:nlme’
 
+> nameEx("draw.derivatives")
+> ### * draw.derivatives
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: draw.derivatives
+> ### Title: Plot derivatives of smooths
+> ### Aliases: draw.derivatives
+> 
+> ### ** Examples
+> 
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+> ## Don't show: 
+> set.seed(42)
+> ## End(Don't show)
+> dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+> mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> ## first derivative of all smooths
+> df <- derivatives(mod)
+> draw(df)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
 > nameEx("draw.evaluated_smooth")
 > ### * draw.evaluated_smooth
 > 
@@ -615,7 +646,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  17.855 0.12 18.043 0 0 
+Time elapsed:  28.61 0.17 29.096 0 0 
 > grDevices::dev.off()
 null device 
           1 

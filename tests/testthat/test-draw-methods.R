@@ -267,3 +267,17 @@ test_that("component-wise CIs work with seWithMean", {
     plt <- draw(m1, inc_mean = TRUE)
     expect_doppelganger("draw gam with inc_mean true", plt)
 })
+
+test_that("draw.derivates() plots derivatives for a GAM", {
+    theme_set(theme_grey())
+    set.seed(1)
+    dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+    m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+
+    d1 <- derivatives(m1)
+    plt <- draw(d1)
+    expect_doppelganger("draw derivatives for a GAM", plt)
+
+    plt <- draw(d1, scales = "fixed")
+    expect_doppelganger("draw derivatives for a GAM with fixed scales", plt)
+})
