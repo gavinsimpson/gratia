@@ -22,7 +22,8 @@ Imports:
 Suggests:
     testthat,
     vdiffr,
-    scam
+    scam,
+    gamm4
 Description: Ggplot-based graphics and utility functions for working with GAMs fitted using the mgcv package.
 License: MIT + file LICENSE
 LazyData: true
