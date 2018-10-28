@@ -278,6 +278,6 @@ test_that("draw.derivates() plots derivatives for a GAM", {
     plt <- draw(d1)
     expect_doppelganger("draw derivatives for a GAM", plt)
 
-    plt <- draw(d1, scales = "fixed")
+    plt <- draw(d1, scales = "free")
     expect_doppelganger("draw derivatives for a GAM with fixed scales", plt)
 })
