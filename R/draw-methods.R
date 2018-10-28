@@ -269,6 +269,16 @@
     plot_grid(plotlist = g, align = align, axis = axis, ...)
 }
 
+##' @rdname draw.gam
+##'
+##' @export
+`draw.list`  <- function(object, ...) { # this should cope with gamm4 models
+    if (is.null(object[["gam"]])) {
+        stop("Don't know how to deal with a list with no 'gam' component.")
+    }
+    draw(object[["gam"]])
+}
+
 ##' @param qq_line logical; draw a reference line through the lower and upper
 ##'   theoretical quartiles.
 ##'

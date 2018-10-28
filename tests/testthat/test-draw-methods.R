@@ -4,6 +4,7 @@
 library("testthat")
 library("gratia")
 library("mgcv")
+library("gamm4")
 library("ggplot2")
 library("vdiffr")
 
@@ -280,4 +281,17 @@ test_that("draw.derivates() plots derivatives for a GAM", {
 
     plt <- draw(d1, scales = "free")
     expect_doppelganger("draw derivatives for a GAM with fixed scales", plt)
+})
+
+test_that("draw.list works for a gamm4 model", {
+    ## from ?gamm4::gamm4
+    set.seed(0)
+    dat <- gamSim(1, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
+    ## Now add 20 level random effect `fac'...
+    dat$fac <- fac <- as.factor(sample(1:20, 400, replace = TRUE))
+    dat$y <- dat$y + model.matrix(~ fac - 1) %*% rnorm(20) * .5
+    m1 <- gamm4(y ~ s(x0) + x1+ s(x2), data = dat, random = ~(1 | fac))
+
+    plt <- draw(m1)
+    expect_doppelganger("draw gamm4 model", plt)
 })
