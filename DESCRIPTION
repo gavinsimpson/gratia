@@ -7,6 +7,8 @@ Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     role = c("aut","cre"),
 		    comment = c(ORCID = "0000-0002-9084-8413")))
 Maintainer: Gavin L. Simpson <ucfagls@gmail.com>
+Depends:
+    R (>= 3.5)
 Imports:
     mgcv,
     ggplot2,
