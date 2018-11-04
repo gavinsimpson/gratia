@@ -326,10 +326,12 @@
                                        colour_scale = scale_colour_discrete,
                                        ...) {
     smooth_var <- names(object)[3L]
+    smooth_fac <- names(object)[4L]
 
-    plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est, colour = ~ f)) +
+    plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est,
+                               colour = as.name(smooth_fac))) +
         geom_line() +
-        colour_scale() +
+        scale_colour_discrete() +
         theme(legend.position = "none")
 
     ## default axis labels if none supplied
