@@ -460,8 +460,13 @@
 
 `parametric_terms` <- function(model) {
     tt <- model$pterms        # get parametric terms
-    tt <- delete.response(tt) # remove response so easier to work with
-    labels(tt)                # names of all parametric terms
+    labs <- if (is.list(tt)) {
+        unique(unlist(lapply(tt, function(x) labels(delete.response(x)))))
+    } else {
+        tt <- delete.response(tt) # remove response so easier to work with
+        labels(tt)                # names of all parametric terms
+    }
+    labs
 }
 
 ## Internal functions
