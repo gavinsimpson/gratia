@@ -18,14 +18,17 @@
 ##' @param unconditional logical; if `TRUE` (and `freq == FALSE`) then the
 ##'   Bayesian smoothing parameter uncertainty corrected covariance matrix is
 ##'   returned, if available.
+##' @param weights numeric; a vector of prior weights. If `newdata` is null
+##'   then defaults to `object[["prior.weights"]]`, otherwise a vector of ones.
 ##' @param ... arguments passed to methods
 ##'
 ##' @return (Currently) A matrix with `nsim` columns.
 ##'
 ##' @author Gavin L. Simpson
 ##'
-##' @importFrom stats simulate runif
+##' @importFrom stats simulate runif family
 ##' @importFrom mvtnorm rmvnorm
+##' @importFrom mgcv fix.family.rd
 ##'
 ##' @export
 ##'
@@ -40,7 +43,8 @@
 ##' sims <- simulate(m1, nsim = 5, seed = 42)
 ##' head(sims)
 `simulate.gam` <- function(object, nsim = 1, seed = NULL, newdata = NULL,
-                           freq = FALSE, unconditional = FALSE, ...) {
+                           freq = FALSE, unconditional = FALSE,
+                           weights = NULL, ...) {
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
         runif(1)
     }
@@ -53,14 +57,37 @@
         on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
     }
 
-    if (missing(newdata) || is.null(newdata)) {
-        newdata <- object$model
+    if (inherits(object, "glm")) {
+        fam <- family(object)           # extract family
+    } else {
+        fam <- object[["family"]]
+    }
+    ## mgcv stores data simulation funs in `rd`
+    fam <- fix.family.rd(fam)
+    if (is.null(fam[["rd"]])) {
+        stop("Don't yet know how to simulate from family <",
+             fam[["family"]], ">", call. = FALSE)
+    }
+    rd_fun <- fam[["rd"]]
+
+    ## dispersion or scale variable for simulation
+    scale <- object[["sig2"]]
+    if (is.null(scale)) {
+        scale <- summary(object)[["dispersion"]]
     }
 
-    V <- vcov(object, freq = freq, unconditional = unconditional)
-    Rbeta <- rmvnorm(n = nsim, mean = coef(object), sigma = V)
-    Xp <- predict(object, newdata = newdata, type = "lpmatrix")
-    sims <- Xp %*% t(Rbeta)
+    if (missing(newdata) || is.null(newdata)) {
+        newdata <- object[["model"]]
+        weights <- object[["prior.weights"]]
+    } else {
+        if (is.null(weights)) {
+            weights <- rep(1, nrow(newdata))
+        }
+    }
+
+    mu <- predict(object, newdata = newdata, type = "response")
+    sims <- replicate(nsim, rd_fun(mu = mu, wt = weights, scale = scale))
+
     attr(sims, "seed") <- RNGstate
     sims
 }
@@ -69,9 +96,11 @@
 ##'
 ##' @export
 `simulate.gamm` <- function(object, nsim = 1, seed = NULL, newdata = NULL,
-                            freq = FALSE, unconditional = FALSE, ...) {
+                            freq = FALSE, unconditional = FALSE, weights = NULL,
+                            ...) {
     simulate(object$gam, nsim = nsim, seed = seed, newdata = newdata,
-             freq = freq, unconditional = unconditional, ...)
+             freq = freq, unconditional = unconditional,
+             weights = weights, ...)
 }
 
 ##' @rdname simulate
@@ -79,11 +108,8 @@
 ##' @importFrom mvtnorm rmvnorm
 ##'
 ##' @export
-##'
-##' @param parametrized logical; use parametrized coefficients and covariance
-##'   matrix, which respect the linear inequality constraints of the model.
 `simulate.scam` <- function(object, nsim = 1, seed = NULL, newdata = NULL,
-                           freq = FALSE, parametrized = TRUE, ...) {
+                            freq = FALSE, weights = NULL, ...) {
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
         runif(1)
     }
@@ -96,15 +122,39 @@
         on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
     }
 
-    if (missing(newdata) || is.null(newdata)) {
-        newdata <- object$model
+    if (inherits(object, "glm")) {
+        fam <- family(object)           # extract family
+    } else {
+        fam <- object[["family"]]
+    }
+    ## mgcv stores data simulation funs in `rd`
+    fam <- fix.family.rd(fam)
+    if (is.null(fam[["rd"]])) {
+        stop("Don't yet know how to simulate from family <",
+             fam[["family"]], ">", call. = FALSE)
+    }
+    rd_fun <- fam[["rd"]]
+
+    ## dispersion or scale variable for simulation
+    scale <- object[["sig2"]]
+    if (is.null(scale)) {
+        scale <- summary(object)[["dispersion"]]
     }
 
-    V <- vcov(object, freq = freq, parametrized = parametrized)
-    B <- coef(object, parametrized = TRUE) # object$coefficients.t
-    Rbeta <- rmvnorm(n = nsim, mean = B, sigma = V)
-    Xp <- predict(object, newdata = newdata, type = "lpmatrix")
-    sims <- Xp %*% t(Rbeta)
+    if (missing(newdata) || is.null(newdata)) {
+        newdata <- object[["model"]]
+        weights <- object[["prior.weights"]]
+    } else {
+        if (is.null(weights)) {
+            weights <- rep(1, nrow(newdata))
+        }
+    }
+
+    mu <- predict(object, newdata = newdata, type = "response")
+
+    ## sims <- mu
+    sims <- replicate(nsim, rd_fun(mu = mu, wt = weights, scale = scale))
+
     attr(sims, "seed") <- RNGstate
     sims
 }
