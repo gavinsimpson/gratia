@@ -24,7 +24,7 @@
 ##' Extracts the dimension of an estimated smooth.
 ##'
 ##' This is a generic function with methods for objects of class
-##'   \code{"gam"}, \code{"gamm"}, and \code{"mgcv.smooth"}.
+##'   `"gam"`, `"gamm"`, and `"mgcv.smooth"`.
 ##
 ##' @param object an R object. See Details for list of supported objects.
 ##'
