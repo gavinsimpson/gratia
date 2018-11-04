@@ -22,6 +22,10 @@ test_that("simulate() works with a gam", {
     sims <- simulate(m1, nsim = 5, seed = 42)
     expect_identical(nrow(sims), 400L)
     expect_identical(ncol(sims), 5L)
+
+    sims <- simulate(m1, nsim = 5, seed = 42, newdata = dat)
+    expect_identical(nrow(sims), 400L)
+    expect_identical(ncol(sims), 5L)
 })
 
 test_that("simulate() works with a gamm", {
@@ -33,6 +37,10 @@ test_that("simulate() works with a gamm", {
 ## monotonic spline age-depth model using scam() from pkg scam
 test_that("simulate() works with a scam", {
     sims <- simulate(sw, nsim = 5, seed = 42)
+    expect_identical(nrow(sims), 12L)
+    expect_identical(ncol(sims), 5L)
+
+    sims <- simulate(sw, nsim = 5, seed = 42, newdata = smallAges)
     expect_identical(nrow(sims), 12L)
     expect_identical(ncol(sims), 5L)
 })
