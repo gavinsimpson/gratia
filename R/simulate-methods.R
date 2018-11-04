@@ -56,19 +56,8 @@
         RNGstate <- structure(seed, kind = as.list(RNGkind()))
         on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
     }
-
-    if (inherits(object, "glm")) {
-        fam <- family(object)           # extract family
-    } else {
-        fam <- object[["family"]]
-    }
-    ## mgcv stores data simulation funs in `rd`
-    fam <- fix.family.rd(fam)
-    if (is.null(fam[["rd"]])) {
-        stop("Don't yet know how to simulate from family <",
-             fam[["family"]], ">", call. = FALSE)
-    }
-    rd_fun <- fam[["rd"]]
+    ## rd function if available
+    rd_fun <- get_family_rd(object)
 
     ## dispersion or scale variable for simulation
     scale <- object[["sig2"]]
@@ -121,19 +110,8 @@
         RNGstate <- structure(seed, kind = as.list(RNGkind()))
         on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
     }
-
-    if (inherits(object, "glm")) {
-        fam <- family(object)           # extract family
-    } else {
-        fam <- object[["family"]]
-    }
-    ## mgcv stores data simulation funs in `rd`
-    fam <- fix.family.rd(fam)
-    if (is.null(fam[["rd"]])) {
-        stop("Don't yet know how to simulate from family <",
-             fam[["family"]], ">", call. = FALSE)
-    }
-    rd_fun <- fam[["rd"]]
+    ## rd function if available
+    rd_fun <- get_family_rd(object)
 
     ## dispersion or scale variable for simulation
     scale <- object[["sig2"]]

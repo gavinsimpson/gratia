@@ -603,3 +603,18 @@
      }
      qt((1 - level) / 2, df = df, lower.tail = FALSE)
 }
+
+`get_family_rd` <- function(object) {
+    if (inherits(object, "glm")) {
+        fam <- family(object)           # extract family
+    } else {
+        fam <- object[["family"]]
+    }
+    ## mgcv stores data simulation funs in `rd`
+    fam <- fix.family.rd(fam)
+    if (is.null(fam[["rd"]])) {
+        stop("Don't yet know how to simulate from family <",
+             fam[["family"]], ">", call. = FALSE)
+    }
+    fam[["rd"]]
+}
