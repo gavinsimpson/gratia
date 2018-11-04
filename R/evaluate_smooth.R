@@ -391,7 +391,8 @@
         evaluated <- add_missing_by_info_to_smooth(evaluated)
     }
 
-    names(evaluated)[3] <- smooth_var
+    names(evaluated)[3L] <- smooth_var
+    names(evaluated)[4L] <- smooth_fac
     class(evaluated) <- c("evaluated_fs_smooth", "evaluated_smooth", class(evaluated))
 
     evaluated
