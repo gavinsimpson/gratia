@@ -95,7 +95,7 @@ test_that("simulate() fails if we don't have an rd function", {
     ## fit model....
     mgev <- gam(list(y ~ s(x2), ~ s(x0), ~ s(x1)), family = gevlss, data = dat)
 
-    expect_erorr(simulate(mgev),
+    expect_error(simulate(mgev),
                  "Don't yet know how to simulate from family <gevlss>",
                  fixed = TRUE)
 })
