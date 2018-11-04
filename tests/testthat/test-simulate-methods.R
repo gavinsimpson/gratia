@@ -35,3 +35,4 @@ test_that("simulate() works with a scam", {
     expect_identical(nrow(sims), 12L)
     expect_identical(ncol(sims), 5L)
 })
+

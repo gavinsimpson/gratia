@@ -7,13 +7,14 @@
 \title{Simulate from the posterior distribution of a GAM}
 \usage{
 \method{simulate}{gam}(object, nsim = 1, seed = NULL, newdata = NULL,
-  freq = FALSE, unconditional = FALSE, ...)
+  freq = FALSE, unconditional = FALSE, weights = NULL, ...)
 
 \method{simulate}{gamm}(object, nsim = 1, seed = NULL,
-  newdata = NULL, freq = FALSE, unconditional = FALSE, ...)
+  newdata = NULL, freq = FALSE, unconditional = FALSE,
+  weights = NULL, ...)
 
 \method{simulate}{scam}(object, nsim = 1, seed = NULL,
-  newdata = NULL, freq = FALSE, parametrized = TRUE, ...)
+  newdata = NULL, freq = FALSE, weights = NULL, ...)
 }
 \arguments{
 \item{object}{a fitted GAM, typically the result of a call to \link[mgcv:gam]{mgcv::gam}`
@@ -35,10 +36,10 @@ covariance matrix of the parameters.}
 Bayesian smoothing parameter uncertainty corrected covariance matrix is
 returned, if available.}
 
-\item{...}{arguments passed to methods}
+\item{weights}{numeric; a vector of prior weights. If \code{newdata} is null
+then defaults to \code{object[["prior.weights"]]}, otherwise a vector of ones.}
 
-\item{parametrized}{logical; use parametrized coefficients and covariance
-matrix, which respect the linear inequality constraints of the model.}
+\item{...}{arguments passed to methods}
 }
 \value{
 (Currently) A matrix with \code{nsim} columns.
