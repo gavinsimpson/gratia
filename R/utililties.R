@@ -458,7 +458,26 @@
     grepl("offset\\(", terms)
 }
 
-`parametric_terms` <- function(model) {
+##' Names of any parametrix terms in a GAM
+##'
+##' @param model a fitted model.
+##' @param ... arguments passed to other methods.
+##'
+##' @export
+`parametric_terms` <- function(model, ...) {
+    UseMethod("parametric_terms")
+}
+
+##' @export
+##' @rdname parametric_terms
+`parametric_terms.default` <- function(model, ...) {
+    stop("Don't know how to identify parametric terms from <",
+         class(model)[[1L]], ">", call. = FALSE)
+}
+
+##' @export
+##' @rdname parametric_terms
+`parametric_terms.gam` <- function(model, ...) {
     tt <- model$pterms        # get parametric terms
     labs <- if (is.list(tt)) {
         unique(unlist(lapply(tt, function(x) labels(delete.response(x)))))
