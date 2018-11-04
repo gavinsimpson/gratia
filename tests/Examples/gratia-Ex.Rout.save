@@ -38,7 +38,7 @@ Type 'q()' to quit R.
 > 
 > library(mgcv)
 Loading required package: nlme
-This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -70,7 +70,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -121,7 +121,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -131,7 +131,7 @@ Gu & Wahba 4 term additive model
 > ci <- confint(mod, parm = "x1", type = "confidence")
 > head(ci)
 # A tibble: 6 x 8
-  smooth fs_variable       x1   est    se  crit lower upper
+  smooth by_variable       x1   est    se  crit lower upper
   <chr>  <fct>          <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
 1 s(x1)  <NA>        0.000663  5.89 0.313  1.96  5.27  6.50
 2 s(x1)  <NA>        0.00568   5.90 0.305  1.96  5.30  6.49
@@ -145,7 +145,7 @@ Gu & Wahba 4 term additive model
 > si <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)
 > head(si)
 # A tibble: 6 x 8
-  smooth fs_variable       x1   est    se  crit lower upper
+  smooth by_variable       x1   est    se  crit lower upper
   <chr>  <fct>          <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
 1 s(x1)  <NA>        0.000663  5.89 0.313  2.60  5.07  6.70
 2 s(x1)  <NA>        0.00568   5.90 0.305  2.60  5.10  6.69
@@ -174,7 +174,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
 > 
 > ## 1d example
 > set.seed(2)
@@ -236,7 +236,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
 > ## Don't show: 
 > set.seed(42)
 > ## End(Don't show)
@@ -297,7 +297,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
 > ## Don't show: 
 > set.seed(42)
 > ## End(Don't show)
@@ -329,7 +329,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
 > 
 > ## Don't show: 
 > set.seed(2)
@@ -370,7 +370,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
 > 
 > ## Don't show: 
 > set.seed(2)
@@ -401,7 +401,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -409,7 +409,7 @@ Gu & Wahba 4 term additive model
 > 
 > head(evaluate_smooth(m1, "s(x1)"))
 # A tibble: 6 x 5
-  smooth fs_variable       x1   est    se
+  smooth by_variable       x1   est    se
   <chr>  <fct>          <dbl> <dbl> <dbl>
 1 s(x1)  <NA>        0.000663 -1.94 0.313
 2 s(x1)  <NA>        0.0108   -1.93 0.296
@@ -426,7 +426,7 @@ Bivariate smoothing example
 > 
 > head(evaluate_smooth(m2, "s(x,z)", n = 100))
 # A tibble: 6 x 6
-  smooth fs_variable         x         z   est    se
+  smooth by_variable         x         z   est    se
   <chr>  <fct>           <dbl>     <dbl> <dbl> <dbl>
 1 s(x,z) <NA>        0.0000230 0.0000432 0.123 0.115
 2 s(x,z) <NA>        0.0101    0.0000432 0.122 0.112
@@ -454,7 +454,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -497,7 +497,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -528,7 +528,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
 > df <- gamSim(1, n = 400, dist = "normal")
 Gu & Wahba 4 term additive model
 > m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = df, method = "REML")
@@ -557,7 +557,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
 > ## simulate binomial data...
 > set.seed(0)
 > n.samp <- 200
@@ -618,7 +618,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-24. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -646,7 +646,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  22.836 0.125 22.553 0 0 
+Time elapsed:  19.662 0.119 19.85 0 0 
 > grDevices::dev.off()
 null device 
           1 
