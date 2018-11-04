@@ -289,3 +289,23 @@ test_that("coverage_normal works for given level", {
 test_that("coverage_t works for given level", {
     expect_silent(coverage_t(0.95, df = 5))
 })
+
+test_that("parametric_terms works for a gaulss GAM", {
+    data(mcycle, package = 'MASS')
+    m1 <- gam(list(accel ~ s(times), ~ s(times)), data = mcycle, method = "REML",
+              family = gaulss())
+    expect_equal(parametric_terms(m1), character(0))
+})
+
+test_that("parametric_terms works for a gaussian GAM", {
+    data(mcycle, package = 'MASS')
+    m1 <- gam(accel ~ s(times), data = mcycle, method = "REML",
+              family = gaussian())
+    expect_equal(parametric_terms(m1), character(0))
+})
+
+test_that("parametric_terms works for a gaussian GAM", {
+    expect_error(parametric_terms(character(0)),
+                 "Don't know how to identify parametric terms from <character>",
+                 fixed = TRUE)
+})
