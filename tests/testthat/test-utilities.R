@@ -4,6 +4,7 @@
 library("testthat")
 library("gratia")
 library("mgcv")
+library("MASS")
 
 context("Testing Utility Functions")
 
