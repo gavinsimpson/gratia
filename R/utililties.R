@@ -604,6 +604,7 @@
      qt((1 - level) / 2, df = df, lower.tail = FALSE)
 }
 
+##' @importFrom mgcv fix.family.rd
 `get_family_rd` <- function(object) {
     if (inherits(object, "glm")) {
         fam <- family(object)           # extract family
