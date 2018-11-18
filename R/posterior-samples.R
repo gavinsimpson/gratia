@@ -29,11 +29,11 @@
 }
 
 ##' @export
-##' @rdname predicted_samples
+##' @rdname posterior_samples
 `posterior_samples.gam` <- function(model, n, newdata, seed,
                                     scale = c("response","linear_predictor"),
-                                    ...) {
-
+                                    freq = FALSE, unconditional = FALSE,
+                                    weights = NULL, ...) {
 }
 
 ##' Draw fitted values from the posterior distribution
@@ -52,10 +52,56 @@
 
 ##' @export
 ##' @rdname predicted_samples
+##'
+##' @importFrom stats vcov coef predict
+##' @importFrom mvtnorm rmvnorm
+##'
+##' @examples
+##' library("mgcv")
+##' \dontshow{set.seed(2)}
+##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+##'
+##' fitted_samples(m1, n = 5, seed = 42)
 `fitted_samples.gam` <- function(model, n, newdata, seed,
                                  scale = c("response","linear_predictor"),
+                                 freq = FALSE, unconditional = FALSE,
                                  ...) {
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+        runif(1)
+    }
+    if (is.null(seed)) {
+        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+    } else {
+        R.seed <- get(".Random.seed", envir = .GlobalEnv)
+        set.seed(seed)
+        RNGstate <- structure(seed, kind = as.list(RNGkind()))
+        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+    }
 
+    if (missing(newdata) || is.null(newdata)) {
+        newdata <- model[["model"]]
+    }
+
+    scale <- match.arg(scale)
+
+    V <- vcov(model, freq = freq, unconditional = unconditional)
+    Rbeta <- rmvnorm(n = n, mean = coef(model), sigma = V)
+    Xp <- predict(model, newdata = newdata, type = "lpmatrix")
+    sims <- Xp %*% t(Rbeta)
+
+    if (isTRUE(identical(scale, "response"))) {
+        ilink <- family(model)[["linkinv"]]
+        sims <- ilink(sims)
+    }
+
+    sims <- as_data_frame(sims)
+    names(sims) <- as.character(seq_len(ncol(sims)))
+    sims <- add_column(sims, .row = seq_len(nrow(sims)))
+    sims <- gather(sims, key = "draw", value = "fitted", - .row)
+    sims[["draw"]] <- as.integer(sims[["draw"]])
+    attr(sims, "seed") <- RNGstate
+    sims
 }
 
 ##' Draw predicted values from the posterior distribution
@@ -66,8 +112,8 @@
 ##'
 ##' @return A tibble (data frame) with 3 columns containing the posterior
 ##'   predicted values in long format. The columns are
-##' * `.row` (numeric) the row of `newdata` that each posterior draw relates to,
-##' * `draw` (numeric) an index, in range `1:n`, indicating which draw each row
+##' * `.row` (integet) the row of `newdata` that each posterior draw relates to,
+##' * `draw` (integer) an index, in range `1:n`, indicating which draw each row
 ##'     relates to,
 ##' * `response` (numeric) the predicted response for the indicated row of
 ##'     `newdata`.
@@ -103,9 +149,12 @@
                                     weights = NULL, ...) {
     sims <- simulate(model, nsim = n, seed = seed, newdata = newdata, freq = freq,
                      unconditional = unconditional, weights = weights)
+    RNGstate <- attr(sims, "seed")
     sims <- as_data_frame(sims)
     names(sims) <- as.character(seq_len(ncol(sims)))
     sims <- add_column(sims, .row = seq_len(nrow(sims)))
     sims <- gather(sims, key = "draw", value = "response", - .row)
+    sims[["draw"]] <- as.integer(sims[["draw"]])
+    attr(sims, "seed") <- RNGstate
     sims
 }
