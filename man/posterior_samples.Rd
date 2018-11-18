@@ -2,20 +2,25 @@
 % Please edit documentation in R/posterior-samples.R
 \name{posterior_samples}
 \alias{posterior_samples}
+\alias{posterior_samples.gam}
 \title{Draw samples from the posterior distribution of an estimated model}
 \usage{
 posterior_samples(model, ...)
+
+\method{posterior_samples}{gam}(model, n, newdata, seed,
+  scale = c("response", "linear_predictor"), freq = FALSE,
+  unconditional = FALSE, weights = NULL, ...)
 }
 \arguments{
 \item{model}{a fitted model of the supported types}
 
 \item{...}{arguments passed to other methods}
 
+\item{n}{numeric; the number of posterior samples to return.}
+
 \item{newdata}{data frame; new observations at which the posterior draws
 from the model should be evaluated. If not supplied, the data used to fit
 the model will be used for \code{newdata}, if available in \code{model}.}
-
-\item{n}{numeric; the number of posterior samples to return.}
 
 \item{seed}{numeric; a random seed for the simulations.}
 
