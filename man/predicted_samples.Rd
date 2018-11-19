@@ -46,7 +46,7 @@ then defaults to \code{object[["prior.weights"]]}, otherwise a vector of ones.}
 A tibble (data frame) with 3 columns containing the posterior
 predicted values in long format. The columns are
 \itemize{
-\item \code{.row} (integet) the row of \code{newdata} that each posterior draw relates to,
+\item \code{row} (integet) the row of \code{newdata} that each posterior draw relates to,
 \item \code{draw} (integer) an index, in range \code{1:n}, indicating which draw each row
 relates to,
 \item \code{response} (numeric) the predicted response for the indicated row of

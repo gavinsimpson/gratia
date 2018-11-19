@@ -11,6 +11,22 @@ fitted_samples(model, ...)
 
 \item{...}{arguments passed to other methods}
 }
+\value{
+A tibble (data frame) with 3 columns containing the posterior
+predicted values in long format. The columns are
+\itemize{
+\item \code{row} (integet) the row of \code{newdata} that each posterior draw relates to,
+\item \code{draw} (integer) an index, in range \code{1:n}, indicating which draw each row
+relates to,
+\item \code{response} (numeric) the predicted response for the indicated row of
+\code{newdata}.
+}
+}
 \description{
-Draw fitted values from the posterior distribution
+Expectations (fitted values) of the response drawn from the posterior
+distribution of fitted model, created via \code{simulate()} (e.g.
+\code{\link[=simulate.gam]{simulate.gam()}}) and returned in a tidy, long, format.
+}
+\author{
+Gavin L. Simpson
 }
