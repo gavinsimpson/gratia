@@ -16,6 +16,10 @@ smooth_samples(model, ...)
 
 \item{...}{arguments passed to other methods}
 
+\item{term}{character; select which smooth's posterior to draw from.
+The default (\code{NULL}) means the posteriors of all smooths in \code{model}
+wil be sampled from. If supplied, a character vector of requested terms.}
+
 \item{n}{numeric; the number of posterior samples to return.}
 
 \item{newdata}{data frame; new observations at which the posterior draws
@@ -34,6 +38,9 @@ returned, if available.}
 
 \item{weights}{numeric; a vector of prior weights. If \code{newdata} is null
 then defaults to \code{object[["prior.weights"]]}, otherwise a vector of ones.}
+
+\item{n_vals}{numeric; how many locations to evaluate the smooth at if
+\code{newdata} not supplied}
 }
 \value{
 A tibble (data frame) with 3 columns containing the posterior
