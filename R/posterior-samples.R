@@ -109,7 +109,7 @@
 
     scale <- match.arg(scale)
 
-    V <- vcov(model, freq = freq, unconditional = unconditional)
+    V <- get_vcov(model, frequentist = freq, unconditional = unconditional)
     Rbeta <- rmvnorm(n = n, mean = coef(model), sigma = V)
     Xp <- predict(model, newdata = newdata, type = "lpmatrix")
     sims <- Xp %*% t(Rbeta)
@@ -219,8 +219,16 @@
          class(model)[[1L]], ">", .call = FALSE)
 }
 
+##' @param n_vals numeric; how many locations to evaluate the smooth at if
+##'   `newdata` not supplied
+##' @param term character; select which smooth's posterior to draw from.
+##'   The default (`NULL`) means the posteriors of all smooths in `model`
+##'   wil be sampled from. If supplied, a character vector of requested terms.
+##'
 ##' @export
+##'
 ##' @rdname smooth_samples
+##'
 ##' @importFrom mvtnorm rmvnorm
 ##' @importFrom dplyr bind_rows
 ##' @importFrom tibble as_tibble add_column
@@ -243,12 +251,17 @@
 
     S <- smooths(model)             # vector of smooth labels - "s(x)"
 
+    if (!is.null(term)) {
+        take <- which_smooths(model, term)
+        S <- S[take]
+    }
+
     if (is.null(newdata)) {
         ## generate data but the simple way
         newdata <- as_tibble(lapply(model[["model"]], seq_min_max, n = n_vals))
     }
 
-    V <- get_vcov(model, freq = freq, unconditional = unconditional)
+    V <- get_vcov(model, frequentist = freq, unconditional = unconditional)
 
     ## Xp <- predict(model, newdata = newdata, type = "lpmatrix")
     coefs <- coef(model)
