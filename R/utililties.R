@@ -619,3 +619,24 @@
     }
     fam[["rd"]]
 }
+
+##' Indices of the parametric terms for a particular smooth
+##'
+##' Returns a vector of indices of the parametric terms that represent the
+##' supplied smooth. Useful for extracting model coefficients and columns
+##' of their covariance matrix.
+##' 
+##' @param smooth an object that inherits from class `mgcv.smooth`
+##'
+##' @return A numeric vector of indices.
+##'
+##' @author Gavin L. Simpson
+##' @export
+`smooth_coefs` <- function(smooth) {
+    if(!is_mgcv_smooth(smooth)) {
+        stop("Not an mgcv smooth object")
+    }
+    start <- smooth[["first.para"]]
+    end <- smooth[["last.para"]]
+    seq(from = start, to = end, by = 1L)
+}
