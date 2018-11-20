@@ -19,7 +19,7 @@
 ##'
 ##' @return A tibble (data frame) with 3 columns containing the posterior
 ##'   predicted values in long format. The columns are
-##' * `row` (integet) the row of `newdata` that each posterior draw relates to,
+##' * `row` (integer) the row of `newdata` that each posterior draw relates to,
 ##' * `draw` (integer) an index, in range `1:n`, indicating which draw each row
 ##'     relates to,
 ##' * `response` (numeric) the predicted response for the indicated row of
@@ -221,9 +221,51 @@
 
 ##' @export
 ##' @rdname smooth_samples
+##' @importFrom mvtnorm rmvnorm
+##' @importFrom dplyr bind_rows
 `smooth_samples.gam` <- function(model, term = NULL, n = 1, newdata = NULL,
                                  seed = NULL, freq = FALSE, unconditional = FALSE,
-                                 weights = NULL, ...) {
-    S <- smooths(model)            # vector of smooth labels - "s(x)"
+                                 weights = NULL, n_vals = 200, ...) {
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+        runif(1)
+    }
+    if (is.null(seed)) {
+        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+    } else {
+        R.seed <- get(".Random.seed", envir = .GlobalEnv)
+        set.seed(seed)
+        RNGstate <- structure(seed, kind = as.list(RNGkind()))
+        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+    }
 
+    S <- smooths(model)             # vector of smooth labels - "s(x)"
+
+    if (is.null(newdata)) {
+        ## generate data but the simple way
+        newdata <- as_tibble(lapply(model[["model"]], seq_min_max, n = n_vals))
+    }
+
+    V <- get_vcov(model, freq = freq, unconditional = unconditional)
+
+    ## Xp <- predict(model, newdata = newdata, type = "lpmatrix")
+    coefs <- coef(model)
+
+    sims <- vector('list', length = length(S))
+    for (i in seq_along(S)) {
+        sm  <- get_smooths_by_id(model, i)[[1L]]
+        idx <- smooth_coefs(sm)
+        Xp <- PredictMat(sm, data = newdata)
+        betas <- rmvnorm(n = n, mean = coefs[idx],
+                         sigma = V[idx, idx, drop = FALSE])
+        sims[[i]] <- as_tibble(Xp %*% t(betas))
+    }
+
+    sims <- do.call("bind_rows", sims)
+    names(sims) <- as.character(seq_len(ncol(sims)))
+    sims <- add_column(sims, term = rep(S, each = n_vals), .before = 1L)
+    sims <- add_column(sims, row = rep(seq_len(nrow(newdata)), times = length(S)), .after = 1L)
+    sims <- gather(sims, key = "draw", value = "smooth", - term, - row)
+    sims[["draw"]] <- as.integer(sims[["draw"]])
+    attr(sims, "seed") <- RNGstate
+    sims
 }
