@@ -223,6 +223,9 @@
 ##' @rdname smooth_samples
 ##' @importFrom mvtnorm rmvnorm
 ##' @importFrom dplyr bind_rows
+##' @importFrom tibble as_tibble add_column
+##' @importFrom tidyr gather
+##' @importFrom mgcv PredictMat
 `smooth_samples.gam` <- function(model, term = NULL, n = 1, newdata = NULL,
                                  seed = NULL, freq = FALSE, unconditional = FALSE,
                                  weights = NULL, n_vals = 200, ...) {
