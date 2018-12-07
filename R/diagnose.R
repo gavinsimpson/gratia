@@ -513,7 +513,8 @@
              paste(dQuote(c("sturges", "scott", "fd")), collapse = ", "))
     }
 
-    plt1 <- qq_plot(model, method = method, type = type, n_uniform = n_uniform)
+    plt1 <- qq_plot(model, method = method, type = type, n_uniform = n_uniform,
+                    n_simulate = n_simulate, level = level, alpha = alpha)
     plt2 <- residuals_linpred_plot(model, type = type)
     plt3 <- residuals_hist_plot(model, type = type, n_bins = n_bins,
                                 subtitle = NULL)
