@@ -24,10 +24,14 @@
 ##'   in the direct computation method (`method = "direct"`).
 ##' @param n_simulate numeric; number of data sets to simulate from the estimated
 ##'   model when using the simulation method (`method = "simulate"`).
+##' @param level numeric; the coverage level for reference intervals. Must be
+##'   strictly `0 < level < 1`. Only used with `method = "simulate"`.
 ##' @param xlab character or expression; the label for the y axis. If not
 ##'   supplied, a suitable label will be generated.
 ##' @param ylab character or expression; the label for the y axis. If not
 ##'   supplied, a suitable label will be generated.
+##' @param alpha numeric; the level of alpha transparency for the reference
+##'   interval when `method = "simulate"`.
 ##'
 ##' @inheritParams draw.evaluated_smooth
 ##'
@@ -60,16 +64,16 @@
                           method = c("direct", "simulate", "normal"),
                           type = c("deviance","response","pearson"),
                           n_uniform = 10, n_simulate = 50,
+                          level = 0.9,
                           ylab = NULL, xlab = NULL,
                           title = NULL, subtitle = NULL, caption = NULL,
-                          ...) {
+                          alpha = 0.2, ...) {
     method <- match.arg(method)         # what method for the QQ plot?
 
-    ## for now, bail if method not "uniform"
-    ## if (!method %in% c("direct", "normal")) {
-    ##     stop("QQ plot method <", method, "> not yet available.",
-    ##          call. = FALSE)
-    ## }
+    if (level <= 0 || level >= 1) {
+        stop("Level must be 0 < level < 1. Supplied level <", level, ">",
+             call. = FALSE)
+    }
 
     type <- match.arg(type)       # what type of residuals
     r <- residuals(model, type = type)  # model residuals
@@ -77,7 +81,8 @@
     ## generate theoretical quantiles
     rq <- switch(method,
                  direct = qq_uniform(model, n = n_uniform, type = type),
-                 simulate = qq_simulate(model, n = n_simulate, type = type),
+                 simulate = qq_simulate(model, n = n_simulate, type = type,
+                                        level = level),
                  normal = qq_normal(model))
 
     ## add labels if not supplied
@@ -98,13 +103,27 @@
     }
 
     ## put into a data frame
-    df <- data.frame(theoretical = sort(rq), residuals = sort(r))
+    df <- if (is.data.frame(rq)) {
+        data.frame(theoretical = rq[["theoretical"]],
+                   residuals   = sort(r),
+                   lower       = rq[["lower"]],
+                   upper       = rq[["upper"]])
+    } else {
+        data.frame(theoretical = sort(rq), residuals = sort(r))
+    }
 
     ## base plot
     plt <- ggplot(df, aes_string(x = "theoretical", y = "residuals"))
 
     ## add reference line
     plt <- plt + geom_abline(slope = 1, intercept = 0, col = "red")
+
+    ## add reference interval
+    if (identical(method, "simulate")) {
+        plt <- plt + geom_ribbon(aes_string(ymin = "lower", ymax = "upper",
+                                            x = "theoretical"),
+                                 inherit.aes = FALSE, alpha = alpha)
+    }
 
     ## add point layer
     plt <- plt + geom_point()
@@ -147,7 +166,7 @@
     n_obs <- length(fit)
     out <- quantile(sims, probs = (seq_len(n_obs) - 0.5) / n_obs)
     int <- apply(sims, 1L, quantile, probs = c(alpha, 1 - alpha))
-    out <- cbind(theoretical = out, lower = int[1L, ], upper = int[2L, ])
+    out <- data.frame(theoretical = out, lower = int[1L, ], upper = int[2L, ])
     out
 }
 
