@@ -37,7 +37,7 @@
 ##'
 ##' @rdname qq_plot
 ##'
-##' @importFrom ggplot2 ggplot geom_point geom_abline labs aes_string
+##' @importFrom ggplot2 ggplot geom_point geom_abline geom_ribbon labs aes_string
 ##' @importFrom tools toTitleCase
 ##' @importFrom stats residuals
 ##' @export
