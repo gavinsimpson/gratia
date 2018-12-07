@@ -9,8 +9,8 @@ qq_plot(model, ...)
 
 \method{qq_plot}{gam}(model, method = c("direct", "simulate", "normal"),
   type = c("deviance", "response", "pearson"), n_uniform = 10,
-  n_simulate = 50, ylab = NULL, xlab = NULL, title = NULL,
-  subtitle = NULL, caption = NULL, ...)
+  n_simulate = 50, level = 0.9, ylab = NULL, xlab = NULL,
+  title = NULL, subtitle = NULL, caption = NULL, alpha = 0.2, ...)
 }
 \arguments{
 \item{model}{a fitted model. Currently only class \code{"gam"}.}
@@ -28,6 +28,9 @@ in the direct computation method (\code{method = "direct"}).}
 \item{n_simulate}{numeric; number of data sets to simulate from the estimated
 model when using the simulation method (\code{method = "simulate"}).}
 
+\item{level}{numeric; the coverage level for reference intervals. Must be
+strictly \code{0 < level < 1}. Only used with \code{method = "simulate"}.}
+
 \item{ylab}{character or expression; the label for the y axis. If not
 supplied, a suitable label will be generated.}
 
@@ -42,6 +45,9 @@ supplied, a suitable label will be generated.}
 
 \item{caption}{character or expression; the plot caption. See
 \code{\link[ggplot2:labs]{ggplot2::labs()}}.}
+
+\item{alpha}{numeric; the level of alpha transparency for the reference
+interval when \code{method = "simulate"}.}
 }
 \description{
 Quantile-quantile plot of model residuals
