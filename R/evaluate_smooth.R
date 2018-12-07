@@ -1,12 +1,18 @@
 ##' Evaluate a smooth
 ##'
-##' Evaluate a smooth at a grid of evenly spaced value over the range of the covariate associated with the smooth. Alternatively, a set of points at which the smooth should be evaluated can be supplied.
+##' Evaluate a smooth at a grid of evenly spaced value over the range of the
+##' covariate associated with the smooth. Alternatively, a set of points at
+##' which the smooth should be evaluated can be supplied.
 ##'
 ##' @param object an object of class `"gam"` or `"gamm"`.
 ##' @param smooth character; a single smooth to evaluate.
-##' @param n numeric; the number of points over the range of the covariate at which to evaluate the smooth.
-##' @param newdata a vector or data frame of points at which to evaluate the smooth.
-##' @param unconditional logical; should confidence intervals include the uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian covariance matrix will be used.
+##' @param n numeric; the number of points over the range of the covariate at
+##'   which to evaluate the smooth.
+##' @param newdata a vector or data frame of points at which to evaluate the
+##'   smooth.
+##' @param unconditional logical; should confidence intervals include the
+##'   uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian
+##'   covariance matrix will be used.
 ##' @param inc_mean logical; should the uncertainty in the model constant term be
 ##'  included in the standard error of the evaluate values of the smooth?
 ##'  Currently not implemented.
@@ -17,7 +23,9 @@
 ##'   [mgcv::exclude.too.far()] for further details.
 ##' @param ... arguments passed to other methods.
 ##'
-##' @return A data frame, which is of class `"evaluated_1d_smooth"` or `evaluated_2d_smooth`, which inherit from classes `"evaluated_smooth"` and `"data.frame"`.
+##' @return A data frame, which is of class `"evaluated_1d_smooth"` or
+##'   `evaluated_2d_smooth`, which inherit from classes `"evaluated_smooth"`
+##'   and `"data.frame"`.
 ##'
 ##' @importFrom mgcv PredictMat exclude.too.far
 ##' @importFrom stats setNames
