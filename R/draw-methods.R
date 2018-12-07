@@ -81,7 +81,7 @@
         xlab <- smooth_var
     }
     if (missing(ylab)) {
-        ylab <- unique(object[["smooth"]])
+        ylab <- paste("Effect:", smooth_var) # unique(object[["smooth"]])
     }
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
@@ -339,7 +339,7 @@
         xlab <- smooth_var
     }
     if (missing(ylab)) {
-        ylab <- unique(object[["smooth"]])
+        ylab <- paste("Effect:", smooth_var) # unique(object[["smooth"]])
     }
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
