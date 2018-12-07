@@ -5,8 +5,9 @@
 \title{Model diagnostic plots}
 \usage{
 appraise(model, method = c("direct", "simulate", "normal"),
-  n_uniform = 10, type = c("deviance", "pearson", "response"),
-  n_bins = c("sturges", "scott", "fd"), ncol = 2, ...)
+  n_uniform = 10, n_simulate = 50, type = c("deviance", "pearson",
+  "response"), n_bins = c("sturges", "scott", "fd"), ncol = 2,
+  level = 0.9, alpha = 0.2, ...)
 }
 \arguments{
 \item{model}{a fitted model. Currently only class \code{"gam"}.}
@@ -14,7 +15,11 @@ appraise(model, method = c("direct", "simulate", "normal"),
 \item{method}{character; method used to generate theoretical quantiles.}
 
 \item{n_uniform}{numeric; number of times to randomize uniform quantiles
-in the direct computation method (\code{method = "direct"}).}
+in the direct computation method (\code{method = "direct"}) for QQ plots.}
+
+\item{n_simulate}{numeric; number of data sets to simulate from the estimated
+model when using the simulation method (\code{method = "simulate"}) for QQ
+plots.}
 
 \item{type}{character; type of residuals to use. Only \code{"deviance"},
 \code{"response"}, and \code{"pearson"} residuals are allowed.}
@@ -24,6 +29,12 @@ indicating how to calculate the number of bins.}
 
 \item{ncol}{numeric; number of columns to draw plots in. See
 \code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}.}
+
+\item{level}{numeric; the coverage level for QQ plot reference intervals.
+Must be strictly \code{0 < level < 1}. Only used with \code{method = "simulate"}.}
+
+\item{alpha}{numeric; the level of alpha transparency for the QQ plot
+reference interval when \code{method = "simulate"}.}
 
 \item{...}{arguments passed to \code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}, except for \code{align}
 and \code{axis}, which are set internally.}
