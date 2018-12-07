@@ -38,7 +38,7 @@ Type 'q()' to quit R.
 > 
 > library(mgcv)
 Loading required package: nlme
-This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -70,7 +70,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -121,7 +121,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -174,7 +174,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
 > 
 > ## 1d example
 > set.seed(2)
@@ -236,7 +236,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
 > ## Don't show: 
 > set.seed(42)
 > ## End(Don't show)
@@ -297,7 +297,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
 > ## Don't show: 
 > set.seed(42)
 > ## End(Don't show)
@@ -329,7 +329,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
 > 
 > ## Don't show: 
 > set.seed(2)
@@ -370,7 +370,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
 > 
 > ## Don't show: 
 > set.seed(2)
@@ -401,7 +401,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -454,7 +454,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -497,7 +497,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -528,7 +528,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
 > df <- gamSim(1, n = 400, dist = "normal")
 Gu & Wahba 4 term additive model
 > m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = df, method = "REML")
@@ -557,7 +557,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
 > ## simulate binomial data...
 > set.seed(0)
 > n.samp <- 200
@@ -618,7 +618,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > library("mgcv")
 Loading required package: nlme
-This is mgcv 1.8-25. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -646,7 +646,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  21.505 0.146 21.752 0 0 
+Time elapsed:  21.06 0.148 21.264 0 0 
 > grDevices::dev.off()
 null device 
           1 
