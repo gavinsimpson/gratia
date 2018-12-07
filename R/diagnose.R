@@ -119,11 +119,13 @@
 
 ##' @importFrom mgcv fix.family.rd
 ##' @importFrom stats weights
-`qq_simulate` <- function(model, n = 50, type = c("deviance","response","pearson")) {
+`qq_simulate` <- function(model, n = 50, type = c("deviance","response","pearson"),
+                          level = 0.9) {
     type <- match.arg(type)
     family <- family(model)
     family <- fix.family.rd(family)
     rd_fun <- family[["rd"]]
+    alpha <- (1 - level) / 2
 
     if (is.null(rd_fun)) {
         stop("Random deviate function for family <", family[["family"]],
@@ -144,6 +146,8 @@
                                        na_action = na_action))
     n_obs <- length(fit)
     out <- quantile(sims, probs = (seq_len(n_obs) - 0.5) / n_obs)
+    int <- apply(sims, 1L, quantile, probs = c(alpha, 1 - alpha))
+    out <- cbind(theoretical = out, lower = int[1L, ], upper = int[2L, ])
     out
 }
 
