@@ -28,9 +28,12 @@ Defaults to \code{"hv"} so that plots are nicely aligned.}
 \item{axis}{characer; see argument \code{axis} in \code{cowplot::plot_grid()}.
 Defaults to \code{"lrtb"} so that plots are nicely aligned.}
 
-\item{n}{numeric; the number of points over the range of the covariate at which to evaluate the smooth.}
+\item{n}{numeric; the number of points over the range of the covariate at
+which to evaluate the smooth.}
 
-\item{unconditional}{logical; should confidence intervals include the uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian covariance matrix will be used.}
+\item{unconditional}{logical; should confidence intervals include the
+uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian
+covariance matrix will be used.}
 
 \item{inc_mean}{logical; should the uncertainty in the model constant term be
 included in the standard error of the evaluate values of the smooth?

@@ -27,11 +27,15 @@ evaluate_parametric_term(object, ...)
 
 \item{smooth}{character; a single smooth to evaluate.}
 
-\item{n}{numeric; the number of points over the range of the covariate at which to evaluate the smooth.}
+\item{n}{numeric; the number of points over the range of the covariate at
+which to evaluate the smooth.}
 
-\item{newdata}{a vector or data frame of points at which to evaluate the smooth.}
+\item{newdata}{a vector or data frame of points at which to evaluate the
+smooth.}
 
-\item{unconditional}{logical; should confidence intervals include the uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian covariance matrix will be used.}
+\item{unconditional}{logical; should confidence intervals include the
+uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian
+covariance matrix will be used.}
 
 \item{inc_mean}{logical; should the uncertainty in the model constant term be
 included in the standard error of the evaluate values of the smooth?
@@ -46,10 +50,14 @@ and \code{dist} is a distance within the unit square. See
 \item{term}{character; which parametric term whose effects are evaulated}
 }
 \value{
-A data frame, which is of class \code{"evaluated_1d_smooth"} or \code{evaluated_2d_smooth}, which inherit from classes \code{"evaluated_smooth"} and \code{"data.frame"}.
+A data frame, which is of class \code{"evaluated_1d_smooth"} or
+\code{evaluated_2d_smooth}, which inherit from classes \code{"evaluated_smooth"}
+and \code{"data.frame"}.
 }
 \description{
-Evaluate a smooth at a grid of evenly spaced value over the range of the covariate associated with the smooth. Alternatively, a set of points at which the smooth should be evaluated can be supplied.
+Evaluate a smooth at a grid of evenly spaced value over the range of the
+covariate associated with the smooth. Alternatively, a set of points at
+which the smooth should be evaluated can be supplied.
 }
 \examples{
 library("mgcv")
