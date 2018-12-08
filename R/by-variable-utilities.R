@@ -59,11 +59,24 @@
 `add_by_var_info_to_smooth` <- function(smooth, by_name, by_data, n) {
     nc <- NCOL(smooth)
     nr <- NROW(smooth)
-    smooth <- add_column(smooth,
-                         by_variable = factor(rep(by_name, NROW(smooth))),
-                         .after = 1L)
-    smooth <- add_column(smooth,
-                         by_var = factor(rep(levels(by_data), each = n)))
-    names(smooth)[NCOL(smooth)] <- by_name
+    if (length(by_name) > 1L) {
+        if (by_name[[1L]] == "NA") {
+            f <- factor(c(rep(NA_character_, n), rep(by_name[[2L]], NROW(smooth) - n)))
+            d <- factor(rep(c(NA, levels(by_data)), each = n))
+        } else {
+            f <- factor(c(rep(by_name[[2L]], NROW(smooth) - n), rep(NA_character_, n)))
+            d <- factor(rep(c(levels(by_data), NA), each = n))
+        }
+        smooth <- add_column(smooth, by_variable = f, .after = 1L)
+        smooth <- add_column(smooth, by_var = d)
+    names(smooth)[NCOL(smooth)] <- by_name[by_name != "NA"]
+    } else {
+        smooth <- add_column(smooth,
+                             by_variable = factor(rep(by_name, NROW(smooth))),
+                             .after = 1L)
+        smooth <- add_column(smooth,
+                             by_var = factor(rep(levels(by_data), each = n)))
+        names(smooth)[NCOL(smooth)] <- by_name
+    }
     smooth
 }
