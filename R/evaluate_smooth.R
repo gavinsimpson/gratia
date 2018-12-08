@@ -165,7 +165,7 @@
     is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
     if (length(object) > 1L) {
         if (!all(is.by)) {
-            vars <- vapply(object, gratia:::smooth_variable, character(1L))
+            vars <- vapply(object, smooth_variable, character(1L))
             if (length(unique(vars)) > 1L) {
                 stop(by_smooth_failure(object))
             }
