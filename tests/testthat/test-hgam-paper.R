@@ -8,7 +8,7 @@ library("ggplot2")
 library("datasets")
 ## library("MASS")
 ## library("stringr")
-library("gamm4")
+## library("gamm4")
 ## library("tidyr")
 ## library("viridis")
 ## library("cowplot")
@@ -58,28 +58,28 @@ bird_mod1 <- gam(count ~ te(week, latitude, bs=c("cc", "tp"), k = c(10, 10)),
                  data = bird_move, method = "REML", family = poisson(),
                  knots = list(week = c(0, 52)))
 
-## bird_mod2 <- gam(count ~ te(week, latitude, bs=c("cc", "tp"),
-##                             k = c(10, 10), m = 2) +
-##                      t2(week, latitude, species, bs = c("cc", "tp", "re"),
-##                         k = c(10, 10, 6), m = 2, full = TRUE),
-##                  data = bird_move, method = "REML", family = poisson(),
-##                  knots = list(week = c(0, 52)))
+bird_mod2 <- gam(count ~ te(week, latitude, bs=c("cc", "tp"),
+                            k = c(10, 10), m = 2) +
+                     t2(week, latitude, species, bs = c("cc", "tp", "re"),
+                        k = c(10, 10, 6), m = 2, full = TRUE),
+                 data = bird_move, method = "REML", family = poisson(),
+                 knots = list(week = c(0, 52)))
 
-## bird_mod3 <- gam(count ~ species +
-##                      te(week, latitude, bs = c("cc", "tp"), k = c(10, 10), m = 2) +
-##                      te(week, latitude, by = species, bs = c("cc", "tp"), k = c(10, 10), m = 1),
-##                  data = bird_move, method = "REML", family = poisson(),
-##                  knots = list(week = c(0, 52)))
+bird_mod3 <- gam(count ~ species +
+                     te(week, latitude, bs = c("cc", "tp"), k = c(10, 10), m = 2) +
+                     te(week, latitude, by = species, bs = c("cc", "tp"), k = c(10, 10), m = 1),
+                 data = bird_move, method = "REML", family = poisson(),
+                 knots = list(week = c(0, 52)))
 
-## bird_mod4 <- gam(count ~ t2(week, latitude, species, bs = c("cc", "tp", "re"),
-##                             k = c(10, 10, 6), m = c(2, 2, 2)),
-##                  data = bird_move, method = "REML", family = poisson(),
-##                  knots = list(week = c(0, 52)))
+bird_mod4 <- gam(count ~ t2(week, latitude, species, bs = c("cc", "tp", "re"),
+                            k = c(10, 10, 6), m = c(2, 2, 2)),
+                 data = bird_move, method = "REML", family = poisson(),
+                 knots = list(week = c(0, 52)))
 
-## bird_mod5 <- gam(count ~ species + te(week, latitude, by = species,
-##                                       bs= c("cc", "tp"), k = c(10, 10), m=2),
-##                  data = bird_move, method = "REML", family = poisson(),
-##                  knots = list(week = c(0, 52)))
+bird_mod5 <- gam(count ~ species + te(week, latitude, by = species,
+                                      bs = c("cc", "tp"), k = c(10, 10), m =2),
+                 data = bird_move, method = "REML", family = poisson(),
+                 knots = list(week = c(0, 52)))
 
 ## tests
 ## CO2
@@ -110,12 +110,18 @@ test_that("draw() can plot CO2 model 5", {
 })
 
 ## bird_move
-## test_that("draw() can plot bird_move model 1", {
-##     plt <- draw(bird_mod1)
-##     expect_doppelganger("hgam-paper-bird-move-model-1", plt)
-## })
+test_that("draw() can plot bird_move model 1", {
+    plt <- draw(bird_mod1)
+    expect_doppelganger("hgam-paper-bird-move-model-1", plt)
+})
 
-## test_that("draw() can plot bird_move model 2", {
-##     plt <- draw(bird_mod2)
-##     expect_doppelganger("hgam-paper-bird-move-model-2", plt)
-## })
+test_that("draw() can plot bird_move model 2", {
+    plt <- draw(bird_mod2)
+    expect_doppelganger("hgam-paper-bird-move-model-2", plt)
+})
+
+test_that("draw() throws message with bird_move model 4", {
+    ## There's nothing we can currently do, as
+    expect_message(draw(bird_mod4), "Unable to draw any of the model terms.",
+                   fixed = FALSE)
+})
