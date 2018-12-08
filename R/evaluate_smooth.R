@@ -165,7 +165,10 @@
     is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
     if (length(object) > 1L) {
         if (!all(is.by)) {
-            ## stop(by_smooth_failure(object))
+            vars <- vapply(object, gratia:::smooth_variable, character(1L))
+            if (length(unique(vars)) > 1L) {
+                stop(by_smooth_failure(object))
+            }
         }
     }
 
@@ -206,8 +209,10 @@
             if (any(na_by)) {
                 levs <- c("NA", levs)
                 newx <- rbind(onewx, newx)
+                newx[[".by_var"]] <- factor(newx[[".by_var"]], levels = levs[-1L])
+            } else {
+                newx[[".by_var"]] <- factor(newx[[".by_var"]], levels = levs)
             }
-            newx[[".by_var"]] <- factor(newx[[".by_var"]], levels = levs[-1L])
         } else {                        # continuous by
             if (any(na_by)) {
                 onewx <- cbind(newx, .ba_var = NA)
@@ -223,11 +228,16 @@
     evaluated <- vector("list", length(object))
     for (i in seq_along(evaluated)) {
         ind <- seq_len(NROW(newx))
-        if (is.factor.by[[i]]) {
-            ind <- newx[, by_var[!na_by]] == levs[i]
-            ind[is.na(ind)] <- FALSE
-        } else {
-            ind <- is.na(newx[, by_var[!na_by]])
+        if (any(is.by)) {
+            if (is.factor.by[[i]]) {
+                ind <- newx[, by_var[!na_by]] == levs[i]
+                ind[is.na(ind)] <- FALSE
+            } else {
+                is_na <- is.na(newx[, by_var[!na_by]])
+                if (any(is_na)) {
+                    ind <- is_na
+                }
+            }
         }
         evaluated[[i]] <- spline_values(object[[i]],
                                         newdata = newx[ind, , drop = FALSE],
