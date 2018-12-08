@@ -76,7 +76,7 @@
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='285.27' y='554.93' style='font-size: 8.80px; fill: #4D4D4D; font-family: Liberation Sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>6.5</text></g>
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='345.35' y='554.93' style='font-size: 8.80px; fill: #4D4D4D; font-family: Liberation Sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>7.0</text></g>
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='176.35' y='567.88' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='45.24px' lengthAdjust='spacingAndGlyphs'>log(conc)</text></g>
-<g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text transform='translate(13.05,323.05) rotate(-90)' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='79.48px' lengthAdjust='spacingAndGlyphs'>Effect: log(conc)</text></g>
+<g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text transform='translate(13.05,297.38) rotate(-90)' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='28.12px' lengthAdjust='spacingAndGlyphs'>Effect</text></g>
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='43.42' y='14.56' style='font-size: 13.20px; font-family: Liberation Sans;' textLength='69.68px' lengthAdjust='spacingAndGlyphs'>s(log(conc))</text></g>
 <defs>
   <clipPath id='cpMzYwfDcyMHw1NzZ8MA=='>
@@ -147,6 +147,6 @@
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='556.52' y='554.93' style='font-size: 8.80px; fill: #4D4D4D; font-family: Liberation Sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>0</text></g>
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='638.18' y='554.93' style='font-size: 8.80px; fill: #4D4D4D; font-family: Liberation Sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>1</text></g>
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='512.19' y='567.88' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='93.56px' lengthAdjust='spacingAndGlyphs'>Gaussian quantiles</text></g>
-<g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text transform='translate(373.05,324.89) rotate(-90)' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='83.16px' lengthAdjust='spacingAndGlyphs'>Effects: Plant_uo</text></g>
+<g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text transform='translate(373.05,300.13) rotate(-90)' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='33.62px' lengthAdjust='spacingAndGlyphs'>Effects</text></g>
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='403.42' y='14.56' style='font-size: 13.20px; font-family: Liberation Sans;' textLength='52.11px' lengthAdjust='spacingAndGlyphs'>Plant_uo</text></g>
 </svg>
