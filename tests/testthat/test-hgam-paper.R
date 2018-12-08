@@ -34,6 +34,7 @@ data(bird_move, package = "gratia")
 CO2_mod1 <- gam(log(uptake) ~ s(log(conc), k = 5, bs = "tp") +
                     s(Plant_uo, k = 12, bs = "re"),
                 data = CO2, method = "REML", family = gaussian())
+
 suppressWarnings(
     CO2_mod2 <- gam(log(uptake) ~ s(log(conc), k = 5, m = 2) +
                         s(log(conc), Plant_uo, k = 5,  bs = "fs", m = 2),
@@ -93,10 +94,10 @@ test_that("draw() can plot CO2 model 2", {
 })
 
 ## We show smooths 1, 14, 3, 5, 10, 13 in the paper code
-## test_that("draw() can plot CO2 model 3", {
-##     plt <- draw(CO2_mod3, inc_mean = TRUE)
-##     expect_doppelganger("hgam-paper-co2-model-3", plt)
-## })
+test_that("draw() can plot CO2 model 3", {
+    plt <- draw(CO2_mod3, inc_mean = TRUE)
+    expect_doppelganger("hgam-paper-co2-model-3", plt)
+})
 
 ## bird_move
 ## test_that("draw() can plot bird_move model 1", {
