@@ -284,6 +284,12 @@
         }
     }
 
+    ## If we can't handle any of the terms in the model, bail
+    if (length(g) == 0L) {
+        message("Unable to draw any of the model terms.")
+        return(invisible(g))
+    }
+
     plot_grid(plotlist = g, align = align, axis = axis, ...)
 }
 
