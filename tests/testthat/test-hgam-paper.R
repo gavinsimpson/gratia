@@ -99,6 +99,16 @@ test_that("draw() can plot CO2 model 3", {
     expect_doppelganger("hgam-paper-co2-model-3", plt)
 })
 
+test_that("draw() can plot CO2 model 4", {
+    plt <- draw(CO2_mod4, inc_mean = TRUE)
+    expect_doppelganger("hgam-paper-co2-model-4", plt)
+})
+
+test_that("draw() can plot CO2 model 5", {
+    plt <- draw(CO2_mod5, inc_mean = TRUE)
+    expect_doppelganger("hgam-paper-co2-model-5", plt)
+})
+
 ## bird_move
 ## test_that("draw() can plot bird_move model 1", {
 ##     plt <- draw(bird_mod1)
