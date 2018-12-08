@@ -86,6 +86,15 @@
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
     }
+    if (all(!is.na(object[["by_variable"]]))) {
+        spl <- strsplit(title, split = ":")
+        title <- spl[[1L]][[1L]]
+        if (is.null(subtitle)) {
+            by_var <- as.character(unique(object[["by_variable"]]))
+            subtitle <- paste0("Factor: ", by_var,
+                               "; Level: ", unique(object[[by_var]]))
+        }
+    }
 
     ## add labelling to plot
     plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
@@ -138,6 +147,15 @@
     }
     if (is.null(title)) {
         title <- guide_title
+    }
+    if (all(!is.na(object[["by_variable"]]))) {
+        spl <- strsplit(title, split = ":")
+        title <- spl[[1L]][[1L]]
+        if (is.null(subtitle)) {
+            by_var <- as.character(unique(object[["by_variable"]]))
+            subtitle <- paste0("Factor: ", by_var,
+                               "; Level: ", unique(object[[by_var]]))
+        }
     }
 
     ## add labelling to plot
@@ -306,6 +324,15 @@
     if(is.null(title)) {
         title <- smooth_var
     }
+    if (all(!is.na(object[["by_variable"]]))) {
+        spl <- strsplit(title, split = ":")
+        title <- spl[[1L]][[1L]]
+        if (is.null(subtitle)) {
+            by_var <- as.character(unique(object[["by_variable"]]))
+            subtitle <- paste0("Factor: ", by_var,
+                               "; Level: ", unique(object[[by_var]]))
+        }
+    }
 
     ## add labelling to plot
     plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
@@ -343,6 +370,15 @@
     }
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
+    }
+    if (all(!is.na(object[["by_variable"]]))) {
+        spl <- strsplit(title, split = ":")
+        title <- spl[[1L]][[1L]]
+        if (is.null(subtitle)) {
+            by_var <- as.character(unique(object[["by_variable"]]))
+            subtitle <- paste0("Factor: ", by_var,
+                               "; Level: ", unique(object[[by_var]]))
+        }
     }
 
     ## add labelling to plot
