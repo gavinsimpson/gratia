@@ -81,7 +81,7 @@
         xlab <- smooth_var
     }
     if (missing(ylab)) {
-        ylab <- paste("Effect:", smooth_var) # unique(object[["smooth"]])
+        ylab <- "Effect"
     }
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
@@ -91,7 +91,7 @@
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
             by_var <- as.character(unique(object[["by_variable"]]))
-            subtitle <- paste0("Factor: ", by_var,
+            subtitle <- paste0("By: ", by_var,
                                "; Level: ", unique(object[[by_var]]))
         }
     }
@@ -153,7 +153,7 @@
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
             by_var <- as.character(unique(object[["by_variable"]]))
-            subtitle <- paste0("Factor: ", by_var,
+            subtitle <- paste0("By: ", by_var,
                                "; Level: ", unique(object[[by_var]]))
         }
     }
@@ -319,7 +319,7 @@
         xlab <- "Gaussian quantiles"
     }
     if (missing(ylab)) {
-        ylab <- paste("Effects:", smooth_var)
+        ylab <- "Effects"
     }
     if(is.null(title)) {
         title <- smooth_var
@@ -329,7 +329,7 @@
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
             by_var <- as.character(unique(object[["by_variable"]]))
-            subtitle <- paste0("Factor: ", by_var,
+            subtitle <- paste0("By: ", by_var,
                                "; Level: ", unique(object[[by_var]]))
         }
     }
@@ -366,7 +366,7 @@
         xlab <- smooth_var
     }
     if (missing(ylab)) {
-        ylab <- paste("Effect:", smooth_var) # unique(object[["smooth"]])
+        ylab <- "Effect"
     }
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
@@ -376,7 +376,7 @@
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
             by_var <- as.character(unique(object[["by_variable"]]))
-            subtitle <- paste0("Factor: ", by_var,
+            subtitle <- paste0("By: ", by_var,
                                "; Level: ", unique(object[[by_var]]))
         }
     }
