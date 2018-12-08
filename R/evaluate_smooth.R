@@ -174,8 +174,6 @@
 
     ## get by variable info
     by_var <- unique(vapply(object, FUN = by_variable, FUN.VALUE = character(1)))
-    ## strip off the "NA" one
-    ## by_var <- by_var[by_var != "NA"]
 
     ## get variable for this smooth
     smooth_var <- unique(vapply(object, FUN = smooth_variable, FUN.VALUE = character(1)))
