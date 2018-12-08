@@ -197,16 +197,19 @@
     is.factor.by     <- vapply(object, FUN = is_factor_by_smooth,     FUN.VALUE = logical(1L))
     is.continuous.by <- vapply(object, FUN = is_continuous_by_smooth, FUN.VALUE = logical(1L))
     if (any(is.by)) {
-        na_by <- by_var == "NA"
-        if (any(is.factor.by)) { # (is.factor(model[["model"]][[by_var]])) {
-            if (any(na_by)) {
+        na_by <- by_var == "NA"         # a non-by global smooth is "NA"
+        if (any(is.factor.by)) {
+            if (any(na_by)) { # if we have a global by need to add some NAs for factor
                 onewx <- cbind(newx, .by_var = NA)
             }
+            ## repeat levels of factor, all has to be done excluding the global smooth
+            ## if present
             levs <- levels(model[["model"]][[by_var[!na_by]]])
             newx <- cbind(newx, .by_var = rep(levs, each = n))
             if (any(na_by)) {
-                levs <- c("NA", levs)
+                levs <- c("NA", levs) # extend levels if a global smoother (for later)...
                 newx <- rbind(onewx, newx)
+                ## ...but convet to factor ignoring this extra level
                 newx[[".by_var"]] <- factor(newx[[".by_var"]], levels = levs[-1L])
             } else {
                 newx[[".by_var"]] <- factor(newx[[".by_var"]], levels = levs)
@@ -226,13 +229,13 @@
     evaluated <- vector("list", length(object))
     for (i in seq_along(evaluated)) {
         ind <- seq_len(NROW(newx))
-        if (any(is.by)) {
+        if (any(is.by)) { # need to differentiate between global and factor by smooths
             if (is.factor.by[[i]]) {
                 ind <- newx[, by_var[!na_by]] == levs[i]
                 ind[is.na(ind)] <- FALSE
-            } else {
+            } else {                    # continous by or a global smooth
                 is_na <- is.na(newx[, by_var[!na_by]])
-                if (any(is_na)) {
+                if (any(is_na)) {       # a global smooth
                     ind <- is_na
                 }
             }
