@@ -18,3 +18,11 @@
 ##' @name smallAges
 ##' @docType data
 NULL
+
+##' Simulated bird migration data
+##'
+##' @format A data frame
+##' @name bird_move
+##' @keywords data
+##' @docType data
+NULL
