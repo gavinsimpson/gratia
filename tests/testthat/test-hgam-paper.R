@@ -16,20 +16,6 @@ data(CO2, package = "datasets")
 CO2 <- transform(CO2, Plant_uo = factor(Plant, ordered=FALSE))
 data(bird_move, package = "gratia")
 
-## bird_mod3 <- gam(count ~ species +
-##                      te(week, latitude, bs = c("cc", "tp"), k = c(10, 10), m = 2) +
-##                      te(week, latitude, by = species, bs = c("cc", "tp"), k = c(10, 10), m = 1),
-##                  data = bird_move, method = "REML", family = poisson(),
-##                  knots = list(week = c(0, 52)))
-
-## bird_mod5 <- gam(count ~ species + te(week, latitude, by = species,
-##                                       bs = c("cc", "tp"), k = c(10, 10), m =2),
-##                  data = bird_move, method = "REML", family = poisson(),
-##                  knots = list(week = c(0, 52)))
-
-## load models
-## load("bird-move-models.rda")
-
 ## tests
 ## CO2
 test_that("draw() can plot CO2 model 1", {
@@ -109,6 +95,20 @@ test_that("draw() can plot bird_move model 2", {
     expect_doppelganger("hgam-paper-bird-move-model-2", plt)
 })
 
+test_that("draw() can plot bird_move model 3", {
+    skip_on_cran()
+    skip_on_travis()
+    bird_mod3 <- gam(count ~ species +
+                         te(week, latitude, bs = c("cc", "tp"),
+                            k = c(10, 10), m = 2) +
+                         te(week, latitude, by = species, bs = c("cc", "tp"),
+                            k = c(10, 10), m = 1),
+                     data = bird_move, method = "REML", family = poisson(),
+                     knots = list(week = c(0, 52)))
+    plt <- draw(bird_mod3)
+    expect_doppelganger("hgam-paper-bird-move-model-3", plt)
+})
+
 test_that("draw() throws message with bird_move model 4", {
     skip_on_cran()
     skip_on_travis()
@@ -119,4 +119,16 @@ test_that("draw() throws message with bird_move model 4", {
     ## There's nothing we can currently do, as
     expect_message(draw(bird_mod4), "Unable to draw any of the model terms.",
                    fixed = FALSE)
+})
+
+test_that("draw() can plot bird_move model 5", {
+    skip_on_cran()
+    skip_on_travis()
+    bird_mod5 <- gam(count ~ species +
+                         te(week, latitude, by = species,
+                            bs = c("cc", "tp"), k = c(10, 10), m = 2),
+                     data = bird_move, method = "REML", family = poisson(),
+                     knots = list(week = c(0, 52)))
+    plt <- draw(bird_mod5)
+    expect_doppelganger("hgam-paper-bird-move-model-5", plt)
 })
