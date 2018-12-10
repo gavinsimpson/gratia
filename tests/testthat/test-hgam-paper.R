@@ -96,7 +96,7 @@ test_that("draw() can plot bird_move model 2", {
 
 test_that("draw() can plot bird_move model 3", {
     skip_on_cran()
-    skip_on_travis()
+    ## skip_on_travis()
     bird_mod3 <- gam(count ~ species +
                          te(week, latitude, bs = c("cc", "tp"),
                             k = c(10, 10), m = 2) +
