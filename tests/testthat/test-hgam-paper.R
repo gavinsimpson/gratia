@@ -43,7 +43,6 @@ test_that("draw() can plot CO2 model 2", {
 ## We show smooths 1, 14, 3, 5, 10, 13 in the paper code
 test_that("draw() can plot CO2 model 3", {
     skip_on_cran()
-    skip_on_travis()
     CO2_mod3 <- gam(log(uptake) ~ s(log(conc), k = 5, m = 2, bs = "tp") +
                         s(log(conc), by = Plant_uo, k = 5, m = 1, bs = "tp") +
                         s(Plant_uo, bs = "re", k = 12),
