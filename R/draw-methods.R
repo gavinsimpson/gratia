@@ -81,10 +81,19 @@
         xlab <- smooth_var
     }
     if (missing(ylab)) {
-        ylab <- paste("Effect:", smooth_var) # unique(object[["smooth"]])
+        ylab <- "Effect"
     }
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
+    }
+    if (all(!is.na(object[["by_variable"]]))) {
+        spl <- strsplit(title, split = ":")
+        title <- spl[[1L]][[1L]]
+        if (is.null(subtitle)) {
+            by_var <- as.character(unique(object[["by_variable"]]))
+            subtitle <- paste0("By: ", by_var,
+                               "; Level: ", unique(object[[by_var]]))
+        }
     }
 
     ## add labelling to plot
@@ -113,11 +122,11 @@
     smooth_vars <- names(object)[3:4]
     show <- match.arg(show)
     if (isTRUE(identical(show, "estimate"))) {
-        guide_title <- unique(object[["smooth"]])
+        guide_title <- "Effect" # unique(object[["smooth"]])
         plot_var <- "est"
         guide_limits <- c(-1, 1) * max(abs(object[[plot_var]]))
     } else {
-        guide_title <- bquote(SE * (.(unique(object[["smooth"]]))))
+        guide_title <- "Std. err." # bquote(SE * (.(unique(object[["smooth"]]))))
         plot_var <- "se"
         guide_limits <- range(object[["se"]])
     }
@@ -137,7 +146,16 @@
         ylab <- smooth_vars[2L]
     }
     if (is.null(title)) {
-        title <- guide_title
+        title <- unique(object[["smooth"]])
+    }
+    if (all(!is.na(object[["by_variable"]]))) {
+        spl <- strsplit(title, split = ":")
+        title <- spl[[1L]][[1L]]
+        if (is.null(subtitle)) {
+            by_var <- as.character(unique(object[["by_variable"]]))
+            subtitle <- paste0("By: ", by_var,
+                               "; Level: ", unique(object[[by_var]]))
+        }
     }
 
     ## add labelling to plot
@@ -266,6 +284,12 @@
         }
     }
 
+    ## If we can't handle any of the terms in the model, bail
+    if (length(g) == 0L) {
+        message("Unable to draw any of the model terms.")
+        return(invisible(g))
+    }
+
     plot_grid(plotlist = g, align = align, axis = axis, ...)
 }
 
@@ -301,10 +325,19 @@
         xlab <- "Gaussian quantiles"
     }
     if (missing(ylab)) {
-        ylab <- paste("Effects:", smooth_var)
+        ylab <- "Effects"
     }
     if(is.null(title)) {
         title <- smooth_var
+    }
+    if (all(!is.na(object[["by_variable"]]))) {
+        spl <- strsplit(title, split = ":")
+        title <- spl[[1L]][[1L]]
+        if (is.null(subtitle)) {
+            by_var <- as.character(unique(object[["by_variable"]]))
+            subtitle <- paste0("By: ", by_var,
+                               "; Level: ", unique(object[[by_var]]))
+        }
     }
 
     ## add labelling to plot
@@ -339,10 +372,19 @@
         xlab <- smooth_var
     }
     if (missing(ylab)) {
-        ylab <- paste("Effect:", smooth_var) # unique(object[["smooth"]])
+        ylab <- "Effect"
     }
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
+    }
+    if (all(!is.na(object[["by_variable"]]))) {
+        spl <- strsplit(title, split = ":")
+        title <- spl[[1L]][[1L]]
+        if (is.null(subtitle)) {
+            by_var <- as.character(unique(object[["by_variable"]]))
+            subtitle <- paste0("By: ", by_var,
+                               "; Level: ", unique(object[[by_var]]))
+        }
     }
 
     ## add labelling to plot

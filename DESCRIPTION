@@ -1,6 +1,6 @@
 Package: gratia
-Version: 0.1-5
-Date: 2018-12-06
+Version: 0.1-6
+Date: 2018-12-08
 Title: ggplot-based Graphics and Other Useful Functions for GAMs Fitted Using mgcv
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     email = "ucfagls@gmail.com",
@@ -25,8 +25,9 @@ Suggests:
     testthat,
     vdiffr,
     MASS,
-    scam
-Description: Ggplot-based graphics and utility functions for working with GAMs fitted using the mgcv package.
+    scam,
+    datasets
+Description: Graceful ggplot-based graphics and utility functions for working with GAMs fitted using the mgcv package.
 License: MIT + file LICENSE
 LazyData: true
 URL: https://gavinsimpson.github.io/gratia

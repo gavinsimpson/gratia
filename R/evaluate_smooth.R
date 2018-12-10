@@ -104,10 +104,14 @@
 `evaluate_re_smooth` <- function(object, model = NULL, newdata = NULL,
                                  unconditional = FALSE) {
     ## If more than one smooth, these should be by variables smooths
+    ## of a global plus by variable smooth
     is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
     if (length(object) > 1L) {
         if (!all(is.by)) {
-            stop(by_smooth_failure(object))
+            vars <- vapply(object, smooth_variable, character(1L))
+            if (length(unique(vars)) > 1L) {
+                stop(by_smooth_failure(object))
+            }
         }
     }
 
@@ -143,9 +147,10 @@
     evaluated <- do.call("rbind", evaluated)
 
     if (any(is.factor.by)) {
+        na_by <- by_var == "NA"         # a non-by global smooth is "NA"
         evaluated <- add_by_var_info_to_smooth(evaluated,
                                                by_name = by_var,
-                                               by_data = model[["model"]][[by_var]],
+                                               by_data = model[["model"]][[by_var[!na_by]]],
                                                n = length(levs))
     } else {
         evaluated <- add_missing_by_info_to_smooth(evaluated)
@@ -162,10 +167,14 @@
 `evaluate_1d_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
                                  unconditional = FALSE, inc_mean = FALSE) {
     ## If more than one smooth, these should be by variables smooths
+    ## of a global plus by variable smooth
     is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
     if (length(object) > 1L) {
         if (!all(is.by)) {
-            stop(by_smooth_failure(object))
+            vars <- vapply(object, smooth_variable, character(1L))
+            if (length(unique(vars)) > 1L) {
+                stop(by_smooth_failure(object))
+            }
         }
     }
 
@@ -194,20 +203,48 @@
     is.factor.by     <- vapply(object, FUN = is_factor_by_smooth,     FUN.VALUE = logical(1L))
     is.continuous.by <- vapply(object, FUN = is_continuous_by_smooth, FUN.VALUE = logical(1L))
     if (any(is.by)) {
-        if (any(is.factor.by)) { # (is.factor(model[["model"]][[by_var]])) {
-            levs <- levels(model[["model"]][[by_var]])
+        na_by <- by_var == "NA"         # a non-by global smooth is "NA"
+        if (any(is.factor.by)) {
+            if (any(na_by)) { # if we have a global by need to add some NAs for factor
+                onewx <- cbind(newx, .by_var = NA)
+            }
+            ## repeat levels of factor, all has to be done excluding the global smooth
+            ## if present
+            levs <- levels(model[["model"]][[by_var[!na_by]]])
             newx <- cbind(newx, .by_var = rep(levs, each = n))
+            if (any(na_by)) {
+                levs <- c("NA", levs) # extend levels if a global smoother (for later)...
+                newx <- rbind(onewx, newx)
+                ## ...but convet to factor ignoring this extra level
+                newx[[".by_var"]] <- factor(newx[[".by_var"]], levels = levs[-1L])
+            } else {
+                newx[[".by_var"]] <- factor(newx[[".by_var"]], levels = levs)
+            }
         } else {                        # continuous by
-            newx <- cbind(newx, .by_var = mean(model[["model"]][[by_var]]))
+            if (any(na_by)) {
+                onewx <- cbind(newx, .ba_var = NA)
+            }
+            newx <- cbind(newx, .by_var = mean(model[["model"]][[by_var[!na_by]]]))
+            if (any(na_by)) {
+                newx <- rbind(onewx, newx)
+            }
         }
-        names(newx)[NCOL(newx)] <- by_var
+        names(newx)[NCOL(newx)] <- by_var[!na_by]
     }
 
     evaluated <- vector("list", length(object))
     for (i in seq_along(evaluated)) {
         ind <- seq_len(NROW(newx))
-        if (any(is.factor.by)) {
-            ind <- newx[, by_var] == levs[i]
+        if (any(is.by)) { # need to differentiate between global and factor by smooths
+            if (is.factor.by[[i]]) {
+                ind <- newx[, by_var[!na_by]] == levs[i]
+                ind[is.na(ind)] <- FALSE
+            } else {                    # continous by or a global smooth
+                is_na <- is.na(newx[, by_var[!na_by]])
+                if (any(is_na)) {       # a global smooth
+                    ind <- is_na
+                }
+            }
         }
         evaluated[[i]] <- spline_values(object[[i]],
                                         newdata = newx[ind, , drop = FALSE],
@@ -221,7 +258,7 @@
     if (any(is.factor.by)) {
         evaluated <- add_by_var_info_to_smooth(evaluated,
                                                by_name = by_var,
-                                               by_data = model[["model"]][[by_var]],
+                                               by_data = model[["model"]][[by_var[!na_by]]],
                                                n = n)
     } else {
         evaluated <- add_missing_by_info_to_smooth(evaluated)
@@ -238,10 +275,14 @@
 `evaluate_2d_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
                                  unconditional = FALSE, inc_mean = FALSE, dist = 0.1) {
     ## If more than one smooth, these should be by variables smooths
+    ## of a global plus by variable smooth
     is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
     if (length(object) > 1L) {
         if (!all(is.by)) {
-            stop(by_smooth_failure(object))
+            vars <- vapply(object, smooth_variable, character(2L))
+            if (length(unique(as.vector(vars))) > 2L) {
+                stop(by_smooth_failure(object))
+            }
         }
     }
 
@@ -270,20 +311,48 @@
     is.factor.by     <- vapply(object, FUN = is_factor_by_smooth,     FUN.VALUE = logical(1L))
     is.continuous.by <- vapply(object, FUN = is_continuous_by_smooth, FUN.VALUE = logical(1L))
     if (any(is.by)) {
-        if (any(is.factor.by)) { # (is.factor(model[["model"]][[by_var]])) {
-            levs <- levels(model[["model"]][[by_var]])
+        na_by <- by_var == "NA"         # a non-by global smooth is "NA"
+        if (any(is.factor.by)) {
+            if (any(na_by)) { # if we have a global by need to add some NAs for factor
+                onewx <- cbind(newx, .by_var = NA)
+            }
+            ## repeat levels of factor, all has to be done excluding the global smooth
+            ## if present
+            levs <- levels(model[["model"]][[by_var[!na_by]]])
             newx <- cbind(newx, .by_var = rep(levs, each = n*n))
+            if (any(na_by)) {
+                levs <- c("NA", levs) # extend levels if a global smoother (for later)...
+                newx <- rbind(onewx, newx)
+                ## ...but convet to factor ignoring this extra level
+                newx[[".by_var"]] <- factor(newx[[".by_var"]], levels = levs[-1L])
+            } else {
+                newx[[".by_var"]] <- factor(newx[[".by_var"]], levels = levs)
+            }
         } else {                        # continuous by
-            newx <- cbind(newx, .by_var = mean(model[["model"]][[by_var]]))
+            if (any(na_by)) {
+                onewx <- cbind(newx, .ba_var = NA)
+            }
+            newx <- cbind(newx, .by_var = mean(model[["model"]][[by_var[!na_by]]]))
+            if (any(na_by)) {
+                newx <- rbind(onewx, newx)
+            }
         }
-        names(newx)[NCOL(newx)] <- by_var
+        names(newx)[NCOL(newx)] <- by_var[!na_by]
     }
 
     evaluated <- vector("list", length(object))
     for (i in seq_along(evaluated)) {
         ind <- seq_len(NROW(newx))
-        if (any(is.factor.by)) {
-            ind <- newx[, by_var] == levs[i]
+        if (any(is.by)) { # need to differentiate between global and factor by smooths
+            if (is.factor.by[[i]]) {
+                ind <- newx[, by_var[!na_by]] == levs[i]
+                ind[is.na(ind)] <- FALSE
+            } else {                    # continous by or a global smooth
+                is_na <- is.na(newx[, by_var[!na_by]])
+                if (any(is_na)) {       # a global smooth
+                    ind <- is_na
+                }
+            }
         }
         evaluated[[i]] <- spline_values(object[[i]],
                                         newdata = newx[ind, , drop = FALSE],
@@ -297,7 +366,7 @@
     if (any(is.factor.by)) {
         evaluated <- add_by_var_info_to_smooth(evaluated,
                                                by_name = by_var,
-                                               by_data = model[["model"]][[by_var]],
+                                               by_data = model[["model"]][[by_var[!na_by]]],
                                                n = n*n)
     } else {
         evaluated <- add_missing_by_info_to_smooth(evaluated)
@@ -326,10 +395,14 @@
 `evaluate_fs_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
                                  unconditional = FALSE, inc_mean = FALSE) {
     ## If more than one smooth, these should be by variables smooths
+    ## of a global plus by variable smooth
     is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
     if (length(object) > 1L) {
         if (!all(is.by)) {
-            stop(by_smooth_failure(object))
+            vars <- vapply(object, smooth_variable, character(1L))
+            if (length(unique(vars)) > 1L) {
+                stop(by_smooth_failure(object))
+            }
         }
     }
 
@@ -362,20 +435,48 @@
     is.factor.by     <- vapply(object, FUN = is_factor_by_smooth,     FUN.VALUE = logical(1L))
     is.continuous.by <- vapply(object, FUN = is_continuous_by_smooth, FUN.VALUE = logical(1L))
     if (any(is.by)) {
+        na_by <- by_var == "NA"         # a non-by global smooth is "NA"
         if (any(is.factor.by)) {
-            levs <- levels(model[["model"]][[by_var]])
+            if (any(na_by)) { # if we have a global by need to add some NAs for factor
+                onewx <- cbind(newx, .by_var = NA)
+            }
+            ## repeat levels of factor, all has to be done excluding the global smooth
+            ## if present
+            levs <- levels(model[["model"]][[by_var[!na_by]]])
             newx <- cbind(newx, .by_var = rep(levs, each = n))
+            if (any(na_by)) {
+                levs <- c("NA", levs) # extend levels if a global smoother (for later)...
+                newx <- rbind(onewx, newx)
+                ## ...but convet to factor ignoring this extra level
+                newx[[".by_var"]] <- factor(newx[[".by_var"]], levels = levs[-1L])
+            } else {
+                newx[[".by_var"]] <- factor(newx[[".by_var"]], levels = levs)
+            }
         } else {                        # continuous by
-            newx <- cbind(newx, .by_var = mean(model[["model"]][[by_var]]))
+            if (any(na_by)) {
+                onewx <- cbind(newx, .ba_var = NA)
+            }
+            newx <- cbind(newx, .by_var = mean(model[["model"]][[by_var[!na_by]]]))
+            if (any(na_by)) {
+                newx <- rbind(onewx, newx)
+            }
         }
-        names(newx)[NCOL(newx)] <- by_var
+        names(newx)[NCOL(newx)] <- by_var[!na_by]
     }
 
     evaluated <- vector("list", length(object))
     for (i in seq_along(evaluated)) {
         ind <- seq_len(NROW(newx))
-        if (any(is.factor.by)) {
-            ind <- newx[, by_var] == levs[i]
+        if (any(is.by)) { # need to differentiate between global and factor by smooths
+            if (is.factor.by[[i]]) {
+                ind <- newx[, by_var[!na_by]] == levs[i]
+                ind[is.na(ind)] <- FALSE
+            } else {                    # continous by or a global smooth
+                is_na <- is.na(newx[, by_var[!na_by]])
+                if (any(is_na)) {       # a global smooth
+                    ind <- is_na
+                }
+            }
         }
         evaluated[[i]] <- spline_values(object[[i]],
                                         newdata = newx[ind, , drop = FALSE],
@@ -389,12 +490,8 @@
     if (any(is.factor.by)) {
         evaluated <- add_by_var_info_to_smooth(evaluated,
                                                by_name = by_var,
-                                               by_data = model[["model"]][[by_var]],
+                                               by_data = model[["model"]][[by_var[!na_by]]],
                                                n = n)
-        ## evaluated <- cbind(evaluated,
-        ##                    by_variable = rep(by_var, NCOL(evaluated)),
-        ##                    by_var = rep(levels(model[["model"]][[by_var]]), each = n))
-        ## names(evaluated)[NCOL(evaluated)] <- by_var
     } else {
         evaluated <- add_missing_by_info_to_smooth(evaluated)
     }
