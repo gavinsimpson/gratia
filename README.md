@@ -34,7 +34,7 @@ to install the package.
 
 ## Why *gratia*?
 
-In naming his [*greta*](https://github.com/greta-dev/greta) package, Nick Golding observed the recent phenomena of naming statistical modelling software, such as Stan or Edward, after individuals that played a prominent role in the development of the field. This lead Nick to name his Tensor Flow-based package *greta* after [*Grete Hermann*](https://greta-dev.github.io/greta/why_greta.html).
+In naming his [*greta*](https://github.com/greta-dev/greta) package, Nick Golding observed the recent phenomena of naming statistical modelling software, such as Stan or Edward, after individuals that played a prominent role in the development of the field. This lead Nick to name his Tensor Flow-based package *greta* after [*Grete Hermann*](https://greta-stats.org/articles/webpages/why_greta.html).
 
 In the same spirit, *gratia* is named in recognition of the contributions of [Grace Wahba](https://en.wikipedia.org/wiki/Grace_Wahba), who did pioneering work on the penalised spline models that are at the foundation of the way GAMs are estimated in *mgcv*. I wanted to name the package *grace*, to explicitly recognise Grace's contributions, but unfortunately there was already a package named *Grace* on CRAN. So I looked elsewhere for inspiration.
 
