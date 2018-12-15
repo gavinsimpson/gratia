@@ -193,8 +193,11 @@ interval when <code>method = "simulate"</code>.</p></td>
 
 <span class='co'>## Q-Q plot; default using direct randomization of uniform quantiles</span>
 <span class='fu'>qq_plot</span>(<span class='no'>m</span>)</div><div class='img'><img src='qq_plot-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'>## Alternatively use simulate new data from the model, which</span>
+<span class='co'>## allows construction of reference intervals for the Q-Q plot</span>
+<span class='fu'>qq_plot</span>(<span class='no'>m</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"simulate"</span>)</div><div class='img'><img src='qq_plot-2.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>## ... or use the usual normality assumption</span>
-<span class='fu'>qq_plot</span>(<span class='no'>m</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"normal"</span>)</div><div class='img'><img src='qq_plot-2.png' alt='' width='700' height='433' /></div></pre>
+<span class='fu'>qq_plot</span>(<span class='no'>m</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"normal"</span>)</div><div class='img'><img src='qq_plot-3.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
