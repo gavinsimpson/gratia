@@ -54,7 +54,7 @@
 ##' draw(sm)
 ##'
 ##' \dontshow{set.seed(2)}
-##' dat <- gamSim(2, n = 4000, dist = "normal", scale = 1)
+##' dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
 ##' m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
 ##'
 ##' sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
