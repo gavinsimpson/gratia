@@ -68,6 +68,10 @@ m <- gam( y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
 ## Q-Q plot; default using direct randomization of uniform quantiles
 qq_plot(m)
 
+## Alternatively use simulate new data from the model, which
+## allows construction of reference intervals for the Q-Q plot
+qq_plot(m, method = "simulate")
+
 ## ... or use the usual normality assumption
 qq_plot(m, method = "normal")
 }
