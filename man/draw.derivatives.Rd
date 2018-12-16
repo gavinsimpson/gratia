@@ -10,7 +10,13 @@
 \arguments{
 \item{object}{a fitted GAM, the result of a call to \code{\link[mgcv:gam]{mgcv::gam()}}.}
 
-\item{select}{currently ignored.}
+\item{select}{character, logical, or numeric; which smooths to plot. If
+\code{NULL}, the default, then all model smooths are drawn. Numeric \code{select}
+indexes the smooths in the order they are specified in the formula and
+stored in \code{object}. Character \code{select} matches the labels for smooths
+as shown for example in the output from \code{summary(object)}. Logical
+\code{select} operates as per numeric \code{select} in the order that smooths are
+stored.}
 
 \item{scales}{character; should all univariate smooths be plotted with the
 same y-axis scale? The default, \code{scales = "fixed"}, ensures this is done.
