@@ -4,7 +4,7 @@
 \alias{draw.gam}
 \title{Plot estimated smooths from a fitted GAM}
 \usage{
-\method{draw}{gam}(object, parametric = TRUE, select,
+\method{draw}{gam}(object, parametric = TRUE, select = NULL,
   scales = c("free", "fixed"), align = "hv", axis = "lrtb",
   n = 100, unconditional = FALSE, inc_mean = FALSE, dist = 0.1,
   ...)
@@ -14,7 +14,13 @@
 
 \item{parametric}{logical; plot parametric terms also? Default is \code{TRUE}.}
 
-\item{select}{character;}
+\item{select}{character, logical, or numeric; which smooths to plot. If
+\code{NULL}, the default, then all model smooths are drawn. Numeric \code{select}
+indexes the smooths in the order they are specified in the formula and
+stored in \code{object}. Character \code{select} matches the labels for smooths
+as shown for example in the output from \code{summary(object)}. Logical
+\code{select} operates as per numeric \code{select} in the order that smooths are
+stored.}
 
 \item{scales}{character; should all univariate smooths be plotted with the
 same y-axis scale? The default, \code{scales = "fixed"}, ensures this is done.
