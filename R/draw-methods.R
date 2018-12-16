@@ -185,7 +185,13 @@
 ##'
 ##' @param object a fitted GAM, the result of a call to [mgcv::gam()].
 ##' @param parametric logical; plot parametric terms also? Default is `TRUE`.
-##' @param select character;
+##' @param select character, logical, or numeric; which smooths to plot. If
+##'   `NULL`, the default, then all model smooths are drawn. Numeric `select`
+##'   indexes the smooths in the order they are specified in the formula and
+##'   stored in `object`. Character `select` matches the labels for smooths
+##'   as shown for example in the output from `summary(object)`. Logical
+##'   `select` operates as per numeric `select` in the order that smooths are
+##'   stored.
 ##' @param scales character; should all univariate smooths be plotted with the
 ##'   same y-axis scale? The default, `scales = "fixed"`, ensures this is done.
 ##'   If `scales = "free"` each univariate smooth has its own y-axis scale.
@@ -218,7 +224,7 @@
 ##' draw(m1)
 `draw.gam` <- function(object,
                        parametric = TRUE,
-                       select, # ignored for now; but used for subsetting which smooths
+                       select = NULL,
                        scales = c("free", "fixed"),
                        align = "hv", axis = "lrtb",
                        n = 100, unconditional = FALSE, inc_mean = FALSE,
@@ -226,8 +232,35 @@
     scales <- match.arg(scales)
     S <- smooths(object)                # vector of smooth labels - "s(x)"
 
+    ## select smooths
+    lenSmo <- length(S)
+    if (!is.null(select)) {
+        lenSel <- length(select)
+        if (is.numeric(select)) {
+            if (lenSmo < lenSel) {
+                stop("Trying to select more smooths that are in the model.")
+            }
+            if (any(select > lenSmo)) {
+                stop("One or more indices in 'select' > than the number of smooths in the model.")
+            }
+            S <- S[select]
+        } else if (is.character(select)) {
+            select <- S %in% select
+            S <- S[select]
+        } else if (is.logical(select)) {
+            if (lenSmo != lenSel) {
+                stop("When 'select' is a logical vector, 'length(select)' must equal\nthe number of smooths in the model.")
+            }
+            S <- S[select]
+        } else {
+            stop("'select' is not numeric, character, or logical.")
+        }
+    } else {
+        select <- rep(TRUE, lenSmo)
+    }
+
     ## can only plot 1 or 2d smooths - get smooth dimensions & prune list `s`
-    d <- smooth_dim(object)
+    d <- smooth_dim(object)[select]
     S <- S[d <= 2L]
     d <- d[d <= 2L]
 
@@ -443,6 +476,7 @@
 ##'
 ##' @param alpha numeric; alpha transparency for confidence or simultaneous
 ##'   interval.
+##' @param select currently ignored.
 ##' @inheritParams draw.gam
 ##'
 ##' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_line labs
