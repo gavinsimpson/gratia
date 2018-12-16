@@ -625,7 +625,7 @@
         lenSel <- length(select)
         if (is.numeric(select)) {
             if (lenSmo < lenSel) {
-                stop("Trying to select more smooths that are in the model.")
+                stop("Trying to select more smooths than are in the model.")
             }
             if (any(select > lenSmo)) {
                 stop("One or more indices in 'select' > than the number of smooths in the model.")
