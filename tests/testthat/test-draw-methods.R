@@ -6,24 +6,68 @@ library("gratia")
 library("mgcv")
 library("ggplot2")
 library("vdiffr")
+theme_set(theme_grey())
 
 context("draw-methods")
 
+## Fit models
+set.seed(1)
+dat1 <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "REML")
+
+set.seed(1)
+dat2 <- gamSim(2, n = 4000, dist = "normal", scale = 1, verbose = FALSE)
+m2 <- gam(y ~ s(x, z, k = 40), data = dat2$data, method = "REML")
+
+set.seed(1)
+dat3 <- gamSim(4, verbose = FALSE)
+m3 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat3)
+
 test_that("draw.evaluated_1d_smooth() plots the smooth", {
     theme_set(theme_grey())
-    set.seed(1)
-    dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
-    m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
     sm <- evaluate_smooth(m1, "s(x2)")
     plt <- draw(sm)
     expect_doppelganger("draw 1d smooth for selected smooth", plt)
 })
 
+test_that("draw.gam works with numeric select", {
+    plt <- draw(m1, select = 2)
+    expect_doppelganger("draw gam smooth for selected smooth numeric", plt)
+    plt <- draw(m1, select = c(1,2))
+    expect_doppelganger("draw gam smooth for two selected smooths numeric", plt)
+})
+
+test_that("draw.gam fails with bad select", {
+    expect_error(draw(m1, select = 8),
+                 "One or more indices in 'select' > than the number of smooths in the model.",
+                 fixed = TRUE)
+    expect_error(draw(m1, select = c(1,3,5,6)),
+                 "One or more indices in 'select' > than the number of smooths in the model.",
+                 fixed = TRUE)
+    expect_error(draw(m1, select = c(1,2,3,4,5)),
+                 "Trying to select more smooths that are in the model.",
+                 fixed = TRUE)
+    expect_error(draw(m1, select = TRUE),
+                 "When 'select' is a logical vector, 'length(select)' must equal
+the number of smooths in the model.", fixed = TRUE)
+})
+
+test_that("draw.gam works with chracter select", {
+    plt <- draw(m1, select = "s(x1)")
+    expect_doppelganger("draw gam smooth for selected smooth character", plt)
+    plt <- draw(m1, select = c("s(x0)", "s(x1"))
+    expect_doppelganger("draw gam smooth for two selected smooths character", plt)
+})
+
+test_that("draw.gam works with logical select", {
+    plt <- draw(m1, select = c(TRUE, rep(FALSE, 3)))
+    expect_doppelganger("draw gam smooth for selected smooth logical", plt)
+    plt <- draw(m1, select = rep(c(TRUE, FALSE), each = 2))
+    expect_doppelganger("draw gam smooth for two selected smooths logical", plt)
+})
+
 test_that("draw.evaluated_2d_smooth() plots the smooth & SE", {
     theme_set(theme_grey())
-    set.seed(1)
-    dat <- gamSim(2, n = 4000, dist = "normal", scale = 1, verbose = FALSE)
-    m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
     sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
     plt <- draw(sm)
     expect_doppelganger("draw 2d smooth", plt)
@@ -33,9 +77,6 @@ test_that("draw.evaluated_2d_smooth() plots the smooth & SE", {
 
 test_that("draw.gam() plots a simple multi-smooth AM", {
     theme_set(theme_grey())
-    set.seed(1)
-    dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
-    m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
     plt <- draw(m1)
     expect_doppelganger("draw simple multi-smooth AM", plt)
@@ -46,9 +87,6 @@ test_that("draw.gam() plots a simple multi-smooth AM", {
 
 test_that("draw.gam() plots an AM with a single 2d smooth", {
     theme_set(theme_grey())
-    set.seed(1)
-    dat <- gamSim(2, n = 4000, dist = "normal", scale = 1, verbose = FALSE)
-    m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
 
     plt <- draw(m2)
     expect_doppelganger("draw AM with 2d smooth", plt)
@@ -60,9 +98,6 @@ test_that("draw.gam() plots an AM with a single 2d smooth", {
 
 test_that("draw.gam() plots an AM with a single factor by-variable smooth", {
     theme_set(theme_grey())
-    set.seed(1)
-    dat <- gamSim(4, verbose = FALSE)
-    m3 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
 
     plt <- draw(m3)
     expect_doppelganger("draw AM with factor by-variable smooth", plt)
@@ -117,17 +152,17 @@ test_that("draw() with random effect smooths (bs = 're') & factor by variable ",
     theme_set(theme_grey())
     ## simulate example...
     set.seed(1)
-    dat1 <- gamSim(4, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
+    df <- gamSim(4, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
 
     ## random effects
     ranef <- as.factor(sample(1:20, 400, replace = TRUE))
-    dat1$X <- model.matrix(~ ranef - 1)
+    df$X <- model.matrix(~ ranef - 1)
     b <- rnorm(20) * 0.5
-    da1 <- transform(dat1, y = y + X %*% b)
+    da1 <- transform(df, y = y + X %*% b)
 
     ## fit model
     rm2 <- gam(y ~ fac + s(ranef, bs = "re", by = fac) + s(x0) + s(x1) + s(x2),
-               data = dat1, method = "ML")
+               data = df, method = "ML")
 
     sm <- evaluate_smooth(rm2, "s(ranef)")
     expect_s3_class(sm, "evaluated_re_smooth")
@@ -257,9 +292,6 @@ test_that("draw() works with parametric terms", {
 
 test_that("component-wise CIs work with seWithMean", {
     theme_set(theme_grey())
-    set.seed(1)
-    dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
-    m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
     sm <- evaluate_smooth(m1, "s(x3)", inc_mean = TRUE)
     plt <- draw(sm)
     expect_doppelganger("draw 1d smooth for selected smooth with inc_mean true", plt)
@@ -270,9 +302,6 @@ test_that("component-wise CIs work with seWithMean", {
 
 test_that("draw.derivates() plots derivatives for a GAM", {
     theme_set(theme_grey())
-    set.seed(1)
-    dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
-    m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
     d1 <- derivatives(m1)
     plt <- draw(d1)
