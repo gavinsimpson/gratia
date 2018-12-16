@@ -14,7 +14,7 @@ The main features of *gratia* are currently
 
     Note specialist smoothers (`bs %in% c("sos","mrf","so")`) are not supported, but univariate, *factor* and *continuous* `by`-variable smooths, simple random effect smooths (`bs = 're'`), factor-smooth interaction smooths (`bs = "fs"`), and bivariate tensor product smooths are supported,
 
-* Estimatation of derivatives of fitted smoothers: `fderiv(gam_model)`,
+* Estimatation of derivatives of fitted smoothers: `derivatives()` (older functionality in `fderiv(gam_model)`),
 
 * Estimation of point-wise across-the-function confidence intervals and simultaneous intervals for smooths: `confint(gam_model)`.
 
