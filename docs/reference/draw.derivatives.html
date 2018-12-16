@@ -61,7 +61,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.7</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.8</span>
       </span>
     </div>
 
@@ -104,8 +104,8 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for derivatives</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>object</span>, <span class='no'>select</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"free"</span>, <span class='st'>"fixed"</span>),
-  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.2</span>, <span class='kw'>align</span> <span class='kw'>=</span> <span class='st'>"hv"</span>, <span class='kw'>axis</span> <span class='kw'>=</span> <span class='st'>"lrtb"</span>, <span class='no'>...</span>)</pre>
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>object</span>, <span class='kw'>select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"free"</span>,
+  <span class='st'>"fixed"</span>), <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.2</span>, <span class='kw'>align</span> <span class='kw'>=</span> <span class='st'>"hv"</span>, <span class='kw'>axis</span> <span class='kw'>=</span> <span class='st'>"lrtb"</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -116,7 +116,13 @@
     </tr>
     <tr>
       <th>select</th>
-      <td><p>currently ignored.</p></td>
+      <td><p>character, logical, or numeric; which smooths to plot. If
+<code>NULL</code>, the default, then all model smooths are drawn. Numeric <code>select</code>
+indexes the smooths in the order they are specified in the formula and
+stored in <code>object</code>. Character <code>select</code> matches the labels for smooths
+as shown for example in the output from <code>summary(object)</code>. Logical
+<code>select</code> operates as per numeric <code>select</code> in the order that smooths are
+stored.</p></td>
     </tr>
     <tr>
       <th>scales</th>
