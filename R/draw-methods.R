@@ -233,31 +233,8 @@
     S <- smooths(object)                # vector of smooth labels - "s(x)"
 
     ## select smooths
-    lenSmo <- length(S)
-    if (!is.null(select)) {
-        lenSel <- length(select)
-        if (is.numeric(select)) {
-            if (lenSmo < lenSel) {
-                stop("Trying to select more smooths that are in the model.")
-            }
-            if (any(select > lenSmo)) {
-                stop("One or more indices in 'select' > than the number of smooths in the model.")
-            }
-            S <- S[select]
-        } else if (is.character(select)) {
-            select <- S %in% select
-            S <- S[select]
-        } else if (is.logical(select)) {
-            if (lenSmo != lenSel) {
-                stop("When 'select' is a logical vector, 'length(select)' must equal\nthe number of smooths in the model.")
-            }
-            S <- S[select]
-        } else {
-            stop("'select' is not numeric, character, or logical.")
-        }
-    } else {
-        select <- rep(TRUE, lenSmo)
-    }
+    select <- check_user_select_smooths(smooths = S, select = select)
+    S <- S[select]
 
     ## can only plot 1 or 2d smooths - get smooth dimensions & prune list `s`
     d <- smooth_dim(object)[select]
@@ -476,7 +453,6 @@
 ##'
 ##' @param alpha numeric; alpha transparency for confidence or simultaneous
 ##'   interval.
-##' @param select currently ignored.
 ##' @inheritParams draw.gam
 ##'
 ##' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_line labs
@@ -494,14 +470,17 @@
 ##' df <- derivatives(mod)
 ##' draw(df)
 `draw.derivatives` <- function(object,
-                               select, # ignored for now; but used for subsetting which smooths
+                               select = NULL,
                                scales = c("free", "fixed"), alpha = 0.2,
                                align = "hv", axis = "lrtb", ...) {
     scales <- match.arg(scales)
 
     ## how many smooths
     sm <- unique(object[["smooth"]])
-    xvar <- unique(object[["var"]])
+    ## select smooths
+    select <- check_user_select_smooths(smooths = sm, select = select)
+    sm <- sm[select]
+    xvar <- unique(object[["var"]])[select]
     plotlist <- vector("list", length = length(sm))
 
     for (i in seq_along(sm)) {

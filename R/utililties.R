@@ -618,3 +618,32 @@
     }
     fam[["rd"]]
 }
+
+`check_user_select_smooths` <- function(smooths, select = NULL) {
+    lenSmo <- length(smooths)
+    select <- if (!is.null(select)) {
+        lenSel <- length(select)
+        if (is.numeric(select)) {
+            if (lenSmo < lenSel) {
+                stop("Trying to select more smooths that are in the model.")
+            }
+            if (any(select > lenSmo)) {
+                stop("One or more indices in 'select' > than the number of smooths in the model.")
+            }
+            select
+        } else if (is.character(select)) {
+            smooths %in% select
+        } else if (is.logical(select)) {
+            if (lenSmo != lenSel) {
+                stop("When 'select' is a logical vector, 'length(select)' must equal\nthe number of smooths in the model.")
+            }
+            select
+        } else {
+            stop("'select' is not numeric, character, or logical.")
+        }
+    } else {
+        rep(TRUE, lenSmo)
+    }
+
+    select
+}
