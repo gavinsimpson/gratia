@@ -15,6 +15,8 @@ The main features of *gratia* are currently
 
 * A *ggplot2*-based replacement for `mgcv:::plot.gam()`: `draw(gam_model)`.
 
+    ![Estimated smooths from a GAM](man/figures/draw-gam-figure.png)
+
     Note specialist smoothers (`bs %in% c("sos","mrf","so")`) are not currently supported, but univariate, *factor* and *continuous* `by`-variable smooths, simple random effect smooths (`bs = 're'`), factor-smooth interaction smooths (`bs = "fs"`), and bivariate tensor product smooths are supported,
 
 * Estimatation of derivatives of fitted smoothers: `derivatives()` (older functionality in `fderiv(gam_model)`),
