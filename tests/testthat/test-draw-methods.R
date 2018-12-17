@@ -45,7 +45,7 @@ test_that("draw.gam fails with bad select", {
                  "One or more indices in 'select' > than the number of smooths in the model.",
                  fixed = TRUE)
     expect_error(draw(m1, select = c(1,2,3,4,5)),
-                 "Trying to select more smooths that are in the model.",
+                 "Trying to select more smooths than are in the model.",
                  fixed = TRUE)
     expect_error(draw(m1, select = TRUE),
                  "When 'select' is a logical vector, 'length(select)' must equal
