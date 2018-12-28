@@ -6,8 +6,8 @@
 \usage{
 \method{draw}{gam}(object, parametric = TRUE, select = NULL,
   scales = c("free", "fixed"), align = "hv", axis = "lrtb",
-  n = 100, unconditional = FALSE, inc_mean = FALSE, dist = 0.1,
-  ...)
+  n = 100, unconditional = FALSE, overall_uncertainty = TRUE,
+  dist = 0.1, ...)
 }
 \arguments{
 \item{object}{a fitted GAM, the result of a call to \code{\link[mgcv:gam]{mgcv::gam()}}.}
@@ -41,9 +41,9 @@ which to evaluate the smooth.}
 uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian
 covariance matrix will be used.}
 
-\item{inc_mean}{logical; should the uncertainty in the model constant term be
-included in the standard error of the evaluate values of the smooth?
-Currently not implemented.}
+\item{overall_uncertainty}{logical; should the uncertainty in the model
+constant term be included in the standard error of the evaluate values of
+the smooth?}
 
 \item{dist}{numeric; if greater than 0, this is used to determine when
 a location is too far from data to be plotted when plotting 2-D smooths.

@@ -290,14 +290,14 @@ test_that("draw() works with parametric terms", {
                    fixed = TRUE)
 })
 
-test_that("component-wise CIs work with seWithMean", {
+test_that("component-wise CIs work without seWithMean", {
     theme_set(theme_grey())
-    sm <- evaluate_smooth(m1, "s(x3)", inc_mean = TRUE)
+    sm <- evaluate_smooth(m1, "s(x3)", overall_uncertainty = FALSE)
     plt <- draw(sm)
-    expect_doppelganger("draw 1d smooth for selected smooth with inc_mean true", plt)
+    expect_doppelganger("draw 1d smooth for selected smooth with overall_uncertainty false", plt)
 
-    plt <- draw(m1, inc_mean = TRUE)
-    expect_doppelganger("draw gam with inc_mean true", plt)
+    plt <- draw(m1, overall_uncertainty = FALSE)
+    expect_doppelganger("draw gam with overall_uncertainty false", plt)
 })
 
 test_that("draw.derivates() plots derivatives for a GAM", {

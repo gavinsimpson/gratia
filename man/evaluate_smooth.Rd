@@ -11,7 +11,7 @@
 evaluate_smooth(object, ...)
 
 \method{evaluate_smooth}{gam}(object, smooth, n = 100, newdata = NULL,
-  unconditional = FALSE, inc_mean = FALSE, dist = 0.1, ...)
+  unconditional = FALSE, overall_uncertainty = TRUE, dist = 0.1, ...)
 
 \method{evaluate_smooth}{gamm}(object, ...)
 
@@ -37,9 +37,9 @@ smooth.}
 uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian
 covariance matrix will be used.}
 
-\item{inc_mean}{logical; should the uncertainty in the model constant term be
-included in the standard error of the evaluate values of the smooth?
-Currently not implemented.}
+\item{overall_uncertainty}{logical; should the uncertainty in the model
+constant term be included in the standard error of the evaluate values of
+the smooth?}
 
 \item{dist}{numeric; if greater than 0, this is used to determine when
 a location is too far from data to be plotted when plotting 2-D smooths.

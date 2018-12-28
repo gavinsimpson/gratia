@@ -227,7 +227,8 @@
                        select = NULL,
                        scales = c("free", "fixed"),
                        align = "hv", axis = "lrtb",
-                       n = 100, unconditional = FALSE, inc_mean = FALSE,
+                       n = 100, unconditional = FALSE,
+                       overall_uncertainty = TRUE,
                        dist = 0.1, ...) {
     scales <- match.arg(scales)
     S <- smooths(object)                # vector of smooth labels - "s(x)"
@@ -265,8 +266,9 @@
 
     for (i in unique(S)) {
         eS <- evaluate_smooth(object, smooth = i, n = n,
-                                  unconditional = unconditional,
-                              inc_mean = inc_mean, dist = dist)
+                              unconditional = unconditional,
+                              overall_uncertainty = overall_uncertainty,
+                              dist = dist)
         l[S == i] <- split(eS, eS[["smooth"]])
     }
 

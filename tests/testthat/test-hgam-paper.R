@@ -26,7 +26,7 @@ test_that("draw() can plot CO2 model 1", {
                         s(Plant_uo, k = 12, bs = "re"),
                     data = CO2, method = "REML", family = gaussian(),
                     control = ctrl)
-    plt <- draw(CO2_mod1, inc_mean = TRUE)
+    plt <- draw(CO2_mod1, overall_uncertainty = TRUE)
     expect_doppelganger("hgam-paper-co2-model-1", plt)
 })
 
@@ -39,7 +39,7 @@ test_that("draw() can plot CO2 model 2", {
                         data = CO2, method = "REML", family = gaussian(),
                         control = ctrl)
     )
-    plt <- draw(CO2_mod2, inc_mean = TRUE)
+    plt <- draw(CO2_mod2, overall_uncertainty = TRUE)
     expect_doppelganger("hgam-paper-co2-model-2", plt)
 })
 
@@ -51,7 +51,7 @@ test_that("draw() can plot CO2 model 3", {
                         s(Plant_uo, bs = "re", k = 12),
                     data = CO2, method = "REML",
                     control = ctrl)
-    plt <- draw(CO2_mod3, inc_mean = TRUE)
+    plt <- draw(CO2_mod3, overall_uncertainty = TRUE)
     expect_doppelganger("hgam-paper-co2-model-3", plt)
 })
 
@@ -61,7 +61,7 @@ test_that("draw() can plot CO2 model 4", {
     CO2_mod4 <- gam(log(uptake) ~ s(log(conc), Plant_uo, k=5, bs="fs", m=2),
                     data=CO2, method="REML",
                     control = ctrl)
-    plt <- draw(CO2_mod4, inc_mean = TRUE)
+    plt <- draw(CO2_mod4, overall_uncertainty = TRUE)
     expect_doppelganger("hgam-paper-co2-model-4", plt)
 })
 
@@ -72,7 +72,7 @@ test_that("draw() can plot CO2 model 5", {
                         s(Plant_uo, bs="re", k=12),
                     data = CO2, method = "REML",
                     control = ctrl)
-    plt <- draw(CO2_mod5, inc_mean = TRUE)
+    plt <- draw(CO2_mod5, overall_uncertainty = TRUE)
     expect_doppelganger("hgam-paper-co2-model-5", plt)
 })
 
