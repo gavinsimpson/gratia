@@ -112,8 +112,8 @@ is used instead.</p>
     <pre class="usage"><span class='co'># S3 method for gam</span>
 <span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>object</span>, <span class='kw'>parametric</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>scales</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"free"</span>, <span class='st'>"fixed"</span>), <span class='kw'>align</span> <span class='kw'>=</span> <span class='st'>"hv"</span>, <span class='kw'>axis</span> <span class='kw'>=</span> <span class='st'>"lrtb"</span>,
-  <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>inc_mean</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
-  <span class='no'>...</span>)</pre>
+  <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overall_uncertainty</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>dist</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -166,10 +166,10 @@ uncertainty due to smoothness selection? If <code>TRUE</code>, the corrected Bay
 covariance matrix will be used.</p></td>
     </tr>
     <tr>
-      <th>inc_mean</th>
-      <td><p>logical; should the uncertainty in the model constant term be
-included in the standard error of the evaluate values of the smooth?
-Currently not implemented.</p></td>
+      <th>overall_uncertainty</th>
+      <td><p>logical; should the uncertainty in the model
+constant term be included in the standard error of the evaluate values of
+the smooth?</p></td>
     </tr>
     <tr>
       <th>dist</th>
