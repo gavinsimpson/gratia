@@ -106,17 +106,18 @@
 ##' @importFrom tibble add_column
 `evaluate_re_smooth` <- function(object, model = NULL, newdata = NULL,
                                  unconditional = FALSE) {
-    ## If more than one smooth, these should be by variables smooths
-    ## of a global plus by variable smooth
+    ## is this a by smooth
     is.by <- vapply(object, FUN = is_by_smooth, FUN.VALUE = logical(1L))
-    if (length(object) > 1L) {
-        if (!all(is.by)) {
-            vars <- vapply(object, smooth_variable, character(1L))
-            if (length(unique(vars)) > 1L) {
-                stop(by_smooth_failure(object))
-            }
-        }
-    }
+    ## 're' smooths can have multiple terms, by the time we're here the
+    ## fun should just work and we don't need this check
+    ## if (length(object) > 1L) {
+    ##     if (!all(is.by)) {
+    ##         vars <- vapply(object, smooth_variable, character(1L))
+    ##         if (length(unique(vars)) > 1L) {
+    ##             stop(by_smooth_failure(object))
+    ##         }
+    ##     }
+    ## }
 
     ## get by variable info
     by_var <- unique(vapply(object, FUN = by_variable, FUN.VALUE = character(1)))
@@ -126,11 +127,12 @@
     }
 
     ## get variable for this smooth
-    smooth_var    <- unique(vapply(object, FUN = smooth_variable,
-                                   FUN.VALUE = character(1)))
+    smooth_var    <- unique(unlist(lapply(object, FUN = smooth_variable)))
     smooth_labels <- vapply(object, FUN = smooth_label, FUN.VALUE = character(1))
-    levs <- levels(model[["model"]][[smooth_var]])
-    labels <- paste0(smooth_var, levs)
+    ## need `drop = FALSE` (the default) here because by default mgcv doesn't
+    ## drop the unused levels; hence we get a coef for all combinations of
+    ## vars in the ranef smooth
+    levs <- levels(interaction(model[["model"]][smooth_var], drop = FALSE))
 
     ## if we have a by variable
     is.factor.by <- vapply(object, FUN = is_factor_by_smooth,
@@ -161,7 +163,7 @@
         evaluated <- add_missing_by_info_to_smooth(evaluated)
     }
 
-    names(evaluated)[3] <- smooth_var
+    names(evaluated)[3] <- paste(smooth_var, collapse = ", ")
     class(evaluated) <- c("evaluated_re_smooth", "evaluated_smooth", class(evaluated))
 
     evaluated
