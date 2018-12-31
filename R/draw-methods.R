@@ -91,8 +91,7 @@
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
             by_var <- as.character(unique(object[["by_variable"]]))
-            subtitle <- paste0("By: ", by_var,
-                               "; Level: ", unique(object[[by_var]]))
+            subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
         }
     }
 
@@ -153,8 +152,7 @@
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
             by_var <- as.character(unique(object[["by_variable"]]))
-            subtitle <- paste0("By: ", by_var,
-                               "; Level: ", unique(object[[by_var]]))
+            subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
         }
     }
 
@@ -347,8 +345,7 @@
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
             by_var <- as.character(unique(object[["by_variable"]]))
-            subtitle <- paste0("By: ", by_var,
-                               "; Level: ", unique(object[[by_var]]))
+            subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
         }
     }
 
@@ -394,8 +391,7 @@
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
             by_var <- as.character(unique(object[["by_variable"]]))
-            subtitle <- paste0("By: ", by_var,
-                               "; Level: ", unique(object[[by_var]]))
+            subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
         }
     }
 
