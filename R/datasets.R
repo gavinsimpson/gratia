@@ -26,3 +26,11 @@ NULL
 ##' @keywords data
 ##' @docType data
 NULL
+
+##' Madison lakes zooplankton data
+##'
+##' @format A data frame
+##' @name zooplankton
+##' @keywords data
+##' @docType data
+NULL
