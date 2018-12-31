@@ -49,10 +49,10 @@ test_that("evaluate_fs_smooth fails with multiple smooths that aren't by factor 
                  "Not all of these are 'by' variable smooths")
 })
 
-test_that("evaluate_re_smooth fails with multiple smooths that aren't by factor smooths", {
-    expect_error(gratia:::evaluate_re_smooth(m1[["smooth"]]),
-                 "Not all of these are 'by' variable smooths")
-})
+## test_that("evaluate_re_smooth fails with multiple smooths that aren't by factor smooths", {
+##     expect_error(gratia:::evaluate_re_smooth(m1[["smooth"]]),
+##                  "Not all of these are 'by' variable smooths")
+## })
 
 test_that("evaluate_smooth fails with a trivariate smooth", {
     m <- gam(y ~ s(x0, x1, x2), data = dat, method = "REML")
