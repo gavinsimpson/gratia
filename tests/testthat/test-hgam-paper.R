@@ -157,6 +157,7 @@ test_that("draw() can plot bird_move model 5", {
 
 test_that("draw() can plot zoo_comm_mod model 4", {
     skip_on_cran()
+    skip_on_travis()
     zoo_comm_mod4 <- gam(density_adj ~ s(day, taxon,
                                          bs="fs",
                                          k=10,
