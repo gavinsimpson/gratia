@@ -89,7 +89,7 @@
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='225.36' y='170.93' style='font-size: 8.80px; fill: #4D4D4D; font-family: Liberation Sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text></g>
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='94.88' y='183.88' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='93.56px' lengthAdjust='spacingAndGlyphs'>Gaussian quantiles</text></g>
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text transform='translate(13.05,115.97) rotate(-90)' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='33.62px' lengthAdjust='spacingAndGlyphs'>Effects</text></g>
-<g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='48.80' y='30.25' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='78.26px' lengthAdjust='spacingAndGlyphs'>By: fac; Level: 1</text></g>
+<g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='48.80' y='30.25' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='45.85px' lengthAdjust='spacingAndGlyphs'>By: fac; 1</text></g>
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='48.80' y='14.56' style='font-size: 13.20px; font-family: Liberation Sans;' textLength='30.09px' lengthAdjust='spacingAndGlyphs'>ranef</text></g>
 <defs>
   <clipPath id='cpMjQwfDQ4MHwxOTJ8MA=='>
@@ -178,7 +178,7 @@
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='465.36' y='170.93' style='font-size: 8.80px; fill: #4D4D4D; font-family: Liberation Sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text></g>
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='334.88' y='183.88' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='93.56px' lengthAdjust='spacingAndGlyphs'>Gaussian quantiles</text></g>
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text transform='translate(253.05,115.97) rotate(-90)' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='33.62px' lengthAdjust='spacingAndGlyphs'>Effects</text></g>
-<g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='288.80' y='30.25' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='78.26px' lengthAdjust='spacingAndGlyphs'>By: fac; Level: 2</text></g>
+<g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='288.80' y='30.25' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='45.85px' lengthAdjust='spacingAndGlyphs'>By: fac; 2</text></g>
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='288.80' y='14.56' style='font-size: 13.20px; font-family: Liberation Sans;' textLength='30.09px' lengthAdjust='spacingAndGlyphs'>ranef</text></g>
 <defs>
   <clipPath id='cpNDgwfDcyMHwxOTJ8MA=='>
@@ -257,7 +257,7 @@
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='705.36' y='170.93' style='font-size: 8.80px; fill: #4D4D4D; font-family: Liberation Sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text></g>
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='574.88' y='183.88' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='93.56px' lengthAdjust='spacingAndGlyphs'>Gaussian quantiles</text></g>
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text transform='translate(493.05,115.97) rotate(-90)' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='33.62px' lengthAdjust='spacingAndGlyphs'>Effects</text></g>
-<g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='528.80' y='30.25' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='78.26px' lengthAdjust='spacingAndGlyphs'>By: fac; Level: 3</text></g>
+<g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='528.80' y='30.25' style='font-size: 11.00px; font-family: Liberation Sans;' textLength='45.85px' lengthAdjust='spacingAndGlyphs'>By: fac; 3</text></g>
 <g clip-path='url(#cpMHw3MjB8NTc2fDA=)'><text x='528.80' y='14.56' style='font-size: 13.20px; font-family: Liberation Sans;' textLength='30.09px' lengthAdjust='spacingAndGlyphs'>ranef</text></g>
 <defs>
   <clipPath id='cpMHwyNDB8Mzg0fDE5Mg=='>

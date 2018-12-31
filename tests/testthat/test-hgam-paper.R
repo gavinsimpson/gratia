@@ -13,9 +13,21 @@ context("test-hgam-paper-models")
 
 ## data load and prep
 data(CO2, package = "datasets")
-CO2 <- transform(CO2, Plant_uo = factor(Plant, ordered=FALSE))
+CO2 <- transform(CO2, Plant_uo = factor(Plant, ordered = FALSE))
 data(bird_move, package = "gratia")
 ctrl <- gam.control(nthreads = 2)
+data(zooplankton, package = "gratia")
+zooplankton <- transform(zooplankton, year_f = factor(year))
+
+## the first training and testing data set will be used to compare dynamics of
+## plankton communities in Lake Mendota
+zoo_train <- subset(zooplankton, year%%2==0 & lake=="Mendota")
+zoo_test  <- subset(zooplankton, year%%2==1 & lake=="Mendota")
+
+## The second training and testing set will compare Daphnia mendotae dynamics
+## among four lakes
+daphnia_train <- subset(zooplankton, year%%2==0 & taxon=="D. mendotae")
+daphnia_test  <- subset(zooplankton, year%%2==1 & taxon=="D. mendotae")
 
 ## tests
 ## CO2
@@ -141,4 +153,35 @@ test_that("draw() can plot bird_move model 5", {
                      control = ctrl)
     plt <- draw(bird_mod5)
     expect_doppelganger("hgam-paper-bird-move-model-5", plt)
+})
+
+test_that("draw() can plot zoo_comm_mod model 4", {
+    skip_on_cran()
+    zoo_comm_mod4 <- gam(density_adj ~ s(day, taxon,
+                                         bs="fs",
+                                         k=10,
+                                         xt=list(bs="cc"))+
+                             s(taxon, year_f, bs="re"),
+                         data=zoo_train,
+                         knots = list(day =c(0, 365)),
+                         family = Gamma(link ="log"),
+                         method = "REML",
+                         drop.unused.levels = FALSE)
+    plt <- draw(zoo_comm_mod4)
+    expect_doppelganger("hgam-paper-zoop-model-4", plt)
+})
+
+test_that("draw() can plot zoo_comm_mod model 5", {
+    skip_on_cran()
+    zoo_comm_mod5 <- gam(density_adj ~ s(day, by=taxon,
+                                     k=10, bs="cc") +
+                                   s(taxon, bs="re") +
+                                   s(taxon, year_f, bs="re"),
+                     data=zoo_train,
+                     knots = list(day =c(0, 365)),
+                     family = Gamma(link ="log"),
+                     method = "REML",
+                     drop.unused.levels = FALSE)
+    plt <- draw(zoo_comm_mod5)
+    expect_doppelganger("hgam-paper-zoop-model-5", plt)
 })
