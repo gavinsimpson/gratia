@@ -1,5 +1,5 @@
 
-R version 3.5.1 Patched (2018-08-31 r75235) -- "Feather Spray"
+R version 3.5.2 Patched (2018-12-26 r75912) -- "Eggshell Igloo"
 Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -133,12 +133,12 @@ Gu & Wahba 4 term additive model
 # A tibble: 6 x 8
   smooth by_variable       x1   est    se  crit lower upper
   <chr>  <fct>          <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-1 s(x1)  <NA>        0.000663  5.89 0.313  1.96  5.27  6.50
-2 s(x1)  <NA>        0.00568   5.90 0.305  1.96  5.30  6.49
-3 s(x1)  <NA>        0.0107    5.90 0.296  1.96  5.32  6.48
-4 s(x1)  <NA>        0.0157    5.91 0.287  1.96  5.35  6.47
-5 s(x1)  <NA>        0.0207    5.92 0.279  1.96  5.37  6.46
-6 s(x1)  <NA>        0.0258    5.92 0.271  1.96  5.39  6.46
+1 s(x1)  <NA>        0.000663  5.89 0.329  1.96  5.24  6.53
+2 s(x1)  <NA>        0.00568   5.90 0.320  1.96  5.27  6.52
+3 s(x1)  <NA>        0.0107    5.90 0.312  1.96  5.29  6.51
+4 s(x1)  <NA>        0.0157    5.91 0.304  1.96  5.31  6.51
+5 s(x1)  <NA>        0.0207    5.92 0.296  1.96  5.34  6.50
+6 s(x1)  <NA>        0.0258    5.92 0.288  1.96  5.36  6.49
 > ##'
 > ## simultaneous interval for smooth term of x1
 > set.seed(42)
@@ -147,12 +147,12 @@ Gu & Wahba 4 term additive model
 # A tibble: 6 x 8
   smooth by_variable       x1   est    se  crit lower upper
   <chr>  <fct>          <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-1 s(x1)  <NA>        0.000663  5.89 0.313  2.60  5.07  6.70
-2 s(x1)  <NA>        0.00568   5.90 0.305  2.60  5.10  6.69
-3 s(x1)  <NA>        0.0107    5.90 0.296  2.60  5.13  6.67
-4 s(x1)  <NA>        0.0157    5.91 0.287  2.60  5.16  6.66
-5 s(x1)  <NA>        0.0207    5.92 0.279  2.60  5.19  6.64
-6 s(x1)  <NA>        0.0258    5.92 0.271  2.60  5.22  6.63
+1 s(x1)  <NA>        0.000663  5.89 0.329  2.26  5.15  6.63
+2 s(x1)  <NA>        0.00568   5.90 0.320  2.26  5.17  6.62
+3 s(x1)  <NA>        0.0107    5.90 0.312  2.26  5.20  6.61
+4 s(x1)  <NA>        0.0157    5.91 0.304  2.26  5.22  6.60
+5 s(x1)  <NA>        0.0207    5.92 0.296  2.26  5.25  6.59
+6 s(x1)  <NA>        0.0258    5.92 0.288  2.26  5.27  6.58
 > 
 > 
 > 
@@ -344,7 +344,7 @@ Gu & Wahba 4 term additive model
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
-> dat <- gamSim(2, n = 4000, dist = "normal", scale = 1)
+> dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
 Bivariate smoothing example
 > m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
 > 
@@ -411,12 +411,12 @@ Gu & Wahba 4 term additive model
 # A tibble: 6 x 5
   smooth by_variable       x1   est    se
   <chr>  <fct>          <dbl> <dbl> <dbl>
-1 s(x1)  <NA>        0.000663 -1.94 0.313
-2 s(x1)  <NA>        0.0108   -1.93 0.296
-3 s(x1)  <NA>        0.0208   -1.92 0.279
-4 s(x1)  <NA>        0.0309   -1.90 0.263
-5 s(x1)  <NA>        0.0410   -1.89 0.248
-6 s(x1)  <NA>        0.0511   -1.87 0.235
+1 s(x1)  <NA>        0.000663 -1.94 0.329
+2 s(x1)  <NA>        0.0108   -1.93 0.312
+3 s(x1)  <NA>        0.0208   -1.92 0.296
+4 s(x1)  <NA>        0.0309   -1.90 0.281
+5 s(x1)  <NA>        0.0410   -1.89 0.267
+6 s(x1)  <NA>        0.0511   -1.87 0.255
 > 
 > ## 2d example
 > set.seed(2)
@@ -428,12 +428,12 @@ Bivariate smoothing example
 # A tibble: 6 x 6
   smooth by_variable         x         z   est    se
   <chr>  <fct>           <dbl>     <dbl> <dbl> <dbl>
-1 s(x,z) <NA>        0.0000230 0.0000432 0.123 0.115
-2 s(x,z) <NA>        0.0101    0.0000432 0.122 0.112
-3 s(x,z) <NA>        0.0202    0.0000432 0.121 0.110
-4 s(x,z) <NA>        0.0303    0.0000432 0.120 0.107
-5 s(x,z) <NA>        0.0404    0.0000432 0.119 0.105
-6 s(x,z) <NA>        0.0505    0.0000432 0.117 0.102
+1 s(x,z) <NA>        0.0000230 0.0000432 0.123 0.116
+2 s(x,z) <NA>        0.0101    0.0000432 0.122 0.114
+3 s(x,z) <NA>        0.0202    0.0000432 0.121 0.111
+4 s(x,z) <NA>        0.0303    0.0000432 0.120 0.109
+5 s(x,z) <NA>        0.0404    0.0000432 0.119 0.106
+6 s(x,z) <NA>        0.0505    0.0000432 0.117 0.104
 > 
 > 
 > 
@@ -573,6 +573,10 @@ Gu & Wahba 4 term additive model
 > ## Q-Q plot; default using direct randomization of uniform quantiles
 > qq_plot(m)
 > 
+> ## Alternatively use simulate new data from the model, which
+> ## allows construction of reference intervals for the Q-Q plot
+> qq_plot(m, method = "simulate")
+> 
 > ## ... or use the usual normality assumption
 > qq_plot(m, method = "normal")
 > 
@@ -646,7 +650,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  21.06 0.148 21.264 0 0 
+Time elapsed:  19.458 0.115 19.678 0 0 
 > grDevices::dev.off()
 null device 
           1 
