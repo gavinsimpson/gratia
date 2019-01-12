@@ -32,7 +32,19 @@
 
 <meta property="og:title" content="Simulated bird migration data — bird_move" />
 
-<meta property="og:description" content="Simulated bird migration data" />
+<meta property="og:description" content="Data generated from a hypothetical study of bird movement along a migration
+corridor, sampled throughout the year. This dataset consists of simulated
+sample records of numbers of observed locations of 100 tagged individuals
+each from six species of bird, at ten locations along a latitudinal gradient,
+with one observation taken every four weeks. Counts were simulated randomly
+for each species in each location and week by creating a species-specific
+migration curve that gave the probability of finding an individual of a
+given species in a given location, then simulated the distribution of
+individuals across sites using a multinomial distribution, and subsampling
+that using a binomial distribution to simulation observation error (i.e.
+not every bird present at a location would be detected). The data set
+(bird_move) consists of the variables count, latitude, week and
+species." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -63,7 +75,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.92</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.93</span>
       </span>
     </div>
 
@@ -101,7 +113,19 @@
 
     <div class="ref-description">
     
-    <p>Simulated bird migration data</p>
+    <p>Data generated from a hypothetical study of bird movement along a migration
+corridor, sampled throughout the year. This dataset consists of simulated
+sample records of numbers of observed locations of 100 tagged individuals
+each from six species of bird, at ten locations along a latitudinal gradient,
+with one observation taken every four weeks. Counts were simulated randomly
+for each species in each location and week by creating a species-specific
+migration curve that gave the probability of finding an individual of a
+given species in a given location, then simulated the distribution of
+individuals across sites using a multinomial distribution, and subsampling
+that using a binomial distribution to simulation observation error (i.e.
+not every bird present at a location would be detected). The data set
+(<code>bird_move</code>) consists of the variables <code>count</code>, <code>latitude</code>, <code>week</code> and
+<code>species</code>.</p>
     
     </div>
 
@@ -110,6 +134,12 @@
 
     <p>A data frame</p>
     
+    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
+
+    <p>Pedersen EJ, Miller DL, Simpson GL, Ross N. 2018. Hierarchical
+generalized additive models: an introduction with mgcv. <em>PeerJ Preprints</em>
+<strong>6</strong>:e27320v1 <a href='https://doi.org/10.7287/peerj.preprints.27320v1'>doi: 10.7287/peerj.preprints.27320v1</a>.</p>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -117,6 +147,8 @@
     <ul class="nav nav-pills nav-stacked">
       
       <li><a href="#format">Format</a></li>
+
+      <li><a href="#source">Source</a></li>
           </ul>
 
   </div>
