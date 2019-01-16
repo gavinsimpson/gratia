@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot of residuals versus linear predictor values — residuals_linpred_plot • gratia</title>
+<title>Create a sequence of evenly-spaced values adjusted to accommodate a
+small adjustment — seq_min_max_eps • gratia</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +31,16 @@
 
 
 
-<meta property="og:title" content="Plot of residuals versus linear predictor values — residuals_linpred_plot" />
+<meta property="og:title" content="Create a sequence of evenly-spaced values adjusted to accommodate a
+small adjustment — seq_min_max_eps" />
 
-<meta property="og:description" content="Plot of residuals versus linear predictor values" />
+<meta property="og:description" content="Creates a sequence of n evenly-spaced values over the range
+min(x) -- max(x), where the minimum and maximum are adjusted such that
+they are always contained within the range of x when x may be shifted
+forwards or backwards by an amount related to eps. This is particularly
+useful in computing derivatives via finite differences where without this
+adjustment we may be predicting for values outside the range of the data
+and hence the conmstraints of the penalty." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -94,59 +102,57 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot of residuals versus linear predictor values</h1>
+    <h1>Create a sequence of evenly-spaced values adjusted to accommodate a
+small adjustment</h1>
     
-    <div class="hidden name"><code>residuals_linpred_plot.Rd</code></div>
+    <div class="hidden name"><code>seq_min_max_eps.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Plot of residuals versus linear predictor values</p>
+    <p>Creates a sequence of <code>n</code> evenly-spaced values over the range
+<code><a href='https://www.rdocumentation.org/packages/base/topics/Extremes'>min(x)</a></code> -- <code><a href='https://www.rdocumentation.org/packages/base/topics/Extremes'>max(x)</a></code>, where the minimum and maximum are adjusted such that
+they are always contained within the range of <code>x</code> when <code>x</code> may be shifted
+forwards or backwards by an amount related to <code>eps</code>. This is particularly
+useful in computing derivatives via finite differences where without this
+adjustment we may be predicting for values outside the range of the data
+and hence the conmstraints of the penalty.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>residuals_linpred_plot</span>(<span class='no'>model</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"deviance"</span>, <span class='st'>"pearson"</span>,
-  <span class='st'>"response"</span>), <span class='kw'>ylab</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>xlab</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>seq_min_max_eps</span>(<span class='no'>x</span>, <span class='no'>n</span>, <span class='no'>order</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"forward"</span>, <span class='st'>"backward"</span>, <span class='st'>"central"</span>),
+  <span class='no'>eps</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>model</th>
-      <td><p>a fitted model. Currently only class <code>"gam"</code>.</p></td>
+      <th>x</th>
+      <td><p>numeric; vector over which evenly-spaced values are returned</p></td>
+    </tr>
+    <tr>
+      <th>n</th>
+      <td><p>numeric; the number of evenly-spaced values to return</p></td>
+    </tr>
+    <tr>
+      <th>order</th>
+      <td><p>integer; the order of derivative. Either <code>1</code> or <code>2</code> for first or
+second order derivatives</p></td>
     </tr>
     <tr>
       <th>type</th>
-      <td><p>character; type of residuals to use. Only <code>"deviance"</code>,
-<code>"response"</code>, and <code>"pearson"</code> residuals are allowed.</p></td>
+      <td><p>character; the type of finite difference used. One of
+<code>"forward"</code>, <code>"backward"</code>, or <code>"central"</code></p></td>
     </tr>
     <tr>
-      <th>ylab</th>
-      <td><p>character or expression; the label for the y axis. If not
-supplied, a suitable label will be generated.</p></td>
-    </tr>
-    <tr>
-      <th>xlab</th>
-      <td><p>character or expression; the label for the y axis. If not
-supplied, a suitable label will be generated.</p></td>
-    </tr>
-    <tr>
-      <th>title</th>
-      <td><p>character or expression; the title for the plot. See
-<code><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggplot2::labs()</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>subtitle</th>
-      <td><p>character or expression; the subtitle for the plot. See
-<code><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggplot2::labs()</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>caption</th>
-      <td><p>character or expression; the plot caption. See
-<code><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggplot2::labs()</a></code>.</p></td>
+      <th>eps</th>
+      <td><p>numeric; the finite difference</p></td>
     </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A numeric vector of length <code>n</code>.</p>
     
 
   </div>
@@ -154,7 +160,9 @@ supplied, a suitable label will be generated.</p></td>
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-                </ul>
+      
+      <li><a href="#value">Value</a></li>
+          </ul>
 
   </div>
 </div>

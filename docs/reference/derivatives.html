@@ -63,7 +63,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.93</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.99</span>
       </span>
     </div>
 
@@ -197,8 +197,8 @@ covariance matrix?</p></td>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='st'>"mgcv"</span>)</div><div class='input'><span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/mgcv/topics/gamSim'>gamSim</a></span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 <span class='no'>mod</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/mgcv/topics/gam'>gam</a></span>(<span class='no'>y</span> ~ <span class='fu'><a href='https://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x0</span>) + <span class='fu'><a href='https://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x1</span>) + <span class='fu'><a href='https://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x2</span>) + <span class='fu'><a href='https://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x3</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
 
-<span class='co'>## first derivative of all smooths</span>
-<span class='fu'>derivatives</span>(<span class='no'>mod</span>)</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 800 x 8</span><span>
+<span class='co'>## first derivative of all smooths using central finite differenc</span>
+<span class='fu'>derivatives</span>(<span class='no'>mod</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"central"</span>)</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 800 x 8</span><span>
 #&gt;    smooth var       data derivative    se  crit lower upper
 #&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #BCBCBC;'> 1</span><span> s(x0)  x0    0.000</span><span style='text-decoration: underline;'>239</span><span>       7.41  3.33  1.96 0.874  13.9
@@ -211,22 +211,7 @@ covariance matrix?</p></td>
 #&gt; </span><span style='color: #BCBCBC;'> 8</span><span> s(x0)  x0    0.035</span><span style='text-decoration: underline;'>3</span><span>         7.34  3.20  1.96 1.07   13.6
 #&gt; </span><span style='color: #BCBCBC;'> 9</span><span> s(x0)  x0    0.040</span><span style='text-decoration: underline;'>3</span><span>         7.32  3.15  1.96 1.14   13.5
 #&gt; </span><span style='color: #BCBCBC;'>10</span><span> s(x0)  x0    0.045</span><span style='text-decoration: underline;'>3</span><span>         7.29  3.10  1.96 1.21   13.4
-#&gt; </span><span style='color: #949494;'># ... with 790 more rows</span><span></div><div class='input'>
-<span class='co'>## second derivative of smooth of x2 only using central finite difference</span>
-<span class='fu'>derivatives</span>(<span class='no'>mod</span>, <span class='st'>"s(x2)"</span>, <span class='kw'>order</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"central"</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 200 x 8</span><span>
-#&gt;    smooth var      data derivative    se  crit  lower upper
-#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> s(x2)  x2    0.003</span><span style='text-decoration: underline;'>59</span><span>      -</span><span style='color: #BB0000;'>9.06</span><span> 12.0   1.96 -</span><span style='color: #BB0000;'>32.5</span><span>   14.4
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> s(x2)  x2    0.008</span><span style='text-decoration: underline;'>60</span><span>      20.1  12.8   1.96  -</span><span style='color: #BB0000;'>5.05</span><span>  45.2
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> s(x2)  x2    0.013</span><span style='text-decoration: underline;'>6</span><span>       -</span><span style='color: #BB0000;'>1.64</span><span>  6.94  1.96 -</span><span style='color: #BB0000;'>15.2</span><span>   12.0
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> s(x2)  x2    0.018</span><span style='text-decoration: underline;'>6</span><span>       19.5  18.6   1.96 -</span><span style='color: #BB0000;'>17.0</span><span>   55.9
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> s(x2)  x2    0.023</span><span style='text-decoration: underline;'>6</span><span>       21.7  29.9   1.96 -</span><span style='color: #BB0000;'>36.9</span><span>   80.2
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> s(x2)  x2    0.028</span><span style='text-decoration: underline;'>6</span><span>       34.8  36.2   1.96 -</span><span style='color: #BB0000;'>36.1</span><span>  106. 
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> s(x2)  x2    0.033</span><span style='text-decoration: underline;'>6</span><span>       66.7  54.7   1.96 -</span><span style='color: #BB0000;'>40.4</span><span>  174. 
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> s(x2)  x2    0.038</span><span style='text-decoration: underline;'>6</span><span>       66.1  66.1   1.96 -</span><span style='color: #BB0000;'>63.4</span><span>  196. 
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> s(x2)  x2    0.043</span><span style='text-decoration: underline;'>6</span><span>       90.1  80.3   1.96 -</span><span style='color: #BB0000;'>67.3</span><span>  247. 
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> s(x2)  x2    0.048</span><span style='text-decoration: underline;'>6</span><span>       83.2  86.5   1.96 -</span><span style='color: #BB0000;'>86.4</span><span>  253. 
-#&gt; </span><span style='color: #949494;'># ... with 190 more rows</span><span></div></span></pre>
+#&gt; </span><span style='color: #949494;'># ... with 790 more rows</span><span></div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
