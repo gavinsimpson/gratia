@@ -28,7 +28,10 @@
 ##'
 ##' @examples
 ##' library("mgcv")
+##' \dontshow{
 ##' set.seed(2)
+##' op <- options(digits = 5)
+##' }
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 ##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
@@ -43,6 +46,7 @@
 ##' set.seed(42)
 ##' x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
 ##' head(x1.sint)
+##' \dontshow{options(op)}
 `confint.fderiv` <- function(object, parm, level = 0.95,
                              type = c("confidence", "simultaneous"), nsim = 10000, ...) {
     ## Process arguments

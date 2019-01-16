@@ -68,11 +68,8 @@ library("mgcv")
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
-## first derivative of all smooths
-derivatives(mod)
-
-## second derivative of smooth of x2 only using central finite difference
-derivatives(mod, "s(x2)", order = 2, type = "central")
+## first derivative of all smooths using central finite differenc
+derivatives(mod, type = "central")
 }
 \author{
 Gavin L. Simpson

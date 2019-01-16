@@ -536,6 +536,55 @@
         length.out = n)
 }
 
+##' @title Create a sequence of evenly-spaced values adjusted to accommodate a
+##'   small adjustment
+##'
+##' @description Creates a sequence of `n` evenly-spaced values over the range
+##'   `min(x)` -- `max(x)`, where the minimum and maximum are adjusted such that
+##'   they are always contained within the range of `x` when `x` may be shifted
+##'   forwards or backwards by an amount related to `eps`. This is particularly
+##'   useful in computing derivatives via finite differences where without this
+##'   adjustment we may be predicting for values outside the range of the data
+##'   and hence the conmstraints of the penalty.
+##'
+##' @param x numeric; vector over which evenly-spaced values are returned
+##' @param n numeric; the number of evenly-spaced values to return
+##' @param eps numeric; the finite difference
+##' @param order integer; the order of derivative. Either `1` or `2` for first or
+##'   second order derivatives
+##' @param type character; the type of finite difference used. One of
+##'   `"forward"`, `"backward"`, or `"central"`
+##'
+##' @return A numeric vector of length `n`.
+`seq_min_max_eps` <- function(x, n, order,
+                              type = c("forward", "backward", "central"), eps) {
+    minx <- min(x, na.rm = TRUE)
+    maxx <- max(x, na.rm = TRUE)
+    heps <- eps / 2
+    deps <- eps * 2
+    type <- match.arg(type)
+    if (isTRUE(all.equal(order, 1L))) {
+        minx <- switch(type,
+                       forward  = minx,
+                       backward = minx + eps,
+                       central  = minx + heps)
+        maxx <- switch(type,
+                       forward  = maxx - eps,
+                       backward = maxx,
+                       central  = maxx - heps)
+    } else {
+        minx <- switch(type,
+                       forward  = minx,
+                       backward = minx + deps,
+                       central  = minx + eps)
+        maxx <- switch(type,
+                       forward  = maxx - deps,
+                       backward = maxx,
+                       central  = maxx - eps)
+    }
+    seq(from = minx, to = maxx, length.out = n)
+}
+
 ##' Vectorized version of `data.class`
 ##'
 ##' @param df a data frame or tibble.##'
