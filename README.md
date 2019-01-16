@@ -7,7 +7,7 @@
 
 ## Overview
 
-Graceful ggplot-based graphics and utility functions for working with GAMs fitted using the mgcv package.
+Graceful 'ggplot'-based graphics and utility functions for working with generalized additive models (GAMs) fitted using the 'mgcv' package. Provides a reimplementation of the `plot()` method for GAMs that 'mgcv' provides, as well as 'tidyverse' compatible representations of estimated smooths.
 
 ## Features
 
