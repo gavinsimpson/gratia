@@ -1,5 +1,5 @@
 
-R version 3.5.2 Patched (2018-12-26 r75912) -- "Eggshell Igloo"
+R version 3.5.1 Patched (2018-11-17 r75624) -- "Feather Spray"
 Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -71,7 +71,10 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > library("mgcv")
 Loading required package: nlme
 This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+> ## Don't show: 
 > set.seed(2)
+> op <- options(digits = 5)
+> ## End(Don't show)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
@@ -82,25 +85,28 @@ Gu & Wahba 4 term additive model
 > ## point-wise interval
 > ci <- confint(fd, type = "confidence")
 > head(ci)
-   term      lower      est    upper
-1 s(x0) -0.8496033 4.112256 9.074116
-2 s(x0) -0.8489453 4.112287 9.073519
-3 s(x0) -0.8448850 4.112468 9.069821
-4 s(x0) -0.8329611 4.112988 9.058936
-5 s(x0) -0.8108549 4.113933 9.038721
-6 s(x0) -0.7769722 4.115360 9.007693
+   term    lower    est  upper
+1 s(x0) -0.84960 4.1123 9.0741
+2 s(x0) -0.84895 4.1123 9.0735
+3 s(x0) -0.84489 4.1125 9.0698
+4 s(x0) -0.83296 4.1130 9.0589
+5 s(x0) -0.81085 4.1139 9.0387
+6 s(x0) -0.77697 4.1154 9.0077
 > 
 > ## simultaneous interval for smooth term of x1
 > set.seed(42)
 > x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
 > head(x1.sint)
-   term     lower      est    upper
-1 s(x1) -5.383827 1.423165 8.230157
-2 s(x1) -5.382662 1.423211 8.229084
-3 s(x1) -5.377287 1.423425 8.224137
-4 s(x1) -5.366493 1.423860 8.214213
-5 s(x1) -5.348794 1.424591 8.197975
-6 s(x1) -5.322803 1.425697 8.174198
+   term   lower    est  upper
+1 s(x1) -5.3838 1.4232 8.2302
+2 s(x1) -5.3827 1.4232 8.2291
+3 s(x1) -5.3773 1.4234 8.2241
+4 s(x1) -5.3665 1.4239 8.2142
+5 s(x1) -5.3488 1.4246 8.1980
+6 s(x1) -5.3228 1.4257 8.1742
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > 
 > 
 > 
@@ -243,8 +249,8 @@ This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
-> ## first derivative of all smooths
-> derivatives(mod)
+> ## first derivative of all smooths using central finite differenc
+> derivatives(mod, type = "central")
 # A tibble: 800 x 8
    smooth var       data derivative    se  crit lower upper
    <chr>  <chr>    <dbl>      <dbl> <dbl> <dbl> <dbl> <dbl>
@@ -259,23 +265,6 @@ This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
  9 s(x0)  x0    0.0403         7.32  3.15  1.96 1.14   13.5
 10 s(x0)  x0    0.0453         7.29  3.10  1.96 1.21   13.4
 # ... with 790 more rows
-> 
-> ## second derivative of smooth of x2 only using central finite difference
-> derivatives(mod, "s(x2)", order = 2, type = "central")
-# A tibble: 200 x 8
-   smooth var      data derivative    se  crit  lower upper
-   <chr>  <chr>   <dbl>      <dbl> <dbl> <dbl>  <dbl> <dbl>
- 1 s(x2)  x2    0.00359      -9.06 12.0   1.96 -32.5   14.4
- 2 s(x2)  x2    0.00860      20.1  12.8   1.96  -5.05  45.2
- 3 s(x2)  x2    0.0136       -1.64  6.94  1.96 -15.2   12.0
- 4 s(x2)  x2    0.0186       19.5  18.6   1.96 -17.0   55.9
- 5 s(x2)  x2    0.0236       21.7  29.9   1.96 -36.9   80.2
- 6 s(x2)  x2    0.0286       34.8  36.2   1.96 -36.1  106. 
- 7 s(x2)  x2    0.0336       66.7  54.7   1.96 -40.4  174. 
- 8 s(x2)  x2    0.0386       66.1  66.1   1.96 -63.4  196. 
- 9 s(x2)  x2    0.0436       90.1  80.3   1.96 -67.3  247. 
-10 s(x2)  x2    0.0486       83.2  86.5   1.96 -86.4  253. 
-# ... with 190 more rows
 > 
 > 
 > 
@@ -455,7 +444,9 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > library("mgcv")
 Loading required package: nlme
 This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+> ## Don't show: 
 > set.seed(2)
+> ## End(Don't show)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
@@ -650,7 +641,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  19.067 0.13 19.262 0 0 
+Time elapsed:  27.232 0.267 27.677 0 0 
 > grDevices::dev.off()
 null device 
           1 
