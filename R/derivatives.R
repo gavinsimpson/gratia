@@ -60,12 +60,9 @@
 ##' \dontshow{set.seed(42)}
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 ##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-##'
-##' ## first derivative of all smooths
-##' derivatives(mod)
-##'
-##' ## second derivative of smooth of x2 only using central finite difference
-##' derivatives(mod, "s(x2)", order = 2, type = "central")
+##' 
+##' ## first derivative of all smooths using central finite differenc
+##' derivatives(mod, type = "central")
 `derivatives.gam` <- function(object, term, newdata, order = 1L,
                               type = c("forward", "backward", "central"),
                               n = 200, eps = 1e-7,
@@ -80,18 +77,20 @@
         seq_len(n_smooths(object))
     }
 
-    ## handle newdata
-    if (missing(newdata)) {
-        newdata <- prediction_data(object, n = n, offset = offset)
-    }
+    ## handle type
+    type <- match.arg(type)
 
     ## handle order
     if (!order %in% c(1L, 2L)) {
         stop("Only 1st or 2nd derivatives are supported: `order %in% c(1,2)`")
     }
 
-    ## handle type
-    type <- match.arg(type)
+    ## handle newdata
+    if (missing(newdata)) {
+        ## newdata <- prediction_data(object, n = n, offset = offset, eps = eps)
+        newdata <- derivative_data(object, n = n, offset = offset,
+                                   order = order, type = type, eps = eps)
+    }
 
     ## handle interval
     interval <- match.arg(interval)
@@ -352,6 +351,48 @@
     x2 <- predict(model, newdata, type = "lpmatrix")
 
     list(xf = x0, xb = x1, x = x2)
+}
+
+##' @importFrom dplyr bind_cols
+##' @importFrom tibble as_tibble
+`derivative_data` <- function(model, n, offset = NULL,
+                              order = NULL, type = NULL, eps = NULL) {
+    mf <- model.frame(model)           # model.frame used to fit model
+
+    ## remove response
+    respvar <- attr(model$terms, "response")
+    if (!identical(respvar, 0)) {
+        mf <- mf[, -respvar, drop = FALSE]
+    }
+
+    ## remove offset() var; model.frame returns both `offset(foo(var))` and `var`,
+    ## so we can just remove the former, but we also want to set the offset
+    ## variable `var` to something constant. FIXME
+    if (is.null(offset)) {
+        offset <- 1L
+    }
+    mf <- fix_offset(model, mf, offset_val = offset)
+    ff <- vapply(mf, is.factor, logical(1L)) # which, if any, are factors vars
+    m.terms <- names(mf)        # list of model terms (variable names)
+
+    if (any(ff)) {
+        ## need to supply something for each factor
+        f.mf <- as_tibble(lapply(mf[, ff, drop = FALSE], rep_first_factor_value, n = n))
+        mf <- mf[, !ff, drop = FALSE] # remove factors from model frame
+    }
+
+    ## generate newdata at `n` locations
+    newdata <- as_tibble(vapply(mf, seq_min_max_eps, numeric(n), n = n,
+                                order = order, type = type, eps = eps))
+
+    ## if there were any factors, add back the factor columns
+    if (any(ff)) {
+        newdata <- bind_cols(newdata, f.mf)
+    }
+    names(newdata) <- c(m.terms[!ff], m.terms[ff])
+
+    newdata <- newdata[, m.terms, drop = FALSE] # re-arrange
+    newdata
 }
 
 ##' @importFrom dplyr bind_cols
