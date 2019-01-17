@@ -1,5 +1,5 @@
 
-R version 3.5.2 Patched (2018-12-26 r75912) -- "Eggshell Igloo"
+R version 3.5.1 Patched (2018-11-17 r75624) -- "Feather Spray"
 Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -395,38 +395,54 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > library("mgcv")
 Loading required package: nlme
 This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+> ## Don't show: 
 > set.seed(2)
+> op <- options(cli.unicode = FALSE, digits = 6)
+> ## End(Don't show)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
-> head(evaluate_smooth(m1, "s(x1)"))
-# A tibble: 6 x 5
-  smooth by_variable       x1   est    se
-  <chr>  <fct>          <dbl> <dbl> <dbl>
-1 s(x1)  <NA>        0.000663 -1.94 0.329
-2 s(x1)  <NA>        0.0108   -1.93 0.312
-3 s(x1)  <NA>        0.0208   -1.92 0.296
-4 s(x1)  <NA>        0.0309   -1.90 0.281
-5 s(x1)  <NA>        0.0410   -1.89 0.267
-6 s(x1)  <NA>        0.0511   -1.87 0.255
+> evaluate_smooth(m1, "s(x1)")
+# A tibble: 100 x 5
+   smooth by_variable       x1   est    se
+   <chr>  <fct>          <dbl> <dbl> <dbl>
+ 1 s(x1)  <NA>        0.000663 -1.94 0.329
+ 2 s(x1)  <NA>        0.0108   -1.93 0.312
+ 3 s(x1)  <NA>        0.0208   -1.92 0.296
+ 4 s(x1)  <NA>        0.0309   -1.90 0.281
+ 5 s(x1)  <NA>        0.0410   -1.89 0.267
+ 6 s(x1)  <NA>        0.0511   -1.87 0.255
+ 7 s(x1)  <NA>        0.0612   -1.86 0.243
+ 8 s(x1)  <NA>        0.0713   -1.84 0.234
+ 9 s(x1)  <NA>        0.0814   -1.83 0.225
+10 s(x1)  <NA>        0.0914   -1.81 0.218
+# ... with 90 more rows
 > 
 > ## 2d example
 > set.seed(2)
-> dat <- gamSim(2, n = 4000, dist = "normal", scale = 1)
+> dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
 Bivariate smoothing example
 > m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
 > 
-> head(evaluate_smooth(m2, "s(x,z)", n = 100))
-# A tibble: 6 x 6
-  smooth by_variable         x         z   est    se
-  <chr>  <fct>           <dbl>     <dbl> <dbl> <dbl>
-1 s(x,z) <NA>        0.0000230 0.0000432 0.123 0.116
-2 s(x,z) <NA>        0.0101    0.0000432 0.122 0.114
-3 s(x,z) <NA>        0.0202    0.0000432 0.121 0.111
-4 s(x,z) <NA>        0.0303    0.0000432 0.120 0.109
-5 s(x,z) <NA>        0.0404    0.0000432 0.119 0.106
-6 s(x,z) <NA>        0.0505    0.0000432 0.117 0.104
+> evaluate_smooth(m2, "s(x,z)", n = 100)
+# A tibble: 10,000 x 6
+   smooth by_variable        x        z    est    se
+   <chr>  <fct>          <dbl>    <dbl>  <dbl> <dbl>
+ 1 s(x,z) <NA>        0.000663 0.000762 0.0881 0.189
+ 2 s(x,z) <NA>        0.0108   0.000762 0.0922 0.186
+ 3 s(x,z) <NA>        0.0208   0.000762 0.0965 0.183
+ 4 s(x,z) <NA>        0.0309   0.000762 0.101  0.180
+ 5 s(x,z) <NA>        0.0410   0.000762 0.105  0.176
+ 6 s(x,z) <NA>        0.0511   0.000762 0.110  0.173
+ 7 s(x,z) <NA>        0.0612   0.000762 0.115  0.170
+ 8 s(x,z) <NA>        0.0713   0.000762 0.120  0.166
+ 9 s(x,z) <NA>        0.0814   0.000762 0.125  0.163
+10 s(x,z) <NA>        0.0914   0.000762 0.130  0.160
+# ... with 9,990 more rows
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > 
 > 
 > 
@@ -645,7 +661,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  18.164 0.133 18.352 0 0 
+Time elapsed:  24.969 0.615 25.82 0 0 
 > grDevices::dev.off()
 null device 
           1 

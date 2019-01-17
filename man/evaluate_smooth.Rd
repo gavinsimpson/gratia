@@ -61,16 +61,20 @@ which the smooth should be evaluated can be supplied.
 }
 \examples{
 library("mgcv")
+\dontshow{
 set.seed(2)
+op <- options(cli.unicode = FALSE, digits = 6)
+}
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
-head(evaluate_smooth(m1, "s(x1)"))
+evaluate_smooth(m1, "s(x1)")
 
 ## 2d example
 set.seed(2)
-dat <- gamSim(2, n = 4000, dist = "normal", scale = 1)
+dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
 m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
 
-head(evaluate_smooth(m2, "s(x,z)", n = 100))
+evaluate_smooth(m2, "s(x,z)", n = 100)
+\dontshow{options(op)}
 }
