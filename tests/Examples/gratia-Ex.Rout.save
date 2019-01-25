@@ -1,6 +1,6 @@
 
-R version 3.5.1 Patched (2018-11-17 r75624) -- "Feather Spray"
-Copyright (C) 2018 The R Foundation for Statistical Computing
+R version 3.5.2 Patched (2019-01-24 r76013) -- "Eggshell Igloo"
+Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -661,7 +661,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  24.969 0.615 25.82 0 0 
+Time elapsed:  24.621 0.261 25.872 0 0 
 > grDevices::dev.off()
 null device 
           1 
