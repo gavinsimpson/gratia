@@ -397,7 +397,7 @@
 ##' @export
 ##'
 ##' @examples
-##' library("mgcv")
+##' suppressPackageStartupMessages(library("mgcv"))
 ##' \dontshow{set.seed(2)}
 ##' df <- gamSim(1, n = 400, dist = "normal")
 ##' m <- gam(y ~ s(x0) + s(x1) + offset(x2), data = df, method = "REML")
@@ -448,7 +448,7 @@
 ##' @export
 ##'
 ##' @examples
-##' library("mgcv")
+##' suppressPackageStartupMessages(library("mgcv"))
 ##' df <- gamSim(1, n = 400, dist = "normal")
 ##' m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = df, method = "REML")
 ##' nm <- names(model.frame(m))

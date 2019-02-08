@@ -51,7 +51,7 @@ the estimated model coefficients and covariance matrix equal to the
 covariance matrix of the coefficients.
 }
 \examples{
-library("mgcv")
+suppressPackageStartupMessages(library("mgcv"))
 \dontshow{set.seed(2)}
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")

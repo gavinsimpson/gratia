@@ -40,7 +40,7 @@ Calculates point-wise confidence or simultaneous intervals for the first
 derivatives of smooth terms in a fitted GAM.
 }
 \examples{
-library("mgcv")
+suppressPackageStartupMessages(library("mgcv"))
 \dontshow{
 set.seed(2)
 op <- options(digits = 5)

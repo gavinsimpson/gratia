@@ -1,6 +1,6 @@
 
-R version 3.5.2 Patched (2019-01-24 r76013) -- "Eggshell Igloo"
-Copyright (C) 2019 The R Foundation for Statistical Computing
+R version 3.5.2 Patched (2018-12-26 r75912) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -38,7 +38,7 @@ Type 'q()' to quit R.
 > 
 > library(mgcv)
 Loading required package: nlme
-This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-27. For overview type 'help("mgcv-package")'.
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -68,9 +68,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> library("mgcv")
-Loading required package: nlme
-This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+> suppressPackageStartupMessages(library("mgcv"))
 > ## Don't show: 
 > set.seed(2)
 > op <- options(digits = 5)
@@ -125,9 +123,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> library("mgcv")
-Loading required package: nlme
-This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+> suppressPackageStartupMessages(library("mgcv"))
 > set.seed(2)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -178,9 +174,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> library("mgcv")
-Loading required package: nlme
-This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+> suppressPackageStartupMessages(library("mgcv"))
 > 
 > ## 1d example
 > set.seed(2)
@@ -240,9 +234,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > ### ** Examples
 > 
 > 
-> library("mgcv")
-Loading required package: nlme
-This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+> suppressPackageStartupMessages(library("mgcv"))
 > ## Don't show: 
 > set.seed(42)
 > op <- options(cli.unicode = FALSE)
@@ -288,9 +280,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > ### ** Examples
 > 
 > 
-> library("mgcv")
-Loading required package: nlme
-This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+> suppressPackageStartupMessages(library("mgcv"))
 > ## Don't show: 
 > set.seed(42)
 > ## End(Don't show)
@@ -320,9 +310,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> library("mgcv")
-Loading required package: nlme
-This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+> suppressPackageStartupMessages(library("mgcv"))
 > 
 > ## Don't show: 
 > set.seed(2)
@@ -361,9 +349,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> library("mgcv")
-Loading required package: nlme
-This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+> suppressPackageStartupMessages(library("mgcv"))
 > 
 > ## Don't show: 
 > set.seed(2)
@@ -392,9 +378,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> library("mgcv")
-Loading required package: nlme
-This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+> suppressPackageStartupMessages(library("mgcv"))
 > ## Don't show: 
 > set.seed(2)
 > op <- options(cli.unicode = FALSE, digits = 6)
@@ -461,9 +445,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> library("mgcv")
-Loading required package: nlme
-This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+> suppressPackageStartupMessages(library("mgcv"))
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -506,9 +488,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> library("mgcv")
-Loading required package: nlme
-This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+> suppressPackageStartupMessages(library("mgcv"))
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -537,9 +517,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> library("mgcv")
-Loading required package: nlme
-This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+> suppressPackageStartupMessages(library("mgcv"))
 > df <- gamSim(1, n = 400, dist = "normal")
 Gu & Wahba 4 term additive model
 > m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = df, method = "REML")
@@ -566,9 +544,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> library("mgcv")
-Loading required package: nlme
-This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+> suppressPackageStartupMessages(library("mgcv"))
 > ## simulate binomial data...
 > set.seed(0)
 > n.samp <- 200
@@ -631,9 +607,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> library("mgcv")
-Loading required package: nlme
-This is mgcv 1.8-26. For overview type 'help("mgcv-package")'.
+> suppressPackageStartupMessages(library("mgcv"))
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -661,7 +635,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  24.621 0.261 25.872 0 0 
+Time elapsed:  15.969 0.114 16.119 0 0 
 > grDevices::dev.off()
 null device 
           1 

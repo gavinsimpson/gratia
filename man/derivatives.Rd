@@ -63,7 +63,7 @@ Derivatives of estimated smooths via finite differences
 }
 \examples{
 
-library("mgcv")
+suppressPackageStartupMessages(library("mgcv"))
 \dontshow{
 set.seed(42)
 op <- options(cli.unicode = FALSE)

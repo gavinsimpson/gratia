@@ -33,7 +33,7 @@
 ##' @export
 ##'
 ##' @examples
-##' library("mgcv")
+##' suppressPackageStartupMessages(library("mgcv"))
 ##' \dontshow{
 ##' set.seed(2)
 ##' op <- options(cli.unicode = FALSE, digits = 6)

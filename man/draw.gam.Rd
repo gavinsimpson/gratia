@@ -63,7 +63,7 @@ Plots estimated smooths from a fitted GAM model in a similar way to
 is used instead.
 }
 \examples{
-library("mgcv")
+suppressPackageStartupMessages(library("mgcv"))
 
 \dontshow{set.seed(2)}
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)

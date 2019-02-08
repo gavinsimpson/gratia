@@ -24,7 +24,7 @@ such that \code{offset(foo(var))} is converted to \code{var}, and possibly sets 
 values of that variable to \code{offset_val}.
 }
 \examples{
-library("mgcv")
+suppressPackageStartupMessages(library("mgcv"))
 \dontshow{set.seed(2)}
 df <- gamSim(1, n = 400, dist = "normal")
 m <- gam(y ~ s(x0) + s(x1) + offset(x2), data = df, method = "REML")
