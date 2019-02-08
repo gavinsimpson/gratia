@@ -44,7 +44,7 @@
 ##' @aliases draw.evaluated_1d_smooth draw.evaluated_2d_smooth
 ##'
 ##' @examples
-##' library("mgcv")
+##' suppressPackageStartupMessages(library("mgcv"))
 ##'
 ##' \dontshow{set.seed(2)}
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
@@ -213,7 +213,7 @@
 ##' @export
 ##'
 ##' @examples
-##' library("mgcv")
+##' suppressPackageStartupMessages(library("mgcv"))
 ##'
 ##' \dontshow{set.seed(2)}
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
@@ -233,10 +233,11 @@
 
     ## select smooths
     select <- check_user_select_smooths(smooths = S, select = select)
-    S <- S[select]
+    ## S <- S[select]
 
     ## can only plot 1 or 2d smooths - get smooth dimensions & prune list `s`
-    d <- smooth_dim(object)[select]
+    ## d <- smooth_dim(object)[select]
+    d <- smooth_dim(object)
     S <- S[d <= 2L]
     d <- d[d <= 2L]
 
@@ -270,6 +271,10 @@
         l[S == i] <- split(eS, eS[["smooth"]])
     }
 
+    ## filter out smooths here using select
+    l <- l[select]
+    d <- d[select]
+    g <- g[select]
     for (i in seq_along(l)) {
         ##l[[i]][["smooth"]] <- droplevels(l[[i]][["smooth"]])
         g[[i]] <- draw(l[[i]])
@@ -289,7 +294,7 @@
         }
         ylims <- range(unlist(lapply(l, wrapper)))
 
-        for (i in seq_along(S)[d == 1L]) { # only the univariate smooths; FIXME: "re" smooths too?
+        for (i in seq_along(g)[d == 1L]) { # only the univariate smooths; FIXME: "re" smooths too?
             g[[i]] <- g[[i]] + lims(y = ylims)
         }
     }
@@ -459,7 +464,7 @@
 ##'
 ##' @examples
 ##'
-##' library("mgcv")
+##' suppressPackageStartupMessages(library("mgcv"))
 ##' \dontshow{set.seed(42)}
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 ##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")

@@ -34,7 +34,7 @@ A data frame of new values spread over the range of the observed values.
 For each smooth in a GAM, generate new data over the range of the variables in volved in a smooth.
 }
 \examples{
-library("mgcv")
+suppressPackageStartupMessages(library("mgcv"))
 
 ## 1d example
 set.seed(2)
