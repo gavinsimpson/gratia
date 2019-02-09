@@ -679,7 +679,9 @@
             if (any(select > lenSmo)) {
                 stop("One or more indices in 'select' > than the number of smooths in the model.")
             }
-            select
+            l <- rep(FALSE, lenSmo)
+            l[select] <- TRUE
+            l
         } else if (is.character(select)) {
             smooths %in% select
         } else if (is.logical(select)) {
