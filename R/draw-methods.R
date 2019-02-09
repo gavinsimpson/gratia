@@ -233,13 +233,14 @@
 
     ## select smooths
     select <- check_user_select_smooths(smooths = S, select = select)
-    ## S <- S[select]
 
     ## can only plot 1 or 2d smooths - get smooth dimensions & prune list `s`
     ## d <- smooth_dim(object)[select]
     d <- smooth_dim(object)
-    S <- S[d <= 2L]
-    d <- d[d <= 2L]
+    take <- d <= 2L
+    select <- select[take]
+    S <- S[take]
+    d <- d[take]
 
     ## FIXME: Exclude "re" smooths from "fixed" scales?
     is_re <- vapply(object[["smooth"]], is_re_smooth, logical(1L))
@@ -262,7 +263,6 @@
     l <- vector("list", length = nsmooth)
     g <- vector("list", length = nsmooth + npara)
 
-
     for (i in unique(S)) {
         eS <- evaluate_smooth(object, smooth = i, n = n,
                               unconditional = unconditional,
@@ -275,8 +275,14 @@
     l <- l[select]
     d <- d[select]
     g <- g[select]
+
+    ## If we can't handle any of the terms in the model, bail
+    if (length(g) == 0L) {
+        message("Unable to draw any of the model terms.")
+        return(invisible(g))
+    }
+
     for (i in seq_along(l)) {
-        ##l[[i]][["smooth"]] <- droplevels(l[[i]][["smooth"]])
         g[[i]] <- draw(l[[i]])
     }
 
@@ -297,12 +303,6 @@
         for (i in seq_along(g)[d == 1L]) { # only the univariate smooths; FIXME: "re" smooths too?
             g[[i]] <- g[[i]] + lims(y = ylims)
         }
-    }
-
-    ## If we can't handle any of the terms in the model, bail
-    if (length(g) == 0L) {
-        message("Unable to draw any of the model terms.")
-        return(invisible(g))
     }
 
     plot_grid(plotlist = g, align = align, axis = axis, ...)
