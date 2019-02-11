@@ -67,7 +67,7 @@
     }
     smooth_ids <- which_smooth(object, smooth) # which smooths match 'smooth'
     if (identical(length(smooth_ids), 0L)) {
-        stop("Request smooth not found in the model <", smooth, ">", call. = FALSE)
+        stop("Requested smooth '", smooth, "' not found", call. = FALSE)
     }
     smooth_labels <- select_smooth(object, smooth)
 
