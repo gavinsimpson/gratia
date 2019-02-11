@@ -26,6 +26,12 @@ test_that("evaluate_smooth throws a message with more than one term", {
                    "Supplied more than 1 'smooth'; using only the first")
 })
 
+test_that("evaluate_smooth throws error if smooth not found", {
+    expect_error(evaluate_smooth(m1, smooth = "s(z)"),
+                 "Requested smooth 's(z)' not found",
+                 fixed = TRUE)
+})
+
 test_that("evaluate_smooth works for a GAMM", {
     sm <- evaluate_smooth(m2, "s(x2)")
     expect_is(sm, "evaluated_1d_smooth")
