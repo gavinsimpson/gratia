@@ -302,10 +302,14 @@
         }
     }
 
-    const <- coef(object)
-    nms <- names(const)
-    test <- grep("Intercept", nms)
-    const <- ifelse(length(test) == 0L, 0, const[test])
+    if (shift) {
+        const <- coef(object)
+        nms <- names(const)
+        test <- grep("Intercept", nms)
+        const <- ifelse(length(test) == 0L, 0, const[test])
+    } else {
+        const <- 0
+    }
 
     ## simplify to a data frame for return
     out <- do.call("bind_rows", out)
