@@ -17,7 +17,7 @@ Imports:
     tidyr,
     cowplot,
     grid,
-    mvtnorm,
+    mvnfast,
     stats,
     tools,
     grDevices

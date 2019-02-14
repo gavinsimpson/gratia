@@ -27,7 +27,6 @@
 ##' @author Gavin L. Simpson
 ##'
 ##' @importFrom stats simulate runif family
-##' @importFrom mvtnorm rmvnorm
 ##' @importFrom mgcv fix.family.rd
 ##'
 ##' @export
@@ -94,7 +93,6 @@
 
 ##' @rdname simulate
 ##'
-##' @importFrom mvtnorm rmvnorm
 ##'
 ##' @export
 `simulate.scam` <- function(object, nsim = 1, seed = NULL, newdata = NULL,
