@@ -298,8 +298,14 @@
                   x[["est"]] - (2 * x[["se"]]))
         }
         ylims <- range(unlist(lapply(l, wrapper)))
+        if (isTRUE(parametric)) {
+            ylims <- range(ylims,
+                           unlist(lapply(p, function(x) range(x[["upper"]],
+                                                              x[["lower"]]))))
+        }
 
-        for (i in seq_along(g)[d == 1L]) { # only the univariate smooths; FIXME: "re" smooths too?
+        gg <- seq_along(g)[c(d==1L, rep(TRUE, npara))]
+        for (i in gg) { # only the univariate smooths; FIXME: "re" smooths too?
             g[[i]] <- g[[i]] + lims(y = ylims)
         }
     }
