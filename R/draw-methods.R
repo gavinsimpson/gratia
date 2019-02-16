@@ -257,11 +257,10 @@
     if (isTRUE(parametric)) {
         terms <- parametric_terms(object)
         npara <- length(terms)
-        p <- vector("list", length = npara)
-    }
+        p <- vector("list", length = npara)    }
 
-    l <- vector("list", length = nsmooth)
-    g <- vector("list", length = nsmooth + npara)
+    g <- l <- vector("list", length = nsmooth)
+    ## g <- vector("list", length = nsmooth + npara)
 
     for (i in unique(S)) {
         eS <- evaluate_smooth(object, smooth = i, n = n,
@@ -289,7 +288,7 @@
     if (isTRUE(parametric)) {
         for (i in seq_along(terms)) {
             p[[i]] <- evaluate_parametric_term(object, term = terms[i])
-            g[[i + nsmooth]] <- draw(p[[i]])
+            g[[i + length(g)]] <- draw(p[[i]])
         }
     }
 
