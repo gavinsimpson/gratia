@@ -65,3 +65,8 @@ test_that("get_by_smooth works", {
                  "Invalid 'level' for smooth 's(x2)'.",
                  fixed = TRUE)
 })
+
+test_that("draw.gam works with select and parametric = TRUE", {
+    vdiffr::expect_doppelganger("draw.gam-user-select-and-parametric-true",
+                                draw(mf, select = 's(x2)fac1', parametric = TRUE))
+})

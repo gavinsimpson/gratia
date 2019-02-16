@@ -257,11 +257,10 @@
     if (isTRUE(parametric)) {
         terms <- parametric_terms(object)
         npara <- length(terms)
-        p <- vector("list", length = npara)
-    }
+        p <- vector("list", length = npara)    }
 
-    l <- vector("list", length = nsmooth)
-    g <- vector("list", length = nsmooth + npara)
+    g <- l <- vector("list", length = nsmooth)
+    ## g <- vector("list", length = nsmooth + npara)
 
     for (i in unique(S)) {
         eS <- evaluate_smooth(object, smooth = i, n = n,
@@ -289,7 +288,7 @@
     if (isTRUE(parametric)) {
         for (i in seq_along(terms)) {
             p[[i]] <- evaluate_parametric_term(object, term = terms[i])
-            g[[i + nsmooth]] <- draw(p[[i]])
+            g[[i + length(g)]] <- draw(p[[i]])
         }
     }
 
@@ -299,8 +298,14 @@
                   x[["est"]] - (2 * x[["se"]]))
         }
         ylims <- range(unlist(lapply(l, wrapper)))
+        if (isTRUE(parametric)) {
+            ylims <- range(ylims,
+                           unlist(lapply(p, function(x) range(x[["upper"]],
+                                                              x[["lower"]]))))
+        }
 
-        for (i in seq_along(g)[d == 1L]) { # only the univariate smooths; FIXME: "re" smooths too?
+        gg <- seq_along(g)[c(d==1L, rep(TRUE, npara))]
+        for (i in gg) { # only the univariate smooths; FIXME: "re" smooths too?
             g[[i]] <- g[[i]] + lims(y = ylims)
         }
     }
