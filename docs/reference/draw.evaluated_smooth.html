@@ -63,7 +63,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.5</span>
       </span>
     </div>
 
@@ -106,8 +106,8 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for evaluated_1d_smooth</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>object</span>, <span class='no'>xlab</span>, <span class='no'>ylab</span>, <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>object</span>, <span class='kw'>rug</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>xlab</span>, <span class='no'>ylab</span>,
+  <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for evaluated_2d_smooth</span>
 <span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>object</span>, <span class='kw'>show</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"estimate"</span>, <span class='st'>"se"</span>),
@@ -119,8 +119,8 @@
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for evaluated_fs_smooth</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>object</span>, <span class='no'>xlab</span>, <span class='no'>ylab</span>, <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>object</span>, <span class='kw'>rug</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>xlab</span>, <span class='no'>ylab</span>,
+  <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>colour_scale</span> <span class='kw'>=</span> <span class='no'>scale_colour_discrete</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for evaluated_parametric_term</span>
@@ -134,6 +134,13 @@
     <tr>
       <th>object</th>
       <td><p>an object, the result of a call to <code><a href='evaluate_smooth.html'>evaluate_smooth()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>rug</th>
+      <td><p>For <code><a href='evaluate_smooth.html'>evaluate_smooth()</a></code>, a numeric vector of values for the
+location of data on the x axis. The default of <code>NULL</code> results in no
+rug plot being drawn. For <code>evaluate_parametric_terms()</code>, a logical to
+indicate if a rug plot should be drawn.</p></td>
     </tr>
     <tr>
       <th>xlab</th>
@@ -182,10 +189,6 @@ theoretical quartiles.</p></td>
     <tr>
       <th>colour_scale</th>
       <td><p>function; an appropriate discrete colour scale from <code>ggplot2</code>.</p></td>
-    </tr>
-    <tr>
-      <th>rug</th>
-      <td><p>logical; draw a rug plot of the data</p></td>
     </tr>
     <tr>
       <th>position</th>
