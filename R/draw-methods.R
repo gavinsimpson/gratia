@@ -20,6 +20,10 @@
 ##' Plots estimated univariate and bivariate smooths using ggplot2.
 ##'
 ##' @param object an object, the result of a call to [evaluate_smooth()].
+##' @param rug For `evaluate_smooth()`, a numeric vector of values for the
+##'   location of data on the x axis. The default of `NULL` results in no
+##'   rug plot being drawn. For `evaluate_parametric_terms()`, a logical to
+##'   indicate if a rug plot should be drawn.
 ##' @param xlab character or expression; the label for the x axis. If not
 ##'   supplied, a suitable label will be generated from `object`.
 ##' @param ylab character or expression; the label for the y axis. If not
@@ -41,7 +45,7 @@
 ##'
 ##' @export
 ##' @name draw.evaluated_smooth
-##' @aliases draw.evaluated_1d_smooth draw.evaluated_2d_smooth
+##' @aliases draw.evaluated_1d_smooth draw.evaluated_2d_smooth geom_rug
 ##'
 ##' @examples
 ##' suppressPackageStartupMessages(library("mgcv"))
@@ -60,6 +64,7 @@
 ##' sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 ##' draw(sm)
 `draw.evaluated_1d_smooth` <- function(object,
+                                       rug = NULL,
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
@@ -70,7 +75,7 @@
     object[["upper"]] <- object[["est"]] + (2 * object[["se"]])
     object[["lower"]] <- object[["est"]] - (2 * object[["se"]])
 
-    plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est)) +
+    plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est, group = ~ smooth)) +
         geom_ribbon(mapping = aes_string(ymin = "lower",
                                          ymax = "upper"),
                     alpha = 0.2) +
@@ -98,6 +103,14 @@
     ## add labelling to plot
     plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
                       caption = caption)
+
+    ## add rug?
+    if (!is.null(rug)) {
+        plt <- plt + geom_rug(data = data.frame(x = rug),
+                              mapping = aes_string(x = 'x'),
+                              inherit.aes = FALSE,
+                              sides = 'b')
+    }
 
     plt
 }
@@ -199,6 +212,7 @@
 ##'   Defaults to `"hv"` so that plots are nicely aligned.
 ##' @param axis characer; see argument `axis` in `cowplot::plot_grid()`.
 ##'   Defaults to `"lrtb"` so that plots are nicely aligned.
+##' @param rug logical; draw a rug plot at the botom of each plot?
 ##' @param ... arguments passed to `cowplot::plot_grid()`. Any arguments to
 ##'   `plot_grid()` may be supplied, except for: `plotlist` and `align`.
 ##'
@@ -227,7 +241,7 @@
                        align = "hv", axis = "lrtb",
                        n = 100, unconditional = FALSE,
                        overall_uncertainty = TRUE,
-                       dist = 0.1, ...) {
+                       dist = 0.1, rug = TRUE, ...) {
     scales <- match.arg(scales)
     S <- smooths(object)                # vector of smooth labels - "s(x)"
 
@@ -281,8 +295,26 @@
         return(invisible(g))
     }
 
+    ## model frame may be needed for rugs
+    mf  <- model.frame(object)
+
     for (i in seq_along(l)) {
-        g[[i]] <- draw(l[[i]])
+        if (isTRUE(rug)) {
+            sname <- unique(l[[i]][["smooth"]])
+            ## could be a by smooth, strip off the by variable bit
+            sname <- strsplit(sname, ":")[[1L]][[1L]]
+            sm <- get_smooth(object, term = sname)
+            if (!is_mgcv_smooth(sm)) {  # could be list (factor by)
+                sm <- sm[[1L]]
+            }
+            svar <- smooth_variable(sm)
+            if (is_fs_smooth(sm)) {
+                svar <- svar[[1L]]
+            }
+            g[[i]] <- draw(l[[i]], rug = mf[[svar]])
+        } else {
+            g[[i]] <- draw(l[[i]])
+        }
     }
 
     if (isTRUE(parametric)) {
@@ -368,10 +400,11 @@
 
 ##' @param colour_scale function; an appropriate discrete colour scale from `ggplot2`.
 ##'
-##' @importFrom ggplot2 geom_line theme scale_colour_discrete
+##' @importFrom ggplot2 geom_line theme scale_colour_discrete geom_rug
 ##' @export
 ##' @rdname draw.evaluated_smooth
 `draw.evaluated_fs_smooth` <- function(object,
+                                       rug = NULL,
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
@@ -409,10 +442,17 @@
     plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
                       caption = caption)
 
+    ## add rug?
+    if (!is.null(rug)) {
+        plt <- plt + geom_rug(data = data.frame(x = rug),
+                              mapping = aes_string(x = 'x'),
+                              inherit.aes = FALSE,
+                              sides = 'b')
+    }
+
     plt
 }
 
-##' @param rug logical; draw a rug plot of the data
 ##' @param position Position adjustment, either as a string, or the result of a
 ##'   call to a position adjustment function.
 ##'
