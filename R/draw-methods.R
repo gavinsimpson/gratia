@@ -218,7 +218,12 @@
 ##'
 ##' @inheritParams evaluate_smooth
 ##'
-##' @return A [ggplot2::ggplot()] object.
+##' @note Internally, plots of each smooth are created using [ggplot2::ggplot()]
+##'   and composed into a single plot using [cowplot::plot_grid()]. As a result,
+##'   it is not possible to use `+` to add to the plots in the way one might
+##'   typically work with `ggplot()` plots.
+##'
+##' @return The object returned is created by [cowplot::plot_grid()].
 ##'
 ##' @author Gavin L. Simpson
 ##'

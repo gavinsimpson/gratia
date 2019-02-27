@@ -57,12 +57,18 @@ and \code{dist} is a distance within the unit square. See
 \code{plot_grid()} may be supplied, except for: \code{plotlist} and \code{align}.}
 }
 \value{
-A \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object.
+The object returned is created by \code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}.
 }
 \description{
 Plots estimated smooths from a fitted GAM model in a similar way to
 \code{mgcv::plot.gam()} but instead of using base graphics, \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}
 is used instead.
+}
+\note{
+Internally, plots of each smooth are created using \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}
+and composed into a single plot using \code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}. As a result,
+it is not possible to use \code{+} to add to the plots in the way one might
+typically work with \code{ggplot()} plots.
 }
 \examples{
 suppressPackageStartupMessages(library("mgcv"))
