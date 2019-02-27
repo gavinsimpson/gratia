@@ -7,7 +7,7 @@
 \method{draw}{gam}(object, parametric = TRUE, select = NULL,
   scales = c("free", "fixed"), align = "hv", axis = "lrtb",
   n = 100, unconditional = FALSE, overall_uncertainty = TRUE,
-  dist = 0.1, ...)
+  dist = 0.1, rug = TRUE, ...)
 }
 \arguments{
 \item{object}{a fitted GAM, the result of a call to \code{\link[mgcv:gam]{mgcv::gam()}}.}
@@ -50,6 +50,8 @@ a location is too far from data to be plotted when plotting 2-D smooths.
 The data are scaled into the unit square before deciding what to exclude,
 and \code{dist} is a distance within the unit square. See
 \code{\link[mgcv:exclude.too.far]{mgcv::exclude.too.far()}} for further details.}
+
+\item{rug}{logical; draw a rug plot at the botom of each plot?}
 
 \item{...}{arguments passed to \code{cowplot::plot_grid()}. Any arguments to
 \code{plot_grid()} may be supplied, except for: \code{plotlist} and \code{align}.}
