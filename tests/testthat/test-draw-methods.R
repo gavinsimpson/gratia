@@ -55,7 +55,7 @@ the number of smooths in the model.", fixed = TRUE)
 test_that("draw.gam works with chracter select", {
     plt <- draw(m1, select = "s(x1)")
     expect_doppelganger("draw gam smooth for selected smooth character", plt)
-    plt <- draw(m1, select = c("s(x0)", "s(x1"))
+    plt <- draw(m1, select = c("s(x0)", "s(x1)"))
     expect_doppelganger("draw gam smooth for two selected smooths character", plt)
 })
 
