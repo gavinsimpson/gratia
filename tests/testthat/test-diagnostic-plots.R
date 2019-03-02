@@ -8,7 +8,6 @@ library("ggplot2")
 library("vdiffr")
 
 context("diagnostic-plots")
-theme_set(theme_grey())
 
 set.seed(2)
 ## simulate some data...

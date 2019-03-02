@@ -6,7 +6,6 @@ library("gratia")
 library("mgcv")
 library("ggplot2")
 library("vdiffr")
-theme_set(theme_grey())
 
 context("draw-methods")
 
@@ -24,7 +23,6 @@ dat3 <- gamSim(4, verbose = FALSE)
 m3 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat3)
 
 test_that("draw.evaluated_1d_smooth() plots the smooth", {
-    theme_set(theme_grey())
     sm <- evaluate_smooth(m1, "s(x2)")
     plt <- draw(sm)
     expect_doppelganger("draw 1d smooth for selected smooth", plt)
@@ -67,7 +65,6 @@ test_that("draw.gam works with logical select", {
 })
 
 test_that("draw.evaluated_2d_smooth() plots the smooth & SE", {
-    theme_set(theme_grey())
     sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
     plt <- draw(sm)
     expect_doppelganger("draw 2d smooth", plt)
@@ -76,8 +73,6 @@ test_that("draw.evaluated_2d_smooth() plots the smooth & SE", {
 })
 
 test_that("draw.gam() plots a simple multi-smooth AM", {
-    theme_set(theme_grey())
-
     plt <- draw(m1)
     expect_doppelganger("draw simple multi-smooth AM", plt)
 
@@ -86,8 +81,6 @@ test_that("draw.gam() plots a simple multi-smooth AM", {
 })
 
 test_that("draw.gam() plots an AM with a single 2d smooth", {
-    theme_set(theme_grey())
-
     plt <- draw(m2)
     expect_doppelganger("draw AM with 2d smooth", plt)
 
@@ -97,8 +90,6 @@ test_that("draw.gam() plots an AM with a single 2d smooth", {
 })
 
 test_that("draw.gam() plots an AM with a single factor by-variable smooth", {
-    theme_set(theme_grey())
-
     plt <- draw(m3)
     expect_doppelganger("draw AM with factor by-variable smooth", plt)
 
@@ -111,19 +102,16 @@ dat <- gamSim(3, n = 400, verbose = FALSE)
 mod <- gam(y ~ s(x2, by = x1), data = dat)
 
 test_that("draw() works with continuous by", {
-    theme_set(theme_grey())
     plt <- draw(mod)
     expect_doppelganger("draw AM with continuous by-variable smooth", plt)
 })
 
 test_that("draw() works with continuous by and fixed scales", {
-    theme_set(theme_grey())
     plt <- draw(mod, scales = "fixed")
     expect_doppelganger("draw AM with continuous by-var fixed scale", plt)
 })
 
 test_that("draw() works with random effect smooths (bs = 're')", {
-    theme_set(theme_grey())
     ## simulate example... from ?mgcv::random.effects
     dat <- gamSim(1, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
 
@@ -149,7 +137,6 @@ test_that("draw() works with random effect smooths (bs = 're')", {
 })
 
 test_that("draw() with random effect smooths (bs = 're') & factor by variable ", {
-    theme_set(theme_grey())
     ## simulate example...
     set.seed(1)
     df <- gamSim(4, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
@@ -175,8 +162,6 @@ test_that("draw() with random effect smooths (bs = 're') & factor by variable ",
 })
 
 test_that("draw() can handle non-standard names -- a function call as a name", {
-    theme_set(theme_grey())
-
     df <- data.frame(y = c(0.15,0.17,0.07,0.17,0.01,0.15,0.18,0.04,-0.06,-0.08,
                            0, 0.03,-0.27,-0.93,0.04,0.12,0.08,0.15,0.04,0.15,
                            0.03,0.09,0.11,0.13,-0.11,-0.32,-0.7,-0.78,0.07,0.04,
@@ -194,7 +179,6 @@ test_that("draw() can handle non-standard names -- a function call as a name", {
 })
 
 test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
-    theme_set(theme_grey())
     ## simulate example... from ?mgcv::factor.smooth.interaction
     set.seed(0)
     ## simulate data...
@@ -232,7 +216,6 @@ test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
 })
 
 test_that("draw() works with parametric terms", {
-    theme_set(theme_grey())
     set.seed(0)
     ## fake some data...
     f1 <- function(x) {exp(2 * x)}
@@ -291,7 +274,6 @@ test_that("draw() works with parametric terms", {
 })
 
 test_that("component-wise CIs work without seWithMean", {
-    theme_set(theme_grey())
     sm <- evaluate_smooth(m1, "s(x3)", overall_uncertainty = FALSE)
     plt <- draw(sm)
     expect_doppelganger("draw 1d smooth for selected smooth with overall_uncertainty false", plt)
@@ -301,8 +283,6 @@ test_that("component-wise CIs work without seWithMean", {
 })
 
 test_that("draw.derivates() plots derivatives for a GAM", {
-    theme_set(theme_grey())
-
     d1 <- derivatives(m1)
     plt <- draw(d1)
     expect_doppelganger("draw derivatives for a GAM", plt)

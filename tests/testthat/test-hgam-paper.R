@@ -7,7 +7,6 @@ library("mgcv")
 library("ggplot2")
 library("datasets")
 library("vdiffr")
-theme_set(theme_grey())
 
 context("test-hgam-paper-models")
 

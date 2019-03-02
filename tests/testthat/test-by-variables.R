@@ -5,7 +5,6 @@ library("testthat")
 library("gratia")
 library("mgcv")
 library("ggplot2")
-theme_set(theme_grey())
 
 context("test-by-variables")
 
