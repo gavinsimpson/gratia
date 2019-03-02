@@ -7,9 +7,16 @@ all: docs check clean
 docs:
 	R -q -e 'library("roxygen2"); roxygenise(".")'
 
+docs-devel:
+	R-devel -q -e 'library("roxygen2"); roxygenise(".")'
+
 build: docs
 	cd ..;\
 	R CMD build gratia
+
+build-devel: docs-devel
+	cd ..;\
+	R-devel CMD build gratia
 
 check: build
 	cd ..; \
@@ -29,7 +36,7 @@ check-as-cran: build
 	echo "$${NOT_CRAN}"; \
 	R CMD check --as-cran gratia_$(PKGVERS).tar.gz
 
-check-devel: build
+check-devel: build-devel
 	cd ..;\
 	R-devel CMD check gratia_$(PKGVERS).tar.gz
 
