@@ -1,9 +1,16 @@
 language: r
 cache: packages
 
-r:
-  - release
-  - devel
+matrix:
+  include:
+  - r: devel
+  - r: release
+    env: VDIFFR_RUN_TESTS=true
+
+env:
+  global:
+  # switch off vdiffr by default
+  - VDIFFR_RUN_TESTS=false
 
 sudo: false
 
