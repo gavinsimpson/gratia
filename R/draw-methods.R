@@ -195,7 +195,9 @@
 ##' is used instead.
 ##'
 ##' @param object a fitted GAM, the result of a call to [mgcv::gam()].
-##' @param parametric logical; plot parametric terms also? Default is `TRUE`.
+##' @param parametric logical; plot parametric terms also? Default is `TRUE`,
+##'   only if `select` is `NULL`. If `select` is used, `parametric` is set to
+##'   `FALSE` unless the user specifically sets `parametric = TRUE`.
 ##' @param select character, logical, or numeric; which smooths to plot. If
 ##'   `NULL`, the default, then all model smooths are drawn. Numeric `select`
 ##'   indexes the smooths in the order they are specified in the formula and
@@ -243,7 +245,7 @@
 ##'
 ##' draw(m1)
 `draw.gam` <- function(object,
-                       parametric = TRUE,
+                       parametric = NULL,
                        select = NULL,
                        scales = c("free", "fixed"),
                        align = "hv", axis = "lrtb",
@@ -253,6 +255,17 @@
                        partial_match = FALSE, ...) {
     scales <- match.arg(scales)
     S <- smooths(object)                # vector of smooth labels - "s(x)"
+
+    ## if not using select, set parametric TRUE if not set to FALSE
+    if (!is.null(select)) {
+        if (is.null(parametric)) {
+            parametric <- FALSE
+        }
+    } else {
+        if (is.null(parametric)) {
+            parametric <- TRUE
+        }
+    }
 
     ## select smooths
     select <- check_user_select_smooths(smooths = S, select = select,
