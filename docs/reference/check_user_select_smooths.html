@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Names of smooths in a GAM — smooths • gratia</title>
+<title>Select smooths based on user's choices — check_user_select_smooths • gratia</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,10 @@
 
 
 
-<meta property="og:title" content="Names of smooths in a GAM — smooths" />
+<meta property="og:title" content="Select smooths based on user's choices — check_user_select_smooths" />
 
-<meta property="og:description" content="Names of smooths in a GAM" />
+<meta property="og:description" content="Given a vector indexing the smooths of a GAM, returns a logical
+vector selecting the requested smooths." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -94,28 +95,44 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Names of smooths in a GAM</h1>
+    <h1>Select smooths based on user's choices</h1>
     
-    <div class="hidden name"><code>smooths.Rd</code></div>
+    <div class="hidden name"><code>check_user_select_smooths.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Names of smooths in a GAM</p>
+    <p>Given a vector indexing the smooths of a GAM, returns a logical
+vector selecting the requested smooths.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>smooths</span>(<span class='no'>object</span>)</pre>
+    <pre class="usage"><span class='fu'>check_user_select_smooths</span>(<span class='no'>smooths</span>, <span class='kw'>select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>partial_match</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>object</th>
-      <td><p>a fitted GAM or related model. Typically the result of a call
-to <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/gam'>mgcv::gam()</a></code>, <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/bam'>mgcv::bam()</a></code>, or <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/gamm'>mgcv::gamm()</a></code>.</p></td>
+      <th>smooths</th>
+      <td><p>character; a vector of smooth labels.</p></td>
+    </tr>
+    <tr>
+      <th>select</th>
+      <td><p>numeric, logical, or character vector of selected smooths.</p></td>
+    </tr>
+    <tr>
+      <th>partial_match</th>
+      <td><p>logical; in the case of character <code>select</code>, should
+<code>select</code> match partially against <code>smooths</code>? If <code>partial_match = TRUE</code>,
+<code>select</code> must only be a single string, a character vector of length 1.</p></td>
     </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A logical vector the same length as <code><a href='https://www.rdocumentation.org/packages/base/topics/length'>length(smooths)</a></code> indicating
+which smooths have been selected.</p>
     
 
   </div>
@@ -123,8 +140,12 @@ to <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/gam'>mgcv:
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-                </ul>
+      
+      <li><a href="#value">Value</a></li>
+          </ul>
 
+    <h2>Author</h2>
+    <p>Gavin L. Simpson</p>
   </div>
 </div>
 
