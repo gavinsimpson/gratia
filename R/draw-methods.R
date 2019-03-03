@@ -213,6 +213,9 @@
 ##' @param axis characer; see argument `axis` in `cowplot::plot_grid()`.
 ##'   Defaults to `"lrtb"` so that plots are nicely aligned.
 ##' @param rug logical; draw a rug plot at the botom of each plot?
+##' @param partial_match logical; should smooths be selected by partial matches
+##'   with `select`? If `TRUE`, `select` can only be a single string to match
+##'   against.
 ##' @param ... arguments passed to `cowplot::plot_grid()`. Any arguments to
 ##'   `plot_grid()` may be supplied, except for: `plotlist` and `align`.
 ##'
@@ -246,12 +249,14 @@
                        align = "hv", axis = "lrtb",
                        n = 100, unconditional = FALSE,
                        overall_uncertainty = TRUE,
-                       dist = 0.1, rug = TRUE, ...) {
+                       dist = 0.1, rug = TRUE,
+                       partial_match = FALSE, ...) {
     scales <- match.arg(scales)
     S <- smooths(object)                # vector of smooth labels - "s(x)"
 
     ## select smooths
-    select <- check_user_select_smooths(smooths = S, select = select)
+    select <- check_user_select_smooths(smooths = S, select = select,
+                                        partial_match = partial_match)
 
     ## can only plot 1 or 2d smooths - get smooth dimensions & prune list `s`
     ## d <- smooth_dim(object)[select]
