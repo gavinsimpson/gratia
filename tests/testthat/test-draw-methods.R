@@ -50,7 +50,7 @@ test_that("draw.gam fails with bad select", {
 the number of smooths in the model.", fixed = TRUE)
 })
 
-test_that("draw.gam works with chracter select", {
+test_that("draw.gam works with character select", {
     plt <- draw(m1, select = "s(x1)")
     expect_doppelganger("draw gam smooth for selected smooth character", plt)
     plt <- draw(m1, select = c("s(x0)", "s(x1)"))
@@ -70,6 +70,19 @@ test_that("draw.gam works with partial_match", {
     expect_message(draw(m3, select = 's(x2)', partial_match = FALSE),
                    "Unable to draw any of the model terms.",
                    fixed = TRUE)
+})
+
+test_that("draw.gam works with select and parametric", {
+    plt <- draw(m3, select = 's(x2)', partial_match = TRUE)
+    expect_doppelganger("draw gam with select and parametric is NULL", plt)
+    plt <- draw(m3, select = 's(x2)', partial_match = TRUE, parametric = FALSE)
+    expect_doppelganger("draw gam with select and parametric is FALSE", plt)
+    plt <- draw(m3, select = 's(x2)', partial_match = TRUE, parametric = TRUE)
+    expect_doppelganger("draw gam with select and parametric is TRUE", plt)
+    plt <- draw(m3, parametric = TRUE)
+    expect_doppelganger("draw gam without select and parametric is TRUE", plt)
+    plt <- draw(m3, parametric = FALSE)
+    expect_doppelganger("draw gam without select and parametric is FALSE", plt)
 })
 
 test_that("draw.evaluated_2d_smooth() plots the smooth & SE", {
