@@ -7,7 +7,7 @@
 \method{draw}{gam}(object, parametric = TRUE, select = NULL,
   scales = c("free", "fixed"), align = "hv", axis = "lrtb",
   n = 100, unconditional = FALSE, overall_uncertainty = TRUE,
-  dist = 0.1, rug = TRUE, ...)
+  dist = 0.1, rug = TRUE, partial_match = FALSE, ...)
 }
 \arguments{
 \item{object}{a fitted GAM, the result of a call to \code{\link[mgcv:gam]{mgcv::gam()}}.}
@@ -52,6 +52,10 @@ and \code{dist} is a distance within the unit square. See
 \code{\link[mgcv:exclude.too.far]{mgcv::exclude.too.far()}} for further details.}
 
 \item{rug}{logical; draw a rug plot at the botom of each plot?}
+
+\item{partial_match}{logical; should smooths be selected by partial matches
+with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
+against.}
 
 \item{...}{arguments passed to \code{cowplot::plot_grid()}. Any arguments to
 \code{plot_grid()} may be supplied, except for: \code{plotlist} and \code{align}.}
