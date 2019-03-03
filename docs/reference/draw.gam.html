@@ -65,7 +65,7 @@ is used instead." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.8</span>
       </span>
     </div>
 
@@ -110,7 +110,7 @@ is used instead.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for gam</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>object</span>, <span class='kw'>parametric</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>object</span>, <span class='kw'>parametric</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>scales</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"free"</span>, <span class='st'>"fixed"</span>), <span class='kw'>align</span> <span class='kw'>=</span> <span class='st'>"hv"</span>, <span class='kw'>axis</span> <span class='kw'>=</span> <span class='st'>"lrtb"</span>,
   <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overall_uncertainty</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>dist</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='kw'>rug</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>partial_match</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
@@ -124,7 +124,9 @@ is used instead.</p>
     </tr>
     <tr>
       <th>parametric</th>
-      <td><p>logical; plot parametric terms also? Default is <code>TRUE</code>.</p></td>
+      <td><p>logical; plot parametric terms also? Default is <code>TRUE</code>,
+only if <code>select</code> is <code>NULL</code>. If <code>select</code> is used, <code>parametric</code> is set to
+<code>FALSE</code> unless the user specifically sets <code>parametric = TRUE</code>.</p></td>
     </tr>
     <tr>
       <th>select</th>
