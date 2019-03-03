@@ -1,5 +1,5 @@
 
-R version 3.5.2 Patched (2019-01-24 r76013) -- "Eggshell Igloo"
+R version 3.5.3 beta (2019-02-28 r76174) -- "Great Truth"
 Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -305,7 +305,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > ### Name: draw.evaluated_smooth
 > ### Title: Plot estimated smooths
 > ### Aliases: draw.evaluated_smooth draw.evaluated_1d_smooth
-> ###   draw.evaluated_2d_smooth draw.evaluated_re_smooth
+> ###   draw.evaluated_2d_smooth geom_rug draw.evaluated_re_smooth
 > ###   draw.evaluated_fs_smooth draw.evaluated_parametric_term
 > 
 > ### ** Examples
@@ -635,7 +635,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  24.456 0.359 24.978 0 0 
+Time elapsed:  18.241 0.134 18.497 0 0 
 > grDevices::dev.off()
 null device 
           1 
