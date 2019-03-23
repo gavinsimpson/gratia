@@ -1,6 +1,6 @@
 
-R version 3.5.2 Patched (2018-12-26 r75912) -- "Eggshell Igloo"
-Copyright (C) 2018 The R Foundation for Statistical Computing
+R version 3.5.3 beta (2019-02-28 r76174) -- "Great Truth"
+Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -135,12 +135,12 @@ Gu & Wahba 4 term additive model
 # A tibble: 6 x 8
   smooth by_variable       x1   est    se  crit lower upper
   <chr>  <fct>          <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-1 s(x1)  <NA>        0.000663  5.89 0.329  1.96  5.24  6.53
-2 s(x1)  <NA>        0.00568   5.90 0.320  1.96  5.27  6.52
-3 s(x1)  <NA>        0.0107    5.90 0.312  1.96  5.29  6.51
-4 s(x1)  <NA>        0.0157    5.91 0.304  1.96  5.31  6.51
-5 s(x1)  <NA>        0.0207    5.92 0.296  1.96  5.34  6.50
-6 s(x1)  <NA>        0.0258    5.92 0.288  1.96  5.36  6.49
+1 s(x1)  <NA>        0.000663 -1.94 0.329  1.96 -2.59 -1.30
+2 s(x1)  <NA>        0.00568  -1.94 0.320  1.96 -2.57 -1.31
+3 s(x1)  <NA>        0.0107   -1.93 0.312  1.96 -2.54 -1.32
+4 s(x1)  <NA>        0.0157   -1.92 0.304  1.96 -2.52 -1.33
+5 s(x1)  <NA>        0.0207   -1.92 0.296  1.96 -2.50 -1.34
+6 s(x1)  <NA>        0.0258   -1.91 0.288  1.96 -2.47 -1.34
 > ##'
 > ## simultaneous interval for smooth term of x1
 > set.seed(42)
@@ -149,12 +149,12 @@ Gu & Wahba 4 term additive model
 # A tibble: 6 x 8
   smooth by_variable       x1   est    se  crit lower upper
   <chr>  <fct>          <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-1 s(x1)  <NA>        0.000663  5.89 0.329  2.26  5.15  6.63
-2 s(x1)  <NA>        0.00568   5.90 0.320  2.26  5.17  6.62
-3 s(x1)  <NA>        0.0107    5.90 0.312  2.26  5.20  6.61
-4 s(x1)  <NA>        0.0157    5.91 0.304  2.26  5.22  6.60
-5 s(x1)  <NA>        0.0207    5.92 0.296  2.26  5.25  6.59
-6 s(x1)  <NA>        0.0258    5.92 0.288  2.26  5.27  6.58
+1 s(x1)  <NA>        0.000663 -1.94 0.329  2.26 -2.69 -1.20
+2 s(x1)  <NA>        0.00568  -1.94 0.320  2.26 -2.66 -1.21
+3 s(x1)  <NA>        0.0107   -1.93 0.312  2.26 -2.63 -1.23
+4 s(x1)  <NA>        0.0157   -1.92 0.304  2.26 -2.61 -1.24
+5 s(x1)  <NA>        0.0207   -1.92 0.296  2.26 -2.58 -1.25
+6 s(x1)  <NA>        0.0258   -1.91 0.288  2.26 -2.56 -1.26
 > 
 > 
 > 
@@ -305,7 +305,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > ### Name: draw.evaluated_smooth
 > ### Title: Plot estimated smooths
 > ### Aliases: draw.evaluated_smooth draw.evaluated_1d_smooth
-> ###   draw.evaluated_2d_smooth draw.evaluated_re_smooth
+> ###   draw.evaluated_2d_smooth geom_rug draw.evaluated_re_smooth
 > ###   draw.evaluated_fs_smooth draw.evaluated_parametric_term
 > 
 > ### ** Examples
@@ -635,7 +635,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  15.969 0.114 16.119 0 0 
+Time elapsed:  18.241 0.134 18.497 0 0 
 > grDevices::dev.off()
 null device 
           1 

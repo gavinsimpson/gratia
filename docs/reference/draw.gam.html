@@ -65,7 +65,7 @@ is used instead." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.8</span>
       </span>
     </div>
 
@@ -110,10 +110,10 @@ is used instead.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for gam</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>object</span>, <span class='kw'>parametric</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>object</span>, <span class='kw'>parametric</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>scales</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"free"</span>, <span class='st'>"fixed"</span>), <span class='kw'>align</span> <span class='kw'>=</span> <span class='st'>"hv"</span>, <span class='kw'>axis</span> <span class='kw'>=</span> <span class='st'>"lrtb"</span>,
   <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overall_uncertainty</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>dist</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='no'>...</span>)</pre>
+  <span class='kw'>dist</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='kw'>rug</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>partial_match</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -124,7 +124,9 @@ is used instead.</p>
     </tr>
     <tr>
       <th>parametric</th>
-      <td><p>logical; plot parametric terms also? Default is <code>TRUE</code>.</p></td>
+      <td><p>logical; plot parametric terms also? Default is <code>TRUE</code>,
+only if <code>select</code> is <code>NULL</code>. If <code>select</code> is used, <code>parametric</code> is set to
+<code>FALSE</code> unless the user specifically sets <code>parametric = TRUE</code>.</p></td>
     </tr>
     <tr>
       <th>select</th>
@@ -180,6 +182,16 @@ and <code>dist</code> is a distance within the unit square. See
 <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/exclude.too.far'>mgcv::exclude.too.far()</a></code> for further details.</p></td>
     </tr>
     <tr>
+      <th>rug</th>
+      <td><p>logical; draw a rug plot at the botom of each plot?</p></td>
+    </tr>
+    <tr>
+      <th>partial_match</th>
+      <td><p>logical; should smooths be selected by partial matches
+with <code>select</code>? If <code>TRUE</code>, <code>select</code> can only be a single string to match
+against.</p></td>
+    </tr>
+    <tr>
       <th>...</th>
       <td><p>arguments passed to <code><a href='https://www.rdocumentation.org/packages/cowplot/topics/plot_grid'>cowplot::plot_grid()</a></code>. Any arguments to
 <code>plot_grid()</code> may be supplied, except for: <code>plotlist</code> and <code>align</code>.</p></td>
@@ -188,7 +200,14 @@ and <code>dist</code> is a distance within the unit square. See
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot2::ggplot()</a></code> object.</p>
+    <p>The object returned is created by <code><a href='https://www.rdocumentation.org/packages/cowplot/topics/plot_grid'>cowplot::plot_grid()</a></code>.</p>
+    
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
+
+    <p>Internally, plots of each smooth are created using <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot2::ggplot()</a></code>
+and composed into a single plot using <code><a href='https://www.rdocumentation.org/packages/cowplot/topics/plot_grid'>cowplot::plot_grid()</a></code>. As a result,
+it is not possible to use <code>+</code> to add to the plots in the way one might
+typically work with <code>ggplot()</code> plots.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -202,6 +221,8 @@ and <code>dist</code> is a distance within the unit square. See
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
+
+      <li><a href="#note">Note</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>

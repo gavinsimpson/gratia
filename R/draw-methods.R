@@ -20,6 +20,10 @@
 ##' Plots estimated univariate and bivariate smooths using ggplot2.
 ##'
 ##' @param object an object, the result of a call to [evaluate_smooth()].
+##' @param rug For `evaluate_smooth()`, a numeric vector of values for the
+##'   location of data on the x axis. The default of `NULL` results in no
+##'   rug plot being drawn. For `evaluate_parametric_terms()`, a logical to
+##'   indicate if a rug plot should be drawn.
 ##' @param xlab character or expression; the label for the x axis. If not
 ##'   supplied, a suitable label will be generated from `object`.
 ##' @param ylab character or expression; the label for the y axis. If not
@@ -41,7 +45,7 @@
 ##'
 ##' @export
 ##' @name draw.evaluated_smooth
-##' @aliases draw.evaluated_1d_smooth draw.evaluated_2d_smooth
+##' @aliases draw.evaluated_1d_smooth draw.evaluated_2d_smooth geom_rug
 ##'
 ##' @examples
 ##' suppressPackageStartupMessages(library("mgcv"))
@@ -60,6 +64,7 @@
 ##' sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 ##' draw(sm)
 `draw.evaluated_1d_smooth` <- function(object,
+                                       rug = NULL,
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
@@ -70,7 +75,7 @@
     object[["upper"]] <- object[["est"]] + (2 * object[["se"]])
     object[["lower"]] <- object[["est"]] - (2 * object[["se"]])
 
-    plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est)) +
+    plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est, group = ~ smooth)) +
         geom_ribbon(mapping = aes_string(ymin = "lower",
                                          ymax = "upper"),
                     alpha = 0.2) +
@@ -98,6 +103,14 @@
     ## add labelling to plot
     plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
                       caption = caption)
+
+    ## add rug?
+    if (!is.null(rug)) {
+        plt <- plt + geom_rug(data = data.frame(x = rug),
+                              mapping = aes_string(x = 'x'),
+                              inherit.aes = FALSE,
+                              sides = 'b')
+    }
 
     plt
 }
@@ -182,7 +195,9 @@
 ##' is used instead.
 ##'
 ##' @param object a fitted GAM, the result of a call to [mgcv::gam()].
-##' @param parametric logical; plot parametric terms also? Default is `TRUE`.
+##' @param parametric logical; plot parametric terms also? Default is `TRUE`,
+##'   only if `select` is `NULL`. If `select` is used, `parametric` is set to
+##'   `FALSE` unless the user specifically sets `parametric = TRUE`.
 ##' @param select character, logical, or numeric; which smooths to plot. If
 ##'   `NULL`, the default, then all model smooths are drawn. Numeric `select`
 ##'   indexes the smooths in the order they are specified in the formula and
@@ -199,12 +214,21 @@
 ##'   Defaults to `"hv"` so that plots are nicely aligned.
 ##' @param axis characer; see argument `axis` in `cowplot::plot_grid()`.
 ##'   Defaults to `"lrtb"` so that plots are nicely aligned.
+##' @param rug logical; draw a rug plot at the botom of each plot?
+##' @param partial_match logical; should smooths be selected by partial matches
+##'   with `select`? If `TRUE`, `select` can only be a single string to match
+##'   against.
 ##' @param ... arguments passed to `cowplot::plot_grid()`. Any arguments to
 ##'   `plot_grid()` may be supplied, except for: `plotlist` and `align`.
 ##'
 ##' @inheritParams evaluate_smooth
 ##'
-##' @return A [ggplot2::ggplot()] object.
+##' @note Internally, plots of each smooth are created using [ggplot2::ggplot()]
+##'   and composed into a single plot using [cowplot::plot_grid()]. As a result,
+##'   it is not possible to use `+` to add to the plots in the way one might
+##'   typically work with `ggplot()` plots.
+##'
+##' @return The object returned is created by [cowplot::plot_grid()].
 ##'
 ##' @author Gavin L. Simpson
 ##'
@@ -221,18 +245,31 @@
 ##'
 ##' draw(m1)
 `draw.gam` <- function(object,
-                       parametric = TRUE,
+                       parametric = NULL,
                        select = NULL,
                        scales = c("free", "fixed"),
                        align = "hv", axis = "lrtb",
                        n = 100, unconditional = FALSE,
                        overall_uncertainty = TRUE,
-                       dist = 0.1, ...) {
+                       dist = 0.1, rug = TRUE,
+                       partial_match = FALSE, ...) {
     scales <- match.arg(scales)
     S <- smooths(object)                # vector of smooth labels - "s(x)"
 
+    ## if not using select, set parametric TRUE if not set to FALSE
+    if (!is.null(select)) {
+        if (is.null(parametric)) {
+            parametric <- FALSE
+        }
+    } else {
+        if (is.null(parametric)) {
+            parametric <- TRUE
+        }
+    }
+
     ## select smooths
-    select <- check_user_select_smooths(smooths = S, select = select)
+    select <- check_user_select_smooths(smooths = S, select = select,
+                                        partial_match = partial_match)
 
     ## can only plot 1 or 2d smooths - get smooth dimensions & prune list `s`
     ## d <- smooth_dim(object)[select]
@@ -257,11 +294,10 @@
     if (isTRUE(parametric)) {
         terms <- parametric_terms(object)
         npara <- length(terms)
-        p <- vector("list", length = npara)
-    }
+        p <- vector("list", length = npara)    }
 
-    l <- vector("list", length = nsmooth)
-    g <- vector("list", length = nsmooth + npara)
+    g <- l <- vector("list", length = nsmooth)
+    ## g <- vector("list", length = nsmooth + npara)
 
     for (i in unique(S)) {
         eS <- evaluate_smooth(object, smooth = i, n = n,
@@ -282,14 +318,32 @@
         return(invisible(g))
     }
 
+    ## model frame may be needed for rugs
+    mf  <- model.frame(object)
+
     for (i in seq_along(l)) {
-        g[[i]] <- draw(l[[i]])
+        if (isTRUE(rug)) {
+            sname <- unique(l[[i]][["smooth"]])
+            ## could be a by smooth, strip off the by variable bit
+            sname <- strsplit(sname, ":")[[1L]][[1L]]
+            sm <- get_smooth(object, term = sname)
+            if (!is_mgcv_smooth(sm)) {  # could be list (factor by)
+                sm <- sm[[1L]]
+            }
+            svar <- smooth_variable(sm)
+            if (is_fs_smooth(sm)) {
+                svar <- svar[[1L]]
+            }
+            g[[i]] <- draw(l[[i]], rug = mf[[svar]])
+        } else {
+            g[[i]] <- draw(l[[i]])
+        }
     }
 
     if (isTRUE(parametric)) {
         for (i in seq_along(terms)) {
             p[[i]] <- evaluate_parametric_term(object, term = terms[i])
-            g[[i + nsmooth]] <- draw(p[[i]])
+            g[[i + length(g)]] <- draw(p[[i]])
         }
     }
 
@@ -299,8 +353,14 @@
                   x[["est"]] - (2 * x[["se"]]))
         }
         ylims <- range(unlist(lapply(l, wrapper)))
+        if (isTRUE(parametric)) {
+            ylims <- range(ylims,
+                           unlist(lapply(p, function(x) range(x[["upper"]],
+                                                              x[["lower"]]))))
+        }
 
-        for (i in seq_along(g)[d == 1L]) { # only the univariate smooths; FIXME: "re" smooths too?
+        gg <- seq_along(g)[c(d==1L, rep(TRUE, npara))]
+        for (i in gg) { # only the univariate smooths; FIXME: "re" smooths too?
             g[[i]] <- g[[i]] + lims(y = ylims)
         }
     }
@@ -363,10 +423,11 @@
 
 ##' @param colour_scale function; an appropriate discrete colour scale from `ggplot2`.
 ##'
-##' @importFrom ggplot2 geom_line theme scale_colour_discrete
+##' @importFrom ggplot2 geom_line theme scale_colour_discrete geom_rug
 ##' @export
 ##' @rdname draw.evaluated_smooth
 `draw.evaluated_fs_smooth` <- function(object,
+                                       rug = NULL,
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
@@ -404,10 +465,17 @@
     plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
                       caption = caption)
 
+    ## add rug?
+    if (!is.null(rug)) {
+        plt <- plt + geom_rug(data = data.frame(x = rug),
+                              mapping = aes_string(x = 'x'),
+                              inherit.aes = FALSE,
+                              sides = 'b')
+    }
+
     plt
 }
 
-##' @param rug logical; draw a rug plot of the data
 ##' @param position Position adjustment, either as a string, or the result of a
 ##'   call to a position adjustment function.
 ##'

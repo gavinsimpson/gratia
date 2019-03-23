@@ -72,7 +72,6 @@ test_that("derivatives() returns derivatives for all smooths in a GAM", {
     expect_named(df, c("smooth","var","data","derivative","se","crit","lower","upper"))
 })
 
-
 test_that("derivatives() returns second derivatives for all smooths in a GAM", {
     expect_silent(df <- derivatives(mod, order = 2))
     expect_s3_class(df, "derivatives")

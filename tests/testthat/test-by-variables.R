@@ -5,7 +5,6 @@ library("testthat")
 library("gratia")
 library("mgcv")
 library("ggplot2")
-theme_set(theme_grey())
 
 context("test-by-variables")
 
@@ -64,4 +63,9 @@ test_that("get_by_smooth works", {
     expect_error(get_by_smooth(mf, "s(x2)", level = "4"),
                  "Invalid 'level' for smooth 's(x2)'.",
                  fixed = TRUE)
+})
+
+test_that("draw.gam works with select and parametric = TRUE", {
+    vdiffr::expect_doppelganger("draw.gam-user-select-and-parametric-true",
+                                draw(mf, select = 's(x2)fac1', parametric = TRUE))
 })

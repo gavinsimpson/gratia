@@ -8,7 +8,6 @@ library("ggplot2")
 library("vdiffr")
 
 context("qq_plot-methods")
-theme_set(theme_grey())
 
 ## simulate binomial data...
 set.seed(0)

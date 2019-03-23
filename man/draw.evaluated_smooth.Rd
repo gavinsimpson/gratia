@@ -4,13 +4,14 @@
 \alias{draw.evaluated_smooth}
 \alias{draw.evaluated_1d_smooth}
 \alias{draw.evaluated_2d_smooth}
+\alias{geom_rug}
 \alias{draw.evaluated_re_smooth}
 \alias{draw.evaluated_fs_smooth}
 \alias{draw.evaluated_parametric_term}
 \title{Plot estimated smooths}
 \usage{
-\method{draw}{evaluated_1d_smooth}(object, xlab, ylab, title = NULL,
-  subtitle = NULL, caption = NULL, ...)
+\method{draw}{evaluated_1d_smooth}(object, rug = NULL, xlab, ylab,
+  title = NULL, subtitle = NULL, caption = NULL, ...)
 
 \method{draw}{evaluated_2d_smooth}(object, show = c("estimate", "se"),
   contour = TRUE, xlab, ylab, title = NULL, subtitle = NULL,
@@ -19,8 +20,8 @@
 \method{draw}{evaluated_re_smooth}(object, qq_line = TRUE, xlab, ylab,
   title = NULL, subtitle = NULL, caption = NULL, ...)
 
-\method{draw}{evaluated_fs_smooth}(object, xlab, ylab, title = NULL,
-  subtitle = NULL, caption = NULL,
+\method{draw}{evaluated_fs_smooth}(object, rug = NULL, xlab, ylab,
+  title = NULL, subtitle = NULL, caption = NULL,
   colour_scale = scale_colour_discrete, ...)
 
 \method{draw}{evaluated_parametric_term}(object, xlab, ylab,
@@ -29,6 +30,11 @@
 }
 \arguments{
 \item{object}{an object, the result of a call to \code{\link[=evaluate_smooth]{evaluate_smooth()}}.}
+
+\item{rug}{For \code{evaluate_smooth()}, a numeric vector of values for the
+location of data on the x axis. The default of \code{NULL} results in no
+rug plot being drawn. For \code{evaluate_parametric_terms()}, a logical to
+indicate if a rug plot should be drawn.}
 
 \item{xlab}{character or expression; the label for the x axis. If not
 supplied, a suitable label will be generated from \code{object}.}
@@ -57,8 +63,6 @@ standard error (\code{"se"}).}
 theoretical quartiles.}
 
 \item{colour_scale}{function; an appropriate discrete colour scale from \code{ggplot2}.}
-
-\item{rug}{logical; draw a rug plot of the data}
 
 \item{position}{Position adjustment, either as a string, or the result of a
 call to a position adjustment function.}
