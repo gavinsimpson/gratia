@@ -5,7 +5,9 @@ Title: Graceful 'ggplot'-Based Graphics and Other Functions for GAMs Fitted Usin
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     email = "ucfagls@gmail.com",
                     role = c("aut","cre"),
-		    comment = c(ORCID = "0000-0002-9084-8413")))
+		    comment = c(ORCID = "0000-0002-9084-8413")),
+		    person(given="Henrik", family="Singmann", role=c("ctb"),
+                    comment=c(ORCID="0000-0002-4842-3657")))
 Maintainer: Gavin L. Simpson <ucfagls@gmail.com>
 Depends:
     R (>= 3.5.0)
