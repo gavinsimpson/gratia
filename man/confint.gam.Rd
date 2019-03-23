@@ -7,7 +7,8 @@
 \usage{
 \method{confint}{gam}(object, parm, level = 0.95, newdata = NULL,
   n = 200, type = c("confidence", "simultaneous"), nsim = 10000,
-  shift = FALSE, transform = FALSE, unconditional = FALSE, ...)
+  shift = FALSE, transform = FALSE, unconditional = FALSE,
+  ncores = 1, ...)
 
 \method{confint}{gamm}(object, ...)
 }
@@ -31,6 +32,8 @@
 \item{transform}{logical; should the smooth be evaluated on a transformed scale? For generalised models, this involves applying the inverse of the link function used to fit the model. Alternatively, the name of, or an actual, function can be supplied to transform the smooth and it's confidence interval.}
 
 \item{unconditional}{logical; if \code{TRUE} (and \code{freq == FALSE}) then the Bayesian smoothing parameter uncertainty corrected covariance matrix is returned, if available.}
+
+\item{ncores}{number of cores for generating random variables from a multivariate normal distribution. Passed to \code{mvnfast::rmvn}. Parallelization will take place only if OpenMP is supported (but appears to work on Windows with current \code{R}).}
 
 \item{...}{additional arguments for methods}
 }

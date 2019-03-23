@@ -17,7 +17,7 @@ derivatives(object, ...)
   type = c("forward", "backward", "central"), n = 200, eps = 1e-07,
   interval = c("confidence", "simultaneous"), n_sim = 10000,
   level = 0.95, unconditional = FALSE, frequentist = FALSE,
-  offset = NULL, ...)
+  offset = NULL, ncores = 1, ...)
 }
 \arguments{
 \item{object}{an R object to compute derivatives for.}
@@ -57,6 +57,11 @@ covariance matrix?}
 \item{frequentist}{logical; use the frequentist covariance matrix?}
 
 \item{offset}{numeric; a value to use for any offset term}
+
+\item{ncores}{number of cores for generating random variables from a
+multivariate normal distribution. Passed to \code{mvnfast::rmvn}.
+Parallelization will take place only if OpenMP is supported (but appears
+to work on Windows with current \code{R}).}
 }
 \description{
 Derivatives of estimated smooths via finite differences

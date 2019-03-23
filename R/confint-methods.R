@@ -14,7 +14,10 @@
 ##'   for point-wise intervals, or `"simultaneous"` for simultaneous intervals.
 ##' @param nsim integer; the number of simulations used in computing the
 ##'   simultaneous intervals.
-##' @param ncores number of cores for generating random variables from a multivariate normal distribution. Passed to `mvnfast::rmvn`. Parallelization will take place only if OpenMP is supported (but appears to work on Windows with current `R`).
+##' @param ncores number of cores for generating random variables from a
+##'   multivariate normal distribution. Passed to `mvnfast::rmvn`.
+##'   Parallelization will take place only if OpenMP is supported (but appears
+##'   to work on Windows with current `R`).
 ##' @param ... additional arguments for methods
 ##'
 ##' @return a data frame with components:
@@ -118,9 +121,8 @@
     ## bayesian covar matrix, possibly accounting for estimating smooth pars
     Vb <- vcov(x[["model"]], unconditional = x$unconditional)
     ## simulate un-biased deviations given bayesian covar matrix
-    buDiff <- mvnfast::rmvn(n = nsim, mu = rep(0, nrow(V)), sigma = V, 
+    buDiff <- mvnfast::rmvn(n = nsim, mu = rep(0, nrow(Vb)), sigma = Vb, 
                             ncores = ncores)
-      #rmvnorm(n = nsim, mean = rep(0, nrow(Vb)), sigma = Vb)
     ## apply wrapper to compute simultaneous interval critical value and
     ## corresponding simultaneous interval for each term
     res <- lapply(x[["derivatives"]][terms], FUN = simInt,
