@@ -163,7 +163,7 @@
 ##' @importFrom stats quantile
 `derivative_simultaneous_int` <- function(x, Xi, level, Vb, n_sim, ncores) {
     ## simulate un-biased deviations given bayesian covariance matrix
-    buDiff <-  mvnfast::rmvn(n = nsim, mu = rep(0, nrow(V)), sigma = V, ncores = ncores)
+    buDiff <-  mvnfast::rmvn(n = nsim, mu = rep(0, nrow(Vb)), sigma = Vb, ncores = ncores)
     simDev <- tcrossprod(Xi, buDiff) # Xi %*% t(bu) # simulate deviations from expected
     absDev <- abs(sweep(simDev, 1L, x[["se"]], FUN = "/")) # absolute deviations
     masd <- apply(absDev, 2L, max)  # & max abs deviation per sim
