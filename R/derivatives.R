@@ -50,7 +50,7 @@
 ##' @param frequentist logical; use the frequentist covariance matrix?
 ##' @param offset numeric; a value to use for any offset term
 ##' @param ncores number of cores for generating random variables from a
-##'   multivariate normal distribution. Passed to `mvnfast::rmvn`.
+##'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
 ##'   Parallelization will take place only if OpenMP is supported (but appears
 ##'   to work on Windows with current `R`).
 ##'
@@ -131,7 +131,7 @@
         } else {
             result[[i]] <- derivative_simultaneous_int(d[["deriv"]], d[["Xi"]],
                                                        level = level, Vb = Vb,
-                                                       n_sim = n_sim, 
+                                                       n_sim = n_sim,
                                                        ncores = ncores)
         }
     }
@@ -164,9 +164,10 @@
 
 ##' @importFrom tibble add_column
 ##' @importFrom stats quantile
+##' @importFrom mvnfast rmvn
 `derivative_simultaneous_int` <- function(x, Xi, level, Vb, n_sim, ncores) {
     ## simulate un-biased deviations given bayesian covariance matrix
-    buDiff <-  mvnfast::rmvn(n = n_sim, mu = rep(0, nrow(Vb)), sigma = Vb, ncores = ncores)
+    buDiff <- rmvn(n = n_sim, mu = rep(0, nrow(Vb)), sigma = Vb, ncores = ncores)
     simDev <- tcrossprod(Xi, buDiff) # Xi %*% t(bu) # simulate deviations from expected
     absDev <- abs(sweep(simDev, 1L, x[["se"]], FUN = "/")) # absolute deviations
     masd <- apply(absDev, 2L, max)  # & max abs deviation per sim
