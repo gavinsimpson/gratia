@@ -59,7 +59,7 @@ covariance matrix?}
 \item{offset}{numeric; a value to use for any offset term}
 
 \item{ncores}{number of cores for generating random variables from a
-multivariate normal distribution. Passed to \code{mvnfast::rmvn}.
+multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
 Parallelization will take place only if OpenMP is supported (but appears
 to work on Windows with current \code{R}).}
 }
