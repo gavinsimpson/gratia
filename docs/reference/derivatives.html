@@ -63,7 +63,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.9</span>
       </span>
     </div>
 
@@ -118,7 +118,7 @@
   <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"forward"</span>, <span class='st'>"backward"</span>, <span class='st'>"central"</span>), <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>1e-07</span>,
   <span class='kw'>interval</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"confidence"</span>, <span class='st'>"simultaneous"</span>), <span class='kw'>n_sim</span> <span class='kw'>=</span> <span class='fl'>10000</span>,
   <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>, <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>frequentist</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>offset</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
+  <span class='kw'>offset</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>ncores</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -188,6 +188,13 @@ covariance matrix?</p></td>
     <tr>
       <th>offset</th>
       <td><p>numeric; a value to use for any offset term</p></td>
+    </tr>
+    <tr>
+      <th>ncores</th>
+      <td><p>number of cores for generating random variables from a
+multivariate normal distribution. Passed to <code><a href='https://www.rdocumentation.org/packages/mvnfast/topics/rmvn'>mvnfast::rmvn()</a></code>.
+Parallelization will take place only if OpenMP is supported (but appears
+to work on Windows with current <code>R</code>).</p></td>
     </tr>
     </table>
     

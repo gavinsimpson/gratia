@@ -64,7 +64,7 @@ derivatives of smooth terms in a fitted GAM." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.9</span>
       </span>
     </div>
 
@@ -109,7 +109,8 @@ derivatives of smooth terms in a fitted GAM.</p>
 
     <pre class="usage"><span class='co'># S3 method for fderiv</span>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/confint'>confint</a></span>(<span class='no'>object</span>, <span class='no'>parm</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
-  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"confidence"</span>, <span class='st'>"simultaneous"</span>), <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>10000</span>, <span class='no'>...</span>)</pre>
+  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"confidence"</span>, <span class='st'>"simultaneous"</span>), <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>10000</span>, <span class='kw'>ncores</span> <span class='kw'>=</span> <span class='fl'>1L</span>,
+  <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -139,6 +140,13 @@ for point-wise intervals, or <code>"simultaneous"</code> for simultaneous interv
       <th>nsim</th>
       <td><p>integer; the number of simulations used in computing the
 simultaneous intervals.</p></td>
+    </tr>
+    <tr>
+      <th>ncores</th>
+      <td><p>number of cores for generating random variables from a
+multivariate normal distribution. Passed to <code><a href='https://www.rdocumentation.org/packages/mvnfast/topics/rmvn'>mvnfast::rmvn()</a></code>.
+Parallelization will take place only if OpenMP is supported (but appears
+to work on Windows with current <code>R</code>).</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -176,12 +184,12 @@ simultaneous intervals.</p></td>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>42</span>)
 <span class='no'>x1.sint</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/confint'>confint</a></span>(<span class='no'>fd</span>, <span class='kw'>parm</span> <span class='kw'>=</span> <span class='st'>"x1"</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"simultaneous"</span>, <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>1000</span>)
 <span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/head'>head</a></span>(<span class='no'>x1.sint</span>)</div><div class='output co'>#&gt;    term   lower    est  upper
-#&gt; 1 s(x1) -5.3838 1.4232 8.2302
-#&gt; 2 s(x1) -5.3827 1.4232 8.2291
-#&gt; 3 s(x1) -5.3773 1.4234 8.2241
-#&gt; 4 s(x1) -5.3665 1.4239 8.2142
-#&gt; 5 s(x1) -5.3488 1.4246 8.1980
-#&gt; 6 s(x1) -5.3228 1.4257 8.1742</div></pre>
+#&gt; 1 s(x1) -5.1662 1.4232 8.0125
+#&gt; 2 s(x1) -5.1650 1.4232 8.0115
+#&gt; 3 s(x1) -5.1598 1.4234 8.0067
+#&gt; 4 s(x1) -5.1494 1.4239 7.9971
+#&gt; 5 s(x1) -5.1322 1.4246 7.9814
+#&gt; 6 s(x1) -5.1070 1.4257 7.9584</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
