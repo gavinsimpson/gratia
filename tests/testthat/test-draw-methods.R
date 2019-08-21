@@ -311,3 +311,14 @@ test_that("draw.derivates() plots derivatives for a GAM", {
     plt <- draw(d1, scales = "free")
     expect_doppelganger("draw derivatives for a GAM with fixed scales", plt)
 })
+
+## test that issue 39 stays fixed
+test_that("draw.gam doesn't create empty plots with multiple parametric terms", {
+    dat <- gamSim(4, n = 300, verbose = FALSE)
+    dat <- transform(dat, fac = factor(fac), fac2 = factor(fac)) # second factor
+    ## GAM with 2 factors and 2 numeric terms
+    m2f <- gam(y ~ s(x0) + s(x1) + fac + fac2, data = dat,
+               family = gaussian(link = "identity"))
+    plt <- draw(m2f)
+    expect_doppelganger("draw issue 39 empty plots", plt)
+})

@@ -341,9 +341,10 @@
     }
 
     if (isTRUE(parametric)) {
+        leng <- length(g)
         for (i in seq_along(terms)) {
             p[[i]] <- evaluate_parametric_term(object, term = terms[i])
-            g[[i + length(g)]] <- draw(p[[i]])
+            g[[i + leng]] <- draw(p[[i]])
         }
     }
 
