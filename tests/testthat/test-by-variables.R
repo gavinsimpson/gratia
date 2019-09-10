@@ -69,3 +69,11 @@ test_that("draw.gam works with select and parametric = TRUE", {
     vdiffr::expect_doppelganger("draw.gam-user-select-and-parametric-true",
                                 draw(mf, select = 's(x2)fac1', parametric = TRUE))
 })
+
+## Issue #37 FIXME
+test_that("draw.gam can handle ordered factor by smooths", {
+    skip('Issue #37 needs work on reimplementing how gratia works with by smooths')
+    m <- gam(uptake ~ Plant + s(conc, k = 5) + s(conc, by = Plant, k = 5), data = CO2,
+             method = 'REML')
+    plt <- draw(m)
+})

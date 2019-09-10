@@ -71,6 +71,14 @@
         smooth <- add_column(smooth, by_var = d)
     names(smooth)[NCOL(smooth)] <- by_name[by_name != "NA"]
     } else {
+        ## FIXME Issue #37
+        ## if by_data is ordered factor, drop the first level
+        ## if (is.ordered(by_data)) {
+        ##     lev <- levels(by_data)
+        ##     ref <- lev[1L]
+        ##     want <- by_data != ref
+        ##     by_data <- factor(by_data[want], levels = lev[-1L], ordered = FALSE)
+        ## }
         smooth <- add_column(smooth,
                              by_variable = factor(rep(by_name, NROW(smooth))),
                              .after = 1L)
