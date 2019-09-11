@@ -609,6 +609,7 @@
 ##' @export
 ##'
 ##' @examples
+##' suppressPackageStartupMessages(library("mgcv"))
 ##' \dontshow{set.seed(42)}
 ##' df <- gamSim(4, n = 400, verbose = FALSE)
 ##'

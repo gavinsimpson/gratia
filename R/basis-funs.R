@@ -13,13 +13,28 @@
 ##' @param constraints logical; should identifiability constraints be applied to
 ##'   the smooth basis. See argument `absorb.cons` in [mgcv::smoothCon()].
 ##' @param ... other arguments passed to [mgcv::smoothCon()].
-##' @return 
+##'
+##' @return A tibble.
+##'
 ##' @author Gavin L. Simpson
+##'
+##' @export
+##'
+##' @importFrom mgcv smoothCon
+##' @importFrom dplyr bind_rows
+##' 
+##' @examples
+##' suppressPackageStartupMessages(library("mgcv"))
+##' \dontshow{set.seed(42)}
+##' df <- gamSim(4, n = 400, verbose = FALSE)
+##'
+##' bf <- basis(s(x0), data = df)
+##' bf <- basis(s(x2, by = fac, bs = 'bs'), data = df, constraints = TRUE)
 `basis` <- function(smooth, data, knots = NULL, constraints = FALSE,
                     ...) {
     ## call smoothCon to create the basis as specified in `x`
     sm <- smoothCon(smooth, data = data, knots = knots,
-                    absorb.con = constraints, ...)
+                    absorb.cons = constraints, ...)
 
     ## sm will be a list, even if a single smooth, bc we could have multiple
     ## smoothers in case of factor `by` smooths.
@@ -44,28 +59,30 @@
 ##' Takes an object of class `mgcv.smooth` and returns a tidy representation
 ##' of the basis.
 ##'
-##' @param sm 
-##' @return 
+##' @param smooth a smooth object.
+##' @param data a data frame containing the variables used in `smooth`.
+##'
+##' @return A tibble.
 ##' @author Gavin L. Simpson
 ##'
 ##' @importFrom tibble as_tibble add_column
 ##' @importFrom tidyr gather
-##' @importFrom dplyr bind_cols everything select
-`tidy_basis` <- function(sm, data) {
-    check_is_mgcv_smooth(sm) # check `sm` is of the correct type
-    tbl <- sm[["X"]]         # extract the model matrix
+##' @importFrom dplyr bind_cols everything select matches
+`tidy_basis` <- function(smooth, data) {
+    check_is_mgcv_smooth(smooth) # check `smooth` is of the correct type
+    tbl <- smooth[["X"]]         # extract the model matrix
     nfun <- NCOL(tbl)        # the number of basis functions
     colnames(tbl) <- seq_len(nfun)
     tbl <- as_tibble(tbl) # convert to tibbles
     data <- as_tibble(data)
-    is_by_fac <- is_factor_by_smooth(sm) # is this a factor by smooth?
+    is_by_fac <- is_factor_by_smooth(smooth) # is this a factor by smooth?
 
     ## If we have a factor by smooth, the model matrix `X` contains 0 everywhere
     ##   that an observation is not from the level for the selected smooth.
     ## Here we filter out those observations from `X` and the `data`
     if (is_by_fac) {
-        by_var <- by_variable(sm)
-        by_lev <- by_level(sm)
+        by_var <- by_variable(smooth)
+        by_lev <- by_level(smooth)
         take <- data[[by_var]] == by_lev
         tbl <- tbl[take, ]
         data <- data[take, ]
@@ -73,7 +90,7 @@
 
     ## Add the data to `tbl`; need it later for plotting etc, but only keep
     ##  the variables involved in this smooth
-    sm_data <- data[, smooth_variable(sm)]
+    sm_data <- data[, smooth_variable(smooth)]
     tbl <- bind_cols(tbl, sm_data)
 
     ## convert to long-form; select the first nfun cols to be gathered,
@@ -82,20 +99,20 @@
                   factor_key = TRUE)
 
     ## reorder cols so we have the basis function & value first, data last
-    tbl <- select(tbl, bf, value, everything())
+    tbl <- select(tbl, matches("bf"), matches("value"), everything())
 
     ## Add on an identifier for the smooth
-    tbl <- add_column(tbl, smooth = smooth_label(sm), .before = 1L)
+    tbl <- add_column(tbl, smooth = smooth_label(smooth), .before = 1L)
 
     ## Need a column for by smooths; will be NA for most smooths
     by_var <- rep(NA_character_, length = nrow(tbl))
-    if (is_by_smooth(sm)) {
-        by_var <- rep(by_variable(sm), length = nrow(tbl))
+    if (is_by_smooth(smooth)) {
+        by_var <- rep(by_variable(smooth), length = nrow(tbl))
         ## If we have a factor by we need to store the factor. Not needed
         ##   for other by variable smooths.
         if (is_by_fac) {
-            tbl <- add_column(tbl, ..xx.. = rep(by_level(sm), nrow(tbl)))
-            names(tbl)[NCOL(tbl)] <- by_variable(sm)
+            tbl <- add_column(tbl, ..xx.. = rep(by_level(smooth), nrow(tbl)))
+            names(tbl)[NCOL(tbl)] <- by_variable(smooth)
         }
     }
 
@@ -103,7 +120,7 @@
     tbl <- add_column(tbl, by_variable = by_var, .after = 1L)
 
     ## class this up
-    class(tbl) <- c(gsub("\\.", "_", class(sm)), class(tbl))
+    class(tbl) <- c(gsub("\\.", "_", class(smooth)), class(tbl))
 
     ## return
     tbl
