@@ -6,6 +6,12 @@
     normal distribution (`mvnfast::rmvn()`). Contributed by Henrik Singmann
     (@singmann) #28
 
+* New function `basis()` for generating tidy representations of basis expansions
+   from an *mgcv*-like definition of a smooth, e.g. `s()`, `te()`, `ti()`, or
+   `t2()`. The basic smooth types also have a simple `draw()` method for plotting
+   the basis. `basis()` is a simple wrapper around `mgcv::smoothCon()` with some
+   post processing of the basis model matrix into a tidy format. #42
+
 ## Bug fixes
 
 * `draw.gam()` would produce empty plots between the panels for the parametric
