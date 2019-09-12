@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>How many smooths in a fitted model — n_smooths • gratia</title>
+<title>A tidy basis representation of a smooth object — tidy_basis • gratia</title>
 
 
 <!-- jquery -->
@@ -33,8 +33,9 @@
 
 
 
-<meta property="og:title" content="How many smooths in a fitted model — n_smooths" />
-<meta property="og:description" content="How many smooths in a fitted model" />
+<meta property="og:title" content="A tidy basis representation of a smooth object — tidy_basis" />
+<meta property="og:description" content="Takes an object of class mgcv.smooth and returns a tidy representation
+of the basis." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -99,47 +100,45 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>How many smooths in a fitted model</h1>
+    <h1>A tidy basis representation of a smooth object</h1>
     
-    <div class="hidden name"><code>n_smooths.Rd</code></div>
+    <div class="hidden name"><code>tidy_basis.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>How many smooths in a fitted model</p>
+    <p>Takes an object of class <code>mgcv.smooth</code> and returns a tidy representation
+of the basis.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>n_smooths</span>(<span class='no'>object</span>)
-
-<span class='co'># S3 method for default</span>
-<span class='fu'>n_smooths</span>(<span class='no'>object</span>)
-
-<span class='co'># S3 method for gam</span>
-<span class='fu'>n_smooths</span>(<span class='no'>object</span>)
-
-<span class='co'># S3 method for gamm</span>
-<span class='fu'>n_smooths</span>(<span class='no'>object</span>)
-
-<span class='co'># S3 method for bam</span>
-<span class='fu'>n_smooths</span>(<span class='no'>object</span>)</pre>
+    <pre class="usage"><span class='fu'>tidy_basis</span>(<span class='no'>smooth</span>, <span class='no'>data</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>object</th>
-      <td><p>a fitted GAM or related model. Typically the result of a call
-to <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/gam'>mgcv::gam()</a></code>, <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/bam'>mgcv::bam()</a></code>, or <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/gamm'>mgcv::gamm()</a></code>.</p></td>
+      <th>smooth</th>
+      <td><p>a smooth object.</p></td>
+    </tr>
+    <tr>
+      <th>data</th>
+      <td><p>a data frame containing the variables used in <code>smooth</code>.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A tibble.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
     </ul>
 
+    <h2>Author</h2>
+    <p>Gavin L. Simpson</p>
   </div>
 </div>
 

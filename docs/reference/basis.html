@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fix the names of a data frame containing an offset variable. — fix_offset • gratia</title>
+<title>Basis expansions for smooths — basis • gratia</title>
 
 
 <!-- jquery -->
@@ -33,10 +33,10 @@
 
 
 
-<meta property="og:title" content="Fix the names of a data frame containing an offset variable. — fix_offset" />
-<meta property="og:description" content="Identifies which variable, if any, is the model offset, and fixed the name
-such that offset(foo(var)) is converted to var, and possibly sets the
-values of that variable to offset_val." />
+<meta property="og:title" content="Basis expansions for smooths — basis" />
+<meta property="og:description" content="Creates a basis expansion from a definition of a smoother using the syntax
+of mgcv's smooths via mgcv::s()., mgcv::te(), mgcv::ti(), and
+mgcv::t2()." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -101,45 +101,57 @@ values of that variable to offset_val." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Fix the names of a data frame containing an offset variable.</h1>
+    <h1>Basis expansions for smooths</h1>
     
-    <div class="hidden name"><code>fix_offset.Rd</code></div>
+    <div class="hidden name"><code>basis.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Identifies which variable, if any, is the model offset, and fixed the name
-such that <code><a href='https://www.rdocumentation.org/packages/stats/topics/offset'>offset(foo(var))</a></code> is converted to <code>var</code>, and possibly sets the
-values of that variable to <code>offset_val</code>.</p>
+    <p>Creates a basis expansion from a definition of a smoother using the syntax
+of <em>mgcv</em>'s smooths via <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/s'>mgcv::s()</a></code>., <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/te'>mgcv::te()</a></code>, <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/te'>mgcv::ti()</a></code>, and
+<code><a href='https://www.rdocumentation.org/packages/mgcv/topics/t2'>mgcv::t2()</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>fix_offset</span>(<span class='no'>model</span>, <span class='no'>newdata</span>, <span class='kw'>offset_val</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>basis</span>(<span class='no'>smooth</span>, <span class='no'>data</span>, <span class='kw'>knots</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>constraints</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>model</th>
-      <td><p>a fitted GAM.</p></td>
+      <th>smooth</th>
+      <td><p>a smooth specification, the result of a call to one of
+<code><a href='https://www.rdocumentation.org/packages/mgcv/topics/s'>mgcv::s()</a></code>., <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/te'>mgcv::te()</a></code>, <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/te'>mgcv::ti()</a></code>, or <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/t2'>mgcv::t2()</a></code>.</p></td>
     </tr>
     <tr>
-      <th>newdata</th>
-      <td><p>data frame; new values at which to predict at.</p></td>
+      <th>data</th>
+      <td><p>a data frame containing the variables used in <code>smooth</code>.</p></td>
     </tr>
     <tr>
-      <th>offset_val</th>
-      <td><p>numeric, optional; if provided, then the offset variable
-in <code>newdata</code> is set to this constant value before returning <code>newdata</code></p></td>
+      <th>knots</th>
+      <td><p>a list or data frame with named components containing
+knots locations. Names must match the covariates for which the basis
+is required. See <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/smoothCon'>mgcv::smoothCon()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>constraints</th>
+      <td><p>logical; should identifiability constraints be applied to
+the smooth basis. See argument <code>absorb.cons</code> in <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/smoothCon'>mgcv::smoothCon()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>other arguments passed to <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/smoothCon'>mgcv::smoothCon()</a></code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The original <code>newdata</code> is returned with fixed names and possibly
-modified offset variable.</p>
+    <p>A tibble.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/message'>suppressPackageStartupMessages</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='st'>"mgcv"</span>))</div><div class='input'><span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/mgcv/topics/gamSim'>gamSim</a></span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>m</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/mgcv/topics/gam'>gam</a></span>(<span class='no'>y</span> ~ <span class='fu'><a href='https://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x0</span>) + <span class='fu'><a href='https://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x1</span>) + <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/offset'>offset</a></span>(<span class='no'>x2</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>df</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/names'>names</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/model.frame'>model.frame</a></span>(<span class='no'>m</span>))</div><div class='output co'>#&gt; [1] "y"          "offset(x2)" "x0"         "x1"        </div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/names'>names</a></span>(<span class='fu'>fix_offset</span>(<span class='no'>m</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/model.frame'>model.frame</a></span>(<span class='no'>m</span>), <span class='kw'>offset_val</span> <span class='kw'>=</span> <span class='fl'>1L</span>))</div><div class='output co'>#&gt; [1] "y"  "x2" "x0" "x1"</div></pre>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/message'>suppressPackageStartupMessages</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='st'>"mgcv"</span>))</div><div class='input'><span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/mgcv/topics/gamSim'>gamSim</a></span>(<span class='fl'>4</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+
+<span class='no'>bf</span> <span class='kw'>&lt;-</span> <span class='fu'>basis</span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x0</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>df</span>)
+<span class='no'>bf</span> <span class='kw'>&lt;-</span> <span class='fu'>basis</span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/mgcv/topics/s'>s</a></span>(<span class='no'>x2</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='no'>fac</span>, <span class='kw'>bs</span> <span class='kw'>=</span> <span class='st'>'bs'</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>df</span>, <span class='kw'>constraints</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
