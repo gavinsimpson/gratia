@@ -575,3 +575,98 @@
 
     plot_grid(plotlist = plotlist, align = align, axis = axis, ...)
 }
+
+##' Plot basis functions
+##'
+##' Plots basis functions using ggplot2
+##' 
+##' @param object an object, the result of a call to [basis()].
+##' @param legend logical; should a legend by drawn to indicate basis functions?
+##' @param use_facets logical; for factor by smooths, use facets to show the
+##'   basis functions for each level of the factor? If `FALSE`, a separate ggplot
+##'   object will be created for each level and combined using
+##'   [cowplot::plot_grid()]. **Currently ignored**.
+##' @param labeller a labeller function with which to label facets. The default
+##'   is to use [ggplot2::label_both()].
+##' @param xlab character or expression; the label for the x axis. If not
+##'   supplied, a suitable label will be generated from `object`.
+##' @param ylab character or expression; the label for the y axis. If not
+##'   supplied, a suitable label will be generated from `object`.
+##' @param title character or expression; the title for the plot. See
+##'   [ggplot2::labs()].
+##' @param subtitle character or expression; the subtitle for the plot. See
+##'   [ggplot2::labs()].
+##' @param caption character or expression; the plot caption. See
+##'   [ggplot2::labs()].
+##' @param ... arguments passed to other methods. Not used by this method.
+##'
+##' @return A [ggplot2::ggplot()] object.
+##'
+##' @author Gavin L. Simpson
+##'
+##' @importFrom ggplot2 ggplot aes_ labs geom_line guides facet_wrap label_both
+##' 
+##' @export
+##'
+##' @examples
+##' suppressPackageStartupMessages(library("mgcv"))
+##' \dontshow{set.seed(42)}
+##' df <- gamSim(4, n = 400, verbose = FALSE)
+##'
+##' bf <- basis(s(x0), data = df)
+##' draw(bf)
+##'
+##' bf <- basis(s(x2, by = fac, bs = 'bs'), data = df)
+##' draw(bf)
+`draw.mgcv_smooth` <- function(object,
+                               legend = FALSE,
+                               use_facets = TRUE,
+                               labeller = NULL,
+                               xlab, ylab,
+                               title = NULL, subtitle = NULL,
+                               caption = NULL,
+                               ...) {
+    ## capture the univariate smooth variable
+    smooth_var <- names(object)[5L]
+
+    ## default labeller
+    if (is.null(labeller)) {
+        labeller  <- label_both
+    }
+
+    ## basis plot
+    plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ value,
+                               colour = ~ bf)) +
+        geom_line()
+
+    ## default labels if none supplied
+    if (missing(xlab)) {
+        xlab <- smooth_var
+    }
+    if (missing(ylab)) {
+        ylab <- "Value"
+    }
+    if (is.null(title)) {
+        title <- attr(object, "smooth_object")
+    }
+
+    ## fixup for by variable smooths, facet for factor by smooths
+    if (all(!is.na(object[["by_variable"]]))) {
+        by_var_name <- unique(object[["by_variable"]])
+        by_var <- object[[by_var_name]]
+        if (is.character(by_var) || is.factor(by_var)) {
+            plt <- plt + facet_wrap(by_var_name, labeller = labeller)
+        }
+    }
+
+    ## add labelling to plot
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+                      caption = caption)
+
+    ## draw a guide?
+    if (!legend) {
+        plt <- plt + guides(colour = "none")
+    }
+
+    plt
+}

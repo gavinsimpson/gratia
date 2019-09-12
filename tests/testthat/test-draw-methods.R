@@ -314,6 +314,7 @@ test_that("draw.derivates() plots derivatives for a GAM", {
 
 ## test that issue 39 stays fixed
 test_that("draw.gam doesn't create empty plots with multiple parametric terms", {
+    set.seed(42)
     dat <- gamSim(4, n = 300, verbose = FALSE)
     dat <- transform(dat, fac = factor(fac), fac2 = factor(fac)) # second factor
     ## GAM with 2 factors and 2 numeric terms
@@ -321,4 +322,20 @@ test_that("draw.gam doesn't create empty plots with multiple parametric terms", 
                family = gaussian(link = "identity"))
     plt <- draw(m2f)
     expect_doppelganger("draw issue 39 empty plots", plt)
+})
+
+test_that("draw.mgcv_smooth() can plot basic smooth bases", {
+    set.seed(42)
+    dat <- gamSim(1, n = 400, verbose = FALSE)
+    bs <- basis(s(x0), data = dat)
+    plt <- draw(bs)
+    expect_doppelganger("draw basic tprs basis", plt)
+})
+
+test_that("draw.mgcv_smooth() can plot by factor basis smooth bases", {
+    set.seed(42)
+    dat <- gamSim(4, n = 400, verbose = FALSE)
+    bs <- basis(s(x2, by = fac), data = dat)
+    plt <- draw(bs)
+    expect_doppelganger("draw by factor basis", plt)
 })
