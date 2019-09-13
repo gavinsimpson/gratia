@@ -299,3 +299,31 @@ test_that("derivatives() returns derivatives with simultaneous intervals for all
     expect_s3_class(df, "tbl_df")
     expect_named(df, c("smooth","var","data","derivative","se","crit","lower","upper"))
 })
+
+test_that("derivatives() works for factor by smooths issue 47", {
+    set.seed(1)
+    dat <- gamSim(4, n = 400, verbose = FALSE)
+    m <- gam(y ~ fac + s(x2, by = fac), data = dat)
+    expect_silent(d <- derivatives(m))
+    expect_s3_class(d, "derivatives")
+    expect_s3_class(d, "tbl_df")
+    expect_named(d, c("smooth","var","data","derivative","se","crit","lower","upper"))
+    plt <- draw(d) # clearly shows the problem
+    expect_doppelganger("draw issue 47 derivatives for factor by", plt)
+
+    m <- gam(y ~ x1 + s(x2) + fac + s(x0, by = fac), data = dat)
+    expect_silent(d <- derivatives(m))
+    expect_s3_class(d, "derivatives")
+    expect_s3_class(d, "tbl_df")
+    expect_named(d, c("smooth","var","data","derivative","se","crit","lower","upper"))
+    plt <- draw(d) # clearly shows the problem
+    expect_doppelganger("draw issue 47 derivatives for complex factor by", plt)
+
+    m <- gamm(y ~ x1 + s(x2) + fac + s(x0, by = fac), data = dat)
+    expect_silent(d <- derivatives(m))
+    expect_s3_class(d, "derivatives")
+    expect_s3_class(d, "tbl_df")
+    expect_named(d, c("smooth","var","data","derivative","se","crit","lower","upper"))
+    plt <- draw(d) # clearly shows the problem
+    expect_doppelganger("draw issue 47 derivatives for gamm factor by", plt)
+})
