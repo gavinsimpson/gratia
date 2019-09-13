@@ -27,6 +27,10 @@ r_packages:
   - vdiffr
   - scam
   - MASS
+  - tibble
+  - dplyr
+  - rlang
+  - mvnfast
 
 r_github_packages:
   - r-lib/covr
