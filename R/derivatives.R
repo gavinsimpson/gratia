@@ -398,10 +398,10 @@
 
     ## need a list of terms used in current smooth
     sm <- get_smooths_by_id(model, id)[[1L]]
-    smooth_vars <- unique(gratia:::smooth_variable(sm))
+    smooth_vars <- unique(smooth_variable(sm))
     ## is smooth a factor by? If it is, extract the by variable
-    by_var <- if (gratia:::is_factor_by_smooth(sm)) {
-        gratia:::by_variable(sm)
+    by_var <- if (is_factor_by_smooth(sm)) {
+        by_variable(sm)
     } else {
         NULL
     }
@@ -417,11 +417,11 @@
         levs <- levels(mf[[by_var]])
         ## coerce level for this smooth to correct factor type with FUN
         ##   return as a list with the correct names
-        newfac <- setNames(list(FUN(gratia:::by_level(sm), levels = levs)), by_var)
+        newfac <- setNames(list(FUN(by_level(sm), levels = levs)), by_var)
         ## append this list to the list of new smooth covariate values
         newlist <- append(newlist, newfac)
     }
-    newdata <- exec(tidyr::nesting, !!!newlist) # actually compute expand.grid-alike
+    newdata <- exec(nesting, !!!newlist) # actually compute expand.grid-alike
 
     ## need to provide single values for all other covariates in data
     unused_vars <- dplyr::setdiff(m.terms, used_vars)
