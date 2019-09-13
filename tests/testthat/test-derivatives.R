@@ -4,6 +4,8 @@
 library("testthat")
 library("gratia")
 library("mgcv")
+library("ggplot2")
+library("vdiffr")
 
 context("derivatives methods")
 
@@ -308,7 +310,7 @@ test_that("derivatives() works for factor by smooths issue 47", {
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
     expect_named(d, c("smooth","var","data","derivative","se","crit","lower","upper"))
-    plt <- draw(d) # clearly shows the problem
+    plt <- draw(d)
     expect_doppelganger("draw issue 47 derivatives for factor by", plt)
 
     m <- gam(y ~ x1 + s(x2) + fac + s(x0, by = fac), data = dat)
@@ -316,14 +318,23 @@ test_that("derivatives() works for factor by smooths issue 47", {
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
     expect_named(d, c("smooth","var","data","derivative","se","crit","lower","upper"))
-    plt <- draw(d) # clearly shows the problem
+    plt <- draw(d)
     expect_doppelganger("draw issue 47 derivatives for complex factor by", plt)
+    
+    dat <- transform(dat, ofac = ordered(fac))
+    m <- gam(y ~ x1 + s(x2) + ofac + s(x0) + s(x0, by = ofac), data = dat)
+    expect_silent(d <- derivatives(m))
+    expect_s3_class(d, "derivatives")
+    expect_s3_class(d, "tbl_df")
+    expect_named(d, c("smooth","var","data","derivative","se","crit","lower","upper"))
+    plt <- draw(d)
+    expect_doppelganger("draw issue 47 derivatives for complex ordered factor by", plt)    
 
     m <- gamm(y ~ x1 + s(x2) + fac + s(x0, by = fac), data = dat)
     expect_silent(d <- derivatives(m))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
     expect_named(d, c("smooth","var","data","derivative","se","crit","lower","upper"))
-    plt <- draw(d) # clearly shows the problem
+    plt <- draw(d)
     expect_doppelganger("draw issue 47 derivatives for gamm factor by", plt)
 })
