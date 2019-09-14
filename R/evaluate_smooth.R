@@ -543,7 +543,8 @@
                                            ...) {
     tt <- object$pterms       # get parametric terms
     tt <- delete.response(tt) # remove response so easier to work with
-    vars <- labels(tt)        # names of all parametric terms
+    vars <- parametric_terms(object)
+    mgcv_names <- names(vars) # this is how mgcv refers to the terms
 
     if (length(term) > 1L) {
         term <- term[1L]
@@ -558,10 +559,17 @@
     mf <- model.frame(object)  # data used to fit model
     is_fac <- is.factor(mf[[term]]) # is term a factor?
 
+    ## match the specific term, with term names mgcv actually uses
+    ## for example in a model with multiple linear predictors, terms in
+    ## nth linear predictor (for n > 1) get appended .{n-1}  
+    ind <- match(term, vars)
+
+    ## take the actual mgcv version of the names for the `terms` argument
     evaluated <- as.data.frame(predict(object, newdata = mf, type = 'terms',
-                                       terms = term, se = TRUE,
+                                       terms = mgcv_names[ind], se = TRUE,
                                        unconditional = unconditional))
     evaluated <- setNames(evaluated, c("partial", "se"))
+    evaluated <- as_tibble(evaluated)
 
     if (is_fac) {
         levs <- levels(mf[, term])
@@ -570,8 +578,11 @@
         evaluated <- cbind(term = term, type = ifelse(is_fac, "factor", "numeric"),
                       newd, do.call("rbind", spl))
     } else {
-        evaluated <- cbind(term = term, type = ifelse(is_fac, "factor", "numeric"),
-                           value = mf[, term], evaluated)
+        nr <- NROW(evaluated)
+        evaluated <- bind_cols(term = rep(term, nr),
+                               type = rep(ifelse(is_fac, "factor", "numeric"), nr),
+                               value = mf[[term]],
+                               evaluated)
     }
 
     ## add confidence interval
