@@ -538,7 +538,7 @@
 ##' @importFrom stats delete.response
 ##' @importFrom tibble as_tibble add_column
 ##' @importFrom rlang .data
-##' @importFrom dplyr mutate bind_cols
+##' @importFrom dplyr mutate bind_cols bind_rows
 ##'
 ##' @export
 `evaluate_parametric_term.gam` <- function(object, term, unconditional = FALSE,
@@ -594,7 +594,6 @@
     evaluated <- mutate(evaluated,
                         upper = .data$partial + (2 * .data$se),
                         lower = .data$partial - (2 * .data$se))
-    ## evaluated[["lower"]] <- evaluated[["partial"]] - (2 * evaluated[["se"]])
 
     class(evaluated) <- c("evaluated_parametric_term", class(evaluated))
     evaluated                           # return
