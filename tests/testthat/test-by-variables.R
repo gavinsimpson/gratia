@@ -1,4 +1,4 @@
-## Test Handling `by` variables in smooths/GAMs
+## Test handling `by` variables in smooths/GAMs
 
 ## load packages
 library("testthat")
@@ -14,7 +14,9 @@ dat <- gamSim(3, n = 400, verbose = FALSE)
 mod <- gam(y ~ s(x2, by = x1), data = dat)
 
 test_that("draw() works with continuous by", {
-    vdiffr::expect_doppelganger("continuous by-variable smmoth", draw(mod))
+    plt <- draw(mod)
+    vdiffr::expect_doppelganger("continuous by-variable smmoth",
+                                plt)
 })
 
 test_that("draw() works with continuous by and fixed scales", {
@@ -66,6 +68,7 @@ test_that("get_by_smooth works", {
 })
 
 test_that("draw.gam works with select and parametric = TRUE", {
+    plt <- draw(mf, select = 's(x2)fac1', parametric = TRUE)
     vdiffr::expect_doppelganger("draw.gam-user-select-and-parametric-true",
-                                draw(mf, select = 's(x2)fac1', parametric = TRUE))
+                                plt)
 })
