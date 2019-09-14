@@ -110,7 +110,7 @@
 }
 
 ## Random effect smooth
-##' @importFrom tibble add_column
+##' @importFrom tibble add_column tibble
 `evaluate_re_smooth` <- function(object, model = NULL, newdata = NULL,
                                  unconditional = FALSE) {
     ## is this a by smooth
@@ -152,10 +152,10 @@
         para_seq <- seq(from = start, to = end, by = 1L)
         coefs <- coef(model)[para_seq]
         se <- diag(vcov(model, unconditional = unconditional))[para_seq]
-        evaluated[[i]] <- data_frame(smooth = rep(smooth_labels[i], length(coefs)),
-                                     ..var  = levs,
-                                     est = coefs,
-                                     se = se)
+        evaluated[[i]] <- tibble(smooth = rep(smooth_labels[i], length(coefs)),
+                                 ..var  = levs,
+                                 est = coefs,
+                                 se = se)
     }
 
     evaluated <- do.call("rbind", evaluated)
@@ -583,7 +583,7 @@
 }
 
 ## loop over smooths and predict
-##' @importFrom tibble data_frame
+##' @importFrom tibble tibble
 `spline_values` <- function(smooth, newdata, model, unconditional,
                             overall_uncertainty = TRUE, term) {
     X <- PredictMat(smooth, newdata)   # prediction matrix
@@ -623,18 +623,18 @@
     ## Return
     out <- if (d == 1L) {
                if (is_fs_smooth(smooth)) {
-                   data_frame(smooth = rep(label, nrow(X)),
-                              x = newdata[, 1L], f = newdata[, 2L],
-                              est = fit, se = se.fit)
+                   tibble(smooth = rep(label, nrow(X)),
+                          x = newdata[, 1L], f = newdata[, 2L],
+                          est = fit, se = se.fit)
                } else {
-                   data_frame(smooth = rep(label, nrow(X)),
-                              x = newdata[, 1L],
-                              est = fit, se = se.fit)
+                   tibble(smooth = rep(label, nrow(X)),
+                          x = newdata[, 1L],
+                          est = fit, se = se.fit)
                }
            } else {
-               data_frame(smooth = rep(label, nrow(X)),
-                          x1 = newdata[, 1L], x2 = newdata[, 2L],
-                          est = fit, se = se.fit)
+               tibble(smooth = rep(label, nrow(X)),
+                      x1 = newdata[, 1L], x2 = newdata[, 2L],
+                      est = fit, se = se.fit)
            }
     out
 }
