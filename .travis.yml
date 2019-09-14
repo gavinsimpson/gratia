@@ -5,7 +5,7 @@ matrix:
   include:
   - r: devel
   - r: release
-    env: VDIFFR_RUN_TESTS=true
+# env: VDIFFR_RUN_TESTS=true ## turned off
 
 env:
   global:
