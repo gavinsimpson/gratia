@@ -29,10 +29,16 @@ The main features of *gratia* are currently
 
 ## Installing *gratia*
 
-*gratia* is under active development and has not yet had its first release to CRAN. The easiest way to install the package is via the `install_github()` function from package *devtools*. Make sure you have *devtools* installed, then run
+*gratia* is now available on CRAN, and can be installed with
 
 ```r
-devtools::install_github("gavinsimpson/gratia")
+install.packages('gratia')
+```
+
+however *gratia* is under active development and you may wish to install the development version from github. The easiest way to do this is via the `install_github()` function from package *remotes*. Make sure you have *remotes* installed, then run
+
+```r
+remotes::install_github("gavinsimpson/gratia")
 ```
 
 to install the package.
