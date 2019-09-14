@@ -536,7 +536,9 @@
 ##' @rdname evaluate_smooth
 ##'
 ##' @importFrom stats delete.response
-##' @importFrom tibble data_frame add_column
+##' @importFrom tibble as_tibble add_column
+##' @importFrom rlang .data
+##' @importFrom dplyr mutate bind_cols
 ##'
 ##' @export
 `evaluate_parametric_term.gam` <- function(object, term, unconditional = FALSE,
@@ -575,8 +577,11 @@
         levs <- levels(mf[, term])
         newd <- setNames(data.frame(fac = factor(levs, levels = levs)), "value")
         spl <- lapply(split(evaluated, mf[, term]), `[`, i = 1, j = )
-        evaluated <- cbind(term = term, type = ifelse(is_fac, "factor", "numeric"),
-                      newd, do.call("rbind", spl))
+        evaluated <- bind_rows(spl)
+        nr <- NROW(evaluated)
+        evaluated <- bind_cols(term = rep(term, nr),
+                               type = rep(ifelse(is_fac, "factor", "numeric"), nr),
+                               newd, evaluated)
     } else {
         nr <- NROW(evaluated)
         evaluated <- bind_cols(term = rep(term, nr),
@@ -586,10 +591,12 @@
     }
 
     ## add confidence interval
-    evaluated[["upper"]] <- evaluated[["partial"]] + (2 * evaluated[["se"]])
-    evaluated[["lower"]] <- evaluated[["partial"]] - (2 * evaluated[["se"]])
+    evaluated <- mutate(evaluated,
+                        upper = .data$partial + (2 * .data$se),
+                        lower = .data$partial - (2 * .data$se))
+    ## evaluated[["lower"]] <- evaluated[["partial"]] - (2 * evaluated[["se"]])
 
-    class(evaluated) <- c("evaluated_parametric_term", "data.frame")
+    class(evaluated) <- c("evaluated_parametric_term", class(evaluated))
     evaluated                           # return
 }
 
