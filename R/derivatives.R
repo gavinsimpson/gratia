@@ -208,7 +208,7 @@
     X
 }
 
-##' @importFrom tibble data_frame
+##' @importFrom tibble tibble
 `compute_derivative` <- function(id, lpmatrix, betas, Vb, model, newdata) {
     sm <- get_smooths_by_id(model, id)[[1L]]
     sm_var <- smooth_variable(sm)
@@ -218,11 +218,11 @@
     Xi[, want] <- lpmatrix[, want]      # copy bits of Xp we need
     d <- drop(Xi %*% betas)             # estimate derivative
     se <- rowSums(Xi %*% Vb * Xi)^0.5   # standard errors
-    result <- list(deriv = data_frame(smooth = rep(sm_lab, length(d)),
-                                      var = rep(sm_var, length(d)),
-                                      data = newdata[[sm_var]],
-                                      derivative = d,
-                                      se = se),
+    result <- list(deriv = tibble(smooth = rep(sm_lab, length(d)),
+                                  var = rep(sm_var, length(d)),
+                                  data = newdata[[sm_var]],
+                                  derivative = d,
+                                  se = se),
                    Xi = Xi)
     result
 }
