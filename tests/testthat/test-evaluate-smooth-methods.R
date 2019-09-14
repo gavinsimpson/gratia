@@ -154,7 +154,12 @@ test_that("evaluate_parametric_terms() works with parametric terms", {
     mod <- gam(y ~ x0 + s(x1) + s(x2) + s(x3), data = df)
 
     ## evaluate parametric terms directly
-    expect_silent(evaluate_parametric_term(mod, term = "x0"))
+    expect_silent(para <- evaluate_parametric_term(mod, term = "x0"))
+    expect_s3_class(para, "evaluated_parametric_term")
+    expect_s3_class(para, "tbl_df")
+    expect_s3_class(para, "tbl")
+    expect_s3_class(para, "data.frame")
+    expect_named(para, c("term","type","value","partial","se","upper","lower"))
 
     expect_error(evaluate_parametric_term(mod, term = "foo"),
                  "Term is not in the parametric part of model: <foo>",

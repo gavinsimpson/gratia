@@ -339,3 +339,31 @@ test_that("draw.mgcv_smooth() can plot by factor basis smooth bases", {
     plt <- draw(bs)
     expect_doppelganger("draw by factor basis", plt)
 })
+
+test_that("draw() works with a ziplss models; issue #45", {
+    ## simulate some data...
+    f0 <- function(x) 2 * sin(pi * x); f1 <- function(x) exp(2 * x)
+    f2 <- function(x) 0.2 * x^11 * (10 * (1 - x))^6 + 10 * 
+                          (10 * x)^3 * (1 - x)^10
+    n <- 500
+    set.seed(5)
+    x0 <- runif(n)
+    x1 <- runif(n)
+    x2 <- runif(n)
+    x3 <- runif(n)
+    
+    ## Simulate probability of potential presence...
+    eta1 <- f0(x0) + f1(x1) - 3
+    p <- binomial()$linkinv(eta1) 
+    y <- as.numeric(runif(n) < p) ## 1 for presence, 0 for absence
+    
+    ## Simulate y given potentially present (not exactly model fitted!)...
+    ind <- y > 0
+    eta2 <- f2(x2[ind])/3
+    y[ind] <- rpois(exp(eta2), exp(eta2))
+    df <- data.frame(y, x0, x1, x2, x3)
+    b1 <- gam(list(y ~ s(x2) + x3,
+                   ~ s(x0) + x1), family = ziplss(), data = df)
+    plt <- draw(b1)
+    vdiffr::expect_doppelganger("draw ziplss parametric terms issue 45", plt)
+})

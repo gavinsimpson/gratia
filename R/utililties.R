@@ -479,11 +479,27 @@
 ##' @rdname parametric_terms
 `parametric_terms.gam` <- function(model, ...) {
     tt <- model$pterms        # get parametric terms
-    labs <- if (is.list(tt)) {
-        unique(unlist(lapply(tt, function(x) labels(delete.response(x)))))
+    if (is.list(tt)) {
+        ## If a list, we have multiple linear predictors. For terms in the
+        ## nth linear predictor (for n > 1) the covariate gets appended '.{n-1}'
+        ## so store the mgcv names as the names of the labels returned  
+        labs <- unlist(lapply(tt, function(x) labels(delete.response(x))))
+        names(labs) <- unlist(lapply(seq_along(labs),
+                                     function(i, labs) {
+                                         if (i > 1L) {
+                                             paste0(labs[[i]], ".", i-1)
+                                         } else {
+                                             labs[[i]]}
+                                     }, labs))
+        labs
     } else {
-        tt <- delete.response(tt) # remove response so easier to work with
-        labels(tt)                # names of all parametric terms
+        if (length(attr(tt, "term.labels") > 0L)) {
+            tt <- delete.response(tt) # remove response so easier to work with
+            labs <- labels(tt)        # names of all parametric terms
+            names(labs) <- labs
+        } else {
+            labs <- character(0)
+        }
     }
     labs
 }
