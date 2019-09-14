@@ -3,14 +3,14 @@
 ## New features
 
 * *gratia* now uses the *mvnfast* package for random draws from a multivariate
-    normal distribution (`mvnfast::rmvn()`). Contributed by Henrik Singmann
-    (@singmann) [#28](https://github.com/gavinsimpson/gratia/issues/28)
+  normal distribution (`mvnfast::rmvn()`). Contributed by Henrik Singmann (@singmann)
+  [#28](https://github.com/gavinsimpson/gratia/issues/28)
 
 * New function `basis()` for generating tidy representations of basis expansions
-   from an *mgcv*-like definition of a smooth, e.g. `s()`, `te()`, `ti()`, or
-   `t2()`. The basic smooth types also have a simple `draw()` method for plotting
-   the basis. `basis()` is a simple wrapper around `mgcv::smoothCon()` with some
-   post processing of the basis model matrix into a tidy format. [#42](https://github.com/gavinsimpson/gratia/issues/42)
+  from an *mgcv*-like definition of a smooth, e.g. `s()`, `te()`, `ti()`, or
+  `t2()`. The basic smooth types also have a simple `draw()` method for plotting
+  the basis. `basis()` is a simple wrapper around `mgcv::smoothCon()` with some
+  post processing of the basis model matrix into a tidy format. [#42](https://github.com/gavinsimpson/gratia/issues/42)
 
 ## Bug fixes
 
@@ -21,3 +21,8 @@
 * `derivatives()` now works with factor by smooths, including ordered factor by
     smooths. The function also now works correctly for complex models with
     multiple covariates/smooths. [#47](https://github.com/gavinsimpson/gratia/issues/47)
+
+* `evaluate_parametric_term()` and hence `draw.gam()` would fail on a `ziplss()` model
+  because i) *gratia* didn't handle parametric terms in models with multiple linear
+  predictors correctly, and ii) *gratia* didn't convert to the naming convention of
+  *mgcv* for terms in higher linear predictors. Reported by @pboesu [#45](https://github.com/gavinsimpson/gratia/issues/45).
