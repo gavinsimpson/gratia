@@ -8,10 +8,12 @@
 
 <title>Fix the names of a data frame containing an offset variable. — fix_offset • gratia</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/simplex/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
@@ -32,12 +34,13 @@
 
 
 
-<meta property="og:title" content="Fix the names of a data frame containing an offset variable. — fix_offset" />
 
+<meta property="og:title" content="Fix the names of a data frame containing an offset variable. — fix_offset" />
 <meta property="og:description" content="Identifies which variable, if any, is the model offset, and fixed the name
 such that offset(foo(var)) is converted to var, and possibly sets the
 values of that variable to offset_val." />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -87,7 +90,6 @@ values of that variable to offset_val." />
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         
       </ul>
@@ -109,15 +111,13 @@ values of that variable to offset_val." />
     </div>
 
     <div class="ref-description">
-    
     <p>Identifies which variable, if any, is the model offset, and fixed the name
 such that <code><a href='https://rdrr.io/r/stats/offset.html'>offset(foo(var))</a></code> is converted to <code>var</code>, and possibly sets the
 values of that variable to <code>offset_val</code>.</p>
-    
     </div>
 
     <pre class="usage"><span class='fu'>fix_offset</span>(<span class='no'>model</span>, <span class='no'>newdata</span>, <span class='kw'>offset_val</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -135,12 +135,11 @@ values of that variable to <code>offset_val</code>.</p>
 in <code>newdata</code> is set to this constant value before returning <code>newdata</code></p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>The original <code>newdata</code> is returned with fixed names and possibly
 modified offset variable.</p>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/message.html'>suppressPackageStartupMessages</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='st'>"mgcv"</span>))
@@ -152,9 +151,7 @@ modified offset variable.</p>
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 

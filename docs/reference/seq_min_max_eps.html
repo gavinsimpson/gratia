@@ -9,10 +9,12 @@
 <title>Create a sequence of evenly-spaced values adjusted to accommodate a
 small adjustment — seq_min_max_eps • gratia</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/simplex/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
@@ -33,9 +35,9 @@ small adjustment — seq_min_max_eps • gratia</title>
 
 
 
+
 <meta property="og:title" content="Create a sequence of evenly-spaced values adjusted to accommodate a
 small adjustment — seq_min_max_eps" />
-
 <meta property="og:description" content="Creates a sequence of n evenly-spaced values over the range
 min(x) -- max(x), where the minimum and maximum are adjusted such that
 they are always contained within the range of x when x may be shifted
@@ -44,6 +46,7 @@ useful in computing derivatives via finite differences where without this
 adjustment we may be predicting for values outside the range of the data
 and hence the conmstraints of the penalty." />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -93,7 +96,6 @@ and hence the conmstraints of the penalty." />
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         
       </ul>
@@ -116,7 +118,6 @@ small adjustment</h1>
     </div>
 
     <div class="ref-description">
-    
     <p>Creates a sequence of <code>n</code> evenly-spaced values over the range
 <code><a href='https://rdrr.io/r/base/Extremes.html'>min(x)</a></code> -- <code><a href='https://rdrr.io/r/base/Extremes.html'>max(x)</a></code>, where the minimum and maximum are adjusted such that
 they are always contained within the range of <code>x</code> when <code>x</code> may be shifted
@@ -124,12 +125,11 @@ forwards or backwards by an amount related to <code>eps</code>. This is particul
 useful in computing derivatives via finite differences where without this
 adjustment we may be predicting for values outside the range of the data
 and hence the conmstraints of the penalty.</p>
-    
     </div>
 
     <pre class="usage"><span class='fu'>seq_min_max_eps</span>(<span class='no'>x</span>, <span class='no'>n</span>, <span class='no'>order</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"forward"</span>, <span class='st'>"backward"</span>, <span class='st'>"central"</span>),
   <span class='no'>eps</span>)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -156,20 +156,18 @@ second order derivatives</p></td>
       <td><p>numeric; the finite difference</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A numeric vector of length <code>n</code>.</p>
-    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-          </ul>
+    </ul>
 
   </div>
 </div>

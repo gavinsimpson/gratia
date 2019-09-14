@@ -8,10 +8,12 @@
 
 <title>Plot estimated smooths from a fitted GAM — draw.gam • gratia</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/simplex/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
@@ -32,12 +34,13 @@
 
 
 
-<meta property="og:title" content="Plot estimated smooths from a fitted GAM — draw.gam" />
 
+<meta property="og:title" content="Plot estimated smooths from a fitted GAM — draw.gam" />
 <meta property="og:description" content="Plots estimated smooths from a fitted GAM model in a similar way to
 mgcv::plot.gam() but instead of using base graphics, ggplot2::ggplot()
 is used instead." />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -87,7 +90,6 @@ is used instead." />
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         
       </ul>
@@ -109,11 +111,9 @@ is used instead." />
     </div>
 
     <div class="ref-description">
-    
     <p>Plots estimated smooths from a fitted GAM model in a similar way to
 <code><a href='https://rdrr.io/pkg/mgcv/man/plot.gam.html'>mgcv::plot.gam()</a></code> but instead of using base graphics, <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot2::ggplot()</a></code>
 is used instead.</p>
-    
     </div>
 
     <pre class="usage"><span class='co'># S3 method for gam</span>
@@ -121,7 +121,7 @@ is used instead.</p>
   <span class='kw'>scales</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"free"</span>, <span class='st'>"fixed"</span>), <span class='kw'>align</span> <span class='kw'>=</span> <span class='st'>"hv"</span>, <span class='kw'>axis</span> <span class='kw'>=</span> <span class='st'>"lrtb"</span>,
   <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overall_uncertainty</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>dist</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='kw'>rug</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>partial_match</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -204,18 +204,16 @@ against.</p></td>
 <code>plot_grid()</code> may be supplied, except for: <code>plotlist</code> and <code>align</code>.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>The object returned is created by <code><a href='https://rdrr.io/pkg/cowplot/man/plot_grid.html'>cowplot::plot_grid()</a></code>.</p>
-    
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
     <p>Internally, plots of each smooth are created using <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot2::ggplot()</a></code>
 and composed into a single plot using <code><a href='https://rdrr.io/pkg/cowplot/man/plot_grid.html'>cowplot::plot_grid()</a></code>. As a result,
 it is not possible to use <code>+</code> to add to the plots in the way one might
 typically work with <code>ggplot()</code> plots.</p>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/message.html'>suppressPackageStartupMessages</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='st'>"mgcv"</span>))
@@ -229,11 +227,8 @@ typically work with <code>ggplot()</code> plots.</p>
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#note">Note</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 
