@@ -104,11 +104,11 @@
 
 ## if no data, set to a 0-row tibble; if data supplied, check it:
 ##   - single row df or list of length-1 elements; only variables in mf
-##' @importFrom tibble is_tibble data_frame
+##' @importFrom tibble is_tibble tibble
 `process_slice_data` <- function(data) {
     ## if NULL, bail early; return a 0-row tibble
     if (is.null(data)) {
-        return(data_frame())
+        return(tibble())
     }
 
     ## we were given something
