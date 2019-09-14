@@ -113,10 +113,7 @@
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>New features</h2>
 <ul>
-<li>
-<em>gratia</em> now uses the <em>mvnfast</em> package for random draws from a multivariate normal distribution (<code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html">mvnfast::rmvn()</a></code>). Contributed by Henrik Singmann
-<p>(<a href='https://github.com/singmann'>@singmann</a>) <a href="https://github.com/gavinsimpson/gratia/issues/28">#28</a></p>
-</li>
+<li><p><em>gratia</em> now uses the <em>mvnfast</em> package for random draws from a multivariate normal distribution (<code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html">mvnfast::rmvn()</a></code>). Contributed by Henrik Singmann (<a href='https://github.com/singmann'>@singmann</a>) <a href="https://github.com/gavinsimpson/gratia/issues/28">#28</a></p></li>
 <li><p>New function <code><a href="../reference/basis.html">basis()</a></code> for generating tidy representations of basis expansions from an <em>mgcv</em>-like definition of a smooth, e.g. <code>s()</code>, <code>te()</code>, <code>ti()</code>, or <code>t2()</code>. The basic smooth types also have a simple <code><a href="../reference/draw.html">draw()</a></code> method for plotting the basis. <code><a href="../reference/basis.html">basis()</a></code> is a simple wrapper around <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html">mgcv::smoothCon()</a></code> with some post processing of the basis model matrix into a tidy format. <a href="https://github.com/gavinsimpson/gratia/issues/42">#42</a></p></li>
 </ul>
 </div>
@@ -126,6 +123,7 @@
 <ul>
 <li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> would produce empty plots between the panels for the parametric terms if there were 2 or more parametric terms in a model. Reported by <a href='https://github.com/sklayn'>@sklayn</a> <a href="https://github.com/gavinsimpson/gratia/issues/39">#39</a>.</p></li>
 <li><p><code><a href="../reference/derivatives.html">derivatives()</a></code> now works with factor by smooths, including ordered factor by smooths. The function also now works correctly for complex models with multiple covariates/smooths. <a href="https://github.com/gavinsimpson/gratia/issues/47">#47</a></p></li>
+<li><p><code><a href="../reference/evaluate_smooth.html">evaluate_parametric_term()</a></code> and hence <code><a href="../reference/draw.gam.html">draw.gam()</a></code> would fail on a <code>ziplss()</code> model because i) <em>gratia</em> didn’t handle parametric terms in models with multiple linear predictors correctly, and ii) <em>gratia</em> didn’t convert to the naming convention of <em>mgcv</em> for terms in higher linear predictors. Reported by <a href='https://github.com/pboesu'>@pboesu</a> <a href="https://github.com/gavinsimpson/gratia/issues/45">#45</a>.</p></li>
 </ul>
 </div>
 </div>
