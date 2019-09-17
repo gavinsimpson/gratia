@@ -69,10 +69,15 @@ suppressPackageStartupMessages(library("mgcv"))
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
-## smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
+smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
+
+## A factor by example (with a spurious covariate x0)
+\dontshow{set.seed(2)}
+dat <- gamSim(4)
+
+## fit model...
+m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
 }
 \author{
-Gavin L. Simpson
-
 Gavin L. Simpson
 }

@@ -80,3 +80,40 @@
     }
     smooth
 }
+
+## Adds data to an object in a consistent way
+##
+## Variables in `data` are selected using `vars`. Then they are renamed
+## `.x1`, `.x2` etc.
+## 
+##' @importFrom dplyr bind_cols
+##' @importFrom rlang !! :=
+add_smooth_var_data <- function(x, vars, data) {
+    sm_data <- data[vars]
+    names(sm_data) <- paste0(".x", seq_len(NCOL(sm_data)))
+    sm_data <- bind_cols(x, sm_data)
+    sm_data
+}
+
+## Adds information about factor by variables to smooths
+##
+##' @importFrom tibble add_column
+##' @importFrom rlang !! :=
+add_factor_by_data <- function(x, n = NULL, by_name, by_data, before = 1L) {
+    ## n is number of observations to add
+    ## by_name should be the name of the factor variable, which should
+    ## be in by_data, a data frame/tibble of data used to create `x`
+    if (is.null(n)) {
+        n <- NROW(x)
+    }
+    if (is.factor(by_data[[by_name]])) {
+        x <- add_column(x, by_variable = rep(by_name, times = n),
+                        .before = before)
+        x <- add_column(x, !!(by_name) := by_data[[by_name]],
+                        .after = before)
+    } else {
+        x <- add_column(x, by_variable = rep(NA_character_, times = n),
+                        .before = before)
+    }
+    x
+}

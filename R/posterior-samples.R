@@ -212,7 +212,14 @@
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 ##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
-##' ## smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
+##' smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
+##'
+##' ## A factor by example (with a spurious covariate x0)
+##' \dontshow{set.seed(2)}
+##' dat <- gamSim(4)
+##'
+##' ## fit model...
+##' m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
 `smooth_samples` <- function(model, ...) {
     UseMethod("smooth_samples")
 }
@@ -233,11 +240,10 @@
 ##'
 ##' @rdname smooth_samples
 ##'
-##' @author Gavin L. Simpson
 ##' @inheritParams posterior_samples
 ##'
 ##' @importFrom mvnfast rmvn
-##' @importFrom dplyr bind_rows
+##' @importFrom dplyr bind_rows starts_with
 ##' @importFrom tibble as_tibble add_column
 ##' @importFrom tidyr gather
 ##' @importFrom mgcv PredictMat
@@ -263,9 +269,9 @@
         S <- S[take]
     }
 
+    need_newdata <- FALSE
     if (is.null(newdata)) {
-        ## generate data but the simple way
-        newdata <- as_tibble(lapply(model[["model"]], seq_min_max, n = n_vals))
+        need_newdata <- TRUE
     }
 
     V <- get_vcov(model, frequentist = freq, unconditional = unconditional)
@@ -273,22 +279,43 @@
     ## Xp <- predict(model, newdata = newdata, type = "lpmatrix")
     coefs <- coef(model)
 
-    sims <- vector('list', length = length(S))
+    sims <- data_names <- vector('list', length = length(S))
     for (i in seq_along(S)) {
+        if (need_newdata) {
+            newdata <- smooth_data(model, id = i, n = n_vals, offset = NULL) # FIXME: should offset be NULL?
+            ## I don't think we need offset here as that really just shifts the response around
+        }
         sm  <- get_smooths_by_id(model, i)[[1L]]
         idx <- smooth_coefs(sm)
         Xp <- PredictMat(sm, data = newdata)
         betas <- rmvn(n = n, mu = coefs[idx], sigma = V[idx, idx, drop=FALSE],
                       ncores = ncores)
-        sims[[i]] <- as_tibble(Xp %*% t(betas))
+        simu <- Xp %*% t(betas)
+        simu <- as_tibble(simu)
+        names(simu) <- paste0("..V", seq_len(NCOL(simu)))
+        is_fac_by <- is_factor_by_smooth(sm)
+        if (is_fac_by) {
+            simu <- add_factor_by_data(simu, n = n_vals,
+                                       by_name = by_variable(sm),
+                                       by_data = newdata, before = 1L)
+        }
+        simu <- add_smooth_var_data(simu, smooth_variable(sm), newdata)
+        sims[[i]] <- simu
+        summ_names <- names(newdata[!vapply(newdata, is.factor, logical(1))])
+        names(summ_names) <- paste0(".x", seq_along(summ_names))
+        data_names[[i]] <- summ_names
     }
 
     sims <- do.call("bind_rows", sims)
-    names(sims) <- as.character(seq_len(ncol(sims)))
-    sims <- add_column(sims, term = rep(S, each = n_vals), .before = 1L)
-    sims <- add_column(sims, row = rep(seq_len(nrow(newdata)), times = length(S)), .after = 1L)
-    sims <- gather(sims, key = "draw", value = "smooth", - term, - row)
-    sims[["draw"]] <- as.integer(sims[["draw"]])
+    sims <- add_column(sims,
+                       smooth = rep(unlist(lapply(strsplit(S, ":"), `[`, 1L)),
+                                    each = n_vals),
+                       .before = 1L)
+    sims <- add_column(sims, term = rep(S, each = n_vals), .before = 2L)
+    sims <- add_column(sims, row = rep(seq_len(nrow(newdata)), times = length(S)))
+    sims <- gather(sims, key = "draw", value = "value", dplyr::starts_with("..V"))
+    sims[["draw"]] <- as.integer(sub("\\.\\.V", "", sims[["draw"]]))
     attr(sims, "seed") <- RNGstate
+    attr(sims, "data_names") <- setNames(data_names, nm = S)
     sims
 }
