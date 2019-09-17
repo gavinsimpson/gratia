@@ -9,7 +9,7 @@ smooth_samples(model, ...)
 
 \method{smooth_samples}{gam}(model, term = NULL, n = 1,
   newdata = NULL, seed = NULL, freq = FALSE, unconditional = FALSE,
-  weights = NULL, n_vals = 200, ...)
+  weights = NULL, ncores = 1L, n_vals = 200, ...)
 }
 \arguments{
 \item{model}{a fitted model of the supported types}
@@ -39,6 +39,11 @@ returned, if available.}
 \item{weights}{numeric; a vector of prior weights. If \code{newdata} is null
 then defaults to \code{object[["prior.weights"]]}, otherwise a vector of ones.}
 
+\item{ncores}{number of cores for generating random variables from a
+multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
+Parallelization will take place only if OpenMP is supported (but appears
+to work on Windows with current \code{R}).}
+
 \item{n_vals}{numeric; how many locations to evaluate the smooth at if
 \code{newdata} not supplied}
 }
@@ -59,7 +64,7 @@ fitted model, created via \code{simulate()} (e.g. \code{\link[=simulate.gam]{sim
 and returned in a tidy, long, format.
 }
 \examples{
-library("mgcv")
+suppressPackageStartupMessages(library("mgcv"))
 \dontshow{set.seed(2)}
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
@@ -67,5 +72,7 @@ m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ## smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
 }
 \author{
+Gavin L. Simpson
+
 Gavin L. Simpson
 }

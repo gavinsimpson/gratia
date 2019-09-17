@@ -8,7 +8,7 @@
 \usage{
 \method{fitted_samples}{gam}(model, n, newdata, seed,
   scale = c("response", "linear_predictor"), freq = FALSE,
-  unconditional = FALSE, ...)
+  unconditional = FALSE, ncores = 1L, ...)
 
 predicted_samples(model, ...)
 
@@ -37,6 +37,11 @@ covariance matrix of the parameters.}
 Bayesian smoothing parameter uncertainty corrected covariance matrix is
 returned, if available.}
 
+\item{ncores}{number of cores for generating random variables from a
+multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
+Parallelization will take place only if OpenMP is supported (but appears
+to work on Windows with current \code{R}).}
+
 \item{...}{arguments passed to other methods}
 
 \item{weights}{numeric; a vector of prior weights. If \code{newdata} is null
@@ -59,13 +64,13 @@ fitted model, created via \code{simulate()} (e.g. \code{\link[=simulate.gam]{sim
 and returned in a tidy, long, format.
 }
 \examples{
-library("mgcv")
+suppressPackageStartupMessages(library("mgcv"))
 \dontshow{set.seed(2)}
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 fitted_samples(m1, n = 5, seed = 42)
-library("mgcv")
+suppressPackageStartupMessages(library("mgcv"))
 \dontshow{set.seed(2)}
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")

@@ -15,6 +15,10 @@
 ##'   returned, if available.
 ##' @param weights numeric; a vector of prior weights. If `newdata` is null
 ##'   then defaults to `object[["prior.weights"]]`, otherwise a vector of ones.
+##' @param ncores number of cores for generating random variables from a
+##'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
+##'   Parallelization will take place only if OpenMP is supported (but appears
+##'   to work on Windows with current `R`).
 ##' @param ... arguments passed to other methods
 ##'
 ##' @return A tibble (data frame) with 3 columns containing the posterior
@@ -43,7 +47,7 @@
 `posterior_samples.gam` <- function(model, n, newdata, seed,
                                     scale = c("response","linear_predictor"),
                                     freq = FALSE, unconditional = FALSE,
-                                    weights = NULL, ...) {
+                                    weights = NULL, ncores = 1L, ...) {
 }
 
 ##' Draw fitted values from the posterior distribution
@@ -78,10 +82,10 @@
 ##' @rdname predicted_samples
 ##'
 ##' @importFrom stats vcov coef predict
-##' @importFrom mvtnorm rmvnorm
+##' @importFrom mvnfast rmvn
 ##'
 ##' @examples
-##' library("mgcv")
+##' suppressPackageStartupMessages(library("mgcv"))
 ##' \dontshow{set.seed(2)}
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 ##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
@@ -90,7 +94,7 @@
 `fitted_samples.gam` <- function(model, n, newdata, seed,
                                  scale = c("response","linear_predictor"),
                                  freq = FALSE, unconditional = FALSE,
-                                 ...) {
+                                 ncores = 1L, ...) {
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
         runif(1)
     }
@@ -110,7 +114,7 @@
     scale <- match.arg(scale)
 
     V <- get_vcov(model, frequentist = freq, unconditional = unconditional)
-    Rbeta <- rmvnorm(n = n, mean = coef(model), sigma = V)
+    Rbeta <- rmvn(n = n, mu = coef(model), sigma = V, ncores = ncores)
     Xp <- predict(model, newdata = newdata, type = "lpmatrix")
     sims <- Xp %*% t(Rbeta)
 
@@ -148,7 +152,7 @@
 ##' @export
 ##'
 ##' @examples
-##' library("mgcv")
+##' suppressPackageStartupMessages(library("mgcv"))
 ##' \dontshow{set.seed(2)}
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 ##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
@@ -203,7 +207,7 @@
 ##' @export
 ##'
 ##' @examples
-##' library("mgcv")
+##' suppressPackageStartupMessages(library("mgcv"))
 ##' \dontshow{set.seed(2)}
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 ##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
@@ -229,14 +233,17 @@
 ##'
 ##' @rdname smooth_samples
 ##'
-##' @importFrom mvtnorm rmvnorm
+##' @author Gavin L. Simpson
+##' @inheritParams posterior_samples
+##'
+##' @importFrom mvnfast rmvn
 ##' @importFrom dplyr bind_rows
 ##' @importFrom tibble as_tibble add_column
 ##' @importFrom tidyr gather
 ##' @importFrom mgcv PredictMat
 `smooth_samples.gam` <- function(model, term = NULL, n = 1, newdata = NULL,
                                  seed = NULL, freq = FALSE, unconditional = FALSE,
-                                 weights = NULL, n_vals = 200, ...) {
+                                 weights = NULL, ncores = 1L, n_vals = 200, ...) {
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
         runif(1)
     }
@@ -271,8 +278,8 @@
         sm  <- get_smooths_by_id(model, i)[[1L]]
         idx <- smooth_coefs(sm)
         Xp <- PredictMat(sm, data = newdata)
-        betas <- rmvnorm(n = n, mean = coefs[idx],
-                         sigma = V[idx, idx, drop = FALSE])
+        betas <- rmvn(n = n, mu = coefs[idx], sigma = V[idx, idx, drop=FALSE],
+                      ncores = ncores)
         sims[[i]] <- as_tibble(Xp %*% t(betas))
     }
 

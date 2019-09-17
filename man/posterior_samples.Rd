@@ -9,7 +9,7 @@ posterior_samples(model, ...)
 
 \method{posterior_samples}{gam}(model, n, newdata, seed,
   scale = c("response", "linear_predictor"), freq = FALSE,
-  unconditional = FALSE, weights = NULL, ...)
+  unconditional = FALSE, weights = NULL, ncores = 1L, ...)
 }
 \arguments{
 \item{model}{a fitted model of the supported types}
@@ -36,6 +36,11 @@ returned, if available.}
 
 \item{weights}{numeric; a vector of prior weights. If \code{newdata} is null
 then defaults to \code{object[["prior.weights"]]}, otherwise a vector of ones.}
+
+\item{ncores}{number of cores for generating random variables from a
+multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
+Parallelization will take place only if OpenMP is supported (but appears
+to work on Windows with current \code{R}).}
 }
 \value{
 A tibble (data frame) with 3 columns containing the posterior
