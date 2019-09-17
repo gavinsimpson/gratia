@@ -93,8 +93,10 @@
 <h2 class="hasAnchor">
 <a href="#installing-gratia" class="anchor"></a>Installing <em>gratia</em>
 </h2>
-<p><em>gratia</em> is under active development and has not yet had its first release to CRAN. The easiest way to install the package is via the <code>install_github()</code> function from package <em>devtools</em>. Make sure you have <em>devtools</em> installed, then run</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"gavinsimpson/gratia"</span>)</a></code></pre></div>
+<p><em>gratia</em> is now available on CRAN, and can be installed with</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">'gratia'</span>)</a></code></pre></div>
+<p>however <em>gratia</em> is under active development and you may wish to install the development version from github. The easiest way to do this is via the <code>install_github()</code> function from package <em>remotes</em>. Make sure you have <em>remotes</em> installed, then run</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">remotes<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/remotes/man/install_github.html">install_github</a></span>(<span class="st">"gavinsimpson/gratia"</span>)</a></code></pre></div>
 <p>to install the package.</p>
 </div>
 <div id="history" class="section level2">
