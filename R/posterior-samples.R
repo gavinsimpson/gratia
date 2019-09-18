@@ -244,6 +244,7 @@
 ##'
 ##' ## fit model...
 ##' m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
+##' smooth_samples(m2, n = 5, seed = 42)
 `smooth_samples` <- function(model, ...) {
     UseMethod("smooth_samples")
 }
