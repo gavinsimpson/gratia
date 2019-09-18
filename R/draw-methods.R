@@ -671,8 +671,54 @@
     plt
 }
 
+##' @param alpha numeric; alpha transparency for confidence or simultaneous
+##'   interval.
+##' @param colour The colour to use to draw the posterior smooths. Passed to
+##'   [ggplot2::geom_line()] as argument `colour`. 
+##'
+##' @export
+##'
+##' @inheritParams draw.gam
+##'
+##' @author Gavin L. Simpson
+##' 
+##' @importFrom dplyr filter
+##' @importFrom purrr map
+##' @importFrom rlang .data
+##'
+##' @examples
+##' suppressPackageStartupMessages('mgcv')
+##' \dontshow{set.seed(1)}
+##' dat1 <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+##' ## a single smooth GAM
+##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "REML")
+##' ## posterior smooths from m1
+##' sm1 <- smooth_samples(m1, n = 15, seed = 23478)
+##' ## plot
+##' draw(sm1, alpha = 0.7)
+##' 
+##' \dontshow{set.seed(1)}
+##' dat2 <- gamSim(2, n = 4000, dist = "normal", scale = 1, verbose = FALSE)
+##' ## a multi-smooth GAM
+##' m2 <- gam(y ~ s(x, z, k = 40), data = dat2$data, method = "REML")
+##' ## posterior smooths from m1
+##' sm2 <- smooth_samples(m2, n = 15, seed = 23478)
+##' ## plot
+##' draw(sm2, alpha = 0.7)
+##' 
+##' \dontshow{set.seed(1)}
+##' dat3 <- gamSim(4, verbose = FALSE)
+##' ## a multi-smooth GAM with a factor-by smooth
+##' m3 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat3)
+##' ## posterior smooths from m1
+##' sm3 <- smooth_samples(m3, n = 15, seed = 23478)
+##' ## plot
+##' draw(sm3, alpha = 0.7)
+##' ## this time selecting only one smooth
+##' draw(sm3, select = "s(x0)")
+##' ## or selecting the factor-by smooth
+##' draw(sm3, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
 `draw.smooth_samples` <- function(object,
-                                  parametric = NULL,
                                   select = NULL,
                                   xlab = NULL, ylab = NULL, title = NULL,
                                   subtitle = NULL, caption = NULL,
@@ -685,17 +731,17 @@
     scales <- match.arg(scales)
 
     ## select smooths
-    S <- unique(object$term)
+    S <- unique(object[["term"]])
     select <- check_user_select_smooths(smooths = S, select = select,
                                         partial_match = partial_match)
     S <- S[select]
-    object <- filter(object, term %in% S)
+    object <- filter(object, .data$term %in% S)
 
     ## can only plot 1d smooths - currently - prune S but how?
     ## FIXME
     
     do_plot_smooths <- function(i, tbl, ...) {
-        tbl <- filter(tbl, term == i)
+        tbl <- filter(tbl, .data$term == i)
         plot_posterior_smooths(tbl, ...)
     }
 

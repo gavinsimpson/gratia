@@ -22,6 +22,7 @@ Imports:
     cowplot,
     grid,
     mvnfast,
+    purrr,
     stats,
     tools,
     grDevices
