@@ -187,63 +187,18 @@
     sims
 }
 
-##' Draw predicted values from the posterior distribution
-##'
-##' Predicted values of the response drawn from the posterior distribution of
-##'   fitted model, created via `simulate()` (e.g. [simulate.gam()])
-##'   and returned in a tidy, long, format.
-##'
-##' @return A tibble (data frame) with 3 columns containing the posterior
-##'   predicted values in long format. The columns are
-##' * `row` (integet) the row of `newdata` that each posterior draw relates to,
-##' * `draw` (integer) an index, in range `1:n`, indicating which draw each row
-##'     relates to,
-##' * `response` (numeric) the predicted response for the indicated row of
-##'     `newdata`.
-##'
-##' @author Gavin L. Simpson
-##'
-##' @inheritParams posterior_samples
-##' @export
-##'
-##' @examples
-##' suppressPackageStartupMessages(library("mgcv"))
-##' \dontshow{set.seed(2)}
-##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
-##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-##'
-##' smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
-##'
-##' ## A factor by example (with a spurious covariate x0)
-##' \dontshow{set.seed(2)}
-##' dat <- gamSim(4)
-##'
-##' ## fit model...
-##' m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
-`smooth_samples` <- function(model, ...) {
-    UseMethod("smooth_samples")
-}
-
-##' @export
-`smooth_samples.default` <- function(model, ...) {
-    stop("Don't know how to sample from the posterior of <",
-         class(model)[[1L]], ">", .call = FALSE)
-}
-
 ##' Posterior draws for individual smooths
 ##'
 ##' Returns draws from the posterior distributions of smooth functions in a GAM.
 ##' Useful, for example, for visualising the uncertainty in individual estimated
 ##' functions.
 ##'
-##' @param n_vals numeric; how many locations to evaluate the smooth at if
-##'   `newdata` not supplied
-##' @param term character; select which smooth's posterior to draw from.
-##'   The default (`NULL`) means the posteriors of all smooths in `model`
-##'   wil be sampled from. If supplied, a character vector of requested terms.
+##' @author Gavin L. Simpson
 ##'
 ##' @return A tibble with additional classes `"smooth_samples"` and
-##'   `"posterior_samples". The columns currently returned (not in this order)
+##'   `"posterior_samples".
+##'
+##'   For the `"gam"` method, the columns currently returned (not in this order)
 ##'   are:
 ##'
 ##' * `smooth`; character vector. Indicates the smooth function for that
@@ -272,6 +227,39 @@
 ##'     which will contain the level for the factor named in `by_variable` for
 ##'     that particular posterior draw.
 ##'
+##' @inheritParams posterior_samples
+##' @export
+##'
+##' @examples
+##' suppressPackageStartupMessages(library("mgcv"))
+##' \dontshow{set.seed(2)}
+##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+##'
+##' smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
+##'
+##' ## A factor by example (with a spurious covariate x0)
+##' \dontshow{set.seed(2)}
+##' dat <- gamSim(4)
+##'
+##' ## fit model...
+##' m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
+`smooth_samples` <- function(model, ...) {
+    UseMethod("smooth_samples")
+}
+
+##' @export
+`smooth_samples.default` <- function(model, ...) {
+    stop("Don't know how to sample from the posterior of <",
+         class(model)[[1L]], ">", .call = FALSE)
+}
+
+##' @param n_vals numeric; how many locations to evaluate the smooth at if
+##'   `newdata` not supplied
+##' @param term character; select which smooth's posterior to draw from.
+##'   The default (`NULL`) means the posteriors of all smooths in `model`
+##'   wil be sampled from. If supplied, a character vector of requested terms.
+##'
 ##' @section Warning:
 ##' The set of variables returned and their order in the tibble is subject to
 ##' change in future versions. Don't rely on position.
@@ -289,7 +277,7 @@
 ##' @importFrom mgcv PredictMat
 `smooth_samples.gam` <- function(model, term = NULL, n = 1, newdata = NULL,
                                  seed = NULL, freq = FALSE, unconditional = FALSE,
-                                 weights = NULL, ncores = 1L, n_vals = 200, ...) {
+                                 ncores = 1L, n_vals = 200, ...) {
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
         runif(1)
     }

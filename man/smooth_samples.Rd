@@ -3,13 +3,13 @@
 \name{smooth_samples}
 \alias{smooth_samples}
 \alias{smooth_samples.gam}
-\title{Draw predicted values from the posterior distribution}
+\title{Posterior draws for individual smooths}
 \usage{
 smooth_samples(model, ...)
 
 \method{smooth_samples}{gam}(model, term = NULL, n = 1,
   newdata = NULL, seed = NULL, freq = FALSE, unconditional = FALSE,
-  weights = NULL, ncores = 1L, n_vals = 200, ...)
+  ncores = 1L, n_vals = 200, ...)
 }
 \arguments{
 \item{model}{a fitted model of the supported types}
@@ -36,9 +36,6 @@ covariance matrix of the parameters.}
 Bayesian smoothing parameter uncertainty corrected covariance matrix is
 returned, if available.}
 
-\item{weights}{numeric; a vector of prior weights. If \code{newdata} is null
-then defaults to \code{object[["prior.weights"]]}, otherwise a vector of ones.}
-
 \item{ncores}{number of cores for generating random variables from a
 multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
 Parallelization will take place only if OpenMP is supported (but appears
@@ -48,18 +45,10 @@ to work on Windows with current \code{R}).}
 \code{newdata} not supplied}
 }
 \value{
-A tibble (data frame) with 3 columns containing the posterior
-predicted values in long format. The columns are
-\itemize{
-\item \code{row} (integet) the row of \code{newdata} that each posterior draw relates to,
-\item \code{draw} (integer) an index, in range \code{1:n}, indicating which draw each row
-relates to,
-\item \code{response} (numeric) the predicted response for the indicated row of
-\code{newdata}.
-}
-
 A tibble with additional classes \code{"smooth_samples"} and
-`"posterior_samples". The columns currently returned (not in this order)
+`"posterior_samples".
+
+For the \code{"gam"} method, the columns currently returned (not in this order)
 are:
 \itemize{
 \item \code{smooth}; character vector. Indicates the smooth function for that
@@ -90,10 +79,6 @@ that particular posterior draw.
 }
 }
 \description{
-Predicted values of the response drawn from the posterior distribution of
-fitted model, created via \code{simulate()} (e.g. \code{\link[=simulate.gam]{simulate.gam()}})
-and returned in a tidy, long, format.
-
 Returns draws from the posterior distributions of smooth functions in a GAM.
 Useful, for example, for visualising the uncertainty in individual estimated
 functions.
