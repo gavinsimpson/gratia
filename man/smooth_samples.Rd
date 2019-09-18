@@ -57,12 +57,53 @@ relates to,
 \item \code{response} (numeric) the predicted response for the indicated row of
 \code{newdata}.
 }
+
+A tibble with additional classes \code{"smooth_samples"} and
+`"posterior_samples". The columns currently returned (not in this order)
+are:
+\itemize{
+\item \code{smooth}; character vector. Indicates the smooth function for that
+particular draw,
+\item \code{term}; character vector. Similar to \code{smooth}, but will contain the
+full label for the smooth, to differentiate factor-by smooths for
+example.
+\item \code{by_variable}; character vector. If the smooth involves a \code{by} term, the
+by variable will be named here, \code{NA_character_} otherwise.
+\item \code{row}; integer. A vector of values \code{seq_len(n_vals)}, repeated if
+\code{n > 1L}. Indexes the row in \code{newdata} for that particular draw.
+\item \code{draw}; integer. A vector of integer values indexing the particular
+posterior draw that each row belongs to.
+\item \code{value}; numeric. The value of smooth function for this posterior draw
+and covariate combination.
+\item \code{.xN}; numeric. A series of one or more columns containing data required
+for the smooth. \code{.x1} will always be present and contains the values of
+the covariate in the smooth. For example if \code{smooth} is \code{s(z)} then
+\code{.x1} will contain the values of covariate \code{z} at which the smooth was
+evaluated. Further covariates for multi-dimensional thin plate splines
+(e.g. \code{s(x, z)}) or tensor product smooths (e.g. \code{te(x,z,a)}) will
+result in variables \code{.x1} and \code{.x2}, and \code{.x1}, \code{.x2}, and \code{.x3}
+respectively, with the number (\code{1}, \code{2}, etc) representing the order
+in which the covariates were specified in the smooth.
+\item Additional columns will be present in the case of factor by smooths,
+which will contain the level for the factor named in \code{by_variable} for
+that particular posterior draw.
+}
 }
 \description{
 Predicted values of the response drawn from the posterior distribution of
 fitted model, created via \code{simulate()} (e.g. \code{\link[=simulate.gam]{simulate.gam()}})
 and returned in a tidy, long, format.
+
+Returns draws from the posterior distributions of smooth functions in a GAM.
+Useful, for example, for visualising the uncertainty in individual estimated
+functions.
 }
+\section{Warning}{
+
+The set of variables returned and their order in the tibble is subject to
+change in future versions. Don't rely on position.
+}
+
 \examples{
 suppressPackageStartupMessages(library("mgcv"))
 \dontshow{set.seed(2)}
