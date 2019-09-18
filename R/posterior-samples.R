@@ -230,11 +230,51 @@
          class(model)[[1L]], ">", .call = FALSE)
 }
 
+##' Posterior draws for individual smooths
+##'
+##' Returns draws from the posterior distributions of smooth functions in a GAM.
+##' Useful, for example, for visualising the uncertainty in individual estimated
+##' functions.
+##'
 ##' @param n_vals numeric; how many locations to evaluate the smooth at if
 ##'   `newdata` not supplied
 ##' @param term character; select which smooth's posterior to draw from.
 ##'   The default (`NULL`) means the posteriors of all smooths in `model`
 ##'   wil be sampled from. If supplied, a character vector of requested terms.
+##'
+##' @return A tibble with additional classes `"smooth_samples"` and
+##'   `"posterior_samples". The columns currently returned (not in this order)
+##'   are:
+##'
+##' * `smooth`; character vector. Indicates the smooth function for that
+##'     particular draw,
+##' * `term`; character vector. Similar to `smooth`, but will contain the
+##'     full label for the smooth, to differentiate factor-by smooths for
+##'     example.
+##' * `by_variable`; character vector. If the smooth involves a `by` term, the
+##'     by variable will be named here, `NA_character_` otherwise.
+##' * `row`; integer. A vector of values `seq_len(n_vals)`, repeated if
+##'     `n > 1L`. Indexes the row in `newdata` for that particular draw.
+##' * `draw`; integer. A vector of integer values indexing the particular
+##'     posterior draw that each row belongs to.
+##' * `value`; numeric. The value of smooth function for this posterior draw
+##'     and covariate combination.
+##' * `.xN`; numeric. A series of one or more columns containing data required
+##'     for the smooth. `.x1` will always be present and contains the values of
+##'     the covariate in the smooth. For example if `smooth` is `s(z)` then
+##'     `.x1` will contain the values of covariate `z` at which the smooth was
+##'     evaluated. Further covariates for multi-dimensional thin plate splines
+##'     (e.g. `s(x, z)`) or tensor product smooths (e.g. `te(x,z,a)`) will
+##'     result in variables `.x1` and `.x2`, and `.x1`, `.x2`, and `.x3`
+##'     respectively, with the number (`1`, `2`, etc) representing the order
+##'     in which the covariates were specified in the smooth.
+##' * Additional columns will be present in the case of factor by smooths,
+##'     which will contain the level for the factor named in `by_variable` for
+##'     that particular posterior draw.
+##'
+##' @section Warning:
+##' The set of variables returned and their order in the tibble is subject to
+##' change in future versions. Don't rely on position.
 ##'
 ##' @export
 ##'
@@ -298,6 +338,9 @@
             simu <- add_factor_by_data(simu, n = n_vals,
                                        by_name = by_variable(sm),
                                        by_data = newdata, before = 1L)
+        } else {
+            simu <- add_column(simu,
+                               by_variable = rep(NA_character_, times = n_vals))
         }
         simu <- add_smooth_var_data(simu, smooth_variable(sm), newdata)
         sims[[i]] <- simu
