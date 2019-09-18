@@ -47,3 +47,24 @@ test_that("smooth_samples() fails if not suitable method available", {
     expect_error(smooth_samples(1:10),
                  "Don't know how to sample from the posterior of <integer>")
 })
+
+context("Testing fitted_samples() methods")
+
+test_that("fitted_samples() fails if not suitable method available", {
+    expect_error(fitted_samples(1:10),
+                 "Don't know how to sample from the posterior of <integer>")
+})
+
+context("Testing predicted_samples() methods")
+
+test_that("predicted_samples() fails if not suitable method available", {
+    expect_error(predicted_samples(1:10),
+                 "Don't know how to sample from the posterior of <integer>")
+})
+
+context("Testing posterior_samples() methods")
+
+test_that("posterior_samples() fails if not suitable method available", {
+    expect_error(posterior_samples(1:10),
+                 "Don't know how to sample from the posterior of <integer>")
+})
