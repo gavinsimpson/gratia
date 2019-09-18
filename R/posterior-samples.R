@@ -331,8 +331,9 @@
         betas <- rmvn(n = n, mu = coefs[idx], sigma = V[idx, idx, drop=FALSE],
                       ncores = ncores)
         simu <- Xp %*% t(betas)
+        colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
         simu <- as_tibble(simu)
-        names(simu) <- paste0("..V", seq_len(NCOL(simu)))
+        ## names(simu) <- paste0("..V", seq_len(NCOL(simu)))
         is_fac_by <- is_factor_by_smooth(sm)
         if (is_fac_by) {
             simu <- add_factor_by_data(simu, n = n_vals,
