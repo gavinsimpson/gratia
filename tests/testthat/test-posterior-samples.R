@@ -42,3 +42,8 @@ test_that("smooth_samples works for a multi-smooth factor by GAM", {
     expect_identical(NROW(sm), 2000L)
     expect_identical(NCOL(sm), 8L) # 8 cols, univatiate smooths with factor
 })
+
+test_that("smooth_samples() fails if not suitable method available", {
+    expect_error(smooth_samples(1:10),
+                 "Don't know how to sample from the posterior of <integer>")
+})

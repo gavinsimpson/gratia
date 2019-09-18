@@ -38,7 +38,7 @@
 
 ##' @export
 `posterior_samples.default` <- function(model, ...) {
-    stop("Don't know how sample from the posterior of <",
+    stop("Don't know how to sample from the posterior of <",
          class(model)[[1L]], ">", .call = FALSE)
 }
 
@@ -74,7 +74,7 @@
 
 ##' @export
 `fitted_samples.default` <- function(model, ...) {
-    stop("Don't know how sample from the posterior of <",
+    stop("Don't know how to sample from the posterior of <",
          class(model)[[1L]], ">", .call = FALSE)
 }
 
@@ -164,7 +164,7 @@
 
 ##' @export
 `predicted_samples.default` <- function(model, ...) {
-    stop("Don't know how sample from the posterior of <",
+    stop("Don't know how to sample from the posterior of <",
          class(model)[[1L]], ">", .call = FALSE)
 }
 
@@ -226,7 +226,7 @@
 
 ##' @export
 `smooth_samples.default` <- function(model, ...) {
-    stop("Don't know how sample from the posterior of <",
+    stop("Don't know how to sample from the posterior of <",
          class(model)[[1L]], ">", .call = FALSE)
 }
 
