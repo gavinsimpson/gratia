@@ -670,3 +670,88 @@
 
     plt
 }
+
+`draw.smooth_samples` <- function(object,
+                                  parametric = NULL,
+                                  select = NULL,
+                                  xlab = NULL, ylab = NULL, title = NULL,
+                                  subtitle = NULL, caption = NULL,
+                                  alpha = 1, colour = "black",
+                                  scales = c("free", "fixed"),
+                                  align = "hv", axis = "lrtb",
+                                  rug = TRUE,
+                                  partial_match = FALSE, ...) {
+    
+    scales <- match.arg(scales)
+
+    ## select smooths
+    S <- unique(object$term)
+    select <- check_user_select_smooths(smooths = S, select = select,
+                                        partial_match = partial_match)
+    S <- S[select]
+    object <- filter(object, term %in% S)
+
+    ## can only plot 1d smooths - currently - prune S but how?
+    ## FIXME
+    
+    do_plot_smooths <- function(i, tbl, ...) {
+        tbl <- filter(tbl, term == i)
+        plot_posterior_smooths(tbl, ...)
+    }
+
+    plts <- map(S, do_plot_smooths, tbl = object, xlab = xlab, ylab = ylab,
+                title = title, subtitle = subtitle, caption = caption,
+                rug = rug, alpha = alpha, colour = colour)
+
+    if (isTRUE(identical(scales, "fixed"))) {
+        ylims <- range(object[["value"]])
+
+        p <- seq_along(plts)
+        for (i in p) {
+            plts[[i]] <- plts[[i]] + lims(y = ylims)
+        }
+    }
+
+    plot_grid(plotlist = plts, align = align, axis = axis, ...)
+}
+
+`plot_posterior_smooths` <- function(tbl, xlab = NULL, ylab = NULL, title = NULL,
+                                     subtitle = NULL, caption = NULL,
+                                     rug = TRUE, alpha = 1, colour = "black", ...) {
+    data_names <- attr(tbl, "data_names")
+    smooth_var <- data_names[[unique(tbl[["term"]])]]
+    
+    plt <- ggplot(tbl, aes_(x = ~ .x1, y = ~ value, group = ~ draw)) +
+        geom_line(alpha = alpha, colour = colour)
+    
+    ## default axis labels if none supplied
+    if (is.null(xlab)) {
+        xlab <- smooth_var
+    }
+    if (is.null(ylab)) {
+        ylab <- "Effect"
+    }
+    if (is.null(title)) {
+        title <- unique(tbl[["term"]])
+    }
+    if (all(!is.na(tbl[["by_variable"]]))) {
+        spl <- strsplit(title, split = ":")
+        title <- spl[[1L]][[1L]]
+        if (is.null(subtitle)) {
+            by_var <- as.character(unique(tbl[["by_variable"]]))
+            subtitle <- paste0("By: ", by_var, "; ", unique(tbl[[by_var]]))
+        }
+    }
+    
+    ## add labelling to plot
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+                      caption = caption)
+    
+    ## add rug?
+    if (!is.null(rug)) {
+        plt <- plt + geom_rug(mapping = aes_string(x = '.x1'),
+                              inherit.aes = FALSE, sides = 'b')
+    }
+    
+    plt
+}
