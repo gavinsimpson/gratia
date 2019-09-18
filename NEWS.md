@@ -12,6 +12,10 @@
   the basis. `basis()` is a simple wrapper around `mgcv::smoothCon()` with some
   post processing of the basis model matrix into a tidy format. [#42](https://github.com/gavinsimpson/gratia/issues/42)
 
+* New function `smooth_samples()` to draw samples of entire smooth functions from
+  their posterior distribution. Also has a `draw()` method for plotting the
+  posterior samples.
+
 ## Bug fixes
 
 * `draw.gam()` would produce empty plots between the panels for the parametric
