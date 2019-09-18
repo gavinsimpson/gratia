@@ -45,26 +45,43 @@ test_that("smooth_samples works for a multi-smooth factor by GAM", {
 
 test_that("smooth_samples() fails if not suitable method available", {
     expect_error(smooth_samples(1:10),
-                 "Don't know how to sample from the posterior of <integer>")
+                 "Don't know how to sample from the posterior of <integer>",
+                 fixed = TRUE)
+})
+
+test_that("smooth_samples sets seed when seed not provided", {
+    expect_silent(smooth_samples(m2, seed = NULL))
+})
+
+test_that("smooth_samples works with term provided", {
+    expect_silent(sm <- smooth_samples(m2, term = "s(x2)", seed = 42))
+})
+
+test_that("smooth_samples errors with invalid term provided", {
+    expect_error(sm <- smooth_samples(m2, term = "s(x10)", seed = 42),
+                 "None of the terms matched a smooth.", fixed = TRUE)
 })
 
 context("Testing fitted_samples() methods")
 
 test_that("fitted_samples() fails if not suitable method available", {
     expect_error(fitted_samples(1:10),
-                 "Don't know how to sample from the posterior of <integer>")
+                 "Don't know how to sample from the posterior of <integer>",
+                 fixed = TRUE)
 })
 
 context("Testing predicted_samples() methods")
 
 test_that("predicted_samples() fails if not suitable method available", {
     expect_error(predicted_samples(1:10),
-                 "Don't know how to sample from the posterior of <integer>")
+                 "Don't know how to sample from the posterior of <integer>",
+                 fixed = TRUE)
 })
 
 context("Testing posterior_samples() methods")
 
 test_that("posterior_samples() fails if not suitable method available", {
     expect_error(posterior_samples(1:10),
-                 "Don't know how to sample from the posterior of <integer>")
+                 "Don't know how to sample from the posterior of <integer>",
+                 fixed = TRUE)
 })
