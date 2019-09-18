@@ -671,10 +671,23 @@
     plt
 }
 
+##' Plotting posterior smooths
+##' 
 ##' @param alpha numeric; alpha transparency for confidence or simultaneous
 ##'   interval.
 ##' @param colour The colour to use to draw the posterior smooths. Passed to
-##'   [ggplot2::geom_line()] as argument `colour`. 
+##'   [ggplot2::geom_line()] as argument `colour`.
+##' @param xlab character or expression; the label for the x axis. If not
+##'   supplied, a suitable label will be generated from `object`.
+##' @param ylab character or expression; the label for the y axis. If not
+##'   supplied, a suitable label will be generated from `object`.
+##' @param title character or expression; the title for the plot. See
+##'   [ggplot2::labs()].
+##' @param subtitle character or expression; the subtitle for the plot. See
+##'   [ggplot2::labs()].
+##' @param caption character or expression; the plot caption. See
+##'   [ggplot2::labs()].
+##' @param ... arguments to be passed to [cowplot::plot_grid()].
 ##'
 ##' @export
 ##'
@@ -687,7 +700,7 @@
 ##' @importFrom rlang .data
 ##'
 ##' @examples
-##' suppressPackageStartupMessages('mgcv')
+##' suppressPackageStartupMessages(library('mgcv'))
 ##' \dontshow{set.seed(1)}
 ##' dat1 <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 ##' ## a single smooth GAM
