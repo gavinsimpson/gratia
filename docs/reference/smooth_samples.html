@@ -38,7 +38,10 @@
 <meta property="og:title" content="Draw predicted values from the posterior distribution — smooth_samples" />
 <meta property="og:description" content="Predicted values of the response drawn from the posterior distribution of
 fitted model, created via simulate() (e.g. simulate.gam())
-and returned in a tidy, long, format." />
+and returned in a tidy, long, format.
+Returns draws from the posterior distributions of smooth functions in a GAM.
+Useful, for example, for visualising the uncertainty in individual estimated
+functions." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -71,7 +74,7 @@ and returned in a tidy, long, format." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.10</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.11</span>
       </span>
     </div>
 
@@ -114,6 +117,9 @@ and returned in a tidy, long, format." />
     <p>Predicted values of the response drawn from the posterior distribution of
 fitted model, created via <code><a href='https://rdrr.io/r/stats/simulate.html'>simulate()</a></code> (e.g. <code><a href='simulate.html'>simulate.gam()</a></code>)
 and returned in a tidy, long, format.</p>
+<p>Returns draws from the posterior distributions of smooth functions in a GAM.
+Useful, for example, for visualising the uncertainty in individual estimated
+functions.</p>
     </div>
 
     <pre class="usage"><span class='fu'>smooth_samples</span>(<span class='no'>model</span>, <span class='no'>...</span>)
@@ -196,6 +202,42 @@ relates to,</p></li>
 <code>newdata</code>.</p></li>
 </ul>
 
+<p>A tibble with additional classes <code>"smooth_samples"</code> and
+`"posterior_samples". The columns currently returned (not in this order)
+are:</p><ul>
+<li><p><code>smooth</code>; character vector. Indicates the smooth function for that
+particular draw,</p></li>
+<li><p><code>term</code>; character vector. Similar to <code>smooth</code>, but will contain the
+full label for the smooth, to differentiate factor-by smooths for
+example.</p></li>
+<li><p><code>by_variable</code>; character vector. If the smooth involves a <code>by</code> term, the
+by variable will be named here, <code>NA_character_</code> otherwise.</p></li>
+<li><p><code>row</code>; integer. A vector of values <code><a href='https://rdrr.io/r/base/seq.html'>seq_len(n_vals)</a></code>, repeated if
+<code>n &gt; 1L</code>. Indexes the row in <code>newdata</code> for that particular draw.</p></li>
+<li><p><code>draw</code>; integer. A vector of integer values indexing the particular
+posterior draw that each row belongs to.</p></li>
+<li><p><code>value</code>; numeric. The value of smooth function for this posterior draw
+and covariate combination.</p></li>
+<li><p><code>.xN</code>; numeric. A series of one or more columns containing data required
+for the smooth. <code>.x1</code> will always be present and contains the values of
+the covariate in the smooth. For example if <code>smooth</code> is <code><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s(z)</a></code> then
+<code>.x1</code> will contain the values of covariate <code>z</code> at which the smooth was
+evaluated. Further covariates for multi-dimensional thin plate splines
+(e.g. <code><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s(x, z)</a></code>) or tensor product smooths (e.g. <code><a href='https://rdrr.io/pkg/mgcv/man/te.html'>te(x,z,a)</a></code>) will
+result in variables <code>.x1</code> and <code>.x2</code>, and <code>.x1</code>, <code>.x2</code>, and <code>.x3</code>
+respectively, with the number (<code>1</code>, <code>2</code>, etc) representing the order
+in which the covariates were specified in the smooth.</p></li>
+<li><p>Additional columns will be present in the case of factor by smooths,
+which will contain the level for the factor named in <code>by_variable</code> for
+that particular posterior draw.</p></li>
+</ul>
+
+    <h2 class="hasAnchor" id="warning"><a class="anchor" href="#warning"></a>Warning</h2>
+
+    
+
+<p>The set of variables returned and their order in the tibble is subject to
+change in future versions. Don't rely on position.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/message.html'>suppressPackageStartupMessages</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='st'>"mgcv"</span>))
@@ -227,6 +269,7 @@ relates to,</p></li>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#warning">Warning</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 
