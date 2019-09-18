@@ -17,8 +17,7 @@ dat2 <- gamSim(4, verbose = FALSE)
 m3 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat2, method = "REML")
 
 test_that("smooth_samples works for a simple GAM", {
-    expect_warning(sm <- smooth_samples(m1, n = 5, n_vals = 100, seed = 42),
-                   "foo")
+    expect_silent(sm <- smooth_samples(m1, n = 5, n_vals = 100, seed = 42))
     expect_s3_class(sm, c("smooth_samples", "posterior_samples", "tbl_df",
                           "tbl", "data.frame"))
     ## 500 == 1 smooth * 5 * 100
