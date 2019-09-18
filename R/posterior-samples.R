@@ -317,5 +317,7 @@
     sims[["draw"]] <- as.integer(sub("\\.\\.V", "", sims[["draw"]]))
     attr(sims, "seed") <- RNGstate
     attr(sims, "data_names") <- setNames(data_names, nm = S)
+    ## add classes
+    class(sims) <- c("smooth_samples", "posterior_samples", class(sims))
     sims
 }
