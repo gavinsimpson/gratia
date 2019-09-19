@@ -66,7 +66,9 @@
 ##'
 ##' @author Gavin L. Simpson
 ##'
-##' @inheritParams predicted_samples
+##' @inheritParams posterior_samples
+##' 
+##' @rdname predicted_samples
 ##' @export
 `fitted_samples` <- function(model, ...) {
     UseMethod("fitted_samples")
