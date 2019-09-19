@@ -310,3 +310,8 @@ test_that("parametric_terms works for a gaussian GAM", {
                  "Don't know how to identify parametric terms from <character>",
                  fixed = TRUE)
 })
+
+test_that("load_mgcv returns invisibly", {
+    out <- expect_invisible(load_mgcv())
+    expect_true(out)
+})

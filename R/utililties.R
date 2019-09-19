@@ -757,3 +757,26 @@
     end <- smooth[["last.para"]]
     seq(from = start, to = end, by = 1L)
 }
+
+##' Load mgcv quietly
+##'
+##' Simple function that loads the *mgcv* package whilst suppressing the startup
+##' messages that it prints to the console.
+##'
+##' @return Returns a logical vectors invisibly, indicating whether the package
+##'   was loaded or not.
+##' 
+##' @export
+`load_mgcv` <- function() {
+    res <- suppressWarnings(requireNamespace("mgcv", quietly = TRUE))
+    if (!res) {
+        stop("Unable to load mgcv. Is it installed?", .call = FALSE)
+    }
+    ## mgcv could be attached already an we don't want to attach again
+    ## as that raises an error
+    attached <- "package:mgcv" %in% search()
+    if(!attached) {
+        suppressPackageStartupMessages(attachNamespace("mgcv"))
+    }
+    invisible(res)
+}
