@@ -45,7 +45,7 @@ A \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object.
 Plots basis functions using ggplot2
 }
 \examples{
-suppressPackageStartupMessages(library("mgcv"))
+load_mgcv()
 \dontshow{set.seed(42)}
 df <- gamSim(4, n = 400, verbose = FALSE)
 

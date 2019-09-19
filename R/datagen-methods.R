@@ -14,7 +14,7 @@
 ##' @rdname datagen
 ##'
 ##' @examples
-##' suppressPackageStartupMessages(library("mgcv"))
+##' load_mgcv()
 ##'
 ##' ## 1d example
 ##' set.seed(2)

@@ -60,7 +60,7 @@
 ##'
 ##' @examples
 ##'
-##' suppressPackageStartupMessages(library("mgcv"))
+##' load_mgcv()
 ##' \dontshow{
 ##' set.seed(42)
 ##' op <- options(cli.unicode = FALSE)

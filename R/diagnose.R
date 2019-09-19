@@ -43,7 +43,7 @@
 ##' @export
 ##'
 ##' @examples
-##' suppressPackageStartupMessages(library("mgcv"))
+##' load_mgcv()
 ##' ## simulate binomial data...
 ##' set.seed(0)
 ##' n.samp <- 200

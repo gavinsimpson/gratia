@@ -60,7 +60,7 @@ covariate associated with the smooth. Alternatively, a set of points at
 which the smooth should be evaluated can be supplied.
 }
 \examples{
-suppressPackageStartupMessages(library("mgcv"))
+load_mgcv()
 \dontshow{
 set.seed(2)
 op <- options(cli.unicode = FALSE, digits = 6)

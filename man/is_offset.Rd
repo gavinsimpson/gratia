@@ -16,7 +16,7 @@ A logical vector of the same length as \code{terms}.
 Given a character vector of model terms, checks to see which, if any, is the model offset.
 }
 \examples{
-suppressPackageStartupMessages(library("mgcv"))
+load_mgcv()
 df <- gamSim(1, n = 400, dist = "normal")
 m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = df, method = "REML")
 nm <- names(model.frame(m))

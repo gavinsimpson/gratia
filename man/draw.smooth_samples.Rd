@@ -66,7 +66,7 @@ against.}
 Plotting posterior smooths
 }
 \examples{
-suppressPackageStartupMessages(library('mgcv'))
+load_mgcv()
 \dontshow{set.seed(1)}
 dat1 <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 ## a single smooth GAM
