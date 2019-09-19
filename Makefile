@@ -51,5 +51,5 @@ clean:
 	cd ..;\
 	rm -r gratia.Rcheck/
 
-pkgdown:
+pkgdown: docs
 	R -q -e 'library("pkgdown"); build_site(preview = FALSE)'
