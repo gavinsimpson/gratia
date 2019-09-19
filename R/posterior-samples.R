@@ -123,7 +123,8 @@
         sims <- ilink(sims)
     }
 
-    sims <- as_data_frame(sims)
+    colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
+    sims <- as_tibble(sims)
     names(sims) <- as.character(seq_len(ncol(sims)))
     sims <- add_column(sims, row = seq_len(nrow(sims)))
     sims <- gather(sims, key = "draw", value = "fitted", - row)
@@ -180,7 +181,8 @@
     sims <- simulate(model, nsim = n, seed = seed, newdata = newdata, freq = freq,
                      unconditional = unconditional, weights = weights)
     RNGstate <- attr(sims, "seed")
-    sims <- as_data_frame(sims)
+    colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
+    sims <- as_tibble(sims)
     names(sims) <- as.character(seq_len(ncol(sims)))
     sims <- add_column(sims, row = seq_len(nrow(sims)))
     sims <- gather(sims, key = "draw", value = "response", - row)
