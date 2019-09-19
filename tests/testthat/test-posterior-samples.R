@@ -64,6 +64,40 @@ test_that("smooth_samples errors with invalid term provided", {
 
 context("Testing fitted_samples() methods")
 
+test_that("fitted_samples works for a simple GAM", {
+    expect_silent(sm <- fitted_samples(m1, n = 5, seed = 42))
+    expect_s3_class(sm, c("fitted_samples", "posterior_samples", "tbl_df",
+                          "tbl", "data.frame"))
+    ## 2000 == 5 * 400 (nrow(dat))
+    expect_identical(NROW(sm), 2000L)
+    expect_identical(NCOL(sm), 3L) # 3 cols
+    expect_named(sm, expected = c("row", "draw", "fitted"))
+})
+
+test_that("fitted_samples works for a multi-smooth GAM", {
+    expect_silent(sm <- fitted_samples(m2, n = 5, seed = 42))
+    expect_s3_class(sm, c("fitted_samples", "posterior_samples", "tbl_df",
+                          "tbl", "data.frame"))
+    ## 2000 == 5 draws * 400 observations in data
+    expect_identical(NROW(sm), 2000L)
+    expect_identical(NCOL(sm), 3L) # 3 cols
+    expect_named(sm, expected = c("row", "draw", "fitted"))
+})
+
+test_that("fitted_samples works for a multi-smooth factor by GAM", {
+    expect_silent(sm <- fitted_samples(m3, n = 5, seed = 42))
+    expect_s3_class(sm, c("fitted_samples", "posterior_samples", "tbl_df",
+                          "tbl", "data.frame"))
+    ## 2000 == 5 draws * 400 observations in data
+    expect_identical(NROW(sm), 2000L)
+    expect_identical(NCOL(sm), 3L) # 3 cols
+    expect_named(sm, expected = c("row", "draw", "fitted"))
+})
+
+test_that("fitted_samples sets seed when seed not provided", {
+    expect_silent(fitted_samples(m2, seed = NULL))
+})
+
 test_that("fitted_samples() fails if not suitable method available", {
     expect_error(fitted_samples(1:10),
                  "Don't know how to sample from the posterior of <integer>",
@@ -71,6 +105,40 @@ test_that("fitted_samples() fails if not suitable method available", {
 })
 
 context("Testing predicted_samples() methods")
+
+test_that("predicted_samples works for a simple GAM", {
+    expect_silent(sm <- predicted_samples(m1, n = 5, seed = 42))
+    expect_s3_class(sm, c("predicted_samples", "posterior_samples", "tbl_df",
+                          "tbl", "data.frame"))
+    ## 2000 == 5 * 400 (nrow(dat))
+    expect_identical(NROW(sm), 2000L)
+    expect_identical(NCOL(sm), 3L) # 3 cols
+    expect_named(sm, expected = c("row", "draw", "response"))
+})
+
+test_that("predicted_samples works for a multi-smooth GAM", {
+    expect_silent(sm <- predicted_samples(m2, n = 5, seed = 42))
+    expect_s3_class(sm, c("predicted_samples", "posterior_samples", "tbl_df",
+                          "tbl", "data.frame"))
+    ## 2000 == 5 draws * 400 observations in data
+    expect_identical(NROW(sm), 2000L)
+    expect_identical(NCOL(sm), 3L) # 3 cols
+    expect_named(sm, expected = c("row", "draw", "response"))
+})
+
+test_that("predicted_samples works for a multi-smooth factor by GAM", {
+    expect_silent(sm <- predicted_samples(m3, n = 5, seed = 42))
+    expect_s3_class(sm, c("predicted_samples", "posterior_samples", "tbl_df",
+                          "tbl", "data.frame"))
+    ## 2000 == 5 draws * 400 observations in data
+    expect_identical(NROW(sm), 2000L)
+    expect_identical(NCOL(sm), 3L) # 3 cols
+    expect_named(sm, expected = c("row", "draw", "response"))
+})
+
+test_that("predicted_samples sets seed when seed not provided", {
+    expect_silent(predicted_samples(m2, seed = NULL))
+})
 
 test_that("predicted_samples() fails if not suitable method available", {
     expect_error(predicted_samples(1:10),

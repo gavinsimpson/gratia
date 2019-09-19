@@ -91,7 +91,7 @@
 ##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
 ##' fitted_samples(m1, n = 5, seed = 42)
-`fitted_samples.gam` <- function(model, n, newdata, seed,
+`fitted_samples.gam` <- function(model, n = 1, newdata, seed,
                                  scale = c("response","linear_predictor"),
                                  freq = FALSE, unconditional = FALSE,
                                  ncores = 1L, ...) {
@@ -129,6 +129,8 @@
     sims <- gather(sims, key = "draw", value = "fitted", - row)
     sims[["draw"]] <- as.integer(sims[["draw"]])
     attr(sims, "seed") <- RNGstate
+    ## add classes
+    class(sims) <- c("fitted_samples", "posterior_samples", class(sims))
     sims
 }
 
@@ -184,6 +186,8 @@
     sims <- gather(sims, key = "draw", value = "response", - row)
     sims[["draw"]] <- as.integer(sims[["draw"]])
     attr(sims, "seed") <- RNGstate
+    ## add classes
+    class(sims) <- c("predicted_samples", "posterior_samples", class(sims))
     sims
 }
 

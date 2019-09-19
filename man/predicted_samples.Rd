@@ -6,7 +6,7 @@
 \alias{predicted_samples.gam}
 \title{Draw predicted values from the posterior distribution}
 \usage{
-\method{fitted_samples}{gam}(model, n, newdata, seed,
+\method{fitted_samples}{gam}(model, n = 1, newdata, seed,
   scale = c("response", "linear_predictor"), freq = FALSE,
   unconditional = FALSE, ncores = 1L, ...)
 
