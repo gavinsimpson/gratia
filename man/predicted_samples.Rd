@@ -81,13 +81,13 @@ fitted model, created via \code{simulate()} (e.g. \code{\link[=simulate.gam]{sim
 and returned in a tidy, long, format.
 }
 \examples{
-suppressPackageStartupMessages(library("mgcv"))
+load_mgcv()
 \dontshow{set.seed(2)}
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 fitted_samples(m1, n = 5, seed = 42)
-suppressPackageStartupMessages(library("mgcv"))
+load_mgcv()
 \dontshow{set.seed(2)}
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")

@@ -24,7 +24,7 @@
 ##' @importFrom dplyr bind_rows
 ##' 
 ##' @examples
-##' suppressPackageStartupMessages(library("mgcv"))
+##' load_mgcv()
 ##' \dontshow{set.seed(42)}
 ##' df <- gamSim(4, n = 400, verbose = FALSE)
 ##'

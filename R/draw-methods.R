@@ -48,7 +48,7 @@
 ##' @aliases draw.evaluated_1d_smooth draw.evaluated_2d_smooth geom_rug
 ##'
 ##' @examples
-##' suppressPackageStartupMessages(library("mgcv"))
+##' load_mgcv()
 ##'
 ##' \dontshow{set.seed(2)}
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
@@ -237,7 +237,7 @@
 ##' @export
 ##'
 ##' @examples
-##' suppressPackageStartupMessages(library("mgcv"))
+##' load_mgcv()
 ##'
 ##' \dontshow{set.seed(2)}
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
@@ -533,7 +533,7 @@
 ##'
 ##' @examples
 ##'
-##' suppressPackageStartupMessages(library("mgcv"))
+##' load_mgcv()
 ##' \dontshow{set.seed(42)}
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 ##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
@@ -609,7 +609,7 @@
 ##' @export
 ##'
 ##' @examples
-##' suppressPackageStartupMessages(library("mgcv"))
+##' load_mgcv()
 ##' \dontshow{set.seed(42)}
 ##' df <- gamSim(4, n = 400, verbose = FALSE)
 ##'
@@ -700,7 +700,7 @@
 ##' @importFrom rlang .data
 ##'
 ##' @examples
-##' suppressPackageStartupMessages(library('mgcv'))
+##' load_mgcv()
 ##' \dontshow{set.seed(1)}
 ##' dat1 <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 ##' ## a single smooth GAM

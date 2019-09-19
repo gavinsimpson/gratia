@@ -53,7 +53,7 @@ interval when \code{method = "simulate"}.}
 Quantile-quantile plot of model residuals
 }
 \examples{
-suppressPackageStartupMessages(library("mgcv"))
+load_mgcv()
 ## simulate binomial data...
 set.seed(0)
 n.samp <- 200

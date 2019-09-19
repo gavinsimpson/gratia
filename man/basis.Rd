@@ -30,7 +30,7 @@ of \emph{mgcv}'s smooths via \code{\link[mgcv:s]{mgcv::s()}}., \code{\link[mgcv:
 \code{\link[mgcv:t2]{mgcv::t2()}}.
 }
 \examples{
-suppressPackageStartupMessages(library("mgcv"))
+load_mgcv()
 \dontshow{set.seed(42)}
 df <- gamSim(4, n = 400, verbose = FALSE)
 

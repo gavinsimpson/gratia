@@ -77,7 +77,7 @@ it is not possible to use \code{+} to add to the plots in the way one might
 typically work with \code{ggplot()} plots.
 }
 \examples{
-suppressPackageStartupMessages(library("mgcv"))
+load_mgcv()
 
 \dontshow{set.seed(2)}
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
