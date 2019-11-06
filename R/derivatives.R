@@ -68,7 +68,7 @@
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 ##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
-##' ## first derivative of all smooths using central finite differenc
+##' ## first derivatives of all smooths using central finite differences
 ##' derivatives(mod, type = "central")
 ##' \dontshow{options(op)}
 `derivatives.gam` <- function(object, term, newdata, order = 1L,
