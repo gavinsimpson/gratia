@@ -70,7 +70,9 @@
 ##'
 ##' ## first derivatives of all smooths using central finite differences
 ##' derivatives(mod, type = "central")
-##' \dontshow{options(op)}
+##' \dontshow{
+##' options(op)
+##' }
 `derivatives.gam` <- function(object, term, newdata, order = 1L,
                               type = c("forward", "backward", "central"),
                               n = 200, eps = 1e-7,

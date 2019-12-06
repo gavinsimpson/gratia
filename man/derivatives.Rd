@@ -78,7 +78,9 @@ mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 ## first derivatives of all smooths using central finite differences
 derivatives(mod, type = "central")
-\dontshow{options(op)}
+\dontshow{
+options(op)
+}
 }
 \author{
 Gavin L. Simpson
