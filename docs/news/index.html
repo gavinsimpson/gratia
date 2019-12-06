@@ -123,7 +123,10 @@
 <a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> would produce empty plots between the panels for the parametric terms if there were 2 or more parametric terms in a model. Reported by <a href='https://github.com/sklayn'>@sklayn</a> <a href="https://github.com/gavinsimpson/gratia/issues/39">#39</a>.</p></li>
-<li><p><code><a href="../reference/derivatives.html">derivatives()</a></code> now works with factor by smooths, including ordered factor by smooths. The function also now works correctly for complex models with multiple covariates/smooths. <a href="https://github.com/gavinsimpson/gratia/issues/47">#47</a></p></li>
+<li>
+<p><code><a href="../reference/derivatives.html">derivatives()</a></code> now works with factor by smooths, including ordered factor by smooths. The function also now works correctly for complex models with multiple covariates/smooths. <a href="https://github.com/gavinsimpson/gratia/issues/47">#47</a></p>
+<p><code><a href="../reference/derivatives.html">derivatives()</a></code> also now handles <code>'fs'</code> smooths. Reported by <a href='https://github.com/tomand-uio'>@tomand-uio</a> <a href="https://github.com/gavinsimpson/gratia/issues/357">#57</a>.</p>
+</li>
 <li><p><code><a href="../reference/evaluate_smooth.html">evaluate_parametric_term()</a></code> and hence <code><a href="../reference/draw.gam.html">draw.gam()</a></code> would fail on a <code>ziplss()</code> model because i) <em>gratia</em> didn’t handle parametric terms in models with multiple linear predictors correctly, and ii) <em>gratia</em> didn’t convert to the naming convention of <em>mgcv</em> for terms in higher linear predictors. Reported by <a href='https://github.com/pboesu'>@pboesu</a> <a href="https://github.com/gavinsimpson/gratia/issues/45">#45</a>.</p></li>
 </ul>
 </div>
