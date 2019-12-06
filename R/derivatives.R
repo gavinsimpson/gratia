@@ -212,18 +212,28 @@
 `compute_derivative` <- function(id, lpmatrix, betas, Vb, model, newdata) {
     sm <- get_smooths_by_id(model, id)[[1L]]
     sm_var <- smooth_variable(sm)
+    ## handle fs smooths
+    fs_var <- NULL
+    if (is_fs_smooth(sm)) {
+        fs_var <- sm_var[-1L]
+        sm_var <- sm_var[1L]
+    }
     sm_lab <- smooth_label(sm)
     want <- grep(sm_lab, colnames(lpmatrix), fixed = TRUE)
     Xi <- lpmatrix * 0                  # zero out the Xp matrix
     Xi[, want] <- lpmatrix[, want]      # copy bits of Xp we need
     d <- drop(Xi %*% betas)             # estimate derivative
     se <- rowSums(Xi %*% Vb * Xi)^0.5   # standard errors
-    result <- list(deriv = tibble(smooth = rep(sm_lab, length(d)),
-                                  var = rep(sm_var, length(d)),
-                                  data = newdata[[sm_var]],
-                                  derivative = d,
-                                  se = se),
-                   Xi = Xi)
+    ## build return tibble
+    deriv <- tibble(smooth = rep(sm_lab, length(d)),
+                    var = rep(sm_var, length(d)),
+                    data = newdata[[sm_var]],
+                    derivative = d,
+                    se = se)
+    if (!is.null(fs_var)) {
+        deriv <- add_column(deriv, fs_var = newdata[[fs_var]], .after = 2L)
+    }
+    result <- list(deriv = deriv, Xi = Xi)
     result
 }
 
@@ -372,7 +382,7 @@
 ##' @importFrom dplyr bind_cols setdiff
 ##' @importFrom tibble as_tibble
 ##' @importFrom rlang exec !!!
-##' @importFrom tidyr nesting
+##' @importFrom tidyr expand_grid
 `derivative_data` <- function(model, id, n, offset = NULL,
                               order = NULL, type = NULL, eps = NULL) {
     mf <- model.frame(model)           # model.frame used to fit model
@@ -399,17 +409,31 @@
     ## need a list of terms used in current smooth
     sm <- get_smooths_by_id(model, id)[[1L]]
     smooth_vars <- unique(smooth_variable(sm))
+    ## Handle special smooths, like 'fs', which involves a factor
+    fs_var <- NULL
+    if (is_fs_smooth(sm)) {
+        ## second element of smooth_var will be a factor
+        fs_var <- smooth_vars[ff]
+        smooth_vars <- smooth_vars[!ff]
+    }
     ## is smooth a factor by? If it is, extract the by variable
     by_var <- if (is_factor_by_smooth(sm)) {
         by_variable(sm)
     } else {
         NULL
     }
-    used_vars <- c(smooth_vars, by_var)
+    used_vars <- c(smooth_vars, fs_var, by_var)
 
     ## generate covariate values for the smooth
     newlist <- lapply(mf[smooth_vars], seq_min_max_eps, n = n,
                       order = order, type = type, eps = eps)
+    ## handle fs smooths
+    if (!is.null(fs_var)) {
+        fs_levs <- levels(mf[[fs_var]])
+        new_fs <- setNames(list(factor(fs_levs, levels = fs_levs)), fs_var)
+        newlist <- append(newlist, new_fs)
+    }
+    ## handle factor by --- FIXME: what about numeric by?
     if (!is.null(by_var)) {
         ## ordered or simple factor? Grab class as a function to apply below
         FUN <- match.fun(data.class(mf[[by_var]]))
@@ -421,7 +445,7 @@
         ## append this list to the list of new smooth covariate values
         newlist <- append(newlist, newfac)
     }
-    newdata <- exec(nesting, !!!newlist) # actually compute expand.grid-alike
+    newdata <- exec(expand_grid, !!!newlist) # actually compute expand.grid-alike
 
     ## need to provide single values for all other covariates in data
     unused_vars <- dplyr::setdiff(m.terms, used_vars)
