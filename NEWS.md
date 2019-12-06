@@ -26,6 +26,9 @@
     smooths. The function also now works correctly for complex models with
     multiple covariates/smooths. [#47](https://github.com/gavinsimpson/gratia/issues/47)
 
+    `derivatives()` also now handles `'fs'` smooths.  Reported by
+    @tomand-uio [#57](https://github.com/gavinsimpson/gratia/issues/357).
+
 * `evaluate_parametric_term()` and hence `draw.gam()` would fail on a `ziplss()` model
   because i) *gratia* didn't handle parametric terms in models with multiple linear
   predictors correctly, and ii) *gratia* didn't convert to the naming convention of
