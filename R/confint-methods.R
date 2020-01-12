@@ -166,7 +166,7 @@
 ##'   vector of terms. If missing, all parameters are considered, although this
 ##'   is not currently implemented.
 ##' @param level numeric, `0 < level < 1`; the confidence level of the point-wise
-##'   or simultaneous interval. The default is `0.95` for a 95\% interval.
+##'   or simultaneous interval. The default is `0.95` for a 95% interval.
 ##' @param newdata data frame; containing new values of the covariates used in
 ##'   the model fit. The selected smooth(s) wil be evaluated at the supplied
 ##'   values.
@@ -210,15 +210,15 @@
 ##' @export
 ##'
 ##' @examples
-##'load_mgcv()
+##' load_mgcv()
 ##' set.seed(2)
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 ##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-##' ##'
+##'
 ##' ## point-wise interval
 ##' ci <- confint(mod, parm = "x1", type = "confidence")
 ##' head(ci)
-##' ##'
+##'
 ##' ## simultaneous interval for smooth term of x1
 ##' set.seed(42)
 ##' si <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)
