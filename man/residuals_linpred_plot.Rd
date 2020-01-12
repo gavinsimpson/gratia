@@ -4,9 +4,15 @@
 \alias{residuals_linpred_plot}
 \title{Plot of residuals versus linear predictor values}
 \usage{
-residuals_linpred_plot(model, type = c("deviance", "pearson",
-  "response"), ylab = NULL, xlab = NULL, title = NULL,
-  subtitle = NULL, caption = NULL)
+residuals_linpred_plot(
+  model,
+  type = c("deviance", "pearson", "response"),
+  ylab = NULL,
+  xlab = NULL,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL
+)
 }
 \arguments{
 \item{model}{a fitted model. Currently only class \code{"gam"}.}

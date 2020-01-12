@@ -4,11 +4,23 @@
 \alias{draw.smooth_samples}
 \title{Plotting posterior smooths}
 \usage{
-\method{draw}{smooth_samples}(object, select = NULL, xlab = NULL,
-  ylab = NULL, title = NULL, subtitle = NULL, caption = NULL,
-  alpha = 1, colour = "black", scales = c("free", "fixed"),
-  align = "hv", axis = "lrtb", rug = TRUE, partial_match = FALSE,
-  ...)
+\method{draw}{smooth_samples}(
+  object,
+  select = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  alpha = 1,
+  colour = "black",
+  scales = c("free", "fixed"),
+  align = "hv",
+  axis = "lrtb",
+  rug = TRUE,
+  partial_match = FALSE,
+  ...
+)
 }
 \arguments{
 \item{object}{a fitted GAM, the result of a call to \code{\link[mgcv:gam]{mgcv::gam()}}.}

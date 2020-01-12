@@ -8,8 +8,16 @@
 \usage{
 fderiv(model, ...)
 
-\method{fderiv}{gam}(model, newdata, term, n = 200, eps = 1e-07,
-  unconditional = FALSE, offset = NULL, ...)
+\method{fderiv}{gam}(
+  model,
+  newdata,
+  term,
+  n = 200,
+  eps = 1e-07,
+  unconditional = FALSE,
+  offset = NULL,
+  ...
+)
 
 \method{fderiv}{gamm}(model, ...)
 }

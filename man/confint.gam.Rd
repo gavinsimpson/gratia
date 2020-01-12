@@ -5,10 +5,20 @@
 \alias{confint.gamm}
 \title{Point-wise and simultaneous confidence intervals for smooths}
 \usage{
-\method{confint}{gam}(object, parm, level = 0.95, newdata = NULL,
-  n = 200, type = c("confidence", "simultaneous"), nsim = 10000,
-  shift = FALSE, transform = FALSE, unconditional = FALSE,
-  ncores = 1, ...)
+\method{confint}{gam}(
+  object,
+  parm,
+  level = 0.95,
+  newdata = NULL,
+  n = 200,
+  type = c("confidence", "simultaneous"),
+  nsim = 10000,
+  shift = FALSE,
+  transform = FALSE,
+  unconditional = FALSE,
+  ncores = 1,
+  ...
+)
 
 \method{confint}{gamm}(object, ...)
 }
@@ -19,7 +29,7 @@
 vector of terms. If missing, all parameters are considered, although this
 is not currently implemented.}
 
-\item{level}{numeric, \code{0 < level < 1}; the confidence level of the point-wise
+\item{level}{numeric, \verb{0 < level < 1}; the confidence level of the point-wise
 or simultaneous interval. The default is \code{0.95} for a 95\% interval.}
 
 \item{newdata}{data frame; containing new values of the covariates used in
@@ -61,7 +71,7 @@ a data frame with components:
 \item \code{lower}; lower limit of the confidence or simultaneous interval,
 \item \code{est}; estimated value of the smooth
 \item \code{upper}; upper limit of the confidence or simultaneous interval,
-\item \code{crit}; critical value for the \code{100 * level}% confidence interval.
+\item \code{crit}; critical value for the \code{100 * level}\% confidence interval.
 }
 }
 \description{
@@ -72,11 +82,11 @@ load_mgcv()
 set.seed(2)
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-##'
+
 ## point-wise interval
 ci <- confint(mod, parm = "x1", type = "confidence")
 head(ci)
-##'
+
 ## simultaneous interval for smooth term of x1
 set.seed(42)
 si <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)

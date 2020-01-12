@@ -4,9 +4,18 @@
 \alias{draw.mgcv_smooth}
 \title{Plot basis functions}
 \usage{
-\method{draw}{mgcv_smooth}(object, legend = FALSE, use_facets = TRUE,
-  labeller = NULL, xlab, ylab, title = NULL, subtitle = NULL,
-  caption = NULL, ...)
+\method{draw}{mgcv_smooth}(
+  object,
+  legend = FALSE,
+  use_facets = TRUE,
+  labeller = NULL,
+  xlab,
+  ylab,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{an object, the result of a call to \code{\link[=basis]{basis()}}.}

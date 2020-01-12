@@ -4,9 +4,15 @@
 \alias{confint.fderiv}
 \title{Point-wise and simultaneous confidence intervals for derivatives of smooths}
 \usage{
-\method{confint}{fderiv}(object, parm, level = 0.95,
-  type = c("confidence", "simultaneous"), nsim = 10000, ncores = 1L,
-  ...)
+\method{confint}{fderiv}(
+  object,
+  parm,
+  level = 0.95,
+  type = c("confidence", "simultaneous"),
+  nsim = 10000,
+  ncores = 1L,
+  ...
+)
 }
 \arguments{
 \item{object}{an object of class \code{"fderiv"} containing the estimated
@@ -15,8 +21,8 @@ derivatives.}
 \item{parm}{which parameters (smooth terms) are to be given intervals as a
 vector of terms. If missing, all parameters are considered.}
 
-\item{level}{numeric, \code{0 < level < 1}; the confidence level of the
-point-wise or simultaneous interval. The default is \code{0.95} for a 95%
+\item{level}{numeric, \verb{0 < level < 1}; the confidence level of the
+point-wise or simultaneous interval. The default is \code{0.95} for a 95\%
 interval.}
 
 \item{type}{character; the type of interval to compute. One of \code{"confidence"}

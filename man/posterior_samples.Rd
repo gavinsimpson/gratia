@@ -7,9 +7,18 @@
 \usage{
 posterior_samples(model, ...)
 
-\method{posterior_samples}{gam}(model, n, newdata, seed,
-  scale = c("response", "linear_predictor"), freq = FALSE,
-  unconditional = FALSE, weights = NULL, ncores = 1L, ...)
+\method{posterior_samples}{gam}(
+  model,
+  n,
+  newdata,
+  seed,
+  scale = c("response", "linear_predictor"),
+  freq = FALSE,
+  unconditional = FALSE,
+  weights = NULL,
+  ncores = 1L,
+  ...
+)
 }
 \arguments{
 \item{model}{a fitted model of the supported types}

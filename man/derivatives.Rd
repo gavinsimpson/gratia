@@ -13,11 +13,23 @@ derivatives(object, ...)
 
 \method{derivatives}{gamm}(object, ...)
 
-\method{derivatives}{gam}(object, term, newdata, order = 1L,
-  type = c("forward", "backward", "central"), n = 200, eps = 1e-07,
-  interval = c("confidence", "simultaneous"), n_sim = 10000,
-  level = 0.95, unconditional = FALSE, frequentist = FALSE,
-  offset = NULL, ncores = 1, ...)
+\method{derivatives}{gam}(
+  object,
+  term,
+  newdata,
+  order = 1L,
+  type = c("forward", "backward", "central"),
+  n = 200,
+  eps = 1e-07,
+  interval = c("confidence", "simultaneous"),
+  n_sim = 10000,
+  level = 0.95,
+  unconditional = FALSE,
+  frequentist = FALSE,
+  offset = NULL,
+  ncores = 1,
+  ...
+)
 }
 \arguments{
 \item{object}{an R object to compute derivatives for.}
@@ -47,8 +59,8 @@ simultaneous intervals.}
 \item{n_sim}{integer; the number of simulations used in computing the
 simultaneous intervals.}
 
-\item{level}{numeric; \code{0 < level < 1}; the confidence level of the
-point-wise or simultaneous interval. The default is \code{0.95} for a 95%
+\item{level}{numeric; \verb{0 < level < 1}; the confidence level of the
+point-wise or simultaneous interval. The default is \code{0.95} for a 95\%
 interval.}
 
 \item{unconditional}{logical; use smoothness selection-corrected Bayesian

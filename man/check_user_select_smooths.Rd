@@ -4,8 +4,7 @@
 \alias{check_user_select_smooths}
 \title{Select smooths based on user's choices}
 \usage{
-check_user_select_smooths(smooths, select = NULL,
-  partial_match = FALSE)
+check_user_select_smooths(smooths, select = NULL, partial_match = FALSE)
 }
 \arguments{
 \item{smooths}{character; a vector of smooth labels.}

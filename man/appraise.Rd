@@ -4,10 +4,18 @@
 \alias{appraise}
 \title{Model diagnostic plots}
 \usage{
-appraise(model, method = c("direct", "simulate", "normal"),
-  n_uniform = 10, n_simulate = 50, type = c("deviance", "pearson",
-  "response"), n_bins = c("sturges", "scott", "fd"), ncol = 2,
-  level = 0.9, alpha = 0.2, ...)
+appraise(
+  model,
+  method = c("direct", "simulate", "normal"),
+  n_uniform = 10,
+  n_simulate = 50,
+  type = c("deviance", "pearson", "response"),
+  n_bins = c("sturges", "scott", "fd"),
+  ncol = 2,
+  level = 0.9,
+  alpha = 0.2,
+  ...
+)
 }
 \arguments{
 \item{model}{a fitted model. Currently only class \code{"gam"}.}
@@ -31,7 +39,7 @@ indicating how to calculate the number of bins.}
 \code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}.}
 
 \item{level}{numeric; the coverage level for QQ plot reference intervals.
-Must be strictly \code{0 < level < 1}. Only used with \code{method = "simulate"}.}
+Must be strictly \verb{0 < level < 1}. Only used with \code{method = "simulate"}.}
 
 \item{alpha}{numeric; the level of alpha transparency for the QQ plot
 reference interval when \code{method = "simulate"}.}

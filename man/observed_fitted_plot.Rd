@@ -4,8 +4,14 @@
 \alias{observed_fitted_plot}
 \title{Plot of fitted against observed response values}
 \usage{
-observed_fitted_plot(model, ylab = NULL, xlab = NULL, title = NULL,
-  subtitle = NULL, caption = NULL)
+observed_fitted_plot(
+  model,
+  ylab = NULL,
+  xlab = NULL,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL
+)
 }
 \arguments{
 \item{model}{a fitted model. Currently only class \code{"gam"}.}

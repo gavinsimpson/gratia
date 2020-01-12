@@ -5,8 +5,7 @@
 \title{Create a sequence of evenly-spaced values adjusted to accommodate a
 small adjustment}
 \usage{
-seq_min_max_eps(x, n, order, type = c("forward", "backward", "central"),
-  eps)
+seq_min_max_eps(x, n, order, type = c("forward", "backward", "central"), eps)
 }
 \arguments{
 \item{x}{numeric; vector over which evenly-spaced values are returned}

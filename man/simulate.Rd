@@ -6,15 +6,37 @@
 \alias{simulate.scam}
 \title{Simulate from the posterior distribution of a GAM}
 \usage{
-\method{simulate}{gam}(object, nsim = 1, seed = NULL, newdata = NULL,
-  freq = FALSE, unconditional = FALSE, weights = NULL, ...)
+\method{simulate}{gam}(
+  object,
+  nsim = 1,
+  seed = NULL,
+  newdata = NULL,
+  freq = FALSE,
+  unconditional = FALSE,
+  weights = NULL,
+  ...
+)
 
-\method{simulate}{gamm}(object, nsim = 1, seed = NULL,
-  newdata = NULL, freq = FALSE, unconditional = FALSE,
-  weights = NULL, ...)
+\method{simulate}{gamm}(
+  object,
+  nsim = 1,
+  seed = NULL,
+  newdata = NULL,
+  freq = FALSE,
+  unconditional = FALSE,
+  weights = NULL,
+  ...
+)
 
-\method{simulate}{scam}(object, nsim = 1, seed = NULL,
-  newdata = NULL, freq = FALSE, weights = NULL, ...)
+\method{simulate}{scam}(
+  object,
+  nsim = 1,
+  seed = NULL,
+  newdata = NULL,
+  freq = FALSE,
+  weights = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{a fitted GAM, typically the result of a call to \link[mgcv:gam]{mgcv::gam}`

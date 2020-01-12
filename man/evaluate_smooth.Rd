@@ -10,15 +10,22 @@
 \usage{
 evaluate_smooth(object, ...)
 
-\method{evaluate_smooth}{gam}(object, smooth, n = 100, newdata = NULL,
-  unconditional = FALSE, overall_uncertainty = TRUE, dist = 0.1, ...)
+\method{evaluate_smooth}{gam}(
+  object,
+  smooth,
+  n = 100,
+  newdata = NULL,
+  unconditional = FALSE,
+  overall_uncertainty = TRUE,
+  dist = 0.1,
+  ...
+)
 
 \method{evaluate_smooth}{gamm}(object, ...)
 
 evaluate_parametric_term(object, ...)
 
-\method{evaluate_parametric_term}{gam}(object, term,
-  unconditional = FALSE, ...)
+\method{evaluate_parametric_term}{gam}(object, term, unconditional = FALSE, ...)
 }
 \arguments{
 \item{object}{an object of class \code{"gam"} or \code{"gamm"}.}

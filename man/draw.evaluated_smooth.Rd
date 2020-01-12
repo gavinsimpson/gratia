@@ -10,23 +10,63 @@
 \alias{draw.evaluated_parametric_term}
 \title{Plot estimated smooths}
 \usage{
-\method{draw}{evaluated_1d_smooth}(object, rug = NULL, xlab, ylab,
-  title = NULL, subtitle = NULL, caption = NULL, ...)
+\method{draw}{evaluated_1d_smooth}(
+  object,
+  rug = NULL,
+  xlab,
+  ylab,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  ...
+)
 
-\method{draw}{evaluated_2d_smooth}(object, show = c("estimate", "se"),
-  contour = TRUE, xlab, ylab, title = NULL, subtitle = NULL,
-  caption = NULL, ...)
+\method{draw}{evaluated_2d_smooth}(
+  object,
+  show = c("estimate", "se"),
+  contour = TRUE,
+  xlab,
+  ylab,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  ...
+)
 
-\method{draw}{evaluated_re_smooth}(object, qq_line = TRUE, xlab, ylab,
-  title = NULL, subtitle = NULL, caption = NULL, ...)
+\method{draw}{evaluated_re_smooth}(
+  object,
+  qq_line = TRUE,
+  xlab,
+  ylab,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  ...
+)
 
-\method{draw}{evaluated_fs_smooth}(object, rug = NULL, xlab, ylab,
-  title = NULL, subtitle = NULL, caption = NULL,
-  colour_scale = scale_colour_discrete, ...)
+\method{draw}{evaluated_fs_smooth}(
+  object,
+  rug = NULL,
+  xlab,
+  ylab,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  colour_scale = scale_colour_discrete,
+  ...
+)
 
-\method{draw}{evaluated_parametric_term}(object, xlab, ylab,
-  title = NULL, subtitle = NULL, caption = NULL, rug = TRUE,
-  position = "identity", ...)
+\method{draw}{evaluated_parametric_term}(
+  object,
+  xlab,
+  ylab,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  rug = TRUE,
+  position = "identity",
+  ...
+)
 }
 \arguments{
 \item{object}{an object, the result of a call to \code{\link[=evaluate_smooth]{evaluate_smooth()}}.}

@@ -4,9 +4,16 @@
 \alias{residuals_hist_plot}
 \title{Histogram of model residuals}
 \usage{
-residuals_hist_plot(model, type = c("deviance", "pearson", "response"),
-  n_bins = c("sturges", "scott", "fd"), ylab = NULL, xlab = NULL,
-  title = NULL, subtitle = NULL, caption = NULL)
+residuals_hist_plot(
+  model,
+  type = c("deviance", "pearson", "response"),
+  n_bins = c("sturges", "scott", "fd"),
+  ylab = NULL,
+  xlab = NULL,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL
+)
 }
 \arguments{
 \item{model}{a fitted model. Currently only class \code{"gam"}.}

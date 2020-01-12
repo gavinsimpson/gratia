@@ -7,9 +7,18 @@
 \usage{
 smooth_samples(model, ...)
 
-\method{smooth_samples}{gam}(model, term = NULL, n = 1,
-  newdata = NULL, seed = NULL, freq = FALSE, unconditional = FALSE,
-  ncores = 1L, n_vals = 200, ...)
+\method{smooth_samples}{gam}(
+  model,
+  term = NULL,
+  n = 1,
+  newdata = NULL,
+  seed = NULL,
+  freq = FALSE,
+  unconditional = FALSE,
+  ncores = 1L,
+  n_vals = 200,
+  ...
+)
 }
 \arguments{
 \item{model}{a fitted model of the supported types}

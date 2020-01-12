@@ -9,15 +9,30 @@
 \usage{
 fitted_samples(model, ...)
 
-\method{fitted_samples}{gam}(model, n = 1, newdata, seed,
-  scale = c("response", "linear_predictor"), freq = FALSE,
-  unconditional = FALSE, ncores = 1L, ...)
+\method{fitted_samples}{gam}(
+  model,
+  n = 1,
+  newdata,
+  seed,
+  scale = c("response", "linear_predictor"),
+  freq = FALSE,
+  unconditional = FALSE,
+  ncores = 1L,
+  ...
+)
 
 predicted_samples(model, ...)
 
-\method{predicted_samples}{gam}(model, n = 1, newdata = NULL,
-  seed = NULL, freq = FALSE, unconditional = FALSE, weights = NULL,
-  ...)
+\method{predicted_samples}{gam}(
+  model,
+  n = 1,
+  newdata = NULL,
+  seed = NULL,
+  freq = FALSE,
+  unconditional = FALSE,
+  weights = NULL,
+  ...
+)
 }
 \arguments{
 \item{model}{a fitted model of the supported types}

@@ -4,10 +4,21 @@
 \alias{draw.gam}
 \title{Plot estimated smooths from a fitted GAM}
 \usage{
-\method{draw}{gam}(object, parametric = NULL, select = NULL,
-  scales = c("free", "fixed"), align = "hv", axis = "lrtb",
-  n = 100, unconditional = FALSE, overall_uncertainty = TRUE,
-  dist = 0.1, rug = TRUE, partial_match = FALSE, ...)
+\method{draw}{gam}(
+  object,
+  parametric = NULL,
+  select = NULL,
+  scales = c("free", "fixed"),
+  align = "hv",
+  axis = "lrtb",
+  n = 100,
+  unconditional = FALSE,
+  overall_uncertainty = TRUE,
+  dist = 0.1,
+  rug = TRUE,
+  partial_match = FALSE,
+  ...
+)
 }
 \arguments{
 \item{object}{a fitted GAM, the result of a call to \code{\link[mgcv:gam]{mgcv::gam()}}.}

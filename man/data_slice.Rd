@@ -10,8 +10,17 @@ data_slice(object, ...)
 
 \method{data_slice}{default}(object, ...)
 
-\method{data_slice}{gam}(object, var1, var2, var3 = NULL, var4 = NULL,
-  data = NULL, n = 50, offset = NULL, ...)
+\method{data_slice}{gam}(
+  object,
+  var1,
+  var2,
+  var3 = NULL,
+  var4 = NULL,
+  data = NULL,
+  n = 50,
+  offset = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{an R model object.}
