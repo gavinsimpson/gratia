@@ -14,6 +14,10 @@ build: docs
 	cd ..;\
 	R CMD build gratia
 
+build-openblas: docs
+	cd ..;\
+	R-openblas CMD build gratia
+
 build-devel: docs-devel
 	cd ..;\
 	R-devel CMD build gratia
@@ -24,11 +28,23 @@ check: build
 	echo "$${NOT_CRAN}"; \
 	R CMD check gratia_$(PKGVERS).tar.gz
 
+check-openblas: build-openblas
+	cd ..; \
+	export NOT_CRAN="true"; \
+	echo "$${NOT_CRAN}"; \
+	R-openblas CMD check gratia_$(PKGVERS).tar.gz
+
 check-test-cran: build
 	cd ..;\
 	export NOT_CRAN="false"; \
         echo "$${NOT_CRAN}"; \
         R CMD check gratia_$(PKGVERS).tar.gz
+
+check-test-cran-openblas: build-openblas
+	cd ..;\
+	export NOT_CRAN="false"; \
+        echo "$${NOT_CRAN}"; \
+        R-openblas CMD check gratia_$(PKGVERS).tar.gz
 
 check-as-cran: build
 	cd ..;\
