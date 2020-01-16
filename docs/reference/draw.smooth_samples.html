@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.11</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -113,11 +113,23 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for smooth_samples</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>object</span>, <span class='kw'>select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>xlab</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>ylab</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>colour</span> <span class='kw'>=</span> <span class='st'>"black"</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"free"</span>, <span class='st'>"fixed"</span>),
-  <span class='kw'>align</span> <span class='kw'>=</span> <span class='st'>"hv"</span>, <span class='kw'>axis</span> <span class='kw'>=</span> <span class='st'>"lrtb"</span>, <span class='kw'>rug</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>partial_match</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='no'>...</span>)</pre>
+<span class='fu'><a href='draw.html'>draw</a></span>(
+  <span class='no'>object</span>,
+  <span class='kw'>select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>xlab</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>ylab</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>colour</span> <span class='kw'>=</span> <span class='st'>"black"</span>,
+  <span class='kw'>scales</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"free"</span>, <span class='st'>"fixed"</span>),
+  <span class='kw'>align</span> <span class='kw'>=</span> <span class='st'>"hv"</span>,
+  <span class='kw'>axis</span> <span class='kw'>=</span> <span class='st'>"lrtb"</span>,
+  <span class='kw'>rug</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>partial_match</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='no'>...</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -217,23 +229,13 @@ against.</p></td>
 <span class='co'>## plot</span>
 <span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>sm1</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.7</span>)</div><div class='img'><img src='draw.smooth_samples-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>1</span>)
-<span class='no'>dat2</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>2</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>4000</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-<span class='co'>## a multi-smooth GAM</span>
-<span class='no'>m2</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x</span>, <span class='no'>z</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>40</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat2</span>$<span class='no'>data</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
+<span class='no'>dat2</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>4</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='co'>## a multi-smooth GAM with a factor-by smooth</span>
+<span class='no'>m2</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='no'>fac</span> + <span class='fu'>s</span>(<span class='no'>x2</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='no'>fac</span>) + <span class='fu'>s</span>(<span class='no'>x0</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat2</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
 <span class='co'>## posterior smooths from m1</span>
 <span class='no'>sm2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='smooth_samples.html'>smooth_samples</a></span>(<span class='no'>m2</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>15</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>23478</span>)
-<span class='co'>## plot</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>sm2</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.7</span>)</div><div class='img'><img src='draw.smooth_samples-2.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>1</span>)
-<span class='no'>dat3</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>4</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-<span class='co'>## a multi-smooth GAM with a factor-by smooth</span>
-<span class='no'>m3</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='no'>fac</span> + <span class='fu'>s</span>(<span class='no'>x2</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='no'>fac</span>) + <span class='fu'>s</span>(<span class='no'>x0</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat3</span>)
-<span class='co'>## posterior smooths from m1</span>
-<span class='no'>sm3</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='smooth_samples.html'>smooth_samples</a></span>(<span class='no'>m3</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>15</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>23478</span>)
-<span class='co'>## plot</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>sm3</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.7</span>)</div><div class='img'><img src='draw.smooth_samples-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'>## this time selecting only one smooth</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>sm3</span>, <span class='kw'>select</span> <span class='kw'>=</span> <span class='st'>"s(x0)"</span>)</div><div class='img'><img src='draw.smooth_samples-4.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'>## or selecting the factor-by smooth</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>sm3</span>, <span class='kw'>select</span> <span class='kw'>=</span> <span class='st'>"s(x2)"</span>, <span class='kw'>partial_match</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.7</span>)</div><div class='img'><img src='draw.smooth_samples-5.png' alt='' width='700' height='433' /></div></pre>
+<span class='co'>## plot, this time selecting only the factor-by smooth</span>
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>sm2</span>, <span class='kw'>select</span> <span class='kw'>=</span> <span class='st'>"s(x2)"</span>, <span class='kw'>partial_match</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.7</span>)</div><div class='img'><img src='draw.smooth_samples-2.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

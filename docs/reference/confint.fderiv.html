@@ -70,7 +70,7 @@ derivatives of smooth terms in a fitted GAM." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.11</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -115,9 +115,15 @@ derivatives of smooth terms in a fitted GAM.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for fderiv</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span>(<span class='no'>object</span>, <span class='no'>parm</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
-  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"confidence"</span>, <span class='st'>"simultaneous"</span>), <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>10000</span>, <span class='kw'>ncores</span> <span class='kw'>=</span> <span class='fl'>1L</span>,
-  <span class='no'>...</span>)</pre>
+<span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span>(
+  <span class='no'>object</span>,
+  <span class='no'>parm</span>,
+  <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
+  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"confidence"</span>, <span class='st'>"simultaneous"</span>),
+  <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>10000</span>,
+  <span class='kw'>ncores</span> <span class='kw'>=</span> <span class='fl'>1L</span>,
+  <span class='no'>...</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -135,7 +141,7 @@ vector of terms. If missing, all parameters are considered.</p></td>
     <tr>
       <th>level</th>
       <td><p>numeric, <code>0 &lt; level &lt; 1</code>; the confidence level of the
-point-wise or simultaneous interval. The default is <code>0.95</code> for a 95<!-- % -->
+point-wise or simultaneous interval. The default is <code>0.95</code> for a 95%
 interval.</p></td>
     </tr>
     <tr>
@@ -175,32 +181,34 @@ to work on Windows with current <code>R</code>).</p></td>
     <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
 <span class='co'># \dontshow{</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>2</span>)
-<span class='no'>op</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>5</span>)
+<span class='no'>op</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>cli.unicode</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 <span class='co'># }</span>
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>mod</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x0</span>) + <span class='fu'>s</span>(<span class='no'>x1</span>) + <span class='fu'>s</span>(<span class='no'>x2</span>) + <span class='fu'>s</span>(<span class='no'>x3</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
+<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>mod</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x0</span>) + <span class='fu'>s</span>(<span class='no'>x1</span>) + <span class='fu'>s</span>(<span class='no'>x2</span>) + <span class='fu'>s</span>(<span class='no'>x3</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
 
 <span class='co'>## first derivatives of all smooths...</span>
 <span class='no'>fd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='fderiv.html'>fderiv</a></span>(<span class='no'>mod</span>)
 
 <span class='co'>## point-wise interval</span>
 <span class='no'>ci</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span>(<span class='no'>fd</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"confidence"</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>ci</span>)</div><div class='output co'>#&gt;    term    lower    est  upper
-#&gt; 1 s(x0) -0.84960 4.1123 9.0741
-#&gt; 2 s(x0) -0.84895 4.1123 9.0735
-#&gt; 3 s(x0) -0.84489 4.1125 9.0698
-#&gt; 4 s(x0) -0.83296 4.1130 9.0589
-#&gt; 5 s(x0) -0.81085 4.1139 9.0387
-#&gt; 6 s(x0) -0.77697 4.1154 9.0077</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>ci</span>)</div><div class='output co'>#&gt;    term lower  est upper
+#&gt; 1 s(x0)  1.22 6.02  10.8
+#&gt; 2 s(x0)  1.22 6.02  10.8
+#&gt; 3 s(x0)  1.22 6.02  10.8
+#&gt; 4 s(x0)  1.23 6.01  10.8
+#&gt; 5 s(x0)  1.25 6.01  10.8
+#&gt; 6 s(x0)  1.27 6.01  10.7</div><div class='input'>
 <span class='co'>## simultaneous interval for smooth term of x1</span>
+<span class='co'># \dontshow{</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
-<span class='no'>x1.sint</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span>(<span class='no'>fd</span>, <span class='kw'>parm</span> <span class='kw'>=</span> <span class='st'>"x1"</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"simultaneous"</span>, <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>1000</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>x1.sint</span>)</div><div class='output co'>#&gt;    term   lower    est  upper
-#&gt; 1 s(x1) -5.1662 1.4232 8.0125
-#&gt; 2 s(x1) -5.1650 1.4232 8.0115
-#&gt; 3 s(x1) -5.1598 1.4234 8.0067
-#&gt; 4 s(x1) -5.1494 1.4239 7.9971
-#&gt; 5 s(x1) -5.1322 1.4246 7.9814
-#&gt; 6 s(x1) -5.1070 1.4257 7.9584</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='no'>op</span>)</div></pre>
+<span class='co'># }</span>
+<span class='no'>x1.sint</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span>(<span class='no'>fd</span>, <span class='kw'>parm</span> <span class='kw'>=</span> <span class='st'>"x1"</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"simultaneous"</span>, <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>2500</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>x1.sint</span>)</div><div class='output co'>#&gt;    term  lower  est upper
+#&gt; 1 s(x1) -0.483 4.70  9.88
+#&gt; 2 s(x1) -0.482 4.70  9.88
+#&gt; 3 s(x1) -0.478 4.70  9.87
+#&gt; 4 s(x1) -0.469 4.70  9.86
+#&gt; 5 s(x1) -0.452 4.70  9.84
+#&gt; 6 s(x1) -0.427 4.69  9.81</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='no'>op</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

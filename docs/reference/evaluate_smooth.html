@@ -71,7 +71,7 @@ which the smooth should be evaluated can be supplied." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.11</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -119,8 +119,16 @@ which the smooth should be evaluated can be supplied.</p>
     <pre class="usage"><span class='fu'>evaluate_smooth</span>(<span class='no'>object</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for gam</span>
-<span class='fu'>evaluate_smooth</span>(<span class='no'>object</span>, <span class='no'>smooth</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overall_uncertainty</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='no'>...</span>)
+<span class='fu'>evaluate_smooth</span>(
+  <span class='no'>object</span>,
+  <span class='no'>smooth</span>,
+  <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>overall_uncertainty</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>dist</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
+  <span class='no'>...</span>
+)
 
 <span class='co'># S3 method for gamm</span>
 <span class='fu'>evaluate_smooth</span>(<span class='no'>object</span>, <span class='no'>...</span>)
@@ -128,8 +136,7 @@ which the smooth should be evaluated can be supplied.</p>
 <span class='fu'>evaluate_parametric_term</span>(<span class='no'>object</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for gam</span>
-<span class='fu'>evaluate_parametric_term</span>(<span class='no'>object</span>, <span class='no'>term</span>,
-  <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>evaluate_parametric_term</span>(<span class='no'>object</span>, <span class='no'>term</span>, <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

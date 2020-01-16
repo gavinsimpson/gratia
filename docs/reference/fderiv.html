@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.11</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -115,8 +115,16 @@
     <pre class="usage"><span class='fu'>fderiv</span>(<span class='no'>model</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for gam</span>
-<span class='fu'>fderiv</span>(<span class='no'>model</span>, <span class='no'>newdata</span>, <span class='no'>term</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>1e-07</span>,
-  <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>offset</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'>fderiv</span>(
+  <span class='no'>model</span>,
+  <span class='no'>newdata</span>,
+  <span class='no'>term</span>,
+  <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>200</span>,
+  <span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>1e-07</span>,
+  <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>offset</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>...</span>
+)
 
 <span class='co'># S3 method for gamm</span>
 <span class='fu'>fderiv</span>(<span class='no'>model</span>, <span class='no'>...</span>)</pre>
