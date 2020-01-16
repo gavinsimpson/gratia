@@ -304,8 +304,8 @@ test_that("derivatives() returns derivatives with simultaneous intervals for all
 
 test_that("derivatives() works for factor by smooths issue 47", {
     set.seed(1)
-    dat <- gamSim(4, n = 400, verbose = FALSE)
-    m <- gam(y ~ fac + s(x2, by = fac), data = dat)
+    dat <- gamSim(4, n = 1000, verbose = FALSE)
+    m <- gam(y ~ fac + s(x2, by = fac), data = dat, method = "REML")
     expect_silent(d <- derivatives(m))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
@@ -313,7 +313,7 @@ test_that("derivatives() works for factor by smooths issue 47", {
     plt <- draw(d)
     expect_doppelganger("draw issue 47 derivatives for factor by", plt)
 
-    m <- gam(y ~ x1 + s(x2) + fac + s(x0, by = fac), data = dat)
+    m <- gam(y ~ x1 + s(x2) + fac + s(x0, by = fac), data = dat, method = "REML")
     expect_silent(d <- derivatives(m))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
@@ -322,7 +322,7 @@ test_that("derivatives() works for factor by smooths issue 47", {
     expect_doppelganger("draw issue 47 derivatives for complex factor by", plt)
     
     dat <- transform(dat, ofac = ordered(fac))
-    m <- gam(y ~ x1 + s(x2) + ofac + s(x0) + s(x0, by = ofac), data = dat)
+    m <- gam(y ~ x1 + s(x2) + ofac + s(x0) + s(x0, by = ofac), data = dat, method = "REML")
     expect_silent(d <- derivatives(m))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")

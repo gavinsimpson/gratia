@@ -1,6 +1,6 @@
 
-R version 3.5.3 beta (2019-02-28 r76174) -- "Great Truth"
-Copyright (C) 2019 The R Foundation for Statistical Computing
+R version 3.6.2 Patched (2020-01-13 r77662) -- "Dark and Stormy Night"
+Copyright (C) 2020 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -38,7 +38,7 @@ Type 'q()' to quit R.
 > 
 > library(mgcv)
 Loading required package: nlme
-This is mgcv 1.8-27. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-31. For overview type 'help("mgcv-package")'.
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -56,6 +56,32 @@ Gu & Wahba 4 term additive model
 
 detaching ‘package:mgcv’, ‘package:nlme’
 
+> nameEx("basis")
+> ### * basis
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: basis
+> ### Title: Basis expansions for smooths
+> ### Aliases: basis
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> ## Don't show: 
+> set.seed(42)
+> ## End(Don't show)
+> df <- gamSim(4, n = 400, verbose = FALSE)
+> 
+> bf <- basis(s(x0), data = df)
+> bf <- basis(s(x2, by = fac, bs = 'bs'), data = df, constraints = TRUE)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("confint.fderiv")
 > ### * confint.fderiv
 > 
@@ -68,12 +94,12 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> suppressPackageStartupMessages(library("mgcv"))
+> load_mgcv()
 > ## Don't show: 
 > set.seed(2)
-> op <- options(digits = 5)
+> op <- options(digits = 3)
 > ## End(Don't show)
-> dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+> dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
@@ -83,25 +109,27 @@ Gu & Wahba 4 term additive model
 > ## point-wise interval
 > ci <- confint(fd, type = "confidence")
 > head(ci)
-   term    lower    est  upper
-1 s(x0) -0.84960 4.1123 9.0741
-2 s(x0) -0.84895 4.1123 9.0735
-3 s(x0) -0.84489 4.1125 9.0698
-4 s(x0) -0.83296 4.1130 9.0589
-5 s(x0) -0.81085 4.1139 9.0387
-6 s(x0) -0.77697 4.1154 9.0077
+   term lower  est upper
+1 s(x0)  1.22 6.02  10.8
+2 s(x0)  1.22 6.02  10.8
+3 s(x0)  1.22 6.02  10.8
+4 s(x0)  1.23 6.01  10.8
+5 s(x0)  1.25 6.01  10.8
+6 s(x0)  1.27 6.01  10.7
 > 
 > ## simultaneous interval for smooth term of x1
+> ## Don't show: 
 > set.seed(42)
-> x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
+> ## End(Don't show)
+> x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 2500)
 > head(x1.sint)
-   term   lower    est  upper
-1 s(x1) -5.3838 1.4232 8.2302
-2 s(x1) -5.3827 1.4232 8.2291
-3 s(x1) -5.3773 1.4234 8.2241
-4 s(x1) -5.3665 1.4239 8.2142
-5 s(x1) -5.3488 1.4246 8.1980
-6 s(x1) -5.3228 1.4257 8.1742
+   term  lower  est upper
+1 s(x1) -0.483 4.70  9.88
+2 s(x1) -0.482 4.70  9.88
+3 s(x1) -0.478 4.70  9.87
+4 s(x1) -0.469 4.70  9.86
+5 s(x1) -0.452 4.70  9.84
+6 s(x1) -0.427 4.69  9.81
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -110,7 +138,7 @@ Gu & Wahba 4 term additive model
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:nlme’
+detaching ‘package:mgcv’
 
 > nameEx("confint.gam")
 > ### * confint.gam
@@ -123,44 +151,62 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> suppressPackageStartupMessages(library("mgcv"))
+> load_mgcv()
+> ## Don't show: 
 > set.seed(2)
-> dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+> op <- options(digits = 4)
+> ## End(Don't show)
+> dat <- gamSim(1, n = 500, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-> ##'
+> 
 > ## point-wise interval
 > ci <- confint(mod, parm = "x1", type = "confidence")
-> head(ci)
-# A tibble: 6 x 8
-  smooth by_variable       x1   est    se  crit lower upper
-  <chr>  <fct>          <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-1 s(x1)  <NA>        0.000663 -1.94 0.329  1.96 -2.59 -1.30
-2 s(x1)  <NA>        0.00568  -1.94 0.320  1.96 -2.57 -1.31
-3 s(x1)  <NA>        0.0107   -1.93 0.312  1.96 -2.54 -1.32
-4 s(x1)  <NA>        0.0157   -1.92 0.304  1.96 -2.52 -1.33
-5 s(x1)  <NA>        0.0207   -1.92 0.296  1.96 -2.50 -1.34
-6 s(x1)  <NA>        0.0258   -1.91 0.288  1.96 -2.47 -1.34
-> ##'
+> ci
+# A tibble: 200 x 8
+   smooth by_variable      x1   est    se  crit lower upper
+   <chr>  <fct>         <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+ 1 s(x1)  <NA>        0.00251 -2.04 0.296  1.96 -2.62 -1.46
+ 2 s(x1)  <NA>        0.00752 -2.04 0.287  1.96 -2.60 -1.47
+ 3 s(x1)  <NA>        0.0125  -2.03 0.279  1.96 -2.58 -1.49
+ 4 s(x1)  <NA>        0.0175  -2.03 0.270  1.96 -2.56 -1.50
+ 5 s(x1)  <NA>        0.0225  -2.02 0.262  1.96 -2.54 -1.51
+ 6 s(x1)  <NA>        0.0276  -2.02 0.254  1.96 -2.52 -1.52
+ 7 s(x1)  <NA>        0.0326  -2.01 0.246  1.96 -2.50 -1.53
+ 8 s(x1)  <NA>        0.0376  -2.01 0.239  1.96 -2.48 -1.54
+ 9 s(x1)  <NA>        0.0426  -2.01 0.232  1.96 -2.46 -1.55
+10 s(x1)  <NA>        0.0476  -2.00 0.226  1.96 -2.44 -1.56
+# … with 190 more rows
+> 
 > ## simultaneous interval for smooth term of x1
+> ## Don't show: 
 > set.seed(42)
+> ## End(Don't show)
 > si <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)
-> head(si)
-# A tibble: 6 x 8
-  smooth by_variable       x1   est    se  crit lower upper
-  <chr>  <fct>          <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-1 s(x1)  <NA>        0.000663 -1.94 0.329  2.26 -2.69 -1.20
-2 s(x1)  <NA>        0.00568  -1.94 0.320  2.26 -2.66 -1.21
-3 s(x1)  <NA>        0.0107   -1.93 0.312  2.26 -2.63 -1.23
-4 s(x1)  <NA>        0.0157   -1.92 0.304  2.26 -2.61 -1.24
-5 s(x1)  <NA>        0.0207   -1.92 0.296  2.26 -2.58 -1.25
-6 s(x1)  <NA>        0.0258   -1.91 0.288  2.26 -2.56 -1.26
+> si
+# A tibble: 200 x 8
+   smooth by_variable      x1   est    se  crit lower upper
+   <chr>  <fct>         <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+ 1 s(x1)  <NA>        0.00251 -2.04 0.296  2.49 -2.78 -1.30
+ 2 s(x1)  <NA>        0.00752 -2.04 0.287  2.49 -2.75 -1.32
+ 3 s(x1)  <NA>        0.0125  -2.03 0.279  2.49 -2.73 -1.34
+ 4 s(x1)  <NA>        0.0175  -2.03 0.270  2.49 -2.70 -1.35
+ 5 s(x1)  <NA>        0.0225  -2.02 0.262  2.49 -2.68 -1.37
+ 6 s(x1)  <NA>        0.0276  -2.02 0.254  2.49 -2.65 -1.39
+ 7 s(x1)  <NA>        0.0326  -2.01 0.246  2.49 -2.63 -1.40
+ 8 s(x1)  <NA>        0.0376  -2.01 0.239  2.49 -2.61 -1.41
+ 9 s(x1)  <NA>        0.0426  -2.01 0.232  2.49 -2.58 -1.43
+10 s(x1)  <NA>        0.0476  -2.00 0.226  2.49 -2.56 -1.44
+# … with 190 more rows
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > 
 > 
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:nlme’
+detaching ‘package:mgcv’
 
 > nameEx("datagen")
 > ### * datagen
@@ -174,7 +220,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> suppressPackageStartupMessages(library("mgcv"))
+> load_mgcv()
 > 
 > ## 1d example
 > set.seed(2)
@@ -219,7 +265,7 @@ Bivariate smoothing example
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:nlme’
+detaching ‘package:mgcv’
 
 > nameEx("derivatives")
 > ### * derivatives
@@ -234,7 +280,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > ### ** Examples
 > 
 > 
-> suppressPackageStartupMessages(library("mgcv"))
+> load_mgcv()
 > ## Don't show: 
 > set.seed(42)
 > op <- options(cli.unicode = FALSE)
@@ -242,7 +288,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
-> ## first derivative of all smooths using central finite differenc
+> ## first derivatives of all smooths using central finite differences
 > derivatives(mod, type = "central")
 # A tibble: 800 x 8
    smooth var       data derivative    se  crit lower upper
@@ -266,7 +312,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:nlme’
+detaching ‘package:mgcv’
 
 > nameEx("draw.derivatives")
 > ### * draw.derivatives
@@ -280,7 +326,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > ### ** Examples
 > 
 > 
-> suppressPackageStartupMessages(library("mgcv"))
+> load_mgcv()
 > ## Don't show: 
 > set.seed(42)
 > ## End(Don't show)
@@ -295,7 +341,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:nlme’
+detaching ‘package:mgcv’
 
 > nameEx("draw.evaluated_smooth")
 > ### * draw.evaluated_smooth
@@ -310,7 +356,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> suppressPackageStartupMessages(library("mgcv"))
+> load_mgcv()
 > 
 > ## Don't show: 
 > set.seed(2)
@@ -336,7 +382,7 @@ Bivariate smoothing example
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:nlme’
+detaching ‘package:mgcv’
 
 > nameEx("draw.gam")
 > ### * draw.gam
@@ -349,7 +395,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> suppressPackageStartupMessages(library("mgcv"))
+> load_mgcv()
 > 
 > ## Don't show: 
 > set.seed(2)
@@ -364,7 +410,91 @@ Gu & Wahba 4 term additive model
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:nlme’
+detaching ‘package:mgcv’
+
+> nameEx("draw.mgcv_smooth")
+> ### * draw.mgcv_smooth
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: draw.mgcv_smooth
+> ### Title: Plot basis functions
+> ### Aliases: draw.mgcv_smooth
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> ## Don't show: 
+> set.seed(42)
+> ## End(Don't show)
+> df <- gamSim(4, n = 400, verbose = FALSE)
+> 
+> bf <- basis(s(x0), data = df)
+> draw(bf)
+> 
+> bf <- basis(s(x2, by = fac, bs = 'bs'), data = df)
+> draw(bf)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
+> nameEx("draw.smooth_samples")
+> ### * draw.smooth_samples
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: draw.smooth_samples
+> ### Title: Plotting posterior smooths
+> ### Aliases: draw.smooth_samples
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> ## Don't show: 
+> set.seed(1)
+> ## End(Don't show)
+> dat1 <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+> ## a single smooth GAM
+> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "REML")
+> ## posterior smooths from m1
+> sm1 <- smooth_samples(m1, n = 15, seed = 23478)
+> ## plot
+> draw(sm1, alpha = 0.7)
+> 
+> ## Don't show: 
+> set.seed(1)
+> ## End(Don't show)
+> dat2 <- gamSim(2, n = 4000, dist = "normal", scale = 1, verbose = FALSE)
+> ## a multi-smooth GAM
+> m2 <- gam(y ~ s(x, z, k = 40), data = dat2$data, method = "REML")
+> ## posterior smooths from m1
+> sm2 <- smooth_samples(m2, n = 15, seed = 23478)
+> ## plot
+> draw(sm2, alpha = 0.7)
+> 
+> ## Don't show: 
+> set.seed(1)
+> ## End(Don't show)
+> dat3 <- gamSim(4, verbose = FALSE)
+> ## a multi-smooth GAM with a factor-by smooth
+> m3 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat3)
+> ## posterior smooths from m1
+> sm3 <- smooth_samples(m3, n = 15, seed = 23478)
+> ## plot
+> draw(sm3, alpha = 0.7)
+> ## this time selecting only one smooth
+> draw(sm3, select = "s(x0)")
+> ## or selecting the factor-by smooth
+> draw(sm3, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
 
 > nameEx("evaluate_smooth")
 > ### * evaluate_smooth
@@ -378,7 +508,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> suppressPackageStartupMessages(library("mgcv"))
+> load_mgcv()
 > ## Don't show: 
 > set.seed(2)
 > op <- options(cli.unicode = FALSE, digits = 6)
@@ -432,7 +562,7 @@ Bivariate smoothing example
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:nlme’
+detaching ‘package:mgcv’
 
 > nameEx("fderiv")
 > ### * fderiv
@@ -445,7 +575,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> suppressPackageStartupMessages(library("mgcv"))
+> load_mgcv()
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -475,7 +605,7 @@ Factor `by' variable example
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:nlme’
+detaching ‘package:mgcv’
 
 > nameEx("fix_offset")
 > ### * fix_offset
@@ -488,7 +618,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> suppressPackageStartupMessages(library("mgcv"))
+> load_mgcv()
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -504,7 +634,7 @@ Gu & Wahba 4 term additive model
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:nlme’
+detaching ‘package:mgcv’
 
 > nameEx("is_offset")
 > ### * is_offset
@@ -517,7 +647,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> suppressPackageStartupMessages(library("mgcv"))
+> load_mgcv()
 > df <- gamSim(1, n = 400, dist = "normal")
 Gu & Wahba 4 term additive model
 > m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = df, method = "REML")
@@ -531,7 +661,72 @@ Gu & Wahba 4 term additive model
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:nlme’
+detaching ‘package:mgcv’
+
+> nameEx("predicted_samples")
+> ### * predicted_samples
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: fitted_samples
+> ### Title: Draw fitted values from the posterior distribution
+> ### Aliases: fitted_samples fitted_samples.gam predicted_samples
+> ###   predicted_samples.gam
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> ## Don't show: 
+> set.seed(2)
+> ## End(Don't show)
+> dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
+Gu & Wahba 4 term additive model
+> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> fitted_samples(m1, n = 5, seed = 42)
+# A tibble: 5,000 x 3
+     row  draw fitted
+   <int> <int>  <dbl>
+ 1     1     1   6.24
+ 2     2     1   5.12
+ 3     3     1   7.06
+ 4     4     1   7.56
+ 5     5     1   9.20
+ 6     6     1   7.94
+ 7     7     1   6.13
+ 8     8     1   7.59
+ 9     9     1  13.9 
+10    10     1  12.7 
+# … with 4,990 more rows
+> load_mgcv()
+> ## Don't show: 
+> set.seed(2)
+> ## End(Don't show)
+> dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
+Gu & Wahba 4 term additive model
+> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> predicted_samples(m1, n = 5, seed = 42)
+# A tibble: 5,000 x 3
+     row  draw response
+   <int> <int>    <dbl>
+ 1     1     1     8.93
+ 2     2     1     4.23
+ 3     3     1     7.71
+ 4     4     1     8.51
+ 5     5     1    10.1 
+ 6     6     1     8.20
+ 7     7     1     8.95
+ 8     8     1     7.20
+ 9     9     1    18.1 
+10    10     1    12.7 
+# … with 4,990 more rows
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
 
 > nameEx("qq_plot")
 > ### * qq_plot
@@ -544,7 +739,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> suppressPackageStartupMessages(library("mgcv"))
+> load_mgcv()
 > ## simulate binomial data...
 > set.seed(0)
 > n.samp <- 200
@@ -571,7 +766,7 @@ Gu & Wahba 4 term additive model
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:nlme’
+detaching ‘package:mgcv’
 
 > nameEx("seq_min_max")
 > ### * seq_min_max
@@ -607,7 +802,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### ** Examples
 > 
-> suppressPackageStartupMessages(library("mgcv"))
+> load_mgcv()
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -627,15 +822,81 @@ Gu & Wahba 4 term additive model
 > 
 > 
 > 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
+> nameEx("smooth_samples")
+> ### * smooth_samples
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: smooth_samples
+> ### Title: Posterior draws for individual smooths
+> ### Aliases: smooth_samples smooth_samples.gam
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> ## Don't show: 
+> set.seed(2)
+> ## End(Don't show)
+> dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
+Gu & Wahba 4 term additive model
+> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
+# A tibble: 1,000 x 7
+   smooth term  by_variable      .x1   row  draw  value
+   <chr>  <chr> <chr>          <dbl> <int> <int>  <dbl>
+ 1 s(x0)  s(x0) <NA>        0.000663     1     1 -0.961
+ 2 s(x0)  s(x0) <NA>        0.00568      2     1 -0.933
+ 3 s(x0)  s(x0) <NA>        0.0107       3     1 -0.906
+ 4 s(x0)  s(x0) <NA>        0.0157       4     1 -0.878
+ 5 s(x0)  s(x0) <NA>        0.0207       5     1 -0.850
+ 6 s(x0)  s(x0) <NA>        0.0258       6     1 -0.822
+ 7 s(x0)  s(x0) <NA>        0.0308       7     1 -0.795
+ 8 s(x0)  s(x0) <NA>        0.0358       8     1 -0.768
+ 9 s(x0)  s(x0) <NA>        0.0408       9     1 -0.740
+10 s(x0)  s(x0) <NA>        0.0458      10     1 -0.713
+# … with 990 more rows
+> 
+> ## A factor by example (with a spurious covariate x0)
+> ## Don't show: 
+> set.seed(2)
+> ## End(Don't show)
+> dat <- gamSim(4)
+Factor `by' variable example
+> 
+> ## fit model...
+> m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
+> smooth_samples(m2, n = 5, seed = 42)
+# A tibble: 4,000 x 8
+   smooth term       by_variable fac       .x1   row  draw value
+   <chr>  <chr>      <chr>       <fct>   <dbl> <int> <int> <dbl>
+ 1 s(x2)  s(x2):fac1 fac         1     0.00325     1     1 -2.90
+ 2 s(x2)  s(x2):fac1 fac         1     0.00825     2     1 -2.74
+ 3 s(x2)  s(x2):fac1 fac         1     0.0132      3     1 -2.58
+ 4 s(x2)  s(x2):fac1 fac         1     0.0182      4     1 -2.43
+ 5 s(x2)  s(x2):fac1 fac         1     0.0232      5     1 -2.27
+ 6 s(x2)  s(x2):fac1 fac         1     0.0282      6     1 -2.11
+ 7 s(x2)  s(x2):fac1 fac         1     0.0332      7     1 -1.96
+ 8 s(x2)  s(x2):fac1 fac         1     0.0382      8     1 -1.80
+ 9 s(x2)  s(x2):fac1 fac         1     0.0432      9     1 -1.65
+10 s(x2)  s(x2):fac1 fac         1     0.0482     10     1 -1.50
+# … with 3,990 more rows
+> 
+> 
+> 
 > ### * <FOOTER>
 > ###
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:nlme’
+detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  18.241 0.134 18.497 0 0 
+Time elapsed:  42.222 0.374 42.88 0.002 0.003 
 > grDevices::dev.off()
 null device 
           1 

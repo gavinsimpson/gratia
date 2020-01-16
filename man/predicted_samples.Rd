@@ -97,14 +97,16 @@ and returned in a tidy, long, format.
 }
 \examples{
 load_mgcv()
-\dontshow{set.seed(2)}
-dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+\dontshow{
+set.seed(2)
+}
+dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 fitted_samples(m1, n = 5, seed = 42)
 load_mgcv()
 \dontshow{set.seed(2)}
-dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 predicted_samples(m1, n = 5, seed = 42)

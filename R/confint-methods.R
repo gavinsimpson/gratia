@@ -34,9 +34,9 @@
 ##' load_mgcv()
 ##' \dontshow{
 ##' set.seed(2)
-##' op <- options(digits = 5)
+##' op <- options(digits = 3)
 ##' }
-##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+##' dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
 ##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
 ##' ## first derivatives of all smooths...
@@ -47,8 +47,10 @@
 ##' head(ci)
 ##'
 ##' ## simultaneous interval for smooth term of x1
+##' \dontshow{
 ##' set.seed(42)
-##' x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
+##' }
+##' x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 2500)
 ##' head(x1.sint)
 ##' \dontshow{options(op)}
 `confint.fderiv` <- function(object, parm, level = 0.95,
@@ -211,18 +213,26 @@
 ##'
 ##' @examples
 ##' load_mgcv()
+##' \dontshow{
 ##' set.seed(2)
-##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+##' op <- options(digits = 4)
+##' }
+##' dat <- gamSim(1, n = 500, dist = "normal", scale = 2)
 ##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
 ##' ## point-wise interval
 ##' ci <- confint(mod, parm = "x1", type = "confidence")
-##' head(ci)
+##' ci
 ##'
 ##' ## simultaneous interval for smooth term of x1
+##' \dontshow{
 ##' set.seed(42)
+##' }
 ##' si <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)
-##' head(si)
+##' si
+##' \dontshow{
+##' options(op)
+##' }
 `confint.gam` <- function(object, parm, level = 0.95, newdata = NULL, n = 200,
                           type = c("confidence", "simultaneous"), nsim = 10000,
                           shift = FALSE, transform = FALSE, unconditional = FALSE,
