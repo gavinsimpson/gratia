@@ -100,7 +100,10 @@ change in future versions. Don't rely on position.
 
 \examples{
 load_mgcv()
-\dontshow{set.seed(2)}
+\dontshow{
+set.seed(2)
+op <- options(cli.unicode = FALSE)
+}
 dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
@@ -113,6 +116,7 @@ dat <- gamSim(4)
 ## fit model...
 m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
 smooth_samples(m2, n = 5, seed = 42)
+\dontshow{options(op)}
 }
 \author{
 Gavin L. Simpson

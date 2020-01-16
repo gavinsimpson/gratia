@@ -91,11 +91,13 @@
 ##' load_mgcv()
 ##' \dontshow{
 ##' set.seed(2)
+##' op <- options(cli.unicode = FALSE)
 ##' }
 ##' dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
 ##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
 ##' fitted_samples(m1, n = 5, seed = 42)
+##' \dontshow{options(op)}
 `fitted_samples.gam` <- function(model, n = 1, newdata, seed,
                                  scale = c("response","linear_predictor"),
                                  freq = FALSE, unconditional = FALSE,
@@ -161,11 +163,15 @@
 ##'
 ##' @examples
 ##' load_mgcv()
-##' \dontshow{set.seed(2)}
+##' \dontshow{
+##' set.seed(2)
+##' op <- options(cli.unicode = FALSE)
+##' }
 ##' dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
 ##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
 ##' predicted_samples(m1, n = 5, seed = 42)
+##' \dontshow{options(op)}
 `predicted_samples` <- function(model, ...) {
     UseMethod("predicted_samples")
 }
@@ -243,7 +249,10 @@
 ##'
 ##' @examples
 ##' load_mgcv()
-##' \dontshow{set.seed(2)}
+##' \dontshow{
+##' set.seed(2)
+##' op <- options(cli.unicode = FALSE)
+##' }
 ##' dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
 ##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
@@ -256,6 +265,7 @@
 ##' ## fit model...
 ##' m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
 ##' smooth_samples(m2, n = 5, seed = 42)
+##' \dontshow{options(op)}
 `smooth_samples` <- function(model, ...) {
     UseMethod("smooth_samples")
 }
