@@ -154,7 +154,7 @@ detaching ‘package:mgcv’
 > load_mgcv()
 > ## Don't show: 
 > set.seed(2)
-> op <- options(digits = 4)
+> op <- options(digits = 4, cli.unicode = FALSE)
 > ## End(Don't show)
 > dat <- gamSim(1, n = 500, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -176,7 +176,7 @@ Gu & Wahba 4 term additive model
  8 s(x1)  <NA>        0.0376  -2.01 0.239  1.96 -2.48 -1.54
  9 s(x1)  <NA>        0.0426  -2.01 0.232  1.96 -2.46 -1.55
 10 s(x1)  <NA>        0.0476  -2.00 0.226  1.96 -2.44 -1.56
-# … with 190 more rows
+# ... with 190 more rows
 > 
 > ## simultaneous interval for smooth term of x1
 > ## Don't show: 
@@ -197,7 +197,7 @@ Gu & Wahba 4 term additive model
  8 s(x1)  <NA>        0.0376  -2.01 0.239  2.49 -2.61 -1.41
  9 s(x1)  <NA>        0.0426  -2.01 0.232  2.49 -2.58 -1.43
 10 s(x1)  <NA>        0.0476  -2.00 0.226  2.49 -2.56 -1.44
-# … with 190 more rows
+# ... with 190 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -467,28 +467,13 @@ detaching ‘package:mgcv’
 > ## Don't show: 
 > set.seed(1)
 > ## End(Don't show)
-> dat2 <- gamSim(2, n = 4000, dist = "normal", scale = 1, verbose = FALSE)
-> ## a multi-smooth GAM
-> m2 <- gam(y ~ s(x, z, k = 40), data = dat2$data, method = "REML")
+> dat2 <- gamSim(4, verbose = FALSE)
+> ## a multi-smooth GAM with a factor-by smooth
+> m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat2, method = "REML")
 > ## posterior smooths from m1
 > sm2 <- smooth_samples(m2, n = 15, seed = 23478)
-> ## plot
-> draw(sm2, alpha = 0.7)
-> 
-> ## Don't show: 
-> set.seed(1)
-> ## End(Don't show)
-> dat3 <- gamSim(4, verbose = FALSE)
-> ## a multi-smooth GAM with a factor-by smooth
-> m3 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat3)
-> ## posterior smooths from m1
-> sm3 <- smooth_samples(m3, n = 15, seed = 23478)
-> ## plot
-> draw(sm3, alpha = 0.7)
-> ## this time selecting only one smooth
-> draw(sm3, select = "s(x0)")
-> ## or selecting the factor-by smooth
-> draw(sm3, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
+> ## plot, this time selecting only the factor-by smooth
+> draw(sm2, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
 > 
 > 
 > 
@@ -908,7 +893,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  42.719 0.562 43.565 0.003 0.002 
+Time elapsed:  35.581 0.355 36.164 0.003 0.005 
 > grDevices::dev.off()
 null device 
           1 
