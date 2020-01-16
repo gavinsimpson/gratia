@@ -1,4 +1,4 @@
-# gratia (development version)
+# gratia 0.3.0 (2020-01-16)
 
 ## New features
 
