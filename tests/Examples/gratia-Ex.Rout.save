@@ -97,7 +97,7 @@ detaching ‘package:mgcv’
 > load_mgcv()
 > ## Don't show: 
 > set.seed(2)
-> op <- options(digits = 3)
+> op <- options(digits = 3, cli.unicode = FALSE)
 > ## End(Don't show)
 > dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -678,6 +678,7 @@ detaching ‘package:mgcv’
 > load_mgcv()
 > ## Don't show: 
 > set.seed(2)
+> op <- options(cli.unicode = FALSE)
 > ## End(Don't show)
 > dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -697,10 +698,14 @@ Gu & Wahba 4 term additive model
  8     8     1   7.59
  9     9     1  13.9 
 10    10     1  12.7 
-# … with 4,990 more rows
+# ... with 4,990 more rows
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > load_mgcv()
 > ## Don't show: 
 > set.seed(2)
+> op <- options(cli.unicode = FALSE)
 > ## End(Don't show)
 > dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -720,7 +725,10 @@ Gu & Wahba 4 term additive model
  8     8     1     7.20
  9     9     1    18.1 
 10    10     1    12.7 
-# … with 4,990 more rows
+# ... with 4,990 more rows
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > 
 > 
 > 
@@ -840,6 +848,7 @@ detaching ‘package:mgcv’
 > load_mgcv()
 > ## Don't show: 
 > set.seed(2)
+> op <- options(cli.unicode = FALSE)
 > ## End(Don't show)
 > dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -859,7 +868,7 @@ Gu & Wahba 4 term additive model
  8 s(x0)  s(x0) <NA>        0.0358       8     1 -0.768
  9 s(x0)  s(x0) <NA>        0.0408       9     1 -0.740
 10 s(x0)  s(x0) <NA>        0.0458      10     1 -0.713
-# … with 990 more rows
+# ... with 990 more rows
 > 
 > ## A factor by example (with a spurious covariate x0)
 > ## Don't show: 
@@ -884,7 +893,10 @@ Factor `by' variable example
  8 s(x2)  s(x2):fac1 fac         1     0.0382      8     1 -1.80
  9 s(x2)  s(x2):fac1 fac         1     0.0432      9     1 -1.65
 10 s(x2)  s(x2):fac1 fac         1     0.0482     10     1 -1.50
-# … with 3,990 more rows
+# ... with 3,990 more rows
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > 
 > 
 > 
@@ -896,7 +908,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  42.222 0.374 42.88 0.002 0.003 
+Time elapsed:  42.719 0.562 43.565 0.003 0.002 
 > grDevices::dev.off()
 null device 
           1 
