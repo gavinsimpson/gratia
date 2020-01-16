@@ -215,7 +215,7 @@
 ##' load_mgcv()
 ##' \dontshow{
 ##' set.seed(2)
-##' op <- options(digits = 4)
+##' op <- options(digits = 4, cli.unicode = FALSE)
 ##' }
 ##' dat <- gamSim(1, n = 500, dist = "normal", scale = 2)
 ##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
