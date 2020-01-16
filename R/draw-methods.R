@@ -711,26 +711,13 @@
 ##' draw(sm1, alpha = 0.7)
 ##' 
 ##' \dontshow{set.seed(1)}
-##' dat2 <- gamSim(2, n = 4000, dist = "normal", scale = 1, verbose = FALSE)
-##' ## a multi-smooth GAM
-##' m2 <- gam(y ~ s(x, z, k = 40), data = dat2$data, method = "REML")
+##' dat2 <- gamSim(4, verbose = FALSE)
+##' ## a multi-smooth GAM with a factor-by smooth
+##' m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat2, method = "REML")
 ##' ## posterior smooths from m1
 ##' sm2 <- smooth_samples(m2, n = 15, seed = 23478)
-##' ## plot
-##' draw(sm2, alpha = 0.7)
-##' 
-##' \dontshow{set.seed(1)}
-##' dat3 <- gamSim(4, verbose = FALSE)
-##' ## a multi-smooth GAM with a factor-by smooth
-##' m3 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat3)
-##' ## posterior smooths from m1
-##' sm3 <- smooth_samples(m3, n = 15, seed = 23478)
-##' ## plot
-##' draw(sm3, alpha = 0.7)
-##' ## this time selecting only one smooth
-##' draw(sm3, select = "s(x0)")
-##' ## or selecting the factor-by smooth
-##' draw(sm3, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
+##' ## plot, this time selecting only the factor-by smooth
+##' draw(sm2, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
 `draw.smooth_samples` <- function(object,
                                   select = NULL,
                                   xlab = NULL, ylab = NULL, title = NULL,
