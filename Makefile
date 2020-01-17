@@ -37,14 +37,14 @@ check-openblas: build-openblas
 check-test-cran: build
 	cd ..;\
 	export NOT_CRAN="false"; \
-        echo "$${NOT_CRAN}"; \
-        R CMD check gratia_$(PKGVERS).tar.gz
+	echo "$${NOT_CRAN}"; \
+	R CMD check gratia_$(PKGVERS).tar.gz
 
 check-test-cran-openblas: build-openblas
 	cd ..;\
 	export NOT_CRAN="false"; \
-        echo "$${NOT_CRAN}"; \
-        R-openblas CMD check gratia_$(PKGVERS).tar.gz
+	echo "$${NOT_CRAN}"; \
+	R-openblas CMD check gratia_$(PKGVERS).tar.gz
 
 check-as-cran: build
 	cd ..;\
@@ -54,6 +54,12 @@ check-as-cran: build
 
 check-devel: build-devel
 	cd ..;\
+	R-devel CMD check gratia_$(PKGVERS).tar.gz
+
+check-as-cran-devel: build-devel
+	cd ..;\
+	export NOT_CRAN="false"; \
+	echo "$${NOT_CRAN}"; \
 	R-devel CMD check gratia_$(PKGVERS).tar.gz
 
 install: build
