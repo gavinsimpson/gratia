@@ -415,3 +415,28 @@
 
     fun # return
 }
+
+##' Family method for GAM objects
+##'
+##' Provides a [stats::family()] method for a range of GAM objects.
+##'
+##' @param object a fitted model. Models fitted by [mgcv::gam()], [mgcv::bam()],
+##'   and [mgcv::gamm()].
+##' @param ... arguments passed to other methods.
+##'
+##' @export
+`family.gam` <- function(object, ...) {
+    object[["family"]]
+}
+
+##' @export
+##' @rdname family.gam
+`family.gamm` <- function(object, ...) {
+    family(object[["gam"]])
+}
+
+##' @export
+##' @rdname family.gam
+`family.bam` <- function(object, ...) {
+    object[["family"]]
+}
