@@ -18,6 +18,10 @@ build-openblas: docs
 	cd ..;\
 	R-openblas CMD build gratia
 
+build-atlas: docs
+	cd ..;\
+	R-atlas CMD build gratia
+
 build-devel: docs-devel
 	cd ..;\
 	R-devel CMD build gratia
@@ -34,6 +38,12 @@ check-openblas: build-openblas
 	echo "$${NOT_CRAN}"; \
 	R-openblas CMD check gratia_$(PKGVERS).tar.gz
 
+check-atlas: build-atlas
+	cd ..; \
+	export NOT_CRAN="true"; \
+	echo "$${NOT_CRAN}"; \
+	R-atlas CMD check gratia_$(PKGVERS).tar.gz
+
 check-test-cran: build
 	cd ..;\
 	export NOT_CRAN="false"; \
@@ -45,6 +55,12 @@ check-test-cran-openblas: build-openblas
 	export NOT_CRAN="false"; \
 	echo "$${NOT_CRAN}"; \
 	R-openblas CMD check gratia_$(PKGVERS).tar.gz
+
+check-test-cran-atlas: build-atlas
+	cd ..;\
+	export NOT_CRAN="false"; \
+	echo "$${NOT_CRAN}"; \
+	R-atlas CMD check gratia_$(PKGVERS).tar.gz
 
 check-as-cran: build
 	cd ..;\
