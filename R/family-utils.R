@@ -270,17 +270,6 @@
     extract_link(family, inverse = inverse)
 }
 
-`quasi_link` <- function(family, parameter = c("location", "mu"),
-                         inverse = FALSE) {
-    if (!identical(family[["family"]], "quasi")) {
-        stop("'family' is not '\"quasipoisson\"'", .call = FALSE)
-    }
-    
-    parameter <- match.arg(parameter)
-    
-    extract_link(family, inverse = inverse)
-}
-
 `quasi_poisson_link` <- function(family, parameter = c("location", "mu"),
                             inverse = FALSE) {
     if (!identical(family[["family"]], "quasipoisson")) {
