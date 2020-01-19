@@ -42,6 +42,30 @@ test_that("link() works with a gam() gaulss model", {
     expect_identical(f, gaussian()$linkfun)
 })
 
+test_that("inv_link() works with a gam() model", {
+    f <- inv_link(m_gam)
+    expect_type(f, "closure")
+    expect_identical(f, gaussian()$linkinv)
+})
+
+test_that("inv_link() works with a gamm() model", {
+    f <- inv_link(m_gamm)
+    expect_type(f, "closure")
+    expect_identical(f, gaussian()$linkinv)
+})
+
+test_that("inv_link() works with a bam() model", {
+    f <- inv_link(m_bam)
+    expect_type(f, "closure")
+    expect_identical(f, gaussian()$linkinv)
+})
+
+test_that("inv_link() works with a gam() gaulss model", {
+    f <- inv_link(m_gaulss)
+    expect_type(f, "closure")
+    expect_identical(f, gaussian()$linkinv)
+})
+
 ## link
 test_that("link() works for gaussian() family objects", {
     f <- link(gaussian())
