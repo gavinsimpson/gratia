@@ -9,6 +9,40 @@ context("Testing Family Utility Functions")
 
 val <- 1
 
+## check link and inv_link for models
+set.seed(4234)
+dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+m_gam <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+m_gaulss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1), data = dat,
+                family = gaulss)
+m_gamm <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
+m_bam <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "fREML")
+
+test_that("link() works with a gam() model", {
+    f <- link(m_gam)
+    expect_type(f, "closure")
+    expect_identical(f, gaussian()$linkfun)
+})
+
+test_that("link() works with a gamm() model", {
+    f <- link(m_gamm)
+    expect_type(f, "closure")
+    expect_identical(f, gaussian()$linkfun)
+})
+
+test_that("link() works with a bam() model", {
+    f <- link(m_bam)
+    expect_type(f, "closure")
+    expect_identical(f, gaussian()$linkfun)
+})
+
+test_that("link() works with a gam() gaulss model", {
+    f <- link(m_gaulss)
+    expect_type(f, "closure")
+    expect_identical(f, gaussian()$linkfun)
+})
+
+## link
 test_that("link() works for gaussian() family objects", {
     f <- link(gaussian())
     expect_type(f, "closure")
