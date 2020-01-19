@@ -67,7 +67,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -105,13 +105,26 @@
       
     </div>
 
-    <div id="gratia-030-2020-01-16" class="section level1">
+    <div id="gratia-031-in-development" class="section level1">
 <h1 class="page-header">
-<a href="#gratia-030-2020-01-16" class="anchor"></a>gratia 0.3.0 (2020-01-16)<small> Unreleased </small>
+<a href="#gratia-031-in-development" class="anchor"></a>gratia 0.3.1 (in development)<small> Unreleased </small>
 </h1>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>New features</h2>
+<ul>
+<li><p>New functions <code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> to access the link function and its inverse from fitted models and family functions. #58</p></li>
+<li><p>Adds explicit <code><a href="https://rdrr.io/r/stats/family.html">family()</a></code> methods for objects of classes <code>"gam"</code>, <code>"bam"</code>, and <code>"gamm"</code>.</p></li>
+</ul>
+</div>
+</div>
+    <div id="gratia-030-2020-01-16" class="section level1">
+<h1 class="page-header">
+<a href="#gratia-030-2020-01-16" class="anchor"></a>gratia 0.3.0 (2020-01-16)<small> Unreleased </small>
+</h1>
+<div id="new-features-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features-1" class="anchor"></a>New features</h2>
 <ul>
 <li><p><em>gratia</em> now uses the <em>mvnfast</em> package for random draws from a multivariate normal distribution (<code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html">mvnfast::rmvn()</a></code>). Contributed by Henrik Singmann (<a href='https://github.com/singmann'>@singmann</a>) <a href="https://github.com/gavinsimpson/gratia/issues/28">#28</a></p></li>
 <li><p>New function <code><a href="../reference/basis.html">basis()</a></code> for generating tidy representations of basis expansions from an <em>mgcv</em>-like definition of a smooth, e.g. <code>s()</code>, <code>te()</code>, <code>ti()</code>, or <code>t2()</code>. The basic smooth types also have a simple <code><a href="../reference/draw.html">draw()</a></code> method for plotting the basis. <code><a href="../reference/basis.html">basis()</a></code> is a simple wrapper around <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html">mgcv::smoothCon()</a></code> with some post processing of the basis model matrix into a tidy format. <a href="https://github.com/gavinsimpson/gratia/issues/42">#42</a></p></li>
@@ -137,6 +150,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#gratia-031-in-development">0.3.1</a></li>
         <li><a href="#gratia-030-2020-01-16">0.3.0</a></li>
       </ul>
     </div>
