@@ -203,11 +203,15 @@
     inv_link(object[["gam"]])
 }
 
+## Internal link extractor functions
 
 `gaussian_link` <- function(family, parameter = c("location", "mu"),
                             inverse = FALSE) {
+    if (!inherits(family, "family")) {
+        stop("'family' is not a family object", call. = FALSE)
+    }
     if (!identical(family[["family"]], "gaussian")) {
-        stop("'family' is not '\"gaussian\"'", .call = FALSE)
+        stop("'family' is not '\"gaussian\"'", call. = FALSE)
     }
 
     parameter <- match.arg(parameter)
@@ -217,8 +221,11 @@
 
 `poisson_link` <- function(family, parameter = c("location", "mu"),
                             inverse = FALSE) {
+    if (!inherits(family, "family")) {
+        stop("'family' is not a family object", call. = FALSE)
+    }
     if (!identical(family[["family"]], "poisson")) {
-        stop("'family' is not '\"poisson\"'", .call = FALSE)
+        stop("'family' is not '\"poisson\"'", call. = FALSE)
     }
 
     parameter <- match.arg(parameter)
@@ -228,8 +235,11 @@
 
 `binomial_link` <- function(family, parameter = c("location", "mu"),
                             inverse = FALSE) {
+    if (!inherits(family, "family")) {
+        stop("'family' is not a family object", call. = FALSE)
+    }
     if (!identical(family[["family"]], "binomial")) {
-        stop("'family' is not '\"binomial\"'", .call = FALSE)
+        stop("'family' is not '\"binomial\"'", call. = FALSE)
     }
 
     parameter <- match.arg(parameter)
@@ -239,8 +249,11 @@
 
 `gamma_link` <- function(family, parameter = c("location", "mu"),
                             inverse = FALSE) {
+    if (!inherits(family, "family")) {
+        stop("'family' is not a family object", call. = FALSE)
+    }
     if (!identical(family[["family"]], "Gamma")) {
-        stop("'family' is not '\"Gamma\"'", .call = FALSE)
+        stop("'family' is not '\"Gamma\"'", call. = FALSE)
     }
 
     parameter <- match.arg(parameter)
@@ -250,8 +263,11 @@
 
 `inverse_gaussian_link` <- function(family, parameter = c("location", "mu"),
                             inverse = FALSE) {
+    if (!inherits(family, "family")) {
+        stop("'family' is not a family object", call. = FALSE)
+    }
     if (!identical(family[["family"]], "inverse.gaussian")) {
-        stop("'family' is not '\"inverse.gaussian\"'", .call = FALSE)
+        stop("'family' is not '\"inverse.gaussian\"'", call. = FALSE)
     }
 
     parameter <- match.arg(parameter)
@@ -261,8 +277,11 @@
 
 `quasi_link` <- function(family, parameter = c("location", "mu"),
                             inverse = FALSE) {
+    if (!inherits(family, "family")) {
+        stop("'family' is not a family object", call. = FALSE)
+    }
     if (!identical(family[["family"]], "quasi")) {
-        stop("'family' is not '\"quasi\"'", .call = FALSE)
+        stop("'family' is not '\"quasi\"'", call. = FALSE)
     }
 
     parameter <- match.arg(parameter)
@@ -272,8 +291,11 @@
 
 `quasi_poisson_link` <- function(family, parameter = c("location", "mu"),
                             inverse = FALSE) {
+    if (!inherits(family, "family")) {
+        stop("'family' is not a family object", call. = FALSE)
+    }
     if (!identical(family[["family"]], "quasipoisson")) {
-        stop("'family' is not '\"quasipoisson\"'", .call = FALSE)
+        stop("'family' is not '\"quasipoisson\"'", call. = FALSE)
     }
 
     parameter <- match.arg(parameter)
@@ -283,8 +305,11 @@
 
 `quasi_binomial_link` <- function(family, parameter = c("location", "mu"),
                             inverse = FALSE) {
+    if (!inherits(family, "family")) {
+        stop("'family' is not a family object", call. = FALSE)
+    }
     if (!identical(family[["family"]], "quasibinomial")) {
-        stop("'family' is not '\"quasibinomial\"'", .call = FALSE)
+        stop("'family' is not '\"quasibinomial\"'", call. = FALSE)
     }
 
     parameter <- match.arg(parameter)
@@ -294,10 +319,13 @@
 
 `nb_link` <- function(family, parameter = c("location", "mu"),
                       inverse = FALSE) {
+    if (!inherits(family, "family")) {
+        stop("'family' is not a family object", call. = FALSE)
+    }
     distr <- family[["family"]]
     if (!(grepl("negative binomial", distr) ||
           grepl("^Negative Binomial", distr))) {
-        stop("'family' is not a negative binomial family", .call = FALSE)
+        stop("'family' is not a negative binomial family", call. = FALSE)
     }
     
     parameter <- match.arg(parameter)
@@ -307,8 +335,11 @@
 
 `tw_link` <- function(family, parameter = c("location", "mu"),
                       inverse = FALSE) {
+    if (!inherits(family, "family")) {
+        stop("'family' is not a family object", call. = FALSE)
+    }
     if (!grepl("^Tweedie", family[["family"]])) {
-        stop("'family' is not a Tweedie family", .call = FALSE)
+        stop("'family' is not a Tweedie family", call. = FALSE)
     }
     
     parameter <- match.arg(parameter)
@@ -318,8 +349,11 @@
 
 `beta_link` <- function(family, parameter = c("location", "mu"),
                         inverse = FALSE) {
+    if (!inherits(family, "family")) {
+        stop("'family' is not a family object", call. = FALSE)
+    }
     if (!identical(family[["family"]], "Beta regression")) {
-        stop("'family' is not \"Beta regression\"", .call = FALSE)
+        stop("'family' is not '\"Beta regression\"'", call. = FALSE)
     }
     
     parameter <- match.arg(parameter)
@@ -329,8 +363,11 @@
 
 `scaled_t_link` <- function(family, parameter = c("location", "mu"),
                             inverse = FALSE) {
+    if (!inherits(family, "family")) {
+        stop("'family' is not a family object", call. = FALSE)
+    }
     if (!identical(family[["family"]], "scaled t")) {
-        stop("'family' is not \"scaled t\"", .call = FALSE)
+        stop("'family' is not '\"scaled t\"'", call. = FALSE)
     }
     
     parameter <- match.arg(parameter)
@@ -340,8 +377,11 @@
 
 `ocat_link` <- function(family, parameter = c("location", "mu"),
                                        inverse = FALSE) {
+    if (!inherits(family, "family")) {
+        stop("'family' is not a family object", call. = FALSE)
+    }
     if (!identical(family[["family"]], "Ordered Categorical")) {
-        stop("'family' is not \"Ordered Categorical\"", .call = FALSE)
+        stop("'family' is not '\"Ordered Categorical\"'", call. = FALSE)
     }
     
     parameter <- match.arg(parameter)
@@ -351,8 +391,11 @@
 
 `zip_link` <- function(family, parameter = c("location", "mu"),
                        inverse = FALSE) {
+    if (!inherits(family, "family")) {
+        stop("'family' is not a family object", call. = FALSE)
+    }
     if (!identical(family[["family"]], "zero inflated Poisson")) {
-        stop("'family' is not \"zero inflated Poisson\"", .call = FALSE)
+        stop("'family' is not '\"zero inflated Poisson\"'", call. = FALSE)
     }
     
     parameter <- match.arg(parameter)
@@ -362,8 +405,11 @@
 
 `cox_ph_link` <- function(family, parameter = c("location", "mu"),
                        inverse = FALSE) {
+    if (!inherits(family, "family")) {
+        stop("'family' is not a family object", call. = FALSE)
+    }
     if (!identical(family[["family"]], "Cox PH")) {
-        stop("'family' is not \"Cox PH\"", .call = FALSE)
+        stop("'family' is not '\"Cox PH\"'", call. = FALSE)
     }
     
     parameter <- match.arg(parameter)
@@ -395,8 +441,11 @@
 
 `gaulss_link` <- function(family, parameter = c("location", "scale", "mu", "sigma"),
                           inverse = FALSE) {
+    if (!inherits(family, "family")) {
+        stop("'family' is not a family object", call. = FALSE)
+    }
     if (!identical(family[["family"]], "gaulss")) {
-        stop("'family' is not '\"gaulss\"'", .call = FALSE)
+        stop("'family' is not '\"gaulss\"'", call. = FALSE)
     }
 
     parameter <- match.arg(parameter)
