@@ -535,3 +535,99 @@ test_that("extract_link() works on cox.ph() family objects", {
     expect_identical(f(val), cox.ph()$linkinv(val))
     expect_identical(f, cox.ph()$linkinv)
 })
+
+## test internal link functions fail gracefully
+test_that("gaussian_link() fails gracefully", {
+    expect_error(gaussian_link(1), "'family' is not a family object")
+    expect_error(gaussian_link(nb()), "'family' is not '\"gaussian\"'")
+})
+
+## test internal link functions fail gracefully
+test_that("poisson_link() fails gracefully", {
+    expect_error(poisson_link(1), "'family' is not a family object")
+    expect_error(poisson_link(nb()), "'family' is not '\"poisson\"'")
+})
+
+## test internal link functions fail gracefully
+test_that("binomial_link() fails gracefully", {
+    expect_error(binomial_link(1), "'family' is not a family object")
+    expect_error(binomial_link(nb()), "'family' is not '\"binomial\"'")
+})
+
+## test internal link functions fail gracefully
+test_that("gamma_link() fails gracefully", {
+    expect_error(gamma_link(1), "'family' is not a family object")
+    expect_error(gamma_link(nb()), "'family' is not '\"Gamma\"'")
+})
+
+## test internal link functions fail gracefully
+test_that("inverse_gaussian_link() fails gracefully", {
+    expect_error(inverse_gaussian_link(1), "'family' is not a family object")
+    expect_error(inverse_gaussian_link(nb()), "'family' is not '\"inverse.gaussian\"'")
+})
+
+## test internal link functions fail gracefully
+test_that("quasi_link() fails gracefully", {
+    expect_error(quasi_link(1), "'family' is not a family object")
+    expect_error(quasi_link(nb()), "'family' is not '\"quasi\"'")
+})
+
+## test internal link functions fail gracefully
+test_that("quasi_poisson_link() fails gracefully", {
+    expect_error(quasi_poisson_link(1), "'family' is not a family object")
+    expect_error(quasi_poisson_link(nb()), "'family' is not '\"quasipoisson\"'")
+})
+
+## test internal link functions fail gracefully
+test_that("quasi_binomial_link() fails gracefully", {
+    expect_error(quasi_binomial_link(1), "'family' is not a family object")
+    expect_error(quasi_binomial_link(nb()), "'family' is not '\"quasibinomial\"'")
+})
+
+## test internal link functions fail gracefully
+test_that("nb_link() fails gracefully", {
+    expect_error(nb_link(1), "'family' is not a family object")
+    expect_error(nb_link(tw()), "'family' is not a negative binomial family")
+})
+
+## test internal link functions fail gracefully
+test_that("tw_link() fails gracefully", {
+    expect_error(tw_link(1), "'family' is not a family object")
+    expect_error(tw_link(nb()), "'family' is not a Tweedie family")
+})
+
+## test internal link functions fail gracefully
+test_that("beta_link() fails gracefully", {
+    expect_error(beta_link(1), "'family' is not a family object")
+    expect_error(beta_link(nb()), "'family' is not '\"Beta regression\"'")
+})
+
+## test internal link functions fail gracefully
+test_that("scaled_t_link() fails gracefully", {
+    expect_error(scaled_t_link(1), "'family' is not a family object")
+    expect_error(scaled_t_link(nb()), "'family' is not '\"scaled t\"'")
+})
+
+## test internal link functions fail gracefully
+test_that("ocat_link() fails gracefully", {
+    expect_error(ocat_link(1), "'family' is not a family object")
+    expect_error(ocat_link(nb()), "'family' is not '\"Ordered Categorical\"'")
+})
+
+## test internal link functions fail gracefully
+test_that("zip_link() fails gracefully", {
+    expect_error(zip_link(1), "'family' is not a family object")
+    expect_error(zip_link(nb()), "'family' is not '\"zero inflated Poisson\"'")
+})
+
+## test internal link functions fail gracefully
+test_that("cox_ph_link() fails gracefully", {
+    expect_error(cox_ph_link(1), "'family' is not a family object")
+    expect_error(cox_ph_link(nb()), "'family' is not '\"Cox PH\"'")
+})
+
+## test internal link functions fail gracefully
+test_that("gaulss_link() fails gracefully", {
+    expect_error(gaulss_link(1), "'family' is not a family object")
+    expect_error(gaulss_link(nb()), "'family' is not '\"gaulss\"'")
+})
