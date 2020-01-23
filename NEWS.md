@@ -4,6 +4,8 @@
 
 * New functions `link()` and `inv_link()` to access the link function and its
   inverse from fitted models and family functions. #58
+  
+  Methods for classes: `"glm"`, `"gam"`, `"bam"`, `"gamm"` currently.
 
 * Adds explicit `family()` methods for objects of classes `"gam"`, `"bam"`, and
   `"gamm"`.
