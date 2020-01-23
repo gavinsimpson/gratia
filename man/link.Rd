@@ -13,8 +13,6 @@
 \alias{inv_link.bam}
 \alias{inv_link.gamm}
 \alias{inv_link.glm}
-\alias{extract_link}
-\alias{extract_link.family}
 \title{Extract link and inverse link functions from models}
 \usage{
 link(object, ...)
@@ -40,10 +38,6 @@ inv_link(object, ...)
 \method{inv_link}{gamm}(object, ...)
 
 \method{inv_link}{glm}(object, ...)
-
-extract_link(family, ...)
-
-\method{extract_link}{family}(family, inverse = FALSE, ...)
 }
 \arguments{
 \item{object}{a family object or a fitted model from which to extract the
@@ -54,11 +48,6 @@ family object.}
 \item{parameter}{character; which parameter of the distribution. Usually
 \code{"location"} but \code{"scale"} and \code{"shape"} may be provided for location
 scale models.}
-
-\item{family}{a family object.}
-
-\item{inverse}{logical; if \code{TRUE} return the link function or if \code{FALSE}
-return the inverse of the link function.}
 }
 \description{
 Returns the link or its inverse from an estimated model, and provides a

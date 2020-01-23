@@ -431,18 +431,10 @@
     extract_link(family, inverse = inverse)
 }
 
-##' @rdname link
-##' @export
 `extract_link` <- function(family, ...) {
     UseMethod("extract_link")
 }
 
-##' @rdname link
-##' 
-##' @param family a family object.
-##' @param inverse logical; if `TRUE` return the link function or if `FALSE`
-##'   return the inverse of the link function.
-##' @export
 `extract_link.family` <- function(family, inverse = FALSE, ...) {
     fun <- if (isTRUE(inverse)) {
                family[["linkinv"]]
