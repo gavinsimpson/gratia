@@ -3,9 +3,9 @@
 ## New features
 
 * New functions `link()` and `inv_link()` to access the link function and its
-  inverse from fitted models and family functions. #58
+  inverse from fitted models and family functions.
   
-  Methods for classes: `"glm"`, `"gam"`, `"bam"`, `"gamm"` currently.
+  Methods for classes: `"glm"`, `"gam"`, `"bam"`, `"gamm"` currently. [#58](https://github.com/gavinsimpson/gratia/issues/58)
 
 * Adds explicit `family()` methods for objects of classes `"gam"`, `"bam"`, and
   `"gamm"`.
