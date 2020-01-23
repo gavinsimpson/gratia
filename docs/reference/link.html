@@ -130,6 +130,9 @@ links, such as location scale models.</p>
 <span class='co'># S3 method for gamm</span>
 <span class='fu'>link</span>(<span class='no'>object</span>, <span class='no'>...</span>)
 
+<span class='co'># S3 method for glm</span>
+<span class='fu'>link</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+
 <span class='fu'>inv_link</span>(<span class='no'>object</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for family</span>
@@ -142,6 +145,9 @@ links, such as location scale models.</p>
 <span class='fu'>inv_link</span>(<span class='no'>object</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>), <span class='no'>...</span>)
 
 <span class='co'># S3 method for gamm</span>
+<span class='fu'>inv_link</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for glm</span>
 <span class='fu'>inv_link</span>(<span class='no'>object</span>, <span class='no'>...</span>)
 
 <span class='fu'>extract_link</span>(<span class='no'>family</span>, <span class='no'>...</span>)
@@ -199,9 +205,9 @@ return the inverse of the link function.</p></td>
 
 <span class='fu'>link</span>(<span class='no'>mod</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='st'>"scale"</span>)</div><div class='output co'>#&gt; function (mu) 
 #&gt; log(1/mu - 0.01)
-#&gt; &lt;environment: 0xebd44d8&gt;</div><div class='input'><span class='fu'>inv_link</span>(<span class='no'>mod</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='st'>"scale"</span>)</div><div class='output co'>#&gt; function (eta) 
+#&gt; &lt;environment: 0xd499128&gt;</div><div class='input'><span class='fu'>inv_link</span>(<span class='no'>mod</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='st'>"scale"</span>)</div><div class='output co'>#&gt; function (eta) 
 #&gt; 1/(exp(eta) + 0.01)
-#&gt; &lt;environment: 0xebd44d8&gt;</div></pre>
+#&gt; &lt;environment: 0xd499128&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
