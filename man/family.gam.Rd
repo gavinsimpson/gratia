@@ -4,7 +4,7 @@
 \alias{family.gam}
 \alias{family.gamm}
 \alias{family.bam}
-\title{Family method for GAM objects}
+\title{Extract family objects from models}
 \usage{
 \method{family}{gam}(object, ...)
 

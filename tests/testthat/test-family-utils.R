@@ -12,11 +12,18 @@ val <- 1
 ## check link and inv_link for models
 set.seed(4234)
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+m_glm <- glm(y ~ x0, data = dat)
 m_gam <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 m_gaulss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1), data = dat,
                 family = gaulss)
 m_gamm <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 m_bam <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "fREML")
+
+test_that("link() works with a glm() model", {
+    f <- link(m_glm)
+    expect_type(f, "closure")
+    expect_identical(f, gaussian()$linkfun)
+})
 
 test_that("link() works with a gam() model", {
     f <- link(m_gam)
@@ -44,6 +51,12 @@ test_that("link() works with a gam() gaulss model", {
 
 test_that("inv_link() works with a gam() model", {
     f <- inv_link(m_gam)
+    expect_type(f, "closure")
+    expect_identical(f, gaussian()$linkinv)
+})
+
+test_that("inv_link() works with a glm() model", {
+    f <- inv_link(m_glm)
     expect_type(f, "closure")
     expect_identical(f, gaussian()$linkinv)
 })

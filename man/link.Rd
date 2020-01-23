@@ -6,11 +6,13 @@
 \alias{link.gam}
 \alias{link.bam}
 \alias{link.gamm}
+\alias{link.glm}
 \alias{inv_link}
 \alias{inv_link.family}
 \alias{inv_link.gam}
 \alias{inv_link.bam}
 \alias{inv_link.gamm}
+\alias{inv_link.glm}
 \alias{extract_link}
 \alias{extract_link.family}
 \title{Extract link and inverse link functions from models}
@@ -25,6 +27,8 @@ link(object, ...)
 
 \method{link}{gamm}(object, ...)
 
+\method{link}{glm}(object, ...)
+
 inv_link(object, ...)
 
 \method{inv_link}{family}(object, parameter = c("location", "scale", "shape"), ...)
@@ -34,6 +38,8 @@ inv_link(object, ...)
 \method{inv_link}{bam}(object, parameter = c("location", "scale", "shape"), ...)
 
 \method{inv_link}{gamm}(object, ...)
+
+\method{inv_link}{glm}(object, ...)
 
 extract_link(family, ...)
 

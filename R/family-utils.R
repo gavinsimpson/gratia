@@ -118,6 +118,13 @@
 
 ##' @rdname link
 ##' @export
+##' @importFrom stats family
+`link.glm` <- function(object, ...) {
+    link(family(object), ...)
+}
+
+##' @rdname link
+##' @export
 `inv_link` <- function(object, ...) {
     UseMethod("inv_link")
 }
@@ -193,7 +200,7 @@
 ##' @rdname link
 ##' @export
 `inv_link.bam` <- function(object, parameter = c("location", "scale", "shape"),
-                       ...) {
+                           ...) {
     NextMethod()
 }
 
@@ -201,6 +208,13 @@
 ##' @export
 `inv_link.gamm` <- function(object, ...) {
     inv_link(object[["gam"]])
+}
+
+##' @rdname link
+##' @export
+##' @importFrom stats family
+`inv_link.glm` <- function(object, ...) {
+    inv_link(family(object), ...)
 }
 
 ## Internal link extractor functions
@@ -465,8 +479,9 @@
     fun # return
 }
 
-##' Family method for GAM objects
-##'
+
+##' Extract family objects from models
+##' 
 ##' Provides a [stats::family()] method for a range of GAM objects.
 ##'
 ##' @param object a fitted model. Models fitted by [mgcv::gam()], [mgcv::bam()],
