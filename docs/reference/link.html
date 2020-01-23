@@ -148,12 +148,7 @@ links, such as location scale models.</p>
 <span class='fu'>inv_link</span>(<span class='no'>object</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for glm</span>
-<span class='fu'>inv_link</span>(<span class='no'>object</span>, <span class='no'>...</span>)
-
-<span class='fu'>extract_link</span>(<span class='no'>family</span>, <span class='no'>...</span>)
-
-<span class='co'># S3 method for family</span>
-<span class='fu'>extract_link</span>(<span class='no'>family</span>, <span class='kw'>inverse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>inv_link</span>(<span class='no'>object</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -172,15 +167,6 @@ family object.</p></td>
       <td><p>character; which parameter of the distribution. Usually
 <code>"location"</code> but <code>"scale"</code> and <code>"shape"</code> may be provided for location
 scale models.</p></td>
-    </tr>
-    <tr>
-      <th>family</th>
-      <td><p>a family object.</p></td>
-    </tr>
-    <tr>
-      <th>inverse</th>
-      <td><p>logical; if <code>TRUE</code> return the link function or if <code>FALSE</code>
-return the inverse of the link function.</p></td>
     </tr>
     </table>
 
@@ -205,9 +191,9 @@ return the inverse of the link function.</p></td>
 
 <span class='fu'>link</span>(<span class='no'>mod</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='st'>"scale"</span>)</div><div class='output co'>#&gt; function (mu) 
 #&gt; log(1/mu - 0.01)
-#&gt; &lt;environment: 0xd499128&gt;</div><div class='input'><span class='fu'>inv_link</span>(<span class='no'>mod</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='st'>"scale"</span>)</div><div class='output co'>#&gt; function (eta) 
+#&gt; &lt;environment: 0x11cf2b98&gt;</div><div class='input'><span class='fu'>inv_link</span>(<span class='no'>mod</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='st'>"scale"</span>)</div><div class='output co'>#&gt; function (eta) 
 #&gt; 1/(exp(eta) + 0.01)
-#&gt; &lt;environment: 0xd499128&gt;</div></pre>
+#&gt; &lt;environment: 0x11cf2b98&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
