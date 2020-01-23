@@ -8,7 +8,7 @@
 * Adds explicit `family()` methods for objects of classes `"gam"`, `"bam"`, and
   `"gamm"`.
 
-# gratia 0.3.0 (2020-01-16)
+# gratia 0.3.0
 
 ## New features
 
