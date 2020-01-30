@@ -217,6 +217,21 @@ to work on Windows with current <code>R</code>).</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A tibble, currently with the following variables:</p><ul>
+<li><p><code>smooth</code>: the smooth each row refers to,</p></li>
+<li><p><code>var</code>: the name of the variable involved in the smooth,</p></li>
+<li><p><code>data</code>: values of <code>var</code> at which the derivative was evaluated,</p></li>
+<li><p><code>derivative</code>: the estimated derivative,</p></li>
+<li><p><code>se</code>: the standard error of the estimated derivative,</p></li>
+<li><p><code>crit</code>: the critical value such that <code>derivative</code> ± <code>(crit * se)</code> gives
+the upper and lower bounds of the requested confidence or simultaneous
+interval (given <code>level</code>),</p></li>
+<li><p><code>lower</code>: the lower bound of the confidence or simultaneous interval,</p></li>
+<li><p><code>upper</code>: the upper bound of the confidence or simultaneous interval.</p></li>
+</ul>
+
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
@@ -250,6 +265,7 @@ to work on Windows with current <code>R</code>).</p></td>
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 
