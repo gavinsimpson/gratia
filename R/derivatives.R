@@ -58,6 +58,18 @@
 ##'
 ##' @rdname derivatives
 ##'
+##' @return A tibble, currently with the following variables:
+##' * `smooth`: the smooth each row refers to,
+##' * `var`: the name of the variable involved in the smooth,
+##' * `data`: values of `var` at which the derivative was evaluated,
+##' * `derivative`: the estimated derivative,
+##' * `se`: the standard error of the estimated derivative,
+##' * `crit`: the critical value such that `derivative` ± `(crit * se)` gives
+##'   the upper and lower bounds of the requested confidence or simultaneous
+##'   interval (given `level`),
+##' * `lower`: the lower bound of the confidence or simultaneous interval,
+##' * `upper`: the upper bound of the confidence or simultaneous interval.
+##'
 ##' @examples
 ##'
 ##' load_mgcv()
