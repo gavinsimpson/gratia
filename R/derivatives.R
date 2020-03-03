@@ -269,12 +269,14 @@
 }
 
 `forward_finite_diff1` <- function(model, newdata, h = 1e-7) {
-    ind <- is_factor_var(newdata)       # exclude factors
+    ## need to exclude anything not numeric (from R's point of view)
+    ## negate result as TRUE == numeric and we want opposite
+    ind <- !is_numeric_var(newdata) # exclude non numerics
     if (all(ind)) {
         stop("Can't compute finite differences for all non-numeric data.")
     }
 
-    ## create newdata2 as newdata + h
+    ## create newdata2 as newdata + h - negate ind as TRUE == numeric
     newdata2 <- shift_values(newdata, h = h, i = ind, FUN = '+')
 
     ## predict for x
@@ -287,7 +289,9 @@
 }
 
 `backward_finite_diff1` <- function(model, newdata, h = 1e-7) {
-    ind <- is_factor_var(newdata)       # exclude factors
+    ## need to exclude anything not numeric (from R's point of view)
+    ## negate result as TRUE == numeric and we want opposite
+    ind <- !is_numeric_var(newdata) # exclude non numerics
     if (all(ind)) {
         stop("Can't compute finite differences for all non-numeric data.")
     }
@@ -305,7 +309,9 @@
 }
 
 `central_finite_diff1` <- function(model, newdata, h = 1e-7) {
-    ind <- is_factor_var(newdata)       # exclude factors
+    ## need to exclude anything not numeric (from R's point of view)
+    ## negate result as TRUE == numeric and we want opposite
+    ind <- !is_numeric_var(newdata) # exclude non numerics
     if (all(ind)) {
         stop("Can't compute finite differences for all non-numeric data.")
     }
@@ -325,7 +331,9 @@
 }
 
 `forward_finite_diff2` <- function(model, newdata, h = 1e-7) {
-    ind <- is_factor_var(newdata)       # exclude factors
+    ## need to exclude anything not numeric (from R's point of view)
+    ## negate result as TRUE == numeric and we want opposite
+    ind <- !is_numeric_var(newdata) # exclude non numerics
     if (all(ind)) {
         stop("Can't compute finite differences for all non-numeric data.")
     }
@@ -348,7 +356,9 @@
 }
 
 `backward_finite_diff2` <- function(model, newdata, h = 1e-7) {
-    ind <- is_factor_var(newdata)       # exclude factors
+    ## need to exclude anything not numeric (from R's point of view)
+    ## negate result as TRUE == numeric and we want opposite
+    ind <- !is_numeric_var(newdata) # exclude non numerics
     if (all(ind)) {
         stop("Can't compute finite differences for all non-numeric data.")
     }
@@ -371,7 +381,9 @@
 }
 
 `central_finite_diff2` <- function(model, newdata, h = 1e-7) {
-    ind <- is_factor_var(newdata)       # exclude factors
+    ## need to exclude anything not numeric (from R's point of view)
+    ## negate result as TRUE == numeric and we want opposite
+    ind <- !is_numeric_var(newdata) # exclude non numerics
     if (all(ind)) {
         stop("Can't compute finite differences for all non-numeric data.")
     }
