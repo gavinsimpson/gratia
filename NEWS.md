@@ -10,6 +10,10 @@
 * Adds explicit `family()` methods for objects of classes `"gam"`, `"bam"`, and
   `"gamm"`.
 
+* `derivatives()` now handles non-numeric when creating shifted data for finite
+  differences. Fixes a problem with `stringsAsFactors = FALSE` default in R-devel.
+  [#64](https://github.com/gavinsimpson/gratia/issues/64)
+
 # gratia 0.3.0
 
 ## New features
