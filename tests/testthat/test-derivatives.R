@@ -264,6 +264,36 @@ test_that("derivatives() returns derivatives for all smooths in a factor by GAM"
 })
 
 test_that("internal finite diff functions fail for all factor vars", {
+    df <- data.frame(a = factor(rep(letters[1:3], 10)),
+                     b = factor(rep(LETTERS[1:3], 10)))
+
+    expect_error( forward_finite_diff1(mod, df),
+                 "Can't compute finite differences for all non-numeric data.",
+                 fixed = TRUE)
+
+    expect_error( backward_finite_diff1(mod, df),
+                 "Can't compute finite differences for all non-numeric data.",
+                 fixed = TRUE)
+
+    expect_error( central_finite_diff1(mod, df),
+                 "Can't compute finite differences for all non-numeric data.",
+                 fixed = TRUE)
+
+    expect_error( forward_finite_diff2(mod, df),
+                 "Can't compute finite differences for all non-numeric data.",
+                 fixed = TRUE)
+
+    expect_error( backward_finite_diff2(mod, df),
+                 "Can't compute finite differences for all non-numeric data.",
+                 fixed = TRUE)
+
+    expect_error( central_finite_diff2(mod, df),
+                 "Can't compute finite differences for all non-numeric data.",
+                 fixed = TRUE)
+})
+
+## for Issue #64
+test_that("internal finite diff functions fail for all non-numeric vars", {
     df <- data.frame(a = rep(letters[1:3], 10),
                      b = rep(LETTERS[1:3], 10))
 

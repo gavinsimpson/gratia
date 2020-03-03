@@ -626,11 +626,17 @@
     result
 }
 
-##' Are variables in a data frame factors?
+##' Vectorised checks for variable types
 ##'
 ##' @param df a data frame or tibble
 `is_factor_var` <- function(df) {
     result <- vapply(df, is.factor, logical(1L))
+    result
+}
+
+##' @rdname is_factor_var
+`is_numeric_var` <- function(df) {
+    result <- vapply(df, is.numeric, logical(1L))
     result
 }
 
