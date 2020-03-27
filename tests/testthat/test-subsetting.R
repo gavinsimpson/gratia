@@ -20,6 +20,7 @@ test_that("subsetting works for smooth_samples", {
 
     attrs <- attributes(hsm)
     expect_type(attrs, "list")
-    expect_named(attrs, expected = c("row.names", "names", "class",
+    skip_on_cran() # temporary until tibble 3.0 hits CRAN
+    expect_named(attrs, expected = c("names", "row.names", "class",
                                      "seed", "data_names"))
 })
