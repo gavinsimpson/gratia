@@ -4,7 +4,9 @@
 \name{zooplankton}
 \alias{zooplankton}
 \title{Madison lakes zooplankton data}
-\format{A data frame}
+\format{
+A data frame
+}
 \source{
 Pedersen EJ, Miller DL, Simpson GL, Ross N. 2018. Hierarchical
 generalized additive models: an introduction with mgcv. \emph{PeerJ Preprints}

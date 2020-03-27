@@ -4,7 +4,9 @@
 \name{bird_move}
 \alias{bird_move}
 \title{Simulated bird migration data}
-\format{A data frame}
+\format{
+A data frame
+}
 \source{
 Pedersen EJ, Miller DL, Simpson GL, Ross N. 2018. Hierarchical
 generalized additive models: an introduction with mgcv. \emph{PeerJ Preprints}

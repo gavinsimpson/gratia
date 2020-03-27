@@ -4,7 +4,9 @@
 \name{smallAges}
 \alias{smallAges}
 \title{Lead-210 age-depth measurements for Small Water}
-\format{A data frame with 12 rows and 7 variables.}
+\format{
+A data frame with 12 rows and 7 variables.
+}
 \source{
 Simpson, G.L. (Unpublished data).
 }
