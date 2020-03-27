@@ -68,7 +68,7 @@ test_that("get_by_smooth works", {
 })
 
 test_that("draw.gam works with select and parametric = TRUE", {
-    plt <- draw(mf, select = 's(x2)fac1', parametric = TRUE)
+    plt <- draw(mf, select = 's(x2):fac1', parametric = TRUE)
     vdiffr::expect_doppelganger("draw.gam-user-select-and-parametric-true",
                                 plt)
 })
