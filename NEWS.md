@@ -14,6 +14,10 @@
   differences. Fixes a problem with `stringsAsFactors = FALSE` default in R-devel.
   [#64](https://github.com/gavinsimpson/gratia/issues/64)
 
+## Bug fixes
+
+* Updated *gratia* to work with *tibble* versions >= 3.0
+
 # gratia 0.3.0
 
 ## New features
