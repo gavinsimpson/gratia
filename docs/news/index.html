@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/simplex/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/simplex/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -53,7 +57,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-news">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -87,7 +91,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/gavinsimpson/gratia/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -101,12 +110,12 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Changelog <small></small></h1>
-      
+      <h1 data-toc-skip>Changelog <small></small></h1>
+      <small>Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
     <div id="gratia-031-in-development" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.3.1">
 <a href="#gratia-031-in-development" class="anchor"></a>gratia 0.3.1 (in development)<small> Unreleased </small>
 </h1>
 <div id="new-features" class="section level2">
@@ -115,23 +124,23 @@
 <ul>
 <li>
 <p>New functions <code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> to access the link function and its inverse from fitted models and family functions.</p>
-<p>Methods for classes: <code>"glm"</code>, <code>"gam"</code>, <code>"bam"</code>, <code>"gamm"</code> currently. <a href="https://github.com/gavinsimpson/gratia/issues/58">#58</a></p>
+<p>Methods for classes: <code>"glm"</code>, <code>"gam"</code>, <code>"bam"</code>, <code>"gamm"</code> currently. <a href="https://github.com/gavinsimpson/gratia/issues/58"><a href='https://github.com/gavinsimpson/gratia/issues/58'>#58</a></a></p>
 </li>
 <li><p>Adds explicit <code><a href="https://rdrr.io/r/stats/family.html">family()</a></code> methods for objects of classes <code>"gam"</code>, <code>"bam"</code>, and <code>"gamm"</code>.</p></li>
-<li><p><code><a href="../reference/derivatives.html">derivatives()</a></code> now handles non-numeric when creating shifted data for finite differences. Fixes a problem with <code>stringsAsFactors = FALSE</code> default in R-devel. <a href="https://github.com/gavinsimpson/gratia/issues/64">#64</a></p></li>
+<li><p><code><a href="../reference/derivatives.html">derivatives()</a></code> now handles non-numeric when creating shifted data for finite differences. Fixes a problem with <code>stringsAsFactors = FALSE</code> default in R-devel. <a href="https://github.com/gavinsimpson/gratia/issues/64"><a href='https://github.com/gavinsimpson/gratia/issues/64'>#64</a></a></p></li>
 </ul>
 </div>
 </div>
     <div id="gratia-030" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.3.0">
 <a href="#gratia-030" class="anchor"></a>gratia 0.3.0<small> 2020-01-19 </small>
 </h1>
 <div id="new-features-1" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features-1" class="anchor"></a>New features</h2>
 <ul>
-<li><p><em>gratia</em> now uses the <em>mvnfast</em> package for random draws from a multivariate normal distribution (<code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html">mvnfast::rmvn()</a></code>). Contributed by Henrik Singmann (<a href='https://github.com/singmann'>@singmann</a>) <a href="https://github.com/gavinsimpson/gratia/issues/28">#28</a></p></li>
-<li><p>New function <code><a href="../reference/basis.html">basis()</a></code> for generating tidy representations of basis expansions from an <em>mgcv</em>-like definition of a smooth, e.g. <code>s()</code>, <code>te()</code>, <code>ti()</code>, or <code>t2()</code>. The basic smooth types also have a simple <code><a href="../reference/draw.html">draw()</a></code> method for plotting the basis. <code><a href="../reference/basis.html">basis()</a></code> is a simple wrapper around <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html">mgcv::smoothCon()</a></code> with some post processing of the basis model matrix into a tidy format. <a href="https://github.com/gavinsimpson/gratia/issues/42">#42</a></p></li>
+<li><p><em>gratia</em> now uses the <em>mvnfast</em> package for random draws from a multivariate normal distribution (<code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html">mvnfast::rmvn()</a></code>). Contributed by Henrik Singmann (<a href='https://github.com/singmann'>@singmann</a>) <a href="https://github.com/gavinsimpson/gratia/issues/28"><a href='https://github.com/gavinsimpson/gratia/issues/28'>#28</a></a></p></li>
+<li><p>New function <code><a href="../reference/basis.html">basis()</a></code> for generating tidy representations of basis expansions from an <em>mgcv</em>-like definition of a smooth, e.g. <code>s()</code>, <code>te()</code>, <code>ti()</code>, or <code>t2()</code>. The basic smooth types also have a simple <code><a href="../reference/draw.html">draw()</a></code> method for plotting the basis. <code><a href="../reference/basis.html">basis()</a></code> is a simple wrapper around <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html">mgcv::smoothCon()</a></code> with some post processing of the basis model matrix into a tidy format. <a href="https://github.com/gavinsimpson/gratia/issues/42"><a href='https://github.com/gavinsimpson/gratia/issues/42'>#42</a></a></p></li>
 <li><p>New function <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> to draw samples of entire smooth functions from their posterior distribution. Also has a <code><a href="../reference/draw.html">draw()</a></code> method for plotting the posterior samples.</p></li>
 </ul>
 </div>
@@ -139,25 +148,21 @@
 <h2 class="hasAnchor">
 <a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
 <ul>
-<li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> would produce empty plots between the panels for the parametric terms if there were 2 or more parametric terms in a model. Reported by <a href='https://github.com/sklayn'>@sklayn</a> <a href="https://github.com/gavinsimpson/gratia/issues/39">#39</a>.</p></li>
+<li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> would produce empty plots between the panels for the parametric terms if there were 2 or more parametric terms in a model. Reported by <a href='https://github.com/sklayn'>@sklayn</a> <a href="https://github.com/gavinsimpson/gratia/issues/39"><a href='https://github.com/gavinsimpson/gratia/issues/39'>#39</a></a>.</p></li>
 <li>
-<p><code><a href="../reference/derivatives.html">derivatives()</a></code> now works with factor by smooths, including ordered factor by smooths. The function also now works correctly for complex models with multiple covariates/smooths. <a href="https://github.com/gavinsimpson/gratia/issues/47">#47</a></p>
-<p><code><a href="../reference/derivatives.html">derivatives()</a></code> also now handles <code>'fs'</code> smooths. Reported by <a href='https://github.com/tomand-uio'>@tomand-uio</a> <a href="https://github.com/gavinsimpson/gratia/issues/57">#57</a>.</p>
+<p><code><a href="../reference/derivatives.html">derivatives()</a></code> now works with factor by smooths, including ordered factor by smooths. The function also now works correctly for complex models with multiple covariates/smooths. <a href="https://github.com/gavinsimpson/gratia/issues/47"><a href='https://github.com/gavinsimpson/gratia/issues/47'>#47</a></a></p>
+<p><code><a href="../reference/derivatives.html">derivatives()</a></code> also now handles <code>'fs'</code> smooths. Reported by <a href='https://github.com/tomand-uio'>@tomand-uio</a> <a href="https://github.com/gavinsimpson/gratia/issues/57"><a href='https://github.com/gavinsimpson/gratia/issues/57'>#57</a></a>.</p>
 </li>
-<li><p><code><a href="../reference/evaluate_smooth.html">evaluate_parametric_term()</a></code> and hence <code><a href="../reference/draw.gam.html">draw.gam()</a></code> would fail on a <code>ziplss()</code> model because i) <em>gratia</em> didn’t handle parametric terms in models with multiple linear predictors correctly, and ii) <em>gratia</em> didn’t convert to the naming convention of <em>mgcv</em> for terms in higher linear predictors. Reported by <a href='https://github.com/pboesu'>@pboesu</a> <a href="https://github.com/gavinsimpson/gratia/issues/45">#45</a>.</p></li>
+<li><p><code><a href="../reference/evaluate_smooth.html">evaluate_parametric_term()</a></code> and hence <code><a href="../reference/draw.gam.html">draw.gam()</a></code> would fail on a <code>ziplss()</code> model because i) <em>gratia</em> didn’t handle parametric terms in models with multiple linear predictors correctly, and ii) <em>gratia</em> didn’t convert to the naming convention of <em>mgcv</em> for terms in higher linear predictors. Reported by <a href='https://github.com/pboesu'>@pboesu</a> <a href="https://github.com/gavinsimpson/gratia/issues/45"><a href='https://github.com/gavinsimpson/gratia/issues/45'>#45</a></a>.</p></li>
 </ul>
 </div>
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <div id="tocnav">
-      <h2>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-        <li><a href="#gratia-031-in-development">0.3.1</a></li>
-        <li><a href="#gratia-030">0.3.0</a></li>
-      </ul>
-    </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 
 </div>
@@ -169,7 +174,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.0.</p>
 </div>
 
       </footer>
