@@ -1,7 +1,7 @@
 
-R version 3.6.2 Patched (2020-01-13 r77662) -- "Dark and Stormy Night"
+R version 3.6.3 (2020-02-29) -- "Holding the Windsock"
 Copyright (C) 2020 The R Foundation for Statistical Computing
-Platform: x86_64-pc-linux-gnu (64-bit)
+Platform: x86_64-redhat-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -648,6 +648,56 @@ Gu & Wahba 4 term additive model
 
 detaching ‘package:mgcv’
 
+> nameEx("link")
+> ### * link
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: link
+> ### Title: Extract link and inverse link functions from models
+> ### Aliases: link link.family link.gam link.bam link.gamm link.glm inv_link
+> ###   inv_link.family inv_link.gam inv_link.bam inv_link.gamm inv_link.glm
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> 
+> link(gaussian())
+function (mu) 
+mu
+<environment: namespace:stats>
+> link(nb())
+function (mu) 
+log(mu)
+<environment: namespace:stats>
+> 
+> inv_link(nb())
+function (eta) 
+pmax(exp(eta), .Machine$double.eps)
+<environment: namespace:stats>
+> 
+> ## Don't show: 
+> set.seed(4234)
+> ## End(Don't show)
+> dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+> mod <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1), data = dat,
++            family = gaulss)
+> 
+> link(mod, parameter = "scale")
+function (mu) 
+log(1/mu - 0.01)
+<environment: 0x55eba611e9c8>
+> inv_link(mod, parameter = "scale")
+function (eta) 
+1/(exp(eta) + 0.01)
+<environment: 0x55eba611e9c8>
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("predicted_samples")
 > ### * predicted_samples
 > 
@@ -893,7 +943,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  35.581 0.355 36.164 0.003 0.005 
+Time elapsed:  8.616 0.132 8.786 0 0 
 > grDevices::dev.off()
 null device 
           1 
