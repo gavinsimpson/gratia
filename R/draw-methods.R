@@ -552,17 +552,18 @@
     ## select smooths
     select <- check_user_select_smooths(smooths = sm, select = select)
     sm <- sm[select]
-    xvar <- unique(object[["var"]])[select]
+    
     plotlist <- vector("list", length = length(sm))
 
     for (i in seq_along(sm)) {
         take <- object[["smooth"]] == sm[i]
         df <- object[take, ]
+        xvar <- unique(df[['var']])
         plotlist[[i]] <- ggplot(df, aes_string(x = "data", y = "derivative")) +
             geom_ribbon(aes_string(ymin = "lower", ymax = "upper", y = NULL),
                         alpha = alpha) +
             geom_line() +
-            labs(title = sm[i], x = xvar[i], y = "Derivative")
+            labs(title = sm[i], x = xvar, y = "Derivative")
     }
 
     if (isTRUE(identical(scales, "fixed"))) {
