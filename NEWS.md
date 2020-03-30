@@ -1,3 +1,16 @@
+# gratia 0.3.2 (in development)
+
+## New features
+
+* `smooth_samples()` can now handle continuous by variable smooths such as in
+  varying coefficient models.
+
+## Bug fixes
+
+* The `draw()` method for `derivatives()` was not getting the x-axis label for
+  factor by smooths correctly, and instead was using `NA` for the second and
+  subsequent levels of the factor.
+
 # gratia 0.3.1
 
 ## New features
