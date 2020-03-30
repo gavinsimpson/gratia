@@ -16,6 +16,19 @@ set.seed(34786)
 dat2 <- gamSim(4, verbose = FALSE)
 m3 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat2, method = "REML")
 
+set.seed(42)
+cont_by_data <- gamSim(3, n = 400, verbose = FALSE)
+cont_by_gam <- gam(y ~ s(x2, by = x1), data = cont_by_data)
+
+test_that("smooth_samples works for a continuous by GAM", {
+    expect_silent(sm <- smooth_samples(cont_by_gam, n = 5, n_vals = 100, seed = 42))
+    expect_s3_class(sm, c("smooth_samples", "posterior_samples", "tbl_df",
+                          "tbl", "data.frame"))
+    ## 500 == 1 smooth * 5 * 100
+    expect_identical(NROW(sm), 500L)
+    expect_identical(NCOL(sm), 7L) # 7 cols, univatiate smooths
+})
+
 test_that("smooth_samples works for a simple GAM", {
     expect_silent(sm <- smooth_samples(m1, n = 5, n_vals = 100, seed = 42))
     expect_s3_class(sm, c("smooth_samples", "posterior_samples", "tbl_df",
