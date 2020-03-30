@@ -530,7 +530,7 @@
     ## need a list of terms used in current smooth
     sm <- get_smooths_by_id(model, id)[[1L]]
     smooth_vars <- unique(smooth_variable(sm))
-    ## is smooth a factor by? If it is, extract the by variable
+    ## is smooth a by? If it is, extract the by variable
     by_var <- if (is_by_smooth(sm)) {
         by_variable(sm)
     } else {
