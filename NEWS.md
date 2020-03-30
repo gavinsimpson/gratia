@@ -2,7 +2,8 @@
 
 ## New features
 
-*
+* `smooth_samples()` can now handle continuous by variable smooths such as in
+  varying coefficient models.
 
 ## Bug fixes
 
