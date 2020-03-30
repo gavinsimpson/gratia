@@ -559,30 +559,5 @@
     }
     newdata <- exec(nesting, !!!newlist) # actually compute expand.grid-alike
 
-    ## need to provide single values for all other covariates in data
-    unused_vars <- dplyr::setdiff(m.terms, used_vars)
-    ## only processed unusaed_vars if length() > 0L
-    if (length(unused_vars) > 0L) {
-        unused_summ <- model[["var.summary"]][unused_vars]
-        ## FIXME: put this in utils.R with a better name!
-        ## this basically just reps the data (scalar) for the closest observation
-        ## to the median over all observations
-        `rep_fun` <- function(x, n) {
-            ## if `x` isn't a factor, select the second element of `x` which
-            ## is the value of the observation in the data closest to median
-            ## of set of observations in data used to fit the model.
-            if (!is.factor(x)) {
-                x <- x[2L]
-            }
-            ## repeat `x` as many times as is needed
-            rep(x, times = n)
-        }
-        n_new <- NROW(newdata)
-        ## unused_data <- as_tibble(lapply(unused_summ, FUN = rep_fun, n = n_new))
-        ## add unnused_data to newdata so we're ready to predict
-        ## newdata <- bind_cols(newdata, unused_data)
-    }
-    
-    ## newdata <- newdata[, m.terms, drop = FALSE] # re-arrange
-    newdata
+    newdata # return
 }
