@@ -118,14 +118,27 @@
 <h1 class="page-header" data-toc-text="0.3.2">
 <a href="#gratia-032-in-development" class="anchor"></a>gratia 0.3.2 (in development)<small> Unreleased </small>
 </h1>
-</div>
-    <div id="gratia-031" class="section level1">
-<h1 class="page-header" data-toc-text="0.3.1">
-<a href="#gratia-031" class="anchor"></a>gratia 0.3.1<small> Unreleased </small>
-</h1>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>New features</h2>
+<ul><li>
+</li></ul>
+</div>
+<div id="bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
+<ul>
+<li>The <code><a href="../reference/draw.html">draw()</a></code> method for <code><a href="../reference/derivatives.html">derivatives()</a></code> was not getting the x-axis label for factor by smooths correctly, and instead was using <code>NA</code> for the second and subsequent levels of the factor.</li>
+</ul>
+</div>
+</div>
+    <div id="gratia-031" class="section level1">
+<h1 class="page-header" data-toc-text="0.3.1">
+<a href="#gratia-031" class="anchor"></a>gratia 0.3.1<small> 2020-03-29 </small>
+</h1>
+<div id="new-features-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features-1" class="anchor"></a>New features</h2>
 <ul>
 <li>
 <p>New functions <code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> to access the link function and its inverse from fitted models and family functions.</p>
@@ -135,9 +148,9 @@
 <li><p><code><a href="../reference/derivatives.html">derivatives()</a></code> now handles non-numeric when creating shifted data for finite differences. Fixes a problem with <code>stringsAsFactors = FALSE</code> default in R-devel. <a href="https://github.com/gavinsimpson/gratia/issues/64"><a href='https://github.com/gavinsimpson/gratia/issues/64'>#64</a></a></p></li>
 </ul>
 </div>
-<div id="bug-fixes" class="section level2">
+<div id="bug-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>Updated <em>gratia</em> to work with <em>tibble</em> versions &gt;= 3.0</li>
 </ul>
@@ -147,18 +160,18 @@
 <h1 class="page-header" data-toc-text="0.3.0">
 <a href="#gratia-030" class="anchor"></a>gratia 0.3.0<small> 2020-01-19 </small>
 </h1>
-<div id="new-features-1" class="section level2">
+<div id="new-features-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-1" class="anchor"></a>New features</h2>
+<a href="#new-features-2" class="anchor"></a>New features</h2>
 <ul>
 <li><p><em>gratia</em> now uses the <em>mvnfast</em> package for random draws from a multivariate normal distribution (<code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html">mvnfast::rmvn()</a></code>). Contributed by Henrik Singmann (<a href='https://github.com/singmann'>@singmann</a>) <a href="https://github.com/gavinsimpson/gratia/issues/28"><a href='https://github.com/gavinsimpson/gratia/issues/28'>#28</a></a></p></li>
 <li><p>New function <code><a href="../reference/basis.html">basis()</a></code> for generating tidy representations of basis expansions from an <em>mgcv</em>-like definition of a smooth, e.g. <code>s()</code>, <code>te()</code>, <code>ti()</code>, or <code>t2()</code>. The basic smooth types also have a simple <code><a href="../reference/draw.html">draw()</a></code> method for plotting the basis. <code><a href="../reference/basis.html">basis()</a></code> is a simple wrapper around <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html">mgcv::smoothCon()</a></code> with some post processing of the basis model matrix into a tidy format. <a href="https://github.com/gavinsimpson/gratia/issues/42"><a href='https://github.com/gavinsimpson/gratia/issues/42'>#42</a></a></p></li>
 <li><p>New function <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> to draw samples of entire smooth functions from their posterior distribution. Also has a <code><a href="../reference/draw.html">draw()</a></code> method for plotting the posterior samples.</p></li>
 </ul>
 </div>
-<div id="bug-fixes-1" class="section level2">
+<div id="bug-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-2" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> would produce empty plots between the panels for the parametric terms if there were 2 or more parametric terms in a model. Reported by <a href='https://github.com/sklayn'>@sklayn</a> <a href="https://github.com/gavinsimpson/gratia/issues/39"><a href='https://github.com/gavinsimpson/gratia/issues/39'>#39</a></a>.</p></li>
 <li>
