@@ -23,12 +23,12 @@
         sm_type <- smooth_type(smooths[[i]])
         sm_list[[i]] <-
             switch(sm_type,
-                   1d_smooth  = eval_1d_smooth(smooths[[i]],
+                   `1d_smooth`  = eval_1d_smooth(smooths[[i]],
                                                n = n,
                                                newdata = newdata,
                                                unconditional = unconditional,
                                                overall_uncertainty = overall_uncertainty),
-                   2d_smooth  = eval_2d_smooth(smooths[[i]],
+                   `2d_smooth`  = eval_2d_smooth(smooths[[i]],
                                                n = n,
                                                newdata = newdata,
                                                unconditional = unconditional,
