@@ -552,6 +552,7 @@
             ## append this list to the list of new smooth covariate values
             newlist <- append(newlist, newfac)
         } else {
+            ## continuous by var; set to median among observed values?
             newby <- setNames(list(median(mf[[by_var]]), na.rm = TRUE), by_var)
             newlist <- append(newlist, newby)
         }
