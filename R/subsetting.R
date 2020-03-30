@@ -8,6 +8,7 @@
 }
 
 ##' @export
+##' @importFrom rlang has_name
 `[.smooth_samples` <- function(x, i, j, drop = FALSE) {
     cls <- class(x)
     seed <- attr(x, "seed")
@@ -15,8 +16,12 @@
     class(x) <- class(x)[-c(1:2)]
     x <- NextMethod()
     class(x) <- cls
-    take <- unique(x$smooth)
-    data_names <- data_names[take]
+    if (has_name(x, "smooth")) { 
+        take <- unique(x[["smooth"]])
+        data_names <- data_names[take]
+    } else {
+        data_names <- NA
+    }
     attr(x, "seed") <- seed
     attr(x, "data_names") <- data_names
     x
