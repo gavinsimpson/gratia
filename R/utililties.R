@@ -786,3 +786,22 @@
     }
     invisible(res)
 }
+
+## check if a model is a gamm4 object
+`is_gamm4` <- function(object) {
+    out <- FALSE
+    ## is object a list?
+    if (!inherits(object, "list")) {
+        return(out)
+    }
+    nms <- names(object)
+    if (! all(c("gam","mer") %in% nms)) {
+        return(out)
+    }
+    if (! (inherits(object[["mer"]], "lmerMod") &&
+           inherits(object[["gam"]], "gam"))) {
+        return(out)
+    }
+    out <- TRUE
+    out
+}
