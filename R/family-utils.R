@@ -125,6 +125,16 @@
 
 ##' @rdname link
 ##' @export
+##' @importFrom stats family
+`link.list` <- function(object, ...) {
+    if (!is_gamm4(object)) {
+        stop("`object` does not appear to a `gamm4` model object", call. = FALSE)
+    }
+    link(family(object[["gam"]], ...))
+}
+
+##' @rdname link
+##' @export
 `inv_link` <- function(object, ...) {
     UseMethod("inv_link")
 }
@@ -208,6 +218,16 @@
 ##' @export
 `inv_link.gamm` <- function(object, ...) {
     inv_link(object[["gam"]])
+}
+
+##' @rdname link
+##' @export
+##' @importFrom stats family
+`inv_link.list` <- function(object, ...) {
+    if (!is_gamm4(object)) {
+        stop("`object` does not appear to a `gamm4` model object", call. = FALSE)
+    }
+    inv_link(family(object[["gam"]], ...))
 }
 
 ##' @rdname link
@@ -495,4 +515,13 @@
 ##' @rdname family.gam
 `family.bam` <- function(object, ...) {
     object[["family"]]
+}
+
+##' @export
+##' @rdname family.gam
+`family.list` <- function(object, ...) {
+    if (!is_gamm4(object)) {
+        stop("`object` does not appear to a `gamm4` model object", call. = FALSE)
+    }
+    family(object[["gam"]])
 }
