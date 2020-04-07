@@ -2,8 +2,13 @@
 
 ## New features
 
-* `smooth_samples()` can now handle continuous by variable smooths such as in
+* `smooth_samples()` can handle continuous by variable smooths such as in
   varying coefficient models.
+
+* `evaluate_smooth()`, `data_slice()`, `family()`, `link()`, `inv_link()` methods
+  for models fitted using `gamm4()` from the **gamm4** package.
+
+* `data_slice()` can generate data for a 1-d slice (a single variable varying).
 
 ## Bug fixes
 
