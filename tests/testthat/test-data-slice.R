@@ -49,8 +49,6 @@ test_that("process_slice_data fails when passed a list with elements of length >
                  fixed = TRUE)
 })
 
-
-
 test_that("process_slice_var fails when passed a logical variable", {
     dat2 <- cbind(dat, foo = sample(c(TRUE,FALSE), nrow(dat), replace = TRUE))
     expect_error( process_slice_var("foo", dat2),

@@ -4,6 +4,7 @@
 \alias{data_slice}
 \alias{data_slice.default}
 \alias{data_slice.gam}
+\alias{data_slice.list}
 \title{Prepare a data slice through covariates}
 \usage{
 data_slice(object, ...)
@@ -13,7 +14,7 @@ data_slice(object, ...)
 \method{data_slice}{gam}(
   object,
   var1,
-  var2,
+  var2 = NULL,
   var3 = NULL,
   var4 = NULL,
   data = NULL,
@@ -21,6 +22,8 @@ data_slice(object, ...)
   offset = NULL,
   ...
 )
+
+\method{data_slice}{list}(object, ...)
 }
 \arguments{
 \item{object}{an R model object.}

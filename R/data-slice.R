@@ -28,10 +28,11 @@
 ##' @export
 ##' @rdname data_slice
 ##'
-##' @importFrom tidyr crossing
+##' @importFrom tidyr nesting
 ##' @importFrom tibble as_tibble
 ##' @importFrom stats model.frame
-`data_slice.gam` <- function(object, var1, var2, var3 = NULL, var4 = NULL,
+##' @importFrom rlang exec
+`data_slice.gam` <- function(object, var1, var2 = NULL, var3 = NULL, var4 = NULL,
                              data = NULL, n = 50, offset = NULL, ...) {
     ## we need the model frame to get data from
     mf <- model.frame(object)
@@ -49,10 +50,15 @@
     }
     mf <- fix_offset(object, mf, offset_val = offset)
 
+    ## process the variables we focus on for the slice
     data1 <- process_slice_var(x = var1, data = mf, n = n)
-    data2 <- process_slice_var(x = var2, data = mf, n = n)
+    ## allow var2 to be null so we can have a 1-d slice
+    data2 <- NULL # needs to be NULL so can be excluded later
+    if (!is.null(var2)) {
+        data2 <- process_slice_var(x = var2, data = mf, n = n)
+    }
 
-    ## if no data, set to a 0-row tibble; if data supplied, check it:
+    ## if no data, set to NULL; if data supplied, check it:
     ##   - single row df or list of length-1 elements; only variables in mf
     data <- process_slice_data(data)
 
@@ -60,15 +66,37 @@
     ##   from mf that is closest to the median
     terms_given <- c(var1, var2, var3, var4, names(data))
     ind <- names(mf) %in% terms_given
+    other_data <- NULL
     if (any(!ind)) {
         other_data <- as_tibble(lapply(mf[!ind], value_closest_to_median))
     }
 
+    ## put all the data objects into a list --- needed for exec() below
+    ## we name the first two elements as otherwise expand_grid() complains
+    ## the other two elements don't want names as the columns would pick them
+    ## up in the expand_grid call later
+    ll <- list(var1 = data1, var2 = data2, data, other_data)
+    ## keep only the non-null elements
+    take <- !vapply(ll, is.null, logical(1))
     ## expand.grid-alike
-    result <- crossing(data1, data2, data, other_data)
-    names(result)[1:2] <- c(var1, var2)
+    result <- exec(expand_grid, !!!ll[take])
+    ## fix up the names
+    names(result)[1] <- var1
+    if (!is.null(var2)) {
+        names(result)[2] <- var2
+    }
 
-    result
+    result # return
+}
+
+##' @export
+##' @rdname data_slice
+`data_slice.list` <- function(object, ...) { # for gamm4 lists only
+    ## Is this list likely to be a gamm4 list?
+    if (! is_gamm4(object)) {
+        stop("`object` does not appear to a `gamm4` model object", call. = FALSE)
+    }
+    data_slice(object[["gam"]], ...)
 }
 
 ##' @importFrom stats median
@@ -108,7 +136,7 @@
 `process_slice_data` <- function(data) {
     ## if NULL, bail early; return a 0-row tibble
     if (is.null(data)) {
-        return(tibble())
+        return(NULL)
     }
 
     ## we were given something
