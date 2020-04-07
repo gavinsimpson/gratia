@@ -109,6 +109,16 @@
     evaluate_smooth(object[["gam"]], ...)
 }
 
+##' @export
+##' @rdname evaluate_smooth
+`evaluate_smooth.list` <- function(object, ...) {
+    ## Is this list likely to be a gamm4 list?
+    if (! is_gamm4(object)) {
+        stop("`object` does not appear to a `gamm4` model object", call. = FALSE)
+    }
+    evaluate_smooth(object[["gam"]], ...)
+}
+
 ## Random effect smooth
 ##' @importFrom tibble add_column tibble
 `evaluate_re_smooth` <- function(object, model = NULL, newdata = NULL,
