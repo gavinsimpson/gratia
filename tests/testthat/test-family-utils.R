@@ -21,6 +21,8 @@ m_gamm <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 m_bam <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "fREML")
 m_gamm4 <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 
+l <- list(mer = 1:3, gam = 1:3)
+
 test_that("link() works with a glm() model", {
     f <- link(m_glm)
     expect_type(f, "closure")
@@ -43,6 +45,12 @@ test_that("link() works with a gamm4() model", {
     f <- link(m_gamm4)
     expect_type(f, "closure")
     expect_identical(f, gaussian()$linkfun)
+})
+
+test_that("link.list() fails with a list that isn't a gamm4", {
+    expect_error(link(l),
+                 regexp = "`object` does not appear to a `gamm4` model object",
+                 fixed = TRUE)
 })
 
 test_that("link() works with a bam() model", {
@@ -85,6 +93,12 @@ test_that("inv_link() works with a bam() model", {
     f <- inv_link(m_bam)
     expect_type(f, "closure")
     expect_identical(f, gaussian()$linkinv)
+})
+
+test_that("inv_link.list() fails with a list that isn't a gamm4", {
+    expect_error(inv_link(l),
+                 regexp = "`object` does not appear to a `gamm4` model object",
+                 fixed = TRUE)
 })
 
 test_that("inv_link() works with a gam() gaulss model", {
@@ -658,3 +672,25 @@ test_that("gaulss_link() fails gracefully", {
     expect_error(gaulss_link(1), "'family' is not a family object")
     expect_error(gaulss_link(nb()), "'family' is not '\"gaulss\"'")
 })
+
+
+## test other gamm4 family utils
+test_that("family.gamm4 works for a gamm4 object", {
+    fam <- family(m_gamm4)
+    expect_s3_class(fam, class = "family")
+    expect_equal(fam, gaussian())
+})
+
+test_that("family.gamm4 throws an error when passed a non-gamm4 object", {
+    expect_error(family(l),
+                 regexp = "`object` does not appear to a `gamm4` model object",
+                 fixed = TRUE)
+})
+
+## test gamm family
+test_that("family.gamm works for a gamm object", {
+    fam <- family(m_gamm)
+    expect_s3_class(fam, class = "family")
+    expect_equal(fam, gaussian())
+})
+
