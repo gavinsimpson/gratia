@@ -27,6 +27,7 @@ Imports:
     tools,
     grDevices
 Suggests:
+    gamm4,
     testthat,
     vdiffr,
     MASS,
