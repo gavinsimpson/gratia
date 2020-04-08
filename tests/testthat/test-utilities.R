@@ -4,6 +4,7 @@
 library("testthat")
 library("gratia")
 library("mgcv")
+library("gamm4")
 library("MASS")
 
 context("Testing Utility Functions")
@@ -14,6 +15,7 @@ m_gam <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 m_gamm <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 m_bam <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 m_gamgcv <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
+m_gamm4 <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 
 test_that("smooth_terms() methods work", {
     st <- smooth_terms(m_gam)
@@ -314,4 +316,16 @@ test_that("parametric_terms works for a gaussian GAM", {
 test_that("load_mgcv returns invisibly", {
     out <- expect_invisible(load_mgcv())
     expect_true(out)
+})
+
+test_that("is_gamm4 returns true for a gamm4 model", {
+    expect_true(is_gamm4(m_gamm4))
+})
+
+test_that("is_gamm4 returns false for something that isn't a gamm4 model object", {
+    expect_false(is_gamm4(m_gam))
+    expect_false(is_gamm4(m_gamgcv))
+    expect_false(is_gamm4(m_bam))
+    expect_false(is_gamm4(m_gamm))
+    expect_false(is_gamm4(list(gam = 1:3, mer = 1:4)))
 })
