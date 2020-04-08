@@ -4,6 +4,7 @@
 library("testthat")
 library("gratia")
 library("mgcv")
+library("gamm4")
 
 context("Testing Family Utility Functions")
 
@@ -18,6 +19,7 @@ m_gaulss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1), data = dat,
                 family = gaulss)
 m_gamm <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 m_bam <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "fREML")
+m_gamm4 <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 
 test_that("link() works with a glm() model", {
     f <- link(m_glm)
@@ -33,6 +35,12 @@ test_that("link() works with a gam() model", {
 
 test_that("link() works with a gamm() model", {
     f <- link(m_gamm)
+    expect_type(f, "closure")
+    expect_identical(f, gaussian()$linkfun)
+})
+
+test_that("link() works with a gamm4() model", {
+    f <- link(m_gamm4)
     expect_type(f, "closure")
     expect_identical(f, gaussian()$linkfun)
 })
@@ -63,6 +71,12 @@ test_that("inv_link() works with a glm() model", {
 
 test_that("inv_link() works with a gamm() model", {
     f <- inv_link(m_gamm)
+    expect_type(f, "closure")
+    expect_identical(f, gaussian()$linkinv)
+})
+
+test_that("inv_link() works with a gamm4() model", {
+    f <- inv_link(m_gamm4)
     expect_type(f, "closure")
     expect_identical(f, gaussian()$linkinv)
 })
