@@ -19,7 +19,8 @@
 ##'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
 ##'   Parallelization will take place only if OpenMP is supported (but appears
 ##'   to work on Windows with current `R`).
-##' @param ... arguments passed to other methods
+##' @param ... arguments passed to other methods. For `fitted_samples()`, these
+##'   are passed on to `predict.gam()`.
 ##'
 ##' @return A tibble (data frame) with 3 columns containing the posterior
 ##'   predicted values in long format. The columns are
@@ -122,7 +123,7 @@
 
     V <- get_vcov(model, frequentist = freq, unconditional = unconditional)
     Rbeta <- rmvn(n = n, mu = coef(model), sigma = V, ncores = ncores)
-    Xp <- predict(model, newdata = newdata, type = "lpmatrix")
+    Xp <- predict(model, newdata = newdata, type = "lpmatrix", ...)
     sims <- Xp %*% t(Rbeta)
 
     if (isTRUE(identical(scale, "response"))) {
