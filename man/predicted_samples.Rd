@@ -37,7 +37,8 @@ predicted_samples(model, ...)
 \arguments{
 \item{model}{a fitted model of the supported types}
 
-\item{...}{arguments passed to other methods}
+\item{...}{arguments passed to other methods. For \code{fitted_samples()}, these
+are passed on to \code{predict.gam()}.}
 
 \item{n}{numeric; the number of posterior samples to return.}
 
