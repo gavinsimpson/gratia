@@ -1,12 +1,18 @@
 ##' Generate data over the range of variables used in smooths
 ##'
-##' For each smooth in a GAM, generate new data over the range of the variables in volved in a smooth.
+##' For each smooth in a GAM, generate new data over the range of the variables
+##' involved in a smooth.
 ##'
-##' @param x an object for which new data is required. Currently objects of classes `"gam"`, and `"gamm"` are supported, as are smooths from **mgcv** inheriting from class `"mgcv.smooth"`.
-##' @param n numeric; the number of data values to generate per term in each smooth.
-##' @param data data frame; for `"mgcv.smooth"` objects, the data used to fit the GAM need to be supplied.
+##' @param x an object for which new data is required. Currently objects of
+##'   classes `"gam"`, and `"gamm"` are supported, as are smooths from **mgcv**
+##'   inheriting from class `"mgcv.smooth"`.
+##' @param n numeric; the number of data values to generate per term in each
+##'   smooth.
+##' @param data data frame; for `"mgcv.smooth"` objects, the data used to fit
+##'   the GAM need to be supplied.
 ##' @param ... arguments passed to methods
-##' @return A data frame of new values spread over the range of the observed values.
+##' @return A data frame of new values spread over the range of the
+##'   observed values.
 ##'
 ##' @author Gavin L. Simpson
 ##'
