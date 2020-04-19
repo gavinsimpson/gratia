@@ -10,11 +10,21 @@
 
 * `data_slice()` can generate data for a 1-d slice (a single variable varying).
 
+## User visible changes
+
+* `datagen()` is now an *internal* function and is no longer exported. Use
+  `data_slice()` instead.
+
 ## Bug fixes
 
 * The `draw()` method for `derivatives()` was not getting the x-axis label for
   factor by smooths correctly, and instead was using `NA` for the second and
   subsequent levels of the factor.
+
+* The `datagen()` method for class `"gam"` couldn't possibly have worked for
+  anything but the simplest models and would fail even with simple factor by
+  smooths. These issues have been fixed, but the behaviour of `datagen()` has
+  changed, and the function is now not intended for use by users.
 
 # gratia 0.3.1
 
