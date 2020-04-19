@@ -131,9 +131,12 @@ involved in a smooth.</p>
 <span class='fu'>datagen</span>(<span class='no'>x</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='no'>data</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for gam</span>
-<span class='fu'>datagen</span>(<span class='no'>x</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='no'>...</span>)
+<span class='fu'>datagen</span>(<span class='no'>x</span>, <span class='kw'>smooth</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for gamm</span>
+<span class='fu'>datagen</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for list</span>
 <span class='fu'>datagen</span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -166,38 +169,6 @@ the GAM need to be supplied.</p></td>
     <p>A data frame of new values spread over the range of the
 observed values.</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
-
-<span class='co'>## 1d example</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>2</span>)
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>m1</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x0</span>) + <span class='fu'>s</span>(<span class='no'>x1</span>) + <span class='fu'>s</span>(<span class='no'>x2</span>) + <span class='fu'>s</span>(<span class='no'>x3</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>datagen</span>(<span class='no'>m1</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>df</span>)</div><div class='output co'>#&gt;    term           x
-#&gt; 1 s(x0) 0.007109038
-#&gt; 2 s(x0) 0.012087246
-#&gt; 3 s(x0) 0.017065454
-#&gt; 4 s(x0) 0.022043662
-#&gt; 5 s(x0) 0.027021870
-#&gt; 6 s(x0) 0.032000078</div><div class='input'>
-<span class='co'>## 2d example</span>
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>2</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; Bivariate smoothing example</div><div class='input'><span class='no'>m2</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x</span>, <span class='no'>z</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>$<span class='no'>data</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>datagen</span>(<span class='no'>m2</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>df</span>)</div><div class='output co'>#&gt;   smooth          x1          x2
-#&gt; 1 s(x,z) 0.001867117 0.002381104
-#&gt; 2 s(x,z) 0.006878970 0.002381104
-#&gt; 3 s(x,z) 0.011890823 0.002381104
-#&gt; 4 s(x,z) 0.016902676 0.002381104
-#&gt; 5 s(x,z) 0.021914529 0.002381104
-#&gt; 6 s(x,z) 0.026926382 0.002381104</div><div class='input'><span class='co'>## alternative showing using the mgcv.smooth method for a single smooth</span>
-<span class='no'>df2</span> <span class='kw'>&lt;-</span> <span class='fu'>datagen</span>(<span class='no'>m2</span><span class='kw'>[[</span><span class='st'>"smooth"</span>]]<span class='kw'>[[</span><span class='fl'>1L</span>]], <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>$<span class='no'>data</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>df2</span>)</div><div class='output co'>#&gt;   smooth          x1          x2
-#&gt; 1 s(x,z) 0.001867117 0.002381104
-#&gt; 2 s(x,z) 0.011941448 0.002381104
-#&gt; 3 s(x,z) 0.022015779 0.002381104
-#&gt; 4 s(x,z) 0.032090110 0.002381104
-#&gt; 5 s(x,z) 0.042164441 0.002381104
-#&gt; 6 s(x,z) 0.052238771 0.002381104</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
