@@ -127,11 +127,20 @@
 <li><p><code><a href="../reference/data_slice.html">data_slice()</a></code> can generate data for a 1-d slice (a single variable varying).</p></li>
 </ul>
 </div>
+<div id="user-visible-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#user-visible-changes" class="anchor"></a>User visible changes</h2>
+<ul>
+<li>
+<code><a href="../reference/datagen.html">datagen()</a></code> is now an <em>internal</em> function and is no longer exported. Use <code><a href="../reference/data_slice.html">data_slice()</a></code> instead.</li>
+</ul>
+</div>
 <div id="bug-fixes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
 <ul>
-<li>The <code><a href="../reference/draw.html">draw()</a></code> method for <code><a href="../reference/derivatives.html">derivatives()</a></code> was not getting the x-axis label for factor by smooths correctly, and instead was using <code>NA</code> for the second and subsequent levels of the factor.</li>
+<li><p>The <code><a href="../reference/draw.html">draw()</a></code> method for <code><a href="../reference/derivatives.html">derivatives()</a></code> was not getting the x-axis label for factor by smooths correctly, and instead was using <code>NA</code> for the second and subsequent levels of the factor.</p></li>
+<li><p>The <code><a href="../reference/datagen.html">datagen()</a></code> method for class <code>"gam"</code> couldn’t possibly have worked for anything but the simplest models and would fail even with simple factor by smooths. These issues have been fixed, but the behaviour of <code><a href="../reference/datagen.html">datagen()</a></code> has changed, and the function is now not intended for use by users.</p></li>
 </ul>
 </div>
 </div>
