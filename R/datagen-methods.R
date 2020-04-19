@@ -36,13 +36,13 @@
 
     if (d == 1L) {                      # 1-d smooths
         xvals <- data[[term]]
-        newvals <- seq(min(xvals), max(xvals), length.out = n)
+        newvals <- seq_min_max(xvals, n = n)
         out <- data.frame(smooth = rep(smooth_label(x), n), x = newvals)
-    } else if (d -- 2L) {                            # 2-d smooths
+    } else if (d == 2L) {                            # 2-d smooths
         xvals <- data[[term[1]]]
         zvals <- data[[term[2]]]
-        newx <- seq(min(xvals), max(xvals), length.out = n)
-        newz <- seq(min(zvals), max(zvals), length.out = n)
+        newx <- seq_min_max(xvals, n = n)
+        newz <- seq_min_max(zvals, n = n)
         out <- expand.grid(x1 = newx, x2 = newz)
         out <- cbind(smooth = rep(smooth_label(x), n^2), out)
     } else {
@@ -103,17 +103,17 @@
 ##' @rdname datagen
 `datagen.gamm` <- function(x, ...) {
     if (!is.gamm(x)) {
-        stop("'x' doesn't appear to be a 'gamm()' model object")
+        stop("Model doesn't appear to be a 'gamm()' model object.")
     }
-    datagen(x[["gam"]])
+    datagen(x[["gam"]], ...)
 }
 
 ##' @export
 ##' @rdname datagen
 `datagen.list` <- function(x, ...) {
     if (!is_gamm4(x)) {
-        stop("'x' doesn't appear to be a 'gamm()' model object")
+        stop("Model doesn't appear to be a 'gamm4()' model object.")
     }
-    datagen(x[["gam"]])
+    datagen(x[["gam"]], ...)
 }
 
