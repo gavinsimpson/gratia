@@ -6,6 +6,7 @@
 \alias{datagen.fs.interaction}
 \alias{datagen.gam}
 \alias{datagen.gamm}
+\alias{datagen.list}
 \title{Generate data over the range of variables used in smooths}
 \usage{
 datagen(x, ...)
@@ -14,9 +15,11 @@ datagen(x, ...)
 
 \method{datagen}{fs.interaction}(x, n = 100, data, ...)
 
-\method{datagen}{gam}(x, n = 200, ...)
+\method{datagen}{gam}(x, smooth = NULL, n = 200, ...)
 
 \method{datagen}{gamm}(x, ...)
+
+\method{datagen}{list}(x, ...)
 }
 \arguments{
 \item{x}{an object for which new data is required. Currently objects of
@@ -39,25 +42,7 @@ observed values.
 For each smooth in a GAM, generate new data over the range of the variables
 involved in a smooth.
 }
-\examples{
-load_mgcv()
-
-## 1d example
-set.seed(2)
-dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
-m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-df <- datagen(m1)
-head(df)
-
-## 2d example
-dat <- gamSim(2, n = 400, dist = "normal", scale = 2)
-m2 <- gam(y ~ s(x, z), data = dat$data, method = "REML")
-df <- datagen(m2)
-head(df)
-## alternative showing using the mgcv.smooth method for a single smooth
-df2 <- datagen(m2[["smooth"]][[1L]], data = dat$data)
-head(df2)
-}
 \author{
 Gavin L. Simpson
 }
+\keyword{internal}
