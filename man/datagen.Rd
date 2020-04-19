@@ -19,19 +19,25 @@ datagen(x, ...)
 \method{datagen}{gamm}(x, ...)
 }
 \arguments{
-\item{x}{an object for which new data is required. Currently objects of classes \code{"gam"}, and \code{"gamm"} are supported, as are smooths from \strong{mgcv} inheriting from class \code{"mgcv.smooth"}.}
+\item{x}{an object for which new data is required. Currently objects of
+classes \code{"gam"}, and \code{"gamm"} are supported, as are smooths from \strong{mgcv}
+inheriting from class \code{"mgcv.smooth"}.}
 
 \item{...}{arguments passed to methods}
 
-\item{n}{numeric; the number of data values to generate per term in each smooth.}
+\item{n}{numeric; the number of data values to generate per term in each
+smooth.}
 
-\item{data}{data frame; for \code{"mgcv.smooth"} objects, the data used to fit the GAM need to be supplied.}
+\item{data}{data frame; for \code{"mgcv.smooth"} objects, the data used to fit
+the GAM need to be supplied.}
 }
 \value{
-A data frame of new values spread over the range of the observed values.
+A data frame of new values spread over the range of the
+observed values.
 }
 \description{
-For each smooth in a GAM, generate new data over the range of the variables in volved in a smooth.
+For each smooth in a GAM, generate new data over the range of the variables
+involved in a smooth.
 }
 \examples{
 load_mgcv()

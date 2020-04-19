@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Generate data over the range of variables used in smooths — datagen" />
-<meta property="og:description" content="For each smooth in a GAM, generate new data over the range of the variables in volved in a smooth." />
+<meta property="og:description" content="For each smooth in a GAM, generate new data over the range of the variables
+involved in a smooth." />
 
 
 
@@ -117,7 +118,8 @@
     </div>
 
     <div class="ref-description">
-    <p>For each smooth in a GAM, generate new data over the range of the variables in volved in a smooth.</p>
+    <p>For each smooth in a GAM, generate new data over the range of the variables
+involved in a smooth.</p>
     </div>
 
     <pre class="usage"><span class='fu'>datagen</span>(<span class='no'>x</span>, <span class='no'>...</span>)
@@ -139,7 +141,9 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>an object for which new data is required. Currently objects of classes <code>"gam"</code>, and <code>"gamm"</code> are supported, as are smooths from <strong>mgcv</strong> inheriting from class <code>"mgcv.smooth"</code>.</p></td>
+      <td><p>an object for which new data is required. Currently objects of
+classes <code>"gam"</code>, and <code>"gamm"</code> are supported, as are smooths from <strong>mgcv</strong>
+inheriting from class <code>"mgcv.smooth"</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -147,17 +151,20 @@
     </tr>
     <tr>
       <th>n</th>
-      <td><p>numeric; the number of data values to generate per term in each smooth.</p></td>
+      <td><p>numeric; the number of data values to generate per term in each
+smooth.</p></td>
     </tr>
     <tr>
       <th>data</th>
-      <td><p>data frame; for <code>"mgcv.smooth"</code> objects, the data used to fit the GAM need to be supplied.</p></td>
+      <td><p>data frame; for <code>"mgcv.smooth"</code> objects, the data used to fit
+the GAM need to be supplied.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data frame of new values spread over the range of the observed values.</p>
+    <p>A data frame of new values spread over the range of the
+observed values.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
