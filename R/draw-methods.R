@@ -84,7 +84,7 @@
         plt <- plt + geom_point(data = partial_residuals,
                                 aes_string(x = "..orig_x", y = "..p_resid"),
                                 inherit.aes = FALSE,
-                                colour = "steelblue", alpha = 0.4)
+                                colour = "steelblue3", alpha = 0.5)
     }
 
     plt <- plt + geom_ribbon(mapping = aes_string(ymin = "lower",
@@ -360,7 +360,6 @@
         }
         
         if (isTRUE(rug)) {
-            ## sname <- unique(l[[i]][["smooth"]])
             ## could be a by smooth, strip off the by variable bit
             sname <- strsplit(sname, ":")[[1L]][[1L]]
             sm <- get_smooth(object, term = sname)
