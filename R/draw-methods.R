@@ -257,6 +257,9 @@
 ##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
 ##' draw(m1)
+##'
+##' ## can add partial residuals
+##' draw(m1, residuals = TRUE)
 `draw.gam` <- function(object,
                        parametric = NULL,
                        select = NULL,
