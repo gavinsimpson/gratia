@@ -18,6 +18,7 @@
   title = NULL,
   subtitle = NULL,
   caption = NULL,
+  partial_residuals = NULL,
   ...
 )
 
@@ -90,6 +91,10 @@ supplied, a suitable label will be generated from \code{object}.}
 
 \item{caption}{character or expression; the plot caption. See
 \code{\link[ggplot2:labs]{ggplot2::labs()}}.}
+
+\item{partial_residuals}{data frame; partial residuals and data values if
+partial residuals are drawn. Should have names \code{..p_resid} and \code{..orig_x} if
+supplied.}
 
 \item{...}{arguments passed to other methods.}
 

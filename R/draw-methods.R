@@ -24,6 +24,9 @@
 ##'   location of data on the x axis. The default of `NULL` results in no
 ##'   rug plot being drawn. For `evaluate_parametric_terms()`, a logical to
 ##'   indicate if a rug plot should be drawn.
+##' @param partial_residuals data frame; partial residuals and data values if
+##'   partial residuals are drawn. Should have names `..p_resid` and `..orig_x` if
+##'   supplied.
 ##' @param xlab character or expression; the label for the x axis. If not
 ##'   supplied, a suitable label will be generated from `object`.
 ##' @param ylab character or expression; the label for the y axis. If not
@@ -68,17 +71,25 @@
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
-                                       ...) {
+                                       partial_residuals = NULL, ...) {
     smooth_var <- names(object)[3L]
 
     ## Add confidence interval
     object[["upper"]] <- object[["est"]] + (2 * object[["se"]])
     object[["lower"]] <- object[["est"]] - (2 * object[["se"]])
 
-    plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est, group = ~ smooth)) +
-        geom_ribbon(mapping = aes_string(ymin = "lower",
-                                         ymax = "upper"),
-                    alpha = 0.2) +
+    plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est, group = ~ smooth))
+
+    if (!is.null(partial_residuals)) {
+        plt <- plt + geom_point(data = partial_residuals,
+                                aes_string(x = "..orig_x", y = "..p_resid"),
+                                inherit.aes = FALSE,
+                                colour = "steelblue", alpha = 0.4)
+    }
+
+    plt <- plt + geom_ribbon(mapping = aes_string(ymin = "lower",
+                                                  ymax = "upper"),
+                             alpha = 0.3) +
         geom_line()
 
     ## default axis labels if none supplied
@@ -205,6 +216,8 @@
 ##'   as shown for example in the output from `summary(object)`. Logical
 ##'   `select` operates as per numeric `select` in the order that smooths are
 ##'   stored.
+##' @param residuals logical; should partial residuals for a smooth be drawn?
+##'   Ignored for anything but a simple univariate smooth.
 ##' @param scales character; should all univariate smooths be plotted with the
 ##'   same y-axis scale? The default, `scales = "fixed"`, ensures this is done.
 ##'   If `scales = "free"` each univariate smooth has its own y-axis scale.
@@ -247,6 +260,7 @@
 `draw.gam` <- function(object,
                        parametric = NULL,
                        select = NULL,
+                       residuals = FALSE,
                        scales = c("free", "fixed"),
                        align = "hv", axis = "lrtb",
                        n = 100, unconditional = FALSE,
@@ -321,9 +335,32 @@
     ## model frame may be needed for rugs
     mf  <- model.frame(object)
 
+    ## get the terms predictions if we need partial residuals
+    if (isTRUE(residuals)) {
+        if (is.null(object$residuals) || is.null(object$weights)) {
+            residuals <- FALSE
+        } else {
+            pred_terms <- predict(object, type = "terms")
+            w_resid <- object$residuals * sqrt(object$weights)
+            pred_terms <- pred_terms + w_resid
+        }
+    }
+
     for (i in seq_along(l)) {
+        partial_residuals <- NULL
+        sname <- unique(l[[i]][["smooth"]])
+
+        ## add partial_residuals
+        if (isTRUE(residuals )) {
+            sm <- get_smooth(object, term = sname)
+            if ((! is_by_smooth(sm)) && smooth_dim(sm) == 1L) {
+                partial_residuals <- tibble(..p_resid = pred_terms[, sname],
+                                            ..orig_x = mf[, smooth_variable(sm)])
+            }
+        }
+        
         if (isTRUE(rug)) {
-            sname <- unique(l[[i]][["smooth"]])
+            ## sname <- unique(l[[i]][["smooth"]])
             ## could be a by smooth, strip off the by variable bit
             sname <- strsplit(sname, ":")[[1L]][[1L]]
             sm <- get_smooth(object, term = sname)
@@ -334,9 +371,10 @@
             if (is_fs_smooth(sm)) {
                 svar <- svar[[1L]]
             }
-            g[[i]] <- draw(l[[i]], rug = mf[[svar]])
+            g[[i]] <- draw(l[[i]], rug = mf[[svar]],
+                           partial_residuals = partial_residuals)
         } else {
-            g[[i]] <- draw(l[[i]])
+            g[[i]] <- draw(l[[i]], partial_residuals = partial_residuals)
         }
     }
 

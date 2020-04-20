@@ -8,6 +8,7 @@
   object,
   parametric = NULL,
   select = NULL,
+  residuals = FALSE,
   scales = c("free", "fixed"),
   align = "hv",
   axis = "lrtb",
@@ -34,6 +35,9 @@ stored in \code{object}. Character \code{select} matches the labels for smooths
 as shown for example in the output from \code{summary(object)}. Logical
 \code{select} operates as per numeric \code{select} in the order that smooths are
 stored.}
+
+\item{residuals}{logical; should partial residuals for a smooth be drawn?
+Ignored for anything but a simple univariate smooth.}
 
 \item{scales}{character; should all univariate smooths be plotted with the
 same y-axis scale? The default, \code{scales = "fixed"}, ensures this is done.
