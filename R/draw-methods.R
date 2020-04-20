@@ -80,6 +80,7 @@
 
     plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est, group = ~ smooth))
 
+    ## do we want partial residuals? Only for univariate smooths without by vars
     if (!is.null(partial_residuals)) {
         plt <- plt + geom_point(data = partial_residuals,
                                 aes_string(x = "..orig_x", y = "..p_resid"),
@@ -87,6 +88,7 @@
                                 colour = "steelblue3", alpha = 0.5)
     }
 
+    ## plot the confidence interval
     plt <- plt + geom_ribbon(mapping = aes_string(ymin = "lower",
                                                   ymax = "upper"),
                              alpha = 0.3) +
@@ -349,6 +351,8 @@
         }
     }
 
+    p_resid_range <- vector("list", length = length(l))
+    
     for (i in seq_along(l)) {
         partial_residuals <- NULL
         sname <- unique(l[[i]][["smooth"]])
@@ -359,6 +363,7 @@
             if ((! is_by_smooth(sm)) && smooth_dim(sm) == 1L) {
                 partial_residuals <- tibble(..p_resid = pred_terms[, sname],
                                             ..orig_x = mf[, smooth_variable(sm)])
+                p_resid_range[[i]] <- range(pred_terms[, sname])
             }
         }
         
@@ -393,7 +398,13 @@
             range(x[["est"]] + (2 * x[["se"]]),
                   x[["est"]] - (2 * x[["se"]]))
         }
-        ylims <- range(unlist(lapply(l, wrapper)))
+        
+        p_resids_lims <- if (residuals) {
+            range(unlist(p_resid_range))
+        } else {
+            rep(0, 2)
+        }
+        ylims <- range(c(unlist(lapply(l, wrapper)), unlist(p_resid_range)))
         if (isTRUE(parametric)) {
             ylims <- range(ylims,
                            unlist(lapply(p, function(x) range(x[["upper"]],

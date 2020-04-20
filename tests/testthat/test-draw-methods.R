@@ -101,6 +101,14 @@ test_that("draw.gam() plots a simple multi-smooth AM", {
     expect_doppelganger("draw simple multi-smooth AM with fixed scales", plt)
 })
 
+test_that("draw.gam() can draw partial residuals", {
+    plt <- draw(m1, residuals = TRUE)
+    expect_doppelganger("draw simple partial residuals", plt)
+
+    plt <- draw(m1, residuals = TRUE, scales = "fixed")
+    expect_doppelganger("draw simple partial residuals with fixed scales", plt)
+})
+
 test_that("draw.gam() plots an AM with a single 2d smooth", {
     plt <- draw(m2)
     expect_doppelganger("draw AM with 2d smooth", plt)
