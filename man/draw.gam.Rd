@@ -99,6 +99,9 @@ dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 draw(m1)
+
+## can add partial residuals
+draw(m1, residuals = TRUE)
 }
 \author{
 Gavin L. Simpson
