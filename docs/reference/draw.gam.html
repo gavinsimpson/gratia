@@ -129,6 +129,7 @@ is used instead.</p>
   <span class='no'>object</span>,
   <span class='kw'>parametric</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>residuals</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>scales</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"free"</span>, <span class='st'>"fixed"</span>),
   <span class='kw'>align</span> <span class='kw'>=</span> <span class='st'>"hv"</span>,
   <span class='kw'>axis</span> <span class='kw'>=</span> <span class='st'>"lrtb"</span>,
@@ -163,6 +164,11 @@ stored in <code>object</code>. Character <code>select</code> matches the labels 
 as shown for example in the output from <code><a href='https://rdrr.io/r/base/summary.html'>summary(object)</a></code>. Logical
 <code>select</code> operates as per numeric <code>select</code> in the order that smooths are
 stored.</p></td>
+    </tr>
+    <tr>
+      <th>residuals</th>
+      <td><p>logical; should partial residuals for a smooth be drawn?
+Ignored for anything but a simple univariate smooth.</p></td>
     </tr>
     <tr>
       <th>scales</th>
@@ -240,7 +246,9 @@ typically work with <code>ggplot()</code> plots.</p>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>2</span>)
 <span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>m1</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x0</span>) + <span class='fu'>s</span>(<span class='no'>x1</span>) + <span class='fu'>s</span>(<span class='no'>x2</span>) + <span class='fu'>s</span>(<span class='no'>x3</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
 
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m1</span>)</div><div class='img'><img src='draw.gam-1.png' alt='' width='700' height='433' /></div></pre>
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m1</span>)</div><div class='img'><img src='draw.gam-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'>## can add partial residuals</span>
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m1</span>, <span class='kw'>residuals</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='img'><img src='draw.gam-2.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

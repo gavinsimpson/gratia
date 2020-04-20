@@ -129,6 +129,7 @@
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>partial_residuals</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>
 )
 
@@ -221,6 +222,12 @@ supplied, a suitable label will be generated from <code>object</code>.</p></td>
       <th>caption</th>
       <td><p>character or expression; the plot caption. See
 <code><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggplot2::labs()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>partial_residuals</th>
+      <td><p>data frame; partial residuals and data values if
+partial residuals are drawn. Should have names <code>..p_resid</code> and <code>..orig_x</code> if
+supplied.</p></td>
     </tr>
     <tr>
       <th>...</th>
