@@ -2,6 +2,11 @@
 
 ## New features
 
+* `draw.gam` can now include partial residuals when drawing univariate smooths.
+  Use `residuals = TRUE` to add partial residuals to each univariate smooth that
+  is drawn. This feature is not available for smooths of more than one variable,
+  by smooths, or factor-smooth interactions (`bs = "fs"`).
+
 * `smooth_samples()` can handle continuous by variable smooths such as in
   varying coefficient models.
 
