@@ -540,7 +540,7 @@
             plt <- plt + geom_rug(sides = "b", position = position)
         }
         plt <- plt + geom_ribbon(aes_string(ymin = "lower", ymax = "upper"),
-                                 alpha = 0.2) +
+                                 alpha = 0.3) +
             geom_line()
     }
 
