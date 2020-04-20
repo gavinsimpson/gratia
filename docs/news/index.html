@@ -122,6 +122,7 @@
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>New features</h2>
 <ul>
+<li><p><code>draw.gam</code> can now include partial residuals when drawing univariate smooths. Use <code>residuals = TRUE</code> to add partial residuals to each univariate smooth that is drawn. This feature is not available for smooths of more than one variable, by smooths, or factor-smooth interactions (<code>bs = "fs"</code>).</p></li>
 <li><p><code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> can handle continuous by variable smooths such as in varying coefficient models.</p></li>
 <li><p><code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code>, <code><a href="../reference/data_slice.html">data_slice()</a></code>, <code><a href="https://rdrr.io/r/stats/family.html">family()</a></code>, <code><a href="../reference/link.html">link()</a></code>, <code><a href="../reference/link.html">inv_link()</a></code> methods for models fitted using <code>gamm4()</code> from the <strong>gamm4</strong> package.</p></li>
 <li><p><code><a href="../reference/data_slice.html">data_slice()</a></code> can generate data for a 1-d slice (a single variable varying).</p></li>
@@ -211,7 +212,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>
