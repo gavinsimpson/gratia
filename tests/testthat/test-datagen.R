@@ -13,7 +13,7 @@ set.seed(2)
 dat1 <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "REML")
 m_gamm <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "ML")
-m_gamm4 <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "ML")
+m_gamm4 <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, REML = TRUE)
 ## 2d example
 dat2 <- gamSim(2, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 m2 <- gam(y ~ s(x, z), data = dat2$data, method = "REML")
