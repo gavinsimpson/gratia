@@ -483,7 +483,7 @@
 ##' @param alpha numeric; the level of alpha transparency for the QQ plot
 ##'   reference interval when `method = "simulate"`.
 ##' @param ... arguments passed to [cowplot::plot_grid()], except for `align`
-##'   and `axis`, which are set internally.
+##'   and `axis`, which are set internally, or [qq_plot()].
 ##'
 ##' @importFrom cowplot plot_grid
 ##'
@@ -499,8 +499,7 @@
 ##' ## simulate some data...
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 ##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
-##' ## run some basic model checks, including checking
-##' ## smoothing basis dimensions...
+##' ## run some basic model checks
 ##' appraise(mod)
 `appraise` <- function(model,
                        method = c("direct", "simulate", "normal"),
@@ -522,7 +521,7 @@
     }
 
     plt1 <- qq_plot(model, method = method, type = type, n_uniform = n_uniform,
-                    n_simulate = n_simulate, level = level, alpha = alpha)
+                    n_simulate = n_simulate, level = level, alpha = alpha, ...)
     plt2 <- residuals_linpred_plot(model, type = type)
     plt3 <- residuals_hist_plot(model, type = type, n_bins = n_bins,
                                 subtitle = NULL)

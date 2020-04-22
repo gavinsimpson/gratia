@@ -45,7 +45,7 @@ Must be strictly \verb{0 < level < 1}. Only used with \code{method = "simulate"}
 reference interval when \code{method = "simulate"}.}
 
 \item{...}{arguments passed to \code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}, except for \code{align}
-and \code{axis}, which are set internally.}
+and \code{axis}, which are set internally, or \code{\link[=qq_plot]{qq_plot()}}.}
 }
 \description{
 Model diagnostic plots
@@ -56,8 +56,7 @@ library(mgcv)
 ## simulate some data...
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
-## run some basic model checks, including checking
-## smoothing basis dimensions...
+## run some basic model checks
 appraise(mod)
 }
 \seealso{
