@@ -126,7 +126,19 @@
 <li><p><code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> can handle continuous by variable smooths such as in varying coefficient models.</p></li>
 <li><p><code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code>, <code><a href="../reference/data_slice.html">data_slice()</a></code>, <code><a href="https://rdrr.io/r/stats/family.html">family()</a></code>, <code><a href="../reference/link.html">link()</a></code>, <code><a href="../reference/link.html">inv_link()</a></code> methods for models fitted using <code>gamm4()</code> from the <strong>gamm4</strong> package.</p></li>
 <li><p><code><a href="../reference/data_slice.html">data_slice()</a></code> can generate data for a 1-d slice (a single variable varying).</p></li>
-<li><p>The colour of the points and reference line in <code><a href="../reference/qq_plot.html">qq_plot()</a></code> can now be specified via arguments <code>qq_point_col</code> and <code>qq_line_col</code>.</p></li>
+<li>
+<p>The colour of the points, reference lines, and simulation band in <code><a href="../reference/appraise.html">appraise()</a></code> can now be specified via arguments</p>
+<ul>
+<li>
+<code>point_col</code>,</li>
+<li>
+<code>point_alpha</code>,</li>
+<li><code>ci_col</code></li>
+<li><code>ci_alpha</code></li>
+<li><code>line_col</code></li>
+</ul>
+<p>These are passed on to <code><a href="../reference/qq_plot.html">qq_plot()</a></code>, <code><a href="../reference/observed_fitted_plot.html">observed_fitted_plot()</a></code>, <code><a href="../reference/residuals_linpred_plot.html">residuals_linpred_plot()</a></code>, and <code><a href="../reference/residuals_hist_plot.html">residuals_hist_plot()</a></code>, which also now take the new arguments were applicable.</p>
+</li>
 </ul>
 </div>
 <div id="user-visible-changes" class="section level2">

@@ -15,8 +15,18 @@
 
 * `data_slice()` can generate data for a 1-d slice (a single variable varying).
 
-* The colour of the points and reference line in `qq_plot()` can now be
-  specified via arguments `qq_point_col` and `qq_line_col`.
+* The colour of the points, reference lines, and simulation band in `appraise()`
+  can now be specified via arguments
+
+    * `point_col`,
+    * `point_alpha`,
+    * `ci_col`
+    * `ci_alpha`
+    * `line_col`
+
+  These are passed on to `qq_plot()`, `observed_fitted_plot()`,
+  `residuals_linpred_plot()`, and `residuals_hist_plot()`, which also now take
+  the new arguments were applicable.
 
 ## User visible changes
 
