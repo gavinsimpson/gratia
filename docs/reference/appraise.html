@@ -129,7 +129,11 @@
   <span class='kw'>n_bins</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sturges"</span>, <span class='st'>"scott"</span>, <span class='st'>"fd"</span>),
   <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='fl'>2</span>,
   <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.9</span>,
-  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.2</span>,
+  <span class='kw'>ci_col</span> <span class='kw'>=</span> <span class='st'>"black"</span>,
+  <span class='kw'>ci_alpha</span> <span class='kw'>=</span> <span class='fl'>0.2</span>,
+  <span class='kw'>point_col</span> <span class='kw'>=</span> <span class='st'>"black"</span>,
+  <span class='kw'>point_alpha</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>line_col</span> <span class='kw'>=</span> <span class='st'>"red"</span>,
   <span class='no'>...</span>
 )</pre>
 
@@ -176,14 +180,27 @@ indicating how to calculate the number of bins.</p></td>
 Must be strictly <code>0 &lt; level &lt; 1</code>. Only used with <code>method = "simulate"</code>.</p></td>
     </tr>
     <tr>
-      <th>alpha</th>
-      <td><p>numeric; the level of alpha transparency for the QQ plot
-reference interval when <code>method = "simulate"</code>.</p></td>
+      <th>ci_alpha, ci_col</th>
+      <td><p>numeric; the level of alpha transparency for the
+QQ plot reference interval when <code>method = "simulate"</code>, or points drawn in
+plots.</p></td>
+    </tr>
+    <tr>
+      <th>point_col, point_alpha</th>
+      <td><p>colour and transparency used to draw points in
+the plots. See <code><a href='https://rdrr.io/r/graphics/par.html'>graphics::par()</a></code> section <strong>Color Specification</strong>. This is
+passed to the individual plotting functions, and therefore affects the
+points of all plots.</p></td>
+    </tr>
+    <tr>
+      <th>line_col</th>
+      <td><p>colour specification for the 1:1 line in the QQ plot and the
+reference line in the residuals vs linear predictor plot.</p></td>
     </tr>
     <tr>
       <th>...</th>
       <td><p>arguments passed to <code><a href='https://rdrr.io/pkg/cowplot/man/plot_grid.html'>cowplot::plot_grid()</a></code>, except for <code>align</code>
-and <code>axis</code>, which are set internally, or <code><a href='qq_plot.html'>qq_plot()</a></code>.</p></td>
+and <code>axis</code>, which are set internally.</p></td>
     </tr>
     </table>
 
@@ -198,7 +215,7 @@ and <code><a href='observed_fitted_plot.html'>gratia::observed_fitted_plot()</a>
 <span class='co'>## simulate some data...</span>
 <span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>mod</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='no'>y</span> ~ <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='no'>x0</span>) + <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='no'>x1</span>) + <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='no'>x2</span>) + <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='no'>x3</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>)
 <span class='co'>## run some basic model checks</span>
-<span class='fu'>appraise</span>(<span class='no'>mod</span>)</div><div class='img'><img src='appraise-1.png' alt='' width='700' height='433' /></div></pre>
+<span class='fu'>appraise</span>(<span class='no'>mod</span>, <span class='kw'>point_col</span> <span class='kw'>=</span> <span class='st'>"steelblue"</span>, <span class='kw'>point_alpha</span> <span class='kw'>=</span> <span class='fl'>0.4</span>)</div><div class='img'><img src='appraise-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

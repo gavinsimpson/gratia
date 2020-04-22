@@ -127,7 +127,10 @@
   <span class='kw'>xlab</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+  <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>point_col</span> <span class='kw'>=</span> <span class='st'>"black"</span>,
+  <span class='kw'>point_alpha</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>line_col</span> <span class='kw'>=</span> <span class='st'>"red"</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -155,17 +158,32 @@ supplied, a suitable label will be generated.</p></td>
     <tr>
       <th>title</th>
       <td><p>character or expression; the title for the plot. See
-<code><a href='https://rdrr.io/pkg/ggplot2/man/labs.html'>ggplot2::labs()</a></code>.</p></td>
+<code><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggplot2::labs()</a></code>.</p></td>
     </tr>
     <tr>
       <th>subtitle</th>
       <td><p>character or expression; the subtitle for the plot. See
-<code><a href='https://rdrr.io/pkg/ggplot2/man/labs.html'>ggplot2::labs()</a></code>.</p></td>
+<code><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggplot2::labs()</a></code>.</p></td>
     </tr>
     <tr>
       <th>caption</th>
       <td><p>character or expression; the plot caption. See
-<code><a href='https://rdrr.io/pkg/ggplot2/man/labs.html'>ggplot2::labs()</a></code>.</p></td>
+<code><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggplot2::labs()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>point_col</th>
+      <td><p>colour used to draw points in the plots. See
+<code><a href='https://rdrr.io/r/graphics/par.html'>graphics::par()</a></code> section <strong>Color Specification</strong>. This is passed to
+the individual plotting functions, and therefore affects the points of
+all plots.</p></td>
+    </tr>
+    <tr>
+      <th>point_alpha</th>
+      <td><p>numeric; alpha transparency for points in plots.</p></td>
+    </tr>
+    <tr>
+      <th>line_col</th>
+      <td><p>colour specification for 1:1 line.</p></td>
     </tr>
     </table>
 

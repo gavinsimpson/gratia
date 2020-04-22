@@ -135,9 +135,11 @@
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.2</span>,
-  <span class='kw'>qq_point_col</span> <span class='kw'>=</span> <span class='st'>"black"</span>,
-  <span class='kw'>qq_line_col</span> <span class='kw'>=</span> <span class='st'>"red"</span>,
+  <span class='kw'>ci_col</span> <span class='kw'>=</span> <span class='st'>"black"</span>,
+  <span class='kw'>ci_alpha</span> <span class='kw'>=</span> <span class='fl'>0.2</span>,
+  <span class='kw'>point_col</span> <span class='kw'>=</span> <span class='st'>"black"</span>,
+  <span class='kw'>point_alpha</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>line_col</span> <span class='kw'>=</span> <span class='st'>"red"</span>,
   <span class='no'>...</span>
 )</pre>
 
@@ -189,29 +191,30 @@ supplied, a suitable label will be generated.</p></td>
     <tr>
       <th>title</th>
       <td><p>character or expression; the title for the plot. See
-<code><a href='https://rdrr.io/pkg/ggplot2/man/labs.html'>ggplot2::labs()</a></code>.</p></td>
+<code><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggplot2::labs()</a></code>.</p></td>
     </tr>
     <tr>
       <th>subtitle</th>
       <td><p>character or expression; the subtitle for the plot. See
-<code><a href='https://rdrr.io/pkg/ggplot2/man/labs.html'>ggplot2::labs()</a></code>.</p></td>
+<code><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggplot2::labs()</a></code>.</p></td>
     </tr>
     <tr>
       <th>caption</th>
       <td><p>character or expression; the plot caption. See
-<code><a href='https://rdrr.io/pkg/ggplot2/man/labs.html'>ggplot2::labs()</a></code>.</p></td>
+<code><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggplot2::labs()</a></code>.</p></td>
     </tr>
     <tr>
-      <th>alpha</th>
-      <td><p>numeric; the level of alpha transparency for the reference
+      <th>ci_col, ci_alpha</th>
+      <td><p>fill colour and alpha transparency for the reference
 interval when <code>method = "simulate"</code>.</p></td>
     </tr>
     <tr>
-      <th>qq_point_col</th>
-      <td><p>colour used to draw the points on the QQ plot.</p></td>
+      <th>point_col, point_alpha</th>
+      <td><p>colour and alpha transparency for points on the
+QQ plot.</p></td>
     </tr>
     <tr>
-      <th>qq_line_col</th>
+      <th>line_col</th>
       <td><p>colour used to draw the 1:1 reference line.</p></td>
     </tr>
     </table>
@@ -233,7 +236,8 @@ interval when <code>method = "simulate"</code>.</p></td>
 <span class='fu'>qq_plot</span>(<span class='no'>m</span>)</div><div class='img'><img src='qq_plot-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>## Alternatively use simulate new data from the model, which</span>
 <span class='co'>## allows construction of reference intervals for the Q-Q plot</span>
-<span class='fu'>qq_plot</span>(<span class='no'>m</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"simulate"</span>)</div><div class='img'><img src='qq_plot-2.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>qq_plot</span>(<span class='no'>m</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"simulate"</span>, <span class='kw'>point_col</span> <span class='kw'>=</span> <span class='st'>"steelblue"</span>,
+        <span class='kw'>point_alpha</span> <span class='kw'>=</span> <span class='fl'>0.4</span>)</div><div class='img'><img src='qq_plot-2.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>## ... or use the usual normality assumption</span>
 <span class='fu'>qq_plot</span>(<span class='no'>m</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"normal"</span>)</div><div class='img'><img src='qq_plot-3.png' alt='' width='700' height='433' /></div></pre>
   </div>
