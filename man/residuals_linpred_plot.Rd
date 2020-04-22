@@ -11,7 +11,10 @@ residuals_linpred_plot(
   xlab = NULL,
   title = NULL,
   subtitle = NULL,
-  caption = NULL
+  caption = NULL,
+  point_col = "black",
+  point_alpha = 1,
+  line_col = "red"
 )
 }
 \arguments{
@@ -34,6 +37,15 @@ supplied, a suitable label will be generated.}
 
 \item{caption}{character or expression; the plot caption. See
 \code{\link[ggplot2:labs]{ggplot2::labs()}}.}
+
+\item{point_col}{colour used to draw points in the plots. See
+\code{\link[graphics:par]{graphics::par()}} section \strong{Color Specification}. This is passed to
+the individual plotting functions, and therefore affects the points of
+all plots.}
+
+\item{point_alpha}{numeric; alpha transparency for points in plots.}
+
+\item{line_col}{colour specification for 1:1 line.}
 }
 \description{
 Plot of residuals versus linear predictor values

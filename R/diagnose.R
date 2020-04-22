@@ -30,10 +30,11 @@
 ##'   supplied, a suitable label will be generated.
 ##' @param ylab character or expression; the label for the y axis. If not
 ##'   supplied, a suitable label will be generated.
-##' @param alpha numeric; the level of alpha transparency for the reference
+##' @param ci_col,ci_alpha fill colour and alpha transparency for the reference
 ##'   interval when `method = "simulate"`.
-##' @param qq_point_col colour used to draw the points on the QQ plot.
-##' @param qq_line_col colour used to draw the 1:1 reference line.
+##' @param point_col,point_alpha colour and alpha transparency for points on the
+##'   QQ plot.
+##' @param line_col colour used to draw the 1:1 reference line.
 ##'
 ##' @inheritParams draw.evaluated_smooth
 ##'
@@ -62,7 +63,8 @@
 ##'
 ##' ## Alternatively use simulate new data from the model, which
 ##' ## allows construction of reference intervals for the Q-Q plot
-##' qq_plot(m, method = "simulate")
+##' qq_plot(m, method = "simulate", point_col = "steelblue",
+##'         point_alpha = 0.4)
 ##'
 ##' ## ... or use the usual normality assumption
 ##' qq_plot(m, method = "normal")
@@ -73,9 +75,11 @@
                           level = 0.9,
                           ylab = NULL, xlab = NULL,
                           title = NULL, subtitle = NULL, caption = NULL,
-                          alpha = 0.2,
-                          qq_point_col = "black",
-                          qq_line_col = "red", ...) {
+                          ci_col = "black",
+                          ci_alpha = 0.2,
+                          point_col = "black",
+                          point_alpha = 1,
+                          line_col = "red", ...) {
     method <- match.arg(method)         # what method for the QQ plot?
 
     if (level <= 0 || level >= 1) {
@@ -124,17 +128,18 @@
     plt <- ggplot(df, aes_string(x = "theoretical", y = "residuals"))
 
     ## add reference line
-    plt <- plt + geom_abline(slope = 1, intercept = 0, col = qq_line_col)
+    plt <- plt + geom_abline(slope = 1, intercept = 0, col = line_col)
 
     ## add reference interval
     if (identical(method, "simulate")) {
         plt <- plt + geom_ribbon(aes_string(ymin = "lower", ymax = "upper",
                                             x = "theoretical"),
-                                 inherit.aes = FALSE, alpha = alpha)
+                                 inherit.aes = FALSE,
+                                 alpha = ci_alpha, fill = ci_col)
     }
 
     ## add point layer
-    plt <- plt + geom_point(colour = qq_point_col)
+    plt <- plt + geom_point(colour = point_col, alpha = point_alpha)
 
     ## add labels
     plt <- plt + labs(title = title, subtitle = subtitle, caption = caption,
@@ -310,6 +315,12 @@
 ##'   [ggplot2::labs()].
 ##' @param caption character or expression; the plot caption. See
 ##'   [ggplot2::labs()].
+##' @param point_col colour used to draw points in the plots. See
+##'   [graphics::par()] section **Color Specification**. This is passed to
+##'   the individual plotting functions, and therefore affects the points of
+##'   all plots.
+##' @param point_alpha numeric; alpha transparency for points in plots.
+##' @param line_col colour specification for 1:1 line.
 ##'
 ##' @export
 ##'
@@ -319,7 +330,9 @@
 `residuals_linpred_plot` <- function(model,
                                      type = c("deviance", "pearson","response"),
                                      ylab = NULL, xlab = NULL, title = NULL,
-                                     subtitle = NULL, caption = NULL) {
+                                     subtitle = NULL, caption = NULL,
+                                     point_col = "black", point_alpha = 1,
+                                     line_col = "red") {
     type <- match.arg(type)
     r <- residuals(model, type = type)
     eta <- model[["linear.predictors"]]
@@ -332,10 +345,10 @@
 
     df <- data.frame(eta = eta, residuals = r)
     plt <- ggplot(df, aes_string(x = "eta", y = "residuals")) +
-        geom_hline(yintercept = 0, col = "red")
+        geom_hline(yintercept = 0, col = line_col)
 
     ## add point layer
-    plt <- plt + geom_point()
+    plt <- plt + geom_point(colour = point_col, alpha = point_alpha)
 
     ## add labels
     if (is.null(xlab)) {
@@ -366,7 +379,8 @@
 ##' @importFrom ggplot2 ggplot aes_string geom_point labs
 `observed_fitted_plot` <- function(model,
                                    ylab = NULL, xlab = NULL, title = NULL,
-                                   subtitle = NULL, caption = NULL) {
+                                   subtitle = NULL, caption = NULL,
+                                   point_col = "black", point_alpha = 1) {
     ## extract data for plot
     fit <- fitted(model)
     obs <- model[["y"]]
@@ -377,7 +391,7 @@
     plt <- ggplot(df, aes_string(x = "fitted", y = "observed"))
 
     ## add point layer
-    plt <- plt + geom_point()
+    plt <- plt + geom_point(colour = point_col, alpha = point_alpha)
 
     ## add labels
     if (is.null(xlab)) {
@@ -480,10 +494,17 @@
 ##'   [cowplot::plot_grid()].
 ##' @param level numeric; the coverage level for QQ plot reference intervals.
 ##'   Must be strictly `0 < level < 1`. Only used with `method = "simulate"`.
-##' @param alpha numeric; the level of alpha transparency for the QQ plot
-##'   reference interval when `method = "simulate"`.
+##' @param ci_alpha,ci_col numeric; the level of alpha transparency for the
+##'   QQ plot reference interval when `method = "simulate"`, or points drawn in
+##'   plots.
+##' @param point_col,point_alpha colour and transparency used to draw points in
+##'   the plots. See [graphics::par()] section **Color Specification**. This is
+##'   passed to the individual plotting functions, and therefore affects the
+##'   points of all plots.
+##' @param line_col colour specification for the 1:1 line in the QQ plot and the
+##'   reference line in the residuals vs linear predictor plot.
 ##' @param ... arguments passed to [cowplot::plot_grid()], except for `align`
-##'   and `axis`, which are set internally, or [qq_plot()].
+##'   and `axis`, which are set internally.
 ##'
 ##' @importFrom cowplot plot_grid
 ##'
@@ -500,13 +521,16 @@
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 ##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 ##' ## run some basic model checks
-##' appraise(mod)
+##' appraise(mod, point_col = "steelblue", point_alpha = 0.4)
 `appraise` <- function(model,
                        method = c("direct", "simulate", "normal"),
                        n_uniform = 10, n_simulate = 50,
                        type = c("deviance", "pearson", "response"),
                        n_bins = c("sturges", "scott", "fd"),
-                       ncol = 2, level = 0.9, alpha = 0.2,
+                       ncol = 2, level = 0.9,
+                       ci_col = "black", ci_alpha = 0.2,
+                       point_col = "black", point_alpha = 1,
+                       line_col = "red",
                        ...) {
     ## process args
     method <- match.arg(method)
@@ -521,11 +545,16 @@
     }
 
     plt1 <- qq_plot(model, method = method, type = type, n_uniform = n_uniform,
-                    n_simulate = n_simulate, level = level, alpha = alpha, ...)
-    plt2 <- residuals_linpred_plot(model, type = type)
+                    n_simulate = n_simulate, level = level, ci_alpha = ci_alpha,
+                    point_col = point_col, point_alpha = point_alpha,
+                    line_col = line_col)
+    plt2 <- residuals_linpred_plot(model, type = type, point_col = point_col,
+                                   point_alpha = point_alpha,
+                                   line_col = line_col)
     plt3 <- residuals_hist_plot(model, type = type, n_bins = n_bins,
                                 subtitle = NULL)
-    plt4 <- observed_fitted_plot(model, subtitle = NULL)
+    plt4 <- observed_fitted_plot(model, subtitle = NULL, point_col = point_col,
+                                 point_alpha = point_alpha)
 
     plot_grid(plt1, plt2, plt3, plt4, ncol = ncol, align = "hv",
               axis = "lrtb", ...)

@@ -19,9 +19,11 @@ qq_plot(model, ...)
   title = NULL,
   subtitle = NULL,
   caption = NULL,
-  alpha = 0.2,
-  qq_point_col = "black",
-  qq_line_col = "red",
+  ci_col = "black",
+  ci_alpha = 0.2,
+  point_col = "black",
+  point_alpha = 1,
+  line_col = "red",
   ...
 )
 }
@@ -59,12 +61,13 @@ supplied, a suitable label will be generated.}
 \item{caption}{character or expression; the plot caption. See
 \code{\link[ggplot2:labs]{ggplot2::labs()}}.}
 
-\item{alpha}{numeric; the level of alpha transparency for the reference
+\item{ci_col, ci_alpha}{fill colour and alpha transparency for the reference
 interval when \code{method = "simulate"}.}
 
-\item{qq_point_col}{colour used to draw the points on the QQ plot.}
+\item{point_col, point_alpha}{colour and alpha transparency for points on the
+QQ plot.}
 
-\item{qq_line_col}{colour used to draw the 1:1 reference line.}
+\item{line_col}{colour used to draw the 1:1 reference line.}
 }
 \description{
 Quantile-quantile plot of model residuals
@@ -87,7 +90,8 @@ qq_plot(m)
 
 ## Alternatively use simulate new data from the model, which
 ## allows construction of reference intervals for the Q-Q plot
-qq_plot(m, method = "simulate")
+qq_plot(m, method = "simulate", point_col = "steelblue",
+        point_alpha = 0.4)
 
 ## ... or use the usual normality assumption
 qq_plot(m, method = "normal")
