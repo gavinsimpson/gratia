@@ -20,6 +20,8 @@ qq_plot(model, ...)
   subtitle = NULL,
   caption = NULL,
   alpha = 0.2,
+  qq_point_col = "black",
+  qq_line_col = "red",
   ...
 )
 }
@@ -59,6 +61,10 @@ supplied, a suitable label will be generated.}
 
 \item{alpha}{numeric; the level of alpha transparency for the reference
 interval when \code{method = "simulate"}.}
+
+\item{qq_point_col}{colour used to draw the points on the QQ plot.}
+
+\item{qq_line_col}{colour used to draw the 1:1 reference line.}
 }
 \description{
 Quantile-quantile plot of model residuals
