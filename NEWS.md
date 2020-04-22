@@ -15,6 +15,9 @@
 
 * `data_slice()` can generate data for a 1-d slice (a single variable varying).
 
+* The colour of the points and reference line in `qq_plot()` can now be
+  specified via arguments `qq_point_col` and `qq_line_col`.
+
 ## User visible changes
 
 * `datagen()` is now an *internal* function and is no longer exported. Use
