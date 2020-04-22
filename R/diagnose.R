@@ -32,6 +32,8 @@
 ##'   supplied, a suitable label will be generated.
 ##' @param alpha numeric; the level of alpha transparency for the reference
 ##'   interval when `method = "simulate"`.
+##' @param qq_point_col colour used to draw the points on the QQ plot.
+##' @param qq_line_col colour used to draw the 1:1 reference line.
 ##'
 ##' @inheritParams draw.evaluated_smooth
 ##'
@@ -71,7 +73,9 @@
                           level = 0.9,
                           ylab = NULL, xlab = NULL,
                           title = NULL, subtitle = NULL, caption = NULL,
-                          alpha = 0.2, ...) {
+                          alpha = 0.2,
+                          qq_point_col = "black",
+                          qq_line_col = "red", ...) {
     method <- match.arg(method)         # what method for the QQ plot?
 
     if (level <= 0 || level >= 1) {
@@ -120,7 +124,7 @@
     plt <- ggplot(df, aes_string(x = "theoretical", y = "residuals"))
 
     ## add reference line
-    plt <- plt + geom_abline(slope = 1, intercept = 0, col = "red")
+    plt <- plt + geom_abline(slope = 1, intercept = 0, col = qq_line_col)
 
     ## add reference interval
     if (identical(method, "simulate")) {
@@ -130,7 +134,7 @@
     }
 
     ## add point layer
-    plt <- plt + geom_point()
+    plt <- plt + geom_point(colour = qq_point_col)
 
     ## add labels
     plt <- plt + labs(title = title, subtitle = subtitle, caption = caption,
