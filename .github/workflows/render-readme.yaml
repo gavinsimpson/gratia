@@ -1,8 +1,7 @@
 on:
   push:
     paths:
-      - examples/README.Rmd
-      - examples/*yaml
+      - README.Rmd
 
 name: Render README
 
@@ -17,7 +16,7 @@ jobs:
       - name: Install rmarkdown
         run: Rscript -e 'install.packages("rmarkdown")'
       - name: Render README
-        run: Rscript -e 'rmarkdown::render("examples/README.Rmd")'
+        run: Rscript -e 'rmarkdown::render("README.Rmd")'
       - name: Commit results
         run: |
           git commit examples/README.md -m 'Re-build README.Rmd' || echo "No changes to commit"
