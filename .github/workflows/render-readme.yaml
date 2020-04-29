@@ -10,14 +10,20 @@ jobs:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: r-lib/actions/setup-r@v1
-      - uses: r-lib/actions/setup-pandoc@v1
+      
+      - uses: r-lib/actions/setup-r@master
+      
+      - uses: r-lib/actions/setup-pandoc@master
+      
       - name: Install rmarkdown
         run: Rscript -e 'install.packages("rmarkdown")'
+
       - name: Install required packages
         run: Rscript -e 'install.packages("gratia")'
+
       - name: Render README
         run: Rscript -e 'rmarkdown::render("README.Rmd")'
+
       - name: Commit results
         run: |
           git config --local user.email "action@github.com"
