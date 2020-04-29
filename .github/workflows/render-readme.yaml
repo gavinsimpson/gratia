@@ -3,7 +3,7 @@ on:
     paths:
       - README.Rmd
 
-name: Render README
+name: Render-README
 
 jobs:
   render:
