@@ -333,6 +333,7 @@ test_that("derivatives() returns derivatives with simultaneous intervals for all
 })
 
 test_that("derivatives() works for factor by smooths issue 47", {
+    skip_on_os("mac")
     set.seed(1)
     dat <- gamSim(4, n = 1000, verbose = FALSE)
     m <- gam(y ~ fac + s(x2, by = fac), data = dat, method = "REML")

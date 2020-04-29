@@ -86,6 +86,7 @@ test_that("draw.gam works with select and parametric", {
 })
 
 test_that("draw.evaluated_2d_smooth() plots the smooth & SE", {
+    skip_on_os("mac")
     sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
     plt <- draw(sm)
     expect_doppelganger("draw 2d smooth", plt)
@@ -110,6 +111,7 @@ test_that("draw.gam() can draw partial residuals", {
 })
 
 test_that("draw.gam() plots an AM with a single 2d smooth", {
+    skip_on_os("mac")
     plt <- draw(m2)
     expect_doppelganger("draw AM with 2d smooth", plt)
 
