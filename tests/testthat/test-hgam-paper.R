@@ -33,6 +33,7 @@ daphnia_test  <- subset(zooplankton, year%%2==1 & taxon=="D. mendotae")
 test_that("draw() can plot CO2 model 1", {
     skip_on_cran()
     skip_on_travis()
+    skip_on_ci()
     CO2_mod1 <- gam(log(uptake) ~ s(log(conc), k = 5, bs = "tp") +
                         s(Plant_uo, k = 12, bs = "re"),
                     data = CO2, method = "REML", family = gaussian(),
@@ -44,6 +45,7 @@ test_that("draw() can plot CO2 model 1", {
 test_that("draw() can plot CO2 model 2", {
     skip_on_cran()
     skip_on_travis()
+    skip_on_ci()
     suppressWarnings(
         CO2_mod2 <- gam(log(uptake) ~ s(log(conc), k = 5, m = 2) +
                             s(log(conc), Plant_uo, k = 5,  bs = "fs", m = 2),
@@ -58,6 +60,7 @@ test_that("draw() can plot CO2 model 2", {
 test_that("draw() can plot CO2 model 3", {
     skip_on_cran()
     skip_on_travis()
+    skip_on_ci()
     CO2_mod3 <- gam(log(uptake) ~ s(log(conc), k = 5, m = 2, bs = "tp") +
                         s(log(conc), by = Plant_uo, k = 5, m = 1, bs = "tp") +
                         s(Plant_uo, bs = "re", k = 12),
@@ -70,6 +73,7 @@ test_that("draw() can plot CO2 model 3", {
 test_that("draw() can plot CO2 model 4", {
     skip_on_cran()
     skip_on_travis()
+    skip_on_ci()
     CO2_mod4 <- gam(log(uptake) ~ s(log(conc), Plant_uo, k=5, bs="fs", m=2),
                     data=CO2, method="REML",
                     control = ctrl)
@@ -92,6 +96,7 @@ test_that("draw() can plot CO2 model 5", {
 test_that("draw() can plot bird_move model 1", {
     skip_on_cran()
     skip_on_travis()
+    skip_on_ci()
     bird_mod1 <- gam(count ~ te(week, latitude, bs=c("cc", "tp"), k = c(10, 10)),
                      data = bird_move, method = "REML", family = poisson(),
                      knots = list(week = c(0, 52)),
@@ -103,6 +108,7 @@ test_that("draw() can plot bird_move model 1", {
 test_that("draw() can plot bird_move model 2", {
     skip_on_cran()
     skip_on_travis()
+    skip_on_ci()
     bird_mod2 <- gam(count ~ te(week, latitude, bs=c("cc", "tp"),
                                 k = c(10, 10), m = 2) +
                          t2(week, latitude, species, bs = c("cc", "tp", "re"),
@@ -117,6 +123,7 @@ test_that("draw() can plot bird_move model 2", {
 test_that("draw() can plot bird_move model 3", {
     skip_on_cran()
     skip_on_travis()
+    skip_on_ci()
     bird_mod3 <- gam(count ~ species +
                          te(week, latitude, bs = c("cc", "tp"),
                             k = c(10, 10), m = 2) +
@@ -132,6 +139,7 @@ test_that("draw() can plot bird_move model 3", {
 test_that("draw() throws message with bird_move model 4", {
     skip_on_cran()
     skip_on_travis()
+    skip_on_ci()
     bird_mod4 <- gam(count ~ t2(week, latitude, species, bs = c("cc", "tp", "re"),
                                 k = c(10, 10, 6), m = c(2, 2, 2)),
                      data = bird_move, method = "REML", family = poisson(),
@@ -145,6 +153,7 @@ test_that("draw() throws message with bird_move model 4", {
 test_that("draw() can plot bird_move model 5", {
     skip_on_cran()
     skip_on_travis()
+    skip_on_ci()
     bird_mod5 <- gam(count ~ species +
                          te(week, latitude, by = species,
                             bs = c("cc", "tp"), k = c(10, 10), m = 2),
@@ -158,6 +167,7 @@ test_that("draw() can plot bird_move model 5", {
 test_that("draw() can plot zoo_comm_mod model 4", {
     skip_on_cran()
     skip_on_travis()
+    skip_on_ci()
     zoo_comm_mod4 <- gam(density_adj ~ s(day, taxon,
                                          bs="fs",
                                          k=10,
@@ -174,6 +184,7 @@ test_that("draw() can plot zoo_comm_mod model 4", {
 
 test_that("draw() can plot zoo_comm_mod model 5", {
     skip_on_cran()
+    skip_on_ci()
     zoo_comm_mod5 <- gam(density_adj ~ s(day, by=taxon,
                                      k=10, bs="cc") +
                                    s(taxon, bs="re") +
