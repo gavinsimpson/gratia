@@ -32,13 +32,13 @@ Graceful 'ggplot'-based graphics and utility functions for working with generali
 
 ## Features
 
-```{r draw-gam-figure, dev = "png", fig.height = 6, fig.width = 9, echo = FALSE, fig.show = "hide", message = FALSE}
+```{r draw-gam-figure, dev = "png", fig.height = 6, fig.width = 9, dpi = 120, echo = FALSE, fig.show = "hide", message = FALSE}
 df <- gamSim(eg = 1, n = 400, verbose = FALSE)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, model = "REML")
 draw(m)
 ```
 
-```{r appraise-figure, dev = "png", fig.height = 6, fig.width = 9, echo = FALSE, fig.show = "hide"}
+```{r appraise-figure, dev = "png", fig.height = 6, fig.width = 9, dpi = 120, echo = FALSE, fig.show = "hide"}
 appraise(m)
 ```
 
