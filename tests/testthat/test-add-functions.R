@@ -27,6 +27,12 @@ test_that("add_fitted works for a GAM with type = 'terms'", {
                        ".s(x0)", ".s(x1)", ".s(x2)", ".s(x3)"))
 })
 
+test_that("add_fitted works for a GAM with se.fit = TRUE", {
+    expect_silent(df <- add_fitted(data, m, se.fit = TRUE))
+    expect_s3_class(df, "tbl_df")
+    expect_named(df, c("y", "x0", "x1", "x2", "x3", ".value"))
+})
+
 test_that("prefix works for a GAM with type = 'terms'", {
     expect_silent(df <- add_fitted(data, m, type = 'terms', prefix = ".."))
     expect_s3_class(df, "tbl_df")
