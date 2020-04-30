@@ -7,7 +7,7 @@ gratia
 
 [![R build
 status](https://github.com/gavinsimpson/gratia/workflows/R-CMD-check/badge.svg)](https://github.com/gavinsimpson/gratia/actions)
-<!-- badges: end --> [![Build
+[![Build
 Status](https://travis-ci.org/gavinsimpson/gratia.svg?branch=master)](https://travis-ci.org/gavinsimpson/gratia)
 [![Build
 status](https://ci.appveyor.com/api/projects/status/w7pj8773t5b8fxkb/branch/master?svg=true)](https://ci.appveyor.com/project/gavinsimpson/gratia/branch/master)
