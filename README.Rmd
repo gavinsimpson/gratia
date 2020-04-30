@@ -31,7 +31,7 @@ Graceful 'ggplot'-based graphics and utility functions for working with generali
 
 ## Features
 
-```{r draw-gam-figure, dev = "png", fig.height = 6, fig.width = 7}
+```{r draw-gam-figure, dev = "png", fig.height = 6, fig.width = 7, echo = FALSE, fig.show = "hide"}
 library('mgcv')
 library('gratia')
 df <- gamSim(eg = 1, n = 400, verbose = FALSE)
@@ -39,7 +39,7 @@ m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, model = "REML")
 draw(m)
 ```
 
-```{r appraise-figure, dev = "png", fig.height = 6, fig.width = 7}
+```{r appraise-figure, dev = "png", fig.height = 6, fig.width = 7, echo = FALSE, fig.show = "hide"}
 appraise(m)
 ```
 
