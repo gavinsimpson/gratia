@@ -27,9 +27,6 @@ smooths.
 Features
 --------
 
-    #> Loading required package: nlme
-    #> This is mgcv 1.8-31. For overview type 'help("mgcv-package")'.
-
 The main features of *gratia* are currently
 
 -   A *ggplot2*-based replacement for `mgcv:::plot.gam()`:
