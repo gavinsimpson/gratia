@@ -31,7 +31,7 @@ Graceful 'ggplot'-based graphics and utility functions for working with generali
 
 ## Features
 
-```{r draw-gam-figure, dev = "png", fig.height = 6, fig.width = 7, echo = FALSE, fig.show = "hide"}
+```{r draw-gam-figure, dev = "png", fig.height = 6, fig.width = 7, echo = FALSE, fig.show = "hide", message = FALSE}
 library('mgcv')
 library('gratia')
 df <- gamSim(eg = 1, n = 400, verbose = FALSE)
