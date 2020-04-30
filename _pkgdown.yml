@@ -1,3 +1,7 @@
+home:
+  title: An R package for working with generalized additive models
+  description: Graceful 'ggplot'-based graphics and utility functions for working with generalized additive models (GAMs) fitted using the 'mgcv' package.
+
 template:
   params:
     bootswatch: simplex
