@@ -27,19 +27,8 @@ smooths.
 Features
 --------
 
-    library('mgcv')
     #> Loading required package: nlme
     #> This is mgcv 1.8-31. For overview type 'help("mgcv-package")'.
-    library('gratia')
-    df <- gamSim(eg = 1, n = 400, verbose = FALSE)
-    m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, model = "REML")
-    draw(m)
-
-<img src="man/figures/README-draw-gam-figure-1.png" width="100%" />
-
-    appraise(m)
-
-<img src="man/figures/README-appraise-figure-1.png" width="100%" />
 
 The main features of *gratia* are currently
 
