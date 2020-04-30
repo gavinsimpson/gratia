@@ -62,9 +62,6 @@
 
     ## check if pred_vals is a list
     if (is.list(pred_vals)) {
-        if(! "fit" %in% names(pred_vals)) {
-            stop("'predict' returned something that can't be handled.")
-        }
         pred_vals <- pred_vals[["fit"]]
     }
 
