@@ -34,6 +34,21 @@ test_that("prefix works for a GAM with type = 'terms'", {
                        "..s(x0)", "..s(x1)", "..s(x2)", "..s(x3)"))
 })
 
+test_that("add_fitted.gam fails if predict returns list without fit", {
+    m_lm <- lm(y ~ x0 + x1 + x2 + x3, data = data)
+    class(m_lm) <- c("my_lm", class(m_lm))
+    `predict.my_lm` <- function(object, ...) {
+        class(object) <- class(object)[-1]
+        out <- vector("list", length = 2)
+        out[[1]] <- predict(object)
+        out[[2]] <- "test"
+        out
+    }
+    expect_error(add_fitted.gam(data, m_lm),
+                 "'predict' returned something that can't be handled.",
+                 fixed = TRUE)
+})
+
 test_that("add_residuals works for a GAM", {
     expect_silent(df <- add_residuals(data, m, type = "pearson"))
     expect_s3_class(df, "tbl_df")
