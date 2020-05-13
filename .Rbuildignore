@@ -11,3 +11,5 @@
 ^cran-comments\.md$
 ^appveyor\.yml$
 ^\.github$
+^README.Rmd$
+
