@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Add residuals from a model to a data frame — add_residuals • gratia</title>
+<title>Is a model term a factor (categorical)? — is_factor_term • gratia</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,11 @@
 
 
 
-<meta property="og:title" content="Add residuals from a model to a data frame — add_residuals" />
-<meta property="og:description" content="Add residuals from a model to a data frame" />
+<meta property="og:title" content="Is a model term a factor (categorical)? — is_factor_term" />
+<meta property="og:description" content="Given the name (a term label) of a term in a model, identify if the term is a
+factor term or numeric. This is useful when considering interactions, where
+terms like fac1:fac2 or num1:fac1 may be requested by the user. Only for
+terms of the type fac1:fac2 will this function return TRUE." />
 <meta property="og:image" content="https://gavinsimpson.github.io/gratia/reference/figures/README-draw-gam-figure-1.png" />
 <meta property="og:image:alt" content="Plot produced by draw() of 4 smooth functions from a fitted generalized additive model" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -116,44 +119,58 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Add residuals from a model to a data frame</h1>
-    <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/add-methods.R'><code>R/add-methods.R</code></a></small>
-    <div class="hidden name"><code>add_residuals.Rd</code></div>
+    <h1>Is a model term a factor (categorical)?</h1>
+    <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/utililties.R'><code>R/utililties.R</code></a></small>
+    <div class="hidden name"><code>is_factor_term.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Add residuals from a model to a data frame</p>
+    <p>Given the name (a term label) of a term in a model, identify if the term is a
+factor term or numeric. This is useful when considering interactions, where
+terms like <code>fac1:fac2</code> or <code>num1:fac1</code> may be requested by the user. Only for
+terms of the type <code>fac1:fac2</code> will this function return <code>TRUE</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>add_residuals</span>(<span class='no'>data</span>, <span class='no'>model</span>, <span class='kw'>value</span> <span class='kw'>=</span> <span class='st'>".residual"</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>is_factor_term</span>(<span class='no'>object</span>, <span class='no'>term</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for terms</span>
+<span class='fu'>is_factor_term</span>(<span class='no'>object</span>, <span class='no'>term</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for gam</span>
+<span class='fu'>is_factor_term</span>(<span class='no'>object</span>, <span class='no'>term</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for bam</span>
+<span class='fu'>is_factor_term</span>(<span class='no'>object</span>, <span class='no'>term</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for gamm</span>
+<span class='fu'>is_factor_term</span>(<span class='no'>object</span>, <span class='no'>term</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for list</span>
+<span class='fu'>is_factor_term</span>(<span class='no'>object</span>, <span class='no'>term</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>data</th>
-      <td><p>a data frame containing values for the variables used to fit the
-model. Passed to <a href='stats::residuals()'>stats::residuals()</a> as <code>newdata</code>.</p></td>
+      <th>object</th>
+      <td><p>an R object on which method dispatch is performed</p></td>
     </tr>
     <tr>
-      <th>model</th>
-      <td><p>a fitted model for which a <a href='stats::residuals()'>stats::residuals()</a> method is
-available. S3 method dispatch is performed on the <code>model</code> argument.</p></td>
-    </tr>
-    <tr>
-      <th>value</th>
-      <td><p>character; the name of the variable in which model residuals
-will be stored.</p></td>
+      <th>term</th>
+      <td><p>character; the name of a model term, in the sense of
+<code><a href='https://rdrr.io/r/base/attr.html'>attr(terms(object), "term.labels")</a></code>. Currently not checked to see if the
+term exists in the model.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>additional arguments passed to methods.</p></td>
+      <td><p>arguments passed to other methods.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data frame (tibble) formed from <code>data</code> and residuals from <code>model</code>.</p>
+    <p>A logical: <code>TRUE</code> if and only if all variables involved in the term
+are factors, otherwise <code>FALSE</code>.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

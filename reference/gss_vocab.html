@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Add residuals from a model to a data frame — add_residuals • gratia</title>
+<title>Data from the General Social Survey (GSS) from the National Opinion Research
+Center of the University of Chicago — gss_vocab • gratia</title>
 
 
 <!-- jquery -->
@@ -39,8 +40,10 @@
 
 
 
-<meta property="og:title" content="Add residuals from a model to a data frame — add_residuals" />
-<meta property="og:description" content="Add residuals from a model to a data frame" />
+<meta property="og:title" content="Data from the General Social Survey (GSS) from the National Opinion Research
+Center of the University of Chicago — gss_vocab" />
+<meta property="og:description" content="A subset of the data from the carData::GSSvocab dataset from the
+carData package, containing observations from 2016 only." />
 <meta property="og:image" content="https://gavinsimpson.github.io/gratia/reference/figures/README-draw-gam-figure-1.png" />
 <meta property="og:image:alt" content="Plot produced by draw() of 4 smooth functions from a fitted generalized additive model" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -116,44 +119,30 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Add residuals from a model to a data frame</h1>
-    <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/add-methods.R'><code>R/add-methods.R</code></a></small>
-    <div class="hidden name"><code>add_residuals.Rd</code></div>
+    <h1>Data from the General Social Survey (GSS) from the National Opinion Research
+Center of the University of Chicago</h1>
+    <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/datasets.R'><code>R/datasets.R</code></a></small>
+    <div class="hidden name"><code>gss_vocab.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Add residuals from a model to a data frame</p>
+    <p>A subset of the data from the <code>carData::GSSvocab</code> dataset from the
+<code>carData</code> package, containing observations from 2016 only.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>add_residuals</span>(<span class='no'>data</span>, <span class='no'>model</span>, <span class='kw'>value</span> <span class='kw'>=</span> <span class='st'>".residual"</span>, <span class='no'>...</span>)</pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>data</th>
-      <td><p>a data frame containing values for the variables used to fit the
-model. Passed to <a href='stats::residuals()'>stats::residuals()</a> as <code>newdata</code>.</p></td>
-    </tr>
-    <tr>
-      <th>model</th>
-      <td><p>a fitted model for which a <a href='stats::residuals()'>stats::residuals()</a> method is
-available. S3 method dispatch is performed on the <code>model</code> argument.</p></td>
-    </tr>
-    <tr>
-      <th>value</th>
-      <td><p>character; the name of the variable in which model residuals
-will be stored.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>additional arguments passed to methods.</p></td>
-    </tr>
-    </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>A data frame (tibble) formed from <code>data</code> and residuals from <code>model</code>.</p>
+    <p>A data frame with 1858 rows and 3 variables:</p><ul>
+<li><p><code>vocab</code>: numeric; the number of words out of 10 correct on a vocabulary
+test.</p></li>
+<li><p><code>nativeBorn</code>: factor; Was the respondent born in the US? A factor with
+levels <code>no</code> and <code>yes</code>.</p></li>
+<li><p><code>ageGroup</code>: factor; grouped age of the respondent with levels <code>18-29</code>
+<code>30-39</code>, <code>40-49</code>, <code>50-59</code>, and <code>60+</code>.##'</p></li>
+</ul>
+
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
