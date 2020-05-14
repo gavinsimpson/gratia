@@ -32,10 +32,20 @@
   `residuals_linpred_plot()`, and `residuals_hist_plot()`, which also now take
   the new arguments were applicable.
 
+* Added utility functions `is_factor_term()` and `term_variables()` for working
+  with models. `is_factor_term()` identifies is the named term is a factor using
+  information from the `terms()` object of the fitted model. `term_variables()`
+  returns a character vector of variable names that are involved in a model
+  term. These are strictly for working with parametric terms in models.
+
 ## User visible changes
 
 * `datagen()` is now an *internal* function and is no longer exported. Use
   `data_slice()` instead.
+
+* `evaluate_parametric_terms()` is now much stricter and can only evaluate main
+  effect terms, i.e. those whose order, as stored in the `terms` object of the
+  model is `1`.
 
 ## Bug fixes
 
@@ -48,6 +58,10 @@
   smooths. These issues have been fixed, but the behaviour of `datagen()` has
   changed, and the function is now not intended for use by users.
 
+* Fixed an issue where in models terms of the form `factor1:factor2` were
+  incorrectly identified as being numeric parametric terms.
+  [#68](https://github.com/gavinsimpson/gratia/issues/68)
+
 # gratia 0.3.1
 
 ## New features
@@ -55,7 +69,8 @@
 * New functions `link()` and `inv_link()` to access the link function and its
   inverse from fitted models and family functions.
   
-  Methods for classes: `"glm"`, `"gam"`, `"bam"`, `"gamm"` currently. [#58](https://github.com/gavinsimpson/gratia/issues/58)
+  Methods for classes: `"glm"`, `"gam"`, `"bam"`, `"gamm"` currently.
+  [#58](https://github.com/gavinsimpson/gratia/issues/58)
 
 * Adds explicit `family()` methods for objects of classes `"gam"`, `"bam"`, and
   `"gamm"`.
