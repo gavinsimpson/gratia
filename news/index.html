@@ -145,14 +145,15 @@
 </ul>
 <p>These are passed on to <code><a href="../reference/qq_plot.html">qq_plot()</a></code>, <code><a href="../reference/observed_fitted_plot.html">observed_fitted_plot()</a></code>, <code><a href="../reference/residuals_linpred_plot.html">residuals_linpred_plot()</a></code>, and <code><a href="../reference/residuals_hist_plot.html">residuals_hist_plot()</a></code>, which also now take the new arguments were applicable.</p>
 </li>
+<li><p>Added utility functions <code><a href="../reference/is_factor_term.html">is_factor_term()</a></code> and <code><a href="../reference/term_variables.html">term_variables()</a></code> for working with models. <code><a href="../reference/is_factor_term.html">is_factor_term()</a></code> identifies is the named term is a factor using information from the <code><a href="https://rdrr.io/r/stats/terms.html">terms()</a></code> object of the fitted model. <code><a href="../reference/term_variables.html">term_variables()</a></code> returns a character vector of variable names that are involved in a model term. These are strictly for working with parametric terms in models.</p></li>
 </ul>
 </div>
 <div id="user-visible-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#user-visible-changes" class="anchor"></a>User visible changes</h2>
 <ul>
-<li>
-<code><a href="../reference/datagen.html">datagen()</a></code> is now an <em>internal</em> function and is no longer exported. Use <code><a href="../reference/data_slice.html">data_slice()</a></code> instead.</li>
+<li><p><code><a href="../reference/datagen.html">datagen()</a></code> is now an <em>internal</em> function and is no longer exported. Use <code><a href="../reference/data_slice.html">data_slice()</a></code> instead.</p></li>
+<li><p><code>evaluate_parametric_terms()</code> is now much stricter and can only evaluate main effect terms, i.e. those whose order, as stored in the <code>terms</code> object of the model is <code>1</code>.</p></li>
 </ul>
 </div>
 <div id="bug-fixes" class="section level2">
@@ -161,6 +162,7 @@
 <ul>
 <li><p>The <code><a href="../reference/draw.html">draw()</a></code> method for <code><a href="../reference/derivatives.html">derivatives()</a></code> was not getting the x-axis label for factor by smooths correctly, and instead was using <code>NA</code> for the second and subsequent levels of the factor.</p></li>
 <li><p>The <code><a href="../reference/datagen.html">datagen()</a></code> method for class <code>"gam"</code> couldn’t possibly have worked for anything but the simplest models and would fail even with simple factor by smooths. These issues have been fixed, but the behaviour of <code><a href="../reference/datagen.html">datagen()</a></code> has changed, and the function is now not intended for use by users.</p></li>
+<li><p>Fixed an issue where in models terms of the form <code>factor1:factor2</code> were incorrectly identified as being numeric parametric terms. <a href="https://github.com/gavinsimpson/gratia/issues/68"><a href='https://github.com/gavinsimpson/gratia/issues/68'>#68</a></a></p></li>
 </ul>
 </div>
 </div>
