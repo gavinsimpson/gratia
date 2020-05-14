@@ -805,3 +805,86 @@
     out <- TRUE
     out
 }
+
+##' Is a model term a factor (categorical)?
+##'
+##' Given the name (a term label) of a term in a model, identify if the term is a
+##' factor term or numeric. This is useful when considering interactions, where
+##' terms like `fac1:fac2` or `num1:fac1` may be requested by the user. Only for
+##' terms of the type `fac1:fac2` will this function return `TRUE`.
+##'
+##' @param object an R object on which method dispatch is performed
+##' @param term character; the name of a model term, in the sense of
+##'   `attr(terms(object), "term.labels")`. Currently not checked to see if the
+##'   term exists in the model.
+##'
+##' @return A logical: `TRUE` if and only if all variables involved in the term
+##'   are factors, otherwise `FALSE`.
+##'
+##' @keywords internal
+##' @noRd
+`is_factor_term` <- function(object, term, ...) {
+    UseMethod("is_factor_term", object)
+}
+
+##' @rdname is_factor_term
+##' @noRd
+`is_factor_term.terms` <- function(object, term, ...) {
+    facs <- attr(object, "factors")[ , term]
+    take <- names(facs)[as.logical(facs)]
+    data_types <- attr(object, 'dataClasses')[take]
+    all(data_types == "factor")
+}
+
+##' @rdname is_factor_term
+##' @noRd
+`is_factor_term.gam` <- function(object, term, ...) {
+    object <- terms(object)
+    is_factor_term(object, term, ...)
+}
+
+##' @rdname is_factor_term
+##' @noRd
+`is_factor_term.bam` <- function(object, term, ...) {
+    object <- terms(object)
+    is_factor_term(object, term, ...)
+}
+
+##' Names of variables involved in a specified model term
+##'
+##' Given the name (a term label) of a term in a model, returns the names
+##' of the variables involved in ther term.
+##'
+##' @param object an R object on which method dispatch is performed
+##' @param term character; the name of a model term, in the sense of
+##'   `attr(terms(object), "term.labels")`. Currently not checked to see if the
+##'   term exists in the model.
+##'
+##' @return A character vector of variable names.
+##'
+##' @keywords internal
+##' @noRd
+`term_variables` <- function(object, term, ...) {
+    UseMethod("terms_variables", object)
+}
+
+##' @rdname term_variables
+##' @noRd
+`term_variables.terms` <- function(object, term, ...) {
+    facs <- attr(object, "factors")[ , term]
+    names(facs)[as.logical(facs)]
+}
+
+##' @rdname term_variables
+##' @noRd
+`term_variables.gam` <- function(object, term, ...) {
+    object <- terms(object)
+    term_variables(object, term, ...)
+}
+
+##' @rdname term_variables
+##' @noRd
+`term_variables.bam` <- function(object, term, ...) {
+    object <- terms(object)
+    term_variables(object, term, ...)
+}
