@@ -17,7 +17,7 @@
 }
 \arguments{
 \item{object}{a fitted model. Models fitted by \code{\link[mgcv:gam]{mgcv::gam()}}, \code{\link[mgcv:bam]{mgcv::bam()}},
-and \code{\link[mgcv:gamm]{mgcv::gamm()}}.}
+\code{\link[mgcv:gamm]{mgcv::gamm()}}, and \code{\link[gamm4:gamm4]{gamm4::gamm4()}} are currently supported.}
 
 \item{...}{arguments passed to other methods.}
 }

@@ -47,7 +47,8 @@ inv_link(object, ...)
 }
 \arguments{
 \item{object}{a family object or a fitted model from which to extract the
-family object.}
+family object.  Models fitted by \code{\link[mgcv:gam]{mgcv::gam()}}, \code{\link[mgcv:bam]{mgcv::bam()}},
+\code{\link[mgcv:gamm]{mgcv::gamm()}}, and \code{\link[gamm4:gamm4]{gamm4::gamm4()}} are currently supported.}
 
 \item{...}{arguments passed to other methods.}
 
