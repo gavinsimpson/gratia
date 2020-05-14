@@ -12,22 +12,22 @@ m <- gam(vocab ~ nativeBorn * ageGroup, data = gss_vocab, method = 'ML')
 
 test_that("evaluate_parametric_terms() works with factor terms", {
     ## evaluate parametric terms directly
-    term <- "nativeBorn:ageGroup"
+    term <- "nativeBorn"
     expect_silent(para <- evaluate_parametric_term(m, term = term))
     expect_s3_class(para, "evaluated_parametric_term")
     expect_s3_class(para, "tbl_df")
     expect_s3_class(para, "tbl")
     expect_s3_class(para, "data.frame")
     expect_named(para,
-                 c("term", "type", "nativeBorn", "ageGroup", "partial",
+                 c("term", "type", "value", "partial",
                    "se", "upper", "lower"))
 
     expect_error(evaluate_parametric_term(m, term = "foo"),
                  "Term is not in the parametric part of model: <foo>",
                  fixed = TRUE)
 
-    expect_warning(evaluate_parametric_term(m, term = c('x0', 'x1')),
-                   "More than one `term` requested; using the first <x0>",
+    expect_warning(evaluate_parametric_term(m, term = c('nativeBorn', 'ageGroup')),
+                   "More than one `term` requested; using the first <nativeBorn>",
                    fixed = TRUE)
 })
 
