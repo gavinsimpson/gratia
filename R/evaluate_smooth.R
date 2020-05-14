@@ -569,33 +569,55 @@
     }
 
     mf <- model.frame(object)  # data used to fit model
-    is_fac <- is.factor(mf[[term]]) # is term a factor?
+    
+    ## is_fac <- is.factor(mf[[term]]) # is term a factor?
+    is_fac <- is_factor_term(tt, term)
 
     ## match the specific term, with term names mgcv actually uses
     ## for example in a model with multiple linear predictors, terms in
     ## nth linear predictor (for n > 1) get appended .{n-1}  
     ind <- match(term, vars)
-
-    ## take the actual mgcv version of the names for the `terms` argument
-    evaluated <- as.data.frame(predict(object, newdata = mf, type = 'terms',
-                                       terms = mgcv_names[ind], se = TRUE,
-                                       unconditional = unconditional))
-    evaluated <- setNames(evaluated, c("partial", "se"))
-    evaluated <- as_tibble(evaluated)
-
+    
     if (is_fac) {
-        levs <- levels(mf[, term])
-        newd <- setNames(data.frame(fac = factor(levs, levels = levs)), "value")
-        spl <- lapply(split(evaluated, mf[, term]), `[`, i = 1, j = )
-        evaluated <- bind_rows(spl)
+        ## check order of term; if > 1 interaction and not handled
+        ord <- attr(tt, "order")[match(term, attr(tt, "term.labels"))]
+        if (ord > 1) {
+            stop("Interaction terms are not currently supported.")
+        }
+        ## facs <- attr(tt, 'factors')[, term]
+        newd <- unique(mf[, term, drop = FALSE])
+        ## ##fac_vars <- rownames(facs)
+        ## fac_vars <- names(facs)[as.logical(facs)]
+        ## facs <- attr(tt, 'factors')[, term]
+        ## newd <- unique(mf[, names(facs)[as.logical(facs)], drop = FALSE])
+        ## ##fac_vars <- rownames(facs)
+        ## fac_vars <- names(facs)[as.logical(facs)]
+        ## ##newd <- unique(mf[, fac_vars, drop = FALSE])
+        other_vars <- setdiff(names(mf), term)
+        other_data <- as_tibble(lapply(mf[other_vars], value_closest_to_median))
+        pred_data <- exec(expand_grid, !!!list(newd, other_data))
+        evaluated <- as.data.frame(predict(object, newdata = pred_data,
+                             type = 'terms',
+                             terms = term, se = TRUE,
+                             unconditional = unconditional,
+                             newdata.guaranteed = FALSE))
+        evaluated <- setNames(evaluated, c("partial", "se"))
+        evaluated <- as_tibble(evaluated)
         nr <- NROW(evaluated)
+        newd <- setNames(newd, "value")
         evaluated <- bind_cols(term = rep(term, nr),
-                               type = rep(ifelse(is_fac, "factor", "numeric"), nr),
+                               type = rep("factor", nr),
                                newd, evaluated)
     } else {
+        ## take the actual mgcv version of the names for the `terms` argument
+        evaluated <- as.data.frame(predict(object, newdata = mf, type = 'terms',
+                                           terms = mgcv_names[ind], se = TRUE,
+                                           unconditional = unconditional))
+        evaluated <- setNames(evaluated, c("partial", "se"))
+        evaluated <- as_tibble(evaluated)
         nr <- NROW(evaluated)
         evaluated <- bind_cols(term = rep(term, nr),
-                               type = rep(ifelse(is_fac, "factor", "numeric"), nr),
+                               type = rep("numeric", nr),
                                value = mf[[term]],
                                evaluated)
     }

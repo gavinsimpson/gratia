@@ -1678,12 +1678,12 @@
 <polyline points='69.12,544.84 69.12,422.36 ' style='stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;' clip-path='url(#cpMzAuOTV8MjM0LjUyfDU0NC44NHw0MjIuMzY=)' />
 <polyline points='132.73,544.84 132.73,422.36 ' style='stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;' clip-path='url(#cpMzAuOTV8MjM0LjUyfDU0NC44NHw0MjIuMzY=)' />
 <polyline points='196.35,544.84 196.35,422.36 ' style='stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;' clip-path='url(#cpMzAuOTV8MjM0LjUyfDU0NC44NHw0MjIuMzY=)' />
-<line x1='69.12' y1='475.80' x2='69.12' y2='475.80' style='stroke-width: 1.07; stroke-linecap: butt;' clip-path='url(#cpMzAuOTV8MjM0LjUyfDU0NC44NHw0MjIuMzY=)' />
-<line x1='132.73' y1='518.12' x2='132.73' y2='496.62' style='stroke-width: 1.07; stroke-linecap: butt;' clip-path='url(#cpMzAuOTV8MjM0LjUyfDU0NC44NHw0MjIuMzY=)' />
 <line x1='196.35' y1='451.38' x2='196.35' y2='427.93' style='stroke-width: 1.07; stroke-linecap: butt;' clip-path='url(#cpMzAuOTV8MjM0LjUyfDU0NC44NHw0MjIuMzY=)' />
-<circle cx='69.12' cy='475.80' r='2.84pt' style='stroke-width: 1.42; fill: #000000;' clip-path='url(#cpMzAuOTV8MjM0LjUyfDU0NC44NHw0MjIuMzY=)' />
-<circle cx='132.73' cy='507.37' r='2.84pt' style='stroke-width: 1.42; fill: #000000;' clip-path='url(#cpMzAuOTV8MjM0LjUyfDU0NC44NHw0MjIuMzY=)' />
+<line x1='132.73' y1='518.12' x2='132.73' y2='496.62' style='stroke-width: 1.07; stroke-linecap: butt;' clip-path='url(#cpMzAuOTV8MjM0LjUyfDU0NC44NHw0MjIuMzY=)' />
+<line x1='69.12' y1='475.80' x2='69.12' y2='475.80' style='stroke-width: 1.07; stroke-linecap: butt;' clip-path='url(#cpMzAuOTV8MjM0LjUyfDU0NC44NHw0MjIuMzY=)' />
 <circle cx='196.35' cy='439.65' r='2.84pt' style='stroke-width: 1.42; fill: #000000;' clip-path='url(#cpMzAuOTV8MjM0LjUyfDU0NC44NHw0MjIuMzY=)' />
+<circle cx='132.73' cy='507.37' r='2.84pt' style='stroke-width: 1.42; fill: #000000;' clip-path='url(#cpMzAuOTV8MjM0LjUyfDU0NC44NHw0MjIuMzY=)' />
+<circle cx='69.12' cy='475.80' r='2.84pt' style='stroke-width: 1.42; fill: #000000;' clip-path='url(#cpMzAuOTV8MjM0LjUyfDU0NC44NHw0MjIuMzY=)' />
 <defs>
   <clipPath id='cpMC4wMHw3MjAuMDB8NTc2LjAwfDAuMDA='>
     <rect x='0.00' y='0.00' width='720.00' height='576.00' />
