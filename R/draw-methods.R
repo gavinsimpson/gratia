@@ -132,6 +132,8 @@
 ##' @param contour logical; should contours be draw on the plot using
 ##'   [ggplot2::geom_contour()].
 ##' @param col_contour colour specification for contour lines.
+##' @param n_contour numeric; the number of contour bins. Will result in
+##'   `n_contour - 1` contour lines being drawn. See [ggplot2::geom_contour()].
 ##'
 ##' @importFrom ggplot2 ggplot aes_string geom_raster geom_contour labs guides guide_colourbar scale_fill_distiller theme
 ##' @importFrom grid unit
@@ -141,6 +143,7 @@
 `draw.evaluated_2d_smooth` <- function(object, show = c("estimate","se"),
                                        contour = TRUE,
                                        col_contour = "#3366FF",
+                                       n_contour = NULL,
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
@@ -162,7 +165,8 @@
 
     if (isTRUE(contour)) {
         plt <- plt + geom_contour(mapping = aes_string(z = plot_var),
-                                  colour = col_contour)
+                                  colour = col_contour,
+                                  bins = n_contour)
     }
 
     ## default axis labels if none supplied
@@ -235,6 +239,8 @@
 ##' @param contour logical; should contours be draw on the plot using
 ##'   [ggplot2::geom_contour()].
 ##' @param col_contour colour specification for contour lines.
+##' @param n_contour numeric; the number of contour bins. Will result in
+##'   `n_contour - 1` contour lines being drawn. See [ggplot2::geom_contour()].
 ##' @param partial_match logical; should smooths be selected by partial matches
 ##'   with `select`? If `TRUE`, `select` can only be a single string to match
 ##'   against.
@@ -272,6 +278,9 @@
 ##' dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
 ##' m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
 ##' draw(m2, contour = FALSE)
+##'
+##' ## change the number of contours drawm
+##' draw(m2, n_contour = 5)
 `draw.gam` <- function(object,
                        parametric = NULL,
                        select = NULL,
@@ -285,6 +294,7 @@
                        rug = TRUE,
                        contour = TRUE,
                        col_contour = "#3366FF",
+                       n_contour = NULL,
                        partial_match = FALSE, ...) {
     scales <- match.arg(scales)
     S <- smooths(object)                # vector of smooth labels - "s(x)"
@@ -394,10 +404,12 @@
             }
             g[[i]] <- draw(l[[i]], rug = mf[[svar]],
                            partial_residuals = partial_residuals,
-                           contour = contour, col_contour = col_contour)
+                           contour = contour, col_contour = col_contour,
+                           n_contour = n_contour)
         } else {
             g[[i]] <- draw(l[[i]], partial_residuals = partial_residuals,
-                           contour = contour, col_contour = col_contour)
+                           contour = contour, col_contour = col_contour,
+                           n_contour = n_contour)
         }
     }
 
