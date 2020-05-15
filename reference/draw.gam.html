@@ -143,6 +143,8 @@ is used instead.</p>
   <span class='kw'>overall_uncertainty</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>dist</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
   <span class='kw'>rug</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>contour</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>col_contour</span> <span class='kw'>=</span> <span class='st'>"#3366FF"</span>,
   <span class='kw'>partial_match</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='no'>...</span>
 )</pre>
@@ -223,6 +225,15 @@ and <code>dist</code> is a distance within the unit square. See
       <td><p>logical; draw a rug plot at the botom of each plot?</p></td>
     </tr>
     <tr>
+      <th>contour</th>
+      <td><p>logical; should contours be draw on the plot using
+<code><a href='https://ggplot2.tidyverse.org/reference/geom_contour.html'>ggplot2::geom_contour()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>col_contour</th>
+      <td><p>colour specification for contour lines.</p></td>
+    </tr>
+    <tr>
       <th>partial_match</th>
       <td><p>logical; should smooths be selected by partial matches
 with <code>select</code>? If <code>TRUE</code>, <code>select</code> can only be a single string to match
@@ -253,7 +264,10 @@ typically work with <code>ggplot()</code> plots.</p>
 
 <span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m1</span>)</div><div class='img'><img src='draw.gam-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>## can add partial residuals</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m1</span>, <span class='kw'>residuals</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='img'><img src='draw.gam-2.png' alt='' width='700' height='433' /></div></pre>
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m1</span>, <span class='kw'>residuals</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='img'><img src='draw.gam-2.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>2</span>)
+<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>2</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt; Bivariate smoothing example</div><div class='input'><span class='no'>m2</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x</span>, <span class='no'>z</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>40</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>$<span class='no'>data</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m2</span>, <span class='kw'>contour</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='img'><img src='draw.gam-3.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
