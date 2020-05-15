@@ -132,7 +132,12 @@ links, such as location scale models.</p>
     <pre class="usage"><span class='fu'>link</span>(<span class='no'>object</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for family</span>
-<span class='fu'>link</span>(<span class='no'>object</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>), <span class='no'>...</span>)
+<span class='fu'>link</span>(
+  <span class='no'>object</span>,
+  <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>),
+  <span class='kw'>which_eta</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>...</span>
+)
 
 <span class='co'># S3 method for gam</span>
 <span class='fu'>link</span>(<span class='no'>object</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>), <span class='no'>...</span>)
@@ -152,7 +157,12 @@ links, such as location scale models.</p>
 <span class='fu'>inv_link</span>(<span class='no'>object</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for family</span>
-<span class='fu'>inv_link</span>(<span class='no'>object</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>), <span class='no'>...</span>)
+<span class='fu'>inv_link</span>(
+  <span class='no'>object</span>,
+  <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>),
+  <span class='kw'>which_eta</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>...</span>
+)
 
 <span class='co'># S3 method for gam</span>
 <span class='fu'>inv_link</span>(<span class='no'>object</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>), <span class='no'>...</span>)
@@ -188,6 +198,11 @@ family object.  Models fitted by <code><a href='https://rdrr.io/pkg/mgcv/man/gam
 <code>"location"</code> but <code>"scale"</code> and <code>"shape"</code> may be provided for location
 scale models.</p></td>
     </tr>
+    <tr>
+      <th>which_eta</th>
+      <td><p>numeric; the linear predictor to extract for families
+<code><a href='https://rdrr.io/pkg/mgcv/man/mvn.html'>mgcv::mvn()</a></code> and <code><a href='https://rdrr.io/pkg/mgcv/man/multinom.html'>mgcv::multinom()</a></code>.</p></td>
+    </tr>
     </table>
 
 
@@ -211,9 +226,9 @@ scale models.</p></td>
 
 <span class='fu'>link</span>(<span class='no'>mod</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='st'>"scale"</span>)</div><div class='output co'>#&gt; function (mu) 
 #&gt; log(1/mu - 0.01)
-#&gt; &lt;environment: 0x7f9cd8477638&gt;</div><div class='input'><span class='fu'>inv_link</span>(<span class='no'>mod</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='st'>"scale"</span>)</div><div class='output co'>#&gt; function (eta) 
+#&gt; &lt;environment: 0x7ff2a949a938&gt;</div><div class='input'><span class='fu'>inv_link</span>(<span class='no'>mod</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='st'>"scale"</span>)</div><div class='output co'>#&gt; function (eta) 
 #&gt; 1/(exp(eta) + 0.01)
-#&gt; &lt;environment: 0x7f9cd8477638&gt;</div></pre>
+#&gt; &lt;environment: 0x7ff2a949a938&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
