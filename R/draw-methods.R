@@ -279,7 +279,7 @@
 ##' m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
 ##' draw(m2, contour = FALSE)
 ##'
-##' ## change the number of contours drawm
+##' ## change the number of contours drawn
 ##' draw(m2, n_contour = 5)
 `draw.gam` <- function(object,
                        parametric = NULL,
