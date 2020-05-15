@@ -144,6 +144,7 @@
   <span class='kw'>show</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"estimate"</span>, <span class='st'>"se"</span>),
   <span class='kw'>contour</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>col_contour</span> <span class='kw'>=</span> <span class='st'>"#3366FF"</span>,
+  <span class='kw'>n_contour</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>xlab</span>,
   <span class='no'>ylab</span>,
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
@@ -252,6 +253,11 @@ standard error (<code>"se"</code>).</p></td>
     <tr>
       <th>col_contour</th>
       <td><p>colour specification for contour lines.</p></td>
+    </tr>
+    <tr>
+      <th>n_contour</th>
+      <td><p>numeric; the number of contour bins. Will result in
+<code>n_contour - 1</code> contour lines being drawn. See <code><a href='https://ggplot2.tidyverse.org/reference/geom_contour.html'>ggplot2::geom_contour()</a></code>.</p></td>
     </tr>
     <tr>
       <th>qq_line</th>
