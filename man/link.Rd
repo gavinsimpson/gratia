@@ -19,7 +19,12 @@
 \usage{
 link(object, ...)
 
-\method{link}{family}(object, parameter = c("location", "scale", "shape"), ...)
+\method{link}{family}(
+  object,
+  parameter = c("location", "scale", "shape"),
+  which_eta = NULL,
+  ...
+)
 
 \method{link}{gam}(object, parameter = c("location", "scale", "shape"), ...)
 
@@ -33,7 +38,12 @@ link(object, ...)
 
 inv_link(object, ...)
 
-\method{inv_link}{family}(object, parameter = c("location", "scale", "shape"), ...)
+\method{inv_link}{family}(
+  object,
+  parameter = c("location", "scale", "shape"),
+  which_eta = NULL,
+  ...
+)
 
 \method{inv_link}{gam}(object, parameter = c("location", "scale", "shape"), ...)
 
@@ -55,6 +65,9 @@ family object.  Models fitted by \code{\link[mgcv:gam]{mgcv::gam()}}, \code{\lin
 \item{parameter}{character; which parameter of the distribution. Usually
 \code{"location"} but \code{"scale"} and \code{"shape"} may be provided for location
 scale models.}
+
+\item{which_eta}{numeric; the linear predictor to extract for families
+\code{\link[mgcv:mvn]{mgcv::mvn()}} and \code{\link[mgcv:multinom]{mgcv::multinom()}}.}
 }
 \description{
 Returns the link or its inverse from an estimated model, and provides a

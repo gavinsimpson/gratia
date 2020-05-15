@@ -620,7 +620,6 @@ test_that("extract_link() works on gaulss() family objects", {
     expect_identical(f, fam$linfo[[2L]]$linkinv)
 })
 
-
 test_that("extract_link() works on gammals() family objects", {
     fam <- gammals()
     ## location parameter
@@ -783,7 +782,7 @@ test_that("extract_link() works on gevlss() family objects", {
     expect_identical(f, fam$linfo[[3L]]$linkinv)
 })
 
-test_that("extract_link() works on gammals() family objects", {
+test_that("extract_link() works on ziplss() family objects", {
     fam <- ziplss()
     ## location parameter
     ## link
@@ -805,7 +804,7 @@ test_that("extract_link() works on gammals() family objects", {
     expect_identical(f(val), fam$linfo[[1L]]$linkinv(val))
     expect_identical(f, fam$linfo[[1L]]$linkinv)
     
-    ## scale parameter
+    ## scale parameter - really the zero-inflation bit
     ## link
     f <- extract_link(fam, parameter = "scale")
     expect_type(f, "closure")
@@ -821,6 +820,68 @@ test_that("extract_link() works on gammals() family objects", {
     expect_identical(f(val), fam$linfo[[2L]]$linkinv(val))
     expect_identical(f, fam$linfo[[2L]]$linkinv)
     f <- extract_link(fam, parameter = "pi", inverse = TRUE)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[2L]]$linkinv(val))
+    expect_identical(f, fam$linfo[[2L]]$linkinv)
+})
+
+test_that("extract_link() works on mvn() family objects", {
+    fam <- mvn(d = 2)
+    ## location parameter
+    ## link
+    f <- extract_link(fam, parameter = "location", which_eta = 1L)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[1L]]$linkfun)
+    f <- extract_link(fam, parameter = "mu", which_eta = 1L)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[1L]]$linkfun)
+
+    ## error if no `which_eta`
+    expect_error(extract_link(fam, parameter = "mu"),
+                 "Which linear predictor not specified; see 'which_eta'",
+                 fixed = TRUE)
+
+    ## inverse
+    f <- extract_link(fam, parameter = "location", inverse = TRUE,
+                      which_eta = 2L)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[2L]]$linkinv(val))
+    expect_identical(f, fam$linfo[[2L]]$linkinv)
+    f <- extract_link(fam, parameter = "mu", inverse = TRUE,
+                      which_eta = 2L)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[2L]]$linkinv(val))
+    expect_identical(f, fam$linfo[[2L]]$linkinv)
+})
+
+test_that("extract_link() works on multinom() family objects", {
+    fam <- multinom(K = 2)
+    ## location parameter
+    ## link
+    f <- extract_link(fam, parameter = "location", which_eta = 1L)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[1L]]$linkfun)
+    f <- extract_link(fam, parameter = "mu", which_eta = 1L)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[1L]]$linkfun)
+
+    ## error if no `which_eta`
+    expect_error(extract_link(fam, parameter = "mu"),
+                 "Which linear predictor not specified; see 'which_eta'",
+                 fixed = TRUE)
+
+    ## inverse
+    f <- extract_link(fam, parameter = "location", inverse = TRUE,
+                      which_eta = 2L)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[2L]]$linkinv(val))
+    expect_identical(f, fam$linfo[[2L]]$linkinv)
+    f <- extract_link(fam, parameter = "mu", inverse = TRUE,
+                      which_eta = 2L)
     expect_type(f, "closure")
     expect_identical(f(val), fam$linfo[[2L]]$linkinv(val))
     expect_identical(f, fam$linfo[[2L]]$linkinv)
@@ -944,6 +1005,18 @@ test_that("gammals_link() fails gracefully", {
 test_that("ziplss_link() fails gracefully", {
     expect_error(ziplss_link(1), "'family' is not a family object")
     expect_error(ziplss_link(nb()), "'family' is not of type '\"ziplss\"'")
+})
+
+## test internal link functions fail gracefully
+test_that("mvn_link() fails gracefully", {
+    expect_error(mvn_link(1), "'family' is not a family object")
+    expect_error(mvn_link(nb()), "'family' is not of type '\"Multivariate normal\"'")
+})
+
+## test internal link functions fail gracefully
+test_that("multinom_link() fails gracefully", {
+    expect_error(multinom_link(1), "'family' is not a family object")
+    expect_error(multinom_link(nb()), "'family' is not of type '\"multinom\"'")
 })
 
 ## test other gamm4 family utils

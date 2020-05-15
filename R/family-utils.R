@@ -10,6 +10,8 @@
 ##' @param parameter character; which parameter of the distribution. Usually
 ##'   `"location"` but `"scale"` and `"shape"` may be provided for location
 ##'   scale models.
+##' @param which_eta numeric; the linear predictor to extract for families
+##'   [mgcv::mvn()] and [mgcv::multinom()].
 ##' @param ... arguments passed to other methods.
 ##'
 ##' @author Gavin L. Simpson
@@ -39,7 +41,8 @@
 
 ##' @rdname link
 ##' @export
-`link.family` <- function(object, parameter = c("location", "scale", "shape"), ...) {
+`link.family` <- function(object, parameter = c("location", "scale", "shape"),
+                          which_eta = NULL, ...) {
     ## match parameter arg before passing on
     parameter <- match.arg(parameter)
 
@@ -95,7 +98,7 @@
 ##' @rdname link
 ##' @export
 `inv_link.family` <- function(object, parameter = c("location", "scale", "shape"),
-                              ...) {
+                              which_eta = NULL, ...) {
     ## match parameter arg before passing on
     parameter <- match.arg(parameter)
 
@@ -178,7 +181,8 @@
 }
 
 ## Workhorse link extractor
-`get_link_function` <- function(object, parameter, inverse) {
+`get_link_function` <- function(object, parameter = "locations",
+                                inverse = FALSE, which_eta = NULL) {
     inverse <- as.logical(inverse)
     linfo <- object[["linfo"]]
     distr <- object[["family"]] # name of the the family
@@ -233,7 +237,11 @@
                    twlss = twlss_link(object, parameter, inverse = inverse),
                    gevlss = gevlss_link(object, parameter, inverse = inverse),
                    gammals = gammals_link(object, parameter, inverse = inverse),
-                   ziplss = ziplss_link(object, parameter, inverse = inverse)
+                   ziplss = ziplss_link(object, parameter, inverse = inverse),
+                   mvn = mvn_link(object, parameter, inverse = inverse,
+                                  which_eta = which_eta),
+                   multinom = multinom_link(object, parameter, inverse = inverse,
+                                            which_eta = which_eta)
                    )
     
     ## return
@@ -437,6 +445,28 @@
     fun # return
 }
 
+`mvn_link` <- function(family, parameter = "location", inverse = FALSE,
+                       which_eta = NULL) {
+    stop_if_not_family(family, type = "Multivariate normal")
+
+    parameter <- match.arg(parameter)
+
+    fun <- extract_link(family, parameter = parameter, inverse = inverse,
+                        which_eta = which_eta)    
+    fun # return
+}
+
+`multinom_link` <- function(family, parameter = "location", inverse = FALSE,
+                            which_eta = NULL) {
+    stop_if_not_family(family, type = "multinom")
+
+    parameter <- match.arg(parameter)
+
+    fun <- extract_link(family, parameter = parameter, inverse = inverse,
+                        which_eta = which_eta)    
+    fun # return
+}
+
 ## Other utility functions ------------------------------------------------------
 
 ## Extracts the link or inverse link function from a family object
@@ -454,7 +484,8 @@
     fun # return
 }
 
-`extract_link.general.family` <- function(family, parameter, inverse = FALSE) {
+`extract_link.general.family` <- function(family, parameter, inverse = FALSE,
+                                          which_eta = NULL) {
     ## check `family`
     ## Note: don't pass a `type` here as we only want a check for being a
     ##       family object
@@ -465,6 +496,26 @@
     ## some general families don't have $linfo
     if (is.null(linfo)) {
         fun <- extract_link.family(family, inverse = inverse)
+    } else if (family[["family"]] %in% c("Multivariate normal", "multinom")) {
+        if (is.null(which_eta)) {
+            stop("Which linear predictor not specified; see 'which_eta'",
+                 .call. = FALSE)
+        }
+        len_linfo <- length(linfo)
+        if (which_eta > len_linfo || which_eta < 1) {
+            stop("Invalid 'which_eta': must be between 1 and ", len_linfo, ".",
+                 call. = FALSE)
+        }
+        if (length(which_eta) > 1L) {
+            which_eta <- rep(which_eta, length.out = 1L)
+            warning("Multiple values passed to 'which_eta'; using only the first.")
+        }
+        lobj <- linfo[[which_eta]]        
+        fun <- if (isTRUE(inverse)) {
+            lobj[["linkinv"]]
+        } else {
+            lobj[["linkfun"]]
+        }
     } else {
         ## linfo is ordered; 1: location; 2: scale or sigma, 3: shape, power, etc
         lobj <- switch(parameter,
