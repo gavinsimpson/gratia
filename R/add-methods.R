@@ -1,8 +1,8 @@
 ##' Add fitted values from a model to a data frame
 ##'
 ##' @param data a data frame containing values for the variables used to fit the
-##'   model. Passed to [stats::predict()]() as `newdata`.
-##' @param model a fitted model for which a [stats::predict()]() method is
+##'   model. Passed to [stats::predict()] as `newdata`.
+##' @param model a fitted model for which a [stats::predict()] method is
 ##'   available. S3 method dispatch is performed on the `model` argument.
 ##' @param value character; the name of the variable in which model predictions
 ##'   will be stored.
@@ -19,12 +19,12 @@
 ##' Add fitted values from a GAM to a data frame
 ##' 
 ##' @param type character; the type of predictions to return. See
-##'   [mgcv::predict.gam()]() for options.
+##'   [mgcv::predict.gam()] for options.
 ##' @param prefix character; string to prepend to names of predicted values when
 ##'   `type` is `"terms"`, `"iterms"`, `"lpmatrix"`. These prediction types result
 ##'   in a matrix of values being returned. `prefix` will be prepended to each of
 ##'   the names of columns returned by such prediction types.
-##' @param ... additional arguments passed to [mgcv::predict.gam()]().
+##' @param ... additional arguments passed to [mgcv::predict.gam()].
 ##'
 ##' @return A data frame (tibble) formed from `data` and predictions from
 ##'   `model`.
@@ -87,8 +87,8 @@
 ##' Add residuals from a model to a data frame
 ##'
 ##' @param data a data frame containing values for the variables used to fit the
-##'   model. Passed to [stats::residuals()]() as `newdata`.
-##' @param model a fitted model for which a [stats::residuals()]() method is
+##'   model. Passed to [stats::residuals()] as `newdata`.
+##' @param model a fitted model for which a [stats::residuals()] method is
 ##'   available. S3 method dispatch is performed on the `model` argument.
 ##' @param value character; the name of the variable in which model residuals
 ##'   will be stored.
@@ -104,8 +104,8 @@
 ##' Add residuals from a GAM to a data frame
 ##' 
 ##' @param type character; the type of residuals to return. See
-##'   [mgcv::residuals.gam()]() for options.
-##' @param ... additional arguments passed to [mgcv::residuals.gam()]().
+##'   [mgcv::residuals.gam()] for options.
+##' @param ... additional arguments passed to [mgcv::residuals.gam()].
 ##'
 ##' @return A data frame (tibble) formed from `data` and residuals from `model`.
 ##' 
