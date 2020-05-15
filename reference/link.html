@@ -41,7 +41,7 @@
 
 <meta property="og:title" content="Extract link and inverse link functions from models — link" />
 <meta property="og:description" content="Returns the link or its inverse from an estimated model, and provides a
-simple way to extract rhese functions from complex models with multiple
+simple way to extract these functions from complex models with multiple
 links, such as location scale models." />
 <meta property="og:image" content="https://gavinsimpson.github.io/gratia/reference/figures/README-draw-gam-figure-1.png" />
 <meta property="og:image:alt" content="Plot produced by draw() of 4 smooth functions from a fitted generalized additive model" />
@@ -125,7 +125,7 @@ links, such as location scale models." />
 
     <div class="ref-description">
     <p>Returns the link or its inverse from an estimated model, and provides a
-simple way to extract rhese functions from complex models with multiple
+simple way to extract these functions from complex models with multiple
 links, such as location scale models.</p>
     </div>
 
@@ -185,8 +185,9 @@ links, such as location scale models.</p>
     <tr>
       <th>object</th>
       <td><p>a family object or a fitted model from which to extract the
-family object.  Models fitted by <code><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>mgcv::gam()</a></code>, <code><a href='https://rdrr.io/pkg/mgcv/man/bam.html'>mgcv::bam()</a></code>,
-<code><a href='https://rdrr.io/pkg/mgcv/man/gamm.html'>mgcv::gamm()</a></code>, and <code><a href='https://rdrr.io/pkg/gamm4/man/gamm4.html'>gamm4::gamm4()</a></code> are currently supported.</p></td>
+family object.  Models fitted by <code><a href='https://rdrr.io/r/stats/glm.html'>stats::glm()</a></code>, <code><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>mgcv::gam()</a></code>,
+<code><a href='https://rdrr.io/pkg/mgcv/man/bam.html'>mgcv::bam()</a></code>, <code><a href='https://rdrr.io/pkg/mgcv/man/gamm.html'>mgcv::gamm()</a></code>, and <code><a href='https://rdrr.io/pkg/gamm4/man/gamm4.html'>gamm4::gamm4()</a></code> are currently
+supported.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -196,7 +197,10 @@ family object.  Models fitted by <code><a href='https://rdrr.io/pkg/mgcv/man/gam
       <th>parameter</th>
       <td><p>character; which parameter of the distribution. Usually
 <code>"location"</code> but <code>"scale"</code> and <code>"shape"</code> may be provided for location
-scale models.</p></td>
+scale models. Other options include <code>"mu"</code> and <code>"sigma"</code> as synonyms for
+<code>"location"</code> and <code>"scale"</code> respectively, <code>"pi"</code> for the zero-inflation
+term in <code><a href='https://rdrr.io/pkg/mgcv/man/ziplss.html'>mgcv::ziplss()</a></code>, <code>"power"</code> for the  <code><a href='https://rdrr.io/pkg/mgcv/man/twlss.html'>mgcv::twlss()</a></code> power
+parameter, and <code>"xi"</code>, the shape parameter for  <code><a href='https://rdrr.io/pkg/mgcv/man/gevlss.html'>mgcv::gevlss()</a></code>.</p></td>
     </tr>
     <tr>
       <th>which_eta</th>
@@ -226,9 +230,9 @@ scale models.</p></td>
 
 <span class='fu'>link</span>(<span class='no'>mod</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='st'>"scale"</span>)</div><div class='output co'>#&gt; function (mu) 
 #&gt; log(1/mu - 0.01)
-#&gt; &lt;environment: 0x7ff2a949a938&gt;</div><div class='input'><span class='fu'>inv_link</span>(<span class='no'>mod</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='st'>"scale"</span>)</div><div class='output co'>#&gt; function (eta) 
+#&gt; &lt;environment: 0x7f8c460dacb8&gt;</div><div class='input'><span class='fu'>inv_link</span>(<span class='no'>mod</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='st'>"scale"</span>)</div><div class='output co'>#&gt; function (eta) 
 #&gt; 1/(exp(eta) + 0.01)
-#&gt; &lt;environment: 0x7ff2a949a938&gt;</div></pre>
+#&gt; &lt;environment: 0x7f8c460dacb8&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
