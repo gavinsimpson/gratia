@@ -26,6 +26,7 @@
   object,
   show = c("estimate", "se"),
   contour = TRUE,
+  col_contour = "#3366FF",
   xlab,
   ylab,
   title = NULL,
@@ -103,6 +104,8 @@ standard error (\code{"se"}).}
 
 \item{contour}{logical; should contours be draw on the plot using
 \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+
+\item{col_contour}{colour specification for contour lines.}
 
 \item{qq_line}{logical; draw a reference line through the lower and upper
 theoretical quartiles.}

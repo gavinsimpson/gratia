@@ -85,11 +85,25 @@ test_that("draw.gam works with select and parametric", {
     expect_doppelganger("draw gam without select and parametric is FALSE", plt)
 })
 
-test_that("draw.evaluated_2d_smooth() plots the smooth & SE", {
+test_that("draw.evaluated_2d_smooth() plots the smooth", {
     skip_on_os("mac")
     sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
     plt <- draw(sm)
     expect_doppelganger("draw 2d smooth", plt)
+    plt <- draw(sm, col_contour = "red")
+    expect_doppelganger("draw 2d smooth diff contour colour", plt)
+})
+
+test_that("draw.evaluated_2d_smooth() plots the smooth without contours", {
+    skip_on_os("mac")
+    sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
+    plt <- draw(sm, contour = FALSE)
+    expect_doppelganger("draw 2d smooth without contours", plt)
+})
+
+test_that("draw.evaluated_2d_smooth() plots the SE", {
+    skip_on_os("mac")
+    sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
     plt <- draw(sm, show = "se")
     expect_doppelganger("draw std error of 2d smooth", plt)
 })

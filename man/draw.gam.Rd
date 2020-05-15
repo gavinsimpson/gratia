@@ -17,6 +17,8 @@
   overall_uncertainty = TRUE,
   dist = 0.1,
   rug = TRUE,
+  contour = TRUE,
+  col_contour = "#3366FF",
   partial_match = FALSE,
   ...
 )
@@ -70,6 +72,11 @@ and \code{dist} is a distance within the unit square. See
 
 \item{rug}{logical; draw a rug plot at the botom of each plot?}
 
+\item{contour}{logical; should contours be draw on the plot using
+\code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+
+\item{col_contour}{colour specification for contour lines.}
+
 \item{partial_match}{logical; should smooths be selected by partial matches
 with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
 against.}
@@ -102,6 +109,11 @@ draw(m1)
 
 ## can add partial residuals
 draw(m1, residuals = TRUE)
+
+\dontshow{set.seed(2)}
+dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
+m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
+draw(m2, contour = FALSE)
 }
 \author{
 Gavin L. Simpson
