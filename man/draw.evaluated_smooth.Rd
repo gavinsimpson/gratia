@@ -27,6 +27,7 @@
   show = c("estimate", "se"),
   contour = TRUE,
   col_contour = "#3366FF",
+  n_contour = NULL,
   xlab,
   ylab,
   title = NULL,
@@ -106,6 +107,9 @@ standard error (\code{"se"}).}
 \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
 
 \item{col_contour}{colour specification for contour lines.}
+
+\item{n_contour}{numeric; the number of contour bins. Will result in
+\code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
 
 \item{qq_line}{logical; draw a reference line through the lower and upper
 theoretical quartiles.}

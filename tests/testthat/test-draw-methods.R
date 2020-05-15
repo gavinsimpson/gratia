@@ -101,6 +101,15 @@ test_that("draw.evaluated_2d_smooth() plots the smooth without contours", {
     expect_doppelganger("draw 2d smooth without contours", plt)
 })
 
+test_that("draw.evaluated_2d_smooth() plots the smooth with different contour bins", {
+    skip_on_os("mac")
+    sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
+    plt <- draw(sm, n_contour = 5)
+    expect_doppelganger("draw 2d smooth with 5 contour bins", plt)
+    plt <- draw(sm, n_contour = 20)
+    expect_doppelganger("draw 2d smooth with 20 contour bins", plt)
+})
+
 test_that("draw.evaluated_2d_smooth() plots the SE", {
     skip_on_os("mac")
     sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
