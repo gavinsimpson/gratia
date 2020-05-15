@@ -14,6 +14,10 @@
 * `smooth_samples()` can handle continuous by variable smooths such as in
   varying coefficient models.
 
+* `link()` and `inv_link()` now work for all families available in *mgcv*,
+  including the location, scale, shape families, and the more specialised
+  families described in `?mgcv::family.mgcv`.
+
 * `evaluate_smooth()`, `data_slice()`, `family()`, `link()`, `inv_link()` methods
   for models fitted using `gamm4()` from the **gamm4** package.
 

@@ -1,19 +1,23 @@
 ##' Extract link and inverse link functions from models
 ##'
 ##' Returns the link or its inverse from an estimated model, and provides a
-##' simple way to extract rhese functions from complex models with multiple
+##' simple way to extract these functions from complex models with multiple
 ##' links, such as location scale models.
 ##'
 ##' @param object a family object or a fitted model from which to extract the
-##'   family object.  Models fitted by [mgcv::gam()], [mgcv::bam()],
-##'   [mgcv::gamm()], and [gamm4::gamm4()] are currently supported.
+##'   family object.  Models fitted by [stats::glm()], [mgcv::gam()],
+##'   [mgcv::bam()], [mgcv::gamm()], and [gamm4::gamm4()] are currently
+##'   supported.
 ##' @param parameter character; which parameter of the distribution. Usually
 ##'   `"location"` but `"scale"` and `"shape"` may be provided for location
-##'   scale models.
+##'   scale models. Other options include `"mu"` and `"sigma"` as synonyms for
+##'   `"location"` and `"scale"` respectively, `"pi"` for the zero-inflation
+##'   term in [mgcv::ziplss()], `"power"` for the  [mgcv::twlss()] power
+##'   parameter, and `"xi"`, the shape parameter for  [mgcv::gevlss()].
 ##' @param which_eta numeric; the linear predictor to extract for families
 ##'   [mgcv::mvn()] and [mgcv::multinom()].
 ##' @param ... arguments passed to other methods.
-##'
+##' 
 ##' @author Gavin L. Simpson
 ##' 
 ##' @export
