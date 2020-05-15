@@ -448,6 +448,17 @@ Gu & Wahba 4 term additive model
 > ## can add partial residuals
 > draw(m1, residuals = TRUE)
 > 
+> ## Don't show: 
+> set.seed(2)
+> ## End(Don't show)
+> dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
+Bivariate smoothing example
+> m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
+> draw(m2, contour = FALSE)
+> 
+> ## change the number of contours drawm
+> draw(m2, n_contour = 5)
+> 
 > 
 > 
 > cleanEx()
@@ -730,11 +741,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55fc78fa11e8>
+<environment: 0x5649be464048>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55fc78fa11e8>
+<environment: 0x5649be464048>
 > 
 > 
 > 
@@ -988,7 +999,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  8.903 0.133 9.098 0 0.003 
+Time elapsed:  9.603 0.122 9.77 0.001 0.002 
 > grDevices::dev.off()
 null device 
           1 
