@@ -119,10 +119,9 @@
 
     ## add rug?
     if (!is.null(rug)) {
-        plt <- plt + geom_rug(data = data.frame(x = rug),
-                              mapping = aes_string(x = 'x'),
-                              inherit.aes = FALSE,
-                              sides = 'b')
+        plt <- plt +
+            geom_rug(data = data.frame(x = rug), mapping = aes_string(x = 'x'),
+                     inherit.aes = FALSE, sides = 'b')
     }
 
     plt
@@ -132,6 +131,7 @@
 ##'   standard error (`"se"`).
 ##' @param contour logical; should contours be draw on the plot using
 ##'   [ggplot2::geom_contour()].
+##' @param col_contour colour specification for contour lines.
 ##'
 ##' @importFrom ggplot2 ggplot aes_string geom_raster geom_contour labs guides guide_colourbar scale_fill_distiller theme
 ##' @importFrom grid unit
@@ -140,6 +140,7 @@
 ##' @rdname draw.evaluated_smooth
 `draw.evaluated_2d_smooth` <- function(object, show = c("estimate","se"),
                                        contour = TRUE,
+                                       col_contour = "#3366FF",
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
@@ -160,7 +161,8 @@
         geom_raster(mapping = aes_string(fill = plot_var))
 
     if (isTRUE(contour)) {
-        plt <- plt + geom_contour(mapping = aes_string(z = plot_var))
+        plt <- plt + geom_contour(mapping = aes_string(z = plot_var),
+                                  colour = col_contour)
     }
 
     ## default axis labels if none supplied
@@ -230,6 +232,9 @@
 ##' @param axis characer; see argument `axis` in `cowplot::plot_grid()`.
 ##'   Defaults to `"lrtb"` so that plots are nicely aligned.
 ##' @param rug logical; draw a rug plot at the botom of each plot?
+##' @param contour logical; should contours be draw on the plot using
+##'   [ggplot2::geom_contour()].
+##' @param col_contour colour specification for contour lines.
 ##' @param partial_match logical; should smooths be selected by partial matches
 ##'   with `select`? If `TRUE`, `select` can only be a single string to match
 ##'   against.
@@ -262,15 +267,24 @@
 ##'
 ##' ## can add partial residuals
 ##' draw(m1, residuals = TRUE)
+##'
+##' \dontshow{set.seed(2)}
+##' dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
+##' m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
+##' draw(m2, contour = FALSE)
 `draw.gam` <- function(object,
                        parametric = NULL,
                        select = NULL,
                        residuals = FALSE,
                        scales = c("free", "fixed"),
-                       align = "hv", axis = "lrtb",
+                       align = "hv",
+                       axis = "lrtb",
                        n = 100, unconditional = FALSE,
                        overall_uncertainty = TRUE,
-                       dist = 0.1, rug = TRUE,
+                       dist = 0.1,
+                       rug = TRUE,
+                       contour = TRUE,
+                       col_contour = "#3366FF",
                        partial_match = FALSE, ...) {
     scales <- match.arg(scales)
     S <- smooths(object)                # vector of smooth labels - "s(x)"
@@ -379,9 +393,11 @@
                 svar <- svar[[1L]]
             }
             g[[i]] <- draw(l[[i]], rug = mf[[svar]],
-                           partial_residuals = partial_residuals)
+                           partial_residuals = partial_residuals,
+                           contour = contour, col_contour = col_contour)
         } else {
-            g[[i]] <- draw(l[[i]], partial_residuals = partial_residuals)
+            g[[i]] <- draw(l[[i]], partial_residuals = partial_residuals,
+                           contour = contour, col_contour = col_contour)
         }
     }
 
