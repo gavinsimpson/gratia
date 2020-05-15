@@ -19,6 +19,7 @@
   rug = TRUE,
   contour = TRUE,
   col_contour = "#3366FF",
+  n_contour = NULL,
   partial_match = FALSE,
   ...
 )
@@ -77,6 +78,9 @@ and \code{dist} is a distance within the unit square. See
 
 \item{col_contour}{colour specification for contour lines.}
 
+\item{n_contour}{numeric; the number of contour bins. Will result in
+\code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+
 \item{partial_match}{logical; should smooths be selected by partial matches
 with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
 against.}
@@ -114,6 +118,9 @@ draw(m1, residuals = TRUE)
 dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
 m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
 draw(m2, contour = FALSE)
+
+## change the number of contours drawm
+draw(m2, n_contour = 5)
 }
 \author{
 Gavin L. Simpson
