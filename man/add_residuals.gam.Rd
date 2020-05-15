@@ -8,18 +8,18 @@
 }
 \arguments{
 \item{data}{a data frame containing values for the variables used to fit the
-model. Passed to \url{stats::predict()} as \code{newdata}.}
+model. Passed to \code{\link[stats:predict]{stats::predict()}} as \code{newdata}.}
 
-\item{model}{a fitted model for which a \url{stats::predict()} method is
+\item{model}{a fitted model for which a \code{\link[stats:predict]{stats::predict()}} method is
 available. S3 method dispatch is performed on the \code{model} argument.}
 
 \item{value}{character; the name of the variable in which model predictions
 will be stored.}
 
 \item{type}{character; the type of residuals to return. See
-\url{mgcv::residuals.gam()} for options.}
+\code{\link[mgcv:residuals.gam]{mgcv::residuals.gam()}} for options.}
 
-\item{...}{additional arguments passed to \url{mgcv::residuals.gam()}.}
+\item{...}{additional arguments passed to \code{\link[mgcv:residuals.gam]{mgcv::residuals.gam()}}.}
 }
 \value{
 A data frame (tibble) formed from \code{data} and residuals from \code{model}.

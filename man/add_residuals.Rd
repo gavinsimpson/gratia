@@ -8,9 +8,9 @@ add_residuals(data, model, value = ".residual", ...)
 }
 \arguments{
 \item{data}{a data frame containing values for the variables used to fit the
-model. Passed to \url{stats::residuals()} as \code{newdata}.}
+model. Passed to \code{\link[stats:residuals]{stats::residuals()}} as \code{newdata}.}
 
-\item{model}{a fitted model for which a \url{stats::residuals()} method is
+\item{model}{a fitted model for which a \code{\link[stats:residuals]{stats::residuals()}} method is
 available. S3 method dispatch is performed on the \code{model} argument.}
 
 \item{value}{character; the name of the variable in which model residuals

@@ -8,9 +8,9 @@ add_fitted(data, model, value = ".value", ...)
 }
 \arguments{
 \item{data}{a data frame containing values for the variables used to fit the
-model. Passed to \url{stats::predict()} as \code{newdata}.}
+model. Passed to \code{\link[stats:predict]{stats::predict()}} as \code{newdata}.}
 
-\item{model}{a fitted model for which a \url{stats::predict()} method is
+\item{model}{a fitted model for which a \code{\link[stats:predict]{stats::predict()}} method is
 available. S3 method dispatch is performed on the \code{model} argument.}
 
 \item{value}{character; the name of the variable in which model predictions

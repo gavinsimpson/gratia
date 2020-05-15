@@ -8,23 +8,23 @@
 }
 \arguments{
 \item{data}{a data frame containing values for the variables used to fit the
-model. Passed to \url{stats::predict()} as \code{newdata}.}
+model. Passed to \code{\link[stats:predict]{stats::predict()}} as \code{newdata}.}
 
-\item{model}{a fitted model for which a \url{stats::predict()} method is
+\item{model}{a fitted model for which a \code{\link[stats:predict]{stats::predict()}} method is
 available. S3 method dispatch is performed on the \code{model} argument.}
 
 \item{value}{character; the name of the variable in which model predictions
 will be stored.}
 
 \item{type}{character; the type of predictions to return. See
-\url{mgcv::predict.gam()} for options.}
+\code{\link[mgcv:predict.gam]{mgcv::predict.gam()}} for options.}
 
 \item{prefix}{character; string to prepend to names of predicted values when
 \code{type} is \code{"terms"}, \code{"iterms"}, \code{"lpmatrix"}. These prediction types result
 in a matrix of values being returned. \code{prefix} will be prepended to each of
 the names of columns returned by such prediction types.}
 
-\item{...}{additional arguments passed to \url{mgcv::predict.gam()}.}
+\item{...}{additional arguments passed to \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}.}
 }
 \value{
 A data frame (tibble) formed from \code{data} and predictions from
