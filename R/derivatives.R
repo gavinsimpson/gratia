@@ -505,7 +505,7 @@
 ##' @importFrom tibble as_tibble
 ##' @importFrom rlang exec !!!
 ##' @importFrom tidyr nesting
-`smooth_data` <- function(model, id, n, offset = NULL) {
+`smooth_data` <- function(model, id, n, offset = NULL, smooth = NULL) {
     mf <- model.frame(model)           # model.frame used to fit model
 
     ## remove response
@@ -528,7 +528,11 @@
     m.terms <- names(model[["var.summary"]])
 
     ## need a list of terms used in current smooth
-    sm <- get_smooths_by_id(model, id)[[1L]]
+    sm <- if (is.null(smooth)) {
+        get_smooths_by_id(model, id)[[1L]]
+    } else {
+        smooth
+    }
     smooth_vars <- unique(smooth_variable(sm))
     ## is smooth a factor by? If it is, extract the by variable
     by_var <- if (is_factor_by_smooth(sm)) {
