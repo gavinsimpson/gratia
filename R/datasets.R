@@ -96,3 +96,15 @@ NULL
 ##' @name gss_vocab
 ##' @docType data
 NULL
+
+##' Reference simulation data
+##'
+##' A set of reference objects for testing [data_sim()].
+##'
+##' @format A named list of simulated data sets created by [data_sim()].
+##'
+##' @keywords data
+##' @name ref_sims
+##' @docType data
+NULL
+
