@@ -119,9 +119,9 @@
       <small>Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="gratia-0399-in-development" class="section level1">
-<h1 class="page-header" data-toc-text="0.3.99">
-<a href="#gratia-0399-in-development" class="anchor"></a>gratia 0.3.99 (in development)<small> Unreleased </small>
+    <div id="gratia-03999-in-development" class="section level1">
+<h1 class="page-header" data-toc-text="0.3.999">
+<a href="#gratia-03999-in-development" class="anchor"></a>gratia 0.3.999 (in development)<small> Unreleased </small>
 </h1>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
@@ -129,6 +129,7 @@
 <ul>
 <li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> can now include partial residuals when drawing univariate smooths. Use <code>residuals = TRUE</code> to add partial residuals to each univariate smooth that is drawn. This feature is not available for smooths of more than one variable, by smooths, or factor-smooth interactions (<code>bs = "fs"</code>).</p></li>
 <li><p>New functions <code><a href="../reference/add_fitted.html">add_fitted()</a></code> and <code><a href="../reference/add_residuals.html">add_residuals()</a></code> to add fitted values (expectations) and model residuals to an existing data frame. Currently methods available for objects fitted by <code>gam()</code> and <code>bam()</code>.</p></li>
+<li><p><code><a href="../reference/data_sim.html">data_sim()</a></code> is a tidy reimplementation of <code><a href="https://rdrr.io/pkg/mgcv/man/gamSim.html">mgcv::gamSim()</a></code> with the added ability to use sampling distributions other than the Gaussian for all models implemented. Currently Gaussian, Poisson, and Bernoulli sampling distributions are available.</p></li>
 <li><p><code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> can handle continuous by variable smooths such as in varying coefficient models.</p></li>
 <li><p><code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> now work for all families available in <em>mgcv</em>, including the location, scale, shape families, and the more specialised families described in <code><a href="https://rdrr.io/pkg/mgcv/man/family.mgcv.html">?mgcv::family.mgcv</a></code>.</p></li>
 <li><p><code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code>, <code><a href="../reference/data_slice.html">data_slice()</a></code>, <code><a href="https://rdrr.io/r/stats/family.html">family()</a></code>, <code><a href="../reference/link.html">link()</a></code>, <code><a href="../reference/link.html">inv_link()</a></code> methods for models fitted using <code>gamm4()</code> from the <strong>gamm4</strong> package.</p></li>
