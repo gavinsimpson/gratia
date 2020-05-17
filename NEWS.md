@@ -1,4 +1,4 @@
-# gratia 0.3.99 (in development)
+# gratia 0.3.999 (in development)
 
 ## New features
 
@@ -10,6 +10,11 @@
 * New functions `add_fitted()` and `add_residuals()` to add fitted values
   (expectations) and model residuals to an existing data frame. Currently methods
   available for objects fitted by `gam()` and `bam()`.
+
+* `data_sim()` is a tidy reimplementation of `mgcv::gamSim()` with the added
+  ability to use sampling distributions other than the Gaussian for all models
+  implemented. Currently Gaussian, Poisson, and Bernoulli sampling distributions
+  are available.
 
 * `smooth_samples()` can handle continuous by variable smooths such as in
   varying coefficient models.
