@@ -32,8 +32,15 @@ The main features of *gratia* are currently
 -   A *ggplot2*-based replacement for `mgcv:::plot.gam()`:
     `draw(gam_model)`.
 
+    For example, the classic four term additive example from Gu & Wabha:
+
     ![Estimated smooths from a
     GAM](man/figures/README-draw-gam-figure-1.png)
+
+    Or for a bivariate smooth:
+
+    ![Estimated smooths from a
+    GAM](man/figures/README-draw-gam-figure-2d-1.png)
 
     Note specialist smoothers (`bs %in% c("sos","mrf","so")`) are not
     currently supported, but univariate, *factor* and *continuous*
