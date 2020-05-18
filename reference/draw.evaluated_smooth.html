@@ -129,6 +129,7 @@
 <span class='fu'><a href='draw.html'>draw</a></span>(
   <span class='no'>object</span>,
   <span class='kw'>rug</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>ci_level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
   <span class='no'>xlab</span>,
   <span class='no'>ylab</span>,
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
@@ -181,6 +182,7 @@
 <span class='co'># S3 method for evaluated_parametric_term</span>
 <span class='fu'><a href='draw.html'>draw</a></span>(
   <span class='no'>object</span>,
+  <span class='kw'>ci_level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
   <span class='no'>xlab</span>,
   <span class='no'>ylab</span>,
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
@@ -204,6 +206,10 @@
 location of data on the x axis. The default of <code>NULL</code> results in no
 rug plot being drawn. For <code>evaluate_parametric_terms()</code>, a logical to
 indicate if a rug plot should be drawn.</p></td>
+    </tr>
+    <tr>
+      <th>ci_level</th>
+      <td><p>numeric between 0 and 1; the coverage of credible interval.</p></td>
     </tr>
     <tr>
       <th>xlab</th>

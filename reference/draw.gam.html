@@ -138,6 +138,7 @@ is used instead.</p>
   <span class='kw'>scales</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"free"</span>, <span class='st'>"fixed"</span>),
   <span class='kw'>align</span> <span class='kw'>=</span> <span class='st'>"hv"</span>,
   <span class='kw'>axis</span> <span class='kw'>=</span> <span class='st'>"lrtb"</span>,
+  <span class='kw'>ci_level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
   <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>,
   <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>overall_uncertainty</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
@@ -195,6 +196,10 @@ Defaults to <code>"hv"</code> so that plots are nicely aligned.</p></td>
       <th>axis</th>
       <td><p>characer; see argument <code>axis</code> in <code><a href='https://rdrr.io/pkg/cowplot/man/plot_grid.html'>cowplot::plot_grid()</a></code>.
 Defaults to <code>"lrtb"</code> so that plots are nicely aligned.</p></td>
+    </tr>
+    <tr>
+      <th>ci_level</th>
+      <td><p>numeric between 0 and 1; the coverage of credible interval.</p></td>
     </tr>
     <tr>
       <th>n</th>
