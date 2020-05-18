@@ -9,7 +9,8 @@
 
 * New function `difference_smooth()` for computing differences between factor
   smooth interactions. Methods available for `gam()`, `bam()`, `gamm()` and
-  `gamm4::gamm4()`. Also has a `draw()` method.
+  `gamm4::gamm4()`. Also has a `draw()` method, which can handle differences of
+  1D and 2D smooths currently (handling 3D and 4D smooths is planned).
 
 * New functions `add_fitted()` and `add_residuals()` to add fitted values
   (expectations) and model residuals to an existing data frame. Currently methods
