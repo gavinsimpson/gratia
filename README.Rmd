@@ -45,7 +45,7 @@ draw(m2)
 ```
 
 ```{r appraise-figure, dev = "png", fig.height = 6, fig.width = 9, dpi = 120, echo = FALSE, fig.show = "hide", dependson = -1}
-appraise(m)
+appraise(m1)
 ```
 
 The main features of *gratia* are currently
