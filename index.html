@@ -91,7 +91,10 @@
 <ul>
 <li>
 <p>A <em>ggplot2</em>-based replacement for <code>mgcv:::plot.gam()</code>: <code><a href="reference/draw.html">draw(gam_model)</a></code>.</p>
+<p>For example, the classic four term additive example from Gu &amp; Wabha:</p>
 <p><img src="reference/figures/README-draw-gam-figure-1.png" alt="Estimated smooths from a GAM"></p>
+<p>Or for a bivariate smooth:</p>
+<p><img src="reference/figures/README-draw-gam-figure-2d-1.png" alt="Estimated smooths from a GAM"></p>
 <p>Note specialist smoothers (<code>bs %in% c("sos","mrf","so")</code>) are not currently supported, but univariate, <em>factor</em> and <em>continuous</em> <code>by</code>-variable smooths, simple random effect smooths (<code>bs = 're'</code>), factor-smooth interaction smooths (<code>bs = "fs"</code>), and bivariate tensor product smooths are supported,</p>
 </li>
 <li><p>Estimatation of derivatives of fitted smoothers: <code><a href="reference/derivatives.html">derivatives()</a></code> (older functionality in <code><a href="reference/fderiv.html">fderiv(gam_model)</a></code>),</p></li>
