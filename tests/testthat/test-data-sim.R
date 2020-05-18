@@ -8,9 +8,17 @@ context("test data_sim()")
 
 data(ref_sims, package = "gratia")
 
-test_that("test data_sim() reproduces expected output", {
+new_sims <- create_reference_simulations()
+
+test_that("test data_sim() produces tibbles", {
+    for (i in names(ref_sims)) {
+        expect_s3_class(new_sims[[!!(i)]],
+                        class = c("tbl_df", "tbl", "data.frame"))
+    }
+})
+
+test_that("test data_sim() reproduces reference output", {
     skip_on_ci()
-    new_sims <- create_reference_simulations()
     for (i in names(ref_sims)) {
         expect_equal(new_sims[[!!(i)]], ref_sims[[!!(i)]])
     }
