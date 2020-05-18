@@ -149,7 +149,13 @@
     ## need `drop = FALSE` (the default) here because by default mgcv doesn't
     ## drop the unused levels; hence we get a coef for all combinations of
     ## vars in the ranef smooth
-    levs <- levels(interaction(model[["model"]][smooth_var], drop = FALSE))
+    var_types <- attr(terms(model), "dataClasses")[smooth_var]
+    levs <- if (all(var_types == "factor")) {
+        levels(interaction(model[["model"]][smooth_var], drop = FALSE))
+    } else {
+        take <- smooth_var[which(var_types == "factor")]
+        levels(interaction(model[["model"]][take]))
+    }
 
     ## if we have a by variable
     is.factor.by <- vapply(object, FUN = is_factor_by_smooth,

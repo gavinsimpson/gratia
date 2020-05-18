@@ -423,3 +423,11 @@ test_that("draw works for sample_smooths objects with user specified smooth", {
     plt <- draw(sm3, select = "s(x2)", alpha = 0.7, partial_match = TRUE)
     vdiffr:::expect_doppelganger("draw selected factor by smooth_samples for GAM m3", plt)
 })
+
+## Issue #22
+test_that("draw() can handle a mixture of numeric and factor random effects", {
+    df <- data_sim("eg4", seed = 42)
+    m <- gam(y ~ s(x2, fac, bs = "re"), data = df, method = "REML")
+    plt <- draw(m)
+    vdiffr:::expect_doppelganger("issue 22 draw with mixed random effects", plt)
+})
