@@ -891,12 +891,13 @@
 ##'   interval.
 ##' @param ci_colour colour specification for the confidence/credible intervals
 ##'   band.
-##' @param line_col colour
+##' @param line_col colour specicification for drawing lines
 ##' @param ncol,nrow numeric; the numbers of rows and columns over which to
 ##'   spread the plots
 ##' @param xlab,ylab,title,subtitle,caption character; labels with which to
 ##'   annotate plots
-##' @param guides
+##' @param guides character; one of `"keep"` (the default), `"collect"`, or
+##'   `"auto"`. Passed to [patchwork::plot_layout()]
 ##' @inheritParams draw.gam
 ##'
 ##' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_line labs
