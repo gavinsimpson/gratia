@@ -13,6 +13,7 @@
 \method{draw}{evaluated_1d_smooth}(
   object,
   rug = NULL,
+  ci_level = 0.95,
   xlab,
   ylab,
   title = NULL,
@@ -61,6 +62,7 @@
 
 \method{draw}{evaluated_parametric_term}(
   object,
+  ci_level = 0.95,
   xlab,
   ylab,
   title = NULL,
@@ -78,6 +80,8 @@
 location of data on the x axis. The default of \code{NULL} results in no
 rug plot being drawn. For \code{evaluate_parametric_terms()}, a logical to
 indicate if a rug plot should be drawn.}
+
+\item{ci_level}{numeric between 0 and 1; the coverage of credible interval.}
 
 \item{xlab}{character or expression; the label for the x axis. If not
 supplied, a suitable label will be generated from \code{object}.}

@@ -622,10 +622,10 @@
                                evaluated)
     }
 
-    ## add confidence interval
-    evaluated <- mutate(evaluated,
-                        upper = .data$partial + (2 * .data$se),
-                        lower = .data$partial - (2 * .data$se))
+    ## add confidence interval -- be consistent and don't add this, but could?
+    ## evaluated <- mutate(evaluated,
+    ##                     upper = .data$partial + (2 * .data$se),
+    ##                     lower = .data$partial - (2 * .data$se))
 
     class(evaluated) <- c("evaluated_parametric_term", class(evaluated))
     evaluated                           # return

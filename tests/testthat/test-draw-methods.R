@@ -294,9 +294,8 @@ test_that("draw() works with parametric terms", {
     ## evaluate parametric terms directly
     e1 <- evaluate_parametric_term(mod, term = "x0")
     expect_s3_class(e1, "evaluated_parametric_term")
-    expect_equal(ncol(e1), 7L)
-    expect_equal(names(e1), c("term", "type", "value", "partial", "se",
-                              "upper", "lower"))
+    expect_equal(ncol(e1), 5L)
+    expect_named(e1, c("term", "type", "value", "partial", "se"))
     p1 <- draw(e1)
     expect_doppelganger("draw.evaluated_parametric_term with linear parametric term", p1)
 

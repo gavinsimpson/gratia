@@ -19,8 +19,7 @@ test_that("evaluate_parametric_terms() works with factor terms", {
     expect_s3_class(para, "tbl")
     expect_s3_class(para, "data.frame")
     expect_named(para,
-                 c("term", "type", "value", "partial",
-                   "se", "upper", "lower"))
+                 c("term", "type", "value", "partial", "se"))
 
     expect_error(evaluate_parametric_term(m, term = "foo"),
                  "Term is not in the parametric part of model: <foo>",
@@ -61,7 +60,7 @@ test_that("evaluate_parametric_terms() works with parametric terms", {
     expect_s3_class(para, "tbl_df")
     expect_s3_class(para, "tbl")
     expect_s3_class(para, "data.frame")
-    expect_named(para, c("term","type","value","partial","se","upper","lower"))
+    expect_named(para, c("term","type","value","partial","se"))
 
     expect_error(evaluate_parametric_term(mod, term = "foo"),
                  "Term is not in the parametric part of model: <foo>",

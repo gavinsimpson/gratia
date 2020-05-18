@@ -24,6 +24,7 @@
 ##'   location of data on the x axis. The default of `NULL` results in no
 ##'   rug plot being drawn. For `evaluate_parametric_terms()`, a logical to
 ##'   indicate if a rug plot should be drawn.
+##' @param ci_level numeric between 0 and 1; the coverage of credible interval.
 ##' @param partial_residuals data frame; partial residuals and data values if
 ##'   partial residuals are drawn. Should have names `..p_resid` and `..orig_x` if
 ##'   supplied.
@@ -68,6 +69,7 @@
 ##' draw(sm)
 `draw.evaluated_1d_smooth` <- function(object,
                                        rug = NULL,
+                                       ci_level = 0.95,
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
@@ -75,8 +77,9 @@
     smooth_var <- names(object)[3L]
 
     ## Add confidence interval
-    object[["upper"]] <- object[["est"]] + (2 * object[["se"]])
-    object[["lower"]] <- object[["est"]] - (2 * object[["se"]])
+    crit <- qnorm((1 - ci_level) / 2, lower.tail = FALSE)
+    object[["upper"]] <- object[["est"]] + (crit * object[["se"]])
+    object[["lower"]] <- object[["est"]] - (crit * object[["se"]])
 
     plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est, group = ~ smooth))
 
@@ -235,6 +238,7 @@
 ##'   Defaults to `"hv"` so that plots are nicely aligned.
 ##' @param axis characer; see argument `axis` in `cowplot::plot_grid()`.
 ##'   Defaults to `"lrtb"` so that plots are nicely aligned.
+##' @param ci_level numeric between 0 and 1; the coverage of credible interval.
 ##' @param rug logical; draw a rug plot at the botom of each plot?
 ##' @param contour logical; should contours be draw on the plot using
 ##'   [ggplot2::geom_contour()].
@@ -288,6 +292,7 @@
                        scales = c("free", "fixed"),
                        align = "hv",
                        axis = "lrtb",
+                       ci_level = 0.95,
                        n = 100, unconditional = FALSE,
                        overall_uncertainty = TRUE,
                        dist = 0.1,
@@ -337,7 +342,8 @@
     if (isTRUE(parametric)) {
         terms <- parametric_terms(object)
         npara <- length(terms)
-        p <- vector("list", length = npara)    }
+        p <- vector("list", length = npara)
+    }
 
     g <- l <- vector("list", length = nsmooth)
     ## g <- vector("list", length = nsmooth + npara)
@@ -405,11 +411,11 @@
             g[[i]] <- draw(l[[i]], rug = mf[[svar]],
                            partial_residuals = partial_residuals,
                            contour = contour, contour_col = contour_col,
-                           n_contour = n_contour)
+                           n_contour = n_contour, ci_level = ci_level)
         } else {
             g[[i]] <- draw(l[[i]], partial_residuals = partial_residuals,
                            contour = contour, contour_col = contour_col,
-                           n_contour = n_contour)
+                           n_contour = n_contour, ci_level = ci_level)
         }
     }
 
@@ -421,10 +427,11 @@
         }
     }
 
+    crit <- qnorm((1 - ci_level) / 2, lower.tail = FALSE)
     if (isTRUE(identical(scales, "fixed"))) {
-        wrapper <- function(x) {
-            range(x[["est"]] + (2 * x[["se"]]),
-                  x[["est"]] - (2 * x[["se"]]))
+        wrapper <- function(x, var, crit) {
+            range(x[[var]] + (crit * x[["se"]]),
+                  x[[var]] - (crit * x[["se"]]))
         }
         
         p_resids_lims <- if (residuals) {
@@ -432,11 +439,11 @@
         } else {
             rep(0, 2)
         }
-        ylims <- range(c(unlist(lapply(l, wrapper)), unlist(p_resid_range)))
+        ylims <- range(c(unlist(lapply(l, wrapper, var = "est", crit = crit)),
+                         unlist(p_resid_range)))
         if (isTRUE(parametric)) {
             ylims <- range(ylims,
-                           unlist(lapply(p, function(x) range(x[["upper"]],
-                                                              x[["lower"]]))))
+                           unlist(lapply(p, wrapper, var = "partial", crit = crit)))
         }
 
         gg <- seq_along(g)[c(d==1L, rep(TRUE, npara))]
@@ -563,6 +570,7 @@
 ##' @export
 ##' @rdname draw.evaluated_smooth
 `draw.evaluated_parametric_term` <- function(object,
+                                             ci_level = 0.95,
                                              xlab, ylab,
                                              title = NULL, subtitle = NULL,
                                              caption = NULL,
@@ -571,6 +579,12 @@
                                              ...) {
     is_fac <- object[["type"]][1L] == "factor"
     term_label <- object[["term"]][1L]
+
+    ## add a CI
+    crit <- qnorm((1 - ci_level) / 2, lower.tail = FALSE)
+    object <- mutate(object,
+                     lower = .data$partial - (crit * .data$se),
+                     upper = .data$partial + (crit * .data$se))
 
     plt <- ggplot(object, aes_string(x = "value", y = "partial"))
 
@@ -1101,12 +1115,24 @@
     plt
 }
 
-`draw_3d_difference` <- function(object, xvars, contour = FALSE) {
+`draw_3d_difference` <- function(object, xvars, contour = FALSE,
+                                 contour_col = "black", n_contour = NULL,
+                                 xlab = NULL,
+                                 ylab = NULL,
+                                 title = NULL,
+                                 subtitle = NULL,
+                                 caption = NULL) {
     warning("Plotting differences of 3D smooths is not yet implemented")
     return(NULL)
 }
 
-`draw_4d_difference` <- function(object, xvars, contour = FALSE) {
+`draw_4d_difference` <- function(object, xvars, contour = FALSE,
+                                 contour_col = "black", n_contour = NULL,
+                                 xlab = NULL,
+                                 ylab = NULL,
+                                 title = NULL,
+                                 subtitle = NULL,
+                                 caption = NULL) {
     warning("Plotting differences of 4D smooths is not yet implemented")
     return(NULL)
 }
