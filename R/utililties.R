@@ -919,3 +919,33 @@
     object <- terms(object)
     term_variables(object, term, ...)
 }
+
+## Create *mgcv*-alike labels for by smooths
+## FIXME: should make this work for continuous by too
+`mgcv_by_smooth_labels` <- function(smooth, by_var, level) {
+    paste0(smooth, ":", by_var, level)
+}
+
+##' Returns names of variables from a smooth label
+##'
+##' @param label character; a length 1 character vector containing the label of
+##'   a smooth.
+##'
+##' @export
+##' 
+##' @importFrom dplyr combine
+##'
+##' @examples
+##'
+##' vars_from_label("s(x1)")
+##' vars_from_label("t2(x1,x2,x3)")
+vars_from_label <- function(label) {
+    if (length(label) > 1) {
+        label <- rep(label, length.out = 1)
+        warning("'label' must be a length 1 vector; using 'label[1]' only.")
+    }
+    vars <- gsub("^[[:alnum:]]{1,2}\\(([[:graph:]]+)\\)$",
+                 "\\1",
+                 label)
+    combine(lapply(strsplit(vars, ","), `[`, 1L))
+}
