@@ -34,8 +34,8 @@ Graceful 'ggplot'-based graphics and utility functions for working with generali
 
 ```{r draw-gam-figure, dev = "png", fig.height = 6, fig.width = 9, dpi = 120, echo = FALSE, fig.show = "hide", message = FALSE}
 df1 <- data_sim("eg1", n = 400, seed = 42)
-m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
-draw(m, partial_residuals = TRUE)
+m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
+draw(m1, residuals = TRUE)
 ```
 
 ```{r draw-gam-figure-2d, dev = "png", fig.height = 6, fig.width = 9, dpi = 120, echo = FALSE, fig.show = "hide", message = FALSE}
