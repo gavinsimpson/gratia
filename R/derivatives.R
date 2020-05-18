@@ -504,7 +504,7 @@
 ##' @importFrom dplyr bind_cols setdiff
 ##' @importFrom tibble as_tibble
 ##' @importFrom rlang exec !!!
-##' @importFrom tidyr nesting
+##' @importFrom tidyr expand_grid
 `smooth_data` <- function(model, id, n, offset = NULL, include_all = FALSE) {
     mf <- model.frame(model)           # model.frame used to fit model
 
@@ -557,7 +557,7 @@
             newlist <- append(newlist, newby)
         }
     }
-    newdata <- exec(nesting, !!!newlist) # actually compute expand.grid-alike
+    newdata <- exec(expand_grid, !!!newlist) # actually compute expand.grid-alike
 
     if (isTRUE(include_all)) {
         ## need to provide single values for all other covariates in data

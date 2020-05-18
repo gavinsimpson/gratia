@@ -10,12 +10,20 @@
   rug = FALSE,
   ref_line = FALSE,
   contour = FALSE,
-  scales = c("free", "fixed"),
+  contour_col = "black",
+  n_contour = NULL,
   ci_alpha = 0.2,
   ci_colour = "black",
   line_col = "steelblue",
-  align = "hv",
-  axis = "lrtb",
+  scales = c("free", "fixed"),
+  ncol = NULL,
+  nrow = NULL,
+  guides = "keep",
+  xlab = NULL,
+  ylab = NULL,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
   ...
 )
 }
@@ -36,11 +44,8 @@ stored.}
 
 \item{contour}{logical;}
 
-\item{scales}{character; should all univariate smooths be plotted with the
-same y-axis scale? The default, \code{scales = "fixed"}, ensures this is done.
-If \code{scales = "free"} each univariate smooth has its own y-axis scale.
-Currently does not affect the y-axis scale of plots of the parametric
-terms.}
+\item{n_contour}{numeric; the number of contour bins. Will result in
+\code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
 
 \item{ci_alpha}{numeric; alpha transparency for confidence or simultaneous
 interval.}
@@ -50,11 +55,17 @@ band.}
 
 \item{line_col}{colour}
 
-\item{align}{characer; see argument \code{align} in \code{cowplot::plot_grid()}.
-Defaults to \code{"hv"} so that plots are nicely aligned.}
+\item{scales}{character; should all univariate smooths be plotted with the
+same y-axis scale? The default, \code{scales = "fixed"}, ensures this is done.
+If \code{scales = "free"} each univariate smooth has its own y-axis scale.
+Currently does not affect the y-axis scale of plots of the parametric
+terms.}
 
-\item{axis}{characer; see argument \code{axis} in \code{cowplot::plot_grid()}.
-Defaults to \code{"lrtb"} so that plots are nicely aligned.}
+\item{ncol, nrow}{numeric; the numbers of rows and columns over which to
+spread the plots}
+
+\item{xlab, ylab, title, subtitle, caption}{character; labels with which to
+annotate plots}
 
 \item{...}{arguments passed to \code{cowplot::plot_grid()}. Any arguments to
 \code{plot_grid()} may be supplied, except for: \code{plotlist} and \code{align}.}
@@ -66,7 +77,7 @@ Plot differences of smooths
 
 load_mgcv()
 \dontshow{set.seed(42)}
-df <- data_sim("eg4")
+df <- data_sim("eg4", seed = 42)
 m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 
 diffs <- difference_smooths(m, smooth = "s(x2)")

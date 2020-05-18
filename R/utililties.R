@@ -947,5 +947,5 @@ vars_from_label <- function(label) {
     vars <- gsub("^[[:alnum:]]{1,2}\\(([[:graph:]]+)\\)$",
                  "\\1",
                  label)
-    combine(lapply(strsplit(vars, ","), `[`, 1L))
+    combine(strsplit(vars, ",")[[1L]])
 }

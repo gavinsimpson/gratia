@@ -344,6 +344,7 @@
         simu <- Xp %*% t(betas)
         colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
         simu <- as_tibble(simu)
+        nr_simu <- nrow(simu)
         ## names(simu) <- paste0("..V", seq_len(NCOL(simu)))
         is_fac_by <- is_factor_by_smooth(sm)
         if (is_fac_by) {
@@ -352,7 +353,7 @@
                                        by_data = newdata, before = 1L)
         } else {
             simu <- add_column(simu,
-                               by_variable = rep(NA_character_, times = n_vals))
+                               by_variable = rep(NA_character_, times = nr_simu))#n_vals))
         }
         simu <- add_smooth_var_data(simu, smooth_variable(sm), newdata)
         sims[[i]] <- simu
@@ -364,9 +365,9 @@
     sims <- do.call("bind_rows", sims)
     sims <- add_column(sims,
                        smooth = rep(unlist(lapply(strsplit(S, ":"), `[`, 1L)),
-                                    each = n_vals),
+                                    each = nr_simu),
                        .before = 1L)
-    sims <- add_column(sims, term = rep(S, each = n_vals), .before = 2L)
+    sims <- add_column(sims, term = rep(S, each = nr_simu), .before = 2L)
     sims <- add_column(sims, row = rep(seq_len(nrow(newdata)), times = length(S)))
     sims <- gather(sims, key = "draw", value = "value", dplyr::starts_with("..V"))
     sims[["draw"]] <- as.integer(sub("\\.\\.V", "", sims[["draw"]]))

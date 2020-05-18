@@ -892,10 +892,15 @@
 ##' @param ci_colour colour specification for the confidence/credible intervals
 ##'   band.
 ##' @param line_col colour
+##' @param ncol,nrow numeric; the numbers of rows and columns over which to
+##'   spread the plots
+##' @param xlab,ylab,title,subtitle,caption character; labels with which to
+##'   annotate plots
+##' @param guides
 ##' @inheritParams draw.gam
 ##'
 ##' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_line labs
-##' @importFrom cowplot plot_grid
+##' @importFrom patchwork wrap_plots
 ##' @importFrom purrr map
 ##' @export
 ##'
@@ -903,7 +908,7 @@
 ##'
 ##' load_mgcv()
 ##' \dontshow{set.seed(42)}
-##' df <- data_sim("eg4")
+##' df <- data_sim("eg4", seed = 42)
 ##' m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 ##'
 ##' diffs <- difference_smooths(m, smooth = "s(x2)")
@@ -913,11 +918,19 @@
                                      rug = FALSE,
                                      ref_line = FALSE,
                                      contour = FALSE,
-                                     scales = c("free", "fixed"),
+                                     contour_col = "black",
+                                     n_contour = NULL,
                                      ci_alpha = 0.2,
                                      ci_colour = "black",
                                      line_col = "steelblue",
-                                     align = "hv", axis = "lrtb", ...) {
+                                     scales = c("free", "fixed"),
+                                     ncol = NULL, nrow = NULL,
+                                     guides = "keep",
+                                     xlab = NULL,
+                                     ylab = NULL,
+                                     title = NULL,
+                                     subtitle = NULL,
+                                     caption = NULL, ...) {
     scales <- match.arg(scales)
 
     ## how many smooths
@@ -932,7 +945,10 @@
 
     plotlist <- map(df_list, draw_difference, ci_alpha = ci_alpha,
                     line_col = line_col, rug = rug, ref_line = ref_line,
-                    ci_colour = ci_colour, contour = contour)
+                    ci_colour = ci_colour, contour = contour,
+                    contour_col = contour_col, n_contour = n_contour,
+                    xlab = xlab, ylab = ylab, title = title,
+                    subtitle = subtitle, caption = caption)
 
     if (isTRUE(identical(scales, "fixed"))) {
         ylims <- range(object[["lower"]], object[["upper"]])
@@ -942,7 +958,14 @@
         }
     }
 
-    plot_grid(plotlist = plotlist, align = align, axis = axis, ...)
+    ## plot_grid(plotlist = plotlist, align = align, axis = axis, ...)
+    n_plots <- length(plotlist)
+    if (is.null(ncol) && is.null(nrow)) {
+        ncol <- ceiling(sqrt(n_plots))
+        nrow <- ceiling(n_plots / ncol)
+    }
+    wrap_plots(plotlist, byrow = TRUE, ncol = ncol, nrow = nrow, guides = guides,
+               ...)
 }
 
 `draw_difference` <- function(object,
@@ -951,20 +974,38 @@
                               contour = NULL,
                               ci_alpha = NULL,
                               ci_colour = NULL,
-                              line_col = NULL) {
+                              line_col = NULL,
+                              contour_col = "black",
+                              n_contour = NULL,
+                              xlab = NULL, ylab = NULL,
+                              title = NULL, subtitle = NULL, caption = NULL) {
     xvars <- unique(object[["smooth"]])
     xvars <- vars_from_label(xvars)
     n_xvars <- length(xvars)
     plt <- if (identical(n_xvars, 1L)) {
       draw_1d_difference(object, xvars, rug = rug, ref_line = ref_line,
                          ci_alpha = ci_alpha, line_col = line_col,
-                         ci_colour = ci_colour)
+                         ci_colour = ci_colour, xlab = xlab, ylab = ylab,
+                         title = title, subtitle = subtitle,
+                         caption = caption)
     } else if (identical(n_xvars, 2L)) {
-        draw_2d_difference(object, xvars, contour = contour)
+        draw_2d_difference(object, xvars, contour = contour,
+                           contour_col = contour_col, n_contour = n_contour,
+                           xlab = xlab, ylab = ylab,
+                           title = title, subtitle = subtitle,
+                           caption = caption)
     } else if (identical(n_xvars, 3L)) {
-        draw_3d_difference(object, xvars, contour = contour)
+        draw_3d_difference(object, xvars, contour = contour,
+                           contour_col = contour_col, n_contour = n_contour,
+                           xlab = xlab, ylab = ylab,
+                           title = title, subtitle = subtitle,
+                           caption = caption)
     } else if (identical(n_xvars, 4L)) {
-        draw_4d_difference(object, xvars, contour = contour)
+        draw_4d_difference(object, xvars, contour = contour,
+                           contour_col = contour_col, n_contour = n_contour,
+                           xlab = xlab, ylab = ylab,
+                           title = title, subtitle = subtitle,
+                           caption = caption)
     } else {
         message("Can't plot differences for smooths of more than 4 variables.")
         NULL
@@ -979,7 +1020,12 @@
                                  ref_line = FALSE,
                                  ci_alpha = 0.2,
                                  ci_colour = "black",
-                                 line_col = "red") {
+                                 line_col = "red",
+                                 xlab = NULL,
+                                 ylab = NULL,
+                                 title = NULL,
+                                 subtitle = NULL,
+                                 caption = NULL) {
     sm_label <- unique(object$smooth)
     by_var <- unique(object$by)
     f1 <- unique(object$level_1)
@@ -1006,10 +1052,52 @@
     plt
 }
 
-##
-`draw_2d_difference` <- function(object, xvars, contour = FALSE) {
-    warning("Plotting differences of 2D smooths is not yet implemented")
-    return(NULL)
+##' @importFrom ggplot2 ggplot guides aes_ geom_raster geom_contour labs scale_fill_distiller guide_colourbar
+##' @importFrom grid unit
+`draw_2d_difference` <- function(object, xvars,
+                                 contour = FALSE,
+                                 contour_col = "black", ## "#3366FF",
+                                 n_contour = NULL,
+                                 xlab = NULL,
+                                 ylab = NULL,
+                                 title = NULL,
+                                 subtitle = NULL,
+                                 caption = NULL) {
+    if (is.null(xlab)) {
+        xlab <- xvars[1]
+    }
+    if (is.null(ylab)) {
+        ylab <- xvars[2]
+    }
+    if (is.null(title)) {
+        sm_label <- unique(object$smooth)
+        by_var <- unique(object$by)
+        f1 <- unique(object$level_1)
+        f2 <- unique(object$level_2)
+        plt_title1 <- mgcv_by_smooth_labels(sm_label, by_var, f1)
+        plt_title2 <- mgcv_by_smooth_labels(sm_label, by_var, f2)
+        title <- paste(plt_title1, plt_title2, sep = " - ")
+    }
+    
+    plt <- ggplot(object, aes_(x = as.name(xvars[1L]), y = as.name(xvars[2L]))) +
+        geom_raster(aes_(fill = ~ diff))
+
+    if (contour) {
+        plt <- plt + geom_contour(aes_(z = ~ diff), bins = n_contour,
+                                  colour = contour_col)
+    }
+
+    plt <- plt +
+        labs(title =title, x = xlab, y = ylab, subtitle = subtitle,
+             caption = caption)
+
+    plt <- plt + scale_fill_distiller(palette = "RdBu", type = "div")
+    plt <- plt +
+        guides(fill = guide_colourbar(title = "Difference", 
+                                      direction = "vertical",
+                                      barheight = grid::unit(0.25, "npc")))
+    
+    plt
 }
 
 `draw_3d_difference` <- function(object, xvars, contour = FALSE) {
