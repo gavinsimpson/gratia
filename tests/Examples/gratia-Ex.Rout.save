@@ -306,6 +306,39 @@ Gu & Wahba 4 term additive model
 
 detaching ‘package:mgcv’
 
+> nameEx("data_sim")
+> ### * data_sim
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: data_sim
+> ### Title: Simulate example data for fitting GAMs
+> ### Aliases: data_sim
+> 
+> ### ** Examples
+> 
+> ## Don't show: 
+> set.seed(1)
+> ## End(Don't show)
+> data_sim("eg1")
+# A tibble: 400 x 10
+         y     x0     x1     x2    x3     f    f0    f1        f2    f3
+     <dbl>  <dbl>  <dbl>  <dbl> <dbl> <dbl> <dbl> <dbl>     <dbl> <dbl>
+ 1  3.34   0.266  0.659  0.859  0.367  5.51 1.48   3.74 0.298         0
+ 2 -0.0758 0.372  0.185  0.0344 0.741  3.58 1.84   1.45 0.288         0
+ 3 10.7    0.573  0.954  0.971  0.934  8.69 1.95   6.74 0.0000861     0
+ 4  8.73   0.908  0.898  0.745  0.673  8.75 0.569  6.02 2.16          0
+ 5 15.0    0.202  0.944  0.273  0.701 16.2  1.18   6.60 8.40          0
+ 6  7.67   0.898  0.724  0.677  0.848  8.03 0.628  4.25 3.15          0
+ 7  7.58   0.945  0.370  0.348  0.706  8.44 0.346  2.10 5.99          0
+ 8  8.51   0.661  0.781  0.947  0.859  6.52 1.75   4.77 0.00243       0
+ 9 10.6    0.629  0.0111 0.339  0.446  9.19 1.84   1.02 6.33          0
+10  3.72   0.0618 0.940  0.0317 0.677  7.17 0.386  6.56 0.231         0
+# … with 390 more rows
+> 
+> 
+> 
+> cleanEx()
 > nameEx("derivatives")
 > ### * derivatives
 > 
@@ -353,6 +386,47 @@ detaching ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
+> nameEx("difference_smooths")
+> ### * difference_smooths
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: difference_smooths
+> ### Title: Differences of factor smooth interactions
+> ### Aliases: difference_smooths difference_smooths.gam
+> 
+> ### ** Examples
+> 
+> 
+> load_mgcv()
+> ## Don't show: 
+> set.seed(42)
+> ## End(Don't show)
+> df <- data_sim("eg4")
+> m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+> 
+> difference_smooths(m, smooth = "s(x2)")
+# A tibble: 300 x 9
+   smooth by    level_1 level_2  diff    se    lower upper      x2
+   <chr>  <chr> <chr>   <chr>   <dbl> <dbl>    <dbl> <dbl>   <dbl>
+ 1 s(x2)  fac   1       2       0.386 0.618 -0.824    1.60 0.00359
+ 2 s(x2)  fac   1       2       0.479 0.574 -0.646    1.60 0.0136 
+ 3 s(x2)  fac   1       2       0.572 0.534 -0.474    1.62 0.0237 
+ 4 s(x2)  fac   1       2       0.665 0.497 -0.308    1.64 0.0338 
+ 5 s(x2)  fac   1       2       0.758 0.464 -0.151    1.67 0.0438 
+ 6 s(x2)  fac   1       2       0.850 0.435 -0.00342  1.70 0.0539 
+ 7 s(x2)  fac   1       2       0.941 0.412  0.134    1.75 0.0639 
+ 8 s(x2)  fac   1       2       1.03  0.393  0.262    1.80 0.0740 
+ 9 s(x2)  fac   1       2       1.12  0.378  0.380    1.86 0.0841 
+10 s(x2)  fac   1       2       1.21  0.367  0.489    1.93 0.0941 
+# … with 290 more rows
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("draw.derivatives")
 > ### * draw.derivatives
 > 
@@ -375,6 +449,34 @@ detaching ‘package:mgcv’
 > ## first derivative of all smooths
 > df <- derivatives(mod)
 > draw(df)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
+> nameEx("draw.difference_smooth")
+> ### * draw.difference_smooth
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: draw.difference_smooth
+> ### Title: Plot differences of smooths
+> ### Aliases: draw.difference_smooth
+> 
+> ### ** Examples
+> 
+> 
+> load_mgcv()
+> ## Don't show: 
+> set.seed(42)
+> ## End(Don't show)
+> df <- data_sim("eg4")
+> m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df)
+> 
+> diffs <- difference_smooths(m, smooth = "s(x2)")
+> draw(diffs)
 > 
 > 
 > 
@@ -456,7 +558,7 @@ Bivariate smoothing example
 > m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
 > draw(m2, contour = FALSE)
 > 
-> ## change the number of contours drawm
+> ## change the number of contours drawn
 > draw(m2, n_contour = 5)
 > 
 > 
@@ -741,11 +843,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x5649be464048>
+<environment: 0x561d29675708>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x5649be464048>
+<environment: 0x561d29675708>
 > 
 > 
 > 
@@ -991,15 +1093,35 @@ Factor `by' variable example
 > 
 > 
 > 
-> ### * <FOOTER>
-> ###
 > cleanEx()
 
 detaching ‘package:mgcv’
 
+> nameEx("vars_from_label")
+> ### * vars_from_label
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: vars_from_label
+> ### Title: Returns names of variables from a smooth label
+> ### Aliases: vars_from_label
+> 
+> ### ** Examples
+> 
+> 
+> vars_from_label("s(x1)")
+[1] "x1"
+> vars_from_label("t2(x1,x2,x3)")
+[1] "x1"
+> 
+> 
+> 
+> ### * <FOOTER>
+> ###
+> cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  9.603 0.122 9.77 0.001 0.002 
+Time elapsed:  10.501 0.141 10.673 0 0 
 > grDevices::dev.off()
 null device 
           1 
