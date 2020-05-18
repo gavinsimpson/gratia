@@ -90,7 +90,7 @@ test_that("draw.evaluated_2d_smooth() plots the smooth", {
     sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
     plt <- draw(sm)
     expect_doppelganger("draw 2d smooth", plt)
-    plt <- draw(sm, col_contour = "red")
+    plt <- draw(sm, contour_col = "red")
     expect_doppelganger("draw 2d smooth diff contour colour", plt)
 })
 
