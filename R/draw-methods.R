@@ -131,7 +131,7 @@
 ##'   standard error (`"se"`).
 ##' @param contour logical; should contours be draw on the plot using
 ##'   [ggplot2::geom_contour()].
-##' @param col_contour colour specification for contour lines.
+##' @param contour_col colour specification for contour lines.
 ##' @param n_contour numeric; the number of contour bins. Will result in
 ##'   `n_contour - 1` contour lines being drawn. See [ggplot2::geom_contour()].
 ##'
@@ -142,7 +142,7 @@
 ##' @rdname draw.evaluated_smooth
 `draw.evaluated_2d_smooth` <- function(object, show = c("estimate","se"),
                                        contour = TRUE,
-                                       col_contour = "#3366FF",
+                                       contour_col = "black",
                                        n_contour = NULL,
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
@@ -165,7 +165,7 @@
 
     if (isTRUE(contour)) {
         plt <- plt + geom_contour(mapping = aes_string(z = plot_var),
-                                  colour = col_contour,
+                                  colour = contour_col,
                                   bins = n_contour)
     }
 
@@ -238,7 +238,7 @@
 ##' @param rug logical; draw a rug plot at the botom of each plot?
 ##' @param contour logical; should contours be draw on the plot using
 ##'   [ggplot2::geom_contour()].
-##' @param col_contour colour specification for contour lines.
+##' @param contour_col colour specification for contour lines.
 ##' @param n_contour numeric; the number of contour bins. Will result in
 ##'   `n_contour - 1` contour lines being drawn. See [ggplot2::geom_contour()].
 ##' @param partial_match logical; should smooths be selected by partial matches
@@ -293,7 +293,7 @@
                        dist = 0.1,
                        rug = TRUE,
                        contour = TRUE,
-                       col_contour = "#3366FF",
+                       contour_col = "black",
                        n_contour = NULL,
                        partial_match = FALSE, ...) {
     scales <- match.arg(scales)
@@ -404,11 +404,11 @@
             }
             g[[i]] <- draw(l[[i]], rug = mf[[svar]],
                            partial_residuals = partial_residuals,
-                           contour = contour, col_contour = col_contour,
+                           contour = contour, contour_col = contour_col,
                            n_contour = n_contour)
         } else {
             g[[i]] <- draw(l[[i]], partial_residuals = partial_residuals,
-                           contour = contour, col_contour = col_contour,
+                           contour = contour, contour_col = contour_col,
                            n_contour = n_contour)
         }
     }
