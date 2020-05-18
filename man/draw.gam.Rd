@@ -12,6 +12,7 @@
   scales = c("free", "fixed"),
   align = "hv",
   axis = "lrtb",
+  ci_level = 0.95,
   n = 100,
   unconditional = FALSE,
   overall_uncertainty = TRUE,
@@ -53,6 +54,8 @@ Defaults to \code{"hv"} so that plots are nicely aligned.}
 
 \item{axis}{characer; see argument \code{axis} in \code{cowplot::plot_grid()}.
 Defaults to \code{"lrtb"} so that plots are nicely aligned.}
+
+\item{ci_level}{numeric between 0 and 1; the coverage of credible interval.}
 
 \item{n}{numeric; the number of points over the range of the covariate at
 which to evaluate the smooth.}
