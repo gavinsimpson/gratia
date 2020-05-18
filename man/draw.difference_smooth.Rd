@@ -53,7 +53,7 @@ interval.}
 \item{ci_colour}{colour specification for the confidence/credible intervals
 band.}
 
-\item{line_col}{colour}
+\item{line_col}{colour specicification for drawing lines}
 
 \item{scales}{character; should all univariate smooths be plotted with the
 same y-axis scale? The default, \code{scales = "fixed"}, ensures this is done.
@@ -63,6 +63,9 @@ terms.}
 
 \item{ncol, nrow}{numeric; the numbers of rows and columns over which to
 spread the plots}
+
+\item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
+\code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
 
 \item{xlab, ylab, title, subtitle, caption}{character; labels with which to
 annotate plots}
