@@ -44,6 +44,8 @@ stored.}
 
 \item{contour}{logical;}
 
+\item{contour_col}{colour specification for contour lines.}
+
 \item{n_contour}{numeric; the number of contour bins. Will result in
 \code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
 

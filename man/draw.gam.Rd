@@ -18,7 +18,7 @@
   dist = 0.1,
   rug = TRUE,
   contour = TRUE,
-  col_contour = "#3366FF",
+  contour_col = "black",
   n_contour = NULL,
   partial_match = FALSE,
   ...
@@ -76,7 +76,7 @@ and \code{dist} is a distance within the unit square. See
 \item{contour}{logical; should contours be draw on the plot using
 \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
 
-\item{col_contour}{colour specification for contour lines.}
+\item{contour_col}{colour specification for contour lines.}
 
 \item{n_contour}{numeric; the number of contour bins. Will result in
 \code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}

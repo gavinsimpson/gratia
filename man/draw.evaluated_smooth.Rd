@@ -26,7 +26,7 @@
   object,
   show = c("estimate", "se"),
   contour = TRUE,
-  col_contour = "#3366FF",
+  contour_col = "black",
   n_contour = NULL,
   xlab,
   ylab,
@@ -106,7 +106,7 @@ standard error (\code{"se"}).}
 \item{contour}{logical; should contours be draw on the plot using
 \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
 
-\item{col_contour}{colour specification for contour lines.}
+\item{contour_col}{colour specification for contour lines.}
 
 \item{n_contour}{numeric; the number of contour bins. Will result in
 \code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
