@@ -2,7 +2,7 @@
 % Please edit documentation in R/draw-methods.R
 \name{draw.smooth_samples}
 \alias{draw.smooth_samples}
-\title{Plotting posterior smooths}
+\title{Plot posterior smooths}
 \usage{
 \method{draw}{smooth_samples}(
   object,
@@ -75,7 +75,7 @@ against.}
 \item{...}{arguments to be passed to \code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}.}
 }
 \description{
-Plotting posterior smooths
+Plot posterior smooths
 }
 \examples{
 load_mgcv()

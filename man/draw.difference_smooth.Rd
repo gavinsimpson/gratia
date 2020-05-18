@@ -67,7 +67,7 @@ Plot differences of smooths
 load_mgcv()
 \dontshow{set.seed(42)}
 df <- data_sim("eg4")
-m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df)
+m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 
 diffs <- difference_smooths(m, smooth = "s(x2)")
 draw(diffs)
