@@ -32,7 +32,7 @@ The main features of *gratia* are currently
 -   A *ggplot2*-based replacement for `mgcv:::plot.gam()`:
     `draw(gam_model)`.
 
-    For example, the classic four term additive example from Gu & Wabha:
+    For example, the classic four term additive example from Gu & Wahba:
 
     ![Estimated smooths from a
     GAM](man/figures/README-draw-gam-figure-1.png)
