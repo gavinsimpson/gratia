@@ -132,12 +132,20 @@
   <span class='kw'>rug</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>ref_line</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>contour</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>scales</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"free"</span>, <span class='st'>"fixed"</span>),
+  <span class='kw'>contour_col</span> <span class='kw'>=</span> <span class='st'>"black"</span>,
+  <span class='kw'>n_contour</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>ci_alpha</span> <span class='kw'>=</span> <span class='fl'>0.2</span>,
   <span class='kw'>ci_colour</span> <span class='kw'>=</span> <span class='st'>"black"</span>,
   <span class='kw'>line_col</span> <span class='kw'>=</span> <span class='st'>"steelblue"</span>,
-  <span class='kw'>align</span> <span class='kw'>=</span> <span class='st'>"hv"</span>,
-  <span class='kw'>axis</span> <span class='kw'>=</span> <span class='st'>"lrtb"</span>,
+  <span class='kw'>scales</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"free"</span>, <span class='st'>"fixed"</span>),
+  <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>guides</span> <span class='kw'>=</span> <span class='st'>"keep"</span>,
+  <span class='kw'>xlab</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>ylab</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>
 )</pre>
 
@@ -171,12 +179,9 @@ stored.</p></td>
       <td><p>logical;</p></td>
     </tr>
     <tr>
-      <th>scales</th>
-      <td><p>character; should all univariate smooths be plotted with the
-same y-axis scale? The default, <code>scales = "fixed"</code>, ensures this is done.
-If <code>scales = "free"</code> each univariate smooth has its own y-axis scale.
-Currently does not affect the y-axis scale of plots of the parametric
-terms.</p></td>
+      <th>n_contour</th>
+      <td><p>numeric; the number of contour bins. Will result in
+<code>n_contour - 1</code> contour lines being drawn. See <code><a href='https://ggplot2.tidyverse.org/reference/geom_contour.html'>ggplot2::geom_contour()</a></code>.</p></td>
     </tr>
     <tr>
       <th>ci_alpha</th>
@@ -193,14 +198,22 @@ band.</p></td>
       <td><p>colour</p></td>
     </tr>
     <tr>
-      <th>align</th>
-      <td><p>characer; see argument <code>align</code> in <code><a href='https://rdrr.io/pkg/cowplot/man/plot_grid.html'>cowplot::plot_grid()</a></code>.
-Defaults to <code>"hv"</code> so that plots are nicely aligned.</p></td>
+      <th>scales</th>
+      <td><p>character; should all univariate smooths be plotted with the
+same y-axis scale? The default, <code>scales = "fixed"</code>, ensures this is done.
+If <code>scales = "free"</code> each univariate smooth has its own y-axis scale.
+Currently does not affect the y-axis scale of plots of the parametric
+terms.</p></td>
     </tr>
     <tr>
-      <th>axis</th>
-      <td><p>characer; see argument <code>axis</code> in <code><a href='https://rdrr.io/pkg/cowplot/man/plot_grid.html'>cowplot::plot_grid()</a></code>.
-Defaults to <code>"lrtb"</code> so that plots are nicely aligned.</p></td>
+      <th>ncol, nrow</th>
+      <td><p>numeric; the numbers of rows and columns over which to
+spread the plots</p></td>
+    </tr>
+    <tr>
+      <th>xlab, ylab, title, subtitle, caption</th>
+      <td><p>character; labels with which to
+annotate plots</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -214,7 +227,7 @@ Defaults to <code>"lrtb"</code> so that plots are nicely aligned.</p></td>
     <pre class="examples"><div class='input'>
 <span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='data_sim.html'>data_sim</a></span>(<span class='st'>"eg4"</span>)
+<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='data_sim.html'>data_sim</a></span>(<span class='st'>"eg4"</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>42</span>)
 <span class='no'>m</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='no'>fac</span> + <span class='fu'>s</span>(<span class='no'>x2</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='no'>fac</span>) + <span class='fu'>s</span>(<span class='no'>x0</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>df</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
 
 <span class='no'>diffs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='difference_smooths.html'>difference_smooths</a></span>(<span class='no'>m</span>, <span class='kw'>smooth</span> <span class='kw'>=</span> <span class='st'>"s(x2)"</span>)
