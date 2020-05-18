@@ -18,9 +18,12 @@ jobs:
     - uses: r-lib/actions/setup-r@v1
     - uses: r-lib/actions/setup-pandoc@v1
 
-    # install packages needed
-    - name: install required packages
-      run: Rscript -e 'install.packages(c("rmarkdown","gratia"))'
+    # install packages
+    - name: install rmarkdown
+      run: Rscript -e 'install.packages(c("rmarkdown","remotes"))'
+      
+    - name: install gratia
+      run: Rscript -e 'remotes::install_github("gavinsimpson/gratia", upgrade_dependencies = FALSE)'
 
     # Render READEME.md using rmarkdown
     - name: render README
