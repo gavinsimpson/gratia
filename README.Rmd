@@ -33,10 +33,15 @@ Graceful 'ggplot'-based graphics and utility functions for working with generali
 ## Features
 
 ```{r draw-gam-figure, dev = "png", fig.height = 6, fig.width = 9, dpi = 120, echo = FALSE, fig.show = "hide", message = FALSE}
-set.seed(42)
-df <- gamSim(eg = 1, n = 400, verbose = FALSE)
-m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
-draw(m)
+df1 <- data_sim("eg1", n = 400, seed = 42)
+m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
+draw(m, partial_residuals = TRUE)
+```
+
+```{r draw-gam-figure-2d, dev = "png", fig.height = 6, fig.width = 9, dpi = 120, echo = FALSE, fig.show = "hide", message = FALSE}
+df2 <- data_sim("eg2", n = 1000, seed = 42)
+m2 <- gam(y ~ s(x, z),  data = df2, method = "REML")
+draw(m2)
 ```
 
 ```{r appraise-figure, dev = "png", fig.height = 6, fig.width = 9, dpi = 120, echo = FALSE, fig.show = "hide", dependson = -1}
@@ -47,7 +52,13 @@ The main features of *gratia* are currently
 
 * A *ggplot2*-based replacement for `mgcv:::plot.gam()`: `draw(gam_model)`.
 
-    ![Estimated smooths from a GAM](man/figures/README-draw-gam-figure-1.png)
+    For example, the classic four term additive example from Gu & Wabha:
+	
+	![Estimated smooths from a GAM](man/figures/README-draw-gam-figure-1.png)
+
+    Or for a bivariate smooth:
+    
+    ![Estimated smooths from a GAM](man/figures/README-draw-gam-figure-2d-1.png)
 
     Note specialist smoothers (`bs %in% c("sos","mrf","so")`) are not currently supported, but univariate, *factor* and *continuous* `by`-variable smooths, simple random effect smooths (`bs = 're'`), factor-smooth interaction smooths (`bs = "fs"`), and bivariate tensor product smooths are supported,
 
