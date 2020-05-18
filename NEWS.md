@@ -7,6 +7,10 @@
   is drawn. This feature is not available for smooths of more than one variable,
   by smooths, or factor-smooth interactions (`bs = "fs"`).
 
+* New function `difference_smooth()` for computing differences between factor
+  smooth interactions. Methods available for `gam()`, `bam()`, `gamm()` and
+  `gamm4::gamm4()`. Also has a `draw()` method.
+
 * New functions `add_fitted()` and `add_residuals()` to add fitted values
   (expectations) and model residuals to an existing data frame. Currently methods
   available for objects fitted by `gam()` and `bam()`.
