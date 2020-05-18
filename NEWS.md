@@ -7,6 +7,15 @@
   is drawn. This feature is not available for smooths of more than one variable,
   by smooths, or factor-smooth interactions (`bs = "fs"`).
 
+* The coverage of credible and ocnfidence intervals drawn by `draw.gam()` can be
+  specified via argument `ci_level`. The default is arbitrarily `0.95` for no
+  other reason than (rough) compatibility with `plot.gam()`.
+  
+  This chance has had the effect of making the intervals slightly narrower than
+  in previous versions of *gratia*; intervals were drawn at &plusmn; 2 &times;
+  the standard error. The default intervals are now drawn at &plusmn; ~1.96
+  &times; the standard error.
+
 * New function `difference_smooth()` for computing differences between factor
   smooth interactions. Methods available for `gam()`, `bam()`, `gamm()` and
   `gamm4::gamm4()`. Also has a `draw()` method, which can handle differences of
