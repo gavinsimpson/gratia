@@ -9,6 +9,7 @@ context("test data_sim()")
 data(ref_sims, package = "gratia")
 
 test_that("test data_sim() reproduces expected output", {
+    skip_on_ci()
     new_sims <- create_reference_simulations()
     for (i in names(ref_sims)) {
         expect_equal(new_sims[[!!(i)]], ref_sims[[!!(i)]])
