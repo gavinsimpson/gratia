@@ -466,7 +466,7 @@
 `draw.evaluated_re_smooth` <- function(object, qq_line = TRUE, xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL, ...) {
-    smooth_var <- names(object)[3L]
+    smooth_var <- unique(object[["smooth"]]) ## names(object)[3L]
 
     ## base plot with computed QQs
     plt <- ggplot(object, aes_string(sample = "est")) +
