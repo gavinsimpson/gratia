@@ -881,3 +881,143 @@
     
     plt
 }
+
+##' Plot differences of smooths
+##'
+##' @param rug logical;
+##' @param ref_line logical;
+##' @param contour logical;
+##' @param ci_alpha numeric; alpha transparency for confidence or simultaneous
+##'   interval.
+##' @param ci_colour colour specification for the confidence/credible intervals
+##'   band.
+##' @param line_col colour
+##' @inheritParams draw.gam
+##'
+##' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_line labs
+##' @importFrom cowplot plot_grid
+##' @importFrom purrr map
+##' @export
+##'
+##' @examples
+##'
+##' load_mgcv()
+##' \dontshow{set.seed(42)}
+##' df <- data_sim("eg4")
+##' m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df)
+##'
+##' diffs <- difference_smooths(m, smooth = "s(x2)")
+##' draw(diffs)
+`draw.difference_smooth` <- function(object,
+                                     select = NULL,
+                                     rug = FALSE,
+                                     ref_line = FALSE,
+                                     contour = FALSE,
+                                     scales = c("free", "fixed"),
+                                     ci_alpha = 0.2,
+                                     ci_colour = "black",
+                                     line_col = "steelblue",
+                                     align = "hv", axis = "lrtb", ...) {
+    scales <- match.arg(scales)
+
+    ## how many smooths
+    sm <- unique(object[["smooth"]])
+    ## select smooths
+    select <- check_user_select_smooths(smooths = sm, select = select)
+    sm <- sm[select]
+    
+    plotlist <- vector("list", length = length(sm))
+
+    df_list <- split(object, f = paste(object$level_1, object$level_2, sep = "-"))
+
+    plotlist <- map(df_list, draw_difference, ci_alpha = ci_alpha,
+                    line_col = line_col, rug = rug, ref_line = ref_line,
+                    ci_colour = ci_colour, contour = contour)
+
+    if (isTRUE(identical(scales, "fixed"))) {
+        ylims <- range(object[["lower"]], object[["upper"]])
+
+        for (i in seq_along(plotlist)) {
+            plotlist[[i]] <- plotlist[[i]] + lims(y = ylims)
+        }
+    }
+
+    plot_grid(plotlist = plotlist, align = align, axis = axis, ...)
+}
+
+`draw_difference` <- function(object,
+                              rug = NULL,
+                              ref_line = NULL,
+                              contour = NULL,
+                              ci_alpha = NULL,
+                              ci_colour = NULL,
+                              line_col = NULL) {
+    xvars <- unique(object[["smooth"]])
+    xvars <- vars_from_label(xvars)
+    n_xvars <- length(xvars)
+    plt <- if (identical(n_xvars, 1L)) {
+      draw_1d_difference(object, xvars, rug = rug, ref_line = ref_line,
+                         ci_alpha = ci_alpha, line_col = line_col,
+                         ci_colour = ci_colour)
+    } else if (identical(n_xvars, 2L)) {
+        draw_2d_difference(object, xvars, contour = contour)
+    } else if (identical(n_xvars, 3L)) {
+        draw_3d_difference(object, xvars, contour = contour)
+    } else if (identical(n_xvars, 4L)) {
+        draw_4d_difference(object, xvars, contour = contour)
+    } else {
+        message("Can't plot differences for smooths of more than 4 variables.")
+        NULL
+    }
+
+    plt #return
+}
+
+##' @importFrom ggplot2 ggplot aes_string geom_ribbon geom_line labs geom_hline geom_rug
+`draw_1d_difference` <- function(object, xvars,
+                                 rug = FALSE,
+                                 ref_line = FALSE,
+                                 ci_alpha = 0.2,
+                                 ci_colour = "black",
+                                 line_col = "red") {
+    sm_label <- unique(object$smooth)
+    by_var <- unique(object$by)
+    f1 <- unique(object$level_1)
+    f2 <- unique(object$level_2)
+    plt_title1 <- mgcv_by_smooth_labels(sm_label, by_var, f1)
+    plt_title2 <- mgcv_by_smooth_labels(sm_label, by_var, f2)
+    plt_title <- paste(plt_title1, plt_title2, sep = " - ")
+    y_label <- "Difference"
+    
+    plt <- ggplot(object, aes_(x = as.name(xvars[1L]), y = ~ diff))
+
+    if (isTRUE(ref_line)) {
+        plt <- plt + geom_hline(yintercept = 0, colour = line_col)
+    }
+    plt <- plt +
+        geom_ribbon(aes_string(ymin = "lower", ymax = "upper", y = NULL),
+                    alpha = ci_alpha) +
+        geom_line() +
+        labs(title = plt_title, x = xvars, y = y_label)
+
+    if(isTRUE(rug)) {
+        plt <- plt + geom_rug(sides = "b")
+    }
+    plt
+}
+
+##
+`draw_2d_difference` <- function(object, xvars, contour = FALSE) {
+    warning("Plotting differences of 2D smooths is not yet implemented")
+    return(NULL)
+}
+
+`draw_3d_difference` <- function(object, xvars, contour = FALSE) {
+    warning("Plotting differences of 3D smooths is not yet implemented")
+    return(NULL)
+}
+
+`draw_4d_difference` <- function(object, xvars, contour = FALSE) {
+    warning("Plotting differences of 4D smooths is not yet implemented")
+    return(NULL)
+}
