@@ -81,7 +81,16 @@
                           point_alpha = 1,
                           line_col = "red", ...) {
     method <- match.arg(method)         # what method for the QQ plot?
-
+    ## check if we can do the method
+    if (identical(method, "direct") &&
+        is.null(fix.family.qf(family(model))[["qf"]])) {
+        method <- "simulate"
+    }
+    if (identical(method, "simulate") &&
+        is.null(fix.family.rd(family(model))[["rd"]])) {
+        method <- "normal"
+    }
+    
     if (level <= 0 || level >= 1) {
         stop("Level must be 0 < level < 1. Supplied level <", level, ">",
              call. = FALSE)
@@ -149,6 +158,29 @@
     plt
 }
 
+##' @export
+##' @rdname qq_plot
+`qq_plot.glm` <- function(model, ...) {
+    if (is.null(model[["sig2"]])) {
+        model[["sig2"]] <- summary(model)$dispersion
+    }
+    qq_plot.gam(model, ...)
+}
+
+##' @importFrom stats df.residual
+`qq_plot.lm` <- function(model, ...) {
+    r <- residuals(model)
+    r.df <- df.residual(model)
+    model[["sig2"]] <- sum((r- mean(r))^2) / r.df
+    if (is.null(weights(model))) {
+        model$prior.weights <- rep(1, nrow(model.frame(model)))
+    }
+    if (is.null(model[["linear.predictors"]])) {
+        model[["linear.predictors"]] <- model[["fitted.values"]]
+    }
+    qq_plot.gam(model, ...)
+}
+
 ##' @importFrom mgcv fix.family.rd
 ##' @importFrom stats weights
 `qq_simulate` <- function(model, n = 50, type = c("deviance","response","pearson"),
@@ -165,10 +197,20 @@
     }
 
     dev_resid_fun <- family[["dev.resids"]] # deviance residuals function
+    if (is.null(dev_resid_fun)) {
+        dev_resid_fun <- family$residuals
+        if (is.null(dev_resid_fun)) {
+            stop("Deviance residual function for family <", family[["family"]],
+                 "> not available.")
+        }
+    }
     var_fun <- family[["variance"]]         # variance function
     fit <- fitted(model)
     prior_w <- weights(model, type = "prior")
     sigma2 <- model[["sig2"]]
+    ## if (is.null(sigma2)) {
+    ##     sigma2 <- summary(model)$dispersion
+    ## }
     na_action <- na.action(model)
 
     sims <- replicate(n = n,
@@ -176,7 +218,7 @@
                                        sigma2 = sigma2, dev_resid_fun = dev_resid_fun,
                                        var_fun = var_fun, type = type,
                                        na_action = na_action))
-    n_obs <- length(fit)
+    n_obs <- NROW(fit)
     out <- quantile(sims, probs = (seq_len(n_obs) - 0.5) / n_obs)
     int <- apply(sims, 1L, quantile, probs = c(alpha, 1 - alpha))
     out <- data.frame(theoretical = out, lower = int[1L, ], upper = int[2L, ])
@@ -222,9 +264,9 @@
     fit <- fitted(model)
     weights <- weights(model, type = "prior")
     sigma2 <- model[["sig2"]]
-    if (is.null(sigma2)) {
-        sigma2 <- summary(model)$dispersion # rather than call summary, do only what it does?
-    }
+    ## if (is.null(sigma2)) {
+    ##     sigma2 <- summary(model)$dispersion # rather than call summary, do only what it does?
+    ## }
     na_action <- na.action(model)
     nr <- length(r)                     # number of residuals
     unif <- (seq_len(nr) - 0.5) / nr
@@ -279,16 +321,23 @@
 }
 
 `deviance_residuals` <- function(y, fit, weights, dev_resid_fun) {
-    ## compute deviance residuals
-    r <- dev_resid_fun(y, fit, weights)
-    ## sign of residuals is typically an attribute
-    posneg <- attr(r, "sign")
-    ## ...but may be missing for some families
-    if (is.null(posneg)) {
-        posneg <- sign(y - fit)
+    if ("object" %in% names(formals(dev_resid_fun))) {
+        r <- dev_resid_fun(list(y = y, fitted.values = fit,
+                                prior.weights = weights),
+                           type = "deviance")
+    } else {
+        ## compute deviance residuals
+        r <- dev_resid_fun(y, fit, weights)
+        ## sign of residuals is typically an attribute
+        posneg <- attr(r, "sign")
+        ## ...but may be missing for some families
+        if (is.null(posneg)) {
+            posneg <- sign(y - fit)
+        }
+        ## calculate the deviance residuals
+        r <- sqrt(pmax(r, 0)) * posneg
     }
-    ## colculate the deviance residuals
-    sqrt(pmax(r, 0)) * posneg
+    r
 }
 
 `pearson_residuals` <- function(y, fit, weights, var_fun) {
@@ -383,6 +432,11 @@
                                    point_col = "black", point_alpha = 1) {
     ## extract data for plot
     fit <- fitted(model)
+    ## handle case where fitted is a matrix; extended.families
+    ##   - the needs to be more involved as what about mvn or multinom familities
+    if (NCOL(fit) > 1L) {
+        fit <- fit[, 1]
+    }
     obs <- model[["y"]]
 
     df <- data.frame(observed = obs, fitted = fit)
@@ -522,7 +576,13 @@
 ##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 ##' ## run some basic model checks
 ##' appraise(mod, point_col = "steelblue", point_alpha = 0.4)
-`appraise` <- function(model,
+`appraise` <- function(model, ...) {
+    UseMethod("appraise")
+}
+
+##' @rdname appraise
+##' @export
+`appraise.gam` <- function(model,
                        method = c("direct", "simulate", "normal"),
                        n_uniform = 10, n_simulate = 50,
                        type = c("deviance", "pearson", "response"),
@@ -558,4 +618,23 @@
 
     plot_grid(plt1, plt2, plt3, plt4, ncol = ncol, align = "hv",
               axis = "lrtb", ...)
+}
+
+##' @rdname appraise
+##' @importFrom stats model.frame model.response df.residual
+##' @export
+`appraise.lm` <- function(model, ...) {
+    r <- residuals(model)
+    r.df <- df.residual(model)
+    model[["sig2"]] <- sum((r- mean(r))^2) / r.df
+    if (is.null(weights(model))) {
+        model$prior.weights <- rep(1, nrow(model.frame(model)))
+    }
+    if (is.null(model[["linear.predictors"]])) {
+        model[["linear.predictors"]] <- model[["fitted.values"]]
+    }
+    if (is.null(model[["y"]])) {
+        model[["y"]] <- model.response(model.frame(model))
+    }
+    appraise.gam(model, ...)
 }

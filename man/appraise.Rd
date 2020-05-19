@@ -2,9 +2,13 @@
 % Please edit documentation in R/diagnose.R
 \name{appraise}
 \alias{appraise}
+\alias{appraise.gam}
+\alias{appraise.lm}
 \title{Model diagnostic plots}
 \usage{
-appraise(
+appraise(model, ...)
+
+\method{appraise}{gam}(
   model,
   method = c("direct", "simulate", "normal"),
   n_uniform = 10,
@@ -20,9 +24,14 @@ appraise(
   line_col = "red",
   ...
 )
+
+\method{appraise}{lm}(model, ...)
 }
 \arguments{
 \item{model}{a fitted model. Currently only class \code{"gam"}.}
+
+\item{...}{arguments passed to \code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}, except for \code{align}
+and \code{axis}, which are set internally.}
 
 \item{method}{character; method used to generate theoretical quantiles.}
 
@@ -56,9 +65,6 @@ points of all plots.}
 
 \item{line_col}{colour specification for the 1:1 line in the QQ plot and the
 reference line in the residuals vs linear predictor plot.}
-
-\item{...}{arguments passed to \code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}, except for \code{align}
-and \code{axis}, which are set internally.}
 }
 \description{
 Model diagnostic plots

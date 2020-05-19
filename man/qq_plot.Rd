@@ -3,6 +3,7 @@
 \name{qq_plot}
 \alias{qq_plot}
 \alias{qq_plot.gam}
+\alias{qq_plot.glm}
 \title{Quantile-quantile plot of model residuals}
 \usage{
 qq_plot(model, ...)
@@ -26,6 +27,8 @@ qq_plot(model, ...)
   line_col = "red",
   ...
 )
+
+\method{qq_plot}{glm}(model, ...)
 }
 \arguments{
 \item{model}{a fitted model. Currently only class \code{"gam"}.}
