@@ -61,6 +61,13 @@
   returns a character vector of variable names that are involved in a model
   term. These are strictly for working with parametric terms in models.
 
+* `appraise()` now works for models fitted by `glm()` and `lm()`, as do the
+  underlying functions it calls, especially `qq_plot`.
+  
+  `appraise()` also works for models fitted with family `gaulss()`. Further
+  locational scale models and models fitted with extended family functions will
+  be supported in upcoming releases.
+
 ## User visible changes
 
 * `datagen()` is now an *internal* function and is no longer exported. Use
