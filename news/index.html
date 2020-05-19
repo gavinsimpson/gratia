@@ -153,6 +153,10 @@
 <p>These are passed on to <code><a href="../reference/qq_plot.html">qq_plot()</a></code>, <code><a href="../reference/observed_fitted_plot.html">observed_fitted_plot()</a></code>, <code><a href="../reference/residuals_linpred_plot.html">residuals_linpred_plot()</a></code>, and <code><a href="../reference/residuals_hist_plot.html">residuals_hist_plot()</a></code>, which also now take the new arguments were applicable.</p>
 </li>
 <li><p>Added utility functions <code><a href="../reference/is_factor_term.html">is_factor_term()</a></code> and <code><a href="../reference/term_variables.html">term_variables()</a></code> for working with models. <code><a href="../reference/is_factor_term.html">is_factor_term()</a></code> identifies is the named term is a factor using information from the <code><a href="https://rdrr.io/r/stats/terms.html">terms()</a></code> object of the fitted model. <code><a href="../reference/term_variables.html">term_variables()</a></code> returns a character vector of variable names that are involved in a model term. These are strictly for working with parametric terms in models.</p></li>
+<li>
+<p><code><a href="../reference/appraise.html">appraise()</a></code> now works for models fitted by <code><a href="https://rdrr.io/r/stats/glm.html">glm()</a></code> and <code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code>, as do the underlying functions it calls, especially <code>qq_plot</code>.</p>
+<p><code><a href="../reference/appraise.html">appraise()</a></code> also works for models fitted with family <code>gaulss()</code>. Further locational scale models and models fitted with extended family functions will be supported in upcoming releases.</p>
+</li>
 </ul>
 </div>
 <div id="user-visible-changes" class="section level2">
