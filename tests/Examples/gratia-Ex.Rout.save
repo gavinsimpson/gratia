@@ -38,7 +38,10 @@ Type 'q()' to quit R.
 > 
 > 
 > load_mgcv()
+> ## Don't show: 
 > set.seed(1)
+> op <- options(digits = 3, cli.unicode = FALSE)
+> ## End(Don't show)
 > df <- gamSim(eg = 1, verbose = FALSE)
 > df <- df[, c("y","x0","x1","x2","x3")]
 > m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
@@ -58,7 +61,7 @@ Type 'q()' to quit R.
  8  8.51   0.661  0.781  0.947  0.859   6.74
  9 10.6    0.629  0.0111 0.339  0.446   9.14
 10  3.72   0.0618 0.940  0.0317 0.677   7.04
-# … with 390 more rows
+# ... with 390 more rows
 > 
 > ## with type = "terms" or "iterms"
 > add_fitted(df, m, type = "terms")
@@ -75,7 +78,10 @@ Type 'q()' to quit R.
  8  8.51   0.661  0.781  0.947  0.859      7.94   0.434     1.67    -3.20 
  9 10.6    0.629  0.0111 0.339  0.446      7.94   0.512    -1.95     2.63 
 10  3.72   0.0618 0.940  0.0317 0.677      7.94  -0.695     3.20    -3.35 
-# … with 390 more rows, and 1 more variable: `.s(x3)` <dbl>
+# ... with 390 more rows, and 1 more variable: `.s(x3)` <dbl>
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > 
 > 
 > 
@@ -96,7 +102,10 @@ detaching ‘package:mgcv’
 > 
 > 
 > load_mgcv()
+> ## Don't show: 
 > set.seed(1)
+> op <- options(digits = 5, cli.unicode = FALSE)
+> ## End(Don't show)
 > df <- gamSim(eg = 1, verbose = FALSE)
 > df <- df[, c("y","x0","x1","x2","x3")]
 > m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
@@ -116,7 +125,10 @@ detaching ‘package:mgcv’
  8  8.51   0.661  0.781  0.947  0.859    1.78  
  9 10.6    0.629  0.0111 0.339  0.446    1.50  
 10  3.72   0.0618 0.940  0.0317 0.677   -3.32  
-# … with 390 more rows
+# ... with 390 more rows
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > 
 > 
 > 
@@ -131,7 +143,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: appraise
 > ### Title: Model diagnostic plots
-> ### Aliases: appraise
+> ### Aliases: appraise appraise.gam appraise.lm
 > 
 > ### ** Examples
 > 
@@ -168,11 +180,15 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > load_mgcv()
 > ## Don't show: 
 > set.seed(42)
+> op <- options(digits = 3, cli.unicode = FALSE)
 > ## End(Don't show)
 > df <- gamSim(4, n = 400, verbose = FALSE)
 > 
 > bf <- basis(s(x0), data = df)
 > bf <- basis(s(x2, by = fac, bs = 'bs'), data = df, constraints = TRUE)
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > 
 > 
 > 
@@ -319,6 +335,7 @@ detaching ‘package:mgcv’
 > 
 > ## Don't show: 
 > set.seed(1)
+> op <- options(digits = 5, cli.unicode = FALSE)
 > ## End(Don't show)
 > data_sim("eg1")
 # A tibble: 400 x 10
@@ -334,7 +351,10 @@ detaching ‘package:mgcv’
  8  8.51   0.661  0.781  0.947  0.859  6.52 1.75   4.77 0.00243       0
  9 10.6    0.629  0.0111 0.339  0.446  9.19 1.84   1.02 6.33          0
 10  3.72   0.0618 0.940  0.0317 0.677  7.17 0.386  6.56 0.231         0
-# … with 390 more rows
+# ... with 390 more rows
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > 
 > 
 > 
@@ -401,6 +421,7 @@ detaching ‘package:mgcv’
 > load_mgcv()
 > ## Don't show: 
 > set.seed(42)
+> op <- options(digits = 3, cli.unicode = FALSE)
 > ## End(Don't show)
 > df <- data_sim("eg4")
 > m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
@@ -419,7 +440,10 @@ detaching ‘package:mgcv’
  8 s(x2)  fac   1       2       1.03  0.393  0.262    1.80 0.0740 
  9 s(x2)  fac   1       2       1.12  0.378  0.380    1.86 0.0841 
 10 s(x2)  fac   1       2       1.21  0.367  0.489    1.93 0.0941 
-# … with 290 more rows
+# ... with 290 more rows
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > 
 > 
 > 
@@ -472,8 +496,8 @@ detaching ‘package:mgcv’
 > ## Don't show: 
 > set.seed(42)
 > ## End(Don't show)
-> df <- data_sim("eg4")
-> m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df)
+> df <- data_sim("eg4", seed = 42)
+> m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 > 
 > diffs <- difference_smooths(m, smooth = "s(x2)")
 > draw(diffs)
@@ -602,7 +626,7 @@ detaching ‘package:mgcv’
 > flush(stderr()); flush(stdout())
 > 
 > ### Name: draw.smooth_samples
-> ### Title: Plotting posterior smooths
+> ### Title: Plot posterior smooths
 > ### Aliases: draw.smooth_samples
 > 
 > ### ** Examples
@@ -652,7 +676,7 @@ detaching ‘package:mgcv’
 > load_mgcv()
 > ## Don't show: 
 > set.seed(2)
-> op <- options(cli.unicode = FALSE, digits = 6)
+> op <- options(cli.unicode = FALSE, digits = 5)
 > ## End(Don't show)
 > dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
@@ -675,7 +699,9 @@ Gu & Wahba 4 term additive model
 # ... with 90 more rows
 > 
 > ## 2d example
+> ## Don't show: 
 > set.seed(2)
+> ## End(Don't show)
 > dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
 Bivariate smoothing example
 > m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
@@ -843,11 +869,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x561d29675708>
+<environment: 0x564c731a5220>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x561d29675708>
+<environment: 0x564c731a5220>
 > 
 > 
 > 
@@ -935,7 +961,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: qq_plot
 > ### Title: Quantile-quantile plot of model residuals
-> ### Aliases: qq_plot qq_plot.gam
+> ### Aliases: qq_plot qq_plot.gam qq_plot.glm
 > 
 > ### ** Examples
 > 
@@ -1112,7 +1138,7 @@ detaching ‘package:mgcv’
 > vars_from_label("s(x1)")
 [1] "x1"
 > vars_from_label("t2(x1,x2,x3)")
-[1] "x1"
+[1] "x1" "x2" "x3"
 > 
 > 
 > 
@@ -1121,7 +1147,7 @@ detaching ‘package:mgcv’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  10.501 0.141 10.673 0 0 
+Time elapsed:  11.859 0.113 12.452 0 0.005 
 > grDevices::dev.off()
 null device 
           1 
