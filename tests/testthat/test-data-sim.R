@@ -19,6 +19,7 @@ test_that("test data_sim() produces tibbles", {
 
 test_that("test data_sim() reproduces reference output", {
     skip_on_ci()
+    skip_on_cran()
     for (i in names(ref_sims)) {
         expect_equal(new_sims[[!!(i)]], ref_sims[[!!(i)]])
     }
