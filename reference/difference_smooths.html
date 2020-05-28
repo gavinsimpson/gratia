@@ -182,7 +182,10 @@ between smooths.</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
+<span class='co'># \dontshow{</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
+<span class='no'>op</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>cli.unicode</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='co'># }</span>
 <span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='data_sim.html'>data_sim</a></span>(<span class='st'>"eg4"</span>)
 <span class='no'>m</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='no'>fac</span> + <span class='fu'>s</span>(<span class='no'>x2</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='no'>fac</span>) + <span class='fu'>s</span>(<span class='no'>x0</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>df</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
 
@@ -199,7 +202,7 @@ between smooths.</p></td>
 #&gt; </span><span style='color: #555555;'> 8</span><span> s(x2)  fac   1       2       1.03  0.393  0.262    1.80 0.074</span><span style='text-decoration: underline;'>0</span><span> 
 #&gt; </span><span style='color: #555555;'> 9</span><span> s(x2)  fac   1       2       1.12  0.378  0.380    1.86 0.084</span><span style='text-decoration: underline;'>1</span><span> 
 #&gt; </span><span style='color: #555555;'>10</span><span> s(x2)  fac   1       2       1.21  0.367  0.489    1.93 0.094</span><span style='text-decoration: underline;'>1</span><span> 
-#&gt; </span><span style='color: #555555;'># … with 290 more rows</span><span></div></span></pre>
+#&gt; </span><span style='color: #555555;'># ... with 290 more rows</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='no'>op</span>)</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
