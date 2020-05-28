@@ -1,4 +1,4 @@
-# gratia 0.3.999 (in development)
+# gratia 0.4.0
 
 ## New features
 
