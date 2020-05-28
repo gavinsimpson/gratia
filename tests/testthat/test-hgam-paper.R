@@ -14,7 +14,7 @@ context("test-hgam-paper-models")
 data(CO2, package = "datasets")
 CO2 <- transform(CO2, Plant_uo = factor(Plant, ordered = FALSE))
 data(bird_move, package = "gratia")
-ctrl <- gam.control(nthreads = 2)
+ctrl <- gam.control(nthreads = 3)
 data(zooplankton, package = "gratia")
 zooplankton <- transform(zooplankton, year_f = factor(year))
 
