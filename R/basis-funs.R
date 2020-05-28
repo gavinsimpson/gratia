@@ -25,11 +25,15 @@
 ##' 
 ##' @examples
 ##' load_mgcv()
-##' \dontshow{set.seed(42)}
+##' \dontshow{
+##' set.seed(42)
+##' op <- options(digits = 3, cli.unicode = FALSE)
+##' }
 ##' df <- gamSim(4, n = 400, verbose = FALSE)
 ##'
 ##' bf <- basis(s(x0), data = df)
 ##' bf <- basis(s(x2, by = fac, bs = 'bs'), data = df, constraints = TRUE)
+##' \dontshow{options(op)}
 `basis` <- function(smooth, data, knots = NULL, constraints = FALSE,
                     ...) {
     ## call smoothCon to create the basis as specified in `x`

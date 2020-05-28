@@ -16,8 +16,12 @@
 ##' @export
 ##'
 ##' @examples
-##' \dontshow{set.seed(1)}
+##' \dontshow{
+##' set.seed(1)
+##' op <- options(digits = 5, cli.unicode = FALSE)
+##' }
 ##' data_sim("eg1")
+##' \dontshow{options(op)}
 `data_sim` <- function(model = "eg1", n = 400, scale = 2,
                        dist = c("normal", "poisson", "binary"),
                        seed = NULL) {

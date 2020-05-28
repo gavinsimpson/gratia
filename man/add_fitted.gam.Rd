@@ -36,7 +36,10 @@ Add fitted values from a GAM to a data frame
 \examples{
 
 load_mgcv()
+\dontshow{
 set.seed(1)
+op <- options(digits = 3, cli.unicode = FALSE)
+}
 df <- gamSim(eg = 1, verbose = FALSE)
 df <- df[, c("y","x0","x1","x2","x3")]
 m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
@@ -46,4 +49,5 @@ add_fitted(df, m)
 
 ## with type = "terms" or "iterms"
 add_fitted(df, m, type = "terms")
+\dontshow{options(op)}
 }

@@ -31,11 +31,15 @@ of \emph{mgcv}'s smooths via \code{\link[mgcv:s]{mgcv::s()}}., \code{\link[mgcv:
 }
 \examples{
 load_mgcv()
-\dontshow{set.seed(42)}
+\dontshow{
+set.seed(42)
+op <- options(digits = 3, cli.unicode = FALSE)
+}
 df <- gamSim(4, n = 400, verbose = FALSE)
 
 bf <- basis(s(x0), data = df)
 bf <- basis(s(x2, by = fac, bs = 'bs'), data = df, constraints = TRUE)
+\dontshow{options(op)}
 }
 \author{
 Gavin L. Simpson

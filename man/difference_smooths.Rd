@@ -43,9 +43,13 @@ Differences of factor smooth interactions
 \examples{
 
 load_mgcv()
-\dontshow{set.seed(42)}
+\dontshow{
+set.seed(42)
+op <- options(digits = 3, cli.unicode = FALSE)
+}
 df <- data_sim("eg4")
 m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 
 difference_smooths(m, smooth = "s(x2)")
+\dontshow{options(op)}
 }
