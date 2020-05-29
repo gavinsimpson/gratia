@@ -136,6 +136,7 @@
   <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>partial_residuals</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>response_range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>
 )
 
@@ -151,6 +152,8 @@
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>response_range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>continuous_fill</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>
 )
 
@@ -163,6 +166,7 @@
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>response_range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>
 )
 
@@ -175,7 +179,8 @@
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>colour_scale</span> <span class='kw'>=</span> <span class='no'>scale_colour_discrete</span>,
+  <span class='kw'>response_range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>discrete_colour</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>
 )
 
@@ -190,6 +195,7 @@
   <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>rug</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>position</span> <span class='kw'>=</span> <span class='st'>"identity"</span>,
+  <span class='kw'>response_range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>
 )</pre>
 
@@ -243,6 +249,12 @@ partial residuals are drawn. Should have names <code>..p_resid</code> and <code>
 supplied.</p></td>
     </tr>
     <tr>
+      <th>response_range</th>
+      <td><p>numeric; a vector of two values giving the range of
+response data for the guide. Used to fix plots to a common scale/range.
+Ignored if <code>show</code> is set to <code>"se"</code>.</p></td>
+    </tr>
+    <tr>
       <th>...</th>
       <td><p>arguments passed to other methods.</p></td>
     </tr>
@@ -266,13 +278,21 @@ standard error (<code>"se"</code>).</p></td>
 <code>n_contour - 1</code> contour lines being drawn. See <code><a href='https://ggplot2.tidyverse.org/reference/geom_contour.html'>ggplot2::geom_contour()</a></code>.</p></td>
     </tr>
     <tr>
+      <th>continuous_fill</th>
+      <td><p>suitable scale used for the filled surface. If <code>NULL</code>,
+the default used is <code>scale_fill_distiller(palette = "RdBu", type = "div")</code>.</p></td>
+    </tr>
+    <tr>
       <th>qq_line</th>
       <td><p>logical; draw a reference line through the lower and upper
 theoretical quartiles.</p></td>
     </tr>
     <tr>
-      <th>colour_scale</th>
-      <td><p>function; an appropriate discrete colour scale from <code>ggplot2</code>.</p></td>
+      <th>discrete_colour</th>
+      <td><p>an appropriate discrete colour scale from <code>ggplot2</code>.
+The scale will need to be able to provide as many colours as there are
+levels in the factor variable involved in the smooth. Suitable alternatives
+include <code><a href='https://ggplot2.tidyverse.org/reference/scale_viridis.html'>ggplot2::scale_colour_viridis_d()</a></code>.</p></td>
     </tr>
     <tr>
       <th>position</th>

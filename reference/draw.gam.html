@@ -148,6 +148,9 @@ is used instead.</p>
   <span class='kw'>contour_col</span> <span class='kw'>=</span> <span class='st'>"black"</span>,
   <span class='kw'>n_contour</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>partial_match</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>discrete_colour</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>continuous_colour</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>continuous_fill</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>
 )</pre>
 
@@ -251,6 +254,11 @@ with <code>select</code>? If <code>TRUE</code>, <code>select</code> can only be 
 against.</p></td>
     </tr>
     <tr>
+      <th>discrete_colour, continuous_colour, continuous_fill</th>
+      <td><p>suitable scales
+for the types of data.</p></td>
+    </tr>
+    <tr>
       <th>...</th>
       <td><p>arguments passed to <code><a href='https://rdrr.io/pkg/cowplot/man/plot_grid.html'>cowplot::plot_grid()</a></code>. Any arguments to
 <code>plot_grid()</code> may be supplied, except for: <code>plotlist</code> and <code>align</code>.</p></td>
@@ -283,7 +291,11 @@ typically work with <code>ggplot()</code> plots.</p>
 <span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>2</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt; Bivariate smoothing example</div><div class='input'><span class='no'>m2</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x</span>, <span class='no'>z</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>40</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>$<span class='no'>data</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
 <span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m2</span>, <span class='kw'>contour</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='img'><img src='draw.gam-3.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>## change the number of contours drawn</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m2</span>, <span class='kw'>n_contour</span> <span class='kw'>=</span> <span class='fl'>5</span>)</div><div class='img'><img src='draw.gam-4.png' alt='' width='700' height='433' /></div></pre>
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m2</span>, <span class='kw'>n_contour</span> <span class='kw'>=</span> <span class='fl'>5</span>)</div><div class='img'><img src='draw.gam-4.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'>## change the number of contours drawn</span>
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m2</span>, <span class='kw'>n_contour</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+     <span class='kw'>continuous_fill</span> <span class='kw'>=</span> <span class='kw pkg'>ggplot2</span><span class='kw ns'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_brewer.html'>scale_fill_distiller</a></span>(<span class='kw'>palette</span> <span class='kw'>=</span> <span class='st'>"Spectral"</span>,
+                                                     <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"div"</span>))</div><div class='img'><img src='draw.gam-5.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
