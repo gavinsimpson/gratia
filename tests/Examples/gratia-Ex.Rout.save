@@ -585,6 +585,11 @@ Bivariate smoothing example
 > ## change the number of contours drawn
 > draw(m2, n_contour = 5)
 > 
+> ## change the fill scale used for the surface
+> draw(m2,
++     continuous_fill = ggplot2::scale_fill_distiller(palette = "Spectral",
++                                                     type = "div"))
+> 
 > 
 > 
 > cleanEx()
@@ -869,11 +874,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x5627d8d63b28>
+<environment: 0x55719ae13d88>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x5627d8d63b28>
+<environment: 0x55719ae13d88>
 > 
 > 
 > 
@@ -1134,7 +1139,7 @@ detaching ‘package:mgcv’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  12.038 0.137 12.622 0.003 0.002 
+Time elapsed:  12.983 0.138 13.499 0.004 0.001 
 > grDevices::dev.off()
 null device 
           1 
