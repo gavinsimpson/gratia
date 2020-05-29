@@ -869,11 +869,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x564c731a5220>
+<environment: 0x5627d8d63b28>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x564c731a5220>
+<environment: 0x5627d8d63b28>
 > 
 > 
 > 
@@ -1098,21 +1098,8 @@ Factor `by' variable example
 > 
 > ## fit model...
 > m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
-> smooth_samples(m2, n = 5, seed = 42)
-# A tibble: 4,000 x 8
-   smooth term       by_variable fac       .x1   row  draw value
-   <chr>  <chr>      <chr>       <fct>   <dbl> <int> <int> <dbl>
- 1 s(x2)  s(x2):fac1 fac         1     0.00325     1     1 -2.90
- 2 s(x2)  s(x2):fac1 fac         1     0.00825     2     1 -2.74
- 3 s(x2)  s(x2):fac1 fac         1     0.0132      3     1 -2.58
- 4 s(x2)  s(x2):fac1 fac         1     0.0182      4     1 -2.43
- 5 s(x2)  s(x2):fac1 fac         1     0.0232      5     1 -2.27
- 6 s(x2)  s(x2):fac1 fac         1     0.0282      6     1 -2.11
- 7 s(x2)  s(x2):fac1 fac         1     0.0332      7     1 -1.96
- 8 s(x2)  s(x2):fac1 fac         1     0.0382      8     1 -1.80
- 9 s(x2)  s(x2):fac1 fac         1     0.0432      9     1 -1.65
-10 s(x2)  s(x2):fac1 fac         1     0.0482     10     1 -1.50
-# ... with 3,990 more rows
+> sms <- smooth_samples(m2, n = 5, seed = 42)
+> draw(sms)
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1147,7 +1134,7 @@ detaching ‘package:mgcv’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  11.859 0.113 12.452 0 0.005 
+Time elapsed:  12.038 0.137 12.622 0.003 0.002 
 > grDevices::dev.off()
 null device 
           1 
