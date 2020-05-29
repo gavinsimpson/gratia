@@ -1,8 +1,20 @@
 # gratia 0.4.1
 
+## User visible changes
+
+* `draw.gam()` with `scales = "fixed"` now applies to all terms that can be
+  plotted, including 2d smooths.
+
+  Reported by @StefanoMezzini [#73](https://github.com/gavinsimpson/gratia/issues/73)
+
 ## Bug fixes
 
 * `dplyr::combine()` was deprecated. Switch to `vctrs::vec_c()`.
+
+* `draw.gam()` with `scales = "fixed"` wasn't using fixed scales where 2d smooths
+  were in the model.
+
+  Reported by @StefanoMezzini [#73](https://github.com/gavinsimpson/gratia/issues/73)
 
 # gratia 0.4.0
 
