@@ -38,13 +38,16 @@
 ##'   [ggplot2::labs()].
 ##' @param caption character or expression; the plot caption. See
 ##'   [ggplot2::labs()].
+##' @param response_range numeric; a vector of two values giving the range of
+##'   response data for the guide. Used to fix plots to a common scale/range.
+##'   Ignored if `show` is set to `"se"`.
 ##' @param ... arguments passed to other methods.
 ##'
 ##' @return A [ggplot2::ggplot()] object.
 ##'
 ##' @author Gavin L. Simpson
 ##'
-##' @importFrom ggplot2 ggplot aes_ aes_string labs geom_line geom_ribbon
+##' @importFrom ggplot2 ggplot aes_ aes_string labs geom_line geom_ribbon expand_limits
 ##' @importFrom grid unit
 ##'
 ##' @export
@@ -73,7 +76,9 @@
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
-                                       partial_residuals = NULL, ...) {
+                                       partial_residuals = NULL,
+                                       response_range = NULL,
+                                       ...) {
     smooth_var <- names(object)[3L]
 
     ## Add confidence interval
@@ -127,6 +132,11 @@
                      inherit.aes = FALSE, sides = 'b')
     }
 
+    ## fixing the y axis limits?
+    if (!is.null(response_range)) {
+        plt <- plt + expand_limits(y = response_range)
+    }
+
     plt
 }
 
@@ -137,6 +147,9 @@
 ##' @param contour_col colour specification for contour lines.
 ##' @param n_contour numeric; the number of contour bins. Will result in
 ##'   `n_contour - 1` contour lines being drawn. See [ggplot2::geom_contour()].
+##' @param response_range numeric; a vector of two values giving the range of
+##'   response data for the guide. Used to fix plots to a common scale/range.
+##'   Ignored if `show` is set to `"se"`.
 ##'
 ##' @importFrom ggplot2 ggplot aes_string geom_raster geom_contour labs guides guide_colourbar scale_fill_distiller theme
 ##' @importFrom grid unit
@@ -150,13 +163,18 @@
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
+                                       response_range = NULL,
                                        ...) {
     smooth_vars <- names(object)[3:4]
     show <- match.arg(show)
     if (isTRUE(identical(show, "estimate"))) {
         guide_title <- "Effect" # unique(object[["smooth"]])
         plot_var <- "est"
-        guide_limits <- c(-1, 1) * max(abs(object[[plot_var]]))
+        guide_limits <- if (is.null(response_range)) {
+            c(-1, 1) * max(abs(object[[plot_var]]))
+        } else {
+            response_range
+        }
     } else {
         guide_title <- "Std. err." # bquote(SE * (.(unique(object[["smooth"]]))))
         plot_var <- "se"
@@ -367,6 +385,14 @@
         return(invisible(g))
     }
 
+    ## evaluate parametric terms here
+    if (isTRUE(parametric)) {
+        leng <- length(g)
+        for (i in seq_along(terms)) {
+            p[[i]] <- evaluate_parametric_term(object, term = terms[i])
+        }
+    }
+
     ## model frame may be needed for rugs
     mf  <- model.frame(object)
 
@@ -381,7 +407,37 @@
         }
     }
 
-    p_resid_range <- vector("list", length = length(l))
+    ylims <- NULL
+    crit <- qnorm((1 - ci_level) / 2, lower.tail = FALSE)
+    if (isTRUE(identical(scales, "fixed"))) {
+        wrapper <- function(x, var, crit) {
+            range(x[[var]] + (crit * x[["se"]]),
+                  x[[var]] - (crit * x[["se"]]))
+        }
+
+        if (isTRUE(residuals)) {
+            want_presids <- function(x) {
+                sm <- get_smooth(object, term = x)
+                (! is_by_smooth(sm)) && smooth_dim(sm) == 1L
+            }
+            take_presids <- vapply(colnames(pred_terms), want_presids, logical(1L))
+            p_resids_lims <- if (NCOL(pred_terms[, take_presids]) > 0) {
+                range(pred_terms[, take_presids])
+            }
+        } else {
+            p_resids_lims <- rep(0, 2)
+        }
+        
+        ylims <- range(c(unlist(lapply(l, wrapper, var = "est", crit = crit)),
+                         p_resids_lims))
+        
+        if (isTRUE(parametric)) {
+            ylims <- range(ylims,
+                           unlist(lapply(p, wrapper, var = "partial", crit = crit)))
+        }
+    }
+
+    ## p_resid_range <- vector("list", length = length(l))
     
     for (i in seq_along(l)) {
         partial_residuals <- NULL
@@ -393,7 +449,6 @@
             if ((! is_by_smooth(sm)) && smooth_dim(sm) == 1L) {
                 partial_residuals <- tibble(..p_resid = pred_terms[, sname],
                                             ..orig_x = mf[, smooth_variable(sm)])
-                p_resid_range[[i]] <- range(pred_terms[, sname])
             }
         }
         
@@ -411,44 +466,20 @@
             g[[i]] <- draw(l[[i]], rug = mf[[svar]],
                            partial_residuals = partial_residuals,
                            contour = contour, contour_col = contour_col,
-                           n_contour = n_contour, ci_level = ci_level)
+                           n_contour = n_contour, ci_level = ci_level,
+                           response_range = ylims)
         } else {
             g[[i]] <- draw(l[[i]], partial_residuals = partial_residuals,
                            contour = contour, contour_col = contour_col,
-                           n_contour = n_contour, ci_level = ci_level)
+                           n_contour = n_contour, ci_level = ci_level,
+                           response_range = ylims)
         }
     }
 
     if (isTRUE(parametric)) {
         leng <- length(g)
         for (i in seq_along(terms)) {
-            p[[i]] <- evaluate_parametric_term(object, term = terms[i])
-            g[[i + leng]] <- draw(p[[i]])
-        }
-    }
-
-    crit <- qnorm((1 - ci_level) / 2, lower.tail = FALSE)
-    if (isTRUE(identical(scales, "fixed"))) {
-        wrapper <- function(x, var, crit) {
-            range(x[[var]] + (crit * x[["se"]]),
-                  x[[var]] - (crit * x[["se"]]))
-        }
-        
-        p_resids_lims <- if (residuals) {
-            range(unlist(p_resid_range))
-        } else {
-            rep(0, 2)
-        }
-        ylims <- range(c(unlist(lapply(l, wrapper, var = "est", crit = crit)),
-                         unlist(p_resid_range)))
-        if (isTRUE(parametric)) {
-            ylims <- range(ylims,
-                           unlist(lapply(p, wrapper, var = "partial", crit = crit)))
-        }
-
-        gg <- seq_along(g)[c(d==1L, rep(TRUE, npara))]
-        for (i in gg) { # only the univariate smooths; FIXME: "re" smooths too?
-            g[[i]] <- g[[i]] + lims(y = ylims)
+            g[[i + leng]] <- draw(p[[i]], response_range = ylims)
         }
     }
 
@@ -458,14 +489,15 @@
 ##' @param qq_line logical; draw a reference line through the lower and upper
 ##'   theoretical quartiles.
 ##'
-##' @importFrom ggplot2 geom_abline geom_point labs
+##' @importFrom ggplot2 geom_abline geom_point labs expand_limits
 ##' @importFrom stats quantile qnorm
 ##'
 ##' @export
 ##' @rdname draw.evaluated_smooth
 `draw.evaluated_re_smooth` <- function(object, qq_line = TRUE, xlab, ylab,
                                        title = NULL, subtitle = NULL,
-                                       caption = NULL, ...) {
+                                       caption = NULL,
+                                       response_range = NULL, ...) {
     smooth_var <- unique(object[["smooth"]]) ## names(object)[3L]
 
     ## base plot with computed QQs
@@ -505,12 +537,17 @@
     plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
                       caption = caption)
 
+    ## fixing the y axis limits?
+    if (!is.null(response_range)) {
+        plt <- plt + expand_limits(y = response_range)
+    }
+
     plt
 }
 
 ##' @param colour_scale function; an appropriate discrete colour scale from `ggplot2`.
 ##'
-##' @importFrom ggplot2 geom_line theme scale_colour_discrete geom_rug
+##' @importFrom ggplot2 geom_line theme scale_colour_discrete geom_rug expand_limits
 ##' @export
 ##' @rdname draw.evaluated_smooth
 `draw.evaluated_fs_smooth` <- function(object,
@@ -519,6 +556,7 @@
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
                                        colour_scale = scale_colour_discrete,
+                                       response_range = NULL,
                                        ...) {
     smooth_var <- names(object)[3L]
     smooth_fac <- names(object)[4L]
@@ -560,13 +598,18 @@
                               sides = 'b')
     }
 
+    ## fixing the y axis limits?
+    if (!is.null(response_range)) {
+        plt <- plt + expand_limits(y = response_range)
+    }
+
     plt
 }
 
 ##' @param position Position adjustment, either as a string, or the result of a
 ##'   call to a position adjustment function.
 ##'
-##' @importFrom ggplot2 ggplot geom_pointrange geom_rug geom_ribbon geom_line aes_string
+##' @importFrom ggplot2 ggplot geom_pointrange geom_rug geom_ribbon geom_line aes_string expand_limits
 ##' @export
 ##' @rdname draw.evaluated_smooth
 `draw.evaluated_parametric_term` <- function(object,
@@ -576,6 +619,7 @@
                                              caption = NULL,
                                              rug = TRUE,
                                              position = "identity",
+                                             response_range = NULL,
                                              ...) {
     is_fac <- object[["type"]][1L] == "factor"
     term_label <- object[["term"]][1L]
@@ -610,6 +654,11 @@
     ## add labelling to plot
     plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
                       caption = caption)
+
+    ## fixing the y axis limits?
+    if (!is.null(response_range)) {
+        plt <- plt + expand_limits(y = response_range)
+    }
 
     plt
 }
