@@ -79,7 +79,7 @@ is used instead." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
       </span>
     </div>
 
@@ -292,10 +292,10 @@ typically work with <code>ggplot()</code> plots.</p>
 <span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m2</span>, <span class='kw'>contour</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='img'><img src='draw.gam-3.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>## change the number of contours drawn</span>
 <span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m2</span>, <span class='kw'>n_contour</span> <span class='kw'>=</span> <span class='fl'>5</span>)</div><div class='img'><img src='draw.gam-4.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'>## change the number of contours drawn</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m2</span>, <span class='kw'>n_contour</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-     <span class='kw'>continuous_fill</span> <span class='kw'>=</span> <span class='kw pkg'>ggplot2</span><span class='kw ns'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_brewer.html'>scale_fill_distiller</a></span>(<span class='kw'>palette</span> <span class='kw'>=</span> <span class='st'>"Spectral"</span>,
-                                                     <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"div"</span>))</div><div class='img'><img src='draw.gam-5.png' alt='' width='700' height='433' /></div></pre>
+<span class='co'>## change the fill scale used for the surface</span>
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>m2</span>,
+    <span class='kw'>continuous_fill</span> <span class='kw'>=</span> <span class='kw pkg'>ggplot2</span><span class='kw ns'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_brewer.html'>scale_fill_distiller</a></span>(<span class='kw'>palette</span> <span class='kw'>=</span> <span class='st'>"Spectral"</span>,
+                                                    <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"div"</span>))</div><div class='img'><img src='draw.gam-5.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
