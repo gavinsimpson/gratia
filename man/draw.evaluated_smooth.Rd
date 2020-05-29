@@ -36,6 +36,7 @@
   subtitle = NULL,
   caption = NULL,
   response_range = NULL,
+  continuous_fill = NULL,
   ...
 )
 
@@ -59,8 +60,8 @@
   title = NULL,
   subtitle = NULL,
   caption = NULL,
-  colour_scale = scale_colour_discrete,
   response_range = NULL,
+  discrete_colour = NULL,
   ...
 )
 
@@ -124,10 +125,16 @@ standard error (\code{"se"}).}
 \item{n_contour}{numeric; the number of contour bins. Will result in
 \code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
 
+\item{continuous_fill}{suitable scale used for the filled surface. If \code{NULL},
+the default used is \code{scale_fill_distiller(palette = "RdBu", type = "div")}.}
+
 \item{qq_line}{logical; draw a reference line through the lower and upper
 theoretical quartiles.}
 
-\item{colour_scale}{function; an appropriate discrete colour scale from \code{ggplot2}.}
+\item{discrete_colour}{an appropriate discrete colour scale from \code{ggplot2}.
+The scale will need to be able to provide as many colours as there are
+levels in the factor variable involved in the smooth. Suitable alternatives
+include \code{\link[ggplot2:scale_colour_viridis_d]{ggplot2::scale_colour_viridis_d()}}.}
 
 \item{position}{Position adjustment, either as a string, or the result of a
 call to a position adjustment function.}

@@ -22,6 +22,9 @@
   contour_col = "black",
   n_contour = NULL,
   partial_match = FALSE,
+  discrete_colour = NULL,
+  continuous_colour = NULL,
+  continuous_fill = NULL,
   ...
 )
 }
@@ -88,6 +91,9 @@ and \code{dist} is a distance within the unit square. See
 with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
 against.}
 
+\item{discrete_colour, continuous_colour, continuous_fill}{suitable scales
+for the types of data.}
+
 \item{...}{arguments passed to \code{cowplot::plot_grid()}. Any arguments to
 \code{plot_grid()} may be supplied, except for: \code{plotlist} and \code{align}.}
 }
@@ -124,6 +130,11 @@ draw(m2, contour = FALSE)
 
 ## change the number of contours drawn
 draw(m2, n_contour = 5)
+
+## change the number of contours drawn
+draw(m2, n_contour = 5,
+     continuous_fill = ggplot2::scale_fill_distiller(palette = "Spectral",
+                                                     type = "div"))
 }
 \author{
 Gavin L. Simpson

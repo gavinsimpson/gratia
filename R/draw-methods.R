@@ -150,6 +150,8 @@
 ##' @param response_range numeric; a vector of two values giving the range of
 ##'   response data for the guide. Used to fix plots to a common scale/range.
 ##'   Ignored if `show` is set to `"se"`.
+##' @param continuous_fill suitable scale used for the filled surface. If `NULL`,
+##'   the default used is `scale_fill_distiller(palette = "RdBu", type = "div")`.
 ##'
 ##' @importFrom ggplot2 ggplot aes_string geom_raster geom_contour labs guides guide_colourbar scale_fill_distiller theme
 ##' @importFrom grid unit
@@ -164,7 +166,11 @@
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
                                        response_range = NULL,
+                                       continuous_fill = NULL,
                                        ...) {
+    if (is.null(continuous_fill)) {
+        continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
+    }
     smooth_vars <- names(object)[3:4]
     show <- match.arg(show)
     if (isTRUE(identical(show, "estimate"))) {
@@ -214,8 +220,10 @@
                       caption = caption)
 
     ## Set the palette
-    plt <- plt + scale_fill_distiller(palette = "RdBu", type = "div",
-                                      limits = guide_limits)
+    plt <- plt + continuous_fill
+
+    ## Set the limits for the fill
+    plt <- plt + expand_limits(fill = guide_limits)
 
     ## add guide
     plt <- plt + guides(fill = guide_colourbar(title = guide_title,
@@ -266,6 +274,8 @@
 ##' @param partial_match logical; should smooths be selected by partial matches
 ##'   with `select`? If `TRUE`, `select` can only be a single string to match
 ##'   against.
+##' @param discrete_colour,continuous_colour,continuous_fill suitable scales
+##'   for the types of data.
 ##' @param ... arguments passed to `cowplot::plot_grid()`. Any arguments to
 ##'   `plot_grid()` may be supplied, except for: `plotlist` and `align`.
 ##'
@@ -280,7 +290,7 @@
 ##'
 ##' @author Gavin L. Simpson
 ##'
-##' @importFrom ggplot2 lims
+##' @importFrom ggplot2 scale_colour_discrete scale_colour_continuous scale_fill_distiller
 ##' @importFrom cowplot plot_grid
 ##' @export
 ##'
@@ -303,6 +313,11 @@
 ##'
 ##' ## change the number of contours drawn
 ##' draw(m2, n_contour = 5)
+##'
+##' ## change the fill scale used for the surface
+##' draw(m2,
+##'     continuous_fill = ggplot2::scale_fill_distiller(palette = "Spectral",
+##'                                                     type = "div"))
 `draw.gam` <- function(object,
                        parametric = NULL,
                        select = NULL,
@@ -318,8 +333,24 @@
                        contour = TRUE,
                        contour_col = "black",
                        n_contour = NULL,
-                       partial_match = FALSE, ...) {
+                       partial_match = FALSE,
+                       discrete_colour = NULL,
+                       continuous_colour = NULL,
+                       continuous_fill = NULL,
+                       ...) {
     scales <- match.arg(scales)
+
+    ## fix up default scales
+    if (is.null(discrete_colour)) {
+        discrete_colour <- scale_colour_discrete()
+    }
+    if (is.null(continuous_colour)) {
+        continuous_colour <- scale_colour_continuous()
+    }
+    if (is.null(continuous_fill)) {
+        continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
+    }
+    
     S <- smooths(object)                # vector of smooth labels - "s(x)"
 
     ## if not using select, set parametric TRUE if not set to FALSE
@@ -467,12 +498,18 @@
                            partial_residuals = partial_residuals,
                            contour = contour, contour_col = contour_col,
                            n_contour = n_contour, ci_level = ci_level,
-                           response_range = ylims)
+                           response_range = ylims,
+                           discrete_colour = discrete_colour,
+                           continuous_colour = continuous_colour,
+                           continuous_fill = continuous_fill)
         } else {
             g[[i]] <- draw(l[[i]], partial_residuals = partial_residuals,
                            contour = contour, contour_col = contour_col,
                            n_contour = n_contour, ci_level = ci_level,
-                           response_range = ylims)
+                           response_range = ylims,
+                           discrete_colour = discrete_colour,
+                           continuous_colour = continuous_colour,
+                           continuous_fill = continuous_fill)
         }
     }
 
@@ -545,7 +582,10 @@
     plt
 }
 
-##' @param colour_scale function; an appropriate discrete colour scale from `ggplot2`.
+##' @param discrete_colour an appropriate discrete colour scale from `ggplot2`.
+##'   The scale will need to be able to provide as many colours as there are
+##'   levels in the factor variable involved in the smooth. Suitable alternatives
+##'   include [ggplot2::scale_colour_viridis_d()].
 ##'
 ##' @importFrom ggplot2 geom_line theme scale_colour_discrete geom_rug expand_limits
 ##' @export
@@ -555,16 +595,20 @@
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
-                                       colour_scale = scale_colour_discrete,
                                        response_range = NULL,
+                                       discrete_colour = NULL,
                                        ...) {
+    if (is.null(discrete_colour)) {
+        discrete_colour <- scale_colour_discrete()
+    }
+    
     smooth_var <- names(object)[3L]
     smooth_fac <- names(object)[4L]
 
     plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est,
                                colour = as.name(smooth_fac))) +
         geom_line() +
-        scale_colour_discrete() +
+        discrete_colour +
         theme(legend.position = "none")
 
     ## default axis labels if none supplied
@@ -963,7 +1007,7 @@
 ##'   `"auto"`. Passed to [patchwork::plot_layout()]
 ##' @inheritParams draw.gam
 ##'
-##' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_line labs
+##' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_line labs lims
 ##' @importFrom patchwork wrap_plots
 ##' @importFrom purrr map
 ##' @export
