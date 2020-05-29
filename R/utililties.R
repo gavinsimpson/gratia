@@ -933,7 +933,7 @@
 ##'
 ##' @export
 ##' 
-##' @importFrom dplyr combine
+##' @importFrom vctrs vec_c
 ##'
 ##' @examples
 ##'
@@ -947,5 +947,5 @@ vars_from_label <- function(label) {
     vars <- gsub("^[[:alnum:]]{1,2}\\(([[:graph:]]+)\\)$",
                  "\\1",
                  label)
-    combine(strsplit(vars, ",")[[1L]])
+    vec_c(strsplit(vars, ",")[[1L]])
 }

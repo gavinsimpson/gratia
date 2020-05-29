@@ -1,3 +1,9 @@
+# gratia 0.4.1
+
+## Bug fixes
+
+* `dplyr::combine()` was deprecated. Switch to `vctrs::vec_c()`.
+
 # gratia 0.4.0
 
 ## New features
