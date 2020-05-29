@@ -1,3 +1,15 @@
+# gratia 0.4.2
+
+## New features
+
+* Users can now control to some extent what colour or fill scales are used when
+  plotting smooths in those `draw()` methods that use them. This is most useful
+  to change the fill scale when plotting 2D smooths, or to change the discrete
+  colour scale used when plotting random factor smooths (`bs = "fs"`).
+  
+  The user can pass scales via arguments `discrete_colour` and
+  `continuous_fill`.
+
 # gratia 0.4.1
 
 ## User visible changes
