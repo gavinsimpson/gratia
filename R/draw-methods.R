@@ -129,7 +129,7 @@
     if (!is.null(rug)) {
         plt <- plt +
             geom_rug(data = data.frame(x = rug), mapping = aes_string(x = 'x'),
-                     inherit.aes = FALSE, sides = 'b')
+                     inherit.aes = FALSE, sides = 'b', alpha = 0.5)
     }
 
     ## fixing the y axis limits?
@@ -639,7 +639,7 @@
         plt <- plt + geom_rug(data = data.frame(x = rug),
                               mapping = aes_string(x = 'x'),
                               inherit.aes = FALSE,
-                              sides = 'b')
+                              sides = 'b', alpha = 0.5)
     }
 
     ## fixing the y axis limits?
@@ -680,7 +680,7 @@
         plt <- plt + geom_pointrange(aes_string(ymin = "lower", ymax = "upper"))
     } else {
         if (isTRUE(rug)) {
-            plt <- plt + geom_rug(sides = "b", position = position)
+            plt <- plt + geom_rug(sides = "b", position = position, alpha = 0.5)
         }
         plt <- plt + geom_ribbon(aes_string(ymin = "lower", ymax = "upper"),
                                  alpha = 0.3) +
@@ -983,7 +983,7 @@
     ## add rug?
     if (!is.null(rug)) {
         plt <- plt + geom_rug(mapping = aes_string(x = '.x1'),
-                              inherit.aes = FALSE, sides = 'b')
+                              inherit.aes = FALSE, sides = 'b', alpha = 0.5)
     }
     
     plt
@@ -1155,7 +1155,7 @@
         labs(title = plt_title, x = xvars, y = y_label)
 
     if(isTRUE(rug)) {
-        plt <- plt + geom_rug(sides = "b")
+        plt <- plt + geom_rug(sides = "b", alpha = 0.5)
     }
     plt
 }
