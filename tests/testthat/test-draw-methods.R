@@ -431,3 +431,10 @@ test_that("draw() can handle a mixture of numeric and factor random effects", {
     plt <- draw(m)
     vdiffr:::expect_doppelganger("issue 22 draw with mixed random effects", plt)
 })
+
+test_that("draw.gam uses fixed scales if asked for them: #73", {
+    skip_on_cran()
+    m <- gam(y ~ s(x1) + s(x2) + ti(x1, x2), data = dat1, method = "REML")
+    plt <- draw(m, scales = "fixed")
+    vdiffr:::expect_doppelganger("issue 73 draw uses fixed scales if asked for them", plt)
+})

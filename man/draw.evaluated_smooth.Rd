@@ -20,6 +20,7 @@
   subtitle = NULL,
   caption = NULL,
   partial_residuals = NULL,
+  response_range = NULL,
   ...
 )
 
@@ -34,6 +35,7 @@
   title = NULL,
   subtitle = NULL,
   caption = NULL,
+  response_range = NULL,
   ...
 )
 
@@ -45,6 +47,7 @@
   title = NULL,
   subtitle = NULL,
   caption = NULL,
+  response_range = NULL,
   ...
 )
 
@@ -57,6 +60,7 @@
   subtitle = NULL,
   caption = NULL,
   colour_scale = scale_colour_discrete,
+  response_range = NULL,
   ...
 )
 
@@ -70,6 +74,7 @@
   caption = NULL,
   rug = TRUE,
   position = "identity",
+  response_range = NULL,
   ...
 )
 }
@@ -101,6 +106,10 @@ supplied, a suitable label will be generated from \code{object}.}
 \item{partial_residuals}{data frame; partial residuals and data values if
 partial residuals are drawn. Should have names \code{..p_resid} and \code{..orig_x} if
 supplied.}
+
+\item{response_range}{numeric; a vector of two values giving the range of
+response data for the guide. Used to fix plots to a common scale/range.
+Ignored if \code{show} is set to \code{"se"}.}
 
 \item{...}{arguments passed to other methods.}
 
