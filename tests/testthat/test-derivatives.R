@@ -7,7 +7,7 @@ library("mgcv")
 library("ggplot2")
 library("vdiffr")
 
-context("derivatives methods")
+context("Test derivatives() methods")
 
 set.seed(42)
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
@@ -334,6 +334,7 @@ test_that("derivatives() returns derivatives with simultaneous intervals for all
 
 test_that("derivatives() works for factor by smooths issue 47", {
     skip_on_os("mac")
+    skip_on_cran()
     set.seed(1)
     dat <- gamSim(4, n = 1000, verbose = FALSE)
     m <- gam(y ~ fac + s(x2, by = fac), data = dat, method = "REML")
@@ -371,6 +372,7 @@ test_that("derivatives() works for factor by smooths issue 47", {
 })
 
 test_that("derivatives() works for fs smooths issue 57", {
+    skip_on_cran()
     set.seed(1)
     logistic.growth <- function(t, y0, K, r) {
         return(K * (y0 / (y0 + (K - y0) * exp(-r * t))))
