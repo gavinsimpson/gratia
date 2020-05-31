@@ -136,7 +136,7 @@
 </div>
     <div id="gratia-041" class="section level1">
 <h1 class="page-header" data-toc-text="0.4.1">
-<a href="#gratia-041" class="anchor"></a>gratia 0.4.1<small> Unreleased </small>
+<a href="#gratia-041" class="anchor"></a>gratia 0.4.1<small> 2020-05-30 </small>
 </h1>
 <div id="user-visible-changes" class="section level2">
 <h2 class="hasAnchor">
@@ -170,8 +170,8 @@
 <ul>
 <li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> can now include partial residuals when drawing univariate smooths. Use <code>residuals = TRUE</code> to add partial residuals to each univariate smooth that is drawn. This feature is not available for smooths of more than one variable, by smooths, or factor-smooth interactions (<code>bs = "fs"</code>).</p></li>
 <li>
-<p>The coverage of credible and ocnfidence intervals drawn by <code><a href="../reference/draw.gam.html">draw.gam()</a></code> can be specified via argument <code>ci_level</code>. The default is arbitrarily <code>0.95</code> for no other reason than (rough) compatibility with <code>plot.gam()</code>.</p>
-<p>This chance has had the effect of making the intervals slightly narrower than in previous versions of <em>gratia</em>; intervals were drawn at ± 2 × the standard error. The default intervals are now drawn at ± ~1.96 × the standard error.</p>
+<p>The coverage of credible and confidence intervals drawn by <code><a href="../reference/draw.gam.html">draw.gam()</a></code> can be specified via argument <code>ci_level</code>. The default is arbitrarily <code>0.95</code> for no other reason than (rough) compatibility with <code>plot.gam()</code>.</p>
+<p>This change has had the effect of making the intervals slightly narrower than in previous versions of <em>gratia</em>; intervals were drawn at ± 2 × the standard error. The default intervals are now drawn at ± ~1.96 × the standard error.</p>
 </li>
 <li><p>New function <code>difference_smooth()</code> for computing differences between factor smooth interactions. Methods available for <code>gam()</code>, <code>bam()</code>, <code>gamm()</code> and <code><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html">gamm4::gamm4()</a></code>. Also has a <code><a href="../reference/draw.html">draw()</a></code> method, which can handle differences of 1D and 2D smooths currently (handling 3D and 4D smooths is planned).</p></li>
 <li><p>New functions <code><a href="../reference/add_fitted.html">add_fitted()</a></code> and <code><a href="../reference/add_residuals.html">add_residuals()</a></code> to add fitted values (expectations) and model residuals to an existing data frame. Currently methods available for objects fitted by <code>gam()</code> and <code>bam()</code>.</p></li>
@@ -196,7 +196,7 @@
 <li><p>Added utility functions <code><a href="../reference/is_factor_term.html">is_factor_term()</a></code> and <code><a href="../reference/term_variables.html">term_variables()</a></code> for working with models. <code><a href="../reference/is_factor_term.html">is_factor_term()</a></code> identifies is the named term is a factor using information from the <code><a href="https://rdrr.io/r/stats/terms.html">terms()</a></code> object of the fitted model. <code><a href="../reference/term_variables.html">term_variables()</a></code> returns a character vector of variable names that are involved in a model term. These are strictly for working with parametric terms in models.</p></li>
 <li>
 <p><code><a href="../reference/appraise.html">appraise()</a></code> now works for models fitted by <code><a href="https://rdrr.io/r/stats/glm.html">glm()</a></code> and <code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code>, as do the underlying functions it calls, especially <code>qq_plot</code>.</p>
-<p><code><a href="../reference/appraise.html">appraise()</a></code> also works for models fitted with family <code>gaulss()</code>. Further locational scale models and models fitted with extended family functions will be supported in upcoming releases.</p>
+<p><code><a href="../reference/appraise.html">appraise()</a></code> also works for models fitted with family <code>gaulss()</code>. Further location scale models and models fitted with extended family functions will be supported in upcoming releases.</p>
 </li>
 </ul>
 </div>
