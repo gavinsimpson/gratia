@@ -37,11 +37,11 @@
   is drawn. This feature is not available for smooths of more than one variable,
   by smooths, or factor-smooth interactions (`bs = "fs"`).
 
-* The coverage of credible and ocnfidence intervals drawn by `draw.gam()` can be
+* The coverage of credible and confidence intervals drawn by `draw.gam()` can be
   specified via argument `ci_level`. The default is arbitrarily `0.95` for no
   other reason than (rough) compatibility with `plot.gam()`.
   
-  This chance has had the effect of making the intervals slightly narrower than
+  This change has had the effect of making the intervals slightly narrower than
   in previous versions of *gratia*; intervals were drawn at &plusmn; 2 &times;
   the standard error. The default intervals are now drawn at &plusmn; ~1.96
   &times; the standard error.
@@ -95,7 +95,7 @@
   underlying functions it calls, especially `qq_plot`.
   
   `appraise()` also works for models fitted with family `gaulss()`. Further
-  locational scale models and models fitted with extended family functions will
+  location scale models and models fitted with extended family functions will
   be supported in upcoming releases.
 
 ## User visible changes
