@@ -46,7 +46,7 @@
   the standard error. The default intervals are now drawn at &plusmn; ~1.96
   &times; the standard error.
 
-* New function `difference_smooth()` for computing differences between factor
+* New function `difference_smooths()` for computing differences between factor
   smooth interactions. Methods available for `gam()`, `bam()`, `gamm()` and
   `gamm4::gamm4()`. Also has a `draw()` method, which can handle differences of
   1D and 2D smooths currently (handling 3D and 4D smooths is planned).
