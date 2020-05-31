@@ -103,7 +103,7 @@
 * `datagen()` is now an *internal* function and is no longer exported. Use
   `data_slice()` instead.
 
-* `evaluate_parametric_terms()` is now much stricter and can only evaluate main
+* `evaluate_parametric_term()` is now much stricter and can only evaluate main
   effect terms, i.e. those whose order, as stored in the `terms` object of the
   model is `1`.
 
