@@ -6,37 +6,11 @@
 \alias{simulate.scam}
 \title{Simulate from the posterior distribution of a GAM}
 \usage{
-\method{simulate}{gam}(
-  object,
-  nsim = 1,
-  seed = NULL,
-  newdata = NULL,
-  freq = FALSE,
-  unconditional = FALSE,
-  weights = NULL,
-  ...
-)
+\method{simulate}{gam}(object, nsim = 1, seed = NULL, newdata = NULL, weights = NULL, ...)
 
-\method{simulate}{gamm}(
-  object,
-  nsim = 1,
-  seed = NULL,
-  newdata = NULL,
-  freq = FALSE,
-  unconditional = FALSE,
-  weights = NULL,
-  ...
-)
+\method{simulate}{gamm}(object, nsim = 1, seed = NULL, newdata = NULL, weights = NULL, ...)
 
-\method{simulate}{scam}(
-  object,
-  nsim = 1,
-  seed = NULL,
-  newdata = NULL,
-  freq = FALSE,
-  weights = NULL,
-  ...
-)
+\method{simulate}{scam}(object, nsim = 1, seed = NULL, newdata = NULL, weights = NULL, ...)
 }
 \arguments{
 \item{object}{a fitted GAM, typically the result of a call to \link[mgcv:gam]{mgcv::gam}`
@@ -50,27 +24,28 @@ or \code{\link[mgcv:gamm]{mgcv::gamm()}}.}
 from the model should be evaluated. If not supplied, the data used to fit
 the model will be used for \code{newdata}, if available in \code{object}.}
 
-\item{freq}{logical; \code{TRUE} to return the frequentist covariance matrix of
-the parameter estimators, \code{FALSE} to return the Bayesian posterior
-covariance matrix of the parameters.}
-
-\item{unconditional}{logical; if \code{TRUE} (and \code{freq == FALSE}) then the
-Bayesian smoothing parameter uncertainty corrected covariance matrix is
-returned, if available.}
-
 \item{weights}{numeric; a vector of prior weights. If \code{newdata} is null
 then defaults to \code{object[["prior.weights"]]}, otherwise a vector of ones.}
 
-\item{...}{arguments passed to methods}
+\item{...}{arguments passed to methods. \code{simulate.gam()} and
+\code{simulate.scam()} pass \code{...} on to \code{predict.gam()}. As such you can pass
+additional arguments such as \code{terms}, \code{exclude}, to select which model
+terms are included in the predictions. This may be useful, for example,
+for excluding the effects of random effect terms.}
 }
 \value{
 (Currently) A matrix with \code{nsim} columns.
 }
 \description{
 Simulations from the posterior distribution of a fitted GAM model involve
-making random draws from a multivariate normal with mean vector equal to
-the estimated model coefficients and covariance matrix equal to the
-covariance matrix of the coefficients.
+computing predicted values for the observation data for which simulated
+data are required, then generating random draws from the probability
+distribution used when fitting the model.
+}
+\details{
+For \code{simulate.gam()} to function, the \code{family} component of the fitted
+model must contain, or be updateable to contain, the required random
+number generator. See \code{\link[mgcv:fix.family.rd]{mgcv::fix.family.rd()}}.
 }
 \examples{
 load_mgcv()
