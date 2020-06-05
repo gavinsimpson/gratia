@@ -158,8 +158,6 @@ and returned in a tidy, long, format.</p>
   <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>freq</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>
 )</pre>
@@ -196,15 +194,15 @@ the model will be used for <code>newdata</code>, if available in <code>model</co
     </tr>
     <tr>
       <th>freq</th>
-      <td><p>logical; <code>TRUE</code> to return the frequentist covariance matrix of
-the parameter estimators, <code>FALSE</code> to return the Bayesian posterior
+      <td><p>logical; <code>TRUE</code> to use the frequentist covariance matrix of
+the parameter estimators, <code>FALSE</code> to use the Bayesian posterior
 covariance matrix of the parameters.</p></td>
     </tr>
     <tr>
       <th>unconditional</th>
       <td><p>logical; if <code>TRUE</code> (and <code>freq == FALSE</code>) then the
 Bayesian smoothing parameter uncertainty corrected covariance matrix is
-returned, if available.</p></td>
+used, if available.</p></td>
     </tr>
     <tr>
       <th>ncores</th>
