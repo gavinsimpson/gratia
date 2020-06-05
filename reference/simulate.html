@@ -41,9 +41,9 @@
 
 <meta property="og:title" content="Simulate from the posterior distribution of a GAM — simulate.gam" />
 <meta property="og:description" content="Simulations from the posterior distribution of a fitted GAM model involve
-making random draws from a multivariate normal with mean vector equal to
-the estimated model coefficients and covariance matrix equal to the
-covariance matrix of the coefficients." />
+computing predicted values for the observation data for which simulated
+data are required, then generating random draws from the probability
+distribution used when fitting the model." />
 <meta property="og:image" content="https://gavinsimpson.github.io/gratia/reference/figures/README-draw-gam-figure-1.png" />
 <meta property="og:image:alt" content="Plot produced by draw() of 4 smooth functions from a fitted generalized additive model" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -126,45 +126,19 @@ covariance matrix of the coefficients." />
 
     <div class="ref-description">
     <p>Simulations from the posterior distribution of a fitted GAM model involve
-making random draws from a multivariate normal with mean vector equal to
-the estimated model coefficients and covariance matrix equal to the
-covariance matrix of the coefficients.</p>
+computing predicted values for the observation data for which simulated
+data are required, then generating random draws from the probability
+distribution used when fitting the model.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for gam</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span>(
-  <span class='no'>object</span>,
-  <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>freq</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>
-)
+<span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span>(<span class='no'>object</span>, <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for gamm</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span>(
-  <span class='no'>object</span>,
-  <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>freq</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>
-)
+<span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span>(<span class='no'>object</span>, <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for scam</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span>(
-  <span class='no'>object</span>,
-  <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>freq</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>
-)</pre>
+<span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span>(<span class='no'>object</span>, <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -189,31 +163,28 @@ from the model should be evaluated. If not supplied, the data used to fit
 the model will be used for <code>newdata</code>, if available in <code>object</code>.</p></td>
     </tr>
     <tr>
-      <th>freq</th>
-      <td><p>logical; <code>TRUE</code> to return the frequentist covariance matrix of
-the parameter estimators, <code>FALSE</code> to return the Bayesian posterior
-covariance matrix of the parameters.</p></td>
-    </tr>
-    <tr>
-      <th>unconditional</th>
-      <td><p>logical; if <code>TRUE</code> (and <code>freq == FALSE</code>) then the
-Bayesian smoothing parameter uncertainty corrected covariance matrix is
-returned, if available.</p></td>
-    </tr>
-    <tr>
       <th>weights</th>
       <td><p>numeric; a vector of prior weights. If <code>newdata</code> is null
 then defaults to <code>object[["prior.weights"]]</code>, otherwise a vector of ones.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>arguments passed to methods</p></td>
+      <td><p>arguments passed to methods. <code>simulate.gam()</code> and
+<code>simulate.scam()</code> pass <code>...</code> on to <code>predict.gam()</code>. As such you can pass
+additional arguments such as <code>terms</code>, <code>exclude</code>, to select which model
+terms are included in the predictions. This may be useful, for example,
+for excluding the effects of random effect terms.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>(Currently) A matrix with <code>nsim</code> columns.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>For <code>simulate.gam()</code> to function, the <code>family</code> component of the fitted
+model must contain, or be updateable to contain, the required random
+number generator. See <code><a href='https://rdrr.io/pkg/mgcv/man/fix.family.link.html'>mgcv::fix.family.rd()</a></code>.</p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Gavin L. Simpson</p>
