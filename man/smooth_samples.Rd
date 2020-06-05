@@ -38,13 +38,13 @@ the model will be used for \code{newdata}, if available in \code{model}.}
 
 \item{seed}{numeric; a random seed for the simulations.}
 
-\item{freq}{logical; \code{TRUE} to return the frequentist covariance matrix of
-the parameter estimators, \code{FALSE} to return the Bayesian posterior
+\item{freq}{logical; \code{TRUE} to use the frequentist covariance matrix of
+the parameter estimators, \code{FALSE} to use the Bayesian posterior
 covariance matrix of the parameters.}
 
 \item{unconditional}{logical; if \code{TRUE} (and \code{freq == FALSE}) then the
 Bayesian smoothing parameter uncertainty corrected covariance matrix is
-returned, if available.}
+used, if available.}
 
 \item{ncores}{number of cores for generating random variables from a
 multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
