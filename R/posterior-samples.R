@@ -7,12 +7,12 @@
 ##' @param n numeric; the number of posterior samples to return.
 ##' @param seed numeric; a random seed for the simulations.
 ##' @param scale character;
-##' @param freq logical; `TRUE` to return the frequentist covariance matrix of
-##'   the parameter estimators, `FALSE` to return the Bayesian posterior
+##' @param freq logical; `TRUE` to use the frequentist covariance matrix of
+##'   the parameter estimators, `FALSE` to use the Bayesian posterior
 ##'   covariance matrix of the parameters.
 ##' @param unconditional logical; if `TRUE` (and `freq == FALSE`) then the
 ##'   Bayesian smoothing parameter uncertainty corrected covariance matrix is
-##'   returned, if available.
+##'   used, if available.
 ##' @param weights numeric; a vector of prior weights. If `newdata` is null
 ##'   then defaults to `object[["prior.weights"]]`, otherwise a vector of ones.
 ##' @param ncores number of cores for generating random variables from a
@@ -123,6 +123,7 @@
 
     V <- get_vcov(model, frequentist = freq, unconditional = unconditional)
     Rbeta <- rmvn(n = n, mu = coef(model), sigma = V, ncores = ncores)
+    ## don't need to pass freq, unconditional here as that is done for V
     Xp <- predict(model, newdata = newdata, type = "lpmatrix", ...)
     sims <- Xp %*% t(Rbeta)
 
@@ -188,10 +189,9 @@
 ##' @importFrom tibble as_data_frame add_column
 ##' @importFrom tidyr gather
 `predicted_samples.gam` <- function(model, n = 1, newdata = NULL, seed = NULL,
-                                    freq = FALSE, unconditional = FALSE,
                                     weights = NULL, ...) {
-    sims <- simulate(model, nsim = n, seed = seed, newdata = newdata, freq = freq,
-                     unconditional = unconditional, weights = weights)
+    sims <- simulate(model, nsim = n, seed = seed, newdata = newdata,
+                     weights = weights, ...)
     RNGstate <- attr(sims, "seed")
     colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
     sims <- as_tibble(sims)
