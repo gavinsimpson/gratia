@@ -10,6 +10,14 @@
   The user can pass scales via arguments `discrete_colour` and
   `continuous_fill`.
 
+* The effects of certain smooths can be excluded from data simulated from a model
+  using `simulate.gam()` and `predicted_samples()` by passing `exclude` or `terms`
+  on to `predict.gam()`. This allows for excluding random effects, for example, from
+  model predicted values that are then used to simulate new data from the conditional
+  distribution. See the example in `predicted_samples()`.
+  
+  Wish of #74 (@hgoldspiel)
+
 # gratia 0.4.1
 
 ## User visible changes
