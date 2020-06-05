@@ -874,11 +874,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55719ae13d88>
+<environment: 0x55e1d2d51090>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55719ae13d88>
+<environment: 0x55e1d2d51090>
 > 
 > 
 > 
@@ -932,9 +932,9 @@ Gu & Wahba 4 term additive model
 > ## End(Don't show)
 > dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
 Gu & Wahba 4 term additive model
-> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
-> predicted_samples(m1, n = 5, seed = 42)
+> predicted_samples(m, n = 5, seed = 42)
 # A tibble: 5,000 x 3
      row  draw response
    <int> <int>    <dbl>
@@ -949,6 +949,62 @@ Gu & Wahba 4 term additive model
  9     9     1    18.1 
 10    10     1    12.7 
 # ... with 4,990 more rows
+> 
+> ## Can pass arguments to predict.gam()
+> newd <- data.frame(x0 = runif(10), x1 = runif(10), x2 = runif(10),
++                    x3 = runif(10))
+> 
+> ## Exclude s(x2)
+> predicted_samples(m, n = 5, newd, exclude = "s(x2)", seed = 25)
+# A tibble: 50 x 3
+     row  draw response
+   <int> <int>    <dbl>
+ 1     1     1     4.16
+ 2     2     1     7.32
+ 3     3     1     8.69
+ 4     4     1     6.36
+ 5     5     1     4.14
+ 6     6     1     8.28
+ 7     7     1    13.2 
+ 8     8     1    13.1 
+ 9     9     1     9.10
+10    10     1     6.27
+# ... with 40 more rows
+> 
+> ## Exclude s(x1)
+> predicted_samples(m, n = 5, newd, exclude = "s(x1)", seed = 25)
+# A tibble: 50 x 3
+     row  draw response
+   <int> <int>    <dbl>
+ 1     1     1     6.00
+ 2     2     1    11.7 
+ 3     3     1     2.05
+ 4     4     1     9.03
+ 5     5     1     3.53
+ 6     6     1     8.29
+ 7     7     1    16.8 
+ 8     8     1    12.4 
+ 9     9     1    10.1 
+10    10     1     6.68
+# ... with 40 more rows
+> 
+> ## Select which terms --- result same as previous
+> predicted_samples(m, n = 5, newd, seed = 25,
++                   terms = c("s(x0)", "s(x2)", "s(x3)"))
+# A tibble: 50 x 3
+     row  draw response
+   <int> <int>    <dbl>
+ 1     1     1     6.00
+ 2     2     1    11.7 
+ 3     3     1     2.05
+ 4     4     1     9.03
+ 5     5     1     3.53
+ 6     6     1     8.29
+ 7     7     1    16.8 
+ 8     8     1    12.4 
+ 9     9     1    10.1 
+10    10     1     6.68
+# ... with 40 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1139,7 +1195,7 @@ detaching ‘package:mgcv’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  12.983 0.138 13.499 0.004 0.001 
+Time elapsed:  12.385 0.149 12.613 0.003 0.001 
 > grDevices::dev.off()
 null device 
           1 
