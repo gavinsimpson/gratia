@@ -6,7 +6,7 @@
   partial residuals are the weighted residuals of the model added to the
   contribution of each smooth term (as returned by `predict(model, type = "terms")`.
   
-  Wish of #76 (@noamross)
+  Wish of [#76](https://github.com/gavinsimpson/gratia/issues/76) (@noamross)
 
 * Users can now control to some extent what colour or fill scales are used when
   plotting smooths in those `draw()` methods that use them. This is most useful
@@ -22,7 +22,7 @@
   model predicted values that are then used to simulate new data from the conditional
   distribution. See the example in `predicted_samples()`.
   
-  Wish of #74 (@hgoldspiel)
+  Wish of [#74](https://github.com/gavinsimpson/gratia/issues/74) (@hgoldspiel)
 
 # gratia 0.4.1
 
