@@ -26,6 +26,29 @@
 ##' 
 ##' @importFrom tibble as_tibble
 ##' @importFrom dplyr bind_cols arrange
+##'
+##' @examples
+##' \dontshow{
+##' set.seed(1)
+##' op <- options(digits = 5, cli.unicode = FALSE)
+##' }
+##' ## load mgcv
+##' load_mgcv()
+##'
+##' ## example data - Gu & Wabha four term model
+##' df <- data_sim("eg1", n = 400, seed = 42)
+##' ## fit the model
+##' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
+##'
+##' ## extract partial residuals
+##' partial_residuals(m)
+##'
+##' ## and for a select term
+##' partial_residuals(m, select = "s(x2)")
+##'
+##' ## or with partial matching
+##' partial_residuals(m, select = "x", partial_match = TRUE) # returns all
+##' \dontshow{options(op)}
 `partial_residuals.gam` <- function(object, select = NULL, partial_match = FALSE,
                                     ...) {
     ## get a vector of labels for smooths

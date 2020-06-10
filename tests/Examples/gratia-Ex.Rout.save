@@ -874,11 +874,94 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55e1d2d51090>
+<environment: 0x565097eb87f0>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55e1d2d51090>
+<environment: 0x565097eb87f0>
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
+> nameEx("partial_residuals")
+> ### * partial_residuals
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: partial_residuals
+> ### Title: Partial residuals
+> ### Aliases: partial_residuals partial_residuals.gam
+> 
+> ### ** Examples
+> 
+> ## Don't show: 
+> set.seed(1)
+> op <- options(digits = 5, cli.unicode = FALSE)
+> ## End(Don't show)
+> ## load mgcv
+> load_mgcv()
+> 
+> ## example data - Gu & Wabha four term model
+> df <- data_sim("eg1", n = 400, seed = 42)
+> ## fit the model
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
+> 
+> ## extract partial residuals
+> partial_residuals(m)
+# A tibble: 400 x 4
+   `s(x0)` `s(x1)` `s(x2)` `s(x3)`
+     <dbl>   <dbl>   <dbl>   <dbl>
+ 1  -0.353 -1.32    -2.18   0.608 
+ 2  -0.123  0.501   -1.77   0.961 
+ 3   1.43   1.52     5.61   0.991 
+ 4  -1.11  -1.70    -0.888 -0.659 
+ 5  -2.12  -0.0138  -2.73  -3.01  
+ 6   1.25  -1.22     3.91   0.0728
+ 7  -0.522  3.02    -0.820 -1.02  
+ 8   1.40   0.218    7.06   1.90  
+ 9   2.80   0.497    7.33   2.50  
+10   1.15  -0.227    0.720  0.744 
+# ... with 390 more rows
+> 
+> ## and for a select term
+> partial_residuals(m, select = "s(x2)")
+# A tibble: 400 x 1
+   `s(x2)`
+     <dbl>
+ 1  -2.18 
+ 2  -1.77 
+ 3   5.61 
+ 4  -0.888
+ 5  -2.73 
+ 6   3.91 
+ 7  -0.820
+ 8   7.06 
+ 9   7.33 
+10   0.720
+# ... with 390 more rows
+> 
+> ## or with partial matching
+> partial_residuals(m, select = "x", partial_match = TRUE) # returns all
+# A tibble: 400 x 4
+   `s(x0)` `s(x1)` `s(x2)` `s(x3)`
+     <dbl>   <dbl>   <dbl>   <dbl>
+ 1  -0.353 -1.32    -2.18   0.608 
+ 2  -0.123  0.501   -1.77   0.961 
+ 3   1.43   1.52     5.61   0.991 
+ 4  -1.11  -1.70    -0.888 -0.659 
+ 5  -2.12  -0.0138  -2.73  -3.01  
+ 6   1.25  -1.22     3.91   0.0728
+ 7  -0.522  3.02    -0.820 -1.02  
+ 8   1.40   0.218    7.06   1.90  
+ 9   2.80   0.497    7.33   2.50  
+10   1.15  -0.227    0.720  0.744 
+# ... with 390 more rows
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > 
 > 
 > 
@@ -1195,7 +1278,7 @@ detaching ‘package:mgcv’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  12.385 0.149 12.613 0.003 0.001 
+Time elapsed:  12.913 0.121 13.095 0.003 0.002 
 > grDevices::dev.off()
 null device 
           1 
