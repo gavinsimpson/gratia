@@ -33,7 +33,7 @@ Partial residuals
 \examples{
 \dontshow{
 set.seed(1)
-op <- options(digits = 5, cli.unicode = FALSE)
+op <- options(digits = 4, cli.unicode = FALSE)
 }
 ## load mgcv
 load_mgcv()
@@ -51,5 +51,7 @@ partial_residuals(m, select = "s(x2)")
 
 ## or with partial matching
 partial_residuals(m, select = "x", partial_match = TRUE) # returns all
-\dontshow{options(op)}
+\dontshow{
+options(op)
+}
 }
