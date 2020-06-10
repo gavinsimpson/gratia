@@ -30,7 +30,7 @@
 ##' @examples
 ##' \dontshow{
 ##' set.seed(1)
-##' op <- options(digits = 5, cli.unicode = FALSE)
+##' op <- options(digits = 4, cli.unicode = FALSE)
 ##' }
 ##' ## load mgcv
 ##' load_mgcv()
@@ -81,5 +81,13 @@
 
 ##' @export
 `partial_residuals.gamm` <- function(object, ...) {
+    partial_residuals(object[["gam"]], ...)
+}
+
+##' @export
+`partial_residuals.list` <- function(object, ...) {
+    if (! is_gamm4(object)) {
+        stop("'object' is not a `gamm4()` fit. Can't handle general lists.")
+    }
     partial_residuals(object[["gam"]], ...)
 }
