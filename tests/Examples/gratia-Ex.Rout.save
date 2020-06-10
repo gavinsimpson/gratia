@@ -874,11 +874,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x565097eb87f0>
+<environment: 0x564e297147a0>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x565097eb87f0>
+<environment: 0x564e297147a0>
 > 
 > 
 > 
@@ -899,7 +899,7 @@ detaching ‘package:mgcv’
 > 
 > ## Don't show: 
 > set.seed(1)
-> op <- options(digits = 5, cli.unicode = FALSE)
+> op <- options(digits = 4, cli.unicode = FALSE)
 > ## End(Don't show)
 > ## load mgcv
 > load_mgcv()
@@ -1278,7 +1278,7 @@ detaching ‘package:mgcv’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  12.913 0.121 13.095 0.003 0.002 
+Time elapsed:  12.624 0.144 12.999 0.004 0 
 > grDevices::dev.off()
 null device 
           1 
