@@ -48,7 +48,9 @@
 ##'
 ##' ## or with partial matching
 ##' partial_residuals(m, select = "x", partial_match = TRUE) # returns all
-##' \dontshow{options(op)}
+##' \dontshow{
+##' options(op)
+##' }
 `partial_residuals.gam` <- function(object, select = NULL, partial_match = FALSE,
                                     ...) {
     ## get a vector of labels for smooths
@@ -75,4 +77,9 @@
     p_resids <- tibble::as_tibble(p_resids)
 
     p_resids
+}
+
+##' @export
+`partial_residuals.gamm` <- function(object, ...) {
+    partial_residuals(object[["gam"]], ...)
 }
