@@ -90,7 +90,7 @@
 ##' @export
 `difference_smooths.list` <- function(model, ...) {
     if (! is_gamm4(model)) {
-        stop()
+        stop("'object' is not a `gamm4()` fit. Can't handle general lists.")
     }
     difference_smooths(model$gam, ...)
 }
