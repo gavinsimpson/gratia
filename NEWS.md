@@ -2,6 +2,12 @@
 
 ## New features
 
+* Partial residuals for models can be computed with `partial_residuals()`. The
+  partial residuals are the weighted residuals of the model added to the
+  contribution of each smooth term (as returned by `predict(model, type = "terms")`.
+  
+  Wish of #76 (@noamross)
+
 * Users can now control to some extent what colour or fill scales are used when
   plotting smooths in those `draw()` methods that use them. This is most useful
   to change the fill scale when plotting 2D smooths, or to change the discrete
