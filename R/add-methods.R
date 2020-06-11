@@ -123,7 +123,6 @@
 ##' @export
 ##'
 ##' @examples
-##'
 ##' load_mgcv()
 ##' \dontshow{
 ##' set.seed(1)
@@ -151,6 +150,70 @@
     }
 
     data <- add_column(data, !!value := drop(resid_vals), .after = ncol(data))
+
+    data
+}
+
+##' Add partial residuals
+##'
+##' @param data a data frame containing values for the variables used to fit the
+##'   model. Passed to [stats::residuals()] as `newdata`.
+##' @param model a fitted model for which a [stats::residuals()] method is
+##'   available. S3 method dispatch is performed on the `model` argument.
+##' @param ... arguments passed to other methods.
+##'
+##' @export
+`add_partial_residuals` <- function(data, model, ...) {
+    UseMethod("add_partial_residuals", model)
+}
+
+##' @rdname add_partial_residuals
+##'
+##' @inheritParams partial_residuals.gam
+##'
+##' @export
+##' 
+##' @importFrom tibble is_tibble as_tibble
+##' @importFrom dplyr bind_cols
+##'
+##' @examples
+##' load_mgcv()
+##' \dontshow{
+##' op <- options(digits = 4, cli.unicode = FALSE)
+##' }
+##' df <- data_sim("eg1", seed = 1)
+##' df <- df[, c("y","x0","x1","x2","x3")]
+##' m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
+##'
+##' ## add partial residuals
+##' add_partial_residuals(df, m)
+##'
+##' ## add partial residuals for selected smooths
+##' add_partial_residuals(df, m, select = "s(x0)")
+##' \dontshow{options(op)}
+`add_partial_residuals.gam` <- function(data, model, select = NULL,
+                                        partial_match = FALSE,
+                                        ...) {
+    ## coerce data to tibble
+    if (!is_tibble(data)) {
+        data <- as_tibble(data)
+    }
+    ## get a vector of labels for smooths
+    sms <- smooths(model)
+    ## which were selected; select = NULL -> all selected
+    take <- check_user_select_smooths(sms, select = select,
+                                      partial_match = partial_match)
+    if (!any(take)) {
+        stop("No smooth label matched 'select'. Try with 'partial_match = TRUE'?",
+             call. = FALSE)
+    }
+    sms <- sms[take] # subset to selected smooths
+
+    ## compute partial resids
+    p_resids <- compute_partial_residuals(model, terms = sms, data = data)
+
+    ## bind partial residuals to data
+    data <- bind_cols(data, as_tibble(p_resids))
 
     data
 }
