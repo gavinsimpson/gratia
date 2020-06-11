@@ -28,7 +28,6 @@ A data frame (tibble) formed from \code{data} and residuals from \code{model}.
 Add residuals from a GAM to a data frame
 }
 \examples{
-
 load_mgcv()
 \dontshow{
 set.seed(1)
