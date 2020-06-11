@@ -64,14 +64,9 @@
     }
     sms <- sms[take] # subset to selected smooths
 
-    ## get the contributions for each selected smooth
-    p_terms <- predict(object, type = "terms", terms = sms)
-    attr(p_terms, "constant") <- NULL # remove intercept attribute
-    ## weight residuals...
-    w_resid <- object$residuals * sqrt(object$weights)
-    ## and compute partial residuals
-    p_resids <- p_terms + w_resid
-
+    ## compute partial resids
+    p_resids <- compute_partial_residuals(object, terms = sms)
+    
     ## cast as a tibble --- do something with the column names?
     ##  - they are non-standard: `s(x)` for example
     p_resids <- tibble::as_tibble(p_resids)
@@ -90,4 +85,32 @@
         stop("'object' is not a `gamm4()` fit. Can't handle general lists.")
     }
     partial_residuals(object[["gam"]], ...)
+}
+
+## Internal function to compute weighted residuals for use by other functions
+`compute_partial_residuals` <- function(object, terms = NULL, data = NULL) {
+    ## weight residuals...
+    w_resid <- object$residuals * sqrt(object$weights)
+
+    ## if data is null, just grab the $model out of object
+    if (is.null(data)) {
+        data <- object[["model"]]
+    } else {
+        ## check size of data
+        if (nrow(data) != length(w_resid)) {
+            stop("Length of model residuals not equal to number of rows in 'data'",
+                 call. = FALSE)
+        }
+    }
+    ## get the contributions for each selected smooth
+    p_terms <- if (is.null(terms)) {
+        predict(object, type = "terms", newdata = data)
+    } else {
+        predict(object, type = "terms", terms = terms, newdata = data)
+    }
+    attr(p_terms, "constant") <- NULL # remove intercept attribute
+    ## and compute partial residuals
+    p_resids <- p_terms + w_resid
+
+    p_resids
 }
