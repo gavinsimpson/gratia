@@ -8,6 +8,9 @@
   
   Wish of [#76](https://github.com/gavinsimpson/gratia/issues/76) (@noamross)
 
+  Also, new function `add_partial_residuals()` can be used to add the partial
+  residuals to data frames.
+
 * Users can now control to some extent what colour or fill scales are used when
   plotting smooths in those `draw()` methods that use them. This is most useful
   to change the fill scale when plotting 2D smooths, or to change the discrete
