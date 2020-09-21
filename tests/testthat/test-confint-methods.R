@@ -4,6 +4,7 @@
 library("testthat")
 library("gratia")
 library("mgcv")
+library('gamm4')
 
 context("confint methods")
 
@@ -91,4 +92,32 @@ test_that("Simultaneous confidence interval for a GAM with factor by variable wo
                                   "crit", "lower", "upper"))
     expect_equal(paste0("s(x2):fac", levels(dat[["fac"]])),
                  unique(ci[["smooth"]]))
+})
+
+## Part of #80
+test_that("Point-wise confidence interval for a GAM with selected factor by variable works", {
+    ci <- confint(mod, parm = "s(x2):fac1", type = "confidence")
+    expect_s3_class(ci, "confint.gam")
+    expect_s3_class(ci, "tbl_df")
+    expect_named(ci, expected = c("smooth", "by_variable", "x2", "est", "se", "fac",
+                                  "crit", "lower", "upper"))
+})
+
+set.seed(2)
+dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+mod <- gamm4::gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, REML = TRUE)
+
+test_that("Point-wise confidence interval for a GAMM works", {
+    ci <- confint(mod, parm = "s(x1)", type = "confidence")
+    expect_s3_class(ci, "confint.gam")
+    expect_s3_class(ci, "tbl_df")
+    expect_named(ci, expected = c("smooth", "by_variable", "x1", "est", "se", "crit", "lower", "upper"))
+})
+
+test_that("Simultaneous interval for a GAMM works", {
+    set.seed(42)
+    ci <- confint(mod, parm = "s(x1)", type = "simultaneous", nsim = 100)
+    expect_s3_class(ci, "confint.gam")
+    expect_s3_class(ci, "tbl_df")
+    expect_named(ci, expected = c("smooth", "by_variable", "x1", "est", "se", "crit", "lower", "upper"))
 })

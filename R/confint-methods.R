@@ -384,3 +384,15 @@
 `confint.gamm` <- function(object, ...) {
     confint(object[["gam"]], ...)
 }
+
+##' @rdname confint.gam
+##'
+##' @importFrom stats confint
+##' 
+##' @export
+`confint.list` <- function(object, ...) {
+    if (!is_gamm4(object)) {
+        stop("`object` does not appear to a `gamm4` model object", call. = FALSE)
+    }
+    confint(object[["gam"]], ...)
+}
