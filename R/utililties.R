@@ -949,3 +949,85 @@ vars_from_label <- function(label) {
                  label)
     vec_c(strsplit(vars, ",")[[1L]])
 }
+
+##' Add a constant to estimated values
+##'
+##' @param object a object to add a constant to.
+##' @param constant the constant to add.
+##' @param ... additional arguments passed to methods.
+##'
+`add_constant` <- function(object, constant = NULL, ...) {
+    UseMethod("add_constant")
+}
+
+`add_constant.evaluated_smooth` <- function(object, constant = NULL, ...) {
+
+    ## If constant supplied, add it to `est`
+    if (!is.null(constant)) {
+        if (!is.numeric(constant)) {
+            stop("'constant' must be numeric, but was supplied <", constant, ">",
+                 call. = FALSE)
+        }
+        object[["est"]] <- object[["est"]] + constant
+    }
+
+    object
+}
+
+`add_constant.evaluated_parametric_term` <- function(object, constant = NULL, ...) {
+
+    ## If constant supplied, add it to `est`
+    if (!is.null(constant)) {
+        if (!is.numeric(constant)) {
+            stop("'constant' must be numeric, but was supplied <", constant, ">",
+                 call. = FALSE)
+        }
+        object[["est"]] <- object[["est"]] + constant
+    }
+
+    object
+}
+
+##' Transform estimated values and confidence intervals by applying a function
+##'
+##' @param object an object to apply the transform function to.
+##' @param fun the function to apply.
+##' @param ... additional arguments passed to methods.
+##'
+`transform_fun` <- function(object, fun = NULL , ...) {
+    UseMethod("add_constant")
+}
+
+`transform_fun.evaluated_smooth` <- function(object, fun = NULL, ...) {
+
+    ## If fun supplied, use it to transform est and the upper and lower interval
+    if (!is.null(fun)) {
+        fun <- match.fun(fun)
+        object[["est"]] <- fun(object[["est"]])
+        if (!is.null(object[["upper"]])) {
+            object[["upper"]] <- fun(object[["upper"]])
+        }
+        if (!is.null(object[["lower"]])) {
+            object[["lower"]] <- fun(object[["lower"]])
+        }
+    }
+
+    object
+}
+
+`transform_fun.evaluated_parametric_term` <- function(object, fun = NULL, ...) {
+
+    ## If fun supplied, use it to transform est and the upper and lower interval
+    if (!is.null(fun)) {
+        fun <- match.fun(fun)
+        object[["est"]] <- fun(object[["est"]])
+        if (!is.null(object[["upper"]])) {
+            object[["upper"]] <- fun(object[["upper"]])
+        }
+        if (!is.null(object[["lower"]])) {
+            object[["lower"]] <- fun(object[["lower"]])
+        }
+    }
+
+    object
+}

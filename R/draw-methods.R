@@ -25,6 +25,13 @@
 ##'   rug plot being drawn. For `evaluate_parametric_terms()`, a logical to
 ##'   indicate if a rug plot should be drawn.
 ##' @param ci_level numeric between 0 and 1; the coverage of credible interval.
+##' @param constant numeric; a constant to add to the estimated values of the
+##'   smooth. `constant`, if supplied, will be added to the estimated value
+##'   before the confidence band is computed.
+##' @param fun function; a function that will be applied to the estimated values
+##'   and confidence interval before plotting. Can be a function or the name of a
+##'   function. Function `fun` will be applied after adding any `constant`, if
+##'   provided.
 ##' @param partial_residuals data frame; partial residuals and data values if
 ##'   partial residuals are drawn. Should have names `..p_resid` and `..orig_x` if
 ##'   supplied.
@@ -64,15 +71,23 @@
 ##' sm <- evaluate_smooth(m1, "s(x2)")
 ##' draw(sm)
 ##'
+##' ## supply constant to shift y axis scale
+##' draw(sm, constant = coef(m1)[1])
+##'
 ##' \dontshow{set.seed(2)}
 ##' dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
 ##' m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
 ##'
 ##' sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 ##' draw(sm)
+##'
+##' ## supply constant to shift y axis scale
+##' draw(sm, constant = coef(m2)[1])
 `draw.evaluated_1d_smooth` <- function(object,
                                        rug = NULL,
                                        ci_level = 0.95,
+                                       constant = NULL,
+                                       fun = NULL,
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
@@ -81,11 +96,17 @@
                                        ...) {
     smooth_var <- names(object)[3L]
 
+    ## If constant supplied apply it to `est`
+    object <- add_constant(object, constant = constant)
+
     ## Add confidence interval
     crit <- qnorm((1 - ci_level) / 2, lower.tail = FALSE)
     object[["upper"]] <- object[["est"]] + (crit * object[["se"]])
     object[["lower"]] <- object[["est"]] - (crit * object[["se"]])
 
+    ## If fun supplied, use it to transform est and the upper and lower interval
+    object <- transform_fun(object, fun = fun)
+    
     plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est, group = ~ smooth))
 
     ## do we want partial residuals? Only for univariate smooths without by vars
@@ -162,6 +183,8 @@
                                        contour = TRUE,
                                        contour_col = "black",
                                        n_contour = NULL,
+                                       constant = NULL,
+                                       fun = NULL,
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
@@ -171,6 +194,13 @@
     if (is.null(continuous_fill)) {
         continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
     }
+
+    ## If constant supplied apply it to `est`
+    object <- add_constant(object, constant = constant)
+
+    ## If fun supplied, use it to transform est and the upper and lower interval
+    object <- transform_fun(object, fun = fun)
+    
     smooth_vars <- names(object)[3:4]
     show <- match.arg(show)
     if (isTRUE(identical(show, "estimate"))) {
@@ -260,6 +290,13 @@
 ##'   If `scales = "free"` each univariate smooth has its own y-axis scale.
 ##'   Currently does not affect the y-axis scale of plots of the parametric
 ##'   terms.
+##' @param constant numeric; a constant to add to the estimated values of the
+##'   smooth. `constant`, if supplied, will be added to the estimated value
+##'   before the confidence band is computed.
+##' @param fun function; a function that will be applied to the estimated values
+##'   and confidence interval before plotting. Can be a function or the name of a
+##'   function. Function `fun` will be applied after adding any `constant`, if
+##'   provided.
 ##' @param align characer; see argument `align` in `cowplot::plot_grid()`.
 ##'   Defaults to `"hv"` so that plots are nicely aligned.
 ##' @param axis characer; see argument `axis` in `cowplot::plot_grid()`.
@@ -326,8 +363,11 @@
                        align = "hv",
                        axis = "lrtb",
                        ci_level = 0.95,
-                       n = 100, unconditional = FALSE,
+                       n = 100,
+                       unconditional = FALSE,
                        overall_uncertainty = TRUE,
+                       constant = NULL,
+                       fun = NULL,
                        dist = 0.1,
                        rug = TRUE,
                        contour = TRUE,
@@ -501,7 +541,8 @@
                            response_range = ylims,
                            discrete_colour = discrete_colour,
                            continuous_colour = continuous_colour,
-                           continuous_fill = continuous_fill)
+                           continuous_fill = continuous_fill,
+                           fun = fun, constant = constant)
         } else {
             g[[i]] <- draw(l[[i]], partial_residuals = partial_residuals,
                            contour = contour, contour_col = contour_col,
@@ -509,14 +550,16 @@
                            response_range = ylims,
                            discrete_colour = discrete_colour,
                            continuous_colour = continuous_colour,
-                           continuous_fill = continuous_fill)
+                           continuous_fill = continuous_fill,
+                           fun = fun, constant = constant)
         }
     }
 
     if (isTRUE(parametric)) {
         leng <- length(g)
         for (i in seq_along(terms)) {
-            g[[i + leng]] <- draw(p[[i]], response_range = ylims)
+            g[[i + leng]] <- draw(p[[i]], response_range = ylims,
+                                  fun = fun, constant = constant)
         }
     }
 
@@ -531,11 +574,19 @@
 ##'
 ##' @export
 ##' @rdname draw.evaluated_smooth
-`draw.evaluated_re_smooth` <- function(object, qq_line = TRUE, xlab, ylab,
+`draw.evaluated_re_smooth` <- function(object, qq_line = TRUE,
+                                       constant = NULL, fun = NULL,
+                                       xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
                                        response_range = NULL, ...) {
     smooth_var <- unique(object[["smooth"]]) ## names(object)[3L]
+
+    ## If constant supplied apply it to `est`
+    object <- add_constant(object, constant = constant)
+
+    ## If fun supplied, use it to transform est and the upper and lower interval
+    object <- transform_fun(object, fun = fun)
 
     ## base plot with computed QQs
     plt <- ggplot(object, aes_string(sample = "est")) +
@@ -592,6 +643,8 @@
 ##' @rdname draw.evaluated_smooth
 `draw.evaluated_fs_smooth` <- function(object,
                                        rug = NULL,
+                                       constant = NULL,
+                                       fun = NULL,
                                        xlab, ylab,
                                        title = NULL, subtitle = NULL,
                                        caption = NULL,
@@ -604,6 +657,12 @@
     
     smooth_var <- names(object)[3L]
     smooth_fac <- names(object)[4L]
+
+    ## If constant supplied apply it to `est`
+    object <- add_constant(object, constant = constant)
+
+    ## If fun supplied, use it to transform est and the upper and lower interval
+    object <- transform_fun(object, fun = fun)
 
     plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est,
                                colour = as.name(smooth_fac))) +
@@ -658,6 +717,8 @@
 ##' @rdname draw.evaluated_smooth
 `draw.evaluated_parametric_term` <- function(object,
                                              ci_level = 0.95,
+                                             constant = NULL,
+                                             fun = NULL,
                                              xlab, ylab,
                                              title = NULL, subtitle = NULL,
                                              caption = NULL,
@@ -668,11 +729,17 @@
     is_fac <- object[["type"]][1L] == "factor"
     term_label <- object[["term"]][1L]
 
+    ## If constant supplied apply it to `est`
+    object <- add_constant(object, constant = constant)
+
     ## add a CI
     crit <- qnorm((1 - ci_level) / 2, lower.tail = FALSE)
     object <- mutate(object,
                      lower = .data$partial - (crit * .data$se),
                      upper = .data$partial + (crit * .data$se))
+
+    ## If fun supplied, use it to transform est and the upper and lower interval
+    object <- transform_fun(object, fun = fun)
 
     plt <- ggplot(object, aes_string(x = "value", y = "partial"))
 
