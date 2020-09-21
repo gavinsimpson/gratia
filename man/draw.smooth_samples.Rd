@@ -52,7 +52,7 @@ supplied, a suitable label will be generated from \code{object}.}
 interval.}
 
 \item{colour}{The colour to use to draw the posterior smooths. Passed to
-\code{\link[ggplot2:geom_line]{ggplot2::geom_line()}} as argument \code{colour}.}
+\code{\link[ggplot2:geom_path]{ggplot2::geom_line()}} as argument \code{colour}.}
 
 \item{scales}{character; should all univariate smooths be plotted with the
 same y-axis scale? The default, \code{scales = "fixed"}, ensures this is done.

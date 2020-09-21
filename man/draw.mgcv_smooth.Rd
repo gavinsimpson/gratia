@@ -28,7 +28,7 @@ object will be created for each level and combined using
 \code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}. \strong{Currently ignored}.}
 
 \item{labeller}{a labeller function with which to label facets. The default
-is to use \code{\link[ggplot2:label_both]{ggplot2::label_both()}}.}
+is to use \code{\link[ggplot2:labellers]{ggplot2::label_both()}}.}
 
 \item{xlab}{character or expression; the label for the x axis. If not
 supplied, a suitable label will be generated from \code{object}.}

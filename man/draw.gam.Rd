@@ -16,6 +16,8 @@
   n = 100,
   unconditional = FALSE,
   overall_uncertainty = TRUE,
+  constant = NULL,
+  fun = NULL,
   dist = 0.1,
   rug = TRUE,
   contour = TRUE,
@@ -70,6 +72,15 @@ covariance matrix will be used.}
 \item{overall_uncertainty}{logical; should the uncertainty in the model
 constant term be included in the standard error of the evaluate values of
 the smooth?}
+
+\item{constant}{numeric; a constant to add to the estimated values of the
+smooth. \code{constant}, if supplied, will be added to the estimated value
+before the confidence band is computed.}
+
+\item{fun}{function; a function that will be applied to the estimated values
+and confidence interval before plotting. Can be a function or the name of a
+function. Function \code{fun} will be applied after adding any \code{constant}, if
+provided.}
 
 \item{dist}{numeric; if greater than 0, this is used to determine when
 a location is too far from data to be plotted when plotting 2-D smooths.

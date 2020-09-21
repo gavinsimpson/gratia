@@ -24,7 +24,7 @@ the name of a model. See Details for possible options.}
 variable.}
 
 \item{seed}{numeric; the seed for the random number generator. Passed to
-\code{\link[base:set.seed]{base::set.seed()}}.}
+\code{\link[base:Random]{base::set.seed()}}.}
 }
 \description{
 A tidy reimplementation of the functions implemented in \code{\link[mgcv:gamSim]{mgcv::gamSim()}}

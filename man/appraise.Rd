@@ -79,7 +79,7 @@ mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 appraise(mod, point_col = "steelblue", point_alpha = 0.4)
 }
 \seealso{
-The plots are produced by functions \code{\link[gratia:qq_plot]{gratia::qq_plot()}},
-\code{\link[gratia:residuals_linpred_plot]{gratia::residuals_linpred_plot()}}, \code{\link[gratia:residuals_hist_plot]{gratia::residuals_hist_plot()}},
-and \code{\link[gratia:observed_fitted_plot]{gratia::observed_fitted_plot()}}.
+The plots are produced by functions \code{\link[=qq_plot]{qq_plot()}},
+\code{\link[=residuals_linpred_plot]{residuals_linpred_plot()}}, \code{\link[=residuals_hist_plot]{residuals_hist_plot()}},
+and \code{\link[=observed_fitted_plot]{observed_fitted_plot()}}.
 }
