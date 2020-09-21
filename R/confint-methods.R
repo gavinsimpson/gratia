@@ -190,6 +190,8 @@
 ##'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
 ##'   Parallelization will take place only if OpenMP is supported (but appears
 ##'   to work on Windows with current `R`).
+##' @param partial_match logical; should matching `parm` use a partial match or
+##'   an exact match? Can only be used if `length(parm)` is `1`.
 ##' @param ... additional arguments for methods
 ##'
 ##' @return a data frame with components:
@@ -221,14 +223,14 @@
 ##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
 ##' ## point-wise interval
-##' ci <- confint(mod, parm = "x1", type = "confidence")
+##' ci <- confint(mod, parm = "s(x1)", type = "confidence")
 ##' ci
 ##'
 ##' ## simultaneous interval for smooth term of x1
 ##' \dontshow{
 ##' set.seed(42)
 ##' }
-##' si <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)
+##' si <- confint(mod, parm = "s(x1)", type = "simultaneous", nsim = 100)
 ##' si
 ##' \dontshow{
 ##' options(op)
@@ -236,19 +238,20 @@
 `confint.gam` <- function(object, parm, level = 0.95, newdata = NULL, n = 200,
                           type = c("confidence", "simultaneous"), nsim = 10000,
                           shift = FALSE, transform = FALSE, unconditional = FALSE,
-                          ncores = 1,
+                          ncores = 1, partial_match = FALSE,
                           ...) {
-    parm <- add_s(parm)
-    ## parm <- select_smooth(object, parm) # select_terms(object, parm)
-    S <- smooths(object)            # vector of smooth labels - "s(x)"
-
-    ## which --- ie index --- smooths match parm
-    take <- which_smooth(object, parm)
+    S <- smooths(object)
+    ## select smooths
+    select <- check_user_select_smooths(smooths = S,
+                                        select = parm,
+                                        partial_match = partial_match)
+    ## did it match anything?
+    if (!any(select)) {
+        stop("No smooths matched <", paste(parm, collapse = ", "),
+             ">. Try adding `partial_match = TRUE`?", call. = FALSE)
+    }
+    take <- select & (smooth_dim(object) <= 1L)
     S <- S[take]
-
-    ## can only do confints for 1d smooths currently --- get smooth dimensions & prune list `S`
-    d <- smooth_dim(object)[take]
-    S <- S[d <= 1L]
 
     ## look to see if smooth is a by variable
     by_levs <- NULL
