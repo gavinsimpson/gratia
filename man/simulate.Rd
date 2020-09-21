@@ -45,7 +45,7 @@ distribution used when fitting the model.
 \details{
 For \code{simulate.gam()} to function, the \code{family} component of the fitted
 model must contain, or be updateable to contain, the required random
-number generator. See \code{\link[mgcv:fix.family.rd]{mgcv::fix.family.rd()}}.
+number generator. See \code{\link[mgcv:fix.family.link]{mgcv::fix.family.rd()}}.
 }
 \examples{
 load_mgcv()

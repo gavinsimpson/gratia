@@ -8,7 +8,7 @@ basis(smooth, data, knots = NULL, constraints = FALSE, ...)
 }
 \arguments{
 \item{smooth}{a smooth specification, the result of a call to one of
-\code{\link[mgcv:s]{mgcv::s()}}., \code{\link[mgcv:te]{mgcv::te()}}, \code{\link[mgcv:ti]{mgcv::ti()}}, or \code{\link[mgcv:t2]{mgcv::t2()}}.}
+\code{\link[mgcv:s]{mgcv::s()}}., \code{\link[mgcv:te]{mgcv::te()}}, \code{\link[mgcv:te]{mgcv::ti()}}, or \code{\link[mgcv:t2]{mgcv::t2()}}.}
 
 \item{data}{a data frame containing the variables used in \code{smooth}.}
 
@@ -26,7 +26,7 @@ A tibble.
 }
 \description{
 Creates a basis expansion from a definition of a smoother using the syntax
-of \emph{mgcv}'s smooths via \code{\link[mgcv:s]{mgcv::s()}}., \code{\link[mgcv:te]{mgcv::te()}}, \code{\link[mgcv:ti]{mgcv::ti()}}, and
+of \emph{mgcv}'s smooths via \code{\link[mgcv:s]{mgcv::s()}}., \code{\link[mgcv:te]{mgcv::te()}}, \code{\link[mgcv:te]{mgcv::ti()}}, and
 \code{\link[mgcv:t2]{mgcv::t2()}}.
 }
 \examples{

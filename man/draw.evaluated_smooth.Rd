@@ -14,6 +14,8 @@
   object,
   rug = NULL,
   ci_level = 0.95,
+  constant = NULL,
+  fun = NULL,
   xlab,
   ylab,
   title = NULL,
@@ -30,6 +32,8 @@
   contour = TRUE,
   contour_col = "black",
   n_contour = NULL,
+  constant = NULL,
+  fun = NULL,
   xlab,
   ylab,
   title = NULL,
@@ -43,6 +47,8 @@
 \method{draw}{evaluated_re_smooth}(
   object,
   qq_line = TRUE,
+  constant = NULL,
+  fun = NULL,
   xlab,
   ylab,
   title = NULL,
@@ -55,6 +61,8 @@
 \method{draw}{evaluated_fs_smooth}(
   object,
   rug = NULL,
+  constant = NULL,
+  fun = NULL,
   xlab,
   ylab,
   title = NULL,
@@ -68,6 +76,8 @@
 \method{draw}{evaluated_parametric_term}(
   object,
   ci_level = 0.95,
+  constant = NULL,
+  fun = NULL,
   xlab,
   ylab,
   title = NULL,
@@ -88,6 +98,15 @@ rug plot being drawn. For \code{evaluate_parametric_terms()}, a logical to
 indicate if a rug plot should be drawn.}
 
 \item{ci_level}{numeric between 0 and 1; the coverage of credible interval.}
+
+\item{constant}{numeric; a constant to add to the estimated values of the
+smooth. \code{constant}, if supplied, will be added to the estimated value
+before the confidence band is computed.}
+
+\item{fun}{function; a function that will be applied to the estimated values
+and confidence interval before plotting. Can be a function or the name of a
+function. Function \code{fun} will be applied after adding any \code{constant}, if
+provided.}
 
 \item{xlab}{character or expression; the label for the x axis. If not
 supplied, a suitable label will be generated from \code{object}.}
@@ -134,7 +153,7 @@ theoretical quartiles.}
 \item{discrete_colour}{an appropriate discrete colour scale from \code{ggplot2}.
 The scale will need to be able to provide as many colours as there are
 levels in the factor variable involved in the smooth. Suitable alternatives
-include \code{\link[ggplot2:scale_colour_viridis_d]{ggplot2::scale_colour_viridis_d()}}.}
+include \code{\link[ggplot2:scale_viridis]{ggplot2::scale_colour_viridis_d()}}.}
 
 \item{position}{Position adjustment, either as a string, or the result of a
 call to a position adjustment function.}
@@ -155,12 +174,18 @@ m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 sm <- evaluate_smooth(m1, "s(x2)")
 draw(sm)
 
+## supply constant to shift y axis scale
+draw(sm, constant = coef(m1)[1])
+
 \dontshow{set.seed(2)}
 dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
 m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
 
 sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 draw(sm)
+
+## supply constant to shift y axis scale
+draw(sm, constant = coef(m2)[1])
 }
 \author{
 Gavin L. Simpson
