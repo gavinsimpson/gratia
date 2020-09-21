@@ -250,7 +250,7 @@
         stop("No smooths matched <", paste(parm, collapse = ", "),
              ">. Try adding `partial_match = TRUE`?", call. = FALSE)
     }
-    take <- select & (smooth_dim(object) <= 1L)
+    take <- select & (smooth_dim(object) <= 2L)
     S <- S[take]
 
     ## look to see if smooth is a by variable

@@ -52,6 +52,26 @@ test_that("Simultaneous interval for a GAM works", {
     expect_named(ci, expected = c("smooth", "by_variable", "x1", "est", "se", "crit", "lower", "upper"))
 })
 
+## data for a 2d smooth
+df_2d <- data_sim("eg2", seed = 2)
+mod_te <- gam(y ~ te(x, z), data = df_2d, method = "REML")
+
+test_that("Point-wise confidence interval for a 2d smooth works", {
+    ci <- confint(mod_te, parm = "te(x,z)", type = "confidence")
+    expect_s3_class(ci, "confint.gam")
+    expect_s3_class(ci, "tbl_df")
+    expect_named(ci, expected = c("smooth", "by_variable", "x", "z", "est", "se",
+                                  "crit", "lower", "upper"))
+})
+
+test_that("Simultaneous interval for a 2d smooth works", {
+    set.seed(42)
+    ci <- confint(mod_te, parm = "te(x,z)", type = "simultaneous", nsim = 100)
+    expect_s3_class(ci, "confint.gam")
+    expect_s3_class(ci, "tbl_df")
+    expect_named(ci, expected = c("smooth", "by_variable", "x", "z", "est", "se", "crit", "lower", "upper"))
+})
+
 mod <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 test_that("Point-wise confidence interval for a GAMM works", {
