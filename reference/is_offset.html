@@ -84,12 +84,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
@@ -125,7 +119,7 @@
     <p>Given a character vector of model terms, checks to see which, if any, is the model offset.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>is_offset</span>(<span class='no'>terms</span>)</pre>
+    <pre class="usage"><span class='fu'>is_offset</span>(<span class='kw'>terms</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -145,9 +139,12 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>m</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x0</span>) + <span class='fu'>s</span>(<span class='no'>x1</span>) + <span class='fu'><a href='https://rdrr.io/r/stats/offset.html'>offset</a></span>(<span class='no'>x0</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>df</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
-<span class='no'>nm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/model.frame.html'>model.frame</a></span>(<span class='no'>m</span>))
-<span class='no'>nm</span></div><div class='output co'>#&gt; [1] "y"          "offset(x0)" "x0"         "x1"        </div><div class='input'><span class='fu'>is_offset</span>(<span class='no'>nm</span>)</div><div class='output co'>#&gt; [1] FALSE  TRUE FALSE FALSE</div></pre>
+<span class='kw'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>1</span>, n = <span class='fl'>400</span>, dist = <span class='st'>"normal"</span>)
+</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='kw'>m</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x0</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x1</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/stats/offset.html'>offset</a></span>(<span class='kw'>x0</span>), data = <span class='kw'>df</span>, method = <span class='st'>"REML"</span>)
+<span class='kw'>nm</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/model.frame.html'>model.frame</a></span>(<span class='kw'>m</span>))
+<span class='kw'>nm</span>
+</div><div class='output co'>#&gt; [1] "y"          "offset(x0)" "x0"         "x1"        </div><div class='input'><span class='fu'>is_offset</span>(<span class='kw'>nm</span>)
+</div><div class='output co'>#&gt; [1] FALSE  TRUE FALSE FALSE</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -163,7 +160,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

@@ -86,12 +86,6 @@ functions." />
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
@@ -129,20 +123,20 @@ Useful, for example, for visualising the uncertainty in individual estimated
 functions.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>smooth_samples</span>(<span class='no'>model</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>smooth_samples</span>(<span class='kw'>model</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for gam</span>
 <span class='fu'>smooth_samples</span>(
-  <span class='no'>model</span>,
-  <span class='kw'>term</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>freq</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>ncores</span> <span class='kw'>=</span> <span class='fl'>1L</span>,
-  <span class='kw'>n_vals</span> <span class='kw'>=</span> <span class='fl'>200</span>,
-  <span class='no'>...</span>
+  <span class='kw'>model</span>,
+  term = <span class='kw'>NULL</span>,
+  n = <span class='fl'>1</span>,
+  newdata = <span class='kw'>NULL</span>,
+  seed = <span class='kw'>NULL</span>,
+  freq = <span class='fl'>FALSE</span>,
+  unconditional = <span class='fl'>FALSE</span>,
+  ncores = <span class='fl'>1L</span>,
+  n_vals = <span class='fl'>200</span>,
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -154,8 +148,8 @@ functions.</p>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>arguments passed to other methods. For <code><a href='predicted_samples.html'>fitted_samples()</a></code>, these
-are passed on to <code>predict.gam()</code>.</p></td>
+      <td><p>arguments passed to other methods. For <code><a href='fitted_samples.html'>fitted_samples()</a></code>, these
+are passed on to <code><a href='https://rdrr.io/pkg/mgcv/man/predict.gam.html'>predict.gam()</a></code>.</p></td>
     </tr>
     <tr>
       <th>term</th>
@@ -224,10 +218,10 @@ posterior draw that each row belongs to.</p></li>
 and covariate combination.</p></li>
 <li><p><code>.xN</code>; numeric. A series of one or more columns containing data required
 for the smooth. <code>.x1</code> will always be present and contains the values of
-the covariate in the smooth. For example if <code>smooth</code> is <code>s(z)</code> then
+the covariate in the smooth. For example if <code>smooth</code> is <code><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s(z)</a></code> then
 <code>.x1</code> will contain the values of covariate <code>z</code> at which the smooth was
 evaluated. Further covariates for multi-dimensional thin plate splines
-(e.g. <code>s(x, z)</code>) or tensor product smooths (e.g. <code>te(x,z,a)</code>) will
+(e.g. <code><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s(x, z)</a></code>) or tensor product smooths (e.g. <code><a href='https://rdrr.io/pkg/mgcv/man/te.html'>te(x,z,a)</a></code>) will
 result in variables <code>.x1</code> and <code>.x2</code>, and <code>.x1</code>, <code>.x2</code>, and <code>.x3</code>
 respectively, with the number (<code>1</code>, <code>2</code>, etc) representing the order
 in which the covariates were specified in the smooth.</p></li>
@@ -250,11 +244,13 @@ change in future versions. Don't rely on position.</p>
     <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
 <span class='co'># \dontshow{</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>2</span>)
-<span class='no'>op</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>cli.unicode</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='kw'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(cli.unicode = <span class='fl'>FALSE</span>)
 <span class='co'># }</span>
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>m1</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x0</span>) + <span class='fu'>s</span>(<span class='no'>x1</span>) + <span class='fu'>s</span>(<span class='no'>x2</span>) + <span class='fu'>s</span>(<span class='no'>x3</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
+<span class='kw'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>1</span>, n = <span class='fl'>1000</span>, dist = <span class='st'>"normal"</span>, scale = <span class='fl'>2</span>)
+</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='kw'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x0</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x1</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x2</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x3</span>), data = <span class='kw'>dat</span>, method = <span class='st'>"REML"</span>)
 
-<span class='fu'>smooth_samples</span>(<span class='no'>m1</span>, <span class='kw'>term</span> <span class='kw'>=</span> <span class='st'>"s(x0)"</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>42</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 1,000 x 7</span><span>
+<span class='fu'>smooth_samples</span>(<span class='kw'>m1</span>, term = <span class='st'>"s(x0)"</span>, n = <span class='fl'>5</span>, seed = <span class='fl'>42</span>)
+</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 1,000 x 7</span><span>
 #&gt;    smooth term  by_variable      .x1   row  draw  value
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>          </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'> 1</span><span> s(x0)  s(x0) </span><span style='color: #BB0000;'>NA</span><span>          0.000</span><span style='text-decoration: underline;'>663</span><span>     1     1 -</span><span style='color: #BB0000;'>0.961</span><span>
@@ -270,11 +266,14 @@ change in future versions. Don't rely on position.</p>
 #&gt; </span><span style='color: #555555;'># ... with 990 more rows</span><span></div><div class='input'>
 <span class='co'>## A factor by example (with a spurious covariate x0)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>2</span>)
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>4</span>)</div><div class='output co'>#&gt; Factor `by' variable example</div><div class='input'>
+<span class='kw'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>4</span>)
+</div><div class='output co'>#&gt; Factor `by' variable example</div><div class='input'>
 <span class='co'>## fit model...</span>
-<span class='no'>m2</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='no'>fac</span> + <span class='fu'>s</span>(<span class='no'>x2</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='no'>fac</span>) + <span class='fu'>s</span>(<span class='no'>x0</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>)
-<span class='no'>sms</span> <span class='kw'>&lt;-</span> <span class='fu'>smooth_samples</span>(<span class='no'>m2</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>42</span>)
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>sms</span>)</div><div class='img'><img src='smooth_samples-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='no'>op</span>)</div></span></pre>
+<span class='kw'>m2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='kw'>fac</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x2</span>, by = <span class='kw'>fac</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x0</span>), data = <span class='kw'>dat</span>)
+<span class='kw'>sms</span> <span class='op'>&lt;-</span> <span class='fu'>smooth_samples</span>(<span class='kw'>m2</span>, n = <span class='fl'>5</span>, seed = <span class='fl'>42</span>)
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='kw'>sms</span>)
+</div><div class='img'><img src='smooth_samples-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>op</span>)
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -290,7 +289,7 @@ change in future versions. Don't rely on position.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

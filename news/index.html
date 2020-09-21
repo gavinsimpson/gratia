@@ -83,12 +83,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
@@ -137,7 +131,7 @@
 <p>The user can pass scales via arguments <code>discrete_colour</code> and <code>continuous_fill</code>.</p>
 </li>
 <li>
-<p>The effects of certain smooths can be excluded from data simulated from a model using <code><a href="../reference/simulate.html">simulate.gam()</a></code> and <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code> by passing <code>exclude</code> or <code>terms</code> on to <code>predict.gam()</code>. This allows for excluding random effects, for example, from model predicted values that are then used to simulate new data from the conditional distribution. See the example in <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code>.</p>
+<p>The effects of certain smooths can be excluded from data simulated from a model using <code><a href="../reference/simulate.gam.html">simulate.gam()</a></code> and <code><a href="../reference/fitted_samples.html">predicted_samples()</a></code> by passing <code>exclude</code> or <code>terms</code> on to <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html">predict.gam()</a></code>. This allows for excluding random effects, for example, from model predicted values that are then used to simulate new data from the conditional distribution. See the example in <code><a href="../reference/fitted_samples.html">predicted_samples()</a></code>.</p>
 <p>Wish of <a href="https://github.com/gavinsimpson/gratia/issues/74"><a href='https://github.com/gavinsimpson/gratia/issues/74'>#74</a></a> (<a href='https://github.com/hgoldspiel'>@hgoldspiel</a>)</p>
 </li>
 </ul>
@@ -179,11 +173,11 @@
 <ul>
 <li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> can now include partial residuals when drawing univariate smooths. Use <code>residuals = TRUE</code> to add partial residuals to each univariate smooth that is drawn. This feature is not available for smooths of more than one variable, by smooths, or factor-smooth interactions (<code>bs = "fs"</code>).</p></li>
 <li>
-<p>The coverage of credible and confidence intervals drawn by <code><a href="../reference/draw.gam.html">draw.gam()</a></code> can be specified via argument <code>ci_level</code>. The default is arbitrarily <code>0.95</code> for no other reason than (rough) compatibility with <code>plot.gam()</code>.</p>
+<p>The coverage of credible and confidence intervals drawn by <code><a href="../reference/draw.gam.html">draw.gam()</a></code> can be specified via argument <code>ci_level</code>. The default is arbitrarily <code>0.95</code> for no other reason than (rough) compatibility with <code><a href="https://rdrr.io/pkg/mgcv/man/plot.gam.html">plot.gam()</a></code>.</p>
 <p>This change has had the effect of making the intervals slightly narrower than in previous versions of <em>gratia</em>; intervals were drawn at ± 2 × the standard error. The default intervals are now drawn at ± ~1.96 × the standard error.</p>
 </li>
-<li><p>New function <code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> for computing differences between factor smooth interactions. Methods available for <code>gam()</code>, <code>bam()</code>, <code>gamm()</code> and <code><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html">gamm4::gamm4()</a></code>. Also has a <code><a href="../reference/draw.html">draw()</a></code> method, which can handle differences of 1D and 2D smooths currently (handling 3D and 4D smooths is planned).</p></li>
-<li><p>New functions <code><a href="../reference/add_fitted.html">add_fitted()</a></code> and <code><a href="../reference/add_residuals.html">add_residuals()</a></code> to add fitted values (expectations) and model residuals to an existing data frame. Currently methods available for objects fitted by <code>gam()</code> and <code>bam()</code>.</p></li>
+<li><p>New function <code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> for computing differences between factor smooth interactions. Methods available for <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html">gam()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html">bam()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html">gamm()</a></code> and <code><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html">gamm4::gamm4()</a></code>. Also has a <code><a href="../reference/draw.html">draw()</a></code> method, which can handle differences of 1D and 2D smooths currently (handling 3D and 4D smooths is planned).</p></li>
+<li><p>New functions <code><a href="../reference/add_fitted.html">add_fitted()</a></code> and <code><a href="../reference/add_residuals.html">add_residuals()</a></code> to add fitted values (expectations) and model residuals to an existing data frame. Currently methods available for objects fitted by <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html">gam()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html">bam()</a></code>.</p></li>
 <li><p><code><a href="../reference/data_sim.html">data_sim()</a></code> is a tidy reimplementation of <code><a href="https://rdrr.io/pkg/mgcv/man/gamSim.html">mgcv::gamSim()</a></code> with the added ability to use sampling distributions other than the Gaussian for all models implemented. Currently Gaussian, Poisson, and Bernoulli sampling distributions are available.</p></li>
 <li><p><code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> can handle continuous by variable smooths such as in varying coefficient models.</p></li>
 <li><p><code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> now work for all families available in <em>mgcv</em>, including the location, scale, shape families, and the more specialised families described in <code><a href="https://rdrr.io/pkg/mgcv/man/family.mgcv.html">?mgcv::family.mgcv</a></code>.</p></li>
@@ -205,7 +199,7 @@
 <li><p>Added utility functions <code><a href="../reference/is_factor_term.html">is_factor_term()</a></code> and <code><a href="../reference/term_variables.html">term_variables()</a></code> for working with models. <code><a href="../reference/is_factor_term.html">is_factor_term()</a></code> identifies is the named term is a factor using information from the <code><a href="https://rdrr.io/r/stats/terms.html">terms()</a></code> object of the fitted model. <code><a href="../reference/term_variables.html">term_variables()</a></code> returns a character vector of variable names that are involved in a model term. These are strictly for working with parametric terms in models.</p></li>
 <li>
 <p><code><a href="../reference/appraise.html">appraise()</a></code> now works for models fitted by <code><a href="https://rdrr.io/r/stats/glm.html">glm()</a></code> and <code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code>, as do the underlying functions it calls, especially <code>qq_plot</code>.</p>
-<p><code><a href="../reference/appraise.html">appraise()</a></code> also works for models fitted with family <code>gaulss()</code>. Further location scale models and models fitted with extended family functions will be supported in upcoming releases.</p>
+<p><code><a href="../reference/appraise.html">appraise()</a></code> also works for models fitted with family <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html">gaulss()</a></code>. Further location scale models and models fitted with extended family functions will be supported in upcoming releases.</p>
 </li>
 </ul>
 </div>
@@ -260,7 +254,7 @@
 <a href="#new-features-3" class="anchor"></a>New features</h2>
 <ul>
 <li><p><em>gratia</em> now uses the <em>mvnfast</em> package for random draws from a multivariate normal distribution (<code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html">mvnfast::rmvn()</a></code>). Contributed by Henrik Singmann (<a href='https://github.com/singmann'>@singmann</a>) <a href="https://github.com/gavinsimpson/gratia/issues/28"><a href='https://github.com/gavinsimpson/gratia/issues/28'>#28</a></a></p></li>
-<li><p>New function <code><a href="../reference/basis.html">basis()</a></code> for generating tidy representations of basis expansions from an <em>mgcv</em>-like definition of a smooth, e.g. <code>s()</code>, <code>te()</code>, <code>ti()</code>, or <code>t2()</code>. The basic smooth types also have a simple <code><a href="../reference/draw.html">draw()</a></code> method for plotting the basis. <code><a href="../reference/basis.html">basis()</a></code> is a simple wrapper around <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html">mgcv::smoothCon()</a></code> with some post processing of the basis model matrix into a tidy format. <a href="https://github.com/gavinsimpson/gratia/issues/42"><a href='https://github.com/gavinsimpson/gratia/issues/42'>#42</a></a></p></li>
+<li><p>New function <code><a href="../reference/basis.html">basis()</a></code> for generating tidy representations of basis expansions from an <em>mgcv</em>-like definition of a smooth, e.g. <code><a href="https://rdrr.io/pkg/mgcv/man/s.html">s()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/te.html">te()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/te.html">ti()</a></code>, or <code><a href="https://rdrr.io/pkg/mgcv/man/t2.html">t2()</a></code>. The basic smooth types also have a simple <code><a href="../reference/draw.html">draw()</a></code> method for plotting the basis. <code><a href="../reference/basis.html">basis()</a></code> is a simple wrapper around <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html">mgcv::smoothCon()</a></code> with some post processing of the basis model matrix into a tidy format. <a href="https://github.com/gavinsimpson/gratia/issues/42"><a href='https://github.com/gavinsimpson/gratia/issues/42'>#42</a></a></p></li>
 <li><p>New function <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> to draw samples of entire smooth functions from their posterior distribution. Also has a <code><a href="../reference/draw.html">draw()</a></code> method for plotting the posterior samples.</p></li>
 </ul>
 </div>
@@ -273,7 +267,7 @@
 <p><code><a href="../reference/derivatives.html">derivatives()</a></code> now works with factor by smooths, including ordered factor by smooths. The function also now works correctly for complex models with multiple covariates/smooths. <a href="https://github.com/gavinsimpson/gratia/issues/47"><a href='https://github.com/gavinsimpson/gratia/issues/47'>#47</a></a></p>
 <p><code><a href="../reference/derivatives.html">derivatives()</a></code> also now handles <code>'fs'</code> smooths. Reported by <a href='https://github.com/tomand-uio'>@tomand-uio</a> <a href="https://github.com/gavinsimpson/gratia/issues/57"><a href='https://github.com/gavinsimpson/gratia/issues/57'>#57</a></a>.</p>
 </li>
-<li><p><code><a href="../reference/evaluate_smooth.html">evaluate_parametric_term()</a></code> and hence <code><a href="../reference/draw.gam.html">draw.gam()</a></code> would fail on a <code>ziplss()</code> model because i) <em>gratia</em> didn’t handle parametric terms in models with multiple linear predictors correctly, and ii) <em>gratia</em> didn’t convert to the naming convention of <em>mgcv</em> for terms in higher linear predictors. Reported by <a href='https://github.com/pboesu'>@pboesu</a> <a href="https://github.com/gavinsimpson/gratia/issues/45"><a href='https://github.com/gavinsimpson/gratia/issues/45'>#45</a></a>.</p></li>
+<li><p><code><a href="../reference/evaluate_smooth.html">evaluate_parametric_term()</a></code> and hence <code><a href="../reference/draw.gam.html">draw.gam()</a></code> would fail on a <code><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html">ziplss()</a></code> model because i) <em>gratia</em> didn’t handle parametric terms in models with multiple linear predictors correctly, and ii) <em>gratia</em> didn’t convert to the naming convention of <em>mgcv</em> for terms in higher linear predictors. Reported by <a href='https://github.com/pboesu'>@pboesu</a> <a href="https://github.com/gavinsimpson/gratia/issues/45"><a href='https://github.com/gavinsimpson/gratia/issues/45'>#45</a></a>.</p></li>
 </ul>
 </div>
 </div>
@@ -294,7 +288,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

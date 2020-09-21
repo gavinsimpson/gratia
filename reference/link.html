@@ -86,12 +86,6 @@ links, such as location scale models." />
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
@@ -129,55 +123,55 @@ simple way to extract these functions from complex models with multiple
 links, such as location scale models.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>link</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>link</span>(<span class='kw'>object</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for family</span>
 <span class='fu'>link</span>(
-  <span class='no'>object</span>,
-  <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>),
-  <span class='kw'>which_eta</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>
+  <span class='kw'>object</span>,
+  parameter = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>),
+  which_eta = <span class='kw'>NULL</span>,
+  <span class='kw'>...</span>
 )
 
 <span class='co'># S3 method for gam</span>
-<span class='fu'>link</span>(<span class='no'>object</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>), <span class='no'>...</span>)
+<span class='fu'>link</span>(<span class='kw'>object</span>, parameter = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>), <span class='kw'>...</span>)
 
 <span class='co'># S3 method for bam</span>
-<span class='fu'>link</span>(<span class='no'>object</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>), <span class='no'>...</span>)
+<span class='fu'>link</span>(<span class='kw'>object</span>, parameter = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>), <span class='kw'>...</span>)
 
 <span class='co'># S3 method for gamm</span>
-<span class='fu'>link</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>link</span>(<span class='kw'>object</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for glm</span>
-<span class='fu'>link</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>link</span>(<span class='kw'>object</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for list</span>
-<span class='fu'>link</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>link</span>(<span class='kw'>object</span>, <span class='kw'>...</span>)
 
-<span class='fu'>inv_link</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>inv_link</span>(<span class='kw'>object</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for family</span>
 <span class='fu'>inv_link</span>(
-  <span class='no'>object</span>,
-  <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>),
-  <span class='kw'>which_eta</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>
+  <span class='kw'>object</span>,
+  parameter = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>),
+  which_eta = <span class='kw'>NULL</span>,
+  <span class='kw'>...</span>
 )
 
 <span class='co'># S3 method for gam</span>
-<span class='fu'>inv_link</span>(<span class='no'>object</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>), <span class='no'>...</span>)
+<span class='fu'>inv_link</span>(<span class='kw'>object</span>, parameter = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>), <span class='kw'>...</span>)
 
 <span class='co'># S3 method for bam</span>
-<span class='fu'>inv_link</span>(<span class='no'>object</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>), <span class='no'>...</span>)
+<span class='fu'>inv_link</span>(<span class='kw'>object</span>, parameter = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span>), <span class='kw'>...</span>)
 
 <span class='co'># S3 method for gamm</span>
-<span class='fu'>inv_link</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>inv_link</span>(<span class='kw'>object</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for list</span>
-<span class='fu'>inv_link</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>inv_link</span>(<span class='kw'>object</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for glm</span>
-<span class='fu'>inv_link</span>(<span class='no'>object</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>inv_link</span>(<span class='kw'>object</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -216,26 +210,31 @@ parameter, and <code>"xi"</code>, the shape parameter for  <code><a href='https:
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
 
-<span class='fu'>link</span>(<span class='fu'><a href='https://rdrr.io/r/stats/family.html'>gaussian</a></span>())</div><div class='output co'>#&gt; function (mu) 
+<span class='fu'>link</span>(<span class='fu'><a href='https://rdrr.io/r/stats/family.html'>gaussian</a></span>())
+</div><div class='output co'>#&gt; function (mu) 
 #&gt; mu
-#&gt; &lt;environment: namespace:stats&gt;</div><div class='input'><span class='fu'>link</span>(<span class='fu'>nb</span>())</div><div class='output co'>#&gt; function (mu) 
+#&gt; &lt;environment: namespace:stats&gt;</div><div class='input'><span class='fu'>link</span>(<span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/negbin.html'>nb</a></span>())
+</div><div class='output co'>#&gt; function (mu) 
 #&gt; log(mu)
 #&gt; &lt;environment: namespace:stats&gt;</div><div class='input'>
-<span class='fu'>inv_link</span>(<span class='fu'>nb</span>())</div><div class='output co'>#&gt; function (eta) 
+<span class='fu'>inv_link</span>(<span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/negbin.html'>nb</a></span>())
+</div><div class='output co'>#&gt; function (eta) 
 #&gt; pmax(exp(eta), .Machine$double.eps)
 #&gt; &lt;environment: namespace:stats&gt;</div><div class='input'>
 <span class='co'># \dontshow{</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>4234</span>)
 <span class='co'># }</span>
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-<span class='no'>mod</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x0</span>) + <span class='fu'>s</span>(<span class='no'>x1</span>) + <span class='fu'>s</span>(<span class='no'>x2</span>) + <span class='fu'>s</span>(<span class='no'>x3</span>), ~ <span class='fl'>1</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>,
-           <span class='kw'>family</span> <span class='kw'>=</span> <span class='no'>gaulss</span>)
+<span class='kw'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>1</span>, n = <span class='fl'>400</span>, dist = <span class='st'>"normal"</span>, scale = <span class='fl'>2</span>, verbose = <span class='fl'>FALSE</span>)
+<span class='kw'>mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x0</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x1</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x2</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x3</span>), <span class='op'>~</span> <span class='fl'>1</span>), data = <span class='kw'>dat</span>,
+           family = <span class='kw'>gaulss</span>)
 
-<span class='fu'>link</span>(<span class='no'>mod</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='st'>"scale"</span>)</div><div class='output co'>#&gt; function (mu) 
+<span class='fu'>link</span>(<span class='kw'>mod</span>, parameter = <span class='st'>"scale"</span>)
+</div><div class='output co'>#&gt; function (mu) 
 #&gt; log(1/mu - 0.01)
-#&gt; &lt;environment: 0x7fb6809cc2b0&gt;</div><div class='input'><span class='fu'>inv_link</span>(<span class='no'>mod</span>, <span class='kw'>parameter</span> <span class='kw'>=</span> <span class='st'>"scale"</span>)</div><div class='output co'>#&gt; function (eta) 
+#&gt; &lt;environment: 0x7fe1a800a438&gt;</div><div class='input'><span class='fu'>inv_link</span>(<span class='kw'>mod</span>, parameter = <span class='st'>"scale"</span>)
+</div><div class='output co'>#&gt; function (eta) 
 #&gt; 1/(exp(eta) + 0.01)
-#&gt; &lt;environment: 0x7fb6809cc2b0&gt;</div></pre>
+#&gt; &lt;environment: 0x7fe1a800a438&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -251,7 +250,7 @@ parameter, and <code>"xi"</code>, the shape parameter for  <code><a href='https:
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

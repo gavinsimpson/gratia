@@ -84,12 +84,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
@@ -127,76 +121,86 @@
 
     <pre class="usage"><span class='co'># S3 method for evaluated_1d_smooth</span>
 <span class='fu'><a href='draw.html'>draw</a></span>(
-  <span class='no'>object</span>,
-  <span class='kw'>rug</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>ci_level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
-  <span class='no'>xlab</span>,
-  <span class='no'>ylab</span>,
-  <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>partial_residuals</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>response_range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>
+  <span class='kw'>object</span>,
+  rug = <span class='kw'>NULL</span>,
+  ci_level = <span class='fl'>0.95</span>,
+  constant = <span class='kw'>NULL</span>,
+  fun = <span class='kw'>NULL</span>,
+  <span class='kw'>xlab</span>,
+  <span class='kw'>ylab</span>,
+  title = <span class='kw'>NULL</span>,
+  subtitle = <span class='kw'>NULL</span>,
+  caption = <span class='kw'>NULL</span>,
+  partial_residuals = <span class='kw'>NULL</span>,
+  response_range = <span class='kw'>NULL</span>,
+  <span class='kw'>...</span>
 )
 
 <span class='co'># S3 method for evaluated_2d_smooth</span>
 <span class='fu'><a href='draw.html'>draw</a></span>(
-  <span class='no'>object</span>,
-  <span class='kw'>show</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"estimate"</span>, <span class='st'>"se"</span>),
-  <span class='kw'>contour</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>contour_col</span> <span class='kw'>=</span> <span class='st'>"black"</span>,
-  <span class='kw'>n_contour</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>xlab</span>,
-  <span class='no'>ylab</span>,
-  <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>response_range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>continuous_fill</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>
+  <span class='kw'>object</span>,
+  show = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"estimate"</span>, <span class='st'>"se"</span>),
+  contour = <span class='fl'>TRUE</span>,
+  contour_col = <span class='st'>"black"</span>,
+  n_contour = <span class='kw'>NULL</span>,
+  constant = <span class='kw'>NULL</span>,
+  fun = <span class='kw'>NULL</span>,
+  <span class='kw'>xlab</span>,
+  <span class='kw'>ylab</span>,
+  title = <span class='kw'>NULL</span>,
+  subtitle = <span class='kw'>NULL</span>,
+  caption = <span class='kw'>NULL</span>,
+  response_range = <span class='kw'>NULL</span>,
+  continuous_fill = <span class='kw'>NULL</span>,
+  <span class='kw'>...</span>
 )
 
 <span class='co'># S3 method for evaluated_re_smooth</span>
 <span class='fu'><a href='draw.html'>draw</a></span>(
-  <span class='no'>object</span>,
-  <span class='kw'>qq_line</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='no'>xlab</span>,
-  <span class='no'>ylab</span>,
-  <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>response_range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>
+  <span class='kw'>object</span>,
+  qq_line = <span class='fl'>TRUE</span>,
+  constant = <span class='kw'>NULL</span>,
+  fun = <span class='kw'>NULL</span>,
+  <span class='kw'>xlab</span>,
+  <span class='kw'>ylab</span>,
+  title = <span class='kw'>NULL</span>,
+  subtitle = <span class='kw'>NULL</span>,
+  caption = <span class='kw'>NULL</span>,
+  response_range = <span class='kw'>NULL</span>,
+  <span class='kw'>...</span>
 )
 
 <span class='co'># S3 method for evaluated_fs_smooth</span>
 <span class='fu'><a href='draw.html'>draw</a></span>(
-  <span class='no'>object</span>,
-  <span class='kw'>rug</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>xlab</span>,
-  <span class='no'>ylab</span>,
-  <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>response_range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>discrete_colour</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>
+  <span class='kw'>object</span>,
+  rug = <span class='kw'>NULL</span>,
+  constant = <span class='kw'>NULL</span>,
+  fun = <span class='kw'>NULL</span>,
+  <span class='kw'>xlab</span>,
+  <span class='kw'>ylab</span>,
+  title = <span class='kw'>NULL</span>,
+  subtitle = <span class='kw'>NULL</span>,
+  caption = <span class='kw'>NULL</span>,
+  response_range = <span class='kw'>NULL</span>,
+  discrete_colour = <span class='kw'>NULL</span>,
+  <span class='kw'>...</span>
 )
 
 <span class='co'># S3 method for evaluated_parametric_term</span>
 <span class='fu'><a href='draw.html'>draw</a></span>(
-  <span class='no'>object</span>,
-  <span class='kw'>ci_level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
-  <span class='no'>xlab</span>,
-  <span class='no'>ylab</span>,
-  <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>rug</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>position</span> <span class='kw'>=</span> <span class='st'>"identity"</span>,
-  <span class='kw'>response_range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>
+  <span class='kw'>object</span>,
+  ci_level = <span class='fl'>0.95</span>,
+  constant = <span class='kw'>NULL</span>,
+  fun = <span class='kw'>NULL</span>,
+  <span class='kw'>xlab</span>,
+  <span class='kw'>ylab</span>,
+  title = <span class='kw'>NULL</span>,
+  subtitle = <span class='kw'>NULL</span>,
+  caption = <span class='kw'>NULL</span>,
+  rug = <span class='fl'>TRUE</span>,
+  position = <span class='st'>"identity"</span>,
+  response_range = <span class='kw'>NULL</span>,
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -216,6 +220,19 @@ indicate if a rug plot should be drawn.</p></td>
     <tr>
       <th>ci_level</th>
       <td><p>numeric between 0 and 1; the coverage of credible interval.</p></td>
+    </tr>
+    <tr>
+      <th>constant</th>
+      <td><p>numeric; a constant to add to the estimated values of the
+smooth. <code>constant</code>, if supplied, will be added to the estimated value
+before the confidence band is computed.</p></td>
+    </tr>
+    <tr>
+      <th>fun</th>
+      <td><p>function; a function that will be applied to the estimated values
+and confidence interval before plotting. Can be a function or the name of a
+function. Function <code>fun</code> will be applied after adding any <code>constant</code>, if
+provided.</p></td>
     </tr>
     <tr>
       <th>xlab</th>
@@ -312,15 +329,25 @@ call to a position adjustment function.</p></td>
     <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
 
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>2</span>)
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>m1</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x0</span>) + <span class='fu'>s</span>(<span class='no'>x1</span>) + <span class='fu'>s</span>(<span class='no'>x2</span>) + <span class='fu'>s</span>(<span class='no'>x3</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
+<span class='kw'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>1</span>, n = <span class='fl'>400</span>, dist = <span class='st'>"normal"</span>, scale = <span class='fl'>2</span>)
+</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='kw'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x0</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x1</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x2</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x3</span>), data = <span class='kw'>dat</span>, method = <span class='st'>"REML"</span>)
 
-<span class='no'>sm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='evaluate_smooth.html'>evaluate_smooth</a></span>(<span class='no'>m1</span>, <span class='st'>"s(x2)"</span>)
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>sm</span>)</div><div class='img'><img src='draw.evaluated_smooth-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='kw'>sm</span> <span class='op'>&lt;-</span> <span class='fu'><a href='evaluate_smooth.html'>evaluate_smooth</a></span>(<span class='kw'>m1</span>, <span class='st'>"s(x2)"</span>)
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='kw'>sm</span>)
+</div><div class='img'><img src='draw.evaluated_smooth-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'>## supply constant to shift y axis scale</span>
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='kw'>sm</span>, constant = <span class='fu'><a href='https://rdrr.io/r/stats/coef.html'>coef</a></span>(<span class='kw'>m1</span>)[<span class='fl'>1</span>])
+</div><div class='img'><img src='draw.evaluated_smooth-2.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>2</span>)
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>2</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt; Bivariate smoothing example</div><div class='input'><span class='no'>m2</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x</span>, <span class='no'>z</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>40</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>$<span class='no'>data</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
+<span class='kw'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>2</span>, n = <span class='fl'>1000</span>, dist = <span class='st'>"normal"</span>, scale = <span class='fl'>1</span>)
+</div><div class='output co'>#&gt; Bivariate smoothing example</div><div class='input'><span class='kw'>m2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x</span>, <span class='kw'>z</span>, k = <span class='fl'>40</span>), data = <span class='kw'>dat</span><span class='op'>$</span><span class='kw'>data</span>, method = <span class='st'>"REML"</span>)
 
-<span class='no'>sm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='evaluate_smooth.html'>evaluate_smooth</a></span>(<span class='no'>m2</span>, <span class='st'>"s(x,z)"</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>)
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>sm</span>)</div><div class='img'><img src='draw.evaluated_smooth-2.png' alt='' width='700' height='433' /></div></pre>
+<span class='kw'>sm</span> <span class='op'>&lt;-</span> <span class='fu'><a href='evaluate_smooth.html'>evaluate_smooth</a></span>(<span class='kw'>m2</span>, <span class='st'>"s(x,z)"</span>, n = <span class='fl'>100</span>)
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='kw'>sm</span>)
+</div><div class='img'><img src='draw.evaluated_smooth-3.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'>## supply constant to shift y axis scale</span>
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='kw'>sm</span>, constant = <span class='fu'><a href='https://rdrr.io/r/stats/coef.html'>coef</a></span>(<span class='kw'>m2</span>)[<span class='fl'>1</span>])
+</div><div class='img'><img src='draw.evaluated_smooth-4.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -336,7 +363,7 @@ call to a position adjustment function.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

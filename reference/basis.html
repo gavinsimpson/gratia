@@ -86,12 +86,6 @@ mgcv::t2()." />
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
@@ -129,7 +123,7 @@ of <em>mgcv</em>'s smooths via <code><a href='https://rdrr.io/pkg/mgcv/man/s.htm
 <code><a href='https://rdrr.io/pkg/mgcv/man/t2.html'>mgcv::t2()</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>basis</span>(<span class='no'>smooth</span>, <span class='no'>data</span>, <span class='kw'>knots</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>constraints</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>basis</span>(<span class='kw'>smooth</span>, <span class='kw'>data</span>, knots = <span class='kw'>NULL</span>, constraints = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -171,13 +165,14 @@ the smooth basis. See argument <code>absorb.cons</code> in <code><a href='https:
     <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
 <span class='co'># \dontshow{</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
-<span class='no'>op</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>cli.unicode</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='kw'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(digits = <span class='fl'>3</span>, cli.unicode = <span class='fl'>FALSE</span>)
 <span class='co'># }</span>
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>4</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='kw'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>4</span>, n = <span class='fl'>400</span>, verbose = <span class='fl'>FALSE</span>)
 
-<span class='no'>bf</span> <span class='kw'>&lt;-</span> <span class='fu'>basis</span>(<span class='fu'>s</span>(<span class='no'>x0</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>df</span>)
-<span class='no'>bf</span> <span class='kw'>&lt;-</span> <span class='fu'>basis</span>(<span class='fu'>s</span>(<span class='no'>x2</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='no'>fac</span>, <span class='kw'>bs</span> <span class='kw'>=</span> <span class='st'>'bs'</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>df</span>, <span class='kw'>constraints</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='no'>op</span>)</div></pre>
+<span class='kw'>bf</span> <span class='op'>&lt;-</span> <span class='fu'>basis</span>(<span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x0</span>), data = <span class='kw'>df</span>)
+<span class='kw'>bf</span> <span class='op'>&lt;-</span> <span class='fu'>basis</span>(<span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x2</span>, by = <span class='kw'>fac</span>, bs = <span class='st'>'bs'</span>), data = <span class='kw'>df</span>, constraints = <span class='fl'>TRUE</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>op</span>)
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -193,7 +188,7 @@ the smooth basis. See argument <code>absorb.cons</code> in <code><a href='https:
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

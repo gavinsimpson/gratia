@@ -85,12 +85,6 @@ derivatives of smooth terms in a fitted GAM." />
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
@@ -129,13 +123,13 @@ derivatives of smooth terms in a fitted GAM.</p>
 
     <pre class="usage"><span class='co'># S3 method for fderiv</span>
 <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span>(
-  <span class='no'>object</span>,
-  <span class='no'>parm</span>,
-  <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
-  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"confidence"</span>, <span class='st'>"simultaneous"</span>),
-  <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>10000</span>,
-  <span class='kw'>ncores</span> <span class='kw'>=</span> <span class='fl'>1L</span>,
-  <span class='no'>...</span>
+  <span class='kw'>object</span>,
+  <span class='kw'>parm</span>,
+  level = <span class='fl'>0.95</span>,
+  type = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"confidence"</span>, <span class='st'>"simultaneous"</span>),
+  nsim = <span class='fl'>10000</span>,
+  ncores = <span class='fl'>1L</span>,
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -197,16 +191,18 @@ to work on Windows with current <code>R</code>).</p></td>
     <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
 <span class='co'># \dontshow{</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>2</span>)
-<span class='no'>op</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>cli.unicode</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='kw'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(digits = <span class='fl'>3</span>, cli.unicode = <span class='fl'>FALSE</span>)
 <span class='co'># }</span>
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>mod</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x0</span>) + <span class='fu'>s</span>(<span class='no'>x1</span>) + <span class='fu'>s</span>(<span class='no'>x2</span>) + <span class='fu'>s</span>(<span class='no'>x3</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
+<span class='kw'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>1</span>, n = <span class='fl'>1000</span>, dist = <span class='st'>"normal"</span>, scale = <span class='fl'>2</span>)
+</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='kw'>mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x0</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x1</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x2</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x3</span>), data = <span class='kw'>dat</span>, method = <span class='st'>"REML"</span>)
 
 <span class='co'>## first derivatives of all smooths...</span>
-<span class='no'>fd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='fderiv.html'>fderiv</a></span>(<span class='no'>mod</span>)
+<span class='kw'>fd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fderiv.html'>fderiv</a></span>(<span class='kw'>mod</span>)
 
 <span class='co'>## point-wise interval</span>
-<span class='no'>ci</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span>(<span class='no'>fd</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"confidence"</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>ci</span>)</div><div class='output co'>#&gt;    term lower  est upper
+<span class='kw'>ci</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span>(<span class='kw'>fd</span>, type = <span class='st'>"confidence"</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='kw'>ci</span>)
+</div><div class='output co'>#&gt;    term lower  est upper
 #&gt; 1 s(x0)  1.22 6.02  10.8
 #&gt; 2 s(x0)  1.22 6.02  10.8
 #&gt; 3 s(x0)  1.22 6.02  10.8
@@ -217,14 +213,16 @@ to work on Windows with current <code>R</code>).</p></td>
 <span class='co'># \dontshow{</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
 <span class='co'># }</span>
-<span class='no'>x1.sint</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span>(<span class='no'>fd</span>, <span class='kw'>parm</span> <span class='kw'>=</span> <span class='st'>"x1"</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"simultaneous"</span>, <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>2500</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>x1.sint</span>)</div><div class='output co'>#&gt;    term  lower  est upper
+<span class='kw'>x1.sint</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span>(<span class='kw'>fd</span>, parm = <span class='st'>"x1"</span>, type = <span class='st'>"simultaneous"</span>, nsim = <span class='fl'>2500</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='kw'>x1.sint</span>)
+</div><div class='output co'>#&gt;    term  lower  est upper
 #&gt; 1 s(x1) -0.483 4.70  9.88
 #&gt; 2 s(x1) -0.482 4.70  9.88
 #&gt; 3 s(x1) -0.478 4.70  9.87
 #&gt; 4 s(x1) -0.469 4.70  9.86
 #&gt; 5 s(x1) -0.452 4.70  9.84
-#&gt; 6 s(x1) -0.427 4.69  9.81</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='no'>op</span>)</div></pre>
+#&gt; 6 s(x1) -0.427 4.69  9.81</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>op</span>)
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -240,7 +238,7 @@ to work on Windows with current <code>R</code>).</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

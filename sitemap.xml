@@ -4,6 +4,9 @@
     <loc>https://gavinsimpson.github.io/gratia//index.html</loc>
   </url>
   <url>
+    <loc>https://gavinsimpson.github.io/gratia//reference/add_constant.html</loc>
+  </url>
+  <url>
     <loc>https://gavinsimpson.github.io/gratia//reference/add_fitted.html</loc>
   </url>
   <url>
@@ -191,6 +194,9 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia//reference/tidy_basis.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia//reference/transform_fun.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia//reference/vars_from_label.html</loc>

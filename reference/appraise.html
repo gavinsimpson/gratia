@@ -84,12 +84,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
@@ -125,28 +119,28 @@
     <p>Model diagnostic plots</p>
     </div>
 
-    <pre class="usage"><span class='fu'>appraise</span>(<span class='no'>model</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>appraise</span>(<span class='kw'>model</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for gam</span>
 <span class='fu'>appraise</span>(
-  <span class='no'>model</span>,
-  <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"direct"</span>, <span class='st'>"simulate"</span>, <span class='st'>"normal"</span>),
-  <span class='kw'>n_uniform</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>n_simulate</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"deviance"</span>, <span class='st'>"pearson"</span>, <span class='st'>"response"</span>),
-  <span class='kw'>n_bins</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sturges"</span>, <span class='st'>"scott"</span>, <span class='st'>"fd"</span>),
-  <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.9</span>,
-  <span class='kw'>ci_col</span> <span class='kw'>=</span> <span class='st'>"black"</span>,
-  <span class='kw'>ci_alpha</span> <span class='kw'>=</span> <span class='fl'>0.2</span>,
-  <span class='kw'>point_col</span> <span class='kw'>=</span> <span class='st'>"black"</span>,
-  <span class='kw'>point_alpha</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>line_col</span> <span class='kw'>=</span> <span class='st'>"red"</span>,
-  <span class='no'>...</span>
+  <span class='kw'>model</span>,
+  method = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"direct"</span>, <span class='st'>"simulate"</span>, <span class='st'>"normal"</span>),
+  n_uniform = <span class='fl'>10</span>,
+  n_simulate = <span class='fl'>50</span>,
+  type = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"deviance"</span>, <span class='st'>"pearson"</span>, <span class='st'>"response"</span>),
+  n_bins = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sturges"</span>, <span class='st'>"scott"</span>, <span class='st'>"fd"</span>),
+  ncol = <span class='fl'>2</span>,
+  level = <span class='fl'>0.9</span>,
+  ci_col = <span class='st'>"black"</span>,
+  ci_alpha = <span class='fl'>0.2</span>,
+  point_col = <span class='st'>"black"</span>,
+  point_alpha = <span class='fl'>1</span>,
+  line_col = <span class='st'>"red"</span>,
+  <span class='kw'>...</span>
 )
 
 <span class='co'># S3 method for lm</span>
-<span class='fu'>appraise</span>(<span class='no'>model</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>appraise</span>(<span class='kw'>model</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -217,17 +211,19 @@ reference line in the residuals vs linear predictor plot.</p></td>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>The plots are produced by functions <code><a href='qq_plot.html'>gratia::qq_plot()</a></code>,
-<code><a href='residuals_linpred_plot.html'>gratia::residuals_linpred_plot()</a></code>, <code><a href='residuals_hist_plot.html'>gratia::residuals_hist_plot()</a></code>,
-and <code><a href='observed_fitted_plot.html'>gratia::observed_fitted_plot()</a></code>.</p></div>
+    <div class='dont-index'><p>The plots are produced by functions <code><a href='qq_plot.html'>qq_plot()</a></code>,
+<code><a href='residuals_linpred_plot.html'>residuals_linpred_plot()</a></code>, <code><a href='residuals_hist_plot.html'>residuals_hist_plot()</a></code>,
+and <code><a href='observed_fitted_plot.html'>observed_fitted_plot()</a></code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>mgcv</span>)
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'>mgcv</span>)
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>2</span>)
 <span class='co'>## simulate some data...</span>
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>mod</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='no'>y</span> ~ <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='no'>x0</span>) + <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='no'>x1</span>) + <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='no'>x2</span>) + <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='no'>x3</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>)
+<span class='kw'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>1</span>, n = <span class='fl'>400</span>, dist = <span class='st'>"normal"</span>, scale = <span class='fl'>2</span>)
+</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='kw'>mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x0</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x1</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x2</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x3</span>), data = <span class='kw'>dat</span>)
 <span class='co'>## run some basic model checks</span>
-<span class='fu'>appraise</span>(<span class='no'>mod</span>, <span class='kw'>point_col</span> <span class='kw'>=</span> <span class='st'>"steelblue"</span>, <span class='kw'>point_alpha</span> <span class='kw'>=</span> <span class='fl'>0.4</span>)</div><div class='img'><img src='appraise-1.png' alt='' width='700' height='433' /></div></pre>
+<span class='fu'>appraise</span>(<span class='kw'>mod</span>, point_col = <span class='st'>"steelblue"</span>, point_alpha = <span class='fl'>0.4</span>)
+</div><div class='img'><img src='appraise-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -243,7 +239,7 @@ and <code><a href='observed_fitted_plot.html'>gratia::observed_fitted_plot()</a>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

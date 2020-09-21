@@ -85,12 +85,6 @@ min(x) -- max(x)." />
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
@@ -127,7 +121,7 @@ min(x) -- max(x)." />
 <code><a href='https://rdrr.io/r/base/Extremes.html'>min(x)</a></code> -- <code><a href='https://rdrr.io/r/base/Extremes.html'>max(x)</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>seq_min_max</span>(<span class='no'>x</span>, <span class='no'>n</span>)</pre>
+    <pre class="usage"><span class='fu'>seq_min_max</span>(<span class='kw'>x</span>, <span class='kw'>n</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -148,9 +142,10 @@ min(x) -- max(x)." />
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>1</span>)
-<span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>10</span>)
-<span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>10L</span>
-<span class='fu'>seq_min_max</span>(<span class='no'>x</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='no'>n</span>)</div><div class='output co'>#&gt;  [1] -0.83562861 -0.56552757 -0.29542652 -0.02532547  0.24477557  0.51487662
+<span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>10</span>)
+<span class='kw'>n</span> <span class='op'>&lt;-</span> <span class='fl'>10L</span>
+<span class='fu'>seq_min_max</span>(<span class='kw'>x</span>, n = <span class='kw'>n</span>)
+</div><div class='output co'>#&gt;  [1] -0.83562861 -0.56552757 -0.29542652 -0.02532547  0.24477557  0.51487662
 #&gt;  [7]  0.78497766  1.05507871  1.32517976  1.59528080</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -167,7 +162,7 @@ min(x) -- max(x)." />
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

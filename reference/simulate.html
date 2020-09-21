@@ -87,12 +87,6 @@ distribution used when fitting the model." />
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
@@ -132,13 +126,13 @@ distribution used when fitting the model.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for gam</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span>(<span class='no'>object</span>, <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span>(<span class='kw'>object</span>, nsim = <span class='fl'>1</span>, seed = <span class='kw'>NULL</span>, newdata = <span class='kw'>NULL</span>, weights = <span class='kw'>NULL</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for gamm</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span>(<span class='no'>object</span>, <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span>(<span class='kw'>object</span>, nsim = <span class='fl'>1</span>, seed = <span class='kw'>NULL</span>, newdata = <span class='kw'>NULL</span>, weights = <span class='kw'>NULL</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for scam</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span>(<span class='no'>object</span>, <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
+<span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span>(<span class='kw'>object</span>, nsim = <span class='fl'>1</span>, seed = <span class='kw'>NULL</span>, newdata = <span class='kw'>NULL</span>, weights = <span class='kw'>NULL</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -170,7 +164,7 @@ then defaults to <code>object[["prior.weights"]]</code>, otherwise a vector of o
     <tr>
       <th>...</th>
       <td><p>arguments passed to methods. <code>simulate.gam()</code> and
-<code>simulate.scam()</code> pass <code>...</code> on to <code>predict.gam()</code>. As such you can pass
+<code>simulate.scam()</code> pass <code>...</code> on to <code><a href='https://rdrr.io/pkg/mgcv/man/predict.gam.html'>predict.gam()</a></code>. As such you can pass
 additional arguments such as <code>terms</code>, <code>exclude</code>, to select which model
 terms are included in the predictions. This may be useful, for example,
 for excluding the effects of random effect terms.</p></td>
@@ -192,10 +186,12 @@ number generator. See <code><a href='https://rdrr.io/pkg/mgcv/man/fix.family.lin
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>2</span>)
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>m1</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x0</span>) + <span class='fu'>s</span>(<span class='no'>x1</span>) + <span class='fu'>s</span>(<span class='no'>x2</span>) + <span class='fu'>s</span>(<span class='no'>x3</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
+<span class='kw'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>1</span>, n = <span class='fl'>400</span>, dist = <span class='st'>"normal"</span>, scale = <span class='fl'>2</span>)
+</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='kw'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x0</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x1</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x2</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x3</span>), data = <span class='kw'>dat</span>, method = <span class='st'>"REML"</span>)
 
-<span class='no'>sims</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span>(<span class='no'>m1</span>, <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>42</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>sims</span>)</div><div class='output co'>#&gt;           [,1]      [,2]      [,3]      [,4]      [,5]
+<span class='kw'>sims</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span>(<span class='kw'>m1</span>, nsim = <span class='fl'>5</span>, seed = <span class='fl'>42</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='kw'>sims</span>)
+</div><div class='output co'>#&gt;           [,1]      [,2]      [,3]      [,4]      [,5]
 #&gt; [1,] 11.445470 11.374304 10.098681  7.264881  8.796630
 #&gt; [2,]  6.510912  5.909584  9.057362  7.698084 11.444781
 #&gt; [3,]  3.837995  3.230610  3.550240  3.759380  4.774581
@@ -217,7 +213,7 @@ number generator. See <code><a href='https://rdrr.io/pkg/mgcv/man/fix.family.lin
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

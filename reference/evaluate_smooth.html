@@ -86,12 +86,6 @@ which the smooth should be evaluated can be supplied." />
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
@@ -129,30 +123,30 @@ covariate associated with the smooth. Alternatively, a set of points at
 which the smooth should be evaluated can be supplied.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>evaluate_smooth</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>evaluate_smooth</span>(<span class='kw'>object</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for gam</span>
 <span class='fu'>evaluate_smooth</span>(
-  <span class='no'>object</span>,
-  <span class='no'>smooth</span>,
-  <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>overall_uncertainty</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>dist</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
-  <span class='no'>...</span>
+  <span class='kw'>object</span>,
+  <span class='kw'>smooth</span>,
+  n = <span class='fl'>100</span>,
+  newdata = <span class='kw'>NULL</span>,
+  unconditional = <span class='fl'>FALSE</span>,
+  overall_uncertainty = <span class='fl'>TRUE</span>,
+  dist = <span class='fl'>0.1</span>,
+  <span class='kw'>...</span>
 )
 
 <span class='co'># S3 method for gamm</span>
-<span class='fu'>evaluate_smooth</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>evaluate_smooth</span>(<span class='kw'>object</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for list</span>
-<span class='fu'>evaluate_smooth</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>evaluate_smooth</span>(<span class='kw'>object</span>, <span class='kw'>...</span>)
 
-<span class='fu'>evaluate_parametric_term</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>evaluate_parametric_term</span>(<span class='kw'>object</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for gam</span>
-<span class='fu'>evaluate_parametric_term</span>(<span class='no'>object</span>, <span class='no'>term</span>, <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>evaluate_parametric_term</span>(<span class='kw'>object</span>, <span class='kw'>term</span>, unconditional = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -215,11 +209,13 @@ and <code>"data.frame"</code>.</p>
     <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
 <span class='co'># \dontshow{</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>2</span>)
-<span class='no'>op</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>cli.unicode</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>5</span>)
+<span class='kw'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(cli.unicode = <span class='fl'>FALSE</span>, digits = <span class='fl'>5</span>)
 <span class='co'># }</span>
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>1</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>400</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='no'>m1</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x0</span>) + <span class='fu'>s</span>(<span class='no'>x1</span>) + <span class='fu'>s</span>(<span class='no'>x2</span>) + <span class='fu'>s</span>(<span class='no'>x3</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
+<span class='kw'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>1</span>, n = <span class='fl'>400</span>, dist = <span class='st'>"normal"</span>, scale = <span class='fl'>2</span>)
+</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='kw'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x0</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x1</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x2</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x3</span>), data = <span class='kw'>dat</span>, method = <span class='st'>"REML"</span>)
 
-<span class='fu'>evaluate_smooth</span>(<span class='no'>m1</span>, <span class='st'>"s(x1)"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 100 x 5</span><span>
+<span class='fu'>evaluate_smooth</span>(<span class='kw'>m1</span>, <span class='st'>"s(x1)"</span>)
+</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 100 x 5</span><span>
 #&gt;    smooth by_variable       x1   est    se
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span>          </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'> 1</span><span> s(x1)  </span><span style='color: #BB0000;'>NA</span><span>          0.000</span><span style='text-decoration: underline;'>663</span><span> -</span><span style='color: #BB0000;'>1.94</span><span> 0.329
@@ -235,9 +231,11 @@ and <code>"data.frame"</code>.</p>
 #&gt; </span><span style='color: #555555;'># ... with 90 more rows</span><span></div><div class='input'>
 <span class='co'>## 2d example</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>2</span>)
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>gamSim</span>(<span class='fl'>2</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>dist</span> <span class='kw'>=</span> <span class='st'>"normal"</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt; Bivariate smoothing example</div><div class='input'><span class='no'>m2</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='fu'>s</span>(<span class='no'>x</span>, <span class='no'>z</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>30</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>dat</span>$<span class='no'>data</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
+<span class='kw'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>2</span>, n = <span class='fl'>1000</span>, dist = <span class='st'>"normal"</span>, scale = <span class='fl'>1</span>)
+</div><div class='output co'>#&gt; Bivariate smoothing example</div><div class='input'><span class='kw'>m2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x</span>, <span class='kw'>z</span>, k = <span class='fl'>30</span>), data = <span class='kw'>dat</span><span class='op'>$</span><span class='kw'>data</span>, method = <span class='st'>"REML"</span>)
 
-<span class='fu'>evaluate_smooth</span>(<span class='no'>m2</span>, <span class='st'>"s(x,z)"</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>100</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 10,000 x 6</span><span>
+<span class='fu'>evaluate_smooth</span>(<span class='kw'>m2</span>, <span class='st'>"s(x,z)"</span>, n = <span class='fl'>100</span>)
+</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 10,000 x 6</span><span>
 #&gt;    smooth by_variable        x        z    est    se
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span>          </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'> 1</span><span> s(x,z) </span><span style='color: #BB0000;'>NA</span><span>          0.000</span><span style='text-decoration: underline;'>663</span><span> 0.000</span><span style='text-decoration: underline;'>762</span><span> 0.088</span><span style='text-decoration: underline;'>1</span><span> 0.189
@@ -250,7 +248,8 @@ and <code>"data.frame"</code>.</p>
 #&gt; </span><span style='color: #555555;'> 8</span><span> s(x,z) </span><span style='color: #BB0000;'>NA</span><span>          0.071</span><span style='text-decoration: underline;'>3</span><span>   0.000</span><span style='text-decoration: underline;'>762</span><span> 0.120  0.166
 #&gt; </span><span style='color: #555555;'> 9</span><span> s(x,z) </span><span style='color: #BB0000;'>NA</span><span>          0.081</span><span style='text-decoration: underline;'>4</span><span>   0.000</span><span style='text-decoration: underline;'>762</span><span> 0.125  0.163
 #&gt; </span><span style='color: #555555;'>10</span><span> s(x,z) </span><span style='color: #BB0000;'>NA</span><span>          0.091</span><span style='text-decoration: underline;'>4</span><span>   0.000</span><span style='text-decoration: underline;'>762</span><span> 0.130  0.160
-#&gt; </span><span style='color: #555555;'># ... with 9,990 more rows</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='no'>op</span>)</div></span></pre>
+#&gt; </span><span style='color: #555555;'># ... with 9,990 more rows</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>op</span>)
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -266,7 +265,7 @@ and <code>"data.frame"</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

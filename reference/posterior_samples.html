@@ -84,12 +84,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
@@ -125,20 +119,20 @@
     <p>Draw samples from the posterior distribution of an estimated model</p>
     </div>
 
-    <pre class="usage"><span class='fu'>posterior_samples</span>(<span class='no'>model</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>posterior_samples</span>(<span class='kw'>model</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for gam</span>
 <span class='fu'>posterior_samples</span>(
-  <span class='no'>model</span>,
-  <span class='no'>n</span>,
-  <span class='no'>newdata</span>,
-  <span class='no'>seed</span>,
-  <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"response"</span>, <span class='st'>"linear_predictor"</span>),
-  <span class='kw'>freq</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>unconditional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>ncores</span> <span class='kw'>=</span> <span class='fl'>1L</span>,
-  <span class='no'>...</span>
+  <span class='kw'>model</span>,
+  <span class='kw'>n</span>,
+  <span class='kw'>newdata</span>,
+  <span class='kw'>seed</span>,
+  scale = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"response"</span>, <span class='st'>"linear_predictor"</span>),
+  freq = <span class='fl'>FALSE</span>,
+  unconditional = <span class='fl'>FALSE</span>,
+  weights = <span class='kw'>NULL</span>,
+  ncores = <span class='fl'>1L</span>,
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -150,8 +144,8 @@
     </tr>
     <tr>
       <th>...</th>
-      <td><p>arguments passed to other methods. For <code><a href='predicted_samples.html'>fitted_samples()</a></code>, these
-are passed on to <code>predict.gam()</code>.</p></td>
+      <td><p>arguments passed to other methods. For <code><a href='fitted_samples.html'>fitted_samples()</a></code>, these
+are passed on to <code><a href='https://rdrr.io/pkg/mgcv/man/predict.gam.html'>predict.gam()</a></code>.</p></td>
     </tr>
     <tr>
       <th>n</th>
@@ -227,7 +221,7 @@ relates to,</p></li>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

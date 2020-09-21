@@ -84,12 +84,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
@@ -127,26 +121,26 @@
 
     <pre class="usage"><span class='co'># S3 method for difference_smooth</span>
 <span class='fu'><a href='draw.html'>draw</a></span>(
-  <span class='no'>object</span>,
-  <span class='kw'>select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>rug</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>ref_line</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>contour</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>contour_col</span> <span class='kw'>=</span> <span class='st'>"black"</span>,
-  <span class='kw'>n_contour</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>ci_alpha</span> <span class='kw'>=</span> <span class='fl'>0.2</span>,
-  <span class='kw'>ci_colour</span> <span class='kw'>=</span> <span class='st'>"black"</span>,
-  <span class='kw'>line_col</span> <span class='kw'>=</span> <span class='st'>"steelblue"</span>,
-  <span class='kw'>scales</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"free"</span>, <span class='st'>"fixed"</span>),
-  <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>guides</span> <span class='kw'>=</span> <span class='st'>"keep"</span>,
-  <span class='kw'>xlab</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>ylab</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>
+  <span class='kw'>object</span>,
+  select = <span class='kw'>NULL</span>,
+  rug = <span class='fl'>FALSE</span>,
+  ref_line = <span class='fl'>FALSE</span>,
+  contour = <span class='fl'>FALSE</span>,
+  contour_col = <span class='st'>"black"</span>,
+  n_contour = <span class='kw'>NULL</span>,
+  ci_alpha = <span class='fl'>0.2</span>,
+  ci_colour = <span class='st'>"black"</span>,
+  line_col = <span class='st'>"steelblue"</span>,
+  scales = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"free"</span>, <span class='st'>"fixed"</span>),
+  ncol = <span class='kw'>NULL</span>,
+  nrow = <span class='kw'>NULL</span>,
+  guides = <span class='st'>"keep"</span>,
+  xlab = <span class='kw'>NULL</span>,
+  ylab = <span class='kw'>NULL</span>,
+  title = <span class='kw'>NULL</span>,
+  subtitle = <span class='kw'>NULL</span>,
+  caption = <span class='kw'>NULL</span>,
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -236,11 +230,12 @@ annotate plots</p></td>
     <pre class="examples"><div class='input'>
 <span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='data_sim.html'>data_sim</a></span>(<span class='st'>"eg4"</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>42</span>)
-<span class='no'>m</span> <span class='kw'>&lt;-</span> <span class='fu'>gam</span>(<span class='no'>y</span> ~ <span class='no'>fac</span> + <span class='fu'>s</span>(<span class='no'>x2</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='no'>fac</span>) + <span class='fu'>s</span>(<span class='no'>x0</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>df</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"REML"</span>)
+<span class='kw'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='data_sim.html'>data_sim</a></span>(<span class='st'>"eg4"</span>, seed = <span class='fl'>42</span>)
+<span class='kw'>m</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='kw'>fac</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x2</span>, by = <span class='kw'>fac</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x0</span>), data = <span class='kw'>df</span>, method = <span class='st'>"REML"</span>)
 
-<span class='no'>diffs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='difference_smooths.html'>difference_smooths</a></span>(<span class='no'>m</span>, <span class='kw'>smooth</span> <span class='kw'>=</span> <span class='st'>"s(x2)"</span>)
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='no'>diffs</span>)</div><div class='img'><img src='draw.difference_smooth-1.png' alt='' width='700' height='433' /></div></pre>
+<span class='kw'>diffs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='difference_smooths.html'>difference_smooths</a></span>(<span class='kw'>m</span>, smooth = <span class='st'>"s(x2)"</span>)
+<span class='fu'><a href='draw.html'>draw</a></span>(<span class='kw'>diffs</span>)
+</div><div class='img'><img src='draw.difference_smooth-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -256,7 +251,7 @@ annotate plots</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
