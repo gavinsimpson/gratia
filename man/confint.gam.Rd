@@ -17,6 +17,7 @@
   transform = FALSE,
   unconditional = FALSE,
   ncores = 1,
+  partial_match = FALSE,
   ...
 )
 
@@ -61,6 +62,9 @@ multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::r
 Parallelization will take place only if OpenMP is supported (but appears
 to work on Windows with current \code{R}).}
 
+\item{partial_match}{logical; should matching \code{parm} use a partial match or
+an exact match? Can only be used if \code{length(parm)} is \code{1}.}
+
 \item{...}{additional arguments for methods}
 }
 \value{
@@ -87,14 +91,14 @@ dat <- gamSim(1, n = 500, dist = "normal", scale = 2)
 mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 ## point-wise interval
-ci <- confint(mod, parm = "x1", type = "confidence")
+ci <- confint(mod, parm = "s(x1)", type = "confidence")
 ci
 
 ## simultaneous interval for smooth term of x1
 \dontshow{
 set.seed(42)
 }
-si <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)
+si <- confint(mod, parm = "s(x1)", type = "simultaneous", nsim = 100)
 si
 \dontshow{
 options(op)
