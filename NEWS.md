@@ -27,6 +27,31 @@
   
   Wish of [#74](https://github.com/gavinsimpson/gratia/issues/74) (@hgoldspiel)
 
+* `draw.gam()` and related functions gain arguments `constant` and `fun` to allow
+  for user-defined constants and transformations of smooth estimates and
+  confidence intervals to be applied.
+  
+  Part of wish of Wish of [#79](https://github.com/gavinsimpson/gratia/issues/79).
+
+* `confint.gam()` now works for 2D smooths also.
+
+## User visible changes
+
+* The meaning of `parm` in `confint.gam` has changed. This argument now requires
+  a smooth label to match a smooth. A vector of labels can be provided, but
+  partial matching against a smooth label only works with a single `parm` value.
+  
+  The default behaviour remains unchanged however; if `parm` is `NULL` then all
+  smooths are evaluated and returned with confidence intervals.
+
+## Bug Fixes
+
+* `confint.gam()` was failing on a tensor product smooth due to matching issues.
+  Reported by @tamas-ferenci [#88](https://github.com/gavinsimpson/gratia/issues/88)
+  
+  This also fixes [#80](https://github.com/gavinsimpson/gratia/issues/80)
+  (@butellyn) which was a related issue with selecting a specific smooth.
+
 # gratia 0.4.1
 
 ## User visible changes
