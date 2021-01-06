@@ -6,9 +6,14 @@ library("gratia")
 library("mgcv")
 library("ggplot2")
 library("datasets")
-library("vdiffr")
 
 context("test-hgam-paper-models")
+
+## Need a local wrapper to allow conditional use of vdiffr
+`expect_doppelganger` <- function(title, fig, path = NULL, ...) {
+  testthat::skip_if_not_installed("vdiffr")
+  vdiffr::expect_doppelganger(title, fig, path = path, ...)
+}
 
 ## data load and prep
 data(CO2, package = "datasets")

@@ -8,6 +8,12 @@ library("ggplot2")
 
 context("test-by-variables")
 
+## Need a local wrapper to allow conditional use of vdiffr
+`expect_doppelganger` <- function(title, fig, path = NULL, ...) {
+  testthat::skip_if_not_installed("vdiffr")
+  vdiffr::expect_doppelganger(title, fig, path = path, ...)
+}
+
 ## simulate date from y = f(x2)*x1 + error
 set.seed(42)
 dat <- gamSim(3, n = 400, verbose = FALSE)
@@ -15,7 +21,7 @@ mod <- gam(y ~ s(x2, by = x1), data = dat)
 
 test_that("draw() works with continuous by", {
     plt <- draw(mod)
-    vdiffr::expect_doppelganger("continuous by-variable smmoth",
+    expect_doppelganger("continuous by-variable smmoth",
                                 plt)
 })
 
@@ -69,6 +75,6 @@ test_that("get_by_smooth works", {
 
 test_that("draw.gam works with select and parametric = TRUE", {
     plt <- draw(mf, select = 's(x2):fac1', parametric = TRUE)
-    vdiffr::expect_doppelganger("draw.gam-user-select-and-parametric-true",
+    expect_doppelganger("draw.gam-user-select-and-parametric-true",
                                 plt)
 })
