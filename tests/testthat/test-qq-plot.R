@@ -5,9 +5,14 @@ library("testthat")
 library("gratia")
 library("mgcv")
 library("ggplot2")
-library("vdiffr")
 
 context("qq_plot-methods")
+
+## Need a local wrapper to allow conditional use of vdiffr
+`expect_doppelganger` <- function(title, fig, path = NULL, ...) {
+  testthat::skip_if_not_installed("vdiffr")
+  vdiffr::expect_doppelganger(title, fig, path = path, ...)
+}
 
 ## simulate binomial data...
 set.seed(0)
