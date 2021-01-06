@@ -1,5 +1,5 @@
 
-R version 3.6.3 (2020-02-29) -- "Holding the Windsock"
+R version 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
 Copyright (C) 2020 The R Foundation for Statistical Computing
 Platform: x86_64-redhat-linux-gnu (64-bit)
 
@@ -210,7 +210,7 @@ detaching ‘package:mgcv’
 > 
 > library(mgcv)
 Loading required package: nlme
-This is mgcv 1.8-31. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-33. For overview type 'help("mgcv-package")'.
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -322,7 +322,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: confint.gam
 > ### Title: Point-wise and simultaneous confidence intervals for smooths
-> ### Aliases: confint.gam confint.gamm
+> ### Aliases: confint.gam confint.gamm confint.list
 > 
 > ### ** Examples
 > 
@@ -336,7 +336,7 @@ Gu & Wahba 4 term additive model
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
 > ## point-wise interval
-> ci <- confint(mod, parm = "x1", type = "confidence")
+> ci <- confint(mod, parm = "s(x1)", type = "confidence")
 > ci
 # A tibble: 200 x 8
    smooth by_variable      x1   est    se  crit lower upper
@@ -357,7 +357,7 @@ Gu & Wahba 4 term additive model
 > ## Don't show: 
 > set.seed(42)
 > ## End(Don't show)
-> si <- confint(mod, parm = "x1", type = "simultaneous", nsim = 100)
+> si <- confint(mod, parm = "s(x1)", type = "simultaneous", nsim = 100)
 > si
 # A tibble: 200 x 8
    smooth by_variable      x1   est    se  crit lower upper
@@ -594,6 +594,9 @@ Gu & Wahba 4 term additive model
 > sm <- evaluate_smooth(m1, "s(x2)")
 > draw(sm)
 > 
+> ## supply constant to shift y axis scale
+> draw(sm, constant = coef(m1)[1])
+> 
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -603,6 +606,9 @@ Bivariate smoothing example
 > 
 > sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 > draw(sm)
+> 
+> ## supply constant to shift y axis scale
+> draw(sm, constant = coef(m2)[1])
 > 
 > 
 > 
@@ -935,11 +941,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55b3f376d390>
+<environment: 0x555c5ad61b28>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55b3f376d390>
+<environment: 0x555c5ad61b28>
 > 
 > 
 > 
@@ -1339,7 +1345,7 @@ detaching ‘package:mgcv’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  16.717 0.184 17.088 0 0.002 
+Time elapsed:  11.061 0.135 11.259 0.001 0.002 
 > grDevices::dev.off()
 null device 
           1 
