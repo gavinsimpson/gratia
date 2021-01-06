@@ -18,6 +18,7 @@ addons:
   apt:
     packages:
       - qpdf
+      - libgit2-dev
 
 r_packages:
   - mgcv
