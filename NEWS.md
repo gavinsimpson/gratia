@@ -52,6 +52,9 @@
   This also fixes [#80](https://github.com/gavinsimpson/gratia/issues/80)
   (@butellyn) which was a related issue with selecting a specific smooth.
 
+* The **vdiffr** package is now used conditionally in package tests.
+  Reported by Brian Ripley [#93](https://github.com/gavinsimpson/gratia/issues/93)
+
 # gratia 0.4.1
 
 ## User visible changes
