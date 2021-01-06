@@ -17,7 +17,7 @@ jobs:
       - name: Install X11 dependencies on MacOS
         if: runner.os == 'macOS'
         run: |
-          brew cask install cairo
+          brew install cairo
 
       - name: Query dependencies
         run: |

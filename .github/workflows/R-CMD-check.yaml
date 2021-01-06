@@ -12,7 +12,7 @@ jobs:
 
       - name: Install XQuartz on MacOS
         if: runner.os == 'macOS'
-        run: brew cask install xquartz cairo
+        run: brew install xquartz cairo
 
       - name: Install dependencies
         run: |
