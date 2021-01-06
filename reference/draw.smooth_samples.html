@@ -93,7 +93,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/gavinsimpson/gratia/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -120,23 +120,23 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for smooth_samples</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(
-  <span class='kw'>object</span>,
-  select = <span class='kw'>NULL</span>,
-  xlab = <span class='kw'>NULL</span>,
-  ylab = <span class='kw'>NULL</span>,
-  title = <span class='kw'>NULL</span>,
-  subtitle = <span class='kw'>NULL</span>,
-  caption = <span class='kw'>NULL</span>,
-  alpha = <span class='fl'>1</span>,
-  colour = <span class='st'>"black"</span>,
-  scales = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"free"</span>, <span class='st'>"fixed"</span>),
-  align = <span class='st'>"hv"</span>,
-  axis = <span class='st'>"lrtb"</span>,
-  rug = <span class='fl'>TRUE</span>,
-  partial_match = <span class='fl'>FALSE</span>,
-  <span class='kw'>...</span>
-)</pre>
+<span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  select <span class='op'>=</span> <span class='cn'>NULL</span>,
+  xlab <span class='op'>=</span> <span class='cn'>NULL</span>,
+  ylab <span class='op'>=</span> <span class='cn'>NULL</span>,
+  title <span class='op'>=</span> <span class='cn'>NULL</span>,
+  subtitle <span class='op'>=</span> <span class='cn'>NULL</span>,
+  caption <span class='op'>=</span> <span class='cn'>NULL</span>,
+  alpha <span class='op'>=</span> <span class='fl'>1</span>,
+  colour <span class='op'>=</span> <span class='st'>"black"</span>,
+  scales <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"free"</span>, <span class='st'>"fixed"</span><span class='op'>)</span>,
+  align <span class='op'>=</span> <span class='st'>"hv"</span>,
+  axis <span class='op'>=</span> <span class='st'>"lrtb"</span>,
+  rug <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  partial_match <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -200,12 +200,12 @@ terms.</p></td>
     </tr>
     <tr>
       <th>align</th>
-      <td><p>characer; see argument <code>align</code> in <code><a href='https://rdrr.io/pkg/cowplot/man/plot_grid.html'>cowplot::plot_grid()</a></code>.
+      <td><p>characer; see argument <code>align</code> in <code><a href='https://wilkelab.org/cowplot/reference/plot_grid.html'>cowplot::plot_grid()</a></code>.
 Defaults to <code>"hv"</code> so that plots are nicely aligned.</p></td>
     </tr>
     <tr>
       <th>axis</th>
-      <td><p>characer; see argument <code>axis</code> in <code><a href='https://rdrr.io/pkg/cowplot/man/plot_grid.html'>cowplot::plot_grid()</a></code>.
+      <td><p>characer; see argument <code>axis</code> in <code><a href='https://wilkelab.org/cowplot/reference/plot_grid.html'>cowplot::plot_grid()</a></code>.
 Defaults to <code>"lrtb"</code> so that plots are nicely aligned.</p></td>
     </tr>
     <tr>
@@ -220,7 +220,7 @@ against.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>arguments to be passed to <code><a href='https://rdrr.io/pkg/cowplot/man/plot_grid.html'>cowplot::plot_grid()</a></code>.</p></td>
+      <td><p>arguments to be passed to <code><a href='https://wilkelab.org/cowplot/reference/plot_grid.html'>cowplot::plot_grid()</a></code>.</p></td>
     </tr>
     </table>
 
@@ -229,24 +229,24 @@ against.</p></td>
     <p>Gavin L. Simpson</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>1</span>)
-<span class='kw'>dat1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>1</span>, n = <span class='fl'>400</span>, dist = <span class='st'>"normal"</span>, scale = <span class='fl'>2</span>, verbose = <span class='fl'>FALSE</span>)
+    <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
+<span class='va'>dat1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>1</span>, n <span class='op'>=</span> <span class='fl'>400</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 <span class='co'>## a single smooth GAM</span>
-<span class='kw'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x0</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x1</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x2</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x3</span>), data = <span class='kw'>dat1</span>, method = <span class='st'>"REML"</span>)
+<span class='va'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat1</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span>
 <span class='co'>## posterior smooths from m1</span>
-<span class='kw'>sm1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='smooth_samples.html'>smooth_samples</a></span>(<span class='kw'>m1</span>, n = <span class='fl'>15</span>, seed = <span class='fl'>23478</span>)
+<span class='va'>sm1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='smooth_samples.html'>smooth_samples</a></span><span class='op'>(</span><span class='va'>m1</span>, n <span class='op'>=</span> <span class='fl'>15</span>, seed <span class='op'>=</span> <span class='fl'>23478</span><span class='op'>)</span>
 <span class='co'>## plot</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='kw'>sm1</span>, alpha = <span class='fl'>0.7</span>)
+<span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span><span class='va'>sm1</span>, alpha <span class='op'>=</span> <span class='fl'>0.7</span><span class='op'>)</span>
 </div><div class='img'><img src='draw.smooth_samples-1.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>1</span>)
-<span class='kw'>dat2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>4</span>, verbose = <span class='fl'>FALSE</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
+<span class='va'>dat2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>4</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 <span class='co'>## a multi-smooth GAM with a factor-by smooth</span>
-<span class='kw'>m2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='kw'>fac</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x2</span>, by = <span class='kw'>fac</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x0</span>), data = <span class='kw'>dat2</span>, method = <span class='st'>"REML"</span>)
+<span class='va'>m2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>fac</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span>, by <span class='op'>=</span> <span class='va'>fac</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat2</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span>
 <span class='co'>## posterior smooths from m1</span>
-<span class='kw'>sm2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='smooth_samples.html'>smooth_samples</a></span>(<span class='kw'>m2</span>, n = <span class='fl'>15</span>, seed = <span class='fl'>23478</span>)
+<span class='va'>sm2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='smooth_samples.html'>smooth_samples</a></span><span class='op'>(</span><span class='va'>m2</span>, n <span class='op'>=</span> <span class='fl'>15</span>, seed <span class='op'>=</span> <span class='fl'>23478</span><span class='op'>)</span>
 <span class='co'>## plot, this time selecting only the factor-by smooth</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='kw'>sm2</span>, select = <span class='st'>"s(x2)"</span>, partial_match = <span class='fl'>TRUE</span>, alpha = <span class='fl'>0.7</span>)
+<span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span><span class='va'>sm2</span>, select <span class='op'>=</span> <span class='st'>"s(x2)"</span>, partial_match <span class='op'>=</span> <span class='cn'>TRUE</span>, alpha <span class='op'>=</span> <span class='fl'>0.7</span><span class='op'>)</span>
 </div><div class='img'><img src='draw.smooth_samples-2.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

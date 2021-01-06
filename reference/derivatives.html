@@ -93,7 +93,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/gavinsimpson/gratia/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -119,32 +119,32 @@
     <p>Derivatives of estimated smooths via finite differences</p>
     </div>
 
-    <pre class="usage"><span class='fu'>derivatives</span>(<span class='kw'>object</span>, <span class='kw'>...</span>)
+    <pre class="usage"><span class='fu'>derivatives</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for default</span>
-<span class='fu'>derivatives</span>(<span class='kw'>object</span>, <span class='kw'>...</span>)
+<span class='fu'>derivatives</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for gamm</span>
-<span class='fu'>derivatives</span>(<span class='kw'>object</span>, <span class='kw'>...</span>)
+<span class='fu'>derivatives</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for gam</span>
-<span class='fu'>derivatives</span>(
-  <span class='kw'>object</span>,
-  <span class='kw'>term</span>,
-  <span class='kw'>newdata</span>,
-  order = <span class='fl'>1L</span>,
-  type = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"forward"</span>, <span class='st'>"backward"</span>, <span class='st'>"central"</span>),
-  n = <span class='fl'>200</span>,
-  eps = <span class='fl'>1e-07</span>,
-  interval = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"confidence"</span>, <span class='st'>"simultaneous"</span>),
-  n_sim = <span class='fl'>10000</span>,
-  level = <span class='fl'>0.95</span>,
-  unconditional = <span class='fl'>FALSE</span>,
-  frequentist = <span class='fl'>FALSE</span>,
-  offset = <span class='kw'>NULL</span>,
-  ncores = <span class='fl'>1</span>,
-  <span class='kw'>...</span>
-)</pre>
+<span class='fu'>derivatives</span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  <span class='va'>term</span>,
+  <span class='va'>newdata</span>,
+  order <span class='op'>=</span> <span class='fl'>1L</span>,
+  type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forward"</span>, <span class='st'>"backward"</span>, <span class='st'>"central"</span><span class='op'>)</span>,
+  n <span class='op'>=</span> <span class='fl'>200</span>,
+  eps <span class='op'>=</span> <span class='fl'>1e-07</span>,
+  interval <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"confidence"</span>, <span class='st'>"simultaneous"</span><span class='op'>)</span>,
+  n_sim <span class='op'>=</span> <span class='fl'>10000</span>,
+  level <span class='op'>=</span> <span class='fl'>0.95</span>,
+  unconditional <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  frequentist <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  offset <span class='op'>=</span> <span class='cn'>NULL</span>,
+  ncores <span class='op'>=</span> <span class='fl'>1</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -245,16 +245,16 @@ interval (given <code>level</code>),</p></li>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
+<span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='co'># \dontshow{</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
-<span class='kw'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(cli.unicode = <span class='fl'>FALSE</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>42</span><span class='op'>)</span>
+<span class='va'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span>cli.unicode <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 <span class='co'># }</span>
-<span class='kw'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>1</span>, n = <span class='fl'>400</span>, dist = <span class='st'>"normal"</span>, scale = <span class='fl'>2</span>, verbose = <span class='fl'>FALSE</span>)
-<span class='kw'>mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x0</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x1</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x2</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x3</span>), data = <span class='kw'>dat</span>, method = <span class='st'>"REML"</span>)
+<span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>1</span>, n <span class='op'>=</span> <span class='fl'>400</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+<span class='va'>mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span>
 
 <span class='co'>## first derivatives of all smooths using central finite differences</span>
-<span class='fu'>derivatives</span>(<span class='kw'>mod</span>, type = <span class='st'>"central"</span>)
+<span class='fu'>derivatives</span><span class='op'>(</span><span class='va'>mod</span>, type <span class='op'>=</span> <span class='st'>"central"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 800 x 8</span><span>
 #&gt;    smooth var       data derivative    se  crit lower upper
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
@@ -269,7 +269,7 @@ interval (given <code>level</code>),</p></li>
 #&gt; </span><span style='color: #555555;'> 9</span><span> s(x0)  x0    0.040</span><span style='text-decoration: underline;'>3</span><span>         7.32  3.15  1.96 1.14   13.5
 #&gt; </span><span style='color: #555555;'>10</span><span> s(x0)  x0    0.045</span><span style='text-decoration: underline;'>3</span><span>         7.29  3.10  1.96 1.21   13.4
 #&gt; </span><span style='color: #555555;'># ... with 790 more rows</span><span></div><div class='input'><span class='co'># \dontshow{</span>
-<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>op</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span>
 <span class='co'># }</span>
 </div></span></pre>
   </div>

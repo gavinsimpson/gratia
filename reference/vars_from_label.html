@@ -93,7 +93,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/gavinsimpson/gratia/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -119,7 +119,7 @@
     <p>Returns names of variables from a smooth label</p>
     </div>
 
-    <pre class="usage"><span class='fu'>vars_from_label</span>(<span class='kw'>label</span>)</pre>
+    <pre class="usage"><span class='fu'>vars_from_label</span><span class='op'>(</span><span class='va'>label</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -134,8 +134,8 @@ a smooth.</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'>vars_from_label</span>(<span class='st'>"s(x1)"</span>)
-</div><div class='output co'>#&gt; [1] "x1"</div><div class='input'><span class='fu'>vars_from_label</span>(<span class='st'>"t2(x1,x2,x3)"</span>)
+<span class='fu'>vars_from_label</span><span class='op'>(</span><span class='st'>"s(x1)"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "x1"</div><div class='input'><span class='fu'>vars_from_label</span><span class='op'>(</span><span class='st'>"t2(x1,x2,x3)"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] "x1" "x2" "x3"</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

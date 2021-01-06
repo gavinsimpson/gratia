@@ -93,7 +93,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/gavinsimpson/gratia/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -120,27 +120,27 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for gam</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span>(
-  <span class='kw'>object</span>,
-  <span class='kw'>parm</span>,
-  level = <span class='fl'>0.95</span>,
-  newdata = <span class='kw'>NULL</span>,
-  n = <span class='fl'>200</span>,
-  type = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"confidence"</span>, <span class='st'>"simultaneous"</span>),
-  nsim = <span class='fl'>10000</span>,
-  shift = <span class='fl'>FALSE</span>,
-  transform = <span class='fl'>FALSE</span>,
-  unconditional = <span class='fl'>FALSE</span>,
-  ncores = <span class='fl'>1</span>,
-  partial_match = <span class='fl'>FALSE</span>,
-  <span class='kw'>...</span>
-)
+<span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  <span class='va'>parm</span>,
+  level <span class='op'>=</span> <span class='fl'>0.95</span>,
+  newdata <span class='op'>=</span> <span class='cn'>NULL</span>,
+  n <span class='op'>=</span> <span class='fl'>200</span>,
+  type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"confidence"</span>, <span class='st'>"simultaneous"</span><span class='op'>)</span>,
+  nsim <span class='op'>=</span> <span class='fl'>10000</span>,
+  shift <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  transform <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  unconditional <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  ncores <span class='op'>=</span> <span class='fl'>1</span>,
+  partial_match <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for gamm</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span>(<span class='kw'>object</span>, <span class='kw'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for list</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span>(<span class='kw'>object</span>, <span class='kw'>...</span>)</pre>
+<span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -232,17 +232,17 @@ an exact match? Can only be used if <code><a href='https://rdrr.io/r/base/length
     <p>Gavin L. Simpson</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
+    <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='co'># \dontshow{</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>2</span>)
-<span class='kw'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(digits = <span class='fl'>4</span>, cli.unicode = <span class='fl'>FALSE</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span>
+<span class='va'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span>digits <span class='op'>=</span> <span class='fl'>4</span>, cli.unicode <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 <span class='co'># }</span>
-<span class='kw'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>1</span>, n = <span class='fl'>500</span>, dist = <span class='st'>"normal"</span>, scale = <span class='fl'>2</span>)
-</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='kw'>mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x0</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x1</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x2</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x3</span>), data = <span class='kw'>dat</span>, method = <span class='st'>"REML"</span>)
+<span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>1</span>, n <span class='op'>=</span> <span class='fl'>500</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='va'>mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span>
 
 <span class='co'>## point-wise interval</span>
-<span class='kw'>ci</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span>(<span class='kw'>mod</span>, parm = <span class='st'>"s(x1)"</span>, type = <span class='st'>"confidence"</span>)
-<span class='kw'>ci</span>
+<span class='va'>ci</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span><span class='va'>mod</span>, parm <span class='op'>=</span> <span class='st'>"s(x1)"</span>, type <span class='op'>=</span> <span class='st'>"confidence"</span><span class='op'>)</span>
+<span class='va'>ci</span>
 </div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 200 x 8</span><span>
 #&gt;    smooth by_variable      x1   est    se  crit lower upper
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
@@ -259,10 +259,10 @@ an exact match? Can only be used if <code><a href='https://rdrr.io/r/base/length
 #&gt; </span><span style='color: #555555;'># ... with 190 more rows</span><span></div><div class='input'>
 <span class='co'>## simultaneous interval for smooth term of x1</span>
 <span class='co'># \dontshow{</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>42</span><span class='op'>)</span>
 <span class='co'># }</span>
-<span class='kw'>si</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span>(<span class='kw'>mod</span>, parm = <span class='st'>"s(x1)"</span>, type = <span class='st'>"simultaneous"</span>, nsim = <span class='fl'>100</span>)
-<span class='kw'>si</span>
+<span class='va'>si</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span><span class='va'>mod</span>, parm <span class='op'>=</span> <span class='st'>"s(x1)"</span>, type <span class='op'>=</span> <span class='st'>"simultaneous"</span>, nsim <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>
+<span class='va'>si</span>
 </div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 200 x 8</span><span>
 #&gt;    smooth by_variable      x1   est    se  crit lower upper
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
@@ -277,7 +277,7 @@ an exact match? Can only be used if <code><a href='https://rdrr.io/r/base/length
 #&gt; </span><span style='color: #555555;'> 9</span><span> s(x1)  </span><span style='color: #BB0000;'>NA</span><span>          0.042</span><span style='text-decoration: underline;'>6</span><span>  -</span><span style='color: #BB0000;'>2.01</span><span> 0.232  2.49 -</span><span style='color: #BB0000;'>2.58</span><span> -</span><span style='color: #BB0000;'>1.43</span><span>
 #&gt; </span><span style='color: #555555;'>10</span><span> s(x1)  </span><span style='color: #BB0000;'>NA</span><span>          0.047</span><span style='text-decoration: underline;'>6</span><span>  -</span><span style='color: #BB0000;'>2.00</span><span> 0.226  2.49 -</span><span style='color: #BB0000;'>2.56</span><span> -</span><span style='color: #BB0000;'>1.44</span><span>
 #&gt; </span><span style='color: #555555;'># ... with 190 more rows</span><span></div><div class='input'><span class='co'># \dontshow{</span>
-<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>op</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span>
 <span class='co'># }</span>
 </div></span></pre>
   </div>

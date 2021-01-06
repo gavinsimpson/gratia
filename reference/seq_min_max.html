@@ -94,7 +94,7 @@ min(x) -- max(x)." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/gavinsimpson/gratia/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -121,7 +121,7 @@ min(x) -- max(x)." />
 <code><a href='https://rdrr.io/r/base/Extremes.html'>min(x)</a></code> -- <code><a href='https://rdrr.io/r/base/Extremes.html'>max(x)</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>seq_min_max</span>(<span class='kw'>x</span>, <span class='kw'>n</span>)</pre>
+    <pre class="usage"><span class='fu'>seq_min_max</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>n</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -141,10 +141,10 @@ min(x) -- max(x)." />
     <p>A numeric vector of length <code>n</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>1</span>)
-<span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>10</span>)
-<span class='kw'>n</span> <span class='op'>&lt;-</span> <span class='fl'>10L</span>
-<span class='fu'>seq_min_max</span>(<span class='kw'>x</span>, n = <span class='kw'>n</span>)
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
+<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>)</span>
+<span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>10L</span>
+<span class='fu'>seq_min_max</span><span class='op'>(</span><span class='va'>x</span>, n <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;  [1] -0.83562861 -0.56552757 -0.29542652 -0.02532547  0.24477557  0.51487662
 #&gt;  [7]  0.78497766  1.05507871  1.32517976  1.59528080</div></pre>
   </div>

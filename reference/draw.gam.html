@@ -95,7 +95,7 @@ is used instead." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/gavinsimpson/gratia/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -124,31 +124,31 @@ is used instead.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for gam</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(
-  <span class='kw'>object</span>,
-  parametric = <span class='kw'>NULL</span>,
-  select = <span class='kw'>NULL</span>,
-  residuals = <span class='fl'>FALSE</span>,
-  scales = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"free"</span>, <span class='st'>"fixed"</span>),
-  align = <span class='st'>"hv"</span>,
-  axis = <span class='st'>"lrtb"</span>,
-  ci_level = <span class='fl'>0.95</span>,
-  n = <span class='fl'>100</span>,
-  unconditional = <span class='fl'>FALSE</span>,
-  overall_uncertainty = <span class='fl'>TRUE</span>,
-  constant = <span class='kw'>NULL</span>,
-  fun = <span class='kw'>NULL</span>,
-  dist = <span class='fl'>0.1</span>,
-  rug = <span class='fl'>TRUE</span>,
-  contour = <span class='fl'>TRUE</span>,
-  contour_col = <span class='st'>"black"</span>,
-  n_contour = <span class='kw'>NULL</span>,
-  partial_match = <span class='fl'>FALSE</span>,
-  discrete_colour = <span class='kw'>NULL</span>,
-  continuous_colour = <span class='kw'>NULL</span>,
-  continuous_fill = <span class='kw'>NULL</span>,
-  <span class='kw'>...</span>
-)</pre>
+<span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  parametric <span class='op'>=</span> <span class='cn'>NULL</span>,
+  select <span class='op'>=</span> <span class='cn'>NULL</span>,
+  residuals <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  scales <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"free"</span>, <span class='st'>"fixed"</span><span class='op'>)</span>,
+  align <span class='op'>=</span> <span class='st'>"hv"</span>,
+  axis <span class='op'>=</span> <span class='st'>"lrtb"</span>,
+  ci_level <span class='op'>=</span> <span class='fl'>0.95</span>,
+  n <span class='op'>=</span> <span class='fl'>100</span>,
+  unconditional <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  overall_uncertainty <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  constant <span class='op'>=</span> <span class='cn'>NULL</span>,
+  fun <span class='op'>=</span> <span class='cn'>NULL</span>,
+  dist <span class='op'>=</span> <span class='fl'>0.1</span>,
+  rug <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  contour <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  contour_col <span class='op'>=</span> <span class='st'>"black"</span>,
+  n_contour <span class='op'>=</span> <span class='cn'>NULL</span>,
+  partial_match <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  discrete_colour <span class='op'>=</span> <span class='cn'>NULL</span>,
+  continuous_colour <span class='op'>=</span> <span class='cn'>NULL</span>,
+  continuous_fill <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -188,12 +188,12 @@ terms.</p></td>
     </tr>
     <tr>
       <th>align</th>
-      <td><p>characer; see argument <code>align</code> in <code><a href='https://rdrr.io/pkg/cowplot/man/plot_grid.html'>cowplot::plot_grid()</a></code>.
+      <td><p>characer; see argument <code>align</code> in <code><a href='https://wilkelab.org/cowplot/reference/plot_grid.html'>cowplot::plot_grid()</a></code>.
 Defaults to <code>"hv"</code> so that plots are nicely aligned.</p></td>
     </tr>
     <tr>
       <th>axis</th>
-      <td><p>characer; see argument <code>axis</code> in <code><a href='https://rdrr.io/pkg/cowplot/man/plot_grid.html'>cowplot::plot_grid()</a></code>.
+      <td><p>characer; see argument <code>axis</code> in <code><a href='https://wilkelab.org/cowplot/reference/plot_grid.html'>cowplot::plot_grid()</a></code>.
 Defaults to <code>"lrtb"</code> so that plots are nicely aligned.</p></td>
     </tr>
     <tr>
@@ -269,18 +269,18 @@ for the types of data.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>arguments passed to <code><a href='https://rdrr.io/pkg/cowplot/man/plot_grid.html'>cowplot::plot_grid()</a></code>. Any arguments to
+      <td><p>arguments passed to <code><a href='https://wilkelab.org/cowplot/reference/plot_grid.html'>cowplot::plot_grid()</a></code>. Any arguments to
 <code>plot_grid()</code> may be supplied, except for: <code>plotlist</code> and <code>align</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The object returned is created by <code><a href='https://rdrr.io/pkg/cowplot/man/plot_grid.html'>cowplot::plot_grid()</a></code>.</p>
+    <p>The object returned is created by <code><a href='https://wilkelab.org/cowplot/reference/plot_grid.html'>cowplot::plot_grid()</a></code>.</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
     <p>Internally, plots of each smooth are created using <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot2::ggplot()</a></code>
-and composed into a single plot using <code><a href='https://rdrr.io/pkg/cowplot/man/plot_grid.html'>cowplot::plot_grid()</a></code>. As a result,
+and composed into a single plot using <code><a href='https://wilkelab.org/cowplot/reference/plot_grid.html'>cowplot::plot_grid()</a></code>. As a result,
 it is not possible to use <code><a href='https://rdrr.io/r/base/Arithmetic.html'>+</a></code> to add to the plots in the way one might
 typically work with <code>ggplot()</code> plots.</p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
@@ -288,29 +288,29 @@ typically work with <code>ggplot()</code> plots.</p>
     <p>Gavin L. Simpson</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span>()
+    <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>2</span>)
-<span class='kw'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>1</span>, n = <span class='fl'>400</span>, dist = <span class='st'>"normal"</span>, scale = <span class='fl'>2</span>)
-</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='kw'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x0</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x1</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x2</span>) <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x3</span>), data = <span class='kw'>dat</span>, method = <span class='st'>"REML"</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span>
+<span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>1</span>, n <span class='op'>=</span> <span class='fl'>400</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='va'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span>
 
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='kw'>m1</span>)
+<span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span><span class='va'>m1</span><span class='op'>)</span>
 </div><div class='img'><img src='draw.gam-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>## can add partial residuals</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='kw'>m1</span>, residuals = <span class='fl'>TRUE</span>)
+<span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span><span class='va'>m1</span>, residuals <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 </div><div class='img'><img src='draw.gam-2.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>2</span>)
-<span class='kw'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span>(<span class='fl'>2</span>, n = <span class='fl'>1000</span>, dist = <span class='st'>"normal"</span>, scale = <span class='fl'>1</span>)
-</div><div class='output co'>#&gt; Bivariate smoothing example</div><div class='input'><span class='kw'>m2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span>(<span class='kw'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span>(<span class='kw'>x</span>, <span class='kw'>z</span>, k = <span class='fl'>40</span>), data = <span class='kw'>dat</span><span class='op'>$</span><span class='kw'>data</span>, method = <span class='st'>"REML"</span>)
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='kw'>m2</span>, contour = <span class='fl'>FALSE</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span>
+<span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>2</span>, n <span class='op'>=</span> <span class='fl'>1000</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Bivariate smoothing example</div><div class='input'><span class='va'>m2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>z</span>, k <span class='op'>=</span> <span class='fl'>40</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span><span class='op'>$</span><span class='va'>data</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span>
+<span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span><span class='va'>m2</span>, contour <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 </div><div class='img'><img src='draw.gam-3.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>## change the number of contours drawn</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='kw'>m2</span>, n_contour = <span class='fl'>5</span>)
+<span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span><span class='va'>m2</span>, n_contour <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span>
 </div><div class='img'><img src='draw.gam-4.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>## change the fill scale used for the surface</span>
-<span class='fu'><a href='draw.html'>draw</a></span>(<span class='kw'>m2</span>,
-    continuous_fill = <span class='kw'>ggplot2</span>::<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_brewer.html'>scale_fill_distiller</a></span>(palette = <span class='st'>"Spectral"</span>,
-                                                    type = <span class='st'>"div"</span>))
+<span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span><span class='va'>m2</span>,
+    continuous_fill <span class='op'>=</span> <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_brewer.html'>scale_fill_distiller</a></span><span class='op'>(</span>palette <span class='op'>=</span> <span class='st'>"Spectral"</span>,
+                                                    type <span class='op'>=</span> <span class='st'>"div"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='img'><img src='draw.gam-5.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
