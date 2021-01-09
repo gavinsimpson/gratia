@@ -941,11 +941,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x555c5ad61b28>
+<environment: 0x55a929264fa0>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x555c5ad61b28>
+<environment: 0x55a929264fa0>
 > 
 > 
 > 
@@ -1264,6 +1264,69 @@ Gu & Wahba 4 term additive model
 
 detaching ‘package:mgcv’
 
+> nameEx("smooth_estimates")
+> ### * smooth_estimates
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: smooth_estimates
+> ### Title: New 'evaluate_smooth()' alike
+> ### Aliases: smooth_estimates smooth_estimates.gam
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> ## Don't show: 
+> set.seed(2)
+> op <- options(cli.unicode = FALSE, digits = 6)
+> ## End(Don't show)
+> dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+Gu & Wahba 4 term additive model
+> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> ## evaluate all smooths
+> smooth_estimates(m1)
+# A tibble: 400 x 9
+   smooth type  by       est    se      x0    x1    x2    x3
+   <chr>  <chr> <chr>  <dbl> <dbl>   <dbl> <dbl> <dbl> <dbl>
+ 1 s(x0)  TPRS  NA    -0.967 0.316 0.00711    NA    NA    NA
+ 2 s(x0)  TPRS  NA    -0.925 0.297 0.0171     NA    NA    NA
+ 3 s(x0)  TPRS  NA    -0.884 0.279 0.0271     NA    NA    NA
+ 4 s(x0)  TPRS  NA    -0.843 0.263 0.0371     NA    NA    NA
+ 5 s(x0)  TPRS  NA    -0.802 0.247 0.0471     NA    NA    NA
+ 6 s(x0)  TPRS  NA    -0.761 0.234 0.0571     NA    NA    NA
+ 7 s(x0)  TPRS  NA    -0.719 0.222 0.0671     NA    NA    NA
+ 8 s(x0)  TPRS  NA    -0.678 0.211 0.0772     NA    NA    NA
+ 9 s(x0)  TPRS  NA    -0.636 0.202 0.0872     NA    NA    NA
+10 s(x0)  TPRS  NA    -0.595 0.195 0.0972     NA    NA    NA
+# ... with 390 more rows
+> 
+> ## or selected smooths
+> smooth_estimates(m1, smooth = c("s(x0)", "s(x1)"))
+# A tibble: 200 x 7
+   smooth type  by       est    se      x0    x1
+   <chr>  <chr> <chr>  <dbl> <dbl>   <dbl> <dbl>
+ 1 s(x0)  TPRS  NA    -0.967 0.316 0.00711    NA
+ 2 s(x0)  TPRS  NA    -0.925 0.297 0.0171     NA
+ 3 s(x0)  TPRS  NA    -0.884 0.279 0.0271     NA
+ 4 s(x0)  TPRS  NA    -0.843 0.263 0.0371     NA
+ 5 s(x0)  TPRS  NA    -0.802 0.247 0.0471     NA
+ 6 s(x0)  TPRS  NA    -0.761 0.234 0.0571     NA
+ 7 s(x0)  TPRS  NA    -0.719 0.222 0.0671     NA
+ 8 s(x0)  TPRS  NA    -0.678 0.211 0.0772     NA
+ 9 s(x0)  TPRS  NA    -0.636 0.202 0.0872     NA
+10 s(x0)  TPRS  NA    -0.595 0.195 0.0972     NA
+# ... with 190 more rows
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("smooth_samples")
 > ### * smooth_samples
 > 
@@ -1345,7 +1408,7 @@ detaching ‘package:mgcv’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  11.061 0.135 11.259 0.001 0.002 
+Time elapsed:  11.2 0.137 11.292 0.001 0.001 
 > grDevices::dev.off()
 null device 
           1 
