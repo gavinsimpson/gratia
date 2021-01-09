@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Repeat the first level of a factor n times — rep_first_factor_value • gratia</title>
+<title>S3 methods to evaulate individual smooths — eval_smooth • gratia</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,8 @@
 
 
 
-<meta property="og:title" content="Repeat the first level of a factor n times — rep_first_factor_value" />
-<meta property="og:description" content="Function to repeat the first level of a factor n times and
-return this vector as a factor with the original levels intact" />
+<meta property="og:title" content="S3 methods to evaulate individual smooths — eval_smooth" />
+<meta property="og:description" content="S3 methods to evaulate individual smooths" />
 <meta property="og:image" content="https://gavinsimpson.github.io/gratia/reference/figures/README-draw-gam-figure-1.png" />
 <meta property="og:image:alt" content="Plot produced by draw() of 4 smooth functions from a fitted generalized additive model" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -113,35 +112,30 @@ return this vector as a factor with the original levels intact" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Repeat the first level of a factor n times</h1>
-    <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/utililties.R'><code>R/utililties.R</code></a></small>
-    <div class="hidden name"><code>rep_first_factor_value.Rd</code></div>
+    <h1>S3 methods to evaulate individual smooths</h1>
+    <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/evaluate_smooth2.R'><code>R/evaluate_smooth2.R</code></a></small>
+    <div class="hidden name"><code>eval_smooth.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Function to repeat the first level of a factor n times and
-return this vector as a factor with the original levels intact</p>
+    <p>S3 methods to evaulate individual smooths</p>
     </div>
 
-    <pre class="usage"><span class='fu'>rep_first_factor_value</span><span class='op'>(</span><span class='va'>f</span>, <span class='va'>n</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>eval_smooth</span><span class='op'>(</span><span class='va'>smooth</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>f</th>
-      <td><p>a factor</p></td>
+      <th>smooth</th>
+      <td><p>currently an object that inherits from class <code>mgcv_smooth</code></p></td>
     </tr>
     <tr>
-      <th>n</th>
-      <td><p>numeric; the number of times to repeat the first level of <code>f</code></p></td>
+      <th>...</th>
+      <td><p>arguments assed to other methods</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>A factor of length <code>n</code> with the levels of <code>f</code>, but whose elements
-are all the first level of <code>f</code>.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
