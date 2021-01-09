@@ -504,6 +504,7 @@
 ##' @importFrom dplyr bind_cols setdiff
 ##' @importFrom tibble as_tibble
 ##' @importFrom rlang exec !!!
+##' @importFrom tidyr expand_grid
 `smooth_data` <- function(model, id, n, offset = NULL, include_all = FALSE) {
     mf <- model.frame(model)           # model.frame used to fit model
 
@@ -527,11 +528,7 @@
     m.terms <- names(model[["var.summary"]])
 
     ## need a list of terms used in current smooth
-    sm <- if (is.null(smooth)) {
-        get_smooths_by_id(model, id)[[1L]]
-    } else {
-        smooth
-    }
+    sm <- get_smooths_by_id(model, id)[[1L]]
     smooth_vars <- unique(smooth_variable(sm))
     ## is smooth a by? If it is, extract the by variable
     by_var <- if (is_by_smooth(sm)) {
@@ -590,3 +587,89 @@
     
     newdata # return
 }
+## `smooth_data` <- function(model, id, n, offset = NULL, include_all = FALSE) {
+##     mf <- model.frame(model)           # model.frame used to fit model
+
+##     ## remove response
+##     respvar <- attr(model$terms, "response")
+##     if (!identical(respvar, 0)) {
+##         mf <- mf[, -respvar, drop = FALSE]
+##     }
+
+##     ## remove offset() var; model.frame returns both `offset(foo(var))` and `var`,
+##     ## so we can just remove the former, but we also want to set the offset
+##     ## variable `var` to something constant. FIXME
+##     if (is.null(offset)) {
+##         offset <- 1L
+##     }
+##     mf <- fix_offset(model, mf, offset_val = offset)
+##     ff <- vapply(mf, is.factor, logical(1L)) # which, if any, are factors vars
+##     ## list of model terms (variable names); extract these from `var.summary`
+##     ## because model.frame() on a gamm() contains extraneous variables, related
+##     ## to the mixed model form for lme()
+##     m.terms <- names(model[["var.summary"]])
+
+##     ## need a list of terms used in current smooth
+##     sm <- if (is.null(smooth)) {
+##         get_smooths_by_id(model, id)[[1L]]
+##     } else {
+##         smooth
+##     }
+##     smooth_vars <- unique(smooth_variable(sm))
+##     ## is smooth a by? If it is, extract the by variable
+##     by_var <- if (is_by_smooth(sm)) {
+##         by_variable(sm)
+##     } else {
+##         NULL
+##     }
+##     used_vars <- c(smooth_vars, by_var)
+
+##     ## generate covariate values for the smooth
+##     newlist <- lapply(mf[smooth_vars], seq_min_max, n = n)
+##     if (!is.null(by_var)) {
+##         if (is_factor_by_smooth(sm)) {
+##             ## ordered or simple factor? Grab class as a function to apply below
+##             FUN <- match.fun(data.class(mf[[by_var]]))
+##             ## extract levels of factor by var,
+##             levs <- levels(mf[[by_var]])
+##             ## coerce level for this smooth to correct factor type with FUN
+##             ##   return as a list with the correct names
+##             newfac <- setNames(list(FUN(by_level(sm), levels = levs)), by_var)
+##             ## append this list to the list of new smooth covariate values
+##             newlist <- append(newlist, newfac)
+##         } else {
+##             ## continuous by var; set to median among observed values?
+##             newby <- setNames(list(median(mf[[by_var]]), na.rm = TRUE), by_var)
+##             newlist <- append(newlist, newby)
+##         }
+##     }
+##     newdata <- exec(expand_grid, !!!newlist) # actually compute expand.grid-alike
+
+##     if (isTRUE(include_all)) {
+##         ## need to provide single values for all other covariates in data
+##         unused_vars <- dplyr::setdiff(m.terms, used_vars)
+##         ## only processed unused_vars if length() > 0L
+##         if (length(unused_vars) > 0L) {
+##             unused_summ <- model[["var.summary"]][unused_vars]
+##             ## FIXME: put this in utils.R with a better name!
+##             ## this basically just reps the data (scalar) for the closest observation
+##             ## to the median over all observations
+##             `rep_fun` <- function(x, n) {
+##                 ## if `x` isn't a factor, select the second element of `x` which
+##                 ## is the value of the observation in the data closest to median
+##                 ## of set of observations in data used to fit the model.
+##                 if (!is.factor(x)) {
+##                     x <- x[2L]
+##                 }
+##                 ## repeat `x` as many times as is needed
+##                 rep(x, times = n)
+##             }
+##             n_new <- NROW(newdata)
+##             unused_data <- as_tibble(lapply(unused_summ, FUN = rep_fun, n = n_new))
+##             ## add unnused_data to newdata so we're ready to predict
+##             newdata <- bind_cols(newdata, unused_data)
+##         }
+##     }
+    
+##     newdata # return
+## }
