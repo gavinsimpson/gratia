@@ -504,7 +504,6 @@
 ##' @importFrom dplyr bind_cols setdiff
 ##' @importFrom tibble as_tibble
 ##' @importFrom rlang exec !!!
-##' @importFrom tidyr expand_grid
 `smooth_data` <- function(model, id, n, offset = NULL, include_all = FALSE) {
     mf <- model.frame(model)           # model.frame used to fit model
 
@@ -528,7 +527,11 @@
     m.terms <- names(model[["var.summary"]])
 
     ## need a list of terms used in current smooth
-    sm <- get_smooths_by_id(model, id)[[1L]]
+    sm <- if (is.null(smooth)) {
+        get_smooths_by_id(model, id)[[1L]]
+    } else {
+        smooth
+    }
     smooth_vars <- unique(smooth_variable(sm))
     ## is smooth a by? If it is, extract the by variable
     by_var <- if (is_by_smooth(sm)) {
