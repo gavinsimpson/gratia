@@ -10,7 +10,7 @@ A data frame
 \source{
 Pedersen EJ, Miller DL, Simpson GL, Ross N. 2018. Hierarchical
 generalized additive models: an introduction with mgcv. \emph{PeerJ Preprints}
-\strong{6}:e27320v1 \href{https://doi.org/10.7287/peerj.preprints.27320v1}{doi: 10.7287/peerj.preprints.27320v1}.
+\strong{6}:e27320v1 \doi{10.7287/peerj.preprints.27320v1}.
 }
 \description{
 The Madison lake zooplankton data are from a long-term study in seasonal

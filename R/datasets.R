@@ -40,7 +40,7 @@ NULL
 ##'
 ##' @source Pedersen EJ, Miller DL, Simpson GL, Ross N. 2018. Hierarchical
 ##'   generalized additive models: an introduction with mgcv. *PeerJ Preprints*
-##'   **6**:e27320v1 [doi: 10.7287/peerj.preprints.27320v1](https://doi.org/10.7287/peerj.preprints.27320v1).
+##'   **6**:e27320v1 \doi{10.7287/peerj.preprints.27320v1}.
 ##'
 ##' @format A data frame
 ##' @name bird_move
@@ -67,7 +67,7 @@ NULL
 ##'
 ##' @source Pedersen EJ, Miller DL, Simpson GL, Ross N. 2018. Hierarchical
 ##'   generalized additive models: an introduction with mgcv. *PeerJ Preprints*
-##'   **6**:e27320v1 [doi: 10.7287/peerj.preprints.27320v1](https://doi.org/10.7287/peerj.preprints.27320v1).
+##'   **6**:e27320v1 \doi{10.7287/peerj.preprints.27320v1}.
 ##'
 ##' @references Lathrop RC. (2000). Madison Wisonsin Lakes Zooplankton 1976--1994.
 ##'   Environmental Data Initiative.
@@ -81,7 +81,7 @@ NULL
 ##' Data from the General Social Survey (GSS) from the National Opinion Research
 ##' Center of the University of Chicago
 ##'
-##' A subset of the data from the [`carData::GSSvocab`] dataset from the
+##' A subset of the data from the `carData::GSSvocab` dataset from the
 ##' `carData` package, containing observations from 2016 only.
 ##'
 ##' @format A data frame with 1858 rows and 3 variables:

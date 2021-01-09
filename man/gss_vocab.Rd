@@ -17,7 +17,7 @@ levels \code{no} and \code{yes}.
 }
 }
 \description{
-A subset of the data from the \code{\link[carData:GSSvocab]{carData::GSSvocab}} dataset from the
+A subset of the data from the \code{carData::GSSvocab} dataset from the
 \code{carData} package, containing observations from 2016 only.
 }
 \keyword{data}
