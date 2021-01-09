@@ -1,4 +1,4 @@
-# gratia 0.4.2
+# gratia 0.5.0
 
 ## New features
 
@@ -34,6 +34,10 @@
   Part of wish of Wish of [#79](https://github.com/gavinsimpson/gratia/issues/79).
 
 * `confint.gam()` now works for 2D smooths also.
+
+* `smooth_estimates()` is an early version of code to replace (or more likely
+  supersede) `evaluate_smooth()`. `smooth_estimates()` can currently only handle
+  1D smooths of the standard types. 
 
 ## User visible changes
 
