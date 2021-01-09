@@ -245,7 +245,8 @@
 
     ## deal with data if supplied
     data <- process_user_data_for_eval(data = data, model = model, n = n,
-                                       smooth = smooth)
+                                       id = which_smooth(model,
+                                                         smooth_label(smooth)))
 
     ## values of spline at data
     eval_sm <- spline_values2(smooth, data = data,
@@ -267,10 +268,11 @@
 }
 
 
-`process_user_data_for_eval` <- function(data, model, n, smooth) {
+`process_user_data_for_eval` <- function(data, model, n, id) {
     data <- if (is.null(data)) {
-        smooth_data(model = model, n = n, smooth = smooth)
-    } else {
+        smooth_data(model = model, n = n, id = id)
+   } else {
+        smooth <- get_smooths_by_id(id)        
         vars <- smooth_variable(smooth)
         by_var <- by_variable(smooth)
         if (!is.na(by_var)) {
