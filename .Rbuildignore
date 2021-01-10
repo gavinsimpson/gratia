@@ -13,3 +13,4 @@
 ^\.github$
 ^README.Rmd$
 ^revdep$
+^pkgdown$
