@@ -458,7 +458,7 @@
     grepl("offset\\(", terms)
 }
 
-##' Names of any parametrix terms in a GAM
+##' Names of any parametric terms in a GAM
 ##'
 ##' @param model a fitted model.
 ##' @param ... arguments passed to other methods.
@@ -608,7 +608,7 @@
 ##'
 ##' @seealso The underlying functionality is provided by [data.class()].
 ##'
-##' @export
+##' @noRd
 `data_class` <- function(df) {
     vapply(df, data.class, character(1L))
 }
