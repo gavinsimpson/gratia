@@ -607,9 +607,6 @@ Bivariate smoothing example
 > sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 > draw(sm)
 > 
-> ## supply constant to shift y axis scale
-> draw(sm, constant = coef(m2)[1])
-> 
 > 
 > 
 > cleanEx()
@@ -941,11 +938,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55a929264fa0>
+<environment: 0x562bd6355188>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55a929264fa0>
+<environment: 0x562bd6355188>
 > 
 > 
 > 
@@ -1408,7 +1405,7 @@ detaching ‘package:mgcv’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  11.2 0.137 11.292 0.001 0.001 
+Time elapsed:  11.461 0.146 11.564 0.002 0 
 > grDevices::dev.off()
 null device 
           1 
