@@ -4,7 +4,7 @@
 \alias{parametric_terms}
 \alias{parametric_terms.default}
 \alias{parametric_terms.gam}
-\title{Names of any parametrix terms in a GAM}
+\title{Names of any parametric terms in a GAM}
 \usage{
 parametric_terms(model, ...)
 
@@ -18,5 +18,5 @@ parametric_terms(model, ...)
 \item{...}{arguments passed to other methods.}
 }
 \description{
-Names of any parametrix terms in a GAM
+Names of any parametric terms in a GAM
 }
