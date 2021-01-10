@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>S3 methods to evaulate individual smooths — eval_smooth • gratia</title>
+<title>S3 methods to evaluate individual smooths — eval_smooth • gratia</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="S3 methods to evaulate individual smooths — eval_smooth" />
-<meta property="og:description" content="S3 methods to evaulate individual smooths" />
+<meta property="og:title" content="S3 methods to evaluate individual smooths — eval_smooth" />
+<meta property="og:description" content="S3 methods to evaluate individual smooths" />
 <meta property="og:image" content="https://gavinsimpson.github.io/gratia/reference/figures/README-draw-gam-figure-1.png" />
 <meta property="og:image:alt" content="Plot produced by draw() of 4 smooth functions from a fitted generalized additive model" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -112,27 +112,119 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>S3 methods to evaulate individual smooths</h1>
+    <h1>S3 methods to evaluate individual smooths</h1>
     <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/evaluate_smooth2.R'><code>R/evaluate_smooth2.R</code></a></small>
     <div class="hidden name"><code>eval_smooth.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>S3 methods to evaulate individual smooths</p>
+    <p>S3 methods to evaluate individual smooths</p>
     </div>
 
-    <pre class="usage"><span class='fu'>eval_smooth</span><span class='op'>(</span><span class='va'>smooth</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>eval_smooth</span><span class='op'>(</span><span class='va'>smooth</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for mgcv.smooth</span>
+<span class='fu'>eval_smooth</span><span class='op'>(</span>
+  <span class='va'>smooth</span>,
+  <span class='va'>model</span>,
+  n <span class='op'>=</span> <span class='fl'>100</span>,
+  data <span class='op'>=</span> <span class='cn'>NULL</span>,
+  unconditional <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  overall_uncertainty <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
+
+<span class='co'># S3 method for fs.interaction</span>
+<span class='fu'>eval_smooth</span><span class='op'>(</span>
+  <span class='va'>smooth</span>,
+  <span class='va'>model</span>,
+  n <span class='op'>=</span> <span class='fl'>100</span>,
+  data <span class='op'>=</span> <span class='cn'>NULL</span>,
+  unconditional <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  overall_uncertainty <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
+
+<span class='co'># S3 method for random.effect</span>
+<span class='fu'>eval_smooth</span><span class='op'>(</span>
+  <span class='va'>smooth</span>,
+  <span class='va'>model</span>,
+  n <span class='op'>=</span> <span class='fl'>100</span>,
+  data <span class='op'>=</span> <span class='cn'>NULL</span>,
+  unconditional <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  overall_uncertainty <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
+
+<span class='co'># S3 method for mrf.smooth</span>
+<span class='fu'>eval_smooth</span><span class='op'>(</span>
+  <span class='va'>smooth</span>,
+  <span class='va'>model</span>,
+  n <span class='op'>=</span> <span class='fl'>100</span>,
+  data <span class='op'>=</span> <span class='cn'>NULL</span>,
+  unconditional <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  overall_uncertainty <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
+
+<span class='co'># S3 method for t2.smooth</span>
+<span class='fu'>eval_smooth</span><span class='op'>(</span>
+  <span class='va'>smooth</span>,
+  <span class='va'>model</span>,
+  n <span class='op'>=</span> <span class='fl'>100</span>,
+  data <span class='op'>=</span> <span class='cn'>NULL</span>,
+  unconditional <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  overall_uncertainty <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
+
+<span class='co'># S3 method for tensor.smooth</span>
+<span class='fu'>eval_smooth</span><span class='op'>(</span>
+  <span class='va'>smooth</span>,
+  <span class='va'>model</span>,
+  n <span class='op'>=</span> <span class='fl'>100</span>,
+  data <span class='op'>=</span> <span class='cn'>NULL</span>,
+  unconditional <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  overall_uncertainty <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>smooth</th>
-      <td><p>currently an object that inherits from class <code>mgcv_smooth</code></p></td>
+      <td><p>currently an object that inherits from class <code>mgcv.smooth</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
       <td><p>arguments assed to other methods</p></td>
+    </tr>
+    <tr>
+      <th>model</th>
+      <td><p>a fitted model; currently only <code><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>mgcv::gam()</a></code> and <code><a href='https://rdrr.io/pkg/mgcv/man/bam.html'>mgcv::bam()</a></code>
+models are suported.</p></td>
+    </tr>
+    <tr>
+      <th>n</th>
+      <td><p>numeric; the number of points over the range of the covariate at
+which to evaluate the smooth.</p></td>
+    </tr>
+    <tr>
+      <th>data</th>
+      <td><p>an optional data frame of values to evaluate <code>smooth</code> at.</p></td>
+    </tr>
+    <tr>
+      <th>unconditional</th>
+      <td><p>logical; should confidence intervals include the
+uncertainty due to smoothness selection? If <code>TRUE</code>, the corrected Bayesian
+covariance matrix will be used.</p></td>
+    </tr>
+    <tr>
+      <th>overall_uncertainty</th>
+      <td><p>logical; should the uncertainty in the model
+constant term be included in the standard error of the evaluate values of
+the smooth?</p></td>
     </tr>
     </table>
 
