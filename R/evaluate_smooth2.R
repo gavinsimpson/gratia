@@ -86,7 +86,7 @@
 
 ##' Determine the type of smooth and return it n a human readble form
 ##'
-##' @param smooth an object inheriting from class `mgcv.smooth`
+##' @param smooth an object inheriting from class `mgcv.smooth`.
 ##'
 ##' @keywords internal
 ##' @noRd
@@ -136,6 +136,11 @@
     sm_type
 }
 
+##' Check user-supplied data for suitability
+##'
+##' @param data a data frame of variables to be checked.
+##' @param vars character; vector of terms.
+##' 
 ##' @importFrom tibble tibble
 ##' @importFrom rlang := !!
 ##'
@@ -173,8 +178,10 @@
 
 ##' Evaluate estimated spline values
 ##'
-##' @param smooth
-##' @param term
+##' @param smooth currently an object that inherits from class `mgcv.smooth`.
+##' @param model a fitted model; currently only [mgcv::gam()] and [mgcv::bam()]
+##'   models are suported.
+##' @param data an optional data frame of values to evaluate `smooth` at.
 ##'
 ##' @inheritParams eval_smooth
 ##' 
@@ -186,7 +193,7 @@
 ##' @keywords internal
 ##' @noRd
 `spline_values2` <- function(smooth, data, model, unconditional,
-                             overall_uncertainty = TRUE, term) {
+                             overall_uncertainty = TRUE) {
     X <- PredictMat(smooth, data)   # prediction matrix
     start <- smooth[["first.para"]]
     end <- smooth[["last.para"]]
@@ -275,7 +282,7 @@
                                       ...) {
     by_var <- by_variable(smooth) # even if not a by as we want NA later
 
-    sm_var <- smooth_variable(smooth)
+    ## sm_var <- smooth_variable(smooth)
 
     ## deal with data if supplied
     data <- process_user_data_for_eval(data = data, model = model, n = n,
@@ -286,8 +293,7 @@
     eval_sm <- spline_values2(smooth, data = data,
                               unconditional = unconditional,
                               model = model,
-                              overall_uncertainty = overall_uncertainty,
-                              term = sm_var)
+                              overall_uncertainty = overall_uncertainty)
 
     ## add on info regarding by variable
     nr <- nrow(eval_sm)
@@ -303,6 +309,12 @@
 
 ##' Wrapper to `gratia::smooth_data()` and `gratia:::check_user_data()` for use
 ##' with [gratia::eval_smooth()] methods
+##'
+##' @param data an optional data frame of values for the smooth
+##' @param model a fitted model
+##' @param n numeric; the number of new observations to generate. Passed to
+##'   [gratia::smooth_data()].
+##' @param id the number ID of the smooth within `model` to process.
 ##'
 ##' @keywords internal
 ##' @noRd
