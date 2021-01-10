@@ -85,9 +85,6 @@
     <loc>https://gavinsimpson.github.io/gratia//reference/evaluate_smooth.html</loc>
   </url>
   <url>
-    <loc>https://gavinsimpson.github.io/gratia//reference/factor_var_names.html</loc>
-  </url>
-  <url>
     <loc>https://gavinsimpson.github.io/gratia//reference/family.gam.html</loc>
   </url>
   <url>
@@ -113,9 +110,6 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia//reference/is_factor_term.html</loc>
-  </url>
-  <url>
-    <loc>https://gavinsimpson.github.io/gratia//reference/is_factor_var.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia//reference/is_mgcv_smooth.html</loc>

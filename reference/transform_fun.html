@@ -121,7 +121,13 @@
     <p>Transform estimated values and confidence intervals by applying a function</p>
     </div>
 
-    <pre class="usage"><span class='fu'>transform_fun</span><span class='op'>(</span><span class='va'>object</span>, fun <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>transform_fun</span><span class='op'>(</span><span class='va'>object</span>, fun <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for evaluated_smooth</span>
+<span class='fu'>transform_fun</span><span class='op'>(</span><span class='va'>object</span>, fun <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for evaluated_parametric_term</span>
+<span class='fu'>transform_fun</span><span class='op'>(</span><span class='va'>object</span>, fun <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -140,6 +146,13 @@
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Returns <code>object</code> but with the estimate and upper and lower values
+of the confidence interval transformed via the function.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Gavin L. Simpson</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
