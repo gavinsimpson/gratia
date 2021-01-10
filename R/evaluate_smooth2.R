@@ -19,9 +19,7 @@
 ##'   [mgcv::exclude.too.far()] for further details.
 ##' @param ... arguments passed to other methods.
 ##'
-##' @return A data frame, which is of class `"evaluated_1d_smooth"` or
-##'   `evaluated_2d_smooth`, which inherit from classes `"evaluated_smooth"`
-##'   and `"data.frame"`.
+##' @return A data frame (tibble), which is of class `"smooth_estimates"`.
 ##' 
 ##' @export
 ##' 
@@ -74,11 +72,24 @@
                                     overall_uncertainty = overall_uncertainty)
     }
 
+    ## create a single df of all the smooths
     sm_list <- bind_rows(sm_list)
+    ## need to unnest the `data` column
     sm_list <- unnest(sm_list, all_of('data'))
+
+    ## add a class
+    class(sm_list) <- c("smooth_estimates", class(sm_list))
+
+    ## return
     sm_list
 }
 
+##' Determine the type of smooth and return it n a human readble form
+##'
+##' @param smooth an object inheriting from class `mgcv.smooth`
+##'
+##' @keywords internal
+##' @noRd
 `smooth_type` <- function(smooth) {
     sm_type <- if (inherits(smooth, "tprs.smooth")) {
         "TPRS"
@@ -127,6 +138,9 @@
 
 ##' @importFrom tibble tibble
 ##' @importFrom rlang := !!
+##'
+##' @keywords internal
+##' @noRd
 `check_user_data` <- function(data, vars) {
     if (is.data.frame(data)) {
         smooth_vars <- vars %in% names(data)
@@ -146,7 +160,10 @@
     data
 }
 
-## Returns the type of smoother as far as mgcv is concerned
+##' Returns the type of smoother as far as mgcv is concerned
+##'
+##' @keywords internal
+##' @noRd
 `mgcv_type` <- function(smooth) {
     stopifnot(is_mgcv_smooth(smooth))
     cls <- class(smooth)[1L]
@@ -154,10 +171,20 @@
     cls
 }
 
+##' Evaluate estimated spline values
+##'
+##' @param smooth
+##' @param term
+##'
+##' @inheritParams eval_smooth
+##' 
 ##' @importFrom tibble tibble add_column
 ##' @importFrom rlang := !!
 ##' @importFrom dplyr pull all_of
 ##' @importFrom tidyr nest unnest
+##'
+##' @keywords internal
+##' @noRd
 `spline_values2` <- function(smooth, data, model, unconditional,
                              overall_uncertainty = TRUE, term) {
     X <- PredictMat(smooth, data)   # prediction matrix
@@ -224,15 +251,22 @@
     out
 }
 
-##' S3 methods to evaulate individual smooths
+##' S3 methods to evaluate individual smooths
 ##' 
-##' @param smooth currently an object that inherits from class `mgcv_smooth`
+##' @param smooth currently an object that inherits from class `mgcv.smooth`.
+##' @param model a fitted model; currently only [mgcv::gam()] and [mgcv::bam()]
+##'   models are suported.
+##' @param data an optional data frame of values to evaluate `smooth` at.
 ##' @param ... arguments assed to other methods
+##'
+##' @inheritParams smooth_estimates
 ##' 
 ##' @export
 `eval_smooth` <- function(smooth, ...) {
     UseMethod("eval_smooth")
 }
+
+##' @rdname eval_smooth
 ##' @importFrom tibble add_column
 ##' @export
 `eval_smooth.mgcv.smooth` <- function(smooth, model, n = 100, data = NULL,
@@ -267,7 +301,11 @@
     eval_sm
 }
 
-
+##' Wrapper to `gratia::smooth_data()` and `gratia:::check_user_data()` for use
+##' with [gratia::eval_smooth()] methods
+##'
+##' @keywords internal
+##' @noRd
 `process_user_data_for_eval` <- function(data, model, n, id) {
     data <- if (is.null(data)) {
         smooth_data(model = model, n = n, id = id)
@@ -283,6 +321,8 @@
     data
 }
 
+##' @rdname eval_smooth
+##' @export
 ##' @importFrom tibble add_column
 `eval_smooth.fs.interaction` <- function(smooth, model, n = 100, data = NULL,
                                          unconditional = FALSE,
@@ -291,6 +331,8 @@
     .NotYetImplemented()
 }
 
+##' @rdname eval_smooth
+##' @export
 ##' @importFrom tibble add_column
 `eval_smooth.random.effect` <- function(smooth, model, n = 100, data = NULL,
                                         unconditional = FALSE,
@@ -301,6 +343,8 @@
     by_var <- by_variable(smooth) # get even if not a by as we want NA later
 }
 
+##' @rdname eval_smooth
+##' @export
 ##' @importFrom tibble add_column
 `eval_smooth.mrf.smooth` <- function(smooth, model, n = 100, data = NULL,
                                      unconditional = FALSE,
@@ -309,6 +353,8 @@
     .NotYetImplemented()
 }
 
+##' @rdname eval_smooth
+##' @export
 ##' @importFrom tibble add_column
 `eval_smooth.t2.smooth` <- function(smooth, model, n = 100, data = NULL,
                                     unconditional = FALSE,
@@ -317,6 +363,8 @@
     .NotYetImplemented()
 }
 
+##' @rdname eval_smooth
+##' @export
 ##' @importFrom tibble add_column
 `eval_smooth.tensor.smooth` <- function(smooth, model, n = 100, data = NULL,
                                         unconditional = FALSE,
