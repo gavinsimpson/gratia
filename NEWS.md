@@ -48,6 +48,9 @@
   The default behaviour remains unchanged however; if `parm` is `NULL` then all
   smooths are evaluated and returned with confidence intervals.
 
+* `data_class()` is no longer exported; it was only ever intended to be an internal
+  function.
+
 ## Bug Fixes
 
 * `confint.gam()` was failing on a tensor product smooth due to matching issues.
