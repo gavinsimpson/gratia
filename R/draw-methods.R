@@ -80,9 +80,6 @@
 ##'
 ##' sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 ##' draw(sm)
-##'
-##' ## supply constant to shift y axis scale
-##' draw(sm, constant = coef(m2)[1])
 `draw.evaluated_1d_smooth` <- function(object,
                                        rug = NULL,
                                        ci_level = 0.95,
