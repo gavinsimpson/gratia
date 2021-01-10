@@ -46,9 +46,7 @@ and \code{dist} is a distance within the unit square. See
 \code{\link[mgcv:exclude.too.far]{mgcv::exclude.too.far()}} for further details.}
 }
 \value{
-A data frame, which is of class \code{"evaluated_1d_smooth"} or
-\code{evaluated_2d_smooth}, which inherit from classes \code{"evaluated_smooth"}
-and \code{"data.frame"}.
+A data frame (tibble), which is of class \code{"smooth_estimates"}.
 }
 \description{
 New \code{evaluate_smooth()} alike

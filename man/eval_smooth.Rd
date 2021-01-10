@@ -2,15 +2,97 @@
 % Please edit documentation in R/evaluate_smooth2.R
 \name{eval_smooth}
 \alias{eval_smooth}
-\title{S3 methods to evaulate individual smooths}
+\alias{eval_smooth.mgcv.smooth}
+\alias{eval_smooth.fs.interaction}
+\alias{eval_smooth.random.effect}
+\alias{eval_smooth.mrf.smooth}
+\alias{eval_smooth.t2.smooth}
+\alias{eval_smooth.tensor.smooth}
+\title{S3 methods to evaluate individual smooths}
 \usage{
 eval_smooth(smooth, ...)
+
+\method{eval_smooth}{mgcv.smooth}(
+  smooth,
+  model,
+  n = 100,
+  data = NULL,
+  unconditional = FALSE,
+  overall_uncertainty = TRUE,
+  ...
+)
+
+\method{eval_smooth}{fs.interaction}(
+  smooth,
+  model,
+  n = 100,
+  data = NULL,
+  unconditional = FALSE,
+  overall_uncertainty = TRUE,
+  ...
+)
+
+\method{eval_smooth}{random.effect}(
+  smooth,
+  model,
+  n = 100,
+  data = NULL,
+  unconditional = FALSE,
+  overall_uncertainty = TRUE,
+  ...
+)
+
+\method{eval_smooth}{mrf.smooth}(
+  smooth,
+  model,
+  n = 100,
+  data = NULL,
+  unconditional = FALSE,
+  overall_uncertainty = TRUE,
+  ...
+)
+
+\method{eval_smooth}{t2.smooth}(
+  smooth,
+  model,
+  n = 100,
+  data = NULL,
+  unconditional = FALSE,
+  overall_uncertainty = TRUE,
+  ...
+)
+
+\method{eval_smooth}{tensor.smooth}(
+  smooth,
+  model,
+  n = 100,
+  data = NULL,
+  unconditional = FALSE,
+  overall_uncertainty = TRUE,
+  ...
+)
 }
 \arguments{
-\item{smooth}{currently an object that inherits from class \code{mgcv_smooth}}
+\item{smooth}{currently an object that inherits from class \code{mgcv.smooth}.}
 
 \item{...}{arguments assed to other methods}
+
+\item{model}{a fitted model; currently only \code{\link[mgcv:gam]{mgcv::gam()}} and \code{\link[mgcv:bam]{mgcv::bam()}}
+models are suported.}
+
+\item{n}{numeric; the number of points over the range of the covariate at
+which to evaluate the smooth.}
+
+\item{data}{an optional data frame of values to evaluate \code{smooth} at.}
+
+\item{unconditional}{logical; should confidence intervals include the
+uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian
+covariance matrix will be used.}
+
+\item{overall_uncertainty}{logical; should the uncertainty in the model
+constant term be included in the standard error of the evaluate values of
+the smooth?}
 }
 \description{
-S3 methods to evaulate individual smooths
+S3 methods to evaluate individual smooths
 }

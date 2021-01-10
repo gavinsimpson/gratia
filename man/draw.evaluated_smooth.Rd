@@ -183,9 +183,6 @@ m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
 
 sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 draw(sm)
-
-## supply constant to shift y axis scale
-draw(sm, constant = coef(m2)[1])
 }
 \author{
 Gavin L. Simpson
