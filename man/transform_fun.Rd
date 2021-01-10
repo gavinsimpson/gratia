@@ -2,9 +2,15 @@
 % Please edit documentation in R/utililties.R
 \name{transform_fun}
 \alias{transform_fun}
+\alias{transform_fun.evaluated_smooth}
+\alias{transform_fun.evaluated_parametric_term}
 \title{Transform estimated values and confidence intervals by applying a function}
 \usage{
 transform_fun(object, fun = NULL, ...)
+
+\method{transform_fun}{evaluated_smooth}(object, fun = NULL, ...)
+
+\method{transform_fun}{evaluated_parametric_term}(object, fun = NULL, ...)
 }
 \arguments{
 \item{object}{an object to apply the transform function to.}
@@ -13,6 +19,13 @@ transform_fun(object, fun = NULL, ...)
 
 \item{...}{additional arguments passed to methods.}
 }
+\value{
+Returns \code{object} but with the estimate and upper and lower values
+of the confidence interval transformed via the function.
+}
 \description{
 Transform estimated values and confidence intervals by applying a function
+}
+\author{
+Gavin L. Simpson
 }

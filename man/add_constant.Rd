@@ -2,9 +2,15 @@
 % Please edit documentation in R/utililties.R
 \name{add_constant}
 \alias{add_constant}
+\alias{add_constant.evaluated_smooth}
+\alias{add_constant.evaluated_parametric_term}
 \title{Add a constant to estimated values}
 \usage{
 add_constant(object, constant = NULL, ...)
+
+\method{add_constant}{evaluated_smooth}(object, constant = NULL, ...)
+
+\method{add_constant}{evaluated_parametric_term}(object, constant = NULL, ...)
 }
 \arguments{
 \item{object}{a object to add a constant to.}
@@ -13,6 +19,13 @@ add_constant(object, constant = NULL, ...)
 
 \item{...}{additional arguments passed to methods.}
 }
+\value{
+Returns \code{object} but with the estimate shifted by the addition of
+the supplied constant.
+}
 \description{
 Add a constant to estimated values
+}
+\author{
+Gavin L. Simpson
 }

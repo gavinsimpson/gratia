@@ -29,5 +29,5 @@ A character vector of variable names.
 }
 \description{
 Given the name (a term label) of a term in a model, returns the names
-of the variables involved in ther term.
+of the variables involved in the term.
 }
