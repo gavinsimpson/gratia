@@ -62,7 +62,8 @@
         seq_len(n_smooths(object))
     }
 
-    smooths <- get_smooths_by_id(object, smooth_ids) # extract the mgcv.smooth objects
+    ## extract the mgcv.smooth objects
+    smooths <- get_smooths_by_id(object, smooth_ids)
 
     ## loop over the smooths and evaluate them
     sm_list <- vector(mode = "list", length = length(smooths))
@@ -125,7 +126,7 @@
     } else if (inherits(smooth, "mrf.smooth")) {
         "MRF"
     } else if (inherits(smooth, "random.effect")) {
-        "Ranef"
+        "Random effect"
     } else if (inherits(smooth, "sw")) {
         "Soap (wiggly)"
     } else if (inherits(smooth, "sf")) {
@@ -149,7 +150,7 @@
 ##'
 ##' @param data a data frame of variables to be checked.
 ##' @param vars character; vector of terms.
-##' 
+##'
 ##' @importFrom tibble tibble
 ##' @importFrom rlang := !!
 ##'
@@ -161,7 +162,7 @@
         if (!all(vars %in% names(data))) {
             stop(paste("Variable(s)",
                        paste(paste0("'", vars[!smooth_vars], "'"),
-                             collapse = ', '),
+                             collapse = ", "),
                        "not found in 'data'."),
                  call. = FALSE)
         }
@@ -202,6 +203,7 @@
 ##' @importFrom rlang := !!
 ##' @importFrom dplyr pull all_of
 ##' @importFrom tidyr nest unnest
+##' @importFrom mgcv PredictMat
 ##'
 ##' @keywords internal
 ##' @noRd
@@ -293,8 +295,6 @@
                                       ...) {
     by_var <- by_variable(smooth) # even if not a by as we want NA later
 
-    ## sm_var <- smooth_variable(smooth)
-
     ## deal with data if supplied
     data <- process_user_data_for_eval(data = data, model = model, n = n,
                                        id = which_smooth(model,
@@ -361,9 +361,29 @@
                                         unconditional = FALSE,
                                         overall_uncertainty = TRUE,
                                         ...) {
-    .NotYetImplemented()
-    is_by <- is_by_smooth(smooth)
-    by_var <- by_variable(smooth) # get even if not a by as we want NA later
+    by_var <- by_variable(smooth) # even if not a by as we want NA later
+
+    ## deal with data if supplied
+    data <- process_user_data_for_eval(data = data, model = model, n = n,
+                                       id = which_smooth(model,
+                                                         smooth_label(smooth)))
+
+    ## values of spline at data
+    eval_sm <- spline_values2(smooth, data = data,
+                              unconditional = unconditional,
+                              model = model,
+                              overall_uncertainty = overall_uncertainty)
+
+    ## add on info regarding by variable
+    nr <- nrow(eval_sm)
+    eval_sm <- add_column(eval_sm, by = rep(by_var, nr),
+                          .after = 1L)
+    ## add on spline type info
+    sm_type <- smooth_type(smooth)
+    eval_sm <- add_column(eval_sm, type = rep(sm_type, nr),
+                          .after = 1L)
+    ## return
+    eval_sm
 }
 
 ##' @rdname eval_smooth
