@@ -8,7 +8,7 @@ library("mgcv")
 context("smooth-estimates-methods")
 
 set.seed(1)
-dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+dat <- data_sim("eg1", n = 400, seed = 1)
 m0 <- gam(y ~ s(x0), data = dat, method = "REML")
 m1 <- gam(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'ps') + s(x3, bs = 'bs'),
           data = dat, method = "REML")
@@ -16,6 +16,13 @@ m2 <- gamm(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'ps') + s(x3, bs = 'bs'),
            data = dat, method = "REML")
 m3 <- gam(y ~ s(x0, x1, x2), data = dat, method = "REML")
 m4 <- gam(y ~ te(x0, x1, x2), data = dat, method = "REML")
+
+dat_biv <- data_sim("eg2", n = 400, seed = 2)
+m_biv <- gam(y ~ s(x, z), data = dat_biv, method = "REML")
+
+set.seed(42)
+dat_2d_by <- data_sim("eg4", n = 400, seed = 42)
+m_2d_by <- gam(y ~ fac + s(x0, x1, by = fac), data = dat_2d_by)
 
 test_that("smooth_estimates works for a GAM", {
     sm <- smooth_estimates(m1, "s(x2)")
@@ -44,10 +51,27 @@ test_that("smooth_estimates works for a GAMM", {
     expect_is(sm, "data.frame")
 })
 
+test_that("smooth_estimates works with a bivariate TPRS smooth", {
+    expect_silent(sm <- smooth_estimates(m_biv, "s(x,z)", n = 50))
+    expect_is(sm, "smooth_estimates")
+    expect_is(sm, "tbl_df")
+    expect_is(sm, "data.frame")
+    expect_identical(nrow(sm), 2500L)
+    expect_named(sm, c("smooth", "type", "by", "est", "se", "x", "z"))
+})
+
 test_that("smooth_estimates fails with a trivariate smooth", {
-    skip('Need to implement multi-dim smooths handling in smooth_estimates')
-    expect_error(smooth_estimates(m3, "s(x0,x1,x2)"))
-    expect_error(smooth_estimates(m4, "s(x0,x1,x2)"))
+    expect_silent(sm <- smooth_estimates(m3, "s(x0,x1,x2)", n = 25))
+    expect_is(sm, "smooth_estimates")
+    expect_is(sm, "tbl_df")
+    expect_is(sm, "data.frame")
+    expect_identical(nrow(sm), 15625L)
+    expect_named(sm, c("smooth", "type", "by", "est", "se", "x0", "x1", "x2"))
+})
+
+test_that("smooth_estimates fails with a trivariate tensor product smooth", {
+    skip('Need to implement tensor product smooth handling in smooth_estimates')
+    expect_error(smooth_estimates(m4, "te(x0,x1,x2)"))
 })
 
 test_that("evaluate_re_smooth throws error when passed newdata", {
@@ -75,7 +99,7 @@ test_that("smooth_estimates fails if smooth var not in data", {
                  fixed = TRUE)
 })
 
-test_that("evaluate_1d_smooth works with vector newdata", {
+test_that("smooth_estimates works with vector newdata", {
     sm1 <- smooth_estimates(m0, "s(x0)", data = dat[, "x0"])
     sm2 <- smooth_estimates(m0, "s(x0)", data = dat)
     expect_is(sm1, "smooth_estimates")
@@ -89,12 +113,8 @@ test_that("evaluate_1d_smooth fails if newdata is not data frame or numeric", {
 })
 
 
-test_that("evaluate_2d_smooth works for a 2d factor by smooth", {
-    skip("Need to implement 2d TPRS handling in smooth_estimates")
-    set.seed(42)
-    dat <- gamSim(4, n = 400, verbose = FALSE)
-    mf <- gam(y ~ fac + s(x0, x1, by = fac), data = dat)
-    sm <- smooth_estimates(mf, "s(x0,x1)")
+test_that("smooth_estimates works for a 2d factor by smooth", {
+    sm <- smooth_estimates(m_2d_by, "s(x0,x1)")
     expect_is(sm, "smooth_estimates")
     expect_is(sm, "tbl_df")
     expect_is(sm, "data.frame")
