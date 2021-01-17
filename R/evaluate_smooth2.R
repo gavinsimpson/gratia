@@ -258,12 +258,10 @@
             nest(tbl, data = !!(sm_var))
         }
      } else {
-        ## need to adapt this to n dimensions!       
-        tbl <- tibble(smooth = rep(label, nrow(X)),
-                      est = fit, se = se.fit,
-                      !!(sm_var[1L]) := pull(data, sm_var[1L]),
-                      !!(sm_var[2L]) := pull(data, sm_var[2L]))
-        nest(tbl, data = c(!!(sm_var[1L]), !!(sm_var[2L])))
+        tbl <- bind_cols(tibble(smooth = rep(label, nrow(X)),
+                                est = fit, se = se.fit),
+                         data)
+        nest(tbl, data = all_of(names(data)))
     }
 
     nr <- nrow(out)
