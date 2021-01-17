@@ -24,6 +24,17 @@ set.seed(42)
 dat_2d_by <- data_sim("eg4", n = 400, seed = 42)
 m_2d_by <- gam(y ~ fac + s(x0, x1, by = fac), data = dat_2d_by)
 
+## simulate example... from ?mgcv::random.effects
+## simulate 4 term additive truth
+dat_re <- data_sim("eg1", n = 400, scale = 2, seed = 1)
+fac <- as.factor(sample(1:20, 400, replace = TRUE))
+X <- model.matrix(~ fac - 1)
+b <- rnorm(20) * 0.5
+dat_re <- transform(dat_re, y = drop(y + X %*% b), fac = fac)
+m_re <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) + s(x3),
+            data = dat, method = "ML")
+rm(fac, b, X)
+
 test_that("smooth_estimates works for a GAM", {
     sm <- smooth_estimates(m1, "s(x2)")
     expect_is(sm, "smooth_estimates")
@@ -35,7 +46,7 @@ test_that("smooth_estimates works with more than one term", {
     sm <- smooth_estimates(m1, c("s(x1)", "s(x2)"))
     expect_is(sm, "smooth_estimates")
     expect_is(sm, "tbl_df")
-    expect_is(sm, "data.frame")    
+    expect_is(sm, "data.frame")
 })
 
 test_that("smooth_estimates throws error if smooth not found", {
@@ -74,22 +85,23 @@ test_that("smooth_estimates fails with a trivariate tensor product smooth", {
     expect_error(smooth_estimates(m4, "te(x0,x1,x2)"))
 })
 
-test_that("evaluate_re_smooth throws error when passed newdata", {
-    skip('Need to implement ranef smooths handling in smooth_estimates')
-    ## simulate example... from ?mgcv::random.effects
-    set.seed(1)
-    dat <- gamSim(1, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
+test_that("smooth_estimates works", {
+    expect_silent(sm <- smooth_estimates(m_re, smooth = "s(fac)"))
+    expect_is(sm, "smooth_estimates")
+    expect_is(sm, "tbl_df")
+    expect_is(sm, "data.frame")
+    expect_identical(nrow(sm), length(levels(dat_re[["fac"]])))
+    expect_named(sm, c("smooth", "type", "by", "est", "se", "fac"))
+})
 
-    fac <- as.factor(sample(1:20, 400, replace = TRUE))
-    dat$X <- model.matrix(~ fac - 1)
-    b <- rnorm(20) * 0.5
-    dat <- transform(dat, y = y + X %*% b)
-
-    rm1 <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) +
-                   s(x3), data = dat, method = "ML")
-
-    expect_error(smooth_estimates(rm1, smooth = "s(fac)", data = model.frame(rm1)),
-                 "Not yet implemented: user-supplied data in 're' smooth")
+test_that("smooth_estimates works when passed data", {
+    expect_silent(sm <- smooth_estimates(m_re, smooth = "s(fac)",
+                                         data = dat_re))
+    expect_is(sm, "smooth_estimates")
+    expect_is(sm, "tbl_df")
+    expect_is(sm, "data.frame")
+    expect_identical(nrow(sm), nrow(dat_re))
+    expect_named(sm, c("smooth", "type", "by", "est", "se", "fac"))
 })
 
 test_that("smooth_estimates fails if smooth var not in data", {
@@ -99,7 +111,7 @@ test_that("smooth_estimates fails if smooth var not in data", {
                  fixed = TRUE)
 })
 
-test_that("smooth_estimates works with vector newdata", {
+test_that("smooth_estimates works with vector data", {
     sm1 <- smooth_estimates(m0, "s(x0)", data = dat[, "x0"])
     sm2 <- smooth_estimates(m0, "s(x0)", data = dat)
     expect_is(sm1, "smooth_estimates")
