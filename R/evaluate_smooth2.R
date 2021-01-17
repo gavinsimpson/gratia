@@ -4,7 +4,7 @@
 ##' @param smooth character; a single smooth to evaluate.
 ##' @param n numeric; the number of points over the range of the covariate at
 ##'   which to evaluate the smooth.
-##' @param newdata a vector or data frame of points at which to evaluate the
+##' @param data a vector or data frame of points at which to evaluate the
 ##'   smooth.
 ##' @param unconditional logical; should confidence intervals include the
 ##'   uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian
@@ -48,8 +48,12 @@
 ##' @rdname smooth_estimates
 ##' @importFrom dplyr bind_rows all_of
 ##' @importFrom tidyr unnest
-`smooth_estimates.gam` <- function(object, smooth = NULL, n = 100, newdata = NULL,
-                                   unconditional = FALSE, overall_uncertainty = TRUE,
+`smooth_estimates.gam` <- function(object,
+                                   smooth = NULL,
+                                   n = 100,
+                                   data = NULL,
+                                   unconditional = FALSE,
+                                   overall_uncertainty = TRUE,
                                    dist = 0.1, ...) {
     ## if particular smooths selected
     smooth_ids <- if (!is.null(smooth)) {
@@ -67,7 +71,7 @@
         sm_list[[i]] <- eval_smooth(smooths[[i]],
                                     model = object,
                                     n = n,
-                                    data = newdata,
+                                    data = data,
                                     unconditional = unconditional,
                                     overall_uncertainty = overall_uncertainty)
     }
@@ -82,6 +86,11 @@
 
     ## return
     sm_list
+}
+
+##' @export
+`smooth_estimates.gamm` <- function(object, ...) {
+    smooth_estimates(object[["gam"]], ...)
 }
 
 ##' Determine the type of smooth and return it n a human readble form
@@ -151,16 +160,20 @@
         smooth_vars <- vars %in% names(data)
         if (!all(vars %in% names(data))) {
             stop(paste("Variable(s)",
-                       paste(vars[!smooth_vars], collapse = ', '),
-                       "not found in 'data'."))
+                       paste(paste0("'", vars[!smooth_vars], "'"),
+                             collapse = ', '),
+                       "not found in 'data'."),
+                 call. = FALSE)
         }
     } else if (is.numeric(data)) {   # vector; coerce to data frame
         if (length(vars) > 1L) {
-            stop("'smooth' requires multiple data vectors but only 1 provided.")
+            stop("'smooth' requires multiple data vectors but only 1 provided.",
+                 call. = FALSE)
         }
         data <- tibble(!!(vars) := data)
     } else {                            # object we can't handle; bail out
-        stop("'data', if supplied, must be a numeric vector or a data frame.")
+        stop("'data', if supplied, must be a numeric vector or a data frame.",
+             call. = FALSE)
     }
     data
 }
@@ -322,10 +335,10 @@
     data <- if (is.null(data)) {
         smooth_data(model = model, n = n, id = id)
    } else {
-        smooth <- get_smooths_by_id(id)        
+        smooth <- get_smooths_by_id(model, id)[[1L]]
         vars <- smooth_variable(smooth)
         by_var <- by_variable(smooth)
-        if (!is.na(by_var)) {
+        if (!identical(by_var, "NA")) {
             vars <- append(vars, by_var)
         }
         check_user_data(data, vars)
