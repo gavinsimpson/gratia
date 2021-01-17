@@ -117,13 +117,33 @@
       <small>Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="gratia-050" class="section level1">
-<h1 class="page-header" data-toc-text="0.5.0">
-<a href="#gratia-050" class="anchor"></a>gratia 0.5.0<small> 2021-01-10 </small>
+    <div id="gratia-051" class="section level1">
+<h1 class="page-header" data-toc-text="0.5.1">
+<a href="#gratia-051" class="anchor"></a>gratia 0.5.1<small> Unreleased </small>
 </h1>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>New features</h2>
+<ul>
+<li>
+<code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> can handle bivariate and multivariate thinplate regression spline smooths, e.g. <code><a href="https://rdrr.io/pkg/mgcv/man/s.html">s(x, z, a)</a></code>.</li>
+</ul>
+</div>
+<div id="user-visible-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#user-visible-changes" class="anchor"></a>User visible changes</h2>
+<ul>
+<li>The <code>newdata</code> argument to <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> has been changed to <code>data</code> as was originally intended.</li>
+</ul>
+</div>
+</div>
+    <div id="gratia-050" class="section level1">
+<h1 class="page-header" data-toc-text="0.5.0">
+<a href="#gratia-050" class="anchor"></a>gratia 0.5.0<small> 2021-01-10 </small>
+</h1>
+<div id="new-features-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features-1" class="anchor"></a>New features</h2>
 <ul>
 <li>
 <p>Partial residuals for models can be computed with <code><a href="../reference/partial_residuals.html">partial_residuals()</a></code>. The partial residuals are the weighted residuals of the model added to the contribution of each smooth term (as returned by <code><a href="https://rdrr.io/r/stats/predict.html">predict(model, type = "terms")</a></code>.</p>
@@ -146,9 +166,9 @@
 <li><p><code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> is an early version of code to replace (or more likely supersede) <code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code>. <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> can currently only handle 1D smooths of the standard types.</p></li>
 </ul>
 </div>
-<div id="user-visible-changes" class="section level2">
+<div id="user-visible-changes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#user-visible-changes" class="anchor"></a>User visible changes</h2>
+<a href="#user-visible-changes-1" class="anchor"></a>User visible changes</h2>
 <ul>
 <li>
 <p>The meaning of <code>parm</code> in <code>confint.gam</code> has changed. This argument now requires a smooth label to match a smooth. A vector of labels can be provided, but partial matching against a smooth label only works with a single <code>parm</code> value.</p>
@@ -174,9 +194,9 @@
 <h1 class="page-header" data-toc-text="0.4.1">
 <a href="#gratia-041" class="anchor"></a>gratia 0.4.1<small> 2020-05-30 </small>
 </h1>
-<div id="user-visible-changes-1" class="section level2">
+<div id="user-visible-changes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#user-visible-changes-1" class="anchor"></a>User visible changes</h2>
+<a href="#user-visible-changes-2" class="anchor"></a>User visible changes</h2>
 <ul>
 <li>
 <p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> with <code>scales = "fixed"</code> now applies to all terms that can be plotted, including 2d smooths.</p>
@@ -200,9 +220,9 @@
 <h1 class="page-header" data-toc-text="0.4.0">
 <a href="#gratia-040" class="anchor"></a>gratia 0.4.0<small> Unreleased </small>
 </h1>
-<div id="new-features-1" class="section level2">
+<div id="new-features-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-1" class="anchor"></a>New features</h2>
+<a href="#new-features-2" class="anchor"></a>New features</h2>
 <ul>
 <li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> can now include partial residuals when drawing univariate smooths. Use <code>residuals = TRUE</code> to add partial residuals to each univariate smooth that is drawn. This feature is not available for smooths of more than one variable, by smooths, or factor-smooth interactions (<code>bs = "fs"</code>).</p></li>
 <li>
@@ -236,9 +256,9 @@
 </li>
 </ul>
 </div>
-<div id="user-visible-changes-2" class="section level2">
+<div id="user-visible-changes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#user-visible-changes-2" class="anchor"></a>User visible changes</h2>
+<a href="#user-visible-changes-3" class="anchor"></a>User visible changes</h2>
 <ul>
 <li><p><code><a href="../reference/datagen.html">datagen()</a></code> is now an <em>internal</em> function and is no longer exported. Use <code><a href="../reference/data_slice.html">data_slice()</a></code> instead.</p></li>
 <li><p><code><a href="../reference/evaluate_smooth.html">evaluate_parametric_term()</a></code> is now much stricter and can only evaluate main effect terms, i.e. those whose order, as stored in the <code>terms</code> object of the model is <code>1</code>.</p></li>
@@ -258,9 +278,9 @@
 <h1 class="page-header" data-toc-text="0.3.1">
 <a href="#gratia-031" class="anchor"></a>gratia 0.3.1<small> 2020-03-29 </small>
 </h1>
-<div id="new-features-2" class="section level2">
+<div id="new-features-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-2" class="anchor"></a>New features</h2>
+<a href="#new-features-3" class="anchor"></a>New features</h2>
 <ul>
 <li>
 <p>New functions <code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> to access the link function and its inverse from fitted models and family functions.</p>
@@ -282,9 +302,9 @@
 <h1 class="page-header" data-toc-text="0.3.0">
 <a href="#gratia-030" class="anchor"></a>gratia 0.3.0<small> 2020-01-19 </small>
 </h1>
-<div id="new-features-3" class="section level2">
+<div id="new-features-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-3" class="anchor"></a>New features</h2>
+<a href="#new-features-4" class="anchor"></a>New features</h2>
 <ul>
 <li><p><em>gratia</em> now uses the <em>mvnfast</em> package for random draws from a multivariate normal distribution (<code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html">mvnfast::rmvn()</a></code>). Contributed by Henrik Singmann (<a href='https://github.com/singmann'>@singmann</a>) <a href="https://github.com/gavinsimpson/gratia/issues/28"><a href='https://github.com/gavinsimpson/gratia/issues/28'>#28</a></a></p></li>
 <li><p>New function <code><a href="../reference/basis.html">basis()</a></code> for generating tidy representations of basis expansions from an <em>mgcv</em>-like definition of a smooth, e.g. <code><a href="https://rdrr.io/pkg/mgcv/man/s.html">s()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/te.html">te()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/te.html">ti()</a></code>, or <code><a href="https://rdrr.io/pkg/mgcv/man/t2.html">t2()</a></code>. The basic smooth types also have a simple <code><a href="../reference/draw.html">draw()</a></code> method for plotting the basis. <code><a href="../reference/basis.html">basis()</a></code> is a simple wrapper around <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html">mgcv::smoothCon()</a></code> with some post processing of the basis model matrix into a tidy format. <a href="https://github.com/gavinsimpson/gratia/issues/42"><a href='https://github.com/gavinsimpson/gratia/issues/42'>#42</a></a></p></li>
