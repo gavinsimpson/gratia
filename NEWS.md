@@ -5,6 +5,8 @@
 * `smooth_estimates()` can handle bivariate and multivariate thinplate
   regression spline smooths, e.g. `s(x, z, a)`.
 
+* `smooth_estimates()` can also handle random effect smooths.
+
 ## User visible changes
 
 * The `newdata` argument to `smooth_estimates()` has been changed to `data` as
