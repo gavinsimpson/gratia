@@ -15,8 +15,8 @@ seq_min_max(x, n)
 A numeric vector of length \code{n}.
 }
 \description{
-Creates a sequence of \code{n} evenly-spaced values over the range
-\code{min(x)} -- \code{max(x)}.
+For a continuous vector \code{x}, \code{seq_min_max()} creates a
+sequence of \code{n} evenly-spaced values over the range \code{min(x)} --
 }
 \examples{
 \dontshow{set.seed(1)}

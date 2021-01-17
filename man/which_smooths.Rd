@@ -6,7 +6,7 @@
 \alias{which_smooths.gam}
 \alias{which_smooths.bam}
 \alias{which_smooths.gamm}
-\title{Identify a smooth term by it's label}
+\title{Identify a smooth term by its label}
 \usage{
 which_smooths(object, ...)
 
@@ -27,5 +27,5 @@ which_smooths(object, ...)
 required smooths.}
 }
 \description{
-Identify a smooth term by it's label
+Identify a smooth term by its label
 }
