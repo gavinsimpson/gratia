@@ -180,7 +180,8 @@
 ##'
 ##' @param object a fitted GAM model object.
 ##' @param term character; the name of a smooth term to extract.
-##' @param level character; which level of the factor to exrtact the smooth for..
+##' @param level character; which level of the factor to exrtact the smooth
+##'   for.
 ##'
 ##' @return A single smooth object, or a list of smooths if several match the
 ##'   named term.
@@ -223,7 +224,7 @@
     S
 }
 
-##' @title Identify a smooth term by it's label
+##' @title Identify a smooth term by its label
 ##'
 ##' @param object a fitted GAM.
 ##' @param terms character; one or more (partial) term labels with which to identify
@@ -532,8 +533,9 @@
 
 ##' @title Create a sequence of evenly-spaced values
 ##'
-##' @description Creates a sequence of `n` evenly-spaced values over the range
-##'   `min(x)` -- `max(x)`.
+##' @description For a continuous vector `x`, `seq_min_max()` creates a
+##'   sequence of `n` evenly-spaced values over the range `min(x)` -- 
+##"   `max(x)`. For a factor `x`, the function returns `levels(x)`.
 ##'
 ##' @param x numeric; vector over which evenly-spaced values are returned
 ##' @param n numeric; the number of evenly-spaced values to return
@@ -548,8 +550,14 @@
 ##' n <- 10L
 ##' seq_min_max(x, n = n)
 `seq_min_max` <- function(x, n) {
-    seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
-        length.out = n)
+    if (is.factor(x)) {
+        ## must coerce to factor otherwise Predict.matrix will coerce
+        ## and that will end up with levels in the wrong order
+        factor(levels(x), levels = levels(x))
+    } else {
+        seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
+            length.out = n)
+    }
 }
 
 ##' @title Create a sequence of evenly-spaced values adjusted to accommodate a
