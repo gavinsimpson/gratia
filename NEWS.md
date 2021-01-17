@@ -1,3 +1,15 @@
+# gratia 0.5.1
+
+## New features
+
+* `smooth_estimates()` can handle bivariate and multivariate thinplate
+  regression spline smooths, e.g. `s(x, z, a)`.
+
+## User visible changes
+
+* The `newdata` argument to `smooth_estimates()` has been changed to `data` as
+  was originally intended.
+
 # gratia 0.5.0
 
 ## New features
