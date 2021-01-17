@@ -11,7 +11,7 @@ smooth_estimates(object, ...)
   object,
   smooth = NULL,
   n = 100,
-  newdata = NULL,
+  data = NULL,
   unconditional = FALSE,
   overall_uncertainty = TRUE,
   dist = 0.1,
@@ -28,7 +28,7 @@ smooth_estimates(object, ...)
 \item{n}{numeric; the number of points over the range of the covariate at
 which to evaluate the smooth.}
 
-\item{newdata}{a vector or data frame of points at which to evaluate the
+\item{data}{a vector or data frame of points at which to evaluate the
 smooth.}
 
 \item{unconditional}{logical; should confidence intervals include the
