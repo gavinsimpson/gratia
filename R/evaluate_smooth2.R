@@ -179,17 +179,6 @@
     data
 }
 
-##' Returns the type of smoother as far as mgcv is concerned
-##'
-##' @keywords internal
-##' @noRd
-`mgcv_type` <- function(smooth) {
-    stopifnot(is_mgcv_smooth(smooth))
-    cls <- class(smooth)[1L]
-    cls <- sub("\\.smooth$", "", cls)
-    cls
-}
-
 ##' Evaluate estimated spline values
 ##'
 ##' @param smooth currently an object that inherits from class `mgcv.smooth`.
