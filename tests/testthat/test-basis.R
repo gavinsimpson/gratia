@@ -4,7 +4,6 @@
 library("testthat")
 library("gratia")
 library("mgcv")
-library("ggplot2")
 
 context("test-basis")
 
