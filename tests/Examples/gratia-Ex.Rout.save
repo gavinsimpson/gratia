@@ -938,11 +938,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x562bd6355188>
+<environment: 0x5608f87dce68>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x562bd6355188>
+<environment: 0x5608f87dce68>
 > 
 > 
 > 
@@ -1026,6 +1026,61 @@ detaching ‘package:mgcv’
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
+> nameEx("penalty")
+> ### * penalty
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: penalty
+> ### Title: Extract and tidy penalty matrices
+> ### Aliases: penalty penalty.gam penalty.mgcv.smooth penalty.tensor.smooth
+> ###   penalty.t2.smooth
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> dat <- data_sim("eg4", n = 400, seed = 42)
+> m <- gam(y ~ s(x0) + s(x1) + s(x2, by = fac),
++          data = dat, method = "REML")
+> penalty(m)
+# A tibble: 405 x 4
+   sp    r     c         value
+   <chr> <chr> <chr>     <dbl>
+ 1 s(x0) f1    f1     9.81e+ 0
+ 2 s(x0) f1    f2    -1.45e+ 0
+ 3 s(x0) f1    f3    -5.00e+ 0
+ 4 s(x0) f1    f4    -1.34e+ 0
+ 5 s(x0) f1    f5    -6.24e+ 0
+ 6 s(x0) f1    f6     3.90e+ 0
+ 7 s(x0) f1    f7    -7.74e+ 0
+ 8 s(x0) f1    f8    -1.79e+ 0
+ 9 s(x0) f1    f9     1.17e-16
+10 s(x0) f2    f1    -1.45e+ 0
+# … with 395 more rows
+> 
+> # for a specific smooth
+> penalty(m, smooth = "s(x2):fac1")
+# A tibble: 81 x 4
+   sp         r     c         value
+   <chr>      <chr> <chr>     <dbl>
+ 1 s(x2):fac1 f1    f1     9.94e+ 0
+ 2 s(x2):fac1 f1    f2     1.40e+ 0
+ 3 s(x2):fac1 f1    f3     4.79e+ 0
+ 4 s(x2):fac1 f1    f4     1.13e+ 0
+ 5 s(x2):fac1 f1    f5     5.84e+ 0
+ 6 s(x2):fac1 f1    f6    -4.06e+ 0
+ 7 s(x2):fac1 f1    f7     8.60e+ 0
+ 8 s(x2):fac1 f1    f8     1.44e+ 0
+ 9 s(x2):fac1 f1    f9    -8.82e-17
+10 s(x2):fac1 f2    f1     1.40e+ 0
+# … with 71 more rows
 > 
 > 
 > 
@@ -1405,7 +1460,7 @@ detaching ‘package:mgcv’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  11.461 0.146 11.564 0.002 0 
+Time elapsed:  15.875 0.187 16.02 0.001 0.003 
 > grDevices::dev.off()
 null device 
           1 
