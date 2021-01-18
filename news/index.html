@@ -125,8 +125,18 @@
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>New features</h2>
 <ul>
-<li><p><code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> can handle bivariate and multivariate thinplate regression spline smooths, e.g. <code><a href="https://rdrr.io/pkg/mgcv/man/s.html">s(x, z, a)</a></code>.</p></li>
-<li><p><code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> can also handle random effect smooths.</p></li>
+<li>
+<p><code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> can now handle</p>
+<ul>
+<li>bivariate and multivariate thinplate regression spline smooths, e.g.  <code><a href="https://rdrr.io/pkg/mgcv/man/s.html">s(x, z, a)</a></code>,</li>
+<li>tensor product smooths (<code><a href="https://rdrr.io/pkg/mgcv/man/te.html">te()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/t2.html">t2()</a></code>, &amp; <code><a href="https://rdrr.io/pkg/mgcv/man/te.html">ti()</a></code>), e.g. <code><a href="https://rdrr.io/pkg/mgcv/man/te.html">te(x, z, a)</a></code>
+</li>
+<li>factor smooth interactions, e.g. <code><a href="https://rdrr.io/pkg/mgcv/man/s.html">s(x, f, bs = "fs")</a></code>
+</li>
+<li>random effect smooths, e.g. <code><a href="https://rdrr.io/pkg/mgcv/man/s.html">s(f, bs = "re")</a></code>
+</li>
+</ul>
+</li>
 </ul>
 </div>
 <div id="user-visible-changes" class="section level2">
