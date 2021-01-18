@@ -2,10 +2,13 @@
 
 ## New features
 
-* `smooth_estimates()` can handle bivariate and multivariate thinplate
-  regression spline smooths, e.g. `s(x, z, a)`.
+* `smooth_estimates()` can now handle
 
-* `smooth_estimates()` can also handle random effect smooths.
+    * bivariate and multivariate thinplate regression spline smooths, e.g. 
+      `s(x, z, a)`,
+    * tensor product smooths (`te()`, `t2()`, & `ti()`), e.g. `te(x, z, a)`
+    * factor smooth interactions, e.g. `s(x, f, bs = "fs")`
+    * random effect smooths, e.g. `s(f, bs = "re")`
 
 ## User visible changes
 
