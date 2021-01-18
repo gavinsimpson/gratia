@@ -59,6 +59,7 @@ eval_smooth(smooth, ...)
   data = NULL,
   unconditional = FALSE,
   overall_uncertainty = TRUE,
+  dist = 0.1,
   ...
 )
 
@@ -92,6 +93,12 @@ covariance matrix will be used.}
 \item{overall_uncertainty}{logical; should the uncertainty in the model
 constant term be included in the standard error of the evaluate values of
 the smooth?}
+
+\item{dist}{numeric; if greater than 0, this is used to determine when
+a location is too far from data to be plotted when plotting 2-D smooths.
+The data are scaled into the unit square before deciding what to exclude,
+and \code{dist} is a distance within the unit square. See
+\code{\link[mgcv:exclude.too.far]{mgcv::exclude.too.far()}} for further details.}
 }
 \description{
 S3 methods to evaluate individual smooths

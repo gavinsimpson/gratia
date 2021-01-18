@@ -74,7 +74,8 @@
                                     n = n,
                                     data = data,
                                     unconditional = unconditional,
-                                    overall_uncertainty = overall_uncertainty)
+                                    overall_uncertainty = overall_uncertainty,
+                                    dist = dist)
     }
 
     ## create a single df of all the smooths
@@ -414,7 +415,7 @@
 `eval_smooth.t2.smooth` <- function(smooth, model, n = 100, data = NULL,
                                     unconditional = FALSE,
                                     overall_uncertainty = TRUE,
-                                    ...) {
+                                    dist = 0.1, ...) {
     by_var <- by_variable(smooth) # even if not a by as we want NA later
 
     ## deal with data if supplied
@@ -434,6 +435,7 @@
     ## add on spline type info
     sm_type <- smooth_type(smooth)
     eval_sm <- add_column(eval_sm, type = rep(sm_type, nr), .after = 1L)
+
     ## return
     eval_sm
 }
