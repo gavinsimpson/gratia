@@ -10,6 +10,10 @@
     * factor smooth interactions, e.g. `s(x, f, bs = "fs")`
     * random effect smooths, e.g. `s(f, bs = "re")`
 
+* `penalty()` provides a tidy representation of the penalty matrices of
+  smooths. The tidy representation is most suitable for plotting with
+  `ggplot()`.
+
 ## User visible changes
 
 * The `newdata` argument to `smooth_estimates()` has been changed to `data` as
