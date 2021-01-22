@@ -457,3 +457,14 @@ test_that("draw.gam can take user specified scales", {
     expect_doppelganger("draw fs smooth with discrete plasma palette",
                                  plt)
 })
+
+test_that("draw.penalty_df works", {
+    expect_silent(pen <- penalty(m1))
+    plt <- draw(pen)
+    expect_doppelganger("draw penalty_df with multiple smooths",
+                        plt)
+
+    plt <- draw(penalty(m1, "s(x1)"))
+    expect_doppelganger("draw penalty_df with single smooths",
+                        plt)
+})
