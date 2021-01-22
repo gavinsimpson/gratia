@@ -64,8 +64,7 @@
 ##' @examples
 ##' load_mgcv()
 ##'
-##' \dontshow{set.seed(2)}
-##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+##' dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 ##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
 ##' sm <- evaluate_smooth(m1, "s(x2)")
@@ -74,9 +73,8 @@
 ##' ## supply constant to shift y axis scale
 ##' draw(sm, constant = coef(m1)[1])
 ##'
-##' \dontshow{set.seed(2)}
-##' dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
-##' m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
+##' dat <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
+##' m2 <- gam(y ~ s(x, z, k = 40), data = dat, method = "REML")
 ##'
 ##' sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 ##' draw(sm)
@@ -1292,4 +1290,121 @@
                                  caption = NULL) {
     warning("Plotting differences of 4D smooths is not yet implemented")
     return(NULL)
+}
+
+##' Display penalty matrices of smooths using `ggplot`
+##'
+##' Displays the penalty matrices of smooths as a heatmap using `ggplot`
+##'
+##' @param normalize logical; normalize the penalty to the range -1, 1?
+##' @param ncol,nrow numeric; the numbers of rows and columns over which to
+##'   spread the plots
+##' @param xlab character or expression; the label for the x axis. If not
+##'   supplied, no axis label will be drawn. May be a vector, one per penalty.
+##' @param ylab character or expression; the label for the y axis.  If not
+##'   supplied, no axis label will be drawn. May be a vector, one per penalty.
+##' @param title character or expression; the title for the plot. See
+##'   [ggplot2::labs()]. May be a vector, one per penalty.
+##' @param subtitle character or expression; the subtitle for the plot. See
+##'   [ggplot2::labs()]. May be a vector, one per penalty.
+##' @param caption character or expression; the plot caption. See
+##'   [ggplot2::labs()]. May be a vector, one per penalty.
+##' @param guides character; one of `"keep"` (the default), `"collect"`, or
+##'   `"auto"`. Passed to [patchwork::plot_layout()]
+##' 
+##' @inheritParams draw.evaluated_2d_smooth
+##'
+##' @importFrom ggplot2 scale_fill_gradient2
+##' @importFrom patchwork wrap_plots
+##'
+##' @export
+##'
+##' @examples
+##' load_mgcv()
+##' dat <- data_sim("eg4", n = 400, seed = 42)
+##' m <- gam(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'bs', by = fac),
+##'          data = dat, method = "REML")
+##'
+##' ## produce a multi-panel plot of all penalties
+##' draw(penalty(m))
+##'
+##' # for a specific smooth
+##' draw(penalty(m, smooth = "s(x2):fac1"))
+`draw.penalty_df` <- function(object,
+                              normalize = FALSE,
+                              continuous_fill = NULL,
+                              xlab = NULL,
+                              ylab = NULL,
+                              title = NULL,
+                              subtitle = NULL,
+                              caption = NULL,
+                              ncol = NULL, nrow = NULL,
+                              guides = "keep",
+                              ...) {
+    ## if non-specified fill set our default
+    if (is.null(continuous_fill)) {
+        continuous_fill <- scale_fill_gradient2(low = "#2166AC",
+                                                high = "#B2182B",
+                                                mid = "white",
+                                                midpoint = 0)
+    }
+
+    plt_list <- split(object, f = object[["penalty"]])
+    n_plots <- length(plt_list)
+    for (i in seq_along(plt_list)) {
+        plt_list[[i]] <- plot_penalty(plt_list[[i]],
+                                      normalize = normalize,
+                                      continuous_fill = continuous_fill,
+                                      xlab = rep(xlab, n_plots),
+                                      ylab = rep(ylab, n_plots),
+                                      title = rep(title, n_plots),
+                                      subtitle = rep(subtitle, n_plots),
+                                      caption = rep(caption, n_plots))
+    }
+    
+    ## return
+    if (is.null(ncol) && is.null(nrow)) {
+        ncol <- ceiling(sqrt(n_plots))
+        nrow <- ceiling(n_plots / ncol)
+    }
+    wrap_plots(plt_list, byrow = TRUE, ncol = ncol, nrow = nrow, guides = guides,
+               ...)
+}
+
+##' @importFrom ggplot2 ggplot geom_raster
+##' @importFrom dplyr mutate
+##' @importFrom rlang .data
+`plot_penalty` <- function(object,
+                           normalize = FALSE,
+                           continuous_fill = NULL,
+                           xlab = NULL,
+                           ylab = NULL,
+                           title = NULL,
+                           subtitle = NULL,
+                           caption = NULL) {
+
+    ## rescale to -1 -- 1
+    if (as.logical(normalize)) {
+        object <- mutate(object, value = norm_minus_one_to_one(.data$value))
+    }
+
+    ## base plot
+    plt <- ggplot(object,
+                  aes_string(x = "col", y = "row", fill = "value")) +
+        geom_raster()
+
+    ## add the scale
+    plt <- plt + continuous_fill
+
+    ## labelling
+    if (is.null(title)) {
+        title <- unique(object[["penalty"]])
+    }
+    if (is.null(caption)) {
+        caption <- object[["type"]]
+    }
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+                      caption = caption, fill = "Penalty")
+
+    plt
 }
