@@ -116,7 +116,7 @@
         "P spline"
     } else if (inherits(smooth, "cp.smooth")) {
         "Cyclic P spline"
-    } else if (inherits(smooth, "Bspline")) {
+    } else if (inherits(smooth, "Bspline.smooth")) {
         "B spline"
     } else if (inherits(smooth, "duchon.spline")) {
         "Duchon"
@@ -141,7 +141,7 @@
     } else if (inherits(smooth, "tensor.smooth")) {
         "Tensor"
     } else {
-        stop("Uknown type of smooth")
+        stop("Unknown type of smooth")
     }
 
     sm_type
