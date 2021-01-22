@@ -14,6 +14,9 @@
   smooths. The tidy representation is most suitable for plotting with
   `ggplot()`.
 
+  A `draw()` method is provided, which represents the penalty matrix as a
+  heatmap.
+
 ## User visible changes
 
 * The `newdata` argument to `smooth_estimates()` has been changed to `data` as
