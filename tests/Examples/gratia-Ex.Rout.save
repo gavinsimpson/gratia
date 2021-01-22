@@ -584,11 +584,7 @@ detaching ‘package:mgcv’
 > 
 > load_mgcv()
 > 
-> ## Don't show: 
-> set.seed(2)
-> ## End(Don't show)
-> dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
-Gu & Wahba 4 term additive model
+> dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
 > sm <- evaluate_smooth(m1, "s(x2)")
@@ -597,12 +593,8 @@ Gu & Wahba 4 term additive model
 > ## supply constant to shift y axis scale
 > draw(sm, constant = coef(m1)[1])
 > 
-> ## Don't show: 
-> set.seed(2)
-> ## End(Don't show)
-> dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
-Bivariate smoothing example
-> m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
+> dat <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
+> m2 <- gam(y ~ s(x, z, k = 40), data = dat, method = "REML")
 > 
 > sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 > draw(sm)
@@ -682,6 +674,34 @@ detaching ‘package:mgcv’
 > 
 > bf <- basis(s(x2, by = fac, bs = 'bs'), data = df)
 > draw(bf)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
+> nameEx("draw.penalty_df")
+> ### * draw.penalty_df
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: draw.penalty_df
+> ### Title: Display penalty matrices of smooths using 'ggplot'
+> ### Aliases: draw.penalty_df
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> dat <- data_sim("eg4", n = 400, seed = 42)
+> m <- gam(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'bs', by = fac),
++          data = dat, method = "REML")
+> 
+> ## produce a multi-panel plot of all penalties
+> draw(penalty(m))
+> 
+> # for a specific smooth
+> draw(penalty(m, smooth = "s(x2):fac1"))
 > 
 > 
 > 
@@ -938,11 +958,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x5608f87dce68>
+<environment: 0x56217c4d3dc8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x5608f87dce68>
+<environment: 0x56217c4d3dc8>
 > 
 > 
 > 
@@ -1050,36 +1070,36 @@ detaching ‘package:mgcv’
 > m <- gam(y ~ s(x0) + s(x1) + s(x2, by = fac),
 +          data = dat, method = "REML")
 > penalty(m)
-# A tibble: 405 x 4
-   sp    r     c         value
-   <chr> <chr> <chr>     <dbl>
- 1 s(x0) f1    f1     9.81e+ 0
- 2 s(x0) f1    f2    -1.45e+ 0
- 3 s(x0) f1    f3    -5.00e+ 0
- 4 s(x0) f1    f4    -1.34e+ 0
- 5 s(x0) f1    f5    -6.24e+ 0
- 6 s(x0) f1    f6     3.90e+ 0
- 7 s(x0) f1    f7    -7.74e+ 0
- 8 s(x0) f1    f8    -1.79e+ 0
- 9 s(x0) f1    f9     1.17e-16
-10 s(x0) f2    f1    -1.45e+ 0
+# A tibble: 405 x 6
+   smooth type  penalty row   col       value
+   <chr>  <chr> <chr>   <chr> <chr>     <dbl>
+ 1 s(x0)  TPRS  s(x0)   f1    f1     9.81e+ 0
+ 2 s(x0)  TPRS  s(x0)   f1    f2    -1.45e+ 0
+ 3 s(x0)  TPRS  s(x0)   f1    f3    -5.00e+ 0
+ 4 s(x0)  TPRS  s(x0)   f1    f4    -1.34e+ 0
+ 5 s(x0)  TPRS  s(x0)   f1    f5    -6.24e+ 0
+ 6 s(x0)  TPRS  s(x0)   f1    f6     3.90e+ 0
+ 7 s(x0)  TPRS  s(x0)   f1    f7    -7.74e+ 0
+ 8 s(x0)  TPRS  s(x0)   f1    f8    -1.79e+ 0
+ 9 s(x0)  TPRS  s(x0)   f1    f9     1.17e-16
+10 s(x0)  TPRS  s(x0)   f2    f1    -1.45e+ 0
 # … with 395 more rows
 > 
 > # for a specific smooth
 > penalty(m, smooth = "s(x2):fac1")
-# A tibble: 81 x 4
-   sp         r     c         value
-   <chr>      <chr> <chr>     <dbl>
- 1 s(x2):fac1 f1    f1     9.94e+ 0
- 2 s(x2):fac1 f1    f2     1.40e+ 0
- 3 s(x2):fac1 f1    f3     4.79e+ 0
- 4 s(x2):fac1 f1    f4     1.13e+ 0
- 5 s(x2):fac1 f1    f5     5.84e+ 0
- 6 s(x2):fac1 f1    f6    -4.06e+ 0
- 7 s(x2):fac1 f1    f7     8.60e+ 0
- 8 s(x2):fac1 f1    f8     1.44e+ 0
- 9 s(x2):fac1 f1    f9    -8.82e-17
-10 s(x2):fac1 f2    f1     1.40e+ 0
+# A tibble: 81 x 6
+   smooth     type  penalty    row   col       value
+   <chr>      <chr> <chr>      <chr> <chr>     <dbl>
+ 1 s(x2):fac1 TPRS  s(x2):fac1 f1    f1     9.94e+ 0
+ 2 s(x2):fac1 TPRS  s(x2):fac1 f1    f2     1.40e+ 0
+ 3 s(x2):fac1 TPRS  s(x2):fac1 f1    f3     4.79e+ 0
+ 4 s(x2):fac1 TPRS  s(x2):fac1 f1    f4     1.13e+ 0
+ 5 s(x2):fac1 TPRS  s(x2):fac1 f1    f5     5.84e+ 0
+ 6 s(x2):fac1 TPRS  s(x2):fac1 f1    f6    -4.06e+ 0
+ 7 s(x2):fac1 TPRS  s(x2):fac1 f1    f7     8.60e+ 0
+ 8 s(x2):fac1 TPRS  s(x2):fac1 f1    f8     1.44e+ 0
+ 9 s(x2):fac1 TPRS  s(x2):fac1 f1    f9    -8.82e-17
+10 s(x2):fac1 TPRS  s(x2):fac1 f2    f1     1.40e+ 0
 # … with 71 more rows
 > 
 > 
@@ -1460,7 +1480,7 @@ detaching ‘package:mgcv’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  15.875 0.187 16.02 0.001 0.003 
+Time elapsed:  12.074 0.162 12.207 0.003 0 
 > grDevices::dev.off()
 null device 
           1 
