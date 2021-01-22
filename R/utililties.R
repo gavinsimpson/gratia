@@ -1053,3 +1053,13 @@ vars_from_label <- function(label) {
 
     object
 }
+
+## Normalize a vector to range -1 -- 1
+`norm_minus_one_to_one` <- function(x) {
+    abs_x <- abs(x)
+    sign_x <- sign(x)
+    minx <- 0
+    maxx <- max(abs_x, na.rm = TRUE)
+    abs_x <- (abs_x - 0) / (maxx - 0)
+    abs_x * sign_x
+}
