@@ -10,9 +10,9 @@
 \usage{
 penalty(object, ...)
 
-\method{penalty}{gam}(object, smooth = NULL, ...)
+\method{penalty}{gam}(object, smooth = NULL, rescale = FALSE, ...)
 
-\method{penalty}{mgcv.smooth}(object, ...)
+\method{penalty}{mgcv.smooth}(object, rescale = FALSE, ...)
 
 \method{penalty}{tensor.smooth}(object, margins = FALSE, ...)
 
@@ -25,6 +25,10 @@ penalty(object, ...)
 
 \item{smooth}{character; vector of smooths to extract penalty matrices for.
 If \code{NULL}, penalty matrices for all smooths in \code{object} are extracted.}
+
+\item{rescale}{logical; by default, \emph{mgcv} will scale the penalty matrix for
+better performance in \code{\link[mgcv:gamm]{mgcv::gamm()}}. If \code{rescale} is \code{TRUE}, this scaling
+will be undone to put the penalty matrix back on the original scale.}
 
 \item{margins}{logical; extract the penalty matrices for the tensor
 product or the margainl smooths of the tensor product?}

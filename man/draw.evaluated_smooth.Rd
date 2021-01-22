@@ -167,8 +167,7 @@ Plots estimated univariate and bivariate smooths using ggplot2.
 \examples{
 load_mgcv()
 
-\dontshow{set.seed(2)}
-dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 sm <- evaluate_smooth(m1, "s(x2)")
@@ -177,9 +176,8 @@ draw(sm)
 ## supply constant to shift y axis scale
 draw(sm, constant = coef(m1)[1])
 
-\dontshow{set.seed(2)}
-dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
-m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
+dat <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
+m2 <- gam(y ~ s(x, z, k = 40), data = dat, method = "REML")
 
 sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 draw(sm)
