@@ -37,7 +37,7 @@ product or the marginal smooths of the tensor product?}
 A 'tibble' (data frame) of class \code{penalty_df} inheriting from
 \code{tbl_df}, with the following components:
 \itemize{
-\item \code{smooth} - character; the label \emph{mgcv} uses to refer to to the smooth,
+\item \code{smooth} - character; the label \emph{mgcv} uses to refer to the smooth,
 \item \code{type} - character; the type of smooth,
 \item \code{penalty} - character; the label for the specific penalty. Some smooths
 have multiple penalty matrices, so the \code{penalty} component identifies the
