@@ -139,13 +139,11 @@ dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
 m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
 draw(m2, contour = FALSE)
 
-## change the number of contours drawn
-draw(m2, n_contour = 5)
-
-## change the fill scale used for the surface
-draw(m2,
-    continuous_fill = ggplot2::scale_fill_distiller(palette = "Spectral",
-                                                    type = "div"))
+## change the number of contours drawn and the fill scale used for
+## the surface
+draw(m2, n_contour = 5,
+     continuous_fill = ggplot2::scale_fill_distiller(palette = "Spectral",
+                                                     type = "div"))
 }
 \author{
 Gavin L. Simpson
