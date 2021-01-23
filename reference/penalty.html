@@ -162,9 +162,26 @@ will be undone to put the penalty matrix back on the original scale.</p></td>
     <tr>
       <th>margins</th>
       <td><p>logical; extract the penalty matrices for the tensor
-product or the margainl smooths of the tensor product?</p></td>
+product or the marginal smooths of the tensor product?</p></td>
     </tr>
     </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A 'tibble' (data frame) of class <code>penalty_df</code> inheriting from
+<code>tbl_df</code>, with the following components:</p><ul>
+<li><p><code>smooth</code> - character; the label <em>mgcv</em> uses to refer to to the smooth,</p></li>
+<li><p><code>type</code> - character; the type of smooth,</p></li>
+<li><p><code>penalty</code> - character; the label for the specific penalty. Some smooths
+have multiple penalty matrices, so the <code>penalty</code> component identifies the
+particular penalty matrix and uses the labelling that <em>mgcv</em> uses internally,</p></li>
+<li><p><code>row</code> - character; a label of the form <code>fn</code> where <code>n</code> is an integer for
+the <code>n</code>th basis function, referencing the columns of the penalty matrix,</p></li>
+<li><p><code>col</code> - character; a label of the form <code>fn</code> where <code>n</code> is an integer for
+the <code>n</code>th basis function, referencing the columns of the penalty matrix,</p></li>
+<li><p><code>value</code> - double; the value of the penalty matrix for the combination of
+<code>row</code> and <code>col</code>,</p></li>
+</ul>
 
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
