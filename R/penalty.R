@@ -28,6 +28,9 @@
 ##' @export
 ##'
 ##' @examples
+##' \dontshow{
+##' op <- options(cli.unicode = FALSE, digits = 5)
+##' }
 ##' load_mgcv()
 ##' dat <- data_sim("eg4", n = 400, seed = 42)
 ##' m <- gam(y ~ s(x0) + s(x1) + s(x2, by = fac),
@@ -36,6 +39,7 @@
 ##'
 ##' # for a specific smooth
 ##' penalty(m, smooth = "s(x2):fac1")
+##' \dontshow{options(op)}
 `penalty` <- function(object, ...) {
     UseMethod("penalty")
 }

@@ -54,6 +54,9 @@ the \code{n}th basis function, referencing the columns of the penalty matrix,
 Extract and tidy penalty matrices
 }
 \examples{
+\dontshow{
+op <- options(cli.unicode = FALSE, digits = 5)
+}
 load_mgcv()
 dat <- data_sim("eg4", n = 400, seed = 42)
 m <- gam(y ~ s(x0) + s(x1) + s(x2, by = fac),
@@ -62,6 +65,7 @@ penalty(m)
 
 # for a specific smooth
 penalty(m, smooth = "s(x2):fac1")
+\dontshow{options(op)}
 }
 \author{
 Gavin L. Simpson

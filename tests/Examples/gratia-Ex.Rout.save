@@ -958,11 +958,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x56217c4d3dc8>
+<environment: 0x5617b61424b8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x56217c4d3dc8>
+<environment: 0x5617b61424b8>
 > 
 > 
 > 
@@ -1065,6 +1065,9 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
+> ## Don't show: 
+> op <- options(cli.unicode = FALSE, digits = 5)
+> ## End(Don't show)
 > load_mgcv()
 > dat <- data_sim("eg4", n = 400, seed = 42)
 > m <- gam(y ~ s(x0) + s(x1) + s(x2, by = fac),
@@ -1083,7 +1086,7 @@ detaching ‘package:mgcv’
  8 s(x0)  TPRS  s(x0)   f1    f8    -1.79e+ 0
  9 s(x0)  TPRS  s(x0)   f1    f9     1.17e-16
 10 s(x0)  TPRS  s(x0)   f2    f1    -1.45e+ 0
-# … with 395 more rows
+# ... with 395 more rows
 > 
 > # for a specific smooth
 > penalty(m, smooth = "s(x2):fac1")
@@ -1100,7 +1103,10 @@ detaching ‘package:mgcv’
  8 s(x2):fac1 TPRS  s(x2):fac1 f1    f8     1.44e+ 0
  9 s(x2):fac1 TPRS  s(x2):fac1 f1    f9    -8.82e-17
 10 s(x2):fac1 TPRS  s(x2):fac1 f2    f1     1.40e+ 0
-# … with 71 more rows
+# ... with 71 more rows
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > 
 > 
 > 
@@ -1480,7 +1486,7 @@ detaching ‘package:mgcv’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  12.074 0.162 12.207 0.003 0 
+Time elapsed:  11.962 0.148 12.096 0 0.003 
 > grDevices::dev.off()
 null device 
           1 
