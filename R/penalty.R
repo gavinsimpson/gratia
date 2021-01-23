@@ -7,9 +7,23 @@
 ##'   better performance in [mgcv::gamm()]. If `rescale` is `TRUE`, this scaling
 ##'   will be undone to put the penalty matrix back on the original scale.
 ##' @param margins logical; extract the penalty matrices for the tensor
-##'   product or the margainl smooths of the tensor product?
+##'   product or the marginal smooths of the tensor product?
 ##' @param ... additional arguments passed to methods.
 ##'
+##' @return A 'tibble' (data frame) of class `penalty_df` inheriting from
+##'   `tbl_df`, with the following components:
+##' * `smooth` - character; the label *mgcv* uses to refer to the smooth,
+##' * `type` - character; the type of smooth,
+##' * `penalty` - character; the label for the specific penalty. Some smooths
+##'   have multiple penalty matrices, so the `penalty` component identifies the
+##'   particular penalty matrix and uses the labelling that *mgcv* uses internally,
+##' * `row` - character; a label of the form `fn` where `n` is an integer for
+##'   the `n`th basis function, referencing the columns of the penalty matrix,
+##' * `col` - character; a label of the form `fn` where `n` is an integer for
+##'   the `n`th basis function, referencing the columns of the penalty matrix,
+##' * `value` - double; the value of the penalty matrix for the combination of
+##'   `row` and `col`,
+##' 
 ##' @author Gavin L. Simpson
 ##' @export
 ##'
@@ -42,7 +56,11 @@
     ## loop over the smooths applying penalty to each
     pen <- lapply(smooths, penalty, rescale = rescale)
     pen <- bind_rows(pen)
-    class(pen) <- c("tidy_penalty", class(pen))
+    ## ensure class is right
+    ## don't think I need this; bind_rows does it, but documented?
+    if (!inherits(pen, "penalty_df")) {
+        class(pen) <- c("penalty_df", class(pen))
+    }
     pen
 }
 

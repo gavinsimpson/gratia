@@ -31,7 +31,24 @@ better performance in \code{\link[mgcv:gamm]{mgcv::gamm()}}. If \code{rescale} i
 will be undone to put the penalty matrix back on the original scale.}
 
 \item{margins}{logical; extract the penalty matrices for the tensor
-product or the margainl smooths of the tensor product?}
+product or the marginal smooths of the tensor product?}
+}
+\value{
+A 'tibble' (data frame) of class \code{penalty_df} inheriting from
+\code{tbl_df}, with the following components:
+\itemize{
+\item \code{smooth} - character; the label \emph{mgcv} uses to refer to to the smooth,
+\item \code{type} - character; the type of smooth,
+\item \code{penalty} - character; the label for the specific penalty. Some smooths
+have multiple penalty matrices, so the \code{penalty} component identifies the
+particular penalty matrix and uses the labelling that \emph{mgcv} uses internally,
+\item \code{row} - character; a label of the form \code{fn} where \code{n} is an integer for
+the \code{n}th basis function, referencing the columns of the penalty matrix,
+\item \code{col} - character; a label of the form \code{fn} where \code{n} is an integer for
+the \code{n}th basis function, referencing the columns of the penalty matrix,
+\item \code{value} - double; the value of the penalty matrix for the combination of
+\code{row} and \code{col},
+}
 }
 \description{
 Extract and tidy penalty matrices
