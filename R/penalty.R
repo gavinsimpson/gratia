@@ -23,6 +23,10 @@
 ##'   the `n`th basis function, referencing the columns of the penalty matrix,
 ##' * `value` - double; the value of the penalty matrix for the combination of
 ##'   `row` and `col`,
+##'
+##' @note The `print()` method uses [base::zapsmall()] to turn very small numbers
+##'   into 0s for display purposes only; the underlying values of the penalty
+##'   matrix or matrices are not changed.
 ##' 
 ##' @author Gavin L. Simpson
 ##' @export
@@ -132,4 +136,11 @@
                     type    = rep(type, ns),
                     penalty = rep(label, ns), .before = 1L)
     s
+}
+
+##' @export
+##' @importFrom rlang .data
+`print.penalty_df` <- function(x, ...) {
+    x <- mutate(x, value = zapsmall(.data$value))
+    NextMethod()
 }

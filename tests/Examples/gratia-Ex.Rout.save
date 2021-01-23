@@ -958,11 +958,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x5617b61424b8>
+<environment: 0x55981f09f640>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x5617b61424b8>
+<environment: 0x55981f09f640>
 > 
 > 
 > 
@@ -1074,35 +1074,35 @@ detaching ‘package:mgcv’
 +          data = dat, method = "REML")
 > penalty(m)
 # A tibble: 405 x 6
-   smooth type  penalty row   col       value
-   <chr>  <chr> <chr>   <chr> <chr>     <dbl>
- 1 s(x0)  TPRS  s(x0)   f1    f1     9.81e+ 0
- 2 s(x0)  TPRS  s(x0)   f1    f2    -1.45e+ 0
- 3 s(x0)  TPRS  s(x0)   f1    f3    -5.00e+ 0
- 4 s(x0)  TPRS  s(x0)   f1    f4    -1.34e+ 0
- 5 s(x0)  TPRS  s(x0)   f1    f5    -6.24e+ 0
- 6 s(x0)  TPRS  s(x0)   f1    f6     3.90e+ 0
- 7 s(x0)  TPRS  s(x0)   f1    f7    -7.74e+ 0
- 8 s(x0)  TPRS  s(x0)   f1    f8    -1.79e+ 0
- 9 s(x0)  TPRS  s(x0)   f1    f9     1.17e-16
-10 s(x0)  TPRS  s(x0)   f2    f1    -1.45e+ 0
+   smooth type  penalty row   col   value
+   <chr>  <chr> <chr>   <chr> <chr> <dbl>
+ 1 s(x0)  TPRS  s(x0)   f1    f1     9.81
+ 2 s(x0)  TPRS  s(x0)   f1    f2    -1.45
+ 3 s(x0)  TPRS  s(x0)   f1    f3    -5   
+ 4 s(x0)  TPRS  s(x0)   f1    f4    -1.34
+ 5 s(x0)  TPRS  s(x0)   f1    f5    -6.24
+ 6 s(x0)  TPRS  s(x0)   f1    f6     3.90
+ 7 s(x0)  TPRS  s(x0)   f1    f7    -7.74
+ 8 s(x0)  TPRS  s(x0)   f1    f8    -1.79
+ 9 s(x0)  TPRS  s(x0)   f1    f9     0   
+10 s(x0)  TPRS  s(x0)   f2    f1    -1.45
 # ... with 395 more rows
 > 
 > # for a specific smooth
 > penalty(m, smooth = "s(x2):fac1")
 # A tibble: 81 x 6
-   smooth     type  penalty    row   col       value
-   <chr>      <chr> <chr>      <chr> <chr>     <dbl>
- 1 s(x2):fac1 TPRS  s(x2):fac1 f1    f1     9.94e+ 0
- 2 s(x2):fac1 TPRS  s(x2):fac1 f1    f2     1.40e+ 0
- 3 s(x2):fac1 TPRS  s(x2):fac1 f1    f3     4.79e+ 0
- 4 s(x2):fac1 TPRS  s(x2):fac1 f1    f4     1.13e+ 0
- 5 s(x2):fac1 TPRS  s(x2):fac1 f1    f5     5.84e+ 0
- 6 s(x2):fac1 TPRS  s(x2):fac1 f1    f6    -4.06e+ 0
- 7 s(x2):fac1 TPRS  s(x2):fac1 f1    f7     8.60e+ 0
- 8 s(x2):fac1 TPRS  s(x2):fac1 f1    f8     1.44e+ 0
- 9 s(x2):fac1 TPRS  s(x2):fac1 f1    f9    -8.82e-17
-10 s(x2):fac1 TPRS  s(x2):fac1 f2    f1     1.40e+ 0
+   smooth     type  penalty    row   col   value
+   <chr>      <chr> <chr>      <chr> <chr> <dbl>
+ 1 s(x2):fac1 TPRS  s(x2):fac1 f1    f1     9.94
+ 2 s(x2):fac1 TPRS  s(x2):fac1 f1    f2     1.40
+ 3 s(x2):fac1 TPRS  s(x2):fac1 f1    f3     4.78
+ 4 s(x2):fac1 TPRS  s(x2):fac1 f1    f4     1.13
+ 5 s(x2):fac1 TPRS  s(x2):fac1 f1    f5     5.84
+ 6 s(x2):fac1 TPRS  s(x2):fac1 f1    f6    -4.06
+ 7 s(x2):fac1 TPRS  s(x2):fac1 f1    f7     8.60
+ 8 s(x2):fac1 TPRS  s(x2):fac1 f1    f8     1.44
+ 9 s(x2):fac1 TPRS  s(x2):fac1 f1    f9     0   
+10 s(x2):fac1 TPRS  s(x2):fac1 f2    f1     1.40
 # ... with 71 more rows
 > ## Don't show: 
 > options(op)
@@ -1486,7 +1486,7 @@ detaching ‘package:mgcv’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  11.962 0.148 12.096 0 0.003 
+Time elapsed:  11.677 0.138 11.819 0.001 0.002 
 > grDevices::dev.off()
 null device 
           1 

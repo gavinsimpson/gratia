@@ -53,6 +53,11 @@ the \code{n}th basis function, referencing the columns of the penalty matrix,
 \description{
 Extract and tidy penalty matrices
 }
+\note{
+The \code{print()} method uses \code{\link[base:zapsmall]{base::zapsmall()}} to turn very small numbers
+into 0s for display purposes only; the underlying values of the penalty
+matrix or matrices are not changed.
+}
 \examples{
 \dontshow{
 op <- options(cli.unicode = FALSE, digits = 5)
