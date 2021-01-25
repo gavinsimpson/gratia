@@ -109,7 +109,7 @@ spread the plots}
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
 \value{
-The object returned is created by \code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}.
+The object returned is created by \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.
 }
 \description{
 Plots estimated smooths from a fitted GAM model in a similar way to
@@ -118,7 +118,7 @@ is used instead.
 }
 \note{
 Internally, plots of each smooth are created using \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}
-and composed into a single plot using \code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}. As a result,
+and composed into a single plot using \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}. As a result,
 it is not possible to use \code{+} to add to the plots in the way one might
 typically work with \code{ggplot()} plots.
 }

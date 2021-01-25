@@ -32,8 +32,7 @@ appraise(model, ...)
 \arguments{
 \item{model}{a fitted model. Currently only class \code{"gam"}.}
 
-\item{...}{arguments passed to \code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}, except for \code{align}
-and \code{axis}, which are set internally.}
+\item{...}{arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 
 \item{method}{character; method used to generate theoretical quantiles.}
 

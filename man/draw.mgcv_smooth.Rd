@@ -25,7 +25,7 @@
 \item{use_facets}{logical; for factor by smooths, use facets to show the
 basis functions for each level of the factor? If \code{FALSE}, a separate ggplot
 object will be created for each level and combined using
-\code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}. \strong{Currently ignored}.}
+\code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}. \strong{Currently ignored}.}
 
 \item{labeller}{a labeller function with which to label facets. The default
 is to use \code{\link[ggplot2:labellers]{ggplot2::label_both()}}.}

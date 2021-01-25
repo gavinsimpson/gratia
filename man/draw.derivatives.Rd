@@ -56,7 +56,7 @@ dat <- data_sim("eg1", n = 800, dist = "normal", scale = 2, seed = 42)
 mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 ## first derivative of all smooths
-df <- derivatives(mod)
+df <- derivatives(mod, type = "central")
 draw(df)
 ## fixed axis scales
 draw(df, scales = "fixed")

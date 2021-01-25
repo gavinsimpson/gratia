@@ -76,7 +76,7 @@ spread the plots}
 \item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
 \code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
 
-\item{...}{arguments to be passed to \code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}.}
+\item{...}{arguments to be passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
 \description{
 Plot posterior smooths
