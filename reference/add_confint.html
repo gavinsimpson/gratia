@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Add a constant to estimated values — add_constant • gratia</title>
+<title>Add a confidence interval to an existing object — add_confint • gratia</title>
 
 
 <!-- jquery -->
@@ -41,8 +41,8 @@
   <link href="../extra.css" rel="stylesheet">
   
 
-<meta property="og:title" content="Add a constant to estimated values — add_constant" />
-<meta property="og:description" content="Add a constant to estimated values" />
+<meta property="og:title" content="Add a confidence interval to an existing object — add_confint" />
+<meta property="og:description" content="Add a confidence interval to an existing object" />
 <meta property="og:image" content="https://gavinsimpson.github.io/gratia/reference/figures/README-draw-gam-figure-1.png" />
 <meta property="og:image:alt" content="Plot produced by draw() of 4 smooth functions from a fitted generalized additive model" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -114,50 +114,38 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Add a constant to estimated values</h1>
+    <h1>Add a confidence interval to an existing object</h1>
     <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/add-methods.R'><code>R/add-methods.R</code></a></small>
-    <div class="hidden name"><code>add_constant.Rd</code></div>
+    <div class="hidden name"><code>add_confint.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Add a constant to estimated values</p>
+    <p>Add a confidence interval to an existing object</p>
     </div>
 
-    <pre class="usage"><span class='fu'>add_constant</span><span class='op'>(</span><span class='va'>object</span>, constant <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>add_confint</span><span class='op'>(</span><span class='va'>object</span>, coverage <span class='op'>=</span> <span class='fl'>0.95</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='co'># S3 method for evaluated_smooth</span>
-<span class='fu'>add_constant</span><span class='op'>(</span><span class='va'>object</span>, constant <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for mgcv_smooth</span>
-<span class='fu'>add_constant</span><span class='op'>(</span><span class='va'>object</span>, constant <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for evaluated_parametric_term</span>
-<span class='fu'>add_constant</span><span class='op'>(</span><span class='va'>object</span>, constant <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='co'># S3 method for smooth_estimates</span>
+<span class='fu'>add_confint</span><span class='op'>(</span><span class='va'>object</span>, coverage <span class='op'>=</span> <span class='fl'>0.95</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>object</th>
-      <td><p>a object to add a constant to.</p></td>
+      <td><p>a R object.</p></td>
     </tr>
     <tr>
-      <th>constant</th>
-      <td><p>the constant to add.</p></td>
+      <th>coverage</th>
+      <td><p>numeric; the coverage for the interval. Must be in the range
+0 &lt; <code>coverage</code> &lt; 1.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>additional arguments passed to methods.</p></td>
+      <td><p>arguments passed to other methods.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>Returns <code>object</code> but with the estimate shifted by the addition of
-the supplied constant.</p>
-    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
-
-    <p>Gavin L. Simpson</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
