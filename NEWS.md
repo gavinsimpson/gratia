@@ -1,3 +1,24 @@
+# gratia 0.5.1.9000
+
+## Major changes
+
+* The {cowplot} package has been replaced by the {patchwork} package for
+  producing multi-panel figures in `draw()` and `appraise()`. This shouldn't
+  affect any code that used {gratia} only, but if you passed additional
+  arguments to `cowplot::plot_grid()` or used the `align` or `axis` arguments of
+  `draw()` and `appraise()`, you'll need to adapt code accordingly.
+  
+  Typically, you can simply delete the `align` or `axis` arguments and
+  {patchwork} will just work and align plots nicely. Any arguments passed via
+  `...` to `cowplot::plot_grid()` will just be ignored by
+  `patchwork::wrap_plots()` unless those passed arguments match any of the
+  arguments of `patchwork::wrap_plots()`.
+
+## New features
+
+* The {patchwork} package is now used for multi-panel figures. As such, {gratia}
+  no longer Imports from the {cowplot} package.
+
 # gratia 0.5.1
 
 ## New features
