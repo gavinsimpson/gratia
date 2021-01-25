@@ -217,3 +217,89 @@
 
     data
 }
+
+##' Add a constant to estimated values
+##'
+##' @param object a object to add a constant to.
+##' @param constant the constant to add.
+##' @param ... additional arguments passed to methods.
+##'
+##' @return Returns `object` but with the estimate shifted by the addition of
+##'   the supplied constant.
+##'
+##' @author Gavin L. Simpson
+`add_constant` <- function(object, constant = NULL, ...) {
+    UseMethod("add_constant")
+}
+
+##' @rdname add_constant
+`add_constant.evaluated_smooth` <- function(object, constant = NULL, ...) {
+    ## If constant supplied, add it to `est`
+    if (!is.null(constant)) {
+        if (!is.numeric(constant)) {
+            stop("'constant' must be numeric, but was supplied <", constant, ">",
+                 call. = FALSE)
+        }
+        object[["est"]] <- object[["est"]] + constant
+    }
+
+    object
+}
+
+##' @rdname add_constant
+`add_constant.mgcv_smooth` <- function(object, constant = NULL, ...) {
+    ## If constant supplied, add it to `est`
+    if (!is.null(constant)) {
+        if (!is.numeric(constant)) {
+            stop("'constant' must be numeric, but was supplied <", constant, ">",
+                 call. = FALSE)
+        }
+        object[["est"]] <- object[["est"]] + constant
+    }
+
+    object
+}
+
+##' @rdname add_constant
+`add_constant.evaluated_parametric_term` <- function(object, constant = NULL, ...) {
+    ## If constant supplied, add it to `est`
+    if (!is.null(constant)) {
+        if (!is.numeric(constant)) {
+            stop("'constant' must be numeric, but was supplied <", constant, ">",
+                 call. = FALSE)
+        }
+        object[["est"]] <- object[["est"]] + constant
+    }
+
+    object
+}
+
+
+##' Add a confidence interval to an existing object
+##'
+##' @param object a R object.
+##' @param coverage numeric; the coverage for the interval. Must be in the range
+##'   0 < `coverage` < 1.
+##' @param ... arguments passed to other methods.
+##'
+##' @export
+`add_confint` <- function(object, coverage = 0.95, ...) {
+    UseMethod("add_confint")
+}
+
+##' @rdname add_confint
+##' @importFrom rlang .data
+##'
+##' @export
+`add_confint.smooth_estimates` <- function(object, coverage = 0.95, ...) {
+    ## compute the critical value
+    crit <- coverage_normal(coverage)
+
+    ## add the frequentist confidence interval
+    object <- mutate(object,
+                     lower_ci = .data[["est"]] + (crit * .data[["se"]]),
+                     upper_ci = .data[["est"]] - (crit * .data[["se"]]))
+
+    ## return
+    object
+}
