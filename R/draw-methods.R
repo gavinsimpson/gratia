@@ -1405,6 +1405,12 @@
                            subtitle = NULL,
                            caption = NULL) {
 
+    ## fix ordering of levels so the heatmap matches a matrix
+    ## Don't reverse the cols!!
+    object <- mutate(object,
+                     row = factor(.data$row, levels = rev(sort(unique(.data$row)))),
+                     col = factor(.data$col, levels = sort(unique(.data$col))))
+    
     ## rescale to -1 -- 1
     if (as.logical(normalize)) {
         object <- mutate(object, value = norm_minus_one_to_one(.data$value))
