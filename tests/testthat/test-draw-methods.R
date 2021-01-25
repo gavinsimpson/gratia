@@ -15,13 +15,11 @@ context("draw-methods")
 }
 
 ## Fit models
-set.seed(1)
-dat1 <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+dat1 <- data_sim("eg1", n = 800, dist = "normal", scale = 2, seed = 1)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "REML")
 
-set.seed(1)
-dat2 <- gamSim(2, n = 4000, dist = "normal", scale = 1, verbose = FALSE)
-m2 <- gam(y ~ s(x, z, k = 40), data = dat2$data, method = "REML")
+dat2 <- data_sim("eg2", n = 5000, dist = "normal", scale = 1, seed = 1)
+m2 <- gam(y ~ s(x, z, k = 40), data = dat2, method = "REML")
 
 set.seed(1)
 dat3 <- gamSim(4, verbose = FALSE)
@@ -341,12 +339,12 @@ test_that("component-wise CIs work without seWithMean", {
 })
 
 test_that("draw.derivates() plots derivatives for a GAM", {
-    d1 <- derivatives(m1)
+    d1 <- derivatives(m1, type = "central")
     plt <- draw(d1)
     expect_doppelganger("draw derivatives for a GAM", plt)
 
     plt <- draw(d1, scales = "fixed")
-    skip_on_ci()
+    ## skip_on_ci()
     expect_doppelganger("draw derivatives for a GAM with fixed scales", plt)
 })
 
