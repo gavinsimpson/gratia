@@ -52,11 +52,12 @@ Plot derivatives of smooths
 \examples{
 
 load_mgcv()
-\dontshow{set.seed(42)}
-dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+dat <- data_sim("eg1", n = 800, dist = "normal", scale = 2, seed = 42)
 mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 ## first derivative of all smooths
 df <- derivatives(mod)
 draw(df)
+## fixed axis scales
+draw(df, scales = "fixed")
 }
