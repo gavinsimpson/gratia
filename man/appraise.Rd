@@ -15,7 +15,9 @@ appraise(model, ...)
   n_simulate = 50,
   type = c("deviance", "pearson", "response"),
   n_bins = c("sturges", "scott", "fd"),
-  ncol = 2,
+  ncol = NULL,
+  nrow = NULL,
+  guides = "keep",
   level = 0.9,
   ci_col = "black",
   ci_alpha = 0.2,
@@ -48,8 +50,11 @@ plots.}
 \item{n_bins}{character or numeric; either the number of bins or a string
 indicating how to calculate the number of bins.}
 
-\item{ncol}{numeric; number of columns to draw plots in. See
-\code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}.}
+\item{ncol, nrow}{numeric; the numbers of rows and columns over which to
+spread the plots.}
+
+\item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
+\code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
 
 \item{level}{numeric; the coverage level for QQ plot reference intervals.
 Must be strictly \verb{0 < level < 1}. Only used with \code{method = "simulate"}.}

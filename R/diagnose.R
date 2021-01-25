@@ -544,8 +544,10 @@
 ##'   `"response"`, and `"pearson"` residuals are allowed.
 ##' @param n_bins character or numeric; either the number of bins or a string
 ##'   indicating how to calculate the number of bins.
-##' @param ncol numeric; number of columns to draw plots in. See
-##'   [cowplot::plot_grid()].
+##' @param ncol,nrow numeric; the numbers of rows and columns over which to
+##'   spread the plots.
+##' @param guides character; one of `"keep"` (the default), `"collect"`, or
+##'   `"auto"`. Passed to [patchwork::plot_layout()]
 ##' @param level numeric; the coverage level for QQ plot reference intervals.
 ##'   Must be strictly `0 < level < 1`. Only used with `method = "simulate"`.
 ##' @param ci_alpha,ci_col numeric; the level of alpha transparency for the
@@ -560,7 +562,7 @@
 ##' @param ... arguments passed to [cowplot::plot_grid()], except for `align`
 ##'   and `axis`, which are set internally.
 ##'
-##' @importFrom cowplot plot_grid
+##' @importFrom patchwork wrap_plots
 ##'
 ##' @seealso The plots are produced by functions [gratia::qq_plot()],
 ##'   [gratia::residuals_linpred_plot()], [gratia::residuals_hist_plot()],
@@ -587,7 +589,9 @@
                        n_uniform = 10, n_simulate = 50,
                        type = c("deviance", "pearson", "response"),
                        n_bins = c("sturges", "scott", "fd"),
-                       ncol = 2, level = 0.9,
+                       ncol = NULL, nrow = NULL,
+                       guides = "keep",
+                       level = 0.9,
                        ci_col = "black", ci_alpha = 0.2,
                        point_col = "black", point_alpha = 1,
                        line_col = "red",
@@ -615,9 +619,15 @@
                                 subtitle = NULL)
     plt4 <- observed_fitted_plot(model, subtitle = NULL, point_col = point_col,
                                  point_alpha = point_alpha)
-
-    plot_grid(plt1, plt2, plt3, plt4, ncol = ncol, align = "hv",
-              axis = "lrtb", ...)
+    ## return
+    n_plots <- 4
+    if (is.null(ncol) && is.null(nrow)) {
+        ncol <- ceiling(sqrt(n_plots))
+        nrow <- ceiling(n_plots / ncol)
+    }
+    wrap_plots(plt1, plt2, plt3, plt4,
+               byrow = TRUE, ncol = ncol, nrow = nrow, guides = guides,
+               ...)
 }
 
 ##' @rdname appraise
