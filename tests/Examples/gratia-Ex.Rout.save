@@ -525,15 +525,14 @@ detaching ‘package:mgcv’
 > 
 > 
 > load_mgcv()
-> ## Don't show: 
-> set.seed(42)
-> ## End(Don't show)
-> dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+> dat <- data_sim("eg1", n = 800, dist = "normal", scale = 2, seed = 42)
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
 > ## first derivative of all smooths
-> df <- derivatives(mod)
+> df <- derivatives(mod, type = "central")
 > draw(df)
+> ## fixed axis scales
+> draw(df, scales = "fixed")
 > 
 > 
 > 
@@ -956,11 +955,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x56321bc18a08>
+<environment: 0x55cc24491b40>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x56321bc18a08>
+<environment: 0x55cc24491b40>
 > 
 > 
 > 
@@ -1484,7 +1483,7 @@ detaching ‘package:mgcv’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  11.46 0.127 11.561 0.001 0.002 
+Time elapsed:  16.253 0.155 13.955 0.001 0.002 
 > grDevices::dev.off()
 null device 
           1 
