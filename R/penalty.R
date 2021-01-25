@@ -123,11 +123,16 @@
 ##' @importFrom tibble add_column as_tibble
 ##' @importFrom tidyr pivot_longer
 ##' @importFrom dplyr starts_with
+##' @importFrom rlang set_names
 `tidy_penalty` <- function(s, smooth, type, label) {
-    rownames(s) <- paste0("f", seq_len(nrow(s)))
-    colnames(s) <- paste0("f", seq_len(ncol(s)))
-    s <- as_tibble(s)
-    s <- add_column(s, row = paste0("f", seq_len(nrow(s))), .before = 1L)
+    ## rownames(s) <- paste0("f", seq_len(nrow(s)))
+    ## colnames(s) <- paste0("f", seq_len(ncol(s)))
+    nc <- ncol(s)
+    new_names <- formatC(seq_len(nc), width = nchar(nc), flag = "0")
+    new_names <- paste0("F", new_names)
+    s <- as_tibble(s, .name_repair = "minimal")
+    s <- set_names(s, new_names)
+    s <- add_column(s, row = new_names, .before = 1L)
     s <- pivot_longer(s, cols = starts_with("f"), names_to = "col",
                       values_to = "value")
     ns <- nrow(s)
