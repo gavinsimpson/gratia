@@ -313,11 +313,11 @@
 ##' @inheritParams evaluate_smooth
 ##'
 ##' @note Internally, plots of each smooth are created using [ggplot2::ggplot()]
-##'   and composed into a single plot using [cowplot::plot_grid()]. As a result,
+##'   and composed into a single plot using [patchwork::wrap_plots()]. As a result,
 ##'   it is not possible to use `+` to add to the plots in the way one might
 ##'   typically work with `ggplot()` plots.
 ##'
-##' @return The object returned is created by [cowplot::plot_grid()].
+##' @return The object returned is created by [patchwork::wrap_plots()].
 ##'
 ##' @author Gavin L. Simpson
 ##'
@@ -790,7 +790,7 @@
 ##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
 ##' ## first derivative of all smooths
-##' df <- derivatives(mod)
+##' df <- derivatives(mod, type = "central")
 ##' draw(df)
 ##' ## fixed axis scales
 ##' draw(df, scales = "fixed")
@@ -847,7 +847,7 @@
 ##' @param use_facets logical; for factor by smooths, use facets to show the
 ##'   basis functions for each level of the factor? If `FALSE`, a separate ggplot
 ##'   object will be created for each level and combined using
-##'   [cowplot::plot_grid()]. **Currently ignored**.
+##'   [patchwork::wrap_plots()]. **Currently ignored**.
 ##' @param labeller a labeller function with which to label facets. The default
 ##'   is to use [ggplot2::label_both()].
 ##' @param xlab character or expression; the label for the x axis. If not
@@ -949,7 +949,7 @@
 ##'   [ggplot2::labs()].
 ##' @param caption character or expression; the plot caption. See
 ##'   [ggplot2::labs()].
-##' @param ... arguments to be passed to [cowplot::plot_grid()].
+##' @param ... arguments to be passed to [patchwork::wrap_plots()].
 ##'
 ##' @export
 ##'

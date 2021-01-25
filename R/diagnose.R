@@ -559,8 +559,7 @@
 ##'   points of all plots.
 ##' @param line_col colour specification for the 1:1 line in the QQ plot and the
 ##'   reference line in the residuals vs linear predictor plot.
-##' @param ... arguments passed to [cowplot::plot_grid()], except for `align`
-##'   and `axis`, which are set internally.
+##' @param ... arguments passed to [patchwork::wrap_plots()].
 ##'
 ##' @importFrom patchwork wrap_plots
 ##'
