@@ -17,6 +17,9 @@ context("draw-methods")
 ## Fit models
 dat1 <- data_sim("eg1", n = 800, dist = "normal", scale = 2, seed = 1)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "REML")
+m_penalty <- gam(y ~ s(x0, bs = 'cr') + s(x1, bs = 'bs') +
+                     s(x2, k = 15) + s(x3, bs = 'ps'),
+                 data = dat1, method = "REML")
 
 dat2 <- data_sim("eg2", n = 5000, dist = "normal", scale = 1, seed = 1)
 m2 <- gam(y ~ s(x, z, k = 40), data = dat2, method = "REML")
@@ -465,6 +468,14 @@ test_that("draw.penalty_df works", {
 
     plt <- draw(penalty(m1, "s(x1)"))
     expect_doppelganger("draw penalty_df with single smooths",
+                        plt)
+})
+
+test_that("draw.penalty_df gets labels on plot in corrcet order issue 95", {
+    skip_on_cran()
+    expect_silent(pen <- penalty(m_penalty))
+    plt <- draw(pen)
+    expect_doppelganger("draw penalty_df issue 95 label order",
                         plt)
 })
 
