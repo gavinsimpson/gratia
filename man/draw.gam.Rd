@@ -10,8 +10,6 @@
   select = NULL,
   residuals = FALSE,
   scales = c("free", "fixed"),
-  align = "hv",
-  axis = "lrtb",
   ci_level = 0.95,
   n = 100,
   unconditional = FALSE,
@@ -27,6 +25,9 @@
   discrete_colour = NULL,
   continuous_colour = NULL,
   continuous_fill = NULL,
+  ncol = NULL,
+  nrow = NULL,
+  guides = "keep",
   ...
 )
 }
@@ -53,12 +54,6 @@ same y-axis scale? The default, \code{scales = "fixed"}, ensures this is done.
 If \code{scales = "free"} each univariate smooth has its own y-axis scale.
 Currently does not affect the y-axis scale of plots of the parametric
 terms.}
-
-\item{align}{characer; see argument \code{align} in \code{cowplot::plot_grid()}.
-Defaults to \code{"hv"} so that plots are nicely aligned.}
-
-\item{axis}{characer; see argument \code{axis} in \code{cowplot::plot_grid()}.
-Defaults to \code{"lrtb"} so that plots are nicely aligned.}
 
 \item{ci_level}{numeric between 0 and 1; the coverage of credible interval.}
 
@@ -105,8 +100,13 @@ against.}
 \item{discrete_colour, continuous_colour, continuous_fill}{suitable scales
 for the types of data.}
 
-\item{...}{arguments passed to \code{cowplot::plot_grid()}. Any arguments to
-\code{plot_grid()} may be supplied, except for: \code{plotlist} and \code{align}.}
+\item{ncol, nrow}{numeric; the numbers of rows and columns over which to
+spread the plots}
+
+\item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
+\code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
+
+\item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
 \value{
 The object returned is created by \code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}.

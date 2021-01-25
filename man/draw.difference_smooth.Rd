@@ -72,8 +72,7 @@ spread the plots}
 \item{xlab, ylab, title, subtitle, caption}{character; labels with which to
 annotate plots}
 
-\item{...}{arguments passed to \code{cowplot::plot_grid()}. Any arguments to
-\code{plot_grid()} may be supplied, except for: \code{plotlist} and \code{align}.}
+\item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
 \description{
 Plot differences of smooths

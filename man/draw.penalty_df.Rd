@@ -43,7 +43,7 @@ supplied, no axis label will be drawn. May be a vector, one per penalty.}
 \code{\link[ggplot2:labs]{ggplot2::labs()}}. May be a vector, one per penalty.}
 
 \item{ncol, nrow}{numeric; the numbers of rows and columns over which to
-spread the plots}
+spread the plots.}
 
 \item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
 \code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}

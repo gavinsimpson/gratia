@@ -15,10 +15,11 @@
   alpha = 1,
   colour = "black",
   scales = c("free", "fixed"),
-  align = "hv",
-  axis = "lrtb",
   rug = TRUE,
   partial_match = FALSE,
+  ncol = NULL,
+  nrow = NULL,
+  guides = "keep",
   ...
 )
 }
@@ -60,17 +61,20 @@ If \code{scales = "free"} each univariate smooth has its own y-axis scale.
 Currently does not affect the y-axis scale of plots of the parametric
 terms.}
 
-\item{align}{characer; see argument \code{align} in \code{cowplot::plot_grid()}.
-Defaults to \code{"hv"} so that plots are nicely aligned.}
-
-\item{axis}{characer; see argument \code{axis} in \code{cowplot::plot_grid()}.
-Defaults to \code{"lrtb"} so that plots are nicely aligned.}
-
 \item{rug}{logical; draw a rug plot at the botom of each plot?}
 
 \item{partial_match}{logical; should smooths be selected by partial matches
 with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
 against.}
+
+\item{ncol}{numeric; the numbers of rows and columns over which to
+spread the plots}
+
+\item{nrow}{numeric; the numbers of rows and columns over which to
+spread the plots}
+
+\item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
+\code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
 
 \item{...}{arguments to be passed to \code{\link[cowplot:plot_grid]{cowplot::plot_grid()}}.}
 }
