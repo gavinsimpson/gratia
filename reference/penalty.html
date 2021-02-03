@@ -135,7 +135,10 @@
 <span class='fu'>penalty</span><span class='op'>(</span><span class='va'>object</span>, margins <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for t2.smooth</span>
-<span class='fu'>penalty</span><span class='op'>(</span><span class='va'>object</span>, margins <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>penalty</span><span class='op'>(</span><span class='va'>object</span>, margins <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for re.smooth.spec</span>
+<span class='fu'>penalty</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>data</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -163,6 +166,11 @@ will be undone to put the penalty matrix back on the original scale.</p></td>
       <th>margins</th>
       <td><p>logical; extract the penalty matrices for the tensor
 product or the marginal smooths of the tensor product?</p></td>
+    </tr>
+    <tr>
+      <th>data</th>
+      <td><p>data frame; a data frame of values for terms mentioned in the
+smooth specification.</p></td>
     </tr>
     </table>
 

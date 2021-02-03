@@ -85,6 +85,9 @@
     <loc>https://gavinsimpson.github.io/gratia//reference/draw.smooth_samples.html</loc>
   </url>
   <url>
+    <loc>https://gavinsimpson.github.io/gratia//reference/edf.html</loc>
+  </url>
+  <url>
     <loc>https://gavinsimpson.github.io/gratia//reference/eval_smooth.html</loc>
   </url>
   <url>
@@ -203,6 +206,9 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia//reference/transform_fun.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia//reference/variance_comp.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia//reference/vars_from_label.html</loc>
