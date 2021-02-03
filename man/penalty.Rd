@@ -6,6 +6,7 @@
 \alias{penalty.mgcv.smooth}
 \alias{penalty.tensor.smooth}
 \alias{penalty.t2.smooth}
+\alias{penalty.re.smooth.spec}
 \title{Extract and tidy penalty matrices}
 \usage{
 penalty(object, ...)
@@ -17,6 +18,8 @@ penalty(object, ...)
 \method{penalty}{tensor.smooth}(object, margins = FALSE, ...)
 
 \method{penalty}{t2.smooth}(object, margins = FALSE, ...)
+
+\method{penalty}{re.smooth.spec}(object, data, ...)
 }
 \arguments{
 \item{object}{a fitted GAM or a smooth.}
@@ -32,6 +35,9 @@ will be undone to put the penalty matrix back on the original scale.}
 
 \item{margins}{logical; extract the penalty matrices for the tensor
 product or the marginal smooths of the tensor product?}
+
+\item{data}{data frame; a data frame of values for terms mentioned in the
+smooth specification.}
 }
 \value{
 A 'tibble' (data frame) of class \code{penalty_df} inheriting from
