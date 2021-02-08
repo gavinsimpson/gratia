@@ -746,6 +746,41 @@ detaching ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
+> nameEx("edf")
+> ### * edf
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: edf
+> ### Title: Effective degrees of freedom for smooth terms
+> ### Aliases: edf edf.gam
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> df <- data_sim("eg1", n = 400, seed = 42)
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+> edf(m)
+# A tibble: 4 x 2
+  smooth   edf
+  <chr>  <dbl>
+1 s(x0)   3.42
+2 s(x1)   3.22
+3 s(x2)   7.90
+4 s(x3)   1.88
+> edf(m, smooth = c("s(x0)", "s(x2)"))
+# A tibble: 2 x 2
+  smooth   edf
+  <chr>  <dbl>
+1 s(x0)   3.42
+2 s(x2)   7.90
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("evaluate_smooth")
 > ### * evaluate_smooth
 > 
@@ -955,11 +990,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55da36dd7cd0>
+<environment: 0x561c8598cb50>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55da36dd7cd0>
+<environment: 0x561c8598cb50>
 > 
 > 
 > 
@@ -1058,7 +1093,7 @@ detaching ‘package:mgcv’
 > ### Name: penalty
 > ### Title: Extract and tidy penalty matrices
 > ### Aliases: penalty penalty.gam penalty.mgcv.smooth penalty.tensor.smooth
-> ###   penalty.t2.smooth
+> ###   penalty.t2.smooth penalty.re.smooth.spec
 > 
 > ### ** Examples
 > 
@@ -1483,7 +1518,7 @@ detaching ‘package:mgcv’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  10.879 0.137 10.957 0.001 0.002 
+Time elapsed:  12.607 0.143 12.541 0.001 0.002 
 > grDevices::dev.off()
 null device 
           1 
