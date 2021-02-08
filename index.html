@@ -87,16 +87,22 @@
 <li>
 <p>A <em>ggplot2</em>-based replacement for <code>mgcv:::plot.gam()</code>: <code><a href="reference/draw.html">draw(gam_model)</a></code>.</p>
 <p>For example, the classic four term additive example from Gu &amp; Wahba:</p>
-<p><img src="reference/figures/README-draw-gam-figure-1.png" alt="Estimated smooths from a GAM"></p>
+<div class="figure">
+<img src="reference/figures/README-draw-gam-figure-1.png" alt=""><p class="caption">Estimated smooths from a GAM</p>
+</div>
 <p>Or for a bivariate smooth:</p>
-<p><img src="reference/figures/README-draw-gam-figure-2d-1.png" alt="Estimated smooths from a GAM"></p>
+<div class="figure">
+<img src="reference/figures/README-draw-gam-figure-2d-1.png" alt=""><p class="caption">Estimated smooths from a GAM</p>
+</div>
 <p>Note specialist smoothers (<code>bs %in% c("sos","mrf","so")</code>) are not currently supported, but univariate, <em>factor</em> and <em>continuous</em> <code>by</code>-variable smooths, simple random effect smooths (<code>bs = 're'</code>), factor-smooth interaction smooths (<code>bs = "fs"</code>), and bivariate tensor product smooths are supported,</p>
 </li>
 <li><p>Estimatation of derivatives of fitted smoothers: <code><a href="reference/derivatives.html">derivatives()</a></code> (older functionality in <code><a href="reference/fderiv.html">fderiv(gam_model)</a></code>),</p></li>
 <li><p>Estimation of point-wise across-the-function confidence intervals and simultaneous intervals for smooths: <code><a href="https://rdrr.io/r/stats/confint.html">confint(gam_model)</a></code>.</p></li>
 <li>
 <p>Model diagnostics via <code><a href="reference/appraise.html">appraise()</a></code></p>
-<p><img src="reference/figures/README-appraise-figure-1.png" alt="Model diagnostics figure"></p>
+<div class="figure">
+<img src="reference/figures/README-appraise-figure-1.png" alt=""><p class="caption">Model diagnostics figure</p>
+</div>
 </li>
 </ul>
 </div>

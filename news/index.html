@@ -117,9 +117,9 @@
       <small>Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="gratia-0519000" class="section level1">
-<h1 class="page-header" data-toc-text="0.5.1.9000">
-<a href="#gratia-0519000" class="anchor"></a>gratia 0.5.1.9000<small> Unreleased </small>
+    <div id="gratia-0519001" class="section level1">
+<h1 class="page-header" data-toc-text="0.5.1.9001">
+<a href="#gratia-0519001" class="anchor"></a>gratia 0.5.1.9001<small> Unreleased </small>
 </h1>
 <div id="major-changes" class="section level2">
 <h2 class="hasAnchor">
@@ -137,6 +137,14 @@
 <ul>
 <li><p>The {patchwork} package is now used for multi-panel figures. As such, {gratia} no longer Imports from the {cowplot} package.</p></li>
 <li><p>The <code><a href="../reference/draw.html">draw()</a></code> method for <code><a href="../reference/penalty.html">penalty()</a></code> now plots the penalty matrix heatmaps in a more-logical orientation, to match how the matrices might be written down or printed to the R console.</p></li>
+</ul>
+</div>
+<div id="bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
+<ul>
+<li>
+<code><a href="../reference/transform_fun.html">transform_fun()</a></code> had a copy paste bug in the definition of the then generic. (<a href='https://github.com/gavinsimpson/gratia/issues/96'>#96</a> <a href='https://github.com/Aariq'>@Aariq</a>)</li>
 </ul>
 </div>
 </div>
@@ -214,14 +222,16 @@
 <li><p><code>data_class()</code> is no longer exported; it was only ever intended to be an internal function.</p></li>
 </ul>
 </div>
-<div id="bug-fixes" class="section level2">
+<div id="bug-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>Bug Fixes</h2>
+<a href="#bug-fixes-1" class="anchor"></a>Bug Fixes</h2>
 <ul>
 <li>
 <p><code><a href="../reference/confint.gam.html">confint.gam()</a></code> was failing on a tensor product smooth due to matching issues. Reported by <a href='https://github.com/tamas-ferenci'>@tamas-ferenci</a> <a href="https://github.com/gavinsimpson/gratia/issues/88"><a href='https://github.com/gavinsimpson/gratia/issues/88'>#88</a></a></p>
 <p>This also fixes <a href="https://github.com/gavinsimpson/gratia/issues/80"><a href='https://github.com/gavinsimpson/gratia/issues/80'>#80</a></a></p>
-<p>(<a href='https://github.com/butellyn'>@butellyn</a>) which was a related issue with selecting a specific smooth.</p>
+<ol class="example" style="list-style-type: decimal">
+<li>which was a related issue with selecting a specific smooth.</li>
+</ol>
 </li>
 <li><p>The <strong>vdiffr</strong> package is now used conditionally in package tests. Reported by Brian Ripley <a href="https://github.com/gavinsimpson/gratia/issues/93"><a href='https://github.com/gavinsimpson/gratia/issues/93'>#93</a></a></p></li>
 </ul>
@@ -241,9 +251,9 @@
 </li>
 </ul>
 </div>
-<div id="bug-fixes-1" class="section level2">
+<div id="bug-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-2" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/combine.html">dplyr::combine()</a></code> was deprecated. Switch to <code><a href="https://vctrs.r-lib.org/reference/vec_c.html">vctrs::vec_c()</a></code>.</p></li>
 <li>
@@ -301,9 +311,9 @@
 <li><p><code><a href="../reference/evaluate_smooth.html">evaluate_parametric_term()</a></code> is now much stricter and can only evaluate main effect terms, i.e. those whose order, as stored in the <code>terms</code> object of the model is <code>1</code>.</p></li>
 </ul>
 </div>
-<div id="bug-fixes-2" class="section level2">
+<div id="bug-fixes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-2" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-3" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li><p>The <code><a href="../reference/draw.html">draw()</a></code> method for <code><a href="../reference/derivatives.html">derivatives()</a></code> was not getting the x-axis label for factor by smooths correctly, and instead was using <code>NA</code> for the second and subsequent levels of the factor.</p></li>
 <li><p>The <code><a href="../reference/datagen.html">datagen()</a></code> method for class <code>"gam"</code> couldn’t possibly have worked for anything but the simplest models and would fail even with simple factor by smooths. These issues have been fixed, but the behaviour of <code><a href="../reference/datagen.html">datagen()</a></code> has changed, and the function is now not intended for use by users.</p></li>
@@ -327,9 +337,9 @@
 <li><p><code><a href="../reference/derivatives.html">derivatives()</a></code> now handles non-numeric when creating shifted data for finite differences. Fixes a problem with <code>stringsAsFactors = FALSE</code> default in R-devel. <a href="https://github.com/gavinsimpson/gratia/issues/64"><a href='https://github.com/gavinsimpson/gratia/issues/64'>#64</a></a></p></li>
 </ul>
 </div>
-<div id="bug-fixes-3" class="section level2">
+<div id="bug-fixes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-3" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-4" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>Updated <em>gratia</em> to work with <em>tibble</em> versions &gt;= 3.0</li>
 </ul>
@@ -348,9 +358,9 @@
 <li><p>New function <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> to draw samples of entire smooth functions from their posterior distribution. Also has a <code><a href="../reference/draw.html">draw()</a></code> method for plotting the posterior samples.</p></li>
 </ul>
 </div>
-<div id="bug-fixes-4" class="section level2">
+<div id="bug-fixes-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-4" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-5" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> would produce empty plots between the panels for the parametric terms if there were 2 or more parametric terms in a model. Reported by <a href='https://github.com/sklayn'>@sklayn</a> <a href="https://github.com/gavinsimpson/gratia/issues/39"><a href='https://github.com/gavinsimpson/gratia/issues/39'>#39</a></a>.</p></li>
 <li>
