@@ -1,4 +1,4 @@
-# gratia 0.5.1.9000
+# gratia 0.5.1.9001
 
 ## Major changes
 
@@ -22,6 +22,11 @@
 * The `draw()` method for `penalty()` now plots the penalty matrix heatmaps in a
   more-logical orientation, to match how the matrices might be written down or
   printed to the R console.
+
+## Bug fixes
+
+* `transform_fun()` had a copy paste bug in the definition of the then generic.
+  (#96 @Aariq)
 
 # gratia 0.5.1
 
