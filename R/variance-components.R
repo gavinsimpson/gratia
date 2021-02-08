@@ -1,8 +1,9 @@
 ##' Variance components of smooths from smoothness estimates
 ##'
-##' A wrapper to [mgcv::gam.vcomp()] which returns the smoothing parameters expressed as variance components.
+##' A wrapper to [mgcv::gam.vcomp()] which returns the smoothing parameters
+##'   expressed as variance components.
 ##'
-##' This function is a wrapper to [mgcv::gam.vcomp()] which performs
+##' @details This function is a wrapper to [mgcv::gam.vcomp()] which performs
 ##'   three additional services
 ##'
 ##' * it suppresses the annoying text output that [mgcv::gam.vcomp()] prints to

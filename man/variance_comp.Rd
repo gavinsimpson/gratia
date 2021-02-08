@@ -25,7 +25,8 @@ scale. This is needed if comparing with other mixed model software, such as
 coverage of the confidence interval that is returned.}
 }
 \description{
-A wrapper to \code{\link[mgcv:gam.vcomp]{mgcv::gam.vcomp()}} which returns the smoothing parameters expressed as variance components.
+A wrapper to \code{\link[mgcv:gam.vcomp]{mgcv::gam.vcomp()}} which returns the smoothing parameters
+expressed as variance components.
 }
 \details{
 This function is a wrapper to \code{\link[mgcv:gam.vcomp]{mgcv::gam.vcomp()}} which performs
