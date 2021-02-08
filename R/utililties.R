@@ -1017,7 +1017,7 @@ vars_from_label <- function(label) {
 ##'
 ##' @author Gavin L. Simpson
 `transform_fun` <- function(object, fun = NULL , ...) {
-    UseMethod("add_constant")
+    UseMethod("transform_fun")
 }
 
 ##' @rdname transform_fun
