@@ -48,11 +48,9 @@
 ##' @examples
 ##' load_mgcv()
 ##' ## simulate binomial data...
-##' set.seed(0)
-##' n.samp <- 200
-##' dat <- gamSim(1, n = n.samp, dist = "binary", scale = .33)
+##' dat <- data_sim("eg1", n = 200, dist = "binary", scale = .33, seed = 0)
 ##' p <- binomial()$linkinv(dat$f)               # binomial p
-##' n <- sample(c(1, 3), n.samp, replace = TRUE) # binomial n
+##' n <- sample(c(1, 3), 200, replace = TRUE) # binomial n
 ##' dat <- transform(dat, y = rbinom(n, n, p), n = n)
 ##' m <- gam( y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
 ##'          family = binomial, data = dat, weights = n,
@@ -721,6 +719,29 @@
 ##' @importFrom dplyr mutate
 ##' @importFrom ggplot2 ggplot geom_point geom_hline geom_ribbon labs aes_string
 ##' @importFrom tools toTitleCase
+##'
+##' @examples
+##' load_mgcv()
+##' ## simulate binomial data...
+##' dat <- data_sim("eg1", n = 200, dist = "binary", scale = .33, seed = 0)
+##' p <- binomial()$linkinv(dat$f)               # binomial p
+##' n <- sample(c(1, 3), 200, replace = TRUE) # binomial n
+##' dat <- transform(dat, y = rbinom(n, n, p), n = n)
+##' m <- gam( y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
+##'          family = binomial, data = dat, weights = n,
+##'          method = "REML")
+##'
+##' ## Worm plot; default using direct randomization of uniform quantiles
+##' ## Note no reference bands are drawn with this method.
+##' worm_plot(m)
+##'
+##' ## Alternatively use simulate new data from the model, which
+##' ## allows construction of reference intervals for the Q-Q plot
+##' worm_plot(m, method = "simulate", point_col = "steelblue",
+##'           point_alpha = 0.4)
+##'
+##' ## ... or use the usual normality assumption
+##' worm_plot(m, method = "normal")
 `worm_plot.gam` <- function(model,
                           method = c("direct", "simulate", "normal"),
                           type = c("deviance", "response", "pearson"),

@@ -78,11 +78,9 @@ Quantile-quantile plot of model residuals
 \examples{
 load_mgcv()
 ## simulate binomial data...
-set.seed(0)
-n.samp <- 200
-dat <- gamSim(1, n = n.samp, dist = "binary", scale = .33)
+dat <- data_sim("eg1", n = 200, dist = "binary", scale = .33, seed = 0)
 p <- binomial()$linkinv(dat$f)               # binomial p
-n <- sample(c(1, 3), n.samp, replace = TRUE) # binomial n
+n <- sample(c(1, 3), 200, replace = TRUE) # binomial n
 dat <- transform(dat, y = rbinom(n, n, p), n = n)
 m <- gam( y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
          family = binomial, data = dat, weights = n,
