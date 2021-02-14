@@ -19,6 +19,10 @@
 * The {patchwork} package is now used for multi-panel figures. As such, {gratia}
   no longer Imports from the {cowplot} package.
 
+* Worm plot diagnostic plots are available via new function `worm_plot()`. Worm
+  plots are detrended Q-Q plots, where deviation from the Q-Q reference line are
+  emphasized as deviations around the line occupy the full height of the plot.
+
 * The `draw()` method for `penalty()` now plots the penalty matrix heatmaps in a
   more-logical orientation, to match how the matrices might be written down or
   printed to the R console.
