@@ -10,7 +10,7 @@ appraise(model, ...)
 
 \method{appraise}{gam}(
   model,
-  method = c("direct", "simulate", "normal"),
+  method = c("uniform", "simulate", "normal", "direct"),
   n_uniform = 10,
   n_simulate = 50,
   type = c("deviance", "pearson", "response"),
@@ -34,7 +34,8 @@ appraise(model, ...)
 
 \item{...}{arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 
-\item{method}{character; method used to generate theoretical quantiles.}
+\item{method}{character; method used to generate theoretical quantiles. Note
+that \code{method = "direct"} is deprecated in favour of \code{method = "uniform"}.}
 
 \item{n_uniform}{numeric; number of times to randomize uniform quantiles
 in the direct computation method (\code{method = "direct"}) for QQ plots.}
@@ -72,6 +73,11 @@ reference line in the residuals vs linear predictor plot.}
 }
 \description{
 Model diagnostic plots
+}
+\note{
+The wording used in \code{\link[mgcv:qq.gam]{mgcv::qq.gam()}} uses \emph{direct} in reference to the
+simulated residuals method (\code{method = "simulated"}). To avoid confusion,
+\code{method = "direct"} is deprecated in favour of \code{method = "uniform"}.
 }
 \examples{
 library(mgcv)

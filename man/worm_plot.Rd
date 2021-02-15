@@ -11,7 +11,7 @@ worm_plot(model, ...)
 
 \method{worm_plot}{gam}(
   model,
-  method = c("direct", "simulate", "normal"),
+  method = c("uniform", "simulate", "normal", "direct"),
   type = c("deviance", "response", "pearson"),
   n_uniform = 10,
   n_simulate = 50,
@@ -38,13 +38,14 @@ worm_plot(model, ...)
 
 \item{...}{arguments passed ot other methods.}
 
-\item{method}{character; method used to generate theoretical quantiles.}
+\item{method}{character; method used to generate theoretical quantiles. Note
+that \code{method = "direct"} is deprecated in favour of \code{method = "uniform"}.}
 
 \item{type}{character; type of residuals to use. Only \code{"deviance"},
 \code{"response"}, and \code{"pearson"} residuals are allowed.}
 
 \item{n_uniform}{numeric; number of times to randomize uniform quantiles
-in the direct computation method (\code{method = "direct"}).}
+in the direct computation method (\code{method = "uniform"}).}
 
 \item{n_simulate}{numeric; number of data sets to simulate from the estimated
 model when using the simulation method (\code{method = "simulate"}).}
@@ -79,10 +80,15 @@ QQ plot.}
 \item{point_alpha}{colour and alpha transparency for points on the
 QQ plot.}
 
-\item{line_col}{colour used to draw the 1:1 reference line.}
+\item{line_col}{colour used to draw the reference line.}
 }
 \description{
 Worm plot of model residuals
+}
+\note{
+The wording used in \code{\link[mgcv:qq.gam]{mgcv::qq.gam()}} uses \emph{direct} in reference to the
+simulated residuals method (\code{method = "simulated"}). To avoid confusion,
+\code{method = "direct"} is deprecated in favour of \code{method = "uniform"}.
 }
 \examples{
 load_mgcv()

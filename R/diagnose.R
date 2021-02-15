@@ -18,11 +18,12 @@
          call. = FALSE)           # don't show the call, simpler error
 }
 
-##' @param method character; method used to generate theoretical quantiles.
+##' @param method character; method used to generate theoretical quantiles. Note
+##'   that `method = "direct"` is deprecated in favour of `method = "uniform"`.
 ##' @param type character; type of residuals to use. Only `"deviance"`,
 ##'   `"response"`, and `"pearson"` residuals are allowed.
 ##' @param n_uniform numeric; number of times to randomize uniform quantiles
-##'   in the direct computation method (`method = "direct"`).
+##'   in the direct computation method (`method = "uniform"`).
 ##' @param n_simulate numeric; number of data sets to simulate from the estimated
 ##'   model when using the simulation method (`method = "simulate"`).
 ##' @param level numeric; the coverage level for reference intervals. Must be
@@ -35,7 +36,11 @@
 ##'   interval when `method = "simulate"`.
 ##' @param point_col,point_alpha colour and alpha transparency for points on the
 ##'   QQ plot.
-##' @param line_col colour used to draw the 1:1 reference line.
+##' @param line_col colour used to draw the reference line.
+##'
+##' @note The wording used in [mgcv::qq.gam()] uses *direct* in reference to the
+##'   simulated residuals method (`method = "simulated"`). To avoid confusion,
+##'   `method = "direct"` is deprecated in favour of `method = "uniform"`.
 ##'
 ##' @inheritParams draw.evaluated_smooth
 ##'
@@ -68,7 +73,7 @@
 ##' ## ... or use the usual normality assumption
 ##' qq_plot(m, method = "normal")
 `qq_plot.gam` <- function(model,
-                          method = c("direct", "simulate", "normal"),
+                          method = c("uniform", "simulate", "normal", "direct"),
                           type = c("deviance", "response", "pearson"),
                           n_uniform = 10, n_simulate = 50,
                           level = 0.9,
@@ -80,8 +85,12 @@
                           point_alpha = 1,
                           line_col = "red", ...) {
     method <- match.arg(method)         # what method for the QQ plot?
+    if (identical(method, "direct")) {
+        message("`method = \"direct\"` is deprecated, use `\"uniform\"`")
+        method <- "uniform"
+    }
     ## check if we can do the method
-    if (identical(method, "direct") &&
+    if (identical(method, "uniform") &&
         is.null(fix.family.qf(family(model))[["qf"]])) {
         method <- "simulate"
     }
@@ -100,10 +109,10 @@
 
     ## generate theoretical quantiles
     df <- switch(method,
-                 direct = qq_uniform(model, n = n_uniform, type = type),
+                 uniform  = qq_uniform(model, n = n_uniform, type = type),
                  simulate = qq_simulate(model, n = n_simulate, type = type,
                                         level = level),
-                 normal = qq_normal(model, type = type, level = level))
+                 normal   = qq_normal(model, type = type, level = level))
     df <- as_tibble(df)
 
     ## add labels if not supplied
@@ -583,7 +592,8 @@
 ##' @title Model diagnostic plots
 ##'
 ##' @param model a fitted model. Currently only class `"gam"`.
-##' @param method character; method used to generate theoretical quantiles.
+##' @param method character; method used to generate theoretical quantiles. Note
+##'   that `method = "direct"` is deprecated in favour of `method = "uniform"`.
 ##' @param n_uniform numeric; number of times to randomize uniform quantiles
 ##'   in the direct computation method (`method = "direct"`) for QQ plots.
 ##' @param n_simulate numeric; number of data sets to simulate from the estimated
@@ -612,6 +622,10 @@
 ##'
 ##' @importFrom patchwork wrap_plots
 ##'
+##' @note The wording used in [mgcv::qq.gam()] uses *direct* in reference to the
+##'   simulated residuals method (`method = "simulated"`). To avoid confusion,
+##'   `method = "direct"` is deprecated in favour of `method = "uniform"`.
+##'
 ##' @seealso The plots are produced by functions [gratia::qq_plot()],
 ##'   [gratia::residuals_linpred_plot()], [gratia::residuals_hist_plot()],
 ##'   and [gratia::observed_fitted_plot()].
@@ -633,7 +647,7 @@
 ##' @rdname appraise
 ##' @export
 `appraise.gam` <- function(model,
-                       method = c("direct", "simulate", "normal"),
+                       method = c("uniform", "simulate", "normal", "direct"),
                        n_uniform = 10, n_simulate = 50,
                        type = c("deviance", "pearson", "response"),
                        n_bins = c("sturges", "scott", "fd"),
@@ -646,6 +660,10 @@
                        ...) {
     ## process args
     method <- match.arg(method)
+    if (identical(method, "direct")) {
+        message("`method = \"direct\"` is deprecated, use `\"uniform\"`")
+        method <- "uniform"
+    }
     type <- match.arg(type)
     if (is.character(n_bins)) {
         n_bins <- match.arg(n_bins)
@@ -715,6 +733,10 @@
 
 ##' @inheritParams qq_plot.gam
 ##' @rdname worm_plot
+##'
+##' @note The wording used in [mgcv::qq.gam()] uses *direct* in reference to the
+##'   simulated residuals method (`method = "simulated"`). To avoid confusion,
+##'   `method = "direct"` is deprecated in favour of `method = "uniform"`.
 ##' 
 ##' @export
 ##'
@@ -745,7 +767,7 @@
 ##' ## ... or use the usual normality assumption
 ##' worm_plot(m, method = "normal")
 `worm_plot.gam` <- function(model,
-                          method = c("direct", "simulate", "normal"),
+                          method = c("uniform", "simulate", "normal", "direct"),
                           type = c("deviance", "response", "pearson"),
                           n_uniform = 10, n_simulate = 50,
                           level = 0.9,
@@ -757,8 +779,12 @@
                           point_alpha = 1,
                           line_col = "red", ...) {
     method <- match.arg(method)         # what method for the QQ plot?
+    if (identical(method, "direct")) {
+        message("`method = \"direct\"` is deprecated, use `\"uniform\"`")
+        method <- "uniform"
+    }
     ## check if we can do the method
-    if (identical(method, "direct") &&
+    if (identical(method, "uniform") &&
         is.null(fix.family.qf(family(model))[["qf"]])) {
         method <- "simulate"
     }
@@ -776,12 +802,12 @@
 
     ## generate theoretical quantiles
     df <- switch(method,
-                 direct = qq_uniform(model, n = n_uniform, type = type,
-                                     level = level, detrend = TRUE),
+                 uniform  = qq_uniform(model, n = n_uniform, type = type,
+                                       level = level, detrend = TRUE),
                  simulate = qq_simulate(model, n = n_simulate, type = type,
                                         level = level, detrend = TRUE),
-                 normal = qq_normal(model, type = type, level = level,
-                                    detrend = TRUE))
+                 normal   = qq_normal(model, type = type, level = level,
+                                      detrend = TRUE))
     df <- as_tibble(df)
 
     ## add labels if not supplied
