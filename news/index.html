@@ -151,6 +151,13 @@
 <li><p>The <code><a href="../reference/draw.html">draw()</a></code> method for <code><a href="../reference/penalty.html">penalty()</a></code> now plots the penalty matrix heatmaps in a more-logical orientation, to match how the matrices might be written down or printed to the R console.</p></li>
 </ul>
 </div>
+<div id="user-visible-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#user-visible-changes" class="anchor"></a>User visible changes</h2>
+<ul>
+<li>The default method name for generating reference quantiles in <code><a href="../reference/qq_plot.html">qq_plot()</a></code> was changed from <code>"direct"</code> to <code>"uniform"</code>, to avoid confusion with the <code><a href="https://rdrr.io/pkg/mgcv/man/qq.gam.html">mgcv::qq.gam()</a></code> help page description of the methods. Accordingly using <code>method = "direct"</code> is deprecated and a message to this effect is displayed if used.</li>
+</ul>
+</div>
 <div id="bug-fixes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
@@ -186,9 +193,9 @@
 </li>
 </ul>
 </div>
-<div id="user-visible-changes" class="section level2">
+<div id="user-visible-changes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#user-visible-changes" class="anchor"></a>User visible changes</h2>
+<a href="#user-visible-changes-1" class="anchor"></a>User visible changes</h2>
 <ul>
 <li>The <code>newdata</code> argument to <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> has been changed to <code>data</code> as was originally intended.</li>
 </ul>
@@ -223,9 +230,9 @@
 <li><p><code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> is an early version of code to replace (or more likely supersede) <code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code>. <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> can currently only handle 1D smooths of the standard types.</p></li>
 </ul>
 </div>
-<div id="user-visible-changes-1" class="section level2">
+<div id="user-visible-changes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#user-visible-changes-1" class="anchor"></a>User visible changes</h2>
+<a href="#user-visible-changes-2" class="anchor"></a>User visible changes</h2>
 <ul>
 <li>
 <p>The meaning of <code>parm</code> in <code>confint.gam</code> has changed. This argument now requires a smooth label to match a smooth. A vector of labels can be provided, but partial matching against a smooth label only works with a single <code>parm</code> value.</p>
@@ -253,9 +260,9 @@
 <h1 class="page-header" data-toc-text="0.4.1">
 <a href="#gratia-041" class="anchor"></a>gratia 0.4.1<small> 2020-05-30 </small>
 </h1>
-<div id="user-visible-changes-2" class="section level2">
+<div id="user-visible-changes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#user-visible-changes-2" class="anchor"></a>User visible changes</h2>
+<a href="#user-visible-changes-3" class="anchor"></a>User visible changes</h2>
 <ul>
 <li>
 <p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> with <code>scales = "fixed"</code> now applies to all terms that can be plotted, including 2d smooths.</p>
@@ -315,9 +322,9 @@
 </li>
 </ul>
 </div>
-<div id="user-visible-changes-3" class="section level2">
+<div id="user-visible-changes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#user-visible-changes-3" class="anchor"></a>User visible changes</h2>
+<a href="#user-visible-changes-4" class="anchor"></a>User visible changes</h2>
 <ul>
 <li><p><code><a href="../reference/datagen.html">datagen()</a></code> is now an <em>internal</em> function and is no longer exported. Use <code><a href="../reference/data_slice.html">data_slice()</a></code> instead.</p></li>
 <li><p><code><a href="../reference/evaluate_smooth.html">evaluate_parametric_term()</a></code> is now much stricter and can only evaluate main effect terms, i.e. those whose order, as stored in the <code>terms</code> object of the model is <code>1</code>.</p></li>
