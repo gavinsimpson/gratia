@@ -40,6 +40,14 @@
   more-logical orientation, to match how the matrices might be written down or
   printed to the R console.
 
+## User visible changes
+
+* The default method name for generating reference quantiles in `qq_plot()` was
+  changed from `"direct"` to `"uniform"`, to avoid confusion with the
+  `mgcv::qq.gam()` help page description of the methods. Accordingly using
+  `method = "direct"` is deprecated and a message to this effect is displayed if
+  used.
+
 ## Bug fixes
 
 * `transform_fun()` had a copy paste bug in the definition of the then generic.
