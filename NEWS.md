@@ -22,6 +22,19 @@
 * Worm plot diagnostic plots are available via new function `worm_plot()`. Worm
   plots are detrended Q-Q plots, where deviation from the Q-Q reference line are
   emphasized as deviations around the line occupy the full height of the plot.
+  
+  `worm_plot()` methods are available for models of classes `"gam"`, `"glm"`,
+  and `"lm"`.
+
+* The reference line in `qq_plot()` with `method = "normal"` was previously
+  drawn as a line with intercept 0 and slope 1, to match the other methods. This
+  was inconsistent with `stats::qqplot()` which drew the line through the 1st
+  and 3rd quartiles. `qq_plot()` with `method = "normal"` now uses this robust
+  reference line. Reference lines for the other methods remain drawn with slope
+  1 and intercept 0.
+  
+* `qq_plot()` with `method = "normal"` now draws a point-wise reference band
+  using the standard error of the order statistic.
 
 * The `draw()` method for `penalty()` now plots the penalty matrix heatmaps in a
   more-logical orientation, to match how the matrices might be written down or
