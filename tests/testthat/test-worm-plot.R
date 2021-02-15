@@ -4,9 +4,9 @@
 library("testthat")
 library("gratia")
 library("mgcv")
-library("ggplot2")
+## library("ggplot2")
 
-context("qq_plot-methods")
+context("worm_plot-methods")
 
 ## Need a local wrapper to allow conditional use of vdiffr
 `expect_doppelganger` <- function(title, fig, path = NULL, ...) {
@@ -27,21 +27,21 @@ m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
          method = "REML")
 
 types <- dQuote(c("deviance", "response", "pearson"))
-methods <- dQuote(c("direct", "simulate", "normal"))
+methods <- dQuote(c("uniform", "simulate", "normal"))
 
-test_that("worm_plot() direct method works", {
-    plt <- worm_plot(m)      # direct randomisation of uniform quantiles
-    expect_doppelganger("worm_plot direct randomisation", plt)
+test_that("worm_plot() uniform method works", {
+    plt <- worm_plot(m)      # uniform randomisation of uniform quantiles
+    expect_doppelganger("worm_plot uniform randomisation", plt)
 })
 
-test_that("worm_plot() direct method works with response residuals", {
+test_that("worm_plot() uniform method works with response residuals", {
     plt <- worm_plot(m, type = "response")
-    expect_doppelganger("worm_plot direct randomisation response residuals", plt)
+    expect_doppelganger("worm_plot uniform randomisation response residuals", plt)
 })
 
-test_that("worm_plot() direct method works with pearson residuals", {
+test_that("worm_plot() uniform method works with pearson residuals", {
     plt <- worm_plot(m, type = "pearson")
-    expect_doppelganger("worm_plot direct randomisation pearson residuals", plt)
+    expect_doppelganger("worm_plot uniform randomisation pearson residuals", plt)
 })
 
 test_that("worm_plot() normal method works", {
@@ -84,6 +84,12 @@ test_that("worm_plot() fails if unsupported method requested", {
     expect_error(worm_plot(m, method = "foo"),
                  paste("'arg' should be one of", paste(methods, collapse = ', ')),
                  fixed = TRUE)
+})
+
+test_that("worm_plot() prints message if direct method requested", {
+    expect_message(worm_plot(m, method = "direct"),
+                   "`method = \"direct\"` is deprecated, use `\"uniform\"`",
+                   fixed = TRUE)
 })
 
 test_that("worm_plot.default fails with error", {

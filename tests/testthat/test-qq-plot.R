@@ -4,7 +4,7 @@
 library("testthat")
 library("gratia")
 library("mgcv")
-library("ggplot2")
+## library("ggplot2")
 
 context("qq_plot-methods")
 
@@ -17,7 +17,7 @@ context("qq_plot-methods")
 ## simulate binomial data...
 set.seed(0)
 n.samp <- 200
-dat <- gamSim(1, n = n.samp, dist = "binary", scale = .33, verbose = FALSE)
+dat <- data_sim("eg1", n = n.samp, dist = "binary", scale = .33, seed = 0)
 p <- binomial()$linkinv(dat$f)               # binomial p
 n <- sample(c(1, 3), n.samp, replace = TRUE) # binomial n
 dat <- transform(dat, y = rbinom(n, n, p), n = n)
@@ -26,21 +26,21 @@ m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
          method = "REML")
 
 types <- dQuote(c("deviance", "response", "pearson"))
-methods <- dQuote(c("direct", "simulate", "normal"))
+methods <- dQuote(c("uniform", "simulate", "normal"))
 
-test_that("qq_plot() direct method works", {
-    plt <- qq_plot(m)      # direct randomisation of uniform quantiles
-    expect_doppelganger("qq_plot direct randomisation", plt)
+test_that("qq_plot() uniform method works", {
+    plt <- qq_plot(m)      # randomisation of uniform quantiles
+    expect_doppelganger("qq_plot uniform randomisation", plt)
 })
 
-test_that("qq_plot() direct method works with response residuals", {
+test_that("qq_plot() uniform method works with response residuals", {
     plt <- qq_plot(m, type = "response")
-    expect_doppelganger("qq_plot direct randomisation response residuals", plt)
+    expect_doppelganger("qq_plot uniform randomisation response residuals", plt)
 })
 
-test_that("qq_plot() direct method works with pearson residuals", {
+test_that("qq_plot() uniform method works with pearson residuals", {
     plt <- qq_plot(m, type = "pearson")
-    expect_doppelganger("qq_plot direct randomisation pearson residuals", plt)
+    expect_doppelganger("qq_plot uniform randomisation pearson residuals", plt)
 })
 
 test_that("qq_plot() normal method works", {
@@ -83,6 +83,12 @@ test_that("qq_plot() fails if unsupported method requested", {
     expect_error(qq_plot(m, method = "foo"),
                  paste("'arg' should be one of", paste(methods, collapse = ', ')),
                  fixed = TRUE)
+})
+
+test_that("qq_plot() prints message if direct method requested", {
+    expect_message(qq_plot(m, method = "direct"),
+                   "`method = \"direct\"` is deprecated, use `\"uniform\"`",
+                   fixed = TRUE)
 })
 
 test_that("qq_plot.default fails with error", {
