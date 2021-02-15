@@ -990,11 +990,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55a3d0e79278>
+<environment: 0x5558bc06bf68>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55a3d0e79278>
+<environment: 0x5558bc06bf68>
 > 
 > 
 > 
@@ -1282,7 +1282,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: qq_plot
 > ### Title: Quantile-quantile plot of model residuals
-> ### Aliases: qq_plot qq_plot.gam qq_plot.glm
+> ### Aliases: qq_plot qq_plot.default qq_plot.gam qq_plot.glm qq_plot.lm
 > 
 > ### ** Examples
 > 
@@ -1518,7 +1518,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: worm_plot
 > ### Title: Worm plot of model residuals
-> ### Aliases: worm_plot worm_plot.gam
+> ### Aliases: worm_plot worm_plot.gam worm_plot.glm worm_plot.lm
 > 
 > ### ** Examples
 > 
@@ -1554,7 +1554,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  11.657 0.165 11.811 0 0 
+Time elapsed:  16.014 0.187 16.126 0 0 
 > grDevices::dev.off()
 null device 
           1 

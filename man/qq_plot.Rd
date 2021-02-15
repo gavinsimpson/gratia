@@ -2,11 +2,15 @@
 % Please edit documentation in R/diagnose.R
 \name{qq_plot}
 \alias{qq_plot}
+\alias{qq_plot.default}
 \alias{qq_plot.gam}
 \alias{qq_plot.glm}
+\alias{qq_plot.lm}
 \title{Quantile-quantile plot of model residuals}
 \usage{
 qq_plot(model, ...)
+
+\method{qq_plot}{default}(model, ...)
 
 \method{qq_plot}{gam}(
   model,
@@ -29,6 +33,8 @@ qq_plot(model, ...)
 )
 
 \method{qq_plot}{glm}(model, ...)
+
+\method{qq_plot}{lm}(model, ...)
 }
 \arguments{
 \item{model}{a fitted model. Currently only class \code{"gam"}.}

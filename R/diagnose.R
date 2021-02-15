@@ -10,6 +10,7 @@
     UseMethod("qq_plot")
 }
 
+##' @rdname qq_plot
 ##' @export
 `qq_plot.default` <- function(model, ...) {
     stop("Unable to produce a Q-Q plot for <",
@@ -170,6 +171,7 @@
     qq_plot.gam(model, ...)
 }
 
+##' @rdname qq_plot
 ##' @importFrom stats df.residual
 `qq_plot.lm` <- function(model, ...) {
     r <- residuals(model)
@@ -822,4 +824,29 @@
 
     ## return
     plt
+}
+
+
+##' @export
+##' @rdname worm_plot
+`worm_plot.glm` <- function(model, ...) {
+    if (is.null(model[["sig2"]])) {
+        model[["sig2"]] <- summary(model)$dispersion
+    }
+    worm_plot.gam(model, ...)
+}
+
+##' @rdname worm_plot
+##' @importFrom stats df.residual
+`worm_plot.lm` <- function(model, ...) {
+    r <- residuals(model)
+    r.df <- df.residual(model)
+    model[["sig2"]] <- sum((r- mean(r))^2) / r.df
+    if (is.null(weights(model))) {
+        model$prior.weights <- rep(1, nrow(model.frame(model)))
+    }
+    if (is.null(model[["linear.predictors"]])) {
+        model[["linear.predictors"]] <- model[["fitted.values"]]
+    }
+    worm_plot.gam(model, ...)
 }

@@ -3,6 +3,8 @@
 \name{worm_plot}
 \alias{worm_plot}
 \alias{worm_plot.gam}
+\alias{worm_plot.glm}
+\alias{worm_plot.lm}
 \title{Worm plot of model residuals}
 \usage{
 worm_plot(model, ...)
@@ -26,6 +28,10 @@ worm_plot(model, ...)
   line_col = "red",
   ...
 )
+
+\method{worm_plot}{glm}(model, ...)
+
+\method{worm_plot}{lm}(model, ...)
 }
 \arguments{
 \item{model}{a fitted model. Currently only class \code{"gam"}.}
