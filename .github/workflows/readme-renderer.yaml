@@ -17,6 +17,24 @@ jobs:
     - uses: actions/checkout@v2
     - uses: r-lib/actions/setup-r@master
     - uses: r-lib/actions/setup-pandoc@master
+    
+    - name: Install dependencies on MacOS
+      if: runner.os == 'macOS'
+      run: |
+        brew install cairo libgit2
+
+    - name: Query dependencies
+      run: |
+        install.packages('remotes')
+        saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
+      shell: Rscript {0}
+    
+    - name: Cache R packages
+      uses: actions/cache@v2
+      with:
+        path: ${{ env.R_LIBS_USER }}
+        key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
+        restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
 
     # install packages
     - name: install rmarkdown
@@ -25,7 +43,7 @@ jobs:
     - name: install gratia
       run: Rscript -e 'remotes::install_github("gavinsimpson/gratia", upgrade_dependencies = FALSE)'
 
-    # Render READEME.md using rmarkdown
+    # Render README.md using rmarkdown
     - name: render README
       run: Rscript -e 'rmarkdown::render("README.Rmd", output_format = "md_document")'
 
