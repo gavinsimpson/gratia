@@ -784,7 +784,7 @@
 
     ## add labels if not supplied
     if (is.null(ylab)) {
-        ylab <- paste(toTitleCase(type), "residuals")
+        ylab <- paste(toTitleCase(type), "residuals (Deviation)")
     }
 
     if (is.null(xlab)) {
