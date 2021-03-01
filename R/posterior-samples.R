@@ -128,7 +128,7 @@
     sims <- Xp %*% t(Rbeta)
 
     if (isTRUE(identical(scale, "response"))) {
-        ilink <- family(model)[["linkinv"]]
+        ilink <- inv_link(model, parameter = "location") # family(model)[["linkinv"]]
         sims <- ilink(sims)
     }
 
