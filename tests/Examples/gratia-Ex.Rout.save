@@ -210,7 +210,7 @@ detaching ‘package:mgcv’
 > 
 > library(mgcv)
 Loading required package: nlme
-This is mgcv 1.8-33. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-34. For overview type 'help("mgcv-package")'.
 > ## Don't show: 
 > set.seed(2)
 > ## End(Don't show)
@@ -990,11 +990,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x5558bc06bf68>
+<environment: 0x55661df9ddb0>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x5558bc06bf68>
+<environment: 0x55661df9ddb0>
 > 
 > 
 > 
@@ -1554,7 +1554,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  16.014 0.187 16.126 0 0 
+Time elapsed:  16.007 0.192 16.245 0 0 
 > grDevices::dev.off()
 null device 
           1 
