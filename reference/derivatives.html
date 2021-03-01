@@ -265,20 +265,20 @@ interval (given <code>level</code>),</p></li>
 
 <span class='co'>## first derivatives of all smooths using central finite differences</span>
 <span class='fu'>derivatives</span><span class='op'>(</span><span class='va'>mod</span>, type <span class='op'>=</span> <span class='st'>"central"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 800 x 8</span><span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 800 x 8</span><span>
 #&gt;    smooth var       data derivative    se  crit lower upper
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> s(x0)  x0    0.000</span><span style='text-decoration: underline;'>239</span><span>       7.41  3.33  1.96 0.874  13.9
-#&gt; </span><span style='color: #555555;'> 2</span><span> s(x0)  x0    0.005</span><span style='text-decoration: underline;'>25</span><span>        7.41  3.33  1.96 0.875  13.9
-#&gt; </span><span style='color: #555555;'> 3</span><span> s(x0)  x0    0.010</span><span style='text-decoration: underline;'>3</span><span>         7.40  3.33  1.96 0.884  13.9
-#&gt; </span><span style='color: #555555;'> 4</span><span> s(x0)  x0    0.015</span><span style='text-decoration: underline;'>3</span><span>         7.40  3.31  1.96 0.902  13.9
-#&gt; </span><span style='color: #555555;'> 5</span><span> s(x0)  x0    0.020</span><span style='text-decoration: underline;'>3</span><span>         7.39  3.30  1.96 0.929  13.8
-#&gt; </span><span style='color: #555555;'> 6</span><span> s(x0)  x0    0.025</span><span style='text-decoration: underline;'>3</span><span>         7.38  3.27  1.96 0.965  13.8
-#&gt; </span><span style='color: #555555;'> 7</span><span> s(x0)  x0    0.030</span><span style='text-decoration: underline;'>3</span><span>         7.36  3.24  1.96 1.01   13.7
-#&gt; </span><span style='color: #555555;'> 8</span><span> s(x0)  x0    0.035</span><span style='text-decoration: underline;'>3</span><span>         7.34  3.20  1.96 1.07   13.6
-#&gt; </span><span style='color: #555555;'> 9</span><span> s(x0)  x0    0.040</span><span style='text-decoration: underline;'>3</span><span>         7.32  3.15  1.96 1.14   13.5
-#&gt; </span><span style='color: #555555;'>10</span><span> s(x0)  x0    0.045</span><span style='text-decoration: underline;'>3</span><span>         7.29  3.10  1.96 1.21   13.4
-#&gt; </span><span style='color: #555555;'># ... with 790 more rows</span><span></div><div class='input'><span class='co'># \dontshow{</span>
+#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> s(x0)  x0    0.000</span><span style='text-decoration: underline;'>239</span><span>       7.41  3.33  1.96 0.874  13.9
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> s(x0)  x0    0.005</span><span style='text-decoration: underline;'>25</span><span>        7.41  3.33  1.96 0.875  13.9
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> s(x0)  x0    0.010</span><span style='text-decoration: underline;'>3</span><span>         7.40  3.33  1.96 0.884  13.9
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> s(x0)  x0    0.015</span><span style='text-decoration: underline;'>3</span><span>         7.40  3.31  1.96 0.902  13.9
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> s(x0)  x0    0.020</span><span style='text-decoration: underline;'>3</span><span>         7.39  3.30  1.96 0.929  13.8
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> s(x0)  x0    0.025</span><span style='text-decoration: underline;'>3</span><span>         7.38  3.27  1.96 0.965  13.8
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> s(x0)  x0    0.030</span><span style='text-decoration: underline;'>3</span><span>         7.36  3.24  1.96 1.01   13.7
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> s(x0)  x0    0.035</span><span style='text-decoration: underline;'>3</span><span>         7.34  3.20  1.96 1.07   13.6
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> s(x0)  x0    0.040</span><span style='text-decoration: underline;'>3</span><span>         7.32  3.15  1.96 1.14   13.5
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span> s(x0)  x0    0.045</span><span style='text-decoration: underline;'>3</span><span>         7.29  3.10  1.96 1.21   13.4
+#&gt; </span><span style='color: #949494;'># ... with 790 more rows</span><span></div><div class='input'><span class='co'># \dontshow{</span>
 <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span>
 <span class='co'># }</span>
 </div></span></pre>
@@ -293,11 +293,11 @@ interval (given <code>level</code>),</p></li>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Gavin L. Simpson.</p>
+  <p><p>Developed by Gavin L. Simpson.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9000.</p></p>
 </div>
 
       </footer>
