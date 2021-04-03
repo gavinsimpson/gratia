@@ -58,9 +58,16 @@
 ##' distribution of fitted model using a Gaussian approximation to the
 ##' posterior.
 ##'
+##' @param method character; the method used to generate samples from the
+##'   posterior distribution of the model. `"gaussian"`, the default, uses a
+##'   Gaussian approximation to the posterior. `"mh"` uses a simple Metropolis
+##'   Hastings sampler, while `"inla"` uses a variant of Integrated Nested
+##'   Laplace Approximation due to Wood (2019). Currently, the only available
+##'   option is `"gaussian"`.
+##'
 ##' @return A tibble (data frame) with 3 columns containing the posterior
 ##'   predicted values in long format. The columns are
-##' * `row` (integet) the row of `newdata` that each posterior draw relates to,
+##' * `row` (integer) the row of `newdata` that each posterior draw relates to,
 ##' * `draw` (integer) an index, in range `1:n`, indicating which draw each row
 ##'     relates to,
 ##' * `response` (numeric) the predicted response for the indicated row of
@@ -70,14 +77,11 @@
 ##'
 ##' @inheritParams posterior_samples
 ##'
-##' @param method character; the method used to generate samples from the
-##'   posterior distribution of the model. `"gaussian"`, the default, uses a
-##'   Gaussian approximation to the posterior. `"mh"` uses a simple Metropolis
-##'   Hastings sampler, while `"inla"` uses a variant of Integrated Nested
-##'   Laplace Approximation due to Wood (2019). Currently, the only available
-##'   option is `"gaussian"`.
+##' @references
+##'
+##' Wood, S.N., (2020). Simplified integrated nested Laplace approximation.
+##'   *Biometrika* **107**, 223--230. \doi{10.1093/biomet/asz044}
 ##' 
-##' @rdname predicted_samples
 ##' @export
 `fitted_samples` <- function(model, ...) {
     UseMethod("fitted_samples")
@@ -90,7 +94,8 @@
 }
 
 ##' @export
-##' @rdname predicted_samples
+##'
+##' @rdname fitted_samples
 ##'
 ##' @importFrom stats vcov coef predict
 ##' @importFrom mvnfast rmvn
@@ -167,7 +172,7 @@
 ##'
 ##' @return A tibble (data frame) with 3 columns containing the posterior
 ##'   predicted values in long format. The columns are
-##' * `row` (integet) the row of `newdata` that each posterior draw relates to,
+##' * `row` (integer) the row of `newdata` that each posterior draw relates to,
 ##' * `draw` (integer) an index, in range `1:n`, indicating which draw each row
 ##'     relates to,
 ##' * `response` (numeric) the predicted response for the indicated row of

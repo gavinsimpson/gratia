@@ -1,6 +1,6 @@
 
-R version 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
-Copyright (C) 2020 The R Foundation for Statistical Computing
+R version 4.0.4 (2021-02-15) -- "Lost Library Book"
+Copyright (C) 2021 The R Foundation for Statistical Computing
 Platform: x86_64-redhat-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -895,6 +895,51 @@ Factor `by' variable example
 
 detaching ‘package:mgcv’
 
+> nameEx("fitted_samples")
+> ### * fitted_samples
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: fitted_samples
+> ### Title: Draw fitted values from the posterior distribution
+> ### Aliases: fitted_samples fitted_samples.gam
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> ## Don't show: 
+> set.seed(2)
+> op <- options(cli.unicode = FALSE)
+> ## End(Don't show)
+> dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
+Gu & Wahba 4 term additive model
+> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> fitted_samples(m1, n = 5, seed = 42)
+# A tibble: 5,000 x 3
+     row  draw fitted
+   <int> <int>  <dbl>
+ 1     1     1   6.24
+ 2     2     1   5.12
+ 3     3     1   7.06
+ 4     4     1   7.56
+ 5     5     1   9.20
+ 6     6     1   7.94
+ 7     7     1   6.13
+ 8     8     1   7.59
+ 9     9     1  13.9 
+10    10     1  12.7 
+# ... with 4,990 more rows
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("fix_offset")
 > ### * fix_offset
 > 
@@ -990,11 +1035,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55661df9ddb0>
+<environment: 0x55e86fc3ef10>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55661df9ddb0>
+<environment: 0x55e86fc3ef10>
 > 
 > 
 > 
@@ -1151,40 +1196,13 @@ detaching ‘package:mgcv’
 > 
 > flush(stderr()); flush(stdout())
 > 
-> ### Name: fitted_samples
-> ### Title: Draw fitted values from the posterior distribution
-> ### Aliases: fitted_samples fitted_samples.gam predicted_samples
-> ###   predicted_samples.gam
+> ### Name: predicted_samples
+> ### Title: Draw new response values from the conditional distribution of
+> ###   the response
+> ### Aliases: predicted_samples predicted_samples.gam
 > 
 > ### ** Examples
 > 
-> load_mgcv()
-> ## Don't show: 
-> set.seed(2)
-> op <- options(cli.unicode = FALSE)
-> ## End(Don't show)
-> dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
-Gu & Wahba 4 term additive model
-> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-> 
-> fitted_samples(m1, n = 5, seed = 42)
-# A tibble: 5,000 x 3
-     row  draw fitted
-   <int> <int>  <dbl>
- 1     1     1   6.24
- 2     2     1   5.12
- 3     3     1   7.06
- 4     4     1   7.56
- 5     5     1   9.20
- 6     6     1   7.94
- 7     7     1   6.13
- 8     8     1   7.59
- 9     9     1  13.9 
-10    10     1  12.7 
-# ... with 4,990 more rows
-> ## Don't show: 
-> options(op)
-> ## End(Don't show)
 > load_mgcv()
 > ## Don't show: 
 > set.seed(2)
@@ -1554,7 +1572,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  16.007 0.192 16.245 0 0 
+Time elapsed:  15.989 0.238 16.3 0 0 
 > grDevices::dev.off()
 null device 
           1 
