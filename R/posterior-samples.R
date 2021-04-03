@@ -55,8 +55,8 @@
 ##' Draw fitted values from the posterior distribution
 ##'
 ##' Expectations (fitted values) of the response drawn from the posterior
-##'   distribution of fitted model, created via `simulate()` (e.g.
-##'   [simulate.gam()]) and returned in a tidy, long, format.
+##' distribution of fitted model using a Gaussian approximation to the
+##' posterior.
 ##'
 ##' @return A tibble (data frame) with 3 columns containing the posterior
 ##'   predicted values in long format. The columns are
@@ -69,6 +69,13 @@
 ##' @author Gavin L. Simpson
 ##'
 ##' @inheritParams posterior_samples
+##'
+##' @param method character; the method used to generate samples from the
+##'   posterior distribution of the model. `"gaussian"`, the default, uses a
+##'   Gaussian approximation to the posterior. `"mh"` uses a simple Metropolis
+##'   Hastings sampler, while `"inla"` uses a variant of Integrated Nested
+##'   Laplace Approximation due to Wood (2019). Currently, the only available
+##'   option is `"gaussian"`.
 ##' 
 ##' @rdname predicted_samples
 ##' @export
@@ -101,6 +108,7 @@
 ##' \dontshow{options(op)}
 `fitted_samples.gam` <- function(model, n = 1, newdata, seed,
                                  scale = c("response","linear_predictor"),
+                                 method = c("gaussian", "mh", "inla"),
                                  freq = FALSE, unconditional = FALSE,
                                  ncores = 1L, ...) {
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
@@ -120,6 +128,11 @@
     }
 
     scale <- match.arg(scale)
+
+    method <- match.arg(method)
+    if (! method %in% c("gaussian")) {
+        warning("Only Gaussian approximation is currently available.")
+    }
 
     V <- get_vcov(model, frequentist = freq, unconditional = unconditional)
     Rbeta <- rmvn(n = n, mu = coef(model), sigma = V, ncores = ncores)
@@ -144,11 +157,13 @@
     sims
 }
 
-##' Draw predicted values from the posterior distribution
+##' Draw new response values from the conditional distribution of the response
 ##'
-##' Predicted values of the response drawn from the posterior distribution of
-##'   fitted model, created via `simulate()` (e.g. [simulate.gam()])
-##'   and returned in a tidy, long, format.
+##' Predicted values of the response (new response data) are drawn from the
+##' fitted model, created via `simulate()` (e.g. [simulate.gam()]) and returned
+##' in a tidy, long, format. These predicted values do not include the
+##' uncertainty in the estimated model; they are simply draws from the
+##' conditional distribution of the response.
 ##'
 ##' @return A tibble (data frame) with 3 columns containing the posterior
 ##'   predicted values in long format. The columns are

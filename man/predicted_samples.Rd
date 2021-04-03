@@ -15,6 +15,7 @@ fitted_samples(model, ...)
   newdata,
   seed,
   scale = c("response", "linear_predictor"),
+  method = c("gaussian", "mh", "inla"),
   freq = FALSE,
   unconditional = FALSE,
   ncores = 1L,
@@ -47,6 +48,13 @@ the model will be used for \code{newdata}, if available in \code{model}.}
 \item{seed}{numeric; a random seed for the simulations.}
 
 \item{scale}{character;}
+
+\item{method}{character; the method used to generate samples from the
+posterior distribution of the model. \code{"gaussian"}, the default, uses a
+Gaussian approximation to the posterior. \code{"mh"} uses a simple Metropolis
+Hastings sampler, while \code{"inla"} uses a variant of Integrated Nested
+Laplace Approximation due to Wood (2019). Currently, the only available
+option is \code{"gaussian"}.}
 
 \item{freq}{logical; \code{TRUE} to use the frequentist covariance matrix of
 the parameter estimators, \code{FALSE} to use the Bayesian posterior
@@ -87,12 +95,14 @@ relates to,
 }
 \description{
 Expectations (fitted values) of the response drawn from the posterior
-distribution of fitted model, created via \code{simulate()} (e.g.
-\code{\link[=simulate.gam]{simulate.gam()}}) and returned in a tidy, long, format.
+distribution of fitted model using a Gaussian approximation to the
+posterior.
 
-Predicted values of the response drawn from the posterior distribution of
-fitted model, created via \code{simulate()} (e.g. \code{\link[=simulate.gam]{simulate.gam()}})
-and returned in a tidy, long, format.
+Predicted values of the response (new response data) are drawn from the
+fitted model, created via \code{simulate()} (e.g. \code{\link[=simulate.gam]{simulate.gam()}}) and returned
+in a tidy, long, format. These predicted values do not include the
+uncertainty in the estimated model; they are simply draws from the
+conditional distribution of the response.
 }
 \examples{
 load_mgcv()
