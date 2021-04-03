@@ -68,6 +68,9 @@ distribution used when fitting the model." />
 
 
 
+<!-- dependencies from examples -->
+
+
   
 
   
@@ -173,8 +176,8 @@ then defaults to <code>object[["prior.weights"]]</code>, otherwise a vector of o
     </tr>
     <tr>
       <th>...</th>
-      <td><p>arguments passed to methods. <code>simulate.gam()</code> and
-<code>simulate.scam()</code> pass <code>...</code> on to <code><a href='https://rdrr.io/pkg/mgcv/man/predict.gam.html'>predict.gam()</a></code>. As such you can pass
+      <td><p>arguments passed to methods. <code><a href='simulate.html'>simulate.gam()</a></code> and
+<code><a href='simulate.html'>simulate.scam()</a></code> pass <code>...</code> on to <code><a href='https://rdrr.io/pkg/mgcv/man/predict.gam.html'>predict.gam()</a></code>. As such you can pass
 additional arguments such as <code>terms</code>, <code>exclude</code>, to select which model
 terms are included in the predictions. This may be useful, for example,
 for excluding the effects of random effect terms.</p></td>
@@ -186,7 +189,7 @@ for excluding the effects of random effect terms.</p></td>
     <p>(Currently) A matrix with <code>nsim</code> columns.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>For <code>simulate.gam()</code> to function, the <code>family</code> component of the fitted
+    <p>For <code><a href='simulate.html'>simulate.gam()</a></code> to function, the <code>family</code> component of the fitted
 model must contain, or be updateable to contain, the required random
 number generator. See <code><a href='https://rdrr.io/pkg/mgcv/man/fix.family.link.html'>mgcv::fix.family.rd()</a></code>.</p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
@@ -223,7 +226,7 @@ number generator. See <code><a href='https://rdrr.io/pkg/mgcv/man/fix.family.lin
 </div>
 
 <div class="pkgdown">
-  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9000.</p></p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>

@@ -43,11 +43,13 @@
 
 <meta property="og:title" content="Draw fitted values from the posterior distribution — fitted_samples" />
 <meta property="og:description" content="Expectations (fitted values) of the response drawn from the posterior
-distribution of fitted model, created via simulate() (e.g.
-simulate.gam()) and returned in a tidy, long, format.
-Predicted values of the response drawn from the posterior distribution of
-fitted model, created via simulate() (e.g. simulate.gam())
-and returned in a tidy, long, format." />
+distribution of fitted model using a Gaussian approximation to the
+posterior.
+Predicted values of the response (new response data) are drawn from the
+fitted model, created via simulate() (e.g. simulate.gam()) and returned
+in a tidy, long, format. These predicted values do not include the
+uncertainty in the estimated model; they are simply draws from the
+conditional distribution of the response." />
 <meta property="og:image" content="https://gavinsimpson.github.io/gratia/reference/figures/README-draw-gam-figure-1.png" />
 <meta property="og:image:alt" content="Plot produced by draw() of 4 smooth functions from a fitted generalized additive model" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -68,6 +70,9 @@ and returned in a tidy, long, format." />
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 
+
+
+<!-- dependencies from examples -->
 
 
   
@@ -132,32 +137,35 @@ and returned in a tidy, long, format." />
 
     <div class="ref-description">
     <p>Expectations (fitted values) of the response drawn from the posterior
-distribution of fitted model, created via <code><a href='https://rdrr.io/r/stats/simulate.html'>simulate()</a></code> (e.g.
-<code><a href='simulate.gam.html'>simulate.gam()</a></code>) and returned in a tidy, long, format.</p>
-<p>Predicted values of the response drawn from the posterior distribution of
-fitted model, created via <code><a href='https://rdrr.io/r/stats/simulate.html'>simulate()</a></code> (e.g. <code><a href='simulate.gam.html'>simulate.gam()</a></code>)
-and returned in a tidy, long, format.</p>
+distribution of fitted model using a Gaussian approximation to the
+posterior.</p>
+<p>Predicted values of the response (new response data) are drawn from the
+fitted model, created via <code><a href='https://rdrr.io/r/stats/simulate.html'>simulate()</a></code> (e.g. <code><a href='simulate.html'>simulate.gam()</a></code>) and returned
+in a tidy, long, format. These predicted values do not include the
+uncertainty in the estimated model; they are simply draws from the
+conditional distribution of the response.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>fitted_samples</span><span class='op'>(</span><span class='va'>model</span>, <span class='va'>...</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'><a href='predicted_samples.html'>fitted_samples</a></span><span class='op'>(</span><span class='va'>model</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for gam</span>
-<span class='fu'>fitted_samples</span><span class='op'>(</span>
+<span class='fu'><a href='predicted_samples.html'>fitted_samples</a></span><span class='op'>(</span>
   <span class='va'>model</span>,
   n <span class='op'>=</span> <span class='fl'>1</span>,
   <span class='va'>newdata</span>,
   <span class='va'>seed</span>,
   scale <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"response"</span>, <span class='st'>"linear_predictor"</span><span class='op'>)</span>,
+  method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"gaussian"</span>, <span class='st'>"mh"</span>, <span class='st'>"inla"</span><span class='op'>)</span>,
   freq <span class='op'>=</span> <span class='cn'>FALSE</span>,
   unconditional <span class='op'>=</span> <span class='cn'>FALSE</span>,
   ncores <span class='op'>=</span> <span class='fl'>1L</span>,
   <span class='va'>...</span>
 <span class='op'>)</span>
 
-<span class='fu'>predicted_samples</span><span class='op'>(</span><span class='va'>model</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'><a href='predicted_samples.html'>predicted_samples</a></span><span class='op'>(</span><span class='va'>model</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for gam</span>
-<span class='fu'>predicted_samples</span><span class='op'>(</span>
+<span class='fu'><a href='predicted_samples.html'>predicted_samples</a></span><span class='op'>(</span>
   <span class='va'>model</span>,
   n <span class='op'>=</span> <span class='fl'>1</span>,
   newdata <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -175,7 +183,7 @@ and returned in a tidy, long, format.</p>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>arguments passed to other methods. For <code>fitted_samples()</code>, these
+      <td><p>arguments passed to other methods. For <code><a href='predicted_samples.html'>fitted_samples()</a></code>, these
 are passed on to <code><a href='https://rdrr.io/pkg/mgcv/man/predict.gam.html'>predict.gam()</a></code>.</p></td>
     </tr>
     <tr>
@@ -195,6 +203,15 @@ the model will be used for <code>newdata</code>, if available in <code>model</co
     <tr>
       <th>scale</th>
       <td><p>character;</p></td>
+    </tr>
+    <tr>
+      <th>method</th>
+      <td><p>character; the method used to generate samples from the
+posterior distribution of the model. <code>"gaussian"</code>, the default, uses a
+Gaussian approximation to the posterior. <code>"mh"</code> uses a simple Metropolis
+Hastings sampler, while <code>"inla"</code> uses a variant of Integrated Nested
+Laplace Approximation due to Wood (2019). Currently, the only available
+option is <code>"gaussian"</code>.</p></td>
     </tr>
     <tr>
       <th>freq</th>
@@ -256,7 +273,7 @@ relates to,</p></li>
 <span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>1</span>, n <span class='op'>=</span> <span class='fl'>1000</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='va'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span>
 
-<span class='fu'>fitted_samples</span><span class='op'>(</span><span class='va'>m1</span>, n <span class='op'>=</span> <span class='fl'>5</span>, seed <span class='op'>=</span> <span class='fl'>42</span><span class='op'>)</span>
+<span class='fu'><a href='predicted_samples.html'>fitted_samples</a></span><span class='op'>(</span><span class='va'>m1</span>, n <span class='op'>=</span> <span class='fl'>5</span>, seed <span class='op'>=</span> <span class='fl'>42</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 5,000 x 3</span><span>
 #&gt;      row  draw fitted
 #&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
@@ -279,7 +296,7 @@ relates to,</p></li>
 <span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>1</span>, n <span class='op'>=</span> <span class='fl'>1000</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='va'>m</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span>
 
-<span class='fu'>predicted_samples</span><span class='op'>(</span><span class='va'>m</span>, n <span class='op'>=</span> <span class='fl'>5</span>, seed <span class='op'>=</span> <span class='fl'>42</span><span class='op'>)</span>
+<span class='fu'><a href='predicted_samples.html'>predicted_samples</a></span><span class='op'>(</span><span class='va'>m</span>, n <span class='op'>=</span> <span class='fl'>5</span>, seed <span class='op'>=</span> <span class='fl'>42</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 5,000 x 3</span><span>
 #&gt;      row  draw response
 #&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
@@ -299,7 +316,7 @@ relates to,</p></li>
                    x3 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'>## Exclude s(x2)</span>
-<span class='fu'>predicted_samples</span><span class='op'>(</span><span class='va'>m</span>, n <span class='op'>=</span> <span class='fl'>5</span>, <span class='va'>newd</span>, exclude <span class='op'>=</span> <span class='st'>"s(x2)"</span>, seed <span class='op'>=</span> <span class='fl'>25</span><span class='op'>)</span>
+<span class='fu'><a href='predicted_samples.html'>predicted_samples</a></span><span class='op'>(</span><span class='va'>m</span>, n <span class='op'>=</span> <span class='fl'>5</span>, <span class='va'>newd</span>, exclude <span class='op'>=</span> <span class='st'>"s(x2)"</span>, seed <span class='op'>=</span> <span class='fl'>25</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 50 x 3</span><span>
 #&gt;      row  draw response
 #&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
@@ -315,7 +332,7 @@ relates to,</p></li>
 #&gt; </span><span style='color: #BCBCBC;'>10</span><span>    10     1     6.27
 #&gt; </span><span style='color: #949494;'># ... with 40 more rows</span><span></div><div class='input'>
 <span class='co'>## Exclude s(x1)</span>
-<span class='fu'>predicted_samples</span><span class='op'>(</span><span class='va'>m</span>, n <span class='op'>=</span> <span class='fl'>5</span>, <span class='va'>newd</span>, exclude <span class='op'>=</span> <span class='st'>"s(x1)"</span>, seed <span class='op'>=</span> <span class='fl'>25</span><span class='op'>)</span>
+<span class='fu'><a href='predicted_samples.html'>predicted_samples</a></span><span class='op'>(</span><span class='va'>m</span>, n <span class='op'>=</span> <span class='fl'>5</span>, <span class='va'>newd</span>, exclude <span class='op'>=</span> <span class='st'>"s(x1)"</span>, seed <span class='op'>=</span> <span class='fl'>25</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 50 x 3</span><span>
 #&gt;      row  draw response
 #&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
@@ -331,7 +348,7 @@ relates to,</p></li>
 #&gt; </span><span style='color: #BCBCBC;'>10</span><span>    10     1     6.68
 #&gt; </span><span style='color: #949494;'># ... with 40 more rows</span><span></div><div class='input'>
 <span class='co'>## Select which terms --- result same as previous</span>
-<span class='fu'>predicted_samples</span><span class='op'>(</span><span class='va'>m</span>, n <span class='op'>=</span> <span class='fl'>5</span>, <span class='va'>newd</span>, seed <span class='op'>=</span> <span class='fl'>25</span>,
+<span class='fu'><a href='predicted_samples.html'>predicted_samples</a></span><span class='op'>(</span><span class='va'>m</span>, n <span class='op'>=</span> <span class='fl'>5</span>, <span class='va'>newd</span>, seed <span class='op'>=</span> <span class='fl'>25</span>,
                   terms <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"s(x0)"</span>, <span class='st'>"s(x2)"</span>, <span class='st'>"s(x3)"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 50 x 3</span><span>
 #&gt;      row  draw response
@@ -363,7 +380,7 @@ relates to,</p></li>
 </div>
 
 <div class="pkgdown">
-  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9000.</p></p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
