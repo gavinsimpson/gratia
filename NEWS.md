@@ -1,4 +1,4 @@
-# gratia 0.5.1.9003
+# gratia 0.5.1.9004
 
 ## Major changes
 
@@ -63,6 +63,9 @@
   with `interval = "confidence"` because it didn't subset the rows of `newdata`
   for the specific level of the by factor when computing derivatives.
   (#102 @sambweber)
+
+* `evaluate_smooth()` can now handle random effect smooths defined using an
+  ordered factor. (#99 @StefanoMezzini)
 
 # gratia 0.5.1
 
