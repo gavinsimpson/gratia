@@ -87,7 +87,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.1.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.1.9004</span>
       </span>
     </div>
 
@@ -124,9 +124,9 @@
       <small>Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="gratia-0519003" class="section level1">
-<h1 class="page-header" data-toc-text="0.5.1.9003">
-<a href="#gratia-0519003" class="anchor"></a>gratia 0.5.1.9003<small> Unreleased </small>
+    <div id="gratia-0519004" class="section level1">
+<h1 class="page-header" data-toc-text="0.5.1.9004">
+<a href="#gratia-0519004" class="anchor"></a>gratia 0.5.1.9004<small> Unreleased </small>
 </h1>
 <div id="major-changes" class="section level2">
 <h2 class="hasAnchor">
@@ -166,6 +166,7 @@
 <ul>
 <li><p><code><a href="../reference/transform_fun.html">transform_fun()</a></code> had a copy paste bug in the definition of the then generic. (<a href='https://github.com/gavinsimpson/gratia/issues/96'>#96</a> <a href='https://github.com/Aariq'>@Aariq</a>)</p></li>
 <li><p><code><a href="../reference/derivatives.html">derivatives()</a></code> with user-supplied <code>newdata</code> would fail for factor by smooths with <code>interval = "simultaneous"</code> and would introduce rows with derivative == 0 with <code>interval = "confidence"</code> because it didn’t subset the rows of <code>newdata</code> for the specific level of the by factor when computing derivatives. (<a href='https://github.com/gavinsimpson/gratia/issues/102'>#102</a> <a href='https://github.com/sambweber'>@sambweber</a>)</p></li>
+<li><p><code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code> can now handle random effect smooths defined using an ordered factor. (<a href='https://github.com/gavinsimpson/gratia/issues/99'>#99</a> <a href='https://github.com/StefanoMezzini'>@StefanoMezzini</a>)</p></li>
 </ul>
 </div>
 </div>
