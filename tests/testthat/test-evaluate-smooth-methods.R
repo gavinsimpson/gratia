@@ -164,3 +164,11 @@ test_that("evaluate_fs_smooth() ", {
     newdf <- data.frame(x1 = x1, fac = fac)
     expect_silent( evaluate_smooth(mod, "x1", newdata = newdf) )
 })
+
+test_that("evaluate_re_smooth works with ordered factor #99", {
+    skip_on_cran()
+    m <- gam(uptake ~ s(conc, Type, bs = 'fs', k = 5) + s(Plant, bs = 're'),
+             family = Gamma('log'), data = CO2)
+    expect_silent(sm <- evaluate_smooth(m_re, "Plant"))
+    expect_identical(nrow(sm), nlevels(CO2[["Plant"]]))
+})
