@@ -457,6 +457,39 @@ detaching ‘package:mgcv’
  9 s(x0)  x0    0.0403         7.32  3.15  1.96 1.14   13.5
 10 s(x0)  x0    0.0453         7.29  3.10  1.96 1.21   13.4
 # ... with 790 more rows
+> 
+> ## derivatives for a selected smooth
+> derivatives(mod, type = "central", term = "s(x1)")
+# A tibble: 200 x 8
+   smooth var       data derivative    se  crit lower upper
+   <chr>  <chr>    <dbl>      <dbl> <dbl> <dbl> <dbl> <dbl>
+ 1 s(x1)  x1    0.000405     -0.907  3.12  1.96 -7.02  5.20
+ 2 s(x1)  x1    0.00541      -0.907  3.12  1.96 -7.02  5.20
+ 3 s(x1)  x1    0.0104       -0.906  3.11  1.96 -7.01  5.20
+ 4 s(x1)  x1    0.0154       -0.903  3.11  1.96 -6.99  5.19
+ 5 s(x1)  x1    0.0204       -0.898  3.10  1.96 -6.97  5.17
+ 6 s(x1)  x1    0.0254       -0.891  3.08  1.96 -6.93  5.15
+ 7 s(x1)  x1    0.0304       -0.880  3.06  1.96 -6.88  5.12
+ 8 s(x1)  x1    0.0354       -0.867  3.04  1.96 -6.82  5.08
+ 9 s(x1)  x1    0.0404       -0.850  3.00  1.96 -6.74  5.04
+10 s(x1)  x1    0.0454       -0.829  2.96  1.96 -6.64  4.98
+# ... with 190 more rows
+> ## or via a partial match
+> derivatives(mod, type = "central", term = "x1", partial_match = TRUE)
+# A tibble: 200 x 8
+   smooth var       data derivative    se  crit lower upper
+   <chr>  <chr>    <dbl>      <dbl> <dbl> <dbl> <dbl> <dbl>
+ 1 s(x1)  x1    0.000405     -0.907  3.12  1.96 -7.02  5.20
+ 2 s(x1)  x1    0.00541      -0.907  3.12  1.96 -7.02  5.20
+ 3 s(x1)  x1    0.0104       -0.906  3.11  1.96 -7.01  5.20
+ 4 s(x1)  x1    0.0154       -0.903  3.11  1.96 -6.99  5.19
+ 5 s(x1)  x1    0.0204       -0.898  3.10  1.96 -6.97  5.17
+ 6 s(x1)  x1    0.0254       -0.891  3.08  1.96 -6.93  5.15
+ 7 s(x1)  x1    0.0304       -0.880  3.06  1.96 -6.88  5.12
+ 8 s(x1)  x1    0.0354       -0.867  3.04  1.96 -6.82  5.08
+ 9 s(x1)  x1    0.0404       -0.850  3.00  1.96 -6.74  5.04
+10 s(x1)  x1    0.0454       -0.829  2.96  1.96 -6.64  4.98
+# ... with 190 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1035,11 +1068,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55e86fc3ef10>
+<environment: 0x55886bbdac08>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55e86fc3ef10>
+<environment: 0x55886bbdac08>
 > 
 > 
 > 
@@ -1572,7 +1605,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  15.989 0.238 16.3 0 0 
+Time elapsed:  16.048 0.164 16.26 0 0 
 > grDevices::dev.off()
 null device 
           1 
