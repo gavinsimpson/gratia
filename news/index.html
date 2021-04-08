@@ -124,9 +124,9 @@
       <small>Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="gratia-0519002" class="section level1">
-<h1 class="page-header" data-toc-text="0.5.1.9002">
-<a href="#gratia-0519002" class="anchor"></a>gratia 0.5.1.9002<small> Unreleased </small>
+    <div id="gratia-0519003" class="section level1">
+<h1 class="page-header" data-toc-text="0.5.1.9003">
+<a href="#gratia-0519003" class="anchor"></a>gratia 0.5.1.9003<small> Unreleased </small>
 </h1>
 <div id="major-changes" class="section level2">
 <h2 class="hasAnchor">
@@ -156,15 +156,16 @@
 <h2 class="hasAnchor">
 <a href="#user-visible-changes" class="anchor"></a>User visible changes</h2>
 <ul>
-<li>The default method name for generating reference quantiles in <code><a href="../reference/qq_plot.html">qq_plot()</a></code> was changed from <code>"direct"</code> to <code>"uniform"</code>, to avoid confusion with the <code><a href="https://rdrr.io/pkg/mgcv/man/qq.gam.html" class="external-link">mgcv::qq.gam()</a></code> help page description of the methods. Accordingly using <code>method = "direct"</code> is deprecated and a message to this effect is displayed if used.</li>
+<li><p>The default method name for generating reference quantiles in <code><a href="../reference/qq_plot.html">qq_plot()</a></code> was changed from <code>"direct"</code> to <code>"uniform"</code>, to avoid confusion with the <code><a href="https://rdrr.io/pkg/mgcv/man/qq.gam.html" class="external-link">mgcv::qq.gam()</a></code> help page description of the methods. Accordingly using <code>method = "direct"</code> is deprecated and a message to this effect is displayed if used.</p></li>
+<li><p>The way smooths/terms are selected in <code><a href="../reference/derivatives.html">derivatives()</a></code> has been switched to use the same mechanism as <code><a href="../reference/draw.gam.html">draw.gam()</a></code>’s <code>select</code> argument. To get a partial match to <code>term</code>, you now need to also specify <code>partial_match = TRUE</code> in the call to <code><a href="../reference/derivatives.html">derivatives()</a></code>.</p></li>
 </ul>
 </div>
 <div id="bug-fixes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
 <ul>
-<li>
-<code><a href="../reference/transform_fun.html">transform_fun()</a></code> had a copy paste bug in the definition of the then generic. (<a href='https://github.com/gavinsimpson/gratia/issues/96'>#96</a> <a href='https://github.com/Aariq'>@Aariq</a>)</li>
+<li><p><code><a href="../reference/transform_fun.html">transform_fun()</a></code> had a copy paste bug in the definition of the then generic. (<a href='https://github.com/gavinsimpson/gratia/issues/96'>#96</a> <a href='https://github.com/Aariq'>@Aariq</a>)</p></li>
+<li><p><code><a href="../reference/derivatives.html">derivatives()</a></code> with user-supplied <code>newdata</code> would fail for factor by smooths with <code>interval = "simultaneous"</code> and would introduce rows with derivative == 0 with <code>interval = "confidence"</code> because it didn’t subset the rows of <code>newdata</code> for the specific level of the by factor when computing derivatives. (<a href='https://github.com/gavinsimpson/gratia/issues/102'>#102</a> <a href='https://github.com/sambweber'>@sambweber</a>)</p></li>
 </ul>
 </div>
 </div>
