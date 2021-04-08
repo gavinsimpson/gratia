@@ -1,4 +1,4 @@
-# gratia 0.5.1.9002
+# gratia 0.5.1.9003
 
 ## Major changes
 
@@ -48,10 +48,21 @@
   `method = "direct"` is deprecated and a message to this effect is displayed if
   used.
 
+* The way smooths/terms are selected in `derivatives()` has been switched to use
+  the same mechanism as `draw.gam()`'s `select` argument. To get a partial match
+  to `term`, you now need to also specify `partial_match = TRUE` in the call to
+  `derivatives()`.
+
 ## Bug fixes
 
 * `transform_fun()` had a copy paste bug in the definition of the then generic.
   (#96 @Aariq)
+
+* `derivatives()` with user-supplied `newdata` would fail for factor by smooths
+  with `interval = "simultaneous"` and would introduce rows with derivative == 0
+  with `interval = "confidence"` because it didn't subset the rows of `newdata`
+  for the specific level of the by factor when computing derivatives.
+  (#102 @sambweber)
 
 # gratia 0.5.1
 
