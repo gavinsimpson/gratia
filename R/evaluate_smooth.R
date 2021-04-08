@@ -150,10 +150,10 @@
     ## drop the unused levels; hence we get a coef for all combinations of
     ## vars in the ranef smooth
     var_types <- attr(terms(model), "dataClasses")[smooth_var]
-    levs <- if (all(var_types == "factor")) {
+    levs <- if (all(var_types %in% c("factor", "ordered"))) {
         levels(interaction(model[["model"]][smooth_var], drop = FALSE))
     } else {
-        take <- smooth_var[which(var_types == "factor")]
+        take <- smooth_var[which(var_types %in% c("factor", "ordered"))]
         levels(interaction(model[["model"]][take]))
     }
 
