@@ -29,7 +29,8 @@
 
 ##' @param term character; vector of one or more smooth terms for which
 ##'   derivatives are required. If missing, derivatives for all smooth terms
-##'   will be returned. Can be a partial match to a smooth term.
+##'   will be returned. Can be a partial match to a smooth term; see argument
+##'   `partial_match` below.
 ##' @param newdata a data frame containing the values of the model covariates
 ##'   at which to evaluate the first derivatives of the smooths.
 ##' @param order numeric; the order of derivative.
@@ -53,8 +54,13 @@
 ##'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
 ##'   Parallelization will take place only if OpenMP is supported (but appears
 ##'   to work on Windows with current `R`).
+##' @param partial_match logical; should smooths be selected by partial matches
+##'   with `term`? If `TRUE`, `term` can only be a single string to match
+##'   against.
 ##'
 ##' @export
+##'
+##' @importFrom dplyr filter
 ##'
 ##' @rdname derivatives
 ##'
@@ -82,6 +88,11 @@
 ##'
 ##' ## first derivatives of all smooths using central finite differences
 ##' derivatives(mod, type = "central")
+##'
+##' ## derivatives for a selected smooth
+##' derivatives(mod, type = "central", term = "s(x1)")
+##' ## or via a partial match
+##' derivatives(mod, type = "central", term = "x1", partial_match = TRUE)
 ##' \dontshow{
 ##' options(op)
 ##' }
@@ -91,10 +102,14 @@
                               interval = c("confidence", "simultaneous"),
                               n_sim = 10000, level = 0.95,
                               unconditional = FALSE, frequentist = FALSE,
-                              offset = NULL, ncores = 1, ...) {
+                              offset = NULL, ncores = 1,
+                              partial_match = FALSE, ...) {
     ## handle term
     smooth_ids <- if (!missing(term)) {
-        which_smooths(object, term) # which smooths match 'term'
+      ## which smooths match 'term'
+      sms <- check_user_select_smooths(smooths(object), term,
+                                       partial_match = partial_match)
+      which(sms)
     } else {
         seq_len(n_smooths(object))
     }
@@ -130,22 +145,30 @@
     for (i in seq_along(smooth_ids)) {
         ## generate newdata if not supplied
         if (need_newdata) {
-            newdata <- derivative_data(object, id = smooth_ids[[i]], n = n,
-                                       offset = offset, order = order,
-                                       type = type, eps = eps)
+            newd <- derivative_data(object, id = smooth_ids[[i]], n = n,
+                                    offset = offset, order = order,
+                                    type = type, eps = eps)
+        } else {
+            ## assume the data are OK - mgcv::predict will catch issues
+            newd <- newdata
+            ## ...but we need to handle factor by
+            sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1]]
+            if (is_factor_by_smooth(sm)) {
+                newd <- filter(newd, newdata[[by_variable(sm)]] == by_level(sm))
+            }
         }
 
         ## generate list of finite difference predictions for the first or second
         ##   derivatives or the required type
         fd <- finite_diff_lpmatrix(object, type = type, order = order,
-                                   newdata = newdata, h = eps)
+                                   newdata = newd, h = eps)
 
         ## compute the finite differences
         X <- finite_difference(fd, order, type, eps)
 
         ## compute derivatives
         d <- compute_derivative(smooth_ids[[i]], lpmatrix = X, betas = betas,
-                                Vb = Vb, model = object, newdata = newdata)
+                                Vb = Vb, model = object, newdata = newd)
 
         ## compute intervals
         if (identical(interval, "confidence")) {

@@ -28,6 +28,7 @@ derivatives(object, ...)
   frequentist = FALSE,
   offset = NULL,
   ncores = 1,
+  partial_match = FALSE,
   ...
 )
 }
@@ -38,7 +39,8 @@ derivatives(object, ...)
 
 \item{term}{character; vector of one or more smooth terms for which
 derivatives are required. If missing, derivatives for all smooth terms
-will be returned. Can be a partial match to a smooth term.}
+will be returned. Can be a partial match to a smooth term; see argument
+\code{partial_match} below.}
 
 \item{newdata}{a data frame containing the values of the model covariates
 at which to evaluate the first derivatives of the smooths.}
@@ -74,6 +76,10 @@ covariance matrix?}
 multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
 Parallelization will take place only if OpenMP is supported (but appears
 to work on Windows with current \code{R}).}
+
+\item{partial_match}{logical; should smooths be selected by partial matches
+with \code{term}? If \code{TRUE}, \code{term} can only be a single string to match
+against.}
 }
 \value{
 A tibble, currently with the following variables:
@@ -105,6 +111,11 @@ mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 ## first derivatives of all smooths using central finite differences
 derivatives(mod, type = "central")
+
+## derivatives for a selected smooth
+derivatives(mod, type = "central", term = "s(x1)")
+## or via a partial match
+derivatives(mod, type = "central", term = "x1", partial_match = TRUE)
 \dontshow{
 options(op)
 }
