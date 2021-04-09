@@ -139,18 +139,13 @@ links, such as location scale models.</p>
     <pre class="usage"><span class='fu'>link</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for family</span>
-<span class='fu'>link</span><span class='op'>(</span>
-  <span class='va'>object</span>,
-  parameter <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span><span class='op'>)</span>,
-  which_eta <span class='op'>=</span> <span class='cn'>NULL</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span>
+<span class='fu'>link</span><span class='op'>(</span><span class='va'>object</span>, parameter <span class='op'>=</span> <span class='cn'>NULL</span>, which_eta <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for gam</span>
-<span class='fu'>link</span><span class='op'>(</span><span class='va'>object</span>, parameter <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span><span class='op'>)</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>link</span><span class='op'>(</span><span class='va'>object</span>, parameter <span class='op'>=</span> <span class='cn'>NULL</span>, which_eta <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for bam</span>
-<span class='fu'>link</span><span class='op'>(</span><span class='va'>object</span>, parameter <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span><span class='op'>)</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>link</span><span class='op'>(</span><span class='va'>object</span>, parameter <span class='op'>=</span> <span class='cn'>NULL</span>, which_eta <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for gamm</span>
 <span class='fu'>link</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
@@ -164,18 +159,13 @@ links, such as location scale models.</p>
 <span class='fu'>inv_link</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for family</span>
-<span class='fu'>inv_link</span><span class='op'>(</span>
-  <span class='va'>object</span>,
-  parameter <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span><span class='op'>)</span>,
-  which_eta <span class='op'>=</span> <span class='cn'>NULL</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span>
+<span class='fu'>inv_link</span><span class='op'>(</span><span class='va'>object</span>, parameter <span class='op'>=</span> <span class='cn'>NULL</span>, which_eta <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for gam</span>
-<span class='fu'>inv_link</span><span class='op'>(</span><span class='va'>object</span>, parameter <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span><span class='op'>)</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>inv_link</span><span class='op'>(</span><span class='va'>object</span>, parameter <span class='op'>=</span> <span class='cn'>NULL</span>, which_eta <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for bam</span>
-<span class='fu'>inv_link</span><span class='op'>(</span><span class='va'>object</span>, parameter <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"location"</span>, <span class='st'>"scale"</span>, <span class='st'>"shape"</span><span class='op'>)</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>inv_link</span><span class='op'>(</span><span class='va'>object</span>, parameter <span class='op'>=</span> <span class='cn'>NULL</span>, which_eta <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for gamm</span>
 <span class='fu'>inv_link</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
@@ -184,7 +174,15 @@ links, such as location scale models.</p>
 <span class='fu'>inv_link</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for glm</span>
-<span class='fu'>inv_link</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>inv_link</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='fu'>extract_link</span><span class='op'>(</span><span class='va'>family</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for family</span>
+<span class='fu'>extract_link</span><span class='op'>(</span><span class='va'>family</span>, inverse <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for general.family</span>
+<span class='fu'>extract_link</span><span class='op'>(</span><span class='va'>family</span>, <span class='va'>parameter</span>, inverse <span class='op'>=</span> <span class='cn'>FALSE</span>, which_eta <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -213,6 +211,14 @@ parameter, and <code>"xi"</code>, the shape parameter for  <code><a href='https:
       <th>which_eta</th>
       <td><p>numeric; the linear predictor to extract for families
 <code><a href='https://rdrr.io/pkg/mgcv/man/mvn.html'>mgcv::mvn()</a></code> and <code><a href='https://rdrr.io/pkg/mgcv/man/multinom.html'>mgcv::multinom()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>family</th>
+      <td><p>a family object, the result of a call to <code><a href='https://rdrr.io/r/stats/family.html'>family()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>inverse</th>
+      <td><p>logical; return the inverse of the link function?</p></td>
     </tr>
     </table>
 
@@ -244,10 +250,10 @@ parameter, and <code>"xi"</code>, the shape parameter for  <code><a href='https:
 <span class='fu'>link</span><span class='op'>(</span><span class='va'>mod</span>, parameter <span class='op'>=</span> <span class='st'>"scale"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; function (mu) 
 #&gt; log(1/mu - 0.01)
-#&gt; &lt;environment: 0x7ffb3cc63ba0&gt;</div><div class='input'><span class='fu'>inv_link</span><span class='op'>(</span><span class='va'>mod</span>, parameter <span class='op'>=</span> <span class='st'>"scale"</span><span class='op'>)</span>
+#&gt; &lt;environment: 0x7f93fd78afd0&gt;</div><div class='input'><span class='fu'>inv_link</span><span class='op'>(</span><span class='va'>mod</span>, parameter <span class='op'>=</span> <span class='st'>"scale"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; function (eta) 
 #&gt; 1/(exp(eta) + 0.01)
-#&gt; &lt;environment: 0x7ffb3cc63ba0&gt;</div></pre>
+#&gt; &lt;environment: 0x7f93fd78afd0&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
