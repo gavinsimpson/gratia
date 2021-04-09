@@ -10,10 +10,13 @@
 ##'   supported.
 ##' @param parameter character; which parameter of the distribution. Usually
 ##'   `"location"` but `"scale"` and `"shape"` may be provided for location
-##'   scale models. Other options include `"mu"` and `"sigma"` as synonyms for
-##'   `"location"` and `"scale"` respectively, `"pi"` for the zero-inflation
-##'   term in [mgcv::ziplss()], `"power"` for the  [mgcv::twlss()] power
-##'   parameter, and `"xi"`, the shape parameter for  [mgcv::gevlss()].
+##'   scale models. Other options include `"mu"` as a synonym for `"location"`,
+##'   `"sigma"` for the scale parameter in [mgcv::gaulss()], `"pi"` for the
+##'   zero-inflation term in [mgcv::ziplss()], `"power"` for the
+##'   [mgcv::twlss()] power parameter, `"xi"`, the shape parameter for
+##'   [mgcv::gevlss()], `"epsilon"` or `"skewness"` for the skewness and
+##'   `"delta"` or `"kurtosis"` for the kurtosis parameter for
+##'   [mgcv::shash()], or `"theta"` for the scale parameter of [mgcv::gammals()].
 ##' @param which_eta numeric; the linear predictor to extract for families
 ##'   [mgcv::mvn()] and [mgcv::multinom()].
 ##' @param ... arguments passed to other methods.
@@ -39,6 +42,9 @@
 ##'
 ##' link(mod, parameter = "scale")
 ##' inv_link(mod, parameter = "scale")
+##'
+##' ## Works with `family` objects too
+##' link(shash(), parameter = "skewness")
 `link` <- function(object, ...) {
     UseMethod("link")
 }

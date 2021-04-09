@@ -64,10 +64,13 @@ supported.}
 
 \item{parameter}{character; which parameter of the distribution. Usually
 \code{"location"} but \code{"scale"} and \code{"shape"} may be provided for location
-scale models. Other options include \code{"mu"} and \code{"sigma"} as synonyms for
-\code{"location"} and \code{"scale"} respectively, \code{"pi"} for the zero-inflation
-term in \code{\link[mgcv:ziplss]{mgcv::ziplss()}}, \code{"power"} for the  \code{\link[mgcv:twlss]{mgcv::twlss()}} power
-parameter, and \code{"xi"}, the shape parameter for  \code{\link[mgcv:gevlss]{mgcv::gevlss()}}.}
+scale models. Other options include \code{"mu"} as a synonym for \code{"location"},
+\code{"sigma"} for the scale parameter in \code{\link[mgcv:gaulss]{mgcv::gaulss()}}, \code{"pi"} for the
+zero-inflation term in \code{\link[mgcv:ziplss]{mgcv::ziplss()}}, \code{"power"} for the
+\code{\link[mgcv:twlss]{mgcv::twlss()}} power parameter, \code{"xi"}, the shape parameter for
+\code{\link[mgcv:gevlss]{mgcv::gevlss()}}, \code{"epsilon"} or \code{"skewness"} for the skewness and
+\code{"delta"} or \code{"kurtosis"} for the kurtosis parameter for
+\code{\link[mgcv:shash]{mgcv::shash()}}, or \code{"theta"} for the scale parameter of \code{\link[mgcv:gammals]{mgcv::gammals()}}.}
 
 \item{which_eta}{numeric; the linear predictor to extract for families
 \code{\link[mgcv:mvn]{mgcv::mvn()}} and \code{\link[mgcv:multinom]{mgcv::multinom()}}.}
@@ -98,6 +101,9 @@ mod <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1), data = dat,
 
 link(mod, parameter = "scale")
 inv_link(mod, parameter = "scale")
+
+## Works with `family` objects too
+link(shash(), parameter = "skewness")
 }
 \author{
 Gavin L. Simpson
