@@ -87,7 +87,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.1.9004</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.1.9005</span>
       </span>
     </div>
 
@@ -124,9 +124,9 @@
       <small>Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="gratia-0519004" class="section level1">
-<h1 class="page-header" data-toc-text="0.5.1.9004">
-<a href="#gratia-0519004" class="anchor"></a>gratia 0.5.1.9004<small> Unreleased </small>
+    <div id="gratia-0519005" class="section level1">
+<h1 class="page-header" data-toc-text="0.5.1.9005">
+<a href="#gratia-0519005" class="anchor"></a>gratia 0.5.1.9005<small> Unreleased </small>
 </h1>
 <div id="major-changes" class="section level2">
 <h2 class="hasAnchor">
@@ -147,6 +147,7 @@
 <p>Worm plot diagnostic plots are available via new function <code><a href="../reference/worm_plot.html">worm_plot()</a></code>. Worm plots are detrended Q-Q plots, where deviation from the Q-Q reference line are emphasized as deviations around the line occupy the full height of the plot.</p>
 <p><code><a href="../reference/worm_plot.html">worm_plot()</a></code> methods are available for models of classes <code>"gam"</code>, <code>"glm"</code>, and <code>"lm"</code>. (<a href='https://github.com/gavinsimpson/gratia/issues/62'>#62</a>)</p>
 </li>
+<li><p>Smooths can now be compared across models using <code><a href="../reference/compare_smooths.html">compare_smooths()</a></code>, and comparisons visualised with the associated <code><a href="../reference/draw.html">draw()</a></code> method. (<a href='https://github.com/gavinsimpson/gratia/issues/85'>#85</a> <a href='https://github.com/dill'>@dill</a>)</p></li>
 <li><p>The reference line in <code><a href="../reference/qq_plot.html">qq_plot()</a></code> with <code>method = "normal"</code> was previously drawn as a line with intercept 0 and slope 1, to match the other methods. This was inconsistent with <code><a href="https://rdrr.io/r/stats/qqnorm.html" class="external-link">stats::qqplot()</a></code> which drew the line through the 1st and 3rd quartiles. <code><a href="../reference/qq_plot.html">qq_plot()</a></code> with <code>method = "normal"</code> now uses this robust reference line. Reference lines for the other methods remain drawn with slope 1 and intercept 0.</p></li>
 <li><p><code><a href="../reference/qq_plot.html">qq_plot()</a></code> with <code>method = "normal"</code> now draws a point-wise reference band using the standard error of the order statistic.</p></li>
 <li><p>The <code><a href="../reference/draw.html">draw()</a></code> method for <code><a href="../reference/penalty.html">penalty()</a></code> now plots the penalty matrix heatmaps in a more-logical orientation, to match how the matrices might be written down or printed to the R console.</p></li>
