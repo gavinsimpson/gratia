@@ -15,6 +15,7 @@ smooth_estimates(object, ...)
   unconditional = FALSE,
   overall_uncertainty = TRUE,
   dist = 0.1,
+  unnest = TRUE,
   ...
 )
 }
@@ -44,6 +45,8 @@ a location is too far from data to be plotted when plotting 2-D smooths.
 The data are scaled into the unit square before deciding what to exclude,
 and \code{dist} is a distance within the unit square. See
 \code{\link[mgcv:exclude.too.far]{mgcv::exclude.too.far()}} for further details.}
+
+\item{unnest}{logical; unnest the smooth objects?}
 }
 \value{
 A data frame (tibble), which is of class \code{"smooth_estimates"}.
