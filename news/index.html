@@ -145,11 +145,13 @@
 <li><p>The {patchwork} package is now used for multi-panel figures. As such, {gratia} no longer Imports from the {cowplot} package.</p></li>
 <li>
 <p>Worm plot diagnostic plots are available via new function <code><a href="../reference/worm_plot.html">worm_plot()</a></code>. Worm plots are detrended Q-Q plots, where deviation from the Q-Q reference line are emphasized as deviations around the line occupy the full height of the plot.</p>
-<p><code><a href="../reference/worm_plot.html">worm_plot()</a></code> methods are available for models of classes <code>"gam"</code>, <code>"glm"</code>, and <code>"lm"</code>.</p>
+<p><code><a href="../reference/worm_plot.html">worm_plot()</a></code> methods are available for models of classes <code>"gam"</code>, <code>"glm"</code>, and <code>"lm"</code>. (<a href='https://github.com/gavinsimpson/gratia/issues/62'>#62</a>)</p>
 </li>
 <li><p>The reference line in <code><a href="../reference/qq_plot.html">qq_plot()</a></code> with <code>method = "normal"</code> was previously drawn as a line with intercept 0 and slope 1, to match the other methods. This was inconsistent with <code><a href="https://rdrr.io/r/stats/qqnorm.html" class="external-link">stats::qqplot()</a></code> which drew the line through the 1st and 3rd quartiles. <code><a href="../reference/qq_plot.html">qq_plot()</a></code> with <code>method = "normal"</code> now uses this robust reference line. Reference lines for the other methods remain drawn with slope 1 and intercept 0.</p></li>
 <li><p><code><a href="../reference/qq_plot.html">qq_plot()</a></code> with <code>method = "normal"</code> now draws a point-wise reference band using the standard error of the order statistic.</p></li>
 <li><p>The <code><a href="../reference/draw.html">draw()</a></code> method for <code><a href="../reference/penalty.html">penalty()</a></code> now plots the penalty matrix heatmaps in a more-logical orientation, to match how the matrices might be written down or printed to the R console.</p></li>
+<li><p><code><a href="../reference/link.html">link()</a></code>, and <code><a href="../reference/link.html">inv_link()</a></code> now work for models fitted with the <code><a href="https://rdrr.io/pkg/mgcv/man/gumbls.html" class="external-link">gumbls()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/shash.html" class="external-link">shash()</a></code> families. (<a href='https://github.com/gavinsimpson/gratia/issues/84'>#84</a>)</p></li>
+<li><p><code><a href="../reference/link.html">extract_link()</a></code> is a lower level utility function related to <code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code>, and is now exported.</p></li>
 </ul>
 </div>
 <div id="user-visible-changes" class="section level2">
