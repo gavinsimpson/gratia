@@ -202,10 +202,13 @@ supported.</p></td>
       <th>parameter</th>
       <td><p>character; which parameter of the distribution. Usually
 <code>"location"</code> but <code>"scale"</code> and <code>"shape"</code> may be provided for location
-scale models. Other options include <code>"mu"</code> and <code>"sigma"</code> as synonyms for
-<code>"location"</code> and <code>"scale"</code> respectively, <code>"pi"</code> for the zero-inflation
-term in <code><a href='https://rdrr.io/pkg/mgcv/man/ziplss.html'>mgcv::ziplss()</a></code>, <code>"power"</code> for the  <code><a href='https://rdrr.io/pkg/mgcv/man/twlss.html'>mgcv::twlss()</a></code> power
-parameter, and <code>"xi"</code>, the shape parameter for  <code><a href='https://rdrr.io/pkg/mgcv/man/gevlss.html'>mgcv::gevlss()</a></code>.</p></td>
+scale models. Other options include <code>"mu"</code> as a synonym for <code>"location"</code>,
+<code>"sigma"</code> for the scale parameter in <code><a href='https://rdrr.io/pkg/mgcv/man/gaulss.html'>mgcv::gaulss()</a></code>, <code>"pi"</code> for the
+zero-inflation term in <code><a href='https://rdrr.io/pkg/mgcv/man/ziplss.html'>mgcv::ziplss()</a></code>, <code>"power"</code> for the
+<code><a href='https://rdrr.io/pkg/mgcv/man/twlss.html'>mgcv::twlss()</a></code> power parameter, <code>"xi"</code>, the shape parameter for
+<code><a href='https://rdrr.io/pkg/mgcv/man/gevlss.html'>mgcv::gevlss()</a></code>, <code>"epsilon"</code> or <code>"skewness"</code> for the skewness and
+<code>"delta"</code> or <code>"kurtosis"</code> for the kurtosis parameter for
+<code><a href='https://rdrr.io/pkg/mgcv/man/shash.html'>mgcv::shash()</a></code>, or <code>"theta"</code> for the scale parameter of <code><a href='https://rdrr.io/pkg/mgcv/man/gammals.html'>mgcv::gammals()</a></code>.</p></td>
     </tr>
     <tr>
       <th>which_eta</th>
@@ -250,10 +253,15 @@ parameter, and <code>"xi"</code>, the shape parameter for  <code><a href='https:
 <span class='fu'>link</span><span class='op'>(</span><span class='va'>mod</span>, parameter <span class='op'>=</span> <span class='st'>"scale"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; function (mu) 
 #&gt; log(1/mu - 0.01)
-#&gt; &lt;environment: 0x7f93fd78afd0&gt;</div><div class='input'><span class='fu'>inv_link</span><span class='op'>(</span><span class='va'>mod</span>, parameter <span class='op'>=</span> <span class='st'>"scale"</span><span class='op'>)</span>
+#&gt; &lt;environment: 0x7ff36972c068&gt;</div><div class='input'><span class='fu'>inv_link</span><span class='op'>(</span><span class='va'>mod</span>, parameter <span class='op'>=</span> <span class='st'>"scale"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; function (eta) 
 #&gt; 1/(exp(eta) + 0.01)
-#&gt; &lt;environment: 0x7f93fd78afd0&gt;</div></pre>
+#&gt; &lt;environment: 0x7ff36972c068&gt;</div><div class='input'>
+<span class='co'>## Works with `family` objects too</span>
+<span class='fu'>link</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/shash.html'>shash</a></span><span class='op'>(</span><span class='op'>)</span>, parameter <span class='op'>=</span> <span class='st'>"skewness"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; function (mu) 
+#&gt; mu
+#&gt; &lt;environment: namespace:stats&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
