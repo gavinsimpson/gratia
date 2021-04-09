@@ -24,7 +24,7 @@
   emphasized as deviations around the line occupy the full height of the plot.
   
   `worm_plot()` methods are available for models of classes `"gam"`, `"glm"`,
-  and `"lm"`.
+  and `"lm"`. (#62)
 
 * The reference line in `qq_plot()` with `method = "normal"` was previously
   drawn as a line with intercept 0 and slope 1, to match the other methods. This
@@ -39,6 +39,12 @@
 * The `draw()` method for `penalty()` now plots the penalty matrix heatmaps in a
   more-logical orientation, to match how the matrices might be written down or
   printed to the R console.
+
+* `link()`, and `inv_link()` now work for models fitted with the `gumbls()` and
+  `shash()` families. (#84)
+
+* `extract_link()` is a lower level utility function related to `link()` and
+  `inv_link()`, and is now exported.
 
 ## User visible changes
 
