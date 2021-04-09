@@ -15,20 +15,18 @@
 \alias{inv_link.gamm}
 \alias{inv_link.list}
 \alias{inv_link.glm}
+\alias{extract_link}
+\alias{extract_link.family}
+\alias{extract_link.general.family}
 \title{Extract link and inverse link functions from models}
 \usage{
 link(object, ...)
 
-\method{link}{family}(
-  object,
-  parameter = c("location", "scale", "shape"),
-  which_eta = NULL,
-  ...
-)
+\method{link}{family}(object, parameter = NULL, which_eta = NULL, ...)
 
-\method{link}{gam}(object, parameter = c("location", "scale", "shape"), ...)
+\method{link}{gam}(object, parameter = NULL, which_eta = NULL, ...)
 
-\method{link}{bam}(object, parameter = c("location", "scale", "shape"), ...)
+\method{link}{bam}(object, parameter = NULL, which_eta = NULL, ...)
 
 \method{link}{gamm}(object, ...)
 
@@ -38,22 +36,23 @@ link(object, ...)
 
 inv_link(object, ...)
 
-\method{inv_link}{family}(
-  object,
-  parameter = c("location", "scale", "shape"),
-  which_eta = NULL,
-  ...
-)
+\method{inv_link}{family}(object, parameter = NULL, which_eta = NULL, ...)
 
-\method{inv_link}{gam}(object, parameter = c("location", "scale", "shape"), ...)
+\method{inv_link}{gam}(object, parameter = NULL, which_eta = NULL, ...)
 
-\method{inv_link}{bam}(object, parameter = c("location", "scale", "shape"), ...)
+\method{inv_link}{bam}(object, parameter = NULL, which_eta = NULL, ...)
 
 \method{inv_link}{gamm}(object, ...)
 
 \method{inv_link}{list}(object, ...)
 
 \method{inv_link}{glm}(object, ...)
+
+extract_link(family, ...)
+
+\method{extract_link}{family}(family, inverse = FALSE, ...)
+
+\method{extract_link}{general.family}(family, parameter, inverse = FALSE, which_eta = NULL, ...)
 }
 \arguments{
 \item{object}{a family object or a fitted model from which to extract the
@@ -72,6 +71,10 @@ parameter, and \code{"xi"}, the shape parameter for  \code{\link[mgcv:gevlss]{mg
 
 \item{which_eta}{numeric; the linear predictor to extract for families
 \code{\link[mgcv:mvn]{mgcv::mvn()}} and \code{\link[mgcv:multinom]{mgcv::multinom()}}.}
+
+\item{family}{a family object, the result of a call to \code{\link[=family]{family()}}.}
+
+\item{inverse}{logical; return the inverse of the link function?}
 }
 \description{
 Returns the link or its inverse from an estimated model, and provides a

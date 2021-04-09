@@ -648,7 +648,7 @@ test_that("extract_link() works on gammals() family objects", {
     expect_type(f, "closure")
     expect_identical(f(val), fam$linfo[[2L]]$linkfun(val))
     expect_identical(f, fam$linfo[[2L]]$linkfun)
-    f <- extract_link(fam, parameter = "sigma")
+    f <- extract_link(fam, parameter = "theta")
     expect_type(f, "closure")
     expect_identical(f(val), fam$linfo[[2L]]$linkfun(val))
     expect_identical(f, fam$linfo[[2L]]$linkfun)
@@ -657,7 +657,42 @@ test_that("extract_link() works on gammals() family objects", {
     expect_type(f, "closure")
     expect_identical(f(val), fam$linfo[[2L]]$linkinv(val))
     expect_identical(f, fam$linfo[[2L]]$linkinv)
-    f <- extract_link(fam, parameter = "sigma", inverse = TRUE)
+    f <- extract_link(fam, parameter = "theta", inverse = TRUE)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[2L]]$linkinv(val))
+    expect_identical(f, fam$linfo[[2L]]$linkinv)
+})
+
+test_that("extract_link() works on gumbls() family objects", {
+    fam <- gumbls()
+    ## location parameter
+    ## link
+    f <- extract_link(fam, parameter = "location")
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[1L]]$linkfun)
+    f <- extract_link(fam, parameter = "mu")
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[1L]]$linkfun)
+    ## inverse
+    f <- extract_link(fam, parameter = "location", inverse = TRUE)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkinv(val))
+    expect_identical(f, fam$linfo[[1L]]$linkinv)
+    f <- extract_link(fam, parameter = "mu", inverse = TRUE)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkinv(val))
+    expect_identical(f, fam$linfo[[1L]]$linkinv)
+    
+    ## scale parameter
+    ## link
+    f <- extract_link(fam, parameter = "scale")
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[2L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[2L]]$linkfun)
+    ## inverse
+    f <- extract_link(fam, parameter = "scale", inverse = TRUE)
     expect_type(f, "closure")
     expect_identical(f(val), fam$linfo[[2L]]$linkinv(val))
     expect_identical(f, fam$linfo[[2L]]$linkinv)
@@ -887,6 +922,89 @@ test_that("extract_link() works on multinom() family objects", {
     expect_identical(f, fam$linfo[[2L]]$linkinv)
 })
 
+test_that("extract_link() works on shash() family objects", {
+    fam <- shash()
+    ## location parameter
+    ## link
+    f <- extract_link(fam, parameter = "location")
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[1L]]$linkfun)
+    f <- extract_link(fam, parameter = "mu")
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[1L]]$linkfun)
+    ## inverse
+    f <- extract_link(fam, parameter = "location", inverse = TRUE)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkinv(val))
+    expect_identical(f, fam$linfo[[1L]]$linkinv)
+    f <- extract_link(fam, parameter = "mu", inverse = TRUE)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkinv(val))
+    expect_identical(f, fam$linfo[[1L]]$linkinv)
+    
+    ## scale parameter
+    ## link
+    f <- extract_link(fam, parameter = "scale")
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[2L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[2L]]$linkfun)
+    f <- extract_link(fam, parameter = "sigma")
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[2L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[2L]]$linkfun)
+    ## inverse
+    f <- extract_link(fam, parameter = "scale", inverse = TRUE)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[2L]]$linkinv(val))
+    expect_identical(f, fam$linfo[[2L]]$linkinv)
+    f <- extract_link(fam, parameter = "sigma", inverse = TRUE)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[2L]]$linkinv(val))
+    expect_identical(f, fam$linfo[[2L]]$linkinv)
+    
+    ## skewness parameter
+    ## link
+    f <- extract_link(fam, parameter = "skewness")
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[3L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[3L]]$linkfun)
+    f <- extract_link(fam, parameter = "epsilon")
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[3L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[3L]]$linkfun)
+    ## inverse
+    f <- extract_link(fam, parameter = "skewness", inverse = TRUE)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[3L]]$linkinv(val))
+    expect_identical(f, fam$linfo[[3L]]$linkinv)
+    f <- extract_link(fam, parameter = "epsilon", inverse = TRUE)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[3L]]$linkinv(val))
+    expect_identical(f, fam$linfo[[3L]]$linkinv)
+
+    ## skewness parameter
+    ## link
+    f <- extract_link(fam, parameter = "kurtosis")
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[4L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[4L]]$linkfun)
+    f <- extract_link(fam, parameter = "delta")
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[4L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[4L]]$linkfun)
+    ## inverse
+    f <- extract_link(fam, parameter = "kurtosis", inverse = TRUE)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[4L]]$linkinv(val))
+    expect_identical(f, fam$linfo[[4L]]$linkinv)
+    f <- extract_link(fam, parameter = "delta", inverse = TRUE)
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[4L]]$linkinv(val))
+    expect_identical(f, fam$linfo[[4L]]$linkinv)
+})
+
 ## test internal link functions fail gracefully
 test_that("gaussian_link() fails gracefully", {
     expect_error(gaussian_link(1), "'family' is not a family object")
@@ -1038,4 +1156,3 @@ test_that("family.gamm works for a gamm object", {
     expect_s3_class(fam, class = "family")
     expect_equal(fam, gaussian())
 })
-

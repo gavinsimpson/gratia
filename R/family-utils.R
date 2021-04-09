@@ -45,13 +45,10 @@
 
 ##' @rdname link
 ##' @export
-`link.family` <- function(object, parameter = c("location", "scale", "shape"),
-                          which_eta = NULL, ...) {
-    ## match parameter arg before passing on
-    parameter <- match.arg(parameter)
-
+`link.family` <- function(object, parameter = NULL, which_eta = NULL, ...) {
     ## extract the link function
-    lfun <- get_link_function(object, parameter = parameter, inverse = FALSE)
+    lfun <- get_link_function(object, parameter = parameter, inverse = FALSE,
+                              which_eta = which_eta, ...)
     ## return
     lfun
 }
@@ -59,14 +56,13 @@
 ##' @rdname link
 ##' @export
 ##' @importFrom stats family
-`link.gam` <- function(object, parameter = c("location", "scale", "shape"), ...) {
-    link(family(object), parameter = parameter, ...)
+`link.gam` <- function(object, parameter = NULL, which_eta = NULL, ...) {
+    link(family(object), parameter = parameter, which_eta = which_eta, ...)
 }
 
 ##' @rdname link
 ##' @export
-`link.bam` <- function(object, parameter = c("location", "scale", "shape"),
-                       ...) {
+`link.bam` <- function(object, parameter = NULL, which_eta = NULL, ...) {
     NextMethod()
 }
 
@@ -101,13 +97,10 @@
 
 ##' @rdname link
 ##' @export
-`inv_link.family` <- function(object, parameter = c("location", "scale", "shape"),
-                              which_eta = NULL, ...) {
-    ## match parameter arg before passing on
-    parameter <- match.arg(parameter)
-
+`inv_link.family` <- function(object, parameter = NULL, which_eta = NULL, ...) {
     ## extract the link function
-    lfun <- get_link_function(object, parameter = parameter, inverse = TRUE)
+    lfun <- get_link_function(object, parameter = parameter, inverse = TRUE,
+                              which_eta = which_eta, ...)
 
     ## return
     lfun
@@ -116,13 +109,13 @@
 ##' @rdname link
 ##' @export
 ##' @importFrom stats family
-`inv_link.gam` <- function(object, parameter = c("location", "scale", "shape"), ...) {
-    inv_link(family(object), parameter = parameter, ...)
+`inv_link.gam` <- function(object, parameter = NULL, which_eta = NULL, ...) {
+    inv_link(family(object), parameter = parameter, which_eta = which_eta, ...)
 }
 
 ##' @rdname link
 ##' @export
-`inv_link.bam` <- function(object, parameter = c("location", "scale", "shape"),
+`inv_link.bam` <- function(object, parameter = NULL, which_eta = NULL,
                            ...) {
     NextMethod()
 }
@@ -184,8 +177,93 @@
     family(object[["gam"]])
 }
 
+## Extracts the link or inverse link function from a family object
+##' @export
+##' @rdname link
+`extract_link` <- function(family, ...) {
+    UseMethod("extract_link")
+}
+
+##' @export
+##' @rdname link
+##'
+##' @param family a family object, the result of a call to [family()].
+##' @param inverse logical; return the inverse of the link function?
+`extract_link.family` <- function(family, inverse = FALSE, ...) {
+    fun <- if (isTRUE(inverse)) {
+        family[["linkinv"]]
+    } else {
+        family[["linkfun"]]
+    }
+    
+    fun # return
+}
+
+##' @export
+##' @rdname link
+`extract_link.general.family` <- function(family, parameter, inverse = FALSE,
+                                          which_eta = NULL, ...) {
+    ## check `family`
+    ## Note: don't pass a `type` here as we only want a check for being a
+    ##       family object
+    stop_if_not_family(family)
+
+    linfo <- family[["linfo"]] # pull out linfo for easy access
+    
+    ## some general families don't have $linfo
+    if (is.null(linfo)) {
+        fun <- extract_link.family(family, inverse = inverse)
+    } else if (family[["family"]] %in% c("Multivariate normal", "multinom")) {
+        if (is.null(which_eta)) {
+            stop("Which linear predictor not specified; see 'which_eta'",
+                 .call. = FALSE)
+        }
+        len_linfo <- length(linfo)
+        if (which_eta > len_linfo || which_eta < 1) {
+            stop("Invalid 'which_eta': must be between 1 and ", len_linfo, ".",
+                 call. = FALSE)
+        }
+        if (length(which_eta) > 1L) {
+            which_eta <- rep(which_eta, length.out = 1L)
+            warning("Multiple values passed to 'which_eta'; using only the first.")
+        }
+        lobj <- linfo[[which_eta]]        
+        fun <- if (isTRUE(inverse)) {
+            lobj[["linkinv"]]
+        } else {
+            lobj[["linkfun"]]
+        }
+    } else {
+        ## linfo is ordered; 1: location; 2: scale or sigma, 3: shape, power, etc
+        lobj <- switch(parameter,
+                       location  = linfo[[1L]],
+                       mu        = linfo[[1L]],
+                       scale     = linfo[[2L]],
+                       sigma     = linfo[[2L]],
+                       theta     = linfo[[2L]], # scale parameter for gammals()
+                       shape     = linfo[[3L]],
+                       power     = linfo[[3L]], # power for twlss()
+                       xi        = linfo[[3L]], # xi for gevlss()
+                       pi        = linfo[[2L]], # pi for zero-inflation (check this is right greek letter!)
+                       epsilon   = linfo[[3L]], # skewness for shash
+                       skewness  = linfo[[3L]], # skewness for shash
+                       delta     = linfo[[4L]], # kurtosis for shash
+                       kurtosis  = linfo[[4L]]  # kurtosis for shash
+                       )
+        
+        fun <- if (isTRUE(inverse)) {
+            lobj[["linkinv"]]
+        } else {
+            lobj[["linkfun"]]
+        }
+    }
+    fun # return
+}
+
+## Other internal functions ------------------------------------------------------
+
 ## Workhorse link extractor
-`get_link_function` <- function(object, parameter = "locations",
+`get_link_function` <- function(object, parameter = "location",
                                 inverse = FALSE, which_eta = NULL) {
     inverse <- as.logical(inverse)
     linfo <- object[["linfo"]]
@@ -241,11 +319,13 @@
                    twlss = twlss_link(object, parameter, inverse = inverse),
                    gevlss = gevlss_link(object, parameter, inverse = inverse),
                    gammals = gammals_link(object, parameter, inverse = inverse),
+                   gumbls = gumbls_link(object, parameter, inverse = inverse),
                    ziplss = ziplss_link(object, parameter, inverse = inverse),
                    mvn = mvn_link(object, parameter, inverse = inverse,
                                   which_eta = which_eta),
                    multinom = multinom_link(object, parameter, inverse = inverse,
-                                            which_eta = which_eta)
+                                            which_eta = which_eta),
+                   shash = shash_link(object, parameter, inverse = inverse)
                    )
     
     ## return
@@ -427,9 +507,20 @@
 
 `gammals_link` <- function(family,
                            parameter = c("location", "scale",
-                                         "mu", "sigma"),
+                                         "mu", "theta"),
                            inverse = FALSE) {
     stop_if_not_family(family, type = "gammals")
+
+    parameter <- match.arg(parameter)
+
+    fun <- extract_link(family, parameter = parameter, inverse = inverse)    
+    fun # return
+}
+
+`gumbls_link` <- function(family,
+                          parameter = c("location", "scale", "mu"),
+                          inverse = FALSE) {
+    stop_if_not_family(family, type = "gumbls")
 
     parameter <- match.arg(parameter)
 
@@ -471,74 +562,15 @@
     fun # return
 }
 
-## Other utility functions ------------------------------------------------------
+`shash_link` <- function(family,
+                         parameter = c("location", "scale", "skewness", "kurtosis",
+                                       "mu", "sigma", "epsilon", "delta"),
+                         inverse = FALSE) {
+    stop_if_not_family(family, type = "shash")
 
-## Extracts the link or inverse link function from a family object
-`extract_link` <- function(family, ...) {
-    UseMethod("extract_link")
-}
+    parameter <- match.arg(parameter)
 
-`extract_link.family` <- function(family, inverse = FALSE, ...) {
-    fun <- if (isTRUE(inverse)) {
-        family[["linkinv"]]
-    } else {
-        family[["linkfun"]]
-    }
-    
-    fun # return
-}
-
-`extract_link.general.family` <- function(family, parameter, inverse = FALSE,
-                                          which_eta = NULL) {
-    ## check `family`
-    ## Note: don't pass a `type` here as we only want a check for being a
-    ##       family object
-    stop_if_not_family(family)
-
-    linfo <- family[["linfo"]] # pull out linfo for easy access
-    
-    ## some general families don't have $linfo
-    if (is.null(linfo)) {
-        fun <- extract_link.family(family, inverse = inverse)
-    } else if (family[["family"]] %in% c("Multivariate normal", "multinom")) {
-        if (is.null(which_eta)) {
-            stop("Which linear predictor not specified; see 'which_eta'",
-                 .call. = FALSE)
-        }
-        len_linfo <- length(linfo)
-        if (which_eta > len_linfo || which_eta < 1) {
-            stop("Invalid 'which_eta': must be between 1 and ", len_linfo, ".",
-                 call. = FALSE)
-        }
-        if (length(which_eta) > 1L) {
-            which_eta <- rep(which_eta, length.out = 1L)
-            warning("Multiple values passed to 'which_eta'; using only the first.")
-        }
-        lobj <- linfo[[which_eta]]        
-        fun <- if (isTRUE(inverse)) {
-            lobj[["linkinv"]]
-        } else {
-            lobj[["linkfun"]]
-        }
-    } else {
-        ## linfo is ordered; 1: location; 2: scale or sigma, 3: shape, power, etc
-        lobj <- switch(parameter,
-                       location = linfo[[1L]],
-                       mu       = linfo[[1L]],
-                       scale    = linfo[[2L]],
-                       sigma    = linfo[[2L]],
-                       shape    = linfo[[3L]],
-                       power    = linfo[[3L]], # power for twlss()
-                       xi       = linfo[[3L]], # xi for gevlss()
-                       pi       = linfo[[2L]]  # pi for zero-inflation (check this is right greek letter!)
-                       )
-        
-        fun <- if (isTRUE(inverse)) {
-            lobj[["linkinv"]]
-        } else {
-            lobj[["linkfun"]]
-        }
-    }
+    fun <- extract_link(family, parameter = parameter, inverse = inverse)    
     fun # return
 }
 
