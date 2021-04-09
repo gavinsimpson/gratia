@@ -257,6 +257,50 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 detaching ‘package:mgcv’
 
+> nameEx("compare_smooths")
+> ### * compare_smooths
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: compare_smooths
+> ### Title: Compare smooths across models
+> ### Aliases: compare_smooths
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> dat <- data_sim("eg1", seed = 2)
+> 
+> ## models to compare smooths across - artificially create differences
+> m1 <- gam(y ~ s(x0, k = 5) + s(x1, k = 5) + s(x2, k = 5) + s(x3, k = 5),
++           data = dat, method = "REML")
+> m2 <- gam(y ~ s(x0, bs = 'ts') + s(x1, bs = 'ts') + s(x2, bs = 'ts') +
++           s(x3, bs = 'ts'), data = dat, method = "REML")
+> 
+> ## build comparisons
+> comp <- compare_smooths(m1, m2)
+> comp
+# A tibble: 8 x 5
+  model smooth type          by    data              
+  <chr> <chr>  <chr>         <chr> <list>            
+1 m1    s(x0)  TPRS          NA    <tibble [100 × 3]>
+2 m2    s(x0)  TPRS (shrink) NA    <tibble [100 × 3]>
+3 m1    s(x1)  TPRS          NA    <tibble [100 × 3]>
+4 m2    s(x1)  TPRS (shrink) NA    <tibble [100 × 3]>
+5 m1    s(x2)  TPRS          NA    <tibble [100 × 3]>
+6 m2    s(x2)  TPRS (shrink) NA    <tibble [100 × 3]>
+7 m1    s(x3)  TPRS          NA    <tibble [100 × 3]>
+8 m2    s(x3)  TPRS (shrink) NA    <tibble [100 × 3]>
+> ## notice that the result is a nested tibble
+> 
+> draw(comp)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("confint.fderiv")
 > ### * confint.fderiv
 > 
@@ -1069,11 +1113,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55d22fddc560>
+<environment: 0x562231c14700>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55d22fddc560>
+<environment: 0x562231c14700>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1612,7 +1656,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  11.527 0.146 11.747 0 0 
+Time elapsed:  12.425 0.136 12.523 0 0 
 > grDevices::dev.off()
 null device 
           1 

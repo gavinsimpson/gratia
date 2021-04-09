@@ -17,6 +17,7 @@
 ##'   The data are scaled into the unit square before deciding what to exclude,
 ##'   and `dist` is a distance within the unit square. See
 ##'   [mgcv::exclude.too.far()] for further details.
+##' @param unnest logical; unnest the smooth objects?
 ##' @param ... arguments passed to other methods.
 ##'
 ##' @return A data frame (tibble), which is of class `"smooth_estimates"`.
@@ -54,7 +55,9 @@
                                    data = NULL,
                                    unconditional = FALSE,
                                    overall_uncertainty = TRUE,
-                                   dist = 0.1, ...) {
+                                   dist = 0.1,
+                                   unnest = TRUE,
+                                   ...) {
     ## if particular smooths selected
     smooth_ids <- if (!is.null(smooth)) {
          which_smooths(object, smooth) # which smooths match 'smooth'
@@ -81,7 +84,9 @@
     ## create a single df of all the smooths
     sm_list <- bind_rows(sm_list)
     ## need to unnest the `data` column
-    sm_list <- unnest(sm_list, all_of('data'))
+    if (isTRUE(unnest)) {
+        sm_list <- unnest(sm_list, all_of('data'))
+    }
 
     ## add a class
     class(sm_list) <- c("smooth_estimates", class(sm_list))
