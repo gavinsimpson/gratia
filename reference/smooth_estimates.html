@@ -143,6 +143,7 @@
   unconditional <span class='op'>=</span> <span class='cn'>FALSE</span>,
   overall_uncertainty <span class='op'>=</span> <span class='cn'>TRUE</span>,
   dist <span class='op'>=</span> <span class='fl'>0.1</span>,
+  unnest <span class='op'>=</span> <span class='cn'>TRUE</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -190,6 +191,10 @@ a location is too far from data to be plotted when plotting 2-D smooths.
 The data are scaled into the unit square before deciding what to exclude,
 and <code>dist</code> is a distance within the unit square. See
 <code><a href='https://rdrr.io/pkg/mgcv/man/exclude.too.far.html'>mgcv::exclude.too.far()</a></code> for further details.</p></td>
+    </tr>
+    <tr>
+      <th>unnest</th>
+      <td><p>logical; unnest the smooth objects?</p></td>
     </tr>
     </table>
 
