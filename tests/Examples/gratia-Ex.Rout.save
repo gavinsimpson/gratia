@@ -1038,7 +1038,8 @@ detaching ‘package:mgcv’
 > ### Title: Extract link and inverse link functions from models
 > ### Aliases: link link.family link.gam link.bam link.gamm link.glm
 > ###   link.list inv_link inv_link.family inv_link.gam inv_link.bam
-> ###   inv_link.gamm inv_link.list inv_link.glm
+> ###   inv_link.gamm inv_link.list inv_link.glm extract_link
+> ###   extract_link.family extract_link.general.family
 > 
 > ### ** Examples
 > 
@@ -1068,11 +1069,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55886bbdac08>
+<environment: 0x559ef244f560>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55886bbdac08>
+<environment: 0x559ef244f560>
 > 
 > 
 > 
@@ -1605,7 +1606,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  16.048 0.164 16.26 0 0 
+Time elapsed:  11.324 0.121 11.447 0 0 
 > grDevices::dev.off()
 null device 
           1 
