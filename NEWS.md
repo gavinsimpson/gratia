@@ -1,4 +1,4 @@
-# gratia 0.5.1.9005
+# gratia 0.6.0
 
 ## Major changes
 
@@ -28,6 +28,9 @@
 
 * Smooths can now be compared across models using `compare_smooths()`, and
   comparisons visualised with the associated `draw()` method. (#85 @dill)
+  
+  This feature is a bit experimental; the returned object uses nested lists and
+  may change in the future if users find this confusing.
 
 * The reference line in `qq_plot()` with `method = "normal"` was previously
   drawn as a line with intercept 0 and slope 1, to match the other methods. This
