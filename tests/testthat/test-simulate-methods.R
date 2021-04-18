@@ -77,6 +77,7 @@ test_that("simulate() works with out a seed", {
 })
 
 test_that("simulate() fails if we don't have an rd function", {
+    skip_on_cran()
     ## Example from ?gevlss
     Fi.gev <- function(z,mu,sigma,xi) {
         ## GEV inverse cdf.
