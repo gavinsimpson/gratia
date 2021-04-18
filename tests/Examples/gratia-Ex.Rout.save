@@ -78,7 +78,7 @@ Type 'q()' to quit R.
  8  8.51   0.661  0.781  0.947  0.859      7.94   0.434     1.67    -3.20 
  9 10.6    0.629  0.0111 0.339  0.446      7.94   0.512    -1.95     2.63 
 10  3.72   0.0618 0.940  0.0317 0.677      7.94  -0.695     3.20    -3.35 
-# ... with 390 more rows, and 1 more variable: `.s(x3)` <dbl>
+# ... with 390 more rows, and 1 more variable: .s(x3) <dbl>
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -268,6 +268,9 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
+> ## Don't show: 
+> op <- options(cli.unicode = FALSE, digits = 5)
+> ## End(Don't show)
 > load_mgcv()
 > dat <- data_sim("eg1", seed = 2)
 > 
@@ -281,19 +284,22 @@ detaching ‘package:mgcv’
 > comp <- compare_smooths(m1, m2)
 > comp
 # A tibble: 8 x 5
-  model smooth type          by    data              
-  <chr> <chr>  <chr>         <chr> <list>            
-1 m1    s(x0)  TPRS          NA    <tibble [100 × 3]>
-2 m2    s(x0)  TPRS (shrink) NA    <tibble [100 × 3]>
-3 m1    s(x1)  TPRS          NA    <tibble [100 × 3]>
-4 m2    s(x1)  TPRS (shrink) NA    <tibble [100 × 3]>
-5 m1    s(x2)  TPRS          NA    <tibble [100 × 3]>
-6 m2    s(x2)  TPRS (shrink) NA    <tibble [100 × 3]>
-7 m1    s(x3)  TPRS          NA    <tibble [100 × 3]>
-8 m2    s(x3)  TPRS (shrink) NA    <tibble [100 × 3]>
+  model smooth type          by    data                  
+  <chr> <chr>  <chr>         <chr> <list>                
+1 m1    s(x0)  TPRS          NA    <tibble[,3] [100 x 3]>
+2 m2    s(x0)  TPRS (shrink) NA    <tibble[,3] [100 x 3]>
+3 m1    s(x1)  TPRS          NA    <tibble[,3] [100 x 3]>
+4 m2    s(x1)  TPRS (shrink) NA    <tibble[,3] [100 x 3]>
+5 m1    s(x2)  TPRS          NA    <tibble[,3] [100 x 3]>
+6 m2    s(x2)  TPRS (shrink) NA    <tibble[,3] [100 x 3]>
+7 m1    s(x3)  TPRS          NA    <tibble[,3] [100 x 3]>
+8 m2    s(x3)  TPRS (shrink) NA    <tibble[,3] [100 x 3]>
 > ## notice that the result is a nested tibble
 > 
 > draw(comp)
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > 
 > 
 > 
@@ -1113,11 +1119,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x562231c14700>
+<environment: 0x555c5dd14e00>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x562231c14700>
+<environment: 0x555c5dd14e00>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1656,7 +1662,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  12.425 0.136 12.523 0 0 
+Time elapsed:  11.868 0.136 12.054 0 0 
 > grDevices::dev.off()
 null device 
           1 

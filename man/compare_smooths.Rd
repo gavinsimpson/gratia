@@ -40,6 +40,7 @@ the smooth?}
 Compare smooths across models
 }
 \examples{
+\dontshow{op <- options(cli.unicode = FALSE, digits = 5)}
 load_mgcv()
 dat <- data_sim("eg1", seed = 2)
 
@@ -55,4 +56,5 @@ comp
 ## notice that the result is a nested tibble
 
 draw(comp)
+\dontshow{options(op)}
 }

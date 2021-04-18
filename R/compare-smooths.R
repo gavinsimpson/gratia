@@ -13,6 +13,7 @@
 ##' @importFrom dplyr group_by %>%
 ##'
 ##' @examples
+##' \dontshow{op <- options(cli.unicode = FALSE, digits = 5)}
 ##' load_mgcv()
 ##' dat <- data_sim("eg1", seed = 2)
 ##'
@@ -28,6 +29,7 @@
 ##' ## notice that the result is a nested tibble
 ##'
 ##' draw(comp)
+##' \dontshow{options(op)}
 `compare_smooths` <- function(model, ..., smooths = NULL,
                               n = 100,
                               data = NULL,
