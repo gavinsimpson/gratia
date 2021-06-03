@@ -65,16 +65,19 @@ test_that("qq_plot() normal method works", {
 })
 
 test_that("qq_plot() simulate method works", {
+    set.seed(42)
     plt <- qq_plot(m, method = "simulate") # simulate data to get quantiles
     expect_doppelganger("qq_plot data simulation", plt)
 })
 
 test_that("qq_plot() simulate method works", {
+    set.seed(42)
     plt <- qq_plot(m, method = "simulate", type = "response")
     expect_doppelganger("qq_plot data simulation response residuals", plt)
 })
 
 test_that("qq_plot() simulate method works", {
+    set.seed(42)
     plt <- qq_plot(m, method = "simulate", type = "pearson")
     expect_doppelganger("qq_plot data simulation pearson residuals", plt)
 })
