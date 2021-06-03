@@ -1063,3 +1063,17 @@ vars_from_label <- function(label) {
     abs_x <- (abs_x - 0) / (maxx - 0)
     abs_x * sign_x
 }
+
+##' Delete response from user-supplied data
+##'
+##' @keywords internal
+##' @noRd
+`delete_response` <- function(model, data = NULL) {
+    if (is.null(data)) {
+        stop("`data` must be supplied currently.")
+    }
+    
+    tt <- terms(model)
+    tt <- delete.response(tt)
+    model.frame(tt, data = data)
+}
