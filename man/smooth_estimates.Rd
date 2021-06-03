@@ -29,7 +29,7 @@ smooth_estimates(object, ...)
 \item{n}{numeric; the number of points over the range of the covariate at
 which to evaluate the smooth.}
 
-\item{data}{a vector or data frame of points at which to evaluate the
+\item{data}{a data frame of covariate values at which to evaluate the
 smooth.}
 
 \item{unconditional}{logical; should confidence intervals include the
