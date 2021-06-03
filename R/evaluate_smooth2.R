@@ -4,7 +4,7 @@
 ##' @param smooth character; a single smooth to evaluate.
 ##' @param n numeric; the number of points over the range of the covariate at
 ##'   which to evaluate the smooth.
-##' @param data a vector or data frame of points at which to evaluate the
+##' @param data a data frame of covariate values at which to evaluate the
 ##'   smooth.
 ##' @param unconditional logical; should confidence intervals include the
 ##'   uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian
@@ -70,6 +70,16 @@
 
     ## loop over the smooths and evaluate them
     sm_list <- vector(mode = "list", length = length(smooths))
+    
+    ## if user data supplied, check for and remove response
+    if (!is.null(data)) {
+        if (!is.data.frame(data)) {
+            stop("'data', if supplied, must be a numeric vector or a data frame.",
+                 call. = FALSE)
+        }
+        check_all_vars(object, data = data, smooths = smooths)
+        data <- delete_response(object, data = data)
+     }
 
     for (i in seq_along(sm_list)) {
         sm_list[[i]] <- eval_smooth(smooths[[i]],
@@ -165,7 +175,7 @@
 `check_user_data` <- function(data, vars) {
     if (is.data.frame(data)) {
         smooth_vars <- vars %in% names(data)
-        if (!all(vars %in% names(data))) {
+        if (!all(smooth_vars)) {
             stop(paste("Variable(s)",
                        paste(paste0("'", vars[!smooth_vars], "'"),
                              collapse = ", "),
@@ -183,6 +193,54 @@
              call. = FALSE)
     }
     data
+}
+
+##' @keywords internal
+##' @noRd
+`check_all_vars` <- function(model, data, smooths = NULL) {
+    ## if we don't pass something to smooths get names of all variables used in
+    ## the model
+    vars <- if (is.null(smooths)) {
+        term_names(model)
+    } else {
+        ## something passed to smooths; bail if not a list or numeric id vector
+        if (!(is.list(smooths) || is.numeric(smooths))) {
+            stop("Do not know how to handle supplied `smooths`.\n",
+                 "Must be a vector of smooth indices or a list of objects ",
+                 "that inherit from class `mgcv.smooth`.",
+                 call. = FALSE)
+        }
+        ## if a numeric vector of smoth indices, then extract those smooths
+        ## and continue
+        if (is.numeric(smooths)) {
+            smooths <- get_smooths_by_id(model, smooths)
+        }
+        ## do all elements of smooths now inherit from mgcv_smooth?
+        sms <- vapply(smooths, FUN = inherits, logical(1L), "mgcv.smooth")
+        ## if they don't bail out with a helpful error
+        if (!all(sms)) {
+            stop("Elements ", paste(which(!sms), collapse = ", "),
+                 " of `smooths` do not inherit from class `mgcv.smooth`.",
+                 call. = FALSE)
+        }
+        ## if they do all inherit from the correct class, then run term_names
+        ## on each element and combine - returns $term and $by from each smooth
+        unlist(sapply(smooths, FUN = term_names))
+    }
+    
+    ## check that the vars we need are in data
+    smooth_vars <- vars %in% names(data)
+    if (!all(smooth_vars)) {
+        stop(paste("Variable(s)",
+                   paste(paste0("'", vars[!smooth_vars], "'"),
+                         collapse = ", "),
+                   "not found in 'data'."),
+             call. = FALSE)
+    }
+    
+    ## if we get here then everything must be OK so return the required variable
+    ## names invisibly in case it is useful
+    invisible(vars)
 }
 
 ##' Evaluate estimated spline values
@@ -243,7 +301,7 @@
 
     ## Return object
     out <- if (d == 1L) {
-        if (is_fs_smooth(smooth)) {
+        if (is_fs_smooth(smooth) || is_factor_by_smooth(smooth)) {
             tbl <- tibble(smooth = rep(label, nrow(X)),
                           est = fit, se = se.fit)
             tbl <- bind_cols(tbl, data)
