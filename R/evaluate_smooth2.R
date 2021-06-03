@@ -325,8 +325,8 @@
 ##' @keywords internal
 ##' @noRd
 `process_user_data_for_eval` <- function(data, model, n, id) {
-    data <- if (is.null(data)) {
-        smooth_data(model = model, n = n, id = id)
+    if (is.null(data)) {
+        data <- smooth_data(model = model, n = n, id = id)
    } else {
         smooth <- get_smooths_by_id(model, id)[[1L]]
         vars <- smooth_variable(smooth)
@@ -334,7 +334,13 @@
         if (!identical(by_var, "NA")) {
             vars <- append(vars, by_var)
         }
-        check_user_data(data, vars)
+        ## check user supplied data for correctness
+        data <- check_user_data(data, vars)
+        ## if this is a by variable, filter the by variable for the required
+        ## level now
+        if (is_factor_by_smooth(smooth)) {
+            data <- data %>% filter(.data[[by_var]] == by_level(smooth))
+        }
     }
     data
 }
