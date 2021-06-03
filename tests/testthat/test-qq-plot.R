@@ -29,16 +29,22 @@ types <- dQuote(c("deviance", "response", "pearson"))
 methods <- dQuote(c("uniform", "simulate", "normal"))
 
 test_that("qq_plot() uniform method works", {
+    ## skip_if(packageVersion("mgcv") < "1.8.36")
+    set.seed(42)
     plt <- qq_plot(m)      # randomisation of uniform quantiles
     expect_doppelganger("qq_plot uniform randomisation", plt)
 })
 
 test_that("qq_plot() uniform method works with response residuals", {
+    ## skip_if(packageVersion("mgcv") < "1.8.36")
+    set.seed(42)
     plt <- qq_plot(m, type = "response")
     expect_doppelganger("qq_plot uniform randomisation response residuals", plt)
 })
 
 test_that("qq_plot() uniform method works with pearson residuals", {
+    ## skip_if(packageVersion("mgcv") < "1.8.36")
+    set.seed(42)
     plt <- qq_plot(m, type = "pearson")
     expect_doppelganger("qq_plot uniform randomisation pearson residuals", plt)
 })
