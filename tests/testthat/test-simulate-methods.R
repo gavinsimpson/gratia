@@ -83,7 +83,7 @@ test_that("simulate() fails if we don't have an rd function", {
     n <- 400
     ## Simulate data...
     dat <- gamSim(1, n = n, dist = "poisson", scale = 0.2)
-    dat$y <- rTweedie(exp(dat$f), p = 1.3, phi = 0.5) ## Tweedie response
+    dat <- transform(dat, y = rTweedie(exp(f), p = 1.3, phi = 0.5)) ## Tweedie response
  
     ## Fit a fixed p Tweedie, with wrong link ...
     m <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3),
