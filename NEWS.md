@@ -1,3 +1,15 @@
+# gratia 0.6.9111
+
+## New features
+
+## Bug fixes
+
+* `smooth_estimates()` was not filtering user-supplied data for the by level of
+  the specific smooth when used with by factor smooths. This would result in the
+  smooth being evaluated at all rows of the user-supplied data, and therefore
+  would result in `nrow(user_data) * nlevels(by_variable)` rows in the returned
+  object instead of `nrow(user_data)` rows.
+
 # gratia 0.6.0
 
 ## Major changes
@@ -7,7 +19,7 @@
   affect any code that used {gratia} only, but if you passed additional
   arguments to `cowplot::plot_grid()` or used the `align` or `axis` arguments of
   `draw()` and `appraise()`, you'll need to adapt code accordingly.
-  
+
   Typically, you can simply delete the `align` or `axis` arguments and
   {patchwork} will just work and align plots nicely. Any arguments passed via
   `...` to `cowplot::plot_grid()` will just be ignored by
@@ -22,13 +34,13 @@
 * Worm plot diagnostic plots are available via new function `worm_plot()`. Worm
   plots are detrended Q-Q plots, where deviation from the Q-Q reference line are
   emphasized as deviations around the line occupy the full height of the plot.
-  
+
   `worm_plot()` methods are available for models of classes `"gam"`, `"glm"`,
   and `"lm"`. (#62)
 
 * Smooths can now be compared across models using `compare_smooths()`, and
   comparisons visualised with the associated `draw()` method. (#85 @dill)
-  
+
   This feature is a bit experimental; the returned object uses nested lists and
   may change in the future if users find this confusing.
 
@@ -38,7 +50,7 @@
   and 3rd quartiles. `qq_plot()` with `method = "normal"` now uses this robust
   reference line. Reference lines for the other methods remain drawn with slope
   1 and intercept 0.
-  
+
 * `qq_plot()` with `method = "normal"` now draws a point-wise reference band
   using the standard error of the order statistic.
 
