@@ -159,9 +159,9 @@ test_that("smooth_estimates works when passed data", {
     expect_named(sm, c("smooth", "type", "by", "est", "se", "fac"))
 })
 
-test_that("smooth_estimates fails if smooth var not in data", {
+test_that("check_user_data fails if smooth var not in data", {
     id <- which(names(dat) == "x0")
-    expect_error(smooth_estimates(m0, "s(x0)", data = dat[, -id]),
+    expect_error(check_user_data(data = dat[, -id], "x0"),
                  "Variable(s) 'x0' not found in 'data'.",
                  fixed = TRUE)
 })
@@ -173,7 +173,7 @@ test_that("smooth_estimates works with vector data", {
     expect_equal(sm1, sm2)
 })
 
-test_that("amooth_estimates fails if data is not data frame or numeric", {
+test_that("smooth_estimates fails if data is not data frame or numeric", {
     expect_error(smooth_estimates(m1, "s(x0)", data = list(x0 = dat[, "x0"])),
                  "'data', if supplied, must be a numeric vector or a data frame.",
                  fixed = TRUE)
@@ -208,7 +208,8 @@ test_that("smooth_estimates works for a factor smooth", {
     expect_error(smooth_estimates(m_fs, "s(x1,fac)", data = newdf),
                  "Variable(s) 'x1' not found in 'data'.", fixed = TRUE)
 
-    expect_error(smooth_estimates(m_fs, "s(x1,fac)", data = newdf$x4),
-                 "'smooth' requires multiple data vectors but only 1 provided.",
+    expect_error(smooth_estimates(m_fs, "s(x1,fac)",
+                                  data = dat_fs[, !names(dat_fs) == "fac"]),
+                 "Variable(s) 'fac' not found in 'data'.",
                  fixed = TRUE)
 })
