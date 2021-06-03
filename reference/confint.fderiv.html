@@ -66,8 +66,6 @@ derivatives of smooth terms in a fitted GAM." />
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -91,7 +89,7 @@ derivatives of smooth terms in a fitted GAM." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.9111</span>
       </span>
     </div>
 
@@ -134,7 +132,7 @@ derivatives of smooth terms in a fitted GAM." />
 derivatives of smooth terms in a fitted GAM.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for fderiv</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='co'># S3 method for fderiv</span>
 <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span>
   <span class='va'>object</span>,
   <span class='va'>parm</span>,
@@ -143,7 +141,7 @@ derivatives of smooth terms in a fitted GAM.</p>
   nsim <span class='op'>=</span> <span class='fl'>10000</span>,
   ncores <span class='op'>=</span> <span class='fl'>1L</span>,
   <span class='va'>...</span>
-<span class='op'>)</span></pre>
+<span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -201,41 +199,44 @@ to work on Windows with current <code>R</code>).</p></td>
     <p>Gavin L. Simpson</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span>
-<span class='co'># \dontshow{</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span>
-<span class='va'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span>digits <span class='op'>=</span> <span class='fl'>3</span>, cli.unicode <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-<span class='co'># }</span>
-<span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>1</span>, n <span class='op'>=</span> <span class='fl'>1000</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='va'>mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span>
-
-<span class='co'>## first derivatives of all smooths...</span>
-<span class='va'>fd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fderiv.html'>fderiv</a></span><span class='op'>(</span><span class='va'>mod</span><span class='op'>)</span>
-
-<span class='co'>## point-wise interval</span>
-<span class='va'>ci</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span><span class='va'>fd</span>, type <span class='op'>=</span> <span class='st'>"confidence"</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>ci</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    term lower  est upper
-#&gt; 1 s(x0)  1.22 6.02  10.8
-#&gt; 2 s(x0)  1.22 6.02  10.8
-#&gt; 3 s(x0)  1.22 6.02  10.8
-#&gt; 4 s(x0)  1.23 6.01  10.8
-#&gt; 5 s(x0)  1.25 6.01  10.8
-#&gt; 6 s(x0)  1.27 6.01  10.7</div><div class='input'>
-<span class='co'>## simultaneous interval for smooth term of x1</span>
-<span class='co'># \dontshow{</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>42</span><span class='op'>)</span>
-<span class='co'># }</span>
-<span class='va'>x1.sint</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span><span class='va'>fd</span>, parm <span class='op'>=</span> <span class='st'>"x1"</span>, type <span class='op'>=</span> <span class='st'>"simultaneous"</span>, nsim <span class='op'>=</span> <span class='fl'>2500</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>x1.sint</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    term  lower  est upper
-#&gt; 1 s(x1) -0.483 4.70  9.88
-#&gt; 2 s(x1) -0.482 4.70  9.88
-#&gt; 3 s(x1) -0.478 4.70  9.87
-#&gt; 4 s(x1) -0.469 4.70  9.86
-#&gt; 5 s(x1) -0.452 4.70  9.84
-#&gt; 6 s(x1) -0.427 4.69  9.81</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span>
-</div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># \dontshow{</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span>digits <span class='op'>=</span> <span class='fl'>3</span>, cli.unicode <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>1</span>, n <span class='op'>=</span> <span class='fl'>1000</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Gu &amp; Wahba 4 term additive model</span>
+<span class='r-in'><span class='va'>mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## first derivatives of all smooths...</span></span>
+<span class='r-in'><span class='va'>fd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fderiv.html'>fderiv</a></span><span class='op'>(</span><span class='va'>mod</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## point-wise interval</span></span>
+<span class='r-in'><span class='va'>ci</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span><span class='va'>fd</span>, type <span class='op'>=</span> <span class='st'>"confidence"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>ci</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    term lower  est upper</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1 s(x0)  1.22 6.02  10.8</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2 s(x0)  1.22 6.02  10.8</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3 s(x0)  1.22 6.02  10.8</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4 s(x0)  1.23 6.01  10.8</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5 s(x0)  1.25 6.01  10.8</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6 s(x0)  1.27 6.01  10.7</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## simultaneous interval for smooth term of x1</span></span>
+<span class='r-in'><span class='co'># \dontshow{</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>42</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'><span class='va'>x1.sint</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span><span class='va'>fd</span>, parm <span class='op'>=</span> <span class='st'>"x1"</span>, type <span class='op'>=</span> <span class='st'>"simultaneous"</span>, nsim <span class='op'>=</span> <span class='fl'>2500</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>x1.sint</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    term  lower  est upper</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1 s(x1) -0.483 4.70  9.88</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2 s(x1) -0.482 4.70  9.88</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3 s(x1) -0.478 4.70  9.87</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4 s(x1) -0.469 4.70  9.86</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5 s(x1) -0.452 4.70  9.84</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6 s(x1) -0.427 4.69  9.81</span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span></span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

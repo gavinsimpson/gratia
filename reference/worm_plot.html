@@ -65,8 +65,6 @@
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -90,7 +88,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.9111</span>
       </span>
     </div>
 
@@ -132,7 +130,7 @@
     <p>Worm plot of model residuals</p>
     </div>
 
-    <pre class="usage"><span class='fu'>worm_plot</span><span class='op'>(</span><span class='va'>model</span>, <span class='va'>...</span><span class='op'>)</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>worm_plot</span><span class='op'>(</span><span class='va'>model</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for gam</span>
 <span class='fu'>worm_plot</span><span class='op'>(</span>
@@ -159,7 +157,7 @@
 <span class='fu'>worm_plot</span><span class='op'>(</span><span class='va'>model</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for lm</span>
-<span class='fu'>worm_plot</span><span class='op'>(</span><span class='va'>model</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>worm_plot</span><span class='op'>(</span><span class='va'>model</span>, <span class='va'>...</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -255,28 +253,31 @@ simulated residuals method (<code>method = "simulated"</code>). To avoid confusi
 <code>method = "direct"</code> is deprecated in favour of <code>method = "uniform"</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span>
-<span class='co'>## simulate binomial data...</span>
-<span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='data_sim.html'>data_sim</a></span><span class='op'>(</span><span class='st'>"eg1"</span>, n <span class='op'>=</span> <span class='fl'>200</span>, dist <span class='op'>=</span> <span class='st'>"binary"</span>, scale <span class='op'>=</span> <span class='fl'>.33</span>, seed <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span>
-<span class='va'>p</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>$</span><span class='fu'>linkinv</span><span class='op'>(</span><span class='va'>dat</span><span class='op'>$</span><span class='va'>f</span><span class='op'>)</span>               <span class='co'># binomial p</span>
-<span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>3</span><span class='op'>)</span>, <span class='fl'>200</span>, replace <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='co'># binomial n</span>
-<span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/transform.html'>transform</a></span><span class='op'>(</span><span class='va'>dat</span>, y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span><span class='op'>(</span><span class='va'>n</span>, <span class='va'>n</span>, <span class='va'>p</span><span class='op'>)</span>, n <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
-<span class='va'>m</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span> <span class='va'>y</span> <span class='op'>/</span> <span class='va'>n</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>,
-         family <span class='op'>=</span> <span class='va'>binomial</span>, data <span class='op'>=</span> <span class='va'>dat</span>, weights <span class='op'>=</span> <span class='va'>n</span>,
-         method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span>
-
-<span class='co'>## Worm plot; default using direct randomization of uniform quantiles</span>
-<span class='co'>## Note no reference bands are drawn with this method.</span>
-<span class='fu'>worm_plot</span><span class='op'>(</span><span class='va'>m</span><span class='op'>)</span>
-</div><div class='img'><img src='worm_plot-1.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'>## Alternatively use simulate new data from the model, which</span>
-<span class='co'>## allows construction of reference intervals for the Q-Q plot</span>
-<span class='fu'>worm_plot</span><span class='op'>(</span><span class='va'>m</span>, method <span class='op'>=</span> <span class='st'>"simulate"</span>, point_col <span class='op'>=</span> <span class='st'>"steelblue"</span>,
-          point_alpha <span class='op'>=</span> <span class='fl'>0.4</span><span class='op'>)</span>
-</div><div class='img'><img src='worm_plot-2.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'>## ... or use the usual normality assumption</span>
-<span class='fu'>worm_plot</span><span class='op'>(</span><span class='va'>m</span>, method <span class='op'>=</span> <span class='st'>"normal"</span><span class='op'>)</span>
-</div><div class='img'><img src='worm_plot-3.png' alt='' width='700' height='433' /></div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'>## simulate binomial data...</span></span>
+<span class='r-in'><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='data_sim.html'>data_sim</a></span><span class='op'>(</span><span class='st'>"eg1"</span>, n <span class='op'>=</span> <span class='fl'>200</span>, dist <span class='op'>=</span> <span class='st'>"binary"</span>, scale <span class='op'>=</span> <span class='fl'>.33</span>, seed <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>p</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>$</span><span class='fu'>linkinv</span><span class='op'>(</span><span class='va'>dat</span><span class='op'>$</span><span class='va'>f</span><span class='op'>)</span>               <span class='co'># binomial p</span></span>
+<span class='r-in'><span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>3</span><span class='op'>)</span>, <span class='fl'>200</span>, replace <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='co'># binomial n</span></span>
+<span class='r-in'><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/transform.html'>transform</a></span><span class='op'>(</span><span class='va'>dat</span>, y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span><span class='op'>(</span><span class='va'>n</span>, <span class='va'>n</span>, <span class='va'>p</span><span class='op'>)</span>, n <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>m</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span> <span class='va'>y</span> <span class='op'>/</span> <span class='va'>n</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>,</span>
+<span class='r-in'>         family <span class='op'>=</span> <span class='va'>binomial</span>, data <span class='op'>=</span> <span class='va'>dat</span>, weights <span class='op'>=</span> <span class='va'>n</span>,</span>
+<span class='r-in'>         method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Worm plot; default using direct randomization of uniform quantiles</span></span>
+<span class='r-in'><span class='co'>## Note no reference bands are drawn with this method.</span></span>
+<span class='r-in'><span class='fu'>worm_plot</span><span class='op'>(</span><span class='va'>m</span><span class='op'>)</span></span>
+<span class='r-plt'><img src='worm_plot-1.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Alternatively use simulate new data from the model, which</span></span>
+<span class='r-in'><span class='co'>## allows construction of reference intervals for the Q-Q plot</span></span>
+<span class='r-in'><span class='fu'>worm_plot</span><span class='op'>(</span><span class='va'>m</span>, method <span class='op'>=</span> <span class='st'>"simulate"</span>, point_col <span class='op'>=</span> <span class='st'>"steelblue"</span>,</span>
+<span class='r-in'>          point_alpha <span class='op'>=</span> <span class='fl'>0.4</span><span class='op'>)</span></span>
+<span class='r-plt'><img src='worm_plot-2.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ... or use the usual normality assumption</span></span>
+<span class='r-in'><span class='fu'>worm_plot</span><span class='op'>(</span><span class='va'>m</span>, method <span class='op'>=</span> <span class='st'>"normal"</span><span class='op'>)</span></span>
+<span class='r-plt'><img src='worm_plot-3.png' alt='' width='700' height='433' /></span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

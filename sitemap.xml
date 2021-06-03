@@ -1,7 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://gavinsimpson.github.io/gratia/404.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/LICENSE-text.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/authors.html</loc>
+  </url>
+  <url>
     <loc>https://gavinsimpson.github.io/gratia/index.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/news/index.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/add_confint.html</loc>
@@ -10,19 +25,19 @@
     <loc>https://gavinsimpson.github.io/gratia/reference/add_constant.html</loc>
   </url>
   <url>
-    <loc>https://gavinsimpson.github.io/gratia/reference/add_fitted.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/add_fitted.gam.html</loc>
   </url>
   <url>
-    <loc>https://gavinsimpson.github.io/gratia/reference/add_fitted.gam.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/add_fitted.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/add_partial_residuals.html</loc>
   </url>
   <url>
-    <loc>https://gavinsimpson.github.io/gratia/reference/add_residuals.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/add_residuals.gam.html</loc>
   </url>
   <url>
-    <loc>https://gavinsimpson.github.io/gratia/reference/add_residuals.gam.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/add_residuals.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/appraise.html</loc>
@@ -64,9 +79,6 @@
     <loc>https://gavinsimpson.github.io/gratia/reference/difference_smooths.html</loc>
   </url>
   <url>
-    <loc>https://gavinsimpson.github.io/gratia/reference/draw.html</loc>
-  </url>
-  <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/draw.compare_smooths.html</loc>
   </url>
   <url>
@@ -80,6 +92,9 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/draw.gam.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/draw.mgcv_smooth.html</loc>
@@ -122,6 +137,9 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/gss_vocab.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/index.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/is_by_smooth.html</loc>

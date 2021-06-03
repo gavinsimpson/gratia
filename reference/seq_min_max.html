@@ -66,8 +66,6 @@ sequence of n evenly-spaced values over the range min(x) --" />
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -91,7 +89,7 @@ sequence of n evenly-spaced values over the range min(x) --" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.9111</span>
       </span>
     </div>
 
@@ -131,10 +129,10 @@ sequence of n evenly-spaced values over the range min(x) --" />
 
     <div class="ref-description">
     <p>For a continuous vector <code>x</code>, <code>seq_min_max()</code> creates a
-sequence of <code>n</code> evenly-spaced values over the range <code><a href='https://rdrr.io/r/base/Extremes.html'>min(x)</a></code> --</p>
+sequence of <code>n</code> evenly-spaced values over the range <code>min(x)</code> --</p>
     </div>
 
-    <pre class="usage"><span class='fu'>seq_min_max</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>n</span><span class='op'>)</span></pre>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>seq_min_max</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>n</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -154,12 +152,13 @@ sequence of <code>n</code> evenly-spaced values over the range <code><a href='ht
     <p>A numeric vector of length <code>n</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
-<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>)</span>
-<span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>10L</span>
-<span class='fu'>seq_min_max</span><span class='op'>(</span><span class='va'>x</span>, n <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] -0.83562861 -0.56552757 -0.29542652 -0.02532547  0.24477557  0.51487662
-#&gt;  [7]  0.78497766  1.05507871  1.32517976  1.59528080</div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>10L</span></span>
+<span class='r-in'><span class='fu'>seq_min_max</span><span class='op'>(</span><span class='va'>x</span>, n <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] -0.83562861 -0.56552757 -0.29542652 -0.02532547  0.24477557  0.51487662</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7]  0.78497766  1.05507871  1.32517976  1.59528080</span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -65,8 +65,6 @@
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -90,7 +88,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.9111</span>
       </span>
     </div>
 
@@ -132,7 +130,7 @@
     <p>Derivatives of estimated smooths via finite differences</p>
     </div>
 
-    <pre class="usage"><span class='fu'>derivatives</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>derivatives</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for default</span>
 <span class='fu'>derivatives</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
@@ -158,7 +156,7 @@
   ncores <span class='op'>=</span> <span class='fl'>1</span>,
   partial_match <span class='op'>=</span> <span class='cn'>FALSE</span>,
   <span class='va'>...</span>
-<span class='op'>)</span></pre>
+<span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -265,65 +263,68 @@ interval (given <code>level</code>),</p></li>
     <p>Gavin L. Simpson</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span>
-<span class='co'># \dontshow{</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>42</span><span class='op'>)</span>
-<span class='va'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span>cli.unicode <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-<span class='co'># }</span>
-<span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>1</span>, n <span class='op'>=</span> <span class='fl'>400</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-<span class='va'>mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span>
-
-<span class='co'>## first derivatives of all smooths using central finite differences</span>
-<span class='fu'>derivatives</span><span class='op'>(</span><span class='va'>mod</span>, type <span class='op'>=</span> <span class='st'>"central"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 800 x 8</span><span>
-#&gt;    smooth var       data derivative    se  crit lower upper
-#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> s(x0)  x0    0.000</span><span style='text-decoration: underline;'>239</span><span>       7.41  3.33  1.96 0.874  13.9
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> s(x0)  x0    0.005</span><span style='text-decoration: underline;'>25</span><span>        7.41  3.33  1.96 0.875  13.9
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> s(x0)  x0    0.010</span><span style='text-decoration: underline;'>3</span><span>         7.40  3.33  1.96 0.884  13.9
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> s(x0)  x0    0.015</span><span style='text-decoration: underline;'>3</span><span>         7.40  3.31  1.96 0.902  13.9
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> s(x0)  x0    0.020</span><span style='text-decoration: underline;'>3</span><span>         7.39  3.30  1.96 0.929  13.8
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> s(x0)  x0    0.025</span><span style='text-decoration: underline;'>3</span><span>         7.38  3.27  1.96 0.965  13.8
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> s(x0)  x0    0.030</span><span style='text-decoration: underline;'>3</span><span>         7.36  3.24  1.96 1.01   13.7
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> s(x0)  x0    0.035</span><span style='text-decoration: underline;'>3</span><span>         7.34  3.20  1.96 1.07   13.6
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> s(x0)  x0    0.040</span><span style='text-decoration: underline;'>3</span><span>         7.32  3.15  1.96 1.14   13.5
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> s(x0)  x0    0.045</span><span style='text-decoration: underline;'>3</span><span>         7.29  3.10  1.96 1.21   13.4
-#&gt; </span><span style='color: #949494;'># ... with 790 more rows</span><span></div><div class='input'>
-<span class='co'>## derivatives for a selected smooth</span>
-<span class='fu'>derivatives</span><span class='op'>(</span><span class='va'>mod</span>, type <span class='op'>=</span> <span class='st'>"central"</span>, term <span class='op'>=</span> <span class='st'>"s(x1)"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 200 x 8</span><span>
-#&gt;    smooth var       data derivative    se  crit lower upper
-#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> s(x1)  x1    0.000</span><span style='text-decoration: underline;'>405</span><span>     -</span><span style='color: #BB0000;'>0.907</span><span>  3.12  1.96 -</span><span style='color: #BB0000;'>7.02</span><span>  5.20
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> s(x1)  x1    0.005</span><span style='text-decoration: underline;'>41</span><span>      -</span><span style='color: #BB0000;'>0.907</span><span>  3.12  1.96 -</span><span style='color: #BB0000;'>7.02</span><span>  5.20
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> s(x1)  x1    0.010</span><span style='text-decoration: underline;'>4</span><span>       -</span><span style='color: #BB0000;'>0.906</span><span>  3.11  1.96 -</span><span style='color: #BB0000;'>7.01</span><span>  5.20
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> s(x1)  x1    0.015</span><span style='text-decoration: underline;'>4</span><span>       -</span><span style='color: #BB0000;'>0.903</span><span>  3.11  1.96 -</span><span style='color: #BB0000;'>6.99</span><span>  5.19
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> s(x1)  x1    0.020</span><span style='text-decoration: underline;'>4</span><span>       -</span><span style='color: #BB0000;'>0.898</span><span>  3.10  1.96 -</span><span style='color: #BB0000;'>6.97</span><span>  5.17
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> s(x1)  x1    0.025</span><span style='text-decoration: underline;'>4</span><span>       -</span><span style='color: #BB0000;'>0.891</span><span>  3.08  1.96 -</span><span style='color: #BB0000;'>6.93</span><span>  5.15
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> s(x1)  x1    0.030</span><span style='text-decoration: underline;'>4</span><span>       -</span><span style='color: #BB0000;'>0.880</span><span>  3.06  1.96 -</span><span style='color: #BB0000;'>6.88</span><span>  5.12
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> s(x1)  x1    0.035</span><span style='text-decoration: underline;'>4</span><span>       -</span><span style='color: #BB0000;'>0.867</span><span>  3.04  1.96 -</span><span style='color: #BB0000;'>6.82</span><span>  5.08
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> s(x1)  x1    0.040</span><span style='text-decoration: underline;'>4</span><span>       -</span><span style='color: #BB0000;'>0.850</span><span>  3.00  1.96 -</span><span style='color: #BB0000;'>6.74</span><span>  5.04
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> s(x1)  x1    0.045</span><span style='text-decoration: underline;'>4</span><span>       -</span><span style='color: #BB0000;'>0.829</span><span>  2.96  1.96 -</span><span style='color: #BB0000;'>6.64</span><span>  4.98
-#&gt; </span><span style='color: #949494;'># ... with 190 more rows</span><span></div><div class='input'><span class='co'>## or via a partial match</span>
-<span class='fu'>derivatives</span><span class='op'>(</span><span class='va'>mod</span>, type <span class='op'>=</span> <span class='st'>"central"</span>, term <span class='op'>=</span> <span class='st'>"x1"</span>, partial_match <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 200 x 8</span><span>
-#&gt;    smooth var       data derivative    se  crit lower upper
-#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> s(x1)  x1    0.000</span><span style='text-decoration: underline;'>405</span><span>     -</span><span style='color: #BB0000;'>0.907</span><span>  3.12  1.96 -</span><span style='color: #BB0000;'>7.02</span><span>  5.20
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> s(x1)  x1    0.005</span><span style='text-decoration: underline;'>41</span><span>      -</span><span style='color: #BB0000;'>0.907</span><span>  3.12  1.96 -</span><span style='color: #BB0000;'>7.02</span><span>  5.20
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> s(x1)  x1    0.010</span><span style='text-decoration: underline;'>4</span><span>       -</span><span style='color: #BB0000;'>0.906</span><span>  3.11  1.96 -</span><span style='color: #BB0000;'>7.01</span><span>  5.20
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> s(x1)  x1    0.015</span><span style='text-decoration: underline;'>4</span><span>       -</span><span style='color: #BB0000;'>0.903</span><span>  3.11  1.96 -</span><span style='color: #BB0000;'>6.99</span><span>  5.19
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> s(x1)  x1    0.020</span><span style='text-decoration: underline;'>4</span><span>       -</span><span style='color: #BB0000;'>0.898</span><span>  3.10  1.96 -</span><span style='color: #BB0000;'>6.97</span><span>  5.17
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> s(x1)  x1    0.025</span><span style='text-decoration: underline;'>4</span><span>       -</span><span style='color: #BB0000;'>0.891</span><span>  3.08  1.96 -</span><span style='color: #BB0000;'>6.93</span><span>  5.15
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> s(x1)  x1    0.030</span><span style='text-decoration: underline;'>4</span><span>       -</span><span style='color: #BB0000;'>0.880</span><span>  3.06  1.96 -</span><span style='color: #BB0000;'>6.88</span><span>  5.12
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> s(x1)  x1    0.035</span><span style='text-decoration: underline;'>4</span><span>       -</span><span style='color: #BB0000;'>0.867</span><span>  3.04  1.96 -</span><span style='color: #BB0000;'>6.82</span><span>  5.08
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> s(x1)  x1    0.040</span><span style='text-decoration: underline;'>4</span><span>       -</span><span style='color: #BB0000;'>0.850</span><span>  3.00  1.96 -</span><span style='color: #BB0000;'>6.74</span><span>  5.04
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> s(x1)  x1    0.045</span><span style='text-decoration: underline;'>4</span><span>       -</span><span style='color: #BB0000;'>0.829</span><span>  2.96  1.96 -</span><span style='color: #BB0000;'>6.64</span><span>  4.98
-#&gt; </span><span style='color: #949494;'># ... with 190 more rows</span><span></div><div class='input'><span class='co'># \dontshow{</span>
-<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span>
-<span class='co'># }</span>
-</div></span></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># \dontshow{</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>42</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span>cli.unicode <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>1</span>, n <span class='op'>=</span> <span class='fl'>400</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## first derivatives of all smooths using central finite differences</span></span>
+<span class='r-in'><span class='fu'>derivatives</span><span class='op'>(</span><span class='va'>mod</span>, type <span class='op'>=</span> <span class='st'>"central"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 800 x 8</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    smooth var       data derivative    se  crit lower upper</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>      <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 1</span> s(x0)  x0    0.000<span style='text-decoration: underline;'>239</span>       7.41  3.33  1.96 0.874  13.9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 2</span> s(x0)  x0    0.005<span style='text-decoration: underline;'>25</span>        7.41  3.33  1.96 0.875  13.9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 3</span> s(x0)  x0    0.010<span style='text-decoration: underline;'>3</span>         7.40  3.33  1.96 0.884  13.9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 4</span> s(x0)  x0    0.015<span style='text-decoration: underline;'>3</span>         7.40  3.31  1.96 0.902  13.9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 5</span> s(x0)  x0    0.020<span style='text-decoration: underline;'>3</span>         7.39  3.30  1.96 0.929  13.8</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 6</span> s(x0)  x0    0.025<span style='text-decoration: underline;'>3</span>         7.38  3.27  1.96 0.965  13.8</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 7</span> s(x0)  x0    0.030<span style='text-decoration: underline;'>3</span>         7.36  3.24  1.96 1.01   13.7</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 8</span> s(x0)  x0    0.035<span style='text-decoration: underline;'>3</span>         7.34  3.20  1.96 1.07   13.6</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 9</span> s(x0)  x0    0.040<span style='text-decoration: underline;'>3</span>         7.32  3.15  1.96 1.14   13.5</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>10</span> s(x0)  x0    0.045<span style='text-decoration: underline;'>3</span>         7.29  3.10  1.96 1.21   13.4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># ... with 790 more rows</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## derivatives for a selected smooth</span></span>
+<span class='r-in'><span class='fu'>derivatives</span><span class='op'>(</span><span class='va'>mod</span>, type <span class='op'>=</span> <span class='st'>"central"</span>, term <span class='op'>=</span> <span class='st'>"s(x1)"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 200 x 8</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    smooth var       data derivative    se  crit lower upper</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>      <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 1</span> s(x1)  x1    0.000<span style='text-decoration: underline;'>405</span>     -<span style='color: #BB0000;'>0.907</span>  3.12  1.96 -<span style='color: #BB0000;'>7.02</span>  5.20</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 2</span> s(x1)  x1    0.005<span style='text-decoration: underline;'>41</span>      -<span style='color: #BB0000;'>0.907</span>  3.12  1.96 -<span style='color: #BB0000;'>7.02</span>  5.20</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 3</span> s(x1)  x1    0.010<span style='text-decoration: underline;'>4</span>       -<span style='color: #BB0000;'>0.906</span>  3.11  1.96 -<span style='color: #BB0000;'>7.01</span>  5.20</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 4</span> s(x1)  x1    0.015<span style='text-decoration: underline;'>4</span>       -<span style='color: #BB0000;'>0.903</span>  3.11  1.96 -<span style='color: #BB0000;'>6.99</span>  5.19</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 5</span> s(x1)  x1    0.020<span style='text-decoration: underline;'>4</span>       -<span style='color: #BB0000;'>0.898</span>  3.10  1.96 -<span style='color: #BB0000;'>6.97</span>  5.17</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 6</span> s(x1)  x1    0.025<span style='text-decoration: underline;'>4</span>       -<span style='color: #BB0000;'>0.891</span>  3.08  1.96 -<span style='color: #BB0000;'>6.93</span>  5.15</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 7</span> s(x1)  x1    0.030<span style='text-decoration: underline;'>4</span>       -<span style='color: #BB0000;'>0.880</span>  3.06  1.96 -<span style='color: #BB0000;'>6.88</span>  5.12</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 8</span> s(x1)  x1    0.035<span style='text-decoration: underline;'>4</span>       -<span style='color: #BB0000;'>0.867</span>  3.04  1.96 -<span style='color: #BB0000;'>6.82</span>  5.08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 9</span> s(x1)  x1    0.040<span style='text-decoration: underline;'>4</span>       -<span style='color: #BB0000;'>0.850</span>  3.00  1.96 -<span style='color: #BB0000;'>6.74</span>  5.04</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>10</span> s(x1)  x1    0.045<span style='text-decoration: underline;'>4</span>       -<span style='color: #BB0000;'>0.829</span>  2.96  1.96 -<span style='color: #BB0000;'>6.64</span>  4.98</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># ... with 190 more rows</span></span>
+<span class='r-in'><span class='co'>## or via a partial match</span></span>
+<span class='r-in'><span class='fu'>derivatives</span><span class='op'>(</span><span class='va'>mod</span>, type <span class='op'>=</span> <span class='st'>"central"</span>, term <span class='op'>=</span> <span class='st'>"x1"</span>, partial_match <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 200 x 8</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    smooth var       data derivative    se  crit lower upper</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>      <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 1</span> s(x1)  x1    0.000<span style='text-decoration: underline;'>405</span>     -<span style='color: #BB0000;'>0.907</span>  3.12  1.96 -<span style='color: #BB0000;'>7.02</span>  5.20</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 2</span> s(x1)  x1    0.005<span style='text-decoration: underline;'>41</span>      -<span style='color: #BB0000;'>0.907</span>  3.12  1.96 -<span style='color: #BB0000;'>7.02</span>  5.20</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 3</span> s(x1)  x1    0.010<span style='text-decoration: underline;'>4</span>       -<span style='color: #BB0000;'>0.906</span>  3.11  1.96 -<span style='color: #BB0000;'>7.01</span>  5.20</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 4</span> s(x1)  x1    0.015<span style='text-decoration: underline;'>4</span>       -<span style='color: #BB0000;'>0.903</span>  3.11  1.96 -<span style='color: #BB0000;'>6.99</span>  5.19</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 5</span> s(x1)  x1    0.020<span style='text-decoration: underline;'>4</span>       -<span style='color: #BB0000;'>0.898</span>  3.10  1.96 -<span style='color: #BB0000;'>6.97</span>  5.17</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 6</span> s(x1)  x1    0.025<span style='text-decoration: underline;'>4</span>       -<span style='color: #BB0000;'>0.891</span>  3.08  1.96 -<span style='color: #BB0000;'>6.93</span>  5.15</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 7</span> s(x1)  x1    0.030<span style='text-decoration: underline;'>4</span>       -<span style='color: #BB0000;'>0.880</span>  3.06  1.96 -<span style='color: #BB0000;'>6.88</span>  5.12</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 8</span> s(x1)  x1    0.035<span style='text-decoration: underline;'>4</span>       -<span style='color: #BB0000;'>0.867</span>  3.04  1.96 -<span style='color: #BB0000;'>6.82</span>  5.08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 9</span> s(x1)  x1    0.040<span style='text-decoration: underline;'>4</span>       -<span style='color: #BB0000;'>0.850</span>  3.00  1.96 -<span style='color: #BB0000;'>6.74</span>  5.04</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>10</span> s(x1)  x1    0.045<span style='text-decoration: underline;'>4</span>       -<span style='color: #BB0000;'>0.829</span>  2.96  1.96 -<span style='color: #BB0000;'>6.64</span>  4.98</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># ... with 190 more rows</span></span>
+<span class='r-in'><span class='co'># \dontshow{</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

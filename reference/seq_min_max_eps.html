@@ -96,7 +96,7 @@ and hence the conmstraints of the penalty." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.9111</span>
       </span>
     </div>
 
@@ -137,7 +137,7 @@ small adjustment</h1>
 
     <div class="ref-description">
     <p>Creates a sequence of <code>n</code> evenly-spaced values over the range
-<code><a href='https://rdrr.io/r/base/Extremes.html'>min(x)</a></code> -- <code><a href='https://rdrr.io/r/base/Extremes.html'>max(x)</a></code>, where the minimum and maximum are adjusted such that
+<code>min(x)</code> -- <code>max(x)</code>, where the minimum and maximum are adjusted such that
 they are always contained within the range of <code>x</code> when <code>x</code> may be shifted
 forwards or backwards by an amount related to <code>eps</code>. This is particularly
 useful in computing derivatives via finite differences where without this
@@ -145,7 +145,7 @@ adjustment we may be predicting for values outside the range of the data
 and hence the conmstraints of the penalty.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>seq_min_max_eps</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>n</span>, <span class='va'>order</span>, type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forward"</span>, <span class='st'>"backward"</span>, <span class='st'>"central"</span><span class='op'>)</span>, <span class='va'>eps</span><span class='op'>)</span></pre>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>seq_min_max_eps</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>n</span>, <span class='va'>order</span>, type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"forward"</span>, <span class='st'>"backward"</span>, <span class='st'>"central"</span><span class='op'>)</span>, <span class='va'>eps</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

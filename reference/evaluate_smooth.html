@@ -67,8 +67,6 @@ which the smooth should be evaluated can be supplied." />
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -92,7 +90,7 @@ which the smooth should be evaluated can be supplied." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.9111</span>
       </span>
     </div>
 
@@ -136,7 +134,7 @@ covariate associated with the smooth. Alternatively, a set of points at
 which the smooth should be evaluated can be supplied.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>evaluate_smooth</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>evaluate_smooth</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for gam</span>
 <span class='fu'>evaluate_smooth</span><span class='op'>(</span>
@@ -159,7 +157,7 @@ which the smooth should be evaluated can be supplied.</p>
 <span class='fu'>evaluate_parametric_term</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for gam</span>
-<span class='fu'>evaluate_parametric_term</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>term</span>, unconditional <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>evaluate_parametric_term</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>term</span>, unconditional <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -219,50 +217,54 @@ and <code>dist</code> is a distance within the unit square. See
 and <code>"data.frame"</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span>
-<span class='co'># \dontshow{</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span>
-<span class='va'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span>cli.unicode <span class='op'>=</span> <span class='cn'>FALSE</span>, digits <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span>
-<span class='co'># }</span>
-<span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>1</span>, n <span class='op'>=</span> <span class='fl'>400</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='va'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span>
-
-<span class='fu'>evaluate_smooth</span><span class='op'>(</span><span class='va'>m1</span>, <span class='st'>"s(x1)"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 100 x 5</span><span>
-#&gt;    smooth by_variable       x1   est    se
-#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;fct&gt;</span><span>          </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> s(x1)  </span><span style='color: #BB0000;'>NA</span><span>          0.000</span><span style='text-decoration: underline;'>663</span><span> -</span><span style='color: #BB0000;'>1.94</span><span> 0.329
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> s(x1)  </span><span style='color: #BB0000;'>NA</span><span>          0.010</span><span style='text-decoration: underline;'>8</span><span>   -</span><span style='color: #BB0000;'>1.93</span><span> 0.312
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> s(x1)  </span><span style='color: #BB0000;'>NA</span><span>          0.020</span><span style='text-decoration: underline;'>8</span><span>   -</span><span style='color: #BB0000;'>1.92</span><span> 0.296
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> s(x1)  </span><span style='color: #BB0000;'>NA</span><span>          0.030</span><span style='text-decoration: underline;'>9</span><span>   -</span><span style='color: #BB0000;'>1.90</span><span> 0.281
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> s(x1)  </span><span style='color: #BB0000;'>NA</span><span>          0.041</span><span style='text-decoration: underline;'>0</span><span>   -</span><span style='color: #BB0000;'>1.89</span><span> 0.267
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> s(x1)  </span><span style='color: #BB0000;'>NA</span><span>          0.051</span><span style='text-decoration: underline;'>1</span><span>   -</span><span style='color: #BB0000;'>1.87</span><span> 0.255
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> s(x1)  </span><span style='color: #BB0000;'>NA</span><span>          0.061</span><span style='text-decoration: underline;'>2</span><span>   -</span><span style='color: #BB0000;'>1.86</span><span> 0.243
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> s(x1)  </span><span style='color: #BB0000;'>NA</span><span>          0.071</span><span style='text-decoration: underline;'>3</span><span>   -</span><span style='color: #BB0000;'>1.84</span><span> 0.234
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> s(x1)  </span><span style='color: #BB0000;'>NA</span><span>          0.081</span><span style='text-decoration: underline;'>4</span><span>   -</span><span style='color: #BB0000;'>1.83</span><span> 0.225
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> s(x1)  </span><span style='color: #BB0000;'>NA</span><span>          0.091</span><span style='text-decoration: underline;'>4</span><span>   -</span><span style='color: #BB0000;'>1.81</span><span> 0.218
-#&gt; </span><span style='color: #949494;'># ... with 90 more rows</span><span></div><div class='input'>
-<span class='co'>## 2d example</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span>
-<span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>2</span>, n <span class='op'>=</span> <span class='fl'>1000</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Bivariate smoothing example</div><div class='input'><span class='va'>m2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>z</span>, k <span class='op'>=</span> <span class='fl'>30</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span><span class='op'>$</span><span class='va'>data</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span>
-
-<span class='fu'>evaluate_smooth</span><span class='op'>(</span><span class='va'>m2</span>, <span class='st'>"s(x,z)"</span>, n <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 10,000 x 6</span><span>
-#&gt;    smooth by_variable        x        z    est    se
-#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;fct&gt;</span><span>          </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> s(x,z) </span><span style='color: #BB0000;'>NA</span><span>          0.000</span><span style='text-decoration: underline;'>663</span><span> 0.000</span><span style='text-decoration: underline;'>762</span><span> 0.088</span><span style='text-decoration: underline;'>1</span><span> 0.189
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> s(x,z) </span><span style='color: #BB0000;'>NA</span><span>          0.010</span><span style='text-decoration: underline;'>8</span><span>   0.000</span><span style='text-decoration: underline;'>762</span><span> 0.092</span><span style='text-decoration: underline;'>2</span><span> 0.186
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> s(x,z) </span><span style='color: #BB0000;'>NA</span><span>          0.020</span><span style='text-decoration: underline;'>8</span><span>   0.000</span><span style='text-decoration: underline;'>762</span><span> 0.096</span><span style='text-decoration: underline;'>5</span><span> 0.183
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> s(x,z) </span><span style='color: #BB0000;'>NA</span><span>          0.030</span><span style='text-decoration: underline;'>9</span><span>   0.000</span><span style='text-decoration: underline;'>762</span><span> 0.101  0.180
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> s(x,z) </span><span style='color: #BB0000;'>NA</span><span>          0.041</span><span style='text-decoration: underline;'>0</span><span>   0.000</span><span style='text-decoration: underline;'>762</span><span> 0.105  0.176
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> s(x,z) </span><span style='color: #BB0000;'>NA</span><span>          0.051</span><span style='text-decoration: underline;'>1</span><span>   0.000</span><span style='text-decoration: underline;'>762</span><span> 0.110  0.173
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> s(x,z) </span><span style='color: #BB0000;'>NA</span><span>          0.061</span><span style='text-decoration: underline;'>2</span><span>   0.000</span><span style='text-decoration: underline;'>762</span><span> 0.115  0.170
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> s(x,z) </span><span style='color: #BB0000;'>NA</span><span>          0.071</span><span style='text-decoration: underline;'>3</span><span>   0.000</span><span style='text-decoration: underline;'>762</span><span> 0.120  0.166
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> s(x,z) </span><span style='color: #BB0000;'>NA</span><span>          0.081</span><span style='text-decoration: underline;'>4</span><span>   0.000</span><span style='text-decoration: underline;'>762</span><span> 0.125  0.163
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> s(x,z) </span><span style='color: #BB0000;'>NA</span><span>          0.091</span><span style='text-decoration: underline;'>4</span><span>   0.000</span><span style='text-decoration: underline;'>762</span><span> 0.130  0.160
-#&gt; </span><span style='color: #949494;'># ... with 9,990 more rows</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span>
-</div></span></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># \dontshow{</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span>cli.unicode <span class='op'>=</span> <span class='cn'>FALSE</span>, digits <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>1</span>, n <span class='op'>=</span> <span class='fl'>400</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Gu &amp; Wahba 4 term additive model</span>
+<span class='r-in'><span class='va'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>evaluate_smooth</span><span class='op'>(</span><span class='va'>m1</span>, <span class='st'>"s(x1)"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 100 x 5</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    smooth by_variable       x1   est    se</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;fct&gt;</span>          <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 1</span> s(x1)  <span style='color: #BB0000;'>NA</span>          0.000<span style='text-decoration: underline;'>663</span> -<span style='color: #BB0000;'>1.94</span> 0.329</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 2</span> s(x1)  <span style='color: #BB0000;'>NA</span>          0.010<span style='text-decoration: underline;'>8</span>   -<span style='color: #BB0000;'>1.93</span> 0.312</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 3</span> s(x1)  <span style='color: #BB0000;'>NA</span>          0.020<span style='text-decoration: underline;'>8</span>   -<span style='color: #BB0000;'>1.92</span> 0.296</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 4</span> s(x1)  <span style='color: #BB0000;'>NA</span>          0.030<span style='text-decoration: underline;'>9</span>   -<span style='color: #BB0000;'>1.90</span> 0.281</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 5</span> s(x1)  <span style='color: #BB0000;'>NA</span>          0.041<span style='text-decoration: underline;'>0</span>   -<span style='color: #BB0000;'>1.89</span> 0.267</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 6</span> s(x1)  <span style='color: #BB0000;'>NA</span>          0.051<span style='text-decoration: underline;'>1</span>   -<span style='color: #BB0000;'>1.87</span> 0.255</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 7</span> s(x1)  <span style='color: #BB0000;'>NA</span>          0.061<span style='text-decoration: underline;'>2</span>   -<span style='color: #BB0000;'>1.86</span> 0.243</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 8</span> s(x1)  <span style='color: #BB0000;'>NA</span>          0.071<span style='text-decoration: underline;'>3</span>   -<span style='color: #BB0000;'>1.84</span> 0.234</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 9</span> s(x1)  <span style='color: #BB0000;'>NA</span>          0.081<span style='text-decoration: underline;'>4</span>   -<span style='color: #BB0000;'>1.83</span> 0.225</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>10</span> s(x1)  <span style='color: #BB0000;'>NA</span>          0.091<span style='text-decoration: underline;'>4</span>   -<span style='color: #BB0000;'>1.81</span> 0.218</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># ... with 90 more rows</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## 2d example</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>2</span>, n <span class='op'>=</span> <span class='fl'>1000</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Bivariate smoothing example</span>
+<span class='r-in'><span class='va'>m2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>z</span>, k <span class='op'>=</span> <span class='fl'>30</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span><span class='op'>$</span><span class='va'>data</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>evaluate_smooth</span><span class='op'>(</span><span class='va'>m2</span>, <span class='st'>"s(x,z)"</span>, n <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 10,000 x 6</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    smooth by_variable        x        z    est    se</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;fct&gt;</span>          <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 1</span> s(x,z) <span style='color: #BB0000;'>NA</span>          0.000<span style='text-decoration: underline;'>663</span> 0.000<span style='text-decoration: underline;'>762</span> 0.088<span style='text-decoration: underline;'>1</span> 0.189</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 2</span> s(x,z) <span style='color: #BB0000;'>NA</span>          0.010<span style='text-decoration: underline;'>8</span>   0.000<span style='text-decoration: underline;'>762</span> 0.092<span style='text-decoration: underline;'>2</span> 0.186</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 3</span> s(x,z) <span style='color: #BB0000;'>NA</span>          0.020<span style='text-decoration: underline;'>8</span>   0.000<span style='text-decoration: underline;'>762</span> 0.096<span style='text-decoration: underline;'>5</span> 0.183</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 4</span> s(x,z) <span style='color: #BB0000;'>NA</span>          0.030<span style='text-decoration: underline;'>9</span>   0.000<span style='text-decoration: underline;'>762</span> 0.101  0.180</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 5</span> s(x,z) <span style='color: #BB0000;'>NA</span>          0.041<span style='text-decoration: underline;'>0</span>   0.000<span style='text-decoration: underline;'>762</span> 0.105  0.176</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 6</span> s(x,z) <span style='color: #BB0000;'>NA</span>          0.051<span style='text-decoration: underline;'>1</span>   0.000<span style='text-decoration: underline;'>762</span> 0.110  0.173</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 7</span> s(x,z) <span style='color: #BB0000;'>NA</span>          0.061<span style='text-decoration: underline;'>2</span>   0.000<span style='text-decoration: underline;'>762</span> 0.115  0.170</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 8</span> s(x,z) <span style='color: #BB0000;'>NA</span>          0.071<span style='text-decoration: underline;'>3</span>   0.000<span style='text-decoration: underline;'>762</span> 0.120  0.166</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 9</span> s(x,z) <span style='color: #BB0000;'>NA</span>          0.081<span style='text-decoration: underline;'>4</span>   0.000<span style='text-decoration: underline;'>762</span> 0.125  0.163</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>10</span> s(x,z) <span style='color: #BB0000;'>NA</span>          0.091<span style='text-decoration: underline;'>4</span>   0.000<span style='text-decoration: underline;'>762</span> 0.130  0.160</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># ... with 9,990 more rows</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span></span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

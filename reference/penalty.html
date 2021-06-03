@@ -65,8 +65,6 @@
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -90,7 +88,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.9111</span>
       </span>
     </div>
 
@@ -132,7 +130,7 @@
     <p>Extract and tidy penalty matrices</p>
     </div>
 
-    <pre class="usage"><span class='fu'>penalty</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>penalty</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for gam</span>
 <span class='fu'>penalty</span><span class='op'>(</span><span class='va'>object</span>, smooth <span class='op'>=</span> <span class='cn'>NULL</span>, rescale <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span>
@@ -147,7 +145,7 @@
 <span class='fu'>penalty</span><span class='op'>(</span><span class='va'>object</span>, margins <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for re.smooth.spec</span>
-<span class='fu'>penalty</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>data</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>penalty</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>data</span>, <span class='va'>...</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -210,45 +208,47 @@ matrix or matrices are not changed.</p>
     <p>Gavin L. Simpson</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \dontshow{</span>
-<span class='va'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span>cli.unicode <span class='op'>=</span> <span class='cn'>FALSE</span>, digits <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span>
-<span class='co'># }</span>
-<span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span>
-<span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='data_sim.html'>data_sim</a></span><span class='op'>(</span><span class='st'>"eg4"</span>, n <span class='op'>=</span> <span class='fl'>400</span>, seed <span class='op'>=</span> <span class='fl'>42</span><span class='op'>)</span>
-<span class='va'>m</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span>, by <span class='op'>=</span> <span class='va'>fac</span><span class='op'>)</span>,
-         data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span>
-<span class='fu'>penalty</span><span class='op'>(</span><span class='va'>m</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 405 x 6</span><span>
-#&gt;    smooth type  penalty row   col   value
-#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> s(x0)  TPRS  s(x0)   F1    F1     9.81
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> s(x0)  TPRS  s(x0)   F1    F2    -</span><span style='color: #BB0000;'>1.45</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> s(x0)  TPRS  s(x0)   F1    F3    -</span><span style='color: #BB0000;'>5</span><span>   
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> s(x0)  TPRS  s(x0)   F1    F4    -</span><span style='color: #BB0000;'>1.34</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> s(x0)  TPRS  s(x0)   F1    F5    -</span><span style='color: #BB0000;'>6.24</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> s(x0)  TPRS  s(x0)   F1    F6     3.90
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> s(x0)  TPRS  s(x0)   F1    F7    -</span><span style='color: #BB0000;'>7.74</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> s(x0)  TPRS  s(x0)   F1    F8    -</span><span style='color: #BB0000;'>1.79</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> s(x0)  TPRS  s(x0)   F1    F9     0   
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> s(x0)  TPRS  s(x0)   F2    F1    -</span><span style='color: #BB0000;'>1.45</span><span>
-#&gt; </span><span style='color: #949494;'># ... with 395 more rows</span><span></div><div class='input'>
-<span class='co'># for a specific smooth</span>
-<span class='fu'>penalty</span><span class='op'>(</span><span class='va'>m</span>, smooth <span class='op'>=</span> <span class='st'>"s(x2):fac1"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 81 x 6</span><span>
-#&gt;    smooth     type  penalty    row   col   value
-#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>      </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>      </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> s(x2):fac1 TPRS  s(x2):fac1 F1    F1     9.94
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> s(x2):fac1 TPRS  s(x2):fac1 F1    F2     1.40
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> s(x2):fac1 TPRS  s(x2):fac1 F1    F3     4.78
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> s(x2):fac1 TPRS  s(x2):fac1 F1    F4     1.13
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> s(x2):fac1 TPRS  s(x2):fac1 F1    F5     5.84
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> s(x2):fac1 TPRS  s(x2):fac1 F1    F6    -</span><span style='color: #BB0000;'>4.06</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> s(x2):fac1 TPRS  s(x2):fac1 F1    F7     8.60
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> s(x2):fac1 TPRS  s(x2):fac1 F1    F8     1.44
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> s(x2):fac1 TPRS  s(x2):fac1 F1    F9     0   
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> s(x2):fac1 TPRS  s(x2):fac1 F2    F1     1.40
-#&gt; </span><span style='color: #949494;'># ... with 71 more rows</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span>
-</div></span></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='co'># \dontshow{</span></span>
+<span class='r-in'><span class='va'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span>cli.unicode <span class='op'>=</span> <span class='cn'>FALSE</span>, digits <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='data_sim.html'>data_sim</a></span><span class='op'>(</span><span class='st'>"eg4"</span>, n <span class='op'>=</span> <span class='fl'>400</span>, seed <span class='op'>=</span> <span class='fl'>42</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>m</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span>, by <span class='op'>=</span> <span class='va'>fac</span><span class='op'>)</span>,</span>
+<span class='r-in'>         data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>penalty</span><span class='op'>(</span><span class='va'>m</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 405 x 6</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    smooth type  penalty row   col   value</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 1</span> s(x0)  TPRS  s(x0)   F1    F1     9.81</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 2</span> s(x0)  TPRS  s(x0)   F1    F2    -<span style='color: #BB0000;'>1.45</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 3</span> s(x0)  TPRS  s(x0)   F1    F3    -<span style='color: #BB0000;'>5</span>   </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 4</span> s(x0)  TPRS  s(x0)   F1    F4    -<span style='color: #BB0000;'>1.34</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 5</span> s(x0)  TPRS  s(x0)   F1    F5    -<span style='color: #BB0000;'>6.24</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 6</span> s(x0)  TPRS  s(x0)   F1    F6     3.90</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 7</span> s(x0)  TPRS  s(x0)   F1    F7    -<span style='color: #BB0000;'>7.74</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 8</span> s(x0)  TPRS  s(x0)   F1    F8    -<span style='color: #BB0000;'>1.79</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 9</span> s(x0)  TPRS  s(x0)   F1    F9     0   </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>10</span> s(x0)  TPRS  s(x0)   F2    F1    -<span style='color: #BB0000;'>1.45</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># ... with 395 more rows</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># for a specific smooth</span></span>
+<span class='r-in'><span class='fu'>penalty</span><span class='op'>(</span><span class='va'>m</span>, smooth <span class='op'>=</span> <span class='st'>"s(x2):fac1"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 81 x 6</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    smooth     type  penalty    row   col   value</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>      <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>      <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 1</span> s(x2):fac1 TPRS  s(x2):fac1 F1    F1     9.94</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 2</span> s(x2):fac1 TPRS  s(x2):fac1 F1    F2     1.40</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 3</span> s(x2):fac1 TPRS  s(x2):fac1 F1    F3     4.78</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 4</span> s(x2):fac1 TPRS  s(x2):fac1 F1    F4     1.13</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 5</span> s(x2):fac1 TPRS  s(x2):fac1 F1    F5     5.84</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 6</span> s(x2):fac1 TPRS  s(x2):fac1 F1    F6    -<span style='color: #BB0000;'>4.06</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 7</span> s(x2):fac1 TPRS  s(x2):fac1 F1    F7     8.60</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 8</span> s(x2):fac1 TPRS  s(x2):fac1 F1    F8     1.44</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 9</span> s(x2):fac1 TPRS  s(x2):fac1 F1    F9     0   </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>10</span> s(x2):fac1 TPRS  s(x2):fac1 F2    F1     1.40</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># ... with 71 more rows</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span></span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

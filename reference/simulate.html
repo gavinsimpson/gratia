@@ -68,8 +68,6 @@ distribution used when fitting the model." />
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -93,7 +91,7 @@ distribution used when fitting the model." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.9111</span>
       </span>
     </div>
 
@@ -138,14 +136,14 @@ data are required, then generating random draws from the probability
 distribution used when fitting the model.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for gam</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='co'># S3 method for gam</span>
 <span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span><span class='op'>(</span><span class='va'>object</span>, nsim <span class='op'>=</span> <span class='fl'>1</span>, seed <span class='op'>=</span> <span class='cn'>NULL</span>, newdata <span class='op'>=</span> <span class='cn'>NULL</span>, weights <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for gamm</span>
 <span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span><span class='op'>(</span><span class='va'>object</span>, nsim <span class='op'>=</span> <span class='fl'>1</span>, seed <span class='op'>=</span> <span class='cn'>NULL</span>, newdata <span class='op'>=</span> <span class='cn'>NULL</span>, weights <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for scam</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span><span class='op'>(</span><span class='va'>object</span>, nsim <span class='op'>=</span> <span class='fl'>1</span>, seed <span class='op'>=</span> <span class='cn'>NULL</span>, newdata <span class='op'>=</span> <span class='cn'>NULL</span>, weights <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span><span class='op'>(</span><span class='va'>object</span>, nsim <span class='op'>=</span> <span class='fl'>1</span>, seed <span class='op'>=</span> <span class='cn'>NULL</span>, newdata <span class='op'>=</span> <span class='cn'>NULL</span>, weights <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -176,8 +174,8 @@ then defaults to <code>object[["prior.weights"]]</code>, otherwise a vector of o
     </tr>
     <tr>
       <th>...</th>
-      <td><p>arguments passed to methods. <code><a href='simulate.html'>simulate.gam()</a></code> and
-<code><a href='simulate.html'>simulate.scam()</a></code> pass <code>...</code> on to <code><a href='https://rdrr.io/pkg/mgcv/man/predict.gam.html'>predict.gam()</a></code>. As such you can pass
+      <td><p>arguments passed to methods. <code>simulate.gam()</code> and
+<code>simulate.scam()</code> pass <code>...</code> on to <code><a href='https://rdrr.io/pkg/mgcv/man/predict.gam.html'>predict.gam()</a></code>. As such you can pass
 additional arguments such as <code>terms</code>, <code>exclude</code>, to select which model
 terms are included in the predictions. This may be useful, for example,
 for excluding the effects of random effect terms.</p></td>
@@ -189,7 +187,7 @@ for excluding the effects of random effect terms.</p></td>
     <p>(Currently) A matrix with <code>nsim</code> columns.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>For <code><a href='simulate.html'>simulate.gam()</a></code> to function, the <code>family</code> component of the fitted
+    <p>For <code>simulate.gam()</code> to function, the <code>family</code> component of the fitted
 model must contain, or be updateable to contain, the required random
 number generator. See <code><a href='https://rdrr.io/pkg/mgcv/man/fix.family.link.html'>mgcv::fix.family.rd()</a></code>.</p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
@@ -197,20 +195,22 @@ number generator. See <code><a href='https://rdrr.io/pkg/mgcv/man/fix.family.lin
     <p>Gavin L. Simpson</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span>
-<span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>1</span>, n <span class='op'>=</span> <span class='fl'>400</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Gu &amp; Wahba 4 term additive model</div><div class='input'><span class='va'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span>
-
-<span class='va'>sims</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span><span class='op'>(</span><span class='va'>m1</span>, nsim <span class='op'>=</span> <span class='fl'>5</span>, seed <span class='op'>=</span> <span class='fl'>42</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>sims</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;           [,1]      [,2]      [,3]      [,4]      [,5]
-#&gt; [1,] 11.445470 11.374304 10.098681  7.264881  8.796630
-#&gt; [2,]  6.510912  5.909584  9.057362  7.698084 11.444781
-#&gt; [3,]  3.837995  3.230610  3.550240  3.759380  4.774581
-#&gt; [4,] 12.361830 11.209226 10.714215 11.861957 10.746417
-#&gt; [5,] 14.851461 12.911440 11.356984 15.783913 15.106270
-#&gt; [6,]  5.921276  4.158963  5.520856  7.973614  9.654888</div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>1</span>, n <span class='op'>=</span> <span class='fl'>400</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Gu &amp; Wahba 4 term additive model</span>
+<span class='r-in'><span class='va'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>sims</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span><span class='op'>(</span><span class='va'>m1</span>, nsim <span class='op'>=</span> <span class='fl'>5</span>, seed <span class='op'>=</span> <span class='fl'>42</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>sims</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>           [,1]      [,2]      [,3]      [,4]      [,5]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1,] 11.445470 11.374304 10.098681  7.264881  8.796630</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [2,]  6.510912  5.909584  9.057362  7.698084 11.444781</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [3,]  3.837995  3.230610  3.550240  3.759380  4.774581</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [4,] 12.361830 11.209226 10.714215 11.861957 10.746417</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [5,] 14.851461 12.911440 11.356984 15.783913 15.106270</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [6,]  5.921276  4.158963  5.520856  7.973614  9.654888</span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

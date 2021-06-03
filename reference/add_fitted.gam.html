@@ -65,8 +65,6 @@
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -90,7 +88,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.9111</span>
       </span>
     </div>
 
@@ -132,8 +130,8 @@
     <p>Add fitted values from a GAM to a data frame</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for gam</span>
-<span class='fu'><a href='add_fitted.html'>add_fitted</a></span><span class='op'>(</span><span class='va'>data</span>, <span class='va'>model</span>, value <span class='op'>=</span> <span class='st'>".value"</span>, type <span class='op'>=</span> <span class='st'>"response"</span>, prefix <span class='op'>=</span> <span class='st'>"."</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='co'># S3 method for gam</span>
+<span class='fu'><a href='add_fitted.html'>add_fitted</a></span><span class='op'>(</span><span class='va'>data</span>, <span class='va'>model</span>, value <span class='op'>=</span> <span class='st'>".value"</span>, type <span class='op'>=</span> <span class='st'>"response"</span>, prefix <span class='op'>=</span> <span class='st'>"."</span>, <span class='va'>...</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -177,49 +175,51 @@ the names of columns returned by such prediction types.</p></td>
 <code>model</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span>
-<span class='co'># \dontshow{</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
-<span class='va'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span>digits <span class='op'>=</span> <span class='fl'>3</span>, cli.unicode <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-<span class='co'># }</span>
-<span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'>gamSim</span><span class='op'>(</span>eg <span class='op'>=</span> <span class='fl'>1</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-<span class='va'>df</span> <span class='op'>&lt;-</span> <span class='va'>df</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"y"</span>,<span class='st'>"x0"</span>,<span class='st'>"x1"</span>,<span class='st'>"x2"</span>,<span class='st'>"x3"</span><span class='op'>)</span><span class='op'>]</span>
-<span class='va'>m</span> <span class='op'>&lt;-</span>  <span class='fu'>gam</span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'>s</span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'>s</span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'>s</span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'>s</span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>df</span>, method <span class='op'>=</span> <span class='st'>'REML'</span><span class='op'>)</span>
-
-<span class='co'>##</span>
-<span class='fu'><a href='add_fitted.html'>add_fitted</a></span><span class='op'>(</span><span class='va'>df</span>, <span class='va'>m</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 400 x 6</span><span>
-#&gt;          y     x0     x1     x2    x3 .value
-#&gt;      </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span>  3.34   0.266  0.659  0.859  0.367   5.90
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> -</span><span style='color: #BB0000;'>0.075</span><span style='color: #BB0000;text-decoration: underline;'>8</span><span> 0.372  0.185  0.034</span><span style='text-decoration: underline;'>4</span><span> 0.741   3.15
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> 10.7    0.573  0.954  0.971  0.934   8.28
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span>  8.73   0.908  0.898  0.745  0.673   8.65
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> 15.0    0.202  0.944  0.273  0.701  15.7 
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span>  7.67   0.898  0.724  0.677  0.848   8.38
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span>  7.58   0.945  0.370  0.348  0.706   7.84
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span>  8.51   0.661  0.781  0.947  0.859   6.74
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> 10.6    0.629  0.011</span><span style='text-decoration: underline;'>1</span><span> 0.339  0.446   9.14
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span>  3.72   0.061</span><span style='text-decoration: underline;'>8</span><span> 0.940  0.031</span><span style='text-decoration: underline;'>7</span><span> 0.677   7.04
-#&gt; </span><span style='color: #949494;'># ... with 390 more rows</span><span></div><div class='input'>
-<span class='co'>## with type = "terms" or "iterms"</span>
-<span class='fu'><a href='add_fitted.html'>add_fitted</a></span><span class='op'>(</span><span class='va'>df</span>, <span class='va'>m</span>, type <span class='op'>=</span> <span class='st'>"terms"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 400 x 10</span><span>
-#&gt;          y     x0     x1     x2    x3 .constant `.s(x0)` `.s(x1)` `.s(x2)`
-#&gt;      </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span>  3.34   0.266  0.659  0.859  0.367      7.94   0.175     0.559   -</span><span style='color: #BB0000;'>2.81</span><span> 
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> -</span><span style='color: #BB0000;'>0.075</span><span style='color: #BB0000;text-decoration: underline;'>8</span><span> 0.372  0.185  0.034</span><span style='text-decoration: underline;'>4</span><span> 0.741      7.94   0.435    -</span><span style='color: #BB0000;'>1.92</span><span>    -</span><span style='color: #BB0000;'>3.23</span><span> 
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> 10.7    0.573  0.954  0.971  0.934      7.94   0.593     3.35    -</span><span style='color: #BB0000;'>3.47</span><span> 
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span>  8.73   0.908  0.898  0.745  0.673      7.94  -</span><span style='color: #BB0000;'>0.812</span><span>     2.77    -</span><span style='color: #BB0000;'>1.19</span><span> 
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> 15.0    0.202  0.944  0.273  0.701      7.94  -</span><span style='color: #BB0000;'>0.058</span><span style='color: #BB0000;text-decoration: underline;'>9</span><span>    3.23     4.63 
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span>  7.67   0.898  0.724  0.677  0.848      7.94  -</span><span style='color: #BB0000;'>0.745</span><span>     1.15     0.146
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span>  7.58   0.945  0.370  0.348  0.706      7.94  -</span><span style='color: #BB0000;'>1.07</span><span>     -</span><span style='color: #BB0000;'>1.31</span><span>     2.34 
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span>  8.51   0.661  0.781  0.947  0.859      7.94   0.434     1.67    -</span><span style='color: #BB0000;'>3.20</span><span> 
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> 10.6    0.629  0.011</span><span style='text-decoration: underline;'>1</span><span> 0.339  0.446      7.94   0.512    -</span><span style='color: #BB0000;'>1.95</span><span>     2.63 
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span>  3.72   0.061</span><span style='text-decoration: underline;'>8</span><span> 0.940  0.031</span><span style='text-decoration: underline;'>7</span><span> 0.677      7.94  -</span><span style='color: #BB0000;'>0.695</span><span>     3.20    -</span><span style='color: #BB0000;'>3.35</span><span> 
-#&gt; </span><span style='color: #949494;'># ... with 390 more rows, and 1 more variable: .s(x3) &lt;dbl&gt;</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span>
-</div></span></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># \dontshow{</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span>digits <span class='op'>=</span> <span class='fl'>3</span>, cli.unicode <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'><span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'>gamSim</span><span class='op'>(</span>eg <span class='op'>=</span> <span class='fl'>1</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>df</span> <span class='op'>&lt;-</span> <span class='va'>df</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"y"</span>,<span class='st'>"x0"</span>,<span class='st'>"x1"</span>,<span class='st'>"x2"</span>,<span class='st'>"x3"</span><span class='op'>)</span><span class='op'>]</span></span>
+<span class='r-in'><span class='va'>m</span> <span class='op'>&lt;-</span>  <span class='fu'>gam</span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'>s</span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'>s</span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'>s</span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'>s</span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>df</span>, method <span class='op'>=</span> <span class='st'>'REML'</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>##</span></span>
+<span class='r-in'><span class='fu'><a href='add_fitted.html'>add_fitted</a></span><span class='op'>(</span><span class='va'>df</span>, <span class='va'>m</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 400 x 6</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>          y     x0     x1     x2    x3 .value</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 1</span>  3.34   0.266  0.659  0.859  0.367   5.90</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 2</span> -<span style='color: #BB0000;'>0.075</span><span style='color: #BB0000; text-decoration: underline;'>8</span> 0.372  0.185  0.034<span style='text-decoration: underline;'>4</span> 0.741   3.15</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 3</span> 10.7    0.573  0.954  0.971  0.934   8.28</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 4</span>  8.73   0.908  0.898  0.745  0.673   8.65</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 5</span> 15.0    0.202  0.944  0.273  0.701  15.7 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 6</span>  7.67   0.898  0.724  0.677  0.848   8.38</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 7</span>  7.58   0.945  0.370  0.348  0.706   7.84</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 8</span>  8.51   0.661  0.781  0.947  0.859   6.74</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 9</span> 10.6    0.629  0.011<span style='text-decoration: underline;'>1</span> 0.339  0.446   9.14</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>10</span>  3.72   0.061<span style='text-decoration: underline;'>8</span> 0.940  0.031<span style='text-decoration: underline;'>7</span> 0.677   7.04</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># ... with 390 more rows</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## with type = "terms" or "iterms"</span></span>
+<span class='r-in'><span class='fu'><a href='add_fitted.html'>add_fitted</a></span><span class='op'>(</span><span class='va'>df</span>, <span class='va'>m</span>, type <span class='op'>=</span> <span class='st'>"terms"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 400 x 10</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>          y     x0     x1     x2    x3 .constant `.s(x0)` `.s(x1)` `.s(x2)`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>     <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 1</span>  3.34   0.266  0.659  0.859  0.367      7.94   0.175     0.559   -<span style='color: #BB0000;'>2.81</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 2</span> -<span style='color: #BB0000;'>0.075</span><span style='color: #BB0000; text-decoration: underline;'>8</span> 0.372  0.185  0.034<span style='text-decoration: underline;'>4</span> 0.741      7.94   0.435    -<span style='color: #BB0000;'>1.92</span>    -<span style='color: #BB0000;'>3.23</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 3</span> 10.7    0.573  0.954  0.971  0.934      7.94   0.593     3.35    -<span style='color: #BB0000;'>3.47</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 4</span>  8.73   0.908  0.898  0.745  0.673      7.94  -<span style='color: #BB0000;'>0.812</span>     2.77    -<span style='color: #BB0000;'>1.19</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 5</span> 15.0    0.202  0.944  0.273  0.701      7.94  -<span style='color: #BB0000;'>0.058</span><span style='color: #BB0000; text-decoration: underline;'>9</span>    3.23     4.63 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 6</span>  7.67   0.898  0.724  0.677  0.848      7.94  -<span style='color: #BB0000;'>0.745</span>     1.15     0.146</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 7</span>  7.58   0.945  0.370  0.348  0.706      7.94  -<span style='color: #BB0000;'>1.07</span>     -<span style='color: #BB0000;'>1.31</span>     2.34 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 8</span>  8.51   0.661  0.781  0.947  0.859      7.94   0.434     1.67    -<span style='color: #BB0000;'>3.20</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 9</span> 10.6    0.629  0.011<span style='text-decoration: underline;'>1</span> 0.339  0.446      7.94   0.512    -<span style='color: #BB0000;'>1.95</span>     2.63 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>10</span>  3.72   0.061<span style='text-decoration: underline;'>8</span> 0.940  0.031<span style='text-decoration: underline;'>7</span> 0.677      7.94  -<span style='color: #BB0000;'>0.695</span>     3.20    -<span style='color: #BB0000;'>3.35</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># ... with 390 more rows, and 1 more variable: .s(x3) &lt;dbl&gt;</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span></span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
