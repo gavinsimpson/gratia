@@ -104,7 +104,7 @@ test_that("smooth_estimates works with a bivariate TPRS smooth", {
     expect_named(sm, c("smooth", "type", "by", "est", "se", "x", "z"))
 })
 
-test_that("smooth_estimates fails with a trivariate smooth", {
+test_that("smooth_estimates works with a trivariate smooth", {
     expect_silent(sm <- smooth_estimates(m3, "s(x0,x1,x2)", n = 25))
     expect_is(sm, "smooth_estimates")
     expect_is(sm, "tbl_df")
