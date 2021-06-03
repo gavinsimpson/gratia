@@ -1066,6 +1066,9 @@ vars_from_label <- function(label) {
 
 ##' Delete response from user-supplied data
 ##'
+##' @param model a fitted model from which a `terms` object can be extracted.
+##' @param data a data frame containing variables in the formula of `model`.
+##'
 ##' @keywords internal
 ##' @noRd
 `delete_response` <- function(model, data = NULL) {
@@ -1073,7 +1076,52 @@ vars_from_label <- function(label) {
         stop("`data` must be supplied currently.")
     }
     
-    tt <- terms(model)
+    tt <- terms(model[["pred.formula"]])
     tt <- delete.response(tt)
     model.frame(tt, data = data)
+}
+
+##' Extract names of all variables needed to fit a GAM or a smooth
+##'
+##' @param object a fitted GAM object or an {mgcv} smooth object
+##' @param ... arguments passed to other methods. Not currently used.
+##'
+##' @return A vector of variable names required for terms in the model
+##'
+##' @export
+`term_names` <- function(object, ...) {
+    UseMethod("term_names")
+}
+
+##' @rdname term_names
+##' @export
+`term_names.gam` <- function(object, ...) {
+    tt <- object[["pred.formula"]]
+    if (is.null(tt)) {
+        stop("`object` does not contain `pred.formula`; is this is fitted GAM?",
+             call. = FALSE)
+    }
+    tt <- terms(tt)
+    attr(tt, "term.labels")
+}
+
+##' @rdname term_names
+##' @export
+`term_names.mgcv.smooth` <- function(object, ...) {
+    tt <- object[["term"]]
+    if (is.null(tt)) {
+        stop("`object` does not contain `term`; is this is an {mgcv} smooth?",
+             call. = FALSE)
+    }
+    if (is_by_smooth(object)) {
+        tt <- append(tt, by_variable(object))
+    }
+    tt
+}
+
+##' @rdname term_names
+##' @export
+`term_names.gamm` <- function(object, ...) {
+    object <- object[["gam"]]
+    NextMethod()
 }
