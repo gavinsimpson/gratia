@@ -324,6 +324,7 @@
 ##'
 ##' @keywords internal
 ##' @noRd
+##' @importFrom rlang .data
 `process_user_data_for_eval` <- function(data, model, n, id) {
     if (is.null(data)) {
         data <- smooth_data(model = model, n = n, id = id)
