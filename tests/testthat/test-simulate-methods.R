@@ -78,33 +78,20 @@ test_that("simulate() works with out a seed", {
 
 test_that("simulate() fails if we don't have an rd function", {
     skip_on_cran()
-    ## Example from ?gevlss
-    Fi.gev <- function(z,mu,sigma,xi) {
-        ## GEV inverse cdf.
-        xi[abs(xi)<1e-8] <- 1e-8 ## approximate xi=0, by small xi
-        x <- mu + ((-log(z))^-xi-1)*sigma/xi
-    }
+    ## Example from ?twlss
+    set.seed(3)
+    n <- 400
+    ## Simulate data...
+    dat <- gamSim(1, n = n, dist = "poisson", scale = 0.2)
+    dat$y <- rTweedie(exp(dat$f), p = 1.3, phi = 0.5) ## Tweedie response
+ 
+    ## Fit a fixed p Tweedie, with wrong link ...
+    m <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+                    ~ 1,
+                    ~ 1),
+              family = twlss(), data = dat)
 
-    ## simulate test data...
-    f0 <- function(x) 2 * sin(pi * x)
-    f1 <- function(x) exp(2 * x)
-    f2 <- function(x) 0.2 * x^11 * (10 * (1 - x))^6 + 10 *
-                          (10 * x)^3 * (1 - x)^10
-    set.seed(1)
-    n <- 250
-    x0 <- runif(n)
-    x1 <- runif(n)
-    x2 <- runif(n)
-    mu <- f2(x2)
-    rho <- f0(x0)
-    xi <- (f1(x1)-4)/9
-    y <- Fi.gev(runif(n), mu, exp(rho), xi)
-    dat <- data.frame(y, x0, x1, x2)
-
-    ## fit model....
-    mgev <- gam(list(y ~ s(x2), ~ s(x0), ~ s(x1)), family = gevlss, data = dat)
-
-    expect_error(simulate(mgev),
-                 "Don't yet know how to simulate from family <gevlss>",
+    expect_error(simulate(m),
+                 "Don't yet know how to simulate from family <twlss>",
                  fixed = TRUE)
 })
