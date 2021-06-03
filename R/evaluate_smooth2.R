@@ -393,8 +393,6 @@
         if (!identical(by_var, "NA")) {
             vars <- append(vars, by_var)
         }
-        ## check user supplied data for correctness
-        data <- check_user_data(data, vars)
         ## if this is a by variable, filter the by variable for the required
         ## level now
         if (is_factor_by_smooth(smooth)) {
