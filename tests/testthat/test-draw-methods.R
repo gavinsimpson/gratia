@@ -262,6 +262,7 @@ mod_fs <- gam(y~s(x0) + s(x1, fac, bs="fs", k=5) + s(x2, k=20),
               method = "ML")
 
 test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
+    skip_if(packageVersion("mgcv") < "1.8.36")
     sm <- evaluate_smooth(mod_fs, "s(x1,fac)")
     expect_s3_class(sm, "evaluated_fs_smooth")
 
@@ -453,7 +454,8 @@ test_that("draw.gam can take user specified scales", {
     plt <- draw(m2, continuous_fill = scale_fill_distiller(palette = "Spectral",
                                                            type = "div"))
     expect_doppelganger("draw 2d smooth with spectral palette", plt)
-
+    
+    skip_if(packageVersion("mgcv") < "1.8.36")
     plt <- draw(mod_fs,
                 discrete_colour = scale_colour_viridis_d(option = "plasma"))
     expect_doppelganger("draw fs smooth with discrete plasma palette",
