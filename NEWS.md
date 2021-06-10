@@ -1,4 +1,4 @@
-# gratia 0.6.9111
+# gratia 0.6.9112
 
 ## New features
 
