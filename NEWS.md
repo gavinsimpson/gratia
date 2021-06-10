@@ -10,6 +10,9 @@
   would result in `nrow(user_data) * nlevels(by_variable)` rows in the returned
   object instead of `nrow(user_data)` rows.
 
+* The `add_confint()` method for `smooth_estimates()` had the upper and lower
+  intervals reversed. #107 Reported by @Aariq
+
 # gratia 0.6.0
 
 ## Major changes
