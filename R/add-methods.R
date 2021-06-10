@@ -297,8 +297,8 @@
 
     ## add the frequentist confidence interval
     object <- mutate(object,
-                     lower_ci = .data[["est"]] + (crit * .data[["se"]]),
-                     upper_ci = .data[["est"]] - (crit * .data[["se"]]))
+                     lower_ci = .data[["est"]] - (crit * .data[["se"]]),
+                     upper_ci = .data[["est"]] + (crit * .data[["se"]]))
 
     ## return
     object
