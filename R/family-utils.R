@@ -640,3 +640,8 @@
 `family_name.gamm` <- function(object, ...) {
     family(object)[["family"]]
 }
+
+##' @export
+`family_name.family` <- function(object, ...) {
+    object[["family"]]
+}
