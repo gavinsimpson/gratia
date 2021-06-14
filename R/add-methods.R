@@ -17,20 +17,20 @@
 }
 
 ##' Add fitted values from a GAM to a data frame
-##' 
+##'
 ##' @param type character; the type of predictions to return. See
 ##'   [mgcv::predict.gam()] for options.
 ##' @param prefix character; string to prepend to names of predicted values when
-##'   `type` is `"terms"`, `"iterms"`, `"lpmatrix"`. These prediction types result
-##'   in a matrix of values being returned. `prefix` will be prepended to each of
-##'   the names of columns returned by such prediction types.
+##'   `type` is `"terms"`, `"iterms"`, `"lpmatrix"`. These prediction types
+##'   result in a matrix of values being returned. `prefix` will be prepended to
+##'   each of the names of columns returned by such prediction types.
 ##' @param ... additional arguments passed to [mgcv::predict.gam()].
 ##'
 ##' @return A data frame (tibble) formed from `data` and predictions from
 ##'   `model`.
-##' 
+##'
 ##' @inheritParams add_fitted
-##' 
+##'
 ##' @importFrom dplyr bind_cols
 ##' @importFrom stats predict
 ##' @importFrom rlang set_names !! :=
@@ -55,12 +55,11 @@
 ##' ## with type = "terms" or "iterms"
 ##' add_fitted(df, m, type = "terms")
 ##' \dontshow{options(op)}
-`add_fitted.gam` <- function(data, model, value = ".value",
-                             type = "response", prefix = ".",
-                             ...) {
+`add_fitted.gam` <- function(data, model, value = ".value", type = "response",
+                             prefix = ".", ...) {
     ## coerce to tibble
     data <- as_tibble(data)
-    
+
     ## predict using the predict method
     pred_vals <- predict(model, newdata = data, type = type, ...)
 
@@ -106,15 +105,15 @@
 }
 
 ##' Add residuals from a GAM to a data frame
-##' 
+##'
 ##' @param type character; the type of residuals to return. See
 ##'   [mgcv::residuals.gam()] for options.
 ##' @param ... additional arguments passed to [mgcv::residuals.gam()].
 ##'
 ##' @return A data frame (tibble) formed from `data` and residuals from `model`.
-##' 
+##'
 ##' @inheritParams add_fitted
-##' 
+##'
 ##' @importFrom dplyr bind_cols
 ##' @importFrom stats residuals
 ##' @importFrom rlang set_names !! :=
@@ -139,7 +138,7 @@
                                 type = "deviance", ...) {
     ## coerce to tibble
     data <- as_tibble(data)
-    
+
     ## predict using the predict method
     resid_vals <- residuals(model, type = type, ...)
 
@@ -172,7 +171,7 @@
 ##' @inheritParams partial_residuals.gam
 ##'
 ##' @export
-##' 
+##'
 ##' @importFrom tibble is_tibble as_tibble
 ##' @importFrom dplyr bind_cols
 ##'
@@ -204,7 +203,7 @@
     take <- check_user_select_smooths(sms, select = select,
                                       partial_match = partial_match)
     if (!any(take)) {
-        stop("No smooth label matched 'select'. Try with 'partial_match = TRUE'?",
+        stop("No smooth label matched 'select'. Try 'partial_match = TRUE'?",
              call. = FALSE)
     }
     sms <- sms[take] # subset to selected smooths
@@ -237,7 +236,7 @@
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {
         if (!is.numeric(constant)) {
-            stop("'constant' must be numeric, but was supplied <", constant, ">",
+            stop("'constant' must be numeric: supplied <", constant, ">",
                  call. = FALSE)
         }
         object[["est"]] <- object[["est"]] + constant
@@ -251,7 +250,7 @@
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {
         if (!is.numeric(constant)) {
-            stop("'constant' must be numeric, but was supplied <", constant, ">",
+            stop("'constant' must be numeric: supplied <", constant, ">",
                  call. = FALSE)
         }
         object[["est"]] <- object[["est"]] + constant
