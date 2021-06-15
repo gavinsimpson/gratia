@@ -103,6 +103,9 @@
     <loc>https://gavinsimpson.github.io/gratia/reference/draw.penalty_df.html</loc>
   </url>
   <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.rootogram.html</loc>
+  </url>
+  <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/draw.smooth_samples.html</loc>
   </url>
   <url>
@@ -116,6 +119,9 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/family.gam.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/family_name.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/fderiv.html</loc>
@@ -163,6 +169,9 @@
     <loc>https://gavinsimpson.github.io/gratia/reference/n_smooths.html</loc>
   </url>
   <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/nb_theta.html</loc>
+  </url>
+  <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/observed_fitted_plot.html</loc>
   </url>
   <url>
@@ -194,6 +203,9 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/residuals_linpred_plot.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/rootogram.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/seq_min_max.html</loc>
