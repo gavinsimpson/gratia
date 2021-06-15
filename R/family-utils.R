@@ -611,3 +611,37 @@
 
     TRUE
 }
+
+##' Name of family used to fit model
+##'
+##' Extracts the name of the family used to fit the supplied model.
+##'
+##' @param object an R object.
+##' @param ... arguments passed to other methods.
+##'
+##' @return A character vector containing the family name.
+##'
+##' @export
+`family_name` <- function(object, ...) {
+    UseMethod("family_name")
+}
+
+##' @export
+`family_name.glm` <- function(object, ...) {
+    family(object)[["family"]]
+}
+
+##' @export
+`family_name.gam` <- function(object, ...) {
+    family(object)[["family"]]
+}
+
+##' @export
+`family_name.gamm` <- function(object, ...) {
+    family(object)[["family"]]
+}
+
+##' @export
+`family_name.family` <- function(object, ...) {
+    object[["family"]]
+}

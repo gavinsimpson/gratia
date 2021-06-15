@@ -26,7 +26,8 @@ Imports:
     purrr,
     stats,
     tools,
-    grDevices
+    grDevices,
+    stringr
 Suggests:
     gamm4,
     testthat,
