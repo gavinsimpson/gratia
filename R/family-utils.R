@@ -645,3 +645,13 @@
 `family_name.family` <- function(object, ...) {
     object[["family"]]
 }
+
+##' @export
+##' @importFrom stats family
+`family_name.list` <- function(object, ...) {
+    if (!is_gamm4(object)) {
+        stop("`object` does not appear to a `gamm4` model object",
+             call. = FALSE)
+    }
+    family_name(object[["gam"]], ...)
+}
