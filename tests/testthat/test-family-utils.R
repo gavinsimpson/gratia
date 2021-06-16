@@ -1156,3 +1156,46 @@ test_that("family.gamm works for a gamm object", {
     expect_s3_class(fam, class = "family")
     expect_equal(fam, gaussian())
 })
+
+## test family name
+test_that("family_name() works with a gam() model", {
+    f <- family_name(m_gam)
+    expect_type(f, "character")
+    expect_identical(f, "gaussian")
+})
+
+test_that("family_name() works with a glm() model", {
+    f <- family_name(m_glm)
+    expect_type(f, "character")
+    expect_identical(f, "gaussian")
+})
+
+test_that("family_name() works with a gamm() model", {
+    f <- family_name(m_gamm)
+    expect_type(f, "character")
+    expect_identical(f, "gaussian")
+})
+
+test_that("family_name() works with a gamm4() model", {
+    f <- family_name(m_gamm4)
+    expect_type(f, "character")
+    expect_identical(f, "gaussian")
+})
+
+test_that("family_name() works with a bam() model", {
+    f <- family_name(m_bam)
+    expect_type(f, "character")
+    expect_identical(f, "gaussian")
+})
+
+test_that("family_name.list() fails with a list that isn't a gamm4", {
+    expect_error(family_name(l),
+                 regexp = "`object` does not appear to a `gamm4` model object",
+                 fixed = TRUE)
+})
+
+test_that("family_name() works with a gam() gaulss model", {
+    f <- family_name(m_gaulss)
+    expect_type(f, "character")
+    expect_identical(f, "gaulss")
+})
