@@ -22,6 +22,12 @@ test_that("edf() works as expected", {
     expect_identical(ncol(edfs), 2L)
     expect_named(edfs, c("smooth", "edf"))
 
+    expect_silent(edfs <- edf(m_reml, smooth = c("s(x0)", "s(x2)")))
+    expect_s3_class(edfs, c("tbl_df", "tbl", "data.frame"))
+    expect_identical(nrow(edfs), 2L)
+    expect_identical(ncol(edfs), 2L)
+    expect_named(edfs, c("smooth", "edf"))
+
     expect_silent(edfs <- edf(m_reml, type = "unconditional"))
     expect_s3_class(edfs, c("tbl_df", "tbl", "data.frame"))
     expect_identical(nrow(edfs), 4L)
