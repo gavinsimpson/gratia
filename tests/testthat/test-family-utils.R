@@ -551,7 +551,7 @@ test_that("extract_link() works on ziP() family objects", {
 })
 
 test_that("extract_link() works on ocat() family objects", {
-    theta = 1.1
+    theta <- 1.1
     ## link
     f <- extract_link(ocat(theta = theta))
     expect_type(f, "closure")
@@ -598,7 +598,7 @@ test_that("extract_link() works on gaulss() family objects", {
     expect_type(f, "closure")
     expect_identical(f(val), fam$linfo[[1L]]$linkinv(val))
     expect_identical(f, fam$linfo[[1L]]$linkinv)
-    
+
     ## scale parameter
     ## link
     f <- extract_link(fam, parameter = "scale")
@@ -641,7 +641,7 @@ test_that("extract_link() works on gammals() family objects", {
     expect_type(f, "closure")
     expect_identical(f(val), fam$linfo[[1L]]$linkinv(val))
     expect_identical(f, fam$linfo[[1L]]$linkinv)
-    
+
     ## scale parameter
     ## link
     f <- extract_link(fam, parameter = "scale")
@@ -684,7 +684,7 @@ test_that("extract_link() works on gumbls() family objects", {
     expect_type(f, "closure")
     expect_identical(f(val), fam$linfo[[1L]]$linkinv(val))
     expect_identical(f, fam$linfo[[1L]]$linkinv)
-    
+
     ## scale parameter
     ## link
     f <- extract_link(fam, parameter = "scale")
@@ -719,7 +719,7 @@ test_that("extract_link() works on twlss() family objects", {
     expect_type(f, "closure")
     expect_identical(f(val), fam$linfo[[1L]]$linkinv(val))
     expect_identical(f, fam$linfo[[1L]]$linkinv)
-    
+
     ## scale parameter
     ## link
     f <- extract_link(fam, parameter = "scale")
@@ -1003,6 +1003,15 @@ test_that("extract_link() works on shash() family objects", {
     expect_type(f, "closure")
     expect_identical(f(val), fam$linfo[[4L]]$linkinv(val))
     expect_identical(f, fam$linfo[[4L]]$linkinv)
+})
+
+## tests some specific extract functions
+test_that("twlss_link() can extract a link function", {
+    fam <- twlss()
+    expect_silent(f <- twlss_link(fam, parameter = "mu"))
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[1L]]$linkfun)
 })
 
 ## test internal link functions fail gracefully
