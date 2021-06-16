@@ -50,9 +50,13 @@ relevent elements of \eqn{\mathrm{diag}(2\mathbf{F} - \mathbf{FF})}.
 load_mgcv()
 df <- data_sim("eg1", n = 400, seed = 42)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+
+# extract the EDFs for all smooths
 edf(m)
-## selected smooths
+
+# or selected smooths
 edf(m, smooth = c("s(x0)", "s(x2)"))
-## accounting for smoothness parameter uncertainty
+
+# accounting for smoothness parameter uncertainty
 edf(m, type = "unconditional")
 }
