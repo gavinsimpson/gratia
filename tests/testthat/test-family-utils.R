@@ -1014,6 +1014,71 @@ test_that("twlss_link() can extract a link function", {
     expect_identical(f, fam$linfo[[1L]]$linkfun)
 })
 
+## tests some specific extract functions
+test_that("gevlss_link() can extract a link function", {
+    fam <- gevlss()
+    expect_silent(f <- gevlss_link(fam, parameter = "mu"))
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[1L]]$linkfun)
+})
+
+## tests some specific extract functions
+test_that("gumbls_link() can extract a link function", {
+    fam <- gumbls()
+    expect_silent(f <- gumbls_link(fam, parameter = "mu"))
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[1L]]$linkfun)
+})
+
+## tests some specific extract functions
+test_that("gammals_link() can extract a link function", {
+    fam <- gammals()
+    expect_silent(f <- gammals_link(fam, parameter = "mu"))
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[1L]]$linkfun)
+})
+
+## tests some specific extract functions
+test_that("ziplss_link() can extract a link function", {
+    fam <- ziplss()
+    expect_silent(f <- ziplss_link(fam, parameter = "mu"))
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[1L]]$linkfun)
+})
+
+## tests some specific extract functions
+test_that("mvn_link() can extract a link function", {
+    fam <- mvn()
+    expect_silent(f <- mvn_link(fam, parameter = "location",
+                                 which_eta = 1))
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[1L]]$linkfun)
+})
+
+## tests some specific extract functions
+test_that("multinom_link() can extract a link function", {
+    fam <- multinom()
+    expect_silent(f <- multinom_link(fam, parameter = "location",
+                                     which_eta = 1))
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[1L]]$linkfun)
+})
+
+## tests some specific extract functions
+test_that("shash_link() can extract a link function", {
+    fam <- shash()
+    expect_silent(f <- shash_link(fam, parameter = "mu"))
+    expect_type(f, "closure")
+    expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
+    expect_identical(f, fam$linfo[[1L]]$linkfun)
+})
+
 ## test internal link functions fail gracefully
 test_that("gaussian_link() fails gracefully", {
     expect_error(gaussian_link(1), "'family' is not a family object")
@@ -1207,4 +1272,10 @@ test_that("family_name() works with a gam() gaulss model", {
     f <- family_name(m_gaulss)
     expect_type(f, "character")
     expect_identical(f, "gaulss")
+})
+
+test_that("family_name() works with a family() object", {
+    f <- family_name(gaussian())
+    expect_type(f, "character")
+    expect_identical(f, "gaussian")
 })
