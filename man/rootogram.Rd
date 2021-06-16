@@ -31,11 +31,6 @@ are obtained by grouping the data into bins. The rootogram is drawn using
 \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} graphics. The design closely follows Kleiber & Zeileis
 (2016).
 }
-\section{Methods (by class)}{
-\itemize{
-\item \code{gam}: Method for class \code{"gam"}
-}}
-
 \examples{
 load_mgcv()
 df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)

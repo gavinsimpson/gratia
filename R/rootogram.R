@@ -43,7 +43,7 @@
     UseMethod("rootogram")
 }
 
-##' @describeIn rootogram Method for class `"gam"`
+##' @rdname rootogram
 ##' @importFrom stringr str_detect str_to_title
 ##' @export
 `rootogram.gam` <- function(object, max_count = NULL, breaks = "Sturges", ...) {
