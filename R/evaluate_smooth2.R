@@ -29,10 +29,9 @@
 ##' @examples
 ##' load_mgcv()
 ##' \dontshow{
-##' set.seed(2)
 ##' op <- options(cli.unicode = FALSE, digits = 6)
 ##' }
-##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+##' dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 ##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ##'
 ##' ## evaluate all smooths
@@ -134,7 +133,7 @@
     } else if (inherits(smooth, "Bspline.smooth")) {
         "B spline"
     } else if (inherits(smooth, "duchon.spline")) {
-        "Duchon"
+        "Duchon spline"
     } else if (inherits(smooth, "fs.interaction")) {
         "Factor smooth"
     } else if (inherits(smooth, "gp.smooth")) {
@@ -538,4 +537,233 @@
                           .after = 1L)
     ## return
     eval_sm
+}
+
+##' @export
+##' @importFrom patchwork wrap_plots
+`draw.smooth_estimates` <- function(object,
+                                    ...) {
+    smth_est <- split(object, f = object[["smooth"]])
+    plts <- vector(mode = "list", length = length(smth_est))
+    for (i in seq_along(smth_est)) {
+        plts[[i]] <- draw_smooth_estimates(smth_est[[i]], ...)
+    }
+
+    wrap_plots(plts)
+}
+
+`draw_smooth_estimates` <- function(object, ...) {
+    sm_vars <- vars_from_label(unique(object[["smooth"]]))
+    sm_dim <- length(sm_vars)
+    sm_type <- unique(object[["type"]])
+
+    if (sm_dim == 1L &&
+        sm_type %in% c("TPRS", "TPRS (shrink)", "CRS", "CRS (shrink)",
+                       "Cyclic CRS", "P spline", "B spline", "Duchon spline",
+                       "GP")) {
+        class(object) <- c("mgcv_smooth", class(object))
+    } else {
+        stop("Unknown type")
+    }
+
+    plot_smooth_estimates(object, variables = sm_vars, ...)
+}
+
+`plot_smooth_estimates` <- function(object, ...) {
+    UseMethod("plot_smooth_estimates")
+}
+
+##' @importFrom dplyr mutate
+`plot_smooth_estimates.mgcv_smooth` <- function (object,
+                                                 variables = NULL,
+                                                 rug = NULL,
+                                                 ci_level = 0.95,
+                                                 alpha = 0.3,
+                                                 constant= NULL,
+                                                 fun = NULL,
+                                                 xlab = NULL,
+                                                 ylab = NULL,
+                                                 title = NULL,
+                                                 subtitle = NULL,
+                                                 caption = NULL,
+                                                 partial_residuals = NULL,
+                                                 ...) {
+    if (is.null(variables)) {
+        variables <- vars_from_label(unique(object[["smooth"]]))
+    }
+
+    ## If constant supplied apply it to `est`
+    object <- add_constant(object, constant = constant)
+
+    ## Add confidence interval
+    crit <- qnorm((1 - ci_level) / 2, lower.tail = FALSE)
+    object <- mutate(object,
+                     upper = .data$est + (crit * .data$se),
+                     lower = .data$est - (crit * .data$se))
+
+    ## If fun supplied, use it to transform est and the upper and lower interval
+    object <- transform_fun(object, fun = fun)
+
+    ## base plot
+    plt <- ggplot(object, aes_string(x = variables, y = "est"))
+
+    ## do we want partial residuals? Only for univariate smooths without by vars
+    if (!is.null(partial_residuals)) {
+        plt <- plt + geom_point(data = partial_residuals,
+                                aes_string(x = "..orig_x", y = "..p_resid"),
+                                inherit.aes = FALSE,
+                                colour = "steelblue3", alpha = 0.5)
+    }
+
+    ## plot the confidence interval
+    plt <- plt +
+        geom_ribbon(mapping = aes_string(ymin = "lower", ymax = "upper"),
+                    alpha = alpha) +
+        geom_line()
+
+    ## default axis labels if none supplied
+    if (missing(xlab) || is.null(xlab)) {
+        xlab <- variables
+    }
+    if (missing(ylab) || is.null(ylab)) {
+        ylab <- "Effect"
+    }
+    if (is.null(title)) {
+        title <- unique(object[["smooth"]])
+    }
+    if (all(is.na(object[["by"]]))) {
+        spl <- strsplit(title, split = ":")
+        title <- spl[[1L]][[1L]]
+        if (is.null(subtitle)) {
+            by_var <- as.character(unique(object[["by"]]))
+            subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+        }
+    }
+
+    ## add labelling to plot
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+                      caption = caption)
+
+    ## add rug?
+    if (!is.null(rug)) {
+        plt <- plt +
+            geom_rug(data = data.frame(x = rug), mapping = aes_string(x = 'x'),
+                     inherit.aes = FALSE, sides = 'b', alpha = 0.5)
+    }
+    
+    plt
+}
+
+`draw2` <- function(object, ...) {
+    UseMethod("draw2")
+}
+
+`draw2.gam()` <- function(object, 
+                       parametric = NULL,
+                       select = NULL,
+                       residuals = FALSE,
+                       scales = c("free", "fixed"),
+                       ci_level = 0.95,
+                       n = 100,
+                       unconditional = FALSE,
+                       overall_uncertainty = TRUE,
+                       constant = NULL,
+                       fun = NULL,
+                       dist = 0.1,
+                       rug = TRUE,
+                       contour = TRUE,
+                       contour_col = "black",
+                       n_contour = NULL,
+                       partial_match = FALSE,
+                       discrete_colour = NULL,
+                       continuous_colour = NULL,
+                       continuous_fill = NULL,
+                       ncol = NULL, nrow = NULL,
+                       guides = "keep",
+                       ...) {
+    ## fixed or free?
+    scales <- match.arg(scales)
+
+    ## fix up default scales
+    if (is.null(discrete_colour)) {
+        discrete_colour <- scale_colour_discrete()
+    }
+    if (is.null(continuous_colour)) {
+        continuous_colour <- scale_colour_continuous()
+    }
+    if (is.null(continuous_fill)) {
+        continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
+    }
+
+    ## if not using select, set parametric TRUE if not set to FALSE
+    if (!is.null(select)) {
+        if (is.null(parametric)) {
+            parametric <- FALSE
+        }
+    } else {
+        if (is.null(parametric)) {
+            parametric <- TRUE
+        }
+    }
+    
+    S <- smooths(object)                # vector of smooth labels - "s(x)"
+
+    ## select smooths
+    select <- check_user_select_smooths(smooths = S, select = select,
+                                        partial_match = partial_match)
+
+    ## evaluate all requested smooths
+    sm_eval <- smooth_estimates(object, smooth = S[select], n = n, data = data,
+                                unconditional = unconditional,
+                                overall_uncertainty = overall_uncertainty,
+                                dist = dist)
+    ## add confidence interval
+    sm_eval <- add_confint(sm_eval, coverage = ci_level)
+
+    ## get the terms predictions if we need partial residuals
+    if (isTRUE(residuals)) {
+        if (is.null(object$residuals) || is.null(object$weights)) {
+            residuals <- FALSE
+        } else {
+            pred_terms <- predict(object, type = "terms")
+            w_resid <- object$residuals * sqrt(object$weights)
+            pred_terms <- pred_terms + w_resid
+        }
+    }
+    
+    ## need to figure out scales if "fixed"
+    ylims <- NULL
+    ## crit <- qnorm((1 - ci_level) / 2, lower.tail = FALSE) # not needed now
+    if (isTRUE(identical(scales, "fixed"))) {
+        ## not needed as we do add_confint above
+        ## wrapper <- function(x, var, crit) {
+        ##     range(x[[var]] + (crit * x[["se"]]),
+        ##           x[[var]] - (crit * x[["se"]]))
+        ## }
+
+        if (isTRUE(residuals)) {
+            want_presids <- function(x) {
+                sm <- get_smooth(object, term = x)
+                (! is_by_smooth(sm)) && smooth_dim(sm) == 1L
+            }
+            take_presids <- vapply(colnames(pred_terms), want_presids, logical(1L))
+            p_resids_lims <- if (NCOL(pred_terms[, take_presids]) > 0) {
+                range(pred_terms[, take_presids])
+            }
+        } else {
+            p_resids_lims <- rep(0, 2)
+        }
+
+        ## this just needs to range est, upper, lower now
+        ylims <- range(c(unlist(lapply(l, wrapper, var = "est", crit = crit)),
+                         p_resids_lims))
+        
+        if (isTRUE(parametric)) {
+            ## fix this as for the above for smooths once I figure out how to
+            ## process the parametric terms in this new version
+            ylims <- range(ylims,
+                           unlist(lapply(p, wrapper, var = "partial", crit = crit)))
+        }
+    }
+    
 }

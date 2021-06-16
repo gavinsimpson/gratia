@@ -57,10 +57,9 @@ New \code{evaluate_smooth()} alike
 \examples{
 load_mgcv()
 \dontshow{
-set.seed(2)
 op <- options(cli.unicode = FALSE, digits = 6)
 }
-dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 ## evaluate all smooths
