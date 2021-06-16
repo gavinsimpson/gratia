@@ -6,6 +6,12 @@
   for fitted models. Currently only for models fitted with `poisson()`,
   `nb()`, `negbin()`, `gaussian()` families.
 
+* `nb_theta()` is a new extractor function that returns the theta parameter of
+  a fitted negative binomial GAM (families `nb()` or `negbin()`).
+
+* `edf()` extracts the effective degrees of freedom (EDF) of a fitted model or a
+  specific smooth in the model. Various forms for the EDF can be extracted.
+
 ## Bug fixes
 
 * `smooth_estimates()` was not filtering user-supplied data for the by level of
