@@ -22,6 +22,7 @@
 
 ##' @export
 ##' @importFrom stringr str_detect
+##' @describeIn nb_theta Method for class `"gam"`
 `nb_theta.gam` <- function(model) {
     supported <- str_detect(family_name(model),
                             c("Negative Binomial", "negative binomial"))
