@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Computes data used to draw a rootogram diagnostic plot — rootogram • gratia</title>
+<title>Rootograms to assess goodness of model fit — rootogram • gratia</title>
 
 
 <!-- jquery -->
@@ -41,8 +41,16 @@
   <link href="../extra.css" rel="stylesheet">
   
 
-<meta property="og:title" content="Computes data used to draw a rootogram diagnostic plot — rootogram" />
-<meta property="og:description" content="Computes data used to draw a rootogram diagnostic plot" />
+<meta property="og:title" content="Rootograms to assess goodness of model fit — rootogram" />
+<meta property="og:description" content="A rootogram is a model diagnostic tool that assesses the goodness of fit of
+a statistical model. The observed values of the response are compared with
+those expected from the fitted model. For discrete, count responses, the
+frequency of each count (0, 1, 2, etc) in the observed data and expected
+from the conditional distribution of the response implied by the model are
+compared. For continuous variables, the observed and expected frequencies
+are obtained by grouping the data into bins. The rootogram is drawn using
+ggplot2::ggplot() graphics. The design closely follows Kleiber &amp;amp; Zeileis
+(2016)." />
 <meta property="og:image" content="https://gavinsimpson.github.io/gratia/reference/figures/README-draw-gam-figure-1.png" />
 <meta property="og:image:alt" content="Plot produced by draw() of 4 smooth functions from a fitted generalized additive model" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -87,7 +95,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.9112</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.9113</span>
       </span>
     </div>
 
@@ -120,13 +128,21 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Computes data used to draw a rootogram diagnostic plot</h1>
+    <h1>Rootograms to assess goodness of model fit</h1>
     <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/rootogram.R'><code>R/rootogram.R</code></a></small>
     <div class="hidden name"><code>rootogram.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Computes data used to draw a rootogram diagnostic plot</p>
+    <p>A rootogram is a model diagnostic tool that assesses the goodness of fit of
+a statistical model. The observed values of the response are compared with
+those expected from the fitted model. For discrete, count responses, the
+frequency of each count (0, 1, 2, etc) in the observed data and expected
+from the conditional distribution of the response implied by the model are
+compared. For continuous variables, the observed and expected frequencies
+are obtained by grouping the data into bins. The rootogram is drawn using
+<code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot2::ggplot()</a></code> graphics. The design closely follows Kleiber &amp; Zeileis
+(2016).</p>
     </div>
 
     <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>rootogram</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
@@ -157,6 +173,17 @@ anything that is acceptable as the <code>breaks</code> argument of
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
+
+    
+<ul>
+<li><p><code>gam</code>: Method for class <code>"gam"</code></p></li>
+</ul>
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+
+    <p>Kleiber, C., Zeileis, A., (2016) Visualizing Count Data
+Regressions Using Rootograms. <em>Am. Stat.</em> <strong>70</strong>, 296–303.
+doi: <a href='https://doi.org/10.1080/00031305.2016.1173590'>10.1080/00031305.2016.1173590</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span></span>
@@ -164,11 +191,11 @@ anything that is acceptable as the <code>breaks</code> argument of
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># A poisson example</span></span>
 <span class='r-in'><span class='va'>m</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span>, bs <span class='op'>=</span> <span class='st'>"cr"</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span>, bs <span class='op'>=</span> <span class='st'>"cr"</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span>, bs <span class='op'>=</span> <span class='st'>"cr"</span><span class='op'>)</span> <span class='op'>+</span></span>
-<span class='r-in'>         <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span>, bs <span class='op'>=</span> <span class='st'>"cr"</span><span class='op'>)</span>, family <span class='op'>=</span> <span class='va'>nb</span>, data <span class='op'>=</span> <span class='va'>df</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span></span>
+<span class='r-in'>         <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span>, bs <span class='op'>=</span> <span class='st'>"cr"</span><span class='op'>)</span>, family <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>poisson</a></span><span class='op'>(</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>df</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span></span>
 <span class='r-in'><span class='va'>rg</span> <span class='op'>&lt;-</span> <span class='fu'>rootogram</span><span class='op'>(</span><span class='va'>m</span><span class='op'>)</span></span>
 <span class='r-in'><span class='va'>rg</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 21 x 3</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>        i observed  expected</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      bin observed    fitted</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span>     <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 1</span>     0      113 460.     </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 2</span>     1      236 335.     </span>
@@ -176,10 +203,10 @@ anything that is acceptable as the <code>breaks</code> argument of
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 4</span>     3      200  46.0    </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 5</span>     4       94  12.3    </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 6</span>     5       68   2.86   </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 7</span>     6       27   0.591  </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 7</span>     6       27   0.590  </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 8</span>     7       22   0.110  </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 9</span>     8        4   0.018<span style='text-decoration: underline;'>7</span> </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>10</span>     9        3   0.002<span style='text-decoration: underline;'>93</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>10</span>     9        3   0.002<span style='text-decoration: underline;'>91</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># … with 11 more rows</span></span>
 <span class='r-in'><span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span><span class='va'>rg</span><span class='op'>)</span> <span class='co'># plot the rootogram</span></span>
 <span class='r-plt'><img src='rootogram-1.png' alt='' width='700' height='433' /></span>

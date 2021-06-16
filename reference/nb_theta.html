@@ -87,7 +87,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.9112</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.9113</span>
       </span>
     </div>
 
@@ -129,7 +129,10 @@
     <p>Negative binomial parameter theta</p>
     </div>
 
-    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>nb_theta</span><span class='op'>(</span><span class='va'>model</span><span class='op'>)</span></code></pre></div>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>nb_theta</span><span class='op'>(</span><span class='va'>model</span><span class='op'>)</span>
+
+<span class='co'># S3 method for gam</span>
+<span class='fu'>nb_theta</span><span class='op'>(</span><span class='va'>model</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -144,6 +147,12 @@
 
     <p>A numeric vector of length 1 containing the estimated value of
 theta.</p>
+    <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
+
+    
+<ul>
+<li><p><code>gam</code>: Method for class <code>"gam"</code></p></li>
+</ul>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span></span>
