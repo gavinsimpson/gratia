@@ -132,7 +132,12 @@
     <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>edf</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for gam</span>
-<span class='fu'>edf</span><span class='op'>(</span><span class='va'>object</span>, smooth <span class='op'>=</span> <span class='cn'>NULL</span>, alternative <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></code></pre></div>
+<span class='fu'>edf</span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  smooth <span class='op'>=</span> <span class='cn'>NULL</span>,
+  type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"default"</span>, <span class='st'>"unconditional"</span>, <span class='st'>"alternative"</span><span class='op'>)</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -151,16 +156,21 @@
 extracted. If <code>NULL</code>, the default, EDFs for all smooths will be returned.</p></td>
     </tr>
     <tr>
-      <th>alternative</th>
-      <td><p>logical; return the alternative form for model EDFs of
-Wood (2017; pp. 252).</p></td>
+      <th>type</th>
+      <td><p>character: which type of EDF to return. <code>"default"</code> returns the
+standard EDF; <code>"unconditional"</code> selects the EDF corrected for smoothness
+parameter selection, if available; <code>"alternative"</code> returns the alternative
+formulation for EDF from Wood (2017, pp. 252)</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Wood (2017; pp. 252) describes an alternative EDF describes an
-alternative EDF form for the entire model
+    <p>Multiple formulations for the effective degrees of freedom are
+available. The additional uncertainty due to selection of smoothness
+parameters can be taken into account when computing the EDF of smooths.
+This form of the EDF is available with <code>type = "unconditional"</code>.</p>
+<p>Wood (2017; pp. 252) describes an alternative EDF for the  model
 $$\mathrm{EDF} = 2\mathrm{tr}(\mathbf{F}) -
   \mathrm{tr}(\mathbf{FF}),$$ where
 \(\mathrm{tr}\) is the matrix trace and \(\mathbf{F}\) is a matrix
@@ -182,12 +192,22 @@ relevent elements of \(\mathrm{diag}(2\mathbf{F} - \mathbf{FF})\).</p>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>2</span> s(x1)   3.22</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>3</span> s(x2)   7.90</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>4</span> s(x3)   1.88</span>
+<span class='r-in'><span class='co'>## selected smooths</span></span>
 <span class='r-in'><span class='fu'>edf</span><span class='op'>(</span><span class='va'>m</span>, smooth <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"s(x0)"</span>, <span class='st'>"s(x2)"</span><span class='op'>)</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 2 x 2</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>   smooth   edf</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span> s(x0)   3.42</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>2</span> s(x2)   7.90</span>
+<span class='r-in'><span class='co'>## accounting for smoothness parameter uncertainty</span></span>
+<span class='r-in'><span class='fu'>edf</span><span class='op'>(</span><span class='va'>m</span>, type <span class='op'>=</span> <span class='st'>"unconditional"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 4 x 2</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   smooth   edf</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span> s(x0)   3.77</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>2</span> s(x1)   3.87</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>3</span> s(x2)   8.07</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>4</span> s(x3)   2.88</span>
 </code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
