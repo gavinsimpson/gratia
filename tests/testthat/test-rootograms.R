@@ -4,7 +4,6 @@
 library("testthat")
 library("gratia")
 library("mgcv")
-library("vdiffr")
 
 context("Test rootograms")
 
