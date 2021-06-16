@@ -1,6 +1,10 @@
-# gratia 0.6.9112
+# gratia 0.6.9113
 
 ## New features
+
+* `rootogram()` and its `draw()` method produce rootograms as diagnostic plots
+  for fitted models. Currently only for models fitted with `poisson()`,
+  `nb()`, `negbin()`, `gaussian()` families.
 
 ## Bug fixes
 
