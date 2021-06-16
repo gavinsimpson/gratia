@@ -2,7 +2,7 @@
 % Please edit documentation in R/rootogram.R
 \name{draw.rootogram}
 \alias{draw.rootogram}
-\title{Draw the computed rootogram}
+\title{Draw a rootogram}
 \usage{
 \method{draw}{rootogram}(
   object,
@@ -10,6 +10,11 @@
   sqrt = TRUE,
   ref_line = TRUE,
   warn_limits = TRUE,
+  fitted_colour = "steelblue",
+  bar_colour = NA,
+  bar_fill = "grey",
+  ref_line_colour = "black",
+  warn_line_colour = "black",
   ylab = NULL,
   xlab = NULL,
   ...
@@ -18,16 +23,19 @@
 \arguments{
 \item{object}{and R object to plot.}
 
-\item{type}{character}
+\item{type}{character; the type of rootogram to draw.}
 
-\item{sqrt}{logical}
+\item{sqrt}{logical; show the observed and fitted frequencies}
 
-\item{ref_line}{logical}
+\item{ref_line}{logical; draw a reference line at zero?}
 
-\item{warn_limits}{logical}
+\item{warn_limits}{logical; draw Tukey's warning limit lines at +/- 1?}
+
+\item{fitted_colour, bar_colour, bar_fill, ref_line_colour, warn_line_colour}{colours used to draw the respective element of the rootogram.}
 
 \item{xlab, ylab}{character; labels for the x and y axis of the rootogram.
-May be missing (\code{NULL}), in which case suitable labels will be used.}
+May be missing (\code{NULL}), in which case suitable labels will be used.
+'}
 
 \item{...}{arguments passed to other methods.}
 }
@@ -35,5 +43,37 @@ May be missing (\code{NULL}), in which case suitable labels will be used.}
 A 'ggplot' object.
 }
 \description{
-Draw the computed rootogram
+A rootogram is a model diagnostic tool that assesses the goodness of fit of
+a statistical model. The observed values of the response are compared with
+those expected from the fitted model. For discrete, count responses, the
+frequency of each count (0, 1, 2, etc) in the observed data and expected
+from the conditional distribution of the response implied by the model are
+compared. For continuous variables, the observed and expected frequencies
+are obtained by grouping the data into bins. The rootogram is drawn using
+\code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} graphics. The design closely follows Kleiber & Zeileis
+(2016).
 }
+\examples{
+load_mgcv()
+df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
+
+# A poisson example
+m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
+         s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
+rg <- rootogram(m)
+
+# plot the rootogram
+draw(rg)
+
+# change the type of rootogram
+draw(rg, type = "suspended")
+}
+\references{
+Kleiber, C., Zeileis, A., (2016) Visualizing Count Data
+Regressions Using Rootograms. \emph{Am. Stat.} \strong{70}, 296–303.
+\doi{10.1080/00031305.2016.1173590}
+}
+\seealso{
+\code{\link[=rootogram]{rootogram()}} to compute the data for the rootogram.
+}
+\concept{draw methods}

@@ -3,7 +3,7 @@
 \name{rootogram}
 \alias{rootogram}
 \alias{rootogram.gam}
-\title{Computes data used to draw a rootogram diagnostic plot}
+\title{Rootograms to assess goodness of model fit}
 \usage{
 rootogram(object, ...)
 
@@ -21,15 +21,28 @@ anything that is acceptable as the \code{breaks} argument of
 \code{\link[graphics:hist]{graphics::hist.default()}}}
 }
 \description{
-Computes data used to draw a rootogram diagnostic plot
+A rootogram is a model diagnostic tool that assesses the goodness of fit of
+a statistical model. The observed values of the response are compared with
+those expected from the fitted model. For discrete, count responses, the
+frequency of each count (0, 1, 2, etc) in the observed data and expected
+from the conditional distribution of the response implied by the model are
+compared. For continuous variables, the observed and expected frequencies
+are obtained by grouping the data into bins. The rootogram is drawn using
+\code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} graphics. The design closely follows Kleiber & Zeileis
+(2016).
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{gam}: Method for class \code{"gam"}
+}}
+
 \examples{
 load_mgcv()
 df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
 
 # A poisson example
 m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
-         s(x3, bs = "cr"), family = nb, data = df, method = "REML")
+         s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
 rg <- rootogram(m)
 rg
 draw(rg) # plot the rootogram
@@ -38,4 +51,9 @@ draw(rg) # plot the rootogram
 df <- data_sim("eg1", dist = "normal", seed = 2)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 draw(rootogram(m, breaks = "FD"), type = "suspended")
+}
+\references{
+Kleiber, C., Zeileis, A., (2016) Visualizing Count Data
+Regressions Using Rootograms. \emph{Am. Stat.} \strong{70}, 296–303.
+\doi{10.1080/00031305.2016.1173590}
 }
