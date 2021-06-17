@@ -260,12 +260,13 @@
 }
 
 ##' @rdname add_constant
-`add_constant.evaluated_parametric_term` <- function(object, constant = NULL, ...) {
+`add_constant.evaluated_parametric_term` <- function(object, constant = NULL,
+                                                     ...) {
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {
         if (!is.numeric(constant)) {
-            stop("'constant' must be numeric, but was supplied <", constant, ">",
-                 call. = FALSE)
+            stop("'constant' must be numeric, but was supplied <", constant,
+                 ">", call. = FALSE)
         }
         object[["est"]] <- object[["est"]] + constant
     }
@@ -288,6 +289,7 @@
 
 ##' @rdname add_confint
 ##' @importFrom rlang .data
+##' @importFrom dplyr mutate
 ##'
 ##' @export
 `add_confint.smooth_estimates` <- function(object, coverage = 0.95, ...) {
@@ -298,6 +300,33 @@
     object <- mutate(object,
                      lower_ci = .data[["est"]] - (crit * .data[["se"]]),
                      upper_ci = .data[["est"]] + (crit * .data[["se"]]))
+
+    ## return
+    object
+}
+
+##' @rdname add_confint
+##' @importFrom rlang .data
+##' @importFrom dplyr %>% mutate relocate
+##'
+##' @export
+`add_confint.default` <- function(object, coverage = 0.95, ...) {
+    nms <- names(object)
+
+    if (!all(c("est", "se") %in% nms)) {
+        stop("'object' <", {{ object }}, "> does not contain one or both of ",
+             "'est' or 'se'.")
+    }
+
+    ## compute the critical value
+    crit <- coverage_normal(coverage)
+
+    ## add the frequentist confidence interval
+    object <- mutate(object,
+                     lower_ci = .data$est - (crit * .data$se),
+                     upper_ci = .data$est + (crit * .data$se)) %>%
+      relocate(all_of(c("lower_ci", "upper_ci")),
+               .after = all_of("se"))
 
     ## return
     object
