@@ -59,9 +59,10 @@
 #'
 #' @author Gavin L. Simpson
 #'
-#' @importFrom ggplot2 scale_colour_discrete scale_colour_continuous scale_fill_distiller
+#' @importFrom ggplot2 scale_colour_discrete scale_colour_continuous
+#'   scale_fill_distiller
 #' @importFrom patchwork wrap_plots
-#' @importFrom dplyr mutate rowwise %>% ungroup left_join summarise
+#' @importFrom dplyr mutate rowwise %>% ungroup left_join summarise group_split
 #' @importFrom purrr pluck
 #' @export
 #'
@@ -209,5 +210,13 @@
 
     sm_plts <- map(sm_l, draw_smooth_estimates, ylim = ylims)
 
+    ## return
+    n_plots <- length(sm_plts)
+    if (is.null(ncol) && is.null(nrow)) {
+        ncol <- ceiling(sqrt(n_plots))
+        nrow <- ceiling(n_plots / ncol)
+    }
+    wrap_plots(sm_plts, byrow = TRUE, ncol = ncol, nrow = nrow,
+               guides = guides, ...)
     wrap_plots(sm_plts)
 }
