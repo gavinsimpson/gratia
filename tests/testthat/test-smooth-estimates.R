@@ -84,7 +84,7 @@ test_that("smooth_estimates works with more than one term", {
 
 test_that("smooth_estimates throws error if smooth not found", {
     expect_error(smooth_estimates(m1, smooth = "s(z)"),
-                 "None of the terms matched a smooth",
+                 "Failed to match any smooths in model `m1`",
                  fixed = TRUE)
 })
 
@@ -181,7 +181,8 @@ test_that("smooth_estimates fails if data is not data frame or numeric", {
 
 
 test_that("smooth_estimates works for a 2d factor by smooth", {
-    expect_silent(sm <- smooth_estimates(m_2d_by, "s(x0,x1)"))
+    expect_silent(sm <- smooth_estimates(m_2d_by, "s(x0,x1)", 
+                                         partial_match = TRUE))
     expect_is(sm, "smooth_estimates")
     expect_is(sm, "tbl_df")
     expect_is(sm, "data.frame")

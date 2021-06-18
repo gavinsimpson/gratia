@@ -258,7 +258,7 @@ fac <- factor(fac)
 y <- f + rnorm(n) * 2
 
 df <- data.frame(y = y, x0 = x0, x1 = x1, x2 = x2, fac = fac)
-mod_fs <- gam(y~s(x0) + s(x1, fac, bs="fs", k=5) + s(x2, k=20),
+mod_fs <- gam(y~s(x0) + s(x1, fac, bs = "fs", k = 5) + s(x2, k = 20),
               method = "ML")
 
 test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
@@ -427,7 +427,7 @@ test_that("draw works for sample_smooths objects with user specified smooth", {
     sm3 <- smooth_samples(m3, n = 15, seed = 23478)
     plt <- draw(sm3, select = "s(x0)", alpha = 0.7)
     expect_doppelganger("draw selected smooth_samples for GAM m3", plt)
-    
+
     plt <- draw(sm3, select = "s(x2)", alpha = 0.7, partial_match = TRUE)
     expect_doppelganger("draw selected factor by smooth_samples for GAM m3", plt)
 })
