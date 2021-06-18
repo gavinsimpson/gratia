@@ -123,7 +123,7 @@ is used instead." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Plot estimated smooths from a fitted GAM</h1>
-    <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/draw-methods.R'><code>R/draw-methods.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/draw-gam.R'><code>R/draw-gam.R</code></a></small>
     <div class="hidden name"><code>draw.gam.Rd</code></div>
     </div>
 
@@ -136,6 +136,7 @@ is used instead.</p>
     <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='co'># S3 method for gam</span>
 <span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span>
   <span class='va'>object</span>,
+  data <span class='op'>=</span> <span class='cn'>NULL</span>,
   parametric <span class='op'>=</span> <span class='cn'>NULL</span>,
   select <span class='op'>=</span> <span class='cn'>NULL</span>,
   residuals <span class='op'>=</span> <span class='cn'>FALSE</span>,
@@ -167,6 +168,10 @@ is used instead.</p>
     <tr>
       <th>object</th>
       <td><p>a fitted GAM, the result of a call to <code><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>mgcv::gam()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>data</th>
+      <td><p>a optional data frame that may or may not be used? FIXME!</p></td>
     </tr>
     <tr>
       <th>parametric</th>
@@ -300,27 +305,23 @@ typically work with <code>ggplot()</code> plots.</p>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span></span>
 <span class='r-in'></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>1</span>, n <span class='op'>=</span> <span class='fl'>400</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> Gu &amp; Wahba 4 term additive model</span>
-<span class='r-in'><span class='va'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>df1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='data_sim.html'>data_sim</a></span><span class='op'>(</span><span class='st'>"eg1"</span>, n <span class='op'>=</span> <span class='fl'>400</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span>, seed <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>df1</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span><span class='va'>m1</span><span class='op'>)</span></span>
 <span class='r-plt'><img src='draw.gam-1.png' alt='' width='700' height='433' /></span>
 <span class='r-in'></span>
-<span class='r-in'><span class='co'>## can add partial residuals</span></span>
+<span class='r-in'><span class='co'># can add partial residuals</span></span>
 <span class='r-in'><span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span><span class='va'>m1</span>, residuals <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
 <span class='r-plt'><img src='draw.gam-2.png' alt='' width='700' height='433' /></span>
 <span class='r-in'></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>2</span>, n <span class='op'>=</span> <span class='fl'>1000</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> Bivariate smoothing example</span>
-<span class='r-in'><span class='va'>m2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>z</span>, k <span class='op'>=</span> <span class='fl'>40</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span><span class='op'>$</span><span class='va'>data</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>df2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='data_sim.html'>data_sim</a></span><span class='op'>(</span><span class='fl'>2</span>, n <span class='op'>=</span> <span class='fl'>1000</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>1</span>, seed <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>m2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>z</span>, k <span class='op'>=</span> <span class='fl'>40</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>df2</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span></span>
 <span class='r-in'><span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span><span class='va'>m2</span>, contour <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
 <span class='r-plt'><img src='draw.gam-3.png' alt='' width='700' height='433' /></span>
 <span class='r-in'></span>
-<span class='r-in'><span class='co'>## change the number of contours drawn and the fill scale used for</span></span>
-<span class='r-in'><span class='co'>## the surface</span></span>
+<span class='r-in'><span class='co'># change the number of contours drawn and the fill scale used for</span></span>
+<span class='r-in'><span class='co'># the surface</span></span>
 <span class='r-in'><span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span><span class='va'>m2</span>, n_contour <span class='op'>=</span> <span class='fl'>5</span>,</span>
 <span class='r-in'>     continuous_fill <span class='op'>=</span> <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_brewer.html'>scale_fill_distiller</a></span><span class='op'>(</span>palette <span class='op'>=</span> <span class='st'>"Spectral"</span>,</span>
 <span class='r-in'>                                                     type <span class='op'>=</span> <span class='st'>"div"</span><span class='op'>)</span><span class='op'>)</span></span>

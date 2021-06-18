@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Add a confidence interval to an existing object — add_confint • gratia</title>
+<title>Partial residuals in nested form — nested_partial_residuals • gratia</title>
 
 
 <!-- jquery -->
@@ -41,8 +41,10 @@
   <link href="../extra.css" rel="stylesheet">
   
 
-<meta property="og:title" content="Add a confidence interval to an existing object — add_confint" />
-<meta property="og:description" content="Add a confidence interval to an existing object" />
+<meta property="og:title" content="Partial residuals in nested form — nested_partial_residuals" />
+<meta property="og:description" content="Computes partial residuals for smooth terms, formats them in long/tidy
+format, then nests the partial_residual column such that the result
+is a nested data frame with one row per smooth." />
 <meta property="og:image" content="https://gavinsimpson.github.io/gratia/reference/figures/README-draw-gam-figure-1.png" />
 <meta property="og:image:alt" content="Plot produced by draw() of 4 smooth functions from a fitted generalized additive model" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -120,40 +122,46 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Add a confidence interval to an existing object</h1>
-    <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/add-methods.R'><code>R/add-methods.R</code></a></small>
-    <div class="hidden name"><code>add_confint.Rd</code></div>
+    <h1>Partial residuals in nested form</h1>
+    <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/nested-functions.R'><code>R/nested-functions.R</code></a></small>
+    <div class="hidden name"><code>nested_partial_residuals.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Add a confidence interval to an existing object</p>
+    <p>Computes partial residuals for smooth terms, formats them in long/tidy
+format, then nests the <code>partial_residual</code> column such that the result
+is a nested data frame with one row per smooth.</p>
     </div>
 
-    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>add_confint</span><span class='op'>(</span><span class='va'>object</span>, coverage <span class='op'>=</span> <span class='fl'>0.95</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for smooth_estimates</span>
-<span class='fu'>add_confint</span><span class='op'>(</span><span class='va'>object</span>, coverage <span class='op'>=</span> <span class='fl'>0.95</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for default</span>
-<span class='fu'>add_confint</span><span class='op'>(</span><span class='va'>object</span>, coverage <span class='op'>=</span> <span class='fl'>0.95</span>, <span class='va'>...</span><span class='op'>)</span></code></pre></div>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>nested_partial_residuals</span><span class='op'>(</span><span class='va'>object</span>, terms <span class='op'>=</span> <span class='cn'>NULL</span>, data <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>object</th>
-      <td><p>a R object.</p></td>
+      <td><p>a fitted GAM model</p></td>
     </tr>
     <tr>
-      <th>coverage</th>
-      <td><p>numeric; the coverage for the interval. Must be in the range
-0 &lt; <code>coverage</code> &lt; 1.</p></td>
+      <th>terms</th>
+      <td><p>a vector of terms to include partial residuals for. Passed to
+argument <code>terms</code> of <code><a href='https://rdrr.io/pkg/mgcv/man/predict.gam.html'>mgcv::predict.gam()</a></code>].</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>arguments passed to other methods.</p></td>
+      <th>data</th>
+      <td><p>optional data frame</p></td>
     </tr>
     </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A nested tibble (data frame) with one row per smooth term. Contains
+two columns:</p><ul>
+<li><p><code>smooth</code> - a label indicating the smooth term</p></li>
+<li><p><code>partial_residual</code> - a list column containing a tibble (data frame) with
+1 column <code>partial_residual</code> containing the requested partial residuals
+for the indicated smooth.</p></li>
+</ul>
 
 
   </div>
