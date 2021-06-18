@@ -126,12 +126,26 @@
     <div id="gratia-069113" class="section level1">
 <h1 class="page-header" data-toc-text="0.6.9113">
 <a href="#gratia-069113" class="anchor" aria-hidden="true"></a>gratia 0.6.9113<small> Unreleased </small></h1>
+<div id="major-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#major-changes" class="anchor" aria-hidden="true"></a>Major changes</h2>
+<ul><li>
+<p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> now uses <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> internally and consequently uses its <code><a href="../reference/draw.html">draw()</a></code> method and underlying plotting code. This has simplified the code compared to <code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code> and its methods, which will allow for future development and addition of features more easily than if <code>evaluate_Smooth()</code> had been retained.</p>
+<p>While a lot of code has been reused so differences between plots as a result of this change should be minimal, some corner cases may have been missed. File and Issue if you notice something that has changed that you think shouldn’t.</p>
+</li>
+</ul></div>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor" aria-hidden="true"></a>New features</h2>
 <ul><li><p><code><a href="../reference/rootogram.html">rootogram()</a></code> and its <code><a href="../reference/draw.html">draw()</a></code> method produce rootograms as diagnostic plots for fitted models. Currently only for models fitted with <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/negbin.html" class="external-link">nb()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/negbin.html" class="external-link">negbin()</a></code>, <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian()</a></code> families.</p></li>
 <li><p><code><a href="../reference/nb_theta.html">nb_theta()</a></code> is a new extractor function that returns the theta parameter of a fitted negative binomial GAM (families <code><a href="https://rdrr.io/pkg/mgcv/man/negbin.html" class="external-link">nb()</a></code> or <code><a href="https://rdrr.io/pkg/mgcv/man/negbin.html" class="external-link">negbin()</a></code>).</p></li>
 <li><p><code><a href="../reference/edf.html">edf()</a></code> extracts the effective degrees of freedom (EDF) of a fitted model or a specific smooth in the model. Various forms for the EDF can be extracted.</p></li>
+<li>
+<p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> can now show a “rug” plot on a bivariate smooth by drawing small points with high transparency over the smooth surface at the data coordinates.</p>
+<p>In addition, the rugs on plots of factor by smooths now show the locations of covariate values for the specific level of the factor and not over all levels. This better reflects what data were used to estimate the smooth, even though the basis for each smooth was set up using all of the covariate locations.</p>
+</li>
+<li><p>Partial residuals can now be plotted on factor by smooths. To allow this, the partial residuals are filtered so that only residuals associated with a particular level’s smooth are drawn on the plot of the smooth.</p></li>
+<li><p><code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> uses <code><a href="../reference/check_user_select_smooths.html">check_user_select_smooths()</a></code> to handle user-specified selection of smooth terms. As such it is more flexible than previously, and allows for easier selection of smooths to evaluate.</p></li>
 </ul></div>
 <div id="bug-fixes" class="section level2">
 <h2 class="hasAnchor">
@@ -143,9 +157,9 @@
     <div id="gratia-060" class="section level1">
 <h1 class="page-header" data-toc-text="0.6.0">
 <a href="#gratia-060" class="anchor" aria-hidden="true"></a>gratia 0.6.0<small> 2021-04-18 </small></h1>
-<div id="major-changes" class="section level2">
+<div id="major-changes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#major-changes" class="anchor" aria-hidden="true"></a>Major changes</h2>
+<a href="#major-changes-1" class="anchor" aria-hidden="true"></a>Major changes</h2>
 <ul><li>
 <p>The {cowplot} package has been replaced by the {patchwork} package for producing multi-panel figures in <code><a href="../reference/draw.html">draw()</a></code> and <code><a href="../reference/appraise.html">appraise()</a></code>. This shouldn’t affect any code that used {gratia} only, but if you passed additional arguments to <code>cowplot::plot_grid()</code> or used the <code>align</code> or <code>axis</code> arguments of <code><a href="../reference/draw.html">draw()</a></code> and <code><a href="../reference/appraise.html">appraise()</a></code>, you’ll need to adapt code accordingly.</p>
 <p>Typically, you can simply delete the <code>align</code> or <code>axis</code> arguments and {patchwork} will just work and align plots nicely. Any arguments passed via <code>...</code> to <code>cowplot::plot_grid()</code> will just be ignored by <code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code> unless those passed arguments match any of the arguments of <code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code>.</p>
