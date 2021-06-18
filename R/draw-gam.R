@@ -142,7 +142,10 @@
                                         partial_match = partial_match)
 
     # evaluate all requested smooths
-    sm_eval <- smooth_estimates(object, smooth = S[select], n = n, data = data,
+    sm_eval <- smooth_estimates(object,
+                                smooth = S[select],
+                                n = n,
+                                data = data,
                                 unconditional = unconditional,
                                 overall_uncertainty = overall_uncertainty,
                                 dist = dist,
@@ -158,7 +161,7 @@
     # add confidence interval
     sm_eval <- sm_eval %>%
       rowwise() %>%
-      mutate(data = list(add_confint(.data$data))) %>%
+      mutate(data = list(add_confint(.data$data, coverage = ci_level))) %>%
       ungroup()
 
     # Take the range of the smooths & their confidence intervals now
@@ -208,7 +211,18 @@
 
     sm_l <- group_split(sm_eval, .data$smooth)
 
-    sm_plts <- map(sm_l, draw_smooth_estimates, ylim = ylims)
+    sm_plts <- map(sm_l,
+                   draw_smooth_estimates,
+                   constant = constant,
+                   fun = fun,
+                   contour = contour,
+                   contour_col = contour_col,
+                   n_contour = n_contour,
+                   partial_match = partial_match,
+                   discrete_colour = discrete_colour,
+                   continuous_colour = continuous_colour,
+                   continuous_fill = continuous_fill,
+                   ylim = ylims)
 
     ## return
     n_plots <- length(sm_plts)
