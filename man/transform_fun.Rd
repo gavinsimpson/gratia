@@ -3,12 +3,15 @@
 \name{transform_fun}
 \alias{transform_fun}
 \alias{transform_fun.evaluated_smooth}
+\alias{transform_fun.mgcv_smooth}
 \alias{transform_fun.evaluated_parametric_term}
 \title{Transform estimated values and confidence intervals by applying a function}
 \usage{
 transform_fun(object, fun = NULL, ...)
 
 \method{transform_fun}{evaluated_smooth}(object, fun = NULL, ...)
+
+\method{transform_fun}{mgcv_smooth}(object, fun = NULL, ...)
 
 \method{transform_fun}{evaluated_parametric_term}(object, fun = NULL, ...)
 }

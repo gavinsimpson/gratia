@@ -16,6 +16,7 @@ smooth_estimates(object, ...)
   overall_uncertainty = TRUE,
   dist = 0.1,
   unnest = TRUE,
+  partial_match = FALSE,
   ...
 )
 }
@@ -47,6 +48,10 @@ and \code{dist} is a distance within the unit square. See
 \code{\link[mgcv:exclude.too.far]{mgcv::exclude.too.far()}} for further details.}
 
 \item{unnest}{logical; unnest the smooth objects?}
+
+\item{partial_match}{logical; in the case of character \code{select}, should
+\code{select} match partially against \code{smooths}? If \code{partial_match = TRUE},
+\code{select} must only be a single string, a character vector of length 1.}
 }
 \value{
 A data frame (tibble), which is of class \code{"smooth_estimates"}.
