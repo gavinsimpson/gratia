@@ -1,83 +1,83 @@
-##' Generic plotting via `ggplot2`
-##'
-##' Generic function for plotting of R objects that uses the `ggplot2` package.
-##'
-##' @title Generic plotting via `ggplot2`
-##' @param object and R object to plot.
-##' @param ... arguments passed to other methods.
-##'
-##' @return A [ggplot2::ggplot()] object.
-##'
-##' @author Gavin L. Simpson
-##'
-##' @export
+#' Generic plotting via `ggplot2`
+#'
+#' Generic function for plotting of R objects that uses the `ggplot2` package.
+#'
+#' @title Generic plotting via `ggplot2`
+#' @param object and R object to plot.
+#' @param ... arguments passed to other methods.
+#'
+#' @return A [ggplot2::ggplot()] object.
+#'
+#' @author Gavin L. Simpson
+#'
+#' @export
 `draw` <- function(object, ...) {
     UseMethod("draw")
 }
 
-##' Plot estimated smooths
-##'
-##' Plots estimated univariate and bivariate smooths using ggplot2.
-##'
-##' @param object an object, the result of a call to [evaluate_smooth()].
-##' @param rug For `evaluate_smooth()`, a numeric vector of values for the
-##'   location of data on the x axis. The default of `NULL` results in no
-##'   rug plot being drawn. For `evaluate_parametric_terms()`, a logical to
-##'   indicate if a rug plot should be drawn.
-##' @param ci_level numeric between 0 and 1; the coverage of credible interval.
-##' @param constant numeric; a constant to add to the estimated values of the
-##'   smooth. `constant`, if supplied, will be added to the estimated value
-##'   before the confidence band is computed.
-##' @param fun function; a function that will be applied to the estimated values
-##'   and confidence interval before plotting. Can be a function or the name of a
-##'   function. Function `fun` will be applied after adding any `constant`, if
-##'   provided.
-##' @param partial_residuals data frame; partial residuals and data values if
-##'   partial residuals are drawn. Should have names `..p_resid` and `..orig_x` if
-##'   supplied.
-##' @param xlab character or expression; the label for the x axis. If not
-##'   supplied, a suitable label will be generated from `object`.
-##' @param ylab character or expression; the label for the y axis. If not
-##'   supplied, a suitable label will be generated from `object`.
-##' @param title character or expression; the title for the plot. See
-##'   [ggplot2::labs()].
-##' @param subtitle character or expression; the subtitle for the plot. See
-##'   [ggplot2::labs()].
-##' @param caption character or expression; the plot caption. See
-##'   [ggplot2::labs()].
-##' @param response_range numeric; a vector of two values giving the range of
-##'   response data for the guide. Used to fix plots to a common scale/range.
-##'   Ignored if `show` is set to `"se"`.
-##' @param ... arguments passed to other methods.
-##'
-##' @return A [ggplot2::ggplot()] object.
-##'
-##' @author Gavin L. Simpson
-##'
-##' @importFrom ggplot2 ggplot aes_ aes_string labs geom_line geom_ribbon expand_limits
-##' @importFrom grid unit
-##'
-##' @export
-##' @name draw.evaluated_smooth
-##' @aliases draw.evaluated_1d_smooth draw.evaluated_2d_smooth geom_rug
-##'
-##' @examples
-##' load_mgcv()
-##'
-##' dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
-##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-##'
-##' sm <- evaluate_smooth(m1, "s(x2)")
-##' draw(sm)
-##'
-##' ## supply constant to shift y axis scale
-##' draw(sm, constant = coef(m1)[1])
-##'
-##' dat <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
-##' m2 <- gam(y ~ s(x, z, k = 40), data = dat, method = "REML")
-##'
-##' sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
-##' draw(sm)
+#' Plot estimated smooths
+#'
+#' Plots estimated univariate and bivariate smooths using ggplot2.
+#'
+#' @param object an object, the result of a call to [evaluate_smooth()].
+#' @param rug For `evaluate_smooth()`, a numeric vector of values for the
+#'   location of data on the x axis. The default of `NULL` results in no
+#'   rug plot being drawn. For `evaluate_parametric_terms()`, a logical to
+#'   indicate if a rug plot should be drawn.
+#' @param ci_level numeric between 0 and 1; the coverage of credible interval.
+#' @param constant numeric; a constant to add to the estimated values of the
+#'   smooth. `constant`, if supplied, will be added to the estimated value
+#'   before the confidence band is computed.
+#' @param fun function; a function that will be applied to the estimated values
+#'   and confidence interval before plotting. Can be a function or the name of a
+#'   function. Function `fun` will be applied after adding any `constant`, if
+#'   provided.
+#' @param partial_residuals data frame; partial residuals and data values if
+#'   partial residuals are drawn. Should have names `..p_resid` and `..orig_x` if
+#'   supplied.
+#' @param xlab character or expression; the label for the x axis. If not
+#'   supplied, a suitable label will be generated from `object`.
+#' @param ylab character or expression; the label for the y axis. If not
+#'   supplied, a suitable label will be generated from `object`.
+#' @param title character or expression; the title for the plot. See
+#'   [ggplot2::labs()].
+#' @param subtitle character or expression; the subtitle for the plot. See
+#'   [ggplot2::labs()].
+#' @param caption character or expression; the plot caption. See
+#'   [ggplot2::labs()].
+#' @param response_range numeric; a vector of two values giving the range of
+#'   response data for the guide. Used to fix plots to a common scale/range.
+#'   Ignored if `show` is set to `"se"`.
+#' @param ... arguments passed to other methods.
+#'
+#' @return A [ggplot2::ggplot()] object.
+#'
+#' @author Gavin L. Simpson
+#'
+#' @importFrom ggplot2 ggplot aes_ aes_string labs geom_line geom_ribbon expand_limits
+#' @importFrom grid unit
+#'
+#' @export
+#' @name draw.evaluated_smooth
+#' @aliases draw.evaluated_1d_smooth draw.evaluated_2d_smooth geom_rug
+#'
+#' @examples
+#' load_mgcv()
+#'
+#' dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
+#' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+#'
+#' sm <- evaluate_smooth(m1, "s(x2)")
+#' draw(sm)
+#'
+#' ## supply constant to shift y axis scale
+#' draw(sm, constant = coef(m1)[1])
+#'
+#' dat <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
+#' m2 <- gam(y ~ s(x, z, k = 40), data = dat, method = "REML")
+#'
+#' sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
+#' draw(sm)
 `draw.evaluated_1d_smooth` <- function(object,
                                        rug = NULL,
                                        ci_level = 0.95,
@@ -101,8 +101,9 @@
 
     ## If fun supplied, use it to transform est and the upper and lower interval
     object <- transform_fun(object, fun = fun)
-    
-    plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est, group = ~ smooth))
+
+    plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est,
+                               group = ~ smooth))
 
     ## do we want partial residuals? Only for univariate smooths without by vars
     if (!is.null(partial_residuals)) {
@@ -156,24 +157,24 @@
     plt
 }
 
-##' @param show character; plot the estimated smooth (`"estimate"`) or its
-##'   standard error (`"se"`).
-##' @param contour logical; should contours be draw on the plot using
-##'   [ggplot2::geom_contour()].
-##' @param contour_col colour specification for contour lines.
-##' @param n_contour numeric; the number of contour bins. Will result in
-##'   `n_contour - 1` contour lines being drawn. See [ggplot2::geom_contour()].
-##' @param response_range numeric; a vector of two values giving the range of
-##'   response data for the guide. Used to fix plots to a common scale/range.
-##'   Ignored if `show` is set to `"se"`.
-##' @param continuous_fill suitable scale used for the filled surface. If `NULL`,
-##'   the default used is `scale_fill_distiller(palette = "RdBu", type = "div")`.
-##'
-##' @importFrom ggplot2 ggplot aes_string geom_raster geom_contour labs guides guide_colourbar scale_fill_distiller theme
-##' @importFrom grid unit
-##'
-##' @export
-##' @rdname draw.evaluated_smooth
+#' @param show character; plot the estimated smooth (`"estimate"`) or its
+#'   standard error (`"se"`).
+#' @param contour logical; should contours be draw on the plot using
+#'   [ggplot2::geom_contour()].
+#' @param contour_col colour specification for contour lines.
+#' @param n_contour numeric; the number of contour bins. Will result in
+#'   `n_contour - 1` contour lines being drawn. See [ggplot2::geom_contour()].
+#' @param response_range numeric; a vector of two values giving the range of
+#'   response data for the guide. Used to fix plots to a common scale/range.
+#'   Ignored if `show` is set to `"se"`.
+#' @param continuous_fill suitable scale used for the filled surface. If `NULL`,
+#'   the default used is `scale_fill_distiller(palette = "RdBu", type = "div")`.
+#'
+#' @importFrom ggplot2 ggplot aes_string geom_raster geom_contour labs guides guide_colourbar scale_fill_distiller theme
+#' @importFrom grid unit
+#'
+#' @export
+#' @rdname draw.evaluated_smooth
 `draw.evaluated_2d_smooth` <- function(object, show = c("estimate","se"),
                                        contour = TRUE,
                                        contour_col = "black",
@@ -261,318 +262,15 @@
     plt
 }
 
-##' Plot estimated smooths from a fitted GAM
-##'
-##' Plots estimated smooths from a fitted GAM model in a similar way to
-##' `mgcv::plot.gam()` but instead of using base graphics, [ggplot2::ggplot()]
-##' is used instead.
-##'
-##' @param object a fitted GAM, the result of a call to [mgcv::gam()].
-##' @param parametric logical; plot parametric terms also? Default is `TRUE`,
-##'   only if `select` is `NULL`. If `select` is used, `parametric` is set to
-##'   `FALSE` unless the user specifically sets `parametric = TRUE`.
-##' @param select character, logical, or numeric; which smooths to plot. If
-##'   `NULL`, the default, then all model smooths are drawn. Numeric `select`
-##'   indexes the smooths in the order they are specified in the formula and
-##'   stored in `object`. Character `select` matches the labels for smooths
-##'   as shown for example in the output from `summary(object)`. Logical
-##'   `select` operates as per numeric `select` in the order that smooths are
-##'   stored.
-##' @param residuals logical; should partial residuals for a smooth be drawn?
-##'   Ignored for anything but a simple univariate smooth.
-##' @param scales character; should all univariate smooths be plotted with the
-##'   same y-axis scale? The default, `scales = "fixed"`, ensures this is done.
-##'   If `scales = "free"` each univariate smooth has its own y-axis scale.
-##'   Currently does not affect the y-axis scale of plots of the parametric
-##'   terms.
-##' @param constant numeric; a constant to add to the estimated values of the
-##'   smooth. `constant`, if supplied, will be added to the estimated value
-##'   before the confidence band is computed.
-##' @param fun function; a function that will be applied to the estimated values
-##'   and confidence interval before plotting. Can be a function or the name of a
-##'   function. Function `fun` will be applied after adding any `constant`, if
-##'   provided.
-##' @param ci_level numeric between 0 and 1; the coverage of credible interval.
-##' @param rug logical; draw a rug plot at the botom of each plot?
-##' @param contour logical; should contours be draw on the plot using
-##'   [ggplot2::geom_contour()].
-##' @param contour_col colour specification for contour lines.
-##' @param n_contour numeric; the number of contour bins. Will result in
-##'   `n_contour - 1` contour lines being drawn. See [ggplot2::geom_contour()].
-##' @param partial_match logical; should smooths be selected by partial matches
-##'   with `select`? If `TRUE`, `select` can only be a single string to match
-##'   against.
-##' @param discrete_colour,continuous_colour,continuous_fill suitable scales
-##'   for the types of data.
-##' @param ncol,nrow numeric; the numbers of rows and columns over which to
-##'   spread the plots
-##' @param guides character; one of `"keep"` (the default), `"collect"`, or
-##'   `"auto"`. Passed to [patchwork::plot_layout()]
-##' @param ... additional arguments passed to [patchwork::wrap_plots()].
-##'
-##' @inheritParams evaluate_smooth
-##'
-##' @note Internally, plots of each smooth are created using [ggplot2::ggplot()]
-##'   and composed into a single plot using [patchwork::wrap_plots()]. As a result,
-##'   it is not possible to use `+` to add to the plots in the way one might
-##'   typically work with `ggplot()` plots.
-##'
-##' @return The object returned is created by [patchwork::wrap_plots()].
-##'
-##' @author Gavin L. Simpson
-##'
-##' @importFrom ggplot2 scale_colour_discrete scale_colour_continuous scale_fill_distiller
-##' @importFrom patchwork wrap_plots
-##' @export
-##'
-##' @examples
-##' load_mgcv()
-##'
-##' \dontshow{set.seed(2)}
-##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
-##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-##'
-##' draw(m1)
-##'
-##' ## can add partial residuals
-##' draw(m1, residuals = TRUE)
-##'
-##' \dontshow{set.seed(2)}
-##' dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
-##' m2 <- gam(y ~ s(x, z, k = 40), data = dat$data, method = "REML")
-##' draw(m2, contour = FALSE)
-##'
-##' ## change the number of contours drawn and the fill scale used for
-##' ## the surface
-##' draw(m2, n_contour = 5,
-##'      continuous_fill = ggplot2::scale_fill_distiller(palette = "Spectral",
-##'                                                      type = "div"))
-`draw.gam` <- function(object,
-                       parametric = NULL,
-                       select = NULL,
-                       residuals = FALSE,
-                       scales = c("free", "fixed"),
-                       ci_level = 0.95,
-                       n = 100,
-                       unconditional = FALSE,
-                       overall_uncertainty = TRUE,
-                       constant = NULL,
-                       fun = NULL,
-                       dist = 0.1,
-                       rug = TRUE,
-                       contour = TRUE,
-                       contour_col = "black",
-                       n_contour = NULL,
-                       partial_match = FALSE,
-                       discrete_colour = NULL,
-                       continuous_colour = NULL,
-                       continuous_fill = NULL,
-                       ncol = NULL, nrow = NULL,
-                       guides = "keep",
-                       ...) {
-    scales <- match.arg(scales)
 
-    ## fix up default scales
-    if (is.null(discrete_colour)) {
-        discrete_colour <- scale_colour_discrete()
-    }
-    if (is.null(continuous_colour)) {
-        continuous_colour <- scale_colour_continuous()
-    }
-    if (is.null(continuous_fill)) {
-        continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
-    }
-    
-    S <- smooths(object)                # vector of smooth labels - "s(x)"
-
-    ## if not using select, set parametric TRUE if not set to FALSE
-    if (!is.null(select)) {
-        if (is.null(parametric)) {
-            parametric <- FALSE
-        }
-    } else {
-        if (is.null(parametric)) {
-            parametric <- TRUE
-        }
-    }
-
-    ## select smooths
-    select <- check_user_select_smooths(smooths = S, select = select,
-                                        partial_match = partial_match)
-
-    ## can only plot 1 or 2d smooths - get smooth dimensions & prune list `s`
-    ## d <- smooth_dim(object)[select]
-    d <- smooth_dim(object)
-    take <- d <= 2L
-    select <- select[take]
-    S <- S[take]
-    d <- d[take]
-
-    ## FIXME: Exclude "re" smooths from "fixed" scales?
-    is_re <- vapply(object[["smooth"]], is_re_smooth, logical(1L))
-
-    is_by <- vapply(object[["smooth"]], is_by_smooth, logical(1L))
-    if (any(is_by)) {
-        S <- vapply(strsplit(S, ":"), `[[`, character(1L), 1L)
-    }
-
-    npara <- 0
-    nsmooth <- length(S)
-
-    ## are we doing parametric terms?
-    if (isTRUE(parametric)) {
-        terms <- parametric_terms(object)
-        npara <- length(terms)
-        p <- vector("list", length = npara)
-    }
-
-    g <- l <- vector("list", length = nsmooth)
-    ## g <- vector("list", length = nsmooth + npara)
-
-    for (i in unique(S)) {
-        eS <- evaluate_smooth(object, smooth = i, n = n,
-                              unconditional = unconditional,
-                              overall_uncertainty = overall_uncertainty,
-                              dist = dist)
-        l[S == i] <- split(eS, eS[["smooth"]])
-    }
-
-    ## filter out smooths here using select
-    l <- l[select]
-    d <- d[select]
-    g <- g[select]
-
-    ## If we can't handle any of the terms in the model, bail
-    if (length(g) == 0L) {
-        message("Unable to draw any of the model terms.")
-        return(invisible(g))
-    }
-
-    ## evaluate parametric terms here
-    if (isTRUE(parametric)) {
-        leng <- length(g)
-        for (i in seq_along(terms)) {
-            p[[i]] <- evaluate_parametric_term(object, term = terms[i])
-        }
-    }
-
-    ## model frame may be needed for rugs
-    mf  <- model.frame(object)
-
-    ## get the terms predictions if we need partial residuals
-    if (isTRUE(residuals)) {
-        if (is.null(object$residuals) || is.null(object$weights)) {
-            residuals <- FALSE
-        } else {
-            pred_terms <- predict(object, type = "terms")
-            w_resid <- object$residuals * sqrt(object$weights)
-            pred_terms <- pred_terms + w_resid
-        }
-    }
-
-    ylims <- NULL
-    crit <- qnorm((1 - ci_level) / 2, lower.tail = FALSE)
-    if (isTRUE(identical(scales, "fixed"))) {
-        wrapper <- function(x, var, crit) {
-            range(x[[var]] + (crit * x[["se"]]),
-                  x[[var]] - (crit * x[["se"]]))
-        }
-
-        if (isTRUE(residuals)) {
-            want_presids <- function(x) {
-                sm <- get_smooth(object, term = x)
-                (! is_by_smooth(sm)) && smooth_dim(sm) == 1L
-            }
-            take_presids <- vapply(colnames(pred_terms), want_presids, logical(1L))
-            p_resids_lims <- if (NCOL(pred_terms[, take_presids]) > 0) {
-                range(pred_terms[, take_presids])
-            }
-        } else {
-            p_resids_lims <- rep(0, 2)
-        }
-        
-        ylims <- range(c(unlist(lapply(l, wrapper, var = "est", crit = crit)),
-                         p_resids_lims))
-        
-        if (isTRUE(parametric)) {
-            ylims <- range(ylims,
-                           unlist(lapply(p, wrapper, var = "partial", crit = crit)))
-        }
-    }
-
-    ## p_resid_range <- vector("list", length = length(l))
-    
-    for (i in seq_along(l)) {
-        partial_residuals <- NULL
-        sname <- unique(l[[i]][["smooth"]])
-
-        ## add partial_residuals
-        if (isTRUE(residuals )) {
-            sm <- get_smooth(object, term = sname)
-            if ((! is_by_smooth(sm)) && smooth_dim(sm) == 1L) {
-                partial_residuals <- tibble(..p_resid = pred_terms[, sname],
-                                            ..orig_x = mf[, smooth_variable(sm)])
-            }
-        }
-        
-        if (isTRUE(rug)) {
-            ## could be a by smooth, strip off the by variable bit
-            sname <- strsplit(sname, ":")[[1L]][[1L]]
-            sm <- get_smooth(object, term = sname)
-            if (!is_mgcv_smooth(sm)) {  # could be list (factor by)
-                sm <- sm[[1L]]
-            }
-            svar <- smooth_variable(sm)
-            if (is_fs_smooth(sm)) {
-                svar <- svar[[1L]]
-            }
-            g[[i]] <- draw(l[[i]], rug = mf[[svar]],
-                           partial_residuals = partial_residuals,
-                           contour = contour, contour_col = contour_col,
-                           n_contour = n_contour, ci_level = ci_level,
-                           response_range = ylims,
-                           discrete_colour = discrete_colour,
-                           continuous_colour = continuous_colour,
-                           continuous_fill = continuous_fill,
-                           fun = fun, constant = constant)
-        } else {
-            g[[i]] <- draw(l[[i]], partial_residuals = partial_residuals,
-                           contour = contour, contour_col = contour_col,
-                           n_contour = n_contour, ci_level = ci_level,
-                           response_range = ylims,
-                           discrete_colour = discrete_colour,
-                           continuous_colour = continuous_colour,
-                           continuous_fill = continuous_fill,
-                           fun = fun, constant = constant)
-        }
-    }
-
-    if (isTRUE(parametric)) {
-        leng <- length(g)
-        for (i in seq_along(terms)) {
-            g[[i + leng]] <- draw(p[[i]], response_range = ylims,
-                                  fun = fun, constant = constant)
-        }
-    }
-
-    ## return
-    n_plots <- length(g)
-    if (is.null(ncol) && is.null(nrow)) {
-        ncol <- ceiling(sqrt(n_plots))
-        nrow <- ceiling(n_plots / ncol)
-    }
-    wrap_plots(g, byrow = TRUE, ncol = ncol, nrow = nrow, guides = guides,
-               ...)
-}
-
-##' @param qq_line logical; draw a reference line through the lower and upper
-##'   theoretical quartiles.
-##'
-##' @importFrom ggplot2 geom_abline geom_point labs expand_limits
-##' @importFrom stats quantile qnorm
-##'
-##' @export
-##' @rdname draw.evaluated_smooth
+#' @param qq_line logical; draw a reference line through the lower and upper
+#'   theoretical quartiles.
+#'
+#' @importFrom ggplot2 geom_abline geom_point labs expand_limits
+#' @importFrom stats quantile qnorm
+#'
+#' @export
+#' @rdname draw.evaluated_smooth
 `draw.evaluated_re_smooth` <- function(object, qq_line = TRUE,
                                        constant = NULL, fun = NULL,
                                        xlab, ylab,
@@ -632,14 +330,14 @@
     plt
 }
 
-##' @param discrete_colour an appropriate discrete colour scale from `ggplot2`.
-##'   The scale will need to be able to provide as many colours as there are
-##'   levels in the factor variable involved in the smooth. Suitable alternatives
-##'   include [ggplot2::scale_colour_viridis_d()].
-##'
-##' @importFrom ggplot2 geom_line theme scale_colour_discrete geom_rug expand_limits
-##' @export
-##' @rdname draw.evaluated_smooth
+#' @param discrete_colour an appropriate discrete colour scale from `ggplot2`.
+#'   The scale will need to be able to provide as many colours as there are
+#'   levels in the factor variable involved in the smooth. Suitable alternatives
+#'   include [ggplot2::scale_colour_viridis_d()].
+#'
+#' @importFrom ggplot2 geom_line theme scale_colour_discrete geom_rug expand_limits
+#' @export
+#' @rdname draw.evaluated_smooth
 `draw.evaluated_fs_smooth` <- function(object,
                                        rug = NULL,
                                        constant = NULL,
@@ -708,12 +406,12 @@
     plt
 }
 
-##' @param position Position adjustment, either as a string, or the result of a
-##'   call to a position adjustment function.
-##'
-##' @importFrom ggplot2 ggplot geom_pointrange geom_rug geom_ribbon geom_line aes_string expand_limits
-##' @export
-##' @rdname draw.evaluated_smooth
+#' @param position Position adjustment, either as a string, or the result of a
+#'   call to a position adjustment function.
+#'
+#' @importFrom ggplot2 ggplot geom_pointrange geom_rug geom_ribbon geom_line aes_string expand_limits
+#' @export
+#' @rdname draw.evaluated_smooth
 `draw.evaluated_parametric_term` <- function(object,
                                              ci_level = 0.95,
                                              constant = NULL,
@@ -773,27 +471,27 @@
     plt
 }
 
-##' Plot derivatives of smooths
-##'
-##' @param alpha numeric; alpha transparency for confidence or simultaneous
-##'   interval.
-##' @inheritParams draw.gam
-##'
-##' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_line labs
-##' @importFrom patchwork wrap_plots
-##' @export
-##'
-##' @examples
-##'
-##' load_mgcv()
-##' dat <- data_sim("eg1", n = 800, dist = "normal", scale = 2, seed = 42)
-##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-##'
-##' ## first derivative of all smooths
-##' df <- derivatives(mod, type = "central")
-##' draw(df)
-##' ## fixed axis scales
-##' draw(df, scales = "fixed")
+#' Plot derivatives of smooths
+#'
+#' @param alpha numeric; alpha transparency for confidence or simultaneous
+#'   interval.
+#' @inheritParams draw.gam
+#'
+#' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_line labs
+#' @importFrom patchwork wrap_plots
+#' @export
+#'
+#' @examples
+#'
+#' load_mgcv()
+#' dat <- data_sim("eg1", n = 800, dist = "normal", scale = 2, seed = 42)
+#' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+#'
+#' ## first derivative of all smooths
+#' df <- derivatives(mod, type = "central")
+#' draw(df)
+#' ## fixed axis scales
+#' draw(df, scales = "fixed")
 `draw.derivatives` <- function(object,
                                select = NULL,
                                scales = c("free", "fixed"), alpha = 0.2,
@@ -838,48 +536,48 @@
                ...)
 }
 
-##' Plot basis functions
-##'
-##' Plots basis functions using ggplot2
-##' 
-##' @param object an object, the result of a call to [basis()].
-##' @param legend logical; should a legend by drawn to indicate basis functions?
-##' @param use_facets logical; for factor by smooths, use facets to show the
-##'   basis functions for each level of the factor? If `FALSE`, a separate ggplot
-##'   object will be created for each level and combined using
-##'   [patchwork::wrap_plots()]. **Currently ignored**.
-##' @param labeller a labeller function with which to label facets. The default
-##'   is to use [ggplot2::label_both()].
-##' @param xlab character or expression; the label for the x axis. If not
-##'   supplied, a suitable label will be generated from `object`.
-##' @param ylab character or expression; the label for the y axis. If not
-##'   supplied, a suitable label will be generated from `object`.
-##' @param title character or expression; the title for the plot. See
-##'   [ggplot2::labs()].
-##' @param subtitle character or expression; the subtitle for the plot. See
-##'   [ggplot2::labs()].
-##' @param caption character or expression; the plot caption. See
-##'   [ggplot2::labs()].
-##' @param ... arguments passed to other methods. Not used by this method.
-##'
-##' @return A [ggplot2::ggplot()] object.
-##'
-##' @author Gavin L. Simpson
-##'
-##' @importFrom ggplot2 ggplot aes_ labs geom_line guides facet_wrap label_both
-##' 
-##' @export
-##'
-##' @examples
-##' load_mgcv()
-##' \dontshow{set.seed(42)}
-##' df <- gamSim(4, n = 400, verbose = FALSE)
-##'
-##' bf <- basis(s(x0), data = df)
-##' draw(bf)
-##'
-##' bf <- basis(s(x2, by = fac, bs = 'bs'), data = df)
-##' draw(bf)
+#' Plot basis functions
+#'
+#' Plots basis functions using ggplot2
+#' 
+#' @param object an object, the result of a call to [basis()].
+#' @param legend logical; should a legend by drawn to indicate basis functions?
+#' @param use_facets logical; for factor by smooths, use facets to show the
+#'   basis functions for each level of the factor? If `FALSE`, a separate ggplot
+#'   object will be created for each level and combined using
+#'   [patchwork::wrap_plots()]. **Currently ignored**.
+#' @param labeller a labeller function with which to label facets. The default
+#'   is to use [ggplot2::label_both()].
+#' @param xlab character or expression; the label for the x axis. If not
+#'   supplied, a suitable label will be generated from `object`.
+#' @param ylab character or expression; the label for the y axis. If not
+#'   supplied, a suitable label will be generated from `object`.
+#' @param title character or expression; the title for the plot. See
+#'   [ggplot2::labs()].
+#' @param subtitle character or expression; the subtitle for the plot. See
+#'   [ggplot2::labs()].
+#' @param caption character or expression; the plot caption. See
+#'   [ggplot2::labs()].
+#' @param ... arguments passed to other methods. Not used by this method.
+#'
+#' @return A [ggplot2::ggplot()] object.
+#'
+#' @author Gavin L. Simpson
+#'
+#' @importFrom ggplot2 ggplot aes_ labs geom_line guides facet_wrap label_both
+#' 
+#' @export
+#'
+#' @examples
+#' load_mgcv()
+#' \dontshow{set.seed(42)}
+#' df <- gamSim(4, n = 400, verbose = FALSE)
+#'
+#' bf <- basis(s(x0), data = df)
+#' draw(bf)
+#'
+#' bf <- basis(s(x2, by = fac, bs = 'bs'), data = df)
+#' draw(bf)
 `draw.mgcv_smooth` <- function(object,
                                legend = FALSE,
                                use_facets = TRUE,
@@ -933,54 +631,54 @@
     plt
 }
 
-##' Plot posterior smooths
-##' 
-##' @param alpha numeric; alpha transparency for confidence or simultaneous
-##'   interval.
-##' @param colour The colour to use to draw the posterior smooths. Passed to
-##'   [ggplot2::geom_line()] as argument `colour`.
-##' @param xlab character or expression; the label for the x axis. If not
-##'   supplied, a suitable label will be generated from `object`.
-##' @param ylab character or expression; the label for the y axis. If not
-##'   supplied, a suitable label will be generated from `object`.
-##' @param title character or expression; the title for the plot. See
-##'   [ggplot2::labs()].
-##' @param subtitle character or expression; the subtitle for the plot. See
-##'   [ggplot2::labs()].
-##' @param caption character or expression; the plot caption. See
-##'   [ggplot2::labs()].
-##' @param ... arguments to be passed to [patchwork::wrap_plots()].
-##'
-##' @export
-##'
-##' @inheritParams draw.gam
-##'
-##' @author Gavin L. Simpson
-##' 
-##' @importFrom dplyr filter
-##' @importFrom purrr map
-##' @importFrom rlang .data
-##' @importFrom patchwork wrap_plots
-##'
-##' @examples
-##' load_mgcv()
-##' \dontshow{set.seed(1)}
-##' dat1 <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
-##' ## a single smooth GAM
-##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "REML")
-##' ## posterior smooths from m1
-##' sm1 <- smooth_samples(m1, n = 15, seed = 23478)
-##' ## plot
-##' draw(sm1, alpha = 0.7)
-##' 
-##' \dontshow{set.seed(1)}
-##' dat2 <- gamSim(4, verbose = FALSE)
-##' ## a multi-smooth GAM with a factor-by smooth
-##' m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat2, method = "REML")
-##' ## posterior smooths from m1
-##' sm2 <- smooth_samples(m2, n = 15, seed = 23478)
-##' ## plot, this time selecting only the factor-by smooth
-##' draw(sm2, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
+#' Plot posterior smooths
+#' 
+#' @param alpha numeric; alpha transparency for confidence or simultaneous
+#'   interval.
+#' @param colour The colour to use to draw the posterior smooths. Passed to
+#'   [ggplot2::geom_line()] as argument `colour`.
+#' @param xlab character or expression; the label for the x axis. If not
+#'   supplied, a suitable label will be generated from `object`.
+#' @param ylab character or expression; the label for the y axis. If not
+#'   supplied, a suitable label will be generated from `object`.
+#' @param title character or expression; the title for the plot. See
+#'   [ggplot2::labs()].
+#' @param subtitle character or expression; the subtitle for the plot. See
+#'   [ggplot2::labs()].
+#' @param caption character or expression; the plot caption. See
+#'   [ggplot2::labs()].
+#' @param ... arguments to be passed to [patchwork::wrap_plots()].
+#'
+#' @export
+#'
+#' @inheritParams draw.gam
+#'
+#' @author Gavin L. Simpson
+#' 
+#' @importFrom dplyr filter
+#' @importFrom purrr map
+#' @importFrom rlang .data
+#' @importFrom patchwork wrap_plots
+#'
+#' @examples
+#' load_mgcv()
+#' \dontshow{set.seed(1)}
+#' dat1 <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+#' ## a single smooth GAM
+#' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "REML")
+#' ## posterior smooths from m1
+#' sm1 <- smooth_samples(m1, n = 15, seed = 23478)
+#' ## plot
+#' draw(sm1, alpha = 0.7)
+#' 
+#' \dontshow{set.seed(1)}
+#' dat2 <- gamSim(4, verbose = FALSE)
+#' ## a multi-smooth GAM with a factor-by smooth
+#' m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat2, method = "REML")
+#' ## posterior smooths from m1
+#' sm2 <- smooth_samples(m2, n = 15, seed = 23478)
+#' ## plot, this time selecting only the factor-by smooth
+#' draw(sm2, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
 `draw.smooth_samples` <- function(object,
                                   select = NULL,
                                   xlab = NULL, ylab = NULL, title = NULL,
@@ -991,7 +689,6 @@
                                   partial_match = FALSE,
                                   ncol = NULL, nrow = NULL,
                                   guides = "keep", ...) {
-    
     scales <- match.arg(scales)
 
     ## select smooths
@@ -1003,7 +700,7 @@
 
     ## can only plot 1d smooths - currently - prune S but how?
     ## FIXME
-    
+
     do_plot_smooths <- function(i, tbl, ...) {
         tbl <- filter(tbl, .data$term == i)
         plot_posterior_smooths(tbl, ...)
@@ -1037,10 +734,10 @@
                                      rug = TRUE, alpha = 1, colour = "black", ...) {
     data_names <- attr(tbl, "data_names")
     smooth_var <- data_names[[unique(tbl[["term"]])]]
-    
+
     plt <- ggplot(tbl, aes_(x = ~ .x1, y = ~ value, group = ~ draw)) +
         geom_line(alpha = alpha, colour = colour)
-    
+
     ## default axis labels if none supplied
     if (is.null(xlab)) {
         xlab <- smooth_var
@@ -1059,52 +756,52 @@
             subtitle <- paste0("By: ", by_var, "; ", unique(tbl[[by_var]]))
         }
     }
-    
+
     ## add labelling to plot
     plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
                       caption = caption)
-    
+
     ## add rug?
     if (!is.null(rug)) {
         plt <- plt + geom_rug(mapping = aes_string(x = '.x1'),
                               inherit.aes = FALSE, sides = 'b', alpha = 0.5)
     }
-    
+
     plt
 }
 
-##' Plot differences of smooths
-##'
-##' @param rug logical;
-##' @param ref_line logical;
-##' @param contour logical;
-##' @param ci_alpha numeric; alpha transparency for confidence or simultaneous
-##'   interval.
-##' @param ci_colour colour specification for the confidence/credible intervals
-##'   band.
-##' @param line_col colour specicification for drawing lines
-##' @param ncol,nrow numeric; the numbers of rows and columns over which to
-##'   spread the plots
-##' @param xlab,ylab,title,subtitle,caption character; labels with which to
-##'   annotate plots
-##' @param guides character; one of `"keep"` (the default), `"collect"`, or
-##'   `"auto"`. Passed to [patchwork::plot_layout()]
-##' @inheritParams draw.gam
-##'
-##' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_line labs lims
-##' @importFrom patchwork wrap_plots
-##' @importFrom purrr map
-##' @export
-##'
-##' @examples
-##'
-##' load_mgcv()
-##' \dontshow{set.seed(42)}
-##' df <- data_sim("eg4", seed = 42)
-##' m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
-##'
-##' diffs <- difference_smooths(m, smooth = "s(x2)")
-##' draw(diffs)
+#' Plot differences of smooths
+#'
+#' @param rug logical;
+#' @param ref_line logical;
+#' @param contour logical;
+#' @param ci_alpha numeric; alpha transparency for confidence or simultaneous
+#'   interval.
+#' @param ci_colour colour specification for the confidence/credible intervals
+#'   band.
+#' @param line_col colour specicification for drawing lines
+#' @param ncol,nrow numeric; the numbers of rows and columns over which to
+#'   spread the plots
+#' @param xlab,ylab,title,subtitle,caption character; labels with which to
+#'   annotate plots
+#' @param guides character; one of `"keep"` (the default), `"collect"`, or
+#'   `"auto"`. Passed to [patchwork::plot_layout()]
+#' @inheritParams draw.gam
+#'
+#' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_line labs lims
+#' @importFrom patchwork wrap_plots
+#' @importFrom purrr map
+#' @export
+#'
+#' @examples
+#'
+#' load_mgcv()
+#' \dontshow{set.seed(42)}
+#' df <- data_sim("eg4", seed = 42)
+#' m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+#'
+#' diffs <- difference_smooths(m, smooth = "s(x2)")
+#' draw(diffs)
 `draw.difference_smooth` <- function(object,
                                      select = NULL,
                                      rug = FALSE,
@@ -1206,7 +903,7 @@
     plt #return
 }
 
-##' @importFrom ggplot2 ggplot aes_string geom_ribbon geom_line labs geom_hline geom_rug
+#' @importFrom ggplot2 ggplot aes_string geom_ribbon geom_line labs geom_hline geom_rug
 `draw_1d_difference` <- function(object, xvars,
                                  rug = FALSE,
                                  ref_line = FALSE,
@@ -1244,8 +941,8 @@
     plt
 }
 
-##' @importFrom ggplot2 ggplot guides aes_ geom_raster geom_contour labs scale_fill_distiller guide_colourbar
-##' @importFrom grid unit
+#' @importFrom ggplot2 ggplot guides aes_ geom_raster geom_contour labs scale_fill_distiller guide_colourbar
+#' @importFrom grid unit
 `draw_2d_difference` <- function(object, xvars,
                                  contour = FALSE,
                                  contour_col = "black", ## "#3366FF",
@@ -1314,44 +1011,44 @@
     return(NULL)
 }
 
-##' Display penalty matrices of smooths using `ggplot`
-##'
-##' Displays the penalty matrices of smooths as a heatmap using `ggplot`
-##'
-##' @param normalize logical; normalize the penalty to the range -1, 1?
-##' @param ncol,nrow numeric; the numbers of rows and columns over which to
-##'   spread the plots.
-##' @param xlab character or expression; the label for the x axis. If not
-##'   supplied, no axis label will be drawn. May be a vector, one per penalty.
-##' @param ylab character or expression; the label for the y axis.  If not
-##'   supplied, no axis label will be drawn. May be a vector, one per penalty.
-##' @param title character or expression; the title for the plot. See
-##'   [ggplot2::labs()]. May be a vector, one per penalty.
-##' @param subtitle character or expression; the subtitle for the plot. See
-##'   [ggplot2::labs()]. May be a vector, one per penalty.
-##' @param caption character or expression; the plot caption. See
-##'   [ggplot2::labs()]. May be a vector, one per penalty.
-##' @param guides character; one of `"keep"` (the default), `"collect"`, or
-##'   `"auto"`. Passed to [patchwork::plot_layout()]
-##' 
-##' @inheritParams draw.evaluated_2d_smooth
-##'
-##' @importFrom ggplot2 scale_fill_gradient2
-##' @importFrom patchwork wrap_plots
-##'
-##' @export
-##'
-##' @examples
-##' load_mgcv()
-##' dat <- data_sim("eg4", n = 400, seed = 42)
-##' m <- gam(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'bs', by = fac),
-##'          data = dat, method = "REML")
-##'
-##' ## produce a multi-panel plot of all penalties
-##' draw(penalty(m))
-##'
-##' # for a specific smooth
-##' draw(penalty(m, smooth = "s(x2):fac1"))
+#' Display penalty matrices of smooths using `ggplot`
+#'
+#' Displays the penalty matrices of smooths as a heatmap using `ggplot`
+#'
+#' @param normalize logical; normalize the penalty to the range -1, 1?
+#' @param ncol,nrow numeric; the numbers of rows and columns over which to
+#'   spread the plots.
+#' @param xlab character or expression; the label for the x axis. If not
+#'   supplied, no axis label will be drawn. May be a vector, one per penalty.
+#' @param ylab character or expression; the label for the y axis.  If not
+#'   supplied, no axis label will be drawn. May be a vector, one per penalty.
+#' @param title character or expression; the title for the plot. See
+#'   [ggplot2::labs()]. May be a vector, one per penalty.
+#' @param subtitle character or expression; the subtitle for the plot. See
+#'   [ggplot2::labs()]. May be a vector, one per penalty.
+#' @param caption character or expression; the plot caption. See
+#'   [ggplot2::labs()]. May be a vector, one per penalty.
+#' @param guides character; one of `"keep"` (the default), `"collect"`, or
+#'   `"auto"`. Passed to [patchwork::plot_layout()]
+#' 
+#' @inheritParams draw.evaluated_2d_smooth
+#'
+#' @importFrom ggplot2 scale_fill_gradient2
+#' @importFrom patchwork wrap_plots
+#'
+#' @export
+#'
+#' @examples
+#' load_mgcv()
+#' dat <- data_sim("eg4", n = 400, seed = 42)
+#' m <- gam(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'bs', by = fac),
+#'          data = dat, method = "REML")
+#'
+#' ## produce a multi-panel plot of all penalties
+#' draw(penalty(m))
+#'
+#' # for a specific smooth
+#' draw(penalty(m, smooth = "s(x2):fac1"))
 `draw.penalty_df` <- function(object,
                               normalize = FALSE,
                               continuous_fill = NULL,
@@ -1383,7 +1080,7 @@
                                       subtitle = rep(subtitle, n_plots),
                                       caption = rep(caption, n_plots))
     }
-    
+
     ## return
     if (is.null(ncol) && is.null(nrow)) {
         ncol <- ceiling(sqrt(n_plots))
@@ -1393,9 +1090,9 @@
                ...)
 }
 
-##' @importFrom ggplot2 ggplot geom_raster
-##' @importFrom dplyr mutate
-##' @importFrom rlang .data
+#' @importFrom ggplot2 ggplot geom_raster
+#' @importFrom dplyr mutate
+#' @importFrom rlang .data
 `plot_penalty` <- function(object,
                            normalize = FALSE,
                            continuous_fill = NULL,
