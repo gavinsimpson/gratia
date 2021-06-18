@@ -73,9 +73,10 @@ test_that("draw.gam works with logical select", {
 test_that("draw.gam works with partial_match", {
     plt <- draw(m3, select = 'x2', partial_match = TRUE)
     expect_doppelganger("draw gam with partial match TRUE", plt)
-    expect_message(draw(m3, select = 's(x2)', partial_match = FALSE),
-                   "Unable to draw any of the model terms.",
-                   fixed = TRUE)
+    expect_error(draw(m3, select = 's(x2)', partial_match = FALSE),
+                 "Failed to match any smooths in model `m3`.\n",
+                 "Try with 'partial_match = TRUE'?",
+                 fixed = TRUE)
 })
 
 test_that("draw.gam works with select and parametric", {
