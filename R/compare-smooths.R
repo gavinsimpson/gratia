@@ -99,7 +99,7 @@
                                    guides = "collect",
                                    ...) {
     l <- group_split(object, .data$smooth)
-    
+
     plts <- map(l, plot_comparison_of_smooths)
 
     ## return
