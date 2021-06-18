@@ -131,7 +131,12 @@ vector selecting the requested smooths." />
 vector selecting the requested smooths.</p>
     </div>
 
-    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>check_user_select_smooths</span><span class='op'>(</span><span class='va'>smooths</span>, select <span class='op'>=</span> <span class='cn'>NULL</span>, partial_match <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></code></pre></div>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>check_user_select_smooths</span><span class='op'>(</span>
+  <span class='va'>smooths</span>,
+  select <span class='op'>=</span> <span class='cn'>NULL</span>,
+  partial_match <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  model_name <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -149,6 +154,11 @@ vector selecting the requested smooths.</p>
       <td><p>logical; in the case of character <code>select</code>, should
 <code>select</code> match partially against <code>smooths</code>? If <code>partial_match = TRUE</code>,
 <code>select</code> must only be a single string, a character vector of length 1.</p></td>
+    </tr>
+    <tr>
+      <th>model_name</th>
+      <td><p>character; a model name that will be used in error
+messages.</p></td>
     </tr>
     </table>
 
