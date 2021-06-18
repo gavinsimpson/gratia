@@ -1,5 +1,17 @@
 # gratia 0.6.9113
 
+## Major changes
+
+* `draw.gam()` now uses `smooth_estimates()` internally and consequently uses
+  its `draw()` method and underlying plotting code. This has simplified the code
+  compared to `evaluate_smooth()` and its methods, which will allow for future
+  development and addition of features more easily than if `evaluate_Smooth()`
+  had been retained.
+
+  While a lot of code has been reused so differences between plots as a result
+  of this change should be minimal, some corner cases may have been missed. File
+  and Issue if you notice something that has changed that you think shouldn't.
+
 ## New features
 
 * `rootogram()` and its `draw()` method produce rootograms as diagnostic plots
@@ -11,6 +23,22 @@
 
 * `edf()` extracts the effective degrees of freedom (EDF) of a fitted model or a
   specific smooth in the model. Various forms for the EDF can be extracted.
+
+* `draw.gam()` can now show a "rug" plot on a bivariate smooth by drawing small
+  points with high transparency over the smooth surface at the data coordinates.
+
+  In addition, the rugs on plots of factor by smooths now show the locations of
+  covariate values for the specific level of the factor and not over all levels.
+  This better reflects what data were used to estimate the smooth, even though
+  the basis for each smooth was set up using all of the covariate locations.
+
+* Partial residuals can now be plotted on factor by smooths. To allow this, the
+  partial residuals are filtered so that only residuals associated with a
+  particular level's smooth are drawn on the plot of the smooth.
+
+* `smooth_estimates()` uses `check_user_select_smooths()` to handle
+  user-specified selection of smooth terms. As such it is more flexible than
+  previously, and allows for easier selection of smooths to evaluate.
 
 ## Bug fixes
 
