@@ -19,39 +19,39 @@
     object[["term"]]
 }
 
-##' Dimension of a smooth
-##'
-##' Extracts the dimension of an estimated smooth.
-##'
-##' This is a generic function with methods for objects of class
-##'   `"gam"`, `"gamm"`, and `"mgcv.smooth"`.
+#' Dimension of a smooth
+#'
+#' Extracts the dimension of an estimated smooth.
+#'
+#' This is a generic function with methods for objects of class
+#'   `"gam"`, `"gamm"`, and `"mgcv.smooth"`.
 ##
-##' @param object an R object. See Details for list of supported objects.
-##'
-##' @return A numeric vector of dimensions for each smooth.
-##'
-##' @author Gavin L. Simpson
-##'
-##' @rdname smooth_dim
-##' @export
+#' @param object an R object. See Details for list of supported objects.
+#'
+#' @return A numeric vector of dimensions for each smooth.
+#'
+#' @author Gavin L. Simpson
+#'
+#' @rdname smooth_dim
+#' @export
 `smooth_dim` <- function(object) {
     UseMethod("smooth_dim")
 }
 
-##' @rdname smooth_dim
-##' @export
+#' @rdname smooth_dim
+#' @export
 `smooth_dim.gam` <- function(object) {
     vapply(object[["smooth"]], FUN = `[[`, FUN.VALUE = integer(1), "dim")
 }
 
-##' @rdname smooth_dim
-##' @export
+#' @rdname smooth_dim
+#' @export
 `smooth_dim.gamm` <- function(object) {
     smooth_dim(object[["gam"]])
 }
 
-##' @rdname smooth_dim
-##' @export
+#' @rdname smooth_dim
+#' @export
 `smooth_dim.mgcv.smooth` <- function(object) {
     object[["dim"]]
 }
@@ -86,12 +86,12 @@
     SMOOTHS[want]
 }
 
-##' Names of smooths in a GAM
-##'
-##' @param object a fitted GAM or related model. Typically the result of a call
-##'   to [mgcv::gam()], [mgcv::bam()], or [mgcv::gamm()].
-##'
-##' @export
+#' Names of smooths in a GAM
+#'
+#' @param object a fitted GAM or related model. Typically the result of a call
+#'   to [mgcv::gam()], [mgcv::bam()], or [mgcv::gamm()].
+#'
+#' @export
 `smooths` <- function(object) {
     vapply(object[["smooth"]], FUN  = `[[`, FUN.VALUE = character(1), "label")
 }
@@ -111,18 +111,18 @@
     smooth[["label"]]
 }
 
-##' @title Check if objects are smooths or are a particular type of smooth
-##'
-##' @param smooth an R object, typically a list
-##'
-##' @export
-##' @rdname is_mgcv_smooth
+#' @title Check if objects are smooths or are a particular type of smooth
+#'
+#' @param smooth an R object, typically a list
+#'
+#' @export
+#' @rdname is_mgcv_smooth
 `is_mgcv_smooth` <- function(smooth) {
     inherits(smooth, "mgcv.smooth")
 }
 
-##' @export
-##' @rdname is_mgcv_smooth
+#' @export
+#' @rdname is_mgcv_smooth
 `is_mrf_smooth` <- function(smooth) {
   inherits(smooth, what= "mrf.smooth")
 }
@@ -143,15 +143,15 @@
     inherits(object, "gam")
 }
 
-##' @title Extract an mgcv smooth by name
-##'
-##' @param object a fitted GAM model object.
-##' @param term character; the name of a smooth term to extract
-##'
-##' @return A single smooth object, or a list of smooths if several match the
-##'   named term.
-##'
-##' @export
+#' @title Extract an mgcv smooth by name
+#'
+#' @param object a fitted GAM model object.
+#' @param term character; the name of a smooth term to extract
+#'
+#' @return A single smooth object, or a list of smooths if several match the
+#'   named term.
+#'
+#' @export
 `get_smooth` <- function(object, term) {
     if (is.gamm(object)) {
         object <- object[["gam"]]
@@ -163,12 +163,12 @@
     smooth
 }
 
-##' @title Extract an mgcv smooth given its position in the model object
-##'
-##' @param object a fitted GAM model object.
-##' @param id numeric; the position of the smooth in the model object.
-##'
-##' @export
+#' @title Extract an mgcv smooth given its position in the model object
+#'
+#' @param object a fitted GAM model object.
+#' @param id numeric; the position of the smooth in the model object.
+#'
+#' @export
 `get_smooths_by_id` <- function(object, id) {
     if (is.gamm(object)) {
         object <- object[["gam"]]
@@ -176,17 +176,17 @@
     object[["smooth"]][id]
 }
 
-##' @title Extract an factor-by smooth by name
-##'
-##' @param object a fitted GAM model object.
-##' @param term character; the name of a smooth term to extract.
-##' @param level character; which level of the factor to exrtact the smooth
-##'   for.
-##'
-##' @return A single smooth object, or a list of smooths if several match the
-##'   named term.
-##'
-##' @export
+#' @title Extract an factor-by smooth by name
+#'
+#' @param object a fitted GAM model object.
+#' @param term character; the name of a smooth term to extract.
+#' @param level character; which level of the factor to exrtact the smooth
+#'   for.
+#'
+#' @return A single smooth object, or a list of smooths if several match the
+#'   named term.
+#'
+#' @export
 `get_by_smooth` <- function(object, term, level) {
     if (is.gamm(object)) {
         object <- object[["gam"]]
@@ -224,27 +224,27 @@
     S
 }
 
-##' @title Identify a smooth term by its label
-##'
-##' @param object a fitted GAM.
-##' @param terms character; one or more (partial) term labels with which to identify
-##'   required smooths.
-##' @param ... arguments passed to other methods.
-##'
-##' @export
+#' @title Identify a smooth term by its label
+#'
+#' @param object a fitted GAM.
+#' @param terms character; one or more (partial) term labels with which to identify
+#'   required smooths.
+#' @param ... arguments passed to other methods.
+#'
+#' @export
 `which_smooths` <- function(object, ...) {
     UseMethod("which_smooths")
 }
 
-##' @export
-##' @rdname which_smooths
+#' @export
+#' @rdname which_smooths
 `which_smooths.default` <- function(object, ...) {
     stop("Don't know how to identify smooths for <", class(object)[[1L]], ">",
          call. = FALSE)           # don't show the call, simpler error
 }
 
-##' @export
-##' @rdname which_smooths
+#' @export
+#' @rdname which_smooths
 `which_smooths.gam` <- function(object, terms, ...) {
     ids <- unique(unlist(lapply(terms, function(x, object) { which_smooth(object, x) },
                                 object = object)))
@@ -255,8 +255,8 @@
     ids
 }
 
-##' @export
-##' @rdname which_smooths
+#' @export
+#' @rdname which_smooths
 `which_smooths.bam` <- function(object, terms, ...) {
     ids <- unique(unlist(lapply(terms, function(x, object) { which_smooth(object, x) },
                                 object = object)))
@@ -267,8 +267,8 @@
     ids
 }
 
-##' @export
-##' @rdname which_smooths
+#' @export
+#' @rdname which_smooths
 `which_smooths.gamm` <- function(object, terms, ...) {
     ids <- unique(unlist(lapply(terms, function(x, object) { which_smooth(object, x) },
                                 object = object[["gam"]])))
@@ -287,17 +287,17 @@
     grep(term, smooths, fixed = TRUE)
 }
 
-##' How many smooths in a fitted model
-##'
-##' @inheritParams smooths
-##'
-##' @export
+#' How many smooths in a fitted model
+#'
+#' @inheritParams smooths
+#'
+#' @export
 `n_smooths` <- function(object) {
     UseMethod("n_smooths")
 }
 
-##' @export
-##' @rdname n_smooths
+#' @export
+#' @rdname n_smooths
 `n_smooths.default` <- function(object) {
     if (!is.null(object[["smooth"]])) {
         return(length(object[["smooth"]]))
@@ -307,20 +307,20 @@
          call. = FALSE)           # don't show the call, simpler error
 }
 
-##' @export
-##' @rdname n_smooths
+#' @export
+#' @rdname n_smooths
 `n_smooths.gam` <- function(object) {
     length(object[["smooth"]])
 }
 
-##' @export
-##' @rdname n_smooths
+#' @export
+#' @rdname n_smooths
 `n_smooths.gamm` <- function(object) {
     length(object[["gam"]][["smooth"]])
 }
 
-##' @export
-##' @rdname n_smooths
+#' @export
+#' @rdname n_smooths
 `n_smooths.bam` <- function(object) {
     length(object[["smooth"]])
 }
@@ -377,33 +377,33 @@
     inherits(smooth, "fs.interaction")
 }
 
-##' Fix the names of a data frame containing an offset variable.
-##'
-##' Identifies which variable, if any, is the model offset, and fixed the name
-##'   such that `offset(foo(var))` is converted to `var`, and possibly sets the
-##'   values of that variable to `offset_val`.
+#' Fix the names of a data frame containing an offset variable.
+#'
+#' Identifies which variable, if any, is the model offset, and fixed the name
+#'   such that `offset(foo(var))` is converted to `var`, and possibly sets the
+#'   values of that variable to `offset_val`.
 ##
-##' @param model a fitted GAM.
-##'
-##' @param newdata data frame; new values at which to predict at.
-##'
-##' @param offset_val numeric, optional; if provided, then the offset variable
-##'   in `newdata` is set to this constant value before returning `newdata`
-##'
-##' @return The original `newdata` is returned with fixed names and possibly
-##'   modified offset variable.
-##'
-##' @author Gavin L. Simpson
-##'
-##' @export
-##'
-##' @examples
-##' load_mgcv()
-##' \dontshow{set.seed(2)}
-##' df <- gamSim(1, n = 400, dist = "normal")
-##' m <- gam(y ~ s(x0) + s(x1) + offset(x2), data = df, method = "REML")
-##' names(model.frame(m))
-##' names(fix_offset(m, model.frame(m), offset_val = 1L))
+#' @param model a fitted GAM.
+#'
+#' @param newdata data frame; new values at which to predict at.
+#'
+#' @param offset_val numeric, optional; if provided, then the offset variable
+#'   in `newdata` is set to this constant value before returning `newdata`
+#'
+#' @return The original `newdata` is returned with fixed names and possibly
+#'   modified offset variable.
+#'
+#' @author Gavin L. Simpson
+#'
+#' @export
+#'
+#' @examples
+#' load_mgcv()
+#' \dontshow{set.seed(2)}
+#' df <- gamSim(1, n = 400, dist = "normal")
+#' m <- gam(y ~ s(x0) + s(x1) + offset(x2), data = df, method = "REML")
+#' names(model.frame(m))
+#' names(fix_offset(m, model.frame(m), offset_val = 1L))
 `fix_offset` <- function(model, newdata, offset_val = NULL) {
     m.terms <- names(newdata)
     p.terms <- attr(terms(model[["pred.formula"]]), "term.labels")
@@ -436,48 +436,48 @@
     newdata                        # return
 }
 
-##' Is a model term an offset?
-##'
-##' Given a character vector of model terms, checks to see which, if any, is the model offset.
-##'
-##' @param terms character vector of model terms.
-##'
-##' @return A logical vector of the same length as `terms`.
-##'
-##' @author Gavin L. Simpson
-##'
-##' @export
-##'
-##' @examples
-##' load_mgcv()
-##' df <- gamSim(1, n = 400, dist = "normal")
-##' m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = df, method = "REML")
-##' nm <- names(model.frame(m))
-##' nm
-##' is_offset(nm)
+#' Is a model term an offset?
+#'
+#' Given a character vector of model terms, checks to see which, if any, is the model offset.
+#'
+#' @param terms character vector of model terms.
+#'
+#' @return A logical vector of the same length as `terms`.
+#'
+#' @author Gavin L. Simpson
+#'
+#' @export
+#'
+#' @examples
+#' load_mgcv()
+#' df <- gamSim(1, n = 400, dist = "normal")
+#' m <- gam(y ~ s(x0) + s(x1) + offset(x0), data = df, method = "REML")
+#' nm <- names(model.frame(m))
+#' nm
+#' is_offset(nm)
 `is_offset` <- function(terms) {
     grepl("offset\\(", terms)
 }
 
-##' Names of any parametric terms in a GAM
-##'
-##' @param model a fitted model.
-##' @param ... arguments passed to other methods.
-##'
-##' @export
+#' Names of any parametric terms in a GAM
+#'
+#' @param model a fitted model.
+#' @param ... arguments passed to other methods.
+#'
+#' @export
 `parametric_terms` <- function(model, ...) {
     UseMethod("parametric_terms")
 }
 
-##' @export
-##' @rdname parametric_terms
+#' @export
+#' @rdname parametric_terms
 `parametric_terms.default` <- function(model, ...) {
     stop("Don't know how to identify parametric terms from <",
          class(model)[[1L]], ">", call. = FALSE)
 }
 
-##' @export
-##' @rdname parametric_terms
+#' @export
+#' @rdname parametric_terms
 `parametric_terms.gam` <- function(model, ...) {
     tt <- model$pterms        # get parametric terms
     if (is.list(tt)) {
@@ -515,40 +515,40 @@
     msg
 }
 
-##' @title Repeat the first level of a factor n times
-##'
-##' @description Function to repeat the first level of a factor n times and
-##'   return this vector as a factor with the original levels intact
-##'
-##' @param f a factor
-##' @param n numeric; the number of times to repeat the first level of `f`
-##'
-##' @return A factor of length `n` with the levels of `f`, but whose elements
-##'   are all the first level of `f`.
+#' @title Repeat the first level of a factor n times
+#'
+#' @description Function to repeat the first level of a factor n times and
+#'   return this vector as a factor with the original levels intact
+#'
+#' @param f a factor
+#' @param n numeric; the number of times to repeat the first level of `f`
+#'
+#' @return A factor of length `n` with the levels of `f`, but whose elements
+#'   are all the first level of `f`.
 `rep_first_factor_value` <- function(f, n) {
     stopifnot(is.factor(f))
     levs <- levels(f)
     factor(rep(levs[1L], length.out = n), levels = levs)
 }
 
-##' @title Create a sequence of evenly-spaced values
-##'
-##' @description For a continuous vector `x`, `seq_min_max()` creates a
-##'   sequence of `n` evenly-spaced values over the range `min(x)` -- 
+#' @title Create a sequence of evenly-spaced values
+#'
+#' @description For a continuous vector `x`, `seq_min_max()` creates a
+#'   sequence of `n` evenly-spaced values over the range `min(x)` -- 
 ##"   `max(x)`. For a factor `x`, the function returns `levels(x)`.
-##'
-##' @param x numeric; vector over which evenly-spaced values are returned
-##' @param n numeric; the number of evenly-spaced values to return
-##'
-##' @return A numeric vector of length `n`.
-##'
-##' @export
-##'
-##' @examples
-##' \dontshow{set.seed(1)}
-##' x <- rnorm(10)
-##' n <- 10L
-##' seq_min_max(x, n = n)
+#'
+#' @param x numeric; vector over which evenly-spaced values are returned
+#' @param n numeric; the number of evenly-spaced values to return
+#'
+#' @return A numeric vector of length `n`.
+#'
+#' @export
+#'
+#' @examples
+#' \dontshow{set.seed(1)}
+#' x <- rnorm(10)
+#' n <- 10L
+#' seq_min_max(x, n = n)
 `seq_min_max` <- function(x, n) {
     if (is.factor(x)) {
         ## must coerce to factor otherwise Predict.matrix will coerce
@@ -560,26 +560,26 @@
     }
 }
 
-##' @title Create a sequence of evenly-spaced values adjusted to accommodate a
-##'   small adjustment
-##'
-##' @description Creates a sequence of `n` evenly-spaced values over the range
-##'   `min(x)` -- `max(x)`, where the minimum and maximum are adjusted such that
-##'   they are always contained within the range of `x` when `x` may be shifted
-##'   forwards or backwards by an amount related to `eps`. This is particularly
-##'   useful in computing derivatives via finite differences where without this
-##'   adjustment we may be predicting for values outside the range of the data
-##'   and hence the conmstraints of the penalty.
-##'
-##' @param x numeric; vector over which evenly-spaced values are returned
-##' @param n numeric; the number of evenly-spaced values to return
-##' @param eps numeric; the finite difference
-##' @param order integer; the order of derivative. Either `1` or `2` for first or
-##'   second order derivatives
-##' @param type character; the type of finite difference used. One of
-##'   `"forward"`, `"backward"`, or `"central"`
-##'
-##' @return A numeric vector of length `n`.
+#' @title Create a sequence of evenly-spaced values adjusted to accommodate a
+#'   small adjustment
+#'
+#' @description Creates a sequence of `n` evenly-spaced values over the range
+#'   `min(x)` -- `max(x)`, where the minimum and maximum are adjusted such that
+#'   they are always contained within the range of `x` when `x` may be shifted
+#'   forwards or backwards by an amount related to `eps`. This is particularly
+#'   useful in computing derivatives via finite differences where without this
+#'   adjustment we may be predicting for values outside the range of the data
+#'   and hence the conmstraints of the penalty.
+#'
+#' @param x numeric; vector over which evenly-spaced values are returned
+#' @param n numeric; the number of evenly-spaced values to return
+#' @param eps numeric; the finite difference
+#' @param order integer; the order of derivative. Either `1` or `2` for first or
+#'   second order derivatives
+#' @param type character; the type of finite difference used. One of
+#'   `"forward"`, `"backward"`, or `"central"`
+#'
+#' @return A numeric vector of length `n`.
 `seq_min_max_eps` <- function(x, n, order,
                               type = c("forward", "backward", "central"), eps) {
     minx <- min(x, na.rm = TRUE)
@@ -609,23 +609,23 @@
     seq(from = minx, to = maxx, length.out = n)
 }
 
-##' Vectorized version of `data.class`
-##'
-##' @param df a data frame or tibble.
-##' @return A named character vector of data classes.
-##'
-##' @seealso The underlying functionality is provided by [data.class()].
-##'
-##' @noRd
+#' Vectorized version of `data.class`
+#'
+#' @param df a data frame or tibble.
+#' @return A named character vector of data classes.
+#'
+#' @seealso The underlying functionality is provided by [data.class()].
+#'
+#' @noRd
 `data_class` <- function(df) {
     vapply(df, data.class, character(1L))
 }
 
-##' Names of any factor variables in model data
-##'
-##' @param df a data frame or tibble
-##'
-##' @noRd
+#' Names of any factor variables in model data
+#'
+#' @param df a data frame or tibble
+#'
+#' @noRd
 `factor_var_names` <- function(df) {
     ind <- is_factor_var(df)
     result <- if (any(ind)) {
@@ -636,31 +636,31 @@
     result
 }
 
-##' Vectorised checks for variable types
-##'
-##' @param df a data frame or tibble
-##'
-##' @noRd
+#' Vectorised checks for variable types
+#'
+#' @param df a data frame or tibble
+#'
+#' @noRd
 `is_factor_var` <- function(df) {
     result <- vapply(df, is.factor, logical(1L))
     result
 }
 
-##' @rdname is_factor_var
-##'
-##' @noRd
+#' @rdname is_factor_var
+#'
+#' @noRd
 `is_numeric_var` <- function(df) {
     result <- vapply(df, is.numeric, logical(1L))
     result
 }
 
-##' Shift numeric values in a data frame by an amount `eps`
-##'
-##' @param df a data frame or tibble.
-##' @param h numeric; the amount to shift values in `df` by.
-##' @param i logical; a vector indexing columns of `df` that should not be
-##'   included in the shift.
-##' @param FUN function; a function to applut the shift. Typically `+` or `-`.
+#' Shift numeric values in a data frame by an amount `eps`
+#'
+#' @param df a data frame or tibble.
+#' @param h numeric; the amount to shift values in `df` by.
+#' @param i logical; a vector indexing columns of `df` that should not be
+#'   included in the shift.
+#' @param FUN function; a function to applut the shift. Typically `+` or `-`.
 `shift_values` <- function(df, h, i, FUN = '+') {
     FUN <- match.fun(FUN)
     result <- df
@@ -672,7 +672,7 @@
     result
 }
 
-##' @importFrom stats qnorm
+#' @importFrom stats qnorm
 `coverage_normal` <- function(level) {
     if (level <= 0 || level >= 1 ) {
          stop("Invalid 'level': must be 0 < level < 1", call. = FALSE)
@@ -680,7 +680,7 @@
      qnorm((1 - level) / 2, lower.tail = FALSE)
 }
 
-##' @importFrom stats qt
+#' @importFrom stats qt
 `coverage_t` <- function(level, df) {
     if (level <= 0 || level >= 1 ) {
          stop("Invalid 'level': must be 0 < level < 1", call. = FALSE)
@@ -688,7 +688,7 @@
      qt((1 - level) / 2, df = df, lower.tail = FALSE)
 }
 
-##' @importFrom mgcv fix.family.rd
+#' @importFrom mgcv fix.family.rd
 `get_family_rd` <- function(object) {
     if (inherits(object, "glm")) {
         fam <- family(object)           # extract family
@@ -704,21 +704,21 @@
     fam[["rd"]]
 }
 
-##' @title Select smooths based on user's choices
-##'
-##' @description Given a vector indexing the smooths of a GAM, returns a logical
-##'   vector selecting the requested smooths.
-##'
-##' @param smooths character; a vector of smooth labels.
-##' @param select numeric, logical, or character vector of selected smooths.
-##' @param partial_match logical; in the case of character `select`, should
-##'   `select` match partially against `smooths`? If `partial_match = TRUE`,
-##'   `select` must only be a single string, a character vector of length 1.
-##'
-##' @return A logical vector the same length as `length(smooths)` indicating
-##'   which smooths have been selected.
-##'
-##' @author Gavin L. Simpson
+#' @title Select smooths based on user's choices
+#'
+#' @description Given a vector indexing the smooths of a GAM, returns a logical
+#'   vector selecting the requested smooths.
+#'
+#' @param smooths character; a vector of smooth labels.
+#' @param select numeric, logical, or character vector of selected smooths.
+#' @param partial_match logical; in the case of character `select`, should
+#'   `select` match partially against `smooths`? If `partial_match = TRUE`,
+#'   `select` must only be a single string, a character vector of length 1.
+#'
+#' @return A logical vector the same length as `length(smooths)` indicating
+#'   which smooths have been selected.
+#'
+#' @author Gavin L. Simpson
 `check_user_select_smooths` <- function(smooths, select = NULL, partial_match = FALSE) {
     lenSmo <- length(smooths)
     select <- if (!is.null(select)) {
@@ -757,18 +757,18 @@
     select
 }
 
-##' Indices of the parametric terms for a particular smooth
-##'
-##' Returns a vector of indices of the parametric terms that represent the
-##' supplied smooth. Useful for extracting model coefficients and columns
-##' of their covariance matrix.
-##' 
-##' @param smooth an object that inherits from class `mgcv.smooth`
-##'
-##' @return A numeric vector of indices.
-##'
-##' @author Gavin L. Simpson
-##' @export
+#' Indices of the parametric terms for a particular smooth
+#'
+#' Returns a vector of indices of the parametric terms that represent the
+#' supplied smooth. Useful for extracting model coefficients and columns
+#' of their covariance matrix.
+#' 
+#' @param smooth an object that inherits from class `mgcv.smooth`
+#'
+#' @return A numeric vector of indices.
+#'
+#' @author Gavin L. Simpson
+#' @export
 `smooth_coefs` <- function(smooth) {
     if(!is_mgcv_smooth(smooth)) {
         stop("Not an mgcv smooth object")
@@ -778,15 +778,15 @@
     seq(from = start, to = end, by = 1L)
 }
 
-##' Load mgcv quietly
-##'
-##' Simple function that loads the *mgcv* package whilst suppressing the startup
-##' messages that it prints to the console.
-##'
-##' @return Returns a logical vectors invisibly, indicating whether the package
-##'   was loaded or not.
-##' 
-##' @export
+#' Load mgcv quietly
+#'
+#' Simple function that loads the *mgcv* package whilst suppressing the startup
+#' messages that it prints to the console.
+#'
+#' @return Returns a logical vectors invisibly, indicating whether the package
+#'   was loaded or not.
+#' 
+#' @export
 `load_mgcv` <- function() {
     res <- suppressWarnings(requireNamespace("mgcv", quietly = TRUE))
     if (!res) {
@@ -820,29 +820,29 @@
     out
 }
 
-##' Is a model term a factor (categorical)?
-##'
-##' Given the name (a term label) of a term in a model, identify if the term is a
-##' factor term or numeric. This is useful when considering interactions, where
-##' terms like `fac1:fac2` or `num1:fac1` may be requested by the user. Only for
-##' terms of the type `fac1:fac2` will this function return `TRUE`.
-##'
-##' @param object an R object on which method dispatch is performed
-##' @param term character; the name of a model term, in the sense of
-##'   `attr(terms(object), "term.labels")`. Currently not checked to see if the
-##'   term exists in the model.
-##' @param ... arguments passed to other methods.
-##'
-##' @return A logical: `TRUE` if and only if all variables involved in the term
-##'   are factors, otherwise `FALSE`.
-##'
-##' @export
+#' Is a model term a factor (categorical)?
+#'
+#' Given the name (a term label) of a term in a model, identify if the term is a
+#' factor term or numeric. This is useful when considering interactions, where
+#' terms like `fac1:fac2` or `num1:fac1` may be requested by the user. Only for
+#' terms of the type `fac1:fac2` will this function return `TRUE`.
+#'
+#' @param object an R object on which method dispatch is performed
+#' @param term character; the name of a model term, in the sense of
+#'   `attr(terms(object), "term.labels")`. Currently not checked to see if the
+#'   term exists in the model.
+#' @param ... arguments passed to other methods.
+#'
+#' @return A logical: `TRUE` if and only if all variables involved in the term
+#'   are factors, otherwise `FALSE`.
+#'
+#' @export
 `is_factor_term` <- function(object, term, ...) {
     UseMethod("is_factor_term", object)
 }
 
-##' @rdname is_factor_term
-##' @export
+#' @rdname is_factor_term
+#' @export
 `is_factor_term.terms` <- function(object, term, ...) {
     if (missing(term)) {
         stop("Argument 'term' must be provided.")
@@ -859,29 +859,29 @@
     out
 }
 
-##' @rdname is_factor_term
-##' @export
+#' @rdname is_factor_term
+#' @export
 `is_factor_term.gam` <- function(object, term, ...) {
     object <- terms(object)
     is_factor_term(object, term, ...)
 }
 
-##' @rdname is_factor_term
-##' @export
+#' @rdname is_factor_term
+#' @export
 `is_factor_term.bam` <- function(object, term, ...) {
     object <- terms(object)
     is_factor_term(object, term, ...)
 }
 
-##' @rdname is_factor_term
-##' @export
+#' @rdname is_factor_term
+#' @export
 `is_factor_term.gamm` <- function(object, term, ...) {
     object <- terms(object$gam)
     is_factor_term(object, term, ...)
 }
 
-##' @rdname is_factor_term
-##' @export
+#' @rdname is_factor_term
+#' @export
 `is_factor_term.list` <- function(object, term, ...) {
     if (!is_gamm4(object)) {
         if (all(vapply(object, inherits, logical(1), "terms"))) {
@@ -896,39 +896,39 @@
     out
 }
 
-##' Names of variables involved in a specified model term
-##'
-##' Given the name (a term label) of a term in a model, returns the names
-##' of the variables involved in the term.
-##'
-##' @param object an R object on which method dispatch is performed
-##' @param term character; the name of a model term, in the sense of
-##'   `attr(terms(object), "term.labels")`. Currently not checked to see if the
-##'   term exists in the model.
-##' @param ... arguments passed to other methods.
-##'
-##' @return A character vector of variable names.
-##'
+#' Names of variables involved in a specified model term
+#'
+#' Given the name (a term label) of a term in a model, returns the names
+#' of the variables involved in the term.
+#'
+#' @param object an R object on which method dispatch is performed
+#' @param term character; the name of a model term, in the sense of
+#'   `attr(terms(object), "term.labels")`. Currently not checked to see if the
+#'   term exists in the model.
+#' @param ... arguments passed to other methods.
+#'
+#' @return A character vector of variable names.
+#'
 `term_variables` <- function(object, term, ...) {
     UseMethod("terms_variables", object)
 }
 
-##' @rdname term_variables
-##' @export
+#' @rdname term_variables
+#' @export
 `term_variables.terms` <- function(object, term, ...) {
     facs <- attr(object, "factors")[ , term]
     names(facs)[as.logical(facs)]
 }
 
-##' @rdname term_variables
-##' @export
+#' @rdname term_variables
+#' @export
 `term_variables.gam` <- function(object, term, ...) {
     object <- terms(object)
     term_variables(object, term, ...)
 }
 
-##' @rdname term_variables
-##' @export
+#' @rdname term_variables
+#' @export
 `term_variables.bam` <- function(object, term, ...) {
     object <- terms(object)
     term_variables(object, term, ...)
@@ -940,45 +940,54 @@
     paste0(smooth, ":", by_var, level)
 }
 
-##' Returns names of variables from a smooth label
-##'
-##' @param label character; a length 1 character vector containing the label of
-##'   a smooth.
-##'
-##' @export
-##' 
-##' @importFrom vctrs vec_c
-##'
-##' @examples
-##'
-##' vars_from_label("s(x1)")
-##' vars_from_label("t2(x1,x2,x3)")
+#' Returns names of variables from a smooth label
+#'
+#' @param label character; a length 1 character vector containing the label of
+#'   a smooth.
+#'
+#' @export
+#'
+#' @importFrom vctrs vec_c
+#'
+#' @examples
+#'
+#' vars_from_label("s(x1)")
+#' vars_from_label("t2(x1,x2,x3)")
 vars_from_label <- function(label) {
     if (length(label) > 1) {
         label <- rep(label, length.out = 1)
         warning("'label' must be a length 1 vector; using 'label[1]' only.")
     }
-    vars <- gsub("^[[:alnum:]]{1,2}\\(([[:graph:]]+)\\)$",
+    # matches 1 or 2 letters or numbers for s, te, t2, etc,
+    # then zero or 1 periods `.` and zero or more numbers for s.1() in LSS mods
+    # then an opening paranethesis \\(
+    # start a group to match 1 or more letter, numbers, punc
+    #  ===> this is the variable or variables
+    # end the group,
+    # then a closing parenthesis \\)
+    # zero or 1 : for the start of the by var info
+    # finally zero or more letters or numbers for the factor level combo
+    vars <- gsub("^[[:alnum:]]{1,2}\\.?[[:digit:]]*\\(([[:graph:]]+)\\):?([[:alnum:]]*)$",
                  "\\1",
                  label)
     vec_c(strsplit(vars, ",")[[1L]])
 }
 
-##' Transform estimated values and confidence intervals by applying a function
-##'
-##' @param object an object to apply the transform function to.
-##' @param fun the function to apply.
-##' @param ... additional arguments passed to methods.
-##'
-##' @return Returns `object` but with the estimate and upper and lower values
-##'   of the confidence interval transformed via the function.
-##'
-##' @author Gavin L. Simpson
+#' Transform estimated values and confidence intervals by applying a function
+#'
+#' @param object an object to apply the transform function to.
+#' @param fun the function to apply.
+#' @param ... additional arguments passed to methods.
+#'
+#' @return Returns `object` but with the estimate and upper and lower values
+#'   of the confidence interval transformed via the function.
+#'
+#' @author Gavin L. Simpson
 `transform_fun` <- function(object, fun = NULL , ...) {
     UseMethod("transform_fun")
 }
 
-##' @rdname transform_fun
+#' @rdname transform_fun
 `transform_fun.evaluated_smooth` <- function(object, fun = NULL, ...) {
     ## If fun supplied, use it to transform est and the upper and lower interval
     if (!is.null(fun)) {
@@ -995,7 +1004,20 @@ vars_from_label <- function(label) {
     object
 }
 
-##' @rdname transform_fun
+#' @rdname transform_fun
+`transform_fun.mgcv_smooth` <- function(object, fun = NULL, ...) {
+    if (!is.null(fun)) {
+        fun <- match.fun(fun)
+        object <- mutate(object,
+                         est = fun(.data$est),
+                         lower_ci = fun(.data$lower_ci),
+                         upper_ci = fun(.data$upper_ci))
+    }
+
+    object
+}
+
+#' @rdname transform_fun
 `transform_fun.evaluated_parametric_term` <- function(object, fun = NULL, ...) {
     ## If fun supplied, use it to transform est and the upper and lower interval
     if (!is.null(fun)) {
@@ -1022,13 +1044,13 @@ vars_from_label <- function(label) {
     abs_x * sign_x
 }
 
-##' Delete response from user-supplied data
-##'
-##' @param model a fitted model from which a `terms` object can be extracted.
-##' @param data a data frame containing variables in the formula of `model`.
-##'
-##' @keywords internal
-##' @noRd
+#' Delete response from user-supplied data
+#'
+#' @param model a fitted model from which a `terms` object can be extracted.
+#' @param data a data frame containing variables in the formula of `model`.
+#'
+#' @keywords internal
+#' @noRd
 `delete_response` <- function(model, data = NULL) {
     if (is.null(data)) {
         stop("`data` must be supplied currently.")
@@ -1039,20 +1061,20 @@ vars_from_label <- function(label) {
     model.frame(tt, data = data)
 }
 
-##' Extract names of all variables needed to fit a GAM or a smooth
-##'
-##' @param object a fitted GAM object or an {mgcv} smooth object
-##' @param ... arguments passed to other methods. Not currently used.
-##'
-##' @return A vector of variable names required for terms in the model
-##'
-##' @export
+#' Extract names of all variables needed to fit a GAM or a smooth
+#'
+#' @param object a fitted GAM object or an {mgcv} smooth object
+#' @param ... arguments passed to other methods. Not currently used.
+#'
+#' @return A vector of variable names required for terms in the model
+#'
+#' @export
 `term_names` <- function(object, ...) {
     UseMethod("term_names")
 }
 
-##' @rdname term_names
-##' @export
+#' @rdname term_names
+#' @export
 `term_names.gam` <- function(object, ...) {
     tt <- object[["pred.formula"]]
     if (is.null(tt)) {
@@ -1063,8 +1085,8 @@ vars_from_label <- function(label) {
     attr(tt, "term.labels")
 }
 
-##' @rdname term_names
-##' @export
+#' @rdname term_names
+#' @export
 `term_names.mgcv.smooth` <- function(object, ...) {
     tt <- object[["term"]]
     if (is.null(tt)) {
@@ -1077,9 +1099,29 @@ vars_from_label <- function(label) {
     tt
 }
 
-##' @rdname term_names
-##' @export
+#' @rdname term_names
+#' @export
 `term_names.gamm` <- function(object, ...) {
     object <- object[["gam"]]
     NextMethod()
+}
+
+#' Identify all terms that are involved in a smooth
+#' @noRd
+#' @keywords internal
+`terms_in_smooth` <- function(smooth) {
+    ## make sure we're using an actual smooth
+    check_is_mgcv_smooth(smooth)
+
+    ## take the term component which has the main terms involved in the smooth
+    sm_terms <- smooth[["term"]]
+
+    ## extract any by variable - could name a factor, a continuous var,
+    ## a matrix. `"NA"` signals missing - yes, really
+    sm_by <- by_variable(smooth)
+    if (sm_by == "NA") { # if `"NA"` set this to NULL
+        sm_by <-  NULL
+    }
+    ## combine the elements. If `sm_by` is `NULL` it isn't included
+    c(sm_terms, sm_by)
 }
