@@ -62,28 +62,15 @@
                                    unnest = TRUE,
                                    partial_match = FALSE,
                                    ...) {
-    ##model_name <- enexpr(object)
+    model_name <- expr_label(substitute(object))
     ## if particular smooths selected
     S <- smooths(object) # vector of smooth labels - "s(x)"
 
     # select smooths
-    select <- check_user_select_smooths(smooths = S, select = smooth,
-                                        partial_match = partial_match)
-    ## did we fail to match?
-    if (sum(select) < length(smooth)) {
-        # must have failed to match at least one of `smooth`
-        if (all(!select)) {
-            stop("Failed to match any smooths in model ",
-                 expr_label(substitute(object)),
-                 call. = FALSE)
-        } else {
-            stop("Some smooths in 'smooth' were not found in model ",
-                 expr_label(substitute(object)),
-                 ":\n\t",
-                 paste(smooth[!smooth %in% S], collapse = ", "),
-                 call. = FALSE)
-        }
-    }
+    select <-
+        check_user_select_smooths(smooths = S, select = smooth,
+                                  partial_match = partial_match,
+                                  model_name = model_name)
     smooth_ids <- which(select)
 
     ## extract the mgcv.smooth objects

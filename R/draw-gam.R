@@ -64,6 +64,7 @@
 #' @importFrom patchwork wrap_plots
 #' @importFrom dplyr mutate rowwise %>% ungroup left_join summarise group_split
 #' @importFrom purrr pluck
+#' @importFrom rlang expr_label
 #' @export
 #'
 #' @examples
@@ -110,6 +111,7 @@
                        ncol = NULL, nrow = NULL,
                        guides = "keep",
                        ...) {
+    model_name <- expr_label(substitute(object))
     # fixed or free?
     scales <- match.arg(scales)
 
@@ -138,8 +140,10 @@
     S <- smooths(object) # vector of smooth labels - "s(x)"
 
     # select smooths
-    select <- check_user_select_smooths(smooths = S, select = select,
-                                        partial_match = partial_match)
+    select <-
+        check_user_select_smooths(smooths = S, select = select,
+                                  partial_match = partial_match,
+                                  model_name = expr_label(substitute(object)))
 
     # evaluate all requested smooths
     sm_eval <- smooth_estimates(object,
