@@ -1,54 +1,54 @@
-##' Effective degrees of freedom for smooth terms
-##'
-##' Extracts the effective degrees of freedom (EDF) for model smooth terms
-##'
-##' @details Multiple formulations for the effective degrees of freedom are
-##'   available. The additional uncertainty due to selection of smoothness
-##'   parameters can be taken into account when computing the EDF of smooths.
-##'   This form of the EDF is available with `type = "unconditional"`.
-##'
-##'   Wood (2017; pp. 252) describes an alternative EDF for the  model
-##'   \deqn{\mathrm{EDF} = 2\mathrm{tr}(\mathbf{F}) -
-##'   \mathrm{tr}(\mathbf{FF}),}{EDF = 2 * tr(F) - tr(F),} where
-##'   \eqn{\mathrm{tr}} is the matrix trace and \eqn{\mathbf{F}}{F} is a matrix
-##'   mapping un-penalized coefficient estimates to the penalized coefficient
-##'   estimates.  The trace of \eqn{\mathbf{F}}{F} is effectively the average
-##'   shrinkage of the coefficients multipled by the number of coefficients
-##'   (Wood, 2017). Smooth-specific EDFs then are obtained by summing up the
-##'   relevent elements of \eqn{\mathrm{diag}(2\mathbf{F} - \mathbf{FF})}.
-##'
-##' @param object a fitted model from which to extract smooth-specific EDFs.
-##' @param ... arguments passed to methods.
-##'
-##' @export
-##'
-##' @examples
-##' load_mgcv()
-##' df <- data_sim("eg1", n = 400, seed = 42)
-##' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
-##'
-##' # extract the EDFs for all smooths
-##' edf(m)
-##'
-##' # or selected smooths
-##' edf(m, smooth = c("s(x0)", "s(x2)"))
-##'
-##' # accounting for smoothness parameter uncertainty
-##' edf(m, type = "unconditional")
+#' Effective degrees of freedom for smooth terms
+#'
+#' Extracts the effective degrees of freedom (EDF) for model smooth terms
+#'
+#' @details Multiple formulations for the effective degrees of freedom are
+#'   available. The additional uncertainty due to selection of smoothness
+#'   parameters can be taken into account when computing the EDF of smooths.
+#'   This form of the EDF is available with `type = "unconditional"`.
+#'
+#'   Wood (2017; pp. 252) describes an alternative EDF for the  model
+#'   \deqn{\mathrm{EDF} = 2\mathrm{tr}(\mathbf{F}) -
+#'   \mathrm{tr}(\mathbf{FF}),}{EDF = 2 * tr(F) - tr(F),} where
+#'   \eqn{\mathrm{tr}} is the matrix trace and \eqn{\mathbf{F}}{F} is a matrix
+#'   mapping un-penalized coefficient estimates to the penalized coefficient
+#'   estimates.  The trace of \eqn{\mathbf{F}}{F} is effectively the average
+#'   shrinkage of the coefficients multipled by the number of coefficients
+#'   (Wood, 2017). Smooth-specific EDFs then are obtained by summing up the
+#'   relevent elements of \eqn{\mathrm{diag}(2\mathbf{F} - \mathbf{FF})}.
+#'
+#' @param object a fitted model from which to extract smooth-specific EDFs.
+#' @param ... arguments passed to methods.
+#'
+#' @export
+#'
+#' @examples
+#' load_mgcv()
+#' df <- data_sim("eg1", n = 400, seed = 42)
+#' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+#'
+#' # extract the EDFs for all smooths
+#' edf(m)
+#'
+#' # or selected smooths
+#' edf(m, smooth = c("s(x0)", "s(x2)"))
+#'
+#' # accounting for smoothness parameter uncertainty
+#' edf(m, type = "unconditional")
 `edf` <- function(object, ...) {
     UseMethod("edf")
 }
 
-##' @param smooth character; a vector of smooth terms whose EDFs will be
-##'   extracted. If `NULL`, the default, EDFs for all smooths will be returned.
-##' @param type character: which type of EDF to return. `"default"` returns the
-##'   standard EDF; `"unconditional"` selects the EDF corrected for smoothness
-##'   parameter selection, if available; `"alternative"` returns the alternative
-##'   formulation for EDF from Wood (2017, pp. 252)
-##'
-##' @export
-##' @importFrom tibble tibble
-##' @rdname edf
+#' @param smooth character; a vector of smooth terms whose EDFs will be
+#'   extracted. If `NULL`, the default, EDFs for all smooths will be returned.
+#' @param type character: which type of EDF to return. `"default"` returns the
+#'   standard EDF; `"unconditional"` selects the EDF corrected for smoothness
+#'   parameter selection, if available; `"alternative"` returns the alternative
+#'   formulation for EDF from Wood (2017, pp. 252)
+#'
+#' @export
+#' @importFrom tibble tibble
+#' @rdname edf
 `edf.gam` <- function(object, smooth = NULL,
                       type = c("default", "unconditional", "alternative"),
                       ...) {
