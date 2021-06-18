@@ -59,7 +59,8 @@ test_that("partial_match selecting works with partial_residuals", {
 })
 
 test_that("selecting throws an error if no match", {
-    err_msg <- "No smooth label matched 'select'. Try with 'partial_match = TRUE'?"
+    err_msg <- "Failed to match any smooths in model `m`.
+Try with 'partial_match = TRUE'?"
     expect_error(partial_residuals(m, select = "foo", partial_match = TRUE),
                  err_msg)
     expect_error(partial_residuals(m, select = "foo", partial_match = FALSE),
