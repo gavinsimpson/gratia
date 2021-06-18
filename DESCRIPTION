@@ -27,7 +27,8 @@ Imports:
     stats,
     tools,
     grDevices,
-    stringr
+    stringr,
+    tidyselect
 Suggests:
     gamm4,
     testthat,
