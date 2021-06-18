@@ -4,7 +4,12 @@
 \alias{check_user_select_smooths}
 \title{Select smooths based on user's choices}
 \usage{
-check_user_select_smooths(smooths, select = NULL, partial_match = FALSE)
+check_user_select_smooths(
+  smooths,
+  select = NULL,
+  partial_match = FALSE,
+  model_name = NULL
+)
 }
 \arguments{
 \item{smooths}{character; a vector of smooth labels.}
@@ -14,6 +19,9 @@ check_user_select_smooths(smooths, select = NULL, partial_match = FALSE)
 \item{partial_match}{logical; in the case of character \code{select}, should
 \code{select} match partially against \code{smooths}? If \code{partial_match = TRUE},
 \code{select} must only be a single string, a character vector of length 1.}
+
+\item{model_name}{character; a model name that will be used in error
+messages.}
 }
 \value{
 A logical vector the same length as \code{length(smooths)} indicating
