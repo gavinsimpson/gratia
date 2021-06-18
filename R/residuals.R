@@ -55,11 +55,13 @@
                                     select = NULL,
                                     partial_match = FALSE,
                                     ...) {
+    model_name <- expr_label(substitute(object))
     ## get a vector of labels for smooths
     sms <- smooths(object)
     ## which were selected; select = NULL -> all selected
     take <- check_user_select_smooths(sms, select = select,
-                                      partial_match = partial_match)
+                                      partial_match = partial_match,
+                                      model_name = model_name)
     if (!any(take)) {
         stop("No smooth label matched 'select'. Try with 'partial_match = TRUE'?",
              call. = FALSE)
