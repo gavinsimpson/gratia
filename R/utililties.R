@@ -714,12 +714,16 @@
 #' @param partial_match logical; in the case of character `select`, should
 #'   `select` match partially against `smooths`? If `partial_match = TRUE`,
 #'   `select` must only be a single string, a character vector of length 1.
+#' @param model_name character; a model name that will be used in error
+#'   messages.
 #'
 #' @return A logical vector the same length as `length(smooths)` indicating
 #'   which smooths have been selected.
 #'
 #' @author Gavin L. Simpson
-`check_user_select_smooths` <- function(smooths, select = NULL, partial_match = FALSE) {
+`check_user_select_smooths` <- function(smooths, select = NULL,
+                                        partial_match = FALSE,
+                                        model_name = NULL) {
     lenSmo <- length(smooths)
     select <- if (!is.null(select)) {
         lenSel <- length(select)
@@ -734,7 +738,7 @@
             l[select] <- TRUE
             l
         } else if (is.character(select)) {
-            if (isTRUE(partial_match)) {
+            take <- if (isTRUE(partial_match)) {
                 if (length(select) != 1L) {
                     stop("When 'partial_match' is 'TRUE', 'select' must be a single string")
                 }
@@ -742,6 +746,24 @@
             } else {
                 smooths %in% select
             }
+            # did we fail to match?
+            if (sum(take) < length(select)) {
+                # must have failed to match at least one of `smooth`
+                if (all(!take)) {
+                    stop("Failed to match any smooths in model",
+                         ifelse(is.null(model_name), "",
+                                paste0(" ", model_name)),
+                        ".\nTry with 'partial_match = TRUE'?",
+                         call. = FALSE)
+                } else {
+                    stop("Some smooths in 'select' were not found in model ",
+                         ifelse(is.null(model_name), "", model_name),
+                         ":\n\t",
+                         paste(select[!select %in% smooths], collapse = ", "),
+                         call. = FALSE)
+                }
+            }
+            take
         } else if (is.logical(select)) {
             if (lenSmo != lenSel) {
                 stop("When 'select' is a logical vector, 'length(select)' must equal\nthe number of smooths in the model.")
