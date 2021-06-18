@@ -60,7 +60,8 @@ test_that("draw.gam works with character select", {
     plt <- draw(m1, select = "s(x1)")
     expect_doppelganger("draw gam smooth for selected smooth character", plt)
     plt <- draw(m1, select = c("s(x0)", "s(x1)"))
-    expect_doppelganger("draw gam smooth for two selected smooths character", plt)
+    expect_doppelganger("draw gam smooth for two selected smooths character",
+                        plt)
 })
 
 test_that("draw.gam works with logical select", {
