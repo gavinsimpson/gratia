@@ -9,9 +9,9 @@ library("ggplot2")
 context("draw-methods")
 
 ## Need a local wrapper to allow conditional use of vdiffr
-`expect_doppelganger` <- function(title, fig, path = NULL, ...) {
+`expect_doppelganger` <- function(title, fig, ...) {
   testthat::skip_if_not_installed("vdiffr")
-  vdiffr::expect_doppelganger(title, fig, path = path, ...)
+  vdiffr::expect_doppelganger(title, fig, ...)
 }
 
 ## Fit models
@@ -75,8 +75,7 @@ test_that("draw.gam works with partial_match", {
     plt <- draw(m3, select = 'x2', partial_match = TRUE)
     expect_doppelganger("draw gam with partial match TRUE", plt)
     expect_error(draw(m3, select = 's(x2)', partial_match = FALSE),
-                 "Failed to match any smooths in model `m3`.\n",
-                 "Try with 'partial_match = TRUE'?",
+                 "Failed to match any smooths in model `m3`.\nTry with 'partial_match = TRUE'?",
                  fixed = TRUE)
 })
 
