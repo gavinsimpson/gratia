@@ -94,10 +94,10 @@ test_that("draw.gam works with select and parametric", {
 
 test_that("draw.evaluated_2d_smooth() plots the smooth", {
     skip_on_os("mac")
-    sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
-    plt <- draw(sm)
+    expect_silent(sm <- evaluate_smooth(m2, "s(x,z)", n = 100))
+    expect_silent(plt <- draw(sm))
     expect_doppelganger("draw 2d smooth", plt)
-    plt <- draw(sm, contour_col = "red")
+    expect_silent(plt <- draw(sm, contour_col = "red"))
     expect_doppelganger("draw 2d smooth diff contour colour", plt)
 })
 
