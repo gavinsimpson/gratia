@@ -155,7 +155,7 @@ test_that("draw.gam() plots an AM with a single factor by-variable smooth", {
     expect_doppelganger("draw AM with factor by-variable smooth", plt)
 
     plt <- draw(m3, scales = "fixed")
-    expect_doppelganger("draw AM with factor by-variable smooth with fixed scales", plt)
+    expect_doppelganger("draw factor by-variable smooth with fixed scales", plt)
 })
 
 ## simulate date from y = f(x2)*x1 + error
@@ -164,12 +164,12 @@ mod <- gam(y ~ s(x2, by = x1), data = dat)
 
 test_that("draw() works with continuous by", {
     plt <- draw(mod)
-    expect_doppelganger("draw AM with continuous by-variable smooth", plt)
+    expect_doppelganger("draw with continuous by-variable smooth", plt)
 })
 
 test_that("draw() works with continuous by and fixed scales", {
     plt <- draw(mod, scales = "fixed")
-    expect_doppelganger("draw AM with continuous by-var fixed scale", plt)
+    expect_doppelganger("draw with continuous by-var fixed scale", plt)
 })
 
 test_that("draw() works with random effect smooths (bs = 're')", {
@@ -194,7 +194,7 @@ test_that("draw() works with random effect smooths (bs = 're')", {
     expect_doppelganger("draw.gam model with ranef smooth", p2)
 
     p3 <- draw(rm1, ncol = 3, scales = "fixed")
-    expect_doppelganger("draw.gam model with ranef smooth fixed scales", p3)
+    expect_doppelganger("draw model with ranef smooth fixed scales", p3)
 })
 
 test_that("draw() with random effect smooths (bs = 're') & factor by variable ", {
@@ -219,7 +219,7 @@ test_that("draw() with random effect smooths (bs = 're') & factor by variable ",
     p2 <- draw(rm2, ncol = 3)
     expect_doppelganger("draw.gam model with ranef smooth factor by", p2)
     p3 <- draw(rm2, ncol = 3, scales = "fixed")
-    expect_doppelganger("draw.gam model with ranef smooth factor by fixed scales", p3)
+    expect_doppelganger("draw with ranef smooth factor by fixed scales", p3)
 })
 
 test_that("draw() can handle non-standard names -- a function call as a name", {
@@ -274,7 +274,7 @@ test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
     expect_doppelganger("draw.gam model with fs smooth", p2)
 
     p3 <- draw(mod_fs, ncol = 2, scales = "fixed")
-    expect_doppelganger("draw.gam model with fs smooth fixed scales", p3)
+    expect_doppelganger("draw model with fs smooth fixed scales", p3)
 })
 
 test_that("draw() works with parametric terms", {
@@ -305,7 +305,7 @@ test_that("draw() works with parametric terms", {
     expect_equal(ncol(e1), 5L)
     expect_named(e1, c("term", "type", "value", "partial", "se"))
     p1 <- draw(e1)
-    expect_doppelganger("draw.evaluated_parametric_term with linear parametric term", p1)
+    expect_doppelganger("draw with linear parametric term", p1)
 
     ## check evaluate_parametric_term works
     p2 <- draw(mod)
@@ -337,7 +337,7 @@ test_that("draw() works with parametric terms", {
 test_that("component-wise CIs work without seWithMean", {
     sm <- evaluate_smooth(m1, "s(x3)", overall_uncertainty = FALSE)
     plt <- draw(sm)
-    expect_doppelganger("draw 1d smooth for selected smooth with overall_uncertainty false", plt)
+    expect_doppelganger("draw selected smooth with overall uncertainty false", plt)
 
     plt <- draw(m1, overall_uncertainty = FALSE)
     expect_doppelganger("draw gam with overall_uncertainty false", plt)
@@ -487,13 +487,13 @@ test_that("draw.penalty_df accepts user-specified continuous_fill", {
     plt <- draw(pen,
                 continuous_fill = scale_fill_distiller(palette = "Spectral",
                                                        type = "div"))
-    expect_doppelganger("draw penalty_df with multiple smooths user continous fill",
+    expect_doppelganger("draw penalty multiple smooths user continous fill",
                         plt)
 
     plt <- draw(penalty(m1, "s(x1)"),
                 continuous_fill = scale_fill_distiller(palette = "Spectral",
                                                        type = "div"))
-    expect_doppelganger("draw penalty_df with single smooths user continous fill",
+    expect_doppelganger("draw penalty single smooths user continous fill",
                         plt)
 })
 
