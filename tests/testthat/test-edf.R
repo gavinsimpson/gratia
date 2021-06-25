@@ -5,8 +5,6 @@ library("testthat")
 library("gratia")
 library("mgcv")
 
-context("Test edf()")
-
 test_that("edf() works as expected", {
     skip_on_cran()
     N <- 500L

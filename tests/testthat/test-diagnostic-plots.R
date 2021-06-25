@@ -6,12 +6,10 @@ library("gratia")
 library("mgcv")
 library("ggplot2")
 
-context("diagnostic-plots")
-
 ## Need a local wrapper to allow conditional use of vdiffr
-`expect_doppelganger` <- function(title, fig, path = NULL, ...) {
+`expect_doppelganger` <- function(title, fig, ...) {
   testthat::skip_if_not_installed("vdiffr")
-  vdiffr::expect_doppelganger(title, fig, path = path, ...)
+  vdiffr::expect_doppelganger(title, fig, ...)
 }
 
 set.seed(2)

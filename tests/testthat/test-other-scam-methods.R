@@ -6,8 +6,6 @@ library("gratia")
 library("mgcv")
 library("scam")
 
-context("Testing other scam methods")
-
 data(smallAges)
 smallAges$Error[1] <- 1.1
 sw <- scam(Date ~ s(Depth, k = 5, bs = "mpd"), data = smallAges,

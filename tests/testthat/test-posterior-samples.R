@@ -5,8 +5,6 @@ library("testthat")
 library("mgcv")
 library("gratia")
 
-context("Testing smooth_samples() methods")
-
 set.seed(12398)
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 m1 <- gam(y ~ s(x0), data = dat, method = "REML")
@@ -75,8 +73,6 @@ test_that("smooth_samples errors with invalid term provided", {
                  "None of the terms matched a smooth.", fixed = TRUE)
 })
 
-context("Testing fitted_samples() methods")
-
 test_that("fitted_samples works for a simple GAM", {
     expect_silent(sm <- fitted_samples(m1, n = 5, seed = 42))
     expect_s3_class(sm, c("fitted_samples", "posterior_samples", "tbl_df",
@@ -117,8 +113,6 @@ test_that("fitted_samples() fails if not suitable method available", {
                  fixed = TRUE)
 })
 
-context("Testing predicted_samples() methods")
-
 test_that("predicted_samples works for a simple GAM", {
     expect_silent(sm <- predicted_samples(m1, n = 5, seed = 42))
     expect_s3_class(sm, c("predicted_samples", "posterior_samples", "tbl_df",
@@ -158,8 +152,6 @@ test_that("predicted_samples() fails if not suitable method available", {
                  "Don't know how to sample from the posterior of <integer>",
                  fixed = TRUE)
 })
-
-context("Testing posterior_samples() methods")
 
 test_that("posterior_samples() fails if not suitable method available", {
     expect_error(posterior_samples(1:10),

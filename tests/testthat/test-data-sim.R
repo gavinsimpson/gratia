@@ -4,8 +4,6 @@
 library("testthat")
 library("gratia")
 
-context("test data_sim()")
-
 data(ref_sims, package = "gratia")
 
 new_sims <- create_reference_simulations()

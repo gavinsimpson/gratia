@@ -5,8 +5,6 @@ library("testthat")
 library("gratia")
 library("mgcv")
 
-context("test-basis")
-
 set.seed(42)
 dat <- gamSim(4, n = 400, verbose = FALSE)
 

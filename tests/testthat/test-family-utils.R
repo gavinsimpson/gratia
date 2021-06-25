@@ -6,8 +6,6 @@ library("gratia")
 library("mgcv")
 library("gamm4")
 
-context("Testing Family Utility Functions")
-
 val <- 1
 
 ## check link and inv_link for models
@@ -1215,7 +1213,7 @@ test_that("multinom_link() fails gracefully", {
 test_that("family.gamm4 works for a gamm4 object", {
     fam <- family(m_gamm4)
     expect_s3_class(fam, class = "family")
-    expect_equal(fam, gaussian())
+    expect_equal(fam, gaussian(), ignore_function_env = TRUE)
 })
 
 test_that("family.gamm4 throws an error when passed a non-gamm4 object", {
@@ -1228,7 +1226,7 @@ test_that("family.gamm4 throws an error when passed a non-gamm4 object", {
 test_that("family.gamm works for a gamm object", {
     fam <- family(m_gamm)
     expect_s3_class(fam, class = "family")
-    expect_equal(fam, gaussian())
+    expect_equal(fam, gaussian(), ignore_function_env = TRUE)
 })
 
 ## test family name

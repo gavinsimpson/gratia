@@ -6,12 +6,10 @@ library("gratia")
 library("mgcv")
 library("ggplot2")
 
-context("test-by-variables")
-
 ## Need a local wrapper to allow conditional use of vdiffr
-`expect_doppelganger` <- function(title, fig, path = NULL, ...) {
+`expect_doppelganger` <- function(title, fig, ...) {
   testthat::skip_if_not_installed("vdiffr")
-  vdiffr::expect_doppelganger(title, fig, path = path, ...)
+  vdiffr::expect_doppelganger(title, fig, ...)
 }
 
 ## simulate date from y = f(x2)*x1 + error
@@ -54,11 +52,11 @@ mfgamm <- gamm(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
 
 test_that("get_by_smooth works", {
     sm <- get_by_smooth(mf, "s(x2)", level = "1")
-    expect_is(sm, "mgcv.smooth")
+    expect_s3_class(sm, "mgcv.smooth")
     expect_equal(sm, mf[["smooth"]][[1L]])
 
     sm <- get_by_smooth(mfgamm, "s(x2)", level = "1")
-    expect_is(sm, "mgcv.smooth")
+    expect_s3_class(sm, "mgcv.smooth")
     expect_equal(sm, mfgamm[["gam"]][["smooth"]][[1L]])
 
     expect_error(get_by_smooth(mf, "s(x4)", level = "1"),

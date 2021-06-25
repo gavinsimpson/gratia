@@ -9,51 +9,51 @@ library("MASS")
 
 test_that("smooth_terms() methods work", {
     st <- smooth_terms(m_gam)
-    expect_is(st, "list")
+    expect_type(st, "list")
     expect_length(st, 4L)
     expect_identical(st, as.list(paste0("x", 0:3)))
 
     st <- smooth_terms(m_gamm)
-    expect_is(st, "list")
+    expect_type(st, "list")
     expect_length(st, 4L)
     expect_identical(st, as.list(paste0("x", 0:3)))
 
     st <- smooth_terms(m_gam[["smooth"]][[1]])
-    expect_is(st, "character")
+    expect_type(st, "character")
     expect_length(st, 1L)
     expect_identical(st, "x0")
 })
 
 test_that("smooth_dim() methods work", {
     d <- smooth_dim(m_gam)
-    expect_is(d, "integer")
+    expect_type(d, "integer")
     expect_length(d, 4L)
     expect_identical(d, rep(1L, 4L))
 
     d <- smooth_dim(m_gamm)
-    expect_is(d, "integer")
+    expect_type(d, "integer")
     expect_length(d, 4L)
     expect_identical(d, rep(1L, 4L))
 
     d <- smooth_dim(m_gam[["smooth"]][[1]])
-    expect_is(d, "integer")
+    expect_type(d, "integer")
     expect_length(d, 1L)
     expect_identical(d, rep(1L, 1L))
 })
 
 test_that("select_terms() works", {
     st <- select_terms(m_gam)
-    expect_is(st, "character")
+    expect_type(st, "character")
     expect_length(st, 4L)
     expect_identical(st, paste0("x", 0:3))
 
     st <- select_terms(m_gam, "x1")
-    expect_is(st, "character")
+    expect_type(st, "character")
     expect_length(st, 1L)
     expect_identical(st, "x1")
 
     st <- select_terms(m_gam, c("x1", "x2"))
-    expect_is(st, "character")
+    expect_type(st, "character")
     expect_length(st, 2L)
     expect_identical(st, c("x1", "x2"))
 
@@ -122,26 +122,26 @@ test_that("is.gam returns FALSE for a none GAMM", {
 
 test_that("get_vcov with frequentist TRUE works", {
     V <- get_vcov(m_gam, frequentist = TRUE)
-    expect_is(V, "matrix")
+    expect_type(V, "double")
     expect_equal(V, m_gam[["Ve"]])
 })
 
 test_that("get_vcov with unconditional = TRUE throws warning if not available", {
     expect_warning(V <- get_vcov(m_gamgcv, unconditional = TRUE),
                    "Covariance corrected for smoothness uncertainty not available.")
-    expect_is(V, "matrix")
+    expect_type(V, "double")
     expect_equal(V, m_gamgcv[["Vp"]])
 })
 
 test_that("get_vcov with unconditional = TRUE returns Vp", {
     V <- get_vcov(m_gam, unconditional = TRUE)
-    expect_is(V, "matrix")
+    expect_type(V, "double")
     expect_equal(V, m_gam[["Vc"]])
 })
 
 test_that("get_vcov with term specified works", {
     V <- get_vcov(m_gam, term = "s(x1)")
-    expect_is(V, "matrix")
+    expect_type(V, "double")
     smooth <- m_gam[["smooth"]][[2L]]
     ind <- smooth$first.para:smooth$last.para
     expect_equal(V, m_gam[["Vp"]][ind, ind, drop = FALSE])
@@ -158,26 +158,26 @@ test_that("get_vcov with term specified works", {
 
 test_that("get_smooth works for a GAM", {
     sm <- get_smooth(m_gam, "s(x1)")
-    expect_is(sm, "mgcv.smooth")
+    expect_s3_class(sm, "mgcv.smooth")
     expect_true(is_mgcv_smooth(sm))
 })
 
 test_that("get_smooth works for a GAMM", {
     sm <- get_smooth(m_gamm, "s(x1)")
-    expect_is(sm, "mgcv.smooth")
+    expect_s3_class(sm, "mgcv.smooth")
     expect_true(is_mgcv_smooth(sm))
 })
 
 test_that("get_smooths_by_id works for a GAM", {
     sm <- get_smooths_by_id(m_gam, 2L)
-    expect_is(sm, "list")
+    expect_type(sm, "list")
     expect_true(is_mgcv_smooth(sm[[1L]]))
     expect_equal(sm[[1L]], get_smooth(m_gam, "s(x1)"))
 })
 
 test_that("get_smooths_by_id works for a GAMM", {
     sm <- get_smooths_by_id(m_gamm, 2L)
-    expect_is(sm, "list")
+    expect_type(sm, "list")
     expect_true(is_mgcv_smooth(sm[[1L]]))
     expect_equal(sm[[1L]], get_smooth(m_gamm, "s(x1)"))
 })

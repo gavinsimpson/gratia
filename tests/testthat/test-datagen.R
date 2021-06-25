@@ -6,8 +6,6 @@ library("gratia")
 library("mgcv")
 library("gamm4")
 
-context("datagen-methods")
-
 ## 1d example
 set.seed(2)
 dat1 <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)

@@ -5,8 +5,6 @@ library("testthat")
 library("gratia")
 library("mgcv")
 
-context("smooth-estimates-methods")
-
 dat <- data_sim("eg1", n = 400, seed = 1)
 m0 <- gam(y ~ s(x0), data = dat, method = "REML")
 m1 <- gam(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'ps') + s(x3, bs = 'bs'),
@@ -70,16 +68,16 @@ m_fs <- gam(y ~ s(x1, fac, bs="fs", k=5), method = "ML", data = dat_fs)
 
 test_that("smooth_estimates works for a GAM", {
     sm <- smooth_estimates(m1, "s(x2)")
-    expect_is(sm, "smooth_estimates")
-    expect_is(sm, "tbl_df")
-    expect_is(sm, "data.frame")
+    expect_s3_class(sm, "smooth_estimates")
+    expect_s3_class(sm, "tbl_df")
+    expect_s3_class(sm, "data.frame")
 })
 
 test_that("smooth_estimates works with more than one term", {
     sm <- smooth_estimates(m1, c("s(x1)", "s(x2)"))
-    expect_is(sm, "smooth_estimates")
-    expect_is(sm, "tbl_df")
-    expect_is(sm, "data.frame")
+    expect_s3_class(sm, "smooth_estimates")
+    expect_s3_class(sm, "tbl_df")
+    expect_s3_class(sm, "data.frame")
 })
 
 test_that("smooth_estimates throws error if smooth not found", {
@@ -90,61 +88,61 @@ test_that("smooth_estimates throws error if smooth not found", {
 
 test_that("smooth_estimates works for a GAMM", {
     sm <- smooth_estimates(m2, "s(x2)")
-    expect_is(sm, "smooth_estimates")
-    expect_is(sm, "tbl_df")
-    expect_is(sm, "data.frame")
+    expect_s3_class(sm, "smooth_estimates")
+    expect_s3_class(sm, "tbl_df")
+    expect_s3_class(sm, "data.frame")
 })
 
 test_that("smooth_estimates works with a bivariate TPRS smooth", {
     expect_silent(sm <- smooth_estimates(m_biv, "s(x,z)", n = 50))
-    expect_is(sm, "smooth_estimates")
-    expect_is(sm, "tbl_df")
-    expect_is(sm, "data.frame")
+    expect_s3_class(sm, "smooth_estimates")
+    expect_s3_class(sm, "tbl_df")
+    expect_s3_class(sm, "data.frame")
     expect_identical(nrow(sm), 2500L)
     expect_named(sm, c("smooth", "type", "by", "est", "se", "x", "z"))
 })
 
 test_that("smooth_estimates works with a trivariate smooth", {
     expect_silent(sm <- smooth_estimates(m3, "s(x0,x1,x2)", n = 25))
-    expect_is(sm, "smooth_estimates")
-    expect_is(sm, "tbl_df")
-    expect_is(sm, "data.frame")
+    expect_s3_class(sm, "smooth_estimates")
+    expect_s3_class(sm, "tbl_df")
+    expect_s3_class(sm, "data.frame")
     expect_identical(nrow(sm), 15625L)
     expect_named(sm, c("smooth", "type", "by", "est", "se", "x0", "x1", "x2"))
 })
 
 test_that("smooth_estimates works with a trivariate tensor product smooth", {
     expect_silent(sm <- smooth_estimates(m4, "te(x0,x1,x2)", n = 25))
-    expect_is(sm, "smooth_estimates")
-    expect_is(sm, "tbl_df")
-    expect_is(sm, "data.frame")
+    expect_s3_class(sm, "smooth_estimates")
+    expect_s3_class(sm, "tbl_df")
+    expect_s3_class(sm, "data.frame")
     expect_identical(nrow(sm), 15625L)
     expect_named(sm, c("smooth", "type", "by", "est", "se", "x0", "x1", "x2"))
 })
 
 test_that("smooth_estimates works with a trivariate t2 tensor product smooth", {
     expect_silent(sm <- smooth_estimates(m_t2, "t2(x0,x1,x2)", n = 25))
-    expect_is(sm, "smooth_estimates")
-    expect_is(sm, "tbl_df")
-    expect_is(sm, "data.frame")
+    expect_s3_class(sm, "smooth_estimates")
+    expect_s3_class(sm, "tbl_df")
+    expect_s3_class(sm, "data.frame")
     expect_identical(nrow(sm), 15625L)
     expect_named(sm, c("smooth", "type", "by", "est", "se", "x0", "x1", "x2"))
 })
 
 test_that("smooth_estimates works with a tensor product interaction smooth", {
     expect_silent(sm <- smooth_estimates(m_ti, "ti(x0,x1)", n = 25))
-    expect_is(sm, "smooth_estimates")
-    expect_is(sm, "tbl_df")
-    expect_is(sm, "data.frame")
+    expect_s3_class(sm, "smooth_estimates")
+    expect_s3_class(sm, "tbl_df")
+    expect_s3_class(sm, "data.frame")
     expect_identical(nrow(sm), 625L)
     expect_named(sm, c("smooth", "type", "by", "est", "se", "x0", "x1"))
 })
 
 test_that("smooth_estimates works", {
     expect_silent(sm <- smooth_estimates(m_re, smooth = "s(fac)"))
-    expect_is(sm, "smooth_estimates")
-    expect_is(sm, "tbl_df")
-    expect_is(sm, "data.frame")
+    expect_s3_class(sm, "smooth_estimates")
+    expect_s3_class(sm, "tbl_df")
+    expect_s3_class(sm, "data.frame")
     expect_identical(nrow(sm), length(levels(dat_re[["fac"]])))
     expect_named(sm, c("smooth", "type", "by", "est", "se", "fac"))
 })
@@ -152,9 +150,9 @@ test_that("smooth_estimates works", {
 test_that("smooth_estimates works when passed data", {
     expect_silent(sm <- smooth_estimates(m_re, smooth = "s(fac)",
                                          data = dat_re))
-    expect_is(sm, "smooth_estimates")
-    expect_is(sm, "tbl_df")
-    expect_is(sm, "data.frame")
+    expect_s3_class(sm, "smooth_estimates")
+    expect_s3_class(sm, "tbl_df")
+    expect_s3_class(sm, "data.frame")
     expect_identical(nrow(sm), nrow(dat_re))
     expect_named(sm, c("smooth", "type", "by", "est", "se", "fac"))
 })
@@ -169,7 +167,7 @@ test_that("check_user_data fails if smooth var not in data", {
 test_that("smooth_estimates works with vector data", {
     sm1 <- smooth_estimates(m0, "s(x0)", data = dat[, "x0"])
     sm2 <- smooth_estimates(m0, "s(x0)", data = dat)
-    expect_is(sm1, "smooth_estimates")
+    expect_s3_class(sm1, "smooth_estimates")
     expect_equal(sm1, sm2)
 })
 
@@ -183,24 +181,24 @@ test_that("smooth_estimates fails if data is not data frame or numeric", {
 test_that("smooth_estimates works for a 2d factor by smooth", {
     expect_silent(sm <- smooth_estimates(m_2d_by, "s(x0,x1)", 
                                          partial_match = TRUE))
-    expect_is(sm, "smooth_estimates")
-    expect_is(sm, "tbl_df")
-    expect_is(sm, "data.frame")
+    expect_s3_class(sm, "smooth_estimates")
+    expect_s3_class(sm, "tbl_df")
+    expect_s3_class(sm, "data.frame")
 })
 
 test_that("smooth_estimates works for a factor smooth", {
     expect_silent(sm <- smooth_estimates(m_fs))
-    expect_is(sm, "smooth_estimates")
-    expect_is(sm, "tbl_df")
-    expect_is(sm, "data.frame")
+    expect_s3_class(sm, "smooth_estimates")
+    expect_s3_class(sm, "tbl_df")
+    expect_s3_class(sm, "data.frame")
     expect_identical(nrow(sm), 1000L) # 100 n * 10 levels
     expect_named(sm, c("smooth", "type", "by", "est", "se", "x1", "fac"))
 
     newdf <- data.frame(x1 = dat_fs$x1, fac = dat_fs$fac)
     expect_silent(sm <- smooth_estimates(m_fs, "s(x1,fac)", data = newdf))
-    expect_is(sm, "smooth_estimates")
-    expect_is(sm, "tbl_df")
-    expect_is(sm, "data.frame")
+    expect_s3_class(sm, "smooth_estimates")
+    expect_s3_class(sm, "tbl_df")
+    expect_s3_class(sm, "data.frame")
     expect_identical(nrow(sm), nrow(newdf))
     expect_named(sm, c("smooth", "type", "by", "est", "se", "x1", "fac"))
 

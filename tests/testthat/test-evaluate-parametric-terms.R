@@ -5,7 +5,6 @@ library("testthat")
 library("gratia")
 library("mgcv")
 
-context("Tests of evaluate_parametric_terms():")
 data(gss_vocab, package = "gratia")
 
 m <- gam(vocab ~ nativeBorn * ageGroup, data = gss_vocab, method = 'ML')

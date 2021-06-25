@@ -6,12 +6,10 @@ library("gratia")
 library("mgcv")
 ## library("ggplot2")
 
-context("worm_plot-methods")
-
 ## Need a local wrapper to allow conditional use of vdiffr
-`expect_doppelganger` <- function(title, fig, path = NULL, ...) {
+`expect_doppelganger` <- function(title, fig, ...) {
   testthat::skip_if_not_installed("vdiffr")
-  vdiffr::expect_doppelganger(title, fig, path = path, ...)
+  vdiffr::expect_doppelganger(title, fig, ...)
 }
 
 ## simulate binomial data...
@@ -26,8 +24,8 @@ m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
          family = binomial, data = dat, weights = n,
          method = "REML")
 
-types <- dQuote(c("deviance", "response", "pearson"))
-methods <- dQuote(c("uniform", "simulate", "normal"))
+types <- c("deviance", "response", "pearson")
+methods <- c("uniform", "simulate", "normal")
 
 test_that("worm_plot() uniform method works", {
     plt <- worm_plot(m)      # uniform randomisation of uniform quantiles
@@ -76,13 +74,15 @@ test_that("worm_plot() simulate method works", {
 
 test_that("worm_plot() fails if unsupported residuals requested", {
     expect_error(worm_plot(m, type = "scaled.pearson"),
-                 paste("'arg' should be one of", paste(types, collapse = ', ')),
+                 paste("'arg' should be one of",
+                       paste(dQuote(types), collapse = ', ')),
                  fixed = TRUE)
 })
 
 test_that("worm_plot() fails if unsupported method requested", {
     expect_error(worm_plot(m, method = "foo"),
-                 paste("'arg' should be one of", paste(methods, collapse = ', ')),
+                 paste("'arg' should be one of",
+                       paste(dQuote(methods), collapse = ', ')),
                  fixed = TRUE)
 })
 

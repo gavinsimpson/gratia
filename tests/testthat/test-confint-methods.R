@@ -6,15 +6,14 @@ library("gratia")
 library("mgcv")
 library('gamm4')
 
-context("confint methods")
-
 set.seed(42)
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 ## first derivatives of all smooths...
-fd <- fderiv(mod)
 
 test_that("Point-wise confidence interval for a first derivatives of a GAM works", {
+    withr::local_options(lifecycle_verbosity = "quiet")
+    fd <- fderiv(mod)
     ci <- confint(fd, type = "confidence")
     expect_s3_class(ci, "confint.fderiv")
     expect_s3_class(ci, "data.frame")
@@ -26,6 +25,8 @@ test_that("Point-wise confidence interval for a first derivatives of a GAM works
 })
 
 test_that("Simultaneous interval for a first derivatives of a GAM works", {
+    withr::local_options(lifecycle_verbosity = "quiet")
+    fd <- fderiv(mod)
     set.seed(42)
     ci <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
     expect_s3_class(ci, "confint.fderiv")

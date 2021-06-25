@@ -6,8 +6,6 @@ library("gratia")
 library("mgcv")
 library("gamm4")
 
-context("Test partial_residuals")
-
 N <- 400L
 df <- data_sim("eg1", n = N, seed = 42)
 ## fit the model

@@ -7,12 +7,10 @@ library("mgcv")
 library("ggplot2")
 library("datasets")
 
-context("test-hgam-paper-models")
-
 ## Need a local wrapper to allow conditional use of vdiffr
-`expect_doppelganger` <- function(title, fig, path = NULL, ...) {
+`expect_doppelganger` <- function(title, fig, ...) {
   testthat::skip_if_not_installed("vdiffr")
-  vdiffr::expect_doppelganger(title, fig, path = path, ...)
+  vdiffr::expect_doppelganger(title, fig, ...)
 }
 
 ## data load and prep
@@ -91,7 +89,8 @@ test_that("draw() can plot CO2 model 5", {
     skip_on_cran()
     skip_on_travis()
     skip_on_ci()
-    CO2_mod5 <- gam(log(uptake) ~ s(log(conc), by = Plant_uo, k = 5, bs = "tp", m = 2) +
+    CO2_mod5 <- gam(log(uptake) ~ s(log(conc), by = Plant_uo, k = 5, bs = "tp", 
+                                    m = 2) +
                         s(Plant_uo, bs="re", k=12),
                     data = CO2, method = "REML",
                     control = ctrl)
@@ -104,11 +103,12 @@ test_that("draw() can plot bird_move model 1", {
     skip_on_cran()
     skip_on_travis()
     skip_on_ci()
-    bird_mod1 <- gam(count ~ te(week, latitude, bs=c("cc", "tp"), k = c(10, 10)),
+    bird_mod1 <- gam(count ~ te(week, latitude, bs=c("cc", "tp"),
+                                k = c(10, 10)),
                      data = bird_move, method = "REML", family = poisson(),
                      knots = list(week = c(0, 52)),
                      control = ctrl)
-    plt <- draw(bird_mod1)
+    plt <- draw(bird_mod1, rug = FALSE)
     expect_doppelganger("hgam-paper-bird-move-model-1", plt)
 })
 
@@ -123,7 +123,7 @@ test_that("draw() can plot bird_move model 2", {
                      data = bird_move, method = "REML", family = poisson(),
                      knots = list(week = c(0, 52)),
                      control = ctrl)
-    plt <- draw(bird_mod2)
+    plt <- draw(bird_mod2, rug = FALSE)
     expect_doppelganger("hgam-paper-bird-move-model-2", plt)
 })
 
@@ -139,7 +139,7 @@ test_that("draw() can plot bird_move model 3", {
                      data = bird_move, method = "REML", family = poisson(),
                      knots = list(week = c(0, 52)),
                      control = ctrl)
-    plt <- draw(bird_mod3)
+    plt <- draw(bird_mod3, rug = FALSE)
     expect_doppelganger("hgam-paper-bird-move-model-3", plt)
 })
 
@@ -147,7 +147,8 @@ test_that("draw() throws message with bird_move model 4", {
     skip_on_cran()
     skip_on_travis()
     skip_on_ci()
-    bird_mod4 <- gam(count ~ t2(week, latitude, species, bs = c("cc", "tp", "re"),
+    bird_mod4 <- gam(count ~ t2(week, latitude, species, 
+                                bs = c("cc", "tp", "re"),
                                 k = c(10, 10, 6), m = c(2, 2, 2)),
                      data = bird_move, method = "REML", family = poisson(),
                      knots = list(week = c(0, 52)),
@@ -167,7 +168,7 @@ test_that("draw() can plot bird_move model 5", {
                      data = bird_move, method = "REML", family = poisson(),
                      knots = list(week = c(0, 52)),
                      control = ctrl)
-    plt <- draw(bird_mod5)
+    plt <- draw(bird_mod5, rug = FALSE)
     expect_doppelganger("hgam-paper-bird-move-model-5", plt)
 })
 
@@ -193,10 +194,10 @@ test_that("draw() can plot zoo_comm_mod model 5", {
     skip_on_cran()
     skip_on_ci()
     zoo_comm_mod5 <- gam(density_adj ~ s(day, by=taxon,
-                                     k=10, bs="cc") +
-                                   s(taxon, bs="re") +
-                                   s(taxon, year_f, bs="re"),
-                     data=zoo_train,
+                                         k = 10, bs = "cc") +
+                                   s(taxon, bs = "re") +
+                                   s(taxon, year_f, bs = "re"),
+                     data = zoo_train,
                      knots = list(day =c(0, 365)),
                      family = Gamma(link ="log"),
                      method = "REML",

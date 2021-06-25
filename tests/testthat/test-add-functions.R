@@ -5,8 +5,6 @@ library("testthat")
 library("gratia")
 library("mgcv")
 
-context("test add_fitted")
-
 set.seed(42)
 data <- gamSim(eg = 1, verbose = FALSE)
 ## take only some columns

@@ -6,8 +6,6 @@ library("gratia")
 library("mgcv")
 library("ggplot2")
 
-context("evaluate-smooth-methods")
-
 set.seed(1)
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
@@ -15,9 +13,9 @@ m2 <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 test_that("evaluate_smooth works for a GAM", {
     sm <- evaluate_smooth(m1, "s(x2)")
-    expect_is(sm, "evaluated_1d_smooth")
-    expect_is(sm, "evaluated_smooth")
-    expect_is(sm, "data.frame")
+    expect_s3_class(sm, "evaluated_1d_smooth")
+    expect_s3_class(sm, "evaluated_smooth")
+    expect_s3_class(sm, "data.frame")
 })
 
 test_that("evaluate_smooth throws a message with more than one term", {
@@ -33,9 +31,9 @@ test_that("evaluate_smooth throws error if smooth not found", {
 
 test_that("evaluate_smooth works for a GAMM", {
     sm <- evaluate_smooth(m2, "s(x2)")
-    expect_is(sm, "evaluated_1d_smooth")
-    expect_is(sm, "evaluated_smooth")
-    expect_is(sm, "data.frame")
+    expect_s3_class(sm, "evaluated_1d_smooth")
+    expect_s3_class(sm, "evaluated_smooth")
+    expect_s3_class(sm, "data.frame")
 })
 
 test_that("evaluate_1d_smooth fails with multiple smooths that aren't by factor smooths", {
@@ -95,7 +93,7 @@ test_that("evaluate_1d_smooth works with vector newdata", {
     m <- gam(y ~ s(x0), data = dat, method = "REML")
     sm1 <- evaluate_smooth(m, "s(x0)", newdata = dat[, "x0"])
     sm2 <- evaluate_smooth(m, "s(x0)", newdata = dat)
-    expect_is(sm1, "evaluated_1d_smooth")
+    expect_s3_class(sm1, "evaluated_1d_smooth")
     expect_equal(sm1, sm2)
 })
 
@@ -125,9 +123,9 @@ test_that("evaluate_2d_smooth works for a 2d factor by smooth", {
     dat <- gamSim(4, n = 400, verbose = FALSE)
     mf <- gam(y ~ fac + s(x0, x1, by = fac), data = dat)
     sm <- evaluate_smooth(mf, "s(x0,x1)")
-    expect_is(sm, "evaluated_2d_smooth")
-    expect_is(sm, "evaluated_smooth")
-    expect_is(sm, "data.frame")
+    expect_s3_class(sm, "evaluated_2d_smooth")
+    expect_s3_class(sm, "evaluated_smooth")
+    expect_s3_class(sm, "data.frame")
 })
 
 test_that("evaluate_fs_smooth() ", {

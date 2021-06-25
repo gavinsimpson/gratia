@@ -5,8 +5,6 @@ library("testthat")
 library("gratia")
 library("mgcv")
 
-context("data-slice-methods")
-
 set.seed(1)
 dat <- gamSim(1, n = 200, dist = "normal", scale = 2, verbose = FALSE)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
