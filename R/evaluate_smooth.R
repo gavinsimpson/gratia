@@ -65,7 +65,7 @@
         message("Supplied more than 1 'smooth'; using only the first")
         smooth <- smooth[1L]
     }
-    smooth_ids <- which_smooth(object, smooth) # which smooths match 'smooth'
+    smooth_ids <- old_which_smooth(object, smooth) # which smooths match 'smooth'
     if (identical(length(smooth_ids), 0L)) {
         stop("Requested smooth '", smooth, "' not found", call. = FALSE)
     }

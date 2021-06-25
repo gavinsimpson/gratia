@@ -1,47 +1,52 @@
-##' Differences of factor smooth interactions
-##'
-##' @param model A fitted model.
-##' @param smooth character; which smooth to compute differences for.
-##' @param n numeric; the number of points at which to evaluate the difference
-##'   between pairs of smooths.
-##' @param ci_level numeric between 0 and 1; the coverage of credible interval.
-##' @param newdata data frame of locations at which to evaluate the difference
-##'   between smooths.
-##' @param unconditional logical; account for smoothness selection in the model?
-##' @param frequentist logical; use the frequentist covariance matrix?
-##' @param ... arguments passed to other methods.
-##' 
-##' @export
-##' @examples
-##'
-##' load_mgcv()
-##' \dontshow{
-##' set.seed(42)
-##' op <- options(digits = 3, cli.unicode = FALSE)
-##' }
-##' df <- data_sim("eg4")
-##' m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
-##'
-##' difference_smooths(m, smooth = "s(x2)")
-##' \dontshow{options(op)}
+#' Differences of factor smooth interactions
+#'
+#' @param model A fitted model.
+#' @param smooth character; which smooth to compute differences for.
+#' @param n numeric; the number of points at which to evaluate the difference
+#'   between pairs of smooths.
+#' @param ci_level numeric between 0 and 1; the coverage of credible interval.
+#' @param newdata data frame of locations at which to evaluate the difference
+#'   between smooths.
+#' @param partial_match logical; should `smooth` match partially against
+#'   `smooths`? If `partial_match = TRUE`, `smooth` must only be a single
+#'   string, a character vector of length 1. Unlike similar functions, the
+#'   default here is `TRUE` because the intention is that users will be matching
+#'   against factor-by smooth labels.
+#' @param unconditional logical; account for smoothness selection in the model?
+#' @param frequentist logical; use the frequentist covariance matrix?
+#' @param ... arguments passed to other methods.
+#'
+#' @export
+#' @examples
+#'
+#' load_mgcv()
+#' \dontshow{
+#' op <- options(digits = 3, cli.unicode = FALSE)
+#' }
+#' df <- data_sim("eg4", seed = 42)
+#' m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+#'
+#' difference_smooths(m, smooth = "s(x2)")
+#' \dontshow{options(op)}
 `difference_smooths` <- function(model, ...) {
     UseMethod("difference_smooths")
 }
 
-##' @export
-##'
-##' @importFrom purrr pmap
-##' @importFrom dplyr bind_rows
-##' @importFrom tibble add_column
-##' @importFrom stats qnorm coef
-##' @importFrom utils combn
-##'
-##' @rdname difference_smooths
+#' @export
+#'
+#' @importFrom purrr pmap
+#' @importFrom dplyr bind_rows
+#' @importFrom tibble add_column
+#' @importFrom stats qnorm coef
+#' @importFrom utils combn
+#'
+#' @rdname difference_smooths
 `difference_smooths.gam` <- function(model,
                                      smooth,
                                      n = 100,
                                      ci_level = 0.95,
                                      newdata = NULL,
+                                     partial_match = TRUE,
                                      unconditional = FALSE,
                                      frequentist = FALSE,
                                      ...) {
@@ -49,7 +54,14 @@
         stop("Must specify a smooth to difference via 'smooth'.")
     }
 
-    sm_ids <- which_smooths(model, smooth)
+    # smooths in model
+    S <- smooths(model) # vector of smooth labels - "s(x)"
+    # select smooths
+    select <-
+        check_user_select_smooths(smooths = S, select = smooth,
+                                  partial_match = partial_match,
+                                  model_name = expr_label(substitute(object)))
+    sm_ids <- which(select)
     smooths <- get_smooths_by_id(model, sm_ids)
     sm_data <- map(sm_ids, smooth_data,
                    model = model, n = n, include_all = TRUE)
@@ -77,17 +89,17 @@
     out
 }
 
-##' @export
+#' @export
 `difference_smooths.bam` <- function(model, ...) {
     NextMethod()
 }
 
-##' @export
+#' @export
 `difference_smooths.gamm` <- function(model, ...) {
     difference_smooths(model[["gam"]], ...)
 }
 
-##' @export
+#' @export
 `difference_smooths.list` <- function(model, ...) {
     if (! is_gamm4(model)) {
         stop("'object' is not a `gamm4()` fit. Can't handle general lists.")
@@ -95,8 +107,8 @@
     difference_smooths(model$gam, ...)
 }
 
-##' @importFrom tibble new_tibble
-##' @importFrom dplyr bind_cols
+#' @importFrom tibble new_tibble
+#' @importFrom dplyr bind_cols
 `calc_difference` <- function(f1, f2, smooth, by_var, smooth_var, data, Xp, V, coefs) {
     ## make sure f1 and f2 are characters
     f1 <-  as.character(f1)

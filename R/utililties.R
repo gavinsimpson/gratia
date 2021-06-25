@@ -162,6 +162,16 @@
     }
     smooth
 }
+`old_get_smooth` <- function(object, term) {
+    if (is.gamm(object)) {
+        object <- object[["gam"]]
+    }
+    smooth <- object[["smooth"]][old_which_smooth(object, term)]
+    if (identical(length(smooth), 1L)) {
+        smooth <- smooth[[1L]]
+    }
+    smooth
+}
 
 #' @title Extract an mgcv smooth given its position in the model object
 #'
@@ -193,7 +203,7 @@
     }
 
     ## which smooth match the term?
-    take <- which_smooth(object, term)
+    take <- old_which_smooth(object, term)
     S <- object[["smooth"]][take]
 
     ## if there are multiple, then suggests a factor by smooth
@@ -280,6 +290,16 @@
 }
 
 `which_smooth` <- function(object, term) {
+    if (is.gamm(object)) {
+        object <- object[["gam"]]
+    }
+    smooths <- smooths(object)
+    #grep(term, smooths, fixed = TRUE)
+    which(term == smooths)
+}
+
+# Needed for evaluate smooth
+`old_which_smooth` <- function(object, term) {
     if (is.gamm(object)) {
         object <- object[["gam"]]
     }
@@ -989,7 +1009,7 @@ vars_from_label <- function(label) {
     # then a closing parenthesis \\)
     # zero or 1 : for the start of the by var info
     # finally zero or more letters or numbers for the factor level combo
-    vars <- gsub("^[[:alnum:]]{1,2}\\.?[[:digit:]]*\\(([[:graph:]]+)\\):?([[:alnum:]]*)$",
+    vars <- gsub("^[[:alnum:]]{1,2}\\.?[[:digit:]]*\\(([[:graph:]]+)\\):?([[:graph:]]*)$",
                  "\\1",
                  label)
     vec_c(strsplit(vars, ",")[[1L]])

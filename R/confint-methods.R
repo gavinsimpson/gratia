@@ -331,7 +331,7 @@
                 out[[i]][["crit"]] <- crit # add on the critical value for this smooth
             } else {                       # is a by variable smooth
                 out[[i]][["crit"]] <- 0    # fill in a variable crit
-                smooth <- get_smooth(object, parm)
+                smooth <- old_get_smooth(object, parm)
                 for (l in seq_along(by_levs)) {
                     ## the 6L should really refer to the by_variable column...
                     ind <- out[[i]][[6L]] == by_levs[l] # which rows in evaulated smooth contain this levels data?
