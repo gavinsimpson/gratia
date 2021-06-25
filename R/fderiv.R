@@ -1,54 +1,73 @@
-##' First derivatives of fitted GAM functions
-##'
-##' The first derivative of the smooth functions of a GAM model calculated using finite differences.
-##'
-##' @param model A fitted GAM. Currently only models fitted by [mgcv::gam()] and [mgcv::gamm()] are supported.
-##' @param ... Arguments that are passed to other methods.
-##'
-##' @return An object of class `"fderiv"` is returned.
-##'
-##' @author Gavin L. Simpson
-##'
-##' @export
+#' First derivatives of fitted GAM functions
+#' 
+#' @description
+#' `r lifecycle::badge('deprecated')`
+#' 
+#' This function was deprecated because it was limited to first order forward
+#' finite differences for derivatives only, but couldn't be improved to offer
+#' the needed functionality without breaking backwards compatability with papers
+#' and blog posts that already used `fderiv()`. A replacement, [derivatives()],
+#' is now available and recommended for new analyses.
+#'
+#' @param model A fitted GAM. Currently only models fitted by [mgcv::gam()] and [mgcv::gamm()] are supported.
+#' @param ... Arguments that are passed to other methods.
+#'
+#' @return An object of class `"fderiv"` is returned.
+#' 
+#' @keywords internal
+#'
+#' @author Gavin L. Simpson
+#'
+#' @export
 `fderiv` <- function(model, ...) {
+    lifecycle::deprecate_warn("0.7.0", "fderiv()", "derivatives()")
     UseMethod("fderiv")
 }
 
-##' @rdname fderiv
-##'
-##' @param newdata a data frame containing the values of the model covariates at which to evaluate the first derivatives of the smooths.
-##' @param term character; vector of one or more terms for which derivatives are required. If missing, derivatives for all smooth terms will be returned.
-##' @param n integer; if `newdata` is missing the original data can be reconstructed from `model` and then `n` controls the number of values over the range of each covariate with which to populate `newdata`.
-##' @param eps numeric; the value of the finite difference used to approximate the first derivative.
-##' @param unconditional logical; if `TRUE`, the smoothing parameter uncertainty corrected covariance matrix is used, *if available*, otherwise the uncorrected Bayesian posterior covariance matrix is used.
-##' @param offset numeric; value of offset to use in generating predictions.
-##'
-##' @importFrom stats coef model.frame predict terms vcov
-##'
-##' @export
-##'
-##' @examples
-##' load_mgcv()
-##' \dontshow{set.seed(2)}
-##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
-##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-##'
-##' ## first derivatives of all smooths...
-##' fd <- fderiv(mod)
-##'
-##' ## ...and a selected smooth
-##' fd2 <- fderiv(mod, term = "x1")
-##'
-##' ## Models with factors
-##' set.seed(2)
-##' dat <- gamSim(4, n = 400, dist = "normal", scale = 2)
-##' mod <- gam(y ~ s(x0) + s(x1) + fac, data = dat, method = "REML")
-##'
-##' ## first derivatives of all smooths...
-##' fd <- fderiv(mod)
-##'
-##' ## ...and a selected smooth
-##' fd2 <- fderiv(mod, term = "x1")
+#' @rdname fderiv
+#'
+#' @param newdata a data frame containing the values of the model covariates at which to evaluate the first derivatives of the smooths.
+#' @param term character; vector of one or more terms for which derivatives are required. If missing, derivatives for all smooth terms will be returned.
+#' @param n integer; if `newdata` is missing the original data can be reconstructed from `model` and then `n` controls the number of values over the range of each covariate with which to populate `newdata`.
+#' @param eps numeric; the value of the finite difference used to approximate the first derivative.
+#' @param unconditional logical; if `TRUE`, the smoothing parameter uncertainty corrected covariance matrix is used, *if available*, otherwise the uncorrected Bayesian posterior covariance matrix is used.
+#' @param offset numeric; value of offset to use in generating predictions.
+#'
+#' @importFrom stats coef model.frame predict terms vcov
+#'
+#' @export
+#'
+#' @examples
+#' load_mgcv()
+#' \dontshow{
+#' op <- options(lifecycle_verbosity = "quiet")
+#' }
+#' dat <- data_sim("eg1", seed = 2)
+#' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+#'
+#' ## first derivatives of all smooths...
+#' fd <- fderiv(mod)
+#' ## now use -->
+#' fd <- derivatives(mod)
+#'
+#' ## ...and a selected smooth
+#' fd2 <- fderiv(mod, term = "x1")
+#' ## now use -->
+#' fd2 <- derivatives(mod, term = "s(x1)")
+#'
+#' ## Models with factors
+#' dat <- data_sim("eg4", n = 400, dist = "normal", scale = 2, seed = 2)
+#' mod <- gam(y ~ s(x0) + s(x1) + fac, data = dat, method = "REML")
+#'
+#' ## first derivatives of all smooths...
+#' fd <- fderiv(mod)
+#' ## now use -->
+#' fd <- derivatives(mod)
+#'
+#' ## ...and a selected smooth
+#' fd2 <- fderiv(mod, term = "x1")
+#' ## now use -->
+#' fd2 <- derivatives(mod, term = "s(x1)")
 `fderiv.gam` <- function(model, newdata, term, n = 200, eps = 1e-7,
                          unconditional = FALSE, offset = NULL, ...) {
 
@@ -162,8 +181,8 @@
     out
 }
 
-##' @rdname fderiv
-##' @export
+#' @rdname fderiv
+#' @export
 `fderiv.gamm` <- function(model, ...) {
     model <- model$gam
     fderiv.gam(model, ...)
