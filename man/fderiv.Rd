@@ -42,31 +42,47 @@ fderiv(model, ...)
 An object of class \code{"fderiv"} is returned.
 }
 \description{
-The first derivative of the smooth functions of a GAM model calculated using finite differences.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+
+This function was deprecated because it was limited to first order forward
+finite differences for derivatives only, but couldn't be improved to offer
+the needed functionality without breaking backwards compatability with papers
+and blog posts that already used \code{fderiv()}. A replacement, \code{\link[=derivatives]{derivatives()}},
+is now available and recommended for new analyses.
 }
 \examples{
 load_mgcv()
-\dontshow{set.seed(2)}
-dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+\dontshow{
+op <- options(lifecycle_verbosity = "quiet")
+}
+dat <- data_sim("eg1", seed = 2)
 mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 ## first derivatives of all smooths...
 fd <- fderiv(mod)
+## now use -->
+fd <- derivatives(mod)
 
 ## ...and a selected smooth
 fd2 <- fderiv(mod, term = "x1")
+## now use -->
+fd2 <- derivatives(mod, term = "s(x1)")
 
 ## Models with factors
-set.seed(2)
-dat <- gamSim(4, n = 400, dist = "normal", scale = 2)
+dat <- data_sim("eg4", n = 400, dist = "normal", scale = 2, seed = 2)
 mod <- gam(y ~ s(x0) + s(x1) + fac, data = dat, method = "REML")
 
 ## first derivatives of all smooths...
 fd <- fderiv(mod)
+## now use -->
+fd <- derivatives(mod)
 
 ## ...and a selected smooth
 fd2 <- fderiv(mod, term = "x1")
+## now use -->
+fd2 <- derivatives(mod, term = "s(x1)")
 }
 \author{
 Gavin L. Simpson
 }
+\keyword{internal}
