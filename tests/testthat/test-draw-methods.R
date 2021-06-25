@@ -60,8 +60,8 @@ test_that("draw.gam works with logical select", {
 test_that("draw.gam works with partial_match", {
     plt <- draw(su_m_factor_by, select = 'x2', partial_match = TRUE)
     expect_doppelganger("draw gam with partial match TRUE", plt)
-    expect_error(draw(su_m_factor_by, select = 's(x2)', partial_match = FALSE),
-                 "Failed to match any smooths in model `m3`.\nTry with 'partial_match = TRUE'?",
+    expect_error(draw(su_m_factor_by, select = "s(x2)", partial_match = FALSE),
+                 "Failed to match any smooths in model `su_m_factor_by`.\nTry with 'partial_match = TRUE'?",
                  fixed = TRUE)
 })
 
@@ -145,8 +145,8 @@ test_that("draw.gam() plots an AM with a single factor by-variable smooth", {
 })
 
 ## simulate date from y = f(x2)*x1 + error
-dat <- gamSim(3, n = 400, verbose = FALSE)
-mod <- gam(y ~ s(x2, by = x1), data = dat)
+#dat <- gamSim(3, n = 400, verbose = FALSE)
+mod <- gam(y ~ s(x2, by = x1), data = su_eg3)
 
 test_that("draw() works with continuous by", {
     plt <- draw(mod)
@@ -160,15 +160,17 @@ test_that("draw() works with continuous by and fixed scales", {
 
 test_that("draw() works with random effect smooths (bs = 're')", {
     ## simulate example... from ?mgcv::random.effects
-    dat <- gamSim(1, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
+    ## dat <- gamSim(1, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
 
-    fac <- as.factor(sample(1:20, 400, replace = TRUE))
-    dat$X <- model.matrix(~ fac - 1)
+    set.seed(42)
+    fac <- as.factor(sample(1:20, 800, replace = TRUE))
+    new_df <- su_eg1
+    new_df$X <- model.matrix(~ fac - 1)
     b <- rnorm(20) * 0.5
-    dat <- transform(dat, y = y + X %*% b)
+    new_df <- transform(new_df, y = y + X %*% b)
 
     rm1 <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) +
-                   s(x3), data = dat, method = "ML")
+                   s(x3), data = new_df, method = "ML")
 
     sm <- evaluate_smooth(rm1, "s(fac)")
     expect_s3_class(sm, "evaluated_re_smooth")
@@ -184,15 +186,14 @@ test_that("draw() works with random effect smooths (bs = 're')", {
 })
 
 test_that("draw() with random effect smooths (bs = 're') & factor by variable ", {
-    ## simulate example...
-    set.seed(1)
-    df <- gamSim(4, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
-
-    ## random effects
+    # simulate example...
+    # random effects
     ranef <- as.factor(sample(1:20, 400, replace = TRUE))
-    df$X <- model.matrix(~ ranef - 1)
+    df <- su_eg4
+    X <- model.matrix(~ ranef - 1)
     b <- rnorm(20) * 0.5
-    da1 <- transform(df, y = y + X %*% b)
+    df <- transform(df, y = y + X %*% b, ranef = ranef)
+    rm(b, X, ranef)
 
     ## fit model
     rm2 <- gam(y ~ fac + s(ranef, bs = "re", by = fac) + s(x0) + s(x1) + s(x2),
@@ -215,7 +216,7 @@ test_that("draw() can handle non-standard names -- a function call as a name", {
                            0.06,0.12,-0.15,0.05,-0.08,0.14,-0.02,-0.14,-0.24,
                            -0.32,-0.78,-0.81,-0.04,-0.25,-0.09,0.02,-0.13,-0.2,
                            -0.04,0,0.02,-0.05,-0.19,-0.37,-0.57,-0.81),
-                     time =  rep(2^c(-1, 0, 1, 1.58,2, 2.58, 3, 3.32, 3.58, 4.17,
+                    time =  rep(2^c(-1, 0, 1, 1.58,2, 2.58, 3, 3.32, 3.58, 4.17,
                                      4.58, 5.58, 6.17, 7.39), 4))
     ## the smooth is of `log2(time)` but this needs special handling
     ## in the `ggplot()` to avoid `ggplot()` looking incorrectly for `time` and
@@ -341,9 +342,9 @@ test_that("draw.derivates() plots derivatives for a GAM", {
 
 ## test that issue 39 stays fixed
 test_that("draw.gam doesn't create empty plots with multiple parametric terms", {
-    set.seed(42)
-    dat <- gamSim(4, n = 300, verbose = FALSE)
-    dat <- transform(dat, fac = factor(fac), fac2 = factor(fac)) # second factor
+    #set.seed(42)
+    #dat <- gamSim(4, n = 300, verbose = FALSE)
+    dat <- transform(su_eg4, fac = factor(fac), fac2 = factor(fac)) # 2nd factor
     ## GAM with 2 factors and 2 numeric terms
     m2f <- gam(y ~ s(x0) + s(x1) + fac + fac2, data = dat,
                family = gaussian(link = "identity"))

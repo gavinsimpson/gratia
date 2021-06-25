@@ -51,11 +51,12 @@ test_that("draw() can plot CO2 model 2", {
     skip_on_cran()
     skip_on_travis()
     skip_on_ci()
-    suppressWarnings(
+    expect_warning(
         CO2_mod2 <- gam(log(uptake) ~ s(log(conc), k = 5, m = 2) +
                             s(log(conc), Plant_uo, k = 5,  bs = "fs", m = 2),
                         data = CO2, method = "REML", family = gaussian(),
-                        control = ctrl)
+                        control = ctrl),
+        "model has repeated 1-d smooths of same variable."
     )
     plt <- draw(CO2_mod2, overall_uncertainty = TRUE)
     expect_doppelganger("hgam-paper-co2-model-2", plt)
