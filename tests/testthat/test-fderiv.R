@@ -8,8 +8,10 @@ library("mgcv")
 mod <- gam(y ~ s(x0) + s(x1) + fac, data = su_eg4, method = "REML")
 
 test_that("fderiv is deprecated", {
-  withr::local_options(digits = 4)
-  expect_snapshot(fderiv(mod))
+    skip_on_cran()
+    skip_on_ci()
+    withr::local_options(digits = 4)
+    expect_snapshot(fderiv(mod))
 })
 
 test_that("fderiv() can create newdata with factors in model", {
