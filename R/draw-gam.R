@@ -63,7 +63,7 @@
 #'   scale_fill_distiller
 #' @importFrom patchwork wrap_plots
 #' @importFrom dplyr mutate rowwise %>% ungroup left_join summarise group_split
-#' @importFrom purrr pluck
+#' @importFrom purrr pluck map_lgl
 #' @importFrom rlang expr_label
 #' @export
 #'
@@ -228,7 +228,16 @@
                    continuous_fill = continuous_fill,
                    ylim = ylims)
 
-    ## return
+    # filter out NULLs as those are types of smooths we can't plot (yet)
+    no_plot <- map_lgl(sm_plts, is.null)
+    if (all(no_plot)) {
+        message("Unable to draw any of the model terms.")
+        return(invisible())
+    }
+
+    sm_plts <- sm_plts[!no_plot]
+
+    # return
     n_plots <- length(sm_plts)
     if (is.null(ncol) && is.null(nrow)) {
         ncol <- ceiling(sqrt(n_plots))
@@ -236,5 +245,4 @@
     }
     wrap_plots(sm_plts, byrow = TRUE, ncol = ncol, nrow = nrow,
                guides = guides, ...)
-    wrap_plots(sm_plts)
 }

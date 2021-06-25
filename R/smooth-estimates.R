@@ -620,7 +620,8 @@
                                 c("bivariate_smooth", "mgcv_smooth"),
                                 after = 0)
     } else {
-        stop("Unknown type")
+        # stop("Unknown type")
+        return(NULL)
     }
 
     plot_smooth(object, variables = sm_vars, rug = rug_data,

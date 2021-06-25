@@ -1008,8 +1008,8 @@ vars_from_label <- function(label) {
     # end the group,
     # then a closing parenthesis \\)
     # zero or 1 : for the start of the by var info
-    # finally zero or more letters or numbers for the factor level combo
-    vars <- gsub("^[[:alnum:]]{1,2}\\.?[[:digit:]]*\\(([[:graph:]]+)\\):?([[:graph:]]*)$",
+    # finally zero or more of any characters for the factor level combo
+    vars <- gsub("^[[:alnum:]]{1,2}\\.?[[:digit:]]*\\(([[:graph:]]+)\\):?(.*)$",
                  "\\1",
                  label)
     vec_c(strsplit(vars, ",")[[1L]])
