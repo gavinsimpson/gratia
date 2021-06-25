@@ -33,3 +33,16 @@ su_m_factor_by_x2 <- gam(y ~ fac + s(x2, by = fac),
 su_gamm_univar_4 <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3),
                          data = su_eg1,
                         method = "REML")
+
+m_gam <- su_m_univar_4
+# m_gam    <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
+#                 method = "REML")
+m_gamm <- su_gamm_univar_4
+# m_gamm   <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
+#                  method = "REML")
+m_bam    <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
+                method = "fREML")
+m_gamgcv <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
+                method = "GCV.Cp")
+m_gamm4  <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
+                  REML = TRUE)

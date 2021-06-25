@@ -7,16 +7,6 @@ library("mgcv")
 library("gamm4")
 library("MASS")
 
-context("Testing Utility Functions")
-
-set.seed(1)
-dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
-m_gam <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-m_gamm <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-m_bam <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
-m_gamgcv <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
-m_gamm4 <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
-
 test_that("smooth_terms() methods work", {
     st <- smooth_terms(m_gam)
     expect_is(st, "list")
@@ -68,7 +58,8 @@ test_that("select_terms() works", {
     expect_identical(st, c("x1", "x2"))
 
     expect_message(select_terms(m_gam, "x4"), "x4 not found in `object`")
-    expect_message(select_terms(m_gam, c("x1", "x4")), "x4 not found in `object`")
+    expect_message(select_terms(m_gam, 
+                                c("x1", "x4")), "x4 not found in `object`")
 
 })
 
@@ -201,23 +192,23 @@ test_that("seq_min_max works as intended", {
     expect_identical(length(s1), n)
 })
 
-set.seed(42)
-dat <- gamSim(4, n = 400, verbose = FALSE)
+#set.seed(42)
+#dat <- gamSim(4, n = 400, verbose = FALSE)
 
 test_that("factor_var_names works", {
-    expect_silent( result <- factor_var_names(dat))
+    expect_silent( result <- factor_var_names(su_eg4))
     expect_identical("fac", result)
 
-    expect_null( factor_var_names(dat[,1:2]) )
+    expect_null( factor_var_names(su_eg1[,1:2]) )
 })
 
 test_that("data_class works for a data frame", {
-    expect_silent( result <- data_class(dat) )
+    expect_silent( result <- data_class(su_eg4) )
 
-    expect_named( result, names(dat) )
+    expect_named( result, names(su_eg4) )
 
-    actual <- c(rep("numeric", 4L), "factor", rep("numeric", 3L))
-    names(actual) <- names(dat)
+    actual <- c(rep("numeric", 4L), "factor", rep("numeric", 4L))
+    names(actual) <- names(su_eg4)
     expect_identical(actual, result)
 })
 
@@ -242,8 +233,8 @@ test_that("n_smooths, works for objects with a smooth component", {
 })
 
 test_that("n_smooths, fails for objects with no smooth component", {
-    expect_error( result <- n_smooths(dat),
-                 "Don't know how to identify smooths for <data.frame>",
+    expect_error( result <- n_smooths(su_eg1),
+                 "Don't know how to identify smooths for <tbl_df>",
                  fixed = TRUE)
 })
 
@@ -253,25 +244,25 @@ test_that("which_smooths throws error if no smooths match the supplied term", {
     expect_error(which_smooths(m_gamm, "foo"), err_msg, fixed = TRUE)
     expect_error(which_smooths(m_bam, "foo"), err_msg, fixed = TRUE)
 
-    expect_identical(2L, which_smooths(m_gam, "x1"))
-    expect_identical(2L, which_smooths(m_gamm, "x1"))
-    expect_identical(2L, which_smooths(m_bam, "x1"))
+    expect_identical(2L, which_smooths(m_gam, "s(x1)"))
+    expect_identical(2L, which_smooths(m_gamm, "s(x1)"))
+    expect_identical(2L, which_smooths(m_bam, "s(x1)"))
 
-    expect_identical(2L, which_smooth(m_gamm, "x1"))
+    expect_identical(2L, which_smooth(m_gamm, "s(x1)"))
 })
 
 test_that("which_smooths throws error for objects It can't handle", {
-    expect_error(which_smooths(dat, terms = "foo"),
-                 "Don't know how to identify smooths for <data.frame>",
+    expect_error(which_smooths(su_eg1, terms = "foo"),
+                 "Don't know how to identify smooths for <tbl_df>",
                  fixed = TRUE)
-    expect_error(which_smooths(dat),
-                 "Don't know how to identify smooths for <data.frame>",
+    expect_error(which_smooths(su_eg1),
+                 "Don't know how to identify smooths for <tbl_df>",
                  fixed = TRUE)
 })
 
 test_that("fix_offset can replace and offset only if there is one", {
-    df <- gamSim(1, n = 100, dist = "normal", verbose = FALSE)
-    m <- gam(y ~ s(x0) + s(x1) + offset(x2), data = df, method = "REML")
+    ## df <- gamSim(1, n = 100, dist = "normal", verbose = FALSE)
+    m <- gam(y ~ s(x0) + s(x1) + offset(x2), data = su_eg1, method = "REML")
     off_val <- 1L
 
     expect_silent(fixed <- fix_offset(m, model.frame(m),
@@ -279,9 +270,11 @@ test_that("fix_offset can replace and offset only if there is one", {
     expect_identical(c("y","x2","x0","x1"), names(fixed))
     expect_true(all(fixed[["x2"]] == off_val))
 
-    m <- gam(y ~ s(x0) + s(x1), data = df, method = "REML")
-    expect_identical(model.frame(m),
-                     fix_offset(m, model.frame(m), offset_val = off_val))
+    # originally had this model
+    # m <- gam(y ~ s(x0) + s(x1), data = df, method = "REML")
+    expect_identical(model.frame(m_gam),
+                     fix_offset(m_gam, model.frame(m_gam),
+                                offset_val = off_val))
 })
 
 ## test coverage_ functions
