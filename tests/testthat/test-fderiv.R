@@ -7,31 +7,34 @@ library("mgcv")
 
 context("Testing fderiv()")
 
+mod <- gam(y ~ s(x0) + s(x1) + fac, data = su_eg4, method = "REML")
+
+test_that("fderiv is deprecated", {
+  expect_snapshot(fderiv(mod))
+})
+
 test_that("fderiv() can create newdata with factors in model", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     ## Example from https://github.com/scottkosty/tsgam/commit/a964ef3fcfc6847f737bd54e4d831b97d9d8b280
-    dat <- gamSim(4, n = 401, dist = "normal", scale = 2, verbose = FALSE)
-    mod <- gam(y ~ s(x0) + s(x1) + fac, data = dat, method = "REML")
     fd <- fderiv(mod)                   # shouldn't thrown an error
     expect_s3_class(fd, "fderiv")
 })
 
 test_that("fderiv() can handle factors in user-supplied newdata", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     ## Example from https://github.com/scottkosty/tsgam/commit/80293d4887ef322686d056ad54dcd183cdab0966
-    dat <- gamSim(4, n = 400, dist = "normal", scale = 2, verbose = FALSE)
-    mod <- gam(y ~ s(x0) + s(x1) + fac, data = dat, method = "REML")
-    newd <- dat[1,]
-    fd <- fderiv(mod, newdata = newd)   # shouldn't thrown an error
+    newd <- delete_response(mod, su_eg4)
+    expect_silent(fd <- fderiv(mod, newdata = su_eg4))
     expect_s3_class(fd, "fderiv")
 })
 
 test_that("fderiv() can handle offsets", {
+    withr::local_options(lifecycle_verbosity = "quiet") 
     ## Example from https://github.com/scottkosty/tsgam/commit/80293d4887ef322686d056ad54dcd183cdab0966
-    dat <- gamSim(4, n = 400, dist = "normal", scale = 2, verbose = FALSE)
-    mod <- gam(y ~ fac + s(x1) + offset(x0), data = dat,
+    mod <- gam(y ~ fac + s(x1) + offset(x0), data = su_eg4,
                method = "REML")
-    fd <- fderiv(mod)                   # shouldn't thrown an error
+    expect_silent(fd <- fderiv(mod))
     expect_s3_class(fd, "fderiv")
-    newd <- dat[1,]
-    fd <- fderiv(mod, newdata = newd)   # shouldn't thrown an error
+    expect_silent(fd <- fderiv(mod, newdata = su_eg4))
     expect_s3_class(fd, "fderiv")
 })
