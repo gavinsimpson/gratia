@@ -42,7 +42,12 @@
   
 
 <meta property="og:title" content="First derivatives of fitted GAM functions — fderiv" />
-<meta property="og:description" content="The first derivative of the smooth functions of a GAM model calculated using finite differences." />
+<meta property="og:description" content="
+This function was deprecated because it was limited to first order forward
+finite differences for derivatives only, but couldn't be improved to offer
+the needed functionality without breaking backwards compatability with papers
+and blog posts that already used fderiv(). A replacement, derivatives(),
+is now available and recommended for new analyses." />
 <meta property="og:image" content="https://gavinsimpson.github.io/gratia/reference/figures/README-draw-gam-figure-1.png" />
 <meta property="og:image:alt" content="Plot produced by draw() of 4 smooth functions from a fitted generalized additive model" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -87,7 +92,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.9113</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.9114</span>
       </span>
     </div>
 
@@ -126,7 +131,12 @@
     </div>
 
     <div class="ref-description">
-    <p>The first derivative of the smooth functions of a GAM model calculated using finite differences.</p>
+    <p><a href='https://lifecycle.r-lib.org/articles/stages.html#deprecated'><img src='figures/lifecycle-deprecated.svg' alt='[Deprecated]' /></a></p>
+<p>This function was deprecated because it was limited to first order forward
+finite differences for derivatives only, but couldn't be improved to offer
+the needed functionality without breaking backwards compatability with papers
+and blog posts that already used <code>fderiv()</code>. A replacement, <code><a href='derivatives.html'>derivatives()</a></code>,
+is now available and recommended for new analyses.</p>
     </div>
 
     <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>fderiv</span><span class='op'>(</span><span class='va'>model</span>, <span class='va'>...</span><span class='op'>)</span>
@@ -192,28 +202,35 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>1</span>, n <span class='op'>=</span> <span class='fl'>400</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> Gu &amp; Wahba 4 term additive model</span>
+<span class='r-in'><span class='co'># \dontshow{</span></span>
+<span class='r-in'><span class='va'>op</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span>lifecycle_verbosity <span class='op'>=</span> <span class='st'>"quiet"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='data_sim.html'>data_sim</a></span><span class='op'>(</span><span class='st'>"eg1"</span>, seed <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span></span>
 <span class='r-in'><span class='va'>mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x3</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'>## first derivatives of all smooths...</span></span>
 <span class='r-in'><span class='va'>fd</span> <span class='op'>&lt;-</span> <span class='fu'>fderiv</span><span class='op'>(</span><span class='va'>mod</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'>## now use --&gt;</span></span>
+<span class='r-in'><span class='va'>fd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='derivatives.html'>derivatives</a></span><span class='op'>(</span><span class='va'>mod</span><span class='op'>)</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'>## ...and a selected smooth</span></span>
 <span class='r-in'><span class='va'>fd2</span> <span class='op'>&lt;-</span> <span class='fu'>fderiv</span><span class='op'>(</span><span class='va'>mod</span>, term <span class='op'>=</span> <span class='st'>"x1"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'>## now use --&gt;</span></span>
+<span class='r-in'><span class='va'>fd2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='derivatives.html'>derivatives</a></span><span class='op'>(</span><span class='va'>mod</span>, term <span class='op'>=</span> <span class='st'>"s(x1)"</span><span class='op'>)</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'>## Models with factors</span></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>4</span>, n <span class='op'>=</span> <span class='fl'>400</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> Factor `by' variable example</span>
+<span class='r-in'><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='data_sim.html'>data_sim</a></span><span class='op'>(</span><span class='st'>"eg4"</span>, n <span class='op'>=</span> <span class='fl'>400</span>, dist <span class='op'>=</span> <span class='st'>"normal"</span>, scale <span class='op'>=</span> <span class='fl'>2</span>, seed <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span></span>
 <span class='r-in'><span class='va'>mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x1</span><span class='op'>)</span> <span class='op'>+</span> <span class='va'>fac</span>, data <span class='op'>=</span> <span class='va'>dat</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'>## first derivatives of all smooths...</span></span>
 <span class='r-in'><span class='va'>fd</span> <span class='op'>&lt;-</span> <span class='fu'>fderiv</span><span class='op'>(</span><span class='va'>mod</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'>## now use --&gt;</span></span>
+<span class='r-in'><span class='va'>fd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='derivatives.html'>derivatives</a></span><span class='op'>(</span><span class='va'>mod</span><span class='op'>)</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'>## ...and a selected smooth</span></span>
 <span class='r-in'><span class='va'>fd2</span> <span class='op'>&lt;-</span> <span class='fu'>fderiv</span><span class='op'>(</span><span class='va'>mod</span>, term <span class='op'>=</span> <span class='st'>"x1"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'>## now use --&gt;</span></span>
+<span class='r-in'><span class='va'>fd2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='derivatives.html'>derivatives</a></span><span class='op'>(</span><span class='va'>mod</span>, term <span class='op'>=</span> <span class='st'>"s(x1)"</span><span class='op'>)</span></span>
 </code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
