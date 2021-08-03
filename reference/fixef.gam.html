@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot basis functions — draw.mgcv_smooth • gratia</title>
+<title>Extract fixed effects estimates from a fitted GAM — fixef.gam • gratia</title>
 
 
 <!-- jquery -->
@@ -41,8 +41,8 @@
   <link href="../extra.css" rel="stylesheet">
   
 
-<meta property="og:title" content="Plot basis functions — draw.mgcv_smooth" />
-<meta property="og:description" content="Plots basis functions using ggplot2" />
+<meta property="og:title" content="Extract fixed effects estimates from a fitted GAM — fixef.gam" />
+<meta property="og:description" content="Extract fixed effects estimates from a fitted GAM" />
 <meta property="og:image" content="https://gavinsimpson.github.io/gratia/reference/figures/README-draw-gam-figure-1.png" />
 <meta property="og:image:alt" content="Plot produced by draw() of 4 smooth functions from a fitted generalized additive model" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -120,102 +120,44 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot basis functions</h1>
-    <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/draw-methods.R'><code>R/draw-methods.R</code></a></small>
-    <div class="hidden name"><code>draw.mgcv_smooth.Rd</code></div>
+    <h1>Extract fixed effects estimates from a fitted GAM</h1>
+    <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/effects.R'><code>R/effects.R</code></a></small>
+    <div class="hidden name"><code>fixef.gam.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Plots basis functions using ggplot2</p>
+    <p>Extract fixed effects estimates from a fitted GAM</p>
     </div>
 
-    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='co'># S3 method for mgcv_smooth</span>
-<span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span>
-  <span class='va'>object</span>,
-  legend <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  use_facets <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  labeller <span class='op'>=</span> <span class='cn'>NULL</span>,
-  <span class='va'>xlab</span>,
-  <span class='va'>ylab</span>,
-  title <span class='op'>=</span> <span class='cn'>NULL</span>,
-  subtitle <span class='op'>=</span> <span class='cn'>NULL</span>,
-  caption <span class='op'>=</span> <span class='cn'>NULL</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span></code></pre></div>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='co'># S3 method for gam</span>
+<span class='fu'><a href='fixef.html'>fixef</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for gamm</span>
+<span class='fu'><a href='fixef.html'>fixef</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>object</th>
-      <td><p>an object, the result of a call to <code><a href='basis.html'>basis()</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>legend</th>
-      <td><p>logical; should a legend by drawn to indicate basis functions?</p></td>
-    </tr>
-    <tr>
-      <th>use_facets</th>
-      <td><p>logical; for factor by smooths, use facets to show the
-basis functions for each level of the factor? If <code>FALSE</code>, a separate ggplot
-object will be created for each level and combined using
-<code><a href='https://patchwork.data-imaginist.com/reference/wrap_plots.html'>patchwork::wrap_plots()</a></code>. <strong>Currently ignored</strong>.</p></td>
-    </tr>
-    <tr>
-      <th>labeller</th>
-      <td><p>a labeller function with which to label facets. The default
-is to use <code><a href='https://ggplot2.tidyverse.org/reference/labellers.html'>ggplot2::label_both()</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>xlab</th>
-      <td><p>character or expression; the label for the x axis. If not
-supplied, a suitable label will be generated from <code>object</code>.</p></td>
-    </tr>
-    <tr>
-      <th>ylab</th>
-      <td><p>character or expression; the label for the y axis. If not
-supplied, a suitable label will be generated from <code>object</code>.</p></td>
-    </tr>
-    <tr>
-      <th>title</th>
-      <td><p>character or expression; the title for the plot. See
-<code><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggplot2::labs()</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>subtitle</th>
-      <td><p>character or expression; the subtitle for the plot. See
-<code><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggplot2::labs()</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>caption</th>
-      <td><p>character or expression; the plot caption. See
-<code><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ggplot2::labs()</a></code>.</p></td>
+      <td><p>a fitted GAM</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>arguments passed to other methods. Not used by this method.</p></td>
+      <td><p>arguments passed to other methods</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>A <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot2::ggplot()</a></code> object.</p>
-    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
-
-    <p>Gavin L. Simpson</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='fu'><a href='load_mgcv.html'>load_mgcv</a></span><span class='op'>(</span><span class='op'>)</span></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>42</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gamSim.html'>gamSim</a></span><span class='op'>(</span><span class='fl'>4</span>, n <span class='op'>=</span> <span class='fl'>400</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='va'>bf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='basis.html'>basis</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>df</span><span class='op'>)</span></span>
-<span class='r-in'><span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span><span class='va'>bf</span><span class='op'>)</span></span>
-<span class='r-plt'><img src='draw.mgcv_smooth-1.png' alt='' width='700' height='433' /></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='va'>bf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='basis.html'>basis</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>x2</span>, by <span class='op'>=</span> <span class='va'>fac</span>, bs <span class='op'>=</span> <span class='st'>'bs'</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>df</span><span class='op'>)</span></span>
-<span class='r-in'><span class='fu'><a href='draw.html'>draw</a></span><span class='op'>(</span><span class='va'>bf</span><span class='op'>)</span></span>
-<span class='r-plt'><img src='draw.mgcv_smooth-2.png' alt='' width='700' height='433' /></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>sleepstudy</span>, package <span class='op'>=</span> <span class='st'>"lme4"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>m</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a></span><span class='op'>(</span><span class='va'>Reaction</span> <span class='op'>~</span> <span class='va'>Days</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>Subject</span>, bs <span class='op'>=</span> <span class='st'>"re"</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>           <span class='fu'><a href='https://rdrr.io/pkg/mgcv/man/s.html'>s</a></span><span class='op'>(</span><span class='va'>Days</span>, <span class='va'>Subject</span>, bs <span class='op'>=</span> <span class='st'>"re"</span><span class='op'>)</span>,</span>
+<span class='r-in'>         data <span class='op'>=</span> <span class='va'>sleepstudy</span>, method <span class='op'>=</span> <span class='st'>"REML"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='fixef.html'>fixef</a></span><span class='op'>(</span><span class='va'>m</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> (Intercept)        Days </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   251.40510    10.46729 </span>
 </code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

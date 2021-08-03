@@ -86,7 +86,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.9114</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.9200</span>
       </span>
     </div>
 
@@ -123,9 +123,9 @@
       <small>Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="gratia-069113" class="section level1">
-<h1 class="page-header" data-toc-text="0.6.9113">
-<a href="#gratia-069113" class="anchor" aria-hidden="true"></a>gratia 0.6.9113<small> Unreleased </small></h1>
+    <div id="gratia-069200" class="section level1">
+<h1 class="page-header" data-toc-text="0.6.9200">
+<a href="#gratia-069200" class="anchor" aria-hidden="true"></a>gratia 0.6.9200<small> Unreleased </small></h1>
 <div id="major-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#major-changes" class="anchor" aria-hidden="true"></a>Major changes</h2>
@@ -146,6 +146,7 @@
 </li>
 <li><p>Partial residuals can now be plotted on factor by smooths. To allow this, the partial residuals are filtered so that only residuals associated with a particular level’s smooth are drawn on the plot of the smooth.</p></li>
 <li><p><code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> uses <code><a href="../reference/check_user_select_smooths.html">check_user_select_smooths()</a></code> to handle user-specified selection of smooth terms. As such it is more flexible than previously, and allows for easier selection of smooths to evaluate.</p></li>
+<li><p><code><a href="../reference/fixef.html">fixef()</a></code> is now imported (and re-exported) from the <em>nlme</em> package, with methods for models fitted with <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">gamm()</a></code>, to extract fixed effects estimates from fitted models.</p></li>
 </ul></div>
 <div id="bug-fixes" class="section level2">
 <h2 class="hasAnchor">

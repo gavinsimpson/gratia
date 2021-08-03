@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Extract family objects from models — family.gam • gratia</title>
+<title>Extract fixed effects estimates — fixef • gratia</title>
 
 
 <!-- jquery -->
@@ -41,8 +41,8 @@
   <link href="../extra.css" rel="stylesheet">
   
 
-<meta property="og:title" content="Extract family objects from models — family.gam" />
-<meta property="og:description" content="Provides a stats::family() method for a range of GAM objects." />
+<meta property="og:title" content="Extract fixed effects estimates — fixef" />
+<meta property="og:description" content="Extract fixed effects estimates" />
 <meta property="og:image" content="https://gavinsimpson.github.io/gratia/reference/figures/README-draw-gam-figure-1.png" />
 <meta property="og:image:alt" content="Plot produced by draw() of 4 smooth functions from a fitted generalized additive model" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -120,38 +120,26 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Extract family objects from models</h1>
-    <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/family-utils.R'><code>R/family-utils.R</code></a></small>
-    <div class="hidden name"><code>family.gam.Rd</code></div>
+    <h1>Extract fixed effects estimates</h1>
+    <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/effects.R'><code>R/effects.R</code></a></small>
+    <div class="hidden name"><code>fixef.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Provides a <code><a href='https://rdrr.io/r/stats/family.html'>stats::family()</a></code> method for a range of GAM objects.</p>
+    <p>Extract fixed effects estimates</p>
     </div>
 
-    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='co'># S3 method for gam</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/family.html'>family</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for gamm</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/family.html'>family</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for bam</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/family.html'>family</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for list</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/family.html'>family</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>object</th>
-      <td><p>a fitted model. Models fitted by <code><a href='https://rdrr.io/pkg/mgcv/man/gam.html'>mgcv::gam()</a></code>, <code><a href='https://rdrr.io/pkg/mgcv/man/bam.html'>mgcv::bam()</a></code>,
-<code><a href='https://rdrr.io/pkg/mgcv/man/gamm.html'>mgcv::gamm()</a></code>, and <code><a href='https://rdrr.io/pkg/gamm4/man/gamm4.html'>gamm4::gamm4()</a></code> are currently supported.</p></td>
+      <td><p>a fitted GAM</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>arguments passed to other methods.</p></td>
+      <td><p>arguments passed to other methods</p></td>
     </tr>
     </table>
 
