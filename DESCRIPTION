@@ -29,9 +29,11 @@ Imports:
     grDevices,
     stringr,
     tidyselect,
-    lifecycle
+    lifecycle,
+    nlme
 Suggests:
     gamm4,
+    lme4,
     testthat,
     vdiffr,
     MASS,
