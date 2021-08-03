@@ -17,3 +17,11 @@
 \description{
 Extract fixed effects estimates from a fitted GAM
 }
+\examples{
+load_mgcv()
+data(sleepstudy, package = "lme4")
+m <- gam(Reaction ~ Days + s(Subject, bs = "re") +
+           s(Days, Subject, bs = "re"),
+         data = sleepstudy, method = "REML")
+fixef(m)
+}

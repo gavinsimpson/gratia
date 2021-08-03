@@ -2,8 +2,9 @@
 #'
 #' @param object a fitted GAM
 #' @param ... arguments passed to other methods
-#' 
+#'
 #' @importFrom nlme fixef
+#' @name fixef
 #' @export
 NULL
 
@@ -11,8 +12,16 @@ NULL
 #'
 #' @param object a fitted GAM
 #' @param ... arguments passed to other methods
-#' 
+#'
 #' @export
+#'
+#' @examples
+#' load_mgcv()
+#' data(sleepstudy, package = "lme4")
+#' m <- gam(Reaction ~ Days + s(Subject, bs = "re") +
+#'            s(Days, Subject, bs = "re"),
+#'          data = sleepstudy, method = "REML")
+#' fixef(m)
 `fixef.gam` <- function(object, ...) {
     coefs <- coef(object)
     nms <- names(coefs)

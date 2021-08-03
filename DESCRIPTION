@@ -33,6 +33,7 @@ Imports:
     nlme
 Suggests:
     gamm4,
+    lme4,
     testthat,
     vdiffr,
     MASS,
