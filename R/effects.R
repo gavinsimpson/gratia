@@ -1,0 +1,31 @@
+#' Extract fixed effects estimates
+#'
+#' @param object a fitted GAM
+#' @param ... arguments passed to other methods
+#' 
+#' @importFrom nlme fixef
+#' @export
+NULL
+
+#' Extract fixed effects estimates from a fitted GAM
+#'
+#' @param object a fitted GAM
+#' @param ... arguments passed to other methods
+#' 
+#' @export
+`fixef.gam` <- function(object, ...) {
+    coefs <- coef(object)
+    nms <- names(coefs)
+    # drop everything that starts with s, te, ti, or t2 and is followed by a (
+    sm_terms <- grepl('^[s te ti t2](?=\\()', names(coef(object)), perl = TRUE)
+    nms <- nms[!sm_terms]
+    # return
+    coefs[nms]
+}
+
+#' @rdname fixef.gam
+#' @export
+`fixef.gamm` <- function(object, ...) {
+    object <- object$gamm
+    fixef(object)
+}
