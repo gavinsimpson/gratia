@@ -1,4 +1,4 @@
-# gratia 0.6.9113
+# gratia 0.6.9200
 
 ## Major changes
 
@@ -39,6 +39,10 @@
 * `smooth_estimates()` uses `check_user_select_smooths()` to handle
   user-specified selection of smooth terms. As such it is more flexible than
   previously, and allows for easier selection of smooths to evaluate.
+
+* `fixef()` is now imported (and re-exported) from the *nlme* package, with
+  methods for models fitted with `gam()` and `gamm()`, to extract fixed effects
+  estimates from fitted models.
 
 ## Bug fixes
 
