@@ -58,7 +58,7 @@
                                    data = NULL,
                                    unconditional = FALSE,
                                    overall_uncertainty = TRUE,
-                                   dist = 0.1,
+                                   dist = NULL,
                                    unnest = TRUE,
                                    partial_match = FALSE,
                                    ...) {
@@ -82,7 +82,7 @@
     ## if user data supplied, check for and remove response
     if (!is.null(data)) {
         if (!is.data.frame(data)) {
-            stop("'data', if supplied, must be a numeric vector or a data frame.",
+            stop("'data', if supplied, must be a numeric vector or data frame.",
                  call. = FALSE)
         }
         check_all_vars(object, data = data, smooths = smooths)
@@ -348,6 +348,7 @@
 `eval_smooth.mgcv.smooth` <- function(smooth, model, n = 100, data = NULL,
                                       unconditional = FALSE,
                                       overall_uncertainty = TRUE,
+                                      dist = NULL,
                                       ...) {
     by_var <- by_variable(smooth) # even if not a by as we want NA later
     if (by_var == "NA") {
@@ -373,6 +374,16 @@
     sm_type <- smooth_type(smooth)
     eval_sm <- add_column(eval_sm, type = rep(sm_type, nr),
                           .after = 1L)
+
+    # set some values to NA if too far from the data
+    if (smooth_dim(smooth) == 2L && (!is.null(dist) && dist > 0)) {
+        eval_sm <- too_far_to_na(smooth,
+                                 input = eval_sm,
+                                 reference = model[["model"]],
+                                 cols = c("est", "se"),
+                                 dist = dist)
+    }
+
     ## return
     eval_sm
 }
@@ -495,7 +506,8 @@
 `eval_smooth.t2.smooth` <- function(smooth, model, n = 100, data = NULL,
                                     unconditional = FALSE,
                                     overall_uncertainty = TRUE,
-                                    dist = 0.1, ...) {
+                                    dist = NULL,
+                                    ...) {
     by_var <- by_variable(smooth) # even if not a by as we want NA later
     if (by_var == "NA") {
         by_var <- NA_character_
@@ -519,6 +531,15 @@
     sm_type <- smooth_type(smooth)
     eval_sm <- add_column(eval_sm, type = rep(sm_type, nr), .after = 1L)
 
+    # set some values to NA if too far from the data
+     if (smooth_dim(smooth) == 2L && (!is.null(dist) && dist > 0)) {
+        eval_sm <- too_far_to_na(smooth,
+                                 input = eval_sm,
+                                 reference = model[["model"]],
+                                 cols = c("est", "se"),
+                                 dist = dist)
+    }
+
     ## return
     eval_sm
 }
@@ -529,6 +550,7 @@
 `eval_smooth.tensor.smooth` <- function(smooth, model, n = 100, data = NULL,
                                         unconditional = FALSE,
                                         overall_uncertainty = TRUE,
+                                        dist = NULL,
                                         ...) {
     by_var <- by_variable(smooth) # even if not a by as we want NA later
     if (by_var == "NA") {
@@ -554,6 +576,16 @@
     sm_type <- smooth_type(smooth)
     eval_sm <- add_column(eval_sm, type = rep(sm_type, nr),
                           .after = 1L)
+
+    # set some values to NA if too far from the data
+    if (smooth_dim(smooth) == 2L && (!is.null(dist) && dist > 0)) {
+        eval_sm <- too_far_to_na(smooth,
+                                 input = eval_sm,
+                                 reference = model[["model"]],
+                                 cols = c("est", "se"),
+                                 dist = dist)
+    }
+
     ## return
     eval_sm
 }

@@ -173,7 +173,7 @@ test_that("smooth_estimates works with vector data", {
 
 test_that("smooth_estimates fails if data is not data frame or numeric", {
     expect_error(smooth_estimates(m1, "s(x0)", data = list(x0 = dat[, "x0"])),
-                 "'data', if supplied, must be a numeric vector or a data frame.",
+                 "'data', if supplied, must be a numeric vector or data frame.",
                  fixed = TRUE)
 })
 

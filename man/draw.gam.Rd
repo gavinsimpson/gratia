@@ -121,9 +121,9 @@ is used instead.
 }
 \note{
 Internally, plots of each smooth are created using \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}
-and composed into a single plot using \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}. As a result,
-it is not possible to use \code{+} to add to the plots in the way one might
-typically work with \code{ggplot()} plots.
+and composed into a single plot using \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}. As a
+result, it is not possible to use \code{+} to add to the plots in the way one
+might typically work with \code{ggplot()} plots.
 }
 \examples{
 load_mgcv()
