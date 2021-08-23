@@ -82,7 +82,8 @@ a data frame with components:
 }
 }
 \description{
-Calculates point-wise confidence or simultaneous intervals for the smooth terms of a fitted GAM.
+Calculates point-wise confidence or simultaneous intervals for the smooth
+terms of a fitted GAM.
 }
 \examples{
 load_mgcv()

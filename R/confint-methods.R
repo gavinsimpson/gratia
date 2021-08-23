@@ -1,60 +1,61 @@
-##' Point-wise and simultaneous confidence intervals for derivatives of smooths
-##'
-##' Calculates point-wise confidence or simultaneous intervals for the first
-##'   derivatives of smooth terms in a fitted GAM.
-##'
-##' @param object an object of class `"fderiv"` containing the estimated
-##'   derivatives.
-##' @param parm which parameters (smooth terms) are to be given intervals as a
-##'   vector of terms. If missing, all parameters are considered.
-##' @param level numeric, `0 < level < 1`; the confidence level of the
-##'   point-wise or simultaneous interval. The default is `0.95` for a 95%
-##'   interval.
-##' @param type character; the type of interval to compute. One of `"confidence"`
-##'   for point-wise intervals, or `"simultaneous"` for simultaneous intervals.
-##' @param nsim integer; the number of simulations used in computing the
-##'   simultaneous intervals.
-##' @param ncores number of cores for generating random variables from a
-##'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
-##'   Parallelization will take place only if OpenMP is supported (but appears
-##'   to work on Windows with current `R`).
-##' @param ... additional arguments for methods
-##'
-##' @return a data frame with components:
-##' 1. `term`; factor indicating to which term each row relates,
-##' 2. `lower`; lower limit of the confidence or simultaneous interval,
-##' 3. `est`; estimated derivative
-##' 4. `upper`; upper limit of the confidence or simultaneous interval.
-##'
-##' @author Gavin L. Simpson
-##'
-##' @export
-##'
-##' @examples
-##' load_mgcv()
-##' \dontshow{
-##' set.seed(2)
-##' op <- options(digits = 3, cli.unicode = FALSE)
-##' }
-##' dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
-##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-##'
-##' ## first derivatives of all smooths...
-##' fd <- fderiv(mod)
-##'
-##' ## point-wise interval
-##' ci <- confint(fd, type = "confidence")
-##' head(ci)
-##'
-##' ## simultaneous interval for smooth term of x1
-##' \dontshow{
-##' set.seed(42)
-##' }
-##' x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 2500)
-##' head(x1.sint)
-##' \dontshow{options(op)}
+#' Point-wise and simultaneous confidence intervals for derivatives of smooths
+#'
+#' Calculates point-wise confidence or simultaneous intervals for the first
+#'   derivatives of smooth terms in a fitted GAM.
+#'
+#' @param object an object of class `"fderiv"` containing the estimated
+#'   derivatives.
+#' @param parm which parameters (smooth terms) are to be given intervals as a
+#'   vector of terms. If missing, all parameters are considered.
+#' @param level numeric, `0 < level < 1`; the confidence level of the
+#'   point-wise or simultaneous interval. The default is `0.95` for a 95%
+#'   interval.
+#' @param type character; the type of interval to compute. One of `"confidence"`
+#'   for point-wise intervals, or `"simultaneous"` for simultaneous intervals.
+#' @param nsim integer; the number of simulations used in computing the
+#'   simultaneous intervals.
+#' @param ncores number of cores for generating random variables from a
+#'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
+#'   Parallelization will take place only if OpenMP is supported (but appears
+#'   to work on Windows with current `R`).
+#' @param ... additional arguments for methods
+#'
+#' @return a data frame with components:
+#' 1. `term`; factor indicating to which term each row relates,
+#' 2. `lower`; lower limit of the confidence or simultaneous interval,
+#' 3. `est`; estimated derivative
+#' 4. `upper`; upper limit of the confidence or simultaneous interval.
+#'
+#' @author Gavin L. Simpson
+#'
+#' @export
+#'
+#' @examples
+#' load_mgcv()
+#' \dontshow{
+#' set.seed(2)
+#' op <- options(digits = 3, cli.unicode = FALSE)
+#' }
+#' dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
+#' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+#'
+#' ## first derivatives of all smooths...
+#' fd <- fderiv(mod)
+#'
+#' ## point-wise interval
+#' ci <- confint(fd, type = "confidence")
+#' head(ci)
+#'
+#' ## simultaneous interval for smooth term of x1
+#' \dontshow{
+#' set.seed(42)
+#' }
+#' x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 2500)
+#' head(x1.sint)
+#' \dontshow{options(op)}
 `confint.fderiv` <- function(object, parm, level = 0.95,
-                             type = c("confidence", "simultaneous"), nsim = 10000,
+                             type = c("confidence", "simultaneous"),
+                             nsim = 10000,
                              ncores = 1L, ...) {
     ## Process arguments
     ## parm is one of the terms in object
@@ -83,7 +84,8 @@
         stop(paste("`level` should be numeric, but supplied:", level))
     }
     if (! (0 < level) && (level < 1)) {
-        stop(paste("`level` should lie in interval [0,1], but supplied:", level))
+        stop(paste("`level` should lie in interval [0,1], but supplied:",
+             level))
     }
 
     ## which type of interval is required
@@ -103,8 +105,8 @@
     interval
 }
 
-##' @importFrom stats quantile vcov
-##' @importFrom mvnfast rmvn
+#' @importFrom stats quantile vcov
+#' @importFrom mvnfast rmvn
 `simultaneous` <- function(x, terms, level, nsim, ncores) {
     ## wrapper the computes each interval
     `simInt` <- function(x, Vb, bu, level, nsim) {
@@ -136,7 +138,7 @@
     res                                                # return
 }
 
-##' @importFrom stats qnorm
+#' @importFrom stats qnorm
 `confidence` <- function(x, terms, level) {
     ## wrapper the computes each interval
     `confInt` <- function(x, level) {
@@ -159,85 +161,87 @@
     res                                                # return
 }
 
-##' Point-wise and simultaneous confidence intervals for smooths
-##'
-##' Calculates point-wise confidence or simultaneous intervals for the smooth terms of a fitted GAM.
-##'
-##' @param object an object of class `"gam"` or `"gamm"`.
-##' @param parm which parameters (smooth terms) are to be given intervals as a
-##'   vector of terms. If missing, all parameters are considered, although this
-##'   is not currently implemented.
-##' @param level numeric, `0 < level < 1`; the confidence level of the point-wise
-##'   or simultaneous interval. The default is `0.95` for a 95% interval.
-##' @param newdata data frame; containing new values of the covariates used in
-##'   the model fit. The selected smooth(s) wil be evaluated at the supplied
-##'   values.
-##' @param n numeric; the number of points to evaluate smooths at.
-##' @param type character; the type of interval to compute. One of `"confidence"`
-##'   for point-wise intervals, or `"simultaneous"` for simultaneous intervals.
-##' @param nsim integer; the number of simulations used in computing the
-##'   simultaneous intervals.
-##' @param shift logical; should the constant term be add to the smooth?
-##' @param transform logical; should the smooth be evaluated on a transformed
-##'   scale? For generalised models, this involves applying the inverse of the
-##'   link function used to fit the model. Alternatively, the name of, or an
-##'   actual, function can be supplied to transform the smooth and it's
-##'   confidence interval.
-##' @param unconditional logical; if `TRUE` (and `freq == FALSE`) then the
-##'   Bayesian smoothing parameter uncertainty corrected covariance matrix is
-##'   returned, if available.
-##' @param ncores number of cores for generating random variables from a
-##'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
-##'   Parallelization will take place only if OpenMP is supported (but appears
-##'   to work on Windows with current `R`).
-##' @param partial_match logical; should matching `parm` use a partial match or
-##'   an exact match? Can only be used if `length(parm)` is `1`.
-##' @param ... additional arguments for methods
-##'
-##' @return a data frame with components:
-##' 1. `term`; factor indicating to which term each row relates,
-##' 2. `x`; the vector of values at which the smooth was evaluated,
-##' 3. `lower`; lower limit of the confidence or simultaneous interval,
-##' 4. `est`; estimated value of the smooth
-##' 5. `upper`; upper limit of the confidence or simultaneous interval,
-##' 6. `crit`; critical value for the `100 * level`% confidence interval.
-##'
-##' @author Gavin L. Simpson
-##'
-##' @importFrom stats family qnorm
-##' @importFrom mgcv PredictMat
-##' @importFrom stats quantile vcov setNames
-##' @importFrom dplyr bind_rows
-##' @importFrom tibble add_column
-##' @importFrom mvnfast rmvn
-##'
-##' @export
-##'
-##' @examples
-##' load_mgcv()
-##' \dontshow{
-##' set.seed(2)
-##' op <- options(digits = 4, cli.unicode = FALSE)
-##' }
-##' dat <- gamSim(1, n = 500, dist = "normal", scale = 2)
-##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-##'
-##' ## point-wise interval
-##' ci <- confint(mod, parm = "s(x1)", type = "confidence")
-##' ci
-##'
-##' ## simultaneous interval for smooth term of x1
-##' \dontshow{
-##' set.seed(42)
-##' }
-##' si <- confint(mod, parm = "s(x1)", type = "simultaneous", nsim = 100)
-##' si
-##' \dontshow{
-##' options(op)
-##' }
+#' Point-wise and simultaneous confidence intervals for smooths
+#'
+#' Calculates point-wise confidence or simultaneous intervals for the smooth
+#' terms of a fitted GAM.
+#'
+#' @param object an object of class `"gam"` or `"gamm"`.
+#' @param parm which parameters (smooth terms) are to be given intervals as a
+#'   vector of terms. If missing, all parameters are considered, although this
+#'   is not currently implemented.
+#' @param level numeric, `0 < level < 1`; the confidence level of the point-wise
+#'   or simultaneous interval. The default is `0.95` for a 95% interval.
+#' @param newdata data frame; containing new values of the covariates used in
+#'   the model fit. The selected smooth(s) wil be evaluated at the supplied
+#'   values.
+#' @param n numeric; the number of points to evaluate smooths at.
+#' @param type character; the type of interval to compute. One of `"confidence"`
+#'   for point-wise intervals, or `"simultaneous"` for simultaneous intervals.
+#' @param nsim integer; the number of simulations used in computing the
+#'   simultaneous intervals.
+#' @param shift logical; should the constant term be add to the smooth?
+#' @param transform logical; should the smooth be evaluated on a transformed
+#'   scale? For generalised models, this involves applying the inverse of the
+#'   link function used to fit the model. Alternatively, the name of, or an
+#'   actual, function can be supplied to transform the smooth and it's
+#'   confidence interval.
+#' @param unconditional logical; if `TRUE` (and `freq == FALSE`) then the
+#'   Bayesian smoothing parameter uncertainty corrected covariance matrix is
+#'   returned, if available.
+#' @param ncores number of cores for generating random variables from a
+#'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
+#'   Parallelization will take place only if OpenMP is supported (but appears
+#'   to work on Windows with current `R`).
+#' @param partial_match logical; should matching `parm` use a partial match or
+#'   an exact match? Can only be used if `length(parm)` is `1`.
+#' @param ... additional arguments for methods
+#'
+#' @return a data frame with components:
+#' 1. `term`; factor indicating to which term each row relates,
+#' 2. `x`; the vector of values at which the smooth was evaluated,
+#' 3. `lower`; lower limit of the confidence or simultaneous interval,
+#' 4. `est`; estimated value of the smooth
+#' 5. `upper`; upper limit of the confidence or simultaneous interval,
+#' 6. `crit`; critical value for the `100 * level`% confidence interval.
+#'
+#' @author Gavin L. Simpson
+#'
+#' @importFrom stats family qnorm
+#' @importFrom mgcv PredictMat
+#' @importFrom stats quantile vcov setNames
+#' @importFrom dplyr bind_rows
+#' @importFrom tibble add_column
+#' @importFrom mvnfast rmvn
+#'
+#' @export
+#'
+#' @examples
+#' load_mgcv()
+#' \dontshow{
+#' set.seed(2)
+#' op <- options(digits = 4, cli.unicode = FALSE)
+#' }
+#' dat <- gamSim(1, n = 500, dist = "normal", scale = 2)
+#' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+#'
+#' ## point-wise interval
+#' ci <- confint(mod, parm = "s(x1)", type = "confidence")
+#' ci
+#'
+#' ## simultaneous interval for smooth term of x1
+#' \dontshow{
+#' set.seed(42)
+#' }
+#' si <- confint(mod, parm = "s(x1)", type = "simultaneous", nsim = 100)
+#' si
+#' \dontshow{
+#' options(op)
+#' }
 `confint.gam` <- function(object, parm, level = 0.95, newdata = NULL, n = 200,
                           type = c("confidence", "simultaneous"), nsim = 10000,
-                          shift = FALSE, transform = FALSE, unconditional = FALSE,
+                          shift = FALSE, transform = FALSE,
+                          unconditional = FALSE,
                           ncores = 1, partial_match = FALSE,
                           ...) {
     S <- smooths(object)
@@ -324,19 +328,21 @@
             ## evaluate smooth
             out[[i]] <- evaluate_smooth(object, uS[i], n = n, newdata = newdata)
 
-            ## if this is a by var smooth, we need to do this for each level of by var
+            # if this is a by var smooth, we need to do this for each level of
+            # by var
             if (is.null(by_levs)) {        # not by variable smooth
                 smooth <- get_smooth(object, parm) # get the specific smooth
                 crit <- sim_interval(smooth, level = level, newdata = out[[i]])
-                out[[i]][["crit"]] <- crit # add on the critical value for this smooth
+                out[[i]][["crit"]] <- crit # add on the critical value
             } else {                       # is a by variable smooth
                 out[[i]][["crit"]] <- 0    # fill in a variable crit
                 smooth <- old_get_smooth(object, parm)
                 for (l in seq_along(by_levs)) {
                     ## the 6L should really refer to the by_variable column...
-                    ind <- out[[i]][[6L]] == by_levs[l] # which rows in evaulated smooth contain this levels data?
-                    crit <- sim_interval(smooth[[l]], level = level, newdata = out[[i]][ind, ])
-                    out[[i]][["crit"]][ind] <- crit # add on the critical value for this smooth
+                    ind <- out[[i]][[6L]] == by_levs[l] # take only needed rows
+                    crit <- sim_interval(smooth[[l]], level = level, 
+                                         newdata = out[[i]][ind, ])
+                    out[[i]][["crit"]][ind] <- crit # add on the critical value
                 }
             }
         }
@@ -354,12 +360,12 @@
     ## simplify to a data frame for return
     out <- do.call("bind_rows", out)
 
-    ## This was needed with `[.evaluated_smooth` before switching to
-    ## NextMethod() to call the next S3 `[` method.
-    ##   See: https://github.com/tidyverse/tibble/issues/511#issuecomment-431225229
-    ## Note needed, it seems now that NextMethod() is used but extending tibbles
-    ## is not currently well documented.
-    ## class(out) <- class(out)[-(1:2)]
+    # This was needed with `[.evaluated_smooth` before switching to
+    # NextMethod() to call the next S3 `[` method.
+    # See: https://github.com/tidyverse/tibble/issues/511#issuecomment-431225229
+    # Note needed, it seems now that NextMethod() is used but extending tibbles
+    # is not currently well documented.
+    # class(out) <- class(out)[-(1:2)]
 
     ## using se and crit, compute the lower and upper intervals
     out <- add_column(out,
@@ -376,23 +382,24 @@
     out                                 # return
 }
 
-##' @rdname confint.gam
-##'
-##' @importFrom stats confint
-##'
-##' @export
+#' @rdname confint.gam
+#'
+#' @importFrom stats confint
+#'
+#' @export
 `confint.gamm` <- function(object, ...) {
     confint(object[["gam"]], ...)
 }
 
-##' @rdname confint.gam
-##'
-##' @importFrom stats confint
-##' 
-##' @export
+#' @rdname confint.gam
+#'
+#' @importFrom stats confint
+#' 
+#' @export
 `confint.list` <- function(object, ...) {
     if (!is_gamm4(object)) {
-        stop("`object` does not appear to a `gamm4` model object", call. = FALSE)
+        stop("`object` does not appear to a `gamm4` model object",
+             call. = FALSE)
     }
     confint(object[["gam"]], ...)
 }
