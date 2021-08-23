@@ -51,9 +51,9 @@
 #' @inheritParams evaluate_smooth
 #'
 #' @note Internally, plots of each smooth are created using [ggplot2::ggplot()]
-#'   and composed into a single plot using [patchwork::wrap_plots()]. As a result,
-#'   it is not possible to use `+` to add to the plots in the way one might
-#'   typically work with `ggplot()` plots.
+#'   and composed into a single plot using [patchwork::wrap_plots()]. As a
+#'   result, it is not possible to use `+` to add to the plots in the way one
+#'   might typically work with `ggplot()` plots.
 #'
 #' @return The object returned is created by [patchwork::wrap_plots()].
 #'
