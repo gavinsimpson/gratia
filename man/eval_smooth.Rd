@@ -19,6 +19,7 @@ eval_smooth(smooth, ...)
   data = NULL,
   unconditional = FALSE,
   overall_uncertainty = TRUE,
+  dist = NULL,
   ...
 )
 
@@ -59,7 +60,7 @@ eval_smooth(smooth, ...)
   data = NULL,
   unconditional = FALSE,
   overall_uncertainty = TRUE,
-  dist = 0.1,
+  dist = NULL,
   ...
 )
 
@@ -70,6 +71,7 @@ eval_smooth(smooth, ...)
   data = NULL,
   unconditional = FALSE,
   overall_uncertainty = TRUE,
+  dist = NULL,
   ...
 )
 }

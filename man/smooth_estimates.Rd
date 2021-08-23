@@ -14,7 +14,7 @@ smooth_estimates(object, ...)
   data = NULL,
   unconditional = FALSE,
   overall_uncertainty = TRUE,
-  dist = 0.1,
+  dist = NULL,
   unnest = TRUE,
   partial_match = FALSE,
   ...
