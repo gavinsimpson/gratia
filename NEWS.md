@@ -5,7 +5,7 @@
 * `draw.gam()` now uses `smooth_estimates()` internally and consequently uses
   its `draw()` method and underlying plotting code. This has simplified the code
   compared to `evaluate_smooth()` and its methods, which will allow for future
-  development and addition of features more easily than if `evaluate_Smooth()`
+  development and addition of features more easily than if `evaluate_smooth()`
   had been retained.
 
   While a lot of code has been reused so differences between plots as a result
