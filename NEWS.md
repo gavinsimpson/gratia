@@ -1,4 +1,4 @@
-# gratia 0.6.9200
+# gratia 0.6.9300
 
 ## Major changes
 
@@ -13,6 +13,16 @@
   and Issue if you notice something that has changed that you think shouldn't.
 
 ## New features
+
+* `fitted_values()` provides a tidy wrapper around `predict.gam()` for
+  generating fitted values from the model. New covariate values can be provide
+  via argument `data`. A credible interval on the fitted values is returned, and
+  values can be on the link (linear predictor) or response scale.
+
+  Note that this function returns expected values of the response. Hence
+  "fitted values" is used instead of "predictions" in the case of new covariate
+  values to differentiate these values from the case of generating new response
+  values from a fitted model.
 
 * `rootogram()` and its `draw()` method produce rootograms as diagnostic plots
   for fitted models. Currently only for models fitted with `poisson()`,
@@ -54,6 +64,10 @@
 
 * The `add_confint()` method for `smooth_estimates()` had the upper and lower
   intervals reversed. #107 Reported by @Aariq
+
+* `draw.gam()` and `smooth_estimates()` were both ignoring the `dist` argument
+  that allows covariate values that lie too far from the support of the data to
+  be excluded when returning estimated values from the smooth and plotting it.
 
 # gratia 0.6.0
 
