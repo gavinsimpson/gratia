@@ -1090,17 +1090,30 @@ vars_from_label <- function(label) {
 #'
 #' @param model a fitted model from which a `terms` object can be extracted.
 #' @param data a data frame containing variables in the formula of `model`.
+#' @param model_frame logical; if `TRUE`, return as a `model.frame` object with
+#'   a `"terms"` attribute. If `FALSE`, return a data frame with the `"terms"`
+#'   attribute removed.
 #'
 #' @keywords internal
 #' @noRd
-`delete_response` <- function(model, data = NULL) {
+`delete_response` <- function(model, data = NULL, model_frame = TRUE) {
     if (is.null(data)) {
-        stop("`data` must be supplied currently.")
+        if (is.null(model[["model"]])) {
+            stop("`data` must be supplied if not available from 'model'")
+        } else {
+            data <- model[["model"]]
+        }
     }
-    
+
     tt <- terms(model[["pred.formula"]])
     tt <- delete.response(tt)
-    model.frame(tt, data = data)
+    out <- model.frame(tt, data = data)
+
+    if(identical(model_frame, FALSE)) {
+        attr(out, "terms") <- NULL
+    }
+
+    out
 }
 
 #' Extract names of all variables needed to fit a GAM or a smooth
