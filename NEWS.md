@@ -68,6 +68,7 @@
 * `draw.gam()` and `smooth_estimates()` were both ignoring the `dist` argument
   that allows covariate values that lie too far from the support of the data to
   be excluded when returning estimated values from the smooth and plotting it.
+  #111 Reported by @Aariq
 
 # gratia 0.6.0
 
