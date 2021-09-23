@@ -2,7 +2,10 @@ on:
   push:
     branches: master
 
-name: pkgdown
+name: pkgdownenv
+
+env:
+  GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   pkgdown:

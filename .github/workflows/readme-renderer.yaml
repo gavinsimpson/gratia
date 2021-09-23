@@ -7,6 +7,10 @@ on:
   push:
     branches: master
 
+
+env:
+  GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   render:
     # The type of runner that the job will run on
