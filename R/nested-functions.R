@@ -85,7 +85,7 @@
 
     # if not supplied data then recover it from the model object
     if (is.null(data)) {
-        data <- model.frame(object)
+        data <- object$model # don't need -> model.frame(object)
     }
 
     # if no terms, extract all smooth labels
@@ -122,6 +122,9 @@
     # retain only those columns we want
     df <- data %>%
         select(all_of(c(sm_var, by_var)))
+
+    # handle matrix covariates, which will get stacked
+    df <- as_tibble(lapply(df, as.numeric))
 
     # do this first so we bind on all the data, then filter
     if (!is.null(extra)) {
