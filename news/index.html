@@ -86,7 +86,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.9200</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.9300</span>
       </span>
     </div>
 
@@ -123,21 +123,25 @@
       <small>Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="gratia-069200" class="section level1">
-<h1 class="page-header" data-toc-text="0.6.9200">
-<a href="#gratia-069200" class="anchor" aria-hidden="true"></a>gratia 0.6.9200<small> Unreleased </small></h1>
+    <div id="gratia-069300" class="section level1">
+<h1 class="page-header" data-toc-text="0.6.9300">
+<a href="#gratia-069300" class="anchor" aria-hidden="true"></a>gratia 0.6.9300<small> Unreleased </small></h1>
 <div id="major-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#major-changes" class="anchor" aria-hidden="true"></a>Major changes</h2>
 <ul><li>
-<p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> now uses <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> internally and consequently uses its <code><a href="../reference/draw.html">draw()</a></code> method and underlying plotting code. This has simplified the code compared to <code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code> and its methods, which will allow for future development and addition of features more easily than if <code>evaluate_Smooth()</code> had been retained.</p>
+<p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> now uses <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> internally and consequently uses its <code><a href="../reference/draw.html">draw()</a></code> method and underlying plotting code. This has simplified the code compared to <code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code> and its methods, which will allow for future development and addition of features more easily than if <code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code> had been retained.</p>
 <p>While a lot of code has been reused so differences between plots as a result of this change should be minimal, some corner cases may have been missed. File and Issue if you notice something that has changed that you think shouldn’t.</p>
 </li>
 </ul></div>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor" aria-hidden="true"></a>New features</h2>
-<ul><li><p><code><a href="../reference/rootogram.html">rootogram()</a></code> and its <code><a href="../reference/draw.html">draw()</a></code> method produce rootograms as diagnostic plots for fitted models. Currently only for models fitted with <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/negbin.html" class="external-link">nb()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/negbin.html" class="external-link">negbin()</a></code>, <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian()</a></code> families.</p></li>
+<ul><li>
+<p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> provides a tidy wrapper around <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">predict.gam()</a></code> for generating fitted values from the model. New covariate values can be provide via argument <code>data</code>. A credible interval on the fitted values is returned, and values can be on the link (linear predictor) or response scale.</p>
+<p>Note that this function returns expected values of the response. Hence “fitted values” is used instead of “predictions” in the case of new covariate values to differentiate these values from the case of generating new response values from a fitted model.</p>
+</li>
+<li><p><code><a href="../reference/rootogram.html">rootogram()</a></code> and its <code><a href="../reference/draw.html">draw()</a></code> method produce rootograms as diagnostic plots for fitted models. Currently only for models fitted with <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/negbin.html" class="external-link">nb()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/negbin.html" class="external-link">negbin()</a></code>, <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian()</a></code> families.</p></li>
 <li><p><code><a href="../reference/nb_theta.html">nb_theta()</a></code> is a new extractor function that returns the theta parameter of a fitted negative binomial GAM (families <code><a href="https://rdrr.io/pkg/mgcv/man/negbin.html" class="external-link">nb()</a></code> or <code><a href="https://rdrr.io/pkg/mgcv/man/negbin.html" class="external-link">negbin()</a></code>).</p></li>
 <li><p><code><a href="../reference/edf.html">edf()</a></code> extracts the effective degrees of freedom (EDF) of a fitted model or a specific smooth in the model. Various forms for the EDF can be extracted.</p></li>
 <li>
@@ -153,6 +157,7 @@
 <a href="#bug-fixes" class="anchor" aria-hidden="true"></a>Bug fixes</h2>
 <ul><li><p><code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> was not filtering user-supplied data for the by level of the specific smooth when used with by factor smooths. This would result in the smooth being evaluated at all rows of the user-supplied data, and therefore would result in <code>nrow(user_data) * nlevels(by_variable)</code> rows in the returned object instead of <code>nrow(user_data)</code> rows.</p></li>
 <li><p>The <code><a href="../reference/add_confint.html">add_confint()</a></code> method for <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> had the upper and lower intervals reversed. <a href='https://github.com/gavinsimpson/gratia/issues/107'>#107</a> Reported by <a href='https://github.com/Aariq'>@Aariq</a></p></li>
+<li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> and <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> were both ignoring the <code>dist</code> argument that allows covariate values that lie too far from the support of the data to be excluded when returning estimated values from the smooth and plotting it. <a href='https://github.com/gavinsimpson/gratia/issues/111'>#111</a> Reported by <a href='https://github.com/Aariq'>@Aariq</a></p></li>
 </ul></div>
 </div>
     <div id="gratia-060" class="section level1">

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>License • gratia</title>
+<title>Exclude values that lie too far from the support of data — too_far • gratia</title>
 
 
 <!-- jquery -->
@@ -18,8 +18,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
 <!-- bootstrap-toc -->
-<link rel="stylesheet" href="bootstrap-toc.css">
-<script src="bootstrap-toc.js"></script>
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
@@ -33,15 +33,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
-<link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script>
+<link href="../pkgdown.css" rel="stylesheet">
+<script src="../pkgdown.js"></script>
 
 
 
-  <link href="extra.css" rel="stylesheet">
+  <link href="../extra.css" rel="stylesheet">
   
 
-<meta property="og:title" content="License" />
+<meta property="og:title" content="Exclude values that lie too far from the support of data — too_far" />
+<meta property="og:description" content="Identifies pairs of covariate values that lie too far from the original data.
+The function is currently a basic wrapper around mgcv::exclude.too.far()." />
 <meta property="og:image" content="https://gavinsimpson.github.io/gratia/reference/figures/README-draw-gam-figure-1.png" />
 <meta property="og:image:alt" content="Plot produced by draw() of 4 smooth functions from a fitted generalized additive model" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -73,7 +75,7 @@
   <body data-spy="scroll" data-target="#toc">
     
 
-    <div class="container template-title-body">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -85,7 +87,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">gratia</a>
+        <a class="navbar-link" href="../index.html">gratia</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.9300</span>
       </span>
     </div>
@@ -93,10 +95,10 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="reference/index.html">Reference</a>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li>
-  <a href="news/index.html">Changelog</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -117,25 +119,53 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>License</h1>
+    <h1>Exclude values that lie too far from the support of data</h1>
+    <small class="dont-index">Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/R/too_far.R'><code>R/too_far.R</code></a></small>
+    <div class="hidden name"><code>too_far.Rd</code></div>
     </div>
 
-<pre>YEAR: 2013-2019
-COPYRIGHT HOLDER: Gavin L. Simpson
-</pre>
+    <div class="ref-description">
+    <p>Identifies pairs of covariate values that lie too far from the original data.
+The function is currently a basic wrapper around <code><a href='https://rdrr.io/pkg/mgcv/man/exclude.too.far.html'>mgcv::exclude.too.far()</a></code>.</p>
+    </div>
+
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>too_far</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>ref_1</span>, <span class='va'>ref_2</span>, dist <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></code></pre></div>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x, y</th>
+      <td><p>numeric; vector of values of the covariates to compare with
+the observed data</p></td>
+    </tr>
+    <tr>
+      <th>ref_1, ref_2</th>
+      <td><p>numeric; vectors of covariate values that represent the
+reference against which <code>x1 and </code>x2` are compared</p></td>
+    </tr>
+    <tr>
+      <th>dist</th>
+      <td><p>if supplied, a numeric vector of length 1 representing the
+distance from the data beyond which an observation is excluded. For
+example, you want to exclude values that lie further from an observation
+than 10% of the range of the observed data, use <code>0.1</code>.</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Returns a logical vector of the same length as <code>x1</code>.</p>
 
   </div>
-
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
-
 </div>
-
 
 
       <footer>

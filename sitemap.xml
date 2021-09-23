@@ -130,6 +130,9 @@
     <loc>https://gavinsimpson.github.io/gratia/reference/fitted_samples.html</loc>
   </url>
   <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/fitted_values.html</loc>
+  </url>
+  <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/fix_offset.html</loc>
   </url>
   <url>
@@ -257,6 +260,15 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/tidy_basis.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/to_na.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/too_far.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/too_far_to_na.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/transform_fun.html</loc>
