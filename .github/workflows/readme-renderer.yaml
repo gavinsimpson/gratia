@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
         with:
-          fetch-depth:0 
+          fetch-depth: 0 
 
       - uses: r-lib/actions/setup-r@v1
       
