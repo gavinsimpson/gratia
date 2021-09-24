@@ -102,7 +102,7 @@
     rug_vals
 }
 
-#' @importFrom dplyr select bind_cols filter
+#' @importFrom dplyr select bind_cols filter %>%
 #' @importFrom tidyselect all_of
 #' @importFrom tibble as_tibble
 #' @noRd
@@ -121,10 +121,10 @@
 
     # retain only those columns we want
     df <- data %>%
-        select(all_of(c(sm_var, by_var)))
+        select(all_of(c(sm_var, by_var))) %>% as_tibble()
 
-    # handle matrix covariates, which will get stacked
-    df <- as_tibble(lapply(df, as.numeric))
+    # handle matrix covariates, which will get stacked by as.numeric
+    df <- unpack_matrix_cols(df) %>% as_tibble()
 
     # do this first so we bind on all the data, then filter
     if (!is.null(extra)) {
@@ -141,4 +141,25 @@
 
     # return
     df
+}
+
+#' @importFrom dplyr bind_cols
+`unpack_matrix_cols` <- function(x) {
+    # what data types are we working with
+    dcs <- data_class(x)
+
+    # do something if we have matrix columns
+    if (any(mcols <- dcs == "matrix")) {
+        # assume that any matrix columns are of the same number of cols
+        nc <- ncol(x[mcols][[1L]])
+        out <- lapply(x[mcols], as.vector)
+        other <- lapply(x[!mcols], function(y, nc) rep(y, times = nc), nc = nc)
+        out <- bind_cols(out, other)
+        # put order back as it was
+        out <- out[names(x)]
+    } else {
+        return(x)
+    }
+
+    out
 }
