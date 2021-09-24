@@ -809,7 +809,8 @@
     if (isTRUE(contour)) {
         plt <- plt + geom_contour(mapping = aes_(z = as.name(plot_var)),
                                   colour = contour_col,
-                                  bins = n_contour)
+                                  bins = n_contour,
+                                  na.rm = TRUE)
     }
 
     ## default axis labels if none supplied
