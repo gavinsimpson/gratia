@@ -161,7 +161,7 @@ test_that("draw() works with random effect smooths (bs = 're')", {
     ## dat <- gamSim(1, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
 
     set.seed(42)
-    fac <- as.factor(sample(1:20, 800, replace = TRUE))
+    fac <- as.factor(sample(1:20, 1000, replace = TRUE))
     new_df <- su_eg1
     new_df$X <- model.matrix(~ fac - 1)
     b <- rnorm(20) * 0.5
@@ -491,5 +491,11 @@ test_that("draw.penalty_df works with normalization", {
 
     plt <- draw(penalty(su_m_univar_4, "s(x1)"), normalize = TRUE)
     expect_doppelganger("draw penalty_df with single smooths normalized",
+                        plt)
+})
+
+test_that("issue 116 - handle distributed lag models", {
+    plt <- draw(dlnm_m)
+    expect_doppelganger("draw distributed lag model issue 116",
                         plt)
 })
