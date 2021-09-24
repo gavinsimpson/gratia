@@ -13,17 +13,17 @@ sw <- scam(Date ~ s(Depth, k = 5, bs = "mpd"), data = smallAges,
 
 test_that("simulate() works with a gam", {
     sims <- simulate(m_gam, nsim = 5, seed = 42)
-    expect_identical(nrow(sims), 800L)
+    expect_identical(nrow(sims), 1000L)
     expect_identical(ncol(sims), 5L)
 
     sims <- simulate(m_gam, nsim = 5, seed = 42, newdata = su_eg1)
-    expect_identical(nrow(sims), 800L)
+    expect_identical(nrow(sims), 1000L)
     expect_identical(ncol(sims), 5L)
 })
 
 test_that("simulate() works with a gamm", {
     sims <- simulate(m_gamm, nsim = 5, seed = 42)
-    expect_identical(nrow(sims), 800L)
+    expect_identical(nrow(sims), 1000L)
     expect_identical(ncol(sims), 5L)
 })
 
@@ -41,12 +41,12 @@ test_that("simulate() works with a scam", {
 test_that("simulate() works with no .Random.seed", {
     rm(".Random.seed", envir = globalenv())
     sims <- simulate(m_gam, nsim = 5, seed = 42)
-    expect_identical(nrow(sims), 800L)
+    expect_identical(nrow(sims), 1000L)
     expect_identical(ncol(sims), 5L)
 
     rm(".Random.seed", envir = globalenv())
     sims <- simulate(m_gamm, nsim = 5, seed = 42)
-    expect_identical(nrow(sims), 800L)
+    expect_identical(nrow(sims), 1000L)
     expect_identical(ncol(sims), 5L)
 
     rm(".Random.seed", envir = globalenv())
@@ -57,11 +57,11 @@ test_that("simulate() works with no .Random.seed", {
 
 test_that("simulate() works with out a seed", {
     sims <- simulate(m_gam, nsim = 5)
-    expect_identical(nrow(sims), 800L)
+    expect_identical(nrow(sims), 1000L)
     expect_identical(ncol(sims), 5L)
 
     sims <- simulate(m_gamm, nsim = 5)
-    expect_identical(nrow(sims), 800L)
+    expect_identical(nrow(sims), 1000L)
     expect_identical(ncol(sims), 5L)
 
     sims <- simulate(sw, nsim = 5)
@@ -76,8 +76,8 @@ test_that("simulate() fails if we don't have an rd function", {
     n <- 400
     ## Simulate data...
     dat <- gamSim(1, n = n, dist = "poisson", scale = 0.2, verbose = FALSE)
-    dat <- transform(dat, y = rTweedie(exp(f), p = 1.3, phi = 0.5)) ## Tweedie response
- 
+    dat <- transform(dat, y = rTweedie(exp(f), p = 1.3, phi = 0.5)) ## Tweedie y
+
     ## Fit a fixed p Tweedie, with wrong link ...
     m <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3),
                     ~ 1,
