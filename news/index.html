@@ -86,7 +86,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.9300</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.9400</span>
       </span>
     </div>
 
@@ -123,9 +123,9 @@
       <small>Source: <a href='https://github.com/gavinsimpson/gratia/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="gratia-069300" class="section level1">
-<h1 class="page-header" data-toc-text="0.6.9300">
-<a href="#gratia-069300" class="anchor" aria-hidden="true"></a>gratia 0.6.9300<small> Unreleased </small></h1>
+    <div id="gratia-069400" class="section level1">
+<h1 class="page-header" data-toc-text="0.6.9400">
+<a href="#gratia-069400" class="anchor" aria-hidden="true"></a>gratia 0.6.9400<small> Unreleased </small></h1>
 <div id="major-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#major-changes" class="anchor" aria-hidden="true"></a>Major changes</h2>
@@ -133,6 +133,7 @@
 <p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> now uses <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> internally and consequently uses its <code><a href="../reference/draw.html">draw()</a></code> method and underlying plotting code. This has simplified the code compared to <code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code> and its methods, which will allow for future development and addition of features more easily than if <code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code> had been retained.</p>
 <p>While a lot of code has been reused so differences between plots as a result of this change should be minimal, some corner cases may have been missed. File and Issue if you notice something that has changed that you think shouldn’t.</p>
 </li>
+<li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> now plots 2D isotropic smooths (TPRS and Duchon splines) with equally-scaled x and y coordinates using <code>coord_equal(ratio = 1)</code>. Alignment of these plots will be a little different now when plotting models with multiple smooths. See Issue <a href='https://github.com/gavinsimpson/gratia/issues/81'>#81</a>.</p></li>
 </ul></div>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
