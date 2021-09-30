@@ -441,7 +441,7 @@ test_that("draw.gam can take user specified scales", {
                 continuous_fill = scale_fill_distiller(palette = "Spectral",
                                                        type = "div"))
     expect_doppelganger("draw 2d smooth with spectral palette", plt)
-    
+
     skip_if(packageVersion("mgcv") < "1.8.36")
     plt <- draw(mod_fs,
                 discrete_colour = scale_colour_viridis_d(option = "plasma"))
