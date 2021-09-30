@@ -644,15 +644,20 @@
         class(object) <- append(class(object),
                                 c("factor_smooth", "mgcv_smooth"),
                                 after = 0)
-    } else if (sm_dim == 2L &&
-                sm_type %in% c("TPRS (2d)", "TPRS (shrink) (2d)",
-                               "Duchon spline (2d)",
-                               "Tensor", "Tensor (T2)")) {
+    } else if (sm_dim == 2L) {
+        # all 2D smooths get these classes
         class(object) <- append(class(object),
                                 c("bivariate_smooth", "mgcv_smooth"),
                                 after = 0)
+        # but TPRS smooths are isotropic so need special plotting
+        # see issue #81. Duchon splines are a more general TPRS so
+        # need to be handled the same way
+        if(sm_type %in% c("TPRS (2d)", "TPRS (shrink) (2d)",
+                          "Duchon spline (2d)")) {
+            class(object) <- append(class(object), "isotropic_smooth",
+                                    after = 0)
+        }
     } else {
-        # stop("Unknown type")
         return(NULL)
     }
 
@@ -862,6 +867,17 @@
     }
 
     plt
+}
+
+#' @importFrom ggplot2 coord_equal
+`plot_smooth.isotropic_smooth` <- function(object, ...) {
+    # plot as per a bivariate smooth
+    plt <- plot_smooth.bivariate_smooth(object, ...)
+
+    # but set the x/y coordinates to have aspect ratio = 1
+    plt <- plt + coord_equal(ratio = 1)
+
+    plt # return
 }
 
 #' @importFrom ggplot2 ggplot geom_point aes_string geom_abline expand_limits

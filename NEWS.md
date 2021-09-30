@@ -1,4 +1,4 @@
-# gratia 0.6.9300
+# gratia 0.6.9400
 
 ## Major changes
 
@@ -11,6 +11,11 @@
   While a lot of code has been reused so differences between plots as a result
   of this change should be minimal, some corner cases may have been missed. File
   and Issue if you notice something that has changed that you think shouldn't.
+
+* `draw.gam()` now plots 2D isotropic smooths (TPRS and Duchon splines) with
+  equally-scaled x and y coordinates using `coord_equal(ratio = 1)`. Alignment of
+  these plots will be a little different now when plotting models with multiple
+  smooths. See Issue #81.
 
 ## New features
 
