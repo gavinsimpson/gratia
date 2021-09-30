@@ -869,6 +869,7 @@
     plt
 }
 
+#' @importFrom ggplot2 coord_equal
 `plot_smooth.isotropic_smooth` <- function(object, ...) {
     # plot as per a bivariate smooth
     plt <- plot_smooth.bivariate_smooth(object, ...)
