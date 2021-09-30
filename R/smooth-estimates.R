@@ -866,12 +866,6 @@
                      inherit.aes = FALSE, alpha = 0.1)
     }
 
-    # are we handling an isotropic smooth like TPRS or Duchon spline
-    # or user requested / overode it
-    if (isTRUE(isotropic)) {
-        plt <- plt + coord_equal(ratio = 1)
-    }
-
     plt
 }
 
