@@ -14,6 +14,6 @@ bibentry(bibtype = "Manual",
              working with generalized additive models (GAMs) fitted using the
              mgcv package. Provides a reimplementation of the plot() method for
              GAMs that mgcv provides, as well as tidyverse-compatible
-             representations of estimated smooths."
+             representations of estimated smooths.",
          note = note,
          url = "https://gavinsimpson.github.io/gratia/")
