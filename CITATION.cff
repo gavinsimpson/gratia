@@ -1,0 +1,75 @@
+# -----------------------------------------------------------
+# CITATION file created with {cffr} R package, v0.1.1
+# See also: https://docs.ropensci.org/cffr/
+# -----------------------------------------------------------
+ 
+cff-version: 1.2.0
+message: 'To cite package "gratia" in publications use:'
+type: software
+license: MIT
+title: 'gratia: Graceful ''ggplot''-Based Graphics and Other Functions for GAMs Fitted
+  Using ''mgcv'''
+version: 0.6.9400
+abstract: Graceful 'ggplot'-based graphics and utility functions for working with
+  generalized additive models (GAMs) fitted using the 'mgcv' package. Provides a reimplementation
+  of the plot() method for GAMs that 'mgcv' provides, as well as 'tidyverse' compatible
+  representations of estimated smooths.
+authors:
+- family-names: Simpson
+  given-names: Gavin L.
+  email: ucfagls@gmail.com
+  orcid: https://orcid.org/0000-0002-9084-8413
+preferred-citation:
+  type: manual
+  title: 'gratia: Graceful ''ggplot''-Based Graphics and Other Functions for GAMs
+    Fitted Using ''mgcv'''
+  authors:
+  - family-names: Simpson
+    given-names: Gavin L.
+    email: ucfagls@gmail.com
+    orcid: https://orcid.org/0000-0002-9084-8413
+  version: 0.6.9400
+  abstract: Graceful 'ggplot'-based graphics and utility functions for working with
+    generalized additive models (GAMs) fitted using the 'mgcv' package. Provides a
+    reimplementation of the plot() method for GAMs that 'mgcv' provides, as well as
+    'tidyverse' compatible representations of estimated smooths.
+  repository: https://CRAN.R-project.org/package=gratia
+  repository-code: https://github.com/gavinsimpson/gratia
+  url: https://gavinsimpson.github.io/gratia/
+  date-released: '2021-09-30'
+  contact:
+  - family-names: Simpson
+    given-names: Gavin L.
+    email: ucfagls@gmail.com
+    orcid: https://orcid.org/0000-0002-9084-8413
+  keywords:
+  - gam
+  - generalized-additive-models
+  - ggplot2
+  - glm
+  - lm
+  - mgcv
+  - r-package
+  - random-effects
+  - smoothing
+  license: MIT
+  year: '2021'
+repository: https://CRAN.R-project.org/package=gratia
+repository-code: https://github.com/gavinsimpson/gratia
+url: https://gavinsimpson.github.io/gratia/
+date-released: '2021-09-30'
+contact:
+- family-names: Simpson
+  given-names: Gavin L.
+  email: ucfagls@gmail.com
+  orcid: https://orcid.org/0000-0002-9084-8413
+keywords:
+- gam
+- generalized-additive-models
+- ggplot2
+- glm
+- lm
+- mgcv
+- r-package
+- random-effects
+- smoothing
