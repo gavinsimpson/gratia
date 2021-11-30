@@ -20,8 +20,10 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v1
 
       - uses: r-lib/actions/setup-r@v1
+        with:
+          use-public-rspm: true
 
-      - uses: r-lib/actions/setup-renv@v1
+      # - uses: r-lib/actions/setup-renv@v1
 
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
