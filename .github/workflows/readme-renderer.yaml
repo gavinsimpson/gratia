@@ -30,6 +30,7 @@ jobs:
           extra-packages: |
             rmarkdown
             mgcv
+            remotes
       
       - name: install gratia
         run: Rscript -e 'remotes::install_github("gavinsimpson/gratia", upgrade_dependencies = FALSE)'
