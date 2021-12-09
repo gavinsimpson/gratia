@@ -642,7 +642,7 @@
 ##' appraise(mod, point_col = "steelblue", point_alpha = 0.4)
 ##' ## To change the theme for all panels use the & operator
 ##' appraise(mod, point_col = "steelblue",
-##'      point_alpha = 0.4, line_col = "black") & theme_minimal()
+##'      point_alpha = 0.4, line_col = "black") & ggplot2::theme_minimal()
 
 `appraise` <- function(model, ...) {
     UseMethod("appraise")

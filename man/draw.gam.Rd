@@ -151,7 +151,7 @@ draw(
   n_contour = 5,
   continuous_fill = ggplot2::scale_fill_distiller(palette = "Spectral",
                                                   type = "div")
-) & theme_minimal()
+) & ggplot2::theme_minimal()
 }
 \author{
 Gavin L. Simpson
