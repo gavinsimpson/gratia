@@ -81,7 +81,8 @@
     bin <- seq(0, max_count, by = 1L)
     names(bin) <- as.character(bin)
     obs <- table(factor(y, levels = bin))
-    lambda <- predict(model, newdata = mf, na.action = na.omit)
+    lambda <- predict(model, newdata = mf, na.action = na.omit,
+                      type = "response")
     fitted <- purrr::map_dfc(bin, .f = dpois, lambda = lambda)
     fitted <- colSums(fitted)
     tibble(bin = bin,
@@ -102,7 +103,8 @@
     bin <- seq(0, max_count, by = 1L)
     names(bin) <- as.character(bin)
     obs <- table(factor(y, levels = bin))
-    mu <- predict(model, newdata = mf, na.action = na.omit)
+    mu <- predict(model, newdata = mf, na.action = na.omit,
+                  type = "response")
     theta <- nb_theta(model)
     fitted <- purrr::map_dfc(bin, .f = dnbinom, mu = mu, size = theta)
     fitted <- colSums(fitted)
