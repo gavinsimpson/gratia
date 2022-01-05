@@ -42,9 +42,9 @@
         mf <- mf[, -respvar, drop = FALSE]
     }
 
-    ## remove offset() var; model.frame returns both `offset(foo(var))` and `var`,
-    ## so we can just remove the former, but we also want to set the offset
-    ## variable `var` to something constant. FIXME
+    ## remove offset() var; model.frame returns both `offset(foo(var))` and
+    ## `var`, so we can just remove the former, but we also want to set the
+    ## offset variable `var` to something constant. FIXME
     if (is.null(offset)) {
         offset <- 1L
     }
@@ -201,4 +201,41 @@
     }
 
     values
+}
+
+##' Typical values of model covariates
+##'
+##' @param object a fitted GAM(M) model.
+##' @param ... arguments passed to other methods.
+##'
+##' @export
+`typical_values` <- function(object, ...) {
+    UseMethod("typical_values")
+}
+
+##' @rdname typical_values
+##' @param vars terms to include or exclude from the returned object. Uses
+##'   tidyselect principles.
+##' @export
+##' @importFrom rlang enquo
+##' @importFrom tidyselect eval_select
+`typical_values.gam` <- function(object, vars = everything(), ...) {
+    # extract the summary from the fitted GAM
+    # summ is a named list
+    summ <- object[["var.summary"]]
+
+    # include/exclude any terms?
+    expr <- rlang::enquo(vars)
+    pos <- eval_select(expr, data = summ)
+    summ <- summ[pos]
+
+    # for numeric variables summ is a vector with 3 elements, we want element 2
+    # which contains the value of the observation closest to the median
+    # probably need to handle matrix covariates here seperately from numerics
+    dc <- data_class(summ)
+    i <-  dc == "numeric" & lengths(summ) == 3L
+    summ[i] <- lapply(summ[i], `[`, 2)
+
+    # return
+    as_tibble(summ)
 }
