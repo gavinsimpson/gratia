@@ -1,4 +1,4 @@
-# gratia 0.6.9400
+# gratia 0.6.9500
 
 ## Major changes
 
@@ -32,6 +32,12 @@
 * `rootogram()` and its `draw()` method produce rootograms as diagnostic plots
   for fitted models. Currently only for models fitted with `poisson()`,
   `nb()`, `negbin()`, `gaussian()` families.
+
+* `typical_values()` is a new helper function to return typical values for the 
+  covariates of a fitted model. It returns the value of the observation closest
+  to the median for numerical covariates or the modal level of a factor while preserving the levels of that factor. `typical_values()` is useful in
+  preparing data slices or scenarios for which fitted values from the estimated
+  model are required.
 
 * `nb_theta()` is a new extractor function that returns the theta parameter of
   a fitted negative binomial GAM (families `nb()` or `negbin()`).
