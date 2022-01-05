@@ -10,7 +10,7 @@
 
   While a lot of code has been reused so differences between plots as a result
   of this change should be minimal, some corner cases may have been missed. File
-  and Issue if you notice something that has changed that you think shouldn't.
+  an Issue if you notice something that has changed that you think shouldn't.
 
 * `draw.gam()` now plots 2D isotropic smooths (TPRS and Duchon splines) with
   equally-scaled x and y coordinates using `coord_equal(ratio = 1)`. Alignment of
