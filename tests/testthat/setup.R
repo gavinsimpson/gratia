@@ -5,10 +5,15 @@ library("scam")
 library("dplyr")
 
 ## Fit models
+quick_eg1 <- data_sim("eg1", n = 200, seed = 1)
 su_eg1 <- data_sim("eg1", n = 1000,  dist = "normal", scale = 2, seed = 1)
 su_eg2 <- data_sim("eg2", n = 5000, dist = "normal", scale = 1, seed = 1)
 su_eg3 <- data_sim("eg3", n = 400, seed = 32)
 su_eg4 <- data_sim("eg4", n = 400,  dist = "normal", scale = 2, seed = 1)
+
+su_m_quick_eg1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+                      data = su_eg1,
+                      method = "REML")
 
 su_m_univar_4 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
                      data = su_eg1,
