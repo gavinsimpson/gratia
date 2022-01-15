@@ -519,7 +519,7 @@
         ## add unnused_data to newdata so we're ready to predict
         newdata <- bind_cols(newdata, unused_data)
     }
-    
+
     newdata <- newdata[, m.terms, drop = FALSE] # re-arrange
     newdata
 }
