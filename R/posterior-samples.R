@@ -350,7 +350,7 @@
     }
 
     S <- smooths(model)             # vector of smooth labels - "s(x)"
-
+    take <- seq_along(S)            # in default case 1,2,3,..,n smooths
     if (!is.null(term)) {
         take <- which_smooths(model, term)
         S <- S[take]
@@ -369,11 +369,12 @@
     for (i in seq_along(S)) {
         if (need_newdata) {
             # FIXME: should offset be NULL?
-            newdata <- smooth_data(model, id = i, n = n_vals, offset = NULL)
+            newdata <- smooth_data(model, id = take[i], n = n_vals,
+                                   offset = NULL)
             ## I don't think we need offset here as that really just shifts the
             ## response around
         }
-        sm  <- get_smooths_by_id(model, i)[[1L]]
+        sm  <- get_smooths_by_id(model, take[i])[[1L]]
         idx <- smooth_coefs(sm)
         Xp <- PredictMat(sm, data = newdata)
         betas <- rmvn(n = n, mu = coefs[idx], sigma = V[idx, idx, drop=FALSE],

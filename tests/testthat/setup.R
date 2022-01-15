@@ -48,6 +48,7 @@ su_gamm_univar_4 <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3),
                          data = su_eg1,
                         method = "REML")
 
+m_1_smooth <- gam(y ~ s(x0), data = quick_eg1, method = "REML")
 m_gam <- su_m_univar_4
 # m_gam    <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
 #                 method = "REML")
