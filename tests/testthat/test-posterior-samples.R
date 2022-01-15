@@ -5,15 +5,6 @@ library("testthat")
 library("mgcv")
 library("gratia")
 
-#set.seed(12398)
-#dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
-#m1 <- gam(y ~ s(x0), data = dat, method = "REML")
-#m2 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-
-#set.seed(34786)
-#dat2 <- gamSim(4, verbose = FALSE)
-#m3 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat2, method = "REML")
-
 set.seed(42)
 cont_by_data <- gamSim(3, n = 400, verbose = FALSE)
 cont_by_gam <- gam(y ~ s(x2, by = x1), data = cont_by_data)
@@ -82,6 +73,22 @@ test_that("smooth_samples gets the right factor by smooth: #121", {
                                        term = "s(x2):fac2", seed = 42))
     # factor level of `fac` column should be 2
     expect_identical(all(sm["fac"] == 2), TRUE)
+})
+
+# from #121 - problems when model contains ranef smooths
+test_that("smooth_samples ignores ranef smooths: #121", {
+    expect_message(sm <- smooth_samples(rm1, n = 5, n_vals = 100, seed = 42),
+                   "Random effect smooths not currently supported.")
+    # given n and n_vals and 4 smooths, nrow == 2000L
+    expect_identical(nrow(sm), 2000L)
+    # shouldn't have "s(fac)" in sm
+    expect_identical(any(sm$smooth == "s(fac)"), FALSE)
+})
+
+test_that("smooth_samples fails if no smooths left to sample from", {
+    expect_error(sm <- smooth_samples(rm1, term = "s(fac)",
+                                        n = 5, n_vals = 100, seed = 42),
+                 "No smooths left that can be sampled from.")
 })
 
 test_that("fitted_samples works for a simple GAM", {

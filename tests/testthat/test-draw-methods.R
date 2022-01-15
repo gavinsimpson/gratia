@@ -66,9 +66,11 @@ test_that("draw.gam works with partial_match", {
 test_that("draw.gam works with select and parametric", {
     plt <- draw(su_m_factor_by, select = 's(x2)', partial_match = TRUE)
     expect_doppelganger("draw gam with select and parametric is NULL", plt)
-    plt <- draw(su_m_factor_by, select = 's(x2)', partial_match = TRUE, parametric = FALSE)
+    plt <- draw(su_m_factor_by, select = 's(x2)', partial_match = TRUE,
+                parametric = FALSE)
     expect_doppelganger("draw gam with select and parametric is FALSE", plt)
-    plt <- draw(su_m_factor_by, select = 's(x2)', partial_match = TRUE, parametric = TRUE)
+    plt <- draw(su_m_factor_by, select = 's(x2)', partial_match = TRUE,
+                parametric = TRUE)
     expect_doppelganger("draw gam with select and parametric is TRUE", plt)
     plt <- draw(su_m_factor_by, parametric = TRUE)
     expect_doppelganger("draw gam without select and parametric is TRUE", plt)
@@ -158,17 +160,10 @@ test_that("draw() works with continuous by and fixed scales", {
 
 test_that("draw() works with random effect smooths (bs = 're')", {
     ## simulate example... from ?mgcv::random.effects
-    ## dat <- gamSim(1, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
-
-    set.seed(42)
-    fac <- as.factor(sample(1:20, 1000, replace = TRUE))
-    new_df <- su_eg1
-    new_df$X <- model.matrix(~ fac - 1)
-    b <- rnorm(20) * 0.5
-    new_df <- transform(new_df, y = y + X %*% b)
-
-    rm1 <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) +
-                   s(x3), data = new_df, method = "ML")
+    ## data are in su_re
+    ## model is rm1 with definition:
+    ## rm1 <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) +
+    ##                s(x3), data = new_df, method = "ML")
 
     sm <- evaluate_smooth(rm1, "s(fac)")
     expect_s3_class(sm, "evaluated_re_smooth")

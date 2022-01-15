@@ -62,6 +62,15 @@ m_gamgcv <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
 m_gamm4  <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
                   REML = TRUE)
 
+#-- A standard GAM with a simple random effect ---------------------------------
+su_re <- su_eg1
+set.seed(42)
+su_re$fac <- as.factor(sample(seq_len(20), 1000, replace = TRUE))
+su_re$X <- model.matrix(~ fac - 1, data = su_re)
+su_re <- transform(su_re, y = y + X %*% rnorm(20) * 0.5)
+rm1 <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) + s(x3),
+           data = su_re, method = "ML")
+
 #-- A distributed lag model example --------------------------------------------
 su_dlnm <- su_eg1 %>%
   mutate(f_lag = cbind(dplyr::lag(f, 1),
