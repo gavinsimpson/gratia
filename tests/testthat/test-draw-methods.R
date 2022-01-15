@@ -7,10 +7,10 @@ library("mgcv")
 library("ggplot2")
 
 ## Need a local wrapper to allow conditional use of vdiffr
-`expect_doppelganger` <- function(title, fig, ...) {
-  testthat::skip_if_not_installed("vdiffr")
-  vdiffr::expect_doppelganger(title, fig, ...)
-}
+# `expect_doppelganger` <- function(title, fig, ...) {
+#   testthat::skip_if_not_installed("vdiffr")
+#   vdiffr::expect_doppelganger(title, fig, ...)
+# }
 
 test_that("draw.evaluated_1d_smooth() plots the smooth", {
     sm <- evaluate_smooth(su_m_univar_4, "s(x2)")
