@@ -1,8 +1,16 @@
 # Setup models for tests
+library("testthat")
 library("mgcv")
 library("gamm4")
 library("scam")
 library("dplyr")
+library("nlme")
+
+## Need a local wrapper to allow conditional use of vdiffr
+`expect_doppelganger` <- function(title, fig, ...) {
+  testthat::skip_if_not_installed("vdiffr")
+  vdiffr::expect_doppelganger(title, fig, ...)
+}
 
 ## Fit models
 quick_eg1 <- data_sim("eg1", n = 200, seed = 1)
@@ -53,7 +61,7 @@ m_gamgcv <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
 m_gamm4  <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
                   REML = TRUE)
 
-# A distributed lag model example
+#-- A distributed lag model example --------------------------------------------
 su_dlnm <- su_eg1 %>%
   mutate(f_lag = cbind(dplyr::lag(f, 1),
                        dplyr::lag(f, 2),
@@ -66,3 +74,33 @@ su_dlnm <- su_eg1 %>%
 # fit DLNM GAM
 dlnm_m <- gam(y ~ te(f_lag, lag), data = su_dlnm,
               method = "REML")
+
+#-- An AR(1) example using bam() with factor by --------------------------------
+# from ?magic
+## simulate truth
+set.seed(1)
+n <- 400
+sig <- 2
+x <- 0:(n-1)/(n-1)
+## produce scaled covariance matrix for AR1 errors...
+rho <- 0.6
+V <- corMatrix(Initialize(corAR1(rho), data.frame(x = x)))
+Cv <- chol(V)  # t(Cv) %*% Cv=V
+## Simulate AR1 errors ...
+e1 <- t(Cv) %*% rnorm(n, 0, sig) # so cov(e) = V * sig^2
+e2 <- t(Cv) %*% rnorm(n, 0, sig) # so cov(e) = V * sig^2
+## Observe truth + AR1 errors
+f1 <- 0.2*x^11*(10*(1-x))^6+10*(10*x)^3*(1-x)^10
+f2 <- (1280 * x^4) * (1- x)^4
+df <- data.frame(x = rep(x, 2), f = c(f1, f2), y = c(f1 + e1, f2 + e2),
+                 series = as.factor(rep(c("A", "B"), each = n)))
+#rm(x, f1, f2, e1, e2, V, Cv)
+AR.start <- rep(FALSE, n*2)
+AR.start[c(1, n+1)] <- TRUE
+## fit GAM using `bam()` with known correlation
+## first just to a single series
+m_ar1 <- bam(y ~ s(x, k = 20), data = df[seq_len(n), ], rho = rho,
+             AR.start = NULL)
+## now as a factor by smooth to model both series
+m_ar1_by <- bam(y ~ series + s(x, k = 20, by = series), data = df, rho = rho,
+                AR.start = AR.start)
