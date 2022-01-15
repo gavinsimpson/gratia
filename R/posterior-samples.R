@@ -356,6 +356,22 @@
         S <- S[take]
     }
 
+    # At least for now, don't work for random effect smooths
+    # do we have ranef smooths?
+    re_sms <- vapply(get_smooths_by_id(model, take), FUN = is_re_smooth,
+                     FUN.VALUE = logical(1L))
+    if (any(re_sms)) {
+        message("\nRandom effect smooths not currently supported.\nIgnoring:",
+                " <", paste(S[re_sms], collapse = ", "), ">\n")
+        S <- S[!re_sms]
+        take <- take[!re_sms]
+    }
+
+    # do we have any remaining terms?
+    if (length(S) < 1L) {
+        stop("No smooths left that can be sampled from.")
+    }
+
     need_newdata <- FALSE
     if (is.null(newdata)) {
         need_newdata <- TRUE
