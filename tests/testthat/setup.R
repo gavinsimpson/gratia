@@ -71,6 +71,15 @@ su_re <- transform(su_re, y = y + X %*% rnorm(20) * 0.5)
 rm1 <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) + s(x3),
            data = su_re, method = "ML")
 
+#-- A factor by GAM with random effects ----------------------------------------
+su_re2 <- su_eg4
+set.seed(42)
+su_re2$ranef <- as.factor(sample(1:20, 400, replace = TRUE))
+su_re2$X <- model.matrix(~ ranef - 1, data = su_re2)
+su_re2 <- transform(su_re2, y = y + X %*% rnorm(20) * 0.5)
+rm2 <- gam(y ~ fac + s(ranef, bs = "re", by = fac) + s(x0) + s(x1) + s(x2),
+           data = su_re2, method = "ML")
+
 #-- A distributed lag model example --------------------------------------------
 su_dlnm <- su_eg1 %>%
   mutate(f_lag = cbind(dplyr::lag(f, 1),

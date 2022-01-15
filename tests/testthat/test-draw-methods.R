@@ -178,19 +178,13 @@ test_that("draw() works with random effect smooths (bs = 're')", {
     expect_doppelganger("draw model with ranef smooth fixed scales", p3)
 })
 
-test_that("draw() with random effect smooths (bs = 're') & factor by variable ", {
+test_that("draw() with random effect smooths (bs = 're') & factor by variable ",
+{
     # simulate example...
-    # random effects
-    ranef <- as.factor(sample(1:20, 400, replace = TRUE))
-    df <- su_eg4
-    X <- model.matrix(~ ranef - 1)
-    b <- rnorm(20) * 0.5
-    df <- transform(df, y = y + X %*% b, ranef = ranef)
-    rm(b, X, ranef)
-
-    ## fit model
-    rm2 <- gam(y ~ fac + s(ranef, bs = "re", by = fac) + s(x0) + s(x1) + s(x2),
-               data = df, method = "ML")
+    # data are in su_re2
+    # model is rm2 with definition:
+    # gam(y ~ fac + s(ranef, bs = "re", by = fac) + s(x0) + s(x1) + s(x2),
+    #     data = su_re2, method = "ML")
 
     sm <- evaluate_smooth(rm2, "s(ranef)")
     expect_s3_class(sm, "evaluated_re_smooth")
