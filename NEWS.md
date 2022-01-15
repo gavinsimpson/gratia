@@ -85,6 +85,10 @@
 * `smooth_samples()` with a factor by GAM would return samples for the first
   factor level only. Reported by @rroyaute in discussion of #121
 
+* `smooth_samples()` would fail if the model contained random effect "smooths".
+  These are now ignored with a message when running `smooth_samples()`.
+  Reported by @isabellaghement in #121
+
 # gratia 0.6.0
 
 ## Major changes
