@@ -82,6 +82,9 @@
   be excluded when returning estimated values from the smooth and plotting it.
   #111 Reported by @Aariq
 
+* `smooth_samples()` with a factor by GAM would return samples for the first
+  factor level only. Reported by @rroyaute in discussion of #121
+
 # gratia 0.6.0
 
 ## Major changes
