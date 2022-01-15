@@ -13,9 +13,9 @@
   an Issue if you notice something that has changed that you think shouldn't.
 
 * `draw.gam()` now plots 2D isotropic smooths (TPRS and Duchon splines) with
-  equally-scaled x and y coordinates using `coord_equal(ratio = 1)`. Alignment of
-  these plots will be a little different now when plotting models with multiple
-  smooths. See Issue #81.
+  equally-scaled x and y coordinates using `coord_equal(ratio = 1)`. Alignment
+  of these plots will be a little different now when plotting models with
+  multiple smooths. See Issue #81.
 
 ## New features
 
@@ -35,7 +35,8 @@
 
 * `typical_values()` is a new helper function to return typical values for the 
   covariates of a fitted model. It returns the value of the observation closest
-  to the median for numerical covariates or the modal level of a factor while preserving the levels of that factor. `typical_values()` is useful in
+  to the median for numerical covariates or the modal level of a factor while
+  preserving the levels of that factor. `typical_values()` is useful in
   preparing data slices or scenarios for which fitted values from the estimated
   model are required.
 
@@ -192,7 +193,8 @@
 
 * Partial residuals for models can be computed with `partial_residuals()`. The
   partial residuals are the weighted residuals of the model added to the
-  contribution of each smooth term (as returned by `predict(model, type = "terms")`.
+  contribution of each smooth term (as returned by `predict(model,
+  type = "terms")`.
   
   Wish of [#76](https://github.com/gavinsimpson/gratia/issues/76) (@noamross)
 
@@ -207,11 +209,11 @@
   The user can pass scales via arguments `discrete_colour` and
   `continuous_fill`.
 
-* The effects of certain smooths can be excluded from data simulated from a model
-  using `simulate.gam()` and `predicted_samples()` by passing `exclude` or `terms`
-  on to `predict.gam()`. This allows for excluding random effects, for example, from
-  model predicted values that are then used to simulate new data from the conditional
-  distribution. See the example in `predicted_samples()`.
+* The effects of certain smooths can be excluded from data simulated from a
+  model using `simulate.gam()` and `predicted_samples()` by passing `exclude` or
+  `terms` on to `predict.gam()`. This allows for excluding random effects, for
+  example, from model predicted values that are then used to simulate new data
+  from the conditional distribution. See the example in `predicted_samples()`.
   
   Wish of [#74](https://github.com/gavinsimpson/gratia/issues/74) (@hgoldspiel)
 
