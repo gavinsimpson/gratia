@@ -57,6 +57,7 @@
 <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span>
   <span class="va">object</span>,
   select <span class="op">=</span> <span class="cn">NULL</span>,
+  n_samples <span class="op">=</span> <span class="cn">NULL</span>,
   xlab <span class="op">=</span> <span class="cn">NULL</span>,
   ylab <span class="op">=</span> <span class="cn">NULL</span>,
   title <span class="op">=</span> <span class="cn">NULL</span>,
@@ -64,6 +65,9 @@
   caption <span class="op">=</span> <span class="cn">NULL</span>,
   alpha <span class="op">=</span> <span class="fl">1</span>,
   colour <span class="op">=</span> <span class="st">"black"</span>,
+  contour <span class="op">=</span> <span class="cn">FALSE</span>,
+  contour_col <span class="op">=</span> <span class="st">"black"</span>,
+  n_contour <span class="op">=</span> <span class="cn">NULL</span>,
   scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"free"</span>, <span class="st">"fixed"</span><span class="op">)</span>,
   rug <span class="op">=</span> <span class="cn">TRUE</span>,
   partial_match <span class="op">=</span> <span class="cn">FALSE</span>,
@@ -86,6 +90,9 @@ stored in <code>object</code>. Character <code>select</code> matches the labels 
 as shown for example in the output from <code>summary(object)</code>. Logical
 <code>select</code> operates as per numeric <code>select</code> in the order that smooths are
 stored.</p></dd>
+<dt>n_samples</dt>
+<dd><p>numeric; if not <code>NULL</code>, sample <code>n_samples</code> from the set
+of posterior samples for plotting.</p></dd>
 <dt>xlab</dt>
 <dd><p>character or expression; the label for the x axis. If not
 supplied, a suitable label will be generated from <code>object</code>.</p></dd>
@@ -107,6 +114,13 @@ interval.</p></dd>
 <dt>colour</dt>
 <dd><p>The colour to use to draw the posterior smooths. Passed to
 <code><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">ggplot2::geom_line()</a></code> as argument <code>colour</code>.</p></dd>
+<dt>contour</dt>
+<dd><p>logical; should contour lines be added to smooth surfaces?</p></dd>
+<dt>contour_col</dt>
+<dd><p>colour specification for contour lines.</p></dd>
+<dt>n_contour</dt>
+<dd><p>numeric; the number of contour bins. Will result in
+<code>n_contour - 1</code> contour lines being drawn. See <code><a href="https://ggplot2.tidyverse.org/reference/geom_contour.html" class="external-link">ggplot2::geom_contour()</a></code>.</p></dd>
 <dt>scales</dt>
 <dd><p>character; should all univariate smooths be plotted with the
 same y-axis scale? The default, <code>scales = "fixed"</code>, ensures this is done.
@@ -172,7 +186,7 @@ spread the plots</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
 </div>
 
       </footer></div>
