@@ -7,6 +7,7 @@
 \method{draw}{smooth_samples}(
   object,
   select = NULL,
+  n_samples = NULL,
   xlab = NULL,
   ylab = NULL,
   title = NULL,
@@ -14,6 +15,9 @@
   caption = NULL,
   alpha = 1,
   colour = "black",
+  contour = FALSE,
+  contour_col = "black",
+  n_contour = NULL,
   scales = c("free", "fixed"),
   rug = TRUE,
   partial_match = FALSE,
@@ -33,6 +37,9 @@ stored in \code{object}. Character \code{select} matches the labels for smooths
 as shown for example in the output from \code{summary(object)}. Logical
 \code{select} operates as per numeric \code{select} in the order that smooths are
 stored.}
+
+\item{n_samples}{numeric; if not \code{NULL}, sample \code{n_samples} from the set
+of posterior samples for plotting.}
 
 \item{xlab}{character or expression; the label for the x axis. If not
 supplied, a suitable label will be generated from \code{object}.}
@@ -54,6 +61,13 @@ interval.}
 
 \item{colour}{The colour to use to draw the posterior smooths. Passed to
 \code{\link[ggplot2:geom_path]{ggplot2::geom_line()}} as argument \code{colour}.}
+
+\item{contour}{logical; should contour lines be added to smooth surfaces?}
+
+\item{contour_col}{colour specification for contour lines.}
+
+\item{n_contour}{numeric; the number of contour bins. Will result in
+\code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
 
 \item{scales}{character; should all univariate smooths be plotted with the
 same y-axis scale? The default, \code{scales = "fixed"}, ensures this is done.
