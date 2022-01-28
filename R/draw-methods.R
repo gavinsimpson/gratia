@@ -632,11 +632,14 @@
 }
 
 #' Plot posterior smooths
-#' 
+#'
+#' @param n_samples numeric; if not `NULL`, sample `n_samples` from the set
+#'   of posterior samples for plotting.
 #' @param alpha numeric; alpha transparency for confidence or simultaneous
 #'   interval.
 #' @param colour The colour to use to draw the posterior smooths. Passed to
 #'   [ggplot2::geom_line()] as argument `colour`.
+#' @param contour logical; should contour lines be added to smooth surfaces?
 #' @param xlab character or expression; the label for the x axis. If not
 #'   supplied, a suitable label will be generated from `object`.
 #' @param ylab character or expression; the label for the y axis. If not
@@ -681,9 +684,13 @@
 #' draw(sm2, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
 `draw.smooth_samples` <- function(object,
                                   select = NULL,
+                                  n_samples = NULL,
                                   xlab = NULL, ylab = NULL, title = NULL,
                                   subtitle = NULL, caption = NULL,
                                   alpha = 1, colour = "black",
+                                  contour = FALSE,
+                                  contour_col = "black",
+                                  n_contour = NULL,
                                   scales = c("free", "fixed"),
                                   rug = TRUE,
                                   partial_match = FALSE,
@@ -701,14 +708,18 @@
     ## can only plot 1d smooths - currently - prune S but how?
     ## FIXME
 
-    do_plot_smooths <- function(i, tbl, ...) {
-        tbl <- filter(tbl, .data$term == i)
-        plot_posterior_smooths(tbl, ...)
+    do_plot_smooths <- function(i, object, ...) {
+        object <- filter(object, .data$term == i)
+        draw_posterior_smooths(object, ...)
     }
 
-    plts <- map(S, do_plot_smooths, tbl = object, xlab = xlab, ylab = ylab,
+    plts <- map(S, do_plot_smooths,
+                object = object, n_samples = n_samples,
+                xlab = xlab, ylab = ylab,
                 title = title, subtitle = subtitle, caption = caption,
-                rug = rug, alpha = alpha, colour = colour)
+                rug = rug, alpha = alpha, colour = colour,
+                contour = contour, n_contour = n_contour,
+                contour_col = contour_col)
 
     if (isTRUE(identical(scales, "fixed"))) {
         ylims <- range(object[["value"]])
@@ -729,13 +740,67 @@
                ...)
 }
 
-`plot_posterior_smooths` <- function(tbl, xlab = NULL, ylab = NULL, title = NULL,
-                                     subtitle = NULL, caption = NULL,
-                                     rug = TRUE, alpha = 1, colour = "black", ...) {
-    data_names <- attr(tbl, "data_names")
-    smooth_var <- data_names[[unique(tbl[["term"]])]]
+`draw_posterior_smooths` <- function(object, n_samples = NULL,
+                                     xlab = NULL, ylab = NULL,
+                                     title = NULL, subtitle = NULL,
+                                     caption = NULL, rug = TRUE, alpha = 1,
+                                     colour = "black",
+                                     contour = FALSE,
+                                     contour_col = "black",
+                                     n_contour = NULL, ...) {
+    #data_names <- attr(tbl, "data_names")
+    #smooth_var <- data_names[[unique(tbl[["term"]])]]
 
-    plt <- ggplot(tbl, aes_(x = ~ .x1, y = ~ value, group = ~ draw)) +
+    xvars <- unique(object[["term"]])
+    xvars <- vars_from_label(xvars)
+    n_xvars <- length(xvars)
+
+    ## randomly sample n_samples from the posterior draws
+    if (!is.null(n_samples)) {
+        if ((m <- max(object[["draw"]])) < n_samples) {
+            n_samples <- m
+        }
+        draws <- unique(object[["draw"]])
+        draws <- sample(draws, n_samples)
+        object <- filter(object, .data$draw %in% draws)
+    }
+
+    plt <- if (identical(n_xvars, 1L)) {
+        draw_1d_posterior_smooths(object, rug = rug,
+                                  alpha = alpha, colour = colour,
+                                  xlab = xlab, ylab = ylab,
+                                  title = title, subtitle = subtitle,
+                                  caption = caption, ...)
+    } else if (identical(n_xvars, 2L)) {
+        draw_2d_posterior_smooths(object, contour = contour,
+                                  contour_col = contour_col,
+                                  n_contour = n_contour,
+                                  xlab = xlab, ylab = ylab,
+                                  title = title, subtitle = subtitle,
+                                  caption = caption, ...)
+    } else if (identical(n_xvars, 3L)) {
+        draw_3d_posterior_smooths(object, contour = contour,
+                                  contour_col = contour_col,
+                                  n_contour = n_contour,
+                                  xlab = xlab, ylab = ylab,
+                                  title = title, subtitle = subtitle,
+                                  caption = caption, ...)
+    } else {
+        message("Can't plot samples of smooths of more than 3 variables.")
+        NULL
+    }
+
+    plt #return
+}
+
+`draw_1d_posterior_smooths` <- function(object, xlab = NULL, ylab = NULL,
+                                        title = NULL, subtitle = NULL,
+                                        caption = NULL, rug = TRUE, alpha = 1,
+                                        colour = "black") {
+    data_names <- attr(object, "data_names")
+    smooth_var <- data_names[[unique(object[["term"]])]]
+
+    plt <- ggplot(object, aes_(x = ~ .x1, y = ~ value, group = ~ draw)) +
         geom_line(alpha = alpha, colour = colour)
 
     ## default axis labels if none supplied
@@ -746,14 +811,14 @@
         ylab <- "Effect"
     }
     if (is.null(title)) {
-        title <- unique(tbl[["term"]])
+        title <- unique(object[["term"]])
     }
-    if (all(!is.na(tbl[["by_variable"]]))) {
+    if (all(!is.na(object[["by_variable"]]))) {
         spl <- strsplit(title, split = ":")
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
-            by_var <- as.character(unique(tbl[["by_variable"]]))
-            subtitle <- paste0("By: ", by_var, "; ", unique(tbl[[by_var]]))
+            by_var <- as.character(unique(object[["by_variable"]]))
+            subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
         }
     }
 
@@ -770,11 +835,88 @@
     plt
 }
 
+
+#' @importFrom ggplot2 ggplot guides aes_ geom_raster geom_contour labs scale_fill_distiller guide_colourbar
+#' @importFrom grid unit
+`draw_2d_posterior_smooths` <- function(object,
+                                        contour = FALSE,
+                                        contour_col = "black",
+                                        n_contour = NULL,
+                                        xlab = NULL,
+                                        ylab = NULL,
+                                        title = NULL,
+                                        subtitle = NULL,
+                                        caption = NULL) {
+    xvars <- unique(object[["term"]])
+    xvars <- vars_from_label(xvars)
+
+    if (is.null(xlab)) {
+        xlab <- xvars[1]
+    }
+    if (is.null(ylab)) {
+        ylab <- xvars[2]
+    }
+    if (is.null(title)) {
+        sm_label <- unique(object$smooth)
+        by_var <- unique(object$by_variable)
+        ## fix this so it knows about the level
+        title <- if (is.na(by_var)) {
+            sm_label
+        } else {
+            mgcv_by_smooth_labels(sm_label, by_var, level = "")
+        }
+    }
+
+    ## this is how it should be done but smooth_samples doesn't put
+    ##   the data into the object under their own names..., just .x1, .x2, etc
+    ## plt <- ggplot(object, aes_(x = as.name(xvars[1L]),
+    ##                           y = as.name(xvars[2L]))) +
+    plt <- ggplot(object, aes_string(x = ".x1", y = ".x2")) +
+        geom_raster(aes_(fill = ~ value))
+
+    if (contour) {
+        plt <- plt + geom_contour(aes_(z = ~ value), bins = n_contour,
+                                  colour = contour_col)
+    }
+
+    plt <- plt +
+        labs(title = title, x = xlab, y = ylab, subtitle = subtitle,
+             caption = caption)
+
+    plt <- plt + scale_fill_distiller(palette = "RdBu", type = "div")
+
+    # facet by the draw column
+    plt <- plt + facet_wrap(~ draw)
+
+    ## Set the limits for the fill
+    guide_limits <- c(-1, 1) * max(abs(object[["value"]]))
+    plt <- plt + expand_limits(fill = guide_limits)
+
+    # add guide
+    plt <- plt +
+        guides(fill = guide_colourbar(title = "Effect", 
+                                      direction = "vertical",
+                                      barheight = grid::unit(0.25, "npc")))
+
+    plt
+}
+
+`draw_3d_posterior_smooths` <- function(object, xvars, contour = FALSE,
+                                        contour_col = "black", n_contour = NULL,
+                                        xlab = NULL,
+                                        ylab = NULL,
+                                        title = NULL,
+                                        subtitle = NULL,
+                                        caption = NULL) {
+    warning("Plotting samples of 3D smooths is not yet implemented")
+    return(NULL)
+}
+
 #' Plot differences of smooths
 #'
 #' @param rug logical;
 #' @param ref_line logical;
-#' @param contour logical;
+#' @param contour logical; should contour lines be added to smooth surfaces?
 #' @param ci_alpha numeric; alpha transparency for confidence or simultaneous
 #'   interval.
 #' @param ci_colour colour specification for the confidence/credible intervals
@@ -827,10 +969,11 @@
     ## select smooths
     select <- check_user_select_smooths(smooths = sm, select = select)
     sm <- sm[select]
-    
+
     plotlist <- vector("list", length = length(sm))
 
-    df_list <- split(object, f = paste(object$level_1, object$level_2, sep = "-"))
+    df_list <- split(object, f = paste(object$level_1, object$level_2,
+                     sep = "-"))
 
     plotlist <- map(df_list, draw_difference, ci_alpha = ci_alpha,
                     line_col = line_col, rug = rug, ref_line = ref_line,
@@ -853,8 +996,8 @@
         ncol <- ceiling(sqrt(n_plots))
         nrow <- ceiling(n_plots / ncol)
     }
-    wrap_plots(plotlist, byrow = TRUE, ncol = ncol, nrow = nrow, guides = guides,
-               ...)
+    wrap_plots(plotlist, byrow = TRUE, ncol = ncol, nrow = nrow,
+               guides = guides, ...)
 }
 
 `draw_difference` <- function(object,
@@ -923,7 +1066,7 @@
     plt_title2 <- mgcv_by_smooth_labels(sm_label, by_var, f2)
     plt_title <- paste(plt_title1, plt_title2, sep = " - ")
     y_label <- "Difference"
-    
+
     plt <- ggplot(object, aes_(x = as.name(xvars[1L]), y = ~ diff))
 
     if (isTRUE(ref_line)) {
@@ -967,8 +1110,9 @@
         plt_title2 <- mgcv_by_smooth_labels(sm_label, by_var, f2)
         title <- paste(plt_title1, plt_title2, sep = " - ")
     }
-    
-    plt <- ggplot(object, aes_(x = as.name(xvars[1L]), y = as.name(xvars[2L]))) +
+
+    plt <- ggplot(object, aes_(x = as.name(xvars[1L]),
+                               y = as.name(xvars[2L]))) +
         geom_raster(aes_(fill = ~ diff))
 
     if (contour) {
@@ -981,11 +1125,16 @@
              caption = caption)
 
     plt <- plt + scale_fill_distiller(palette = "RdBu", type = "div")
+
+    ## Set the limits for the fill
+    guide_limits <- c(-1, 1) * max(abs(object[["diff"]]))
+    plt <- plt + expand_limits(fill = guide_limits)
+
     plt <- plt +
         guides(fill = guide_colourbar(title = "Difference", 
                                       direction = "vertical",
                                       barheight = grid::unit(0.25, "npc")))
-    
+
     plt
 }
 
