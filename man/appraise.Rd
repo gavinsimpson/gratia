@@ -91,8 +91,7 @@ appraise(mod, point_col = "steelblue", point_alpha = 0.4)
 ## To change the theme for all panels use the & operator, for example to 
 ## change the ggplot theme for all panels
 library("ggplot2")
-library("patchwork")
-appraise(mod, point_col = "steelblue", oint_alpha = 0.4,
+appraise(mod, point_col = "steelblue", point_alpha = 0.4,
          line_col = "black") & theme_minimal()
 }
 \seealso{

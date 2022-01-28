@@ -85,7 +85,6 @@
 #' # change the number of contours drawn and the fill scale used for
 #' # the surface
 #' library("ggplot2")
-#' library("patchwork")
 #' draw(m2, n_contour = 5,
 #'      continuous_fill = scale_fill_distiller(palette = "Spectral",
 #'                                             type = "div"))
