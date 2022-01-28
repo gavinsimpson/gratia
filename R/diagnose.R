@@ -1,77 +1,77 @@
 ## Functions diagnose problems with fitted GAMs
 
-##' @title Quantile-quantile plot of model residuals
-##'
-##' @param model a fitted model. Currently only class `"gam"`.
-##' @param ... arguments passed ot other methods.
-##'
-##' @export
+#' @title Quantile-quantile plot of model residuals
+#' 
+#' @param model a fitted model. Currently only class `"gam"`.
+#' @param ... arguments passed ot other methods.
+#' 
+#' @export
 `qq_plot` <- function(model, ...) {
     UseMethod("qq_plot")
 }
 
-##' @rdname qq_plot
-##' @export
+#' @rdname qq_plot
+#' @export
 `qq_plot.default` <- function(model, ...) {
     stop("Unable to produce a Q-Q plot for <",
          class(model)[[1L]], ">",
          call. = FALSE)           # don't show the call, simpler error
 }
 
-##' @param method character; method used to generate theoretical quantiles. Note
-##'   that `method = "direct"` is deprecated in favour of `method = "uniform"`.
-##' @param type character; type of residuals to use. Only `"deviance"`,
-##'   `"response"`, and `"pearson"` residuals are allowed.
-##' @param n_uniform numeric; number of times to randomize uniform quantiles
-##'   in the direct computation method (`method = "uniform"`).
-##' @param n_simulate numeric; number of data sets to simulate from the estimated
-##'   model when using the simulation method (`method = "simulate"`).
-##' @param level numeric; the coverage level for reference intervals. Must be
-##'   strictly `0 < level < 1`. Only used with `method = "simulate"`.
-##' @param xlab character or expression; the label for the y axis. If not
-##'   supplied, a suitable label will be generated.
-##' @param ylab character or expression; the label for the y axis. If not
-##'   supplied, a suitable label will be generated.
-##' @param ci_col,ci_alpha fill colour and alpha transparency for the reference
-##'   interval when `method = "simulate"`.
-##' @param point_col,point_alpha colour and alpha transparency for points on the
-##'   QQ plot.
-##' @param line_col colour used to draw the reference line.
-##'
-##' @note The wording used in [mgcv::qq.gam()] uses *direct* in reference to the
-##'   simulated residuals method (`method = "simulated"`). To avoid confusion,
-##'   `method = "direct"` is deprecated in favour of `method = "uniform"`.
-##'
-##' @inheritParams draw.evaluated_smooth
-##'
-##' @rdname qq_plot
-##'
-##' @importFrom ggplot2 ggplot geom_point geom_abline geom_ribbon labs aes_string
-##' @importFrom tools toTitleCase
-##' @importFrom stats residuals IQR median
-##' @export
-##'
-##' @examples
-##' load_mgcv()
-##' ## simulate binomial data...
-##' dat <- data_sim("eg1", n = 200, dist = "binary", scale = .33, seed = 0)
-##' p <- binomial()$linkinv(dat$f)               # binomial p
-##' n <- sample(c(1, 3), 200, replace = TRUE) # binomial n
-##' dat <- transform(dat, y = rbinom(n, n, p), n = n)
-##' m <- gam( y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
-##'          family = binomial, data = dat, weights = n,
-##'          method = "REML")
-##'
-##' ## Q-Q plot; default using direct randomization of uniform quantiles
-##' qq_plot(m)
-##'
-##' ## Alternatively use simulate new data from the model, which
-##' ## allows construction of reference intervals for the Q-Q plot
-##' qq_plot(m, method = "simulate", point_col = "steelblue",
-##'         point_alpha = 0.4)
-##'
-##' ## ... or use the usual normality assumption
-##' qq_plot(m, method = "normal")
+#' @param method character; method used to generate theoretical quantiles. Note
+#'   that `method = "direct"` is deprecated in favour of `method = "uniform"`.
+#' @param type character; type of residuals to use. Only `"deviance"`,
+#'   `"response"`, and `"pearson"` residuals are allowed.
+#' @param n_uniform numeric; number of times to randomize uniform quantiles
+#'   in the direct computation method (`method = "uniform"`).
+#' @param n_simulate numeric; number of data sets to simulate from the estimated
+#'   model when using the simulation method (`method = "simulate"`).
+#' @param level numeric; the coverage level for reference intervals. Must be
+#'   strictly `0 < level < 1`. Only used with `method = "simulate"`.
+#' @param xlab character or expression; the label for the y axis. If not
+#'   supplied, a suitable label will be generated.
+#' @param ylab character or expression; the label for the y axis. If not
+#'   supplied, a suitable label will be generated.
+#' @param ci_col,ci_alpha fill colour and alpha transparency for the reference
+#'   interval when `method = "simulate"`.
+#' @param point_col,point_alpha colour and alpha transparency for points on the
+#'   QQ plot.
+#' @param line_col colour used to draw the reference line.
+#' 
+#' @note The wording used in [mgcv::qq.gam()] uses *direct* in reference to the
+#'   simulated residuals method (`method = "simulated"`). To avoid confusion,
+#'   `method = "direct"` is deprecated in favour of `method = "uniform"`.
+#' 
+#' @inheritParams draw.evaluated_smooth
+#' 
+#' @rdname qq_plot
+#' 
+#' @importFrom ggplot2 ggplot geom_point geom_abline geom_ribbon labs aes_string
+#' @importFrom tools toTitleCase
+#' @importFrom stats residuals IQR median
+#' @export
+#' 
+#' @examples
+#' load_mgcv()
+#' ## simulate binomial data...
+#' dat <- data_sim("eg1", n = 200, dist = "binary", scale = .33, seed = 0)
+#' p <- binomial()$linkinv(dat$f)               # binomial p
+#' n <- sample(c(1, 3), 200, replace = TRUE) # binomial n
+#' dat <- transform(dat, y = rbinom(n, n, p), n = n)
+#' m <- gam( y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
+#'          family = binomial, data = dat, weights = n,
+#'          method = "REML")
+#' 
+#' ## Q-Q plot; default using direct randomization of uniform quantiles
+#' qq_plot(m)
+#' 
+#' ## Alternatively use simulate new data from the model, which
+#' ## allows construction of reference intervals for the Q-Q plot
+#' qq_plot(m, method = "simulate", point_col = "steelblue",
+#'         point_alpha = 0.4)
+#' 
+#' ## ... or use the usual normality assumption
+#' qq_plot(m, method = "normal")
 `qq_plot.gam` <- function(model,
                           method = c("uniform", "simulate", "normal", "direct"),
                           type = c("deviance", "response", "pearson"),
@@ -98,7 +98,7 @@
         is.null(fix.family.rd(family(model))[["rd"]])) {
         method <- "normal"
     }
-    
+
     if (level <= 0 || level >= 1) {
         stop("Level must be 0 < level < 1. Supplied level <", level, ">",
              call. = FALSE)
@@ -131,10 +131,10 @@
     if (is.null(subtitle)) {
         subtitle <- paste("Method:", method)
     }
-    
+
     ## base plot
     plt <- ggplot(df, aes_string(x = "theoretical", y = "residuals"))
-    
+
     ## add reference line
     qq_intercept <- 0
     qq_slope <- 1
@@ -151,7 +151,7 @@
     }
     plt <- plt + geom_abline(slope = qq_slope, intercept = qq_intercept,
                              col = line_col)
-    
+
     ## add reference interval
     if (isTRUE(method %in% c("simulate", "normal"))) {
         plt <- plt + geom_ribbon(aes_string(ymin = "lower", ymax = "upper",
@@ -159,20 +159,20 @@
                                  inherit.aes = FALSE,
                                  alpha = ci_alpha, fill = ci_col)
     }
-    
+
     ## add point layer
     plt <- plt + geom_point(colour = point_col, alpha = point_alpha)
-    
+
     ## add labels
     plt <- plt + labs(title = title, subtitle = subtitle, caption = caption,
                       y = ylab, x = xlab)
-    
+
     ## return
     plt
 }
 
-##' @export
-##' @rdname qq_plot
+#' @export
+#' @rdname qq_plot
 `qq_plot.glm` <- function(model, ...) {
     if (is.null(model[["sig2"]])) {
         model[["sig2"]] <- summary(model)$dispersion
@@ -180,8 +180,8 @@
     qq_plot.gam(model, ...)
 }
 
-##' @rdname qq_plot
-##' @importFrom stats df.residual
+#' @rdname qq_plot
+#' @importFrom stats df.residual
 `qq_plot.lm` <- function(model, ...) {
     r <- residuals(model)
     r.df <- df.residual(model)
@@ -195,8 +195,8 @@
     qq_plot.gam(model, ...)
 }
 
-##' @importFrom mgcv fix.family.rd
-##' @importFrom stats weights
+#' @importFrom mgcv fix.family.rd
+#' @importFrom stats weights
 `qq_simulate` <- function(model, n = 50, type = c("deviance","response","pearson"),
                           level = 0.9, detrend = FALSE) {
     type <- match.arg(type)
@@ -243,7 +243,7 @@
         int[1L, ] <- int[1L, ] - out
         int[2L, ] <- int[2L, ] - out
     }
-    
+
     out <- tibble(theoretical = out,
                   residuals = r,
                   lower = int[1L, ],
@@ -263,7 +263,7 @@
     sort(r)
 }
 
-##' @importFrom stats ppoints pnorm dnorm IQR median
+#' @importFrom stats ppoints pnorm dnorm IQR median
 `qq_normal` <- function(model, type = c("deviance", "response", "pearson"),
                         level = 0.9, detrend = FALSE) {
     se_zscore <- function(z) {
@@ -297,8 +297,8 @@
     out
 }
 
-##' @importFrom mgcv fix.family.qf
-##' @importFrom stats residuals fitted family weights na.action
+#' @importFrom mgcv fix.family.qf
+#' @importFrom stats residuals fitted family weights na.action
 `qq_uniform` <- function(model, n = 10, type = c("deviance","response","pearson"),
                          level = 0.9, detrend = FALSE) {
     type <- match.arg(type)
@@ -334,14 +334,14 @@
                                           na_action = na_action)
     }
 
-    out <- rowMeans(sims)    
+    out <- rowMeans(sims)
     r <- sort(r)
 
     ## detrend for worm plots?
     if (isTRUE(detrend)) {
         r <- r - out
     }
-    
+
     out <- tibble(theoretical = out,
                   residuals = r)
     out
@@ -359,7 +359,7 @@
     sort(r)
 }
 
-##' @importFrom stats naresid
+#' @importFrom stats naresid
 `compute_residuals` <- function(y, fit, weights,
                                 type = c("deviance","response","pearson"),
                                 dev_resid_fun, var_fun, na_action) {
@@ -407,33 +407,33 @@
     (y - fit) * sqrt(weights) / sqrt(var_fun(fit))
 }
 
-##' @title Plot of residuals versus linear predictor values
-##'
-##' @param model a fitted model. Currently only class `"gam"`.
-##' @param type character; type of residuals to use. Only `"deviance"`,
-##'   `"response"`, and `"pearson"` residuals are allowed.
-##' @param xlab character or expression; the label for the y axis. If not
-##'   supplied, a suitable label will be generated.
-##' @param ylab character or expression; the label for the y axis. If not
-##'   supplied, a suitable label will be generated.
-##' @param title character or expression; the title for the plot. See
-##'   [ggplot2::labs()].
-##' @param subtitle character or expression; the subtitle for the plot. See
-##'   [ggplot2::labs()].
-##' @param caption character or expression; the plot caption. See
-##'   [ggplot2::labs()].
-##' @param point_col colour used to draw points in the plots. See
-##'   [graphics::par()] section **Color Specification**. This is passed to
-##'   the individual plotting functions, and therefore affects the points of
-##'   all plots.
-##' @param point_alpha numeric; alpha transparency for points in plots.
-##' @param line_col colour specification for 1:1 line.
-##'
-##' @export
-##'
-##' @importFrom stats napredict residuals
-##' @importFrom tools toTitleCase
-##' @importFrom ggplot2 ggplot aes_string geom_point geom_hline labs
+#' @title Plot of residuals versus linear predictor values
+#' 
+#' @param model a fitted model. Currently only class `"gam"`.
+#' @param type character; type of residuals to use. Only `"deviance"`,
+#'   `"response"`, and `"pearson"` residuals are allowed.
+#' @param xlab character or expression; the label for the y axis. If not
+#'   supplied, a suitable label will be generated.
+#' @param ylab character or expression; the label for the y axis. If not
+#'   supplied, a suitable label will be generated.
+#' @param title character or expression; the title for the plot. See
+#'   [ggplot2::labs()].
+#' @param subtitle character or expression; the subtitle for the plot. See
+#'   [ggplot2::labs()].
+#' @param caption character or expression; the plot caption. See
+#'   [ggplot2::labs()].
+#' @param point_col colour used to draw points in the plots. See
+#'   [graphics::par()] section **Color Specification**. This is passed to
+#'   the individual plotting functions, and therefore affects the points of
+#'   all plots.
+#' @param point_alpha numeric; alpha transparency for points in plots.
+#' @param line_col colour specification for 1:1 line.
+#' 
+#' @export
+#' 
+#' @importFrom stats napredict residuals
+#' @importFrom tools toTitleCase
+#' @importFrom ggplot2 ggplot aes_string geom_point geom_hline labs
 `residuals_linpred_plot` <- function(model,
                                      type = c("deviance", "pearson","response"),
                                      ylab = NULL, xlab = NULL, title = NULL,
@@ -477,13 +477,13 @@
     plt
 }
 
-##' @title Plot of fitted against observed response values
-##'
-##' @inheritParams residuals_linpred_plot
-##'
-##' @export
-##'
-##' @importFrom ggplot2 ggplot aes_string geom_point labs
+#' @title Plot of fitted against observed response values
+#' 
+#' @inheritParams residuals_linpred_plot
+#' 
+#' @export
+#' 
+#' @importFrom ggplot2 ggplot aes_string geom_point labs
 `observed_fitted_plot` <- function(model,
                                    ylab = NULL, xlab = NULL, title = NULL,
                                    subtitle = NULL, caption = NULL,
@@ -525,19 +525,19 @@
     plt
 }
 
-##' @title Histogram of model residuals
-##'
-##' @param n_bins character or numeric; either the number of bins or a string
-##'   indicating how to calculate the number of bins.
-##'
-##' @inheritParams residuals_linpred_plot
-##'
-##' @export
-##'
-##' @importFrom ggplot2 ggplot aes_string geom_histogram labs
-##' @importFrom tools toTitleCase
-##' @importFrom stats residuals
-##' @importFrom grDevices nclass.Sturges nclass.scott nclass.FD
+#' @title Histogram of model residuals
+#' 
+#' @param n_bins character or numeric; either the number of bins or a string
+#'   indicating how to calculate the number of bins.
+#' 
+#' @inheritParams residuals_linpred_plot
+#' 
+#' @export
+#' 
+#' @importFrom ggplot2 ggplot aes_string geom_histogram labs
+#' @importFrom tools toTitleCase
+#' @importFrom stats residuals
+#' @importFrom grDevices nclass.Sturges nclass.scott nclass.FD
 `residuals_hist_plot` <- function(model,
                                   type = c("deviance", "pearson", "response"),
                                   n_bins = c("sturges", "scott", "fd"),
@@ -589,63 +589,69 @@
     plt
 }
 
-##' @title Model diagnostic plots
-##'
-##' @param model a fitted model. Currently only class `"gam"`.
-##' @param method character; method used to generate theoretical quantiles. Note
-##'   that `method = "direct"` is deprecated in favour of `method = "uniform"`.
-##' @param n_uniform numeric; number of times to randomize uniform quantiles
-##'   in the direct computation method (`method = "direct"`) for QQ plots.
-##' @param n_simulate numeric; number of data sets to simulate from the estimated
-##'   model when using the simulation method (`method = "simulate"`) for QQ
-##'   plots.
-##' @param type character; type of residuals to use. Only `"deviance"`,
-##'   `"response"`, and `"pearson"` residuals are allowed.
-##' @param n_bins character or numeric; either the number of bins or a string
-##'   indicating how to calculate the number of bins.
-##' @param ncol,nrow numeric; the numbers of rows and columns over which to
-##'   spread the plots.
-##' @param guides character; one of `"keep"` (the default), `"collect"`, or
-##'   `"auto"`. Passed to [patchwork::plot_layout()]
-##' @param level numeric; the coverage level for QQ plot reference intervals.
-##'   Must be strictly `0 < level < 1`. Only used with `method = "simulate"`.
-##' @param ci_alpha,ci_col numeric; the level of alpha transparency for the
-##'   QQ plot reference interval when `method = "simulate"`, or points drawn in
-##'   plots.
-##' @param point_col,point_alpha colour and transparency used to draw points in
-##'   the plots. See [graphics::par()] section **Color Specification**. This is
-##'   passed to the individual plotting functions, and therefore affects the
-##'   points of all plots.
-##' @param line_col colour specification for the 1:1 line in the QQ plot and the
-##'   reference line in the residuals vs linear predictor plot.
-##' @param ... arguments passed to [patchwork::wrap_plots()].
-##'
-##' @importFrom patchwork wrap_plots
-##'
-##' @note The wording used in [mgcv::qq.gam()] uses *direct* in reference to the
-##'   simulated residuals method (`method = "simulated"`). To avoid confusion,
-##'   `method = "direct"` is deprecated in favour of `method = "uniform"`.
-##'
-##' @seealso The plots are produced by functions [gratia::qq_plot()],
-##'   [gratia::residuals_linpred_plot()], [gratia::residuals_hist_plot()],
-##'   and [gratia::observed_fitted_plot()].
-##'
-##' @export
-##'
-##' @examples
-##' library(mgcv)
-##' \dontshow{set.seed(2)}
-##' ## simulate some data...
-##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
-##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
-##' ## run some basic model checks
-##' appraise(mod, point_col = "steelblue", point_alpha = 0.4)
+#' @title Model diagnostic plots
+#' 
+#' @param model a fitted model. Currently only class `"gam"`.
+#' @param method character; method used to generate theoretical quantiles. Note
+#'   that `method = "direct"` is deprecated in favour of `method = "uniform"`.
+#' @param n_uniform numeric; number of times to randomize uniform quantiles
+#'   in the direct computation method (`method = "direct"`) for QQ plots.
+#' @param n_simulate numeric; number of data sets to simulate from the estimated
+#'   model when using the simulation method (`method = "simulate"`) for QQ
+#'   plots.
+#' @param type character; type of residuals to use. Only `"deviance"`,
+#'   `"response"`, and `"pearson"` residuals are allowed.
+#' @param n_bins character or numeric; either the number of bins or a string
+#'   indicating how to calculate the number of bins.
+#' @param ncol,nrow numeric; the numbers of rows and columns over which to
+#'   spread the plots.
+#' @param guides character; one of `"keep"` (the default), `"collect"`, or
+#'   `"auto"`. Passed to [patchwork::plot_layout()]
+#' @param level numeric; the coverage level for QQ plot reference intervals.
+#'   Must be strictly `0 < level < 1`. Only used with `method = "simulate"`.
+#' @param ci_alpha,ci_col numeric; the level of alpha transparency for the
+#'   QQ plot reference interval when `method = "simulate"`, or points drawn in
+#'   plots.
+#' @param point_col,point_alpha colour and transparency used to draw points in
+#'   the plots. See [graphics::par()] section **Color Specification**. This is
+#'   passed to the individual plotting functions, and therefore affects the
+#'   points of all plots.
+#' @param line_col colour specification for the 1:1 line in the QQ plot and the
+#'   reference line in the residuals vs linear predictor plot.
+#' @param ... arguments passed to [patchwork::wrap_plots()].
+#' 
+#' @importFrom patchwork wrap_plots
+#' 
+#' @note The wording used in [mgcv::qq.gam()] uses *direct* in reference to the
+#'   simulated residuals method (`method = "simulated"`). To avoid confusion,
+#'   `method = "direct"` is deprecated in favour of `method = "uniform"`.
+#' 
+#' @seealso The plots are produced by functions [gratia::qq_plot()],
+#'   [gratia::residuals_linpred_plot()], [gratia::residuals_hist_plot()],
+#'   and [gratia::observed_fitted_plot()].
+#' 
+#' @export
+#' 
+#' @examples
+#' load_mgcv()
+#' \dontshow{set.seed(2)}
+#' ## simulate some data...
+#' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+#' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
+#' ## run some basic model checks
+#' appraise(mod, point_col = "steelblue", point_alpha = 0.4)
+#'
+#' ## To change the theme for all panels use the & operator, for example to 
+#' ## change the ggplot theme for all panels
+#' library("ggplot2")
+#' appraise(mod, point_col = "steelblue", oint_alpha = 0.4,
+#'          line_col = "black") & theme_minimal()
 `appraise` <- function(model, ...) {
     UseMethod("appraise")
 }
 
-##' @rdname appraise
-##' @export
+#' @rdname appraise
+#' @export
 `appraise.gam` <- function(model,
                        method = c("uniform", "simulate", "normal", "direct"),
                        n_uniform = 10, n_simulate = 50,
@@ -696,9 +702,9 @@
                ...)
 }
 
-##' @rdname appraise
-##' @importFrom stats model.frame model.response df.residual
-##' @export
+#' @rdname appraise
+#' @importFrom stats model.frame model.response df.residual
+#' @export
 `appraise.lm` <- function(model, ...) {
     r <- residuals(model)
     r.df <- df.residual(model)
@@ -715,57 +721,57 @@
     appraise.gam(model, ...)
 }
 
-##' Worm plot of model residuals
-##'
-##' @inheritParams qq_plot
-##'
-##' @export
+#' Worm plot of model residuals
+#' 
+#' @inheritParams qq_plot
+#' 
+#' @export
 `worm_plot` <- function(model, ...) {
     UseMethod("worm_plot")
 }
 
-##' @export
+#' @export
 `worm_plot.default` <- function(model, ...) {
     stop("Unable to produce a worm plot for <",
          class(model)[[1L]], ">",
          call. = FALSE)           # don't show the call, simpler error
 }
 
-##' @inheritParams qq_plot.gam
-##' @rdname worm_plot
-##'
-##' @note The wording used in [mgcv::qq.gam()] uses *direct* in reference to the
-##'   simulated residuals method (`method = "simulated"`). To avoid confusion,
-##'   `method = "direct"` is deprecated in favour of `method = "uniform"`.
-##' 
-##' @export
-##'
-##' @importFrom dplyr mutate
-##' @importFrom ggplot2 ggplot geom_point geom_hline geom_ribbon labs aes_string
-##' @importFrom tools toTitleCase
-##'
-##' @examples
-##' load_mgcv()
-##' ## simulate binomial data...
-##' dat <- data_sim("eg1", n = 200, dist = "binary", scale = .33, seed = 0)
-##' p <- binomial()$linkinv(dat$f)               # binomial p
-##' n <- sample(c(1, 3), 200, replace = TRUE) # binomial n
-##' dat <- transform(dat, y = rbinom(n, n, p), n = n)
-##' m <- gam( y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
-##'          family = binomial, data = dat, weights = n,
-##'          method = "REML")
-##'
-##' ## Worm plot; default using direct randomization of uniform quantiles
-##' ## Note no reference bands are drawn with this method.
-##' worm_plot(m)
-##'
-##' ## Alternatively use simulate new data from the model, which
-##' ## allows construction of reference intervals for the Q-Q plot
-##' worm_plot(m, method = "simulate", point_col = "steelblue",
-##'           point_alpha = 0.4)
-##'
-##' ## ... or use the usual normality assumption
-##' worm_plot(m, method = "normal")
+#' @inheritParams qq_plot.gam
+#' @rdname worm_plot
+#' 
+#' @note The wording used in [mgcv::qq.gam()] uses *direct* in reference to the
+#'   simulated residuals method (`method = "simulated"`). To avoid confusion,
+#'   `method = "direct"` is deprecated in favour of `method = "uniform"`.
+#' 
+#' @export
+#' 
+#' @importFrom dplyr mutate
+#' @importFrom ggplot2 ggplot geom_point geom_hline geom_ribbon labs aes_string
+#' @importFrom tools toTitleCase
+#' 
+#' @examples
+#' load_mgcv()
+#' ## simulate binomial data...
+#' dat <- data_sim("eg1", n = 200, dist = "binary", scale = .33, seed = 0)
+#' p <- binomial()$linkinv(dat$f)               # binomial p
+#' n <- sample(c(1, 3), 200, replace = TRUE) # binomial n
+#' dat <- transform(dat, y = rbinom(n, n, p), n = n)
+#' m <- gam( y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
+#'          family = binomial, data = dat, weights = n,
+#'          method = "REML")
+#' 
+#' ## Worm plot; default using direct randomization of uniform quantiles
+#' ## Note no reference bands are drawn with this method.
+#' worm_plot(m)
+#' 
+#' ## Alternatively use simulate new data from the model, which
+#' ## allows construction of reference intervals for the Q-Q plot
+#' worm_plot(m, method = "simulate", point_col = "steelblue",
+#'           point_alpha = 0.4)
+#' 
+#' ## ... or use the usual normality assumption
+#' worm_plot(m, method = "normal")
 `worm_plot.gam` <- function(model,
                           method = c("uniform", "simulate", "normal", "direct"),
                           type = c("deviance", "response", "pearson"),
@@ -792,7 +798,7 @@
         is.null(fix.family.rd(family(model))[["rd"]])) {
         method <- "normal"
     }
-    
+
     if (level <= 0 || level >= 1) {
         stop("Level must be 0 < level < 1. Supplied level <", level, ">",
              call. = FALSE)
@@ -853,8 +859,8 @@
 }
 
 
-##' @export
-##' @rdname worm_plot
+#' @export
+#' @rdname worm_plot
 `worm_plot.glm` <- function(model, ...) {
     if (is.null(model[["sig2"]])) {
         model[["sig2"]] <- summary(model)$dispersion
@@ -862,8 +868,8 @@
     worm_plot.gam(model, ...)
 }
 
-##' @rdname worm_plot
-##' @importFrom stats df.residual
+#' @rdname worm_plot
+#' @importFrom stats df.residual
 `worm_plot.lm` <- function(model, ...) {
     r <- residuals(model)
     r.df <- df.residual(model)

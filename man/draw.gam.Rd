@@ -142,9 +142,14 @@ draw(m2, contour = FALSE)
 
 # change the number of contours drawn and the fill scale used for
 # the surface
+library("ggplot2")
 draw(m2, n_contour = 5,
-     continuous_fill = ggplot2::scale_fill_distiller(palette = "Spectral",
-                                                     type = "div"))
+     continuous_fill = scale_fill_distiller(palette = "Spectral",
+                                            type = "div"))
+
+# to modify all panels, for example to change the theme, use the & operator
+draw(m2, n_contour = 5) &
+  theme_minimal()
 }
 \author{
 Gavin L. Simpson

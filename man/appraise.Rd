@@ -80,13 +80,19 @@ simulated residuals method (\code{method = "simulated"}). To avoid confusion,
 \code{method = "direct"} is deprecated in favour of \code{method = "uniform"}.
 }
 \examples{
-library(mgcv)
+load_mgcv()
 \dontshow{set.seed(2)}
 ## simulate some data...
 dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 ## run some basic model checks
 appraise(mod, point_col = "steelblue", point_alpha = 0.4)
+
+## To change the theme for all panels use the & operator, for example to 
+## change the ggplot theme for all panels
+library("ggplot2")
+appraise(mod, point_col = "steelblue", oint_alpha = 0.4,
+         line_col = "black") & theme_minimal()
 }
 \seealso{
 The plots are produced by functions \code{\link[=qq_plot]{qq_plot()}},
