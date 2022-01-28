@@ -84,17 +84,14 @@
 #'
 #' # change the number of contours drawn and the fill scale used for
 #' # the surface
+#' library("ggplot2")
 #' draw(m2, n_contour = 5,
-#'      continuous_fill = ggplot2::scale_fill_distiller(palette = "Spectral",
-#'                                                      type = "div"))
-#' # to change the theme use the & operator as for a patchwork composition.
-#' draw(
-#'   m2,
-#'   n_contour = 5,
-#'   continuous_fill = ggplot2::scale_fill_distiller(palette = "Spectral",
-#'                                                   type = "div")
-#' ) & ggplot2::theme_minimal()
-
+#'      continuous_fill = scale_fill_distiller(palette = "Spectral",
+#'                                             type = "div"))
+#'
+#' # to modify all panels, for example to change the theme, use the & operator
+#' draw(m2, n_contour = 5) &
+#'   theme_minimal()
 `draw.gam` <- function(object,
                        data = NULL,
                        parametric = NULL,
