@@ -8,6 +8,7 @@
   object,
   select = NULL,
   n_samples = NULL,
+  seed = NULL,
   xlab = NULL,
   ylab = NULL,
   title = NULL,
@@ -38,8 +39,10 @@ as shown for example in the output from \code{summary(object)}. Logical
 \code{select} operates as per numeric \code{select} in the order that smooths are
 stored.}
 
-\item{n_samples}{numeric; if not \code{NULL}, sample \code{n_samples} from the set
-of posterior samples for plotting.}
+\item{n_samples}{numeric; if not \code{NULL}, sample \code{n_samples} from the
+posterior draws for plotting.}
+
+\item{seed}{numeric; random seed to be used to if sampling draws.}
 
 \item{xlab}{character or expression; the label for the x axis. If not
 supplied, a suitable label will be generated from \code{object}.}
@@ -97,23 +100,33 @@ Plot posterior smooths
 }
 \examples{
 load_mgcv()
-\dontshow{set.seed(1)}
-dat1 <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+dat1 <- data_sim("eg1", n = 400, dist = "normal", scale = 1, seed = 1)
 ## a single smooth GAM
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "REML")
 ## posterior smooths from m1
 sm1 <- smooth_samples(m1, n = 15, seed = 23478)
 ## plot
 draw(sm1, alpha = 0.7)
+## plot only 5 randomly smapled draws
+draw(sm1, n_samples = 5, alpha = 0.7)
 
-\dontshow{set.seed(1)}
-dat2 <- gamSim(4, verbose = FALSE)
+## A factor-by smooth example
+dat2 <- data_sim("eg4", n = 400, dist = "normal", scale = 1, seed = 1)
 ## a multi-smooth GAM with a factor-by smooth
 m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat2, method = "REML")
 ## posterior smooths from m1
 sm2 <- smooth_samples(m2, n = 15, seed = 23478)
 ## plot, this time selecting only the factor-by smooth
 draw(sm2, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
+
+## A 2D smooth example
+dat3 <- data_sim("eg2", n = 400, dist = "normal", scale = 1, seed = 1)
+## fit a 2D smooth
+m3 <- gam(y ~ te(x, z), data = dat3, method = "REML")
+## get samples
+sm3 <- smooth_samples(m3, n = 10)
+## plot just 6 of the draws, with contour line overlays
+draw(sm3, n_samples = 6, contour = TRUE, seed = 42)
 }
 \author{
 Gavin L. Simpson
