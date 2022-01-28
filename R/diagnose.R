@@ -98,7 +98,7 @@
         is.null(fix.family.rd(family(model))[["rd"]])) {
         method <- "normal"
     }
-    
+
     if (level <= 0 || level >= 1) {
         stop("Level must be 0 < level < 1. Supplied level <", level, ">",
              call. = FALSE)
@@ -131,10 +131,10 @@
     if (is.null(subtitle)) {
         subtitle <- paste("Method:", method)
     }
-    
+
     ## base plot
     plt <- ggplot(df, aes_string(x = "theoretical", y = "residuals"))
-    
+
     ## add reference line
     qq_intercept <- 0
     qq_slope <- 1
@@ -151,7 +151,7 @@
     }
     plt <- plt + geom_abline(slope = qq_slope, intercept = qq_intercept,
                              col = line_col)
-    
+
     ## add reference interval
     if (isTRUE(method %in% c("simulate", "normal"))) {
         plt <- plt + geom_ribbon(aes_string(ymin = "lower", ymax = "upper",
@@ -159,14 +159,14 @@
                                  inherit.aes = FALSE,
                                  alpha = ci_alpha, fill = ci_col)
     }
-    
+
     ## add point layer
     plt <- plt + geom_point(colour = point_col, alpha = point_alpha)
-    
+
     ## add labels
     plt <- plt + labs(title = title, subtitle = subtitle, caption = caption,
                       y = ylab, x = xlab)
-    
+
     ## return
     plt
 }
@@ -243,7 +243,7 @@
         int[1L, ] <- int[1L, ] - out
         int[2L, ] <- int[2L, ] - out
     }
-    
+
     out <- tibble(theoretical = out,
                   residuals = r,
                   lower = int[1L, ],
@@ -334,14 +334,14 @@
                                           na_action = na_action)
     }
 
-    out <- rowMeans(sims)    
+    out <- rowMeans(sims)
     r <- sort(r)
 
     ## detrend for worm plots?
     if (isTRUE(detrend)) {
         r <- r - out
     }
-    
+
     out <- tibble(theoretical = out,
                   residuals = r)
     out
@@ -633,13 +633,17 @@
 ##' @export
 ##'
 ##' @examples
-##' library(mgcv)
+##' load_mgcv()
 ##' \dontshow{set.seed(2)}
 ##' ## simulate some data...
 ##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
 ##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 ##' ## run some basic model checks
 ##' appraise(mod, point_col = "steelblue", point_alpha = 0.4)
+##' ## To change the theme for all panels use the & operator
+##' appraise(mod, point_col = "steelblue",
+##'      point_alpha = 0.4, line_col = "black") & ggplot2::theme_minimal()
+
 `appraise` <- function(model, ...) {
     UseMethod("appraise")
 }
@@ -737,7 +741,7 @@
 ##' @note The wording used in [mgcv::qq.gam()] uses *direct* in reference to the
 ##'   simulated residuals method (`method = "simulated"`). To avoid confusion,
 ##'   `method = "direct"` is deprecated in favour of `method = "uniform"`.
-##' 
+##'
 ##' @export
 ##'
 ##' @importFrom dplyr mutate
@@ -792,7 +796,7 @@
         is.null(fix.family.rd(family(model))[["rd"]])) {
         method <- "normal"
     }
-    
+
     if (level <= 0 || level >= 1) {
         stop("Level must be 0 < level < 1. Supplied level <", level, ">",
              call. = FALSE)

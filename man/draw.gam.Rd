@@ -145,6 +145,13 @@ draw(m2, contour = FALSE)
 draw(m2, n_contour = 5,
      continuous_fill = ggplot2::scale_fill_distiller(palette = "Spectral",
                                                      type = "div"))
+# to change the theme use the & operator as for a patchwork composition.
+draw(
+  m2,
+  n_contour = 5,
+  continuous_fill = ggplot2::scale_fill_distiller(palette = "Spectral",
+                                                  type = "div")
+) & ggplot2::theme_minimal()
 }
 \author{
 Gavin L. Simpson
