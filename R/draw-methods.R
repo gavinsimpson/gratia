@@ -633,8 +633,9 @@
 
 #' Plot posterior smooths
 #'
-#' @param n_samples numeric; if not `NULL`, sample `n_samples` from the set
-#'   of posterior samples for plotting.
+#' @param n_samples numeric; if not `NULL`, sample `n_samples` from the
+#'   posterior draws for plotting.
+#' @param seed numeric; random seed to be used to if sampling draws.
 #' @param alpha numeric; alpha transparency for confidence or simultaneous
 #'   interval.
 #' @param colour The colour to use to draw the posterior smooths. Passed to
@@ -665,26 +666,36 @@
 #'
 #' @examples
 #' load_mgcv()
-#' \dontshow{set.seed(1)}
-#' dat1 <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+#' dat1 <- data_sim("eg1", n = 400, dist = "normal", scale = 1, seed = 1)
 #' ## a single smooth GAM
 #' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "REML")
 #' ## posterior smooths from m1
 #' sm1 <- smooth_samples(m1, n = 15, seed = 23478)
 #' ## plot
 #' draw(sm1, alpha = 0.7)
-#' 
-#' \dontshow{set.seed(1)}
-#' dat2 <- gamSim(4, verbose = FALSE)
+#' ## plot only 5 randomly smapled draws
+#' draw(sm1, n_samples = 5, alpha = 0.7)
+#'
+#' ## A factor-by smooth example
+#' dat2 <- data_sim("eg4", n = 400, dist = "normal", scale = 1, seed = 1)
 #' ## a multi-smooth GAM with a factor-by smooth
 #' m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat2, method = "REML")
 #' ## posterior smooths from m1
 #' sm2 <- smooth_samples(m2, n = 15, seed = 23478)
 #' ## plot, this time selecting only the factor-by smooth
 #' draw(sm2, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
+#'
+#' ## A 2D smooth example
+#' dat3 <- data_sim("eg2", n = 400, dist = "normal", scale = 1, seed = 1)
+#' ## fit a 2D smooth
+#' m3 <- gam(y ~ te(x, z), data = dat3, method = "REML")
+#' ## get samples
+#' sm3 <- smooth_samples(m3, n = 10)
+#' ## plot just 6 of the draws, with contour line overlays
+#' draw(sm3, n_samples = 6, contour = TRUE, seed = 42)
 `draw.smooth_samples` <- function(object,
                                   select = NULL,
-                                  n_samples = NULL,
+                                  n_samples = NULL, seed = NULL,
                                   xlab = NULL, ylab = NULL, title = NULL,
                                   subtitle = NULL, caption = NULL,
                                   alpha = 1, colour = "black",
@@ -714,7 +725,7 @@
     }
 
     plts <- map(S, do_plot_smooths,
-                object = object, n_samples = n_samples,
+                object = object, n_samples = n_samples, seed = seed,
                 xlab = xlab, ylab = ylab,
                 title = title, subtitle = subtitle, caption = caption,
                 rug = rug, alpha = alpha, colour = colour,
@@ -740,7 +751,7 @@
                ...)
 }
 
-`draw_posterior_smooths` <- function(object, n_samples = NULL,
+`draw_posterior_smooths` <- function(object, n_samples = NULL, seed = NULL,
                                      xlab = NULL, ylab = NULL,
                                      title = NULL, subtitle = NULL,
                                      caption = NULL, rug = TRUE, alpha = 1,
@@ -748,18 +759,45 @@
                                      contour = FALSE,
                                      contour_col = "black",
                                      n_contour = NULL, ...) {
-    #data_names <- attr(tbl, "data_names")
-    #smooth_var <- data_names[[unique(tbl[["term"]])]]
+    # handle the seed nicely
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+        runif(1)
+    }
+    if (is.null(seed)) {
+        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+    } else {
+        R.seed <- get(".Random.seed", envir = .GlobalEnv)
+        set.seed(seed)
+        RNGstate <- structure(seed, kind = as.list(RNGkind()))
+        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+    }
 
     xvars <- unique(object[["term"]])
     xvars <- vars_from_label(xvars)
     n_xvars <- length(xvars)
 
     ## randomly sample n_samples from the posterior draws
-    if (!is.null(n_samples)) {
-        if ((m <- max(object[["draw"]])) < n_samples) {
-            n_samples <- m
+    n_draws <- max(object[["draw"]]) # how many draws?
+    max_plts <- 16L
+
+    # if n_samples null, user didn't specify how many, set to maximum
+    if (is.null(n_samples)) {
+        n_samples <- if (n_xvars > 1L) {
+            max_plts
+        } else {
+            n_draws
         }
+    }
+    # if n_samples exceeds the number of draws, set it to be the maximum
+    # this is really only if a user set it too large. Also handle case of user
+    # being silly and asking for < 1 draw
+    if (n_draws < n_samples || n_samples < 1L) {
+        n_samples <- n_draws
+    }
+
+    # if we're ploting fewer than n_draws samples, randomly sample the draws
+    # to plot
+    if (n_samples < n_draws) {
         draws <- unique(object[["draw"]])
         draws <- sample(draws, n_samples)
         object <- filter(object, .data$draw %in% draws)
