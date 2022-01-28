@@ -1,6 +1,6 @@
 Package: gratia
-Version: 0.6.9600
-Date: 2022-01-15
+Version: 0.6.9700
+Date: 2022-01-28
 Title: Graceful 'ggplot'-Based Graphics and Other Functions for GAMs Fitted Using 'mgcv'
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     email = "ucfagls@gmail.com",

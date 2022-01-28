@@ -1,4 +1,4 @@
-# gratia 0.6.9600
+# gratia 0.6.9700
 
 ## Major changes
 
@@ -65,6 +65,12 @@
 * `fixef()` is now imported (and re-exported) from the *nlme* package, with
   methods for models fitted with `gam()` and `gamm()`, to extract fixed effects
   estimates from fitted models.
+
+* The `draw()` method for `smooth_samples()` can now handle 2D smooths.
+  Additionally, the number of posterior draws to plot can now be specified when
+  plotting using new argument `n_samples`, which will result in `n_samples`
+  draws being selected at random from the set of draws for plotting. New
+  argument `seed` allows the selection of draws to be repeatable.
 
 ## Bug fixes
 
