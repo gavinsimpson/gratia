@@ -20,9 +20,9 @@ library('gratia')
 
 <!-- badges: start -->
 [![R build status](https://github.com/gavinsimpson/gratia/workflows/R-CMD-check/badge.svg)](https://github.com/gavinsimpson/gratia/actions)
-[![Build status](https://ci.appveyor.com/api/projects/status/w7pj8773t5b8fxkb/branch/master?svg=true)](https://ci.appveyor.com/project/gavinsimpson/gratia/branch/master)
 [![codecov.io](https://codecov.io/gh/gavinsimpson/gratia/branch/master/graph/badge.svg)](https://codecov.io/gh/gavinsimpson/gratia)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/gratia)](https://cran.r-project.org/package=gratia)
+[![](http://cranlogs.r-pkg.org/badges/grand-total/gratia)](http://cran.rstudio.com/web/packages/gratia/index.html)
 <!-- badges: end -->
 
 ## Overview
