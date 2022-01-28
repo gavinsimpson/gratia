@@ -366,12 +366,12 @@ test_that("draw() works with a ziplss models; issue #45", {
     x1 <- runif(n)
     x2 <- runif(n)
     x3 <- runif(n)
-    
+
     ## Simulate probability of potential presence...
     eta1 <- f0(x0) + f1(x1) - 3
     p <- binomial()$linkinv(eta1) 
     y <- as.numeric(runif(n) < p) ## 1 for presence, 0 for absence
-    
+
     ## Simulate y given potentially present (not exactly model fitted!)...
     ind <- y > 0
     eta2 <- f2(x2[ind])/3
@@ -387,15 +387,28 @@ test_that("draw works for sample_smooths objects", {
     sm1 <- smooth_samples(su_m_univar_4, n = 15, seed = 23478)
     plt <- draw(sm1, alpha = 0.7)
     expect_doppelganger("draw smooth_samples for GAM m1", plt)
-    
+
     sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478)
-    ## FIXME #71
-    ##plt <- draw(sm2, alpha = 0.7)
-    ##expect_doppelganger("draw smooth_samples for GAM m2", plt)
-    
+    plt <- draw(sm2, alpha = 0.7)
+    expect_doppelganger("draw smooth_samples for GAM m2", plt)
+
     sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478)
     plt <- draw(sm3, alpha = 0.7)
     expect_doppelganger("draw smooth_samples for GAM m3", plt)
+})
+
+test_that("draw works for sample_smooths objects with n_samples", {
+    sm1 <- smooth_samples(su_m_univar_4, n = 15, seed = 23478)
+    plt <- draw(sm1, alpha = 0.7, n_samples = 6)
+    expect_doppelganger("draw smooth_samples for m1 n_samples", plt)
+
+    sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478)
+    plt <- draw(sm2, alpha = 0.7, n_samples = 2)
+    expect_doppelganger("draw smooth_samples for m2 n_samples", plt)
+
+    sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478)
+    plt <- draw(sm3, alpha = 0.7, n_samples = 6)
+    expect_doppelganger("draw smooth_samples for GAM n_samples", plt)
 })
 
 test_that("draw works for sample_smooths objects with user specified smooth", {
@@ -404,7 +417,8 @@ test_that("draw works for sample_smooths objects with user specified smooth", {
     expect_doppelganger("draw selected smooth_samples for GAM m3", plt)
 
     plt <- draw(sm3, select = "s(x2)", alpha = 0.7, partial_match = TRUE)
-    expect_doppelganger("draw selected factor by smooth_samples for GAM m3", plt)
+    expect_doppelganger("draw selected factor by smooth_samples for GAM m3",
+                        plt)
 })
 
 ## Issue #22
@@ -438,6 +452,7 @@ test_that("draw.gam can take user specified scales", {
                                  plt)
 })
 
+## draw.penalty
 test_that("draw.penalty_df works", {
     expect_silent(pen <- penalty(su_m_univar_4))
     plt <- draw(pen)
@@ -483,6 +498,7 @@ test_that("draw.penalty_df works with normalization", {
                         plt)
 })
 
+# Distributed lag models
 test_that("issue 116 - handle distributed lag models", {
     plt <- draw(dlnm_m)
     expect_doppelganger("draw distributed lag model issue 116",
