@@ -42,7 +42,7 @@ stored.}
 
 \item{ref_line}{logical;}
 
-\item{contour}{logical;}
+\item{contour}{logical; should contour lines be added to smooth surfaces?}
 
 \item{contour_col}{colour specification for contour lines.}
 
