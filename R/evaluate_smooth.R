@@ -1,61 +1,82 @@
-##' Evaluate a smooth
-##'
-##' Evaluate a smooth at a grid of evenly spaced value over the range of the
-##' covariate associated with the smooth. Alternatively, a set of points at
-##' which the smooth should be evaluated can be supplied.
-##'
-##' @param object an object of class `"gam"` or `"gamm"`.
-##' @param smooth character; a single smooth to evaluate.
-##' @param n numeric; the number of points over the range of the covariate at
-##'   which to evaluate the smooth.
-##' @param newdata a vector or data frame of points at which to evaluate the
-##'   smooth.
-##' @param unconditional logical; should confidence intervals include the
-##'   uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian
-##'   covariance matrix will be used.
-##' @param overall_uncertainty logical; should the uncertainty in the model
-##'  constant term be included in the standard error of the evaluate values of
-##'  the smooth?
-##' @param dist numeric; if greater than 0, this is used to determine when
-##'   a location is too far from data to be plotted when plotting 2-D smooths.
-##'   The data are scaled into the unit square before deciding what to exclude,
-##'   and `dist` is a distance within the unit square. See
-##'   [mgcv::exclude.too.far()] for further details.
-##' @param ... arguments passed to other methods.
-##'
-##' @return A data frame, which is of class `"evaluated_1d_smooth"` or
-##'   `evaluated_2d_smooth`, which inherit from classes `"evaluated_smooth"`
-##'   and `"data.frame"`.
-##'
-##' @importFrom mgcv PredictMat exclude.too.far
-##' @importFrom stats setNames
-##'
-##' @export
-##'
-##' @examples
-##' load_mgcv()
-##' \dontshow{
-##' set.seed(2)
-##' op <- options(cli.unicode = FALSE, digits = 5)
-##' }
-##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
-##' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-##'
-##' evaluate_smooth(m1, "s(x1)")
-##'
-##' ## 2d example
-##' \dontshow{set.seed(2)}
-##' dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
-##' m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
-##'
-##' evaluate_smooth(m2, "s(x,z)", n = 100)
-##' \dontshow{options(op)}
+#' Evaluate a smooth
+#'
+#' `r lifecycle::badge('deprecated')` Evaluate a smooth at a grid of evenly
+#' spaced value over the range of the covariate associated with the smooth.
+#' Alternatively, a set of points at which the smooth should be evaluated can be
+#' supplied.
+#'
+#' @description
+#' `r lifecycle::badge('deprecated')` `evaluate_smooth()` is deprecated in
+#' favour of `[smooth_estimates()]`, which provides a cleaner way to evaluate a
+#' smooth over a range of covariate values. [smooth_estimates()] can handle a
+#' much wider range of models than `evaluate_smooth()` is capable of and
+#' [smooth_estimates()] is much easier to extend to handle new smooth types.
+#' 
+#' Most code that uses `evaluate_smooth()` should work simply by changing the
+#' function call to [smooth_estimates()]. However, there are some differences:
+#' 
+#' * the `newdata` argument becomes `data`
+#' 
+#' Consider `evaluate_smooth()` to be *soft*-deprecated; its use is discouraged
+#' and it may be removed at a later date if it becomes difficult to maintain
+#' the current functionality, but there are no intentions of removing it from
+#' gratia unless that situation arises.
+#'
+#' @param object an object of class `"gam"` or `"gamm"`.
+#' @param smooth character; a single smooth to evaluate.
+#' @param n numeric; the number of points over the range of the covariate at
+#'   which to evaluate the smooth.
+#' @param newdata a vector or data frame of points at which to evaluate the
+#'   smooth.
+#' @param unconditional logical; should confidence intervals include the
+#'   uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian
+#'   covariance matrix will be used.
+#' @param overall_uncertainty logical; should the uncertainty in the model
+#'  constant term be included in the standard error of the evaluate values of
+#'  the smooth?
+#' @param dist numeric; if greater than 0, this is used to determine when
+#'   a location is too far from data to be plotted when plotting 2-D smooths.
+#'   The data are scaled into the unit square before deciding what to exclude,
+#'   and `dist` is a distance within the unit square. See
+#'   [mgcv::exclude.too.far()] for further details.
+#' @param ... arguments passed to other methods.
+#'
+#' @return A data frame, which is of class `"evaluated_1d_smooth"` or
+#'   `evaluated_2d_smooth`, which inherit from classes `"evaluated_smooth"`
+#'   and `"data.frame"`.
+#'
+#' @importFrom mgcv PredictMat exclude.too.far
+#' @importFrom stats setNames
+#'
+#' @export
+#'
+#' @examples
+#' load_mgcv()
+#' \dontshow{
+#' set.seed(2)
+#' op <- options(cli.unicode = FALSE, digits = 5)
+#' }
+#' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+#' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+#'
+#' evaluate_smooth(m1, "s(x1)")
+#'
+#' ## 2d example
+#' \dontshow{set.seed(2)}
+#' dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
+#' m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
+#'
+#' evaluate_smooth(m2, "s(x,z)", n = 100)
+#' \dontshow{options(op)}
 `evaluate_smooth` <- function(object, ...) {
+    lifecycle::deprecate_warn("0.7.0",
+                              "evaluate_smooth()",
+                              "smooth_estimates()")
     UseMethod("evaluate_smooth")
 }
 
-##' @export
-##' @rdname evaluate_smooth
+#' @export
+#' @rdname evaluate_smooth
 `evaluate_smooth.gam` <- function(object, smooth, n = 100, newdata = NULL,
                                   unconditional = FALSE,
                                   overall_uncertainty = TRUE,
@@ -65,7 +86,7 @@
         message("Supplied more than 1 'smooth'; using only the first")
         smooth <- smooth[1L]
     }
-    smooth_ids <- old_which_smooth(object, smooth) # which smooths match 'smooth'
+    smooth_ids <- old_which_smooth(object, smooth)
     if (identical(length(smooth_ids), 0L)) {
         stop("Requested smooth '", smooth, "' not found", call. = FALSE)
     }
@@ -103,14 +124,14 @@
     evaluated
 }
 
-##' @export
-##' @rdname evaluate_smooth
+#' @export
+#' @rdname evaluate_smooth
 `evaluate_smooth.gamm` <- function(object, ...) {
     evaluate_smooth(object[["gam"]], ...)
 }
 
-##' @export
-##' @rdname evaluate_smooth
+#' @export
+#' @rdname evaluate_smooth
 `evaluate_smooth.list` <- function(object, ...) {
     ## Is this list likely to be a gamm4 list?
     if (! is_gamm4(object)) {
@@ -120,7 +141,7 @@
 }
 
 ## Random effect smooth
-##' @importFrom tibble add_column tibble
+#' @importFrom tibble add_column tibble
 `evaluate_re_smooth` <- function(object, model = NULL, newdata = NULL,
                                  unconditional = FALSE) {
     ## is this a by smooth
@@ -192,8 +213,8 @@
     evaluated
 }
 
-##' @importFrom tibble add_column
-##' @importFrom dplyr bind_rows
+#' @importFrom tibble add_column
+#' @importFrom dplyr bind_rows
 `evaluate_1d_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
                                  unconditional = FALSE,
                                  overall_uncertainty = TRUE) {
@@ -303,8 +324,8 @@
     evaluated
 }
 
-##' @importFrom tibble add_column
-##' @importFrom mgcv exclude.too.far
+#' @importFrom tibble add_column
+#' @importFrom mgcv exclude.too.far
 `evaluate_2d_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
                                  unconditional = FALSE,
                                  overall_uncertainty = TRUE, dist = 0.1) {
@@ -426,7 +447,7 @@
     evaluated
 }
 
-##' @importFrom tibble add_column
+#' @importFrom tibble add_column
 `evaluate_fs_smooth` <- function(object, n = NULL, model = NULL, newdata = NULL,
                                  unconditional = FALSE,
                                  overall_uncertainty = TRUE) {
@@ -540,23 +561,23 @@
     evaluated
 }
 
-##' @rdname evaluate_smooth
-##'
-##' @export
+#' @rdname evaluate_smooth
+#'
+#' @export
 `evaluate_parametric_term` <- function(object, ...) {
     UseMethod("evaluate_parametric_term")
 }
 
-##' @param term character; which parametric term whose effects are evaulated
-##'
-##' @rdname evaluate_smooth
-##'
-##' @importFrom stats delete.response
-##' @importFrom tibble as_tibble add_column
-##' @importFrom rlang .data
-##' @importFrom dplyr mutate bind_cols bind_rows
-##'
-##' @export
+#' @param term character; which parametric term whose effects are evaulated
+#'
+#' @rdname evaluate_smooth
+#'
+#' @importFrom stats delete.response
+#' @importFrom tibble as_tibble add_column
+#' @importFrom rlang .data
+#' @importFrom dplyr mutate bind_cols bind_rows
+#'
+#' @export
 `evaluate_parametric_term.gam` <- function(object, term, unconditional = FALSE,
                                            ...) {
     tt <- object$pterms       # get parametric terms
@@ -638,7 +659,7 @@
 }
 
 ## loop over smooths and predict
-##' @importFrom tibble tibble
+#' @importFrom tibble tibble
 `spline_values` <- function(smooth, newdata, model, unconditional,
                             overall_uncertainty = TRUE, term) {
     X <- PredictMat(smooth, newdata)   # prediction matrix
