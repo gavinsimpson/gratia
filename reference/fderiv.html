@@ -84,19 +84,27 @@ is now available and recommended for new analyses.</p>
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>model</dt>
-<dd><p>A fitted GAM. Currently only models fitted by <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">mgcv::gamm()</a></code> are supported.</p></dd>
+<dd><p>A fitted GAM. Currently only models fitted by <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code> and
+<code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">mgcv::gamm()</a></code> are supported.</p></dd>
 <dt>...</dt>
 <dd><p>Arguments that are passed to other methods.</p></dd>
 <dt>newdata</dt>
-<dd><p>a data frame containing the values of the model covariates at which to evaluate the first derivatives of the smooths.</p></dd>
+<dd><p>a data frame containing the values of the model covariates at
+which to evaluate the first derivatives of the smooths.</p></dd>
 <dt>term</dt>
-<dd><p>character; vector of one or more terms for which derivatives are required. If missing, derivatives for all smooth terms will be returned.</p></dd>
+<dd><p>character; vector of one or more terms for which derivatives are
+required. If missing, derivatives for all smooth terms will be returned.</p></dd>
 <dt>n</dt>
-<dd><p>integer; if <code>newdata</code> is missing the original data can be reconstructed from <code>model</code> and then <code>n</code> controls the number of values over the range of each covariate with which to populate <code>newdata</code>.</p></dd>
+<dd><p>integer; if <code>newdata</code> is missing the original data can be
+reconstructed from <code>model</code> and then <code>n</code> controls the number of values over
+the range of each covariate with which to populate <code>newdata</code>.</p></dd>
 <dt>eps</dt>
-<dd><p>numeric; the value of the finite difference used to approximate the first derivative.</p></dd>
+<dd><p>numeric; the value of the finite difference used to approximate
+the first derivative.</p></dd>
 <dt>unconditional</dt>
-<dd><p>logical; if <code>TRUE</code>, the smoothing parameter uncertainty corrected covariance matrix is used, <em>if available</em>, otherwise the uncorrected Bayesian posterior covariance matrix is used.</p></dd>
+<dd><p>logical; if <code>TRUE</code>, the smoothing parameter uncertainty
+corrected covariance matrix is used, <em>if available</em>, otherwise the
+uncorrected Bayesian posterior covariance matrix is used.</p></dd>
 <dt>offset</dt>
 <dd><p>numeric; value of offset to use in generating predictions.</p></dd>
 </dl></div>

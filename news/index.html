@@ -56,7 +56,14 @@
 <p>While a lot of code has been reused so differences between plots as a result of this change should be minimal, some corner cases may have been missed. File an Issue if you notice something that has changed that you think shouldn’t.</p>
 </li>
 <li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> now plots 2D isotropic smooths (TPRS and Duchon splines) with equally-scaled x and y coordinates using <code>coord_equal(ratio = 1)</code>. Alignment of these plots will be a little different now when plotting models with multiple smooths. See Issue <a href="https://github.com/gavinsimpson/gratia/issues/81" class="external-link">#81</a>.</p></li>
-</ul></div>
+</ul><div class="section level4">
+<h4 id="deprecated-functions-0-6-9800">Deprecated functions<a class="anchor" aria-label="anchor" href="#deprecated-functions-0-6-9800"></a></h4>
+<p>From version 0.7.0, the following functions are considered deprecated and their use is dicouraged:</p>
+<ul><li><p><code><a href="../reference/fderiv.html">fderiv()</a></code> is <em>soft</em>-deprecated in favour of <code><a href="../reference/derivatives.html">derivatives()</a></code>.</p></li>
+<li><p><code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code> is <em>soft</em>-deprecated in favour of <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code></p></li>
+</ul><p>The first call to one of these functions will generate a warning, pointing to the newver, alternative, function. It is safe to ignore these warnings, but these deprecated functions will no longer receive updates and are thus at risk of being removed from the package at some future date. The newer alternatives can handle more types of models and smooths, especially so in the case of <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>.</p>
+</div>
+</div>
 <div class="section level3">
 <h3 id="new-features-0-6-9800">New features<a class="anchor" aria-label="anchor" href="#new-features-0-6-9800"></a></h3>
 <ul><li>
@@ -212,7 +219,7 @@
 <h2 class="page-header" data-toc-text="0.4.0" id="gratia-040">gratia 0.4.0<a class="anchor" aria-label="anchor" href="#gratia-040"></a></h2>
 <div class="section level3">
 <h3 id="new-features-0-4-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-4-0"></a></h3>
-<ul><li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> can now include partial residuals when drawing univariate smooths. Use <code>residuals = TRUE</code> to add partial residuals to each univariate smooth that is drawn. This feature is not available for smooths of more than one variable, by smooths, or factor-smooth interactions (<code>bs = "fs"</code>).</p></li>
+<ul><li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> can include partial residuals when drawing univariate smooths. Use <code>residuals = TRUE</code> to add partial residuals to each univariate smooth that is drawn. This feature is not available for smooths of more than one variable, by smooths, or factor-smooth interactions (<code>bs = "fs"</code>).</p></li>
 <li>
 <p>The coverage of credible and confidence intervals drawn by <code><a href="../reference/draw.gam.html">draw.gam()</a></code> can be specified via argument <code>ci_level</code>. The default is arbitrarily <code>0.95</code> for no other reason than (rough) compatibility with <code>plot.gam()</code>.</p>
 <p>This change has had the effect of making the intervals slightly narrower than in previous versions of <em>gratia</em>; intervals were drawn at ± 2 × the standard error. The default intervals are now drawn at ± ~1.96 × the standard error.</p>
@@ -273,7 +280,10 @@
 <h2 class="page-header" data-toc-text="0.3.0" id="gratia-030">gratia 0.3.0<small>2020-01-19</small><a class="anchor" aria-label="anchor" href="#gratia-030"></a></h2>
 <div class="section level3">
 <h3 id="new-features-0-3-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-3-0"></a></h3>
-<ul><li><p><em>gratia</em> now uses the <em>mvnfast</em> package for random draws from a multivariate normal distribution (<code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code>). Contributed by Henrik Singmann (<a href="https://github.com/singmann" class="external-link">@singmann</a>) <a href="https://github.com/gavinsimpson/gratia/issues/28" class="external-link">#28</a></p></li>
+<ul><li>
+<p><em>gratia</em> now uses the <em>mvnfast</em> package for random draws from a multivariate normal distribution (<code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code>). Contributed by Henrik Singmann</p>
+<ol start="2" class="example" style="list-style-type: decimal"><li><a href="https://github.com/gavinsimpson/gratia/issues/28" class="external-link">#28</a></li>
+</ol></li>
 <li><p>New function <code><a href="../reference/basis.html">basis()</a></code> for generating tidy representations of basis expansions from an <em>mgcv</em>-like definition of a smooth, e.g. <code>s()</code>, <code>te()</code>, <code>ti()</code>, or <code>t2()</code>. The basic smooth types also have a simple <code><a href="../reference/draw.html">draw()</a></code> method for plotting the basis. <code><a href="../reference/basis.html">basis()</a></code> is a simple wrapper around <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html" class="external-link">mgcv::smoothCon()</a></code> with some post processing of the basis model matrix into a tidy format. <a href="https://github.com/gavinsimpson/gratia/issues/42" class="external-link">#42</a></p></li>
 <li><p>New function <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> to draw samples of entire smooth functions from their posterior distribution. Also has a <code><a href="../reference/draw.html">draw()</a></code> method for plotting the posterior samples.</p></li>
 </ul></div>
@@ -284,7 +294,7 @@
 <p><code><a href="../reference/derivatives.html">derivatives()</a></code> now works with factor by smooths, including ordered factor by smooths. The function also now works correctly for complex models with multiple covariates/smooths. <a href="https://github.com/gavinsimpson/gratia/issues/47" class="external-link">#47</a></p>
 <p><code><a href="../reference/derivatives.html">derivatives()</a></code> also now handles <code>'fs'</code> smooths. Reported by <a href="https://github.com/tomand-uio" class="external-link">@tomand-uio</a> <a href="https://github.com/gavinsimpson/gratia/issues/57" class="external-link">#57</a>.</p>
 </li>
-<li><p><code><a href="../reference/evaluate_smooth.html">evaluate_parametric_term()</a></code> and hence <code><a href="../reference/draw.gam.html">draw.gam()</a></code> would fail on a <code>ziplss()</code> model because i) <em>gratia</em> didn’t handle parametric terms in models with multiple linear predictors correctly, and ii) <em>gratia</em> didn’t convert to the naming convention of <em>mgcv</em> for terms in higher linear predictors. Reported by <a href="https://github.com/pboesu" class="external-link">@pboesu</a> <a href="https://github.com/gavinsimpson/gratia/issues/45" class="external-link">#45</a>.</p></li>
+<li><p><code><a href="../reference/evaluate_smooth.html">evaluate_parametric_term()</a></code> and hence <code><a href="../reference/draw.gam.html">draw.gam()</a></code> would fail on a <code>ziplss()</code> model because i) <em>gratia</em> didn’t handle parametric terms in models with multiple linear predictors correctly, and ii) <em>gratia</em> didn’t convert to the naming convention of <em>mgcv</em> for terms in higher linear predictors. Reported by <a href="https://github.com/pboesu" class="external-link">@pboesu</a> <a href="https://github.com/gavinsimpson/gratia/issues/45" class="external-link">#45</a></p></li>
 </ul></div>
 </div>
   </div>
