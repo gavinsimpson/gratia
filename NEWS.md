@@ -1,4 +1,4 @@
-# gratia 0.6.9700
+# gratia 0.6.9800
 
 ## Major changes
 
@@ -53,6 +53,11 @@
   covariate values for the specific level of the factor and not over all levels.
   This better reflects what data were used to estimate the smooth, even though
   the basis for each smooth was set up using all of the covariate locations.
+
+* `draw.gam()` and `draw.smooth_estimates()` now allow some aspects of the plot
+  to be changed: the fill (but not colour) and alpha attributes of the credible
+  interval, and the line colour for the smooth can now be specified using
+  arguments `ci_col`, `ci_alpha`, and `smooth_col` respectively.
 
 * Partial residuals can now be plotted on factor by smooths. To allow this, the
   partial residuals are filtered so that only residuals associated with a
