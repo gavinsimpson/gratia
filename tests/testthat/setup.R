@@ -23,6 +23,11 @@ su_m_quick_eg1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
                       data = su_eg1,
                       method = "REML")
 
+su_m_quick_eg1_shrink <- gam(y ~ s(x0, bs = "ts") + s(x1, bs = "ts") +
+                               s(x2, bs = "ts") + s(x3, bs = "ts"),
+                             data = su_eg1,
+                             method = "REML")
+
 su_m_univar_4 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
                      data = su_eg1,
                      method = "REML")
