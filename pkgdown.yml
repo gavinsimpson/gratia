@@ -2,7 +2,7 @@ pandoc: 2.7.3
 pkgdown: 2.0.2.9000
 pkgdown_sha: ae7363faac9040a473a54fb3d770decdfb8dfec1
 articles: {}
-last_built: 2022-02-01T13:40Z
+last_built: 2022-02-01T15:03Z
 urls:
   reference: https://gavinsimpson.github.io/gratia/reference
   article: https://gavinsimpson.github.io/gratia/articles
