@@ -590,16 +590,66 @@
     eval_sm
 }
 
+#' Plot the result of a call to `smooth_estimates()`
+#'
+#' @param ylim numeric; vector of y axis limits to use all *all* panels drawn.
+#' 
+#' @inheritParams draw.gam
+#'
 #' @export
 #' @importFrom patchwork wrap_plots
+#'
+#' @examples
+#' load_mgcv()
+#' # example data
+#' df <- data_sim("eg1", seed = 21)
+#' # fit GAM
+#' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+#' # plot all of the estimated smooths
+#' sm <- smooth_estimates(m)
+#' draw(sm)
+#' # evaluate smooth of `x2`
+#' sm <- smooth_estimates(m, smooth = "s(x2)")
+#' # plot it
+#' draw(sm)
+#'
+#' # customising some plot elements
+#' draw(sm, ci_col = "steelblue", smooth_col = "forestgreen", ci_alpha = 0.3)
 `draw.smooth_estimates` <- function(object,
+                                    constant = NULL,
+                                    fun = NULL,
+                                    contour = TRUE,
+                                    contour_col = "black",
+                                    n_contour = NULL,
+                                    ci_alpha = 0.2,
+                                    ci_col = "black",
+                                    smooth_col = "black",
+                                    partial_match = FALSE,
+                                    discrete_colour = NULL,
+                                    continuous_colour = NULL,
+                                    continuous_fill = NULL,
+                                    ylim = NULL,
                                     ...) {
     smth_est <- split(object, f = object[["smooth"]])
     plts <- vector(mode = "list", length = length(smth_est))
     for (i in seq_along(smth_est)) {
         ## add on confint
         smth_est[[i]] <- add_confint(smth_est[[i]])
-        plts[[i]] <- draw_smooth_estimates(smth_est[[i]], ...)
+        plts[[i]] <-
+            draw_smooth_estimates(smth_est[[i]],
+                                  constant = constant,
+                                  fun = fun,
+                                  contour = contour,
+                                  contour_col = contour_col,
+                                  n_contour = n_contour,
+                                  ci_alpha = ci_alpha,
+                                  ci_col = ci_col,
+                                  smooth_col = smooth_col,
+                                  partial_match = partial_match,
+                                  discrete_colour = discrete_colour,
+                                  continuous_colour = continuous_colour,
+                                  continuous_fill = continuous_fill,
+                                  ylim = ylim, ...)
     }
 
     wrap_plots(plts)
@@ -678,9 +728,11 @@
                                        variables = NULL,
                                        rug = NULL,
                                        ci_level = 0.95,
-                                       alpha = 0.3,
                                        constant = NULL,
                                        fun = NULL,
+                                       ci_alpha = 0.2,
+                                       ci_col = "black",
+                                       smooth_col = "black",
                                        xlab = NULL,
                                        ylab = NULL,
                                        title = NULL,
@@ -711,11 +763,11 @@
                                 colour = "steelblue3", alpha = 0.5)
     }
 
-    # plot the confidence interval
+    # plot the confidence interval and smooth line
     plt <- plt +
         geom_ribbon(mapping = aes_string(ymin = "lower_ci", ymax = "upper_ci"),
-                    alpha = alpha) +
-        geom_line()
+                    alpha = ci_alpha, colour = NA, fill = ci_col) +
+        geom_line(colour = smooth_col)
 
     ## default axis labels if none supplied
     if (is.null(xlab)) {
@@ -971,9 +1023,6 @@
     if (is.null(discrete_colour)) {
         discrete_colour <- scale_colour_discrete()
     }
-
-    #smooth_var <- names(object)[3L]
-    #smooth_fac <- names(object)[4L]
 
     ## If constant supplied apply it to `est`
     object <- add_constant(object, constant = constant)

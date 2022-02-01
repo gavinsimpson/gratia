@@ -34,6 +34,11 @@
 #' @param rug logical; draw a rug plot at the botom of each plot?
 #' @param contour logical; should contours be draw on the plot using
 #'   [ggplot2::geom_contour()].
+#' @param ci_alpha numeric; alpha transparency for confidence or simultaneous
+#'   interval.
+#' @param ci_col colour specification for the confidence/credible intervals
+#'   band. Affects the fill of the interval.
+#' @param smooth_col colour specification for the the smooth line.
 #' @param contour_col colour specification for contour lines.
 #' @param n_contour numeric; the number of contour bins. Will result in
 #'   `n_contour - 1` contour lines being drawn. See [ggplot2::geom_contour()].
@@ -53,7 +58,8 @@
 #' @note Internally, plots of each smooth are created using [ggplot2::ggplot()]
 #'   and composed into a single plot using [patchwork::wrap_plots()]. As a
 #'   result, it is not possible to use `+` to add to the plots in the way one
-#'   might typically work with `ggplot()` plots.
+#'   might typically work with `ggplot()` plots. Instead, use the `&` operator;
+#'   see the examples.
 #'
 #' @return The object returned is created by [patchwork::wrap_plots()].
 #'
@@ -70,9 +76,12 @@
 #' @examples
 #' load_mgcv()
 #'
+#' # simulate some data
 #' df1 <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
+#' # fit GAM
 #' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
 #'
+#' # plot all smooths
 #' draw(m1)
 #'
 #' # can add partial residuals
@@ -92,6 +101,9 @@
 #' # to modify all panels, for example to change the theme, use the & operator
 #' draw(m2, n_contour = 5) &
 #'   theme_minimal()
+#'
+#' # customising some plot elements
+#' draw(m1, ci_col = "steelblue", smooth_col = "forestgreen", ci_alpha = 0.3)
 `draw.gam` <- function(object,
                        data = NULL,
                        parametric = NULL,
@@ -107,6 +119,9 @@
                        dist = 0.1,
                        rug = TRUE,
                        contour = TRUE,
+                       ci_alpha = 0.2,
+                       ci_col = "black",
+                       smooth_col = "black",
                        contour_col = "black",
                        n_contour = NULL,
                        partial_match = FALSE,
@@ -227,6 +242,9 @@
                    contour = contour,
                    contour_col = contour_col,
                    n_contour = n_contour,
+                   ci_alpha = ci_alpha,
+                   ci_col = ci_col,
+                   smooth_col = smooth_col,
                    partial_match = partial_match,
                    discrete_colour = discrete_colour,
                    continuous_colour = continuous_colour,

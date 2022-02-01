@@ -33,8 +33,8 @@
 #'   function. Function `fun` will be applied after adding any `constant`, if
 #'   provided.
 #' @param partial_residuals data frame; partial residuals and data values if
-#'   partial residuals are drawn. Should have names `..p_resid` and `..orig_x` if
-#'   supplied.
+#'   partial residuals are drawn. Should have names `..p_resid` and `..orig_x`
+#'   if supplied.
 #' @param xlab character or expression; the label for the x axis. If not
 #'   supplied, a suitable label will be generated from `object`.
 #' @param ylab character or expression; the label for the y axis. If not
@@ -54,7 +54,8 @@
 #'
 #' @author Gavin L. Simpson
 #'
-#' @importFrom ggplot2 ggplot aes_ aes_string labs geom_line geom_ribbon expand_limits
+#' @importFrom ggplot2 ggplot aes_ aes_string labs geom_line geom_ribbon
+#'   expand_limits
 #' @importFrom grid unit
 #'
 #' @export
@@ -170,7 +171,8 @@
 #' @param continuous_fill suitable scale used for the filled surface. If `NULL`,
 #'   the default used is `scale_fill_distiller(palette = "RdBu", type = "div")`.
 #'
-#' @importFrom ggplot2 ggplot aes_string geom_raster geom_contour labs guides guide_colourbar scale_fill_distiller theme
+#' @importFrom ggplot2 ggplot aes_string geom_raster geom_contour labs guides
+#'   guide_colourbar scale_fill_distiller theme
 #' @importFrom grid unit
 #'
 #' @export
@@ -196,11 +198,11 @@
 
     ## If fun supplied, use it to transform est and the upper and lower interval
     object <- transform_fun(object, fun = fun)
-    
+
     smooth_vars <- names(object)[3:4]
     show <- match.arg(show)
     if (isTRUE(identical(show, "estimate"))) {
-        guide_title <- "Effect" # unique(object[["smooth"]])
+        guide_title <- "Effect"
         plot_var <- "est"
         guide_limits <- if (is.null(response_range)) {
             c(-1, 1) * max(abs(object[[plot_var]]))
@@ -208,7 +210,7 @@
             response_range
         }
     } else {
-        guide_title <- "Std. err." # bquote(SE * (.(unique(object[["smooth"]]))))
+        guide_title <- "Std. err."
         plot_var <- "se"
         guide_limits <- range(object[["se"]])
     }
@@ -254,7 +256,8 @@
     ## add guide
     plt <- plt + guides(fill = guide_colourbar(title = guide_title,
                                                direction = "vertical",
-                                               barheight = grid::unit(0.25, "npc")))
+                                               barheight = grid::unit(0.25,
+                                                                      "npc")))
 
     ## position legend at the
     plt <- plt + theme(legend.position = "right")
@@ -335,7 +338,8 @@
 #'   levels in the factor variable involved in the smooth. Suitable alternatives
 #'   include [ggplot2::scale_colour_viridis_d()].
 #'
-#' @importFrom ggplot2 geom_line theme scale_colour_discrete geom_rug expand_limits
+#' @importFrom ggplot2 geom_line theme scale_colour_discrete geom_rug
+#'   expand_limits
 #' @export
 #' @rdname draw.evaluated_smooth
 `draw.evaluated_fs_smooth` <- function(object,
@@ -409,7 +413,8 @@
 #' @param position Position adjustment, either as a string, or the result of a
 #'   call to a position adjustment function.
 #'
-#' @importFrom ggplot2 ggplot geom_pointrange geom_rug geom_ribbon geom_line aes_string expand_limits
+#' @importFrom ggplot2 ggplot geom_pointrange geom_rug geom_ribbon geom_line
+#'   aes_string expand_limits
 #' @export
 #' @rdname draw.evaluated_smooth
 `draw.evaluated_parametric_term` <- function(object,
@@ -532,8 +537,8 @@
         ncol <- ceiling(sqrt(n_plots))
         nrow <- ceiling(n_plots / ncol)
     }
-    wrap_plots(plotlist, byrow = TRUE, ncol = ncol, nrow = nrow, guides = guides,
-               ...)
+    wrap_plots(plotlist, byrow = TRUE, ncol = ncol, nrow = nrow,
+               guides = guides, ...)
 }
 
 #' Plot basis functions
@@ -874,7 +879,8 @@
 }
 
 
-#' @importFrom ggplot2 ggplot guides aes_ geom_raster geom_contour labs scale_fill_distiller guide_colourbar
+#' @importFrom ggplot2 ggplot guides aes_ geom_raster geom_contour labs
+#'   scale_fill_distiller guide_colourbar
 #' @importFrom grid unit
 `draw_2d_posterior_smooths` <- function(object,
                                         contour = FALSE,
@@ -939,8 +945,10 @@
     plt
 }
 
-`draw_3d_posterior_smooths` <- function(object, xvars, contour = FALSE,
-                                        contour_col = "black", n_contour = NULL,
+`draw_3d_posterior_smooths` <- function(object, xvars,
+                                        contour = FALSE,
+                                        contour_col = "black",
+                                        n_contour = NULL,
                                         xlab = NULL,
                                         ylab = NULL,
                                         title = NULL,
@@ -957,9 +965,10 @@
 #' @param contour logical; should contour lines be added to smooth surfaces?
 #' @param ci_alpha numeric; alpha transparency for confidence or simultaneous
 #'   interval.
-#' @param ci_colour colour specification for the confidence/credible intervals
-#'   band.
-#' @param line_col colour specicification for drawing lines
+#' @param ci_col colour specification for the confidence/credible intervals
+#'   band. Affects the fill of the interval.
+#' @param smooth_col colour specification for the the smooth or difference line.
+#' @param line_col colour specicification for drawing reference lines
 #' @param ncol,nrow numeric; the numbers of rows and columns over which to
 #'   spread the plots
 #' @param xlab,ylab,title,subtitle,caption character; labels with which to
@@ -976,10 +985,12 @@
 #' @examples
 #'
 #' load_mgcv()
-#' \dontshow{set.seed(42)}
+#' # simulate some data; a factor smooth example
 #' df <- data_sim("eg4", seed = 42)
+#' # fit GAM
 #' m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 #'
+#' # calculate the differences between pairs of smooths the f_j(x2) term
 #' diffs <- difference_smooths(m, smooth = "s(x2)")
 #' draw(diffs)
 `draw.difference_smooth` <- function(object,
@@ -990,8 +1001,9 @@
                                      contour_col = "black",
                                      n_contour = NULL,
                                      ci_alpha = 0.2,
-                                     ci_colour = "black",
-                                     line_col = "steelblue",
+                                     ci_col= "black",
+                                     smooth_col = "black",
+                                     line_col = "red",
                                      scales = c("free", "fixed"),
                                      ncol = NULL, nrow = NULL,
                                      guides = "keep",
@@ -1013,10 +1025,16 @@
     df_list <- split(object, f = paste(object$level_1, object$level_2,
                      sep = "-"))
 
-    plotlist <- map(df_list, draw_difference, ci_alpha = ci_alpha,
-                    line_col = line_col, rug = rug, ref_line = ref_line,
-                    ci_colour = ci_colour, contour = contour,
-                    contour_col = contour_col, n_contour = n_contour,
+    plotlist <- map(df_list, draw_difference,
+                    ci_alpha = ci_alpha,
+                    smooth_col = smooth_col,
+                    line_col = line_col,
+                    rug = rug,
+                    ref_line = ref_line,
+                    ci_col = ci_col,
+                    contour = contour,
+                    contour_col = contour_col,
+                    n_contour = n_contour,
                     xlab = xlab, ylab = ylab, title = title,
                     subtitle = subtitle, caption = caption)
 
@@ -1043,7 +1061,8 @@
                               ref_line = NULL,
                               contour = NULL,
                               ci_alpha = NULL,
-                              ci_colour = NULL,
+                              ci_col = NULL,
+                              smooth_col = NULL,
                               line_col = NULL,
                               contour_col = "black",
                               n_contour = NULL,
@@ -1054,8 +1073,9 @@
     n_xvars <- length(xvars)
     plt <- if (identical(n_xvars, 1L)) {
       draw_1d_difference(object, xvars, rug = rug, ref_line = ref_line,
-                         ci_alpha = ci_alpha, line_col = line_col,
-                         ci_colour = ci_colour, xlab = xlab, ylab = ylab,
+                         ci_alpha = ci_alpha, smooth_col = smooth_col,
+                         line_col = line_col,
+                         ci_col = ci_col, xlab = xlab, ylab = ylab,
                          title = title, subtitle = subtitle,
                          caption = caption)
     } else if (identical(n_xvars, 2L)) {
@@ -1084,12 +1104,14 @@
     plt #return
 }
 
-#' @importFrom ggplot2 ggplot aes_string geom_ribbon geom_line labs geom_hline geom_rug
+#' @importFrom ggplot2 ggplot aes_string geom_ribbon geom_line labs geom_hline
+#'   geom_rug
 `draw_1d_difference` <- function(object, xvars,
                                  rug = FALSE,
                                  ref_line = FALSE,
                                  ci_alpha = 0.2,
-                                 ci_colour = "black",
+                                 ci_col = "black",
+                                 smooth_col = "black",
                                  line_col = "red",
                                  xlab = NULL,
                                  ylab = NULL,
@@ -1112,8 +1134,8 @@
     }
     plt <- plt +
         geom_ribbon(aes_string(ymin = "lower", ymax = "upper", y = NULL),
-                    alpha = ci_alpha) +
-        geom_line() +
+                    alpha = ci_alpha, fill = ci_col, colour = NA) +
+        geom_line(colour = smooth_col) +
         labs(title = plt_title, x = xvars, y = y_label)
 
     if(isTRUE(rug)) {
@@ -1122,11 +1144,12 @@
     plt
 }
 
-#' @importFrom ggplot2 ggplot guides aes_ geom_raster geom_contour labs scale_fill_distiller guide_colourbar
+#' @importFrom ggplot2 ggplot guides aes_ geom_raster geom_contour labs
+#'   scale_fill_distiller guide_colourbar
 #' @importFrom grid unit
 `draw_2d_difference` <- function(object, xvars,
                                  contour = FALSE,
-                                 contour_col = "black", ## "#3366FF",
+                                 contour_col = "black",
                                  n_contour = NULL,
                                  xlab = NULL,
                                  ylab = NULL,
@@ -1273,7 +1296,8 @@
         ncol <- ceiling(sqrt(n_plots))
         nrow <- ceiling(n_plots / ncol)
     }
-    wrap_plots(plt_list, byrow = TRUE, ncol = ncol, nrow = nrow, guides = guides,
+    wrap_plots(plt_list, byrow = TRUE, ncol = ncol, nrow = nrow,
+               guides = guides,
                ...)
 }
 
@@ -1292,9 +1316,10 @@
     ## fix ordering of levels so the heatmap matches a matrix
     ## Don't reverse the cols!!
     object <- mutate(object,
-                     row = factor(.data$row, levels = rev(sort(unique(.data$row)))),
+                     row = factor(.data$row,
+                                  levels = rev(sort(unique(.data$row)))),
                      col = factor(.data$col, levels = sort(unique(.data$col))))
-    
+
     ## rescale to -1 -- 1
     if (as.logical(normalize)) {
         object <- mutate(object, value = norm_minus_one_to_one(.data$value))
