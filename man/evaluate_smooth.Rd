@@ -66,7 +66,7 @@ and \code{"data.frame"}.
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} \code{evaluate_smooth()} is deprecated in
-favour of \verb{[smooth_estimates()]}, which provides a cleaner way to evaluate a
+favour of \code{\link[=smooth_estimates]{smooth_estimates()}}, which provides a cleaner way to evaluate a
 smooth over a range of covariate values. \code{\link[=smooth_estimates]{smooth_estimates()}} can handle a
 much wider range of models than \code{evaluate_smooth()} is capable of and
 \code{\link[=smooth_estimates]{smooth_estimates()}} is much easier to extend to handle new smooth types.

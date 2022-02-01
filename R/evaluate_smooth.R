@@ -7,7 +7,7 @@
 #'
 #' @description
 #' `r lifecycle::badge('deprecated')` `evaluate_smooth()` is deprecated in
-#' favour of `[smooth_estimates()]`, which provides a cleaner way to evaluate a
+#' favour of [smooth_estimates()], which provides a cleaner way to evaluate a
 #' smooth over a range of covariate values. [smooth_estimates()] can handle a
 #' much wider range of models than `evaluate_smooth()` is capable of and
 #' [smooth_estimates()] is much easier to extend to handle new smooth types.
