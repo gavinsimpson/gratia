@@ -870,6 +870,7 @@
 
 #' @rdname worm_plot
 #' @importFrom stats df.residual
+#' @export
 `worm_plot.lm` <- function(model, ...) {
     r <- residuals(model)
     r.df <- df.residual(model)
@@ -881,4 +882,19 @@
         model[["linear.predictors"]] <- model[["fitted.values"]]
     }
     worm_plot.gam(model, ...)
+}
+
+#' @export
+`weights.lm` <- function(object, type = c("prior", "working"), ...) {
+    type <- match.arg(type)
+    wts <- if (type == "prior") {
+        object$prior.weights
+    } else {
+        object$weights
+    }
+    if (is.null(object$na.action)) {
+        wts
+    } else {
+        naresid(object$na.action, wts)
+    }
 }
