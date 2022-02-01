@@ -3,7 +3,7 @@
 \name{smooth_estimates}
 \alias{smooth_estimates}
 \alias{smooth_estimates.gam}
-\title{New \code{evaluate_smooth()} alike}
+\title{Evaluate smooths at covariate values}
 \usage{
 smooth_estimates(object, ...)
 
@@ -57,7 +57,11 @@ and \code{dist} is a distance within the unit square. See
 A data frame (tibble), which is of class \code{"smooth_estimates"}.
 }
 \description{
-New \code{evaluate_smooth()} alike
+Evaluate a smooth at a grid of evenly spaced value over the range of the
+covariate associated with the smooth. Alternatively, a set of points at which
+the smooth should be evaluated can be supplied. \code{smooth_estimates()} is a new
+implementation of \code{\link[=evaluate_smooth]{evaluate_smooth()}}, and should be used instead of that
+other function.
 }
 \examples{
 load_mgcv()

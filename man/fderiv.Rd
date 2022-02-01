@@ -22,19 +22,27 @@ fderiv(model, ...)
 \method{fderiv}{gamm}(model, ...)
 }
 \arguments{
-\item{model}{A fitted GAM. Currently only models fitted by \code{\link[mgcv:gam]{mgcv::gam()}} and \code{\link[mgcv:gamm]{mgcv::gamm()}} are supported.}
+\item{model}{A fitted GAM. Currently only models fitted by \code{\link[mgcv:gam]{mgcv::gam()}} and
+\code{\link[mgcv:gamm]{mgcv::gamm()}} are supported.}
 
 \item{...}{Arguments that are passed to other methods.}
 
-\item{newdata}{a data frame containing the values of the model covariates at which to evaluate the first derivatives of the smooths.}
+\item{newdata}{a data frame containing the values of the model covariates at
+which to evaluate the first derivatives of the smooths.}
 
-\item{term}{character; vector of one or more terms for which derivatives are required. If missing, derivatives for all smooth terms will be returned.}
+\item{term}{character; vector of one or more terms for which derivatives are
+required. If missing, derivatives for all smooth terms will be returned.}
 
-\item{n}{integer; if \code{newdata} is missing the original data can be reconstructed from \code{model} and then \code{n} controls the number of values over the range of each covariate with which to populate \code{newdata}.}
+\item{n}{integer; if \code{newdata} is missing the original data can be
+reconstructed from \code{model} and then \code{n} controls the number of values over
+the range of each covariate with which to populate \code{newdata}.}
 
-\item{eps}{numeric; the value of the finite difference used to approximate the first derivative.}
+\item{eps}{numeric; the value of the finite difference used to approximate
+the first derivative.}
 
-\item{unconditional}{logical; if \code{TRUE}, the smoothing parameter uncertainty corrected covariance matrix is used, \emph{if available}, otherwise the uncorrected Bayesian posterior covariance matrix is used.}
+\item{unconditional}{logical; if \code{TRUE}, the smoothing parameter uncertainty
+corrected covariance matrix is used, \emph{if available}, otherwise the
+uncorrected Bayesian posterior covariance matrix is used.}
 
 \item{offset}{numeric; value of offset to use in generating predictions.}
 }
