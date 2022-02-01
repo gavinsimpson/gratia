@@ -135,7 +135,7 @@
     if (is.null(edf_vec)) {
         edf_vec <- object[["edf"]]
         warning("Smoothness parameter uncertainty unavailable;",
-                "using `type = \"default\"`")
+                " using `type = \"default\"`")
     }
     if (sum) {
         edf_vec <- sum(edf_vec)
