@@ -1,4 +1,10 @@
-#' New `evaluate_smooth()` alike
+#' Evaluate smooths at covariate values
+#'
+#' Evaluate a smooth at a grid of evenly spaced value over the range of the
+#' covariate associated with the smooth. Alternatively, a set of points at which
+#' the smooth should be evaluated can be supplied. `smooth_estimates()` is a new
+#' implementation of [evaluate_smooth()], and should be used instead of that
+#' other function.
 #'
 #' @param object an object of class `"gam"` or `"gamm"`.
 #' @param smooth character; a single smooth to evaluate.
@@ -24,9 +30,9 @@
 #' @param ... arguments passed to other methods.
 #'
 #' @return A data frame (tibble), which is of class `"smooth_estimates"`.
-#' 
+#'
 #' @export
-#' 
+#'
 #' @rdname smooth_estimates
 #'
 #' @examples
