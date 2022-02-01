@@ -30,7 +30,7 @@ test_that("fderiv() can handle factors in user-supplied newdata", {
 })
 
 test_that("fderiv() can handle offsets", {
-    withr::local_options(lifecycle_verbosity = "quiet") 
+    withr::local_options(lifecycle_verbosity = "quiet")
     ## Example from https://github.com/scottkosty/tsgam/commit/80293d4887ef322686d056ad54dcd183cdab0966
     mod <- gam(y ~ fac + s(x1) + offset(x0), data = su_eg4,
                method = "REML")

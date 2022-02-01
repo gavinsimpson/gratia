@@ -13,6 +13,7 @@ library("ggplot2")
 # }
 
 test_that("draw.evaluated_1d_smooth() plots the smooth", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     sm <- evaluate_smooth(su_m_univar_4, "s(x2)")
     plt <- draw(sm)
     expect_doppelganger("draw 1d smooth for selected smooth", plt)
@@ -80,6 +81,7 @@ test_that("draw.gam works with select and parametric", {
 
 test_that("draw.evaluated_2d_smooth() plots the smooth", {
     skip_on_os("mac")
+    withr::local_options(lifecycle_verbosity = "quiet")
     expect_silent(sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100))
     expect_silent(plt <- draw(sm))
     expect_doppelganger("draw 2d smooth", plt)
@@ -89,6 +91,7 @@ test_that("draw.evaluated_2d_smooth() plots the smooth", {
 
 test_that("draw.evaluated_2d_smooth() plots the smooth without contours", {
     skip_on_os("mac")
+    withr::local_options(lifecycle_verbosity = "quiet")
     sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100)
     plt <- draw(sm, contour = FALSE)
     expect_doppelganger("draw 2d smooth without contours", plt)
@@ -97,6 +100,7 @@ test_that("draw.evaluated_2d_smooth() plots the smooth without contours", {
 test_that("draw.evaluated_2d_smooth() plots the smooth with different contour bins", {
     skip_on_os("mac")
     skip_on_os("windows")
+    withr::local_options(lifecycle_verbosity = "quiet")
     sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100)
     plt <- draw(sm, n_contour = 5)
     expect_doppelganger("draw 2d smooth with 5 contour bins", plt)
@@ -107,6 +111,7 @@ test_that("draw.evaluated_2d_smooth() plots the smooth with different contour bi
 test_that("draw.evaluated_2d_smooth() plots the SE", {
     skip_on_os("mac")
     skip_on_os("windows")
+    withr::local_options(lifecycle_verbosity = "quiet")
     sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100)
     plt <- draw(sm, show = "se")
     expect_doppelganger("draw std error of 2d smooth", plt)
@@ -131,6 +136,7 @@ test_that("draw.gam() can draw partial residuals", {
 test_that("draw.gam() plots an AM with a single 2d smooth", {
     skip_on_os("mac")
     skip_on_os("windows")
+    withr::local_options(lifecycle_verbosity = "quiet")
     plt <- draw(su_m_bivar)
     expect_doppelganger("draw AM with 2d smooth", plt)
 
@@ -162,6 +168,7 @@ test_that("draw() works with continuous by and fixed scales", {
 })
 
 test_that("draw() works with random effect smooths (bs = 're')", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     ## simulate example... from ?mgcv::random.effects
     ## data are in su_re
     ## model is rm1 with definition:
@@ -183,6 +190,7 @@ test_that("draw() works with random effect smooths (bs = 're')", {
 
 test_that("draw() with random effect smooths (bs = 're') & factor by variable ",
 {
+    withr::local_options(lifecycle_verbosity = "quiet")
     # simulate example...
     # data are in su_re2
     # model is rm2 with definition:
@@ -240,6 +248,7 @@ mod_fs <- gam(y~s(x0) + s(x1, fac, bs = "fs", k = 5) + s(x2, k = 20),
               method = "ML")
 
 test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     skip_if(packageVersion("mgcv") < "1.8.36")
     sm <- evaluate_smooth(mod_fs, "s(x1,fac)")
     expect_s3_class(sm, "evaluated_fs_smooth")
@@ -312,6 +321,7 @@ test_that("draw() works with parametric terms", {
 })
 
 test_that("component-wise CIs work without seWithMean", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     sm <- evaluate_smooth(su_m_univar_4, "s(x3)", overall_uncertainty = FALSE)
     plt <- draw(sm)
     expect_doppelganger("draw selected smooth with overall uncertainty false", plt)

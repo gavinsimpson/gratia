@@ -29,6 +29,7 @@ test_that("draw() works with continuous by and fixed scales", {
 })
 
 test_that("evaluate_smooth() works with continuous by", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     sm  <- evaluate_smooth(mod, "s(x2)")
     expect_s3_class(sm, "evaluated_1d_smooth")
 })

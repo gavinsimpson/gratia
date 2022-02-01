@@ -11,7 +11,15 @@ dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 m2 <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
+test_that("evaluate_smooth is deprecated", {
+    skip_on_cran()
+    skip_on_ci()
+    withr::local_options(digits = 3)
+    expect_snapshot(evaluate_smooth(m1, smooth = "s(x0)"))
+})
+
 test_that("evaluate_smooth works for a GAM", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     sm <- evaluate_smooth(m1, "s(x2)")
     expect_s3_class(sm, "evaluated_1d_smooth")
     expect_s3_class(sm, "evaluated_smooth")
@@ -19,17 +27,20 @@ test_that("evaluate_smooth works for a GAM", {
 })
 
 test_that("evaluate_smooth throws a message with more than one term", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     expect_message(evaluate_smooth(m1, c("s(x1)", "s(x2)")),
                    "Supplied more than 1 'smooth'; using only the first")
 })
 
 test_that("evaluate_smooth throws error if smooth not found", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     expect_error(evaluate_smooth(m1, smooth = "s(z)"),
                  "Requested smooth 's(z)' not found",
                  fixed = TRUE)
 })
 
 test_that("evaluate_smooth works for a GAMM", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     sm <- evaluate_smooth(m2, "s(x2)")
     expect_s3_class(sm, "evaluated_1d_smooth")
     expect_s3_class(sm, "evaluated_smooth")
@@ -37,27 +48,32 @@ test_that("evaluate_smooth works for a GAMM", {
 })
 
 test_that("evaluate_1d_smooth fails with multiple smooths that aren't by factor smooths", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     expect_error(gratia:::evaluate_1d_smooth(m1[["smooth"]]),
                  "Not all of these are 'by' variable smooths")
 })
 
 ## test_that("evaluate_2d_smooth fails with multiple smooths that aren't by factor smooths", {
+##    withr::local_options(lifecycle_verbosity = "quiet")
 ##     ## need to rethink this test
 ##     expect_error(gratia:::evaluate_2d_smooth(m1[["smooth"]]),
 ##                  "Not all of these are 'by' variable smooths")
 ## })
 
 test_that("evaluate_fs_smooth fails with multiple smooths that aren't by factor smooths", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     expect_error(gratia:::evaluate_fs_smooth(m1[["smooth"]]),
                  "Not all of these are 'by' variable smooths")
 })
 
 ## test_that("evaluate_re_smooth fails with multiple smooths that aren't by factor smooths", {
+##    withr::local_options(lifecycle_verbosity = "quiet")
 ##     expect_error(gratia:::evaluate_re_smooth(m1[["smooth"]]),
 ##                  "Not all of these are 'by' variable smooths")
 ## })
 
 test_that("evaluate_smooth fails with a trivariate smooth", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     m <- gam(y ~ s(x0, x1, x2), data = dat, method = "REML")
     expect_error(evaluate_smooth(m, "s(x0,x1,x2)"))
     m <- gam(y ~ te(x0, x1, x2), data = dat, method = "REML")
@@ -65,6 +81,7 @@ test_that("evaluate_smooth fails with a trivariate smooth", {
 })
 
 test_that("evaluate_re_smooth throws error when passed newdata", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     ## simulate example... from ?mgcv::random.effects
     set.seed(1)
     dat <- gamSim(1, n = 400, scale = 2, verbose = FALSE) ## simulate 4 term additive truth
@@ -82,6 +99,7 @@ test_that("evaluate_re_smooth throws error when passed newdata", {
 })
 
 test_that("evaluate_1d_smooth fails if smooth var not in newdata", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     m <- gam(y ~ s(x0), data = dat, method = "REML")
     id <- which(names(dat) == "x0")
     expect_error(evaluate_smooth(m, "s(x0)", newdata = dat[, -id]),
@@ -90,6 +108,7 @@ test_that("evaluate_1d_smooth fails if smooth var not in newdata", {
 })
 
 test_that("evaluate_1d_smooth works with vector newdata", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     m <- gam(y ~ s(x0), data = dat, method = "REML")
     sm1 <- evaluate_smooth(m, "s(x0)", newdata = dat[, "x0"])
     sm2 <- evaluate_smooth(m, "s(x0)", newdata = dat)
@@ -98,12 +117,14 @@ test_that("evaluate_1d_smooth works with vector newdata", {
 })
 
 test_that("evaluate_1d_smooth fails if newdata is not data frame or numeric", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     expect_error(evaluate_smooth(m1, "s(x0)", newdata = list(x0 = dat[, "x0"])),
                  "'newdata', if supplied, must be a numeric vector or a data frame.",
                  fixed = TRUE)
 })
 
 test_that("evaluate_2d_smooth fails if smooth var not in newdata", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     m <- gam(y ~ s(x0, x1), data = dat, method = "REML")
     id <- which(names(dat) == "x0")
     expect_error(evaluate_smooth(m, "s(x0,x1)", newdata = dat[, -id]),
@@ -112,6 +133,7 @@ test_that("evaluate_2d_smooth fails if smooth var not in newdata", {
 })
 
 test_that("evaluate_2d_smooth fails if newdata is not data frame or numeric", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     m <- gam(y ~ s(x0, x1), data = dat, method = "REML")
     expect_error(evaluate_smooth(m, "s(x0,x1)", newdata = list(x0 = dat[, "x0"])),
                  "'newdata', if supplied, must be a numeric vector or a data frame.",
@@ -119,6 +141,7 @@ test_that("evaluate_2d_smooth fails if newdata is not data frame or numeric", {
 })
 
 test_that("evaluate_2d_smooth works for a 2d factor by smooth", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     set.seed(42)
     dat <- gamSim(4, n = 400, verbose = FALSE)
     mf <- gam(y ~ fac + s(x0, x1, by = fac), data = dat)
@@ -129,6 +152,7 @@ test_that("evaluate_2d_smooth works for a 2d factor by smooth", {
 })
 
 test_that("evaluate_fs_smooth() ", {
+    withr::local_options(lifecycle_verbosity = "quiet")
     ## simulate example... from ?mgcv::factor.smooth.interaction
     set.seed(0)
     ## simulate data...
@@ -165,6 +189,7 @@ test_that("evaluate_fs_smooth() ", {
 
 test_that("evaluate_re_smooth works with ordered factor #99", {
     skip_on_cran()
+    withr::local_options(lifecycle_verbosity = "quiet")
     m <- gam(uptake ~ s(conc, Type, bs = 'fs', k = 5) + s(Plant, bs = 're'),
              family = Gamma('log'), data = CO2)
     expect_silent(sm <- evaluate_smooth(m, "Plant"))
