@@ -65,6 +65,13 @@ A data frame, which is of class \code{"evaluated_1d_smooth"} or
 and \code{"data.frame"}.
 }
 \description{
+#'
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Evaluate a smooth at a grid of evenly
+spaced value over the range of the covariate associated with the smooth.
+Alternatively, a set of points at which the smooth should be evaluated can be
+supplied.
+}
+\details{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} \code{evaluate_smooth()} is deprecated in
 favour of \code{\link[=smooth_estimates]{smooth_estimates()}}, which provides a cleaner way to evaluate a
 smooth over a range of covariate values. \code{\link[=smooth_estimates]{smooth_estimates()}} can handle a
@@ -81,12 +88,6 @@ Consider \code{evaluate_smooth()} to be \emph{soft}-deprecated; its use is disco
 and it may be removed at a later date if it becomes difficult to maintain
 the current functionality, but there are no intentions of removing it from
 gratia unless that situation arises.
-}
-\details{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Evaluate a smooth at a grid of evenly
-spaced value over the range of the covariate associated with the smooth.
-Alternatively, a set of points at which the smooth should be evaluated can be
-supplied.
 }
 \examples{
 load_mgcv()

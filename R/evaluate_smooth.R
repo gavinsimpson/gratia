@@ -1,11 +1,12 @@
 #' Evaluate a smooth
 #'
+#' @description#'
 #' `r lifecycle::badge('deprecated')` Evaluate a smooth at a grid of evenly
 #' spaced value over the range of the covariate associated with the smooth.
 #' Alternatively, a set of points at which the smooth should be evaluated can be
 #' supplied.
 #'
-#' @description
+#' @details
 #' `r lifecycle::badge('deprecated')` `evaluate_smooth()` is deprecated in
 #' favour of [smooth_estimates()], which provides a cleaner way to evaluate a
 #' smooth over a range of covariate values. [smooth_estimates()] can handle a
