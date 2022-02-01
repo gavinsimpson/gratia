@@ -1,6 +1,6 @@
 #' Evaluate a smooth
 #'
-#' @description#'
+#' @description
 #' `r lifecycle::badge('deprecated')` Evaluate a smooth at a grid of evenly
 #' spaced value over the range of the covariate associated with the smooth.
 #' Alternatively, a set of points at which the smooth should be evaluated can be

@@ -65,7 +65,6 @@ A data frame, which is of class \code{"evaluated_1d_smooth"} or
 and \code{"data.frame"}.
 }
 \description{
-#'
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Evaluate a smooth at a grid of evenly
 spaced value over the range of the covariate associated with the smooth.
 Alternatively, a set of points at which the smooth should be evaluated can be
