@@ -1,35 +1,35 @@
-##' Compare smooths across models
-##'
-##' @param model Primary model for comparison.
-##' @param ... Additional models to compare smooths against those of `model`.
-##' @param smooths character; vector of smooths to compare. If not specified
-##'   comparisons will be performed for smooths common to all models supplied. 
-##'
-##' @inheritParams smooth_estimates
-##'
-##' @export
-##' 
-##' @importFrom rlang enexpr ensyms expr_text
-##' @importFrom dplyr group_by %>%
-##'
-##' @examples
-##' \dontshow{op <- options(cli.unicode = FALSE, digits = 5)}
-##' load_mgcv()
-##' dat <- data_sim("eg1", seed = 2)
-##'
-##' ## models to compare smooths across - artificially create differences
-##' m1 <- gam(y ~ s(x0, k = 5) + s(x1, k = 5) + s(x2, k = 5) + s(x3, k = 5),
-##'           data = dat, method = "REML")
-##' m2 <- gam(y ~ s(x0, bs = 'ts') + s(x1, bs = 'ts') + s(x2, bs = 'ts') +
-##'           s(x3, bs = 'ts'), data = dat, method = "REML")
-##'
-##' ## build comparisons
-##' comp <- compare_smooths(m1, m2)
-##' comp
-##' ## notice that the result is a nested tibble
-##'
-##' draw(comp)
-##' \dontshow{options(op)}
+#' Compare smooths across models
+#'
+#' @param model Primary model for comparison.
+#' @param ... Additional models to compare smooths against those of `model`.
+#' @param smooths character; vector of smooths to compare. If not specified
+#'   comparisons will be performed for smooths common to all models supplied. 
+#'
+#' @inheritParams smooth_estimates
+#'
+#' @export
+#' 
+#' @importFrom rlang enexpr ensyms expr_text
+#' @importFrom dplyr group_by %>%
+#'
+#' @examples
+#' \dontshow{op <- options(cli.unicode = FALSE, digits = 5)}
+#' load_mgcv()
+#' dat <- data_sim("eg1", seed = 2)
+#'
+#' ## models to compare smooths across - artificially create differences
+#' m1 <- gam(y ~ s(x0, k = 5) + s(x1, k = 5) + s(x2, k = 5) + s(x3, k = 5),
+#'           data = dat, method = "REML")
+#' m2 <- gam(y ~ s(x0, bs = 'ts') + s(x1, bs = 'ts') + s(x2, bs = 'ts') +
+#'           s(x3, bs = 'ts'), data = dat, method = "REML")
+#'
+#' ## build comparisons
+#' comp <- compare_smooths(m1, m2)
+#' comp
+#' ## notice that the result is a nested tibble
+#'
+#' draw(comp)
+#' \dontshow{options(op)}
 `compare_smooths` <- function(model, ..., smooths = NULL,
                               n = 100,
                               data = NULL,
@@ -84,16 +84,16 @@
     sm_est
 }
 
-##' Plot comparisons of smooths
-##'
-##' @param object of class `"compare_smooths"`, the result of a call to
-##'   [gratia::compare_smooths()].
-##' @inheritParams draw.gam
-##' 
-##' @export
-##' @importFrom dplyr group_split
-##' @importFrom purrr map
-##' @importFrom patchwork wrap_plots
+#' Plot comparisons of smooths
+#'
+#' @param object of class `"compare_smooths"`, the result of a call to
+#'   [gratia::compare_smooths()].
+#' @inheritParams draw.gam
+#' 
+#' @export
+#' @importFrom dplyr group_split
+#' @importFrom purrr map
+#' @importFrom patchwork wrap_plots
 `draw.compare_smooths` <- function(object, 
                                    ncol = NULL, nrow = NULL,
                                    guides = "collect",
@@ -112,9 +112,9 @@
                ...)
 }
 
-##' @importFrom dplyr mutate
-##' @importFrom tidyr unnest
-##' @importFrom ggplot2 ggplot geom_ribbon geom_line
+#' @importFrom dplyr mutate
+#' @importFrom tidyr unnest
+#' @importFrom ggplot2 ggplot geom_ribbon geom_line
 `plot_comparison_of_smooths` <- function(object, coverage = 0.95, ...) {
     ## get the covariate labels
     sm_vars <- vars_from_label(unique(object[["smooth"]]))
