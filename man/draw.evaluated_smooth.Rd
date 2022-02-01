@@ -124,8 +124,8 @@ supplied, a suitable label will be generated from \code{object}.}
 \code{\link[ggplot2:labs]{ggplot2::labs()}}.}
 
 \item{partial_residuals}{data frame; partial residuals and data values if
-partial residuals are drawn. Should have names \code{..p_resid} and \code{..orig_x} if
-supplied.}
+partial residuals are drawn. Should have names \code{..p_resid} and \code{..orig_x}
+if supplied.}
 
 \item{response_range}{numeric; a vector of two values giving the range of
 response data for the guide. Used to fix plots to a common scale/range.

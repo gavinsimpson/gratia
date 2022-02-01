@@ -13,8 +13,9 @@
   contour_col = "black",
   n_contour = NULL,
   ci_alpha = 0.2,
-  ci_colour = "black",
-  line_col = "steelblue",
+  ci_col = "black",
+  smooth_col = "black",
+  line_col = "red",
   scales = c("free", "fixed"),
   ncol = NULL,
   nrow = NULL,
@@ -52,10 +53,12 @@ stored.}
 \item{ci_alpha}{numeric; alpha transparency for confidence or simultaneous
 interval.}
 
-\item{ci_colour}{colour specification for the confidence/credible intervals
-band.}
+\item{ci_col}{colour specification for the confidence/credible intervals
+band. Affects the fill of the interval.}
 
-\item{line_col}{colour specicification for drawing lines}
+\item{smooth_col}{colour specification for the the smooth or difference line.}
+
+\item{line_col}{colour specicification for drawing reference lines}
 
 \item{scales}{character; should all univariate smooths be plotted with the
 same y-axis scale? The default, \code{scales = "fixed"}, ensures this is done.
@@ -80,10 +83,12 @@ Plot differences of smooths
 \examples{
 
 load_mgcv()
-\dontshow{set.seed(42)}
+# simulate some data; a factor smooth example
 df <- data_sim("eg4", seed = 42)
+# fit GAM
 m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 
+# calculate the differences between pairs of smooths the f_j(x2) term
 diffs <- difference_smooths(m, smooth = "s(x2)")
 draw(diffs)
 }

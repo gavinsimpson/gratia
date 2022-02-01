@@ -20,6 +20,9 @@
   dist = 0.1,
   rug = TRUE,
   contour = TRUE,
+  ci_alpha = 0.2,
+  ci_col = "black",
+  smooth_col = "black",
   contour_col = "black",
   n_contour = NULL,
   partial_match = FALSE,
@@ -91,6 +94,14 @@ and \code{dist} is a distance within the unit square. See
 \item{contour}{logical; should contours be draw on the plot using
 \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
 
+\item{ci_alpha}{numeric; alpha transparency for confidence or simultaneous
+interval.}
+
+\item{ci_col}{colour specification for the confidence/credible intervals
+band. Affects the fill of the interval.}
+
+\item{smooth_col}{colour specification for the the smooth line.}
+
 \item{contour_col}{colour specification for contour lines.}
 
 \item{n_contour}{numeric; the number of contour bins. Will result in
@@ -123,14 +134,18 @@ is used instead.
 Internally, plots of each smooth are created using \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}
 and composed into a single plot using \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}. As a
 result, it is not possible to use \code{+} to add to the plots in the way one
-might typically work with \code{ggplot()} plots.
+might typically work with \code{ggplot()} plots. Instead, use the \code{&} operator;
+see the examples.
 }
 \examples{
 load_mgcv()
 
+# simulate some data
 df1 <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
+# fit GAM
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
 
+# plot all smooths
 draw(m1)
 
 # can add partial residuals
@@ -150,6 +165,9 @@ draw(m2, n_contour = 5,
 # to modify all panels, for example to change the theme, use the & operator
 draw(m2, n_contour = 5) &
   theme_minimal()
+
+# customising some plot elements
+draw(m1, ci_col = "steelblue", smooth_col = "forestgreen", ci_alpha = 0.3)
 }
 \author{
 Gavin L. Simpson
