@@ -67,6 +67,9 @@ m_gamgcv <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
 m_gamm4  <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
                   REML = TRUE)
 
+m_lm  <- lm(y ~ x0 + x1 + x2 + x3, data = quick_eg1)
+m_glm <- glm(y ~ x0 + x1 + x2 + x3, data = quick_eg1)
+
 #-- A standard GAM with a simple random effect ---------------------------------
 su_re <- su_eg1
 set.seed(42)
