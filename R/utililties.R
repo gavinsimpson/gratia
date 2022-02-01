@@ -862,6 +862,11 @@
     out
 }
 
+## check is a model is a gamm object
+`is_gamm` <- function(object) {
+    inherits(object, "gamm")
+}
+
 #' Is a model term a factor (categorical)?
 #'
 #' Given the name (a term label) of a term in a model, identify if the term is a
