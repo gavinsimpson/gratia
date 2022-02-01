@@ -96,6 +96,7 @@ test_that("draw.evaluated_2d_smooth() plots the smooth without contours", {
 
 test_that("draw.evaluated_2d_smooth() plots the smooth with different contour bins", {
     skip_on_os("mac")
+    skip_on_os("windows")
     sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100)
     plt <- draw(sm, n_contour = 5)
     expect_doppelganger("draw 2d smooth with 5 contour bins", plt)
@@ -105,6 +106,7 @@ test_that("draw.evaluated_2d_smooth() plots the smooth with different contour bi
 
 test_that("draw.evaluated_2d_smooth() plots the SE", {
     skip_on_os("mac")
+    skip_on_os("windows")
     sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100)
     plt <- draw(sm, show = "se")
     expect_doppelganger("draw std error of 2d smooth", plt)
@@ -128,6 +130,7 @@ test_that("draw.gam() can draw partial residuals", {
 
 test_that("draw.gam() plots an AM with a single 2d smooth", {
     skip_on_os("mac")
+    skip_on_os("windows")
     plt <- draw(su_m_bivar)
     expect_doppelganger("draw AM with 2d smooth", plt)
 
