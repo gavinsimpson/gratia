@@ -293,6 +293,15 @@
 ##'
 ##' @export
 `add_confint.smooth_estimates` <- function(object, coverage = 0.95, ...) {
+    # check if this is nested
+    nms <- names(object)
+
+    if (!all(c("est", "se") %in% nms)) {
+        stop("'object' does not contain one or both of ",
+             "'est', 'se'.",
+             "\n  Did you use `smooth_estimates(..., unnest = FALSE)`?")
+    }
+
     ## compute the critical value
     crit <- coverage_normal(coverage)
 
@@ -314,7 +323,7 @@
     nms <- names(object)
 
     if (!all(c("est", "se") %in% nms)) {
-        stop("'object' <", {{ object }}, "> does not contain one or both of ",
+        stop("'object' does not contain one or both of ",
              "'est' or 'se'.")
     }
 
