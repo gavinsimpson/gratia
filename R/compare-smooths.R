@@ -120,7 +120,7 @@
     sm_vars <- vars_from_label(unique(object[["smooth"]]))
     ## unnest data cols
     object <- unnest(object, cols = all_of("data"))
-    
+
     ## compute the critical value
     crit <- coverage_normal(coverage)
 
@@ -128,7 +128,7 @@
     object <- mutate(object,
                      lower_ci = .data[["est"]] + (crit * .data[["se"]]),
                      upper_ci = .data[["est"]] - (crit * .data[["se"]]))
-    
+
     ## basic plot
     plt <- ggplot(object, aes_string(x = sm_vars[1L],
                                      y = "est",
