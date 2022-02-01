@@ -17,6 +17,22 @@
   of these plots will be a little different now when plotting models with
   multiple smooths. See Issue #81.
 
+### Deprecated functions
+
+From version 0.7.0, the following functions are considered deprecated and their
+use is dicouraged:
+
+* `fderiv()` is *soft*-deprecated in favour of `derivatives()`.
+
+* `evaluate_smooth()` is *soft*-deprecated in favour of `smooth_estimates()`
+
+The first call to one of these functions will generate a warning, pointing to
+the newver, alternative, function. It is safe to ignore these warnings, but
+these deprecated functions will no longer receive updates and are thus at risk
+of being removed from the package at some future date. The newer alternatives
+can handle more types of models and smooths, especially so in the case of
+`smooth_estimates()`.
+
 ## New features
 
 * `fitted_values()` provides a tidy wrapper around `predict.gam()` for
@@ -235,11 +251,12 @@
   
   Wish of [#74](https://github.com/gavinsimpson/gratia/issues/74) (@hgoldspiel)
 
-* `draw.gam()` and related functions gain arguments `constant` and `fun` to allow
-  for user-defined constants and transformations of smooth estimates and
+* `draw.gam()` and related functions gain arguments `constant` and `fun` to
+  allow for user-defined constants and transformations of smooth estimates and
   confidence intervals to be applied.
   
-  Part of wish of Wish of [#79](https://github.com/gavinsimpson/gratia/issues/79).
+  Part of wish of Wish of
+  [#79](https://github.com/gavinsimpson/gratia/issues/79).
 
 * `confint.gam()` now works for 2D smooths also.
 
@@ -256,19 +273,21 @@
   The default behaviour remains unchanged however; if `parm` is `NULL` then all
   smooths are evaluated and returned with confidence intervals.
 
-* `data_class()` is no longer exported; it was only ever intended to be an internal
-  function.
+* `data_class()` is no longer exported; it was only ever intended to be an
+  internal function.
 
 ## Bug Fixes
 
 * `confint.gam()` was failing on a tensor product smooth due to matching issues.
-  Reported by @tamas-ferenci [#88](https://github.com/gavinsimpson/gratia/issues/88)
+  Reported by @tamas-ferenci
+  [#88](https://github.com/gavinsimpson/gratia/issues/88)
   
   This also fixes [#80](https://github.com/gavinsimpson/gratia/issues/80)
   (@butellyn) which was a related issue with selecting a specific smooth.
 
 * The **vdiffr** package is now used conditionally in package tests.
-  Reported by Brian Ripley [#93](https://github.com/gavinsimpson/gratia/issues/93)
+  Reported by Brian Ripley
+  [#93](https://github.com/gavinsimpson/gratia/issues/93)
 
 # gratia 0.4.1
 
@@ -277,22 +296,24 @@
 * `draw.gam()` with `scales = "fixed"` now applies to all terms that can be
   plotted, including 2d smooths.
 
-  Reported by @StefanoMezzini [#73](https://github.com/gavinsimpson/gratia/issues/73)
+  Reported by @StefanoMezzini
+  [#73](https://github.com/gavinsimpson/gratia/issues/73)
 
 ## Bug fixes
 
 * `dplyr::combine()` was deprecated. Switch to `vctrs::vec_c()`.
 
-* `draw.gam()` with `scales = "fixed"` wasn't using fixed scales where 2d smooths
-  were in the model.
+* `draw.gam()` with `scales = "fixed"` wasn't using fixed scales where 2d
+  smooths were in the model.
 
-  Reported by @StefanoMezzini [#73](https://github.com/gavinsimpson/gratia/issues/73)
+  Reported by @StefanoMezzini
+  [#73](https://github.com/gavinsimpson/gratia/issues/73)
 
 # gratia 0.4.0
 
 ## New features
 
-* `draw.gam()` can now include partial residuals when drawing univariate smooths.
+* `draw.gam()` can include partial residuals when drawing univariate smooths.
   Use `residuals = TRUE` to add partial residuals to each univariate smooth that
   is drawn. This feature is not available for smooths of more than one variable,
   by smooths, or factor-smooth interactions (`bs = "fs"`).
@@ -312,8 +333,8 @@
   1D and 2D smooths currently (handling 3D and 4D smooths is planned).
 
 * New functions `add_fitted()` and `add_residuals()` to add fitted values
-  (expectations) and model residuals to an existing data frame. Currently methods
-  available for objects fitted by `gam()` and `bam()`.
+  (expectations) and model residuals to an existing data frame. Currently
+  methods available for objects fitted by `gam()` and `bam()`.
 
 * `data_sim()` is a tidy reimplementation of `mgcv::gamSim()` with the added
   ability to use sampling distributions other than the Gaussian for all models
@@ -327,8 +348,8 @@
   including the location, scale, shape families, and the more specialised
   families described in `?mgcv::family.mgcv`.
 
-* `evaluate_smooth()`, `data_slice()`, `family()`, `link()`, `inv_link()` methods
-  for models fitted using `gamm4()` from the **gamm4** package.
+* `evaluate_smooth()`, `data_slice()`, `family()`, `link()`, `inv_link()`
+  methods for models fitted using `gamm4()` from the **gamm4** package.
 
 * `data_slice()` can generate data for a 1-d slice (a single variable varying).
 
@@ -396,8 +417,8 @@
   `"gamm"`.
 
 * `derivatives()` now handles non-numeric when creating shifted data for finite
-  differences. Fixes a problem with `stringsAsFactors = FALSE` default in R-devel.
-  [#64](https://github.com/gavinsimpson/gratia/issues/64)
+  differences. Fixes a problem with `stringsAsFactors = FALSE` default in
+  R-devel. [#64](https://github.com/gavinsimpson/gratia/issues/64)
 
 ## Bug fixes
 
@@ -408,8 +429,8 @@
 ## New features
 
 * *gratia* now uses the *mvnfast* package for random draws from a multivariate
-  normal distribution (`mvnfast::rmvn()`). Contributed by Henrik Singmann (@singmann)
-  [#28](https://github.com/gavinsimpson/gratia/issues/28)
+  normal distribution (`mvnfast::rmvn()`). Contributed by Henrik Singmann
+  (@singmann) [#28](https://github.com/gavinsimpson/gratia/issues/28)
 
 * New function `basis()` for generating tidy representations of basis expansions
   from an *mgcv*-like definition of a smooth, e.g. `s()`, `te()`, `ti()`, or
@@ -418,8 +439,8 @@
   post processing of the basis model matrix into a tidy format.
   [#42](https://github.com/gavinsimpson/gratia/issues/42)
 
-* New function `smooth_samples()` to draw samples of entire smooth functions from
-  their posterior distribution. Also has a `draw()` method for plotting the
+* New function `smooth_samples()` to draw samples of entire smooth functions
+  from their posterior distribution. Also has a `draw()` method for plotting the
   posterior samples.
 
 ## Bug fixes
@@ -436,8 +457,8 @@
     `derivatives()` also now handles `'fs'` smooths.  Reported by
     @tomand-uio [#57](https://github.com/gavinsimpson/gratia/issues/57).
 
-* `evaluate_parametric_term()` and hence `draw.gam()` would fail on a `ziplss()` model
-  because i) *gratia* didn't handle parametric terms in models with multiple linear
-  predictors correctly, and ii) *gratia* didn't convert to the naming convention of
-  *mgcv* for terms in higher linear predictors. Reported by @pboesu
-  [#45](https://github.com/gavinsimpson/gratia/issues/45).
+* `evaluate_parametric_term()` and hence `draw.gam()` would fail on a `ziplss()`
+  model because i) *gratia* didn't handle parametric terms in models with
+  multiple linear predictors correctly, and ii) *gratia* didn't convert to the
+  naming convention of *mgcv* for terms in higher linear predictors. Reported by
+  @pboesu [#45](https://github.com/gavinsimpson/gratia/issues/45)
