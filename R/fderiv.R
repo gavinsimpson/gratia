@@ -9,7 +9,8 @@
 #' and blog posts that already used `fderiv()`. A replacement, [derivatives()],
 #' is now available and recommended for new analyses.
 #'
-#' @param model A fitted GAM. Currently only models fitted by [mgcv::gam()] and [mgcv::gamm()] are supported.
+#' @param model A fitted GAM. Currently only models fitted by [mgcv::gam()] and
+#'   [mgcv::gamm()] are supported.
 #' @param ... Arguments that are passed to other methods.
 #'
 #' @return An object of class `"fderiv"` is returned.
@@ -26,11 +27,18 @@
 
 #' @rdname fderiv
 #'
-#' @param newdata a data frame containing the values of the model covariates at which to evaluate the first derivatives of the smooths.
-#' @param term character; vector of one or more terms for which derivatives are required. If missing, derivatives for all smooth terms will be returned.
-#' @param n integer; if `newdata` is missing the original data can be reconstructed from `model` and then `n` controls the number of values over the range of each covariate with which to populate `newdata`.
-#' @param eps numeric; the value of the finite difference used to approximate the first derivative.
-#' @param unconditional logical; if `TRUE`, the smoothing parameter uncertainty corrected covariance matrix is used, *if available*, otherwise the uncorrected Bayesian posterior covariance matrix is used.
+#' @param newdata a data frame containing the values of the model covariates at
+#'   which to evaluate the first derivatives of the smooths.
+#' @param term character; vector of one or more terms for which derivatives are
+#'   required. If missing, derivatives for all smooth terms will be returned.
+#' @param n integer; if `newdata` is missing the original data can be
+#'   reconstructed from `model` and then `n` controls the number of values over
+#'   the range of each covariate with which to populate `newdata`.
+#' @param eps numeric; the value of the finite difference used to approximate
+#'  the first derivative.
+#' @param unconditional logical; if `TRUE`, the smoothing parameter uncertainty
+#'  corrected covariance matrix is used, *if available*, otherwise the
+#'  uncorrected Bayesian posterior covariance matrix is used.
 #' @param offset numeric; value of offset to use in generating predictions.
 #'
 #' @importFrom stats coef model.frame predict terms vcov
@@ -82,7 +90,8 @@
             mf <- mf[, -respvar, drop = FALSE]
         }
 
-        ## remove offset() var; model.frame returns both `offset(foo(var))` and `var`,
+        ## remove offset() var; model.frame returns both `offset(foo(var))` and
+        ##  `var`,
         ## so we can just remove the former, but we also want to set the offset
         ## variable `var` to something constant. FIXME
         if (is.null(offset)) {
@@ -101,7 +110,8 @@
                 levs <- levels(f)
                 factor(rep(f[1], length.out = n), levels = levs)
             }
-            f.mf <- lapply(mf[, ff, drop = FALSE], rep_first_factor_value, n = n)
+            f.mf <- lapply(mf[, ff, drop = FALSE], rep_first_factor_value,
+                           n = n)
             f.mf <- do.call("cbind.data.frame", f.mf)
 
             ## remove factors
@@ -176,7 +186,8 @@
         lD[[i]] <- list(deriv = df, se.deriv = df.sd, Xi = Xi)
     }
     out <- structure(list(derivatives = lD, terms = S, model = model,
-                          eps = eps, eval = newdata, unconditional = unconditional),
+                          eps = eps, eval = newdata,
+                          unconditional = unconditional),
                      class = "fderiv")
     out
 }
