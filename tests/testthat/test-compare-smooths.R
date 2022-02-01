@@ -35,7 +35,6 @@ test_that("draw.compare_smooths() can plot a comparison of smooths", {
     expect_silent(plt <- draw(cs, nrow = 2, ncol = 3))
     expect_doppelganger("compare smooths - set nrow ncol", plt)
 
-    expect_silent(plt <- draw(cs) &
-                    theme(legend.position='bottom'))
+    expect_silent(plt <- draw(cs) & theme(legend.position = "bottom"))
     expect_doppelganger("compare smooths - bottom legened", plt)
 })
