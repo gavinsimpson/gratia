@@ -1,4 +1,4 @@
-# gratia 0.6.9800
+# gratia 0.6.9810
 
 ## Major changes
 
@@ -61,6 +61,9 @@ can handle more types of models and smooths, especially so in the case of
 
 * `edf()` extracts the effective degrees of freedom (EDF) of a fitted model or a
   specific smooth in the model. Various forms for the EDF can be extracted.
+
+* `model_edf()` returns the EDF of the overall model. If supplied with multiple
+  models, the EDFs of each model are returned for comparison.
 
 * `draw.gam()` can now show a "rug" plot on a bivariate smooth by drawing small
   points with high transparency over the smooth surface at the data coordinates.
