@@ -11,6 +11,12 @@ test_that("appraise() works", {
     expect_doppelganger("appraise diagnostic plots", plt)
 })
 
+test_that("appraise() method direct yields a message", {
+    expect_message(plt <- appraise(m_gam, method = "direct"),
+                   "`method = \"direct\"` is deprecated, use `\"uniform\"`")
+    expect_doppelganger("appraise diagnostic plots", plt)
+})
+
 test_that("appraise() fails if n_bins not numeric or one of character options",
 {
     msg <- paste("'arg' should be one of",
