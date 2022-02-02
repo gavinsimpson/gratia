@@ -291,6 +291,9 @@
     if (identical(distr, "scaled t")) {
         distr <- "scaled_t"
     }
+    if (grepl("^Scaled t", distr)) {
+      distr <- "scaled_t"
+    }
     if (identical(distr, "Ordered Categorical")) {
         distr <- "ocat"
     }
@@ -602,11 +605,15 @@
             if (!grepl(type, fam, ignore.case = TRUE)) {
                 stop("'family' is not of type '\"", type, "\"'", call. = FALSE)
             }
+        } else if (identical(type, "scaled t")) {
+          if (!grepl(type, fam, ignore.case = TRUE)) {
+            stop("'family' is not of type '\"", type, "\"'", call. = FALSE)
+          }
         } else {
             if (!identical(fam, type)) {
                 stop("'family' is not of type '\"", type, "\"'", call. = FALSE)
             }
-        }
+        } 
     }
 
     TRUE
