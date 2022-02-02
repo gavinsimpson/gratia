@@ -64,6 +64,9 @@
     <loc>https://gavinsimpson.github.io/gratia/reference/confint.gam.html</loc>
   </url>
   <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/data_combos.html</loc>
+  </url>
+  <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/data_sim.html</loc>
   </url>
   <url>
@@ -119,6 +122,9 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/evaluate_smooth.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/factor_combos.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/family.gam.html</loc>
