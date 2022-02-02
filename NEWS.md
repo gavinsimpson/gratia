@@ -1,4 +1,4 @@
-# gratia 0.6.9810
+# gratia 0.6.9820
 
 ## Major changes
 
@@ -118,6 +118,9 @@ can handle more types of models and smooths, especially so in the case of
 * `smooth_samples()` would fail if the model contained random effect "smooths".
   These are now ignored with a message when running `smooth_samples()`.
   Reported by @isabellaghement in #121
+
+* `link()`, `inv_link()` were failing on models fitted with `family = scat()`.
+  Reported by @Aariq #130
 
 # gratia 0.6.0
 
