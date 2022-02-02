@@ -92,10 +92,7 @@ link(nb())
 
 inv_link(nb())
 
-\dontshow{
-set.seed(4234)
-}
-dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+dat <- data_sim("eg1", seed = 4234)
 mod <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1), data = dat,
            family = gaulss)
 

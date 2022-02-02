@@ -156,21 +156,18 @@ zero-inflation term in <code><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html" 
 <span class="r-out co"><span class="r-pr">#&gt;</span> pmax(exp(eta), .Machine$double.eps)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: namespace:stats&gt;</span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontshow{</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">4234</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># }</span></span>
-<span class="r-in"><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu">gamSim</span><span class="op">(</span><span class="fl">1</span>, n <span class="op">=</span> <span class="fl">400</span>, dist <span class="op">=</span> <span class="st">"normal"</span>, scale <span class="op">=</span> <span class="fl">2</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, seed <span class="op">=</span> <span class="fl">4234</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, <span class="op">~</span> <span class="fl">1</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>,</span>
 <span class="r-in">           family <span class="op">=</span> <span class="va">gaulss</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="fu">link</span><span class="op">(</span><span class="va">mod</span>, parameter <span class="op">=</span> <span class="st">"scale"</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> function (mu) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> log(1/mu - 0.01)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x560a58e24880&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x563a64118bc8&gt;</span>
 <span class="r-in"><span class="fu">inv_link</span><span class="op">(</span><span class="va">mod</span>, parameter <span class="op">=</span> <span class="st">"scale"</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> function (eta) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1/(exp(eta) + 0.01)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x560a58e24880&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x563a64118bc8&gt;</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## Works with `family` objects too</span></span>
 <span class="r-in"><span class="fu">link</span><span class="op">(</span><span class="fu">shash</span><span class="op">(</span><span class="op">)</span>, parameter <span class="op">=</span> <span class="st">"skewness"</span><span class="op">)</span></span>
