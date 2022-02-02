@@ -200,7 +200,7 @@ test_that("link() works for tw() family objects", {
 })
 
 test_that("link() works for scat() family objects", {
-    f <- link(scat())
+    f <- link(m_gam_scat)
     expect_type(f, "closure")
     expect_identical(f(val), scat()$linkfun(val))
     expect_identical(f, scat()$linkfun)
