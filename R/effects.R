@@ -41,6 +41,30 @@ NULL
 #' @rdname fixef.gam
 #' @export
 `fixef.gamm` <- function(object, ...) {
-    object <- object$gamm
+    object <- object$gam
     fixef(object)
+}
+
+#' @rdname fixef.gam
+#' @export
+`fixef.lm` <- function(object, ...) {
+    coef(object)
+}
+
+#' @rdname fixef.gam
+#' @export
+`fixef.glm` <- function(object, ...) {
+    coef(object)
+}
+
+#' @rdname fixef.gam
+#' @export
+`fixed_effects` <- function(object, ...) {
+    UseMethod("fixed_effects")
+}
+
+#' @rdname fixef.gam
+#' @export
+`fixed_effects.default` <- function(object, ...) {
+    fixef(object, ...)
 }
