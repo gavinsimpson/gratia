@@ -60,15 +60,15 @@ test_that("worm_plot works for a GLM", {
 
 test_that("worm_plot works for a LM", {
     set.seed(1)
-    expect_silent(plt <- worm_plot(m_glm))
+    expect_silent(plt <- worm_plot(m_lm))
     expect_doppelganger("worm plot lm uniform", plt)
 
     set.seed(1)
-    expect_silent(plt <- worm_plot(m_glm, method = "simulate"))
+    expect_silent(plt <- worm_plot(m_lm, method = "simulate"))
     expect_doppelganger("worm plot lm simulate", plt)
 
     set.seed(1)
-    expect_silent(plt <- worm_plot(m_glm, method = "normal"))
+    expect_silent(plt <- worm_plot(m_lm, method = "normal"))
     expect_doppelganger("worm plot lm normal", plt)
 })
 
