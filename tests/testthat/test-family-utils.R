@@ -18,6 +18,7 @@ m_gaulss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1), data = dat,
 m_gamm <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 m_bam <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "fREML")
 m_gamm4 <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
+m_gam_scat <- gam(y ~ 1, data = dat, family = scat)
 
 l <- list(mer = 1:3, gam = 1:3)
 
@@ -91,6 +92,12 @@ test_that("inv_link() works with a bam() model", {
     f <- inv_link(m_bam)
     expect_type(f, "closure")
     expect_identical(f, gaussian()$linkinv)
+})
+
+test_that("inv_link() works with scaled t distribution", {
+  f <- inv_link(m_gam_scat)
+  expect_type(f, "closure")
+  expect_identical(f, scat()$linkinv)
 })
 
 test_that("inv_link.list() fails with a list that isn't a gamm4", {
