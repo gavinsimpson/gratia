@@ -899,7 +899,7 @@
         facs <- facs[, term, drop = FALSE]
         take <- rownames(facs)[as.logical(facs)]
         data_types <- attr(object, 'dataClasses')[take]
-        all(data_types == "factor")
+        all(data_types %in% c("factor", "character"))
     } else {
         NULL
     }
