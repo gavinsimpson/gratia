@@ -3,11 +3,23 @@
 \name{fixef.gam}
 \alias{fixef.gam}
 \alias{fixef.gamm}
+\alias{fixef.lm}
+\alias{fixef.glm}
+\alias{fixed_effects}
+\alias{fixed_effects.default}
 \title{Extract fixed effects estimates from a fitted GAM}
 \usage{
 \method{fixef}{gam}(object, ...)
 
 \method{fixef}{gamm}(object, ...)
+
+\method{fixef}{lm}(object, ...)
+
+\method{fixef}{glm}(object, ...)
+
+fixed_effects(object, ...)
+
+\method{fixed_effects}{default}(object, ...)
 }
 \arguments{
 \item{object}{a fitted GAM}
