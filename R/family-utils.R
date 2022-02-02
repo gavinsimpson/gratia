@@ -288,7 +288,7 @@
     if (identical(distr, "Beta regression")) {
         distr <- "beta"
     }
-    if (identical(distr, "scaled t")) {
+    if (grepl("^scaled t", distr, ignore.case = TRUE)) {
         distr <- "scaled_t"
     }
     if (identical(distr, "Ordered Categorical")) {
@@ -591,14 +591,10 @@
 
     if (! is.null(type)) {
         fam <- object[["family"]]
-    
         ## check that family is of the correct type
         ##  - need to handle a couple of special types
-        if (identical(type, "Tweedie")) {
-            if (!grepl(type, fam)) {
-                stop("'family' is not of type '\"", type, "\"'", call. = FALSE)
-            }
-        } else if (identical(type, "Negative Binomial")) {
+        special <- c("Tweedie", "Negative Binomial", "Scaled t")
+        if (type %in% special) {
             if (!grepl(type, fam, ignore.case = TRUE)) {
                 stop("'family' is not of type '\"", type, "\"'", call. = FALSE)
             }
