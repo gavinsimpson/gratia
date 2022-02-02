@@ -118,6 +118,9 @@ can handle more types of models and smooths, especially so in the case of
 * `smooth_samples()` would fail if the model contained random effect "smooths".
   These are now ignored with a message when running `smooth_samples()`.
   Reported by @isabellaghement in #121
+  
+* `inv_link()` would return NULL for GAMs with scaled t family. #130 reported by
+  @Aariq
 
 # gratia 0.6.0
 
