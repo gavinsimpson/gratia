@@ -1,37 +1,37 @@
-##' Prepare a data slice through covariates
-##'
-##' @param object an R model object.
-##' @param ... arguments passed to other methods.
-##'
-##' @export
+#' Prepare a data slice through covariates
+#'
+#' @param object an R model object.
+#' @param ... arguments passed to other methods.
+#'
+#' @export
 `data_slice` <- function(object, ...) {
     UseMethod("data_slice")
 }
 
-##' @export
-##' @rdname data_slice
+#' @export
+#' @rdname data_slice
 `data_slice.default` <- function(object, ...) {
     stop("Don't know how to create a data slice from <", class(object)[[1L]],
          ">", call. = FALSE)
 }
 
-##' @param var1 character;
-##' @param var2 character;
-##' @param var3 character; ignored currently.
-##' @param var4 character; ignored currently.
-##' @param data a 1-row data frame or tibble containing values for variables in
-##'   the fitted model that are not varying in the slice.
-##' @param n numeric; the number of values to create for each of `var1` and
-##'   `var2`in the slice.
-##' @param offset numeric; value to use for an offset term in the model.
-##'
-##' @export
-##' @rdname data_slice
-##'
-##' @importFrom tidyr nesting
-##' @importFrom tibble as_tibble
-##' @importFrom stats model.frame
-##' @importFrom rlang exec
+#' @param var1 character;
+#' @param var2 character;
+#' @param var3 character; ignored currently.
+#' @param var4 character; ignored currently.
+#' @param data a 1-row data frame or tibble containing values for variables in
+#'   the fitted model that are not varying in the slice.
+#' @param n numeric; the number of values to create for each of `var1` and
+#'   `var2`in the slice.
+#' @param offset numeric; value to use for an offset term in the model.
+#'
+#' @export
+#' @rdname data_slice
+#'
+#' @importFrom tidyr nesting
+#' @importFrom tibble as_tibble
+#' @importFrom stats model.frame
+#' @importFrom rlang exec
 `data_slice.gam` <- function(object, var1, var2 = NULL, var3 = NULL, var4 = NULL,
                              data = NULL, n = 50, offset = NULL, ...) {
     ## we need the model frame to get data from
@@ -89,8 +89,8 @@
     result # return
 }
 
-##' @export
-##' @rdname data_slice
+#' @export
+#' @rdname data_slice
 `data_slice.list` <- function(object, ...) { # for gamm4 lists only
     ## Is this list likely to be a gamm4 list?
     if (! is_gamm4(object)) {
@@ -99,7 +99,7 @@
     data_slice(object[["gam"]], ...)
 }
 
-##' @importFrom stats median
+#' @importFrom stats median
 `value_closest_to_median` <- function(x) {
     ## only work on numeric or factor variables
     is_fac <- is.factor(x)
@@ -132,7 +132,7 @@
 
 ## if no data, set to a 0-row tibble; if data supplied, check it:
 ##   - single row df or list of length-1 elements; only variables in mf
-##' @importFrom tibble is_tibble tibble
+#' @importFrom tibble is_tibble tibble
 `process_slice_data` <- function(data) {
     ## if NULL, bail early; return a 0-row tibble
     if (is.null(data)) {
@@ -203,22 +203,22 @@
     values
 }
 
-##' Typical values of model covariates
-##'
-##' @param object a fitted GAM(M) model.
-##' @param ... arguments passed to other methods.
-##'
-##' @export
+#' Typical values of model covariates
+#'
+#' @param object a fitted GAM(M) model.
+#' @param ... arguments passed to other methods.
+#'
+#' @export
 `typical_values` <- function(object, ...) {
     UseMethod("typical_values")
 }
 
-##' @rdname typical_values
-##' @param vars terms to include or exclude from the returned object. Uses
-##'   tidyselect principles.
-##' @export
-##' @importFrom rlang enquo
-##' @importFrom tidyselect eval_select
+#' @rdname typical_values
+#' @param vars terms to include or exclude from the returned object. Uses
+#'   tidyselect principles.
+#' @export
+#' @importFrom rlang enquo
+#' @importFrom tidyselect eval_select
 `typical_values.gam` <- function(object, vars = everything(), ...) {
     # extract the summary from the fitted GAM
     # summ is a named list
@@ -238,4 +238,79 @@
 
     # return
     as_tibble(summ)
+}
+
+#' All combinations of factor levels
+#'
+#' @param object a fitted model object.
+#' @param vars terms to include or exclude from the returned object. Uses
+#'   tidyselect principles.
+#' @param complete logical; should all combinations of factor levels be
+#'   returned? If `FALSE`, only those combinations of levels observed in the
+#'   model are retained.
+#' @param ... arguments passed to methods.
+#'
+#' @export
+`factor_combos` <- function(object, ...) {
+    UseMethod("factor_combos")
+}
+
+#' @export
+#' @importFrom purrr cross_df
+#' @importFrom rlang enquo
+#' @importFrom tidyr nesting expand
+#' @rdname data_combos
+`factor_combos.gam` <- function(object, vars = everything(),
+                                complete = TRUE, ...) {
+    # extract the summary from the fitted GAM
+    # summ is a named list
+    summ <- object[["var.summary"]]
+
+    # which are factors?
+    is_fac <- vapply(summ, is.factor, logical(1L))
+    if (!any(is_fac)) {
+        stop("Model contains no factor terms")
+    } else {
+        summ <- summ[is_fac]
+    }
+
+    # include/exclude any terms?
+    expr <- rlang::enquo(vars)
+    pos <- eval_select(expr, data = summ)
+    summ <- summ[pos]
+
+    f <- lapply(summ, function(x) factor(levels(x), levels = levels(x)))
+    f <- purrr::cross_df(f)
+    if (isFALSE(complete)) {
+        mf <- model.frame(object)[names(summ)]
+        f <- expand(f, nesting(mf))
+    }
+    f
+}
+
+#' All combinations of factor levels plus typical values of continuous variables
+#'
+#' @inheritParams factor_combos
+#' @export
+`data_combos` <- function(object, ...) {
+    UseMethod("data_combos")
+}
+
+#' @export
+#' @rdname data_combos
+`data_combos.gam` <- function(object, vars = everything(),
+                              complete = TRUE, ...) {
+    tv <- typical_values(object)
+    is_fac <- vapply(tv, is.factor, logical(1L))
+    if (any(is_fac)) { # drop factor from typical values
+        tv <- tv[, !is_fac]
+    }
+    fc <- factor_combos(object)
+    tbl <- expand_grid(fc, tv)
+
+    # include/exclude any terms?
+    expr <- rlang::enquo(vars)
+    pos <- eval_select(expr, data = tbl)
+    tbl <- tbl[pos]
+    tbl
 }
