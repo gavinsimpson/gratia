@@ -5,6 +5,7 @@ library("mgcv")
 library("gamm4")
 library("scam")
 library("dplyr")
+library("tibble")
 library("nlme")
 
 ## Need a local wrapper to allow conditional use of vdiffr
@@ -67,6 +68,12 @@ m_gamgcv <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
                 method = "GCV.Cp")
 m_gamm4  <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
                   REML = TRUE)
+
+m_gaulss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1), data = su_eg1,
+                family = gaulss)
+
+m_scat <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
+              family = scat(), method = "REML")
 
 m_lm  <- lm(y ~ x0 + x1 + x2 + x3, data = quick_eg1)
 m_glm <- glm(y ~ x0 + x1 + x2 + x3, data = quick_eg1)
@@ -132,3 +139,11 @@ m_ar1 <- bam(y ~ s(x, k = 20), data = df[seq_len(n), ], rho = rho,
 ## now as a factor by smooth to model both series
 m_ar1_by <- bam(y ~ series + s(x, k = 20, by = series), data = df, rho = rho,
                 AR.start = AR.start)
+
+# A standard GAM with multiple factors
+set.seed(1)
+df_2_fac <- add_column(su_eg4,
+                       ff = as.character(sample(LETTERS[1:4], nrow(su_eg4),
+                                                replace = TRUE)))
+m_2_fac <- gam(y ~ fac * ff + s(x0) + s(x1) + s(x2),
+               data = df_2_fac, method = "REML")

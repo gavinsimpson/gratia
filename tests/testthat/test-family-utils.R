@@ -7,18 +7,6 @@ library("mgcv")
 library("gamm4")
 
 val <- 1
-
-## check link and inv_link for models
-set.seed(4234)
-dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
-m_glm <- glm(y ~ x0, data = dat)
-m_gam <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-m_gaulss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1), data = dat,
-                family = gaulss)
-m_gamm <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
-m_bam <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "fREML")
-m_gamm4 <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
-
 l <- list(mer = 1:3, gam = 1:3)
 
 test_that("link() works with a glm() model", {
@@ -194,6 +182,13 @@ test_that("link() works for tw() family objects", {
 
 test_that("link() works for scat() family objects", {
     f <- link(scat())
+    expect_type(f, "closure")
+    expect_identical(f(val), scat()$linkfun(val))
+    expect_identical(f, scat()$linkfun)
+})
+
+test_that("link() works for scat() family objects", {
+    f <- link(m_scat)
     expect_type(f, "closure")
     expect_identical(f(val), scat()$linkfun(val))
     expect_identical(f, scat()$linkfun)
