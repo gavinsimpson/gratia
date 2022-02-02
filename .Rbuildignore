@@ -1,0 +1,17 @@
+^\.travis\.yml$
+^LICENSE\.md$
+\.Rproj$
+^\.Rproj\.user$
+^Makefile
+^\.gitattributes
+^\.gitignore
+^docs$
+^_pkgdown\.yml$
+^codecov\.yml$
+^cran-comments\.md$
+^appveyor\.yml$
+^\.github$
+^README.Rmd$
+^revdep$
+^pkgdown$
+^CITATION\.cff$

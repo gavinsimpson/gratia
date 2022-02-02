@@ -1,0 +1,16 @@
+url: https://gavinsimpson.github.io/gratia/
+
+home:
+  title: An R package for working with generalized additive models
+  description: Graceful 'ggplot'-based graphics and utility functions for working with generalized additive models (GAMs) fitted using the 'mgcv' package.
+
+template:
+  params:
+    bootswatch: simplex
+  opengraph:
+    image:
+      src: man/figures/README-draw-gam-figure-1.png
+      alt: "Plot produced by draw() of 4 smooth functions from a fitted generalized additive model"
+    twitter:
+      creator: "@ucfagls"
+      card: summary_large_image
