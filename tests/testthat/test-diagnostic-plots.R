@@ -71,3 +71,31 @@ test_that("worm_plot works for a LM", {
     expect_silent(plt <- worm_plot(m_glm, method = "normal"))
     expect_doppelganger("worm plot lm normal", plt)
 })
+
+test_that("qq_plot works for a GLM", {
+    set.seed(1)
+    expect_silent(plt <- qq_plot(m_glm))
+    expect_doppelganger("qq plot glm uniform", plt)
+
+    set.seed(1)
+    expect_silent(plt <- qq_plot(m_glm, method = "simulate"))
+    expect_doppelganger("qq plot glm simulate", plt)
+
+    set.seed(1)
+    expect_silent(plt <- qq_plot(m_glm, method = "normal"))
+    expect_doppelganger("qq plot glm normal", plt)
+})
+
+test_that("qq_plot works for a LM", {
+    set.seed(1)
+    expect_silent(plt <- qq_plot(m_lm))
+    expect_doppelganger("qq plot lm uniform", plt)
+
+    set.seed(1)
+    expect_silent(plt <- qq_plot(m_lm, method = "simulate"))
+    expect_doppelganger("qq plot lm simulate", plt)
+
+    set.seed(1)
+    expect_silent(plt <- qq_plot(m_lm, method = "normal"))
+    expect_doppelganger("qq plot lm normal", plt)
+})
