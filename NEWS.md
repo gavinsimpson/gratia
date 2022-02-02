@@ -88,7 +88,7 @@ can handle more types of models and smooths, especially so in the case of
 
 * `fixef()` is now imported (and re-exported) from the *nlme* package, with
   methods for models fitted with `gam()` and `gamm()`, to extract fixed effects
-  estimates from fitted models.
+  estimates from fitted models. `fixed_effects()` is an alias for `fixef()`.
 
 * The `draw()` method for `smooth_samples()` can now handle 2D smooths.
   Additionally, the number of posterior draws to plot can now be specified when
