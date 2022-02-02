@@ -99,3 +99,9 @@ test_that("qq_plot works for a LM", {
     expect_silent(plt <- qq_plot(m_lm, method = "normal"))
     expect_doppelganger("qq plot lm normal", plt)
 })
+
+test_that("appraise works for a LM", {
+    set.seed(1)
+    expect_silent(plt <- appraise(m_lm))
+    expect_doppelganger("appraise lm ", plt)
+})
