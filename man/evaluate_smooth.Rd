@@ -57,7 +57,7 @@ The data are scaled into the unit square before deciding what to exclude,
 and \code{dist} is a distance within the unit square. See
 \code{\link[mgcv:exclude.too.far]{mgcv::exclude.too.far()}} for further details.}
 
-\item{term}{character; which parametric term whose effects are evaulated}
+\item{term}{character; which parametric term whose effects are evaluated}
 }
 \value{
 A data frame, which is of class \code{"evaluated_1d_smooth"} or

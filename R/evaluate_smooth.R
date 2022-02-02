@@ -569,7 +569,7 @@
     UseMethod("evaluate_parametric_term")
 }
 
-#' @param term character; which parametric term whose effects are evaulated
+#' @param term character; which parametric term whose effects are evaluated
 #'
 #' @rdname evaluate_smooth
 #'
