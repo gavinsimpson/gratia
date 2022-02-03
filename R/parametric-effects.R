@@ -3,8 +3,6 @@
 #' @param object a fitted model object.
 #' @param terms character; which model parametric terms should be drawn? The
 #'   Default of `NULL` will plot all parametric terms that can be drawn.
-#' @param data a data frame of covariate values used to fit the model. Can
-#'   be missing, in which case the data will be recovered from the model.
 #' @param unconditional logical; should confidence intervals include the
 #'   uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian
 #'   covariance matrix will be used.
@@ -30,7 +28,7 @@
 #' @rdname parametric_effects
 #' @export
 `parametric_effects.gam` <- function(object, terms = NULL,
-                                     data = NULL,
+                                     #data = NULL,
                                      unconditional = FALSE,
                                      unnest = TRUE,
                                      ci_level = 0.95,
@@ -71,12 +69,12 @@
                     unconditional = unconditional)
     # try to recover the data
     mf <- model.frame(object)
-    if (is.null(data)) {
-        data <- eval(object$call$data, envir)
-    }
-    if (is.null(data)) {
-        data <- mf
-    }
+    # if (is.null(data)) {
+        # data <- eval(object$call$data, envir)
+    # }
+    # if (is.null(data)) {
+        # data <- mf
+    # }
 
     # loop over the valid_terms and prepare the parametric effects
     fun <- function(term, data, pred) {
@@ -99,7 +97,7 @@
         out
     }
 
-    effects <- map_df(valid_terms, .f = fun, data = data, pred = pred)
+    effects <- map_df(valid_terms, .f = fun, data = mf, pred = pred)
 
     if (unnest) {
         effects <- unnest(effects, cols = "data") %>%

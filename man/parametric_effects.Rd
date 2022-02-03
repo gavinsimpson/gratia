@@ -10,7 +10,6 @@ parametric_effects(object, ...)
 \method{parametric_effects}{gam}(
   object,
   terms = NULL,
-  data = NULL,
   unconditional = FALSE,
   unnest = TRUE,
   ci_level = 0.95,
@@ -25,9 +24,6 @@ parametric_effects(object, ...)
 
 \item{terms}{character; which model parametric terms should be drawn? The
 Default of \code{NULL} will plot all parametric terms that can be drawn.}
-
-\item{data}{a data frame of covariate values used to fit the model. Can
-be missing, in which case the data will be recovered from the model.}
 
 \item{unconditional}{logical; should confidence intervals include the
 uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian

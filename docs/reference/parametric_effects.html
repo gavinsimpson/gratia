@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.9840</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.9850</span>
       </span>
     </div>
 
@@ -59,7 +59,6 @@
 <span class="fu">parametric_effects</span><span class="op">(</span>
   <span class="va">object</span>,
   terms <span class="op">=</span> <span class="cn">NULL</span>,
-  data <span class="op">=</span> <span class="cn">NULL</span>,
   unconditional <span class="op">=</span> <span class="cn">FALSE</span>,
   unnest <span class="op">=</span> <span class="cn">TRUE</span>,
   ci_level <span class="op">=</span> <span class="fl">0.95</span>,
@@ -77,9 +76,6 @@
 <dt>terms</dt>
 <dd><p>character; which model parametric terms should be drawn? The
 Default of <code>NULL</code> will plot all parametric terms that can be drawn.</p></dd>
-<dt>data</dt>
-<dd><p>a data frame of covariate values used to fit the model. Can
-be missing, in which case the data will be recovered from the model.</p></dd>
 <dt>unconditional</dt>
 <dd><p>logical; should confidence intervals include the
 uncertainty due to smoothness selection? If <code>TRUE</code>, the corrected Bayesian
