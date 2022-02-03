@@ -19,7 +19,7 @@ is used instead."><meta property="og:image" content="https://gavinsimpson.github
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.9830</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.9840</span>
       </span>
     </div>
 
@@ -61,8 +61,9 @@ is used instead.</p>
 <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span>
   <span class="va">object</span>,
   data <span class="op">=</span> <span class="cn">NULL</span>,
-  parametric <span class="op">=</span> <span class="cn">NULL</span>,
   select <span class="op">=</span> <span class="cn">NULL</span>,
+  parametric <span class="op">=</span> <span class="cn">FALSE</span>,
+  terms <span class="op">=</span> <span class="cn">NULL</span>,
   residuals <span class="op">=</span> <span class="cn">FALSE</span>,
   scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"free"</span>, <span class="st">"fixed"</span><span class="op">)</span>,
   ci_level <span class="op">=</span> <span class="fl">0.95</span>,
@@ -83,6 +84,7 @@ is used instead.</p>
   discrete_colour <span class="op">=</span> <span class="cn">NULL</span>,
   continuous_colour <span class="op">=</span> <span class="cn">NULL</span>,
   continuous_fill <span class="op">=</span> <span class="cn">NULL</span>,
+  position <span class="op">=</span> <span class="st">"identity"</span>,
   ncol <span class="op">=</span> <span class="cn">NULL</span>,
   nrow <span class="op">=</span> <span class="cn">NULL</span>,
   guides <span class="op">=</span> <span class="st">"keep"</span>,
@@ -96,10 +98,6 @@ is used instead.</p>
 <dd><p>a fitted GAM, the result of a call to <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code>.</p></dd>
 <dt>data</dt>
 <dd><p>a optional data frame that may or may not be used? FIXME!</p></dd>
-<dt>parametric</dt>
-<dd><p>logical; plot parametric terms also? Default is <code>TRUE</code>,
-only if <code>select</code> is <code>NULL</code>. If <code>select</code> is used, <code>parametric</code> is set to
-<code>FALSE</code> unless the user specifically sets <code>parametric = TRUE</code>.</p></dd>
 <dt>select</dt>
 <dd><p>character, logical, or numeric; which smooths to plot. If
 <code>NULL</code>, the default, then all model smooths are drawn. Numeric <code>select</code>
@@ -108,6 +106,14 @@ stored in <code>object</code>. Character <code>select</code> matches the labels 
 as shown for example in the output from <code>summary(object)</code>. Logical
 <code>select</code> operates as per numeric <code>select</code> in the order that smooths are
 stored.</p></dd>
+<dt>parametric</dt>
+<dd><p>logical; plot parametric terms also? Note that <code>select</code> is
+used for selecting which smooths to plot. The <code>terms</code> argument is used to
+select which parametric effects are plotted. The default, as with
+<code><a href="https://rdrr.io/pkg/mgcv/man/plot.gam.html" class="external-link">mgcv::plot.gam()</a></code>, is to not draw parametyric effects.</p></dd>
+<dt>terms</dt>
+<dd><p>character; which model parametric terms should be drawn? The
+Default of <code>NULL</code> will plot all parametric terms that can be drawn.</p></dd>
 <dt>residuals</dt>
 <dd><p>logical; should partial residuals for a smooth be drawn?
 Ignored for anything but a simple univariate smooth.</p></dd>

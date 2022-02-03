@@ -7,8 +7,9 @@
 \method{draw}{gam}(
   object,
   data = NULL,
-  parametric = NULL,
   select = NULL,
+  parametric = FALSE,
+  terms = NULL,
   residuals = FALSE,
   scales = c("free", "fixed"),
   ci_level = 0.95,
@@ -29,6 +30,7 @@
   discrete_colour = NULL,
   continuous_colour = NULL,
   continuous_fill = NULL,
+  position = "identity",
   ncol = NULL,
   nrow = NULL,
   guides = "keep",
@@ -40,10 +42,6 @@
 
 \item{data}{a optional data frame that may or may not be used? FIXME!}
 
-\item{parametric}{logical; plot parametric terms also? Default is \code{TRUE},
-only if \code{select} is \code{NULL}. If \code{select} is used, \code{parametric} is set to
-\code{FALSE} unless the user specifically sets \code{parametric = TRUE}.}
-
 \item{select}{character, logical, or numeric; which smooths to plot. If
 \code{NULL}, the default, then all model smooths are drawn. Numeric \code{select}
 indexes the smooths in the order they are specified in the formula and
@@ -51,6 +49,14 @@ stored in \code{object}. Character \code{select} matches the labels for smooths
 as shown for example in the output from \code{summary(object)}. Logical
 \code{select} operates as per numeric \code{select} in the order that smooths are
 stored.}
+
+\item{parametric}{logical; plot parametric terms also? Note that \code{select} is
+used for selecting which smooths to plot. The \code{terms} argument is used to
+select which parametric effects are plotted. The default, as with
+\code{\link[mgcv:plot.gam]{mgcv::plot.gam()}}, is to not draw parametyric effects.}
+
+\item{terms}{character; which model parametric terms should be drawn? The
+Default of \code{NULL} will plot all parametric terms that can be drawn.}
 
 \item{residuals}{logical; should partial residuals for a smooth be drawn?
 Ignored for anything but a simple univariate smooth.}

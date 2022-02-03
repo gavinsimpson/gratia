@@ -1,7 +1,8 @@
 #' Estimated values for parametric model terms
 #'
 #' @param object a fitted model object.
-#' @param term character; which parametric term whose effects are evaluated.
+#' @param terms character; which model parametric terms should be drawn? The
+#'   Default of `NULL` will plot all parametric terms that can be drawn.
 #' @param data a data frame of covariate values used to fit the model. Can
 #'   be missing, in which case the data will be recovered from the model.
 #' @param unconditional logical; should confidence intervals include the
@@ -28,7 +29,7 @@
 #'
 #' @rdname parametric_effects
 #' @export
-`parametric_effects.gam` <- function(object, term = NULL,
+`parametric_effects.gam` <- function(object, terms = NULL,
                                      data = NULL,
                                      unconditional = FALSE,
                                      unnest = TRUE,
@@ -42,12 +43,12 @@
 
     # user supplied term? if provided check the stated terms are actually model
     # parametric terms
-    valid_terms <- if (is.null(term)) {
+    valid_terms <- if (is.null(terms)) {
         mgcv_names
     } else {
-        if (!any(valid_terms <- term %in% vars)) {
+        if (!any(valid_terms <- terms %in% vars)) {
             stop(sprintf("Term is not in the parametric part of model: <%s>",
-                         term))
+                         terms))
         }
         valid_terms
     }

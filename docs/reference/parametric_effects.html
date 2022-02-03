@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gratia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.9830</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.9840</span>
       </span>
     </div>
 
@@ -58,7 +58,7 @@
 <span class="co"># S3 method for gam</span>
 <span class="fu">parametric_effects</span><span class="op">(</span>
   <span class="va">object</span>,
-  term <span class="op">=</span> <span class="cn">NULL</span>,
+  terms <span class="op">=</span> <span class="cn">NULL</span>,
   data <span class="op">=</span> <span class="cn">NULL</span>,
   unconditional <span class="op">=</span> <span class="cn">FALSE</span>,
   unnest <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -74,8 +74,9 @@
 <dd><p>a fitted model object.</p></dd>
 <dt>...</dt>
 <dd><p>arguments passed to other methods.</p></dd>
-<dt>term</dt>
-<dd><p>character; which parametric term whose effects are evaluated.</p></dd>
+<dt>terms</dt>
+<dd><p>character; which model parametric terms should be drawn? The
+Default of <code>NULL</code> will plot all parametric terms that can be drawn.</p></dd>
 <dt>data</dt>
 <dd><p>a data frame of covariate values used to fit the model. Can
 be missing, in which case the data will be recovered from the model.</p></dd>

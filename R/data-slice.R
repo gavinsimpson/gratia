@@ -269,7 +269,8 @@
     # which are factors?
     is_fac <- vapply(summ, is.factor, logical(1L))
     if (!any(is_fac)) {
-        stop("Model contains no factor terms")
+        message("Model contains no factor terms")
+        return(NULL)
     } else {
         summ <- summ[is_fac]
     }

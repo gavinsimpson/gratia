@@ -6,9 +6,6 @@
 #'
 #' @param object a fitted GAM, the result of a call to [mgcv::gam()].
 #' @param data a optional data frame that may or may not be used? FIXME!
-#' @param parametric logical; plot parametric terms also? Default is `TRUE`,
-#'   only if `select` is `NULL`. If `select` is used, `parametric` is set to
-#'   `FALSE` unless the user specifically sets `parametric = TRUE`.
 #' @param select character, logical, or numeric; which smooths to plot. If
 #'   `NULL`, the default, then all model smooths are drawn. Numeric `select`
 #'   indexes the smooths in the order they are specified in the formula and
@@ -16,6 +13,12 @@
 #'   as shown for example in the output from `summary(object)`. Logical
 #'   `select` operates as per numeric `select` in the order that smooths are
 #'   stored.
+#' @param parametric logical; plot parametric terms also? Note that `select` is
+#'   used for selecting which smooths to plot. The `terms` argument is used to
+#'   select which parametric effects are plotted. The default, as with
+#'   [mgcv::plot.gam()], is to not draw parametyric effects.
+#' @param terms character; which model parametric terms should be drawn? The
+#'   Default of `NULL` will plot all parametric terms that can be drawn.
 #' @param residuals logical; should partial residuals for a smooth be drawn?
 #'   Ignored for anything but a simple univariate smooth.
 #' @param scales character; should all univariate smooths be plotted with the
@@ -106,8 +109,9 @@
 #' draw(m1, ci_col = "steelblue", smooth_col = "forestgreen", ci_alpha = 0.3)
 `draw.gam` <- function(object,
                        data = NULL,
-                       parametric = NULL,
                        select = NULL,
+                       parametric = FALSE,
+                       terms = NULL,
                        residuals = FALSE,
                        scales = c("free", "fixed"),
                        ci_level = 0.95,
@@ -128,6 +132,7 @@
                        discrete_colour = NULL,
                        continuous_colour = NULL,
                        continuous_fill = NULL,
+                       position = "identity",
                        ncol = NULL, nrow = NULL,
                        guides = "keep",
                        ...) {
@@ -233,8 +238,38 @@
         ylims <- range(sm_rng, p_resids_rng)
     }
 
-    sm_l <- group_split(sm_eval, .data$smooth)
+    # Are we plotting parametric effects too?
+    if (isTRUE(parametric)) {
+        para <- parametric_effects(object, term = terms, data = data,
+                                   unconditional = unconditional,
+                                   unnest = TRUE, ci_level = ci_level)
+        # Add CI
+        crit <- coverage_normal(ci_level)
+        object <- mutate(para,
+                         lower = .data$partial - (crit * .data$se),
+                         upper = .data$partial + (crit * .data$se))
+        # need to alter the ylim if scales are fixed
+        if (isTRUE(identical(scales, "fixed"))) {
+            ylims <- range(ylims, object$partial, object$upper, object$lower)
+        }
 
+        para_plts <- para %>%
+          group_by(.data$term) %>%
+          group_map(.keep = TRUE,
+                    .f = ~ draw_parametric_effect(.x,
+                                                  ci_level = ci_level,
+                                                  ci_col = ci_col,
+                                                  ci_alpha = ci_alpha,
+                                                  line_col = smooth_col,
+                                                  constant = constant,
+                                                  fun = fun,
+                                                  rug = rug,
+                                                  position = position,
+                                                  ylim = ylims))
+    } # parametric done
+
+    # draw smooths
+    sm_l <- group_split(sm_eval, .data$smooth)
     sm_plts <- map(sm_l,
                    draw_smooth_estimates,
                    constant = constant,
@@ -260,6 +295,10 @@
 
     sm_plts <- sm_plts[!no_plot]
 
+    if (isTRUE(parametric)) {
+        sm_plts <- append(sm_plts, para_plts)
+    }
+
     # return
     n_plots <- length(sm_plts)
     if (is.null(ncol) && is.null(nrow)) {
@@ -268,4 +307,17 @@
     }
     wrap_plots(sm_plts, byrow = TRUE, ncol = ncol, nrow = nrow,
                guides = guides, ...)
+}
+
+#' @export
+`draw.list` <- function(object, ...) {
+    if (!is_gamm4(object)) {
+        stop("Don't know how to draw a list")
+    }
+    draw(object$gam)
+}
+
+#' @export
+`draw.gamm` <- function(object, ...) {
+    draw(object$gam)
 }
