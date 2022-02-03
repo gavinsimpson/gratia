@@ -1,30 +1,30 @@
-##' Generate data over the range of variables used in smooths
-##'
-##' For each smooth in a GAM, generate new data over the range of the variables
-##' involved in a smooth.
-##'
-##' @param x an object for which new data is required. Currently objects of
-##'   classes `"gam"`, and `"gamm"` are supported, as are smooths from **mgcv**
-##'   inheriting from class `"mgcv.smooth"`.
-##' @param n numeric; the number of data values to generate per term in each
-##'   smooth.
-##' @param data data frame; for `"mgcv.smooth"` objects, the data used to fit
-##'   the GAM need to be supplied.
-##' @param ... arguments passed to methods
-##' @return A data frame of new values spread over the range of the
-##'   observed values.
-##'
-##' @author Gavin L. Simpson
-##'
-##' @rdname datagen
-##'
-##' @keywords internal
+#' Generate data over the range of variables used in smooths
+#'
+#' For each smooth in a GAM, generate new data over the range of the variables
+#' involved in a smooth.
+#'
+#' @param x an object for which new data is required. Currently objects of
+#'   classes `"gam"`, and `"gamm"` are supported, as are smooths from **mgcv**
+#'   inheriting from class `"mgcv.smooth"`.
+#' @param n numeric; the number of data values to generate per term in each
+#'   smooth.
+#' @param data data frame; for `"mgcv.smooth"` objects, the data used to fit
+#'   the GAM need to be supplied.
+#' @param ... arguments passed to methods
+#' @return A data frame of new values spread over the range of the
+#'   observed values.
+#'
+#' @author Gavin L. Simpson
+#'
+#' @rdname datagen
+#'
+#' @keywords internal
 `datagen` <- function(x, ...) {
     UseMethod("datagen")
 }
 
-##' @export
-##' @rdname datagen
+#' @export
+#' @rdname datagen
 `datagen.mgcv.smooth` <- function(x, n = 100, data, ...) {
     d <- smooth_dim(x)                 # how many dimensions in smooth
     term <- smooth_terms(x)            # what term are we dealing with
@@ -53,8 +53,8 @@
     out
 }
 
-##' @export
-##' @rdname datagen
+#' @export
+#' @rdname datagen
 `datagen.fs.interaction` <- function(x, n = 100, data, ...) {
     d <- smooth_dim(x)                 # how many dimensions in smooth
     term <- smooth_variable(x)         # what term are we dealing with
@@ -84,8 +84,8 @@
     out                                 # return
 }
 
-##' @export
-##' @rdname datagen
+#' @export
+#' @rdname datagen
 `datagen.gam` <- function(x, smooth = NULL, n = 200, ...) {
     if (is.null(smooth)) {
         stop("Argument 'smooth' must be specified and not 'NULL'.")
@@ -99,8 +99,8 @@
             n = n, data = x[["model"]])
 }
 
-##' @export
-##' @rdname datagen
+#' @export
+#' @rdname datagen
 `datagen.gamm` <- function(x, ...) {
     if (!is.gamm(x)) {
         stop("Model doesn't appear to be a 'gamm()' model object.")
@@ -108,8 +108,8 @@
     datagen(x[["gam"]], ...)
 }
 
-##' @export
-##' @rdname datagen
+#' @export
+#' @rdname datagen
 `datagen.list` <- function(x, ...) {
     if (!is_gamm4(x)) {
         stop("Model doesn't appear to be a 'gamm4()' model object.")

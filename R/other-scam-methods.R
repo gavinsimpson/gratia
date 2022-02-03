@@ -1,4 +1,4 @@
-##' @export
+#' @export
 `vcov.scam` <- function (object, freq = FALSE, dispersion = NULL,
                          parametrized = TRUE, ...)  {
     if (freq) {
@@ -22,13 +22,13 @@
     vc
 }
 
-##' Extract coefficients from a fitted `scam` model.
-##'
-##' @param object a model object fitted by `scam()`
-##' @param parametrized logical; extract parametrized coefficients, which respect the linear inequality constraints of the model.
-##' @param ... other arguments.
-##'
-##' @export
+#' Extract coefficients from a fitted `scam` model.
+#'
+#' @param object a model object fitted by `scam()`
+#' @param parametrized logical; extract parametrized coefficients, which respect the linear inequality constraints of the model.
+#' @param ... other arguments.
+#'
+#' @export
 `coef.scam` <- function(object, parametrized = TRUE, ...) {
     coefs <- if (parametrized) {
         object$coefficients.t

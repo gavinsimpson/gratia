@@ -1,27 +1,27 @@
-##' Simulate example data for fitting GAMs
-##'
-##' A tidy reimplementation of the functions implemented in [mgcv::gamSim()]
-##' that can be used to fit GAMs. An new feature is that the sampling
-##' distribution can be applied to all the example types.
-##'
-##' @param model character; either `"egX"` where `X` is an integer `1:7`, or
-##'   the name of a model. See Details for possible options.
-##' @param n numeric; the number of observations to simulate.
-##' @param dist character; a sampling distribution for the response
-##'   variable.
-##' @param scale numeric; the level of noise to use.
-##' @param seed numeric; the seed for the random number generator. Passed to
-##'   [base::set.seed()].
-##'
-##' @export
-##'
-##' @examples
-##' \dontshow{
-##' set.seed(1)
-##' op <- options(digits = 5, cli.unicode = FALSE)
-##' }
-##' data_sim("eg1")
-##' \dontshow{options(op)}
+#' Simulate example data for fitting GAMs
+#'
+#' A tidy reimplementation of the functions implemented in [mgcv::gamSim()]
+#' that can be used to fit GAMs. An new feature is that the sampling
+#' distribution can be applied to all the example types.
+#'
+#' @param model character; either `"egX"` where `X` is an integer `1:7`, or
+#'   the name of a model. See Details for possible options.
+#' @param n numeric; the number of observations to simulate.
+#' @param dist character; a sampling distribution for the response
+#'   variable.
+#' @param scale numeric; the level of noise to use.
+#' @param seed numeric; the seed for the random number generator. Passed to
+#'   [base::set.seed()].
+#'
+#' @export
+#'
+#' @examples
+#' \dontshow{
+#' set.seed(1)
+#' op <- options(digits = 5, cli.unicode = FALSE)
+#' }
+#' data_sim("eg1")
+#' \dontshow{options(op)}
 `data_sim` <- function(model = "eg1", n = 400, scale = 2,
                        dist = c("normal", "poisson", "binary"),
                        seed = NULL) {
@@ -59,19 +59,19 @@
     model_fun(n = n, sim_fun = sim_fun, scale = scale)
 }
 
-##' @importFrom stats rnorm
+#' @importFrom stats rnorm
 `sim_normal` <- function(x, scale = 2, ...) {
     tibble(y = x + rnorm(length(x), mean = 0, sd = scale),
            f = x)
 }
 
-##' @importFrom stats rpois
+#' @importFrom stats rpois
 `sim_poisson` <- function(x, scale = 2, ...) {
     lam <- exp(x * scale)
     tibble(y = rpois(rep(1, length(x)), lam), f = log(lam))
 }
 
-##' @importFrom stats rbinom binomial
+#' @importFrom stats rbinom binomial
 `sim_binary` <- function(x, scale = 2, ...) {
     ilink <- inv_link(binomial())
     x <- (x - 5) * scale
@@ -102,9 +102,9 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
                     0.8 * exp(-(x - 0.7)^2/sx^2 - (z - 0.8)^2/sz^2))
 }
 
-##' @importFrom tibble tibble
-##' @importFrom dplyr mutate bind_cols
-##' @importFrom rlang .data
+#' @importFrom tibble tibble
+#' @importFrom dplyr mutate bind_cols
+#' @importFrom rlang .data
 `four_term_additive_model` <- function(n, sim_fun = sim_normal, scale = 2) {
     data <- tibble(x0 = runif(n, 0, 1), x1 = runif(n, 0, 1),
                    x2 = runif(n, 0, 1), x3 = runif(n, 0, 1))
@@ -116,9 +116,9 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
     data[c("y", "x0", "x1", "x2", "x3", "f", "f0", "f1", "f2", "f3")]
 }
 
-##' @importFrom tibble tibble
-##' @importFrom dplyr mutate bind_cols
-##' @importFrom rlang .data
+#' @importFrom tibble tibble
+#' @importFrom dplyr mutate bind_cols
+#' @importFrom rlang .data
 `correlated_four_term_additive_model` <-
     function(n, sim_fun = sim_normal, scale = 2) {
     data <- tibble(x0 = runif(n, 0, 1), x2 = runif(n, 0, 1))
@@ -133,9 +133,9 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
     data[c("y", "x0", "x1", "x2", "x3", "f", "f0", "f1", "f2", "f3")]
 }
 
-##' @importFrom tibble tibble
-##' @importFrom dplyr bind_cols
-##' @importFrom rlang .data
+#' @importFrom tibble tibble
+#' @importFrom dplyr bind_cols
+#' @importFrom rlang .data
 `bivariate_model` <- function(n, sim_fun = sim_normal, scale = 2) {
     data <- tibble(x = runif(n), z = runif(n))
     data2 <- sim_fun(x = bivariate(data$x, data$z))
@@ -143,8 +143,8 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
     data
 }
 
-##' @importFrom tibble tibble
-##' @importFrom dplyr bind_cols 
+#' @importFrom tibble tibble
+#' @importFrom dplyr bind_cols 
 `continuous_by_model` <- function(n, sim_fun = sim_normal, scale = 2) {
     data <- tibble(x1 = runif(n, 0, 1), x2 = sort(runif(n, 0, 1)))
     `f_fun` <- function(x) {
@@ -155,9 +155,9 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
     data[c("y", "x1", "x2", "f")]
 }
 
-##' @importFrom tibble tibble
-##' @importFrom dplyr bind_cols
-##' @importFrom rlang .data
+#' @importFrom tibble tibble
+#' @importFrom dplyr bind_cols
+#' @importFrom rlang .data
 `factor_by_model` <- function(n, sim_fun = sim_normal, scale = 2) {
     data <- tibble(x0 = runif(n, 0, 1), x1 = runif(n, 0, 1),
                    x2 = sort(runif(n, 0, 1)))
@@ -174,9 +174,9 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
     data[c("y", "x0", "x1", "x2", "fac", "f", "f1", "f2", "f3")]
 }
 
-##' @importFrom tibble tibble
-##' @importFrom dplyr bind_cols
-##' @importFrom rlang .data
+#' @importFrom tibble tibble
+#' @importFrom dplyr bind_cols
+#' @importFrom rlang .data
 `additive_plus_factor_model` <- function(n, sim_fun = sim_normal, scale = 2) {
     data <- tibble(x0 = rep(1:4, n / 4), x1 = runif(n, 0, 1),
                    x2 = runif(n, 0, 1), x3 = runif(n, 0, 1))
@@ -193,9 +193,9 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
     data[c("y", "x0", "x1", "x2", "x3", "f", "f0", "f1", "f2", "f3")]
 }
 
-##' @importFrom tibble tibble
-##' @importFrom dplyr bind_cols
-##' @importFrom rlang .data
+#' @importFrom tibble tibble
+#' @importFrom dplyr bind_cols
+#' @importFrom rlang .data
 `four_term_plus_ranef_model` <- function(n, sim_fun = sim_normal, scale = 2) {
     data <- four_term_additive_model(n = n, sim_fun = sim_fun, scale = 0)
     data <- mutate(data, fac = rep(1:4, n / 4))
@@ -207,16 +207,16 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
     data[c("y", "x0", "x1", "x2", "x3", "fac", "f", "f0", "f1", "f2", "f3")]
 }
 
-##' Generate reference simulations for testing
-##'
-##' @param scale numeric; the noise level.
-##' @param seed numeric; the seed to use for simulating data.
-##'
-##' @return A named list of tibbles containing
-##' 
-##' @importFrom tidyr expand_grid
-##' @importFrom purrr pmap
-##' @noRd
+#' Generate reference simulations for testing
+#'
+#' @param scale numeric; the noise level.
+#' @param seed numeric; the seed to use for simulating data.
+#'
+#' @return A named list of tibbles containing
+#' 
+#' @importFrom tidyr expand_grid
+#' @importFrom purrr pmap
+#' @noRd
 `create_reference_simulations` <- function(scale = 0.2, n = 100, seed = 42) {
     `data_sim_wrap` <- function(model, dist, scale, n, seed, ...) {
         data_sim(model, dist = dist, scale = scale, n = n, seed = seed, ...)

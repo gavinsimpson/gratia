@@ -1,17 +1,17 @@
-##' @title Derivatives of estimated smooths via finite differences
-##'
-##' @param object an R object to compute derivatives for.
-##' @param ... arguments passed to other methods.
-##'
-##' @author Gavin L. Simpson
-##'
-##' @export
+#' @title Derivatives of estimated smooths via finite differences
+#'
+#' @param object an R object to compute derivatives for.
+#' @param ... arguments passed to other methods.
+#'
+#' @author Gavin L. Simpson
+#'
+#' @export
 `derivatives` <- function(object, ...) {
     UseMethod("derivatives")
 }
 
-##' @rdname derivatives
-##' @export
+#' @rdname derivatives
+#' @export
 `derivatives.default` <- function(object, ...) {
     ## want to bail with a useful error;
     ## see Jenny Bryan's Code Smells UseR 2018 talk: rstd.io/code-smells
@@ -20,82 +20,82 @@
          call. = FALSE)           # don't show the call, simpler error
 }
 
-##' @rdname derivatives
-##'
-##' @export
+#' @rdname derivatives
+#'
+#' @export
 `derivatives.gamm` <- function(object, ...) {
     derivatives(object[["gam"]], ...)
 }
 
-##' @param term character; vector of one or more smooth terms for which
-##'   derivatives are required. If missing, derivatives for all smooth terms
-##'   will be returned. Can be a partial match to a smooth term; see argument
-##'   `partial_match` below.
-##' @param newdata a data frame containing the values of the model covariates
-##'   at which to evaluate the first derivatives of the smooths.
-##' @param order numeric; the order of derivative.
-##' @param type character; the type of finite difference used. One of
-##'   `"forward"`, `"backward"`, or `"central"`.
-##' @param n numeric; the number of points to evaluate the derivative at.
-##' @param eps numeric; the finite difference.
-##' @param interval character; the type of interval to compute. One of
-##'   `"confidence"` for point-wise intervals, or `"simultaneous"` for
-##'   simultaneous intervals.
-##' @param n_sim integer; the number of simulations used in computing the
-##'   simultaneous intervals.
-##' @param level numeric; `0 < level < 1`; the confidence level of the
-##'   point-wise or simultaneous interval. The default is `0.95` for a 95%
-##'   interval.
-##' @param unconditional logical; use smoothness selection-corrected Bayesian
-##'   covariance matrix?
-##' @param frequentist logical; use the frequentist covariance matrix?
-##' @param offset numeric; a value to use for any offset term
-##' @param ncores number of cores for generating random variables from a
-##'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
-##'   Parallelization will take place only if OpenMP is supported (but appears
-##'   to work on Windows with current `R`).
-##' @param partial_match logical; should smooths be selected by partial matches
-##'   with `term`? If `TRUE`, `term` can only be a single string to match
-##'   against.
-##'
-##' @export
-##'
-##' @importFrom dplyr filter
-##'
-##' @rdname derivatives
-##'
-##' @return A tibble, currently with the following variables:
-##' * `smooth`: the smooth each row refers to,
-##' * `var`: the name of the variable involved in the smooth,
-##' * `data`: values of `var` at which the derivative was evaluated,
-##' * `derivative`: the estimated derivative,
-##' * `se`: the standard error of the estimated derivative,
-##' * `crit`: the critical value such that `derivative` ± `(crit * se)` gives
-##'   the upper and lower bounds of the requested confidence or simultaneous
-##'   interval (given `level`),
-##' * `lower`: the lower bound of the confidence or simultaneous interval,
-##' * `upper`: the upper bound of the confidence or simultaneous interval.
-##'
-##' @examples
-##'
-##' load_mgcv()
-##' \dontshow{
-##' set.seed(42)
-##' op <- options(cli.unicode = FALSE)
-##' }
-##' dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
-##' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-##'
-##' ## first derivatives of all smooths using central finite differences
-##' derivatives(mod, type = "central")
-##'
-##' ## derivatives for a selected smooth
-##' derivatives(mod, type = "central", term = "s(x1)")
-##' ## or via a partial match
-##' derivatives(mod, type = "central", term = "x1", partial_match = TRUE)
-##' \dontshow{
-##' options(op)
-##' }
+#' @param term character; vector of one or more smooth terms for which
+#'   derivatives are required. If missing, derivatives for all smooth terms
+#'   will be returned. Can be a partial match to a smooth term; see argument
+#'   `partial_match` below.
+#' @param newdata a data frame containing the values of the model covariates
+#'   at which to evaluate the first derivatives of the smooths.
+#' @param order numeric; the order of derivative.
+#' @param type character; the type of finite difference used. One of
+#'   `"forward"`, `"backward"`, or `"central"`.
+#' @param n numeric; the number of points to evaluate the derivative at.
+#' @param eps numeric; the finite difference.
+#' @param interval character; the type of interval to compute. One of
+#'   `"confidence"` for point-wise intervals, or `"simultaneous"` for
+#'   simultaneous intervals.
+#' @param n_sim integer; the number of simulations used in computing the
+#'   simultaneous intervals.
+#' @param level numeric; `0 < level < 1`; the confidence level of the
+#'   point-wise or simultaneous interval. The default is `0.95` for a 95%
+#'   interval.
+#' @param unconditional logical; use smoothness selection-corrected Bayesian
+#'   covariance matrix?
+#' @param frequentist logical; use the frequentist covariance matrix?
+#' @param offset numeric; a value to use for any offset term
+#' @param ncores number of cores for generating random variables from a
+#'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
+#'   Parallelization will take place only if OpenMP is supported (but appears
+#'   to work on Windows with current `R`).
+#' @param partial_match logical; should smooths be selected by partial matches
+#'   with `term`? If `TRUE`, `term` can only be a single string to match
+#'   against.
+#'
+#' @export
+#'
+#' @importFrom dplyr filter
+#'
+#' @rdname derivatives
+#'
+#' @return A tibble, currently with the following variables:
+#' * `smooth`: the smooth each row refers to,
+#' * `var`: the name of the variable involved in the smooth,
+#' * `data`: values of `var` at which the derivative was evaluated,
+#' * `derivative`: the estimated derivative,
+#' * `se`: the standard error of the estimated derivative,
+#' * `crit`: the critical value such that `derivative` ± `(crit * se)` gives
+#'   the upper and lower bounds of the requested confidence or simultaneous
+#'   interval (given `level`),
+#' * `lower`: the lower bound of the confidence or simultaneous interval,
+#' * `upper`: the upper bound of the confidence or simultaneous interval.
+#'
+#' @examples
+#'
+#' load_mgcv()
+#' \dontshow{
+#' set.seed(42)
+#' op <- options(cli.unicode = FALSE)
+#' }
+#' dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
+#' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+#'
+#' ## first derivatives of all smooths using central finite differences
+#' derivatives(mod, type = "central")
+#'
+#' ## derivatives for a selected smooth
+#' derivatives(mod, type = "central", term = "s(x1)")
+#' ## or via a partial match
+#' derivatives(mod, type = "central", term = "x1", partial_match = TRUE)
+#' \dontshow{
+#' options(op)
+#' }
 `derivatives.gam` <- function(object, term, newdata, order = 1L,
                               type = c("forward", "backward", "central"),
                               n = 200, eps = 1e-7,
@@ -189,7 +189,7 @@
     result                                           # return
 }
 
-##' @importFrom tibble add_column
+#' @importFrom tibble add_column
 `derivative_pointwise_int` <- function(x, level, distrib = c("normal", "t"),
                                        df) {
     distrib <- match.arg(distrib)
@@ -206,9 +206,9 @@
     derivative
 }
 
-##' @importFrom tibble add_column
-##' @importFrom stats quantile
-##' @importFrom mvnfast rmvn
+#' @importFrom tibble add_column
+#' @importFrom stats quantile
+#' @importFrom mvnfast rmvn
 `derivative_simultaneous_int` <- function(x, Xi, level, Vb, n_sim, ncores) {
     ## simulate un-biased deviations given bayesian covariance matrix
     buDiff <- rmvn(n = n_sim, mu = rep(0, nrow(Vb)), sigma = Vb, ncores = ncores)
@@ -245,7 +245,7 @@
     X
 }
 
-##' @importFrom tibble tibble
+#' @importFrom tibble tibble
 `compute_derivative` <- function(id, lpmatrix, betas, Vb, model, newdata) {
     sm <- get_smooths_by_id(model, id)[[1L]]
     sm_var <- smooth_variable(sm)
@@ -428,10 +428,10 @@
     list(xf = x0, xb = x1, x = x2)
 }
 
-##' @importFrom dplyr bind_cols setdiff
-##' @importFrom tibble as_tibble
-##' @importFrom rlang exec !!!
-##' @importFrom tidyr expand_grid
+#' @importFrom dplyr bind_cols setdiff
+#' @importFrom tibble as_tibble
+#' @importFrom rlang exec !!!
+#' @importFrom tidyr expand_grid
 `derivative_data` <- function(model, id, n, offset = NULL,
                               order = NULL, type = NULL, eps = NULL) {
     mf <- model.frame(model)           # model.frame used to fit model
@@ -524,10 +524,10 @@
     newdata
 }
 
-##' @importFrom dplyr bind_cols setdiff
-##' @importFrom tibble as_tibble
-##' @importFrom rlang exec !!!
-##' @importFrom tidyr expand_grid
+#' @importFrom dplyr bind_cols setdiff
+#' @importFrom tibble as_tibble
+#' @importFrom rlang exec !!!
+#' @importFrom tidyr expand_grid
 `smooth_data` <- function(model, id, n, offset = NULL, include_all = FALSE) {
     mf <- model.frame(model)           # model.frame used to fit model
 
