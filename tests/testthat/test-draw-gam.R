@@ -23,6 +23,8 @@ test_that("draw.gam works for m_gamm", {
 })
 
 test_that("draw.gam works for m_gamm4", {
+    skip_on_ci()
+    skip_on_cran()
     expect_silent(plt <- draw(m_gamm4))
     expect_doppelganger("draw_gam m_gamm4", plt)
 })
