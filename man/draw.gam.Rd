@@ -162,17 +162,17 @@ draw(m1, residuals = TRUE)
 
 df2 <- data_sim(2, n = 1000, dist = "normal", scale = 1, seed = 2)
 m2 <- gam(y ~ s(x, z, k = 40), data = df2, method = "REML")
-draw(m2, contour = FALSE)
+draw(m2, contour = FALSE, n = 50)
 
 # change the number of contours drawn and the fill scale used for
 # the surface
 library("ggplot2")
-draw(m2, n_contour = 5,
+draw(m2, n_contour = 5, n = 50,
      continuous_fill = scale_fill_distiller(palette = "Spectral",
                                             type = "div"))
 
 # to modify all panels, for example to change the theme, use the & operator
-draw(m2, n_contour = 5) &
+draw(m2, n_contour = 5, n = 50) &
   theme_minimal()
 
 # customising some plot elements
