@@ -2,9 +2,21 @@
 % Please edit documentation in R/parametric-effects.R
 \name{parametric_effects}
 \alias{parametric_effects}
+\alias{parametric_effects.gam}
 \title{Estimated values for parametric model terms}
 \usage{
 parametric_effects(object, ...)
+
+\method{parametric_effects}{gam}(
+  object,
+  term = NULL,
+  data = NULL,
+  unconditional = FALSE,
+  unnest = TRUE,
+  ci_level = 0.95,
+  envir = environment(formula(object)),
+  ...
+)
 }
 \arguments{
 \item{object}{a fitted model object.}
@@ -13,8 +25,19 @@ parametric_effects(object, ...)
 
 \item{term}{character; which parametric term whose effects are evaluated.}
 
+\item{data}{a data frame of covariate values used to fit the model. Can
+be missing, in which case the data will be recovered from the model.}
+
+\item{unconditional}{logical; should confidence intervals include the
+uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian
+covariance matrix will be used.}
+
+\item{unnest}{logical; unnest the smooth objects?}
+
 \item{ci_level}{numeric; the coverage required for the confidence interval.
 Currently ignored.}
+
+\item{envir}{an environment to look up the data within.}
 }
 \description{
 Estimated values for parametric model terms
