@@ -50,6 +50,8 @@
 #'   against.
 #' @param discrete_colour,continuous_colour,continuous_fill suitable scales
 #'   for the types of data.
+#' @param position Position adjustment, either as a string, or the result of a
+#'   call to a position adjustment function.
 #' @param ncol,nrow numeric; the numbers of rows and columns over which to
 #'   spread the plots
 #' @param guides character; one of `"keep"` (the default), `"collect"`, or
@@ -240,7 +242,7 @@
 
     # Are we plotting parametric effects too?
     if (isTRUE(parametric)) {
-        para <- parametric_effects(object, term = terms, data = data,
+        para <- parametric_effects(object, term = terms, #data = data,
                                    unconditional = unconditional,
                                    unnest = TRUE, ci_level = ci_level)
         # Add CI
