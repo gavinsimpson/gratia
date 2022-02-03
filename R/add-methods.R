@@ -1,60 +1,60 @@
-##' Add fitted values from a model to a data frame
-##'
-##' @param data a data frame containing values for the variables used to fit the
-##'   model. Passed to [stats::predict()] as `newdata`.
-##' @param model a fitted model for which a [stats::predict()] method is
-##'   available. S3 method dispatch is performed on the `model` argument.
-##' @param value character; the name of the variable in which model predictions
-##'   will be stored.
-##' @param ... additional arguments passed to methods.
-##'
-##' @return A data frame (tibble) formed from `data` and fitted values from
-##'   `model`.
-##'
-##' @export
+#' Add fitted values from a model to a data frame
+#'
+#' @param data a data frame containing values for the variables used to fit the
+#'   model. Passed to [stats::predict()] as `newdata`.
+#' @param model a fitted model for which a [stats::predict()] method is
+#'   available. S3 method dispatch is performed on the `model` argument.
+#' @param value character; the name of the variable in which model predictions
+#'   will be stored.
+#' @param ... additional arguments passed to methods.
+#'
+#' @return A data frame (tibble) formed from `data` and fitted values from
+#'   `model`.
+#'
+#' @export
 `add_fitted` <- function(data, model, value = ".value", ...) {
     UseMethod("add_fitted", model)
 }
 
-##' Add fitted values from a GAM to a data frame
-##'
-##' @param type character; the type of predictions to return. See
-##'   [mgcv::predict.gam()] for options.
-##' @param prefix character; string to prepend to names of predicted values when
-##'   `type` is `"terms"`, `"iterms"`, `"lpmatrix"`. These prediction types
-##'   result in a matrix of values being returned. `prefix` will be prepended to
-##'   each of the names of columns returned by such prediction types.
-##' @param ... additional arguments passed to [mgcv::predict.gam()].
-##'
-##' @return A data frame (tibble) formed from `data` and predictions from
-##'   `model`.
-##'
-##' @inheritParams add_fitted
-##'
-##' @importFrom dplyr bind_cols
-##' @importFrom stats predict
-##' @importFrom rlang set_names !! :=
-##' @importFrom tibble as_tibble add_column
-##'
-##' @export
-##'
-##' @examples
-##'
-##' load_mgcv()
-##' \dontshow{
-##' set.seed(1)
-##' op <- options(digits = 3, cli.unicode = FALSE)
-##' }
-##' df <- gamSim(eg = 1, verbose = FALSE)
-##' df <- df[, c("y","x0","x1","x2","x3")]
-##' m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
-##'
-##' ##
-##' add_fitted(df, m)
-##'
-##' ## with type = "terms" or "iterms"
-##' add_fitted(df, m, type = "terms")
-##' \dontshow{options(op)}
+#' Add fitted values from a GAM to a data frame
+#'
+#' @param type character; the type of predictions to return. See
+#'   [mgcv::predict.gam()] for options.
+#' @param prefix character; string to prepend to names of predicted values when
+#'   `type` is `"terms"`, `"iterms"`, `"lpmatrix"`. These prediction types
+#'   result in a matrix of values being returned. `prefix` will be prepended to
+#'   each of the names of columns returned by such prediction types.
+#' @param ... additional arguments passed to [mgcv::predict.gam()].
+#'
+#' @return A data frame (tibble) formed from `data` and predictions from
+#'   `model`.
+#'
+#' @inheritParams add_fitted
+#'
+#' @importFrom dplyr bind_cols
+#' @importFrom stats predict
+#' @importFrom rlang set_names !! :=
+#' @importFrom tibble as_tibble add_column
+#'
+#' @export
+#'
+#' @examples
+#'
+#' load_mgcv()
+#' \dontshow{
+#' set.seed(1)
+#' op <- options(digits = 3, cli.unicode = FALSE)
+#' }
+#' df <- gamSim(eg = 1, verbose = FALSE)
+#' df <- df[, c("y","x0","x1","x2","x3")]
+#' m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
+#'
+#' ##
+#' add_fitted(df, m)
+#'
+#' ## with type = "terms" or "iterms"
+#' add_fitted(df, m, type = "terms")
+#' \dontshow{options(op)}
 `add_fitted.gam` <- function(data, model, value = ".value", type = "response",
                              prefix = ".", ...) {
     ## coerce to tibble
@@ -87,53 +87,53 @@
     data
 }
 
-##' Add residuals from a model to a data frame
-##'
-##' @param data a data frame containing values for the variables used to fit the
-##'   model. Passed to [stats::residuals()] as `newdata`.
-##' @param model a fitted model for which a [stats::residuals()] method is
-##'   available. S3 method dispatch is performed on the `model` argument.
-##' @param value character; the name of the variable in which model residuals
-##'   will be stored.
-##' @param ... additional arguments passed to methods.
-##'
-##' @return A data frame (tibble) formed from `data` and residuals from `model`.
-##'
-##' @export
+#' Add residuals from a model to a data frame
+#'
+#' @param data a data frame containing values for the variables used to fit the
+#'   model. Passed to [stats::residuals()] as `newdata`.
+#' @param model a fitted model for which a [stats::residuals()] method is
+#'   available. S3 method dispatch is performed on the `model` argument.
+#' @param value character; the name of the variable in which model residuals
+#'   will be stored.
+#' @param ... additional arguments passed to methods.
+#'
+#' @return A data frame (tibble) formed from `data` and residuals from `model`.
+#'
+#' @export
 `add_residuals` <- function(data, model, value = ".residual", ...) {
     UseMethod("add_residuals", model)
 }
 
-##' Add residuals from a GAM to a data frame
-##'
-##' @param type character; the type of residuals to return. See
-##'   [mgcv::residuals.gam()] for options.
-##' @param ... additional arguments passed to [mgcv::residuals.gam()].
-##'
-##' @return A data frame (tibble) formed from `data` and residuals from `model`.
-##'
-##' @inheritParams add_fitted
-##'
-##' @importFrom dplyr bind_cols
-##' @importFrom stats residuals
-##' @importFrom rlang set_names !! :=
-##' @importFrom tibble as_tibble add_column
-##'
-##' @export
-##'
-##' @examples
-##' load_mgcv()
-##' \dontshow{
-##' set.seed(1)
-##' op <- options(digits = 5, cli.unicode = FALSE)
-##' }
-##' df <- gamSim(eg = 1, verbose = FALSE)
-##' df <- df[, c("y","x0","x1","x2","x3")]
-##' m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
-##'
-##' ##
-##' add_residuals(df, m)
-##' \dontshow{options(op)}
+#' Add residuals from a GAM to a data frame
+#'
+#' @param type character; the type of residuals to return. See
+#'   [mgcv::residuals.gam()] for options.
+#' @param ... additional arguments passed to [mgcv::residuals.gam()].
+#'
+#' @return A data frame (tibble) formed from `data` and residuals from `model`.
+#'
+#' @inheritParams add_fitted
+#'
+#' @importFrom dplyr bind_cols
+#' @importFrom stats residuals
+#' @importFrom rlang set_names !! :=
+#' @importFrom tibble as_tibble add_column
+#'
+#' @export
+#'
+#' @examples
+#' load_mgcv()
+#' \dontshow{
+#' set.seed(1)
+#' op <- options(digits = 5, cli.unicode = FALSE)
+#' }
+#' df <- gamSim(eg = 1, verbose = FALSE)
+#' df <- df[, c("y","x0","x1","x2","x3")]
+#' m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
+#'
+#' ##
+#' add_residuals(df, m)
+#' \dontshow{options(op)}
 `add_residuals.gam` <- function(data, model, value = ".residual",
                                 type = "deviance", ...) {
     ## coerce to tibble
@@ -153,43 +153,43 @@
     data
 }
 
-##' Add partial residuals
-##'
-##' @param data a data frame containing values for the variables used to fit the
-##'   model. Passed to [stats::residuals()] as `newdata`.
-##' @param model a fitted model for which a [stats::residuals()] method is
-##'   available. S3 method dispatch is performed on the `model` argument.
-##' @param ... arguments passed to other methods.
-##'
-##' @export
+#' Add partial residuals
+#'
+#' @param data a data frame containing values for the variables used to fit the
+#'   model. Passed to [stats::residuals()] as `newdata`.
+#' @param model a fitted model for which a [stats::residuals()] method is
+#'   available. S3 method dispatch is performed on the `model` argument.
+#' @param ... arguments passed to other methods.
+#'
+#' @export
 `add_partial_residuals` <- function(data, model, ...) {
     UseMethod("add_partial_residuals", model)
 }
 
-##' @rdname add_partial_residuals
-##'
-##' @inheritParams partial_residuals.gam
-##'
-##' @export
-##'
-##' @importFrom tibble is_tibble as_tibble
-##' @importFrom dplyr bind_cols
-##'
-##' @examples
-##' load_mgcv()
-##' \dontshow{
-##' op <- options(digits = 4, cli.unicode = FALSE)
-##' }
-##' df <- data_sim("eg1", seed = 1)
-##' df <- df[, c("y","x0","x1","x2","x3")]
-##' m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
-##'
-##' ## add partial residuals
-##' add_partial_residuals(df, m)
-##'
-##' ## add partial residuals for selected smooths
-##' add_partial_residuals(df, m, select = "s(x0)")
-##' \dontshow{options(op)}
+#' @rdname add_partial_residuals
+#'
+#' @inheritParams partial_residuals.gam
+#'
+#' @export
+#'
+#' @importFrom tibble is_tibble as_tibble
+#' @importFrom dplyr bind_cols
+#'
+#' @examples
+#' load_mgcv()
+#' \dontshow{
+#' op <- options(digits = 4, cli.unicode = FALSE)
+#' }
+#' df <- data_sim("eg1", seed = 1)
+#' df <- df[, c("y","x0","x1","x2","x3")]
+#' m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
+#'
+#' ## add partial residuals
+#' add_partial_residuals(df, m)
+#'
+#' ## add partial residuals for selected smooths
+#' add_partial_residuals(df, m, select = "s(x0)")
+#' \dontshow{options(op)}
 `add_partial_residuals.gam` <- function(data, model, select = NULL,
                                         partial_match = FALSE,
                                         ...) {
@@ -217,21 +217,23 @@
     data
 }
 
-##' Add a constant to estimated values
-##'
-##' @param object a object to add a constant to.
-##' @param constant the constant to add.
-##' @param ... additional arguments passed to methods.
-##'
-##' @return Returns `object` but with the estimate shifted by the addition of
-##'   the supplied constant.
-##'
-##' @author Gavin L. Simpson
+#' Add a constant to estimated values
+#'
+#' @param object a object to add a constant to.
+#' @param constant the constant to add.
+#' @param ... additional arguments passed to methods.
+#' @param column character; for the `"tbl_df"` method, which column to add the
+#'   constant too.
+#'
+#' @return Returns `object` but with the estimate shifted by the addition of
+#'   the supplied constant.
+#'
+#' @author Gavin L. Simpson
 `add_constant` <- function(object, constant = NULL, ...) {
     UseMethod("add_constant")
 }
 
-##' @rdname add_constant
+#' @rdname add_constant
 `add_constant.evaluated_smooth` <- function(object, constant = NULL, ...) {
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {
@@ -245,7 +247,7 @@
     object
 }
 
-##' @rdname add_constant
+#' @rdname add_constant
 `add_constant.mgcv_smooth` <- function(object, constant = NULL, ...) {
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {
@@ -259,7 +261,40 @@
     object
 }
 
-##' @rdname add_constant
+#' @rdname add_constant
+`add_constant.parametric_effects` <- function(object, constant = NULL,
+                                              ...) {
+    ## If constant supplied, add it to `est`
+    if (!is.null(constant)) {
+        if (!is.numeric(constant)) {
+            stop("'constant' must be numeric, but was supplied <", constant,
+                 ">", call. = FALSE)
+        }
+        object[["partial"]] <- object[["partial"]] + constant
+    }
+
+    object
+}
+
+#' @rdname add_constant
+`add_constant.tbl_df` <- function(object, constant = NULL, column = NULL,
+                                  ...) {
+    if (is.null(column)) {
+        stop("'column' to modify must be supplied.")
+    }
+    ## If constant supplied, add it to `est`
+    if (!is.null(constant)) {
+        if (!is.numeric(constant)) {
+            stop("'constant' must be numeric, but was supplied <", constant,
+                 ">", call. = FALSE)
+        }
+        object[[column]] <- object[[column]] + constant
+    }
+
+    object
+}
+
+#' @rdname add_constant
 `add_constant.evaluated_parametric_term` <- function(object, constant = NULL,
                                                      ...) {
     ## If constant supplied, add it to `est`
@@ -275,23 +310,23 @@
 }
 
 
-##' Add a confidence interval to an existing object
-##'
-##' @param object a R object.
-##' @param coverage numeric; the coverage for the interval. Must be in the range
-##'   0 < `coverage` < 1.
-##' @param ... arguments passed to other methods.
-##'
-##' @export
+#' Add a confidence interval to an existing object
+#'
+#' @param object a R object.
+#' @param coverage numeric; the coverage for the interval. Must be in the range
+#'   0 < `coverage` < 1.
+#' @param ... arguments passed to other methods.
+#'
+#' @export
 `add_confint` <- function(object, coverage = 0.95, ...) {
     UseMethod("add_confint")
 }
 
-##' @rdname add_confint
-##' @importFrom rlang .data
-##' @importFrom dplyr mutate
-##'
-##' @export
+#' @rdname add_confint
+#' @importFrom rlang .data
+#' @importFrom dplyr mutate
+#'
+#' @export
 `add_confint.smooth_estimates` <- function(object, coverage = 0.95, ...) {
     # check if this is nested
     nms <- names(object)
@@ -314,11 +349,11 @@
     object
 }
 
-##' @rdname add_confint
-##' @importFrom rlang .data
-##' @importFrom dplyr %>% mutate relocate
-##'
-##' @export
+#' @rdname add_confint
+#' @importFrom rlang .data
+#' @importFrom dplyr %>% mutate relocate
+#'
+#' @export
 `add_confint.default` <- function(object, coverage = 0.95, ...) {
     nms <- names(object)
 
