@@ -9,7 +9,7 @@ parametric_effects(object, ...)
 
 \method{parametric_effects}{gam}(
   object,
-  term = NULL,
+  terms = NULL,
   data = NULL,
   unconditional = FALSE,
   unnest = TRUE,
@@ -23,7 +23,8 @@ parametric_effects(object, ...)
 
 \item{...}{arguments passed to other methods.}
 
-\item{term}{character; which parametric term whose effects are evaluated.}
+\item{terms}{character; which model parametric terms should be drawn? The
+Default of \code{NULL} will plot all parametric terms that can be drawn.}
 
 \item{data}{a data frame of covariate values used to fit the model. Can
 be missing, in which case the data will be recovered from the model.}
