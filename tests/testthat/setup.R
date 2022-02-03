@@ -43,9 +43,21 @@ su_m_bivar <- gam(y ~ s(x, z, k = 40),
                   data = su_eg2,
                   method = "REML")
 
+su_m_bivar_te <- gam(y ~ te(x, z), data = su_eg2, method = "REML")
+
+su_m_cont_by <- gam(y ~ s(x2, by = x1), data = su_eg3, method = "REML")
+
 su_m_factor_by <- gam(y ~ fac + s(x2, by = fac) + s(x0),
                       data = su_eg4,
                       method = "REML")
+
+su_m_factor_by_gamm <- gamm(y ~ fac + s(x2, by = fac) + s(x0),
+                            data = su_eg4, REML = TRUE)
+
+su_m_factor_by_gamm4 <- gamm4(y ~ fac + s(x2, by = fac) + s(x0),
+                              data = su_eg4, REML = TRUE)
+
+su_m_factor_by_bam <- bam(y ~ fac + s(x2, by = fac) + s(x0), data = su_eg4)
 
 su_m_factor_by_x2 <- gam(y ~ fac + s(x2, by = fac),
                          data = su_eg4,
@@ -53,7 +65,7 @@ su_m_factor_by_x2 <- gam(y ~ fac + s(x2, by = fac),
 
 su_gamm_univar_4 <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3),
                          data = su_eg1,
-                        method = "REML")
+                         method = "REML")
 
 m_1_smooth <- gam(y ~ s(x0), data = quick_eg1, method = "REML")
 m_gam <- su_m_univar_4

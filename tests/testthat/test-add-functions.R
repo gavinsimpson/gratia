@@ -5,51 +5,51 @@ library("testthat")
 library("gratia")
 library("mgcv")
 
-set.seed(42)
-data <- gamSim(eg = 1, verbose = FALSE)
+#set.seed(42)
+#data <- gamSim(eg = 1, verbose = FALSE)
 ## take only some columns
-data <- data[, c("y","x0","x1","x2","x3")]
+data <- su_eg1[, c("y", "x0", "x1", "x2", "x3")]
 ## fit the model
-m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = data, method = 'REML')
+#m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1, method = 'REML')
 
 test_that("add_fitted works for a GAM", {
-    expect_silent(df <- add_fitted(data, m))
+    expect_silent(df <- add_fitted(data, m_gam))
     expect_s3_class(df, "tbl_df")
     expect_named(df, c("y", "x0", "x1", "x2", "x3", ".value"))
 })
 
 test_that("add_fitted works for a GAM with type = 'terms'", {
-    expect_silent(df <- add_fitted(data, m, type = 'terms'))
+    expect_silent(df <- add_fitted(data, m_gam, type = 'terms'))
     expect_s3_class(df, "tbl_df")
     expect_named(df, c("y", "x0", "x1", "x2", "x3", ".constant",
                        ".s(x0)", ".s(x1)", ".s(x2)", ".s(x3)"))
 })
 
 test_that("add_fitted works for a GAM with se.fit = TRUE", {
-    expect_silent(df <- add_fitted(data, m, se.fit = TRUE))
+    expect_silent(df <- add_fitted(data, m_gam, se.fit = TRUE))
     expect_s3_class(df, "tbl_df")
     expect_named(df, c("y", "x0", "x1", "x2", "x3", ".value"))
 })
 
 test_that("prefix works for a GAM with type = 'terms'", {
-    expect_silent(df <- add_fitted(data, m, type = 'terms', prefix = ".."))
+    expect_silent(df <- add_fitted(data, m_gam, type = 'terms', prefix = ".."))
     expect_s3_class(df, "tbl_df")
     expect_named(df, c("y", "x0", "x1", "x2", "x3", "..constant",
                        "..s(x0)", "..s(x1)", "..s(x2)", "..s(x3)"))
 })
 
 test_that("add_residuals works for a GAM", {
-    expect_silent(df <- add_residuals(data, m, type = "pearson"))
+    expect_silent(df <- add_residuals(data, m_gam, type = "pearson"))
     expect_s3_class(df, "tbl_df")
     expect_named(df, c("y", "x0", "x1", "x2", "x3", ".residual"))
 })
 
 test_that("add_partial_residuals works for a GAM", {
-    expect_silent(df <- add_partial_residuals(data, m))
+    expect_silent(df <- add_partial_residuals(data, m_gam))
     expect_s3_class(df, "tbl_df")
     expect_named(df, c("y", "x0", "x1", "x2", "x3",
                        "s(x0)", "s(x1)", "s(x2)", "s(x3)"))
-    expect_silent(df <- add_partial_residuals(data, m, select = "s(x2)"))
+    expect_silent(df <- add_partial_residuals(data, m_gam, select = "s(x2)"))
     expect_s3_class(df, "tbl_df")
     expect_named(df, c("y", "x0", "x1", "x2", "x3", "s(x2)"))
 })
