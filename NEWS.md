@@ -1,4 +1,4 @@
-# gratia 0.6.9820
+# gratia 0.6.9830
 
 ## Major changes
 
@@ -7,6 +7,10 @@
   compared to `evaluate_smooth()` and its methods, which will allow for future
   development and addition of features more easily than if `evaluate_smooth()`
   had been retained.
+
+  Similarly, `evaluate_parametric_terms()` is now deprecated in favour of
+  `parametric_effects()`, which is also used internally by `draw.gam()` if
+  parametric terms are present in the model.
 
   While a lot of code has been reused so differences between plots as a result
   of this change should be minimal, some corner cases may have been missed. File
@@ -49,12 +53,27 @@ can handle more types of models and smooths, especially so in the case of
   for fitted models. Currently only for models fitted with `poisson()`,
   `nb()`, `negbin()`, `gaussian()` families.
 
-* `typical_values()` is a new helper function to return typical values for the 
-  covariates of a fitted model. It returns the value of the observation closest
-  to the median for numerical covariates or the modal level of a factor while
-  preserving the levels of that factor. `typical_values()` is useful in
-  preparing data slices or scenarios for which fitted values from the estimated
-  model are required.
+* New helper functions `typical_values()`, `factor_combos()` and
+  `data_combos()` for quickly creating data sets for producing predictions from
+  fitted models where some of the covariates are fixed at come typical or
+  representative values.
+
+    `typical_values()` is a new helper function to return typical values for the 
+    covariates of a fitted model. It returns the value of the observation closest
+    to the median for numerical covariates or the modal level of a factor while
+    preserving the levels of that factor. `typical_values()` is useful in
+    preparing data slices or scenarios for which fitted values from the estimated
+    model are required.
+    
+    `factor_combos()` extracts and returns the combinations of levels of factors found in data used to fit a model. Unlike `typical_values()`,
+    `factor_combos()` returns all of the combinations of factor levels observed
+    in the data, not just the modal level. Optionally, all combinations of
+    factor levels can be returned, not just those in the observed data.
+    
+    `data_combos()` combines returns the factor data from `factor_combos()` plus
+    the typical values of numerical covariates. This is useful if you want to
+    generate predictions from the model for each combinationn of factor terms
+    while holding any continuous covariates at their median values.
 
 * `nb_theta()` is a new extractor function that returns the theta parameter of
   a fitted negative binomial GAM (families `nb()` or `negbin()`).
