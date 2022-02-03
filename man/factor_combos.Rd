@@ -2,9 +2,12 @@
 % Please edit documentation in R/data-slice.R
 \name{factor_combos}
 \alias{factor_combos}
+\alias{factor_combos.gam}
 \title{All combinations of factor levels}
 \usage{
 factor_combos(object, ...)
+
+\method{factor_combos}{gam}(object, vars = everything(), complete = TRUE, ...)
 }
 \arguments{
 \item{object}{a fitted model object.}

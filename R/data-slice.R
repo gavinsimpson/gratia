@@ -259,7 +259,7 @@
 #' @importFrom purrr cross_df
 #' @importFrom rlang enquo
 #' @importFrom tidyr nesting expand
-#' @rdname data_combos
+#' @rdname factor_combos
 `factor_combos.gam` <- function(object, vars = everything(),
                                 complete = TRUE, ...) {
     # extract the summary from the fitted GAM
@@ -296,6 +296,7 @@
     UseMethod("data_combos")
 }
 
+#' @inheritParams factor_combos
 #' @export
 #' @rdname data_combos
 `data_combos.gam` <- function(object, vars = everything(),
