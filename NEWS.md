@@ -58,14 +58,15 @@ can handle more types of models and smooths, especially so in the case of
   fitted models where some of the covariates are fixed at come typical or
   representative values.
 
-    `typical_values()` is a new helper function to return typical values for the 
-    covariates of a fitted model. It returns the value of the observation closest
-    to the median for numerical covariates or the modal level of a factor while
-    preserving the levels of that factor. `typical_values()` is useful in
-    preparing data slices or scenarios for which fitted values from the estimated
-    model are required.
+    `typical_values()` is a new helper function to return typical values for the
+    covariates of a fitted model. It returns the value of the observation
+    closest to the median for numerical covariates or the modal level of a
+    factor while preserving the levels of that factor. `typical_values()` is
+    useful in preparing data slices or scenarios for which fitted values from
+    the estimated model are required.
     
-    `factor_combos()` extracts and returns the combinations of levels of factors found in data used to fit a model. Unlike `typical_values()`,
+    `factor_combos()` extracts and returns the combinations of levels of factors
+    found in data used to fit a model. Unlike `typical_values()`,
     `factor_combos()` returns all of the combinations of factor levels observed
     in the data, not just the modal level. Optionally, all combinations of
     factor levels can be returned, not just those in the observed data.
