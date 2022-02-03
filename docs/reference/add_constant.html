@@ -61,6 +61,12 @@
 <span class="co"># S3 method for mgcv_smooth</span>
 <span class="fu">add_constant</span><span class="op">(</span><span class="va">object</span>, constant <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
 
+<span class="co"># S3 method for parametric_effects</span>
+<span class="fu">add_constant</span><span class="op">(</span><span class="va">object</span>, constant <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
+
+<span class="co"># S3 method for tbl_df</span>
+<span class="fu">add_constant</span><span class="op">(</span><span class="va">object</span>, constant <span class="op">=</span> <span class="cn">NULL</span>, column <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
+
 <span class="co"># S3 method for evaluated_parametric_term</span>
 <span class="fu">add_constant</span><span class="op">(</span><span class="va">object</span>, constant <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
     </div>
@@ -73,6 +79,9 @@
 <dd><p>the constant to add.</p></dd>
 <dt>...</dt>
 <dd><p>additional arguments passed to methods.</p></dd>
+<dt>column</dt>
+<dd><p>character; for the <code>"tbl_df"</code> method, which column to add the
+constant too.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>

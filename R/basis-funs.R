@@ -1,39 +1,39 @@
-##' Basis expansions for smooths
-##' 
-##' Creates a basis expansion from a definition of a smoother using the syntax
-##'   of *mgcv*'s smooths via [mgcv::s()]., [mgcv::te()], [mgcv::ti()], and
-##'   [mgcv::t2()].
-##'
-##' @param smooth a smooth specification, the result of a call to one of
-##'   [mgcv::s()]., [mgcv::te()], [mgcv::ti()], or [mgcv::t2()].
-##' @param data a data frame containing the variables used in `smooth`.
-##' @param knots a list or data frame with named components containing
-##'   knots locations. Names must match the covariates for which the basis
-##'   is required. See [mgcv::smoothCon()].
-##' @param constraints logical; should identifiability constraints be applied to
-##'   the smooth basis. See argument `absorb.cons` in [mgcv::smoothCon()].
-##' @param ... other arguments passed to [mgcv::smoothCon()].
-##'
-##' @return A tibble.
-##'
-##' @author Gavin L. Simpson
-##'
-##' @export
-##'
-##' @importFrom mgcv smoothCon
-##' @importFrom dplyr bind_rows
-##' 
-##' @examples
-##' load_mgcv()
-##' \dontshow{
-##' set.seed(42)
-##' op <- options(digits = 3, cli.unicode = FALSE)
-##' }
-##' df <- gamSim(4, n = 400, verbose = FALSE)
-##'
-##' bf <- basis(s(x0), data = df)
-##' bf <- basis(s(x2, by = fac, bs = 'bs'), data = df, constraints = TRUE)
-##' \dontshow{options(op)}
+#' Basis expansions for smooths
+#' 
+#' Creates a basis expansion from a definition of a smoother using the syntax
+#'   of *mgcv*'s smooths via [mgcv::s()]., [mgcv::te()], [mgcv::ti()], and
+#'   [mgcv::t2()].
+#'
+#' @param smooth a smooth specification, the result of a call to one of
+#'   [mgcv::s()]., [mgcv::te()], [mgcv::ti()], or [mgcv::t2()].
+#' @param data a data frame containing the variables used in `smooth`.
+#' @param knots a list or data frame with named components containing
+#'   knots locations. Names must match the covariates for which the basis
+#'   is required. See [mgcv::smoothCon()].
+#' @param constraints logical; should identifiability constraints be applied to
+#'   the smooth basis. See argument `absorb.cons` in [mgcv::smoothCon()].
+#' @param ... other arguments passed to [mgcv::smoothCon()].
+#'
+#' @return A tibble.
+#'
+#' @author Gavin L. Simpson
+#'
+#' @export
+#'
+#' @importFrom mgcv smoothCon
+#' @importFrom dplyr bind_rows
+#' 
+#' @examples
+#' load_mgcv()
+#' \dontshow{
+#' set.seed(42)
+#' op <- options(digits = 3, cli.unicode = FALSE)
+#' }
+#' df <- gamSim(4, n = 400, verbose = FALSE)
+#'
+#' bf <- basis(s(x0), data = df)
+#' bf <- basis(s(x2, by = fac, bs = 'bs'), data = df, constraints = TRUE)
+#' \dontshow{options(op)}
 `basis` <- function(smooth, data, knots = NULL, constraints = FALSE,
                     ...) {
     ## call smoothCon to create the basis as specified in `x`
@@ -58,20 +58,20 @@
     bfuns
 }
 
-##' A tidy basis representation of a smooth object
-##'
-##' Takes an object of class `mgcv.smooth` and returns a tidy representation
-##' of the basis.
-##'
-##' @param smooth a smooth object.
-##' @param data a data frame containing the variables used in `smooth`.
-##'
-##' @return A tibble.
-##' @author Gavin L. Simpson
-##'
-##' @importFrom tibble as_tibble add_column
-##' @importFrom tidyr gather
-##' @importFrom dplyr bind_cols everything select matches
+#' A tidy basis representation of a smooth object
+#'
+#' Takes an object of class `mgcv.smooth` and returns a tidy representation
+#' of the basis.
+#'
+#' @param smooth a smooth object.
+#' @param data a data frame containing the variables used in `smooth`.
+#'
+#' @return A tibble.
+#' @author Gavin L. Simpson
+#'
+#' @importFrom tibble as_tibble add_column
+#' @importFrom tidyr gather
+#' @importFrom dplyr bind_cols everything select matches
 `tidy_basis` <- function(smooth, data) {
     check_is_mgcv_smooth(smooth) # check `smooth` is of the correct type
     tbl <- smooth[["X"]]         # extract the model matrix

@@ -53,7 +53,19 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">parametric_effects</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">parametric_effects</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span>
+
+<span class="co"># S3 method for gam</span>
+<span class="fu">parametric_effects</span><span class="op">(</span>
+  <span class="va">object</span>,
+  term <span class="op">=</span> <span class="cn">NULL</span>,
+  data <span class="op">=</span> <span class="cn">NULL</span>,
+  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,
+  unnest <span class="op">=</span> <span class="cn">TRUE</span>,
+  ci_level <span class="op">=</span> <span class="fl">0.95</span>,
+  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span><span class="op">)</span>,
+  <span class="va">...</span>
+<span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -64,9 +76,20 @@
 <dd><p>arguments passed to other methods.</p></dd>
 <dt>term</dt>
 <dd><p>character; which parametric term whose effects are evaluated.</p></dd>
+<dt>data</dt>
+<dd><p>a data frame of covariate values used to fit the model. Can
+be missing, in which case the data will be recovered from the model.</p></dd>
+<dt>unconditional</dt>
+<dd><p>logical; should confidence intervals include the
+uncertainty due to smoothness selection? If <code>TRUE</code>, the corrected Bayesian
+covariance matrix will be used.</p></dd>
+<dt>unnest</dt>
+<dd><p>logical; unnest the smooth objects?</p></dd>
 <dt>ci_level</dt>
 <dd><p>numeric; the coverage required for the confidence interval.
 Currently ignored.</p></dd>
+<dt>envir</dt>
+<dd><p>an environment to look up the data within.</p></dd>
 </dl></div>
 
   </div>

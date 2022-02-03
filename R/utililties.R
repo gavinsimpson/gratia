@@ -1025,6 +1025,8 @@ vars_from_label <- function(label) {
 #' @param object an object to apply the transform function to.
 #' @param fun the function to apply.
 #' @param ... additional arguments passed to methods.
+#' @param column character; for the `"tbl_df"` method, which column to
+#'   transform.
 #'
 #' @return Returns `object` but with the estimate and upper and lower values
 #'   of the confidence interval transformed via the function.
@@ -1070,6 +1072,43 @@ vars_from_label <- function(label) {
     if (!is.null(fun)) {
         fun <- match.fun(fun)
         object[["est"]] <- fun(object[["est"]])
+        if (!is.null(object[["upper"]])) {
+            object[["upper"]] <- fun(object[["upper"]])
+        }
+        if (!is.null(object[["lower"]])) {
+            object[["lower"]] <- fun(object[["lower"]])
+        }
+    }
+
+    object
+}
+
+#' @rdname transform_fun
+`transform_fun.parametric_effects` <- function(object, fun = NULL, ...) {
+    ## If fun supplied, use it to transform est and the upper and lower interval
+    if (!is.null(fun)) {
+        fun <- match.fun(fun)
+        object[["partial"]] <- fun(object[["partial"]])
+        if (!is.null(object[["upper"]])) {
+            object[["upper"]] <- fun(object[["upper"]])
+        }
+        if (!is.null(object[["lower"]])) {
+            object[["lower"]] <- fun(object[["lower"]])
+        }
+    }
+
+    object
+}
+
+#' @rdname transform_fun
+`transform_fun.tbl_df` <- function(object, fun = NULL, column = NULL, ...) {
+    if (is.null(column)) {
+        stop("'column' to modify must be supplied.")
+    }
+    ## If fun supplied, use it to transform est and the upper and lower interval
+    if (!is.null(fun)) {
+        fun <- match.fun(fun)
+        object[[column]] <- fun(object[[column]])
         if (!is.null(object[["upper"]])) {
             object[["upper"]] <- fun(object[["upper"]])
         }

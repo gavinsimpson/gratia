@@ -4,6 +4,8 @@
 \alias{add_constant}
 \alias{add_constant.evaluated_smooth}
 \alias{add_constant.mgcv_smooth}
+\alias{add_constant.parametric_effects}
+\alias{add_constant.tbl_df}
 \alias{add_constant.evaluated_parametric_term}
 \title{Add a constant to estimated values}
 \usage{
@@ -13,6 +15,10 @@ add_constant(object, constant = NULL, ...)
 
 \method{add_constant}{mgcv_smooth}(object, constant = NULL, ...)
 
+\method{add_constant}{parametric_effects}(object, constant = NULL, ...)
+
+\method{add_constant}{tbl_df}(object, constant = NULL, column = NULL, ...)
+
 \method{add_constant}{evaluated_parametric_term}(object, constant = NULL, ...)
 }
 \arguments{
@@ -21,6 +27,9 @@ add_constant(object, constant = NULL, ...)
 \item{constant}{the constant to add.}
 
 \item{...}{additional arguments passed to methods.}
+
+\item{column}{character; for the \code{"tbl_df"} method, which column to add the
+constant too.}
 }
 \value{
 Returns \code{object} but with the estimate shifted by the addition of

@@ -62,7 +62,13 @@
 <span class="fu">transform_fun</span><span class="op">(</span><span class="va">object</span>, fun <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="co"># S3 method for evaluated_parametric_term</span>
-<span class="fu">transform_fun</span><span class="op">(</span><span class="va">object</span>, fun <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+<span class="fu">transform_fun</span><span class="op">(</span><span class="va">object</span>, fun <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
+
+<span class="co"># S3 method for parametric_effects</span>
+<span class="fu">transform_fun</span><span class="op">(</span><span class="va">object</span>, fun <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
+
+<span class="co"># S3 method for tbl_df</span>
+<span class="fu">transform_fun</span><span class="op">(</span><span class="va">object</span>, fun <span class="op">=</span> <span class="cn">NULL</span>, column <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -73,6 +79,9 @@
 <dd><p>the function to apply.</p></dd>
 <dt>...</dt>
 <dd><p>additional arguments passed to methods.</p></dd>
+<dt>column</dt>
+<dd><p>character; for the <code>"tbl_df"</code> method, which column to
+transform.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>

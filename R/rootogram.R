@@ -1,51 +1,51 @@
 ## Add rootogram support for suitable distributions
 
-##' Rootograms to assess goodness of model fit
-##'
-##' A rootogram is a model diagnostic tool that assesses the goodness of fit of
-##' a statistical model. The observed values of the response are compared with
-##' those expected from the fitted model. For discrete, count responses, the
-##' frequency of each count (0, 1, 2, etc) in the observed data and expected
-##' from the conditional distribution of the response implied by the model are
-##' compared. For continuous variables, the observed and expected frequencies
-##' are obtained by grouping the data into bins. The rootogram is drawn using
-##' [ggplot2::ggplot()] graphics. The design closely follows Kleiber & Zeileis
-##' (2016).
-##'
-##' @param object an R object
-##' @param max_count integer; the largest count to consider
-##' @param breaks for continuous responses, how to group the response. Can be
-##'   anything that is acceptable as the `breaks` argument of
-##'   [graphics::hist.default()]
-##' @param ... arguments passed to other methods
-##'
-##' @references Kleiber, C., Zeileis, A., (2016) Visualizing Count Data
-##'   Regressions Using Rootograms. *Am. Stat.* **70**, 296–303.
-##'   \doi{10.1080/00031305.2016.1173590}
-##'
-##' @export
-##' @examples
-##' load_mgcv()
-##' df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
-##'
-##' # A poisson example
-##' m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
-##'          s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
-##' rg <- rootogram(m)
-##' rg
-##' draw(rg) # plot the rootogram
-##'
-##' # A Gaussian example
-##' df <- data_sim("eg1", dist = "normal", seed = 2)
-##' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
-##' draw(rootogram(m, breaks = "FD"), type = "suspended")
+#' Rootograms to assess goodness of model fit
+#'
+#' A rootogram is a model diagnostic tool that assesses the goodness of fit of
+#' a statistical model. The observed values of the response are compared with
+#' those expected from the fitted model. For discrete, count responses, the
+#' frequency of each count (0, 1, 2, etc) in the observed data and expected
+#' from the conditional distribution of the response implied by the model are
+#' compared. For continuous variables, the observed and expected frequencies
+#' are obtained by grouping the data into bins. The rootogram is drawn using
+#' [ggplot2::ggplot()] graphics. The design closely follows Kleiber & Zeileis
+#' (2016).
+#'
+#' @param object an R object
+#' @param max_count integer; the largest count to consider
+#' @param breaks for continuous responses, how to group the response. Can be
+#'   anything that is acceptable as the `breaks` argument of
+#'   [graphics::hist.default()]
+#' @param ... arguments passed to other methods
+#'
+#' @references Kleiber, C., Zeileis, A., (2016) Visualizing Count Data
+#'   Regressions Using Rootograms. *Am. Stat.* **70**, 296–303.
+#'   \doi{10.1080/00031305.2016.1173590}
+#'
+#' @export
+#' @examples
+#' load_mgcv()
+#' df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
+#'
+#' # A poisson example
+#' m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
+#'          s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
+#' rg <- rootogram(m)
+#' rg
+#' draw(rg) # plot the rootogram
+#'
+#' # A Gaussian example
+#' df <- data_sim("eg1", dist = "normal", seed = 2)
+#' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+#' draw(rootogram(m, breaks = "FD"), type = "suspended")
 `rootogram` <- function(object, ...) {
     UseMethod("rootogram")
 }
 
-##' @rdname rootogram
-##' @importFrom stringr str_detect str_to_title
-##' @export
+#' @rdname rootogram
+#' @importFrom stringr str_detect str_to_title
+#' @export
 `rootogram.gam` <- function(object, max_count = NULL, breaks = "Sturges", ...) {
     ## limit this to a few distributions at the moment
     distrs <- c("poisson", "Negative Binomial", "gaussian")
@@ -68,10 +68,10 @@
     df
 }
 
-##' @importFrom purrr map_dfc
-##' @importFrom stats dpois na.omit
-##' @importFrom tibble tibble
-##' @keywords internal
+#' @importFrom purrr map_dfc
+#' @importFrom stats dpois na.omit
+#' @importFrom tibble tibble
+#' @keywords internal
 `fitted_poisson` <- function(model, max_count = NULL) {
     mf <- model.frame(model)
     y <- model.response(mf)
@@ -90,10 +90,10 @@
            fitted = fitted)
 }
 
-##' @importFrom purrr map_dfc
-##' @importFrom stats dnbinom na.omit
-##' @importFrom tibble tibble
-##' @keywords internal
+#' @importFrom purrr map_dfc
+#' @importFrom stats dnbinom na.omit
+#' @importFrom tibble tibble
+#' @keywords internal
 `fitted_neg_bin` <- function(model, max_count = NULL) {
     mf <- model.frame(model)
     y <- model.response(mf)
@@ -115,11 +115,11 @@
     df
 }
 
-##' @importFrom purrr map_dfc
-##' @importFrom stats pnorm na.omit
-##' @importFrom graphics hist
-##' @importFrom tibble tibble
-##' @keywords internal
+#' @importFrom purrr map_dfc
+#' @importFrom stats pnorm na.omit
+#' @importFrom graphics hist
+#' @importFrom tibble tibble
+#' @keywords internal
 `fitted_gaussian` <- function(model, breaks = NULL) {
     if (is.null(breaks)) {
         breaks <- "Sturges" ## give same breaks as those of hist()
@@ -148,63 +148,63 @@
 }
 
 ## try to match countreg::rootogram
-##' @noRd
-##' @keywords internal
+#' @noRd
+#' @keywords internal
 `rootogram_max_count` <- function(y) {
     max(1.5 * max(y), 20L)
 }
 
-##' Draw a rootogram
-##'
-##' A rootogram is a model diagnostic tool that assesses the goodness of fit of
-##' a statistical model. The observed values of the response are compared with
-##' those expected from the fitted model. For discrete, count responses, the
-##' frequency of each count (0, 1, 2, etc) in the observed data and expected
-##' from the conditional distribution of the response implied by the model are
-##' compared. For continuous variables, the observed and expected frequencies
-##' are obtained by grouping the data into bins. The rootogram is drawn using
-##' [ggplot2::ggplot()] graphics. The design closely follows Kleiber & Zeileis
-##' (2016).
-##'
-##' @param type character; the type of rootogram to draw.
-##' @param sqrt logical; show the observed and fitted frequencies
-##' @param ref_line logical; draw a reference line at zero?
-##' @param warn_limits logical; draw Tukey's warning limit lines at +/- 1?
-##' @param fitted_colour,bar_colour,bar_fill,ref_line_colour,warn_line_colour
-##'   colours used to draw the respective element of the rootogram.
-##' @param xlab,ylab character; labels for the x and y axis of the rootogram.
-##'   May be missing (`NULL`), in which case suitable labels will be used.
-##''
-##' @inheritParams draw
-##'
-##' @references Kleiber, C., Zeileis, A., (2016) Visualizing Count Data
-##'   Regressions Using Rootograms. *Am. Stat.* **70**, 296–303.
-##'   \doi{10.1080/00031305.2016.1173590}
-##'
-##' @return A 'ggplot' object.
-##'
-##' @family draw methods
-##' @seealso [rootogram()] to compute the data for the rootogram.
-##'
-##' @export
-##' @importFrom rlang .data
-##' @importFrom dplyr mutate
-##' @importFrom ggplot2 ggplot aes_string geom_rect geom_point geom_line labs geom_hline
-##'
-##' @examples
-##' load_mgcv()
-##' df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
-##'
-##' # A poisson example
-##' m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
-##'          s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
-##' rg <- rootogram(m)
-##'
-##' # plot the rootogram
-##' draw(rg)
-##'
-##' # change the type of rootogram
-##' draw(rg, type = "suspended")
+#' Draw a rootogram
+#'
+#' A rootogram is a model diagnostic tool that assesses the goodness of fit of
+#' a statistical model. The observed values of the response are compared with
+#' those expected from the fitted model. For discrete, count responses, the
+#' frequency of each count (0, 1, 2, etc) in the observed data and expected
+#' from the conditional distribution of the response implied by the model are
+#' compared. For continuous variables, the observed and expected frequencies
+#' are obtained by grouping the data into bins. The rootogram is drawn using
+#' [ggplot2::ggplot()] graphics. The design closely follows Kleiber & Zeileis
+#' (2016).
+#'
+#' @param type character; the type of rootogram to draw.
+#' @param sqrt logical; show the observed and fitted frequencies
+#' @param ref_line logical; draw a reference line at zero?
+#' @param warn_limits logical; draw Tukey's warning limit lines at +/- 1?
+#' @param fitted_colour,bar_colour,bar_fill,ref_line_colour,warn_line_colour
+#'   colours used to draw the respective element of the rootogram.
+#' @param xlab,ylab character; labels for the x and y axis of the rootogram.
+#'   May be missing (`NULL`), in which case suitable labels will be used.
+#''
+#' @inheritParams draw
+#'
+#' @references Kleiber, C., Zeileis, A., (2016) Visualizing Count Data
+#'   Regressions Using Rootograms. *Am. Stat.* **70**, 296–303.
+#'   \doi{10.1080/00031305.2016.1173590}
+#'
+#' @return A 'ggplot' object.
+#'
+#' @family draw methods
+#' @seealso [rootogram()] to compute the data for the rootogram.
+#'
+#' @export
+#' @importFrom rlang .data
+#' @importFrom dplyr mutate
+#' @importFrom ggplot2 ggplot aes_string geom_rect geom_point geom_line labs geom_hline
+#'
+#' @examples
+#' load_mgcv()
+#' df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
+#'
+#' # A poisson example
+#' m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
+#'          s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
+#' rg <- rootogram(m)
+#'
+#' # plot the rootogram
+#' draw(rg)
+#'
+#' # change the type of rootogram
+#' draw(rg, type = "suspended")
 `draw.rootogram` <- function(object,
                              type = c("hanging", "standing", "suspended"),
                              sqrt = TRUE,

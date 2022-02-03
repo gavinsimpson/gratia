@@ -103,6 +103,9 @@
     <loc>https://gavinsimpson.github.io/gratia/reference/draw.mgcv_smooth.html</loc>
   </url>
   <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.parametric_effects.html</loc>
+  </url>
+  <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/draw.penalty_df.html</loc>
   </url>
   <url>
@@ -113,6 +116,9 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/draw.smooth_samples.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw_parametric_effect.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/edf.html</loc>
