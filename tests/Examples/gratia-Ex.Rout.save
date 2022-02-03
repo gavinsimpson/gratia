@@ -724,17 +724,17 @@ detaching ‘package:mgcv’
 > 
 > df2 <- data_sim(2, n = 1000, dist = "normal", scale = 1, seed = 2)
 > m2 <- gam(y ~ s(x, z, k = 40), data = df2, method = "REML")
-> draw(m2, contour = FALSE)
+> draw(m2, contour = FALSE, n = 50)
 > 
 > # change the number of contours drawn and the fill scale used for
 > # the surface
 > library("ggplot2")
-> draw(m2, n_contour = 5,
+> draw(m2, n_contour = 5, n = 50,
 +      continuous_fill = scale_fill_distiller(palette = "Spectral",
 +                                             type = "div"))
 > 
 > # to modify all panels, for example to change the theme, use the & operator
-> draw(m2, n_contour = 5) &
+> draw(m2, n_contour = 5, n = 50) &
 +   theme_minimal()
 > 
 > # customising some plot elements
@@ -1320,11 +1320,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x561100cf28b0>
+<environment: 0x55f51b657278>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x561100cf28b0>
+<environment: 0x55f51b657278>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1932,7 +1932,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  20.058 0.192 20.419 0 0 
+Time elapsed:  20.846 0.148 21.176 0 0 
 > grDevices::dev.off()
 null device 
           1 
