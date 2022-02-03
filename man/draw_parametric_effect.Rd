@@ -60,6 +60,9 @@ supplied, a suitable label will be generated from \code{object}.}
 
 \item{rug}{logical; draw a rug plot at the botom of each plot?}
 
+\item{position}{Position adjustment, either as a string, or the result of a
+call to a position adjustment function.}
+
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
 \description{

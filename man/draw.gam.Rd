@@ -120,6 +120,9 @@ against.}
 \item{discrete_colour, continuous_colour, continuous_fill}{suitable scales
 for the types of data.}
 
+\item{position}{Position adjustment, either as a string, or the result of a
+call to a position adjustment function.}
+
 \item{ncol, nrow}{numeric; the numbers of rows and columns over which to
 spread the plots}
 
