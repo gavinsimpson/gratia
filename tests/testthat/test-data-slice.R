@@ -122,3 +122,67 @@ test_that("typical_values works when excluding terms", {
     expect_identical(ncol(tv), 2L)
     expect_identical(names(tv), c("x1","x3"))
 })
+
+# factor_combos()
+test_that("factor_combos works with a simple GAM", {
+    expect_silent(fc <- factor_combos(m_para_sm))
+    expect_s3_class(fc, "tbl_df")
+    expect_identical(nrow(fc), 12L)
+    expect_identical(ncol(fc), 2L)
+    expect_named(fc, c("fac", "ff"))
+})
+
+test_that("factor_combos works when including terms", {
+    expect_silent(fc <- factor_combos(m_para_sm, vars = fac))
+    expect_s3_class(fc, "tbl_df")
+    expect_identical(nrow(fc), 3L)
+    expect_identical(ncol(fc), 1L)
+    expect_named(fc, c("fac"))
+})
+
+test_that("factor_combos works when excluding terms", {
+    expect_silent(fc <- factor_combos(m_para_sm, vars = !fac))
+    expect_s3_class(fc, "tbl_df")
+    expect_identical(nrow(fc), 4L)
+    expect_identical(ncol(fc), 1L)
+    expect_named(fc, c("ff"))
+})
+
+test_that("factor_combos works when there are no factor terms", {
+    expect_message(fc <- factor_combos(m_gam, vars = !fac),
+                   "Model contains no factor terms")
+    expect_identical(fc, NULL)
+})
+
+# data_combos()
+test_that("data_combos works with a GAM", {
+    expect_silent(dc <- data_combos(m_para_sm))
+    expect_s3_class(dc, "tbl_df")
+    expect_identical(nrow(dc), 12L)
+    expect_identical(ncol(dc), 5L)
+    expect_named(dc, c("fac", "ff", "x0", "x1", "x2"))
+})
+
+test_that("data_combos works when including terms", {
+    expect_silent(dc <- data_combos(m_para_sm, vars = c(fac, x0)))
+    expect_s3_class(dc, "tbl_df")
+    expect_identical(nrow(dc), 12L)
+    expect_identical(ncol(dc), 2L)
+    expect_named(dc, c("fac", "x0"))
+})
+
+test_that("data_combos works when exluding terms", {
+    expect_silent(dc <- data_combos(m_para_sm, vars = !c(fac, x0)))
+    expect_s3_class(dc, "tbl_df")
+    expect_identical(nrow(dc), 12L)
+    expect_identical(ncol(dc), 3L)
+    expect_named(dc, c("ff", "x1", "x2"))
+})
+
+test_that("data_combos works when there are no factor terms", {
+    expect_message(dc <- data_combos(m_gam),
+                   "Model contains no factor terms")
+    expect_identical(nrow(dc), 1L)
+    expect_identical(ncol(dc), 4L)
+    expect_named(dc, c("x0", "x1", "x2", "x3"))
+})
