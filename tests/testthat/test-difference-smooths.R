@@ -28,6 +28,8 @@ test_that("difference_smooths() works for a bam model", {
 
 test_that("difference_smooths() works for a gamm model", {
     skip_on_cran()
+    skip_on_windows()
+    skip_on_mac()
     expect_silent(ds <- difference_smooths(su_m_factor_by_gamm,
                                            smooth = "s(x2)"))
     expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
