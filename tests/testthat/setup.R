@@ -143,7 +143,11 @@ m_ar1_by <- bam(y ~ series + s(x, k = 20, by = series), data = df, rho = rho,
 # A standard GAM with multiple factors
 set.seed(1)
 df_2_fac <- add_column(su_eg4,
-                       ff = as.character(sample(LETTERS[1:4], nrow(su_eg4),
+                       ff = factor(sample(LETTERS[1:4], nrow(su_eg4),
                                                 replace = TRUE)))
+# a GAM with multiple factor parametric terms
 m_2_fac <- gam(y ~ fac * ff + s(x0) + s(x1) + s(x2),
                data = df_2_fac, method = "REML")
+# a GAM with parametric terms (factor and linear) and smooth terms
+m_para_sm <- gam(y ~ fac * ff + x0 + s(x1) + s(x2),
+                 data = df_2_fac, method = "REML")
