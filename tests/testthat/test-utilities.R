@@ -327,6 +327,22 @@ test_that("term_names works with a gam", {
     expect_silent(tn <- term_names(m_gam))
 })
 
+test_that("term_names works with a mgcv smooth", {
+    expect_silent(tn <- term_names(get_smooth(m_gam, term = "s(x0)")))
+    expect_identical(tn, "x0")
+
+    expect_silent(tn <- term_names(get_smooth(su_m_factor_by,
+                                              term = "s(x2):fac2")))
+    expect_identical(tn, c("x2", "fac"))
+})
+
+test_that("term_names fails if not a gam", {
+    skip_on_cran()
+    expect_error(tn <- gratia:::term_names.gam(m_glm),
+      "`object` does not contain `pred.formula`; is this is fitted GAM?",
+      fixed = TRUE)
+})
+
 test_that("term_names works with a gamm", {
     expect_silent(tn <- term_names(m_gamm))
 })
