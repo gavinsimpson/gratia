@@ -227,25 +227,3 @@ test_that("check_user_data works when passed a vector with 1 var", {
     expect_silent(df <- check_user_data(1:10, vars = "x1"))
     expect_s3_class(df, c("tbl_df", "tbl", "data.frame"))
 })
-
-test_that("add_confint works for smooth_estimates", {
-    expect_silent(sm <- smooth_estimates(m_gam))
-    expect_silent(sm <- add_confint(sm, coverage = 0.89))
-    expect_s3_class(sm, c("smooth_estimates", "tbl_df", "tbl", "data.frame"))
-    expect_named(sm, c("smooth", "type", "by", "est", "se", "x0",
-                       "x1", "x2", "x3", "lower_ci","upper_ci"))
-    expect_identical(nrow(sm), 400L)
-    expect_identical(ncol(sm), 11L)
-})
-
-test_that("add_confint works for smooth_estimates", {
-    expect_silent(sm <- smooth_estimates(m_gam, unnest = FALSE))
-    expect_error(add_confint(sm),
-                 "Did you use `smooth_estimates(..., unnest = FALSE)`?",
-                 fixed = TRUE)
-})
-
-test_that("add_confint.default fails is no est and se", {
-    expect_error(add_confint(typical_values(m_gam)),
-                 "'object' does not contain one or both of 'est' or 'se'.")
-})
