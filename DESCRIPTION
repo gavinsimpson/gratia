@@ -39,7 +39,8 @@ Suggests:
     MASS,
     scam,
     datasets,
-    withr
+    withr,
+    knitr
 Description: Graceful 'ggplot'-based graphics and utility functions for working with generalized additive models (GAMs) fitted using the 'mgcv' package. Provides a reimplementation of the plot() method for GAMs that 'mgcv' provides, as well as 'tidyverse' compatible representations of estimated smooths.
 License: MIT + file LICENSE
 LazyData: true
@@ -48,4 +49,5 @@ BugReports: https://github.com/gavinsimpson/gratia/issues
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Encoding: UTF-8
+VignetteBuilder: knitr
 Config/testthat/edition: 3
