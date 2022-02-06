@@ -48,7 +48,7 @@
             stop(sprintf("Term is not in the parametric part of model: <%s>",
                          terms))
         }
-        valid_terms
+        terms[valid_terms]
     }
 
     # check order of terms; if > 1 interaction and not handled
