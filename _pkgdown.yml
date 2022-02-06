@@ -9,4 +9,4 @@ template:
 navbar:
   structure:
   left: [intro, reference, news]
-  right: [github]
+  right: [search, github]
