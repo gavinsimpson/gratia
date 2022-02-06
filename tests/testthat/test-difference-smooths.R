@@ -15,6 +15,15 @@ test_that("difference_smooths() works for a gam model", {
     expect_doppelganger("draw difference_smooths gam", plt)
 })
 
+test_that("difference_smooths() works for a gam model fixed scales", {
+    expect_silent(ds <- difference_smooths(su_m_factor_by, smooth = "s(x2)"))
+    expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
+
+    ## plot
+    plt <- draw(ds, scales = "fixed")
+    expect_doppelganger("draw difference_smooths gam fixed scales", plt)
+})
+
 test_that("difference_smooths() works for a bam model", {
     skip_on_cran()
     expect_silent(ds <- difference_smooths(su_m_factor_by_bam,
