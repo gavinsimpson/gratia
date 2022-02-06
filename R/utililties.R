@@ -1202,7 +1202,7 @@ vars_from_label <- function(label) {
 #' @export
 `term_names.gamm` <- function(object, ...) {
     object <- object[["gam"]]
-    NextMethod()
+    term_names(object)
 }
 
 #' Identify all terms that are involved in a smooth

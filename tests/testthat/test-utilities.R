@@ -322,3 +322,11 @@ test_that("is_gamm4 returns false for something that isn't a gamm4 model object"
     expect_false(is_gamm4(m_gamm))
     expect_false(is_gamm4(list(gam = 1:3, mer = 1:4)))
 })
+
+test_that("term_names works with a gam", {
+    expect_silent(tn <- term_names(m_gam))
+})
+
+test_that("term_names works with a gamm", {
+    expect_silent(tn <- term_names(m_gamm))
+})
