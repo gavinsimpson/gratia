@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.9999</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,9 +48,9 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.6.9999" id="gratia-069999">gratia 0.6.9999<a class="anchor" aria-label="anchor" href="#gratia-069999"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.7.0" id="gratia-070">gratia 0.7.0<a class="anchor" aria-label="anchor" href="#gratia-070"></a></h2>
 <div class="section level3">
-<h3 id="major-changes-0-6-9999">Major changes<a class="anchor" aria-label="anchor" href="#major-changes-0-6-9999"></a></h3>
+<h3 id="major-changes-0-7-0">Major changes<a class="anchor" aria-label="anchor" href="#major-changes-0-7-0"></a></h3>
 <ul><li>
 <p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> now uses <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> internally and consequently uses its <code><a href="../reference/draw.html">draw()</a></code> method and underlying plotting code. This has simplified the code compared to <code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code> and its methods, which will allow for future development and addition of features more easily than if <code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code> had been retained.</p>
 <p>Similarly, <code>evaluate_parametric_terms()</code> is now deprecated in favour of <code><a href="../reference/parametric_effects.html">parametric_effects()</a></code>, which is also used internally by <code><a href="../reference/draw.gam.html">draw.gam()</a></code> if parametric terms are present in the model.</p>
@@ -58,7 +58,7 @@
 </li>
 <li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> now plots 2D isotropic smooths (TPRS and Duchon splines) with equally-scaled x and y coordinates using <code>coord_equal(ratio = 1)</code>. Alignment of these plots will be a little different now when plotting models with multiple smooths. See Issue <a href="https://github.com/gavinsimpson/gratia/issues/81" class="external-link">#81</a>.</p></li>
 </ul><div class="section level4">
-<h4 id="deprecated-functions-0-6-9999">Deprecated functions<a class="anchor" aria-label="anchor" href="#deprecated-functions-0-6-9999"></a></h4>
+<h4 id="deprecated-functions-0-7-0">Deprecated functions<a class="anchor" aria-label="anchor" href="#deprecated-functions-0-7-0"></a></h4>
 <p>From version 0.7.0, the following functions are considered deprecated and their use is dicouraged:</p>
 <ul><li><p><code><a href="../reference/fderiv.html">fderiv()</a></code> is <em>soft</em>-deprecated in favour of <code><a href="../reference/derivatives.html">derivatives()</a></code>.</p></li>
 <li><p><code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code> is <em>soft</em>-deprecated in favour of <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code></p></li>
@@ -66,7 +66,7 @@
 </div>
 </div>
 <div class="section level3">
-<h3 id="new-features-0-6-9999">New features<a class="anchor" aria-label="anchor" href="#new-features-0-6-9999"></a></h3>
+<h3 id="new-features-0-7-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-0"></a></h3>
 <ul><li>
 <p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> provides a tidy wrapper around <code>predict.gam()</code> for generating fitted values from the model. New covariate values can be provide via argument <code>data</code>. A credible interval on the fitted values is returned, and values can be on the link (linear predictor) or response scale.</p>
 <p>Note that this function returns expected values of the response. Hence “fitted values” is used instead of “predictions” in the case of new covariate values to differentiate these values from the case of generating new response values from a fitted model.</p>
@@ -92,7 +92,7 @@
 <li><p>The <code><a href="../reference/draw.html">draw()</a></code> method for <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> can now handle 2D smooths. Additionally, the number of posterior draws to plot can now be specified when plotting using new argument <code>n_samples</code>, which will result in <code>n_samples</code> draws being selected at random from the set of draws for plotting. New argument <code>seed</code> allows the selection of draws to be repeatable.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-6-9999">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-6-9999"></a></h3>
+<h3 id="bug-fixes-0-7-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-0"></a></h3>
 <ul><li><p><code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> was not filtering user-supplied data for the by level of the specific smooth when used with by factor smooths. This would result in the smooth being evaluated at all rows of the user-supplied data, and therefore would result in <code>nrow(user_data) * nlevels(by_variable)</code> rows in the returned object instead of <code>nrow(user_data)</code> rows.</p></li>
 <li><p>The <code><a href="../reference/add_confint.html">add_confint()</a></code> method for <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> had the upper and lower intervals reversed. <a href="https://github.com/gavinsimpson/gratia/issues/107" class="external-link">#107</a> Reported by <a href="https://github.com/Aariq" class="external-link">@Aariq</a></p></li>
 <li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> and <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> were both ignoring the <code>dist</code> argument that allows covariate values that lie too far from the support of the data to be excluded when returning estimated values from the smooth and plotting it. <a href="https://github.com/gavinsimpson/gratia/issues/111" class="external-link">#111</a> Reported by <a href="https://github.com/Aariq" class="external-link">@Aariq</a></p></li>
