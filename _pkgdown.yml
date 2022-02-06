@@ -1,0 +1,12 @@
+authors:
+  Gavin L Simpson:
+    href: https://fromthebottomoftheheap.net
+
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+navbar:
+  structure:
+  left: [intro, reference, news]
+  right: [github]
