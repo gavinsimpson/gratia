@@ -404,6 +404,12 @@ test_that("draw works for sample_smooths objects", {
     expect_doppelganger("draw smooth_samples for GAM m3 fixed scales", plt)
 })
 
+test_that("draw works for sample_smooths objects", {
+    sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478)
+    plt <- draw(sm2, alpha = 0.7, contour = TRUE)
+    expect_doppelganger("draw smooth_samples for bivariate GAM contours", plt)
+})
+
 test_that("draw works for sample_smooths objects with n_samples", {
     sm1 <- smooth_samples(su_m_univar_4, n = 15, seed = 23478)
     plt <- draw(sm1, alpha = 0.7, n_samples = 6)
