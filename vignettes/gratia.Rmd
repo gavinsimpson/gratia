@@ -1,5 +1,5 @@
 ---
-title: "Get started with *gratia*"
+title: "Get started with gratia"
 output: 
   rmarkdown::html_vignette:
     fig_width: 8
