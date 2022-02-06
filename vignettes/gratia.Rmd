@@ -19,5 +19,91 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library("gratia")
-library("mgcv")
+load_mgcv() # load mgcv quietly
+```
+
+gratia is a package to make working with generalized additive models (GAMs) in R
+easier, including producing plots of estimated smooths using the ggplot2
+&#128230;.
+
+This introduction will cover some of the basic functionality of gratia to get
+you started. We'll work with some classic simulated data often used to
+illustrate properties of GAMs
+
+```{r data-sim}
+df <- data_sim("eg1", seed = 42)
+df
+```
+
+and the following GAM
+
+```{r fit-gam}
+m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+summary(m)
+```
+
+## Plotting
+
+gratia provides the `draw()` function to produce plots using the ggplot2
+&#128230;. To draw the estimated smooths from the GAM we fitted above, use
+
+```{r draw-gam}
+draw(m)
+```
+
+This is intended as reasonable overview of the estimated model, but it offers
+limited option to modify the resulting plot. If you want full control, you can
+obtain the data used to create the plot above with `smooth_estimates()`
+
+```{r smooth-estimates}
+sm <- smooth_estimates(m)
+sm
+```
+
+which will evaluate all smooths are unevenly spaced values over the range of the
+covariate(s). If you want to evaluate only selected smooths, you can specify
+which via the `smooth` argument. This takes the *smooth labels* which are the
+names of the smooths as they are known to mgcv. To list the labels for the
+smooths in use
+```{r smooths}
+smooths(m)
+```
+To evaluate only $f(x_2)$ use
+```{r smooth-estimates-x2}
+sm <- smooth_estimates(m, smooth = "s(x2)")
+sm
+```
+Then you can generate your own plot using the ggplot2 package, for example
+```{r ggplot-smooth}
+library("ggplot2")
+library("dplyr")
+sm %>%
+  add_confint() %>%
+  ggplot(aes(y = est, x = x2)) +
+    geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci),
+                alpha = 0.2, fill = "forestgreen") +
+    geom_line(colour = "forestgreen", size = 1.5) +
+    labs(y = "Partial effect",
+         title = expression("Partial effect of" ~ f(x[2])),
+         x = expression(x[2]))
+```
+
+## Model diagnostics
+
+The `appraise()` function provides standard diagnotic plots for GAMs
+
+```{r appraise}
+appraise(m)
+```
+
+The plots produced are (from left-to-right, top-to-bottom),
+* a quantile-quantile (QQ) plot of deviance residuals,
+* a scatterplot of deviance residuals against the linear predictor,
+* a histogram of deviance residuals, and
+* a scatterplot of observed vs fitted values.
+
+Adding partial residuals to the partial effect plots produced by `draw()`
+can also help diagnose problems with the model, such as undersmoothing
+```{r draw-partial-residuals}
+draw(m, residuals = TRUE)
 ```
