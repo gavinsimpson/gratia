@@ -5,12 +5,8 @@ library("testthat")
 library("mgcv")
 library("gratia")
 
-set.seed(42)
-cont_by_data <- gamSim(3, n = 400, verbose = FALSE)
-cont_by_gam <- gam(y ~ s(x2, by = x1), data = cont_by_data)
-
 test_that("smooth_samples works for a continuous by GAM", {
-    expect_silent(sm <- smooth_samples(cont_by_gam, n = 5, n_vals = 100,
+    expect_silent(sm <- smooth_samples(su_m_cont_by, n = 5, n_vals = 100,
                                        seed = 42))
     expect_s3_class(sm, c("smooth_samples", "posterior_samples", "tbl_df",
                           "tbl", "data.frame"))

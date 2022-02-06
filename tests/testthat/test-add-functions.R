@@ -80,7 +80,8 @@ test_that("add_partial_residuals works for a GAM", {
     expect_s3_class(df, "tbl_df")
     expect_named(df, c("y", "x0", "x1", "x2", "x3",
                        "s(x0)", "s(x1)", "s(x2)", "s(x3)"))
-    expect_silent(df <- add_partial_residuals(data, m_na_excl, select = "s(x2)"))
+    expect_silent(df <- add_partial_residuals(data, m_na_excl,
+                  select = "s(x2)"))
     expect_s3_class(df, "tbl_df")
     expect_named(df, c("y", "x0", "x1", "x2", "x3", "s(x2)"))
 })
