@@ -1,4 +1,4 @@
-# gratia 0.6.9999
+# gratia 0.7.0
 
 ## Major changes
 
