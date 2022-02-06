@@ -374,3 +374,24 @@ test_that("term_variables works for a terms", {
     expect_identical(term_variables(terms(m_para_sm), term = "fac:ff"),
                      c("fac", "ff"))
 })
+
+test_that("transform_fun works for parametric_effects", {
+    expect_message(pe <- parametric_effects(m_para_sm),
+                   "Interaction terms are not currently supported.")
+    expect_silent(pe <- transform_fun(pe, fun = abs))
+    expect_true(all(!pe$partial < 0L))
+})
+
+test_that("transform_fun works for evaluated_smooth", {
+    expect_warning(sm <- evaluate_smooth(m_gam, smooth = "s(x1)"))
+    expect_silent(sm <- transform_fun(sm, fun = exp))
+})
+
+test_that("transform_fun works for evaluated_smooth", {
+    expect_silent(sm <- smooth_estimates(m_gam, smooth = "s(x1)"))
+    expect_silent(sm <- transform_fun(sm, fun = exp))
+})
+
+test_that("transform_fun works for tbl", {
+    expect_silent(tbl <- transform_fun(su_eg1, fun = abs, column = "y"))
+})

@@ -3,6 +3,7 @@
 \name{transform_fun}
 \alias{transform_fun}
 \alias{transform_fun.evaluated_smooth}
+\alias{transform_fun.smooth_estimates}
 \alias{transform_fun.mgcv_smooth}
 \alias{transform_fun.evaluated_parametric_term}
 \alias{transform_fun.parametric_effects}
@@ -12,6 +13,8 @@
 transform_fun(object, fun = NULL, ...)
 
 \method{transform_fun}{evaluated_smooth}(object, fun = NULL, ...)
+
+\method{transform_fun}{smooth_estimates}(object, fun = NULL, ...)
 
 \method{transform_fun}{mgcv_smooth}(object, fun = NULL, ...)
 

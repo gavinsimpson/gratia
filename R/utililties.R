@@ -1041,6 +1041,7 @@ vars_from_label <- function(label) {
 }
 
 #' @rdname transform_fun
+#' @export
 `transform_fun.evaluated_smooth` <- function(object, fun = NULL, ...) {
     ## If fun supplied, use it to transform est and the upper and lower interval
     if (!is.null(fun)) {
@@ -1058,6 +1059,25 @@ vars_from_label <- function(label) {
 }
 
 #' @rdname transform_fun
+#' @export
+`transform_fun.smooth_estimates` <- function(object, fun = NULL, ...) {
+    ## If fun supplied, use it to transform est and the upper and lower interval
+    if (!is.null(fun)) {
+        fun <- match.fun(fun)
+        object[["est"]] <- fun(object[["est"]])
+        if (!is.null(object[["upper"]])) {
+            object[["upper"]] <- fun(object[["upper"]])
+        }
+        if (!is.null(object[["lower"]])) {
+            object[["lower"]] <- fun(object[["lower"]])
+        }
+    }
+
+    object
+}
+
+#' @rdname transform_fun
+#' @export
 `transform_fun.mgcv_smooth` <- function(object, fun = NULL, ...) {
     if (!is.null(fun)) {
         fun <- match.fun(fun)
@@ -1071,6 +1091,7 @@ vars_from_label <- function(label) {
 }
 
 #' @rdname transform_fun
+#' @export
 `transform_fun.evaluated_parametric_term` <- function(object, fun = NULL, ...) {
     ## If fun supplied, use it to transform est and the upper and lower interval
     if (!is.null(fun)) {
@@ -1088,6 +1109,7 @@ vars_from_label <- function(label) {
 }
 
 #' @rdname transform_fun
+#' @export
 `transform_fun.parametric_effects` <- function(object, fun = NULL, ...) {
     ## If fun supplied, use it to transform est and the upper and lower interval
     if (!is.null(fun)) {
@@ -1105,6 +1127,7 @@ vars_from_label <- function(label) {
 }
 
 #' @rdname transform_fun
+#' @export
 `transform_fun.tbl_df` <- function(object, fun = NULL, column = NULL, ...) {
     if (is.null(column)) {
         stop("'column' to modify must be supplied.")
