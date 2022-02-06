@@ -1,9 +1,9 @@
 ---
-title: "Getting Started"
+title: "Get started with *gratia*"
 output: 
   rmarkdown::html_vignette:
-    fig_width: 6
-    fig_height: 4
+    fig_width: 8
+    fig_height: 5.3333
 vignette: >
   %\VignetteIndexEntry{Getting Started}
   %\VignetteEngine{knitr::rmarkdown}
@@ -97,13 +97,21 @@ appraise(m)
 ```
 
 The plots produced are (from left-to-right, top-to-bottom),
+
 * a quantile-quantile (QQ) plot of deviance residuals,
 * a scatterplot of deviance residuals against the linear predictor,
 * a histogram of deviance residuals, and
 * a scatterplot of observed vs fitted values.
 
 Adding partial residuals to the partial effect plots produced by `draw()`
-can also help diagnose problems with the model, such as undersmoothing
+can also help diagnose problems with the model, such as oversmoothing
 ```{r draw-partial-residuals}
 draw(m, residuals = TRUE)
 ```
+
+## Want to learn more?
+
+*gratia* is in very active development and an area of development that is
+currently lacking is documentation. To find out more about the package, look at
+the [help pages for the package](https://gavinsimpson.github.io/gratia/reference/index.html)
+and look at the examples for more code to help you get going.
