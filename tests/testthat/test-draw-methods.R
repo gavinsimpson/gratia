@@ -342,28 +342,18 @@ test_that("draw.derivates() plots derivatives for a GAM", {
 
 ## test that issue 39 stays fixed
 test_that("draw.gam doesn't create empty plots with multiple parametric terms", {
-    #set.seed(42)
-    #dat <- gamSim(4, n = 300, verbose = FALSE)
-    dat <- transform(su_eg4, fac = factor(fac), fac2 = factor(fac)) # 2nd factor
-    ## GAM with 2 factors and 2 numeric terms
-    m2f <- gam(y ~ s(x0) + s(x1) + fac + fac2, data = dat,
-               family = gaussian(link = "identity"))
-    plt <- draw(m2f)
+    plt <- draw(m_2_fac)
     expect_doppelganger("draw issue 39 empty plots", plt)
 })
 
 test_that("draw.mgcv_smooth() can plot basic smooth bases", {
-    set.seed(42)
-    dat <- gamSim(1, n = 400, verbose = FALSE)
-    bs <- basis(s(x0), data = dat)
+    bs <- basis(s(x0), data = su_eg1)
     plt <- draw(bs)
     expect_doppelganger("draw basic tprs basis", plt)
 })
 
 test_that("draw.mgcv_smooth() can plot by factor basis smooth bases", {
-    set.seed(42)
-    dat <- gamSim(4, n = 400, verbose = FALSE)
-    bs <- basis(s(x2, by = fac), data = dat)
+    bs <- basis(s(x2, by = fac), data = su_eg4)
     plt <- draw(bs)
     expect_doppelganger("draw by factor basis", plt)
 })
@@ -408,6 +398,10 @@ test_that("draw works for sample_smooths objects", {
     sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478)
     plt <- draw(sm3, alpha = 0.7)
     expect_doppelganger("draw smooth_samples for GAM m3", plt)
+
+    sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478)
+    plt <- draw(sm3, alpha = 0.7, scales = "fixed", seed = 23478)
+    expect_doppelganger("draw smooth_samples for GAM m3 fixed scales", plt)
 })
 
 test_that("draw works for sample_smooths objects with n_samples", {
