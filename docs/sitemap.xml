@@ -1,321 +1,321 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/404.html</loc>
   </url>
   <url>
-    <loc>/LICENSE-text.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>/LICENSE.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/LICENSE.html</loc>
   </url>
   <url>
-    <loc>/articles/gratia.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/articles/gratia.html</loc>
   </url>
   <url>
-    <loc>/articles/index.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/articles/index.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/authors.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/index.html</loc>
   </url>
   <url>
-    <loc>/news/index.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/news/index.html</loc>
   </url>
   <url>
-    <loc>/reference/add_confint.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/add_confint.html</loc>
   </url>
   <url>
-    <loc>/reference/add_constant.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/add_constant.html</loc>
   </url>
   <url>
-    <loc>/reference/add_fitted.gam.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/add_fitted.gam.html</loc>
   </url>
   <url>
-    <loc>/reference/add_fitted.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/add_fitted.html</loc>
   </url>
   <url>
-    <loc>/reference/add_partial_residuals.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/add_partial_residuals.html</loc>
   </url>
   <url>
-    <loc>/reference/add_residuals.gam.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/add_residuals.gam.html</loc>
   </url>
   <url>
-    <loc>/reference/add_residuals.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/add_residuals.html</loc>
   </url>
   <url>
-    <loc>/reference/appraise.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/appraise.html</loc>
   </url>
   <url>
-    <loc>/reference/basis.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/basis.html</loc>
   </url>
   <url>
-    <loc>/reference/bird_move.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/bird_move.html</loc>
   </url>
   <url>
-    <loc>/reference/check_user_select_smooths.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/check_user_select_smooths.html</loc>
   </url>
   <url>
-    <loc>/reference/coef.scam.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/coef.scam.html</loc>
   </url>
   <url>
-    <loc>/reference/compare_smooths.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/compare_smooths.html</loc>
   </url>
   <url>
-    <loc>/reference/confint.fderiv.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/confint.fderiv.html</loc>
   </url>
   <url>
-    <loc>/reference/confint.gam.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/confint.gam.html</loc>
   </url>
   <url>
-    <loc>/reference/data_combos.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/data_combos.html</loc>
   </url>
   <url>
-    <loc>/reference/data_sim.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/data_sim.html</loc>
   </url>
   <url>
-    <loc>/reference/data_slice.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/data_slice.html</loc>
   </url>
   <url>
-    <loc>/reference/datagen.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/datagen.html</loc>
   </url>
   <url>
-    <loc>/reference/derivatives.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/derivatives.html</loc>
   </url>
   <url>
-    <loc>/reference/difference_smooths.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/difference_smooths.html</loc>
   </url>
   <url>
-    <loc>/reference/draw.compare_smooths.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.compare_smooths.html</loc>
   </url>
   <url>
-    <loc>/reference/draw.derivatives.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.derivatives.html</loc>
   </url>
   <url>
-    <loc>/reference/draw.difference_smooth.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.difference_smooth.html</loc>
   </url>
   <url>
-    <loc>/reference/draw.evaluated_smooth.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.evaluated_smooth.html</loc>
   </url>
   <url>
-    <loc>/reference/draw.gam.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.gam.html</loc>
   </url>
   <url>
-    <loc>/reference/draw.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.html</loc>
   </url>
   <url>
-    <loc>/reference/draw.mgcv_smooth.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.mgcv_smooth.html</loc>
   </url>
   <url>
-    <loc>/reference/draw.parametric_effects.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.parametric_effects.html</loc>
   </url>
   <url>
-    <loc>/reference/draw.penalty_df.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.penalty_df.html</loc>
   </url>
   <url>
-    <loc>/reference/draw.rootogram.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.rootogram.html</loc>
   </url>
   <url>
-    <loc>/reference/draw.smooth_estimates.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.smooth_estimates.html</loc>
   </url>
   <url>
-    <loc>/reference/draw.smooth_samples.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.smooth_samples.html</loc>
   </url>
   <url>
-    <loc>/reference/draw_parametric_effect.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw_parametric_effect.html</loc>
   </url>
   <url>
-    <loc>/reference/edf.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/edf.html</loc>
   </url>
   <url>
-    <loc>/reference/eval_smooth.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/eval_smooth.html</loc>
   </url>
   <url>
-    <loc>/reference/evaluate_parametric_term.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/evaluate_parametric_term.html</loc>
   </url>
   <url>
-    <loc>/reference/evaluate_smooth.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/evaluate_smooth.html</loc>
   </url>
   <url>
-    <loc>/reference/factor_combos.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/factor_combos.html</loc>
   </url>
   <url>
-    <loc>/reference/family.gam.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/family.gam.html</loc>
   </url>
   <url>
-    <loc>/reference/family_name.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/family_name.html</loc>
   </url>
   <url>
-    <loc>/reference/fderiv.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/fderiv.html</loc>
   </url>
   <url>
-    <loc>/reference/fitted_samples.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/fitted_samples.html</loc>
   </url>
   <url>
-    <loc>/reference/fitted_values.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/fitted_values.html</loc>
   </url>
   <url>
-    <loc>/reference/fix_offset.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/fix_offset.html</loc>
   </url>
   <url>
-    <loc>/reference/fixef.gam.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/fixef.gam.html</loc>
   </url>
   <url>
-    <loc>/reference/fixef.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/fixef.html</loc>
   </url>
   <url>
-    <loc>/reference/get_by_smooth.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/get_by_smooth.html</loc>
   </url>
   <url>
-    <loc>/reference/get_smooth.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/get_smooth.html</loc>
   </url>
   <url>
-    <loc>/reference/get_smooths_by_id.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/get_smooths_by_id.html</loc>
   </url>
   <url>
-    <loc>/reference/gss_vocab.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/gss_vocab.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/is_by_smooth.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/is_by_smooth.html</loc>
   </url>
   <url>
-    <loc>/reference/is_factor_term.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/is_factor_term.html</loc>
   </url>
   <url>
-    <loc>/reference/is_mgcv_smooth.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/is_mgcv_smooth.html</loc>
   </url>
   <url>
-    <loc>/reference/is_offset.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/is_offset.html</loc>
   </url>
   <url>
-    <loc>/reference/link.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/link.html</loc>
   </url>
   <url>
-    <loc>/reference/load_mgcv.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/load_mgcv.html</loc>
   </url>
   <url>
-    <loc>/reference/n_smooths.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/n_smooths.html</loc>
   </url>
   <url>
-    <loc>/reference/nb_theta.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/nb_theta.html</loc>
   </url>
   <url>
-    <loc>/reference/nested_partial_residuals.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/nested_partial_residuals.html</loc>
   </url>
   <url>
-    <loc>/reference/nested_rug_values.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/nested_rug_values.html</loc>
   </url>
   <url>
-    <loc>/reference/observed_fitted_plot.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/observed_fitted_plot.html</loc>
   </url>
   <url>
-    <loc>/reference/parametric_effects.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/parametric_effects.html</loc>
   </url>
   <url>
-    <loc>/reference/parametric_terms.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/parametric_terms.html</loc>
   </url>
   <url>
-    <loc>/reference/partial_residuals.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/partial_residuals.html</loc>
   </url>
   <url>
-    <loc>/reference/penalty.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/penalty.html</loc>
   </url>
   <url>
-    <loc>/reference/posterior_samples.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/posterior_samples.html</loc>
   </url>
   <url>
-    <loc>/reference/predicted_samples.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/predicted_samples.html</loc>
   </url>
   <url>
-    <loc>/reference/qq_plot.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/qq_plot.html</loc>
   </url>
   <url>
-    <loc>/reference/ref_sims.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/ref_sims.html</loc>
   </url>
   <url>
-    <loc>/reference/rep_first_factor_value.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/rep_first_factor_value.html</loc>
   </url>
   <url>
-    <loc>/reference/residuals_hist_plot.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/residuals_hist_plot.html</loc>
   </url>
   <url>
-    <loc>/reference/residuals_linpred_plot.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/residuals_linpred_plot.html</loc>
   </url>
   <url>
-    <loc>/reference/rootogram.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/rootogram.html</loc>
   </url>
   <url>
-    <loc>/reference/seq_min_max.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/seq_min_max.html</loc>
   </url>
   <url>
-    <loc>/reference/seq_min_max_eps.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/seq_min_max_eps.html</loc>
   </url>
   <url>
-    <loc>/reference/shift_values.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/shift_values.html</loc>
   </url>
   <url>
-    <loc>/reference/simulate.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/simulate.html</loc>
   </url>
   <url>
-    <loc>/reference/smallAges.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/smallAges.html</loc>
   </url>
   <url>
-    <loc>/reference/smooth_coefs.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/smooth_coefs.html</loc>
   </url>
   <url>
-    <loc>/reference/smooth_dim.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/smooth_dim.html</loc>
   </url>
   <url>
-    <loc>/reference/smooth_estimates.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/smooth_estimates.html</loc>
   </url>
   <url>
-    <loc>/reference/smooth_samples.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/smooth_samples.html</loc>
   </url>
   <url>
-    <loc>/reference/smooths.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/smooths.html</loc>
   </url>
   <url>
-    <loc>/reference/term_names.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/term_names.html</loc>
   </url>
   <url>
-    <loc>/reference/term_variables.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/term_variables.html</loc>
   </url>
   <url>
-    <loc>/reference/tidy_basis.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/tidy_basis.html</loc>
   </url>
   <url>
-    <loc>/reference/to_na.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/to_na.html</loc>
   </url>
   <url>
-    <loc>/reference/too_far.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/too_far.html</loc>
   </url>
   <url>
-    <loc>/reference/too_far_to_na.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/too_far_to_na.html</loc>
   </url>
   <url>
-    <loc>/reference/transform_fun.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/transform_fun.html</loc>
   </url>
   <url>
-    <loc>/reference/typical_values.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/typical_values.html</loc>
   </url>
   <url>
-    <loc>/reference/variance_comp.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/variance_comp.html</loc>
   </url>
   <url>
-    <loc>/reference/vars_from_label.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/vars_from_label.html</loc>
   </url>
   <url>
-    <loc>/reference/which_smooths.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/which_smooths.html</loc>
   </url>
   <url>
-    <loc>/reference/worm_plot.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/worm_plot.html</loc>
   </url>
   <url>
-    <loc>/reference/zooplankton.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/zooplankton.html</loc>
   </url>
 </urlset>
