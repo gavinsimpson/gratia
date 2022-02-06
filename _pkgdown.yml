@@ -2,6 +2,8 @@ authors:
   Gavin L Simpson:
     href: https://fromthebottomoftheheap.net
 
+url: https://gavinsimpson.github.io/gratia/
+
 template:
   bootstrap: 5
   bootswatch: flatly
