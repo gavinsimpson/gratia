@@ -6,7 +6,7 @@ library("gratia")
 library("mgcv")
 
 dat <- data_sim("eg1", n = 400, seed = 1)
-m0 <- gam(y ~ s(x0), data = dat, method = "REML")
+#m_1_smooth <- gam(y ~ s(x0), data = dat, method = "REML")
 m1 <- gam(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'ps') + s(x3, bs = 'bs'),
           data = dat, method = "REML")
 m2 <- gamm(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'ps') + s(x3, bs = 'bs'),
@@ -16,25 +16,22 @@ m4 <- gam(y ~ te(x0, x1, x2), data = dat, method = "REML")
 m_t2 <- gam(y ~ t2(x0, x1, x2), data = dat, method = "REML")
 m_ti <- gam(y ~ s(x0) + s(x1) + ti(x0, x1), data = dat, method = "REML")
 
-dat_biv <- data_sim("eg2", n = 400, seed = 2)
-m_biv <- gam(y ~ s(x, z), data = dat_biv, method = "REML")
-
 dat_2d_by <- data_sim("eg4", n = 400, seed = 42)
 m_2d_by <- gam(y ~ fac + s(x0, x1, by = fac), data = dat_2d_by)
 
 ## simulate example... from ?mgcv::random.effects
 ## simulate 4 term additive truth
-dat_re <- data_sim("eg1", n = 400, scale = 2, seed = 1)
-fac <- as.factor(sample(1:20, 400, replace = TRUE))
-X <- model.matrix(~ fac - 1)
-b <- rnorm(20) * 0.5
-dat_re <- transform(dat_re, y = drop(y + X %*% b), fac = fac)
-m_re <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) + s(x3),
-            data = dat, method = "ML")
-rm(fac, b, X)
+# dat_re <- data_sim("eg1", n = 400, scale = 2, seed = 1)
+# fac <- as.factor(sample(1:20, 400, replace = TRUE))
+# X <- model.matrix(~ fac - 1)
+# b <- rnorm(20) * 0.5
+# dat_re <- transform(dat_re, y = drop(y + X %*% b), fac = fac)
+# m_re <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) + s(x3),
+#             data = dat, method = "ML")
+# rm(fac, b, X)
 
 # dat <- data_sim("eg1", n = 400, seed = 1)
-# m0 <- gam(y ~ s(x0), data = dat, method = "REML")
+# m_1_smooth <- gam(y ~ s(x0), data = dat, method = "REML")
 # m1 <- gam(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'ps') + s(x3, bs = 'bs'),
 #           data = dat, method = "REML")
 # m2 <- gamm(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'ps') + s(x3, bs = 'bs'),
@@ -94,7 +91,7 @@ test_that("smooth_estimates works for a GAMM", {
 })
 
 test_that("smooth_estimates works with a bivariate TPRS smooth", {
-    expect_silent(sm <- smooth_estimates(m_biv, "s(x,z)", n = 50))
+    expect_silent(sm <- smooth_estimates(su_m_bivar, "s(x,z)", n = 50))
     expect_s3_class(sm, "smooth_estimates")
     expect_s3_class(sm, "tbl_df")
     expect_s3_class(sm, "data.frame")
@@ -139,21 +136,21 @@ test_that("smooth_estimates works with a tensor product interaction smooth", {
 })
 
 test_that("smooth_estimates works", {
-    expect_silent(sm <- smooth_estimates(m_re, smooth = "s(fac)"))
+    expect_silent(sm <- smooth_estimates(rm1, smooth = "s(fac)"))
     expect_s3_class(sm, "smooth_estimates")
     expect_s3_class(sm, "tbl_df")
     expect_s3_class(sm, "data.frame")
-    expect_identical(nrow(sm), length(levels(dat_re[["fac"]])))
+    expect_identical(nrow(sm), length(levels(su_re[["fac"]])))
     expect_named(sm, c("smooth", "type", "by", "est", "se", "fac"))
 })
 
 test_that("smooth_estimates works when passed data", {
-    expect_silent(sm <- smooth_estimates(m_re, smooth = "s(fac)",
-                                         data = dat_re))
+    expect_silent(sm <- smooth_estimates(rm1, smooth = "s(fac)",
+                                         data = su_re))
     expect_s3_class(sm, "smooth_estimates")
     expect_s3_class(sm, "tbl_df")
     expect_s3_class(sm, "data.frame")
-    expect_identical(nrow(sm), nrow(dat_re))
+    expect_identical(nrow(sm), nrow(su_re))
     expect_named(sm, c("smooth", "type", "by", "est", "se", "fac"))
 })
 
@@ -165,8 +162,8 @@ test_that("check_user_data fails if smooth var not in data", {
 })
 
 test_that("smooth_estimates works with vector data", {
-    sm1 <- smooth_estimates(m0, "s(x0)", data = dat[, "x0"])
-    sm2 <- smooth_estimates(m0, "s(x0)", data = dat)
+    sm1 <- smooth_estimates(m_1_smooth, "s(x0)", data = dat[, "x0"])
+    sm2 <- smooth_estimates(m_1_smooth, "s(x0)", data = dat)
     expect_s3_class(sm1, "smooth_estimates")
     expect_equal(sm1, sm2)
 })
@@ -211,4 +208,22 @@ test_that("smooth_estimates works for a factor smooth", {
                                   data = dat_fs[, !names(dat_fs) == "fac"]),
                  "Variable(s) 'fac' not found in 'data'.",
                  fixed = TRUE)
+})
+
+## check_user_data
+test_that("check_user_data throws error when passed a vector with vars >1", {
+    expect_error(check_user_data(1:10, vars = c("x1", "x2")),
+                 "'smooth' requires multiple data vectors but only 1 provided.",
+                 fixed = TRUE)
+})
+
+test_that("check_user_data errors when passed a non-numeric vector", {
+    expect_error(check_user_data(LETTERS, vars = "x1"),
+                 "'data', if supplied, must be a numeric vector or a data frame.",
+                 fixed = TRUE)
+})
+
+test_that("check_user_data works when passed a vector with 1 var", {
+    expect_silent(df <- check_user_data(1:10, vars = "x1"))
+    expect_s3_class(df, c("tbl_df", "tbl", "data.frame"))
 })

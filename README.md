@@ -24,8 +24,7 @@ smooths.
 
 The main features of *gratia* are currently
 
--   A *ggplot2*-based replacement for `mgcv:::plot.gam()`:
-    `draw(gam_model)`.
+-   A *ggplot2*-based replacement for `mgcv:::plot.gam()`: `draw.gam()`.
 
     For example, the classic four term additive example from Gu & Wahba:
 
@@ -43,11 +42,10 @@ The main features of *gratia* are currently
     factor-smooth interaction smooths (`bs = "fs"`), and bivariate
     tensor product smooths are supported,
 
--   Estimatation of derivatives of fitted smoothers: `derivatives()`
-    (older functionality in `fderiv(gam_model)`),
+-   Estimatation of derivatives of fitted smoothers: `derivatives()`,
 
 -   Estimation of point-wise across-the-function confidence intervals
-    and simultaneous intervals for smooths: `confint(gam_model)`.
+    and simultaneous intervals for smooths: `confint.gam()`.
 
 -   Model diagnostics via `appraise()`
 

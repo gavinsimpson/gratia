@@ -80,7 +80,7 @@
 <p>The main features of <em>gratia</em> are currently</p>
 <ul>
 <li>
-<p>A <em>ggplot2</em>-based replacement for <code>mgcv:::plot.gam()</code>: <code>draw(gam_model)</code>.</p>
+<p>A <em>ggplot2</em>-based replacement for <code>mgcv:::plot.gam()</code>: <code><a href="reference/draw.gam.html">draw.gam()</a></code>.</p>
 <p>For example, the classic four term additive example from Gu &amp; Wahba:</p>
 <div class="figure">
 <img src="reference/figures/README-draw-gam-figure-1.png" alt=""><p class="caption">Estimated smooths from a GAM</p>
@@ -91,8 +91,8 @@
 </div>
 <p>Note specialist smoothers (<code>bs %in% c("sos","mrf","so")</code>) are not currently supported, but univariate, <em>factor</em> and <em>continuous</em> <code>by</code>-variable smooths, simple random effect smooths (<code>bs = 're'</code>), factor-smooth interaction smooths (<code>bs = "fs"</code>), and bivariate tensor product smooths are supported,</p>
 </li>
-<li><p>Estimatation of derivatives of fitted smoothers: <code><a href="reference/derivatives.html">derivatives()</a></code> (older functionality in <code>fderiv(gam_model)</code>),</p></li>
-<li><p>Estimation of point-wise across-the-function confidence intervals and simultaneous intervals for smooths: <code>confint(gam_model)</code>.</p></li>
+<li><p>Estimatation of derivatives of fitted smoothers: <code><a href="reference/derivatives.html">derivatives()</a></code>,</p></li>
+<li><p>Estimation of point-wise across-the-function confidence intervals and simultaneous intervals for smooths: <code><a href="reference/confint.gam.html">confint.gam()</a></code>.</p></li>
 <li>
 <p>Model diagnostics via <code><a href="reference/appraise.html">appraise()</a></code></p>
 <div class="figure">
