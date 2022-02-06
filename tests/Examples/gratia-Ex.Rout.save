@@ -992,8 +992,7 @@ detaching ‘package:mgcv’
 > ### Name: evaluate_smooth
 > ### Title: Evaluate a smooth
 > ### Aliases: evaluate_smooth evaluate_smooth.gam evaluate_smooth.gamm
-> ###   evaluate_smooth.list evaluate_parametric_term
-> ###   evaluate_parametric_term.gam
+> ###   evaluate_smooth.list
 > 
 > ### ** Examples
 > 
@@ -1320,11 +1319,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55f51b657278>
+<environment: 0x560a0db9f0b8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55f51b657278>
+<environment: 0x560a0db9f0b8>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1932,7 +1931,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  20.846 0.148 21.176 0 0 
+Time elapsed:  18.544 0.242 18.839 0 0 
 > grDevices::dev.off()
 null device 
           1 

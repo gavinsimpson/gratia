@@ -557,12 +557,19 @@
 
     names(evaluated)[3L] <- smooth_var
     names(evaluated)[4L] <- smooth_fac
-    class(evaluated) <- c("evaluated_fs_smooth", "evaluated_smooth", class(evaluated))
+    class(evaluated) <- c("evaluated_fs_smooth", "evaluated_smooth",
+                          class(evaluated))
 
     evaluated
 }
 
-#' @rdname evaluate_smooth
+#' Evaluate parametric model terms
+#' 
+#' @description
+#' `r lifecycle::badge('deprecated')` Returns values of parametric model terms
+#' at values of factor terms and over a grid of covariate values for linear
+#' parametric terms. This function is now deprecated in favour of
+#' [parametric_effects()].
 #'
 #' @export
 `evaluate_parametric_term` <- function(object, ...) {
@@ -571,7 +578,8 @@
 
 #' @param term character; which parametric term whose effects are evaluated
 #'
-#' @rdname evaluate_smooth
+#' @inheritParams evaluate_smooth
+#' @rdname evaluate_parametric_term
 #'
 #' @importFrom stats delete.response
 #' @importFrom tibble as_tibble add_column
