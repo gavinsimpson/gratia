@@ -956,13 +956,17 @@
 #'
 #' @return A character vector of variable names.
 #'
+#' @export
 `term_variables` <- function(object, term, ...) {
-    UseMethod("terms_variables", object)
+    UseMethod("term_variables")
 }
 
 #' @rdname term_variables
 #' @export
 `term_variables.terms` <- function(object, term, ...) {
+    if (missing(term)) {
+        stop("'term' must be supplied.")
+    }
     facs <- attr(object, "factors")[ , term]
     names(facs)[as.logical(facs)]
 }
@@ -971,7 +975,7 @@
 #' @export
 `term_variables.gam` <- function(object, term, ...) {
     object <- terms(object)
-    term_variables(object, term, ...)
+    term_variables(object, term = term, ...)
 }
 
 #' @rdname term_variables

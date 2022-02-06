@@ -330,3 +330,31 @@ test_that("term_names works with a gam", {
 test_that("term_names works with a gamm", {
     expect_silent(tn <- term_names(m_gamm))
 })
+
+test_that("is_factor_term works", {
+    expect_false(ft <- is_factor_term(m_para_sm, term = "x0"))
+    expect_true(ft <- is_factor_term(m_para_sm, term = "ff"))
+    expect_null(ft <- is_factor_term(m_gam, term = "s(x0)"))
+})
+
+test_that("is_factor_term works for a bam", {
+    expect_null(ft <- is_factor_term(m_bam, term = "s(x0)"))
+})
+
+test_that("is_factor_term works for a gamm", {
+    expect_null(ft <- is_factor_term(m_gamm, term = "s(x0)"))
+})
+
+test_that("is_factor_term works for a gamm4", {
+    expect_null(ft <- is_factor_term(m_gamm4, term = "s(x0)"))
+})
+
+test_that("term_variables works for a gam", {
+    expect_identical(term_variables(m_para_sm, term = "fac:ff"),
+                     c("fac", "ff"))
+})
+
+test_that("term_variables works for a terms", {
+    expect_identical(term_variables(terms(m_para_sm), term = "fac:ff"),
+                     c("fac", "ff"))
+})
