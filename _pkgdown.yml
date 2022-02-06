@@ -1,8 +1,10 @@
+
+destination: docs
+url: https://gavinsimpson.github.io/gratia/
+
 authors:
   Gavin L Simpson:
     href: https://fromthebottomoftheheap.net
-
-url: https://gavinsimpson.github.io/gratia/
 
 template:
   bootstrap: 5
