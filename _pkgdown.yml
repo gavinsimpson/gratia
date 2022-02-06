@@ -8,5 +8,5 @@ template:
 
 navbar:
   structure:
-  left: [intro, reference, news]
-  right: [search, github]
+    left: [intro, reference, news]
+    right: [search, github]
