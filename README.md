@@ -1,20 +1,18 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-gratia
-======
+# gratia
 
 <!-- badges: start -->
 
 [![R build
 status](https://github.com/gavinsimpson/gratia/workflows/R-CMD-check/badge.svg)](https://github.com/gavinsimpson/gratia/actions)
-[![Build
-status](https://ci.appveyor.com/api/projects/status/w7pj8773t5b8fxkb/branch/master?svg=true)](https://ci.appveyor.com/project/gavinsimpson/gratia/branch/master)
 [![codecov.io](https://codecov.io/gh/gavinsimpson/gratia/branch/master/graph/badge.svg)](https://codecov.io/gh/gavinsimpson/gratia)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/gratia)](https://cran.r-project.org/package=gratia)
+[![CRAN
+Downloads](http://cranlogs.r-pkg.org/badges/grand-total/gratia)](http://cran.rstudio.com/web/packages/gratia/index.html)
 <!-- badges: end -->
 
-Overview
---------
+## Overview
 
 Graceful ‘ggplot’-based graphics and utility functions for working with
 generalized additive models (GAMs) fitted using the ‘mgcv’ package.
@@ -22,8 +20,7 @@ Provides a reimplementation of the `plot()` method for GAMs that ‘mgcv’
 provides, as well as ‘tidyverse’ compatible representations of estimated
 smooths.
 
-Features
---------
+## Features
 
 The main features of *gratia* are currently
 
@@ -57,8 +54,7 @@ The main features of *gratia* are currently
     ![Model diagnostics
     figure](man/figures/README-appraise-figure-1.png)
 
-Installing *gratia*
--------------------
+## Installing *gratia*
 
 *gratia* is now available on CRAN, and can be installed with
 
@@ -73,8 +69,7 @@ have *remotes* installed, then run
 
 to install the package.
 
-History
--------
+## History
 
 *gratia* grew out of an earlier package, *schoenberg*, itself a
 development of the earlier package *tsgam*, which was originally
@@ -87,8 +82,7 @@ name *schoenberg*. At a later date someone released another package
 called *schoenberg* to CRAN, so that scuppered that idea. Now I’m
 calling the package *gratia*. Hopefully I won’t have to change it again…
 
-Why *gratia*?
--------------
+## Why *gratia*?
 
 In naming his [*greta*](https://github.com/greta-dev/greta) package,
 Nick Golding observed the recent phenomena of naming statistical
