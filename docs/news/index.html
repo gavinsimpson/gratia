@@ -60,8 +60,12 @@
 </ul><div class="section level4">
 <h4 id="deprecated-functions-0-7-0">Deprecated functions<a class="anchor" aria-label="anchor" href="#deprecated-functions-0-7-0"></a></h4>
 <p>From version 0.7.0, the following functions are considered deprecated and their use is dicouraged:</p>
-<ul><li><p><code><a href="../reference/fderiv.html">fderiv()</a></code> is <em>soft</em>-deprecated in favour of <code><a href="../reference/derivatives.html">derivatives()</a></code>.</p></li>
-<li><p><code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code> is <em>soft</em>-deprecated in favour of <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code></p></li>
+<ul><li>
+<code><a href="../reference/fderiv.html">fderiv()</a></code> is <em>soft</em>-deprecated in favour of <code><a href="../reference/derivatives.html">derivatives()</a></code>,</li>
+<li>
+<code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code> is <em>soft</em>-deprecated in favour of <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>,</li>
+<li>
+<code><a href="../reference/evaluate_parametric_term.html">evaluate_parametric_term()</a></code> is deprecated in favour of <code><a href="../reference/parametric_effects.html">parametric_effects()</a></code>.</li>
 </ul><p>The first call to one of these functions will generate a warning, pointing to the newver, alternative, function. It is safe to ignore these warnings, but these deprecated functions will no longer receive updates and are thus at risk of being removed from the package at some future date. The newer alternatives can handle more types of models and smooths, especially so in the case of <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>.</p>
 </div>
 </div>
