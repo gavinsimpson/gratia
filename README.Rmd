@@ -22,7 +22,7 @@ library('gratia')
 [![R build status](https://github.com/gavinsimpson/gratia/workflows/R-CMD-check/badge.svg)](https://github.com/gavinsimpson/gratia/actions)
 [![codecov.io](https://codecov.io/gh/gavinsimpson/gratia/branch/master/graph/badge.svg)](https://codecov.io/gh/gavinsimpson/gratia)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/gratia)](https://cran.r-project.org/package=gratia)
-[![](http://cranlogs.r-pkg.org/badges/grand-total/gratia)](http://cran.rstudio.com/web/packages/gratia/index.html)
+[![CRAN Downloads](http://cranlogs.r-pkg.org/badges/grand-total/gratia)](http://cran.rstudio.com/web/packages/gratia/index.html)
 <!-- badges: end -->
 
 ## Overview
@@ -43,7 +43,7 @@ m2 <- gam(y ~ s(x, z),  data = df2, method = "REML")
 draw(m2)
 ```
 
-```{r appraise-figure, dev = "png", fig.height = 6, fig.width = 9, dpi = 120, echo = FALSE, fig.show = "hide", dependson = -1}
+```{r appraise-figure, dev = "png", fig.height = 6, fig.width = 9, dpi = 120, echo = FALSE, fig.show = "hide", dependson = -2}
 appraise(m1)
 ```
 
