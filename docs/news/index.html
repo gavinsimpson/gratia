@@ -259,7 +259,7 @@
 <div class="section level3">
 <h3 id="user-visible-changes-0-4-0">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-4-0"></a></h3>
 <ul><li><p><code><a href="../reference/datagen.html">datagen()</a></code> is now an <em>internal</em> function and is no longer exported. Use <code><a href="../reference/data_slice.html">data_slice()</a></code> instead.</p></li>
-<li><p><code><a href="../reference/evaluate_smooth.html">evaluate_parametric_term()</a></code> is now much stricter and can only evaluate main effect terms, i.e. those whose order, as stored in the <code>terms</code> object of the model is <code>1</code>.</p></li>
+<li><p><code><a href="../reference/evaluate_parametric_term.html">evaluate_parametric_term()</a></code> is now much stricter and can only evaluate main effect terms, i.e. those whose order, as stored in the <code>terms</code> object of the model is <code>1</code>.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-4-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-4-0"></a></h3>
@@ -302,7 +302,7 @@
 <p><code><a href="../reference/derivatives.html">derivatives()</a></code> now works with factor by smooths, including ordered factor by smooths. The function also now works correctly for complex models with multiple covariates/smooths. <a href="https://github.com/gavinsimpson/gratia/issues/47" class="external-link">#47</a></p>
 <p><code><a href="../reference/derivatives.html">derivatives()</a></code> also now handles <code>'fs'</code> smooths. Reported by <a href="https://github.com/tomand-uio" class="external-link">@tomand-uio</a> <a href="https://github.com/gavinsimpson/gratia/issues/57" class="external-link">#57</a>.</p>
 </li>
-<li><p><code><a href="../reference/evaluate_smooth.html">evaluate_parametric_term()</a></code> and hence <code><a href="../reference/draw.gam.html">draw.gam()</a></code> would fail on a <code>ziplss()</code> model because i) <em>gratia</em> didn’t handle parametric terms in models with multiple linear predictors correctly, and ii) <em>gratia</em> didn’t convert to the naming convention of <em>mgcv</em> for terms in higher linear predictors. Reported by <a href="https://github.com/pboesu" class="external-link">@pboesu</a> <a href="https://github.com/gavinsimpson/gratia/issues/45" class="external-link">#45</a></p></li>
+<li><p><code><a href="../reference/evaluate_parametric_term.html">evaluate_parametric_term()</a></code> and hence <code><a href="../reference/draw.gam.html">draw.gam()</a></code> would fail on a <code>ziplss()</code> model because i) <em>gratia</em> didn’t handle parametric terms in models with multiple linear predictors correctly, and ii) <em>gratia</em> didn’t convert to the naming convention of <em>mgcv</em> for terms in higher linear predictors. Reported by <a href="https://github.com/pboesu" class="external-link">@pboesu</a> <a href="https://github.com/gavinsimpson/gratia/issues/45" class="external-link">#45</a></p></li>
 </ul></div>
 </div>
   </div>
