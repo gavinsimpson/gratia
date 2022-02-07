@@ -183,6 +183,31 @@
     family(object[["gam"]])
 }
 
+#' Extracts the type of family in a consistent way
+#'
+#' @param object an R object. Currently [family()] objects and anything with a
+#'   [family()] method.
+#' @param ... arguments passed to other methods.
+#' @export
+`family_type` <- function(object, ...) {
+    UseMethod("family_type")
+}
+
+#' @export
+#' @rdname family_type
+family_type.family <- function(object, ...) {
+    fn <- family_name(object)
+    fn <- tolower(gsub("\\([[:alnum:]\\.,]+\\)", "", fn))
+    fn <- gsub("\\s", "_", fn)
+    fn
+}
+
+#' @export
+#' @rdname family_type
+`family_type.default` <- function(object, ...) {
+    family_type(family(object))
+}
+
 ## Extracts the link or inverse link function from a family object
 #' @export
 #' @rdname link

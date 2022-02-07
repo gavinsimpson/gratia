@@ -151,6 +151,9 @@
     <loc>https://gavinsimpson.github.io/gratia/reference/family_name.html</loc>
   </url>
   <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/family_type.html</loc>
+  </url>
+  <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/fderiv.html</loc>
   </url>
   <url>
@@ -179,6 +182,9 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/gss_vocab.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/has_theta.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/index.html</loc>
@@ -287,6 +293,9 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/term_variables.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/theta.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/tidy_basis.html</loc>

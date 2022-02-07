@@ -5,28 +5,9 @@ library("testthat")
 library("gratia")
 library("mgcv")
 
-## Need a local wrapper to allow conditional use of vdiffr
-`expect_doppelganger` <- function(title, fig, ...) {
-  testthat::skip_if_not_installed("vdiffr")
-  vdiffr::expect_doppelganger(title, fig, ...)
-}
-
-N <- 500L
-df_gauss <- data_sim("eg1", n = N, seed = 42)
-df_pois  <- data_sim("eg1", dist = "poisson", n = N, scale = 0.2, seed = 42)
-## fit the model
-m_gauss <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_gauss,
-                method = "REML", family = gaussian())
-b_pois  <-  bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
-                method = "fREML", family = poisson())
-m_nb    <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
-                method = "REML", family = nb())
-m_tw    <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
-                method = "REML", family = tw())
-
 test_that("rootogram works for a continuous Gaussian response", {
     skip_on_cran()
-    expect_silent(rg <- rootogram(m_gauss))
+    expect_silent(rg <- rootogram(m_gam))
     expect_doppelganger("draw gaussian rootogram", draw(rg))
 })
 
@@ -44,6 +25,6 @@ test_that("rootogram works for a discrete negative binomial response", {
 test_that("rootogram fails for a a non-supported response", {
     skip_on_cran()
     expect_error(rootogram(m_tw),
-                 "Only <Poisson, Negative Binomial, Gaussian> models supported.",
-                 fixed = TRUE)
+      "Only <Poisson, Negative Binomial, Gaussian> models supported.",
+      fixed = TRUE)
 })

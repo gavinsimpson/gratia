@@ -1255,6 +1255,31 @@ Loading required package: Matrix
 
 detaching ‘package:lme4’, ‘package:Matrix’, ‘package:mgcv’
 
+> nameEx("has_theta")
+> ### * has_theta
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: has_theta
+> ### Title: Are additional parameters available for a GAM?
+> ### Aliases: has_theta
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> df <- data_sim("eg1", dist = "poisson", seed = 42, scale = 1/5)
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML",
++          family = nb())
+> has_theta(m)
+[1] TRUE
+> p <- theta(m)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("is_offset")
 > ### * is_offset
 > 
@@ -1319,11 +1344,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x558e29b1ee80>
+<environment: 0x560a4c372388>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x558e29b1ee80>
+<environment: 0x560a4c372388>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1870,6 +1895,29 @@ detaching ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
+> nameEx("theta")
+> ### * theta
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: theta
+> ### Title: General extractor for additional parameters in mgcv models
+> ### Aliases: theta theta.gam
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> df <- data_sim("eg1", dist = "poisson", seed = 42, scale = 1/5)
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML",
++          family = nb())
+> p <- theta(m)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("vars_from_label")
 > ### * vars_from_label
 > 
@@ -1933,7 +1981,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  19.208 0.156 19.49 0 0 
+Time elapsed:  16.915 0.156 17.124 0 0 
 > grDevices::dev.off()
 null device 
           1 

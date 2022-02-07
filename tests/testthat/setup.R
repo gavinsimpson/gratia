@@ -92,6 +92,18 @@ m_scat <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
 m_lm  <- lm(y ~ x0 + x1 + x2 + x3, data = quick_eg1)
 m_glm <- glm(y ~ x0 + x1 + x2 + x3, data = quick_eg1)
 
+# rootogram models
+df_pois  <- data_sim("eg1", dist = "poisson", n = 500L, scale = 0.2, seed = 42)
+## fit the model
+b_pois  <-  bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
+                method = "fREML", family = poisson())
+m_nb    <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
+                method = "REML", family = nb())
+m_negbin    <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
+                    method = "REML", family = negbin(25))
+m_tw    <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
+                method = "REML", family = tw())
+
 #-- A standard GAM with a simple random effect ---------------------------------
 su_re <- su_eg1
 set.seed(42)
