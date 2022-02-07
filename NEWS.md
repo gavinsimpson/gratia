@@ -78,7 +78,11 @@ can handle more types of models and smooths, especially so in the case of
     while holding any continuous covariates at their median values.
 
 * `nb_theta()` is a new extractor function that returns the theta parameter of
-  a fitted negative binomial GAM (families `nb()` or `negbin()`).
+  a fitted negative binomial GAM (families `nb()` or `negbin()`). Additionally,
+  `theta()` and `has_theta()` provide additional functionality. `theta()` is an
+  experimental function for extracting any additional parameters from the model
+  or family. `has_theta()` is useful for checking if any additional parameters
+  are available from the family or model. 
 
 * `edf()` extracts the effective degrees of freedom (EDF) of a fitted model or a
   specific smooth in the model. Various forms for the EDF can be extracted.
