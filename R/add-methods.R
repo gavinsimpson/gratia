@@ -229,11 +229,13 @@
 #'   the supplied constant.
 #'
 #' @author Gavin L. Simpson
+#' @export
 `add_constant` <- function(object, constant = NULL, ...) {
     UseMethod("add_constant")
 }
 
 #' @rdname add_constant
+#' @export
 `add_constant.evaluated_smooth` <- function(object, constant = NULL, ...) {
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {
@@ -248,6 +250,7 @@
 }
 
 #' @rdname add_constant
+#' @export
 `add_constant.smooth_estimates` <- function(object, constant = NULL, ...) {
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {
@@ -262,6 +265,7 @@
 }
 
 #' @rdname add_constant
+#' @export
 `add_constant.mgcv_smooth` <- function(object, constant = NULL, ...) {
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {
@@ -276,12 +280,13 @@
 }
 
 #' @rdname add_constant
+#' @export
 `add_constant.parametric_effects` <- function(object, constant = NULL,
                                               ...) {
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {
         if (!is.numeric(constant)) {
-            stop("'constant' must be numeric, but was supplied <", constant,
+            stop("'constant' must be numeric: supplied <", constant,
                  ">", call. = FALSE)
         }
         object[["partial"]] <- object[["partial"]] + constant
@@ -291,6 +296,7 @@
 }
 
 #' @rdname add_constant
+#' @export
 `add_constant.tbl_df` <- function(object, constant = NULL, column = NULL,
                                   ...) {
     if (is.null(column)) {
@@ -299,7 +305,7 @@
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {
         if (!is.numeric(constant)) {
-            stop("'constant' must be numeric, but was supplied <", constant,
+            stop("'constant' must be numeric: supplied <", constant,
                  ">", call. = FALSE)
         }
         object[[column]] <- object[[column]] + constant
@@ -309,12 +315,13 @@
 }
 
 #' @rdname add_constant
+#' @export
 `add_constant.evaluated_parametric_term` <- function(object, constant = NULL,
                                                      ...) {
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {
         if (!is.numeric(constant)) {
-            stop("'constant' must be numeric, but was supplied <", constant,
+            stop("'constant' must be numeric: supplied <", constant,
                  ">", call. = FALSE)
         }
         object[["partial"]] <- object[["partial"]] + constant

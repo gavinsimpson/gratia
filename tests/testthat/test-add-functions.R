@@ -114,7 +114,7 @@ test_that("add_constant works for parametric_effects", {
                    "Interaction terms are not currently supported.")
     expect_silent(pe <- add_constant(pe, constant = 10))
     expect_error(pe <- add_constant(pe, constant = "a"),
-                 "'constant' must be numeric, but was supplied <a>",
+                 "'constant' must be numeric: supplied <a>",
                  fixed = TRUE)
 })
 
@@ -122,29 +122,29 @@ test_that("add_constant works for evaluate_parametric_term", {
     expect_silent(pe <- evaluate_parametric_term(m_para_sm, term = "fac"))
     expect_silent(pe <- add_constant(pe, constant = 10))
     expect_error(pe <- add_constant(pe, constant = "a"),
-                 "'constant' must be numeric, but was supplied <a>",
+                 "'constant' must be numeric: supplied <a>",
                  fixed = TRUE)
 })
 
 test_that("add_constant works for evaluated_smooth", {
     expect_warning(sm <- evaluate_smooth(m_gam, smooth = "s(x1)"))
     expect_silent(sm <- add_constant(sm, constant = 10))
-    expect_error(sm <- add_constant(sm, constant = "a"),
-                 "'constant' must be numeric, but was supplied <a>",
+    expect_error(pe <- add_constant(pe, constant = "a"),
+                 "'constant' must be numeric: supplied <a>",
                  fixed = TRUE)
 })
 
 test_that("add_constant works for evaluated_smooth", {
     expect_silent(sm <- smooth_estimates(m_gam, smooth = "s(x1)"))
     expect_silent(sm <- add_constant(sm, constant = 10))
-    expect_error(sm <- add_constant(sm, constant = "a"),
-                 "'constant' must be numeric, but was supplied <a>",
+    expect_error(pe <- add_constant(pe, constant = "a"),
+                 "'constant' must be numeric: supplied <a>",
                  fixed = TRUE)
 })
 
 test_that("add_constant works for tbl", {
     expect_silent(tbl <- add_constant(su_eg1, constant = 10, column = "y"))
-    expect_error(tbl <- add_constant(tbl, constant = "a", column = "y"),
-                 "'constant' must be numeric, but was supplied <a>",
+    expect_error(pe <- add_constant(pe, constant = "a"),
+                 "'constant' must be numeric: supplied <a>",
                  fixed = TRUE)
 })
