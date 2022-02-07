@@ -10,7 +10,7 @@
 
   Similarly, `evaluate_parametric_terms()` is now deprecated in favour of
   `parametric_effects()`, which is also used internally by `draw.gam()` if
-  parametric terms are present in the model.
+  parametric terms are present in the model (and `parametric = TRUE`).
 
   While a lot of code has been reused so differences between plots as a result
   of this change should be minimal, some corner cases may have been missed. File
