@@ -24,15 +24,15 @@
 ### Deprecated functions
 
 From version 0.7.0, the following functions are considered deprecated and their
-use is dicouraged:
+use is discouraged:
 
 * `fderiv()` is *soft*-deprecated in favour of `derivatives()`,
 * `evaluate_smooth()` is *soft*-deprecated in favour of `smooth_estimates()`,
-* `evaluate_parametric_term()` is deprecated in favour of
+* `evaluate_parametric_term()` is *soft*-deprecated in favour of
   `parametric_effects()`.
 
 The first call to one of these functions will generate a warning, pointing to
-the newver, alternative, function. It is safe to ignore these warnings, but
+the newer, alternative, function. It is safe to ignore these warnings, but
 these deprecated functions will no longer receive updates and are thus at risk
 of being removed from the package at some future date. The newer alternatives
 can handle more types of models and smooths, especially so in the case of
@@ -74,7 +74,7 @@ can handle more types of models and smooths, especially so in the case of
     
     `data_combos()` combines returns the factor data from `factor_combos()` plus
     the typical values of numerical covariates. This is useful if you want to
-    generate predictions from the model for each combinationn of factor terms
+    generate predictions from the model for each combination of factor terms
     while holding any continuous covariates at their median values.
 
 * `nb_theta()` is a new extractor function that returns the theta parameter of
