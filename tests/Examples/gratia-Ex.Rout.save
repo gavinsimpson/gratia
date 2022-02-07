@@ -1319,11 +1319,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55e036be6e88>
+<environment: 0x55b375d8a9c8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55e036be6e88>
+<environment: 0x55b375d8a9c8>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1660,6 +1660,9 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
+> ## Don't show: 
+> op <- options(cli.unicode = FALSE, digits = 6)
+> ## End(Don't show)
 > df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
 > 
 > # A poisson example
@@ -1667,7 +1670,7 @@ detaching ‘package:mgcv’
 +          s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
 > rg <- rootogram(m)
 > rg
-# A tibble: 21 × 3
+# A tibble: 21 x 3
      bin observed fitted
    <dbl>    <int>  <dbl>
  1     0      113 117.  
@@ -1680,13 +1683,16 @@ detaching ‘package:mgcv’
  8     7       22  15.1 
  9     8        4   6.89
 10     9        3   3.00
-# … with 11 more rows
+# ... with 11 more rows
 > draw(rg) # plot the rootogram
 > 
 > # A Gaussian example
 > df <- data_sim("eg1", dist = "normal", seed = 2)
 > m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 > draw(rootogram(m, breaks = "FD"), type = "suspended")
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > 
 > 
 > 
@@ -1933,7 +1939,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  17.368 0.152 17.653 0 0 
+Time elapsed:  24.631 0.227 24.985 0 0 
 > grDevices::dev.off()
 null device 
           1 
