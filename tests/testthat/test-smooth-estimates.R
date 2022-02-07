@@ -256,3 +256,11 @@ test_that("check_user_data works when passed a vector with 1 var", {
     expect_silent(df <- check_user_data(1:10, vars = "x1"))
     expect_s3_class(df, c("tbl_df", "tbl", "data.frame"))
 })
+
+test_that("smooth_estimates works for m_gamm4", {
+    expect_silent(sm <- smooth_estimates(m_gamm4, "s(x2)"))
+    expect_s3_class(sm, c("smooth_estimates", "tbl_df", "tbl", "data.frame"))
+    expect_identical(ncol(sm), 6L)
+    expect_identical(nrow(sm), 100L)
+    expect_named(sm, c("smooth", "type", "by", "est", "se", "x2"))
+})
