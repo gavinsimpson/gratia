@@ -45,6 +45,8 @@ su_m_bivar <- gam(y ~ s(x, z, k = 40),
 
 su_m_bivar_te <- gam(y ~ te(x, z), data = su_eg2, method = "REML")
 
+su_m_bivar_t2 <- gam(y ~ t2(x, z), data = su_eg2, method = "REML")
+
 su_m_cont_by <- gam(y ~ s(x2, by = x1), data = su_eg3, method = "REML")
 
 su_m_factor_by <- gam(y ~ fac + s(x2, by = fac) + s(x0),

@@ -59,3 +59,8 @@ test_that("draw.smooth_estimates works for su_m_bivar_te", {
     expect_silent(plt <- draw(smooth_estimates(su_m_bivar_te, dist = 0.1)))
     expect_doppelganger("draw.smooth_estimates su_m_bivar_te", plt)
 })
+
+test_that("draw.smooth_estimates works for su_m_bivar_t2", {
+    expect_silent(plt <- draw(smooth_estimates(su_m_bivar_t2, dist = 0.1)))
+    expect_doppelganger("draw.smooth_estimates su_m_bivar_t2", plt)
+})
