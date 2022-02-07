@@ -248,6 +248,20 @@
 }
 
 #' @rdname add_constant
+`add_constant.smooth_estimates` <- function(object, constant = NULL, ...) {
+    ## If constant supplied, add it to `est`
+    if (!is.null(constant)) {
+        if (!is.numeric(constant)) {
+            stop("'constant' must be numeric: supplied <", constant, ">",
+                 call. = FALSE)
+        }
+        object[["est"]] <- object[["est"]] + constant
+    }
+
+    object
+}
+
+#' @rdname add_constant
 `add_constant.mgcv_smooth` <- function(object, constant = NULL, ...) {
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {
@@ -303,7 +317,7 @@
             stop("'constant' must be numeric, but was supplied <", constant,
                  ">", call. = FALSE)
         }
-        object[["est"]] <- object[["est"]] + constant
+        object[["partial"]] <- object[["partial"]] + constant
     }
 
     object
