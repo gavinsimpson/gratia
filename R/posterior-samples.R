@@ -284,18 +284,14 @@
 #'
 #' @examples
 #' load_mgcv()
-#' \dontshow{
-#' set.seed(2)
-#' op <- options(cli.unicode = FALSE)
-#' }
-#' dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
+#' \dontshow{op <- options(cli.unicode = FALSE)}
+#' dat <- data_sim("eg1", n = 1000, seed = 2)
 #' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
 #' smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
 #'
 #' ## A factor by example (with a spurious covariate x0)
-#' \dontshow{set.seed(2)}
-#' dat <- gamSim(4)
+#' dat <- data_sim("eg4", n = 1000, seed = 2)
 #'
 #' ## fit model...
 #' m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
