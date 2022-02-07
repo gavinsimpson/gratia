@@ -1344,11 +1344,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x560a4c372388>
+<environment: 0x55b7ffca5f30>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x560a4c372388>
+<environment: 0x55b7ffca5f30>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1981,7 +1981,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  16.915 0.156 17.124 0 0 
+Time elapsed:  17.252 0.16 17.553 0 0 
 > grDevices::dev.off()
 null device 
           1 
