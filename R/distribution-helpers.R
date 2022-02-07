@@ -95,7 +95,7 @@
 #' p <- theta(m)
 `has_theta` <- function(object) {
     theta_fun <- if (inherits(object, "family")) {
-        family$getTheta
+        object$getTheta
     } else {
         family(object)$getTheta
     }

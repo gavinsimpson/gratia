@@ -40,6 +40,10 @@ test_that("has_theta() returns TRUE for a nb() GAM", {
     expect_true(has_theta(m_nb))
 })
 
+test_that("has_theta() returns TRUE for a nb() GAM", {
+    expect_true(has_theta(nb()))
+})
+
 test_that("has_theta() returns FALSE for a poisson() GAM", {
     expect_false(has_theta(b_pois))
 })
