@@ -3,6 +3,7 @@
 \name{add_constant}
 \alias{add_constant}
 \alias{add_constant.evaluated_smooth}
+\alias{add_constant.smooth_estimates}
 \alias{add_constant.mgcv_smooth}
 \alias{add_constant.parametric_effects}
 \alias{add_constant.tbl_df}
@@ -12,6 +13,8 @@
 add_constant(object, constant = NULL, ...)
 
 \method{add_constant}{evaluated_smooth}(object, constant = NULL, ...)
+
+\method{add_constant}{smooth_estimates}(object, constant = NULL, ...)
 
 \method{add_constant}{mgcv_smooth}(object, constant = NULL, ...)
 
