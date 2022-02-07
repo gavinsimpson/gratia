@@ -29,7 +29,7 @@
     supported <- str_detect(family_name(model),
                             c("Negative Binomial", "negative binomial"))
     if (!any(supported)) {
-        stop()
+        stop("Only negative binomial models are supported.")
     }
 
     ## how mgcv stores theta depends on which family was used, and this also
@@ -44,4 +44,60 @@
 
     ## return
     theta
+}
+
+#' General extractor for additional parameters in mgcv models
+#'
+#' @param object a fitted model
+#' @param transform logical; transform to the natural scale of the parameter
+#' @param ... arguments passed to other methods.
+#'
+#' @export
+#'
+#' @return Returns a numeric vector of additional parameters
+#'
+#' @examples
+#' load_mgcv()
+#' df <- data_sim("eg1", dist = "poisson", seed = 42, scale = 1/5)
+#' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML",
+#'          family = nb())
+#' p <- theta(m)
+`theta` <- function(object, ...) {
+    UseMethod("theta")
+}
+
+#' @export
+#' @rdname theta
+`theta.gam` <- function(object, transform = TRUE, ...) {
+    theta_fun <- family(object)$getTheta
+    if (is.null(theta_fun)) {
+        stop("No additional parameters available for this model")
+    }
+    theta_fun(trans = transform)
+}
+
+#' Are additional parameters available for a GAM?
+#'
+#' @param object an R object, either a [family()] object or an object whose
+#'   class has a [family()] method.
+#'
+#' @return A logical; `TRUE` if additional parameters available, `FALSE`
+#'   otherwise.
+#'
+#' @export
+#'
+#' @examples
+#' load_mgcv()
+#' df <- data_sim("eg1", dist = "poisson", seed = 42, scale = 1/5)
+#' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML",
+#'          family = nb())
+#' has_theta(m)
+#' p <- theta(m)
+`has_theta` <- function(object) {
+    theta_fun <- if (inherits(object, "family")) {
+        family$getTheta
+    } else {
+        family(object)$getTheta
+    }
+    !is.null(theta_fun)
 }
