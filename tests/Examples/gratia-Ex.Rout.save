@@ -1319,11 +1319,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x560a0db9f0b8>
+<environment: 0x55e036be6e88>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x560a0db9f0b8>
+<environment: 0x55e036be6e88>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1353,8 +1353,10 @@ detaching ‘package:mgcv’
 > 
 > m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
 +          s(x3, bs = "cr"), family = nb, data = df, method = "REML")
+> ## IGNORE_RDIFF_BEGIN
 > nb_theta(m)
 [1] 239340.6
+> ## IGNORE_RDIFF_END
 > 
 > 
 > 
@@ -1931,7 +1933,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  18.544 0.242 18.839 0 0 
+Time elapsed:  17.368 0.152 17.653 0 0 
 > grDevices::dev.off()
 null device 
           1 
