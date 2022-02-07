@@ -24,7 +24,7 @@
 ### Deprecated functions
 
 From version 0.7.0, the following functions are considered deprecated and their
-use is dicouraged:
+use is discouraged:
 
 * `fderiv()` is *soft*-deprecated in favour of `derivatives()`,
 * `evaluate_smooth()` is *soft*-deprecated in favour of `smooth_estimates()`,
