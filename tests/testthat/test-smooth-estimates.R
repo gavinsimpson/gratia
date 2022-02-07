@@ -99,6 +99,35 @@ test_that("smooth_estimates works with a bivariate TPRS smooth", {
     expect_named(sm, c("smooth", "type", "by", "est", "se", "x", "z"))
 })
 
+test_that("smooth_estimates works with a bivariate TPRS smooth with dist", {
+    expect_silent(sm <- smooth_estimates(su_m_bivar, "s(x,z)", n = 50,
+                                         dist = 0.1))
+    expect_s3_class(sm, "smooth_estimates")
+    expect_s3_class(sm, "tbl_df")
+    expect_s3_class(sm, "data.frame")
+    expect_identical(nrow(sm), 2500L)
+    expect_named(sm, c("smooth", "type", "by", "est", "se", "x", "z"))
+})
+
+test_that("smooth_estimates works with a bivariate te smooth", {
+    expect_silent(sm <- smooth_estimates(su_m_bivar_te, "te(x,z)", n = 50))
+    expect_s3_class(sm, "smooth_estimates")
+    expect_s3_class(sm, "tbl_df")
+    expect_s3_class(sm, "data.frame")
+    expect_identical(nrow(sm), 2500L)
+    expect_named(sm, c("smooth", "type", "by", "est", "se", "x", "z"))
+})
+
+test_that("smooth_estimates works with a bivariate te smooth with dist", {
+    expect_silent(sm <- smooth_estimates(su_m_bivar_te, "te(x,z)", n = 50,
+                                         dist = 0.1))
+    expect_s3_class(sm, "smooth_estimates")
+    expect_s3_class(sm, "tbl_df")
+    expect_s3_class(sm, "data.frame")
+    expect_identical(nrow(sm), 2500L)
+    expect_named(sm, c("smooth", "type", "by", "est", "se", "x", "z"))
+})
+
 test_that("smooth_estimates works with a trivariate smooth", {
     expect_silent(sm <- smooth_estimates(m3, "s(x0,x1,x2)", n = 25))
     expect_s3_class(sm, "smooth_estimates")

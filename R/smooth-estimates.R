@@ -122,6 +122,15 @@
     smooth_estimates(object[["gam"]], ...)
 }
 
+# gamm4 method
+#' @export
+`smooth_estimates.list` <- function(object, ...) {
+    if (!is_gamm4(object)) {
+        stop("'smooth_estimates()' not available for a generic list")
+    }
+    smooth_estimates(object[["gam"]], ...)
+}
+
 #' Determine the type of smooth and return it n a human readble form
 #'
 #' @param smooth an object inheriting from class `mgcv.smooth`.
