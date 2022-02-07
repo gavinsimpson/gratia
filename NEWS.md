@@ -28,7 +28,7 @@ use is discouraged:
 
 * `fderiv()` is *soft*-deprecated in favour of `derivatives()`,
 * `evaluate_smooth()` is *soft*-deprecated in favour of `smooth_estimates()`,
-* `evaluate_parametric_term()` is deprecated in favour of
+* `evaluate_parametric_term()` is *soft*-deprecated in favour of
   `parametric_effects()`.
 
 The first call to one of these functions will generate a warning, pointing to
