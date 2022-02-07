@@ -26,6 +26,7 @@
 #' @export
 #' @examples
 #' load_mgcv()
+#' \dontshow{op <- options(cli.unicode = FALSE, digits = 6)}
 #' df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
 #'
 #' # A poisson example
@@ -39,6 +40,7 @@
 #' df <- data_sim("eg1", dist = "normal", seed = 2)
 #' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 #' draw(rootogram(m, breaks = "FD"), type = "suspended")
+#' \dontshow{options(op)}
 `rootogram` <- function(object, ...) {
     UseMethod("rootogram")
 }
