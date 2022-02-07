@@ -1319,11 +1319,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55b375d8a9c8>
+<environment: 0x558e29b1ee80>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55b375d8a9c8>
+<environment: 0x558e29b1ee80>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1832,11 +1832,9 @@ detaching ‘package:mgcv’
 > 
 > load_mgcv()
 > ## Don't show: 
-> set.seed(2)
 > op <- options(cli.unicode = FALSE)
 > ## End(Don't show)
-> dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
-Gu & Wahba 4 term additive model
+> dat <- data_sim("eg1", n = 1000, seed = 2)
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
 > smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
@@ -1856,11 +1854,7 @@ Gu & Wahba 4 term additive model
 # ... with 990 more rows
 > 
 > ## A factor by example (with a spurious covariate x0)
-> ## Don't show: 
-> set.seed(2)
-> ## End(Don't show)
-> dat <- gamSim(4)
-Factor `by' variable example
+> dat <- data_sim("eg4", n = 1000, seed = 2)
 > 
 > ## fit model...
 > m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
@@ -1939,7 +1933,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  24.631 0.227 24.985 0 0 
+Time elapsed:  19.208 0.156 19.49 0 0 
 > grDevices::dev.off()
 null device 
           1 
