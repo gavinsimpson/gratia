@@ -43,6 +43,30 @@ test_that("model_edf() works as expected for a single model", {
     expect_named(medf, c("model", "edf"))
 })
 
+test_that("model_edf() works for a single model type default", {
+    expect_silent(medf <- model_edf(m_gam, type = "default"))
+    expect_s3_class(medf, c("tbl_df", "tbl", "data.frame"))
+    expect_identical(nrow(medf), 1L)
+    expect_identical(ncol(medf), 2L)
+    expect_named(medf, c("model", "edf"))
+})
+
+test_that("model_edf() works for a single model type alternative", {
+    expect_silent(medf <- model_edf(m_gam, type = "alternative"))
+    expect_s3_class(medf, c("tbl_df", "tbl", "data.frame"))
+    expect_identical(nrow(medf), 1L)
+    expect_identical(ncol(medf), 2L)
+    expect_named(medf, c("model", "edf"))
+})
+
+test_that("model_edf() works for a single model, type unconditional", {
+    expect_silent(medf <- model_edf(m_gam, type = "unconditional"))
+    expect_s3_class(medf, c("tbl_df", "tbl", "data.frame"))
+    expect_identical(nrow(medf), 1L)
+    expect_identical(ncol(medf), 2L)
+    expect_named(medf, c("model", "edf"))
+})
+
 test_that("model_edf() works as expected for a single model", {
     expect_silent(medf <- model_edf(m_gam, m_1_smooth))
     expect_s3_class(medf, c("tbl_df", "tbl", "data.frame"))

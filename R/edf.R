@@ -79,7 +79,7 @@
     ##     sure why Simon extracts it
     ## - object$edf2 is an EDF that acocunts for smoothness parameter
     ##     uncertainty; only available for REML and ML fits
-    edf_vec <- extract_edf(object, type)
+    edf_vec <- extract_edf(object, type, sum = FALSE)
     edf_out <- numeric(length = n_sm)
     sm_labs <- smooths(object)[sm_ids]
     for (i in seq_along(edf_out)) {
@@ -104,9 +104,12 @@
     ## combine model and others into a list
     models <- append(list(object), dots)
 
+    ## match type
+    type <- match.arg(type)
+
     ## loop over models and extract the requested EDF
     edfs <- vapply(models, FUN = extract_edf, FUN.VALUE = numeric(1L),
-                   sum = TRUE)
+                   sum = TRUE, type = type)
 
     ## prepare output tibble
     tibble(model = model_names, edf = edfs)

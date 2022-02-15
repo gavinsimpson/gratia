@@ -1,3 +1,10 @@
+# gratia 0.7.0-1
+
+## Bug fixes
+
+* `model_edf()` was not using the `type` argument. As a result it only ever
+   returned the default EDF type.
+
 # gratia 0.7.0
 
 ## Major changes
