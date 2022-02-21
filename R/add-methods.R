@@ -236,6 +236,8 @@
 
 #' @rdname add_constant
 #' @export
+#' @importFrom dplyr mutate across
+#' @importFrom tidyselect any_of
 `add_constant.evaluated_smooth` <- function(object, constant = NULL, ...) {
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {
@@ -243,7 +245,9 @@
             stop("'constant' must be numeric: supplied <", constant, ">",
                  call. = FALSE)
         }
-        object[["est"]] <- object[["est"]] + constant
+        mutate(object,
+               across(any_of(c("est", "lower", "upper")),
+                      .fns = ~ .x + constant))
     }
 
     object
@@ -251,6 +255,8 @@
 
 #' @rdname add_constant
 #' @export
+#' @importFrom dplyr mutate across
+#' @importFrom tidyselect any_of
 `add_constant.smooth_estimates` <- function(object, constant = NULL, ...) {
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {
@@ -258,7 +264,9 @@
             stop("'constant' must be numeric: supplied <", constant, ">",
                  call. = FALSE)
         }
-        object[["est"]] <- object[["est"]] + constant
+        mutate(object,
+               across(any_of(c("est", "lower", "upper")),
+                      .fns = ~ .x + constant))
     }
 
     object
@@ -266,6 +274,8 @@
 
 #' @rdname add_constant
 #' @export
+#' @importFrom dplyr mutate across
+#' @importFrom tidyselect any_of
 `add_constant.mgcv_smooth` <- function(object, constant = NULL, ...) {
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {
@@ -273,7 +283,9 @@
             stop("'constant' must be numeric: supplied <", constant, ">",
                  call. = FALSE)
         }
-        object[["est"]] <- object[["est"]] + constant
+        mutate(object,
+               across(any_of(c("est", "lower_ci", "upper_ci")),
+                      .fns = ~ .x + constant))
     }
 
     object
@@ -281,6 +293,8 @@
 
 #' @rdname add_constant
 #' @export
+#' @importFrom dplyr mutate across
+#' @importFrom tidyselect any_of
 `add_constant.parametric_effects` <- function(object, constant = NULL,
                                               ...) {
     ## If constant supplied, add it to `est`
@@ -289,7 +303,9 @@
             stop("'constant' must be numeric: supplied <", constant,
                  ">", call. = FALSE)
         }
-        object[["partial"]] <- object[["partial"]] + constant
+        mutate(object,
+               across(any_of(c("partial", "lower", "upper")),
+                      .fns = ~ .x + constant))
     }
 
     object
@@ -297,6 +313,8 @@
 
 #' @rdname add_constant
 #' @export
+#' @importFrom dplyr mutate across
+#' @importFrom tidyselect all_of
 `add_constant.tbl_df` <- function(object, constant = NULL, column = NULL,
                                   ...) {
     if (is.null(column)) {
@@ -308,7 +326,9 @@
             stop("'constant' must be numeric: supplied <", constant,
                  ">", call. = FALSE)
         }
-        object[[column]] <- object[[column]] + constant
+        mutate(object,
+               across(all_of(column),
+                      .fns = ~ .x + constant))
     }
 
     object
@@ -316,6 +336,8 @@
 
 #' @rdname add_constant
 #' @export
+#' @importFrom dplyr mutate across
+#' @importFrom tidyselect all_of
 `add_constant.evaluated_parametric_term` <- function(object, constant = NULL,
                                                      ...) {
     ## If constant supplied, add it to `est`
@@ -324,7 +346,9 @@
             stop("'constant' must be numeric: supplied <", constant,
                  ">", call. = FALSE)
         }
-        object[["partial"]] <- object[["partial"]] + constant
+        mutate(object,
+               across(all_of(c("partial")),
+                      .fns = ~ .x + constant))
     }
 
     object
