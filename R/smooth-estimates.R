@@ -670,7 +670,20 @@
 
 #' @importFrom tidyr unnest
 #' @importFrom tidyselect any_of
-`draw_smooth_estimates` <- function(object, ...) {
+`draw_smooth_estimates` <- function(object,
+                                    constant = constant,
+                                    fun = fun,
+                                    contour = contour,
+                                    contour_col = contour_col,
+                                    n_contour = n_contour,
+                                    ci_alpha = ci_alpha,
+                                    ci_col = ci_col,
+                                    smooth_col = smooth_col,
+                                    partial_match = partial_match,
+                                    discrete_colour = discrete_colour,
+                                    continuous_colour = continuous_colour,
+                                    continuous_fill = continuous_fill,
+                                    ylim = ylim, ...) {
     sm_vars <- vars_from_label(unique(object[["smooth"]]))
     sm_dim <- length(sm_vars)
     sm_type <- unique(object[["type"]])
@@ -725,7 +738,21 @@
     }
 
     plot_smooth(object, variables = sm_vars, rug = rug_data,
-                partial_residuals = p_residuals, ...)
+                partial_residuals = p_residuals,
+                constant = constant,
+                fun = fun,
+                contour = contour,
+                contour_col = contour_col,
+                n_contour = n_contour,
+                ci_alpha = ci_alpha,
+                ci_col = ci_col,
+                smooth_col = smooth_col,
+                partial_match = partial_match,
+                discrete_colour = discrete_colour,
+                continuous_colour = continuous_colour,
+                continuous_fill = continuous_fill,
+                ylim = ylim,
+                ...)
 }
 
 `plot_smooth` <- function(object, ...) {
