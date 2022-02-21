@@ -1035,6 +1035,7 @@ vars_from_label <- function(label) {
 #' @return Returns `object` but with the estimate and upper and lower values
 #'   of the confidence interval transformed via the function.
 #'
+#' @export
 #' @author Gavin L. Simpson
 `transform_fun` <- function(object, fun = NULL , ...) {
     UseMethod("transform_fun")
@@ -1134,7 +1135,7 @@ vars_from_label <- function(label) {
     if (!is.null(fun)) {
         fun <- match.fun(fun)
         object <- mutate(object,
-                         across(column, .fns = fun))
+                         across(all_of(column), .fns = fun))
     }
 
     object
