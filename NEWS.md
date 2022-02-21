@@ -1,9 +1,12 @@
-# gratia 0.7.0-1
+# gratia 0.7.0-2
 
 ## Bug fixes
 
 * `model_edf()` was not using the `type` argument. As a result it only ever
    returned the default EDF type.
+
+* `add_constant` methods weren't applying the constant to all the required
+  variables.
 
 # gratia 0.7.0
 
@@ -48,11 +51,11 @@ can handle more types of models and smooths, especially so in the case of
 ## New features
 
 * `fitted_values()` provides a tidy wrapper around `predict.gam()` for
-  generating fitted values from the model. New covariate values can be provide
+  generating fitted values from the model. New covariate values can be provided
   via argument `data`. A credible interval on the fitted values is returned, and
   values can be on the link (linear predictor) or response scale.
 
-  Note that this function returns expected values of the response. Hence
+  Note that this function returns expected values of the response. Hence,
   "fitted values" is used instead of "predictions" in the case of new covariate
   values to differentiate these values from the case of generating new response
   values from a fitted model.
@@ -63,7 +66,7 @@ can handle more types of models and smooths, especially so in the case of
 
 * New helper functions `typical_values()`, `factor_combos()` and
   `data_combos()` for quickly creating data sets for producing predictions from
-  fitted models where some of the covariates are fixed at come typical or
+  fitted models where some covariatess are fixed at come typical or
   representative values.
 
     `typical_values()` is a new helper function to return typical values for the
@@ -75,7 +78,7 @@ can handle more types of models and smooths, especially so in the case of
     
     `factor_combos()` extracts and returns the combinations of levels of factors
     found in data used to fit a model. Unlike `typical_values()`,
-    `factor_combos()` returns all of the combinations of factor levels observed
+    `factor_combos()` returns all the combinations of factor levels observed
     in the data, not just the modal level. Optionally, all combinations of
     factor levels can be returned, not just those in the observed data.
     
