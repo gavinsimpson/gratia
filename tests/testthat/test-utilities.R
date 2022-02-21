@@ -387,7 +387,7 @@ test_that("transform_fun works for evaluated_smooth", {
     expect_silent(sm <- transform_fun(sm, fun = exp))
 })
 
-test_that("transform_fun works for evaluated_smooth", {
+test_that("transform_fun works for smooth_estimates", {
     expect_silent(sm <- smooth_estimates(m_gam, smooth = "s(x1)"))
     expect_silent(sm <- transform_fun(sm, fun = exp))
 })

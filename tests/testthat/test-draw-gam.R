@@ -95,3 +95,37 @@ test_that("draw.gam works for m_para_sm", {
                    "Interaction terms are not currently supported.")
     expect_doppelganger("draw_gam m_para_sm parametric", plt)
 })
+
+test_that("draw.gam with constant works for GAM with 1 smooth", {
+    constant <- coef(m_1_smooth)[1]
+    expect_silent(plt <- draw(m_1_smooth, constant = constant))
+    expect_doppelganger("draw_gam m_1_smooth constant", plt)
+})
+
+test_that("draw.gam with constant works for GAM with multiple smooths", {
+    constant <- coef(m_gam)[1]
+    expect_silent(plt <- draw(m_gam, constant = constant))
+    expect_doppelganger("draw_gam m_gam constant", plt)
+})
+
+test_that("draw.gam with fun works for GAM with 1 smooth", {
+    expect_silent(plt <- draw(m_1_smooth, fun = exp))
+    expect_doppelganger("draw_gam m_1_smooth fun", plt)
+})
+
+test_that("draw.gam with fun works for GAM with multiple smooths", {
+    expect_silent(plt <- draw(m_gam, fun = exp))
+    expect_doppelganger("draw_gam m_gam fun", plt)
+})
+
+test_that("draw.gam with constant + fun works for GAM with 1 smooth", {
+    constant <- coef(m_gam)[1]
+    expect_silent(plt <- draw(m_1_smooth, constant = constant, fun = exp))
+    expect_doppelganger("draw_gam m_1_smooth constant fun", plt)
+})
+
+test_that("draw.gam with constant + fun works for GAM with multiple smooths", {
+    constant <- coef(m_gam)[1]
+    expect_silent(plt <- draw(m_gam, constant = constant, fun = exp))
+    expect_doppelganger("draw_gam m_gam constant fun", plt)
+})

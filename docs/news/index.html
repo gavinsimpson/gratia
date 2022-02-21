@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0-1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0-2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,11 +48,11 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.7.0-1" id="gratia-070-1">gratia 0.7.0-1<a class="anchor" aria-label="anchor" href="#gratia-070-1"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.7.0-2" id="gratia-070-2">gratia 0.7.0-2<a class="anchor" aria-label="anchor" href="#gratia-070-2"></a></h2>
 <div class="section level3">
-<h3 id="bug-fixes-0-7-0-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-0-1"></a></h3>
-<ul><li>
-<code><a href="../reference/edf.html">model_edf()</a></code> was not using the <code>type</code> argument. As a result it only ever returned the default EDF type.</li>
+<h3 id="bug-fixes-0-7-0-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-0-2"></a></h3>
+<ul><li><p><code><a href="../reference/edf.html">model_edf()</a></code> was not using the <code>type</code> argument. As a result it only ever returned the default EDF type.</p></li>
+<li><p><code>add_constant</code> methods weren’t applying the constant to all the required variables.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -80,14 +80,14 @@
 <div class="section level3">
 <h3 id="new-features-0-7-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-0"></a></h3>
 <ul><li>
-<p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> provides a tidy wrapper around <code>predict.gam()</code> for generating fitted values from the model. New covariate values can be provide via argument <code>data</code>. A credible interval on the fitted values is returned, and values can be on the link (linear predictor) or response scale.</p>
-<p>Note that this function returns expected values of the response. Hence “fitted values” is used instead of “predictions” in the case of new covariate values to differentiate these values from the case of generating new response values from a fitted model.</p>
+<p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> provides a tidy wrapper around <code>predict.gam()</code> for generating fitted values from the model. New covariate values can be provided via argument <code>data</code>. A credible interval on the fitted values is returned, and values can be on the link (linear predictor) or response scale.</p>
+<p>Note that this function returns expected values of the response. Hence, “fitted values” is used instead of “predictions” in the case of new covariate values to differentiate these values from the case of generating new response values from a fitted model.</p>
 </li>
 <li><p><code><a href="../reference/rootogram.html">rootogram()</a></code> and its <code><a href="../reference/draw.html">draw()</a></code> method produce rootograms as diagnostic plots for fitted models. Currently only for models fitted with <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson()</a></code>, <code>nb()</code>, <code>negbin()</code>, <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian()</a></code> families.</p></li>
 <li>
-<p>New helper functions <code><a href="../reference/typical_values.html">typical_values()</a></code>, <code><a href="../reference/factor_combos.html">factor_combos()</a></code> and <code><a href="../reference/data_combos.html">data_combos()</a></code> for quickly creating data sets for producing predictions from fitted models where some of the covariates are fixed at come typical or representative values.</p>
+<p>New helper functions <code><a href="../reference/typical_values.html">typical_values()</a></code>, <code><a href="../reference/factor_combos.html">factor_combos()</a></code> and <code><a href="../reference/data_combos.html">data_combos()</a></code> for quickly creating data sets for producing predictions from fitted models where some covariatess are fixed at come typical or representative values.</p>
 <p><code><a href="../reference/typical_values.html">typical_values()</a></code> is a new helper function to return typical values for the covariates of a fitted model. It returns the value of the observation closest to the median for numerical covariates or the modal level of a factor while preserving the levels of that factor. <code><a href="../reference/typical_values.html">typical_values()</a></code> is useful in preparing data slices or scenarios for which fitted values from the estimated model are required.</p>
-<p><code><a href="../reference/factor_combos.html">factor_combos()</a></code> extracts and returns the combinations of levels of factors found in data used to fit a model. Unlike <code><a href="../reference/typical_values.html">typical_values()</a></code>, <code><a href="../reference/factor_combos.html">factor_combos()</a></code> returns all of the combinations of factor levels observed in the data, not just the modal level. Optionally, all combinations of factor levels can be returned, not just those in the observed data.</p>
+<p><code><a href="../reference/factor_combos.html">factor_combos()</a></code> extracts and returns the combinations of levels of factors found in data used to fit a model. Unlike <code><a href="../reference/typical_values.html">typical_values()</a></code>, <code><a href="../reference/factor_combos.html">factor_combos()</a></code> returns all the combinations of factor levels observed in the data, not just the modal level. Optionally, all combinations of factor levels can be returned, not just those in the observed data.</p>
 <p><code><a href="../reference/data_combos.html">data_combos()</a></code> combines returns the factor data from <code><a href="../reference/factor_combos.html">factor_combos()</a></code> plus the typical values of numerical covariates. This is useful if you want to generate predictions from the model for each combination of factor terms while holding any continuous covariates at their median values.</p>
 </li>
 <li><p><code><a href="../reference/nb_theta.html">nb_theta()</a></code> is a new extractor function that returns the theta parameter of a fitted negative binomial GAM (families <code>nb()</code> or <code>negbin()</code>). Additionally, <code><a href="../reference/theta.html">theta()</a></code> and <code><a href="../reference/has_theta.html">has_theta()</a></code> provide additional functionality. <code><a href="../reference/theta.html">theta()</a></code> is an experimental function for extracting any additional parameters from the model or family. <code><a href="../reference/has_theta.html">has_theta()</a></code> is useful for checking if any additional parameters are available from the family or model.</p></li>
