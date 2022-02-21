@@ -5,7 +5,7 @@ library("testthat")
 library("gratia")
 library("mgcv")
 library("gamm4")
-## library("MASS")
+# library("MASS")
 
 test_that("smooth_terms() methods work", {
     st <- smooth_terms(m_gam)
