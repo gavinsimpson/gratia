@@ -57,6 +57,6 @@ o_conc <- concrvity(m)
 draw(o_conc)
 
 ## pairwise concurvity
-p_conc <- concrvity(m)
+p_conc <- concrvity(m, pairwise = TRUE)
 draw(p_conc)
 }
