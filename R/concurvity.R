@@ -32,7 +32,7 @@
 #' draw(o_conc)
 #'
 #' ## pairwise concurvity
-#' p_conc <- concrvity(m)
+#' p_conc <- concrvity(m, pairwise = TRUE)
 #' draw(p_conc)
 `model_concurvity` <-  function(model, ...) {
     UseMethod("model_concurvity")
