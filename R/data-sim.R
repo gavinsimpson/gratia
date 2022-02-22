@@ -80,18 +80,38 @@
 }
 
 ## Gu Wabha functions
+#' Gu and Wabha test functions
+#'
+#' @param x numeric; vecotor of points to evaluate the function at, on interval
+#'   (0,1)
+#'
+#' @rdname gw_functions
+#' @export
+#'
+#' @examples
+#' x <- seq(0, 1, length = 6)
+#' gw_f0(x)
+#' gw_f1(x)
+#' gw_f2(x)
+#' gw_f3(x) # should be constant 0
 gw_f0 <- function(x) {
     2 * sin(pi * x)
 }
 
+#' @rdname gw_functions
+#' @export
 gw_f1 <- function(x) {
     exp(2 * x)
 }
 
+#' @rdname gw_functions
+#' @export
 gw_f2 <- function(x) {
     0.2 * x^11 * (10 * (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^10
 }
 
+#' @rdname gw_functions
+#' @export
 gw_f3 <- function(x) { # a null function with zero effect
     0 * x
 }
@@ -162,7 +182,8 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
     data <- tibble(x0 = runif(n, 0, 1), x1 = runif(n, 0, 1),
                    x2 = sort(runif(n, 0, 1)))
     data <- mutate(data,
-                   f1 = 2 * sin(pi * .data$x2), f2 = exp(2 * .data$x2) - 3.75887,
+                   f1 = 2 * sin(pi * .data$x2), f2 = exp(2 * .data$x2) -
+                     3.75887,
                    f3 = 0.2 * .data$x2^11 * (10 * (1 - .data$x2))^6 +
                        10 * (10 * .data$x2)^3 * (1 - .data$x2)^10,
                    fac = as.factor(sample(1:3, n, replace = TRUE)))

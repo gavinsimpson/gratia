@@ -1,5 +1,12 @@
 #' Concurvity of an estimated GAM
 #'
+#' @param model a fitted GAM. Currently only objects of class `"gam"` are
+#'   supported
+#' @param terms currently ignored
+#' @param type character;
+#' @param pairwise logical; extract pairwise concurvity of model terms?
+#' @param ... arguents passed to other methods.
+#'
 #' @importFrom tibble as_tibble add_column rownames_to_column
 #' @importFrom mgcv concurvity
 #' @importFrom tidyr pivot_longer
@@ -9,10 +16,12 @@
 #'
 #' @examples
 #' ## simulate data with concurvity...
+#' library("tibble")
+#' load_mgcv()
 #' set.seed(8)
 #' n <- 200
 #' df <- tibble(t = sort(runif(n)),
-#'              x = gratia::f2_fun(t) + rnorm(n) * 3,
+#'              x = gw_f2(t) + rnorm(n) * 3,
 #'              y = sin(4 * pi * t) + exp(x / 20) + rnorm(n) * 0.3)
 #'
 #' ## fit model
@@ -25,9 +34,16 @@
 #' ## pairwise concurvity
 #' p_conc <- concrvity(m)
 #' draw(p_conc)
-`model_concurvity` <- function(model, terms = everything(),
-                               type = c("all", "estimate", "observed", "worst"),
-                               pairwise = FALSE) {
+`model_concurvity` <-  function(model, ...) {
+    UseMethod("model_concurvity")
+}
+
+#' @export
+#' @rdname model_concurvity
+`model_concurvity.gam` <- function(model, terms = everything(),
+                                   type = c("all", "estimate", "observed",
+                                            "worst"),
+                                   pairwise = FALSE, ...) {
     type <- match.arg(type)
     con <- if (pairwise) {
         pairwise_concurvity(model, terms = terms, type = type)
@@ -41,11 +57,11 @@
 #' @rdname model_concurvity
 `concrvity` <- function(model, terms = everything(),
                         type = c("all", "estimate", "observed", "worst"),
-                        pairwise = FALSE) {
+                        pairwise = FALSE, ...) {
     model_concurvity(model = model,
                      terms = terms,
                      type = type,
-                     pairwise = pairwise)
+                     pairwise = pairwise, ...)
 }
 
 `pairwise_concurvity` <- function(model, terms = everything(),
