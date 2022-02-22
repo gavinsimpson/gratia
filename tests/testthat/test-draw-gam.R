@@ -129,3 +129,13 @@ test_that("draw.gam with constant + fun works for GAM with multiple smooths", {
     expect_silent(plt <- draw(m_gam, constant = constant, fun = exp))
     expect_doppelganger("draw_gam m_gam constant fun", plt)
 })
+
+test_that("draw.gam works for a trivariate smooth", {
+    expect_silent(plt <- draw(su_m_trivar_te))
+    expect_doppelganger("draw_gam trivar te", plt)
+})
+
+test_that("draw.gam works for a quadvariate smooth", {
+    expect_silent(plt <- draw(su_m_quadvar_te))
+    expect_doppelganger("draw_gam quadvar te", plt)
+})
