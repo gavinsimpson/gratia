@@ -34,6 +34,25 @@
 #'   function. Function `fun` will be applied after adding any `constant`, if
 #'   provided.
 #' @param ci_level numeric between 0 and 1; the coverage of credible interval.
+#' @param n numeric; the number of points over the range of the covariate at
+#'   which to evaluate the smooth.
+#' @param n_3d numeric; the number of new observations to generate for the third
+#'   dimension of a 3D smooth.
+#' @param n_4d numeric; the number of new observations to generate for the
+#'   dimensions higher than 2 (!) of a *k*D smooth (*k* >= 4). For example, if
+#'   the smooth is a 4D smooth, each of dimensions 3 and 4 will get `n_4d`
+#'   new observations.
+#' @param unconditional logical; should confidence intervals include the
+#'   uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian
+#'   covariance matrix will be used.
+#' @param overall_uncertainty logical; should the uncertainty in the model
+#'  constant term be included in the standard error of the evaluate values of
+#'  the smooth?
+#' @param dist numeric; if greater than 0, this is used to determine when
+#'   a location is too far from data to be plotted when plotting 2-D smooths.
+#'   The data are scaled into the unit square before deciding what to exclude,
+#'   and `dist` is a distance within the unit square. See
+#'   [mgcv::exclude.too.far()] for further details.
 #' @param rug logical; draw a rug plot at the botom of each plot?
 #' @param contour logical; should contours be draw on the plot using
 #'   [ggplot2::geom_contour()].
@@ -57,8 +76,6 @@
 #' @param guides character; one of `"keep"` (the default), `"collect"`, or
 #'   `"auto"`. Passed to [patchwork::plot_layout()]
 #' @param ... additional arguments passed to [patchwork::wrap_plots()].
-#'
-#' @inheritParams evaluate_smooth
 #'
 #' @note Internally, plots of each smooth are created using [ggplot2::ggplot()]
 #'   and composed into a single plot using [patchwork::wrap_plots()]. As a
@@ -118,6 +135,8 @@
                        scales = c("free", "fixed"),
                        ci_level = 0.95,
                        n = 100,
+                       n_3d = 16,
+                       n_4d = 4,
                        unconditional = FALSE,
                        overall_uncertainty = TRUE,
                        constant = NULL,
@@ -164,6 +183,10 @@
         }
     }
 
+    # sort out n_3d and n_4d. If these are `NULL` then do sensible thing at set
+    # them small. Default is 3 for n_4d and for 12 for n_3d, but if we have a kD
+    # smooth (k >= 4) we want to
+
     S <- smooths(object) # vector of smooth labels - "s(x)"
 
     # select smooths
@@ -176,6 +199,8 @@
     sm_eval <- smooth_estimates(object,
                                 smooth = S[select],
                                 n = n,
+                                n_3d = n_3d,
+                                n_4d = n_4d,
                                 data = data,
                                 unconditional = unconditional,
                                 overall_uncertainty = overall_uncertainty,

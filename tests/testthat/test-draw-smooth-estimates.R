@@ -64,3 +64,39 @@ test_that("draw.smooth_estimates works for su_m_bivar_t2", {
     expect_silent(plt <- draw(smooth_estimates(su_m_bivar_t2, dist = 0.1)))
     expect_doppelganger("draw.smooth_estimates su_m_bivar_t2", plt)
 })
+
+test_that("draw.smooth_estimates works for su_m_trivar", {
+    expect_silent(plt <- draw(smooth_estimates(su_m_trivar, dist = 0.1,
+                                               n = 25, n_3d = 4)))
+    expect_doppelganger("draw.smooth_estimates su_m_trivar", plt)
+})
+
+test_that("draw.smooth_estimates works for su_m_trivar_te", {
+    expect_silent(plt <- draw(smooth_estimates(su_m_trivar_te, dist = 0.1,
+                                               n = 25, n_3d = 4)))
+    expect_doppelganger("draw.smooth_estimates su_m_trivar_te", plt)
+})
+
+test_that("draw.smooth_estimates works for su_m_trivar_t2", {
+    expect_silent(plt <- draw(smooth_estimates(su_m_trivar_t2, dist = 0.1,
+                                               n = 25, n_3d = 4)))
+    expect_doppelganger("draw.smooth_estimates su_m_trivar_t2", plt)
+})
+
+test_that("draw.smooth_estimates works for su_m_quadvar", {
+    expect_silent(plt <- draw(smooth_estimates(su_m_quadvar, dist = 0.1,
+                                               n = 25, n_3d = 4, n_4d = 3)))
+    expect_doppelganger("draw.smooth_estimates su_m_quadvar", plt)
+})
+
+test_that("draw.smooth_estimates works for su_m_quadvar_te", {
+    expect_silent(plt <- draw(smooth_estimates(su_m_quadvar_te, dist = 0.1,
+                                               n = 25, n_3d = 4, n_4d = 3)))
+    expect_doppelganger("draw.smooth_estimates su_m_quadvar_te", plt)
+})
+
+test_that("draw.smooth_estimates works for su_m_quadvar_t2", {
+    expect_silent(plt <- draw(smooth_estimates(su_m_quadvar_t2, dist = 0.1,
+                                               n = 25, n_3d = 4, n_4d = 3)))
+    expect_doppelganger("draw.smooth_estimates su_m_quadvar_t2", plt)
+})

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0-2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0-3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,6 +61,8 @@
   <span class="va">smooth</span>,
   <span class="va">model</span>,
   n <span class="op">=</span> <span class="fl">100</span>,
+  n_3d <span class="op">=</span> <span class="cn">NULL</span>,
+  n_4d <span class="op">=</span> <span class="cn">NULL</span>,
   data <span class="op">=</span> <span class="cn">NULL</span>,
   unconditional <span class="op">=</span> <span class="cn">FALSE</span>,
   overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -106,6 +108,8 @@
   <span class="va">smooth</span>,
   <span class="va">model</span>,
   n <span class="op">=</span> <span class="fl">100</span>,
+  n_3d <span class="op">=</span> <span class="cn">NULL</span>,
+  n_4d <span class="op">=</span> <span class="cn">NULL</span>,
   data <span class="op">=</span> <span class="cn">NULL</span>,
   unconditional <span class="op">=</span> <span class="cn">FALSE</span>,
   overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -118,6 +122,8 @@
   <span class="va">smooth</span>,
   <span class="va">model</span>,
   n <span class="op">=</span> <span class="fl">100</span>,
+  n_3d <span class="op">=</span> <span class="cn">NULL</span>,
+  n_4d <span class="op">=</span> <span class="cn">NULL</span>,
   data <span class="op">=</span> <span class="cn">NULL</span>,
   unconditional <span class="op">=</span> <span class="cn">FALSE</span>,
   overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -138,6 +144,24 @@ models are suported.</p></dd>
 <dt>n</dt>
 <dd><p>numeric; the number of points over the range of the covariate at
 which to evaluate the smooth.</p></dd>
+<dt>n_3d</dt>
+<dd><p>numeric; the number of points over the range of last
+covariate in a 3D or 4D smooth. The default is <code>NULL</code> which achieves the
+standard behaviour of using <code>n</code> points over the range of all covariate,
+resulting in <code>n^d</code> evaluation pointsm, where <code>d</code> is the dimension of the
+smooth. For <code>d &gt; 2</code> this can result in very many evaluation points and slow
+performance. For smooths of <code>d &gt; 4</code>, the value of <code>n_4d</code> will be used for
+all dimensions <code>&gt; 4</code>, unless this is <code>NULL</code>, in which case the default
+behaviour (using <code>n</code> for all dimensions) will be observed.</p></dd>
+<dt>n_4d</dt>
+<dd><p>numeric; the number of points over the range of last
+covariate in a 3D or 4D smooth. The default is <code>NULL</code> which achieves the
+standard behaviour of using <code>n</code> points over the range of all covariate,
+resulting in <code>n^d</code> evaluation pointsm, where <code>d</code> is the dimension of the
+smooth. For <code>d &gt; 2</code> this can result in very many evaluation points and slow
+performance. For smooths of <code>d &gt; 4</code>, the value of <code>n_4d</code> will be used for
+all dimensions <code>&gt; 4</code>, unless this is <code>NULL</code>, in which case the default
+behaviour (using <code>n</code> for all dimensions) will be observed.</p></dd>
 <dt>data</dt>
 <dd><p>an optional data frame of values to evaluate <code>smooth</code> at.</p></dd>
 <dt>unconditional</dt>

@@ -43,9 +43,25 @@ su_m_bivar <- gam(y ~ s(x, z, k = 40),
                   data = su_eg2,
                   method = "REML")
 
-su_m_bivar_te <- gam(y ~ te(x, z), data = su_eg2, method = "REML")
+su_m_trivar <- gam(y ~ s(x0, x1, x2), data = su_eg1, method = "REML")
 
-su_m_bivar_t2 <- gam(y ~ t2(x, z), data = su_eg2, method = "REML")
+su_m_quadvar <- gam(y ~ s(x0, x1, x2, x3), data = su_eg1, method = "REML")
+
+su_m_bivar_te <- gam(y ~ te(x, z, k = c(5, 5)), data = su_eg2, method = "REML")
+
+su_m_bivar_t2 <- gam(y ~ t2(x, z, k = c(5, 5)), data = su_eg2, method = "REML")
+
+su_m_trivar_te <- gam(y ~ te(x0, x1, x2, k = c(3, 3, 3)),
+                      data = su_eg1, method = "REML")
+
+su_m_quadvar_te <- gam(y ~ te(x0, x1, x2, x3, k = c(3, 3, 3, 3)),
+                       data = su_eg1, method = "REML")
+
+su_m_trivar_t2 <- gam(y ~ t2(x0, x1, x2, k = c(3, 3, 3)),
+                      data = su_eg1, method = "REML")
+
+su_m_quadvar_t2 <- gam(y ~ t2(x0, x1, x2, x3, k = c(3, 3, 3, 3)),
+                       data = su_eg1, method = "REML")
 
 su_m_cont_by <- gam(y ~ s(x2, by = x1), data = su_eg3, method = "REML")
 

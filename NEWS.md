@@ -1,4 +1,26 @@
-# gratia 0.7.0-2
+# gratia 0.7.0-3
+
+## New features
+
+* {gratia} can now handle smooths of 3 or 4 covariates when plotting. For
+  smooths of 3 covariates, the third covariate is handled with
+  `ggplot2::facet_wrap()` and a set (default `n` = 16) of small multiples is
+  drawn, each a 2d surface evaluated at the specified value of the third
+  covariate. For smooths of 4 covariates, `ggplot2::facet_grid()` is used to
+  draw the small multiples, with the default producing 4 rows by 4 columns of
+  plots at the specific values of the third and fourth covariates. The number of
+  small multiples produced is controlled by new arguments `n_3d` (default =
+  `n_3d = 16`) and `n_4d` (default `n_4d = 4, yielding `n_4d * n_4d` = 16
+  facets) respectively.
+
+  This only affects plotting; `smooth_estimates()` has been able to handle
+  smooths of any number of covariates for a while.
+
+  When handling higher-dimensional smooths, actually drawing the plots on the
+  default device can be slow, especially with the default value of `n = 100`
+  (which for 3D or 4D smooths would result in 160,000 data points being
+  plotted). As such it is recommended that you reduce `n` to a smaller value:
+  `n = 50` is a reasonable compromise of resolution and speed.
 
 ## Bug fixes
 

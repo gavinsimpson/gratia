@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0-2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0-3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,9 +48,17 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.7.0-2" id="gratia-070-2">gratia 0.7.0-2<a class="anchor" aria-label="anchor" href="#gratia-070-2"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.7.0-3" id="gratia-070-3">gratia 0.7.0-3<a class="anchor" aria-label="anchor" href="#gratia-070-3"></a></h2>
 <div class="section level3">
-<h3 id="bug-fixes-0-7-0-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-0-2"></a></h3>
+<h3 id="new-features-0-7-0-3">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-0-3"></a></h3>
+<ul><li>
+<p>{gratia} can now handle smooths of 3 or 4 covariates when plotting. For smooths of 3 covariates, the third covariate is handled with <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">ggplot2::facet_wrap()</a></code> and a set (default <code>n</code> = 16) of small multiples is drawn, each a 2d surface evaluated at the specified value of the third covariate. For smooths of 4 covariates, <code><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">ggplot2::facet_grid()</a></code> is used to draw the small multiples, with the default producing 4 rows by 4 columns of plots at the specific values of the third and fourth covariates. The number of small multiples produced is controlled by new arguments <code>n_3d</code> (default = <code>n_3d = 16</code>) and <code>n_4d</code> (default <code>n_4d = 4, yielding</code>n_4d * n_4d` = 16 facets) respectively.</p>
+<p>This only affects plotting; <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> has been able to handle smooths of any number of covariates for a while.</p>
+<p>When handling higher-dimensional smooths, actually drawing the plots on the default device can be slow, especially with the default value of <code>n = 100</code> (which for 3D or 4D smooths would result in 160,000 data points being plotted). As such it is recommended that you reduce <code>n</code> to a smaller value: <code>n = 50</code> is a reasonable compromise of resolution and speed.</p>
+</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-7-0-3">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-0-3"></a></h3>
 <ul><li><p><code><a href="../reference/edf.html">model_edf()</a></code> was not using the <code>type</code> argument. As a result it only ever returned the default EDF type.</p></li>
 <li><p><code>add_constant</code> methods weren’t applying the constant to all the required variables.</p></li>
 </ul></div>

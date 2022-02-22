@@ -10,6 +10,14 @@
 #' @param smooth character; a single smooth to evaluate.
 #' @param n numeric; the number of points over the range of the covariate at
 #'   which to evaluate the smooth.
+#' @param n_3d,n_4d numeric; the number of points over the range of last
+#'   covariate in a 3D or 4D smooth. The default is `NULL` which achieves the
+#'   standard behaviour of using `n` points over the range of all covariate,
+#'   resulting in `n^d` evaluation pointsm, where `d` is the dimension of the
+#'   smooth. For `d > 2` this can result in very many evaluation points and slow
+#'   performance. For smooths of `d > 4`, the value of `n_4d` will be used for
+#'   all dimensions `> 4`, unless this is `NULL`, in which case the default
+#'   behaviour (using `n` for all dimensions) will be observed.
 #' @param data a data frame of covariate values at which to evaluate the
 #'   smooth.
 #' @param unconditional logical; should confidence intervals include the
@@ -59,6 +67,8 @@
 `smooth_estimates.gam` <- function(object,
                                    smooth = NULL,
                                    n = 100,
+                                   n_3d = NULL,
+                                   n_4d = NULL,
                                    data = NULL,
                                    unconditional = FALSE,
                                    overall_uncertainty = TRUE,
@@ -91,12 +101,23 @@
         }
         check_all_vars(object, data = data, smooths = smooths)
         data <- delete_response(object, data = data)
-     }
+    }
+
+    # fix up the n, n_3d, n_4d. If `n_3d` is `NULL` set `n_3d <- n`
+    if (is.null(n_3d)) {
+        n_3d <- n
+    }
+    # likewise fix up n_4d; set it to `n` if `n_4d` is NULL
+    if (is.null(n_4d)) {
+        n_4d <- n
+    }
 
     for (i in seq_along(sm_list)) {
         sm_list[[i]] <- eval_smooth(smooths[[i]],
                                     model = object,
                                     n = n,
+                                    n_3d = n_3d,
+                                    n_4d = n_4d,
                                     data = data,
                                     unconditional = unconditional,
                                     overall_uncertainty = overall_uncertainty,
@@ -358,7 +379,11 @@
 #' @rdname eval_smooth
 #' @importFrom tibble add_column
 #' @export
-`eval_smooth.mgcv.smooth` <- function(smooth, model, n = 100, data = NULL,
+`eval_smooth.mgcv.smooth` <- function(smooth, model,
+                                      n = 100,
+                                      n_3d = NULL,
+                                      n_4d = NULL,
+                                      data = NULL,
                                       unconditional = FALSE,
                                       overall_uncertainty = TRUE,
                                       dist = NULL,
@@ -369,7 +394,8 @@
     }
 
     ## deal with data if supplied
-    data <- process_user_data_for_eval(data = data, model = model, n = n,
+    data <- process_user_data_for_eval(data = data, model = model,
+                                       n = n, n_3d = n_3d, n_4d = n_4d,
                                        id = which_smooth(model,
                                                          smooth_label(smooth)))
 
@@ -408,14 +434,23 @@
 #' @param model a fitted model
 #' @param n numeric; the number of new observations to generate. Passed to
 #'   [gratia::smooth_data()].
+#' @param n_3d numeric; the number of new observations to generate for the third
+#'   dimension of a 3D smooth. Passed to [gratia::smooth_data()].
+#' @param n_4d numeric; the number of new observations to generate for the
+#'   fourth (or higher) dimension(s) of a *k*D smooth (*k* >= 4). Passed to
+#'   [gratia::smooth_data()].
 #' @param id the number ID of the smooth within `model` to process.
 #'
 #' @keywords internal
 #' @noRd
 #' @importFrom rlang .data
-`process_user_data_for_eval` <- function(data, model, n, id) {
+`process_user_data_for_eval` <- function(data, model, n, n_3d, n_4d, id) {
     if (is.null(data)) {
-        data <- smooth_data(model = model, n = n, id = id)
+        data <- smooth_data(model = model,
+                            n = n,
+                            n_3d = n_3d,
+                            n_4d = n_4d,
+                            id = id)
    } else {
         smooth <- get_smooths_by_id(model, id)[[1L]]
         vars <- smooth_variable(smooth)
@@ -446,9 +481,10 @@
     }
 
     ## deal with data if supplied
-    data <- process_user_data_for_eval(data = data, model = model, n = n,
-                                       id = which_smooth(model,
-                                                         smooth_label(smooth)))
+    id <- which_smooth(model, smooth_label(smooth))
+    data <- process_user_data_for_eval(data = data, model = model,
+                                       n = n, n_3d = NULL, n_4d = NULL,
+                                       id = id)
 
     ## values of spline at data
     eval_sm <- spline_values2(smooth, data = data,
@@ -481,9 +517,10 @@
     }
 
     ## deal with data if supplied
-    data <- process_user_data_for_eval(data = data, model = model, n = n,
-                                       id = which_smooth(model,
-                                                         smooth_label(smooth)))
+    id <- which_smooth(model, smooth_label(smooth))
+    data <- process_user_data_for_eval(data = data, model = model,
+                                       n = n, n_3d = NULL, n_4d = NULL,
+                                       id = id)
 
     ## values of spline at data
     eval_sm <- spline_values2(smooth, data = data,
@@ -516,7 +553,11 @@
 #' @rdname eval_smooth
 #' @export
 #' @importFrom tibble add_column
-`eval_smooth.t2.smooth` <- function(smooth, model, n = 100, data = NULL,
+`eval_smooth.t2.smooth` <- function(smooth, model,
+                                    n = 100,
+                                    n_3d = NULL,
+                                    n_4d = NULL,
+                                    data = NULL,
                                     unconditional = FALSE,
                                     overall_uncertainty = TRUE,
                                     dist = NULL,
@@ -527,9 +568,10 @@
     }
 
     ## deal with data if supplied
-    data <- process_user_data_for_eval(data = data, model = model, n = n,
-                                       id = which_smooth(model,
-                                                         smooth_label(smooth)))
+    id <- which_smooth(model, smooth_label(smooth))
+    data <- process_user_data_for_eval(data = data, model = model,
+                                       n = n, n_3d = n_3d, n_4d = n_4d,
+                                       id = id)
 
     ## values of spline at data
     eval_sm <- spline_values2(smooth, data = data,
@@ -560,7 +602,11 @@
 #' @rdname eval_smooth
 #' @export
 #' @importFrom tibble add_column
-`eval_smooth.tensor.smooth` <- function(smooth, model, n = 100, data = NULL,
+`eval_smooth.tensor.smooth` <- function(smooth, model,
+                                        n = 100, 
+                                        n_3d = NULL,
+                                        n_4d = NULL,
+                                        data = NULL,
                                         unconditional = FALSE,
                                         overall_uncertainty = TRUE,
                                         dist = NULL,
@@ -571,9 +617,11 @@
     }
 
     ## deal with data if supplied
-    data <- process_user_data_for_eval(data = data, model = model, n = n,
-                                       id = which_smooth(model,
-                                                         smooth_label(smooth)))
+
+    id <- which_smooth(model, smooth_label(smooth))
+    data <- process_user_data_for_eval(data = data, model = model,
+                                       n = n, n_3d = n_3d, n_4d = n_4d,
+                                       id = id)
 
     ## values of spline at data
     eval_sm <- spline_values2(smooth, data = data,
@@ -732,6 +780,36 @@
                           "Duchon spline (2d)")) {
             class(object) <- append(class(object), "isotropic_smooth",
                                     after = 0)
+        }
+    } else if (sm_dim == 3L) {
+        # all 2D smooths get these classes
+        class(object) <- append(class(object),
+                                c("trivariate_smooth", "mgcv_smooth"),
+                                after = 0)
+        # but TPRS smooths are isotropic so need special plotting
+        # see issue #81. Duchon splines are a more general TPRS so
+        # need to be handled the same way, but we don't need to handle
+        # this as a special method, so add after the trivariate_smooth
+        # class
+        if(sm_type %in% c("TPRS (3d)", "TPRS (shrink) (3d)",
+                          "Duchon spline (3d)")) {
+            class(object) <- append(class(object), "isotropic_smooth",
+                                    after = 1L)
+        }
+    } else if (sm_dim == 4L) {
+        # all 2D smooths get these classes
+        class(object) <- append(class(object),
+                                c("quadvariate_smooth", "mgcv_smooth"),
+                                after = 0)
+        # but TPRS smooths are isotropic so need special plotting
+        # see issue #81. Duchon splines are a more general TPRS so
+        # need to be handled the same way, but we don't need to handle
+        # this as a special method, so add after the trivariate_smooth
+        # class
+        if(sm_type %in% c("TPRS (4d)", "TPRS (shrink) (4d)",
+                          "Duchon spline (4d)")) {
+            class(object) <- append(class(object), "isotropic_smooth",
+                                    after = 1L)
         }
     } else {
         return(NULL)
@@ -901,7 +979,7 @@
 
     plt <- ggplot(object, aes_(x = as.name(variables[1]),
                                y = as.name(variables[2]))) +
-        geom_raster(mapping = aes_(fill = as.name(plot_var)))
+        geom_raster(mapping = aes_(fill = as.name(plot_var))) 
 
     if (isTRUE(contour)) {
         plt <- plt + geom_contour(mapping = aes_(z = as.name(plot_var)),
@@ -956,6 +1034,272 @@
                      mapping = aes_(x = as.name(variables[1]),
                                     y = as.name(variables[2])),
                      inherit.aes = FALSE, alpha = 0.1)
+    }
+
+    plt
+}
+
+#' @importFrom ggplot2 ggplot geom_point geom_raster geom_contour aes_
+#'   expand_limits labs guides guide_colourbar theme facet_wrap
+#' @importFrom grid unit
+#' @keywords internal
+#' @noRd
+`plot_smooth.trivariate_smooth` <- function(object,
+                                            variables = NULL,
+                                            rug = NULL,
+                                            show = c("estimate","se"),
+                                            contour = TRUE,
+                                            contour_col = "black",
+                                            n_contour = NULL,
+                                            constant = NULL,
+                                            fun = NULL,
+                                            xlab = NULL,
+                                            ylab = NULL,
+                                            title = NULL,
+                                            subtitle = NULL,
+                                            caption = NULL,
+                                            ylim = NULL,
+                                            continuous_fill = NULL,
+                                            ...) {
+    if (is.null(variables)) {
+        variables <- vars_from_label(unique(object[["smooth"]]))
+    }
+
+    if (is.null(continuous_fill)) {
+        continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
+    }
+
+    ## If constant supplied apply it to `est`
+    object <- add_constant(object, constant = constant)
+
+    ## If fun supplied, use it to transform est and the upper and lower interval
+    object <- transform_fun(object, fun = fun)
+
+    show <- match.arg(show)
+    if (isTRUE(identical(show, "estimate"))) {
+        guide_title <- "Effect"
+        plot_var <- "est"
+        guide_limits <- if (is.null(ylim)) {
+            c(-1, 1) * max(abs(object[[plot_var]]))
+        } else {
+            ylim
+        }
+    } else {
+        guide_title <- "Std. err."
+        plot_var <- "se"
+        guide_limits <- range(object[["se"]])
+    }
+
+    plt <- ggplot(object, aes_(x = as.name(variables[1]),
+                               y = as.name(variables[2]))) +
+        geom_raster(mapping = aes_(fill = as.name(plot_var))) +
+        facet_wrap(as.name(variables[3]))
+
+    if (isTRUE(contour)) {
+        plt <- plt + geom_contour(mapping = aes_(z = as.name(plot_var)),
+                                  colour = contour_col,
+                                  bins = n_contour,
+                                  na.rm = TRUE)
+    }
+
+    ## default axis labels if none supplied
+    if (is.null(xlab)) {
+        xlab <- variables[1L]
+    }
+    if (is.null(ylab)) {
+        ylab <- variables[2L]
+    }
+    if (is.null(title)) {
+        title <- unique(object[["smooth"]])
+    }
+
+    if (all(!is.na(object[["by"]]))) {
+        spl <- strsplit(title, split = ":")
+        title <- spl[[1L]][[1L]]
+        if (is.null(subtitle)) {
+            by_var <- as.character(unique(object[["by"]]))
+            subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+        }
+    }
+
+    ## add labelling to plot
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+                      caption = caption)
+
+    ## Set the palette
+    plt <- plt + continuous_fill
+
+    ## Set the limits for the fill
+    plt <- plt + expand_limits(fill = guide_limits)
+
+    ## add guide
+    plt <- plt +
+        guides(fill = guide_colourbar(title = guide_title,
+                                      direction = "vertical",
+                                      barheight = grid::unit(0.25, "npc")))
+
+    ## position legend at the
+    plt <- plt + theme(legend.position = "right")
+
+    ## add rug? -- not yet. Need a better way to select smooth_data for 3 and 4D
+    ## smooths. At the moment, we are taking a few values over the range of the
+    ## 3 or 4 d variables (only, 1 and 2 dim still get n values). But we don't
+    ## have data at those 3/4d coordinates. When we plot with a rug, we end up
+    ## introducing nrow(orig_data) new values into the object that gets plotted
+    ## and this messes up the facets at draw time.
+    ##
+    ## What we want here perhaps is to bin the data into the groups formed by
+    ## the cut points of the data that we're plottign at and only modify the
+    ## rug data so that we group the data by the cuts we're facetting by and
+    ## modify the 3/4d variable(s) to be these unique values that we're
+    ## plotting as facets.
+    # if (!is.null(rug)) {
+    #     plt <- plt +
+    #       geom_point(data = rug,
+    #                  mapping = aes_(x = as.name(variables[1]),
+    #                                 y = as.name(variables[2])),
+    #                  inherit.aes = FALSE, alpha = 0.1)
+    # }
+
+    if (inherits(object, "isotropic_smooth")) {
+        plt <- plt + coord_equal()
+    }
+
+    plt
+}
+
+
+#' @importFrom ggplot2 ggplot geom_point geom_raster geom_contour aes_
+#'   expand_limits labs guides guide_colourbar theme facet_grid
+#' @importFrom dplyr vars
+#' @importFrom grid unit
+#' @keywords internal
+#' @noRd
+`plot_smooth.quadvariate_smooth` <- function(object,
+                                             variables = NULL,
+                                             rug = NULL,
+                                             show = c("estimate","se"),
+                                             contour = TRUE,
+                                             contour_col = "black",
+                                             n_contour = NULL,
+                                             constant = NULL,
+                                             fun = NULL,
+                                             xlab = NULL,
+                                             ylab = NULL,
+                                             title = NULL,
+                                             subtitle = NULL,
+                                             caption = NULL,
+                                             ylim = NULL,
+                                             continuous_fill = NULL,
+                                             ...) {
+    if (is.null(variables)) {
+        variables <- vars_from_label(unique(object[["smooth"]]))
+    }
+
+    if (is.null(continuous_fill)) {
+        continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
+    }
+
+    ## If constant supplied apply it to `est`
+    object <- add_constant(object, constant = constant)
+
+    ## If fun supplied, use it to transform est and the upper and lower interval
+    object <- transform_fun(object, fun = fun)
+
+    show <- match.arg(show)
+    if (isTRUE(identical(show, "estimate"))) {
+        guide_title <- "Effect"
+        plot_var <- "est"
+        guide_limits <- if (is.null(ylim)) {
+            c(-1, 1) * max(abs(object[[plot_var]]))
+        } else {
+            ylim
+        }
+    } else {
+        guide_title <- "Std. err."
+        plot_var <- "se"
+        guide_limits <- range(object[["se"]])
+    }
+
+    plt <- ggplot(object, aes_(x = as.name(variables[1]),
+                               y = as.name(variables[2]))) +
+        geom_raster(mapping = aes_(fill = as.name(plot_var))) +
+        facet_grid(rows = vars(!!as.name(variables[3])),
+                   cols = vars(!!as.name(variables[4])),
+                   as.table = FALSE)
+
+    if (isTRUE(contour)) {
+        plt <- plt + geom_contour(mapping = aes_(z = as.name(plot_var)),
+                                  colour = contour_col,
+                                  bins = n_contour,
+                                  na.rm = TRUE)
+    }
+
+    ## default axis labels if none supplied
+    if (is.null(xlab)) {
+        xlab <- variables[1L]
+    }
+    if (is.null(ylab)) {
+        ylab <- variables[2L]
+    }
+    if (is.null(title)) {
+        title <- unique(object[["smooth"]])
+    }
+    if (is.null(caption)) {
+        caption <- paste0("Facet rows: ", variables[3],
+                          "; columns: ", variables[4])
+    }
+
+    if (all(!is.na(object[["by"]]))) {
+        spl <- strsplit(title, split = ":")
+        title <- spl[[1L]][[1L]]
+        if (is.null(subtitle)) {
+            by_var <- as.character(unique(object[["by"]]))
+            subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+        }
+    }
+
+    ## add labelling to plot
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+                      caption = caption)
+
+    ## Set the palette
+    plt <- plt + continuous_fill
+
+    ## Set the limits for the fill
+    plt <- plt + expand_limits(fill = guide_limits)
+
+    ## add guide
+    plt <- plt +
+        guides(fill = guide_colourbar(title = guide_title,
+                                      direction = "vertical",
+                                      barheight = grid::unit(0.25, "npc")))
+
+    ## position legend at the
+    plt <- plt + theme(legend.position = "right")
+
+    ## add rug? -- not yet. Need a better way to select smooth_data for 3 and 4D
+    ## smooths. At the moment, we are taking a few values over the range of the
+    ## 3 or 4 d variables (only, 1 and 2 dim still get n values). But we don't
+    ## have data at those 3/4d coordinates. When we plot with a rug, we end up
+    ## introducing nrow(orig_data) new values into the object that gets plotted
+    ## and this messes up the facets at draw time.
+    ##
+    ## What we want here perhaps is to bin the data into the groups formed by
+    ## the cut points of the data that we're plottign at and only modify the
+    ## rug data so that we group the data by the cuts we're facetting by and
+    ## modify the 3/4d variable(s) to be these unique values that we're
+    ## plotting as facets.
+    # if (!is.null(rug)) {
+    #     plt <- plt +
+    #       geom_point(data = rug,
+    #                  mapping = aes_(x = as.name(variables[1]),
+    #                                 y = as.name(variables[2])),
+    #                  inherit.aes = FALSE, alpha = 0.1)
+    # }
+
+    if (inherits(object, "isotropic_smooth")) {
+        plt <- plt + coord_equal()
     }
 
     plt

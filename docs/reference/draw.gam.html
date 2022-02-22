@@ -14,7 +14,7 @@ is used instead."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0-2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0-3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,6 +71,8 @@ is used instead.</p>
   scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"free"</span>, <span class="st">"fixed"</span><span class="op">)</span>,
   ci_level <span class="op">=</span> <span class="fl">0.95</span>,
   n <span class="op">=</span> <span class="fl">100</span>,
+  n_3d <span class="op">=</span> <span class="fl">16</span>,
+  n_4d <span class="op">=</span> <span class="fl">4</span>,
   unconditional <span class="op">=</span> <span class="cn">FALSE</span>,
   overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,
   constant <span class="op">=</span> <span class="cn">NULL</span>,
@@ -131,6 +133,14 @@ terms.</p></dd>
 <dt>n</dt>
 <dd><p>numeric; the number of points over the range of the covariate at
 which to evaluate the smooth.</p></dd>
+<dt>n_3d</dt>
+<dd><p>numeric; the number of new observations to generate for the third
+dimension of a 3D smooth.</p></dd>
+<dt>n_4d</dt>
+<dd><p>numeric; the number of new observations to generate for the
+dimensions higher than 2 (!) of a <em>k</em>D smooth (<em>k</em> &gt;= 4). For example, if
+the smooth is a 4D smooth, each of dimensions 3 and 4 will get <code>n_4d</code>
+new observations.</p></dd>
 <dt>unconditional</dt>
 <dd><p>logical; should confidence intervals include the
 uncertainty due to smoothness selection? If <code>TRUE</code>, the corrected Bayesian
