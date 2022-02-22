@@ -1,4 +1,4 @@
-# gratia 0.7.0-3
+# gratia 0.7.0-4
 
 ## New features
 
@@ -21,6 +21,12 @@
   (which for 3D or 4D smooths would result in 160,000 data points being
   plotted). As such it is recommended that you reduce `n` to a smaller value:
   `n = 50` is a reasonable compromise of resolution and speed.
+
+* `model_concurvity()` returns concurvity measures from `mgcv::concurvity()`
+  for estimated GAMs in a tidy format. The synonym `concrvity()` is also
+  provided. A `draw()` method is provided which produces a bar plot or a heatmap
+  of the concurvity values depending on whether the overall concurvity of each
+  smooth or the pairwise concurvity of each smooth in the model is requested.
 
 ## Bug fixes
 
