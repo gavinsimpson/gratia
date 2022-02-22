@@ -14,6 +14,8 @@
   scales = c("free", "fixed"),
   ci_level = 0.95,
   n = 100,
+  n_3d = 16,
+  n_4d = 4,
   unconditional = FALSE,
   overall_uncertainty = TRUE,
   constant = NULL,
@@ -71,6 +73,14 @@ terms.}
 
 \item{n}{numeric; the number of points over the range of the covariate at
 which to evaluate the smooth.}
+
+\item{n_3d}{numeric; the number of new observations to generate for the third
+dimension of a 3D smooth.}
+
+\item{n_4d}{numeric; the number of new observations to generate for the
+dimensions higher than 2 (!) of a \emph{k}D smooth (\emph{k} >= 4). For example, if
+the smooth is a 4D smooth, each of dimensions 3 and 4 will get \code{n_4d}
+new observations.}
 
 \item{unconditional}{logical; should confidence intervals include the
 uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian
