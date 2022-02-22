@@ -1112,6 +1112,9 @@
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
     }
+    if (is.null(caption)) {
+        caption <- paste0("Facets: ", variables[3])
+    }
 
     if (all(!is.na(object[["by"]]))) {
         spl <- strsplit(title, split = ":")
