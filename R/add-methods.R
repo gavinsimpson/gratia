@@ -245,9 +245,9 @@
             stop("'constant' must be numeric: supplied <", constant, ">",
                  call. = FALSE)
         }
-        mutate(object,
-               across(any_of(c("est", "lower", "upper")),
-                      .fns = ~ .x + constant))
+        object <- mutate(object,
+                         across(any_of(c("est", "lower", "upper")),
+                                .fns = ~ .x + constant))
     }
 
     object
@@ -264,9 +264,9 @@
             stop("'constant' must be numeric: supplied <", constant, ">",
                  call. = FALSE)
         }
-        mutate(object,
-               across(any_of(c("est", "lower", "upper")),
-                      .fns = ~ .x + constant))
+        object <- mutate(object,
+                         across(any_of(c("est", "lower", "upper")),
+                                .fns = ~ .x + constant))
     }
 
     object
@@ -283,9 +283,9 @@
             stop("'constant' must be numeric: supplied <", constant, ">",
                  call. = FALSE)
         }
-        mutate(object,
-               across(any_of(c("est", "lower_ci", "upper_ci")),
-                      .fns = ~ .x + constant))
+        object <- mutate(object,
+                         across(any_of(c("est", "lower_ci", "upper_ci")),
+                                .fns = ~ .x + constant))
     }
 
     object
@@ -303,9 +303,9 @@
             stop("'constant' must be numeric: supplied <", constant,
                  ">", call. = FALSE)
         }
-        mutate(object,
-               across(any_of(c("partial", "lower", "upper")),
-                      .fns = ~ .x + constant))
+        object <- mutate(object,
+                         across(any_of(c("partial", "lower", "upper")),
+                                .fns = ~ .x + constant))
     }
 
     object
@@ -326,9 +326,9 @@
             stop("'constant' must be numeric: supplied <", constant,
                  ">", call. = FALSE)
         }
-        mutate(object,
-               across(all_of(column),
-                      .fns = ~ .x + constant))
+        object <- mutate(object,
+                         across(all_of(column),
+                         .fns = ~ .x + constant))
     }
 
     object
@@ -346,9 +346,9 @@
             stop("'constant' must be numeric: supplied <", constant,
                  ">", call. = FALSE)
         }
-        mutate(object,
-               across(all_of(c("partial")),
-                      .fns = ~ .x + constant))
+        object <- mutate(object,
+                         across(all_of(c("partial")),
+                                .fns = ~ .x + constant))
     }
 
     object
