@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0-4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0-5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,9 +48,9 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.7.0-4" id="gratia-070-4">gratia 0.7.0-4<a class="anchor" aria-label="anchor" href="#gratia-070-4"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.7.0-5" id="gratia-070-5">gratia 0.7.0-5<a class="anchor" aria-label="anchor" href="#gratia-070-5"></a></h2>
 <div class="section level3">
-<h3 id="new-features-0-7-0-4">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-0-4"></a></h3>
+<h3 id="new-features-0-7-0-5">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-0-5"></a></h3>
 <ul><li>
 <p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> and <code><a href="../reference/draw.smooth_estimates.html">draw.smooth_estimates()</a></code>: {gratia} can now handle smooths of 3 or 4 covariates when plotting. For smooths of 3 covariates, the third covariate is handled with <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">ggplot2::facet_wrap()</a></code> and a set (default <code>n</code> =</p>
 <ol start="16" style="list-style-type: decimal"><li>of small multiples is drawn, each a 2d surface evaluated at the specified value of the third covariate. For smooths of 4 covariates, <code><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">ggplot2::facet_grid()</a></code> is used to draw the small multiples, with the default producing 4 rows by 4 columns of plots at the specific values of the third and fourth covariates. The number of small multiples produced is controlled by new arguments <code>n_3d</code> (default = <code>n_3d = 16</code>) and <code>n_4d</code> (default <code>n_4d = 4</code>, yielding <code>n_4d * n_4d</code> = 16 facets) respectively.</li>
@@ -60,7 +60,7 @@
 <li><p><code><a href="../reference/model_concurvity.html">model_concurvity()</a></code> returns concurvity measures from <code><a href="https://rdrr.io/pkg/mgcv/man/concurvity.html" class="external-link">mgcv::concurvity()</a></code> for estimated GAMs in a tidy format. The synonym <code><a href="../reference/model_concurvity.html">concrvity()</a></code> is also provided. A <code><a href="../reference/draw.html">draw()</a></code> method is provided which produces a bar plot or a heatmap of the concurvity values depending on whether the overall concurvity of each smooth or the pairwise concurvity of each smooth in the model is requested.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-7-0-4">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-0-4"></a></h3>
+<h3 id="bug-fixes-0-7-0-5">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-0-5"></a></h3>
 <ul><li><p><code><a href="../reference/edf.html">model_edf()</a></code> was not using the <code>type</code> argument. As a result it only ever returned the default EDF type.</p></li>
 <li><p><code>add_constant</code> methods weren’t applying the constant to all the required variables.</p></li>
 </ul></div>
