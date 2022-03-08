@@ -195,75 +195,94 @@
                                   partial_match = partial_match,
                                   model_name = expr_label(substitute(object)))
 
-    # evaluate all requested smooths
-    sm_eval <- smooth_estimates(object,
-                                smooth = S[select],
-                                n = n,
-                                n_3d = n_3d,
-                                n_4d = n_4d,
-                                data = data,
-                                unconditional = unconditional,
-                                overall_uncertainty = overall_uncertainty,
-                                dist = dist,
-                                unnest = FALSE)
+    # this is needed for the parametric terms below
+    sm_plts <- NULL
+    ylims <- NULL
 
-    # =====> Start Here in continuing fixes
-    # --> if we unnest = FALSE above then we can't add a confint to the entire
-    #     object in one go. So we'll need to add it when we compute the axis
-    #     limits for fixed scales, plot the smooth, add rug, partial resids etc
-    # --> doing all this will be easier now as we have 1 row per smooth in
-    #     sm_eval
+    # do we have any smooths to plot?
+    if (length(select) > 0L) {
+        # evaluate all requested smooths
+        sm_eval <- smooth_estimates(object,
+                                    smooth = S[select],
+                                    n = n,
+                                    n_3d = n_3d,
+                                    n_4d = n_4d,
+                                    data = data,
+                                    unconditional = unconditional,
+                                    overall_uncertainty = overall_uncertainty,
+                                    dist = dist,
+                                    unnest = FALSE)
 
-    # add confidence interval
-    sm_eval <- sm_eval %>%
-      rowwise() %>%
-      mutate(data = list(add_confint(.data$data, coverage = ci_level))) %>%
-      ungroup()
+        # add confidence interval
+        sm_eval <- sm_eval %>%
+          rowwise() %>%
+          mutate(data = list(add_confint(.data$data, coverage = ci_level))) %>%
+          ungroup()
 
-    # Take the range of the smooths & their confidence intervals now
-    # before we put rug and residuals on
-    sm_rng <- sm_eval %>%
-        rowwise() %>%
-        summarise(rng = range(c(data$est, data$lower_ci, data$upper_ci))) %>%
-        pluck("rng")
+        # Take the range of the smooths & their confidence intervals now
+        # before we put rug and residuals on
+        sm_rng <- sm_eval %>%
+            rowwise() %>%
+            summarise(rng = range(c(data$est, data$lower_ci,
+                                    data$upper_ci))) %>%
+            pluck("rng")
 
-    # Add partial residuals if requested - by default they are
-    # At the end of this, sm_eval will have a new list column containing the
-    # partial residuals, `partial_residual`
-    p_resids_rng <- NULL
-    if (isTRUE(residuals)) {
-        if (is.null(residuals(object)) || is.null(weights(object))) {
-            residuals <- FALSE
-        } else {
-            # get residuals in a suitable format
-            p_resids <- nested_partial_residuals(object, terms = S[select])
+        # Add partial residuals if requested - by default they are
+        # At the end of this, sm_eval will have a new list column containing the
+        # partial residuals, `partial_residual`
+        p_resids_rng <- NULL
+        if (isTRUE(residuals)) {
+            if (is.null(residuals(object)) || is.null(weights(object))) {
+                residuals <- FALSE
+            } else {
+                # get residuals in a suitable format
+                p_resids <- nested_partial_residuals(object, terms = S[select])
 
-            # compute the range of residuals for each smooth
-            p_resids_rng <- p_resids %>%
-                rowwise() %>%
-                summarise(rng =
-                          range(.data$partial_residual$partial_residual)) %>%
-                pluck("rng")
+                # compute the range of residuals for each smooth
+                p_resids_rng <- p_resids %>%
+                    rowwise() %>%
+                    summarise(rng =
+                        range(.data$partial_residual$partial_residual)) %>%
+                    pluck("rng")
+
+                # merge with the evaluated smooth
+                sm_eval <- left_join(sm_eval, p_resids, by = "smooth")
+            }
+        }
+
+        # add rug data?
+        if (isTRUE(rug)) {
+            # get rug data in a suitable format
+            rug_data <- nested_rug_values(object, terms = S[select])
 
             # merge with the evaluated smooth
-            sm_eval <- left_join(sm_eval, p_resids, by = "smooth")
+            sm_eval <- left_join(sm_eval, rug_data, by = "smooth")
         }
-    }
 
-    # add rug data?
-    if (isTRUE(rug)) {
-        # get rug data in a suitable format
-        rug_data <- nested_rug_values(object, terms = S[select])
+        # need to figure out scales if "fixed"
+        if (isTRUE(identical(scales, "fixed"))) {
+            ylims <- range(sm_rng, p_resids_rng)
+        }
 
-        # merge with the evaluated smooth
-        sm_eval <- left_join(sm_eval, rug_data, by = "smooth")
-    }
+        # draw smooths
+        sm_l <- group_split(sm_eval, .data$smooth)
+        sm_plts <- map(sm_l,
+                       draw_smooth_estimates,
+                       constant = constant,
+                       fun = fun,
+                       contour = contour,
+                       contour_col = contour_col,
+                       n_contour = n_contour,
+                       ci_alpha = ci_alpha,
+                       ci_col = ci_col,
+                       smooth_col = smooth_col,
+                       partial_match = partial_match,
+                       discrete_colour = discrete_colour,
+                       continuous_colour = continuous_colour,
+                       continuous_fill = continuous_fill,
+                       ylim = ylims)
 
-    # need to figure out scales if "fixed"
-    ylims <- NULL
-    if (isTRUE(identical(scales, "fixed"))) {
-        ylims <- range(sm_rng, p_resids_rng)
-    }
+    } # end stuff for smooths...
 
     # Are we plotting parametric effects too?
     if (isTRUE(parametric)) {
@@ -295,35 +314,17 @@
                                                   ylim = ylims))
     } # parametric done
 
-    # draw smooths
-    sm_l <- group_split(sm_eval, .data$smooth)
-    sm_plts <- map(sm_l,
-                   draw_smooth_estimates,
-                   constant = constant,
-                   fun = fun,
-                   contour = contour,
-                   contour_col = contour_col,
-                   n_contour = n_contour,
-                   ci_alpha = ci_alpha,
-                   ci_col = ci_col,
-                   smooth_col = smooth_col,
-                   partial_match = partial_match,
-                   discrete_colour = discrete_colour,
-                   continuous_colour = continuous_colour,
-                   continuous_fill = continuous_fill,
-                   ylim = ylims)
+    if (isTRUE(parametric)) {
+        sm_plts <- append(sm_plts, para_plts)
+    }
 
     # filter out NULLs as those are types of smooths we can't plot (yet)
     no_plot <- map_lgl(sm_plts, is.null)
+    sm_plts <- sm_plts[!no_plot]
+
     if (all(no_plot)) {
         message("Unable to draw any of the model terms.")
         return(invisible())
-    }
-
-    sm_plts <- sm_plts[!no_plot]
-
-    if (isTRUE(parametric)) {
-        sm_plts <- append(sm_plts, para_plts)
     }
 
     # return
