@@ -143,3 +143,14 @@ test_that("draw.gam works for a quadvariate smooth", {
     expect_silent(plt <- draw(su_m_quadvar_te))
     expect_doppelganger("draw_gam quadvar te", plt)
 })
+
+test_that("draw.gam issues message for parametric only model", {
+    expect_message(plt <- draw(m_only_para),
+                   "Unable to draw any of the model terms.")
+})
+
+test_that("draw.gam works for a parametric only model", {
+    expect_message(plt <- draw(m_only_para, parametric = TRUE),
+                   "Interaction terms are not currently supported.")
+    expect_doppelganger("draw_gam parametric only model", plt)
+})

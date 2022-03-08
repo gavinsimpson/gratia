@@ -64,8 +64,10 @@
     # the factor combos in the data and typical values of all other terms
     # and exclude the effects of smooths as they don't change anything in
     # terms
+    # Work around a bug in predict.gam() with exclude length 0 character
+    # (i.e smooths(objects) when model contains only parametric terms)
     pred <- predict(object, type = "terms",
-                    exclude = smooths(object), se.fit = TRUE,
+                    terms = mgcv_names, se.fit = TRUE,
                     unconditional = unconditional)
     # try to recover the data
     mf <- model.frame(object)
