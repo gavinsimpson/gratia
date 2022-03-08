@@ -1,4 +1,4 @@
-# gratia 0.7.0-5
+# gratia 0.7.0-6
 
 ## New features
 
@@ -33,8 +33,15 @@
 * `model_edf()` was not using the `type` argument. As a result it only ever
    returned the default EDF type.
 
-* `add_constant` methods weren't applying the constant to all the required
+* `add_constant()` methods weren't applying the constant to all the required
   variables.
+
+* `draw.gam()`, `draw.parametric_effects()` now actually work for a model with
+  only parametric effects. #142 Reported by @Nelson-Gon
+
+* `parametric_effects()` would fail for a model with only parametric terms
+  because `predict.gam()` returns empty arrays when passed 
+  `exclude = character(0)`.
 
 # gratia 0.7.0
 
