@@ -30,3 +30,10 @@ test_that("draw.parametric_effects works for m_para_sm select term", {
     expect_silent(plt <- draw(peff))
     expect_doppelganger("draw parametric effects m_para_sm with term", plt)
 })
+
+test_that("draw.parametric_effects works with only parametric terms", {
+    expect_message(peff <- parametric_effects(m_only_para),
+                   "Interaction terms are not currently supported.")
+    expect_silent(plt <- draw(peff))
+    expect_doppelganger("draw parametric effects m_only_para", plt)
+})

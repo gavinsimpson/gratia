@@ -42,3 +42,13 @@ test_that("parametric_effects works for m_para_sm select term", {
     expect_identical(nrow(peff), 3L)
     expect_named(peff, c("term", "type", "level", "partial", "se"))
 })
+
+test_that("parametric_effects works with only parametric terms", {
+    expect_message(peff <- parametric_effects(m_only_para),
+                   "Interaction terms are not currently supported.")
+    expect_s3_class(peff, class = c("parametric_effects", "tbl_df", "tbl",
+                                    "data.frame"))
+    expect_identical(ncol(peff), 6L)
+    expect_identical(nrow(peff), 1207L)
+    expect_named(peff, c("term", "type", "level", "value", "partial", "se"))
+})
