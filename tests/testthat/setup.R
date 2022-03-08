@@ -193,3 +193,6 @@ m_2_fac <- gam(y ~ fac * ff + s(x0) + s(x1) + s(x2),
 # a GAM with parametric terms (factor and linear) and smooth terms
 m_para_sm <- gam(y ~ fac * ff + x0 + s(x1) + s(x2),
                  data = df_2_fac, method = "REML")
+# a GAM with parametric terms (factor and linear) and smooth terms
+m_only_para <- gam(y ~ fac * ff + x0 + x1 + x2,
+                   data = df_2_fac, method = "REML")
