@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0-6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0-7</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,6 +65,7 @@
   ci_alpha <span class="op">=</span> <span class="fl">0.2</span>,
   ci_col <span class="op">=</span> <span class="st">"black"</span>,
   smooth_col <span class="op">=</span> <span class="st">"black"</span>,
+  resid_col <span class="op">=</span> <span class="st">"steelblue3"</span>,
   partial_match <span class="op">=</span> <span class="cn">FALSE</span>,
   discrete_colour <span class="op">=</span> <span class="cn">NULL</span>,
   continuous_colour <span class="op">=</span> <span class="cn">NULL</span>,
@@ -102,7 +103,9 @@ interval.</p></dd>
 <dd><p>colour specification for the confidence/credible intervals
 band. Affects the fill of the interval.</p></dd>
 <dt>smooth_col</dt>
-<dd><p>colour specification for the the smooth line.</p></dd>
+<dd><p>colour specification for the smooth line.</p></dd>
+<dt>resid_col</dt>
+<dd><p>colour specification for the partial residuals.</p></dd>
 <dt>partial_match</dt>
 <dd><p>logical; should smooths be selected by partial matches
 with <code>select</code>? If <code>TRUE</code>, <code>select</code> can only be a single string to match

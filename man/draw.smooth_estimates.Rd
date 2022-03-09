@@ -14,6 +14,7 @@
   ci_alpha = 0.2,
   ci_col = "black",
   smooth_col = "black",
+  resid_col = "steelblue3",
   partial_match = FALSE,
   discrete_colour = NULL,
   continuous_colour = NULL,
@@ -48,7 +49,9 @@ interval.}
 \item{ci_col}{colour specification for the confidence/credible intervals
 band. Affects the fill of the interval.}
 
-\item{smooth_col}{colour specification for the the smooth line.}
+\item{smooth_col}{colour specification for the smooth line.}
+
+\item{resid_col}{colour specification for the partial residuals.}
 
 \item{partial_match}{logical; should smooths be selected by partial matches
 with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
