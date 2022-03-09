@@ -26,6 +26,7 @@
   ci_alpha = 0.2,
   ci_col = "black",
   smooth_col = "black",
+  resid_col = "steelblue3",
   contour_col = "black",
   n_contour = NULL,
   partial_match = FALSE,
@@ -116,7 +117,9 @@ interval.}
 \item{ci_col}{colour specification for the confidence/credible intervals
 band. Affects the fill of the interval.}
 
-\item{smooth_col}{colour specification for the the smooth line.}
+\item{smooth_col}{colour specification for the smooth line.}
+
+\item{resid_col}{colour specification for the partial residuals.}
 
 \item{contour_col}{colour specification for contour lines.}
 
