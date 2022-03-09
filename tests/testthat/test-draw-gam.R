@@ -12,6 +12,12 @@ test_that("draw.gam works for m_1_smooth", {
     expect_doppelganger("draw_gam m_1_smooth", plt)
 })
 
+test_that("draw.gam works for m_1_smooth with partial residuals", {
+    expect_silent(plt <- draw(m_1_smooth, residuals = TRUE,
+                            resid_col = "hotpink"))
+    expect_doppelganger("draw_gam m_1_smooth hotpink residuals", plt)
+})
+
 test_that("draw.gam works for m_gam", {
     expect_silent(plt <- draw(m_gam))
     expect_doppelganger("draw_gam m_gam", plt)
