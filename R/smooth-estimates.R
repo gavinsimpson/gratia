@@ -685,6 +685,7 @@
                                     ci_alpha = 0.2,
                                     ci_col = "black",
                                     smooth_col = "black",
+                                    resid_col = "steelblue3",
                                     partial_match = FALSE,
                                     discrete_colour = NULL,
                                     continuous_colour = NULL,
@@ -719,19 +720,21 @@
 #' @importFrom tidyr unnest
 #' @importFrom tidyselect any_of
 `draw_smooth_estimates` <- function(object,
-                                    constant = constant,
-                                    fun = fun,
-                                    contour = contour,
-                                    contour_col = contour_col,
-                                    n_contour = n_contour,
-                                    ci_alpha = ci_alpha,
-                                    ci_col = ci_col,
-                                    smooth_col = smooth_col,
-                                    partial_match = partial_match,
-                                    discrete_colour = discrete_colour,
-                                    continuous_colour = continuous_colour,
-                                    continuous_fill = continuous_fill,
-                                    ylim = ylim, ...) {
+                                    constant = NULL,
+                                    fun = NULL,
+                                    contour = TRUE,
+                                    contour_col = "black",
+                                    n_contour = NULL,
+                                    ci_alpha = 0.2,
+                                    ci_col = "black",
+                                    smooth_col = "black",
+                                    resid_col = "steelblue3",
+                                    partial_match = FALSE,
+                                    discrete_colour = NULL,
+                                    continuous_colour = NULL,
+                                    continuous_fill = NULL,
+                                    ylim = NULL,
+                                    ...) {
     sm_vars <- vars_from_label(unique(object[["smooth"]]))
     sm_dim <- length(sm_vars)
     sm_type <- unique(object[["type"]])
@@ -825,6 +828,7 @@
                 ci_alpha = ci_alpha,
                 ci_col = ci_col,
                 smooth_col = smooth_col,
+                resid_col = resid_col,
                 partial_match = partial_match,
                 discrete_colour = discrete_colour,
                 continuous_colour = continuous_colour,
@@ -851,6 +855,7 @@
                                        ci_alpha = 0.2,
                                        ci_col = "black",
                                        smooth_col = "black",
+                                       resid_col = "steelblue3",
                                        xlab = NULL,
                                        ylab = NULL,
                                        title = NULL,
@@ -878,7 +883,7 @@
                                 aes_(x = as.name(variables),
                                      y = ~partial_residual),
                                 inherit.aes = FALSE,
-                                colour = "steelblue3", alpha = 0.5)
+                                colour = resid_col, alpha = 0.5)
     }
 
     # plot the confidence interval and smooth line
