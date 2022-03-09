@@ -1,4 +1,4 @@
-# gratia 0.7.0-6
+# gratia 0.7.0-7
 
 ## New features
 
@@ -27,6 +27,9 @@
   provided. A `draw()` method is provided which produces a bar plot or a heatmap
   of the concurvity values depending on whether the overall concurvity of each
   smooth or the pairwise concurvity of each smooth in the model is requested.
+
+* `draw.gam()` gains argument `resid_col = "steelblue3"` that allows the colour
+  of the partial residuals (if plotted) to be changed.
 
 ## Bug fixes
 
