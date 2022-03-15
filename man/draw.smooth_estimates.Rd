@@ -89,4 +89,7 @@ draw(sm)
 
 # customising some plot elements
 draw(sm, ci_col = "steelblue", smooth_col = "forestgreen", ci_alpha = 0.3)
+
+# Add a constant to the plotted smooth
+draw(sm, constant = coef(m)[1])
 }
