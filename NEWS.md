@@ -1,4 +1,4 @@
-# gratia 0.7.0-7
+# gratia 0.7.1
 
 ## New features
 
