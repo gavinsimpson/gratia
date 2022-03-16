@@ -4,8 +4,8 @@
 
 * `draw.gam()` and `draw.smooth_estimates()`: {gratia} can now handle smooths
   of 3 or 4 covariates when plotting. For smooths of 3 covariates, the third
-  covariate is handled with `ggplot2::facet_wrap()` and a set (default `n` =
-  16) of small multiples is drawn, each a 2d surface evaluated at the specified
+  covariate is handled with `ggplot2::facet_wrap()` and a set (default `n` = 16)
+  of small multiples is drawn, each a 2d surface evaluated at the specified
   value of the third covariate. For smooths of 4 covariates,
   `ggplot2::facet_grid()` is used to draw the small multiples, with the default
   producing 4 rows by 4 columns of plots at the specific values of the third
