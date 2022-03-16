@@ -229,6 +229,7 @@
 #' ## plot, this time selecting only the factor-by smooth
 #' draw(sm2, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
 #'
+#' \donttest{
 #' ## A 2D smooth example
 #' dat3 <- data_sim("eg2", n = 400, dist = "normal", scale = 1, seed = 1)
 #' ## fit a 2D smooth
@@ -237,6 +238,7 @@
 #' sm3 <- smooth_samples(m3, n = 10)
 #' ## plot just 6 of the draws, with contour line overlays
 #' draw(sm3, n_samples = 6, contour = TRUE, seed = 42)
+#' }
 `draw.smooth_samples` <- function(object,
                                   select = NULL,
                                   n_samples = NULL, seed = NULL,

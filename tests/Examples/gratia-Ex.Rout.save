@@ -1,6 +1,6 @@
 
-R version 4.1.2 (2021-11-01) -- "Bird Hippie"
-Copyright (C) 2021 The R Foundation for Statistical Computing
+R version 4.1.3 (2022-03-10) -- "One Push-Up"
+Copyright (C) 2022 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -861,6 +861,9 @@ detaching ‘package:mgcv’
 > # customising some plot elements
 > draw(sm, ci_col = "steelblue", smooth_col = "forestgreen", ci_alpha = 0.3)
 > 
+> # Add a constant to the plotted smooth
+> draw(sm, constant = coef(m)[1])
+> 
 > 
 > 
 > cleanEx()
@@ -898,14 +901,6 @@ detaching ‘package:mgcv’
 > ## plot, this time selecting only the factor-by smooth
 > draw(sm2, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
 > 
-> ## A 2D smooth example
-> dat3 <- data_sim("eg2", n = 400, dist = "normal", scale = 1, seed = 1)
-> ## fit a 2D smooth
-> m3 <- gam(y ~ te(x, z), data = dat3, method = "REML")
-> ## get samples
-> sm3 <- smooth_samples(m3, n = 10)
-> ## plot just 6 of the draws, with contour line overlays
-> draw(sm3, n_samples = 6, contour = TRUE, seed = 42)
 > 
 > 
 > 
@@ -1255,6 +1250,36 @@ Loading required package: Matrix
 
 detaching ‘package:lme4’, ‘package:Matrix’, ‘package:mgcv’
 
+> nameEx("gw_functions")
+> ### * gw_functions
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: gw_f0
+> ### Title: Gu and Wabha test functions
+> ### Aliases: gw_f0 gw_f1 gw_f2 gw_f3
+> 
+> ### ** Examples
+> 
+> ## Don't show: 
+> op <- options(digits = 4)
+> ## End(Don't show)
+> x <- seq(0, 1, length = 6)
+> gw_f0(x)
+[1] 0.000e+00 1.176e+00 1.902e+00 1.902e+00 1.176e+00 2.449e-16
+> gw_f1(x)
+[1] 1.000 1.492 2.226 3.320 4.953 7.389
+> gw_f2(x)
+[1] 0.000 8.591 4.261 3.199 1.100 0.000
+> gw_f3(x) # should be constant 0
+[1] 0 0 0 0 0 0
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
+> 
+> 
+> 
+> cleanEx()
 > nameEx("has_theta")
 > ### * has_theta
 > 
@@ -1344,11 +1369,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55b7ffca5f30>
+<environment: 0x555e07dfec40>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55b7ffca5f30>
+<environment: 0x555e07dfec40>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1361,6 +1386,43 @@ mu
 > cleanEx()
 
 detaching ‘package:mgcv’
+
+> nameEx("model_concurvity")
+> ### * model_concurvity
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: model_concurvity
+> ### Title: Concurvity of an estimated GAM
+> ### Aliases: model_concurvity model_concurvity.gam concrvity
+> 
+> ### ** Examples
+> 
+> ## simulate data with concurvity...
+> library("tibble")
+> load_mgcv()
+> set.seed(8)
+> n <- 200
+> df <- tibble(t = sort(runif(n)),
++              x = gw_f2(t) + rnorm(n) * 3,
++              y = sin(4 * pi * t) + exp(x / 20) + rnorm(n) * 0.3)
+> 
+> ## fit model
+> m <- gam(y ~ s(t, k = 15) + s(x, k = 15), data = df, method = "REML")
+> 
+> ## overall concurvity
+> o_conc <- concrvity(m)
+> draw(o_conc)
+> 
+> ## pairwise concurvity
+> p_conc <- concrvity(m, pairwise = TRUE)
+> draw(p_conc)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:tibble’
 
 > nameEx("nb_theta")
 > ### * nb_theta
@@ -1380,7 +1442,7 @@ detaching ‘package:mgcv’
 +          s(x3, bs = "cr"), family = nb, data = df, method = "REML")
 > ## IGNORE_RDIFF_BEGIN
 > nb_theta(m)
-[1] 239340.6
+[1] 239362.2
 > ## IGNORE_RDIFF_END
 > 
 > 
@@ -1981,7 +2043,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  17.252 0.16 17.553 0 0 
+Time elapsed:  15.08 0.115 15.301 0 0 
 > grDevices::dev.off()
 null device 
           1 

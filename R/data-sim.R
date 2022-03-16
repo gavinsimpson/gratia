@@ -82,18 +82,20 @@
 ## Gu Wabha functions
 #' Gu and Wabha test functions
 #'
-#' @param x numeric; vecotor of points to evaluate the function at, on interval
+#' @param x numeric; vector of points to evaluate the function at, on interval
 #'   (0,1)
 #'
 #' @rdname gw_functions
 #' @export
 #'
 #' @examples
+#' \dontshow{op <- options(digits = 4)}
 #' x <- seq(0, 1, length = 6)
 #' gw_f0(x)
 #' gw_f1(x)
 #' gw_f2(x)
 #' gw_f3(x) # should be constant 0
+#' \dontshow{options(op)}
 gw_f0 <- function(x) {
     2 * sin(pi * x)
 }

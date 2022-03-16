@@ -119,6 +119,7 @@ sm2 <- smooth_samples(m2, n = 15, seed = 23478)
 ## plot, this time selecting only the factor-by smooth
 draw(sm2, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
 
+\donttest{
 ## A 2D smooth example
 dat3 <- data_sim("eg2", n = 400, dist = "normal", scale = 1, seed = 1)
 ## fit a 2D smooth
@@ -127,6 +128,7 @@ m3 <- gam(y ~ te(x, z), data = dat3, method = "REML")
 sm3 <- smooth_samples(m3, n = 10)
 ## plot just 6 of the draws, with contour line overlays
 draw(sm3, n_samples = 6, contour = TRUE, seed = 42)
+}
 }
 \author{
 Gavin L. Simpson
