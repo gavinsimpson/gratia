@@ -16,3 +16,4 @@
 ^pkgdown$
 ^CITATION\.cff$
 ^CODE_OF_CONDUCT\.md$
+^\.vscode$
