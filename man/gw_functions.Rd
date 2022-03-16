@@ -16,16 +16,18 @@ gw_f2(x)
 gw_f3(x)
 }
 \arguments{
-\item{x}{numeric; vecotor of points to evaluate the function at, on interval
+\item{x}{numeric; vector of points to evaluate the function at, on interval
 (0,1)}
 }
 \description{
 Gu and Wabha test functions
 }
 \examples{
+\dontshow{op <- options(digits = 4)}
 x <- seq(0, 1, length = 6)
 gw_f0(x)
 gw_f1(x)
 gw_f2(x)
 gw_f3(x) # should be constant 0
+\dontshow{options(op)}
 }
