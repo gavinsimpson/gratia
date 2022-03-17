@@ -4,12 +4,15 @@
 \alias{tidy_basis}
 \title{A tidy basis representation of a smooth object}
 \usage{
-tidy_basis(smooth, data)
+tidy_basis(smooth, data, at = NULL)
 }
 \arguments{
 \item{smooth}{a smooth object.}
 
 \item{data}{a data frame containing the variables used in \code{smooth}.}
+
+\item{at}{a data frame containing values of the smooth covariate(s) at which
+the basis should be evaluated.}
 }
 \value{
 A tibble.
