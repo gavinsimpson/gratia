@@ -17,17 +17,17 @@ library("nlme")
 ## Fit models
 quick_eg1 <- data_sim("eg1", n = 200, seed = 1)
 su_eg1 <- data_sim("eg1", n = 1000,  dist = "normal", scale = 2, seed = 1)
-su_eg2 <- data_sim("eg2", n = 5000, dist = "normal", scale = 1, seed = 1)
+su_eg2 <- data_sim("eg2", n = 2000, dist = "normal", scale = 0.5, seed = 42)
 su_eg3 <- data_sim("eg3", n = 400, seed = 32)
 su_eg4 <- data_sim("eg4", n = 400,  dist = "normal", scale = 2, seed = 1)
 
 su_m_quick_eg1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-                      data = su_eg1,
+                      data = quick_eg1,
                       method = "REML")
 
 su_m_quick_eg1_shrink <- gam(y ~ s(x0, bs = "ts") + s(x1, bs = "ts") +
                                s(x2, bs = "ts") + s(x3, bs = "ts"),
-                             data = su_eg1,
+                             data = quick_eg1,
                              method = "REML")
 
 su_m_univar_4 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
@@ -121,11 +121,11 @@ m_tw    <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
                 method = "REML", family = tw())
 
 #-- A standard GAM with a simple random effect ---------------------------------
-su_re <- su_eg1
+su_re <- quick_eg1
 set.seed(42)
-su_re$fac <- as.factor(sample(seq_len(20), 1000, replace = TRUE))
+su_re$fac <- as.factor(sample(seq_len(10), 200, replace = TRUE))
 su_re$X <- model.matrix(~ fac - 1, data = su_re)
-su_re <- transform(su_re, y = y + X %*% rnorm(20) * 0.5)
+su_re <- transform(su_re, y = y + X %*% rnorm(10) * 0.5)
 rm1 <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) + s(x3),
            data = su_re, method = "ML")
 
