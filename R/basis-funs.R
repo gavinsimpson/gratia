@@ -12,6 +12,8 @@
 #'   is required. See [mgcv::smoothCon()].
 #' @param constraints logical; should identifiability constraints be applied to
 #'   the smooth basis. See argument `absorb.cons` in [mgcv::smoothCon()].
+#' @param at a data frame containing values of the smooth covariate(s) at which
+#'   the basis should be evaluated.
 #' @param ... other arguments passed to [mgcv::smoothCon()].
 #'
 #' @return A tibble.
@@ -22,20 +24,17 @@
 #'
 #' @importFrom mgcv smoothCon
 #' @importFrom dplyr bind_rows
-#' 
+#'
 #' @examples
 #' load_mgcv()
-#' \dontshow{
-#' set.seed(42)
-#' op <- options(digits = 3, cli.unicode = FALSE)
-#' }
-#' df <- gamSim(4, n = 400, verbose = FALSE)
+#' \dontshow{op <- options(digits = 3, cli.unicode = FALSE)}
+#' df <- data_sim("eg4", n = 400, seed = 42)
 #'
 #' bf <- basis(s(x0), data = df)
 #' bf <- basis(s(x2, by = fac, bs = 'bs'), data = df, constraints = TRUE)
 #' \dontshow{options(op)}
 `basis` <- function(smooth, data, knots = NULL, constraints = FALSE,
-                    ...) {
+                    at = NULL, ...) {
     ## call smoothCon to create the basis as specified in `x`
     sm <- smoothCon(smooth, data = data, knots = knots,
                     absorb.cons = constraints, ...)
@@ -43,7 +42,7 @@
     ## sm will be a list, even if a single smooth, bc we could have multiple
     ## smoothers in case of factor `by` smooths.
     ## Need to walk the list and convert the design matrix `X` to a tidy form
-    bfuns <- lapply(sm, tidy_basis, data = data)
+    bfuns <- lapply(sm, tidy_basis, data = data, at = at)
 
     ## rebind
     bfuns <- bind_rows(bfuns)
@@ -65,6 +64,8 @@
 #'
 #' @param smooth a smooth object.
 #' @param data a data frame containing the variables used in `smooth`.
+#' @param at a data frame containing values of the smooth covariate(s) at which
+#'   the basis should be evaluated.
 #'
 #' @return A tibble.
 #' @author Gavin L. Simpson
@@ -72,9 +73,14 @@
 #' @importFrom tibble as_tibble add_column
 #' @importFrom tidyr gather
 #' @importFrom dplyr bind_cols everything select matches
-`tidy_basis` <- function(smooth, data) {
+`tidy_basis` <- function(smooth, data, at = NULL) {
     check_is_mgcv_smooth(smooth) # check `smooth` is of the correct type
-    tbl <- smooth[["X"]]         # extract the model matrix
+    if (is.null(at)) {
+        tbl <- smooth[["X"]]         # extract the model matrix
+    } else {
+        tbl <- PredictMat(smooth, data = at)
+        data <- at
+    }
     nfun <- NCOL(tbl)        # the number of basis functions
     colnames(tbl) <- seq_len(nfun)
     tbl <- as_tibble(tbl) # convert to tibbles

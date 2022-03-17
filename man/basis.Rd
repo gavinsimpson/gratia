@@ -4,7 +4,7 @@
 \alias{basis}
 \title{Basis expansions for smooths}
 \usage{
-basis(smooth, data, knots = NULL, constraints = FALSE, ...)
+basis(smooth, data, knots = NULL, constraints = FALSE, at = NULL, ...)
 }
 \arguments{
 \item{smooth}{a smooth specification, the result of a call to one of
@@ -19,6 +19,9 @@ is required. See \code{\link[mgcv:smoothCon]{mgcv::smoothCon()}}.}
 \item{constraints}{logical; should identifiability constraints be applied to
 the smooth basis. See argument \code{absorb.cons} in \code{\link[mgcv:smoothCon]{mgcv::smoothCon()}}.}
 
+\item{at}{a data frame containing values of the smooth covariate(s) at which
+the basis should be evaluated.}
+
 \item{...}{other arguments passed to \code{\link[mgcv:smoothCon]{mgcv::smoothCon()}}.}
 }
 \value{
@@ -31,11 +34,8 @@ of \emph{mgcv}'s smooths via \code{\link[mgcv:s]{mgcv::s()}}., \code{\link[mgcv:
 }
 \examples{
 load_mgcv()
-\dontshow{
-set.seed(42)
-op <- options(digits = 3, cli.unicode = FALSE)
-}
-df <- gamSim(4, n = 400, verbose = FALSE)
+\dontshow{op <- options(digits = 3, cli.unicode = FALSE)}
+df <- data_sim("eg4", n = 400, seed = 42)
 
 bf <- basis(s(x0), data = df)
 bf <- basis(s(x2, by = fac, bs = 'bs'), data = df, constraints = TRUE)

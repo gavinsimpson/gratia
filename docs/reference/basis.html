@@ -60,7 +60,7 @@ of <em>mgcv</em>'s smooths via <code><a href="https://rdrr.io/pkg/mgcv/man/s.htm
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">basis</span><span class="op">(</span><span class="va">smooth</span>, <span class="va">data</span>, knots <span class="op">=</span> <span class="cn">NULL</span>, constraints <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">basis</span><span class="op">(</span><span class="va">smooth</span>, <span class="va">data</span>, knots <span class="op">=</span> <span class="cn">NULL</span>, constraints <span class="op">=</span> <span class="cn">FALSE</span>, at <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -77,6 +77,9 @@ is required. See <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html" cla
 <dt>constraints</dt>
 <dd><p>logical; should identifiability constraints be applied to
 the smooth basis. See argument <code>absorb.cons</code> in <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html" class="external-link">mgcv::smoothCon()</a></code>.</p></dd>
+<dt>at</dt>
+<dd><p>a data frame containing values of the smooth covariate(s) at which
+the basis should be evaluated.</p></dd>
 <dt>...</dt>
 <dd><p>other arguments passed to <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html" class="external-link">mgcv::smoothCon()</a></code>.</p></dd>
 </dl></div>
@@ -92,11 +95,8 @@ the smooth basis. See argument <code>absorb.cons</code> in <code><a href="https:
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># \dontshow{</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">op</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">3</span>, cli.unicode <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># }</span></span>
-<span class="r-in"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">gamSim</span><span class="op">(</span><span class="fl">4</span>, n <span class="op">=</span> <span class="fl">400</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg4"</span>, n <span class="op">=</span> <span class="fl">400</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu">basis</span><span class="op">(</span><span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu">basis</span><span class="op">(</span><span class="fu">s</span><span class="op">(</span><span class="va">x2</span>, by <span class="op">=</span> <span class="va">fac</span>, bs <span class="op">=</span> <span class="st">'bs'</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, constraints <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
