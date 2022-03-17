@@ -19,39 +19,39 @@ test_that("draw.gam works for m_1_smooth with partial residuals", {
 })
 
 test_that("draw.gam works for m_gam", {
-    expect_silent(plt <- draw(m_gam))
+    expect_silent(plt <- draw(m_gam, rug = FALSE))
     expect_doppelganger("draw_gam m_gam", plt)
 })
 
 test_that("draw.gam works for m_gamm", {
-    expect_silent(plt <- draw(m_gamm))
+    expect_silent(plt <- draw(m_gamm, rug = FALSE))
     expect_doppelganger("draw_gam m_gamm", plt)
 })
 
 test_that("draw.gam works for m_gamm4", {
     skip_on_ci()
     skip_on_cran()
-    expect_silent(plt <- draw(m_gamm4))
+    expect_silent(plt <- draw(m_gamm4, rug = FALSE))
     expect_doppelganger("draw_gam m_gamm4", plt)
 })
 
 test_that("draw.gam works for m_bam", {
-    expect_silent(plt <- draw(m_bam))
+    expect_silent(plt <- draw(m_bam, rug = FALSE))
     expect_doppelganger("draw_gam m_bam", plt)
 })
 
 test_that("draw.gam works for m_gaulss", {
-    expect_silent(plt <- draw(m_gaulss))
+    expect_silent(plt <- draw(m_gaulss, rug = FALSE))
     expect_doppelganger("draw_gam m_gaulss", plt)
 })
 
 test_that("draw.gam works for m_scat", {
-    expect_silent(plt <- draw(m_scat))
+    expect_silent(plt <- draw(m_scat, rug = FALSE))
     expect_doppelganger("draw_gam m_scat", plt)
 })
 
 test_that("draw.gam works for m_gamgcv", {
-    expect_silent(plt <- draw(m_gamgcv))
+    expect_silent(plt <- draw(m_gamgcv, rug = FALSE))
     expect_doppelganger("draw_gam m_gamgcv", plt)
 })
 
@@ -66,7 +66,7 @@ test_that("draw.gam works for rm2", {
 })
 
 test_that("draw.gam works for dlnm_m", {
-    expect_silent(plt <- draw(dlnm_m))
+    expect_silent(plt <- draw(dlnm_m, rug = FALSE))
     expect_doppelganger("draw_gam dlnm_m", plt)
 })
 
@@ -104,35 +104,37 @@ test_that("draw.gam works for m_para_sm", {
 
 test_that("draw.gam with constant works for GAM with 1 smooth", {
     constant <- coef(m_1_smooth)[1]
-    expect_silent(plt <- draw(m_1_smooth, constant = constant))
+    expect_silent(plt <- draw(m_1_smooth, constant = constant, rug = FALSE))
     expect_doppelganger("draw_gam m_1_smooth constant", plt)
 })
 
 test_that("draw.gam with constant works for GAM with multiple smooths", {
     constant <- coef(m_gam)[1]
-    expect_silent(plt <- draw(m_gam, constant = constant))
+    expect_silent(plt <- draw(m_gam, constant = constant, rug = FALSE))
     expect_doppelganger("draw_gam m_gam constant", plt)
 })
 
 test_that("draw.gam with fun works for GAM with 1 smooth", {
-    expect_silent(plt <- draw(m_1_smooth, fun = exp))
+    expect_silent(plt <- draw(m_1_smooth, fun = exp, rug = FALSE))
     expect_doppelganger("draw_gam m_1_smooth fun", plt)
 })
 
 test_that("draw.gam with fun works for GAM with multiple smooths", {
-    expect_silent(plt <- draw(m_gam, fun = exp))
+    expect_silent(plt <- draw(m_gam, fun = exp, rug = FALSE))
     expect_doppelganger("draw_gam m_gam fun", plt)
 })
 
 test_that("draw.gam with constant + fun works for GAM with 1 smooth", {
     constant <- coef(m_gam)[1]
-    expect_silent(plt <- draw(m_1_smooth, constant = constant, fun = exp))
+    expect_silent(plt <- draw(m_1_smooth, constant = constant, fun = exp,
+                              rug = FALSE))
     expect_doppelganger("draw_gam m_1_smooth constant fun", plt)
 })
 
 test_that("draw.gam with constant + fun works for GAM with multiple smooths", {
     constant <- coef(m_gam)[1]
-    expect_silent(plt <- draw(m_gam, constant = constant, fun = exp))
+    expect_silent(plt <- draw(m_gam, constant = constant, fun = exp,
+                              rug = FALSE))
     expect_doppelganger("draw_gam m_gam constant fun", plt)
 })
 

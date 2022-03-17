@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,7 +48,23 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.7.2" id="gratia-072">gratia 0.7.2<a class="anchor" aria-label="anchor" href="#gratia-072"></a></h2>
+<div class="section level3">
+<h3 id="new-features-0-7-2">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-2"></a></h3>
+<ul><li>
+<code><a href="../reference/fitted_values.html">fitted_values()</a></code> insures that <code>data</code> (and hence the returned object) is a tibble rather than a common or garden data frame.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-7-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-2"></a></h3>
+<ul><li><p><code>draw.posterior_smooths()</code> was redundantly plotting duplicate data in the rug plot. Now only the unique set of covariate values are used for drawing the rug.</p></li>
+<li><p><code><a href="../reference/data_sim.html">data_sim()</a></code> was not passing the <code>scale</code> argument in the bivariate example setting (<code>"eg2"</code>).</p></li>
+<li><p><code><a href="../reference/draw.html">draw()</a></code> methods for <code>gamm()</code> and <code><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html" class="external-link">gamm4::gamm4()</a></code> fits were not passing arguments on to <code><a href="../reference/draw.gam.html">draw.gam()</a></code>.</p></li>
+<li><p><code><a href="../reference/draw.smooth_estimates.html">draw.smooth_estimates()</a></code> would produce a subtitle with data for a continuous by smooth as if it were a factor by smooth. Now the subtitle only contains the name of the continuous by variable.</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.1" id="gratia-071">gratia 0.7.1<a class="anchor" aria-label="anchor" href="#gratia-071"></a></h2>
+<p>Due to an issue with the size of the package source tarball, which wasn’t discovered until after submission to CRAN, 0.7.1 was never released.</p>
 <div class="section level3">
 <h3 id="new-features-0-7-1">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-1"></a></h3>
 <ul><li>

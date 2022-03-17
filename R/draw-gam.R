@@ -345,10 +345,10 @@
     if (!is_gamm4(object)) {
         stop("Don't know how to draw a list")
     }
-    draw(object$gam)
+    draw(object$gam, ...)
 }
 
 #' @export
 `draw.gamm` <- function(object, ...) {
-    draw(object$gam)
+    draw(object$gam, ...)
 }

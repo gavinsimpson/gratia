@@ -1,4 +1,30 @@
+# gratia 0.7.2
+
+## New features
+
+* `fitted_values()` insures that `data` (and hence the returned object) is a
+  tibble rather than a common or garden data frame.
+
+## Bug fixes
+
+* `draw.posterior_smooths()` was redundantly plotting duplicate data in the rug
+  plot. Now only the unique set of covariate values are used for drawing the
+  rug.
+
+* `data_sim()` was not passing the `scale` argument in the bivariate example
+  setting (`"eg2"`).
+
+* `draw()` methods for `gamm()` and `gamm4::gamm4()` fits were not passing 
+  arguments on to `draw.gam()`.
+
+* `draw.smooth_estimates()` would produce a subtitle with data for a continuous
+  by smooth as if it were a factor by smooth. Now the subtitle only contains the
+  name of the continuous by variable.
+
 # gratia 0.7.1
+
+Due to an issue with the size of the package source tarball, which wasn't
+discovered until after submission to CRAN, 0.7.1 was never released.
 
 ## New features
 
