@@ -126,10 +126,10 @@ test_that("draw.gam() plots a simple multi-smooth AM", {
 })
 
 test_that("draw.gam() can draw partial residuals", {
-    plt <- draw(su_m_quick_eg1, residuals = TRUE)
+    plt <- draw(su_m_quick_eg1, residuals = TRUE, rug = FALSE)
     expect_doppelganger("draw simple partial residuals", plt)
 
-    plt <- draw(su_m_quick_eg1, residuals = TRUE, scales = "fixed")
+    plt <- draw(su_m_quick_eg1, residuals = TRUE, scales = "fixed", rug = FALSE)
     expect_doppelganger("draw simple partial residuals with fixed scales", plt)
 })
 
@@ -256,10 +256,10 @@ test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
     p1 <- draw(sm)
     expect_doppelganger("draw.evaluated_fs_smooth", p1)
 
-    p2 <- draw(mod_fs, ncol = 2)
+    p2 <- draw(mod_fs, ncol = 2, rug = FALSE)
     expect_doppelganger("draw.gam model with fs smooth", p2)
 
-    p3 <- draw(mod_fs, ncol = 2, scales = "fixed")
+    p3 <- draw(mod_fs, ncol = 2, scales = "fixed", rug = FALSE)
     expect_doppelganger("draw model with fs smooth fixed scales", p3)
 })
 
