@@ -694,6 +694,8 @@
                                     continuous_colour = NULL,
                                     continuous_fill = NULL,
                                     ylim = NULL,
+                                    projection = "orthographic",
+                                    orientation = NULL,
                                     ...) {
     smth_est <- split(object, f = object[["smooth"]])
     plts <- vector(mode = "list", length = length(smth_est))
@@ -714,7 +716,10 @@
                                   discrete_colour = discrete_colour,
                                   continuous_colour = continuous_colour,
                                   continuous_fill = continuous_fill,
-                                  ylim = ylim, ...)
+                                  ylim = ylim,
+                                  projection = projection,
+                                  prientation = orientation,
+                                  ...)
     }
 
     wrap_plots(plts)
@@ -737,6 +742,8 @@
                                     continuous_colour = NULL,
                                     continuous_fill = NULL,
                                     ylim = NULL,
+                                    projection = "orthographic",
+                                    orientation = NULL,
                                     ...) {
     sm_vars <- vars_from_label(unique(object[["smooth"]]))
     sm_dim <- length(sm_vars)
@@ -773,6 +780,10 @@
     } else if (sm_type == "Factor smooth") {
         class(object) <- append(class(object),
                                 c("factor_smooth", "mgcv_smooth"),
+                                after = 0)
+    } else if (sm_type == "SOS") {
+        class(object) <- append(class(object),
+                                c("sos", "mgcv_smooth"),
                                 after = 0)
     } else if (sm_dim == 2L) {
         # all 2D smooths get these classes
@@ -821,7 +832,9 @@
         return(NULL)
     }
 
-    plot_smooth(object, variables = sm_vars, rug = rug_data,
+    plot_smooth(object,
+                variables = sm_vars,
+                rug = rug_data,
                 partial_residuals = p_residuals,
                 constant = constant,
                 fun = fun,
@@ -837,6 +850,8 @@
                 continuous_colour = continuous_colour,
                 continuous_fill = continuous_fill,
                 ylim = ylim,
+                projection = projection,
+                orientation = orientation,
                 ...)
 }
 
@@ -993,7 +1008,7 @@
 
     plt <- ggplot(object, aes_(x = as.name(variables[1]),
                                y = as.name(variables[2]))) +
-        geom_raster(mapping = aes_(fill = as.name(plot_var))) 
+        geom_raster(mapping = aes_(fill = as.name(plot_var)))
 
     if (isTRUE(contour)) {
         plt <- plt + geom_contour(mapping = aes_(z = as.name(plot_var)),
@@ -1471,6 +1486,137 @@
     ## fixing the y axis limits?
     if (!is.null(ylim)) {
         plt <- plt + expand_limits(y = ylim)
+    }
+
+    plt
+}
+
+#' @importFrom ggplot2 coord_map geom_tile
+`plot_smooth.sos` <- function(object,
+                              variables = NULL,
+                              rug = NULL,
+                              show = c("estimate", "se"),
+                              contour = TRUE,
+                              contour_col = "black",
+                              n_contour = NULL,
+                              constant = NULL,
+                              fun = NULL,
+                              xlab = NULL,
+                              ylab = NULL,
+                              title = NULL,
+                              subtitle = NULL,
+                              caption = NULL,
+                              ylim = NULL,
+                              continuous_fill = NULL,
+                              projection = "orthographic",
+                              orientation = NULL,
+                              ...) {
+    # handle splines on the sphere
+
+    if (is.null(variables)) {
+        variables <- vars_from_label(unique(object[["smooth"]]))
+    }
+
+    if (is.null(continuous_fill)) {
+        continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
+    }
+
+    ## If constant supplied apply it to `est`
+    object <- add_constant(object, constant = constant)
+
+    ## If fun supplied, use it to transform est and the upper and lower interval
+    object <- transform_fun(object, fun = fun)
+
+    show <- match.arg(show)
+    if (isTRUE(identical(show, "estimate"))) {
+        guide_title <- "Effect"
+        plot_var <- "est"
+        guide_limits <- if (is.null(ylim)) {
+            c(-1, 1) * max(abs(object[[plot_var]]))
+        } else {
+            ylim
+        }
+    } else {
+        guide_title <- "Std. err."
+        plot_var <- "se"
+        guide_limits <- range(object[["se"]])
+    }
+
+    # if orientation is not specified, use c(20, 0, mean(range(longitude)))
+    if (is.null(orientation)) {
+        orientation <- c(20, 0, mean(range(object[[variables[2]]])))
+    }
+
+    # base plot
+    # Simon parameterises the SOS with first argument latitude and second
+    #  argument longitude, so we need to reverse that here
+    plt <- ggplot(object, aes_(x = as.name(variables[2]),
+                               y = as.name(variables[1]))) +
+        geom_tile(mapping = aes_string(fill = plot_var)) +
+        coord_map(projection = projection,
+                  orientation = orientation)
+
+    if (isTRUE(contour)) {
+        plt <- plt + geom_contour(mapping = aes_(z = as.name(plot_var)),
+                                  colour = contour_col,
+                                  bins = n_contour,
+                                  na.rm = TRUE)
+    }
+
+    ## default axis labels if none supplied
+    if (missing(xlab)) {
+        xlab <- variables[2] ## yes, the smooth is s(lat, lon) !
+    }
+
+    if (missing(ylab)) {
+        ylab <- variables[1] ## yes, the smooth is s(lat, lon) !
+    }
+
+    if (is.null(title)) {
+        title <- unique(object[["smooth"]])
+    }
+
+    if (all(!is.na(object[["by"]]))) {
+        # is the by variable a factor or a numeric
+        by_class <- data_class(object)[[object[["by"]][[1L]]]]
+        by_var <- as.character(unique(object[["by"]]))
+        spl <- strsplit(title, split = ":")
+        title <- spl[[1L]][[1L]]
+        if (is.null(subtitle)) {
+            subtitle <- if (by_class != "factor") {
+                paste0("By: ", by_var) # continuous by
+            } else {
+                paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+            }
+        }
+    }
+
+    ## add labelling to plot
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+                      caption = caption)
+
+    ## Set the palette
+    plt <- plt + continuous_fill
+
+    ## Set the limits for the fill
+    plt <- plt + expand_limits(fill = guide_limits)
+
+    ## add guide
+    plt <- plt +
+        guides(fill = guide_colourbar(title = guide_title,
+                                      direction = "vertical",
+                                      barheight = grid::unit(0.25, "npc")))
+
+    ## position legend at the
+    plt <- plt + theme(legend.position = "right")
+
+    ## add rug?
+    if (!is.null(rug)) {
+        plt <- plt +
+          geom_point(data = rug, ## yes, the smooth is s(lat, lon) !
+                     mapping = aes_(x = as.name(variables[2]),
+                                    y = as.name(variables[1])),
+                     inherit.aes = FALSE, alpha = 0.1)
     }
 
     plt
