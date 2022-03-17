@@ -59,14 +59,11 @@
     }
     scale <- match.arg(scale)
 
-    # convert data to a tibble if
-    if (!is_tibble(data)) {
-        data <- as_tibble(data)
-    }
-
     if (is.null(data)) {
         data <- delete_response(object, model_frame = FALSE) %>%
                 as_tibble()
+    } else if (!is_tibble(data)) {
+        data <- as_tibble(data)
     }
     fit <- predict(object, newdata = data, ..., type = "link",
                    se.fit = TRUE) %>%
