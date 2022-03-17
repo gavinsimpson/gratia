@@ -377,6 +377,8 @@
     plt #return
 }
 
+#' @importFrom rlang .data
+#' @importFrom dplyr distinct
 `draw_1d_posterior_smooths` <- function(object, xlab = NULL, ylab = NULL,
                                         title = NULL, subtitle = NULL,
                                         caption = NULL, rug = TRUE, alpha = 1,
@@ -412,7 +414,8 @@
 
     ## add rug?
     if (!is.null(rug)) {
-        plt <- plt + geom_rug(mapping = aes_string(x = '.x1'),
+        plt <- plt + geom_rug(data = distinct(object, .data$.x1),
+                              mapping = aes_string(x = '.x1'),
                               inherit.aes = FALSE, sides = 'b', alpha = 0.5)
     }
 
