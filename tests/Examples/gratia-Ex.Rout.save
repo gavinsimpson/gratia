@@ -244,10 +244,9 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 > 
 > load_mgcv()
 > ## Don't show: 
-> set.seed(42)
 > op <- options(digits = 3, cli.unicode = FALSE)
 > ## End(Don't show)
-> df <- gamSim(4, n = 400, verbose = FALSE)
+> df <- data_sim("eg4", n = 400, seed = 42)
 > 
 > bf <- basis(s(x0), data = df)
 > bf <- basis(s(x2, by = fac, bs = 'bs'), data = df, constraints = TRUE)
@@ -1369,11 +1368,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x555e07dfec40>
+<environment: 0x55f8564cd1c8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x555e07dfec40>
+<environment: 0x55f8564cd1c8>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2043,7 +2042,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  15.08 0.115 15.301 0 0 
+Time elapsed:  16.415 0.149 16.695 0 0 
 > grDevices::dev.off()
 null device 
           1 
