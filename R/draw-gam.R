@@ -76,6 +76,15 @@
 #'   spread the plots
 #' @param guides character; one of `"keep"` (the default), `"collect"`, or
 #'   `"auto"`. Passed to [patchwork::plot_layout()]
+#' @param projection character; projection to use, see [mapproj::mapproject()]
+#'   for a list.
+#' @param orientation an optional vector `c(latitude, longitude, rotation)`
+#'   which describes where the "North Pole" should be when computing the
+#'   projection. The third value is a clockwise rotation (in degrees), which
+#'   defaults to the midrange of the longitude coordinates in the data. The
+#'   default values for `orientation` therefore are
+#'   `c(20, 0, mean(range(longitude))))`` if this is not specified by the user.
+#'   See [mapproj::mapproject()] for more information.
 #' @param ... additional arguments passed to [patchwork::wrap_plots()].
 #'
 #' @note Internally, plots of each smooth are created using [ggplot2::ggplot()]
@@ -158,6 +167,8 @@
                        position = "identity",
                        ncol = NULL, nrow = NULL,
                        guides = "keep",
+                       projection = "orthographic",
+                       orientation = NULL,
                        ...) {
     model_name <- expr_label(substitute(object))
     # fixed or free?
@@ -283,7 +294,9 @@
                        discrete_colour = discrete_colour,
                        continuous_colour = continuous_colour,
                        continuous_fill = continuous_fill,
-                       ylim = ylims)
+                       ylim = ylims,
+                       projection = projection,
+                       orientation = orientation)
 
     } # end stuff for smooths...
 

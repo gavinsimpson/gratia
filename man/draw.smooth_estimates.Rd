@@ -20,6 +20,8 @@
   continuous_colour = NULL,
   continuous_fill = NULL,
   ylim = NULL,
+  projection = "orthographic",
+  orientation = NULL,
   ...
 )
 }
@@ -67,6 +69,17 @@ for the types of data.}
 for the types of data.}
 
 \item{ylim}{numeric; vector of y axis limits to use all \emph{all} panels drawn.}
+
+\item{projection}{character; projection to use, see \code{\link[mapproj:mapproject]{mapproj::mapproject()}}
+for a list.}
+
+\item{orientation}{an optional vector \code{c(latitude, longitude, rotation)}
+which describes where the "North Pole" should be when computing the
+projection. The third value is a clockwise rotation (in degrees), which
+defaults to the midrange of the longitude coordinates in the data. The
+default values for \code{orientation} therefore are
+`c(20, 0, mean(range(longitude))))`` if this is not specified by the user.
+See \code{\link[mapproj:mapproject]{mapproj::mapproject()}} for more information.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }

@@ -2,6 +2,12 @@
 
 ## New features
 
+* `draw.gam()` and `draw.smooth_estimates()` can now handle splines on the
+  sphere (`s(lat,long, bs = "sos")`) with special plotting methods using
+  `ggplot2::coord_map()` to handle the projection to spherical coordinates. An
+  orthographic projection is used by default, with an essentially arbitrary
+  (and northern hemisphere-centric) default for the orientation of the view.
+
 * `fitted_values()` insures that `data` (and hence the returned object) is a
   tibble rather than a common or garden data frame.
 

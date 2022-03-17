@@ -94,6 +94,8 @@ is used instead.</p>
   ncol <span class="op">=</span> <span class="cn">NULL</span>,
   nrow <span class="op">=</span> <span class="cn">NULL</span>,
   guides <span class="op">=</span> <span class="st">"keep"</span>,
+  projection <span class="op">=</span> <span class="st">"orthographic"</span>,
+  orientation <span class="op">=</span> <span class="cn">NULL</span>,
   <span class="va">...</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -201,6 +203,17 @@ spread the plots</p></dd>
 <dt>guides</dt>
 <dd><p>character; one of <code>"keep"</code> (the default), <code>"collect"</code>, or
 <code>"auto"</code>. Passed to <code><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">patchwork::plot_layout()</a></code></p></dd>
+<dt>projection</dt>
+<dd><p>character; projection to use, see <code>mapproj::mapproject()</code>
+for a list.</p></dd>
+<dt>orientation</dt>
+<dd><p>an optional vector <code>c(latitude, longitude, rotation)</code>
+which describes where the "North Pole" should be when computing the
+projection. The third value is a clockwise rotation (in degrees), which
+defaults to the midrange of the longitude coordinates in the data. The
+default values for <code>orientation</code> therefore are
+`c(20, 0, mean(range(longitude))))`` if this is not specified by the user.
+See <code>mapproj::mapproject()</code> for more information.</p></dd>
 <dt>...</dt>
 <dd><p>additional arguments passed to <code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code>.</p></dd>
 </dl></div>
