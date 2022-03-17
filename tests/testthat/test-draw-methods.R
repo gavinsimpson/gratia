@@ -81,6 +81,7 @@ test_that("draw.gam works with select and parametric", {
 
 test_that("draw.evaluated_2d_smooth() plots the smooth", {
     skip_on_os("mac")
+    skip_on_os("win") # failing for trivial diffs in contours
     withr::local_options(lifecycle_verbosity = "quiet")
     expect_silent(sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100))
     expect_silent(plt <- draw(sm))
@@ -450,6 +451,8 @@ test_that("draw.gam uses fixed scales if asked for them: #73", {
 })
 
 test_that("draw.gam can take user specified scales", {
+    skip_on_os(os = "win")
+    skip_on_os(os = "mac") # trivial diffs in contours
     plt <- draw(su_m_bivar, rug = FALSE,
                 continuous_fill = scale_fill_distiller(palette = "Spectral",
                                                        type = "div"))
