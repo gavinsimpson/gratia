@@ -1,5 +1,10 @@
 # gratia 0.7.2
 
+## New features
+
+* `fitted_values()` insures that `data` (and hence the returned object) is a
+  tibble rather than a common or garden data frame.
+
 ## Bug fixes
 
 * `draw.posterior_smooths()` was redundantly plotting duplicate data in the rug
