@@ -906,11 +906,17 @@
         title <- unique(object[["smooth"]])
     }
     if (all(!is.na(object[["by"]]))) {
+        # is the by variable a factor or a numeric
+        by_class <- data_class(object)[[object[["by"]][[1L]]]]
+        by_var <- as.character(unique(object[["by"]]))
         spl <- strsplit(title, split = ":")
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
-            by_var <- as.character(unique(object[["by"]]))
-            subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+            subtitle <- if (by_class != "factor") {
+                paste0("By: ", by_var) # continuous by
+            } else {
+                paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+            }
         }
     }
 
@@ -1297,8 +1303,8 @@
     ## and this messes up the facets at draw time.
     ##
     ## What we want here perhaps is to bin the data into the groups formed by
-    ## the cut points of the data that we're plottign at and only modify the
-    ## rug data so that we group the data by the cuts we're facetting by and
+    ## the cut points of the data that we're plotting at and only modify the
+    ## rug data so that we group the data by the cuts we're faceting by and
     ## modify the 3/4d variable(s) to be these unique values that we're
     ## plotting as facets.
     # if (!is.null(rug)) {
