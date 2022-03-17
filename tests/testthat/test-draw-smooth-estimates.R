@@ -51,14 +51,11 @@ test_that("draw.smooth_estimates works for m_gamgcv", {
 })
 
 test_that("draw.smooth_estimates works for su_m_bivar", {
-    skip_on_os(os = "mac") # trivial diffs in contours
-    skip_on_os(os = "win") # trivial diffs in contours
     expect_silent(plt <- draw(smooth_estimates(su_m_bivar, dist = 0.1)))
     expect_doppelganger("draw.smooth_estimates su_m_bivar", plt)
 })
 
 test_that("draw.smooth_estimates works for su_m_bivar_te", {
-    skip_on_os(os = "win") # trivial diffs in contours
     expect_silent(plt <- draw(smooth_estimates(su_m_bivar_te, dist = 0.1)))
     expect_doppelganger("draw.smooth_estimates su_m_bivar_te", plt)
 })

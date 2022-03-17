@@ -160,7 +160,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom rlang .data
 `bivariate_model` <- function(n, sim_fun = sim_normal, scale = 2) {
     data <- tibble(x = runif(n), z = runif(n))
-    data2 <- sim_fun(x = bivariate(data$x, data$z), scale = scale)
+    data2 <- sim_fun(x = bivariate(data$x, data$z))
     data <- bind_cols(data2, data)
     data
 }
