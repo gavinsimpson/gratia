@@ -62,7 +62,7 @@ The main features of *gratia* are currently
     
     ![Estimated smooths from a GAM](man/figures/README-draw-gam-figure-2d-1.png)
 
-    Note specialist smoothers (`bs %in% c("sos","mrf","so")`) are not currently
+    Note specialist smoothers (`bs %in% c("mrf","so")`) are not currently
     supported, but univariate, *factor* and *continuous* `by`-variable smooths,
     simple random effect smooths (`bs = 're'`), factor-smooth interaction
     smooths (`bs = "fs"`), and bivariate tensor product smooths are supported,
