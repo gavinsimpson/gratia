@@ -116,16 +116,18 @@ draw_concurvity <- function(object, ...) {
     UseMethod("draw_concurvity")
 }
 
-#' @importFrom ggplot2 ggplot aes_string geom_tile facet_wrap coord_equal labs
+#' @importFrom ggplot2 ggplot aes geom_tile facet_wrap coord_equal labs
 #'   scale_fill_viridis_c
 `draw_concurvity.pairwise_concurvity` <-
   function(object, title = "Smooth-wise concurvity",
            subtitle = NULL, caption = NULL,
            continuous_colour = NULL, ...) {
     plt <- ggplot(object,
-                  aes_string(x = "term", y = "with", group = "type")) +
-      geom_tile(aes_string(fill = "concurvity")) +
-      facet_wrap("type") +
+                  aes(x = .data[["term"]],
+                      y = .data[["with"]],
+                      group = .data[["type"]])) +
+      geom_tile(aes(fill = .data[["concurvity"]])) +
+      facet_wrap(vars(.data[["type"]])) +
       coord_equal()
 
     plt <- plt +
@@ -140,18 +142,18 @@ draw_concurvity <- function(object, ...) {
     plt
 }
 
-#' @importFrom ggplot2 ggplot aes_string geom_col facet_wrap labs
+#' @importFrom ggplot2 ggplot aes geom_col facet_wrap labs
 `draw_concurvity.overall_concurvity` <-
   function(object, title = "Overall concurvity",
            subtitle = NULL, caption = NULL, ylab = "Concurvity",
            xlab = NULL,
            bar_col = "steelblue", bar_fill = "steelblue",
            ...) {
-    plt <- ggplot(object, aes_string(x = "term",
-                                     y = "concurvity",
-                                     group = "type")) +
+    plt <- ggplot(object, aes(x = .data[["term"]],
+                              y = .data[["concurvity"]],
+                              group = .data[["type"]])) +
       geom_col(colour = bar_col, fill = bar_fill) +
-      facet_wrap("type") +
+      facet_wrap(vars(.data[["type"]])) +
       labs(title = title, subtitle = subtitle, cpation = caption,
            x = xlab, y = ylab)
 

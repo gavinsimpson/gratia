@@ -860,8 +860,9 @@
 }
 
 #' @importFrom dplyr mutate
-#' @importFrom ggplot2 ggplot geom_point aes_ aes_string geom_rug geom_abline
-#'   expand_limits labs geom_line geom_ribbon
+#' @importFrom ggplot2 ggplot geom_point geom_rug geom_abline
+#'   expand_limits labs geom_line geom_ribbon aes
+#' @importFrom rlang .data
 #' @keywords internal
 #' @noRd
 `plot_smooth.mgcv_smooth` <- function (object,
@@ -893,20 +894,21 @@
     object <- transform_fun(object, fun = fun)
 
     # base plot - need as.name to handle none standard names, like log2(x)
-    plt <- ggplot(object, aes_(x = as.name(variables), y =  ~ est))
+    plt <- ggplot(object, aes(x = .data[[variables]], y = .data$est))
 
     # do we want partial residuals? Only for univariate smooths without by vars
     if (!is.null(partial_residuals)) {
         plt <- plt + geom_point(data = partial_residuals,
-                                aes_(x = as.name(variables),
-                                     y = ~partial_residual),
+                                aes(x = .data[[variables]],
+                                    y = .data[["partial_residual"]]),
                                 inherit.aes = FALSE,
                                 colour = resid_col, alpha = 0.5)
     }
 
     # plot the confidence interval and smooth line
     plt <- plt +
-        geom_ribbon(mapping = aes_string(ymin = "lower_ci", ymax = "upper_ci"),
+        geom_ribbon(mapping = aes(ymin = .data[["lower_ci"]],
+                                  ymax = .data[["upper_ci"]]),
                     alpha = ci_alpha, colour = NA, fill = ci_col) +
         geom_line(colour = smooth_col)
 
@@ -943,8 +945,8 @@
     if (!is.null(rug)) {
         plt <- plt +
             geom_rug(data = rug,
-                     mapping = aes_(x = as.name(variables)),
-                     inherit.aes = FALSE, sides = 'b', alpha = 0.5)
+                     mapping = aes(x = .data[[variables]]),
+                     inherit.aes = FALSE, sides = "b", alpha = 0.5)
     }
 
     # fix the yaxis limits?
@@ -955,15 +957,16 @@
     plt
 }
 
-#' @importFrom ggplot2 ggplot geom_point geom_raster geom_contour aes_
+#' @importFrom ggplot2 ggplot geom_point geom_raster geom_contour
 #'   expand_limits labs guides guide_colourbar theme
 #' @importFrom grid unit
+#' @importFrom rlang .data
 #' @keywords internal
 #' @noRd
 `plot_smooth.bivariate_smooth` <- function(object,
                                            variables = NULL,
                                            rug = NULL,
-                                           show = c("estimate","se"),
+                                           show = c("estimate", "se"),
                                            contour = TRUE,
                                            contour_col = "black",
                                            n_contour = NULL,
@@ -1006,12 +1009,12 @@
         guide_limits <- range(object[["se"]])
     }
 
-    plt <- ggplot(object, aes_(x = as.name(variables[1]),
-                               y = as.name(variables[2]))) +
-        geom_raster(mapping = aes_(fill = as.name(plot_var)))
+    plt <- ggplot(object, aes(x = .data[[variables[1]]],
+                              y = .data[[variables[2]]])) +
+        geom_raster(mapping = aes(fill = .data[[plot_var]]))
 
     if (isTRUE(contour)) {
-        plt <- plt + geom_contour(mapping = aes_(z = as.name(plot_var)),
+        plt <- plt + geom_contour(mapping = aes(z = .data[[plot_var]]),
                                   colour = contour_col,
                                   bins = n_contour,
                                   na.rm = TRUE)
@@ -1060,15 +1063,15 @@
     if (!is.null(rug)) {
         plt <- plt +
           geom_point(data = rug,
-                     mapping = aes_(x = as.name(variables[1]),
-                                    y = as.name(variables[2])),
+                     mapping = aes(x = .data[[variables[1]]],
+                                   y = .data[[variables[2]]]),
                      inherit.aes = FALSE, alpha = 0.1)
     }
 
     plt
 }
 
-#' @importFrom ggplot2 ggplot geom_point geom_raster geom_contour aes_
+#' @importFrom ggplot2 ggplot geom_point geom_raster geom_contour aes
 #'   expand_limits labs guides guide_colourbar theme facet_wrap
 #' @importFrom grid unit
 #' @keywords internal
@@ -1119,13 +1122,13 @@
         guide_limits <- range(object[["se"]])
     }
 
-    plt <- ggplot(object, aes_(x = as.name(variables[1]),
-                               y = as.name(variables[2]))) +
-        geom_raster(mapping = aes_(fill = as.name(plot_var))) +
-        facet_wrap(as.name(variables[3]))
+    plt <- ggplot(object, aes(x = .data[[variables[1]]],
+                              y = .data[[variables[2]]])) +
+        geom_raster(mapping = aes(fill = .data[[plot_var]])) +
+        facet_wrap(vars(.data[[variables[3]]]))
 
     if (isTRUE(contour)) {
-        plt <- plt + geom_contour(mapping = aes_(z = as.name(plot_var)),
+        plt <- plt + geom_contour(mapping = aes(z = .data[[plot_var]]),
                                   colour = contour_col,
                                   bins = n_contour,
                                   na.rm = TRUE)
@@ -1188,8 +1191,8 @@
     # if (!is.null(rug)) {
     #     plt <- plt +
     #       geom_point(data = rug,
-    #                  mapping = aes_(x = as.name(variables[1]),
-    #                                 y = as.name(variables[2])),
+    #                  mapping = aes(x = .data[[variables[1]]],
+    #                                y = .data[[variables[2]]]),
     #                  inherit.aes = FALSE, alpha = 0.1)
     # }
 
@@ -1201,7 +1204,7 @@
 }
 
 
-#' @importFrom ggplot2 ggplot geom_point geom_raster geom_contour aes_
+#' @importFrom ggplot2 ggplot geom_point geom_raster geom_contour
 #'   expand_limits labs guides guide_colourbar theme facet_grid
 #' @importFrom dplyr vars
 #' @importFrom grid unit
@@ -1253,15 +1256,15 @@
         guide_limits <- range(object[["se"]])
     }
 
-    plt <- ggplot(object, aes_(x = as.name(variables[1]),
-                               y = as.name(variables[2]))) +
-        geom_raster(mapping = aes_(fill = as.name(plot_var))) +
-        facet_grid(rows = vars(!!as.name(variables[3])),
-                   cols = vars(!!as.name(variables[4])),
+    plt <- ggplot(object, aes(x = .data[[variables[1]]],
+                              y = .data[[variables[2]]])) +
+        geom_raster(mapping = aes(fill = .data[[plot_var]])) +
+        facet_grid(rows = vars(.data[[variables[3]]]),
+                   cols = vars(.data[[variables[4]]]),
                    as.table = FALSE)
 
     if (isTRUE(contour)) {
-        plt <- plt + geom_contour(mapping = aes_(z = as.name(plot_var)),
+        plt <- plt + geom_contour(mapping = aes(z = .data[[plot_var]]),
                                   colour = contour_col,
                                   bins = n_contour,
                                   na.rm = TRUE)
@@ -1325,8 +1328,8 @@
     # if (!is.null(rug)) {
     #     plt <- plt +
     #       geom_point(data = rug,
-    #                  mapping = aes_(x = as.name(variables[1]),
-    #                                 y = as.name(variables[2])),
+    #                  mapping = aes(x = .data[[variables[1]]],
+    #                                y = .data[[variables[2]]]),
     #                  inherit.aes = FALSE, alpha = 0.1)
     # }
 
@@ -1348,7 +1351,7 @@
     plt # return
 }
 
-#' @importFrom ggplot2 ggplot geom_point aes_string geom_abline expand_limits
+#' @importFrom ggplot2 ggplot geom_point geom_abline expand_limits
 #'   labs
 #' @keywords internal
 #' @noRd
@@ -1375,7 +1378,7 @@
     object <- transform_fun(object, fun = fun)
 
     ## base plot with computed QQs
-    plt <- ggplot(object, aes_string(sample = "est")) +
+    plt <- ggplot(object, aes(sample = .data[["est"]])) +
         geom_point(stat = "qq")
 
     ## add a QQ reference line
@@ -1419,6 +1422,11 @@
     plt
 }
 
+#' @importFrom rlang .data
+#' @importFrom ggplot2 ggplot geom_point geom_line expand_limits theme aes
+#'   labs
+#' @keywords internal
+#' @noRd
 `plot_smooth.factor_smooth` <- function(object,
                                         variables = NULL,
                                         rug = NULL,
@@ -1446,8 +1454,9 @@
     ## If fun supplied, use it to transform est and the upper and lower interval
     object <- transform_fun(object, fun = fun)
 
-    plt <- ggplot(object, aes_(x = as.name(variables[1]), y = ~ est,
-                               colour = as.name(variables[2]))) +
+    plt <- ggplot(object, aes(x = .data[[variables[1]]],
+                              y = .data[["est"]],
+                              colour = .data[[variables[2]]])) +
         geom_line() +
         discrete_colour +
         theme(legend.position = "none")
@@ -1478,9 +1487,9 @@
     ## add rug?
     if (!is.null(rug)) {
         plt <- plt + geom_rug(data = rug,
-                              mapping = aes_(x = as.name(variables[1])),
+                              mapping = aes(x = .data[[variables[1]]]),
                               inherit.aes = FALSE,
-                              sides = 'b', alpha = 0.5)
+                              sides = "b", alpha = 0.5)
     }
 
     ## fixing the y axis limits?
@@ -1491,7 +1500,7 @@
     plt
 }
 
-#' @importFrom ggplot2 coord_map geom_tile
+#' @importFrom ggplot2 coord_map geom_tile guide_colourbar geom_contour aes
 `plot_smooth.sos` <- function(object,
                               variables = NULL,
                               rug = NULL,
@@ -1550,14 +1559,14 @@
     # base plot
     # Simon parameterises the SOS with first argument latitude and second
     #  argument longitude, so we need to reverse that here
-    plt <- ggplot(object, aes_(x = as.name(variables[2]),
-                               y = as.name(variables[1]))) +
-        geom_tile(mapping = aes_string(fill = plot_var)) +
+    plt <- ggplot(object, aes(x = .data[[variables[2]]],
+                              y = .data[[variables[1]]])) +
+        geom_tile(mapping = aes(fill = .data[[plot_var]])) +
         coord_map(projection = projection,
                   orientation = orientation)
 
     if (isTRUE(contour)) {
-        plt <- plt + geom_contour(mapping = aes_(z = as.name(plot_var)),
+        plt <- plt + geom_contour(mapping = aes(z = .data[[plot_var]]),
                                   colour = contour_col,
                                   bins = n_contour,
                                   na.rm = TRUE)
@@ -1614,8 +1623,8 @@
     if (!is.null(rug)) {
         plt <- plt +
           geom_point(data = rug, ## yes, the smooth is s(lat, lon) !
-                     mapping = aes_(x = as.name(variables[2]),
-                                    y = as.name(variables[1])),
+                     mapping = aes(x = .data[[variables[2]]],
+                                   y = .data[[variables[1]]]),
                      inherit.aes = FALSE, alpha = 0.1)
     }
 
