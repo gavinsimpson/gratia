@@ -129,22 +129,23 @@
                      upper_ci = .data[["est"]] - (crit * .data[["se"]]))
 
     ## basic plot
-    plt <- ggplot(object, aes_string(x = sm_vars[1L],
-                                     y = "est",
-                                     group = "model"))
+    plt <- ggplot(object, aes(x = .data[[sm_vars[1L]]],
+                              y = .data[["est"]],
+                              group = .data[["model"]]))
 
     ## add uncertainty bands
-    plt <- plt + geom_ribbon(aes_string(ymin = "lower_ci", ymax = "upper_ci",
-                                        fill = "model"),
+    plt <- plt + geom_ribbon(aes(ymin = .data[["lower_ci"]],
+                                 ymax = .data[["upper_ci"]],
+                                 fill = .data[["model"]]),
                              alpha = 0.2)
 
     ## add smooth lines
-    plt <- plt + geom_line(aes_string(colour = "model"))
+    plt <- plt + geom_line(aes(colour = .data[["model"]]))
 
     ## Add labels
     plt <- plt + labs(colour = "Model", fill = "Model",
                       title = unique(object[["smooth"]]),
                       y = "Estimate")
-    
+
     plt
 }

@@ -37,8 +37,9 @@
 #'
 #' @author Gavin L. Simpson
 #'
-#' @importFrom ggplot2 ggplot aes_ aes_string labs geom_line geom_ribbon
+#' @importFrom ggplot2 ggplot aes labs geom_line geom_ribbon
 #'   expand_limits
+#' @importFrom rlang .data
 #' @importFrom grid unit
 #'
 #' @export
@@ -86,20 +87,22 @@
     ## If fun supplied, use it to transform est and the upper and lower interval
     object <- transform_fun(object, fun = fun)
 
-    plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est,
-                               group = ~ smooth))
+    plt <- ggplot(object, aes(x = .data[[smooth_var]],
+                              y = .data[["est"]],
+                              group = .data[["smooth"]]))
 
     ## do we want partial residuals? Only for univariate smooths without by vars
     if (!is.null(partial_residuals)) {
         plt <- plt + geom_point(data = partial_residuals,
-                                aes_string(x = "..orig_x", y = "..p_resid"),
+                                aes(x = .data[["..orig_x"]],
+                                    y = .data[["..p_resid"]]),
                                 inherit.aes = FALSE,
                                 colour = "steelblue3", alpha = 0.5)
     }
 
     ## plot the confidence interval
-    plt <- plt + geom_ribbon(mapping = aes_string(ymin = "lower",
-                                                  ymax = "upper"),
+    plt <- plt + geom_ribbon(mapping = aes(ymin = .data$lower,
+                                           ymax = .data$upper),
                              alpha = 0.3) +
         geom_line()
 
@@ -129,8 +132,9 @@
     ## add rug?
     if (!is.null(rug)) {
         plt <- plt +
-            geom_rug(data = data.frame(x = rug), mapping = aes_string(x = 'x'),
-                     inherit.aes = FALSE, sides = 'b', alpha = 0.5)
+            geom_rug(data = data.frame(x = rug),
+                     mapping = aes(x = .data$x),
+                     inherit.aes = FALSE, sides = "b", alpha = 0.5)
     }
 
     ## fixing the y axis limits?
@@ -154,7 +158,7 @@
 #' @param continuous_fill suitable scale used for the filled surface. If `NULL`,
 #'   the default used is `scale_fill_distiller(palette = "RdBu", type = "div")`.
 #'
-#' @importFrom ggplot2 ggplot aes_string geom_raster geom_contour labs guides
+#' @importFrom ggplot2 ggplot aes geom_raster geom_contour labs guides
 #'   guide_colourbar scale_fill_distiller theme
 #' @importFrom grid unit
 #'
@@ -198,11 +202,12 @@
         guide_limits <- range(object[["se"]])
     }
 
-    plt <- ggplot(object, aes_string(x = smooth_vars[1], y = smooth_vars[2])) +
-        geom_raster(mapping = aes_string(fill = plot_var))
+    plt <- ggplot(object, aes(x = .data[[smooth_vars[1]]],
+                              y = .data[[smooth_vars[2]]])) +
+        geom_raster(mapping = aes(fill = .data[[plot_var]]))
 
     if (isTRUE(contour)) {
-        plt <- plt + geom_contour(mapping = aes_string(z = plot_var),
+        plt <- plt + geom_contour(mapping = aes(z = .data[[plot_var]]),
                                   colour = contour_col,
                                   bins = n_contour)
     }
@@ -272,7 +277,7 @@
     object <- transform_fun(object, fun = fun)
 
     ## base plot with computed QQs
-    plt <- ggplot(object, aes_string(sample = "est")) +
+    plt <- ggplot(object, aes(sample = .data$est)) +
         geom_point(stat = "qq")
 
     ## add a QQ reference line
@@ -338,7 +343,7 @@
     if (is.null(discrete_colour)) {
         discrete_colour <- scale_colour_discrete()
     }
-    
+
     smooth_var <- names(object)[3L]
     smooth_fac <- names(object)[4L]
 
@@ -348,8 +353,9 @@
     ## If fun supplied, use it to transform est and the upper and lower interval
     object <- transform_fun(object, fun = fun)
 
-    plt <- ggplot(object, aes_(x = as.name(smooth_var), y = ~ est,
-                               colour = as.name(smooth_fac))) +
+    plt <- ggplot(object, aes(x = .data[[smooth_var]],
+                              y = .data$est,
+                              colour = .data[[smooth_fac]])) +
         geom_line() +
         discrete_colour +
         theme(legend.position = "none")
@@ -380,9 +386,9 @@
     ## add rug?
     if (!is.null(rug)) {
         plt <- plt + geom_rug(data = data.frame(x = rug),
-                              mapping = aes_string(x = 'x'),
+                              mapping = aes(x = .data$x),
                               inherit.aes = FALSE,
-                              sides = 'b', alpha = 0.5)
+                              sides = "b", alpha = 0.5)
     }
 
     ## fixing the y axis limits?
@@ -397,7 +403,7 @@
 #'   call to a position adjustment function.
 #'
 #' @importFrom ggplot2 ggplot geom_pointrange geom_rug geom_ribbon geom_line
-#'   aes_string expand_limits
+#'   aes expand_limits
 #' @export
 #' @rdname draw.evaluated_smooth
 `draw.evaluated_parametric_term` <- function(object,
@@ -426,15 +432,17 @@
     ## If fun supplied, use it to transform est and the upper and lower interval
     object <- transform_fun(object, fun = fun)
 
-    plt <- ggplot(object, aes_string(x = "value", y = "partial"))
+    plt <- ggplot(object, aes(x = .data$value, y = .data$partial))
 
     if (is_fac) {
-        plt <- plt + geom_pointrange(aes_string(ymin = "lower", ymax = "upper"))
+        plt <- plt + geom_pointrange(aes(ymin = .data$lower,
+                                         ymax = .data$upper))
     } else {
         if (isTRUE(rug)) {
             plt <- plt + geom_rug(sides = "b", position = position, alpha = 0.5)
         }
-        plt <- plt + geom_ribbon(aes_string(ymin = "lower", ymax = "upper"),
+        plt <- plt + geom_ribbon(aes(ymin = .data$lower,
+                                     ymax = .data$upper),
                                  alpha = 0.3) +
             geom_line()
     }

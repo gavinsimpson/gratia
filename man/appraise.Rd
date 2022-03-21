@@ -88,7 +88,7 @@ mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 ## run some basic model checks
 appraise(mod, point_col = "steelblue", point_alpha = 0.4)
 
-## To change the theme for all panels use the & operator, for example to 
+## To change the theme for all panels use the & operator, for example to
 ## change the ggplot theme for all panels
 library("ggplot2")
 appraise(mod, point_col = "steelblue", point_alpha = 0.4,

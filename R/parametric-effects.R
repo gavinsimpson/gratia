@@ -199,7 +199,7 @@ draw.parametric_effects <- function(object,
 #' @inheritParams draw.gam
 #'
 #' @importFrom dplyr mutate if_else
-#' @importFrom ggplot2 ggplot aes_string geom_pointrange geom_rug geom_ribbon
+#' @importFrom ggplot2 ggplot aes geom_pointrange geom_rug geom_ribbon
 #'   geom_line labs expand_limits
 #' @keywords internal
 `draw_parametric_effect` <- function(object,
@@ -236,15 +236,18 @@ draw.parametric_effects <- function(object,
     object <- transform_fun(object, fun = fun, column = "partial")
 
     # base plot
-    plt <- ggplot(object, aes_string(x = x_val, y = "partial"))
+    plt <- ggplot(object, aes(x = .data[[x_val]],
+                              y = .data$partial))
 
     if (is_fac) {
-        plt <- plt + geom_pointrange(aes_string(ymin = "lower", ymax = "upper"))
+        plt <- plt + geom_pointrange(aes(ymin = .data$lower,
+                                         ymax = .data$upper))
     } else {
         if (isTRUE(rug)) {
             plt <- plt + geom_rug(sides = "b", position = position, alpha = 0.5)
         }
-        plt <- plt + geom_ribbon(aes_string(ymin = "lower", ymax = "upper"),
+        plt <- plt + geom_ribbon(aes(ymin = .data$lower,
+                                     ymax = .data$upper),
                                  alpha = ci_alpha, fill = ci_col, colour = NA) +
             geom_line(colour = line_col)
     }
