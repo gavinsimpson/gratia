@@ -8,7 +8,8 @@ data_sim(
   model = "eg1",
   n = 400,
   scale = 2,
-  dist = c("normal", "poisson", "binary"),
+  theta = 3,
+  dist = c("normal", "poisson", "binary", "negbin", "tweedie"),
   seed = NULL
 )
 }
@@ -19,6 +20,10 @@ the name of a model. See Details for possible options.}
 \item{n}{numeric; the number of observations to simulate.}
 
 \item{scale}{numeric; the level of noise to use.}
+
+\item{theta}{numeric; the dispersion parameter \eqn{\theta} to use. The
+default is entirely arbitrary, chosen only to provide simulated data that
+exhibits extra dispersion beyond that assumed by under a Poisson.}
 
 \item{dist}{character; a sampling distribution for the response
 variable.}

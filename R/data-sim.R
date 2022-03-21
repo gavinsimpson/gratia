@@ -10,6 +10,9 @@
 #' @param dist character; a sampling distribution for the response
 #'   variable.
 #' @param scale numeric; the level of noise to use.
+#' @param theta numeric; the dispersion parameter \eqn{\theta} to use. The
+#'   default is entirely arbitrary, chosen only to provide simulated data that
+#'   exhibits extra dispersion beyond that assumed by under a Poisson.
 #' @param seed numeric; the seed for the random number generator. Passed to
 #'   [base::set.seed()].
 #'
@@ -22,8 +25,9 @@
 #' }
 #' data_sim("eg1")
 #' \dontshow{options(op)}
-`data_sim` <- function(model = "eg1", n = 400, scale = 2,
-                       dist = c("normal", "poisson", "binary"),
+`data_sim` <- function(model = "eg1", n = 400, scale = 2, theta = 3,
+                       dist = c("normal", "poisson", "binary",
+                                "negbin", "tweedie"),
                        seed = NULL) {
     ## sort out the seed
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
@@ -45,7 +49,9 @@
     sim_fun <- switch(dist,
                       normal  = sim_normal,
                       poisson = sim_poisson,
-                      binary  = sim_binary)
+                      binary  = sim_binary,
+                      negbin  = sim_nb,
+                      tweedie = sim_tweedie)
 
     model_fun <- switch(model,
                         eg1 = four_term_additive_model,
@@ -56,7 +62,7 @@
                         eg6 = four_term_plus_ranef_model,
                         eg7 = correlated_four_term_additive_model)
 
-    model_fun(n = n, sim_fun = sim_fun, scale = scale)
+    model_fun(n = n, sim_fun = sim_fun, scale = scale, theta = theta)
 }
 
 #' @importFrom stats rnorm
@@ -77,6 +83,17 @@
     x <- (x - 5) * scale
     p <- ilink(x)
     tibble(y = rbinom(p, 1, p), f = x)
+}
+
+#' @importFrom stats rnbinom
+`sim_nb` <- function(x, scale = 2, theta = 3, ...) {
+    lam <- exp(x * scale)
+    tibble(y = rnbinom(rep(1, length(x)), mu = lam, size = theta),
+           f = log(lam))
+}
+
+`sim_tweedie` <- function(x, scale = 2, power = 1, ...) {
+    .NotYetImplemented()
 }
 
 ## Gu Wabha functions
@@ -127,13 +144,14 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom tibble tibble
 #' @importFrom dplyr mutate bind_cols
 #' @importFrom rlang .data
-`four_term_additive_model` <- function(n, sim_fun = sim_normal, scale = 2) {
+`four_term_additive_model` <- function(n, sim_fun = sim_normal, scale = 2,
+                                       theta = 3) {
     data <- tibble(x0 = runif(n, 0, 1), x1 = runif(n, 0, 1),
                    x2 = runif(n, 0, 1), x3 = runif(n, 0, 1))
     data <- mutate(data,
                    f0 = gw_f0(.data$x0), f1 = gw_f1(.data$x1),
                    f2 = gw_f2(.data$x2), f3 = gw_f3(.data$x3))
-    data2 <- sim_fun(x = data$f0 + data$f1 + data$f2, scale)
+    data2 <- sim_fun(x = data$f0 + data$f1 + data$f2, scale, theta = theta)
     data <- bind_cols(data2, data)
     data[c("y", "x0", "x1", "x2", "x3", "f", "f0", "f1", "f2", "f3")]
 }
@@ -141,8 +159,8 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom tibble tibble
 #' @importFrom dplyr mutate bind_cols
 #' @importFrom rlang .data
-`correlated_four_term_additive_model` <-
-    function(n, sim_fun = sim_normal, scale = 2) {
+`correlated_four_term_additive_model` <- function(n, sim_fun = sim_normal,
+                                                  scale = 2, theta = 3) {
     data <- tibble(x0 = runif(n, 0, 1), x2 = runif(n, 0, 1))
     data <- mutate(data,
                    x1 = .data$x0 * 0.7 + runif(n, 0, 0.3),
@@ -150,7 +168,8 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
     data <- mutate(data,
                    f0 = gw_f0(.data$x0), f1 = gw_f1(.data$x1),
                    f2 = gw_f2(.data$x2), f3 = gw_f3(.data$x0))
-    data2 <- sim_fun(x = data$f0 + data$f1 + data$f2, scale = scale)
+    data2 <- sim_fun(x = data$f0 + data$f1 + data$f2, scale = scale,
+                     theta = theta)
     data <- bind_cols(data2, data)
     data[c("y", "x0", "x1", "x2", "x3", "f", "f0", "f1", "f2", "f3")]
 }
@@ -158,21 +177,23 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom tibble tibble
 #' @importFrom dplyr bind_cols
 #' @importFrom rlang .data
-`bivariate_model` <- function(n, sim_fun = sim_normal, scale = 2) {
+`bivariate_model` <- function(n, sim_fun = sim_normal, scale = 2, theta = 3) {
     data <- tibble(x = runif(n), z = runif(n))
-    data2 <- sim_fun(x = bivariate(data$x, data$z), scale = scale)
+    data2 <- sim_fun(x = bivariate(data$x, data$z), scale = scale,
+                     theta = theta)
     data <- bind_cols(data2, data)
     data
 }
 
 #' @importFrom tibble tibble
 #' @importFrom dplyr bind_cols 
-`continuous_by_model` <- function(n, sim_fun = sim_normal, scale = 2) {
+`continuous_by_model` <- function(n, sim_fun = sim_normal, scale = 2,
+                                  theta = 3) {
     data <- tibble(x1 = runif(n, 0, 1), x2 = sort(runif(n, 0, 1)))
     `f_fun` <- function(x) {
         0.2 * x^11 * (10 * (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^10
     }
-    data2 <- sim_fun(x = f_fun(data$x2) * data$x1, scale = scale)
+    data2 <- sim_fun(x = f_fun(data$x2) * data$x1, scale = scale, theta = theta)
     data <- bind_cols(data2, data)
     data[c("y", "x1", "x2", "f")]
 }
@@ -180,7 +201,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom tibble tibble
 #' @importFrom dplyr bind_cols
 #' @importFrom rlang .data
-`factor_by_model` <- function(n, sim_fun = sim_normal, scale = 2) {
+`factor_by_model` <- function(n, sim_fun = sim_normal, scale = 2, theta = 3) {
     data <- tibble(x0 = runif(n, 0, 1), x1 = runif(n, 0, 1),
                    x2 = sort(runif(n, 0, 1)))
     data <- mutate(data,
@@ -192,7 +213,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
     y <- data$f1 * as.numeric(data$fac == 1) +
         data$f2 * as.numeric(data$fac == 2) +
         data$f3 * as.numeric(data$fac == 3)
-    data2 <- sim_fun(y, scale = scale)
+    data2 <- sim_fun(y, scale = scale, theta = theta)
     data <- bind_cols(data2, data)
     data[c("y", "x0", "x1", "x2", "fac", "f", "f1", "f2", "f3")]
 }
@@ -200,7 +221,8 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom tibble tibble
 #' @importFrom dplyr bind_cols
 #' @importFrom rlang .data
-`additive_plus_factor_model` <- function(n, sim_fun = sim_normal, scale = 2) {
+`additive_plus_factor_model` <- function(n, sim_fun = sim_normal, scale = 2,
+                                         theta = 3) {
     data <- tibble(x0 = rep(1:4, n / 4), x1 = runif(n, 0, 1),
                    x2 = runif(n, 0, 1), x3 = runif(n, 0, 1))
     data <- mutate(data,
@@ -210,7 +232,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
                        (10 * .data$x2)^3 * (1 - .data$x2)^10,
                    f3 = 0 * .data$x3)
     y <- data$f0 + data$f1 + data$f2
-    data2 <- sim_fun(y, scale = scale)
+    data2 <- sim_fun(y, scale = scale, theta = theta)
     data <- mutate(data, x0 = as.factor(.data$x0))
     data <- bind_cols(data2, data)
     data[c("y", "x0", "x1", "x2", "x3", "f", "f0", "f1", "f2", "f3")]
@@ -219,13 +241,14 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom tibble tibble
 #' @importFrom dplyr bind_cols
 #' @importFrom rlang .data
-`four_term_plus_ranef_model` <- function(n, sim_fun = sim_normal, scale = 2) {
+`four_term_plus_ranef_model` <- function(n, sim_fun = sim_normal, scale = 2,
+                                         theta = 3) {
     data <- four_term_additive_model(n = n, sim_fun = sim_fun, scale = 0)
     data <- mutate(data, fac = rep(1:4, n / 4))
     data <- mutate(data,
                    f = .data$f + .data$fac * 3,
                    fac = as.factor(.data$fac))
-    data2 <- sim_fun(data$f, scale = scale)
+    data2 <- sim_fun(data$f, scale = scale, theta = theta)
     data <- mutate(data, y = data2$y)
     data[c("y", "x0", "x1", "x2", "x3", "fac", "f", "f0", "f1", "f2", "f3")]
 }
@@ -240,15 +263,19 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom tidyr expand_grid
 #' @importFrom purrr pmap
 #' @noRd
-`create_reference_simulations` <- function(scale = 0.2, n = 100, seed = 42) {
-    `data_sim_wrap` <- function(model, dist, scale, n, seed, ...) {
-        data_sim(model, dist = dist, scale = scale, n = n, seed = seed, ...)
+`create_reference_simulations` <- function(scale = 0.2, n = 100, seed = 42,
+                                           theta = 4) {
+    `data_sim_wrap` <- function(model, dist, scale, theta, n, seed, ...) {
+        data_sim(model, dist = dist, scale = scale, theta = theta,
+                 n = n, seed = seed, ...)
     }
     params <- expand_grid(model = paste0("eg", 1:7),
-                          dist  = c("normal", "poisson", "binary"),
+                          dist  = c("normal", "poisson", "binary",
+                                    "negbin"),
                           scale = rep(scale, length.out = 1),
                           n = rep(n, length.out = 1),
-                          seed = rep(seed, length.out = 1))
+                          seed = rep(seed, length.out = 1),
+                          theta = rep(theta, length.out = 1))
     out <- pmap(params, .f = data_sim_wrap)
     nms <- unlist(pmap(params[1:2], paste, sep = "-"))
     names(out) <- nms
