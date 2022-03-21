@@ -46,7 +46,7 @@
 #' 
 #' @rdname qq_plot
 #' 
-#' @importFrom ggplot2 ggplot geom_point geom_abline geom_ribbon labs aes_string
+#' @importFrom ggplot2 ggplot geom_point geom_abline geom_ribbon labs aes
 #' @importFrom tools toTitleCase
 #' @importFrom stats residuals IQR median
 #' @export
@@ -61,15 +61,15 @@
 #' m <- gam( y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
 #'          family = binomial, data = dat, weights = n,
 #'          method = "REML")
-#' 
+#'
 #' ## Q-Q plot; default using direct randomization of uniform quantiles
 #' qq_plot(m)
-#' 
+#'
 #' ## Alternatively use simulate new data from the model, which
 #' ## allows construction of reference intervals for the Q-Q plot
 #' qq_plot(m, method = "simulate", point_col = "steelblue",
 #'         point_alpha = 0.4)
-#' 
+#'
 #' ## ... or use the usual normality assumption
 #' qq_plot(m, method = "normal")
 `qq_plot.gam` <- function(model,
@@ -133,7 +133,8 @@
     }
 
     ## base plot
-    plt <- ggplot(df, aes_string(x = "theoretical", y = "residuals"))
+    plt <- ggplot(df, aes(x = .data$theoretical,
+                          y = .data$residuals))
 
     ## add reference line
     qq_intercept <- 0
@@ -154,8 +155,9 @@
 
     ## add reference interval
     if (isTRUE(method %in% c("simulate", "normal"))) {
-        plt <- plt + geom_ribbon(aes_string(ymin = "lower", ymax = "upper",
-                                            x = "theoretical"),
+        plt <- plt + geom_ribbon(aes(ymin = .data$lower,
+                                     ymax = .data$upper,
+                                        x = .data$theoretical),
                                  inherit.aes = FALSE,
                                  alpha = ci_alpha, fill = ci_col)
     }
@@ -197,7 +199,8 @@
 
 #' @importFrom mgcv fix.family.rd
 #' @importFrom stats weights
-`qq_simulate` <- function(model, n = 50, type = c("deviance","response","pearson"),
+`qq_simulate` <- function(model, n = 50,
+                          type = c("deviance", "response", "pearson"),
                           level = 0.9, detrend = FALSE) {
     type <- match.arg(type)
     family <- family(model)
@@ -229,7 +232,8 @@
 
     sims <- replicate(n = n,
                       qq_simulate_data(rd_fun, fit = fit, weights = prior_w,
-                                       sigma2 = sigma2, dev_resid_fun = dev_resid_fun,
+                                       sigma2 = sigma2,
+                                       dev_resid_fun = dev_resid_fun,
                                        var_fun = var_fun, type = type,
                                        na_action = na_action))
     n_obs <- NROW(fit)
@@ -276,7 +280,7 @@
     nr <- length(r)
     ord <- order(order(r))
     sd <- IQR(r) / 1.349
-    theoretical <- qnorm(ppoints(nr)) #[ord] :no need to reorder now return is df
+    theoretical <- qnorm(ppoints(nr)) #[ord] :no need to reorder as return is df
     med <- median(r) + theoretical * sd
     se <- sd * se_zscore(theoretical)
     crit <- coverage_normal(level)
@@ -289,7 +293,6 @@
         med <- med * 0
     }
 
-    ## out <- qnorm(ppoints(nr))[ord]
     out <- tibble(theoretical = theoretical,
                   residuals = r,
                   lower = med - crit_se,
@@ -299,7 +302,8 @@
 
 #' @importFrom mgcv fix.family.qf
 #' @importFrom stats residuals fitted family weights na.action
-`qq_uniform` <- function(model, n = 10, type = c("deviance","response","pearson"),
+`qq_uniform` <- function(model, n = 10,
+                         type = c("deviance", "response", "pearson"),
                          level = 0.9, detrend = FALSE) {
     type <- match.arg(type)
     family <- family(model)                 # extract family
@@ -308,7 +312,8 @@
     var_fun <- family[["variance"]]         # variance function
     q_fun <- family[["qf"]]
     if (is.null(q_fun)) {
-        stop("Quantile function for family <", family[["family"]], "> not available.")
+        stop("Quantile function for family <", family[["family"]],
+             "> not available.")
     }
     r <- residuals(model, type = type)
     fit <- fitted(model)
@@ -361,7 +366,7 @@
 
 #' @importFrom stats naresid
 `compute_residuals` <- function(y, fit, weights,
-                                type = c("deviance","response","pearson"),
+                                type = c("deviance", "response", "pearson"),
                                 dev_resid_fun, var_fun, na_action) {
     type <- match.arg(type)
 
@@ -433,7 +438,7 @@
 #' 
 #' @importFrom stats napredict residuals
 #' @importFrom tools toTitleCase
-#' @importFrom ggplot2 ggplot aes_string geom_point geom_hline labs
+#' @importFrom ggplot2 ggplot aes geom_point geom_hline labs
 `residuals_linpred_plot` <- function(model,
                                      type = c("deviance", "pearson","response"),
                                      ylab = NULL, xlab = NULL, title = NULL,
@@ -451,7 +456,8 @@
     eta <- napredict(na_action, eta)
 
     df <- data.frame(eta = eta, residuals = r)
-    plt <- ggplot(df, aes_string(x = "eta", y = "residuals")) +
+    plt <- ggplot(df, aes(x = .data$eta,
+                          y = .data$residuals)) +
         geom_hline(yintercept = 0, col = line_col)
 
     ## add point layer
@@ -483,7 +489,7 @@
 #' 
 #' @export
 #' 
-#' @importFrom ggplot2 ggplot aes_string geom_point labs
+#' @importFrom ggplot2 ggplot aes geom_point labs
 `observed_fitted_plot` <- function(model,
                                    ylab = NULL, xlab = NULL, title = NULL,
                                    subtitle = NULL, caption = NULL,
@@ -500,7 +506,8 @@
     df <- data.frame(observed = obs, fitted = fit)
 
     ## base plot
-    plt <- ggplot(df, aes_string(x = "fitted", y = "observed"))
+    plt <- ggplot(df, aes(x = .data$fitted,
+                          y = .data$observed))
 
     ## add point layer
     plt <- plt + geom_point(colour = point_col, alpha = point_alpha)
@@ -534,7 +541,7 @@
 #' 
 #' @export
 #' 
-#' @importFrom ggplot2 ggplot aes_string geom_histogram labs
+#' @importFrom ggplot2 ggplot aes geom_histogram labs
 #' @importFrom tools toTitleCase
 #' @importFrom stats residuals
 #' @importFrom grDevices nclass.Sturges nclass.scott nclass.FD
@@ -564,10 +571,11 @@
     }
 
     ## base plot
-    plt <- ggplot(df, aes_string(x = "residuals"))
+    plt <- ggplot(df, aes(x = .data$residuals))
 
     ## add point layer
-    plt <- plt + geom_histogram(bins = n_bins, colour = "black", fill = "grey80")
+    plt <- plt + geom_histogram(bins = n_bins, colour = "black",
+                                fill = "grey80")
 
     ## add labels
     if (is.null(xlab)) {
@@ -619,19 +627,19 @@
 #' @param line_col colour specification for the 1:1 line in the QQ plot and the
 #'   reference line in the residuals vs linear predictor plot.
 #' @param ... arguments passed to [patchwork::wrap_plots()].
-#' 
+#'
 #' @importFrom patchwork wrap_plots
-#' 
+#'
 #' @note The wording used in [mgcv::qq.gam()] uses *direct* in reference to the
 #'   simulated residuals method (`method = "simulated"`). To avoid confusion,
 #'   `method = "direct"` is deprecated in favour of `method = "uniform"`.
-#' 
+#'
 #' @seealso The plots are produced by functions [gratia::qq_plot()],
 #'   [gratia::residuals_linpred_plot()], [gratia::residuals_hist_plot()],
 #'   and [gratia::observed_fitted_plot()].
-#' 
+#'
 #' @export
-#' 
+#'
 #' @examples
 #' load_mgcv()
 #' \dontshow{set.seed(2)}
@@ -641,7 +649,7 @@
 #' ## run some basic model checks
 #' appraise(mod, point_col = "steelblue", point_alpha = 0.4)
 #'
-#' ## To change the theme for all panels use the & operator, for example to 
+#' ## To change the theme for all panels use the & operator, for example to
 #' ## change the ggplot theme for all panels
 #' library("ggplot2")
 #' appraise(mod, point_col = "steelblue", point_alpha = 0.4,
@@ -747,7 +755,7 @@
 #' @export
 #' 
 #' @importFrom dplyr mutate
-#' @importFrom ggplot2 ggplot geom_point geom_hline geom_ribbon labs aes_string
+#' @importFrom ggplot2 ggplot geom_point geom_hline geom_ribbon labs aes
 #' @importFrom tools toTitleCase
 #' 
 #' @examples
@@ -760,16 +768,16 @@
 #' m <- gam( y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
 #'          family = binomial, data = dat, weights = n,
 #'          method = "REML")
-#' 
+#'
 #' ## Worm plot; default using direct randomization of uniform quantiles
 #' ## Note no reference bands are drawn with this method.
 #' worm_plot(m)
-#' 
+#'
 #' ## Alternatively use simulate new data from the model, which
 #' ## allows construction of reference intervals for the Q-Q plot
 #' worm_plot(m, method = "simulate", point_col = "steelblue",
 #'           point_alpha = 0.4)
-#' 
+#'
 #' ## ... or use the usual normality assumption
 #' worm_plot(m, method = "normal")
 `worm_plot.gam` <- function(model,
@@ -834,15 +842,17 @@
     }
 
     ## base plot
-    plt <- ggplot(df, aes_string(x = "theoretical", y = "residuals"))
+    plt <- ggplot(df, aes(x = .data$theoretical,
+                          y = .data$residuals))
 
     ## Now need a reference horizonta line
     plt <- plt + geom_hline(yintercept = 0, col = line_col)
 
     ## add reference interval
     if (isTRUE(method %in% c("simulate", "normal"))) {
-        plt <- plt + geom_ribbon(aes_string(ymin = "lower", ymax = "upper",
-                                            x = "theoretical"),
+        plt <- plt + geom_ribbon(aes(ymin = .data$lower,
+                                     ymax = .data$upper,
+                                        x = .data$theoretical),
                                  inherit.aes = FALSE,
                                  alpha = ci_alpha, fill = ci_col)
     }

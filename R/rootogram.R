@@ -191,7 +191,7 @@
 #' @export
 #' @importFrom rlang .data
 #' @importFrom dplyr mutate
-#' @importFrom ggplot2 ggplot aes_string geom_rect geom_point geom_line labs geom_hline
+#' @importFrom ggplot2 ggplot aes geom_rect geom_point geom_line labs geom_hline
 #'
 #' @examples
 #' load_mgcv()
@@ -269,12 +269,16 @@
     }
 
     plt <- ggplot(object) +
-        geom_rect(aes_string(xmin = "x_low", xmax = "x_high",
-                             ymin = "y_bot", ymax = "y_top"),
+        geom_rect(aes(xmin = .data$x_low,
+                      xmax = .data$x_high,
+                      ymin = .data$y_bot,
+                      ymax = .data$y_top),
                   fill = bar_fill, col = bar_colour) +
-        geom_line(aes_string(x = "bin", y = "fitted"),
+        geom_line(aes(x = .data$bin,
+                      y = .data$fitted),
                   colour = fitted_colour, size = 1) +
-        geom_point(aes_string(x = "bin", y = "fitted"),
+        geom_point(aes(x = .data$bin,
+                       y = .data$fitted),
                    colour = fitted_colour, size = 2.5)
 
     if (as.logical(ref_line) & type != "standing") {
