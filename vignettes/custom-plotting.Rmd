@@ -114,7 +114,7 @@ eg1 <- eg1 %>%
 
 This will^[currently; I'm not entirely happy with this naming convention as there's nothing to indicate to the user that these are *partial residuals* for the smooth with name matching the created variable name.] add columns with names ``"`s(x0)`"``. ``"`s(x1)`"``, etc. to the data.
 
-```{ custom-plot-names}
+```{r custom-plot-names}
 names(eg1)
 ```
 
