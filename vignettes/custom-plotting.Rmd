@@ -1,5 +1,5 @@
 ---
-title: "Customizing plots produced by `draw()`"
+title: "Customizing plots"
 output: 
   rmarkdown::html_vignette:
     fig_width: 8
