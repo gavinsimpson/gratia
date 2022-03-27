@@ -187,7 +187,10 @@
 <span class="va">eg1</span> <span class="op">&lt;-</span> <span class="va">eg1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="../reference/add_partial_residuals.html">add_partial_residuals</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></code></pre></div>
 <p>This will<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;currently; I’m not entirely happy with this naming convention as there’s nothing to indicate to the user that these are &lt;em&gt;partial residuals&lt;/em&gt; for the smooth with name matching the created variable name.&lt;/p&gt;"><sup>2</sup></a> add columns with names <code>"`s(x0)`"</code>. <code>"`s(x1)`"</code>, etc. to the data.</p>
-<p><code>{ custom-plot-names} names(eg1)</code></p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">eg1</span><span class="op">)</span>
+<span class="co">#&gt;  [1] "y"     "x0"    "x1"    "x2"    "x3"    "f"     "f0"    "f1"    "f2"   </span>
+<span class="co">#&gt; [10] "f3"    "s(x0)" "s(x1)" "s(x2)" "s(x3)"</span></code></pre></div>
 <p>Now we have everything we need to recreate the plots created by <code><a href="../reference/draw.gam.html">draw.gam()</a></code>. In the code block below we filter <code>sm</code> to focus on a specific smooth, here <span class="math inline">\(f(x2)\)</span> (<code>"s(x2)"</code>), then we add</p>
 <ol style="list-style-type: decimal">
 <li>a rug plot of the observed values of <code>x2</code>,</li>
@@ -196,7 +199,7 @@
 <li>the estimated smooth as a line layer,</li>
 <li>some annotation</li>
 </ol>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p_sx2</span> <span class="op">&lt;-</span> <span class="va">sm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">smooth</span> <span class="op">==</span> <span class="st">"s(x2)"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -212,16 +215,16 @@
 <span class="va">p_sx2</span></code></pre></div>
 <p><img src="custom-plotting_files/figure-html/custom-plot-sx2-1.png" width="700"></p>
 <p>Assuming we repeat the above steps for the other smooths, creating plot objects <code>p_sx0</code>, <code>p_sx1</code>, <code>p_sx2</code>, and <code>p_sx3</code> (code not shown), we can complete the plot by creating the patchwork with the desired number of rows and columns</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p_sx0</span> <span class="op">+</span> <span class="va">p_sx1</span> <span class="op">+</span> <span class="va">p_sx2</span> <span class="op">+</span> <span class="va">p_sx3</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <p><img src="custom-plotting_files/figure-html/custom-plot-final-1.png" width="700"></p>
 <p>The real benefit of having complete control over how the data are plotted is that you can use the power of {ggplot2} to map additional variables to plot aesthetics. As an example, let’s assume we have a factor variable in the original data and we want to colour the partial residuals accoring to the levels of this factor. Let’s create that factor</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span>
 <span class="va">eg1</span> <span class="op">&lt;-</span> <span class="va">eg1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>fac <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>Now we can modify our plotting code to map <code>fac</code> to the colour aesthetic when we plot the partial residuals. To save some typing, we’ll reorder the layers in the plot and add the partial residuals last</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">plt</span> <span class="op">&lt;-</span> <span class="va">sm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">smooth</span> <span class="op">==</span> <span class="st">"s(x2)"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -239,7 +242,7 @@
              data <span class="op">=</span> <span class="va">eg1</span>, cex <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span></code></pre></div>
 <p><img src="custom-plotting_files/figure-html/plot-partial-resids-with-colours-by-fac-1.png" width="700"></p>
 <p>We can also do some simple model checking by plotting the smooth with partial residuals coloured according to one of the other covariates (we could also do this by plotting the actual residuals against covariates). In the code chunk below, we map the covariate <code>x1</code> to both the <em>colour</em> and <em>size</em> aesthetics (note we deleted <code>cex = 1.5</code> to allow the mapping to <em>size</em>)</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">plt</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x2</span>, y <span class="op">=</span> <span class="va">`s(x2)`</span>,
                  colour <span class="op">=</span> <span class="va">x1</span>, size <span class="op">=</span> <span class="va">x1</span><span class="op">)</span>, <span class="co"># &lt;-- map fac to colour aesthetic</span>
