@@ -12,5 +12,5 @@ template:
 
 navbar:
   structure:
-    left: [intro, reference, news]
+    left: [intro, articles, reference, news]
     right: [search, github]
