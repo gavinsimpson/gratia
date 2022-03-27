@@ -68,7 +68,7 @@ p & theme_bw()
 
 `draw()` methods like `draw.gam()` return an object created by `patchwork::wrap_plots()`, and as a result it isn't straightforward to combine those objects into a new patchwork
 
-```{r draw-multiple-patchworks, error = TRUE}
+```{r draw-multiple-patchworks, error = TRUE, fig.show = "hide"}
 p1 <- draw(m, select = "s(x0)")
 p2 <- draw(m, select = "s(x1)")
 p3 <- draw(m, select = "s(x2)")

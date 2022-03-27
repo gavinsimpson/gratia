@@ -146,7 +146,6 @@
 <span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="va">p3</span>
 <span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `wrap_dims()`:</span></span>
 <span class="co">#&gt; <span style="color: #BBBB00;">!</span> The given dimensions cannot hold all panels. Please increase `ncol` or `nrow`</span></code></pre></div>
-<p><img src="custom-plotting_files/figure-html/draw-multiple-patchworks-1.png" width="700"></p>
 <p>To avoid the error, we need to use <code><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">patchwork::plot_layout()</a></code> to set the dimensions we want</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="va">p3</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
