@@ -186,7 +186,7 @@
 <code class="sourceCode R"><span class="co"># add partial residuals to data</span>
 <span class="va">eg1</span> <span class="op">&lt;-</span> <span class="va">eg1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="../reference/add_partial_residuals.html">add_partial_residuals</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></code></pre></div>
-<p>This will<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;currently; I’m not entirely happy with this naming convention as there’s nothing to indicate to the user that these are &lt;em&gt;partial residuals&lt;/em&gt; for the smooth with name matching the created variable name.&lt;/p&gt;"><sup>2</sup></a> add columns with names <code>"`s(x0)`"</code>. <code>"`s(x1)`"</code>, etc. to the data.</p>
+<p>This will<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;currently; I’m not entirely happy with this naming convention as there’s nothing to indicate to the user that these are &lt;em&gt;partial residuals&lt;/em&gt; for the smooth with name matching the created variable name.&lt;/p&gt;"><sup>2</sup></a> add columns with names <code>"s(x0)"</code>. <code>"s(x1)"</code>, etc. to the data.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">eg1</span><span class="op">)</span>
 <span class="co">#&gt;  [1] "y"     "x0"    "x1"    "x2"    "x3"    "f"     "f0"    "f1"    "f2"   </span>
