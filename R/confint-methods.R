@@ -33,10 +33,9 @@
 #' @examples
 #' load_mgcv()
 #' \dontshow{
-#' set.seed(2)
 #' op <- options(digits = 3, cli.unicode = FALSE)
 #' }
-#' dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
+#' dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 #' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
 #' ## first derivatives of all smooths...
@@ -222,7 +221,7 @@
 #' set.seed(2)
 #' op <- options(digits = 4, cli.unicode = FALSE)
 #' }
-#' dat <- gamSim(1, n = 500, dist = "normal", scale = 2)
+#' dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 #' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
 #' ## point-wise interval
@@ -233,7 +232,7 @@
 #' \dontshow{
 #' set.seed(42)
 #' }
-#' si <- confint(mod, parm = "s(x1)", type = "simultaneous", nsim = 100)
+#' si <- confint(mod, parm = "s(x1)", type = "simultaneous", nsim = 1000)
 #' si
 #' \dontshow{
 #' options(op)
