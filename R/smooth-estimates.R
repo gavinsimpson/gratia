@@ -917,7 +917,7 @@
         xlab <- variables
     }
     if (is.null(ylab)) {
-        ylab <- "Effect"
+        ylab <- "Partial effect"
     }
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
@@ -996,7 +996,7 @@
 
     show <- match.arg(show)
     if (isTRUE(identical(show, "estimate"))) {
-        guide_title <- "Effect"
+        guide_title <- "Partial\neffect"
         plot_var <- "est"
         guide_limits <- if (is.null(ylim)) {
             c(-1, 1) * max(abs(object[[plot_var]]))
@@ -1109,7 +1109,7 @@
 
     show <- match.arg(show)
     if (isTRUE(identical(show, "estimate"))) {
-        guide_title <- "Effect"
+        guide_title <- "Partial\neffect"
         plot_var <- "est"
         guide_limits <- if (is.null(ylim)) {
             c(-1, 1) * max(abs(object[[plot_var]]))
@@ -1243,7 +1243,7 @@
 
     show <- match.arg(show)
     if (isTRUE(identical(show, "estimate"))) {
-        guide_title <- "Effect"
+        guide_title <- "Partial\neffect"
         plot_var <- "est"
         guide_limits <- if (is.null(ylim)) {
             c(-1, 1) * max(abs(object[[plot_var]]))
@@ -1396,7 +1396,7 @@
         xlab <- "Gaussian quantiles"
     }
     if (is.null(ylab)) {
-        ylab <- "Effects"
+        ylab <- "Partial effects"
     }
     if(is.null(title)) {
         title <- variables
@@ -1466,7 +1466,7 @@
         xlab <- variables[1]
     }
     if (missing(ylab)) {
-        ylab <- "Effect"
+        ylab <- "Partial effect"
     }
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
@@ -1538,7 +1538,7 @@
 
     show <- match.arg(show)
     if (isTRUE(identical(show, "estimate"))) {
-        guide_title <- "Effect"
+        guide_title <- "Partial\neffect"
         plot_var <- "est"
         guide_limits <- if (is.null(ylim)) {
             c(-1, 1) * max(abs(object[[plot_var]]))

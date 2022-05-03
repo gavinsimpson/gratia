@@ -133,7 +133,7 @@
 <text x='434.38' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>4</text>
 <text x='578.58' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>6</text>
 <text x='376.34' y='562.76' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='48.91px' lengthAdjust='spacingAndGlyphs'>log2(time)</text>
-<text transform='translate(18.53,292.60) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(18.53,292.60) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='43.65' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='74.08px' lengthAdjust='spacingAndGlyphs'>s(log2(time))</text>
 <text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='249.50px' lengthAdjust='spacingAndGlyphs'>draw.gam model with non-standard names</text>
 </g>

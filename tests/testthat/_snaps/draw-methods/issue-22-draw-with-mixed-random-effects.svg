@@ -392,7 +392,7 @@
 <text x='582.43' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text>
 <text x='685.47' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>3</text>
 <text x='376.34' y='562.76' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='93.57px' lengthAdjust='spacingAndGlyphs'>Gaussian quantiles</text>
-<text transform='translate(18.53,292.60) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='33.63px' lengthAdjust='spacingAndGlyphs'>Effects</text>
+<text transform='translate(18.53,292.60) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='66.65px' lengthAdjust='spacingAndGlyphs'>Partial effects</text>
 <text x='43.65' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='13.95px' lengthAdjust='spacingAndGlyphs'>x2</text>
 <text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='238.48px' lengthAdjust='spacingAndGlyphs'>issue 22 draw with mixed random effects</text>
 </g>

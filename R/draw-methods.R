@@ -400,7 +400,7 @@
         xlab <- smooth_var
     }
     if (is.null(ylab)) {
-        ylab <- "Effect"
+        ylab <- "Partial effect"
     }
     if (is.null(title)) {
         title <- unique(object[["term"]])
@@ -488,7 +488,7 @@
 
     # add guide
     plt <- plt +
-        guides(fill = guide_colourbar(title = "Effect",
+        guides(fill = guide_colourbar(title = "Partial effect",
                                       direction = "vertical",
                                       barheight = grid::unit(0.25, "npc")))
 
