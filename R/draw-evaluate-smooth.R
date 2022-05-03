@@ -111,7 +111,7 @@
         xlab <- smooth_var
     }
     if (missing(ylab)) {
-        ylab <- "Effect"
+        ylab <- "Partial effect"
     }
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
@@ -189,7 +189,7 @@
     smooth_vars <- names(object)[3:4]
     show <- match.arg(show)
     if (isTRUE(identical(show, "estimate"))) {
-        guide_title <- "Effect"
+        guide_title <- "Partial\neffect"
         plot_var <- "est"
         guide_limits <- if (is.null(response_range)) {
             c(-1, 1) * max(abs(object[[plot_var]]))
@@ -295,7 +295,7 @@
         xlab <- "Gaussian quantiles"
     }
     if (missing(ylab)) {
-        ylab <- "Effects"
+        ylab <- "Partial effects"
     }
     if(is.null(title)) {
         title <- smooth_var
@@ -365,7 +365,7 @@
         xlab <- smooth_var
     }
     if (missing(ylab)) {
-        ylab <- "Effect"
+        ylab <- "Partial effect"
     }
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
