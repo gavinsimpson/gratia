@@ -1,5 +1,10 @@
 # gratia 0.7.2.0001 (in development)
 
+## User visible changes
+
+* Plots of smooths now use "Partial effect" for the y-axis label in place of
+  "Effect", to better indicate what is displayed.
+
 ## New features
 
 * `confint.fderiv()` and `confint.gam()` now return their results as a tibble
