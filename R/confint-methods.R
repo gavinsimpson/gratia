@@ -33,24 +33,34 @@
 #' @examples
 #' load_mgcv()
 #' \dontshow{
-#' op <- options(digits = 3, cli.unicode = FALSE)
+#' op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 #' }
 #' dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 #' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
+#' # new data to evaluate the derivatives at, say over the middle 80% of range
+#' # of each covariate
+#' middle <- function(x, n = 50, coverage = 0.8) {
+#'   v <- (1 - coverage) / 2
+#'   q <- quantile(x, prob = c(0 + v, 1 - v))
+#'   seq(q[1], q[2], length = n)
+#' }
+#' new_data <- sapply(dat[c("x0", "x1", "x2", "x3")], middle)
+#' new_data <- data.frame(new_data)
 #' ## first derivatives of all smooths...
-#' fd <- fderiv(mod)
+#' fd <- fderiv(mod, newdata = new_data)
 #'
 #' ## point-wise interval
 #' ci <- confint(fd, type = "confidence")
-#' head(ci)
+#' ci
 #'
-#' ## simultaneous interval for smooth term of x1
+#' ## simultaneous interval for smooth term of x2
 #' \dontshow{
 #' set.seed(42)
 #' }
-#' x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 2500)
-#' head(x1.sint)
+#' x2_sint <- confint(fd, parm = "x2", type = "simultaneous",
+#'                    nsim = 3000, ncores = 2)
+#' x2_sint
 #' \dontshow{options(op)}
 `confint.fderiv` <- function(object, parm, level = 0.95,
                              type = c("confidence", "simultaneous"),
@@ -98,7 +108,9 @@
                      ncores = ncores)
     }
 
-    class(interval) <- c("confint.fderiv", "data.frame")
+    interval <- as_tibble(interval)
+
+    class(interval) <- c("confint.fderiv", class(interval))
 
     ## return
     interval
@@ -218,21 +230,31 @@
 #' @examples
 #' load_mgcv()
 #' \dontshow{
-#' set.seed(2)
-#' op <- options(digits = 4, cli.unicode = FALSE)
+#' op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 #' }
 #' dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 #' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
-#' ## point-wise interval
-#' ci <- confint(mod, parm = "s(x1)", type = "confidence")
+#' # new data to evaluate the smooths at, say over the middle 80% of range
+#' # of each covariate
+#' middle <- function(x, n = 50, coverage = 0.8) {
+#'   v <- (1 - coverage) / 2
+#'   q <- quantile(x, prob = c(0 + v, 1 - v))
+#'   seq(q[1], q[2], length = n)
+#' }
+#' new_data <- sapply(dat[c("x0", "x1", "x2", "x3")], middle)
+#' new_data <- data.frame(new_data)
+#' 
+#' ## point-wise interval for smooth of x2
+#' ci <- confint(mod, parm = "s(x2)", type = "confidence", newdata = new_data)
 #' ci
 #'
-#' ## simultaneous interval for smooth term of x1
+#' ## simultaneous interval for smooth of x2
 #' \dontshow{
 #' set.seed(42)
 #' }
-#' si <- confint(mod, parm = "s(x1)", type = "simultaneous", nsim = 1000)
+#' si <- confint(mod, parm = "s(x2)", newdata = new_data,
+#'               type = "simultaneous", nsim = 3000, ncores = 2)
 #' si
 #' \dontshow{
 #' options(op)
@@ -357,7 +379,8 @@
     }
 
     ## simplify to a data frame for return
-    out <- do.call("bind_rows", out)
+    #out <- do.call("bind_rows", out)
+    out <- bind_rows(out)
 
     # This was needed with `[.evaluated_smooth` before switching to
     # NextMethod() to call the next S3 `[` method.
