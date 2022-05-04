@@ -56,6 +56,11 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.2.0001" id="gratia-0720001-in-development">gratia 0.7.2.0001 (in development)<a class="anchor" aria-label="anchor" href="#gratia-0720001-in-development"></a></h2>
 <div class="section level3">
+<h3 id="new-features-0-7-2-0001">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-2-0001"></a></h3>
+<ul><li><p><code><a href="../reference/confint.fderiv.html">confint.fderiv()</a></code> and <code><a href="../reference/confint.gam.html">confint.gam()</a></code> now return their results as a tibble instead of a common-or-garden data frame. The latter mostly already did this.</p></li>
+<li><p>Examples for <code><a href="../reference/confint.fderiv.html">confint.fderiv()</a></code> and <code><a href="../reference/confint.gam.html">confint.gam()</a></code> were reworked, in part to remove some inconsistent output in the examples when run on M1 macs.</p></li>
+</ul></div>
+<div class="section level3">
 <h3 id="bug-fixes-0-7-2-0001">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-2-0001"></a></h3>
 <ul><li>
 <code><a href="../reference/compare_smooths.html">compare_smooths()</a></code> failed when passed non-standard model “names” like <code>compare_smooths(m_gam, m_gamm$gam)</code> or <code>compare_smooths(l[[1]], l[[2]])</code> even if the evaluated objects were valid GAM(M) models. Reported by Andrew Irwin <a href="https://github.com/gavinsimpson/gratia/issues/150" class="external-link">#150</a></li></ul></div>

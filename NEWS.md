@@ -1,5 +1,13 @@
 # gratia 0.7.2.0001 (in development)
 
+## New features
+
+* `confint.fderiv()` and `confint.gam()` now return their results as a tibble
+  instead of a common-or-garden data frame. The latter mostly already did this.
+
+* Examples for `confint.fderiv()` and `confint.gam()` were reworked, in part to
+  remove some inconsistent output in the examples when run on M1 macs.
+
 ## Bug fixes
 
 * `compare_smooths()` failed when passed non-standard model "names" like
