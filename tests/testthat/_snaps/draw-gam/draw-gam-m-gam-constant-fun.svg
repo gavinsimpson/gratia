@@ -76,7 +76,7 @@
 <text x='270.58' y='276.75' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.75</text>
 <text x='338.63' y='276.75' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>1.00</text>
 <text x='202.70' y='288.89' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='11.62px' lengthAdjust='spacingAndGlyphs'>x0</text>
-<text transform='translate(18.53,155.67) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(18.53,155.67) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='53.20' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='29.34px' lengthAdjust='spacingAndGlyphs'>s(x0)</text>
 </g>
 <defs>
@@ -142,7 +142,7 @@
 <text x='627.69' y='276.75' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.75</text>
 <text x='695.76' y='276.75' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>1.00</text>
 <text x='559.54' y='288.89' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='11.62px' lengthAdjust='spacingAndGlyphs'>x1</text>
-<text transform='translate(370.73,155.67) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(370.73,155.67) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='410.05' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='29.34px' lengthAdjust='spacingAndGlyphs'>s(x1)</text>
 </g>
 <defs>
@@ -204,7 +204,7 @@
 <text x='270.64' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.75</text>
 <text x='338.64' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>1.00</text>
 <text x='202.70' y='562.76' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='11.62px' lengthAdjust='spacingAndGlyphs'>x2</text>
-<text transform='translate(18.53,429.53) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(18.53,429.53) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='53.20' y='311.22' style='font-size: 13.20px; font-family: sans;' textLength='29.34px' lengthAdjust='spacingAndGlyphs'>s(x2)</text>
 </g>
 <defs>
@@ -266,7 +266,7 @@
 <text x='627.58' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.75</text>
 <text x='695.67' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>1.00</text>
 <text x='559.54' y='562.76' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='11.62px' lengthAdjust='spacingAndGlyphs'>x3</text>
-<text transform='translate(370.73,429.53) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(370.73,429.53) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='410.05' y='311.22' style='font-size: 13.20px; font-family: sans;' textLength='29.34px' lengthAdjust='spacingAndGlyphs'>s(x3)</text>
 <text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='184.93px' lengthAdjust='spacingAndGlyphs'>draw_gam m_gam constant fun</text>
 </g>

@@ -324,13 +324,22 @@ detaching ‘package:mgcv’
 > 
 > load_mgcv()
 > ## Don't show: 
-> op <- options(digits = 3, cli.unicode = FALSE)
+> op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 > ## End(Don't show)
 > dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
+> # new data to evaluate the derivatives at, say over the middle 80% of range
+> # of each covariate
+> middle <- function(x, n = 50, coverage = 0.8) {
++   v <- (1 - coverage) / 2
++   q <- quantile(x, prob = c(0 + v, 1 - v))
++   seq(q[1], q[2], length = n)
++ }
+> new_data <- sapply(dat[c("x0", "x1", "x2", "x3")], middle)
+> new_data <- data.frame(new_data)
 > ## first derivatives of all smooths...
-> fd <- fderiv(mod)
+> fd <- fderiv(mod, newdata = new_data)
 Warning: `fderiv()` was deprecated in gratia 0.7.0.
 Please use `derivatives()` instead.
 This warning is displayed once every 8 hours.
@@ -338,28 +347,43 @@ Call `lifecycle::last_lifecycle_warnings()` to see where this warning was genera
 > 
 > ## point-wise interval
 > ci <- confint(fd, type = "confidence")
-> head(ci)
-   term lower  est upper
-1 s(x0)  1.22 6.02  10.8
-2 s(x0)  1.22 6.02  10.8
-3 s(x0)  1.22 6.02  10.8
-4 s(x0)  1.23 6.01  10.8
-5 s(x0)  1.25 6.01  10.8
-6 s(x0)  1.27 6.01  10.7
+> ci
+# A tibble: 200 x 4
+   term  lower   est upper
+   <chr> <dbl> <dbl> <dbl>
+ 1 s(x0)  2.38  5.73  9.08
+ 2 s(x0)  2.58  5.60  8.62
+ 3 s(x0)  2.60  5.44  8.27
+ 4 s(x0)  2.51  5.26  8.01
+ 5 s(x0)  2.37  5.07  7.77
+ 6 s(x0)  2.24  4.86  7.48
+ 7 s(x0)  2.12  4.65  7.17
+ 8 s(x0)  1.98  4.42  6.87
+ 9 s(x0)  1.77  4.19  6.62
+10 s(x0)  1.51  3.95  6.40
+# ... with 190 more rows
 > 
-> ## simultaneous interval for smooth term of x1
+> ## simultaneous interval for smooth term of x2
 > ## Don't show: 
 > set.seed(42)
 > ## End(Don't show)
-> x1.sint <- confint(fd, parm = "x1", type = "simultaneous", nsim = 2500)
-> head(x1.sint)
-   term  lower  est upper
-1 s(x1) -0.483 4.70  9.88
-2 s(x1) -0.482 4.70  9.88
-3 s(x1) -0.478 4.70  9.87
-4 s(x1) -0.469 4.70  9.86
-5 s(x1) -0.452 4.70  9.84
-6 s(x1) -0.427 4.69  9.81
+> x2_sint <- confint(fd, parm = "x2", type = "simultaneous",
++                    nsim = 3000, ncores = 2)
+> x2_sint
+# A tibble: 50 x 4
+   term   lower      est upper
+   <chr>  <dbl>    <dbl> <dbl>
+ 1 s(x2)  44.7   52.4    60.1 
+ 2 s(x2)  44.1   52.5    60.8 
+ 3 s(x2)  41.1   50.7    60.3 
+ 4 s(x2)  36.5   46.7    56.9 
+ 5 s(x2)  30.5   40.4    50.4 
+ 6 s(x2)  23.1   32.0    41.0 
+ 7 s(x2)  14.0   22.0    30.0 
+ 8 s(x2)   3.11  11.0    18.9 
+ 9 s(x2)  -8.68  -0.0580  8.57
+10 s(x2) -20.0  -10.5    -1.06
+# ... with 40 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -383,54 +407,64 @@ detaching ‘package:mgcv’
 > 
 > load_mgcv()
 > ## Don't show: 
-> set.seed(2)
-> op <- options(digits = 4, cli.unicode = FALSE)
+> op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 > ## End(Don't show)
 > dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
-> ## point-wise interval
-> ci <- confint(mod, parm = "s(x1)", type = "confidence")
+> # new data to evaluate the smooths at, say over the middle 80% of range
+> # of each covariate
+> middle <- function(x, n = 50, coverage = 0.8) {
++   v <- (1 - coverage) / 2
++   q <- quantile(x, prob = c(0 + v, 1 - v))
++   seq(q[1], q[2], length = n)
++ }
+> new_data <- sapply(dat[c("x0", "x1", "x2", "x3")], middle)
+> new_data <- data.frame(new_data)
+> 
+> ## point-wise interval for smooth of x2
+> ci <- confint(mod, parm = "s(x2)", type = "confidence", newdata = new_data)
 Warning: `evaluate_smooth()` was deprecated in gratia 0.7.0.
 Please use `smooth_estimates()` instead.
 This warning is displayed once every 8 hours.
 Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
 > ci
-# A tibble: 200 x 8
-   smooth by_variable       x1   est    se  crit lower upper
-   <chr>  <fct>          <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
- 1 s(x1)  <NA>        0.000762 -2.76 0.229  1.96 -3.21 -2.31
- 2 s(x1)  <NA>        0.00578  -2.73 0.222  1.96 -3.17 -2.30
- 3 s(x1)  <NA>        0.0108   -2.71 0.215  1.96 -3.13 -2.29
- 4 s(x1)  <NA>        0.0158   -2.69 0.209  1.96 -3.10 -2.28
- 5 s(x1)  <NA>        0.0208   -2.66 0.202  1.96 -3.06 -2.27
- 6 s(x1)  <NA>        0.0258   -2.64 0.196  1.96 -3.02 -2.26
- 7 s(x1)  <NA>        0.0309   -2.62 0.190  1.96 -2.99 -2.24
- 8 s(x1)  <NA>        0.0359   -2.59 0.184  1.96 -2.95 -2.23
- 9 s(x1)  <NA>        0.0409   -2.57 0.179  1.96 -2.92 -2.22
-10 s(x1)  <NA>        0.0459   -2.55 0.173  1.96 -2.89 -2.21
-# ... with 190 more rows
+# A tibble: 50 x 8
+   smooth by_variable    x2   est    se  crit lower upper
+   <chr>  <fct>       <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+ 1 s(x2)  <NA>        0.112 0.937 0.202  1.96 0.541  1.33
+ 2 s(x2)  <NA>        0.128 1.79  0.198  1.96 1.40   2.17
+ 3 s(x2)  <NA>        0.144 2.62  0.190  1.96 2.25   2.99
+ 4 s(x2)  <NA>        0.160 3.41  0.183  1.96 3.05   3.77
+ 5 s(x2)  <NA>        0.176 4.12  0.183  1.96 3.76   4.48
+ 6 s(x2)  <NA>        0.193 4.71  0.189  1.96 4.34   5.08
+ 7 s(x2)  <NA>        0.209 5.14  0.194  1.96 4.76   5.53
+ 8 s(x2)  <NA>        0.225 5.41  0.194  1.96 5.03   5.79
+ 9 s(x2)  <NA>        0.241 5.50  0.189  1.96 5.13   5.87
+10 s(x2)  <NA>        0.257 5.41  0.183  1.96 5.05   5.77
+# ... with 40 more rows
 > 
-> ## simultaneous interval for smooth term of x1
+> ## simultaneous interval for smooth of x2
 > ## Don't show: 
 > set.seed(42)
 > ## End(Don't show)
-> si <- confint(mod, parm = "s(x1)", type = "simultaneous", nsim = 1000)
+> si <- confint(mod, parm = "s(x2)", newdata = new_data,
++               type = "simultaneous", nsim = 3000, ncores = 2)
 > si
-# A tibble: 200 x 8
-   smooth by_variable       x1   est    se  crit lower upper
-   <chr>  <fct>          <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
- 1 s(x1)  <NA>        0.000762 -2.76 0.229  2.49 -3.33 -2.19
- 2 s(x1)  <NA>        0.00578  -2.73 0.222  2.49 -3.29 -2.18
- 3 s(x1)  <NA>        0.0108   -2.71 0.215  2.49 -3.25 -2.17
- 4 s(x1)  <NA>        0.0158   -2.69 0.209  2.49 -3.21 -2.17
- 5 s(x1)  <NA>        0.0208   -2.66 0.202  2.49 -3.17 -2.16
- 6 s(x1)  <NA>        0.0258   -2.64 0.196  2.49 -3.13 -2.15
- 7 s(x1)  <NA>        0.0309   -2.62 0.190  2.49 -3.09 -2.14
- 8 s(x1)  <NA>        0.0359   -2.59 0.184  2.49 -3.05 -2.13
- 9 s(x1)  <NA>        0.0409   -2.57 0.179  2.49 -3.01 -2.12
-10 s(x1)  <NA>        0.0459   -2.55 0.173  2.49 -2.98 -2.11
-# ... with 190 more rows
+# A tibble: 50 x 8
+   smooth by_variable    x2   est    se  crit lower upper
+   <chr>  <fct>       <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+ 1 s(x2)  <NA>        0.112 0.937 0.202  2.75 0.381  1.49
+ 2 s(x2)  <NA>        0.128 1.79  0.198  2.75 1.24   2.33
+ 3 s(x2)  <NA>        0.144 2.62  0.190  2.75 2.10   3.14
+ 4 s(x2)  <NA>        0.160 3.41  0.183  2.75 2.91   3.92
+ 5 s(x2)  <NA>        0.176 4.12  0.183  2.75 3.61   4.62
+ 6 s(x2)  <NA>        0.193 4.71  0.189  2.75 4.19   5.23
+ 7 s(x2)  <NA>        0.209 5.14  0.194  2.75 4.61   5.68
+ 8 s(x2)  <NA>        0.225 5.41  0.194  2.75 4.88   5.95
+ 9 s(x2)  <NA>        0.241 5.50  0.189  2.75 4.98   6.02
+10 s(x2)  <NA>        0.257 5.41  0.183  2.75 4.91   5.92
+# ... with 40 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1365,11 +1399,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55c54fa199d8>
+<environment: 0x556d12539388>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55c54fa199d8>
+<environment: 0x556d12539388>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2039,7 +2073,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  15.901 0.115 16.326 0 0 
+Time elapsed:  20.177 0.157 20.407 0 0 
 > grDevices::dev.off()
 null device 
           1 
