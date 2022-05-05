@@ -54,20 +54,18 @@
 #' @examples
 #' load_mgcv()
 #' \dontshow{
-#' set.seed(2)
-#' op <- options(cli.unicode = FALSE, digits = 5)
+#' op <- options(cli.unicode = FALSE, pillar.sigfig = 2)
 #' }
-#' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+#' dat <- data_sim("eg1", n = 500, dist = "normal", scale = 1, seed = 2)
 #' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
 #' evaluate_smooth(m1, "s(x1)")
 #'
 #' ## 2d example
-#' \dontshow{set.seed(2)}
-#' dat <- gamSim(2, n = 1000, dist = "normal", scale = 1)
-#' m2 <- gam(y ~ s(x, z, k = 30), data = dat$data, method = "REML")
+#' dat <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
+#' m2 <- gam(y ~ s(x, z, k = 30), data = dat, method = "REML")
 #'
-#' evaluate_smooth(m2, "s(x,z)", n = 100)
+#' evaluate_smooth(m2, "s(x,z)", n = 50)
 #' \dontshow{options(op)}
 `evaluate_smooth` <- function(object, ...) {
     lifecycle::deprecate_warn("0.7.0",
