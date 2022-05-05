@@ -117,8 +117,7 @@
 #'
 #' @examples
 #' load_mgcv()
-#' \dontshow{set.seed(42)}
-#' df <- gamSim(4, n = 400, verbose = FALSE)
+#' df <- data_sim("eg4", n = 400, seed = 42)
 #'
 #' bf <- basis(s(x0), data = df)
 #' draw(bf)
