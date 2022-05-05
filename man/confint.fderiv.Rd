@@ -80,7 +80,7 @@ ci
 set.seed(42)
 }
 x2_sint <- confint(fd, parm = "x2", type = "simultaneous",
-                   nsim = 5000, ncores = 2)
+                   nsim = 10000, ncores = 2)
 x2_sint
 \dontshow{options(op)}
 }
