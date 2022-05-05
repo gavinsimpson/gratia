@@ -654,7 +654,7 @@
 #' Plot the result of a call to `smooth_estimates()`
 #'
 #' @param ylim numeric; vector of y axis limits to use all *all* panels drawn.
-#' 
+#'
 #' @inheritParams draw.gam
 #'
 #' @export
