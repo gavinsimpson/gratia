@@ -108,10 +108,13 @@
 #' dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 #' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
-#' fitted_samples(m1, n = 5, seed = 42)
+#' fs <- fitted_samples(m1, n = 5, seed = 42)
+#' \donttest{
+#' fs
+#' }
 #' \dontshow{options(op)}
 `fitted_samples.gam` <- function(model, n = 1, newdata, seed,
-                                 scale = c("response","linear_predictor"),
+                                 scale = c("response", "linear_predictor"),
                                  method = c("gaussian", "mh", "inla"),
                                  freq = FALSE, unconditional = FALSE,
                                  ncores = 1L, ...) {
@@ -284,10 +287,13 @@
 #' @examples
 #' load_mgcv()
 #' \dontshow{op <- options(cli.unicode = FALSE, pillar.sigfig = 3)}
-#' dat <- data_sim("eg1", n = 1000, seed = 2)
+#' dat <- data_sim("eg1", n = 400, seed = 2)
 #' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
-#' smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
+#' sms <- smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
+#' \donttest{
+#' sms
+#' }
 #'
 #' ## A factor by example (with a spurious covariate x0)
 #' dat <- data_sim("eg4", n = 1000, seed = 2)

@@ -142,3 +142,29 @@ test_that("Simultaneous interval for a GAMM works", {
     expect_named(ci, expected = c("smooth", "by_variable", "x1", "est", "se",
                                   "crit", "lower", "upper"))
 })
+
+## test snapshots...
+test_that("confint.fderiv example output", {
+    skip_on_cran()
+    #skip_on_ci()
+    withr::local_options(lifecycle_verbosity = "quiet")
+    # new data to evaluate the derivatives at, say over the middle 50% of range
+    # of each covariate
+    middle <- function(x, n = 25, coverage = 0.5) {
+      v <- (1 - coverage) / 2
+      q <- quantile(x, prob = c(0 + v, 1 - v), type = 8)
+      seq(q[1], q[2], length = n)
+    }
+    new_data <- sapply(su_eg1[c("x0", "x1", "x2", "x3")], middle)
+    new_data <- data.frame(new_data)
+    ## first derivatives of all smooths...
+    fd <- fderiv(m_gam, newdata = new_data)
+    ## point-wise interval
+    ci <- confint(fd, type = "confidence")
+    expect_snapshot_output(ci)
+    ## simultaneous interval for smooth term of x2
+    set.seed(42)
+    x2_sint <- confint(fd, parm = "x2", type = "simultaneous",
+                       nsim = 10000, ncores = 2)
+    expect_snapshot_output(x2_sint)
+})

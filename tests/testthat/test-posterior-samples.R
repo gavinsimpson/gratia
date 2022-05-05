@@ -172,3 +172,15 @@ test_that("posterior_samples() fails if not suitable method available", {
                  "Don't know how to sample from the posterior of <integer>",
                  fixed = TRUE)
 })
+
+test_that("fitted_samples example output doesn't change", {
+    skip_on_cran()
+    fs <- fitted_samples(m_gam, n = 5, seed = 42)
+    expect_snapshot(fs)
+})
+
+test_that("smooth_samples example output doesn't change", {
+    skip_on_cran()
+    samples <- smooth_samples(m_gam, term = "s(x0)", n = 5, seed = 42)
+    expect_snapshot(samples)
+})
