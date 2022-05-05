@@ -86,7 +86,7 @@
 <text x='115.35' y='139.82' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>0</text>
 <text x='147.85' y='139.82' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>1</text>
 <text x='115.35' y='151.95' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='93.57px' lengthAdjust='spacingAndGlyphs'>Gaussian quantiles</text>
-<text transform='translate(18.53,94.87) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='33.63px' lengthAdjust='spacingAndGlyphs'>Effects</text>
+<text transform='translate(18.53,94.87) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='66.65px' lengthAdjust='spacingAndGlyphs'>Partial effects</text>
 <text x='53.44' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='52.11px' lengthAdjust='spacingAndGlyphs'>Plant_uo</text>
 </g>
 <defs>
@@ -236,7 +236,7 @@
 <text x='329.39' y='139.82' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>6.5</text>
 <text x='353.30' y='139.82' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>7.0</text>
 <text x='292.61' y='151.95' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='45.25px' lengthAdjust='spacingAndGlyphs'>log(conc)</text>
-<text transform='translate(195.79,94.87) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(195.79,94.87) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='230.70' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='69.70px' lengthAdjust='spacingAndGlyphs'>s(log(conc))</text>
 </g>
 <defs>
@@ -313,7 +313,7 @@
 <text x='506.65' y='139.82' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>6.5</text>
 <text x='530.56' y='139.82' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>7.0</text>
 <text x='469.87' y='151.95' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='45.25px' lengthAdjust='spacingAndGlyphs'>log(conc)</text>
-<text transform='translate(373.05,94.87) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(373.05,94.87) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='407.96' y='53.14' style='font-size: 11.00px; font-family: sans;' textLength='89.28px' lengthAdjust='spacingAndGlyphs'>By: Plant_uo; Mc1</text>
 <text x='407.96' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='69.70px' lengthAdjust='spacingAndGlyphs'>s(log(conc))</text>
 </g>
@@ -395,7 +395,7 @@
 <text x='683.91' y='139.82' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>6.5</text>
 <text x='707.82' y='139.82' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>7.0</text>
 <text x='647.13' y='151.95' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='45.25px' lengthAdjust='spacingAndGlyphs'>log(conc)</text>
-<text transform='translate(550.31,94.87) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(550.31,94.87) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='585.22' y='53.14' style='font-size: 11.00px; font-family: sans;' textLength='89.28px' lengthAdjust='spacingAndGlyphs'>By: Plant_uo; Mc2</text>
 <text x='585.22' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='69.70px' lengthAdjust='spacingAndGlyphs'>s(log(conc))</text>
 </g>
@@ -465,7 +465,7 @@
 <text x='152.13' y='276.75' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>6.5</text>
 <text x='176.04' y='276.75' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>7.0</text>
 <text x='115.35' y='288.89' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='45.25px' lengthAdjust='spacingAndGlyphs'>log(conc)</text>
-<text transform='translate(18.53,231.80) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(18.53,231.80) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='53.44' y='190.07' style='font-size: 11.00px; font-family: sans;' textLength='89.28px' lengthAdjust='spacingAndGlyphs'>By: Plant_uo; Mc3</text>
 <text x='53.44' y='174.28' style='font-size: 13.20px; font-family: sans;' textLength='69.70px' lengthAdjust='spacingAndGlyphs'>s(log(conc))</text>
 </g>
@@ -536,7 +536,7 @@
 <text x='329.39' y='276.75' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>6.5</text>
 <text x='353.30' y='276.75' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>7.0</text>
 <text x='292.61' y='288.89' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='45.25px' lengthAdjust='spacingAndGlyphs'>log(conc)</text>
-<text transform='translate(195.79,231.80) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(195.79,231.80) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='230.70' y='190.07' style='font-size: 11.00px; font-family: sans;' textLength='89.90px' lengthAdjust='spacingAndGlyphs'>By: Plant_uo; Mn1</text>
 <text x='230.70' y='174.28' style='font-size: 13.20px; font-family: sans;' textLength='69.70px' lengthAdjust='spacingAndGlyphs'>s(log(conc))</text>
 </g>
@@ -615,7 +615,7 @@
 <text x='506.65' y='276.75' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>6.5</text>
 <text x='530.56' y='276.75' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>7.0</text>
 <text x='469.87' y='288.89' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='45.25px' lengthAdjust='spacingAndGlyphs'>log(conc)</text>
-<text transform='translate(373.05,231.80) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(373.05,231.80) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='407.96' y='190.07' style='font-size: 11.00px; font-family: sans;' textLength='89.90px' lengthAdjust='spacingAndGlyphs'>By: Plant_uo; Mn2</text>
 <text x='407.96' y='174.28' style='font-size: 13.20px; font-family: sans;' textLength='69.70px' lengthAdjust='spacingAndGlyphs'>s(log(conc))</text>
 </g>
@@ -694,7 +694,7 @@
 <text x='683.91' y='276.75' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>6.5</text>
 <text x='707.82' y='276.75' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>7.0</text>
 <text x='647.13' y='288.89' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='45.25px' lengthAdjust='spacingAndGlyphs'>log(conc)</text>
-<text transform='translate(550.31,231.80) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(550.31,231.80) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='585.22' y='190.07' style='font-size: 11.00px; font-family: sans;' textLength='89.90px' lengthAdjust='spacingAndGlyphs'>By: Plant_uo; Mn3</text>
 <text x='585.22' y='174.28' style='font-size: 13.20px; font-family: sans;' textLength='69.70px' lengthAdjust='spacingAndGlyphs'>s(log(conc))</text>
 </g>
@@ -773,7 +773,7 @@
 <text x='152.13' y='413.69' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>6.5</text>
 <text x='176.04' y='413.69' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>7.0</text>
 <text x='115.35' y='425.82' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='45.25px' lengthAdjust='spacingAndGlyphs'>log(conc)</text>
-<text transform='translate(18.53,368.73) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(18.53,368.73) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='53.44' y='327.01' style='font-size: 11.00px; font-family: sans;' textLength='88.68px' lengthAdjust='spacingAndGlyphs'>By: Plant_uo; Qc1</text>
 <text x='53.44' y='311.22' style='font-size: 13.20px; font-family: sans;' textLength='69.70px' lengthAdjust='spacingAndGlyphs'>s(log(conc))</text>
 </g>
@@ -847,7 +847,7 @@
 <text x='329.39' y='413.69' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>6.5</text>
 <text x='353.30' y='413.69' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>7.0</text>
 <text x='292.61' y='425.82' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='45.25px' lengthAdjust='spacingAndGlyphs'>log(conc)</text>
-<text transform='translate(195.79,368.73) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(195.79,368.73) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='230.70' y='327.01' style='font-size: 11.00px; font-family: sans;' textLength='88.68px' lengthAdjust='spacingAndGlyphs'>By: Plant_uo; Qc2</text>
 <text x='230.70' y='311.22' style='font-size: 13.20px; font-family: sans;' textLength='69.70px' lengthAdjust='spacingAndGlyphs'>s(log(conc))</text>
 </g>
@@ -926,7 +926,7 @@
 <text x='506.65' y='413.69' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>6.5</text>
 <text x='530.56' y='413.69' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>7.0</text>
 <text x='469.87' y='425.82' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='45.25px' lengthAdjust='spacingAndGlyphs'>log(conc)</text>
-<text transform='translate(373.05,368.73) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(373.05,368.73) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='407.96' y='327.01' style='font-size: 11.00px; font-family: sans;' textLength='88.68px' lengthAdjust='spacingAndGlyphs'>By: Plant_uo; Qc3</text>
 <text x='407.96' y='311.22' style='font-size: 13.20px; font-family: sans;' textLength='69.70px' lengthAdjust='spacingAndGlyphs'>s(log(conc))</text>
 </g>
@@ -1000,7 +1000,7 @@
 <text x='683.91' y='413.69' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>6.5</text>
 <text x='707.82' y='413.69' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>7.0</text>
 <text x='647.13' y='425.82' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='45.25px' lengthAdjust='spacingAndGlyphs'>log(conc)</text>
-<text transform='translate(550.31,368.73) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(550.31,368.73) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='585.22' y='327.01' style='font-size: 11.00px; font-family: sans;' textLength='89.29px' lengthAdjust='spacingAndGlyphs'>By: Plant_uo; Qn1</text>
 <text x='585.22' y='311.22' style='font-size: 13.20px; font-family: sans;' textLength='69.70px' lengthAdjust='spacingAndGlyphs'>s(log(conc))</text>
 </g>
@@ -1073,7 +1073,7 @@
 <text x='152.13' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>6.5</text>
 <text x='176.04' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>7.0</text>
 <text x='115.35' y='562.76' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='45.25px' lengthAdjust='spacingAndGlyphs'>log(conc)</text>
-<text transform='translate(18.53,505.67) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(18.53,505.67) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='53.44' y='463.94' style='font-size: 11.00px; font-family: sans;' textLength='89.29px' lengthAdjust='spacingAndGlyphs'>By: Plant_uo; Qn2</text>
 <text x='53.44' y='448.15' style='font-size: 13.20px; font-family: sans;' textLength='69.70px' lengthAdjust='spacingAndGlyphs'>s(log(conc))</text>
 </g>
@@ -1152,7 +1152,7 @@
 <text x='329.39' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>6.5</text>
 <text x='353.30' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>7.0</text>
 <text x='292.61' y='562.76' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='45.25px' lengthAdjust='spacingAndGlyphs'>log(conc)</text>
-<text transform='translate(195.79,505.67) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(195.79,505.67) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='230.70' y='463.94' style='font-size: 11.00px; font-family: sans;' textLength='89.29px' lengthAdjust='spacingAndGlyphs'>By: Plant_uo; Qn3</text>
 <text x='230.70' y='448.15' style='font-size: 13.20px; font-family: sans;' textLength='69.70px' lengthAdjust='spacingAndGlyphs'>s(log(conc))</text>
 <text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='148.96px' lengthAdjust='spacingAndGlyphs'>hgam-paper-co2-model-3</text>

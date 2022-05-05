@@ -86,7 +86,7 @@
 <text x='202.76' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>0</text>
 <text x='283.71' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>1</text>
 <text x='202.76' y='562.76' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='93.57px' lengthAdjust='spacingAndGlyphs'>Gaussian quantiles</text>
-<text transform='translate(18.53,292.60) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='33.63px' lengthAdjust='spacingAndGlyphs'>Effects</text>
+<text transform='translate(18.53,292.60) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='66.65px' lengthAdjust='spacingAndGlyphs'>Partial effects</text>
 <text x='48.54' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='52.11px' lengthAdjust='spacingAndGlyphs'>Plant_uo</text>
 </g>
 <defs>
@@ -236,7 +236,7 @@
 <text x='646.45' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>6.5</text>
 <text x='706.01' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>7.0</text>
 <text x='554.83' y='562.76' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='45.25px' lengthAdjust='spacingAndGlyphs'>log(conc)</text>
-<text transform='translate(375.50,292.60) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(375.50,292.60) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='400.62' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='69.70px' lengthAdjust='spacingAndGlyphs'>s(log(conc))</text>
 <text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='148.96px' lengthAdjust='spacingAndGlyphs'>hgam-paper-co2-model-1</text>
 </g>
