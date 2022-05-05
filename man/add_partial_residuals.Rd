@@ -36,7 +36,7 @@ Add partial residuals
 \examples{
 load_mgcv()
 \dontshow{
-op <- options(digits = 4, cli.unicode = FALSE)
+op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 }
 df <- data_sim("eg1", seed = 1)
 df <- df[, c("y","x0","x1","x2","x3")]

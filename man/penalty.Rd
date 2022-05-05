@@ -47,7 +47,8 @@ A 'tibble' (data frame) of class \code{penalty_df} inheriting from
 \item \code{type} - character; the type of smooth,
 \item \code{penalty} - character; the label for the specific penalty. Some smooths
 have multiple penalty matrices, so the \code{penalty} component identifies the
-particular penalty matrix and uses the labelling that \emph{mgcv} uses internally,
+particular penalty matrix and uses the labelling that \emph{mgcv} uses
+internally,
 \item \code{row} - character; a label of the form \code{fn} where \code{n} is an integer for
 the \code{n}th basis function, referencing the columns of the penalty matrix,
 \item \code{col} - character; a label of the form \code{fn} where \code{n} is an integer for
@@ -63,19 +64,29 @@ Extract and tidy penalty matrices
 The \code{print()} method uses \code{\link[base:zapsmall]{base::zapsmall()}} to turn very small numbers
 into 0s for display purposes only; the underlying values of the penalty
 matrix or matrices are not changed.
+
+For smooths that are subject to an eigendecomposition (e.g. the default
+thin plate regression splines, \code{bs = "tp"}), the signs of the eigenvectors
+are not defined and as such you can expect differences across systems in
+the penalties for such smooths that are system-, OS-, and CPU architecture-
+specific.
 }
 \examples{
 \dontshow{
-op <- options(cli.unicode = FALSE, digits = 5)
+op <- options(cli.unicode = FALSE, pillar.sigfig = 3)
 }
 load_mgcv()
 dat <- data_sim("eg4", n = 400, seed = 42)
-m <- gam(y ~ s(x0) + s(x1) + s(x2, by = fac),
+m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") +
+           s(x2, by = fac, bs = "cr"),
          data = dat, method = "REML")
+
+# penalties for all smooths
 penalty(m)
 
 # for a specific smooth
 penalty(m, smooth = "s(x2):fac1")
+
 \dontshow{options(op)}
 }
 \author{

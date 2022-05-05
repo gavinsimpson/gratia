@@ -75,10 +75,9 @@ posterior.
 \examples{
 load_mgcv()
 \dontshow{
-set.seed(2)
-op <- options(cli.unicode = FALSE)
+op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 }
-dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
+dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 fitted_samples(m1, n = 5, seed = 42)

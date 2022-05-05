@@ -54,15 +54,15 @@ conditional distribution of the response.
 \examples{
 load_mgcv()
 \dontshow{
-set.seed(2)
-op <- options(cli.unicode = FALSE)
+op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 }
-dat <- gamSim(1, n = 1000, dist = "normal", scale = 2)
+dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 predicted_samples(m, n = 5, seed = 42)
 
 ## Can pass arguments to predict.gam()
+\dontshow{set.seed(6791)}
 newd <- data.frame(x0 = runif(10), x1 = runif(10), x2 = runif(10),
                    x3 = runif(10))
 

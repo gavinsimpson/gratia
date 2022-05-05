@@ -101,7 +101,7 @@ change in future versions. Don't rely on position.
 
 \examples{
 load_mgcv()
-\dontshow{op <- options(cli.unicode = FALSE)}
+\dontshow{op <- options(cli.unicode = FALSE, pillar.sigfig = 3)}
 dat <- data_sim("eg1", n = 1000, seed = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
