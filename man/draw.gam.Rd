@@ -197,12 +197,10 @@ draw(m2, n_contour = 5, n = 50,
      continuous_fill = scale_fill_distiller(palette = "Spectral",
                                             type = "div"))
 
+# See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
+# for more examples and for details on how to modify the theme of all the
+# plots produced by draw()
 # to modify all panels, for example to change the theme, use the & operator
-draw(m2, n_contour = 5, n = 50) &
-  theme_minimal()
-
-# customising some plot elements
-draw(m1, ci_col = "steelblue", smooth_col = "forestgreen", ci_alpha = 0.3)
 }
 \author{
 Gavin L. Simpson
