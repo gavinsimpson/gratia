@@ -718,7 +718,7 @@
                                   continuous_fill = continuous_fill,
                                   ylim = ylim,
                                   projection = projection,
-                                  prientation = orientation,
+                                  orientation = orientation,
                                   ...)
     }
 
