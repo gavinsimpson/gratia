@@ -144,8 +144,8 @@ spread the plots}
 \item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
 \code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
 
-\item{projection}{character; projection to use, see \code{\link[mapproj:mapproject]{mapproj::mapproject()}}
-for a list.}
+\item{projection}{character; projection to use, see \code{\link[ggplot2:coord_map]{ggplot2::coord_map()}}
+for details.}
 
 \item{orientation}{an optional vector \code{c(latitude, longitude, rotation)}
 which describes where the "North Pole" should be when computing the
@@ -153,7 +153,7 @@ projection. The third value is a clockwise rotation (in degrees), which
 defaults to the midrange of the longitude coordinates in the data. The
 default values for \code{orientation} therefore are
 `c(20, 0, mean(range(longitude))))`` if this is not specified by the user.
-See \code{\link[mapproj:mapproject]{mapproj::mapproject()}} for more information.}
+See links in \code{\link[ggplot2:coord_map]{ggplot2::coord_map()}} for more information.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
