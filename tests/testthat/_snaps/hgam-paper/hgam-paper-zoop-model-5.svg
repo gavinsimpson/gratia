@@ -204,7 +204,7 @@
 <text x='118.22' y='190.57' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>200</text>
 <text x='154.19' y='190.57' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>300</text>
 <text x='112.29' y='202.71' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='17.74px' lengthAdjust='spacingAndGlyphs'>day</text>
-<text transform='translate(18.53,120.24) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(18.53,120.24) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='43.65' y='53.14' style='font-size: 11.00px; font-family: sans;' textLength='119.25px' lengthAdjust='spacingAndGlyphs'>By: taxon; C. sphaericus</text>
 <text x='43.65' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='36.69px' lengthAdjust='spacingAndGlyphs'>s(day)</text>
 </g>
@@ -390,7 +390,7 @@
 <text x='291.81' y='190.57' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>200</text>
 <text x='327.78' y='190.57' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>300</text>
 <text x='285.88' y='202.71' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='17.74px' lengthAdjust='spacingAndGlyphs'>day</text>
-<text transform='translate(199.46,120.24) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(199.46,120.24) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='217.24' y='53.14' style='font-size: 11.00px; font-family: sans;' textLength='146.18px' lengthAdjust='spacingAndGlyphs'>By: taxon; Calanoid copepods</text>
 <text x='217.24' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='36.69px' lengthAdjust='spacingAndGlyphs'>s(day)</text>
 </g>
@@ -577,7 +577,7 @@
 <text x='472.74' y='190.57' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>200</text>
 <text x='508.71' y='190.57' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>300</text>
 <text x='466.81' y='202.71' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='17.74px' lengthAdjust='spacingAndGlyphs'>day</text>
-<text transform='translate(373.05,120.24) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(373.05,120.24) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='398.17' y='53.14' style='font-size: 11.00px; font-family: sans;' textLength='151.07px' lengthAdjust='spacingAndGlyphs'>By: taxon; Cyclopoid copepods</text>
 <text x='398.17' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='36.69px' lengthAdjust='spacingAndGlyphs'>s(day)</text>
 </g>
@@ -787,7 +787,7 @@
 <text x='646.33' y='190.57' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>200</text>
 <text x='682.30' y='190.57' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>300</text>
 <text x='640.40' y='202.71' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='17.74px' lengthAdjust='spacingAndGlyphs'>day</text>
-<text transform='translate(553.98,120.24) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(553.98,120.24) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='571.76' y='53.14' style='font-size: 11.00px; font-family: sans;' textLength='114.97px' lengthAdjust='spacingAndGlyphs'>By: taxon; D. mendotae</text>
 <text x='571.76' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='36.69px' lengthAdjust='spacingAndGlyphs'>s(day)</text>
 </g>
@@ -982,7 +982,7 @@
 <text x='118.22' y='378.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>200</text>
 <text x='154.19' y='378.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>300</text>
 <text x='112.29' y='390.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='17.74px' lengthAdjust='spacingAndGlyphs'>day</text>
-<text transform='translate(18.53,307.93) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(18.53,307.93) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='43.65' y='240.83' style='font-size: 11.00px; font-family: sans;' textLength='104.56px' lengthAdjust='spacingAndGlyphs'>By: taxon; D. thomasi</text>
 <text x='43.65' y='225.04' style='font-size: 13.20px; font-family: sans;' textLength='36.69px' lengthAdjust='spacingAndGlyphs'>s(day)</text>
 </g>
@@ -1125,7 +1125,7 @@
 <text x='291.81' y='378.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>200</text>
 <text x='327.78' y='378.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>300</text>
 <text x='285.88' y='390.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='17.74px' lengthAdjust='spacingAndGlyphs'>day</text>
-<text transform='translate(199.46,307.93) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(199.46,307.93) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='217.24' y='240.83' style='font-size: 11.00px; font-family: sans;' textLength='114.97px' lengthAdjust='spacingAndGlyphs'>By: taxon; K. cochlearis</text>
 <text x='217.24' y='225.04' style='font-size: 13.20px; font-family: sans;' textLength='36.69px' lengthAdjust='spacingAndGlyphs'>s(day)</text>
 </g>
@@ -1316,7 +1316,7 @@
 <text x='472.74' y='378.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>200</text>
 <text x='508.71' y='378.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>300</text>
 <text x='466.81' y='390.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='17.74px' lengthAdjust='spacingAndGlyphs'>day</text>
-<text transform='translate(373.05,307.93) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(373.05,307.93) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='398.17' y='240.83' style='font-size: 11.00px; font-family: sans;' textLength='108.85px' lengthAdjust='spacingAndGlyphs'>By: taxon; L. siciloides</text>
 <text x='398.17' y='225.04' style='font-size: 13.20px; font-family: sans;' textLength='36.69px' lengthAdjust='spacingAndGlyphs'>s(day)</text>
 </g>
@@ -1507,7 +1507,7 @@
 <text x='646.33' y='378.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>200</text>
 <text x='682.30' y='378.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>300</text>
 <text x='640.40' y='390.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='17.74px' lengthAdjust='spacingAndGlyphs'>day</text>
-<text transform='translate(553.98,307.93) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(553.98,307.93) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='571.76' y='240.83' style='font-size: 11.00px; font-family: sans;' textLength='91.12px' lengthAdjust='spacingAndGlyphs'>By: taxon; M. edax</text>
 <text x='571.76' y='225.04' style='font-size: 13.20px; font-family: sans;' textLength='36.69px' lengthAdjust='spacingAndGlyphs'>s(day)</text>
 </g>
@@ -1587,7 +1587,7 @@
 <text x='155.80' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>1.0</text>
 <text x='177.55' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>1.5</text>
 <text x='112.29' y='562.76' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='93.57px' lengthAdjust='spacingAndGlyphs'>Gaussian quantiles</text>
-<text transform='translate(18.53,480.29) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='33.63px' lengthAdjust='spacingAndGlyphs'>Effects</text>
+<text transform='translate(18.53,480.29) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='66.65px' lengthAdjust='spacingAndGlyphs'>Partial effects</text>
 <text x='43.65' y='412.73' style='font-size: 13.20px; font-family: sans;' textLength='32.30px' lengthAdjust='spacingAndGlyphs'>taxon</text>
 </g>
 <defs>
@@ -1803,7 +1803,7 @@
 <text x='308.84' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>1</text>
 <text x='331.81' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text>
 <text x='285.88' y='562.76' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='93.57px' lengthAdjust='spacingAndGlyphs'>Gaussian quantiles</text>
-<text transform='translate(199.46,480.29) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='33.63px' lengthAdjust='spacingAndGlyphs'>Effects</text>
+<text transform='translate(199.46,480.29) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='66.65px' lengthAdjust='spacingAndGlyphs'>Partial effects</text>
 <text x='217.24' y='412.73' style='font-size: 13.20px; font-family: sans;' textLength='32.30px' lengthAdjust='spacingAndGlyphs'>taxon</text>
 <text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='156.30px' lengthAdjust='spacingAndGlyphs'>hgam-paper-zoop-model-5</text>
 </g>

@@ -5,8 +5,6 @@ library("testthat")
 library("gratia")
 library("mgcv")
 
-#set.seed(42)
-#data <- gamSim(eg = 1, verbose = FALSE)
 ## take only some columns
 data <- su_eg1[, c("y", "x0", "x1", "x2", "x3")]
 ## fit the model

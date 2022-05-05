@@ -1079,7 +1079,7 @@
 <text x='209.17' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>200</text>
 <text x='292.54' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>300</text>
 <text x='195.41' y='562.76' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='17.74px' lengthAdjust='spacingAndGlyphs'>day</text>
-<text transform='translate(18.53,292.60) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='28.13px' lengthAdjust='spacingAndGlyphs'>Effect</text>
+<text transform='translate(18.53,292.60) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='36.31' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='72.65px' lengthAdjust='spacingAndGlyphs'>s(day,taxon)</text>
 </g>
 <defs>
@@ -1295,7 +1295,7 @@
 <text x='603.16' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>1</text>
 <text x='656.39' y='550.62' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text>
 <text x='549.94' y='562.76' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='93.57px' lengthAdjust='spacingAndGlyphs'>Gaussian quantiles</text>
-<text transform='translate(373.05,292.60) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='33.63px' lengthAdjust='spacingAndGlyphs'>Effects</text>
+<text transform='translate(373.05,292.60) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='66.65px' lengthAdjust='spacingAndGlyphs'>Partial effects</text>
 <text x='390.83' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='32.30px' lengthAdjust='spacingAndGlyphs'>taxon</text>
 <text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='156.30px' lengthAdjust='spacingAndGlyphs'>hgam-paper-zoop-model-4</text>
 </g>

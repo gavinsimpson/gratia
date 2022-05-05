@@ -42,10 +42,9 @@
 #'
 #' load_mgcv()
 #' \dontshow{
-#' set.seed(1)
-#' op <- options(digits = 3, cli.unicode = FALSE)
+#' op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 #' }
-#' df <- gamSim(eg = 1, verbose = FALSE)
+#' df <- data_sim("eg1", seed = 1)
 #' df <- df[, c("y","x0","x1","x2","x3")]
 #' m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
 #'
@@ -125,9 +124,9 @@
 #' load_mgcv()
 #' \dontshow{
 #' set.seed(1)
-#' op <- options(digits = 5, cli.unicode = FALSE)
+#' op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 #' }
-#' df <- gamSim(eg = 1, verbose = FALSE)
+#' df <- data_sim("eg1", seed = 1)
 #' df <- df[, c("y","x0","x1","x2","x3")]
 #' m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
 #'
@@ -178,7 +177,7 @@
 #' @examples
 #' load_mgcv()
 #' \dontshow{
-#' op <- options(digits = 4, cli.unicode = FALSE)
+#' op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 #' }
 #' df <- data_sim("eg1", seed = 1)
 #' df <- df[, c("y","x0","x1","x2","x3")]

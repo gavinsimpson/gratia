@@ -18,7 +18,8 @@
 #' * `type` - character; the type of smooth,
 #' * `penalty` - character; the label for the specific penalty. Some smooths
 #'   have multiple penalty matrices, so the `penalty` component identifies the
-#'   particular penalty matrix and uses the labelling that *mgcv* uses internally,
+#'   particular penalty matrix and uses the labelling that *mgcv* uses
+#'   internally,
 #' * `row` - character; a label of the form `fn` where `n` is an integer for
 #'   the `n`th basis function, referencing the columns of the penalty matrix,
 #' * `col` - character; a label of the form `fn` where `n` is an integer for
@@ -29,22 +30,32 @@
 #' @note The `print()` method uses [base::zapsmall()] to turn very small numbers
 #'   into 0s for display purposes only; the underlying values of the penalty
 #'   matrix or matrices are not changed.
-#' 
+#'
+#'   For smooths that are subject to an eigendecomposition (e.g. the default
+#'   thin plate regression splines, `bs = "tp"`), the signs of the eigenvectors
+#'   are not defined and as such you can expect differences across systems in
+#'   the penalties for such smooths that are system-, OS-, and CPU architecture-
+#'   specific.
+#'
 #' @author Gavin L. Simpson
 #' @export
 #'
 #' @examples
 #' \dontshow{
-#' op <- options(cli.unicode = FALSE, digits = 5)
+#' op <- options(cli.unicode = FALSE, pillar.sigfig = 3)
 #' }
 #' load_mgcv()
 #' dat <- data_sim("eg4", n = 400, seed = 42)
-#' m <- gam(y ~ s(x0) + s(x1) + s(x2, by = fac),
+#' m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") +
+#'            s(x2, by = fac, bs = "cr"),
 #'          data = dat, method = "REML")
+#'
+#' # penalties for all smooths
 #' penalty(m)
 #'
 #' # for a specific smooth
 #' penalty(m, smooth = "s(x2):fac1")
+#'
 #' \dontshow{options(op)}
 `penalty` <- function(object, ...) {
     UseMethod("penalty")

@@ -49,8 +49,7 @@ number generator. See \code{\link[mgcv:fix.family.link]{mgcv::fix.family.rd()}}.
 }
 \examples{
 load_mgcv()
-\dontshow{set.seed(2)}
-dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
 sims <- simulate(m1, nsim = 5, seed = 42)

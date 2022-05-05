@@ -33,16 +33,16 @@
 #' @examples
 #' load_mgcv()
 #' \dontshow{
-#' op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
+#' op <- options(pillar.sigfig = 2, cli.unicode = FALSE)
 #' }
 #' dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 #' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
-#' # new data to evaluate the derivatives at, say over the middle 80% of range
+#' # new data to evaluate the derivatives at, say over the middle 50% of range
 #' # of each covariate
-#' middle <- function(x, n = 50, coverage = 0.8) {
+#' middle <- function(x, n = 25, coverage = 0.5) {
 #'   v <- (1 - coverage) / 2
-#'   q <- quantile(x, prob = c(0 + v, 1 - v))
+#'   q <- quantile(x, prob = c(0 + v, 1 - v), type = 8)
 #'   seq(q[1], q[2], length = n)
 #' }
 #' new_data <- sapply(dat[c("x0", "x1", "x2", "x3")], middle)
@@ -59,7 +59,7 @@
 #' set.seed(42)
 #' }
 #' x2_sint <- confint(fd, parm = "x2", type = "simultaneous",
-#'                    nsim = 3000, ncores = 2)
+#'                    nsim = 5000, ncores = 2)
 #' x2_sint
 #' \dontshow{options(op)}
 `confint.fderiv` <- function(object, parm, level = 0.95,
@@ -230,16 +230,16 @@
 #' @examples
 #' load_mgcv()
 #' \dontshow{
-#' op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
+#' op <- options(pillar.sigfig = 2, cli.unicode = FALSE)
 #' }
 #' dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 #' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
-#' # new data to evaluate the smooths at, say over the middle 80% of range
+#' # new data to evaluate the smooths at, say over the middle 50% of range
 #' # of each covariate
-#' middle <- function(x, n = 50, coverage = 0.8) {
+#' middle <- function(x, n = 50, coverage = 0.5) {
 #'   v <- (1 - coverage) / 2
-#'   q <- quantile(x, prob = c(0 + v, 1 - v))
+#'   q <- quantile(x, prob = c(0 + v, 1 - v), type = 8)
 #'   seq(q[1], q[2], length = n)
 #' }
 #' new_data <- sapply(dat[c("x0", "x1", "x2", "x3")], middle)
