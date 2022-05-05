@@ -363,7 +363,7 @@ Call `lifecycle::last_lifecycle_warnings()` to see where this warning was genera
 > set.seed(42)
 > ## End(Don't show)
 > x2_sint <- confint(fd, parm = "x2", type = "simultaneous",
-+                    nsim = 5000, ncores = 2)
++                    nsim = 10000, ncores = 2)
 > x2_sint
 # A tibble: 25 x 4
    term  lower   est upper
@@ -372,7 +372,7 @@ Call `lifecycle::last_lifecycle_warnings()` to see where this warning was genera
  2 s(x2)  -35.  -26. -16. 
  3 s(x2)  -41.  -33. -24. 
  4 s(x2)  -44.  -36. -29. 
- 5 s(x2)  -44.  -36. -28. 
+ 5 s(x2)  -44.  -36. -29. 
  6 s(x2)  -42.  -34. -25. 
  7 s(x2)  -38.  -30. -21. 
  8 s(x2)  -33.  -24. -16. 
@@ -758,12 +758,10 @@ detaching ‘package:mgcv’
 +      continuous_fill = scale_fill_distiller(palette = "Spectral",
 +                                             type = "div"))
 > 
+> # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
+> # for more examples and for details on how to modify the theme of all the
+> # plots produced by draw()
 > # to modify all panels, for example to change the theme, use the & operator
-> draw(m2, n_contour = 5, n = 50) &
-+   theme_minimal()
-> 
-> # customising some plot elements
-> draw(m1, ci_col = "steelblue", smooth_col = "forestgreen", ci_alpha = 0.3)
 > 
 > 
 > 
@@ -1381,11 +1379,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x560e6b11dc38>
+<environment: 0x561948bbecf8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x560e6b11dc38>
+<environment: 0x561948bbecf8>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2056,7 +2054,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  21.243 0.204 21.531 0 0 
+Time elapsed:  17.157 0.16 17.387 0 0 
 > grDevices::dev.off()
 null device 
           1 

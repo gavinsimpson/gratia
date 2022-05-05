@@ -161,7 +161,7 @@ to work on Windows with current <code>R</code>).</p></dd>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span class="r-in"><span class="co"># }</span></span>
 <span class="r-in"><span class="va">x2_sint</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">fd</span>, parm <span class="op">=</span> <span class="st">"x2"</span>, type <span class="op">=</span> <span class="st">"simultaneous"</span>,</span>
-<span class="r-in">                   nsim <span class="op">=</span> <span class="fl">5000</span>, ncores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span class="r-in">                   nsim <span class="op">=</span> <span class="fl">10000</span>, ncores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">x2_sint</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 25 x 4</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    term  lower   est upper</span>
@@ -170,7 +170,7 @@ to work on Windows with current <code>R</code>).</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> s(x2)  -<span style="color: #BB0000;">35.</span>  -<span style="color: #BB0000;">26.</span> -<span style="color: #BB0000;">16.</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> s(x2)  -<span style="color: #BB0000;">41.</span>  -<span style="color: #BB0000;">33.</span> -<span style="color: #BB0000;">24.</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> s(x2)  -<span style="color: #BB0000;">44.</span>  -<span style="color: #BB0000;">36.</span> -<span style="color: #BB0000;">29.</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> s(x2)  -<span style="color: #BB0000;">44.</span>  -<span style="color: #BB0000;">36.</span> -<span style="color: #BB0000;">28.</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> s(x2)  -<span style="color: #BB0000;">44.</span>  -<span style="color: #BB0000;">36.</span> -<span style="color: #BB0000;">29.</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> s(x2)  -<span style="color: #BB0000;">42.</span>  -<span style="color: #BB0000;">34.</span> -<span style="color: #BB0000;">25.</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> s(x2)  -<span style="color: #BB0000;">38.</span>  -<span style="color: #BB0000;">30.</span> -<span style="color: #BB0000;">21.</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> s(x2)  -<span style="color: #BB0000;">33.</span>  -<span style="color: #BB0000;">24.</span> -<span style="color: #BB0000;">16.</span> </span>
