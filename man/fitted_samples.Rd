@@ -80,7 +80,10 @@ op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
-fitted_samples(m1, n = 5, seed = 42)
+fs <- fitted_samples(m1, n = 5, seed = 42)
+\donttest{
+fs
+}
 \dontshow{options(op)}
 }
 \references{

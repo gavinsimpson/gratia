@@ -364,21 +364,6 @@ Call `lifecycle::last_lifecycle_warnings()` to see where this warning was genera
 > ## End(Don't show)
 > x2_sint <- confint(fd, parm = "x2", type = "simultaneous",
 +                    nsim = 10000, ncores = 2)
-> x2_sint
-# A tibble: 25 x 4
-   term  lower   est upper
-   <chr> <dbl> <dbl> <dbl>
- 1 s(x2)  -24.  -15.  -5.6
- 2 s(x2)  -35.  -26. -16. 
- 3 s(x2)  -41.  -33. -24. 
- 4 s(x2)  -44.  -36. -29. 
- 5 s(x2)  -44.  -36. -29. 
- 6 s(x2)  -42.  -34. -25. 
- 7 s(x2)  -38.  -30. -21. 
- 8 s(x2)  -33.  -24. -16. 
- 9 s(x2)  -27.  -19. -11. 
-10 s(x2)  -22.  -14.  -5.8
-# ... with 15 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1130,21 +1115,7 @@ detaching ‘package:mgcv’
 > dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
-> fitted_samples(m1, n = 5, seed = 42)
-# A tibble: 5,000 x 3
-     row  draw fitted
-   <int> <int>  <dbl>
- 1     1     1   6.24
- 2     2     1   5.12
- 3     3     1   7.06
- 4     4     1   7.56
- 5     5     1   9.20
- 6     6     1   7.94
- 7     7     1   6.13
- 8     8     1   7.59
- 9     9     1  13.9 
-10    10     1  12.7 
-# ... with 4,990 more rows
+> fs <- fitted_samples(m1, n = 5, seed = 42)
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1379,11 +1350,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x561948bbecf8>
+<environment: 0x55ec44e380c8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x561948bbecf8>
+<environment: 0x55ec44e380c8>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1932,24 +1903,10 @@ detaching ‘package:mgcv’
 > ## Don't show: 
 > op <- options(cli.unicode = FALSE, pillar.sigfig = 3)
 > ## End(Don't show)
-> dat <- data_sim("eg1", n = 1000, seed = 2)
+> dat <- data_sim("eg1", n = 400, seed = 2)
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
-> smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
-# A tibble: 1,000 x 7
-   smooth term  by_variable      .x1   row  draw  value
-   <chr>  <chr> <chr>          <dbl> <int> <int>  <dbl>
- 1 s(x0)  s(x0) <NA>        0.000663     1     1 -0.961
- 2 s(x0)  s(x0) <NA>        0.00568      2     1 -0.933
- 3 s(x0)  s(x0) <NA>        0.0107       3     1 -0.906
- 4 s(x0)  s(x0) <NA>        0.0157       4     1 -0.878
- 5 s(x0)  s(x0) <NA>        0.0207       5     1 -0.850
- 6 s(x0)  s(x0) <NA>        0.0258       6     1 -0.822
- 7 s(x0)  s(x0) <NA>        0.0308       7     1 -0.795
- 8 s(x0)  s(x0) <NA>        0.0358       8     1 -0.768
- 9 s(x0)  s(x0) <NA>        0.0408       9     1 -0.740
-10 s(x0)  s(x0) <NA>        0.0458      10     1 -0.713
-# ... with 990 more rows
+> sms <- smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
 > 
 > ## A factor by example (with a spurious covariate x0)
 > dat <- data_sim("eg4", n = 1000, seed = 2)
@@ -2054,7 +2011,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  17.157 0.16 17.387 0 0 
+Time elapsed:  14.33 0.122 14.493 0 0 
 > grDevices::dev.off()
 null device 
           1 
