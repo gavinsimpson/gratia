@@ -175,12 +175,14 @@ test_that("posterior_samples() fails if not suitable method available", {
 
 test_that("fitted_samples example output doesn't change", {
     skip_on_cran()
+    skip_on_os("mac")
     fs <- fitted_samples(m_gam, n = 5, seed = 42)
     expect_snapshot(fs)
 })
 
 test_that("smooth_samples example output doesn't change", {
     skip_on_cran()
+    skip_on_os("mac")
     samples <- smooth_samples(m_gam, term = "s(x0)", n = 5, seed = 42)
     expect_snapshot(samples)
 })
