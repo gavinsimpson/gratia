@@ -78,8 +78,9 @@ test_that("draw() can plot CO2 model 4", {
     skip_on_cran()
     skip_on_travis()
     skip_on_ci()
-    CO2_mod4 <- gam(log(uptake) ~ s(log(conc), Plant_uo, k=5, bs="fs", m=2),
-                    data=CO2, method="REML",
+    CO2_mod4 <- gam(log(uptake) ~
+                      s(log(conc), Plant_uo, k = 5, bs = "fs", m = 2),
+                    data = CO2, method = "REML",
                     control = ctrl)
     plt <- draw(CO2_mod4, overall_uncertainty = TRUE)
     expect_doppelganger("hgam-paper-co2-model-4", plt)
@@ -154,7 +155,8 @@ test_that("draw() throws message with bird_move model 4", {
                      knots = list(week = c(0, 52)),
                      control = ctrl)
     ## There's nothing we can currently do, as
-    expect_message(draw(bird_mod4), "Unable to draw any of the model terms.",
+    expect_message(draw(bird_mod4),
+                   "Unable to draw any of the model terms.",
                    fixed = FALSE)
 })
 
