@@ -395,3 +395,8 @@ test_that("transform_fun works for smooth_estimates", {
 test_that("transform_fun works for tbl", {
     expect_silent(tbl <- transform_fun(su_eg1, fun = abs, column = "y"))
 })
+
+test_that("involves_ranef_smooth works", {
+    sm <- smooths(su_m_trivar_t2)
+    expect_false(involves_ranef_smooth(get_smooth(su_m_trivar_t2, sm[1])))
+})
