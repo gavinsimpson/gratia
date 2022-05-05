@@ -642,9 +642,8 @@
 #'
 #' @examples
 #' load_mgcv()
-#' \dontshow{set.seed(2)}
 #' ## simulate some data...
-#' dat <- gamSim(1, n = 400, dist = "normal", scale = 2)
+#' dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 #' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 #' ## run some basic model checks
 #' appraise(mod, point_col = "steelblue", point_alpha = 0.4)
