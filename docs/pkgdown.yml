@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   custom-plotting: custom-plotting.html
   gratia: gratia.html
-last_built: 2022-05-05T15:21Z
+last_built: 2022-05-06T11:55Z
 urls:
   reference: https://gavinsimpson.github.io/gratia/reference
   article: https://gavinsimpson.github.io/gratia/articles
