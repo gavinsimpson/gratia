@@ -147,7 +147,7 @@ test_that("Simultaneous interval for a GAMM works", {
 test_that("confint.fderiv example output", {
     skip_on_cran()
     skip_on_os("mac")
-    
+
     withr::local_options(lifecycle_verbosity = "quiet")
     # new data to evaluate the derivatives at, say over the middle 50% of range
     # of each covariate
