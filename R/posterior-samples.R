@@ -410,6 +410,10 @@
                                by_variable = rep(NA_character_,
                                                  times = nr_simu))
         }
+    #   # add on spline type info
+        sm_type <- smooth_type(sm)
+        simu <- add_column(simu, type = rep(sm_type, nr_simu),
+                           .after = 1L)
         simu <- add_smooth_var_data(simu, smooth_variable(sm), newdata)
         sims[[i]] <- simu
         summ_names <- names(newdata[!vapply(newdata, is.factor, logical(1))])

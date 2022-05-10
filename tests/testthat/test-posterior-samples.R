@@ -12,7 +12,7 @@ test_that("smooth_samples works for a continuous by GAM", {
                           "tbl", "data.frame"))
     ## 500 == 1 smooth * 5 * 100
     expect_identical(NROW(sm), 500L)
-    expect_identical(NCOL(sm), 7L) # 7 cols, univatiate smooths
+    expect_identical(NCOL(sm), 8L) # 8 cols, univatiate smooths
 })
 
 test_that("smooth_samples works for a simple GAM", {
@@ -22,7 +22,7 @@ test_that("smooth_samples works for a simple GAM", {
                           "tbl", "data.frame"))
     ## 500 == 1 smooth * 5 * 100
     expect_identical(NROW(sm), 500L)
-    expect_identical(NCOL(sm), 7L) # 7 cols, univatiate smooths
+    expect_identical(NCOL(sm), 8L) # 8 cols, univatiate smooths
 })
 
 test_that("smooth_samples works for a multi-smooth GAM", {
@@ -31,17 +31,17 @@ test_that("smooth_samples works for a multi-smooth GAM", {
                           "tbl", "data.frame"))
     ## 2000 == 4 smooths * 5 * 100
     expect_identical(NROW(sm), 2000L)
-    expect_identical(NCOL(sm), 7L) # 7 cols, univatiate smooths
+    expect_identical(NCOL(sm), 8L) # 8 cols, univatiate smooths
 })
 
 test_that("smooth_samples works for a multi-smooth factor by GAM", {
-    expect_silent(sm <- smooth_samples(su_m_factor_by, n = 5, n_vals = 100,
+    expect_silent(sm <- smooth_samples(su_m_factor_by, n = 5, n_vals = 50,
                                        seed = 42))
     expect_s3_class(sm, c("smooth_samples", "posterior_samples", "tbl_df",
                           "tbl", "data.frame"))
-    ## 2000 == 1 + (1 * 3) smooths * 5 * 100
-    expect_identical(NROW(sm), 2000L)
-    expect_identical(NCOL(sm), 8L) # 8 cols, univatiate smooths with factor
+    ## 2000 == 1 + (1 * 3) smooths * 5 * 50
+    expect_identical(NROW(sm), 1000L)
+    expect_identical(NCOL(sm), 9L) # 9 cols, univatiate smooths with factor
 })
 
 test_that("smooth_samples() fails if not suitable method available", {
