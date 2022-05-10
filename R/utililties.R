@@ -1265,3 +1265,15 @@ vars_from_label <- function(label) {
 
     out
 }
+
+# is a smooth isotropic?
+`is_isotropic_smooth` <- function(smooth) {
+    check_is_mgcv_smooth(smooth)
+
+    out <- FALSE
+    cls <- c("tprs.smooth", "duchon.smooth") # others? gp?
+    if (inherits(smooth, what = cls)) {
+        out <- TRUE
+    }
+    out
+}
