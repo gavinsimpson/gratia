@@ -1,3 +1,10 @@
+# gratia 0.7.3.1 (In development)
+
+## Bug fixes
+
+* `draw.posterior_smooths` now plots posterior samples with a fixed aspect ratio
+  if the smooth is isotropic. #148
+
 # gratia 0.7.3
 
 ## User visible changes
