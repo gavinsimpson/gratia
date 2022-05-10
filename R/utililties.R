@@ -1271,7 +1271,7 @@ vars_from_label <- function(label) {
     check_is_mgcv_smooth(smooth)
 
     out <- FALSE
-    cls <- c("tprs.smooth", "duchon.smooth") # others? gp?
+    cls <- c("tprs.smooth", "duchon.spline", "gp.smooth") # others?
     if (inherits(smooth, what = cls)) {
         out <- TRUE
     }
