@@ -23,18 +23,18 @@
     Code
       samples
     Output
-      # A tibble: 1,000 x 7
-         smooth term  by_variable     .x1   row  draw  value
-         <chr>  <chr> <chr>         <dbl> <int> <int>  <dbl>
-       1 s(x0)  s(x0) <NA>        0.00131     1     1 -1.07 
-       2 s(x0)  s(x0) <NA>        0.00633     2     1 -1.04 
-       3 s(x0)  s(x0) <NA>        0.0114      3     1 -1.02 
-       4 s(x0)  s(x0) <NA>        0.0164      4     1 -0.997
-       5 s(x0)  s(x0) <NA>        0.0214      5     1 -0.975
-       6 s(x0)  s(x0) <NA>        0.0264      6     1 -0.952
-       7 s(x0)  s(x0) <NA>        0.0314      7     1 -0.929
-       8 s(x0)  s(x0) <NA>        0.0364      8     1 -0.906
-       9 s(x0)  s(x0) <NA>        0.0415      9     1 -0.882
-      10 s(x0)  s(x0) <NA>        0.0465     10     1 -0.859
+      # A tibble: 1,000 x 8
+         smooth term  type  by_variable     .x1   row  draw  value
+         <chr>  <chr> <chr> <chr>         <dbl> <int> <int>  <dbl>
+       1 s(x0)  s(x0) TPRS  <NA>        0.00131     1     1 -1.07 
+       2 s(x0)  s(x0) TPRS  <NA>        0.00633     2     1 -1.04 
+       3 s(x0)  s(x0) TPRS  <NA>        0.0114      3     1 -1.02 
+       4 s(x0)  s(x0) TPRS  <NA>        0.0164      4     1 -0.997
+       5 s(x0)  s(x0) TPRS  <NA>        0.0214      5     1 -0.975
+       6 s(x0)  s(x0) TPRS  <NA>        0.0264      6     1 -0.952
+       7 s(x0)  s(x0) TPRS  <NA>        0.0314      7     1 -0.929
+       8 s(x0)  s(x0) TPRS  <NA>        0.0364      8     1 -0.906
+       9 s(x0)  s(x0) TPRS  <NA>        0.0415      9     1 -0.882
+      10 s(x0)  s(x0) TPRS  <NA>        0.0465     10     1 -0.859
       # ... with 990 more rows
 
