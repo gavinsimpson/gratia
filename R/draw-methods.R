@@ -344,7 +344,7 @@
         n_samples <- n_draws
     }
 
-    # if we're ploting fewer than n_draws samples, randomly sample the draws
+    # if we're plotting fewer than n_draws samples, randomly sample the draws
     # to plot
     if (n_samples < n_draws) {
         draws <- unique(object[["draw"]])
@@ -490,6 +490,12 @@
         guides(fill = guide_colourbar(title = "Partial effect",
                                       direction = "vertical",
                                       barheight = grid::unit(0.25, "npc")))
+
+    # if isotropic smooth, fix aspect ratio
+    if (any(str_detect(unique(object$type),
+                       c("^TPRS", "^Duchon", "^GP", "^SOS")))) {
+        plt <- plt + coord_equal()
+    }
 
     plt
 }
