@@ -50,7 +50,8 @@ and confidence interval before plotting. Can be a function or the name of a
 function. Function \code{fun} will be applied after adding any \code{constant}, if
 provided.}
 
-\item{rug}{logical; draw a rug plot at the botom of each plot?}
+\item{rug}{logical; draw a rug plot at the botom of each plot for 1-D
+smooths or plot locations of data for higher dimensions.}
 
 \item{position}{Position adjustment, either as a string, or the result of a
 call to a position adjustment function.}
