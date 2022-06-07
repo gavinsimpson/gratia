@@ -53,7 +53,8 @@
 #'   The data are scaled into the unit square before deciding what to exclude,
 #'   and `dist` is a distance within the unit square. See
 #'   [mgcv::exclude.too.far()] for further details.
-#' @param rug logical; draw a rug plot at the botom of each plot?
+#' @param rug logical; draw a rug plot at the botom of each plot for 1-D
+#'   smooths or plot locations of data for higher dimensions.
 #' @param contour logical; should contours be draw on the plot using
 #'   [ggplot2::geom_contour()].
 #' @param ci_alpha numeric; alpha transparency for confidence or simultaneous

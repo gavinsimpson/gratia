@@ -108,7 +108,8 @@ The data are scaled into the unit square before deciding what to exclude,
 and \code{dist} is a distance within the unit square. See
 \code{\link[mgcv:exclude.too.far]{mgcv::exclude.too.far()}} for further details.}
 
-\item{rug}{logical; draw a rug plot at the botom of each plot?}
+\item{rug}{logical; draw a rug plot at the botom of each plot for 1-D
+smooths or plot locations of data for higher dimensions.}
 
 \item{contour}{logical; should contours be draw on the plot using
 \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
