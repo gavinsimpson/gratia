@@ -1,4 +1,10 @@
-# gratia 0.7.3.1 (In development)
+# gratia 0.7.3.2 (In development)
+
+## New features
+
+* `difference_smooths()` will now use the user-supplied data as points at
+which to evaluate a pair of smooths. Also note that the argument `newdata` has
+been renamed `data`. #175
 
 ## Bug fixes
 
