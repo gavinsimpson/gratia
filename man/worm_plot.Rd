@@ -68,16 +68,10 @@ supplied, a suitable label will be generated.}
 \item{caption}{character or expression; the plot caption. See
 \code{\link[ggplot2:labs]{ggplot2::labs()}}.}
 
-\item{ci_col}{fill colour and alpha transparency for the reference
+\item{ci_col, ci_alpha}{fill colour and alpha transparency for the reference
 interval when \code{method = "simulate"}.}
 
-\item{ci_alpha}{fill colour and alpha transparency for the reference
-interval when \code{method = "simulate"}.}
-
-\item{point_col}{colour and alpha transparency for points on the
-QQ plot.}
-
-\item{point_alpha}{colour and alpha transparency for points on the
+\item{point_col, point_alpha}{colour and alpha transparency for points on the
 QQ plot.}
 
 \item{line_col}{colour used to draw the reference line.}

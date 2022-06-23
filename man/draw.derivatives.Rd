@@ -35,10 +35,7 @@ terms.}
 \item{alpha}{numeric; alpha transparency for confidence or simultaneous
 interval.}
 
-\item{ncol}{numeric; the numbers of rows and columns over which to
-spread the plots}
-
-\item{nrow}{numeric; the numbers of rows and columns over which to
+\item{ncol, nrow}{numeric; the numbers of rows and columns over which to
 spread the plots}
 
 \item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or

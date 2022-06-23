@@ -12,7 +12,7 @@ difference_smooths(model, ...)
   smooth,
   n = 100,
   ci_level = 0.95,
-  newdata = NULL,
+  data = NULL,
   partial_match = TRUE,
   unconditional = FALSE,
   frequentist = FALSE,
@@ -22,7 +22,7 @@ difference_smooths(model, ...)
 \arguments{
 \item{model}{A fitted model.}
 
-\item{...}{arguments passed to other methods.}
+\item{...}{arguments passed to other methods. Not currently used.}
 
 \item{smooth}{character; which smooth to compute differences for.}
 
@@ -31,7 +31,7 @@ between pairs of smooths.}
 
 \item{ci_level}{numeric between 0 and 1; the coverage of credible interval.}
 
-\item{newdata}{data frame of locations at which to evaluate the difference
+\item{data}{data frame of locations at which to evaluate the difference
 between smooths.}
 
 \item{partial_match}{logical; should \code{smooth} match partially against

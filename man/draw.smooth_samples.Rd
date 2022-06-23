@@ -85,10 +85,7 @@ smooths or plot locations of data for higher dimensions.}
 with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
 against.}
 
-\item{ncol}{numeric; the numbers of rows and columns over which to
-spread the plots}
-
-\item{nrow}{numeric; the numbers of rows and columns over which to
+\item{ncol, nrow}{numeric; the numbers of rows and columns over which to
 spread the plots}
 
 \item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or

@@ -158,18 +158,7 @@ models are suported.</p></dd>
 which to evaluate the smooth.</p></dd>
 
 
-<dt>n_3d</dt>
-<dd><p>numeric; the number of points over the range of last
-covariate in a 3D or 4D smooth. The default is <code>NULL</code> which achieves the
-standard behaviour of using <code>n</code> points over the range of all covariate,
-resulting in <code>n^d</code> evaluation pointsm, where <code>d</code> is the dimension of the
-smooth. For <code>d &gt; 2</code> this can result in very many evaluation points and slow
-performance. For smooths of <code>d &gt; 4</code>, the value of <code>n_4d</code> will be used for
-all dimensions <code>&gt; 4</code>, unless this is <code>NULL</code>, in which case the default
-behaviour (using <code>n</code> for all dimensions) will be observed.</p></dd>
-
-
-<dt>n_4d</dt>
+<dt>n_3d, n_4d</dt>
 <dd><p>numeric; the number of points over the range of last
 covariate in a 3D or 4D smooth. The default is <code>NULL</code> which achieves the
 standard behaviour of using <code>n</code> points over the range of all covariate,
