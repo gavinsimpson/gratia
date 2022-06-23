@@ -58,10 +58,7 @@ call to a position adjustment function.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 
-\item{ncol}{numeric; the numbers of rows and columns over which to
-spread the plots}
-
-\item{nrow}{numeric; the numbers of rows and columns over which to
+\item{ncol, nrow}{numeric; the numbers of rows and columns over which to
 spread the plots}
 
 \item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or

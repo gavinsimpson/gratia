@@ -10,10 +10,7 @@
 \item{object}{of class \code{"compare_smooths"}, the result of a call to
 \code{\link[=compare_smooths]{compare_smooths()}}.}
 
-\item{ncol}{numeric; the numbers of rows and columns over which to
-spread the plots}
-
-\item{nrow}{numeric; the numbers of rows and columns over which to
+\item{ncol, nrow}{numeric; the numbers of rows and columns over which to
 spread the plots}
 
 \item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
