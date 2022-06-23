@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -149,76 +149,119 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>object</dt>
 <dd><p>an object, the result of a call to <code><a href="evaluate_smooth.html">evaluate_smooth()</a></code>.</p></dd>
+
+
 <dt>rug</dt>
 <dd><p>For <code><a href="evaluate_smooth.html">evaluate_smooth()</a></code>, a numeric vector of values for the
 location of data on the x axis. The default of <code>NULL</code> results in no
 rug plot being drawn. For <code>evaluate_parametric_terms()</code>, a logical to
 indicate if a rug plot should be drawn.</p></dd>
+
+
 <dt>ci_level</dt>
 <dd><p>numeric between 0 and 1; the coverage of credible interval.</p></dd>
+
+
 <dt>constant</dt>
 <dd><p>numeric; a constant to add to the estimated values of the
 smooth. <code>constant</code>, if supplied, will be added to the estimated value
 before the confidence band is computed.</p></dd>
+
+
 <dt>fun</dt>
 <dd><p>function; a function that will be applied to the estimated values
 and confidence interval before plotting. Can be a function or the name of a
 function. Function <code>fun</code> will be applied after adding any <code>constant</code>, if
 provided.</p></dd>
+
+
 <dt>xlab</dt>
 <dd><p>character or expression; the label for the x axis. If not
 supplied, a suitable label will be generated from <code>object</code>.</p></dd>
+
+
 <dt>ylab</dt>
 <dd><p>character or expression; the label for the y axis. If not
 supplied, a suitable label will be generated from <code>object</code>.</p></dd>
+
+
 <dt>title</dt>
 <dd><p>character or expression; the title for the plot. See
 <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggplot2::labs()</a></code>.</p></dd>
+
+
 <dt>subtitle</dt>
 <dd><p>character or expression; the subtitle for the plot. See
 <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggplot2::labs()</a></code>.</p></dd>
+
+
 <dt>caption</dt>
 <dd><p>character or expression; the plot caption. See
 <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggplot2::labs()</a></code>.</p></dd>
+
+
 <dt>partial_residuals</dt>
 <dd><p>data frame; partial residuals and data values if
 partial residuals are drawn. Should have names <code>..p_resid</code> and <code>..orig_x</code>
 if supplied.</p></dd>
+
+
 <dt>response_range</dt>
 <dd><p>numeric; a vector of two values giving the range of
 response data for the guide. Used to fix plots to a common scale/range.
 Ignored if <code>show</code> is set to <code>"se"</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>arguments passed to other methods.</p></dd>
+
+
 <dt>show</dt>
 <dd><p>character; plot the estimated smooth (<code>"estimate"</code>) or its
 standard error (<code>"se"</code>).</p></dd>
+
+
 <dt>contour</dt>
 <dd><p>logical; should contours be draw on the plot using
 <code><a href="https://ggplot2.tidyverse.org/reference/geom_contour.html" class="external-link">ggplot2::geom_contour()</a></code>.</p></dd>
+
+
 <dt>contour_col</dt>
 <dd><p>colour specification for contour lines.</p></dd>
+
+
 <dt>n_contour</dt>
 <dd><p>numeric; the number of contour bins. Will result in
 <code>n_contour - 1</code> contour lines being drawn. See <code><a href="https://ggplot2.tidyverse.org/reference/geom_contour.html" class="external-link">ggplot2::geom_contour()</a></code>.</p></dd>
+
+
 <dt>continuous_fill</dt>
 <dd><p>suitable scale used for the filled surface. If <code>NULL</code>,
 the default used is <code>scale_fill_distiller(palette = "RdBu", type = "div")</code>.</p></dd>
+
+
 <dt>qq_line</dt>
 <dd><p>logical; draw a reference line through the lower and upper
 theoretical quartiles.</p></dd>
+
+
 <dt>discrete_colour</dt>
 <dd><p>an appropriate discrete colour scale from <code>ggplot2</code>.
 The scale will need to be able to provide as many colours as there are
 levels in the factor variable involved in the smooth. Suitable alternatives
 include <code><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">ggplot2::scale_colour_viridis_d()</a></code>.</p></dd>
+
+
 <dt>position</dt>
 <dd><p>Position adjustment, either as a string, or the result of a
 call to a position adjustment function.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot()</a></code> object.</p>
+    
+
+<p>A <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot()</a></code> object.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -257,7 +300,7 @@ call to a position adjustment function.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

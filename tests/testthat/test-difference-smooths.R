@@ -67,3 +67,17 @@ test_that("difference_smooths() works for a gamm4 model", {
     plt <- draw(ds)
     expect_doppelganger("draw difference_smooths gamm4", plt)
 })
+
+test_that("difference_smooths() works with user data", {
+    df <- with(su_eg4,
+               expand_grid(fac = factor(levels(fac), levels = levels(fac)),
+                           x2 = seq_min_max(x2, n = 20),
+                           x0 = mean(x0)))
+    expect_silent(ds <-
+      difference_smooths(su_m_factor_by, smooth = "s(x2)", data = df))
+    expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
+
+    ## plot
+    plt <- draw(ds)
+    #expect_doppelganger("draw difference_smooths gam", plt)
+})

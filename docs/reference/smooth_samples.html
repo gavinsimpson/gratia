@@ -14,7 +14,7 @@ functions."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,43 +87,66 @@ functions.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>model</dt>
 <dd><p>a fitted model of the supported types</p></dd>
+
+
 <dt>...</dt>
 <dd><p>arguments passed to other methods. For <code><a href="fitted_samples.html">fitted_samples()</a></code>, these
 are passed on to <code>predict.gam()</code>.</p></dd>
+
+
 <dt>term</dt>
 <dd><p>character; select which smooth's posterior to draw from.
 The default (<code>NULL</code>) means the posteriors of all smooths in <code>model</code>
 wil be sampled from. If supplied, a character vector of requested terms.</p></dd>
+
+
 <dt>n</dt>
 <dd><p>numeric; the number of posterior samples to return.</p></dd>
+
+
 <dt>newdata</dt>
 <dd><p>data frame; new observations at which the posterior draws
 from the model should be evaluated. If not supplied, the data used to fit
 the model will be used for <code>newdata</code>, if available in <code>model</code>.</p></dd>
+
+
 <dt>seed</dt>
 <dd><p>numeric; a random seed for the simulations.</p></dd>
+
+
 <dt>freq</dt>
 <dd><p>logical; <code>TRUE</code> to use the frequentist covariance matrix of
 the parameter estimators, <code>FALSE</code> to use the Bayesian posterior
 covariance matrix of the parameters.</p></dd>
+
+
 <dt>unconditional</dt>
 <dd><p>logical; if <code>TRUE</code> (and <code>freq == FALSE</code>) then the
 Bayesian smoothing parameter uncertainty corrected covariance matrix is
 used, if available.</p></dd>
+
+
 <dt>ncores</dt>
 <dd><p>number of cores for generating random variables from a
 multivariate normal distribution. Passed to <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code>.
 Parallelization will take place only if OpenMP is supported (but appears
 to work on Windows with current <code>R</code>).</p></dd>
+
+
 <dt>n_vals</dt>
 <dd><p>numeric; how many locations to evaluate the smooth at if
 <code>newdata</code> not supplied</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble with additional classes <code>"smooth_samples"</code> and
-`"posterior_samples".
-For the <code>"gam"</code> method, the columns currently returned (not in this order)
+    
+
+<p>A tibble with additional classes <code>"smooth_samples"</code> and
+`"posterior_samples".</p>
+
+
+<p>For the <code>"gam"</code> method, the columns currently returned (not in this order)
 are:</p><ul><li><p><code>smooth</code>; character vector. Indicates the smooth function for that
 particular draw,</p></li>
 <li><p><code>term</code>; character vector. Similar to <code>smooth</code>, but will contain the
@@ -208,7 +231,7 @@ change in future versions. Don't rely on position.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

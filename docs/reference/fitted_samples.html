@@ -14,7 +14,7 @@ posterior."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,19 +87,31 @@ posterior.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>model</dt>
 <dd><p>a fitted model of the supported types</p></dd>
+
+
 <dt>...</dt>
 <dd><p>arguments passed to other methods. For <code>fitted_samples()</code>, these
 are passed on to <code>predict.gam()</code>.</p></dd>
+
+
 <dt>n</dt>
 <dd><p>numeric; the number of posterior samples to return.</p></dd>
+
+
 <dt>newdata</dt>
 <dd><p>data frame; new observations at which the posterior draws
 from the model should be evaluated. If not supplied, the data used to fit
 the model will be used for <code>newdata</code>, if available in <code>model</code>.</p></dd>
+
+
 <dt>seed</dt>
 <dd><p>numeric; a random seed for the simulations.</p></dd>
+
+
 <dt>scale</dt>
 <dd><p>character;</p></dd>
+
+
 <dt>method</dt>
 <dd><p>character; the method used to generate samples from the
 posterior distribution of the model. <code>"gaussian"</code>, the default, uses a
@@ -107,23 +119,32 @@ Gaussian approximation to the posterior. <code>"mh"</code> uses a simple Metropo
 Hastings sampler, while <code>"inla"</code> uses a variant of Integrated Nested
 Laplace Approximation due to Wood (2019). Currently, the only available
 option is <code>"gaussian"</code>.</p></dd>
+
+
 <dt>freq</dt>
 <dd><p>logical; <code>TRUE</code> to use the frequentist covariance matrix of
 the parameter estimators, <code>FALSE</code> to use the Bayesian posterior
 covariance matrix of the parameters.</p></dd>
+
+
 <dt>unconditional</dt>
 <dd><p>logical; if <code>TRUE</code> (and <code>freq == FALSE</code>) then the
 Bayesian smoothing parameter uncertainty corrected covariance matrix is
 used, if available.</p></dd>
+
+
 <dt>ncores</dt>
 <dd><p>number of cores for generating random variables from a
 multivariate normal distribution. Passed to <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code>.
 Parallelization will take place only if OpenMP is supported (but appears
 to work on Windows with current <code>R</code>).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble (data frame) with 3 columns containing the posterior
+    
+
+<p>A tibble (data frame) with 3 columns containing the posterior
 predicted values in long format. The columns are</p><ul><li><p><code>row</code> (integer) the row of <code>newdata</code> that each posterior draw relates to,</p></li>
 <li><p><code>draw</code> (integer) an index, in range <code>1:n</code>, indicating which draw each row
 relates to,</p></li>
@@ -179,7 +200,7 @@ relates to,</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

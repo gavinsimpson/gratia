@@ -14,7 +14,7 @@ mgcv::t2()."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,24 +74,37 @@ of <em>mgcv</em>'s smooths via <code><a href="https://rdrr.io/pkg/mgcv/man/s.htm
     <dl><dt>smooth</dt>
 <dd><p>a smooth specification, the result of a call to one of
 <code><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">mgcv::s()</a></code>., <code><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">mgcv::te()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">mgcv::ti()</a></code>, or <code><a href="https://rdrr.io/pkg/mgcv/man/t2.html" class="external-link">mgcv::t2()</a></code>.</p></dd>
+
+
 <dt>data</dt>
 <dd><p>a data frame containing the variables used in <code>smooth</code>.</p></dd>
+
+
 <dt>knots</dt>
 <dd><p>a list or data frame with named components containing
 knots locations. Names must match the covariates for which the basis
 is required. See <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html" class="external-link">mgcv::smoothCon()</a></code>.</p></dd>
+
+
 <dt>constraints</dt>
 <dd><p>logical; should identifiability constraints be applied to
 the smooth basis. See argument <code>absorb.cons</code> in <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html" class="external-link">mgcv::smoothCon()</a></code>.</p></dd>
+
+
 <dt>at</dt>
 <dd><p>a data frame containing values of the smooth covariate(s) at which
 the basis should be evaluated.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>other arguments passed to <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html" class="external-link">mgcv::smoothCon()</a></code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble.</p>
+    
+
+<p>A tibble.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -118,7 +131,7 @@ the basis should be evaluated.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

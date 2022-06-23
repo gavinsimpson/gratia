@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,25 +82,38 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>object</dt>
 <dd><p>a fitted GAM or a smooth.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>additional arguments passed to methods.</p></dd>
+
+
 <dt>smooth</dt>
 <dd><p>character; vector of smooths to extract penalty matrices for.
 If <code>NULL</code>, penalty matrices for all smooths in <code>object</code> are extracted.</p></dd>
+
+
 <dt>rescale</dt>
 <dd><p>logical; by default, <em>mgcv</em> will scale the penalty matrix for
 better performance in <code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">mgcv::gamm()</a></code>. If <code>rescale</code> is <code>TRUE</code>, this scaling
 will be undone to put the penalty matrix back on the original scale.</p></dd>
+
+
 <dt>margins</dt>
 <dd><p>logical; extract the penalty matrices for the tensor
 product or the marginal smooths of the tensor product?</p></dd>
+
+
 <dt>data</dt>
 <dd><p>data frame; a data frame of values for terms mentioned in the
 smooth specification.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A 'tibble' (data frame) of class <code>penalty_df</code> inheriting from
+    
+
+<p>A 'tibble' (data frame) of class <code>penalty_df</code> inheriting from
 <code>tbl_df</code>, with the following components:</p><ul><li><p><code>smooth</code> - character; the label <em>mgcv</em> uses to refer to the smooth,</p></li>
 <li><p><code>type</code> - character; the type of smooth,</p></li>
 <li><p><code>penalty</code> - character; the label for the specific penalty. Some smooths
@@ -187,7 +200,7 @@ specific.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

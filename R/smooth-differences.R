@@ -5,7 +5,7 @@
 #' @param n numeric; the number of points at which to evaluate the difference
 #'   between pairs of smooths.
 #' @param ci_level numeric between 0 and 1; the coverage of credible interval.
-#' @param newdata data frame of locations at which to evaluate the difference
+#' @param data data frame of locations at which to evaluate the difference
 #'   between smooths.
 #' @param partial_match logical; should `smooth` match partially against
 #'   `smooths`? If `partial_match = TRUE`, `smooth` must only be a single
@@ -14,7 +14,7 @@
 #'   against factor-by smooth labels.
 #' @param unconditional logical; account for smoothness selection in the model?
 #' @param frequentist logical; use the frequentist covariance matrix?
-#' @param ... arguments passed to other methods.
+#' @param ... arguments passed to other methods. Not currently used.
 #'
 #' @export
 #' @examples
@@ -45,7 +45,7 @@
                                      smooth,
                                      n = 100,
                                      ci_level = 0.95,
-                                     newdata = NULL,
+                                     data = NULL,
                                      partial_match = TRUE,
                                      unconditional = FALSE,
                                      frequentist = FALSE,
@@ -63,22 +63,26 @@
                                   model_name = expr_label(substitute(object)))
     sm_ids <- which(select)
     smooths <- get_smooths_by_id(model, sm_ids)
-    sm_data <- map(sm_ids, smooth_data,
-                   model = model, n = n, include_all = TRUE)
-    sm_data <- bind_rows(sm_data)
+    if (is.null(data)) {
+        sm_data <- map(sm_ids, smooth_data,
+                       model = model, n = n, include_all = TRUE)
+        data <- bind_rows(sm_data)
+    } else {
+        data <- as_tibble(data)
+    }
     by_var <- by_variable(smooths[[1L]])
     smooth_var <- smooth_variable(smooths[[1L]])
-    pairs <- as_tibble(as.data.frame(t(combn(levels(sm_data[[by_var]]), 2)),
+    pairs <- as_tibble(as.data.frame(t(combn(levels(data[[by_var]]), 2)),
                                      stringsAsFactor = FALSE))
     names(pairs) <- paste0("f", 1:2)
 
-    Xp <- predict(model, newdata = sm_data, type = "lpmatrix")
+    Xp <- predict(model, newdata = data, type = "lpmatrix")
     V <- get_vcov(model, unconditional = unconditional,
                   frequentist = frequentist)
     coefs <- coef(model)
 
     out <- pmap(pairs, calc_difference, smooth = smooth, by_var = by_var,
-                smooth_var = smooth_var, data = sm_data, Xp = Xp, V = V,
+                smooth_var = smooth_var, data = data, Xp = Xp, V = V,
                 coefs = coefs)
     out <- bind_rows(out)
     crit <- qnorm((1 - ci_level) / 2, lower.tail = FALSE)
@@ -109,7 +113,8 @@
 
 #' @importFrom tibble new_tibble
 #' @importFrom dplyr bind_cols
-`calc_difference` <- function(f1, f2, smooth, by_var, smooth_var, data, Xp, V, coefs) {
+`calc_difference` <- function(f1, f2, smooth, by_var, smooth_var, data, Xp, V,
+                              coefs) {
     ## make sure f1 and f2 are characters
     f1 <-  as.character(f1)
     f2 <-  as.character(f2)
@@ -141,6 +146,6 @@
     out <- new_tibble(out, nrow = NROW(X), class = "difference_smooth")
     ## Only need rows associated with one of the levels
     out <- bind_cols(out, data[r1, smooth_var])
-    
+
     out
 }

@@ -12,7 +12,7 @@ derivatives of smooth terms in a fitted GAM."><!-- mathjax --><script src="https
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,30 +80,45 @@ derivatives of smooth terms in a fitted GAM.</p>
     <dl><dt>object</dt>
 <dd><p>an object of class <code>"fderiv"</code> containing the estimated
 derivatives.</p></dd>
+
+
 <dt>parm</dt>
 <dd><p>which parameters (smooth terms) are to be given intervals as a
 vector of terms. If missing, all parameters are considered.</p></dd>
+
+
 <dt>level</dt>
 <dd><p>numeric, <code>0 &lt; level &lt; 1</code>; the confidence level of the
 point-wise or simultaneous interval. The default is <code>0.95</code> for a 95%
 interval.</p></dd>
+
+
 <dt>type</dt>
 <dd><p>character; the type of interval to compute. One of <code>"confidence"</code>
 for point-wise intervals, or <code>"simultaneous"</code> for simultaneous intervals.</p></dd>
+
+
 <dt>nsim</dt>
 <dd><p>integer; the number of simulations used in computing the
 simultaneous intervals.</p></dd>
+
+
 <dt>ncores</dt>
 <dd><p>number of cores for generating random variables from a
 multivariate normal distribution. Passed to <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code>.
 Parallelization will take place only if OpenMP is supported (but appears
 to work on Windows with current <code>R</code>).</p></dd>
+
+
 <dt>...</dt>
 <dd><p>additional arguments for methods</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>a data frame with components:</p><ol><li><p><code>term</code>; factor indicating to which term each row relates,</p></li>
+    
+
+<p>a data frame with components:</p><ol><li><p><code>term</code>; factor indicating to which term each row relates,</p></li>
 <li><p><code>lower</code>; lower limit of the confidence or simultaneous interval,</p></li>
 <li><p><code>est</code>; estimated derivative</p></li>
 <li><p><code>upper</code>; upper limit of the confidence or simultaneous interval.</p></li>
@@ -191,7 +206,7 @@ to work on Windows with current <code>R</code>).</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>
