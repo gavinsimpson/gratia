@@ -1,10 +1,10 @@
 pandoc: 2.14.2
-pkgdown: 2.0.4
+pkgdown: 2.0.5
 pkgdown_sha: ~
 articles:
   custom-plotting: custom-plotting.html
   gratia: gratia.html
-last_built: 2022-06-24T13:30Z
+last_built: 2022-06-24T17:39Z
 urls:
   reference: https://gavinsimpson.github.io/gratia/reference
   article: https://gavinsimpson.github.io/gratia/articles

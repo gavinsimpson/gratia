@@ -9,8 +9,9 @@
 
 * `data_slice()` has been totally revised. Now, the user provides the values for
   the variables they want in the slice and any variables in the model that are
-  not specified will be held at typical values (value of the observation that
-  is closest to the median for numeric variables, or the model factor level.)
+  not specified will be held at typical values (i.e. the value of the
+  observation that is closest to the median for numeric variables, or the modal
+  factor level.)
 
   Data slices are now produced by passing `name` = `value` pairs for the
   variables and their values that you want to appear in the slice. For example
