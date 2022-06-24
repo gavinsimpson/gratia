@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,13 +54,22 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.7.3.2" id="gratia-0732-in-development">gratia 0.7.3.2 (In development)<a class="anchor" aria-label="anchor" href="#gratia-0732-in-development"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.7.3.3" id="gratia-0733-in-development">gratia 0.7.3.3 (In development)<a class="anchor" aria-label="anchor" href="#gratia-0733-in-development"></a></h2>
 <div class="section level3">
-<h3 id="new-features-0-7-3-2">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-3-2"></a></h3>
-<ul><li>
-<code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> will now use the user-supplied data as points at which to evaluate a pair of smooths. Also note that the argument <code>newdata</code> has been renamed <code>data</code>. <a href="https://github.com/gavinsimpson/gratia/issues/175" class="external-link">#175</a></li></ul></div>
+<h3 id="new-features-0-7-3-3">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-3-3"></a></h3>
+<ul><li><p><code><a href="../reference/evenly.html">evenly()</a></code> is a synonym for <code><a href="../reference/evenly.html">seq_min_max()</a></code> and is preferred going forward.</p></li>
+<li><p><code><a href="../reference/model_vars.html">model_vars()</a></code> is a new, public facing way of returning a vector of variables that are used in a model.</p></li>
+<li>
+<p><code><a href="../reference/data_slice.html">data_slice()</a></code> has been totally revised. Now, the user provides the values for the variables they want in the slice and any variables in the model that are not specified will be held at typical values (value of the observation that is closest to the median for numeric variables, or the model factor level.)</p>
+<p>Data slices are now produced by passing <code>name</code> = <code>value</code> pairs for the variables and their values that you want to appear in the slice. For example</p>
+<pre><code><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="va">x2</span> <span class="op">+</span> <span class="va">fac</span><span class="op">)</span>
+<span class="fu"><a href="../reference/data_slice.html">data_slice</a></span><span class="op">(</span><span class="va">model</span>, x1 <span class="op">=</span> <span class="fu"><a href="../reference/evenly.html">evenly</a></span><span class="op">(</span><span class="va">x1</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>, x2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span><span class="op">)</span></code></pre>
+<p>The <code>value</code> in the pair can be an expression that will be looked up (evaluated) in the <code>data</code> argument or the model frame of the fitted model (the default). In the above example, the resulting slice will be a data frame of 100 observations, comprising <code>x1</code>, which is a vector of 100 values spread evenly over the range of <code>x1</code>, a constant value of the mean of <code>x2</code> for the <code>x2</code> variable, and a constant factor level, the model class of <code>fac</code>, for the <code>fac</code> variable of the model.</p>
+</li>
+<li><p><code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> will now use the user-supplied data as points at which to evaluate a pair of smooths. Also note that the argument <code>newdata</code> has been renamed <code>data</code>. <a href="https://github.com/gavinsimpson/gratia/issues/175" class="external-link">#175</a></p></li>
+</ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-7-3-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-3-2"></a></h3>
+<h3 id="bug-fixes-0-7-3-3">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-3-3"></a></h3>
 <ul><li>
 <code>draw.posterior_smooths</code> now plots posterior samples with a fixed aspect ratio if the smooth is isotropic. <a href="https://github.com/gavinsimpson/gratia/issues/148" class="external-link">#148</a></li></ul></div>
 </div>

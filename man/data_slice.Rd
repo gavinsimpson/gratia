@@ -4,48 +4,54 @@
 \alias{data_slice}
 \alias{data_slice.default}
 \alias{data_slice.gam}
+\alias{data_slice.gamm}
 \alias{data_slice.list}
-\title{Prepare a data slice through covariates}
+\title{Prepare a data slice through model covariates}
 \usage{
 data_slice(object, ...)
 
 \method{data_slice}{default}(object, ...)
 
-\method{data_slice}{gam}(
-  object,
-  var1,
-  var2 = NULL,
-  var3 = NULL,
-  var4 = NULL,
-  data = NULL,
-  n = 50,
-  offset = NULL,
-  ...
-)
+\method{data_slice}{gam}(object, ..., data = NULL, offset = NULL)
+
+\method{data_slice}{gamm}(object, ...)
 
 \method{data_slice}{list}(object, ...)
 }
 \arguments{
 \item{object}{an R model object.}
 
-\item{...}{arguments passed to other methods.}
+\item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> User supplied variables
+defining the data slice. Arguments passed via \code{...} need to \emph{named}}
 
-\item{var1}{character;}
-
-\item{var2}{character;}
-
-\item{var3}{character; ignored currently.}
-
-\item{var4}{character; ignored currently.}
-
-\item{data}{a 1-row data frame or tibble containing values for variables in
-the fitted model that are not varying in the slice.}
-
-\item{n}{numeric; the number of values to create for each of \code{var1} and
-\code{var2}in the slice.}
+\item{data}{an alternative data frame of values containing all the variables
+needed to fit the model. If \code{NULL}, the default, the data used to fit the
+model will be recovered using \code{model.frame}. User-supplied expressions
+passed in \code{...} will be evaluated in \code{data}.}
 
 \item{offset}{numeric; value to use for an offset term in the model.}
 }
 \description{
-Prepare a data slice through covariates
+Prepare a data slice through model covariates
+}
+\examples{
+load_mgcv()
+
+# simulate some Gaussian data
+df <- data_sim("eg1", n = 50, seed = 2)
+
+# fit a GAM with 1 smooth and 1 linear term
+m1 <- gam(y ~ s(x2, k = 7) + x1, data = df, method = "REML")
+
+# Want to predict over f(x2) while holding `x1` at some value.
+# Default will use the observation closest to the median for unspecified
+# variables.
+ds <- data_slice(m1, x2 = evenly(x2, n = 50))
+
+# for full control, specify the values you want
+ds <- data_slice(m1, x2 = evenly(x2, n = 50), x1 = 0.3)
+
+# or provide an expression (function call) which will be evaluated in the
+# data frame passed to `data` or `model.frame(object)`
+ds <- data_slice(m1, x2 = evenly(x2, n = 50), x1 = mean(x1))
 }

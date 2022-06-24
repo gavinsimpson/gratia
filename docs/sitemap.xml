@@ -145,6 +145,9 @@
     <loc>https://gavinsimpson.github.io/gratia/reference/evaluate_smooth.html</loc>
   </url>
   <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/evenly.html</loc>
+  </url>
+  <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/factor_combos.html</loc>
   </url>
   <url>
@@ -217,6 +220,9 @@
     <loc>https://gavinsimpson.github.io/gratia/reference/model_concurvity.html</loc>
   </url>
   <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/model_vars.html</loc>
+  </url>
+  <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/n_smooths.html</loc>
   </url>
   <url>
@@ -230,6 +236,9 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/observed_fitted_plot.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/old_data_slice.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/parametric_effects.html</loc>
@@ -266,9 +275,6 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/rootogram.html</loc>
-  </url>
-  <url>
-    <loc>https://gavinsimpson.github.io/gratia/reference/seq_min_max.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/seq_min_max_eps.html</loc>

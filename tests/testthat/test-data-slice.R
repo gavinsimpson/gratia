@@ -1,16 +1,22 @@
-## Test data_slice() methods
+# Test data_slice() methods
 
-## load packages
+# load packages
 library("testthat")
 library("gratia")
 library("mgcv")
 
 test_that("data_slice works for a GAM", {
-    expect_silent(ds <- data_slice(su_m_quick_eg1, var1 = "x1", var2 = "x2"))
+    expect_silent(ds <- data_slice(su_m_quick_eg1,
+                                   x1 = evenly(x1, n = 50),
+                                   x2 = evenly(x2, n = 50)))
     expect_s3_class(ds, "tbl_df")
     expect_named(ds, c("x1", "x2", "x0", "x3"))
-    expect_error(data_slice(su_m_quick_eg1, var1 = "x1", var2 = "foo"),
-                 "Variable <foo> not found in data.", fixed = TRUE)
+    expect_message(data_slice(su_m_quick_eg1,
+                              x1 = evenly(x1, n = 50), var2 = "foo"),
+                   "Some specified variable\\(s\\) not used in model")
+    expect_message(data_slice(su_m_quick_eg1,
+                              x1 = evenly(x1, n = 50), var2 = "foo"),
+                   "var2")
 })
 
 test_that("process_slice_data works when passed a 1-row data frame, tibble, or list", {
@@ -62,19 +68,21 @@ test_that("process_slice_var returns NULL when `x` is NULL", {
     expect_identical( process_slice_var(NULL, dat2), NULL)
 })
 
-set.seed(42)
-dat <- gamSim(4, n = 400, verbose = FALSE)
-mf <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
+#set.seed(42)
+#dat <- gamSim(4, n = 400, verbose = FALSE)
+#mf <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
 
 test_that("data_slice works for a GAM with factor by", {
-    expect_silent(ds <- data_slice(mf, var1 = "x2", var2 = "fac"))
+    expect_silent(ds <- data_slice(su_m_factor_by,
+                                   x2 = evenly(x2),
+                                   fac = evenly(fac)))
     expect_s3_class(ds, "tbl_df")
     expect_named(ds, c("x2", "fac", "x0"))
 })
 
 test_that("default data_slice method fails gracefully", {
-    expect_error(data_slice(dat),
-                 "Don't know how to create a data slice from <data.frame>",
+    expect_error(data_slice(su_eg4),
+                 "Don't know how to create a data slice from <tbl_df>",
                  fixed = TRUE)
 })
 
@@ -85,14 +93,16 @@ test_that("value_closest_to_median fails for character vectors", {
 })
 
 test_that("value_closest_to_median fails for logical vectors", {
-    expect_error(value_closest_to_median(sample(c(TRUE, FALSE), 50, replace = TRUE)),
+    expect_error(value_closest_to_median(sample(c(TRUE, FALSE), 50,
+                                                replace = TRUE)),
                  "'x' must be a factor or numeric vector. Supplied <logical>",
                  fixed = TRUE)
 })
 
 test_that("value_closest_to_median works with a factor", {
-    expect_silent( result <- gratia:::value_closest_to_median(dat[["fac"]]) )
-    expect_identical(factor(3, levels = c(1,2,3)), result)
+    expect_silent( result <- 
+      gratia:::value_closest_to_median(su_eg4[["fac"]]) )
+    expect_identical(factor(1, levels = c(1,2,3)), result)
 })
 
 # typical_values()
