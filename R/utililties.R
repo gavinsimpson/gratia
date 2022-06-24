@@ -554,12 +554,14 @@
 
 #' @title Create a sequence of evenly-spaced values
 #'
-#' @description For a continuous vector `x`, `seq_min_max()` creates a
-#'   sequence of `n` evenly-spaced values over the range `min(x)` -- 
-##"   `max(x)`. For a factor `x`, the function returns `levels(x)`.
+#' @description For a continuous vector `x`, `evenly` and `seq_min_max()`
+#'   create a sequence of `n` evenly-spaced values over the range `min(x)`
+#'   -- `max(x)`. For a factor `x`, the function returns `levels(x)`.
 #'
 #' @param x numeric; vector over which evenly-spaced values are returned
-#' @param n numeric; the number of evenly-spaced values to return
+#' @param n numeric; the number of evenly-spaced values to return. A default of
+#'   `100` is used for convenience as that what is typically used when
+#'   evaluating a smooth.
 #'
 #' @return A numeric vector of length `n`.
 #'
@@ -569,7 +571,19 @@
 #' \dontshow{set.seed(1)}
 #' x <- rnorm(10)
 #' n <- 10L
-#' seq_min_max(x, n = n)
+#' evenly(x, n = n)
+`evenly` <- function(x, n = 100) {
+    if (is.factor(x)) {
+        ## must coerce to factor otherwise Predict.matrix will coerce
+        ## and that will end up with levels in the wrong order
+        factor(levels(x), levels = levels(x))
+    } else {
+        seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
+            length.out = n)
+    }
+}
+
+#' @rdname evenly
 `seq_min_max` <- function(x, n) {
     if (is.factor(x)) {
         ## must coerce to factor otherwise Predict.matrix will coerce
@@ -1277,4 +1291,95 @@ vars_from_label <- function(label) {
         out <- TRUE
     }
     out
+}
+
+#' List the variables involved in a model fitted with a formula
+#' 
+#' @param model a fitted model object with a `$pred.formula`, `$terms`
+#'   component or a `"terms"` attribute
+#' @param ... Arguments passed to other methods. Currently ignored.
+#'
+#' @export
+#'
+#' @examples
+#' load_mgcv()
+#' 
+#' # simulate some Gaussian data
+#' df <- data_sim("eg1", n = 50, seed = 2)
+#' 
+#' # fit a GAM with 1 smooth and 1 linear term
+#' m1 <- gam(y ~ s(x2, k = 7) + x1, data = df, method = "REML")
+#' model_vars(m1)
+#' 
+#' # fit a lm with two linear terms
+#' m2 <- lm(y ~ x2 + x1, data = df)
+#' model_vars(m2)
+`model_vars` <- function(model, ...) {
+    UseMethod("model_vars")
+}
+
+#' @export
+#' @rdname model_vars
+`model_vars.gam` <- function(model, ...){
+    # want a vector of variables involved in the model formula.
+    # Don't want this `attr(terms(model), "term.labels")` ! as this returns
+    # model terms not variable names. Use all.vars() on `pred.formula` for
+    # a GAM(M) model
+    all.vars(model$pred.formula)
+}
+
+#' @export
+#' @rdname model_vars
+`model_vars.default` <- function(model, ...){
+    # want a vector of variables involved in the model formula
+    tt <- terms(model)
+    if (is.null(tt)) {
+        stop("`terms()` not available for `model`.")
+    }
+    tt <- delete.response(tt) 
+    all.vars(attr(tt, "variables"))
+}
+
+#' @export
+#' @rdname model_vars
+`model_vars.bam` <- function(model, ...){
+    # want a vector of variables involved in the model formula.
+    # Don't want this `attr(terms(model), "term.labels")` ! as this returns
+    # model terms not variable names. Use all.vars() on `pred.formula` for
+    # a GAM(M) model
+    all.vars(model$pred.formula)
+}
+
+#' @export
+#' @rdname model_vars
+`model_vars.gamm` <- function(model, ...){
+    # want a vector of variables involved in the model formula.
+    # Don't want this `attr(terms(model), "term.labels")` ! as this returns
+    # model terms not variable names. Use all.vars() on `pred.formula` for
+    # a GAM(M) model
+    model_vars(model[["gam"]]$pred.formula)
+}
+
+#' @export
+#' @rdname model_vars
+`model_vars.gamm4` <- function(model, ...){
+    # this is here for when Simon actually classes gamm4 objects
+    # want a vector of variables involved in the model formula.
+    # Don't want this `attr(terms(model), "term.labels")` ! as this returns
+    # model terms not variable names. Use all.vars() on `pred.formula` for
+    # a GAM(M) model
+    model_vars(model[["gam"]]$pred.formula)
+}
+
+#' @export
+#' @rdname model_vars
+`model_vars.list` <- function(model, ...){
+    # want a vector of variables involved in the model formula.
+    # Don't want this `attr(terms(model), "term.labels")` ! as this returns
+    # model terms not variable names. Use all.vars() on `pred.formula` for
+    # a GAM(M) model
+    if (!is_gamm4(model)) {
+        stop("Don't know how to handle generic list objects.")
+    }
+    model_vars(model[["gam"]]$pred.formula)
 }
