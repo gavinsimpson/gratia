@@ -1,7 +1,8 @@
-#' Prepare a data slice through covariates
+#' Prepare a data slice through model covariates
 #'
 #' @param object an R model object.
-#' @param ... arguments passed to other methods.
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> User supplied variables
+#'   defining the data slice. Arguments passed via `...` need to *named*
 #'
 #' @export
 `data_slice` <- function(object, ...) {
@@ -15,6 +16,89 @@
          ">", call. = FALSE)
 }
 
+#' @param data an alternative data frame of values containing all the variables
+#'   needed to fit the model. If `NULL`, the default, the data used to fit the
+#'   model will be recovered using `model.frame`. User-supplied expressions
+#'   passed in `...` will be evaluated in `data`.
+#' @param offset numeric; value to use for an offset term in the model.
+#'
+#' @export
+#' @rdname data_slice
+#' @importFrom tidyr expand_grid
+#' @importFrom rlang enquos eval_tidy
+#' @importFrom stats model.frame
+#'
+#' @examples
+#' load_mgcv()
+#' 
+#' # simulate some Gaussian data
+#' df <- data_sim("eg1", n = 50, seed = 2)
+#' 
+#' # fit a GAM with 1 smooth and 1 linear term
+#' m1 <- gam(y ~ s(x2, k = 7) + x1, data = df, method = "REML")
+#' 
+#' # Want to predict over f(x2) while holding `x1` at some value.
+#' # Default will use the observation closest to the median for unspecified
+#' # variables.
+#' ds <- data_slice(m1, x2 = evenly(x2, n = 50))
+#' 
+#' # for full control, specify the values you want
+#' ds <- data_slice(m1, x2 = evenly(x2, n = 50), x1 = 0.3)
+#' 
+#' # or provide an expression (function call) which will be evaluated in the
+#' # data frame passed to `data` or `model.frame(object)`
+#' ds <- data_slice(m1, x2 = evenly(x2, n = 50), x1 = mean(x1))
+`data_slice.gam` <- function(object, ..., data = NULL, offset = NULL) {
+
+    if (is.null(data)) {
+        data <- delete_response(object) %>% as_tibble()
+    }
+    
+    # deal with ...
+    ##ellipsis::check_dots_unnamed()
+    exprs <- rlang::enquos(...)
+    slice_vars <- purrr::map(exprs, rlang::eval_tidy, data = data)
+
+    # check now if there are elements of slice_vars that aren't in the model
+    vars <- model_vars(object)
+    nms <- names(slice_vars)
+    if (any(i <- ! nms %in% vars)) {
+        message("Some specified variable(s) not used in model:\n",
+                paste(" * ", nms[i], collapse = "\n", sep = ""),
+                "\n")
+    }
+
+    # typical values, only needed ones that aren't
+    need_tv <- setdiff(vars, names(slice_vars))
+    if (length(need_tv) > 0L) {
+        tv <- typical_values(object)
+        slice_vars <- append(slice_vars, tv[need_tv])
+    }
+
+    expand_grid(!!!{slice_vars})
+}
+
+#' @export
+#' @rdname data_slice
+`data_slice.gamm` <- function(object, ...) { # for gamm() models
+    data_slice(object[["gam"]], ...)
+}
+
+#' @export
+#' @rdname data_slice
+`data_slice.list` <- function(object, ...) { # for gamm4 lists only
+    ## Is this list likely to be a gamm4 list?
+    if (! is_gamm4(object)) {
+        stop("`object` does not appear to a `gamm4` model object",
+             call. = FALSE)
+    }
+    data_slice(object[["gam"]], ...)
+}
+
+
+#' Deprecated version of `data_slice`
+#'
+#' @param object A model object.
 #' @param var1 character;
 #' @param var2 character;
 #' @param var3 character; ignored currently.
@@ -24,16 +108,18 @@
 #' @param n numeric; the number of values to create for each of `var1` and
 #'   `var2`in the slice.
 #' @param offset numeric; value to use for an offset term in the model.
+#' @param ... arguments passed to other methods.
 #'
 #' @export
-#' @rdname data_slice
+#' @rdname old_data_slice
 #'
 #' @importFrom tidyr nesting
 #' @importFrom tibble as_tibble
 #' @importFrom stats model.frame
 #' @importFrom rlang exec
-`data_slice.gam` <- function(object, var1, var2 = NULL, var3 = NULL, var4 = NULL,
-                             data = NULL, n = 50, offset = NULL, ...) {
+`old_data_slice.gam` <- function(object, var1, var2 = NULL, var3 = NULL,
+                                 var4 = NULL,
+                                 data = NULL, n = 50, offset = NULL, ...) {
     ## we need the model frame to get data from
     mf <- model.frame(object)
     ## remove response
@@ -89,17 +175,7 @@
     result # return
 }
 
-#' @export
-#' @rdname data_slice
-`data_slice.list` <- function(object, ...) { # for gamm4 lists only
-    ## Is this list likely to be a gamm4 list?
-    if (! is_gamm4(object)) {
-        stop("`object` does not appear to a `gamm4` model object", call. = FALSE)
-    }
-    data_slice(object[["gam"]], ...)
-}
-
-#' @importFrom stats median
+#' @importFrom stats median quantile
 `value_closest_to_median` <- function(x) {
     ## only work on numeric or factor variables
     is_fac <- is.factor(x)
@@ -120,11 +196,13 @@
         result <- factor(result, levels = levs)
     }
 
-    ## if x is numeric, return the median value
+    ## if x is numeric, return the observation closest to median value
     if (is_num) {
-        med <- median(x, na.rm = TRUE)      # median
-        dif <- abs(x - med)
-        result <- x[which.min(dif)]
+        # mgcv prefers this to `median()` as it is a data point
+        med <- quantile(x, na.rm = TRUE, prob = 0.5, type = 3)
+        # and as a result we don't need to find the value closest to med
+        # as that's what `type` does
+        result <- unname(med)
     }
 
     result
@@ -231,7 +309,7 @@
 
     # for numeric variables summ is a vector with 3 elements, we want element 2
     # which contains the value of the observation closest to the median
-    # probably need to handle matrix covariates here seperately from numerics
+    # probably need to handle matrix covariates here separately from numerics
     dc <- data_class(summ)
     i <-  dc == "numeric" & lengths(summ) == 3L
     summ[i] <- lapply(summ[i], `[`, 2)
