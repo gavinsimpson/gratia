@@ -2,6 +2,32 @@
 
 ## New features
 
+* `evenly()` is a synonym for `seq_min_max()` and is preferred going forward.
+
+* `model_vars()` is a new, public facing way of returning a vector of variables
+  that are used in a model.
+
+* `data_slice()` has been totally revised. Now, the user provides the values for
+  the variables they want in the slice and any variables in the model that are
+  not specified will be held at typical values (value of the observation that
+  is closest to the median for numeric variables, or the model factor level.)
+
+  Data slices are now produced by passing `name` = `value` pairs for the
+  variables and their values that you want to appear in the slice. For example
+
+  ```
+  m <- gam(y ~ s(x1) + x2 + fac)
+  data_slice(model, x1 = evenly(x1, n = 100), x2 = mean(x2))
+  ```
+
+  The `value` in the pair can be an expression that will be looked up
+  (evaluated) in the `data` argument or the model frame of the fitted model
+  (the default). In the above example, the resulting slice will be a data frame
+  of 100 observations, comprising `x1`, which is a vector of 100 values spread
+  evenly over the range of `x1`, a constant value of the mean of `x2` for the
+  `x2` variable, and a constant factor level, the model class of `fac`, for the
+  `fac` variable of the model.
+
 * `difference_smooths()` will now use the user-supplied data as points at
 which to evaluate a pair of smooths. Also note that the argument `newdata` has
 been renamed `data`. #175
