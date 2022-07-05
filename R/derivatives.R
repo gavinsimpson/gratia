@@ -80,7 +80,6 @@
 #'
 #' load_mgcv()
 #' \dontshow{
-#' set.seed(42)
 #' op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 #' }
 #' dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 42)
