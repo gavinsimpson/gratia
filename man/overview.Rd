@@ -12,7 +12,8 @@ overview(model, ...)
   parametric = TRUE,
   random_effects = TRUE,
   dispersion = NULL,
-  freq = FALSE,
+  frequentist = FALSE,
+  accuracy = 0.001,
   ...
 )
 }
@@ -20,6 +21,28 @@ overview(model, ...)
 \item{model}{a fitted model object to overview.}
 
 \item{...}{arguments passed to other methods.}
+
+\item{parametric}{logical; include the model parametric terms in the
+overview?}
+
+\item{random_effects}{tests of fully penalized smooth terms (those with a
+zero-dimensaionl null space, e.g. random effects) are computationally
+expensive and for large data sets producing these p values can take a
+very long time. If \code{random_effects = FALSE}, the tests of the expensive
+terms will be skipped.}
+
+\item{dispersion}{numeric; a known value for the dispersion parameter. The
+default \code{NULL} implies that the estimated value or the default value (1
+for the Poisson distribution for example) where this is specified is used
+instead.}
+
+\item{frequentist}{logical; by default the Bayesian estimated covariance
+matrix of the parameter estimates is used to calculate p values for
+parametric terms. If \code{frequentist = FALSE}, the frequentist covariance
+matrix of the parameter estimates is used.}
+
+\item{accuracy}{numeric; accuracy with which to report p values, with p
+values below this value displayed as \code{"< 0.001"}.}
 }
 \description{
 Provides an overview of a model and the terms in that model

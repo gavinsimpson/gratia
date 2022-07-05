@@ -68,7 +68,8 @@
 <span>  parametric <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  random_effects <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  dispersion <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  freq <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  accuracy <span class="op">=</span> <span class="fl">0.001</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -81,6 +82,38 @@
 
 <dt>...</dt>
 <dd><p>arguments passed to other methods.</p></dd>
+
+
+<dt>parametric</dt>
+<dd><p>logical; include the model parametric terms in the
+overview?</p></dd>
+
+
+<dt>random_effects</dt>
+<dd><p>tests of fully penalized smooth terms (those with a
+zero-dimensaionl null space, e.g. random effects) are computationally
+expensive and for large data sets producing these p values can take a
+very long time. If <code>random_effects = FALSE</code>, the tests of the expensive
+terms will be skipped.</p></dd>
+
+
+<dt>dispersion</dt>
+<dd><p>numeric; a known value for the dispersion parameter. The
+default <code>NULL</code> implies that the estimated value or the default value (1
+for the Poisson distribution for example) where this is specified is used
+instead.</p></dd>
+
+
+<dt>frequentist</dt>
+<dd><p>logical; by default the Bayesian estimated covariance
+matrix of the parameter estimates is used to calculate p values for
+parametric terms. If <code>frequentist = FALSE</code>, the frequentist covariance
+matrix of the parameter estimates is used.</p></dd>
+
+
+<dt>accuracy</dt>
+<dd><p>numeric; accuracy with which to report p values, with p
+values below this value displayed as <code>"&lt; 0.001"</code>.</p></dd>
 
 </dl></div>
 
