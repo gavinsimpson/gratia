@@ -32,6 +32,20 @@
 #' @importFrom tibble rownames_to_column as_tibble add_column
 #' @importFrom tidyselect matches
 #' @importFrom rlang set_names .data
+#' 
+#' @examples
+#' 
+#' load_mgcv()
+#' \dontshow{
+#' op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
+#' }
+#' df <- data_sim(n = 400, seed = 2)
+#' m <- gam(y ~ x3 + s(x0) + s(x1, bs = "bs") + s(x2, bs = "ts"),
+#'          data = df, method = "REML")
+#' overview(m)
+#' \dontshow{
+#' options(op)
+#' }
 `overview.gam` <- function(model, parametric = TRUE, random_effects = TRUE,
                            dispersion = NULL, frequentist = FALSE,
                            accuracy = 0.001,
