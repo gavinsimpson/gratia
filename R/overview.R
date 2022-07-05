@@ -8,6 +8,24 @@
     UseMethod("overview")
 }
 
+#' @param parametric logical; include the model parametric terms in the
+#'   overview?
+#' @param random_effects tests of fully penalized smooth terms (those with a
+#'   zero-dimensaionl null space, e.g. random effects) are computationally
+#'   expensive and for large data sets producing these p values can take a
+#'   very long time. If `random_effects = FALSE`, the tests of the expensive
+#'   terms will be skipped.
+#' @param dispersion numeric; a known value for the dispersion parameter. The
+#'   default `NULL` implies that the estimated value or the default value (1
+#'   for the Poisson distribution for example) where this is specified is used
+#'   instead.
+#' @param frequentist logical; by default the Bayesian estimated covariance
+#'   matrix of the parameter estimates is used to calculate p values for
+#'   parametric terms. If `frequentist = FALSE`, the frequentist covariance
+#'   matrix of the parameter estimates is used.
+#' @param accuracy numeric; accuracy with which to report p values, with p
+#'   values below this value displayed as `"< 0.001"`.
+#'
 #' @export
 #' @rdname overview
 #' @importFrom dplyr %>% select
@@ -15,10 +33,11 @@
 #' @importFrom tidyselect matches
 #' @importFrom rlang set_names .data
 `overview.gam` <- function(model, parametric = TRUE, random_effects = TRUE,
-                           dispersion = NULL, freq = FALSE, accuracy = 0.001,
+                           dispersion = NULL, frequentist = FALSE,
+                           accuracy = 0.001,
                            ...) {
     smry <- summary(model, dispersion = dispersion, re.test = random_effects,
-                    freq = freq)
+                    freq = frequentist)
     nms <- c("term", "type", "edf", "statistic", "p.value")
 
     # smooth terms
