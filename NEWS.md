@@ -1,4 +1,4 @@
-# gratia 0.7.3.3 (In development)
+# gratia 0.7.3.4 (In development)
 
 ## New features
 
@@ -28,6 +28,8 @@
   evenly over the range of `x1`, a constant value of the mean of `x2` for the
   `x2` variable, and a constant factor level, the model class of `fac`, for the
   `fac` variable of the model.
+
+* `overview()` provides a simple overview of model terms for fitted GAMs.
 
 * `difference_smooths()` will now use the user-supplied data as points at
 which to evaluate a pair of smooths. Also note that the argument `newdata` has

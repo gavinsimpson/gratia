@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,37 +60,37 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">qq_plot</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for default</span>
-<span class="fu">qq_plot</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for gam</span>
-<span class="fu">qq_plot</span><span class="op">(</span>
-  <span class="va">model</span>,
-  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"uniform"</span>, <span class="st">"simulate"</span>, <span class="st">"normal"</span>, <span class="st">"direct"</span><span class="op">)</span>,
-  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"deviance"</span>, <span class="st">"response"</span>, <span class="st">"pearson"</span><span class="op">)</span>,
-  n_uniform <span class="op">=</span> <span class="fl">10</span>,
-  n_simulate <span class="op">=</span> <span class="fl">50</span>,
-  level <span class="op">=</span> <span class="fl">0.9</span>,
-  ylab <span class="op">=</span> <span class="cn">NULL</span>,
-  xlab <span class="op">=</span> <span class="cn">NULL</span>,
-  title <span class="op">=</span> <span class="cn">NULL</span>,
-  subtitle <span class="op">=</span> <span class="cn">NULL</span>,
-  caption <span class="op">=</span> <span class="cn">NULL</span>,
-  ci_col <span class="op">=</span> <span class="st">"black"</span>,
-  ci_alpha <span class="op">=</span> <span class="fl">0.2</span>,
-  point_col <span class="op">=</span> <span class="st">"black"</span>,
-  point_alpha <span class="op">=</span> <span class="fl">1</span>,
-  line_col <span class="op">=</span> <span class="st">"red"</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for glm</span>
-<span class="fu">qq_plot</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for lm</span>
-<span class="fu">qq_plot</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">qq_plot</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for default</span></span>
+<span><span class="fu">qq_plot</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for gam</span></span>
+<span><span class="fu">qq_plot</span><span class="op">(</span></span>
+<span>  <span class="va">model</span>,</span>
+<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"uniform"</span>, <span class="st">"simulate"</span>, <span class="st">"normal"</span>, <span class="st">"direct"</span><span class="op">)</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"deviance"</span>, <span class="st">"response"</span>, <span class="st">"pearson"</span><span class="op">)</span>,</span>
+<span>  n_uniform <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  n_simulate <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  level <span class="op">=</span> <span class="fl">0.9</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  subtitle <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  caption <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ci_col <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>  ci_alpha <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  point_col <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>  point_alpha <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  line_col <span class="op">=</span> <span class="st">"red"</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for glm</span></span>
+<span><span class="fu">qq_plot</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for lm</span></span>
+<span><span class="fu">qq_plot</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -176,28 +176,28 @@ simulated residuals method (<code>method = "simulated"</code>). To avoid confusi
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="co">## simulate binomial data...</span></span>
-<span class="r-in"><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">200</span>, dist <span class="op">=</span> <span class="st">"binary"</span>, scale <span class="op">=</span> <span class="fl">.33</span>, seed <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">linkinv</span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">f</span><span class="op">)</span>               <span class="co"># binomial p</span></span>
-<span class="r-in"><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fl">200</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># binomial n</span></span>
-<span class="r-in"><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">dat</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">n</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span>, n <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span> <span class="va">y</span> <span class="op">/</span> <span class="va">n</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>,</span>
-<span class="r-in">         family <span class="op">=</span> <span class="va">binomial</span>, data <span class="op">=</span> <span class="va">dat</span>, weights <span class="op">=</span> <span class="va">n</span>,</span>
-<span class="r-in">         method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Q-Q plot; default using direct randomization of uniform quantiles</span></span>
-<span class="r-in"><span class="fu">qq_plot</span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co">## simulate binomial data...</span></span></span>
+<span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">200</span>, dist <span class="op">=</span> <span class="st">"binary"</span>, scale <span class="op">=</span> <span class="fl">.33</span>, seed <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">linkinv</span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">f</span><span class="op">)</span>               <span class="co"># binomial p</span></span></span>
+<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fl">200</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># binomial n</span></span></span>
+<span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">dat</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">n</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span>, n <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span> <span class="va">y</span> <span class="op">/</span> <span class="va">n</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>         family <span class="op">=</span> <span class="va">binomial</span>, data <span class="op">=</span> <span class="va">dat</span>, weights <span class="op">=</span> <span class="va">n</span>,</span></span>
+<span class="r-in"><span>         method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Q-Q plot; default using direct randomization of uniform quantiles</span></span></span>
+<span class="r-in"><span><span class="fu">qq_plot</span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="qq_plot-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Alternatively use simulate new data from the model, which</span></span>
-<span class="r-in"><span class="co">## allows construction of reference intervals for the Q-Q plot</span></span>
-<span class="r-in"><span class="fu">qq_plot</span><span class="op">(</span><span class="va">m</span>, method <span class="op">=</span> <span class="st">"simulate"</span>, point_col <span class="op">=</span> <span class="st">"steelblue"</span>,</span>
-<span class="r-in">        point_alpha <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Alternatively use simulate new data from the model, which</span></span></span>
+<span class="r-in"><span><span class="co">## allows construction of reference intervals for the Q-Q plot</span></span></span>
+<span class="r-in"><span><span class="fu">qq_plot</span><span class="op">(</span><span class="va">m</span>, method <span class="op">=</span> <span class="st">"simulate"</span>, point_col <span class="op">=</span> <span class="st">"steelblue"</span>,</span></span>
+<span class="r-in"><span>        point_alpha <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="qq_plot-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ... or use the usual normality assumption</span></span>
-<span class="r-in"><span class="fu">qq_plot</span><span class="op">(</span><span class="va">m</span>, method <span class="op">=</span> <span class="st">"normal"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ... or use the usual normality assumption</span></span></span>
+<span class="r-in"><span><span class="fu">qq_plot</span><span class="op">(</span><span class="va">m</span>, method <span class="op">=</span> <span class="st">"normal"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="qq_plot-3.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,82 +60,82 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">eval_smooth</span><span class="op">(</span><span class="va">smooth</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for mgcv.smooth</span>
-<span class="fu">eval_smooth</span><span class="op">(</span>
-  <span class="va">smooth</span>,
-  <span class="va">model</span>,
-  n <span class="op">=</span> <span class="fl">100</span>,
-  n_3d <span class="op">=</span> <span class="cn">NULL</span>,
-  n_4d <span class="op">=</span> <span class="cn">NULL</span>,
-  data <span class="op">=</span> <span class="cn">NULL</span>,
-  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,
-  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,
-  dist <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for fs.interaction</span>
-<span class="fu">eval_smooth</span><span class="op">(</span>
-  <span class="va">smooth</span>,
-  <span class="va">model</span>,
-  n <span class="op">=</span> <span class="fl">100</span>,
-  data <span class="op">=</span> <span class="cn">NULL</span>,
-  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,
-  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for random.effect</span>
-<span class="fu">eval_smooth</span><span class="op">(</span>
-  <span class="va">smooth</span>,
-  <span class="va">model</span>,
-  n <span class="op">=</span> <span class="fl">100</span>,
-  data <span class="op">=</span> <span class="cn">NULL</span>,
-  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,
-  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for mrf.smooth</span>
-<span class="fu">eval_smooth</span><span class="op">(</span>
-  <span class="va">smooth</span>,
-  <span class="va">model</span>,
-  n <span class="op">=</span> <span class="fl">100</span>,
-  data <span class="op">=</span> <span class="cn">NULL</span>,
-  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,
-  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for t2.smooth</span>
-<span class="fu">eval_smooth</span><span class="op">(</span>
-  <span class="va">smooth</span>,
-  <span class="va">model</span>,
-  n <span class="op">=</span> <span class="fl">100</span>,
-  n_3d <span class="op">=</span> <span class="cn">NULL</span>,
-  n_4d <span class="op">=</span> <span class="cn">NULL</span>,
-  data <span class="op">=</span> <span class="cn">NULL</span>,
-  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,
-  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,
-  dist <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for tensor.smooth</span>
-<span class="fu">eval_smooth</span><span class="op">(</span>
-  <span class="va">smooth</span>,
-  <span class="va">model</span>,
-  n <span class="op">=</span> <span class="fl">100</span>,
-  n_3d <span class="op">=</span> <span class="cn">NULL</span>,
-  n_4d <span class="op">=</span> <span class="cn">NULL</span>,
-  data <span class="op">=</span> <span class="cn">NULL</span>,
-  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,
-  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,
-  dist <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">eval_smooth</span><span class="op">(</span><span class="va">smooth</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for mgcv.smooth</span></span>
+<span><span class="fu">eval_smooth</span><span class="op">(</span></span>
+<span>  <span class="va">smooth</span>,</span>
+<span>  <span class="va">model</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  n_3d <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n_4d <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  dist <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for fs.interaction</span></span>
+<span><span class="fu">eval_smooth</span><span class="op">(</span></span>
+<span>  <span class="va">smooth</span>,</span>
+<span>  <span class="va">model</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for random.effect</span></span>
+<span><span class="fu">eval_smooth</span><span class="op">(</span></span>
+<span>  <span class="va">smooth</span>,</span>
+<span>  <span class="va">model</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for mrf.smooth</span></span>
+<span><span class="fu">eval_smooth</span><span class="op">(</span></span>
+<span>  <span class="va">smooth</span>,</span>
+<span>  <span class="va">model</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for t2.smooth</span></span>
+<span><span class="fu">eval_smooth</span><span class="op">(</span></span>
+<span>  <span class="va">smooth</span>,</span>
+<span>  <span class="va">model</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  n_3d <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n_4d <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  dist <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for tensor.smooth</span></span>
+<span><span class="fu">eval_smooth</span><span class="op">(</span></span>
+<span>  <span class="va">smooth</span>,</span>
+<span>  <span class="va">model</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  n_3d <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n_4d <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  dist <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">

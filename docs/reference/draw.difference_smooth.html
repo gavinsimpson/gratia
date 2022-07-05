@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,30 +60,30 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S3 method for difference_smooth</span>
-<span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span>
-  <span class="va">object</span>,
-  select <span class="op">=</span> <span class="cn">NULL</span>,
-  rug <span class="op">=</span> <span class="cn">FALSE</span>,
-  ref_line <span class="op">=</span> <span class="cn">FALSE</span>,
-  contour <span class="op">=</span> <span class="cn">FALSE</span>,
-  contour_col <span class="op">=</span> <span class="st">"black"</span>,
-  n_contour <span class="op">=</span> <span class="cn">NULL</span>,
-  ci_alpha <span class="op">=</span> <span class="fl">0.2</span>,
-  ci_col <span class="op">=</span> <span class="st">"black"</span>,
-  smooth_col <span class="op">=</span> <span class="st">"black"</span>,
-  line_col <span class="op">=</span> <span class="st">"red"</span>,
-  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"free"</span>, <span class="st">"fixed"</span><span class="op">)</span>,
-  ncol <span class="op">=</span> <span class="cn">NULL</span>,
-  nrow <span class="op">=</span> <span class="cn">NULL</span>,
-  guides <span class="op">=</span> <span class="st">"keep"</span>,
-  xlab <span class="op">=</span> <span class="cn">NULL</span>,
-  ylab <span class="op">=</span> <span class="cn">NULL</span>,
-  title <span class="op">=</span> <span class="cn">NULL</span>,
-  subtitle <span class="op">=</span> <span class="cn">NULL</span>,
-  caption <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for difference_smooth</span></span>
+<span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  select <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  rug <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  ref_line <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  contour <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  contour_col <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>  n_contour <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ci_alpha <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  ci_col <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>  smooth_col <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>  line_col <span class="op">=</span> <span class="st">"red"</span>,</span>
+<span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"free"</span>, <span class="st">"fixed"</span><span class="op">)</span>,</span>
+<span>  ncol <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  nrow <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  guides <span class="op">=</span> <span class="st">"keep"</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  subtitle <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  caption <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -171,16 +171,16 @@ annotate plots</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># simulate some data; a factor smooth example</span></span>
-<span class="r-in"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg4"</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># fit GAM</span></span>
-<span class="r-in"><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">fac</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span>, by <span class="op">=</span> <span class="va">fac</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># calculate the differences between pairs of smooths the f_j(x2) term</span></span>
-<span class="r-in"><span class="va">diffs</span> <span class="op">&lt;-</span> <span class="fu"><a href="difference_smooths.html">difference_smooths</a></span><span class="op">(</span><span class="va">m</span>, smooth <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">diffs</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># simulate some data; a factor smooth example</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg4"</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># fit GAM</span></span></span>
+<span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">fac</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span>, by <span class="op">=</span> <span class="va">fac</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># calculate the differences between pairs of smooths the f_j(x2) term</span></span></span>
+<span class="r-in"><span><span class="va">diffs</span> <span class="op">&lt;-</span> <span class="fu"><a href="difference_smooths.html">difference_smooths</a></span><span class="op">(</span><span class="va">m</span>, smooth <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">diffs</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="draw.difference_smooth-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
