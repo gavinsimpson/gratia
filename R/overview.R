@@ -13,7 +13,7 @@
 #' @importFrom dplyr %>% select
 #' @importFrom tibble rownames_to_column as_tibble add_column
 #' @importFrom tidyselect matches
-#' @importFrom rlang set_names
+#' @importFrom rlang set_names .data
 `overview.gam` <- function(model, parametric = TRUE, random_effects = TRUE,
                            dispersion = NULL, freq = FALSE, accuracy = 0.001,
                            ...) {
@@ -35,7 +35,7 @@
         para <- as.data.frame(smry$pTerms.table) %>%
           rownames_to_column() %>%
           as_tibble() %>%
-          rename(edf = df) %>%
+          rename(edf = "df") %>%
           add_column(type = rep("parametric", nrow(smry$pTerms.table)),
                      .after = 1L)
         out <- bind_rows(para, out)
@@ -43,7 +43,7 @@
 
     out <- set_names(out, nms)
 
-    out <- mutate(out, p.value = format.pval(p.value, eps = accuracy))
+    out <- mutate(out, p.value = format.pval(.data$p.value, eps = accuracy))
 
     class(out) <- append(class(out), values = "overview", after = 0)
     out
