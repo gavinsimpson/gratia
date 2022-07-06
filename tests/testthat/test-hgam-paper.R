@@ -45,6 +45,8 @@ test_that("draw() can plot CO2 model 1", {
                     control = ctrl)
     plt <- draw(CO2_mod1, overall_uncertainty = TRUE)
     expect_doppelganger("hgam-paper-co2-model-1", plt)
+
+    expect_silent(d <- derivatives(CO2_mod1))
 })
 
 test_that("draw() can plot CO2 model 2", {
@@ -60,6 +62,8 @@ test_that("draw() can plot CO2 model 2", {
     )
     plt <- draw(CO2_mod2, overall_uncertainty = TRUE)
     expect_doppelganger("hgam-paper-co2-model-2", plt)
+
+    expect_silent(d <- derivatives(CO2_mod2))
 })
 
 ## We show smooths 1, 14, 3, 5, 10, 13 in the paper code
@@ -74,6 +78,8 @@ test_that("draw() can plot CO2 model 3", {
                     control = ctrl)
     plt <- draw(CO2_mod3, overall_uncertainty = TRUE)
     expect_doppelganger("hgam-paper-co2-model-3", plt)
+
+    expect_silent(d <- derivatives(CO2_mod3))
 })
 
 test_that("draw() can plot CO2 model 4", {
@@ -86,6 +92,8 @@ test_that("draw() can plot CO2 model 4", {
                     control = ctrl)
     plt <- draw(CO2_mod4, overall_uncertainty = TRUE)
     expect_doppelganger("hgam-paper-co2-model-4", plt)
+
+    expect_silent(d <- derivatives(CO2_mod4))
 })
 
 test_that("draw() can plot CO2 model 5", {
@@ -99,6 +107,8 @@ test_that("draw() can plot CO2 model 5", {
                     control = ctrl)
     plt <- draw(CO2_mod5, overall_uncertainty = TRUE)
     expect_doppelganger("hgam-paper-co2-model-5", plt)
+
+    expect_silent(d <- derivatives(CO2_mod5))
 })
 
 ## bird_move

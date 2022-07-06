@@ -1,4 +1,4 @@
-# gratia 0.7.3.5 (In development)
+# gratia 0.7.3.6 (In development)
 
 ## New features
 
@@ -41,6 +41,9 @@ been renamed `data`. #175
 
 * `draw.posterior_smooths` now plots posterior samples with a fixed aspect ratio
   if the smooth is isotropic. #148
+
+* `derivatives()` now ignores random effect smooths (for which derivatives
+  don't make sense anyway). #168
 
 # gratia 0.7.3
 
