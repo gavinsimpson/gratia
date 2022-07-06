@@ -416,3 +416,18 @@ test_that("derivatives with simultaneous intervals works for factor by", {
     expect_s3_class(d_pw, "tbl_df")
     expect_identical(nrow(d_pw), as.integer(N * 3L))
 })
+
+## tests for models with random effects
+test_that("derivatives works with models that include random effects", {
+    expect_silent(d <- derivatives(rm1))
+    expect_s3_class(d, "derivatives")
+    expect_s3_class(d, "tbl_df")
+    expect_named(d, c("smooth","var","data","derivative","se","crit",
+                      "lower","upper"))
+
+    expect_silent(d <- derivatives(rm2))
+    expect_s3_class(d, "derivatives")
+    expect_s3_class(d, "tbl_df")
+    expect_named(d, c("smooth","var","data","derivative","se","crit",
+                      "lower","upper"))
+})
