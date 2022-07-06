@@ -58,6 +58,9 @@
 #'   with `term`? If `TRUE`, `term` can only be a single string to match
 #'   against.
 #'
+#' @note `derivatives()` will ignore any random effect smooths it encounters in
+#'   `object`.
+#'
 #' @export
 #'
 #' @importFrom dplyr filter
@@ -105,12 +108,20 @@
                               partial_match = FALSE, ...) {
     ## handle term
     smooth_ids <- if (!missing(term)) {
-      ## which smooths match 'term'
-      sms <- check_user_select_smooths(smooths(object), term,
-                                       partial_match = partial_match)
-      which(sms)
+        ## which smooths match 'term'
+        sms <- check_user_select_smooths(smooths(object), term,
+                                         partial_match = partial_match)
+        ## need to skip random effect smooths
+        take <- vapply(object$smooth[sms], smooth_type , character(1)) %in%
+          "Random effect"
+        sms[take] <- FALSE
+        which(sms)
     } else {
-        seq_len(n_smooths(object))
+        s <- seq_len(n_smooths(object))
+        ## need to skip random effect smooths
+        take <- vapply(object$smooth, smooth_type,
+                         character(1)) %in% "Random effect"
+        s[!take]
     }
 
     ## handle type
