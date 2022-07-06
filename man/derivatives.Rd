@@ -16,7 +16,7 @@ derivatives(object, ...)
 \method{derivatives}{gam}(
   object,
   term,
-  newdata,
+  data = newdata,
   order = 1L,
   type = c("forward", "backward", "central"),
   n = 200,
@@ -29,7 +29,8 @@ derivatives(object, ...)
   offset = NULL,
   ncores = 1,
   partial_match = FALSE,
-  ...
+  ...,
+  newdata = NULL
 )
 }
 \arguments{
@@ -42,7 +43,7 @@ derivatives are required. If missing, derivatives for all smooth terms
 will be returned. Can be a partial match to a smooth term; see argument
 \code{partial_match} below.}
 
-\item{newdata}{a data frame containing the values of the model covariates
+\item{data}{a data frame containing the values of the model covariates
 at which to evaluate the first derivatives of the smooths.}
 
 \item{order}{numeric; the order of derivative.}
@@ -80,6 +81,8 @@ to work on Windows with current \code{R}).}
 \item{partial_match}{logical; should smooths be selected by partial matches
 with \code{term}? If \code{TRUE}, \code{term} can only be a single string to match
 against.}
+
+\item{newdata}{Deprecated: use \code{data} instead.}
 }
 \value{
 A tibble, currently with the following variables:
