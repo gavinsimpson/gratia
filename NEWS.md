@@ -35,6 +35,8 @@
 which to evaluate a pair of smooths. Also note that the argument `newdata` has
 been renamed `data`. #175
 
+* `derivatives()` now works for factor-smooth interaction (`"fs"`) smooths.
+
 ## Bug fixes
 
 * `draw.posterior_smooths` now plots posterior samples with a fixed aspect ratio
