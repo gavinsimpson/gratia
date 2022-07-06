@@ -56,7 +56,7 @@
         take <- object[["smooth"]] == sm[i]
         df <- object[take, ]
         xvar <- unique(df[['var']])
-        plt <- if ("fs_var" %in% names(df)) {
+        plt <- if (!all(is.na(df$fs_var))) {
             ggplot(df, aes(x = .data$data,
                            y = .data$derivative,
                            group = .data$fs_var))
