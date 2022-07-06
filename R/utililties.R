@@ -1383,3 +1383,8 @@ vars_from_label <- function(label) {
     }
     model_vars(model[["gam"]]$pred.formula)
 }
+
+`newdata_deprecated` <- function() {
+    message("Use of the `newdata` argument is deprecated.\n",
+            "Instead, use the data argument `data`.\n")
+}

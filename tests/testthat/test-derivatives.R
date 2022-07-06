@@ -452,15 +452,20 @@ test_that("derivatives with simultaneous intervals works for factor by", {
     newd <- with(su_eg4, expand.grid(fac = levels(fac),
                                      x2 = seq(min(x2), max(x2), length = N),
                                      x0 = mean(x0)))
+    expect_message(d_pw <- derivatives(su_m_factor_by,
+                                       newdata = newd,
+                                       term = smooths(su_m_factor_by)[1:3]),
+                   "Use of the `newdata` argument is deprecated.
+Instead, use the data argument `data`.\n")
     expect_silent(d_pw <- derivatives(su_m_factor_by,
-                                      newdata = newd,
+                                      data = newd,
                                       term = smooths(su_m_factor_by)[1:3]))
     expect_s3_class(d_pw, "derivatives")
     expect_s3_class(d_pw, "tbl_df")
     expect_identical(nrow(d_pw), as.integer(N * 3L))
     set.seed(15)
     expect_silent(d_sim <- derivatives(su_m_factor_by,
-                                       newdata = newd,
+                                       data = newd,
                                        term = smooths(su_m_factor_by)[1:3],
                                        interval = "simultaneous"))
     expect_s3_class(d_pw, "derivatives")

@@ -72,7 +72,7 @@
 <span><span class="fu">derivatives</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
 <span>  <span class="va">term</span>,</span>
-<span>  <span class="va">newdata</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">newdata</span>,</span>
 <span>  order <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"forward"</span>, <span class="st">"backward"</span>, <span class="st">"central"</span><span class="op">)</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">200</span>,</span>
@@ -85,7 +85,8 @@
 <span>  offset <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  newdata <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -106,7 +107,7 @@ will be returned. Can be a partial match to a smooth term; see argument
 <code>partial_match</code> below.</p></dd>
 
 
-<dt>newdata</dt>
+<dt>data</dt>
 <dd><p>a data frame containing the values of the model covariates
 at which to evaluate the first derivatives of the smooths.</p></dd>
 
@@ -169,6 +170,10 @@ to work on Windows with current <code>R</code>).</p></dd>
 <dd><p>logical; should smooths be selected by partial matches
 with <code>term</code>? If <code>TRUE</code>, <code>term</code> can only be a single string to match
 against.</p></dd>
+
+
+<dt>newdata</dt>
+<dd><p>Deprecated: use <code>data</code> instead.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -31,7 +31,7 @@
 #'   derivatives are required. If missing, derivatives for all smooth terms
 #'   will be returned. Can be a partial match to a smooth term; see argument
 #'   `partial_match` below.
-#' @param newdata a data frame containing the values of the model covariates
+#' @param data a data frame containing the values of the model covariates
 #'   at which to evaluate the first derivatives of the smooths.
 #' @param order numeric; the order of derivative.
 #' @param type character; the type of finite difference used. One of
@@ -57,6 +57,7 @@
 #' @param partial_match logical; should smooths be selected by partial matches
 #'   with `term`? If `TRUE`, `term` can only be a single string to match
 #'   against.
+#' @param newdata Deprecated: use `data` instead.
 #'
 #' @note `derivatives()` will ignore any random effect smooths it encounters in
 #'   `object`.
@@ -99,14 +100,14 @@
 #' \dontshow{
 #' options(op)
 #' }
-`derivatives.gam` <- function(object, term, newdata, order = 1L,
+`derivatives.gam` <- function(object, term, data = newdata, order = 1L,
                               type = c("forward", "backward", "central"),
                               n = 200, eps = 1e-7,
                               interval = c("confidence", "simultaneous"),
                               n_sim = 10000, level = 0.95,
                               unconditional = FALSE, frequentist = FALSE,
                               offset = NULL, ncores = 1,
-                              partial_match = FALSE, ...) {
+                              partial_match = FALSE, ..., newdata = NULL) {
     ## handle term
     smooth_ids <- if (!missing(term)) {
         ## which smooths match 'term'
@@ -133,10 +134,14 @@
         stop("Only 1st or 2nd derivatives are supported: `order %in% c(1,2)`")
     }
 
-    ## handle newdata
-    need_newdata <- FALSE
-    if (missing(newdata)) {
-        need_newdata <- TRUE
+    if (!is.null(newdata)) {
+        newdata_deprecated()
+    }
+
+    ## handle data
+    need_data <- FALSE
+    if (is.null(data)) {
+        need_data <- TRUE
     }
 
     ## handle interval
@@ -154,32 +159,32 @@
 
     ## loop over the smooths and compute derivatives from finite differences
     for (i in seq_along(smooth_ids)) {
-        ## generate newdata if not supplied
-        if (need_newdata) {
+        ## generate data if not supplied
+        if (need_data) {
             newd <- derivative_data(object, id = smooth_ids[[i]], n = n,
                                     offset = offset, order = order,
                                     type = type, eps = eps)
         } else {
             ## assume the data are OK - mgcv::predict will catch issues
-            newd <- newdata
+            newd <- data
             ## ...but we need to handle factor by
             sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1]]
             if (is_factor_by_smooth(sm)) {
-                newd <- filter(newd, newdata[[by_variable(sm)]] == by_level(sm))
+                newd <- filter(newd, data[[by_variable(sm)]] == by_level(sm))
             }
         }
 
         ## generate list of finite difference predictions for the first or second
         ##   derivatives or the required type
         fd <- finite_diff_lpmatrix(object, type = type, order = order,
-                                   newdata = newd, h = eps)
+                                   data = newd, h = eps)
 
         ## compute the finite differences
         X <- finite_difference(fd, order, type, eps)
 
         ## compute derivatives
         d <- compute_derivative(smooth_ids[[i]], lpmatrix = X, betas = betas,
-                                Vb = Vb, model = object, newdata = newd)
+                                Vb = Vb, model = object, data = newd)
 
         ## compute intervals
         if (identical(interval, "confidence")) {
@@ -264,7 +269,7 @@
 
 #' @importFrom rlang eval_tidy parse_expr
 #' @importFrom tibble tibble
-`compute_derivative` <- function(id, lpmatrix, betas, Vb, model, newdata) {
+`compute_derivative` <- function(id, lpmatrix, betas, Vb, model, data) {
     sm <- get_smooths_by_id(model, id)[[1L]]
     sm_var <- smooth_variable(sm)
     by_var <- by_variable(sm)
@@ -283,20 +288,20 @@
     ## build return tibble
     deriv <- tibble(smooth = rep(sm_lab, length(d)),
                     var = rep(sm_var, length(d)),
-                    data = eval_tidy(parse_expr(sm_var), data = newdata),
+                    data = eval_tidy(parse_expr(sm_var), data = data),
                     derivative = d,
                     se = se)
     fs_var <- if (is.null(fs_var)) {
         rep(NA_character_, nrow(deriv))
     } else {
-        newdata[[fs_var]]
+        data[[fs_var]]
     }
     deriv <- add_column(deriv, fs_var = fs_var, .after = 2L)
     
     by_var <- if (by_var == "NA"){
         rep(NA_character_, nrow(deriv))
     } else {
-        deriv <- add_column(deriv, {{ by_var }} := newdata[[by_var]],
+        deriv <- add_column(deriv, {{ by_var }} := data[[by_var]],
                             .after = 2L)
         rep(by_var, nrow(deriv))
     }
@@ -305,156 +310,156 @@
     result
 }
 
-`finite_diff_lpmatrix` <- function(object, type, order, newdata = NULL, h = 1e-7) {
+`finite_diff_lpmatrix` <- function(object, type, order, data = NULL, h = 1e-7) {
     result <- if (order == 1L) {
         switch(type,
-               forward  = forward_finite_diff1(object, newdata, h),
-               backward = backward_finite_diff1(object, newdata, h),
-               central  = central_finite_diff1(object, newdata, h))
+               forward  = forward_finite_diff1(object, data, h),
+               backward = backward_finite_diff1(object, data, h),
+               central  = central_finite_diff1(object, data, h))
     } else {
         switch(type,
-               forward  = forward_finite_diff2(object, newdata, h),
-               backward = backward_finite_diff2(object, newdata, h),
-               central  = central_finite_diff2(object, newdata, h))
+               forward  = forward_finite_diff2(object, data, h),
+               backward = backward_finite_diff2(object, data, h),
+               central  = central_finite_diff2(object, data, h))
 
     }
 
     result
 }
 
-`forward_finite_diff1` <- function(model, newdata, h = 1e-7) {
+`forward_finite_diff1` <- function(model, data, h = 1e-7) {
     ## need to exclude anything not numeric (from R's point of view)
     ## negate result as TRUE == numeric and we want opposite
-    ind <- !is_numeric_var(newdata) # exclude non numerics
+    ind <- !is_numeric_var(data) # exclude non numerics
     if (all(ind)) {
         stop("Can't compute finite differences for all non-numeric data.")
     }
 
-    ## create newdata2 as newdata + h - negate ind as TRUE == numeric
-    newdata2 <- shift_values(newdata, h = h, i = ind, FUN = '+')
+    ## create data2 as data + h - negate ind as TRUE == numeric
+    data2 <- shift_values(data, h = h, i = ind, FUN = '+')
 
     ## predict for x
-    x0 <- predict(model, newdata, type = "lpmatrix")
+    x0 <- predict(model, data, type = "lpmatrix")
 
     ## predict for x + h
-    x1 <- predict(model, newdata2, type = "lpmatrix")
+    x1 <- predict(model, data2, type = "lpmatrix")
 
     list(xf = x1, xb = x0)
 }
 
-`backward_finite_diff1` <- function(model, newdata, h = 1e-7) {
+`backward_finite_diff1` <- function(model, data, h = 1e-7) {
     ## need to exclude anything not numeric (from R's point of view)
     ## negate result as TRUE == numeric and we want opposite
-    ind <- !is_numeric_var(newdata) # exclude non numerics
+    ind <- !is_numeric_var(data) # exclude non numerics
     if (all(ind)) {
         stop("Can't compute finite differences for all non-numeric data.")
     }
 
-    ## create newdata2 as newdata - h
-    newdata2 <- shift_values(newdata, h = h, i = ind, FUN = '-')
+    ## create data2 as data - h
+    data2 <- shift_values(data, h = h, i = ind, FUN = '-')
 
     ## predict for x
-    x0 <- predict(model, newdata, type = "lpmatrix")
+    x0 <- predict(model, data, type = "lpmatrix")
 
     ## predict for x - h
-    x1 <- predict(model, newdata2, type = "lpmatrix")
+    x1 <- predict(model, data2, type = "lpmatrix")
 
     list(xf = x0, xb = x1)              # intentionally flipped order
 }
 
-`central_finite_diff1` <- function(model, newdata, h = 1e-7) {
+`central_finite_diff1` <- function(model, data, h = 1e-7) {
     ## need to exclude anything not numeric (from R's point of view)
     ## negate result as TRUE == numeric and we want opposite
-    ind <- !is_numeric_var(newdata) # exclude non numerics
+    ind <- !is_numeric_var(data) # exclude non numerics
     if (all(ind)) {
         stop("Can't compute finite differences for all non-numeric data.")
     }
 
-    ## create newdata as newdata + 0.5h
-    newdata1 <- shift_values(newdata, h = h/2, i = ind, FUN = '+')
-    ## create newdata2 as newdata - 0.5h
-    newdata2 <- shift_values(newdata, h = h/2, i = ind, FUN = '-')
+    ## create data as data + 0.5h
+    data1 <- shift_values(data, h = h/2, i = ind, FUN = '+')
+    ## create data2 as data - 0.5h
+    data2 <- shift_values(data, h = h/2, i = ind, FUN = '-')
 
     ## predict for x + 0.5h
-    x0 <- predict(model, newdata1, type = "lpmatrix")
+    x0 <- predict(model, data1, type = "lpmatrix")
 
     ## predict for x - 0.5h
-    x1 <- predict(model, newdata2, type = "lpmatrix")
+    x1 <- predict(model, data2, type = "lpmatrix")
 
     list(xf = x0, xb = x1)
 }
 
-`forward_finite_diff2` <- function(model, newdata, h = 1e-7) {
+`forward_finite_diff2` <- function(model, data, h = 1e-7) {
     ## need to exclude anything not numeric (from R's point of view)
     ## negate result as TRUE == numeric and we want opposite
-    ind <- !is_numeric_var(newdata) # exclude non numerics
+    ind <- !is_numeric_var(data) # exclude non numerics
     if (all(ind)) {
         stop("Can't compute finite differences for all non-numeric data.")
     }
 
-    ## create newdata as newdata + h
-    newdata1 <- shift_values(newdata, h = h, i = ind, FUN = '+')
-    ## create newdata2 as newdata + 2h
-    newdata2 <- shift_values(newdata, h = 2*h, i = ind, FUN = '+')
+    ## create data as data + h
+    data1 <- shift_values(data, h = h, i = ind, FUN = '+')
+    ## create data2 as data + 2h
+    data2 <- shift_values(data, h = 2*h, i = ind, FUN = '+')
 
     ## predict for x + h
-    x0 <- predict(model, newdata1, type = "lpmatrix")
+    x0 <- predict(model, data1, type = "lpmatrix")
 
     ## predict for x + 2h
-    x1 <- predict(model, newdata2, type = "lpmatrix")
+    x1 <- predict(model, data2, type = "lpmatrix")
 
     ## predict for x
-    x2 <- predict(model, newdata, type = "lpmatrix")
+    x2 <- predict(model, data, type = "lpmatrix")
 
     list(xf = x0, xb = x1, x = x2)
 }
 
-`backward_finite_diff2` <- function(model, newdata, h = 1e-7) {
+`backward_finite_diff2` <- function(model, data, h = 1e-7) {
     ## need to exclude anything not numeric (from R's point of view)
     ## negate result as TRUE == numeric and we want opposite
-    ind <- !is_numeric_var(newdata) # exclude non numerics
+    ind <- !is_numeric_var(data) # exclude non numerics
     if (all(ind)) {
         stop("Can't compute finite differences for all non-numeric data.")
     }
 
-    ## create newdata as newdata - h
-    newdata1 <- shift_values(newdata, h = h, i = ind, FUN = '-')
-    ## create newdata2 as newdata - 2h
-    newdata2 <- shift_values(newdata, h = 2*h, i = ind, FUN = '-')
+    ## create data as data - h
+    data1 <- shift_values(data, h = h, i = ind, FUN = '-')
+    ## create data2 as data - 2h
+    data2 <- shift_values(data, h = 2*h, i = ind, FUN = '-')
 
     ## predict for x - h
-    x0 <- predict(model, newdata1, type = "lpmatrix")
+    x0 <- predict(model, data1, type = "lpmatrix")
 
     ## predict for x - 2h
-    x1 <- predict(model, newdata2, type = "lpmatrix")
+    x1 <- predict(model, data2, type = "lpmatrix")
 
     ## predict for x
-    x2 <- predict(model, newdata, type = "lpmatrix")
+    x2 <- predict(model, data, type = "lpmatrix")
 
     list(xf = x0, xb = x1, x = x2)
 }
 
-`central_finite_diff2` <- function(model, newdata, h = 1e-7) {
+`central_finite_diff2` <- function(model, data, h = 1e-7) {
     ## need to exclude anything not numeric (from R's point of view)
     ## negate result as TRUE == numeric and we want opposite
-    ind <- !is_numeric_var(newdata) # exclude non numerics
+    ind <- !is_numeric_var(data) # exclude non numerics
     if (all(ind)) {
         stop("Can't compute finite differences for all non-numeric data.")
     }
 
-    ## create newdata as newdata + h
-    newdata1 <- shift_values(newdata, h = h, i = ind, FUN = '+')
-    ## create newdata2 as newdata - h
-    newdata2 <- shift_values(newdata, h = h, i = ind, FUN = '-')
+    ## create data as data + h
+    data1 <- shift_values(data, h = h, i = ind, FUN = '+')
+    ## create data2 as data - h
+    data2 <- shift_values(data, h = h, i = ind, FUN = '-')
 
     ## predict for x + h
-    x0 <- predict(model, newdata1, type = "lpmatrix")
+    x0 <- predict(model, data1, type = "lpmatrix")
 
     ## predict for x - h
-    x1 <- predict(model, newdata2, type = "lpmatrix")
+    x1 <- predict(model, data2, type = "lpmatrix")
 
     ## predict for x
-    x2 <- predict(model, newdata, type = "lpmatrix")
+    x2 <- predict(model, data, type = "lpmatrix")
 
     list(xf = x0, xb = x1, x = x2)
 }
@@ -528,7 +533,7 @@
         newlist <- append(newlist, newfac)
     }
 
-    newdata <- expand_grid(!!!{newlist}) # actually compute expand.grid-alike
+    data <- expand_grid(!!!{newlist}) # actually compute expand.grid-alike
 
     ## need to provide single values for all other covariates in data
     unused_vars <- dplyr::setdiff(all_m_vars, used_vars)
@@ -548,14 +553,14 @@
             ## repeat `x` as many times as is needed
             rep(x, times = n)
         }
-        n_new <- NROW(newdata)
+        n_new <- NROW(data)
         unused_data <- as_tibble(lapply(unused_summ, FUN = rep_fun, n = n_new))
-        ## add unnused_data to newdata so we're ready to predict
-        newdata <- bind_cols(newdata, unused_data)
+        ## add unnused_data to data so we're ready to predict
+        data <- bind_cols(data, unused_data)
     }
 
-    newdata <- newdata[, all_m_vars, drop = FALSE] # re-arrange
-    newdata
+    data <- data[, all_m_vars, drop = FALSE] # re-arrange
+    data
 }
 
 `deriv_ref_data` <- function(vars, model, n, order, type, eps) {
