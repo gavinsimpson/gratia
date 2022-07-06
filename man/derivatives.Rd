@@ -99,6 +99,10 @@ interval (given \code{level}),
 \description{
 Derivatives of estimated smooths via finite differences
 }
+\note{
+\code{derivatives()} will ignore any random effect smooths it encounters in
+\code{object}.
+}
 \examples{
 
 load_mgcv()
