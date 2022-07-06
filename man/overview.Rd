@@ -47,3 +47,17 @@ values below this value displayed as \code{"< 0.001"}.}
 \description{
 Provides an overview of a model and the terms in that model
 }
+\examples{
+
+load_mgcv()
+\dontshow{
+op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
+}
+df <- data_sim(n = 400, seed = 2)
+m <- gam(y ~ x3 + s(x0) + s(x1, bs = "bs") + s(x2, bs = "ts"),
+         data = df, method = "REML")
+overview(m)
+\dontshow{
+options(op)
+}
+}

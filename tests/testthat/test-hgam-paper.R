@@ -17,9 +17,11 @@ library("datasets")
 data(CO2, package = "datasets")
 CO2 <- transform(CO2, Plant_uo = factor(Plant, ordered = FALSE))
 data(bird_move, package = "gratia")
-ctrl <- gam.control(nthreads = 3)
 data(zooplankton, package = "gratia")
 zooplankton <- transform(zooplankton, year_f = factor(year))
+
+## use several threads to speed up some fits
+ctrl <- gam.control(nthreads = 3)
 
 ## the first training and testing data set will be used to compare dynamics of
 ## plankton communities in Lake Mendota
