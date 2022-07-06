@@ -1,4 +1,11 @@
-# gratia 0.7.3.6 (In development)
+# gratia 0.7.3.7 (In development)
+
+## User visible changes
+
+* Functions in {gratia} have harmonised to use and argument named `data` instead
+  of `newdata` for passing new data at which to evaluate features of smooths. A
+  message will be printed if `newdata` is used from now on. Existing code does
+  not need to be changed as `data` takes it value from `newdata`.
 
 ## New features
 
