@@ -16,7 +16,10 @@ test_that("simulate() works with a gam", {
     expect_identical(nrow(sims), 1000L)
     expect_identical(ncol(sims), 5L)
 
-    sims <- simulate(m_gam, nsim = 5, seed = 42, newdata = su_eg1)
+    expect_message(sims <- simulate(m_gam, nsim = 5, seed = 42,
+                                    newdata = su_eg1),
+                   "Use of the `newdata` argument is deprecated.
+Instead, use the data argument `data`.\n")
     expect_identical(nrow(sims), 1000L)
     expect_identical(ncol(sims), 5L)
 })
@@ -33,7 +36,7 @@ test_that("simulate() works with a scam", {
     expect_identical(nrow(sims), 12L)
     expect_identical(ncol(sims), 5L)
 
-    sims <- simulate(sw, nsim = 5, seed = 42, newdata = smallAges)
+    sims <- simulate(sw, nsim = 5, seed = 42, data = smallAges)
     expect_identical(nrow(sims), 12L)
     expect_identical(ncol(sims), 5L)
 })
