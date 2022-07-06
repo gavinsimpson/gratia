@@ -244,6 +244,7 @@
     X
 }
 
+#' @importFrom rlang eval_tidy parse_expr
 #' @importFrom tibble tibble
 `compute_derivative` <- function(id, lpmatrix, betas, Vb, model, newdata) {
     sm <- get_smooths_by_id(model, id)[[1L]]
@@ -263,7 +264,7 @@
     ## build return tibble
     deriv <- tibble(smooth = rep(sm_lab, length(d)),
                     var = rep(sm_var, length(d)),
-                    data = newdata[[sm_var]],
+                    data = eval_tidy(parse_expr(sm_var), data = newdata),
                     derivative = d,
                     se = se)
     if (!is.null(fs_var)) {
@@ -431,6 +432,7 @@
 #' @importFrom tibble as_tibble
 #' @importFrom rlang exec !!!
 #' @importFrom tidyr expand_grid
+#' @importFrom stringr str_detect
 `derivative_data` <- function(model, id, n, offset = NULL,
                               order = NULL, type = NULL, eps = NULL) {
     mf <- model.frame(model)           # model.frame used to fit model
@@ -449,14 +451,18 @@
     }
     mf <- fix_offset(model, mf, offset_val = offset)
     ff <- vapply(mf, is.factor, logical(1L)) # which, if any, are factors vars
-    ## list of model terms (variable names); extract these from `var.summary`
-    ## because model.frame() on a gamm() contains extraneous variables, related
-    ## to the mixed model form for lme()
-    m.terms <- names(model[["var.summary"]])
 
     ## need a list of terms used in current smooth
     sm <- get_smooths_by_id(model, id)[[1L]]
     smooth_vars <- unique(smooth_variable(sm))
+
+    ## list of model terms (variable names); extract these from `var.summary`
+    ## because model.frame() on a gamm() contains extraneous variables, related
+    ## to the mixed model form for lme()
+    all_m_vars <- m_vars <- model_vars(model)
+    want <- str_detect(smooth_vars, m_vars)
+    m_vars <- m_vars[want]
+
     ## Handle special smooths, like 'fs', which involves a factor
     fs_var <- NULL
     if (is_fs_smooth(sm)) {
@@ -470,17 +476,14 @@
     } else {
         NULL
     }
-    used_vars <- c(smooth_vars, fs_var, by_var)
+    used_vars <- c(m_vars, by_var)
 
     ## generate covariate values for the smooth
-    newlist <- lapply(mf[smooth_vars], seq_min_max_eps, n = n,
-                      order = order, type = type, eps = eps)
-    ## handle fs smooths
-    if (!is.null(fs_var)) {
-        fs_levs <- levels(mf[[fs_var]])
-        new_fs <- setNames(list(factor(fs_levs, levels = fs_levs)), fs_var)
-        newlist <- append(newlist, new_fs)
-    }
+    ## This handles terms of the form log(conc)
+    newlist <- deriv_ref_data(m_vars, model = model, n = n, order = order,
+                              type = type, eps = eps)
+    ## handle fs smooths? --- handled by the above now automagically
+    
     ## handle factor by --- FIXME: what about numeric by?
     if (!is.null(by_var)) {
         ## ordered or simple factor? Grab class as a function to apply below
@@ -493,10 +496,11 @@
         ## append this list to the list of new smooth covariate values
         newlist <- append(newlist, newfac)
     }
-    newdata <- exec(expand_grid, !!!newlist) # actually compute expand.grid-alike
+
+    newdata <- expand_grid(!!!{newlist}) # actually compute expand.grid-alike
 
     ## need to provide single values for all other covariates in data
-    unused_vars <- dplyr::setdiff(m.terms, used_vars)
+    unused_vars <- dplyr::setdiff(all_m_vars, used_vars)
     ## only processed unusaed_vars if length() > 0L
     if (length(unused_vars) > 0L) {
         unused_summ <- model[["var.summary"]][unused_vars]
@@ -519,6 +523,23 @@
         newdata <- bind_cols(newdata, unused_data)
     }
 
-    newdata <- newdata[, m.terms, drop = FALSE] # re-arrange
+    newdata <- newdata[, all_m_vars, drop = FALSE] # re-arrange
     newdata
+}
+
+`deriv_ref_data` <- function(vars, model, n, order, type, eps) {
+    var_sum <- model[["var.summary"]][vars]
+    l <- map(var_sum, expand_ref_data,
+             n = n, order = order, type = type, eps = eps)
+    l
+}
+
+`expand_ref_data` <- function(x, n, order, type, eps = 0) {
+    if (is.factor(x) | is.character(x)) {
+        out <- factor(levels(x), levels = levels(x))
+    } else {
+        out <- seq_min_max_eps(x[c(1,3)],
+                               n = n, eps = eps, order = order, type = type)
+    }
+    out
 }
