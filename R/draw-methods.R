@@ -56,12 +56,18 @@
         take <- object[["smooth"]] == sm[i]
         df <- object[take, ]
         xvar <- unique(df[['var']])
-        plotlist[[i]] <- ggplot(df, aes(x = .data$data,
-                                        y = .data$derivative)) +
-            geom_ribbon(aes(ymin = .data$lower,
-                            ymax = .data$upper,
-                            y = NULL),
-                        alpha = alpha) +
+        plt <- if ("fs_var" %in% names(df)) {
+            ggplot(df, aes(x = .data$data,
+                           y = .data$derivative,
+                           group = .data$fs_var))
+        } else {
+            ggplot(df, aes(x = .data$data,
+                           y = .data$derivative)) +
+              geom_ribbon(aes(ymin = .data$lower,
+                              ymax = .data$upper,
+                              y = NULL), alpha = alpha) 
+        }
+        plotlist[[i]] <- plt +
             geom_line() +
             labs(title = sm[i], x = xvar, y = "Derivative")
     }
