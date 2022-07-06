@@ -13,7 +13,7 @@
 #'   or [mgcv::gamm()].
 #' @param nsim numeric; the number of posterior simulations to return.
 #' @param seed numeric; a random seed for the simulations.
-#' @param newdata data frame; new observations at which the posterior draws
+#' @param data data frame; new observations at which the posterior draws
 #'   from the model should be evaluated. If not supplied, the data used to fit
 #'   the model will be used for `newdata`, if available in `object`.
 #' @param weights numeric; a vector of prior weights. If `newdata` is null
@@ -23,6 +23,7 @@
 #'   additional arguments such as `terms`, `exclude`, to select which model
 #'   terms are included in the predictions. This may be useful, for example,
 #'   for excluding the effects of random effect terms.
+#' @param newdata Deprecated. Use `data` instead.
 #'
 #' @return (Currently) A matrix with `nsim` columns.
 #'
@@ -42,8 +43,8 @@
 #'
 #' sims <- simulate(m1, nsim = 5, seed = 42)
 #' head(sims)
-`simulate.gam` <- function(object, nsim = 1, seed = NULL, newdata = NULL,
-                           weights = NULL, ...) {
+`simulate.gam` <- function(object, nsim = 1, seed = NULL, data = newdata,
+                           weights = NULL, ..., newdata = NULL) {
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
         runif(1)
     }
@@ -64,16 +65,20 @@
         scale <- summary(object)[["dispersion"]]
     }
 
-    if (missing(newdata) || is.null(newdata)) {
-        newdata <- object[["model"]]
+    if (!is.null(newdata)) {
+        newdata_deprecated()
+    }
+
+    if (is.null(data)) {
+        data <- object[["model"]]
         weights <- object[["prior.weights"]]
     } else {
         if (is.null(weights)) {
-            weights <- rep(1, nrow(newdata))
+            weights <- rep(1, nrow(data))
         }
     }
 
-    mu <- predict(object, newdata = newdata, type = "response", ...)
+    mu <- predict(object, newdata = data, type = "response", ...)
     sims <- replicate(nsim, rd_fun(mu = mu, wt = weights, scale = scale))
 
     attr(sims, "seed") <- RNGstate
@@ -83,9 +88,13 @@
 #' @rdname simulate
 #'
 #' @export
-`simulate.gamm` <- function(object, nsim = 1, seed = NULL, newdata = NULL,
-                            weights = NULL, ...) {
-    simulate(object$gam, nsim = nsim, seed = seed, newdata = newdata,
+`simulate.gamm` <- function(object, nsim = 1, seed = NULL, data = newdata,
+                            weights = NULL, ..., newdata = NULL) {
+    if (!is.null(newdata)) {
+        newdata_deprecated()
+    }
+
+    simulate(object$gam, nsim = nsim, seed = seed, data = newdata,
              weights = weights, ...)
 }
 
@@ -93,8 +102,8 @@
 #'
 #'
 #' @export
-`simulate.scam` <- function(object, nsim = 1, seed = NULL, newdata = NULL,
-                            weights = NULL, ...) {
+`simulate.scam` <- function(object, nsim = 1, seed = NULL, data = newdata,
+                            weights = NULL, ..., newdata = NULL) {
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
         runif(1)
     }
@@ -115,18 +124,21 @@
         scale <- summary(object)[["dispersion"]]
     }
 
-    if (missing(newdata) || is.null(newdata)) {
-        newdata <- object[["model"]]
+    if (!is.null(newdata)) {
+        newdata_deprecated()
+    }
+
+    if (is.null(data)) {
+        data <- object[["model"]]
         weights <- object[["prior.weights"]]
     } else {
         if (is.null(weights)) {
-            weights <- rep(1, nrow(newdata))
+            weights <- rep(1, nrow(data))
         }
     }
 
-    mu <- predict(object, newdata = newdata, type = "response", ...)
+    mu <- predict(object, newdata = data, type = "response", ...)
 
-    ## sims <- mu
     sims <- replicate(nsim, rd_fun(mu = mu, wt = weights, scale = scale))
 
     attr(sims, "seed") <- RNGstate
