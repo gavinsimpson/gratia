@@ -10,10 +10,11 @@ predicted_samples(model, ...)
 \method{predicted_samples}{gam}(
   model,
   n = 1,
-  newdata = NULL,
+  data = newdata,
   seed = NULL,
   weights = NULL,
-  ...
+  ...,
+  newdata = NULL
 )
 }
 \arguments{
@@ -24,24 +25,26 @@ are passed on to \code{predict.gam()}.}
 
 \item{n}{numeric; the number of posterior samples to return.}
 
-\item{newdata}{data frame; new observations at which the posterior draws
+\item{data}{data frame; new observations at which the posterior draws
 from the model should be evaluated. If not supplied, the data used to fit
-the model will be used for \code{newdata}, if available in \code{model}.}
+the model will be used for \code{data}, if available in \code{model}.}
 
 \item{seed}{numeric; a random seed for the simulations.}
 
-\item{weights}{numeric; a vector of prior weights. If \code{newdata} is null
+\item{weights}{numeric; a vector of prior weights. If \code{data} is null
 then defaults to \code{object[["prior.weights"]]}, otherwise a vector of ones.}
+
+\item{newdata}{Deprecated: use \code{data} instead.}
 }
 \value{
 A tibble (data frame) with 3 columns containing the posterior
 predicted values in long format. The columns are
 \itemize{
-\item \code{row} (integer) the row of \code{newdata} that each posterior draw relates to,
+\item \code{row} (integer) the row of \code{data} that each posterior draw relates to,
 \item \code{draw} (integer) an index, in range \code{1:n}, indicating which draw each row
 relates to,
 \item \code{response} (numeric) the predicted response for the indicated row of
-\code{newdata}.
+\code{data}.
 }
 }
 \description{
