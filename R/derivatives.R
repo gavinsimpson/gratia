@@ -63,7 +63,8 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr filter
+#' @importFrom dplyr filter relocate
+#' @importFrom tidyselect last_col
 #'
 #' @rdname derivatives
 #'
@@ -193,7 +194,13 @@
     }
 
     ## results in a list of tibbles that we need to bind row-wise
-    result <- do.call("bind_rows", result)
+    result <- bind_rows(result)
+
+    ## reorder the columns
+    result <- result %>%
+      relocate(any_of(c("smooth", "var", "by_var", "fs_var")), .before = 1) %>%
+      relocate(all_of(c("data","derivative","se","crit", "lower", "upper")),
+               .after = last_col())
 
     class(result) <- c("derivatives", class(result)) # add class
     result                                           # return
@@ -260,6 +267,7 @@
 `compute_derivative` <- function(id, lpmatrix, betas, Vb, model, newdata) {
     sm <- get_smooths_by_id(model, id)[[1L]]
     sm_var <- smooth_variable(sm)
+    by_var <- by_variable(sm)
     ## handle fs smooths
     fs_var <- NULL
     if (is_fs_smooth(sm)) {
@@ -278,9 +286,21 @@
                     data = eval_tidy(parse_expr(sm_var), data = newdata),
                     derivative = d,
                     se = se)
-    if (!is.null(fs_var)) {
-        deriv <- add_column(deriv, fs_var = newdata[[fs_var]], .after = 2L)
+    fs_var <- if (is.null(fs_var)) {
+        rep(NA_character_, nrow(deriv))
+    } else {
+        newdata[[fs_var]]
     }
+    deriv <- add_column(deriv, fs_var = fs_var, .after = 2L)
+    
+    by_var <- if (by_var == "NA"){
+        rep(NA_character_, nrow(deriv))
+    } else {
+        deriv <- add_column(deriv, {{ by_var }} := newdata[[by_var]],
+                            .after = 2L)
+        rep(by_var, nrow(deriv))
+    }
+    deriv <- add_column(deriv, by_var = by_var, .after = 2L)
     result <- list(deriv = deriv, Xi = Xi)
     result
 }
