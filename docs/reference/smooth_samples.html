@@ -73,13 +73,14 @@ functions.</p>
 <span>  <span class="va">model</span>,</span>
 <span>  term <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">newdata</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  freq <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  n_vals <span class="op">=</span> <span class="fl">200</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  newdata <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -104,10 +105,10 @@ wil be sampled from. If supplied, a character vector of requested terms.</p></dd
 <dd><p>numeric; the number of posterior samples to return.</p></dd>
 
 
-<dt>newdata</dt>
+<dt>data</dt>
 <dd><p>data frame; new observations at which the posterior draws
 from the model should be evaluated. If not supplied, the data used to fit
-the model will be used for <code>newdata</code>, if available in <code>model</code>.</p></dd>
+the model will be used for <code>data</code>, if available in <code>model</code>.</p></dd>
 
 
 <dt>seed</dt>
@@ -135,7 +136,11 @@ to work on Windows with current <code>R</code>).</p></dd>
 
 <dt>n_vals</dt>
 <dd><p>numeric; how many locations to evaluate the smooth at if
-<code>newdata</code> not supplied</p></dd>
+<code>data</code> not supplied</p></dd>
+
+
+<dt>newdata</dt>
+<dd><p>Deprecated: use <code>data</code> instead.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -155,7 +160,7 @@ example.</p></li>
 <li><p><code>by_variable</code>; character vector. If the smooth involves a <code>by</code> term, the
 by variable will be named here, <code>NA_character_</code> otherwise.</p></li>
 <li><p><code>row</code>; integer. A vector of values <code>seq_len(n_vals)</code>, repeated if
-<code>n &gt; 1L</code>. Indexes the row in <code>newdata</code> for that particular draw.</p></li>
+<code>n &gt; 1L</code>. Indexes the row in <code>data</code> for that particular draw.</p></li>
 <li><p><code>draw</code>; integer. A vector of integer values indexing the particular
 posterior draw that each row belongs to.</p></li>
 <li><p><code>value</code>; numeric. The value of smooth function for this posterior draw

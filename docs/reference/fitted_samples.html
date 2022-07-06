@@ -72,14 +72,15 @@ posterior.</p>
 <span><span class="fu">fitted_samples</span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  <span class="va">newdata</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">newdata</span>,</span>
 <span>  <span class="va">seed</span>,</span>
 <span>  scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"response"</span>, <span class="st">"linear_predictor"</span><span class="op">)</span>,</span>
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"mh"</span>, <span class="st">"inla"</span><span class="op">)</span>,</span>
 <span>  freq <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fl">1L</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  newdata <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -98,10 +99,10 @@ are passed on to <code>predict.gam()</code>.</p></dd>
 <dd><p>numeric; the number of posterior samples to return.</p></dd>
 
 
-<dt>newdata</dt>
+<dt>data</dt>
 <dd><p>data frame; new observations at which the posterior draws
 from the model should be evaluated. If not supplied, the data used to fit
-the model will be used for <code>newdata</code>, if available in <code>model</code>.</p></dd>
+the model will be used for <code>data</code>, if available in <code>model</code>.</p></dd>
 
 
 <dt>seed</dt>
@@ -139,17 +140,21 @@ multivariate normal distribution. Passed to <code><a href="https://rdrr.io/pkg/m
 Parallelization will take place only if OpenMP is supported (but appears
 to work on Windows with current <code>R</code>).</p></dd>
 
+
+<dt>newdata</dt>
+<dd><p>Deprecated: use <code>data</code> instead.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
 <p>A tibble (data frame) with 3 columns containing the posterior
-predicted values in long format. The columns are</p><ul><li><p><code>row</code> (integer) the row of <code>newdata</code> that each posterior draw relates to,</p></li>
+predicted values in long format. The columns are</p><ul><li><p><code>row</code> (integer) the row of <code>data</code> that each posterior draw relates to,</p></li>
 <li><p><code>draw</code> (integer) an index, in range <code>1:n</code>, indicating which draw each row
 relates to,</p></li>
 <li><p><code>response</code> (numeric) the predicted response for the indicated row of
-<code>newdata</code>.</p></li>
+<code>data</code>.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>

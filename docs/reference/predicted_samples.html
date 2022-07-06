@@ -78,10 +78,11 @@ conditional distribution of the response.</p>
 <span><span class="fu">predicted_samples</span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">newdata</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  newdata <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -100,10 +101,10 @@ are passed on to <code>predict.gam()</code>.</p></dd>
 <dd><p>numeric; the number of posterior samples to return.</p></dd>
 
 
-<dt>newdata</dt>
+<dt>data</dt>
 <dd><p>data frame; new observations at which the posterior draws
 from the model should be evaluated. If not supplied, the data used to fit
-the model will be used for <code>newdata</code>, if available in <code>model</code>.</p></dd>
+the model will be used for <code>data</code>, if available in <code>model</code>.</p></dd>
 
 
 <dt>seed</dt>
@@ -111,8 +112,12 @@ the model will be used for <code>newdata</code>, if available in <code>model</co
 
 
 <dt>weights</dt>
-<dd><p>numeric; a vector of prior weights. If <code>newdata</code> is null
+<dd><p>numeric; a vector of prior weights. If <code>data</code> is null
 then defaults to <code>object[["prior.weights"]]</code>, otherwise a vector of ones.</p></dd>
+
+
+<dt>newdata</dt>
+<dd><p>Deprecated: use <code>data</code> instead.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -120,11 +125,11 @@ then defaults to <code>object[["prior.weights"]]</code>, otherwise a vector of o
     
 
 <p>A tibble (data frame) with 3 columns containing the posterior
-predicted values in long format. The columns are</p><ul><li><p><code>row</code> (integer) the row of <code>newdata</code> that each posterior draw relates to,</p></li>
+predicted values in long format. The columns are</p><ul><li><p><code>row</code> (integer) the row of <code>data</code> that each posterior draw relates to,</p></li>
 <li><p><code>draw</code> (integer) an index, in range <code>1:n</code>, indicating which draw each row
 relates to,</p></li>
 <li><p><code>response</code> (numeric) the predicted response for the indicated row of
-<code>newdata</code>.</p></li>
+<code>data</code>.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
