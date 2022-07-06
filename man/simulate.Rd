@@ -6,11 +6,35 @@
 \alias{simulate.scam}
 \title{Simulate from the posterior distribution of a GAM}
 \usage{
-\method{simulate}{gam}(object, nsim = 1, seed = NULL, newdata = NULL, weights = NULL, ...)
+\method{simulate}{gam}(
+  object,
+  nsim = 1,
+  seed = NULL,
+  data = newdata,
+  weights = NULL,
+  ...,
+  newdata = NULL
+)
 
-\method{simulate}{gamm}(object, nsim = 1, seed = NULL, newdata = NULL, weights = NULL, ...)
+\method{simulate}{gamm}(
+  object,
+  nsim = 1,
+  seed = NULL,
+  data = newdata,
+  weights = NULL,
+  ...,
+  newdata = NULL
+)
 
-\method{simulate}{scam}(object, nsim = 1, seed = NULL, newdata = NULL, weights = NULL, ...)
+\method{simulate}{scam}(
+  object,
+  nsim = 1,
+  seed = NULL,
+  data = newdata,
+  weights = NULL,
+  ...,
+  newdata = NULL
+)
 }
 \arguments{
 \item{object}{a fitted GAM, typically the result of a call to \link[mgcv:gam]{mgcv::gam}`
@@ -20,7 +44,7 @@ or \code{\link[mgcv:gamm]{mgcv::gamm()}}.}
 
 \item{seed}{numeric; a random seed for the simulations.}
 
-\item{newdata}{data frame; new observations at which the posterior draws
+\item{data}{data frame; new observations at which the posterior draws
 from the model should be evaluated. If not supplied, the data used to fit
 the model will be used for \code{newdata}, if available in \code{object}.}
 
@@ -32,6 +56,8 @@ then defaults to \code{object[["prior.weights"]]}, otherwise a vector of ones.}
 additional arguments such as \code{terms}, \code{exclude}, to select which model
 terms are included in the predictions. This may be useful, for example,
 for excluding the effects of random effect terms.}
+
+\item{newdata}{Deprecated. Use \code{data} instead.}
 }
 \value{
 (Currently) A matrix with \code{nsim} columns.

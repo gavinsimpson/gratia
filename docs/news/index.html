@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.7</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,9 +54,12 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.7.3.6" id="gratia-0736-in-development">gratia 0.7.3.6 (In development)<a class="anchor" aria-label="anchor" href="#gratia-0736-in-development"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.7.3.7" id="gratia-0737-in-development">gratia 0.7.3.7 (In development)<a class="anchor" aria-label="anchor" href="#gratia-0737-in-development"></a></h2>
 <div class="section level3">
-<h3 id="new-features-0-7-3-6">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-3-6"></a></h3>
+<h3 id="user-visible-changes-0-7-3-7">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-7-3-7"></a></h3>
+<ul><li>Functions in {gratia} have harmonised to use and argument named <code>data</code> instead of <code>newdata</code> for passing new data at which to evaluate features of smooths. A message will be printed if <code>newdata</code> is used from now on. Existing code does not need to be changed as <code>data</code> takes it value from <code>newdata</code>.</li></ul></div>
+<div class="section level3">
+<h3 id="new-features-0-7-3-7">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-3-7"></a></h3>
 <ul><li><p><code><a href="../reference/evenly.html">evenly()</a></code> is a synonym for <code><a href="../reference/evenly.html">seq_min_max()</a></code> and is preferred going forward.</p></li>
 <li><p><code><a href="../reference/model_vars.html">model_vars()</a></code> is a new, public facing way of returning a vector of variables that are used in a model.</p></li>
 <li>
@@ -71,7 +74,7 @@
 <li><p><code><a href="../reference/derivatives.html">derivatives()</a></code> now works for factor-smooth interaction (<code>"fs"</code>) smooths.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-7-3-6">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-3-6"></a></h3>
+<h3 id="bug-fixes-0-7-3-7">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-3-7"></a></h3>
 <ul><li><p><code>draw.posterior_smooths</code> now plots posterior samples with a fixed aspect ratio if the smooth is isotropic. <a href="https://github.com/gavinsimpson/gratia/issues/148" class="external-link">#148</a></p></li>
 <li><p><code><a href="../reference/derivatives.html">derivatives()</a></code> now ignores random effect smooths (for which derivatives don’t make sense anyway). <a href="https://github.com/gavinsimpson/gratia/issues/168" class="external-link">#168</a></p></li>
 </ul></div>
