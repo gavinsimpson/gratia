@@ -1,4 +1,4 @@
-# gratia 0.7.3.7 (In development)
+# gratia 0.7.3.8 (In development)
 
 ## User visible changes
 
@@ -51,6 +51,9 @@ been renamed `data`. #175
 
 * `derivatives()` now ignores random effect smooths (for which derivatives
   don't make sense anyway). #168
+
+* `confint.gam(...., method = "simultaneous")` now works with factor by smooths
+  where `parm` is passed the full name of a specific smooth `s(x)faclevel`.
 
 # gratia 0.7.3
 
