@@ -2,7 +2,7 @@
 
 ## User visible changes
 
-* Functions in {gratia} have harmonised to use and argument named `data` instead
+* Functions in {gratia} have harmonised to use an argument named `data` instead
   of `newdata` for passing new data at which to evaluate features of smooths. A
   message will be printed if `newdata` is used from now on. Existing code does
   not need to be changed as `data` takes it value from `newdata`.
