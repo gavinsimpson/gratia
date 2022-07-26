@@ -85,7 +85,7 @@
                 smooth_var = smooth_var, data = data, Xp = Xp, V = V,
                 coefs = coefs)
     out <- bind_rows(out)
-    crit <- qnorm((1 - ci_level) / 2, lower.tail = FALSE)
+    crit <- coverage_normal(ci_level)
     out <- add_column(out,
                       lower = out$diff - (crit * out$se),
                       upper = out$diff + (crit * out$se),
