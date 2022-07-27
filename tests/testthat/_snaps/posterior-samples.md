@@ -17,6 +17,7 @@
        9     9     1   9.76
       10    10     1   7.39
       # ... with 4,990 more rows
+      # i Use `print(n = ...)` to see more rows
 
 # smooth_samples example output doesn't change
 
@@ -37,4 +38,5 @@
        9 s(x0)  s(x0) TPRS  <NA>        0.0415      9     1 -0.882
       10 s(x0)  s(x0) TPRS  <NA>        0.0465     10     1 -0.859
       # ... with 990 more rows
+      # i Use `print(n = ...)` to see more rows
 

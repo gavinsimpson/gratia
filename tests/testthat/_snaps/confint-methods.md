@@ -14,6 +14,7 @@
      9 s(x0) -1.79  0.838  3.47
     10 s(x0) -2.48  0.111  2.71
     # ... with 90 more rows
+    # i Use `print(n = ...)` to see more rows
 
 ---
 
@@ -31,4 +32,5 @@
      9 s(x2) -33.6  -24.6    -15.7 
     10 s(x2) -27.1  -19.1    -11.1 
     # ... with 15 more rows
+    # i Use `print(n = ...)` to see more rows
 
