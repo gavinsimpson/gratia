@@ -3,7 +3,7 @@
 \name{lp_matrix}
 \alias{lp_matrix}
 \alias{lp_matrix.gam}
-\title{Return the linear prediction matrix}
+\title{Return the linear prediction matrix of a fitted GAM}
 \usage{
 lp_matrix(model, ...)
 
@@ -13,13 +13,29 @@ lp_matrix(model, ...)
 \item{model}{a fitted model}
 
 \item{...}{arguments passed to other methods and \code{predict} methods including
-\link[mgcv:predict.gam]{mgcv::predict.gam} and \link[mgcv:predict.bam]{mgcv::predict.bam}}
+\code{\link[mgcv:predict.gam]{mgcv::predict.gam()}} and \code{\link[mgcv:predict.bam]{mgcv::predict.bam()}}}
 
 \item{data}{a data frame of values at which to return the linear prediction
 matrix.}
 }
+\value{
+The linear prediction matrix is returned as a matrix. The object
+returned is of class \code{"lp_matrix"}, which inherits from classes \code{"matrix"}
+and \code{"array"}. The special class allows the printing of the matrix to be
+controlled, which we do by printing the matrix as a tibble.
+}
 \description{
-Return the linear prediction matrix
+\code{lp_matrix()} is a wrapper to \code{predict(..., type = "lpmatrix")} for returning
+the linear predictor matrix for the model training data (when \code{data = NULL}),
+or user-specified data values specified via \code{data}.
+}
+\details{
+The linear prediction matrix \eqn{\mathbf{X}_p} is a matrix that maps values
+of parameters \eqn{\hat{\mathbf{\beta}}_p} to values on the linear
+predictor of the model \eqn{\hat{\eta}_p = \mathbf{X}_p
+\hat{\mathbf{\beta}}_p}. \verb{\\mathbf\{X\}_p} is the model matrix where spline
+covariates have been replaced by the values of the basis functions evaluated
+at the respective covariates. Parametric covariates are also included.
 }
 \examples{
 load_mgcv()
