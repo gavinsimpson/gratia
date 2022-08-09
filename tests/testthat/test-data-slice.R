@@ -20,9 +20,9 @@ test_that("data_slice works for a GAM", {
 })
 
 test_that("process_slice_data works when passed a 1-row data frame, tibble, or list", {
-    expect_silent( result1 <- process_slice_data(quick_eg1[1, ]) )
-    expect_silent( result2 <- process_slice_data(tibble::as_tibble(quick_eg1[1, ])))
-    expect_silent( result3 <- process_slice_data(as.list(quick_eg1[1, ])))
+    expect_silent(result1 <- process_slice_data(quick_eg1[1, ]))
+    expect_silent(result2 <- process_slice_data(as_tibble(quick_eg1[1, ])))
+    expect_silent(result3 <- process_slice_data(as.list(quick_eg1[1, ])))
     expect_equal(NROW(result1), 1L)
     expect_equal(NROW(result2), 1L)
     expect_equal(NROW(result3), 1L)
@@ -52,20 +52,20 @@ test_that("process_slice_data fails when passed a list with elements of length >
 test_that("process_slice_var fails when passed a logical variable", {
     dat2 <- cbind(quick_eg1,
                   foo = sample(c(TRUE,FALSE), nrow(quick_eg1), replace = TRUE))
-    expect_error( process_slice_var("foo", dat2),
+    expect_error(process_slice_var("foo", dat2),
                  "Variable <foo> must be a factor or numeric vector. Found <character>",
                  fixed = TRUE)
 })
 
 test_that("process_slice_var fails when `x` is not character", {
     bar <- 1
-    expect_error( process_slice_var(bar, dat2),
+    expect_error(process_slice_var(bar, dat2),
                  "Supplied 'x' is not character.",
                  fixed = TRUE)
 })
 
 test_that("process_slice_var returns NULL when `x` is NULL", {
-    expect_identical( process_slice_var(NULL, dat2), NULL)
+    expect_identical(process_slice_var(NULL, dat2), NULL)
 })
 
 #set.seed(42)
