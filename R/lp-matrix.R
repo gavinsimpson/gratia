@@ -2,9 +2,11 @@
 #'
 #' `lp_matrix()` is a wrapper to `predict(..., type = "lpmatrix")` for returning
 #' the linear predictor matrix for the model training data (when `data = NULL`),
-#' or user-specified data values specified via `data`.
+#' or user-specified data values supplied via `data`.
 #'
 #' @param model a fitted model
+#' @param data a data frame of values at which to return the linear prediction
+#'   matrix.
 #' @param ... arguments passed to other methods and `predict` methods including
 #'   [mgcv::predict.gam()] and [mgcv::predict.bam()]
 #'
@@ -13,7 +15,7 @@
 #' The linear prediction matrix \eqn{\mathbf{X}_p} is a matrix that maps values
 #' of parameters \eqn{\hat{\mathbf{\beta}}_p} to values on the linear
 #' predictor of the model \eqn{\hat{\eta}_p = \mathbf{X}_p
-#' \hat{\mathbf{\beta}}_p}. `\mathbf{X}_p` is the model matrix where spline
+#' \hat{\mathbf{\beta}}_p}. \exp{\mathbf{X}_p} is the model matrix where spline
 #' covariates have been replaced by the values of the basis functions evaluated
 #' at the respective covariates. Parametric covariates are also included.
 #'
@@ -47,8 +49,6 @@
     UseMethod("lp_matrix")
 }
 
-#' @param data a data frame of values at which to return the linear prediction
-#'   matrix.
 #' @export
 #'
 #' @rdname lp_matrix
