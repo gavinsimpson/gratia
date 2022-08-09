@@ -30,6 +30,8 @@ Imports:
     stringr,
     tidyselect,
     lifecycle,
+    pillar,
+    cli,
     nlme
 Suggests:
     gamm4,
@@ -48,7 +50,7 @@ LazyData: true
 URL: https://gavinsimpson.github.io/gratia/
 BugReports: https://github.com/gavinsimpson/gratia/issues
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Encoding: UTF-8
 VignetteBuilder: knitr
 Config/testthat/edition: 3

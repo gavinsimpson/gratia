@@ -21,9 +21,9 @@ Negative binomial parameter theta
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{gam}: Method for class \code{"gam"}
-}}
+\item \code{nb_theta(gam)}: Method for class \code{"gam"}
 
+}}
 \examples{
 load_mgcv()
 df <- data_sim("eg1", n = 500, dist = "poisson", scale = 0.1, seed = 6)

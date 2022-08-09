@@ -217,6 +217,9 @@
     <loc>https://gavinsimpson.github.io/gratia/reference/load_mgcv.html</loc>
   </url>
   <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/lp_matrix.html</loc>
+  </url>
+  <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/model_concurvity.html</loc>
   </url>
   <url>
@@ -236,9 +239,6 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/observed_fitted_plot.html</loc>
-  </url>
-  <url>
-    <loc>https://gavinsimpson.github.io/gratia/reference/old_data_slice.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/overview.html</loc>
