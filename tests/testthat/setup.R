@@ -81,23 +81,32 @@ su_m_factor_by_x2 <- gam(y ~ fac + s(x2, by = fac),
                          data = su_eg4,
                          method = "REML")
 
+su_eg2_by <- su_eg2 %>%
+  mutate(y = y + y^2 + y^3) %>%
+  bind_rows(su_eg2) %>%
+  mutate(fac = factor(rep(c("A", "B"), each = nrow(su_eg2))))
+su_m_bivar_by_fac <- gam(y ~ fac + s(x, z, k = 40, by = fac),
+                  data = su_eg2_by,
+                  method = "REML")
+
 su_gamm_univar_4 <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3),
                          data = su_eg1,
                          method = "REML")
 
 m_1_smooth <- gam(y ~ s(x0), data = quick_eg1, method = "REML")
+
 m_gam <- su_m_univar_4
-# m_gam    <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
-#                 method = "REML")
+
 m_gamm <- su_gamm_univar_4
-# m_gamm   <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
-#                  method = "REML")
+
 m_bam    <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
-                method = "fREML")
+  method = "fREML")
+
 m_gamgcv <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
-                method = "GCV.Cp")
+  method = "GCV.Cp")
+
 m_gamm4  <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
-                  REML = TRUE)
+  REML = TRUE)
 
 m_gaulss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1), data = su_eg1,
                 family = gaulss)
@@ -106,6 +115,7 @@ m_scat <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
               family = scat(), method = "REML")
 
 m_lm  <- lm(y ~ x0 + x1 + x2 + x3, data = quick_eg1)
+
 m_glm <- glm(y ~ x0 + x1 + x2 + x3, data = quick_eg1)
 
 # rootogram models
