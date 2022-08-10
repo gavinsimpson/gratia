@@ -93,6 +93,7 @@ test_that("difference_smooths() works for a bivariate gam", {
     expect_doppelganger("draw difference_smooths bivariate gam", plt)
 
     ## plot
+    skip_on_os("mac")
     plt <- draw(ds, contour = TRUE)
     expect_doppelganger("draw difference_smooths bivariate gam contours", plt)
 })
