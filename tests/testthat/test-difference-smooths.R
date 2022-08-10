@@ -81,3 +81,18 @@ test_that("difference_smooths() works with user data", {
     plt <- draw(ds)
     #expect_doppelganger("draw difference_smooths gam", plt)
 })
+
+test_that("difference_smooths() works for a bivariate gam", {
+    skip_on_cran()
+    expect_silent(ds <- difference_smooths(su_m_bivar_by_fac,
+        smooth = "s(x,z)"))
+    expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
+
+    ## plot
+    plt <- draw(ds)
+    expect_doppelganger("draw difference_smooths bivariate gam", plt)
+
+    ## plot
+    plt <- draw(ds, contour = TRUE)
+    expect_doppelganger("draw difference_smooths bivariate gam contours", plt)
+})

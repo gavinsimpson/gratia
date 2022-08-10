@@ -1,4 +1,4 @@
-# gratia 0.7.3.9 (In development)
+# gratia 0.7.3.10 (In development)
 
 ## User visible changes
 
@@ -50,8 +50,11 @@
   that are used in a model.
 
 * `difference_smooths()` will now use the user-supplied data as points at
-which to evaluate a pair of smooths. Also note that the argument `newdata` has
-been renamed `data`. #175
+  which to evaluate a pair of smooths. Also note that the argument `newdata` has
+  been renamed `data`. #175
+
+* The `draw()` method for `difference_smooths()` now uses better labels for
+  plot titles to avoid long labels with even modest factor levels.
 
 * `derivatives()` now works for factor-smooth interaction (`"fs"`) smooths.
 

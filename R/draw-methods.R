@@ -49,7 +49,7 @@
     ## select smooths
     select <- check_user_select_smooths(smooths = sm, select = select)
     sm <- sm[select]
-    
+
     plotlist <- vector("list", length = length(sm))
 
     for (i in seq_along(sm)) {
@@ -682,10 +682,21 @@
     by_var <- unique(object$by)
     f1 <- unique(object$level_1)
     f2 <- unique(object$level_2)
-    plt_title1 <- mgcv_by_smooth_labels(sm_label, by_var, f1)
-    plt_title2 <- mgcv_by_smooth_labels(sm_label, by_var, f2)
-    plt_title <- paste(plt_title1, plt_title2, sep = " - ")
-    y_label <- "Difference"
+    plt_subtitle <- if (is.null(subtitle)) {
+        bquote("Comparison:" ~ .(f1) - .(f2))
+    } else {
+        subtitle
+    }
+    y_label <- if (is.null(ylab)) {
+        "Difference"
+    } else {
+        ylab
+    }
+    plt_title <- if (is.null(title)) {
+        paste(sm_label, "by", by_var)
+    } else {
+        title
+    }
 
     plt <- ggplot(object, aes(x = .data[[xvars[1L]]],
                               y = .data$diff))
@@ -699,9 +710,10 @@
                         y = NULL),
                     alpha = ci_alpha, fill = ci_col, colour = NA) +
         geom_line(colour = smooth_col) +
-        labs(title = plt_title, x = xvars, y = y_label)
+            labs(title = plt_title, x = xvars, y = y_label,
+                 subtitle = plt_subtitle)
 
-    if(isTRUE(rug)) {
+    if (isTRUE(rug)) {
         plt <- plt + geom_rug(sides = "b", alpha = 0.5)
     }
     plt
@@ -725,14 +737,19 @@
     if (is.null(ylab)) {
         ylab <- xvars[2]
     }
-    if (is.null(title)) {
-        sm_label <- unique(object$smooth)
-        by_var <- unique(object$by)
-        f1 <- unique(object$level_1)
-        f2 <- unique(object$level_2)
-        plt_title1 <- mgcv_by_smooth_labels(sm_label, by_var, f1)
-        plt_title2 <- mgcv_by_smooth_labels(sm_label, by_var, f2)
-        title <- paste(plt_title1, plt_title2, sep = " - ")
+    sm_label <- unique(object$smooth)
+    by_var <- unique(object$by)
+    f1 <- unique(object$level_1)
+    f2 <- unique(object$level_2)
+    plt_title <- if (is.null(title)) {
+        paste(sm_label, "by", by_var)
+    } else {
+        title
+    }
+    plt_subtitle <- if (is.null(subtitle)) {
+        bquote("Comparison:" ~ .(f1) - .(f2))
+    } else {
+        subtitle
     }
 
     plt <- ggplot(object, aes(x = .data[[xvars[1L]]],
@@ -746,7 +763,7 @@
     }
 
     plt <- plt +
-        labs(title =title, x = xlab, y = ylab, subtitle = subtitle,
+        labs(title = plt_title, x = xlab, y = ylab, subtitle = plt_subtitle,
              caption = caption)
 
     plt <- plt + scale_fill_distiller(palette = "RdBu", type = "div")
