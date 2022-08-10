@@ -24,7 +24,7 @@
 #'   parametric terms. If `frequentist = FALSE`, the frequentist covariance
 #'   matrix of the parameter estimates is used.
 #' @param accuracy numeric; accuracy with which to report p values, with p
-#'   values below this value displayed as `"< 0.001"`.
+#'   values below this value displayed as `"< accuracy"`.
 #'
 #' @export
 #' @rdname overview
@@ -60,11 +60,11 @@
       rownames_to_column() %>%
       as_tibble() %>%
       select(!matches("Ref.df")) %>%
-      add_column(type = types, .after = 1L) 
-    
+      add_column(type = types, .after = 1L)
+
     # parametric terms
     para <- NULL
-    if (isTRUE(parametric)) {
+    if (isTRUE(parametric) && ! is.null(smry$pTerms.table)) {
         para <- as.data.frame(smry$pTerms.table) %>%
           rownames_to_column() %>%
           as_tibble() %>%
@@ -80,4 +80,42 @@
 
     class(out) <- append(class(out), values = "overview", after = 0)
     out
+}
+
+#' @export
+`overview.gamm` <- function(model, ...) {
+    out <- overview(model$gam)
+    class(out) <- append(class(out), values = "overview_gamm", after = 0)
+    out
+}
+
+#' @export
+`overview.bam` <- function(model, ...) {
+    out <- NextMethod()
+    class(out) <- append(class(out), values = "overview_bam", after = 0)
+    out
+}
+
+#' @export
+#' @importFrom cli symbol pluralize
+`tbl_sum.overview` <- function(x, ...) {
+  c("Generalized Additive Model" = pluralize("with {nrow(x)} term{?s}"))
+}
+
+#' @export
+#' @importFrom cli symbol pluralize
+`tbl_sum.overview_gamm` <- function(x, ...) {
+  c("Generalized Additive Mixed Model" = pluralize("with {nrow(x)} term{?s}"))
+}
+
+#' @export
+#' @importFrom cli symbol pluralize
+`tbl_sum.overview_bam` <- function(x, ...) {
+  c("Big Additive Model" = pluralize("with {nrow(x)} term{?s}"))
+}
+
+#' @export
+#' @importFrom cli style_dim
+tbl_format_header.overview <- function(x, setup, ...) {
+    style_dim("\n", names(setup$tbl_sum), " ", setup$tbl_sum, "\n")
 }
