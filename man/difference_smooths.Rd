@@ -56,6 +56,9 @@ op <- options(digits = 3, cli.unicode = FALSE)
 df <- data_sim("eg4", seed = 42)
 m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 
-difference_smooths(m, smooth = "s(x2)")
+sm_dif <- difference_smooths(m, smooth = "s(x2)")
+sm_dif
+
+draw(sm_dif)
 \dontshow{options(op)}
 }
