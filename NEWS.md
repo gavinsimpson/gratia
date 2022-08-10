@@ -1,18 +1,20 @@
-# gratia 0.7.3.8 (In development)
+# gratia 0.7.3.9 (In development)
 
 ## User visible changes
 
 * Functions in {gratia} have harmonised to use an argument named `data` instead
   of `newdata` for passing new data at which to evaluate features of smooths. A
   message will be printed if `newdata` is used from now on. Existing code does
-  not need to be changed as `data` takes it value from `newdata`.
+  not need to be changed as `data` takes its value from `newdata`.
+  
+  Note that due to the way `...` is handled in R, if your R script uses the
+  `data` argument, *and* is run with versions of gratia prior to 8.0 (when
+  released; 0.7.3.8 if using the development version) the user-supplied data
+  will be silently ignored. As such, scripts using `data` should check that the
+  installed version of gratia is >= 0.8 and package developers should update
+  to depend on versions >= 0.8 by using `gratia (>= 0.8)` in `DESCRIPTION`.
 
 ## New features
-
-* `evenly()` is a synonym for `seq_min_max()` and is preferred going forward.
-
-* `model_vars()` is a new, public facing way of returning a vector of variables
-  that are used in a model.
 
 * `data_slice()` has been totally revised. Now, the user provides the values for
   the variables they want in the slice and any variables in the model that are
@@ -37,6 +39,15 @@
   `fac` variable of the model.
 
 * `overview()` provides a simple overview of model terms for fitted GAMs.
+
+* `lp_matrix()` is a new utility function to quickly return the linear predictor
+  matrix for an estimated model. It is a wrapper to
+  `predict(..., type = "lpmatrix")`
+
+* `evenly()` is a synonym for `seq_min_max()` and is preferred going forward.
+
+* `model_vars()` is a new, public facing way of returning a vector of variables
+  that are used in a model.
 
 * `difference_smooths()` will now use the user-supplied data as points at
 which to evaluate a pair of smooths. Also note that the argument `newdata` has

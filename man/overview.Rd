@@ -42,7 +42,7 @@ parametric terms. If \code{frequentist = FALSE}, the frequentist covariance
 matrix of the parameter estimates is used.}
 
 \item{accuracy}{numeric; accuracy with which to report p values, with p
-values below this value displayed as \code{"< 0.001"}.}
+values below this value displayed as \code{"< accuracy"}.}
 }
 \description{
 Provides an overview of a model and the terms in that model
