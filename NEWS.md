@@ -1,4 +1,4 @@
-# gratia 0.7.3.10 (In development)
+# gratia 0.7.3.11 (In development)
 
 ## User visible changes
 
@@ -57,6 +57,9 @@
   plot titles to avoid long labels with even modest factor levels.
 
 * `derivatives()` now works for factor-smooth interaction (`"fs"`) smooths.
+
+* `draw()` methods now allow the angle of tick labels on the x axis of plots to
+  be rotated using argument `angle`. Requested by @tamas-ferenci #67
 
 ## Bug fixes
 

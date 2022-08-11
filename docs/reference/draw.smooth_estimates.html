@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.10</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.11</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,6 +76,7 @@
 <span>  discrete_colour <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  continuous_colour <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  continuous_fill <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  angle <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  projection <span class="op">=</span> <span class="st">"orthographic"</span>,</span>
 <span>  orientation <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -143,6 +144,11 @@ against.</p></dd>
 <dt>discrete_colour, continuous_colour, continuous_fill</dt>
 <dd><p>suitable scales
 for the types of data.</p></dd>
+
+
+<dt>angle</dt>
+<dd><p>numeric; the angle at which the x axis tick labels are to be
+drawn passed to the <code>angle</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/guide_axis.html" class="external-link">ggplot2::guide_axis()</a></code>.</p></dd>
 
 
 <dt>ylim</dt>

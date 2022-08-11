@@ -14,7 +14,7 @@ is used instead."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.10</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.11</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,6 +97,7 @@ is used instead.</p>
 <span>  continuous_colour <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  continuous_fill <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
+<span>  angle <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  nrow <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  guides <span class="op">=</span> <span class="st">"keep"</span>,</span>
@@ -256,6 +257,11 @@ for the types of data.</p></dd>
 <dt>position</dt>
 <dd><p>Position adjustment, either as a string, or the result of a
 call to a position adjustment function.</p></dd>
+
+
+<dt>angle</dt>
+<dd><p>numeric; the angle at which the x axis tick labels are to be
+drawn passed to the <code>angle</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/guide_axis.html" class="external-link">ggplot2::guide_axis()</a></code>.</p></dd>
 
 
 <dt>ncol, nrow</dt>

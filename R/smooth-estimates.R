@@ -693,6 +693,7 @@
                                     discrete_colour = NULL,
                                     continuous_colour = NULL,
                                     continuous_fill = NULL,
+                                    angle = NULL,
                                     ylim = NULL,
                                     projection = "orthographic",
                                     orientation = NULL,
@@ -716,6 +717,7 @@
                                   discrete_colour = discrete_colour,
                                   continuous_colour = continuous_colour,
                                   continuous_fill = continuous_fill,
+                                  angle = angle,
                                   ylim = ylim,
                                   projection = projection,
                                   orientation = orientation,
@@ -741,6 +743,7 @@
                                     discrete_colour = NULL,
                                     continuous_colour = NULL,
                                     continuous_fill = NULL,
+                                    angle = NULL,
                                     ylim = NULL,
                                     projection = "orthographic",
                                     orientation = NULL,
@@ -849,6 +852,7 @@
                 discrete_colour = discrete_colour,
                 continuous_colour = continuous_colour,
                 continuous_fill = continuous_fill,
+                angle = angle,
                 ylim = ylim,
                 projection = projection,
                 orientation = orientation,
@@ -861,7 +865,7 @@
 
 #' @importFrom dplyr mutate
 #' @importFrom ggplot2 ggplot geom_point geom_rug geom_abline
-#'   expand_limits labs geom_line geom_ribbon aes
+#'   expand_limits labs geom_line geom_ribbon aes guides guide_axis
 #' @importFrom rlang .data
 #' @keywords internal
 #' @noRd
@@ -875,6 +879,7 @@
                                        ci_col = "black",
                                        smooth_col = "black",
                                        resid_col = "steelblue3",
+                                       angle = NULL,
                                        xlab = NULL,
                                        ylab = NULL,
                                        title = NULL,
@@ -894,7 +899,8 @@
     object <- transform_fun(object, fun = fun)
 
     # base plot - need as.name to handle none standard names, like log2(x)
-    plt <- ggplot(object, aes(x = .data[[variables]], y = .data$est))
+    plt <- ggplot(object, aes(x = .data[[variables]], y = .data$est)) +
+        guides(x = guide_axis(angle = angle))
 
     # do we want partial residuals? Only for univariate smooths without by vars
     if (!is.null(partial_residuals)) {
@@ -958,7 +964,7 @@
 }
 
 #' @importFrom ggplot2 ggplot geom_point geom_raster geom_contour
-#'   expand_limits labs guides guide_colourbar theme
+#'   expand_limits labs guides guide_colourbar theme guide_axis
 #' @importFrom grid unit
 #' @importFrom rlang .data
 #' @keywords internal
@@ -979,6 +985,7 @@
                                            caption = NULL,
                                            ylim = NULL,
                                            continuous_fill = NULL,
+                                           angle = NULL,
                                            ...) {
     if (is.null(variables)) {
         variables <- vars_from_label(unique(object[["smooth"]]))
@@ -1053,8 +1060,9 @@
     ## add guide
     plt <- plt +
         guides(fill = guide_colourbar(title = guide_title,
-                                      direction = "vertical",
-                                      barheight = grid::unit(0.25, "npc")))
+            direction = "vertical",
+            barheight = grid::unit(0.25, "npc")),
+        x = guide_axis(angle = angle))
 
     ## position legend at the
     plt <- plt + theme(legend.position = "right")
@@ -1092,6 +1100,7 @@
                                             caption = NULL,
                                             ylim = NULL,
                                             continuous_fill = NULL,
+                                            angle = NULL,
                                             ...) {
     if (is.null(variables)) {
         variables <- vars_from_label(unique(object[["smooth"]]))
@@ -1171,7 +1180,8 @@
     plt <- plt +
         guides(fill = guide_colourbar(title = guide_title,
                                       direction = "vertical",
-                                      barheight = grid::unit(0.25, "npc")))
+                                      barheight = grid::unit(0.25, "npc")),
+        x = guide_axis(angle = angle))
 
     ## position legend at the
     plt <- plt + theme(legend.position = "right")
@@ -1226,6 +1236,7 @@
                                              caption = NULL,
                                              ylim = NULL,
                                              continuous_fill = NULL,
+                                             angle = NULL,
                                              ...) {
     if (is.null(variables)) {
         variables <- vars_from_label(unique(object[["smooth"]]))
@@ -1308,7 +1319,8 @@
     plt <- plt +
         guides(fill = guide_colourbar(title = guide_title,
                                       direction = "vertical",
-                                      barheight = grid::unit(0.25, "npc")))
+                                      barheight = grid::unit(0.25, "npc")),
+        x = guide_axis(angle = angle))
 
     ## position legend at the
     plt <- plt + theme(legend.position = "right")
@@ -1366,6 +1378,7 @@
                                         subtitle = NULL,
                                         caption = NULL,
                                         ylim = NULL,
+                                        angle = NULL,
                                         ...) {
     if (is.null(variables)) {
         variables <- vars_from_label(unique(object[["smooth"]]))
@@ -1379,7 +1392,8 @@
 
     ## base plot with computed QQs
     plt <- ggplot(object, aes(sample = .data[["est"]])) +
-        geom_point(stat = "qq")
+        geom_point(stat = "qq") +
+        guides(x = guide_axis(angle = angle))
 
     ## add a QQ reference line
     if (isTRUE(qq_line)) {
@@ -1439,6 +1453,7 @@
                                         caption = NULL,
                                         ylim = NULL,
                                         discrete_colour = NULL,
+                                        angle = NULL,
                                        ...) {
     if (is.null(variables)) {
         variables <- vars_from_label(unique(object[["smooth"]]))
@@ -1459,7 +1474,8 @@
                               colour = .data[[variables[2]]])) +
         geom_line() +
         discrete_colour +
-        theme(legend.position = "none")
+        theme(legend.position = "none") +
+        guides(x = guide_axis(angle = angle))
 
     ## default axis labels if none supplied
     if (missing(xlab)) {
@@ -1519,6 +1535,7 @@
                               continuous_fill = NULL,
                               projection = "orthographic",
                               orientation = NULL,
+                              angle = NULL,
                               ...) {
     # handle splines on the sphere
 
@@ -1613,8 +1630,9 @@
     ## add guide
     plt <- plt +
         guides(fill = guide_colourbar(title = guide_title,
-                                      direction = "vertical",
-                                      barheight = grid::unit(0.25, "npc")))
+            direction = "vertical",
+            barheight = grid::unit(0.25, "npc")),
+            x = guide_axis(angle = angle))
 
     ## position legend at the
     plt <- plt + theme(legend.position = "right")

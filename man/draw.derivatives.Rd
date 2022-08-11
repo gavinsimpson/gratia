@@ -12,6 +12,7 @@
   ncol = NULL,
   nrow = NULL,
   guides = "keep",
+  angle = NULL,
   ...
 )
 }
@@ -40,6 +41,9 @@ spread the plots}
 
 \item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
 \code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
+
+\item{angle}{numeric; the angle at which the x axis tick labels are to be
+drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggplot2::guide_axis()}}.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
