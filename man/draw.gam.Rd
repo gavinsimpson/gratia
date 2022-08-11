@@ -34,6 +34,7 @@
   continuous_colour = NULL,
   continuous_fill = NULL,
   position = "identity",
+  angle = NULL,
   ncol = NULL,
   nrow = NULL,
   guides = "keep",
@@ -138,6 +139,9 @@ for the types of data.}
 
 \item{position}{Position adjustment, either as a string, or the result of a
 call to a position adjustment function.}
+
+\item{angle}{numeric; the angle at which the x axis tick labels are to be
+drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggplot2::guide_axis()}}.}
 
 \item{ncol, nrow}{numeric; the numbers of rows and columns over which to
 spread the plots}

@@ -22,6 +22,7 @@
   scales = c("free", "fixed"),
   rug = TRUE,
   partial_match = FALSE,
+  angle = NULL,
   ncol = NULL,
   nrow = NULL,
   guides = "keep",
@@ -84,6 +85,9 @@ smooths or plot locations of data for higher dimensions.}
 \item{partial_match}{logical; should smooths be selected by partial matches
 with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
 against.}
+
+\item{angle}{numeric; the angle at which the x axis tick labels are to be
+drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggplot2::guide_axis()}}.}
 
 \item{ncol, nrow}{numeric; the numbers of rows and columns over which to
 spread the plots}

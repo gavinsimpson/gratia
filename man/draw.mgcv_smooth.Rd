@@ -14,6 +14,7 @@
   title = NULL,
   subtitle = NULL,
   caption = NULL,
+  angle = NULL,
   ...
 )
 }
@@ -44,6 +45,9 @@ supplied, a suitable label will be generated from \code{object}.}
 
 \item{caption}{character or expression; the plot caption. See
 \code{\link[ggplot2:labs]{ggplot2::labs()}}.}
+
+\item{angle}{numeric; the angle at which the x axis tick labels are to be
+drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggplot2::guide_axis()}}.}
 
 \item{...}{arguments passed to other methods. Not used by this method.}
 }
