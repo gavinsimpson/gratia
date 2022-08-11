@@ -59,7 +59,7 @@
 * `derivatives()` now works for factor-smooth interaction (`"fs"`) smooths.
 
 * `draw()` methods now allow the angle of tick labels on the x axis of plots to
-  be rotated using argument `angle`. Requested by @tamas-ferenci #67
+  be rotated using argument `angle`. Requested by @tamas-ferenci #87
 
 ## Bug fixes
 
