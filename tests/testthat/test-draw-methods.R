@@ -336,6 +336,17 @@ test_that("draw.derivates() plots derivatives for a GAM", {
     expect_doppelganger("draw derivatives for a GAM with fixed scales", plt)
 })
 
+test_that("draw.derivates() plots derivatives for a GAM rotated labels", {
+    skip_on_cran()
+    d1 <- derivatives(su_m_univar_4, type = "central")
+    plt <- draw(d1, angle = 45)
+    expect_doppelganger("draw derivatives for a GAM rotated labels", plt)
+
+    plt <- draw(d1, scales = "fixed", angle = 45)
+    expect_doppelganger("draw derivatives for a GAM with fixed scales rotated",
+        plt)
+})
+
 ## test that issue 39 stays fixed
 test_that("draw.gam doesn't create empty plots with multiple parametric terms", {
     plt <- draw(m_2_fac)
@@ -346,6 +357,14 @@ test_that("draw.mgcv_smooth() can plot basic smooth bases", {
     bs <- basis(s(x0), data = su_eg1)
     plt <- draw(bs)
     expect_doppelganger("draw basic tprs basis", plt)
+})
+
+test_that("draw.mgcv_smooth() can plot basic smooth bases with rotated labels",
+{
+    skip_on_cran()
+    bs <- basis(s(x0), data = su_eg1)
+    plt <- draw(bs, angle = 45)
+    expect_doppelganger("draw basic tprs basis rotated", plt)
 })
 
 test_that("draw.mgcv_smooth() can plot by factor basis smooth bases", {
@@ -398,6 +417,27 @@ test_that("draw works for sample_smooths objects", {
     sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478, n_vals = 100)
     plt <- draw(sm3, alpha = 0.7, scales = "fixed", n_samples = 15, seed = 2635)
     expect_doppelganger("draw smooth_samples for GAM m3 fixed scales", plt)
+})
+
+test_that("draw works for sample_smooths objects rotated labels", {
+    skip_on_cran()
+    sm1 <- smooth_samples(su_m_univar_4, n = 15, seed = 23478, n_vals = 100)
+    plt <- draw(sm1, alpha = 0.7, n_samples = 15, seed = 2635, angle = 45)
+    expect_doppelganger("draw smooth_samples for GAM m1 rotated", plt)
+
+    sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478, n_vals = 100)
+    plt <- draw(sm2, alpha = 0.7, n_samples = 4, seed = 2635, angle = 45)
+    expect_doppelganger("draw smooth_samples for GAM m2 rotated", plt)
+
+    sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478, n_vals = 100)
+    plt <- draw(sm3, alpha = 0.7, n_samples = 15, seed = 2635, angle = 45)
+    expect_doppelganger("draw smooth_samples for GAM m3 rotated", plt)
+
+    sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478, n_vals = 100)
+    plt <- draw(sm3, alpha = 0.7, scales = "fixed", n_samples = 15, seed = 2635,
+        angle = 45)
+    expect_doppelganger("draw smooth_samples for GAM m3 fixed scales rotated",
+        plt)
 })
 
 test_that("draw works for sample_smooths objects", {

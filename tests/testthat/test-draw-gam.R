@@ -12,6 +12,11 @@ test_that("draw.gam works for m_1_smooth", {
     expect_doppelganger("draw_gam m_1_smooth", plt)
 })
 
+test_that("draw.gam works for m_1_smooth with angled labels", {
+    expect_silent(plt <- draw(m_1_smooth, angle = 45))
+    expect_doppelganger("draw_gam m_1_smooth rotated", plt)
+})
+
 test_that("draw.gam works for m_1_smooth with partial residuals", {
     expect_silent(plt <- draw(m_1_smooth, residuals = TRUE,
                             resid_col = "hotpink"))
@@ -21,6 +26,11 @@ test_that("draw.gam works for m_1_smooth with partial residuals", {
 test_that("draw.gam works for m_gam", {
     expect_silent(plt <- draw(m_gam, rug = FALSE))
     expect_doppelganger("draw_gam m_gam", plt)
+})
+
+test_that("draw.gam works for m_gam rotated", {
+    expect_silent(plt <- draw(m_gam, rug = FALSE, angle = 45))
+    expect_doppelganger("draw_gam m_gam rotated", plt)
 })
 
 test_that("draw.gam works for m_gamm", {
@@ -152,6 +162,20 @@ test_that("draw.gam works for a quadvariate smooth", {
     expect_doppelganger("draw_gam quadvar te", plt)
 })
 
+test_that("draw.gam works for a trivariate smooth rotated labels", {
+    skip_on_os(os = "win")
+    skip_on_os(os = "mac")
+    expect_silent(plt <- draw(su_m_trivar_te, angle = 45))
+    expect_doppelganger("draw_gam trivar te rotated labels", plt)
+})
+
+test_that("draw.gam works for a quadvariate smooth rotated labels", {
+    skip_on_os(os = "win")
+    skip_on_os(os = "mac")
+    expect_silent(plt <- draw(su_m_quadvar_te, angle = 45))
+    expect_doppelganger("draw_gam quadvar te rotated labels", plt)
+})
+
 test_that("draw.gam issues message for parametric only model", {
     expect_message(plt <- draw(m_only_para),
                    "Unable to draw any of the model terms.")
@@ -161,4 +185,9 @@ test_that("draw.gam works for a parametric only model", {
     expect_message(plt <- draw(m_only_para, parametric = TRUE),
                    "Interaction terms are not currently supported.")
     expect_doppelganger("draw_gam parametric only model", plt)
+
+    # rotated
+    expect_message(plt <- draw(m_only_para, parametric = TRUE, angle = 90),
+                   "Interaction terms are not currently supported.")
+    expect_doppelganger("draw_gam parametric only model rotated labels", plt)
 })

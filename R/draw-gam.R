@@ -73,6 +73,8 @@
 #'   for the types of data.
 #' @param position Position adjustment, either as a string, or the result of a
 #'   call to a position adjustment function.
+#' @param angle numeric; the angle at which the x axis tick labels are to be
+#'   drawn passed to the `angle` argument of [ggplot2::guide_axis()].
 #' @param ncol,nrow numeric; the numbers of rows and columns over which to
 #'   spread the plots
 #' @param guides character; one of `"keep"` (the default), `"collect"`, or
@@ -164,6 +166,7 @@
                        continuous_colour = NULL,
                        continuous_fill = NULL,
                        position = "identity",
+                       angle = NULL,
                        ncol = NULL, nrow = NULL,
                        guides = "keep",
                        projection = "orthographic",
@@ -293,6 +296,7 @@
                        discrete_colour = discrete_colour,
                        continuous_colour = continuous_colour,
                        continuous_fill = continuous_fill,
+                       angle = angle,
                        ylim = ylims,
                        projection = projection,
                        orientation = orientation)
@@ -326,6 +330,7 @@
                                                   fun = fun,
                                                   rug = rug,
                                                   position = position,
+                                                  angle = angle,
                                                   ylim = ylims))
     } # parametric done
 

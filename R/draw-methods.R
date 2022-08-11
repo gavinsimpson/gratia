@@ -41,6 +41,7 @@
                                scales = c("free", "fixed"), alpha = 0.2,
                                ncol = NULL, nrow = NULL,
                                guides = "keep",
+                               angle = NULL,
                                ...) {
     scales <- match.arg(scales)
 
@@ -69,7 +70,8 @@
         }
         plotlist[[i]] <- plt +
             geom_line() +
-            labs(title = sm[i], x = xvar, y = "Derivative")
+            labs(title = sm[i], x = xvar, y = "Derivative") +
+            guides(x = guide_axis(angle = angle))
     }
 
     if (isTRUE(identical(scales, "fixed"))) {
@@ -111,6 +113,8 @@
 #'   [ggplot2::labs()].
 #' @param caption character or expression; the plot caption. See
 #'   [ggplot2::labs()].
+#' @param angle numeric; the angle at which the x axis tick labels are to be
+#'   drawn passed to the `angle` argument of [ggplot2::guide_axis()].
 #' @param ... arguments passed to other methods. Not used by this method.
 #'
 #' @return A [ggplot2::ggplot()] object.
@@ -137,6 +141,7 @@
                                xlab, ylab,
                                title = NULL, subtitle = NULL,
                                caption = NULL,
+                               angle = NULL,
                                ...) {
     ## capture the univariate smooth variable
     smooth_var <- names(object)[5L]
@@ -150,7 +155,8 @@
     plt <- ggplot(object, aes(x = .data[[smooth_var]],
                               y = .data[["value"]],
                               colour = .data[["bf"]])) +
-        geom_line()
+        geom_line() +
+        guides(x = guide_axis(angle = angle))
 
     ## default labels if none supplied
     if (missing(xlab)) {
@@ -204,6 +210,8 @@
 #'   [ggplot2::labs()].
 #' @param caption character or expression; the plot caption. See
 #'   [ggplot2::labs()].
+#' @param angle numeric; the angle at which the x axis tick labels are to be
+#'   drawn passed to the `angle` argument of [ggplot2::guide_axis()].
 #' @param ... arguments to be passed to [patchwork::wrap_plots()].
 #'
 #' @export
@@ -260,6 +268,7 @@
                                   scales = c("free", "fixed"),
                                   rug = TRUE,
                                   partial_match = FALSE,
+                                  angle = NULL,
                                   ncol = NULL, nrow = NULL,
                                   guides = "keep", ...) {
     scales <- match.arg(scales)
@@ -285,7 +294,7 @@
                 title = title, subtitle = subtitle, caption = caption,
                 rug = rug, alpha = alpha, colour = colour,
                 contour = contour, n_contour = n_contour,
-                contour_col = contour_col)
+                contour_col = contour_col, angle = angle)
 
     if (isTRUE(identical(scales, "fixed"))) {
         ylims <- range(object[["value"]])
@@ -313,7 +322,7 @@
                                      colour = "black",
                                      contour = FALSE,
                                      contour_col = "black",
-                                     n_contour = NULL, ...) {
+                                     n_contour = NULL, angle = NULL, ...) {
     # handle the seed nicely
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
         runif(1)
@@ -363,21 +372,21 @@
                                   alpha = alpha, colour = colour,
                                   xlab = xlab, ylab = ylab,
                                   title = title, subtitle = subtitle,
-                                  caption = caption, ...)
+                                  caption = caption, angle = angle, ...)
     } else if (identical(n_xvars, 2L)) {
         draw_2d_posterior_smooths(object, contour = contour,
                                   contour_col = contour_col,
                                   n_contour = n_contour,
                                   xlab = xlab, ylab = ylab,
                                   title = title, subtitle = subtitle,
-                                  caption = caption, ...)
+                                  caption = caption, angle = angle, ...)
     } else if (identical(n_xvars, 3L)) {
         draw_3d_posterior_smooths(object, contour = contour,
                                   contour_col = contour_col,
                                   n_contour = n_contour,
                                   xlab = xlab, ylab = ylab,
                                   title = title, subtitle = subtitle,
-                                  caption = caption, ...)
+                                  caption = caption, angle = angle, ...)
     } else {
         message("Can't plot samples of smooths of more than 3 variables.")
         NULL
@@ -391,14 +400,15 @@
 `draw_1d_posterior_smooths` <- function(object, xlab = NULL, ylab = NULL,
                                         title = NULL, subtitle = NULL,
                                         caption = NULL, rug = TRUE, alpha = 1,
-                                        colour = "black") {
+                                        colour = "black", angle = NULL) {
     data_names <- attr(object, "data_names")
     smooth_var <- data_names[[unique(object[["term"]])]]
 
     plt <- ggplot(object, aes(x = .data[[".x1"]],
                               y = .data[["value"]],
                               group = .data[["draw"]])) +
-        geom_line(alpha = alpha, colour = colour)
+        geom_line(alpha = alpha, colour = colour) +
+        guides(x = guide_axis(angle = angle))
 
     ## default axis labels if none supplied
     if (is.null(xlab)) {
@@ -445,7 +455,8 @@
                                         ylab = NULL,
                                         title = NULL,
                                         subtitle = NULL,
-                                        caption = NULL) {
+                                        caption = NULL,
+                                        angle = NULL) {
     xvars <- unique(object[["term"]])
     xvars <- vars_from_label(xvars)
 
@@ -470,7 +481,8 @@
     ##   the data into the object under their own names..., just .x1, .x2, etc
     plt <- ggplot(object, aes(x = .data[[".x1"]],
                               y = .data[[".x2"]])) +
-        geom_raster(aes(fill = .data[["value"]]))
+        geom_raster(aes(fill = .data[["value"]])) +
+        guides(x = guide_axis(angle = angle))
 
     if (contour) {
         plt <- plt + geom_contour(aes(z = .data[["value"]]),
@@ -514,7 +526,8 @@
                                         ylab = NULL,
                                         title = NULL,
                                         subtitle = NULL,
-                                        caption = NULL) {
+                                        caption = NULL,
+                                        angle = NULL) {
     warning("Plotting samples of 3D smooths is not yet implemented")
     return(NULL)
 }
@@ -572,7 +585,8 @@
                                      ylab = NULL,
                                      title = NULL,
                                      subtitle = NULL,
-                                     caption = NULL, ...) {
+                                     caption = NULL,
+                                     angle = NULL, ...) {
     scales <- match.arg(scales)
 
     ## how many smooths
@@ -597,7 +611,7 @@
                     contour_col = contour_col,
                     n_contour = n_contour,
                     xlab = xlab, ylab = ylab, title = title,
-                    subtitle = subtitle, caption = caption)
+                    subtitle = subtitle, caption = caption, angle = angle)
 
     if (isTRUE(identical(scales, "fixed"))) {
         ylims <- range(object[["lower"]], object[["upper"]])
@@ -627,7 +641,8 @@
                               contour_col = "black",
                               n_contour = NULL,
                               xlab = NULL, ylab = NULL,
-                              title = NULL, subtitle = NULL, caption = NULL) {
+                              title = NULL, subtitle = NULL, caption = NULL,
+                              angle = NULL) {
     xvars <- unique(object[["smooth"]])
     xvars <- vars_from_label(xvars)
     n_xvars <- length(xvars)
@@ -637,25 +652,25 @@
                          line_col = line_col,
                          ci_col = ci_col, xlab = xlab, ylab = ylab,
                          title = title, subtitle = subtitle,
-                         caption = caption)
+                         caption = caption, angle = angle)
     } else if (identical(n_xvars, 2L)) {
         draw_2d_difference(object, xvars, contour = contour,
                            contour_col = contour_col, n_contour = n_contour,
                            xlab = xlab, ylab = ylab,
                            title = title, subtitle = subtitle,
-                           caption = caption)
+                           caption = caption, angle = angle)
     } else if (identical(n_xvars, 3L)) {
         draw_3d_difference(object, xvars, contour = contour,
                            contour_col = contour_col, n_contour = n_contour,
                            xlab = xlab, ylab = ylab,
                            title = title, subtitle = subtitle,
-                           caption = caption)
+                           caption = caption, angle = angle)
     } else if (identical(n_xvars, 4L)) {
         draw_4d_difference(object, xvars, contour = contour,
                            contour_col = contour_col, n_contour = n_contour,
                            xlab = xlab, ylab = ylab,
                            title = title, subtitle = subtitle,
-                           caption = caption)
+                           caption = caption, angle = angle)
     } else {
         message("Can't plot differences for smooths of more than 4 variables.")
         NULL
@@ -677,7 +692,7 @@
                                  ylab = NULL,
                                  title = NULL,
                                  subtitle = NULL,
-                                 caption = NULL) {
+                                 caption = NULL, angle = NULL) {
     sm_label <- unique(object$smooth)
     by_var <- unique(object$by)
     f1 <- unique(object$level_1)
@@ -699,7 +714,8 @@
     }
 
     plt <- ggplot(object, aes(x = .data[[xvars[1L]]],
-                              y = .data$diff))
+                              y = .data$diff)) +
+        guides(x = guide_axis(angle = angle))
 
     if (isTRUE(ref_line)) {
         plt <- plt + geom_hline(yintercept = 0, colour = line_col)
@@ -730,7 +746,7 @@
                                  ylab = NULL,
                                  title = NULL,
                                  subtitle = NULL,
-                                 caption = NULL) {
+                                 caption = NULL, angle = NULL) {
     if (is.null(xlab)) {
         xlab <- xvars[1]
     }
@@ -754,7 +770,8 @@
 
     plt <- ggplot(object, aes(x = .data[[xvars[1L]]],
                               y = .data[[xvars[2L]]])) +
-        geom_raster(aes(fill = .data$diff))
+        geom_raster(aes(fill = .data$diff)) +
+        guides(x = guide_axis(angle = angle))
 
     if (contour) {
         plt <- plt + geom_contour(aes(z = .data$diff),
@@ -786,7 +803,7 @@
                                  ylab = NULL,
                                  title = NULL,
                                  subtitle = NULL,
-                                 caption = NULL) {
+                                 caption = NULL, angle = NULL) {
     warning("Plotting differences of 3D smooths is not yet implemented")
     return(NULL)
 }
@@ -797,7 +814,7 @@
                                  ylab = NULL,
                                  title = NULL,
                                  subtitle = NULL,
-                                 caption = NULL) {
+                                 caption = NULL, angle = NULL) {
     warning("Plotting differences of 4D smooths is not yet implemented")
     return(NULL)
 }
