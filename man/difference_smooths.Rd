@@ -13,6 +13,7 @@ difference_smooths(model, ...)
   n = 100,
   ci_level = 0.95,
   data = NULL,
+  group_means = FALSE,
   partial_match = TRUE,
   unconditional = FALSE,
   frequentist = FALSE,
@@ -34,6 +35,9 @@ between pairs of smooths.}
 \item{data}{data frame of locations at which to evaluate the difference
 between smooths.}
 
+\item{group_means}{logical; should the group means be included in the
+difference?}
+
 \item{partial_match}{logical; should \code{smooth} match partially against
 \code{smooths}? If \code{partial_match = TRUE}, \code{smooth} must only be a single
 string, a character vector of length 1. Unlike similar functions, the
@@ -45,7 +49,10 @@ against factor-by smooth labels.}
 \item{frequentist}{logical; use the frequentist covariance matrix?}
 }
 \description{
-Differences of factor smooth interactions
+Estimates pairwise differences (comparisons) between factor smooth
+interactions (smooths with a factor \code{by} argument) for pairs of groups
+defined by the factor. The group means can be optionally included in the
+difference.
 }
 \examples{
 
@@ -60,5 +67,9 @@ sm_dif <- difference_smooths(m, smooth = "s(x2)")
 sm_dif
 
 draw(sm_dif)
+
+# include the groups means for `fac` in the difference
+sm_dif2 <- difference_smooths(m, smooth = "s(x2)", group_means = TRUE)
+draw(sm_dif2)
 \dontshow{options(op)}
 }

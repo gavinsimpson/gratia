@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.11</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.12</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -107,8 +107,7 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 12.8  0.135 0.265  0.225 0.503 11.4  0.821  1.70 8.90       0</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 13.8  0.657 0.084<span style="text-decoration: underline;">3</span> 0.282 0.254 11.1  1.76   1.18 8.20       0</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  7.51 0.705 0.386  0.504 0.667  6.50 1.60   2.16 2.74       0</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 390 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ Use `print(n = ...)` to see more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 390 more rows</span></span></span></code></pre></div>
 <p>and the following GAM</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
@@ -161,8 +160,7 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> s(x0)  TPRS  <span style="color: #BB0000;">NA</span>    -<span style="color: #BB0000;">0.803</span> 0.249 0.070<span style="text-decoration: underline;">7</span>      <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> s(x0)  TPRS  <span style="color: #BB0000;">NA</span>    -<span style="color: #BB0000;">0.732</span> 0.237 0.080<span style="text-decoration: underline;">7</span>      <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> s(x0)  TPRS  <span style="color: #BB0000;">NA</span>    -<span style="color: #BB0000;">0.662</span> 0.228 0.090<span style="text-decoration: underline;">8</span>      <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 390 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ Use `print(n = ...)` to see more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 390 more rows</span></span></span></code></pre></div>
 <p>which will evaluate all smooths are unevenly spaced values over the range of the covariate(s). If you want to evaluate only selected smooths, you can specify which via the <code>smooth</code> argument. This takes the <em>smooth labels</em> which are the names of the smooths as they are known to mgcv. To list the labels for the smooths in use</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/smooths.html">smooths</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
@@ -184,8 +182,7 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>    -<span style="color: #BB0000;">1.08</span>   0.264 0.074<span style="text-decoration: underline;">0</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>    -<span style="color: #BB0000;">0.564</span>  0.278 0.084<span style="text-decoration: underline;">1</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>    -<span style="color: #BB0000;">0.036</span><span style="color: #BB0000; text-decoration: underline;">4</span> 0.289 0.094<span style="text-decoration: underline;">1</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 90 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ Use `print(n = ...)` to see more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 90 more rows</span></span></span></code></pre></div>
 <p>Then you can generate your own plot using the ggplot2 package, for example</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></span>

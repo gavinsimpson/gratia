@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.11</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.12</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,16 +54,20 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.7.3.11" id="gratia-07311-in-development">gratia 0.7.3.11 (In development)<a class="anchor" aria-label="anchor" href="#gratia-07311-in-development"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.7.3.12" id="gratia-07312-in-development">gratia 0.7.3.12 (In development)<a class="anchor" aria-label="anchor" href="#gratia-07312-in-development"></a></h2>
 <div class="section level3">
-<h3 id="user-visible-changes-0-7-3-11">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-7-3-11"></a></h3>
+<h3 id="user-visible-changes-0-7-3-12">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-7-3-12"></a></h3>
 <ul><li>
 <p>Functions in {gratia} have harmonised to use an argument named <code>data</code> instead of <code>newdata</code> for passing new data at which to evaluate features of smooths. A message will be printed if <code>newdata</code> is used from now on. Existing code does not need to be changed as <code>data</code> takes its value from <code>newdata</code>.</p>
 <p>Note that due to the way <code>...</code> is handled in R, if your R script uses the <code>data</code> argument, <em>and</em> is run with versions of gratia prior to 8.0 (when released; 0.7.3.8 if using the development version) the user-supplied data will be silently ignored. As such, scripts using <code>data</code> should check that the installed version of gratia is &gt;= 0.8 and package developers should update to depend on versions &gt;= 0.8 by using <code>gratia (&gt;= 0.8)</code> in <code>DESCRIPTION</code>.</p>
 </li></ul></div>
 <div class="section level3">
-<h3 id="new-features-0-7-3-11">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-3-11"></a></h3>
+<h3 id="new-features-0-7-3-12">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-3-12"></a></h3>
 <ul><li>
+<p><code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> can now include the group means in the difference, which many users expected. To include the group means use <code>group_means = TRUE</code> in the function call, e.g. <code>difference_smooths(model, smooth = "s(x)", group_means = TRUE</code>). Note: this function is still differs from <code>plot_diff()</code> in package <em>itsadug</em>, which essentially computes differences of model predictions. The main practical difference is that other effects beyond the factor by smooth, including random effects, may be included with <code>plot_diff()</code>.</p>
+<p>This implements the main wish of <a href="https://github.com/gavinsimpson/gratia/issues/108" class="external-link">#108</a> (<a href="https://github.com/dinga92" class="external-link">@dinga92</a>) and <a href="https://github.com/gavinsimpson/gratia/issues/143" class="external-link">#143</a> (<a href="https://github.com/mbolyanatz" class="external-link">@mbolyanatz</a>) despite my protestations that this was complicated in some cases (it isn’t; the complexity just cancels out.)</p>
+</li>
+<li>
 <p><code><a href="../reference/data_slice.html">data_slice()</a></code> has been totally revised. Now, the user provides the values for the variables they want in the slice and any variables in the model that are not specified will be held at typical values (i.e. the value of the observation that is closest to the median for numeric variables, or the modal factor level.)</p>
 <p>Data slices are now produced by passing <code>name</code> = <code>value</code> pairs for the variables and their values that you want to appear in the slice. For example</p>
 <pre><code><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="va">x2</span> <span class="op">+</span> <span class="va">fac</span><span class="op">)</span></span>
@@ -73,6 +77,7 @@
 <li><p><code><a href="../reference/overview.html">overview()</a></code> provides a simple overview of model terms for fitted GAMs.</p></li>
 <li><p><code><a href="../reference/lp_matrix.html">lp_matrix()</a></code> is a new utility function to quickly return the linear predictor matrix for an estimated model. It is a wrapper to <code>predict(..., type = "lpmatrix")</code></p></li>
 <li><p><code><a href="../reference/evenly.html">evenly()</a></code> is a synonym for <code><a href="../reference/evenly.html">seq_min_max()</a></code> and is preferred going forward.</p></li>
+<li><p><code><a href="../reference/ref_level.html">ref_level()</a></code> and <code><a href="../reference/ref_level.html">level()</a></code> are new utility functions for extracting the reference or a specific level of a factor respectively. These will be most useful when specifying covariate values to condition on in a data slice.</p></li>
 <li><p><code><a href="../reference/model_vars.html">model_vars()</a></code> is a new, public facing way of returning a vector of variables that are used in a model.</p></li>
 <li><p><code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> will now use the user-supplied data as points at which to evaluate a pair of smooths. Also note that the argument <code>newdata</code> has been renamed <code>data</code>. <a href="https://github.com/gavinsimpson/gratia/issues/175" class="external-link">#175</a></p></li>
 <li><p>The <code><a href="../reference/draw.html">draw()</a></code> method for <code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> now uses better labels for plot titles to avoid long labels with even modest factor levels.</p></li>
@@ -80,7 +85,7 @@
 <li><p><code><a href="../reference/draw.html">draw()</a></code> methods now allow the angle of tick labels on the x axis of plots to be rotated using argument <code>angle</code>. Requested by <a href="https://github.com/tamas-ferenci" class="external-link">@tamas-ferenci</a> <a href="https://github.com/gavinsimpson/gratia/issues/87" class="external-link">#87</a></p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-7-3-11">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-3-11"></a></h3>
+<h3 id="bug-fixes-0-7-3-12">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-3-12"></a></h3>
 <ul><li><p><code>draw.posterior_smooths</code> now plots posterior samples with a fixed aspect ratio if the smooth is isotropic. <a href="https://github.com/gavinsimpson/gratia/issues/148" class="external-link">#148</a></p></li>
 <li><p><code><a href="../reference/derivatives.html">derivatives()</a></code> now ignores random effect smooths (for which derivatives don’t make sense anyway). <a href="https://github.com/gavinsimpson/gratia/issues/168" class="external-link">#168</a></p></li>
 <li><p><code>confint.gam(...., method = "simultaneous")</code> now works with factor by smooths where <code>parm</code> is passed the full name of a specific smooth <code>s(x)faclevel</code>.</p></li>

@@ -1,5 +1,10 @@
 #' Differences of factor smooth interactions
 #'
+#' Estimates pairwise differences (comparisons) between factor smooth
+#' interactions (smooths with a factor `by` argument) for pairs of groups
+#' defined by the factor. The group means can be optionally included in the
+#' difference.
+#'
 #' @param model A fitted model.
 #' @param smooth character; which smooth to compute differences for.
 #' @param n numeric; the number of points at which to evaluate the difference
@@ -7,6 +12,8 @@
 #' @param ci_level numeric between 0 and 1; the coverage of credible interval.
 #' @param data data frame of locations at which to evaluate the difference
 #'   between smooths.
+#' @param group_means logical; should the group means be included in the
+#'   difference?
 #' @param partial_match logical; should `smooth` match partially against
 #'   `smooths`? If `partial_match = TRUE`, `smooth` must only be a single
 #'   string, a character vector of length 1. Unlike similar functions, the
@@ -30,6 +37,10 @@
 #' sm_dif
 #'
 #' draw(sm_dif)
+#'
+#' # include the groups means for `fac` in the difference
+#' sm_dif2 <- difference_smooths(m, smooth = "s(x2)", group_means = TRUE)
+#' draw(sm_dif2)
 #' \dontshow{options(op)}
 `difference_smooths` <- function(model, ...) {
     UseMethod("difference_smooths")
@@ -39,7 +50,7 @@
 #'
 #' @importFrom purrr pmap
 #' @importFrom dplyr bind_rows
-#' @importFrom tibble add_column
+#' @importFrom tibble add_column as_tibble
 #' @importFrom stats qnorm coef
 #' @importFrom utils combn
 #'
@@ -49,6 +60,7 @@
                                      n = 100,
                                      ci_level = 0.95,
                                      data = NULL,
+                                     group_means = FALSE,
                                      partial_match = TRUE,
                                      unconditional = FALSE,
                                      frequentist = FALSE,
@@ -86,7 +98,7 @@
 
     out <- pmap(pairs, calc_difference, smooth = smooth, by_var = by_var,
                 smooth_var = smooth_var, data = data, Xp = Xp, V = V,
-                coefs = coefs)
+                coefs = coefs, group_means = group_means)
     out <- bind_rows(out)
     crit <- coverage_normal(ci_level)
     out <- add_column(out,
@@ -117,14 +129,30 @@
 #' @importFrom tibble new_tibble
 #' @importFrom dplyr bind_cols
 `calc_difference` <- function(f1, f2, smooth, by_var, smooth_var, data, Xp, V,
-                              coefs) {
+                              coefs, group_means = FALSE) {
     ## make sure f1 and f2 are characters
     f1 <-  as.character(f1)
     f2 <-  as.character(f2)
     cnames <- colnames(Xp)
-    ## columns of Xp associated with pair of smooths
-    c1 <- grepl(mgcv_by_smooth_labels(smooth, by_var, f1), cnames, fixed = TRUE)
-    c2 <- grepl(mgcv_by_smooth_labels(smooth, by_var, f2), cnames, fixed = TRUE)
+
+    # what are we keeping?
+    keep <- if (isTRUE(group_means)) {
+        # columns of Xp associated with pair of smooths, including parametric
+        # terms for the group means
+        c1 <- grepl(paste0(by_var, f1), cnames, fixed = TRUE)
+        c2 <- grepl(paste0(by_var, f2), cnames, fixed = TRUE)
+        # set the intercept to be included
+        c0 <- grepl("(Intercept)", cnames, fixed = TRUE)
+        (c0 | c1 | c2)
+    } else {
+        # columns of Xp associated with pair of smooths, but not
+        c1 <- grepl(mgcv_by_smooth_labels(smooth, by_var, f1), cnames,
+                    fixed = TRUE)
+        c2 <- grepl(mgcv_by_smooth_labels(smooth, by_var, f2), cnames,
+            fixed = TRUE)
+        (c1 | c2)
+    }
+
     ## rows of Xp associated with pair of smooths
     r1 <- data[[by_var]] == f1
     r2 <- data[[by_var]] == f2
@@ -132,11 +160,8 @@
     ## difference rows of Xp for pair of smooths
     X <- Xp[r1, ] - Xp[r2, ]
 
-    ## zero the cols related to other splines
-    X[, ! (c1 | c2)] <- 0
-
-    ## zero out the parametric cols
-    X[, !grepl('^s\\(', cnames)] <- 0
+    ## zero the cols related to other splines and covariates
+    X[, ! keep] <- 0
 
     ## compute difference
     sm_diff <- drop(X %*% coefs)

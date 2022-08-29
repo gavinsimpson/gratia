@@ -1386,5 +1386,53 @@ vars_from_label <- function(label) {
 
 `newdata_deprecated` <- function() {
     message("Use of the `newdata` argument is deprecated.\n",
-            "Instead, use the data argument `data`.\n")
+        "Instead, use the data argument `data`.\n")
+}
+
+#' @title Return the reference or specific level of a factor
+#'
+#' @description Extracts the reference or a specific level the supplied factor,
+#'   returning it as a factor with the same levels as the one supplied.
+#'
+#' @param fct factor; the factor from which the reference or specific level will
+#'   be extracted.
+#' @param level character; the specific level to extract in the case of
+#'   `level()`.
+#'
+#' @return A length 1 factor with the same levels as the supplied factor `fct`.
+#'
+#' @export
+#'
+#' @examples
+#' \dontshow{set.seed(1)}
+#' f <- factor(sample(letters[1:5], 100, replace = TRUE))
+#'
+#' # the reference level
+#' ref_level(f)
+#'
+#' # a specific level
+#' level(f, level = "b")
+#'
+#' # note that the levels will always match the input factor
+#' identical(levels(f), levels(ref_level(f)))
+#' identical(levels(f), levels(level(f, "c")))
+#' @export
+`ref_level` <- function(fct) {
+    if (!is.factor(fct)) {
+        stop("'fct' must be a factor")
+    }
+    lev <- levels(fct)
+    factor(lev[1], levels = lev)
+}
+#' @export
+#' @rdname ref_level
+`level` <- function(fct, level) {
+    if (!is.factor(fct)) {
+        stop("'fct' must be a factor")
+    }
+    lev <- levels(fct)
+    if (!level %in% lev) {
+        stop("Level <", level, "> not a valid level of factor")
+    }
+    factor(level, levels = lev)
 }
