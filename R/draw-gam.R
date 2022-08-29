@@ -280,7 +280,8 @@
         }
 
         # draw smooths
-        sm_l <- group_split(sm_eval, .data$smooth)
+        # the factor is to reorder to way the smooths entered the model
+        sm_l <- group_split(sm_eval, factor(.data$smooth, levels = S[select]))
         sm_plts <- map(sm_l,
                        draw_smooth_estimates,
                        constant = constant,
@@ -300,6 +301,8 @@
                        ylim = ylims,
                        projection = projection,
                        orientation = orientation)
+
+        #sm_plts <- sm_plts[S] # reorder to way the smooths entered the model
 
     } # end stuff for smooths...
 
