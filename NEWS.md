@@ -1,4 +1,4 @@
-# gratia 0.7.3.11 (In development)
+# gratia 0.7.3.12 (In development)
 
 ## User visible changes
 
@@ -15,6 +15,19 @@
   to depend on versions >= 0.8 by using `gratia (>= 0.8)` in `DESCRIPTION`.
 
 ## New features
+
+* `difference_smooths()` can now include the group means in the difference,
+  which many users expected. To include the group means use `group_means = TRUE`
+  in the function call, e.g.
+  `difference_smooths(model, smooth = "s(x)", group_means = TRUE`). Note: this
+  function is still differs from `plot_diff()` in package *itsadug*, which
+  essentially computes differences of model predictions. The main practical
+  difference is that other effects beyond the factor by smooth, including random
+  effects, may be included with `plot_diff()`.
+
+  This implements the main wish of #108 (@dinga92) and #143 (@mbolyanatz)
+  despite my protestations that this was complicated in some cases (it isn't;
+  the complexity just cancels out.)
 
 * `data_slice()` has been totally revised. Now, the user provides the values for
   the variables they want in the slice and any variables in the model that are
@@ -45,6 +58,10 @@
   `predict(..., type = "lpmatrix")`
 
 * `evenly()` is a synonym for `seq_min_max()` and is preferred going forward.
+
+* `ref_level()` and `level()` are new utility functions for extracting the
+  reference or a specific level of a factor respectively. These will be most
+  useful when specifying covariate values to condition on in a data slice.
 
 * `model_vars()` is a new, public facing way of returning a vector of variables
   that are used in a model.
