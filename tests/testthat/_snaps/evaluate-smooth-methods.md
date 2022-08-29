@@ -20,5 +20,4 @@
        9 s(x0)  <NA>        0.0925 -0.548 0.255
       10 s(x0)  <NA>        0.102  -0.501 0.242
       # ... with 90 more rows
-      # i Use `print(n = ...)` to see more rows
 

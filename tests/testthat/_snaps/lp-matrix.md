@@ -12,5 +12,4 @@
       4 1              1.1366~ -0.097~  1.380~ -0.247~ -1.437~ -0.161~ -1.408~ -0.787~
       5 1             -1.0624~ -0.412~ -1.032~ -0.091~  0.781~  0.031~  0.689~  0.100~
       # ... with 995 more rows, 28 more variables: `s(x0).9` <matrix>, ...
-      # i Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names
 
