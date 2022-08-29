@@ -1,4 +1,4 @@
-# gratia 0.7.3.12 (In development)
+# gratia 0.7.3.13 (In development)
 
 ## User visible changes
 
@@ -13,6 +13,10 @@
   will be silently ignored. As such, scripts using `data` should check that the
   installed version of gratia is >= 0.8 and package developers should update
   to depend on versions >= 0.8 by using `gratia (>= 0.8)` in `DESCRIPTION`.
+
+* The order of the plots of smooths has changed in `draw.gam()` so they again
+  match the order in which smooths were specified in the model formula. See
+  *Bug Fixes* below for more detail or #154.
 
 ## New features
 
@@ -88,6 +92,14 @@
 
 * `confint.gam(...., method = "simultaneous")` now works with factor by smooths
   where `parm` is passed the full name of a specific smooth `s(x)faclevel`.
+
+* The order of plots produced by `gratia::draw.gam()` again matches the order
+  in which the smooths entered the model formula. Recent changes to the
+  internals of `gratia::draw.gam()` when the switch to `smooth_estimates()` was
+  undertaken lead to a change in behaviour resulting from the use of
+  `dplyr::group_split()`, and it's coercion internally of a character vector to
+  a factor. This factor is now created explicitly, and the levels set to the
+  correct order. #154
 
 # gratia 0.7.3
 
