@@ -80,6 +80,6 @@
 
 #' @export
 #' @importFrom cli style_dim
-tbl_format_header.tbl_lp_matrix <- function(x, setup, ...) {
+`tbl_format_header.tbl_lp_matrix` <- function(x, setup, ...) {
     style_dim(names(setup$tbl_sum), " (", setup$tbl_sum, ")")
 }
