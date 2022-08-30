@@ -186,17 +186,22 @@
     } else if (inherits(smooth, "random.effect")) {
         "Random effect"
     } else if (inherits(smooth, "sw")) {
-        "Soap (wiggly)"
+        "Soap film (wiggly)"
     } else if (inherits(smooth, "sf")) {
-        "Soap (boundary)"
+        "Soap film (boundary)"
     } else if (inherits(smooth, "soap.film")) {
-        "Soap"
+        "Soap film"
     } else if (inherits(smooth, "t2.smooth")) {
-        "Tensor (T2)"
+        "Tensor product (T2)"
     } else if (inherits(smooth, "sos.smooth")) {
         "SOS"
     } else if (inherits(smooth, "tensor.smooth")) {
-        "Tensor"
+        inter <- smooth[["inter"]]
+        if (isTRUE(inter)) {
+            "Tensor product int."
+        } else {
+            "Tensor product"
+        }
     } else {
         stop("Unknown type of smooth")
     }
@@ -928,6 +933,9 @@
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
     }
+    if (is.null(caption)) {
+        caption <- paste("Basis:", object[["type"]])
+    }
     if (all(!is.na(object[["by"]]))) {
         # is the by variable a factor or a numeric
         by_class <- data_class(object)[[object[["by"]][[1L]]]]
@@ -1036,6 +1044,9 @@
     }
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
+    }
+    if (is.null(caption)) {
+        caption <- paste("Basis:", object[["type"]])
     }
 
     if (all(!is.na(object[["by"]]))) {
@@ -1154,7 +1165,7 @@
         title <- unique(object[["smooth"]])
     }
     if (is.null(caption)) {
-        caption <- paste0("Facets: ", variables[3])
+        caption <- paste("Facets:", variables[3], "; Basis:", object[["type"]])
     }
 
     if (all(!is.na(object[["by"]]))) {
@@ -1292,8 +1303,9 @@
         title <- unique(object[["smooth"]])
     }
     if (is.null(caption)) {
-        caption <- paste0("Facet rows: ", variables[3],
-                          "; columns: ", variables[4])
+        caption <- paste("Facet rows:", variables[3],
+            "; columns:", variables[4],
+            "; Basis:", object[["type"]])
     }
 
     if (all(!is.na(object[["by"]]))) {
@@ -1415,6 +1427,10 @@
     if(is.null(title)) {
         title <- variables
     }
+    if (is.null(caption)) {
+        caption <- paste("Basis:", object[["type"]])
+    }
+
     if (all(!is.na(object[["by"]]))) {
         spl <- strsplit(title, split = ":")
         title <- spl[[1L]][[1L]]
@@ -1487,6 +1503,10 @@
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
     }
+    if (is.null(caption)) {
+        caption <- paste("Basis:", object[["type"]])
+    }
+
     if (all(!is.na(object[["by"]]))) {
         spl <- strsplit(title, split = ":")
         title <- spl[[1L]][[1L]]
@@ -1600,6 +1620,10 @@
 
     if (is.null(title)) {
         title <- unique(object[["smooth"]])
+    }
+
+    if (is.null(caption)) {
+        caption <- paste("Basis:", object[["type"]])
     }
 
     if (all(!is.na(object[["by"]]))) {

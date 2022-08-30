@@ -747,7 +747,7 @@
 <line x1='686.21' y1='307.85' x2='689.66' y2='307.85' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <line x1='686.21' y1='267.88' x2='689.66' y2='267.88' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='45.61' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='86.59px' lengthAdjust='spacingAndGlyphs'>te(x0,x1,x2,x3)</text>
-<text x='639.29' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='109.08px' lengthAdjust='spacingAndGlyphs'>Facet rows: x2; columns: x3</text>
+<text x='639.29' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='204.47px' lengthAdjust='spacingAndGlyphs'>Facet rows: x2 ; columns: x3 ; Basis: Tensor product</text>
 <text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='127.69px' lengthAdjust='spacingAndGlyphs'>draw_gam quadvar te</text>
 </g>
 </svg>

@@ -266,6 +266,9 @@ draw.parametric_effects <- function(object,
     if (is.null(title)) {
         title <- term_label
     }
+    if (is.null(caption)) {
+        caption <- paste("Parametric terms")
+    }
 
     ## add labelling to plot
     plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
