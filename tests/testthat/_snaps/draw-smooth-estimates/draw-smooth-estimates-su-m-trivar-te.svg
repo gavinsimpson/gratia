@@ -267,7 +267,7 @@
 <line x1='686.21' y1='273.14' x2='689.66' y2='273.14' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <line x1='686.21' y1='238.43' x2='689.66' y2='238.43' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='45.61' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='68.98px' lengthAdjust='spacingAndGlyphs'>te(x0,x1,x2)</text>
-<text x='655.94' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='40.60px' lengthAdjust='spacingAndGlyphs'>Facets: x2</text>
+<text x='655.94' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='133.55px' lengthAdjust='spacingAndGlyphs'>Facets: x2 ; Basis: Tensor product</text>
 <text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='230.41px' lengthAdjust='spacingAndGlyphs'>draw.smooth_estimates su_m_trivar_te</text>
 </g>
 </svg>

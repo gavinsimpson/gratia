@@ -1,4 +1,4 @@
-# gratia 0.7.3.13 (In development)
+# gratia 0.7.3.14 (In development)
 
 ## User visible changes
 
@@ -81,6 +81,10 @@
 
 * `draw()` methods now allow the angle of tick labels on the x axis of plots to
   be rotated using argument `angle`. Requested by @tamas-ferenci #87
+
+* `draw.gam()` and related functions (`draw.parametric_effects()`,
+  `draw.smooth_estimates()`) now add the basis to the plot using a caption.
+  #155
 
 ## Bug fixes
 
