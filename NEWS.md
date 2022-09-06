@@ -1,6 +1,8 @@
-# gratia 0.7.3.15 (In development)
+# gratia 0.7.3.16 (In development)
 
 ## User visible changes
+
+* {gratia} now depends on R version 4.1 or later.
 
 * Functions in {gratia} have harmonised to use an argument named `data` instead
   of `newdata` for passing new data at which to evaluate features of smooths. A
