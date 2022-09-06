@@ -1,0 +1,240 @@
+---
+title: "Data slices"
+output: 
+  rmarkdown::html_vignette:
+    fig_width: 8
+    fig_height: 5.3333
+vignette: >
+  %\VignetteIndexEntry{Data slices}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Having fitted a GAM or other model containing penalised splines, we often want to evaluate the model at some pre-specified values of the covariates. For more complex models, this will typically involve holding some covariates at fixed, representative values while visualising the change in the response or effect of a smooth over supplied values of one or more other covariates. The values of the covariates at which we evaluate a smooth or a model are called a *data slice*^[at least that's what I'm calling them.].
+
+This article will explain how to create data slices with {gratia} and its `data_slice()` function, and how to use them to visualise features of your fitted GAMs.
+
+We'll need the following packages for this article
+```{r load-packages, results = "hide"}
+library("mgcv")
+library("gratia")
+library("dplyr")
+library("ggplot2")
+library("forcats")
+library("datasets")
+```
+
+## Carbon Dioxide Uptake in Grass Plants
+
+The first example uses a small data set from an experimental study of the cold tolerance of the grass *Echinochloa crusgalli*. The data are in data frame `CO2` and provided with the {datasets} package that ships with R.
+
+```{r load-co2}
+## data load and prep
+data(CO2, package = "datasets")
+plant <- CO2 %>%
+    as_tibble() %>%
+    rename(plant = Plant, type = Type, treatment = Treatment) %>%
+    mutate(plant = factor(plant, ordered = FALSE))
+```
+
+```{r plot-plant-data}
+plant_ylab <- expression(CO[2] ~ uptake ~ (mu * mol ~ m^{-3}))
+plant_xlab <- expression(CO[2] ~ concentration ~ (mL ~ L^{-1}))
+
+plant %>%
+    ggplot(aes(x = conc, y = uptake, group = plant, colour = treatment)) +
+    geom_point() +
+    geom_line() +
+    facet_wrap(~ type) +
+    labs(y = plant_ylab, x = plant_xlab, colour = "Treatment")
+```
+
+One way to model these data is to allow for different smooths for all combinations of the `treatment` and `type` covariates
+```{r fit-plant-gam}
+plant <- plant %>%
+    mutate(tt = fct_cross(treatment, type))
+m_plant <- gam(uptake ~ treatment * type +
+                 s(conc, by = tt, k = 6) + s(plant, bs = "re"),
+    data = plant, method = "REML", familly = Gamma(link = "log"))
+overview(m_plant)
+```
+
+We can look at the fitted smooths using `draw()`
+```{r draw-plant-model}
+draw(m_plant, residuals = TRUE, scales = "fixed")
+```
+
+We might want to compare model fitted values for the treatment for each of the types (origins), ignoring the random effect component. For this we want to evaluate the model at a range of values of covariate `conc` for some combinations of the other factors. This is a data slice through the covariate space, which we can create using `data_slice()`. To create a data slice for `conc` for the `Quebec` `type` in the `chilled` `treatment` we would use
+```{r plant-ds-1}
+ds1 <- data_slice(m_plant, conc = evenly(conc, n = 100),
+    type = level(type, "Quebec"), treatment = level(treatment, "chilled"))
+ds1
+```
+
+Notice how `data_slice()` has filled in something for the remaining covariates that we didn't mention? In this case, `data_slice()` doesn't know how `tt` was created, so it has chosen the modal level for the `tt` factor, which is not the correct choice in this case. Instead, we need to specify the correct level explicitly for `tt`
+```{r plant-ds-1a}
+ds1 <- data_slice(m_plant, conc = evenly(conc, n = 100),
+    treatment = level(treatment, "chilled"), type = level(type, "Quebec"),
+    tt = level(tt, "chilled:Quebec"))
+ds1
+```
+
+Having created the data slice, we can predict from the model using the combination of covariate values specified in our slice. We could use `predict.gam()` for this, but the `fitted_values()` function in {gratia} is easier to use, especially for non-Gaussian models
+```{r plant-fitted-1}
+fv1 <- fitted_values(m_plant, data = ds1, scale = "response", exclude = "s(plant)")
+fv1
+```
+
+Notice how we excluded the random effect term; even though we had to specify something for the `plant` covariate we can ignore this term in the model using the `exclude` argument. `fitted_values()` creates the credible interval on the scale of the link function and then back-transforms to the response scale when `scale = "response"`, which is also the default.
+
+Plotting the fitted values for the data slice now only requires some simple {ggplot2} knowledge
+```{r plot-plant-fitted-1}
+fv1 %>%
+    ggplot(aes(x = conc, y = fitted)) +
+    geom_point(data = plant %>%
+                 filter(type == "Quebec", treatment == "chilled"),
+        mapping = aes(y = uptake),
+        alpha = 0.8, colour = "steelblue") +
+    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
+    geom_line() +
+    labs(x = plant_xlab, y = plant_ylab,
+        title = expression(Estimated ~ CO[2] ~ uptake),
+        subtitle = "Chilled plants of the Quebec type")
+```
+
+Next, let's compare the fitted effects of the treatment in the Mississippi origin plants
+```{r plant-data-slice-2}
+ds2 <- data_slice(m_plant, conc = evenly(conc, n = 100),
+    treatment = evenly(treatment), type = level(type, "Mississippi")) %>%
+    mutate(tt = fct_cross(treatment, type, keep_empty = TRUE))
+ds2
+```
+
+Here, we replaced the automatically-generated `tt` variable with the correctly specified call to `fct_cross()`, retaining the levels of the `type` and `treatment` factors. This insures that we have the correct combinations corresponding to the `treatment` and `type` factors but also that we preserve the original levels of the `tt` covariate we created.
+
+We can again visualise the fitted values for this data slice
+```{r draw-plant-fitted-values-2}
+fitted_values(m_plant, data = ds2, scale = "response", exclude = "s(plant)") %>%
+    ggplot(aes(x = conc, y = fitted, group = treatment)) +
+    geom_point(data = plant %>% filter(type == "Mississippi"),
+        mapping = aes(y = uptake, colour = treatment),
+        alpha = 0.8) +
+    geom_ribbon(aes(ymin = lower, ymax = upper, fill = treatment),
+        alpha = 0.2) +
+    geom_line(aes(colour = treatment)) +
+    labs(x = plant_xlab, y = plant_ylab,
+        title = expression(Estimated ~ CO[2] ~ uptake),
+        subtitle = "Comparison of treatment in plants of the Mississippi type",
+        colour = "Treatment", fill = "Treatment")
+```
+
+When we were creating our data slices, we used some helper functions to specify covariate values for the slice. {gratia} provides several such helper functions:
+
+* `evenly(x, n = 100)` --- creates `n` evenly spaced values over the range of the covariate,
+* `evenly(fct)` --- produces a new factor containing each level of the specified factor `fct` just once,
+* `ref_level(fct)` --- creates a new factor containing just the reference level of the specified factor covariate `fct`, and
+* `level(fct, "level")` --- creates a factor with requested `"level"` from the factor `fct`.
+
+In all cases involving factors, the helper functions set the levels of the factor to match those in the original model fit^[Depending on the value of argument `drop.unused.levels` passed to `gam()` when you fitted the model. The default will drop any unused levels before fitting the model, and as a result the helpers will not include those levels either.].
+
+The second argument to `data_slice()` is `...`
+```{r data-slice-args}
+args(gratia:::data_slice.gam)
+```
+The `...` argument allows you to provide expressions to create the covariate values you want for your data slice. Expressions passed to `...` are evaluated within the model frame of the fitted model (argument `object`) or in `data` (if supplied). You are not restricted either to using only the helper functions provide by {gratia}; any R function could be used as long as it makes sense in the context of the model frame, and it returns something that can be combined using `tidyr::expand_grid()`.
+
+## Slices through a 2D smooth
+
+In the second example, I'll use the bivariate example data set from {mgcv} but fit a tensor product of covariates `x` and `z`
+```{r data-sim-and-fit}
+# simulate data from the bivariate surface
+df <- data_sim("eg2", n = 1000, scale = 0.25, seed = 2)
+
+# fit the GAM
+m_biv <- gam(y ~ te(x,z), data = df, method = "REML")
+```
+
+The aim of the example will be to create a univariate data slice through the 2D smooth at user-specified values of `x` while holding `z` at one or more fixed values. We could visualise the effect at the smooth level, using `smooth_estimates()`, or at the response level, as we did above using `fitted_values()`.
+
+### Using `smooth_estimates()`
+
+We begin by creating a slice through the data space. We also create a label at this point for a nice axis label.
+```{r data-slice-biv-1}
+ds3 <- data_slice(m_biv,
+                  x = evenly(x, n = 100),
+                  z = quantile(z, probs = 0.25))
+
+z_val <- with(ds3, round(quantile(z, probs = 0.25),2))
+ylab <- bquote(hat(f)(x, .(z_val)))
+```
+
+Then we evaluate the smooth at the desired values and add a confidence interval
+```{r smooth-estimates-bivar}
+sm <- smooth_estimates(m_biv, smooth = "te(x,z)", data = ds3) |>
+  add_confint()
+sm
+```
+
+We can plot `sm` using {ggplot2}
+```{r plot-smooth-estimates-bivar}
+sm |>
+  ggplot(aes(x = x, y = est)) +
+  geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), alpha = 0.2) +
+  geom_line() +
+  labs(title = "Evaluation of smooth te(x,z) at fixed z",
+       y = ylab)
+```
+
+Note that the above interval is not the Marra and Wood (2012) interval. It doesn't include the uncertainty from the model constant term at the moment, but unless the smooth is very close to linear that shouldn't make too much difference.
+
+This extends to multiple slices by asking for several discrete `z`
+```{r data-slice-biv-2}
+ds4 <- data_slice(m_biv, x = evenly(x, n = 100),
+                  z = round(quantile(z, probs = c(0.25, 0.5, 0.75)), 2))
+
+sm <- smooth_estimates(m_biv, smooth = "te(x,z)", data = ds4) |>
+  add_confint() |>
+  mutate(fz = factor(z))
+
+sm |>
+  ggplot(aes(x = x, y = est, colour = fz, group = fz)) +
+  geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci, fill = fz, colour = NULL),
+              alpha = 0.2) +
+  geom_line() +
+  labs(title = "Evaluation of smooth te(x,z) at fixed z",
+       y = expression(hat(f)(x,z)), colour = "z", fill = "z")
+```
+
+### Using `fitted_samples()`
+
+If you want to evaluate the surface over `x` at fixed `z` conditional upon other values of other covariates (model predicted or fitted values) then `fitted_samples()` is a tidy wrapper to `predict.gam()`.
+
+For single `z` we have
+```{r data-slice-biv-1-fitted-values}
+fitted_values(m_biv, data = ds3) |> # default is response scale, not link
+  ggplot(aes(x = x, y = fitted)) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
+  geom_line() +
+  labs(title = "Fitted values from model",
+       y = expression(hat(y)))
+```
+
+And for the multiple `z` we have
+```{r data-slice-biv-2-fitted-values}r
+fitted_values(m_biv, data = ds4) |>
+  mutate(fz = factor(z)) |>
+  ggplot(aes(x = x, y = fitted, colour = fz, group = fz)) +
+  geom_ribbon(aes(ymin = lower, ymax = upper, fill = fz, colour = NULL),
+              alpha = 0.2) +
+  geom_line() +
+  labs(title = "Fitted values from model",
+       y = expression(hat(y)), colour = "z", fill = "z")
+```
+where the only difference here is that now the model constant is included as well as its uncertainty.
