@@ -1,5 +1,5 @@
 Package: gratia
-Version: 0.7.3.15
+Version: 0.7.3.16
 Date: 2022-09-06
 Title: Graceful 'ggplot'-Based Graphics and Other Functions for GAMs Fitted Using 'mgcv'
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
@@ -11,7 +11,7 @@ Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     comment = c(ORCID = "0000-0002-4842-3657")))
 Maintainer: Gavin L. Simpson <ucfagls@gmail.com>
 Depends:
-    R (>= 3.6.0)
+    R (>= 4.1.0)
 Imports:
     mgcv,
     ggplot2,
@@ -43,7 +43,8 @@ Suggests:
     datasets,
     withr,
     knitr,
-    rmarkdown
+    rmarkdown,
+    forcats
 Description: Graceful 'ggplot'-based graphics and utility functions for working with generalized additive models (GAMs) fitted using the 'mgcv' package. Provides a reimplementation of the plot() method for GAMs that 'mgcv' provides, as well as 'tidyverse' compatible representations of estimated smooths.
 License: MIT + file LICENSE
 LazyData: true
