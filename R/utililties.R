@@ -139,8 +139,16 @@
     inherits(object, "gamm")
 }
 
+`is.gamm4` <- function(object) {
+    is.list(object) & (!is.null(object[["gam"]]))
+}
+
 `is.gam` <- function(object) {
     inherits(object, "gam")
+}
+
+`is.bam` <- function(object) {
+    inherits(object, "bam")
 }
 
 #' @title Extract an mgcv smooth by name
@@ -153,7 +161,7 @@
 #'
 #' @export
 `get_smooth` <- function(object, term) {
-    if (is.gamm(object)) {
+    if (is.gamm(object) || is.gamm4(object)) {
         object <- object[["gam"]]
     }
     smooth <- object[["smooth"]][which_smooth(object, term)]
@@ -426,7 +434,13 @@
 #' names(fix_offset(m, model.frame(m), offset_val = 1L))
 `fix_offset` <- function(model, newdata, offset_val = NULL) {
     m.terms <- names(newdata)
-    p.terms <- attr(terms(model[["pred.formula"]]), "term.labels")
+    p.terms <- if (inherits(model, "scam") &&
+        is.null(model[["pred.formula"]])) {
+        attr(model[["terms"]], "term.labels")
+    } else {
+        attr(terms(model[["pred.formula"]]), "term.labels")
+    }
+
 
     ## remove repsonse from m.terms if it is in there
     tt <- terms(model)
@@ -504,7 +518,7 @@
     if (is.list(tt)) {
         ## If a list, we have multiple linear predictors. For terms in the
         ## nth linear predictor (for n > 1) the covariate gets appended '.{n-1}'
-        ## so store the mgcv names as the names of the labels returned  
+        ## so store the mgcv names as the names of the labels returned
         labs <- unlist(lapply(tt, function(x) labels(delete.response(x))))
         names(labs) <- unlist(lapply(seq_along(labs),
                                      function(i, labs) {
@@ -786,16 +800,16 @@
                 # must have failed to match at least one of `smooth`
                 if (all(!take)) {
                     stop("Failed to match any smooths in model",
-                         ifelse(is.null(model_name), "",
-                                paste0(" ", model_name)),
+                        ifelse(is.null(model_name), "",
+                            paste0(" ", model_name)),
                         ".\nTry with 'partial_match = TRUE'?",
-                         call. = FALSE)
+                        call. = FALSE)
                 } else {
                     stop("Some smooths in 'select' were not found in model ",
-                         ifelse(is.null(model_name), "", model_name),
-                         ":\n\t",
-                         paste(select[!select %in% smooths], collapse = ", "),
-                         call. = FALSE)
+                        ifelse(is.null(model_name), "", model_name),
+                        ":\n\t",
+                        paste(select[!select %in% smooths], collapse = ", "),
+                        call. = FALSE)
                 }
             }
             take
@@ -814,27 +828,6 @@
     select
 }
 
-#' Indices of the parametric terms for a particular smooth
-#'
-#' Returns a vector of indices of the parametric terms that represent the
-#' supplied smooth. Useful for extracting model coefficients and columns
-#' of their covariance matrix.
-#' 
-#' @param smooth an object that inherits from class `mgcv.smooth`
-#'
-#' @return A numeric vector of indices.
-#'
-#' @author Gavin L. Simpson
-#' @export
-`smooth_coefs` <- function(smooth) {
-    if(!is_mgcv_smooth(smooth)) {
-        stop("Not an mgcv smooth object")
-    }
-    start <- smooth[["first.para"]]
-    end <- smooth[["last.para"]]
-    seq(from = start, to = end, by = 1L)
-}
-
 #' Load mgcv quietly
 #'
 #' Simple function that loads the *mgcv* package whilst suppressing the startup
@@ -842,7 +835,7 @@
 #'
 #' @return Returns a logical vectors invisibly, indicating whether the package
 #'   was loaded or not.
-#' 
+#'
 #' @export
 `load_mgcv` <- function() {
     res <- suppressWarnings(requireNamespace("mgcv", quietly = TRUE))

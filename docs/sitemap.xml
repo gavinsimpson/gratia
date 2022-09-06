@@ -94,6 +94,9 @@
     <loc>https://gavinsimpson.github.io/gratia/reference/difference_smooths.html</loc>
   </url>
   <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.basis.html</loc>
+  </url>
+  <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/draw.compare_smooths.html</loc>
   </url>
   <url>
@@ -293,6 +296,9 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/smallAges.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/smooth_coef_indices.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/smooth_coefs.html</loc>

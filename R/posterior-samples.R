@@ -407,7 +407,7 @@
             ## response around
         }
         sm  <- get_smooths_by_id(model, take[i])[[1L]]
-        idx <- smooth_coefs(sm)
+        idx <- smooth_coef_indices(sm)
         Xp <- PredictMat(sm, data = data)
         betas <- rmvn(n = n, mu = coefs[idx], sigma = V[idx, idx, drop=FALSE],
                       ncores = ncores)

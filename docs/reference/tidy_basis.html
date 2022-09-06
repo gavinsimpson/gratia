@@ -12,7 +12,7 @@ of the basis."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/li
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.14</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.15</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,13 +63,16 @@ of the basis.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tidy_basis</span><span class="op">(</span><span class="va">smooth</span>, <span class="va">data</span>, at <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tidy_basis</span><span class="op">(</span><span class="va">smooth</span>, data <span class="op">=</span> <span class="cn">NULL</span>, at <span class="op">=</span> <span class="cn">NULL</span>, coefs <span class="op">=</span> <span class="cn">NULL</span>, p_ident <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>smooth</dt>
-<dd><p>a smooth object.</p></dd>
+<dd><p>a smooth object of or inheriting from class <code>"mgcv.smooth"</code>.
+Typically, such objects are returned as part of a fitted GAM or GAMM in
+the <code>$smooth</code> component of the model object or the <code>$gam$smooth</code> component
+if the model was fitted by <code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">mgcv::gamm()</a></code> or <code><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html" class="external-link">gamm4::gamm4()</a></code>.</p></dd>
 
 
 <dt>data</dt>
@@ -79,6 +82,14 @@ of the basis.</p>
 <dt>at</dt>
 <dd><p>a data frame containing values of the smooth covariate(s) at which
 the basis should be evaluated.</p></dd>
+
+
+<dt>coefs</dt>
+<dd><p>numeric; an optional vector of coefficients for the smooth</p></dd>
+
+
+<dt>p_ident</dt>
+<dd><p>logical vector; only used for handling <code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam::scam()</a></code> smooths.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -92,6 +103,30 @@ the basis should be evaluated.</p></dd>
     <p>Gavin L. Simpson</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># \dontshow{</span></span></span>
+<span class="r-in"><span><span class="va">op</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">3</span>, cli.unicode <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">400</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># fit model</span></span></span>
+<span class="r-in"><span><span class="va">m</span>  <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># tidy representaition of a basis for a smooth definition</span></span></span>
+<span class="r-in"><span><span class="co"># extract the smooth</span></span></span>
+<span class="r-in"><span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_smooth.html">get_smooth</a></span><span class="op">(</span><span class="va">m</span>, <span class="st">"s(x2)"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># get the tidy basis - need to pass where we want it to be evaluated</span></span></span>
+<span class="r-in"><span><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu">tidy_basis</span><span class="op">(</span><span class="va">sm</span>, at <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># can weight the basis by the model coefficients for this smooth</span></span></span>
+<span class="r-in"><span><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu">tidy_basis</span><span class="op">(</span><span class="va">sm</span>, at <span class="op">=</span> <span class="va">df</span>, coefs <span class="op">=</span> <span class="fu"><a href="smooth_coefs.html">smooth_coefs</a></span><span class="op">(</span><span class="va">sm</span>, model <span class="op">=</span> <span class="va">m</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># \dontshow{</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">op</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
