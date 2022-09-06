@@ -1,4 +1,4 @@
-# gratia 0.7.3.14 (In development)
+# gratia 0.7.3.15 (In development)
 
 ## User visible changes
 
@@ -14,9 +14,9 @@
   installed version of gratia is >= 0.8 and package developers should update
   to depend on versions >= 0.8 by using `gratia (>= 0.8)` in `DESCRIPTION`.
 
-* The order of the plots of smooths has changed in `draw.gam()` so they again
-  match the order in which smooths were specified in the model formula. See
-  *Bug Fixes* below for more detail or #154.
+* The order of the plots of smooths has changed in `draw.gam()` so that they
+  again match the order in which smooths were specified in the model formula.
+  See *Bug Fixes* below for more detail or #154.
 
 ## New features
 
@@ -57,6 +57,18 @@
 
 * `overview()` provides a simple overview of model terms for fitted GAMs.
 
+* `basis()` now has a method for fitted GAM(M)s which can extract the estimated
+  basis from the model and plot it, using the estimated coefficients for the
+  smooth to weight the basis. #137
+
+  There is also a new `draw.basis()` method for plotting the results of a call
+  to `basis()`.
+
+  `tidy_basis()` is a lower level function that does the heavy lifting in
+  `basis()`, and is now exported. `tidy_basis()` returns a tidy representation
+  of a basis supplied as an object inheriting from class `"mgcv.smooth"`. These
+  objects are returned in the `$smooth` component of a fitted GAM(M) model.
+
 * `lp_matrix()` is a new utility function to quickly return the linear predictor
   matrix for an estimated model. It is a wrapper to
   `predict(..., type = "lpmatrix")`
@@ -85,6 +97,12 @@
 * `draw.gam()` and related functions (`draw.parametric_effects()`,
   `draw.smooth_estimates()`) now add the basis to the plot using a caption.
   #155
+
+* `smooth_coefs()` is a new utility function for extracting the coefficients
+  for a particular smooth from a fitted model. `smooth_coef_indices()` is an
+  associated function that returns the indices (positions) in the vector of
+  model coefficients (returned by `coef(gam_model)`) of those coefficients that
+  pertain to the stated smooth.
 
 ## Bug fixes
 
