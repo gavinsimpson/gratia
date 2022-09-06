@@ -2,14 +2,6 @@
 
 ## load packages
 library("testthat")
-library("gratia")
-library("mgcv")
-library("scam")
-
-data(smallAges)
-smallAges$Error[1] <- 1.1
-sw <- scam(Date ~ s(Depth, k = 5, bs = "mpd"), data = smallAges,
-           weights = 1 / smallAges$Error, gamma = 1.4)
 
 test_that("vcov.scam works", {
     V <- vcov(sw)
