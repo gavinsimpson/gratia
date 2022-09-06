@@ -24,9 +24,7 @@ test_that("smooth_coefs() works with a gamm4", {
 })
 
 test_that("smooth_coefs() works with a proper gamm4 class", {
-    m_gamm4_really <- m_gamm4
-    class(m_gamm4_really) <- append("gamm4", class(m_gamm4_really[-1L]))
-    expect_silent(b <- smooth_coefs(m_gamm4_really, term = "s(x0)"))
+    expect_silent(b <- smooth_coefs(m_gamm4_real, term = "s(x0)"))
     expect_named(b, paste("s(x0)", 1:9, sep = "."))
     expect_identical(length(b), 9L)
 })

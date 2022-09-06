@@ -107,6 +107,8 @@ m_gamgcv <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
 
 m_gamm4  <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
   REML = TRUE)
+m_gamm4_real <- m_gamm4
+  class(m_gamm4_real) <- append("gamm4", class(m_gamm4_real[-1L]))
 
 m_gaulss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1), data = su_eg1,
                 family = gaulss)
