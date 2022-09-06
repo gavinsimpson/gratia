@@ -38,9 +38,9 @@ The first example uses a small data set from an experimental study of the cold t
 ```{r load-co2}
 ## data load and prep
 data(CO2, package = "datasets")
-plant <- CO2 %>%
-    as_tibble() %>%
-    rename(plant = Plant, type = Type, treatment = Treatment) %>%
+plant <- CO2 |>
+    as_tibble() |>
+    rename(plant = Plant, type = Type, treatment = Treatment) |>
     mutate(plant = factor(plant, ordered = FALSE))
 ```
 
@@ -48,7 +48,7 @@ plant <- CO2 %>%
 plant_ylab <- expression(CO[2] ~ uptake ~ (mu * mol ~ m^{-3}))
 plant_xlab <- expression(CO[2] ~ concentration ~ (mL ~ L^{-1}))
 
-plant %>%
+plant |>
     ggplot(aes(x = conc, y = uptake, group = plant, colour = treatment)) +
     geom_point() +
     geom_line() +
@@ -58,7 +58,7 @@ plant %>%
 
 One way to model these data is to allow for different smooths for all combinations of the `treatment` and `type` covariates
 ```{r fit-plant-gam}
-plant <- plant %>%
+plant <- plant |>
     mutate(tt = fct_cross(treatment, type))
 m_plant <- gam(uptake ~ treatment * type +
                  s(conc, by = tt, k = 6) + s(plant, bs = "re"),
@@ -96,9 +96,9 @@ Notice how we excluded the random effect term; even though we had to specify som
 
 Plotting the fitted values for the data slice now only requires some simple {ggplot2} knowledge
 ```{r plot-plant-fitted-1}
-fv1 %>%
+fv1 |>
     ggplot(aes(x = conc, y = fitted)) +
-    geom_point(data = plant %>%
+    geom_point(data = plant |>
                  filter(type == "Quebec", treatment == "chilled"),
         mapping = aes(y = uptake),
         alpha = 0.8, colour = "steelblue") +
@@ -112,7 +112,7 @@ fv1 %>%
 Next, let's compare the fitted effects of the treatment in the Mississippi origin plants
 ```{r plant-data-slice-2}
 ds2 <- data_slice(m_plant, conc = evenly(conc, n = 100),
-    treatment = evenly(treatment), type = level(type, "Mississippi")) %>%
+    treatment = evenly(treatment), type = level(type, "Mississippi")) |>
     mutate(tt = fct_cross(treatment, type, keep_empty = TRUE))
 ds2
 ```
@@ -121,9 +121,10 @@ Here, we replaced the automatically-generated `tt` variable with the correctly s
 
 We can again visualise the fitted values for this data slice
 ```{r draw-plant-fitted-values-2}
-fitted_values(m_plant, data = ds2, scale = "response", exclude = "s(plant)") %>%
+fitted_values(m_plant, data = ds2, scale = "response",
+    exclude = "s(plant)") |>
     ggplot(aes(x = conc, y = fitted, group = treatment)) +
-    geom_point(data = plant %>% filter(type == "Mississippi"),
+    geom_point(data = plant |> filter(type == "Mississippi"),
         mapping = aes(y = uptake, colour = treatment),
         alpha = 0.8) +
     geom_ribbon(aes(ymin = lower, ymax = upper, fill = treatment),
