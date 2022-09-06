@@ -227,7 +227,7 @@ fitted_values(m_biv, data = ds3) |> # default is response scale, not link
 ```
 
 And for the multiple `z` we have
-```{r data-slice-biv-2-fitted-values}r
+```{r data-slice-biv-2-fitted-values}
 fitted_values(m_biv, data = ds4) |>
   mutate(fz = factor(z)) |>
   ggplot(aes(x = x, y = fitted, colour = fz, group = fz)) +
