@@ -25,7 +25,7 @@ smooth_coefs(object, ...)
 
 \method{smooth_coefs}{mgcv.smooth}(object, model, ...)
 
-\method{smooth_coefs}{scam}(object, model, ...)
+\method{smooth_coefs}{scam}(object, term, ...)
 }
 \arguments{
 \item{object}{a fitted GAM(M) object, or, for the \code{"mgcv.smooth"} method,
