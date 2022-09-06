@@ -3,8 +3,9 @@ pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   custom-plotting: custom-plotting.html
+  data-slices: data-slices.html
   gratia: gratia.html
-last_built: 2022-09-06T12:46Z
+last_built: 2022-09-06T12:47Z
 urls:
   reference: https://gavinsimpson.github.io/gratia/reference
   article: https://gavinsimpson.github.io/gratia/articles

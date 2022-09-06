@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.16</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.17</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a>
+    <a class="dropdown-item" href="../articles/data-slices.html">Data slices</a>
   </div>
 </li>
 <li class="nav-item">
@@ -54,10 +55,11 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.7.3.16" id="gratia-07316-in-development">gratia 0.7.3.16 (In development)<a class="anchor" aria-label="anchor" href="#gratia-07316-in-development"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.7.3.17" id="gratia-07317-in-development">gratia 0.7.3.17 (In development)<a class="anchor" aria-label="anchor" href="#gratia-07317-in-development"></a></h2>
 <div class="section level3">
-<h3 id="user-visible-changes-0-7-3-16">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-7-3-16"></a></h3>
+<h3 id="user-visible-changes-0-7-3-17">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-7-3-17"></a></h3>
 <ul><li><p>{gratia} now depends on R version 4.1 or later.</p></li>
+<li><p>A new vignette “Data slices” is supplied with {gratia}.</p></li>
 <li>
 <p>Functions in {gratia} have harmonised to use an argument named <code>data</code> instead of <code>newdata</code> for passing new data at which to evaluate features of smooths. A message will be printed if <code>newdata</code> is used from now on. Existing code does not need to be changed as <code>data</code> takes its value from <code>newdata</code>.</p>
 <p>Note that due to the way <code>...</code> is handled in R, if your R script uses the <code>data</code> argument, <em>and</em> is run with versions of gratia prior to 8.0 (when released; 0.7.3.8 if using the development version) the user-supplied data will be silently ignored. As such, scripts using <code>data</code> should check that the installed version of gratia is &gt;= 0.8 and package developers should update to depend on versions &gt;= 0.8 by using <code>gratia (&gt;= 0.8)</code> in <code>DESCRIPTION</code>.</p>
@@ -65,7 +67,7 @@
 <li><p>The order of the plots of smooths has changed in <code><a href="../reference/draw.gam.html">draw.gam()</a></code> so that they again match the order in which smooths were specified in the model formula. See <em>Bug Fixes</em> below for more detail or <a href="https://github.com/gavinsimpson/gratia/issues/154" class="external-link">#154</a>.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-0-7-3-16">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-3-16"></a></h3>
+<h3 id="new-features-0-7-3-17">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-3-17"></a></h3>
 <ul><li>
 <p><code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> can now include the group means in the difference, which many users expected. To include the group means use <code>group_means = TRUE</code> in the function call, e.g. <code>difference_smooths(model, smooth = "s(x)", group_means = TRUE</code>). Note: this function is still differs from <code>plot_diff()</code> in package <em>itsadug</em>, which essentially computes differences of model predictions. The main practical difference is that other effects beyond the factor by smooth, including random effects, may be included with <code>plot_diff()</code>.</p>
 <p>This implements the main wish of <a href="https://github.com/gavinsimpson/gratia/issues/108" class="external-link">#108</a> (<a href="https://github.com/dinga92" class="external-link">@dinga92</a>) and <a href="https://github.com/gavinsimpson/gratia/issues/143" class="external-link">#143</a> (<a href="https://github.com/mbolyanatz" class="external-link">@mbolyanatz</a>) despite my protestations that this was complicated in some cases (it isn’t; the complexity just cancels out.)</p>
@@ -95,7 +97,7 @@
 <li><p><code><a href="../reference/smooth_coefs.html">smooth_coefs()</a></code> is a new utility function for extracting the coefficients for a particular smooth from a fitted model. <code><a href="../reference/smooth_coef_indices.html">smooth_coef_indices()</a></code> is an associated function that returns the indices (positions) in the vector of model coefficients (returned by <code>coef(gam_model)</code>) of those coefficients that pertain to the stated smooth.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-7-3-16">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-3-16"></a></h3>
+<h3 id="bug-fixes-0-7-3-17">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-3-17"></a></h3>
 <ul><li><p><code>draw.posterior_smooths</code> now plots posterior samples with a fixed aspect ratio if the smooth is isotropic. <a href="https://github.com/gavinsimpson/gratia/issues/148" class="external-link">#148</a></p></li>
 <li><p><code><a href="../reference/derivatives.html">derivatives()</a></code> now ignores random effect smooths (for which derivatives don’t make sense anyway). <a href="https://github.com/gavinsimpson/gratia/issues/168" class="external-link">#168</a></p></li>
 <li><p><code>confint.gam(...., method = "simultaneous")</code> now works with factor by smooths where <code>parm</code> is passed the full name of a specific smooth <code>s(x)faclevel</code>.</p></li>
