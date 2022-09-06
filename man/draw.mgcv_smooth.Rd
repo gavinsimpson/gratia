@@ -64,7 +64,7 @@ df <- data_sim("eg4", n = 400, seed = 42)
 bf <- basis(s(x0), data = df)
 draw(bf)
 
-bf <- basis(s(x2, by = fac, bs = 'bs'), data = df)
+bf <- basis(s(x2, by = fac, bs = "bs"), data = df)
 draw(bf)
 }
 \author{
