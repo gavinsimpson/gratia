@@ -206,3 +206,36 @@ m_para_sm <- gam(y ~ fac * ff + x0 + s(x1) + s(x2),
 # a GAM with parametric terms (factor and linear) and smooth terms
 m_only_para <- gam(y ~ fac * ff + x0 + x1 + x2,
                    data = df_2_fac, method = "REML")
+
+##-- scam models ---------------------------------------------------------------
+data(smallAges)
+smallAges$Error[1] <- 1.1
+sw <- scam(Date ~ s(Depth, k = 5, bs = "mpd"), data = smallAges,
+  weights = 1 / smallAges$Error, gamma = 1.4)
+
+# this should be folded into data_sim()
+`sim_scam` <- function(n, seed = NULL) {
+      ## sort out the seed
+      if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+        runif(1)
+      }
+      if (is.null(seed)) {
+          RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+      }
+      else {
+          R.seed <- get(".Random.seed", envir = .GlobalEnv)
+          set.seed(seed)
+          RNGstate <- structure(seed, kind = as.list(RNGkind()))
+          on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+      }
+      # from ?scam, first example
+      x1 <- runif(n) * 6 - 3
+      f1 <- 3 * exp(-x1^2) # unconstrained term
+      x2 <- runif(n) * 4 - 1
+      f2 <- exp(4 * x2) / (1 + exp(4 * x2)) # monotone increasing smooth
+      y <- f1 + f2 + rnorm(n) * .5
+      tibble(x1 = x1, x2 = x2, y = y)
+}
+dat <- sim_scam(n = 200, seed = 4)
+## fit model, get results, and plot...
+m_scam <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "mpi"), data = dat)
