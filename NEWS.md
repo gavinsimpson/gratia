@@ -1,4 +1,4 @@
-# gratia 0.7.3.17 (In development)
+# gratia 0.7.3.18 (In development)
 
 ## User visible changes
 
