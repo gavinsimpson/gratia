@@ -1,4 +1,4 @@
-# gratia 0.7.3.18 (In development)
+# gratia 0.7.3.19 (In development)
 
 ## User visible changes
 
@@ -78,6 +78,8 @@
   `predict(..., type = "lpmatrix")`
 
 * `evenly()` is a synonym for `seq_min_max()` and is preferred going forward.
+  Gains argument `by` to produce sequences over a covariate that increment in
+  units of `by`.
 
 * `ref_level()` and `level()` are new utility functions for extracting the
   reference or a specific level of a factor respectively. These will be most
