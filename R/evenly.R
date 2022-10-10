@@ -8,6 +8,9 @@
 #' @param n numeric; the number of evenly-spaced values to return. A default of
 #'   `100` is used for convenience as that what is typically used when
 #'   evaluating a smooth.
+#' @param by numeric; the increment of the sequence. If specified, argument `n`
+#'   is ignored and the sequence returned will be from `min(x)` to `max(x)` in
+#'   increments of `by`.
 #'
 #' @return A numeric vector of length `n`.
 #'
@@ -18,28 +21,41 @@
 #' x <- rnorm(10)
 #' n <- 10L
 #' evenly(x, n = n)
-`evenly` <- function(x, n = 100) {
-    if (is.factor(x)) {
+`evenly` <- function(x, n = 100, by = NULL) {
+    out <- if (is.factor(x)) {
         ## must coerce to factor otherwise Predict.matrix will coerce
         ## and that will end up with levels in the wrong order
         ## need to make this ordered if `x` is ordered
         factor(levels(x), levels = levels(x), ordered = is.ordered(x))
     } else {
-        seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
-            length.out = n)
+        if (is.null(by)) {
+            seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
+                length.out = n)
+        } else {
+            seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
+                by = by)
+        }
     }
+    out
 }
 
 #' @rdname evenly
-`seq_min_max` <- function(x, n) {
-    if (is.factor(x)) {
+`seq_min_max` <- function(x, n, by = NULL) {
+    out <- if (is.factor(x)) {
         ## must coerce to factor otherwise Predict.matrix will coerce
         ## and that will end up with levels in the wrong order
-        factor(levels(x), levels = levels(x))
+        ## need to make this ordered if `x` is ordered
+        factor(levels(x), levels = levels(x), ordered = is.ordered(x))
     } else {
-        seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
-            length.out = n)
+        if (is.null(by)) {
+            seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
+                length.out = n)
+        } else {
+            seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
+                by = by)
+        }
     }
+    out
 }
 
 #' @title Create a sequence of evenly-spaced values adjusted to accommodate a
