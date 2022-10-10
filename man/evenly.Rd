@@ -5,7 +5,7 @@
 \alias{seq_min_max}
 \title{Create a sequence of evenly-spaced values}
 \usage{
-evenly(x, n = 100)
+evenly(x, n = 100, by = NULL)
 
 seq_min_max(x, n)
 }
@@ -15,6 +15,10 @@ seq_min_max(x, n)
 \item{n}{numeric; the number of evenly-spaced values to return. A default of
 \code{100} is used for convenience as that what is typically used when
 evaluating a smooth.}
+
+\item{by}{numeric; the increment of the sequence. If specified, argument \code{n}
+is ignored and the sequence returned will be from \code{min(x)} to \code{max(x)} in
+increments of \code{by}.}
 }
 \value{
 A numeric vector of length \code{n}.
