@@ -30,10 +30,10 @@
     } else {
         if (is.null(by)) {
             seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
-                length.out = n)
+                by = by)
         } else {
             seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
-                by = by)
+                length.out = n)
         }
     }
     out
@@ -49,10 +49,10 @@
     } else {
         if (is.null(by)) {
             seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
-                length.out = n)
+                by = by)
         } else {
             seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
-                by = by)
+                length.out = n)
         }
     }
     out
