@@ -40,7 +40,7 @@
 }
 
 #' @rdname evenly
-`seq_min_max` <- function(x, n) {
+`seq_min_max` <- function(x, n, by = NULL) {
     out <- if (is.factor(x)) {
         ## must coerce to factor otherwise Predict.matrix will coerce
         ## and that will end up with levels in the wrong order
