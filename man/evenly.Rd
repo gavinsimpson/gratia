@@ -7,7 +7,7 @@
 \usage{
 evenly(x, n = 100, by = NULL)
 
-seq_min_max(x, n)
+seq_min_max(x, n, by = NULL)
 }
 \arguments{
 \item{x}{numeric; vector over which evenly-spaced values are returned}
