@@ -1,4 +1,4 @@
-# gratia 0.7.3.19 (In development)
+# gratia 0.7.3.20 (In development)
 
 ## User visible changes
 
@@ -128,6 +128,10 @@
   `dplyr::group_split()`, and it's coercion internally of a character vector to
   a factor. This factor is now created explicitly, and the levels set to the
   correct order. #154
+
+* Setting the `dist` argument to set response or smooth values to `NA` if they
+  lay too far from the support of the data in multivariate smooths, this would
+  lead an incorrect scale for the response guide. This is now fixed. #193
 
 # gratia 0.7.3
 
