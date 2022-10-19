@@ -1014,7 +1014,7 @@
         guide_title <- "Partial\neffect"
         plot_var <- "est"
         guide_limits <- if (is.null(ylim)) {
-            c(-1, 1) * max(abs(object[[plot_var]]))
+            c(-1, 1) * max(abs(object[[plot_var]]), na.rm = TRUE)
         } else {
             ylim
         }
@@ -1132,7 +1132,7 @@
         guide_title <- "Partial\neffect"
         plot_var <- "est"
         guide_limits <- if (is.null(ylim)) {
-            c(-1, 1) * max(abs(object[[plot_var]]))
+            c(-1, 1) * max(abs(object[[plot_var]]), na.rm = TRUE)
         } else {
             ylim
         }
@@ -1268,7 +1268,7 @@
         guide_title <- "Partial\neffect"
         plot_var <- "est"
         guide_limits <- if (is.null(ylim)) {
-            c(-1, 1) * max(abs(object[[plot_var]]))
+            c(-1, 1) * max(abs(object[[plot_var]]), na.rm = TRUE)
         } else {
             ylim
         }
@@ -1578,7 +1578,7 @@
         guide_title <- "Partial\neffect"
         plot_var <- "est"
         guide_limits <- if (is.null(ylim)) {
-            c(-1, 1) * max(abs(object[[plot_var]]))
+            c(-1, 1) * max(abs(object[[plot_var]]), na.rm = TRUE)
         } else {
             ylim
         }
