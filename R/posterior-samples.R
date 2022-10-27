@@ -212,9 +212,11 @@
 #' ## Exclude s(x1)
 #' predicted_samples(m, n = 5, newd, exclude = "s(x1)", seed = 25)
 #'
-#' ## Select which terms --- result same as previous
+#' ## Select which terms --- result should be the same as previous
+#' ## but note that we have to include any parametric terms, including the
+#' ## model
 #' predicted_samples(m, n = 5, newd, seed = 25,
-#'                   terms = c("s(x0)", "s(x2)", "s(x3)"))
+#'                   terms = c("Intercept", "s(x0)", "s(x2)", "s(x3)"))
 #' \dontshow{options(op)}
 `predicted_samples` <- function(model, ...) {
     UseMethod("predicted_samples")
