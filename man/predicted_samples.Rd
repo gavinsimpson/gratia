@@ -77,7 +77,7 @@ predicted_samples(m, n = 5, newd, exclude = "s(x1)", seed = 25)
 
 ## Select which terms --- result same as previous
 predicted_samples(m, n = 5, newd, seed = 25,
-                  terms = c("s(x0)", "s(x2)", "s(x3)"))
+                  terms = c("Intercept", "s(x0)", "s(x2)", "s(x3)"))
 \dontshow{options(op)}
 }
 \author{

@@ -120,18 +120,18 @@ each of the names of columns returned by such prediction types.</p></dd>
 <span class="r-in"><span><span class="co">##</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="add_fitted.html">add_fitted</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">m</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 400 x 6</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          y     x0     x1     x2    x3 .value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  3.34   0.266  0.659  0.859  0.367   5.90</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> -<span style="color: #BB0000;">0.075</span><span style="color: #BB0000; text-decoration: underline;">8</span> 0.372  0.185  0.034<span style="text-decoration: underline;">4</span> 0.741   3.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 10.7    0.573  0.954  0.971  0.934   8.28</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>  8.73   0.908  0.898  0.745  0.673   8.65</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 15.0    0.202  0.944  0.273  0.701  15.7 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>  7.67   0.898  0.724  0.677  0.848   8.38</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>  7.58   0.945  0.370  0.348  0.706   7.84</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>  8.51   0.661  0.781  0.947  0.859   6.74</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 10.6    0.629  0.011<span style="text-decoration: underline;">1</span> 0.339  0.446   9.14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>  3.72   0.061<span style="text-decoration: underline;">8</span> 0.940  0.031<span style="text-decoration: underline;">7</span> 0.677   7.04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          y     x0     x1     x2    x3    .value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl[1d]&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  3.34   0.266  0.659  0.859  0.367      5.90</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> -<span style="color: #BB0000;">0.075</span><span style="color: #BB0000; text-decoration: underline;">8</span> 0.372  0.185  0.034<span style="text-decoration: underline;">4</span> 0.741      3.15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 10.7    0.573  0.954  0.971  0.934      8.28</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>  8.73   0.908  0.898  0.745  0.673      8.65</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 15.0    0.202  0.944  0.273  0.701     15.7 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>  7.67   0.898  0.724  0.677  0.848      8.38</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>  7.58   0.945  0.370  0.348  0.706      7.84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>  8.51   0.661  0.781  0.947  0.859      6.74</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 10.6    0.629  0.011<span style="text-decoration: underline;">1</span> 0.339  0.446      9.14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>  3.72   0.061<span style="text-decoration: underline;">8</span> 0.940  0.031<span style="text-decoration: underline;">7</span> 0.677      7.04</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ... with 390 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## with type = "terms" or "iterms"</span></span></span>

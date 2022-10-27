@@ -109,7 +109,8 @@
 <h2 class="pkg-version" data-toc-text="0.7.3" id="gratia-073">gratia 0.7.3<a class="anchor" aria-label="anchor" href="#gratia-073"></a></h2><p class="text-muted">CRAN release: 2022-05-09</p>
 <div class="section level3">
 <h3 id="user-visible-changes-0-7-3">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-7-3"></a></h3>
-<ul><li>Plots of smooths now use “Partial effect” for the y-axis label in place of “Effect”, to better indicate what is displayed.</li></ul></div>
+<ul><li>Plots of smooths now use “Partial effect” for the y-axis label in place of “Effect”, to better indicate what is displayed.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="new-features-0-7-3">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-3"></a></h3>
 <ul><li><p><code><a href="../reference/confint.fderiv.html">confint.fderiv()</a></code> and <code><a href="../reference/confint.gam.html">confint.gam()</a></code> now return their results as a tibble instead of a common-or-garden data frame. The latter mostly already did this.</p></li>
@@ -118,7 +119,8 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-7-3">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-3"></a></h3>
 <ul><li>
-<code><a href="../reference/compare_smooths.html">compare_smooths()</a></code> failed when passed non-standard model “names” like <code>compare_smooths(m_gam, m_gamm$gam)</code> or <code>compare_smooths(l[[1]], l[[2]])</code> even if the evaluated objects were valid GAM(M) models. Reported by Andrew Irwin <a href="https://github.com/gavinsimpson/gratia/issues/150" class="external-link">#150</a></li></ul></div>
+<code><a href="../reference/compare_smooths.html">compare_smooths()</a></code> failed when passed non-standard model “names” like <code>compare_smooths(m_gam, m_gamm$gam)</code> or <code>compare_smooths(l[[1]], l[[2]])</code> even if the evaluated objects were valid GAM(M) models. Reported by Andrew Irwin <a href="https://github.com/gavinsimpson/gratia/issues/150" class="external-link">#150</a></li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.2" id="gratia-072">gratia 0.7.2<a class="anchor" aria-label="anchor" href="#gratia-072"></a></h2><p class="text-muted">CRAN release: 2022-03-17</p>
@@ -221,7 +223,8 @@
 <ul><li>
 <p>The {cowplot} package has been replaced by the {patchwork} package for producing multi-panel figures in <code><a href="../reference/draw.html">draw()</a></code> and <code><a href="../reference/appraise.html">appraise()</a></code>. This shouldn’t affect any code that used {gratia} only, but if you passed additional arguments to <code>cowplot::plot_grid()</code> or used the <code>align</code> or <code>axis</code> arguments of <code><a href="../reference/draw.html">draw()</a></code> and <code><a href="../reference/appraise.html">appraise()</a></code>, you’ll need to adapt code accordingly.</p>
 <p>Typically, you can simply delete the <code>align</code> or <code>axis</code> arguments and {patchwork} will just work and align plots nicely. Any arguments passed via <code>...</code> to <code>cowplot::plot_grid()</code> will just be ignored by <code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code> unless those passed arguments match any of the arguments of <code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code>.</p>
-</li></ul></div>
+</li>
+</ul></div>
 <div class="section level3">
 <h3 id="new-features-0-6-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-6-0"></a></h3>
 <ul><li><p>The {patchwork} package is now used for multi-panel figures. As such, {gratia} no longer Imports from the {cowplot} package.</p></li>
@@ -272,7 +275,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="user-visible-changes-0-5-1">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-5-1"></a></h3>
-<ul><li>The <code>newdata</code> argument to <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> has been changed to <code>data</code> as was originally intended.</li></ul></div>
+<ul><li>The <code>newdata</code> argument to <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> has been changed to <code>data</code> as was originally intended.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.0" id="gratia-050">gratia 0.5.0<a class="anchor" aria-label="anchor" href="#gratia-050"></a></h2><p class="text-muted">CRAN release: 2021-01-10</p>
@@ -311,7 +315,8 @@
 <ul><li>
 <p><code><a href="../reference/confint.gam.html">confint.gam()</a></code> was failing on a tensor product smooth due to matching issues. Reported by <a href="https://github.com/tamas-ferenci" class="external-link">@tamas-ferenci</a> <a href="https://github.com/gavinsimpson/gratia/issues/88" class="external-link">#88</a></p>
 <p>This also fixes <a href="https://github.com/gavinsimpson/gratia/issues/80" class="external-link">#80</a></p>
-<ol class="example" style="list-style-type: decimal"><li>which was a related issue with selecting a specific smooth.</li></ol></li>
+<ol class="example" style="list-style-type: decimal"><li>which was a related issue with selecting a specific smooth.</li>
+</ol></li>
 <li><p>The <strong>vdiffr</strong> package is now used conditionally in package tests. Reported by Brian Ripley <a href="https://github.com/gavinsimpson/gratia/issues/93" class="external-link">#93</a></p></li>
 </ul></div>
 </div>
@@ -322,7 +327,8 @@
 <ul><li>
 <p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> with <code>scales = "fixed"</code> now applies to all terms that can be plotted, including 2d smooths.</p>
 <p>Reported by <a href="https://github.com/StefanoMezzini" class="external-link">@StefanoMezzini</a> <a href="https://github.com/gavinsimpson/gratia/issues/73" class="external-link">#73</a></p>
-</li></ul></div>
+</li>
+</ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-4-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-4-1"></a></h3>
 <ul><li><p><code><a href="https://dplyr.tidyverse.org/reference/combine.html" class="external-link">dplyr::combine()</a></code> was deprecated. Switch to <code><a href="https://vctrs.r-lib.org/reference/vec_c.html" class="external-link">vctrs::vec_c()</a></code>.</p></li>
@@ -390,7 +396,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-3-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-3-1"></a></h3>
-<ul><li>Updated <em>gratia</em> to work with <em>tibble</em> versions &gt;= 3.0</li></ul></div>
+<ul><li>Updated <em>gratia</em> to work with <em>tibble</em> versions &gt;= 3.0</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="gratia-030">gratia 0.3.0<a class="anchor" aria-label="anchor" href="#gratia-030"></a></h2><p class="text-muted">CRAN release: 2020-01-19</p>
@@ -398,7 +405,8 @@
 <h3 id="new-features-0-3-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-3-0"></a></h3>
 <ul><li>
 <p><em>gratia</em> now uses the <em>mvnfast</em> package for random draws from a multivariate normal distribution (<code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code>). Contributed by Henrik Singmann</p>
-<ol start="2" class="example" style="list-style-type: decimal"><li><a href="https://github.com/gavinsimpson/gratia/issues/28" class="external-link">#28</a></li></ol></li>
+<ol start="2" class="example" style="list-style-type: decimal"><li><a href="https://github.com/gavinsimpson/gratia/issues/28" class="external-link">#28</a></li>
+</ol></li>
 <li><p>New function <code><a href="../reference/basis.html">basis()</a></code> for generating tidy representations of basis expansions from an <em>mgcv</em>-like definition of a smooth, e.g. <code><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">te()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">ti()</a></code>, or <code><a href="https://rdrr.io/pkg/mgcv/man/t2.html" class="external-link">t2()</a></code>. The basic smooth types also have a simple <code><a href="../reference/draw.html">draw()</a></code> method for plotting the basis. <code><a href="../reference/basis.html">basis()</a></code> is a simple wrapper around <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html" class="external-link">mgcv::smoothCon()</a></code> with some post processing of the basis model matrix into a tidy format. <a href="https://github.com/gavinsimpson/gratia/issues/42" class="external-link">#42</a></p></li>
 <li><p>New function <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> to draw samples of entire smooth functions from their posterior distribution. Also has a <code><a href="../reference/draw.html">draw()</a></code> method for plotting the posterior samples.</p></li>
 </ul></div>

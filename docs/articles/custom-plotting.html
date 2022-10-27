@@ -88,13 +88,39 @@
 <div class="section level2">
 <h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
 </h2>
-<p>The <code><a href="../reference/draw.html">draw()</a></code> function in {gratia} was envisaged as a <code>ggplot</code>-based alternative to <code>mgcv:::plot.gam()</code>. As such, it was never intended to allow the sorts of customization that is possible with <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code> or some other packages that use <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code> as the plotting layer. This is largely due to the decision to produce multiple separate <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code> plots for GAMs with multiple smooths, which would subsequently be combined into a single <em>figure</em> on the device, initially using {cowplot} and more recently {patchwork}. Why I did things this way is evident when you consider how we might represent smooths of 3 or 4 variables (which are more common than you might think; consider space-time models via <code>te(x, y, time, d = c(2,1))</code> or space-depth-time models [think ocean or atmospheric data over space and at depth (height), observed over time] via <code>te(x, y, depth, time, d = c(2, 1, 1))</code>), and which require facets top produce small multiples, which means we can’t use facets to plot separate smooths. Additional complications arise when we consider more complex smooth types, such as splines on the sphere, for which we might want to us different coordinate systems or geoms to best represent the underlying smooth.</p>
-<p>Having gone down the root of combining multiple <code>ggplot</code> objects into a single figure, the problem of customizing these plots quickly rears its head. This vignette presents some solutions to the problem of modifying or adding to the plots produced by <code><a href="../reference/draw.html">draw()</a></code> culminating in an example illustrating how to use {gratia}’s utility functions to produce your own plots from lower-lever components.</p>
+<p>The <code><a href="../reference/draw.html">draw()</a></code> function in {gratia} was envisaged as a
+<code>ggplot</code>-based alternative to <code>mgcv:::plot.gam()</code>.
+As such, it was never intended to allow the sorts of customization that
+is possible with <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code> or some other packages that use
+<code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code> as the plotting layer. This is largely due to the
+decision to produce multiple separate <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code> plots for
+GAMs with multiple smooths, which would subsequently be combined into a
+single <em>figure</em> on the device, initially using {cowplot} and more
+recently {patchwork}. Why I did things this way is evident when you
+consider how we might represent smooths of 3 or 4 variables (which are
+more common than you might think; consider space-time models via
+<code>te(x, y, time, d = c(2,1))</code> or space-depth-time models
+[think ocean or atmospheric data over space and at depth (height),
+observed over time] via
+<code>te(x, y, depth, time, d = c(2, 1, 1))</code>), and which require
+facets top produce small multiples, which means we can’t use facets to
+plot separate smooths. Additional complications arise when we consider
+more complex smooth types, such as splines on the sphere, for which we
+might want to us different coordinate systems or geoms to best represent
+the underlying smooth.</p>
+<p>Having gone down the root of combining multiple <code>ggplot</code>
+objects into a single figure, the problem of customizing these plots
+quickly rears its head. This vignette presents some solutions to the
+problem of modifying or adding to the plots produced by
+<code><a href="../reference/draw.html">draw()</a></code> culminating in an example illustrating how to use
+{gratia}’s utility functions to produce your own plots from lower-lever
+components.</p>
 </div>
 <div class="section level2">
 <h2 id="adding-layers-to-plots-with-the-operator">Adding layers to plots with the <code>&amp;</code> operator<a class="anchor" aria-label="anchor" href="#adding-layers-to-plots-with-the-operator"></a>
 </h2>
-<p>We start by simulating some data and fitting a GAM with four smooth functions</p>
+<p>We start by simulating some data and fitting a GAM with four smooth
+functions</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"mgcv"</span><span class="op">)</span></span>
@@ -127,11 +153,17 @@
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="va">p</span></span></code></pre></div>
 <p><img src="custom-plotting_files/figure-html/draw-eg1-1-1.png" width="700"></p>
-<p>If we want to change the theme for the plots, we can’t append a <code><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme()</a></code> layer to <code>p</code> as this only affects the last plot in the <em>patchwork</em><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;A &lt;em&gt;patchwork&lt;/em&gt; is the name given to the composition of individual plots created by &lt;code&gt;&lt;a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link"&gt;patchwork::wrap_plots()&lt;/a&gt;&lt;/code&gt; or the composition operators &lt;code&gt;+&lt;/code&gt;, &lt;code&gt;|&lt;/code&gt; and &lt;code&gt;/&lt;/code&gt;.&lt;/p&gt;'><sup>1</sup></a></p>
+<p>If we want to change the theme for the plots, we can’t append a
+<code><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme()</a></code> layer to <code>p</code> as this only affects the
+last plot in the <em>patchwork</em><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;A &lt;em&gt;patchwork&lt;/em&gt; is the name given to the
+composition of individual plots created by
+&lt;code&gt;&lt;a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link"&gt;patchwork::wrap_plots()&lt;/a&gt;&lt;/code&gt; or the composition operators
+&lt;code&gt;+&lt;/code&gt;, &lt;code&gt;|&lt;/code&gt; and &lt;code&gt;/&lt;/code&gt;.&lt;/p&gt;'><sup>1</sup></a></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="custom-plotting_files/figure-html/draw-eg1-wrong-theme-1.png" width="700"></p>
-<p>One way to apply the theme to all plots in the patchwork is to the the <code>&amp;</code> operator.</p>
+<p>One way to apply the theme to all plots in the patchwork is to the
+the <code>&amp;</code> operator.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&amp;</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="custom-plotting_files/figure-html/draw-eg1-right-theme-1.png" width="700"></p>
@@ -139,7 +171,10 @@
 <div class="section level2">
 <h2 id="combining-individual-plots-produced-by-draw">Combining individual plots produced by <code>draw()</code><a class="anchor" aria-label="anchor" href="#combining-individual-plots-produced-by-draw"></a>
 </h2>
-<p><code><a href="../reference/draw.html">draw()</a></code> methods like <code><a href="../reference/draw.gam.html">draw.gam()</a></code> return an object created by <code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code>, and as a result it isn’t straightforward to combine those objects into a new patchwork</p>
+<p><code><a href="../reference/draw.html">draw()</a></code> methods like <code><a href="../reference/draw.gam.html">draw.gam()</a></code> return an
+object created by <code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code>, and as a result
+it isn’t straightforward to combine those objects into a new
+patchwork</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span>, select <span class="op">=</span> <span class="st">"s(x0)"</span><span class="op">)</span></span>
 <span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span>, select <span class="op">=</span> <span class="st">"s(x1)"</span><span class="op">)</span></span>
@@ -147,22 +182,37 @@
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="va">p3</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `wrap_dims()`:</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> The given dimensions cannot hold all panels. Please increase `ncol` or `nrow`</span></span></code></pre></div>
-<p>To avoid the error, we need to use <code><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">patchwork::plot_layout()</a></code> to set the dimensions we want</p>
+<p>To avoid the error, we need to use
+<code><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">patchwork::plot_layout()</a></code> to set the dimensions we want</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="va">p3</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="custom-plotting_files/figure-html/draw-multiple-patchworks-layout-1.png" width="700"></p>
-<p>The above could have been achieved directly via <code><a href="../reference/draw.html">draw()</a></code></p>
+<p>The above could have been achieved directly via
+<code><a href="../reference/draw.html">draw()</a></code></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span>, select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s(x0)"</span>, <span class="st">"s(x1)"</span>, <span class="st">"s(x2)"</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="custom-plotting_files/figure-html/draw-multiple-patchworks-draw-1.png" width="700"></p>
-<p>but it is instructive to know how to combine the outputs of <code><a href="../reference/draw.html">draw()</a></code> should the need arise, such as when you want to create a patchwork of plots from different models.</p>
+<p>but it is instructive to know how to combine the outputs of
+<code><a href="../reference/draw.html">draw()</a></code> should the need arise, such as when you want to
+create a patchwork of plots from different models.</p>
 </div>
 <div class="section level2">
 <h2 id="building-your-own-plot-by-hand">Building your own plot by hand<a class="anchor" aria-label="anchor" href="#building-your-own-plot-by-hand"></a>
 </h2>
-<p>{gratia} provides high-level functions like <code><a href="../reference/draw.html">draw()</a></code> to get you a good graphical overview of a fitted model, but with little option for customisation — it isn’t possible or desirable to allow all possible customisation options and fatures of {ggplot2} through a single function. Think about how many arguments that would require!</p>
-<p>Instead, {gratia} also exports the lower-level functions used <code><a href="../reference/draw.html">draw()</a></code> so that you can create your own plot using whatever {ggplot2} functions make sense. In the next few code blocks we’ll see how the plot created by <code>draw(m)</code> can be recreated by hand using these lower-level building blocks.</p>
-<p>The main thing we need is to evaluate the smooths at values of their covariates. This is done using <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>. We also need to add a credible interval to the evaluations, which can be done <em>tidyverse</em>-style via <code><a href="../reference/add_confint.html">add_confint()</a></code></p>
+<p>{gratia} provides high-level functions like <code><a href="../reference/draw.html">draw()</a></code> to
+get you a good graphical overview of a fitted model, but with little
+option for customisation — it isn’t possible or desirable to allow all
+possible customisation options and fatures of {ggplot2} through a single
+function. Think about how many arguments that would require!</p>
+<p>Instead, {gratia} also exports the lower-level functions used
+<code><a href="../reference/draw.html">draw()</a></code> so that you can create your own plot using whatever
+{ggplot2} functions make sense. In the next few code blocks we’ll see
+how the plot created by <code>draw(m)</code> can be recreated by hand
+using these lower-level building blocks.</p>
+<p>The main thing we need is to evaluate the smooths at values of their
+covariates. This is done using <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>. We also
+need to add a credible interval to the evaluations, which can be done
+<em>tidyverse</em>-style via <code><a href="../reference/add_confint.html">add_confint()</a></code></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># evaluate the smooths</span></span>
 <span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -182,17 +232,27 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> s(x0)  TPRS  <span style="color: #BB0000;">NA</span>    -<span style="color: #BB0000;">0.548</span> 0.255 0.092<span style="text-decoration: underline;">5</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   -<span style="color: #BB0000;">1.05</span>   -<span style="color: #BB0000;">0.048</span><span style="color: #BB0000; text-decoration: underline;">3</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> s(x0)  TPRS  <span style="color: #BB0000;">NA</span>    -<span style="color: #BB0000;">0.501</span> 0.242 0.102     <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   -<span style="color: #BB0000;">0.975</span>  -<span style="color: #BB0000;">0.026</span><span style="color: #BB0000; text-decoration: underline;">6</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># … with 390 more rows</span></span></span></code></pre></div>
-<p>By default <code><a href="../reference/draw.gam.html">draw.gam()</a></code> will add partial residuals to the partial effects plots. To achieve the same effect, we need to add the partial residuals to the data used to fit the model. This can be done via <code><a href="../reference/add_partial_residuals.html">add_partial_residuals()</a></code></p>
+<p>By default <code><a href="../reference/draw.gam.html">draw.gam()</a></code> will add partial residuals to the
+partial effects plots. To achieve the same effect, we need to add the
+partial residuals to the data used to fit the model. This can be done
+via <code><a href="../reference/add_partial_residuals.html">add_partial_residuals()</a></code></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># add partial residuals to data</span></span>
 <span><span class="va">eg1</span> <span class="op">&lt;-</span> <span class="va">eg1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_partial_residuals.html">add_partial_residuals</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
-<p>This will<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;currently; I’m not entirely happy with this naming convention as there’s nothing to indicate to the user that these are &lt;em&gt;partial residuals&lt;/em&gt; for the smooth with name matching the created variable name.&lt;/p&gt;"><sup>2</sup></a> add columns with names <code>"s(x0)"</code>. <code>"s(x1)"</code>, etc. to the data.</p>
+<p>This will<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;currently; I’m not entirely happy with this naming
+convention as there’s nothing to indicate to the user that these are
+&lt;em&gt;partial residuals&lt;/em&gt; for the smooth with name matching the created
+variable name.&lt;/p&gt;"><sup>2</sup></a> add columns with names
+<code>"s(x0)"</code>. <code>"s(x1)"</code>, etc. to the data.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">eg1</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "y"     "x0"    "x1"    "x2"    "x3"    "f"     "f0"    "f1"    "f2"   </span></span>
 <span><span class="co">#&gt; [10] "f3"    "s(x0)" "s(x1)" "s(x2)" "s(x3)"</span></span></code></pre></div>
-<p>Now we have everything we need to recreate the plots created by <code><a href="../reference/draw.gam.html">draw.gam()</a></code>. In the code block below we filter <code>sm</code> to focus on a specific smooth, here <span class="math inline">\(f(x2)\)</span> (<code>"s(x2)"</code>), then we add</p>
+<p>Now we have everything we need to recreate the plots created by
+<code><a href="../reference/draw.gam.html">draw.gam()</a></code>. In the code block below we filter
+<code>sm</code> to focus on a specific smooth, here <span class="math inline">\(f(x2)\)</span> (<code>"s(x2)"</code>), then we
+add</p>
 <ol style="list-style-type: decimal">
 <li>a rug plot of the observed values of <code>x2</code>,</li>
 <li>the credible interval around the estimated smooth,</li>
@@ -215,16 +275,27 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="st">"Partial effect"</span>, title <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span>
 <span><span class="va">p_sx2</span></span></code></pre></div>
 <p><img src="custom-plotting_files/figure-html/custom-plot-sx2-1.png" width="700"></p>
-<p>Assuming we repeat the above steps for the other smooths, creating plot objects <code>p_sx0</code>, <code>p_sx1</code>, <code>p_sx2</code>, and <code>p_sx3</code> (code not shown), we can complete the plot by creating the patchwork with the desired number of rows and columns</p>
+<p>Assuming we repeat the above steps for the other smooths, creating
+plot objects <code>p_sx0</code>, <code>p_sx1</code>, <code>p_sx2</code>,
+and <code>p_sx3</code> (code not shown), we can complete the plot by
+creating the patchwork with the desired number of rows and columns</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p_sx0</span> <span class="op">+</span> <span class="va">p_sx1</span> <span class="op">+</span> <span class="va">p_sx2</span> <span class="op">+</span> <span class="va">p_sx3</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="custom-plotting_files/figure-html/custom-plot-final-1.png" width="700"></p>
-<p>The real benefit of having complete control over how the data are plotted is that you can use the power of {ggplot2} to map additional variables to plot aesthetics. As an example, let’s assume we have a factor variable in the original data and we want to colour the partial residuals accoring to the levels of this factor. Let’s create that factor</p>
+<p>The real benefit of having complete control over how the data are
+plotted is that you can use the power of {ggplot2} to map additional
+variables to plot aesthetics. As an example, let’s assume we have a
+factor variable in the original data and we want to colour the partial
+residuals accoring to the levels of this factor. Let’s create that
+factor</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span></span>
 <span><span class="va">eg1</span> <span class="op">&lt;-</span> <span class="va">eg1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>fac <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Now we can modify our plotting code to map <code>fac</code> to the colour aesthetic when we plot the partial residuals. To save some typing, we’ll reorder the layers in the plot and add the partial residuals last</p>
+<p>Now we can modify our plotting code to map <code>fac</code> to the
+colour aesthetic when we plot the partial residuals. To save some
+typing, we’ll reorder the layers in the plot and add the partial
+residuals last</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plt</span> <span class="op">&lt;-</span> <span class="va">sm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">smooth</span> <span class="op">==</span> <span class="st">"s(x2)"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -242,7 +313,12 @@
 <span>                 colour <span class="op">=</span> <span class="va">fac</span><span class="op">)</span>, <span class="co"># &lt;-- map fac to colour aesthetic</span></span>
 <span>             data <span class="op">=</span> <span class="va">eg1</span>, cex <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span></span></code></pre></div>
 <p><img src="custom-plotting_files/figure-html/plot-partial-resids-with-colours-by-fac-1.png" width="700"></p>
-<p>We can also do some simple model checking by plotting the smooth with partial residuals coloured according to one of the other covariates (we could also do this by plotting the actual residuals against covariates). In the code chunk below, we map the covariate <code>x1</code> to both the <em>colour</em> and <em>size</em> aesthetics (note we deleted <code>cex = 1.5</code> to allow the mapping to <em>size</em>)</p>
+<p>We can also do some simple model checking by plotting the smooth with
+partial residuals coloured according to one of the other covariates (we
+could also do this by plotting the actual residuals against covariates).
+In the code chunk below, we map the covariate <code>x1</code> to both
+the <em>colour</em> and <em>size</em> aesthetics (note we deleted
+<code>cex = 1.5</code> to allow the mapping to <em>size</em>)</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plt</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x2</span>, y <span class="op">=</span> <span class="va">`s(x2)`</span>,</span>
@@ -250,7 +326,10 @@
 <span>             data <span class="op">=</span> <span class="va">eg1</span>, alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span>   <span class="co"># &lt;-- deleted cex!!</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_colour_viridis_c</a></span><span class="op">(</span>option <span class="op">=</span> <span class="st">"plasma"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="custom-plotting_files/figure-html/plot-partial-resids-with-colours-by-x1-1.png" width="700"></p>
-<p>The resulting plot doesn’t show any particular problems with the model because of the way the data were simulated, but hopefully this illustrates what can be possible once you use the low-level functions provided by {gratia}.</p>
+<p>The resulting plot doesn’t show any particular problems with the
+model because of the way the data were simulated, but hopefully this
+illustrates what can be possible once you use the low-level functions
+provided by {gratia}.</p>
 </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

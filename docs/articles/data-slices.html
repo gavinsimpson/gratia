@@ -85,8 +85,16 @@
 
     
     
-<p>Having fitted a GAM or other model containing penalised splines, we often want to evaluate the model at some pre-specified values of the covariates. For more complex models, this will typically involve holding some covariates at fixed, representative values while visualising the change in the response or effect of a smooth over supplied values of one or more other covariates. The values of the covariates at which we evaluate a smooth or a model are called a <em>data slice</em><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;at least that’s what I’m calling them.&lt;/p&gt;"><sup>1</sup></a>.</p>
-<p>This article will explain how to create data slices with {gratia} and its <code><a href="../reference/data_slice.html">data_slice()</a></code> function, and how to use them to visualise features of your fitted GAMs.</p>
+<p>Having fitted a GAM or other model containing penalised splines, we
+often want to evaluate the model at some pre-specified values of the
+covariates. For more complex models, this will typically involve holding
+some covariates at fixed, representative values while visualising the
+change in the response or effect of a smooth over supplied values of one
+or more other covariates. The values of the covariates at which we
+evaluate a smooth or a model are called a <em>data slice</em><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;at least that’s what I’m calling them.&lt;/p&gt;"><sup>1</sup></a>.</p>
+<p>This article will explain how to create data slices with {gratia} and
+its <code><a href="../reference/data_slice.html">data_slice()</a></code> function, and how to use them to visualise
+features of your fitted GAMs.</p>
 <p>We’ll need the following packages for this article</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"mgcv"</span><span class="op">)</span></span>
@@ -111,7 +119,10 @@
 <div class="section level2">
 <h2 id="carbon-dioxide-uptake-in-grass-plants">Carbon Dioxide Uptake in Grass Plants<a class="anchor" aria-label="anchor" href="#carbon-dioxide-uptake-in-grass-plants"></a>
 </h2>
-<p>The first example uses a small data set from an experimental study of the cold tolerance of the grass <em>Echinochloa crusgalli</em>. The data are in data frame <code>CO2</code> and provided with the {datasets} package that ships with R.</p>
+<p>The first example uses a small data set from an experimental study of
+the cold tolerance of the grass <em>Echinochloa crusgalli</em>. The data
+are in data frame <code>CO2</code> and provided with the {datasets}
+package that ships with R.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## data load and prep</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">CO2</span>, package <span class="op">=</span> <span class="st">"datasets"</span><span class="op">)</span></span>
@@ -130,7 +141,9 @@
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">type</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">plant_ylab</span>, x <span class="op">=</span> <span class="va">plant_xlab</span>, colour <span class="op">=</span> <span class="st">"Treatment"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="data-slices_files/figure-html/plot-plant-data-1.png" width="700"></p>
-<p>One way to model these data is to allow for different smooths for all combinations of the <code>treatment</code> and <code>type</code> covariates</p>
+<p>One way to model these data is to allow for different smooths for all
+combinations of the <code>treatment</code> and <code>type</code>
+covariates</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plant</span> <span class="op">&lt;-</span> <span class="va">plant</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>tt <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_cross.html" class="external-link">fct_cross</a></span><span class="op">(</span><span class="va">treatment</span>, <span class="va">type</span><span class="op">)</span><span class="op">)</span></span>
@@ -155,7 +168,14 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m_plant</span>, residuals <span class="op">=</span> <span class="cn">TRUE</span>, scales <span class="op">=</span> <span class="st">"fixed"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="data-slices_files/figure-html/draw-plant-model-1.png" width="700"></p>
-<p>We might want to compare model fitted values for the treatment for each of the types (origins), ignoring the random effect component. For this we want to evaluate the model at a range of values of covariate <code>conc</code> for some combinations of the other factors. This is a data slice through the covariate space, which we can create using <code><a href="../reference/data_slice.html">data_slice()</a></code>. To create a data slice for <code>conc</code> for the <code>Quebec</code> <code>type</code> in the <code>chilled</code> <code>treatment</code> we would use</p>
+<p>We might want to compare model fitted values for the treatment for
+each of the types (origins), ignoring the random effect component. For
+this we want to evaluate the model at a range of values of covariate
+<code>conc</code> for some combinations of the other factors. This is a
+data slice through the covariate space, which we can create using
+<code><a href="../reference/data_slice.html">data_slice()</a></code>. To create a data slice for <code>conc</code>
+for the <code>Quebec</code> <code>type</code> in the
+<code>chilled</code> <code>treatment</code> we would use</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ds1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_slice.html">data_slice</a></span><span class="op">(</span><span class="va">m_plant</span>, conc <span class="op">=</span> <span class="fu"><a href="../reference/evenly.html">evenly</a></span><span class="op">(</span><span class="va">conc</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>    type <span class="op">=</span> <span class="fu"><a href="../reference/ref_level.html">level</a></span><span class="op">(</span><span class="va">type</span>, <span class="st">"Quebec"</span><span class="op">)</span>, treatment <span class="op">=</span> <span class="fu"><a href="../reference/ref_level.html">level</a></span><span class="op">(</span><span class="va">treatment</span>, <span class="st">"chilled"</span><span class="op">)</span><span class="op">)</span></span>
@@ -174,7 +194,12 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  168. Quebec chilled   nonchilled:Quebec Qn1  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  177. Quebec chilled   nonchilled:Quebec Qn1  </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># … with 90 more rows</span></span></span></code></pre></div>
-<p>Notice how <code><a href="../reference/data_slice.html">data_slice()</a></code> has filled in something for the remaining covariates that we didn’t mention? In this case, <code><a href="../reference/data_slice.html">data_slice()</a></code> doesn’t know how <code>tt</code> was created, so it has chosen the modal level for the <code>tt</code> factor, which is not the correct choice in this case. Instead, we need to specify the correct level explicitly for <code>tt</code></p>
+<p>Notice how <code><a href="../reference/data_slice.html">data_slice()</a></code> has filled in something for the
+remaining covariates that we didn’t mention? In this case,
+<code><a href="../reference/data_slice.html">data_slice()</a></code> doesn’t know how <code>tt</code> was created,
+so it has chosen the modal level for the <code>tt</code> factor, which
+is not the correct choice in this case. Instead, we need to specify the
+correct level explicitly for <code>tt</code></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ds1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_slice.html">data_slice</a></span><span class="op">(</span><span class="va">m_plant</span>, conc <span class="op">=</span> <span class="fu"><a href="../reference/evenly.html">evenly</a></span><span class="op">(</span><span class="va">conc</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>    treatment <span class="op">=</span> <span class="fu"><a href="../reference/ref_level.html">level</a></span><span class="op">(</span><span class="va">treatment</span>, <span class="st">"chilled"</span><span class="op">)</span>, type <span class="op">=</span> <span class="fu"><a href="../reference/ref_level.html">level</a></span><span class="op">(</span><span class="va">type</span>, <span class="st">"Quebec"</span><span class="op">)</span>,</span>
@@ -194,26 +219,36 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  168. chilled   Quebec chilled:Quebec Qn1  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  177. chilled   Quebec chilled:Quebec Qn1  </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># … with 90 more rows</span></span></span></code></pre></div>
-<p>Having created the data slice, we can predict from the model using the combination of covariate values specified in our slice. We could use <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">predict.gam()</a></code> for this, but the <code><a href="../reference/fitted_values.html">fitted_values()</a></code> function in {gratia} is easier to use, especially for non-Gaussian models</p>
+<p>Having created the data slice, we can predict from the model using
+the combination of covariate values specified in our slice. We could use
+<code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">predict.gam()</a></code> for this, but the
+<code><a href="../reference/fitted_values.html">fitted_values()</a></code> function in {gratia} is easier to use,
+especially for non-Gaussian models</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fv1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m_plant</span>, data <span class="op">=</span> <span class="va">ds1</span>, scale <span class="op">=</span> <span class="st">"response"</span>, exclude <span class="op">=</span> <span class="st">"s(plant)"</span><span class="op">)</span></span>
 <span><span class="va">fv1</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 100 × 9</span></span></span>
-<span><span class="co">#&gt;     conc treatment type   tt             plant fitted    se lower upper</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>   95  chilled   Quebec chilled:Quebec Qn1     12.9  1.64  9.66  16.1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  104. chilled   Quebec chilled:Quebec Qn1     14.4  1.57 11.3   17.4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  113. chilled   Quebec chilled:Quebec Qn1     15.8  1.52 12.9   18.8</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  122. chilled   Quebec chilled:Quebec Qn1     17.3  1.48 14.4   20.2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  132. chilled   Quebec chilled:Quebec Qn1     18.7  1.46 15.9   21.6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  141. chilled   Quebec chilled:Quebec Qn1     20.1  1.45 17.3   23.0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  150. chilled   Quebec chilled:Quebec Qn1     21.5  1.45 18.7   24.4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  159. chilled   Quebec chilled:Quebec Qn1     22.8  1.45 20.0   25.7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  168. chilled   Quebec chilled:Quebec Qn1     24.1  1.47 21.3   27.0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  177. chilled   Quebec chilled:Quebec Qn1     25.4  1.48 22.5   28.3</span></span>
+<span><span class="co">#&gt;     conc treatment type   tt             plant    fitted        se   lower upper</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl[1d]&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl[1d]&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl[1&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>   95  chilled   Quebec chilled:Quebec Qn1        12.9      1.64    9.66  16.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  104. chilled   Quebec chilled:Quebec Qn1        14.4      1.57   11.3   17.4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  113. chilled   Quebec chilled:Quebec Qn1        15.8      1.52   12.9   18.8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  122. chilled   Quebec chilled:Quebec Qn1        17.3      1.48   14.4   20.2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  132. chilled   Quebec chilled:Quebec Qn1        18.7      1.46   15.9   21.6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  141. chilled   Quebec chilled:Quebec Qn1        20.1      1.45   17.3   23.0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  150. chilled   Quebec chilled:Quebec Qn1        21.5      1.45   18.7   24.4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  159. chilled   Quebec chilled:Quebec Qn1        22.8      1.45   20.0   25.7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  168. chilled   Quebec chilled:Quebec Qn1        24.1      1.47   21.3   27.0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  177. chilled   Quebec chilled:Quebec Qn1        25.4      1.48   22.5   28.3</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># … with 90 more rows</span></span></span></code></pre></div>
-<p>Notice how we excluded the random effect term; even though we had to specify something for the <code>plant</code> covariate we can ignore this term in the model using the <code>exclude</code> argument. <code><a href="../reference/fitted_values.html">fitted_values()</a></code> creates the credible interval on the scale of the link function and then back-transforms to the response scale when <code>scale = "response"</code>, which is also the default.</p>
-<p>Plotting the fitted values for the data slice now only requires some simple {ggplot2} knowledge</p>
+<p>Notice how we excluded the random effect term; even though we had to
+specify something for the <code>plant</code> covariate we can ignore
+this term in the model using the <code>exclude</code> argument.
+<code><a href="../reference/fitted_values.html">fitted_values()</a></code> creates the credible interval on the scale
+of the link function and then back-transforms to the response scale when
+<code>scale = "response"</code>, which is also the default.</p>
+<p>Plotting the fitted values for the data slice now only requires some
+simple {ggplot2} knowledge</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fv1</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">conc</span>, y <span class="op">=</span> <span class="va">fitted</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -227,7 +262,8 @@
 <span>        title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Estimated</span> <span class="op">~</span> <span class="va">CO</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">~</span> <span class="va">uptake</span><span class="op">)</span>,</span>
 <span>        subtitle <span class="op">=</span> <span class="st">"Chilled plants of the Quebec type"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="data-slices_files/figure-html/plot-plant-fitted-1-1.png" width="700"></p>
-<p>Next, let’s compare the fitted effects of the treatment in the Mississippi origin plants</p>
+<p>Next, let’s compare the fitted effects of the treatment in the
+Mississippi origin plants</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ds2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_slice.html">data_slice</a></span><span class="op">(</span><span class="va">m_plant</span>, conc <span class="op">=</span> <span class="fu"><a href="../reference/evenly.html">evenly</a></span><span class="op">(</span><span class="va">conc</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>    treatment <span class="op">=</span> <span class="fu"><a href="../reference/evenly.html">evenly</a></span><span class="op">(</span><span class="va">treatment</span><span class="op">)</span>, type <span class="op">=</span> <span class="fu"><a href="../reference/ref_level.html">level</a></span><span class="op">(</span><span class="va">type</span>, <span class="st">"Mississippi"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -247,7 +283,13 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  132. nonchilled Mississippi nonchilled:Mississippi Qn1  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  132. chilled    Mississippi chilled:Mississippi    Qn1  </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># … with 190 more rows</span></span></span></code></pre></div>
-<p>Here, we replaced the automatically-generated <code>tt</code> variable with the correctly specified call to <code><a href="https://forcats.tidyverse.org/reference/fct_cross.html" class="external-link">fct_cross()</a></code>, retaining the levels of the <code>type</code> and <code>treatment</code> factors. This insures that we have the correct combinations corresponding to the <code>treatment</code> and <code>type</code> factors but also that we preserve the original levels of the <code>tt</code> covariate we created.</p>
+<p>Here, we replaced the automatically-generated <code>tt</code>
+variable with the correctly specified call to <code><a href="https://forcats.tidyverse.org/reference/fct_cross.html" class="external-link">fct_cross()</a></code>,
+retaining the levels of the <code>type</code> and <code>treatment</code>
+factors. This insures that we have the correct combinations
+corresponding to the <code>treatment</code> and <code>type</code>
+factors but also that we preserve the original levels of the
+<code>tt</code> covariate we created.</p>
 <p>We can again visualise the fitted values for this data slice</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m_plant</span>, data <span class="op">=</span> <span class="va">ds2</span>, scale <span class="op">=</span> <span class="st">"response"</span>,</span>
@@ -264,40 +306,69 @@
 <span>        subtitle <span class="op">=</span> <span class="st">"Comparison of treatment in plants of the Mississippi type"</span>,</span>
 <span>        colour <span class="op">=</span> <span class="st">"Treatment"</span>, fill <span class="op">=</span> <span class="st">"Treatment"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="data-slices_files/figure-html/draw-plant-fitted-values-2-1.png" width="700"></p>
-<p>When we were creating our data slices, we used some helper functions to specify covariate values for the slice. {gratia} provides several such helper functions:</p>
+<p>When we were creating our data slices, we used some helper functions
+to specify covariate values for the slice. {gratia} provides several
+such helper functions:</p>
 <ul>
 <li>
-<code>evenly(x, n = 100)</code> — creates <code>n</code> evenly spaced values over the range of the covariate,</li>
+<code>evenly(x, n = 100)</code> — creates <code>n</code> evenly
+spaced values over the range of the covariate,</li>
 <li>
-<code>evenly(fct)</code> — produces a new factor containing each level of the specified factor <code>fct</code> just once,</li>
+<code>evenly(fct)</code> — produces a new factor containing each
+level of the specified factor <code>fct</code> just once,</li>
 <li>
-<code>ref_level(fct)</code> — creates a new factor containing just the reference level of the specified factor covariate <code>fct</code>, and</li>
+<code>ref_level(fct)</code> — creates a new factor containing just
+the reference level of the specified factor covariate <code>fct</code>,
+and</li>
 <li>
-<code>level(fct, "level")</code> — creates a factor with requested <code>"level"</code> from the factor <code>fct</code>.</li>
+<code>level(fct, "level")</code> — creates a factor with requested
+<code>"level"</code> from the factor <code>fct</code>.</li>
 </ul>
-<p>In all cases involving factors, the helper functions set the levels of the factor to match those in the original model fit<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Depending on the value of argument &lt;code&gt;drop.unused.levels&lt;/code&gt; passed to &lt;code&gt;&lt;a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link"&gt;gam()&lt;/a&gt;&lt;/code&gt; when you fitted the model. The default will drop any unused levels before fitting the model, and as a result the helpers will not include those levels either.&lt;/p&gt;'><sup>2</sup></a>.</p>
-<p>The second argument to <code><a href="../reference/data_slice.html">data_slice()</a></code> is <code>...</code></p>
+<p>In all cases involving factors, the helper functions set the levels
+of the factor to match those in the original model fit<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Depending on the value of argument
+&lt;code&gt;drop.unused.levels&lt;/code&gt; passed to &lt;code&gt;&lt;a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link"&gt;gam()&lt;/a&gt;&lt;/code&gt; when you
+fitted the model. The default will drop any unused levels before fitting
+the model, and as a result the helpers will not include those levels
+either.&lt;/p&gt;'><sup>2</sup></a>.</p>
+<p>The second argument to <code><a href="../reference/data_slice.html">data_slice()</a></code> is
+<code>...</code></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/args.html" class="external-link">args</a></span><span class="op">(</span><span class="fu">gratia</span><span class="fu">:::</span><span class="va"><a href="../reference/data_slice.html">data_slice.gam</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; function (object, ..., data = NULL, offset = NULL) </span></span>
 <span><span class="co">#&gt; NULL</span></span></code></pre></div>
-<p>The <code>...</code> argument allows you to provide expressions to create the covariate values you want for your data slice. Expressions passed to <code>...</code> are evaluated within the model frame of the fitted model (argument <code>object</code>) or in <code>data</code> (if supplied). You are not restricted either to using only the helper functions provide by {gratia}; any R function could be used as long as it makes sense in the context of the model frame, and it returns something that can be combined using <code><a href="https://tidyr.tidyverse.org/reference/expand_grid.html" class="external-link">tidyr::expand_grid()</a></code>.</p>
+<p>The <code>...</code> argument allows you to provide expressions to
+create the covariate values you want for your data slice. Expressions
+passed to <code>...</code> are evaluated within the model frame of the
+fitted model (argument <code>object</code>) or in <code>data</code> (if
+supplied). You are not restricted either to using only the helper
+functions provide by {gratia}; any R function could be used as long as
+it makes sense in the context of the model frame, and it returns
+something that can be combined using
+<code><a href="https://tidyr.tidyverse.org/reference/expand_grid.html" class="external-link">tidyr::expand_grid()</a></code>.</p>
 </div>
 <div class="section level2">
 <h2 id="slices-through-a-2d-smooth">Slices through a 2D smooth<a class="anchor" aria-label="anchor" href="#slices-through-a-2d-smooth"></a>
 </h2>
-<p>In the second example, I’ll use the bivariate example data set from {mgcv} but fit a tensor product of covariates <code>x</code> and <code>z</code></p>
+<p>In the second example, I’ll use the bivariate example data set from
+{mgcv} but fit a tensor product of covariates <code>x</code> and
+<code>z</code></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># simulate data from the bivariate surface</span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg2"</span>, n <span class="op">=</span> <span class="fl">1000</span>, scale <span class="op">=</span> <span class="fl">0.25</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># fit the GAM</span></span>
 <span><span class="va">m_biv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">te</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">z</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></code></pre></div>
-<p>The aim of the example will be to create a univariate data slice through the 2D smooth at user-specified values of <code>x</code> while holding <code>z</code> at one or more fixed values. We could visualise the effect at the smooth level, using <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>, or at the response level, as we did above using <code><a href="../reference/fitted_values.html">fitted_values()</a></code>.</p>
+<p>The aim of the example will be to create a univariate data slice
+through the 2D smooth at user-specified values of <code>x</code> while
+holding <code>z</code> at one or more fixed values. We could visualise
+the effect at the smooth level, using <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>,
+or at the response level, as we did above using
+<code><a href="../reference/fitted_values.html">fitted_values()</a></code>.</p>
 <div class="section level3">
 <h3 id="using-smooth_estimates">Using <code>smooth_estimates()</code><a class="anchor" aria-label="anchor" href="#using-smooth_estimates"></a>
 </h3>
-<p>We begin by creating a slice through the data space. We also create a label at this point for a nice axis label.</p>
+<p>We begin by creating a slice through the data space. We also create a
+label at this point for a nice axis label.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ds3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_slice.html">data_slice</a></span><span class="op">(</span><span class="va">m_biv</span>,</span>
 <span>                  x <span class="op">=</span> <span class="fu"><a href="../reference/evenly.html">evenly</a></span><span class="op">(</span><span class="va">x</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
@@ -305,7 +376,8 @@
 <span></span>
 <span><span class="va">z_val</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">ds3</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">z</span>, probs <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">ylab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/bquote.html" class="external-link">bquote</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/influence.measures.html" class="external-link">hat</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span><span class="op">(</span><span class="va">x</span>, <span class="fu">.</span><span class="op">(</span><span class="va">z_val</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Then we evaluate the smooth at the desired values and add a confidence interval</p>
+<p>Then we evaluate the smooth at the desired values and add a
+confidence interval</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m_biv</span>, smooth <span class="op">=</span> <span class="st">"te(x,z)"</span>, data <span class="op">=</span> <span class="va">ds3</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/add_confint.html">add_confint</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -333,8 +405,12 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Evaluation of smooth te(x,z) at fixed z"</span>,</span>
 <span>       y <span class="op">=</span> <span class="va">ylab</span><span class="op">)</span></span></code></pre></div>
 <p><img src="data-slices_files/figure-html/plot-smooth-estimates-bivar-1.png" width="700"></p>
-<p>Note that the above interval is not the Marra and Wood (2012) interval. It doesn’t include the uncertainty from the model constant term at the moment, but unless the smooth is very close to linear that shouldn’t make too much difference.</p>
-<p>This extends to multiple slices by asking for several discrete <code>z</code></p>
+<p>Note that the above interval is not the Marra and Wood (2012)
+interval. It doesn’t include the uncertainty from the model constant
+term at the moment, but unless the smooth is very close to linear that
+shouldn’t make too much difference.</p>
+<p>This extends to multiple slices by asking for several discrete
+<code>z</code></p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ds4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_slice.html">data_slice</a></span><span class="op">(</span><span class="va">m_biv</span>, x <span class="op">=</span> <span class="fu"><a href="../reference/evenly.html">evenly</a></span><span class="op">(</span><span class="va">x</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                  z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">z</span>, probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span><span class="op">)</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
@@ -355,7 +431,10 @@
 <div class="section level3">
 <h3 id="using-fitted_samples">Using <code>fitted_samples()</code><a class="anchor" aria-label="anchor" href="#using-fitted_samples"></a>
 </h3>
-<p>If you want to evaluate the surface over <code>x</code> at fixed <code>z</code> conditional upon other values of other covariates (model predicted or fitted values) then <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> is a tidy wrapper to <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">predict.gam()</a></code>.</p>
+<p>If you want to evaluate the surface over <code>x</code> at fixed
+<code>z</code> conditional upon other values of other covariates (model
+predicted or fitted values) then <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> is a tidy
+wrapper to <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">predict.gam()</a></code>.</p>
 <p>For single <code>z</code> we have</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m_biv</span>, data <span class="op">=</span> <span class="va">ds3</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># default is response scale, not link</span></span>
@@ -375,7 +454,9 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Fitted values from model"</span>,</span>
 <span>       y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/influence.measures.html" class="external-link">hat</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span>, colour <span class="op">=</span> <span class="st">"z"</span>, fill <span class="op">=</span> <span class="st">"z"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="data-slices_files/figure-html/data-slice-biv-2-fitted-values-1.png" width="700"> where the only difference here is that now the model constant is included as well as its uncertainty.</p>
+<p><img src="data-slices_files/figure-html/data-slice-biv-2-fitted-values-1.png" width="700">
+where the only difference here is that now the model constant is
+included as well as its uncertainty.</p>
 </div>
 </div>
 
