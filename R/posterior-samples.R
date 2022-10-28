@@ -214,7 +214,7 @@
 #'
 #' ## Select which terms --- result should be the same as previous
 #' ## but note that we have to include any parametric terms, including the
-#' ## model
+#' ## constant term
 #' predicted_samples(m, n = 5, newd, seed = 25,
 #'                   terms = c("Intercept", "s(x0)", "s(x2)", "s(x3)"))
 #' \dontshow{options(op)}
