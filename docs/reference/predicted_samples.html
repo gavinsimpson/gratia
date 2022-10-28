@@ -205,7 +205,9 @@ relates to,</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10     1     8.38</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ... with 40 more rows</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Select which terms --- result same as previous</span></span></span>
+<span class="r-in"><span><span class="co">## Select which terms --- result should be the same as previous</span></span></span>
+<span class="r-in"><span><span class="co">## but note that we have to include any parametric terms, including the</span></span></span>
+<span class="r-in"><span><span class="co">## constant term</span></span></span>
 <span class="r-in"><span><span class="fu">predicted_samples</span><span class="op">(</span><span class="va">m</span>, n <span class="op">=</span> <span class="fl">5</span>, <span class="va">newd</span>, seed <span class="op">=</span> <span class="fl">25</span>,</span></span>
 <span class="r-in"><span>                  terms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"s(x0)"</span>, <span class="st">"s(x2)"</span>, <span class="st">"s(x3)"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Use of the `newdata` argument is deprecated.</span>
