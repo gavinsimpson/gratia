@@ -59,6 +59,13 @@
   `x2` variable, and a constant factor level, the model class of `fac`, for the
   `fac` variable of the model.
 
+* `partial_derivatives()` is a new function for computing partial derivatives
+   of multivariate smooths (e.g. `s(x,z)`, `te(x,z)`) with respect to one of
+  the margins of the smooth. Multivariate smooths of any dimension are handled,
+  but only one of the dimensions is allowed to vary. Partial derivatives are
+  estimated using the method of finite differences, with forward, backward,
+  and central finite differences available. Requested by @noamross #101
+
 * `overview()` provides a simple overview of model terms for fitted GAMs.
 
 * `basis()` now has a method for fitted GAM(M)s which can extract the estimated

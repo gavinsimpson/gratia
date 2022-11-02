@@ -4,7 +4,7 @@
 \alias{shift_values}
 \title{Shift numeric values in a data frame by an amount \code{eps}}
 \usage{
-shift_values(df, h, i, FUN = "+")
+shift_values(df, h, i, FUN = `+`, focal = NULL)
 }
 \arguments{
 \item{df}{a data frame or tibble.}
@@ -15,6 +15,9 @@ shift_values(df, h, i, FUN = "+")
 included in the shift.}
 
 \item{FUN}{function; a function to applut the shift. Typically \code{+} or \code{-}.}
+
+\item{focal}{character; the focal variable when computing partial
+derivatives. This allows shifting only the focal variable by \code{eps}.}
 }
 \description{
 Shift numeric values in a data frame by an amount \code{eps}

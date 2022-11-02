@@ -2,9 +2,22 @@
 % Please edit documentation in R/draw-methods.R
 \name{draw.derivatives}
 \alias{draw.derivatives}
+\alias{draw.partial_derivatives}
 \title{Plot derivatives of smooths}
 \usage{
 \method{draw}{derivatives}(
+  object,
+  select = NULL,
+  scales = c("free", "fixed"),
+  alpha = 0.2,
+  ncol = NULL,
+  nrow = NULL,
+  guides = "keep",
+  angle = NULL,
+  ...
+)
+
+\method{draw}{partial_derivatives}(
   object,
   select = NULL,
   scales = c("free", "fixed"),

@@ -91,6 +91,64 @@
                guides = guides, ...)
 }
 
+#' @export
+#' @rdname draw.derivatives
+`draw.partial_derivatives` <- function(object,
+                               select = NULL,
+                               scales = c("free", "fixed"), alpha = 0.2,
+                               ncol = NULL, nrow = NULL,
+                               guides = "keep",
+                               angle = NULL,
+                               ...) {
+    scales <- match.arg(scales)
+
+    ## how many smooths
+    sm <- unique(object[["smooth"]])
+    ## select smooths
+    select <- check_user_select_smooths(smooths = sm, select = select)
+    sm <- sm[select]
+
+    plotlist <- vector("list", length = length(sm))
+
+    for (i in seq_along(sm)) {
+        take <- object[["smooth"]] == sm[i]
+        df <- object[take, ]
+        xvar <- unique(df[['var']])
+        plt <- if (!all(is.na(df$fs_var))) {
+            ggplot(df, aes(x = .data$data,
+                           y = .data$partial_deriv,
+                           group = .data$fs_var))
+        } else {
+            ggplot(df, aes(x = .data$data,
+                           y = .data$partial_deriv)) +
+              geom_ribbon(aes(ymin = .data$lower,
+                              ymax = .data$upper,
+                              y = NULL), alpha = alpha)
+        }
+        plotlist[[i]] <- plt +
+            geom_line() +
+            labs(title = sm[i], x = xvar,
+            y = paste("Partial derivative with respect to", xvar)) +
+            guides(x = guide_axis(angle = angle))
+    }
+
+    if (isTRUE(identical(scales, "fixed"))) {
+        ylims <- range(object[["lower"]], object[["upper"]])
+
+        for (i in seq_along(plotlist)) {
+            plotlist[[i]] <- plotlist[[i]] + lims(y = ylims)
+        }
+    }
+    ## return
+    n_plots <- length(plotlist)
+    if (is.null(ncol) && is.null(nrow)) {
+        ncol <- ceiling(sqrt(n_plots))
+        nrow <- ceiling(n_plots / ncol)
+    }
+    wrap_plots(plotlist, byrow = TRUE, ncol = ncol, nrow = nrow,
+               guides = guides, ...)
+}
+
 #' Plot basis functions
 #'
 #' Plots basis functions using ggplot2

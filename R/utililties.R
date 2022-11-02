@@ -619,9 +619,15 @@
 #' @param i logical; a vector indexing columns of `df` that should not be
 #'   included in the shift.
 #' @param FUN function; a function to applut the shift. Typically `+` or `-`.
-`shift_values` <- function(df, h, i, FUN = '+') {
+#' @param focal character; the focal variable when computing partial
+#'   derivatives. This allows shifting only the focal variable by `eps`.
+`shift_values` <- function(df, h, i, FUN = `+`, focal = NULL) {
     FUN <- match.fun(FUN)
     result <- df
+    if (!is.null(focal)) {
+        take <- names(df) %in% focal
+        i <- i | !take
+    }
     if (any(i)) {
         result[, !i] <- FUN(result[, !i], h)
     } else {
@@ -632,7 +638,7 @@
 
 #' @importFrom stats qnorm
 `coverage_normal` <- function(level) {
-    if (level <= 0 || level >= 1 ) {
+    if (level <= 0 || level >= 1) {
          stop("Invalid 'level': must be 0 < level < 1", call. = FALSE)
      }
      qnorm((1 - level) / 2, lower.tail = FALSE)

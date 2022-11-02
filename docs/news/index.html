@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.20</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.21</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,6 +79,7 @@
 <span><span class="fu"><a href="../reference/data_slice.html">data_slice</a></span><span class="op">(</span><span class="va">model</span>, x1 <span class="op">=</span> <span class="fu"><a href="../reference/evenly.html">evenly</a></span><span class="op">(</span><span class="va">x1</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>, x2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span><span class="op">)</span></span></code></pre>
 <p>The <code>value</code> in the pair can be an expression that will be looked up (evaluated) in the <code>data</code> argument or the model frame of the fitted model (the default). In the above example, the resulting slice will be a data frame of 100 observations, comprising <code>x1</code>, which is a vector of 100 values spread evenly over the range of <code>x1</code>, a constant value of the mean of <code>x2</code> for the <code>x2</code> variable, and a constant factor level, the model class of <code>fac</code>, for the <code>fac</code> variable of the model.</p>
 </li>
+<li><p><code><a href="../reference/partial_derivatives.html">partial_derivatives()</a></code> is a new function for computing partial derivatives of multivariate smooths (e.g. <code>s(x,z)</code>, <code>te(x,z)</code>) with respect to one of the margins of the smooth. Multivariate smooths of any dimension are handled, but only one of the dimensions is allowed to vary. Partial derivatives are estimated using the method of finite differences, with forward, backward, and central finite differences available. Requested by <a href="https://github.com/noamross" class="external-link">@noamross</a> <a href="https://github.com/gavinsimpson/gratia/issues/101" class="external-link">#101</a></p></li>
 <li><p><code><a href="../reference/overview.html">overview()</a></code> provides a simple overview of model terms for fitted GAMs.</p></li>
 <li>
 <p><code><a href="../reference/basis.html">basis()</a></code> now has a method for fitted GAM(M)s which can extract the estimated basis from the model and plot it, using the estimated coefficients for the smooth to weight the basis. <a href="https://github.com/gavinsimpson/gratia/issues/137" class="external-link">#137</a></p>
