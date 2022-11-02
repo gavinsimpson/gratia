@@ -1040,7 +1040,7 @@ vars_from_label <- function(label) {
     if (!is.null(fun)) {
         fun <- match.fun(fun)
         object <- mutate(object,
-                         across(any_of(c("partial")),
+                         across(any_of(c("partial", "lower", "upper")),
                                 .fns = fun))
     }
 
