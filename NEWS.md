@@ -1,4 +1,4 @@
-# gratia 0.7.3.20 (In development)
+# gratia 0.7.3.22 (In development)
 
 ## User visible changes
 
@@ -139,6 +139,9 @@
 * Setting the `dist` argument to set response or smooth values to `NA` if they
   lay too far from the support of the data in multivariate smooths, this would
   lead an incorrect scale for the response guide. This is now fixed. #193
+
+* Argument `fun` to `draw.gam()` was not being applied to any parametric terms.
+  Reported by @grasshoppermouse #195
 
 # gratia 0.7.3
 

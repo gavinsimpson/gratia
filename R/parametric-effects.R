@@ -236,7 +236,8 @@ draw.parametric_effects <- function(object,
     }
 
     ## If fun supplied, use it to transform est and the upper and lower interval
-    object <- transform_fun(object, fun = fun, column = "partial")
+    object <- transform_fun(object, fun = fun,
+        column = c("partial", "lower", "upper"))
 
     # base plot
     plt <- ggplot(object,
