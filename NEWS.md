@@ -1,4 +1,4 @@
-# gratia 0.7.3.23 (In development)
+# gratia 0.7.3.24 (In development)
 
 ## User visible changes
 
@@ -116,6 +116,9 @@
   associated function that returns the indices (positions) in the vector of
   model coefficients (returned by `coef(gam_model)`) of those coefficients that
   pertain to the stated smooth.
+
+* `draw.gam()` now better handles patchworks of plots where one or more of
+  those plots has fixed aspect ratios. #190
 
 ## Bug fixes
 

@@ -14,7 +14,7 @@ is used instead."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.23</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.24</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -102,6 +102,8 @@ is used instead.</p>
 <span>  ncol <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  nrow <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  guides <span class="op">=</span> <span class="st">"keep"</span>,</span>
+<span>  widths <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  heights <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  projection <span class="op">=</span> <span class="st">"orthographic"</span>,</span>
 <span>  orientation <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -273,6 +275,11 @@ spread the plots</p></dd>
 <dt>guides</dt>
 <dd><p>character; one of <code>"keep"</code> (the default), <code>"collect"</code>, or
 <code>"auto"</code>. Passed to <code><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">patchwork::plot_layout()</a></code></p></dd>
+
+
+<dt>widths, heights</dt>
+<dd><p>The relative widths and heights of each column and
+row in the grid. Will get repeated to match the dimensions of the grid.</p></dd>
 
 
 <dt>projection</dt>
