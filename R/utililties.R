@@ -1314,3 +1314,16 @@ vars_from_label <- function(label) {
     message("Use of the `newdata` argument is deprecated.\n",
         "Instead, use the data argument `data`.\n")
 }
+
+# Indices of which coefs are in which linear predictors
+# returns a list of length equal to the number of linear predictors
+`lss_eta_index` <- function(object) {
+    lpi <- attr(formula(object), "lpi")
+    if (is.null(lpi)) {
+        lpi <- list(seq_along(coef(object)))
+    }
+    # get rid of the shared information as I don't think this is needed
+    attr(lpi, "overlap") <- NULL
+    # return
+    lpi
+}
