@@ -358,6 +358,10 @@
         ncol <- ceiling(sqrt(n_plots))
         nrow <- ceiling(n_plots / ncol)
     }
+    if (n_plots == 1L) {
+        # then it doesn't matter about the widths, so set it to NULL
+        widths <- NULL
+    }
     wrap_plots(sm_plts, byrow = TRUE, ncol = ncol, nrow = nrow,
                guides = guides, widths = widths, heights = heights, ...)
 }
