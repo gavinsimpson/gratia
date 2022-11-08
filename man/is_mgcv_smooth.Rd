@@ -2,10 +2,16 @@
 % Please edit documentation in R/utililties.R
 \name{is_mgcv_smooth}
 \alias{is_mgcv_smooth}
+\alias{stop_if_not_mgcv_smooth}
+\alias{check_is_mgcv_smooth}
 \alias{is_mrf_smooth}
 \title{Check if objects are smooths or are a particular type of smooth}
 \usage{
 is_mgcv_smooth(smooth)
+
+stop_if_not_mgcv_smooth(smooth)
+
+check_is_mgcv_smooth(smooth)
 
 is_mrf_smooth(smooth)
 }
@@ -14,4 +20,12 @@ is_mrf_smooth(smooth)
 }
 \description{
 Check if objects are smooths or are a particular type of smooth
+}
+\details{
+Check if a smooth inherits from class \code{"mgcv.smooth"}.
+\code{stop_if_not_mgcv_smooth()} is a wrapper around \code{is_mgcv_smooth()}, useful
+when programming for checking if the supplied object is one of mgcv's
+smooths, and throwing a consistent error if not.
+\code{check_is_mgcv_smooth()} is similar to \code{stop_if_not_mgcv_smooth()} but
+returns the result of \code{is_mgcv_smooth()} invisibly.
 }
