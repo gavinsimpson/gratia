@@ -38,7 +38,7 @@
   ncol = NULL,
   nrow = NULL,
   guides = "keep",
-  widths = 1,
+  widths = NULL,
   heights = NULL,
   projection = "orthographic",
   orientation = NULL,
@@ -152,7 +152,10 @@ spread the plots}
 \code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
 
 \item{widths, heights}{The relative widths and heights of each column and
-row in the grid. Will get repeated to match the dimensions of the grid.}
+row in the grid. Will get repeated to match the dimensions of the grid. If
+there is more than 1 plot and \code{widths = NULL}, the value of \code{widths} will
+be set internally to \code{widths = 1} to accomodate plots of smooths that
+use a fixed aspect ratio.}
 
 \item{projection}{character; projection to use, see \code{\link[ggplot2:coord_map]{ggplot2::coord_map()}}
 for details.}

@@ -80,7 +80,10 @@
 #' @param guides character; one of `"keep"` (the default), `"collect"`, or
 #'   `"auto"`. Passed to [patchwork::plot_layout()]
 #' @param widths,heights The relative widths and heights of each column and
-#'   row in the grid. Will get repeated to match the dimensions of the grid.
+#'   row in the grid. Will get repeated to match the dimensions of the grid. If
+#'   there is more than 1 plot and `widths = NULL`, the value of `widths` will
+#'   be set internally to `widths = 1` to accomodate plots of smooths that
+#'   use a fixed aspect ratio.
 #' @param projection character; projection to use, see [ggplot2::coord_map()]
 #'   for details.
 #' @param orientation an optional vector `c(latitude, longitude, rotation)`
@@ -170,7 +173,7 @@
                        position = "identity",
                        angle = NULL,
                        ncol = NULL, nrow = NULL,
-                       guides = "keep", widths = 1, heights = NULL,
+                       guides = "keep", widths = NULL, heights = NULL,
                        projection = "orthographic",
                        orientation = NULL,
                        ...) {
@@ -358,9 +361,11 @@
         ncol <- ceiling(sqrt(n_plots))
         nrow <- ceiling(n_plots / ncol)
     }
-    if (n_plots == 1L) {
-        # then it doesn't matter about the widths, so set it to NULL
-        widths <- NULL
+    if (n_plots > 1L && is.null(widths)) {
+        # it doesn't matter about the widths if only one plot, but if we have
+        # more than one plot and the user didn't change `widths`, then we will
+        # force a value of 1 to give all plots the same relative width
+        widths <- 1
     }
     wrap_plots(sm_plts, byrow = TRUE, ncol = ncol, nrow = nrow,
                guides = guides, widths = widths, heights = heights, ...)
