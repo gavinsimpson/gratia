@@ -38,6 +38,8 @@
   ncol = NULL,
   nrow = NULL,
   guides = "keep",
+  widths = 1,
+  heights = NULL,
   projection = "orthographic",
   orientation = NULL,
   ...
@@ -148,6 +150,9 @@ spread the plots}
 
 \item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
 \code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
+
+\item{widths, heights}{The relative widths and heights of each column and
+row in the grid. Will get repeated to match the dimensions of the grid.}
 
 \item{projection}{character; projection to use, see \code{\link[ggplot2:coord_map]{ggplot2::coord_map()}}
 for details.}
