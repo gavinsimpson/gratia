@@ -270,6 +270,7 @@
     lcms <- length(column_means)
     nc <- ncol(V)
     meanL1 <- smooth[["meanL1"]]
+    eta_idx <- lss_eta_index(model)
 
     if (isTRUE(overall_uncertainty) && attr(smooth, "nCons") > 0L) {
         if (lcms < nc) {
@@ -280,9 +281,15 @@
             Xcm <- Xcm / meanL1
         }
         Xcm[, para.seq] <- X
-        rs <- rowSums((Xcm %*% V) * Xcm)
+        # only apply the uncertainty from linear predictors of which this smooth
+        # is a part of
+        idx <- vapply(eta_idx, function(i, beta) any(beta %in% i),
+            FUN.VALUE = logical(1L), beta = para.seq)
+        idx <- unlist(eta_idx[idx])
+        rs <- rowSums((Xcm[, idx, drop = FALSE] %*%
+            V[idx, idx, drop = FALSE]) * Xcm[, idx, drop = FALSE])
     } else {
-        rs <- rowSums((X %*% V[para.seq, para.seq]) * X)
+        rs <- rowSums((X %*% V[para.seq, para.seq, drop = FALSE]) * X)
     }
 
     ## standard error of the estimate
