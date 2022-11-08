@@ -94,7 +94,7 @@ test_that("is_mgcv_smooth returns false for objects that aren't smooths", {
 
 test_that("check_is_mgcv_smooth throws error for objects that aren't smooths", {
     expect_error(check_is_mgcv_smooth(1:10),
-                 "Object passed to 'smooth' is not a 'mgcv.smooth'.",
+                 "'smooth' is not an 'mgcv.smooth'",
                  fixed = TRUE)
 })
 

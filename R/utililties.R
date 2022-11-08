@@ -115,6 +115,13 @@
 #'
 #' @param smooth an R object, typically a list
 #'
+#' @details Check if a smooth inherits from class `"mgcv.smooth"`.
+#'   `stop_if_not_mgcv_smooth()` is a wrapper around `is_mgcv_smooth()`, useful
+#'   when programming for checking if the supplied object is one of mgcv's
+#'   smooths, and throwing a consistent error if not.
+#'   `check_is_mgcv_smooth()` is similar to `stop_if_not_mgcv_smooth()` but
+#'   returns the result of `is_mgcv_smooth()` invisibly.
+#'
 #' @export
 #' @rdname is_mgcv_smooth
 `is_mgcv_smooth` <- function(smooth) {
@@ -123,16 +130,27 @@
 
 #' @export
 #' @rdname is_mgcv_smooth
-`is_mrf_smooth` <- function(smooth) {
-  inherits(smooth, what= "mrf.smooth")
+stop_if_not_mgcv_smooth <- function(smooth) {
+    out <- is_mgcv_smooth(smooth)
+    if (!out) {
+        stop("'smooth' is not an 'mgcv.smooth'.")
+    }
 }
 
+#' @export
+#' @rdname is_mgcv_smooth
 `check_is_mgcv_smooth` <- function(smooth) {
     out <- is_mgcv_smooth(smooth)
     if (identical(out, FALSE)) {
-        stop("Object passed to 'smooth' is not a 'mgcv.smooth'.")
+        stop("'smooth' is not an 'mgcv.smooth'")
     }
     invisible(out)
+}
+
+#' @export
+#' @rdname is_mgcv_smooth
+`is_mrf_smooth` <- function(smooth) {
+  inherits(smooth, what = "mrf.smooth")
 }
 
 `is.gamm` <- function(object) {

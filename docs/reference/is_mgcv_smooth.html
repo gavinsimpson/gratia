@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.22</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.3.23</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,6 +63,10 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">is_mgcv_smooth</span><span class="op">(</span><span class="va">smooth</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">stop_if_not_mgcv_smooth</span><span class="op">(</span><span class="va">smooth</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">check_is_mgcv_smooth</span><span class="op">(</span><span class="va">smooth</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">is_mrf_smooth</span><span class="op">(</span><span class="va">smooth</span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -72,6 +76,15 @@
 <dd><p>an R object, typically a list</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Check if a smooth inherits from class <code>"mgcv.smooth"</code>.
+<code>stop_if_not_mgcv_smooth()</code> is a wrapper around <code>is_mgcv_smooth()</code>, useful
+when programming for checking if the supplied object is one of mgcv's
+smooths, and throwing a consistent error if not.
+<code>check_is_mgcv_smooth()</code> is similar to <code>stop_if_not_mgcv_smooth()</code> but
+returns the result of <code>is_mgcv_smooth()</code> invisibly.</p>
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>

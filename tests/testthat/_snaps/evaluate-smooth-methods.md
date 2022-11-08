@@ -4,7 +4,7 @@
       evaluate_smooth(m1, smooth = "s(x0)")
     Warning <lifecycle_warning_deprecated>
       `evaluate_smooth()` was deprecated in gratia 0.7.0.
-      Please use `smooth_estimates()` instead.
+      i Please use `smooth_estimates()` instead.
     Output
       # A tibble: 100 x 5
          smooth by_variable     x0    est    se

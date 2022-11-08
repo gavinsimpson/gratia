@@ -4,7 +4,7 @@
       fderiv(mod)
     Warning <lifecycle_warning_deprecated>
       `fderiv()` was deprecated in gratia 0.7.0.
-      Please use `derivatives()` instead.
+      i Please use `derivatives()` instead.
     Output
       $derivatives
       $derivatives$`s(x0)`

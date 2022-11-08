@@ -364,6 +364,10 @@
     ## actually add on the by variable info
     tbl <- add_column(tbl, by_variable = by_var, .after = 1L)
 
+    # add on the smooth type
+    sm_type <- rep(smooth_type(smooth), length.out = nrow(tbl))
+    tbl <- add_column(tbl, type = sm_type, .after = 1L)
+
     ## class this up
     class(tbl) <- append(class(tbl), gsub("\\.", "_", class(smooth)),
         after = 0L)

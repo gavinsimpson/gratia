@@ -1,4 +1,4 @@
-# gratia 0.7.3.22 (In development)
+# gratia 0.7.3.23 (In development)
 
 ## User visible changes
 
@@ -73,7 +73,7 @@
   smooth to weight the basis. #137
 
   There is also a new `draw.basis()` method for plotting the results of a call
-  to `basis()`.
+  to `basis()`. This method can now also handle bivariate bases.
 
   `tidy_basis()` is a lower level function that does the heavy lifting in
   `basis()`, and is now exported. `tidy_basis()` returns a tidy representation
