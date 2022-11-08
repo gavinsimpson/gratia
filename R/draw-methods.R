@@ -258,10 +258,6 @@
 #'
 #' @param object an object, the result of a call to [basis()].
 #' @param legend logical; should a legend by drawn to indicate basis functions?
-#' @param use_facets logical; for factor by smooths, use facets to show the
-#'   basis functions for each level of the factor? If `FALSE`, a separate ggplot
-#'   object will be created for each level and combined using
-#'   [patchwork::wrap_plots()]. **Currently ignored**.
 #' @param labeller a labeller function with which to label facets. The default
 #'   is to use [ggplot2::label_both()].
 #' @param ylab character or expression; the label for the y axis. If not
@@ -300,27 +296,32 @@
 #' draw(bf)
 `draw.basis` <- function(object,
                          legend = FALSE,
-                         use_facets = TRUE,
                          labeller = NULL,
-                         ylab = "Value",
+                         ylab = NULL,
                          title = NULL, subtitle = NULL,
                          caption = NULL,
                          ncol = NULL, nrow = NULL,
                          angle = NULL,
                          guides = "keep",
+                         contour = FALSE,
+                         n_contour = 10,
+                         contour_col = "black",
                          ...) {
     sm <- unique(object[["smooth"]])
     sm_l <- group_split(object, factor(.data$smooth, levels = sm))
     sm_plts <- map(sm_l,
         plot_basis,
         legend = legend,
-        use_facets = use_facets,
         labeller = labeller,
         ylab = ylab,
         title = title,
         subtitle = subtitle,
         caption = caption,
-        angle = angle)
+        angle = angle,
+        contour = contour,
+        n_contour = n_contour,
+        contour_col = contour_col,
+        ...)
 
     # filter out NULLs as those are types of smooths we can't plot (yet)
     no_plot <- map_lgl(sm_plts, is.null)
@@ -344,14 +345,41 @@
 #' @importFrom ggplot2 ggplot aes labs geom_line guides facet_wrap label_both
 `plot_basis` <- function(object,
                          legend = FALSE,
-                         use_facets = TRUE,
                          labeller = NULL,
-                         xlab, ylab,
+                         xlab = NULL, ylab = NULL,
                          title = NULL, subtitle = NULL,
                          caption = NULL,
                          angle = NULL,
+                         contour = TRUE,
+                         n_contour = 10,
+                         contour_col = "black",
                          ...) {
     ## capture the univariate smooth variable
+    smooth_var <- vars_from_label(unique(object[["smooth"]]))
+    n_sms <- length(smooth_var)
+
+    plt <- switch(n_sms,
+        plot_univariate_basis(object, legend = legend,
+            labeller = labeller, xlab = xlab, ylab = ylab,
+            title = title, subtitle = subtitle, caption = caption,
+            angle = angle, ...),
+        plot_bivariate_basis(object, legend = legend,
+            labeller = labeller, xlab = xlab, ylab = ylab,
+            title = title, subtitle = subtitle, caption = caption,
+            angle = angle, contour = contour, n_contour = n_contour,
+            contour_col = contour_col, ...))
+
+    plt
+}
+
+`plot_univariate_basis` <- function(object,
+                                    legend = FALSE,
+                                    labeller = NULL,
+                                    xlab = NULL, ylab = NULL,
+                                    title = NULL, subtitle = NULL,
+                                    caption = NULL,
+                                    angle = NULL,
+                                    ...) {
     smooth_var <- vars_from_label(unique(object[["smooth"]]))
 
     ## default labeller
@@ -367,10 +395,10 @@
         guides(x = guide_axis(angle = angle))
 
     ## default labels if none supplied
-    if (missing(xlab)) {
+    if (is.null(xlab)) {
         xlab <- smooth_var
     }
-    if (missing(ylab)) {
+    if (is.null(ylab)) {
         ylab <- "Value"
     }
     if (is.null(title)) {
@@ -397,6 +425,83 @@
     ## draw a guide?
     if (!legend) {
         plt <- plt + guides(colour = "none")
+    }
+
+    plt
+}
+
+`plot_bivariate_basis` <- function(object,
+                                   legend = FALSE,
+                                   labeller = NULL,
+                                   xlab = NULL, ylab = NULL,
+                                   title = NULL, subtitle = NULL,
+                                   caption = NULL,
+                                   angle = NULL,
+                                   contour = TRUE,
+                                   n_contour = 10,
+                                   contour_col = "black",
+                                   ...) {
+    smooth_var <- vars_from_label(unique(object[["smooth"]]))
+
+    ## default labeller
+    if (is.null(labeller)) {
+        labeller  <- label_both
+    }
+
+    ## basis plot
+    plt <- ggplot(object, aes(x = .data[[smooth_var[1]]],
+        y = .data[[smooth_var[2]]],
+        fill = .data[["value"]],
+        group = .data[["bf"]])) +
+        geom_raster() +
+        guides(x = guide_axis(angle = angle)) +
+        scale_fill_distiller(palette = "RdBu", type = "div")
+
+    ## default labels if none supplied
+    if (is.null(xlab)) {
+        xlab <- smooth_var[2]
+    }
+    if (is.null(ylab)) {
+        ylab <- smooth_var[2]
+    }
+    flab <- "value"
+    if (is.null(title)) {
+        title <- attr(object, "smooth_object")
+        # if still null then this came from a model & we don't have the call
+        if (is.null(title)) {
+            title <- unique(object[["smooth"]])
+        }
+    }
+
+    ## fixup for by variable smooths, facet for factor by smooths
+    if (all(!is.na(object[["by_variable"]]))) {
+        by_var_name <- unique(object[["by_variable"]])
+        by_var <- object[[by_var_name]]
+        if (is.character(by_var) || is.factor(by_var)) {
+            plt <- plt + facet_wrap(by_var_name, labeller = labeller)
+        }
+    } else {
+        plt <- plt + facet_wrap(vars(.data[["bf"]]), labeller = labeller)
+    }
+
+    ## add labelling to plot
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+        caption = caption, fill = flab)
+
+    ## draw a guide?
+    if (!legend) {
+        plt <- plt + guides(fill = "none")
+    }
+
+    if (isTRUE(contour)) {
+        plt <- plt + geom_contour(mapping = aes(z = .data[["value"]]),
+            colour = contour_col,
+            bins = n_contour,
+            na.rm = TRUE)
+    }
+
+    if (str_detect(object[["type"]][1L], "TPRS")) {
+        plt <- plt + coord_equal()
     }
 
     plt

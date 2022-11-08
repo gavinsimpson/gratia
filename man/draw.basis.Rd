@@ -7,9 +7,8 @@
 \method{draw}{basis}(
   object,
   legend = FALSE,
-  use_facets = TRUE,
   labeller = NULL,
-  ylab = "Value",
+  ylab = NULL,
   title = NULL,
   subtitle = NULL,
   caption = NULL,
@@ -17,6 +16,9 @@
   nrow = NULL,
   angle = NULL,
   guides = "keep",
+  contour = FALSE,
+  n_contour = 10,
+  contour_col = "black",
   ...
 )
 }
@@ -24,11 +26,6 @@
 \item{object}{an object, the result of a call to \code{\link[=basis]{basis()}}.}
 
 \item{legend}{logical; should a legend by drawn to indicate basis functions?}
-
-\item{use_facets}{logical; for factor by smooths, use facets to show the
-basis functions for each level of the factor? If \code{FALSE}, a separate ggplot
-object will be created for each level and combined using
-\code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}. \strong{Currently ignored}.}
 
 \item{labeller}{a labeller function with which to label facets. The default
 is to use \code{\link[ggplot2:labellers]{ggplot2::label_both()}}.}
@@ -53,6 +50,14 @@ drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggp
 
 \item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
 \code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
+
+\item{contour}{logical; should contours be draw on the plot using
+\code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+
+\item{n_contour}{numeric; the number of contour bins. Will result in
+\code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+
+\item{contour_col}{colour specification for contour lines.}
 
 \item{...}{arguments passed to other methods. Not used by this method.}
 }
