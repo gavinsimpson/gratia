@@ -1,4 +1,4 @@
-# gratia 0.7.3.24 (In development)
+# gratia 0.7.3.25 (In development)
 
 ## User visible changes
 
@@ -145,6 +145,10 @@
 
 * Argument `fun` to `draw.gam()` was not being applied to any parametric terms.
   Reported by @grasshoppermouse #195
+
+* `draw.gam()` was adding the uncertainty for all linear predictors to smooths
+  when `overall_uncertainty = TRUE` was used. Now `draw.gam()` only includes the
+  uncertainty for those linear predictors in which a smooth takes part. #154
 
 # gratia 0.7.3
 
