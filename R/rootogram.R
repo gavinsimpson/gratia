@@ -276,7 +276,7 @@
                   fill = bar_fill, col = bar_colour) +
         geom_line(aes(x = .data$bin,
                       y = .data$fitted),
-                  colour = fitted_colour, size = 1) +
+                  colour = fitted_colour, linewidth = 1) +
         geom_point(aes(x = .data$bin,
                        y = .data$fitted),
                    colour = fitted_colour, size = 2.5)
