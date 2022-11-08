@@ -79,6 +79,8 @@
 #'   spread the plots
 #' @param guides character; one of `"keep"` (the default), `"collect"`, or
 #'   `"auto"`. Passed to [patchwork::plot_layout()]
+#' @param widths,heights The relative widths and heights of each column and
+#'   row in the grid. Will get repeated to match the dimensions of the grid.
 #' @param projection character; projection to use, see [ggplot2::coord_map()]
 #'   for details.
 #' @param orientation an optional vector `c(latitude, longitude, rotation)`
@@ -168,7 +170,7 @@
                        position = "identity",
                        angle = NULL,
                        ncol = NULL, nrow = NULL,
-                       guides = "keep",
+                       guides = "keep", widths = 1, heights = NULL,
                        projection = "orthographic",
                        orientation = NULL,
                        ...) {
@@ -357,7 +359,7 @@
         nrow <- ceiling(n_plots / ncol)
     }
     wrap_plots(sm_plts, byrow = TRUE, ncol = ncol, nrow = nrow,
-               guides = guides, ...)
+               guides = guides, widths = widths, heights = heights, ...)
 }
 
 #' @export
