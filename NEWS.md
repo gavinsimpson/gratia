@@ -148,7 +148,7 @@
 
 * `draw.gam()` was adding the uncertainty for all linear predictors to smooths
   when `overall_uncertainty = TRUE` was used. Now `draw.gam()` only includes the
-  uncertainty for those linear predictors in which a smooth takes part. #154
+  uncertainty for those linear predictors in which a smooth takes part. #158
 
 # gratia 0.7.3
 
