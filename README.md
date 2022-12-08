@@ -65,7 +65,16 @@ have *remotes* installed, then run
 
     remotes::install_github("gavinsimpson/gratia")
 
-to install the package.
+to install the package. Alternatively, binary packages of the
+development version are available from rOpenSci’s R Universe service:
+
+    # Enable repository from gavinsimpson
+    options(repos = c(
+      gavinsimpson = "https://gavinsimpson.r-universe.dev",
+      CRAN = "https://cloud.r-project.org"))
+
+    # Download and install gratia in R
+    install.packages("gratia")
 
 ## History
 
