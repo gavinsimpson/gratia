@@ -841,12 +841,6 @@
             if (is.null(focal)) {
                 focal <- names(newd)[which(n_unique > 1L)]
             } else {
-                # check that the focal one is actually varying
-                n_focal <- length(unique(newd[[focal]]))
-                if (n_focal < 2L) {
-                    stop("Focal variable has fewer than 2 unique ",
-                    "observations in supplied 'data'")
-                }
                 # and that the others are not varying
                 bad <- n_unique[setdiff(names(newd), focal)] > 1L
                 if (any(bad)) {
