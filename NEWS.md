@@ -1,4 +1,4 @@
-# gratia 0.7.3.25 (In development)
+# gratia 0.7.3.26 (In development)
 
 ## User visible changes
 
@@ -149,6 +149,9 @@
 * `draw.gam()` was adding the uncertainty for all linear predictors to smooths
   when `overall_uncertainty = TRUE` was used. Now `draw.gam()` only includes the
   uncertainty for those linear predictors in which a smooth takes part. #158
+
+* `partial_derivatives()` works when provided with a single data point at
+  which to evaluate the derivative. #199
 
 # gratia 0.7.3
 
