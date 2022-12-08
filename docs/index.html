@@ -116,7 +116,14 @@
 <div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">'gratia'</span>)</span></code></pre></div>
 <p>however <em>gratia</em> is under active development and you may wish to install the development version from github. The easiest way to do this is via the <code>install_github()</code> function from package <em>remotes</em>. Make sure you have <em>remotes</em> installed, then run</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"gavinsimpson/gratia"</span>)</span></code></pre></div>
-<p>to install the package.</p>
+<p>to install the package. Alternatively, binary packages of the development version are available from rOpenSci’s R Universe service:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Enable repository from gavinsimpson</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">repos =</span> <span class="fu">c</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">gavinsimpson =</span> <span class="st">"https://gavinsimpson.r-universe.dev"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">CRAN =</span> <span class="st">"https://cloud.r-project.org"</span>))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Download and install gratia in R</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"gratia"</span>)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="history">History<a class="anchor" aria-label="anchor" href="#history"></a>
