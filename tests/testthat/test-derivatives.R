@@ -6,12 +6,6 @@ library("gratia")
 library("mgcv")
 library("ggplot2")
 
-## Need a local wrapper to allow conditional use of vdiffr
-`expect_doppelganger` <- function(title, fig, ...) {
-  testthat::skip_if_not_installed("vdiffr")
-  vdiffr::expect_doppelganger(title, fig, ...)
-}
-
 test_that("derivatives fails for an unknown object", {
     df <- data.frame(a = 1:10, b = 1:10)
     expect_error(derivatives(df),
