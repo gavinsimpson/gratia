@@ -37,6 +37,10 @@
     tt <- object$pterms       # get model terms object
     tt <- delete.response(tt) # remove response so easier to work with
     vars <- parametric_terms(object) # vector of names of model terms
+    if (length(vars) == 0L) {
+        warning("The model doesn't contain any parametric terms")
+        return(NULL)
+    }
     mgcv_names <- names(vars) # this is how mgcv refers to the terms
 
     # user supplied term? if provided check the stated terms are actually model

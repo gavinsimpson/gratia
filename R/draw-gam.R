@@ -313,33 +313,38 @@
 
     # Are we plotting parametric effects too?
     if (isTRUE(parametric)) {
-        para <- parametric_effects(object, term = terms, #data = data,
-                                   unconditional = unconditional,
-                                   unnest = TRUE, ci_level = ci_level)
-        # Add CI
-        crit <- coverage_normal(ci_level)
-        object <- mutate(para,
-                         lower = .data$partial - (crit * .data$se),
-                         upper = .data$partial + (crit * .data$se))
-        # need to alter the ylim if scales are fixed
-        if (isTRUE(identical(scales, "fixed"))) {
-            ylims <- range(ylims, object$partial, object$upper, object$lower)
-        }
+        if (length(parametric_terms(object)) == 0L) {
+            message("The model contains no parametric terms")
+            parametric <- FALSE
+        } else {
+            para <- parametric_effects(object, term = terms, # data = data,
+                unconditional = unconditional,
+                unnest = TRUE, ci_level = ci_level)
+            # Add CI
+            crit <- coverage_normal(ci_level)
+            object <- mutate(para,
+                lower = .data$partial - (crit * .data$se),
+                upper = .data$partial + (crit * .data$se))
+            # need to alter the ylim if scales are fixed
+            if (isTRUE(identical(scales, "fixed"))) {
+                ylims <- range(ylims, object$partial, object$upper, object$lower)
+            }
 
-        para_plts <- para %>%
-          group_by(.data$term) %>%
-          group_map(.keep = TRUE,
+            para_plts <- para %>%
+                group_by(.data$term) %>%
+                group_map(.keep = TRUE,
                     .f = ~ draw_parametric_effect(.x,
-                                                  ci_level = ci_level,
-                                                  ci_col = ci_col,
-                                                  ci_alpha = ci_alpha,
-                                                  line_col = smooth_col,
-                                                  constant = constant,
-                                                  fun = fun,
-                                                  rug = rug,
-                                                  position = position,
-                                                  angle = angle,
-                                                  ylim = ylims))
+                        ci_level = ci_level,
+                        ci_col = ci_col,
+                        ci_alpha = ci_alpha,
+                        line_col = smooth_col,
+                        constant = constant,
+                        fun = fun,
+                        rug = rug,
+                        position = position,
+                        angle = angle,
+                        ylim = ylims))
+        }
     } # parametric done
 
     if (isTRUE(parametric)) {
