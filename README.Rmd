@@ -93,7 +93,18 @@ development version from github. The easiest way to do this is via the
 remotes::install_github("gavinsimpson/gratia")
 ```
 
-to install the package.
+to install the package. Alternatively, binary packages of the development
+version are available from rOpenSci's R Universe service:
+
+```{r install-r-universe, eval = FALSE}
+# Enable repository from gavinsimpson
+options(repos = c(
+  gavinsimpson = "https://gavinsimpson.r-universe.dev",
+  CRAN = "https://cloud.r-project.org"))
+
+# Download and install gratia in R
+install.packages("gratia")
+```
 
 ## History
 
