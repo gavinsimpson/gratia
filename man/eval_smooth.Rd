@@ -4,6 +4,7 @@
 \alias{eval_smooth}
 \alias{eval_smooth.mgcv.smooth}
 \alias{eval_smooth.fs.interaction}
+\alias{eval_smooth.sz.interaction}
 \alias{eval_smooth.random.effect}
 \alias{eval_smooth.mrf.smooth}
 \alias{eval_smooth.t2.smooth}
@@ -26,6 +27,16 @@ eval_smooth(smooth, ...)
 )
 
 \method{eval_smooth}{fs.interaction}(
+  smooth,
+  model,
+  n = 100,
+  data = NULL,
+  unconditional = FALSE,
+  overall_uncertainty = TRUE,
+  ...
+)
+
+\method{eval_smooth}{sz.interaction}(
   smooth,
   model,
   n = 100,

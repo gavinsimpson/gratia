@@ -115,3 +115,18 @@ test_that("draw.smooth_estimates works for su_m_quadvar_t2", {
                                                n = 25, n_3d = 4, n_4d = 3)))
     expect_doppelganger("draw.smooth_estimates su_m_quadvar_t2", plt)
 })
+
+test_that("draw.smooth_estimates works for sz factor smooth", {
+    skip_on_os(os = "win")
+    skip_on_os(os = "mac")
+    expect_silent(plt <- draw(smooth_estimates(m_sz)))
+    expect_doppelganger("draw.smooth_estimates sz factor smooth", plt)
+})
+
+
+test_that("draw.smooth_estimates works for sz two factor smooth", {
+    skip_on_os(os = "win")
+    skip_on_os(os = "mac")
+    expect_silent(plt <- draw(smooth_estimates(m_sz_2f)))
+    expect_doppelganger("draw.smooth_estimates sz two factor smooth", plt)
+})

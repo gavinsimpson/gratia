@@ -13,6 +13,7 @@
 \alias{smooth_type.Bspline.smooth}
 \alias{smooth_type.duchon.spline}
 \alias{smooth_type.fs.interaction}
+\alias{smooth_type.sz.interaction}
 \alias{smooth_type.gp.smooth}
 \alias{smooth_type.mrf.smooth}
 \alias{smooth_type.random.effect}
@@ -55,6 +56,8 @@ smooth_type(smooth)
 \method{smooth_type}{duchon.spline}(smooth)
 
 \method{smooth_type}{fs.interaction}(smooth)
+
+\method{smooth_type}{sz.interaction}(smooth)
 
 \method{smooth_type}{gp.smooth}(smooth)
 

@@ -31,6 +31,7 @@
   n_contour = NULL,
   partial_match = FALSE,
   discrete_colour = NULL,
+  discrete_fill = NULL,
   continuous_colour = NULL,
   continuous_fill = NULL,
   position = "identity",
@@ -136,8 +137,7 @@ band. Affects the fill of the interval.}
 with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
 against.}
 
-\item{discrete_colour, continuous_colour, continuous_fill}{suitable scales
-for the types of data.}
+\item{discrete_colour, discrete_fill, continuous_colour, continuous_fill}{suitable scales for the types of data.}
 
 \item{position}{Position adjustment, either as a string, or the result of a
 call to a position adjustment function.}
