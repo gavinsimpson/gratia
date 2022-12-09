@@ -1,4 +1,4 @@
-# gratia 0.7.3.26 (In development)
+# gratia 0.7.3.27 (In development)
 
 ## User visible changes
 
@@ -67,6 +67,11 @@
   and central finite differences available. Requested by @noamross #101
 
 * `overview()` provides a simple overview of model terms for fitted GAMs.
+
+* The new `bs = "sz"` basis that was released with *mgcv* version 1.18-41 is
+  now supported in `smooth_estimates()`, `draw.gam()`, and
+  `draw.smooth_estimates()` and this basis has its own unique plotting method.
+  #202
 
 * `basis()` now has a method for fitted GAM(M)s which can extract the estimated
   basis from the model and plot it, using the estimated coefficients for the

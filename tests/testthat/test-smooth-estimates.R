@@ -264,3 +264,19 @@ test_that("smooth_estimates works for m_gamm4", {
     expect_identical(nrow(sm), 100L)
     expect_named(sm, c("smooth", "type", "by", "est", "se", "x2"))
 })
+
+test_that("smooth_estimates works for GAM with sz smooth single factor", {
+    expect_silent(sm <- smooth_estimates(m_sz, "s(fac,x2)"))
+    expect_s3_class(sm, c("smooth_estimates", "tbl_df", "tbl", "data.frame"))
+    expect_identical(ncol(sm), 7L)
+    expect_identical(nrow(sm), 300L)
+    expect_named(sm, c("smooth", "type", "by", "est", "se", "fac", "x2"))
+})
+
+test_that("smooth_estimates works for GAM with sz smooth two factors", {
+    expect_silent(sm <- smooth_estimates(m_sz_2f, "s(f1,f2,x)"))
+    expect_s3_class(sm, c("smooth_estimates", "tbl_df", "tbl", "data.frame"))
+    expect_identical(ncol(sm), 8L)
+    expect_identical(nrow(sm), 600L)
+    expect_named(sm, c("smooth", "type", "by", "est", "se", "f1", "f2", "x"))
+})

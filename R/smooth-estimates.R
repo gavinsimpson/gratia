@@ -456,6 +456,43 @@
 #' @rdname eval_smooth
 #' @export
 #' @importFrom tibble add_column
+`eval_smooth.sz.interaction` <- function(smooth, model, n = 100, data = NULL,
+                                         unconditional = FALSE,
+                                         overall_uncertainty = TRUE,
+                                         ...) {
+
+    by_var <- by_variable(smooth) # even if not a by as we want NA later
+    if (by_var == "NA") {
+        by_var <- NA_character_
+    }
+
+    ## deal with data if supplied
+    id <- which_smooth(model, smooth_label(smooth))
+    data <- process_user_data_for_eval(data = data, model = model,
+        n = n, n_3d = NULL, n_4d = NULL,
+        id = id)
+
+    ## values of spline at data
+    eval_sm <- spline_values2(smooth, data = data,
+        unconditional = unconditional,
+        model = model,
+        overall_uncertainty = overall_uncertainty)
+
+    ## add on info regarding by variable
+    nr <- nrow(eval_sm)
+    eval_sm <- add_column(eval_sm, by = rep(by_var, nr),
+        .after = 1L)
+    ## add on spline type info
+    sm_type <- smooth_type(smooth)
+    eval_sm <- add_column(eval_sm, type = rep(sm_type, nr),
+        .after = 1L)
+    ## return
+    eval_sm
+}
+
+#' @rdname eval_smooth
+#' @export
+#' @importFrom tibble add_column
 `eval_smooth.random.effect` <- function(smooth, model, n = 100, data = NULL,
                                         unconditional = FALSE,
                                         overall_uncertainty = TRUE,
@@ -640,6 +677,7 @@
                                     resid_col = "steelblue3",
                                     partial_match = FALSE,
                                     discrete_colour = NULL,
+                                    discrete_fill = NULL,
                                     continuous_colour = NULL,
                                     continuous_fill = NULL,
                                     angle = NULL,
@@ -647,31 +685,34 @@
                                     projection = "orthographic",
                                     orientation = NULL,
                                     ...) {
-    smth_est <- split(object, f = object[["smooth"]])
-    plts <- vector(mode = "list", length = length(smth_est))
-    for (i in seq_along(smth_est)) {
-        ## add on confint
-        smth_est[[i]] <- add_confint(smth_est[[i]])
-        plts[[i]] <-
-            draw_smooth_estimates(smth_est[[i]],
-                                  constant = constant,
-                                  fun = fun,
-                                  contour = contour,
-                                  contour_col = contour_col,
-                                  n_contour = n_contour,
-                                  ci_alpha = ci_alpha,
-                                  ci_col = ci_col,
-                                  smooth_col = smooth_col,
-                                  partial_match = partial_match,
-                                  discrete_colour = discrete_colour,
-                                  continuous_colour = continuous_colour,
-                                  continuous_fill = continuous_fill,
-                                  angle = angle,
-                                  ylim = ylim,
-                                  projection = projection,
-                                  orientation = orientation,
-                                  ...)
-    }
+    # add confidence intervals
+    object <- object |> add_confint()
+
+    # draw smooths
+    # the factor in group_split is to reorder to way the smooths entered the
+    # model
+    sm_levs <- unique(object$smooth)
+    sm_l <- group_split(object, factor(object$smooth, levels = sm_levs))
+    plts <- map(sm_l,
+        draw_smooth_estimates,
+        constant = constant,
+        fun = fun,
+        contour = contour,
+        contour_col = contour_col,
+        n_contour = n_contour,
+        ci_alpha = ci_alpha,
+        ci_col = ci_col,
+        smooth_col = smooth_col,
+        partial_match = partial_match,
+        discrete_colour = discrete_colour,
+        discrete_fill = discrete_fill,
+        continuous_colour = continuous_colour,
+        continuous_fill = continuous_fill,
+        angle = angle,
+        ylim = ylim,
+        projection = projection,
+        orientation = orientation,
+        ...)
 
     wrap_plots(plts)
 }
@@ -690,6 +731,7 @@
                                     resid_col = "steelblue3",
                                     partial_match = FALSE,
                                     discrete_colour = NULL,
+                                    discrete_fill = NULL,
                                     continuous_colour = NULL,
                                     continuous_fill = NULL,
                                     angle = NULL,
@@ -732,6 +774,10 @@
     } else if (sm_type == "Factor smooth") {
         class(object) <- append(class(object),
                                 c("factor_smooth", "mgcv_smooth"),
+                                after = 0)
+    } else if (sm_type == "Constr. factor smooth") {
+        class(object) <- append(class(object),
+                                c("sz_factor_smooth", "mgcv_smooth"),
                                 after = 0)
     } else if (sm_type == "SOS") {
         class(object) <- append(class(object),
@@ -799,6 +845,7 @@
                 resid_col = resid_col,
                 partial_match = partial_match,
                 discrete_colour = discrete_colour,
+                discrete_fill = discrete_fill,
                 continuous_colour = continuous_colour,
                 continuous_fill = continuous_fill,
                 angle = angle,
@@ -1468,6 +1515,131 @@
     if (!is.null(rug)) {
         plt <- plt + geom_rug(data = rug,
                               mapping = aes(x = .data[[variables[1]]]),
+                              inherit.aes = FALSE,
+                              sides = "b", alpha = 0.5)
+    }
+
+    ## fixing the y axis limits?
+    if (!is.null(ylim)) {
+        plt <- plt + expand_limits(y = ylim)
+    }
+
+    plt
+}
+
+#' @importFrom rlang .data
+#' @importFrom ggplot2 ggplot geom_point geom_line expand_limits theme aes
+#'   labs scale_colour_viridis_d scale_fill_viridis_d
+#' @keywords internal
+#' @noRd
+`plot_smooth.sz_factor_smooth` <- function(object,
+                                           variables = NULL,
+                                           rug = NULL,
+                                           constant = NULL,
+                                           fun = NULL,
+                                           ci_alpha = 0.2,
+                                           xlab = NULL,
+                                           ylab = NULL,
+                                           title = NULL,
+                                           subtitle = NULL,
+                                           caption = NULL,
+                                           ylim = NULL,
+                                           discrete_colour = NULL,
+                                           discrete_fill = NULL,
+                                           angle = NULL,
+                                           ...) {
+    if (is.null(variables)) {
+        variables <- vars_from_label(unique(object[["smooth"]]))
+    }
+
+    # variables will likely be length two, but it could be >2 if there are
+    # multivariate factors
+    fs <- vapply(object[variables], is.factor, logical(1L))
+    if (length(variables) > 2L) {
+        object <- mutate(object,
+            ".sz_var" = interaction(object[variables[fs]], sep = ":",
+            lex.order = TRUE))
+        fac_var <- ".sz_var"
+        fac_var_lab <- paste(variables[fs], sep = ":")
+        x_var <- variables[!fs]
+
+        # need to repeat for the rug
+        if (!is.null(rug)) {
+            rug <- mutate(rug,
+                ".sz_var" = interaction(object[variables[fs]], sep = ":",
+            lex.order = TRUE))
+        }
+
+        if (length(x_var) > 1L) {
+            # this is a bivariate sz factor smooth, which we can't handle yet
+            return(NULL)
+        }
+    } else {
+        x_var <- variables[2]
+        fac_var <- variables[1]
+        fac_var_lab <- variables[1]
+    }
+
+    if (is.null(discrete_colour)) {
+        discrete_colour <- scale_colour_viridis_d()
+    }
+
+    if (is.null(discrete_fill)) {
+        discrete_fill <- scale_fill_viridis_d()
+    }
+
+    ## If constant supplied apply it to `est`
+    object <- add_constant(object, constant = constant)
+
+    ## If fun supplied, use it to transform est and the upper and lower interval
+    object <- transform_fun(object, fun = fun)
+
+    # plot
+    plt <- ggplot(object, aes(x = .data[[x_var]],
+                              y = .data[["est"]],
+                              colour = .data[[fac_var]])) +
+        geom_ribbon(mapping = aes(ymin = .data[["lower_ci"]],
+                                  ymax = .data[["upper_ci"]],
+                                  fill = .data[[fac_var]],
+                                  colour = NULL),
+                    alpha = ci_alpha) +
+        geom_line() +
+        discrete_colour +
+        discrete_fill +
+        guides(x = guide_axis(angle = angle))
+
+    ## default axis labels if none supplied
+    if (missing(xlab)) {
+        xlab <- x_var
+    }
+    if (missing(ylab)) {
+        ylab <- "Partial effect"
+    }
+    if (is.null(title)) {
+        title <- unique(object[["smooth"]])
+    }
+    if (is.null(caption)) {
+        caption <- paste("Basis:", object[["type"]])
+    }
+
+    if (all(!is.na(object[["by"]]))) {
+        spl <- strsplit(title, split = ":")
+        title <- spl[[1L]][[1L]]
+        if (is.null(subtitle)) {
+            by_var <- as.character(unique(object[["by"]]))
+            subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+        }
+    }
+
+    ## add labelling to plot
+    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+        caption = caption, colour = fac_var_lab, fill = fac_var_lab)
+
+    ## add rug?
+    if (!is.null(rug)) {
+        plt <- plt + geom_rug(data = rug,
+                              mapping = aes(x = .data[[x_var]],
+                              colour = .data[[fac_var]]),
                               inherit.aes = FALSE,
                               sides = "b", alpha = 0.5)
     }

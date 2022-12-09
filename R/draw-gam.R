@@ -69,8 +69,8 @@
 #' @param partial_match logical; should smooths be selected by partial matches
 #'   with `select`? If `TRUE`, `select` can only be a single string to match
 #'   against.
-#' @param discrete_colour,continuous_colour,continuous_fill suitable scales
-#'   for the types of data.
+#' @param discrete_colour,discrete_fill,continuous_colour,continuous_fill
+#'   suitable scales for the types of data.
 #' @param position Position adjustment, either as a string, or the result of a
 #'   call to a position adjustment function.
 #' @param angle numeric; the angle at which the x axis tick labels are to be
@@ -168,6 +168,7 @@
                        n_contour = NULL,
                        partial_match = FALSE,
                        discrete_colour = NULL,
+                       discrete_fill = NULL,
                        continuous_colour = NULL,
                        continuous_fill = NULL,
                        position = "identity",
@@ -182,9 +183,9 @@
     scales <- match.arg(scales)
 
     # fix up default scales
-    if (is.null(discrete_colour)) {
-        discrete_colour <- scale_colour_discrete()
-    }
+    #if (is.null(discrete_colour)) {
+    #    discrete_colour <- scale_colour_discrete()
+    #}
     if (is.null(continuous_colour)) {
         continuous_colour <- scale_colour_continuous()
     }
@@ -300,14 +301,13 @@
                        resid_col = resid_col,
                        partial_match = partial_match,
                        discrete_colour = discrete_colour,
+                       discrete_fill = discrete_fill,
                        continuous_colour = continuous_colour,
                        continuous_fill = continuous_fill,
                        angle = angle,
                        ylim = ylims,
                        projection = projection,
                        orientation = orientation)
-
-        #sm_plts <- sm_plts[S] # reorder to way the smooths entered the model
 
     } # end stuff for smooths...
 
