@@ -97,6 +97,13 @@
 
 #' @export
 #' @rdname smooth_type
+`smooth_type.sz.interaction` <- function(smooth) {
+    sm_type <- "Constr. factor smooth"
+    sm_type
+}
+
+#' @export
+#' @rdname smooth_type
 `smooth_type.gp.smooth` <- function(smooth) {
     sm_type <- "GP"
     sm_type
