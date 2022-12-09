@@ -51,7 +51,7 @@ LazyData: true
 URL: https://gavinsimpson.github.io/gratia/
 BugReports: https://github.com/gavinsimpson/gratia/issues
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2
 Encoding: UTF-8
 VignetteBuilder: knitr
 Config/testthat/edition: 3
