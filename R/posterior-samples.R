@@ -238,7 +238,7 @@
         newdata_deprecated()
     }
 
-    sims <- simulate(model, nsim = n, seed = seed, newdata = data,
+    sims <- simulate(model, nsim = n, seed = seed, data = data,
                      weights = weights, ...)
     RNGstate <- attr(sims, "seed")
     colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
