@@ -164,7 +164,7 @@ test_that("confint.fderiv example output", {
     ci <- confint(fd, type = "confidence")
     expect_snapshot_output(ci)
     ## simultaneous interval for smooth term of x2
-    set.seed(42)
+    set.seed(24)
     x2_sint <- confint(fd, parm = "x2", type = "simultaneous",
                        nsim = 10000, ncores = 2)
     expect_snapshot_output(x2_sint)
