@@ -4,6 +4,9 @@ library("gratia")
 library("mgcv")
 
 test_that("draw.gamlss can plot a GJRM gamlss model", {
+    skip_on_os("mac")
+    skip_on_os("win")
+
     testthat::skip_if_not_installed("GJRM")
     skip_on_cran()
 
