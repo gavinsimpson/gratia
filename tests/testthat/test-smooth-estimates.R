@@ -266,6 +266,7 @@ test_that("smooth_estimates works for m_gamm4", {
 })
 
 test_that("smooth_estimates works for GAM with sz smooth single factor", {
+    skip_if_not(packageVersion("mgcv") >= "1.8.41")
     expect_silent(sm <- smooth_estimates(m_sz, "s(fac,x2)"))
     expect_s3_class(sm, c("smooth_estimates", "tbl_df", "tbl", "data.frame"))
     expect_identical(ncol(sm), 7L)
@@ -274,6 +275,7 @@ test_that("smooth_estimates works for GAM with sz smooth single factor", {
 })
 
 test_that("smooth_estimates works for GAM with sz smooth two factors", {
+    skip_if_not(packageVersion("mgcv") >= "1.8.41")
     expect_silent(sm <- smooth_estimates(m_sz_2f, "s(f1,f2,x)"))
     expect_s3_class(sm, c("smooth_estimates", "tbl_df", "tbl", "data.frame"))
     expect_identical(ncol(sm), 8L)

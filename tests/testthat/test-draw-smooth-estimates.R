@@ -119,6 +119,7 @@ test_that("draw.smooth_estimates works for su_m_quadvar_t2", {
 test_that("draw.smooth_estimates works for sz factor smooth", {
     skip_on_os(os = "win")
     skip_on_os(os = "mac")
+    skip_if_not(packageVersion("mgcv") >= "1.8.41")
     expect_silent(plt <- draw(smooth_estimates(m_sz)))
     expect_doppelganger("draw.smooth_estimates sz factor smooth", plt)
 })
@@ -127,6 +128,7 @@ test_that("draw.smooth_estimates works for sz factor smooth", {
 test_that("draw.smooth_estimates works for sz two factor smooth", {
     skip_on_os(os = "win")
     skip_on_os(os = "mac")
+    skip_if_not(packageVersion("mgcv") >= "1.8.41")
     expect_silent(plt <- draw(smooth_estimates(m_sz_2f)))
     expect_doppelganger("draw.smooth_estimates sz two factor smooth", plt)
 })
