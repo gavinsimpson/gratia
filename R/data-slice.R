@@ -256,9 +256,9 @@
 }
 
 #' @export
-#' @importFrom purrr cross_df
-#' @importFrom rlang enquo
-#' @importFrom tidyr nesting expand
+#' @importFrom rlang enquo !!! exec
+#' @importFrom tidyr nesting expand expand_grid
+#' @importFrom tidyselect eval_select
 #' @rdname factor_combos
 `factor_combos.gam` <- function(object, vars = everything(),
                                 complete = TRUE, ...) {
@@ -281,7 +281,7 @@
     summ <- summ[pos]
 
     f <- lapply(summ, function(x) factor(levels(x), levels = levels(x)))
-    f <- purrr::cross_df(f)
+    f <- exec("expand_grid", !!!f) # f <- purrr::cross_df(f)
     if (isFALSE(complete)) {
         mf <- model.frame(object)[names(summ)]
         f <- expand(f, nesting(mf))
