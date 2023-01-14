@@ -93,6 +93,7 @@
 #'   default values for `orientation` therefore are
 #'   `c(20, 0, mean(range(longitude))))`` if this is not specified by the user.
 #'   See links in [ggplot2::coord_map()] for more information.
+#' @param wrap logical; wrap plots as a patchwork?
 #' @param ... additional arguments passed to [patchwork::wrap_plots()].
 #'
 #' @note Internally, plots of each smooth are created using [ggplot2::ggplot()]
@@ -177,6 +178,7 @@
                        guides = "keep", widths = NULL, heights = NULL,
                        projection = "orthographic",
                        orientation = NULL,
+                       wrap = TRUE,
                        ...) {
     model_name <- expr_label(substitute(object))
     # fixed or free?
@@ -345,7 +347,7 @@
                         angle = angle,
                         ylim = ylims))
         }
-    } # parametric done
+    }
 
     if (isTRUE(parametric)) {
         sm_plts <- append(sm_plts, para_plts)
@@ -372,8 +374,14 @@
         # force a value of 1 to give all plots the same relative width
         widths <- 1
     }
-    wrap_plots(sm_plts, byrow = TRUE, ncol = ncol, nrow = nrow,
-               guides = guides, widths = widths, heights = heights, ...)
+
+    if (wrap) {
+        sm_plts <- wrap_plots(sm_plts, byrow = TRUE, ncol = ncol, nrow = nrow,
+            guides = guides, widths = widths, heights = heights, ...)
+    }
+
+    # return
+    sm_plts
 }
 
 #' @export
