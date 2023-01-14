@@ -26,8 +26,10 @@
 \item{object}{a fitted GAM, the result of a call to \code{\link[mgcv:gam]{mgcv::gam()}}.}
 
 \item{scales}{character; should all univariate smooths be plotted with the
-same y-axis scale? The default, \code{scales = "fixed"}, ensures this is done.
-If \code{scales = "free"} each univariate smooth has its own y-axis scale.
+same y-axis scale? If \code{scales = "free"}, the default, each univariate
+smooth has its own y-axis scale. If \code{scales = "fixed"}, a common y axis
+scale is used for all univariate smooths.
+
 Currently does not affect the y-axis scale of plots of the parametric
 terms.}
 

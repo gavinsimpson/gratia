@@ -22,8 +22,10 @@
 #' @param residuals logical; should partial residuals for a smooth be drawn?
 #'   Ignored for anything but a simple univariate smooth.
 #' @param scales character; should all univariate smooths be plotted with the
-#'   same y-axis scale? The default, `scales = "fixed"`, ensures this is done.
-#'   If `scales = "free"` each univariate smooth has its own y-axis scale.
+#'   same y-axis scale? If `scales = "free"`, the default, each univariate
+#'   smooth has its own y-axis scale. If `scales = "fixed"`, a common y axis
+#'   scale is used for all univariate smooths.
+#'   
 #'   Currently does not affect the y-axis scale of plots of the parametric
 #'   terms.
 #' @param constant numeric; a constant to add to the estimated values of the
