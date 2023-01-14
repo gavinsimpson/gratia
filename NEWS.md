@@ -1,4 +1,4 @@
-# gratia 0.7.3.27 (In development)
+# gratia 0.7.3.28 (In development)
 
 ## User visible changes
 
@@ -23,6 +23,10 @@
   See *Bug Fixes* below for more detail or #154.
 
 ## New features
+
+* Added basic support for GAMLSS (distributional GAMs) fitted with the
+  `gamlss()´ function from package GJRM. Support is currently restricted to a
+  `draw()´ method.
 
 * `difference_smooths()` can now include the group means in the difference,
   which many users expected. To include the group means use `group_means = TRUE`
