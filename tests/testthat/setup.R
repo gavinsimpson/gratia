@@ -81,47 +81,48 @@ su_m_factor_by_x2 <- gam(y ~ fac + s(x2, by = fac),
   data = su_eg4,
   method = "REML")
 
-m_sz <- gam(y ~ s(x2) + s(fac, x2, bs = "sz") + s(x0),
-  data = su_eg4, method = "REML")
+if (packageVersion("mgcv") >= "1.8.41") {
+  m_sz <- gam(y ~ s(x2) + s(fac, x2, bs = "sz") + s(x0),
+    data = su_eg4, method = "REML")
 
-# two factor sz smooth example from ?smooth.construct.sz.smooth.spec
-## Example involving 2 factors
-two_factor_sz_example <- function(seed = NULL) {
-  ## sort out the seed
-  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+  # two factor sz smooth example from ?smooth.construct.sz.smooth.spec
+  ## Example involving 2 factors
+  two_factor_sz_example <- function(seed = NULL) {
+    ## sort out the seed
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
       runif(1)
-  }
-  if (is.null(seed)) {
+    }
+    if (is.null(seed)) {
       RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-  }
-  else {
+    } else {
       R.seed <- get(".Random.seed", envir = .GlobalEnv)
       set.seed(seed)
       RNGstate <- structure(seed, kind = as.list(RNGkind()))
       on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+    }
+    f1 <- function(x2) 2 * sin(pi * x2)
+    f2 <- function(x2) exp(2 * x2) - 3.75887
+    f3 <- function(x2) 0.2 * x2^11 * (10 * (1 - x2))^6 + 10 * (10 * x2)^3 *
+      (1 - x2)^10
+
+    n <- 600
+    x <- runif(n)
+    f1 <- factor(sample(c("a", "b", "c"), n, replace = TRUE))
+    f2 <- factor(sample(c("foo", "bar"), n, replace = TRUE))
+
+    mu <- f3(x)
+    for (i in 1:3) mu <- mu + exp(2 * (2 - i) * x) * (f1 == levels(f1)[i])
+    for (i in 1:2) mu <- mu + 10 * i * x * (1 - x) * (f2 == levels(f2)[i])
+    y <- mu + rnorm(n)
+    dat <- data.frame(y = y, x = x, f1 = f1, f2 = f2)
+    dat
   }
-  f1 <- function(x2) 2 * sin(pi * x2)
-  f2 <- function(x2) exp(2 * x2) - 3.75887
-  f3 <- function(x2) 0.2 * x2^11 * (10 * (1 - x2))^6 + 10 * (10 * x2)^3 *
-    (1 - x2)^10
-
-  n <- 600
-  x <- runif(n)
-  f1 <- factor(sample(c("a", "b", "c"), n, replace = TRUE))
-  f2 <- factor(sample(c("foo", "bar"), n, replace = TRUE))
-
-  mu <- f3(x)
-  for (i in 1:3) mu <- mu + exp(2 * (2 - i) * x) * (f1 == levels(f1)[i])
-  for (i in 1:2) mu <- mu + 10 * i * x * (1 - x) * (f2 == levels(f2)[i])
-  y <- mu + rnorm(n)
-  dat <- data.frame(y = y, x = x, f1 = f1, f2 = f2)
-  dat
-}
-su_eg_sz_2_factor <- two_factor_sz_example(seed = 42)
-# using bam as it is so much faster
-m_sz_2f <- bam(y ~ s(x) + s(f1, x, bs = "sz") + s(f2, x, bs = "sz") +
+  su_eg_sz_2_factor <- two_factor_sz_example(seed = 42)
+  # using bam as it is so much faster
+  m_sz_2f <- bam(y ~ s(x) + s(f1, x, bs = "sz") + s(f2, x, bs = "sz") +
     s(f1, f2, x, bs = "sz", id = 1),
   data = su_eg_sz_2_factor, method = "fREML")
+}
 
 su_eg2_by <- su_eg2 %>%
   mutate(y = y + y^2 + y^3) %>%
