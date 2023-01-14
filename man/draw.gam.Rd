@@ -43,6 +43,7 @@
   heights = NULL,
   projection = "orthographic",
   orientation = NULL,
+  wrap = TRUE,
   ...
 )
 }
@@ -167,6 +168,8 @@ defaults to the midrange of the longitude coordinates in the data. The
 default values for \code{orientation} therefore are
 `c(20, 0, mean(range(longitude))))`` if this is not specified by the user.
 See links in \code{\link[ggplot2:coord_map]{ggplot2::coord_map()}} for more information.}
+
+\item{wrap}{logical; wrap plots as a patchwork?}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
