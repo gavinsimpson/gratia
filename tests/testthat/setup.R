@@ -138,6 +138,9 @@ su_gamm_univar_4 <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3),
 
 m_1_smooth <- gam(y ~ s(x0), data = quick_eg1, method = "REML")
 
+m_1_smooth_offset <- gam(y ~ s(x0) + offset(log(off)),
+  data = quick_eg1 |> mutate(off = 2), method = "REML")
+
 m_gam <- su_m_univar_4
 
 m_gamm <- su_gamm_univar_4

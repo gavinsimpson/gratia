@@ -1,4 +1,4 @@
-# gratia 0.7.3.29 (In development)
+# gratia 0.7.3.30 (In development)
 
 ## User visible changes
 
@@ -164,6 +164,9 @@
 
 * `transform_fun.smooth_estimates()` was addressing the wrong variable names
   when trying to transform the confidence interval. #201
+
+* `data_slice()` doesn't fail with an error when used with a model that contains
+  an offset term. #198
 
 # gratia 0.7.3
 

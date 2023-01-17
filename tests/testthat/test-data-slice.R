@@ -187,8 +187,31 @@ test_that("data_combos works when exluding terms", {
 
 test_that("data_combos works when there are no factor terms", {
     expect_message(dc <- data_combos(m_gam),
-                   "Model contains no factor terms")
+        "Model contains no factor terms")
     expect_identical(nrow(dc), 1L)
     expect_identical(ncol(dc), 4L)
     expect_named(dc, c("x0", "x1", "x2", "x3"))
+})
+
+# Test data_slice with models that have an offset(s) - # 189
+test_that("data_slice with no args works with models with an offset", {
+    expect_silent(ds <- data_slice(m_1_smooth_offset))
+    expect_identical(nrow(ds), 1L)
+    expect_identical(ncol(ds), 2L)
+    expect_identical(ds$off, 2)
+})
+
+test_that("data_slice with works with models with an offset", {
+    expect_silent(ds <- data_slice(m_1_smooth_offset, off = 1))
+    expect_identical(nrow(ds), 1L)
+    expect_identical(ncol(ds), 2L)
+    expect_identical(ds$off, 1)
+})
+
+test_that("data_slice with works with models with an offset", {
+    expect_silent(ds <- data_slice(m_1_smooth_offset, x0 = evenly(x0, n = 50),
+        off = 1))
+    expect_identical(nrow(ds), 50L)
+    expect_identical(ncol(ds), 2L)
+    expect_identical(ds$off, rep(1, length.out = 50))
 })
