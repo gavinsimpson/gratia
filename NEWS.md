@@ -162,6 +162,9 @@
 * `partial_derivatives()` works when provided with a single data point at
   which to evaluate the derivative. #199
 
+* `transform_fun.smooth_estimates()` was addressing the wrong variable names
+  when trying to transform the confidence interval. #201
+
 # gratia 0.7.3
 
 ## User visible changes

@@ -1006,13 +1006,9 @@ vars_from_label <- function(label) {
     ## If fun supplied, use it to transform est and the upper and lower interval
     if (!is.null(fun)) {
         fun <- match.fun(fun)
-        object[["est"]] <- fun(object[["est"]])
-        if (!is.null(object[["upper"]])) {
-            object[["upper"]] <- fun(object[["upper"]])
-        }
-        if (!is.null(object[["lower"]])) {
-            object[["lower"]] <- fun(object[["lower"]])
-        }
+        object <- mutate(object,
+                         across(any_of(c("est", "lower_ci", "upper_ci")),
+                                .fns = fun))
     }
 
     object
@@ -1058,7 +1054,7 @@ vars_from_label <- function(label) {
     if (!is.null(fun)) {
         fun <- match.fun(fun)
         object <- mutate(object,
-                         across(any_of(c("partial", "lower", "upper")),
+                         across(any_of(c("partial", "lower_ci", "upper_ci")),
                                 .fns = fun))
     }
 
