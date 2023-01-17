@@ -20,8 +20,7 @@
 #'   needed to fit the model. If `NULL`, the default, the data used to fit the
 #'   model will be recovered using `model.frame`. User-supplied expressions
 #'   passed in `...` will be evaluated in `data`.
-#' @param offset numeric; value to use for an offset term in the model.
-#'
+#' 
 #' @export
 #' @rdname data_slice
 #' @importFrom tidyr expand_grid
@@ -48,11 +47,9 @@
 #' # or provide an expression (function call) which will be evaluated in the
 #' # data frame passed to `data` or `model.frame(object)`
 #' ds <- data_slice(m1, x2 = evenly(x2, n = 50), x1 = mean(x1))
-`data_slice.gam` <- function(object, ..., data = NULL, offset = NULL) {
-
-    if (is.null(data)) {
-        data <- delete_response(object) %>% as_tibble()
-    }
+`data_slice.gam` <- function(object, ..., data = NULL) {
+    # prep data
+    data <- data_slice_data(object, data = data)
 
     # deal with ...
     ##ellipsis::check_dots_unnamed()
@@ -95,7 +92,49 @@
     data_slice(object[["gam"]], ...)
 }
 
+`data_slice_data` <- function(object, data = NULL) {
+    is_mf <- FALSE # is a data a model frame
+    if (is.null(data)) {
+        # get data from object$model
+        data <- object[["model"]]
+        is_mf <- TRUE
+    } else {
+        if (!is.null(attr(data, "terms"))) {
+            is_mf <- TRUE
+        }
+    }
 
+    # find the response if there
+    tt <- terms(object)
+    resp_i <- attr(tt, "response")
+    y_var <- names(attr(tt, "dataClasses"))[resp_i]
+    all_vars <- all.vars(tt)
+    data_names <- names(data)
+    # if the response variable is named in data, delete it
+    y_in_data <- data_names %in% y_var
+    if (any(y_in_data)) {
+        data <- data[!y_in_data]
+    }
+
+    # handle offsets; if we generated the data from the model, then set
+    # offset variable(s) to 1
+    # But note that this is only for the data object that we'll eval into
+    # The offset will get set to whatever is the typical value for those offset
+    # variable(s). As with any other variable you'll need to provide a value
+    # for each offset if you want to use that value
+    if (is_mf) {
+        # are there any offsets
+        offsets <- attr(tt, "offset")
+        if (length(offsets)) {
+            # when selected from data, remember we deleted the response already
+            # offsets will be shifted 1 col to left
+            data[, offsets - 1] <- 1
+            names(data)[offsets - 1] <- all_vars[offsets]
+        }
+    }
+
+    data
+}
 
 #' @importFrom stats median quantile
 `value_closest_to_median` <- function(x) {
