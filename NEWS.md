@@ -1,4 +1,4 @@
-# gratia 0.7.3.30 (In development)
+# gratia 0.7.3.31 (In development)
 
 ## User visible changes
 
@@ -167,6 +167,9 @@
 
 * `data_slice()` doesn't fail with an error when used with a model that contains
   an offset term. #198
+
+* `confint.gam()` no longer uses `evaluate_smooth()`, which is soft deprecated.
+  #167
 
 # gratia 0.7.3
 

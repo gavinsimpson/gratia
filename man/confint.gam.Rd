@@ -11,7 +11,7 @@
   parm,
   level = 0.95,
   data = newdata,
-  n = 200,
+  n = 100,
   type = c("confidence", "simultaneous"),
   nsim = 10000,
   shift = FALSE,
@@ -75,14 +75,19 @@ covariates used in the model fit. The selected smooth(s) wil be evaluated
 at the supplied values.}
 }
 \value{
-a data frame with components:
+a tibble with components:
 \enumerate{
-\item \code{term}; factor indicating to which term each row relates,
-\item \code{x}; the vector of values at which the smooth was evaluated,
-\item \code{lower}; lower limit of the confidence or simultaneous interval,
-\item \code{est}; estimated value of the smooth
-\item \code{upper}; upper limit of the confidence or simultaneous interval,
+\item \code{smooth}; character indicating to which term each row relates,
+\item \code{type}; the type of smooth,
+\item \code{by} the name of the by variable if a by smooth, \code{NA} otherwise,
+\item one or more vectors of values at which the smooth was evaluated, named as
+per the variables in the smooth,
+\item zero or more variables containing values of the by variable,
+\item \code{est}; estimated value of the smooth,
+\item \code{se}; standard error of the estimated value of the smooth,
 \item \code{crit}; critical value for the \code{100 * level}\% confidence interval.
+\item \code{lower}; lower limit of the confidence or simultaneous interval,
+\item \code{upper}; upper limit of the confidence or simultaneous interval,
 }
 }
 \description{

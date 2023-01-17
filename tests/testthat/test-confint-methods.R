@@ -35,7 +35,7 @@ test_that("Point-wise confidence interval for a GAM works", {
     ci <- confint(m_gam, parm = "s(x1)", type = "confidence")
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "tbl_df")
-    expect_named(ci, expected = c("smooth", "by_variable", "x1", "est", "se",
+    expect_named(ci, expected = c("smooth", "type", "by", "x1", "est", "se",
                                   "crit", "lower", "upper"))
 })
 
@@ -45,7 +45,7 @@ test_that("Simultaneous interval for a GAM works", {
     ci <- confint(m_gam, parm = "s(x1)", type = "simultaneous", nsim = 100)
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "tbl_df")
-    expect_named(ci, expected = c("smooth", "by_variable", "x1", "est", "se",
+    expect_named(ci, expected = c("smooth", "type", "by", "x1", "est", "se",
                                   "crit", "lower", "upper"))
 })
 
@@ -55,7 +55,7 @@ test_that("Point-wise confidence interval for a 2d smooth works", {
     ci <- confint(su_m_bivar_te, parm = "te(x,z)", type = "confidence")
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "tbl_df")
-    expect_named(ci, expected = c("smooth", "by_variable", "x", "z", "est",
+    expect_named(ci, expected = c("smooth", "type", "by", "x", "z", "est",
                                   "se", "crit", "lower", "upper"))
 })
 
@@ -66,7 +66,7 @@ test_that("Simultaneous interval for a 2d smooth works", {
                   nsim = 100)
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "tbl_df")
-    expect_named(ci, expected = c("smooth", "by_variable", "x", "z", "est",
+    expect_named(ci, expected = c("smooth", "type", "by", "x", "z", "est",
                                   "se", "crit", "lower", "upper"))
 })
 
@@ -75,7 +75,7 @@ test_that("Point-wise confidence interval for a GAMM works", {
     ci <- confint(m_gamm, parm = "s(x1)", type = "confidence")
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "tbl_df")
-    expect_named(ci, expected = c("smooth", "by_variable", "x1", "est", "se",
+    expect_named(ci, expected = c("smooth", "type", "by", "x1", "est", "se",
                                   "crit", "lower", "upper"))
 })
 
@@ -85,7 +85,7 @@ test_that("Simultaneous interval for a GAMM works", {
     ci <- confint(m_gamm, parm = "s(x1)", type = "simultaneous", nsim = 100)
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "tbl_df")
-    expect_named(ci, expected = c("smooth", "by_variable", "x1", "est", "se",
+    expect_named(ci, expected = c("smooth", "type", "by", "x1", "est", "se",
                                   "crit", "lower", "upper"))
 })
 
@@ -96,8 +96,8 @@ test_that("Point-wise confidence interval for a GAM with factor by variable work
                   partial_match = TRUE)
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "tbl_df")
-    expect_named(ci, expected = c("smooth", "by_variable", "x2", "est", "se",
-                                  "fac", "crit", "lower", "upper"))
+    expect_named(ci, expected = c("smooth", "type", "by", "x2", "fac", "est",
+                                  "se", "crit", "lower", "upper"))
     expect_equal(paste0("s(x2):fac", levels(su_eg4[["fac"]])),
                  unique(ci[["smooth"]]))
 })
@@ -108,8 +108,8 @@ test_that("Simultaneous confidence interval for a GAM with factor by variable wo
                   partial_match = TRUE)
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "tbl_df")
-    expect_named(ci, expected = c("smooth", "by_variable", "x2", "est", "se",
-                                  "fac", "crit", "lower", "upper"))
+    expect_named(ci, expected = c("smooth", "type", "by", "x2", "fac", "est",
+                                  "se", "crit", "lower", "upper"))
     expect_equal(paste0("s(x2):fac", levels(su_eg4[["fac"]])),
                  unique(ci[["smooth"]]))
 })
@@ -120,8 +120,8 @@ test_that("Point-wise confidence interval for a GAM with selected factor by vari
     ci <- confint(su_m_factor_by_x2, parm = "s(x2):fac1", type = "confidence")
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "tbl_df")
-    expect_named(ci, expected = c("smooth", "by_variable", "x2", "est", "se",
-                                  "fac", "crit", "lower", "upper"))
+    expect_named(ci, expected = c("smooth", "type", "by", "x2", "fac", "est",
+                                  "se", "crit", "lower", "upper"))
 })
 
 test_that("Point-wise confidence interval for a GAMM works", {
@@ -129,7 +129,7 @@ test_that("Point-wise confidence interval for a GAMM works", {
     ci <- confint(m_gamm4, parm = "s(x1)", type = "confidence")
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "tbl_df")
-    expect_named(ci, expected = c("smooth", "by_variable", "x1", "est", "se",
+    expect_named(ci, expected = c("smooth", "type", "by", "x1", "est", "se",
                                   "crit", "lower", "upper"))
 })
 
@@ -139,7 +139,7 @@ test_that("Simultaneous interval for a GAMM works", {
     ci <- confint(m_gamm4, parm = "s(x1)", type = "simultaneous", nsim = 100)
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "tbl_df")
-    expect_named(ci, expected = c("smooth", "by_variable", "x1", "est", "se",
+    expect_named(ci, expected = c("smooth", "type", "by", "x1", "est", "se",
                                   "crit", "lower", "upper"))
 })
 
