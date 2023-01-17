@@ -271,7 +271,9 @@
                     pluck("rng")
 
                 # merge with the evaluated smooth
-                sm_eval <- left_join(sm_eval, p_resids, by = "smooth")
+                sm_eval <- suppress_matches_multiple_warning(
+                  left_join(sm_eval, p_resids, by = "smooth")
+                )
             }
         }
 
@@ -281,7 +283,9 @@
             rug_data <- nested_rug_values(object, terms = S[select])
 
             # merge with the evaluated smooth
-            sm_eval <- left_join(sm_eval, rug_data, by = "smooth")
+            sm_eval <- suppress_matches_multiple_warning(
+              left_join(sm_eval, rug_data, by = "smooth")
+            )
         }
 
         # need to figure out scales if "fixed"
@@ -397,4 +401,17 @@
 #' @export
 `draw.gamm` <- function(object, ...) {
     draw(object$gam, ...)
+}
+
+# TODO: Remove after dplyr 1.1.0 is released and use `multiple = "all"` instead
+suppress_matches_multiple_warning <- function(expr) {
+  handler_matches_multiple <- function(cnd) {
+    if (inherits(cnd, "dplyr_warning_join_matches_multiple")) {
+      restart <- findRestart("muffleWarning")
+      if (!is.null(restart)) {
+        invokeRestart(restart)
+      }
+    }
+  }
+  withCallingHandlers(expr, warning = handler_matches_multiple)
 }
