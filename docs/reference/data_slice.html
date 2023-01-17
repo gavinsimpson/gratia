@@ -67,7 +67,7 @@
 <span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for gam</span></span>
-<span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span>, data <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span>, data <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for gamm</span></span>
 <span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -92,10 +92,6 @@ defining the data slice. Arguments passed via <code>...</code> need to <em>named
 needed to fit the model. If <code>NULL</code>, the default, the data used to fit the
 model will be recovered using <code>model.frame</code>. User-supplied expressions
 passed in <code>...</code> will be evaluated in <code>data</code>.</p></dd>
-
-
-<dt>offset</dt>
-<dd><p>numeric; value to use for an offset term in the model.</p></dd>
 
 </dl></div>
 

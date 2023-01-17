@@ -12,7 +12,7 @@ data_slice(object, ...)
 
 \method{data_slice}{default}(object, ...)
 
-\method{data_slice}{gam}(object, ..., data = NULL, offset = NULL)
+\method{data_slice}{gam}(object, ..., data = NULL)
 
 \method{data_slice}{gamm}(object, ...)
 
@@ -28,8 +28,6 @@ defining the data slice. Arguments passed via \code{...} need to \emph{named}}
 needed to fit the model. If \code{NULL}, the default, the data used to fit the
 model will be recovered using \code{model.frame}. User-supplied expressions
 passed in \code{...} will be evaluated in \code{data}.}
-
-\item{offset}{numeric; value to use for an offset term in the model.}
 }
 \description{
 Prepare a data slice through model covariates
