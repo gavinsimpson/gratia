@@ -212,13 +212,18 @@
 #'   covariates used in the model fit. The selected smooth(s) wil be evaluated
 #'   at the supplied values.
 #'
-#' @return a data frame with components:
-#' 1. `term`; factor indicating to which term each row relates,
-#' 2. `x`; the vector of values at which the smooth was evaluated,
-#' 3. `lower`; lower limit of the confidence or simultaneous interval,
-#' 4. `est`; estimated value of the smooth
-#' 5. `upper`; upper limit of the confidence or simultaneous interval,
-#' 6. `crit`; critical value for the `100 * level`% confidence interval.
+#' @return a tibble with components:
+#' 1. `smooth`; character indicating to which term each row relates,
+#' 2. `type`; the type of smooth,
+#' 3. `by` the name of the by variable if a by smooth, `NA` otherwise,
+#' 4. one or more vectors of values at which the smooth was evaluated, named as
+#'    per the variables in the smooth,
+#' 5. zero or more variables containing values of the by variable,
+#' 6. `est`; estimated value of the smooth,
+#' 7. `se`; standard error of the estimated value of the smooth,
+#' 8. `crit`; critical value for the `100 * level`% confidence interval.
+#' 9. `lower`; lower limit of the confidence or simultaneous interval,
+#' 10. `upper`; upper limit of the confidence or simultaneous interval,
 #'
 #' @author Gavin L. Simpson
 #'
@@ -228,6 +233,7 @@
 #' @importFrom dplyr bind_rows
 #' @importFrom tibble add_column
 #' @importFrom mvnfast rmvn
+#' @importFrom tidyselect all_of last_col
 #'
 #' @export
 #'
@@ -263,7 +269,7 @@
 #' \dontshow{
 #' options(op)
 #' }
-`confint.gam` <- function(object, parm, level = 0.95, data = newdata, n = 200,
+`confint.gam` <- function(object, parm, level = 0.95, data = newdata, n = 100,
                           type = c("confidence", "simultaneous"), nsim = 10000,
                           shift = FALSE, transform = FALSE,
                           unconditional = FALSE,
@@ -286,7 +292,7 @@
     by_levs <- NULL
     is_by <- vapply(object[["smooth"]][take], is_by_smooth, logical(1L))
     if (any(is_by)) {
-        S <- vapply(strsplit(S, ":"), `[[`, character(1L), 1L)
+        #S <- vapply(strsplit(S, ":"), `[[`, character(1L), 1L)
         by_levs <- vapply(object[["smooth"]][take], by_level, character(1L))
         by_var <- vapply(object[["smooth"]][take], by_variable, character(1L))
     }
@@ -320,7 +326,8 @@
 
     if (isTRUE(type == "confidence")) {
         for (i in seq_along(out)) {
-            out[[i]] <- evaluate_smooth(object, uS[i], n = n, newdata = data)
+            out[[i]] <- smooth_estimates(object, smooth = uS[i],
+                n = n, data = data, partial_match = partial_match)
             out[[i]][["crit"]] <- coverage_normal(level)
         }
     } else {
@@ -337,44 +344,32 @@
             simDev <- Cg %*% t(buDiff[, para.seq])
             absDev <- abs(sweep(simDev, 1L, data[["se"]], FUN = "/"))
             masd <- apply(absDev, 2L, max)
-            quantile(masd, probs = level, type = 8)
+            unname(quantile(masd, probs = level, type = 8))
         }
         ## need VCOV for simultaneous intervals
         V <- get_vcov(object, unconditional = unconditional)
         ## simulate un-biased deviations given bayesian covar matrix
-        buDiff <- rmvn(n = nsim, mu = rep(0, nrow(V)), sigma = V,
+        buDiff <- mvnfast::rmvn(n = nsim, mu = rep(0, nrow(V)), sigma = V,
                        ncores = ncores)
         ## loop over smooths
         for (i in seq_along(out)) {
             ## evaluate smooth
-            out[[i]] <- evaluate_smooth(object, uS[i], n = n, newdata = data)
+            out[[i]] <- smooth_estimates(object, smooth = uS[i],
+                n = n, data = data, partial_match = partial_match)
 
             # if this is a by var smooth, we need to do this for each level of
             # by var
+            # I think this can now be simplified to just be the code in the
+            # else branch as smooth_estimates knows how to handle very specific
+            # smooth names FIXME
             if (is.null(by_levs)) {        # not by variable smooth
                 smooth <- get_smooth(object, parm) # get the specific smooth
                 crit <- sim_interval(smooth, level = level, data = out[[i]])
                 out[[i]][["crit"]] <- crit # add on the critical value
             } else {                       # is a by variable smooth
-                # filter out rows that have nothing to do with this by smooth &
-                # set of levels we are evaluating
-                out[[i]] <- out[[i]][out[[i]][[6L]] %in% by_levs, ]
-                out[[i]][["crit"]] <- 0    # fill in a variable critS
-                smooth <- old_get_smooth(object, parm)
-                for (l in seq_along(by_levs)) {
-                    ## the 6L should really refer to the by_variable column...
-                    ind <- out[[i]][[6L]] == by_levs[l] # take only needed rows
-                    # handle case where user has specific a specific by smooth
-                    # level "s(x2):fac1"
-                    sm <- if (is_mgcv_smooth(smooth)) {
-                        smooth
-                    } else {
-                        smooth[[l]]
-                    }
-                    crit <- sim_interval(sm, level = level,
-                                         data = out[[i]][ind, ])
-                    out[[i]][["crit"]][ind] <- crit # add on the critical value
-                }
+                smooth <- old_get_smooth(object, uS[i])
+                crit <- sim_interval(smooth, level = level, data = out[[i]])
+                out[[i]][["crit"]] <- crit # add on the critical value
             }
         }
     }
@@ -389,7 +384,6 @@
     }
 
     ## simplify to a data frame for return
-    #out <- do.call("bind_rows", out)
     out <- bind_rows(out)
 
     # This was needed with `[.evaluated_smooth` before switching to
@@ -408,6 +402,11 @@
     out[["est"]]   <- ilink(out[["est"]] + const)
     out[["lower"]] <- ilink(out[["lower"]] + const)
     out[["upper"]] <- ilink(out[["upper"]] + const)
+
+    # smooth_estimates has columns in different places, relocate them to match
+    # old output as much as possible
+    out <- relocate(out, all_of(c("est", "se", "crit", "lower", "upper")),
+        .after = last_col())
 
     ## prepare for return
     class(out) <- c("confint.gam", class(out))
