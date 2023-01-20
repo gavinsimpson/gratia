@@ -213,9 +213,11 @@
              "> not available.")
     }
 
-    dev_resid_fun <- family[["dev.resids"]] # deviance residuals function
+    dev_resid_fun <- family[["residuals"]]
+    # If dev_resid_fun is NULL it means it is one of the standard families so
+    # copy over the the dev.resids object from the family instead
     if (is.null(dev_resid_fun)) {
-        dev_resid_fun <- family$residuals
+        dev_resid_fun <- family[["dev.resids"]]
         if (is.null(dev_resid_fun)) {
             stop("Deviance residual function for family <", family[["family"]],
                  "> not available.")
@@ -225,9 +227,11 @@
     fit <- fitted(model)
     prior_w <- weights(model, type = "prior")
     sigma2 <- model[["sig2"]]
-    ## if (is.null(sigma2)) {
-    ##     sigma2 <- summary(model)$dispersion
-    ## }
+    # I don't know why this is necessary as summary() doesn't seem to change
+    # sig2, but at least stop it from doing expensive ranef tests
+    if (is.null(sigma2)) {
+        sigma2 <- summary(model, re.test = FALSE)$dispersion
+    }
     na_action <- na.action(model)
 
     sims <- replicate(n = n,
@@ -235,7 +239,8 @@
                                        sigma2 = sigma2,
                                        dev_resid_fun = dev_resid_fun,
                                        var_fun = var_fun, type = type,
-                                       na_action = na_action))
+                                       na_action = na_action,
+                                       model = model))
     n_obs <- NROW(fit)
     out <- quantile(sims, probs = (seq_len(n_obs) - 0.5) / n_obs)
     int <- apply(sims, 1L, quantile, probs = c(alpha, 1 - alpha))
@@ -256,13 +261,13 @@
 }
 
 `qq_simulate_data` <- function(rd_fun, fit, weights, sigma2, dev_resid_fun,
-                               var_fun, type, na_action) {
+                               var_fun, type, na_action, model) {
     ## simulate data
     ysim <- rd_fun(fit, weights, sigma2)
     ## new residuals
     r <- compute_residuals(ysim, fit = fit, weights = weights, type = type,
                            dev_resid_fun = dev_resid_fun, var_fun = var_fun,
-                           na_action = na_action)
+                           na_action = na_action, model = model)
     ## sort residuals & return
     sort(r)
 }
@@ -308,7 +313,12 @@
     type <- match.arg(type)
     family <- family(model)                 # extract family
     family <- fix.family.qf(family)         # add quantile fun to family
-    dev_resid_fun <- family[["dev.resids"]] # deviance residuals function
+    dev_resid_fun <- family[["residuals"]]  # deviance residuals function
+    # If dev_resid_fun is NULL it means it is one of the standard families so
+    # copy over the the dev.resids object from the family instead
+    if (is.null(dev_resid_fun)) {
+        dev_resid_fun <- family[["dev.resids"]] # deviance residuals function
+    }
     var_fun <- family[["variance"]]         # variance function
     q_fun <- family[["qf"]]
     if (is.null(q_fun)) {
@@ -319,9 +329,11 @@
     fit <- fitted(model)
     weights <- weights(model, type = "prior")
     sigma2 <- model[["sig2"]]
-    ## if (is.null(sigma2)) {
-    ##     sigma2 <- summary(model)$dispersion # rather than call summary, do only what it does?
-    ## }
+    # I don't know why this is necessary as summary() doesn't seem to change
+    # sig2, but at least stop it from doing expensive ranef tests
+    if (is.null(sigma2)) {
+        sigma2 <- summary(model, re.test = FALSE)$dispersion
+    }
     na_action <- na.action(model)
     nr <- length(r)                     # number of residuals
     unif <- (seq_len(nr) - 0.5) / nr
@@ -336,7 +348,8 @@
                                           dev_resid_fun = dev_resid_fun,
                                           var_fun = var_fun,
                                           type = type,
-                                          na_action = na_action)
+                                          na_action = na_action,
+                                          model = model)
     }
 
     out <- rowMeans(sims)
@@ -353,13 +366,13 @@
 }
 
 `qq_uniform_quantiles` <- function(qs, q_fun, fit, weights, sigma2, dev_resid_fun,
-                                   var_fun, type, na_action) {
+                                   var_fun, type, na_action, model) {
     ## generate quantiles for uniforms from q_fun
     qq <- q_fun(qs, fit, weights, sigma2)
     ## new residuals
     r <- compute_residuals(qq, fit = fit, weights = weights, type = type,
                            dev_resid_fun = dev_resid_fun, var_fun = var_fun,
-                           na_action = na_action)
+                           na_action = na_action, model = model)
     ## sort residuals & return
     sort(r)
 }
@@ -367,11 +380,12 @@
 #' @importFrom stats naresid
 `compute_residuals` <- function(y, fit, weights,
                                 type = c("deviance", "response", "pearson"),
-                                dev_resid_fun, var_fun, na_action) {
+                                dev_resid_fun, var_fun, na_action, model) {
     type <- match.arg(type)
 
     r <- switch(type,
-                deviance = deviance_residuals(y, fit, weights, dev_resid_fun),
+                deviance = deviance_residuals(y, fit, weights, dev_resid_fun,
+                model = model),
                 response = response_residuals(y, fit),
                 pearson  = pearson_residuals(y, fit, weights, var_fun)
                 )
@@ -383,11 +397,17 @@
     y - fit
 }
 
-`deviance_residuals` <- function(y, fit, weights, dev_resid_fun) {
+`deviance_residuals` <- function(y, fit, weights, dev_resid_fun, model) {
     if ("object" %in% names(formals(dev_resid_fun))) {
-        r <- dev_resid_fun(list(y = y, fitted.values = fit,
-                                prior.weights = weights),
-                           type = "deviance")
+        # have to handle families that provide a residuals function, which
+        # takes the fitted model as in put
+        model$y <- y
+        model$fitted.values <- fit
+        model$prior.weights <- weights
+        #r <- dev_resid_fun(list(y = y, fitted.values = fit,
+        #                        prior.weights = weights),
+        #                   type = "deviance")
+        r <- dev_resid_fun(model, type = "deviance")
     } else {
         ## compute deviance residuals
         r <- dev_resid_fun(y, fit, weights)
@@ -395,7 +415,7 @@
         posneg <- attr(r, "sign")
         ## ...but may be missing for some families
         if (is.null(posneg)) {
-            posneg <- sign(y - fit)
+           posneg <- sign(y - fit)
         }
         ## calculate the deviance residuals
         r <- sqrt(pmax(r, 0)) * posneg

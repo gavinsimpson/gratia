@@ -1,4 +1,4 @@
-# gratia 0.7.3.31 (In development)
+# gratia 0.7.3.32 (In development)
 
 ## User visible changes
 
@@ -170,6 +170,13 @@
 
 * `confint.gam()` no longer uses `evaluate_smooth()`, which is soft deprecated.
   #167
+
+* `qq_plot()` and `worm_plot()` could compute the wrong deviance residuals used
+  to generate the theoretical quantiles for some of the more exotic families
+  (distributions) available in *mgcv*. This also affected `appraise()` but only
+  for the QQ plot; the residuals shown in the other plots and the deviance
+  residuals shown on the y-axis of the QQ plot were correct. Only the
+  generation of the reference intervals/quantiles was affected.
 
 # gratia 0.7.3
 
