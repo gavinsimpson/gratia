@@ -79,7 +79,7 @@
         }
         data <- bind_cols(data, pred_vals)
     } else {
-        data <- add_column(data, !!value := drop(pred_vals),
+        data <- add_column(data, !!value := as.numeric(pred_vals),
                            .after = ncol(data))
     }
 
