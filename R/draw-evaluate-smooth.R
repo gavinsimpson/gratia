@@ -47,6 +47,7 @@
 #' @aliases draw.evaluated_1d_smooth draw.evaluated_2d_smooth geom_rug
 #'
 #' @examples
+#' \dontshow{op <- options(cli.unicode = FALSE)}
 #' load_mgcv()
 #'
 #' dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
@@ -63,6 +64,7 @@
 #'
 #' sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 #' draw(sm)
+#' \dontshow{options(op)}
 `draw.evaluated_1d_smooth` <- function(object,
                                        rug = NULL,
                                        ci_level = 0.95,
