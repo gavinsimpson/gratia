@@ -47,3 +47,9 @@ test_that("smooth_coefs() works with a mgcv.smooth", {
     expect_named(b, paste("s(x0)", 1:9, sep = "."))
     expect_identical(length(b), 9L)
 })
+
+test_that("smothh-coefs print() output is as expected", {
+    expect_snapshot({
+        print(smooth_coefs(m_gam, term = "s(x0)"))
+    })
+})
