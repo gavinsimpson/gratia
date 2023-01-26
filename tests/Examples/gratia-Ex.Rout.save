@@ -751,6 +751,9 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
+> ## Don't show: 
+> op <- options(cli.unicode = FALSE)
+> ## End(Don't show)
 > load_mgcv()
 > 
 > dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
@@ -758,7 +761,7 @@ detaching ‘package:mgcv’
 > 
 > sm <- evaluate_smooth(m1, "s(x2)")
 Warning: `evaluate_smooth()` was deprecated in gratia 0.7.0.
-ℹ Please use `smooth_estimates()` instead.
+i Please use `smooth_estimates()` instead.
 > draw(sm)
 > 
 > ## supply constant to shift y axis scale
@@ -769,6 +772,9 @@ Warning: `evaluate_smooth()` was deprecated in gratia 0.7.0.
 > 
 > sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 > draw(sm)
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > 
 > 
 > 
@@ -1483,11 +1489,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x564874ab85d0>
+<environment: 0x556be1ba0838>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x564874ab85d0>
+<environment: 0x556be1ba0838>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1521,6 +1527,7 @@ detaching ‘package:mgcv’
 > 
 > # linear prediction matrix for observed data
 > xp <- lp_matrix(m)
+> ## IGNORE_RDIFF_BEGIN
 > xp
 Linear prediction matrix (400 x 37)
   `(Intercept)` s(x0).~1 s(x0)~2 s(x0)~3 s(x0)~4 s(x0)~5 s(x0)~6 s(x0)~7 s(x0)~8
@@ -1531,6 +1538,7 @@ Linear prediction matrix (400 x 37)
 4 1             -1.273    0.156  -1.5344 -0.222  -1.598   0.197~ -1.5836 -0.7479
 5 1              1.051    0.420   1.1138 -0.214   0.893   0.035~  0.7760 -0.0289
 # ... with 395 more rows, 28 more variables: `s(x0).9` <matrix>, ...
+> ## IGNORE_RDIFF_END
 > 
 > # the object `xp` *is* a matrix
 > class(xp)
@@ -1540,6 +1548,7 @@ Linear prediction matrix (400 x 37)
 > # linear predictor matrix for new data set
 > ds <- data_slice(m, x2 = evenly(x2))
 > xp <- lp_matrix(m, data = ds)
+> ## IGNORE_RDIFF_BEGIN
 > xp
 Linear prediction matrix (100 x 37)
   `(Intercept)` s(x0).~1 s(x0)~2 s(x0)~3 s(x0)~4 s(x0)~5 s(x0)~6 s(x0)~7 s(x0)~8
@@ -1550,6 +1559,7 @@ Linear prediction matrix (100 x 37)
 4 1             0.17     -0.542  -0.0371 0.0534  0.144   -0.353  -0.0572 0.518  
 5 1             0.17     -0.542  -0.0371 0.0534  0.144   -0.353  -0.0572 0.518  
 # ... with 95 more rows, 28 more variables: `s(x0).9` <matrix>, ...
+> ## IGNORE_RDIFF_END
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -2186,15 +2196,21 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> 
+> ## Don't show: 
+> op <- options(digits = 3)
+> ## End(Don't show)
 > load_mgcv()
 > df <- data_sim("eg1", seed = 2)
 > m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+> 
+> ## IGNORE_RDIFF_BEGIN
 > smooth_coefs(m, term = "s(x2)")
-  s(x2).1   s(x2).2   s(x2).3   s(x2).4   s(x2).5   s(x2).6   s(x2).7   s(x2).8 
--6.533373  9.694277  2.194078  1.967280 -2.374874  1.207638 -1.572586  9.269744 
-  s(x2).9 
- 5.622738 
+s(x2).1 s(x2).2 s(x2).3 s(x2).4 s(x2).5 s(x2).6 s(x2).7 s(x2).8 s(x2).9 
+  -6.53    9.69    2.19    1.97   -2.37    1.21   -1.57    9.27    5.62 
+> ## IGNORE_RDIFF_END
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
 > 
 > 
 > 
@@ -2424,7 +2440,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  18.804 0.18 18.944 0 0 
+Time elapsed:  42.352 0.38 42.682 0 0 
 > grDevices::dev.off()
 null device 
           1 
