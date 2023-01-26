@@ -66,9 +66,10 @@
         data <- as_tibble(data)
     }
     fit <- predict(object, newdata = data, ..., type = "link",
-                   se.fit = TRUE) %>%
-           bind_cols() %>%
-           rlang::set_names(c("fitted", "se"))
+                   se.fit = TRUE) |>
+           as.data.frame() |>
+               rlang::set_names(c("fitted", "se")) |>
+               as_tibble()
     fit <- bind_cols(data, fit)
 
     # create the confidence interval
