@@ -165,6 +165,7 @@ A \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object.
 Plots estimated univariate and bivariate smooths using ggplot2.
 }
 \examples{
+\dontshow{op <- options(cli.unicode = FALSE)}
 load_mgcv()
 
 dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
@@ -181,6 +182,7 @@ m2 <- gam(y ~ s(x, z, k = 40), data = dat, method = "REML")
 
 sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
 draw(sm)
+\dontshow{options(op)}
 }
 \author{
 Gavin L. Simpson

@@ -1,4 +1,4 @@
-# gratia 0.7.3.32 (In development)
+# gratia 0.8.0
 
 ## User visible changes
 
@@ -32,7 +32,7 @@
   which many users expected. To include the group means use `group_means = TRUE`
   in the function call, e.g.
   `difference_smooths(model, smooth = "s(x)", group_means = TRUE`). Note: this
-  function is still differs from `plot_diff()` in package *itsadug*, which
+  function still differs from `plot_diff()` in package *itsadug*, which
   essentially computes differences of model predictions. The main practical
   difference is that other effects beyond the factor by smooth, including random
   effects, may be included with `plot_diff()`.
@@ -64,7 +64,7 @@
   `fac` variable of the model.
 
 * `partial_derivatives()` is a new function for computing partial derivatives
-   of multivariate smooths (e.g. `s(x,z)`, `te(x,z)`) with respect to one of
+  of multivariate smooths (e.g. `s(x,z)`, `te(x,z)`) with respect to one of
   the margins of the smooth. Multivariate smooths of any dimension are handled,
   but only one of the dimensions is allowed to vary. Partial derivatives are
   estimated using the method of finite differences, with forward, backward,

@@ -45,7 +45,9 @@ m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df)
 
 # linear prediction matrix for observed data
 xp <- lp_matrix(m)
+## IGNORE_RDIFF_BEGIN
 xp
+## IGNORE_RDIFF_END
 
 # the object `xp` *is* a matrix
 class(xp)
@@ -54,6 +56,8 @@ class(xp)
 # linear predictor matrix for new data set
 ds <- data_slice(m, x2 = evenly(x2))
 xp <- lp_matrix(m, data = ds)
+## IGNORE_RDIFF_BEGIN
 xp
+## IGNORE_RDIFF_END
 \dontshow{options(op)}
 }
