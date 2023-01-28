@@ -246,21 +246,11 @@
 
         # Take the range of the smooths & their confidence intervals now
         # before we put rug and residuals on
-        if (utils::packageVersion("dplyr") > "1.0.10") {
-            # code for new version
-            sm_rng <- sm_eval |>
-                rowwise() |>
-                dplyr::reframe(rng = range(c(data$est, data$lower_ci,
-                                      data$upper_ci))) |>
-                pluck("rng")
-        } else {
-            # code for old version
-            sm_rng <- sm_eval |>
-                rowwise() |>
-                summarise(rng = range(c(data$est, data$lower_ci,
-                                        data$upper_ci))) |>
-                pluck("rng")
-        }
+        sm_rng <- sm_eval |>
+            rowwise() |>
+            dplyr::reframe(rng = range(c(data$est, data$lower_ci,
+                                  data$upper_ci))) |>
+            pluck("rng")
 
         # Add partial residuals if requested - by default they are
         # At the end of this, sm_eval will have a new list column containing the
@@ -274,21 +264,11 @@
                 p_resids <- nested_partial_residuals(object, terms = S[select])
 
                 # compute the range of residuals for each smooth
-                if (utils::packageVersion("dplyr") > "1.0.10") {
-                    # code for new version
-                    p_resids_rng <- p_resids |>
-                        rowwise() |>
-                        dplyr::reframe(rng =
-                            range(.data$partial_residual$partial_residual)) |>
-                        pluck("rng")
-                } else {
-                    # code for old version
-                    p_resids_rng <- p_resids |>
-                        rowwise() |>
-                        summarise(rng =
-                            range(.data$partial_residual$partial_residual)) |>
-                        pluck("rng")
-                }
+                p_resids_rng <- p_resids |>
+                    rowwise() |>
+                    dplyr::reframe(rng =
+                        range(.data$partial_residual$partial_residual)) |>
+                    pluck("rng")
 
                 # merge with the evaluated smooth
                 sm_eval <- suppress_matches_multiple_warning(
