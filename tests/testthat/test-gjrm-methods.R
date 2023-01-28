@@ -14,7 +14,7 @@ test_that("draw works for a simple GJRM gamlss", {
     skip_on_os("mac")
 
     # follow example from ?GJRM::gamlss
-    library("GJRM")
+    suppressPackageStartupMessages(library("GJRM"))
     set.seed(0)
     n <- 400
     x1 <- round(runif(n))
