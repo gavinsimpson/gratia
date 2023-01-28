@@ -29,6 +29,7 @@ jobs:
         with:
           extra-packages: |
             any::pkgdown
+            github::tidyverse/dplyr
             local::.
           needs: website
 

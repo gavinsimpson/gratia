@@ -52,6 +52,7 @@ jobs:
         with:
           extra-packages: |
             any::rcmdcheck
+            github::tidyverse/dplyr
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
