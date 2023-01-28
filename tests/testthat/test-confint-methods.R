@@ -3,8 +3,6 @@
 ## load packages
 library("testthat")
 library("gratia")
-library("mgcv")
-library('gamm4')
 
 ## first derivatives of all smooths...
 test_that("Point-wise confidence interval for a first derivatives of a GAM works", {
