@@ -843,7 +843,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 +     # follow example from ?GJRM::gamlss
 +     library(GJRM)
 +     set.seed(0)
-+     n <- 400
++     n <- 100
 +     x1 <- round(runif(n))
 +     x2 <- runif(n)
 +     x3 <- runif(n)
@@ -1489,11 +1489,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x556be1ba0838>
+<environment: 0x55f3ff1223d8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x556be1ba0838>
+<environment: 0x55f3ff1223d8>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2440,7 +2440,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  42.352 0.38 42.682 0 0 
+Time elapsed:  28.522 0.304 28.784 0 0 
 > grDevices::dev.off()
 null device 
           1 
