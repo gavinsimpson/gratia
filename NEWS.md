@@ -1,3 +1,10 @@
+# gratia 0.8.1
+
+## Bug fixes
+
+* Additional fixes for changes in dplyr 1.1.0 (which is in the process of being
+  released through CRAN)
+
 # gratia 0.8.0
 
 ## User visible changes
