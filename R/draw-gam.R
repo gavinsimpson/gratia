@@ -111,7 +111,7 @@
 #' @importFrom ggplot2 scale_colour_discrete scale_colour_continuous
 #'   scale_fill_distiller
 #' @importFrom patchwork wrap_plots
-#' @importFrom dplyr mutate rowwise %>% ungroup left_join summarise group_split
+#' @importFrom dplyr mutate rowwise %>% ungroup left_join reframe group_split
 #' @importFrom purrr pluck map_lgl
 #' @importFrom rlang expr_label
 #' @export
@@ -248,8 +248,8 @@
         # before we put rug and residuals on
         sm_rng <- sm_eval %>%
             rowwise() %>%
-            summarise(rng = range(c(data$est, data$lower_ci,
-                                    data$upper_ci))) %>%
+            reframe(rng = range(c(data$est, data$lower_ci,
+                                  data$upper_ci))) %>%
             pluck("rng")
 
         # Add partial residuals if requested - by default they are
@@ -266,7 +266,7 @@
                 # compute the range of residuals for each smooth
                 p_resids_rng <- p_resids %>%
                     rowwise() %>%
-                    summarise(rng =
+                    reframe(rng =
                         range(.data$partial_residual$partial_residual)) %>%
                     pluck("rng")
 
