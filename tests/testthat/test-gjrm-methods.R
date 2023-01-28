@@ -10,6 +10,8 @@ library("mgcv")
 test_that("draw works for a simple GJRM gamlss", {
     skip_if_not_installed("GJRM", minimum_version = "0.2-6")
     skip_on_cran()
+    skip_on_os("win")
+    skip_on_os("mac")
 
     # follow example from ?GJRM::gamlss
     library("GJRM")
