@@ -111,7 +111,7 @@
 #' @importFrom ggplot2 scale_colour_discrete scale_colour_continuous
 #'   scale_fill_distiller
 #' @importFrom patchwork wrap_plots
-#' @importFrom dplyr mutate rowwise %>% ungroup left_join reframe group_split
+#' @importFrom dplyr mutate rowwise %>% ungroup left_join group_split summarise
 #' @importFrom purrr pluck map_lgl
 #' @importFrom rlang expr_label
 #' @export
@@ -246,11 +246,21 @@
 
         # Take the range of the smooths & their confidence intervals now
         # before we put rug and residuals on
-        sm_rng <- sm_eval %>%
-            rowwise() %>%
-            reframe(rng = range(c(data$est, data$lower_ci,
-                                  data$upper_ci))) %>%
-            pluck("rng")
+        if (utils::packageVersion("dplyr") > "1.10.0") {
+            # code for new version
+            sm_rng <- sm_eval |>
+                rowwise() |>
+                dplyr::reframe(rng = range(c(data$est, data$lower_ci,
+                                      data$upper_ci))) |>
+                pluck("rng")
+        } else {
+            # code for old version
+            sm_rng <- sm_eval |>
+                rowwise() |>
+                summarise(rng = range(c(data$est, data$lower_ci,
+                                        data$upper_ci))) |>
+                pluck("rng")
+        }
 
         # Add partial residuals if requested - by default they are
         # At the end of this, sm_eval will have a new list column containing the
@@ -264,11 +274,21 @@
                 p_resids <- nested_partial_residuals(object, terms = S[select])
 
                 # compute the range of residuals for each smooth
-                p_resids_rng <- p_resids %>%
-                    rowwise() %>%
-                    reframe(rng =
-                        range(.data$partial_residual$partial_residual)) %>%
-                    pluck("rng")
+                if (utils::packageVersion("dplyr") > "1.10.0") {
+                    # code for new version
+                    p_resids_rng <- p_resids |>
+                        rowwise() |>
+                        dplyr::reframe(rng =
+                            range(.data$partial_residual$partial_residual)) |>
+                        pluck("rng")
+                } else {
+                    # code for old version
+                    p_resids_rng <- p_resids |>
+                        rowwise() |>
+                        summarise(rng =
+                            range(.data$partial_residual$partial_residual)) |>
+                        pluck("rng")
+                }
 
                 # merge with the evaluated smooth
                 sm_eval <- suppress_matches_multiple_warning(
