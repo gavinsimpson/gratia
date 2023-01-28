@@ -161,7 +161,8 @@
                    ref_2 = reference[[sm_vars[2L]]],
                    dist = dist)
     # set the indicated columns to `NA`
-    input <- mutate(input, across(all_of(cols), to_na, i = ind))
+    input <- mutate(input,
+        across(all_of(cols), \(x) to_na(x, i = ind)))
 
     # nest `input` again if it was nested previously
     if (was_nested) {
