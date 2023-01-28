@@ -246,7 +246,7 @@
 
         # Take the range of the smooths & their confidence intervals now
         # before we put rug and residuals on
-        if (utils::packageVersion("dplyr") > "1.10.0") {
+        if (utils::packageVersion("dplyr") > "1.0.10") {
             # code for new version
             sm_rng <- sm_eval |>
                 rowwise() |>
@@ -274,7 +274,7 @@
                 p_resids <- nested_partial_residuals(object, terms = S[select])
 
                 # compute the range of residuals for each smooth
-                if (utils::packageVersion("dplyr") > "1.10.0") {
+                if (utils::packageVersion("dplyr") > "1.0.10") {
                     # code for new version
                     p_resids_rng <- p_resids |>
                         rowwise() |>
