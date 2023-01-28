@@ -16,7 +16,7 @@ Imports:
     mgcv,
     ggplot2,
     tibble,
-    dplyr (>= 1.0.99.9000),
+    dplyr (>= 1.0.10),
     tidyr,
     rlang,
     patchwork,
