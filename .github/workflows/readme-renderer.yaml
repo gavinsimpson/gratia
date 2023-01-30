@@ -31,7 +31,6 @@ jobs:
             rmarkdown
             mgcv
             remotes
-            github::tidyverse/dplyr
       
       - name: install gratia
         run: Rscript -e 'remotes::install_github("gavinsimpson/gratia", upgrade_dependencies = FALSE)'

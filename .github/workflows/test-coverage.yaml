@@ -25,7 +25,6 @@ jobs:
         with:
           extra-packages: |
             any::covr
-            github::tidyverse/dplyr
           needs: coverage
 
       - name: Test coverage
