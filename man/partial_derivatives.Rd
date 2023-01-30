@@ -142,7 +142,7 @@ pd_x <- partial_derivatives(m, data = ds, type = "central", focal = "x")
 
 # draw te(x,z)
 p1 <- draw(m, rug = FALSE) &
-    geom_hline(yintercept = 0.4, size = 1)
+    geom_hline(yintercept = 0.4, linewidth = 1)
 p1
 
 # draw te(x,z) along slice
