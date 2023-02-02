@@ -718,10 +718,9 @@
                                         title = NULL, subtitle = NULL,
                                         caption = NULL, rug = TRUE, alpha = 1,
                                         colour = "black", angle = NULL) {
-    data_names <- attr(object, "data_names")
-    smooth_var <- data_names[[unique(object[["term"]])]]
+    smooth_var <- vars_from_label(object[1L, "smooth"])
 
-    plt <- ggplot(object, aes(x = .data[[".x1"]],
+    plt <- ggplot(object, aes(x = .data[[smooth_var]],
                               y = .data[["value"]],
                               group = .data[["draw"]])) +
         geom_line(alpha = alpha, colour = colour) +
@@ -751,9 +750,9 @@
                       caption = caption)
 
     ## add rug?
-    if (!is.null(rug)) {
-        plt <- plt + geom_rug(data = distinct(object, .data$.x1),
-                              mapping = aes(x = .data[[".x1"]]),
+    if (isTRUE(rug)) {
+        plt <- plt + geom_rug(data = distinct(object, .data[[smooth_var]]),
+                              mapping = aes(x = .data[[smooth_var]]),
                               inherit.aes = FALSE, sides = "b", alpha = 0.5)
     }
 
@@ -794,10 +793,9 @@
         }
     }
 
-    ## this is how it should be done but smooth_samples doesn't put
-    ##   the data into the object under their own names..., just .x1, .x2, etc
-    plt <- ggplot(object, aes(x = .data[[".x1"]],
-                              y = .data[[".x2"]])) +
+    ## plot
+    plt <- ggplot(object, aes(x = .data[[xvars[1L]]],
+                              y = .data[[xvars[2L]]])) +
         geom_raster(aes(fill = .data[["value"]])) +
         guides(x = guide_axis(angle = angle))
 

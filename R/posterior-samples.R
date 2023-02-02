@@ -344,7 +344,7 @@
 #' @importFrom mvnfast rmvn
 #' @importFrom dplyr bind_rows starts_with
 #' @importFrom tibble as_tibble add_column
-#' @importFrom tidyr gather
+#' @importFrom tidyr pivot_longer
 #' @importFrom mgcv PredictMat
 `smooth_samples.gam` <- function(model, term = NULL, n = 1, data = newdata,
                                  seed = NULL, freq = FALSE,
@@ -429,28 +429,29 @@
         }
     #   # add on spline type info
         sm_type <- smooth_type(sm)
-        simu <- add_column(simu, type = rep(sm_type, nr_simu),
-                           .after = 1L)
-        simu <- add_smooth_var_data(simu, smooth_variable(sm), data)
+        simu <- add_column(simu,
+            smooth = rep(unlist(lapply(strsplit(S[[i]], ":"), `[`, 1L)),
+            nr_simu),
+            term = rep(S[[i]], each = nr_simu),
+            type = rep(sm_type, nr_simu),
+            row = seq_len(nr_simu),
+            .after = 0L)
+        simu <- bind_cols(simu, data[smooth_variable(sm)])
+        simu <- pivot_longer(simu, cols = dplyr::starts_with("..V"),
+            names_to = "draw", values_to = "value",
+            names_transform = \(x) as.integer(sub("\\.\\.V", "", x)))
+        # summ_names <- names(data[!vapply(data, is.factor, logical(1))])
+        # names(summ_names) <- paste0(".x", seq_along(summ_names))
+        # data_names[[i]] <- summ_names
+        ## nest all columns with varying data
+        simu <- nest(simu, data = all_of(c("row", "draw", "value",
+            smooth_variable(sm))))
         sims[[i]] <- simu
-        summ_names <- names(data[!vapply(data, is.factor, logical(1))])
-        names(summ_names) <- paste0(".x", seq_along(summ_names))
-        data_names[[i]] <- summ_names
     }
 
-    sims <- do.call("bind_rows", sims)
-    sims <- add_column(sims,
-                       smooth = rep(unlist(lapply(strsplit(S, ":"), `[`, 1L)),
-                                    each = nr_simu),
-                       .before = 1L)
-    sims <- add_column(sims, term = rep(S, each = nr_simu), .before = 2L)
-    sims <- add_column(sims, row = rep(seq_len(nrow(data)),
-                       times = length(S)))
-    sims <- gather(sims, key = "draw", value = "value",
-                   dplyr::starts_with("..V"))
-    sims[["draw"]] <- as.integer(sub("\\.\\.V", "", sims[["draw"]]))
+    sims <- bind_rows(sims)
+    sims <- unnest(sims, all_of("data"))
     attr(sims, "seed") <- RNGstate
-    attr(sims, "data_names") <- setNames(data_names, nm = S)
     ## add classes
     class(sims) <- c("smooth_samples", "posterior_samples", class(sims))
     sims
