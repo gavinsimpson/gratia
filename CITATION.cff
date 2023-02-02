@@ -4,7 +4,7 @@ type: software
 license: MIT
 title: 'gratia: Graceful ggplot-Based Graphics and Other Functions for GAMs
   Fitted Using mgcv'
-version: 0.6.9400
+version: 0.8.1
 abstract: 'Graceful ggplot-based graphics and utility functions for working with
   generalized additive models (GAMs) fitted using the mgcv package. Provides a
   reimplementation of the plot() method for GAMs that mgcv provides, as well
@@ -23,7 +23,7 @@ preferred-citation:
     given-names: Gavin L.
     email: ucfagls@gmail.com
     orcid: https://orcid.org/0000-0002-9084-8413
-  version: 0.6.9400
+  version: 0.8.1
   abstract: 'Graceful ggplot-based graphics and utility functions for working
     with generalized additive models (GAMs) fitted using the mgcv package.
     Provides a reimplementation of the plot() method for GAMs that mgcv
@@ -32,7 +32,7 @@ preferred-citation:
   repository: https://CRAN.R-project.org/package=gratia
   repository-code: https://github.com/gavinsimpson/gratia
   url: https://gavinsimpson.github.io/gratia/
-  date-released: '2021-09-30'
+  date-released: '2023-02-02'
   contact:
   - family-names: Simpson
     given-names: Gavin L.
@@ -49,11 +49,11 @@ preferred-citation:
   - random-effects
   - smoothing
   license: MIT
-  year: '2021'
+  year: '2023'
 repository: https://CRAN.R-project.org/package=gratia
 repository-code: https://github.com/gavinsimpson/gratia
 url: https://gavinsimpson.github.io/gratia/
-date-released: '2021-09-30'
+date-released: '2023-02-02'
 contact:
 - family-names: Simpson
   given-names: Gavin L.

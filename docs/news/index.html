@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.93</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,20 +55,20 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.8.0.93" id="gratia-08093">gratia 0.8.0.93<a class="anchor" aria-label="anchor" href="#gratia-08093"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.8.1" id="gratia-081">gratia 0.8.1<a class="anchor" aria-label="anchor" href="#gratia-081"></a></h2>
 <div class="section level3">
-<h3 id="user-visible-changes-0-8-0-93">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-8-0-93"></a></h3>
-<ul><li>
-<code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> now returns objects with variables involved in smooths that have their correct name. Previously variables were named <code>.x1</code>, <code>.x2</code>, etc. Fixing <a href="https://github.com/gavinsimpson/gratia/issues/126" class="external-link">#126</a> and improving compatibility with <code><a href="../reference/compare_smooths.html">compare_smooths()</a></code> and <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> allowed the variables to be named correctly.</li>
+<h3 id="user-visible-changes-0-8-1">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-8-1"></a></h3>
+<ul><li><p><code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> now returns objects with variables involved in smooths that have their correct name. Previously variables were named <code>.x1</code>, <code>.x2</code>, etc. Fixing <a href="https://github.com/gavinsimpson/gratia/issues/126" class="external-link">#126</a> and improving compatibility with <code><a href="../reference/compare_smooths.html">compare_smooths()</a></code> and <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> allowed the variables to be named correctly.</p></li>
+<li><p><em>gratia</em> now depends on version 1.8-41 or later of the <em>mgcv</em> package.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-0-8-0-93">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-0-93"></a></h3>
+<h3 id="new-features-0-8-1">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-1"></a></h3>
 <ul><li>
 <code><a href="../reference/draw.gam.html">draw.gam()</a></code> can now handle tensor products that include a marginal random effect smooth. Beware plotting such smooths if there are many levels, however, as a separate surface plot will be produced for each level.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-8-0-93">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-0-93"></a></h3>
-<ul><li><p>Additional fixes for changes in dplyr 1.1.0 (which is in the process of being released through CRAN)</p></li>
+<h3 id="bug-fixes-0-8-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-1"></a></h3>
+<ul><li><p>Additional fixes for changes in dplyr 1.1.0.</p></li>
 <li><p><code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> now works when sampling from posteriors of multiple smooths with different dimension. <a href="https://github.com/gavinsimpson/gratia/issues/126" class="external-link">#126</a> reported by <a href="https://github.com/Aariq" class="external-link">@Aariq</a></p></li>
 </ul></div>
 </div>
