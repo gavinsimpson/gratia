@@ -160,16 +160,15 @@ test_that("draw() throws message with bird_move model 4", {
     skip_on_cran()
     skip_on_travis()
     skip_on_ci()
-    bird_mod4 <- gam(count ~ t2(week, latitude, species, 
+    bird_mod4 <- gam(count ~ t2(week, latitude, species,
                                 bs = c("cc", "tp", "re"),
                                 k = c(10, 10, 6), m = c(2, 2, 2)),
                      data = bird_move, method = "REML", family = poisson(),
                      knots = list(week = c(0, 52)),
                      control = ctrl)
     ## There's nothing we can currently do, as
-    expect_message(draw(bird_mod4),
-                   "Unable to draw any of the model terms.",
-                   fixed = FALSE)
+    expect_silent(plt <- draw(bird_mod4, n = 25, rug = FALSE))
+    expect_doppelganger("hgam-paper-bird-move-model-4", plt)
 })
 
 test_that("draw() can plot bird_move model 5", {
