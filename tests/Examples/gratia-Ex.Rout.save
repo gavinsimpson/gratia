@@ -240,7 +240,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 > 
 > load_mgcv()
 > ## Don't show: 
-> op <- options(digits = 3, cli.unicode = FALSE)
+> op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 > ## End(Don't show)
 > df <- data_sim("eg4", n = 400, seed = 42)
 > 
@@ -268,7 +268,7 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > ## Don't show: 
-> op <- options(cli.unicode = FALSE, digits = 5)
+> op <- options(cli.unicode = FALSE, pillar.sigfig = 5)
 > ## End(Don't show)
 > load_mgcv()
 > dat <- data_sim("eg1", seed = 2)
@@ -463,23 +463,23 @@ detaching ‘package:mgcv’
 > 
 > ## Don't show: 
 > set.seed(1)
-> op <- options(digits = 5, cli.unicode = FALSE)
+> op <- options(pillar.sigfig = 5, cli.unicode = FALSE)
 > ## End(Don't show)
 > data_sim("eg1")
 # A tibble: 400 x 10
-         y     x0     x1     x2    x3     f    f0    f1        f2    f3
-     <dbl>  <dbl>  <dbl>  <dbl> <dbl> <dbl> <dbl> <dbl>     <dbl> <dbl>
- 1  3.34   0.266  0.659  0.859  0.367  5.51 1.48   3.74 0.298         0
- 2 -0.0758 0.372  0.185  0.0344 0.741  3.58 1.84   1.45 0.288         0
- 3 10.7    0.573  0.954  0.971  0.934  8.69 1.95   6.74 0.0000861     0
- 4  8.73   0.908  0.898  0.745  0.673  8.75 0.569  6.02 2.16          0
- 5 15.0    0.202  0.944  0.273  0.701 16.2  1.18   6.60 8.40          0
- 6  7.67   0.898  0.724  0.677  0.848  8.03 0.628  4.25 3.15          0
- 7  7.58   0.945  0.370  0.348  0.706  8.44 0.346  2.10 5.99          0
- 8  8.51   0.661  0.781  0.947  0.859  6.52 1.75   4.77 0.00243       0
- 9 10.6    0.629  0.0111 0.339  0.446  9.19 1.84   1.02 6.33          0
-10  3.72   0.0618 0.940  0.0317 0.677  7.17 0.386  6.56 0.231         0
-# ... with 390 more rows
+           y       x0       x1       x2      x3       f      f0     f1        f2
+       <dbl>    <dbl>    <dbl>    <dbl>   <dbl>   <dbl>   <dbl>  <dbl>     <dbl>
+ 1  3.3407   0.26551  0.65888  0.85869  0.36653  5.5145 1.4814  3.7350 2.9808e-1
+ 2 -0.075760 0.37212  0.18507  0.034439 0.74139  3.5764 1.8408  1.4479 2.8770e-1
+ 3 10.683    0.57285  0.95438  0.97100  0.93351  8.6926 1.9478  6.7447 8.6114e-5
+ 4  8.7291   0.90821  0.89785  0.74511  0.67321  8.7529 0.56879 6.0237 2.1604e+0
+ 5 14.991    0.20168  0.94370  0.27326  0.70136 16.190  1.1841  6.6021 8.4041e+0
+ 6  7.6709   0.89839  0.72369  0.67711  0.84763  8.0268 0.62765 4.2520 3.1472e+0
+ 7  7.5833   0.94468  0.37036  0.34795  0.70616  8.4353 0.34587 2.0974 5.9920e+0
+ 8  8.5145   0.66080  0.78102  0.94702  0.85881  6.5211 1.7502  4.7685 2.4301e-3
+ 9 10.646    0.62911  0.011150 0.33862  0.44564  9.1904 1.8377  1.0225 6.3302e+0
+10  3.7212   0.061786 0.94031  0.031713 0.67663  7.1744 0.38578 6.5576 2.3108e-1
+# ... with 390 more rows, and 1 more variable: f3 <dbl>
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -618,7 +618,7 @@ detaching ‘package:mgcv’
 > 
 > load_mgcv()
 > ## Don't show: 
-> op <- options(digits = 3, cli.unicode = FALSE)
+> op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 > ## End(Don't show)
 > df <- data_sim("eg4", seed = 42)
 > m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
@@ -1042,7 +1042,7 @@ detaching ‘package:mgcv’
 > 
 > load_mgcv()
 > ## Don't show: 
-> op <- options(cli.unicode = FALSE, digits = 6)
+> op <- options(cli.unicode = FALSE, pillar.sigfig = 5)
 > ## End(Don't show)
 > df <- data_sim("eg1", n = 400, seed = 42)
 > m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
@@ -1050,46 +1050,46 @@ detaching ‘package:mgcv’
 > # extract the EDFs for all smooths
 > edf(m)
 # A tibble: 4 x 2
-  smooth   edf
-  <chr>  <dbl>
-1 s(x0)   3.42
-2 s(x1)   3.22
-3 s(x2)   7.90
-4 s(x3)   1.88
+  smooth    edf
+  <chr>   <dbl>
+1 s(x0)  3.4248
+2 s(x1)  3.2213
+3 s(x2)  7.9049
+4 s(x3)  1.8847
 > 
 > # or selected smooths
 > edf(m, smooth = c("s(x0)", "s(x2)"))
 # A tibble: 2 x 2
-  smooth   edf
-  <chr>  <dbl>
-1 s(x0)   3.42
-2 s(x2)   7.90
+  smooth    edf
+  <chr>   <dbl>
+1 s(x0)  3.4248
+2 s(x2)  7.9049
 > 
 > # accounting for smoothness parameter uncertainty
 > edf(m, type = "unconditional")
 # A tibble: 4 x 2
-  smooth   edf
-  <chr>  <dbl>
-1 s(x0)   3.77
-2 s(x1)   3.87
-3 s(x2)   8.07
-4 s(x3)   2.88
+  smooth    edf
+  <chr>   <dbl>
+1 s(x0)  3.7697
+2 s(x1)  3.8728
+3 s(x2)  8.0670
+4 s(x3)  2.8834
 > 
 > # over EDF of the model, including the intercept
 > model_edf(m)
 # A tibble: 1 x 2
-  model   edf
-  <chr> <dbl>
-1 m      17.4
+  model    edf
+  <chr>  <dbl>
+1 m     17.436
 > 
 > # can get model EDF for multiple models
 > m2 <- gam(y ~ s(x0) + s(x1) + s(x3), data = df, method = "REML")
 > model_edf(m, m2)
 # A tibble: 2 x 2
-  model   edf
-  <chr> <dbl>
-1 m     17.4 
-2 m2     7.58
+  model     edf
+  <chr>   <dbl>
+1 m     17.436 
+2 m2     7.5777
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1278,25 +1278,25 @@ detaching ‘package:mgcv’
 > 
 > load_mgcv()
 > ## Don't show: 
-> op <- options(cli.unicode = FALSE, digits = 6)
+> op <- options(cli.unicode = FALSE, pillar.sigfig = 6)
 > ## End(Don't show)
 > sim_df <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 > m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = sim_df, method = "REML")
 > fv <- fitted_values(m)
 > fv
 # A tibble: 400 x 8
-      x0     x1      x2    x3 fitted    se lower upper
-   <dbl>  <dbl>   <dbl> <dbl>  <dbl> <dbl> <dbl> <dbl>
- 1 0.185 0.617  0.415   0.132   8.74 0.355  8.04  9.43
- 2 0.702 0.569  0.531   0.365   7.63 0.338  6.96  8.29
- 3 0.573 0.154  0.00325 0.455   3.12 0.592  1.96  4.28
- 4 0.168 0.0348 0.252   0.537  11.1  0.402 10.3  11.9 
- 5 0.944 0.998  0.155   0.185  14.1  0.453 13.2  14.9 
- 6 0.943 0.836  0.879   0.449   6.13 0.365  5.42  6.85
- 7 0.129 0.587  0.204   0.257  12.5  0.356 11.8  13.2 
- 8 0.833 0.339  0.584   0.618   6.25 0.345  5.58  6.93
- 9 0.468 0.167  0.804   0.881   4.21 0.372  3.49  4.94
-10 0.550 0.807  0.265   0.318  15.5  0.370 14.8  16.3 
+         x0        x1         x2       x3   fitted       se    lower    upper
+      <dbl>     <dbl>      <dbl>    <dbl>    <dbl>    <dbl>    <dbl>    <dbl>
+ 1 0.184882 0.617142  0.415244   0.132410  8.73875 0.354677  8.04360  9.43390
+ 2 0.702374 0.569064  0.531439   0.365331  7.62581 0.337779  6.96378  8.28785
+ 3 0.573326 0.153970  0.00324621 0.454532  3.12106 0.591862  1.96103  4.28109
+ 4 0.168052 0.0348332 0.252100   0.537114 11.1124  0.402378 10.3237  11.9010 
+ 5 0.943839 0.997953  0.155229   0.185495 14.0533  0.452947 13.1655  14.9411 
+ 6 0.943475 0.835574  0.878840   0.449276  6.13080 0.364521  5.41635  6.84525
+ 7 0.129159 0.586562  0.203511   0.256527 12.4838  0.355808 11.7864  13.1812 
+ 8 0.833449 0.339117  0.583528   0.618458  6.25215 0.344700  5.57655  6.92775
+ 9 0.468019 0.166883  0.804473   0.880744  4.21463 0.372003  3.48552  4.94374
+10 0.549984 0.807410  0.264717   0.317747 15.5283  0.369999 14.8031  16.2535 
 # ... with 390 more rows
 > ## Don't show: 
 > options(op)
@@ -1383,15 +1383,16 @@ detaching ‘package:lme4’, ‘package:Matrix’, ‘package:mgcv’
 > ### ** Examples
 > 
 > ## Don't show: 
-> op <- options(digits = 4)
+> op <- options(pillar.sigfig = 4)
 > ## End(Don't show)
 > x <- seq(0, 1, length = 6)
 > gw_f0(x)
-[1] 0.000e+00 1.176e+00 1.902e+00 1.902e+00 1.176e+00 2.449e-16
+[1] 0.000000e+00 1.175571e+00 1.902113e+00 1.902113e+00 1.175571e+00
+[6] 2.449294e-16
 > gw_f1(x)
-[1] 1.000 1.492 2.226 3.320 4.953 7.389
+[1] 1.000000 1.491825 2.225541 3.320117 4.953032 7.389056
 > gw_f2(x)
-[1] 0.000 8.591 4.261 3.199 1.100 0.000
+[1] 0.000000 8.591008 4.261214 3.198526 1.100036 0.000000
 > gw_f3(x) # should be constant 0
 [1] 0 0 0 0 0 0
 > ## Don't show: 
@@ -1489,11 +1490,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x559a1a1226c0>
+<environment: 0x557fd2441618>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x559a1a1226c0>
+<environment: 0x557fd2441618>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1520,7 +1521,7 @@ detaching ‘package:mgcv’
 > 
 > load_mgcv()
 > ## Don't show: 
-> op <- options(digits = 3, cli.unicode = FALSE)
+> op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 > ## End(Don't show)
 > df <- data_sim("eg1", seed = 1)
 > m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df)
@@ -1532,11 +1533,11 @@ detaching ‘package:mgcv’
 Linear prediction matrix (400 x 37)
   `(Intercept)` s(x0).~1 s(x0)~2 s(x0)~3 s(x0)~4 s(x0)~5 s(x0)~6 s(x0)~7 s(x0)~8
   <matrix>      <matrix> <matri> <matri> <matri> <matri> <matri> <matri> <matri>
-1 1              0.961    0.227   0.7058  0.135   0.457  -0.146~  0.6209  0.2016
-2 1              0.651   -0.241   0.0684  0.308   0.394  -0.009~  0.3551  0.4182
-3 1             -0.385   -0.549   0.0660  0.204  -0.416  -0.247~ -0.0349  0.4622
-4 1             -1.273    0.156  -1.5344 -0.222  -1.598   0.197~ -1.5836 -0.7479
-5 1              1.051    0.420   1.1138 -0.214   0.893   0.035~  0.7760 -0.0289
+1 1              0.9611~  0.227~  0.705~  0.134~  0.457~ -0.146~  0.620~  0.201~
+2 1              0.6513~ -0.240~  0.068~  0.308~  0.394~ -0.009~  0.355~  0.418~
+3 1             -0.3847~ -0.549~  0.066~  0.204~ -0.415~ -0.247~ -0.034~  0.462~
+4 1             -1.2733~  0.155~ -1.534~ -0.222~ -1.598~  0.197~ -1.583~ -0.747~
+5 1              1.0510~  0.420~  1.113~ -0.213~  0.892~  0.035~  0.776~ -0.028~
 # ... with 395 more rows, 28 more variables: `s(x0).9` <matrix>, ...
 > ## IGNORE_RDIFF_END
 > 
@@ -1553,11 +1554,11 @@ Linear prediction matrix (400 x 37)
 Linear prediction matrix (100 x 37)
   `(Intercept)` s(x0).~1 s(x0)~2 s(x0)~3 s(x0)~4 s(x0)~5 s(x0)~6 s(x0)~7 s(x0)~8
   <matrix>      <matrix> <matri> <matri> <matri> <matri> <matri> <matri> <matri>
-1 1             0.17     -0.542  -0.0371 0.0534  0.144   -0.353  -0.0572 0.518  
-2 1             0.17     -0.542  -0.0371 0.0534  0.144   -0.353  -0.0572 0.518  
-3 1             0.17     -0.542  -0.0371 0.0534  0.144   -0.353  -0.0572 0.518  
-4 1             0.17     -0.542  -0.0371 0.0534  0.144   -0.353  -0.0572 0.518  
-5 1             0.17     -0.542  -0.0371 0.0534  0.144   -0.353  -0.0572 0.518  
+1 1             0.16990~ -0.541~ -0.037~ 0.0534~ 0.1444~ -0.353~ -0.057~ 0.5181~
+2 1             0.16990~ -0.541~ -0.037~ 0.0534~ 0.1444~ -0.353~ -0.057~ 0.5181~
+3 1             0.16990~ -0.541~ -0.037~ 0.0534~ 0.1444~ -0.353~ -0.057~ 0.5181~
+4 1             0.16990~ -0.541~ -0.037~ 0.0534~ 0.1444~ -0.353~ -0.057~ 0.5181~
+5 1             0.16990~ -0.541~ -0.037~ 0.0534~ 0.1444~ -0.353~ -0.057~ 0.5181~
 # ... with 95 more rows, 28 more variables: `s(x0).9` <matrix>, ...
 > ## IGNORE_RDIFF_END
 > ## Don't show: 
@@ -1787,7 +1788,7 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
 > 
 > ## Don't show: 
 > set.seed(1)
-> op <- options(digits = 4, cli.unicode = FALSE)
+> op <- options(pillar.sigfig = 4, cli.unicode = FALSE)
 > ## End(Don't show)
 > ## load mgcv
 > load_mgcv()
@@ -1800,18 +1801,18 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
 > ## extract partial residuals
 > partial_residuals(m)
 # A tibble: 400 x 4
-   `s(x0)` `s(x1)` `s(x2)` `s(x3)`
-     <dbl>   <dbl>   <dbl>   <dbl>
- 1  -0.353 -1.32    -2.18   0.608 
- 2  -0.123  0.501   -1.77   0.961 
- 3   1.43   1.52     5.61   0.991 
- 4  -1.11  -1.70    -0.888 -0.659 
- 5  -2.12  -0.0138  -2.73  -3.01  
- 6   1.25  -1.22     3.91   0.0728
- 7  -0.522  3.02    -0.820 -1.02  
- 8   1.40   0.218    7.06   1.90  
- 9   2.80   0.497    7.33   2.50  
-10   1.15  -0.227    0.720  0.744 
+   `s(x0)`  `s(x1)` `s(x2)`  `s(x3)`
+     <dbl>    <dbl>   <dbl>    <dbl>
+ 1 -0.3527 -1.321   -2.180   0.6077 
+ 2 -0.1233  0.5013  -1.775   0.9613 
+ 3  1.429   1.515    5.609   0.9910 
+ 4 -1.110  -1.700   -0.8882 -0.6593 
+ 5 -2.120  -0.01378 -2.733  -3.012  
+ 6  1.254  -1.224    3.915   0.07275
+ 7 -0.5220  3.023   -0.8197 -1.019  
+ 8  1.398   0.2184   7.055   1.897  
+ 9  2.797   0.4969   7.329   2.498  
+10  1.151  -0.2267   0.7202  0.7437 
 # ... with 390 more rows
 > 
 > ## and for a select term
@@ -1819,33 +1820,33 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
 # A tibble: 400 x 1
    `s(x2)`
      <dbl>
- 1  -2.18 
- 2  -1.77 
- 3   5.61 
- 4  -0.888
- 5  -2.73 
- 6   3.91 
- 7  -0.820
- 8   7.06 
- 9   7.33 
-10   0.720
+ 1 -2.180 
+ 2 -1.775 
+ 3  5.609 
+ 4 -0.8882
+ 5 -2.733 
+ 6  3.915 
+ 7 -0.8197
+ 8  7.055 
+ 9  7.329 
+10  0.7202
 # ... with 390 more rows
 > 
 > ## or with partial matching
 > partial_residuals(m, select = "x", partial_match = TRUE) # returns all
 # A tibble: 400 x 4
-   `s(x0)` `s(x1)` `s(x2)` `s(x3)`
-     <dbl>   <dbl>   <dbl>   <dbl>
- 1  -0.353 -1.32    -2.18   0.608 
- 2  -0.123  0.501   -1.77   0.961 
- 3   1.43   1.52     5.61   0.991 
- 4  -1.11  -1.70    -0.888 -0.659 
- 5  -2.12  -0.0138  -2.73  -3.01  
- 6   1.25  -1.22     3.91   0.0728
- 7  -0.522  3.02    -0.820 -1.02  
- 8   1.40   0.218    7.06   1.90  
- 9   2.80   0.497    7.33   2.50  
-10   1.15  -0.227    0.720  0.744 
+   `s(x0)`  `s(x1)` `s(x2)`  `s(x3)`
+     <dbl>    <dbl>   <dbl>    <dbl>
+ 1 -0.3527 -1.321   -2.180   0.6077 
+ 2 -0.1233  0.5013  -1.775   0.9613 
+ 3  1.429   1.515    5.609   0.9910 
+ 4 -1.110  -1.700   -0.8882 -0.6593 
+ 5 -2.120  -0.01378 -2.733  -3.012  
+ 6  1.254  -1.224    3.915   0.07275
+ 7 -0.5220  3.023   -0.8197 -1.019  
+ 8  1.398   0.2184   7.055   1.897  
+ 9  2.797   0.4969   7.329   2.498  
+10  1.151  -0.2267   0.7202  0.7437 
 # ... with 390 more rows
 > ## Don't show: 
 > options(op)
@@ -2113,7 +2114,7 @@ Levels: a b c d e
 > 
 > load_mgcv()
 > ## Don't show: 
-> op <- options(cli.unicode = FALSE, digits = 6)
+> op <- options(cli.unicode = FALSE, pillar.sigfig = 6)
 > ## End(Don't show)
 > df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
 > 
@@ -2123,18 +2124,18 @@ Levels: a b c d e
 > rg <- rootogram(m)
 > rg
 # A tibble: 21 x 3
-     bin observed fitted
-   <dbl>    <int>  <dbl>
- 1     0      113 117.  
- 2     1      236 228.  
- 3     2      230 239.  
- 4     3      200 182.  
- 5     4       94 113.  
- 6     5       68  62.5 
- 7     6       27  31.7 
- 8     7       22  15.1 
- 9     8        4   6.89
-10     9        3   3.00
+     bin observed    fitted
+   <dbl>    <int>     <dbl>
+ 1     0      113 116.640  
+ 2     1      236 227.869  
+ 3     2      230 239.168  
+ 4     3      200 181.679  
+ 5     4       94 113.432  
+ 6     5       68  62.4881 
+ 7     6       27  31.6795 
+ 8     7       22  15.1323 
+ 9     8        4   6.88637
+10     9        3   2.99628
 # ... with 11 more rows
 > draw(rg) # plot the rootogram
 > 
@@ -2197,7 +2198,7 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > ## Don't show: 
-> op <- options(digits = 3)
+> op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 > ## End(Don't show)
 > load_mgcv()
 > df <- data_sim("eg1", seed = 2)
@@ -2205,8 +2206,10 @@ detaching ‘package:mgcv’
 > 
 > ## IGNORE_RDIFF_BEGIN
 > smooth_coefs(m, term = "s(x2)")
-s(x2).1 s(x2).2 s(x2).3 s(x2).4 s(x2).5 s(x2).6 s(x2).7 s(x2).8 s(x2).9 
-  -6.53    9.69    2.19    1.97   -2.37    1.21   -1.57    9.27    5.62 
+  s(x2).1   s(x2).2   s(x2).3   s(x2).4   s(x2).5   s(x2).6   s(x2).7   s(x2).8 
+-6.533373  9.694277  2.194078  1.967280 -2.374874  1.207638 -1.572586  9.269744 
+  s(x2).9 
+ 5.622738 
 > ## IGNORE_RDIFF_END
 > ## Don't show: 
 > options(op)
@@ -2231,7 +2234,7 @@ detaching ‘package:mgcv’
 > 
 > 
 > ## Don't show: 
-> op <- options(cli.unicode = FALSE, digits = 4)
+> op <- options(cli.unicode = FALSE, pillar.sigfig = 4)
 > ## End(Don't show)
 > load_mgcv()
 > df <- data_sim("eg1", seed = 42)
@@ -2240,36 +2243,36 @@ detaching ‘package:mgcv’
 > # generate data over range of x1 for smooth s(x1)
 > smooth_data(m, id = 2)
 # A tibble: 100 x 1
-         x1
-      <dbl>
- 1 0.000405
- 2 0.0105  
- 3 0.0205  
- 4 0.0306  
- 5 0.0406  
- 6 0.0507  
- 7 0.0607  
- 8 0.0708  
- 9 0.0809  
-10 0.0909  
+          x1
+       <dbl>
+ 1 0.0004050
+ 2 0.01046  
+ 3 0.02052  
+ 4 0.03057  
+ 5 0.04063  
+ 6 0.05069  
+ 7 0.06074  
+ 8 0.07080  
+ 9 0.08086  
+10 0.09091  
 # ... with 90 more rows
 > 
 > # generate data over range of x1 for smooth s(x1), with typical value for
 > # other covariates in the model
 > smooth_data(m, id = 2, include_all = TRUE)
 # A tibble: 100 x 4
-         x1    x0    x2    x3
-      <dbl> <dbl> <dbl> <dbl>
- 1 0.000405 0.488 0.471 0.488
- 2 0.0105   0.488 0.471 0.488
- 3 0.0205   0.488 0.471 0.488
- 4 0.0306   0.488 0.471 0.488
- 5 0.0406   0.488 0.471 0.488
- 6 0.0507   0.488 0.471 0.488
- 7 0.0607   0.488 0.471 0.488
- 8 0.0708   0.488 0.471 0.488
- 9 0.0809   0.488 0.471 0.488
-10 0.0909   0.488 0.471 0.488
+          x1     x0     x2     x3
+       <dbl>  <dbl>  <dbl>  <dbl>
+ 1 0.0004050 0.4883 0.4708 0.4879
+ 2 0.01046   0.4883 0.4708 0.4879
+ 3 0.02052   0.4883 0.4708 0.4879
+ 4 0.03057   0.4883 0.4708 0.4879
+ 5 0.04063   0.4883 0.4708 0.4879
+ 6 0.05069   0.4883 0.4708 0.4879
+ 7 0.06074   0.4883 0.4708 0.4879
+ 8 0.07080   0.4883 0.4708 0.4879
+ 9 0.08086   0.4883 0.4708 0.4879
+10 0.09091   0.4883 0.4708 0.4879
 # ... with 90 more rows
 > 
 > ## Don't show: 
@@ -2295,7 +2298,7 @@ detaching ‘package:mgcv’
 > 
 > load_mgcv()
 > ## Don't show: 
-> op <- options(cli.unicode = FALSE, digits = 6)
+> op <- options(cli.unicode = FALSE, pillar.sigfig = 6)
 > ## End(Don't show)
 > dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
@@ -2303,35 +2306,35 @@ detaching ‘package:mgcv’
 > ## evaluate all smooths
 > smooth_estimates(m1)
 # A tibble: 400 x 9
-   smooth type  by       est    se      x0    x1    x2    x3
-   <chr>  <chr> <chr>  <dbl> <dbl>   <dbl> <dbl> <dbl> <dbl>
- 1 s(x0)  TPRS  <NA>  -0.967 0.316 0.00711    NA    NA    NA
- 2 s(x0)  TPRS  <NA>  -0.925 0.297 0.0171     NA    NA    NA
- 3 s(x0)  TPRS  <NA>  -0.884 0.279 0.0271     NA    NA    NA
- 4 s(x0)  TPRS  <NA>  -0.843 0.263 0.0371     NA    NA    NA
- 5 s(x0)  TPRS  <NA>  -0.802 0.247 0.0471     NA    NA    NA
- 6 s(x0)  TPRS  <NA>  -0.761 0.234 0.0571     NA    NA    NA
- 7 s(x0)  TPRS  <NA>  -0.719 0.222 0.0671     NA    NA    NA
- 8 s(x0)  TPRS  <NA>  -0.678 0.211 0.0772     NA    NA    NA
- 9 s(x0)  TPRS  <NA>  -0.636 0.202 0.0872     NA    NA    NA
-10 s(x0)  TPRS  <NA>  -0.595 0.195 0.0972     NA    NA    NA
+   smooth type  by          est       se         x0    x1    x2    x3
+   <chr>  <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl> <dbl> <dbl>
+ 1 s(x0)  TPRS  <NA>  -0.966542 0.316118 0.00710904    NA    NA    NA
+ 2 s(x0)  TPRS  <NA>  -0.925391 0.297170 0.0171157     NA    NA    NA
+ 3 s(x0)  TPRS  <NA>  -0.884233 0.279256 0.0271224     NA    NA    NA
+ 4 s(x0)  TPRS  <NA>  -0.843050 0.262594 0.0371291     NA    NA    NA
+ 5 s(x0)  TPRS  <NA>  -0.801824 0.247376 0.0471358     NA    NA    NA
+ 6 s(x0)  TPRS  <NA>  -0.760536 0.233728 0.0571425     NA    NA    NA
+ 7 s(x0)  TPRS  <NA>  -0.719175 0.221701 0.0671492     NA    NA    NA
+ 8 s(x0)  TPRS  <NA>  -0.677736 0.211261 0.0771559     NA    NA    NA
+ 9 s(x0)  TPRS  <NA>  -0.636220 0.202303 0.0871626     NA    NA    NA
+10 s(x0)  TPRS  <NA>  -0.594641 0.194685 0.0971693     NA    NA    NA
 # ... with 390 more rows
 > 
 > ## or selected smooths
 > smooth_estimates(m1, smooth = c("s(x0)", "s(x1)"))
 # A tibble: 200 x 7
-   smooth type  by       est    se      x0    x1
-   <chr>  <chr> <chr>  <dbl> <dbl>   <dbl> <dbl>
- 1 s(x0)  TPRS  <NA>  -0.967 0.316 0.00711    NA
- 2 s(x0)  TPRS  <NA>  -0.925 0.297 0.0171     NA
- 3 s(x0)  TPRS  <NA>  -0.884 0.279 0.0271     NA
- 4 s(x0)  TPRS  <NA>  -0.843 0.263 0.0371     NA
- 5 s(x0)  TPRS  <NA>  -0.802 0.247 0.0471     NA
- 6 s(x0)  TPRS  <NA>  -0.761 0.234 0.0571     NA
- 7 s(x0)  TPRS  <NA>  -0.719 0.222 0.0671     NA
- 8 s(x0)  TPRS  <NA>  -0.678 0.211 0.0772     NA
- 9 s(x0)  TPRS  <NA>  -0.636 0.202 0.0872     NA
-10 s(x0)  TPRS  <NA>  -0.595 0.195 0.0972     NA
+   smooth type  by          est       se         x0    x1
+   <chr>  <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl>
+ 1 s(x0)  TPRS  <NA>  -0.966542 0.316118 0.00710904    NA
+ 2 s(x0)  TPRS  <NA>  -0.925391 0.297170 0.0171157     NA
+ 3 s(x0)  TPRS  <NA>  -0.884233 0.279256 0.0271224     NA
+ 4 s(x0)  TPRS  <NA>  -0.843050 0.262594 0.0371291     NA
+ 5 s(x0)  TPRS  <NA>  -0.801824 0.247376 0.0471358     NA
+ 6 s(x0)  TPRS  <NA>  -0.760536 0.233728 0.0571425     NA
+ 7 s(x0)  TPRS  <NA>  -0.719175 0.221701 0.0671492     NA
+ 8 s(x0)  TPRS  <NA>  -0.677736 0.211261 0.0771559     NA
+ 9 s(x0)  TPRS  <NA>  -0.636220 0.202303 0.0871626     NA
+10 s(x0)  TPRS  <NA>  -0.594641 0.194685 0.0971693     NA
 # ... with 190 more rows
 > ## Don't show: 
 > options(op)
@@ -2416,7 +2419,7 @@ detaching ‘package:mgcv’
 > 
 > load_mgcv()
 > ## Don't show: 
-> op <- options(digits = 3, cli.unicode = FALSE)
+> op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 > ## End(Don't show)
 > df <- data_sim("eg1", n = 400, seed = 42)
 > 
@@ -2504,7 +2507,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  19.96 0.224 20.145 0 0 
+Time elapsed:  43.665 0.347 43.967 0 0 
 > grDevices::dev.off()
 null device 
           1 

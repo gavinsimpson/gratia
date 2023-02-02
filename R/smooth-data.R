@@ -26,7 +26,7 @@
 #'
 #' @examples
 #'
-#' \dontshow{op <- options(cli.unicode = FALSE, digits = 4)}
+#' \dontshow{op <- options(cli.unicode = FALSE, pillar.sigfig = 4)}
 #' load_mgcv()
 #' df <- data_sim("eg1", seed = 42)
 #' m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df)

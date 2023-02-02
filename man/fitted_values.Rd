@@ -55,7 +55,7 @@ scale, not the response scale.
 \examples{
 load_mgcv()
 \dontshow{
-op <- options(cli.unicode = FALSE, digits = 6)
+op <- options(cli.unicode = FALSE, pillar.sigfig = 6)
 }
 sim_df <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = sim_df, method = "REML")

@@ -28,7 +28,7 @@
 #'
 #' load_mgcv()
 #' \dontshow{
-#' op <- options(digits = 3, cli.unicode = FALSE)
+#' op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 #' }
 #' df <- data_sim("eg4", seed = 42)
 #' m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")

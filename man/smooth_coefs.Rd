@@ -46,7 +46,7 @@ Returns a vector of model coefficients of the parametric terms that represent
 the supplied smooth.
 }
 \examples{
-\dontshow{op <- options(digits = 3)}
+\dontshow{op <- options(pillar.sigfig = 3, cli.unicode = FALSE)}
 load_mgcv()
 df <- data_sim("eg1", seed = 2)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
