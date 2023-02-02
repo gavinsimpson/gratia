@@ -1,4 +1,4 @@
-# gratia 0.8.0.93
+# gratia 0.8.1
 
 ## User visible changes
 
@@ -6,6 +6,8 @@
   that have their correct name. Previously variables were named `.x1`, `.x2`,
   etc. Fixing #126 and improving compatibility with `compare_smooths()` and
   `smooth_estimates()` allowed the variables to be named correctly.
+
+* *gratia* now depends on version 1.8-41 or later of the *mgcv* package.
 
 ## New features
 
@@ -15,8 +17,7 @@
 
 ## Bug fixes
 
-* Additional fixes for changes in dplyr 1.1.0 (which is in the process of being
-  released through CRAN)
+* Additional fixes for changes in dplyr 1.1.0.
 
 * `smooth_samples()` now works when sampling from posteriors of multiple smooths
   with different dimension. #126 reported by @Aariq
