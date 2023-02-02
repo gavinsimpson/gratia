@@ -77,15 +77,9 @@ by variable will be named here, \code{NA_character_} otherwise.
 posterior draw that each row belongs to.
 \item \code{value}; numeric. The value of smooth function for this posterior draw
 and covariate combination.
-\item \code{.xN}; numeric. A series of one or more columns containing data required
-for the smooth. \code{.x1} will always be present and contains the values of
-the covariate in the smooth. For example if \code{smooth} is \code{s(z)} then
-\code{.x1} will contain the values of covariate \code{z} at which the smooth was
-evaluated. Further covariates for multi-dimensional thin plate splines
-(e.g. \code{s(x, z)}) or tensor product smooths (e.g. \code{te(x,z,a)}) will
-result in variables \code{.x1} and \code{.x2}, and \code{.x1}, \code{.x2}, and \code{.x3}
-respectively, with the number (\code{1}, \code{2}, etc) representing the order
-in which the covariates were specified in the smooth.
+\item \code{xxx}; numeric. A series of one or more columns containing data required
+for the smooth, named as per the variables involved in the respective
+smooth.
 \item Additional columns will be present in the case of factor by smooths,
 which will contain the level for the factor named in \code{by_variable} for
 that particular posterior draw.
