@@ -35,9 +35,25 @@ new observations.}
 if \code{FALSE}, only the covariates involved in the smooth will be included in
 the returned data frame. If \code{TRUE}, a representative value will be included
 for all other covariates in the model that aren't actually used in the
-model. This can be useful if you want to pass the returned data frame on to
-\code{\link[mgcv:smoothCon]{mgcv::PredictMat()}}.}
+smooth. This can be useful if you want to pass the returned data frame on
+to \code{\link[mgcv:smoothCon]{mgcv::PredictMat()}}.}
 }
 \description{
 Generate regular data over the covariates of a smooth
+}
+\examples{
+
+\dontshow{op <- options(cli.unicode = FALSE, digits = 4)}
+load_mgcv()
+df <- data_sim("eg1", seed = 42)
+m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df)
+
+# generate data over range of x1 for smooth s(x1)
+smooth_data(m, id = 2)
+
+# generate data over range of x1 for smooth s(x1), with typical value for
+# other covariates in the model
+smooth_data(m, id = 2, include_all = TRUE)
+
+\dontshow{options(op)}
 }

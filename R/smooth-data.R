@@ -14,15 +14,31 @@
 #'   if `FALSE`, only the covariates involved in the smooth will be included in
 #'   the returned data frame. If `TRUE`, a representative value will be included
 #'   for all other covariates in the model that aren't actually used in the
-#'   model. This can be useful if you want to pass the returned data frame on to
-#'   [mgcv::PredictMat()].
-#' 
+#'   smooth. This can be useful if you want to pass the returned data frame on
+#'   to [mgcv::PredictMat()].
+#'
 #' @export
-#' 
+#'
 #' @importFrom dplyr bind_cols setdiff
 #' @importFrom tibble as_tibble
 #' @importFrom rlang exec !!!
 #' @importFrom tidyr expand_grid
+#'
+#' @examples
+#'
+#' \dontshow{op <- options(cli.unicode = FALSE, digits = 4)}
+#' load_mgcv()
+#' df <- data_sim("eg1", seed = 42)
+#' m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df)
+#'
+#' # generate data over range of x1 for smooth s(x1)
+#' smooth_data(m, id = 2)
+#'
+#' # generate data over range of x1 for smooth s(x1), with typical value for
+#' # other covariates in the model
+#' smooth_data(m, id = 2, include_all = TRUE)
+#'
+#' \dontshow{options(op)}
 `smooth_data` <- function(model, id, n = 100, n_3d = NULL, n_4d = NULL,
                           offset = NULL, include_all = FALSE) {
     mf <- model.frame(model)           # model.frame used to fit model
@@ -76,7 +92,7 @@
         }
         seq_min_max_wrapper <- function(i, data, vars, n) {
             out <- seq_min_max(data[[vars[i]]], n = n[i])
-            if (i > 2L) {
+            if (i > 2L && !(is.factor(data[[vars[i]]]))) {
                 out <- round(out, 3)
             }
             out
