@@ -10,8 +10,8 @@
 ## New features
 
 * `draw.gam()` can now handle tensor products that include a marginal random
-  effect smooth. Beware plotting such smooths if there are a large number of
-  levels, however, as a separate surface plot will be produced for each level.
+  effect smooth. Beware plotting such smooths if there are many levels,
+  however, as a separate surface plot will be produced for each level.
 
 ## Bug fixes
 
