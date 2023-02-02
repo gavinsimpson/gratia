@@ -1,9 +1,25 @@
-# gratia 0.8.0.90
+# gratia 0.8.0.92
+
+## User visible changes
+
+* `smooth_samples()` now returns objects with variables involved in smooths
+  that have their correct name. Previously variables were named `.x1`, `.x2`,
+  etc. Fixing #126 and improving compatibility with `compare_smooths()` and
+  `smooth_estimates()` allowed the variables to be named correctly.
+
+## New features
+
+* `draw.gam()` can now handle tensor products that include a marginal random
+  effect smooth. Beware plotting such smooths if there are many levels,
+  however, as a separate surface plot will be produced for each level.
 
 ## Bug fixes
 
 * Additional fixes for changes in dplyr 1.1.0 (which is in the process of being
   released through CRAN)
+
+* `smooth_samples()` now works when sampling from posteriors of multiple smooths
+  with different dimension. #126 reported by @Aariq
 
 # gratia 0.8.0
 

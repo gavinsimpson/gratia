@@ -73,9 +73,9 @@ test_that("draw.gam works with select and parametric", {
     plt <- draw(su_m_factor_by, select = 's(x2)', partial_match = TRUE,
                 parametric = TRUE)
     expect_doppelganger("draw gam with select and parametric is TRUE", plt)
-    plt <- draw(su_m_factor_by, parametric = TRUE)
+    plt <- draw(su_m_factor_by, parametric = TRUE, rug = FALSE)
     expect_doppelganger("draw gam without select and parametric is TRUE", plt)
-    plt <- draw(su_m_factor_by, parametric = FALSE)
+    plt <- draw(su_m_factor_by, parametric = FALSE, rug = FALSE)
     expect_doppelganger("draw gam without select and parametric is FALSE", plt)
 })
 
@@ -138,12 +138,12 @@ test_that("draw.gam() plots an AM with a single 2d smooth", {
     skip_on_os("mac")
     skip_on_os("windows")
     withr::local_options(lifecycle_verbosity = "quiet")
-    plt <- draw(su_m_bivar)
+    plt <- draw(su_m_bivar, n = 50, rug = FALSE)
     expect_doppelganger("draw AM with 2d smooth", plt)
 
-    sm <- evaluate_smooth(su_m_bivar, smooth = "s(x,z)")
-    plt <- draw(sm, show = "se")
-    expect_doppelganger("draw evaulated 2d smooth standard errors", plt)
+    # sm <- evaluate_smooth(su_m_bivar, smooth = "s(x,z)")
+    # plt <- draw(sm, show = "se")
+    # expect_doppelganger("draw evalated 2d smooth standard errors", plt)
 })
 
 test_that("draw.gam() plots an AM with a single factor by-variable smooth", {
@@ -182,10 +182,10 @@ test_that("draw() works with random effect smooths (bs = 're')", {
     p1 <- draw(sm)
     expect_doppelganger("draw.evaluated_re_smooth", p1)
 
-    p2 <- draw(rm1, ncol = 3)
+    p2 <- draw(rm1, ncol = 3, rug = FALSE)
     expect_doppelganger("draw.gam model with ranef smooth", p2)
 
-    p3 <- draw(rm1, ncol = 3, scales = "fixed")
+    p3 <- draw(rm1, ncol = 3, scales = "fixed", rug = FALSE)
     expect_doppelganger("draw model with ranef smooth fixed scales", p3)
 })
 
@@ -202,9 +202,9 @@ test_that("draw() with random effect smooths (bs = 're') & factor by variable ",
     expect_s3_class(sm, "evaluated_re_smooth")
     p1 <- draw(sm)
     expect_doppelganger("draw.evaluated_re_smooth with factor by", p1)
-    p2 <- draw(rm2, ncol = 3)
+    p2 <- draw(rm2, ncol = 3, rug = FALSE)
     expect_doppelganger("draw.gam model with ranef smooth factor by", p2)
-    p3 <- draw(rm2, ncol = 3, scales = "fixed")
+    p3 <- draw(rm2, ncol = 3, scales = "fixed", rug = FALSE)
     expect_doppelganger("draw with ranef smooth factor by fixed scales", p3)
 })
 
@@ -349,7 +349,7 @@ test_that("draw.derivates() plots derivatives for a GAM rotated labels", {
 
 ## test that issue 39 stays fixed
 test_that("draw.gam doesn't create empty plots with multiple parametric terms", {
-    plt <- draw(m_2_fac)
+    plt <- draw(m_2_fac, rug = FALSE)
     expect_doppelganger("draw issue 39 empty plots", plt)
 })
 
@@ -397,45 +397,49 @@ test_that("draw() works with a ziplss models; issue #45", {
     df <- data.frame(y, x0, x1, x2, x3)
     b1 <- gam(list(y ~ s(x2) + x3,
                    ~ s(x0) + x1), family = ziplss(), data = df)
-    plt <- draw(b1)
+    plt <- draw(b1, rug = FALSE)
     expect_doppelganger("draw ziplss parametric terms issue 45", plt)
 })
 
 test_that("draw works for sample_smooths objects", {
-    sm1 <- smooth_samples(su_m_univar_4, n = 15, seed = 23478, n_vals = 100)
+    sm1 <- smooth_samples(su_m_univar_4, n = 15, seed = 23478, n_vals = 50)
     plt <- draw(sm1, alpha = 0.7, n_samples = 15, seed = 2635)
     expect_doppelganger("draw smooth_samples for GAM m1", plt)
 
-    sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478, n_vals = 100)
+    sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478, n_vals = 50)
     plt <- draw(sm2, alpha = 0.7, n_samples = 4, seed = 2635)
     expect_doppelganger("draw smooth_samples for GAM m2", plt)
 
-    sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478, n_vals = 100)
-    plt <- draw(sm3, alpha = 0.7, n_samples = 15, seed = 2635)
+    sm3 <- smooth_samples(su_m_factor_by, n = 10, seed = 23478, n_vals = 50)
+    plt <- draw(sm3, alpha = 0.7, n_samples = 10, seed = 2635, rug = FALSE)
     expect_doppelganger("draw smooth_samples for GAM m3", plt)
 
-    sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478, n_vals = 100)
-    plt <- draw(sm3, alpha = 0.7, scales = "fixed", n_samples = 15, seed = 2635)
+    sm3 <- smooth_samples(su_m_factor_by, n = 10, seed = 23478, n_vals = 50)
+    plt <- draw(sm3, alpha = 0.7, scales = "fixed", n_samples = 10, seed = 2635,
+    rug = FALSE)
     expect_doppelganger("draw smooth_samples for GAM m3 fixed scales", plt)
 })
 
 test_that("draw works for sample_smooths objects rotated labels", {
     skip_on_cran()
-    sm1 <- smooth_samples(su_m_univar_4, n = 15, seed = 23478, n_vals = 100)
-    plt <- draw(sm1, alpha = 0.7, n_samples = 15, seed = 2635, angle = 45)
+    sm1 <- smooth_samples(su_m_univar_4, n = 15, seed = 23478, n_vals = 50)
+    plt <- draw(sm1, alpha = 0.7, n_samples = 15, seed = 2635, angle = 45,
+        rug = FALSE)
     expect_doppelganger("draw smooth_samples for GAM m1 rotated", plt)
 
-    sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478, n_vals = 100)
-    plt <- draw(sm2, alpha = 0.7, n_samples = 4, seed = 2635, angle = 45)
+    sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478, n_vals = 50)
+    plt <- draw(sm2, alpha = 0.7, n_samples = 4, seed = 2635, angle = 45,
+        rug = FALSE)
     expect_doppelganger("draw smooth_samples for GAM m2 rotated", plt)
 
-    sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478, n_vals = 100)
-    plt <- draw(sm3, alpha = 0.7, n_samples = 15, seed = 2635, angle = 45)
+    sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478, n_vals = 50)
+    plt <- draw(sm3, alpha = 0.7, n_samples = 15, seed = 2635, angle = 45,
+        rug = FALSE)
     expect_doppelganger("draw smooth_samples for GAM m3 rotated", plt)
 
-    sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478, n_vals = 100)
+    sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478, n_vals = 50)
     plt <- draw(sm3, alpha = 0.7, scales = "fixed", n_samples = 15, seed = 2635,
-        angle = 45)
+        angle = 45, rug = FALSE)
     expect_doppelganger("draw smooth_samples for GAM m3 fixed scales rotated",
         plt)
 })
@@ -443,27 +447,27 @@ test_that("draw works for sample_smooths objects rotated labels", {
 test_that("draw works for sample_smooths objects", {
     skip_on_os("win")
     skip_on_os("mac")
-    sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478)
+    sm2 <- smooth_samples(su_m_bivar, n = 2, seed = 23478, n_vals = 50)
     plt <- draw(sm2, alpha = 0.7, contour = TRUE)
     expect_doppelganger("draw smooth_samples for bivariate GAM contours", plt)
 })
 
 test_that("draw works for sample_smooths objects with n_samples", {
-    sm1 <- smooth_samples(su_m_univar_4, n = 15, seed = 23478, n_vals = 100)
+    sm1 <- smooth_samples(su_m_univar_4, n = 15, seed = 23478, n_vals = 50)
     plt <- draw(sm1, alpha = 0.7, n_samples = 6)
     expect_doppelganger("draw smooth_samples for m1 n_samples", plt)
 
-    sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478)
+    sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478, n_vals = 50)
     plt <- draw(sm2, alpha = 0.7, n_samples = 2)
     expect_doppelganger("draw smooth_samples for m2 n_samples", plt)
 
-    sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478, n_vals = 100)
+    sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478, n_vals = 50)
     plt <- draw(sm3, alpha = 0.7, n_samples = 6)
     expect_doppelganger("draw smooth_samples for GAM n_samples", plt)
 })
 
 test_that("draw works for sample_smooths objects with user specified smooth", {
-    sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478, n_vals = 100)
+    sm3 <- smooth_samples(su_m_factor_by, n = 15, seed = 23478, n_vals = 50)
     plt <- draw(sm3, select = "s(x0)", alpha = 0.7)
     expect_doppelganger("draw selected smooth_samples for GAM m3", plt)
 

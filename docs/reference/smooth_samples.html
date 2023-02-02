@@ -14,7 +14,7 @@ functions."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.90</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.92</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -166,15 +166,9 @@ by variable will be named here, <code>NA_character_</code> otherwise.</p></li>
 posterior draw that each row belongs to.</p></li>
 <li><p><code>value</code>; numeric. The value of smooth function for this posterior draw
 and covariate combination.</p></li>
-<li><p><code>.xN</code>; numeric. A series of one or more columns containing data required
-for the smooth. <code>.x1</code> will always be present and contains the values of
-the covariate in the smooth. For example if <code>smooth</code> is <code>s(z)</code> then
-<code>.x1</code> will contain the values of covariate <code>z</code> at which the smooth was
-evaluated. Further covariates for multi-dimensional thin plate splines
-(e.g. <code>s(x, z)</code>) or tensor product smooths (e.g. <code>te(x,z,a)</code>) will
-result in variables <code>.x1</code> and <code>.x2</code>, and <code>.x1</code>, <code>.x2</code>, and <code>.x3</code>
-respectively, with the number (<code>1</code>, <code>2</code>, etc) representing the order
-in which the covariates were specified in the smooth.</p></li>
+<li><p><code>xxx</code>; numeric. A series of one or more columns containing data required
+for the smooth, named as per the variables involved in the respective
+smooth.</p></li>
 <li><p>Additional columns will be present in the case of factor by smooths,
 which will contain the level for the factor named in <code>by_variable</code> for
 that particular posterior draw.</p></li>
@@ -202,18 +196,18 @@ change in future versions. Don't rely on position.</p>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="va">sms</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1,000 x 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    smooth term  type  by_variable     .x1   row  draw  value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>          0.007<span style="text-decoration: underline;">11</span>     1     1 -<span style="color: #BB0000;">0.981</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>          0.012<span style="text-decoration: underline;">1</span>      2     1 -<span style="color: #BB0000;">0.951</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>          0.017<span style="text-decoration: underline;">1</span>      3     1 -<span style="color: #BB0000;">0.922</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>          0.022<span style="text-decoration: underline;">0</span>      4     1 -<span style="color: #BB0000;">0.892</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>          0.027<span style="text-decoration: underline;">0</span>      5     1 -<span style="color: #BB0000;">0.863</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>          0.032<span style="text-decoration: underline;">0</span>      6     1 -<span style="color: #BB0000;">0.833</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>          0.037<span style="text-decoration: underline;">0</span>      7     1 -<span style="color: #BB0000;">0.804</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>          0.042<span style="text-decoration: underline;">0</span>      8     1 -<span style="color: #BB0000;">0.774</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>          0.046<span style="text-decoration: underline;">9</span>      9     1 -<span style="color: #BB0000;">0.744</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>          0.051<span style="text-decoration: underline;">9</span>     10     1 -<span style="color: #BB0000;">0.714</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    smooth term  type  by_variable   row  draw  value      x0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              1     1 -<span style="color: #BB0000;">0.940</span> 0.007<span style="text-decoration: underline;">11</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              1     2 -<span style="color: #BB0000;">1.08</span>  0.007<span style="text-decoration: underline;">11</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              1     3 -<span style="color: #BB0000;">1.11</span>  0.007<span style="text-decoration: underline;">11</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              1     4 -<span style="color: #BB0000;">1.18</span>  0.007<span style="text-decoration: underline;">11</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              1     5 -<span style="color: #BB0000;">1.04</span>  0.007<span style="text-decoration: underline;">11</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              2     1 -<span style="color: #BB0000;">0.919</span> 0.012<span style="text-decoration: underline;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              2     2 -<span style="color: #BB0000;">1.05</span>  0.012<span style="text-decoration: underline;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              2     3 -<span style="color: #BB0000;">1.09</span>  0.012<span style="text-decoration: underline;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              2     4 -<span style="color: #BB0000;">1.16</span>  0.012<span style="text-decoration: underline;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              2     5 -<span style="color: #BB0000;">1.01</span>  0.012<span style="text-decoration: underline;">1</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ... with 990 more rows</span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>

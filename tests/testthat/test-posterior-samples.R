@@ -31,7 +31,7 @@ test_that("smooth_samples works for a multi-smooth GAM", {
                           "tbl", "data.frame"))
     ## 2000 == 4 smooths * 5 * 100
     expect_identical(NROW(sm), 2000L)
-    expect_identical(NCOL(sm), 8L) # 8 cols, univatiate smooths
+    expect_identical(NCOL(sm), 11L) # 11 cols, 4 univatiate smooths
 })
 
 test_that("smooth_samples works for a multi-smooth factor by GAM", {
@@ -41,7 +41,7 @@ test_that("smooth_samples works for a multi-smooth factor by GAM", {
                           "tbl", "data.frame"))
     ## 2000 == 1 + (1 * 3) smooths * 5 * 50
     expect_identical(NROW(sm), 1000L)
-    expect_identical(NCOL(sm), 9L) # 9 cols, univatiate smooths with factor
+    expect_identical(NCOL(sm), 10L) # 10 cols, univatiate smooths with factor
 })
 
 test_that("smooth_samples() fails if not suitable method available", {
@@ -167,7 +167,7 @@ test_that("predicted_samples() fails if not suitable method available", {
                  fixed = TRUE)
 })
 
-test_that("posterior_samples() fails if not suitable method available", {
+test_that("posterior_samples() fails if no suitable method available", {
     expect_error(posterior_samples(1:10),
                  "Don't know how to sample from the posterior of <integer>",
                  fixed = TRUE)

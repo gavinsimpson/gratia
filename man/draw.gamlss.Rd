@@ -61,9 +61,9 @@ if (require("GJRM", quietly = TRUE)) {
     y1 <- -1.55 + 2*x1 + f1(x2) + rnorm(n)
     dataSim <- data.frame(y1, x1, x2, x3)
 
-    eq.mu <- y1 ~ x1 + s(x2) + s(x3)
-    eq.s  <-    ~ s(x3)
-    fl    <- list(eq.mu, eq.s)
+    eq_mu <- y1 ~ x1 + s(x2)
+    eq_s  <-    ~ s(x3, k = 6)
+    fl    <- list(eq_mu, eq_s)
     m <- gamlss(fl, data = dataSim)
 
     draw(m)
