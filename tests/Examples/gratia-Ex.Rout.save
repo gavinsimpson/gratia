@@ -1383,16 +1383,15 @@ detaching ‘package:lme4’, ‘package:Matrix’, ‘package:mgcv’
 > ### ** Examples
 > 
 > ## Don't show: 
-> op <- options(pillar.sigfig = 4)
+> op <- options(digits = 4)
 > ## End(Don't show)
 > x <- seq(0, 1, length = 6)
 > gw_f0(x)
-[1] 0.000000e+00 1.175571e+00 1.902113e+00 1.902113e+00 1.175571e+00
-[6] 2.449294e-16
+[1] 0.000e+00 1.176e+00 1.902e+00 1.902e+00 1.176e+00 2.449e-16
 > gw_f1(x)
-[1] 1.000000 1.491825 2.225541 3.320117 4.953032 7.389056
+[1] 1.000 1.492 2.226 3.320 4.953 7.389
 > gw_f2(x)
-[1] 0.000000 8.591008 4.261214 3.198526 1.100036 0.000000
+[1] 0.000 8.591 4.261 3.199 1.100 0.000
 > gw_f3(x) # should be constant 0
 [1] 0 0 0 0 0 0
 > ## Don't show: 
@@ -1490,11 +1489,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x557fd2441618>
+<environment: 0x55b51c67e5d8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x557fd2441618>
+<environment: 0x55b51c67e5d8>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2507,7 +2506,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  43.665 0.347 43.967 0 0 
+Time elapsed:  19.972 0.167 20.1 0 0 
 > grDevices::dev.off()
 null device 
           1 
