@@ -31,7 +31,7 @@
 #'
 #' @examples
 #' load_mgcv()
-#' \dontshow{op <- options(cli.unicode = FALSE, digits = 6)}
+#' \dontshow{op <- options(cli.unicode = FALSE, pillar.sigfig = 5)}
 #' df <- data_sim("eg1", n = 400, seed = 42)
 #' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 #'

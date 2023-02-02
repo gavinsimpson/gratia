@@ -31,7 +31,7 @@ of the basis.
 \examples{
 load_mgcv()
 \dontshow{
-op <- options(digits = 3, cli.unicode = FALSE)
+op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 }
 df <- data_sim("eg1", n = 400, seed = 42)
 

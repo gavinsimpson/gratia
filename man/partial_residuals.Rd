@@ -33,7 +33,7 @@ Partial residuals
 \examples{
 \dontshow{
 set.seed(1)
-op <- options(digits = 4, cli.unicode = FALSE)
+op <- options(pillar.sigfig = 4, cli.unicode = FALSE)
 }
 ## load mgcv
 load_mgcv()

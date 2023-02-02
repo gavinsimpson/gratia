@@ -21,7 +21,7 @@
 #' @examples
 #' \dontshow{
 #' set.seed(1)
-#' op <- options(digits = 5, cli.unicode = FALSE)
+#' op <- options(pillar.sigfig = 5, cli.unicode = FALSE)
 #' }
 #' data_sim("eg1")
 #' \dontshow{options(op)}

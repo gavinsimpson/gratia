@@ -13,7 +13,7 @@
 #' @importFrom dplyr group_by %>%
 #'
 #' @examples
-#' \dontshow{op <- options(cli.unicode = FALSE, digits = 5)}
+#' \dontshow{op <- options(cli.unicode = FALSE, pillar.sigfig = 5)}
 #' load_mgcv()
 #' dat <- data_sim("eg1", seed = 2)
 #'
