@@ -1,3 +1,16 @@
+# gratia 0.8.1.1
+
+## New features
+
+* `data_sim()` can now simulate response data from Tweedie and ordered
+  categorical distributions.
+
+## Bug fixes
+
+* `link()`, `inv_link()`, and related family functions for the `ocat()` weren't
+  correctly identifying the family name and as a result would throw an error
+  even when passed an object of the correct family.
+
 # gratia 0.8.1
 
 ## User visible changes
@@ -49,8 +62,8 @@
 ## New features
 
 * Added basic support for GAMLSS (distributional GAMs) fitted with the
-  `gamlss()´ function from package GJRM. Support is currently restricted to a
-  `draw()´ method.
+  `gamlss()` function from package GJRM. Support is currently restricted to a
+  `draw()` method.
 
 * `difference_smooths()` can now include the group means in the difference,
   which many users expected. To include the group means use `group_means = TRUE`
