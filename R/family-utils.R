@@ -318,7 +318,7 @@ family_type.family <- function(object, ...) {
     if (grepl("^scaled t", distr, ignore.case = TRUE)) {
         distr <- "scaled_t"
     }
-    if (identical(distr, "Ordered Categorical")) {
+    if (grepl("^Ordered Categorical", distr)) {
         distr <- "ocat"
     }
     if (identical(distr, "zero inflated Poisson")) {
@@ -622,7 +622,7 @@ family_type.family <- function(object, ...) {
         ## check that family is of the correct type
         ##  - need to handle a couple of special types
         special <- c("Tweedie", "Negative Binomial", "negative binomial",
-                     "Scaled t", "scaled t")
+                     "Scaled t", "scaled t", "Ordered Categorical")
         if (type %in% special) {
             if (!grepl(type, fam, ignore.case = TRUE)) {
                 stop("'family' is not of type '\"", type, "\"'", call. = FALSE)
