@@ -13,21 +13,29 @@
 #' @param theta numeric; the dispersion parameter \eqn{\theta} to use. The
 #'   default is entirely arbitrary, chosen only to provide simulated data that
 #'   exhibits extra dispersion beyond that assumed by under a Poisson.
+#' @param n_cat integer; the number of categories for categorical response.
+#'   Currently only used for `distr %in% c("ocat", "ordered categorical")`.
+#' @param cuts numeric; vector of cut points on the latent variable, excluding
+#'   the end points `-Inf` and `Inf`. Must be one fewer than the number of
+#'   categories: `length(cuts) == n_cat - 1`.
 #' @param seed numeric; the seed for the random number generator. Passed to
 #'   [base::set.seed()].
 #'
 #' @export
 #'
 #' @examples
-#' \dontshow{
-#' set.seed(1)
-#' op <- options(pillar.sigfig = 5, cli.unicode = FALSE)
+#' \dontshow{op <- options(pillar.sigfig = 5, cli.unicode = FALSE)
 #' }
-#' data_sim("eg1")
+#' data_sim("eg1", n = 100, seed = 1)
+#'
+#' # an ordered categorical response
+#' data_sim("eg1", n = 100, dist = "ocat", n_cat = 4, cuts = c(-1, 0, 5))
 #' \dontshow{options(op)}
 `data_sim` <- function(model = "eg1", n = 400, scale = 2, theta = 3,
                        dist = c("normal", "poisson", "binary",
-                                "negbin", "tweedie"),
+                                "negbin", "tweedie",
+                                "ocat", "ordered categorical"),
+                       n_cat = 4, cuts = c(-1, 0, 5),
                        seed = NULL) {
     ## sort out the seed
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
@@ -45,13 +53,18 @@
 
     ## check dist is OK
     dist <- match.arg(dist)
+    special_dist <- c(ocat = "ordered categorical")
+    if (dist %in% special_dist) {
+        dist <- names(special_dist[dist])
+    }
 
     sim_fun <- switch(dist,
-                      normal  = sim_normal,
-                      poisson = sim_poisson,
-                      binary  = sim_binary,
-                      negbin  = sim_nb,
-                      tweedie = sim_tweedie)
+        normal  = sim_normal,
+        poisson = sim_poisson,
+        binary  = sim_binary,
+        negbin  = sim_nb,
+        tweedie = sim_tweedie,
+        ocat = sim_normal)
 
     model_fun <- switch(model,
                         eg1 = four_term_additive_model,
@@ -62,7 +75,23 @@
                         eg6 = four_term_plus_ranef_model,
                         eg7 = correlated_four_term_additive_model)
 
-    model_fun(n = n, sim_fun = sim_fun, scale = scale, theta = theta)
+    sim <- model_fun(n = n, sim_fun = sim_fun, scale = scale, theta = theta)
+
+    # some distributions will require post-processing, such as OCAT
+    post_proc_dists <- c("ocat")
+    post_proc_fun <- function(x, ...) { # default just returns it's input
+        x
+    }
+    if (dist %in% post_proc_dists) {
+        # post_proc_fun <- match.fun(paste0("post_proc_", dist))
+        post_proc_fun <- get(paste0("post_proc_", dist))
+    }
+
+    # post process
+    sim <- post_proc_fun(sim, n_cat = n_cat)
+
+    # return
+    sim
 }
 
 #' @importFrom stats rnorm
@@ -92,9 +121,42 @@
            f = log(lam))
 }
 
-`sim_tweedie` <- function(x, scale = 2, power = 1, ...) {
-    .NotYetImplemented()
+#' @importFrom mgcv rTweedie
+`sim_tweedie` <- function(x, scale = 2, power = 1.5, ...) {
+    mu <- exp((x / 3) + 0.1)
+    tibble(y = rTweedie(mu = mu, p = power, phi = scale),
+        f = log(mu))
 }
+
+# post-processing
+
+# post-process ocat - simulates normal data, but we need to convert to
+# categories.
+#' @importFrom dplyr mutate select left_join join_by
+#' @importFrom tibble tibble
+#' @importFrom rlang .data
+`post_proc_ocat` <- function(x, n_cat = 4, cuts = c(-1, 0, 5), ...) {
+    # follows example from ?ocat
+    n_cuts <- length(cuts)
+    if (!identical(as.integer(n_cat), as.integer(n_cuts + 1L))) {
+        stop("Number of cut points not equal to ", n_cat, "-1.")
+    }
+
+    alpha <- c(-Inf, cuts, Inf)
+    ru <- runif(nrow(x))
+    x <- mutate(x, f = .data$f - mean(.data$f),
+        latent = .data$f + log(ru / (1 - ru)))
+    cats <- seq_len(n_cat)
+    lkp_up <- tibble(cat = cats,
+        lower = alpha[cats], upper = alpha[cats + 1])
+    by <- join_by("latent" > "lower", "latent" <= "upper")
+    x <- left_join(x, lkp_up, by = by) |>
+        mutate(y = .data$cat) |>
+        select(-c("cat", "lower", "upper"))
+
+    x
+}
+
 
 ## Gu Wabha functions
 #' Gu and Wabha test functions
@@ -271,7 +333,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
     }
     params <- expand_grid(model = paste0("eg", 1:7),
                           dist  = c("normal", "poisson", "binary",
-                                    "negbin"),
+                                    "negbin", "ocat"),
                           scale = rep(scale, length.out = 1),
                           n = rep(n, length.out = 1),
                           seed = rep(seed, length.out = 1),
