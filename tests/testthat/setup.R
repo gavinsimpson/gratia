@@ -287,3 +287,8 @@ sw <- scam(Date ~ s(Depth, k = 5, bs = "mpd"), data = smallAges,
 dat <- sim_scam(n = 200, seed = 4)
 ## fit model, get results, and plot...
 m_scam <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "mpi"), data = dat)
+
+# Ordered categorical model ocat()
+su_eg1_ocat <- data_sim("eg1", n = 200, dist = "ordered categorical")
+m_ocat <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+  family = ocat(R = R), data = su_eg1_ocat, method = "REML")
