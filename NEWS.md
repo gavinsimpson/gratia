@@ -5,6 +5,13 @@
 * `data_sim()` can now simulate response data from Tweedie and ordered
   categorical distributions.
 
+* `fitted_values()` now works with models fitted using the `mgcv::ocat()`
+  family. The predicted probability for each category is returned, alongside a
+  Wald interval created using the standard error (SE) of the estimated
+  probability. The SE and estimated probabilities are transformed to the logit
+  (linear predictor) scale, a Wald credible interval is formed, which is then
+  back-transformed to the response (probability) scale.
+
 ## Bug fixes
 
 * `link()`, `inv_link()`, and related family functions for the `ocat()` weren't

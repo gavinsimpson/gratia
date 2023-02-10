@@ -53,9 +53,9 @@
 
     ## check dist is OK
     dist <- match.arg(dist)
-    special_dist <- c(ocat = "ordered categorical")
-    if (dist %in% special_dist) {
-        dist <- names(special_dist[dist])
+    special_dist <- c("ordered categorical" = "ocat")
+    if (dist %in% names(special_dist)) {
+        dist <- unname(special_dist[dist])
     }
 
     sim_fun <- switch(dist,

@@ -112,20 +112,25 @@ used to fit the model (if <code>data</code> was <code>NULL</code>), or the varia
 <li><p><code>se</code>: the standard error of the fitted values (always on the <em>link</em> scale),</p></li>
 <li><p><code>lower</code>, <code>upper</code>: the limits of the credible interval on the fitted values,
 on the specified scale.</p></li>
+</ul><p>Models fitted with certain families will include additional variables</p><ul><li><p><code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code> models: when <code>scale = "repsonse"</code>, the returned object will
+contain a <code>row</code> column and a <code>category</code> column, which indicate to which row
+of the <code>data</code> each row of the returned object belongs. Additionally, there
+will be <code>nrow(data) * n_categories</code> rows in the returned object; each row
+is the predicted probability for a single category of the response.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
-    <p>Regardless of the scale on which the fitted values are returned, the
-<code>se</code> component of the returned object is on the <em>link</em> (<em>linear predictor</em>)
-scale, not the response scale.</p>
+    <p>For most families, regardless of the scale on which the fitted values
+are returned, the <code>se</code> component of the returned object is on the <em>link</em>
+(<em>linear predictor</em>) scale, not the response scale. An exception is the
+<code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code> family, for which the <code>se</code> is on the response scale if
+<code>scale = "response"</code>.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># \dontshow{</span></span></span>
 <span class="r-in"><span><span class="va">op</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>cli.unicode <span class="op">=</span> <span class="cn">FALSE</span>, pillar.sigfig <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span><span class="va">sim_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">400</span>, dist <span class="op">=</span> <span class="st">"normal"</span>, scale <span class="op">=</span> <span class="fl">2</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">sim_df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fv</span> <span class="op">&lt;-</span> <span class="fu">fitted_values</span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></span>
