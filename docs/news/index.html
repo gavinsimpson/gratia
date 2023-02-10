@@ -60,6 +60,7 @@
 <h3 id="new-features-0-8-1-1">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-1-1"></a></h3>
 <ul><li><p><code><a href="../reference/data_sim.html">data_sim()</a></code> can now simulate response data from Tweedie and ordered categorical distributions.</p></li>
 <li><p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> now works with models fitted using the <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code> family. The predicted probability for each category is returned, alongside a Wald interval created using the standard error (SE) of the estimated probability. The SE and estimated probabilities are transformed to the logit (linear predictor) scale, a Wald credible interval is formed, which is then back-transformed to the response (probability) scale.</p></li>
+<li><p><code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> work for models fitted using the <code><a href="https://rdrr.io/pkg/mgcv/man/cnorm.html" class="external-link">cnorm()</a></code> family.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-8-1-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-1-1"></a></h3>

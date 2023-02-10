@@ -12,6 +12,8 @@
   (linear predictor) scale, a Wald credible interval is formed, which is then
   back-transformed to the response (probability) scale.
 
+* `link()` and `inv_link()` work for models fitted using the `cnorm()` family.
+
 ## Bug fixes
 
 * `link()`, `inv_link()`, and related family functions for the `ocat()` weren't
