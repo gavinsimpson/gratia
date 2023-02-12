@@ -289,6 +289,8 @@ dat <- sim_scam(n = 200, seed = 4)
 m_scam <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "mpi"), data = dat)
 
 # Ordered categorical model ocat()
-su_eg1_ocat <- data_sim("eg1", n = 200, dist = "ordered categorical")
+n_categories <- 4
+su_eg1_ocat <- data_sim("eg1", n = 200, dist = "ordered categorical",
+  n_cat = n_categories)
 m_ocat <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-  family = ocat(R = R), data = su_eg1_ocat, method = "REML")
+  family = ocat(R = n_categories), data = su_eg1_ocat, method = "REML")
