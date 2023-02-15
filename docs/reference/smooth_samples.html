@@ -14,7 +14,7 @@ functions."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,13 +75,19 @@ functions.</p>
 <span>  term <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">newdata</span>,</span>
+<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"mh"</span>, <span class="st">"inla"</span>, <span class="st">"user"</span><span class="op">)</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  freq <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  ncores <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  n_cores <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  n_vals <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>  burnin <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  thin <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  t_df <span class="op">=</span> <span class="fl">40</span>,</span>
+<span>  rw_scale <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  newdata <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ncores <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -112,6 +118,17 @@ from the model should be evaluated. If not supplied, the data used to fit
 the model will be used for <code>data</code>, if available in <code>model</code>.</p></dd>
 
 
+<dt>method</dt>
+<dd><p>character; which method should be used to draw samples from
+the posterior distribution. <code>"gaussian"</code> uses a Gaussian (Laplace)
+approximation to the posterior. <code>"mh"</code> uses a Metropolis Hastings sample
+that alternates t proposals with proposals based on a shrunken version of
+the posterior covariance matrix. <code>"inla"</code> uses a variant of Integrated
+Nested Laplace Approximation due to Wood (2019), (currently not
+implemented). <code>"user"</code> allows for user-supplied posterior draws
+(currently not implemented).</p></dd>
+
+
 <dt>seed</dt>
 <dd><p>numeric; a random seed for the simulations.</p></dd>
 
@@ -128,7 +145,7 @@ Bayesian smoothing parameter uncertainty corrected covariance matrix is
 used, if available.</p></dd>
 
 
-<dt>ncores</dt>
+<dt>n_cores</dt>
 <dd><p>number of cores for generating random variables from a
 multivariate normal distribution. Passed to <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code>.
 Parallelization will take place only if OpenMP is supported (but appears
@@ -140,8 +157,37 @@ to work on Windows with current <code>R</code>).</p></dd>
 <code>data</code> not supplied</p></dd>
 
 
+<dt>burnin</dt>
+<dd><p>numeric; number of samples to discard as the burnin draws.
+Only used with <code>method = "mh"</code>.</p></dd>
+
+
+<dt>thin</dt>
+<dd><p>numeric; the number of samples to skip when taking <code>n</code> draws.
+Results in <code>thin * n</code> draws from the posterior being taken. Only used with
+<code>method = "mh"</code>.</p></dd>
+
+
+<dt>t_df</dt>
+<dd><p>numeric; degrees of freedome for t distribution proposals. Only
+used with <code>method = "mh"</code>.</p></dd>
+
+
+<dt>rw_scale</dt>
+<dd><p>numeric; Factor by which to scale posterior covariance
+matrix when generating random walk proposals. Negative or non finite to
+skip the random walk step. Only used with <code>method = "mh"</code>.</p></dd>
+
+
 <dt>newdata</dt>
 <dd><p>Deprecated: use <code>data</code> instead.</p></dd>
+
+
+<dt>ncores</dt>
+<dd><p>Deprecated; use <code>n_cores</code> instead. The number of cores for
+generating random variables from a multivariate normal distribution.
+Passed to <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code>. Parallelization will take place only if
+OpenMP is supported (but appears to work on Windows with current <code>R</code>).</p></dd>
 
 </dl></div>
     <div class="section level2">
