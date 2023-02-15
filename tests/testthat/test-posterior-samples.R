@@ -25,6 +25,16 @@ test_that("smooth_samples works for a simple GAM", {
     expect_identical(NCOL(sm), 8L) # 8 cols, univatiate smooths
 })
 
+test_that("smooth_samples works for a simple GAM MH sampling", {
+    expect_silent(sm <- smooth_samples(m_1_smooth, n = 5, n_vals = 100,
+                                       method = "mh", seed = 42))
+    expect_s3_class(sm, c("smooth_samples", "posterior_samples", "tbl_df",
+                          "tbl", "data.frame"))
+    ## 500 == 1 smooth * 5 * 100
+    expect_identical(NROW(sm), 500L)
+    expect_identical(NCOL(sm), 8L) # 8 cols, univatiate smooths
+})
+
 test_that("smooth_samples works for a multi-smooth GAM", {
     expect_silent(sm <- smooth_samples(m_gam, n = 5, n_vals = 100, seed = 42))
     expect_s3_class(sm, c("smooth_samples", "posterior_samples", "tbl_df",
