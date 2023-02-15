@@ -1,9 +1,14 @@
-# gratia 0.8.1.1
+# gratia 0.8.1.2
 
 ## New features
 
 * `data_sim()` can now simulate response data from Tweedie and ordered
   categorical distributions.
+
+* `fitted_samples()` and `smooth_samples()` can now use the Metropolis Hastings
+  sampler from `mgcv::gam.mh()`, instead of a Gaussian approximation, to sample
+  from the posterior distribution of the model or specific smooths
+  respectively.
 
 * `fitted_values()` now works with models fitted using the `mgcv::ocat()`
   family. The predicted probability for each category is returned, alongside a
