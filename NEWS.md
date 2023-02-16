@@ -1,4 +1,4 @@
-# gratia 0.8.1.3
+# gratia 0.8.1.4
 
 ## User visible changes
 
@@ -38,6 +38,10 @@
 * `link()`, `inv_link()`, and related family functions for the `ocat()` weren't
   correctly identifying the family name and as a result would throw an error
   even when passed an object of the correct family.
+
+* The `print()` method for `lp_matrix()` now converts the matrix to a data frame
+  before conversion to a tibble. This makes more sense as it results in more
+  typical behaviour as the columns of the printed object are doubles.
 
 # gratia 0.8.1
 
