@@ -6,12 +6,6 @@ library("gratia")
 library("mgcv")
 library("ggplot2")
 
-## Need a local wrapper to allow conditional use of vdiffr
-# `expect_doppelganger` <- function(title, fig, ...) {
-#   testthat::skip_if_not_installed("vdiffr")
-#   vdiffr::expect_doppelganger(title, fig, ...)
-# }
-
 test_that("draw.evaluated_1d_smooth() plots the smooth", {
     withr::local_options(lifecycle_verbosity = "quiet")
     sm <- evaluate_smooth(su_m_univar_4, "s(x2)")
@@ -344,6 +338,31 @@ test_that("draw.derivates() plots derivatives for a GAM rotated labels", {
 
     plt <- draw(d1, scales = "fixed", angle = 45)
     expect_doppelganger("draw derivatives for a GAM with fixed scales rotated",
+        plt)
+})
+
+test_that("draw plots partial derivatives for a GAM", {
+    d1 <- partial_derivatives(su_m_bivar_te, term = "te(x,z)", focal = "z",
+        type = "central")
+    plt <- draw(d1)
+    expect_doppelganger("draw partial derivatives for a GAM", plt)
+
+    plt <- draw(d1, scales = "fixed")
+    ## skip_on_ci()
+    expect_doppelganger("draw partial derivatives for a GAM with fixed scales",
+        plt)
+})
+
+test_that("draw plots partial derivs for GAM rotated labels", {
+    skip_on_cran()
+    d1 <- partial_derivatives(su_m_bivar_te, term = "te(x,z)", focal = "z",
+        type = "central")
+    plt <- draw(d1, angle = 45)
+    expect_doppelganger("draw partial derivatives for GAM rotated labels",
+        plt)
+
+    plt <- draw(d1, scales = "fixed", angle = 45)
+    expect_doppelganger("draw partial derivatives for GAM fixed scales rotated",
         plt)
 })
 
