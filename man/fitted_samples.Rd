@@ -42,12 +42,14 @@ the model will be used for \code{data}, if available in \code{model}.}
 
 \item{scale}{character;}
 
-\item{method}{character; the method used to generate samples from the
-posterior distribution of the model. \code{"gaussian"}, the default, uses a
-Gaussian approximation to the posterior. \code{"mh"} uses a simple Metropolis
-Hastings sampler, while \code{"inla"} uses a variant of Integrated Nested
-Laplace Approximation due to Wood (2019). Currently, the only available
-option is \code{"gaussian"}.}
+\item{method}{character; which method should be used to draw samples from
+the posterior distribution. \code{"gaussian"} uses a Gaussian (Laplace)
+approximation to the posterior. \code{"mh"} uses a Metropolis Hastings sample
+that alternates t proposals with proposals based on a shrunken version of
+the posterior covariance matrix. \code{"inla"} uses a variant of Integrated
+Nested Laplace Approximation due to Wood (2019), (currently not
+implemented). \code{"user"} allows for user-supplied posterior draws
+(currently not implemented).}
 
 \item{n_cores}{number of cores for generating random variables from a
 multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
@@ -97,7 +99,7 @@ relates to,
 \description{
 Expectations (fitted values) of the response drawn from the posterior
 distribution of fitted model using a Gaussian approximation to the
-posterior.
+posterior or a simple Metropolis Hastings sampler.
 }
 \examples{
 load_mgcv()

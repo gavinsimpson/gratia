@@ -22,6 +22,7 @@ smooth_samples(model, ...)
   thin = 1,
   t_df = 40,
   rw_scale = 0.25,
+  rng_per_smooth = FALSE,
   ...,
   newdata = NULL,
   ncores = NULL
@@ -83,6 +84,11 @@ used with \code{method = "mh"}.}
 \item{rw_scale}{numeric; Factor by which to scale posterior covariance
 matrix when generating random walk proposals. Negative or non finite to
 skip the random walk step. Only used with \code{method = "mh"}.}
+
+\item{rng_per_smooth}{logical; if TRUE, the behaviour of gratia version
+0.8.1 or earlier is used, whereby a separate call the the random number
+generator (RNG) is performed for each smooth. If FALSE, a single call to the
+RNG is performed for all model parameters}
 
 \item{newdata}{Deprecated: use \code{data} instead.}
 

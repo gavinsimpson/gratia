@@ -1,4 +1,18 @@
-# gratia 0.8.1.2
+# gratia 0.8.1.3
+
+## User visible changes
+
+* `smooth_samples()` now uses a single call to the RNG to generate draws from
+  the posterior of smooths. Previous to version 0.9.0, `smooth_samples()` would
+  do a separate call to `mvnfast::rmvn()` for each smooth. As a result, the
+  result of a call to `smooth_samples()` on a model with multiple smooths will
+  now produce different results to those generated previously. To regain the
+  old behaviour, add `rng_per_smooth = TRUE` to the `smooth_samples()` call.
+  
+  Note, however, that using per-smooth RNG calls with `method = "mh"` will be
+  very inefficient as, with that method, posterior draws for all coefficients
+  in the model are sampled at once. So, only use `rng_per_smooth = TRUE` with
+  `method = "gaussian"`.
 
 ## New features
 
