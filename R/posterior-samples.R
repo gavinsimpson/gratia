@@ -88,14 +88,7 @@
 #'
 #' Expectations (fitted values) of the response drawn from the posterior
 #' distribution of fitted model using a Gaussian approximation to the
-#' posterior.
-#'
-#' @param method character; the method used to generate samples from the
-#'   posterior distribution of the model. `"gaussian"`, the default, uses a
-#'   Gaussian approximation to the posterior. `"mh"` uses a simple Metropolis
-#'   Hastings sampler, while `"inla"` uses a variant of Integrated Nested
-#'   Laplace Approximation due to Wood (2019). Currently, the only available
-#'   option is `"gaussian"`.
+#' posterior or a simple Metropolis Hastings sampler.
 #'
 #' @return A tibble (data frame) with 3 columns containing the posterior
 #'   predicted values in long format. The columns are
@@ -362,6 +355,10 @@
 #' @param term character; select which smooth's posterior to draw from.
 #'   The default (`NULL`) means the posteriors of all smooths in `model`
 #'   wil be sampled from. If supplied, a character vector of requested terms.
+#' @param rng_per_smooth logical; if TRUE, the behaviour of gratia version
+#' 0.8.1 or earlier is used, whereby a separate call the the random number
+#' generator (RNG) is performed for each smooth. If FALSE, a single call to the
+#' RNG is performed for all model parameters
 #'
 #' @section Warning:
 #' The set of variables returned and their order in the tibble is subject to
@@ -389,6 +386,7 @@
     thin = 1,
     t_df = 40,
     rw_scale = 0.25,
+    rng_per_smooth = FALSE,
     ...,
     newdata = NULL,
     ncores = NULL) {
@@ -445,9 +443,13 @@
     # what posterior sampling are we using
     method <- match.arg(method)
 
-    V <- get_vcov(model, frequentist = freq, unconditional = unconditional)
-
-    coefs <- coef(model)
+    # get posterior draws - call this once for all parameters
+    if (isFALSE(rng_per_smooth)) {
+        betas <- post_draws(n = n, method = method,
+            n_cores = n_cores, model = model,
+            burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
+            index = NULL, frequentist = freq, unconditional = unconditional)
+    }
 
     sims <- data_names <- vector('list', length = length(S))
     for (i in seq_along(S)) {
@@ -455,18 +457,22 @@
             # FIXME: should offset be NULL?
             data <- smooth_data(model, id = take[i], n = n_vals,
                                 offset = NULL)
-            ## I don't think we need offset here as that really just shifts the
-            ## response around
+            # I don't think we need offset here as that really just shifts the
+            # response around
         }
         sm  <- get_smooths_by_id(model, take[i])[[1L]]
         idx <- smooth_coef_indices(sm)
         Xp <- PredictMat(sm, data = data)
-        # get posterior draws
-        betas <- post_draws(n = n, method = method,
-            n_cores = n_cores, model = model,
-            burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-            index = idx, frequentist = freq, unconditional = unconditional)
-        simu <- Xp %*% t(betas)
+        # get posterior draws - use old behaviour? TRUE is yes
+        simu <- if (isTRUE(rng_per_smooth)) {
+            betas <- post_draws(n = n, method = method,
+                n_cores = n_cores, model = model,
+                burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
+                index = idx, frequentist = freq, unconditional = unconditional)
+            Xp %*% t(betas)
+        } else {
+            Xp %*% t(betas[, idx, drop = FALSE])
+        }
         colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
         simu <- as_tibble(simu)
         nr_simu <- nrow(simu)
@@ -480,7 +486,7 @@
                                by_variable = rep(NA_character_,
                                                  times = nr_simu))
         }
-    #   # add on spline type info
+        # add on spline type info
         sm_type <- smooth_type(sm)
         simu <- add_column(simu,
             smooth = rep(unlist(lapply(strsplit(S[[i]], ":"), `[`, 1L)),
@@ -493,9 +499,7 @@
         simu <- pivot_longer(simu, cols = dplyr::starts_with("..V"),
             names_to = "draw", values_to = "value",
             names_transform = \(x) as.integer(sub("\\.\\.V", "", x)))
-        # summ_names <- names(data[!vapply(data, is.factor, logical(1))])
-        # names(summ_names) <- paste0(".x", seq_along(summ_names))
-        # data_names[[i]] <- summ_names
+
         ## nest all columns with varying data
         simu <- nest(simu, data = all_of(c("row", "draw", "value",
             smooth_variable(sm))))
