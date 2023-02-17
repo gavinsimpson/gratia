@@ -173,8 +173,6 @@
 
     method <- match.arg(method)
 
-    V <- get_vcov(model, frequentist = freq, unconditional = unconditional)
-    # Rbeta <- rmvn(n = n, mu = coef(model), sigma = V, ncores = ncores)
     # get posterior draws
     betas <- post_draws(n = n, method = method,
         n_cores = n_cores, model = model,

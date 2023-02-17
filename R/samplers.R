@@ -27,6 +27,7 @@
     betas
 }
 
+#' @importFrom mvnfast rmvn
 `gaussian_draws` <- function(n, model, n_cores = 1L, index = NULL,
     frequentist = FALSE, unconditional = FALSE) {
     mu <- coef(model)
@@ -36,7 +37,7 @@
         mu <- mu[index]
         sigma <- sigma[index, index, drop = FALSE]
     }
-    betas <- rmvn(n = n, mu = mu, sigma = sigma, ncores = n_cores)
+    betas <- mvnfast::rmvn(n = n, mu = mu, sigma = sigma, ncores = n_cores)
     betas
 }
 
