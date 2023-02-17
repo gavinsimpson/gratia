@@ -430,7 +430,7 @@
     plt
 }
 
-#' @importFrom ggplot2 scale_fill_distiller guides guides_axis facet_wrap vars labs geom_contour coord_equal
+#' @importFrom ggplot2 scale_fill_distiller guides guide_axis facet_wrap vars labs geom_contour coord_equal
 `plot_bivariate_basis` <- function(object,
                                    legend = FALSE,
                                    labeller = NULL,
