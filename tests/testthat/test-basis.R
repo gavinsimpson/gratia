@@ -37,3 +37,30 @@ test_that("basis() works with a scam", {
     plt <- draw(bs)
     expect_doppelganger("draw basis works with a scam single smooth", plt)
 })
+
+
+test_that("basis() works with bivariate smooths", {
+    expect_silent(ds <- data_slice(su_eg2, x = evenly(x, n = 20),
+        z = evenly(z, n = 20)))
+    expect_silent(bs <- basis(s(x, z, k = 25), data = su_eg2, at = ds,
+        constraints = TRUE))
+    expect_s3_class(bs, "basis")
+
+    plt <- draw(bs)
+    expect_doppelganger("draw basis works with a bivariate tprs", plt)
+
+    plt <- draw(bs, contour = TRUE)
+    expect_doppelganger("draw basis works with a bivariate tprs contour", plt)
+
+    expect_silent(ds <- data_slice(su_eg2, x = evenly(x, n = 20),
+        z = evenly(z, n = 20)))
+    expect_silent(bs <- basis(te(x, z, k = c(5, 5)), data = su_eg2, at = ds,
+        constraints = TRUE))
+    expect_s3_class(bs, "basis")
+
+    plt <- draw(bs)
+    expect_doppelganger("draw basis works with a bivariate te", plt)
+
+    plt <- draw(bs, contour = TRUE)
+    expect_doppelganger("draw basis works with a bivariate te contour", plt)
+})

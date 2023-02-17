@@ -430,6 +430,7 @@
     plt
 }
 
+#' @importFrom ggplot2 scale_fill_distiller guides guide_axis facet_wrap vars labs geom_contour coord_equal
 `plot_bivariate_basis` <- function(object,
                                    legend = FALSE,
                                    labeller = NULL,
@@ -454,12 +455,12 @@
         fill = .data[["value"]],
         group = .data[["bf"]])) +
         geom_raster() +
-        guides(x = guide_axis(angle = angle)) +
+        guides(x = guide_axis(angle = angle, check.overlap = TRUE)) +
         scale_fill_distiller(palette = "RdBu", type = "div")
 
     ## default labels if none supplied
     if (is.null(xlab)) {
-        xlab <- smooth_var[2]
+        xlab <- smooth_var[1]
     }
     if (is.null(ylab)) {
         ylab <- smooth_var[2]
@@ -494,7 +495,8 @@
     }
 
     if (isTRUE(contour)) {
-        plt <- plt + geom_contour(mapping = aes(z = .data[["value"]]),
+        plt <- plt + geom_contour(mapping = aes(z = .data[["value"]],
+        group = .data[["bf"]], fill = NULL),
             colour = contour_col,
             bins = n_contour,
             na.rm = TRUE)

@@ -510,8 +510,8 @@ detaching ‘package:mgcv’
 > 
 > ### Name: data_slice
 > ### Title: Prepare a data slice through model covariates
-> ### Aliases: data_slice data_slice.default data_slice.gam data_slice.gamm
-> ###   data_slice.list
+> ### Aliases: data_slice data_slice.default data_slice.data.frame
+> ###   data_slice.gam data_slice.gamm data_slice.list
 > 
 > ### ** Examples
 > 
@@ -1505,11 +1505,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55dc6aad4d28>
+<environment: 0x5626650f0ce0>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55dc6aad4d28>
+<environment: 0x5626650f0ce0>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1546,14 +1546,14 @@ detaching ‘package:mgcv’
 > ## IGNORE_RDIFF_BEGIN
 > xp
 Linear prediction matrix (400 x 37)
-  `(Intercept)` s(x0).~1 s(x0)~2 s(x0)~3 s(x0)~4 s(x0)~5 s(x0)~6 s(x0)~7 s(x0)~8
-  <matrix>      <matrix> <matri> <matri> <matri> <matri> <matri> <matri> <matri>
-1 1              0.9611~  0.227~  0.705~  0.134~  0.457~ -0.146~  0.620~  0.201~
-2 1              0.6513~ -0.240~  0.068~  0.308~  0.394~ -0.009~  0.355~  0.418~
-3 1             -0.3847~ -0.549~  0.066~  0.204~ -0.415~ -0.247~ -0.034~  0.462~
-4 1             -1.2733~  0.155~ -1.534~ -0.222~ -1.598~  0.197~ -1.583~ -0.747~
-5 1              1.0510~  0.420~  1.113~ -0.213~  0.892~  0.035~  0.776~ -0.028~
-# ... with 395 more rows, 28 more variables: `s(x0).9` <matrix>, ...
+  `(Intercept)` s(x0)~1 s(x0)~2 s(x0)~3 s(x0)~4 s(x0)~5 s(x0).~6 s(x0)~7 s(x0)~8
+          <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>    <dbl>   <dbl>   <dbl>
+1             1   0.961   0.227  0.706    0.135   0.457 -0.146    0.621   0.202 
+2             1   0.651  -0.241  0.0684   0.308   0.394 -0.00994  0.355   0.418 
+3             1  -0.385  -0.549  0.0660   0.204  -0.416 -0.247   -0.0349  0.462 
+4             1  -1.27    0.156 -1.53    -0.222  -1.60   0.198   -1.58   -0.748 
+5             1   1.05    0.420  1.11    -0.214   0.893  0.0351   0.776  -0.0289
+# ... with 395 more rows, 28 more variables: `s(x0).9` <dbl>, ...
 > ## IGNORE_RDIFF_END
 > 
 > # the object `xp` *is* a matrix
@@ -1568,13 +1568,13 @@ Linear prediction matrix (400 x 37)
 > xp
 Linear prediction matrix (100 x 37)
   `(Intercept)` s(x0).~1 s(x0)~2 s(x0)~3 s(x0)~4 s(x0)~5 s(x0)~6 s(x0)~7 s(x0)~8
-  <matrix>      <matrix> <matri> <matri> <matri> <matri> <matri> <matri> <matri>
-1 1             0.16990~ -0.541~ -0.037~ 0.0534~ 0.1444~ -0.353~ -0.057~ 0.5181~
-2 1             0.16990~ -0.541~ -0.037~ 0.0534~ 0.1444~ -0.353~ -0.057~ 0.5181~
-3 1             0.16990~ -0.541~ -0.037~ 0.0534~ 0.1444~ -0.353~ -0.057~ 0.5181~
-4 1             0.16990~ -0.541~ -0.037~ 0.0534~ 0.1444~ -0.353~ -0.057~ 0.5181~
-5 1             0.16990~ -0.541~ -0.037~ 0.0534~ 0.1444~ -0.353~ -0.057~ 0.5181~
-# ... with 95 more rows, 28 more variables: `s(x0).9` <matrix>, ...
+          <dbl>    <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
+1             1    0.170  -0.542 -0.0371  0.0534   0.144  -0.353 -0.0572   0.518
+2             1    0.170  -0.542 -0.0371  0.0534   0.144  -0.353 -0.0572   0.518
+3             1    0.170  -0.542 -0.0371  0.0534   0.144  -0.353 -0.0572   0.518
+4             1    0.170  -0.542 -0.0371  0.0534   0.144  -0.353 -0.0572   0.518
+5             1    0.170  -0.542 -0.0371  0.0534   0.144  -0.353 -0.0572   0.518
+# ... with 95 more rows, 28 more variables: `s(x0).9` <dbl>, ...
 > ## IGNORE_RDIFF_END
 > ## Don't show: 
 > options(op)
@@ -2522,7 +2522,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  26.158 0.203 26.34 0 0 
+Time elapsed:  42.449 0.36 42.754 0 0 
 > grDevices::dev.off()
 null device 
           1 

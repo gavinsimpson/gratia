@@ -191,8 +191,8 @@
     }
 
     if (is.null(data)) {
-        data <- smooth_data(model, ids[i], n = n, n_3d = n_3d, n_4d = n_4d,
-            offset = offset)
+        data <- smooth_data(model, ids[i],
+            n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, offset = offset)
     }
 
     tbl <- tidy_basis(smooths[[i]], at = data, coefs = betas,
@@ -216,7 +216,7 @@
     }
     ## call smoothCon to create the basis as specified in `x`
     sm <- smoothCon(object, data = data, knots = knots,
-        absorb.cons = constraints, ...)
+        absorb.cons = constraints)
 
     ## sm will be a list, even if a single smooth, bc we could have multiple
     ## smoothers in case of factor `by` smooths.
