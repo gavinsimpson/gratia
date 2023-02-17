@@ -6,7 +6,6 @@
 #'   the model will be used for `data`, if available in `model`.
 #' @param n numeric; the number of posterior samples to return.
 #' @param seed numeric; a random seed for the simulations.
-#' @param scale character;
 #' @param freq logical; `TRUE` to use the frequentist covariance matrix of
 #'   the parameter estimators, `FALSE` to use the Bayesian posterior
 #'   covariance matrix of the parameters.
@@ -38,7 +37,9 @@
 #'   matrix when generating random walk proposals. Negative or non finite to
 #'   skip the random walk step. Only used with `method = "mh"`.
 #' @param ... arguments passed to other methods. For `fitted_samples()`, these
-#'   are passed on to `predict.gam()`.
+#'   are passed on to `predict.gam()`. For `posterior_samples()` these are
+#'   passed on to `fitted_samples()`. For `predicted_samples()` these are
+#'   passed on to the relevant `simulate()` method.
 #' @param newdata Deprecated: use `data` instead.
 #' @param ncores Deprecated; use `n_cores` instead. The number of cores for
 #'   generating random variables from a multivariate normal distribution.
@@ -73,15 +74,69 @@
 
 #' @export
 #' @rdname posterior_samples
-`posterior_samples.gam` <- function(model, n, data = newdata, seed,
-    scale = c("response","linear_predictor"),
+`posterior_samples.gam` <- function(model, n, data = newdata, seed = NULL,
     method = c("gaussian", "mh", "inla", "user"),
     n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
     freq = FALSE, unconditional = FALSE,
     weights = NULL, ...,
     newdata = NULL,
     ncores = NULL) {
-    .NotYetImplemented()
+    # generate new response data from the model including the uncertainty in
+    # the model.
+
+    # start my getting draws of expectation
+    sim_eta <- fitted_samples(model, n = n, data = data, seed = seed,
+        scale = "response", method = method, n_cores = n_cores, burnin = burnin,
+        thin = thin, t_df = t_df, rw_scale = rw_scale, freq = freq,
+        unconditional = unconditional, weights = weights, newdata = newdata,
+        ncores = ncores, ...)
+
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+        runif(1)
+    }
+    if (is.null(seed)) {
+        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+    } else {
+        R.seed <- get(".Random.seed", envir = .GlobalEnv)
+        set.seed(seed)
+        RNGstate <- structure(seed, kind = as.list(RNGkind()))
+        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+    }
+
+    ## rd function if available
+    rd_fun <- get_family_rd(model)
+
+    ## dispersion or scale variable for simulation
+    scale <- model[["sig2"]]
+    if (is.null(scale)) {
+        scale <- summary(model)[["dispersion"]]
+    }
+
+    if (!is.null(newdata)) {
+        newdata_deprecated()
+    }
+
+    if (is.null(data)) {
+        # data <- model[["model"]]
+        weights <- model[["prior.weights"]]
+    } else {
+        if (is.null(weights)) {
+            weights <- rep(1, nrow(data))
+        }
+    }
+
+    # need to extend weights by number of draws
+    weights <- rep(weights, times = n)
+    #scale <- rep(scale, times = n)
+
+    # replace fitted with
+    sim_eta <- sim_eta |>
+        mutate(response = rd_fun(mu = fitted, wt = weights, scale = scale)) |>
+        select(all_of(c("row", "draw", "response")))
+
+    ## add classes
+    class(sim_eta) <- c("posterior_samples", class(sim_eta))
+    sim_eta
 }
 
 #' Draw fitted values from the posterior distribution
@@ -89,6 +144,10 @@
 #' Expectations (fitted values) of the response drawn from the posterior
 #' distribution of fitted model using a Gaussian approximation to the
 #' posterior or a simple Metropolis Hastings sampler.
+#' 
+#' @param scale character; what scale should the fitted values be returned on?
+#'   `"linear predictor"` is a synonym for `"link"` if you prefer that
+#'   terminology.
 #'
 #' @return A tibble (data frame) with 3 columns containing the posterior
 #'   predicted values in long format. The columns are
@@ -195,7 +254,7 @@
     sims[["draw"]] <- as.integer(sims[["draw"]])
     attr(sims, "seed") <- RNGstate
     ## add classes
-    class(sims) <- c("fitted_samples", "posterior_samples", class(sims))
+    class(sims) <- c("fitted_samples", class(sims))
     sims
 }
 
@@ -278,7 +337,7 @@
     sims[["draw"]] <- as.integer(sims[["draw"]])
     attr(sims, "seed") <- RNGstate
     ## add classes
-    class(sims) <- c("predicted_samples", "posterior_samples", class(sims))
+    class(sims) <- c("predicted_samples", class(sims))
     sims
 }
 
@@ -508,6 +567,6 @@
     sims <- unnest(sims, all_of("data"))
     attr(sims, "seed") <- RNGstate
     ## add classes
-    class(sims) <- c("smooth_samples", "posterior_samples", class(sims))
+    class(sims) <- c("smooth_samples", class(sims))
     sims
 }
