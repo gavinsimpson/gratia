@@ -577,6 +577,7 @@ test_that("draw.penalty_df works with normalization", {
 test_that("plotting sos smooths works", {
     skip_on_cran()
     skip_if_not_installed("mapproj")
+    skip_if_os("mac")
     expect_silent(plt <- draw(m_sos, n = 25))
     expect_doppelganger("draw works for sos smooths", plt)
 })
