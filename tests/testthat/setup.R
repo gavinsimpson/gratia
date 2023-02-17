@@ -294,3 +294,34 @@ su_eg1_ocat <- data_sim("eg1", n = 200, dist = "ordered categorical",
   n_cat = n_categories)
 m_ocat <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   family = ocat(R = n_categories), data = su_eg1_ocat, method = "REML")
+
+# Simon's spline on the sphere example from ?smooth.construct.sos.smooth.spec
+`sim_sos_eg_data` <- function(n = 400, seed = NULL) {
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+    runif(1)
+  }
+  if (is.null(seed)) {
+    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+  } else {
+    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+    set.seed(seed)
+    RNGstate <- structure(seed, kind = as.list(RNGkind()))
+    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+  }
+  f <- function(la, lo) { ## a test function...
+    sin(lo) * cos(la - 0.3)
+  }
+  ## generate with uniform density on sphere...
+  lo <- runif(n) * 2 * pi - pi ## longitude
+  la <- runif(3 * n) * pi - pi / 2
+  ind <- runif(3 * n) <= cos(la)
+  la <- la[ind]
+  la <- la[seq_len(n)]
+  ff <- f(la, lo)
+  y <- ff + rnorm(n) * 0.2 ## test data
+  out <- tibble(latitude = la * 180 / pi,
+    longitude = lo * 180 / pi, y = y)
+  out
+}
+sos_df <- sim_sos_eg_data(n = 400, seed = 0)
+m_sos <- gam(y ~ s(latitude, longitude, bs = "sos", k = 60), data = sos_df)

@@ -573,3 +573,9 @@ test_that("draw.penalty_df works with normalization", {
     expect_doppelganger("draw penalty_df with single smooths normalized",
                         plt)
 })
+
+test_that("plotting sos smooths works", {
+    skip_on_cran()
+    expect_silent(plt <- draw(m_sos, n = 25))
+    expect_doppelganger("draw works for sos smooths", plt)
+})
