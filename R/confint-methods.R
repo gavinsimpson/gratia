@@ -138,7 +138,8 @@
     ## bayesian covar matrix, possibly accounting for estimating smooth pars
     Vb <- vcov(x[["model"]], unconditional = x$unconditional)
     ## simulate un-biased deviations given bayesian covar matrix
-    buDiff <- rmvn(n = nsim, mu = rep(0, nrow(Vb)), sigma = Vb, ncores = ncores)
+    buDiff <- mvnfast::rmvn(n = nsim, mu = rep(0, nrow(Vb)), sigma = Vb,
+        ncores = ncores)
     ## apply wrapper to compute simultaneous interval critical value and
     ## corresponding simultaneous interval for each term
     res <- lapply(x[["derivatives"]][terms], FUN = simInt,
