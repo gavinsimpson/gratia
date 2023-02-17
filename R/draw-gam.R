@@ -354,7 +354,8 @@
                 upper = .data$partial + (crit * .data$se))
             # need to alter the ylim if scales are fixed
             if (isTRUE(identical(scales, "fixed"))) {
-                ylims <- range(ylims, object$partial, object$upper, object$lower)
+                ylims <- range(ylims, object$partial, object$upper,
+                    object$lower)
             }
 
             para_plts <- para %>%
