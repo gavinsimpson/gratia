@@ -11,8 +11,7 @@ posterior_samples(model, ...)
   model,
   n,
   data = newdata,
-  seed,
-  scale = c("response", "linear_predictor"),
+  seed = NULL,
   method = c("gaussian", "mh", "inla", "user"),
   n_cores = 1,
   burnin = 1000,
@@ -31,7 +30,9 @@ posterior_samples(model, ...)
 \item{model}{a fitted model of the supported types}
 
 \item{...}{arguments passed to other methods. For \code{fitted_samples()}, these
-are passed on to \code{predict.gam()}.}
+are passed on to \code{predict.gam()}. For \code{posterior_samples()} these are
+passed on to \code{fitted_samples()}. For \code{predicted_samples()} these are
+passed on to the relevant \code{simulate()} method.}
 
 \item{n}{numeric; the number of posterior samples to return.}
 
@@ -40,8 +41,6 @@ from the model should be evaluated. If not supplied, the data used to fit
 the model will be used for \code{data}, if available in \code{model}.}
 
 \item{seed}{numeric; a random seed for the simulations.}
-
-\item{scale}{character;}
 
 \item{method}{character; which method should be used to draw samples from
 the posterior distribution. \code{"gaussian"} uses a Gaussian (Laplace)

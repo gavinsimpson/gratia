@@ -21,7 +21,9 @@ predicted_samples(model, ...)
 \item{model}{a fitted model of the supported types}
 
 \item{...}{arguments passed to other methods. For \code{fitted_samples()}, these
-are passed on to \code{predict.gam()}.}
+are passed on to \code{predict.gam()}. For \code{posterior_samples()} these are
+passed on to \code{fitted_samples()}. For \code{predicted_samples()} these are
+passed on to the relevant \code{simulate()} method.}
 
 \item{n}{numeric; the number of posterior samples to return.}
 
