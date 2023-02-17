@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,23 +55,23 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.8.1.4" id="gratia-0814">gratia 0.8.1.4<a class="anchor" aria-label="anchor" href="#gratia-0814"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.8.1.5" id="gratia-0815">gratia 0.8.1.5<a class="anchor" aria-label="anchor" href="#gratia-0815"></a></h2>
 <div class="section level3">
-<h3 id="user-visible-changes-0-8-1-4">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-8-1-4"></a></h3>
+<h3 id="user-visible-changes-0-8-1-5">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-8-1-5"></a></h3>
 <ul><li>
 <p><code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> now uses a single call to the RNG to generate draws from the posterior of smooths. Previous to version 0.9.0, <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> would do a separate call to <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code> for each smooth. As a result, the result of a call to <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> on a model with multiple smooths will now produce different results to those generated previously. To regain the old behaviour, add <code>rng_per_smooth = TRUE</code> to the <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> call.</p>
 <p>Note, however, that using per-smooth RNG calls with <code>method = "mh"</code> will be very inefficient as, with that method, posterior draws for all coefficients in the model are sampled at once. So, only use <code>rng_per_smooth = TRUE</code> with <code>method = "gaussian"</code>.</p>
 </li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-0-8-1-4">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-1-4"></a></h3>
+<h3 id="new-features-0-8-1-5">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-1-5"></a></h3>
 <ul><li><p><code><a href="../reference/data_sim.html">data_sim()</a></code> can now simulate response data from Tweedie and ordered categorical distributions.</p></li>
 <li><p><code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> and <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> can now use the Metropolis Hastings sampler from <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code>, instead of a Gaussian approximation, to sample from the posterior distribution of the model or specific smooths respectively.</p></li>
 <li><p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> now works with models fitted using the <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code> family. The predicted probability for each category is returned, alongside a Wald interval created using the standard error (SE) of the estimated probability. The SE and estimated probabilities are transformed to the logit (linear predictor) scale, a Wald credible interval is formed, which is then back-transformed to the response (probability) scale.</p></li>
 <li><p><code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> work for models fitted using the <code><a href="https://rdrr.io/pkg/mgcv/man/cnorm.html" class="external-link">cnorm()</a></code> family.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-8-1-4">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-1-4"></a></h3>
+<h3 id="bug-fixes-0-8-1-5">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-1-5"></a></h3>
 <ul><li><p><code><a href="../reference/link.html">link()</a></code>, <code><a href="../reference/link.html">inv_link()</a></code>, and related family functions for the <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">ocat()</a></code> weren’t correctly identifying the family name and as a result would throw an error even when passed an object of the correct family.</p></li>
 <li><p>The <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method for <code><a href="../reference/lp_matrix.html">lp_matrix()</a></code> now converts the matrix to a data frame before conversion to a tibble. This makes more sense as it results in more typical behaviour as the columns of the printed object are doubles.</p></li>
 </ul></div>
