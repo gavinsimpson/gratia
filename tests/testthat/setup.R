@@ -173,8 +173,8 @@ b_pois  <-  bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
                 method = "fREML", family = poisson())
 m_nb    <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
                 method = "REML", family = nb())
-m_negbin    <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
-                    method = "REML", family = negbin(25))
+m_negbin <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
+                method = "REML", family = negbin(25))
 m_tw    <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
                 method = "REML", family = tw())
 
