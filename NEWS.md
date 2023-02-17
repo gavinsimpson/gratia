@@ -1,4 +1,4 @@
-# gratia 0.8.1.5
+# gratia 0.8.1.6
 
 ## User visible changes
 
@@ -23,6 +23,10 @@
   sampler from `mgcv::gam.mh()`, instead of a Gaussian approximation, to sample
   from the posterior distribution of the model or specific smooths
   respectively.
+
+* `data_slice()` gains a method for data frames and tibbles.
+
+* `typical_values()` gains a method for data frames and tibbles.
 
 * `fitted_values()` now works with models fitted using the `mgcv::ocat()`
   family. The predicted probability for each category is returned, alongside a
