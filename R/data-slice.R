@@ -16,11 +16,39 @@
          ">", call. = FALSE)
 }
 
+#' @export
+#' @rdname data_slice
+#' @importFrom tidyr expand_grid
+#' @importFrom rlang enquos eval_tidy
+`data_slice.data.frame` <- function(object, ...) {
+    # deal with ...
+    exprs <- rlang::enquos(...)
+    slice_vars <- purrr::map(exprs, rlang::eval_tidy, data = object)
+
+    # check now if there are elements of slice_vars that aren't in the object
+    vars <- names(object)
+    nms <- names(slice_vars)
+    if (any(i <- ! nms %in% vars)) {
+        message("Some specified variable(s) not used in `object``:\n",
+                paste(" * ", nms[i], collapse = "\n", sep = ""),
+                "\n")
+    }
+
+    # typical values, only needed ones that aren't
+    need_tv <- setdiff(vars, names(slice_vars))
+    if (length(need_tv) > 0L) {
+        tv <- typical_values(object)
+        slice_vars <- append(slice_vars, tv[need_tv])
+    }
+
+    expand_grid(!!!{slice_vars})
+}
+
 #' @param data an alternative data frame of values containing all the variables
 #'   needed to fit the model. If `NULL`, the default, the data used to fit the
 #'   model will be recovered using `model.frame`. User-supplied expressions
 #'   passed in `...` will be evaluated in `data`.
-#' 
+#'
 #' @export
 #' @rdname data_slice
 #' @importFrom tidyr expand_grid
@@ -277,6 +305,24 @@
 
     # return
     as_tibble(summ)
+}
+
+#' @export
+#' @rdname typical_values
+#' @importFrom tidyselect everything
+#' @importFrom dplyr summarise across
+#' @importFrom tibble as_tibble
+`typical_values.data.frame` <- function(object, vars = everything(), ...) {
+    # include/exclude any terms?
+    expr <- rlang::enquo(vars)
+    pos <- eval_select(expr, data = object)
+    object <- object[pos]
+
+    df <- object |>
+        summarise(across(everything(), .fns = value_closest_to_median))
+
+    # return
+    as_tibble(df)
 }
 
 #' All combinations of factor levels
