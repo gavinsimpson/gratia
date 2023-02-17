@@ -1,4 +1,4 @@
-# gratia 0.8.1.6
+# gratia 0.8.1.7
 
 ## User visible changes
 
@@ -23,6 +23,16 @@
   sampler from `mgcv::gam.mh()`, instead of a Gaussian approximation, to sample
   from the posterior distribution of the model or specific smooths
   respectively.
+
+* `posterior_samples()` is a new function in the family of `fitted_samples()`
+  and `smooth_samples()`. `posterior_samples()` returns draws from the
+  posterior distribution of the response, combining the uncertainty in the
+  estimated expected value of the response and the dispersion of the response
+  distribution. The difference between `posterior_samples()` and
+  `predicted_samples()` is that the latter only includes variation due to
+  drawing samples from the conditional distribution of the response (the
+  uncertainty in the expected values is ignored), while the former includes
+  both sources of uncertainty.
 
 * `data_slice()` gains a method for data frames and tibbles.
 
