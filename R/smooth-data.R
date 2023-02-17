@@ -3,6 +3,8 @@
 #' @param model a fitted model
 #' @param id the number ID of the smooth within `model` to process.
 #' @param n numeric; the number of new observations to generate.
+#' @param n_2d numeric; the number of new observations to generate for the
+#'   second dimension of a 2D smooth. *Currently ignored*.
 #' @param n_3d numeric; the number of new observations to generate for the third
 #'   dimension of a 3D smooth.
 #' @param n_4d numeric; the number of new observations to generate for the
@@ -39,8 +41,8 @@
 #' smooth_data(m, id = 2, include_all = TRUE)
 #'
 #' \dontshow{options(op)}
-`smooth_data` <- function(model, id, n = 100, n_3d = NULL, n_4d = NULL,
-                          offset = NULL, include_all = FALSE) {
+`smooth_data` <- function(model, id, n = 100, n_2d = NULL, n_3d = NULL,
+                          n_4d = NULL, offset = NULL, include_all = FALSE) {
     mf <- model.frame(model)           # model.frame used to fit model
 
     ## remove response
