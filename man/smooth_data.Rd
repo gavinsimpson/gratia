@@ -8,6 +8,7 @@ smooth_data(
   model,
   id,
   n = 100,
+  n_2d = NULL,
   n_3d = NULL,
   n_4d = NULL,
   offset = NULL,
@@ -20,6 +21,9 @@ smooth_data(
 \item{id}{the number ID of the smooth within \code{model} to process.}
 
 \item{n}{numeric; the number of new observations to generate.}
+
+\item{n_2d}{numeric; the number of new observations to generate for the
+second dimension of a 2D smooth. \emph{Currently ignored}.}
 
 \item{n_3d}{numeric; the number of new observations to generate for the third
 dimension of a 3D smooth.}

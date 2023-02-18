@@ -3,11 +3,14 @@
 \name{typical_values}
 \alias{typical_values}
 \alias{typical_values.gam}
+\alias{typical_values.data.frame}
 \title{Typical values of model covariates}
 \usage{
 typical_values(object, ...)
 
 \method{typical_values}{gam}(object, vars = everything(), ...)
+
+\method{typical_values}{data.frame}(object, vars = everything(), ...)
 }
 \arguments{
 \item{object}{a fitted GAM(M) model.}

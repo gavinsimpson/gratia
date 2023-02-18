@@ -9,7 +9,10 @@ data_sim(
   n = 400,
   scale = 2,
   theta = 3,
-  dist = c("normal", "poisson", "binary", "negbin", "tweedie"),
+  dist = c("normal", "poisson", "binary", "negbin", "tweedie", "gamma", "ocat",
+    "ordered categorical"),
+  n_cat = 4,
+  cuts = c(-1, 0, 5),
   seed = NULL
 )
 }
@@ -28,6 +31,13 @@ exhibits extra dispersion beyond that assumed by under a Poisson.}
 \item{dist}{character; a sampling distribution for the response
 variable.}
 
+\item{n_cat}{integer; the number of categories for categorical response.
+Currently only used for \code{distr \%in\% c("ocat", "ordered categorical")}.}
+
+\item{cuts}{numeric; vector of cut points on the latent variable, excluding
+the end points \code{-Inf} and \code{Inf}. Must be one fewer than the number of
+categories: \code{length(cuts) == n_cat - 1}.}
+
 \item{seed}{numeric; the seed for the random number generator. Passed to
 \code{\link[base:Random]{base::set.seed()}}.}
 }
@@ -37,10 +47,11 @@ that can be used to fit GAMs. An new feature is that the sampling
 distribution can be applied to all the example types.
 }
 \examples{
-\dontshow{
-set.seed(1)
-op <- options(pillar.sigfig = 5, cli.unicode = FALSE)
+\dontshow{op <- options(pillar.sigfig = 5, cli.unicode = FALSE)
 }
-data_sim("eg1")
+data_sim("eg1", n = 100, seed = 1)
+
+# an ordered categorical response
+data_sim("eg1", n = 100, dist = "ocat", n_cat = 4, cuts = c(-1, 0, 5))
 \dontshow{options(op)}
 }

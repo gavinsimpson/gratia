@@ -1675,6 +1675,14 @@
                               ...) {
     # handle splines on the sphere
 
+    # this currently needs the mapproj pkg for coord_map()
+    if (!requireNamespace("mapproj", quietly = TRUE)) {
+        message("\nPlotting SOS smooths uses `ggplot2::coord_map()`.\n",
+            "This requires that the {mapproj} package be installed.\n",
+            "Run: `install.packages(\"mapproj\")`\n")
+        stop("Package {mapproj} is not available.")
+    }
+
     if (is.null(variables)) {
         variables <- vars_from_label(unique(object[["smooth"]]))
     }

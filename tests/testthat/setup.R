@@ -25,7 +25,7 @@ su_m_quick_eg1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
                       data = quick_eg1,
                       method = "REML")
 
-su_m_quick_eg1_shrink <- gam(y ~ s(x0, bs = "ts") + s(x1, bs = "ts") +
+su_m_quick_eg1_shrink <- gam(y ~ s(x0, bs = "ts") + s(x1, bs = "cs") +
                                s(x2, bs = "ts") + s(x3, bs = "ts"),
                              data = quick_eg1,
                              method = "REML")
@@ -39,15 +39,19 @@ su_m_penalty <- gam(y ~ s(x0, bs = 'cr') + s(x1, bs = 'bs') +
                     data = su_eg1,
                     method = "REML")
 
-su_m_bivar <- gam(y ~ s(x, z, k = 40),
-                  data = su_eg2,
-                  method = "REML")
+su_m_bivar <- gam(y ~ s(x, z, k = 40), data = su_eg2, method = "REML")
+
+su_m_bivar_ds <- gam(y ~ s(x, z, k = 20, bs = "ds"), data = su_eg2,
+  method = "REML")
 
 su_m_trivar <- gam(y ~ s(x0, x1, x2), data = su_eg1, method = "REML")
 
 su_m_quadvar <- gam(y ~ s(x0, x1, x2, x3), data = su_eg1, method = "REML")
 
 su_m_bivar_te <- gam(y ~ te(x, z, k = c(5, 5)), data = su_eg2, method = "REML")
+
+su_m_bivar_ti <- gam(y ~ s(x, k = 5) + s(z, k = 5) + ti(x, z, k = c(5, 5)),
+  data = su_eg2, method = "REML")
 
 su_m_bivar_t2 <- gam(y ~ t2(x, z, k = c(5, 5)), data = su_eg2, method = "REML")
 
@@ -66,8 +70,7 @@ su_m_quadvar_t2 <- gam(y ~ t2(x0, x1, x2, x3, k = c(3, 3, 3, 3)),
 su_m_cont_by <- gam(y ~ s(x2, by = x1), data = su_eg3, method = "REML")
 
 su_m_factor_by <- gam(y ~ fac + s(x2, by = fac) + s(x0),
-                      data = su_eg4,
-                      method = "REML")
+                      data = su_eg4, method = "REML")
 
 su_m_factor_by_gamm <- gamm(y ~ fac + s(x2, by = fac) + s(x0),
                             data = su_eg4, REML = TRUE)
@@ -78,8 +81,7 @@ su_m_factor_by_gamm4 <- gamm4(y ~ fac + s(x2, by = fac) + s(x0),
 su_m_factor_by_bam <- bam(y ~ fac + s(x2, by = fac) + s(x0), data = su_eg4)
 
 su_m_factor_by_x2 <- gam(y ~ fac + s(x2, by = fac),
-  data = su_eg4,
-  method = "REML")
+  data = su_eg4, method = "REML")
 
 if (packageVersion("mgcv") >= "1.8.41") {
   m_sz <- gam(y ~ s(x2) + s(fac, x2, bs = "sz") + s(x0),
@@ -173,8 +175,8 @@ b_pois  <-  bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
                 method = "fREML", family = poisson())
 m_nb    <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
                 method = "REML", family = nb())
-m_negbin    <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
-                    method = "REML", family = negbin(25))
+m_negbin <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
+                method = "REML", family = negbin(25))
 m_tw    <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
                 method = "REML", family = tw())
 
@@ -260,6 +262,10 @@ data(smallAges)
 smallAges$Error[1] <- 1.1
 sw <- scam(Date ~ s(Depth, k = 5, bs = "mpd"), data = smallAges,
   weights = 1 / smallAges$Error, gamma = 1.4)
+sw_mdcx <- scam(Date ~ s(Depth, k = 5, bs = "mdcx"), data = smallAges,
+  weights = 1 / smallAges$Error, gamma = 1.4)
+sw_mdcv <- scam(Date ~ s(Depth, k = 5, bs = "mdcv"), data = smallAges,
+  weights = 1 / smallAges$Error, gamma = 1.4)
 
 # this should be folded into data_sim()
 `sim_scam` <- function(n, seed = NULL) {
@@ -287,3 +293,43 @@ sw <- scam(Date ~ s(Depth, k = 5, bs = "mpd"), data = smallAges,
 dat <- sim_scam(n = 200, seed = 4)
 ## fit model, get results, and plot...
 m_scam <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "mpi"), data = dat)
+m_scam_micx <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "micx"), data = dat)
+m_scam_micv <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "micv"), data = dat)
+
+# Ordered categorical model ocat()
+n_categories <- 4
+su_eg1_ocat <- data_sim("eg1", n = 200, dist = "ordered categorical",
+  n_cat = n_categories)
+m_ocat <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+  family = ocat(R = n_categories), data = su_eg1_ocat, method = "REML")
+
+# Simon's spline on the sphere example from ?smooth.construct.sos.smooth.spec
+`sim_sos_eg_data` <- function(n = 400, seed = NULL) {
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+    runif(1)
+  }
+  if (is.null(seed)) {
+    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+  } else {
+    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+    set.seed(seed)
+    RNGstate <- structure(seed, kind = as.list(RNGkind()))
+    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+  }
+  f <- function(la, lo) { ## a test function...
+    sin(lo) * cos(la - 0.3)
+  }
+  ## generate with uniform density on sphere...
+  lo <- runif(n) * 2 * pi - pi ## longitude
+  la <- runif(3 * n) * pi - pi / 2
+  ind <- runif(3 * n) <= cos(la)
+  la <- la[ind]
+  la <- la[seq_len(n)]
+  ff <- f(la, lo)
+  y <- ff + rnorm(n) * 0.2 ## test data
+  out <- tibble(latitude = la * 180 / pi,
+    longitude = lo * 180 / pi, y = y)
+  out
+}
+sos_df <- sim_sos_eg_data(n = 400, seed = 0)
+m_sos <- gam(y ~ s(latitude, longitude, bs = "sos", k = 60), data = sos_df)
