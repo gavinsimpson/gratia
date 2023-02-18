@@ -25,7 +25,7 @@ su_m_quick_eg1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
                       data = quick_eg1,
                       method = "REML")
 
-su_m_quick_eg1_shrink <- gam(y ~ s(x0, bs = "ts") + s(x1, bs = "ts") +
+su_m_quick_eg1_shrink <- gam(y ~ s(x0, bs = "ts") + s(x1, bs = "cs") +
                                s(x2, bs = "ts") + s(x3, bs = "ts"),
                              data = quick_eg1,
                              method = "REML")
@@ -66,8 +66,7 @@ su_m_quadvar_t2 <- gam(y ~ t2(x0, x1, x2, x3, k = c(3, 3, 3, 3)),
 su_m_cont_by <- gam(y ~ s(x2, by = x1), data = su_eg3, method = "REML")
 
 su_m_factor_by <- gam(y ~ fac + s(x2, by = fac) + s(x0),
-                      data = su_eg4,
-                      method = "REML")
+                      data = su_eg4, method = "REML")
 
 su_m_factor_by_gamm <- gamm(y ~ fac + s(x2, by = fac) + s(x0),
                             data = su_eg4, REML = TRUE)
@@ -78,8 +77,7 @@ su_m_factor_by_gamm4 <- gamm4(y ~ fac + s(x2, by = fac) + s(x0),
 su_m_factor_by_bam <- bam(y ~ fac + s(x2, by = fac) + s(x0), data = su_eg4)
 
 su_m_factor_by_x2 <- gam(y ~ fac + s(x2, by = fac),
-  data = su_eg4,
-  method = "REML")
+  data = su_eg4, method = "REML")
 
 if (packageVersion("mgcv") >= "1.8.41") {
   m_sz <- gam(y ~ s(x2) + s(fac, x2, bs = "sz") + s(x0),
