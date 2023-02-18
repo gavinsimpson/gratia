@@ -33,7 +33,7 @@
 #' \dontshow{options(op)}
 `data_sim` <- function(model = "eg1", n = 400, scale = 2, theta = 3,
                        dist = c("normal", "poisson", "binary",
-                                "negbin", "tweedie",
+                                "negbin", "tweedie", "gamma",
                                 "ocat", "ordered categorical"),
                        n_cat = 4, cuts = c(-1, 0, 5),
                        seed = NULL) {
@@ -64,6 +64,7 @@
         binary  = sim_binary,
         negbin  = sim_nb,
         tweedie = sim_tweedie,
+        gamma   = sim_gamma,
         ocat = sim_normal)
 
     model_fun <- switch(model,
@@ -128,6 +129,13 @@
         f = log(mu))
 }
 
+#' @importFrom stats rgamma
+`sim_gamma` <- function(x, scale = 2, ...) {
+    mu <- exp(x/3 + 0.1)
+    tibble(y = rgamma(length(mu), shape = 1 / scale, scale = mu * scale),
+           f = log(mu))
+}
+
 # post-processing
 
 # post-process ocat - simulates normal data, but we need to convert to
@@ -156,7 +164,6 @@
 
     x
 }
-
 
 ## Gu Wabha functions
 #' Gu and Wabha test functions
@@ -305,7 +312,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom rlang .data
 `four_term_plus_ranef_model` <- function(n, sim_fun = sim_normal, scale = 2,
                                          theta = 3) {
-    data <- four_term_additive_model(n = n, sim_fun = sim_fun, scale = 0)
+    data <- four_term_additive_model(n = n, sim_fun = sim_fun, scale = 0.01)
     data <- mutate(data, fac = rep(1:4, n / 4))
     data <- mutate(data,
                    f = .data$f + .data$fac * 3,
@@ -321,19 +328,19 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @param seed numeric; the seed to use for simulating data.
 #'
 #' @return A named list of tibbles containing
-#' 
+#'
 #' @importFrom tidyr expand_grid
 #' @importFrom purrr pmap
 #' @noRd
-`create_reference_simulations` <- function(scale = 0.2, n = 100, seed = 42,
-                                           theta = 4) {
+`create_reference_simulations` <- function(scale = 2, n = 100, seed = 42,
+                                           theta = 4, power = 1.5) {
     `data_sim_wrap` <- function(model, dist, scale, theta, n, seed, ...) {
         data_sim(model, dist = dist, scale = scale, theta = theta,
                  n = n, seed = seed, ...)
     }
     params <- expand_grid(model = paste0("eg", 1:7),
                           dist  = c("normal", "poisson", "binary",
-                                    "negbin", "ocat"),
+                                    "negbin", "ocat", "tweedie", "gamma"),
                           scale = rep(scale, length.out = 1),
                           n = rep(n, length.out = 1),
                           seed = rep(seed, length.out = 1),

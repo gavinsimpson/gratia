@@ -9,7 +9,7 @@ data_sim(
   n = 400,
   scale = 2,
   theta = 3,
-  dist = c("normal", "poisson", "binary", "negbin", "tweedie", "ocat",
+  dist = c("normal", "poisson", "binary", "negbin", "tweedie", "gamma", "ocat",
     "ordered categorical"),
   n_cat = 4,
   cuts = c(-1, 0, 5),
