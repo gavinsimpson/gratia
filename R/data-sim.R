@@ -8,11 +8,12 @@
 #'   the name of a model. See Details for possible options.
 #' @param n numeric; the number of observations to simulate.
 #' @param dist character; a sampling distribution for the response
-#'   variable.
+#'   variable. `"ordered categorical"` is a synonym of `"ocat"`.
 #' @param scale numeric; the level of noise to use.
 #' @param theta numeric; the dispersion parameter \eqn{\theta} to use. The
 #'   default is entirely arbitrary, chosen only to provide simulated data that
 #'   exhibits extra dispersion beyond that assumed by under a Poisson.
+#' @param power numeric; the Tweedie power parameter.
 #' @param n_cat integer; the number of categories for categorical response.
 #'   Currently only used for `distr %in% c("ocat", "ordered categorical")`.
 #' @param cuts numeric; vector of cut points on the latent variable, excluding
@@ -30,7 +31,8 @@
 #' # an ordered categorical response
 #' data_sim("eg1", n = 100, dist = "ocat", n_cat = 4, cuts = c(-1, 0, 5))
 #' \dontshow{options(op)}
-`data_sim` <- function(model = "eg1", n = 400, scale = 2, theta = 3,
+`data_sim` <- function(model = "eg1", n = 400,
+                       scale = 2, theta = 3, power = 1.5,
                        dist = c("normal", "poisson", "binary",
                                 "negbin", "tweedie", "gamma",
                                 "ocat", "ordered categorical"),
@@ -75,7 +77,8 @@
                         eg6 = four_term_plus_ranef_model,
                         eg7 = correlated_four_term_additive_model)
 
-    sim <- model_fun(n = n, sim_fun = sim_fun, scale = scale, theta = theta)
+    sim <- model_fun(n = n, sim_fun = sim_fun, scale = scale, theta = theta,
+        power = power)
 
     # some distributions will require post-processing, such as OCAT
     post_proc_dists <- c("ocat")

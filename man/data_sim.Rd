@@ -9,6 +9,7 @@ data_sim(
   n = 400,
   scale = 2,
   theta = 3,
+  power = 1.5,
   dist = c("normal", "poisson", "binary", "negbin", "tweedie", "gamma", "ocat",
     "ordered categorical"),
   n_cat = 4,
@@ -28,8 +29,10 @@ the name of a model. See Details for possible options.}
 default is entirely arbitrary, chosen only to provide simulated data that
 exhibits extra dispersion beyond that assumed by under a Poisson.}
 
+\item{power}{numeric; the Tweedie power parameter.}
+
 \item{dist}{character; a sampling distribution for the response
-variable.}
+variable. \code{"ordered categorical"} is a synonym of \code{"ocat"}.}
 
 \item{n_cat}{integer; the number of categories for categorical response.
 Currently only used for \code{distr \%in\% c("ocat", "ordered categorical")}.}
