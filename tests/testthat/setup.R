@@ -262,6 +262,10 @@ data(smallAges)
 smallAges$Error[1] <- 1.1
 sw <- scam(Date ~ s(Depth, k = 5, bs = "mpd"), data = smallAges,
   weights = 1 / smallAges$Error, gamma = 1.4)
+sw_mdcx <- scam(Date ~ s(Depth, k = 5, bs = "mdcx"), data = smallAges,
+  weights = 1 / smallAges$Error, gamma = 1.4)
+sw_mdcv <- scam(Date ~ s(Depth, k = 5, bs = "mdcv"), data = smallAges,
+  weights = 1 / smallAges$Error, gamma = 1.4)
 
 # this should be folded into data_sim()
 `sim_scam` <- function(n, seed = NULL) {
@@ -289,6 +293,8 @@ sw <- scam(Date ~ s(Depth, k = 5, bs = "mpd"), data = smallAges,
 dat <- sim_scam(n = 200, seed = 4)
 ## fit model, get results, and plot...
 m_scam <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "mpi"), data = dat)
+m_scam_micx <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "micx"), data = dat)
+m_scam_micv <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "micv"), data = dat)
 
 # Ordered categorical model ocat()
 n_categories <- 4
