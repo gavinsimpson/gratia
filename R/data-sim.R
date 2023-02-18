@@ -216,13 +216,14 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom dplyr mutate bind_cols
 #' @importFrom rlang .data
 `four_term_additive_model` <- function(n, sim_fun = sim_normal, scale = 2,
-                                       theta = 3) {
+                                       theta = 3, power = 1.5) {
     data <- tibble(x0 = runif(n, 0, 1), x1 = runif(n, 0, 1),
                    x2 = runif(n, 0, 1), x3 = runif(n, 0, 1))
     data <- mutate(data,
                    f0 = gw_f0(.data$x0), f1 = gw_f1(.data$x1),
                    f2 = gw_f2(.data$x2), f3 = gw_f3(.data$x3))
-    data2 <- sim_fun(x = data$f0 + data$f1 + data$f2, scale, theta = theta)
+    data2 <- sim_fun(x = data$f0 + data$f1 + data$f2, scale, theta = theta,
+        power = power)
     data <- bind_cols(data2, data)
     data[c("y", "x0", "x1", "x2", "x3", "f", "f0", "f1", "f2", "f3")]
 }
@@ -231,7 +232,8 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom dplyr mutate bind_cols
 #' @importFrom rlang .data
 `correlated_four_term_additive_model` <- function(n, sim_fun = sim_normal,
-                                                  scale = 2, theta = 3) {
+                                                  scale = 2, theta = 3,
+                                                  power = 1.5) {
     data <- tibble(x0 = runif(n, 0, 1), x2 = runif(n, 0, 1))
     data <- mutate(data,
                    x1 = .data$x0 * 0.7 + runif(n, 0, 0.3),
@@ -240,7 +242,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
                    f0 = gw_f0(.data$x0), f1 = gw_f1(.data$x1),
                    f2 = gw_f2(.data$x2), f3 = gw_f3(.data$x0))
     data2 <- sim_fun(x = data$f0 + data$f1 + data$f2, scale = scale,
-                     theta = theta)
+                     theta = theta, power = power)
     data <- bind_cols(data2, data)
     data[c("y", "x0", "x1", "x2", "x3", "f", "f0", "f1", "f2", "f3")]
 }
@@ -248,10 +250,11 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom tibble tibble
 #' @importFrom dplyr bind_cols
 #' @importFrom rlang .data
-`bivariate_model` <- function(n, sim_fun = sim_normal, scale = 2, theta = 3) {
+`bivariate_model` <- function(n, sim_fun = sim_normal, scale = 2, theta = 3,
+                              power = 1.5) {
     data <- tibble(x = runif(n), z = runif(n))
     data2 <- sim_fun(x = bivariate(data$x, data$z), scale = scale,
-                     theta = theta)
+                     theta = theta, power = power)
     data <- bind_cols(data2, data)
     data
 }
@@ -259,12 +262,13 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom tibble tibble
 #' @importFrom dplyr bind_cols 
 `continuous_by_model` <- function(n, sim_fun = sim_normal, scale = 2,
-                                  theta = 3) {
+                                  theta = 3, power = 1.5) {
     data <- tibble(x1 = runif(n, 0, 1), x2 = sort(runif(n, 0, 1)))
     `f_fun` <- function(x) {
         0.2 * x^11 * (10 * (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^10
     }
-    data2 <- sim_fun(x = f_fun(data$x2) * data$x1, scale = scale, theta = theta)
+    data2 <- sim_fun(x = f_fun(data$x2) * data$x1, scale = scale,
+        theta = theta, power = power)
     data <- bind_cols(data2, data)
     data[c("y", "x1", "x2", "f")]
 }
@@ -272,7 +276,8 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom tibble tibble
 #' @importFrom dplyr bind_cols
 #' @importFrom rlang .data
-`factor_by_model` <- function(n, sim_fun = sim_normal, scale = 2, theta = 3) {
+`factor_by_model` <- function(n, sim_fun = sim_normal, scale = 2, theta = 3,
+                              power = 1.5) {
     data <- tibble(x0 = runif(n, 0, 1), x1 = runif(n, 0, 1),
                    x2 = sort(runif(n, 0, 1)))
     data <- mutate(data,
@@ -284,7 +289,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
     y <- data$f1 * as.numeric(data$fac == 1) +
         data$f2 * as.numeric(data$fac == 2) +
         data$f3 * as.numeric(data$fac == 3)
-    data2 <- sim_fun(y, scale = scale, theta = theta)
+    data2 <- sim_fun(y, scale = scale, theta = theta, power = power)
     data <- bind_cols(data2, data)
     data[c("y", "x0", "x1", "x2", "fac", "f", "f1", "f2", "f3")]
 }
@@ -293,7 +298,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom dplyr bind_cols
 #' @importFrom rlang .data
 `additive_plus_factor_model` <- function(n, sim_fun = sim_normal, scale = 2,
-                                         theta = 3) {
+                                         theta = 3, power = 1.5) {
     data <- tibble(x0 = rep(1:4, n / 4), x1 = runif(n, 0, 1),
                    x2 = runif(n, 0, 1), x3 = runif(n, 0, 1))
     data <- mutate(data,
@@ -303,7 +308,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
                        (10 * .data$x2)^3 * (1 - .data$x2)^10,
                    f3 = 0 * .data$x3)
     y <- data$f0 + data$f1 + data$f2
-    data2 <- sim_fun(y, scale = scale, theta = theta)
+    data2 <- sim_fun(y, scale = scale, theta = theta, power = power)
     data <- mutate(data, x0 = as.factor(.data$x0))
     data <- bind_cols(data2, data)
     data[c("y", "x0", "x1", "x2", "x3", "f", "f0", "f1", "f2", "f3")]
@@ -313,13 +318,13 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom dplyr bind_cols
 #' @importFrom rlang .data
 `four_term_plus_ranef_model` <- function(n, sim_fun = sim_normal, scale = 2,
-                                         theta = 3) {
+                                         theta = 3, power = 1.5) {
     data <- four_term_additive_model(n = n, sim_fun = sim_fun, scale = 0.01)
     data <- mutate(data, fac = rep(1:4, n / 4))
     data <- mutate(data,
                    f = .data$f + .data$fac * 3,
                    fac = as.factor(.data$fac))
-    data2 <- sim_fun(data$f, scale = scale, theta = theta)
+    data2 <- sim_fun(data$f, scale = scale, theta = theta, power = power)
     data <- mutate(data, y = data2$y)
     data[c("y", "x0", "x1", "x2", "x3", "fac", "f", "f0", "f1", "f2", "f3")]
 }
