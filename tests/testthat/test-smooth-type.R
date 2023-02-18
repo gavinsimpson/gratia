@@ -68,3 +68,13 @@ test_that("smooth_type works for sos smooths", {
     expect_silent(st <- smooth_type(get_smooth(m_sos, "s(latitude,longitude)")))
     expect_identical(st, "SOS")
 })
+
+test_that("smooth_type works for scam monotone decreasing smooths", {
+    expect_silent(st <- smooth_type(get_smooth(sw, "s(Depth)")))
+    expect_identical(st, "Monotone decr.")
+})
+
+test_that("smooth_type works for duchon spline smooths", {
+    expect_silent(st <- smooth_type(get_smooth(su_m_bivar_ds, "s(x,z)")))
+    expect_identical(st, "Duchon spline (2d)")
+})

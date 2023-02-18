@@ -39,9 +39,10 @@ su_m_penalty <- gam(y ~ s(x0, bs = 'cr') + s(x1, bs = 'bs') +
                     data = su_eg1,
                     method = "REML")
 
-su_m_bivar <- gam(y ~ s(x, z, k = 40),
-                  data = su_eg2,
-                  method = "REML")
+su_m_bivar <- gam(y ~ s(x, z, k = 40), data = su_eg2, method = "REML")
+
+su_m_bivar_ds <- gam(y ~ s(x, z, k = 20, bs = "ds"), data = su_eg2,
+  method = "REML")
 
 su_m_trivar <- gam(y ~ s(x0, x1, x2), data = su_eg1, method = "REML")
 
