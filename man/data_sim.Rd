@@ -47,8 +47,7 @@ that can be used to fit GAMs. An new feature is that the sampling
 distribution can be applied to all the example types.
 }
 \examples{
-\dontshow{op <- options(pillar.sigfig = 5, cli.unicode = FALSE)
-}
+\dontshow{op <- options(pillar.sigfig = 5, cli.unicode = FALSE)}
 data_sim("eg1", n = 100, seed = 1)
 
 # an ordered categorical response

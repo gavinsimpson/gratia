@@ -1,4 +1,4 @@
-if(!exists("meta") || is.null(meta)) meta <- packageDescription("analogue")
+if(!exists("meta") || is.null(meta)) meta <- packageDescription("gratia")
 
 year <- sub("-.*", "", meta$Date)
 note <- sprintf("R package version %s", meta$Version)
