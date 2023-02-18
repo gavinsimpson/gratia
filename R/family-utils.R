@@ -296,25 +296,37 @@ family_type.family <- function(object, ...) {
 ## Other internal functions ---------------------------------------------------
 
 ## Workhorse link extractor
-#' @importFrom dplyr case_when
 `get_link_function` <- function(object, parameter = "location",
                                 inverse = FALSE, which_eta = NULL) {
     inverse <- as.logical(inverse)
     linfo <- object[["linfo"]]
     distr <- object[["family"]] # name of the the family
 
-    ## process distr for some familiee
-    distr <- case_when(
-        grepl("^Negative Binomial", distr, ignore.case = TRUE) ~ "nb",
-        grepl("^Tweedie", distr, ignore.case = TRUE) ~ "tweedie",
-        grepl("^Beta regression", distr, ignore.case = TRUE) ~ "beta",
-        grepl("^scaled t", distr, ignore.case = TRUE) ~ "scaled_t",
-        grepl("^Ordered Categorical", distr, ignore.case = TRUE) ~ "ocat",
-        grepl("^zero inflated Poisson", distr, ignore.case = TRUE) ~ "zip",
-        grepl("^Cox PH", distr, ignore.case = TRUE) ~ "cox_ph",
-        grepl("^censored normal", distr, ignore.case = TRUE) ~ "cnorm",
-        .default = as.character(distr)
-    )
+    ## process distr for some families
+    if (grepl("^Negative Binomial", distr)) {
+        distr <- "nb"
+    }
+    if (grepl("negative binomial", distr)) {
+        distr <- "nb"
+    }
+    if (grepl("^Tweedie", distr)) {
+        distr <- "tweedie"
+    }
+    if (identical(distr, "Beta regression")) {
+        distr <- "beta"
+    }
+    if (grepl("^scaled t", distr, ignore.case = TRUE)) {
+        distr <- "scaled_t"
+    }
+    if (identical(distr, "Ordered Categorical")) {
+        distr <- "ocat"
+    }
+    if (identical(distr, "zero inflated Poisson")) {
+        distr <- "zip"
+    }
+    if (identical(distr, "Cox PH")) {
+        distr <- "cox_ph"
+    }
 
     ## which link function
     lfun <-
@@ -347,8 +359,7 @@ family_type.family <- function(object, ...) {
                             which_eta = which_eta),
              multinom = multinom_link(object, parameter, inverse = inverse,
                                       which_eta = which_eta),
-             shash = shash_link(object, parameter, inverse = inverse),
-             cnorm = cnorm_link(object, parameter, inverse = inverse)
+             shash = shash_link(object, parameter, inverse = inverse)
              )
 
     ## return
@@ -360,15 +371,6 @@ family_type.family <- function(object, ...) {
 `gaussian_link` <- function(family, parameter = c("location", "mu"),
                             inverse = FALSE) {
     stop_if_not_family(family, type = "gaussian")
-
-    parameter <- match.arg(parameter)
-
-    extract_link(family, inverse = inverse)
-}
-
-`cnorm_link` <- function(family, parameter = c("location", "mu"),
-                            inverse = FALSE) {
-    stop_if_not_family(family, type = "censored normal")
 
     parameter <- match.arg(parameter)
 
@@ -620,7 +622,7 @@ family_type.family <- function(object, ...) {
         ## check that family is of the correct type
         ##  - need to handle a couple of special types
         special <- c("Tweedie", "Negative Binomial", "negative binomial",
-                     "Scaled t", "scaled t", "Ordered Categorical")
+                     "Scaled t", "scaled t")
         if (type %in% special) {
             if (!grepl(type, fam, ignore.case = TRUE)) {
                 stop("'family' is not of type '\"", type, "\"'", call. = FALSE)

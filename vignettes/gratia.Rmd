@@ -82,7 +82,7 @@ sm %>%
   ggplot(aes(y = est, x = x2)) +
     geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci),
                 alpha = 0.2, fill = "forestgreen") +
-    geom_line(colour = "forestgreen", linewidth = 1.5) +
+    geom_line(colour = "forestgreen", size = 1.5) +
     labs(y = "Partial effect",
          title = expression("Partial effect of" ~ f(x[2])),
          x = expression(x[2]))

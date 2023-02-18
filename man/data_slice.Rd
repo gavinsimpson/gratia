@@ -3,7 +3,6 @@
 \name{data_slice}
 \alias{data_slice}
 \alias{data_slice.default}
-\alias{data_slice.data.frame}
 \alias{data_slice.gam}
 \alias{data_slice.gamm}
 \alias{data_slice.list}
@@ -12,8 +11,6 @@
 data_slice(object, ...)
 
 \method{data_slice}{default}(object, ...)
-
-\method{data_slice}{data.frame}(object, ...)
 
 \method{data_slice}{gam}(object, ..., data = NULL)
 

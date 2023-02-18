@@ -71,7 +71,7 @@
 #' @importFrom pillar tbl_sum tbl_format_header
 `print.lp_matrix` <- function(x, ..., n = 5, max_footer_lines = 1) {
     class(x) <- class(x)[-1]
-    tbl <- as_tibble(as.data.frame(x))
+    tbl <- as_tibble(x)
     class(tbl) <- append(class(tbl), "tbl_lp_matrix", after = 0)
     print(tbl, ..., n = n, max_footer_lines = max_footer_lines)
 }

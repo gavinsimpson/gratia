@@ -13,26 +13,19 @@ fitted_samples(model, ...)
   data = newdata,
   seed,
   scale = c("response", "linear_predictor"),
-  method = c("gaussian", "mh", "inla", "user"),
-  n_cores = 1,
-  burnin = 1000,
-  thin = 1,
-  t_df = 40,
-  rw_scale = 0.25,
+  method = c("gaussian", "mh", "inla"),
   freq = FALSE,
   unconditional = FALSE,
+  ncores = 1L,
   ...,
-  newdata = NULL,
-  ncores = NULL
+  newdata = NULL
 )
 }
 \arguments{
 \item{model}{a fitted model of the supported types}
 
 \item{...}{arguments passed to other methods. For \code{fitted_samples()}, these
-are passed on to \code{predict.gam()}. For \code{posterior_samples()} these are
-passed on to \code{fitted_samples()}. For \code{predicted_samples()} these are
-passed on to the relevant \code{simulate()} method.}
+are passed on to \code{predict.gam()}.}
 
 \item{n}{numeric; the number of posterior samples to return.}
 
@@ -42,37 +35,14 @@ the model will be used for \code{data}, if available in \code{model}.}
 
 \item{seed}{numeric; a random seed for the simulations.}
 
-\item{scale}{character; what scale should the fitted values be returned on?
-\code{"linear predictor"} is a synonym for \code{"link"} if you prefer that
-terminology.}
+\item{scale}{character;}
 
-\item{method}{character; which method should be used to draw samples from
-the posterior distribution. \code{"gaussian"} uses a Gaussian (Laplace)
-approximation to the posterior. \code{"mh"} uses a Metropolis Hastings sample
-that alternates t proposals with proposals based on a shrunken version of
-the posterior covariance matrix. \code{"inla"} uses a variant of Integrated
-Nested Laplace Approximation due to Wood (2019), (currently not
-implemented). \code{"user"} allows for user-supplied posterior draws
-(currently not implemented).}
-
-\item{n_cores}{number of cores for generating random variables from a
-multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
-Parallelization will take place only if OpenMP is supported (but appears
-to work on Windows with current \code{R}).}
-
-\item{burnin}{numeric; number of samples to discard as the burnin draws.
-Only used with \code{method = "mh"}.}
-
-\item{thin}{numeric; the number of samples to skip when taking \code{n} draws.
-Results in \code{thin * n} draws from the posterior being taken. Only used with
-\code{method = "mh"}.}
-
-\item{t_df}{numeric; degrees of freedome for t distribution proposals. Only
-used with \code{method = "mh"}.}
-
-\item{rw_scale}{numeric; Factor by which to scale posterior covariance
-matrix when generating random walk proposals. Negative or non finite to
-skip the random walk step. Only used with \code{method = "mh"}.}
+\item{method}{character; the method used to generate samples from the
+posterior distribution of the model. \code{"gaussian"}, the default, uses a
+Gaussian approximation to the posterior. \code{"mh"} uses a simple Metropolis
+Hastings sampler, while \code{"inla"} uses a variant of Integrated Nested
+Laplace Approximation due to Wood (2019). Currently, the only available
+option is \code{"gaussian"}.}
 
 \item{freq}{logical; \code{TRUE} to use the frequentist covariance matrix of
 the parameter estimators, \code{FALSE} to use the Bayesian posterior
@@ -82,12 +52,12 @@ covariance matrix of the parameters.}
 Bayesian smoothing parameter uncertainty corrected covariance matrix is
 used, if available.}
 
-\item{newdata}{Deprecated: use \code{data} instead.}
+\item{ncores}{number of cores for generating random variables from a
+multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
+Parallelization will take place only if OpenMP is supported (but appears
+to work on Windows with current \code{R}).}
 
-\item{ncores}{Deprecated; use \code{n_cores} instead. The number of cores for
-generating random variables from a multivariate normal distribution.
-Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}. Parallelization will take place only if
-OpenMP is supported (but appears to work on Windows with current \code{R}).}
+\item{newdata}{Deprecated: use \code{data} instead.}
 }
 \value{
 A tibble (data frame) with 3 columns containing the posterior
@@ -103,7 +73,7 @@ relates to,
 \description{
 Expectations (fitted values) of the response drawn from the posterior
 distribution of fitted model using a Gaussian approximation to the
-posterior or a simple Metropolis Hastings sampler.
+posterior.
 }
 \examples{
 load_mgcv()

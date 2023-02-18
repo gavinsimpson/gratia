@@ -6,6 +6,12 @@ library("gratia")
 library("mgcv")
 library("ggplot2")
 
+## Need a local wrapper to allow conditional use of vdiffr
+# `expect_doppelganger` <- function(title, fig, ...) {
+#   testthat::skip_if_not_installed("vdiffr")
+#   vdiffr::expect_doppelganger(title, fig, ...)
+# }
+
 test_that("draw.evaluated_1d_smooth() plots the smooth", {
     withr::local_options(lifecycle_verbosity = "quiet")
     sm <- evaluate_smooth(su_m_univar_4, "s(x2)")
@@ -341,31 +347,6 @@ test_that("draw.derivates() plots derivatives for a GAM rotated labels", {
         plt)
 })
 
-test_that("draw plots partial derivatives for a GAM", {
-    d1 <- partial_derivatives(su_m_bivar_te, term = "te(x,z)", focal = "z",
-        type = "central")
-    plt <- draw(d1)
-    expect_doppelganger("draw partial derivatives for a GAM", plt)
-
-    plt <- draw(d1, scales = "fixed")
-    ## skip_on_ci()
-    expect_doppelganger("draw partial derivatives for a GAM with fixed scales",
-        plt)
-})
-
-test_that("draw plots partial derivs for GAM rotated labels", {
-    skip_on_cran()
-    d1 <- partial_derivatives(su_m_bivar_te, term = "te(x,z)", focal = "z",
-        type = "central")
-    plt <- draw(d1, angle = 45)
-    expect_doppelganger("draw partial derivatives for GAM rotated labels",
-        plt)
-
-    plt <- draw(d1, scales = "fixed", angle = 45)
-    expect_doppelganger("draw partial derivatives for GAM fixed scales rotated",
-        plt)
-})
-
 ## test that issue 39 stays fixed
 test_that("draw.gam doesn't create empty plots with multiple parametric terms", {
     plt <- draw(m_2_fac, rug = FALSE)
@@ -572,12 +553,4 @@ test_that("draw.penalty_df works with normalization", {
     plt <- draw(penalty(su_m_univar_4, "s(x1)"), normalize = TRUE)
     expect_doppelganger("draw penalty_df with single smooths normalized",
                         plt)
-})
-
-test_that("plotting sos smooths works", {
-    skip_on_cran()
-    skip_if_not_installed("mapproj")
-    skip_on_os("mac")
-    expect_silent(plt <- draw(m_sos, n = 25))
-    expect_doppelganger("draw works for sos smooths", plt)
 })

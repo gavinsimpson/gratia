@@ -1,62 +1,3 @@
-# gratia 0.8.1.7
-
-## User visible changes
-
-* `smooth_samples()` now uses a single call to the RNG to generate draws from
-  the posterior of smooths. Previous to version 0.9.0, `smooth_samples()` would
-  do a separate call to `mvnfast::rmvn()` for each smooth. As a result, the
-  result of a call to `smooth_samples()` on a model with multiple smooths will
-  now produce different results to those generated previously. To regain the
-  old behaviour, add `rng_per_smooth = TRUE` to the `smooth_samples()` call.
-  
-  Note, however, that using per-smooth RNG calls with `method = "mh"` will be
-  very inefficient as, with that method, posterior draws for all coefficients
-  in the model are sampled at once. So, only use `rng_per_smooth = TRUE` with
-  `method = "gaussian"`.
-
-## New features
-
-* `data_sim()` can now simulate response data from Tweedie and ordered
-  categorical distributions.
-
-* `fitted_samples()` and `smooth_samples()` can now use the Metropolis Hastings
-  sampler from `mgcv::gam.mh()`, instead of a Gaussian approximation, to sample
-  from the posterior distribution of the model or specific smooths
-  respectively.
-
-* `posterior_samples()` is a new function in the family of `fitted_samples()`
-  and `smooth_samples()`. `posterior_samples()` returns draws from the
-  posterior distribution of the response, combining the uncertainty in the
-  estimated expected value of the response and the dispersion of the response
-  distribution. The difference between `posterior_samples()` and
-  `predicted_samples()` is that the latter only includes variation due to
-  drawing samples from the conditional distribution of the response (the
-  uncertainty in the expected values is ignored), while the former includes
-  both sources of uncertainty.
-
-* `data_slice()` gains a method for data frames and tibbles.
-
-* `typical_values()` gains a method for data frames and tibbles.
-
-* `fitted_values()` now works with models fitted using the `mgcv::ocat()`
-  family. The predicted probability for each category is returned, alongside a
-  Wald interval created using the standard error (SE) of the estimated
-  probability. The SE and estimated probabilities are transformed to the logit
-  (linear predictor) scale, a Wald credible interval is formed, which is then
-  back-transformed to the response (probability) scale.
-
-* `link()` and `inv_link()` work for models fitted using the `cnorm()` family.
-
-## Bug fixes
-
-* `link()`, `inv_link()`, and related family functions for the `ocat()` weren't
-  correctly identifying the family name and as a result would throw an error
-  even when passed an object of the correct family.
-
-* The `print()` method for `lp_matrix()` now converts the matrix to a data frame
-  before conversion to a tibble. This makes more sense as it results in more
-  typical behaviour as the columns of the printed object are doubles.
-
 # gratia 0.8.1
 
 ## User visible changes
@@ -108,8 +49,8 @@
 ## New features
 
 * Added basic support for GAMLSS (distributional GAMs) fitted with the
-  `gamlss()` function from package GJRM. Support is currently restricted to a
-  `draw()` method.
+  `gamlss()´ function from package GJRM. Support is currently restricted to a
+  `draw()´ method.
 
 * `difference_smooths()` can now include the group means in the difference,
   which many users expected. To include the group means use `group_means = TRUE`

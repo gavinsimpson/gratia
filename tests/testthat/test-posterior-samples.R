@@ -8,46 +8,17 @@ library("gratia")
 test_that("smooth_samples works for a continuous by GAM", {
     expect_silent(sm <- smooth_samples(su_m_cont_by, n = 5, n_vals = 100,
                                        seed = 42))
-    expect_s3_class(sm, c("smooth_samples", "tbl_df",
+    expect_s3_class(sm, c("smooth_samples", "posterior_samples", "tbl_df",
                           "tbl", "data.frame"))
     ## 500 == 1 smooth * 5 * 100
     expect_identical(NROW(sm), 500L)
     expect_identical(NCOL(sm), 8L) # 8 cols, univatiate smooths
-    skip_on_cran()
-    skip_on_ci()
-    expect_snapshot(sm)
 })
 
 test_that("smooth_samples works for a simple GAM", {
     expect_silent(sm <- smooth_samples(m_1_smooth, n = 5, n_vals = 100,
                                        seed = 42))
-    expect_s3_class(sm, c("smooth_samples", "tbl_df",
-                          "tbl", "data.frame"))
-    ## 500 == 1 smooth * 5 * 100
-    expect_identical(NROW(sm), 500L)
-    expect_identical(NCOL(sm), 8L) # 8 cols, univatiate smooths
-    skip_on_cran()
-    skip_on_ci()
-    expect_snapshot(sm)
-})
-
-test_that("smooth_samples works for a simple GAM multi rng calls", {
-    expect_silent(sm <- smooth_samples(m_1_smooth, n = 5, n_vals = 100,
-                                       seed = 42, rng_per_smooth = TRUE))
-    expect_s3_class(sm, c("smooth_samples", "tbl_df",
-                          "tbl", "data.frame"))
-    ## 500 == 1 smooth * 5 * 100
-    expect_identical(NROW(sm), 500L)
-    expect_identical(NCOL(sm), 8L) # 8 cols, univatiate smooths
-    skip_on_cran()
-    skip_on_ci()
-    expect_snapshot(sm)
-})
-
-test_that("smooth_samples works for a simple GAM MH sampling", {
-    expect_silent(sm <- smooth_samples(m_1_smooth, n = 5, n_vals = 100,
-                                       method = "mh", seed = 42))
-    expect_s3_class(sm, c("smooth_samples", "tbl_df",
+    expect_s3_class(sm, c("smooth_samples", "posterior_samples", "tbl_df",
                           "tbl", "data.frame"))
     ## 500 == 1 smooth * 5 * 100
     expect_identical(NROW(sm), 500L)
@@ -56,7 +27,7 @@ test_that("smooth_samples works for a simple GAM MH sampling", {
 
 test_that("smooth_samples works for a multi-smooth GAM", {
     expect_silent(sm <- smooth_samples(m_gam, n = 5, n_vals = 100, seed = 42))
-    expect_s3_class(sm, c("smooth_samples", "tbl_df",
+    expect_s3_class(sm, c("smooth_samples", "posterior_samples", "tbl_df",
                           "tbl", "data.frame"))
     ## 2000 == 4 smooths * 5 * 100
     expect_identical(NROW(sm), 2000L)
@@ -66,7 +37,7 @@ test_that("smooth_samples works for a multi-smooth GAM", {
 test_that("smooth_samples works for a multi-smooth factor by GAM", {
     expect_silent(sm <- smooth_samples(su_m_factor_by, n = 5, n_vals = 50,
                                        seed = 42))
-    expect_s3_class(sm, c("smooth_samples", "tbl_df",
+    expect_s3_class(sm, c("smooth_samples", "posterior_samples", "tbl_df",
                           "tbl", "data.frame"))
     ## 2000 == 1 + (1 * 3) smooths * 5 * 50
     expect_identical(NROW(sm), 1000L)
@@ -118,7 +89,7 @@ test_that("smooth_samples fails if no smooths left to sample from", {
 
 test_that("fitted_samples works for a simple GAM", {
     expect_silent(sm <- fitted_samples(m_1_smooth, n = 5, seed = 42))
-    expect_s3_class(sm, c("fitted_samples", "tbl_df",
+    expect_s3_class(sm, c("fitted_samples", "posterior_samples", "tbl_df",
                           "tbl", "data.frame"))
     ## 1000 == 5 * 200 (nrow(dat))
     expect_identical(NROW(sm), 1000L)
@@ -128,7 +99,7 @@ test_that("fitted_samples works for a simple GAM", {
 
 test_that("fitted_samples works for a multi-smooth GAM", {
     expect_silent(sm <- fitted_samples(m_gam, n = 5, seed = 42))
-    expect_s3_class(sm, c("fitted_samples", "tbl_df",
+    expect_s3_class(sm, c("fitted_samples", "posterior_samples", "tbl_df",
                           "tbl", "data.frame"))
     ## 5000 == 5 draws * 1000 observations in data
     expect_identical(NROW(sm), 5000L)
@@ -138,7 +109,7 @@ test_that("fitted_samples works for a multi-smooth GAM", {
 
 test_that("fitted_samples works for a multi-smooth factor by GAM", {
     expect_silent(sm <- fitted_samples(su_m_factor_by, n = 5, seed = 42))
-    expect_s3_class(sm, c("fitted_samples", "tbl_df",
+    expect_s3_class(sm, c("fitted_samples", "posterior_samples", "tbl_df",
                           "tbl", "data.frame"))
     ## 2000 == 5 draws * 400 observations in data
     expect_identical(NROW(sm), 2000L)
@@ -158,7 +129,7 @@ test_that("fitted_samples() fails if not suitable method available", {
 
 test_that("predicted_samples works for a simple GAM", {
     expect_silent(sm <- predicted_samples(m_1_smooth, n = 5, seed = 42))
-    expect_s3_class(sm, c("predicted_samples", "tbl_df",
+    expect_s3_class(sm, c("predicted_samples", "posterior_samples", "tbl_df",
                           "tbl", "data.frame"))
     ## 2000 == 5 * 100 (nrow(dat))
     expect_identical(NROW(sm), 1000L)
@@ -168,7 +139,7 @@ test_that("predicted_samples works for a simple GAM", {
 
 test_that("predicted_samples works for a multi-smooth GAM", {
     expect_silent(sm <- predicted_samples(m_gam, n = 5, seed = 42))
-    expect_s3_class(sm, c("predicted_samples", "tbl_df",
+    expect_s3_class(sm, c("predicted_samples", "posterior_samples", "tbl_df",
                           "tbl", "data.frame"))
     ## 5000 == 5 draws * 1000 observations in data
     expect_identical(NROW(sm), 5000L)
@@ -178,7 +149,7 @@ test_that("predicted_samples works for a multi-smooth GAM", {
 
 test_that("predicted_samples works for a multi-smooth factor by GAM", {
     expect_silent(sm <- predicted_samples(su_m_factor_by, n = 5, seed = 42))
-    expect_s3_class(sm, c("predicted_samples", "tbl_df",
+    expect_s3_class(sm, c("predicted_samples", "posterior_samples", "tbl_df",
                           "tbl", "data.frame"))
     ## 2000 == 5 draws * 400 observations in data
     expect_identical(NROW(sm), 2000L)
@@ -214,24 +185,4 @@ test_that("smooth_samples example output doesn't change", {
     skip_on_os("mac")
     samples <- smooth_samples(m_gam, term = "s(x0)", n = 5, seed = 42)
     expect_snapshot(samples)
-})
-
-test_that("posterior_samples works for a simple GAM", {
-    expect_silent(sm <- posterior_samples(m_1_smooth, n = 5, seed = 42))
-    expect_s3_class(sm, c("posterior_samples", "tbl_df",
-        "tbl", "data.frame"))
-    ## 1000 == 5 * 200 (nrow(dat))
-    expect_identical(NROW(sm), 1000L)
-    expect_identical(NCOL(sm), 3L) # 3 cols
-    expect_named(sm, expected = c("row", "draw", "response"))
-})
-
-test_that("posterior_samples works for a multi-smooth tweedie GAM", {
-    expect_silent(sm <- posterior_samples(m_tw, n = 5, seed = 42))
-    expect_s3_class(sm, c("posterior_samples", "tbl_df",
-                          "tbl", "data.frame"))
-    ## 2500 == 5 draws * 5000 observations in data
-    expect_identical(NROW(sm), 2500L)
-    expect_identical(NCOL(sm), 3L) # 3 cols
-    expect_named(sm, expected = c("row", "draw", "response"))
 })

@@ -81,8 +81,8 @@ test_that("data_slice works for a GAM with factor by", {
 })
 
 test_that("default data_slice method fails gracefully", {
-    expect_error(data_slice(1:10),
-                 "Don't know how to create a data slice from <integer>",
+    expect_error(data_slice(su_eg4),
+                 "Don't know how to create a data slice from <tbl_df>",
                  fixed = TRUE)
 })
 
@@ -214,20 +214,4 @@ test_that("data_slice with works with models with an offset", {
     expect_identical(nrow(ds), 50L)
     expect_identical(ncol(ds), 2L)
     expect_identical(ds$off, rep(1, length.out = 50))
-})
-
-test_that("typical_values works for a data frame", {
-    expect_silent(tv <- typical_values(su_eg2, vars = any_of(c("x", "z"))))
-    expect_snapshot(tv, cran = FALSE)
-})
-
-test_that("data_slice works for a data frame", {
-    expect_silent(ds <- data_slice(su_eg2, x = evenly(x, n = 25)))
-    expect_snapshot(ds, cran = FALSE)
-    expect_identical(nrow(ds), 25L)
-
-    expect_silent(ds <- data_slice(su_eg2, x = evenly(x, n = 25),
-        z = evenly(z, n = 25)))
-    expect_snapshot(ds, cran = FALSE)
-    expect_identical(nrow(ds), 625L)
 })

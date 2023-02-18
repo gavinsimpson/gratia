@@ -6,6 +6,7 @@
 #'   the model will be used for `data`, if available in `model`.
 #' @param n numeric; the number of posterior samples to return.
 #' @param seed numeric; a random seed for the simulations.
+#' @param scale character;
 #' @param freq logical; `TRUE` to use the frequentist covariance matrix of
 #'   the parameter estimators, `FALSE` to use the Bayesian posterior
 #'   covariance matrix of the parameters.
@@ -14,37 +15,13 @@
 #'   used, if available.
 #' @param weights numeric; a vector of prior weights. If `data` is null
 #'   then defaults to `object[["prior.weights"]]`, otherwise a vector of ones.
-#' @param n_cores number of cores for generating random variables from a
+#' @param ncores number of cores for generating random variables from a
 #'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
 #'   Parallelization will take place only if OpenMP is supported (but appears
 #'   to work on Windows with current `R`).
-#' @param method character; which method should be used to draw samples from
-#'   the posterior distribution. `"gaussian"` uses a Gaussian (Laplace)
-#'   approximation to the posterior. `"mh"` uses a Metropolis Hastings sample
-#'   that alternates t proposals with proposals based on a shrunken version of
-#'   the posterior covariance matrix. `"inla"` uses a variant of Integrated
-#'   Nested Laplace Approximation due to Wood (2019), (currently not
-#'   implemented). `"user"` allows for user-supplied posterior draws
-#'   (currently not implemented).
-#' @param burnin numeric; number of samples to discard as the burnin draws.
-#'   Only used with `method = "mh"`.
-#' @param thin numeric; the number of samples to skip when taking `n` draws.
-#'   Results in `thin * n` draws from the posterior being taken. Only used with
-#'   `method = "mh"`.
-#' @param t_df numeric; degrees of freedome for t distribution proposals. Only
-#'   used with `method = "mh"`.
-#' @param rw_scale numeric; Factor by which to scale posterior covariance
-#'   matrix when generating random walk proposals. Negative or non finite to
-#'   skip the random walk step. Only used with `method = "mh"`.
 #' @param ... arguments passed to other methods. For `fitted_samples()`, these
-#'   are passed on to `predict.gam()`. For `posterior_samples()` these are
-#'   passed on to `fitted_samples()`. For `predicted_samples()` these are
-#'   passed on to the relevant `simulate()` method.
+#'   are passed on to `predict.gam()`.
 #' @param newdata Deprecated: use `data` instead.
-#' @param ncores Deprecated; use `n_cores` instead. The number of cores for
-#'   generating random variables from a multivariate normal distribution.
-#'   Passed to [mvnfast::rmvn()]. Parallelization will take place only if
-#'   OpenMP is supported (but appears to work on Windows with current `R`).
 #'
 #' @return A tibble (data frame) with 3 columns containing the posterior
 #'   predicted values in long format. The columns are
@@ -55,11 +32,6 @@
 #'     `data`.
 #'
 #' @author Gavin L. Simpson
-#'
-#' @references
-#'
-#' Wood, S.N., (2020). Simplified integrated nested Laplace approximation.
-#'   *Biometrika* **107**, 223--230. \doi{10.1093/biomet/asz044}
 #'
 #' @export
 `posterior_samples` <- function(model, ...) {
@@ -74,80 +46,26 @@
 
 #' @export
 #' @rdname posterior_samples
-`posterior_samples.gam` <- function(model, n, data = newdata, seed = NULL,
-    method = c("gaussian", "mh", "inla", "user"),
-    n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
-    freq = FALSE, unconditional = FALSE,
-    weights = NULL, ...,
-    newdata = NULL,
-    ncores = NULL) {
-    # generate new response data from the model including the uncertainty in
-    # the model.
-
-    # start my getting draws of expectation
-    sim_eta <- fitted_samples(model, n = n, data = data, seed = seed,
-        scale = "response", method = method, n_cores = n_cores, burnin = burnin,
-        thin = thin, t_df = t_df, rw_scale = rw_scale, freq = freq,
-        unconditional = unconditional, weights = weights, newdata = newdata,
-        ncores = ncores, ...)
-
-    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-        runif(1)
-    }
-    if (is.null(seed)) {
-        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-    } else {
-        R.seed <- get(".Random.seed", envir = .GlobalEnv)
-        set.seed(seed)
-        RNGstate <- structure(seed, kind = as.list(RNGkind()))
-        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-    }
-
-    ## rd function if available
-    rd_fun <- get_family_rd(model)
-
-    ## dispersion or scale variable for simulation
-    scale <- model[["sig2"]]
-    if (is.null(scale)) {
-        scale <- summary(model)[["dispersion"]]
-    }
-
-    if (!is.null(newdata)) {
-        newdata_deprecated()
-    }
-
-    if (is.null(data)) {
-        # data <- model[["model"]]
-        weights <- model[["prior.weights"]]
-    } else {
-        if (is.null(weights)) {
-            weights <- rep(1, nrow(data))
-        }
-    }
-
-    # need to extend weights by number of draws
-    weights <- rep(weights, times = n)
-    #scale <- rep(scale, times = n)
-
-    # replace fitted with
-    sim_eta <- sim_eta |>
-        mutate(response = rd_fun(mu = fitted, wt = weights, scale = scale)) |>
-        select(all_of(c("row", "draw", "response")))
-
-    ## add classes
-    class(sim_eta) <- c("posterior_samples", class(sim_eta))
-    sim_eta
+`posterior_samples.gam` <- function(model, n, data = newdata, seed,
+                                    scale = c("response","linear_predictor"),
+                                    freq = FALSE, unconditional = FALSE,
+                                    weights = NULL, ncores = 1L, ...,
+                                    newdata = NULL) {
+    .NotYetImplemented()
 }
 
 #' Draw fitted values from the posterior distribution
 #'
 #' Expectations (fitted values) of the response drawn from the posterior
 #' distribution of fitted model using a Gaussian approximation to the
-#' posterior or a simple Metropolis Hastings sampler.
-#' 
-#' @param scale character; what scale should the fitted values be returned on?
-#'   `"linear predictor"` is a synonym for `"link"` if you prefer that
-#'   terminology.
+#' posterior.
+#'
+#' @param method character; the method used to generate samples from the
+#'   posterior distribution of the model. `"gaussian"`, the default, uses a
+#'   Gaussian approximation to the posterior. `"mh"` uses a simple Metropolis
+#'   Hastings sampler, while `"inla"` uses a variant of Integrated Nested
+#'   Laplace Approximation due to Wood (2019). Currently, the only available
+#'   option is `"gaussian"`.
 #'
 #' @return A tibble (data frame) with 3 columns containing the posterior
 #'   predicted values in long format. The columns are
@@ -198,11 +116,10 @@
 #' }
 #' \dontshow{options(op)}
 `fitted_samples.gam` <- function(model, n = 1, data = newdata, seed,
-    scale = c("response", "linear_predictor"),
-    method = c("gaussian", "mh", "inla", "user"),
-    n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
-    freq = FALSE, unconditional = FALSE,
-    ..., newdata = NULL, ncores = NULL) {
+                                 scale = c("response", "linear_predictor"),
+                                 method = c("gaussian", "mh", "inla"),
+                                 freq = FALSE, unconditional = FALSE,
+                                 ncores = 1L, ..., newdata = NULL) {
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
         runif(1)
     }
@@ -219,11 +136,6 @@
         newdata_deprecated()
     }
 
-    if (!is.null(ncores)) {
-        message("Argument `ncores` is deprecated. Use `n_cores` instead.")
-        n_cores <- ncores
-    }
-
     if (is.null(data)) {
         data <- model[["model"]]
     }
@@ -231,15 +143,15 @@
     scale <- match.arg(scale)
 
     method <- match.arg(method)
+    if (! method %in% c("gaussian")) {
+        warning("Only Gaussian approximation is currently available.")
+    }
 
-    # get posterior draws
-    betas <- post_draws(n = n, method = method,
-        n_cores = n_cores, model = model,
-        burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-        index = NULL, frequentist = freq, unconditional = unconditional)
+    V <- get_vcov(model, frequentist = freq, unconditional = unconditional)
+    Rbeta <- rmvn(n = n, mu = coef(model), sigma = V, ncores = ncores)
     ## don't need to pass freq, unconditional here as that is done for V
     Xp <- predict(model, newdata = data, type = "lpmatrix", ...)
-    sims <- Xp %*% t(betas)
+    sims <- Xp %*% t(Rbeta)
 
     if (isTRUE(identical(scale, "response"))) {
         ilink <- inv_link(model, parameter = "location")
@@ -254,7 +166,7 @@
     sims[["draw"]] <- as.integer(sims[["draw"]])
     attr(sims, "seed") <- RNGstate
     ## add classes
-    class(sims) <- c("fitted_samples", class(sims))
+    class(sims) <- c("fitted_samples", "posterior_samples", class(sims))
     sims
 }
 
@@ -337,7 +249,7 @@
     sims[["draw"]] <- as.integer(sims[["draw"]])
     attr(sims, "seed") <- RNGstate
     ## add classes
-    class(sims) <- c("predicted_samples", class(sims))
+    class(sims) <- c("predicted_samples", "posterior_samples", class(sims))
     sims
 }
 
@@ -412,10 +324,6 @@
 #' @param term character; select which smooth's posterior to draw from.
 #'   The default (`NULL`) means the posteriors of all smooths in `model`
 #'   wil be sampled from. If supplied, a character vector of requested terms.
-#' @param rng_per_smooth logical; if TRUE, the behaviour of gratia version
-#' 0.8.1 or earlier is used, whereby a separate call the the random number
-#' generator (RNG) is performed for each smooth. If FALSE, a single call to the
-#' RNG is performed for all model parameters
 #'
 #' @section Warning:
 #' The set of variables returned and their order in the tibble is subject to
@@ -433,21 +341,10 @@
 #' @importFrom tidyr pivot_longer
 #' @importFrom mgcv PredictMat
 `smooth_samples.gam` <- function(model, term = NULL, n = 1, data = newdata,
-    method = c("gaussian", "mh", "inla", "user"),
-    seed = NULL,
-    freq = FALSE,
-    unconditional = FALSE,
-    n_cores = 1L,
-    n_vals = 200,
-    burnin = 1000,
-    thin = 1,
-    t_df = 40,
-    rw_scale = 0.25,
-    rng_per_smooth = FALSE,
-    ...,
-    newdata = NULL,
-    ncores = NULL) {
-    # smooth_samples begins
+                                 seed = NULL, freq = FALSE,
+                                 unconditional = FALSE,
+                                 ncores = 1L, n_vals = 200, ...,
+                                 newdata = NULL) {
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
         runif(1)
     }
@@ -487,26 +384,14 @@
         newdata_deprecated()
     }
 
-    if (!is.null(ncores)) {
-        message("Argument `ncores` is deprecated. Use `n_cores` instead.")
-        n_cores <- ncores
-    }
-
     need_data <- FALSE
     if (is.null(data)) {
         need_data <- TRUE
     }
 
-    # what posterior sampling are we using
-    method <- match.arg(method)
+    V <- get_vcov(model, frequentist = freq, unconditional = unconditional)
 
-    # get posterior draws - call this once for all parameters
-    if (isFALSE(rng_per_smooth)) {
-        betas <- post_draws(n = n, method = method,
-            n_cores = n_cores, model = model,
-            burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-            index = NULL, frequentist = freq, unconditional = unconditional)
-    }
+    coefs <- coef(model)
 
     sims <- data_names <- vector('list', length = length(S))
     for (i in seq_along(S)) {
@@ -514,22 +399,15 @@
             # FIXME: should offset be NULL?
             data <- smooth_data(model, id = take[i], n = n_vals,
                                 offset = NULL)
-            # I don't think we need offset here as that really just shifts the
-            # response around
+            ## I don't think we need offset here as that really just shifts the
+            ## response around
         }
         sm  <- get_smooths_by_id(model, take[i])[[1L]]
         idx <- smooth_coef_indices(sm)
         Xp <- PredictMat(sm, data = data)
-        # get posterior draws - use old behaviour? TRUE is yes
-        simu <- if (isTRUE(rng_per_smooth)) {
-            betas <- post_draws(n = n, method = method,
-                n_cores = n_cores, model = model,
-                burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-                index = idx, frequentist = freq, unconditional = unconditional)
-            Xp %*% t(betas)
-        } else {
-            Xp %*% t(betas[, idx, drop = FALSE])
-        }
+        betas <- rmvn(n = n, mu = coefs[idx], sigma = V[idx, idx, drop=FALSE],
+                      ncores = ncores)
+        simu <- Xp %*% t(betas)
         colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
         simu <- as_tibble(simu)
         nr_simu <- nrow(simu)
@@ -543,7 +421,7 @@
                                by_variable = rep(NA_character_,
                                                  times = nr_simu))
         }
-        # add on spline type info
+    #   # add on spline type info
         sm_type <- smooth_type(sm)
         simu <- add_column(simu,
             smooth = rep(unlist(lapply(strsplit(S[[i]], ":"), `[`, 1L)),
@@ -556,7 +434,9 @@
         simu <- pivot_longer(simu, cols = dplyr::starts_with("..V"),
             names_to = "draw", values_to = "value",
             names_transform = \(x) as.integer(sub("\\.\\.V", "", x)))
-
+        # summ_names <- names(data[!vapply(data, is.factor, logical(1))])
+        # names(summ_names) <- paste0(".x", seq_along(summ_names))
+        # data_names[[i]] <- summ_names
         ## nest all columns with varying data
         simu <- nest(simu, data = all_of(c("row", "draw", "value",
             smooth_variable(sm))))
@@ -567,6 +447,6 @@
     sims <- unnest(sims, all_of("data"))
     attr(sims, "seed") <- RNGstate
     ## add classes
-    class(sims) <- c("smooth_samples", class(sims))
+    class(sims) <- c("smooth_samples", "posterior_samples", class(sims))
     sims
 }

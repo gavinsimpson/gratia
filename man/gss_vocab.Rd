@@ -13,7 +13,7 @@ test.
 \item \code{nativeBorn}: factor; Was the respondent born in the US? A factor with
 levels \code{no} and \code{yes}.
 \item \code{ageGroup}: factor; grouped age of the respondent with levels \code{18-29}
-\code{30-39}, \code{40-49}, \code{50-59}, and \verb{60+}.
+\code{30-39}, \code{40-49}, \code{50-59}, and \verb{60+}.##'
 }
 }
 \description{

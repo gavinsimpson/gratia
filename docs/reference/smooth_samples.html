@@ -14,7 +14,7 @@ functions."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,20 +75,13 @@ functions.</p>
 <span>  term <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">newdata</span>,</span>
-<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"mh"</span>, <span class="st">"inla"</span>, <span class="st">"user"</span><span class="op">)</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  freq <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  n_cores <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  ncores <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  n_vals <span class="op">=</span> <span class="fl">200</span>,</span>
-<span>  burnin <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  thin <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  t_df <span class="op">=</span> <span class="fl">40</span>,</span>
-<span>  rw_scale <span class="op">=</span> <span class="fl">0.25</span>,</span>
-<span>  rng_per_smooth <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  ncores <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  newdata <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -100,9 +93,7 @@ functions.</p>
 
 <dt>...</dt>
 <dd><p>arguments passed to other methods. For <code><a href="fitted_samples.html">fitted_samples()</a></code>, these
-are passed on to <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">predict.gam()</a></code>. For <code><a href="posterior_samples.html">posterior_samples()</a></code> these are
-passed on to <code><a href="fitted_samples.html">fitted_samples()</a></code>. For <code><a href="predicted_samples.html">predicted_samples()</a></code> these are
-passed on to the relevant <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> method.</p></dd>
+are passed on to <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">predict.gam()</a></code>.</p></dd>
 
 
 <dt>term</dt>
@@ -121,17 +112,6 @@ from the model should be evaluated. If not supplied, the data used to fit
 the model will be used for <code>data</code>, if available in <code>model</code>.</p></dd>
 
 
-<dt>method</dt>
-<dd><p>character; which method should be used to draw samples from
-the posterior distribution. <code>"gaussian"</code> uses a Gaussian (Laplace)
-approximation to the posterior. <code>"mh"</code> uses a Metropolis Hastings sample
-that alternates t proposals with proposals based on a shrunken version of
-the posterior covariance matrix. <code>"inla"</code> uses a variant of Integrated
-Nested Laplace Approximation due to Wood (2019), (currently not
-implemented). <code>"user"</code> allows for user-supplied posterior draws
-(currently not implemented).</p></dd>
-
-
 <dt>seed</dt>
 <dd><p>numeric; a random seed for the simulations.</p></dd>
 
@@ -148,7 +128,7 @@ Bayesian smoothing parameter uncertainty corrected covariance matrix is
 used, if available.</p></dd>
 
 
-<dt>n_cores</dt>
+<dt>ncores</dt>
 <dd><p>number of cores for generating random variables from a
 multivariate normal distribution. Passed to <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code>.
 Parallelization will take place only if OpenMP is supported (but appears
@@ -160,44 +140,8 @@ to work on Windows with current <code>R</code>).</p></dd>
 <code>data</code> not supplied</p></dd>
 
 
-<dt>burnin</dt>
-<dd><p>numeric; number of samples to discard as the burnin draws.
-Only used with <code>method = "mh"</code>.</p></dd>
-
-
-<dt>thin</dt>
-<dd><p>numeric; the number of samples to skip when taking <code>n</code> draws.
-Results in <code>thin * n</code> draws from the posterior being taken. Only used with
-<code>method = "mh"</code>.</p></dd>
-
-
-<dt>t_df</dt>
-<dd><p>numeric; degrees of freedome for t distribution proposals. Only
-used with <code>method = "mh"</code>.</p></dd>
-
-
-<dt>rw_scale</dt>
-<dd><p>numeric; Factor by which to scale posterior covariance
-matrix when generating random walk proposals. Negative or non finite to
-skip the random walk step. Only used with <code>method = "mh"</code>.</p></dd>
-
-
-<dt>rng_per_smooth</dt>
-<dd><p>logical; if TRUE, the behaviour of gratia version
-0.8.1 or earlier is used, whereby a separate call the the random number
-generator (RNG) is performed for each smooth. If FALSE, a single call to the
-RNG is performed for all model parameters</p></dd>
-
-
 <dt>newdata</dt>
 <dd><p>Deprecated: use <code>data</code> instead.</p></dd>
-
-
-<dt>ncores</dt>
-<dd><p>Deprecated; use <code>n_cores</code> instead. The number of cores for
-generating random variables from a multivariate normal distribution.
-Passed to <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code>. Parallelization will take place only if
-OpenMP is supported (but appears to work on Windows with current <code>R</code>).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -254,16 +198,16 @@ change in future versions. Don't rely on position.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1,000 x 8</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    smooth term  type  by_variable   row  draw  value      x0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              1     1 -<span style="color: #BB0000;">0.357</span> 0.007<span style="text-decoration: underline;">11</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              1     2 -<span style="color: #BB0000;">0.465</span> 0.007<span style="text-decoration: underline;">11</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              1     3 -<span style="color: #BB0000;">0.720</span> 0.007<span style="text-decoration: underline;">11</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              1     4 -<span style="color: #BB0000;">1.27</span>  0.007<span style="text-decoration: underline;">11</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              1     5 -<span style="color: #BB0000;">1.18</span>  0.007<span style="text-decoration: underline;">11</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              2     1 -<span style="color: #BB0000;">0.365</span> 0.012<span style="text-decoration: underline;">1</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              2     2 -<span style="color: #BB0000;">0.464</span> 0.012<span style="text-decoration: underline;">1</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              2     3 -<span style="color: #BB0000;">0.708</span> 0.012<span style="text-decoration: underline;">1</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              2     4 -<span style="color: #BB0000;">1.24</span>  0.012<span style="text-decoration: underline;">1</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              2     5 -<span style="color: #BB0000;">1.16</span>  0.012<span style="text-decoration: underline;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              1     1 -<span style="color: #BB0000;">0.940</span> 0.007<span style="text-decoration: underline;">11</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              1     2 -<span style="color: #BB0000;">1.08</span>  0.007<span style="text-decoration: underline;">11</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              1     3 -<span style="color: #BB0000;">1.11</span>  0.007<span style="text-decoration: underline;">11</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              1     4 -<span style="color: #BB0000;">1.18</span>  0.007<span style="text-decoration: underline;">11</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              1     5 -<span style="color: #BB0000;">1.04</span>  0.007<span style="text-decoration: underline;">11</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              2     1 -<span style="color: #BB0000;">0.919</span> 0.012<span style="text-decoration: underline;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              2     2 -<span style="color: #BB0000;">1.05</span>  0.012<span style="text-decoration: underline;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              2     3 -<span style="color: #BB0000;">1.09</span>  0.012<span style="text-decoration: underline;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              2     4 -<span style="color: #BB0000;">1.16</span>  0.012<span style="text-decoration: underline;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> s(x0)  s(x0) TPRS  <span style="color: #BB0000;">NA</span>              2     5 -<span style="color: #BB0000;">1.01</span>  0.012<span style="text-decoration: underline;">1</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ... with 990 more rows</span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>

@@ -12,29 +12,20 @@ smooth_samples(model, ...)
   term = NULL,
   n = 1,
   data = newdata,
-  method = c("gaussian", "mh", "inla", "user"),
   seed = NULL,
   freq = FALSE,
   unconditional = FALSE,
-  n_cores = 1L,
+  ncores = 1L,
   n_vals = 200,
-  burnin = 1000,
-  thin = 1,
-  t_df = 40,
-  rw_scale = 0.25,
-  rng_per_smooth = FALSE,
   ...,
-  newdata = NULL,
-  ncores = NULL
+  newdata = NULL
 )
 }
 \arguments{
 \item{model}{a fitted model of the supported types}
 
 \item{...}{arguments passed to other methods. For \code{fitted_samples()}, these
-are passed on to \code{predict.gam()}. For \code{posterior_samples()} these are
-passed on to \code{fitted_samples()}. For \code{predicted_samples()} these are
-passed on to the relevant \code{simulate()} method.}
+are passed on to \code{predict.gam()}.}
 
 \item{term}{character; select which smooth's posterior to draw from.
 The default (\code{NULL}) means the posteriors of all smooths in \code{model}
@@ -46,15 +37,6 @@ wil be sampled from. If supplied, a character vector of requested terms.}
 from the model should be evaluated. If not supplied, the data used to fit
 the model will be used for \code{data}, if available in \code{model}.}
 
-\item{method}{character; which method should be used to draw samples from
-the posterior distribution. \code{"gaussian"} uses a Gaussian (Laplace)
-approximation to the posterior. \code{"mh"} uses a Metropolis Hastings sample
-that alternates t proposals with proposals based on a shrunken version of
-the posterior covariance matrix. \code{"inla"} uses a variant of Integrated
-Nested Laplace Approximation due to Wood (2019), (currently not
-implemented). \code{"user"} allows for user-supplied posterior draws
-(currently not implemented).}
-
 \item{seed}{numeric; a random seed for the simulations.}
 
 \item{freq}{logical; \code{TRUE} to use the frequentist covariance matrix of
@@ -65,7 +47,7 @@ covariance matrix of the parameters.}
 Bayesian smoothing parameter uncertainty corrected covariance matrix is
 used, if available.}
 
-\item{n_cores}{number of cores for generating random variables from a
+\item{ncores}{number of cores for generating random variables from a
 multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
 Parallelization will take place only if OpenMP is supported (but appears
 to work on Windows with current \code{R}).}
@@ -73,31 +55,7 @@ to work on Windows with current \code{R}).}
 \item{n_vals}{numeric; how many locations to evaluate the smooth at if
 \code{data} not supplied}
 
-\item{burnin}{numeric; number of samples to discard as the burnin draws.
-Only used with \code{method = "mh"}.}
-
-\item{thin}{numeric; the number of samples to skip when taking \code{n} draws.
-Results in \code{thin * n} draws from the posterior being taken. Only used with
-\code{method = "mh"}.}
-
-\item{t_df}{numeric; degrees of freedome for t distribution proposals. Only
-used with \code{method = "mh"}.}
-
-\item{rw_scale}{numeric; Factor by which to scale posterior covariance
-matrix when generating random walk proposals. Negative or non finite to
-skip the random walk step. Only used with \code{method = "mh"}.}
-
-\item{rng_per_smooth}{logical; if TRUE, the behaviour of gratia version
-0.8.1 or earlier is used, whereby a separate call the the random number
-generator (RNG) is performed for each smooth. If FALSE, a single call to the
-RNG is performed for all model parameters}
-
 \item{newdata}{Deprecated: use \code{data} instead.}
-
-\item{ncores}{Deprecated; use \code{n_cores} instead. The number of cores for
-generating random variables from a multivariate normal distribution.
-Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}. Parallelization will take place only if
-OpenMP is supported (but appears to work on Windows with current \code{R}).}
 }
 \value{
 A tibble with additional classes \code{"smooth_samples"} and
