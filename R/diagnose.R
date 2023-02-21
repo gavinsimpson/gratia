@@ -618,10 +618,11 @@
 }
 
 #' @title Model diagnostic plots
-#' 
+#'
 #' @param model a fitted model. Currently only class `"gam"`.
 #' @param method character; method used to generate theoretical quantiles. Note
 #'   that `method = "direct"` is deprecated in favour of `method = "uniform"`.
+#' @param use_worm logical; should a worm plot be drawn in place of the QQ plot?
 #' @param n_uniform numeric; number of times to randomize uniform quantiles
 #'   in the direct computation method (`method = "direct"`) for QQ plots.
 #' @param n_simulate numeric; number of data sets to simulate from the estimated
@@ -681,6 +682,7 @@
 #' @export
 `appraise.gam` <- function(model,
                        method = c("uniform", "simulate", "normal", "direct"),
+                       use_worm = FALSE,
                        n_uniform = 10, n_simulate = 50,
                        type = c("deviance", "pearson", "response"),
                        n_bins = c("sturges", "scott", "fd"),
@@ -707,10 +709,17 @@
              paste(dQuote(c("sturges", "scott", "fd")), collapse = ", "))
     }
 
-    plt1 <- qq_plot(model, method = method, type = type, n_uniform = n_uniform,
-                    n_simulate = n_simulate, level = level, ci_alpha = ci_alpha,
-                    point_col = point_col, point_alpha = point_alpha,
-                    line_col = line_col)
+    plt1 <- if (isTRUE(use_worm)) {
+        worm_plot(model, method = method, type = type, n_uniform = n_uniform,
+            n_simulate = n_simulate, level = level, ci_alpha = ci_alpha,
+            point_col = point_col, point_alpha = point_alpha,
+            line_col = line_col)
+    } else {
+        qq_plot(model, method = method, type = type, n_uniform = n_uniform,
+            n_simulate = n_simulate, level = level, ci_alpha = ci_alpha,
+            point_col = point_col, point_alpha = point_alpha,
+            line_col = line_col)
+    }
     plt2 <- residuals_linpred_plot(model, type = type, point_col = point_col,
                                    point_alpha = point_alpha,
                                    line_col = line_col)

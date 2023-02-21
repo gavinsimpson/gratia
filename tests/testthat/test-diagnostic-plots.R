@@ -111,3 +111,10 @@ test_that("appraise works for a LM", {
     expect_silent(plt <- appraise(m_lm))
     expect_doppelganger("appraise lm ", plt)
 })
+
+test_that("appraise can use the worm plot", {
+    set.seed(1)
+    expect_silent(plt <- appraise(m_gam, use_worm = TRUE,
+        method = "simulate"))
+    expect_doppelganger("appraise worm plot", plt)
+})
