@@ -1529,7 +1529,8 @@
 
 #' @importFrom rlang .data
 #' @importFrom ggplot2 ggplot geom_point geom_line expand_limits theme aes
-#'   labs scale_colour_viridis_d scale_fill_viridis_d
+#'   labs scale_fill_hue scale_colour_hue
+#' @importFrom ggokabeito scale_colour_okabe_ito scale_fill_okabe_ito
 #' @keywords internal
 #' @noRd
 `plot_smooth.sz_factor_smooth` <- function(object,
@@ -1575,17 +1576,32 @@
             return(NULL)
         }
     } else {
-        x_var <- variables[2]
-        fac_var <- variables[1]
-        fac_var_lab <- variables[1]
+        # which is the factor?
+        if (fs[1L]) {
+            x_var <- variables[2]
+            fac_var <- fac_var_lab <- variables[1]
+        } else {
+            x_var <- variables[1]
+            fac_var <- fac_var_lab <- variables[2]
+        }
     }
 
+    # how many levels? can't have more than 9 for okabeito
+    n_levs <- nlevels(object[[fac_var]])
     if (is.null(discrete_colour)) {
-        discrete_colour <- scale_colour_viridis_d()
+        discrete_colour <- if (n_levs > 9L) {
+            scale_colour_hue()
+        } else {
+            scale_colour_okabe_ito()
+        }
     }
 
     if (is.null(discrete_fill)) {
-        discrete_fill <- scale_fill_viridis_d()
+        discrete_fill <- if (n_levs > 9L) {
+            scale_fill_hue()
+        } else {
+            scale_fill_okabe_ito()
+        }
     }
 
     ## If constant supplied apply it to `est`
