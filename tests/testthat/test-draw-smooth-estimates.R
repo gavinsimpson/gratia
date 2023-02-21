@@ -124,7 +124,6 @@ test_that("draw.smooth_estimates works for sz factor smooth", {
     expect_doppelganger("draw.smooth_estimates sz factor smooth", plt)
 })
 
-
 test_that("draw.smooth_estimates works for sz two factor smooth", {
     skip_on_os(os = "win")
     skip_on_os(os = "mac")

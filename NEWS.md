@@ -1,4 +1,4 @@
-# gratia 0.8.1.7
+# gratia 0.8.1.8
 
 ## User visible changes
 
@@ -56,6 +56,10 @@
 * The `print()` method for `lp_matrix()` now converts the matrix to a data frame
   before conversion to a tibble. This makes more sense as it results in more
   typical behaviour as the columns of the printed object are doubles.
+
+* Constrained factor smooths (`bs = "sz"`) where the factor is not the first
+  variable mentioned in the smooth (i.e. `s(x, f, bs = "sz")` for continuous
+  `x` and factor `f`) are not plottable with `draw()`. #208
 
 # gratia 0.8.1
 
