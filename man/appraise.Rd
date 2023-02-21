@@ -11,6 +11,7 @@ appraise(model, ...)
 \method{appraise}{gam}(
   model,
   method = c("uniform", "simulate", "normal", "direct"),
+  use_worm = FALSE,
   n_uniform = 10,
   n_simulate = 50,
   type = c("deviance", "pearson", "response"),
@@ -36,6 +37,8 @@ appraise(model, ...)
 
 \item{method}{character; method used to generate theoretical quantiles. Note
 that \code{method = "direct"} is deprecated in favour of \code{method = "uniform"}.}
+
+\item{use_worm}{logical; should a worm plot be drawn in place of the QQ plot?}
 
 \item{n_uniform}{numeric; number of times to randomize uniform quantiles
 in the direct computation method (\code{method = "direct"}) for QQ plots.}

@@ -1,4 +1,4 @@
-# gratia 0.8.1.8
+# gratia 0.8.1.9
 
 ## User visible changes
 
@@ -16,7 +16,7 @@
 
 ## New features
 
-* `data_sim()` can now simulate response data from Tweedie and ordered
+* `data_sim()` can now simulate response data from gamma, Tweedie and ordered
   categorical distributions.
 
 * `fitted_samples()` and `smooth_samples()` can now use the Metropolis Hastings
@@ -46,6 +46,9 @@
   back-transformed to the response (probability) scale.
 
 * `link()` and `inv_link()` work for models fitted using the `cnorm()` family.
+
+* A worm plot can now be drawn in place of the QQ plot with `appraise()` via
+  new argument `use_worm = TRUE`. #62
 
 ## Bug fixes
 
