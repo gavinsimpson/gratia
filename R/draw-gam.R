@@ -250,8 +250,8 @@
         if (utils::packageVersion("dplyr") > "1.0.10") {
             sm_rng <- sm_eval |>
                 rowwise() |>
-                utils::getFromNamespace("reframe", "dplyr")(rng = range(c(data$est,
-                data$lower_ci, data$upper_ci))) |>
+                utils::getFromNamespace("reframe", "dplyr")(rng = 
+                    range(c(data$est, data$lower_ci, data$upper_ci))) |>
                 pluck("rng")
         } else {sm_rng <- sm_eval |>
             rowwise() |>
