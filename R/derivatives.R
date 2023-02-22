@@ -890,3 +890,312 @@
         class(result)) # add class
     result                                           # return
 }
+
+#' @title Derivatives on the response scale from an estimated GAM
+#'
+#' @param object an R object to compute derivatives for.
+#' @param ... arguments passed to other methods and on to `fitted_samples()`
+#'
+#' @author Gavin L. Simpson
+#'
+#' @export
+`response_derivatives` <- function(object, ...) {
+    UseMethod("response_derivatives")
+}
+
+#' @rdname response_derivatives
+#' @export
+`response_derivatives.default` <- function(object, ...) {
+    ## want to bail with a useful error;
+    ## see Jenny Bryan's Code Smells UseR 2018 talk: rstd.io/code-smells
+    stop("Don't know how to calculate response derivatives for <",
+         class(object)[[1L]], ">",
+         call. = FALSE)           # don't show the call, simpler error
+}
+
+#' @rdname response_derivatives
+#'
+#' @export
+`response_derivatives.gamm` <- function(object, ...) {
+    response_derivatives(object[["gam"]], ...)
+}
+
+#' @param focal character; name of the focal variable. The response derivative
+#'   of the response with respect to this variable will be returned.
+#'   All other variables involved in the model will be held at constant values.
+#'   This can be missing if supplying `data`, in which case, the focal variable
+#'   will be identified as the one variable that is not constant.
+#' @param data a data frame containing the values of the model covariates
+#'   at which to evaluate the first derivatives of the smooths. If supplied,
+#'   all but one variable must be held at a constant value.
+#' @param order numeric; the order of derivative.
+#' @param type character; the type of finite difference used. One of
+#'   `"forward"`, `"backward"`, or `"central"`.
+#' @param method character; which method should be used to draw samples from
+#'   the posterior distribution. `"gaussian"` uses a Gaussian (Laplace)
+#'   approximation to the posterior. `"mh"` uses a Metropolis Hastings sample
+#'   that alternates t proposals with proposals based on a shrunken version of
+#'   the posterior covariance matrix. `"inla"` uses a variant of Integrated
+#'   Nested Laplace Approximation due to Wood (2019), (currently not
+#'   implemented). `"user"` allows for user-supplied posterior draws
+#'   (currently not implemented).
+#' @param scale character; should the derivative be estimated on the response
+#'   or the linear predictor (link) scale? One of `"response"` (the default),
+#'   or `"linear predictor"`.
+#' @param n numeric; the number of points to evaluate the derivative at (if
+#'   `data` is not supplied).
+#' @param eps numeric; the finite difference.
+#' @param n_sim integer; the number of simulations used in computing the
+#'   simultaneous intervals.
+#' @param level numeric; `0 < level < 1`; the coverage level of the
+#'   credible interval. The default is `0.95` for a 95% interval.
+#' @param seed numeric; a random seed for the simulations.
+#'
+#' @export
+#'
+#' @rdname response_derivatives
+#'
+#' @return A tibble, currently with the following variables:
+#' * `focal`: the name of the variable for which the partial derivative was
+#'     evaluated,
+#' * `derivative`: the estimated partial derivative,
+#' * `lower`: the lower bound of the confidence or simultaneous interval,
+#' * `upper`: the upper bound of the confidence or simultaneous interval,
+#' * additional columns containing the covariate values at which the derivative
+#'   was eveluated.
+#'
+#' @examples
+#'
+#' library("ggplot2")
+#' library("patchwork")
+#' load_mgcv()
+#' \dontshow{
+#' op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
+#' }
+#' df <- data_sim("eg1", dist = "negbin", scale = 0.25, seed = 42)
+#'
+#' # fit the GAM (note: for execution time reasons using bam())
+#' m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+#'     data = df, family = nb(), method = "fREML", discrete = TRUE)
+#'
+#' # data slice through data along x2 - all other covariates will be set to
+#' # typical values (value closest to median)
+#' ds <- data_slice(m, x2 = evenly(x2, n = 100))
+#'
+#' # fitted values along x2
+#' fv <- fitted_values(m, smooth = "s(x2)", data = ds)
+#'
+#' # response derivatives
+#' y_d <- response_derivatives(m, data = ds, type = "central",
+#'                             focal = "x2", eps = 0.01)
+#'
+#' # draw fitted values along x2
+#' p1 <- fv |>
+#'     ggplot(aes(x = x2, y = fitted)) +
+#'     geom_ribbon(aes(ymin = lower, ymax = upper, y = NULL), alpha = 0.2) +
+#'     geom_line() +
+#'     labs(title = "Estimated count as a function of x2",
+#'          y = "Estimated count")
+#' p1
+#'
+#' # draw response derivatives
+#' p2 <- y_d |>
+#'     ggplot(aes(x = x2, y = derivative)) +
+#'     geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), alpha = 0.2) +
+#'     geom_line() +
+#'     labs(title = "Estimated 1st derivative of estimated count",
+#'          y = "First derivative")
+#' p2
+#'
+#' # draw both panels
+#' p1 + p2 + plot_layout(nrow = 2)
+#' \dontshow{options(op)}
+`response_derivatives.gam` <- function(object, focal = NULL,
+    data = NULL,
+    order = 1L,
+    type = c("forward", "backward", "central"),
+    scale = c("response", "linear_predictor"),
+    method = c("gaussian", "mh", "inla", "user"),
+    n = 100, eps = 1e-7,
+    n_sim = 10000, level = 0.95,
+    seed = NULL,
+    ...) {
+    ## handle seed
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+        runif(1)
+    }
+    if (is.null(seed)) {
+        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+    } else {
+        R.seed <- get(".Random.seed", envir = .GlobalEnv)
+        set.seed(seed)
+        RNGstate <- structure(seed, kind = as.list(RNGkind()))
+        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+    }
+    ## handle type
+    type <- match.arg(type)
+    ## handle method
+    method <- match.arg(method)
+    ## handle scale
+    scale <- match.arg(scale)
+
+    ## handle order
+    if (!order %in% c(1L, 2L)) {
+        stop("Only 1st or 2nd order partial derivatives are supported: ",
+            "`order %in% c(1,2)`")
+    }
+
+    ## handle data
+    need_data <- is.null(data)
+
+    ## should check that focal variable is continuous and not a factor
+
+    ## sort out data
+    if (need_data) {
+        x <- object$var.summary[[focal]]
+        x <- seq(x[1L], x[3L], length = n)
+        tv <- typical_values(object, vars = !matches(focal))
+        data <- expand_grid(.x = x, tv)
+    } else {
+        data <- data |>
+            rename(.x = {{focal}})
+    }
+    data <- data |>
+        add_column(..row = seq_len(nrow(data)), .before = 1L)
+
+    # now shift values depending on method
+    fd_data <- prepare_fdiff_data(data = data, eps = eps, type = type,
+        order = order, focal = focal)
+
+    ## compute posterior draws of E(y) (on response scale)
+    fs <- fitted_samples(model = object, n = n_sim, data = fd_data,
+        method = method, seed = seed, ...)
+
+    fs <- fs |>
+        left_join(select(fd_data, all_of(c("row", "..type", "..orig"))),
+            by = "row")
+
+    qq <- (1 - level) / 2
+    yd <- compute_y_fdiff(fs, order = order, type = type, eps = eps)
+
+    yd <- yd |>
+        group_by(.data[["..orig"]]) |>
+        summarise(
+            derivative = median(.data[["..fd"]]),
+            lower_ci = quantile(.data[["..fd"]], probs = qq),
+            upper_ci = quantile(.data[["..fd"]], probs = 1 - qq)) |>
+        left_join(data, by = join_by("..orig" == "..row")) |>
+        rename("{focal}" := .data[[".x"]]) |>
+        select(!matches(c("..xf", "..xb", "..orig"))) |>
+        add_column(focal = rep(focal, nrow(data)), .before = 1L)
+
+    class(yd) <- append(class(yd), "response_derivatives", after = 0L)
+    yd
+}
+
+`prepare_fdiff_data` <- function(data, eps = 1e-7, order, type, focal) {
+    fd_fun <- if (isTRUE(identical(as.integer(order), 1L))) {
+        prepare_fdiff_data_1
+    } else {
+        prepare_fdiff_data_2
+    }
+    fd_fun(data = data, eps = eps, type = type, focal = focal)
+}
+
+#' @importFrom dplyr mutate bind_rows rename
+#' @importFrom tibble add_column
+`prepare_fdiff_data_1` <- function(data, eps = 1e-7, type, focal) {
+    n <- nrow(data)
+    h <- eps
+    fd_data <- if (isTRUE(identical(type, "central"))) {
+        h <- eps / 2
+        xf <- mutate(data, .x = .data[[".x"]] + h, ..type = rep("xf", n))
+        xb <- mutate(data, .x = .data[[".x"]] - h, ..type = rep("xb", n))
+        list(xf = xf, xb = xb)
+    } else if (isTRUE(identical(type, "forward"))) {
+        xf <- mutate(data, .x = .data[[".x"]] + h, ..type = rep("xf", n))
+        data <- mutate(data, ..type = "xb")
+        list(xf = xf, xb = data)
+    } else { # backward
+        xb <- mutate(data, .x = .data[[".x"]] - h, ..type = rep("xb", n))
+        data <- mutate(data, ..type = "xf")
+        list(xf = data, xb = xb)
+    }
+    fd_data <- fd_data |>
+        bind_rows() |>
+        rename("{focal}" := ".x") |>
+        add_column(row = seq_len(NROW(data) * 2), .before = 1L,
+            ..orig = rep(seq_len(n), times = 2))
+    fd_data
+}
+
+
+#' @importFrom dplyr mutate bind_rows rename
+#' @importFrom tibble add_column
+`prepare_fdiff_data_2` <- function(data, eps = 1e-7, type, focal) {
+    n <- nrow(data)
+    h <- eps
+    data <- mutate(data, ..type = rep("x", n))
+    fd_data <- if (isTRUE(identical(type, "central"))) {
+        h <- eps / 2
+        xf <- mutate(data, .x = .data[[".x"]] + h, ..type = rep("xf", n))
+        xb <- mutate(data, .x = .data[[".x"]] - h, ..type = rep("xb", n))
+        list(xf = xf, xb = xb, x = data)
+    } else if (isTRUE(identical(type, "forward"))) {
+        xf <- mutate(data, .x = .data[[".x"]] + h, ..type = rep("xf", n))
+        xb <- mutate(data, .x = .data[[".x"]] + (2 * h), ..type = rep("xb", n))
+        list(xf = xf, xb = xb, x = data)
+    } else { # backward
+        xf <- mutate(data, .x = .data[[".x"]] - h, ..type = rep("xf", n))
+        xb <- mutate(data, .x = .data[[".x"]] - (2 * h), ..type = rep("xb", n))
+        list(xf = data, xb = xb, x = data)
+    }
+    fd_data <- fd_data |>
+        bind_rows() |>
+        rename("{focal}" := ".x") |>
+        add_column(row = seq_len(NROW(data) * 3), .before = 1L,
+            ..orig = rep(seq_len(n), times = 3))
+    fd_data
+}
+
+`compute_y_fdiff` <- function(samples, order, type, eps = 1e-7) {
+    y_fd <- if (isTRUE(identical(as.integer(order), 1L))) {
+        compute_y_fdiff_1(samples = samples, eps = eps, type = type)
+    } else {
+        compute_y_fdiff_2(samples = samples, eps = eps, type = type)
+    }
+    y_fd
+}
+
+#' @importFrom tidyr pivot_wider
+#' @importFrom dplyr mutate
+#' @importFrom tidyselect matches
+`compute_y_fdiff_1` <- function(samples, type, eps = 1e-7) {
+    samples <- samples |>
+        pivot_wider(id_cols = matches(c(".orig", "draw")),
+            names_from = "..type", values_from = "fitted",
+            names_prefix = "..")
+
+    samples |>
+        mutate(..fd = (.data[["..xf"]] - .data[["..xb"]]) / eps)
+}
+
+#' @importFrom tidyr pivot_wider
+#' @importFrom dplyr mutate case_match
+#' @importFrom tidyselect matches
+`compute_y_fdiff_2` <- function(samples, type, eps = 1e-7) {
+    samples <- samples |>
+        pivot_wider(id_cols = !matches("fitted", "..type"),
+            names_from = "..type", values_from = "fitted",
+            names_prefix = "..")
+
+    samples |>
+        mutate(..fd =
+            case_match(type,
+                "forward"  ~ (.data[["..xb"]] -
+                    (2 * .data[["..xf"]]) + .data[["..x"]])  / eps^2,
+                "backward" ~ (.data[["..x"]]  -
+                    (2 * .data[["..xf"]]) + .data[["..xb"]]) / eps^2,
+                "backward" ~ (.data[["..xf"]] -
+                    (2 * .data[["..x"]])  + .data[["..xb"]]) / eps^2))
+}
