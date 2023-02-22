@@ -197,7 +197,7 @@
 #' fs
 #' }
 #' \dontshow{options(op)}
-`fitted_samples.gam` <- function(model, n = 1, data = newdata, seed,
+`fitted_samples.gam` <- function(model, n = 1, data = newdata, seed = NULL,
     scale = c("response", "linear_predictor"),
     method = c("gaussian", "mh", "inla", "user"),
     n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,

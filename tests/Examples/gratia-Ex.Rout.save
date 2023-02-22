@@ -1505,11 +1505,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x5626650f0ce0>
+<environment: 0x555babee3e90>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x5626650f0ce0>
+<environment: 0x555babee3e90>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2116,6 +2116,72 @@ Levels: a b c d e
 > 
 > 
 > cleanEx()
+> nameEx("response_derivatives")
+> ### * response_derivatives
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: response_derivatives
+> ### Title: Derivatives on the response scale from an estimated GAM
+> ### Aliases: response_derivatives response_derivatives.default
+> ###   response_derivatives.gamm response_derivatives.gam
+> 
+> ### ** Examples
+> 
+> 
+> library("ggplot2")
+> library("patchwork")
+> load_mgcv()
+> ## Don't show: 
+> op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
+> ## End(Don't show)
+> df <- data_sim("eg1", dist = "negbin", scale = 0.25, seed = 42)
+> 
+> # fit the GAM (note: for execution time reasons using bam())
+> m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
++     data = df, family = nb(), method = "fREML", discrete = TRUE)
+> 
+> # data slice through data along x2 - all other covariates will be set to
+> # typical values (value closest to median)
+> ds <- data_slice(m, x2 = evenly(x2, n = 100))
+> 
+> # fitted values along x2
+> fv <- fitted_values(m, smooth = "s(x2)", data = ds)
+> 
+> # response derivatives
+> y_d <- response_derivatives(m, data = ds, type = "central",
++                             focal = "x2", eps = 0.01)
+> 
+> # draw fitted values along x2
+> p1 <- fv |>
++     ggplot(aes(x = x2, y = fitted)) +
++     geom_ribbon(aes(ymin = lower, ymax = upper, y = NULL), alpha = 0.2) +
++     geom_line() +
++     labs(title = "Estimated count as a function of x2",
++          y = "Estimated count")
+> p1
+> 
+> # draw response derivatives
+> p2 <- y_d |>
++     ggplot(aes(x = x2, y = derivative)) +
++     geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), alpha = 0.2) +
++     geom_line() +
++     labs(title = "Estimated 1st derivative of estimated count",
++          y = "First derivative")
+> p2
+> 
+> # draw both panels
+> p1 + p2 + plot_layout(nrow = 2)
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
+
 > nameEx("rootogram")
 > ### * rootogram
 > 
@@ -2522,7 +2588,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  42.449 0.36 42.754 0 0 
+Time elapsed:  24.733 0.236 24.94 0 0 
 > grDevices::dev.off()
 null device 
           1 

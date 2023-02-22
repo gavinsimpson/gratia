@@ -1,4 +1,4 @@
-# gratia 0.8.1.9
+# gratia 0.8.1.10
 
 ## User visible changes
 
@@ -15,6 +15,14 @@
   `method = "gaussian"`.
 
 ## New features
+
+* `response_derivatives()` is a new function for computing derivatives of the
+  response with respect to a (continuous) focal variable. First or second
+  order derivatives can be computed using forward, backward, or central
+  finite differences. The uncertainty in the estimated derivative is determined
+  using posterior sampling via `fitted_samples()`, and hence can be derived
+  from a Gaussian approximation to the posterior or using a Metropolis Hastings
+  sampler (see below.)
 
 * `data_sim()` can now simulate response data from gamma, Tweedie and ordered
   categorical distributions.

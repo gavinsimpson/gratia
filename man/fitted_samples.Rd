@@ -11,7 +11,7 @@ fitted_samples(model, ...)
   model,
   n = 1,
   data = newdata,
-  seed,
+  seed = NULL,
   scale = c("response", "linear_predictor"),
   method = c("gaussian", "mh", "inla", "user"),
   n_cores = 1,
