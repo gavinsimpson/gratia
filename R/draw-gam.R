@@ -96,6 +96,7 @@
 #'   `c(20, 0, mean(range(longitude))))`` if this is not specified by the user.
 #'   See links in [ggplot2::coord_map()] for more information.
 #' @param wrap logical; wrap plots as a patchwork?
+#' @param envir an environment to look up the data within.
 #' @param ... additional arguments passed to [patchwork::wrap_plots()].
 #'
 #' @note Internally, plots of each smooth are created using [ggplot2::ggplot()]
@@ -182,6 +183,7 @@
                        projection = "orthographic",
                        orientation = NULL,
                        wrap = TRUE,
+                       envir = environment(formula(object)),
                        ...) {
     model_name <- expr_label(substitute(object))
     # fixed or free?
@@ -344,9 +346,9 @@
             message("The model contains no parametric terms")
             parametric <- FALSE
         } else {
-            para <- parametric_effects(object, term = terms, # data = data,
+            para <- parametric_effects(object, term = terms, data = data,
                 unconditional = unconditional,
-                unnest = TRUE, ci_level = ci_level)
+                unnest = TRUE, ci_level = ci_level, envir = envir)
             # Add CI
             crit <- coverage_normal(ci_level)
             object <- mutate(para,
