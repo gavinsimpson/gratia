@@ -1,10 +1,10 @@
 ## Test draw() methods
 
 ## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-library("ggplot2")
+#library("testthat")
+#library("gratia")
+#library("mgcv")
+#library("ggplot2")
 
 test_that("draw.evaluated_1d_smooth() plots the smooth", {
     withr::local_options(lifecycle_verbosity = "quiet")
