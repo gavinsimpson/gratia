@@ -1,4 +1,4 @@
-# gratia 0.8.1.10
+# gratia 0.8.1.11
 
 ## User visible changes
 
@@ -71,6 +71,9 @@
 * Constrained factor smooths (`bs = "sz"`) where the factor is not the first
   variable mentioned in the smooth (i.e. `s(x, f, bs = "sz")` for continuous
   `x` and factor `f`) are not plottable with `draw()`. #208
+
+* `parametric_effects()` was unable to handle special parametric terms like
+  `poly(x)` or `log(x)` in formulas. Reported by @fhui28 #212
 
 # gratia 0.8.1
 
