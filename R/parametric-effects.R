@@ -3,13 +3,19 @@
 #' @param object a fitted model object.
 #' @param terms character; which model parametric terms should be drawn? The
 #'   Default of `NULL` will plot all parametric terms that can be drawn.
+#' @param data a optional data frame that may or may not be used? FIXME!
 #' @param unconditional logical; should confidence intervals include the
 #'   uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian
 #'   covariance matrix will be used.
-#' @param unnest logical; unnest the smooth objects?
+#' @param unnest logical; unnest the parametric effect objects?
 #' @param ci_level numeric; the coverage required for the confidence interval.
 #'   Currently ignored.
 #' @param envir an environment to look up the data within.
+#' @param transform logical; if `TRUE`, the parametric effect will be plotted on
+#'   its transformed scale which will result in the effect being a straight
+#'   line. If FALSE, the effect will be plotted against the raw data (i.e. for
+#'   `log10(x)`, or `poly(z)`, the x-axis of the plot will be `x` or `z`
+#'   respectively.)
 #' @param ... arguments passed to other methods.
 #'
 #' @export
@@ -28,11 +34,12 @@
 #' @rdname parametric_effects
 #' @export
 `parametric_effects.gam` <- function(object, terms = NULL,
-                                     #data = NULL,
+                                     data = NULL,
                                      unconditional = FALSE,
                                      unnest = TRUE,
                                      ci_level = 0.95,
                                      envir = environment(formula(object)),
+                                     transform = FALSE,
                                      ...) {
     tt <- object$pterms       # get model terms object
     tt <- delete.response(tt) # remove response so easier to work with
@@ -75,18 +82,28 @@
                     unconditional = unconditional)
     # try to recover the data
     mf <- model.frame(object)
-    # if (is.null(data)) {
-        # data <- eval(object$call$data, envir)
-    # }
-    # if (is.null(data)) {
-        # data <- mf
-    # }
+    if (is.null(data)) {
+        data <- eval(object$call$data, envir)
+    }
+    if (is.null(data)) {
+        data <- mf
+    }
 
     # loop over the valid_terms and prepare the parametric effects
     fun <- function(term, data, pred) {
-        out <- bind_cols(level = data[[term]],
+        term_expr <- str2expression(term)[[1L]]
+        x_data <- if (length(term_expr) > 1L) {
+            if (transform) {
+                pred$fit[, term]
+            } else {
+                eval(term_expr[[2L]], data, enclos = envir)
+            }
+        } else {
+            eval(term_expr, data, enclos = envir)
+        }
+        out <- bind_cols(level = x_data,
                          partial = pred[["fit"]][, term],
-                         se = pred[["se.fit"]][, term]) %>%
+                         se = pred[["se.fit"]][, term]) |>
           distinct(.data$level, .keep_all = TRUE)
         nr <- nrow(out)
         is_fac <- is.factor(out$level)
@@ -103,7 +120,7 @@
         out
     }
 
-    effects <- map_df(valid_terms, .f = fun, data = mf, pred = pred)
+    effects <- map_df(valid_terms, .f = fun, data = data, pred = pred)
 
     if (unnest) {
         effects <- unnest(effects, cols = "data") %>%
