@@ -44,6 +44,7 @@
   projection = "orthographic",
   orientation = NULL,
   wrap = TRUE,
+  envir = environment(formula(object)),
   ...
 )
 }
@@ -172,6 +173,8 @@ default values for \code{orientation} therefore are
 See links in \code{\link[ggplot2:coord_map]{ggplot2::coord_map()}} for more information.}
 
 \item{wrap}{logical; wrap plots as a patchwork?}
+
+\item{envir}{an environment to look up the data within.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
