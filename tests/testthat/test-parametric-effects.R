@@ -83,7 +83,8 @@ test_that("issue 212 remains fixed", {
         poly(x1, 2, raw = TRUE) +
         poly(x2, 2, raw = TRUE) +
         poly(x3, 2, raw = TRUE), data = data_212)
-    expect_silent(peff <- parametric_effects(m_212))
+    expect_silent(peff <- parametric_effects(m_212, data = data_212,
+        envir = teardown_env()))
     expect_s3_class(peff, class = c("parametric_effects", "tbl_df", "tbl",
                                     "data.frame"))
     expect_identical(ncol(peff), 6L)

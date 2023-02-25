@@ -65,7 +65,7 @@ test_that("draw.gam works with select and parametric", {
                 parametric = FALSE)
     expect_doppelganger("draw gam with select and parametric is FALSE", plt)
     plt <- draw(su_m_factor_by, select = 's(x2)', partial_match = TRUE,
-                parametric = TRUE)
+                parametric = TRUE, data = su_eg4, envir = teardown_env())
     expect_doppelganger("draw gam with select and parametric is TRUE", plt)
     plt <- draw(su_m_factor_by, parametric = TRUE, rug = FALSE)
     expect_doppelganger("draw gam without select and parametric is TRUE", plt)
