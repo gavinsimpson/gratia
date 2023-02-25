@@ -253,8 +253,12 @@ m_2_fac <- gam(y ~ fac * ff + s(x0) + s(x1) + s(x2),
 # a GAM with parametric terms (factor and linear) and smooth terms
 m_para_sm <- gam(y ~ fac * ff + x0 + s(x1) + s(x2),
                  data = df_2_fac, method = "REML")
-# a GAM with parametric terms (factor and linear) and smooth terms
+# a GAM with parametric terms (factor and linear)
 m_only_para <- gam(y ~ fac * ff + x0 + x1 + x2,
+  data = df_2_fac, method = "REML")
+
+# a GAM with weird parametric terms
+m_poly <- gam(y ~ fac + ff + log(x0) + x1 + poly(x2, 2, raw = TRUE),
                    data = df_2_fac, method = "REML")
 
 ##-- scam models ---------------------------------------------------------------

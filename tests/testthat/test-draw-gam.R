@@ -101,13 +101,15 @@ test_that("draw.gam works for m_para_sm", {
 })
 
 test_that("draw.gam works for m_2_fac", {
-    expect_message(plt <- draw(m_2_fac, parametric = TRUE, rug = FALSE),
+    expect_message(plt <- draw(m_2_fac, parametric = TRUE, rug = FALSE,
+        data = df_2_fac, envir = teardown_env()),
                    "Interaction terms are not currently supported.")
     expect_doppelganger("draw_gam m_2_fac parametric", plt)
 })
 
 test_that("draw.gam works for m_para_sm", {
-    expect_message(plt <- draw(m_para_sm, parametric = TRUE, rug = FALSE),
+    expect_message(plt <- draw(m_para_sm, parametric = TRUE, rug = FALSE,
+        data = df_2_fac, envir = teardown_env()),
                    "Interaction terms are not currently supported.")
     expect_doppelganger("draw_gam m_para_sm parametric", plt)
 })
@@ -183,13 +185,13 @@ test_that("draw.gam issues message for parametric only model", {
 
 test_that("draw.gam works for a parametric only model", {
     expect_message(plt <- draw(m_only_para, parametric = TRUE,
-        rug = FALSE),
+        rug = FALSE, data = df_2_fac, envir = teardown_env()),
                    "Interaction terms are not currently supported.")
     expect_doppelganger("draw_gam parametric only model", plt)
 
     # rotated
     expect_message(plt <- draw(m_only_para, parametric = TRUE, angle = 90,
-        rug = FALSE),
+        rug = FALSE, data = df_2_fac, envir = teardown_env()),
                    "Interaction terms are not currently supported.")
     expect_doppelganger("draw_gam parametric only model rotated labels", plt)
 })

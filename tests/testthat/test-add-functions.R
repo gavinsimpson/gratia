@@ -108,7 +108,8 @@ test_that("add_confint.default fails is no est and se", {
 })
 
 test_that("add_constant works for parametric_effects", {
-    expect_message(pe <- parametric_effects(m_para_sm),
+    expect_message(pe <- parametric_effects(m_para_sm, data = df_2_fac,
+        envir = teardown_env()),
                    "Interaction terms are not currently supported.")
     expect_silent(pe <- add_constant(pe, constant = 10))
     expect_error(pe <- add_constant(pe, constant = "a"),

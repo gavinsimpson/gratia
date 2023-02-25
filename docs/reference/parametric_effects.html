@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.10</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.11</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,10 +67,12 @@
 <span><span class="fu">parametric_effects</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
 <span>  terms <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unnest <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ci_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -90,6 +92,10 @@
 Default of <code>NULL</code> will plot all parametric terms that can be drawn.</p></dd>
 
 
+<dt>data</dt>
+<dd><p>a optional data frame that may or may not be used? FIXME!</p></dd>
+
+
 <dt>unconditional</dt>
 <dd><p>logical; should confidence intervals include the
 uncertainty due to smoothness selection? If <code>TRUE</code>, the corrected Bayesian
@@ -97,7 +103,7 @@ covariance matrix will be used.</p></dd>
 
 
 <dt>unnest</dt>
-<dd><p>logical; unnest the smooth objects?</p></dd>
+<dd><p>logical; unnest the parametric effect objects?</p></dd>
 
 
 <dt>ci_level</dt>
@@ -107,6 +113,14 @@ Currently ignored.</p></dd>
 
 <dt>envir</dt>
 <dd><p>an environment to look up the data within.</p></dd>
+
+
+<dt>transform</dt>
+<dd><p>logical; if <code>TRUE</code>, the parametric effect will be plotted on
+its transformed scale which will result in the effect being a straight
+line. If FALSE, the effect will be plotted against the raw data (i.e. for
+<code>log10(x)</code>, or <code>poly(z)</code>, the x-axis of the plot will be <code>x</code> or <code>z</code>
+respectively.)</p></dd>
 
 </dl></div>
 

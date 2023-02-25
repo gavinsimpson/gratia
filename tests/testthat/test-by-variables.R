@@ -56,7 +56,8 @@ test_that("get_by_smooth works", {
 })
 
 test_that("draw.gam works with select and parametric = TRUE", {
-    plt <- draw(su_m_factor_by, select = 's(x2):fac1', parametric = TRUE)
+    plt <- draw(su_m_factor_by, select = 's(x2):fac1', parametric = TRUE,
+        data = df_2_fac, envir = teardown_env())
     expect_doppelganger("draw.gam-user-select-and-parametric-true",
                                 plt)
 })
