@@ -122,7 +122,6 @@ p1 <- fv |>
     geom_line() +
     labs(title = "Estimated count as a function of x2",
          y = "Estimated count")
-p1
 
 # draw response derivatives
 p2 <- y_d |>
@@ -131,7 +130,6 @@ p2 <- y_d |>
     geom_line() +
     labs(title = "Estimated 1st derivative of estimated count",
          y = "First derivative")
-p2
 
 # draw both panels
 p1 + p2 + plot_layout(nrow = 2)
