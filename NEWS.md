@@ -1,4 +1,4 @@
-# gratia 0.8.1.11
+# gratia 0.8.1.12
 
 ## User visible changes
 
@@ -53,10 +53,16 @@
   (linear predictor) scale, a Wald credible interval is formed, which is then
   back-transformed to the response (probability) scale.
 
+* `fitted_values()` now works for GAMMs fitted using `mgcv::gamm()`. Fitted
+  (predicted) values only use the GAM part of the model, and thus exclude the
+  random effects.
+
 * `link()` and `inv_link()` work for models fitted using the `cnorm()` family.
 
 * A worm plot can now be drawn in place of the QQ plot with `appraise()` via
   new argument `use_worm = TRUE`. #62
+
+* `smooths()` now works for models fitted with `mgcv::gamm()`.
 
 ## Bug fixes
 
