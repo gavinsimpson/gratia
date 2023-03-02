@@ -1288,7 +1288,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: fitted_values
 > ### Title: Generate fitted values from a estimated GAM
-> ### Aliases: fitted_values fitted_values.gam
+> ### Aliases: fitted_values fitted_values.gam fitted_values.gamm
 > 
 > ### ** Examples
 > 
@@ -1505,11 +1505,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x555babee3e90>
+<environment: 0x55ab137d7498>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x555babee3e90>
+<environment: 0x55ab137d7498>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2159,7 +2159,6 @@ Levels: a b c d e
 +     geom_line() +
 +     labs(title = "Estimated count as a function of x2",
 +          y = "Estimated count")
-> p1
 > 
 > # draw response derivatives
 > p2 <- y_d |>
@@ -2168,7 +2167,6 @@ Levels: a b c d e
 +     geom_line() +
 +     labs(title = "Estimated 1st derivative of estimated count",
 +          y = "First derivative")
-> p2
 > 
 > # draw both panels
 > p1 + p2 + plot_layout(nrow = 2)
@@ -2588,7 +2586,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  24.733 0.236 24.94 0 0 
+Time elapsed:  47.89 0.532 48.371 0 0 
 > grDevices::dev.off()
 null device 
           1 

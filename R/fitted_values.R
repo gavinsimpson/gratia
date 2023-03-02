@@ -55,8 +55,8 @@
 `fitted_values.gam` <- function(object,
                                 data = NULL,
                                 scale = c("response",
-                                          "link",
-                                          "linear predictor"),
+                                    "link",
+                                    "linear predictor"),
                                 ci_level = 0.95, ...) {
     # Handle everything up to and including the extended families, but not more
     if (inherits(family(object), "general.family")) {
@@ -78,6 +78,12 @@
     fit <- fit_vals_fun(object, data = data, ci_level = ci_level,
         scale = scale, ...)
     fit
+}
+
+#' @export
+#' @rdname fitted_values
+`fitted_values.gamm` <- function(object, ...) {
+    fitted_values(object$gam, ...)
 }
 
 #' @importFrom rlang set_names .data

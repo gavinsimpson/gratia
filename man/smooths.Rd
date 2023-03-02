@@ -2,9 +2,15 @@
 % Please edit documentation in R/utililties.R
 \name{smooths}
 \alias{smooths}
+\alias{smooths.default}
+\alias{smooths.gamm}
 \title{Names of smooths in a GAM}
 \usage{
 smooths(object)
+
+\method{smooths}{default}(object)
+
+\method{smooths}{gamm}(object)
 }
 \arguments{
 \item{object}{a fitted GAM or related model. Typically the result of a call

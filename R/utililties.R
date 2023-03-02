@@ -93,7 +93,19 @@
 #'
 #' @export
 `smooths` <- function(object) {
+    UseMethod("smooths")
+}
+
+#' @export
+#' @rdname smooths
+`smooths.default` <- function(object) {
     vapply(object[["smooth"]], FUN  = `[[`, FUN.VALUE = character(1), "label")
+}
+
+#' @export
+#' @rdname smooths
+`smooths.gamm` <- function(object) {
+    smooths(object$gam)
 }
 
 `smooth_variable` <- function(smooth) {
