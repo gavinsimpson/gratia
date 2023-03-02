@@ -53,7 +53,7 @@
   (linear predictor) scale, a Wald credible interval is formed, which is then
   back-transformed to the response (probability) scale.
 
-* `fitted_values()` now works for GAMMs fitted using `mgcv::gamm()`. Fitted
+* `fiited_values()` now works for GAMMs fitted using `mgcv::gamm()`. Fitted
   (predicted) values only use the GAM part of the model, and thus exclude the
   random effects.
 
