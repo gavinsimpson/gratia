@@ -26,7 +26,6 @@ supported.}
 Extract basis dimension of a smooth
 }
 \examples{
-
 load_mgcv()
 
 df <- data_sim("eg1", n = 200, seed = 1)

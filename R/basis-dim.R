@@ -5,8 +5,9 @@
 #' supported.
 #' @param ... Arguments passed to other methods.
 #'
-#' @examples
+#' @export
 #'
+#' @examples
 #' load_mgcv()
 #'
 #' df <- data_sim("eg1", n = 200, seed = 1)

@@ -96,7 +96,7 @@
 <div class="figure">
 <img src="reference/figures/README-draw-gam-figure-2d-1.png" alt=""><p class="caption">Estimated smooths from a GAM</p>
 </div>
-<p>Note specialist smoothers (<code>bs %in% c("mrf","so")</code>) are not currently supported, but univariate, <em>factor</em> and <em>continuous</em> <code>by</code>-variable smooths, simple random effect smooths (<code>bs = 're'</code>), factor-smooth interaction smooths (<code>bs = "fs"</code>), and bivariate tensor product smooths are supported,</p>
+<p>Note that some specialist smoothers (<code>bs %in% c("mrf","sw", "sf")</code>) are not currently supported, but univariate, <em>factor</em> and <em>continuous</em> <code>by</code>-variable smooths, simple random effect smooths (<code>bs = 're'</code>), factor-smooth interaction smooths (<code>bs = "fs"</code>), constrained factor smooths (<code>bs = "sz"</code>), full soap film smooths (<code>bs = "so"</code>), and bivariate, trivariate, and quadvariate TPRS and tensor product smooths are supported,</p>
 </li>
 <li><p>Estimatation of derivatives of fitted smoothers: <code><a href="reference/derivatives.html">derivatives()</a></code>,</p></li>
 <li><p>Estimation of point-wise across-the-function confidence intervals and simultaneous intervals for smooths: <code><a href="reference/confint.gam.html">confint.gam()</a></code>.</p></li>
