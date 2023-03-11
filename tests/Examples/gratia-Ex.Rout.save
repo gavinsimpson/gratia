@@ -256,6 +256,32 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
+> nameEx("basis_dim")
+> ### * basis_dim
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: basis_dim
+> ### Title: Extract basis dimension of a smooth
+> ### Aliases: basis_dim basis_dim.mgcv.smooth basis_dim.gam basis_dim.gamm
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> 
+> df <- data_sim("eg1", n = 200, seed = 1)
+> m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df)
+> 
+> basis_dim(m)
+s(x0) s(x1) s(x2) s(x3) 
+    9     9     9     9 
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("compare_smooths")
 > ### * compare_smooths
 > 
@@ -1505,11 +1531,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55ab137d7498>
+<environment: 0x562610543608>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55ab137d7498>
+<environment: 0x562610543608>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1706,12 +1732,12 @@ detaching ‘package:mgcv’
 
 Generalized Additive Model with 4 terms
 
-  term  type            edf statistic p.value
-  <chr> <chr>         <dbl>     <dbl> <chr>  
-1 x3    parametric     1         4.28 0.03926
-2 s(x0) TPRS           3.02      6.25 < 0.001
-3 s(x1) B spline       2.81     71.0  < 0.001
-4 s(x2) TPRS (shrink)  7.91     83.8  < 0.001
+  term  type              k   edf statistic p.value
+  <chr> <chr>         <dbl> <dbl>     <dbl> <chr>  
+1 x3    parametric       NA  1         4.28 0.03926
+2 s(x0) TPRS              9  3.02      6.25 < 0.001
+3 s(x1) B spline          9  2.81     71.0  < 0.001
+4 s(x2) TPRS (shrink)     9  7.91     83.8  < 0.001
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -2586,7 +2612,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  47.89 0.532 48.371 0 0 
+Time elapsed:  20.509 0.22 20.689 0 0 
 > grDevices::dev.off()
 null device 
           1 
