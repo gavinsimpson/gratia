@@ -33,6 +33,7 @@
 #' @importFrom tibble rownames_to_column as_tibble add_column
 #' @importFrom tidyselect matches
 #' @importFrom rlang set_names .data
+#' @importFrom stats symnum
 #'
 #' @examples
 #'
