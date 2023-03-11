@@ -11,7 +11,7 @@
 #'
 #' df <- data_sim("eg1", n = 200, seed = 1)
 #' m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df)
-#' 
+#'
 #' basis_dim(m)
 `basis_dim` <- function(object, ...) {
     UseMethod("basis_dim")
