@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.12</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.13</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,6 +71,7 @@
 <span>  dispersion <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  accuracy <span class="op">=</span> <span class="fl">0.001</span>,</span>
+<span>  stars <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -92,7 +93,7 @@ overview?</p></dd>
 
 <dt>random_effects</dt>
 <dd><p>tests of fully penalized smooth terms (those with a
-zero-dimensaionl null space, e.g. random effects) are computationally
+zero-dimensional null space, e.g. random effects) are computationally
 expensive and for large data sets producing these p values can take a
 very long time. If <code>random_effects = FALSE</code>, the tests of the expensive
 terms will be skipped.</p></dd>
@@ -116,6 +117,10 @@ matrix of the parameter estimates is used.</p></dd>
 <dd><p>numeric; accuracy with which to report p values, with p
 values below this value displayed as <code>"&lt; accuracy"</code>.</p></dd>
 
+
+<dt>stars</dt>
+<dd><p>logical; should significance stars be added to the output?</p></dd>
+
 </dl></div>
 
     <div class="section level2">
@@ -132,12 +137,12 @@ values below this value displayed as <code>"&lt; accuracy"</code>.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: 100;">Generalized Additive Model with 4 terms</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   term  type            edf statistic p.value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> x3    parametric     1         4.28 0.03926</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> s(x0) TPRS           3.02      6.25 &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> s(x1) B spline       2.81     71.0  &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> s(x2) TPRS (shrink)  7.91     83.8  &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   term  type              k   edf statistic p.value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> x3    parametric       <span style="color: #BB0000;">NA</span>  1         4.28 0.03926</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> s(x0) TPRS              9  3.02      6.25 &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> s(x1) B spline          9  2.81     71.0  &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> s(x2) TPRS (shrink)     9  7.91     83.8  &lt; 0.001</span>
 <span class="r-in"><span><span class="co"># \dontshow{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">op</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>

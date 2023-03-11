@@ -14,6 +14,7 @@ overview(model, ...)
   dispersion = NULL,
   frequentist = FALSE,
   accuracy = 0.001,
+  stars = FALSE,
   ...
 )
 }
@@ -26,7 +27,7 @@ overview(model, ...)
 overview?}
 
 \item{random_effects}{tests of fully penalized smooth terms (those with a
-zero-dimensaionl null space, e.g. random effects) are computationally
+zero-dimensional null space, e.g. random effects) are computationally
 expensive and for large data sets producing these p values can take a
 very long time. If \code{random_effects = FALSE}, the tests of the expensive
 terms will be skipped.}
@@ -43,6 +44,8 @@ matrix of the parameter estimates is used.}
 
 \item{accuracy}{numeric; accuracy with which to report p values, with p
 values below this value displayed as \code{"< accuracy"}.}
+
+\item{stars}{logical; should significance stars be added to the output?}
 }
 \description{
 Provides an overview of a model and the terms in that model
