@@ -26,16 +26,25 @@ test_that("print() output is as expected for GAM", {
     expect_snapshot({
         print(overview(m_gam))
     })
+    expect_snapshot({
+        print(overview(m_gam, stars = TRUE))
+    })
 })
 
 test_that("print() output is as expected for GAMM", {
     expect_snapshot({
         print(overview(m_gamm))
     })
+    expect_snapshot({
+        print(overview(m_gamm, stars = TRUE))
+    })
 })
 
 test_that("print() output is as expected for BAM", {
     expect_snapshot({
         print(overview(m_bam))
+    })
+    expect_snapshot({
+        print(overview(m_bam, stars = TRUE))
     })
 })
