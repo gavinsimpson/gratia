@@ -900,7 +900,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 + 
 +     draw(m)
 + }
-This is mgcv 1.8-41. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-42. For overview type 'help("mgcv-package")'.
 
 This is GJRM 0.2-6.1.
 For overview type 'help("GJRM-package")'.
@@ -1531,11 +1531,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x562610543608>
+<environment: 0x56433987f788>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x562610543608>
+<environment: 0x56433987f788>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2612,7 +2612,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  20.509 0.22 20.689 0 0 
+Time elapsed:  21.086 0.227 21.272 0 0 
 > grDevices::dev.off()
 null device 
           1 
