@@ -18,7 +18,8 @@
 #' @examples
 #' if (require("GJRM", quietly = TRUE)) {
 #'     # follow example from ?GJRM::gamlss
-#'     library(GJRM)
+#'     load_mgcv()
+#'     library("GJRM")
 #'     set.seed(0)
 #'     n <- 100
 #'     x1 <- round(runif(n))
