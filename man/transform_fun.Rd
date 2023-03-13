@@ -16,6 +16,8 @@ transform_fun(object, fun = NULL, ...)
 
 \method{transform_fun}{smooth_estimates}(object, fun = NULL, ...)
 
+\method{transform_fun}{smooth_estimates}(object, fun = NULL, ...)
+
 \method{transform_fun}{mgcv_smooth}(object, fun = NULL, ...)
 
 \method{transform_fun}{evaluated_parametric_term}(object, fun = NULL, ...)
