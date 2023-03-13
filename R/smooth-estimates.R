@@ -686,7 +686,7 @@
                                     orientation = NULL,
                                     ...) {
     # add confidence intervals if they don't already exist
-    if (!all(c("lower_ci", "upper_ci") %in% names(sm))) {
+    if (!all(c("lower_ci", "upper_ci") %in% names(object))) {
         object <- object |> add_confint()
     }
 
