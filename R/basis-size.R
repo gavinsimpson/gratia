@@ -13,30 +13,30 @@
 #' df <- data_sim("eg1", n = 200, seed = 1)
 #' m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df)
 #'
-#' basis_dim(m)
-`basis_dim` <- function(object, ...) {
-    UseMethod("basis_dim")
+#' basis_size(m)
+`basis_size` <- function(object, ...) {
+    UseMethod("basis_size")
 }
 
 #' @export
-#' @rdname basis_dim
-`basis_dim.mgcv.smooth` <- function(object, ...) {
+#' @rdname basis_size
+`basis_size.mgcv.smooth` <- function(object, ...) {
      check_is_mgcv_smooth(object)
      object[["df"]]
 }
 
 #' @export
-#' @rdname basis_dim
-`basis_dim.gam` <- function(object, ...) {
-    dims <- vapply(object$smooth, basis_dim, double(1))
+#' @rdname basis_size
+`basis_size.gam` <- function(object, ...) {
+    dims <- vapply(object$smooth, basis_size, double(1))
     dims <- setNames(dims, smooths(object))
     dims
 }
 
 #' @export
-#' @rdname basis_dim
-`basis_dim.gamm` <- function(object, ...) {
-    dims <- vapply(object$gam$smooth, basis_dim, double(1))
+#' @rdname basis_size
+`basis_size.gamm` <- function(object, ...) {
+    dims <- vapply(object$gam$smooth, basis_size, double(1))
     dims <- setNames(dims, smooths(object$gam))
     dims
 }
