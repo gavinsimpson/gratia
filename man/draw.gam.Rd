@@ -172,8 +172,8 @@ default values for \code{orientation} therefore are
 `c(20, 0, mean(range(longitude))))`` if this is not specified by the user.
 See links in \code{\link[ggplot2:coord_map]{ggplot2::coord_map()}} for more information.}
 
-\item{wrap}{logical; wrap plots as a patchwork? If \code{FALSE}, a list of ggplot
-objects is returned, 1 per term plotted.}
+\item{wrap}{logical; wrap plots as a patchwork? If \code{FALSE}, a list of
+ggplot objects is returned, 1 per term plotted.}
 
 \item{envir}{an environment to look up the data within.}
 
