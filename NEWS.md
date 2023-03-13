@@ -1,4 +1,4 @@
-# gratia 0.8.1.18
+# gratia 0.8.1.19
 
 ## User visible changes
 
@@ -73,6 +73,9 @@
   legend is printed in the tibble footer. Part of wish of @noamross #214
 
 * New `add_constant()` and `transform_fun()` methods for `smooth_samples()`.
+
+* `evenly()` gains arguments `lower` and `upper` to modify the lower and / or
+  upper bound of the interval over which evenly spaced values will be generated.
 
 ## Bug fixes
 

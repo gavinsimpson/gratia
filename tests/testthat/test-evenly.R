@@ -8,12 +8,32 @@ test_that("evenly with by works", {
     expect_silent(x <- evenly(1987:1999, by = 2))
     expect_identical(length(x), 7L)
     expect_identical(seq(1987, 1999, by = 2), x)
+
+
+    expect_silent(x <- evenly(1987:1999, by = 2, lower = 1990))
+    expect_identical(length(x), 5L)
+    expect_identical(seq(1990, 1999, by = 2), x)
+
+
+    expect_silent(x <- evenly(1987:1999, by = 2, upper = 1997))
+    expect_identical(length(x), 6L)
+    expect_identical(seq(1987, 1997, by = 2), x)
 })
 
 test_that("seq min max with by works", {
     expect_silent(x <- seq_min_max(1987:1999, by = 2))
     expect_identical(length(x), 7L)
     expect_identical(seq(1987, 1999, by = 2), x)
+
+
+    expect_silent(x <- seq_min_max(1987:1999, by = 2, lower = 1990))
+    expect_identical(length(x), 5L)
+    expect_identical(seq(1990, 1999, by = 2), x)
+
+
+    expect_silent(x <- seq_min_max(1987:1999, by = 2, upper = 1997))
+    expect_identical(length(x), 6L)
+    expect_identical(seq(1987, 1997, by = 2), x)
 })
 
 test_that("ref_level works", {

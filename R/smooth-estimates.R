@@ -685,8 +685,10 @@
                                     projection = "orthographic",
                                     orientation = NULL,
                                     ...) {
-    # add confidence intervals
-    object <- object |> add_confint()
+    # add confidence intervals if they don't already exist
+    if (!all(c("lower_ci", "upper_ci") %in% names(object))) {
+        object <- object |> add_confint()
+    }
 
     # draw smooths
     # the factor in group_split is to reorder to way the smooths entered the
