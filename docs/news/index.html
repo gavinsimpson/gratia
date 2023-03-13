@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.18</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,21 +55,21 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.8.1.13" id="gratia-08113">gratia 0.8.1.13<a class="anchor" aria-label="anchor" href="#gratia-08113"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.8.1.18" id="gratia-08118">gratia 0.8.1.18<a class="anchor" aria-label="anchor" href="#gratia-08118"></a></h2>
 <div class="section level3">
-<h3 id="user-visible-changes-0-8-1-13">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-8-1-13"></a></h3>
+<h3 id="user-visible-changes-0-8-1-18">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-8-1-18"></a></h3>
 <ul><li>
 <p><code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> now uses a single call to the RNG to generate draws from the posterior of smooths. Previous to version 0.9.0, <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> would do a separate call to <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code> for each smooth. As a result, the result of a call to <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> on a model with multiple smooths will now produce different results to those generated previously. To regain the old behaviour, add <code>rng_per_smooth = TRUE</code> to the <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> call.</p>
 <p>Note, however, that using per-smooth RNG calls with <code>method = "mh"</code> will be very inefficient as, with that method, posterior draws for all coefficients in the model are sampled at once. So, only use <code>rng_per_smooth = TRUE</code> with <code>method = "gaussian"</code>.</p>
 </li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-0-8-1-13">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-1-13"></a></h3>
+<h3 id="new-features-0-8-1-18">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-1-18"></a></h3>
 <ul><li><p><code><a href="../reference/response_derivatives.html">response_derivatives()</a></code> is a new function for computing derivatives of the response with respect to a (continuous) focal variable. First or second order derivatives can be computed using forward, backward, or central finite differences. The uncertainty in the estimated derivative is determined using posterior sampling via <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code>, and hence can be derived from a Gaussian approximation to the posterior or using a Metropolis Hastings sampler (see below.)</p></li>
 <li><p><code><a href="../reference/data_sim.html">data_sim()</a></code> can now simulate response data from gamma, Tweedie and ordered categorical distributions.</p></li>
 <li><p><code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> and <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> can now use the Metropolis Hastings sampler from <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code>, instead of a Gaussian approximation, to sample from the posterior distribution of the model or specific smooths respectively.</p></li>
 <li><p><code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> is a new function in the family of <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> and <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code>. <code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> returns draws from the posterior distribution of the response, combining the uncertainty in the estimated expected value of the response and the dispersion of the response distribution. The difference between <code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> and <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code> is that the latter only includes variation due to drawing samples from the conditional distribution of the response (the uncertainty in the expected values is ignored), while the former includes both sources of uncertainty.</p></li>
-<li><p><code><a href="../reference/basis_dim.html">basis_dim()</a></code> is a new function to extract the basis dimension (number of basis functions) for smooths. Methods are available for objects that inherit from classes <code>"gam"</code>, <code>"gamm"</code>, and <code>"mgcv.smooth"</code> (for individual smooths).</p></li>
+<li><p><code><a href="../reference/basis_size.html">basis_size()</a></code> is a new function to extract the basis dimension (number of basis functions) for smooths. Methods are available for objects that inherit from classes <code>"gam"</code>, <code>"gamm"</code>, and <code>"mgcv.smooth"</code> (for individual smooths).</p></li>
 <li><p><code><a href="../reference/data_slice.html">data_slice()</a></code> gains a method for data frames and tibbles.</p></li>
 <li><p><code><a href="../reference/typical_values.html">typical_values()</a></code> gains a method for data frames and tibbles.</p></li>
 <li><p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> now works with models fitted using the <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code> family. The predicted probability for each category is returned, alongside a Wald interval created using the standard error (SE) of the estimated probability. The SE and estimated probabilities are transformed to the logit (linear predictor) scale, a Wald credible interval is formed, which is then back-transformed to the response (probability) scale.</p></li>
@@ -78,9 +78,10 @@
 <li><p>A worm plot can now be drawn in place of the QQ plot with <code><a href="../reference/appraise.html">appraise()</a></code> via new argument <code>use_worm = TRUE</code>. <a href="https://github.com/gavinsimpson/gratia/issues/62" class="external-link">#62</a></p></li>
 <li><p><code><a href="../reference/smooths.html">smooths()</a></code> now works for models fitted with <code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">mgcv::gamm()</a></code>.</p></li>
 <li><p><code><a href="../reference/overview.html">overview()</a></code> now returns the basis dimension for each smooth and gains an argument <code>stars</code> which if <code>TRUE</code> add significance stars to the output plus a legend is printed in the tibble footer. Part of wish of <a href="https://github.com/noamross" class="external-link">@noamross</a> <a href="https://github.com/gavinsimpson/gratia/issues/214" class="external-link">#214</a></p></li>
+<li><p>New <code><a href="../reference/add_constant.html">add_constant()</a></code> and <code><a href="../reference/transform_fun.html">transform_fun()</a></code> methods for <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code>.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-8-1-13">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-1-13"></a></h3>
+<h3 id="bug-fixes-0-8-1-18">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-1-18"></a></h3>
 <ul><li><p><code><a href="../reference/link.html">link()</a></code>, <code><a href="../reference/link.html">inv_link()</a></code>, and related family functions for the <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">ocat()</a></code> weren’t correctly identifying the family name and as a result would throw an error even when passed an object of the correct family.</p></li>
 <li><p>The <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method for <code><a href="../reference/lp_matrix.html">lp_matrix()</a></code> now converts the matrix to a data frame before conversion to a tibble. This makes more sense as it results in more typical behaviour as the columns of the printed object are doubles.</p></li>
 <li><p>Constrained factor smooths (<code>bs = "sz"</code>) where the factor is not the first variable mentioned in the smooth (i.e. <code>s(x, f, bs = "sz")</code> for continuous <code>x</code> and factor <code>f</code>) are not plottable with <code><a href="../reference/draw.html">draw()</a></code>. <a href="https://github.com/gavinsimpson/gratia/issues/208" class="external-link">#208</a></p></li>

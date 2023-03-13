@@ -275,6 +275,25 @@
 #' @export
 #' @importFrom dplyr mutate across
 #' @importFrom tidyselect any_of
+`add_constant.smooth_samples` <- function(object, constant = NULL, ...) {
+    ## If constant supplied, add it to `est`
+    if (!is.null(constant)) {
+        if (!is.numeric(constant)) {
+            stop("'constant' must be numeric: supplied <", constant, ">",
+                 call. = FALSE)
+        }
+        object <- mutate(object,
+                         across(any_of(c("est", "lower", "upper")),
+                                .fns = ~ .x + constant))
+    }
+
+    object
+}
+
+#' @rdname add_constant
+#' @export
+#' @importFrom dplyr mutate across
+#' @importFrom tidyselect any_of
 `add_constant.mgcv_smooth` <- function(object, constant = NULL, ...) {
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {

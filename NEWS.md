@@ -1,4 +1,4 @@
-# gratia 0.8.1.13
+# gratia 0.8.1.18
 
 ## User visible changes
 
@@ -42,7 +42,7 @@
   uncertainty in the expected values is ignored), while the former includes
   both sources of uncertainty.
 
-* `basis_dim()` is a new function to extract the basis dimension (number of
+* `basis_size()` is a new function to extract the basis dimension (number of
   basis functions) for smooths. Methods are available for objects that inherit
   from classes `"gam"`, `"gamm"`, and `"mgcv.smooth"` (for individual smooths).
 
@@ -71,6 +71,8 @@
 * `overview()` now returns the basis dimension for each smooth and gains an
   argument `stars` which if `TRUE` add significance stars to the output plus a
   legend is printed in the tibble footer. Part of wish of @noamross #214
+
+* New `add_constant()` and `transform_fun()` methods for `smooth_samples()`.
 
 ## Bug fixes
 
