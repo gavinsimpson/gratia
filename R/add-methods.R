@@ -264,7 +264,7 @@
                  call. = FALSE)
         }
         object <- mutate(object,
-                         across(any_of(c("est", "lower", "upper")),
+                         across(any_of(c("est", "lower_ci", "upper_ci")),
                                 .fns = ~ .x + constant))
     }
 
@@ -283,7 +283,7 @@
                  call. = FALSE)
         }
         object <- mutate(object,
-                         across(any_of(c("est", "lower", "upper")),
+                         across(any_of(c("value", "lower", "upper")),
                                 .fns = ~ .x + constant))
     }
 
