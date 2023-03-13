@@ -59,7 +59,7 @@
 
     # smooth terms
     types <- vapply(model$smooth, smooth_type, character(1))
-    dfs <- vapply(model$smooth, basis_dim, double(1))
+    dfs <- vapply(model$smooth, basis_size, double(1))
     out <- as.data.frame(smry$s.table) %>%
       rownames_to_column() %>%
       as_tibble() %>%
