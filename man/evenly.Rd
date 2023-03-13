@@ -5,9 +5,9 @@
 \alias{seq_min_max}
 \title{Create a sequence of evenly-spaced values}
 \usage{
-evenly(x, n = 100, by = NULL)
+evenly(x, n = 100, by = NULL, lower = NULL, upper = NULL)
 
-seq_min_max(x, n, by = NULL)
+seq_min_max(x, n, by = NULL, lower = NULL, upper = NULL)
 }
 \arguments{
 \item{x}{numeric; vector over which evenly-spaced values are returned}
@@ -19,14 +19,20 @@ evaluating a smooth.}
 \item{by}{numeric; the increment of the sequence. If specified, argument \code{n}
 is ignored and the sequence returned will be from \code{min(x)} to \code{max(x)} in
 increments of \code{by}.}
+
+\item{lower}{numeric; the lower bound of the interval.}
+
+\item{upper}{numeric; the upper bound of the interval.}
 }
 \value{
 A numeric vector of length \code{n}.
 }
 \description{
 For a continuous vector \code{x}, \code{evenly} and \code{seq_min_max()}
-create a sequence of \code{n} evenly-spaced values over the range \code{min(x)}
--- \code{max(x)}. For a factor \code{x}, the function returns \code{levels(x)}.
+create a sequence of \code{n} evenly-spaced values over the range \code{lower}
+-- \code{upper}. By default, \code{lower} is defined as \code{min(x)} and \code{upper} as
+\code{max(x)}, excluding \code{NA}s. For a factor \code{x}, the function returns
+\code{levels(x)}.
 }
 \examples{
 \dontshow{set.seed(1)}

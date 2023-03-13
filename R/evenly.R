@@ -1,8 +1,10 @@
 #' @title Create a sequence of evenly-spaced values
 #'
 #' @description For a continuous vector `x`, `evenly` and `seq_min_max()`
-#'   create a sequence of `n` evenly-spaced values over the range `min(x)`
-#'   -- `max(x)`. For a factor `x`, the function returns `levels(x)`.
+#'   create a sequence of `n` evenly-spaced values over the range `lower`
+#'   -- `upper`. By default, `lower` is defined as `min(x)` and `upper` as
+#'   `max(x)`, excluding `NA`s. For a factor `x`, the function returns
+#'   `levels(x)`.
 #'
 #' @param x numeric; vector over which evenly-spaced values are returned
 #' @param n numeric; the number of evenly-spaced values to return. A default of
@@ -11,6 +13,8 @@
 #' @param by numeric; the increment of the sequence. If specified, argument `n`
 #'   is ignored and the sequence returned will be from `min(x)` to `max(x)` in
 #'   increments of `by`.
+#' @param lower numeric; the lower bound of the interval.
+#' @param upper numeric; the upper bound of the interval.
 #'
 #' @return A numeric vector of length `n`.
 #'
@@ -21,38 +25,38 @@
 #' x <- rnorm(10)
 #' n <- 10L
 #' evenly(x, n = n)
-`evenly` <- function(x, n = 100, by = NULL) {
+`evenly` <- function(x, n = 100, by = NULL, lower = NULL, upper = NULL) {
     out <- if (is.factor(x)) {
         ## must coerce to factor otherwise Predict.matrix will coerce
         ## and that will end up with levels in the wrong order
         ## need to make this ordered if `x` is ordered
         factor(levels(x), levels = levels(x), ordered = is.ordered(x))
     } else {
+        lower <- ifelse(is.null(lower), min(x, na.rm = TRUE), lower)
+        upper <- ifelse(is.null(upper), max(x, na.rm = TRUE), upper)
         if (is.null(by)) {
-            seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
-                length.out = n)
+            seq(from = lower, to = upper, length.out = n)
         } else {
-            seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
-                by = by)
+            seq(from = lower, to = upper, by = by)
         }
     }
     out
 }
 
 #' @rdname evenly
-`seq_min_max` <- function(x, n, by = NULL) {
+`seq_min_max` <- function(x, n, by = NULL, lower = NULL, upper = NULL) {
     out <- if (is.factor(x)) {
         ## must coerce to factor otherwise Predict.matrix will coerce
         ## and that will end up with levels in the wrong order
         ## need to make this ordered if `x` is ordered
         factor(levels(x), levels = levels(x), ordered = is.ordered(x))
     } else {
+        lower <- ifelse(is.null(lower), min(x, na.rm = TRUE), lower)
+        upper <- ifelse(is.null(upper), max(x, na.rm = TRUE), upper)
         if (is.null(by)) {
-            seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
-                length.out = n)
+            seq(from = lower, to = upper, length.out = n)
         } else {
-            seq(from = min(x, na.rm = TRUE), to = max(x, na.rm = TRUE),
-                by = by)
+            seq(from = lower, to = upper, by = by)
         }
     }
     out
