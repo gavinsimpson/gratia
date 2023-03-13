@@ -95,7 +95,8 @@
 #'   default values for `orientation` therefore are
 #'   `c(20, 0, mean(range(longitude))))`` if this is not specified by the user.
 #'   See links in [ggplot2::coord_map()] for more information.
-#' @param wrap logical; wrap plots as a patchwork?
+#' @param wrap logical; wrap plots as a patchwork? If \code{FALSE}, a list of
+#'   ggplot objects is returned, 1 per term plotted.
 #' @param envir an environment to look up the data within.
 #' @param ... additional arguments passed to [patchwork::wrap_plots()].
 #'
