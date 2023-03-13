@@ -1015,7 +1015,7 @@ vars_from_label <- function(label) {
 #' @rdname transform_fun
 #' @export
 #' @importFrom dplyr mutate across
-#' @importFrom tidyselect any_off
+#' @importFrom tidyselect any_of
 `transform_fun.smooth_estimates` <- function(object, fun = NULL, ...) {
     ## If fun supplied, use it to transform est and the upper and lower interval
     if (!is.null(fun)) {
@@ -1031,7 +1031,7 @@ vars_from_label <- function(label) {
 #' @rdname transform_fun
 #' @export
 #' @importFrom dplyr mutate across
-#' @importFrom tidyselect all_off
+#' @importFrom tidyselect all_of
 `transform_fun.smooth_samples` <- function(object, fun = NULL, ...) {
     ## If fun supplied, use it to transform est and the upper and lower interval
     if (!is.null(fun)) {
