@@ -1033,7 +1033,7 @@ vars_from_label <- function(label) {
     if (!is.null(fun)) {
         fun <- match.fun(fun)
         object <- mutate(object,
-                         across(ally_of("value"),
+                         across(all_of("value"),
                                 .fns = fun))
     }
 
