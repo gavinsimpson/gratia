@@ -620,7 +620,8 @@ family_type.family <- function(object, ...) {
         ## check that family is of the correct type
         ##  - need to handle a couple of special types
         special <- c("Tweedie", "Negative Binomial", "negative binomial",
-                     "Scaled t", "scaled t", "Ordered Categorical")
+            "Scaled t", "scaled t", "Ordered Categorical",
+        "Beta regression")
         if (type %in% special) {
             if (!grepl(type, fam, ignore.case = TRUE)) {
                 stop("'family' is not of type '\"", type, "\"'", call. = FALSE)
