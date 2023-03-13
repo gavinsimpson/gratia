@@ -6,7 +6,7 @@
 
 [![R build
 status](https://github.com/gavinsimpson/gratia/workflows/R-CMD-check/badge.svg)](https://github.com/gavinsimpson/gratia/actions)
-[![codecov](https://codecov.io/gh/gavinsimpson/gratia/branch/main/graph/badge.svg?token=GG5NQfgRFu)](https://codecov.io/gh/gavinsimpson/gratia)
+[![codecov](https://codecov.io/gh/gavinsimpson/gratia/branch/main/graph/badge.svg?token=GG5NQfgRFu)](https://app.codecov.io/gh/gavinsimpson/gratia)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/gratia)](https://cran.r-project.org/package=gratia)
 [![CRAN
 Downloads](https://cranlogs.r-pkg.org/badges/grand-total/gratia)](https://cran.r-project.org/package=gratia)
