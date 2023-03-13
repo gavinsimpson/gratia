@@ -256,14 +256,15 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
-> nameEx("basis_dim")
-> ### * basis_dim
+> nameEx("basis_size")
+> ### * basis_size
 > 
 > flush(stderr()); flush(stdout())
 > 
-> ### Name: basis_dim
+> ### Name: basis_size
 > ### Title: Extract basis dimension of a smooth
-> ### Aliases: basis_dim basis_dim.mgcv.smooth basis_dim.gam basis_dim.gamm
+> ### Aliases: basis_size basis_size.mgcv.smooth basis_size.gam
+> ###   basis_size.gamm
 > 
 > ### ** Examples
 > 
@@ -272,7 +273,7 @@ detaching ‘package:mgcv’
 > df <- data_sim("eg1", n = 200, seed = 1)
 > m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df)
 > 
-> basis_dim(m)
+> basis_size(m)
 s(x0) s(x1) s(x2) s(x3) 
     9     9     9     9 
 > 
@@ -1532,11 +1533,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x561a29dac248>
+<environment: 0x55768b134a78>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x561a29dac248>
+<environment: 0x55768b134a78>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2613,7 +2614,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  23.617 0.263 23.85 0 0 
+Time elapsed:  22.806 0.227 22.99 0 0 
 > grDevices::dev.off()
 null device 
           1 
