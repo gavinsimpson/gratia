@@ -1,4 +1,4 @@
-# gratia 0.8.1.14
+# gratia 0.8.1.15
 
 ## User visible changes
 
@@ -71,6 +71,8 @@
 * `overview()` now returns the basis dimension for each smooth and gains an
   argument `stars` which if `TRUE` add significance stars to the output plus a
   legend is printed in the tibble footer. Part of wish of @noamross #214
+
+* New `add_constant()` and `transform_fun()` methods for `smooth_samples()`.
 
 ## Bug fixes
 

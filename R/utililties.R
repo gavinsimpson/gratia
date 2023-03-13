@@ -1028,6 +1028,20 @@ vars_from_label <- function(label) {
 
 #' @rdname transform_fun
 #' @export
+`transform_fun.smooth_estimates` <- function(object, fun = NULL, ...) {
+    ## If fun supplied, use it to transform est and the upper and lower interval
+    if (!is.null(fun)) {
+        fun <- match.fun(fun)
+        object <- mutate(object,
+                         across(ally_of("value"),
+                                .fns = fun))
+    }
+
+    object
+}
+
+#' @rdname transform_fun
+#' @export
 #' @importFrom dplyr mutate across
 #' @importFrom tidyselect all_of
 `transform_fun.mgcv_smooth` <- function(object, fun = NULL, ...) {
