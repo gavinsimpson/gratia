@@ -33,8 +33,8 @@
 #'   before the confidence band is computed.
 #' @param fun function; a function that will be applied to the estimated values
 #'   and confidence interval before plotting. Can be a function or the name of a
-#'   provided.
 #'   function. Function `fun` will be applied after adding any `constant`, if
+#'   provided.
 #' @param ci_level numeric between 0 and 1; the coverage of credible interval.
 #' @param n numeric; the number of points over the range of the covariate at
 #'   which to evaluate the smooth.
