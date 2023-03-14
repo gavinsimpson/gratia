@@ -469,7 +469,11 @@
 }
 
 #' @export
+#' @importFrom dplyr mutate case_when
+#' @importFrom rlang .data
+#' @rdname add_sizer
 `add_sizer.derivatives` <- function(object, type = c("change", "sizer"), ...) {
+    # match the type argument
     type <- match.arg(type)
 
     # if just doing a change indicator
@@ -478,13 +482,13 @@
             mutate(.change = 
             case_when(.data$lower > 0 | .data$upper < 0 ~ .data$derivative,
                 .default = NA_real_))
-    } else {
+    } else { # other wise we are adding a sizer-like indicator
         object |>
             mutate(
             .decrease =
-            case_when(.data$lower > 0 ~ .data$derivative, .default = NA_real_),
+            case_when(.data$upper < 0 ~ .data$derivative, .default = NA_real_),
             .increase =
-            case_when(.data$upper < 0 ~ .data$derivative, .default = NA_real_))
+            case_when(.data$lower > 0 ~ .data$derivative, .default = NA_real_))
 
     }
     object
