@@ -9,7 +9,13 @@
   object,
   select = NULL,
   scales = c("free", "fixed"),
+  add_change = FALSE,
+  change_type = c("change", "sizer"),
   alpha = 0.2,
+  col_change = "black",
+  col_decrease = "#56B4E9",
+  col_increase = "#E69F00",
+  lwd_change = 1.5,
   ncol = NULL,
   nrow = NULL,
   guides = "keep",
@@ -48,8 +54,23 @@ scale is used for all univariate smooths.
 Currently does not affect the y-axis scale of plots of the parametric
 terms.}
 
+\item{add_change}{logical; should the periods of significant change be
+highlighted on the plot?}
+
+\item{change_type}{character; the type of change to indicate. If \code{"change"},
+no differentiation is made between periods of significant increase or
+decrease. If \code{"sizer"}, the periods of increase and decrease are
+differentiated in the resulting plot.}
+
 \item{alpha}{numeric; alpha transparency for confidence or simultaneous
 interval.}
+
+\item{col_change, col_decrease, col_increase}{colour specifications to use for
+indicating periods of change. \code{col_change} is used when
+\code{change_type = "change"}, while \code{col_decrease} and \code{col_increase} are used
+when `change_type = "sizer"``.}
+
+\item{lwd_change}{numeric; the \code{linewidth} to use for the change indicators.}
 
 \item{ncol, nrow}{numeric; the numbers of rows and columns over which to
 spread the plots}
