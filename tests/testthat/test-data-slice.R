@@ -155,8 +155,7 @@ test_that("factor_combos works when excluding terms", {
 })
 
 test_that("factor_combos works when there are no factor terms", {
-    expect_message(fc <- factor_combos(m_gam, vars = !fac),
-                   "Model contains no factor terms")
+    expect_silent(fc <- factor_combos(m_gam, vars = !fac))
     expect_identical(fc, NULL)
 })
 
@@ -186,8 +185,7 @@ test_that("data_combos works when exluding terms", {
 })
 
 test_that("data_combos works when there are no factor terms", {
-    expect_message(dc <- data_combos(m_gam),
-        "Model contains no factor terms")
+    expect_silent(dc <- data_combos(m_gam))
     expect_identical(nrow(dc), 1L)
     expect_identical(ncol(dc), 4L)
     expect_named(dc, c("x0", "x1", "x2", "x3"))
