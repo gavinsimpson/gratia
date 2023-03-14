@@ -90,8 +90,11 @@
     }
 
     # loop over the valid_terms and prepare the parametric effects
-    fun <- function(term, data, pred) {
-        term_expr <- str2expression(term)[[1L]]
+    fun <- function(term, data, pred, vars) {
+        # if we are handling an lss model, we need to find the right data
+        vars <- vars[term]
+        # term_expr <- str2expression(term)[[1L]]
+        term_expr <- str2expression(vars)[[1L]]
         x_data <- if (length(term_expr) > 1L) {
             if (transform) {
                 pred$fit[, term]
@@ -120,7 +123,8 @@
         out
     }
 
-    effects <- map_df(valid_terms, .f = fun, data = data, pred = pred)
+    effects <- map_df(valid_terms, .f = fun, data = data, pred = pred,
+        vars = vars)
 
     if (unnest) {
         effects <- unnest(effects, cols = "data") %>%
@@ -289,7 +293,7 @@ draw.parametric_effects <- function(object,
         title <- term_label
     }
     if (is.null(caption)) {
-        caption <- paste("Parametric terms")
+        caption <- paste("Parametric term")
     }
 
     ## add labelling to plot
