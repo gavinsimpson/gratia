@@ -1,4 +1,4 @@
-# gratia 0.8.1.20
+# gratia 0.8.1.21
 
 ## User visible changes
 
@@ -105,6 +105,9 @@
 
 * `parametric_effects()` was unable to handle special parametric terms like
   `poly(x)` or `log(x)` in formulas. Reported by @fhui28 #212
+
+* `parametric_effects()` now works better for location, scale, shape models.
+  Reported by @pboesu #45
 
 # gratia 0.8.1
 
