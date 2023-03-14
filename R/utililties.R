@@ -545,20 +545,28 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 #' @export
 #' @rdname parametric_terms
 `parametric_terms.gam` <- function(model, ...) {
+    # function to label lss terms
+    `lss_terms` <- function(i, terms) {
+        labs <- labels(delete.response(terms[[i]]))
+        names(labs) <- unlist(lapply(labs,
+            function(lab, i) {
+                lab <- if (i > 1L) {
+                    paste0(lab, ".", i - 1)
+                } else {
+                    lab
+                }
+                lab
+            }, i = i))
+        labs
+    }
+
     tt <- model$pterms        # get parametric terms
+
     if (is.list(tt)) {
         ## If a list, we have multiple linear predictors. For terms in the
         ## nth linear predictor (for n > 1) the covariate gets appended '.{n-1}'
         ## so store the mgcv names as the names of the labels returned
-        labs <- unlist(lapply(tt, function(x) labels(delete.response(x))))
-        names(labs) <- unlist(lapply(seq_along(labs),
-                                     function(i, labs) {
-                                         if (i > 1L) {
-                                             paste0(labs[[i]], ".", i-1)
-                                         } else {
-                                             labs[[i]]}
-                                     }, labs))
-        labs
+        labs <- unlist(lapply(seq_along(tt), lss_terms, terms = tt))
     } else {
         if (length(attr(tt, "term.labels") > 0L)) {
             tt <- delete.response(tt) # remove response so easier to work with
