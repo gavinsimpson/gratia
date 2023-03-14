@@ -741,7 +741,11 @@
                                     projection = "orthographic",
                                     orientation = NULL,
                                     ...) {
-    sm_vars <- vars_from_label(unique(object[["smooth"]]))
+    sm_vars <- if (".term" %in% names(object)) {
+        vars_from_label(unique(object[[".term"]]))
+    } else {
+        vars_from_label(unique(object[["smooth"]]))
+    }
     sm_dim <- length(sm_vars)
     sm_type <- unique(object[["type"]])
 
@@ -886,9 +890,19 @@
                                        partial_residuals = NULL,
                                        ylim = NULL,
                                        ...) {
-    if (is.null(variables)) {
-        variables <- vars_from_label(unique(object[["smooth"]]))
+    # do we have a grouped factor by?
+    grouped_by <- FALSE
+    if (".term" %in% names(object) && !all(is.na(object[["by"]]))) {
+        if (is.null(variables)) {
+            variables <- vars_from_label(unique(object[[".term"]]))
+        }
+        grouped_by <- TRUE
+    } else {
+        if (is.null(variables)) {
+            variables <- vars_from_label(unique(object[["smooth"]]))
+        }
     }
+
 
     # If constant supplied apply it to `est`
     object <- add_constant(object, constant = constant)
@@ -897,8 +911,15 @@
     object <- transform_fun(object, fun = fun)
 
     # base plot - need as.name to handle none standard names, like log2(x)
-    plt <- ggplot(object, aes(x = .data[[variables]], y = .data$est)) +
-        guides(x = guide_axis(angle = angle))
+    plt <- if (grouped_by) {
+        by_var <- unique(object$by)
+        ggplot(object, aes(x = .data[[variables]], y = .data$est,
+            colour = .data[[by_var]], group = .data[[by_var]])) +
+            guides(x = guide_axis(angle = angle))
+    } else {
+        ggplot(object, aes(x = .data[[variables]], y = .data$est)) +
+            guides(x = guide_axis(angle = angle))
+    }
 
     # do we want partial residuals? Only for univariate smooths without by vars
     if (!is.null(partial_residuals)) {
@@ -910,11 +931,22 @@
     }
 
     # plot the confidence interval and smooth line
-    plt <- plt +
+    plt <- if (grouped_by) {
+        plt +
+        geom_ribbon(mapping = aes(ymin = .data[["lower_ci"]],
+                                  ymax = .data[["upper_ci"]],
+                                  fill = .data[[by_var]]),
+                    alpha = ci_alpha, colour = NA) +
+        geom_line(aes(colour = .data[[by_var]])) +
+            scale_colour_okabe_ito() +
+            scale_fill_okabe_ito()
+    } else {
+        plt +
         geom_ribbon(mapping = aes(ymin = .data[["lower_ci"]],
                                   ymax = .data[["upper_ci"]]),
                     alpha = ci_alpha, colour = NA, fill = ci_col) +
         geom_line(colour = smooth_col)
+    }
 
     ## default axis labels if none supplied
     if (is.null(xlab)) {
@@ -924,22 +956,29 @@
         ylab <- "Partial effect"
     }
     if (is.null(title)) {
-        title <- unique(object[["smooth"]])
+        title <- ifelse(grouped_by, unique(object$.term),
+            as.character(unique(object$smooth)))
     }
     if (is.null(caption)) {
         caption <- paste("Basis:", object[["type"]])
     }
     if (all(!is.na(object[["by"]]))) {
-        # is the by variable a factor or a numeric
-        by_class <- data_class(object)[[object[["by"]][[1L]]]]
-        by_var <- as.character(unique(object[["by"]]))
-        spl <- strsplit(title, split = ":")
-        title <- spl[[1L]][[1L]]
-        if (is.null(subtitle)) {
-            subtitle <- if (by_class != "factor") {
-                paste0("By: ", by_var) # continuous by
-            } else {
-                paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+        if (grouped_by) {
+            if (is.null(subtitle)) {
+                subtitle <- paste0("By: ", by_var)
+            }
+        } else {
+            # is the by variable a factor or a numeric
+            by_class <- data_class(object)[[object[["by"]][[1L]]]]
+            by_var <- as.character(unique(object[["by"]]))
+            spl <- strsplit(title, split = ":")
+            title <- spl[[1L]][[1L]]
+            if (is.null(subtitle)) {
+                subtitle <- if (by_class != "factor") {
+                    paste0("By: ", by_var) # continuous by
+                } else {
+                    paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+                }
             }
         }
     }
