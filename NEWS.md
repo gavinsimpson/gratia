@@ -1,4 +1,4 @@
-# gratia 0.8.1.19
+# gratia 0.8.1.20
 
 ## User visible changes
 
@@ -76,6 +76,18 @@
 
 * `evenly()` gains arguments `lower` and `upper` to modify the lower and / or
   upper bound of the interval over which evenly spaced values will be generated.
+
+* `add_sizer()` is a new function to add information on whether the derivative
+  of a smooth is significantly changing (where the credible interval excludes
+  0). Currently, a method for `derivatives()` objects is provided. Part of wish
+  of @asanders11 #117
+
+* `draw.dervivatives()` gains arguments `add_change` and `change_type` to allow
+  derivatives of smooths to be plotted with indicators where the credible
+  interval on the derivative excludes 0. Options allow for periods of decrease
+  or increase to be differentiated via `change_type = "sizer"` instead of the
+  default `change_type = "change"`, which emphasises either type of change in
+  the same way. Part of wish of @asanders11 #117
 
 ## Bug fixes
 
