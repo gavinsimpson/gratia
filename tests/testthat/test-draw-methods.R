@@ -332,6 +332,18 @@ test_that("draw.derivates() plots derivatives for a GAM", {
     expect_doppelganger("draw derivatives for a GAM with fixed scales", plt)
 })
 
+test_that("draw.derivates plots derivatives with change indicators", {
+    # not on CRAN
+    skip_on_cran()
+
+    d1 <- derivatives(m_gam, type = "central")
+    expect_silent(plt <- draw(d1, add_change = TRUE))
+    expect_doppelganger("draw derivatives for a GAM with default change", plt)
+
+    expect_silent(plt <- draw(d1, add_change = TRUE, change_type = "sizer"))
+    expect_doppelganger("draw derivatives for a GAM with sizer change", plt)
+})
+
 test_that("draw.derivates() plots derivatives for a GAM rotated labels", {
     skip_on_cran()
     d1 <- derivatives(su_m_univar_4, type = "central")
