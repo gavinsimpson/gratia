@@ -23,6 +23,7 @@
   dist = 0.1,
   rug = TRUE,
   contour = TRUE,
+  grouped_by = FALSE,
   ci_alpha = 0.2,
   ci_col = "black",
   smooth_col = "black",
@@ -121,6 +122,10 @@ smooths or plot locations of data for higher dimensions.}
 
 \item{contour}{logical; should contours be draw on the plot using
 \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+
+\item{grouped_by}{logical; should factor by smooths be drawn as one panel
+per level of the factor (\code{FALSE}, the default), or should the individual
+smooths be combined into a single panel containing all levels (\code{TRUE})?}
 
 \item{ci_alpha}{numeric; alpha transparency for confidence or simultaneous
 interval.}
@@ -221,8 +226,8 @@ draw(m2, n_contour = 5, n = 50,
 
 # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 # for more examples and for details on how to modify the theme of all the
-# plots produced by draw()
-# to modify all panels, for example to change the theme, use the & operator
+# plots produced by draw(). To modify all panels, for example to change the
+# theme, use the & operator
 }
 \author{
 Gavin L. Simpson

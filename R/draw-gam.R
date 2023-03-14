@@ -59,6 +59,9 @@
 #'   smooths or plot locations of data for higher dimensions.
 #' @param contour logical; should contours be draw on the plot using
 #'   [ggplot2::geom_contour()].
+#' @param grouped_by logical; should factor by smooths be drawn as one panel
+#'   per level of the factor (`FALSE`, the default), or should the individual
+#'   smooths be combined into a single panel containing all levels (`TRUE`)?
 #' @param ci_alpha numeric; alpha transparency for confidence or simultaneous
 #'   interval.
 #' @param ci_col colour specification for the confidence/credible intervals
@@ -117,6 +120,7 @@
 #' @importFrom purrr pluck map_lgl
 #' @importFrom rlang expr_label
 #' @importFrom utils packageVersion getFromNamespace
+#' @importFrom stringr str_split_fixed
 #' @export
 #'
 #' @examples
@@ -146,8 +150,8 @@
 #'
 #' # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 #' # for more examples and for details on how to modify the theme of all the
-#' # plots produced by draw()
-#' # to modify all panels, for example to change the theme, use the & operator
+#' # plots produced by draw(). To modify all panels, for example to change the
+#' # theme, use the & operator
 `draw.gam` <- function(object,
                        data = NULL,
                        select = NULL,
@@ -166,6 +170,7 @@
                        dist = 0.1,
                        rug = TRUE,
                        contour = TRUE,
+                       grouped_by = FALSE,
                        ci_alpha = 0.2,
                        ci_col = "black",
                        smooth_col = "black",
@@ -316,8 +321,18 @@
         }
 
         # draw smooths
-        # the factor is to reorder to way the smooths entered the model
-        sm_l <- group_split(sm_eval, factor(.data$smooth, levels = S[select]))
+        sm_l <- if (isTRUE(grouped_by)) {
+            levs <- unique(str_split_fixed(sm_eval$smooth, ":", n = 2)[, 1])
+            sm_eval |>
+                mutate(smooth = factor(.data$smooth, levels = S[select]),
+                .term = str_split_fixed(.data$smooth, ":", n = 2)[, 1]) |>
+                arrange(.data$smooth) |>
+                relocate(".term", .before = 1L) |>
+                group_split(factor(.data$.term, levels = levs), .data$by)
+        } else {
+            # the factor is to reorder to way the smooths entered the model
+            group_split(sm_eval, factor(.data$smooth, levels = S[select]))
+        }
         sm_plts <- map(sm_l,
                        draw_smooth_estimates,
                        constant = constant,
