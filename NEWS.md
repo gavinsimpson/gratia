@@ -1,4 +1,4 @@
-# gratia 0.8.1.21
+# gratia 0.8.1.22
 
 ## User visible changes
 
@@ -89,11 +89,18 @@
   default `change_type = "change"`, which emphasises either type of change in
   the same way. Part of wish of @asanders11 #117
 
+* `draw.gam()` can now group factor by smooths for a given factor into a single
+  panel, rather than plotting the smooths for each level in separate panels.
+  This is achieved via new argument `grouped_by`. Requested by @RPanczak #89
+
 ## Bug fixes
 
 * `link()`, `inv_link()`, and related family functions for the `ocat()` weren't
   correctly identifying the family name and as a result would throw an error
   even when passed an object of the correct family.
+
+  `link()` and `inv_link()` now work correctly for the `betar()` family in a
+  fitted GAM.
 
 * The `print()` method for `lp_matrix()` now converts the matrix to a data frame
   before conversion to a tibble. This makes more sense as it results in more

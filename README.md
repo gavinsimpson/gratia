@@ -70,13 +70,9 @@ have *remotes* installed, then run
 to install the package. Alternatively, binary packages of the
 development version are available from rOpenSci’s R Universe service:
 
-    # Enable repository from gavinsimpson
-    options(repos = c(
-      gavinsimpson = "https://gavinsimpson.r-universe.dev",
-      CRAN = "https://cloud.r-project.org"))
-
-    # Download and install gratia in R
-    install.packages("gratia")
+    # Install gratia in R
+    install.packages("gratia", repos = c("https://gavinsimpson.r-universe.dev",
+      "https://cloud.r-project.org"))
 
 ## History
 

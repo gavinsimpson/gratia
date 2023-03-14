@@ -896,8 +896,8 @@ detaching ‘package:mgcv’
 > 
 > # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 > # for more examples and for details on how to modify the theme of all the
-> # plots produced by draw()
-> # to modify all panels, for example to change the theme, use the & operator
+> # plots produced by draw(). To modify all panels, for example to change the
+> # theme, use the & operator
 > 
 > 
 > 
@@ -1567,11 +1567,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55cae1e460e0>
+<environment: 0x558a562dd6e0>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55cae1e460e0>
+<environment: 0x558a562dd6e0>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2648,7 +2648,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  24.598 0.243 24.806 0 0 
+Time elapsed:  22.85 0.204 23.024 0 0 
 > grDevices::dev.off()
 null device 
           1 

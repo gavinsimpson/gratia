@@ -195,3 +195,9 @@ test_that("draw.gam works for a parametric only model", {
                    "Interaction terms are not currently supported.")
     expect_doppelganger("draw_gam parametric only model rotated labels", plt)
 })
+
+test_that("draw.gam works with grouped by option", {
+    expect_silent(plt <- draw(su_m_factor_by, grouped_by = TRUE))
+
+    expect_doppelganger("grouped by gam", plt)
+})
