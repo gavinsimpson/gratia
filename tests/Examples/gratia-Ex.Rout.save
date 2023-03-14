@@ -197,6 +197,40 @@ detaching ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
+> nameEx("add_sizer")
+> ### * add_sizer
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: add_sizer
+> ### Title: Add indicators of significant change after SiZeR
+> ### Aliases: add_sizer add_sizer.derivatives
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> ## Don't show: 
+> op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
+> ## End(Don't show)
+> dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 42)
+> mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> 
+> ## first derivatives of all smooths using central finite differences
+> d <- derivatives(mod, type = "central") |>
++     add_sizer()
+> 
+> # default adds a .change column
+> names(d)
+ [1] "smooth"     "var"        "by_var"     "fs_var"     "data"      
+ [6] "derivative" "se"         "crit"       "lower"      "upper"     
+[11] ".change"   
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("appraise")
 > ### * appraise
 > 
@@ -1533,11 +1567,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55768b134a78>
+<environment: 0x562c9cd4cb48>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55768b134a78>
+<environment: 0x562c9cd4cb48>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2614,7 +2648,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  22.806 0.227 22.99 0 0 
+Time elapsed:  20.505 0.208 20.678 0 0 
 > grDevices::dev.off()
 null device 
           1 

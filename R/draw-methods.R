@@ -19,6 +19,18 @@
 #'
 #' @param alpha numeric; alpha transparency for confidence or simultaneous
 #'   interval.
+#' @param add_change logical; should the periods of significant change be
+#'   highlighted on the plot?
+#' @param change_type character; the type of change to indicate. If `"change"`,
+#'   no differentiation is made between periods of significant increase or
+#'   decrease. If `"sizer"`, the periods of increase and decrease are
+#'   differentiated in the resulting plot.
+#' @param col_change,col_decrease,col_increase colour specifications to use for
+#'   indicating periods of change. `col_change` is used when
+#'   `change_type = "change"`, while `col_decrease` and `col_increase` are used
+#'   when `change_type = "sizer"``.
+#' @param lwd_change numeric; the `linewidth` to use for the change indicators.
+#'
 #' @inheritParams draw.gam
 #'
 #' @importFrom ggplot2 ggplot geom_ribbon aes geom_line labs
@@ -38,12 +50,25 @@
 #' draw(df, scales = "fixed")
 `draw.derivatives` <- function(object,
                                select = NULL,
-                               scales = c("free", "fixed"), alpha = 0.2,
+                               scales = c("free", "fixed"),
+                               add_change = FALSE,
+                               change_type = c("change", "sizer"),
+                               alpha = 0.2,
+                               col_change = "black",
+                               col_decrease = "#56B4E9",
+                               col_increase = "#E69F00",
+                               lwd_change = 1.5,
                                ncol = NULL, nrow = NULL,
                                guides = "keep",
                                angle = NULL,
                                ...) {
     scales <- match.arg(scales)
+    change_type <- match.arg(change_type)
+
+    if (isTRUE(add_change)) {
+        object <- object |>
+            add_sizer(type = change_type)
+    }
 
     ## how many smooths
     sm <- unique(object[["smooth"]])
@@ -66,12 +91,30 @@
                            y = .data$derivative)) +
               geom_ribbon(aes(ymin = .data$lower,
                               ymax = .data$upper,
-                              y = NULL), alpha = alpha) 
+                              y = NULL), alpha = alpha)
         }
-        plotlist[[i]] <- plt +
+        plt <- plt +
             geom_line() +
             labs(title = sm[i], x = xvar, y = "Derivative") +
             guides(x = guide_axis(angle = angle))
+        if (isTRUE(add_change)) {
+            plt <- if (identical(change_type, "change")) {
+                plt +
+                    geom_line(aes(x = .data$data, y = .data$.change),
+                        linewidth = lwd_change, na.rm = TRUE,
+                        colour = col_change)
+            } else {
+                plt +
+                    geom_line(aes(x = .data$data, y = .data$.increase),
+                        colour = col_increase, linewidth = lwd_change,
+                        na.rm = TRUE) +
+                    geom_line(aes(x = .data$data, y = .data$.decrease),
+                        colour = col_decrease, linewidth = lwd_change,
+                        na.rm = TRUE)
+
+            }
+        }
+        plotlist[[i]] <- plt
     }
 
     if (isTRUE(identical(scales, "fixed"))) {

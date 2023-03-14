@@ -422,7 +422,7 @@
 
     if (!all(c("est", "se") %in% nms)) {
         stop("'object' does not contain one or both of ",
-             "'est' or 'se'.")
+            "'est' or 'se'.")
     }
 
     ## compute the critical value
@@ -430,11 +430,66 @@
 
     ## add the frequentist confidence interval
     object <- mutate(object,
-                     lower_ci = .data$est - (crit * .data$se),
-                     upper_ci = .data$est + (crit * .data$se)) %>%
-      relocate(all_of(c("lower_ci", "upper_ci")),
-               .after = all_of("se"))
+        lower_ci = .data$est - (crit * .data$se),
+        upper_ci = .data$est + (crit * .data$se)) %>%
+        relocate(all_of(c("lower_ci", "upper_ci")),
+            .after = all_of("se"))
 
     ## return
+    object
+}
+
+#' Add indicators of significant change after SiZeR
+#'
+#' @param object an R object. Currently supported methods are for classes
+#'   `"derivatives"`.
+#' @param type character; `"change"` adds a single variable to `object`
+#'   indicating where the credible interval on the derivative excludes 0.
+#'   `"sizer"` adds two variables indicating whether the derivative is postive
+#'   or negative.
+#' @param ... arguments passed to other methods
+#'
+#' @export
+#' @examples
+#' load_mgcv()
+#' \dontshow{
+#' op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
+#' }
+#' dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 42)
+#' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+#'
+#' ## first derivatives of all smooths using central finite differences
+#' d <- derivatives(mod, type = "central") |>
+#'     add_sizer()
+#'
+#' # default adds a .change column
+#' names(d)
+`add_sizer` <- function(object, type = c("change", "sizer"), ...) {
+    UseMethod("add_sizer")
+}
+
+#' @export
+#' @importFrom dplyr mutate case_when
+#' @importFrom rlang .data
+#' @rdname add_sizer
+`add_sizer.derivatives` <- function(object, type = c("change", "sizer"), ...) {
+    # match the type argument
+    type <- match.arg(type)
+
+    # if just doing a change indicator
+    object <- if (isTRUE(identical(type, "change"))) {
+        object |>
+            mutate(.change = 
+            case_when(.data$lower > 0 | .data$upper < 0 ~ .data$derivative,
+                .default = NA_real_))
+    } else { # other wise we are adding a sizer-like indicator
+        object |>
+            mutate(
+            .decrease =
+            case_when(.data$upper < 0 ~ .data$derivative, .default = NA_real_),
+            .increase =
+            case_when(.data$lower > 0 ~ .data$derivative, .default = NA_real_))
+
+    }
     object
 }

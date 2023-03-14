@@ -147,3 +147,14 @@ test_that("add_constant works for tbl", {
                  "'constant' must be numeric: supplied <a>",
                  fixed = TRUE)
 })
+
+test_that("add_sizer derivatives method works", {
+    nms <- c("smooth", "var", "by_var", "fs_var", "data", "derivative", "se",
+        "crit", "lower", "upper")
+    expect_silent(d <- derivatives(m_gam, type = "central"))
+    expect_silent(tbl <- add_sizer(d, type = "change"))
+    expect_named(tbl, c(nms, ".change"))
+
+    expect_silent(tbl <- add_sizer(d, type = "sizer"))
+    expect_named(tbl, c(nms, ".decrease", ".increase"))
+})
