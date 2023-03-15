@@ -3,11 +3,14 @@
 \name{add_sizer}
 \alias{add_sizer}
 \alias{add_sizer.derivatives}
+\alias{add_sizer.smooth_estimates}
 \title{Add indicators of significant change after SiZeR}
 \usage{
 add_sizer(object, type = c("change", "sizer"), ...)
 
 \method{add_sizer}{derivatives}(object, type = c("change", "sizer"), ...)
+
+\method{add_sizer}{smooth_estimates}(object, type = c("change", "sizer"), derivatives = NULL, ...)
 }
 \arguments{
 \item{object}{an R object. Currently supported methods are for classes
@@ -19,6 +22,9 @@ indicating where the credible interval on the derivative excludes 0.
 or negative.}
 
 \item{...}{arguments passed to other methods}
+
+\item{derivatives}{an object of class \code{"derivatives"}, resulting from a call
+to \code{\link[=derivatives]{derivatives()}}.}
 }
 \description{
 Add indicators of significant change after SiZeR
