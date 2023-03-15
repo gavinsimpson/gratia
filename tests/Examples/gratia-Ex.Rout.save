@@ -624,53 +624,53 @@ detaching ‘package:mgcv’
 > 
 > ## first derivatives of all smooths using central finite differences
 > derivatives(mod, type = "central")
-# A tibble: 800 x 10
+# A tibble: 400 x 10
    smooth var   by_var fs_var     data derivative    se  crit lower upper
    <chr>  <chr> <chr>  <chr>     <dbl>      <dbl> <dbl> <dbl> <dbl> <dbl>
  1 s(x0)  x0    <NA>   <NA>   0.000239       7.41  3.33  1.96 0.874  13.9
- 2 s(x0)  x0    <NA>   <NA>   0.00525        7.41  3.33  1.96 0.875  13.9
- 3 s(x0)  x0    <NA>   <NA>   0.0103         7.40  3.33  1.96 0.884  13.9
- 4 s(x0)  x0    <NA>   <NA>   0.0153         7.40  3.31  1.96 0.902  13.9
- 5 s(x0)  x0    <NA>   <NA>   0.0203         7.39  3.30  1.96 0.929  13.8
- 6 s(x0)  x0    <NA>   <NA>   0.0253         7.38  3.27  1.96 0.965  13.8
- 7 s(x0)  x0    <NA>   <NA>   0.0303         7.36  3.24  1.96 1.01   13.7
- 8 s(x0)  x0    <NA>   <NA>   0.0353         7.34  3.20  1.96 1.07   13.6
- 9 s(x0)  x0    <NA>   <NA>   0.0403         7.32  3.15  1.96 1.14   13.5
-10 s(x0)  x0    <NA>   <NA>   0.0453         7.29  3.10  1.96 1.21   13.4
-# ... with 790 more rows
+ 2 s(x0)  x0    <NA>   <NA>   0.0103         7.40  3.33  1.96 0.884  13.9
+ 3 s(x0)  x0    <NA>   <NA>   0.0204         7.39  3.30  1.96 0.929  13.8
+ 4 s(x0)  x0    <NA>   <NA>   0.0304         7.36  3.24  1.96 1.01   13.7
+ 5 s(x0)  x0    <NA>   <NA>   0.0405         7.32  3.15  1.96 1.14   13.5
+ 6 s(x0)  x0    <NA>   <NA>   0.0506         7.26  3.04  1.96 1.30   13.2
+ 7 s(x0)  x0    <NA>   <NA>   0.0606         7.18  2.90  1.96 1.49   12.9
+ 8 s(x0)  x0    <NA>   <NA>   0.0707         7.09  2.76  1.96 1.69   12.5
+ 9 s(x0)  x0    <NA>   <NA>   0.0807         6.99  2.61  1.96 1.87   12.1
+10 s(x0)  x0    <NA>   <NA>   0.0908         6.87  2.47  1.96 2.03   11.7
+# ... with 390 more rows
 > 
 > ## derivatives for a selected smooth
 > derivatives(mod, type = "central", term = "s(x1)")
-# A tibble: 200 x 10
+# A tibble: 100 x 10
    smooth var   by_var fs_var     data derivative    se  crit lower upper
    <chr>  <chr> <chr>  <chr>     <dbl>      <dbl> <dbl> <dbl> <dbl> <dbl>
  1 s(x1)  x1    <NA>   <NA>   0.000405     -0.907  3.12  1.96 -7.02  5.20
- 2 s(x1)  x1    <NA>   <NA>   0.00541      -0.907  3.12  1.96 -7.02  5.20
- 3 s(x1)  x1    <NA>   <NA>   0.0104       -0.906  3.11  1.96 -7.01  5.20
- 4 s(x1)  x1    <NA>   <NA>   0.0154       -0.903  3.11  1.96 -6.99  5.19
- 5 s(x1)  x1    <NA>   <NA>   0.0204       -0.898  3.10  1.96 -6.97  5.17
- 6 s(x1)  x1    <NA>   <NA>   0.0254       -0.891  3.08  1.96 -6.93  5.15
- 7 s(x1)  x1    <NA>   <NA>   0.0304       -0.880  3.06  1.96 -6.88  5.12
- 8 s(x1)  x1    <NA>   <NA>   0.0354       -0.867  3.04  1.96 -6.82  5.08
- 9 s(x1)  x1    <NA>   <NA>   0.0404       -0.850  3.00  1.96 -6.74  5.04
-10 s(x1)  x1    <NA>   <NA>   0.0454       -0.829  2.96  1.96 -6.64  4.98
-# ... with 190 more rows
+ 2 s(x1)  x1    <NA>   <NA>   0.0105       -0.906  3.11  1.96 -7.01  5.20
+ 3 s(x1)  x1    <NA>   <NA>   0.0205       -0.898  3.10  1.96 -6.97  5.17
+ 4 s(x1)  x1    <NA>   <NA>   0.0306       -0.880  3.06  1.96 -6.88  5.12
+ 5 s(x1)  x1    <NA>   <NA>   0.0406       -0.849  3.00  1.96 -6.73  5.03
+ 6 s(x1)  x1    <NA>   <NA>   0.0507       -0.803  2.92  1.96 -6.52  4.92
+ 7 s(x1)  x1    <NA>   <NA>   0.0607       -0.740  2.81  1.96 -6.25  4.77
+ 8 s(x1)  x1    <NA>   <NA>   0.0708       -0.659  2.69  1.96 -5.93  4.61
+ 9 s(x1)  x1    <NA>   <NA>   0.0809       -0.557  2.56  1.96 -5.57  4.46
+10 s(x1)  x1    <NA>   <NA>   0.0909       -0.436  2.42  1.96 -5.19  4.32
+# ... with 90 more rows
 > ## or via a partial match
 > derivatives(mod, type = "central", term = "x1", partial_match = TRUE)
-# A tibble: 200 x 10
+# A tibble: 100 x 10
    smooth var   by_var fs_var     data derivative    se  crit lower upper
    <chr>  <chr> <chr>  <chr>     <dbl>      <dbl> <dbl> <dbl> <dbl> <dbl>
  1 s(x1)  x1    <NA>   <NA>   0.000405     -0.907  3.12  1.96 -7.02  5.20
- 2 s(x1)  x1    <NA>   <NA>   0.00541      -0.907  3.12  1.96 -7.02  5.20
- 3 s(x1)  x1    <NA>   <NA>   0.0104       -0.906  3.11  1.96 -7.01  5.20
- 4 s(x1)  x1    <NA>   <NA>   0.0154       -0.903  3.11  1.96 -6.99  5.19
- 5 s(x1)  x1    <NA>   <NA>   0.0204       -0.898  3.10  1.96 -6.97  5.17
- 6 s(x1)  x1    <NA>   <NA>   0.0254       -0.891  3.08  1.96 -6.93  5.15
- 7 s(x1)  x1    <NA>   <NA>   0.0304       -0.880  3.06  1.96 -6.88  5.12
- 8 s(x1)  x1    <NA>   <NA>   0.0354       -0.867  3.04  1.96 -6.82  5.08
- 9 s(x1)  x1    <NA>   <NA>   0.0404       -0.850  3.00  1.96 -6.74  5.04
-10 s(x1)  x1    <NA>   <NA>   0.0454       -0.829  2.96  1.96 -6.64  4.98
-# ... with 190 more rows
+ 2 s(x1)  x1    <NA>   <NA>   0.0105       -0.906  3.11  1.96 -7.01  5.20
+ 3 s(x1)  x1    <NA>   <NA>   0.0205       -0.898  3.10  1.96 -6.97  5.17
+ 4 s(x1)  x1    <NA>   <NA>   0.0306       -0.880  3.06  1.96 -6.88  5.12
+ 5 s(x1)  x1    <NA>   <NA>   0.0406       -0.849  3.00  1.96 -6.73  5.03
+ 6 s(x1)  x1    <NA>   <NA>   0.0507       -0.803  2.92  1.96 -6.52  4.92
+ 7 s(x1)  x1    <NA>   <NA>   0.0607       -0.740  2.81  1.96 -6.25  4.77
+ 8 s(x1)  x1    <NA>   <NA>   0.0708       -0.659  2.69  1.96 -5.93  4.61
+ 9 s(x1)  x1    <NA>   <NA>   0.0809       -0.557  2.56  1.96 -5.57  4.46
+10 s(x1)  x1    <NA>   <NA>   0.0909       -0.436  2.42  1.96 -5.19  4.32
+# ... with 90 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1574,11 +1574,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55cd182b6950>
+<environment: 0x562a1c003388>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55cd182b6950>
+<environment: 0x562a1c003388>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2655,7 +2655,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  48.453 0.448 48.854 0 0 
+Time elapsed:  32.38 0.26 32.601 0 0 
 > grDevices::dev.off()
 null device 
           1 
