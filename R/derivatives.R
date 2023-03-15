@@ -102,7 +102,7 @@
 #' }
 `derivatives.gam` <- function(object, term, data = newdata, order = 1L,
                               type = c("forward", "backward", "central"),
-                              n = 200, eps = 1e-7,
+                              n = 100, eps = 1e-7,
                               interval = c("confidence", "simultaneous"),
                               n_sim = 10000, level = 0.95,
                               unconditional = FALSE, frequentist = FALSE,
@@ -739,7 +739,7 @@
     data = newdata,
     order = 1L,
     type = c("forward", "backward", "central"),
-    n = 200, eps = 1e-7,
+    n = 100, eps = 1e-7,
     interval = c("confidence", "simultaneous"),
     n_sim = 10000, level = 0.95,
     unconditional = FALSE, frequentist = FALSE,
