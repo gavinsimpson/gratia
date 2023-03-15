@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.22</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.23</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,10 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">add_sizer</span><span class="op">(</span><span class="va">object</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"change"</span>, <span class="st">"sizer"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for derivatives</span></span>
-<span><span class="fu">add_sizer</span><span class="op">(</span><span class="va">object</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"change"</span>, <span class="st">"sizer"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">add_sizer</span><span class="op">(</span><span class="va">object</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"change"</span>, <span class="st">"sizer"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for smooth_estimates</span></span>
+<span><span class="fu">add_sizer</span><span class="op">(</span><span class="va">object</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"change"</span>, <span class="st">"sizer"</span><span class="op">)</span>, derivatives <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -83,6 +86,11 @@ or negative.</p></dd>
 
 <dt>...</dt>
 <dd><p>arguments passed to other methods</p></dd>
+
+
+<dt>derivatives</dt>
+<dd><p>an object of class <code>"derivatives"</code>, resulting from a call
+to <code><a href="derivatives.html">derivatives()</a></code>.</p></dd>
 
 </dl></div>
 

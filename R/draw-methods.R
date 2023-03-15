@@ -25,7 +25,7 @@
 #'   no differentiation is made between periods of significant increase or
 #'   decrease. If `"sizer"`, the periods of increase and decrease are
 #'   differentiated in the resulting plot.
-#' @param col_change,col_decrease,col_increase colour specifications to use for
+#' @param change_col,decrease_col,increase_col colour specifications to use for
 #'   indicating periods of change. `col_change` is used when
 #'   `change_type = "change"`, while `col_decrease` and `col_increase` are used
 #'   when `change_type = "sizer"``.
@@ -54,9 +54,9 @@
                                add_change = FALSE,
                                change_type = c("change", "sizer"),
                                alpha = 0.2,
-                               col_change = "black",
-                               col_decrease = "#56B4E9",
-                               col_increase = "#E69F00",
+                               change_col = "black",
+                               decrease_col = "#56B4E9",
+                               increase_col = "#E69F00",
                                lwd_change = 1.5,
                                ncol = NULL, nrow = NULL,
                                guides = "keep",
@@ -102,14 +102,14 @@
                 plt +
                     geom_line(aes(x = .data$data, y = .data$.change),
                         linewidth = lwd_change, na.rm = TRUE,
-                        colour = col_change)
+                        colour = change_col)
             } else {
                 plt +
                     geom_line(aes(x = .data$data, y = .data$.increase),
-                        colour = col_increase, linewidth = lwd_change,
+                        colour = increase_col, linewidth = lwd_change,
                         na.rm = TRUE) +
                     geom_line(aes(x = .data$data, y = .data$.decrease),
-                        colour = col_decrease, linewidth = lwd_change,
+                        colour = decrease_col, linewidth = lwd_change,
                         na.rm = TRUE)
 
             }

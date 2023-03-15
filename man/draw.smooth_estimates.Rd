@@ -9,12 +9,16 @@
   constant = NULL,
   fun = NULL,
   contour = TRUE,
+  grouped_by = FALSE,
   contour_col = "black",
   n_contour = NULL,
   ci_alpha = 0.2,
   ci_col = "black",
   smooth_col = "black",
   resid_col = "steelblue3",
+  decrease_col = "#56B4E9",
+  increase_col = "#E69F00",
+  change_lwd = 1.75,
   partial_match = FALSE,
   discrete_colour = NULL,
   discrete_fill = NULL,
@@ -42,6 +46,10 @@ provided.}
 \item{contour}{logical; should contours be draw on the plot using
 \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
 
+\item{grouped_by}{logical; should factor by smooths be drawn as one panel
+per level of the factor (\code{FALSE}, the default), or should the individual
+smooths be combined into a single panel containing all levels (\code{TRUE})?}
+
 \item{contour_col}{colour specification for contour lines.}
 
 \item{n_contour}{numeric; the number of contour bins. Will result in
@@ -56,6 +64,14 @@ band. Affects the fill of the interval.}
 \item{smooth_col}{colour specification for the smooth line.}
 
 \item{resid_col}{colour specification for the partial residuals.}
+
+\item{decrease_col, increase_col}{colour specifications to use for
+indicating periods of change. \code{col_change} is used when
+\code{change_type = "change"}, while \code{col_decrease} and \code{col_increase} are used
+when `change_type = "sizer"``.}
+
+\item{change_lwd}{numeric; the value to set the \code{linewidth} to in
+\code{\link[ggplot2:geom_path]{ggplot2::geom_line()}}, used to represent the perdios of change.}
 
 \item{partial_match}{logical; should smooths be selected by partial matches
 with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
@@ -103,4 +119,11 @@ draw(sm, ci_col = "steelblue", smooth_col = "forestgreen", ci_alpha = 0.3)
 
 # Add a constant to the plotted smooth
 draw(sm, constant = coef(m)[1])
+
+# Adding change indicators to smooths based on derivatives of the smooth
+d <- derivatives(m, n = 100) # n to match smooth_estimates()
+
+smooth_estimates(m) |>
+    add_sizer(derivatives = d, type = "sizer") |>
+    draw()
 }

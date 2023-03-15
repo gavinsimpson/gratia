@@ -479,16 +479,64 @@
     # if just doing a change indicator
     object <- if (isTRUE(identical(type, "change"))) {
         object |>
-            mutate(.change = 
-            case_when(.data$lower > 0 | .data$upper < 0 ~ .data$derivative,
-                .default = NA_real_))
+            mutate(.change =
+                case_when(.data$lower > 0 | .data$upper < 0 ~ .data$derivative,
+                    .default = NA_real_))
     } else { # other wise we are adding a sizer-like indicator
         object |>
             mutate(
-            .decrease =
-            case_when(.data$upper < 0 ~ .data$derivative, .default = NA_real_),
-            .increase =
-            case_when(.data$lower > 0 ~ .data$derivative, .default = NA_real_))
+                .decrease = case_when(.data$upper < 0 ~ .data$derivative,
+                    .default = NA_real_),
+                .increase = case_when(.data$lower > 0 ~ .data$derivative,
+                    .default = NA_real_))
+
+    }
+    object
+}
+
+#' @param derivatives an object of class `"derivatives"`, resulting from a call
+#'   to [derivatives()].
+#' @export
+#' @importFrom dplyr mutate case_when bind_cols
+#' @importFrom rlang .data
+#' @rdname add_sizer
+`add_sizer.smooth_estimates` <- function(object, type = c("change", "sizer"),
+    derivatives = NULL, ...) {
+    # match the type argument
+    type <- match.arg(type)
+
+    # must supply derivatives
+    if (is.null(derivatives)) {
+        stop("An object of class 'derivatives' must be supplied.")
+    }
+    # must be of the correct class
+    if (!inherits(derivatives, "derivatives")) {
+        stop("Supplied 'derivatives' is not of class 'derivatives'")
+    }
+    # if we get this far, derivatives must be checked to see that it matches
+    # object. Right now this isn't easy as derivatives is older and stores
+    # all covariate information in column `data`, so for now, just leave this
+    # up to the user to ensure
+    if (nrow(object) != nrow(derivatives)) {
+        stop("Number of rows in 'object' and 'derivatives' are not equal.")
+    }
+
+    # if just doing a change indicator
+    object <- if (isTRUE(identical(type, "change"))) {
+        derivatives <- derivatives |>
+            mutate(.change =
+                case_when(.data$lower > 0 | .data$upper < 0 ~ object$est,
+                    .default = NA_real_))
+        object |> bind_cols(.change = derivatives$.change)
+    } else { # otherwise we are adding a sizer-like indicator
+        derivatives <- derivatives |>
+            mutate(
+                .decrease = case_when(.data$upper < 0 ~ object$est,
+                    .default = NA_real_),
+                .increase = case_when(.data$lower > 0 ~ object$est,
+                    .default = NA_real_))
+        object |> bind_cols(.decrease = derivatives$.decrease,
+            .increase = derivatives$.increase)
 
     }
     object

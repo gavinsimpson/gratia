@@ -246,7 +246,6 @@
                                     overall_uncertainty = overall_uncertainty,
                                     dist = dist,
                                     unnest = FALSE)
-
         # add confidence interval
         sm_eval <- sm_eval %>%
           rowwise() %>%

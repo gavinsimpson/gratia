@@ -204,7 +204,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: add_sizer
 > ### Title: Add indicators of significant change after SiZeR
-> ### Aliases: add_sizer add_sizer.derivatives
+> ### Aliases: add_sizer add_sizer.derivatives add_sizer.smooth_estimates
 > 
 > ### ** Examples
 > 
@@ -1063,6 +1063,13 @@ detaching ‘package:mgcv’
 > # Add a constant to the plotted smooth
 > draw(sm, constant = coef(m)[1])
 > 
+> # Adding change indicators to smooths based on derivatives of the smooth
+> d <- derivatives(m, n = 100) # n to match smooth_estimates()
+> 
+> smooth_estimates(m) |>
++     add_sizer(derivatives = d, type = "sizer") |>
++     draw()
+> 
 > 
 > 
 > cleanEx()
@@ -1567,11 +1574,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x558a562dd6e0>
+<environment: 0x55cd182b6950>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x558a562dd6e0>
+<environment: 0x55cd182b6950>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2648,7 +2655,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  22.85 0.204 23.024 0 0 
+Time elapsed:  48.453 0.448 48.854 0 0 
 > grDevices::dev.off()
 null device 
           1 

@@ -12,9 +12,9 @@
   add_change = FALSE,
   change_type = c("change", "sizer"),
   alpha = 0.2,
-  col_change = "black",
-  col_decrease = "#56B4E9",
-  col_increase = "#E69F00",
+  change_col = "black",
+  decrease_col = "#56B4E9",
+  increase_col = "#E69F00",
   lwd_change = 1.5,
   ncol = NULL,
   nrow = NULL,
@@ -65,7 +65,7 @@ differentiated in the resulting plot.}
 \item{alpha}{numeric; alpha transparency for confidence or simultaneous
 interval.}
 
-\item{col_change, col_decrease, col_increase}{colour specifications to use for
+\item{change_col, decrease_col, increase_col}{colour specifications to use for
 indicating periods of change. \code{col_change} is used when
 \code{change_type = "change"}, while \code{col_decrease} and \code{col_increase} are used
 when `change_type = "sizer"``.}

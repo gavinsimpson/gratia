@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.22</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.23</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,9 +69,9 @@
 <span>  add_change <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  change_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"change"</span>, <span class="st">"sizer"</span><span class="op">)</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.2</span>,</span>
-<span>  col_change <span class="op">=</span> <span class="st">"black"</span>,</span>
-<span>  col_decrease <span class="op">=</span> <span class="st">"#56B4E9"</span>,</span>
-<span>  col_increase <span class="op">=</span> <span class="st">"#E69F00"</span>,</span>
+<span>  change_col <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>  decrease_col <span class="op">=</span> <span class="st">"#56B4E9"</span>,</span>
+<span>  increase_col <span class="op">=</span> <span class="st">"#E69F00"</span>,</span>
 <span>  lwd_change <span class="op">=</span> <span class="fl">1.5</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  nrow <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -136,7 +136,7 @@ differentiated in the resulting plot.</p></dd>
 interval.</p></dd>
 
 
-<dt>col_change, col_decrease, col_increase</dt>
+<dt>change_col, decrease_col, increase_col</dt>
 <dd><p>colour specifications to use for
 indicating periods of change. <code>col_change</code> is used when
 <code>change_type = "change"</code>, while <code>col_decrease</code> and <code>col_increase</code> are used
