@@ -19,7 +19,7 @@ derivatives(object, ...)
   data = newdata,
   order = 1L,
   type = c("forward", "backward", "central"),
-  n = 200,
+  n = 100,
   eps = 1e-07,
   interval = c("confidence", "simultaneous"),
   n_sim = 10000,
