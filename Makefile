@@ -12,7 +12,7 @@ docs-devel:
 
 build: docs
 	cd ..;\
-	R CMD build gratia
+	R CMD build --compression=gzip --resave-data gratia
 
 build-openblas: docs
 	cd ..;\
