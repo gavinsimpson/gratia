@@ -589,7 +589,7 @@
 #' @export
 #' @importFrom tibble add_column
 `eval_smooth.tensor.smooth` <- function(smooth, model,
-                                        n = 100, 
+                                        n = 100,
                                         n_3d = NULL,
                                         n_4d = NULL,
                                         data = NULL,
@@ -606,31 +606,31 @@
 
     id <- which_smooth(model, smooth_label(smooth))
     data <- process_user_data_for_eval(data = data, model = model,
-                                       n = n, n_3d = n_3d, n_4d = n_4d,
-                                       id = id)
+        n = n, n_3d = n_3d, n_4d = n_4d,
+        id = id)
 
     ## values of spline at data
     eval_sm <- spline_values2(smooth, data = data,
-                              unconditional = unconditional,
-                              model = model,
-                              overall_uncertainty = overall_uncertainty)
+        unconditional = unconditional,
+        model = model,
+        overall_uncertainty = overall_uncertainty)
 
     ## add on info regarding by variable
     nr <- nrow(eval_sm)
     eval_sm <- add_column(eval_sm, by = rep(by_var, nr),
-                          .after = 1L)
+        .after = 1L)
     ## add on spline type info
     sm_type <- smooth_type(smooth)
     eval_sm <- add_column(eval_sm, type = rep(sm_type, nr),
-                          .after = 1L)
+        .after = 1L)
 
     # set some values to NA if too far from the data
     if (smooth_dim(smooth) == 2L && (!is.null(dist) && dist > 0)) {
         eval_sm <- too_far_to_na(smooth,
-                                 input = eval_sm,
-                                 reference = model[["model"]],
-                                 cols = c("est", "se"),
-                                 dist = dist)
+            input = eval_sm,
+            reference = model[["model"]],
+            cols = c("est", "se"),
+            dist = dist)
     }
 
     ## return
@@ -639,6 +639,12 @@
 
 #' Plot the result of a call to `smooth_estimates()`
 #'
+#' @param decrease_col,increase_col colour specifications to use for
+#'   indicating periods of change. `col_change` is used when
+#'   `change_type = "change"`, while `col_decrease` and `col_increase` are used
+#'   when `change_type = "sizer"``.
+#' @param change_lwd numeric; the value to set the `linewidth` to in
+#'   [ggplot2::geom_line()], used to represent the perdios of change.
 #' @param ylim numeric; vector of y axis limits to use all *all* panels drawn.
 #'
 #' @inheritParams draw.gam
@@ -665,16 +671,27 @@
 #'
 #' # Add a constant to the plotted smooth
 #' draw(sm, constant = coef(m)[1])
+#'
+#' # Adding change indicators to smooths based on derivatives of the smooth
+#' d <- derivatives(m, n = 100) # n to match smooth_estimates()
+#'
+#' smooth_estimates(m) |>
+#'     add_sizer(derivatives = d, type = "sizer") |>
+#'     draw()
 `draw.smooth_estimates` <- function(object,
                                     constant = NULL,
                                     fun = NULL,
                                     contour = TRUE,
+                                    grouped_by = FALSE,
                                     contour_col = "black",
                                     n_contour = NULL,
                                     ci_alpha = 0.2,
                                     ci_col = "black",
                                     smooth_col = "black",
                                     resid_col = "steelblue3",
+                                    decrease_col = "#56B4E9",
+                                    increase_col = "#E69F00",
+                                    change_lwd = 1.75,
                                     partial_match = FALSE,
                                     discrete_colour = NULL,
                                     discrete_fill = NULL,
@@ -694,7 +711,24 @@
     # the factor in group_split is to reorder to way the smooths entered the
     # model
     sm_levs <- unique(object$smooth)
-    sm_l <- group_split(object, factor(object$smooth, levels = sm_levs))
+
+    sm_l <- if (isTRUE(grouped_by)) {
+        # need the order of the smooths, I think
+        levs <- unique(str_split_fixed(object$smooth, ":", n = 2)[, 1])
+        # nest the object so we can reuse the code/ideas from draw.gam
+        object |>
+            nest(data = !all_of(c("smooth", "type", "by"))) |>
+            mutate(smooth = factor(.data$smooth, levels = sm_levs),
+                .term = str_split_fixed(.data$smooth, ":", n = 2)[, 1]) |>
+            arrange(.data$smooth) |>
+            relocate(".term", .before = 1L)|>
+            unnest(all_of("data")) |>
+            group_split(factor(.data$.term, levels = levs), .data$by)
+    } else {
+        # the factor is to reorder to way the smooths entered the model
+        group_split(object, factor(object$smooth, levels = sm_levs))
+    }
+    ## sm_l <- group_split(object, factor(object$smooth, levels = sm_levs))
     plts <- map(sm_l,
         draw_smooth_estimates,
         constant = constant,
@@ -705,6 +739,9 @@
         ci_alpha = ci_alpha,
         ci_col = ci_col,
         smooth_col = smooth_col,
+        increase_col = increase_col,
+        decrease_col = decrease_col,
+        change_lwd = change_lwd,
         partial_match = partial_match,
         discrete_colour = discrete_colour,
         discrete_fill = discrete_fill,
@@ -731,6 +768,9 @@
                                     ci_col = "black",
                                     smooth_col = "black",
                                     resid_col = "steelblue3",
+                                    decrease_col = "#56B4E9",
+                                    increase_col = "#E69F00",
+                                    change_lwd = 1.75,
                                     partial_match = FALSE,
                                     discrete_colour = NULL,
                                     discrete_fill = NULL,
@@ -849,6 +889,9 @@
                 ci_col = ci_col,
                 smooth_col = smooth_col,
                 resid_col = resid_col,
+                increase_col = increase_col,
+                decrease_col = decrease_col,
+                change_lwd = change_lwd,
                 partial_match = partial_match,
                 discrete_colour = discrete_colour,
                 discrete_fill = discrete_fill,
@@ -881,6 +924,9 @@
                                        ci_col = "black",
                                        smooth_col = "black",
                                        resid_col = "steelblue3",
+                                       decrease_col = "#56B4E9",
+                                       increase_col = "#E69F00",
+                                       change_lwd = 1.75,
                                        angle = NULL,
                                        xlab = NULL,
                                        ylab = NULL,
@@ -902,7 +948,6 @@
             variables <- vars_from_label(unique(object[["smooth"]]))
         }
     }
-
 
     # If constant supplied apply it to `est`
     object <- add_constant(object, constant = constant)
@@ -931,8 +976,10 @@
     }
 
     # plot the confidence interval and smooth line
-    plt <- if (grouped_by) {
-        plt +
+    sizer_cols <- c(".change", ".increase", ".decrease")
+    do_sizer <- sizer_cols %in% names(object)
+    if (grouped_by) {
+        plt <- plt +
         geom_ribbon(mapping = aes(ymin = .data[["lower_ci"]],
                                   ymax = .data[["upper_ci"]],
                                   fill = .data[[by_var]]),
@@ -940,12 +987,42 @@
         geom_line(aes(colour = .data[[by_var]])) +
             scale_colour_okabe_ito() +
             scale_fill_okabe_ito()
+        if (any(do_sizer)) {
+            plt <- if (do_sizer[[1]]) {
+                plt + geom_line(aes(y = .data[[".change"]],
+                    colour = .data[[by_var]]), linewidth = change_lwd,
+                    na.rm = TRUE)
+            } else {
+                plt + geom_line(aes(y = .data[[".increase"]],
+                    colour = .data[[by_var]]), linewidth = change_lwd,
+                    na.rm = TRUE,
+                    show.legend = FALSE) +
+                    geom_line(aes(y = .data[[".decrease"]],
+                    colour = .data[[by_var]]), linewidth = change_lwd,
+                    na.rm = TRUE,
+                    show.legend = FALSE)
+            }
+        }
     } else {
-        plt +
+        plt <- plt +
         geom_ribbon(mapping = aes(ymin = .data[["lower_ci"]],
                                   ymax = .data[["upper_ci"]]),
                     alpha = ci_alpha, colour = NA, fill = ci_col) +
         geom_line(colour = smooth_col)
+        if (any(do_sizer)) {
+            plt <- if (do_sizer[[1]]) {
+                plt + geom_line(aes(y = .data[[".change"]]),
+                    colour = smooth_col, linewidth = change_lwd, na.rm = TRUE,
+                    show.legend = FALSE)
+            } else {
+                plt + geom_line(aes(y = .data[[".increase"]]),
+                    colour = increase_col, linewidth = change_lwd,
+                    na.rm = TRUE, show.legend = FALSE) +
+                    geom_line(aes(y = .data[[".decrease"]]),
+                        colour = decrease_col, linewidth = change_lwd,
+                        na.rm = TRUE, show.legend = FALSE)
+            }
+        }
     }
 
     ## default axis labels if none supplied
