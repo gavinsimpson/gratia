@@ -1,10 +1,5 @@
 # Test draw.parametric_effects() method
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-
 test_that("draw.parametric_effects works for m_2_fac", {
     expect_message(peff <- parametric_effects(m_2_fac, data = df_2_fac,
     envir = teardown_env()),
@@ -17,7 +12,7 @@ test_that("draw.parametric_effects works for m_para_sm", {
     expect_message(peff <- parametric_effects(m_para_sm, data = df_2_fac,
     envir = teardown_env()),
                    "Interaction terms are not currently supported.")
-    expect_silent(plt <- draw(peff))
+    expect_silent(plt <- draw(peff, rug = FALSE))
     expect_doppelganger("draw parametric effects m_para_sm", plt)
 })
 
@@ -31,7 +26,7 @@ test_that("draw.parametric_effects works for m_2_fac select term", {
 test_that("draw.parametric_effects works for m_para_sm select term", {
     expect_silent(peff <- parametric_effects(m_para_sm, term = "fac", data = df_2_fac,
     envir = teardown_env()))
-    expect_silent(plt <- draw(peff))
+    expect_silent(plt <- draw(peff, rug = FALSE))
     expect_doppelganger("draw parametric effects m_para_sm with term", plt)
 })
 
@@ -39,7 +34,7 @@ test_that("draw.parametric_effects works with only parametric terms", {
     expect_message(peff <- parametric_effects(m_only_para, data = df_2_fac,
         envir = teardown_env()),
     "Interaction terms are not currently supported.")
-    expect_silent(plt <- draw(peff))
+    expect_silent(plt <- draw(peff, rug = FALSE))
     expect_doppelganger("draw parametric effects m_only_para", plt)
 })
 

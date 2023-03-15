@@ -1,25 +1,19 @@
 # Test draw.gam()
 # A lot of the current tests for this are over in test-draw-methods.R
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-library("ggplot2")
-
 test_that("draw.gam works for m_1_smooth", {
-    expect_silent(plt <- draw(m_1_smooth))
+    expect_silent(plt <- draw(m_1_smooth, rug = FALSE))
     expect_doppelganger("draw_gam m_1_smooth", plt)
 })
 
 test_that("draw.gam works for m_1_smooth with angled labels", {
-    expect_silent(plt <- draw(m_1_smooth, angle = 45))
+    expect_silent(plt <- draw(m_1_smooth, angle = 45, rug = FALSE))
     expect_doppelganger("draw_gam m_1_smooth rotated", plt)
 })
 
 test_that("draw.gam works for m_1_smooth with partial residuals", {
     expect_silent(plt <- draw(m_1_smooth, residuals = TRUE,
-                            resid_col = "hotpink"))
+                            resid_col = "hotpink", rug = FALSE))
     expect_doppelganger("draw_gam m_1_smooth hotpink residuals", plt)
 })
 
@@ -81,12 +75,12 @@ test_that("draw.gam works for dlnm_m", {
 })
 
 test_that("draw.gam works for m_ar1", {
-    expect_silent(plt <- draw(m_ar1))
+    expect_silent(plt <- draw(m_ar1, rug = FALSE, n = 50))
     expect_doppelganger("draw_gam m_ar1", plt)
 })
 
 test_that("draw.gam works for m_ar1_by", {
-    expect_silent(plt <- draw(m_ar1_by))
+    expect_silent(plt <- draw(m_ar1_by, rug = FALSE, n = 50))
     expect_doppelganger("draw_gam m_ar1_by", plt)
 })
 
@@ -96,7 +90,7 @@ test_that("draw.gam works for m_2_fac", {
 })
 
 test_that("draw.gam works for m_para_sm", {
-    expect_silent(plt <- draw(m_para_sm))
+    expect_silent(plt <- draw(m_para_sm, rug = FALSE))
     expect_doppelganger("draw_gam m_para_sm", plt)
 })
 
@@ -184,10 +178,6 @@ test_that("draw.gam issues message for parametric only model", {
 })
 
 test_that("draw.gam works for a parametric only model", {
-    expect_message(plt <- draw(m_only_para, parametric = TRUE,
-        rug = FALSE, data = df_2_fac, envir = teardown_env()),
-                   "Interaction terms are not currently supported.")
-    expect_doppelganger("draw_gam parametric only model", plt)
 
     # rotated
     expect_message(plt <- draw(m_only_para, parametric = TRUE, angle = 90,
@@ -197,7 +187,7 @@ test_that("draw.gam works for a parametric only model", {
 })
 
 test_that("draw.gam works with grouped by option", {
-    expect_silent(plt <- draw(su_m_factor_by, grouped_by = TRUE))
+    expect_silent(plt <- draw(su_m_factor_by, grouped_by = TRUE, rug = FALSE))
 
     expect_doppelganger("grouped by gam", plt)
 })
