@@ -1,4 +1,4 @@
-# gratia 0.8.1.22
+# gratia 0.8.1.23
 
 ## User visible changes
 
@@ -79,8 +79,8 @@
 
 * `add_sizer()` is a new function to add information on whether the derivative
   of a smooth is significantly changing (where the credible interval excludes
-  0). Currently, a method for `derivatives()` objects is provided. Part of wish
-  of @asanders11 #117
+  0). Currently, methods for `derivatives()` and `smooth_estimates()` objects
+  are implemented. Part of request of @asanders11 #117
 
 * `draw.dervivatives()` gains arguments `add_change` and `change_type` to allow
   derivatives of smooths to be plotted with indicators where the credible
@@ -92,6 +92,15 @@
 * `draw.gam()` can now group factor by smooths for a given factor into a single
   panel, rather than plotting the smooths for each level in separate panels.
   This is achieved via new argument `grouped_by`. Requested by @RPanczak #89
+
+  `draw.smooth_estimates()` can now also group factor by smooths for a given
+  factor into a single panel.
+
+* The underlying plotting code used by `draw_smooth_estimates()` for most
+  univariate smooths can now add change indicators to the plots of smooths if
+  those change indicators are added to the object created by
+  `smooth_estimates()` using `add_sizer()`. See the example in
+  `?draw.smooth_estimates`.
 
 ## Bug fixes
 
