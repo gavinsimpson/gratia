@@ -18,6 +18,9 @@
 #'   for all other covariates in the model that aren't actually used in the
 #'   smooth. This can be useful if you want to pass the returned data frame on
 #'   to [mgcv::PredictMat()].
+#' @param var_order character; the order in which the terms in the smooth
+#'   should be processed. Only useful for tensor products with at least one
+#'   2d marginal smooth.
 #'
 #' @export
 #'
@@ -42,7 +45,8 @@
 #'
 #' \dontshow{options(op)}
 `smooth_data` <- function(model, id, n = 100, n_2d = NULL, n_3d = NULL,
-                          n_4d = NULL, offset = NULL, include_all = FALSE) {
+                          n_4d = NULL, offset = NULL, include_all = FALSE,
+                          var_order = NULL) {
     mf <- model.frame(model)           # model.frame used to fit model
 
     ## remove response
@@ -66,7 +70,12 @@
 
     ## need a list of terms used in current smooth
     sm <- get_smooths_by_id(model, id)[[1L]]
-    smooth_vars <- unique(smooth_variable(sm))
+    orig_order <- unique(smooth_variable(sm))
+    smooth_vars <- if (is.null(var_order)) {
+        orig_order
+    } else {
+        var_order
+    }
     ## is smooth a by? If it is, extract the by variable
     by_var <- if (is_by_smooth(sm)) {
         by_variable(sm)
@@ -93,10 +102,14 @@
             n_per_dim[seq_len(dim - 2) + 2] <- n_4d
         }
         seq_min_max_wrapper <- function(i, data, vars, n) {
+            # if dim >= 2 we want n_3d or n_4d pretty values, but pretty()
+            # won't return exactly the right n
             out <- seq_min_max(data[[vars[i]]], n = n[i])
+            # now that we have the ordering of vars corrected we can round here
             if (i > 2L && !(is.factor(data[[vars[i]]]))) {
                 out <- round(out, 3)
             }
+            out
             out
         }
         out <- lapply(seq_along(vars),
