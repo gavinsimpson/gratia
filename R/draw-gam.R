@@ -246,6 +246,10 @@
                                     overall_uncertainty = overall_uncertainty,
                                     dist = dist,
                                     unnest = FALSE)
+
+         # grab tensor term order if present, if not it is NULL & that's OK
+        tensor_term_order <- attr(sm_eval, "tensor_term_order")
+
         # add confidence interval
         sm_eval <- sm_eval %>%
           rowwise() %>%
@@ -333,25 +337,26 @@
             group_split(sm_eval, factor(.data$smooth, levels = S[select]))
         }
         sm_plts <- map(sm_l,
-                       draw_smooth_estimates,
-                       constant = constant,
-                       fun = fun,
-                       contour = contour,
-                       contour_col = contour_col,
-                       n_contour = n_contour,
-                       ci_alpha = ci_alpha,
-                       ci_col = ci_col,
-                       smooth_col = smooth_col,
-                       resid_col = resid_col,
-                       partial_match = partial_match,
-                       discrete_colour = discrete_colour,
-                       discrete_fill = discrete_fill,
-                       continuous_colour = continuous_colour,
-                       continuous_fill = continuous_fill,
-                       angle = angle,
-                       ylim = ylims,
-                       projection = projection,
-                       orientation = orientation)
+            draw_smooth_estimates,
+            constant = constant,
+            fun = fun,
+            contour = contour,
+            contour_col = contour_col,
+            n_contour = n_contour,
+            ci_alpha = ci_alpha,
+            ci_col = ci_col,
+            smooth_col = smooth_col,
+            resid_col = resid_col,
+            partial_match = partial_match,
+            discrete_colour = discrete_colour,
+            discrete_fill = discrete_fill,
+            continuous_colour = continuous_colour,
+            continuous_fill = continuous_fill,
+            angle = angle,
+            ylim = ylims,
+            projection = projection,
+            orientation = orientation,
+            tensor_term_order = tensor_term_order)
 
     } # end stuff for smooths...
 

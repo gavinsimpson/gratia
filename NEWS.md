@@ -1,4 +1,4 @@
-# gratia 0.8.1.24
+# gratia 0.8.1.25
 
 ## User visible changes
 
@@ -21,6 +21,8 @@
   allows the covariates involved in that surface to vary fastest, ahead of terms
   in other marginals. This change has been made as it provides a better default
   when nothing is provided to `data`.
+
+  This also affects `draw.gam()`.
 
 ## New features
 
@@ -135,6 +137,8 @@
   `discrete = TRUE` is used with `bam()` the terms in the tensor product may
   get rearranged during model setup for maximum efficiency (See *Details* in
   `?mgcv::bam`).
+
+  Additionally, `draw.gam()` now also works the same way.
 
 ## Bug fixes
 
