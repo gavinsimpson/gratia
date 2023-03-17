@@ -1362,25 +1362,3 @@ vars_from_label <- function(label) {
     # return
     lpi
 }
-
-#' @importFrom purrr map
-`get_xlim_from_plots` <- function(plts) {
-    map(plts, get_xlim_from_plot)
-}
-
-#' @importFrom ggplot2 layer_scales
-`get_xlim_from_plot` <- function(p) {
-    f <- layer_scales(p)[["x"]][["get_limits"]]
-    f()
-}
-
-#' @importFrom purrr map
-`get_ylim_from_plots` <- function(plts) {
-    map(plts, get_ylim_from_plot)
-}
-
-#' @importFrom ggplot2 layer_scales
-`get_ylim_from_plot` <- function(p) {
-    f <- layer_scales(p)[["y"]][["get_limits"]]
-    f()
-}
