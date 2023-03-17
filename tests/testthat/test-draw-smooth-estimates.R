@@ -144,6 +144,10 @@ test_that("draw.smooth_estimates works for trivar te with a 2d marginal", {
     expect_silent(plt <- draw(smooth_estimates(su_m_trivar_te2, dist = 0.1,
                                                n = 20, n_3d = 4)))
     expect_doppelganger("draw.smooth_estimates su_m_trivar_te2", plt)
+
+    # also check that draw.gam() works for this model
+    expect_silent(plt <- draw(su_m_trivar_te2, dist = 0.1, n = 20, n_3d = 5))
+    expect_doppelganger("draw.gam for su_m_trivar_te2", plt)
 })
 
 test_that("draw.smooth_estimates works for quadvar te with 2d marginals", {
@@ -159,6 +163,11 @@ test_that("draw.smooth_estimates works for quadvar te with 2d marginals", {
     expect_silent(plt <- draw(smooth_estimates(su_m_quadvar_te2, dist = 0.1,
                                                n = 20, n_3d = 4, n_4d = 3)))
     expect_doppelganger("draw.smooth_estimates su_m_quadvar_te2", plt)
+
+    # also check that draw.gam() works for this model
+    expect_silent(plt <- draw(su_m_quadvar_te2, dist = 0.1, n = 20, n_3d = 4,
+        n_4d = 3))
+    expect_doppelganger("draw.gam for su_m_quadvar_te2", plt)
 })
 
 test_that("draw.smooth_estimates works for trivar t2 with a 2d marginal", {
@@ -173,6 +182,10 @@ test_that("draw.smooth_estimates works for trivar t2 with a 2d marginal", {
     expect_silent(plt <- draw(smooth_estimates(su_m_trivar_t22, dist = 0.1,
                                                n = 20, n_3d = 4)))
     expect_doppelganger("draw.smooth_estimates su_m_trivar_t22", plt)
+
+    # also check that draw.gam() works for this model
+    expect_silent(plt <- draw(su_m_trivar_t22, dist = 0.1, n = 20, n_3d = 5))
+    expect_doppelganger("draw.gam for su_m_trivar_t22", plt)
 })
 
 test_that("draw.smooth_estimates works for quadvar t2 with 2d marginals", {
@@ -188,4 +201,9 @@ test_that("draw.smooth_estimates works for quadvar t2 with 2d marginals", {
     expect_silent(plt <- draw(smooth_estimates(su_m_quadvar_t22, dist = 0.1,
         n = 20, n_3d = 4, n_4d = 3)))
     expect_doppelganger("draw.smooth_estimates su_m_quadvar_t22", plt)
+
+    # also check that draw.gam() works for this model
+    expect_silent(plt <- draw(su_m_quadvar_t22, dist = 0.1, n = 20, n_3d = 4,
+        n_4d = 3))
+    expect_doppelganger("draw.gam for su_m_quadvar_t22", plt)
 })
