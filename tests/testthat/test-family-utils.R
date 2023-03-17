@@ -1025,7 +1025,6 @@ test_that("extract_link() works on cnorm() family objects", {
     expect_identical(f, cnorm()$linkinv)
 })
 
-
 ## tests some specific extract functions
 test_that("twlss_link() can extract a link function", {
     fam <- twlss()
@@ -1299,4 +1298,22 @@ test_that("family_name() works with a family() object", {
     f <- family_name(gaussian())
     expect_type(f, "character")
     expect_identical(f, "gaussian")
+})
+
+# special cnorm tests
+test_that("family utils work on cnorm() family objects from a model", {
+    ## link
+    f <- extract_link(family(m_censor))
+    expect_type(f, "closure")
+    expect_identical(f(val), val)
+    expect_identical(f, cnorm()$linkfun)
+    ## inverse
+    f <- extract_link(family(m_censor), inverse = TRUE)
+    expect_type(f, "closure")
+    expect_identical(f(val), val)
+    expect_identical(f, cnorm()$linkinv)
+
+    f <- family_name(m_censor)
+    expect_type(f, "character")
+    expect_match(f, "^cnorm\\(\\d+\\.?\\d+\\)$")
 })
