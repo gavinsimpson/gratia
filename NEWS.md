@@ -1,4 +1,4 @@
-# gratia 0.8.1.23
+# gratia 0.8.1.24
 
 ## User visible changes
 
@@ -13,6 +13,14 @@
   very inefficient as, with that method, posterior draws for all coefficients
   in the model are sampled at once. So, only use `rng_per_smooth = TRUE` with
   `method = "gaussian"`.
+
+* The output of `smooth_estimates()` and its `draw()` method have changed for
+  tensor product smooths that involve one or more 2D marginal smooths. Now,
+  if no covariate values are supplied via the `data` argument,
+  `smooth_estimates()` identifies that one of the marginals is a 2d surface and
+  allows the covariates involved in that surface to vary fastest, ahead of terms
+  in other marginals. This change has been made as it provides a better default
+  when nothing is provided to `data`.
 
 ## New features
 
@@ -101,6 +109,32 @@
   those change indicators are added to the object created by
   `smooth_estimates()` using `add_sizer()`. See the example in
   `?draw.smooth_estimates`.
+
+* `smooth_estimates()` can, when evaluating a 3D or 4D tensor product smooth,
+  identify if one or more 2D smooths is a marginal of the tensor product. If
+  users do not provide covariate values at which to evaluate the smooths,
+  `smooth_estimates()` will focus on the 2D marginal smooth (or the first if
+  more than one is involved in the tensor product), instead of following the
+  ordering of the terms in the definition of the tensor product. #191
+
+  For example, in `te(z, x, y, bs = c(cr, ds), d = c(1, 2))`, the second
+  marginal smooth is a 2D Duchon spline of covariates `x` and `y`. Previously,
+  `smooth_estimates()` would have generated `n` values each for `z` and `x` and
+  `n_3d` values for `y`, and then evaluated the tensor product at all
+  combinations of those generated values. This would ignore the structure
+  implicit in the tensor product, where we are likely to want to know how the
+  surface estimated by the Duchon spline of `x` and `y` smoothly varies with
+  `z`. Instead, previously `smooth_estimates()` would generate surfaces of `z`
+  and `x`, varying by `y`. Now, `smooth_estimates()` correctly identifies that
+  one of the marginal smooths of the tensor product is a 2D surface and will
+  focus on that surface varying with the other terms in the tensor product.
+
+  This improved behaviour is needed because in some `bam()` models it is not
+  possible to do the obvious thing and reorder the smooths when defining the
+  tensor product to be `te(x, y, z, bs = c(ds, cr), d = c(2, 1))`. When
+  `discrete = TRUE` is used with `bam()` the terms in the tensor product may
+  get rearranged during model setup for maximum efficiency (See *Details* in
+  `?mgcv::bam`).
 
 ## Bug fixes
 
