@@ -6,38 +6,16 @@ library("gratia")
 library("mgcv")
 
 dat <- data_sim("eg1", n = 400, seed = 1)
-#m_1_smooth <- gam(y ~ s(x0), data = dat, method = "REML")
 m1 <- gam(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'ps') + s(x3, bs = 'bs'),
           data = dat, method = "REML")
 m2 <- gamm(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'ps') + s(x3, bs = 'bs'),
            data = dat, method = "REML")
-m3 <- gam(y ~ s(x0, x1, x2), data = dat, method = "REML")
-m4 <- gam(y ~ te(x0, x1, x2), data = dat, method = "REML")
+
 m_t2 <- gam(y ~ t2(x0, x1, x2), data = dat, method = "REML")
 m_ti <- gam(y ~ s(x0) + s(x1) + ti(x0, x1), data = dat, method = "REML")
 
 dat_2d_by <- data_sim("eg4", n = 400, seed = 42)
 m_2d_by <- gam(y ~ fac + s(x0, x1, by = fac), data = dat_2d_by)
-
-## simulate example... from ?mgcv::random.effects
-## simulate 4 term additive truth
-# dat_re <- data_sim("eg1", n = 400, scale = 2, seed = 1)
-# fac <- as.factor(sample(1:20, 400, replace = TRUE))
-# X <- model.matrix(~ fac - 1)
-# b <- rnorm(20) * 0.5
-# dat_re <- transform(dat_re, y = drop(y + X %*% b), fac = fac)
-# m_re <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) + s(x3),
-#             data = dat, method = "ML")
-# rm(fac, b, X)
-
-# dat <- data_sim("eg1", n = 400, seed = 1)
-# m_1_smooth <- gam(y ~ s(x0), data = dat, method = "REML")
-# m1 <- gam(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'ps') + s(x3, bs = 'bs'),
-#           data = dat, method = "REML")
-# m2 <- gamm(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'ps') + s(x3, bs = 'bs'),
-#            data = dat, method = "REML")
-# m3 <- gam(y ~ s(x0, x1, x2), data = dat, method = "REML")
-# m4 <- gam(y ~ te(x0, x1, x2), data = dat, method = "REML")
 
 ## simulate example... from ?mgcv::factor.smooth.interaction
 sim_fs <- function(n = 500, nf = 10) {
@@ -129,20 +107,20 @@ test_that("smooth_estimates works with a bivariate te smooth with dist", {
 })
 
 test_that("smooth_estimates works with a trivariate smooth", {
-    expect_silent(sm <- smooth_estimates(m3, "s(x0,x1,x2)", n = 25))
+    expect_silent(sm <- smooth_estimates(su_m_trivar, "s(x0,x1,x2)", n = 25))
     expect_s3_class(sm, "smooth_estimates")
     expect_s3_class(sm, "tbl_df")
     expect_s3_class(sm, "data.frame")
-    expect_identical(nrow(sm), 15625L)
+    expect_identical(nrow(sm), 10000L)
     expect_named(sm, c("smooth", "type", "by", "est", "se", "x0", "x1", "x2"))
 })
 
 test_that("smooth_estimates works with a trivariate tensor product smooth", {
-    expect_silent(sm <- smooth_estimates(m4, "te(x0,x1,x2)", n = 25))
+    expect_silent(sm <- smooth_estimates(su_m_trivar_te, "te(x0,x1,x2)", n = 25))
     expect_s3_class(sm, "smooth_estimates")
     expect_s3_class(sm, "tbl_df")
     expect_s3_class(sm, "data.frame")
-    expect_identical(nrow(sm), 15625L)
+    expect_identical(nrow(sm), 10000L)
     expect_named(sm, c("smooth", "type", "by", "est", "se", "x0", "x1", "x2"))
 })
 
@@ -151,7 +129,7 @@ test_that("smooth_estimates works with a trivariate t2 tensor product smooth", {
     expect_s3_class(sm, "smooth_estimates")
     expect_s3_class(sm, "tbl_df")
     expect_s3_class(sm, "data.frame")
-    expect_identical(nrow(sm), 15625L)
+    expect_identical(nrow(sm), 10000L)
     expect_named(sm, c("smooth", "type", "by", "est", "se", "x0", "x1", "x2"))
 })
 
