@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.23</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.24</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +69,8 @@
 <span>  n_3d <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n_4d <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  offset <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  include_all <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  include_all <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  var_order <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -115,6 +116,12 @@ the returned data frame. If <code>TRUE</code>, a representative value will be in
 for all other covariates in the model that aren't actually used in the
 smooth. This can be useful if you want to pass the returned data frame on
 to <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html" class="external-link">mgcv::PredictMat()</a></code>.</p></dd>
+
+
+<dt>var_order</dt>
+<dd><p>character; the order in which the terms in the smooth
+should be processed. Only useful for tensor products with at least one
+2d marginal smooth.</p></dd>
 
 </dl></div>
 

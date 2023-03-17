@@ -131,3 +131,61 @@ test_that("draw.smooth_estimates works for sz two factor smooth", {
     expect_silent(plt <- draw(smooth_estimates(m_sz_2f)))
     expect_doppelganger("draw.smooth_estimates sz two factor smooth", plt)
 })
+
+test_that("draw.smooth_estimates works for trivar te with a 2d marginal", {
+    skip_on_cran()
+    skip_on_os(os = "win")
+    skip_on_os(os = "mac")
+
+    # only running this here so it doesn't add too much compute time for CRAN
+    su_m_trivar_te2 <- gam(y ~ te(x0, x1, x2, k = c(3, 9), d = c(1, 2),
+            bs = c("cr", "ds")),
+        data = su_eg1, method = "REML")
+    expect_silent(plt <- draw(smooth_estimates(su_m_trivar_te2, dist = 0.1,
+                                               n = 20, n_3d = 4)))
+    expect_doppelganger("draw.smooth_estimates su_m_trivar_te2", plt)
+})
+
+test_that("draw.smooth_estimates works for quadvar te with 2d marginals", {
+    skip_on_cran()
+    skip_on_os(os = "win")
+    skip_on_os(os = "mac")
+
+    # only running this here so it doesn't add too much compute time for CRAN
+    su_m_quadvar_te2 <- bam(y ~ te(x0, x1, x2, x3, k = c(3, 3, 3, 3),
+            d = c(2, 2), bs = c("ds", "ds")),
+        data = su_eg1, method = "fREML", discrete = TRUE, nthreads = 2)
+
+    expect_silent(plt <- draw(smooth_estimates(su_m_quadvar_te2, dist = 0.1,
+                                               n = 20, n_3d = 4, n_4d = 3)))
+    expect_doppelganger("draw.smooth_estimates su_m_quadvar_te2", plt)
+})
+
+test_that("draw.smooth_estimates works for trivar t2 with a 2d marginal", {
+    skip_on_cran()
+    skip_on_os(os = "win")
+    skip_on_os(os = "mac")
+
+    # only running this here so it doesn't add too much compute time for CRAN
+    su_m_trivar_t22 <- gam(y ~ t2(x0, x1, x2, k = c(3, 9), d = c(1, 2),
+            bs = c("cr", "ds")),
+        data = su_eg1, method = "REML")
+    expect_silent(plt <- draw(smooth_estimates(su_m_trivar_t22, dist = 0.1,
+                                               n = 20, n_3d = 4)))
+    expect_doppelganger("draw.smooth_estimates su_m_trivar_t22", plt)
+})
+
+test_that("draw.smooth_estimates works for quadvar t2 with 2d marginals", {
+    skip_on_cran()
+    skip_on_os(os = "win")
+    skip_on_os(os = "mac")
+
+    # only running this here so it doesn't add too much compute time for CRAN
+    su_m_quadvar_t22 <- bam(y ~ t2(x0, x1, x2, x3, k = c(3, 3, 3, 3),
+        d = c(2, 2), bs = c("ds", "ds")),
+    data = su_eg1, method = "fREML", discrete = TRUE, nthreads = 2)
+
+    expect_silent(plt <- draw(smooth_estimates(su_m_quadvar_t22, dist = 0.1,
+        n = 20, n_3d = 4, n_4d = 3)))
+    expect_doppelganger("draw.smooth_estimates su_m_quadvar_t22", plt)
+})

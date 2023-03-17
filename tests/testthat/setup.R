@@ -56,7 +56,7 @@ su_m_bivar_ti <- gam(y ~ s(x, k = 5) + s(z, k = 5) + ti(x, z, k = c(5, 5)),
 su_m_bivar_t2 <- gam(y ~ t2(x, z, k = c(5, 5)), data = su_eg2, method = "REML")
 
 su_m_trivar_te <- gam(y ~ te(x0, x1, x2, k = c(3, 3, 3)),
-                      data = su_eg1, method = "REML")
+  data = su_eg1, method = "REML")
 
 su_m_quadvar_te <- gam(y ~ te(x0, x1, x2, x3, k = c(3, 3, 3, 3)),
                        data = su_eg1, method = "REML")

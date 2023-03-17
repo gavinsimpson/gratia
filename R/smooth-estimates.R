@@ -67,8 +67,8 @@
 `smooth_estimates.gam` <- function(object,
                                    smooth = NULL,
                                    n = 100,
-                                   n_3d = NULL,
-                                   n_4d = NULL,
+                                   n_3d = 16,
+                                   n_4d = 4,
                                    data = NULL,
                                    unconditional = FALSE,
                                    overall_uncertainty = TRUE,
@@ -103,14 +103,14 @@
         data <- delete_response(object, data = data)
     }
 
-    # fix up the n, n_3d, n_4d. If `n_3d` is `NULL` set `n_3d <- n`
-    if (is.null(n_3d)) {
-        n_3d <- n
-    }
-    # likewise fix up n_4d; set it to `n` if `n_4d` is NULL
-    if (is.null(n_4d)) {
-        n_4d <- n
-    }
+    # # fix up the n, n_3d, n_4d. If `n_3d` is `NULL` set `n_3d <- n`
+    # if (is.null(n_3d)) {
+    #     n_3d <- n
+    # }
+    # # likewise fix up n_4d; set it to `n` if `n_4d` is NULL
+    # if (is.null(n_4d)) {
+    #     n_4d <- n
+    # }
 
     for (i in seq_along(sm_list)) {
         sm_list[[i]] <- eval_smooth(smooths[[i]],
@@ -124,12 +124,18 @@
                                     dist = dist)
     }
 
+    # see if we have any tensor term orders to collect & apply
+    tensor_term_order <- lapply(sm_list, attr, "tensor_term_order")
     ## create a single df of all the smooths
     sm_list <- bind_rows(sm_list)
-    ## need to unnest the `data` column
+
+    ## need to unnest the `data` column?
     if (isTRUE(unnest)) {
         sm_list <- unnest(sm_list, all_of('data'))
     }
+
+    # add back any special attributes
+    attr(sm_list, "tensor_term_order") <- do.call("c", tensor_term_order)
 
     ## add a class
     class(sm_list) <- c("smooth_estimates", class(sm_list))
@@ -371,7 +377,6 @@
                                  cols = c("est", "se"),
                                  dist = dist)
     }
-
     ## return
     eval_sm
 }
@@ -393,13 +398,15 @@
 #' @keywords internal
 #' @noRd
 #' @importFrom rlang .data
-`process_user_data_for_eval` <- function(data, model, n, n_3d, n_4d, id) {
+`process_user_data_for_eval` <- function(data, model, n, n_3d, n_4d, id,
+    var_order = NULL) {
     if (is.null(data)) {
         data <- smooth_data(model = model,
-                            n = n,
-                            n_3d = n_3d,
-                            n_4d = n_4d,
-                            id = id)
+            n = n,
+            n_3d = n_3d,
+            n_4d = n_4d,
+            id = id,
+            var_order = var_order)
    } else {
         smooth <- get_smooths_by_id(model, id)[[1L]]
         vars <- smooth_variable(smooth)
@@ -553,11 +560,14 @@
         by_var <- NA_character_
     }
 
+    # order of variables
+    var_order <- reorder_tensor_smooth_terms(smooth)
+
     ## deal with data if supplied
     id <- which_smooth(model, smooth_label(smooth))
     data <- process_user_data_for_eval(data = data, model = model,
                                        n = n, n_3d = n_3d, n_4d = n_4d,
-                                       id = id)
+                                       id = id, var_order = var_order)
 
     ## values of spline at data
     eval_sm <- spline_values2(smooth, data = data,
@@ -581,7 +591,13 @@
                                  dist = dist)
     }
 
+    tensor_term_order <- list(var_order) |>
+        setNames(smooth_label(smooth))
+    attr(eval_sm, "tensor_term_order") <- tensor_term_order
+
     ## return
+    class(eval_sm) <- append(class(eval_sm), c("tensor_eval_sm", "eval_sm"),
+        after = 0L)
     eval_sm
 }
 
@@ -602,12 +618,14 @@
         by_var <- NA_character_
     }
 
-    ## deal with data if supplied
+    # order of variables
+    var_order <- reorder_tensor_smooth_terms(smooth)
 
+    # deal with data if supplied
     id <- which_smooth(model, smooth_label(smooth))
     data <- process_user_data_for_eval(data = data, model = model,
         n = n, n_3d = n_3d, n_4d = n_4d,
-        id = id)
+        id = id, var_order = var_order)
 
     ## values of spline at data
     eval_sm <- spline_values2(smooth, data = data,
@@ -633,7 +651,13 @@
             dist = dist)
     }
 
+    tensor_term_order <- list(var_order) |>
+        setNames(smooth_label(smooth))
+    attr(eval_sm, "tensor_term_order") <- tensor_term_order
+
     ## return
+    class(eval_sm) <- append(class(eval_sm), c("tensor_eval_sm", "eval_sm"),
+        after = 0L)
     eval_sm
 }
 
@@ -707,6 +731,9 @@
         object <- object |> add_confint()
     }
 
+    # grab tensor term order if present, if not present it is NULL & that's OK
+    tensor_term_order <- attr(object, "tensor_term_order")
+
     # draw smooths
     # the factor in group_split is to reorder to way the smooths entered the
     # model
@@ -751,6 +778,7 @@
         ylim = ylim,
         projection = projection,
         orientation = orientation,
+        tensor_term_order = tensor_term_order, # pass on tensor order info
         ...)
 
     wrap_plots(plts)
@@ -780,11 +808,15 @@
                                     ylim = NULL,
                                     projection = "orthographic",
                                     orientation = NULL,
+                                    tensor_term_order = NULL,
                                     ...) {
-    sm_vars <- if (".term" %in% names(object)) {
-        vars_from_label(unique(object[[".term"]]))
-    } else {
-        vars_from_label(unique(object[["smooth"]]))
+    sm_vars <- tensor_term_order[[unique(object$smooth)]]
+    if (is.null(sm_vars)) {
+        sm_vars <- if (".term" %in% names(object)) {
+            vars_from_label(unique(object[[".term"]]))
+        } else {
+            vars_from_label(unique(object[["smooth"]]))
+        }
     }
     sm_dim <- length(sm_vars)
     sm_type <- unique(object[["type"]])
@@ -843,7 +875,7 @@
                                     after = 0)
         }
     } else if (sm_dim == 3L) {
-        # all 2D smooths get these classes
+        # all 3D smooths get these classes
         class(object) <- append(class(object),
                                 c("trivariate_smooth", "mgcv_smooth"),
                                 after = 0)
@@ -852,10 +884,10 @@
         # need to be handled the same way, but we don't need to handle
         # this as a special method, so add after the trivariate_smooth
         # class
-        if(sm_type %in% c("TPRS (3d)", "TPRS (shrink) (3d)",
-                          "Duchon spline (3d)")) {
+        if (sm_type %in% c("TPRS (3d)", "TPRS (shrink) (3d)",
+            "Duchon spline (3d)")) {
             class(object) <- append(class(object), "isotropic_smooth",
-                                    after = 1L)
+                after = 1L)
         }
     } else if (sm_dim == 4L) {
         # all 2D smooths get these classes
@@ -1223,7 +1255,10 @@
                                             angle = NULL,
                                             ...) {
     if (is.null(variables)) {
-        variables <- vars_from_label(unique(object[["smooth"]]))
+        variables <- attr(object, "tensor_term_order")
+        if (is.null(variables)) {
+            variables <- vars_from_label(unique(object[["smooth"]]))
+        }
     }
 
     if (is.null(continuous_fill)) {
@@ -1254,7 +1289,7 @@
     plt <- ggplot(object, aes(x = .data[[variables[1]]],
                               y = .data[[variables[2]]])) +
         geom_raster(mapping = aes(fill = .data[[plot_var]])) +
-        facet_wrap(vars(.data[[variables[3]]]))
+            facet_wrap(vars(.data[[variables[3]]]))
 
     if (isTRUE(contour)) {
         plt <- plt + geom_contour(mapping = aes(z = .data[[plot_var]]),
