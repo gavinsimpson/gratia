@@ -337,3 +337,12 @@ m_ocat <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
 }
 sos_df <- sim_sos_eg_data(n = 400, seed = 0)
 m_sos <- gam(y ~ s(latitude, longitude, bs = "sos", k = 60), data = sos_df)
+
+# censored normal
+cens_df <- quick_eg1 |>
+    mutate(y = y - 5, # shift data down
+        censored = case_when(y < 0 ~ -Inf, .default = y))
+cens_df$y_cens <- with(cens_df, cbind(y, censored))
+
+m_censor <- bam(y_cens ~ s(x0) + s(x1) + s(x2) + s(x3), data = cens_df,
+  family = cnorm(), method = "fREML")

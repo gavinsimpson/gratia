@@ -313,6 +313,7 @@ family_type.family <- function(object, ...) {
         grepl("^zero inflated Poisson", distr, ignore.case = TRUE) ~ "zip",
         grepl("^Cox PH", distr, ignore.case = TRUE) ~ "cox_ph",
         grepl("^censored normal", distr, ignore.case = TRUE) ~ "cnorm",
+        grepl("^cnorm", distr, ignore.case = TRUE) ~ "cnorm",
         .default = as.character(distr)
     )
 
@@ -368,7 +369,14 @@ family_type.family <- function(object, ...) {
 
 `cnorm_link` <- function(family, parameter = c("location", "mu"),
                             inverse = FALSE) {
-    stop_if_not_family(family, type = "censored normal")
+    # stop_if_not_family(family, type = "censored normal")
+    # mgcv is especially inconsistent in naming this family
+    # the raw family is "censored normal", but when used on a fitted model it
+    # is "cnorm(xxx)" with xxx being some number that is the log standard dev
+    if (!any(grepl("^censored normal", family$family),
+        grepl("^cnorm", family$family))) {
+        stop("'family' is not a censored normal family", call. = FALSE)
+    }
 
     parameter <- match.arg(parameter)
 
@@ -621,7 +629,7 @@ family_type.family <- function(object, ...) {
         ##  - need to handle a couple of special types
         special <- c("Tweedie", "Negative Binomial", "negative binomial",
             "Scaled t", "scaled t", "Ordered Categorical",
-        "Beta regression")
+            "Beta regression")
         if (type %in% special) {
             if (!grepl(type, fam, ignore.case = TRUE)) {
                 stop("'family' is not of type '\"", type, "\"'", call. = FALSE)
