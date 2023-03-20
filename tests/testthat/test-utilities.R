@@ -401,3 +401,13 @@ test_that("involves_ranef_smooth works", {
     sm <- smooths(su_m_trivar_t2)
     expect_false(involves_ranef_smooth(get_smooth(su_m_trivar_t2, sm[1])))
 })
+
+test_that("null_deviance works for a gam", {
+    expect_silent(nd <- null_deviance(m_bam))
+    expect_identical(null_deviance(m_gam), m_gam$null.deviance)
+})
+
+test_that("null_deviance works for a gam", {
+    expect_silent(nd <- null_deviance(m_bam))
+    expect_identical(null_deviance(m_gam), m_bam$null.deviance)
+})
