@@ -1362,3 +1362,22 @@ vars_from_label <- function(label) {
     # return
     lpi
 }
+
+#' Extract the null deviance of a fitted model
+#'
+#' @param model a fitted model
+#' @param ... arguments passed to other methods
+#' @export
+`null_deviance` <- function(model, ...) {
+    UseMethod("null_deviance")
+}
+
+#' @export
+#' @rdname null_deviance
+`null_deviance.default` <- function(model, ...) {
+    if (is.null(model$null.deviance)) {
+        stop("The null deviance is not available for <", model, ">",
+            call. = FALSE)
+    }
+    model$null.deviance
+}
