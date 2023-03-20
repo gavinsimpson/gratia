@@ -1,4 +1,4 @@
-# gratia 0.8.1.26
+# gratia 0.8.1.27
 
 ## User visible changes
 
@@ -139,6 +139,9 @@
   `?mgcv::bam`).
 
   Additionally, `draw.gam()` now also works the same way.
+
+* New function `null_deviance()` that extracts the null deviance of a fitted
+  model.
 
 ## Bug fixes
 
