@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.27</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.28</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -193,7 +193,7 @@ for the <code>Quebec</code> <code>type</code> in the
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  159. Quebec chilled   nonchilled:Quebec Qn1  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  168. Quebec chilled   nonchilled:Quebec Qn1  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  177. Quebec chilled   nonchilled:Quebec Qn1  </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 90 more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 90 more rows</span></span></span></code></pre></div>
 <p>Notice how <code><a href="../reference/data_slice.html">data_slice()</a></code> has filled in something for the
 remaining covariates that we didn’t mention? In this case,
 <code><a href="../reference/data_slice.html">data_slice()</a></code> doesn’t know how <code>tt</code> was created,
@@ -218,7 +218,7 @@ correct level explicitly for <code>tt</code></p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  159. chilled   Quebec chilled:Quebec Qn1  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  168. chilled   Quebec chilled:Quebec Qn1  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  177. chilled   Quebec chilled:Quebec Qn1  </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 90 more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 90 more rows</span></span></span></code></pre></div>
 <p>Having created the data slice, we can predict from the model using
 the combination of covariate values specified in our slice. We could use
 <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">predict.gam()</a></code> for this, but the
@@ -240,7 +240,7 @@ especially for non-Gaussian models</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  159. chilled   Quebec chilled:Quebec Qn1     22.8  1.45 20.0   25.7</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  168. chilled   Quebec chilled:Quebec Qn1     24.1  1.47 21.3   27.0</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  177. chilled   Quebec chilled:Quebec Qn1     25.4  1.48 22.5   28.3</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 90 more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 90 more rows</span></span></span></code></pre></div>
 <p>Notice how we excluded the random effect term; even though we had to
 specify something for the <code>plant</code> covariate we can ignore
 this term in the model using the <code>exclude</code> argument.
@@ -282,7 +282,7 @@ Mississippi origin plants</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  122. chilled    Mississippi chilled:Mississippi    Qn1  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  132. nonchilled Mississippi nonchilled:Mississippi Qn1  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  132. chilled    Mississippi chilled:Mississippi    Qn1  </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 190 more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 190 more rows</span></span></span></code></pre></div>
 <p>Here, we replaced the automatically-generated <code>tt</code>
 variable with the correctly specified call to <code><a href="https://forcats.tidyverse.org/reference/fct_cross.html" class="external-link">fct_cross()</a></code>,
 retaining the levels of the <code>type</code> and <code>treatment</code>
@@ -395,7 +395,7 @@ confidence interval</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> te(x,z) Tensor product <span style="color: #BB0000;">NA</span>    0.230 0.037<span style="text-decoration: underline;">2</span> 0.071<span style="text-decoration: underline;">3</span>   0.245   0.157     0.303</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> te(x,z) Tensor product <span style="color: #BB0000;">NA</span>    0.247 0.035<span style="text-decoration: underline;">1</span> 0.081<span style="text-decoration: underline;">4</span>   0.245   0.178     0.316</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> te(x,z) Tensor product <span style="color: #BB0000;">NA</span>    0.263 0.033<span style="text-decoration: underline;">3</span> 0.091<span style="text-decoration: underline;">4</span>   0.245   0.198     0.328</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 90 more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 90 more rows</span></span></span></code></pre></div>
 <p>We can plot <code>sm</code> using {ggplot2}</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sm</span> <span class="op">|&gt;</span></span>

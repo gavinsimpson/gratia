@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.27</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.28</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -227,7 +227,7 @@ interval (given <code>level</code>),</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> s(x0)  x0    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     0.070<span style="text-decoration: underline;">7</span>         7.09  2.76  1.96 1.69   12.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> s(x0)  x0    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     0.080<span style="text-decoration: underline;">7</span>         6.99  2.61  1.96 1.87   12.1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> s(x0)  x0    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     0.090<span style="text-decoration: underline;">8</span>         6.87  2.47  1.96 2.03   11.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ... with 390 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 390 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## derivatives for a selected smooth</span></span></span>
 <span class="r-in"><span><span class="fu">derivatives</span><span class="op">(</span><span class="va">mod</span>, type <span class="op">=</span> <span class="st">"central"</span>, term <span class="op">=</span> <span class="st">"s(x1)"</span><span class="op">)</span></span></span>
@@ -244,7 +244,7 @@ interval (given <code>level</code>),</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> s(x1)  x1    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     0.070<span style="text-decoration: underline;">8</span>       -<span style="color: #BB0000;">0.659</span>  2.69  1.96 -<span style="color: #BB0000;">5.93</span>  4.61</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> s(x1)  x1    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     0.080<span style="text-decoration: underline;">9</span>       -<span style="color: #BB0000;">0.557</span>  2.56  1.96 -<span style="color: #BB0000;">5.57</span>  4.46</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> s(x1)  x1    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     0.090<span style="text-decoration: underline;">9</span>       -<span style="color: #BB0000;">0.436</span>  2.42  1.96 -<span style="color: #BB0000;">5.19</span>  4.32</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ... with 90 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 90 more rows</span></span>
 <span class="r-in"><span><span class="co">## or via a partial match</span></span></span>
 <span class="r-in"><span><span class="fu">derivatives</span><span class="op">(</span><span class="va">mod</span>, type <span class="op">=</span> <span class="st">"central"</span>, term <span class="op">=</span> <span class="st">"x1"</span>, partial_match <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 100 x 10</span></span>
@@ -260,7 +260,7 @@ interval (given <code>level</code>),</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> s(x1)  x1    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     0.070<span style="text-decoration: underline;">8</span>       -<span style="color: #BB0000;">0.659</span>  2.69  1.96 -<span style="color: #BB0000;">5.93</span>  4.61</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> s(x1)  x1    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     0.080<span style="text-decoration: underline;">9</span>       -<span style="color: #BB0000;">0.557</span>  2.56  1.96 -<span style="color: #BB0000;">5.57</span>  4.46</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> s(x1)  x1    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     0.090<span style="text-decoration: underline;">9</span>       -<span style="color: #BB0000;">0.436</span>  2.42  1.96 -<span style="color: #BB0000;">5.19</span>  4.32</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ... with 90 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 90 more rows</span></span>
 <span class="r-in"><span><span class="co"># \dontshow{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">op</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
