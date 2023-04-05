@@ -1,4 +1,4 @@
-# gratia 0.8.1.27
+# gratia 0.8.1.28
 
 ## User visible changes
 
@@ -23,6 +23,8 @@
   when nothing is provided to `data`.
 
   This also affects `draw.gam()`.
+
+* *gratia* now requires *dplyr* versions >= 1.1.0.
 
 ## New features
 
