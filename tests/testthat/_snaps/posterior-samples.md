@@ -16,7 +16,7 @@
        8 s(x2)  s(x2):x1 TPRS  <NA>            2     3  0.222   0.0103  
        9 s(x2)  s(x2):x1 TPRS  <NA>            2     4  0.0197  0.0103  
       10 s(x2)  s(x2):x1 TPRS  <NA>            2     5  0.143   0.0103  
-      # ... with 490 more rows
+      # i 490 more rows
 
 # smooth_samples works for a simple GAM
 
@@ -36,7 +36,7 @@
        8 s(x0)  s(x0) TPRS  <NA>            2     3 -1.48  0.0230
        9 s(x0)  s(x0) TPRS  <NA>            2     4 -1.25  0.0230
       10 s(x0)  s(x0) TPRS  <NA>            2     5 -0.346 0.0230
-      # ... with 490 more rows
+      # i 490 more rows
 
 # smooth_samples works for a simple GAM multi rng calls
 
@@ -56,7 +56,7 @@
        8 s(x0)  s(x0) TPRS  <NA>            2     3 -3.16 0.0230
        9 s(x0)  s(x0) TPRS  <NA>            2     4 -2.98 0.0230
       10 s(x0)  s(x0) TPRS  <NA>            2     5 -1.91 0.0230
-      # ... with 490 more rows
+      # i 490 more rows
 
 # fitted_samples example output doesn't change
 
@@ -76,7 +76,7 @@
        8     8     1   6.86
        9     9     1   9.76
       10    10     1   7.39
-      # ... with 4,990 more rows
+      # i 4,990 more rows
 
 # smooth_samples example output doesn't change
 
@@ -96,5 +96,5 @@
        8 s(x0)  s(x0) TPRS  <NA>            2     3 -1.00 0.00633
        9 s(x0)  s(x0) TPRS  <NA>            2     4 -1.58 0.00633
       10 s(x0)  s(x0) TPRS  <NA>            2     5 -1.29 0.00633
-      # ... with 990 more rows
+      # i 990 more rows
 
