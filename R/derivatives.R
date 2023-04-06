@@ -987,7 +987,7 @@
 #'
 #' # response derivatives
 #' y_d <- response_derivatives(m, data = ds, type = "central",
-#'                             focal = "x2", eps = 0.01)
+#'                             focal = "x2", eps = 0.01, seed = 21)
 #'
 #' # draw fitted values along x2
 #' p1 <- fv |>
