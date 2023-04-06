@@ -6,19 +6,19 @@ test_that("response derivatives works", {
     N <- 50L
     expect_silent(ds <- data_slice(m_nb, x2 = evenly(x2, n = N)))
     expect_silent(yd <- response_derivatives(m_nb, data = ds,
-        type = "central", focal = "x2"))
+        type = "central", focal = "x2", seed = 2))
     expect_s3_class(yd, class = "response_derivatives")
     expect_identical(nrow(yd), N)
     expect_snapshot(print(yd))
 
     expect_silent(yd <- response_derivatives(m_nb, data = ds,
-        type = "forward", focal = "x2"))
+        type = "forward", focal = "x2", seed = 2))
     expect_s3_class(yd, class = "response_derivatives")
     expect_identical(nrow(yd), N)
     expect_snapshot(print(yd))
 
     expect_silent(yd <- response_derivatives(m_nb, data = ds,
-        type = "backward", focal = "x2"))
+        type = "backward", focal = "x2", seed = 2))
     expect_s3_class(yd, class = "response_derivatives")
     expect_identical(nrow(yd), N)
     expect_snapshot(print(yd))
