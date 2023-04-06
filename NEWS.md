@@ -1,4 +1,4 @@
-# gratia 0.8.1.30
+# gratia 0.8.1.31
 
 ## User visible changes
 
@@ -24,7 +24,7 @@
 
   This also affects `draw.gam()`.
 
-* *gratia* now requires *dplyr* versions >= 1.1.0.
+* *gratia* now requires *dplyr* versions >= 1.1.0 and *tidyselect* >= 1.2.0.
 
 ## New features
 

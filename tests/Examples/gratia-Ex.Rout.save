@@ -1,6 +1,6 @@
 
-R version 4.2.2 Patched (2022-11-10 r83330) -- "Innocent and Trusting"
-Copyright (C) 2022 The R Foundation for Statistical Computing
+R version 4.2.3 (2023-03-15) -- "Shortstop Beagle"
+Copyright (C) 2023 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -60,25 +60,25 @@ Type 'q()' to quit R.
  8  8.51   0.661  0.781  0.947  0.859   6.74
  9 10.6    0.629  0.0111 0.339  0.446   9.14
 10  3.72   0.0618 0.940  0.0317 0.677   7.04
-# ... with 390 more rows
+# i 390 more rows
 > 
 > ## with type = "terms" or "iterms"
 > add_fitted(df, m, type = "terms")
 # A tibble: 400 x 10
-         y     x0     x1     x2    x3 .constant `.s(x0)` .s(x1~1 .s(x2~2 .s(x3~3
-     <dbl>  <dbl>  <dbl>  <dbl> <dbl>     <dbl>    <dbl>   <dbl>   <dbl>   <dbl>
- 1  3.34   0.266  0.659  0.859  0.367      7.94   0.175    0.559  -2.81   0.0351
- 2 -0.0758 0.372  0.185  0.0344 0.741      7.94   0.435   -1.92   -3.23  -0.0687
- 3 10.7    0.573  0.954  0.971  0.934      7.94   0.593    3.35   -3.47  -0.122 
- 4  8.73   0.908  0.898  0.745  0.673      7.94  -0.812    2.77   -1.19  -0.0498
- 5 15.0    0.202  0.944  0.273  0.701      7.94  -0.0589   3.23    4.63  -0.0576
- 6  7.67   0.898  0.724  0.677  0.848      7.94  -0.745    1.15    0.146 -0.0981
- 7  7.58   0.945  0.370  0.348  0.706      7.94  -1.07    -1.31    2.34  -0.0589
- 8  8.51   0.661  0.781  0.947  0.859      7.94   0.434    1.67   -3.20  -0.101 
- 9 10.6    0.629  0.0111 0.339  0.446      7.94   0.512   -1.95    2.63   0.0132
-10  3.72   0.0618 0.940  0.0317 0.677      7.94  -0.695    3.20   -3.35  -0.0508
-# ... with 390 more rows, and abbreviated variable names 1: `.s(x1)`,
-#   2: `.s(x2)`, 3: `.s(x3)`
+         y     x0     x1     x2    x3 .constant `.s(x0)` `.s(x1)` `.s(x2)`
+     <dbl>  <dbl>  <dbl>  <dbl> <dbl>     <dbl>    <dbl>    <dbl>    <dbl>
+ 1  3.34   0.266  0.659  0.859  0.367      7.94   0.175     0.559   -2.81 
+ 2 -0.0758 0.372  0.185  0.0344 0.741      7.94   0.435    -1.92    -3.23 
+ 3 10.7    0.573  0.954  0.971  0.934      7.94   0.593     3.35    -3.47 
+ 4  8.73   0.908  0.898  0.745  0.673      7.94  -0.812     2.77    -1.19 
+ 5 15.0    0.202  0.944  0.273  0.701      7.94  -0.0589    3.23     4.63 
+ 6  7.67   0.898  0.724  0.677  0.848      7.94  -0.745     1.15     0.146
+ 7  7.58   0.945  0.370  0.348  0.706      7.94  -1.07     -1.31     2.34 
+ 8  8.51   0.661  0.781  0.947  0.859      7.94   0.434     1.67    -3.20 
+ 9 10.6    0.629  0.0111 0.339  0.446      7.94   0.512    -1.95     2.63 
+10  3.72   0.0618 0.940  0.0317 0.677      7.94  -0.695     3.20    -3.35 
+# i 390 more rows
+# i 1 more variable: `.s(x3)` <dbl>
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -123,7 +123,7 @@ detaching ‘package:mgcv’
  8  8.51   0.661  0.781  0.947  0.859   2.21    3.44   -1.42   1.68  
  9 10.6    0.629  0.0111 0.339  0.446   2.01   -0.445   4.13   1.51  
 10  3.72   0.0618 0.940  0.0317 0.677  -4.02   -0.123  -6.67  -3.37  
-# ... with 390 more rows
+# i 390 more rows
 > 
 > ## add partial residuals for selected smooths
 > add_partial_residuals(df, m, select = "s(x0)")
@@ -140,7 +140,7 @@ detaching ‘package:mgcv’
  8  8.51   0.661  0.781  0.947  0.859   2.21 
  9 10.6    0.629  0.0111 0.339  0.446   2.01 
 10  3.72   0.0618 0.940  0.0317 0.677  -4.02 
-# ... with 390 more rows
+# i 390 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -186,7 +186,7 @@ detaching ‘package:mgcv’
  8  8.51   0.661  0.781  0.947  0.859    1.78  
  9 10.6    0.629  0.0111 0.339  0.446    1.50  
 10  3.72   0.0618 0.940  0.0317 0.677   -3.32  
-# ... with 390 more rows
+# i 390 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -416,7 +416,7 @@ i Please use `derivatives()` instead.
  8 s(x0) -0.79    1.7    4.2
  9 s(x0) -1.1     1.3    3.8
 10 s(x0) -1.4     0.99   3.4
-# ... with 90 more rows
+# i 90 more rows
 > 
 > ## simultaneous interval for smooth term of x2
 > ## Don't show: 
@@ -478,7 +478,7 @@ detaching ‘package:mgcv’
  8 s(x2)  TPRS  <NA>   0.34   3.2  0.20   2.0   2.9   3.6
  9 s(x2)  TPRS  <NA>   0.35   2.9  0.20   2.0   2.5   3.3
 10 s(x2)  TPRS  <NA>   0.36   2.5  0.19   2.0   2.1   2.9
-# ... with 40 more rows
+# i 40 more rows
 > 
 > ## simultaneous interval for smooth of x2
 > ## Don't show: 
@@ -500,7 +500,7 @@ detaching ‘package:mgcv’
  8 s(x2)  TPRS  <NA>   0.34   3.2  0.20   2.6   2.7   3.8
  9 s(x2)  TPRS  <NA>   0.35   2.9  0.20   2.6   2.4   3.4
 10 s(x2)  TPRS  <NA>   0.36   2.5  0.19   2.6   2.0   3.0
-# ... with 40 more rows
+# i 40 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -539,7 +539,7 @@ detaching ‘package:mgcv’
  8 10.839  0.66080  0.47812 0.12916 0.81344   9.7565 1.7502  2.6019 5.4045     0
  9 16.883  0.62911  0.92407 0.25637 0.068447 16.909  1.8377  6.3481 8.7237     0
 10  7.3603 0.061786 0.59876 0.71794 0.40045   6.3401 0.38578 3.3119 2.6424     0
-# ... with 90 more rows
+# i 90 more rows
 > 
 > # an ordered categorical response
 > data_sim("eg1", n = 100, dist = "ocat", n_cat = 4, cuts = c(-1, 0, 5))
@@ -556,7 +556,8 @@ detaching ‘package:mgcv’
  8     3 0.66080  0.47812 0.12916 0.81344   0.98419 1.7502  2.6019 5.4045     0
  9     4 0.62911  0.92407 0.25637 0.068447  8.1371  1.8377  6.3481 8.7237     0
 10     1 0.061786 0.59876 0.71794 0.40045  -2.4322  0.38578 3.3119 2.6424     0
-# ... with 90 more rows, and 1 more variable: latent <dbl>
+# i 90 more rows
+# i 1 more variable: latent <dbl>
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -637,7 +638,7 @@ detaching ‘package:mgcv’
  8 s(x0)  x0    <NA>   <NA>   0.0707         7.09  2.76  1.96 1.69   12.5
  9 s(x0)  x0    <NA>   <NA>   0.0807         6.99  2.61  1.96 1.87   12.1
 10 s(x0)  x0    <NA>   <NA>   0.0908         6.87  2.47  1.96 2.03   11.7
-# ... with 390 more rows
+# i 390 more rows
 > 
 > ## derivatives for a selected smooth
 > derivatives(mod, type = "central", term = "s(x1)")
@@ -654,7 +655,7 @@ detaching ‘package:mgcv’
  8 s(x1)  x1    <NA>   <NA>   0.0708       -0.659  2.69  1.96 -5.93  4.61
  9 s(x1)  x1    <NA>   <NA>   0.0809       -0.557  2.56  1.96 -5.57  4.46
 10 s(x1)  x1    <NA>   <NA>   0.0909       -0.436  2.42  1.96 -5.19  4.32
-# ... with 90 more rows
+# i 90 more rows
 > ## or via a partial match
 > derivatives(mod, type = "central", term = "x1", partial_match = TRUE)
 # A tibble: 100 x 10
@@ -670,7 +671,7 @@ detaching ‘package:mgcv’
  8 s(x1)  x1    <NA>   <NA>   0.0708       -0.659  2.69  1.96 -5.93  4.61
  9 s(x1)  x1    <NA>   <NA>   0.0809       -0.557  2.56  1.96 -5.57  4.46
 10 s(x1)  x1    <NA>   <NA>   0.0909       -0.436  2.42  1.96 -5.19  4.32
-# ... with 90 more rows
+# i 90 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -715,7 +716,7 @@ detaching ‘package:mgcv’
  8 s(x2)  fac   1       2       1.03  0.393  0.262    1.80 0.0740 
  9 s(x2)  fac   1       2       1.12  0.378  0.380    1.86 0.0841 
 10 s(x2)  fac   1       2       1.21  0.367  0.489    1.93 0.0941 
-# ... with 290 more rows
+# i 290 more rows
 > 
 > draw(sm_dif)
 > 
@@ -1218,7 +1219,7 @@ detaching ‘package:mgcv’
  8 s(x1)  <NA>        0.073   -2.0 0.10 
  9 s(x1)  <NA>        0.083   -2.0 0.10 
 10 s(x1)  <NA>        0.093   -2.0 0.097
-# ... with 90 more rows
+# i 90 more rows
 > 
 > ## 2d example
 > dat <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
@@ -1238,7 +1239,7 @@ detaching ‘package:mgcv’
  8 s(x,z) <NA>        0.14    0.00076 0.15   0.15
  9 s(x,z) <NA>        0.16    0.00076 0.16   0.14
 10 s(x,z) <NA>        0.18    0.00076 0.17   0.14
-# ... with 2,490 more rows
+# i 2,490 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1382,7 +1383,7 @@ detaching ‘package:mgcv’
  8 0.833449 0.339117  0.583528   0.618458  6.25215 0.344700  5.57655  6.92775
  9 0.468019 0.166883  0.804473   0.880744  4.21463 0.372003  3.48552  4.94374
 10 0.549984 0.807410  0.264717   0.317747 15.5283  0.369999 14.8031  16.2535 
-# ... with 390 more rows
+# i 390 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1574,11 +1575,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x562a1c003388>
+<environment: 0x55a851a81350>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x562a1c003388>
+<environment: 0x55a851a81350>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1615,14 +1616,14 @@ detaching ‘package:mgcv’
 > ## IGNORE_RDIFF_BEGIN
 > xp
 Linear prediction matrix (400 x 37)
-  `(Intercept)` s(x0)~1 s(x0)~2 s(x0)~3 s(x0)~4 s(x0)~5 s(x0).~6 s(x0)~7 s(x0)~8
-          <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>    <dbl>   <dbl>   <dbl>
-1             1   0.961   0.227  0.706    0.135   0.457 -0.146    0.621   0.202 
-2             1   0.651  -0.241  0.0684   0.308   0.394 -0.00994  0.355   0.418 
-3             1  -0.385  -0.549  0.0660   0.204  -0.416 -0.247   -0.0349  0.462 
-4             1  -1.27    0.156 -1.53    -0.222  -1.60   0.198   -1.58   -0.748 
-5             1   1.05    0.420  1.11    -0.214   0.893  0.0351   0.776  -0.0289
-# ... with 395 more rows, 28 more variables: `s(x0).9` <dbl>, ...
+  `(Intercept)` `s(x0).1` `s(x0).2` `s(x0).3` `s(x0).4` `s(x0).5` `s(x0).6`
+          <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
+1             1     0.961     0.227    0.706      0.135     0.457  -0.146  
+2             1     0.651    -0.241    0.0684     0.308     0.394  -0.00994
+3             1    -0.385    -0.549    0.0660     0.204    -0.416  -0.247  
+4             1    -1.27      0.156   -1.53      -0.222    -1.60    0.198  
+5             1     1.05      0.420    1.11      -0.214     0.893   0.0351 
+# i 395 more rows
 > ## IGNORE_RDIFF_END
 > 
 > # the object `xp` *is* a matrix
@@ -1636,14 +1637,14 @@ Linear prediction matrix (400 x 37)
 > ## IGNORE_RDIFF_BEGIN
 > xp
 Linear prediction matrix (100 x 37)
-  `(Intercept)` s(x0).~1 s(x0)~2 s(x0)~3 s(x0)~4 s(x0)~5 s(x0)~6 s(x0)~7 s(x0)~8
-          <dbl>    <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
-1             1    0.170  -0.542 -0.0371  0.0534   0.144  -0.353 -0.0572   0.518
-2             1    0.170  -0.542 -0.0371  0.0534   0.144  -0.353 -0.0572   0.518
-3             1    0.170  -0.542 -0.0371  0.0534   0.144  -0.353 -0.0572   0.518
-4             1    0.170  -0.542 -0.0371  0.0534   0.144  -0.353 -0.0572   0.518
-5             1    0.170  -0.542 -0.0371  0.0534   0.144  -0.353 -0.0572   0.518
-# ... with 95 more rows, 28 more variables: `s(x0).9` <dbl>, ...
+  `(Intercept)` `s(x0).1` `s(x0).2` `s(x0).3` `s(x0).4` `s(x0).5` `s(x0).6`
+          <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
+1             1     0.170    -0.542   -0.0371    0.0534     0.144    -0.353
+2             1     0.170    -0.542   -0.0371    0.0534     0.144    -0.353
+3             1     0.170    -0.542   -0.0371    0.0534     0.144    -0.353
+4             1     0.170    -0.542   -0.0371    0.0534     0.144    -0.353
+5             1     0.170    -0.542   -0.0371    0.0534     0.144    -0.353
+# i 95 more rows
 > ## IGNORE_RDIFF_END
 > ## Don't show: 
 > options(op)
@@ -1897,7 +1898,7 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
  8  1.398   0.2184   7.055   1.897  
  9  2.797   0.4969   7.329   2.498  
 10  1.151  -0.2267   0.7202  0.7437 
-# ... with 390 more rows
+# i 390 more rows
 > 
 > ## and for a select term
 > partial_residuals(m, select = "s(x2)")
@@ -1914,7 +1915,7 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
  8  7.055 
  9  7.329 
 10  0.7202
-# ... with 390 more rows
+# i 390 more rows
 > 
 > ## or with partial matching
 > partial_residuals(m, select = "x", partial_match = TRUE) # returns all
@@ -1931,7 +1932,7 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
  8  1.398   0.2184   7.055   1.897  
  9  2.797   0.4969   7.329   2.498  
 10  1.151  -0.2267   0.7202  0.7437 
-# ... with 390 more rows
+# i 390 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1978,7 +1979,7 @@ detaching ‘package:mgcv’
  8 s(x0)  CRS   s(x0)   F1    F8     0.0216
  9 s(x0)  CRS   s(x0)   F1    F9     0.0247
 10 s(x0)  CRS   s(x0)   F2    F1    -0.635 
-# ... with 395 more rows
+# i 395 more rows
 > 
 > # for a specific smooth
 > penalty(m, smooth = "s(x2):fac1")
@@ -1995,7 +1996,7 @@ detaching ‘package:mgcv’
  8 s(x2):fac1 CRS   s(x2):fac1 F1    F8     0.164 
  9 s(x2):fac1 CRS   s(x2):fac1 F1    F9     0.0597
 10 s(x2):fac1 CRS   s(x2):fac1 F2    F1    -0.755 
-# ... with 71 more rows
+# i 71 more rows
 > 
 > ## Don't show: 
 > options(op)
@@ -2040,7 +2041,7 @@ detaching ‘package:mgcv’
  8     8     1     7.20
  9     9     1    18.1 
 10    10     1    12.7 
-# ... with 4,990 more rows
+# i 4,990 more rows
 > 
 > ## Can pass arguments to predict.gam()
 > ## Don't show: 
@@ -2064,7 +2065,7 @@ detaching ‘package:mgcv’
  8     8     1    10.5 
  9     9     1     8.43
 10    10     1    12.2 
-# ... with 40 more rows
+# i 40 more rows
 > 
 > ## Exclude s(x1)
 > predicted_samples(m, n = 5, newd, exclude = "s(x1)", seed = 25)
@@ -2081,7 +2082,7 @@ detaching ‘package:mgcv’
  8     8     1     5.66
  9     9     1    12.6 
 10    10     1     8.38
-# ... with 40 more rows
+# i 40 more rows
 > 
 > ## Select which terms --- result should be the same as previous
 > ## but note that we have to include any parametric terms, including the
@@ -2101,7 +2102,7 @@ detaching ‘package:mgcv’
  8     8     1   -2.33 
  9     9     1    4.65 
 10    10     1    0.395
-# ... with 40 more rows
+# i 40 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -2284,7 +2285,7 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
  8     7       22  15.1323 
  9     8        4   6.88637
 10     9        3   2.99628
-# ... with 11 more rows
+# i 11 more rows
 > draw(rg) # plot the rootogram
 > 
 > # A Gaussian example
@@ -2403,7 +2404,7 @@ detaching ‘package:mgcv’
  8 0.07080  
  9 0.08086  
 10 0.09091  
-# ... with 90 more rows
+# i 90 more rows
 > 
 > # generate data over range of x1 for smooth s(x1), with typical value for
 > # other covariates in the model
@@ -2421,7 +2422,7 @@ detaching ‘package:mgcv’
  8 0.07080   0.4883 0.4708 0.4879
  9 0.08086   0.4883 0.4708 0.4879
 10 0.09091   0.4883 0.4708 0.4879
-# ... with 90 more rows
+# i 90 more rows
 > 
 > ## Don't show: 
 > options(op)
@@ -2466,7 +2467,7 @@ detaching ‘package:mgcv’
  8 s(x0)  TPRS  <NA>  -0.677736 0.211261 0.0771559     NA    NA    NA
  9 s(x0)  TPRS  <NA>  -0.636220 0.202303 0.0871626     NA    NA    NA
 10 s(x0)  TPRS  <NA>  -0.594641 0.194685 0.0971693     NA    NA    NA
-# ... with 390 more rows
+# i 390 more rows
 > 
 > ## or selected smooths
 > smooth_estimates(m1, smooth = c("s(x0)", "s(x1)"))
@@ -2483,7 +2484,7 @@ detaching ‘package:mgcv’
  8 s(x0)  TPRS  <NA>  -0.677736 0.211261 0.0771559     NA
  9 s(x0)  TPRS  <NA>  -0.636220 0.202303 0.0871626     NA
 10 s(x0)  TPRS  <NA>  -0.594641 0.194685 0.0971693     NA
-# ... with 190 more rows
+# i 190 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -2655,7 +2656,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  32.38 0.26 32.601 0 0 
+Time elapsed:  45.36 0.4 45.704 0 0 
 > grDevices::dev.off()
 null device 
           1 
