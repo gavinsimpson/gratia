@@ -1083,7 +1083,7 @@
             lower_ci = quantile(.data[["..fd"]], probs = qq),
             upper_ci = quantile(.data[["..fd"]], probs = 1 - qq)) |>
         left_join(data, by = join_by("..orig" == "..row")) |>
-        rename("{focal}" := .data[[".x"]]) |>
+        rename("{focal}" := ".x") |>
         select(!matches(c("..xf", "..xb", "..orig"))) |>
         add_column(focal = rep(focal, nrow(data)), .before = 1L)
 

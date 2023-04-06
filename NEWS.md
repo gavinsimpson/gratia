@@ -1,4 +1,4 @@
-# gratia 0.8.1.29
+# gratia 0.8.1.30
 
 ## User visible changes
 
@@ -167,6 +167,9 @@
 
 * `parametric_effects()` now works better for location, scale, shape models.
   Reported by @pboesu #45
+
+* `response_derivatives()` was incorrectly using `.data` with *tidyselect*
+  selectors.
 
 # gratia 0.8.1
 
