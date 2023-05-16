@@ -4,7 +4,8 @@
 test_that("response derivatives works", {
     skip_on_cran()
     N <- 50L
-    expect_silent(ds <- data_slice(m_nb, x2 = evenly(x2, n = N)))
+    expect_silent(ds <- data_slice(m_nb, x2 = evenly(x2, n = N),
+        data = df_pois, envir = teardown_env()))
     expect_silent(yd <- response_derivatives(m_nb, data = ds,
         type = "central", focal = "x2", seed = 2))
     expect_s3_class(yd, class = "response_derivatives")

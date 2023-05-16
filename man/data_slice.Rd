@@ -15,7 +15,7 @@ data_slice(object, ...)
 
 \method{data_slice}{data.frame}(object, ...)
 
-\method{data_slice}{gam}(object, ..., data = NULL)
+\method{data_slice}{gam}(object, ..., data = NULL, envir = environment(formula(object)))
 
 \method{data_slice}{gamm}(object, ...)
 
@@ -31,6 +31,9 @@ defining the data slice. Arguments passed via \code{...} need to \emph{named}}
 needed to fit the model. If \code{NULL}, the default, the data used to fit the
 model will be recovered using \code{model.frame}. User-supplied expressions
 passed in \code{...} will be evaluated in \code{data}.}
+
+\item{envir}{the environment within which to recreate the data used to fit
+\code{object}.}
 }
 \description{
 Prepare a data slice through model covariates

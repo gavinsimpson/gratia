@@ -7,15 +7,17 @@ library("mgcv")
 
 test_that("data_slice works for a GAM", {
     expect_silent(ds <- data_slice(su_m_quick_eg1,
-                                   x1 = evenly(x1, n = 50),
-                                   x2 = evenly(x2, n = 50)))
+        x1 = evenly(x1, n = 50),
+        x2 = evenly(x2, n = 50), data = quick_eg1, envir = teardown_env()))
     expect_s3_class(ds, "tbl_df")
     expect_named(ds, c("x1", "x2", "x0", "x3"))
     expect_message(data_slice(su_m_quick_eg1,
-                              x1 = evenly(x1, n = 50), var2 = "foo"),
+                              x1 = evenly(x1, n = 50), var2 = "foo",
+                              data = quick_eg1, envir = teardown_env()),
                    "Some specified variable\\(s\\) not used in model")
     expect_message(data_slice(su_m_quick_eg1,
-                              x1 = evenly(x1, n = 50), var2 = "foo"),
+                              x1 = evenly(x1, n = 50), var2 = "foo",
+                              data = quick_eg1, envir = teardown_env()),
                    "var2")
 })
 
@@ -74,8 +76,9 @@ test_that("process_slice_var returns NULL when `x` is NULL", {
 
 test_that("data_slice works for a GAM with factor by", {
     expect_silent(ds <- data_slice(su_m_factor_by,
-                                   x2 = evenly(x2),
-                                   fac = evenly(fac)))
+        x2 = evenly(x2),
+        fac = evenly(fac),
+        data = su_eg4, envir = teardown_env()))
     expect_s3_class(ds, "tbl_df")
     expect_named(ds, c("x2", "fac", "x0"))
 })
@@ -107,14 +110,16 @@ test_that("value_closest_to_median works with a factor", {
 
 # typical_values()
 test_that("typical_values works with a simple GAM", {
-    expect_silent(tv <- typical_values(su_m_quick_eg1))
+    expect_silent(tv <- typical_values(su_m_quick_eg1,
+        data = quick_eg1, envir = teardown_env()))
     expect_s3_class(tv, "tbl_df")
     expect_identical(nrow(tv), 1L)
     expect_identical(ncol(tv), 4L)
 })
 
 test_that("typical_values works when including terms", {
-    expect_silent(tv <- typical_values(su_m_quick_eg1, vars = c(x0, x2)))
+    expect_silent(tv <- typical_values(su_m_quick_eg1, vars = c(x0, x2),
+        data = quick_eg1, envir = teardown_env()))
     expect_s3_class(tv, "tbl_df")
     expect_identical(nrow(tv), 1L)
     expect_identical(ncol(tv), 2L)
@@ -122,7 +127,8 @@ test_that("typical_values works when including terms", {
 })
 
 test_that("typical_values works when excluding terms", {
-    expect_silent(tv <- typical_values(su_m_quick_eg1, vars = !c(x0, x2)))
+    expect_silent(tv <- typical_values(su_m_quick_eg1, vars = !c(x0, x2),
+        data = quick_eg1, envir = teardown_env()))
     expect_s3_class(tv, "tbl_df")
     expect_identical(nrow(tv), 1L)
     expect_identical(ncol(tv), 2L)
@@ -161,7 +167,8 @@ test_that("factor_combos works when there are no factor terms", {
 
 # data_combos()
 test_that("data_combos works with a GAM", {
-    expect_silent(dc <- data_combos(m_para_sm))
+    expect_silent(dc <- data_combos(m_para_sm,
+        envir = teardown_env(), data = df_2_fac))
     expect_s3_class(dc, "tbl_df")
     expect_identical(nrow(dc), 12L)
     expect_identical(ncol(dc), 5L)
@@ -169,7 +176,8 @@ test_that("data_combos works with a GAM", {
 })
 
 test_that("data_combos works when including terms", {
-    expect_silent(dc <- data_combos(m_para_sm, vars = c(fac, x0)))
+    expect_silent(dc <- data_combos(m_para_sm, vars = c(fac, x0),
+        data = df_2_fac, envir = teardown_env()))
     expect_s3_class(dc, "tbl_df")
     expect_identical(nrow(dc), 12L)
     expect_identical(ncol(dc), 2L)
@@ -177,7 +185,8 @@ test_that("data_combos works when including terms", {
 })
 
 test_that("data_combos works when exluding terms", {
-    expect_silent(dc <- data_combos(m_para_sm, vars = !c(fac, x0)))
+    expect_silent(dc <- data_combos(m_para_sm, vars = !c(fac, x0),
+        data = df_2_fac, envir = teardown_env()))
     expect_s3_class(dc, "tbl_df")
     expect_identical(nrow(dc), 12L)
     expect_identical(ncol(dc), 3L)
@@ -185,7 +194,8 @@ test_that("data_combos works when exluding terms", {
 })
 
 test_that("data_combos works when there are no factor terms", {
-    expect_silent(dc <- data_combos(m_gam))
+    expect_silent(dc <- data_combos(m_gam,
+        data = su_eg1, envir = teardown_env()))
     expect_identical(nrow(dc), 1L)
     expect_identical(ncol(dc), 4L)
     expect_named(dc, c("x0", "x1", "x2", "x3"))
@@ -193,14 +203,16 @@ test_that("data_combos works when there are no factor terms", {
 
 # Test data_slice with models that have an offset(s) - # 189
 test_that("data_slice with no args works with models with an offset", {
-    expect_silent(ds <- data_slice(m_1_smooth_offset))
+    expect_silent(ds <- data_slice(m_1_smooth_offset,
+        data = quick_eg1_off, envir = teardown_env()))
     expect_identical(nrow(ds), 1L)
     expect_identical(ncol(ds), 2L)
     expect_identical(ds$off, 2)
 })
 
 test_that("data_slice with works with models with an offset", {
-    expect_silent(ds <- data_slice(m_1_smooth_offset, off = 1))
+    expect_silent(ds <- data_slice(m_1_smooth_offset, off = 1,
+        data = quick_eg1_off, envir = teardown_env()))
     expect_identical(nrow(ds), 1L)
     expect_identical(ncol(ds), 2L)
     expect_identical(ds$off, 1)
@@ -228,4 +240,10 @@ test_that("data_slice works for a data frame", {
         z = evenly(z, n = 25)))
     expect_snapshot(ds, cran = FALSE)
     expect_identical(nrow(ds), 625L)
+})
+
+# make sure #222 remains fixed
+test_that("issue 222 is fixed", {
+    expect_silent(tv <- typical_values(m_logical, envir = teardown_env(),
+        data = logi_df))
 })
