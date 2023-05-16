@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.32</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.33</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,9 +55,9 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.8.1.32" id="gratia-08132">gratia 0.8.1.32<a class="anchor" aria-label="anchor" href="#gratia-08132"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.8.1.33" id="gratia-08133">gratia 0.8.1.33<a class="anchor" aria-label="anchor" href="#gratia-08133"></a></h2>
 <div class="section level3">
-<h3 id="user-visible-changes-0-8-1-32">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-8-1-32"></a></h3>
+<h3 id="user-visible-changes-0-8-1-33">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-8-1-33"></a></h3>
 <ul><li>
 <p><code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> now uses a single call to the RNG to generate draws from the posterior of smooths. Previous to version 0.9.0, <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> would do a separate call to <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code> for each smooth. As a result, the result of a call to <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> on a model with multiple smooths will now produce different results to those generated previously. To regain the old behaviour, add <code>rng_per_smooth = TRUE</code> to the <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> call.</p>
 <p>Note, however, that using per-smooth RNG calls with <code>method = "mh"</code> will be very inefficient as, with that method, posterior draws for all coefficients in the model are sampled at once. So, only use <code>rng_per_smooth = TRUE</code> with <code>method = "gaussian"</code>.</p>
@@ -69,7 +69,7 @@
 <li><p><em>gratia</em> now requires <em>dplyr</em> versions &gt;= 1.1.0 and <em>tidyselect</em> &gt;= 1.2.0.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-0-8-1-32">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-1-32"></a></h3>
+<h3 id="new-features-0-8-1-33">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-1-33"></a></h3>
 <ul><li><p><code><a href="../reference/response_derivatives.html">response_derivatives()</a></code> is a new function for computing derivatives of the response with respect to a (continuous) focal variable. First or second order derivatives can be computed using forward, backward, or central finite differences. The uncertainty in the estimated derivative is determined using posterior sampling via <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code>, and hence can be derived from a Gaussian approximation to the posterior or using a Metropolis Hastings sampler (see below.)</p></li>
 <li><p><code><a href="../reference/data_sim.html">data_sim()</a></code> can now simulate response data from gamma, Tweedie and ordered categorical distributions.</p></li>
 <li><p><code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> and <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> can now use the Metropolis Hastings sampler from <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code>, instead of a Gaussian approximation, to sample from the posterior distribution of the model or specific smooths respectively.</p></li>
@@ -101,7 +101,7 @@
 <li><p>New function <code><a href="../reference/null_deviance.html">null_deviance()</a></code> that extracts the null deviance of a fitted model.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-8-1-32">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-1-32"></a></h3>
+<h3 id="bug-fixes-0-8-1-33">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-1-33"></a></h3>
 <ul><li>
 <p><code><a href="../reference/link.html">link()</a></code>, <code><a href="../reference/link.html">inv_link()</a></code>, and related family functions for the <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">ocat()</a></code> weren’t correctly identifying the family name and as a result would throw an error even when passed an object of the correct family.</p>
 <p><code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> now work correctly for the <code><a href="https://rdrr.io/pkg/mgcv/man/Beta.html" class="external-link">betar()</a></code> family in a fitted GAM.</p>
@@ -112,6 +112,7 @@
 <li><p><code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> now works better for location, scale, shape models. Reported by <a href="https://github.com/pboesu" class="external-link">@pboesu</a> <a href="https://github.com/gavinsimpson/gratia/issues/45" class="external-link">#45</a></p></li>
 <li><p><code><a href="../reference/response_derivatives.html">response_derivatives()</a></code> was incorrectly using <code>.data</code> with <em>tidyselect</em> selectors.</p></li>
 <li><p><code><a href="../reference/typical_values.html">typical_values()</a></code> could not handle logical variables in a GAM fit as mgcv stores these as numerics in the <code>var.summary</code>. This affected <code><a href="../reference/evenly.html">evenly()</a></code> and <code><a href="../reference/data_slice.html">data_slice()</a></code>. <a href="https://github.com/gavinsimpson/gratia/issues/222" class="external-link">#222</a></p></li>
+<li><p><code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> would fail when two or more ordered factors were in the model. Reported by <a href="https://github.com/dsmi31" class="external-link">@dsmi31</a> <a href="https://github.com/gavinsimpson/gratia/issues/221" class="external-link">#221</a></p></li>
 </ul></div>
 </div>
     <div class="section level2">
