@@ -1575,11 +1575,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55a851a81350>
+<environment: 0x55b1e7981350>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55a851a81350>
+<environment: 0x55b1e7981350>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2220,7 +2220,7 @@ Levels: a b c d e
 > 
 > # response derivatives
 > y_d <- response_derivatives(m, data = ds, type = "central",
-+                             focal = "x2", eps = 0.01)
++                             focal = "x2", eps = 0.01, seed = 21)
 > 
 > # draw fitted values along x2
 > p1 <- fv |>
@@ -2656,7 +2656,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  45.36 0.4 45.704 0 0 
+Time elapsed:  34.07 0.36 34.373 0 0 
 > grDevices::dev.off()
 null device 
           1 

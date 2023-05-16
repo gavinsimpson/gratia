@@ -8,7 +8,13 @@
 \usage{
 typical_values(object, ...)
 
-\method{typical_values}{gam}(object, vars = everything(), ...)
+\method{typical_values}{gam}(
+  object,
+  vars = everything(),
+  envir = environment(formula(object)),
+  data = NULL,
+  ...
+)
 
 \method{typical_values}{data.frame}(object, vars = everything(), ...)
 }
@@ -19,6 +25,12 @@ typical_values(object, ...)
 
 \item{vars}{terms to include or exclude from the returned object. Uses
 tidyselect principles.}
+
+\item{envir}{the environment within which to recreate the data used to fit
+\code{object}.}
+
+\item{data}{an optional data frame of data used to fit the mdoel if
+reconstruction of the data from the model doesn't work.}
 }
 \description{
 Typical values of model covariates

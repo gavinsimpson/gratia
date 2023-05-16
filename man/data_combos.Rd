@@ -7,7 +7,14 @@
 \usage{
 data_combos(object, ...)
 
-\method{data_combos}{gam}(object, vars = everything(), complete = TRUE, ...)
+\method{data_combos}{gam}(
+  object,
+  vars = everything(),
+  complete = TRUE,
+  envir = environment(formula(object)),
+  data = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{a fitted model object.}
@@ -20,6 +27,12 @@ tidyselect principles.}
 \item{complete}{logical; should all combinations of factor levels be
 returned? If \code{FALSE}, only those combinations of levels observed in the
 model are retained.}
+
+\item{envir}{the environment within which to recreate the data used to fit
+\code{object}.}
+
+\item{data}{an optional data frame of data used to fit the mdoel if
+reconstruction of the data from the model doesn't work.}
 }
 \description{
 All combinations of factor levels plus typical values of continuous variables

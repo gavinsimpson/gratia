@@ -1,4 +1,4 @@
-# gratia 0.8.1.31
+# gratia 0.8.1.32
 
 ## User visible changes
 
@@ -170,6 +170,10 @@
 
 * `response_derivatives()` was incorrectly using `.data` with *tidyselect*
   selectors.
+
+* `typical_values()` could not handle logical variables in a GAM fit as mgcv
+  stores these as numerics in the `var.summary`. This affected `evenly()` and
+  `data_slice()`. #222
 
 # gratia 0.8.1
 

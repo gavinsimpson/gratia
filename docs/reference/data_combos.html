@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.31</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.32</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,14 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">data_combos</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for gam</span></span>
-<span><span class="fu">data_combos</span><span class="op">(</span><span class="va">object</span>, vars <span class="op">=</span> <span class="fu">everything</span><span class="op">(</span><span class="op">)</span>, complete <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">data_combos</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  vars <span class="op">=</span> <span class="fu">everything</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  complete <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -86,6 +93,16 @@ tidyselect principles.</p></dd>
 <dd><p>logical; should all combinations of factor levels be
 returned? If <code>FALSE</code>, only those combinations of levels observed in the
 model are retained.</p></dd>
+
+
+<dt>envir</dt>
+<dd><p>the environment within which to recreate the data used to fit
+<code>object</code>.</p></dd>
+
+
+<dt>data</dt>
+<dd><p>an optional data frame of data used to fit the mdoel if
+reconstruction of the data from the model doesn't work.</p></dd>
 
 </dl></div>
 

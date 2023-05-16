@@ -103,7 +103,8 @@ test_that("add_confint works for smooth_estimates", {
 })
 
 test_that("add_confint.default fails is no est and se", {
-    expect_error(add_confint(typical_values(m_gam)),
+    expect_error(add_confint(typical_values(m_gam,
+    data = su_eg1, envir = teardown_env())),
                  "'object' does not contain one or both of 'est' or 'se'.")
 })
 

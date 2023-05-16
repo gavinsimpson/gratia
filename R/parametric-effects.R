@@ -70,7 +70,7 @@
     }
 
     # data combinations to get all parametric terms inc factor level combos
-    tbl <- data_combos(object, complete = FALSE)
+    tbl <- data_combos(object, complete = FALSE, envir = envir, data = data)
     # predict model contributions for the parametric terms, using only
     # the factor combos in the data and typical values of all other terms
     # and exclude the effects of smooths as they don't change anything in
