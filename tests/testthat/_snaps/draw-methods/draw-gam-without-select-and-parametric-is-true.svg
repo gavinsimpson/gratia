@@ -337,7 +337,7 @@
 <text x='378.79' y='549.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>fac</text>
 <text transform='translate(263.03,426.69) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='280.81' y='318.88' style='font-size: 13.20px; font-family: sans;' textLength='17.61px' lengthAdjust='spacingAndGlyphs'>fac</text>
-<text x='476.77' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='62.60px' lengthAdjust='spacingAndGlyphs'>Parametric term</text>
+<text x='476.77' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='24.94px' lengthAdjust='spacingAndGlyphs'>Factor</text>
 <text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='286.15px' lengthAdjust='spacingAndGlyphs'>draw gam without select and parametric is TRUE</text>
 </g>
 </svg>

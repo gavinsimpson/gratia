@@ -221,7 +221,7 @@
 <text x='615.14' y='275.53' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='20.80px' lengthAdjust='spacingAndGlyphs'>x1.1</text>
 <text transform='translate(486.33,148.98) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='521.24' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='24.96px' lengthAdjust='spacingAndGlyphs'>x1.1</text>
-<text x='709.04' y='289.35' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='62.60px' lengthAdjust='spacingAndGlyphs'>Parametric term</text>
+<text x='709.04' y='289.35' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='32.77px' lengthAdjust='spacingAndGlyphs'>Numeric</text>
 </g>
 <defs>
   <clipPath id='cpNS40OHwyMzYuOTN8Mjk2LjY1fDU3MC41Mg=='>
@@ -284,7 +284,7 @@
 <text x='137.55' y='549.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='11.62px' lengthAdjust='spacingAndGlyphs'>x3</text>
 <text transform='translate(18.53,422.85) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='43.65' y='311.22' style='font-size: 13.20px; font-family: sans;' textLength='13.95px' lengthAdjust='spacingAndGlyphs'>x3</text>
-<text x='231.45' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='62.60px' lengthAdjust='spacingAndGlyphs'>Parametric term</text>
+<text x='231.45' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='32.77px' lengthAdjust='spacingAndGlyphs'>Numeric</text>
 </g>
 <defs>
   <clipPath id='cpMjM2LjkzfDQ3My4yOHwyOTYuNjV8NTcwLjUy'>
@@ -332,7 +332,7 @@
 <text x='373.90' y='549.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='11.62px' lengthAdjust='spacingAndGlyphs'>x4</text>
 <text transform='translate(249.98,422.85) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='280.00' y='311.22' style='font-size: 13.20px; font-family: sans;' textLength='13.95px' lengthAdjust='spacingAndGlyphs'>x4</text>
-<text x='467.80' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='62.60px' lengthAdjust='spacingAndGlyphs'>Parametric term</text>
+<text x='467.80' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='24.94px' lengthAdjust='spacingAndGlyphs'>Factor</text>
 <text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='198.85px' lengthAdjust='spacingAndGlyphs'>ziplss with both parametric plotted</text>
 </g>
 </svg>
