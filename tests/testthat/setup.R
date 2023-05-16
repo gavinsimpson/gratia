@@ -16,6 +16,7 @@ library("nlme")
 
 ## Fit models
 quick_eg1 <- data_sim("eg1", n = 200, seed = 1)
+quick_eg1_off <- quick_eg1 |> mutate(off = 2)
 su_eg1 <- data_sim("eg1", n = 1000,  dist = "normal", scale = 2, seed = 1)
 su_eg2 <- data_sim("eg2", n = 2000, dist = "normal", scale = 0.5, seed = 42)
 su_eg3 <- data_sim("eg3", n = 400, seed = 32)
@@ -141,7 +142,7 @@ su_gamm_univar_4 <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3),
 m_1_smooth <- gam(y ~ s(x0), data = quick_eg1, method = "REML")
 
 m_1_smooth_offset <- gam(y ~ s(x0) + offset(log(off)),
-  data = quick_eg1 |> mutate(off = 2), method = "REML")
+  data = quick_eg1_off, method = "REML")
 
 m_gam <- su_m_univar_4
 
@@ -346,3 +347,11 @@ cens_df$y_cens <- with(cens_df, cbind(y, censored))
 
 m_censor <- bam(y_cens ~ s(x0) + s(x1) + s(x2) + s(x3), data = cens_df,
   family = cnorm(), method = "fREML")
+
+# examples for logical variables - examples if from mgcViz::pterms
+logi_df <- data_sim("eg1", n = 600, dist = "normal", scale = 20, seed = 3) |>
+    mutate(fac = as.factor(sample(c("A1", "A2", "A3"), 600, replace = TRUE)),
+           logi = as.logical(sample(c(TRUE, FALSE), 600, replace = TRUE)))
+m_logical <- gam(y ~ x0 + x1 + I(x1^2) + s(x2, bs = "cr", k = 12) + fac +
+                   x3:fac + I(x1*x2) + logi,
+                 data = logi_df)
