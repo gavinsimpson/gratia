@@ -48,6 +48,8 @@
 #'   needed to fit the model. If `NULL`, the default, the data used to fit the
 #'   model will be recovered using `model.frame`. User-supplied expressions
 #'   passed in `...` will be evaluated in `data`.
+#' @param envir the environment within which to recreate the data used to fit
+#'   `object`.
 #'
 #' @export
 #' @rdname data_slice
@@ -75,8 +77,10 @@
 #' # or provide an expression (function call) which will be evaluated in the
 #' # data frame passed to `data` or `model.frame(object)`
 #' ds <- data_slice(m1, x2 = evenly(x2, n = 50), x1 = mean(x1))
-`data_slice.gam` <- function(object, ..., data = NULL) {
+`data_slice.gam` <- function(object, ..., data = NULL,
+                             envir = environment(formula(object))) {
     # prep data
+    odata <- data
     data <- data_slice_data(object, data = data)
 
     # deal with ...
@@ -96,7 +100,7 @@
     # typical values, only needed ones that aren't
     need_tv <- setdiff(vars, names(slice_vars))
     if (length(need_tv) > 0L) {
-        tv <- typical_values(object)
+        tv <- typical_values(object, data = odata, envir = envir)
         slice_vars <- append(slice_vars, tv[need_tv])
     }
 
@@ -283,10 +287,17 @@
 #' @rdname typical_values
 #' @param vars terms to include or exclude from the returned object. Uses
 #'   tidyselect principles.
+#' @param envir the environment within which to recreate the data used to fit
+#'   `object`.
+#' @param data an optional data frame of data used to fit the mdoel if
+#'   reconstruction of the data from the model doesn't work.
+#' 
 #' @export
 #' @importFrom rlang enquo
 #' @importFrom tidyselect eval_select
-`typical_values.gam` <- function(object, vars = everything(), ...) {
+#' @importFrom stats model.frame formula
+`typical_values.gam` <- function(object, vars = everything(),
+    envir = environment(formula(object)), data = NULL, ...) {
     # extract the summary from the fitted GAM
     # summ is a named list
     summ <- object[["var.summary"]]
@@ -299,6 +310,28 @@
     # for numeric variables summ is a vector with 3 elements, we want element 2
     # which contains the value of the observation closest to the median
     # probably need to handle matrix covariates here separately from numerics
+    # logical values get stored as numeric in the summary
+    # dc <- data_class(summ) # mgcv doesn't store logicals as logicals
+    # so we need to extract the data classes ourselves
+    # try to recover the data
+    mf <- model.frame(object)
+    if (is.null(data)) {
+        data <- eval(object$call$data, envir)
+    }
+    if (is.null(data)) {
+        data <- mf
+    }
+    data <- data[names(summ)] # take only vars mgcv thinks we need
+    dc <- data_class(data)
+
+    # if any logicals extract them as per numeric (2nd value) and convert to
+    # logical. do this before extracting the numerics
+    is_log <- dc == "logical"
+    if (any(is_log)) {
+        summ[is_log] <- lapply(summ[is_log], \(x) as.logical(x[2]))
+    }
+
+    # now process the numerics
     dc <- data_class(summ)
     i <-  dc == "numeric" & lengths(summ) == 3L
     summ[i] <- lapply(summ[i], `[`, 2)
@@ -382,12 +415,19 @@
     UseMethod("data_combos")
 }
 
+#' @param envir the environment within which to recreate the data used to fit
+#'   `object`.
+#' @param data an optional data frame of data used to fit the mdoel if
+#'   reconstruction of the data from the model doesn't work.
+#'
 #' @inheritParams factor_combos
 #' @export
 #' @rdname data_combos
 `data_combos.gam` <- function(object, vars = everything(),
-                              complete = TRUE, ...) {
-    tv <- typical_values(object)
+                              complete = TRUE,
+                              envir = environment(formula(object)),
+                              data = NULL, ...) {
+    tv <- typical_values(object, envir = envir, data = data)
     is_fac <- vapply(tv, is.factor, logical(1L))
     if (any(is_fac)) { # drop factor from typical values
         tv <- tv[, !is_fac]
