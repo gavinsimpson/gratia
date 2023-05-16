@@ -1,4 +1,4 @@
-# gratia 0.8.1.32
+# gratia 0.8.1.33
 
 ## User visible changes
 
@@ -174,6 +174,9 @@
 * `typical_values()` could not handle logical variables in a GAM fit as mgcv
   stores these as numerics in the `var.summary`. This affected `evenly()` and
   `data_slice()`. #222
+
+* `parametric_effects()` would fail when two or more ordered factors were in
+  the model. Reported by @dsmi31 #221
 
 # gratia 0.8.1
 

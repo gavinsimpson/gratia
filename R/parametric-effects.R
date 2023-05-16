@@ -110,14 +110,21 @@
           distinct(.data$level, .keep_all = TRUE)
         nr <- nrow(out)
         is_fac <- is.factor(out$level)
+        type <- "factor"
         if (!is_fac) {
-            out <- out %>%
-              rename("value" = "level")
+            type <- class(out$level) # numeric but I presume logical too
+            out <- out |>
+                rename("value" = "level")
+        } else {
+            if (is.ordered(out$level)) {
+                type <- "ordered"
+            }
+            out <- out |>
+            mutate(level = as.character(.data$level))
         }
-        out <- out %>%
+        out <- out |>
           add_column(term = rep(term, times = nr),
-                     type = rep(if_else(is_fac, "factor", "numeric"),
-                                        times = nr),
+                     type = rep(type, times = nr),
                      .before = 1L) %>%
           nest(data = any_of(c("level", "value", "partial", "se")))
         out
@@ -127,7 +134,7 @@
         vars = vars)
 
     if (unnest) {
-        effects <- unnest(effects, cols = "data") %>%
+        effects <- unnest(effects, cols = "data") |>
           relocate(c("partial", "se"), .after = last_col())
     }
 
@@ -245,7 +252,8 @@ draw.parametric_effects <- function(object,
                                      angle = NULL,
                                      ...) {
     # plot
-    is_fac <- unique(object[["type"]]) == "factor"
+    type <- unique(object[["type"]])
+    is_fac <- type %in% c("ordered", "factor")
     x_val <- if_else(is_fac, "level", "value")
     term_label <- unique(object[["term"]])
 
@@ -293,7 +301,14 @@ draw.parametric_effects <- function(object,
         title <- term_label
     }
     if (is.null(caption)) {
-        caption <- paste("Parametric term")
+        # caption <- paste("Parametric term")
+        caption <- case_match(type,
+            "ordered" ~ "Ordered factor",
+            "factor" ~ "Factor",
+            "numeric" ~ "Numeric",
+            "logical" ~ "Logical",
+            .default = "Parametric term",
+            .ptype = character())
     }
 
     ## add labelling to plot
