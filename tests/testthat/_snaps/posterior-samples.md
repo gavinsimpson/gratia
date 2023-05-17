@@ -24,18 +24,18 @@
       sm
     Output
       # A tibble: 500 x 8
-         smooth term  type  by_variable   row  draw  value     x0
-         <chr>  <chr> <chr> <chr>       <int> <int>  <dbl>  <dbl>
-       1 s(x0)  s(x0) TPRS  <NA>            1     1 -1.20  0.0131
-       2 s(x0)  s(x0) TPRS  <NA>            1     2 -1.89  0.0131
-       3 s(x0)  s(x0) TPRS  <NA>            1     3 -1.46  0.0131
-       4 s(x0)  s(x0) TPRS  <NA>            1     4 -1.28  0.0131
-       5 s(x0)  s(x0) TPRS  <NA>            1     5 -0.319 0.0131
-       6 s(x0)  s(x0) TPRS  <NA>            2     1 -1.16  0.0230
-       7 s(x0)  s(x0) TPRS  <NA>            2     2 -1.86  0.0230
-       8 s(x0)  s(x0) TPRS  <NA>            2     3 -1.48  0.0230
-       9 s(x0)  s(x0) TPRS  <NA>            2     4 -1.25  0.0230
-      10 s(x0)  s(x0) TPRS  <NA>            2     5 -0.346 0.0230
+         smooth term  type  by_variable   row  draw  value      x0
+         <chr>  <chr> <chr> <chr>       <int> <int>  <dbl>   <dbl>
+       1 s(x0)  s(x0) TPRS  <NA>            1     1 -0.812 0.00162
+       2 s(x0)  s(x0) TPRS  <NA>            1     2 -2.33  0.00162
+       3 s(x0)  s(x0) TPRS  <NA>            1     3 -1.91  0.00162
+       4 s(x0)  s(x0) TPRS  <NA>            1     4 -1.72  0.00162
+       5 s(x0)  s(x0) TPRS  <NA>            1     5 -2.05  0.00162
+       6 s(x0)  s(x0) TPRS  <NA>            2     1 -0.812 0.0117 
+       7 s(x0)  s(x0) TPRS  <NA>            2     2 -2.21  0.0117 
+       8 s(x0)  s(x0) TPRS  <NA>            2     3 -1.82  0.0117 
+       9 s(x0)  s(x0) TPRS  <NA>            2     4 -1.64  0.0117 
+      10 s(x0)  s(x0) TPRS  <NA>            2     5 -1.91  0.0117 
       # i 490 more rows
 
 # smooth_samples works for a simple GAM multi rng calls
@@ -44,18 +44,18 @@
       sm
     Output
       # A tibble: 500 x 8
-         smooth term  type  by_variable   row  draw value     x0
-         <chr>  <chr> <chr> <chr>       <int> <int> <dbl>  <dbl>
-       1 s(x0)  s(x0) TPRS  <NA>            1     1 -1.36 0.0131
-       2 s(x0)  s(x0) TPRS  <NA>            1     2 -1.17 0.0131
-       3 s(x0)  s(x0) TPRS  <NA>            1     3 -3.29 0.0131
-       4 s(x0)  s(x0) TPRS  <NA>            1     4 -3.10 0.0131
-       5 s(x0)  s(x0) TPRS  <NA>            1     5 -2.00 0.0131
-       6 s(x0)  s(x0) TPRS  <NA>            2     1 -1.28 0.0230
-       7 s(x0)  s(x0) TPRS  <NA>            2     2 -1.18 0.0230
-       8 s(x0)  s(x0) TPRS  <NA>            2     3 -3.16 0.0230
-       9 s(x0)  s(x0) TPRS  <NA>            2     4 -2.98 0.0230
-      10 s(x0)  s(x0) TPRS  <NA>            2     5 -1.91 0.0230
+         smooth term  type  by_variable   row  draw value      x0
+         <chr>  <chr> <chr> <chr>       <int> <int> <dbl>   <dbl>
+       1 s(x0)  s(x0) TPRS  <NA>            1     1 -1.73 0.00162
+       2 s(x0)  s(x0) TPRS  <NA>            1     2 -2.34 0.00162
+       3 s(x0)  s(x0) TPRS  <NA>            1     3 -1.93 0.00162
+       4 s(x0)  s(x0) TPRS  <NA>            1     4 -2.28 0.00162
+       5 s(x0)  s(x0) TPRS  <NA>            1     5 -2.11 0.00162
+       6 s(x0)  s(x0) TPRS  <NA>            2     1 -1.65 0.0117 
+       7 s(x0)  s(x0) TPRS  <NA>            2     2 -2.21 0.0117 
+       8 s(x0)  s(x0) TPRS  <NA>            2     3 -1.90 0.0117 
+       9 s(x0)  s(x0) TPRS  <NA>            2     4 -2.20 0.0117 
+      10 s(x0)  s(x0) TPRS  <NA>            2     5 -1.98 0.0117 
       # i 490 more rows
 
 # fitted_samples example output doesn't change

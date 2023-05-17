@@ -121,7 +121,7 @@ test_that("fitted_samples works for a simple GAM", {
     expect_s3_class(sm, c("fitted_samples", "tbl_df",
                           "tbl", "data.frame"))
     ## 1000 == 5 * 200 (nrow(dat))
-    expect_identical(NROW(sm), 1000L)
+    expect_identical(NROW(sm), 1500L)
     expect_identical(NCOL(sm), 3L) # 3 cols
     expect_named(sm, expected = c("row", "draw", "fitted"))
 })
@@ -161,7 +161,7 @@ test_that("predicted_samples works for a simple GAM", {
     expect_s3_class(sm, c("predicted_samples", "tbl_df",
                           "tbl", "data.frame"))
     ## 2000 == 5 * 100 (nrow(dat))
-    expect_identical(NROW(sm), 1000L)
+    expect_identical(NROW(sm), 1500L)
     expect_identical(NCOL(sm), 3L) # 3 cols
     expect_named(sm, expected = c("row", "draw", "response"))
 })
@@ -221,7 +221,7 @@ test_that("posterior_samples works for a simple GAM", {
     expect_s3_class(sm, c("posterior_samples", "tbl_df",
         "tbl", "data.frame"))
     ## 1000 == 5 * 200 (nrow(dat))
-    expect_identical(NROW(sm), 1000L)
+    expect_identical(NROW(sm), 1500L)
     expect_identical(NCOL(sm), 3L) # 3 cols
     expect_named(sm, expected = c("row", "draw", "response"))
 })
