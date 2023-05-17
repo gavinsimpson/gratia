@@ -88,7 +88,7 @@ test_that("issue 212 remains fixed", {
     expect_s3_class(peff, class = c("parametric_effects", "tbl_df", "tbl",
                                     "data.frame"))
     expect_identical(ncol(peff), 6L)
-    expect_identical(nrow(peff), 802L)
+    expect_identical(nrow(peff), 1202L)
     expect_named(peff, c("term", "type", "level", "value", "partial", "se"))
 
     plt <- draw(peff, rug = FALSE)
