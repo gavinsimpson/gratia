@@ -1,9 +1,9 @@
-## Test fitted-values()
+## Test compare_smooths()
 
 ## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
+# library("testthat")
+# library("gratia")
+# library("mgcv")
 
 # uses
 # * su_m_quick_eg1, and
@@ -33,7 +33,7 @@ test_that("draw.compare_smooths() can plot a comparison of smooths", {
     expect_doppelganger("compare smooths - set nrow ncol", plt)
 
     expect_silent(plt <- draw(cs) & theme(legend.position = "bottom"))
-    expect_doppelganger("compare smooths - bottom legened", plt)
+    expect_doppelganger("compare smooths - bottom legend", plt)
 })
 
 test_that("compare_smooths() works when a model is not a simple object", {

@@ -78,7 +78,7 @@ test_that("issue 212 remains fixed", {
     skip_on_cran()
     # issue #212 is about weird model terms
     data_212 <- quick_eg1 |>
-        mutate(fac = factor(rep(c("a", "b"), c(150, 50))))
+        mutate(fac = factor(rep(c("a", "b"), c(200, 100))))
     m_212 <- gam(y ~ fac + poly(x0, 2, raw = TRUE) +
         poly(x1, 2, raw = TRUE) +
         poly(x2, 2, raw = TRUE) +

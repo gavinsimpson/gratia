@@ -15,7 +15,8 @@ library("nlme")
 }
 
 ## Fit models
-quick_eg1 <- data_sim("eg1", n = 200, seed = 1)
+n_quick <- 300
+quick_eg1 <- data_sim("eg1", n = n_quick, seed = 21)
 quick_eg1_off <- quick_eg1 |> mutate(off = 2)
 su_eg1 <- data_sim("eg1", n = 1000,  dist = "normal", scale = 2, seed = 1)
 su_eg2 <- data_sim("eg2", n = 2000, dist = "normal", scale = 0.5, seed = 42)
@@ -184,7 +185,7 @@ m_tw    <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
 #-- A standard GAM with a simple random effect ---------------------------------
 su_re <- quick_eg1
 set.seed(42)
-su_re$fac <- as.factor(sample(seq_len(10), 200, replace = TRUE))
+su_re$fac <- as.factor(sample(seq_len(10), n_quick, replace = TRUE))
 su_re$X <- model.matrix(~ fac - 1, data = su_re)
 su_re <- transform(su_re, y = y + X %*% rnorm(10) * 0.5)
 rm1 <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) + s(x3),
@@ -193,7 +194,7 @@ rm1 <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) + s(x3),
 #-- A factor by GAM with random effects ----------------------------------------
 su_re2 <- su_eg4
 set.seed(42)
-su_re2$ranef <- as.factor(sample(1:20, 400, replace = TRUE))
+su_re2$ranef <- as.factor(sample(1:20, nrow(su_eg4), replace = TRUE))
 su_re2$X <- model.matrix(~ ranef - 1, data = su_re2)
 su_re2 <- transform(su_re2, y = y + X %*% rnorm(20) * 0.5)
 rm2 <- gam(y ~ fac + s(ranef, bs = "re", by = fac) + s(x0) + s(x1) + s(x2),
@@ -304,7 +305,7 @@ m_scam_micv <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "micv"), data = dat)
 # Ordered categorical model ocat()
 n_categories <- 4
 su_eg1_ocat <- data_sim("eg1", n = 200, dist = "ordered categorical",
-  n_cat = n_categories)
+  n_cat = n_categories, seed = 42)
 m_ocat <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   family = ocat(R = n_categories), data = su_eg1_ocat, method = "REML")
 

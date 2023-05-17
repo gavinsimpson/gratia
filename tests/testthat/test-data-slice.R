@@ -35,7 +35,7 @@ test_that("process_slice_data works when passed a 1-row data frame, tibble, or l
 
 test_that("process_slice_data fails when passed a data frame with > 1 rows", {
     expect_error(process_slice_data(quick_eg1),
-                 "'data' should have 1 row only. Supplied <200>",
+                 "'data' should have 1 row only. Supplied <300>",
                  fixed = TRUE)
 })
 
