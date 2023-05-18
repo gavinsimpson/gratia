@@ -6,16 +6,16 @@
       # A tibble: 500 x 8
          smooth term     type  by_variable   row  draw    value       x2
          <chr>  <chr>    <chr> <chr>       <int> <int>    <dbl>    <dbl>
-       1 s(x2)  s(x2):x1 TPRS  <NA>            1     1  0.153   0.000206
-       2 s(x2)  s(x2):x1 TPRS  <NA>            1     2 -0.453   0.000206
-       3 s(x2)  s(x2):x1 TPRS  <NA>            1     3  0.0733  0.000206
-       4 s(x2)  s(x2):x1 TPRS  <NA>            1     4 -0.144   0.000206
-       5 s(x2)  s(x2):x1 TPRS  <NA>            1     5  0.00382 0.000206
-       6 s(x2)  s(x2):x1 TPRS  <NA>            2     1  0.236   0.0103  
-       7 s(x2)  s(x2):x1 TPRS  <NA>            2     2 -0.209   0.0103  
-       8 s(x2)  s(x2):x1 TPRS  <NA>            2     3  0.222   0.0103  
-       9 s(x2)  s(x2):x1 TPRS  <NA>            2     4  0.0197  0.0103  
-      10 s(x2)  s(x2):x1 TPRS  <NA>            2     5  0.143   0.0103  
+       1 s(x2)  s(x2):x1 TPRS  <NA>            1     1  0.323   0.000206
+       2 s(x2)  s(x2):x1 TPRS  <NA>            1     2 -0.955   0.000206
+       3 s(x2)  s(x2):x1 TPRS  <NA>            1     3  0.154   0.000206
+       4 s(x2)  s(x2):x1 TPRS  <NA>            1     4 -0.305   0.000206
+       5 s(x2)  s(x2):x1 TPRS  <NA>            1     5  0.00806 0.000206
+       6 s(x2)  s(x2):x1 TPRS  <NA>            2     1  0.497   0.0103  
+       7 s(x2)  s(x2):x1 TPRS  <NA>            2     2 -0.441   0.0103  
+       8 s(x2)  s(x2):x1 TPRS  <NA>            2     3  0.468   0.0103  
+       9 s(x2)  s(x2):x1 TPRS  <NA>            2     4  0.0415  0.0103  
+      10 s(x2)  s(x2):x1 TPRS  <NA>            2     5  0.302   0.0103  
       # i 490 more rows
 
 # smooth_samples works for a simple GAM

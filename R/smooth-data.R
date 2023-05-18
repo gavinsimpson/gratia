@@ -136,7 +136,9 @@
             newlist <- append(newlist, newfac)
         } else {
             ## continuous by var; set to median among observed values?
-            newby <- setNames(list(median(mf[[by_var]]), na.rm = TRUE), by_var)
+            ## newby <- setNames(list(median(mf[[by_var]]), na.rm = TRUE), by_var)
+            ## no, should be set to 1
+            newby <- setNames(list(1L), by_var)
             newlist <- append(newlist, newby)
         }
     }
