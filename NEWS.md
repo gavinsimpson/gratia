@@ -1,4 +1,4 @@
-# gratia 0.8.1.33
+# gratia 0.8.1.34
 
 ## User visible changes
 
@@ -177,6 +177,9 @@
 
 * `parametric_effects()` would fail when two or more ordered factors were in
   the model. Reported by @dsmi31 #221
+
+* Continuous by smooths were being evaluated with the median value of the `by`
+  variable instead of a value of 1. #224
 
 # gratia 0.8.1
 
