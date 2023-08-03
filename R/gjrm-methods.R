@@ -142,7 +142,7 @@
 # object is the gamlss object
 # model is the name "gamX" with X and integer 1:9
 `modify_gamlss_gam` <- function(object, model, i) {
-    # exract the GAM
+    # extract the GAM
     gam_obj <- object[[model]]
 
     # modify the GAM
