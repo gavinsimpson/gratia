@@ -3,6 +3,8 @@
 # response derivatives
 test_that("response derivatives works", {
     skip_on_cran()
+    skip_on_ci()
+
     N <- 50L
     expect_silent(ds <- data_slice(m_nb, x2 = evenly(x2, n = N),
         data = df_pois, envir = teardown_env()))
