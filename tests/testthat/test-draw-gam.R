@@ -70,6 +70,8 @@ test_that("draw.gam works for rm2", {
 })
 
 test_that("draw.gam works for dlnm_m", {
+    skip_on_os("mac") # numerical issueson GH
+
     expect_silent(plt <- draw(dlnm_m, rug = FALSE))
     expect_doppelganger("draw_gam dlnm_m", plt)
 })
