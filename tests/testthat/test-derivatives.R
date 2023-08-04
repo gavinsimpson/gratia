@@ -386,8 +386,8 @@ test_that("derivatives() works for factor by smooths issue 47", {
     expect_silent(d <- derivatives(m))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
-    expect_named(d, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(d, c("smooth", "var", "by_var", "fs_var", "fac", "data",
+                      "derivative", "se", "crit", "lower", "upper"))
     plt <- draw(d)
     expect_doppelganger("draw issue 47 derivatives for complex factor by", plt)
 
@@ -397,17 +397,18 @@ test_that("derivatives() works for factor by smooths issue 47", {
     expect_silent(d <- derivatives(m))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
-    expect_named(d, c("smooth","var","by_var","fs_var","ofac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(d, c("smooth", "var", "by_var", "fs_var", "ofac", "data",
+                      "derivative", "se", "crit", "lower", "upper"))
     plt <- draw(d)
     expect_doppelganger("draw issue 47 derivs for ordered factor by", plt)
 
+    skip_on_covr()
     m <- gamm(y ~ x1 + s(x2) + fac + s(x0, by = fac), data = su_eg4)
     expect_silent(d <- derivatives(m))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
-    expect_named(d, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(d, c("smooth", "var", "by_var", "fs_var", "fac", "data",
+                      "derivative", "se", "crit", "lower", "upper"))
     plt <- draw(d)
     expect_doppelganger("draw issue 47 derivatives for gamm factor by", plt)
 })
