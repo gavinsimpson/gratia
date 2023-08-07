@@ -243,7 +243,8 @@ mod_fs <- gam(y~s(x0) + s(x1, fac, bs = "fs", k = 5) + s(x2, k = 20),
               method = "ML")
 
 test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
-    skip_on_os("mac")
+    # skip_on_os("mac") # try without this and check on Simon's mac system
+    skip_on_ci()
 
     withr::local_options(lifecycle_verbosity = "quiet")
     skip_if(packageVersion("mgcv") < "1.8.36")

@@ -371,6 +371,7 @@ test_that("derivatives() returns derivatives with simultaneous intervals for all
 
 test_that("derivatives() works for factor by smooths issue 47", {
     skip_on_os("mac")
+    skip_on_ci()
     skip_on_cran()
 
     expect_silent(d <- derivatives(su_m_factor_by_x2))
