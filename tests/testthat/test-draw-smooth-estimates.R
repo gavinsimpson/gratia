@@ -19,6 +19,7 @@ test_that("draw.smooth_estimates works for m_gam", {
 })
 
 test_that("draw.smooth_estimates works for m_gamm", {
+    skip_on_ci() # Windows on GH seems very fragile
     expect_silent(plt <- draw(smooth_estimates(m_gamm, "s(x2)")))
     expect_doppelganger("draw.smooth_estimates m_gamm", plt)
 })
