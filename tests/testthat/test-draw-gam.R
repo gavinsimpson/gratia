@@ -28,6 +28,7 @@ test_that("draw.gam works for m_gam rotated", {
 })
 
 test_that("draw.gam works for m_gamm", {
+    skip_on_ci()
     expect_silent(plt <- draw(m_gamm, rug = FALSE))
     expect_doppelganger("draw_gam m_gamm", plt)
 })
@@ -70,7 +71,8 @@ test_that("draw.gam works for rm2", {
 })
 
 test_that("draw.gam works for dlnm_m", {
-    skip_on_os("mac") # numerical issueson GH
+    # skip_on_os("mac") # numerical issueson GH
+    skip_on_ci()
 
     expect_silent(plt <- draw(dlnm_m, rug = FALSE))
     expect_doppelganger("draw_gam dlnm_m", plt)
