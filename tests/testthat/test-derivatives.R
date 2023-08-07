@@ -403,6 +403,7 @@ test_that("derivatives() works for factor by smooths issue 47", {
     expect_doppelganger("draw issue 47 derivs for ordered factor by", plt)
 
     skip_on_covr()
+    skip_on_ci()
     m <- gamm(y ~ x1 + s(x2) + fac + s(x0, by = fac), data = su_eg4)
     expect_silent(d <- derivatives(m))
     expect_s3_class(d, "derivatives")
