@@ -1,10 +1,5 @@
 ## Test fitted-values()
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-
 test_that("fitted_values() works for a GAM", {
     expect_silent(fv <- fitted_values(m_gam))
 

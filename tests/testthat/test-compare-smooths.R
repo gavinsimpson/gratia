@@ -1,10 +1,5 @@
 ## Test compare_smooths()
 
-## load packages
-# library("testthat")
-# library("gratia")
-# library("mgcv")
-
 # uses
 # * su_m_quick_eg1, and
 # * su_m_quick_eg1_shrink

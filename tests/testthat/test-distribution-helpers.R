@@ -1,10 +1,5 @@
 # Test rootograms() and related residuals functions
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-
 test_that("nb_theta works a nb() model", {
     expect_silent(theta <- nb_theta(m_nb))
 })

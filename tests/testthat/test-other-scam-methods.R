@@ -1,8 +1,5 @@
 ## Test other scam methods
 
-## load packages
-library("testthat")
-
 test_that("vcov.scam works", {
     V <- vcov(sw)
     expect_identical(dim(V), c(5L, 5L))

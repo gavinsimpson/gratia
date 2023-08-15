@@ -1,9 +1,5 @@
 # Test lp_matrix() & methods
 
-# load packages
-library("testthat")
-library("gratia")
-
 test_that("lp_matrix works for a GAM", {
     skip_on_ci()
 

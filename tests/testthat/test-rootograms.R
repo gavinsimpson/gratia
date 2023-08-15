@@ -1,10 +1,5 @@
 ## Test rootograms() and related residuals functions
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-
 test_that("rootogram works for a continuous Gaussian response", {
     skip_on_cran()
     expect_silent(rg <- rootogram(m_gam))

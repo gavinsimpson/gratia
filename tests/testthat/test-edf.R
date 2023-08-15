@@ -1,10 +1,5 @@
 ## Test edf()
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-
 test_that("edf() works as expected", {
     expect_silent(edfs <- edf(m_gam))
     expect_s3_class(edfs, c("tbl_df", "tbl", "data.frame"))

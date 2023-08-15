@@ -7,6 +7,7 @@ library("scam")
 library("dplyr")
 library("tibble")
 library("nlme")
+library("ggplot2")
 
 ## Need a local wrapper to allow conditional use of vdiffr
 `expect_doppelganger` <- function(title, fig, ...) {
@@ -158,7 +159,7 @@ m_gamgcv <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
 m_gamm4  <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1,
   REML = TRUE)
 m_gamm4_real <- m_gamm4
-  class(m_gamm4_real) <- append("gamm4", class(m_gamm4_real[-1L]))
+class(m_gamm4_real) <- append("gamm4", class(m_gamm4_real[-1L]))
 
 m_gaulss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1), data = su_eg1,
                 family = gaulss)
@@ -184,19 +185,19 @@ m_tw    <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
 
 #-- A standard GAM with a simple random effect ---------------------------------
 su_re <- quick_eg1
-set.seed(42)
-su_re$fac <- as.factor(sample(seq_len(10), n_quick, replace = TRUE))
+su_re$fac <- withr::with_seed(42,
+  as.factor(sample(seq_len(10), n_quick, replace = TRUE)))
 su_re$X <- model.matrix(~ fac - 1, data = su_re)
-su_re <- transform(su_re, y = y + X %*% rnorm(10) * 0.5)
+su_re <- withr::with_seed(42, transform(su_re, y = y + X %*% rnorm(10) * 0.5))
 rm1 <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) + s(x3),
            data = su_re, method = "ML")
 
 #-- A factor by GAM with random effects ----------------------------------------
 su_re2 <- su_eg4
-set.seed(42)
-su_re2$ranef <- as.factor(sample(1:20, nrow(su_eg4), replace = TRUE))
+su_re2$ranef <- withr::with_seed(42,
+  as.factor(sample(1:20, nrow(su_eg4), replace = TRUE)))
 su_re2$X <- model.matrix(~ ranef - 1, data = su_re2)
-su_re2 <- transform(su_re2, y = y + X %*% rnorm(20) * 0.5)
+su_re2 <- withr::with_seed(42, transform(su_re2, y = y + X %*% rnorm(20) * 0.5))
 rm2 <- gam(y ~ fac + s(ranef, bs = "re", by = fac) + s(x0) + s(x1) + s(x2),
            data = su_re2, method = "ML")
 
@@ -217,25 +218,27 @@ dlnm_m <- gam(y ~ te(f_lag, lag), data = su_dlnm,
 #-- An AR(1) example using bam() with factor by --------------------------------
 # from ?magic
 ## simulate truth
-set.seed(1)
+#set.seed(1)
 n <- 400
 sig <- 2
-x <- 0:(n-1)/(n-1)
-## produce scaled covariance matrix for AR1 errors...
-rho <- 0.6
-V <- corMatrix(Initialize(corAR1(rho), data.frame(x = x)))
-Cv <- chol(V)  # t(Cv) %*% Cv=V
-## Simulate AR1 errors ...
-e1 <- t(Cv) %*% rnorm(n, 0, sig) # so cov(e) = V * sig^2
-e2 <- t(Cv) %*% rnorm(n, 0, sig) # so cov(e) = V * sig^2
-## Observe truth + AR1 errors
-f1 <- 0.2*x^11*(10*(1-x))^6+10*(10*x)^3*(1-x)^10
-f2 <- (1280 * x^4) * (1- x)^4
-df <- data.frame(x = rep(x, 2), f = c(f1, f2), y = c(f1 + e1, f2 + e2),
-                 series = as.factor(rep(c("A", "B"), each = n)))
+df <- withr::with_seed(1, {
+  x <- 0:(n - 1) / (n - 1)
+  ## produce scaled covariance matrix for AR1 errors...
+  rho <- 0.6
+  V <- corMatrix(Initialize(corAR1(rho), data.frame(x = x)))
+  Cv <- chol(V)  # t(Cv) %*% Cv=V
+  ## Simulate AR1 errors ...
+  e1 <- t(Cv) %*% rnorm(n, 0, sig) # so cov(e) = V * sig^2
+  e2 <- t(Cv) %*% rnorm(n, 0, sig) # so cov(e) = V * sig^2
+  ## Observe truth + AR1 errors
+  f1 <- 0.2 * x^11 * (10 * (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^10
+  f2 <- (1280 * x^4) * (1 - x)^4
+  data.frame(x = rep(x, 2), f = c(f1, f2), y = c(f1 + e1, f2 + e2),
+    series = as.factor(rep(c("A", "B"), each = n)))
+})
 #rm(x, f1, f2, e1, e2, V, Cv)
-AR.start <- rep(FALSE, n*2)
-AR.start[c(1, n+1)] <- TRUE
+AR.start <- rep(FALSE, n * 2)
+AR.start[c(1, n + 1)] <- TRUE
 ## fit GAM using `bam()` with known correlation
 ## first just to a single series
 m_ar1 <- bam(y ~ s(x, k = 20), data = df[seq_len(n), ], rho = rho,
@@ -245,10 +248,10 @@ m_ar1_by <- bam(y ~ series + s(x, k = 20, by = series), data = df, rho = rho,
                 AR.start = AR.start)
 
 # A standard GAM with multiple factors
-set.seed(1)
-df_2_fac <- add_column(su_eg4,
-                       ff = factor(sample(LETTERS[1:4], nrow(su_eg4),
-                                                replace = TRUE)))
+# set.seed(1)
+df_2_fac <- withr::with_seed(1,
+  add_column(su_eg4, ff = factor(sample(LETTERS[1:4],
+    nrow(su_eg4), replace = TRUE))))
 # a GAM with multiple factor parametric terms
 m_2_fac <- gam(y ~ fac * ff + s(x0) + s(x1) + s(x2),
                data = df_2_fac, method = "REML")

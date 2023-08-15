@@ -1,10 +1,5 @@
 ## Test bam() with AR(1) models
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-
 # models created in setup.R
 #  * m_ar1 simple model with single time series with rho = 0.6
 #  * m_ar1_by factor by model with two series, rho = 0.6, n = 400 in each

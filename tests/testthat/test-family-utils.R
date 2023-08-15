@@ -1,11 +1,5 @@
 ## Test family and link utilities
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-library("gamm4")
-
 val <- 1
 l <- list(mer = 1:3, gam = 1:3)
 

@@ -1,9 +1,5 @@
 # Test overview() & methods
 
-# load packages
-library("testthat")
-library("gratia")
-
 test_that("overview works for a GAM", {
     expect_silent(ovr <- overview(m_gam))
     expect_s3_class(ovr, "tbl_df")

@@ -1,12 +1,6 @@
 # Test draw.smooth_estimates()
 # A lot of the current tests for this are over in test-draw-methods.R
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-library("ggplot2")
-
 test_that("draw.smooth_estimates works for m_1_smooth", {
     skip_on_cran()
     expect_silent(plt <- draw(smooth_estimates(m_1_smooth, "s(x0)")))

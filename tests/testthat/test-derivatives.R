@@ -1,10 +1,4 @@
-## Test confint() methods
-
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-library("ggplot2")
+## Test derivatives functions
 
 test_that("derivatives fails for an unknown object", {
     df <- data.frame(a = 1:10, b = 1:10)
@@ -417,7 +411,7 @@ test_that("derivatives() works for factor by smooths issue 47", {
 
 test_that("derivatives() works for fs smooths issue 57", {
     skip_on_cran()
-    set.seed(1)
+    # set.seed(1)
     logistic.growth <- function(t, y0, K, r) {
         return(K * (y0 / (y0 + (K - y0) * exp(-r * t))))
     }
@@ -425,13 +419,14 @@ test_that("derivatives() works for fs smooths issue 57", {
     n <- 12
     y0 <- 0.5
     r  <- 0.25
-    K  <- rnorm(N, mean=5, sd=1)
+    K  <- withr::with_seed(1, rnorm(N, mean = 5, sd = 1))
     d <- data.frame(unit = factor(rep(seq_len(N), each = n)),
                     t = rep(seq(0, 20, length = n), N))
     d <- transform(d, y = logistic.growth(t, y0, K[unit], r))
     S  <- 0.25
     d <- transform(d, y.obs = y + rnorm(nrow(d), sd = S))
-    m <- gam(y.obs ~ s(t, unit, k=5, bs="fs", m=2), data=d, method="REML")
+    m <- gam(y.obs ~ s(t, unit, k = 5, bs = "fs", m = 2), data = d,
+        method = "REML")
     
     expect_silent(d <- derivatives(m))
     expect_s3_class(d, "derivatives")
@@ -460,11 +455,12 @@ Instead, use the data argument `data`.\n")
     expect_s3_class(d_pw, "derivatives")
     expect_s3_class(d_pw, "tbl_df")
     expect_identical(nrow(d_pw), as.integer(N * 3L))
-    set.seed(15)
-    expect_silent(d_sim <- derivatives(su_m_factor_by,
-                                       data = newd,
-                                       term = smooths(su_m_factor_by)[1:3],
-                                       interval = "simultaneous"))
+    # set.seed(15)
+    expect_silent(d_sim <- withr::with_seed(15,
+        derivatives(su_m_factor_by,
+            data = newd,
+            term = smooths(su_m_factor_by)[1:3],
+            interval = "simultaneous")))
     expect_s3_class(d_pw, "derivatives")
     expect_s3_class(d_pw, "tbl_df")
     expect_identical(nrow(d_pw), as.integer(N * 3L))

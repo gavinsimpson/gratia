@@ -1,10 +1,5 @@
 ## Test subsetting methods `[`
 
-## load packages
-library("testthat")
-library("mgcv")
-library("gratia")
-
 test_that("subsetting works for smooth_samples", {
     sm <- smooth_samples(m_gam, seed = 42)
     hsm <- head(sm)

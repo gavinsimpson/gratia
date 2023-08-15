@@ -1,11 +1,5 @@
 ## Test partial_residuals() and related residuals functions
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-library("gamm4")
-
 N <- 400L
 df <- data_sim("eg1", n = N, seed = 42)
 ## fit the model

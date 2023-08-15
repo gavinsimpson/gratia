@@ -1,10 +1,5 @@
 ## Test effects()
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-
 test_that("fixef() works for a simple GAM", {
     expect_silent(fe <- fixef(m_gam))
 

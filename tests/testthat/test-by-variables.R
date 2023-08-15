@@ -1,11 +1,5 @@
 ## Test handling `by` variables in smooths/GAMs
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-library("ggplot2")
-
 test_that("draw() works with continuous by", {
     plt <- draw(su_m_cont_by)
     expect_doppelganger("continuous by-variable smmoth", plt)
@@ -17,6 +11,7 @@ test_that("draw() works with continuous by and fixed scales", {
 })
 
 test_that("evaluate_smooth() works with continuous by", {
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     sm  <- evaluate_smooth(su_m_cont_by, "s(x2)")
     expect_s3_class(sm, "evaluated_1d_smooth")

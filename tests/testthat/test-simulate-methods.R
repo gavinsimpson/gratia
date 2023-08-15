@@ -1,11 +1,5 @@
 ## Test simulate() methods
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-library("scam")
-
 data(smallAges)
 smallAges$Error[1] <- 1.1
 sw <- scam(Date ~ s(Depth, k = 5, bs = "mpd"), data = smallAges,
@@ -75,11 +69,13 @@ test_that("simulate() works with out a seed", {
 test_that("simulate() fails if we don't have an rd function", {
     skip_on_cran()
     ## Example from ?twlss
-    set.seed(3)
+    # set.seed(3)
     n <- 400
     ## Simulate data...
-    dat <- gamSim(1, n = n, dist = "poisson", scale = 0.2, verbose = FALSE)
-    dat <- transform(dat, y = rTweedie(exp(f), p = 1.3, phi = 0.5)) ## Tweedie y
+    dat <- data_sim("eg1", n = n, dist = "poisson", scale = 0.2, seed = 3)
+    dat <- withr::with_seed(3, {
+        transform(dat, y = rTweedie(exp(f), p = 1.3, phi = 0.5)) ## Tweedie y
+    })
 
     ## Fit a fixed p Tweedie, with wrong link ...
     m <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3),
