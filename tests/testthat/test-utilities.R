@@ -1,12 +1,5 @@
 ## Test Utilties
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-library("gamm4")
-# library("MASS")
-
 test_that("smooth_terms() methods work", {
     st <- smooth_terms(m_gam)
     expect_type(st, "list")

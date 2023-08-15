@@ -1,10 +1,5 @@
 # Test evaluate_parametric_terms
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-
 data(gss_vocab, package = "gratia")
 
 m <- gam(vocab ~ nativeBorn * ageGroup, data = gss_vocab, method = 'ML')
@@ -30,24 +25,30 @@ test_that("evaluate_parametric_terms() works with factor terms", {
 })
 
 
-set.seed(0)
+# set.seed(0)
 ## fake some data...
-f1 <- function(x) {exp(2 * x)}
-f2 <- function(x) {
-    0.2*x^11*(10*(1-x))^6+10*(10*x)^3*(1-x)^10
-}
-f3 <- function(x) {x*0}
+df <- withr::with_seed(0, {
+    f1 <- function(x) {
+        exp(2 * x)
+    }
+    f2 <- function(x) {
+        0.2 * x^11 * (10 * (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^10
+    }
+    f3 <- function(x) {
+        x * 0
+    }
 
-n <- 200
-sig2 <- 4
-x0 <- rep(1:4,50)
-x1 <- runif(n, 0, 1)
-x2 <- runif(n, 0, 1)
-x3 <- runif(n, 0, 1)
-e <- rnorm(n, 0, sqrt(sig2))
-y <- 2*x0 + f1(x1) + f2(x2) + f3(x3) + e
-df <- data.frame(x0 = x0, x1 = x1, x2 = x2, x3 = x3, y = y,
-                 fx0 = factor(x0))
+    n <- 200
+    sig2 <- 4
+    x0 <- rep(1:4, 50)
+    x1 <- runif(n, 0, 1)
+    x2 <- runif(n, 0, 1)
+    x3 <- runif(n, 0, 1)
+    e <- rnorm(n, 0, sqrt(sig2))
+    y <- 2 * x0 + f1(x1) + f2(x2) + f3(x3) + e
+    data.frame(x0 = x0, x1 = x1, x2 = x2, x3 = x3, y = y,
+        fx0 = factor(x0))
+})
 
 ## fit
 mod <- gam(y ~ x0 + s(x1) + s(x2) + s(x3), data = df)

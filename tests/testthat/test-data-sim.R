@@ -1,9 +1,5 @@
 ## Test basis() and related functions
 
-## load packages
-library("testthat")
-library("gratia")
-
 data(ref_sims, package = "gratia")
 
 new_sims <- create_reference_simulations()

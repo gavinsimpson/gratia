@@ -1,6 +1,4 @@
 # uses su_eg2 & su_m_bivar_te
-## load packages
-library("testthat")
 
 # partial derivatives
 test_that("partial derivatives works with single data point", {

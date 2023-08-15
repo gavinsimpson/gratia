@@ -1,6 +1,7 @@
 ## Test draw() methods
 
 test_that("draw.evaluated_1d_smooth() plots the smooth", {
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     sm <- evaluate_smooth(su_m_univar_4, "s(x2)")
     plt <- draw(sm)
@@ -78,6 +79,7 @@ test_that("draw.gam works with select and parametric", {
 test_that("draw.evaluated_2d_smooth() plots the smooth", {
     skip_on_os("mac")
     skip_on_os("win") # failing for trivial diffs in contours
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     expect_silent(sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100))
     expect_silent(plt <- draw(sm))
@@ -88,6 +90,7 @@ test_that("draw.evaluated_2d_smooth() plots the smooth", {
 
 test_that("draw.evaluated_2d_smooth() plots the smooth without contours", {
     skip_on_os("mac")
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100)
     plt <- draw(sm, contour = FALSE)
@@ -97,6 +100,7 @@ test_that("draw.evaluated_2d_smooth() plots the smooth without contours", {
 test_that("draw.evaluated_2d_smooth() plots the smooth with different contour bins", {
     skip_on_os("mac")
     skip_on_os("windows")
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100)
     plt <- draw(sm, n_contour = 5)
@@ -106,6 +110,7 @@ test_that("draw.evaluated_2d_smooth() plots the smooth with different contour bi
 test_that("draw.evaluated_2d_smooth() plots the SE", {
     skip_on_os("mac")
     skip_on_os("windows")
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100)
     plt <- draw(sm, show = "se")
@@ -131,6 +136,7 @@ test_that("draw.gam() can draw partial residuals", {
 test_that("draw.gam() plots an AM with a single 2d smooth", {
     skip_on_os("mac")
     skip_on_os("windows")
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     plt <- draw(su_m_bivar, n = 50, rug = FALSE)
     expect_doppelganger("draw AM with 2d smooth", plt)
@@ -163,6 +169,7 @@ test_that("draw() works with continuous by and fixed scales", {
 })
 
 test_that("draw() works with random effect smooths (bs = 're')", {
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     ## simulate example... from ?mgcv::random.effects
     ## data are in su_re
@@ -185,6 +192,7 @@ test_that("draw() works with random effect smooths (bs = 're')", {
 
 test_that("draw() with random effect smooths (bs = 're') & factor by variable ",
 {
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     # simulate example...
     # data are in su_re2
@@ -220,32 +228,35 @@ test_that("draw() can handle non-standard names -- a function call as a name", {
 })
 
 ## simulate example... from ?mgcv::factor.smooth.interaction
-set.seed(0)
+# set.seed(0)
 ## simulate data...
-f0 <- function(x) 2 * sin(pi * x)
-f1 <- function(x, a=2, b=-1) exp(a * x)+b
-f2 <- function(x) 0.2 * x^11 * (10 * (1 - x))^6 + 10 *
-                      (10 * x)^3 * (1 - x)^10
-n <- 500
-nf <- 10
-fac <- sample(1:nf, n, replace=TRUE)
-x0 <- runif(n)
-x1 <- runif(n)
-x2 <- runif(n)
-a <- rnorm(nf) * .2 + 2;
-b <- rnorm(nf) * .5
-f <- f0(x0) + f1(x1, a[fac], b[fac]) + f2(x2)
-fac <- factor(fac)
-y <- f + rnorm(n) * 2
+df <- withr::with_seed(0, {
+    f0 <- function(x) 2 * sin(pi * x)
+    f1 <- function(x, a = 2, b = -1) exp(a * x) + b
+    f2 <- function(x) 0.2 * x^11 * (10 * (1 - x))^6 + 10 *
+        (10 * x)^3 * (1 - x)^10
+    n <- 500
+    nf <- 10
+    fac <- sample(1:nf, n, replace = TRUE)
+    x0 <- runif(n)
+    x1 <- runif(n)
+    x2 <- runif(n)
+    a <- rnorm(nf) * .2 + 2
+    b <- rnorm(nf) * .5
+    f <- f0(x0) + f1(x1, a[fac], b[fac]) + f2(x2)
+    fac <- factor(fac)
+    y <- f + rnorm(n) * 2
 
-df <- data.frame(y = y, x0 = x0, x1 = x1, x2 = x2, fac = fac)
+    data.frame(y = y, x0 = x0, x1 = x1, x2 = x2, fac = fac)
+})
 mod_fs <- gam(y~s(x0) + s(x1, fac, bs = "fs", k = 5) + s(x2, k = 20),
-              method = "ML")
+              data = df, method = "ML")
 
 test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
     # skip_on_os("mac") # try without this and check on Simon's mac system
     skip_on_ci()
 
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     skip_if(packageVersion("mgcv") < "1.8.36")
     sm <- evaluate_smooth(mod_fs, "s(x1,fac)")
@@ -262,23 +273,29 @@ test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
 })
 
 test_that("draw() works with parametric terms", {
-    set.seed(0)
+    # set.seed(0)
     ## fake some data...
-    f1 <- function(x) {exp(2 * x)}
-    f2 <- function(x) {
-        0.2*x^11*(10*(1-x))^6+10*(10*x)^3*(1-x)^10
-    }
-    f3 <- function(x) {x*0}
+    df <- withr::with_seed(0, {
+        f1 <- function(x) {
+            exp(2 * x)
+        }
+        f2 <- function(x) {
+            0.2 * x^11 * (10 * (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^10
+        }
+        f3 <- function(x) {
+            x * 0
+        }
 
-    n <- 200
-    sig2 <- 4
-    x0 <- rep(1:4,50)
-    x1 <- runif(n, 0, 1)
-    x2 <- runif(n, 0, 1)
-    x3 <- runif(n, 0, 1)
-    e <- rnorm(n, 0, sqrt(sig2))
-    y <- 2*x0 + f1(x1) + f2(x2) + f3(x3) + e
-    df <- data.frame(x0 = x0, x1 = x1, x2 = x2, x3 = x3, y = y)
+        n <- 200
+        sig2 <- 4
+        x0 <- rep(1:4, 50)
+        x1 <- runif(n, 0, 1)
+        x2 <- runif(n, 0, 1)
+        x3 <- runif(n, 0, 1)
+        e <- rnorm(n, 0, sqrt(sig2))
+        y <- 2 * x0 + f1(x1) + f2(x2) + f3(x3) + e
+        data.frame(x0 = x0, x1 = x1, x2 = x2, x3 = x3, y = y)
+    })
 
     ## fit
     mod <- gam(y ~ x0 + s(x1) + s(x2) + s(x3), data = df)
@@ -424,22 +441,24 @@ test_that("draw() works with a ziplss models; issue #45", {
     f2 <- function(x) 0.2 * x^11 * (10 * (1 - x))^6 + 10 * 
                           (10 * x)^3 * (1 - x)^10
     n <- 500
-    set.seed(5)
-    x0 <- runif(n)
-    x1 <- runif(n)
-    x2 <- runif(n)
-    x3 <- runif(n)
+    #set.seed(5)
+    df <- withr::with_seed(0, {
+        x0 <- runif(n)
+        x1 <- runif(n)
+        x2 <- runif(n)
+        x3 <- runif(n)
 
-    ## Simulate probability of potential presence...
-    eta1 <- f0(x0) + f1(x1) - 3
-    p <- binomial()$linkinv(eta1) 
-    y <- as.numeric(runif(n) < p) ## 1 for presence, 0 for absence
+        ## Simulate probability of potential presence...
+        eta1 <- f0(x0) + f1(x1) - 3
+        p <- binomial()$linkinv(eta1)
+        y <- as.numeric(runif(n) < p) ## 1 for presence, 0 for absence
 
-    ## Simulate y given potentially present (not exactly model fitted!)...
-    ind <- y > 0
-    eta2 <- f2(x2[ind])/3
-    y[ind] <- rpois(exp(eta2), exp(eta2))
-    df <- data.frame(y, x0, x1, x2, x3)
+        ## Simulate y given potentially present (not exactly model fitted!)...
+        ind <- y > 0
+        eta2 <- f2(x2[ind]) / 3
+        y[ind] <- rpois(exp(eta2), exp(eta2))
+        data.frame(y, x0, x1, x2, x3)
+    })
     b1 <- gam(list(y ~ s(x2) + x3,
                    ~ s(x0) + x1), family = ziplss(), data = df)
     plt <- draw(b1, rug = FALSE)
@@ -507,15 +526,15 @@ test_that("draw works for sample_smooths objects with n_samples", {
     skip_on_ci() # minor statistical differences
 
     sm1 <- smooth_samples(su_m_univar_4, n = 5, seed = 23478, n_vals = 50)
-    plt <- draw(sm1, alpha = 0.7, n_samples = 3, rug = FALSE)
+    plt <- draw(sm1, alpha = 0.7, n_samples = 3, rug = FALSE, seed = 1)
     expect_doppelganger("draw smooth_samples for m1 n_samples", plt)
 
     sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478, n_vals = 50)
-    plt <- draw(sm2, alpha = 0.7, n_samples = 2, rug = FALSE)
+    plt <- draw(sm2, alpha = 0.7, n_samples = 2, rug = FALSE, seed = 14)
     expect_doppelganger("draw smooth_samples for m2 n_samples", plt)
 
     sm3 <- smooth_samples(su_m_factor_by, n = 5, seed = 23478, n_vals = 50)
-    plt <- draw(sm3, alpha = 0.7, n_samples = 3, rug = FALSE)
+    plt <- draw(sm3, alpha = 0.7, n_samples = 3, rug = FALSE, seed = 19)
     expect_doppelganger("draw smooth_samples for GAM n_samples", plt)
 })
 
@@ -561,7 +580,7 @@ test_that("draw.gam can take user specified scales", {
 
     skip_if(packageVersion("mgcv") < "1.8.36")
     plt <- draw(mod_fs, rug = FALSE,
-                discrete_colour = scale_colour_viridis_d(option = "plasma"))
+                discrete_colour = ggplot2::scale_colour_viridis_d(option = "plasma"))
     expect_doppelganger("draw fs smooth with discrete plasma palette",
                                  plt)
 })

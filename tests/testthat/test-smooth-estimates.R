@@ -1,10 +1,5 @@
 # Test draw() methods
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-
 dat <- data_sim("eg1", n = 400, seed = 1)
 m1 <- gam(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'ps') + s(x3, bs = 'bs'),
           data = dat, method = "REML")
@@ -37,9 +32,9 @@ sim_fs <- function(n = 500, nf = 10) {
     df <- data.frame(y = y, x0 = x0, x1 = x1, x2 = x2, fac = fac)
     df
 }
-set.seed(0)
-dat_fs <- sim_fs()
-m_fs <- gam(y ~ s(x1, fac, bs="fs", k=5), method = "ML", data = dat_fs)
+# set.seed(0)
+dat_fs <- withr::with_seed(0, sim_fs())
+m_fs <- gam(y ~ s(x1, fac, bs = "fs", k = 5), method = "ML", data = dat_fs)
 
 test_that("smooth_estimates works for a GAM", {
     sm <- smooth_estimates(m1, "s(x2)")

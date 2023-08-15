@@ -1,10 +1,5 @@
 ## Test posterior sampling functions
 
-## load packages
-# library("testthat")
-# library("mgcv")
-# library("gratia")
-
 test_that("smooth_samples works for a continuous by GAM", {
     expect_silent(sm <- smooth_samples(su_m_cont_by, n = 5, n_vals = 100,
                                        seed = 42))
@@ -245,11 +240,14 @@ test_that("posterior sampling funs work with offsets in formula issue 233", {
     skip_on_cran()
     skip_on_ci()
 
-    set.seed(123)
+    # set.seed(123)
     n  <- 100
-    df <- data.frame(y = rnbinom(n = n, size = 0.9, prob = 0.3),
-        x = rnorm(n = n, mean = 123, sd = 66),
-        denom = round(rnorm(n = n, mean = 1000, sd = 1)))
+    df <- withr::with_seed(123, {
+        data.frame(y = rnbinom(n = n, size = 0.9, prob = 0.3),
+            x = rnorm(n = n, mean = 123, sd = 66),
+            denom = round(rnorm(n = n, mean = 1000, sd = 1)))
+    })
+    
     mod <- gam(y ~ 1 + offset(log(denom)),
         data = df, family = "nb")
 

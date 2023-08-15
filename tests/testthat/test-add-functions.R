@@ -1,10 +1,5 @@
 ## Test basis() and related functions
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-
 ## take only some columns
 data <- su_eg1[, c("y", "x0", "x1", "x2", "x3")]
 ## fit the model

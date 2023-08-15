@@ -1,23 +1,12 @@
 ## Test qq_plot() methods
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-
-## Need a local wrapper to allow conditional use of vdiffr
-`expect_doppelganger` <- function(title, fig, ...) {
-  testthat::skip_if_not_installed("vdiffr")
-  vdiffr::expect_doppelganger(title, fig, ...)
-}
-
 ## simulate binomial data...
-set.seed(0)
+# set.seed(0)
 n.samp <- 200
 dat <- data_sim("eg1", n = n.samp, dist = "binary", scale = .33, seed = 0)
 p <- binomial()$linkinv(dat$f)               # binomial p
-n <- sample(c(1, 3), n.samp, replace = TRUE) # binomial n
-dat <- transform(dat, y = rbinom(n, n, p), n = n)
+n  <- withr::with_seed(0, sample(c(1, 3), n.samp, replace = TRUE)) # binomial n
+dat  <- withr::with_seed(0, transform(dat, y = rbinom(n, n, p), n = n))
 m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
          family = binomial, data = dat, weights = n,
          method = "REML")
@@ -27,55 +16,54 @@ methods <- c("uniform", "simulate", "normal")
 
 test_that("qq_plot() uniform method works", {
     skip_if(packageVersion("mgcv") < "1.8.36")
-    set.seed(42)
-    plt <- qq_plot(m)      # randomisation of uniform quantiles
+    plt <- withr::with_seed(42, qq_plot(m)) # randomisation of uniform quantiles
     expect_doppelganger("qq_plot uniform randomisation", plt)
 })
 
 test_that("qq_plot() uniform method works with response residuals", {
     skip_if(packageVersion("mgcv") < "1.8.36")
-    set.seed(42)
-    plt <- qq_plot(m, type = "response")
+    plt <- withr::with_seed(42, qq_plot(m, type = "response"))
     expect_doppelganger("qq_plot uniform randomisation response residuals", plt)
 })
 
 test_that("qq_plot() uniform method works with pearson residuals", {
     skip_if(packageVersion("mgcv") < "1.8.36")
-    set.seed(42)
-    plt <- qq_plot(m, type = "pearson")
+    plt <- withr::with_seed(42, qq_plot(m, type = "pearson"))
     expect_doppelganger("qq_plot uniform randomisation pearson residuals", plt)
 })
 
 test_that("qq_plot() normal method works", {
-    plt <- qq_plot(m, method = "normal") # normality assumption
+    # normality assumption
+    plt <- withr::with_seed(42, qq_plot(m, method = "normal"))
     expect_doppelganger("qq_plot normality assumption", plt)
 })
 
 test_that("qq_plot() normal method works", {
-    plt <- qq_plot(m, method = "normal", type = "response")
+    plt <- withr::with_seed(42, qq_plot(m, method = "normal",
+        type = "response"))
     expect_doppelganger("qq_plot normality assumption response residuals", plt)
 })
 
 test_that("qq_plot() normal method works", {
-    plt <- qq_plot(m, method = "normal", type = "pearson")
+    plt <- withr::with_seed(42, qq_plot(m, method = "normal", type = "pearson"))
     expect_doppelganger("qq_plot normality assumption pearson residuals", plt)
 })
 
 test_that("qq_plot() simulate method works", {
-    set.seed(42)
-    plt <- qq_plot(m, method = "simulate") # simulate data to get quantiles
+    # simulate data to get quantiles
+    plt <- withr::with_seed(42, qq_plot(m, method = "simulate"))
     expect_doppelganger("qq_plot data simulation", plt)
 })
 
 test_that("qq_plot() simulate method works", {
-    set.seed(42)
-    plt <- qq_plot(m, method = "simulate", type = "response")
+    plt <- withr::with_seed(42, qq_plot(m, method = "simulate",
+        type = "response"))
     expect_doppelganger("qq_plot data simulation response residuals", plt)
 })
 
 test_that("qq_plot() simulate method works", {
-    set.seed(42)
-    plt <- qq_plot(m, method = "simulate", type = "pearson")
+    plt <- withr::with_seed(42, qq_plot(m, method = "simulate",
+        type = "pearson"))
     expect_doppelganger("qq_plot data simulation pearson residuals", plt)
 })
 

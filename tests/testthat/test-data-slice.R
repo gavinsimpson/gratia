@@ -1,10 +1,5 @@
 # Test data_slice() methods
 
-# load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-
 test_that("data_slice works for a GAM", {
     expect_silent(ds <- data_slice(su_m_quick_eg1,
         x1 = evenly(x1, n = 50),

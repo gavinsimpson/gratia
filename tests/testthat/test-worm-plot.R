@@ -1,25 +1,13 @@
 ## Test worm_plot() methods
 
-## load packages
-library("testthat")
-library("gratia")
-library("mgcv")
-## library("ggplot2")
-
-## Need a local wrapper to allow conditional use of vdiffr
-`expect_doppelganger` <- function(title, fig, ...) {
-  testthat::skip_if_not_installed("vdiffr")
-  vdiffr::expect_doppelganger(title, fig, ...)
-}
-
 ## simulate binomial data...
-set.seed(0)
+# set.seed(0)
 n.samp <- 200
 dat <- data_sim("eg1", n = n.samp, dist = "binary",
                 scale = .33, seed = 0)
 p <- binomial()$linkinv(dat$f)               # binomial p
-n <- sample(c(1, 3), n.samp, replace = TRUE) # binomial n
-dat <- transform(dat, y = rbinom(n, n, p), n = n)
+n  <- withr::with_seed(0, sample(c(1, 3), n.samp, replace = TRUE)) # binomial n
+dat  <- withr::with_seed(0, transform(dat, y = rbinom(n, n, p), n = n))
 m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
          family = binomial, data = dat, weights = n,
          method = "REML")
@@ -27,48 +15,57 @@ m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
 types <- c("deviance", "response", "pearson")
 methods <- c("uniform", "simulate", "normal")
 
+# uniform randomisation of uniform quantiles
 test_that("worm_plot() uniform method works", {
-    plt <- worm_plot(m)      # uniform randomisation of uniform quantiles
+    plt <- withr::with_seed(42, worm_plot(m))
     expect_doppelganger("worm_plot uniform randomisation", plt)
 })
 
 test_that("worm_plot() uniform method works with response residuals", {
-    plt <- worm_plot(m, type = "response")
-    expect_doppelganger("worm_plot uniform randomisation response residuals", plt)
+    plt <- withr::with_seed(42, worm_plot(m, type = "response"))
+    expect_doppelganger("worm_plot uniform randomisation response residuals",
+        plt)
 })
 
 test_that("worm_plot() uniform method works with pearson residuals", {
-    plt <- worm_plot(m, type = "pearson")
-    expect_doppelganger("worm_plot uniform randomisation pearson residuals", plt)
+    plt <- withr::with_seed(42, worm_plot(m, type = "pearson"))
+    expect_doppelganger("worm_plot uniform randomisation pearson residuals",
+        plt)
 })
 
+# normality assumption
 test_that("worm_plot() normal method works", {
-    plt <- worm_plot(m, method = "normal") # normality assumption
+    plt <- worm_plot(m, method = "normal")
     expect_doppelganger("worm_plot normality assumption", plt)
 })
 
 test_that("worm_plot() normal method works", {
     plt <- worm_plot(m, method = "normal", type = "response")
-    expect_doppelganger("worm_plot normality assumption response residuals", plt)
+    expect_doppelganger("worm_plot normality assumption response residuals",
+        plt)
 })
 
 test_that("worm_plot() normal method works", {
     plt <- worm_plot(m, method = "normal", type = "pearson")
-    expect_doppelganger("worm_plot normality assumption pearson residuals", plt)
+    expect_doppelganger("worm_plot normality assumption pearson residuals",
+        plt)
 })
 
+# simulate data to get quantiles
 test_that("worm_plot() simulate method works", {
-    plt <- worm_plot(m, method = "simulate") # simulate data to get quantiles
+    plt <- withr::with_seed(42, worm_plot(m, method = "simulate"))
     expect_doppelganger("worm_plot data simulation", plt)
 })
 
 test_that("worm_plot() simulate method works", {
-    plt <- worm_plot(m, method = "simulate", type = "response")
+    plt <- withr::with_seed(42, worm_plot(m, method = "simulate",
+        type = "response"))
     expect_doppelganger("worm_plot data simulation response residuals", plt)
 })
 
 test_that("worm_plot() simulate method works", {
-    plt <- worm_plot(m, method = "simulate", type = "pearson")
+    plt <- withr::with_seed(42, worm_plot(m, method = "simulate",
+        type = "pearson"))
     expect_doppelganger("worm_plot data simulation pearson residuals", plt)
 })
 

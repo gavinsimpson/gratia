@@ -1,11 +1,8 @@
 ## Test confint() methods
 
-## load packages
-library("testthat")
-library("gratia")
-
 ## first derivatives of all smooths...
 test_that("Point-wise confidence interval for a first derivatives of a GAM works", {
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     fd <- fderiv(m_gam)
     ci <- confint(fd, type = "confidence")
@@ -19,16 +16,18 @@ test_that("Point-wise confidence interval for a first derivatives of a GAM works
 })
 
 test_that("Simultaneous interval for a first derivatives of a GAM works", {
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     fd <- fderiv(m_gam)
-    set.seed(42)
-    ci <- confint(fd, parm = "x1", type = "simultaneous", nsim = 1000)
+    ci <- withr::with_seed(42,
+        confint(fd, parm = "x1", type = "simultaneous", nsim = 1000))
     expect_s3_class(ci, "confint.fderiv")
     expect_s3_class(ci, "data.frame")
     expect_named(ci, expected = c("term", "lower", "est", "upper"))
 })
 
 test_that("Point-wise confidence interval for a GAM works", {
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     ci <- confint(m_gam, parm = "s(x1)", type = "confidence")
     expect_s3_class(ci, "confint.gam")
@@ -38,9 +37,10 @@ test_that("Point-wise confidence interval for a GAM works", {
 })
 
 test_that("Simultaneous interval for a GAM works", {
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
-    set.seed(42)
-    ci <- confint(m_gam, parm = "s(x1)", type = "simultaneous", nsim = 100)
+    ci <- withr::with_seed(42,
+        confint(m_gam, parm = "s(x1)", type = "simultaneous", nsim = 100))
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "tbl_df")
     expect_named(ci, expected = c("smooth", "type", "by", "x1", "est", "se",
@@ -49,6 +49,7 @@ test_that("Simultaneous interval for a GAM works", {
 
 ## 2d smooth
 test_that("Point-wise confidence interval for a 2d smooth works", {
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     ci <- confint(su_m_bivar_te, parm = "te(x,z)", type = "confidence")
     expect_s3_class(ci, "confint.gam")
@@ -58,10 +59,11 @@ test_that("Point-wise confidence interval for a 2d smooth works", {
 })
 
 test_that("Simultaneous interval for a 2d smooth works", {
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
-    set.seed(42)
-    ci <- confint(su_m_bivar_te, parm = "te(x,z)", type = "simultaneous",
-                  nsim = 100)
+    ci <- withr::with_seed(42,
+        confint(su_m_bivar_te, parm = "te(x,z)", type = "simultaneous",
+            nsim = 100))
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "tbl_df")
     expect_named(ci, expected = c("smooth", "type", "by", "x", "z", "est",
@@ -70,6 +72,7 @@ test_that("Simultaneous interval for a 2d smooth works", {
 
 test_that("Point-wise confidence interval for a GAMM works", {
     withr::local_options(lifecycle_verbosity = "quiet")
+    skip_if_not_installed("withr")
     ci <- confint(m_gamm, parm = "s(x1)", type = "confidence")
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "tbl_df")
@@ -78,9 +81,10 @@ test_that("Point-wise confidence interval for a GAMM works", {
 })
 
 test_that("Simultaneous interval for a GAMM works", {
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
-    set.seed(42)
-    ci <- confint(m_gamm, parm = "s(x1)", type = "simultaneous", nsim = 100)
+    ci <- withr::with_seed(42,
+        confint(m_gamm, parm = "s(x1)", type = "simultaneous", nsim = 100))
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "tbl_df")
     expect_named(ci, expected = c("smooth", "type", "by", "x1", "est", "se",
@@ -89,6 +93,7 @@ test_that("Simultaneous interval for a GAMM works", {
 
 ## confint methods for by variables
 test_that("Point-wise confidence interval for a GAM with factor by variable works", {
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     ci <- confint(su_m_factor_by_x2, parm = "s(x2)", type = "confidence",
                   partial_match = TRUE)
@@ -101,6 +106,7 @@ test_that("Point-wise confidence interval for a GAM with factor by variable work
 })
 
 test_that("Simultaneous confidence interval for a GAM with factor by variable works", {
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     ci <- confint(su_m_factor_by_x2, parm = "s(x2)", type = "simultaneous",
                   partial_match = TRUE)
@@ -114,6 +120,7 @@ test_that("Simultaneous confidence interval for a GAM with factor by variable wo
 
 ## Part of #80
 test_that("Point-wise confidence interval for a GAM with selected factor by variable works", {
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     ci <- confint(su_m_factor_by_x2, parm = "s(x2):fac1", type = "confidence")
     expect_s3_class(ci, "confint.gam")
@@ -123,6 +130,7 @@ test_that("Point-wise confidence interval for a GAM with selected factor by vari
 })
 
 test_that("Point-wise confidence interval for a GAMM works", {
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     ci <- confint(m_gamm4, parm = "s(x1)", type = "confidence")
     expect_s3_class(ci, "confint.gam")
@@ -132,9 +140,10 @@ test_that("Point-wise confidence interval for a GAMM works", {
 })
 
 test_that("Simultaneous interval for a GAMM works", {
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
-    set.seed(42)
-    ci <- confint(m_gamm4, parm = "s(x1)", type = "simultaneous", nsim = 100)
+    ci <- withr::with_seed(42,
+        confint(m_gamm4, parm = "s(x1)", type = "simultaneous", nsim = 100))
     expect_s3_class(ci, "confint.gam")
     expect_s3_class(ci, "tbl_df")
     expect_named(ci, expected = c("smooth", "type", "by", "x1", "est", "se",
@@ -147,6 +156,7 @@ test_that("confint.fderiv example output", {
     skip_on_os("mac")
     skip_on_os("win")
 
+    skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     # new data to evaluate the derivatives at, say over the middle 50% of range
     # of each covariate
@@ -163,8 +173,8 @@ test_that("confint.fderiv example output", {
     ci <- confint(fd, type = "confidence")
     expect_snapshot_output(ci)
     ## simultaneous interval for smooth term of x2
-    set.seed(24)
-    x2_sint <- confint(fd, parm = "x2", type = "simultaneous",
-                       nsim = 10000, ncores = 2)
+    x2_sint <- withr::with_seed(24,
+        confint(fd, parm = "x2", type = "simultaneous", nsim = 10000,
+            ncores = 2))
     expect_snapshot_output(x2_sint)
 })
