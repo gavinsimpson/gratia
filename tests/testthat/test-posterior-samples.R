@@ -245,6 +245,7 @@ test_that("posterior sampling funs work with offsets in formula issue 233", {
     skip_on_cran()
     skip_on_ci()
 
+    set.seed(123)
     n  <- 100
     df <- data.frame(y = rnbinom(n = n, size = 0.9, prob = 0.3),
         x = rnorm(n = n, mean = 123, sd = 66),
@@ -260,5 +261,5 @@ test_that("posterior sampling funs work with offsets in formula issue 233", {
     expect_identical(nrow(fs), as.integer(n * n_samples))
 
     expect_snapshot(print(ps), variant = "posterior", cran = FALSE)
-    expect_snapshot(print(fs), variant = "samples", cran = FALSE)
+    expect_snapshot(print(fs), variant = "fitted", cran = FALSE)
 })
