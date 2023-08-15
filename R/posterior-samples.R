@@ -20,7 +20,7 @@
 #'   to work on Windows with current `R`).
 #' @param method character; which method should be used to draw samples from
 #'   the posterior distribution. `"gaussian"` uses a Gaussian (Laplace)
-#'   approximation to the posterior. `"mh"` uses a Metropolis Hastings sample
+#'   approximation to the posterior. `"mh"` uses a Metropolis Hastings sampler
 #'   that alternates t proposals with proposals based on a shrunken version of
 #'   the posterior covariance matrix. `"inla"` uses a variant of Integrated
 #'   Nested Laplace Approximation due to Wood (2019), (currently not
@@ -37,7 +37,7 @@
 #'   matrix when generating random walk proposals. Negative or non finite to
 #'   skip the random walk step. Only used with `method = "mh"`.
 #' @param ... arguments passed to other methods. For `fitted_samples()`, these
-#'   are passed on to `predict.gam()`. For `posterior_samples()` these are
+#'   are passed on to [predict.gam()]. For `posterior_samples()` these are
 #'   passed on to `fitted_samples()`. For `predicted_samples()` these are
 #'   passed on to the relevant `simulate()` method.
 #' @param newdata Deprecated: use `data` instead.
@@ -45,6 +45,18 @@
 #'   generating random variables from a multivariate normal distribution.
 #'   Passed to [mvnfast::rmvn()]. Parallelization will take place only if
 #'   OpenMP is supported (but appears to work on Windows with current `R`).
+#'
+#' @details
+#' # Note
+#'
+#' Models with offset terms supplied via the `offset` argument to
+#' [mgcv::gam()] etc. are ignored by [mgcv::predict.gam()]. As such, this
+#' kind of offset term is also ignored by `posterior_samples()`. Offset terms
+#' that are included in the model formula supplied to [mgcv::gam()] etc are
+#' not ignored and the posterior samples produced will reflect those offset
+#' term values. This has the side effect of requiring any new data values
+#' provided to `posterior_samples()` via the `data` argument must include the
+#' offset variable.
 #'
 #' @return A tibble (data frame) with 3 columns containing the posterior
 #'   predicted values in long format. The columns are
@@ -144,10 +156,22 @@
 #' Expectations (fitted values) of the response drawn from the posterior
 #' distribution of fitted model using a Gaussian approximation to the
 #' posterior or a simple Metropolis Hastings sampler.
-#' 
+#'
 #' @param scale character; what scale should the fitted values be returned on?
 #'   `"linear predictor"` is a synonym for `"link"` if you prefer that
 #'   terminology.
+#'
+#' @details
+#' # Note
+#'
+#' Models with offset terms supplied via the `offset` argument to
+#' [mgcv::gam()] etc. are ignored by [mgcv::predict.gam()]. As such, this
+#' kind of offset term is also ignored by `posterior_samples()`. Offset terms
+#' that are included in the model formula supplied to [mgcv::gam()] etc are
+#' not ignored and the posterior samples produced will reflect those offset
+#' term values. This has the side effect of requiring any new data values
+#' provided to `posterior_samples()` via the `data` argument must include the
+#' offset variable.
 #'
 #' @return A tibble (data frame) with 3 columns containing the posterior
 #'   predicted values in long format. The columns are
