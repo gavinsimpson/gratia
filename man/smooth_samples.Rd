@@ -32,7 +32,7 @@ smooth_samples(model, ...)
 \item{model}{a fitted model of the supported types}
 
 \item{...}{arguments passed to other methods. For \code{fitted_samples()}, these
-are passed on to \code{predict.gam()}. For \code{posterior_samples()} these are
+are passed on to \code{\link[=predict.gam]{predict.gam()}}. For \code{posterior_samples()} these are
 passed on to \code{fitted_samples()}. For \code{predicted_samples()} these are
 passed on to the relevant \code{simulate()} method.}
 
@@ -48,7 +48,7 @@ the model will be used for \code{data}, if available in \code{model}.}
 
 \item{method}{character; which method should be used to draw samples from
 the posterior distribution. \code{"gaussian"} uses a Gaussian (Laplace)
-approximation to the posterior. \code{"mh"} uses a Metropolis Hastings sample
+approximation to the posterior. \code{"mh"} uses a Metropolis Hastings sampler
 that alternates t proposals with proposals based on a shrunken version of
 the posterior covariance matrix. \code{"inla"} uses a variant of Integrated
 Nested Laplace Approximation due to Wood (2019), (currently not
