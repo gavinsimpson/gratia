@@ -240,6 +240,11 @@
     ## don't need to pass freq, unconditional here as that is done for V
     Xp <- predict(model, newdata = data, type = "lpmatrix", ...)
     sims <- Xp %*% t(betas)
+    # handle the offset if present; it is an attribute on the Xp matrix
+    m_offset <- attr(Xp, "model.offset")
+    if (!is.null(m_offset)) {
+        sims <- sims + m_offset
+    }
 
     if (isTRUE(identical(scale, "response"))) {
         ilink <- inv_link(model, parameter = "location")
