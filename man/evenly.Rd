@@ -38,5 +38,17 @@ create a sequence of \code{n} evenly-spaced values over the range \code{lower}
 \dontshow{set.seed(1)}
 x <- rnorm(10)
 n <- 10L
+
+# 10 values evenly over the range of `x`
 evenly(x, n = n)
+
+# evenly spaced values, incrementing by 0.2
+evenly(x, by = 0.2)
+
+# evenly spaced values, incrementing by 0.2, starting at -2
+evenly(x, by = 0.2, lower = -2)
+}
+\seealso{
+See \code{\link[base:seq]{base::seq()}} for details of the behaviour of \code{evenly()} when
+using \code{by}.
 }
