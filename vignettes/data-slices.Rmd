@@ -140,7 +140,7 @@ When we were creating our data slices, we used some helper functions to specify 
 
 * `evenly(x, n = 100)` --- creates `n` evenly spaced values over the range of the covariate,
 * `evenly(x, by = 5` --- creates evenly spaced values over the range of the covariate in increments of 5,
-* `evenly(x, ..., lower = 5, upper = 10)` --- either of the two above uses of `evenly()` will use the lower and upper limits of the vector `x`. Arguments `lower` and `upper` are be used to change one or both of the upper or lower bounds.
+* `evenly(x, ..., lower = 5, upper = 10)` --- either of the two uses of `evenly()` shown above will use the lower and upper limits of the vector `x`. Arguments `lower` and `upper` can be used to change one or both of the upper or lower bounds.
 * `evenly(fct)` --- produces a new factor containing each level of the specified factor `fct` just once,
 * `ref_level(fct)` --- creates a new factor containing just the reference level of the specified factor covariate `fct`, and
 * `level(fct, "level")` --- creates a factor with requested `"level"` from the factor `fct`.
