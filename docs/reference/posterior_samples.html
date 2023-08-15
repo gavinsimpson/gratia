@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.34</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.35</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -114,7 +114,7 @@ the model will be used for <code>data</code>, if available in <code>model</code>
 <dt>method</dt>
 <dd><p>character; which method should be used to draw samples from
 the posterior distribution. <code>"gaussian"</code> uses a Gaussian (Laplace)
-approximation to the posterior. <code>"mh"</code> uses a Metropolis Hastings sample
+approximation to the posterior. <code>"mh"</code> uses a Metropolis Hastings sampler
 that alternates t proposals with proposals based on a shrunken version of
 the posterior covariance matrix. <code>"inla"</code> uses a variant of Integrated
 Nested Laplace Approximation due to Wood (2019), (currently not
@@ -190,6 +190,17 @@ relates to,</p></li>
 <li><p><code>response</code> (numeric) the predicted response for the indicated row of
 <code>data</code>.</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
+    <p>Models with offset terms supplied via the <code>offset</code> argument to
+<code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code> etc. are ignored by <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">mgcv::predict.gam()</a></code>. As such, this
+kind of offset term is also ignored by <code>posterior_samples()</code>. Offset terms
+that are included in the model formula supplied to <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code> etc are
+not ignored and the posterior samples produced will reflect those offset
+term values. This has the side effect of requiring any new data values
+provided to <code>posterior_samples()</code> via the <code>data</code> argument must include the
+offset variable.</p>
+    </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Wood, S.N., (2020). Simplified integrated nested Laplace approximation.

@@ -30,7 +30,7 @@ fitted_samples(model, ...)
 \item{model}{a fitted model of the supported types}
 
 \item{...}{arguments passed to other methods. For \code{fitted_samples()}, these
-are passed on to \code{predict.gam()}. For \code{posterior_samples()} these are
+are passed on to \code{\link[=predict.gam]{predict.gam()}}. For \code{posterior_samples()} these are
 passed on to \code{fitted_samples()}. For \code{predicted_samples()} these are
 passed on to the relevant \code{simulate()} method.}
 
@@ -48,7 +48,7 @@ terminology.}
 
 \item{method}{character; which method should be used to draw samples from
 the posterior distribution. \code{"gaussian"} uses a Gaussian (Laplace)
-approximation to the posterior. \code{"mh"} uses a Metropolis Hastings sample
+approximation to the posterior. \code{"mh"} uses a Metropolis Hastings sampler
 that alternates t proposals with proposals based on a shrunken version of
 the posterior covariance matrix. \code{"inla"} uses a variant of Integrated
 Nested Laplace Approximation due to Wood (2019), (currently not
@@ -105,6 +105,17 @@ Expectations (fitted values) of the response drawn from the posterior
 distribution of fitted model using a Gaussian approximation to the
 posterior or a simple Metropolis Hastings sampler.
 }
+\section{Note}{
+Models with offset terms supplied via the \code{offset} argument to
+\code{\link[mgcv:gam]{mgcv::gam()}} etc. are ignored by \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}. As such, this
+kind of offset term is also ignored by \code{posterior_samples()}. Offset terms
+that are included in the model formula supplied to \code{\link[mgcv:gam]{mgcv::gam()}} etc are
+not ignored and the posterior samples produced will reflect those offset
+term values. This has the side effect of requiring any new data values
+provided to \code{posterior_samples()} via the \code{data} argument must include the
+offset variable.
+}
+
 \examples{
 load_mgcv()
 \dontshow{

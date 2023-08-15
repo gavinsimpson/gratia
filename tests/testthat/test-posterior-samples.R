@@ -239,3 +239,26 @@ test_that("posterior_samples works for a multi-smooth tweedie GAM", {
     expect_identical(NCOL(sm), 3L) # 3 cols
     expect_named(sm, expected = c("row", "draw", "response"))
 })
+
+# test for offset handling
+test_that("posterior sampling funs work with offsets in formula issue 233", {
+    skip_on_cran()
+
+    n  <- 100
+    df <- data.frame(y = rnbinom(n = n, size = 0.9, prob = 0.3),
+        x = rnorm(n = n, mean = 123, sd = 66),
+        denom = round(rnorm(n = n, mean = 1000, sd = 1)))
+    mod <- gam(y ~ 1 + offset(log(denom)),
+        data = df, family = "nb")
+
+    n_samples <- 5
+    expect_silent(ps <- posterior_samples(mod, n = n_samples, seed = 42))
+    expect_identical(nrow(ps), as.integer(n * n_samples))
+
+    expect_silent(fs <- fitted_samples(mod, n = n_samples, seed = 42))
+    expect_identical(nrow(fs), as.integer(n * n_samples))
+
+    skip_on_ci()
+    expect_snapshot(print(ps), variant = "posterior", cran = FALSE)
+    expect_snapshot(print(fs), variant = "samples", cran = FALSE)
+})
