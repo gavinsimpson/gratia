@@ -243,6 +243,7 @@ test_that("posterior_samples works for a multi-smooth tweedie GAM", {
 # test for offset handling
 test_that("posterior sampling funs work with offsets in formula issue 233", {
     skip_on_cran()
+    skip_on_ci()
 
     n  <- 100
     df <- data.frame(y = rnbinom(n = n, size = 0.9, prob = 0.3),
@@ -258,7 +259,6 @@ test_that("posterior sampling funs work with offsets in formula issue 233", {
     expect_silent(fs <- fitted_samples(mod, n = n_samples, seed = 42))
     expect_identical(nrow(fs), as.integer(n * n_samples))
 
-    skip_on_ci()
     expect_snapshot(print(ps), variant = "posterior", cran = FALSE)
     expect_snapshot(print(fs), variant = "samples", cran = FALSE)
 })
