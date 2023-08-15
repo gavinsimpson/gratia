@@ -18,13 +18,24 @@
 #'
 #' @return A numeric vector of length `n`.
 #'
+#' @seealso See [base::seq()] for details of the behaviour of `evenly()` when
+#'   using `by`.
+#'
 #' @export
 #'
 #' @examples
 #' \dontshow{set.seed(1)}
 #' x <- rnorm(10)
 #' n <- 10L
+#'
+#' # 10 values evenly over the range of `x`
 #' evenly(x, n = n)
+#'
+#' # evenly spaced values, incrementing by 0.2
+#' evenly(x, by = 0.2)
+#'
+#' # evenly spaced values, incrementing by 0.2, starting at -2
+#' evenly(x, by = 0.2, lower = -2)
 `evenly` <- function(x, n = 100, by = NULL, lower = NULL, upper = NULL) {
     out <- if (is.factor(x)) {
         ## must coerce to factor otherwise Predict.matrix will coerce
