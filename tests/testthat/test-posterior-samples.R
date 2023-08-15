@@ -252,12 +252,13 @@ test_that("posterior sampling funs work with offsets in formula issue 233", {
         data = df, family = "nb")
 
     n_samples <- 5
-    expect_silent(sm <- posterior_samples(mod, n = n_samples, seed = 42))
-    expect_identical(nrow(sm), as.integer(n * n_samples))
+    expect_silent(ps <- posterior_samples(mod, n = n_samples, seed = 42))
+    expect_identical(nrow(ps), as.integer(n * n_samples))
 
-    expect_silent(sm <- fitted_samples(mod, n = n_samples, seed = 42))
-    expect_identical(nrow(sm), as.integer(n * n_samples))
+    expect_silent(fs <- fitted_samples(mod, n = n_samples, seed = 42))
+    expect_identical(nrow(fs), as.integer(n * n_samples))
 
     skip_on_ci()
-    expect_snapshot(print(sm), cran = FALSE)
+    expect_snapshot(print(ps), variant = "posterior", cran = FALSE)
+    expect_snapshot(print(fs), variant = "samples", cran = FALSE)
 })
