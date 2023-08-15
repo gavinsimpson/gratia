@@ -1,4 +1,4 @@
-# gratia 0.8.1.34
+# gratia 0.8.1.35
 
 ## User visible changes
 
@@ -180,6 +180,11 @@
 
 * Continuous by smooths were being evaluated with the median value of the `by`
   variable instead of a value of 1. #224
+
+* `fitted_samples()` (and hence `posterior_samples()`) now handles models with
+  offset terms in the formula. Offset terms supplied via the `offset` argument
+  are ignored by `mgcv:::predict.gam()` and hence are ignored also by `gratia`.
+  Reported by @jonathonmellor #231 #233
 
 # gratia 0.8.1
 
