@@ -580,7 +580,7 @@ test_that("draw.gam can take user specified scales", {
 
     skip_if(packageVersion("mgcv") < "1.8.36")
     plt <- draw(mod_fs, rug = FALSE,
-                discrete_colour = ggplot2::scale_colour_viridis_d(option = "plasma"))
+        discrete_colour = ggplot2::scale_colour_viridis_d(option = "plasma"))
     expect_doppelganger("draw fs smooth with discrete plasma palette",
                                  plt)
 })
