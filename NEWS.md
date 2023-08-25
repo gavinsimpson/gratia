@@ -1,4 +1,4 @@
-# gratia 0.8.1.35
+# gratia 0.8.1.36
 
 ## User visible changes
 
@@ -167,6 +167,9 @@
 
 * `parametric_effects()` now works better for location, scale, shape models.
   Reported by @pboesu #45
+
+* `parametric_effects` now works when there are missing values in one or more
+  variables used in a fitted GAM. #219
 
 * `response_derivatives()` was incorrectly using `.data` with *tidyselect*
   selectors.

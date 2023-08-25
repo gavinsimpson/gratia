@@ -69,17 +69,6 @@
         valid_terms <- valid_terms[!(ord > 1)]
     }
 
-    # data combinations to get all parametric terms inc factor level combos
-    tbl <- data_combos(object, complete = FALSE, envir = envir, data = data)
-    # predict model contributions for the parametric terms, using only
-    # the factor combos in the data and typical values of all other terms
-    # and exclude the effects of smooths as they don't change anything in
-    # terms
-    # Work around a bug in predict.gam() with exclude length 0 character
-    # (i.e smooths(objects) when model contains only parametric terms)
-    pred <- predict(object, type = "terms",
-                    terms = mgcv_names, se.fit = TRUE,
-                    unconditional = unconditional)
     # try to recover the data
     mf <- model.frame(object)
     if (is.null(data)) {
@@ -88,6 +77,26 @@
     if (is.null(data)) {
         data <- mf
     }
+
+    # have to do predictions *after* we reconstruct the data otherwise we get
+    # problems if there were NAs in the original data.
+
+    # predict model contributions for the parametric terms, using only
+    # the factor combos in the data and typical values of all other terms
+    # and exclude the effects of smooths as they don't change anything in
+    # terms
+    # get the data that we need for the model; right now `data` could contain
+    # everything and be a model frame
+    data <- model.frame(object$pred.formula, data = data)
+    attr(data, "terms") <- NULL # squich this or predict.gam complains
+    # can limit the data combinations we predict at now by taking the unique
+    # data combos
+    data <- distinct(data)
+    # Work around a bug in predict.gam() with exclude length 0 character
+    # (i.e smooths(objects) when model contains only parametric terms)
+    pred <- predict(object, newdata = data, type = "terms",
+                    terms = mgcv_names, se.fit = TRUE,
+                    unconditional = unconditional)
 
     # loop over the valid_terms and prepare the parametric effects
     fun <- function(term, data, pred, vars) {
@@ -104,6 +113,7 @@
         } else {
             eval(term_expr, data, enclos = envir)
         }
+
         out <- bind_cols(level = x_data,
                          partial = pred[["fit"]][, term],
                          se = pred[["se.fit"]][, term]) |>
