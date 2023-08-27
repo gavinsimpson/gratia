@@ -113,13 +113,7 @@
         } else {
             eval(term_expr, data, enclos = envir)
         }
-        # could have `NA`s in the raw data we reconstructed
-        # check
-        lx <- nrow(x_data)
-        lp <- length(pred[["fit"]][, term])
-        if (!isTRUE(all.equal(lx, lp))) {
 
-        }
         out <- bind_cols(level = x_data,
                          partial = pred[["fit"]][, term],
                          se = pred[["se.fit"]][, term]) |>
