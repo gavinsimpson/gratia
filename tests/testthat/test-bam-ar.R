@@ -6,10 +6,14 @@
 
 test_that("draw works for a simple BAM with AR 1", {
     expect_silent(plt <- draw(m_ar1))
+
+    skip_on_ci()
     expect_doppelganger("draw bam ar 1 single series", plt)
 })
 
 test_that("draw works for a factor by BAM, 2 series, with AR 1", {
     expect_silent(plt <- draw(m_ar1_by))
+
+    skip_on_ci()
     expect_doppelganger("draw bam ar 1 factor by", plt)
 })
