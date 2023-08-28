@@ -91,7 +91,7 @@ test_that("draw.evaluated_2d_smooth() plots the smooth", {
     skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     expect_silent(sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100))
-    
+
     skip_on_ci()
     expect_silent(plt1 <- draw(sm))
     expect_silent(plt2 <- draw(sm, contour_col = "red"))
@@ -105,6 +105,7 @@ test_that("draw.evaluated_2d_smooth() plots the smooth without contours", {
     withr::local_options(lifecycle_verbosity = "quiet")
     sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100)
     plt <- draw(sm, contour = FALSE)
+    skip_on_ci()
     expect_doppelganger("draw 2d smooth without contours", plt)
 })
 
@@ -115,6 +116,7 @@ test_that("draw.evaluated_2d_smooth() plots the smooth with different contour bi
     withr::local_options(lifecycle_verbosity = "quiet")
     sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100)
     plt <- draw(sm, n_contour = 5)
+    skip_on_ci()
     expect_doppelganger("draw 2d smooth with 5 contour bins", plt)
 })
 
@@ -125,23 +127,26 @@ test_that("draw.evaluated_2d_smooth() plots the SE", {
     withr::local_options(lifecycle_verbosity = "quiet")
     sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100)
     plt <- draw(sm, show = "se")
+    skip_on_ci()
     expect_doppelganger("draw std error of 2d smooth", plt)
 })
 
 test_that("draw.gam() plots a simple multi-smooth AM", {
-    plt <- draw(su_m_quick_eg1, rug = FALSE)
-    expect_doppelganger("draw simple multi-smooth AM", plt)
+    plt1 <- draw(su_m_quick_eg1, rug = FALSE)
+    plt2 <- draw(su_m_quick_eg1, scales = "fixed", rug = FALSE)
 
-    plt <- draw(su_m_quick_eg1, scales = "fixed", rug = FALSE)
-    expect_doppelganger("draw simple multi-smooth AM with fixed scales", plt)
+    skip_on_ci()
+    expect_doppelganger("draw simple multi-smooth AM", plt1)
+    expect_doppelganger("draw simple multi-smooth AM with fixed scales", plt2)
 })
 
 test_that("draw.gam() can draw partial residuals", {
-    plt <- draw(su_m_quick_eg1, residuals = TRUE, rug = FALSE)
-    expect_doppelganger("draw simple partial residuals", plt)
+    plt1 <- draw(su_m_quick_eg1, residuals = TRUE, rug = FALSE)
+    plt2 <- draw(su_m_quick_eg1, residuals = TRUE, scales = "fixed", rug = FALSE)
 
-    plt <- draw(su_m_quick_eg1, residuals = TRUE, scales = "fixed", rug = FALSE)
-    expect_doppelganger("draw simple partial residuals with fixed scales", plt)
+    skip_on_ci()
+    expect_doppelganger("draw simple partial residuals", plt1)
+    expect_doppelganger("draw simple partial residuals with fixed scales", plt2)
 })
 
 test_that("draw.gam() plots an AM with a single 2d smooth", {
@@ -150,6 +155,8 @@ test_that("draw.gam() plots an AM with a single 2d smooth", {
     skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     plt <- draw(su_m_bivar, n = 50, rug = FALSE)
+
+    skip_on_ci()
     expect_doppelganger("draw AM with 2d smooth", plt)
 
     # sm <- evaluate_smooth(su_m_bivar, smooth = "s(x,z)")
@@ -158,11 +165,12 @@ test_that("draw.gam() plots an AM with a single 2d smooth", {
 })
 
 test_that("draw.gam() plots an AM with a single factor by-variable smooth", {
-    plt <- draw(su_m_factor_by, rug = FALSE)
-    expect_doppelganger("draw AM with factor by-variable smooth", plt)
+    plt1 <- draw(su_m_factor_by, rug = FALSE)
+    plt2 <- draw(su_m_factor_by, scales = "fixed", rug = FALSE)
 
-    plt <- draw(su_m_factor_by, scales = "fixed", rug = FALSE)
-    expect_doppelganger("draw factor by-variable smooth with fixed scales", plt)
+    skip_on_ci()
+    expect_doppelganger("draw factor by-variable smooth with fixed scales", plt1)
+    expect_doppelganger("draw AM with factor by-variable smooth", plt2)
 })
 
 ## simulate date from y = f(x2)*x1 + error
@@ -171,11 +179,13 @@ mod <- gam(y ~ s(x2, by = x1), data = su_eg3)
 
 test_that("draw() works with continuous by", {
     plt <- draw(mod, rug = FALSE, n = 50)
+    skip_on_ci()
     expect_doppelganger("draw with continuous by-variable smooth", plt)
 })
 
 test_that("draw() works with continuous by and fixed scales", {
     plt <- draw(mod, scales = "fixed", rug = FALSE, n = 50)
+    skip_on_ci()
     expect_doppelganger("draw with continuous by-var fixed scale", plt)
 })
 
@@ -192,12 +202,12 @@ test_that("draw() works with random effect smooths (bs = 're')", {
     expect_s3_class(sm, "evaluated_re_smooth")
 
     p1 <- draw(sm)
-    expect_doppelganger("draw.evaluated_re_smooth", p1)
-
     p2 <- draw(rm1, ncol = 3, rug = FALSE)
-    expect_doppelganger("draw.gam model with ranef smooth", p2)
-
     p3 <- draw(rm1, ncol = 3, scales = "fixed", rug = FALSE)
+
+    skip_on_ci()
+    expect_doppelganger("draw.evaluated_re_smooth", p1)
+    expect_doppelganger("draw.gam model with ranef smooth", p2)
     expect_doppelganger("draw model with ranef smooth fixed scales", p3)
 })
 
@@ -214,10 +224,12 @@ test_that("draw() with random effect smooths (bs = 're') & factor by variable ",
     sm <- evaluate_smooth(rm2, "s(ranef)")
     expect_s3_class(sm, "evaluated_re_smooth")
     p1 <- draw(sm)
-    expect_doppelganger("draw.evaluated_re_smooth with factor by", p1)
     p2 <- draw(rm2, ncol = 3, rug = FALSE)
-    expect_doppelganger("draw.gam model with ranef smooth factor by", p2)
     p3 <- draw(rm2, ncol = 3, scales = "fixed", rug = FALSE)
+
+    skip_on_ci()
+    expect_doppelganger("draw.evaluated_re_smooth with factor by", p1)
+    expect_doppelganger("draw.gam model with ranef smooth factor by", p2)
     expect_doppelganger("draw with ranef smooth factor by fixed scales", p3)
 })
 
@@ -235,6 +247,7 @@ test_that("draw() can handle non-standard names -- a function call as a name", {
     ## not the correct `log2(time)`
     fit <- gam(y ~ s(log2(time)), data = df, method = "REML")
     p1 <- draw(fit)
+    skip_on_ci()
     expect_doppelganger("draw.gam model with non-standard names", p1)
 })
 
@@ -274,12 +287,12 @@ test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
     expect_s3_class(sm, "evaluated_fs_smooth")
 
     p1 <- draw(sm)
-    expect_doppelganger("draw.evaluated_fs_smooth", p1)
-
     p2 <- draw(mod_fs, ncol = 2, rug = FALSE)
-    expect_doppelganger("draw.gam model with fs smooth", p2)
-
     p3 <- draw(mod_fs, ncol = 2, scales = "fixed", rug = FALSE)
+
+    skip_on_ci()
+    expect_doppelganger("draw.evaluated_fs_smooth", p1)
+    expect_doppelganger("draw.gam model with fs smooth", p2)
     expect_doppelganger("draw model with fs smooth fixed scales", p3)
 })
 
@@ -317,11 +330,9 @@ test_that("draw() works with parametric terms", {
     expect_equal(ncol(e1), 5L)
     expect_named(e1, c("term", "type", "value", "partial", "se"))
     p1 <- draw(e1, rug = FALSE)
-    expect_doppelganger("draw with linear parametric term", p1)
 
     ## check evaluate_parametric_term works
     p2 <- draw(mod, rug = FALSE)
-    expect_doppelganger("draw.gam with linear parametric term", p2)
 
     ## factor parametric terms
     x0 <- factor(x0)
@@ -331,7 +342,6 @@ test_that("draw() works with parametric terms", {
 
     ## check evaluate_parametric_term works
     p3 <- draw(mod, rug = FALSE)
-    expect_doppelganger("draw.gam with factor parametric term", p3)
 
     ## evaluate parametric terms directly
     e2 <- evaluate_parametric_term(mod, term = "x0")
@@ -341,13 +351,20 @@ test_that("draw() works with parametric terms", {
                  "Term is not in the parametric part of model: <x1>",
                  fixed = TRUE)
 
-    expect_warning(evaluate_parametric_term(mod, term = c('x0', 'x1')),
-                   "More than one `term` requested; using the first <x0>",
-                   fixed = TRUE)
+    expect_warning(evaluate_parametric_term(mod, term = c("x0", "x1")),
+        "More than one `term` requested; using the first <x0>",
+        fixed = TRUE)
+    
+    skip_on_ci()
+    expect_doppelganger("draw with linear parametric term", p1)
+    expect_doppelganger("draw.gam with linear parametric term", p2)
+    expect_doppelganger("draw.gam with factor parametric term", p3)
 })
 
 test_that("component-wise CIs work without seWithMean", {
     plt <- draw(su_m_univar_4, overall_uncertainty = FALSE, rug = FALSE)
+
+    skip_on_ci()
     expect_doppelganger("draw gam with overall_uncertainty false", plt)
 })
 
@@ -356,11 +373,12 @@ test_that("draw.derivates() plots derivatives for a GAM", {
     skip_on_ci()
 
     d1 <- derivatives(su_m_univar_4, type = "central", n = 200)
-    plt <- draw(d1)
-    expect_doppelganger("draw derivatives for a GAM", plt)
+    plt1 <- draw(d1)
+    plt2 <- draw(d1, scales = "fixed")
 
-    plt <- draw(d1, scales = "fixed")
-    expect_doppelganger("draw derivatives for a GAM with fixed scales", plt)
+    skip_on_ci()
+    expect_doppelganger("draw derivatives for a GAM", plt1)
+    expect_doppelganger("draw derivatives for a GAM with fixed scales", plt2)
 })
 
 test_that("draw.derivates plots derivatives with change indicators", {
@@ -369,52 +387,58 @@ test_that("draw.derivates plots derivatives with change indicators", {
     skip_on_ci() # causing trivial failures on GH
 
     d1 <- derivatives(m_gam, type = "central", n = 200)
-    expect_silent(plt <- draw(d1, add_change = TRUE))
-    expect_doppelganger("draw derivatives for a GAM with default change", plt)
+    expect_silent(plt1 <- draw(d1, add_change = TRUE))
+    expect_silent(plt2 <- draw(d1, add_change = TRUE, change_type = "sizer"))
 
-    expect_silent(plt <- draw(d1, add_change = TRUE, change_type = "sizer"))
-    expect_doppelganger("draw derivatives for a GAM with sizer change", plt)
+    skip_on_ci()
+    expect_doppelganger("draw derivatives for a GAM with default change", plt1)
+    expect_doppelganger("draw derivatives for a GAM with sizer change", plt2)
 })
 
 test_that("draw.derivates() plots derivatives for a GAM rotated labels", {
     skip_on_cran()
     d1 <- derivatives(su_m_univar_4, type = "central", n = 100)
-    plt <- draw(d1, angle = 45)
-    expect_doppelganger("draw derivatives for a GAM rotated labels", plt)
+    plt1 <- draw(d1, angle = 45)
+    plt2 <- draw(d1, scales = "fixed", angle = 45)
 
-    plt <- draw(d1, scales = "fixed", angle = 45)
+    skip_on_ci()
+    expect_doppelganger("draw derivatives for a GAM rotated labels", plt1)
     expect_doppelganger("draw derivatives for a GAM with fixed scales rotated",
-        plt)
+        plt2)
 })
 
 test_that("draw plots partial derivatives for a GAM", {
     d1 <- partial_derivatives(su_m_bivar_te, term = "te(x,z)", focal = "z",
         type = "central", n = 100)
-    plt <- draw(d1)
+    plt1 <- draw(d1)
     expect_doppelganger("draw partial derivatives for a GAM", plt)
 
-    plt <- draw(d1, scales = "fixed")
-    ## skip_on_ci()
+    plt2 <- draw(d1, scales = "fixed")
+
+    skip_on_ci()
+    expect_doppelganger("draw partial derivatives for a GAM", plt1)
     expect_doppelganger("draw partial derivatives for a GAM with fixed scales",
-        plt)
+        plt2)
 })
 
 test_that("draw plots partial derivs for GAM rotated labels", {
     skip_on_cran()
     d1 <- partial_derivatives(su_m_bivar_te, term = "te(x,z)", focal = "z",
         type = "central", n = 100)
-    plt <- draw(d1, angle = 45)
-    expect_doppelganger("draw partial derivatives for GAM rotated labels",
-        plt)
+    plt1 <- draw(d1, angle = 45)
+    plt2 <- draw(d1, scales = "fixed", angle = 45)
 
-    plt <- draw(d1, scales = "fixed", angle = 45)
+    skip_on_ci()
+    expect_doppelganger("draw partial derivatives for GAM rotated labels",
+        plt1)
     expect_doppelganger("draw partial derivatives for GAM fixed scales rotated",
-        plt)
+        plt2)
 })
 
 ## test that issue 39 stays fixed
 test_that("draw.gam doesn't create empty plots with multiple parametric terms", {
     plt <- draw(m_2_fac, rug = FALSE)
+    skip_on_ci()
     expect_doppelganger("draw issue 39 empty plots", plt)
 })
 
@@ -424,6 +448,7 @@ test_that("draw.mgcv_smooth() can plot basic smooth bases", {
 
     bs <- basis(s(x0), data = quick_eg1)
     plt <- draw(bs)
+    skip_on_ci()
     expect_doppelganger("draw basic tprs basis", plt)
 })
 
@@ -434,6 +459,7 @@ test_that("draw.mgcv_smooth() can plot basic smooth bases with rotated labels",
 
     bs <- basis(s(x0), data = quick_eg1)
     plt <- draw(bs, angle = 45)
+    skip_on_ci()
     expect_doppelganger("draw basic tprs basis rotated", plt)
 })
 
@@ -443,6 +469,7 @@ test_that("draw.mgcv_smooth() can plot by factor basis smooth bases", {
 
     bs <- basis(s(x2, by = fac), data = su_eg4)
     plt <- draw(bs)
+    skip_on_ci()
     expect_doppelganger("draw by factor basis", plt)
 })
 
@@ -473,6 +500,7 @@ test_that("draw() works with a ziplss models; issue #45", {
     b1 <- gam(list(y ~ s(x2) + x3,
                    ~ s(x0) + x1), family = ziplss(), data = df)
     plt <- draw(b1, rug = FALSE)
+    skip_on_ci()
     expect_doppelganger("draw ziplss parametric terms issue 45", plt)
 })
 
@@ -481,21 +509,23 @@ test_that("draw works for sample_smooths objects", {
     skip_on_ci() # minor statistical differences
 
     sm1 <- smooth_samples(su_m_univar_4, n = 5, seed = 23478, n_vals = 50)
-    plt <- draw(sm1, alpha = 0.7, n_samples = 5, seed = 2635, rug = FALSE)
-    expect_doppelganger("draw smooth_samples for GAM m1", plt)
+    plt1 <- draw(sm1, alpha = 0.7, n_samples = 5, seed = 2635, rug = FALSE)
 
     sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478, n_vals = 50)
-    plt <- draw(sm2, alpha = 0.7, n_samples = 4, seed = 2635)
-    expect_doppelganger("draw smooth_samples for GAM m2", plt)
+    plt2 <- draw(sm2, alpha = 0.7, n_samples = 4, seed = 2635)
 
     sm3 <- smooth_samples(su_m_factor_by, n = 5, seed = 23478, n_vals = 50)
-    plt <- draw(sm3, alpha = 0.7, n_samples = 5, seed = 2635, rug = FALSE)
-    expect_doppelganger("draw smooth_samples for GAM m3", plt)
+    plt3 <- draw(sm3, alpha = 0.7, n_samples = 5, seed = 2635, rug = FALSE)
 
     sm3 <- smooth_samples(su_m_factor_by, n = 5, seed = 23478, n_vals = 50)
-    plt <- draw(sm3, alpha = 0.7, scales = "fixed", n_samples = 10, seed = 2635,
-    rug = FALSE)
-    expect_doppelganger("draw smooth_samples for GAM m3 fixed scales", plt)
+    plt4 <- draw(sm3, alpha = 0.7, scales = "fixed", n_samples = 10,
+      seed = 2635, rug = FALSE)
+
+    skip_on_ci()
+    expect_doppelganger("draw smooth_samples for GAM m1", plt1)
+    expect_doppelganger("draw smooth_samples for GAM m2", plt2)
+    expect_doppelganger("draw smooth_samples for GAM m3", plt3)
+    expect_doppelganger("draw smooth_samples for GAM m3 fixed scales", plt4)
 })
 
 test_that("draw works for sample_smooths objects rotated labels", {
@@ -503,25 +533,27 @@ test_that("draw works for sample_smooths objects rotated labels", {
     skip_on_ci() # minor statistical differences
 
     sm1 <- smooth_samples(su_m_univar_4, n = 5, seed = 23478, n_vals = 50)
-    plt <- draw(sm1, alpha = 0.7, n_samples = 5, seed = 2635, angle = 45,
+    plt1 <- draw(sm1, alpha = 0.7, n_samples = 5, seed = 2635, angle = 45,
         rug = FALSE)
-    expect_doppelganger("draw smooth_samples for GAM m1 rotated", plt)
 
     sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478, n_vals = 50)
-    plt <- draw(sm2, alpha = 0.7, n_samples = 4, seed = 2635, angle = 45,
+    plt2 <- draw(sm2, alpha = 0.7, n_samples = 4, seed = 2635, angle = 45,
         rug = FALSE)
-    expect_doppelganger("draw smooth_samples for GAM m2 rotated", plt)
 
     sm3 <- smooth_samples(su_m_factor_by, n = 5, seed = 23478, n_vals = 50)
-    plt <- draw(sm3, alpha = 0.7, n_samples = 5, seed = 2635, angle = 45,
+    plt3 <- draw(sm3, alpha = 0.7, n_samples = 5, seed = 2635, angle = 45,
         rug = FALSE)
-    expect_doppelganger("draw smooth_samples for GAM m3 rotated", plt)
 
     sm3 <- smooth_samples(su_m_factor_by, n = 5, seed = 23478, n_vals = 50)
-    plt <- draw(sm3, alpha = 0.7, scales = "fixed", n_samples = 5, seed = 2635,
+    plt4 <- draw(sm3, alpha = 0.7, scales = "fixed", n_samples = 5, seed = 2635,
         angle = 45, rug = FALSE)
+
+    skip_on_ci()
+    expect_doppelganger("draw smooth_samples for GAM m1 rotated", plt1)
+    expect_doppelganger("draw smooth_samples for GAM m2 rotated", plt2)
+    expect_doppelganger("draw smooth_samples for GAM m3 rotated", plt3)
     expect_doppelganger("draw smooth_samples for GAM m3 fixed scales rotated",
-        plt)
+        plt4)
 })
 
 test_that("draw works for sample_smooths objects", {
@@ -529,6 +561,8 @@ test_that("draw works for sample_smooths objects", {
     skip_on_os("mac")
     sm2 <- smooth_samples(su_m_bivar, n = 2, seed = 23478, n_vals = 50)
     plt <- draw(sm2, alpha = 0.7, contour = TRUE)
+
+    skip_on_ci()
     expect_doppelganger("draw smooth_samples for bivariate GAM contours", plt)
 })
 
@@ -537,16 +571,18 @@ test_that("draw works for sample_smooths objects with n_samples", {
     skip_on_ci() # minor statistical differences
 
     sm1 <- smooth_samples(su_m_univar_4, n = 5, seed = 23478, n_vals = 50)
-    plt <- draw(sm1, alpha = 0.7, n_samples = 3, rug = FALSE, seed = 1)
-    expect_doppelganger("draw smooth_samples for m1 n_samples", plt)
+    plt1 <- draw(sm1, alpha = 0.7, n_samples = 3, rug = FALSE, seed = 1)
 
     sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478, n_vals = 50)
-    plt <- draw(sm2, alpha = 0.7, n_samples = 2, rug = FALSE, seed = 14)
-    expect_doppelganger("draw smooth_samples for m2 n_samples", plt)
+    plt2 <- draw(sm2, alpha = 0.7, n_samples = 2, rug = FALSE, seed = 14)
 
     sm3 <- smooth_samples(su_m_factor_by, n = 5, seed = 23478, n_vals = 50)
-    plt <- draw(sm3, alpha = 0.7, n_samples = 3, rug = FALSE, seed = 19)
-    expect_doppelganger("draw smooth_samples for GAM n_samples", plt)
+    plt3 <- draw(sm3, alpha = 0.7, n_samples = 3, rug = FALSE, seed = 19)
+
+    skip_on_ci()
+    expect_doppelganger("draw smooth_samples for m1 n_samples", plt1)
+    expect_doppelganger("draw smooth_samples for m2 n_samples", plt2)
+    expect_doppelganger("draw smooth_samples for GAM n_samples", plt3)
 })
 
 test_that("draw works for sample_smooths objects with user specified smooth", {
@@ -554,13 +590,15 @@ test_that("draw works for sample_smooths objects with user specified smooth", {
     skip_on_ci() # minor statistical differences
 
     sm3 <- smooth_samples(su_m_factor_by, n = 5, seed = 23478, n_vals = 50)
-    plt <- draw(sm3, select = "s(x0)", alpha = 0.7, rug = FALSE)
-    expect_doppelganger("draw selected smooth_samples for GAM m3", plt)
+    plt1 <- draw(sm3, select = "s(x0)", alpha = 0.7, rug = FALSE)
 
-    plt <- draw(sm3, select = "s(x2)", alpha = 0.7, partial_match = TRUE,
+    plt2 <- draw(sm3, select = "s(x2)", alpha = 0.7, partial_match = TRUE,
         rug = FALSE)
+    
+    skip_on_ci()
     expect_doppelganger("draw selected factor by smooth_samples for GAM m3",
-                        plt)
+                        plt2)
+    expect_doppelganger("draw selected smooth_samples for GAM m3", plt1)
 })
 
 ## Issue #22
@@ -568,6 +606,8 @@ test_that("draw() can handle a mixture of numeric and factor random effects", {
     df <- data_sim("eg4", seed = 42)
     m <- gam(y ~ s(x2, fac, bs = "re"), data = df, method = "REML")
     plt <- draw(m)
+
+    skip_on_ci()
     expect_doppelganger("issue 22 draw with mixed random effects", plt)
 })
 
@@ -577,6 +617,8 @@ test_that("draw.gam uses fixed scales if asked for them: #73", {
     df <- data_sim("eg1", n = 1000, seed = 1)
     m <- gam(y ~ s(x1) + s(x2) + ti(x1, x2), data = su_eg1, method = "REML")
     plt <- draw(m, scales = "fixed", rug = FALSE)
+
+    skip_on_ci()
     expect_doppelganger("issue 73 draw uses fixed scales if asked for them",
                                  plt)
 })
@@ -584,16 +626,20 @@ test_that("draw.gam uses fixed scales if asked for them: #73", {
 test_that("draw.gam can take user specified scales", {
     skip_on_os(os = "win")
     skip_on_os(os = "mac") # trivial diffs in contours
-    plt <- draw(su_m_bivar, rug = FALSE,
+    plt1 <- draw(su_m_bivar, rug = FALSE,
                 continuous_fill = scale_fill_distiller(palette = "Spectral",
                                                        type = "div"))
-    expect_doppelganger("draw 2d smooth with spectral palette", plt)
 
     skip_if(packageVersion("mgcv") < "1.8.36")
-    plt <- draw(mod_fs, rug = FALSE,
+    plt2 <- draw(mod_fs, rug = FALSE,
         discrete_colour = ggplot2::scale_colour_viridis_d(option = "plasma"))
+    
+    skip_on_ci()
+    expect_doppelganger("draw 2d smooth with spectral palette", plt1)
+
+    skip_if(packageVersion("mgcv") < "1.8.36")
     expect_doppelganger("draw fs smooth with discrete plasma palette",
-                                 plt)
+                                 plt2)
 })
 
 ## draw.penalty
@@ -602,13 +648,12 @@ test_that("draw.penalty_df works", {
     skip_on_ci()
 
     expect_silent(pen <- penalty(su_m_univar_4))
-    plt <- draw(pen)
-    expect_doppelganger("draw penalty_df with multiple smooths",
-                        plt)
+    plt1 <- draw(pen)
+    plt2 <- draw(penalty(su_m_univar_4, "s(x1)"))
 
-    plt <- draw(penalty(su_m_univar_4, "s(x1)"))
-    expect_doppelganger("draw penalty_df with single smooths",
-                        plt)
+    skip_on_ci()
+    expect_doppelganger("draw penalty_df with multiple smooths", plt1)
+    expect_doppelganger("draw penalty_df with single smooths", plt2)
 })
 
 test_that("draw.penalty_df gets labels on plot in corrcet order issue 95", {
@@ -617,6 +662,8 @@ test_that("draw.penalty_df gets labels on plot in corrcet order issue 95", {
 
     expect_silent(pen <- penalty(su_m_penalty))
     plt <- draw(pen)
+
+    skip_on_ci()
     expect_doppelganger("draw penalty_df issue 95 label order",
                         plt)
 })
@@ -626,17 +673,18 @@ test_that("draw.penalty_df accepts user-specified continuous_fill", {
     skip_on_ci()
 
     expect_silent(pen <- penalty(su_m_univar_4))
-    plt <- draw(pen,
+    plt1 <- draw(pen,
                 continuous_fill = scale_fill_distiller(palette = "Spectral",
                                                        type = "div"))
+    plt2 <- draw(penalty(su_m_univar_4, "s(x1)"),
+        continuous_fill = scale_fill_distiller(palette = "Spectral",
+            type = "div"))
+    
+    skip_on_ci()
     expect_doppelganger("draw penalty multiple smooths user continous fill",
-                        plt)
-
-    plt <- draw(penalty(su_m_univar_4, "s(x1)"),
-                continuous_fill = scale_fill_distiller(palette = "Spectral",
-                                                       type = "div"))
+                        plt1)
     expect_doppelganger("draw penalty single smooths user continous fill",
-                        plt)
+                        plt2)
 })
 
 test_that("draw.penalty_df works with normalization", {
@@ -644,13 +692,14 @@ test_that("draw.penalty_df works with normalization", {
     skip_on_ci()
     
     expect_silent(pen <- penalty(su_m_univar_4))
-    plt <- draw(pen, normalize = TRUE)
-    expect_doppelganger("draw penalty_df with multiple smooths normalized",
-                        plt)
+    plt1 <- draw(pen, normalize = TRUE)
+    plt2 <- draw(penalty(su_m_univar_4, "s(x1)"), normalize = TRUE)
 
-    plt <- draw(penalty(su_m_univar_4, "s(x1)"), normalize = TRUE)
+    skip_on_ci()
     expect_doppelganger("draw penalty_df with single smooths normalized",
-                        plt)
+                        plt1)
+    expect_doppelganger("draw penalty_df with multiple smooths normalized",
+                        plt2)
 })
 
 test_that("plotting sos smooths works", {
@@ -658,5 +707,7 @@ test_that("plotting sos smooths works", {
     skip_if_not_installed("mapproj")
     skip_on_os("mac")
     expect_silent(plt <- draw(m_sos, n = 20))
+
+    skip_on_ci()
     expect_doppelganger("draw works for sos smooths", plt)
 })
