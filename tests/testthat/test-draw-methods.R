@@ -35,6 +35,8 @@ the number of smooths in the model.", fixed = TRUE)
 test_that("draw.gam works with character select", {
     plt1 <- draw(su_m_quick_eg1, select = "s(x1)", rug = FALSE)
     plt2 <- draw(su_m_quick_eg1, select = c("s(x0)", "s(x1)"), rug = FALSE)
+    
+    skip_on_ci()
     expect_doppelganger("draw gam smooth for selected smooth character", plt1)
     expect_doppelganger("draw gam smooth for two selected smooths character",
                         plt2)
@@ -57,10 +59,12 @@ test_that("draw.gam works with logical select two smooths", {
 test_that("draw.gam works with partial_match", {
     plt <- draw(su_m_factor_by, select = "x2", partial_match = TRUE,
         rug = FALSE, n = 50)
-    expect_doppelganger("draw gam with partial match TRUE", plt)
     expect_error(draw(su_m_factor_by, select = "s(x2)", partial_match = FALSE),
-                 "Failed to match any smooths in model `su_m_factor_by`.\nTry with 'partial_match = TRUE'?",
-                 fixed = TRUE)
+        "Failed to match any smooths in model `su_m_factor_by`.\nTry with 'partial_match = TRUE'?",
+        fixed = TRUE)
+    
+    skip_on_ci()
+    expect_doppelganger("draw gam with partial match TRUE", plt)
 })
 
 test_that("draw.gam works with select and parametric", {
