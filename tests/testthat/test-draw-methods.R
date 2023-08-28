@@ -463,12 +463,11 @@ test_that("draw.mgcv_smooth() can plot basic smooth bases with rotated labels",
 })
 
 test_that("draw.mgcv_smooth() can plot by factor basis smooth bases", {
-    skip_on_cran()
-    skip_on_ci() # sign differences due to eigendecomposition in TPRS
-
     bs <- basis(s(x2, by = fac), data = su_eg4)
     plt <- draw(bs)
+
     skip_on_ci()
+    skip_on_cran()
     expect_doppelganger("draw by factor basis", plt)
 })
 
