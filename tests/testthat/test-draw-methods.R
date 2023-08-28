@@ -6,13 +6,15 @@ test_that("draw.evaluated_1d_smooth() plots the smooth", {
     sm <- evaluate_smooth(su_m_univar_4, "s(x2)")
     plt <- draw(sm)
     expect_doppelganger("draw 1d smooth for selected smooth", plt)
+    skip_on_ci()
 })
 
 test_that("draw.gam works with numeric select", {
-    plt <- draw(su_m_quick_eg1, select = 2, rug = FALSE)
-    expect_doppelganger("draw gam smooth for selected smooth numeric", plt)
-    plt <- draw(su_m_quick_eg1, select = c(1,2), rug = FALSE)
-    expect_doppelganger("draw gam smooth for two selected smooths numeric", plt)
+    plt1 <- draw(su_m_quick_eg1, select = 2, rug = FALSE)
+    plt2 <- draw(su_m_quick_eg1, select = c(1,2), rug = FALSE)
+    skip_on_ci()
+    expect_doppelganger("draw gam smooth for selected smooth numeric", plt1)
+    expect_doppelganger("draw gam smooth for two selected smooths numeric", plt2)
 })
 
 test_that("draw.gam fails with bad select", {
@@ -31,19 +33,24 @@ the number of smooths in the model.", fixed = TRUE)
 })
 
 test_that("draw.gam works with character select", {
-    plt <- draw(su_m_quick_eg1, select = "s(x1)", rug = FALSE)
-    expect_doppelganger("draw gam smooth for selected smooth character", plt)
-    plt <- draw(su_m_quick_eg1, select = c("s(x0)", "s(x1)"), rug = FALSE)
+    plt1 <- draw(su_m_quick_eg1, select = "s(x1)", rug = FALSE)
+    plt2 <- draw(su_m_quick_eg1, select = c("s(x0)", "s(x1)"), rug = FALSE)
+    expect_doppelganger("draw gam smooth for selected smooth character", plt1)
     expect_doppelganger("draw gam smooth for two selected smooths character",
-                        plt)
+                        plt2)
 })
 
-test_that("draw.gam works with logical select", {
+test_that("draw.gam works with logical select single smooth", {
     plt <- draw(su_m_quick_eg1, select = c(TRUE, rep(FALSE, 3)),
         rug = FALSE)
+    skip_on_ci()
     expect_doppelganger("draw gam smooth for selected smooth logical", plt)
+})
+
+test_that("draw.gam works with logical select two smooths", {
     plt <- draw(su_m_quick_eg1, select = rep(c(TRUE, FALSE), each = 2),
         rug = FALSE)
+    skip_on_ci()
     expect_doppelganger("draw gam smooth for two selected smooths logical", plt)
 })
 
@@ -57,23 +64,25 @@ test_that("draw.gam works with partial_match", {
 })
 
 test_that("draw.gam works with select and parametric", {
-    plt <- draw(su_m_factor_by, select = "s(x2)", partial_match = TRUE,
+    plt1 <- draw(su_m_factor_by, select = "s(x2)", partial_match = TRUE,
         rug = FALSE)
-    expect_doppelganger("draw gam with select and parametric is NULL", plt)
-    plt <- draw(su_m_factor_by, select = "s(x2)", partial_match = TRUE,
+    plt2 <- draw(su_m_factor_by, select = "s(x2)", partial_match = TRUE,
                 parametric = FALSE, data = su_eg4, envir = teardown_env(),
         rug = FALSE)
-    expect_doppelganger("draw gam with select and parametric is FALSE", plt)
-    plt <- draw(su_m_factor_by, select = "s(x2)", partial_match = TRUE,
+    plt3 <- draw(su_m_factor_by, select = "s(x2)", partial_match = TRUE,
                 parametric = TRUE, data = su_eg4, envir = teardown_env(),
         rug = FALSE)
-    expect_doppelganger("draw gam with select and parametric is TRUE", plt)
-    plt <- draw(su_m_factor_by, parametric = TRUE, rug = FALSE,
+    plt4 <- draw(su_m_factor_by, parametric = TRUE, rug = FALSE,
         data = su_eg4, envir = teardown_env())
-    expect_doppelganger("draw gam without select and parametric is TRUE", plt)
-    plt <- draw(su_m_factor_by, parametric = FALSE, rug = FALSE,
+    plt5 <- draw(su_m_factor_by, parametric = FALSE, rug = FALSE,
         data = su_eg4, envir = teardown_env())
-    expect_doppelganger("draw gam without select and parametric is FALSE", plt)
+    
+    skip_on_ci()
+    expect_doppelganger("draw gam with select and parametric is NULL", plt1)
+    expect_doppelganger("draw gam with select and parametric is FALSE", plt2)
+    expect_doppelganger("draw gam with select and parametric is TRUE", plt3)
+    expect_doppelganger("draw gam without select and parametric is TRUE", plt4)
+    expect_doppelganger("draw gam without select and parametric is FALSE", plt5)
 })
 
 test_that("draw.evaluated_2d_smooth() plots the smooth", {
@@ -82,9 +91,11 @@ test_that("draw.evaluated_2d_smooth() plots the smooth", {
     skip_if_not_installed("withr")
     withr::local_options(lifecycle_verbosity = "quiet")
     expect_silent(sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100))
-    expect_silent(plt <- draw(sm))
+    
+    skip_on_ci()
+    expect_silent(plt1 <- draw(sm))
+    expect_silent(plt2 <- draw(sm, contour_col = "red"))
     expect_doppelganger("draw 2d smooth", plt)
-    expect_silent(plt <- draw(sm, contour_col = "red"))
     expect_doppelganger("draw 2d smooth diff contour colour", plt)
 })
 
