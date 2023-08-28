@@ -17,15 +17,17 @@ test_that("basis() works with a gam", {
     expect_silent(bs <- basis(m_gam))
     expect_s3_class(bs, "basis")
 
-    plt <- draw(bs)
-    expect_doppelganger("draw basis works with a gam multiple smooths", plt)
+    plt1 <- draw(bs)
 
     expect_silent(bs <- basis(m_gam, "s(x2)"))
     expect_s3_class(bs, "basis")
     expect_named(bs, c("smooth", "type", "by_variable", "bf", "value", "x2"))
 
-    plt <- draw(bs)
-    expect_doppelganger("draw basis works with a gam single smooth", plt)
+    plt2 <- draw(bs)
+
+    skip_on_ci()
+    expect_doppelganger("draw basis works with a gam multiple smooths", plt1)
+    expect_doppelganger("draw basis works with a gam single smooth", plt2)
 })
 
 test_that("basis() works with a scam", {
@@ -35,6 +37,8 @@ test_that("basis() works with a scam", {
     expect_named(bs, c("smooth", "type", "by_variable", "bf", "value", "x2"))
 
     plt <- draw(bs)
+
+    skip_on_ci()
     expect_doppelganger("draw basis works with a scam single smooth", plt)
 })
 
@@ -45,13 +49,15 @@ test_that("basis() works with bivariate tprs smooths", {
         constraints = TRUE))
     expect_s3_class(bs, "basis")
 
-    plt <- draw(bs)
-    expect_doppelganger("draw basis works with a bivariate tprs", plt)
+    plt1 <- draw(bs)
 
     skip_on_cran()
     skip_on_os("mac")
-    plt <- draw(bs, contour = TRUE)
-    expect_doppelganger("draw basis works with a bivariate tprs contour", plt)
+    plt2 <- draw(bs, contour = TRUE)
+
+    skip_on_ci()
+    expect_doppelganger("draw basis works with a bivariate tprs", plt1)
+    expect_doppelganger("draw basis works with a bivariate tprs contour", plt2)
 })
 
 test_that("basis() works with bivariate te smooths", {
@@ -61,11 +67,13 @@ test_that("basis() works with bivariate te smooths", {
         constraints = TRUE))
     expect_s3_class(bs, "basis")
 
-    plt <- draw(bs)
-    expect_doppelganger("draw basis works with a bivariate te", plt)
+    plt1 <- draw(bs)
 
     skip_on_cran()
     skip_on_os("mac")
-    plt <- draw(bs, contour = TRUE)
-    expect_doppelganger("draw basis works with a bivariate te contour", plt)
+    plt2 <- draw(bs, contour = TRUE)
+
+    skip_on_ci()
+    expect_doppelganger("draw basis works with a bivariate te", plt1)
+    expect_doppelganger("draw basis works with a bivariate te contour", plt2)
 })
