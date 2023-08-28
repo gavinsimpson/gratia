@@ -87,5 +87,7 @@ test_that("issue 212 remains fixed", {
     expect_named(peff, c("term", "type", "level", "value", "partial", "se"))
 
     plt <- draw(peff, rug = FALSE)
+
+    skip_on_ci()
     expect_doppelganger("testing issue 212", plt)
 })

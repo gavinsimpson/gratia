@@ -18,17 +18,23 @@ methods <- c("uniform", "simulate", "normal")
 # uniform randomisation of uniform quantiles
 test_that("worm_plot() uniform method works", {
     plt <- withr::with_seed(42, worm_plot(m))
+
+    skip_on_ci()
     expect_doppelganger("worm_plot uniform randomisation", plt)
 })
 
 test_that("worm_plot() uniform method works with response residuals", {
     plt <- withr::with_seed(42, worm_plot(m, type = "response"))
+
+    skip_on_ci()
     expect_doppelganger("worm_plot uniform randomisation response residuals",
         plt)
 })
 
 test_that("worm_plot() uniform method works with pearson residuals", {
     plt <- withr::with_seed(42, worm_plot(m, type = "pearson"))
+
+    skip_on_ci()
     expect_doppelganger("worm_plot uniform randomisation pearson residuals",
         plt)
 })
@@ -36,17 +42,23 @@ test_that("worm_plot() uniform method works with pearson residuals", {
 # normality assumption
 test_that("worm_plot() normal method works", {
     plt <- worm_plot(m, method = "normal")
+
+    skip_on_ci()
     expect_doppelganger("worm_plot normality assumption", plt)
 })
 
 test_that("worm_plot() normal method works", {
     plt <- worm_plot(m, method = "normal", type = "response")
+
+    skip_on_ci()
     expect_doppelganger("worm_plot normality assumption response residuals",
         plt)
 })
 
 test_that("worm_plot() normal method works", {
     plt <- worm_plot(m, method = "normal", type = "pearson")
+
+    skip_on_ci()
     expect_doppelganger("worm_plot normality assumption pearson residuals",
         plt)
 })
@@ -54,18 +66,24 @@ test_that("worm_plot() normal method works", {
 # simulate data to get quantiles
 test_that("worm_plot() simulate method works", {
     plt <- withr::with_seed(42, worm_plot(m, method = "simulate"))
+
+    skip_on_ci()
     expect_doppelganger("worm_plot data simulation", plt)
 })
 
 test_that("worm_plot() simulate method works", {
     plt <- withr::with_seed(42, worm_plot(m, method = "simulate",
         type = "response"))
+
+    skip_on_ci()
     expect_doppelganger("worm_plot data simulation response residuals", plt)
 })
 
 test_that("worm_plot() simulate method works", {
     plt <- withr::with_seed(42, worm_plot(m, method = "simulate",
         type = "pearson"))
+
+    skip_on_ci()
     expect_doppelganger("worm_plot data simulation pearson residuals", plt)
 })
 

@@ -1,4 +1,4 @@
-# Test draw() methods
+# Test smooth_estimates()
 
 dat <- data_sim("eg1", n = 400, seed = 1)
 m1 <- gam(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'ps') + s(x3, bs = 'bs'),
