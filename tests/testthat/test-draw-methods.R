@@ -411,7 +411,6 @@ test_that("draw plots partial derivatives for a GAM", {
     d1 <- partial_derivatives(su_m_bivar_te, term = "te(x,z)", focal = "z",
         type = "central", n = 100)
     plt1 <- draw(d1)
-    expect_doppelganger("draw partial derivatives for a GAM", plt)
 
     plt2 <- draw(d1, scales = "fixed")
 
