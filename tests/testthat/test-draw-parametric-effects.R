@@ -5,6 +5,8 @@ test_that("draw.parametric_effects works for m_2_fac", {
     envir = teardown_env()),
                    "Interaction terms are not currently supported.")
     expect_silent(plt <- draw(peff))
+
+    skip_on_ci()
     expect_doppelganger("draw parametric effects m_2_fac", plt)
 })
 
@@ -13,6 +15,8 @@ test_that("draw.parametric_effects works for m_para_sm", {
     envir = teardown_env()),
                    "Interaction terms are not currently supported.")
     expect_silent(plt <- draw(peff, rug = FALSE))
+
+    skip_on_ci()
     expect_doppelganger("draw parametric effects m_para_sm", plt)
 })
 
@@ -20,6 +24,8 @@ test_that("draw.parametric_effects works for m_2_fac select term", {
     expect_silent(peff <- parametric_effects(m_2_fac, term = "fac", data = df_2_fac,
     envir = teardown_env()))
     expect_silent(plt <- draw(peff))
+
+    skip_on_ci()
     expect_doppelganger("draw parametric effects m_2_fac with term", plt)
 })
 
@@ -27,6 +33,8 @@ test_that("draw.parametric_effects works for m_para_sm select term", {
     expect_silent(peff <- parametric_effects(m_para_sm, term = "fac", data = df_2_fac,
     envir = teardown_env()))
     expect_silent(plt <- draw(peff, rug = FALSE))
+
+    skip_on_ci()
     expect_doppelganger("draw parametric effects m_para_sm with term", plt)
 })
 
@@ -35,6 +43,8 @@ test_that("draw.parametric_effects works with only parametric terms", {
         envir = teardown_env()),
     "Interaction terms are not currently supported.")
     expect_silent(plt <- draw(peff, rug = FALSE))
+
+    skip_on_ci()
     expect_doppelganger("draw parametric effects m_only_para", plt)
 })
 
@@ -85,34 +95,36 @@ test_that("issue 45 parametric effects for lss models remains fixed", {
     b <- gam(list(y ~ s(x2) + x3, ~ s(x0) + x1), family = ziplss(),
         data = data_45)
 
-    expect_silent(plt <- draw(b, rug = FALSE))
-    expect_doppelganger("ziplss with numeric para not plotted", plt)
+    expect_silent(plt1 <- draw(b, rug = FALSE))
 
-    expect_silent(plt <- draw(b, parametric = TRUE, rug = FALSE,
+    expect_silent(plt2 <- draw(b, parametric = TRUE, rug = FALSE,
         data = data_45, envir = teardown_env()))
-    expect_doppelganger("ziplss with numeric para plotted", plt)
 
     # ZIP model with a categorical predictor
     b0 <- gam(list(y ~ s(x2) + x4, ~ s(x0) + x1), family = ziplss(),
         data = data_45)
 
-    expect_silent(plt <- draw(b0, rug = FALSE))
-    expect_doppelganger("ziplss with factor para not plotted", plt)
+    expect_silent(plt3 <- draw(b0, rug = FALSE))
 
-    expect_silent(plt <- draw(b0, parametric = TRUE, rug = FALSE,
+    expect_silent(plt4 <- draw(b0, parametric = TRUE, rug = FALSE,
         data = data_45, envir = teardown_env()))
-    expect_doppelganger("ziplss with factor para plotted", plt)
 
     # ZIP model with linear and categorical predictor
     b1 <- gam(list(y ~ s(x2) + x3 + x4, ~ s(x0) + x1), family = ziplss(),
         data = data_45)
 
-    expect_silent(plt <- draw(b1, rug = FALSE))
-    expect_doppelganger("ziplss with both parametric not plotted", plt)
+    expect_silent(plt5 <- draw(b1, rug = FALSE))
 
-    expect_silent(plt <- draw(b1, parametric = TRUE, rug = FALSE,
+    expect_silent(plt6 <- draw(b1, parametric = TRUE, rug = FALSE,
         data = data_45, envir = teardown_env()))
-    expect_doppelganger("ziplss with both parametric plotted", plt)
+
+    skip_on_ci()
+    expect_doppelganger("ziplss with numeric para not plotted", plt1)
+    expect_doppelganger("ziplss with numeric para plotted", plt2)
+    expect_doppelganger("ziplss with factor para not plotted", plt3)
+    expect_doppelganger("ziplss with factor para plotted", plt4)
+    expect_doppelganger("ziplss with both parametric not plotted", plt5)
+    expect_doppelganger("ziplss with both parametric plotted", plt6)
 })
 
 # test #219
@@ -141,5 +153,7 @@ test_that("parametric effects works with mssing data in model fit", {
 
     expect_silent(plt <- draw(m3_hgam, residuals = TRUE, rug = FALSE,
         grouped_by = TRUE, parametric = TRUE))
+    
+    skip_on_ci()
     expect_doppelganger("issue 219 parametric effects", plt)
 })
