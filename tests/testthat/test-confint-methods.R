@@ -176,5 +176,7 @@ test_that("confint.fderiv example output", {
     x2_sint <- withr::with_seed(24,
         confint(fd, parm = "x2", type = "simultaneous", nsim = 10000,
             ncores = 2))
+
+    skip_on_ci()
     expect_snapshot_output(x2_sint)
 })

@@ -364,8 +364,6 @@ test_that("derivatives() returns derivatives with simultaneous intervals for all
 })
 
 test_that("derivatives() works for factor by smooths issue 47", {
-    skip_on_os("mac")
-    skip_on_ci()
     skip_on_cran()
 
     expect_silent(d <- derivatives(su_m_factor_by_x2))
@@ -373,8 +371,7 @@ test_that("derivatives() works for factor by smooths issue 47", {
     expect_s3_class(d, "tbl_df")
     expect_named(d, c("smooth","var","by_var","fs_var","fac","data",
                        "derivative","se","crit","lower","upper"))
-    plt <- draw(d)
-    expect_doppelganger("draw issue 47 derivatives for factor by", plt)
+    plt1 <- draw(d)
 
     m <- gam(y ~ x1 + s(x2) + fac + s(x0, by = fac), data = su_eg4,
              method = "REML")
@@ -383,8 +380,7 @@ test_that("derivatives() works for factor by smooths issue 47", {
     expect_s3_class(d, "tbl_df")
     expect_named(d, c("smooth", "var", "by_var", "fs_var", "fac", "data",
                       "derivative", "se", "crit", "lower", "upper"))
-    plt <- draw(d)
-    expect_doppelganger("draw issue 47 derivatives for complex factor by", plt)
+    plt2 <- draw(d)
 
     dat <- transform(su_eg4, ofac = ordered(fac))
     m <- gam(y ~ x1 + s(x2) + ofac + s(x0) + s(x0, by = ofac), data = dat,
@@ -394,19 +390,21 @@ test_that("derivatives() works for factor by smooths issue 47", {
     expect_s3_class(d, "tbl_df")
     expect_named(d, c("smooth", "var", "by_var", "fs_var", "ofac", "data",
                       "derivative", "se", "crit", "lower", "upper"))
-    plt <- draw(d)
-    expect_doppelganger("draw issue 47 derivs for ordered factor by", plt)
-
-    skip_on_covr()
-    skip_on_ci()
+    plt3 <- draw(d)
     m <- gamm(y ~ x1 + s(x2) + fac + s(x0, by = fac), data = su_eg4)
     expect_silent(d <- derivatives(m))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
     expect_named(d, c("smooth", "var", "by_var", "fs_var", "fac", "data",
                       "derivative", "se", "crit", "lower", "upper"))
-    plt <- draw(d)
-    expect_doppelganger("draw issue 47 derivatives for gamm factor by", plt)
+    plt4 <- draw(d)
+
+    skip_on_ci()
+    skip_on_covr()
+    expect_doppelganger("draw issue 47 derivatives for factor by", plt1)
+    expect_doppelganger("draw issue 47 derivatives for complex factor by", plt2)
+    expect_doppelganger("draw issue 47 derivs for ordered factor by", plt3)
+    expect_doppelganger("draw issue 47 derivatives for gamm factor by", plt4)
 })
 
 test_that("derivatives() works for fs smooths issue 57", {

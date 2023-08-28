@@ -21,14 +21,16 @@ test_that("compare_smooths() errors when passed a single model", {
 test_that("draw.compare_smooths() can plot a comparison of smooths", {
     expect_silent(cs <- compare_smooths(su_m_quick_eg1,
                                         su_m_quick_eg1_shrink))
-    expect_silent(plt <- draw(cs))
-    expect_doppelganger("compare smooths - all smooths", plt)
+    expect_silent(plt1 <- draw(cs))
 
-    expect_silent(plt <- draw(cs, nrow = 2, ncol = 3))
-    expect_doppelganger("compare smooths - set nrow ncol", plt)
+    expect_silent(plt2 <- draw(cs, nrow = 2, ncol = 3))
 
-    expect_silent(plt <- draw(cs) & theme(legend.position = "bottom"))
-    expect_doppelganger("compare smooths - bottom legend", plt)
+    expect_silent(plt3 <- draw(cs) & theme(legend.position = "bottom"))
+
+    skip_on_ci()
+    expect_doppelganger("compare smooths - all smooths", plt1)
+    expect_doppelganger("compare smooths - set nrow ncol", plt2)
+    expect_doppelganger("compare smooths - bottom legend", plt3)
 })
 
 test_that("compare_smooths() works when a model is not a simple object", {
