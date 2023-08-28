@@ -70,7 +70,7 @@ data(columb)       ## data frame
 data(columb.polys) ## district shapes list
 xt <- list(polys = columb.polys) ## neighbourhood structure info for MRF
 ## First a full rank MRF...
-mrf_mod <- gam(crime ~ s(district, bs="mrf", xt=xt), data = columb,
+mrf_mod <- gam(crime ~ s(district, bs = "mrf", xt = xt), data = columb,
                method = "REML")
 
 test_that("is_mrf_smooth returns true for an MRF smooth", {

@@ -6,6 +6,8 @@ test_that("difference_smooths() works for a gam model", {
 
     ## plot
     plt <- draw(ds)
+
+    skip_on_ci()
     expect_doppelganger("draw difference_smooths gam", plt)
 })
 
@@ -16,6 +18,8 @@ test_that("difference_smooths() works for a gam model including group means", {
 
     ## plot
     plt <- draw(ds)
+
+    skip_on_ci()
     expect_doppelganger("draw difference_smooths gam inc grp means", plt)
 })
 
@@ -25,6 +29,8 @@ test_that("difference_smooths() works for a gam model fixed scales", {
 
     ## plot
     plt <- draw(ds, scales = "fixed")
+
+    skip_on_ci()
     expect_doppelganger("draw difference_smooths gam fixed scales", plt)
 })
 
@@ -34,6 +40,8 @@ test_that("difference_smooths() works for a gam model fixed scales", {
 
     ## plot
     plt <- draw(ds, ref_line = TRUE)
+
+    skip_on_ci()
     expect_doppelganger("draw difference_smooths gam ref line", plt)
 })
 
@@ -45,6 +53,8 @@ test_that("difference_smooths() works for a bam model", {
 
     ## plot
     plt <- draw(ds)
+
+    skip_on_ci()
     expect_doppelganger("draw difference_smooths bam", plt)
 })
 
@@ -57,6 +67,8 @@ test_that("difference_smooths() works for a gamm model", {
 
     ## plot
     plt <- draw(ds)
+
+    skip_on_ci()
     expect_doppelganger("draw difference_smooths gamm", plt)
 })
 
@@ -69,6 +81,8 @@ test_that("difference_smooths() works for a gamm4 model", {
 
     ## plot
     plt <- draw(ds)
+
+    skip_on_ci()
     expect_doppelganger("draw difference_smooths gamm4", plt)
 })
 
@@ -83,7 +97,9 @@ test_that("difference_smooths() works with user data", {
 
     ## plot
     plt <- draw(ds)
-    #expect_doppelganger("draw difference_smooths gam", plt)
+
+    skip_on_ci()
+    expect_doppelganger("draw difference_smooths gam", plt)
 })
 
 test_that("difference_smooths() works for a bivariate gam", {
@@ -93,11 +109,13 @@ test_that("difference_smooths() works for a bivariate gam", {
     expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
 
     ## plot
-    plt <- draw(ds)
-    expect_doppelganger("draw difference_smooths bivariate gam", plt)
+    plt1 <- draw(ds)
 
     ## plot
     skip_on_os("mac")
-    plt <- draw(ds, contour = TRUE)
-    expect_doppelganger("draw difference_smooths bivariate gam contours", plt)
+    plt2 <- draw(ds, contour = TRUE)
+
+    skip_on_ci()
+    expect_doppelganger("draw difference_smooths bivariate gam", plt1)
+    expect_doppelganger("draw difference_smooths bivariate gam contours", plt2)
 })

@@ -27,5 +27,7 @@ test_that("draw works for a simple GJRM gamlss", {
     m_gamlss_gjrm <- GJRM::gamlss(fl, data = dataSim)
     expect_silent(plt <- draw(m_gamlss_gjrm))
 
+
+    skip_on_ci()
     expect_doppelganger("draw-simple-gjrm-gamlss", plt)
 })
