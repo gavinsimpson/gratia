@@ -90,8 +90,6 @@ Posterior expectations of derivatives from an estimated model
 }
 \examples{
 
-library("ggplot2")
-library("patchwork")
 load_mgcv()
 df <- data_sim("eg1", dist = "negbin", scale = 0.25, seed = 42)
 
@@ -108,10 +106,13 @@ fd_samp <- derivative_samples(m, data = ds, type = "central",
     focal = "x2", eps = 0.01, seed = 21)
 
 # plot the first 20 posterior draws
-fd_samp |>
-    filter(draw <= 20) |>
-    ggplot(aes(x = x2, y = derivative, group = draw)) +
-    geom_line(alpha = 0.5)
+if (requireNamespace("ggplot2") && requireNamespace("dplyr")) {
+    library("ggplot2")
+    fd_samp |>
+        dplyr::filter(draw <= 20) |>
+        ggplot(aes(x = x2, y = derivative, group = draw)) +
+        geom_line(alpha = 0.5)
+}
 }
 \author{
 Gavin L. Simpson
