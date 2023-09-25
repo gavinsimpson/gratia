@@ -99,8 +99,8 @@ test_that("draw.evaluated_2d_smooth() plots the smooth", {
     skip_on_ci()
     expect_silent(plt1 <- draw(sm))
     expect_silent(plt2 <- draw(sm, contour_col = "red"))
-    expect_doppelganger("draw 2d smooth", plt)
-    expect_doppelganger("draw 2d smooth diff contour colour", plt)
+    expect_doppelganger("draw 2d smooth", plt1)
+    expect_doppelganger("draw 2d smooth diff contour colour", plt2)
 })
 
 test_that("draw.evaluated_2d_smooth() plots the smooth without contours", {
@@ -173,8 +173,8 @@ test_that("draw.gam() plots an AM with a single factor by-variable smooth", {
     plt2 <- draw(su_m_factor_by, scales = "fixed", rug = FALSE)
 
     skip_on_ci()
-    expect_doppelganger("draw factor by-variable smooth with fixed scales", plt1)
-    expect_doppelganger("draw AM with factor by-variable smooth", plt2)
+    expect_doppelganger("draw AM with factor by-variable smooth", plt1)
+    expect_doppelganger("draw factor by-variable smooth with fixed scales", plt2)
 })
 
 ## simulate date from y = f(x2)*x1 + error
@@ -676,8 +676,9 @@ test_that("draw.penalty_df accepts user-specified continuous_fill", {
 
     expect_silent(pen <- penalty(su_m_univar_4))
     plt1 <- draw(pen,
-                continuous_fill = scale_fill_distiller(palette = "Spectral",
-                                                       type = "div"))
+        continuous_fill = scale_fill_distiller(palette = "Spectral",
+            type = "div"))
+    
     plt2 <- draw(penalty(su_m_univar_4, "s(x1)"),
         continuous_fill = scale_fill_distiller(palette = "Spectral",
             type = "div"))
@@ -698,9 +699,9 @@ test_that("draw.penalty_df works with normalization", {
     plt2 <- draw(penalty(su_m_univar_4, "s(x1)"), normalize = TRUE)
 
     skip_on_ci()
-    expect_doppelganger("draw penalty_df with single smooths normalized",
-                        plt1)
     expect_doppelganger("draw penalty_df with multiple smooths normalized",
+                        plt1)
+    expect_doppelganger("draw penalty_df with single smooths normalized",
                         plt2)
 })
 

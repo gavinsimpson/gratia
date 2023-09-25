@@ -89,7 +89,7 @@ test_that("difference_smooths() works for a gamm4 model", {
 test_that("difference_smooths() works with user data", {
     df <- with(su_eg4,
                expand_grid(fac = factor(levels(fac), levels = levels(fac)),
-                           x2 = seq_min_max(x2, n = 20),
+                           x2 = evenly(x2, n = 100),
                            x0 = mean(x0)))
     expect_silent(ds <-
       difference_smooths(su_m_factor_by, smooth = "s(x2)", data = df))
@@ -99,7 +99,7 @@ test_that("difference_smooths() works with user data", {
     plt <- draw(ds)
 
     skip_on_ci()
-    expect_doppelganger("draw difference_smooths gam", plt)
+    expect_doppelganger("draw difference_smooths gam user data", plt)
 })
 
 test_that("difference_smooths() works for a bivariate gam", {

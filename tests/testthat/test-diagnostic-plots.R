@@ -65,9 +65,9 @@ test_that("worm_plot works for a GLM", {
 })
 
 test_that("worm_plot works for a LM", {
-    expect_silent(plt2 <- withr::with_seed(1, worm_plot(m_lm)))
+    expect_silent(plt1 <- withr::with_seed(1, worm_plot(m_lm)))
 
-    expect_silent(pl2t <- withr::with_seed(1, worm_plot(m_lm,
+    expect_silent(plt2 <- withr::with_seed(1, worm_plot(m_lm,
         method = "simulate")))
 
     expect_silent(plt3 <- withr::with_seed(1, worm_plot(m_lm,
