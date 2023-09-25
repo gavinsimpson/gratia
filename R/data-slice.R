@@ -64,19 +64,19 @@
 #' df <- data_sim("eg1", n = 50, seed = 2)
 #'
 #' # fit a GAM with 1 smooth and 1 linear term
-#' m1 <- gam(y ~ s(x2, k = 7) + x1, data = df, method = "REML")
+#' m <- gam(y ~ s(x2, k = 7) + x1, data = df, method = "REML")
 #'
 #' # Want to predict over f(x2) while holding `x1` at some value.
 #' # Default will use the observation closest to the median for unspecified
 #' # variables.
-#' ds <- data_slice(m1, x2 = evenly(x2, n = 50))
+#' ds <- data_slice(m, x2 = evenly(x2, n = 50))
 #'
 #' # for full control, specify the values you want
-#' ds <- data_slice(m1, x2 = evenly(x2, n = 50), x1 = 0.3)
+#' ds <- data_slice(m, x2 = evenly(x2, n = 50), x1 = 0.3)
 #'
 #' # or provide an expression (function call) which will be evaluated in the
 #' # data frame passed to `data` or `model.frame(object)`
-#' ds <- data_slice(m1, x2 = evenly(x2, n = 50), x1 = mean(x1))
+#' ds <- data_slice(m, x2 = evenly(x2, n = 50), x1 = mean(x1))
 `data_slice.gam` <- function(object, ..., data = NULL,
                              envir = environment(formula(object))) {
     # prep data
