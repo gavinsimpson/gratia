@@ -36,6 +36,11 @@
   from a Gaussian approximation to the posterior or using a Metropolis Hastings
   sampler (see below.)
 
+* `derivative_samples()` is the work horse function behind
+  `response_derivatives()`, which computes and returns posterior draws of the
+  derivatives of any additive combination of model terms. Requested by
+  @jonathanmellor #237
+
 * `data_sim()` can now simulate response data from gamma, Tweedie and ordered
   categorical distributions.
 
