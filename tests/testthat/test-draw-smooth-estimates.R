@@ -174,7 +174,7 @@ test_that("draw.smooth_estimates works for trivar te with a 2d marginal", {
     su_m_trivar_te2 <- gam(y ~ te(x0, x1, x2, k = c(3, 9), d = c(1, 2),
             bs = c("cr", "ds")),
         data = su_eg1, method = "REML")
-    expect_silent(plt2 <- draw(smooth_estimates(su_m_trivar_te2, dist = 0.1,
+    expect_silent(plt1 <- draw(smooth_estimates(su_m_trivar_te2, dist = 0.1,
                                                n = 20, n_3d = 4)))
 
     # also check that draw.gam() works for this model

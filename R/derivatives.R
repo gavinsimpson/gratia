@@ -953,6 +953,8 @@
 #'
 #' @export
 #'
+#' @importFrom dplyr distinct pick group_by mutate
+#'
 #' @rdname response_derivatives
 #'
 #' @return A tibble, currently with the following variables:
@@ -1008,7 +1010,8 @@
 #' # draw both panels
 #' p1 + p2 + plot_layout(nrow = 2)
 #' \dontshow{options(op)}
-`response_derivatives.gam` <- function(object, focal = NULL,
+`response_derivatives.gam` <- function(object,
+    focal = NULL,
     data = NULL,
     order = 1L,
     type = c("forward", "backward", "central"),
@@ -1018,76 +1021,28 @@
     n_sim = 10000, level = 0.95,
     seed = NULL,
     ...) {
-    ## handle seed
-    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-        runif(1)
-    }
-    if (is.null(seed)) {
-        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-    } else {
-        R.seed <- get(".Random.seed", envir = .GlobalEnv)
-        set.seed(seed)
-        RNGstate <- structure(seed, kind = as.list(RNGkind()))
-        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-    }
-    ## handle type
-    type <- match.arg(type)
-    ## handle method
-    method <- match.arg(method)
-    ## handle scale
-    scale <- match.arg(scale)
-
-    ## handle order
-    if (!order %in% c(1L, 2L)) {
-        stop("Only 1st or 2nd order partial derivatives are supported: ",
-            "`order %in% c(1,2)`")
-    }
-
-    ## handle data
-    need_data <- is.null(data)
-
-    ## should check that focal variable is continuous and not a factor
-
-    ## sort out data
-    if (need_data) {
-        x <- object$var.summary[[focal]]
-        x <- seq(x[1L], x[3L], length = n)
-        tv <- typical_values(object, vars = !matches(focal))
-        data <- expand_grid(.x = x, tv)
-    } else {
-        data <- data |>
-            rename(.x = {{focal}})
-    }
-    data <- data |>
-        add_column(..row = seq_len(nrow(data)), .before = 1L)
-
-    # now shift values depending on method
-    fd_data <- prepare_fdiff_data(data = data, eps = eps, type = type,
-        order = order, focal = focal)
-
-    ## compute posterior draws of E(y) (on response scale)
-    fs <- fitted_samples(model = object, n = n_sim, data = fd_data,
-        method = method, seed = seed, ...)
-
-    fs <- fs |>
-        left_join(select(fd_data, all_of(c("row", "..type", "..orig"))),
-            by = "row")
-
+    yd <- derivative_samples(object, focal = focal, data = data, order = order,
+        type = type, scale = scale, method = method, n = n, eps = eps,
+        n_sim = n_sim)
+    
     qq <- (1 - level) / 2
-    yd <- compute_y_fdiff(fs, order = order, type = type, eps = eps)
 
     yd <- yd |>
-        group_by(.data[["..orig"]]) |>
-        summarise(
-            derivative = median(.data[["..fd"]]),
-            lower_ci = quantile(.data[["..fd"]], probs = qq),
-            upper_ci = quantile(.data[["..fd"]], probs = 1 - qq)) |>
-        left_join(data, by = join_by("..orig" == "..row")) |>
-        rename("{focal}" := ".x") |>
-        select(!matches(c("..xf", "..xb", "..orig"))) |>
-        add_column(focal = rep(focal, nrow(data)), .before = 1L)
+        group_by(pick(matches(".row"))) |>
+        mutate(
+            .derivative = median(.data[["derivative"]]),
+            lower_ci = quantile(.data[["derivative"]], probs = qq),
+            upper_ci = quantile(.data[["derivative"]], probs = 1 - qq)) |>
+        distinct(pick(all_of(c("focal", ".row", ".derivative", "lower_ci",
+            "upper_ci"))), .keep_all = TRUE) |>
+        select(!all_of(c("draw", "derivative"))) |>
+        rename("derivative" = ".derivative") |>
+        relocate(all_of(c(".row", "focal", "derivative", "lower_ci",
+            "upper_ci")))
 
-    class(yd) <- append(class(yd), "response_derivatives", after = 0L)
+    cls <- class(yd)
+    cls[1] <- "response_derivatives"
+    class(yd) <- cls
     yd
 }
 

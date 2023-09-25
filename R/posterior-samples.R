@@ -599,3 +599,147 @@
     class(sims) <- c("smooth_samples", class(sims))
     sims
 }
+
+#' @title Posterior expectations of derivatives from an estimated model
+#'
+#' @param object an R object to compute derivatives for
+#' @param ... arguments passed to other methods and on to `fitted_samples()`
+#'
+#' @author Gavin L. Simpson
+#'
+#' @export
+`derivative_samples` <- function(object, ...) {
+    UseMethod("derivative_samples")
+}
+
+#' @rdname derivative_samples
+#' @export
+`derivative_samples.default` <- function(object, ...) {
+    ## want to bail with a useful error;
+    ## see Jenny Bryan's Code Smells UseR 2018 talk: rstd.io/code-smells
+    stop("Don't know how to calculate response derivatives for <",
+         class(object)[[1L]], ">",
+         call. = FALSE)           # don't show the call, simpler error
+}
+
+#' @rdname derivative_samples
+#'
+#' @export
+`derivative_ssamples.gamm` <- function(object, ...) {
+    derivative_samples(object[["gam"]], ...)
+}
+
+#' @inheritParams response_derivatives
+#'
+#' @export
+#'
+#' @rdname derivative_samples
+#'
+#' @return A tibble, currently with the following variables:
+#' * `derivative`: the estimated partial derivative,
+#' * `lower`: the lower bound of the confidence or simultaneous interval,
+#' * `upper`: the upper bound of the confidence or simultaneous interval,
+#' * additional columns containing the covariate values at which the derivative
+#'   was eveluated.
+#'
+#' @examples
+#'
+#' library("ggplot2")
+#' library("patchwork")
+#' load_mgcv()
+#' df <- data_sim("eg1", dist = "negbin", scale = 0.25, seed = 42)
+#'
+#' # fit the GAM (note: for execution time reasons using bam())
+#' m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+#'     data = df, family = nb(), method = "fREML", discrete = TRUE)
+#'
+#' # data slice through data along x2 - all other covariates will be set to
+#' # typical values (value closest to median)
+#' ds <- data_slice(m, x2 = evenly(x2, n = 200))
+#'
+#' # samples from posterior of derivatives
+#' fd_samp <- derivative_samples(m, data = ds, type = "central",
+#'     focal = "x2", eps = 0.01, seed = 21)
+#'
+#' # plot the first 20 posterior draws
+#' fd_samp |>
+#'     filter(draw <= 20) |>
+#'     ggplot(aes(x = x2, y = derivative, group = draw)) +
+#'     geom_line(alpha = 0.5)
+`derivative_samples.gam` <- function(object,
+    focal = NULL,
+    data = NULL,
+    order = 1L,
+    type = c("forward", "backward", "central"),
+    scale = c("response", "linear_predictor"),
+    method = c("gaussian", "mh", "inla", "user"),
+    n = 100,
+    eps = 1e-7,
+    n_sim = 10000, level = 0.95,
+    seed = NULL,
+    ...) {
+    ## handle seed
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+        runif(1)
+    }
+    if (is.null(seed)) {
+        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+    } else {
+        R.seed <- get(".Random.seed", envir = .GlobalEnv)
+        set.seed(seed)
+        RNGstate <- structure(seed, kind = as.list(RNGkind()))
+        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+    }
+    ## handle type
+    type <- match.arg(type)
+    ## handle method
+    method <- match.arg(method)
+    ## handle scale
+    scale <- match.arg(scale)
+
+    ## handle order
+    if (!order %in% c(1L, 2L)) {
+        stop("Only 1st or 2nd order partial derivatives are supported: ",
+            "`order %in% c(1,2)`")
+    }
+
+    ## handle data
+    need_data <- is.null(data)
+
+    ## sort out data
+    if (need_data) {
+        x <- object$var.summary[[focal]]
+        x <- seq(x[1L], x[3L], length = n)
+        tv <- typical_values(object, vars = !matches(focal))
+        data <- expand_grid(.x = x, tv)
+    } else {
+        data <- data |>
+            rename(.x = all_of({{ focal }}))
+    }
+    data <- data |>
+        add_column(..row = seq_len(nrow(data)), .before = 1L)
+
+    # now shift values depending on method
+    fd_data <- prepare_fdiff_data(data = data, eps = eps, type = type,
+        order = order, focal = focal)
+
+    ## compute posterior draws of E(y) (on response scale)
+    fs <- fitted_samples(model = object, n = n_sim, data = fd_data,
+        method = method, seed = seed, ...)
+
+    fs <- fs |>
+        left_join(select(fd_data, all_of(c("row", "..type", "..orig"))),
+            by = "row")
+
+    yd <- compute_y_fdiff(fs, order = order, type = type, eps = eps)
+
+    yd <- yd |>
+        left_join(data, by = join_by("..orig" == "..row")) |>
+        rename("{focal}" := ".x", "derivative" = "..fd", ".row" = "..orig") |>
+        select(!matches(c("..xf", "..xb"))) |>
+        add_column(focal = rep(focal, nrow(data) * n_sim), .before = 1L) |>
+        relocate(".row", .before = 1L)
+
+    class(yd) <- append(class(yd), "derivative_samples", after = 0L)
+    yd
+}

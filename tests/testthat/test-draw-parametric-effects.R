@@ -128,22 +128,27 @@ test_that("issue 45 parametric effects for lss models remains fixed", {
 })
 
 # test #219
-test_that("parametric effects works with mssing data in model fit", {
+test_that("parametric effects works with messing data in model fit", {
     skip_on_cran()
     skip_on_ci()
     skip_if_offline()
+    skip_if_not_installed("forcats")
+    skip_if_not_installed("readr")
 
     rats_url <- "https://bit.ly/rat-hormone"
-    expect_warning(rats <- read_table(rats_url, col_types = "dddddddddddd-"))
+    expect_warning(rats <- readr::read_table(rats_url,
+        col_types = "dddddddddddd-"))
     # ignore the warning - it"s due to trailing white space at the ends of each
     #   row in the file
 
     rats <- rats |>
-        mutate(treatment = fct_recode(factor(group, levels = c(1, 2, 3)),
+        mutate(treatment = forcats::fct_recode(factor(group,
+        levels = c(1, 2, 3)),
             Low = "1",
             High = "2",
             Control = "3"),
-        treatment = fct_relevel(treatment, c("Control", "Low", "High")),
+        treatment = forcats::fct_relevel(treatment,
+            c("Control", "Low", "High")),
         subject = factor(subject))
 
     m_rat <- gam(response ~ treatment +
@@ -151,9 +156,10 @@ test_that("parametric effects works with mssing data in model fit", {
         s(subject, bs = "re"),
     data = rats, method = "REML")
 
-    expect_silent(plt <- draw(m3_hgam, residuals = TRUE, rug = FALSE,
-        grouped_by = TRUE, parametric = TRUE))
-    
+    expect_silent(plt <- draw(m_rat, residuals = TRUE, rug = FALSE,
+        grouped_by = TRUE, parametric = TRUE,
+        data = rats, envir = teardown_env()))
+
     skip_on_ci()
     expect_doppelganger("issue 219 parametric effects", plt)
 })

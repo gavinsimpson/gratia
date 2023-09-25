@@ -19,7 +19,7 @@
 #' if (require("GJRM", quietly = TRUE)) {
 #'     # follow example from ?GJRM::gamlss
 #'     load_mgcv()
-#'     library("GJRM")
+#'     suppressPackageStartupMessages(library("GJRM"))
 #'     set.seed(0)
 #'     n <- 100
 #'     x1 <- round(runif(n))

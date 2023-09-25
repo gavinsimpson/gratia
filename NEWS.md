@@ -36,6 +36,11 @@
   from a Gaussian approximation to the posterior or using a Metropolis Hastings
   sampler (see below.)
 
+* `derivative_samples()` is the work horse function behind
+  `response_derivatives()`, which computes and returns posterior draws of the
+  derivatives of any additive combination of model terms. Requested by
+  @jonathanmellor #237
+
 * `data_sim()` can now simulate response data from gamma, Tweedie and ordered
   categorical distributions.
 
@@ -160,7 +165,7 @@
 
 * Constrained factor smooths (`bs = "sz"`) where the factor is not the first
   variable mentioned in the smooth (i.e. `s(x, f, bs = "sz")` for continuous
-  `x` and factor `f`) are not plottable with `draw()`. #208
+  `x` and factor `f`) are now plottable with `draw()`. #208
 
 * `parametric_effects()` was unable to handle special parametric terms like
   `poly(x)` or `log(x)` in formulas. Reported by @fhui28 #212

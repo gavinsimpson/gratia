@@ -1,6 +1,4 @@
 # Setup models for tests
-library("testthat")
-library("gratia")
 library("mgcv")
 library("gamm4")
 library("scam")
