@@ -958,11 +958,13 @@
 #' @rdname response_derivatives
 #'
 #' @return A tibble, currently with the following variables:
-#' * `focal`: the name of the variable for which the partial derivative was
-#'     evaluated,
-#' * `derivative`: the estimated partial derivative,
-#' * `lower`: the lower bound of the confidence or simultaneous interval,
-#' * `upper`: the upper bound of the confidence or simultaneous interval,
+#' * `.row`: integer, indexing the row of `data` each row in the output
+#'   represents
+#' * `.focal`: the name of the variable for which the partial derivative was
+#'   evaluated,
+#' * `.derivative`: the estimated partial derivative,
+#' * `.lower_ci`: the lower bound of the confidence or simultaneous interval,
+#' * `.upper_ci`: the upper bound of the confidence or simultaneous interval,
 #' * additional columns containing the covariate values at which the derivative
 #'   was eveluated.
 #'
@@ -987,9 +989,9 @@
 #' # fitted values along x2
 #' fv <- fitted_values(m, smooth = "s(x2)", data = ds)
 #'
-#' # response derivatives
-#' y_d <- response_derivatives(m, data = ds, type = "central",
-#'                             focal = "x2", eps = 0.01, seed = 21)
+#' # response derivatives - ideally n_sim = >10000
+#' y_d <- response_derivatives(m, data = ds, type = "central", focal = "x2",
+#'     eps = 0.01, seed = 21, n_sim = 1000)
 #'
 #' # draw fitted values along x2
 #' p1 <- fv |>
@@ -1001,8 +1003,8 @@
 #'
 #' # draw response derivatives
 #' p2 <- y_d |>
-#'     ggplot(aes(x = x2, y = derivative)) +
-#'     geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), alpha = 0.2) +
+#'     ggplot(aes(x = x2, y = .derivative)) +
+#'     geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
 #'     geom_line() +
 #'     labs(title = "Estimated 1st derivative of estimated count",
 #'          y = "First derivative")
@@ -1023,22 +1025,21 @@
     ...) {
     yd <- derivative_samples(object, focal = focal, data = data, order = order,
         type = type, scale = scale, method = method, n = n, eps = eps,
-        n_sim = n_sim)
-    
+        n_sim = n_sim, ...)
+
     qq <- (1 - level) / 2
 
     yd <- yd |>
         group_by(pick(matches(".row"))) |>
         mutate(
-            .derivative = median(.data[["derivative"]]),
-            lower_ci = quantile(.data[["derivative"]], probs = qq),
-            upper_ci = quantile(.data[["derivative"]], probs = 1 - qq)) |>
-        distinct(pick(all_of(c("focal", ".row", ".derivative", "lower_ci",
-            "upper_ci"))), .keep_all = TRUE) |>
-        select(!all_of(c("draw", "derivative"))) |>
-        rename("derivative" = ".derivative") |>
-        relocate(all_of(c(".row", "focal", "derivative", "lower_ci",
-            "upper_ci")))
+            .lower_ci = quantile(.data[[".derivative"]], probs = qq),
+            .upper_ci = quantile(.data[[".derivative"]], probs = 1 - qq),
+            .derivative = median(.data[[".derivative"]])) |>
+        distinct(pick(all_of(c(".focal", ".row", ".derivative", ".lower_ci",
+            ".upper_ci"))), .keep_all = TRUE) |>
+        select(!all_of(c(".draw"))) |>
+        relocate(all_of(c(".row", ".focal", ".derivative", ".lower_ci",
+            ".upper_ci")))
 
     cls <- class(yd)
     cls[1] <- "response_derivatives"
@@ -1077,7 +1078,7 @@
     fd_data <- fd_data |>
         bind_rows() |>
         rename("{focal}" := ".x") |>
-        add_column(row = seq_len(NROW(data) * 2), .before = 1L,
+        mutate(.row = seq_len(NROW(data) * 2), .before = 1L,
             ..orig = rep(seq_len(n), times = 2))
     fd_data
 }
@@ -1106,7 +1107,7 @@
     fd_data <- fd_data |>
         bind_rows() |>
         rename("{focal}" := ".x") |>
-        add_column(row = seq_len(NROW(data) * 3), .before = 1L,
+        mutate(.row = seq_len(NROW(data) * 3), .before = 1L,
             ..orig = rep(seq_len(n), times = 3))
     fd_data
 }
@@ -1125,8 +1126,8 @@
 #' @importFrom tidyselect matches
 `compute_y_fdiff_1` <- function(samples, type, eps = 1e-7) {
     samples <- samples |>
-        pivot_wider(id_cols = matches(c(".orig", "draw")),
-            names_from = "..type", values_from = "fitted",
+        pivot_wider(id_cols = c("..orig", ".draw"),
+            names_from = "..type", values_from = ".fitted",
             names_prefix = "..")
 
     samples |>
@@ -1138,8 +1139,8 @@
 #' @importFrom tidyselect matches
 `compute_y_fdiff_2` <- function(samples, type, eps = 1e-7) {
     samples <- samples |>
-        pivot_wider(id_cols = !matches("fitted", "..type"),
-            names_from = "..type", values_from = "fitted",
+        pivot_wider(id_cols = !matches(".fitted", "..type"),
+            names_from = "..type", values_from = ".fitted",
             names_prefix = "..")
 
     samples |>

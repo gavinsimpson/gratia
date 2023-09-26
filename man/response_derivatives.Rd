@@ -78,11 +78,13 @@ credible interval. The default is \code{0.95} for a 95\% interval.}
 \value{
 A tibble, currently with the following variables:
 \itemize{
-\item \code{focal}: the name of the variable for which the partial derivative was
+\item \code{.row}: integer, indexing the row of \code{data} each row in the output
+represents
+\item \code{.focal}: the name of the variable for which the partial derivative was
 evaluated,
-\item \code{derivative}: the estimated partial derivative,
-\item \code{lower}: the lower bound of the confidence or simultaneous interval,
-\item \code{upper}: the upper bound of the confidence or simultaneous interval,
+\item \code{.derivative}: the estimated partial derivative,
+\item \code{.lower_ci}: the lower bound of the confidence or simultaneous interval,
+\item \code{.upper_ci}: the upper bound of the confidence or simultaneous interval,
 \item additional columns containing the covariate values at which the derivative
 was eveluated.
 }
@@ -111,9 +113,9 @@ ds <- data_slice(m, x2 = evenly(x2, n = 100))
 # fitted values along x2
 fv <- fitted_values(m, smooth = "s(x2)", data = ds)
 
-# response derivatives
-y_d <- response_derivatives(m, data = ds, type = "central",
-                            focal = "x2", eps = 0.01, seed = 21)
+# response derivatives - ideally n_sim = >10000
+y_d <- response_derivatives(m, data = ds, type = "central", focal = "x2",
+    eps = 0.01, seed = 21, n_sim = 1000)
 
 # draw fitted values along x2
 p1 <- fv |>
@@ -125,8 +127,8 @@ p1 <- fv |>
 
 # draw response derivatives
 p2 <- y_d |>
-    ggplot(aes(x = x2, y = derivative)) +
-    geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), alpha = 0.2) +
+    ggplot(aes(x = x2, y = .derivative)) +
+    geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
     geom_line() +
     labs(title = "Estimated 1st derivative of estimated count",
          y = "First derivative")

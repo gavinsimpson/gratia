@@ -139,12 +139,13 @@
 
     # need to extend weights by number of draws
     weights <- rep(weights, times = n)
-    #scale <- rep(scale, times = n)
+    # scale <- rep(scale, times = n)
 
     # replace fitted with
     sim_eta <- sim_eta |>
-        mutate(response = rd_fun(mu = fitted, wt = weights, scale = scale)) |>
-        select(all_of(c("row", "draw", "response")))
+        mutate(.response = rd_fun(mu = .data$.fitted, wt = weights,
+            scale = scale)) |>
+        select(all_of(c(".row", ".draw", ".response")))
 
     ## add classes
     class(sim_eta) <- c("posterior_samples", class(sim_eta))
@@ -206,6 +207,9 @@
 #' @rdname fitted_samples
 #'
 #' @importFrom stats vcov coef predict
+#' @importFrom dplyr mutate
+#' @importFrom tidyr gather
+#' @importFrom tibble as_tibble
 #' @importFrom mvnfast rmvn
 #'
 #' @examples
@@ -278,9 +282,9 @@
     colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
     sims <- as_tibble(sims)
     names(sims) <- as.character(seq_len(ncol(sims)))
-    sims <- add_column(sims, row = seq_len(nrow(sims)))
-    sims <- gather(sims, key = "draw", value = "fitted", - row)
-    sims[["draw"]] <- as.integer(sims[["draw"]])
+    sims <- add_column(sims, .row = seq_len(nrow(sims)))
+    sims <- gather(sims, key = ".draw", value = ".fitted", - .row) |>
+        mutate(.draw = as.integer(.data$.draw))
     attr(sims, "seed") <- RNGstate
     ## add classes
     class(sims) <- c("fitted_samples", class(sims))
@@ -361,9 +365,9 @@
     colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
     sims <- as_tibble(sims)
     names(sims) <- as.character(seq_len(ncol(sims)))
-    sims <- add_column(sims, row = seq_len(nrow(sims)))
-    sims <- gather(sims, key = "draw", value = "response", - row)
-    sims[["draw"]] <- as.integer(sims[["draw"]])
+    sims <- add_column(sims, .row = seq_len(nrow(sims)))
+    sims <- gather(sims, key = ".draw", value = ".response", - .row) |>
+        mutate(.draw = as.integer(.data$.draw))
     attr(sims, "seed") <- RNGstate
     ## add classes
     class(sims) <- c("predicted_samples", class(sims))
@@ -629,6 +633,9 @@
     derivative_samples(object[["gam"]], ...)
 }
 
+#' @param envir the environment within which to recreate the data used to fit
+#'   `object`.
+#'
 #' @inheritParams response_derivatives
 #'
 #' @export
@@ -636,9 +643,7 @@
 #' @rdname derivative_samples
 #'
 #' @return A tibble, currently with the following variables:
-#' * `derivative`: the estimated partial derivative,
-#' * `lower`: the lower bound of the confidence or simultaneous interval,
-#' * `upper`: the upper bound of the confidence or simultaneous interval,
+#' * `.derivative`: the estimated partial derivative,
 #' * additional columns containing the covariate values at which the derivative
 #'   was eveluated.
 #'
@@ -657,14 +662,14 @@
 #'
 #' # samples from posterior of derivatives
 #' fd_samp <- derivative_samples(m, data = ds, type = "central",
-#'     focal = "x2", eps = 0.01, seed = 21)
+#'     focal = "x2", eps = 0.01, seed = 21, n_sim = 100)
 #'
 #' # plot the first 20 posterior draws
 #' if (requireNamespace("ggplot2") && requireNamespace("dplyr")) {
 #'     library("ggplot2")
 #'     fd_samp |>
-#'         dplyr::filter(draw <= 20) |>
-#'         ggplot(aes(x = x2, y = derivative, group = draw)) +
+#'         dplyr::filter(.draw <= 20) |>
+#'         ggplot(aes(x = x2, y = .derivative, group = .draw)) +
 #'         geom_line(alpha = 0.5)
 #' }
 `derivative_samples.gam` <- function(object,
@@ -678,6 +683,7 @@
     eps = 1e-7,
     n_sim = 10000, level = 0.95,
     seed = NULL,
+    envir = environment(formula(object)),
     ...) {
     ## handle seed
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
@@ -711,14 +717,16 @@
     if (need_data) {
         x <- object$var.summary[[focal]]
         x <- seq(x[1L], x[3L], length = n)
-        tv <- typical_values(object, vars = !matches(focal))
+        tv <- typical_values(object, vars = !matches(focal), data = data,
+            envir = envir)
         data <- expand_grid(.x = x, tv)
     } else {
         data <- data |>
+        select(all_of(model_vars(object))) |>
             rename(.x = all_of({{ focal }}))
     }
     data <- data |>
-        add_column(..row = seq_len(nrow(data)), .before = 1L)
+        add_column(.row = seq_len(nrow(data)), .before = 1L)
 
     # now shift values depending on method
     fd_data <- prepare_fdiff_data(data = data, eps = eps, type = type,
@@ -729,16 +737,16 @@
         method = method, seed = seed, ...)
 
     fs <- fs |>
-        left_join(select(fd_data, all_of(c("row", "..type", "..orig"))),
-            by = "row")
+        left_join(select(fd_data, all_of(c(".row", "..type", "..orig"))),
+            by = ".row")
 
     yd <- compute_y_fdiff(fs, order = order, type = type, eps = eps)
 
     yd <- yd |>
-        left_join(data, by = join_by("..orig" == "..row")) |>
-        rename("{focal}" := ".x", "derivative" = "..fd", ".row" = "..orig") |>
+        left_join(data, by = join_by("..orig" == ".row")) |>
+        rename("{focal}" := ".x", ".derivative" = "..fd", ".row" = "..orig") |>
         select(!matches(c("..xf", "..xb"))) |>
-        add_column(focal = rep(focal, nrow(data) * n_sim), .before = 1L) |>
+        add_column(.focal = rep(focal, nrow(data) * n_sim), .before = 1L) |>
         relocate(".row", .before = 1L)
 
     class(yd) <- append(class(yd), "derivative_samples", after = 0L)

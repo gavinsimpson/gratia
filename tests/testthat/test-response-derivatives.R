@@ -12,17 +12,17 @@ test_that("response derivatives works", {
         type = "central", focal = "x2", seed = 2))
     expect_s3_class(yd, class = "response_derivatives")
     expect_identical(nrow(yd), N)
-    expect_snapshot(print(yd))
+    expect_snapshot(print(yd), variant = "central")
 
     expect_silent(yd <- response_derivatives(m_nb, data = ds,
         type = "forward", focal = "x2", seed = 2))
     expect_s3_class(yd, class = "response_derivatives")
     expect_identical(nrow(yd), N)
-    expect_snapshot(print(yd))
+    expect_snapshot(print(yd), variant = "forward")
 
     expect_silent(yd <- response_derivatives(m_nb, data = ds,
         type = "backward", focal = "x2", seed = 2))
     expect_s3_class(yd, class = "response_derivatives")
     expect_identical(nrow(yd), N)
-    expect_snapshot(print(yd))
+    expect_snapshot(print(yd), variant = "backward")
 })

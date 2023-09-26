@@ -64,18 +64,18 @@
       fs
     Output
       # A tibble: 5,000 x 3
-           row  draw fitted
-         <int> <int>  <dbl>
-       1     1     1   4.76
-       2     2     1   5.70
-       3     3     1   4.16
-       4     4     1  11.0 
-       5     5     1  11.1 
-       6     6     1   4.47
-       7     7     1   5.67
-       8     8     1   6.86
-       9     9     1   9.76
-      10    10     1   7.39
+          .row .draw .fitted
+         <int> <int>   <dbl>
+       1     1     1    4.76
+       2     2     1    5.70
+       3     3     1    4.16
+       4     4     1   11.0 
+       5     5     1   11.1 
+       6     6     1    4.47
+       7     7     1    5.67
+       8     8     1    6.86
+       9     9     1    9.76
+      10    10     1    7.39
       # i 4,990 more rows
 
 # smooth_samples example output doesn't change
