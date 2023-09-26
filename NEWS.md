@@ -1,4 +1,4 @@
-# gratia 0.8.1.37
+# gratia 0.8.1.38
 
 ## User visible changes
 
@@ -23,6 +23,11 @@
   when nothing is provided to `data`.
 
   This also affects `draw.gam()`.
+
+* `fitted_samples()`, `posterior_samples()`, `derivative_samples()` are
+  converging in terms of the names on returned objects. In order to avoid
+  clashes with variable names used in user's models or data, a period (`.`) is
+  now being used as a prefix for generated variable names.
 
 * *gratia* now requires *dplyr* versions >= 1.1.0 and *tidyselect* >= 1.2.0.
 
