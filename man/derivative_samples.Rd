@@ -26,6 +26,7 @@ derivative_ssamples.gamm(object, ...)
   n_sim = 10000,
   level = 0.95,
   seed = NULL,
+  envir = environment(formula(object)),
   ...
 )
 }
@@ -74,13 +75,14 @@ simultaneous intervals.}
 credible interval. The default is \code{0.95} for a 95\% interval.}
 
 \item{seed}{numeric; a random seed for the simulations.}
+
+\item{envir}{the environment within which to recreate the data used to fit
+\code{object}.}
 }
 \value{
 A tibble, currently with the following variables:
 \itemize{
-\item \code{derivative}: the estimated partial derivative,
-\item \code{lower}: the lower bound of the confidence or simultaneous interval,
-\item \code{upper}: the upper bound of the confidence or simultaneous interval,
+\item \code{.derivative}: the estimated partial derivative,
 \item additional columns containing the covariate values at which the derivative
 was eveluated.
 }
@@ -103,14 +105,14 @@ ds <- data_slice(m, x2 = evenly(x2, n = 200))
 
 # samples from posterior of derivatives
 fd_samp <- derivative_samples(m, data = ds, type = "central",
-    focal = "x2", eps = 0.01, seed = 21)
+    focal = "x2", eps = 0.01, seed = 21, n_sim = 100)
 
 # plot the first 20 posterior draws
 if (requireNamespace("ggplot2") && requireNamespace("dplyr")) {
     library("ggplot2")
     fd_samp |>
-        dplyr::filter(draw <= 20) |>
-        ggplot(aes(x = x2, y = derivative, group = draw)) +
+        dplyr::filter(.draw <= 20) |>
+        ggplot(aes(x = x2, y = .derivative, group = .draw)) +
         geom_line(alpha = 0.5)
 }
 }
