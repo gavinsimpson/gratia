@@ -78,6 +78,8 @@ credible interval. The default is \code{0.95} for a 95\% interval.}
 \value{
 A tibble, currently with the following variables:
 \itemize{
+\item \code{.row}: integer, indexing the row of \code{data} each row in the output
+represents
 \item \code{.focal}: the name of the variable for which the partial derivative was
 evaluated,
 \item \code{.derivative}: the estimated partial derivative,
@@ -111,9 +113,9 @@ ds <- data_slice(m, x2 = evenly(x2, n = 100))
 # fitted values along x2
 fv <- fitted_values(m, smooth = "s(x2)", data = ds)
 
-# response derivatives
-y_d <- response_derivatives(m, data = ds, type = "central",
-                            focal = "x2", eps = 0.01, seed = 21)
+# response derivatives - ideally n_sim = >10000
+y_d <- response_derivatives(m, data = ds, type = "central", focal = "x2",
+    eps = 0.01, seed = 21, n_sim = 1000)
 
 # draw fitted values along x2
 p1 <- fv |>
