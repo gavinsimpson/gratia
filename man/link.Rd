@@ -70,7 +70,8 @@ zero-inflation term in \code{\link[mgcv:ziplss]{mgcv::ziplss()}}, \code{"power"}
 \code{\link[mgcv:twlss]{mgcv::twlss()}} power parameter, \code{"xi"}, the shape parameter for
 \code{\link[mgcv:gevlss]{mgcv::gevlss()}}, \code{"epsilon"} or \code{"skewness"} for the skewness and
 \code{"delta"} or \code{"kurtosis"} for the kurtosis parameter for
-\code{\link[mgcv:shash]{mgcv::shash()}}, or \code{"theta"} for the scale parameter of \code{\link[mgcv:gammals]{mgcv::gammals()}}.}
+\code{\link[mgcv:shash]{mgcv::shash()}}, or \code{"phi"} for the scale parameter of \code{\link[mgcv:gammals]{mgcv::gammals()}} &
+\code{\link[mgcv:twlss]{mgcv::twlss()}}.}
 
 \item{which_eta}{numeric; the linear predictor to extract for families
 \code{\link[mgcv:mvn]{mgcv::mvn()}} and \code{\link[mgcv:multinom]{mgcv::multinom()}}.}

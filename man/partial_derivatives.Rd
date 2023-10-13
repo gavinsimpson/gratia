@@ -31,6 +31,7 @@ partial_derivatives(object, ...)
   offset = NULL,
   ncores = 1,
   partial_match = FALSE,
+  seed = NULL,
   ...,
   newdata = NULL
 )
@@ -91,6 +92,8 @@ to work on Windows with current \code{R}).}
 with \code{term}? If \code{TRUE}, \code{term} can only be a single string to match
 against.}
 
+\item{seed}{numeric; RNG seed to use.}
+
 \item{newdata}{Deprecated: use \code{data} instead.}
 }
 \value{
@@ -148,8 +151,8 @@ p1
 # draw te(x,z) along slice
 cap <- expression(z == 0.4)
 p2 <- sm |>
-    ggplot(aes(x = x, y = est)) +
-    geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), alpha = 0.2) +
+    ggplot(aes(x = x, y = .estimate)) +
+    geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
     geom_line() +
     labs(x = "x", y = "Partial effect", title = "te(x,z)",
         caption = cap)

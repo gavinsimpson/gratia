@@ -119,8 +119,9 @@ y_d <- response_derivatives(m, data = ds, type = "central", focal = "x2",
 
 # draw fitted values along x2
 p1 <- fv |>
-    ggplot(aes(x = x2, y = fitted)) +
-    geom_ribbon(aes(ymin = lower, ymax = upper, y = NULL), alpha = 0.2) +
+    ggplot(aes(x = x2, y = .fitted)) +
+    geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci, y = NULL),
+        alpha = 0.2) +
     geom_line() +
     labs(title = "Estimated count as a function of x2",
          y = "Estimated count")
