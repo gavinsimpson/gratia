@@ -16,7 +16,8 @@
 #'   [mgcv::twlss()] power parameter, `"xi"`, the shape parameter for
 #'   [mgcv::gevlss()], `"epsilon"` or `"skewness"` for the skewness and
 #'   `"delta"` or `"kurtosis"` for the kurtosis parameter for
-#'   [mgcv::shash()], or `"theta"` for the scale parameter of [mgcv::gammals()].
+#'   [mgcv::shash()], or `"phi"` for the scale parameter of [mgcv::gammals()] &
+#'   [mgcv::twlss()].
 #' @param which_eta numeric; the linear predictor to extract for families
 #'   [mgcv::mvn()] and [mgcv::multinom()].
 #' @param ... arguments passed to other methods.
@@ -267,22 +268,22 @@ family_type.family <- function(object, ...) {
         }
     } else {
         # linfo is ordered; 1: location; 2: scale or sigma, 3: shape, power, etc
-        # (check pi is right greek letter for zero-inflation!)
+        # (check pi is right greek letter for zero-inflation! - YES)
         lobj <- switch(parameter,
-                       location  = linfo[[1L]],
-                       mu        = linfo[[1L]],
-                       scale     = linfo[[2L]],
-                       sigma     = linfo[[2L]],
-                       theta     = linfo[[2L]], # scale parameter for gammals()
-                       shape     = linfo[[3L]],
-                       power     = linfo[[3L]], # power for twlss()
-                       xi        = linfo[[3L]], # xi for gevlss()
-                       pi        = linfo[[2L]], # pi for zero-inflation
-                       epsilon   = linfo[[3L]], # skewness for shash
-                       skewness  = linfo[[3L]], # skewness for shash
-                       delta     = linfo[[4L]], # kurtosis for shash
-                       kurtosis  = linfo[[4L]]  # kurtosis for shash
-                       )
+            location  = linfo[[1L]],
+            mu        = linfo[[1L]],
+            scale     = linfo[[2L]],
+            sigma     = linfo[[2L]],
+            phi       = linfo[[2L]], # scale parameter for twlss() gammals()
+            shape     = linfo[[3L]],
+            power     = linfo[[3L]], # power for twlss()
+            xi        = linfo[[3L]], # xi for gevlss()
+            pi        = linfo[[2L]], # pi for zero-inflation
+            epsilon   = linfo[[3L]], # skewness for shash
+            skewness  = linfo[[3L]], # skewness for shash
+            delta     = linfo[[4L]], # kurtosis for shash
+            kurtosis  = linfo[[4L]]  # kurtosis for shash
+            )
 
         fun <- if (isTRUE(inverse)) {
             lobj[["linkinv"]]
