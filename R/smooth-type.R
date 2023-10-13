@@ -173,14 +173,14 @@
 #' @export
 #' @rdname smooth_type
 `smooth_type.mpi.smooth` <- function(smooth) {
-    sm_type <- "Monotone incr."
+    sm_type <- "Mono. incr."
     sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.mpd.smooth` <- function(smooth) {
-    sm_type <- "Monotone decr."
+    sm_type <- "Mono. decr."
     sm_type
 }
 
@@ -201,27 +201,27 @@
 #' @export
 #' @rdname smooth_type
 `smooth_type.micx.smooth` <- function(smooth) {
-    sm_type <- "Monotone incr. convex"
+    sm_type <- "Mono. incr. conv."
     sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.micv.smooth` <- function(smooth) {
-    sm_type <- "Monotone incr. concave"
+    sm_type <- "Mono. incr. conc."
     sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.mdcx.smooth` <- function(smooth) {
-    sm_type <- "Monotone decr. convex"
+    sm_type <- "Mono. decr. conv."
     sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.mdcv.smooth` <- function(smooth) {
-    sm_type <- "Monotone decr. concave"
+    sm_type <- "Mono. decr. conc."
     sm_type
 }

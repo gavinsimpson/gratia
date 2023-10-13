@@ -3,7 +3,7 @@
 \name{derivative_samples}
 \alias{derivative_samples}
 \alias{derivative_samples.default}
-\alias{derivative_ssamples.gamm}
+\alias{derivative_samples.gamm}
 \alias{derivative_samples.gam}
 \title{Posterior expectations of derivatives from an estimated model}
 \usage{
@@ -11,7 +11,7 @@ derivative_samples(object, ...)
 
 \method{derivative_samples}{default}(object, ...)
 
-derivative_ssamples.gamm(object, ...)
+\method{derivative_samples}{gamm}(object, ...)
 
 \method{derivative_samples}{gam}(
   object,

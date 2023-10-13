@@ -1,4 +1,4 @@
-## Test posterior sampling functions
+# Test posterior sampling functions
 
 test_that("smooth_samples works for a continuous by GAM", {
     expect_silent(sm <- smooth_samples(su_m_cont_by, n = 5, n_vals = 100,

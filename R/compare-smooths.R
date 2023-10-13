@@ -124,18 +124,16 @@
     crit <- coverage_normal(coverage)
 
     ## add the frequentist confidence interval
-    object <- mutate(object,
-                     lower_ci = .data[["est"]] + (crit * .data[["se"]]),
-                     upper_ci = .data[["est"]] - (crit * .data[["se"]]))
+    object <- object |> add_confint(coverage = coverage)
 
     ## basic plot
     plt <- ggplot(object, aes(x = .data[[sm_vars[1L]]],
-                              y = .data[["est"]],
+                              y = .data[[".estimate"]],
                               group = .data[["model"]]))
 
     ## add uncertainty bands
-    plt <- plt + geom_ribbon(aes(ymin = .data[["lower_ci"]],
-                                 ymax = .data[["upper_ci"]],
+    plt <- plt + geom_ribbon(aes(ymin = .data[[".lower_ci"]],
+                                 ymax = .data[[".upper_ci"]],
                                  fill = .data[["model"]]),
                              alpha = 0.2)
 

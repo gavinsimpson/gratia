@@ -373,7 +373,7 @@ test_that("transform_fun works for parametric_effects", {
     envir = teardown_env()),
                    "Interaction terms are not currently supported.")
     expect_silent(pe <- transform_fun(pe, fun = abs))
-    expect_true(all(!pe$partial < 0L))
+    expect_true(all(!pe$.partial < 0L))
 })
 
 test_that("transform_fun works for evaluated_smooth", {

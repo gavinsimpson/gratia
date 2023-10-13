@@ -329,7 +329,7 @@
         for (i in seq_along(out)) {
             out[[i]] <- smooth_estimates(object, smooth = uS[i],
                 n = n, data = data, partial_match = partial_match)
-            out[[i]][["crit"]] <- coverage_normal(level)
+            out[[i]][[".crit"]] <- coverage_normal(level)
         }
     } else {
         ## function to do simultaneous intervals for a smooth
@@ -343,7 +343,7 @@
             para.seq <- start:end
             Cg <- PredictMat(smooth, data)
             simDev <- Cg %*% t(buDiff[, para.seq])
-            absDev <- abs(sweep(simDev, 1L, data[["se"]], FUN = "/"))
+            absDev <- abs(sweep(simDev, 1L, data[[".se"]], FUN = "/"))
             masd <- apply(absDev, 2L, max)
             unname(quantile(masd, probs = level, type = 8))
         }
@@ -366,12 +366,11 @@
             if (is.null(by_levs)) {        # not by variable smooth
                 smooth <- get_smooth(object, parm) # get the specific smooth
                 crit <- sim_interval(smooth, level = level, data = out[[i]])
-                out[[i]][["crit"]] <- crit # add on the critical value
             } else {                       # is a by variable smooth
                 smooth <- old_get_smooth(object, uS[i])
                 crit <- sim_interval(smooth, level = level, data = out[[i]])
-                out[[i]][["crit"]] <- crit # add on the critical value
             }
+            out[[i]][[".crit"]] <- crit # add on the critical value
         }
     }
 
@@ -396,18 +395,18 @@
 
     ## using se and crit, compute the lower and upper intervals
     out <- add_column(out,
-                      lower = out$est - (out$crit * out$se),
-                      upper = out$est + (out$crit * out$se))
+                      .lower_ci = out$.estimate - (out$.crit * out$.se),
+                      .upper_ci = out$.estimate + (out$.crit * out$.se))
 
     ## transform
-    out[["est"]]   <- ilink(out[["est"]] + const)
-    out[["lower"]] <- ilink(out[["lower"]] + const)
-    out[["upper"]] <- ilink(out[["upper"]] + const)
+    out <- out |>
+        mutate(across(all_of(c(".estimate", ".lower_ci", ".upper_ci")),
+            .fns = ilink))
 
     # smooth_estimates has columns in different places, relocate them to match
     # old output as much as possible
-    out <- relocate(out, all_of(c("est", "se", "crit", "lower", "upper")),
-        .after = last_col())
+    out <- relocate(out, all_of(c(".estimate", ".se", ".crit", ".lower_ci",
+        ".upper_ci")), .after = last_col())
 
     ## prepare for return
     class(out) <- c("confint.gam", class(out))

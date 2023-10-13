@@ -3,12 +3,15 @@
 \name{add_confint}
 \alias{add_confint}
 \alias{add_confint.smooth_estimates}
+\alias{add_confint.parametric_effects}
 \alias{add_confint.default}
 \title{Add a confidence interval to an existing object}
 \usage{
 add_confint(object, coverage = 0.95, ...)
 
 \method{add_confint}{smooth_estimates}(object, coverage = 0.95, ...)
+
+\method{add_confint}{parametric_effects}(object, coverage = 0.95, ...)
 
 \method{add_confint}{default}(object, coverage = 0.95, ...)
 }

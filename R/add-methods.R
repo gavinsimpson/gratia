@@ -245,8 +245,9 @@
                  call. = FALSE)
         }
         object <- mutate(object,
-                         across(any_of(c("est", "lower", "upper")),
-                                .fns = ~ .x + constant))
+            across(any_of(c("est", "lower", "upper", ".estimate", ".lower_ci",
+            ".upper_ci")),
+            .fns = ~ .x + constant))
     }
 
     object
@@ -264,8 +265,9 @@
                  call. = FALSE)
         }
         object <- mutate(object,
-                         across(any_of(c("est", "lower_ci", "upper_ci")),
-                                .fns = ~ .x + constant))
+            across(any_of(c("est", "lower_ci", "upper_ci", ".estimate", ".lower_ci",
+                ".upper_ci")),
+            .fns = ~ .x + constant))
     }
 
     object
@@ -283,8 +285,9 @@
                  call. = FALSE)
         }
         object <- mutate(object,
-                         across(any_of(c("value", "lower", "upper")),
-                                .fns = ~ .x + constant))
+            across(any_of(c("value", "lower", "upper",
+                ".value", ".lower_ci", ".upper_ci")),
+            .fns = ~ .x + constant))
     }
 
     object
@@ -302,8 +305,9 @@
                  call. = FALSE)
         }
         object <- mutate(object,
-                         across(any_of(c("est", "lower_ci", "upper_ci")),
-                                .fns = ~ .x + constant))
+            across(any_of(c("est", "lower_ci", "upper_ci", ".estimate",
+            ".lower_ci", ".upper_ci")),
+                .fns = ~ .x + constant))
     }
 
     object
@@ -322,8 +326,9 @@
                  ">", call. = FALSE)
         }
         object <- mutate(object,
-                         across(any_of(c("partial", "lower", "upper")),
-                                .fns = ~ .x + constant))
+            across(any_of(c("partial", "lower", "upper", ".estimate",
+            ".lower_ci", ".upper_ci")),
+                .fns = ~ .x + constant))
     }
 
     object
@@ -394,9 +399,9 @@
     # check if this is nested
     nms <- names(object)
 
-    if (!all(c("est", "se") %in% nms)) {
+    if (!all(c(".estimate", ".se") %in% nms)) {
         stop("'object' does not contain one or both of ",
-             "'est', 'se'.",
+             "'.estimate', '.se'.",
              "\n  Did you use `smooth_estimates(..., unnest = FALSE)`?")
     }
 
@@ -405,8 +410,35 @@
 
     ## add the frequentist confidence interval
     object <- mutate(object,
-                     lower_ci = .data$est - (crit * .data$se),
-                     upper_ci = .data$est + (crit * .data$se))
+                     .lower_ci = .data$.estimate - (crit * .data$.se),
+                     .upper_ci = .data$.estimate + (crit * .data$.se))
+
+    ## return
+    object
+}
+
+#' @rdname add_confint
+#' @importFrom rlang .data
+#' @importFrom dplyr mutate
+#'
+#' @export
+`add_confint.parametric_effects` <- function(object, coverage = 0.95, ...) {
+    # check if this is nested
+    nms <- names(object)
+
+    if (!all(c(".partial", ".se") %in% nms)) {
+        stop("'object' does not contain one or both of ",
+             "'.partial', '.se'.",
+             "\n  Did you use `partial_effects(..., unnest = FALSE)`?")
+    }
+
+    ## compute the critical value
+    crit <- coverage_normal(coverage)
+
+    ## add the frequentist confidence interval
+    object <- mutate(object,
+                     .lower_ci = .data$.partial - (crit * .data$.se),
+                     .upper_ci = .data$.partial + (crit * .data$.se))
 
     ## return
     object
@@ -420,9 +452,9 @@
 `add_confint.default` <- function(object, coverage = 0.95, ...) {
     nms <- names(object)
 
-    if (!all(c("est", "se") %in% nms)) {
+    if (!all(c(".estimate", ".se") %in% nms)) {
         stop("'object' does not contain one or both of ",
-            "'est' or 'se'.")
+            "'.estimate' or '.se'.")
     }
 
     ## compute the critical value
@@ -430,10 +462,10 @@
 
     ## add the frequentist confidence interval
     object <- mutate(object,
-        lower_ci = .data$est - (crit * .data$se),
-        upper_ci = .data$est + (crit * .data$se)) %>%
-        relocate(all_of(c("lower_ci", "upper_ci")),
-            .after = all_of("se"))
+        .lower_ci = .data$.estimate - (crit * .data$.se),
+        .upper_ci = .data$.estimate + (crit * .data$.se)) %>%
+        relocate(all_of(c(".lower_ci", ".upper_ci")),
+            .after = all_of(".se"))
 
     ## return
     object
@@ -525,15 +557,15 @@
     object <- if (isTRUE(identical(type, "change"))) {
         derivatives <- derivatives |>
             mutate(.change =
-                case_when(.data$lower > 0 | .data$upper < 0 ~ object$est,
+                case_when(.data$lower > 0 | .data$upper < 0 ~ .data$derivative,
                     .default = NA_real_))
         object |> bind_cols(.change = derivatives$.change)
     } else { # otherwise we are adding a sizer-like indicator
         derivatives <- derivatives |>
             mutate(
-                .decrease = case_when(.data$upper < 0 ~ object$est,
+                .decrease = case_when(.data$upper < 0 ~ .data$derivative,
                     .default = NA_real_),
-                .increase = case_when(.data$lower > 0 ~ object$est,
+                .increase = case_when(.data$lower > 0 ~ .data$derivative,
                     .default = NA_real_))
         object |> bind_cols(.decrease = derivatives$.decrease,
             .increase = derivatives$.increase)

@@ -12,7 +12,7 @@ terms of a fitted GAM."><!-- mathjax --><script src="https://cdnjs.cloudflare.co
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.38</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1.41</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -209,18 +209,18 @@ per the variables in the smooth,</p></li>
 <span class="r-in"><span><span class="va">ci</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">mod</span>, parm <span class="op">=</span> <span class="st">"s(x2)"</span>, type <span class="op">=</span> <span class="st">"confidence"</span>, data <span class="op">=</span> <span class="va">new_data</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">ci</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 50 x 9</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    smooth type  by       x2   est    se  crit lower upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.26   5.3  0.18   2.0   5.0   5.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.27   5.1  0.18   2.0   4.8   5.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.28   4.9  0.18   2.0   4.6   5.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.29   4.6  0.18   2.0   4.3   5.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.30   4.3  0.19   2.0   3.9   4.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.32   4.0  0.19   2.0   3.6   4.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.33   3.6  0.20   2.0   3.2   4.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.34   3.2  0.20   2.0   2.9   3.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.35   2.9  0.20   2.0   2.5   3.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.36   2.5  0.19   2.0   2.1   2.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    smooth type  by       x2 .estimate   .se .crit .lower_ci .upper_ci</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.26       5.3  0.18   2.0       5.0       5.7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.27       5.1  0.18   2.0       4.8       5.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.28       4.9  0.18   2.0       4.6       5.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.29       4.6  0.18   2.0       4.3       5.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.30       4.3  0.19   2.0       3.9       4.7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.32       4.0  0.19   2.0       3.6       4.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.33       3.6  0.20   2.0       3.2       4.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.34       3.2  0.20   2.0       2.9       3.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.35       2.9  0.20   2.0       2.5       3.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.36       2.5  0.19   2.0       2.1       2.9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 40 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## simultaneous interval for smooth of x2</span></span></span>
@@ -231,18 +231,18 @@ per the variables in the smooth,</p></li>
 <span class="r-in"><span>              type <span class="op">=</span> <span class="st">"simultaneous"</span>, nsim <span class="op">=</span> <span class="fl">3000</span>, ncores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">si</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 50 x 9</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    smooth type  by       x2   est    se  crit lower upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.26   5.3  0.18   2.6   4.8   5.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.27   5.1  0.18   2.6   4.7   5.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.28   4.9  0.18   2.6   4.4   5.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.29   4.6  0.18   2.6   4.1   5.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.30   4.3  0.19   2.6   3.8   4.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.32   4.0  0.19   2.6   3.5   4.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.33   3.6  0.20   2.6   3.1   4.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.34   3.2  0.20   2.6   2.7   3.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.35   2.9  0.20   2.6   2.4   3.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.36   2.5  0.19   2.6   2.0   3.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    smooth type  by       x2 .estimate   .se .crit .lower_ci .upper_ci</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.26       5.3  0.18   2.6       4.8       5.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.27       5.1  0.18   2.6       4.7       5.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.28       4.9  0.18   2.6       4.4       5.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.29       4.6  0.18   2.6       4.1       5.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.30       4.3  0.19   2.6       3.8       4.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.32       4.0  0.19   2.6       3.5       4.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.33       3.6  0.20   2.6       3.1       4.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.34       3.2  0.20   2.6       2.7       3.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.35       2.9  0.20   2.6       2.4       3.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> s(x2)  TPRS  <span style="color: #BB0000;">NA</span>     0.36       2.5  0.19   2.6       2.0       3.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 40 more rows</span></span>
 <span class="r-in"><span><span class="co"># \dontshow{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">op</span><span class="op">)</span></span></span>

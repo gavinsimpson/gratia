@@ -1,6 +1,19 @@
-# gratia 0.8.1.38
+# gratia 0.8.1.41
 
 ## User visible changes
+
+* Many functions now return objects with different named variables. In order to
+  avoid clashes with variable names used in user's models or data, a period
+  (`.`) is now being used as a prefix for generated variable names. The
+  functions whose names have changed are: `smooth_estimates()`,
+  `fitted_values()`, `fitted_samples()`, `posterior_samples()`, and
+  `derivative_samples()`. In addition, `add_confint()` also adds newly-named
+  variables.
+
+      1. `est` is now `.estimate`,
+      2. `lower` and `upper` are now `.lower_ci` and `.upper_ci`,
+      3. `draw` and `row` and now `.draw` and `.row` respectively,
+      4. `fitted`, `se`, `crit` are now `.fitted`, `.se`, `.crit`, respectively.
 
 * `smooth_samples()` now uses a single call to the RNG to generate draws from
   the posterior of smooths. Previous to version 0.9.0, `smooth_samples()` would
@@ -24,10 +37,10 @@
 
   This also affects `draw.gam()`.
 
-* `fitted_samples()`, `posterior_samples()`, `derivative_samples()` are
-  converging in terms of the names on returned objects. In order to avoid
-  clashes with variable names used in user's models or data, a period (`.`) is
-  now being used as a prefix for generated variable names.
+* `fitted_values()` now has some level of support for location, scale, shape
+  families. Suppoerted families are `mgcv::gaulss()`, `mgcv::gumbls()`,
+  `mgcv::gevlss()`, `mgcv::gumbls()`, `mgcv::shash()`, and `mgcv::ziplss()`.
+  
 
 * *gratia* now requires *dplyr* versions >= 1.1.0 and *tidyselect* >= 1.2.0.
 
@@ -154,6 +167,10 @@
 
 * New function `null_deviance()` that extracts the null deviance of a fitted
   model.
+
+* `draw()`, `smooth_estimates()`, & `smooth_samples()` now all work for models
+  fitted with `scam::scam()`. Currently support extends only to univariate
+  smooths.
 
 ## Bug fixes
 

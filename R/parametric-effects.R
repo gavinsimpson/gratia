@@ -114,29 +114,29 @@
             eval(term_expr, data, enclos = envir)
         }
 
-        out <- bind_cols(level = x_data,
-                         partial = pred[["fit"]][, term],
-                         se = pred[["se.fit"]][, term]) |>
-          distinct(.data$level, .keep_all = TRUE)
+        out <- bind_cols(.level = x_data,
+                         .partial = pred[["fit"]][, term],
+                         .se = pred[["se.fit"]][, term]) |>
+          distinct(.data$.level, .keep_all = TRUE)
         nr <- nrow(out)
-        is_fac <- is.factor(out$level)
+        is_fac <- is.factor(out$.level)
         type <- "factor"
         if (!is_fac) {
-            type <- class(out$level) # numeric but I presume logical too
+            type <- class(out$.level) # numeric but I presume logical too
             out <- out |>
-                rename("value" = "level")
+                rename(".value" = ".level")
         } else {
-            if (is.ordered(out$level)) {
+            if (is.ordered(out$.level)) {
                 type <- "ordered"
             }
             out <- out |>
-            mutate(level = as.character(.data$level))
+            mutate(.level = as.character(.data$.level))
         }
         out <- out |>
           add_column(term = rep(term, times = nr),
                      type = rep(type, times = nr),
                      .before = 1L) %>%
-          nest(data = any_of(c("level", "value", "partial", "se")))
+          nest(data = any_of(c(".level", ".value", ".partial", ".se")))
         out
     }
 
@@ -145,7 +145,7 @@
 
     if (unnest) {
         effects <- unnest(effects, cols = "data") |>
-          relocate(c("partial", "se"), .after = last_col())
+          relocate(c(".partial", ".se"), .after = last_col())
     }
 
     ## add confidence interval -- be consistent and don't add this, but could?
@@ -190,8 +190,8 @@ draw.parametric_effects <- function(object,
     # Add CI
     crit <- coverage_normal(ci_level)
     object <- mutate(object,
-                     lower = .data$partial - (crit * .data$se),
-                     upper = .data$partial + (crit * .data$se))
+                     .lower_ci = .data$.partial - (crit * .data$.se),
+                     .upper_ci = .data$.partial + (crit * .data$.se))
 
     # fixed or free?
     scales <- match.arg(scales)
@@ -199,7 +199,7 @@ draw.parametric_effects <- function(object,
     # need to figure out scales if "fixed"
     ylim <- NULL
     if (isTRUE(identical(scales, "fixed"))) {
-        ylim <- range(object$partial, object$upper, object$lower)
+        ylim <- range(object$.partial, object$.upper_ci, object$.lower_ci)
     }
 
     plts <- object %>%
@@ -264,38 +264,38 @@ draw.parametric_effects <- function(object,
     # plot
     type <- unique(object[["type"]])
     is_fac <- type %in% c("ordered", "factor")
-    x_val <- if_else(is_fac, "level", "value")
+    x_val <- if_else(is_fac, ".level", ".value")
     term_label <- unique(object[["term"]])
 
     ## If constant supplied apply it to `est`
-    object <- add_constant(object, constant = constant, column = "partial")
+    object <- add_constant(object, constant = constant, column = ".partial")
 
     ## add a CI
-    if (!all(c("upper", "lower") %in% names(object))) {
+    if (!all(c(".upper_ci", ".lower_ci") %in% names(object))) {
         crit <- coverage_normal(ci_level)
         object <- mutate(object,
-            lower = .data$partial - (crit * .data$se),
-            upper = .data$partial + (crit * .data$se))
+            .lower_ci = .data$.partial - (crit * .data$.se),
+            .upper_ci = .data$.partial + (crit * .data$.se))
     }
 
     ## If fun supplied, use it to transform est and the upper and lower interval
     object <- transform_fun(object, fun = fun,
-        column = c("partial", "lower", "upper"))
+        column = c(".partial", ".lower_ci", ".upper_ci"))
 
     # base plot
     plt <- ggplot(object,
-        aes(x = .data[[x_val]], y = .data$partial)) +
+        aes(x = .data[[x_val]], y = .data$.partial)) +
         guides(x = guide_axis(angle = angle))
 
     if (is_fac) {
-        plt <- plt + geom_pointrange(aes(ymin = .data$lower,
-            ymax = .data$upper))
+        plt <- plt + geom_pointrange(aes(ymin = .data$.lower_ci,
+            ymax = .data$.upper_ci))
     } else {
         if (isTRUE(rug)) {
             plt <- plt + geom_rug(sides = "b", position = position, alpha = 0.5)
         }
-        plt <- plt + geom_ribbon(aes(ymin = .data$lower,
-            ymax = .data$upper),
+        plt <- plt + geom_ribbon(aes(ymin = .data$.lower_ci,
+            ymax = .data$.upper_ci),
         alpha = ci_alpha, fill = ci_col, colour = NA) +
             geom_line(colour = line_col)
     }

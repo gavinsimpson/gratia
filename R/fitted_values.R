@@ -59,8 +59,12 @@
                                     "linear predictor"),
                                 ci_level = 0.95, ...) {
     # Handle everything up to and including the extended families, but not more
+    fn <- family_type(object)
     if (inherits(family(object), "general.family")) {
-        stop("General likelihood GAMs not yet supported.")
+        allowed <- c("gaulss", "gammals", "gumbls", "gevlss", "shash", "ziplss")
+        if (!fn %in% allowed) {
+            stop("General likelihood GAMs not yet supported.")
+        }
     }
     scale <- match.arg(scale)
 
@@ -73,10 +77,18 @@
 
     # handle special distributions that return more than vector fit & std. err.
     # find the name of the function that produces fitted values for this family
-    fit_vals_fun <- get_fit_fun(object)
+    fit_vals_fun <- get_fit_fun(fn)
+    extra_fns <- switch(fn,
+        "gumbls"  = post_link_funs(location = exp, scale = exp),
+        "gammals" = post_link_funs(location = exp, scale = exp),
+        "gevlss"  = post_link_funs(scale = exp),
+        "shash"   = post_link_funs(scale = exp, kurtosis = exp),
+        "ziplss"  = post_link_funs(location = exp,
+            pi = inv_link(binomial("cloglog"))),
+        post_link_funs())
     # compute fitted values
     fit <- fit_vals_fun(object, data = data, ci_level = ci_level,
-        scale = scale, ...)
+        scale = scale, extra_fns = extra_fns, ...)
     fit
 }
 
@@ -94,23 +106,157 @@
     fit <- predict(object, newdata = data, ..., type = "link",
         se.fit = TRUE) |>
         as.data.frame() |>
-        rlang::set_names(c("fitted", "se")) |>
+        rlang::set_names(c(".fitted", ".se")) |>
         as_tibble()
     fit <- bind_cols(data, fit)
 
     # create the confidence interval
     crit <- coverage_normal(ci_level)
     fit <- mutate(fit,
-        lower = .data[["fitted"]] - (crit * .data[["se"]]),
-        upper = .data[["fitted"]] + (crit * .data[["se"]]))
+        ".lower_ci" = .data[[".fitted"]] - (crit * .data[[".se"]]),
+        ".upper_ci" = .data[[".fitted"]] + (crit * .data[[".se"]]))
 
     # convert to the response scale if requested
     if (identical(scale, "response")) {
-        ilink <- inv_link(object)
-        fit <- mutate(fit, across(all_of(c("fitted", "lower", "upper")), ilink))
+        fit <- fit |>
+            mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
+                .fns = inv_link(object)))
     }
 
     fit
+}
+
+#' @importFrom dplyr mutate across case_match
+#' @importFrom tidyr pivot_longer
+#' @importFrom tibble as_tibble add_column
+`fit_vals_general_lss` <- function(object, data, ci_level = 0.95,
+    scale = "response", extra_fns = post_link_funs(), ...) {
+    crit <- coverage_normal(ci_level)
+    # get the fitted values for data
+    fv <- predict(object, newdata = data, ..., type = "link",
+        se.fit = TRUE)
+    std_err <- fv[[2L]]
+    fv <- fv[[1]]
+    colnames(std_err) <- colnames(fv) <- lss_parameters(object)
+    # convert fv to tibble then long format
+    fv <- fv |>
+        as_tibble() |>
+        tidyr::pivot_longer(everything(), values_to = ".fitted",
+            names_to = "parameter")
+    # convert fv to tibble then long format
+    std_err <- std_err |>
+        as_tibble() |>
+        tidyr::pivot_longer(everything(), values_to = ".std_err",
+            names_to = "parameter")
+    # bind .std_err to fv...
+    fit <- fv |>
+        add_column(.std_err = pull(std_err, ".std_err")) |>
+        # ...and compute interval
+        mutate(.lower_ci = .data$.fitted + (crit * .data$.std_err),
+            .upper_ci = .data$.fitted - (crit * .data$.std_err))
+
+    # convert to the response scale if requested
+    if (identical(scale, "response")) {
+        ilink_loc <- inv_link(object, parameter = "location")
+        ilink_scl <- inv_link(object, parameter = "scale")
+
+        fit <- fit |>
+            mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
+                .fns = ~ case_match(.data$parameter,
+                    "location"    ~ extra_fns[["location"]](ilink_loc(.x)),
+                    "scale"       ~ extra_fns[["scale"]](ilink_scl(.x)),
+                    "shape"       ~ extra_fns[["shape"]](ilink_scl(.x)),
+                    "skewness"    ~ extra_fns[["skewness"]](ilink_scl(.x)),
+                    "kurtosis"    ~ extra_fns[["scale"]](ilink_scl(.x)),
+                    "power"       ~ extra_fns[["scale"]](ilink_scl(.x)),
+                    "pi"          ~ extra_fns[["pi"]](ilink_scl(.x)))))
+    }
+
+    fit
+}
+
+#' A list of transformation functions named for LSS parameters in a GAMLSS
+#'
+#' @keywords internal
+post_link_funs <- function(location = identity_fun,
+    scale = identity_fun,
+    shape = identity_fun,
+    skewness = identity_fun,
+    kurtosis = identity_fun,
+    power = identity_fun,
+    pi = identity_fun) {
+
+    list(location = location, scale = scale, shape = shape, skewness = skewness,
+        power = power, pi = pi)
+}
+
+#' General names of LSS parameters for each GAM family
+#'
+#' @keywords internal
+lss_parameters <- function(object) {
+    fn <- family_type(object)
+    par_names <- switch(fn,
+    "gaulss"  = c("location", "scale"),
+    "gammals" = c("location", "scale"),
+    "gumbls"  = c("location", "scale"),
+    "gevlss"  = c("location", "scale", "shape"),
+    "shash"   = c("location", "scale", "skewness", "kurtosis"),
+    "ziplss"  = c("location", "pi"),
+    "location") # <- default, for most GAM families that's all there is
+    par_names
+}
+
+# an identity function that simply returns input
+identity_fun <- function(eta) {
+    eta
+}
+
+#' @importFrom dplyr mutate across case_match row_number
+#' @importFrom tidyr pivot_longer
+#' @importFrom tibble as_tibble add_column
+`fit_vals_ziplss` <- function(object, data, ci_level = 0.95,
+    scale = "response", extra_fns = post_link_funs(), ...) {
+
+    crit <- coverage_normal(ci_level)
+    # get the fitted values for data
+    fv <- predict(object, newdata = data, ..., type = "link",
+        se.fit = TRUE)
+    std_err <- fv[[2L]]
+    fv <- fv[[1]]
+    colnames(std_err) <- colnames(fv) <- lss_parameters(object)
+    # convert fv to tibble then long format
+    fv <- fv |>
+        as_tibble() |>
+        mutate(.row = row_number()) |>
+        relocate(.data$.row, .before = 1L) |>
+        tidyr::pivot_longer(!matches("\\.row"), values_to = ".fitted",
+            names_to = "parameter")
+    # convert fv to tibble then long format
+    std_err <- std_err |>
+        as_tibble() |>
+        tidyr::pivot_longer(everything(), values_to = ".std_err",
+            names_to = "parameter")
+    # bind .std_err to fv...
+    fit <- fv |>
+        add_column(.std_err = pull(std_err, ".std_err")) |>
+        # ...and compute interval
+        mutate(.lower_ci = .data$.fitted + (crit * .data$.std_err),
+            .upper_ci = .data$.fitted - (crit * .data$.std_err))
+
+    # convert to the response scale if requested
+    if (identical(scale, "response")) {
+        ilink_loc <- inv_link(object, parameter = "location")
+        ilink_scl <- inv_link(object, parameter = "scale")
+
+        fit <- fit |>
+            mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
+                .fns = ~ case_match(.data$parameter,
+                    "location"    ~ extra_fns[["location"]](ilink_loc(.x)),
+                    "pi"          ~ extra_fns[["pi"]](ilink_scl(.x)))))
+    }
+
+    fit
+
 }
 
 #' @importFrom dplyr bind_rows relocate
@@ -159,28 +305,34 @@
         fit_upr <- ifun(fit_lp + (crit * se_lp))
 
         # create the return object
-        fit <- tibble(row = rep(seq_len(n_data), times = n_cat),
-            category = factor(rep(seq_len(n_cat), each = n_data)),
-            fitted = as.numeric(fv$fit),
-            se = as.numeric(fv$se.fit),
-            lower = as.numeric(fit_lwr),
-            upper = as.numeric(fit_upr))
+        fit <- tibble(.row = rep(seq_len(n_data), times = n_cat),
+            .category = factor(rep(seq_len(n_cat), each = n_data)),
+            .fitted = as.numeric(fv$fit),
+            .se = as.numeric(fv$se.fit),
+            .lower_ci = as.numeric(fit_lwr),
+            .upper_ci = as.numeric(fit_upr))
 
         # expand data so it is replicated once per category & add to the fitted
         # values
         fit <- expand_grid(category = seq_len(n_cat), data) |>
             select(-c("category")) |>
             bind_cols(fit) |>
-            relocate(row, .before = 1)
+            relocate(".row", .before = 1)
     }
     fit
 }
 
 #' @importFrom dplyr case_when
-`get_fit_fun` <- function(object) {
-    fn <- family_type(object)
+`get_fit_fun` <- function(fam) {
+    # family <- family_type(object)
     fam <- case_when(
-        grepl("^ordered_categorical", fn, ignore.case = TRUE) == TRUE ~ "ocat",
+        grepl("^ordered_categorical", fam, ignore.case = TRUE) == TRUE ~ "ocat",
+        fam == "gaulss"  ~ "general_lss",
+        fam == "gammals" ~ "general_lss",
+        fam == "gumbls"  ~ "general_lss",
+        fam == "gevlss"  ~ "general_lss",
+        fam == "shash"   ~ "general_lss",
+        fam == "ziplss"  ~ "ziplss",
         .default = "default"
     )
     get(paste0("fit_vals_", fam), mode = "function")

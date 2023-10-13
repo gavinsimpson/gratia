@@ -97,12 +97,12 @@ Notice how we excluded the random effect term; even though we had to specify som
 Plotting the fitted values for the data slice now only requires some simple {ggplot2} knowledge
 ```{r plot-plant-fitted-1}
 fv1 |>
-    ggplot(aes(x = conc, y = fitted)) +
+    ggplot(aes(x = conc, y = .fitted)) +
     geom_point(data = plant |>
                  filter(type == "Quebec", treatment == "chilled"),
         mapping = aes(y = uptake),
         alpha = 0.8, colour = "steelblue") +
-    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
+    geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
     geom_line() +
     labs(x = plant_xlab, y = plant_ylab,
         title = expression(Estimated ~ CO[2] ~ uptake),
@@ -123,11 +123,11 @@ We can again visualise the fitted values for this data slice
 ```{r draw-plant-fitted-values-2}
 fitted_values(m_plant, data = ds2, scale = "response",
     exclude = "s(plant)") |>
-    ggplot(aes(x = conc, y = fitted, group = treatment)) +
+    ggplot(aes(x = conc, y = .fitted, group = treatment)) +
     geom_point(data = plant |> filter(type == "Mississippi"),
         mapping = aes(y = uptake, colour = treatment),
         alpha = 0.8) +
-    geom_ribbon(aes(ymin = lower, ymax = upper, fill = treatment),
+    geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci, fill = treatment),
         alpha = 0.2) +
     geom_line(aes(colour = treatment)) +
     labs(x = plant_xlab, y = plant_ylab,
@@ -188,8 +188,8 @@ sm
 We can plot `sm` using {ggplot2}
 ```{r plot-smooth-estimates-bivar}
 sm |>
-  ggplot(aes(x = x, y = est)) +
-  geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), alpha = 0.2) +
+  ggplot(aes(x = x, y = .estimate)) +
+  geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
   geom_line() +
   labs(title = "Evaluation of smooth te(x,z) at fixed z",
        y = ylab)
@@ -207,8 +207,8 @@ sm <- smooth_estimates(m_biv, smooth = "te(x,z)", data = ds4) |>
   mutate(fz = factor(z))
 
 sm |>
-  ggplot(aes(x = x, y = est, colour = fz, group = fz)) +
-  geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci, fill = fz, colour = NULL),
+  ggplot(aes(x = x, y = .estimate, colour = fz, group = fz)) +
+  geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci, fill = fz, colour = NULL),
               alpha = 0.2) +
   geom_line() +
   labs(title = "Evaluation of smooth te(x,z) at fixed z",
@@ -222,8 +222,8 @@ If you want to evaluate the surface over `x` at fixed `z` conditional upon other
 For single `z` we have
 ```{r data-slice-biv-1-fitted-values}
 fitted_values(m_biv, data = ds3) |> # default is response scale, not link
-  ggplot(aes(x = x, y = fitted)) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
+  ggplot(aes(x = x, y = .fitted)) +
+  geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
   geom_line() +
   labs(title = "Fitted values from model",
        y = expression(hat(y)))
@@ -233,8 +233,8 @@ And for the multiple `z` we have
 ```{r data-slice-biv-2-fitted-values}
 fitted_values(m_biv, data = ds4) |>
   mutate(fz = factor(z)) |>
-  ggplot(aes(x = x, y = fitted, colour = fz, group = fz)) +
-  geom_ribbon(aes(ymin = lower, ymax = upper, fill = fz, colour = NULL),
+  ggplot(aes(x = x, y = .fitted, colour = fz, group = fz)) +
+  geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci, fill = fz, colour = NULL),
               alpha = 0.2) +
   geom_line() +
   labs(title = "Fitted values from model",
