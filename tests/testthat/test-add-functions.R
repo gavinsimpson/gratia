@@ -84,8 +84,8 @@ test_that("add_confint works for smooth_estimates", {
     expect_silent(sm <- smooth_estimates(m_gam))
     expect_silent(sm <- add_confint(sm, coverage = 0.89))
     expect_s3_class(sm, c("smooth_estimates", "tbl_df", "tbl", "data.frame"))
-    expect_named(sm, c("smooth", "type", "by", "est", "se", "x0",
-                       "x1", "x2", "x3", "lower_ci","upper_ci"))
+    expect_named(sm, c("smooth", "type", "by", ".estimate", ".se", "x0",
+                       "x1", "x2", "x3", ".lower_ci",".upper_ci"))
     expect_identical(nrow(sm), 400L)
     expect_identical(ncol(sm), 11L)
 })
@@ -100,7 +100,7 @@ test_that("add_confint works for smooth_estimates", {
 test_that("add_confint.default fails is no est and se", {
     expect_error(add_confint(typical_values(m_gam,
     data = su_eg1, envir = teardown_env())),
-                 "'object' does not contain one or both of 'est' or 'se'.")
+        "'object' does not contain one or both of '.estimate' or '.se'.")
 })
 
 test_that("add_constant works for parametric_effects", {
