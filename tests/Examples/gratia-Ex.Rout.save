@@ -1,5 +1,5 @@
 
-R version 4.2.3 (2023-03-15) -- "Shortstop Beagle"
+R version 4.3.1 (2023-06-16) -- "Beagle Scouts"
 Copyright (C) 2023 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -466,18 +466,18 @@ detaching ‘package:mgcv’
 > ci <- confint(mod, parm = "s(x2)", type = "confidence", data = new_data)
 > ci
 # A tibble: 50 x 9
-   smooth type  by       x2   est    se  crit lower upper
-   <chr>  <chr> <chr> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
- 1 s(x2)  TPRS  <NA>   0.26   5.3  0.18   2.0   5.0   5.7
- 2 s(x2)  TPRS  <NA>   0.27   5.1  0.18   2.0   4.8   5.5
- 3 s(x2)  TPRS  <NA>   0.28   4.9  0.18   2.0   4.6   5.3
- 4 s(x2)  TPRS  <NA>   0.29   4.6  0.18   2.0   4.3   5.0
- 5 s(x2)  TPRS  <NA>   0.30   4.3  0.19   2.0   3.9   4.7
- 6 s(x2)  TPRS  <NA>   0.32   4.0  0.19   2.0   3.6   4.3
- 7 s(x2)  TPRS  <NA>   0.33   3.6  0.20   2.0   3.2   4.0
- 8 s(x2)  TPRS  <NA>   0.34   3.2  0.20   2.0   2.9   3.6
- 9 s(x2)  TPRS  <NA>   0.35   2.9  0.20   2.0   2.5   3.3
-10 s(x2)  TPRS  <NA>   0.36   2.5  0.19   2.0   2.1   2.9
+   smooth type  by       x2 .estimate   .se .crit .lower_ci .upper_ci
+   <chr>  <chr> <chr> <dbl>     <dbl> <dbl> <dbl>     <dbl>     <dbl>
+ 1 s(x2)  TPRS  <NA>   0.26       5.3  0.18   2.0       5.0       5.7
+ 2 s(x2)  TPRS  <NA>   0.27       5.1  0.18   2.0       4.8       5.5
+ 3 s(x2)  TPRS  <NA>   0.28       4.9  0.18   2.0       4.6       5.3
+ 4 s(x2)  TPRS  <NA>   0.29       4.6  0.18   2.0       4.3       5.0
+ 5 s(x2)  TPRS  <NA>   0.30       4.3  0.19   2.0       3.9       4.7
+ 6 s(x2)  TPRS  <NA>   0.32       4.0  0.19   2.0       3.6       4.3
+ 7 s(x2)  TPRS  <NA>   0.33       3.6  0.20   2.0       3.2       4.0
+ 8 s(x2)  TPRS  <NA>   0.34       3.2  0.20   2.0       2.9       3.6
+ 9 s(x2)  TPRS  <NA>   0.35       2.9  0.20   2.0       2.5       3.3
+10 s(x2)  TPRS  <NA>   0.36       2.5  0.19   2.0       2.1       2.9
 # i 40 more rows
 > 
 > ## simultaneous interval for smooth of x2
@@ -488,18 +488,18 @@ detaching ‘package:mgcv’
 +               type = "simultaneous", nsim = 3000, ncores = 2)
 > si
 # A tibble: 50 x 9
-   smooth type  by       x2   est    se  crit lower upper
-   <chr>  <chr> <chr> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
- 1 s(x2)  TPRS  <NA>   0.26   5.3  0.18   2.6   4.8   5.8
- 2 s(x2)  TPRS  <NA>   0.27   5.1  0.18   2.6   4.7   5.6
- 3 s(x2)  TPRS  <NA>   0.28   4.9  0.18   2.6   4.4   5.4
- 4 s(x2)  TPRS  <NA>   0.29   4.6  0.18   2.6   4.1   5.1
- 5 s(x2)  TPRS  <NA>   0.30   4.3  0.19   2.6   3.8   4.8
- 6 s(x2)  TPRS  <NA>   0.32   4.0  0.19   2.6   3.5   4.5
- 7 s(x2)  TPRS  <NA>   0.33   3.6  0.20   2.6   3.1   4.1
- 8 s(x2)  TPRS  <NA>   0.34   3.2  0.20   2.6   2.7   3.8
- 9 s(x2)  TPRS  <NA>   0.35   2.9  0.20   2.6   2.4   3.4
-10 s(x2)  TPRS  <NA>   0.36   2.5  0.19   2.6   2.0   3.0
+   smooth type  by       x2 .estimate   .se .crit .lower_ci .upper_ci
+   <chr>  <chr> <chr> <dbl>     <dbl> <dbl> <dbl>     <dbl>     <dbl>
+ 1 s(x2)  TPRS  <NA>   0.26       5.3  0.18   2.6       4.8       5.8
+ 2 s(x2)  TPRS  <NA>   0.27       5.1  0.18   2.6       4.7       5.6
+ 3 s(x2)  TPRS  <NA>   0.28       4.9  0.18   2.6       4.4       5.4
+ 4 s(x2)  TPRS  <NA>   0.29       4.6  0.18   2.6       4.1       5.1
+ 5 s(x2)  TPRS  <NA>   0.30       4.3  0.19   2.6       3.8       4.8
+ 6 s(x2)  TPRS  <NA>   0.32       4.0  0.19   2.6       3.5       4.5
+ 7 s(x2)  TPRS  <NA>   0.33       3.6  0.20   2.6       3.1       4.1
+ 8 s(x2)  TPRS  <NA>   0.34       3.2  0.20   2.6       2.7       3.8
+ 9 s(x2)  TPRS  <NA>   0.35       2.9  0.20   2.6       2.4       3.4
+10 s(x2)  TPRS  <NA>   0.36       2.5  0.19   2.6       2.0       3.0
 # i 40 more rows
 > ## Don't show: 
 > options(op)
@@ -583,25 +583,68 @@ detaching ‘package:mgcv’
 > df <- data_sim("eg1", n = 50, seed = 2)
 > 
 > # fit a GAM with 1 smooth and 1 linear term
-> m1 <- gam(y ~ s(x2, k = 7) + x1, data = df, method = "REML")
+> m <- gam(y ~ s(x2, k = 7) + x1, data = df, method = "REML")
 > 
 > # Want to predict over f(x2) while holding `x1` at some value.
 > # Default will use the observation closest to the median for unspecified
 > # variables.
-> ds <- data_slice(m1, x2 = evenly(x2, n = 50))
+> ds <- data_slice(m, x2 = evenly(x2, n = 50))
 > 
 > # for full control, specify the values you want
-> ds <- data_slice(m1, x2 = evenly(x2, n = 50), x1 = 0.3)
+> ds <- data_slice(m, x2 = evenly(x2, n = 50), x1 = 0.3)
 > 
 > # or provide an expression (function call) which will be evaluated in the
 > # data frame passed to `data` or `model.frame(object)`
-> ds <- data_slice(m1, x2 = evenly(x2, n = 50), x1 = mean(x1))
+> ds <- data_slice(m, x2 = evenly(x2, n = 50), x1 = mean(x1))
 > 
 > 
 > 
 > cleanEx()
 
 detaching ‘package:mgcv’
+
+> nameEx("derivative_samples")
+> ### * derivative_samples
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: derivative_samples
+> ### Title: Posterior expectations of derivatives from an estimated model
+> ### Aliases: derivative_samples derivative_samples.default
+> ###   derivative_samples.gamm derivative_samples.gam
+> 
+> ### ** Examples
+> 
+> 
+> load_mgcv()
+> df <- data_sim("eg1", dist = "negbin", scale = 0.25, seed = 42)
+> 
+> # fit the GAM (note: for execution time reasons using bam())
+> m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
++     data = df, family = nb(), method = "fREML", discrete = TRUE)
+> 
+> # data slice through data along x2 - all other covariates will be set to
+> # typical values (value closest to median)
+> ds <- data_slice(m, x2 = evenly(x2, n = 200))
+> 
+> # samples from posterior of derivatives
+> fd_samp <- derivative_samples(m, data = ds, type = "central",
++     focal = "x2", eps = 0.01, seed = 21, n_sim = 100)
+> 
+> # plot the first 20 posterior draws
+> if (requireNamespace("ggplot2") && requireNamespace("dplyr")) {
++     library("ggplot2")
++     fd_samp |>
++         dplyr::filter(.draw <= 20) |>
++         ggplot(aes(x = x2, y = .derivative, group = .draw)) +
++         geom_line(alpha = 0.5)
++ }
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:ggplot2’, ‘package:mgcv’
 
 > nameEx("derivatives")
 > ### * derivatives
@@ -920,7 +963,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 > if (require("GJRM", quietly = TRUE)) {
 +     # follow example from ?GJRM::gamlss
 +     load_mgcv()
-+     library("GJRM")
++     suppressPackageStartupMessages(library("GJRM"))
 +     set.seed(0)
 +     n <- 100
 +     x1 <- round(runif(n))
@@ -937,9 +980,9 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 + 
 +     draw(m)
 + }
-This is mgcv 1.8-42. For overview type 'help("mgcv-package")'.
+This is mgcv 1.9-0. For overview type 'help("mgcv-package")'.
 
-This is GJRM 0.2-6.1.
+This is GJRM 0.2-6.4.
 For overview type 'help("GJRM-package")'.
 
 > 
@@ -1266,9 +1309,22 @@ detaching ‘package:mgcv’
 > ## End(Don't show)
 > x <- rnorm(10)
 > n <- 10L
+> 
+> # 10 values evenly over the range of `x`
 > evenly(x, n = n)
  [1] -0.83562861 -0.56552757 -0.29542652 -0.02532547  0.24477557  0.51487662
  [7]  0.78497766  1.05507871  1.32517976  1.59528080
+> 
+> # evenly spaced values, incrementing by 0.2
+> evenly(x, by = 0.2)
+ [1] -0.83562861 -0.63562861 -0.43562861 -0.23562861 -0.03562861  0.16437139
+ [7]  0.36437139  0.56437139  0.76437139  0.96437139  1.16437139  1.36437139
+[13]  1.56437139
+> 
+> # evenly spaced values, incrementing by 0.2, starting at -2
+> evenly(x, by = 0.2, lower = -2)
+ [1] -2.0 -1.8 -1.6 -1.4 -1.2 -1.0 -0.8 -0.6 -0.4 -0.2  0.0  0.2  0.4  0.6  0.8
+[16]  1.0  1.2  1.4
 > 
 > 
 > 
@@ -1371,18 +1427,18 @@ detaching ‘package:mgcv’
 > fv <- fitted_values(m)
 > fv
 # A tibble: 400 x 8
-         x0        x1         x2       x3   fitted       se    lower    upper
-      <dbl>     <dbl>      <dbl>    <dbl>    <dbl>    <dbl>    <dbl>    <dbl>
- 1 0.184882 0.617142  0.415244   0.132410  8.73875 0.354677  8.04360  9.43390
- 2 0.702374 0.569064  0.531439   0.365331  7.62581 0.337779  6.96378  8.28785
- 3 0.573326 0.153970  0.00324621 0.454532  3.12106 0.591862  1.96103  4.28109
- 4 0.168052 0.0348332 0.252100   0.537114 11.1124  0.402378 10.3237  11.9010 
- 5 0.943839 0.997953  0.155229   0.185495 14.0533  0.452947 13.1655  14.9411 
- 6 0.943475 0.835574  0.878840   0.449276  6.13080 0.364521  5.41635  6.84525
- 7 0.129159 0.586562  0.203511   0.256527 12.4838  0.355808 11.7864  13.1812 
- 8 0.833449 0.339117  0.583528   0.618458  6.25215 0.344700  5.57655  6.92775
- 9 0.468019 0.166883  0.804473   0.880744  4.21463 0.372003  3.48552  4.94374
-10 0.549984 0.807410  0.264717   0.317747 15.5283  0.369999 14.8031  16.2535 
+         x0        x1         x2       x3  .fitted      .se .lower_ci .upper_ci
+      <dbl>     <dbl>      <dbl>    <dbl>    <dbl>    <dbl>     <dbl>     <dbl>
+ 1 0.184882 0.617142  0.415244   0.132410  8.73875 0.354677   8.04360   9.43390
+ 2 0.702374 0.569064  0.531439   0.365331  7.62581 0.337779   6.96378   8.28785
+ 3 0.573326 0.153970  0.00324621 0.454532  3.12106 0.591862   1.96103   4.28109
+ 4 0.168052 0.0348332 0.252100   0.537114 11.1124  0.402378  10.3237   11.9010 
+ 5 0.943839 0.997953  0.155229   0.185495 14.0533  0.452947  13.1655   14.9411 
+ 6 0.943475 0.835574  0.878840   0.449276  6.13080 0.364521   5.41635   6.84525
+ 7 0.129159 0.586562  0.203511   0.256527 12.4838  0.355808  11.7864   13.1812 
+ 8 0.833449 0.339117  0.583528   0.618458  6.25215 0.344700   5.57655   6.92775
+ 9 0.468019 0.166883  0.804473   0.880744  4.21463 0.372003   3.48552   4.94374
+10 0.549984 0.807410  0.264717   0.317747 15.5283  0.369999  14.8031   16.2535 
 # i 390 more rows
 > ## Don't show: 
 > options(op)
@@ -1575,11 +1631,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55b1e7981350>
+<environment: 0x56275be23608>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55b1e7981350>
+<environment: 0x56275be23608>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2029,18 +2085,18 @@ detaching ‘package:mgcv’
 > 
 > predicted_samples(m, n = 5, seed = 42)
 # A tibble: 5,000 x 3
-     row  draw response
-   <int> <int>    <dbl>
- 1     1     1     8.93
- 2     2     1     4.23
- 3     3     1     7.71
- 4     4     1     8.51
- 5     5     1    10.1 
- 6     6     1     8.20
- 7     7     1     8.95
- 8     8     1     7.20
- 9     9     1    18.1 
-10    10     1    12.7 
+    .row .draw .response
+   <int> <int>     <dbl>
+ 1     1     1      8.93
+ 2     2     1      4.23
+ 3     3     1      7.71
+ 4     4     1      8.51
+ 5     5     1     10.1 
+ 6     6     1      8.20
+ 7     7     1      8.95
+ 8     8     1      7.20
+ 9     9     1     18.1 
+10    10     1     12.7 
 # i 4,990 more rows
 > 
 > ## Can pass arguments to predict.gam()
@@ -2053,35 +2109,35 @@ detaching ‘package:mgcv’
 > ## Exclude s(x2)
 > predicted_samples(m, n = 5, newd, exclude = "s(x2)", seed = 25)
 # A tibble: 50 x 3
-     row  draw response
-   <int> <int>    <dbl>
- 1     1     1     9.42
- 2     2     1     6.97
- 3     3     1     8.10
- 4     4     1     9.95
- 5     5     1     6.75
- 6     6     1    10.3 
- 7     7     1    10.8 
- 8     8     1    10.5 
- 9     9     1     8.43
-10    10     1    12.2 
+    .row .draw .response
+   <int> <int>     <dbl>
+ 1     1     1      9.42
+ 2     2     1      6.97
+ 3     3     1      8.10
+ 4     4     1      9.95
+ 5     5     1      6.75
+ 6     6     1     10.3 
+ 7     7     1     10.8 
+ 8     8     1     10.5 
+ 9     9     1      8.43
+10    10     1     12.2 
 # i 40 more rows
 > 
 > ## Exclude s(x1)
 > predicted_samples(m, n = 5, newd, exclude = "s(x1)", seed = 25)
 # A tibble: 50 x 3
-     row  draw response
-   <int> <int>    <dbl>
- 1     1     1     6.05
- 2     2     1     5.28
- 3     3     1     5.96
- 4     4     1    13.7 
- 5     5     1     4.36
- 6     6     1     5.11
- 7     7     1    12.5 
- 8     8     1     5.66
- 9     9     1    12.6 
-10    10     1     8.38
+    .row .draw .response
+   <int> <int>     <dbl>
+ 1     1     1      6.05
+ 2     2     1      5.28
+ 3     3     1      5.96
+ 4     4     1     13.7 
+ 5     5     1      4.36
+ 6     6     1      5.11
+ 7     7     1     12.5 
+ 8     8     1      5.66
+ 9     9     1     12.6 
+10    10     1      8.38
 # i 40 more rows
 > 
 > ## Select which terms --- result should be the same as previous
@@ -2090,18 +2146,18 @@ detaching ‘package:mgcv’
 > predicted_samples(m, n = 5, newd, seed = 25,
 +                   terms = c("Intercept", "s(x0)", "s(x2)", "s(x3)"))
 # A tibble: 50 x 3
-     row  draw response
-   <int> <int>    <dbl>
- 1     1     1   -1.94 
- 2     2     1   -2.71 
- 3     3     1   -2.03 
- 4     4     1    5.73 
- 5     5     1   -3.63 
- 6     6     1   -2.87 
- 7     7     1    4.48 
- 8     8     1   -2.33 
- 9     9     1    4.65 
-10    10     1    0.395
+    .row .draw .response
+   <int> <int>     <dbl>
+ 1     1     1    -1.94 
+ 2     2     1    -2.71 
+ 3     3     1    -2.03 
+ 4     4     1     5.73 
+ 5     5     1    -3.63 
+ 6     6     1    -2.87 
+ 7     7     1     4.48 
+ 8     8     1    -2.33 
+ 9     9     1     4.65 
+10    10     1     0.395
 # i 40 more rows
 > ## Don't show: 
 > options(op)
@@ -2218,22 +2274,23 @@ Levels: a b c d e
 > # fitted values along x2
 > fv <- fitted_values(m, smooth = "s(x2)", data = ds)
 > 
-> # response derivatives
-> y_d <- response_derivatives(m, data = ds, type = "central",
-+                             focal = "x2", eps = 0.01, seed = 21)
+> # response derivatives - ideally n_sim = >10000
+> y_d <- response_derivatives(m, data = ds, type = "central", focal = "x2",
++     eps = 0.01, seed = 21, n_sim = 1000)
 > 
 > # draw fitted values along x2
 > p1 <- fv |>
-+     ggplot(aes(x = x2, y = fitted)) +
-+     geom_ribbon(aes(ymin = lower, ymax = upper, y = NULL), alpha = 0.2) +
++     ggplot(aes(x = x2, y = .fitted)) +
++     geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci, y = NULL),
++         alpha = 0.2) +
 +     geom_line() +
 +     labs(title = "Estimated count as a function of x2",
 +          y = "Estimated count")
 > 
 > # draw response derivatives
 > p2 <- y_d |>
-+     ggplot(aes(x = x2, y = derivative)) +
-+     geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), alpha = 0.2) +
++     ggplot(aes(x = x2, y = .derivative)) +
++     geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
 +     geom_line() +
 +     labs(title = "Estimated 1st derivative of estimated count",
 +          y = "First derivative")
@@ -2656,7 +2713,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  34.07 0.36 34.373 0 0 
+Time elapsed:  43.596 0.372 43.912 0 0 
 > grDevices::dev.off()
 null device 
           1 
