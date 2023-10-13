@@ -1029,8 +1029,10 @@ vars_from_label <- function(label) {
     if (!is.null(fun)) {
         fun <- match.fun(fun)
         object <- mutate(object,
-                         across(any_of(c("est", "lower_ci", "upper_ci")),
-                                .fns = fun))
+            across(any_of(c("est", "lower_ci", "upper_ci",
+            ".estimate", ".upper_ci", ".lower_ci")),
+                .fns = fun))
+        
     }
 
     object
@@ -1060,8 +1062,8 @@ vars_from_label <- function(label) {
     if (!is.null(fun)) {
         fun <- match.fun(fun)
         object <- mutate(object,
-                         across(all_of(c("est", "lower_ci", "upper_ci")),
-                                .fns = fun))
+            across(all_of(c(".estimate", ".upper_ci", ".lower_ci")),
+                .fns = fun))
     }
 
     object
@@ -1076,8 +1078,8 @@ vars_from_label <- function(label) {
     if (!is.null(fun)) {
         fun <- match.fun(fun)
         object <- mutate(object,
-                         across(all_of(c("est", "lower", "upper")),
-                                .fns = fun))
+            across(all_of(c("est", "lower", "upper")),
+                .fns = fun))
     }
 
     object
@@ -1092,8 +1094,9 @@ vars_from_label <- function(label) {
     if (!is.null(fun)) {
         fun <- match.fun(fun)
         object <- mutate(object,
-                         across(any_of(c("partial", "lower_ci", "upper_ci")),
-                                .fns = fun))
+            across(any_of(c(".partial", ".lower_ci", ".upper_ci")),
+                .fns = fun))
+
     }
 
     object

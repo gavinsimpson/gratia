@@ -262,11 +262,12 @@
             sm_rng <- sm_eval |>
                 rowwise() |>
                 utils::getFromNamespace("reframe", "dplyr")(rng = 
-                    range(c(data$est, data$lower_ci, data$upper_ci))) |>
+                    range(c(data$.estimate, data$.lower_ci, data$.upper_ci))) |>
                 pluck("rng")
         } else {sm_rng <- sm_eval |>
             rowwise() |>
-            summarise(rng = range(c(data$est, data$lower_ci, data$upper_ci))) |>
+            summarise(rng = range(c(data$.estimate, data$.lower_ci,
+            data$.upper_ci))) |>
             pluck("rng")
         }
 
@@ -370,14 +371,15 @@
                 unconditional = unconditional,
                 unnest = TRUE, ci_level = ci_level, envir = envir)
             # Add CI
-            crit <- coverage_normal(ci_level)
-            object <- mutate(para,
-                lower = .data$partial - (crit * .data$se),
-                upper = .data$partial + (crit * .data$se))
+            # crit <- coverage_normal(ci_level)
+            # object <- mutate(para,
+            #    .lower_ci = .data$.partial - (crit * .data$.se),
+            #    .upper_ci = .data$.partial + (crit * .data$.se))
+            object <- para |> add_confint(coverage = ci_level)
             # need to alter the ylim if scales are fixed
             if (isTRUE(identical(scales, "fixed"))) {
-                ylims <- range(ylims, object$partial, object$upper,
-                    object$lower)
+                ylims <- range(ylims, object$.partial, object$.upper_ci,
+                    object$.lower_ci)
             }
 
             para_plts <- para %>%
@@ -443,6 +445,12 @@
 #' @export
 `draw.gamm` <- function(object, ...) {
     draw(object$gam, ...)
+}
+
+#' @export
+`draw.scam` <- function(object, ...) {
+    class(object) <- append(class(object), "gam", after = 1)
+    draw.gam(object)
 }
 
 # TODO: Remove after dplyr 1.1.0 is released and use `multiple = "all"` instead

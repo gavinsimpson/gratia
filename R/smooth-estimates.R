@@ -149,6 +149,11 @@
     smooth_estimates(object[["gam"]], ...)
 }
 
+#' @export
+`smooth_estimates.scam` <- function(object, ...) {
+    smooth_estimates.gam(object, ...)
+}
+
 # gamm4 method
 #' @export
 `smooth_estimates.list` <- function(object, ...) {
@@ -264,6 +269,11 @@
     end <- smooth[["last.para"]]
     para.seq <- start:end
     coefs <- coef(model)[para.seq]
+
+    # handle scam models, which return the intercept with PredictMat
+    if (inherits(model, "scam")) {
+        X <- X[, -1, drop = FALSE] # drop the intercept
+    }
     fit <- drop(X %*% coefs)
 
     label <- smooth_label(smooth)
@@ -307,11 +317,11 @@
     data <- select(data, all_of(keep_vars))
 
     ## Return object
-    tbl <- tibble(smooth = rep(label, nrow(X)), est = fit, se = se.fit)
+    tbl <- tibble(smooth = rep(label, nrow(X)), .estimate = fit, .se = se.fit)
     ## bind on the data
     tbl <- bind_cols(tbl, data)
     ## nest all columns with varying data
-    tbl <- nest(tbl, data = all_of(c("est", "se", names(data))))
+    tbl <- nest(tbl, data = all_of(c(".estimate", ".se", names(data))))
 
     tbl
 }
@@ -374,7 +384,7 @@
         eval_sm <- too_far_to_na(smooth,
                                  input = eval_sm,
                                  reference = model[["model"]],
-                                 cols = c("est", "se"),
+                                 cols = c(".estimate", ".se"),
                                  dist = dist)
     }
     ## return
@@ -587,7 +597,7 @@
         eval_sm <- too_far_to_na(smooth,
                                  input = eval_sm,
                                  reference = model[["model"]],
-                                 cols = c("est", "se"),
+                                 cols = c(".estimate", ".se"),
                                  dist = dist)
     }
 
@@ -647,7 +657,7 @@
         eval_sm <- too_far_to_na(smooth,
             input = eval_sm,
             reference = model[["model"]],
-            cols = c("est", "se"),
+            cols = c(".estimate", ".se"),
             dist = dist)
     }
 
@@ -843,7 +853,15 @@
     if (sm_dim == 1L &&
         sm_type %in% c("TPRS", "TPRS (shrink)", "CRS", "CRS (shrink)",
                        "Cyclic CRS", "P spline", "B spline", "Duchon spline",
-                       "GP")) {
+                       "GP",
+                       "Mono. incr.",
+                       "Mono. decr.",
+                       "Convex",
+                       "Concave",
+                       "Mono. decr. conv.",
+                       "Mono. decr. conc.",
+                       "Mono. incr. conv.",
+                       "Mono. incr. conc.")) {
         class(object) <- c("mgcv_smooth", class(object))
     } else if (sm_type == "Random effect") {
         class(object) <- append(class(object),
@@ -981,7 +999,7 @@
         }
     }
 
-    # If constant supplied apply it to `est`
+    # If constant supplied apply it to `.estimate`
     object <- add_constant(object, constant = constant)
 
     # If fun supplied, use it to transform est and the upper and lower interval
@@ -990,11 +1008,11 @@
     # base plot - need as.name to handle none standard names, like log2(x)
     plt <- if (grouped_by) {
         by_var <- unique(object$by)
-        ggplot(object, aes(x = .data[[variables]], y = .data$est,
+        ggplot(object, aes(x = .data[[variables]], y = .data$.estimate,
             colour = .data[[by_var]], group = .data[[by_var]])) +
             guides(x = guide_axis(angle = angle))
     } else {
-        ggplot(object, aes(x = .data[[variables]], y = .data$est)) +
+        ggplot(object, aes(x = .data[[variables]], y = .data$.estimate)) +
             guides(x = guide_axis(angle = angle))
     }
 
@@ -1012,8 +1030,8 @@
     do_sizer <- sizer_cols %in% names(object)
     if (grouped_by) {
         plt <- plt +
-        geom_ribbon(mapping = aes(ymin = .data[["lower_ci"]],
-                                  ymax = .data[["upper_ci"]],
+        geom_ribbon(mapping = aes(ymin = .data[[".lower_ci"]],
+                                  ymax = .data[[".upper_ci"]],
                                   fill = .data[[by_var]]),
                     alpha = ci_alpha, colour = NA) +
         geom_line(aes(colour = .data[[by_var]])) +
@@ -1037,8 +1055,8 @@
         }
     } else {
         plt <- plt +
-        geom_ribbon(mapping = aes(ymin = .data[["lower_ci"]],
-                                  ymax = .data[["upper_ci"]]),
+        geom_ribbon(mapping = aes(ymin = .data[[".lower_ci"]],
+                                  ymax = .data[[".upper_ci"]]),
                     alpha = ci_alpha, colour = NA, fill = ci_col) +
         geom_line(colour = smooth_col)
         if (any(do_sizer)) {
@@ -1153,7 +1171,7 @@
     show <- match.arg(show)
     if (isTRUE(identical(show, "estimate"))) {
         guide_title <- "Partial\neffect"
-        plot_var <- "est"
+        plot_var <- ".estimate"
         guide_limits <- if (is.null(ylim)) {
             c(-1, 1) * max(abs(object[[plot_var]]), na.rm = TRUE)
         } else {
@@ -1161,8 +1179,8 @@
         }
     } else {
         guide_title <- "Std. err."
-        plot_var <- "se"
-        guide_limits <- range(object[["se"]])
+        plot_var <- ".se"
+        guide_limits <- range(object[[".se"]])
     }
 
     plt <- ggplot(object, aes(x = .data[[variables[1]]],
@@ -1274,7 +1292,7 @@
     show <- match.arg(show)
     if (isTRUE(identical(show, "estimate"))) {
         guide_title <- "Partial\neffect"
-        plot_var <- "est"
+        plot_var <- ".estimate"
         guide_limits <- if (is.null(ylim)) {
             c(-1, 1) * max(abs(object[[plot_var]]), na.rm = TRUE)
         } else {
@@ -1282,8 +1300,8 @@
         }
     } else {
         guide_title <- "Std. err."
-        plot_var <- "se"
-        guide_limits <- range(object[["se"]])
+        plot_var <- ".se"
+        guide_limits <- range(object[[".se"]])
     }
 
     plt <- ggplot(object, aes(x = .data[[variables[1]]],
@@ -1410,7 +1428,7 @@
     show <- match.arg(show)
     if (isTRUE(identical(show, "estimate"))) {
         guide_title <- "Partial\neffect"
-        plot_var <- "est"
+        plot_var <- ".estimate"
         guide_limits <- if (is.null(ylim)) {
             c(-1, 1) * max(abs(object[[plot_var]]), na.rm = TRUE)
         } else {
@@ -1418,8 +1436,8 @@
         }
     } else {
         guide_title <- "Std. err."
-        plot_var <- "se"
-        guide_limits <- range(object[["se"]])
+        plot_var <- ".se"
+        guide_limits <- range(object[[".se"]])
     }
 
     plt <- ggplot(object, aes(x = .data[[variables[1]]],
@@ -1547,13 +1565,13 @@
     object <- transform_fun(object, fun = fun)
 
     ## base plot with computed QQs
-    plt <- ggplot(object, aes(sample = .data[["est"]])) +
+    plt <- ggplot(object, aes(sample = .data[[".estimate"]])) +
         geom_point(stat = "qq") +
         guides(x = guide_axis(angle = angle))
 
     ## add a QQ reference line
     if (isTRUE(qq_line)) {
-        sampq <- quantile(object[["est"]], c(0.25, 0.75))
+        sampq <- quantile(object[[".estimate"]], c(0.25, 0.75))
         gaussq <- qnorm(c(0.25, 0.75))
         slope <- diff(sampq) / diff(gaussq)
         intercept <- sampq[1L] - slope * gaussq[1L]
@@ -1630,7 +1648,7 @@
     object <- transform_fun(object, fun = fun)
 
     plt <- ggplot(object, aes(x = .data[[variables[1]]],
-                              y = .data[["est"]],
+                              y = .data[[".estimate"]],
                               colour = .data[[variables[2]]])) +
         geom_line() +
         discrete_colour +
@@ -1765,10 +1783,10 @@
 
     # plot
     plt <- ggplot(object, aes(x = .data[[x_var]],
-                              y = .data[["est"]],
+                              y = .data[[".estimate"]],
                               colour = .data[[fac_var]])) +
-        geom_ribbon(mapping = aes(ymin = .data[["lower_ci"]],
-                                  ymax = .data[["upper_ci"]],
+        geom_ribbon(mapping = aes(ymin = .data[[".lower_ci"]],
+                                  ymax = .data[[".upper_ci"]],
                                   fill = .data[[fac_var]],
                                   colour = NULL),
                     alpha = ci_alpha) +
@@ -1869,7 +1887,7 @@
     show <- match.arg(show)
     if (isTRUE(identical(show, "estimate"))) {
         guide_title <- "Partial\neffect"
-        plot_var <- "est"
+        plot_var <- ".estimate"
         guide_limits <- if (is.null(ylim)) {
             c(-1, 1) * max(abs(object[[plot_var]]), na.rm = TRUE)
         } else {
@@ -1877,8 +1895,8 @@
         }
     } else {
         guide_title <- "Std. err."
-        plot_var <- "se"
-        guide_limits <- range(object[["se"]])
+        plot_var <- ".se"
+        guide_limits <- range(object[[".se"]])
     }
 
     # if orientation is not specified, use c(20, 0, mean(range(longitude)))

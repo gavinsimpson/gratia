@@ -661,6 +661,7 @@
 #' @param partial_match logical; should smooths be selected by partial matches
 #'   with `term`? If `TRUE`, `term` can only be a single string to match
 #'   against.
+#' @param seed numeric; RNG seed to use.
 #' @param newdata Deprecated: use `data` instead.
 #'
 #' @note `partial_derivatives()` will ignore any random effect smooths it
@@ -717,8 +718,8 @@
 #' # draw te(x,z) along slice
 #' cap <- expression(z == 0.4)
 #' p2 <- sm |>
-#'     ggplot(aes(x = x, y = est)) +
-#'     geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), alpha = 0.2) +
+#'     ggplot(aes(x = x, y = .estimate)) +
+#'     geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
 #'     geom_line() +
 #'     labs(x = "x", y = "Partial effect", title = "te(x,z)",
 #'         caption = cap)
@@ -744,7 +745,20 @@
     n_sim = 10000, level = 0.95,
     unconditional = FALSE, frequentist = FALSE,
     offset = NULL, ncores = 1,
-    partial_match = FALSE, ..., newdata = NULL) {
+    partial_match = FALSE, seed = NULL, ..., newdata = NULL) {
+
+    ## handle seed
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+        runif(1)
+    }
+    if (is.null(seed)) {
+        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+    } else {
+        R.seed <- get(".Random.seed", envir = .GlobalEnv)
+        set.seed(seed)
+        RNGstate <- structure(seed, kind = as.list(RNGkind()))
+        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+    }
 
     ## handle term
     smooth_ids <- if (!missing(term)) {
@@ -995,8 +1009,9 @@
 #'
 #' # draw fitted values along x2
 #' p1 <- fv |>
-#'     ggplot(aes(x = x2, y = fitted)) +
-#'     geom_ribbon(aes(ymin = lower, ymax = upper, y = NULL), alpha = 0.2) +
+#'     ggplot(aes(x = x2, y = .fitted)) +
+#'     geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci, y = NULL),
+#'         alpha = 0.2) +
 #'     geom_line() +
 #'     labs(title = "Estimated count as a function of x2",
 #'          y = "Estimated count")
@@ -1025,7 +1040,7 @@
     ...) {
     yd <- derivative_samples(object, focal = focal, data = data, order = order,
         type = type, scale = scale, method = method, n = n, eps = eps,
-        n_sim = n_sim, ...)
+        n_sim = n_sim, seed = seed, ...)
 
     qq <- (1 - level) / 2
 
