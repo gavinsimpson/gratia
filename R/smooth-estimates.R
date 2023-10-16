@@ -263,23 +263,33 @@
 #' @keywords internal
 #' @noRd
 `spline_values2` <- function(smooth, data, model, unconditional,
-                             overall_uncertainty = TRUE) {
+                             overall_uncertainty = TRUE,
+                             parameterized = TRUE,
+                             frequentist = FALSE) {
     X <- PredictMat(smooth, data)   # prediction matrix
     start <- smooth[["first.para"]]
     end <- smooth[["last.para"]]
     para.seq <- start:end
-    coefs <- coef(model)[para.seq]
+    coefs <- if (inherits(model, "scam")) {
+        coef(model, parameterized = parameterized)[para.seq]
+    } else {
+        coef(model)[para.seq]
+    }
 
     # handle scam models, which return the intercept with PredictMat
     if (inherits(model, "scam")) {
-        X <- X[, -1, drop = FALSE] # drop the intercept
+        X <- X[, para.seq, drop = FALSE] # drop the intercept
     }
     fit <- drop(X %*% coefs)
 
     label <- smooth_label(smooth)
 
     ## want full vcov for component-wise CI
-    V <- get_vcov(model, unconditional = unconditional)
+    V <- if (inherits(model, "scam")) {
+        vcov(model, freq = frequentist, parameterized = parameterized)
+    } else {
+        get_vcov(model, unconditional = unconditional)
+    }
 
     ## variables for component-wise CIs for smooths
     column_means <- model[["cmX"]]

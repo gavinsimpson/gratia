@@ -4,6 +4,7 @@
 \alias{fitted_values}
 \alias{fitted_values.gam}
 \alias{fitted_values.gamm}
+\alias{fitted_values.scam}
 \title{Generate fitted values from a estimated GAM}
 \usage{
 fitted_values(object, ...)
@@ -17,6 +18,8 @@ fitted_values(object, ...)
 )
 
 \method{fitted_values}{gamm}(object, ...)
+
+\method{fitted_values}{scam}(object, ...)
 }
 \arguments{
 \item{object}{a fitted model. Currently only models fitted by \code{\link[mgcv:gam]{mgcv::gam()}}

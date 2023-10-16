@@ -98,6 +98,12 @@
     fitted_values(object$gam, ...)
 }
 
+#' @export
+#' @rdname fitted_values
+`fitted_values.scam` <- function(object, ...) {
+    fitted_values.gam(object, ...)
+}
+
 #' @importFrom rlang set_names .data
 #' @importFrom dplyr bind_cols mutate across
 #' @importFrom tibble as_tibble is_tibble

@@ -7,6 +7,7 @@
 \alias{data_slice.gam}
 \alias{data_slice.gamm}
 \alias{data_slice.list}
+\alias{data_slice.scam}
 \title{Prepare a data slice through model covariates}
 \usage{
 data_slice(object, ...)
@@ -20,6 +21,8 @@ data_slice(object, ...)
 \method{data_slice}{gamm}(object, ...)
 
 \method{data_slice}{list}(object, ...)
+
+\method{data_slice}{scam}(object, ...)
 }
 \arguments{
 \item{object}{an R model object.}

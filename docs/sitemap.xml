@@ -196,6 +196,9 @@
     <loc>https://gavinsimpson.github.io/gratia/reference/fixef.html</loc>
   </url>
   <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/gaussian_draws.html</loc>
+  </url>
+  <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/get_by_smooth.html</loc>
   </url>
   <url>
@@ -244,6 +247,9 @@
     <loc>https://gavinsimpson.github.io/gratia/reference/lss_parameters.html</loc>
   </url>
   <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/mh_draws.html</loc>
+  </url>
+  <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/model_concurvity.html</loc>
   </url>
   <url>
@@ -284,6 +290,9 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/penalty.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/post_draws.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/post_link_funs.html</loc>

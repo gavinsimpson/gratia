@@ -203,6 +203,16 @@
 }
 
 #' @export
+`fitted_samples.gamm` <- function(model, ...) {
+    fitted_samples(model$gam, ...)
+}
+
+#' @export
+`fitted_samples.scam` <- function(model, ...) {
+    fitted_samples.gam(model, ...)
+}
+
+#' @export
 #'
 #' @rdname fitted_samples
 #'
@@ -742,6 +752,11 @@
     ## add classes
     class(sims) <- c("smooth_samples", class(sims))
     sims
+}
+
+#' @export
+`smooth_samples.gamm` <- function(model, ...) {
+    smooth_samples(model$gam)
 }
 
 #' @title Posterior expectations of derivatives from an estimated model
