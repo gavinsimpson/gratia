@@ -124,6 +124,12 @@
     data_slice(object[["gam"]], ...)
 }
 
+#' @export
+#' @rdname data_slice
+`data_slice.scam` <- function(object, ...) {
+    data_slice.gam(object, ...)
+}
+
 `data_slice_data` <- function(object, data = NULL) {
     is_mf <- FALSE # is a data a model frame
     if (is.null(data)) {
@@ -358,6 +364,11 @@
     as_tibble(df)
 }
 
+#' @export
+`typical_values.scam` <- function(object, ...) {
+    typical_values.gam(object, ...)
+}
+
 #' All combinations of factor levels
 #'
 #' @param object a fitted model object.
@@ -407,6 +418,11 @@
     f
 }
 
+#' @export
+`factor_combos.scam` <- function(object, ...) {
+    factor_combos.gam(object, ...)
+}
+
 #' All combinations of factor levels plus typical values of continuous variables
 #'
 #' @inheritParams factor_combos
@@ -440,4 +456,9 @@
     pos <- eval_select(expr, data = tbl)
     tbl <- tbl[pos]
     tbl
+}
+
+#' @export
+`data_combos.scam` <- function(object, ...) {
+    data_combos.gam(object, ...)
 }
