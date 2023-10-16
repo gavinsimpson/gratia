@@ -573,7 +573,7 @@ detaching ‘package:mgcv’
 > ### Name: data_slice
 > ### Title: Prepare a data slice through model covariates
 > ### Aliases: data_slice data_slice.default data_slice.data.frame
-> ###   data_slice.gam data_slice.gamm data_slice.list
+> ###   data_slice.gam data_slice.gamm data_slice.list data_slice.scam
 > 
 > ### ** Examples
 > 
@@ -1415,6 +1415,7 @@ detaching ‘package:mgcv’
 > ### Name: fitted_values
 > ### Title: Generate fitted values from a estimated GAM
 > ### Aliases: fitted_values fitted_values.gam fitted_values.gamm
+> ###   fitted_values.scam
 > 
 > ### ** Examples
 > 
@@ -1631,11 +1632,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x56275be23608>
+<environment: 0x55dd05b84b28>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x56275be23608>
+<environment: 0x55dd05b84b28>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1891,8 +1892,8 @@ detaching ‘package:mgcv’
 > # draw te(x,z) along slice
 > cap <- expression(z == 0.4)
 > p2 <- sm |>
-+     ggplot(aes(x = x, y = est)) +
-+     geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), alpha = 0.2) +
++     ggplot(aes(x = x, y = .estimate)) +
++     geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
 +     geom_line() +
 +     labs(x = "x", y = "Partial effect", title = "te(x,z)",
 +         caption = cap)
@@ -2512,7 +2513,7 @@ detaching ‘package:mgcv’
 > ## evaluate all smooths
 > smooth_estimates(m1)
 # A tibble: 400 x 9
-   smooth type  by          est       se         x0    x1    x2    x3
+   smooth type  by    .estimate      .se         x0    x1    x2    x3
    <chr>  <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl> <dbl> <dbl>
  1 s(x0)  TPRS  <NA>  -0.966542 0.316118 0.00710904    NA    NA    NA
  2 s(x0)  TPRS  <NA>  -0.925391 0.297170 0.0171157     NA    NA    NA
@@ -2529,7 +2530,7 @@ detaching ‘package:mgcv’
 > ## or selected smooths
 > smooth_estimates(m1, smooth = c("s(x0)", "s(x1)"))
 # A tibble: 200 x 7
-   smooth type  by          est       se         x0    x1
+   smooth type  by    .estimate      .se         x0    x1
    <chr>  <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl>
  1 s(x0)  TPRS  <NA>  -0.966542 0.316118 0.00710904    NA
  2 s(x0)  TPRS  <NA>  -0.925391 0.297170 0.0171157     NA
@@ -2713,7 +2714,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  43.596 0.372 43.912 0 0 
+Time elapsed:  43.169 0.38 43.492 0 0 
 > grDevices::dev.off()
 null device 
           1 
