@@ -1,4 +1,4 @@
-# gratia 0.8.1.41
+# gratia 0.8.1.42
 
 ## User visible changes
 
@@ -40,7 +40,6 @@
 * `fitted_values()` now has some level of support for location, scale, shape
   families. Suppoerted families are `mgcv::gaulss()`, `mgcv::gumbls()`,
   `mgcv::gevlss()`, `mgcv::gumbls()`, `mgcv::shash()`, and `mgcv::ziplss()`.
-  
 
 * *gratia* now requires *dplyr* versions >= 1.1.0 and *tidyselect* >= 1.2.0.
 
@@ -168,9 +167,15 @@
 * New function `null_deviance()` that extracts the null deviance of a fitted
   model.
 
-* `draw()`, `smooth_estimates()`, & `smooth_samples()` now all work for models
-  fitted with `scam::scam()`. Currently support extends only to univariate
-  smooths.
+* `draw()`, `smooth_estimates()`, `fitted_values()`, `data_slice()`, and
+  `smooth_samples()` now all work for models fitted with `scam::scam()`.
+  Where it matters, current support extends only to univariate smooths.
+
+* `post_draws()` is a new low-level function for generating posterior draws
+  from fitted model coefficients. `post_daws()` is an S3 generic function so is
+  extensible by users. Currently provides a simple interface to a simple
+  Gaussian approximation sampler (`gaussian_draws()`) and the simple Metropolis
+  Hasting sample  (`mh_draws()`) available via `mgcv::gam.mh()`.
 
 ## Bug fixes
 
