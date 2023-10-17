@@ -269,14 +269,16 @@ family_type.family <- function(object, ...) {
     } else {
         # linfo is ordered; 1: location; 2: scale or sigma, 3: shape, power, etc
         # (check pi is right greek letter for zero-inflation! - YES)
+        # but for twlss, eta2 is actually for p (power)
         lobj <- switch(parameter,
             location  = linfo[[1L]],
             mu        = linfo[[1L]],
             scale     = linfo[[2L]],
             sigma     = linfo[[2L]],
-            phi       = linfo[[2L]], # scale parameter for twlss() gammals()
+            phi       = if (family_name(family) == "twlss") {linfo[[3L]]} else 
+            {linfo[[2L]]}, # scale parameter for twlss() gammals()
             shape     = linfo[[3L]],
-            power     = linfo[[3L]], # power for twlss()
+            power     = linfo[[2L]], # power for twlss()
             xi        = linfo[[3L]], # xi for gevlss()
             pi        = linfo[[2L]], # pi for zero-inflation
             epsilon   = linfo[[3L]], # skewness for shash

@@ -1393,3 +1393,26 @@ vars_from_label <- function(label) {
     }
     model$null.deviance
 }
+
+# function to return the vector of boundary points for power parameter
+get_tw_bounds <- function(model) {
+    fam <- family_name(model)
+    if (fam != "twlss") {
+        stop("'model' wasn't fitted with 'twlss()' family.",
+            call. = FALSE)
+    }
+    rfun <- family(model)$residuals
+    a <- get(".a", envir = environment(rfun))
+    b <- get(".b", envir = environment(rfun))
+    c(a, b)
+}
+
+# function to convert vector of theta values to power values for twlss family
+twlss_theta_2_power <- function(theta, a, b) {
+    i <- theta > 0
+    exp_theta_pos <- exp(-theta[i])
+    exp_theta_neg <- exp(theta[!i])
+    theta[i]  <- (b + a * exp_theta_pos) / (1 + exp_theta_pos)
+    theta[!i] <- (b * exp_theta_neg + a) / (1 + exp_theta_neg)
+    theta
+}
