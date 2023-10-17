@@ -1,7 +1,6 @@
-## Test methods for GJRM models
-
+# Test methods for GJRM models
 # Fit an example GJRM model using the example from ?GJRM::gamlss
-library("GJRM")
+suppressPackageStartupMessages(library("GJRM"))
 
 test_that("draw works for a simple GJRM gamlss", {
     skip_if_not_installed("GJRM", minimum_version = "0.2-6")
