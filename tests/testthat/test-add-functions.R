@@ -154,3 +154,21 @@ test_that("add_sizer derivatives method works", {
     expect_silent(tbl <- add_sizer(d, type = "sizer"))
     expect_named(tbl, c(nms, ".decrease", ".increase"))
 })
+
+test_that("add_sizer smooth_estimates method works", {
+    nms <- c("smooth", "type", "by", ".estimate", ".se")
+    expect_silent(d <- derivatives(m_gam, type = "central"))
+    expect_silent(sm <- smooth_estimates(m_gam))
+    expect_silent(tbl <- sm |>
+        add_sizer(derivatives = d, type = "change"))
+    expect_named(tbl, c(nms, "x0", "x1", "x2", "x3", ".change"))
+
+    expect_silent(tbl <- sm |>
+        add_sizer(derivatives = d, type = "sizer"))
+    expect_named(tbl, c(nms, "x0", "x1", "x2", "x3", ".decrease", ".increase"))
+
+    expect_error(sm |> add_sizer(type = "change"),
+        "An object of class 'derivatives' must be supplied.", fixed = TRUE)
+    expect_error(sm |> add_sizer(type = "sizer"),
+        "An object of class 'derivatives' must be supplied.", fixed = TRUE)
+})
