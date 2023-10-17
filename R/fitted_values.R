@@ -113,8 +113,10 @@
         se.fit = TRUE) |>
         as.data.frame() |>
         rlang::set_names(c(".fitted", ".se")) |>
-        as_tibble()
-    fit <- bind_cols(data, fit)
+        as_tibble() |>
+        mutate(.row = row_number())
+    fit <- bind_cols(data, fit) |>
+        relocate(".row", .before = 1L)
 
     # create the confidence interval
     crit <- coverage_normal(ci_level)
@@ -147,19 +149,23 @@
     # convert fv to tibble then long format
     fv <- fv |>
         as_tibble() |>
-        tidyr::pivot_longer(everything(), values_to = ".fitted",
-            names_to = "parameter")
+        mutate(.row = row_number()) |>
+        relocate(".row", .before = 1L) |>
+        tidyr::pivot_longer(!matches("\\.row"), values_to = ".fitted",
+            names_to = ".parameter")
     # convert fv to tibble then long format
     std_err <- std_err |>
         as_tibble() |>
-        tidyr::pivot_longer(everything(), values_to = ".std_err",
-            names_to = "parameter")
+        mutate(.row = row_number()) |>
+        relocate(".row", .before = 1L) |>
+        tidyr::pivot_longer(!matches("\\.row"), values_to = ".std_err",
+            names_to = ".parameter")
     # bind .std_err to fv...
     fit <- fv |>
-        add_column(.std_err = pull(std_err, ".std_err")) |>
+        add_column(.se = pull(std_err, ".std_err")) |>
         # ...and compute interval
-        mutate(.lower_ci = .data$.fitted + (crit * .data$.std_err),
-            .upper_ci = .data$.fitted - (crit * .data$.std_err))
+        mutate(.lower_ci = .data$.fitted + (crit * .data$.se),
+            .upper_ci = .data$.fitted - (crit * .data$.se))
 
     # convert to the response scale if requested
     if (identical(scale, "response")) {
@@ -168,7 +174,7 @@
 
         fit <- fit |>
             mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
-                .fns = ~ case_match(.data$parameter,
+                .fns = ~ case_match(.data$.parameter,
                     "location"    ~ extra_fns[["location"]](ilink_loc(.x)),
                     "scale"       ~ extra_fns[["scale"]](ilink_scl(.x)),
                     "shape"       ~ extra_fns[["shape"]](ilink_scl(.x)),
@@ -236,18 +242,18 @@ identity_fun <- function(eta) {
         mutate(.row = row_number()) |>
         relocate(".row", .before = 1L) |>
         tidyr::pivot_longer(!matches("\\.row"), values_to = ".fitted",
-            names_to = "parameter")
+            names_to = ".parameter")
     # convert fv to tibble then long format
     std_err <- std_err |>
         as_tibble() |>
         tidyr::pivot_longer(everything(), values_to = ".std_err",
-            names_to = "parameter")
+            names_to = ".parameter")
     # bind .std_err to fv...
     fit <- fv |>
-        add_column(.std_err = pull(std_err, ".std_err")) |>
+        add_column(.se = pull(std_err, ".std_err")) |>
         # ...and compute interval
-        mutate(.lower_ci = .data$.fitted + (crit * .data$.std_err),
-            .upper_ci = .data$.fitted - (crit * .data$.std_err))
+        mutate(.lower_ci = .data$.fitted + (crit * .data$.se),
+            .upper_ci = .data$.fitted - (crit * .data$.se))
 
     # convert to the response scale if requested
     if (identical(scale, "response")) {
@@ -256,7 +262,7 @@ identity_fun <- function(eta) {
 
         fit <- fit |>
             mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
-                .fns = ~ case_match(.data$parameter,
+                .fns = ~ case_match(.data$.parameter,
                     "location"    ~ extra_fns[["location"]](ilink_loc(.x)),
                     "pi"          ~ extra_fns[["pi"]](ilink_scl(.x)))))
     }
