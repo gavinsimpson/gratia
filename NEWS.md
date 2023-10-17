@@ -1,4 +1,4 @@
-# gratia 0.8.1.42
+# gratia 0.8.1.43
 
 ## User visible changes
 
@@ -39,7 +39,8 @@
 
 * `fitted_values()` now has some level of support for location, scale, shape
   families. Suppoerted families are `mgcv::gaulss()`, `mgcv::gumbls()`,
-  `mgcv::gevlss()`, `mgcv::gumbls()`, `mgcv::shash()`, and `mgcv::ziplss()`.
+  `mgcv::gevlss()`, `mgcv::gumbls()`, `mgcv::shash()`, `mgcv::twlss()`, and
+  `mgcv::ziplss()`.
 
 * *gratia* now requires *dplyr* versions >= 1.1.0 and *tidyselect* >= 1.2.0.
 
