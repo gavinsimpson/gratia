@@ -89,6 +89,13 @@ test_that("fitted values works for a gaulss model", {
     expect_named(fv, expected = c(".row", ".parameter", fv_nms))
 })
 
+test_that("fitted values works for a twlss model", {
+    expect_silent(fv <- fitted_values(m_twlss))
+    expect_named(fv, expected = c(".row", ".parameter", fv_nms))
+    expect_identical(pull(fv, ".parameter") |> unique(),
+        c("location", "power", "scale"))
+})
+
 test_that("fitted values works for a gamm model", {
     expect_silent(fv <- fitted_values(m_gamm))
     expect_named(fv, expected = c(".row","x0", "x1", "x2", "x3", fv_nms))

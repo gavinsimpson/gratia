@@ -388,4 +388,12 @@ ziplss_data <- function(seed = 0) {
 ziplss_df <- ziplss_data()
 m_ziplss <- gam(list(y ~ s(x2) + x3,
   ~ s(x0) + x1), family = ziplss(), data = ziplss_df)
-    
+
+# TWLSS example from ?mgcv::twlss
+twlss_df <- withr::with_seed(3, gamSim(1, n = 400, dist = "poisson",
+    scale = 0.2, verbose = FALSE) |>
+  mutate(y = mgcv::rTweedie(exp(.data$f), p = 1.3,
+    phi = 0.5))) ## Tweedie response
+## Fit a fixed p Tweedie, with wrong link ...
+m_twlss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1, ~ 1),
+  family = twlss(), data = twlss_df)
