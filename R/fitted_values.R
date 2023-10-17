@@ -234,7 +234,7 @@ identity_fun <- function(eta) {
     fv <- fv |>
         as_tibble() |>
         mutate(.row = row_number()) |>
-        relocate(.data$.row, .before = 1L) |>
+        relocate(".row", .before = 1L) |>
         tidyr::pivot_longer(!matches("\\.row"), values_to = ".fitted",
             names_to = "parameter")
     # convert fv to tibble then long format
