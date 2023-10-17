@@ -78,3 +78,15 @@ test_that("fitted_values() works for an ocat GAM", {
     expect_s3_class(fv, c("tbl_df", "tbl", "data.frame"))
     expect_identical(nrow(new_df), nrow(fv))
 })
+
+test_that("fitted values works for a univariate scam model", {
+    expect_silent(fv <- fitted_values(m_scam))
+})
+
+test_that("fitted values works for a ziplss model", {
+    expect_silent(fv <- fitted_values(m_ziplss))
+})
+
+test_that("fitted values works for a gaulss model", {
+    expect_silent(fv <- fitted_values(m_gaulss))
+})
