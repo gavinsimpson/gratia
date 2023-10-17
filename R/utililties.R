@@ -1149,7 +1149,16 @@ vars_from_label <- function(label) {
         }
     }
 
-    tt <- terms(model[["pred.formula"]])
+    # some models we want to handle don't have pred.formula, e.g. scam() models
+    tt <- if (is.null(model$pred.formula)) {
+        if (!is.null(model$terms)) {
+            terms(model)
+        } else {
+            stop("`model` has no terms object to work with.", call. = FALSE)
+        }
+    } else {
+        terms(model[["pred.formula"]])
+    }
     tt <- delete.response(tt)
     out <- model.frame(tt, data = data)
 
