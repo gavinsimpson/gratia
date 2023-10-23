@@ -173,55 +173,69 @@
 #' @export
 #' @rdname smooth_type
 `smooth_type.mpi.smooth` <- function(smooth) {
-    sm_type <- "Mono. incr."
+    sm_type <- "Mono inc P spline"
     sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.mpd.smooth` <- function(smooth) {
-    sm_type <- "Mono. decr."
+    sm_type <- "Mono dec P spline"
     sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.cx.smooth` <- function(smooth) {
-    sm_type <- "Convex"
+    sm_type <- "Convex P spline"
     sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.cv.smooth` <- function(smooth) {
-    sm_type <- "Concave"
+    sm_type <- "Concave P spline"
     sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.micx.smooth` <- function(smooth) {
-    sm_type <- "Mono. incr. conv."
+    sm_type <- "Mono inc conv P spline"
     sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.micv.smooth` <- function(smooth) {
-    sm_type <- "Mono. incr. conc."
+    sm_type <- "Mono inc conc P spline"
     sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.mdcx.smooth` <- function(smooth) {
-    sm_type <- "Mono. decr. conv."
+    sm_type <- "Mono dec conv P spline"
     sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.mdcv.smooth` <- function(smooth) {
-    sm_type <- "Mono. decr. conc."
+    sm_type <- "Mono dec conc P spline"
+    sm_type
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.miso.smooth` <- function(smooth) {
+    sm_type <- "Mono inc 0 start P spline"
+    sm_type
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.mifo.smooth` <- function(smooth) {
+    sm_type <- "Mono inc 0 end P spline"
     sm_type
 }

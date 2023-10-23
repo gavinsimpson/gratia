@@ -547,7 +547,13 @@
                 index = idx, frequentist = freq, unconditional = unconditional)
             Xp %*% t(betas)
         } else {
-            Xp[, idx, drop = FALSE] %*% t(betas[, idx, drop = FALSE])
+            # In a scam model, the intercept seems to be parametrised into the
+            # smooth as PredictMat returns a constant column
+            if (isTRUE(length(idx) < ncol(Xp))) {
+                Xp[, -1, drop = FALSE] %*% t(betas[, idx, drop = FALSE])
+            } else {
+                Xp %*% t(betas[, idx, drop = FALSE])
+            }
         }
         colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
         simu <- as_tibble(simu)

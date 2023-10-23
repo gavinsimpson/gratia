@@ -37,7 +37,7 @@
 #' @param unconditional logical; if `TRUE`  the Bayesian smoothing parameter
 #'   uncertainty corrected covariance matrix is used, *if available* for
 #'   `model`. See `mgcv::vcov.gam()`.
-#' @param parameterized logical; use parametrized coefficients and covariance
+#' @param parametrized logical; use parametrized coefficients and covariance
 #'   matrix, which respect the linear inequality constraints of the model. Only
 #'   for `scam::scam()` model fits.
 #' @param mvn_method character; one of `"mvnfast"` or `"mgcv"`. The default is
@@ -67,14 +67,14 @@
     index = NULL,
     frequentist = FALSE,
     unconditional  = FALSE,
-    parameterized = TRUE,
+    parametrized = TRUE,
     mvn_method = c("mvnfast", "mgcv"), ...) {
     # what posterior sampling are we using
     method <- match.arg(method)
     betas <- switch(method,
         "gaussian" = gaussian_draws(model = model, n = n,
             n_cores = n_cores, index = index, frequentist = frequentist,
-            unconditional = FALSE, parameterized = parameterized),
+            unconditional = FALSE, parametrized = parametrized),
         "mh" = mh_draws(n = n, model = model, burnin = burnin,
             thin = thin, t_df = t_df, rw_scale = rw_scale, index = index),
         "inla" = .NotYetImplemented(),
@@ -115,9 +115,9 @@
 #' @export
 #' @rdname gaussian_draws
 `gaussian_draws.scam` <- function(model, n, n_cores = 1L, index = NULL,
-    frequentist = FALSE, parameterized = TRUE, mvn_method = "mvnfast", ...) {
-    mu <- coef(model, parameterized = parameterized)
-    sigma <- vcov(model, freq = frequentist, parameterised = parameterized)
+    frequentist = FALSE, parametrized = TRUE, mvn_method = "mvnfast", ...) {
+    mu <- coef(model, parametrized = parametrized)
+    sigma <- vcov(model, freq = frequentist, parametrized = parametrized)
     if (!is.null(index)) {
         mu <- mu[index]
         sigma <- sigma[index, index, drop = FALSE]
