@@ -297,11 +297,11 @@ sw_mdcv <- scam(Date ~ s(Depth, k = 5, bs = "mdcv"), data = smallAges,
       y <- f1 + f2 + rnorm(n) * .5
       tibble(x1 = x1, x2 = x2, y = y)
 }
-dat <- sim_scam(n = 200, seed = 4)
+scam_dat <- sim_scam(n = 200, seed = 4)
 ## fit model, get results, and plot...
-m_scam <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "mpi"), data = dat)
-m_scam_micx <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "micx"), data = dat)
-m_scam_micv <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "micv"), data = dat)
+m_scam <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "mpi"), data = scam_dat)
+m_scam_micx <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "micx"), data = scam_dat)
+m_scam_micv <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "micv"), data = scam_dat)
 
 # Ordered categorical model ocat()
 n_categories <- 4

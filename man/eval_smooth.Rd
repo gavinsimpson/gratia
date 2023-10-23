@@ -3,6 +3,7 @@
 \name{eval_smooth}
 \alias{eval_smooth}
 \alias{eval_smooth.mgcv.smooth}
+\alias{eval_smooth.scam_smooth}
 \alias{eval_smooth.fs.interaction}
 \alias{eval_smooth.sz.interaction}
 \alias{eval_smooth.random.effect}
@@ -14,6 +15,19 @@
 eval_smooth(smooth, ...)
 
 \method{eval_smooth}{mgcv.smooth}(
+  smooth,
+  model,
+  n = 100,
+  n_3d = NULL,
+  n_4d = NULL,
+  data = NULL,
+  unconditional = FALSE,
+  overall_uncertainty = TRUE,
+  dist = NULL,
+  ...
+)
+
+\method{eval_smooth}{scam_smooth}(
   smooth,
   model,
   n = 100,
