@@ -77,30 +77,30 @@ test_that("smooth_type works for duchon spline smooths", {
 # SCAM smooths
 test_that("smooth_type works for scam monotone decreasing smooths", {
     expect_silent(st <- smooth_type(get_smooth(sw, "s(Depth)")))
-    expect_identical(st, "Mono. decr.")
+    expect_identical(st, "Mono dec P spline")
 })
 
 test_that("smooth_type works for scam monotone decreasing smooths", {
     expect_silent(st <- smooth_type(get_smooth(sw_mdcx, "s(Depth)")))
-    expect_identical(st, "Mono. decr. conv.")
+    expect_identical(st, "Mono dec conv P spline")
 })
 
 test_that("smooth_type works for scam monotone decreasing smooths", {
     expect_silent(st <- smooth_type(get_smooth(sw_mdcv, "s(Depth)")))
-    expect_identical(st, "Mono. decr. conc.")
+    expect_identical(st, "Mono dec conc P spline")
 })
 
 test_that("smooth_type works for scam monotone increasing smooths", {
     expect_silent(st <- smooth_type(get_smooth(m_scam, "s(x2)")))
-    expect_identical(st, "Mono. incr.")
+    expect_identical(st, "Mono inc P spline")
 })
 
 test_that("smooth_type works for scam monotone increasing smooths", {
     expect_silent(st <- smooth_type(get_smooth(m_scam_micx, "s(x2)")))
-    expect_identical(st, "Mono. incr. conv.")
+    expect_identical(st, "Mono inc conv P spline")
 })
 
 test_that("smooth_type works for scam monotone increasing smooths", {
     expect_silent(st <- smooth_type(get_smooth(m_scam_micv, "s(x2)")))
-    expect_identical(st, "Mono. incr. conc.")
+    expect_identical(st, "Mono inc conc P spline")
 })
