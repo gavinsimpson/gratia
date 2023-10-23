@@ -31,6 +31,8 @@
 \alias{smooth_type.micv.smooth}
 \alias{smooth_type.mdcx.smooth}
 \alias{smooth_type.mdcv.smooth}
+\alias{smooth_type.miso.smooth}
+\alias{smooth_type.mifo.smooth}
 \title{Determine the type of smooth and return it n a human readable form}
 \usage{
 smooth_type(smooth)
@@ -92,6 +94,10 @@ smooth_type(smooth)
 \method{smooth_type}{mdcx.smooth}(smooth)
 
 \method{smooth_type}{mdcv.smooth}(smooth)
+
+\method{smooth_type}{miso.smooth}(smooth)
+
+\method{smooth_type}{mifo.smooth}(smooth)
 }
 \arguments{
 \item{smooth}{an object inheriting from class \code{mgcv.smooth}.}

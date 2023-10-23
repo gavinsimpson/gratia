@@ -22,7 +22,7 @@ post_draws(model, ...)
   index = NULL,
   frequentist = FALSE,
   unconditional = FALSE,
-  parameterized = TRUE,
+  parametrized = TRUE,
   mvn_method = c("mvnfast", "mgcv"),
   ...
 )
@@ -79,7 +79,7 @@ covariance matrix of the parameters is used. See \code{mgcv::vcov.gam()}.}
 uncertainty corrected covariance matrix is used, \emph{if available} for
 \code{model}. See \code{mgcv::vcov.gam()}.}
 
-\item{parameterized}{logical; use parametrized coefficients and covariance
+\item{parametrized}{logical; use parametrized coefficients and covariance
 matrix, which respect the linear inequality constraints of the model. Only
 for \code{scam::scam()} model fits.}
 

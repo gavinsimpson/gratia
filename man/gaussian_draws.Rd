@@ -25,7 +25,7 @@ gaussian_draws(model, ...)
   n_cores = 1L,
   index = NULL,
   frequentist = FALSE,
-  parameterized = TRUE,
+  parametrized = TRUE,
   mvn_method = "mvnfast",
   ...
 )
@@ -62,7 +62,7 @@ numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
 for some marginal fits, such as those where the covariance matrix is close
 to singular.}
 
-\item{parameterized}{logical; use parametrized coefficients and covariance
+\item{parametrized}{logical; use parametrized coefficients and covariance
 matrix, which respect the linear inequality constraints of the model. Only
 for \code{scam::scam()} model fits.}
 }
