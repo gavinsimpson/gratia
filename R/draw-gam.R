@@ -448,9 +448,9 @@
 }
 
 #' @export
-`draw.scam` <- function(object, ...) {
+`draw.scam` <- function(object, ..., overall_uncertainty = FALSE) {
     class(object) <- append(class(object), "gam", after = 1)
-    draw.gam(object)
+    draw.gam(object, overall_uncertainty = FALSE, ...)
 }
 
 # TODO: Remove after dplyr 1.1.0 is released and use `multiple = "all"` instead

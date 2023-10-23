@@ -151,6 +151,11 @@
 
 #' @export
 `smooth_estimates.scam` <- function(object, ...) {
+    # scam has too many smooth types to write methods for all of them
+    # this just adds on some classes that allows gratia to dispatch special
+    # methods for their peculiarities
+    object$smooth <- lapply(object$smooth, reclass_scam_smooth)
+    # now just call the "gam" method
     smooth_estimates.gam(object, ...)
 }
 
@@ -252,7 +257,7 @@
 #' @param data an optional data frame of values to evaluate `smooth` at.
 #'
 #' @inheritParams eval_smooth
-#' 
+#'
 #' @importFrom tibble tibble add_column
 #' @importFrom rlang := !!
 #' @importFrom dplyr pull
@@ -264,32 +269,19 @@
 #' @noRd
 `spline_values2` <- function(smooth, data, model, unconditional,
                              overall_uncertainty = TRUE,
-                             parameterized = TRUE,
                              frequentist = FALSE) {
     X <- PredictMat(smooth, data)   # prediction matrix
     start <- smooth[["first.para"]]
     end <- smooth[["last.para"]]
     para.seq <- start:end
-    coefs <- if (inherits(model, "scam")) {
-        coef(model, parameterized = parameterized)[para.seq]
-    } else {
-        coef(model)[para.seq]
-    }
+    coefs <- coef(model)[para.seq]
 
-    # handle scam models, which return the intercept with PredictMat
-    if (inherits(model, "scam")) {
-        X <- X[, para.seq, drop = FALSE] # drop the intercept
-    }
     fit <- drop(X %*% coefs)
 
     label <- smooth_label(smooth)
 
     ## want full vcov for component-wise CI
-    V <- if (inherits(model, "scam")) {
-        vcov(model, freq = frequentist, parameterized = parameterized)
-    } else {
-        get_vcov(model, unconditional = unconditional)
-    }
+    V <- get_vcov(model, unconditional = unconditional)
 
     ## variables for component-wise CIs for smooths
     column_means <- model[["cmX"]]
@@ -328,6 +320,74 @@
 
     ## Return object
     tbl <- tibble(smooth = rep(label, nrow(X)), .estimate = fit, .se = se.fit)
+    ## bind on the data
+    tbl <- bind_cols(tbl, data)
+    ## nest all columns with varying data
+    tbl <- nest(tbl, data = all_of(c(".estimate", ".se", names(data))))
+
+    tbl
+}
+
+`smooth_values` <- function(smooth, ...) {
+    UseMethod("smooth_values")
+}
+
+#' @export
+`smooth_values.univariate_scam_smooth` <- function(smooth, data, model, V,
+    ...) {
+    
+    # get values of smooth 
+    X <- PredictMat(smooth, data)   # prediction matrix
+    off <- attr(X, "offset") # offset, if any
+    if (is.null(off)) {
+        off <- 0
+    }
+    start <- smooth[["first.para"]]
+    end <- smooth[["last.para"]]
+    para_seq <- smooth_coef_indices(smooth) # start:end
+    coefs <- coef(model, parametrized = FALSE)[para_seq]
+
+    # scam smooths work quite differently to mgcv smooths as X can contain
+    # constant terms, need exponentiating etc
+    which_exp <- which_exp_scam_coefs(model)[para_seq] # which betas need exp
+    idx <- seq_along(coefs)[which_exp]
+    # which exp function are we using?
+    exp_fn <- exp_fun(model)
+    # exponentiate any coefs that need it
+    coefs[idx] <- exp_fn(coefs[idx])
+    # coefs need reprarameterizing in some smooth type or padding with a 0
+    stats <- scam_beta_se(smooth, beta = coefs, X = X, ndata = nrow(data),
+        V = V)
+    coefs <- stats$betas
+    se_fit <- stats$se
+    fit <- drop(X %*% coefs) + off
+    list(fit = fit, se = se_fit)
+}
+
+`spline_values_scam` <- function(smooth, data, model,
+    overall_uncertainty = TRUE, frequentist = FALSE) {
+    # reclass the smooth to add classes needed for gratia's S3 methods to work
+    smooth <- reclass_scam_smooth(smooth)
+
+    ## want full vcov for component-wise CI
+    V <- vcov(model, freq = frequentist, parametrized = TRUE)
+
+    # get values of smooth & std errs, modified as needed for scam smooths
+    sv <- smooth_values(smooth = smooth, data = data, model = model, V = V)
+
+    fit <- sv$fit # fitted value at data
+    se_fit <- sv$se # sqrt(pmax(0, sv$se)) # std err of fitted value
+
+    label <- smooth_label(smooth)
+
+    ## identify which vars are needed for this smooth...
+    keep_vars <- terms_in_smooth(smooth)
+    ## ... then keep only those vars
+    data <- select(data, all_of(keep_vars))
+
+    ## Return object
+    tbl <- tibble(smooth = rep(label, nrow(data)), .estimate = fit,
+        .se = se_fit)
     ## bind on the data
     tbl <- bind_cols(tbl, data)
     ## nest all columns with varying data
@@ -379,6 +439,52 @@
                               unconditional = unconditional,
                               model = model,
                               overall_uncertainty = overall_uncertainty)
+
+    ## add on info regarding by variable
+    nr <- nrow(eval_sm)
+    eval_sm <- add_column(eval_sm, by = rep(by_var, nr),
+                          .after = 1L)
+    ## add on spline type info
+    sm_type <- smooth_type(smooth)
+    eval_sm <- add_column(eval_sm, type = rep(sm_type, nr),
+                          .after = 1L)
+
+    # set some values to NA if too far from the data
+    if (smooth_dim(smooth) == 2L && (!is.null(dist) && dist > 0)) {
+        eval_sm <- too_far_to_na(smooth,
+                                 input = eval_sm,
+                                 reference = model[["model"]],
+                                 cols = c(".estimate", ".se"),
+                                 dist = dist)
+    }
+    ## return
+    eval_sm
+}
+#' @rdname eval_smooth
+#' @importFrom tibble add_column
+#' @export
+`eval_smooth.scam_smooth` <- function(smooth, model,
+                                      n = 100,
+                                      n_3d = NULL,
+                                      n_4d = NULL,
+                                      data = NULL,
+                                      unconditional = FALSE,
+                                      overall_uncertainty = TRUE,
+                                      dist = NULL,
+                                      ...) {
+    by_var <- by_variable(smooth) # even if not a by as we want NA later
+    if (by_var == "NA") {
+        by_var <- NA_character_
+    }
+
+    ## deal with data if supplied
+    data <- process_user_data_for_eval(data = data, model = model,
+        n = n, n_3d = n_3d, n_4d = n_4d,
+        id = which_smooth(model, smooth_label(smooth)))
+
+    ## values of spline at data
+    eval_sm <- spline_values_scam(smooth, data = data, model = model,
+        overall_uncertainty = overall_uncertainty)
 
     ## add on info regarding by variable
     nr <- nrow(eval_sm)
@@ -864,14 +970,16 @@
         sm_type %in% c("TPRS", "TPRS (shrink)", "CRS", "CRS (shrink)",
                        "Cyclic CRS", "P spline", "B spline", "Duchon spline",
                        "GP",
-                       "Mono. incr.",
-                       "Mono. decr.",
-                       "Convex",
-                       "Concave",
-                       "Mono. decr. conv.",
-                       "Mono. decr. conc.",
-                       "Mono. incr. conv.",
-                       "Mono. incr. conc.")) {
+                       "Mono inc P spline",
+                       "Mono dec P spline",
+                       "Convex P spline",
+                       "Concave P spline",
+                       "Mono dec conv P spline",
+                       "Mono dec conc P spline",
+                       "Mono inc conv P spline",
+                       "Mono inc conc P spline",
+                       "Mono inc 0 start P spline",
+                       "Mono inc 0 start P spline")) {
         class(object) <- c("mgcv_smooth", class(object))
     } else if (sm_type == "Random effect") {
         class(object) <- append(class(object),

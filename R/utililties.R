@@ -1416,3 +1416,147 @@ twlss_theta_2_power <- function(theta, a, b) {
     theta[!i] <- (b * exp_theta_neg + a) / (1 + exp_theta_neg)
     theta
 }
+
+reclass_scam_smooth <- function(smooth) {
+    stop_if_not_mgcv_smooth(smooth)
+    uni_sm <- c("mpi.smooth", "mpd.smooth", "cv.smooth", "cx.smooth",
+        "po.smooth", "mdcv.smooth", "mdcx.smooth", "micv.smooth", "micx.smooth",
+        "mifo.smooth", "miso.smooth", "mpdBy.smooth", "cxBy.smooth",
+        "mpiBy.smooth", "cvBy.smooth", "mdcxBy.smooth", "mdcvBy.smooth",
+        "micxBy.smooth", "micvBy.smooth")
+    
+    uni_by_sm <- c("mpdBy.smooth", "cxBy.smooth", "mpiBy.smooth", "cvBy.smooth",
+        "mdcxBy.smooth", "mdcvBy.smooth", "micxBy.smooth", "micvBy.smooth")
+    
+    uni_zero_sm <- c( "mifo.smooth", "miso.smooth")
+
+    tensor_sm <- c("tedmi.smooth", "tedmd.smooth", "tesmi1.smooth",
+        "tesmi2.smooth", "tesmd1.smooth", "tesmd2.smooth", "temicx.smooth",
+        "temicv.smooth", "tedecx.smooth", "tedecv.smooth", "tescx.smooth",
+        "tescv.smooth", "tecvcv.smooth", "tecxcx.smooth", "tecxcv.smooth")
+
+    double_mono <- c("tedmi.smooth", "tedmd.smooth", "temicx.smooth",
+        "temicv.smooth", "tedecx.smooth", "tedecv.smooth", "tecvcv.smooth",
+        "tecxcx.smooth", "tecxcv.smooth")
+
+    single_mono <- c("tesmi1.smooth", "tesmi2.smooth", "tesmd1.smooth",
+        "tesmd2.smooth", "tescx.smooth", "tescv.smooth")
+
+    new_cls <- NULL
+
+    if (inherits(smooth, uni_sm)) {
+        new_cls <- c("univariate_scam_smooth", "scam_smooth")
+
+        if (inherits(smooth, uni_by_sm)) {
+            new_cls <- append(new_cls, "univariate_by_scam_smooth", after = 0)
+        }
+        
+        if (inherits(smooth, uni_zero_sm)) {
+            new_cls <- append(new_cls, "zero_point_scam_smooth", after = 0)
+        }
+    }
+
+    if (inherits(smooth, tensor_sm)) {
+        new_cls <- c("tensor_scam_smooth", "scam_smooth")
+
+        if (inherits(smooth, double_mono)) {
+            new_cls <- append(new_cls, "double_mono_tensor_scam_smooth",
+                after = 0L)
+        }
+
+        if (inherits(smooth, single_mono)) {
+            new_cls <- append(new_cls, "single_mono_tensor_scam_smooth",
+                after = 0L)
+        }
+    }
+
+    class(smooth) <- append(class(smooth), new_cls, after = 1L)
+
+    smooth
+}
+
+`which_exp_scam_coefs` <- function(model) {
+    model$p.ident
+}
+
+`exp_fun` <- function(model) {
+    not_exp <- model$not.exp
+    fun <- exp # set the default
+    if (isTRUE(not_exp)) { # not_exp == NULL --> FALSE (not TRUE)
+        fun <- mgcv::notExp
+    }
+    fun
+}
+
+`scam_beta_se` <- function(smooth, ...) {
+    UseMethod("scam_beta_se")
+}
+
+#' @export
+`scam_beta_se.univariate_scam_smooth` <- function(smooth, X, beta, ndata, V,
+    ...) {
+    # extending betas with a 0 - will zero out constant column in Xp
+    beta <- c(0, beta)
+
+    fv_c <- X %*% beta
+
+    const_dif <- - sum(fv_c) / ndata
+    ones <- matrix(rep(1, times = ndata), nrow = 1, ncol = ndata)
+    A <- ones %*% X 
+    qrX <- qr(X)
+    R <- qr.R(qrX) 
+    qrA <- qr(t(A))
+    R <- R[-1, ]
+    RZa <- t(qr.qty(qrA, t(R)))[, seq(2, ncol(X))]
+    RZa_inv <- solve(RZa) # FIXME? can we do this & next line better, without inverting?
+    RZaR <- RZa_inv %*% R
+    beta <- qr.qy(qrA, c(0, RZaR %*% beta))
+    idx <- c(1, smooth_coef_indices(smooth))
+    vc <- vv <- V[idx, idx, drop = FALSE] 
+    vc[, 1] <- rep(0, nrow(vv))
+    vc[1, ] <- rep(0, ncol(vv))
+    
+    XZa <- t(qr.qty(qrA, t(X)))[, seq(2, ncol(X))]
+    Ga <- XZa %*% RZaR
+    se <- sqrt(pmax(0, rowSums((Ga %*% vc) * Ga)))
+
+    list(betas = beta, se = se)
+}
+
+# p for sw [1] 113.00627  43.09450  54.19013 103.56536 149.15428
+
+#' @export
+`scam_beta_se.univariate_by_scam_smooth` <- function(smooth, X, beta, V, ...) {
+    # return the coefs unmodified, so just compute se
+    idx <- c(1, smooth_coef_indices(smooth))
+    V <- V[idx, idx, drop = FALSE]
+    se <- sqrt(pmax(0, rowSums((X %*% V) * X)))
+    list(betas = beta, se = se)
+}
+
+#' @export
+`scam_beta_se.po.smooth` <- function(smooth, X, beta, V, ...) {
+    # extending betas with a 0 - will zero out constant column in Xp
+    beta <- c(0, beta)
+    idx <- smooth_coef_indices(smooth)
+    vc <- vv <- V[idx, idx, drop = FALSE] 
+    vc[, 1] <- rep(0, nrow(vv))
+    vc[1, ] <- rep(0, ncol(vv))
+    se <- sqrt(pmax(0, rowSums((X %*% vc) * X)))
+    list(betas = beta, se = se)
+}
+
+#' @export
+`scam_beta_se.zero_point_scam_smooth` <- function(smooth, X, beta, V, ...) {
+    nz <- smooth$n.zero
+    lnz <- length(nz)
+    beta_z <- rep(0, length(beta) + length(nz))
+    beta_z[-nz] <- beta
+    idx <- smooth_coef_indices(smooth)
+    V <- V[idx, idx, drop = FALSE]
+    ## adding rows and columns of 0's...
+    vc <- matrix(0, nrow(V) + lnz, ncol(V) + lnz)
+    vc[-nz, -nz] <- V
+    se <- sqrt(pmax(0, rowSums((X %*% vc) * X)))
+    list(betas = beta_z, se = se)
+}
