@@ -218,10 +218,40 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 #'
 #' @export
 `get_smooths_by_id` <- function(object, id) {
-    if (is.gamm(object)) {
-        object <- object[["gam"]]
-    }
+    UseMethod("get_smooths_by_id")
+}
+
+#' @export
+#' @rdname get_smooths_by_id
+`get_smooths_by_id.gam` <- function(object, id) {
     object[["smooth"]][id]
+}
+
+#' @export
+#' @rdname get_smooths_by_id
+`get_smooths_by_id.scam` <- function(object, id) {
+    object[["smooth"]][id]
+}
+
+#' @export
+#' @rdname get_smooths_by_id
+`get_smooths_by_id.gamm` <- function(object, id) {
+    object[["gam"]][["smooth"]][id]
+}
+
+#' @export
+#' @rdname get_smooths_by_id
+`get_smooths_by_id.gamm4` <- function(object, id) {
+    object[["gam"]][["smooth"]][id]
+}
+
+#' @export
+#' @rdname get_smooths_by_id
+`get_smooths_by_id.list` <- function(object, id) {
+    if (!is.gamm4(object)) {
+        stop("Not a gamm4 model fit.", call. = FALSE)
+    }
+    object[["gam"]][["smooth"]][id]
 }
 
 #' @title Extract an factor-by smooth by name
