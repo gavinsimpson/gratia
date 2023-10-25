@@ -2,9 +2,24 @@
 % Please edit documentation in R/utililties.R
 \name{get_smooths_by_id}
 \alias{get_smooths_by_id}
+\alias{get_smooths_by_id.gam}
+\alias{get_smooths_by_id.scam}
+\alias{get_smooths_by_id.gamm}
+\alias{get_smooths_by_id.gamm4}
+\alias{get_smooths_by_id.list}
 \title{Extract an mgcv smooth given its position in the model object}
 \usage{
 get_smooths_by_id(object, id)
+
+\method{get_smooths_by_id}{gam}(object, id)
+
+\method{get_smooths_by_id}{scam}(object, id)
+
+\method{get_smooths_by_id}{gamm}(object, id)
+
+\method{get_smooths_by_id}{gamm4}(object, id)
+
+\method{get_smooths_by_id}{list}(object, id)
 }
 \arguments{
 \item{object}{a fitted GAM model object.}
