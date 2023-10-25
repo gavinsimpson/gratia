@@ -201,7 +201,7 @@ stop_if_not_mgcv_smooth <- function(smooth) {
     smooth
 }
 `old_get_smooth` <- function(object, term) {
-    if (is.gamm(object)) {
+    if (is.gamm(object) || is.gamm4(object)) {
         object <- object[["gam"]]
     }
     smooth <- object[["smooth"]][old_which_smooth(object, term)]
@@ -218,7 +218,7 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 #'
 #' @export
 `get_smooths_by_id` <- function(object, id) {
-    if (is.gamm(object)) {
+    if (is.gamm(object) || is.gamm4(object)) {
         object <- object[["gam"]]
     }
     object[["smooth"]][id]
@@ -236,7 +236,7 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 #'
 #' @export
 `get_by_smooth` <- function(object, term, level) {
-    if (is.gamm(object)) {
+    if (is.gamm(object) || is.gamm4(object)) {
         object <- object[["gam"]]
     }
 
@@ -328,7 +328,7 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 }
 
 `which_smooth` <- function(object, term) {
-    if (is.gamm(object)) {
+    if (is.gamm(object) || is.gamm4(object)) {
         object <- object[["gam"]]
     }
     smooths <- smooths(object)
@@ -338,7 +338,7 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 
 # Needed for evaluate smooth
 `old_which_smooth` <- function(object, term) {
-    if (is.gamm(object)) {
+    if (is.gamm(object) || is.gamm4(object)) {
         object <- object[["gam"]]
     }
     smooths <- smooths(object)
