@@ -175,6 +175,20 @@ test_that("get_smooths_by_id works for a GAMM", {
     expect_equal(sm[[1L]], get_smooth(m_gamm, "s(x1)"))
 })
 
+test_that("get_smooths_by_id works for gamm4", {
+    sm <- get_smooths_by_id(m_gamm4, 2L)
+    expect_type(sm, "list")
+    expect_true(is_mgcv_smooth(sm[[1L]]))
+    expect_equal(sm[[1L]], get_smooth(m_gamm4, "s(x1)"))
+})
+
+test_that("get_smooths_by_id works for scam", {
+    sm <- get_smooths_by_id(m_scam, 1L)
+    expect_type(sm, "list")
+    expect_true(is_mgcv_smooth(sm[[1L]]))
+    expect_equal(sm[[1L]], get_smooth(m_scam, "s(x1)"))
+})
+
 test_that("seq_min_max works as intended", {
     x <- rnorm(10)
     n <- 50L
