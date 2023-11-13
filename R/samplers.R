@@ -147,6 +147,11 @@
     } else {
         mgcv::rmvn(n = n, mu = mu, V = sigma)
     }
+    # if we ask for n=1 samples, we need to get back a matrix
+    if (!is.matrix(betas)) {
+        betas <- matrix(betas, nrow = n, byrow = TRUE)
+    }
+
     betas
 }
 
@@ -165,6 +170,10 @@
         mvnfast::rmvn(n = n, mu = mu, sigma = sigma, ncores = n_cores)
     } else {
         mgcv::rmvn(n = n, mu = mu, V = sigma)
+    }
+    # if we ask for n=1 samples, we need to get back a matrix
+    if (!is.matrix(betas)) {
+        betas <- matrix(betas, nrow = n, byrow = TRUE)
     }
     betas
 }
