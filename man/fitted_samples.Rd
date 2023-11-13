@@ -21,6 +21,7 @@ fitted_samples(model, ...)
   rw_scale = 0.25,
   freq = FALSE,
   unconditional = FALSE,
+  draws = NULL,
   ...,
   newdata = NULL,
   ncores = NULL
@@ -82,6 +83,9 @@ covariance matrix of the parameters.}
 Bayesian smoothing parameter uncertainty corrected covariance matrix is
 used, if available.}
 
+\item{draws}{matrix; user supplied posterior draws to be used when
+\code{method = "user"}.}
+
 \item{newdata}{Deprecated: use \code{data} instead.}
 
 \item{ncores}{Deprecated; use \code{n_cores} instead. The number of cores for
@@ -127,6 +131,13 @@ m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 fs <- fitted_samples(m1, n = 5, seed = 42)
 \donttest{
 fs
+}
+
+# can generate own set of draws and use them
+drws <- generate_draws(m1, n = 2, seed = 24)
+fs2 <- fitted_samples(m1, method = "user", draws = drws)
+\donttest{
+fs2
 }
 \dontshow{options(op)}
 }

@@ -21,6 +21,7 @@ posterior_samples(model, ...)
   freq = FALSE,
   unconditional = FALSE,
   weights = NULL,
+  draws = NULL,
   ...,
   newdata = NULL,
   ncores = NULL
@@ -80,6 +81,9 @@ used, if available.}
 
 \item{weights}{numeric; a vector of prior weights. If \code{data} is null
 then defaults to \code{object[["prior.weights"]]}, otherwise a vector of ones.}
+
+\item{draws}{matrix; user supplied posterior draws to be used when
+\code{method = "user"}.}
 
 \item{newdata}{Deprecated: use \code{data} instead.}
 

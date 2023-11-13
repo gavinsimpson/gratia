@@ -23,6 +23,7 @@ smooth_samples(model, ...)
   t_df = 40,
   rw_scale = 0.25,
   rng_per_smooth = FALSE,
+  draws = NULL,
   ...,
   newdata = NULL,
   ncores = NULL
@@ -91,6 +92,9 @@ skip the random walk step. Only used with \code{method = "mh"}.}
 0.8.1 or earlier is used, whereby a separate call the the random number
 generator (RNG) is performed for each smooth. If FALSE, a single call to the
 RNG is performed for all model parameters}
+
+\item{draws}{matrix; user supplied posterior draws to be used when
+\code{method = "user"}.}
 
 \item{newdata}{Deprecated: use \code{data} instead.}
 

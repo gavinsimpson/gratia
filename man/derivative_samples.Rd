@@ -27,6 +27,7 @@ derivative_samples(object, ...)
   level = 0.95,
   seed = NULL,
   envir = environment(formula(object)),
+  draws = NULL,
   ...
 )
 }
@@ -78,6 +79,9 @@ credible interval. The default is \code{0.95} for a 95\% interval.}
 
 \item{envir}{the environment within which to recreate the data used to fit
 \code{object}.}
+
+\item{draws}{matrix; user supplied posterior draws to be used when
+\code{method = "user"}.}
 }
 \value{
 A tibble, currently with the following variables:

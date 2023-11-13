@@ -3,6 +3,8 @@
 \name{post_draws}
 \alias{post_draws}
 \alias{post_draws.default}
+\alias{generate_draws}
+\alias{generate_draws.gam}
 \title{Low-level Functions to generate draws from the posterior distribution of
 model coefficients}
 \usage{
@@ -23,6 +25,27 @@ post_draws(model, ...)
   frequentist = FALSE,
   unconditional = FALSE,
   parametrized = TRUE,
+  mvn_method = c("mvnfast", "mgcv"),
+  draws = NULL,
+  ...
+)
+
+generate_draws(model, ...)
+
+\method{generate_draws}{gam}(
+  model,
+  n,
+  method = c("gaussian", "mh", "inla"),
+  mu = NULL,
+  sigma = NULL,
+  n_cores = 1L,
+  burnin = 1000,
+  thin = 1,
+  t_df = 40,
+  rw_scale = 0.25,
+  index = NULL,
+  frequentist = FALSE,
+  unconditional = FALSE,
   mvn_method = c("mvnfast", "mgcv"),
   ...
 )
@@ -88,8 +111,13 @@ uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
 numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
 for some marginal fits, such as those where the covariance matrix is close
 to singular.}
+
+\item{draws}{matrix; user supplied posterior draws to be used when
+\code{method = "user"}.}
 }
 \description{
 Low-level Functions to generate draws from the posterior distribution of
 model coefficients
+
+Generate posterior draws from a fitted model
 }
