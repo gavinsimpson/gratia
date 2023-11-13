@@ -397,3 +397,9 @@ twlss_df <- withr::with_seed(3, gamSim(1, n = 400, dist = "poisson",
 ## Fit a fixed p Tweedie, with wrong link ...
 m_twlss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1, ~ 1),
   family = twlss(), data = twlss_df)
+
+### glmmTMB support
+data("sleepstudy", package = "lme4")
+library("glmmTMB")
+m_glmmTMB <- glmmTMB(Reaction ~ s(log(Days + 1), k = 4), data = sleepstudy,
+  REML = TRUE)
