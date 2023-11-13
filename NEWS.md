@@ -1,4 +1,4 @@
-# gratia 0.8.1.44
+# gratia 0.8.1.46
 
 ## User visible changes
 
@@ -55,7 +55,7 @@
   sampler (see below.)
 
 * `derivative_samples()` is the work horse function behind
-  `response_derivatives()`, which computes and returns posterior draws of the
+  `response_derivatives()`, which computes and returns posSterior draws of the
   derivatives of any additive combination of model terms. Requested by
   @jonathanmellor #237
 
@@ -76,6 +76,9 @@
   drawing samples from the conditional distribution of the response (the
   uncertainty in the expected values is ignored), while the former includes
   both sources of uncertainty.
+
+* `fitted_samples()` can new use a matrix of user-supplied posterior draws.
+  Related to #120
 
 * `basis_size()` is a new function to extract the basis dimension (number of
   basis functions) for smooths. Methods are available for objects that inherit
@@ -172,11 +175,11 @@
   `smooth_samples()` now all work for models fitted with `scam::scam()`.
   Where it matters, current support extends only to univariate smooths.
 
-* `post_draws()` is a new low-level function for generating posterior draws
-  from fitted model coefficients. `post_daws()` is an S3 generic function so is
-  extensible by users. Currently provides a simple interface to a simple
+* `generate_draws()` is a new low-level function for generating posterior draws
+  from fitted model coefficients. `generate_daws()` is an S3 generic function so
+  is extensible by users. Currently provides a simple interface to a simple
   Gaussian approximation sampler (`gaussian_draws()`) and the simple Metropolis
-  Hasting sample  (`mh_draws()`) available via `mgcv::gam.mh()`.
+  Hasting sample (`mh_draws()`) available via `mgcv::gam.mh()`. # 211
 
 ## Bug fixes
 

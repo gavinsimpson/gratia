@@ -45,6 +45,8 @@
 #'   numbers of MVN random values than `mgcv::rmvn()`, but which might not work
 #'   for some marginal fits, such as those where the covariance matrix is close
 #'   to singular.
+#' @param draws matrix; user supplied posterior draws to be used when
+#'   `method = "user"`.
 #' @param ... arguments passed to methods.
 #'
 #' @export
@@ -68,17 +70,54 @@
     frequentist = FALSE,
     unconditional  = FALSE,
     parametrized = TRUE,
+    mvn_method = c("mvnfast", "mgcv"),
+    draws = NULL, ...) {
+    # what posterior sampling are we using
+    method <- match.arg(method)
+    betas <- switch(method,
+        "gaussian" = gaussian_draws(model = model, n = n,
+            n_cores = n_cores, index = index, frequentist = frequentist,
+            unconditional = FALSE, parametrized = parametrized,
+            mvn_method = mvn_method, ...),
+        "mh" = mh_draws(n = n, model = model, burnin = burnin,
+            thin = thin, t_df = t_df, rw_scale = rw_scale, index = index, ...),
+        "inla" = .NotYetImplemented(),
+        "user" = user_draws(model = model, draws = draws, ...))
+    betas
+}
+#' Generate posterior draws from a fitted model
+#'
+#' @export
+#' @rdname post_draws
+`generate_draws` <- function(model, ...) {
+    UseMethod("generate_draws")
+}
+
+#' @export
+#' @rdname post_draws
+`generate_draws.gam` <- function(model,
+    n,
+    method = c("gaussian", "mh", "inla"),
+    mu = NULL,
+    sigma = NULL,
+    n_cores = 1L,
+    burnin = 1000,
+    thin = 1,
+    t_df = 40,
+    rw_scale = 0.25,
+    index = NULL,
+    frequentist = FALSE,
+    unconditional  = FALSE,
     mvn_method = c("mvnfast", "mgcv"), ...) {
     # what posterior sampling are we using
     method <- match.arg(method)
     betas <- switch(method,
         "gaussian" = gaussian_draws(model = model, n = n,
             n_cores = n_cores, index = index, frequentist = frequentist,
-            unconditional = FALSE, parametrized = parametrized),
+            unconditional = FALSE, mvn_method = mvn_method, ...),
         "mh" = mh_draws(n = n, model = model, burnin = burnin,
             thin = thin, t_df = t_df, rw_scale = rw_scale, index = index),
-        "inla" = .NotYetImplemented(),
-        "user" = .NotYetImplemented())
+        "inla" = .NotYetImplemented())
     betas
 }
 
@@ -156,4 +195,38 @@
     attr(betas, "fixed_acceptance") <- fixed_acceptance
     attr(betas, "rw_acceptance") <- rw_acceptance
     betas
+}
+
+#' Handle user-supplied posterior draws
+#'
+#' @inheritParams post_draws
+#' @export
+`user_draws` <- function(model, draws, ...) {
+    UseMethod("user_draws")
+}
+
+#' @export
+`user_draws.gam` <- function(model, draws, index = NULL, ...) {
+    # draws must be a matrix
+    if (!is.matrix(draws)) {
+        stop("Supplied 'draws' is not a matrix of coefficients.",
+            call. = FALSE)
+    }
+
+    # draws must have as many columns as model coefficients
+    n_coef <- length(coef(model))
+    n_col <- ncol(draws)
+    if (isFALSE(identical(n_col, n_coef))) {
+        stop("Supplied 'draws' doesn't match number of model coefficients.\n",
+            "Number of model coefs: ", n_coef, "\n",
+            "Number of columns in 'draws': ", n_col, "\n", call. = FALSE)
+    }
+
+    # if index provided, subset the draws
+    if (!is.null(index)) {
+        draws <- draws[, index, drop = FALSE]
+    }
+
+    # return the user-supplied draws
+    draws
 }

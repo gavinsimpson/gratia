@@ -45,6 +45,8 @@
 #'   generating random variables from a multivariate normal distribution.
 #'   Passed to [mvnfast::rmvn()]. Parallelization will take place only if
 #'   OpenMP is supported (but appears to work on Windows with current `R`).
+#' @param draws matrix; user supplied posterior draws to be used when
+#'   `method = "user"`.
 #'
 #' @details
 #' # Note
@@ -90,7 +92,7 @@
     method = c("gaussian", "mh", "inla", "user"),
     n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
     freq = FALSE, unconditional = FALSE,
-    weights = NULL, ...,
+    weights = NULL, draws = NULL, ...,
     newdata = NULL,
     ncores = NULL) {
     # generate new response data from the model including the uncertainty in
@@ -101,7 +103,7 @@
         scale = "response", method = method, n_cores = n_cores, burnin = burnin,
         thin = thin, t_df = t_df, rw_scale = rw_scale, freq = freq,
         unconditional = unconditional, weights = weights, newdata = newdata,
-        ncores = ncores, ...)
+        ncores = ncores, draws = draws, ...)
 
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
         runif(1)
@@ -234,12 +236,19 @@
 #' \donttest{
 #' fs
 #' }
+#'
+#' # can generate own set of draws and use them
+#' drws <- generate_draws(m1, n = 2, seed = 24)
+#' fs2 <- fitted_samples(m1, method = "user", draws = drws)
+#' \donttest{
+#' fs2
+#' }
 #' \dontshow{options(op)}
 `fitted_samples.gam` <- function(model, n = 1, data = newdata, seed = NULL,
     scale = c("response", "linear_predictor"),
     method = c("gaussian", "mh", "inla", "user"),
     n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
-    freq = FALSE, unconditional = FALSE,
+    freq = FALSE, unconditional = FALSE, draws = NULL,
     ..., newdata = NULL, ncores = NULL) {
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
         runif(1)
@@ -274,7 +283,8 @@
     betas <- post_draws(n = n, method = method,
         n_cores = n_cores, model = model,
         burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-        index = NULL, frequentist = freq, unconditional = unconditional)
+        index = NULL, frequentist = freq, unconditional = unconditional,
+        draws = draws)
     ## don't need to pass freq, unconditional here as that is done for V
     Xp <- predict(model, newdata = data, type = "lpmatrix", ...)
     sims <- Xp %*% t(betas)
@@ -463,6 +473,7 @@
     t_df = 40,
     rw_scale = 0.25,
     rng_per_smooth = FALSE,
+    draws = NULL,
     ...,
     newdata = NULL,
     ncores = NULL) {
@@ -524,7 +535,8 @@
         betas <- post_draws(n = n, method = method,
             n_cores = n_cores, model = model,
             burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-            index = NULL, frequentist = freq, unconditional = unconditional)
+            index = NULL, frequentist = freq, unconditional = unconditional,
+            draws = draws)
     }
 
     sims <- data_names <- vector('list', length = length(S))
@@ -633,6 +645,7 @@
     t_df = 40,
     rw_scale = 0.25,
     rng_per_smooth = FALSE,
+    draws = NULL,
     ...,
     newdata = NULL,
     ncores = NULL) {
@@ -694,7 +707,8 @@
         betas <- post_draws(n = n, method = method,
             n_cores = n_cores, model = model,
             burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-            index = NULL, frequentist = freq, unconditional = unconditional)
+            index = NULL, frequentist = freq, unconditional = unconditional,
+            draws = draws)
     }
 
     sims <- data_names <- vector('list', length = length(S))
@@ -796,6 +810,8 @@
 
 #' @param envir the environment within which to recreate the data used to fit
 #'   `object`.
+#' @param draws matrix; user supplied posterior draws to be used when
+#'   `method = "user"`.
 #'
 #' @inheritParams response_derivatives
 #'
@@ -845,6 +861,7 @@
     n_sim = 10000, level = 0.95,
     seed = NULL,
     envir = environment(formula(object)),
+    draws = NULL,
     ...) {
     ## handle seed
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
@@ -895,7 +912,7 @@
 
     ## compute posterior draws of E(y) (on response scale)
     fs <- fitted_samples(model = object, n = n_sim, data = fd_data,
-        method = method, seed = seed, ...)
+        method = method, seed = seed, draws = draws, ...)
 
     fs <- fs |>
         left_join(select(fd_data, all_of(c(".row", "..type", "..orig"))),
