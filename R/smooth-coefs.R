@@ -96,6 +96,19 @@
     coef(object)[i]
 }
 
+#' @export
+#' @rdname smooth_coefs
+#' @importFrom stats coef
+`smooth_coefs.evgam` <- function(object, term, ...) {
+    if (length(term) > 1L) {
+        warning("More than one smooth specified by `term`.\n",
+                "Using only the first.")
+        term <- term[1L]
+    }
+    sm <- get_smooth(object, term = term)
+    i <- smooth_coef_indices(sm)
+    coef(object)[i]
+}
 #' Indices of the parametric terms for a particular smooth
 #'
 #' Returns a vector of indices of the parametric terms that represent the
