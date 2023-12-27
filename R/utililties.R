@@ -1111,7 +1111,7 @@ vars_from_label <- function(label) {
     tt <- delete.response(tt)
     out <- model.frame(tt, data = data)
 
-    if(identical(model_frame, FALSE)) {
+    if (identical(model_frame, FALSE)) {
         attr(out, "terms") <- NULL
     }
 
@@ -1120,7 +1120,9 @@ vars_from_label <- function(label) {
 
 #' Extract names of all variables needed to fit a GAM or a smooth
 #'
-#' @param object a fitted GAM object or an {mgcv} smooth object
+#' @param object a fitted GAM object (inheriting from class `"gam"` or an
+#'   [mgcv::smooth.construct] smooth object, inheriting from class
+#'   `"mgcv.smooth"`.
 #' @param ... arguments passed to other methods. Not currently used.
 #'
 #' @return A vector of variable names required for terms in the model
