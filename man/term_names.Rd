@@ -16,7 +16,9 @@ term_names(object, ...)
 \method{term_names}{gamm}(object, ...)
 }
 \arguments{
-\item{object}{a fitted GAM object or an {mgcv} smooth object}
+\item{object}{a fitted GAM object (inheriting from class \code{"gam"} or an
+\link[mgcv:smooth.construct]{mgcv::smooth.construct} smooth object, inheriting from class
+\code{"mgcv.smooth"}.}
 
 \item{...}{arguments passed to other methods. Not currently used.}
 }
