@@ -182,6 +182,7 @@
     qq_plot.gam(model, ...)
 }
 
+#' @export
 #' @rdname qq_plot
 #' @importFrom stats df.residual
 `qq_plot.lm` <- function(model, ...) {
