@@ -191,6 +191,7 @@
 
 #' @importFrom mgcv gam.mh
 #' @rdname mh_draws
+#' @export
 `mh_draws.gam` <- function(model, n, burnin = 1000, thin = 1,
     t_df = 40, rw_scale = 0.25, index = NULL, ...) {
     capture.output(betas <- mgcv::gam.mh(b = model, ns = n * thin,
