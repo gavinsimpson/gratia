@@ -1,5 +1,5 @@
 ## smooth_terms should be removed
-`smooth_terms` <- function(obj, ...) {
+`smooth_terms` <- function(object, ...) {
     UseMethod("smooth_terms")
 }
 
