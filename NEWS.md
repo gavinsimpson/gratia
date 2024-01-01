@@ -1,3 +1,7 @@
+# gratia 0.8.2
+
+* Small fixes for CRAN.
+
 # gratia 0.8.1
 
 ## User visible changes
