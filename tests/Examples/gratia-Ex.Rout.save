@@ -1,5 +1,5 @@
 
-R version 4.3.1 (2023-06-16) -- "Beagle Scouts"
+R version 4.3.2 (2023-10-31) -- "Eye Holes"
 Copyright (C) 2023 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -478,28 +478,6 @@ detaching ‘package:mgcv’
  8 s(x2)  TPRS  <NA>   0.34       3.2  0.20   2.0       2.9       3.6
  9 s(x2)  TPRS  <NA>   0.35       2.9  0.20   2.0       2.5       3.3
 10 s(x2)  TPRS  <NA>   0.36       2.5  0.19   2.0       2.1       2.9
-# i 40 more rows
-> 
-> ## simultaneous interval for smooth of x2
-> ## Don't show: 
-> set.seed(42)
-> ## End(Don't show)
-> si <- confint(mod, parm = "s(x2)", data = new_data,
-+               type = "simultaneous", nsim = 3000, ncores = 2)
-> si
-# A tibble: 50 x 9
-   smooth type  by       x2 .estimate   .se .crit .lower_ci .upper_ci
-   <chr>  <chr> <chr> <dbl>     <dbl> <dbl> <dbl>     <dbl>     <dbl>
- 1 s(x2)  TPRS  <NA>   0.26       5.3  0.18   2.6       4.8       5.8
- 2 s(x2)  TPRS  <NA>   0.27       5.1  0.18   2.6       4.7       5.6
- 3 s(x2)  TPRS  <NA>   0.28       4.9  0.18   2.6       4.4       5.4
- 4 s(x2)  TPRS  <NA>   0.29       4.6  0.18   2.6       4.1       5.1
- 5 s(x2)  TPRS  <NA>   0.30       4.3  0.19   2.6       3.8       4.8
- 6 s(x2)  TPRS  <NA>   0.32       4.0  0.19   2.6       3.5       4.5
- 7 s(x2)  TPRS  <NA>   0.33       3.6  0.20   2.6       3.1       4.1
- 8 s(x2)  TPRS  <NA>   0.34       3.2  0.20   2.6       2.7       3.8
- 9 s(x2)  TPRS  <NA>   0.35       2.9  0.20   2.6       2.4       3.4
-10 s(x2)  TPRS  <NA>   0.36       2.5  0.19   2.6       2.0       3.0
 # i 40 more rows
 > ## Don't show: 
 > options(op)
@@ -980,7 +958,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 + 
 +     draw(m)
 + }
-This is mgcv 1.9-0. For overview type 'help("mgcv-package")'.
+This is mgcv 1.9-1. For overview type 'help("mgcv-package")'.
 
 This is GJRM 0.2-6.4.
 For overview type 'help("GJRM-package")'.
@@ -1397,6 +1375,10 @@ detaching ‘package:mgcv’
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
 > fs <- fitted_samples(m1, n = 5, seed = 42)
+> 
+> # can generate own set of draws and use them
+> drws <- generate_draws(m1, n = 2, seed = 24)
+> fs2 <- fitted_samples(m1, method = "user", draws = drws)
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1633,11 +1615,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x556411c46340>
+<environment: 0x558bbbf30108>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x556411c46340>
+<environment: 0x558bbbf30108>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1802,7 +1784,7 @@ detaching ‘package:mgcv’
 +          s(x3, bs = "cr"), family = nb, data = df, method = "REML")
 > ## IGNORE_RDIFF_BEGIN
 > nb_theta(m)
-[1] 239398.6
+[1] 239349
 > ## IGNORE_RDIFF_END
 > 
 > 
@@ -2715,7 +2697,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  20.751 0.204 20.919 0 0 
+Time elapsed:  36.591 0.332 36.403 0 0 
 > grDevices::dev.off()
 null device 
           1 

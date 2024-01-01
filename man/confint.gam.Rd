@@ -77,17 +77,17 @@ at the supplied values.}
 \value{
 a tibble with components:
 \enumerate{
-\item \code{smooth}; character indicating to which term each row relates,
-\item \code{type}; the type of smooth,
-\item \code{by} the name of the by variable if a by smooth, \code{NA} otherwise,
+\item \code{.smooth}; character indicating to which term each row relates,
+\item \code{.type}; the type of smooth,
+\item \code{.by} the name of the by variable if a by smooth, \code{NA} otherwise,
 \item one or more vectors of values at which the smooth was evaluated, named as
 per the variables in the smooth,
 \item zero or more variables containing values of the by variable,
-\item \code{est}; estimated value of the smooth,
-\item \code{se}; standard error of the estimated value of the smooth,
-\item \code{crit}; critical value for the \code{100 * level}\% confidence interval.
-\item \code{lower}; lower limit of the confidence or simultaneous interval,
-\item \code{upper}; upper limit of the confidence or simultaneous interval,
+\item \code{.estimate}; estimated value of the smooth,
+\item \code{.se}; standard error of the estimated value of the smooth,
+\item \code{.crit}; critical value for the \code{100 * level}\% confidence interval.
+\item \code{.lower_ci}; lower limit of the confidence or simultaneous interval,
+\item \code{.upper_ci}; upper limit of the confidence or simultaneous interval,
 }
 }
 \description{
@@ -115,14 +115,6 @@ new_data <- data.frame(new_data)
 ## point-wise interval for smooth of x2
 ci <- confint(mod, parm = "s(x2)", type = "confidence", data = new_data)
 ci
-
-## simultaneous interval for smooth of x2
-\dontshow{
-set.seed(42)
-}
-si <- confint(mod, parm = "s(x2)", data = new_data,
-              type = "simultaneous", nsim = 3000, ncores = 2)
-si
 \dontshow{
 options(op)
 }
