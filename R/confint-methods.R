@@ -213,17 +213,17 @@
 #'   at the supplied values.
 #'
 #' @return a tibble with components:
-#' 1. `smooth`; character indicating to which term each row relates,
-#' 2. `type`; the type of smooth,
-#' 3. `by` the name of the by variable if a by smooth, `NA` otherwise,
+#' 1. `.smooth`; character indicating to which term each row relates,
+#' 2. `.type`; the type of smooth,
+#' 3. `.by` the name of the by variable if a by smooth, `NA` otherwise,
 #' 4. one or more vectors of values at which the smooth was evaluated, named as
 #'    per the variables in the smooth,
 #' 5. zero or more variables containing values of the by variable,
-#' 6. `est`; estimated value of the smooth,
-#' 7. `se`; standard error of the estimated value of the smooth,
-#' 8. `crit`; critical value for the `100 * level`% confidence interval.
-#' 9. `lower`; lower limit of the confidence or simultaneous interval,
-#' 10. `upper`; upper limit of the confidence or simultaneous interval,
+#' 6. `.estimate`; estimated value of the smooth,
+#' 7. `.se`; standard error of the estimated value of the smooth,
+#' 8. `.crit`; critical value for the `100 * level`% confidence interval.
+#' 9. `.lower_ci`; lower limit of the confidence or simultaneous interval,
+#' 10. `.upper_ci`; upper limit of the confidence or simultaneous interval,
 #'
 #' @author Gavin L. Simpson
 #'
@@ -258,14 +258,6 @@
 #' ## point-wise interval for smooth of x2
 #' ci <- confint(mod, parm = "s(x2)", type = "confidence", data = new_data)
 #' ci
-#'
-#' ## simultaneous interval for smooth of x2
-#' \dontshow{
-#' set.seed(42)
-#' }
-#' si <- confint(mod, parm = "s(x2)", data = new_data,
-#'               type = "simultaneous", nsim = 3000, ncores = 2)
-#' si
 #' \dontshow{
 #' options(op)
 #' }
