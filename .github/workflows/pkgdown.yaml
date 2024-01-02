@@ -30,6 +30,8 @@ jobs:
           extra-packages: |
             any::pkgdown
             local::.
+            Matrix
+          pak-version: devel
           needs: website
 
       - name: Build site
