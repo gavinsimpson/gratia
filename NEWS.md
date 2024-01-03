@@ -1,4 +1,4 @@
-# gratia 0.8.1.47
+# gratia 0.8.1.49
 
 ## User visible changes
 
@@ -13,7 +13,9 @@
       1. `est` is now `.estimate`,
       2. `lower` and `upper` are now `.lower_ci` and `.upper_ci`,
       3. `draw` and `row` and now `.draw` and `.row` respectively,
-      4. `fitted`, `se`, `crit` are now `.fitted`, `.se`, `.crit`, respectively.
+      4. `fitted`, `se`, `crit` are now `.fitted`, `.se`, `.crit`, respectively
+      5. `smooth`, `by`, and `type` in `smooth_estimates()` are now `.smooth`,
+        `.by`, `.type`, respectively.
 
 * `smooth_samples()` now uses a single call to the RNG to generate draws from
   the posterior of smooths. Previous to version 0.9.0, `smooth_samples()` would
