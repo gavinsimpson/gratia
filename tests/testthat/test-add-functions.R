@@ -1,9 +1,7 @@
 ## Test basis() and related functions
 
-## take only some columns
+## data object to use in tests
 add_data <- su_eg1[, c("y", "x0", "x1", "x2", "x3")]
-## fit the model
-#m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = su_eg1, method = 'REML')
 
 test_that("add_fitted works for a GAM", {
     expect_silent(df <- add_fitted(add_data, m_gam))
