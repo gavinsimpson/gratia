@@ -4,7 +4,7 @@
 \alias{add_fitted.gam}
 \title{Add fitted values from a GAM to a data frame}
 \usage{
-\method{add_fitted}{gam}(data, model, value = ".value", type = "response", prefix = ".", ...)
+\method{add_fitted}{gam}(data, model, value = ".fitted", type = "response", ...)
 }
 \arguments{
 \item{data}{a data frame containing values for the variables used to fit the
@@ -18,11 +18,6 @@ will be stored.}
 
 \item{type}{character; the type of predictions to return. See
 \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}} for options.}
-
-\item{prefix}{character; string to prepend to names of predicted values when
-\code{type} is \code{"terms"}, \code{"iterms"}, \code{"lpmatrix"}. These prediction types
-result in a matrix of values being returned. \code{prefix} will be prepended to
-each of the names of columns returned by such prediction types.}
 
 \item{...}{additional arguments passed to \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}.}
 }

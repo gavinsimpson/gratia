@@ -20,10 +20,6 @@
 #'
 #' @param type character; the type of predictions to return. See
 #'   [mgcv::predict.gam()] for options.
-#' @param prefix character; string to prepend to names of predicted values when
-#'   `type` is `"terms"`, `"iterms"`, `"lpmatrix"`. These prediction types
-#'   result in a matrix of values being returned. `prefix` will be prepended to
-#'   each of the names of columns returned by such prediction types.
 #' @param ... additional arguments passed to [mgcv::predict.gam()].
 #'
 #' @return A data frame (tibble) formed from `data` and predictions from
@@ -54,8 +50,8 @@
 #' ## with type = "terms" or "iterms"
 #' add_fitted(df, m, type = "terms")
 #' \dontshow{options(op)}
-`add_fitted.gam` <- function(data, model, value = ".value", type = "response",
-                             prefix = ".", ...) {
+`add_fitted.gam` <- function(data, model, value = ".fitted", type = "response",
+                             ...) {
     ## coerce to tibble
     data <- as_tibble(data)
 
@@ -70,11 +66,10 @@
     ## having pruned off any standard errors, process the result
     if (is.array(pred_vals) && length(dim(pred_vals)) > 1L) {
         pred_vals <- as_tibble(pred_vals)
-        pred_vals <- set_names(pred_vals, nm = paste0(prefix, names(pred_vals)))
         if (type %in% c("terms", "iterms")) {
             pred_vals <-
                 add_column(pred_vals,
-                           !!(paste0(prefix, "constant")) := coef(model)[1],
+                           !!(".constant") := coef(model)[1],
                            .before = 1L)
         }
         data <- bind_cols(data, pred_vals)
@@ -181,7 +176,7 @@
 #' }
 #' df <- data_sim("eg1", seed = 1)
 #' df <- df[, c("y","x0","x1","x2","x3")]
-#' m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
+#' m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 #'
 #' ## add partial residuals
 #' add_partial_residuals(df, m)
@@ -262,11 +257,11 @@
     if (!is.null(constant)) {
         if (!is.numeric(constant)) {
             stop("'constant' must be numeric: supplied <", constant, ">",
-                 call. = FALSE)
+                call. = FALSE)
         }
         object <- mutate(object,
-            across(any_of(c("est", "lower_ci", "upper_ci", ".estimate", ".lower_ci",
-                ".upper_ci")),
+            across(any_of(c("est", "lower_ci", "upper_ci", ".estimate",
+                ".lower_ci", ".upper_ci")),
             .fns = ~ .x + constant))
     }
 

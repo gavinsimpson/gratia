@@ -1592,3 +1592,13 @@ reclass_scam_smooth <- function(smooth) {
     se <- sqrt(pmax(0, rowSums((X %*% vc) * X)))
     list(betas = beta_z, se = se)
 }
+
+#' @importFrom tibble add_column
+`add_by_var_column` <- function(object, by_var) {
+    add_column(object, .by = rep(by_var, nrow(object)), .after = 1L)
+}
+
+#' @importFrom tibble add_column
+`add_smooth_type_column` <- function(object, sm_type) {
+    add_column(object, .type = rep(sm_type, nrow(object)), .after = 1L)
+}

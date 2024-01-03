@@ -62,23 +62,23 @@
 
     ## loop over list of smooth estimates and add model column
     for (i in seq_along(sm_est)) {
-        sm_est[[i]] <- add_column(sm_est[[i]], model = model_names[i],
+        sm_est[[i]] <- add_column(sm_est[[i]], .model = model_names[i],
                                   .before = 1L)
     }
 
     `unnest_nest` <- function(x) {
         x %>%
-            group_by(.data$smooth) %>%
+            group_by(.data$.smooth) %>%
             group_split() %>%
             purrr::map(unnest, cols = all_of("data")) %>%
-            purrr::map(nest, data = !all_of(c("model", "smooth",
-                                              "type", "by"))) %>%
+            purrr::map(nest, data = !all_of(c(".model", ".smooth",
+                                              ".type", ".by"))) %>%
             bind_rows()
     }
     sm_est <- purrr::map(sm_est, unnest_nest)
 
     sm_est <- bind_rows(sm_est) %>%
-        arrange(.data$smooth)
+        arrange(.data$.smooth)
     class(sm_est) <- c("compare_smooths", class(sm_est))
     sm_est
 }
@@ -97,7 +97,7 @@
                                    ncol = NULL, nrow = NULL,
                                    guides = "collect",
                                    ...) {
-    l <- group_split(object, .data$smooth)
+    l <- group_split(object, .data$.smooth)
 
     plts <- map(l, plot_comparison_of_smooths)
 
@@ -116,7 +116,7 @@
 #' @importFrom ggplot2 ggplot geom_ribbon geom_line
 `plot_comparison_of_smooths` <- function(object, coverage = 0.95, ...) {
     ## get the covariate labels
-    sm_vars <- vars_from_label(unique(object[["smooth"]]))
+    sm_vars <- vars_from_label(unique(object[[".smooth"]]))
     ## unnest data cols
     object <- unnest(object, cols = all_of("data"))
 
@@ -129,20 +129,20 @@
     ## basic plot
     plt <- ggplot(object, aes(x = .data[[sm_vars[1L]]],
                               y = .data[[".estimate"]],
-                              group = .data[["model"]]))
+                              group = .data[[".model"]]))
 
     ## add uncertainty bands
     plt <- plt + geom_ribbon(aes(ymin = .data[[".lower_ci"]],
                                  ymax = .data[[".upper_ci"]],
-                                 fill = .data[["model"]]),
+                                 fill = .data[[".model"]]),
                              alpha = 0.2)
 
     ## add smooth lines
-    plt <- plt + geom_line(aes(colour = .data[["model"]]))
+    plt <- plt + geom_line(aes(colour = .data[[".model"]]))
 
     ## Add labels
     plt <- plt + labs(colour = "Model", fill = "Model",
-                      title = unique(object[["smooth"]]),
+                      title = unique(object[[".smooth"]]),
                       y = "Estimate")
 
     plt

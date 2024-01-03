@@ -33,7 +33,7 @@
 
     ## tidy partial residuals to long format
     p_resids <- pivot_longer(p_resids, everything(),
-                             names_to = "smooth",
+                             names_to = ".smooth",
                              values_to = "partial_residual")
 
     # nest this long format so we 1 row per smooth, and partial_residual is now
@@ -56,7 +56,7 @@
     p_resids <- p_resids %>%
       rowwise() %>%
       mutate(partial_residual =
-        list(get_obs_data_for_smooth(.data$smooth,
+        list(get_obs_data_for_smooth(.data$.smooth,
                                      object, data,
                                      extra = .data$partial_residual))) %>%
       ungroup()
@@ -93,10 +93,10 @@
         terms <- smooths(object)
     }
 
-    rug_vals <- tibble(smooth = terms) %>%
-        rowwise() %>%
+    rug_vals <- tibble(.smooth = terms) |>
+        rowwise() |>
         mutate(rug_data =
-                 list(get_obs_data_for_smooth(.data$smooth, object, data))) %>%
+                 list(get_obs_data_for_smooth(.data$.smooth, object, data))) |>
         ungroup()
 
     rug_vals

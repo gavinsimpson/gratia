@@ -128,7 +128,7 @@ Now we have everything we need to recreate the plots created by `draw.gam()`. In
 
 ```{r custom-plot-sx2}
 p_sx2 <- sm %>%
-  filter(smooth == "s(x2)") %>%
+  filter(.smooth == "s(x2)") %>%
   ggplot() +
   geom_rug(aes(x = x2),
            data = eg1,
@@ -145,7 +145,7 @@ p_sx2
 
 ```{r custom-plot-other-smooths, echo = FALSE}
 p_sx0 <- sm %>%
-  filter(smooth == "s(x0)") %>%
+  filter(.smooth == "s(x0)") %>%
   ggplot() +
   geom_rug(aes(x = x0),
            data = eg1,
@@ -158,7 +158,7 @@ p_sx0 <- sm %>%
   labs(y = "Partial effect", title = "s(x0)")
 
 p_sx1 <- sm %>%
-  filter(smooth == "s(x1)") %>%
+  filter(.smooth == "s(x1)") %>%
   ggplot() +
   geom_rug(aes(x = x1),
            data = eg1,
@@ -171,7 +171,7 @@ p_sx1 <- sm %>%
   labs(y = "Partial effect", title = "s(x1)")
 
 p_sx3 <- sm %>%
-  filter(smooth == "s(x3)") %>%
+  filter(.smooth == "s(x3)") %>%
   ggplot() +
   geom_rug(aes(x = x3),
            data = eg1,
@@ -202,7 +202,7 @@ Now we can modify our plotting code to map `fac` to the colour aesthetic when we
 
 ```{r plot-partial-resids-with-colours-by-fac}
 plt <- sm %>%
-  filter(smooth == "s(x2)") %>%
+  filter(.smooth == "s(x2)") %>%
   ggplot() +
   geom_rug(aes(x = x2),
            data = eg1,

@@ -319,7 +319,7 @@
     data <- select(data, all_of(keep_vars))
 
     ## Return object
-    tbl <- tibble(smooth = rep(label, nrow(X)), .estimate = fit, .se = se.fit)
+    tbl <- tibble(.smooth = rep(label, nrow(X)), .estimate = fit, .se = se.fit)
     ## bind on the data
     tbl <- bind_cols(tbl, data)
     ## nest all columns with varying data
@@ -386,7 +386,7 @@
     data <- select(data, all_of(keep_vars))
 
     ## Return object
-    tbl <- tibble(smooth = rep(label, nrow(data)), .estimate = fit,
+    tbl <- tibble(.smooth = rep(label, nrow(data)), .estimate = fit,
         .se = se_fit)
     ## bind on the data
     tbl <- bind_cols(tbl, data)
@@ -430,36 +430,33 @@
 
     ## deal with data if supplied
     data <- process_user_data_for_eval(data = data, model = model,
-                                       n = n, n_3d = n_3d, n_4d = n_4d,
-                                       id = which_smooth(model,
-                                                         smooth_label(smooth)))
+        n = n, n_3d = n_3d, n_4d = n_4d,
+        id = which_smooth(model,
+            smooth_label(smooth)))
 
     ## values of spline at data
     eval_sm <- spline_values2(smooth, data = data,
-                              unconditional = unconditional,
-                              model = model,
-                              overall_uncertainty = overall_uncertainty)
+        unconditional = unconditional,
+        model = model,
+        overall_uncertainty = overall_uncertainty)
 
     ## add on info regarding by variable
-    nr <- nrow(eval_sm)
-    eval_sm <- add_column(eval_sm, by = rep(by_var, nr),
-                          .after = 1L)
+    eval_sm <- add_by_var_column(eval_sm, by_var = by_var)
     ## add on spline type info
-    sm_type <- smooth_type(smooth)
-    eval_sm <- add_column(eval_sm, type = rep(sm_type, nr),
-                          .after = 1L)
+    eval_sm <- add_smooth_type_column(eval_sm, sm_type = smooth_type(smooth))
 
     # set some values to NA if too far from the data
     if (smooth_dim(smooth) == 2L && (!is.null(dist) && dist > 0)) {
         eval_sm <- too_far_to_na(smooth,
-                                 input = eval_sm,
-                                 reference = model[["model"]],
-                                 cols = c(".estimate", ".se"),
-                                 dist = dist)
+            input = eval_sm,
+            reference = model[["model"]],
+            cols = c(".estimate", ".se"),
+            dist = dist)
     }
     ## return
     eval_sm
 }
+
 #' @rdname eval_smooth
 #' @importFrom tibble add_column
 #' @export
@@ -487,21 +484,17 @@
         overall_uncertainty = overall_uncertainty)
 
     ## add on info regarding by variable
-    nr <- nrow(eval_sm)
-    eval_sm <- add_column(eval_sm, by = rep(by_var, nr),
-                          .after = 1L)
+    eval_sm <- add_by_var_column(eval_sm, by_var = by_var)
     ## add on spline type info
-    sm_type <- smooth_type(smooth)
-    eval_sm <- add_column(eval_sm, type = rep(sm_type, nr),
-                          .after = 1L)
+    eval_sm <- add_smooth_type_column(eval_sm, sm_type = smooth_type(smooth))
 
     # set some values to NA if too far from the data
     if (smooth_dim(smooth) == 2L && (!is.null(dist) && dist > 0)) {
         eval_sm <- too_far_to_na(smooth,
-                                 input = eval_sm,
-                                 reference = model[["model"]],
-                                 cols = c(".estimate", ".se"),
-                                 dist = dist)
+            input = eval_sm,
+            reference = model[["model"]],
+            cols = c(".estimate", ".se"),
+            dist = dist)
     }
     ## return
     eval_sm
@@ -570,18 +563,15 @@
 
     ## values of spline at data
     eval_sm <- spline_values2(smooth, data = data,
-                              unconditional = unconditional,
-                              model = model,
-                              overall_uncertainty = overall_uncertainty)
+        unconditional = unconditional,
+        model = model,
+        overall_uncertainty = overall_uncertainty)
 
     ## add on info regarding by variable
-    nr <- nrow(eval_sm)
-    eval_sm <- add_column(eval_sm, by = rep(by_var, nr),
-                          .after = 1L)
+    eval_sm <- add_by_var_column(eval_sm, by_var = by_var)
     ## add on spline type info
-    sm_type <- smooth_type(smooth)
-    eval_sm <- add_column(eval_sm, type = rep(sm_type, nr),
-                          .after = 1L)
+    eval_sm <- add_smooth_type_column(eval_sm, sm_type = smooth_type(smooth))
+
     ## return
     eval_sm
 }
@@ -612,13 +602,9 @@
         overall_uncertainty = overall_uncertainty)
 
     ## add on info regarding by variable
-    nr <- nrow(eval_sm)
-    eval_sm <- add_column(eval_sm, by = rep(by_var, nr),
-        .after = 1L)
+    eval_sm <- add_by_var_column(eval_sm, by_var = by_var)
     ## add on spline type info
-    sm_type <- smooth_type(smooth)
-    eval_sm <- add_column(eval_sm, type = rep(sm_type, nr),
-        .after = 1L)
+    eval_sm <- add_smooth_type_column(eval_sm, sm_type = smooth_type(smooth))
     ## return
     eval_sm
 }
@@ -648,13 +634,9 @@
                               overall_uncertainty = overall_uncertainty)
 
     ## add on info regarding by variable
-    nr <- nrow(eval_sm)
-    eval_sm <- add_column(eval_sm, by = rep(by_var, nr),
-                          .after = 1L)
+    eval_sm <- add_by_var_column(eval_sm, by_var = by_var)
     ## add on spline type info
-    sm_type <- smooth_type(smooth)
-    eval_sm <- add_column(eval_sm, type = rep(sm_type, nr),
-                          .after = 1L)
+    eval_sm <- add_smooth_type_column(eval_sm, sm_type = smooth_type(smooth))
     ## return
     eval_sm
 }
@@ -692,29 +674,27 @@
     ## deal with data if supplied
     id <- which_smooth(model, smooth_label(smooth))
     data <- process_user_data_for_eval(data = data, model = model,
-                                       n = n, n_3d = n_3d, n_4d = n_4d,
-                                       id = id, var_order = var_order)
+        n = n, n_3d = n_3d, n_4d = n_4d,
+        id = id, var_order = var_order)
 
     ## values of spline at data
     eval_sm <- spline_values2(smooth, data = data,
-                              unconditional = unconditional,
-                              model = model,
-                              overall_uncertainty = overall_uncertainty)
+        unconditional = unconditional,
+        model = model,
+        overall_uncertainty = overall_uncertainty)
 
     ## add on info regarding by variable
-    nr <- nrow(eval_sm)
-    eval_sm <- add_column(eval_sm, by = rep(by_var, nr), .after = 1L)
+    eval_sm <- add_by_var_column(eval_sm, by_var = by_var)
     ## add on spline type info
-    sm_type <- smooth_type(smooth)
-    eval_sm <- add_column(eval_sm, type = rep(sm_type, nr), .after = 1L)
+    eval_sm <- add_smooth_type_column(eval_sm, sm_type = smooth_type(smooth))
 
     # set some values to NA if too far from the data
-     if (smooth_dim(smooth) == 2L && (!is.null(dist) && dist > 0)) {
+    if (smooth_dim(smooth) == 2L && (!is.null(dist) && dist > 0)) {
         eval_sm <- too_far_to_na(smooth,
-                                 input = eval_sm,
-                                 reference = model[["model"]],
-                                 cols = c(".estimate", ".se"),
-                                 dist = dist)
+            input = eval_sm,
+            reference = model[["model"]],
+            cols = c(".estimate", ".se"),
+            dist = dist)
     }
 
     tensor_term_order <- list(var_order) |>
@@ -760,13 +740,9 @@
         overall_uncertainty = overall_uncertainty)
 
     ## add on info regarding by variable
-    nr <- nrow(eval_sm)
-    eval_sm <- add_column(eval_sm, by = rep(by_var, nr),
-        .after = 1L)
+    eval_sm <- add_by_var_column(eval_sm, by_var = by_var)
     ## add on spline type info
-    sm_type <- smooth_type(smooth)
-    eval_sm <- add_column(eval_sm, type = rep(sm_type, nr),
-        .after = 1L)
+    eval_sm <- add_smooth_type_column(eval_sm, sm_type = smooth_type(smooth))
 
     # set some values to NA if too far from the data
     if (smooth_dim(smooth) == 2L && (!is.null(dist) && dist > 0)) {
@@ -853,7 +829,7 @@
                                     orientation = NULL,
                                     ...) {
     # add confidence intervals if they don't already exist
-    if (!all(c("lower_ci", "upper_ci") %in% names(object))) {
+    if (!all(c(".lower_ci", ".upper_ci") %in% names(object))) {
         object <- object |> add_confint()
     }
 
@@ -863,23 +839,23 @@
     # draw smooths
     # the factor in group_split is to reorder to way the smooths entered the
     # model
-    sm_levs <- unique(object$smooth)
+    sm_levs <- unique(object$.smooth)
 
     sm_l <- if (isTRUE(grouped_by)) {
         # need the order of the smooths, I think
-        levs <- unique(str_split_fixed(object$smooth, ":", n = 2)[, 1])
+        levs <- unique(str_split_fixed(object$.smooth, ":", n = 2)[, 1])
         # nest the object so we can reuse the code/ideas from draw.gam
         object |>
-            nest(data = !all_of(c("smooth", "type", "by"))) |>
-            mutate(smooth = factor(.data$smooth, levels = sm_levs),
-                .term = str_split_fixed(.data$smooth, ":", n = 2)[, 1]) |>
-            arrange(.data$smooth) |>
+            nest(data = !all_of(c(".smooth", ".type", ".by"))) |>
+            mutate(.smooth = factor(.data$.smooth, levels = sm_levs),
+                .term = str_split_fixed(.data$.smooth, ":", n = 2)[, 1]) |>
+            arrange(.data$.smooth) |>
             relocate(".term", .before = 1L)|>
             unnest(all_of("data")) |>
-            group_split(factor(.data$.term, levels = levs), .data$by)
+            group_split(factor(.data$.term, levels = levs), .data$.by)
     } else {
         # the factor is to reorder to way the smooths entered the model
-        group_split(object, factor(object$smooth, levels = sm_levs))
+        group_split(object, factor(object$.smooth, levels = sm_levs))
     }
     ## sm_l <- group_split(object, factor(object$smooth, levels = sm_levs))
     plts <- map(sm_l,
@@ -936,16 +912,16 @@
                                     orientation = NULL,
                                     tensor_term_order = NULL,
                                     ...) {
-    sm_vars <- tensor_term_order[[unique(object$smooth)]]
+    sm_vars <- tensor_term_order[[unique(object$.smooth)]]
     if (is.null(sm_vars)) {
         sm_vars <- if (".term" %in% names(object)) {
             vars_from_label(unique(object[[".term"]]))
         } else {
-            vars_from_label(unique(object[["smooth"]]))
+            vars_from_label(unique(object[[".smooth"]]))
         }
     }
     sm_dim <- length(sm_vars)
-    sm_type <- unique(object[["type"]])
+    sm_type <- unique(object[[".type"]])
 
     # set some values to NULL in case these components don't exist
     rug_data <- NULL
@@ -1106,14 +1082,14 @@
                                        ...) {
     # do we have a grouped factor by?
     grouped_by <- FALSE
-    if (".term" %in% names(object) && !all(is.na(object[["by"]]))) {
+    if (".term" %in% names(object) && !all(is.na(object[[".by"]]))) {
         if (is.null(variables)) {
             variables <- vars_from_label(unique(object[[".term"]]))
         }
         grouped_by <- TRUE
     } else {
         if (is.null(variables)) {
-            variables <- vars_from_label(unique(object[["smooth"]]))
+            variables <- vars_from_label(unique(object[[".smooth"]]))
         }
     }
 
@@ -1125,7 +1101,7 @@
 
     # base plot - need as.name to handle none standard names, like log2(x)
     plt <- if (grouped_by) {
-        by_var <- unique(object$by)
+        by_var <- unique(object$.by)
         ggplot(object, aes(x = .data[[variables]], y = .data$.estimate,
             colour = .data[[by_var]], group = .data[[by_var]])) +
             guides(x = guide_axis(angle = angle))
@@ -1202,20 +1178,20 @@
     }
     if (is.null(title)) {
         title <- ifelse(grouped_by, unique(object$.term),
-            as.character(unique(object$smooth)))
+            as.character(unique(object$.smooth)))
     }
     if (is.null(caption)) {
-        caption <- paste("Basis:", object[["type"]])
+        caption <- paste("Basis:", object[[".type"]])
     }
-    if (all(!is.na(object[["by"]]))) {
+    if (all(!is.na(object[[".by"]]))) {
         if (grouped_by) {
             if (is.null(subtitle)) {
                 subtitle <- paste0("By: ", by_var)
             }
         } else {
             # is the by variable a factor or a numeric
-            by_class <- data_class(object)[[object[["by"]][[1L]]]]
-            by_var <- as.character(unique(object[["by"]]))
+            by_class <- data_class(object)[[object[[".by"]][[1L]]]]
+            by_var <- as.character(unique(object[[".by"]]))
             spl <- strsplit(title, split = ":")
             title <- spl[[1L]][[1L]]
             if (is.null(subtitle)) {
@@ -1273,14 +1249,14 @@
                                            angle = NULL,
                                            ...) {
     if (is.null(variables)) {
-        variables <- vars_from_label(unique(object[["smooth"]]))
+        variables <- vars_from_label(unique(object[[".smooth"]]))
     }
 
     if (is.null(continuous_fill)) {
         continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
     }
 
-    ## If constant supplied apply it to `est`
+    ## If constant supplied apply it to `.estimate`
     object <- add_constant(object, constant = constant)
 
     ## If fun supplied, use it to transform est and the upper and lower interval
@@ -1320,17 +1296,17 @@
         ylab <- variables[2L]
     }
     if (is.null(title)) {
-        title <- unique(object[["smooth"]])
+        title <- unique(object[[".smooth"]])
     }
     if (is.null(caption)) {
-        caption <- paste("Basis:", object[["type"]])
+        caption <- paste("Basis:", object[[".type"]])
     }
 
-    if (all(!is.na(object[["by"]]))) {
+    if (all(!is.na(object[[".by"]]))) {
         spl <- strsplit(title, split = ":")
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
-            by_var <- as.character(unique(object[["by"]]))
+            by_var <- as.character(unique(object[[".by"]]))
             subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
         }
     }
@@ -1393,7 +1369,7 @@
     if (is.null(variables)) {
         variables <- attr(object, "tensor_term_order")
         if (is.null(variables)) {
-            variables <- vars_from_label(unique(object[["smooth"]]))
+            variables <- vars_from_label(unique(object[[".smooth"]]))
         }
     }
 
@@ -1401,7 +1377,7 @@
         continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
     }
 
-    ## If constant supplied apply it to `est`
+    ## If constant supplied apply it to `estimate`
     object <- add_constant(object, constant = constant)
 
     ## If fun supplied, use it to transform est and the upper and lower interval
@@ -1442,17 +1418,17 @@
         ylab <- variables[2L]
     }
     if (is.null(title)) {
-        title <- unique(object[["smooth"]])
+        title <- unique(object[[".smooth"]])
     }
     if (is.null(caption)) {
-        caption <- paste("Facets:", variables[3], "; Basis:", object[["type"]])
+        caption <- paste("Facets:", variables[3], "; Basis:", object[[".type"]])
     }
 
-    if (all(!is.na(object[["by"]]))) {
+    if (all(!is.na(object[[".by"]]))) {
         spl <- strsplit(title, split = ":")
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
-            by_var <- as.character(unique(object[["by"]]))
+            by_var <- as.character(unique(object[[".by"]]))
             subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
         }
     }
@@ -1530,14 +1506,14 @@
                                              angle = NULL,
                                              ...) {
     if (is.null(variables)) {
-        variables <- vars_from_label(unique(object[["smooth"]]))
+        variables <- vars_from_label(unique(object[[".smooth"]]))
     }
 
     if (is.null(continuous_fill)) {
         continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
     }
 
-    ## If constant supplied apply it to `est`
+    ## If constant supplied apply it to `estimate`
     object <- add_constant(object, constant = constant)
 
     ## If fun supplied, use it to transform est and the upper and lower interval
@@ -1580,19 +1556,19 @@
         ylab <- variables[2L]
     }
     if (is.null(title)) {
-        title <- unique(object[["smooth"]])
+        title <- unique(object[[".smooth"]])
     }
     if (is.null(caption)) {
         caption <- paste("Facet rows:", variables[3],
             "; columns:", variables[4],
-            "; Basis:", object[["type"]])
+            "; Basis:", object[[".type"]])
     }
 
-    if (all(!is.na(object[["by"]]))) {
+    if (all(!is.na(object[[".by"]]))) {
         spl <- strsplit(title, split = ":")
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
-            by_var <- as.character(unique(object[["by"]]))
+            by_var <- as.character(unique(object[[".by"]]))
             subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
         }
     }
@@ -1673,7 +1649,7 @@
                                         angle = NULL,
                                         ...) {
     if (is.null(variables)) {
-        variables <- vars_from_label(unique(object[["smooth"]]))
+        variables <- vars_from_label(unique(object[[".smooth"]]))
     }
 
     ## If constant supplied apply it to `est`
@@ -1708,14 +1684,14 @@
         title <- variables
     }
     if (is.null(caption)) {
-        caption <- paste("Basis:", object[["type"]])
+        caption <- paste("Basis:", object[[".type"]])
     }
 
-    if (all(!is.na(object[["by"]]))) {
+    if (all(!is.na(object[[".by"]]))) {
         spl <- strsplit(title, split = ":")
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
-            by_var <- as.character(unique(object[["by"]]))
+            by_var <- as.character(unique(object[[".by"]]))
             subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
         }
     }
@@ -1752,7 +1728,7 @@
                                         angle = NULL,
                                        ...) {
     if (is.null(variables)) {
-        variables <- vars_from_label(unique(object[["smooth"]]))
+        variables <- vars_from_label(unique(object[[".smooth"]]))
     }
 
     if (is.null(discrete_colour)) {
@@ -1781,17 +1757,17 @@
         ylab <- "Partial effect"
     }
     if (is.null(title)) {
-        title <- unique(object[["smooth"]])
+        title <- unique(object[[".smooth"]])
     }
     if (is.null(caption)) {
-        caption <- paste("Basis:", object[["type"]])
+        caption <- paste("Basis:", object[[".type"]])
     }
 
-    if (all(!is.na(object[["by"]]))) {
+    if (all(!is.na(object[[".by"]]))) {
         spl <- strsplit(title, split = ":")
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
-            by_var <- as.character(unique(object[["by"]]))
+            by_var <- as.character(unique(object[[".by"]]))
             subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
         }
     }
@@ -1839,7 +1815,7 @@
                                            angle = NULL,
                                            ...) {
     if (is.null(variables)) {
-        variables <- vars_from_label(unique(object[["smooth"]]))
+        variables <- vars_from_label(unique(object[[".smooth"]]))
     }
 
     # variables will likely be length two, but it could be >2 if there are
@@ -1921,17 +1897,17 @@
         ylab <- "Partial effect"
     }
     if (is.null(title)) {
-        title <- unique(object[["smooth"]])
+        title <- unique(object[[".smooth"]])
     }
     if (is.null(caption)) {
-        caption <- paste("Basis:", object[["type"]])
+        caption <- paste("Basis:", object[[".type"]])
     }
 
-    if (all(!is.na(object[["by"]]))) {
+    if (all(!is.na(object[[".by"]]))) {
         spl <- strsplit(title, split = ":")
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
-            by_var <- as.character(unique(object[["by"]]))
+            by_var <- as.character(unique(object[[".by"]]))
             subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
         }
     }
@@ -1989,7 +1965,7 @@
     }
 
     if (is.null(variables)) {
-        variables <- vars_from_label(unique(object[["smooth"]]))
+        variables <- vars_from_label(unique(object[[".smooth"]]))
     }
 
     if (is.null(continuous_fill)) {
@@ -2048,17 +2024,17 @@
     }
 
     if (is.null(title)) {
-        title <- unique(object[["smooth"]])
+        title <- unique(object[[".smooth"]])
     }
 
     if (is.null(caption)) {
-        caption <- paste("Basis:", object[["type"]])
+        caption <- paste("Basis:", object[[".type"]])
     }
 
-    if (all(!is.na(object[["by"]]))) {
+    if (all(!is.na(object[[".by"]]))) {
         # is the by variable a factor or a numeric
-        by_class <- data_class(object)[[object[["by"]][[1L]]]]
-        by_var <- as.character(unique(object[["by"]]))
+        by_class <- data_class(object)[[object[[".by"]][[1L]]]]
+        by_var <- as.character(unique(object[[".by"]]))
         spl <- strsplit(title, split = ":")
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {

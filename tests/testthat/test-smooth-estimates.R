@@ -36,7 +36,7 @@ sim_fs <- function(n = 500, nf = 10) {
 dat_fs <- withr::with_seed(0, sim_fs())
 m_fs <- gam(y ~ s(x1, fac, bs = "fs", k = 5), method = "ML", data = dat_fs)
 
-obj_nms <- c("smooth", "type", "by", ".estimate", ".se")
+obj_nms <- c(".smooth", ".type", ".by", ".estimate", ".se")
 
 test_that("smooth_estimates works for a GAM", {
     sm <- smooth_estimates(m1, "s(x2)")

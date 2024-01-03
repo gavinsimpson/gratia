@@ -303,7 +303,7 @@
                 }
                 # merge with the evaluated smooth
                 sm_eval <- suppress_matches_multiple_warning(
-                  left_join(sm_eval, p_resids, by = "smooth")
+                  left_join(sm_eval, p_resids, by = ".smooth")
                 )
             }
         }
@@ -315,7 +315,7 @@
 
             # merge with the evaluated smooth
             sm_eval <- suppress_matches_multiple_warning(
-              left_join(sm_eval, rug_data, by = "smooth")
+              left_join(sm_eval, rug_data, by = ".smooth")
             )
         }
 
@@ -326,16 +326,16 @@
 
         # draw smooths
         sm_l <- if (isTRUE(grouped_by)) {
-            levs <- unique(str_split_fixed(sm_eval$smooth, ":", n = 2)[, 1])
+            levs <- unique(str_split_fixed(sm_eval$.smooth, ":", n = 2)[, 1])
             sm_eval |>
-                mutate(smooth = factor(.data$smooth, levels = S[select]),
-                .term = str_split_fixed(.data$smooth, ":", n = 2)[, 1]) |>
-                arrange(.data$smooth) |>
+                mutate(smooth = factor(.data$.smooth, levels = S[select]),
+                .term = str_split_fixed(.data$.smooth, ":", n = 2)[, 1]) |>
+                arrange(.data$.smooth) |>
                 relocate(".term", .before = 1L) |>
-                group_split(factor(.data$.term, levels = levs), .data$by)
+                group_split(factor(.data$.term, levels = levs), .data$.by)
         } else {
             # the factor is to reorder to way the smooths entered the model
-            group_split(sm_eval, factor(.data$smooth, levels = S[select]))
+            group_split(sm_eval, factor(.data$.smooth, levels = S[select]))
         }
         sm_plts <- map(sm_l,
             draw_smooth_estimates,

@@ -373,26 +373,27 @@ test_that("derivatives() works for factor by smooths issue 47", {
                        "derivative","se","crit","lower","upper"))
     plt1 <- draw(d)
 
-    m <- gam(y ~ x1 + s(x2) + fac + s(x0, by = fac), data = su_eg4,
+    m_47 <- gam(y ~ x1 + s(x2) + fac + s(x0, by = fac), data = su_eg4,
              method = "REML")
-    expect_silent(d <- derivatives(m))
+    expect_silent(d <- derivatives(m_47))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
     expect_named(d, c("smooth", "var", "by_var", "fs_var", "fac", "data",
                       "derivative", "se", "crit", "lower", "upper"))
     plt2 <- draw(d)
 
-    dat <- transform(su_eg4, ofac = ordered(fac))
-    m <- gam(y ~ x1 + s(x2) + ofac + s(x0) + s(x0, by = ofac), data = dat,
+    dat_47 <- transform(su_eg4, ofac = ordered(fac))
+    m_47 <- gam(y ~ x1 + s(x2) + ofac + s(x0) + s(x0, by = ofac), data = dat_47,
              method = "REML")
-    expect_silent(d <- derivatives(m))
+    expect_silent(d <- derivatives(m_47))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
     expect_named(d, c("smooth", "var", "by_var", "fs_var", "ofac", "data",
                       "derivative", "se", "crit", "lower", "upper"))
     plt3 <- draw(d)
-    m <- gamm(y ~ x1 + s(x2) + fac + s(x0, by = fac), data = su_eg4)
-    expect_silent(d <- derivatives(m))
+    
+    m_47 <- gamm(y ~ x1 + s(x2) + fac + s(x0, by = fac), data = su_eg4)
+    expect_silent(d <- derivatives(m_47))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
     expect_named(d, c("smooth", "var", "by_var", "fs_var", "fac", "data",
