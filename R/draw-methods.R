@@ -71,7 +71,7 @@
     }
 
     ## how many smooths
-    sm <- unique(object[["smooth"]])
+    sm <- unique(object[[".smooth"]])
     ## select smooths
     select <- check_user_select_smooths(smooths = sm, select = select)
     sm <- sm[select]
@@ -79,18 +79,18 @@
     plotlist <- vector("list", length = length(sm))
 
     for (i in seq_along(sm)) {
-        take <- object[["smooth"]] == sm[i]
+        take <- object[[".smooth"]] == sm[i]
         df <- object[take, ]
-        xvar <- unique(df[['var']])
-        plt <- if (!all(is.na(df$fs_var))) {
-            ggplot(df, aes(x = .data$data,
-                           y = .data$derivative,
-                           group = .data$fs_var))
+        xvar <- vars_from_label(unique(df[[".smooth"]])) # unique(df[['var']])
+        plt <- if (!all(is.na(df$.fs_var))) {
+            ggplot(df, aes(x = .data[[xvar]], #.data$data,
+                           y = .data$.derivative,
+                           group = .data$.fs_var))
         } else {
-            ggplot(df, aes(x = .data$data,
-                           y = .data$derivative)) +
-              geom_ribbon(aes(ymin = .data$lower,
-                              ymax = .data$upper,
+            ggplot(df, aes(x = .data[[xvar]], #.data$data,
+                           y = .data$.derivative)) +
+              geom_ribbon(aes(ymin = .data$.lower_ci,
+                              ymax = .data$.upper_ci,
                               y = NULL), alpha = alpha)
         }
         plt <- plt +
@@ -100,15 +100,15 @@
         if (isTRUE(add_change)) {
             plt <- if (identical(change_type, "change")) {
                 plt +
-                    geom_line(aes(x = .data$data, y = .data$.change),
+                    geom_line(aes(x = .data[[xvar]], y = .data$.change),
                         linewidth = lwd_change, na.rm = TRUE,
                         colour = change_col)
             } else {
                 plt +
-                    geom_line(aes(x = .data$data, y = .data$.increase),
+                    geom_line(aes(x = .data[[xvar]], y = .data$.increase),
                         colour = increase_col, linewidth = lwd_change,
                         na.rm = TRUE) +
-                    geom_line(aes(x = .data$data, y = .data$.decrease),
+                    geom_line(aes(x = .data[[xvar]], y = .data$.decrease),
                         colour = decrease_col, linewidth = lwd_change,
                         na.rm = TRUE)
 
@@ -118,7 +118,7 @@
     }
 
     if (isTRUE(identical(scales, "fixed"))) {
-        ylims <- range(object[["lower"]], object[["upper"]])
+        ylims <- range(object[[".lower_ci"]], object[[".upper_ci"]])
 
         for (i in seq_along(plotlist)) {
             plotlist[[i]] <- plotlist[[i]] + lims(y = ylims)
@@ -146,7 +146,7 @@
     scales <- match.arg(scales)
 
     ## how many smooths
-    sm <- unique(object[["smooth"]])
+    sm <- unique(object[[".smooth"]])
     ## select smooths
     select <- check_user_select_smooths(smooths = sm, select = select)
     sm <- sm[select]
@@ -154,18 +154,18 @@
     plotlist <- vector("list", length = length(sm))
 
     for (i in seq_along(sm)) {
-        take <- object[["smooth"]] == sm[i]
+        take <- object[[".smooth"]] == sm[i]
         df <- object[take, ]
-        xvar <- unique(df[['var']])
-        plt <- if (!all(is.na(df$fs_var))) {
-            ggplot(df, aes(x = .data$data,
-                           y = .data$partial_deriv,
-                           group = .data$fs_var))
+        xvar <- unique(df[[".focal"]])
+        plt <- if (!all(is.na(df$.fs_var))) {
+            ggplot(df, aes(x = .data[[xvar]],
+                           y = .data$.partial_deriv,
+                           group = .data$.fs_var))
         } else {
-            ggplot(df, aes(x = .data$data,
-                           y = .data$partial_deriv)) +
-              geom_ribbon(aes(ymin = .data$lower,
-                              ymax = .data$upper,
+            ggplot(df, aes(x = .data[[xvar]],
+                           y = .data$.partial_deriv)) +
+              geom_ribbon(aes(ymin = .data$.lower_ci,
+                              ymax = .data$.upper_ci,
                               y = NULL), alpha = alpha)
         }
         plotlist[[i]] <- plt +
@@ -176,7 +176,7 @@
     }
 
     if (isTRUE(identical(scales, "fixed"))) {
-        ylims <- range(object[["lower"]], object[["upper"]])
+        ylims <- range(object[[".lower_ci"]], object[[".upper_ci"]])
 
         for (i in seq_along(plotlist)) {
             plotlist[[i]] <- plotlist[[i]] + lims(y = ylims)

@@ -220,9 +220,9 @@ detaching ‘package:mgcv’
 > 
 > # default adds a .change column
 > names(d)
- [1] "smooth"     "var"        "by_var"     "fs_var"     "data"      
- [6] "derivative" "se"         "crit"       "lower"      "upper"     
-[11] ".change"   
+ [1] ".smooth"     ".by_var"     ".fs_var"     ".derivative" ".se"        
+ [6] ".crit"       ".lower_ci"   ".upper_ci"   "x0"          "x1"         
+[11] "x2"          "x3"          ".change"    
 > 
 > 
 > 
@@ -645,52 +645,53 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 > 
 > ## first derivatives of all smooths using central finite differences
 > derivatives(mod, type = "central")
-# A tibble: 400 x 10
-   smooth var   by_var fs_var     data derivative    se  crit lower upper
-   <chr>  <chr> <chr>  <chr>     <dbl>      <dbl> <dbl> <dbl> <dbl> <dbl>
- 1 s(x0)  x0    <NA>   <NA>   0.000239       7.41  3.33  1.96 0.874  13.9
- 2 s(x0)  x0    <NA>   <NA>   0.0103         7.40  3.33  1.96 0.884  13.9
- 3 s(x0)  x0    <NA>   <NA>   0.0204         7.39  3.30  1.96 0.929  13.8
- 4 s(x0)  x0    <NA>   <NA>   0.0304         7.36  3.24  1.96 1.01   13.7
- 5 s(x0)  x0    <NA>   <NA>   0.0405         7.32  3.15  1.96 1.14   13.5
- 6 s(x0)  x0    <NA>   <NA>   0.0506         7.26  3.04  1.96 1.30   13.2
- 7 s(x0)  x0    <NA>   <NA>   0.0606         7.18  2.90  1.96 1.49   12.9
- 8 s(x0)  x0    <NA>   <NA>   0.0707         7.09  2.76  1.96 1.69   12.5
- 9 s(x0)  x0    <NA>   <NA>   0.0807         6.99  2.61  1.96 1.87   12.1
-10 s(x0)  x0    <NA>   <NA>   0.0908         6.87  2.47  1.96 2.03   11.7
+# A tibble: 400 x 12
+   .smooth .by_var .fs_var .derivative   .se .crit .lower_ci .upper_ci       x0
+   <chr>   <chr>   <chr>         <dbl> <dbl> <dbl>     <dbl>     <dbl>    <dbl>
+ 1 s(x0)   <NA>    <NA>           7.41  3.33  1.96     0.874      13.9 0.000239
+ 2 s(x0)   <NA>    <NA>           7.40  3.33  1.96     0.884      13.9 0.0103  
+ 3 s(x0)   <NA>    <NA>           7.39  3.30  1.96     0.929      13.8 0.0204  
+ 4 s(x0)   <NA>    <NA>           7.36  3.24  1.96     1.01       13.7 0.0304  
+ 5 s(x0)   <NA>    <NA>           7.32  3.15  1.96     1.14       13.5 0.0405  
+ 6 s(x0)   <NA>    <NA>           7.26  3.04  1.96     1.30       13.2 0.0506  
+ 7 s(x0)   <NA>    <NA>           7.18  2.90  1.96     1.49       12.9 0.0606  
+ 8 s(x0)   <NA>    <NA>           7.09  2.76  1.96     1.69       12.5 0.0707  
+ 9 s(x0)   <NA>    <NA>           6.99  2.61  1.96     1.87       12.1 0.0807  
+10 s(x0)   <NA>    <NA>           6.87  2.47  1.96     2.03       11.7 0.0908  
 # i 390 more rows
+# i 3 more variables: x1 <dbl>, x2 <dbl>, x3 <dbl>
 > 
 > ## derivatives for a selected smooth
 > derivatives(mod, type = "central", term = "s(x1)")
-# A tibble: 100 x 10
-   smooth var   by_var fs_var     data derivative    se  crit lower upper
-   <chr>  <chr> <chr>  <chr>     <dbl>      <dbl> <dbl> <dbl> <dbl> <dbl>
- 1 s(x1)  x1    <NA>   <NA>   0.000405     -0.907  3.12  1.96 -7.02  5.20
- 2 s(x1)  x1    <NA>   <NA>   0.0105       -0.906  3.11  1.96 -7.01  5.20
- 3 s(x1)  x1    <NA>   <NA>   0.0205       -0.898  3.10  1.96 -6.97  5.17
- 4 s(x1)  x1    <NA>   <NA>   0.0306       -0.880  3.06  1.96 -6.88  5.12
- 5 s(x1)  x1    <NA>   <NA>   0.0406       -0.849  3.00  1.96 -6.73  5.03
- 6 s(x1)  x1    <NA>   <NA>   0.0507       -0.803  2.92  1.96 -6.52  4.92
- 7 s(x1)  x1    <NA>   <NA>   0.0607       -0.740  2.81  1.96 -6.25  4.77
- 8 s(x1)  x1    <NA>   <NA>   0.0708       -0.659  2.69  1.96 -5.93  4.61
- 9 s(x1)  x1    <NA>   <NA>   0.0809       -0.557  2.56  1.96 -5.57  4.46
-10 s(x1)  x1    <NA>   <NA>   0.0909       -0.436  2.42  1.96 -5.19  4.32
+# A tibble: 100 x 9
+   .smooth .by_var .fs_var .derivative   .se .crit .lower_ci .upper_ci       x1
+   <chr>   <chr>   <chr>         <dbl> <dbl> <dbl>     <dbl>     <dbl>    <dbl>
+ 1 s(x1)   <NA>    <NA>         -0.907  3.12  1.96     -7.02      5.20 0.000405
+ 2 s(x1)   <NA>    <NA>         -0.906  3.11  1.96     -7.01      5.20 0.0105  
+ 3 s(x1)   <NA>    <NA>         -0.898  3.10  1.96     -6.97      5.17 0.0205  
+ 4 s(x1)   <NA>    <NA>         -0.880  3.06  1.96     -6.88      5.12 0.0306  
+ 5 s(x1)   <NA>    <NA>         -0.849  3.00  1.96     -6.73      5.03 0.0406  
+ 6 s(x1)   <NA>    <NA>         -0.803  2.92  1.96     -6.52      4.92 0.0507  
+ 7 s(x1)   <NA>    <NA>         -0.740  2.81  1.96     -6.25      4.77 0.0607  
+ 8 s(x1)   <NA>    <NA>         -0.659  2.69  1.96     -5.93      4.61 0.0708  
+ 9 s(x1)   <NA>    <NA>         -0.557  2.56  1.96     -5.57      4.46 0.0809  
+10 s(x1)   <NA>    <NA>         -0.436  2.42  1.96     -5.19      4.32 0.0909  
 # i 90 more rows
 > ## or via a partial match
 > derivatives(mod, type = "central", term = "x1", partial_match = TRUE)
-# A tibble: 100 x 10
-   smooth var   by_var fs_var     data derivative    se  crit lower upper
-   <chr>  <chr> <chr>  <chr>     <dbl>      <dbl> <dbl> <dbl> <dbl> <dbl>
- 1 s(x1)  x1    <NA>   <NA>   0.000405     -0.907  3.12  1.96 -7.02  5.20
- 2 s(x1)  x1    <NA>   <NA>   0.0105       -0.906  3.11  1.96 -7.01  5.20
- 3 s(x1)  x1    <NA>   <NA>   0.0205       -0.898  3.10  1.96 -6.97  5.17
- 4 s(x1)  x1    <NA>   <NA>   0.0306       -0.880  3.06  1.96 -6.88  5.12
- 5 s(x1)  x1    <NA>   <NA>   0.0406       -0.849  3.00  1.96 -6.73  5.03
- 6 s(x1)  x1    <NA>   <NA>   0.0507       -0.803  2.92  1.96 -6.52  4.92
- 7 s(x1)  x1    <NA>   <NA>   0.0607       -0.740  2.81  1.96 -6.25  4.77
- 8 s(x1)  x1    <NA>   <NA>   0.0708       -0.659  2.69  1.96 -5.93  4.61
- 9 s(x1)  x1    <NA>   <NA>   0.0809       -0.557  2.56  1.96 -5.57  4.46
-10 s(x1)  x1    <NA>   <NA>   0.0909       -0.436  2.42  1.96 -5.19  4.32
+# A tibble: 100 x 9
+   .smooth .by_var .fs_var .derivative   .se .crit .lower_ci .upper_ci       x1
+   <chr>   <chr>   <chr>         <dbl> <dbl> <dbl>     <dbl>     <dbl>    <dbl>
+ 1 s(x1)   <NA>    <NA>         -0.907  3.12  1.96     -7.02      5.20 0.000405
+ 2 s(x1)   <NA>    <NA>         -0.906  3.11  1.96     -7.01      5.20 0.0105  
+ 3 s(x1)   <NA>    <NA>         -0.898  3.10  1.96     -6.97      5.17 0.0205  
+ 4 s(x1)   <NA>    <NA>         -0.880  3.06  1.96     -6.88      5.12 0.0306  
+ 5 s(x1)   <NA>    <NA>         -0.849  3.00  1.96     -6.73      5.03 0.0406  
+ 6 s(x1)   <NA>    <NA>         -0.803  2.92  1.96     -6.52      4.92 0.0507  
+ 7 s(x1)   <NA>    <NA>         -0.740  2.81  1.96     -6.25      4.77 0.0607  
+ 8 s(x1)   <NA>    <NA>         -0.659  2.69  1.96     -5.93      4.61 0.0708  
+ 9 s(x1)   <NA>    <NA>         -0.557  2.56  1.96     -5.57      4.46 0.0809  
+10 s(x1)   <NA>    <NA>         -0.436  2.42  1.96     -5.19      4.32 0.0909  
 # i 90 more rows
 > ## Don't show: 
 > options(op)
@@ -1614,11 +1615,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x560557e03140>
+<environment: 0x55fedaf93740>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x560557e03140>
+<environment: 0x55fedaf93740>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2696,7 +2697,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  35.665 0.305 35.441 0 0 
+Time elapsed:  38.205 0.348 37.93 0 0 
 > grDevices::dev.off()
 null device 
           1 

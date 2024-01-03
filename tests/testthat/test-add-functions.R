@@ -136,14 +136,14 @@ test_that("add_constant works for tbl", {
 })
 
 test_that("add_sizer derivatives method works", {
-    nms <- c("smooth", "var", "by_var", "fs_var", "data", "derivative", "se",
-        "crit", "lower", "upper")
+    nms <- c(".smooth", ".by_var", ".fs_var", ".derivative", ".se",
+        ".crit", ".lower_ci", ".upper_ci")
     expect_silent(d <- derivatives(m_gam, type = "central"))
     expect_silent(tbl <- add_sizer(d, type = "change"))
-    expect_named(tbl, c(nms, ".change"))
+    expect_named(tbl, c(nms, paste0("x", 0:3), ".change"))
 
     expect_silent(tbl <- add_sizer(d, type = "sizer"))
-    expect_named(tbl, c(nms, ".decrease", ".increase"))
+    expect_named(tbl, c(nms, paste0("x", 0:3), ".decrease", ".increase"))
 })
 
 test_that("add_sizer smooth_estimates method works", {

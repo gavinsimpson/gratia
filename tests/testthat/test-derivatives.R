@@ -19,281 +19,251 @@ test_that("derivatives() fails with inappropriate args", {
                  fixed = TRUE)
 })
 
+deriv_nms <- c(".smooth", ".by_var", ".fs_var", ".derivative", ".se", ".crit",
+    ".lower_ci", ".upper_ci")
+
 test_that("derivatives() returns derivatives for all smooths in a GAM", {
     expect_silent(df <- derivatives(su_m_univar_4))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 
     expect_silent(df <- derivatives(su_m_univar_4, type = "forward"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 
     expect_silent(df <- derivatives(su_m_univar_4, type = "backward"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 
     expect_silent(df <- derivatives(su_m_univar_4, type = "central"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 
     expect_silent(df <- derivatives(su_m_univar_4, "x1", partial_match = TRUE))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x1"))
 
-    expect_silent(df <- derivatives(su_m_univar_4, "x1", type = "forward", partial_match = TRUE))
+    expect_silent(df <- derivatives(su_m_univar_4, "x1", type = "forward",
+        partial_match = TRUE))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x1"))
 
-    expect_silent(df <- derivatives(su_m_univar_4, "x1", type = "backward", partial_match = TRUE))
+    expect_silent(df <- derivatives(su_m_univar_4, "x1", type = "backward",
+        partial_match = TRUE))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x1"))
 
-    expect_silent(df <- derivatives(su_m_univar_4, "x1", type = "central", partial_match = TRUE))
+    expect_silent(df <- derivatives(su_m_univar_4, "x1", type = "central",
+        partial_match = TRUE))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x1"))
 })
 
 test_that("derivatives() returns second derivatives for all smooths in a GAM", {
     expect_silent(df <- derivatives(su_m_univar_4, order = 2))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 
     expect_silent(df <- derivatives(su_m_univar_4, order = 2, type = "forward"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 
     expect_silent(df <- derivatives(su_m_univar_4, order = 2, type = "backward"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 
     expect_silent(df <- derivatives(su_m_univar_4, order = 2, type = "central"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 
-    expect_silent(df <- derivatives(su_m_univar_4, "x1", order = 2, partial_match = TRUE))
+    expect_silent(df <- derivatives(su_m_univar_4, "x1", order = 2,
+        partial_match = TRUE))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x1"))
 
-    expect_silent(df <- derivatives(su_m_univar_4, "x1", order = 2, type = "forward",
-                                    partial_match = TRUE))
+    expect_silent(df <- derivatives(su_m_univar_4, "x1", order = 2,
+        type = "forward", partial_match = TRUE))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x1"))
 
-    expect_silent(df <- derivatives(su_m_univar_4, "x1", order = 2, type = "backward",
-                                    partial_match = TRUE))
+    expect_silent(df <- derivatives(su_m_univar_4, "x1", order = 2,
+        type = "backward", partial_match = TRUE))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x1"))
 
-    expect_silent(df <- derivatives(su_m_univar_4, "x1", order = 2, type = "central",
-                                    partial_match = TRUE))
+    expect_silent(df <- derivatives(su_m_univar_4, "x1", order = 2,
+        type = "central", partial_match = TRUE))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x1"))
 })
 
 test_that("derivatives() returns derivatives for all smooths in a GAMM", {
     expect_silent(df <- derivatives(su_gamm_univar_4))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 
     expect_silent(df <- derivatives(su_gamm_univar_4, type = "forward"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 
     expect_silent(df <- derivatives(su_gamm_univar_4, type = "backward"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 
     expect_silent(df <- derivatives(su_gamm_univar_4, type = "central"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 })
 
 test_that("derivatives() returns second derivatives for all smooths in a GAMM", {
     expect_silent(df <- derivatives(su_gamm_univar_4, order = 2))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 
-    expect_silent(df <- derivatives(su_gamm_univar_4, order = 2, type = "forward"))
+    expect_silent(df <- derivatives(su_gamm_univar_4, order = 2,
+        type = "forward"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 
-    expect_silent(df <- derivatives(su_gamm_univar_4, order = 2, type = "backward"))
+    expect_silent(df <- derivatives(su_gamm_univar_4, order = 2,
+        type = "backward"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 
-    expect_silent(df <- derivatives(su_gamm_univar_4, order = 2, type = "central"))
+    expect_silent(df <- derivatives(su_gamm_univar_4, order = 2,
+        type = "central"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 })
 
 ## confint methods for by variables
 
 test_that("derivatives() fails with inappropriate args", {
     expect_error(derivatives(su_m_factor_by_x2, type = "foo"),
-                 paste("'arg' should be one of",
-                       paste(dQuote(c("forward","backward","central")),
-                             collapse = ", ")),
-                 fixed = TRUE)
+        paste("'arg' should be one of",
+            paste(dQuote(c("forward", "backward", "central")),
+                collapse = ", ")),
+        fixed = TRUE)
 
     expect_error(derivatives(su_m_factor_by_x2, order = 3),
-                 "Only 1st or 2nd derivatives are supported: `order %in% c(1,2)`",
-                 fixed = TRUE)
+        "Only 1st or 2nd derivatives are supported: `order %in% c(1,2)`",
+        fixed = TRUE)
 })
 
 test_that("derivatives() returns derivatives for all smooths in a factor by GAM", {
     expect_silent(df <- derivatives(su_m_factor_by_x2))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x2", "fac"))
 
     expect_silent(df <- derivatives(su_m_factor_by_x2, type = "forward"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x2", "fac"))
 
     expect_silent(df <- derivatives(su_m_factor_by_x2, type = "backward"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x2", "fac"))
 
     expect_silent(df <- derivatives(su_m_factor_by_x2, type = "central"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x2", "fac"))
 
     expect_silent(df <- derivatives(su_m_factor_by_x2, "x2",
                                     partial_match = TRUE))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x2", "fac"))
 
     expect_silent(df <- derivatives(su_m_factor_by_x2, "x2", type = "forward",
                                     partial_match = TRUE))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x2", "fac"))
 
     expect_silent(df <- derivatives(su_m_factor_by_x2, "x2", type = "backward",
                                     partial_match = TRUE))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x2", "fac"))
 
     expect_silent(df <- derivatives(su_m_factor_by_x2, "x2", type = "central",
                                     partial_match = TRUE))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x2", "fac"))
 })
 
 test_that("derivatives() returns derivatives for all smooths in a factor by GAM", {
     expect_silent(df <- derivatives(su_m_factor_by_x2, order = 2))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x2", "fac"))
 
     expect_silent(df <- derivatives(su_m_factor_by_x2, order = 2, type = "forward"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x2", "fac"))
 
     expect_silent(df <- derivatives(su_m_factor_by_x2, order = 2, type = "backward"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x2", "fac"))
 
     expect_silent(df <- derivatives(su_m_factor_by_x2, order = 2, type = "central"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x2", "fac"))
 
     expect_silent(df <- derivatives(su_m_factor_by_x2, order = 2, "x2",
                                     partial_match = TRUE))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x2", "fac"))
 
     expect_silent(df <- derivatives(su_m_factor_by_x2, "x2", order = 2,
                                     type = "forward", partial_match = TRUE))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x2", "fac"))
 
     expect_silent(df <- derivatives(su_m_factor_by_x2, "x2", order = 2,
                                     type = "backward", partial_match = TRUE))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x2", "fac"))
 
     expect_silent(df <- derivatives(su_m_factor_by_x2, "x2", order = 2,
                                     type = "central", partial_match = TRUE))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, "x2", "fac"))
 })
 
 test_that("internal finite diff functions fail for all factor vars", {
@@ -359,8 +329,7 @@ test_that("derivatives() returns derivatives with simultaneous intervals for all
     expect_silent(df <- derivatives(su_m_univar_4, interval = "simultaneous"))
     expect_s3_class(df, "derivatives")
     expect_s3_class(df, "tbl_df")
-    expect_named(df, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(df, c(deriv_nms, paste0("x", 0:3)))
 })
 
 test_that("derivatives() works for factor by smooths issue 47", {
@@ -369,8 +338,7 @@ test_that("derivatives() works for factor by smooths issue 47", {
     expect_silent(d <- derivatives(su_m_factor_by_x2))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
-    expect_named(d, c("smooth","var","by_var","fs_var","fac","data",
-                       "derivative","se","crit","lower","upper"))
+    expect_named(d, c(deriv_nms, "x2", "fac"))
     plt1 <- draw(d)
 
     m_47 <- gam(y ~ x1 + s(x2) + fac + s(x0, by = fac), data = su_eg4,
@@ -378,8 +346,7 @@ test_that("derivatives() works for factor by smooths issue 47", {
     expect_silent(d <- derivatives(m_47))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
-    expect_named(d, c("smooth", "var", "by_var", "fs_var", "fac", "data",
-                      "derivative", "se", "crit", "lower", "upper"))
+    expect_named(d, c(deriv_nms, "x2", "x0", "fac"))
     plt2 <- draw(d)
 
     dat_47 <- transform(su_eg4, ofac = ordered(fac))
@@ -388,16 +355,14 @@ test_that("derivatives() works for factor by smooths issue 47", {
     expect_silent(d <- derivatives(m_47))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
-    expect_named(d, c("smooth", "var", "by_var", "fs_var", "ofac", "data",
-                      "derivative", "se", "crit", "lower", "upper"))
+    expect_named(d, c(deriv_nms, "x2", "x0", "ofac"))
     plt3 <- draw(d)
-    
+
     m_47 <- gamm(y ~ x1 + s(x2) + fac + s(x0, by = fac), data = su_eg4)
     expect_silent(d <- derivatives(m_47))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
-    expect_named(d, c("smooth", "var", "by_var", "fs_var", "fac", "data",
-                      "derivative", "se", "crit", "lower", "upper"))
+    expect_named(d, c(deriv_nms, "x2", "x0", "fac"))
     plt4 <- draw(d)
 
     skip_on_ci()
@@ -424,14 +389,13 @@ test_that("derivatives() works for fs smooths issue 57", {
     d <- transform(d, y = logistic.growth(t, y0, K[unit], r))
     S  <- 0.25
     d <- transform(d, y.obs = y + rnorm(nrow(d), sd = S))
-    m <- gam(y.obs ~ s(t, unit, k = 5, bs = "fs", m = 2), data = d,
-        method = "REML")
+    m_logistic_growth <- gam(y.obs ~ s(t, unit, k = 5, bs = "fs", m = 2),
+        data = d,  method = "REML")
     
-    expect_silent(d <- derivatives(m))
+    expect_silent(d <- derivatives(m_logistic_growth))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
-    expect_named(d, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(d, c(deriv_nms, "t"))
     ## plt <- draw(d) # FIXME: need to update draw(d) so it works with fs smooths
     ## expect_doppelganger("draw issue 57 derivatives for factor by", plt)
 })
@@ -470,12 +434,10 @@ test_that("derivatives works with models that include random effects", {
     expect_silent(d <- derivatives(rm1))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
-    expect_named(d, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(d, c(deriv_nms, paste0("x", 0:3)))
 
     expect_silent(d <- derivatives(rm2))
     expect_s3_class(d, "derivatives")
     expect_s3_class(d, "tbl_df")
-    expect_named(d, c("smooth","var","by_var","fs_var","data","derivative",
-                       "se","crit","lower","upper"))
+    expect_named(d, c(deriv_nms, paste0("x", 0:2)))
 })
