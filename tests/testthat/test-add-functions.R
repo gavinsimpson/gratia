@@ -73,7 +73,6 @@ test_that("add_partial_residuals works for a GAM with NA in data", {
     expect_named(df, c("y", "x0", "x1", "x2", "x3", "s(x2)"))
 })
 
-
 test_that("add_confint works for smooth_estimates", {
     expect_silent(sm <- smooth_estimates(m_gam))
     expect_silent(sm <- add_confint(sm, coverage = 0.89))
