@@ -166,7 +166,7 @@
 
     # nest `input` again if it was nested previously
     if (was_nested) {
-        input <- nest(input, data = !all_of(c("smooth", "type", "by")))
+        input <- nest(input, data = !all_of(c(".smooth", ".type", ".by")))
     }
 
     # return

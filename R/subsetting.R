@@ -35,8 +35,8 @@
     class(x) <- class(x)[-c(1:2)]
     x <- NextMethod()
     class(x) <- cls
-    if (has_name(x, "smooth")) {
-        take <- unique(x[["smooth"]])
+    if (has_name(x, ".smooth")) {
+        take <- unique(x[[".smooth"]])
         tensor_term_order <- tensor_term_order[take]
     } else {
         tensor_term_order <- NA
@@ -53,8 +53,8 @@
     class(x) <- class(x)[-c(1:2)]
     x <- NextMethod()
     class(x) <- cls
-    if (has_name(x, "smooth")) {
-        take <- unique(x[["smooth"]])
+    if (has_name(x, ".smooth")) {
+        take <- unique(x[[".smooth"]])
         tensor_term_order <- tensor_term_order[take]
     } else {
         tensor_term_order <- NA
