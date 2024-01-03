@@ -75,7 +75,7 @@ test_that("add_confint works for smooth_estimates", {
     expect_silent(sm <- smooth_estimates(m_gam))
     expect_silent(sm <- add_confint(sm, coverage = 0.89))
     expect_s3_class(sm, c("smooth_estimates", "tbl_df", "tbl", "data.frame"))
-    expect_named(sm, c("smooth", "type", "by", ".estimate", ".se", "x0",
+    expect_named(sm, c(".smooth", ".type", ".by", ".estimate", ".se", "x0",
                        "x1", "x2", "x3", ".lower_ci",".upper_ci"))
     expect_identical(nrow(sm), 400L)
     expect_identical(ncol(sm), 11L)
@@ -147,7 +147,7 @@ test_that("add_sizer derivatives method works", {
 })
 
 test_that("add_sizer smooth_estimates method works", {
-    nms <- c("smooth", "type", "by", ".estimate", ".se")
+    nms <- c(".smooth", ".type", ".by", ".estimate", ".se")
     expect_silent(d <- derivatives(m_gam, type = "central"))
     expect_silent(sm <- smooth_estimates(m_gam))
     expect_silent(tbl <- sm |>
