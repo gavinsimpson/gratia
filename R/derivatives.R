@@ -202,10 +202,11 @@
     result <- bind_rows(result)
 
     ## reorder the columns
-    result <- result %>%
-      relocate(any_of(c("smooth", "var", "by_var", "fs_var")), .before = 1) %>%
-      relocate(all_of(c("data","derivative", "se", "crit", "lower", "upper")),
-               .after = last_col())
+    result <- result |>
+        relocate(any_of(c(".smooth", ".var", ".by_var", ".fs_var",
+        ".derivative", ".se", ".crit", ".lower_ci", ".upper_ci")), .before = 1) # |>
+        #relocate(all_of(c(".derivative", ".se", ".crit", ".lower_ci",
+        #    ".upper_ci")), .after = last_col())
 
     class(result) <- c("derivatives", class(result)) # add class
     result                                           # return
@@ -220,11 +221,11 @@
     } else{
         coverage_t(level = level, df = df)
     }
-    adj <- (crit * x[["se"]])
+    adj <- (crit * x[[".se"]])
     derivative <- add_column(x,
-                             crit  = rep(crit, nrow(x)),
-                             lower = x[["derivative"]] - adj,
-                             upper = x[["derivative"]] + adj)
+                             .crit  = rep(crit, nrow(x)),
+                             .lower_ci = x[[".derivative"]] - adj,
+                             .upper_ci = x[[".derivative"]] + adj)
     derivative
 }
 
@@ -233,19 +234,19 @@
 #' @importFrom mvnfast rmvn
 `derivative_simultaneous_int` <- function(x, Xi, level, Vb, n_sim, ncores) {
     ## simulate un-biased deviations given bayesian covariance matrix
-    buDiff <- rmvn(n = n_sim, mu = rep(0, nrow(Vb)), sigma = Vb,
+    buDiff <- mvnfast::rmvn(n = n_sim, mu = rep(0, nrow(Vb)), sigma = Vb,
         ncores = ncores)
     # simulate deviations from expected
     simDev <- tcrossprod(Xi, buDiff) # Xi %*% t(bu)
-    absDev <- abs(sweep(simDev, 1L, x[["se"]], FUN = "/")) # absolute deviations
+    absDev <- abs(sweep(simDev, 1L, x[[".se"]], FUN = "/")) # absolute deviations
     masd <- apply(absDev, 2L, max)  # & max abs deviation per sim
     ## simultaneous interval critical value
     crit <- quantile(masd, prob = level, type = 8)
-    adj <- (crit * x[["se"]])
+    adj <- (crit * x[[".se"]])
     derivative <- add_column(x,
-                             crit  = rep(crit, nrow(x)),
-                             lower = x[["derivative"]] - adj,
-                             upper = x[["derivative"]] + adj)
+                             .crit  = rep(crit, nrow(x)),
+                             .lower_ci = x[[".derivative"]] - adj,
+                             .upper_ci = x[[".derivative"]] + adj)
     derivative
 }
 
@@ -294,17 +295,18 @@
     d <- drop(Xi %*% betas)             # estimate derivative
     se <- rowSums(Xi %*% Vb * Xi)^0.5   # standard errors
     ## build return tibble
-    deriv <- tibble(smooth = rep(sm_lab, length(d)),
-                    var = rep(sm_var, length(d)),
-                    data = eval_tidy(parse_expr(sm_var), data = data),
-                    derivative = d,
-                    se = se)
+    deriv <- tibble(.smooth = rep(sm_lab, length(d)),
+                    #.var = rep(sm_var, length(d)),
+                    {{ sm_var }} := eval_tidy(parse_expr(sm_var), data = data),
+                    # .data = eval_tidy(parse_expr(sm_var), data = data),
+                    .derivative = d,
+                    .se = se)
     fs_var <- if (is.null(fs_var)) {
         rep(NA_character_, nrow(deriv))
     } else {
         data[[fs_var]]
     }
-    deriv <- add_column(deriv, fs_var = fs_var, .after = 2L)
+    deriv <- add_column(deriv, .fs_var = fs_var, .after = 2L)
 
     by_var <- if (by_var == "NA"){
         rep(NA_character_, nrow(deriv))
@@ -313,7 +315,7 @@
                             .after = 2L)
         rep(by_var, nrow(deriv))
     }
-    deriv <- add_column(deriv, by_var = by_var, .after = 2L)
+    deriv <- add_column(deriv, .by_var = by_var, .after = 2L)
     result <- list(deriv = deriv, Xi = Xi)
     result
 }
@@ -675,17 +677,14 @@
 #' @rdname partial_derivatives
 #'
 #' @return A tibble, currently with the following variables:
-#' * `smooth`: the smooth each row refers to,
-#' * `var`: the name of the variable for which the partial derivative was
-#'     evaluated,
-#' * `data`: values of `var` at which the derivative was evaluated,
-#' * `partial_deriv`: the estimated partial derivative,
-#' * `se`: the standard error of the estimated partial derivative,
-#' * `crit`: the critical value such that `derivative` ± `(crit * se)` gives
+#' * `.smooth`: the smooth each row refers to,
+#' * `.partial_deriv`: the estimated partial derivative,
+#' * `.se`: the standard error of the estimated partial derivative,
+#' * `.crit`: the critical value such that `derivative` ± `(crit * se)` gives
 #'   the upper and lower bounds of the requested confidence or simultaneous
 #'   interval (given `level`),
-#' * `lower`: the lower bound of the confidence or simultaneous interval,
-#' * `upper`: the upper bound of the confidence or simultaneous interval.
+#' * `.lower_ci`: the lower bound of the confidence or simultaneous interval,
+#' * `.upper_ci`: the upper bound of the confidence or simultaneous interval.
 #'
 #' @examples
 #'
@@ -893,12 +892,12 @@
     result <- bind_rows(result)
 
     ## reorder the columns
-    result <- result %>%
-        rename(partial_deriv = "derivative")%>%
-        relocate(any_of(c("smooth", "var", "by_var", "fs_var")),
-            .before = 1) %>%
-        relocate(all_of(c("data", "partial_deriv", "se", "crit", "lower",
-            "upper")), .after = last_col())
+    result <- result |>
+        rename(.partial_deriv = ".derivative") |>
+        relocate(any_of(c(".smooth", ".by_var", ".fs_var",
+            ".partial_deriv", ".se", ".crit", ".lower_ci", ".upper_ci")),
+        .before = 1) |>
+        add_column(.focal = rep(focal, nrow(result)), .after = 1L)
 
     class(result) <- c("partial_derivatives", "derivatives",
         class(result)) # add class
