@@ -1,21 +1,28 @@
-# gratia 0.8.1.49
+# gratia 0.8.1.50
 
-## User visible changes
+## Breaking changes
 
 * Many functions now return objects with different named variables. In order to
   avoid clashes with variable names used in user's models or data, a period
   (`.`) is now being used as a prefix for generated variable names. The
   functions whose names have changed are: `smooth_estimates()`,
-  `fitted_values()`, `fitted_samples()`, `posterior_samples()`, and
-  `derivative_samples()`. In addition, `add_confint()` also adds newly-named
-  variables.
+  `fitted_values()`, `fitted_samples()`, `posterior_samples()`, `derivatives()`,
+  `partial_derivatives()`, and `derivative_samples()`. In addition,
+  `add_confint()` also adds newly-named variables.
 
       1. `est` is now `.estimate`,
       2. `lower` and `upper` are now `.lower_ci` and `.upper_ci`,
       3. `draw` and `row` and now `.draw` and `.row` respectively,
       4. `fitted`, `se`, `crit` are now `.fitted`, `.se`, `.crit`, respectively
       5. `smooth`, `by`, and `type` in `smooth_estimates()` are now `.smooth`,
-        `.by`, `.type`, respectively.
+         `.by`, `.type`, respectively.
+
+* `derivatives()` and `partial_derivatives()` now work more like
+  `smooth_estimates()`; in place of the `var` and `data` columns, *gratia* now
+  stores the data variables at which the derivatives were evaluated as columns
+  in the object with their actual variable names.
+
+## User visible changes
 
 * `smooth_samples()` now uses a single call to the RNG to generate draws from
   the posterior of smooths. Previous to version 0.9.0, `smooth_samples()` would
@@ -40,7 +47,7 @@
   This also affects `draw.gam()`.
 
 * `fitted_values()` now has some level of support for location, scale, shape
-  families. Suppoerted families are `mgcv::gaulss()`, `mgcv::gumbls()`,
+  families. Supported families are `mgcv::gaulss()`, `mgcv::gumbls()`,
   `mgcv::gevlss()`, `mgcv::gumbls()`, `mgcv::shash()`, `mgcv::twlss()`, and
   `mgcv::ziplss()`.
 
