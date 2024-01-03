@@ -343,16 +343,16 @@ detaching ‘package:mgcv’
 > comp <- compare_smooths(m1, m2)
 > comp
 # A tibble: 8 x 5
-  model smooth type          by    data              
-  <chr> <chr>  <chr>         <chr> <list>            
-1 m1    s(x0)  TPRS          <NA>  <tibble [100 x 3]>
-2 m2    s(x0)  TPRS (shrink) <NA>  <tibble [100 x 3]>
-3 m1    s(x1)  TPRS          <NA>  <tibble [100 x 3]>
-4 m2    s(x1)  TPRS (shrink) <NA>  <tibble [100 x 3]>
-5 m1    s(x2)  TPRS          <NA>  <tibble [100 x 3]>
-6 m2    s(x2)  TPRS (shrink) <NA>  <tibble [100 x 3]>
-7 m1    s(x3)  TPRS          <NA>  <tibble [100 x 3]>
-8 m2    s(x3)  TPRS (shrink) <NA>  <tibble [100 x 3]>
+  .model .smooth .type         .by   data              
+  <chr>  <chr>   <chr>         <chr> <list>            
+1 m1     s(x0)   TPRS          <NA>  <tibble [100 x 3]>
+2 m2     s(x0)   TPRS (shrink) <NA>  <tibble [100 x 3]>
+3 m1     s(x1)   TPRS          <NA>  <tibble [100 x 3]>
+4 m2     s(x1)   TPRS (shrink) <NA>  <tibble [100 x 3]>
+5 m1     s(x2)   TPRS          <NA>  <tibble [100 x 3]>
+6 m2     s(x2)   TPRS (shrink) <NA>  <tibble [100 x 3]>
+7 m1     s(x3)   TPRS          <NA>  <tibble [100 x 3]>
+8 m2     s(x3)   TPRS (shrink) <NA>  <tibble [100 x 3]>
 > ## notice that the result is a nested tibble
 > 
 > draw(comp)
@@ -465,18 +465,18 @@ detaching ‘package:mgcv’
 > ci <- confint(mod, parm = "s(x2)", type = "confidence", data = new_data)
 > ci
 # A tibble: 50 x 9
-   smooth type  by       x2 .estimate   .se .crit .lower_ci .upper_ci
-   <chr>  <chr> <chr> <dbl>     <dbl> <dbl> <dbl>     <dbl>     <dbl>
- 1 s(x2)  TPRS  <NA>   0.26       5.3  0.18   2.0       5.0       5.7
- 2 s(x2)  TPRS  <NA>   0.27       5.1  0.18   2.0       4.8       5.5
- 3 s(x2)  TPRS  <NA>   0.28       4.9  0.18   2.0       4.6       5.3
- 4 s(x2)  TPRS  <NA>   0.29       4.6  0.18   2.0       4.3       5.0
- 5 s(x2)  TPRS  <NA>   0.30       4.3  0.19   2.0       3.9       4.7
- 6 s(x2)  TPRS  <NA>   0.32       4.0  0.19   2.0       3.6       4.3
- 7 s(x2)  TPRS  <NA>   0.33       3.6  0.20   2.0       3.2       4.0
- 8 s(x2)  TPRS  <NA>   0.34       3.2  0.20   2.0       2.9       3.6
- 9 s(x2)  TPRS  <NA>   0.35       2.9  0.20   2.0       2.5       3.3
-10 s(x2)  TPRS  <NA>   0.36       2.5  0.19   2.0       2.1       2.9
+   .smooth .type .by      x2 .estimate   .se .crit .lower_ci .upper_ci
+   <chr>   <chr> <chr> <dbl>     <dbl> <dbl> <dbl>     <dbl>     <dbl>
+ 1 s(x2)   TPRS  <NA>   0.26       5.3  0.18   2.0       5.0       5.7
+ 2 s(x2)   TPRS  <NA>   0.27       5.1  0.18   2.0       4.8       5.5
+ 3 s(x2)   TPRS  <NA>   0.28       4.9  0.18   2.0       4.6       5.3
+ 4 s(x2)   TPRS  <NA>   0.29       4.6  0.18   2.0       4.3       5.0
+ 5 s(x2)   TPRS  <NA>   0.30       4.3  0.19   2.0       3.9       4.7
+ 6 s(x2)   TPRS  <NA>   0.32       4.0  0.19   2.0       3.6       4.3
+ 7 s(x2)   TPRS  <NA>   0.33       3.6  0.20   2.0       3.2       4.0
+ 8 s(x2)   TPRS  <NA>   0.34       3.2  0.20   2.0       2.9       3.6
+ 9 s(x2)   TPRS  <NA>   0.35       2.9  0.20   2.0       2.5       3.3
+10 s(x2)   TPRS  <NA>   0.36       2.5  0.19   2.0       2.1       2.9
 # i 40 more rows
 > ## Don't show: 
 > options(op)
@@ -1614,11 +1614,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55f843048450>
+<environment: 0x560557e03140>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55f843048450>
+<environment: 0x560557e03140>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2495,35 +2495,35 @@ detaching ‘package:mgcv’
 > ## evaluate all smooths
 > smooth_estimates(m1)
 # A tibble: 400 x 9
-   smooth type  by    .estimate      .se         x0    x1    x2    x3
-   <chr>  <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl> <dbl> <dbl>
- 1 s(x0)  TPRS  <NA>  -0.966542 0.316118 0.00710904    NA    NA    NA
- 2 s(x0)  TPRS  <NA>  -0.925391 0.297170 0.0171157     NA    NA    NA
- 3 s(x0)  TPRS  <NA>  -0.884233 0.279256 0.0271224     NA    NA    NA
- 4 s(x0)  TPRS  <NA>  -0.843050 0.262594 0.0371291     NA    NA    NA
- 5 s(x0)  TPRS  <NA>  -0.801824 0.247376 0.0471358     NA    NA    NA
- 6 s(x0)  TPRS  <NA>  -0.760536 0.233728 0.0571425     NA    NA    NA
- 7 s(x0)  TPRS  <NA>  -0.719175 0.221701 0.0671492     NA    NA    NA
- 8 s(x0)  TPRS  <NA>  -0.677736 0.211261 0.0771559     NA    NA    NA
- 9 s(x0)  TPRS  <NA>  -0.636220 0.202303 0.0871626     NA    NA    NA
-10 s(x0)  TPRS  <NA>  -0.594641 0.194685 0.0971693     NA    NA    NA
+   .smooth .type .by   .estimate      .se         x0    x1    x2    x3
+   <chr>   <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl> <dbl> <dbl>
+ 1 s(x0)   TPRS  <NA>  -0.966542 0.316118 0.00710904    NA    NA    NA
+ 2 s(x0)   TPRS  <NA>  -0.925391 0.297170 0.0171157     NA    NA    NA
+ 3 s(x0)   TPRS  <NA>  -0.884233 0.279256 0.0271224     NA    NA    NA
+ 4 s(x0)   TPRS  <NA>  -0.843050 0.262594 0.0371291     NA    NA    NA
+ 5 s(x0)   TPRS  <NA>  -0.801824 0.247376 0.0471358     NA    NA    NA
+ 6 s(x0)   TPRS  <NA>  -0.760536 0.233728 0.0571425     NA    NA    NA
+ 7 s(x0)   TPRS  <NA>  -0.719175 0.221701 0.0671492     NA    NA    NA
+ 8 s(x0)   TPRS  <NA>  -0.677736 0.211261 0.0771559     NA    NA    NA
+ 9 s(x0)   TPRS  <NA>  -0.636220 0.202303 0.0871626     NA    NA    NA
+10 s(x0)   TPRS  <NA>  -0.594641 0.194685 0.0971693     NA    NA    NA
 # i 390 more rows
 > 
 > ## or selected smooths
 > smooth_estimates(m1, smooth = c("s(x0)", "s(x1)"))
 # A tibble: 200 x 7
-   smooth type  by    .estimate      .se         x0    x1
-   <chr>  <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl>
- 1 s(x0)  TPRS  <NA>  -0.966542 0.316118 0.00710904    NA
- 2 s(x0)  TPRS  <NA>  -0.925391 0.297170 0.0171157     NA
- 3 s(x0)  TPRS  <NA>  -0.884233 0.279256 0.0271224     NA
- 4 s(x0)  TPRS  <NA>  -0.843050 0.262594 0.0371291     NA
- 5 s(x0)  TPRS  <NA>  -0.801824 0.247376 0.0471358     NA
- 6 s(x0)  TPRS  <NA>  -0.760536 0.233728 0.0571425     NA
- 7 s(x0)  TPRS  <NA>  -0.719175 0.221701 0.0671492     NA
- 8 s(x0)  TPRS  <NA>  -0.677736 0.211261 0.0771559     NA
- 9 s(x0)  TPRS  <NA>  -0.636220 0.202303 0.0871626     NA
-10 s(x0)  TPRS  <NA>  -0.594641 0.194685 0.0971693     NA
+   .smooth .type .by   .estimate      .se         x0    x1
+   <chr>   <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl>
+ 1 s(x0)   TPRS  <NA>  -0.966542 0.316118 0.00710904    NA
+ 2 s(x0)   TPRS  <NA>  -0.925391 0.297170 0.0171157     NA
+ 3 s(x0)   TPRS  <NA>  -0.884233 0.279256 0.0271224     NA
+ 4 s(x0)   TPRS  <NA>  -0.843050 0.262594 0.0371291     NA
+ 5 s(x0)   TPRS  <NA>  -0.801824 0.247376 0.0471358     NA
+ 6 s(x0)   TPRS  <NA>  -0.760536 0.233728 0.0571425     NA
+ 7 s(x0)   TPRS  <NA>  -0.719175 0.221701 0.0671492     NA
+ 8 s(x0)   TPRS  <NA>  -0.677736 0.211261 0.0771559     NA
+ 9 s(x0)   TPRS  <NA>  -0.636220 0.202303 0.0871626     NA
+10 s(x0)   TPRS  <NA>  -0.594641 0.194685 0.0971693     NA
 # i 190 more rows
 > ## Don't show: 
 > options(op)
@@ -2696,7 +2696,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  36.697 0.348 36.368 0 0 
+Time elapsed:  35.665 0.305 35.441 0 0 
 > grDevices::dev.off()
 null device 
           1 
