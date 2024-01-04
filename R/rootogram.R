@@ -87,9 +87,9 @@
                       type = "response")
     fitted <- purrr::map_dfc(bin, .f = dpois, lambda = lambda)
     fitted <- colSums(fitted)
-    tibble(bin = bin,
-           observed = as.integer(obs[seq_along(bin)]),
-           fitted = fitted)
+    tibble(.bin = bin,
+           .observed = as.integer(obs[seq_along(bin)]),
+           .fitted = fitted)
 }
 
 #' @importFrom purrr map_dfc
@@ -110,9 +110,9 @@
     theta <- nb_theta(model)
     fitted <- purrr::map_dfc(bin, .f = dnbinom, mu = mu, size = theta)
     fitted <- colSums(fitted)
-    df <- tibble(bin = bin,
-                 observed = as.integer(obs[seq_along(bin)]),
-                 fitted = fitted)
+    df <- tibble(.bin = bin,
+                 .observed = as.integer(obs[seq_along(bin)]),
+                 .fitted = fitted)
     attr(df, "theta") <- theta
     df
 }
@@ -140,9 +140,9 @@
     fitted <- pdf[, seq(1, nc - 1, by = 1L)]
     fitted[] <- pdf[, seq(2, nc, by = 1L)] - pdf[, seq(1, nc - 1, by = 1L)]
     fitted <- colSums(fitted)
-    df <- tibble::tibble(bin = bin[-nc],
-                         observed = obs,
-                         fitted = fitted)
+    df <- tibble::tibble(.bin = bin[-nc],
+                         .observed = obs,
+                         .fitted = fitted)
     attr(df, "sigma") <- sigma
     attr(df, "mid") <- mid
     attr(df, "width") <- diff(h$breaks)
@@ -224,8 +224,8 @@
     if (is.null(ylab)) {
         ylab <- if (as.logical(sqrt)) {
             object <- mutate(object,
-                             observed = sqrt(.data$observed),
-                             fitted = sqrt(.data$fitted))
+                             .observed = sqrt(.data$.observed),
+                             .fitted = sqrt(.data$.fitted))
             expression(sqrt(Frequency))
         } else {
             "Frequency"
@@ -250,22 +250,22 @@
     }
 
     object <- mutate(object,
-                     x_low = .data$bin - width,
-                     x_high = .data$bin + width)
+                     x_low = .data$.bin - width,
+                     x_high = .data$.bin + width)
 
     nr <- nrow(object)
     object <- if (type == "hanging") {
         mutate(object,
-               y_bot = .data$fitted - .data$observed,
-               y_top = .data$y_bot + .data$observed)
+               y_bot = .data$.fitted - .data$.observed,
+               y_top = .data$y_bot + .data$.observed)
     } else if (type == "suspended") {
         mutate(object,
                y_bot = rep(0, nr),
-               y_top = .data$fitted - .data$observed)
+               y_top = .data$.fitted - .data$.observed)
     } else {
         mutate(object,
                y_bot = rep(0, nr),
-               y_top = .data$y_bot + .data$observed)
+               y_top = .data$y_bot + .data$.observed)
     }
 
     plt <- ggplot(object) +
@@ -274,11 +274,11 @@
                       ymin = .data$y_bot,
                       ymax = .data$y_top),
                   fill = bar_fill, col = bar_colour) +
-        geom_line(aes(x = .data$bin,
-                      y = .data$fitted),
+        geom_line(aes(x = .data$.bin,
+                      y = .data$.fitted),
                   colour = fitted_colour, linewidth = 1) +
-        geom_point(aes(x = .data$bin,
-                       y = .data$fitted),
+        geom_point(aes(x = .data$.bin,
+                       y = .data$.fitted),
                    colour = fitted_colour, size = 2.5)
 
     if (as.logical(ref_line) & type != "standing") {
