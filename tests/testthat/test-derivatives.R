@@ -19,7 +19,7 @@ test_that("derivatives() fails with inappropriate args", {
                  fixed = TRUE)
 })
 
-deriv_nms <- c(".smooth", ".by_var", ".fs_var", ".derivative", ".se", ".crit",
+deriv_nms <- c(".smooth", ".by", ".fs", ".derivative", ".se", ".crit",
     ".lower_ci", ".upper_ci")
 
 test_that("derivatives() returns derivatives for all smooths in a GAM", {
