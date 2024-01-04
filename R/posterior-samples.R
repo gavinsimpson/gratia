@@ -408,18 +408,18 @@
 #'   For the `"gam"` method, the columns currently returned (not in this order)
 #'   are:
 #'
-#' * `smooth`; character vector. Indicates the smooth function for that
+#' * `.smooth`; character vector. Indicates the smooth function for that
 #'     particular draw,
-#' * `term`; character vector. Similar to `smooth`, but will contain the
+#' * `.term`; character vector. Similar to `smooth`, but will contain the
 #'     full label for the smooth, to differentiate factor-by smooths for
 #'     example.
-#' * `by_variable`; character vector. If the smooth involves a `by` term, the
+#' * `.by`; character vector. If the smooth involves a `by` term, the
 #'     by variable will be named here, `NA_character_` otherwise.
-#' * `row`; integer. A vector of values `seq_len(n_vals)`, repeated if
+#' * `.row`; integer. A vector of values `seq_len(n_vals)`, repeated if
 #'     `n > 1L`. Indexes the row in `data` for that particular draw.
-#' * `draw`; integer. A vector of integer values indexing the particular
+#' * `.draw`; integer. A vector of integer values indexing the particular
 #'     posterior draw that each row belongs to.
-#' * `value`; numeric. The value of smooth function for this posterior draw
+#' * `.value`; numeric. The value of smooth function for this posterior draw
 #'     and covariate combination.
 #' * `xxx`; numeric. A series of one or more columns containing data required
 #'     for the smooth, named as per the variables involved in the respective
@@ -570,33 +570,54 @@
         colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
         simu <- as_tibble(simu)
         nr_simu <- nrow(simu)
-        is_fac_by <- is_factor_by_smooth(sm)
-        if (is_fac_by) {
-            simu <- add_factor_by_data(simu, n = n_vals,
-                                       by_name = by_variable(sm),
-                                       by_data = data, before = 1L)
-        } else {
-            simu <- add_column(simu,
-                               by_variable = rep(NA_character_,
-                                                 times = nr_simu))
-        }
+        # is_fac_by <- is_factor_by_smooth(sm)
+        # if (is_fac_by) {
+        #     simu <- add_factor_by_data(simu, n = n_vals,
+        #                                by_name = by_variable(sm),
+        #                                by_data = data, before = 1L)
+        # } else {
+        #     simu <- add_column(simu,
+        #                        by_variable = rep(NA_character_,
+        #                                          times = nr_simu))
+        # }
+        # # add on spline type info
+        # sm_type <- smooth_type(sm)
+        # simu <- add_column(simu,
+        #     smooth = rep(unlist(lapply(strsplit(S[[i]], ":"), `[`, 1L)),
+        #     nr_simu),
+        #     term = rep(S[[i]], each = nr_simu),
+        #     type = rep(sm_type, nr_simu),
+        #     row = seq_len(nr_simu),
+        #     .after = 0L)
+        # simu <- bind_cols(simu, data[smooth_variable(sm)])
+        # simu <- pivot_longer(simu, cols = dplyr::starts_with("..V"),
+        #     names_to = "draw", values_to = "value",
+        #     names_transform = \(x) as.integer(sub("\\.\\.V", "", x)))
+
+        # ## nest all columns with varying data
+        # simu <- nest(simu, data = all_of(c("row", "draw", "value",
+        #     smooth_variable(sm))))
+        simu <- add_by_data(simu, by_name = by_variable(sm), by_data = data,
+            before = 1L)
         # add on spline type info
         sm_type <- smooth_type(sm)
         simu <- add_column(simu,
-            smooth = rep(unlist(lapply(strsplit(S[[i]], ":"), `[`, 1L)),
+            .smooth = rep(unlist(lapply(strsplit(S[[i]], ":"), `[`, 1L)),
             nr_simu),
-            term = rep(S[[i]], each = nr_simu),
-            type = rep(sm_type, nr_simu),
-            row = seq_len(nr_simu),
+            .term = rep(S[[i]], each = nr_simu),
+            .type = rep(sm_type, nr_simu),
+            .row = seq_len(nr_simu),
             .after = 0L)
         simu <- bind_cols(simu, data[smooth_variable(sm)])
         simu <- pivot_longer(simu, cols = dplyr::starts_with("..V"),
-            names_to = "draw", values_to = "value",
+            names_to = ".draw", values_to = ".value",
             names_transform = \(x) as.integer(sub("\\.\\.V", "", x)))
-
+        simu <- relocate(simu, names(data), .after = last_col()) |>
+            relocate(".by", .after = 3L)
         ## nest all columns with varying data
-        simu <- nest(simu, data = all_of(c("row", "draw", "value",
-            smooth_variable(sm))))
+        simu <- nest(simu, data = all_of(c(".row", ".draw", ".value",
+            vars_in_smooth(sm))))
+
         sims[[i]] <- simu
     }
 
@@ -736,33 +757,35 @@
         colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
         simu <- as_tibble(simu)
         nr_simu <- nrow(simu)
-        is_fac_by <- is_factor_by_smooth(sm)
-        if (is_fac_by) {
-            simu <- add_factor_by_data(simu, n = n_vals,
-                                       by_name = by_variable(sm),
-                                       by_data = data, before = 1L)
-        } else {
-            simu <- add_column(simu,
-                               by_variable = rep(NA_character_,
-                                                 times = nr_simu))
-        }
+        #is_fac_by <- is_factor_by_smooth(sm)
+        # if (is_fac_by)) {
+        #     simu <- add_factor_by_data(simu, n = n_vals,
+        #                                by_name = by_variable(sm),
+        #                                by_data = data, before = 1L)
+        # } else {
+        #     simu <- add_by_var_column(simu, n = nr_simu,
+        #         by_var = by_variable(sm))
+        # }
+        simu <- add_by_data(simu, by_name = by_variable(sm), by_data = data,
+            before = 1L)
         # add on spline type info
         sm_type <- smooth_type(sm)
         simu <- add_column(simu,
-            smooth = rep(unlist(lapply(strsplit(S[[i]], ":"), `[`, 1L)),
+            .smooth = rep(unlist(lapply(strsplit(S[[i]], ":"), `[`, 1L)),
             nr_simu),
-            term = rep(S[[i]], each = nr_simu),
-            type = rep(sm_type, nr_simu),
-            row = seq_len(nr_simu),
+            .term = rep(S[[i]], each = nr_simu),
+            .type = rep(sm_type, nr_simu),
+            .row = seq_len(nr_simu),
             .after = 0L)
         simu <- bind_cols(simu, data[smooth_variable(sm)])
         simu <- pivot_longer(simu, cols = dplyr::starts_with("..V"),
-            names_to = "draw", values_to = "value",
+            names_to = ".draw", values_to = ".value",
             names_transform = \(x) as.integer(sub("\\.\\.V", "", x)))
-
+        simu <- relocate(simu, names(data), .after = last_col()) |>
+            relocate(".by", .after = 3L)
         ## nest all columns with varying data
-        simu <- nest(simu, data = all_of(c("row", "draw", "value",
-            smooth_variable(sm))))
+        simu <- nest(simu, data = all_of(c(".row", ".draw", ".value",
+            vars_in_smooth(sm))))
         sims[[i]] <- simu
     }
 

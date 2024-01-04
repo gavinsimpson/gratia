@@ -51,10 +51,11 @@
 #' @importFrom tibble add_column
 `add_missing_by_info_to_smooth` <- function(smooth) {
     smooth <- add_column(smooth,
-                         by_variable = factor(rep(NA_character_, nrow(smooth))),
-                         .after = 1L)
+        by_variable = factor(rep(NA_character_, nrow(smooth))),
+        .after = 1L)
 }
 
+## !! Only affects evaluate_smooth()
 #' @importFrom tibble add_column
 `add_by_var_info_to_smooth` <- function(smooth, by_name, by_data, n) {
     nc <- NCOL(smooth)
@@ -99,21 +100,42 @@ add_smooth_var_data <- function(x, vars, data) {
 ##
 #' @importFrom tibble add_column
 #' @importFrom rlang !! :=
-add_factor_by_data <- function(x, n = NULL, by_name, by_data, before = 1L) {
+`add_by_data` <- function(x, n = NULL, by_name, by_data, before = 1L) {
     ## n is number of observations to add
     ## by_name should be the name of the factor variable, which should
     ## be in by_data, a data frame/tibble of data used to create `x`
     if (is.null(n)) {
         n <- NROW(x)
     }
-    if (is.factor(by_data[[by_name]])) {
-        x <- add_column(x, by_variable = rep(by_name, times = n),
-                        .before = before)
-        x <- add_column(x, !!(by_name) := by_data[[by_name]],
-                        .after = before)
-    } else {
-        x <- add_column(x, by_variable = rep(NA_character_, times = n),
-                        .before = before)
+
+    # check if by_name is "NA" ! yes, that's how Simon stores it
+    if (by_name == "NA") {
+        by_name <- NA_character_
+    }
+
+    # add on the by variable info
+    x <- add_by_var_column(x, by_var = by_name, n = n)
+
+    if (!is.na(by_name)) { # no longer "NA" remember
+        x <- add_column(x, !!(by_name) := by_data[[by_name]], .after = before)
     }
     x
+}
+
+# !! newer, used in several eval_smooth methods
+#' @importFrom tibble add_column
+`add_by_var_column` <- function(object, by_var, n = NULL) {
+    if (is.null(n)) {
+        n <- NROW(object)
+    }
+    add_column(object, .by = rep(by_var, times = n), .after = 1L)
+}
+
+# !! newer, used in several eval_smooth methods
+#' @importFrom tibble add_column
+`add_smooth_type_column` <- function(object, sm_type, n = NULL) {
+    if (is.null(n)) {
+        n <- NROW(object)
+    }
+    add_column(object, .type = rep(sm_type, times = n), .after = 1L)
 }

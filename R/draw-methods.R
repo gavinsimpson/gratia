@@ -641,17 +641,17 @@
     scales <- match.arg(scales)
 
     ## select smooths
-    S <- unique(object[["term"]])
+    S <- unique(object[[".term"]])
     select <- check_user_select_smooths(smooths = S, select = select,
                                         partial_match = partial_match)
     S <- S[select]
-    object <- filter(object, .data$term %in% S)
+    object <- filter(object, .data$.term %in% S)
 
     ## can only plot 1d smooths - currently - prune S but how?
     ## FIXME
 
     do_plot_smooths <- function(i, object, ...) {
-        object <- filter(object, .data$term == i)
+        object <- filter(object, .data$.term == i)
         draw_posterior_smooths(object, ...)
     }
 
@@ -664,7 +664,7 @@
                 contour_col = contour_col, angle = angle)
 
     if (isTRUE(identical(scales, "fixed"))) {
-        ylims <- range(object[["value"]])
+        ylims <- range(object[[".value"]])
 
         p <- seq_along(plts)
         for (i in p) {
@@ -703,12 +703,12 @@
         on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
     }
 
-    xvars <- unique(object[["term"]])
+    xvars <- unique(object[[".term"]])
     xvars <- vars_from_label(xvars)
     n_xvars <- length(xvars)
 
     ## randomly sample n_samples from the posterior draws
-    n_draws <- max(object[["draw"]]) # how many draws?
+    n_draws <- max(object[[".draw"]]) # how many draws?
     max_plts <- 16L
 
     # if n_samples null, user didn't specify how many, set to maximum
@@ -729,9 +729,9 @@
     # if we're plotting fewer than n_draws samples, randomly sample the draws
     # to plot
     if (n_samples < n_draws) {
-        draws <- unique(object[["draw"]])
+        draws <- unique(object[[".draw"]])
         draws <- sample(draws, n_samples)
-        object <- filter(object, .data$draw %in% draws)
+        object <- filter(object, .data$.draw %in% draws)
     }
 
     plt <- if (identical(n_xvars, 1L)) {
@@ -768,11 +768,11 @@
                                         title = NULL, subtitle = NULL,
                                         caption = NULL, rug = TRUE, alpha = 1,
                                         colour = "black", angle = NULL) {
-    smooth_var <- vars_from_label(object[1L, "smooth"])
+    smooth_var <- vars_from_label(object[1L, ".smooth"])
 
     plt <- ggplot(object, aes(x = .data[[smooth_var]],
-                              y = .data[["value"]],
-                              group = .data[["draw"]])) +
+                              y = .data[[".value"]],
+                              group = .data[[".draw"]])) +
         geom_line(alpha = alpha, colour = colour) +
         guides(x = guide_axis(angle = angle))
 
@@ -784,13 +784,13 @@
         ylab <- "Partial effect"
     }
     if (is.null(title)) {
-        title <- unique(object[["term"]])
+        title <- unique(object[[".term"]])
     }
-    if (all(!is.na(object[["by_variable"]]))) {
+    if (all(!is.na(object[[".by"]]))) {
         spl <- strsplit(title, split = ":")
         title <- spl[[1L]][[1L]]
         if (is.null(subtitle)) {
-            by_var <- as.character(unique(object[["by_variable"]]))
+            by_var <- as.character(unique(object[[".by"]]))
             subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
         }
     }
@@ -823,7 +823,7 @@
                                         subtitle = NULL,
                                         caption = NULL,
                                         angle = NULL) {
-    xvars <- unique(object[["term"]])
+    xvars <- unique(object[[".term"]])
     xvars <- vars_from_label(xvars)
 
     if (is.null(xlab)) {
@@ -833,8 +833,8 @@
         ylab <- xvars[2]
     }
     if (is.null(title)) {
-        sm_label <- unique(object$smooth)
-        by_var <- unique(object$by_variable)
+        sm_label <- unique(object$.smooth)
+        by_var <- unique(object$.by)
         ## fix this so it knows about the level
         title <- if (is.na(by_var)) {
             sm_label
@@ -846,11 +846,11 @@
     ## plot
     plt <- ggplot(object, aes(x = .data[[xvars[1L]]],
                               y = .data[[xvars[2L]]])) +
-        geom_raster(aes(fill = .data[["value"]])) +
+        geom_raster(aes(fill = .data[[".value"]])) +
         guides(x = guide_axis(angle = angle))
 
     if (contour) {
-        plt <- plt + geom_contour(aes(z = .data[["value"]]),
+        plt <- plt + geom_contour(aes(z = .data[[".value"]]),
                                       bins = n_contour,
                                   colour = contour_col)
     }
@@ -862,10 +862,10 @@
     plt <- plt + scale_fill_distiller(palette = "RdBu", type = "div")
 
     # facet by the draw column
-    plt <- plt + facet_wrap(~ draw)
+    plt <- plt + facet_wrap(~ .draw)
 
     ## Set the limits for the fill
-    guide_limits <- c(-1, 1) * max(abs(object[["value"]]))
+    guide_limits <- c(-1, 1) * max(abs(object[[".value"]]))
     plt <- plt + expand_limits(fill = guide_limits)
 
     # add guide
@@ -875,7 +875,7 @@
                                       barheight = grid::unit(0.25, "npc")))
 
     # if isotropic smooth, fix aspect ratio
-    if (any(str_detect(unique(object$type),
+    if (any(str_detect(unique(object$.type),
                        c("^TPRS", "^Duchon", "^GP", "^SOS")))) {
         plt <- plt + coord_equal()
     }
