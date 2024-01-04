@@ -7,6 +7,7 @@
 \method{draw}{penalty_df}(
   object,
   normalize = FALSE,
+  as_matrix = TRUE,
   continuous_fill = NULL,
   xlab = NULL,
   ylab = NULL,
@@ -23,6 +24,10 @@
 \item{object}{an object, the result of a call to \code{\link[=evaluate_smooth]{evaluate_smooth()}}.}
 
 \item{normalize}{logical; normalize the penalty to the range -1, 1?}
+
+\item{as_matrix}{logical; how should the plotted penalty matrix be oriented?
+If \code{TRUE} row 1, column 1 of the penalty matrix is draw in the upper left,
+whereas, if \code{FALSE} it is drawn in the lower left of the plot.}
 
 \item{continuous_fill}{suitable scale used for the filled surface. If \code{NULL},
 the default used is \code{scale_fill_distiller(palette = "RdBu", type = "div")}.}
