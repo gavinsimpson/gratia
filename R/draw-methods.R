@@ -82,10 +82,10 @@
         take <- object[[".smooth"]] == sm[i]
         df <- object[take, ]
         xvar <- vars_from_label(unique(df[[".smooth"]])) # unique(df[['var']])
-        plt <- if (!all(is.na(df$.fs_var))) {
+        plt <- if (!all(is.na(df$.fs))) {
             ggplot(df, aes(x = .data[[xvar]], #.data$data,
                            y = .data$.derivative,
-                           group = .data$.fs_var))
+                           group = .data$.fs))
         } else {
             ggplot(df, aes(x = .data[[xvar]], #.data$data,
                            y = .data$.derivative)) +
@@ -157,10 +157,10 @@
         take <- object[[".smooth"]] == sm[i]
         df <- object[take, ]
         xvar <- unique(df[[".focal"]])
-        plt <- if (!all(is.na(df$.fs_var))) {
+        plt <- if (!all(is.na(df$.fs))) {
             ggplot(df, aes(x = .data[[xvar]],
                            y = .data$.partial_deriv,
-                           group = .data$.fs_var))
+                           group = .data$.fs))
         } else {
             ggplot(df, aes(x = .data[[xvar]],
                            y = .data$.partial_deriv)) +
