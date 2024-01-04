@@ -86,7 +86,7 @@
         paras <- smooth_coef_indices(object[["smooth"]][[sm_ids[i]]])
         edf_out[i] <- sum(edf_vec[paras])
     }
-    edf_out <- tibble(smooth = sm_labs, edf = edf_out)
+    edf_out <- tibble(.smooth = sm_labs, .edf = edf_out)
     edf_out
 }
 
@@ -112,7 +112,7 @@
                    sum = TRUE, type = type)
 
     ## prepare output tibble
-    tibble(model = model_names, edf = edfs)
+    tibble(.model = model_names, .edf = edfs)
 }
 
 `extract_edf` <- function(object, type = "default", sum = FALSE, ...) {

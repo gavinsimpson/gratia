@@ -209,8 +209,8 @@
 <polyline points='39.83,292.27 42.57,292.27 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <polyline points='39.83,253.94 42.57,253.94 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <polyline points='39.83,215.60 42.57,215.60 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<text x='347.08' y='415.07' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='22.00px' lengthAdjust='spacingAndGlyphs'>term</text>
-<text transform='translate(13.05,292.27) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='19.56px' lengthAdjust='spacingAndGlyphs'>with</text>
+<text x='347.08' y='415.07' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='25.67px' lengthAdjust='spacingAndGlyphs'>Term</text>
+<text transform='translate(13.05,292.27) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='22.00px' lengthAdjust='spacingAndGlyphs'>With</text>
 <rect x='662.55' y='241.41' width='51.98' height='101.73' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
 <image width='17.28' height='86.40' x='662.55' y='256.74' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAAv0lEQVQ4jZWSwRXDMAhDVQ/X/efIECUHN8YIgV8ufiagL8CBXV8bZh/8DwADHm4HMAxPCANYxsWzrssmNwheiYJozXkdatZBUZRvwCcy1eEInUP3vvkbarJqCHFhDqU53hsJymERPrRlxbYNT1hL8fDhcfG6IdYdLIWbpHDCZRbw9B7LiCkH3ywrl6O7iruqZJwVYzX7E2E170lRWO5NOnT9KtsLUtb2XugtOSsBnUI1ZKohcUv/VdAqxU/0V91u2p/20u7o8yMAAAAASUVORK5CYII='/>
 <text x='685.30' y='324.50' style='font-size: 8.80px; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.25</text>

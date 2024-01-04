@@ -36,7 +36,5 @@
 #' @export
 #' @rdname basis_size
 `basis_size.gamm` <- function(object, ...) {
-    dims <- vapply(object$gam$smooth, basis_size, double(1))
-    dims <- setNames(dims, smooths(object$gam))
-    dims
+    basis_size(object$gam)
 }
