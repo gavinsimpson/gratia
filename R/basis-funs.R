@@ -324,6 +324,7 @@
     ## If we have a factor by smooth, the model matrix `X` contains 0 everywhere
     ##   that an observation is not from the level for the selected smooth.
     ## Here we filter out those observations from `X` and the `data`
+    by_var <- NA_character_
     if (is_by_fac) {
         by_var <- by_variable(smooth)
         by_lev <- by_level(smooth)
@@ -339,34 +340,34 @@
 
     ## convert to long-form; select the first nfun cols to be gathered,
     ##   rest should be the variable(s) involved in the smooth
-    tbl <- tbl %>%
-        pivot_longer(seq_len(nfun), names_to = "bf", values_to = "value") %>%
-        mutate(bf = factor(.data[["bf"]], levels = seq_len(nfun)))
+    tbl <- tbl |>
+        pivot_longer(seq_len(nfun), names_to = ".bf", values_to = ".value") |>
+        mutate(.bf = factor(.data[[".bf"]], levels = seq_len(nfun)))
 
     ## reorder cols so we have the basis function & value first, data last
-    tbl <- select(tbl, matches("bf"), matches("value"), everything())
+    tbl <- select(tbl, matches(".bf"), matches(".value"), everything())
 
     ## Add on an identifier for the smooth
-    tbl <- add_column(tbl, smooth = smooth_label(smooth), .before = 1L)
+    tbl <- add_column(tbl, .smooth = smooth_label(smooth), .before = 1L)
 
     ## Need a column for by smooths; will be NA for most smooths
-    by_var <- rep(NA_character_, length = nrow(tbl))
+    by_var_vec <- rep(NA_character_, length = nrow(tbl))
     if (is_by_smooth(smooth)) {
-        by_var <- rep(by_variable(smooth), length = nrow(tbl))
+        by_var_vec <- rep(by_var, length = nrow(tbl))
         ## If we have a factor by we need to store the factor. Not needed
         ##   for other by variable smooths.
         if (is_by_fac) {
-            tbl <- add_column(tbl, ..xx.. = rep(by_level(smooth), nrow(tbl)))
-            names(tbl)[NCOL(tbl)] <- by_variable(smooth)
+            tbl <- add_column(tbl,
+                {{ by_var }} := rep(by_level(smooth), nrow(tbl)))
+            names(tbl)[NCOL(tbl)] <- by_var
         }
     }
 
-    ## actually add on the by variable info
-    tbl <- add_column(tbl, by_variable = by_var, .after = 1L)
+    # add add on the by variable info
+    tbl <- add_by_var_column(tbl, by_var = by_var)
 
     # add on the smooth type
-    sm_type <- rep(smooth_type(smooth), length.out = nrow(tbl))
-    tbl <- add_column(tbl, type = sm_type, .after = 1L)
+    tbl <- add_smooth_type_column(tbl, sm_type = smooth_type(smooth))
 
     ## class this up
     class(tbl) <- append(class(tbl), gsub("\\.", "_", class(smooth)),
