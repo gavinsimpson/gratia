@@ -64,6 +64,7 @@
                      pairwise = pairwise, ...)
 }
 
+#' @importFrom rlang .data
 `pairwise_concurvity` <- function(model, terms = everything(),
                                   type) {
     con <- concurvity(model, full = FALSE)
@@ -72,67 +73,76 @@
     nc <- length(nms)
     wrap_as_data_frame <- function(m) {
         df <- as.data.frame(m)
-        rownames_to_column(df, "term")
+        rownames_to_column(df, ".term")
     }
     con <- lapply(con, wrap_as_data_frame)
     con <- unname(con)
-    con <- bind_rows(con) %>%
-      as_tibble() %>%
-      add_column(type = rep(type_nms, each = nc), .before = 1L)
+    con <- bind_rows(con) |>
+        as_tibble() |>
+        add_column(.type = rep(type_nms, each = nc), .before = 1L)
     if (type != "all") {
-        con <- con %>% filter(type == type)
+        con <- con |> filter(.data[[".type"]] == type)
     }
-    con <- con %>%
-      pivot_longer(-c("type", "term"), names_to = "with",
-                   values_to = "concurvity")
+    con <- con |>
+        pivot_longer(-c(".type", ".term"), names_to = ".with",
+            values_to = ".concurvity")
     class(con) <- c("pairwise_concurvity", "concurvity", class(con))
     con
 }
 
-`overall_concurvity` <- function(model, terms = everything(),
-                                 type) {
+#' @importFrom rlang .data
+`overall_concurvity` <- function(model, terms = everything(), type) {
     con <- concurvity(model, full = TRUE)
     con <- as.data.frame(con)
-    con <- rownames_to_column(con, "type")
+    con <- rownames_to_column(con, ".type")
     con <- as_tibble(con)
     if (type != "all") {
-        con <- con %>%
-          filter(type == type)
+        con <- con |>
+            filter(.data[[".type"]] == type)
     }
     con <- con %>%
-      pivot_longer(-c("type"), names_to = "term",
-                   values_to = "concurvity")
+        pivot_longer(-c(".type"), names_to = ".term",
+            values_to = ".concurvity")
     class(con) <- c("overall_concurvity", "concurvity", class(con))
     con
 }
 
+#' Plot concurvity measures
+#'
+#' @param object An object inheriting from class `"concurvity"`, usually the
+#'   result of a call to [model_concurvity()] or its abbreviated form
+#'   [concrvity()].
+#' @param x_lab character; the label for the x axis.
+#' @param y_lab character; the label for the y axis.
+#' @param title character; the plot title.
+#' @param subtitle character; the plot subtitle.
+#' @param caption character; the plot caption
+#' @param fill_lab character; the label to use for the fill guide.
+#' @param continuous_colour function; continuous colour (fill) scale to use.
+#' @param bar_col colour specification for the bar colour.
+#' @param bar_fill colour specification for the bar fill
+#' @param ... arguments passed to other methods.
+#'
 #' @export
-`draw.concurvity` <- function(object, ...) {
-    plt <- draw_concurvity(object, ...)
-    plt
-}
-
-draw_concurvity <- function(object, ...) {
-    UseMethod("draw_concurvity")
-}
-
 #' @importFrom ggplot2 ggplot aes geom_tile facet_wrap coord_equal labs
 #'   scale_fill_viridis_c
-`draw_concurvity.pairwise_concurvity` <-
-  function(object, title = "Smooth-wise concurvity",
+`draw.pairwise_concurvity` <- function(object,
+           title = "Smooth-wise concurvity",
            subtitle = NULL, caption = NULL,
+           x_lab = "Term", y_lab = "With",
+           fill_lab = "Concurvity",
            continuous_colour = NULL, ...) {
     plt <- ggplot(object,
-                  aes(x = .data[["term"]],
-                      y = .data[["with"]],
-                      group = .data[["type"]])) +
-      geom_tile(aes(fill = .data[["concurvity"]])) +
-      facet_wrap(vars(.data[["type"]])) +
+                  aes(x = .data[[".term"]],
+                      y = .data[[".with"]],
+                      group = .data[[".type"]])) +
+      geom_tile(aes(fill = .data[[".concurvity"]])) +
+      facet_wrap(vars(.data[[".type"]])) +
       coord_equal()
 
     plt <- plt +
-      labs(title = title, subtitle = subtitle, caption = caption,
-           fill = "Concurvity")
+      labs(x = x_lab, y = y_lab, title = title, subtitle = subtitle,
+      caption = caption, fill = fill_lab)
 
     if (is.null(continuous_colour)) {
         continuous_colour <- scale_fill_viridis_c(option = "cividis")
@@ -143,19 +153,21 @@ draw_concurvity <- function(object, ...) {
 }
 
 #' @importFrom ggplot2 ggplot aes geom_col facet_wrap labs
-`draw_concurvity.overall_concurvity` <-
-  function(object, title = "Overall concurvity",
-           subtitle = NULL, caption = NULL, ylab = "Concurvity",
-           xlab = NULL,
+#' @export
+#' @rdname draw.pairwise_concurvity
+`draw.overall_concurvity` <- function(object, title = "Overall concurvity",
+           subtitle = NULL, caption = NULL,
+           y_lab = "Concurvity",
+           x_lab = NULL,
            bar_col = "steelblue", bar_fill = "steelblue",
            ...) {
-    plt <- ggplot(object, aes(x = .data[["term"]],
-                              y = .data[["concurvity"]],
-                              group = .data[["type"]])) +
+    plt <- ggplot(object, aes(x = .data[[".term"]],
+                              y = .data[[".concurvity"]],
+                              group = .data[[".type"]])) +
       geom_col(colour = bar_col, fill = bar_fill) +
-      facet_wrap(vars(.data[["type"]])) +
-      labs(title = title, subtitle = subtitle, cpation = caption,
-           x = xlab, y = ylab)
+      facet_wrap(vars(.data[[".type"]])) +
+      labs(title = title, subtitle = subtitle, caption = caption,
+           x = x_lab, y = y_lab)
 
     plt
 }
