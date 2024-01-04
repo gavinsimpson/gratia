@@ -1157,46 +1157,46 @@ detaching ‘package:mgcv’
 > # extract the EDFs for all smooths
 > edf(m)
 # A tibble: 4 x 2
-  smooth    edf
-  <chr>   <dbl>
-1 s(x0)  3.4248
-2 s(x1)  3.2213
-3 s(x2)  7.9049
-4 s(x3)  1.8847
+  .smooth   .edf
+  <chr>    <dbl>
+1 s(x0)   3.4248
+2 s(x1)   3.2213
+3 s(x2)   7.9049
+4 s(x3)   1.8847
 > 
 > # or selected smooths
 > edf(m, smooth = c("s(x0)", "s(x2)"))
 # A tibble: 2 x 2
-  smooth    edf
-  <chr>   <dbl>
-1 s(x0)  3.4248
-2 s(x2)  7.9049
+  .smooth   .edf
+  <chr>    <dbl>
+1 s(x0)   3.4248
+2 s(x2)   7.9049
 > 
 > # accounting for smoothness parameter uncertainty
 > edf(m, type = "unconditional")
 # A tibble: 4 x 2
-  smooth    edf
-  <chr>   <dbl>
-1 s(x0)  3.7697
-2 s(x1)  3.8728
-3 s(x2)  8.0670
-4 s(x3)  2.8834
+  .smooth   .edf
+  <chr>    <dbl>
+1 s(x0)   3.7697
+2 s(x1)   3.8728
+3 s(x2)   8.0670
+4 s(x3)   2.8834
 > 
 > # over EDF of the model, including the intercept
 > model_edf(m)
 # A tibble: 1 x 2
-  model    edf
-  <chr>  <dbl>
-1 m     17.436
+  .model   .edf
+  <chr>   <dbl>
+1 m      17.436
 > 
 > # can get model EDF for multiple models
 > m2 <- gam(y ~ s(x0) + s(x1) + s(x3), data = df, method = "REML")
 > model_edf(m, m2)
 # A tibble: 2 x 2
-  model     edf
-  <chr>   <dbl>
-1 m     17.436 
-2 m2     7.5777
+  .model    .edf
+  <chr>    <dbl>
+1 m      17.436 
+2 m2      7.5777
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1615,11 +1615,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55fedaf93740>
+<environment: 0x55a7552effd8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55fedaf93740>
+<environment: 0x55a7552effd8>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2697,7 +2697,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  38.205 0.348 37.93 0 0 
+Time elapsed:  36.14 0.363 35.94 0 0 
 > grDevices::dev.off()
 null device 
           1 
