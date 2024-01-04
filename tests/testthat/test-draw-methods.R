@@ -533,7 +533,7 @@ test_that("draw works for sample_smooths objects rotated labels", {
         plt4)
 })
 
-test_that("draw works for sample_smooths objects", {
+test_that("draw works for smooth_samples objects", {
     skip_on_os("win")
     skip_on_os("mac")
     sm2 <- smooth_samples(su_m_bivar, n = 2, seed = 23478, n_vals = 50)

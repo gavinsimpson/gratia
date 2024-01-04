@@ -1593,16 +1593,6 @@ reclass_scam_smooth <- function(smooth) {
     list(betas = beta_z, se = se)
 }
 
-#' @importFrom tibble add_column
-`add_by_var_column` <- function(object, by_var) {
-    add_column(object, .by = rep(by_var, nrow(object)), .after = 1L)
-}
-
-#' @importFrom tibble add_column
-`add_smooth_type_column` <- function(object, sm_type) {
-    add_column(object, .type = rep(sm_type, nrow(object)), .after = 1L)
-}
-
 # my own version of a label_both to remove '.' prefix when plotting
 #' @importFrom stringr regex str_remove str_detect
 #' @importFrom rlang inject
@@ -1634,4 +1624,18 @@ reclass_scam_smooth <- function(smooth) {
             stringr::regex("^\\.")), collapse = ", "))
     }
     lapply(row, rep, nrow(labels) %||% length(labels[[1]]))
+}
+
+`vars_in_smooth` <- function(smooth) {
+    check_is_mgcv_smooth(smooth)
+
+    # if an mgcv smooth, continue
+    sm_vars <- smooth_variable(smooth)
+
+    # if this is a by smooth, append the by variable name
+    if (is_by_smooth(smooth)) {
+        sm_vars <- append(sm_vars, by_variable(smooth))
+    }
+
+    sm_vars
 }
