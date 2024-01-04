@@ -350,8 +350,8 @@
                          n_contour = 10,
                          contour_col = "black",
                          ...) {
-    sm <- unique(object[["smooth"]])
-    sm_l <- group_split(object, factor(.data$smooth, levels = sm))
+    sm <- unique(object[[".smooth"]])
+    sm_l <- group_split(object, factor(.data$.smooth, levels = sm))
     sm_plts <- map(sm_l,
         plot_basis,
         legend = legend,
@@ -398,7 +398,7 @@
                          contour_col = "black",
                          ...) {
     ## capture the univariate smooth variable
-    smooth_var <- vars_from_label(unique(object[["smooth"]]))
+    smooth_var <- vars_from_label(unique(object[[".smooth"]]))
     n_sms <- length(smooth_var)
 
     plt <- switch(n_sms,
@@ -423,17 +423,18 @@
                                     caption = NULL,
                                     angle = NULL,
                                     ...) {
-    smooth_var <- vars_from_label(unique(object[["smooth"]]))
+    sm_lab <- unique(object[[".smooth"]])
+    smooth_var <- vars_from_label(sm_lab)
 
     ## default labeller
     if (is.null(labeller)) {
-        labeller  <- label_both
+        labeller  <- prefix_label_both
     }
 
     ## basis plot
     plt <- ggplot(object, aes(x = .data[[smooth_var]],
-        y = .data[["value"]],
-        colour = .data[["bf"]])) +
+        y = .data[[".value"]],
+        colour = .data[[".bf"]])) +
         geom_line() +
         guides(x = guide_axis(angle = angle))
 
@@ -448,13 +449,13 @@
         title <- attr(object, "smooth_object")
         # if still null then this came from a model & we don't have the call
         if (is.null(title)) {
-            title <- unique(object[["smooth"]])
+            title <- sm_lab
         }
     }
 
     ## fixup for by variable smooths, facet for factor by smooths
-    if (all(!is.na(object[["by_variable"]]))) {
-        by_var_name <- unique(object[["by_variable"]])
+    if (all(!is.na(object[[".by"]]))) {
+        by_var_name <- unique(object[[".by"]])
         by_var <- object[[by_var_name]]
         if (is.character(by_var) || is.factor(by_var)) {
             plt <- plt + facet_wrap(by_var_name, labeller = labeller)
@@ -485,18 +486,19 @@
                                    n_contour = 10,
                                    contour_col = "black",
                                    ...) {
-    smooth_var <- vars_from_label(unique(object[["smooth"]]))
+    sm_lab <- unique(object[[".smooth"]])
+    smooth_var <- vars_from_label(sm_lab)
 
     ## default labeller
     if (is.null(labeller)) {
-        labeller  <- label_both
+        labeller  <- prefix_label_both
     }
 
     ## basis plot
     plt <- ggplot(object, aes(x = .data[[smooth_var[1]]],
         y = .data[[smooth_var[2]]],
-        fill = .data[["value"]],
-        group = .data[["bf"]])) +
+        fill = .data[[".value"]],
+        group = .data[[".bf"]])) +
         geom_raster() +
         guides(x = guide_axis(angle = angle, check.overlap = TRUE)) +
         scale_fill_distiller(palette = "RdBu", type = "div")
@@ -513,19 +515,22 @@
         title <- attr(object, "smooth_object")
         # if still null then this came from a model & we don't have the call
         if (is.null(title)) {
-            title <- unique(object[["smooth"]])
+            title <- sm_lab
         }
     }
 
     ## fixup for by variable smooths, facet for factor by smooths
-    if (all(!is.na(object[["by_variable"]]))) {
-        by_var_name <- unique(object[["by_variable"]])
+    if (all(!is.na(object[[".by"]]))) {
+        by_var_name <- unique(object[[".by"]])
         by_var <- object[[by_var_name]]
         if (is.character(by_var) || is.factor(by_var)) {
+            # FIXME: this can't possibly work right
+            # We are plotting a surface for each function, but only facetting
+            # on the by variable here
             plt <- plt + facet_wrap(by_var_name, labeller = labeller)
         }
     } else {
-        plt <- plt + facet_wrap(vars(.data[["bf"]]), labeller = labeller)
+        plt <- plt + facet_wrap(vars(.data[[".bf"]]), labeller = labeller)
     }
 
     ## add labelling to plot
@@ -538,14 +543,14 @@
     }
 
     if (isTRUE(contour)) {
-        plt <- plt + geom_contour(mapping = aes(z = .data[["value"]],
-        group = .data[["bf"]], fill = NULL),
+        plt <- plt + geom_contour(mapping = aes(z = .data[[".value"]],
+        group = .data[[".bf"]], fill = NULL),
             colour = contour_col,
             bins = n_contour,
             na.rm = TRUE)
     }
 
-    if (str_detect(object[["type"]][1L], "TPRS")) {
+    if (str_detect(object[[".type"]][1L], "TPRS")) {
         plt <- plt + coord_equal()
     }
 
