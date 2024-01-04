@@ -34,11 +34,11 @@ load_mgcv()
 \dontshow{
 op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 }
-dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 42)
-mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+df <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 42)
+m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 
 ## first derivatives of all smooths using central finite differences
-d <- derivatives(mod, type = "central") |>
+d <- derivatives(m, type = "central") |>
     add_sizer()
 
 # default adds a .change column

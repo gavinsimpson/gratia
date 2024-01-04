@@ -203,7 +203,7 @@
 
     ## reorder the columns
     result <- result |>
-        relocate(any_of(c(".smooth", ".var", ".by_var", ".fs_var",
+        relocate(any_of(c(".smooth", ".var", ".by", ".fs",
         ".derivative", ".se", ".crit", ".lower_ci", ".upper_ci")), .before = 1) # |>
         #relocate(all_of(c(".derivative", ".se", ".crit", ".lower_ci",
         #    ".upper_ci")), .after = last_col())
@@ -306,7 +306,7 @@
     } else {
         data[[fs_var]]
     }
-    deriv <- add_column(deriv, .fs_var = fs_var, .after = 2L)
+    deriv <- add_column(deriv, .fs = fs_var, .after = 2L)
 
     by_var <- if (by_var == "NA"){
         rep(NA_character_, nrow(deriv))
@@ -315,7 +315,7 @@
                             .after = 2L)
         rep(by_var, nrow(deriv))
     }
-    deriv <- add_column(deriv, .by_var = by_var, .after = 2L)
+    deriv <- add_column(deriv, .by = by_var, .after = 2L)
     result <- list(deriv = deriv, Xi = Xi)
     result
 }
@@ -894,7 +894,7 @@
     ## reorder the columns
     result <- result |>
         rename(.partial_deriv = ".derivative") |>
-        relocate(any_of(c(".smooth", ".by_var", ".fs_var",
+        relocate(any_of(c(".smooth", ".by", ".fs",
             ".partial_deriv", ".se", ".crit", ".lower_ci", ".upper_ci")),
         .before = 1) |>
         add_column(.focal = rep(focal, nrow(result)), .after = 1L)
