@@ -7,7 +7,8 @@ test_that("smooth_samples works for a continuous by GAM", {
                           "tbl", "data.frame"))
     ## 500 == 1 smooth * 5 * 100
     expect_identical(NROW(sm), 500L)
-    expect_identical(NCOL(sm), 8L) # 8 cols, univatiate smooths
+    # 9 cols, 8 for univariate smooths + 1 for cont by var
+    expect_identical(NCOL(sm), 9L)
     skip_on_cran()
     skip_on_ci()
     expect_snapshot(sm)
@@ -111,7 +112,7 @@ test_that("smooth_samples ignores ranef smooths: #121", {
     # given n and n_vals and 4 smooths, nrow == 2000L
     expect_identical(nrow(sm), 2000L)
     # shouldn't have "s(fac)" in sm
-    expect_identical(any(sm$smooth == "s(fac)"), FALSE)
+    expect_identical(any(sm$.smooth == "s(fac)"), FALSE)
 })
 
 test_that("smooth_samples fails if no smooths left to sample from", {

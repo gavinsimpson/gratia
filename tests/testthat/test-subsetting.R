@@ -8,5 +8,6 @@ test_that("subsetting works for smooth_samples", {
 
     attrs <- attributes(hsm)
     expect_type(attrs, "list")
-    expect_named(attrs, expected = c("names", "row.names", "class", "seed"))
+    expect_named(attrs,
+        expected = c("names", "row.names", "class", "seed", "data_names"))
 })
