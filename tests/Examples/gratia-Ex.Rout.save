@@ -211,18 +211,18 @@ detaching ‘package:mgcv’
 > ## Don't show: 
 > op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 > ## End(Don't show)
-> dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 42)
-> mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> df <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 42)
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 > 
 > ## first derivatives of all smooths using central finite differences
-> d <- derivatives(mod, type = "central") |>
+> d <- derivatives(m, type = "central") |>
 +     add_sizer()
 > 
 > # default adds a .change column
 > names(d)
- [1] ".smooth"     ".by_var"     ".fs_var"     ".derivative" ".se"        
- [6] ".crit"       ".lower_ci"   ".upper_ci"   "x0"          "x1"         
-[11] "x2"          "x3"          ".change"    
+ [1] ".smooth"     ".by"         ".fs"         ".derivative" ".se"        
+ [6] ".crit"       ".lower_ci"   ".upper_ci"   ".change"     "x0"         
+[11] "x1"          "x2"          "x3"         
 > 
 > 
 > 
@@ -646,52 +646,52 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 > ## first derivatives of all smooths using central finite differences
 > derivatives(mod, type = "central")
 # A tibble: 400 x 12
-   .smooth .by_var .fs_var .derivative   .se .crit .lower_ci .upper_ci       x0
-   <chr>   <chr>   <chr>         <dbl> <dbl> <dbl>     <dbl>     <dbl>    <dbl>
- 1 s(x0)   <NA>    <NA>           7.41  3.33  1.96     0.874      13.9 0.000239
- 2 s(x0)   <NA>    <NA>           7.40  3.33  1.96     0.884      13.9 0.0103  
- 3 s(x0)   <NA>    <NA>           7.39  3.30  1.96     0.929      13.8 0.0204  
- 4 s(x0)   <NA>    <NA>           7.36  3.24  1.96     1.01       13.7 0.0304  
- 5 s(x0)   <NA>    <NA>           7.32  3.15  1.96     1.14       13.5 0.0405  
- 6 s(x0)   <NA>    <NA>           7.26  3.04  1.96     1.30       13.2 0.0506  
- 7 s(x0)   <NA>    <NA>           7.18  2.90  1.96     1.49       12.9 0.0606  
- 8 s(x0)   <NA>    <NA>           7.09  2.76  1.96     1.69       12.5 0.0707  
- 9 s(x0)   <NA>    <NA>           6.99  2.61  1.96     1.87       12.1 0.0807  
-10 s(x0)   <NA>    <NA>           6.87  2.47  1.96     2.03       11.7 0.0908  
+   .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci      x0    x1
+   <chr>   <chr> <chr>       <dbl> <dbl> <dbl>     <dbl>     <dbl>   <dbl> <dbl>
+ 1 s(x0)   <NA>  <NA>         7.41  3.33  1.96     0.874      13.9 2.39e-4    NA
+ 2 s(x0)   <NA>  <NA>         7.40  3.33  1.96     0.884      13.9 1.03e-2    NA
+ 3 s(x0)   <NA>  <NA>         7.39  3.30  1.96     0.929      13.8 2.04e-2    NA
+ 4 s(x0)   <NA>  <NA>         7.36  3.24  1.96     1.01       13.7 3.04e-2    NA
+ 5 s(x0)   <NA>  <NA>         7.32  3.15  1.96     1.14       13.5 4.05e-2    NA
+ 6 s(x0)   <NA>  <NA>         7.26  3.04  1.96     1.30       13.2 5.06e-2    NA
+ 7 s(x0)   <NA>  <NA>         7.18  2.90  1.96     1.49       12.9 6.06e-2    NA
+ 8 s(x0)   <NA>  <NA>         7.09  2.76  1.96     1.69       12.5 7.07e-2    NA
+ 9 s(x0)   <NA>  <NA>         6.99  2.61  1.96     1.87       12.1 8.07e-2    NA
+10 s(x0)   <NA>  <NA>         6.87  2.47  1.96     2.03       11.7 9.08e-2    NA
 # i 390 more rows
-# i 3 more variables: x1 <dbl>, x2 <dbl>, x3 <dbl>
+# i 2 more variables: x2 <dbl>, x3 <dbl>
 > 
 > ## derivatives for a selected smooth
 > derivatives(mod, type = "central", term = "s(x1)")
 # A tibble: 100 x 9
-   .smooth .by_var .fs_var .derivative   .se .crit .lower_ci .upper_ci       x1
-   <chr>   <chr>   <chr>         <dbl> <dbl> <dbl>     <dbl>     <dbl>    <dbl>
- 1 s(x1)   <NA>    <NA>         -0.907  3.12  1.96     -7.02      5.20 0.000405
- 2 s(x1)   <NA>    <NA>         -0.906  3.11  1.96     -7.01      5.20 0.0105  
- 3 s(x1)   <NA>    <NA>         -0.898  3.10  1.96     -6.97      5.17 0.0205  
- 4 s(x1)   <NA>    <NA>         -0.880  3.06  1.96     -6.88      5.12 0.0306  
- 5 s(x1)   <NA>    <NA>         -0.849  3.00  1.96     -6.73      5.03 0.0406  
- 6 s(x1)   <NA>    <NA>         -0.803  2.92  1.96     -6.52      4.92 0.0507  
- 7 s(x1)   <NA>    <NA>         -0.740  2.81  1.96     -6.25      4.77 0.0607  
- 8 s(x1)   <NA>    <NA>         -0.659  2.69  1.96     -5.93      4.61 0.0708  
- 9 s(x1)   <NA>    <NA>         -0.557  2.56  1.96     -5.57      4.46 0.0809  
-10 s(x1)   <NA>    <NA>         -0.436  2.42  1.96     -5.19      4.32 0.0909  
+   .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci       x1
+   <chr>   <chr> <chr>       <dbl> <dbl> <dbl>     <dbl>     <dbl>    <dbl>
+ 1 s(x1)   <NA>  <NA>       -0.907  3.12  1.96     -7.02      5.20 0.000405
+ 2 s(x1)   <NA>  <NA>       -0.906  3.11  1.96     -7.01      5.20 0.0105  
+ 3 s(x1)   <NA>  <NA>       -0.898  3.10  1.96     -6.97      5.17 0.0205  
+ 4 s(x1)   <NA>  <NA>       -0.880  3.06  1.96     -6.88      5.12 0.0306  
+ 5 s(x1)   <NA>  <NA>       -0.849  3.00  1.96     -6.73      5.03 0.0406  
+ 6 s(x1)   <NA>  <NA>       -0.803  2.92  1.96     -6.52      4.92 0.0507  
+ 7 s(x1)   <NA>  <NA>       -0.740  2.81  1.96     -6.25      4.77 0.0607  
+ 8 s(x1)   <NA>  <NA>       -0.659  2.69  1.96     -5.93      4.61 0.0708  
+ 9 s(x1)   <NA>  <NA>       -0.557  2.56  1.96     -5.57      4.46 0.0809  
+10 s(x1)   <NA>  <NA>       -0.436  2.42  1.96     -5.19      4.32 0.0909  
 # i 90 more rows
 > ## or via a partial match
 > derivatives(mod, type = "central", term = "x1", partial_match = TRUE)
 # A tibble: 100 x 9
-   .smooth .by_var .fs_var .derivative   .se .crit .lower_ci .upper_ci       x1
-   <chr>   <chr>   <chr>         <dbl> <dbl> <dbl>     <dbl>     <dbl>    <dbl>
- 1 s(x1)   <NA>    <NA>         -0.907  3.12  1.96     -7.02      5.20 0.000405
- 2 s(x1)   <NA>    <NA>         -0.906  3.11  1.96     -7.01      5.20 0.0105  
- 3 s(x1)   <NA>    <NA>         -0.898  3.10  1.96     -6.97      5.17 0.0205  
- 4 s(x1)   <NA>    <NA>         -0.880  3.06  1.96     -6.88      5.12 0.0306  
- 5 s(x1)   <NA>    <NA>         -0.849  3.00  1.96     -6.73      5.03 0.0406  
- 6 s(x1)   <NA>    <NA>         -0.803  2.92  1.96     -6.52      4.92 0.0507  
- 7 s(x1)   <NA>    <NA>         -0.740  2.81  1.96     -6.25      4.77 0.0607  
- 8 s(x1)   <NA>    <NA>         -0.659  2.69  1.96     -5.93      4.61 0.0708  
- 9 s(x1)   <NA>    <NA>         -0.557  2.56  1.96     -5.57      4.46 0.0809  
-10 s(x1)   <NA>    <NA>         -0.436  2.42  1.96     -5.19      4.32 0.0909  
+   .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci       x1
+   <chr>   <chr> <chr>       <dbl> <dbl> <dbl>     <dbl>     <dbl>    <dbl>
+ 1 s(x1)   <NA>  <NA>       -0.907  3.12  1.96     -7.02      5.20 0.000405
+ 2 s(x1)   <NA>  <NA>       -0.906  3.11  1.96     -7.01      5.20 0.0105  
+ 3 s(x1)   <NA>  <NA>       -0.898  3.10  1.96     -6.97      5.17 0.0205  
+ 4 s(x1)   <NA>  <NA>       -0.880  3.06  1.96     -6.88      5.12 0.0306  
+ 5 s(x1)   <NA>  <NA>       -0.849  3.00  1.96     -6.73      5.03 0.0406  
+ 6 s(x1)   <NA>  <NA>       -0.803  2.92  1.96     -6.52      4.92 0.0507  
+ 7 s(x1)   <NA>  <NA>       -0.740  2.81  1.96     -6.25      4.77 0.0607  
+ 8 s(x1)   <NA>  <NA>       -0.659  2.69  1.96     -5.93      4.61 0.0708  
+ 9 s(x1)   <NA>  <NA>       -0.557  2.56  1.96     -5.57      4.46 0.0809  
+10 s(x1)   <NA>  <NA>       -0.436  2.42  1.96     -5.19      4.32 0.0909  
 # i 90 more rows
 > ## Don't show: 
 > options(op)
@@ -725,18 +725,18 @@ detaching ‘package:mgcv’
 > sm_dif <- difference_smooths(m, smooth = "s(x2)")
 > sm_dif
 # A tibble: 300 x 9
-   smooth by    level_1 level_2  diff    se    lower upper      x2
-   <chr>  <chr> <chr>   <chr>   <dbl> <dbl>    <dbl> <dbl>   <dbl>
- 1 s(x2)  fac   1       2       0.386 0.618 -0.824    1.60 0.00359
- 2 s(x2)  fac   1       2       0.479 0.574 -0.646    1.60 0.0136 
- 3 s(x2)  fac   1       2       0.572 0.534 -0.474    1.62 0.0237 
- 4 s(x2)  fac   1       2       0.665 0.497 -0.308    1.64 0.0338 
- 5 s(x2)  fac   1       2       0.758 0.464 -0.151    1.67 0.0438 
- 6 s(x2)  fac   1       2       0.850 0.435 -0.00342  1.70 0.0539 
- 7 s(x2)  fac   1       2       0.941 0.412  0.134    1.75 0.0639 
- 8 s(x2)  fac   1       2       1.03  0.393  0.262    1.80 0.0740 
- 9 s(x2)  fac   1       2       1.12  0.378  0.380    1.86 0.0841 
-10 s(x2)  fac   1       2       1.21  0.367  0.489    1.93 0.0941 
+   .smooth .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2
+   <chr>   <chr> <chr>    <chr>    <dbl> <dbl>     <dbl>     <dbl>   <dbl>
+ 1 s(x2)   fac   1        2        0.386 0.618  -0.824        1.60 0.00359
+ 2 s(x2)   fac   1        2        0.479 0.574  -0.646        1.60 0.0136 
+ 3 s(x2)   fac   1        2        0.572 0.534  -0.474        1.62 0.0237 
+ 4 s(x2)   fac   1        2        0.665 0.497  -0.308        1.64 0.0338 
+ 5 s(x2)   fac   1        2        0.758 0.464  -0.151        1.67 0.0438 
+ 6 s(x2)   fac   1        2        0.850 0.435  -0.00342      1.70 0.0539 
+ 7 s(x2)   fac   1        2        0.941 0.412   0.134        1.75 0.0639 
+ 8 s(x2)   fac   1        2        1.03  0.393   0.262        1.80 0.0740 
+ 9 s(x2)   fac   1        2        1.12  0.378   0.380        1.86 0.0841 
+10 s(x2)   fac   1        2        1.21  0.367   0.489        1.93 0.0941 
 # i 290 more rows
 > 
 > draw(sm_dif)
@@ -1615,11 +1615,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55a7552effd8>
+<environment: 0x5636134e37f0>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55a7552effd8>
+<environment: 0x5636134e37f0>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2007,24 +2007,24 @@ detaching ‘package:mgcv’
 > # penalties for all smooths
 > penalty(m)
 # A tibble: 405 x 6
-   smooth type  penalty row   col     value
-   <chr>  <chr> <chr>   <chr> <chr>   <dbl>
- 1 s(x0)  CRS   s(x0)   F1    F1     0.783 
- 2 s(x0)  CRS   s(x0)   F1    F2    -0.635 
- 3 s(x0)  CRS   s(x0)   F1    F3     0.265 
- 4 s(x0)  CRS   s(x0)   F1    F4    -0.0203
- 5 s(x0)  CRS   s(x0)   F1    F5     0.0441
- 6 s(x0)  CRS   s(x0)   F1    F6     0.0378
- 7 s(x0)  CRS   s(x0)   F1    F7     0.0482
- 8 s(x0)  CRS   s(x0)   F1    F8     0.0216
- 9 s(x0)  CRS   s(x0)   F1    F9     0.0247
-10 s(x0)  CRS   s(x0)   F2    F1    -0.635 
+   .smooth .type .penalty .row  .col   .value
+   <chr>   <chr> <chr>    <chr> <chr>   <dbl>
+ 1 s(x0)   CRS   s(x0)    F1    F1     0.783 
+ 2 s(x0)   CRS   s(x0)    F1    F2    -0.635 
+ 3 s(x0)   CRS   s(x0)    F1    F3     0.265 
+ 4 s(x0)   CRS   s(x0)    F1    F4    -0.0203
+ 5 s(x0)   CRS   s(x0)    F1    F5     0.0441
+ 6 s(x0)   CRS   s(x0)    F1    F6     0.0378
+ 7 s(x0)   CRS   s(x0)    F1    F7     0.0482
+ 8 s(x0)   CRS   s(x0)    F1    F8     0.0216
+ 9 s(x0)   CRS   s(x0)    F1    F9     0.0247
+10 s(x0)   CRS   s(x0)    F2    F1    -0.635 
 # i 395 more rows
 > 
 > # for a specific smooth
 > penalty(m, smooth = "s(x2):fac1")
 # A tibble: 81 x 6
-   smooth     type  penalty    row   col     value
+   .smooth    .type .penalty   .row  .col   .value
    <chr>      <chr> <chr>      <chr> <chr>   <dbl>
  1 s(x2):fac1 CRS   s(x2):fac1 F1    F1     1.66  
  2 s(x2):fac1 CRS   s(x2):fac1 F1    F2    -0.755 
@@ -2314,18 +2314,18 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
 > rg <- rootogram(m)
 > rg
 # A tibble: 21 x 3
-     bin observed    fitted
-   <dbl>    <int>     <dbl>
- 1     0      113 116.640  
- 2     1      236 227.869  
- 3     2      230 239.168  
- 4     3      200 181.679  
- 5     4       94 113.432  
- 6     5       68  62.4881 
- 7     6       27  31.6795 
- 8     7       22  15.1323 
- 9     8        4   6.88637
-10     9        3   2.99628
+    .bin .observed   .fitted
+   <dbl>     <int>     <dbl>
+ 1     0       113 116.640  
+ 2     1       236 227.869  
+ 3     2       230 239.168  
+ 4     3       200 181.679  
+ 5     4        94 113.432  
+ 6     5        68  62.4881 
+ 7     6        27  31.6795 
+ 8     7        22  15.1323 
+ 9     8         4   6.88637
+10     9         3   2.99628
 # i 11 more rows
 > draw(rg) # plot the rootogram
 > 
@@ -2697,7 +2697,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  36.14 0.363 35.94 0 0 
+Time elapsed:  45.566 0.42 44.621 0 0 
 > grDevices::dev.off()
 null device 
           1 
