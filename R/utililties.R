@@ -1602,3 +1602,36 @@ reclass_scam_smooth <- function(smooth) {
 `add_smooth_type_column` <- function(object, sm_type) {
     add_column(object, .type = rep(sm_type, nrow(object)), .after = 1L)
 }
+
+# my own version of a label_both to remove '.' prefix when plotting
+#' @importFrom stringr regex str_remove str_detect
+#' @importFrom rlang inject
+#' @importFrom ggplot2 label_value
+`prefix_label_both` <- function(labels, multi_line = TRUE, sep = ": ") {
+    value <- ggplot2::label_value(labels, multi_line = multi_line)
+    variable <- label_var(labels, multi_line = multi_line)
+    if (multi_line) {
+        out <- vector("list", length(value))
+        for (i in seq_along(out)) {
+            out[[i]] <- paste(variable[[i]], value[[i]], sep = sep)
+        }
+    } else {
+        value <- rlang::inject(paste(!!!value, sep = ", "))
+        variable <- rlang::inject(paste(!!!variable, sep = ", "))
+        out <- Map(paste, variable, value, sep = sep)
+        out <- list(unname(unlist(out)))
+    }
+    out
+}
+
+#' @importFrom rlang %||%
+`label_var` <- function(labels, multi_line = TRUE) {
+    if (multi_line) {
+        row <- as.list(str_remove(string = names(labels),
+            stringr::regex("^\\.")))
+    } else {
+        row <- list(paste(str_remove(string = names(labels),
+            stringr::regex("^\\.")), collapse = ", "))
+    }
+    lapply(row, rep, nrow(labels) %||% length(labels[[1]]))
+}
