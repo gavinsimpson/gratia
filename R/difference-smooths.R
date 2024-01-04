@@ -102,8 +102,8 @@
     out <- bind_rows(out)
     crit <- coverage_normal(ci_level)
     out <- add_column(out,
-                      lower = out$diff - (crit * out$se),
-                      upper = out$diff + (crit * out$se),
+                      .lower_ci = out$.diff - (crit * out$.se),
+                      .upper_ci = out$.diff + (crit * out$.se),
                       .after = 6L)
     out
 }
@@ -167,10 +167,10 @@
     sm_diff <- drop(X %*% coefs)
     se <- sqrt(rowSums((X %*% V) * X))
     nr <- NROW(X)
-    out <- list(smooth = rep(smooth, nr), by = rep(by_var, nr),
-                level_1 = rep(f1, nr),
-                level_2 = rep(f2, nr),
-                diff = sm_diff, se = se)
+    out <- list(.smooth = rep(smooth, nr), .by = rep(by_var, nr),
+                .level_1 = rep(f1, nr),
+                .level_2 = rep(f2, nr),
+                .diff = sm_diff, .se = se)
     out <- new_tibble(out, nrow = NROW(X), class = "difference_smooth")
     ## Only need rows associated with one of the levels
     out <- bind_cols(out, data[r1, smooth_var])

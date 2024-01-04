@@ -109,18 +109,18 @@
                                  label = sp_label[i])
     }
 
-    ## should the default penalty rescaling for gamm performance be reversed?
+    # should the default penalty rescaling for gamm performance be reversed?
     if (rescale) {
         for (i in pen_seq) {
             S_scale <- object[["S.scale"]][i]
             if (is.null(S_scale)) {
                 S_scale <- 1
             }
-            pen[[i]][["value"]] <- pen[[i]][["value"]] * S_scale
+            pen[[i]][[".value"]] <- pen[[i]][[".value"]] * S_scale
         }
     }
 
-    ## combine the tidy penalty matrices into a single tibble
+    # combine the tidy penalty matrices into a single tibble
     pen <- bind_rows(pen)
     class(pen) <- c("penalty_df", class(pen))
     pen
@@ -138,36 +138,6 @@
     .NotYetImplemented()
 }
 
-#' @importFrom tibble add_column as_tibble
-#' @importFrom tidyr pivot_longer
-#' @importFrom dplyr starts_with
-#' @importFrom rlang set_names
-`tidy_penalty` <- function(s, smooth, type, label) {
-    ## rownames(s) <- paste0("f", seq_len(nrow(s)))
-    ## colnames(s) <- paste0("f", seq_len(ncol(s)))
-    nc <- ncol(s)
-    new_names <- formatC(seq_len(nc), width = nchar(nc), flag = "0")
-    new_names <- paste0("F", new_names)
-    s <- as_tibble(s, .name_repair = "minimal")
-    s <- set_names(s, new_names)
-    s <- add_column(s, row = new_names, .before = 1L)
-    s <- pivot_longer(s, cols = starts_with("f"), names_to = "col",
-                      values_to = "value")
-    ns <- nrow(s)
-    s <- add_column(s,
-                    smooth  = rep(smooth, ns),
-                    type    = rep(type, ns),
-                    penalty = rep(label, ns), .before = 1L)
-    s
-}
-
-#' @export
-#' @importFrom rlang .data
-`print.penalty_df` <- function(x, ...) {
-    x <- mutate(x, value = zapsmall(.data$value))
-    NextMethod()
-}
-
 #' @export
 #' @importFrom mgcv smoothCon
 #' @importFrom dplyr bind_rows
@@ -178,4 +148,34 @@
     pen <- lapply(sm, penalty, ...)
     pen <- bind_rows(pen)
     pen
+}
+
+#' @importFrom tibble add_column as_tibble
+#' @importFrom tidyr pivot_longer
+#' @importFrom dplyr starts_with
+#' @importFrom rlang set_names
+`tidy_penalty` <- function(s, smooth, type, label) {
+    nc <- ncol(s)
+    new_names <- formatC(seq_len(nc), width = nchar(nc), flag = "0")
+    new_names <- paste0("F", new_names)
+    s <- s |>
+        as_tibble(.name_repair = "minimal") |>
+        set_names(new_names) |>
+        add_column(.row = new_names, .before = 1L) |>
+        pivot_longer(cols = starts_with("f"), names_to = ".col",
+            values_to = ".value")
+    
+    ns <- nrow(s)
+    s <- add_column(s,
+                    .smooth  = rep(smooth, ns),
+                    .type    = rep(type, ns),
+                    .penalty = rep(label, ns), .before = 1L)
+    s
+}
+
+#' @export
+#' @importFrom rlang .data
+`print.penalty_df` <- function(x, ...) {
+    x <- mutate(x, .value = zapsmall(.data$.value))
+    NextMethod()
 }
