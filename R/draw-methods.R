@@ -955,15 +955,15 @@
     scales <- match.arg(scales)
 
     ## how many smooths
-    sm <- unique(object[["smooth"]])
+    sm <- unique(object[[".smooth"]])
     ## select smooths
     select <- check_user_select_smooths(smooths = sm, select = select)
     sm <- sm[select]
 
     plotlist <- vector("list", length = length(sm))
 
-    df_list <- split(object, f = paste(object$level_1, object$level_2,
-                     sep = "-"))
+    df_list <- split(object,
+        f = paste(object$.level_1, object$.level_2, sep = "-"))
 
     plotlist <- map(df_list, draw_difference,
                     ci_alpha = ci_alpha,
@@ -979,7 +979,7 @@
                     subtitle = subtitle, caption = caption, angle = angle)
 
     if (isTRUE(identical(scales, "fixed"))) {
-        ylims <- range(object[["lower"]], object[["upper"]])
+        ylims <- range(object[[".lower_ci"]], object[[".upper_ci"]])
 
         for (i in seq_along(plotlist)) {
             plotlist[[i]] <- plotlist[[i]] + lims(y = ylims)
@@ -1008,7 +1008,7 @@
                               xlab = NULL, ylab = NULL,
                               title = NULL, subtitle = NULL, caption = NULL,
                               angle = NULL) {
-    xvars <- unique(object[["smooth"]])
+    xvars <- unique(object[[".smooth"]])
     xvars <- vars_from_label(xvars)
     n_xvars <- length(xvars)
     plt <- if (identical(n_xvars, 1L)) {
@@ -1058,10 +1058,10 @@
                                  title = NULL,
                                  subtitle = NULL,
                                  caption = NULL, angle = NULL) {
-    sm_label <- unique(object$smooth)
-    by_var <- unique(object$by)
-    f1 <- unique(object$level_1)
-    f2 <- unique(object$level_2)
+    sm_label <- unique(object$.smooth)
+    by_var <- unique(object$.by)
+    f1 <- unique(object$.level_1)
+    f2 <- unique(object$.level_2)
     plt_subtitle <- if (is.null(subtitle)) {
         bquote("Comparison:" ~ .(f1) - .(f2))
     } else {
@@ -1079,15 +1079,15 @@
     }
 
     plt <- ggplot(object, aes(x = .data[[xvars[1L]]],
-                              y = .data$diff)) +
+                              y = .data$.diff)) +
         guides(x = guide_axis(angle = angle))
 
     if (isTRUE(ref_line)) {
         plt <- plt + geom_hline(yintercept = 0, colour = line_col)
     }
     plt <- plt +
-        geom_ribbon(aes(ymin = .data$lower,
-                        ymax = .data$upper,
+        geom_ribbon(aes(ymin = .data$.lower_ci,
+                        ymax = .data$.upper_ci,
                         y = NULL),
                     alpha = ci_alpha, fill = ci_col, colour = NA) +
         geom_line(colour = smooth_col) +
@@ -1118,10 +1118,10 @@
     if (is.null(ylab)) {
         ylab <- xvars[2]
     }
-    sm_label <- unique(object$smooth)
-    by_var <- unique(object$by)
-    f1 <- unique(object$level_1)
-    f2 <- unique(object$level_2)
+    sm_label <- unique(object$.smooth)
+    by_var <- unique(object$.by)
+    f1 <- unique(object$.level_1)
+    f2 <- unique(object$.level_2)
     plt_title <- if (is.null(title)) {
         paste(sm_label, "by", by_var)
     } else {
@@ -1135,11 +1135,11 @@
 
     plt <- ggplot(object, aes(x = .data[[xvars[1L]]],
                               y = .data[[xvars[2L]]])) +
-        geom_raster(aes(fill = .data$diff)) +
+        geom_raster(aes(fill = .data$.diff)) +
         guides(x = guide_axis(angle = angle))
 
     if (contour) {
-        plt <- plt + geom_contour(aes(z = .data$diff),
+        plt <- plt + geom_contour(aes(z = .data$.diff),
                                   bins = n_contour,
                                   colour = contour_col)
     }
@@ -1151,7 +1151,7 @@
     plt <- plt + scale_fill_distiller(palette = "RdBu", type = "div")
 
     ## Set the limits for the fill
-    guide_limits <- c(-1, 1) * max(abs(object[["diff"]]))
+    guide_limits <- c(-1, 1) * max(abs(object[[".diff"]]))
     plt <- plt + expand_limits(fill = guide_limits)
 
     plt <- plt +
@@ -1189,6 +1189,9 @@
 #' Displays the penalty matrices of smooths as a heatmap using `ggplot`
 #'
 #' @param normalize logical; normalize the penalty to the range -1, 1?
+#' @param as_matrix logical; how should the plotted penalty matrix be oriented?
+#'   If `TRUE` row 1, column 1 of the penalty matrix is draw in the upper left,
+#'   whereas, if `FALSE` it is drawn in the lower left of the plot.
 #' @param ncol,nrow numeric; the numbers of rows and columns over which to
 #'   spread the plots.
 #' @param xlab character or expression; the label for the x axis. If not
@@ -1224,6 +1227,7 @@
 #' draw(penalty(m, smooth = "s(x2):fac1"))
 `draw.penalty_df` <- function(object,
                               normalize = FALSE,
+                              as_matrix = TRUE,
                               continuous_fill = NULL,
                               xlab = NULL,
                               ylab = NULL,
@@ -1241,11 +1245,12 @@
                                                 midpoint = 0)
     }
 
-    plt_list <- split(object, f = object[["penalty"]])
+    plt_list <- split(object, f = object[[".penalty"]])
     n_plots <- length(plt_list)
     for (i in seq_along(plt_list)) {
         plt_list[[i]] <- plot_penalty(plt_list[[i]],
                                       normalize = normalize,
+                                      as_matrix = as_matrix,
                                       continuous_fill = continuous_fill,
                                       xlab = rep(xlab, n_plots),
                                       ylab = rep(ylab, n_plots),
@@ -1269,6 +1274,7 @@
 #' @importFrom rlang .data
 `plot_penalty` <- function(object,
                            normalize = FALSE,
+                           as_matrix = TRUE,
                            continuous_fill = NULL,
                            xlab = NULL,
                            ylab = NULL,
@@ -1277,21 +1283,25 @@
                            caption = NULL) {
     ## fix ordering of levels so the heatmap matches a matrix
     ## Don't reverse the cols!!
+    row_levs <- if (isTRUE(as_matrix)) {
+        rev(sort(unique(object$.row)))
+    } else {
+        sort(unique(object$.row))
+    }
     object <- mutate(object,
-        row = factor(.data$row,
-            levels = rev(sort(unique(.data$row)))),
-        col = factor(.data$col, levels = sort(unique(.data$col))))
+        .row = factor(.data$.row, levels = row_levs),
+        .col = factor(.data$.col, levels = sort(unique(.data$.col))))
 
     ## rescale to -1 -- 1
     if (as.logical(normalize)) {
-        object <- mutate(object, value = norm_minus_one_to_one(.data$value))
+        object <- mutate(object, .value = norm_minus_one_to_one(.data$.value))
     }
 
     ## base plot
     plt <- ggplot(object,
-        aes(x = .data$col,
-            y = .data$row,
-            fill = .data$value)) +
+        aes(x = .data$.col,
+            y = .data$.row,
+            fill = .data$.value)) +
         geom_raster()
 
     ## add the scale
@@ -1299,10 +1309,10 @@
 
     ## labelling
     if (is.null(title)) {
-        title <- unique(object[["penalty"]])
+        title <- unique(object[[".penalty"]])
     }
     if (is.null(caption)) {
-        caption <- object[["type"]]
+        caption <- object[[".type"]]
     }
     plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
         caption = caption, fill = "Penalty")
