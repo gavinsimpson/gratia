@@ -110,18 +110,18 @@ A tibble with additional classes \code{"smooth_samples"} and
 For the \code{"gam"} method, the columns currently returned (not in this order)
 are:
 \itemize{
-\item \code{smooth}; character vector. Indicates the smooth function for that
+\item \code{.smooth}; character vector. Indicates the smooth function for that
 particular draw,
-\item \code{term}; character vector. Similar to \code{smooth}, but will contain the
+\item \code{.term}; character vector. Similar to \code{smooth}, but will contain the
 full label for the smooth, to differentiate factor-by smooths for
 example.
-\item \code{by_variable}; character vector. If the smooth involves a \code{by} term, the
+\item \code{.by}; character vector. If the smooth involves a \code{by} term, the
 by variable will be named here, \code{NA_character_} otherwise.
-\item \code{row}; integer. A vector of values \code{seq_len(n_vals)}, repeated if
+\item \code{.row}; integer. A vector of values \code{seq_len(n_vals)}, repeated if
 \code{n > 1L}. Indexes the row in \code{data} for that particular draw.
-\item \code{draw}; integer. A vector of integer values indexing the particular
+\item \code{.draw}; integer. A vector of integer values indexing the particular
 posterior draw that each row belongs to.
-\item \code{value}; numeric. The value of smooth function for this posterior draw
+\item \code{.value}; numeric. The value of smooth function for this posterior draw
 and covariate combination.
 \item \code{xxx}; numeric. A series of one or more columns containing data required
 for the smooth, named as per the variables involved in the respective
