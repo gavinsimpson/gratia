@@ -914,6 +914,11 @@
     ## handle data
     need_data <- is.null(data)
 
+    ## handle focal
+    if (is.null(focal)) {
+        stop("Argument 'focal' must be supplied.")
+    }
+
     ## sort out data
     if (need_data) {
         x <- object$var.summary[[focal]]
