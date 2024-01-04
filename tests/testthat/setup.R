@@ -84,6 +84,9 @@ su_m_factor_by_bam <- bam(y ~ fac + s(x2, by = fac) + s(x0), data = su_eg4)
 su_m_factor_by_x2 <- gam(y ~ fac + s(x2, by = fac),
   data = su_eg4, method = "REML")
 
+su_m_su_eg4 <- gam(y ~ s(x0) + s(x1) + s(x2, by = fac),
+  data = su_eg4, method = "REML")
+
 if (packageVersion("mgcv") >= "1.8.41") {
   m_sz <- gam(y ~ s(x2) + s(fac, x2, bs = "sz") + s(x0),
     data = su_eg4, method = "REML")

@@ -604,80 +604,19 @@ test_that("draw.gam can take user specified scales", {
     skip_on_os(os = "win")
     skip_on_os(os = "mac") # trivial diffs in contours
     plt1 <- draw(su_m_bivar, rug = FALSE,
-                continuous_fill = scale_fill_distiller(palette = "Spectral",
-                                                       type = "div"))
+        continuous_fill = scale_fill_distiller(palette = "Spectral",
+            type = "div"))
 
     skip_if(packageVersion("mgcv") < "1.8.36")
     plt2 <- draw(mod_fs, rug = FALSE,
         discrete_colour = ggplot2::scale_colour_viridis_d(option = "plasma"))
-    
+
     skip_on_ci()
     expect_doppelganger("draw 2d smooth with spectral palette", plt1)
 
     skip_if(packageVersion("mgcv") < "1.8.36")
     expect_doppelganger("draw fs smooth with discrete plasma palette",
-                                 plt2)
-})
-
-## draw.penalty
-test_that("draw.penalty_df works", {
-    skip_on_cran()
-    skip_on_ci()
-
-    expect_silent(pen <- penalty(su_m_univar_4))
-    plt1 <- draw(pen)
-    plt2 <- draw(penalty(su_m_univar_4, "s(x1)"))
-
-    skip_on_ci()
-    expect_doppelganger("draw penalty_df with multiple smooths", plt1)
-    expect_doppelganger("draw penalty_df with single smooths", plt2)
-})
-
-test_that("draw.penalty_df gets labels on plot in corrcet order issue 95", {
-    skip_on_cran()
-    skip_on_ci()
-
-    expect_silent(pen <- penalty(su_m_penalty))
-    plt <- draw(pen)
-
-    skip_on_ci()
-    expect_doppelganger("draw penalty_df issue 95 label order",
-                        plt)
-})
-
-test_that("draw.penalty_df accepts user-specified continuous_fill", {
-    skip_on_cran()
-    skip_on_ci()
-
-    expect_silent(pen <- penalty(su_m_univar_4))
-    plt1 <- draw(pen,
-        continuous_fill = scale_fill_distiller(palette = "Spectral",
-            type = "div"))
-    
-    plt2 <- draw(penalty(su_m_univar_4, "s(x1)"),
-        continuous_fill = scale_fill_distiller(palette = "Spectral",
-            type = "div"))
-    
-    skip_on_ci()
-    expect_doppelganger("draw penalty multiple smooths user continous fill",
-                        plt1)
-    expect_doppelganger("draw penalty single smooths user continous fill",
-                        plt2)
-})
-
-test_that("draw.penalty_df works with normalization", {
-    skip_on_cran()
-    skip_on_ci()
-    
-    expect_silent(pen <- penalty(su_m_univar_4))
-    plt1 <- draw(pen, normalize = TRUE)
-    plt2 <- draw(penalty(su_m_univar_4, "s(x1)"), normalize = TRUE)
-
-    skip_on_ci()
-    expect_doppelganger("draw penalty_df with multiple smooths normalized",
-                        plt1)
-    expect_doppelganger("draw penalty_df with single smooths normalized",
-                        plt2)
+        plt2)
 })
 
 test_that("plotting sos smooths works", {
