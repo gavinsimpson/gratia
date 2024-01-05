@@ -1,0 +1,61 @@
+---
+title: "Posterior Simulation"
+output: 
+  rmarkdown::html_vignette:
+    fig_width: 8
+    fig_height: 5.3333
+vignette: >
+  %\VignetteIndexEntry{Posterior Simulation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+<Introduction>
+
+We'll need the following packages for this article
+```{r load-packages, results = "hide"}
+library("mgcv")
+library("gratia")
+library("dplyr")
+library("ggplot2")
+library("ggdist")
+```
+
+## What are we simulating?
+
+There are multiple types of data that we can simulate from a fitted GAM. We might simulate from the posterior distribution of a single estimated smooth function to see the uncertainty in the estimate of that function. Instead we might be interested in the uncertainty in the expectation (expected value) of the model at some given values of the covariates. Or we might want to generate new values of response variable via draws from the conditional distribution of the response, again at given covariate values. Finally we might want to combine the latter two options, simulating new values of the response data that also include the uncertainty in the expected values.
+
+gratia allows you to do all of the above through the following functions
+
+1. `smooth_samples()` generates draws from the posterior distribution of single estimated smooth functions,
+2. `fitted_samples()` generates draws from the posterior distribution of $\mathbb{E}(y_i | \mathbf{X}_i = x_i)$, the expected value of the responss,
+3. `predicted_samples()`, generates new response data given supplied values of covariates $y^{*}_i | \mathbf{X}_i = x^{*}_i$
+4. `posterior_samples()`, generates draws from the posterior distribution of the model, including the uncertainty in the estimated parameters of that model.
+
+In simpler terms, `fitted_samples()` generates predictions about the "average" or expected value of the response at values of the covariates. These predictions only include the uncertainty in the estimated values of the model coefficients. In contrast, `posterior_samples()` generates predictions of the actual values of the response we might expect to observe (if the model is correct) given values of the covariates. These predicted values include the variance of the sampling distribution (error term). `predicted_samples()` lies somewhere in between these two; the predicted values only include the variation in the sampling distribution, and take the model as fixed, known.
+
+It is worth reminding ourselves that these posterior draws are all conditional upon the selected values of the smoothing parameter(s) $\lambda_j$. We act as if the wiggliness of the estimated smooths was known, when in actual fact we estimated (selected is perhaps a better description) these wiglinesses from the data during model fitting. If the estimated GAM has been fitted with `method` argument set to `"REML"`, or `"ML"`, then a covariace matrix corrected for smoothing parameter uncertainty, $V_c$, is available, which, to an extent, allows for the posterior simulation to account for this additional source of uncertainty. Regardless, the GAMs we fit with {mgcv} are *empirical* bayes models, and I need something here to explain this from Dave's Bayesian GAM primer.
+
+There are two additional functions available in gratia that do posterior simulation:
+
+* `simulate()`, and
+* `derivative_samples()`.
+
+gratia provides `simulate()` methods for models estimated using `gam()`, `bam()`, and `gamm()`, as well as those fitted via `scam()` in the scam package. `simulate()` is a base R convention that does the same thing as `predicted_samples()`, just in a non-tidy way (that is not perjorative; it returns the simulated response values as a matrix, which is arguably more useful if you are doing math or further statistical computation.) `derivative_samples()` provides draws from the posterior distribution of the derivative of response variable for a given change in a focal covariate value. `derivative_samples()` is less general version of `fitted_samples()`; you could achieve the same thing by two separate calls to `fitted_samples()`. We'll reserver discussion of `derivative_samples()` to a separate vignette focused on estimating derivatives from GAMs.
+
+In the following sections we'll look at each of the four main posterior simulation functions in turn.
+
+## `smooth_samples()`
+
+## `fitted_samples()`
+
+## `predicted_samples()`
+
+## `posterior_samples()`
