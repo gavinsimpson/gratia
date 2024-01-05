@@ -45,9 +45,9 @@
     tbl <- rownames_to_column(vcomps,
                               var = "component") %>%
         as_tibble() %>%
-        set_names(nm = c("component", "std_dev", "lower_ci",
-                         "upper_ci")) %>%
-        add_column(variance = vcomps[, "std.dev"]^2, .after = 1L)
+        set_names(nm = c(".component", ".std_dev", ".lower_ci",
+                         ".upper_ci")) %>%
+        add_column(.variance = vcomps[, "std.dev"]^2, .after = 1L)
     class(tbl) <- c("variance_comp", class(tbl))
     tbl
 }
