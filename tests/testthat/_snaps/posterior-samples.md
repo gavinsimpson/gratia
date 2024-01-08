@@ -16,7 +16,7 @@
        8     8     1   6.86
        9     9     1   9.76
       10    10     1   7.39
-      # ... with 4,990 more rows
+      # i 4,990 more rows
 
 # smooth_samples example output doesn't change
 
@@ -36,5 +36,5 @@
        8 s(x0)  s(x0) TPRS  <NA>            2     3 -1.46  0.00633
        9 s(x0)  s(x0) TPRS  <NA>            2     4 -1.30  0.00633
       10 s(x0)  s(x0) TPRS  <NA>            2     5 -0.976 0.00633
-      # ... with 990 more rows
+      # i 990 more rows
 

@@ -2,7 +2,8 @@
 
     Code
       evaluate_smooth(m1, smooth = "s(x0)")
-    Warning <lifecycle_warning_deprecated>
+    Condition
+      Warning:
       `evaluate_smooth()` was deprecated in gratia 0.7.0.
       i Please use `smooth_estimates()` instead.
     Output
@@ -19,5 +20,5 @@
        8 s(x0)  <NA>        0.0826 -0.595 0.270
        9 s(x0)  <NA>        0.0925 -0.548 0.255
       10 s(x0)  <NA>        0.102  -0.501 0.242
-      # ... with 90 more rows
+      # i 90 more rows
 
