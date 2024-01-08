@@ -30,7 +30,7 @@ library("ggdist")
 
 ## What are we simulating?
 
-There are multiple types of data that we can simulate from a fitted GAM. We might simulate from the posterior distribution of a single estimated smooth function to see the uncertainty in the estimate of that function. Instead we might be interested in the uncertainty in the expectation (expected value) of the model at some given values of the covariates. Or we might want to generate new values of response variable via draws from the conditional distribution of the response, again at given covariate values. Finally we might want to combine the latter two options, simulating new values of the response data that also include the uncertainty in the expected values.
+There are multiple types of values that we can simulate from a fitted GAM. We might simulate from the posterior distribution of a single estimated smooth function to see the uncertainty in the estimate of that function. Instead we might be interested in the uncertainty in the expectation (expected value) of the model at some given values of the covariates. Or we might want to generate new values of response variable via draws from the conditional distribution of the response, again at given covariate values. Finally we might want to combine the latter two options, simulating new values of the response data that also include the uncertainty in the expected values.
 
 gratia allows you to do all of the above through the following functions
 
