@@ -69,13 +69,14 @@
         ocat = sim_normal)
 
     model_fun <- switch(model,
-                        eg1 = four_term_additive_model,
-                        eg2 = bivariate_model,
-                        eg3 = continuous_by_model,
-                        eg4 = factor_by_model,
-                        eg5 = additive_plus_factor_model,
-                        eg6 = four_term_plus_ranef_model,
-                        eg7 = correlated_four_term_additive_model)
+        eg1 = four_term_additive_model,
+        eg2 = bivariate_model,
+        eg3 = continuous_by_model,
+        eg4 = factor_by_model,
+        eg5 = additive_plus_factor_model,
+        eg6 = four_term_plus_ranef_model,
+        eg7 = correlated_four_term_additive_model,
+        gwf2 = gu_wabha_f2)
 
     sim <- model_fun(n = n, sim_fun = sim_fun, scale = scale, theta = theta,
         power = power)
@@ -322,11 +323,23 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
     data <- four_term_additive_model(n = n, sim_fun = sim_fun, scale = 0.01)
     data <- mutate(data, fac = rep(1:4, n / 4))
     data <- mutate(data,
-                   f = .data$f + .data$fac * 3,
-                   fac = as.factor(.data$fac))
+        f = .data$f + .data$fac * 3,
+        fac = as.factor(.data$fac))
     data2 <- sim_fun(data$f, scale = scale, theta = theta, power = power)
     data <- mutate(data, y = data2$y)
     data[c("y", "x0", "x1", "x2", "x3", "fac", "f", "f0", "f1", "f2", "f3")]
+}
+
+#' @importFrom tibble tibble
+#' @importFrom dplyr mutate bind_cols
+#' @importFrom rlang .data
+`gu_wabha_f2` <- function(n, sim_fun = sim_normal, scale = 2,
+    theta = 3, power = 1.5) {
+    data <- tibble(x = runif(n, 0, 1))
+    data <- mutate(data, f2 = gw_f2(.data$x))
+    data2 <- sim_fun(x = data$f2, scale, theta = theta, power = power)
+    data <- bind_cols(data2, data)
+    data[c("y", "x", "f", "f2")]
 }
 
 #' Generate reference simulations for testing
