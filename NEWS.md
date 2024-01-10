@@ -1,4 +1,4 @@
-# gratia 0.8.1.56
+# gratia 0.8.2.57
 
 ## Breaking changes
 
@@ -188,7 +188,10 @@
   from fitted model coefficients. `generate_daws()` is an S3 generic function so
   is extensible by users. Currently provides a simple interface to a simple
   Gaussian approximation sampler (`gaussian_draws()`) and the simple Metropolis
-  Hasting sample (`mh_draws()`) available via `mgcv::gam.mh()`. # 211
+  Hasting sample (`mh_draws()`) available via `mgcv::gam.mh()`. #211
+
+* `data_sim()` gains a new example `"gwf2"`, simulating data only from Gu &
+  Wabha's *f2* function.
 
 ## Bug fixes
 
@@ -233,6 +236,10 @@
   offset terms in the formula. Offset terms supplied via the `offset` argument
   are ignored by `mgcv:::predict.gam()` and hence are ignored also by `gratia`.
   Reported by @jonathonmellor #231 #233
+
+# gratia 0.8.2
+
+* Small fixes for CRAN.
 
 # gratia 0.8.1
 
