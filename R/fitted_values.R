@@ -118,7 +118,7 @@
         as_tibble()
     # add .row *unless* it already exists
     if (!".row" %in% names(data)) {
-        fit <- mutate(.row = row_number())
+        fit <- mutate(fit, .row = row_number())
     }
     fit <- bind_cols(data, fit) |>
         relocate(".row", .before = 1L)
