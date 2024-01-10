@@ -77,7 +77,7 @@
     betas <- switch(method,
         "gaussian" = gaussian_draws(model = model, n = n,
             n_cores = n_cores, index = index, frequentist = frequentist,
-            unconditional = FALSE, parametrized = parametrized,
+            unconditional = unconditional, parametrized = parametrized,
             mvn_method = mvn_method, ...),
         "mh" = mh_draws(n = n, model = model, burnin = burnin,
             thin = thin, t_df = t_df, rw_scale = rw_scale, index = index, ...),
@@ -114,7 +114,7 @@
     betas <- switch(method,
         "gaussian" = gaussian_draws(model = model, n = n,
             n_cores = n_cores, index = index, frequentist = frequentist,
-            unconditional = FALSE, mvn_method = mvn_method, ...),
+            unconditional = unconditional, mvn_method = mvn_method, ...),
         "mh" = mh_draws(n = n, model = model, burnin = burnin,
             thin = thin, t_df = t_df, rw_scale = rw_scale, index = index),
         "inla" = .NotYetImplemented())
