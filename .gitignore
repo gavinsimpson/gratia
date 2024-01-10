@@ -20,3 +20,6 @@ revdep/
 
 ## skip the .vscode folder with local editor stuff
 .vscode/
+
+## ignore
+CRAN-SUBMISSION
