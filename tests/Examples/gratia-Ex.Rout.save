@@ -1615,11 +1615,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x561ef301c910>
+<environment: 0x55f4ecfd4730>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x561ef301c910>
+<environment: 0x55f4ecfd4730>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2536,6 +2536,42 @@ detaching ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
+> nameEx("smooth_label")
+> ### * smooth_label
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: smooth_label
+> ### Title: Extract the label for a smooth used by 'mgcv'
+> ### Aliases: smooth_label smooth_label.gam smooth_label.mgcv.smooth
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> df <- data_sim("gwf2", n = 100)
+> m <- gam(y ~ s(x), data = df, method = "REML")
+> 
+> # extract the smooth
+> sm <- get_smooths_by_id(m, id = 1)[[1]]
+> 
+> # extract the label
+> smooth_label(sm)
+[1] "s(x)"
+> 
+> # or directly on the fitted GAM
+> smooth_label(m$smooth[[1]])
+[1] "s(x)"
+> 
+> # or extract labels by idex/position
+> smooth_label(m, id = 1)
+[1] "s(x)"
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("smooth_samples")
 > ### * smooth_samples
 > 
@@ -2697,7 +2733,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  17.956 0.24 17.924 0 0 
+Time elapsed:  39.125 0.392 38.973 0 0 
 > grDevices::dev.off()
 null device 
           1 

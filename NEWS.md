@@ -47,8 +47,8 @@
   This also affects `draw.gam()`.
 
 * `fitted_values()` now has some level of support for location, scale, shape
-  families. Supported families are `mgcv::gaulss()`, `mgcv::gumbls()`,
-  `mgcv::gevlss()`, `mgcv::gumbls()`, `mgcv::shash()`, `mgcv::twlss()`, and
+  families. Supported families are `mgcv::gaulss()`, `mgcv::gammals()`,
+  `mgcv::gumbls()`, `mgcv::gevlss()`, `mgcv::shash()`, `mgcv::twlss()`, and
   `mgcv::ziplss()`.
 
 * *gratia* now requires *dplyr* versions >= 1.1.0 and *tidyselect* >= 1.2.0.
