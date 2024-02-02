@@ -1,4 +1,4 @@
-# gratia 0.8.2.57
+# gratia 0.8.2.58
 
 ## Breaking changes
 
@@ -39,7 +39,7 @@
 * The output of `smooth_estimates()` and its `draw()` method have changed for
   tensor product smooths that involve one or more 2D marginal smooths. Now,
   if no covariate values are supplied via the `data` argument,
-  `smooth_estimates()` identifies that one of the marginals is a 2d surface and
+  `smooth_estimates()` identifies if one of the marginals is a 2d surface and
   allows the covariates involved in that surface to vary fastest, ahead of terms
   in other marginals. This change has been made as it provides a better default
   when nothing is provided to `data`.
@@ -53,6 +53,9 @@
 
 * *gratia* now requires *dplyr* versions >= 1.1.0 and *tidyselect* >= 1.2.0.
 
+* A new vignette *Posterior Simulation* is available, which describes how to
+  do posterior simulation from fitted GAMs using {gratia}.
+
 ## New features
 
 * `response_derivatives()` is a new function for computing derivatives of the
@@ -64,7 +67,7 @@
   sampler (see below.)
 
 * `derivative_samples()` is the work horse function behind
-  `response_derivatives()`, which computes and returns posSterior draws of the
+  `response_derivatives()`, which computes and returns posterior draws of the
   derivatives of any additive combination of model terms. Requested by
   @jonathanmellor #237
 
@@ -129,7 +132,7 @@
   0). Currently, methods for `derivatives()` and `smooth_estimates()` objects
   are implemented. Part of request of @asanders11 #117
 
-* `draw.dervivatives()` gains arguments `add_change` and `change_type` to allow
+* `draw.derivatives()` gains arguments `add_change` and `change_type` to allow
   derivatives of smooths to be plotted with indicators where the credible
   interval on the derivative excludes 0. Options allow for periods of decrease
   or increase to be differentiated via `change_type = "sizer"` instead of the
@@ -163,14 +166,14 @@
   combinations of those generated values. This would ignore the structure
   implicit in the tensor product, where we are likely to want to know how the
   surface estimated by the Duchon spline of `x` and `y` smoothly varies with
-  `z`. Instead, previously `smooth_estimates()` would generate surfaces of `z`
-  and `x`, varying by `y`. Now, `smooth_estimates()` correctly identifies that
-  one of the marginal smooths of the tensor product is a 2D surface and will
-  focus on that surface varying with the other terms in the tensor product.
+  `z`. Previously `smooth_estimates()` would generate surfaces of `z` and `x`,
+  varying by `y`. Now, `smooth_estimates()` correctly identifies that one of the
+  marginal smooths of the tensor product is a 2D surface and will focus on that
+  surface varying with the other terms in the tensor product.
 
   This improved behaviour is needed because in some `bam()` models it is not
-  possible to do the obvious thing and reorder the smooths when defining the
-  tensor product to be `te(x, y, z, bs = c(ds, cr), d = c(2, 1))`. When
+  always possible to do the obvious thing and reorder the smooths when defining
+  the tensor product to be `te(x, y, z, bs = c(ds, cr), d = c(2, 1))`. When
   `discrete = TRUE` is used with `bam()` the terms in the tensor product may
   get rearranged during model setup for maximum efficiency (See *Details* in
   `?mgcv::bam`).
@@ -193,6 +196,9 @@
 * `data_sim()` gains a new example `"gwf2"`, simulating data only from Gu &
   Wabha's *f2* function.
 
+* `smooth_label()` is a new function for extracting the labels 'mgcv' creates for
+  smooths from the smooth object itself.
+
 ## Bug fixes
 
 * `link()`, `inv_link()`, and related family functions for the `ocat()` weren't
@@ -208,7 +214,7 @@
 
 * Constrained factor smooths (`bs = "sz"`) where the factor is not the first
   variable mentioned in the smooth (i.e. `s(x, f, bs = "sz")` for continuous
-  `x` and factor `f`) are now plottable with `draw()`. #208
+  `x` and factor `f`) are now plotable with `draw()`. #208
 
 * `parametric_effects()` was unable to handle special parametric terms like
   `poly(x)` or `log(x)` in formulas. Reported by @fhui28 #212
@@ -236,6 +242,24 @@
   offset terms in the formula. Offset terms supplied via the `offset` argument
   are ignored by `mgcv:::predict.gam()` and hence are ignored also by `gratia`.
   Reported by @jonathonmellor #231 #233
+
+* `smooth_estimates()` would fail on a `"fs"` smooth when a multivariate base
+  smoother was used *and* the factor was not the last variable specified in the
+  definition of the smooth: `s(x1, x2, f, bs = "fs", xt = list(bs = "ds"))`
+  would work, but `s(f, x1, x2, bs = "fs", xt = list(bs = "ds"))` (or any
+  ordering of variables that places the factor not last) would emit an obscure
+  error. The ordering of the terms involved in the smooth now doesn't matter.
+  Reported by @chrisaak #249.
+
+* `draw.gam()` would fail when plotting a multivariate base smoother used in an
+  `"sz"` smooth. Now, this use case is identified and a message printed
+  indicating that (currently) gratia doesn't know how to plot such a smooth.
+  Reported by @chrisaak #249.
+
+* `draw.gam()` would fail when plotting a multivariate base smoother used in an
+  `"fs"` smooth. Now, this use case is identified and a message printed
+  indicating that (currently) gratia doesn't know how to plot such a smooth.
+  Reported by @chrisaak #249.
 
 # gratia 0.8.2
 

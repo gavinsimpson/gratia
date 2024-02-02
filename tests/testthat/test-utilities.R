@@ -418,3 +418,18 @@ test_that("null_deviance works for a gam", {
     expect_silent(nd <- null_deviance(m_bam))
     expect_identical(null_deviance(m_gam), m_bam$null.deviance)
 })
+
+## smooth_label
+test_that("smooth_label extracts the smooth label from a GAM", {
+    expect_silent(lab <- smooth_label(m_gam$smooth[[1]]))
+    expect_identical(lab, "s(x0)")
+
+    labs <- vapply(m_gam$smooth, FUN = smooth_label, FUN.VALUE = character(1L))
+    expect_identical(labs, c("s(x0)", "s(x1)", "s(x2)", "s(x3)"))
+})
+
+test_that("smooth_label works for a gam object", {
+    expect_identical(smooth_label(m_gam, id = 1), "s(x0)")
+    expect_identical(smooth_label(m_gam),
+        c("s(x0)", "s(x1)", "s(x2)", "s(x3)"))
+})

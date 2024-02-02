@@ -172,7 +172,7 @@ m_lm  <- lm(y ~ x0 + x1 + x2 + x3, data = quick_eg1)
 
 m_glm <- glm(y ~ x0 + x1 + x2 + x3, data = quick_eg1)
 
-# rootogram models
+##-- rootogram models ----------------------------------------------------------
 df_pois  <- data_sim("eg1", dist = "poisson", n = 500L, scale = 0.2, seed = 42)
 ## fit the model
 b_pois  <-  bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
@@ -183,6 +183,33 @@ m_negbin <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
                 method = "REML", family = negbin(25))
 m_tw    <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df_pois,
                 method = "REML", family = tw())
+
+##-- fs smooths ----------------------------------------------------------------
+
+## simulate example... from ?mgcv::factor.smooth.interaction
+# set.seed(0)
+## simulate data...
+df_fs <- withr::with_seed(0, {
+    f0 <- function(x) 2 * sin(pi * x)
+    f1 <- function(x, a = 2, b = -1) exp(a * x) + b
+    f2 <- function(x) 0.2 * x^11 * (10 * (1 - x))^6 + 10 *
+        (10 * x)^3 * (1 - x)^10
+    n <- 500
+    nf <- 10
+    fac <- sample(1:nf, n, replace = TRUE)
+    x0 <- runif(n)
+    x1 <- runif(n)
+    x2 <- runif(n)
+    a <- rnorm(nf) * .2 + 2
+    b <- rnorm(nf) * .5
+    f <- f0(x0) + f1(x1, a[fac], b[fac]) + f2(x2)
+    fac <- factor(fac)
+    y <- f + rnorm(n) * 2
+
+    data.frame(y = y, x0 = x0, x1 = x1, x2 = x2, fac = fac)
+})
+mod_fs <- gam(y ~ s(x0) + s(x1, fac, bs = "fs", k = 5) + s(x2, k = 20),
+              data = df_fs, method = "ML")
 
 #-- A standard GAM with a simple random effect ---------------------------------
 su_re <- quick_eg1
@@ -401,3 +428,16 @@ twlss_df <- withr::with_seed(3, gamSim(1, n = 400, dist = "poisson",
 m_twlss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1, ~ 1),
   family = twlss(), data = twlss_df)
 
+##-- Models for 2d sz and fs basis smooths #249 --------------------------------
+i_m <- c(1, 0.5)
+i_xt <- list(bs = "ds", m = i_m)
+i_sz <- gam(Petal.Width ~ s(Sepal.Length, Sepal.Width, bs = "ds", m = i_m) +
+    s(Species, Sepal.Length, Sepal.Width, bs = "sz", xt = i_xt),
+  method = "REML",
+  data = iris)
+
+i_fs <- gam(Petal.Width ~ s(Sepal.Length, Sepal.Width, bs = "ds", m = i_m) +
+    s(Sepal.Length, Sepal.Width, Species, bs = "fs", xt = i_xt),
+  method = "REML",
+  data = iris)
+rm(i_m, i_xt)

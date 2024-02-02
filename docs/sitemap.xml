@@ -319,6 +319,9 @@
     <loc>https://gavinsimpson.github.io/gratia/reference/ref_sims.html</loc>
   </url>
   <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/reorder_fs_smooth_terms.html</loc>
+  </url>
+  <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/reorder_tensor_smooth_terms.html</loc>
   </url>
   <url>
@@ -362,6 +365,9 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/smooth_estimates.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/smooth_label.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/smooth_samples.html</loc>

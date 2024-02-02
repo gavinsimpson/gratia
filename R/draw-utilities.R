@@ -27,7 +27,7 @@
     sm_dim <- smooth_dim(smooth)
     # clause triggers for any m-d marginal: doesn't mean we have a 2d smooth
     # but we focus on 2d terms because of if on n_2d_margins
-    # this could be improved for a 3d amrginal in a 4d tensor - we could take
+    # this could be improved for a 3d marginal in a 4d tensor - we could take
     # the first 2 terms in that 3d marginal and then reorder the 3rd term in
     # the marginal plus the 4th term in the tensor after the first two
     if (n_margin < sm_dim) {
@@ -41,6 +41,26 @@
         }
         var_order <- unlist(m_terms[take])
     }
+    var_order # return
+}
+
+#' Reorder random factor smooth terms to place factor last
+#'
+#' @param smooth an mgcv smooth object
+#'
+#' @keywords internal
+`reorder_fs_smooth_terms` <- function(smooth) {
+    # ensure we're working with an mgcv smooth
+    check_is_mgcv_smooth(smooth)
+    # take the order as specified in smooth$term as we return this if we can't
+    # improve the order
+    var_order <- smooth_variable(smooth)
+    # which term is the factor - info in smooth$base$term is the vars in the
+    # smooth which will be continuous vars. The omitted term is the factor
+    base_vars <- smooth$base$term
+    f_var <- setdiff(var_order, base_vars)
+    # reorder so  f_var is after base_vars
+    var_order <- c(base_vars, f_var)
     var_order # return
 }
 

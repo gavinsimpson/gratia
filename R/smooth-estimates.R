@@ -555,11 +555,18 @@
         by_var <- NA_character_
     }
 
+    # order of variables - we can specify fs smooths with the factor term
+    # anywhere in the smooth definition:
+    #   s(f, x1, x2, bs = "fs", xt = list(bs = "ds"))
+    # and the code to evaluate fs smooths works if the terms are evaluated in
+    # with the factor last. So use the reordering functionality in place for
+    # >=3D tensor product smooths
+    var_order <- reorder_tensor_smooth_terms(smooth)
+
     ## deal with data if supplied
     id <- which_smooth(model, smooth_label(smooth))
     data <- process_user_data_for_eval(data = data, model = model,
-                                       n = n, n_3d = NULL, n_4d = NULL,
-                                       id = id)
+        n = n, n_3d = NULL, n_4d = NULL, id = id, var_order = var_order)
 
     ## values of spline at data
     eval_sm <- spline_values2(smooth, data = data,
@@ -1731,6 +1738,15 @@
         variables <- vars_from_label(unique(object[[".smooth"]]))
     }
 
+    # throw a warning and return NULL if trying to plot a >=2d base smoother
+    # like a 2D TPRS or Duchon spline
+    if ((l <- length(variables)) > 2L) {
+        # warning("Can't plot ", l - 1, "D random factor smooths. Not plotting.")
+        message("Can't currently plot multivariate 'fs' smooths.")
+        message("Skipping: ", unique(object[[".smooth"]]))
+        return(NULL) # returns early!
+    }
+
     if (is.null(discrete_colour)) {
         discrete_colour <- scale_colour_discrete()
     }
@@ -1818,8 +1834,66 @@
         variables <- vars_from_label(unique(object[[".smooth"]]))
     }
 
+    fs <- vapply(object[variables], is.factor, logical(1L))
+    # Are we plotting a >1D base smoother?
+    plt <- if (sum(!fs) > 1L) {
+        plot_multivariate_sz_smooth(object, variables = variables, rug = rug,
+            constant = constant, fun = fun, ci_alpha = ci_alpha,
+            xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
+            caption = caption, ylim = ylim, discrete_colour = discrete_colour,
+            discrete_fill = discrete_fill, angle = angle,
+            ...)
+    } else {
+        plot_univariate_sz_smooth(object, variables = variables, rug = rug,
+            constant = constant, fun = fun, ci_alpha = ci_alpha,
+            xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
+            caption = caption, ylim = ylim, discrete_colour = discrete_colour,
+            discrete_fill = discrete_fill, angle = angle,
+            ...)
+    }
+    plt
+}
+
+`plot_multivariate_sz_smooth` <- function(object,
+    variables = NULL,
+    rug = NULL,
+    constant = NULL,
+    fun = NULL,
+    ci_alpha = 0.2,
+    xlab = NULL,
+    ylab = NULL,
+    title = NULL,
+    subtitle = NULL,
+    caption = NULL,
+    ylim = NULL,
+    discrete_colour = NULL,
+    discrete_fill = NULL,
+    angle = NULL,
+    ...) {
+    message("Can't currently plot multivariate 'sz' smooths.")
+    message("Skipping: ", unique(object[[".smooth"]]))
+    NULL
+}
+
+`plot_univariate_sz_smooth` <- function(object,
+    variables = NULL,
+    rug = NULL,
+    constant = NULL,
+    fun = NULL,
+    ci_alpha = 0.2,
+    xlab = NULL,
+    ylab = NULL,
+    title = NULL,
+    subtitle = NULL,
+    caption = NULL,
+    ylim = NULL,
+    discrete_colour = NULL,
+    discrete_fill = NULL,
+    angle = NULL,
+    ...) {
     # variables will likely be length two, but it could be >2 if there are
-    # multivariate factors
+    # multivariate factors **or** if the base smooth is nD isotropic smooth
+    # such as a TPRS or Duchon spline
     fs <- vapply(object[variables], is.factor, logical(1L))
     if (length(variables) > 2L) {
         object <- mutate(object,
@@ -1890,10 +1964,10 @@
         guides(x = guide_axis(angle = angle))
 
     ## default axis labels if none supplied
-    if (missing(xlab)) {
+    if (is.null(xlab)) {
         xlab <- x_var
     }
-    if (missing(ylab)) {
+    if (is.null(ylab)) {
         ylab <- "Partial effect"
     }
     if (is.null(title)) {

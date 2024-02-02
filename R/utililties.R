@@ -118,9 +118,58 @@
     smooth[["fterm"]]
 }
 
-`smooth_label` <- function(smooth) {
-    check_is_mgcv_smooth(smooth)
-    smooth[["label"]]
+#' Extract the label for a smooth used by 'mgcv'
+#'
+#' The label 'mgcv' uses for smooths is useful in many contexts, including
+#' selecting smooths or labelling plots. `smooth_label()` extracts this label
+#' from an 'mgcv' smooth object, i.e. an object that inherits from class
+#' `"mgcv.smooth"`. These would typically be found in the `$smooth` component of
+#' a GAM fitted by [mgcv::gam()] or [mgcv::bam()], or related functions.
+#'
+#' @param object an R object. Currently, methods for class `"gam"` and for mgcv
+#'   smooth objects inheriting from class `"mgcv.smooth"` are supported.
+#' @param ... arguments passed to other methods.
+#'
+#' @return A character vector.
+#'
+#' @export
+#' @examples
+#' load_mgcv()
+#' df <- data_sim("gwf2", n = 100)
+#' m <- gam(y ~ s(x), data = df, method = "REML")
+#'
+#' # extract the smooth
+#' sm <- get_smooths_by_id(m, id = 1)[[1]]
+#'
+#' # extract the label
+#' smooth_label(sm)
+#'
+#' # or directly on the fitted GAM
+#' smooth_label(m$smooth[[1]])
+#'
+#' # or extract labels by idex/position
+#' smooth_label(m, id = 1)
+`smooth_label` <- function(object, ...) {
+    UseMethod("smooth_label")
+}
+
+#' @export
+#'
+#' @param id numeric; the indices of the smooths whose labels are to be
+#'   extracted. If missing, labels for all smooths in the model are returned.
+#'
+#' @rdname smooth_label
+`smooth_label.gam` <- function(object, id, ...) {
+    sms <- get_smooths_by_id(object, id = id)
+    vapply(sms, smooth_label, character(1L))
+}
+
+#' @export
+#'
+#' @rdname smooth_label
+`smooth_label.mgcv.smooth` <- function(object, ...) {
+    check_is_mgcv_smooth(object)
+    object[["label"]]
 }
 
 #' @title Check if objects are smooths or are a particular type of smooth
