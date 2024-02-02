@@ -255,31 +255,6 @@ test_that("draw() can handle non-standard names -- a function call as a name", {
     expect_doppelganger("draw.gam model with non-standard names", p1)
 })
 
-## simulate example... from ?mgcv::factor.smooth.interaction
-# set.seed(0)
-## simulate data...
-df <- withr::with_seed(0, {
-    f0 <- function(x) 2 * sin(pi * x)
-    f1 <- function(x, a = 2, b = -1) exp(a * x) + b
-    f2 <- function(x) 0.2 * x^11 * (10 * (1 - x))^6 + 10 *
-        (10 * x)^3 * (1 - x)^10
-    n <- 500
-    nf <- 10
-    fac <- sample(1:nf, n, replace = TRUE)
-    x0 <- runif(n)
-    x1 <- runif(n)
-    x2 <- runif(n)
-    a <- rnorm(nf) * .2 + 2
-    b <- rnorm(nf) * .5
-    f <- f0(x0) + f1(x1, a[fac], b[fac]) + f2(x2)
-    fac <- factor(fac)
-    y <- f + rnorm(n) * 2
-
-    data.frame(y = y, x0 = x0, x1 = x1, x2 = x2, fac = fac)
-})
-mod_fs <- gam(y~s(x0) + s(x1, fac, bs = "fs", k = 5) + s(x2, k = 20),
-              data = df, method = "ML")
-
 test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
     # skip_on_os("mac") # try without this and check on Simon's mac system
     skip_on_ci()
