@@ -837,50 +837,6 @@ detaching ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
-> nameEx("draw.evaluated_smooth")
-> ### * draw.evaluated_smooth
-> 
-> flush(stderr()); flush(stdout())
-> 
-> ### Name: draw.evaluated_smooth
-> ### Title: Plot estimated smooths
-> ### Aliases: draw.evaluated_smooth draw.evaluated_1d_smooth
-> ###   draw.evaluated_2d_smooth geom_rug draw.evaluated_re_smooth
-> ###   draw.evaluated_fs_smooth draw.evaluated_parametric_term
-> 
-> ### ** Examples
-> 
-> ## Don't show: 
-> op <- options(cli.unicode = FALSE)
-> ## End(Don't show)
-> load_mgcv()
-> 
-> dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
-> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-> 
-> sm <- evaluate_smooth(m1, "s(x2)")
-Warning: `evaluate_smooth()` was deprecated in gratia 0.7.0.
-i Please use `smooth_estimates()` instead.
-> draw(sm)
-> 
-> ## supply constant to shift y axis scale
-> draw(sm, constant = coef(m1)[1])
-> 
-> dat <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
-> m2 <- gam(y ~ s(x, z, k = 40), data = dat, method = "REML")
-> 
-> sm <- evaluate_smooth(m2, "s(x,z)", n = 100)
-> draw(sm)
-> ## Don't show: 
-> options(op)
-> ## End(Don't show)
-> 
-> 
-> 
-> cleanEx()
-
-detaching ‘package:mgcv’
-
 > nameEx("draw.gam")
 > ### * draw.gam
 > 
@@ -960,7 +916,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 + }
 This is mgcv 1.9-1. For overview type 'help("mgcv-package")'.
 
-This is GJRM 0.2-6.4.
+This is GJRM 0.2-6.5.
 For overview type 'help("GJRM-package")'.
 
 > 
@@ -1197,70 +1153,6 @@ detaching ‘package:mgcv’
   <chr>    <dbl>
 1 m      17.436 
 2 m2      7.5777
-> ## Don't show: 
-> options(op)
-> ## End(Don't show)
-> 
-> 
-> 
-> cleanEx()
-
-detaching ‘package:mgcv’
-
-> nameEx("evaluate_smooth")
-> ### * evaluate_smooth
-> 
-> flush(stderr()); flush(stdout())
-> 
-> ### Name: evaluate_smooth
-> ### Title: Evaluate a smooth
-> ### Aliases: evaluate_smooth evaluate_smooth.gam evaluate_smooth.gamm
-> ###   evaluate_smooth.list
-> 
-> ### ** Examples
-> 
-> load_mgcv()
-> ## Don't show: 
-> op <- options(cli.unicode = FALSE, pillar.sigfig = 2)
-> ## End(Don't show)
-> dat <- data_sim("eg1", n = 500, dist = "normal", scale = 1, seed = 2)
-> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-> 
-> evaluate_smooth(m1, "s(x1)")
-# A tibble: 100 x 5
-   smooth by_variable     x1   est    se
-   <chr>  <fct>        <dbl> <dbl> <dbl>
- 1 s(x1)  <NA>        0.0025  -2.1 0.17 
- 2 s(x1)  <NA>        0.013   -2.1 0.15 
- 3 s(x1)  <NA>        0.023   -2.1 0.14 
- 4 s(x1)  <NA>        0.033   -2.0 0.13 
- 5 s(x1)  <NA>        0.043   -2.0 0.12 
- 6 s(x1)  <NA>        0.053   -2.0 0.11 
- 7 s(x1)  <NA>        0.063   -2.0 0.11 
- 8 s(x1)  <NA>        0.073   -2.0 0.10 
- 9 s(x1)  <NA>        0.083   -2.0 0.10 
-10 s(x1)  <NA>        0.093   -2.0 0.097
-# i 90 more rows
-> 
-> ## 2d example
-> dat <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
-> m2 <- gam(y ~ s(x, z, k = 30), data = dat, method = "REML")
-> 
-> evaluate_smooth(m2, "s(x,z)", n = 50)
-# A tibble: 2,500 x 6
-   smooth by_variable       x       z   est    se
-   <chr>  <fct>         <dbl>   <dbl> <dbl> <dbl>
- 1 s(x,z) <NA>        0.00066 0.00076 0.088  0.19
- 2 s(x,z) <NA>        0.021   0.00076 0.097  0.18
- 3 s(x,z) <NA>        0.041   0.00076 0.11   0.18
- 4 s(x,z) <NA>        0.062   0.00076 0.12   0.17
- 5 s(x,z) <NA>        0.082   0.00076 0.13   0.16
- 6 s(x,z) <NA>        0.10    0.00076 0.14   0.16
- 7 s(x,z) <NA>        0.12    0.00076 0.14   0.15
- 8 s(x,z) <NA>        0.14    0.00076 0.15   0.15
- 9 s(x,z) <NA>        0.16    0.00076 0.16   0.14
-10 s(x,z) <NA>        0.18    0.00076 0.17   0.14
-# i 2,490 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1615,11 +1507,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55f4ecfd4730>
+<environment: 0x55de4644ee88>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55f4ecfd4730>
+<environment: 0x55de4644ee88>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2733,7 +2625,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  39.125 0.392 38.973 0 0 
+Time elapsed:  33.091 0.332 32.783 0 0 
 > grDevices::dev.off()
 null device 
           1 
