@@ -39,8 +39,11 @@ A data frame of new values spread over the range of the
 observed values.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+
 For each smooth in a GAM, generate new data over the range of the variables
-involved in a smooth.
+involved in a smooth. This function is deprecated as it is only useful for a
+very narrow use-case. Use \code{\link[=data_slice]{data_slice()}} instead.
 }
 \author{
 Gavin L. Simpson

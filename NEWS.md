@@ -1,4 +1,4 @@
-# gratia 0.8.2.58
+# gratia 0.8.9.1
 
 ## Breaking changes
 
@@ -21,6 +21,27 @@
   `smooth_estimates()`; in place of the `var` and `data` columns, *gratia* now
   stores the data variables at which the derivatives were evaluated as columns
   in the object with their actual variable names.
+
+### Defunct and deprecated functions
+
+#### Defunct
+
+* `evaluate_smooth()` was deprecated in gratia version 0.7.0. This function and
+  all it's methods have been removed from the package. Use `smooth_estimates()`
+  instead.
+
+#### Deprecated functions
+
+The following functions were deprecated in version 0.9.0 of gratia. They will
+eventually be removed from the package as part of a clean up ahead of an
+eventual 1.0.0 release. These functions will become defunct by version 0.11.0 or
+1.0.0, whichever is released soonest.
+
+* `evaluate_parametric_term()` has been deprecated. Use `parametric_effects()`
+  instead.
+
+* `datagen()` has been deprecated. It never really did what it was originally
+  designed to do, and has been replaced by `data_slice()`.
 
 ## User visible changes
 

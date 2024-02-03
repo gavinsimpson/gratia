@@ -2,7 +2,6 @@
 % Please edit documentation in R/add-methods.R
 \name{add_constant}
 \alias{add_constant}
-\alias{add_constant.evaluated_smooth}
 \alias{add_constant.smooth_estimates}
 \alias{add_constant.smooth_samples}
 \alias{add_constant.mgcv_smooth}
@@ -12,8 +11,6 @@
 \title{Add a constant to estimated values}
 \usage{
 add_constant(object, constant = NULL, ...)
-
-\method{add_constant}{evaluated_smooth}(object, constant = NULL, ...)
 
 \method{add_constant}{smooth_estimates}(object, constant = NULL, ...)
 

@@ -2,54 +2,14 @@
 % Please edit documentation in R/evaluate_smooth.R
 \name{evaluate_smooth}
 \alias{evaluate_smooth}
-\alias{evaluate_smooth.gam}
-\alias{evaluate_smooth.gamm}
-\alias{evaluate_smooth.list}
 \title{Evaluate a smooth}
 \usage{
 evaluate_smooth(object, ...)
-
-\method{evaluate_smooth}{gam}(
-  object,
-  smooth,
-  n = 100,
-  newdata = NULL,
-  unconditional = FALSE,
-  overall_uncertainty = TRUE,
-  dist = 0.1,
-  ...
-)
-
-\method{evaluate_smooth}{gamm}(object, ...)
-
-\method{evaluate_smooth}{list}(object, ...)
 }
 \arguments{
 \item{object}{an object of class \code{"gam"} or \code{"gamm"}.}
 
 \item{...}{arguments passed to other methods.}
-
-\item{smooth}{character; a single smooth to evaluate.}
-
-\item{n}{numeric; the number of points over the range of the covariate at
-which to evaluate the smooth.}
-
-\item{newdata}{a vector or data frame of points at which to evaluate the
-smooth.}
-
-\item{unconditional}{logical; should confidence intervals include the
-uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian
-covariance matrix will be used.}
-
-\item{overall_uncertainty}{logical; should the uncertainty in the model
-constant term be included in the standard error of the evaluate values of
-the smooth?}
-
-\item{dist}{numeric; if greater than 0, this is used to determine when
-a location is too far from data to be plotted when plotting 2-D smooths.
-The data are scaled into the unit square before deciding what to exclude,
-and \code{dist} is a distance within the unit square. See
-\code{\link[mgcv:exclude.too.far]{mgcv::exclude.too.far()}} for further details.}
 }
 \value{
 A data frame, which is of class \code{"evaluated_1d_smooth"} or
@@ -74,26 +34,4 @@ function call to \code{\link[=smooth_estimates]{smooth_estimates()}}. However, t
 \itemize{
 \item the \code{newdata} argument becomes \code{data}
 }
-
-Consider \code{evaluate_smooth()} to be \emph{soft}-deprecated; its use is discouraged
-and it may be removed at a later date if it becomes difficult to maintain
-the current functionality, but there are no intentions of removing it from
-gratia unless that situation arises.
-}
-\examples{
-load_mgcv()
-\dontshow{
-op <- options(cli.unicode = FALSE, pillar.sigfig = 2)
-}
-dat <- data_sim("eg1", n = 500, dist = "normal", scale = 1, seed = 2)
-m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-
-evaluate_smooth(m1, "s(x1)")
-
-## 2d example
-dat <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
-m2 <- gam(y ~ s(x, z, k = 30), data = dat, method = "REML")
-
-evaluate_smooth(m2, "s(x,z)", n = 50)
-\dontshow{options(op)}
 }

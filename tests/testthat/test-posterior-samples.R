@@ -51,12 +51,12 @@ test_that("smooth_samples works for a simple GAM MH sampling", {
 })
 
 test_that("smooth_samples works for a multi-smooth GAM", {
-    expect_silent(sm <- smooth_samples(m_gam, n = 5, n_vals = 100, seed = 42))
-    expect_s3_class(sm, c("smooth_samples", "tbl_df",
-                          "tbl", "data.frame"))
-    ## 2000 == 4 smooths * 5 * 100
-    expect_identical(NROW(sm), 2000L)
-    expect_identical(NCOL(sm), 11L) # 11 cols, 4 univatiate smooths
+  expect_silent(sm <- smooth_samples(m_gam, n = 5, n_vals = 100, seed = 42))
+  expect_s3_class(sm, c("smooth_samples", "tbl_df",
+    "tbl", "data.frame"))
+  ## 2000 == 4 smooths * 5 * 100
+  expect_identical(NROW(sm), 2000L)
+  expect_identical(NCOL(sm), 11L) # 11 cols, 4 univatiate smooths
 })
 
 test_that("smooth_samples works for a multi-smooth factor by GAM", {
@@ -70,18 +70,17 @@ test_that("smooth_samples works for a multi-smooth factor by GAM", {
 })
 
 test_that("smooth_samples works for a multi-smooth SCAM", {
-    expect_silent(sm <- smooth_samples(m_scam, n = 5, n_vals = 50, eed = 42))
-    expect_s3_class(sm, c("smooth_samples", "tbl_df",
-                          "tbl", "data.frame"))
-    ## 500 == 2 smooths * 5 * 50
-    expect_identical(NROW(sm), 500L)
-    expect_identical(NCOL(sm), 9L)
+  expect_silent(sm <- smooth_samples(m_scam, n = 5, n_vals = 50, seed = 42))
+  expect_s3_class(sm, c("smooth_samples", "tbl_df", "tbl", "data.frame"))
+  ## 500 == 2 smooths * 5 * 50
+  expect_identical(NROW(sm), 500L)
+  expect_identical(NCOL(sm), 9L)
 })
 
 test_that("smooth_samples() fails if not suitable method available", {
-    expect_error(smooth_samples(1:10),
-                 "Don't know how to sample from the posterior of <integer>",
-                 fixed = TRUE)
+  expect_error(smooth_samples(1:10),
+    "Don't know how to sample from the posterior of <integer>",
+    fixed = TRUE)
 })
 
 test_that("smooth_samples sets seed when seed not provided", {

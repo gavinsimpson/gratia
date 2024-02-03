@@ -21,7 +21,7 @@
 )
 }
 \arguments{
-\item{object}{an object, the result of a call to \code{\link[=evaluate_smooth]{evaluate_smooth()}}.}
+\item{object}{a fitted GAM, the result of a call to \code{\link[mgcv:gam]{mgcv::gam()}}.}
 
 \item{normalize}{logical; normalize the penalty to the range -1, 1?}
 
@@ -29,8 +29,8 @@
 If \code{TRUE} row 1, column 1 of the penalty matrix is draw in the upper left,
 whereas, if \code{FALSE} it is drawn in the lower left of the plot.}
 
-\item{continuous_fill}{suitable scale used for the filled surface. If \code{NULL},
-the default used is \code{scale_fill_distiller(palette = "RdBu", type = "div")}.}
+\item{continuous_fill}{a suitable fill scale to be used when plotting
+continuous variables.}
 
 \item{xlab}{character or expression; the label for the x axis. If not
 supplied, no axis label will be drawn. May be a vector, one per penalty.}
@@ -53,7 +53,7 @@ spread the plots.}
 \item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
 \code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
 
-\item{...}{arguments passed to other methods.}
+\item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
 \description{
 Displays the penalty matrices of smooths as a heatmap using \code{ggplot}

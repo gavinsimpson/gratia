@@ -14,13 +14,6 @@ test_that("draw() works with continuous by and fixed scales", {
     expect_doppelganger("continuous by-variable smmoth fixed scales", plt)
 })
 
-test_that("evaluate_smooth() works with continuous by", {
-    skip_if_not_installed("withr")
-    withr::local_options(lifecycle_verbosity = "quiet")
-    sm  <- evaluate_smooth(su_m_cont_by, "s(x2)")
-    expect_s3_class(sm, "evaluated_1d_smooth")
-})
-
 test_that("is_by_smooth() is TRUE with continuous by", {
     expect_true(is_by_smooth(su_m_cont_by[["smooth"]][[1]]))
 })

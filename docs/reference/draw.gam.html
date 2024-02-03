@@ -14,7 +14,7 @@ is used instead."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.2.58</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.9.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -264,8 +264,24 @@ with <code>select</code>? If <code>TRUE</code>, <code>select</code> can only be 
 against.</p></dd>
 
 
-<dt>discrete_colour, discrete_fill, continuous_colour, continuous_fill</dt>
-<dd><p>suitable scales for the types of data.</p></dd>
+<dt>discrete_colour</dt>
+<dd><p>a suitable colour scale to be used when plotting
+discrete variables.</p></dd>
+
+
+<dt>discrete_fill</dt>
+<dd><p>a suitable fill scale to be used when plotting
+discrete variables.</p></dd>
+
+
+<dt>continuous_colour</dt>
+<dd><p>a suitable colour scale to be used when plotting
+continuous variables.</p></dd>
+
+
+<dt>continuous_fill</dt>
+<dd><p>a suitable fill scale to be used when plotting
+continuous variables.</p></dd>
 
 
 <dt>position</dt>
@@ -292,7 +308,7 @@ spread the plots</p></dd>
 <dd><p>The relative widths and heights of each column and
 row in the grid. Will get repeated to match the dimensions of the grid. If
 there is more than 1 plot and <code>widths = NULL</code>, the value of <code>widths</code> will
-be set internally to <code>widths = 1</code> to accomodate plots of smooths that
+be set internally to <code>widths = 1</code> to accommodate plots of smooths that
 use a fixed aspect ratio.</p></dd>
 
 

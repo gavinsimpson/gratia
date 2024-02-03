@@ -1,6 +1,6 @@
 Package: gratia
-Version: 0.8.2.58
-Date: 2024-02-02
+Version: 0.8.9.1
+Date: 2024-02-03
 Title: Graceful 'ggplot'-Based Graphics and Other Functions for GAMs Fitted Using 'mgcv'
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     email = "ucfagls@gmail.com",
@@ -59,7 +59,7 @@ LazyData: true
 URL: https://gavinsimpson.github.io/gratia/
 BugReports: https://github.com/gavinsimpson/gratia/issues
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Encoding: UTF-8
 VignetteBuilder: knitr
 Config/testthat/edition: 3

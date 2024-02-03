@@ -55,7 +55,7 @@
         .after = 1L)
 }
 
-## !! Only affects evaluate_smooth()
+## !! Only affects evaluate_smooth() which was removed in 0.9.0
 #' @importFrom tibble add_column
 `add_by_var_info_to_smooth` <- function(smooth, by_name, by_data, n) {
     nc <- NCOL(smooth)

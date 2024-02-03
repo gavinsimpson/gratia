@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.2.58</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.9.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,7 +83,7 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>object</dt>
-<dd><p>an object, the result of a call to <code><a href="evaluate_smooth.html">evaluate_smooth()</a></code>.</p></dd>
+<dd><p>a fitted GAM, the result of a call to <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code>.</p></dd>
 
 
 <dt>normalize</dt>
@@ -97,8 +97,8 @@ whereas, if <code>FALSE</code> it is drawn in the lower left of the plot.</p></d
 
 
 <dt>continuous_fill</dt>
-<dd><p>suitable scale used for the filled surface. If <code>NULL</code>,
-the default used is <code>scale_fill_distiller(palette = "RdBu", type = "div")</code>.</p></dd>
+<dd><p>a suitable fill scale to be used when plotting
+continuous variables.</p></dd>
 
 
 <dt>xlab</dt>
@@ -137,7 +137,7 @@ spread the plots.</p></dd>
 
 
 <dt>...</dt>
-<dd><p>arguments passed to other methods.</p></dd>
+<dd><p>additional arguments passed to <code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code>.</p></dd>
 
 </dl></div>
 

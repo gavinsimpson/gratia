@@ -1,22 +1,36 @@
-## smooth_terms should be removed
+# smooth_terms should be removed
+#' List the variables involved in smooths
+#'
+#' @description
+#' `r lifecycle::badge("experimental")`
+#'
+#' @param object an R object the result of a call to [mgcv::gam()],
+#' [mgcv::bam()], or [mgcv::gamm()], or that inherits from classes `"gam"` or
+#' `"mgcv.smooth"`, or `"fs.interaction"`.
+#' @param ... arguments passed to other methods. Currently unused.
+#' @export
 `smooth_terms` <- function(object, ...) {
-    UseMethod("smooth_terms")
+  UseMethod("smooth_terms")
 }
 
+#' @export
 `smooth_terms.gam` <- function(object, ...) {
-    lapply(object[["smooth"]], `[[`, "term")
+  lapply(object[["smooth"]], `[[`, "term")
 }
 
+#' @export
 `smooth_terms.gamm` <- function(object, ...) {
-    smooth_terms(object[["gam"]], ...)
+  smooth_terms(object[["gam"]], ...)
 }
 
+#' @export
 `smooth_terms.mgcv.smooth` <- function(object, ...) {
-    object[["term"]]
+  object[["term"]]
 }
 
+#' @export
 `smooth_terms.fs.interaction` <- function(object, ...) {
-    object[["term"]]
+  object[["term"]]
 }
 
 #' Dimension of a smooth
@@ -1079,24 +1093,6 @@ vars_from_label <- function(label) {
 #' @author Gavin L. Simpson
 `transform_fun` <- function(object, fun = NULL , ...) {
     UseMethod("transform_fun")
-}
-
-#' @rdname transform_fun
-#' @export
-`transform_fun.evaluated_smooth` <- function(object, fun = NULL, ...) {
-    ## If fun supplied, use it to transform est and the upper and lower interval
-    if (!is.null(fun)) {
-        fun <- match.fun(fun)
-        object[["est"]] <- fun(object[["est"]])
-        if (!is.null(object[["upper"]])) {
-            object[["upper"]] <- fun(object[["upper"]])
-        }
-        if (!is.null(object[["lower"]])) {
-            object[["lower"]] <- fun(object[["lower"]])
-        }
-    }
-
-    object
 }
 
 #' @rdname transform_fun

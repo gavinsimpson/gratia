@@ -1,4 +1,4 @@
-## Test Utilties
+## Test Utilities
 
 test_that("smooth_terms() methods work", {
     st <- smooth_terms(m_gam)
@@ -383,16 +383,13 @@ test_that("term_variables works for a terms", {
 })
 
 test_that("transform_fun works for parametric_effects", {
+    skip_if_not_installed("withr")
+    withr::local_options(lifecycle_verbosity = "quiet")
     expect_message(pe <- parametric_effects(m_para_sm, data = df_2_fac,
     envir = teardown_env()),
                    "Interaction terms are not currently supported.")
     expect_silent(pe <- transform_fun(pe, fun = abs))
     expect_true(all(!pe$.partial < 0L))
-})
-
-test_that("transform_fun works for evaluated_smooth", {
-    expect_warning(sm <- evaluate_smooth(m_gam, smooth = "s(x1)"))
-    expect_silent(sm <- transform_fun(sm, fun = exp))
 })
 
 test_that("transform_fun works for smooth_estimates", {

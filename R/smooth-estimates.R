@@ -3,8 +3,8 @@
 #' Evaluate a smooth at a grid of evenly spaced value over the range of the
 #' covariate associated with the smooth. Alternatively, a set of points at which
 #' the smooth should be evaluated can be supplied. `smooth_estimates()` is a new
-#' implementation of [evaluate_smooth()], and should be used instead of that
-#' other function.
+#' implementation of `evaluate_smooth()`, and replaces that function, which has
+#' been removed from the package.
 #'
 #' @param object an object of class `"gam"` or `"gamm"`.
 #' @param smooth character; a single smooth to evaluate.

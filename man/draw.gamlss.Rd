@@ -35,7 +35,7 @@ spread the plots}
 \item{widths, heights}{The relative widths and heights of each column and
 row in the grid. Will get repeated to match the dimensions of the grid. If
 there is more than 1 plot and \code{widths = NULL}, the value of \code{widths} will
-be set internally to \code{widths = 1} to accomodate plots of smooths that
+be set internally to \code{widths = 1} to accommodate plots of smooths that
 use a fixed aspect ratio.}
 
 \item{...}{arguments passed to \code{\link[=draw.gam]{draw.gam()}}}

@@ -9,7 +9,8 @@
 \arguments{
 \item{object}{a model object fitted by \code{scam()}}
 
-\item{parametrized}{logical; extract parametrized coefficients, which respect the linear inequality constraints of the model.}
+\item{parametrized}{logical; extract parametrized coefficients, which
+respect the linear inequality constraints of the model.}
 
 \item{...}{other arguments.}
 }

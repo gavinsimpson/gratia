@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.2.58</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.9.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -139,27 +139,35 @@ supplied, a suitable label will be generated.</p></dd>
 
 <dt>title</dt>
 <dd><p>character or expression; the title for the plot. See
-<code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggplot2::labs()</a></code>.</p></dd>
+<code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggplot2::labs()</a></code>. May be a vector, one per penalty.</p></dd>
 
 
 <dt>subtitle</dt>
 <dd><p>character or expression; the subtitle for the plot. See
-<code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggplot2::labs()</a></code>.</p></dd>
+<code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggplot2::labs()</a></code>. May be a vector, one per penalty.</p></dd>
 
 
 <dt>caption</dt>
 <dd><p>character or expression; the plot caption. See
-<code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggplot2::labs()</a></code>.</p></dd>
+<code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggplot2::labs()</a></code>. May be a vector, one per penalty.</p></dd>
 
 
-<dt>ci_col, ci_alpha</dt>
-<dd><p>fill colour and alpha transparency for the reference
+<dt>ci_col</dt>
+<dd><p>fill colour for the reference interval when
+<code>method = "simulate"</code>.</p></dd>
+
+
+<dt>ci_alpha</dt>
+<dd><p>alpha transparency for the reference
 interval when <code>method = "simulate"</code>.</p></dd>
 
 
-<dt>point_col, point_alpha</dt>
-<dd><p>colour and alpha transparency for points on the
-QQ plot.</p></dd>
+<dt>point_col</dt>
+<dd><p>colour of points on the QQ plot.</p></dd>
+
+
+<dt>point_alpha</dt>
+<dd><p>alpha transparency of points on the QQ plot.</p></dd>
 
 
 <dt>line_col</dt>

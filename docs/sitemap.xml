@@ -121,7 +121,7 @@
     <loc>https://gavinsimpson.github.io/gratia/reference/draw.difference_smooth.html</loc>
   </url>
   <url>
-    <loc>https://gavinsimpson.github.io/gratia/reference/draw.evaluated_smooth.html</loc>
+    <loc>https://gavinsimpson.github.io/gratia/reference/draw.evaluated_parametric_term.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/draw.gam.html</loc>
@@ -371,6 +371,9 @@
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/smooth_samples.html</loc>
+  </url>
+  <url>
+    <loc>https://gavinsimpson.github.io/gratia/reference/smooth_terms.html</loc>
   </url>
   <url>
     <loc>https://gavinsimpson.github.io/gratia/reference/smooth_type.html</loc>
