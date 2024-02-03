@@ -105,17 +105,11 @@ test_that("add_constant works for parametric_effects", {
 })
 
 test_that("add_constant works for evaluate_parametric_term", {
+    skip_if_not_installed("withr")
+    withr::local_options(lifecycle_verbosity = "quiet")
     expect_silent(pe <- evaluate_parametric_term(m_para_sm, term = "fac"))
     expect_silent(pe <- add_constant(pe, constant = 10))
     expect_error(pe <- add_constant(pe, constant = "a"),
-                 "'constant' must be numeric: supplied <a>",
-                 fixed = TRUE)
-})
-
-test_that("add_constant works for evaluated_smooth", {
-    expect_warning(sm <- evaluate_smooth(m_gam, smooth = "s(x1)"))
-    expect_silent(sm <- add_constant(sm, constant = 10))
-    expect_error(sm <- add_constant(sm, constant = "a"),
                  "'constant' must be numeric: supplied <a>",
                  fixed = TRUE)
 })

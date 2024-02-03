@@ -1,14 +1,5 @@
 ## Test draw() methods
 
-test_that("draw.evaluated_1d_smooth() plots the smooth", {
-    skip_if_not_installed("withr")
-    withr::local_options(lifecycle_verbosity = "quiet")
-    sm <- evaluate_smooth(su_m_univar_4, "s(x2)")
-    plt <- draw(sm)
-    expect_doppelganger("draw 1d smooth for selected smooth", plt)
-    skip_on_ci()
-})
-
 test_that("draw.gam works with numeric select", {
     plt1 <- draw(su_m_quick_eg1, select = 2, rug = FALSE)
     plt2 <- draw(su_m_quick_eg1, select = c(1,2), rug = FALSE)
@@ -89,52 +80,6 @@ test_that("draw.gam works with select and parametric", {
     expect_doppelganger("draw gam without select and parametric is FALSE", plt5)
 })
 
-test_that("draw.evaluated_2d_smooth() plots the smooth", {
-    skip_on_os("mac")
-    skip_on_os("win") # failing for trivial diffs in contours
-    skip_if_not_installed("withr")
-    withr::local_options(lifecycle_verbosity = "quiet")
-    expect_silent(sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100))
-
-    skip_on_ci()
-    expect_silent(plt1 <- draw(sm))
-    expect_silent(plt2 <- draw(sm, contour_col = "red"))
-    expect_doppelganger("draw 2d smooth", plt1)
-    expect_doppelganger("draw 2d smooth diff contour colour", plt2)
-})
-
-test_that("draw.evaluated_2d_smooth() plots the smooth without contours", {
-    skip_on_os("mac")
-    skip_if_not_installed("withr")
-    withr::local_options(lifecycle_verbosity = "quiet")
-    sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100)
-    plt <- draw(sm, contour = FALSE)
-    skip_on_ci()
-    expect_doppelganger("draw 2d smooth without contours", plt)
-})
-
-test_that("draw.evaluated_2d_smooth() plots the smooth with different contour bins", {
-    skip_on_os("mac")
-    skip_on_os("windows")
-    skip_if_not_installed("withr")
-    withr::local_options(lifecycle_verbosity = "quiet")
-    sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100)
-    plt <- draw(sm, n_contour = 5)
-    skip_on_ci()
-    expect_doppelganger("draw 2d smooth with 5 contour bins", plt)
-})
-
-test_that("draw.evaluated_2d_smooth() plots the SE", {
-    skip_on_os("mac")
-    skip_on_os("windows")
-    skip_if_not_installed("withr")
-    withr::local_options(lifecycle_verbosity = "quiet")
-    sm <- evaluate_smooth(su_m_bivar, "s(x,z)", n = 100)
-    plt <- draw(sm, show = "se")
-    skip_on_ci()
-    expect_doppelganger("draw std error of 2d smooth", plt)
-})
-
 test_that("draw.gam() plots a simple multi-smooth AM", {
     plt1 <- draw(su_m_quick_eg1, rug = FALSE)
     plt2 <- draw(su_m_quick_eg1, scales = "fixed", rug = FALSE)
@@ -156,16 +101,10 @@ test_that("draw.gam() can draw partial residuals", {
 test_that("draw.gam() plots an AM with a single 2d smooth", {
     skip_on_os("mac")
     skip_on_os("windows")
-    skip_if_not_installed("withr")
-    withr::local_options(lifecycle_verbosity = "quiet")
     plt <- draw(su_m_bivar, n = 50, rug = FALSE)
 
     skip_on_ci()
     expect_doppelganger("draw AM with 2d smooth", plt)
-
-    # sm <- evaluate_smooth(su_m_bivar, smooth = "s(x,z)")
-    # plt <- draw(sm, show = "se")
-    # expect_doppelganger("draw evalated 2d smooth standard errors", plt)
 })
 
 test_that("draw.gam() plots an AM with a single factor by-variable smooth", {
@@ -177,62 +116,33 @@ test_that("draw.gam() plots an AM with a single factor by-variable smooth", {
     expect_doppelganger("draw factor by-variable smooth with fixed scales", plt2)
 })
 
-## simulate date from y = f(x2)*x1 + error
-#dat <- gamSim(3, n = 400, verbose = FALSE)
-mod <- gam(y ~ s(x2, by = x1), data = su_eg3)
-
 test_that("draw() works with continuous by", {
-    plt <- draw(mod, rug = FALSE, n = 50)
+    plt <- draw(su_m_cont_by, rug = FALSE, n = 50)
     skip_on_ci()
     expect_doppelganger("draw with continuous by-variable smooth", plt)
 })
 
 test_that("draw() works with continuous by and fixed scales", {
-    plt <- draw(mod, scales = "fixed", rug = FALSE, n = 50)
+    plt <- draw(su_m_cont_by, scales = "fixed", rug = FALSE, n = 50)
     skip_on_ci()
     expect_doppelganger("draw with continuous by-var fixed scale", plt)
 })
 
 test_that("draw() works with random effect smooths (bs = 're')", {
-    skip_if_not_installed("withr")
-    withr::local_options(lifecycle_verbosity = "quiet")
-    ## simulate example... from ?mgcv::random.effects
-    ## data are in su_re
-    ## model is rm1 with definition:
-    ## rm1 <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) +
-    ##                s(x3), data = new_df, method = "ML")
-
-    sm <- evaluate_smooth(rm1, "s(fac)")
-    expect_s3_class(sm, "evaluated_re_smooth")
-
-    p1 <- draw(sm)
     p2 <- draw(rm1, ncol = 3, rug = FALSE)
     p3 <- draw(rm1, ncol = 3, scales = "fixed", rug = FALSE)
 
     skip_on_ci()
-    expect_doppelganger("draw.evaluated_re_smooth", p1)
     expect_doppelganger("draw.gam model with ranef smooth", p2)
     expect_doppelganger("draw model with ranef smooth fixed scales", p3)
 })
 
 test_that("draw() with random effect smooths (bs = 're') & factor by variable ",
 {
-    skip_if_not_installed("withr")
-    withr::local_options(lifecycle_verbosity = "quiet")
-    # simulate example...
-    # data are in su_re2
-    # model is rm2 with definition:
-    # gam(y ~ fac + s(ranef, bs = "re", by = fac) + s(x0) + s(x1) + s(x2),
-    #     data = su_re2, method = "ML")
-
-    sm <- evaluate_smooth(rm2, "s(ranef)")
-    expect_s3_class(sm, "evaluated_re_smooth")
-    p1 <- draw(sm)
     p2 <- draw(rm2, ncol = 3, rug = FALSE)
     p3 <- draw(rm2, ncol = 3, scales = "fixed", rug = FALSE)
 
     skip_on_ci()
-    expect_doppelganger("draw.evaluated_re_smooth with factor by", p1)
     expect_doppelganger("draw.gam model with ranef smooth factor by", p2)
     expect_doppelganger("draw with ranef smooth factor by fixed scales", p3)
 })
@@ -258,19 +168,11 @@ test_that("draw() can handle non-standard names -- a function call as a name", {
 test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
     # skip_on_os("mac") # try without this and check on Simon's mac system
     skip_on_ci()
-
-    skip_if_not_installed("withr")
-    withr::local_options(lifecycle_verbosity = "quiet")
     skip_if(packageVersion("mgcv") < "1.8.36")
-    sm <- evaluate_smooth(mod_fs, "s(x1,fac)")
-    expect_s3_class(sm, "evaluated_fs_smooth")
-
-    p1 <- draw(sm)
     p2 <- draw(mod_fs, ncol = 2, rug = FALSE)
     p3 <- draw(mod_fs, ncol = 2, scales = "fixed", rug = FALSE)
 
     skip_on_ci()
-    expect_doppelganger("draw.evaluated_fs_smooth", p1)
     expect_doppelganger("draw.gam model with fs smooth", p2)
     expect_doppelganger("draw model with fs smooth fixed scales", p3)
 })
@@ -302,6 +204,10 @@ test_that("draw() works with parametric terms", {
 
     ## fit
     mod <- gam(y ~ x0 + s(x1) + s(x2) + s(x3), data = df)
+
+
+    skip_if_not_installed("withr")
+    withr::local_options(lifecycle_verbosity = "quiet")
 
     ## evaluate parametric terms directly
     e1 <- evaluate_parametric_term(mod, term = "x0")

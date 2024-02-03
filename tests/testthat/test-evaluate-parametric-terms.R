@@ -6,6 +6,8 @@ m <- gam(vocab ~ nativeBorn * ageGroup, data = gss_vocab, method = 'ML')
 
 test_that("evaluate_parametric_terms() works with factor terms", {
     ## evaluate parametric terms directly
+    skip_if_not_installed("withr")
+    withr::local_options(lifecycle_verbosity = "quiet")
     term <- "nativeBorn"
     expect_silent(para <- evaluate_parametric_term(m, term = term))
     expect_s3_class(para, "evaluated_parametric_term")
@@ -54,6 +56,8 @@ df <- withr::with_seed(0, {
 mod <- gam(y ~ x0 + s(x1) + s(x2) + s(x3), data = df)
 
 test_that("evaluate_parametric_terms() works with parametric terms", {
+    skip_if_not_installed("withr")
+    withr::local_options(lifecycle_verbosity = "quiet")
     ## evaluate parametric terms directly
     expect_silent(para <- evaluate_parametric_term(mod, term = "x0"))
     expect_s3_class(para, "evaluated_parametric_term")
