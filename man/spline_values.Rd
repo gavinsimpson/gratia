@@ -28,6 +28,8 @@ covariance matrix will be used.}
 \item{overall_uncertainty}{logical; should the uncertainty in the model
 constant term be included in the standard error of the evaluate values of
 the smooth?}
+
+\item{frequentist}{logical; use the frequentist covariance matrix?}
 }
 \description{
 Evaluate a spline at provided covariate values

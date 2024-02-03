@@ -79,32 +79,32 @@
 #' ds <- data_slice(m, x2 = evenly(x2, n = 50), x1 = mean(x1))
 `data_slice.gam` <- function(object, ..., data = NULL,
                              envir = environment(formula(object))) {
-    # prep data
-    odata <- data
-    data <- data_slice_data(object, data = data)
+  # prep data
+  odata <- data
+  data <- data_slice_data(object, data = data)
 
-    # deal with ...
-    ##ellipsis::check_dots_unnamed()
-    exprs <- rlang::enquos(...)
-    slice_vars <- purrr::map(exprs, rlang::eval_tidy, data = data)
+  # deal with ...
+  ##ellipsis::check_dots_unnamed()
+  exprs <- rlang::enquos(...)
+  slice_vars <- purrr::map(exprs, rlang::eval_tidy, data = data)
 
-    # check now if there are elements of slice_vars that aren't in the model
-    vars <- model_vars(object)
-    nms <- names(slice_vars)
-    if (any(i <- ! nms %in% vars)) {
-        message("Some specified variable(s) not used in model:\n",
-                paste(" * ", nms[i], collapse = "\n", sep = ""),
-                "\n")
-    }
+  # check now if there are elements of slice_vars that aren't in the model
+  vars <- model_vars(object)
+  nms <- names(slice_vars)
+  if (any(i <- !nms %in% vars)) {
+    message("Some specified variable(s) not used in model:\n",
+      paste(" * ", nms[i], collapse = "\n", sep = ""),
+      "\n")
+  }
 
-    # typical values, only needed ones that aren't
-    need_tv <- setdiff(vars, names(slice_vars))
-    if (length(need_tv) > 0L) {
-        tv <- typical_values(object, data = odata, envir = envir)
-        slice_vars <- append(slice_vars, tv[need_tv])
-    }
+  # typical values, only needed ones that aren't
+  need_tv <- setdiff(vars, names(slice_vars))
+  if (length(need_tv) > 0L) {
+    tv <- typical_values(object, data = odata, envir = envir)
+    slice_vars <- append(slice_vars, tv[need_tv])
+  }
 
-    expand_grid(!!!{slice_vars})
+  expand_grid(!!!{slice_vars})
 }
 
 #' @export
