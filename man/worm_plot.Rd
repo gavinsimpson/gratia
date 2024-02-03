@@ -60,19 +60,23 @@ supplied, a suitable label will be generated.}
 supplied, a suitable label will be generated.}
 
 \item{title}{character or expression; the title for the plot. See
-\code{\link[ggplot2:labs]{ggplot2::labs()}}.}
+\code{\link[ggplot2:labs]{ggplot2::labs()}}. May be a vector, one per penalty.}
 
 \item{subtitle}{character or expression; the subtitle for the plot. See
-\code{\link[ggplot2:labs]{ggplot2::labs()}}.}
+\code{\link[ggplot2:labs]{ggplot2::labs()}}. May be a vector, one per penalty.}
 
 \item{caption}{character or expression; the plot caption. See
-\code{\link[ggplot2:labs]{ggplot2::labs()}}.}
+\code{\link[ggplot2:labs]{ggplot2::labs()}}. May be a vector, one per penalty.}
 
-\item{ci_col, ci_alpha}{fill colour and alpha transparency for the reference
+\item{ci_col}{fill colour for the reference interval when
+\code{method = "simulate"}.}
+
+\item{ci_alpha}{alpha transparency for the reference
 interval when \code{method = "simulate"}.}
 
-\item{point_col, point_alpha}{colour and alpha transparency for points on the
-QQ plot.}
+\item{point_col}{colour of points on the QQ plot.}
+
+\item{point_alpha}{alpha transparency of points on the QQ plot.}
 
 \item{line_col}{colour used to draw the reference line.}
 }

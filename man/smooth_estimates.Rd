@@ -71,8 +71,8 @@ A data frame (tibble), which is of class \code{"smooth_estimates"}.
 Evaluate a smooth at a grid of evenly spaced value over the range of the
 covariate associated with the smooth. Alternatively, a set of points at which
 the smooth should be evaluated can be supplied. \code{smooth_estimates()} is a new
-implementation of \code{\link[=evaluate_smooth]{evaluate_smooth()}}, and should be used instead of that
-other function.
+implementation of \code{evaluate_smooth()}, and replaces that function, which has
+been removed from the package.
 }
 \examples{
 load_mgcv()

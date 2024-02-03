@@ -146,7 +146,17 @@ band. Affects the fill of the interval.}
 with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
 against.}
 
-\item{discrete_colour, discrete_fill, continuous_colour, continuous_fill}{suitable scales for the types of data.}
+\item{discrete_colour}{a suitable colour scale to be used when plotting
+discrete variables.}
+
+\item{discrete_fill}{a suitable fill scale to be used when plotting
+discrete variables.}
+
+\item{continuous_colour}{a suitable colour scale to be used when plotting
+continuous variables.}
+
+\item{continuous_fill}{a suitable fill scale to be used when plotting
+continuous variables.}
 
 \item{position}{Position adjustment, either as a string, or the result of a
 call to a position adjustment function.}
@@ -163,7 +173,7 @@ spread the plots}
 \item{widths, heights}{The relative widths and heights of each column and
 row in the grid. Will get repeated to match the dimensions of the grid. If
 there is more than 1 plot and \code{widths = NULL}, the value of \code{widths} will
-be set internally to \code{widths = 1} to accomodate plots of smooths that
+be set internally to \code{widths = 1} to accommodate plots of smooths that
 use a fixed aspect ratio.}
 
 \item{projection}{character; projection to use, see \code{\link[ggplot2:coord_map]{ggplot2::coord_map()}}

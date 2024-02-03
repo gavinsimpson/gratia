@@ -77,7 +77,17 @@ when `change_type = "sizer"``.}
 with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
 against.}
 
-\item{discrete_colour, discrete_fill, continuous_colour, continuous_fill}{suitable scales for the types of data.}
+\item{discrete_colour}{a suitable colour scale to be used when plotting
+discrete variables.}
+
+\item{discrete_fill}{a suitable fill scale to be used when plotting
+discrete variables.}
+
+\item{continuous_colour}{a suitable colour scale to be used when plotting
+continuous variables.}
+
+\item{continuous_fill}{a suitable fill scale to be used when plotting
+continuous variables.}
 
 \item{angle}{numeric; the angle at which the x axis tick labels are to be
 drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggplot2::guide_axis()}}.}
