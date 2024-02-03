@@ -264,7 +264,7 @@
 #' @importFrom tidyselect all_of
 #' @importFrom tidyr nest unnest
 #' @importFrom mgcv PredictMat
-#'
+#' @export
 `spline_values` <- function(smooth, data, model, unconditional, 
   overall_uncertainty = TRUE, frequentist = FALSE) {
     X <- PredictMat(smooth, data)   # prediction matrix
