@@ -255,6 +255,7 @@
 #' @param model a fitted model; currently only [mgcv::gam()] and [mgcv::bam()]
 #'   models are suported.
 #' @param data a data frame of values to evaluate `smooth` at.
+#' @param frequentist logical; use the frequentist covariance matrix?
 #'
 #' @inheritParams eval_smooth
 #'
@@ -265,7 +266,7 @@
 #' @importFrom tidyr nest unnest
 #' @importFrom mgcv PredictMat
 #' @export
-`spline_values` <- function(smooth, data, model, unconditional, 
+`spline_values` <- function(smooth, data, model, unconditional,
   overall_uncertainty = TRUE, frequentist = FALSE) {
     X <- PredictMat(smooth, data)   # prediction matrix
     start <- smooth[["first.para"]]
@@ -339,6 +340,7 @@
 #' @param model a fitted model; currently only [mgcv::gam()] and [mgcv::bam()]
 #'   models are suported.
 #' @param data an optional data frame of values to evaluate `smooth` at.
+#' @param frequentist logical; use the frequentist covariance matrix?
 #'
 #' @inheritParams eval_smooth
 #' 
