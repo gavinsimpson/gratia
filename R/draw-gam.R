@@ -74,8 +74,14 @@
 #' @param partial_match logical; should smooths be selected by partial matches
 #'   with `select`? If `TRUE`, `select` can only be a single string to match
 #'   against.
-#' @param discrete_colour,discrete_fill,continuous_colour,continuous_fill
-#'   suitable scales for the types of data.
+#' @param discrete_colour a suitable colour scale to be used when plotting
+#'   discrete variables.
+#' @param discrete_fill a suitable fill scale to be used when plotting
+#'   discrete variables.
+#' @param continuous_colour a suitable colour scale to be used when plotting
+#'   continuous variables.
+#' @param continuous_fill a suitable fill scale to be used when plotting
+#'   continuous variables.
 #' @param position Position adjustment, either as a string, or the result of a
 #'   call to a position adjustment function.
 #' @param angle numeric; the angle at which the x axis tick labels are to be
@@ -87,7 +93,7 @@
 #' @param widths,heights The relative widths and heights of each column and
 #'   row in the grid. Will get repeated to match the dimensions of the grid. If
 #'   there is more than 1 plot and `widths = NULL`, the value of `widths` will
-#'   be set internally to `widths = 1` to accomodate plots of smooths that
+#'   be set internally to `widths = 1` to accommodate plots of smooths that
 #'   use a fixed aspect ratio.
 #' @param projection character; projection to use, see [ggplot2::coord_map()]
 #'   for details.

@@ -1,23 +1,9 @@
-## Functions diagnose problems with fitted GAMs
+## Functions to diagnose problems with fitted GAMs
 
 #' @title Quantile-quantile plot of model residuals
-#' 
+#'
 #' @param model a fitted model. Currently only class `"gam"`.
-#' @param ... arguments passed ot other methods.
-#' 
-#' @export
-`qq_plot` <- function(model, ...) {
-    UseMethod("qq_plot")
-}
-
-#' @rdname qq_plot
-#' @export
-`qq_plot.default` <- function(model, ...) {
-    stop("Unable to produce a Q-Q plot for <",
-         class(model)[[1L]], ">",
-         call. = FALSE)           # don't show the call, simpler error
-}
-
+#'
 #' @param method character; method used to generate theoretical quantiles. Note
 #'   that `method = "direct"` is deprecated in favour of `method = "uniform"`.
 #' @param type character; type of residuals to use. Only `"deviance"`,
@@ -32,25 +18,46 @@
 #'   supplied, a suitable label will be generated.
 #' @param ylab character or expression; the label for the y axis. If not
 #'   supplied, a suitable label will be generated.
-#' @param ci_col,ci_alpha fill colour and alpha transparency for the reference
+#' @param title character or expression; the title for the plot. See
+#'   [ggplot2::labs()]. May be a vector, one per penalty.
+#' @param subtitle character or expression; the subtitle for the plot. See
+#'   [ggplot2::labs()]. May be a vector, one per penalty.
+#' @param caption character or expression; the plot caption. See
+#'   [ggplot2::labs()]. May be a vector, one per penalty.
+#' @param ci_col fill colour for the reference interval when
+#'   `method = "simulate"`.
+#' @param ci_alpha alpha transparency for the reference
 #'   interval when `method = "simulate"`.
-#' @param point_col,point_alpha colour and alpha transparency for points on the
-#'   QQ plot.
+#' @param point_col colour of points on the QQ plot.
+#' @param point_alpha alpha transparency of points on the QQ plot.
 #' @param line_col colour used to draw the reference line.
-#' 
+#' @param ... arguments passed ot other methods.
+#'
 #' @note The wording used in [mgcv::qq.gam()] uses *direct* in reference to the
 #'   simulated residuals method (`method = "simulated"`). To avoid confusion,
 #'   `method = "direct"` is deprecated in favour of `method = "uniform"`.
-#' 
-#' @inheritParams draw.evaluated_smooth
-#' 
+#'
+#' @export
+`qq_plot` <- function(model, ...) {
+  UseMethod("qq_plot")
+}
+
 #' @rdname qq_plot
-#' 
+#' @export
+`qq_plot.default` <- function(model, ...) {
+  stop("Unable to produce a Q-Q plot for <",
+    class(model)[[1L]], ">",
+    call. = FALSE)           # don't show the call, simpler error
+}
+
+#' @rdname qq_plot
+#'
 #' @importFrom ggplot2 ggplot geom_point geom_abline geom_ribbon labs aes
 #' @importFrom tools toTitleCase
 #' @importFrom stats residuals IQR median
+#'
 #' @export
-#' 
+#'
 #' @examples
 #' load_mgcv()
 #' ## simulate binomial data...
@@ -84,93 +91,81 @@
                           point_col = "black",
                           point_alpha = 1,
                           line_col = "red", ...) {
-    method <- match.arg(method)         # what method for the QQ plot?
-    if (identical(method, "direct")) {
-        message("`method = \"direct\"` is deprecated, use `\"uniform\"`")
-        method <- "uniform"
-    }
-    ## check if we can do the method
-    if (identical(method, "uniform") &&
-        is.null(fix.family.qf(family(model))[["qf"]])) {
-        method <- "simulate"
-    }
-    if (identical(method, "simulate") &&
-        is.null(fix.family.rd(family(model))[["rd"]])) {
-        method <- "normal"
-    }
+  method <- match.arg(method)         # what method for the QQ plot?
+  if (identical(method, "direct")) {
+    message("`method = \"direct\"` is deprecated, use `\"uniform\"`")
+    method <- "uniform"
+  }
+  ## check if we can do the method
+  ff_qf <- fix.family.qf(family(model))[["qf"]]
+  if (identical(method, "uniform") && is.null(ff_qf)) {
+    method <- "simulate"
+  }
+  ff_rd <- fix.family.rd(family(model))[["rd"]]
+  if (identical(method, "simulate") && is.null(ff_rd)) {
+    method <- "normal"
+  }
+  if (level <= 0 || level >= 1) {
+    stop("Level must be 0 < level < 1. Supplied level <", level, ">",
+      call. = FALSE)
+  }
+  type <- match.arg(type)       # what type of residuals
+  ##r <- residuals(model, type = type)  # model residuals
+  ## generate theoretical quantiles
+  df <- switch(method,
+               uniform  = qq_uniform(model, n = n_uniform, type = type),
+               simulate = qq_simulate(model, n = n_simulate, type = type,
+                                      level = level),
+               normal   = qq_normal(model, type = type, level = level))
+  df <- as_tibble(df)
+  ## add labels if not supplied
+  if (is.null(ylab)) {
+      ylab <- paste(toTitleCase(type), "residuals")
+  }
+  if (is.null(xlab)) {
+      xlab <- "Theoretical quantiles"
+  }
+  if (is.null(title)) {
+      title <- "QQ plot of residuals"
+  }
+  if (is.null(subtitle)) {
+      subtitle <- paste("Method:", method)
+  }
+  ## base plot
+  plt <- ggplot(df, aes(x = .data$theoretical,
+                        y = .data$residuals))
+  ## add reference line
+  qq_intercept <- 0
+  qq_slope <- 1
+  if (method == "normal") {
+    qq_intercept <- median(df[["residuals"]])
+    qq_slope <- IQR(df[["residuals"]]) / 1.349
+    ## R's qq.line() does this, which seems the same as above
+    ## probs <- c(0.25, 0.75)
+    ## qq_y <- quantile(df[["residuals"]], probs = probs,
+    ##                  names = FALSE, qtype = 7)
+    ## qq_x <- qnorm(probs)
+    ## qq_slope <- diff(qq_y) / diff(qq_x)
+    ## qq_intercept <- qq_y[1L] - qq_slope * qq_x[1L]
+  }
 
-    if (level <= 0 || level >= 1) {
-        stop("Level must be 0 < level < 1. Supplied level <", level, ">",
-             call. = FALSE)
-    }
-
-    type <- match.arg(type)       # what type of residuals
-    ##r <- residuals(model, type = type)  # model residuals
-
-    ## generate theoretical quantiles
-    df <- switch(method,
-                 uniform  = qq_uniform(model, n = n_uniform, type = type),
-                 simulate = qq_simulate(model, n = n_simulate, type = type,
-                                        level = level),
-                 normal   = qq_normal(model, type = type, level = level))
-    df <- as_tibble(df)
-
-    ## add labels if not supplied
-    if (is.null(ylab)) {
-        ylab <- paste(toTitleCase(type), "residuals")
-    }
-
-    if (is.null(xlab)) {
-        xlab <- "Theoretical quantiles"
-    }
-
-    if (is.null(title)) {
-        title <- "QQ plot of residuals"
-    }
-
-    if (is.null(subtitle)) {
-        subtitle <- paste("Method:", method)
-    }
-
-    ## base plot
-    plt <- ggplot(df, aes(x = .data$theoretical,
-                          y = .data$residuals))
-
-    ## add reference line
-    qq_intercept <- 0
-    qq_slope <- 1
-    if (method == "normal") {
-        qq_intercept <- median(df[["residuals"]])
-        qq_slope <- IQR(df[["residuals"]]) / 1.349
-        ## R's qq.line() does this, which seems the same as above
-        ## probs <- c(0.25, 0.75)
-        ## qq_y <- quantile(df[["residuals"]], probs = probs,
-        ##                  names = FALSE, qtype = 7)
-        ## qq_x <- qnorm(probs)
-        ## qq_slope <- diff(qq_y) / diff(qq_x)
-        ## qq_intercept <- qq_y[1L] - qq_slope * qq_x[1L]
-    }
-    plt <- plt + geom_abline(slope = qq_slope, intercept = qq_intercept,
-                             col = line_col)
-
-    ## add reference interval
-    if (isTRUE(method %in% c("simulate", "normal"))) {
-        plt <- plt + geom_ribbon(aes(ymin = .data$lower,
-                                     ymax = .data$upper,
-                                        x = .data$theoretical),
-                                 inherit.aes = FALSE,
-                                 alpha = ci_alpha, fill = ci_col)
-    }
-
-    ## add point layer
-    plt <- plt + geom_point(colour = point_col, alpha = point_alpha)
-
-    ## add labels
-    plt <- plt + labs(title = title, subtitle = subtitle, caption = caption,
-                      y = ylab, x = xlab)
-
-    ## return
-    plt
+  plt <- plt + geom_abline(slope = qq_slope, intercept = qq_intercept,
+    col = line_col)
+  ## add reference interval
+  if (isTRUE(method %in% c("simulate", "normal"))) {
+    plt <- plt + geom_ribbon(aes(ymin = .data$lower,
+      ymax = .data$upper,
+      x = .data$theoretical),
+    inherit.aes = FALSE,
+    alpha = ci_alpha, fill = ci_col)
+  }
+  ## add point layer
+  plt <- plt + geom_point(colour = point_col, alpha = point_alpha)
+  ## add labels
+  plt <- plt + labs(title = title, subtitle = subtitle, caption = caption,
+    y = ylab, x = xlab)
+  ## return
+  plt
 }
 
 #' @export
@@ -759,9 +754,9 @@
 }
 
 #' Worm plot of model residuals
-#' 
+#'
 #' @inheritParams qq_plot
-#' 
+#'
 #' @export
 `worm_plot` <- function(model, ...) {
     UseMethod("worm_plot")

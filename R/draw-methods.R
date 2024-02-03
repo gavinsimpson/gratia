@@ -1206,8 +1206,8 @@
 #'   [ggplot2::labs()]. May be a vector, one per penalty.
 #' @param guides character; one of `"keep"` (the default), `"collect"`, or
 #'   `"auto"`. Passed to [patchwork::plot_layout()]
-#' 
-#' @inheritParams draw.evaluated_2d_smooth
+#'
+#' @inheritParams draw.gam
 #'
 #' @importFrom ggplot2 scale_fill_gradient2
 #' @importFrom patchwork wrap_plots

@@ -232,26 +232,6 @@
 #' @export
 #' @importFrom dplyr mutate across
 #' @importFrom tidyselect any_of
-`add_constant.evaluated_smooth` <- function(object, constant = NULL, ...) {
-    ## If constant supplied, add it to `est`
-    if (!is.null(constant)) {
-        if (!is.numeric(constant)) {
-            stop("'constant' must be numeric: supplied <", constant, ">",
-                 call. = FALSE)
-        }
-        object <- mutate(object,
-            across(any_of(c("est", "lower", "upper", ".estimate", ".lower_ci",
-            ".upper_ci")),
-            .fns = ~ .x + constant))
-    }
-
-    object
-}
-
-#' @rdname add_constant
-#' @export
-#' @importFrom dplyr mutate across
-#' @importFrom tidyselect any_of
 `add_constant.smooth_estimates` <- function(object, constant = NULL, ...) {
     ## If constant supplied, add it to `est`
     if (!is.null(constant)) {

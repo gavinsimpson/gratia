@@ -56,34 +56,24 @@
 
 #' @export
 #' @rdname post_draws
-`post_draws.default` <- function(model,
-    n,
-    method = c("gaussian", "mh", "inla", "user"),
-    mu = NULL,
-    sigma = NULL,
-    n_cores = 1L,
-    burnin = 1000,
-    thin = 1,
-    t_df = 40,
-    rw_scale = 0.25,
-    index = NULL,
-    frequentist = FALSE,
-    unconditional  = FALSE,
-    parametrized = TRUE,
-    mvn_method = c("mvnfast", "mgcv"),
-    draws = NULL, ...) {
-    # what posterior sampling are we using
-    method <- match.arg(method)
-    betas <- switch(method,
-        "gaussian" = gaussian_draws(model = model, n = n,
-            n_cores = n_cores, index = index, frequentist = frequentist,
-            unconditional = unconditional, parametrized = parametrized,
-            mvn_method = mvn_method, ...),
-        "mh" = mh_draws(n = n, model = model, burnin = burnin,
-            thin = thin, t_df = t_df, rw_scale = rw_scale, index = index, ...),
-        "inla" = .NotYetImplemented(),
-        "user" = user_draws(model = model, draws = draws, ...))
-    betas
+`post_draws.default` <- function(model, n,
+  method = c("gaussian", "mh", "inla", "user"), mu = NULL, sigma = NULL,
+  n_cores = 1L, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
+  index = NULL, frequentist = FALSE, unconditional  = FALSE,
+  parametrized = TRUE, mvn_method = c("mvnfast", "mgcv"), draws = NULL, ...) {
+  # what posterior sampling are we using
+  method <- match.arg(method)
+  mvn_method <- match.arg(mvn_method)
+  betas <- switch(method,
+    "gaussian" = gaussian_draws(model = model, n = n,
+      n_cores = n_cores, index = index, frequentist = frequentist,
+      unconditional = unconditional, parametrized = parametrized,
+      mvn_method = mvn_method, ...),
+    "mh" = mh_draws(n = n, model = model, burnin = burnin,
+      thin = thin, t_df = t_df, rw_scale = rw_scale, index = index, ...),
+    "inla" = .NotYetImplemented(),
+    "user" = user_draws(model = model, draws = draws, ...))
+  betas
 }
 #' Generate posterior draws from a fitted model
 #'
@@ -95,30 +85,21 @@
 
 #' @export
 #' @rdname post_draws
-`generate_draws.gam` <- function(model,
-    n,
-    method = c("gaussian", "mh", "inla"),
-    mu = NULL,
-    sigma = NULL,
-    n_cores = 1L,
-    burnin = 1000,
-    thin = 1,
-    t_df = 40,
-    rw_scale = 0.25,
-    index = NULL,
-    frequentist = FALSE,
-    unconditional  = FALSE,
-    mvn_method = c("mvnfast", "mgcv"), ...) {
-    # what posterior sampling are we using
-    method <- match.arg(method)
-    betas <- switch(method,
-        "gaussian" = gaussian_draws(model = model, n = n,
-            n_cores = n_cores, index = index, frequentist = frequentist,
-            unconditional = unconditional, mvn_method = mvn_method, ...),
-        "mh" = mh_draws(n = n, model = model, burnin = burnin,
-            thin = thin, t_df = t_df, rw_scale = rw_scale, index = index),
-        "inla" = .NotYetImplemented())
-    betas
+`generate_draws.gam` <- function(model, n, method = c("gaussian", "mh", "inla"),
+  mu = NULL, sigma = NULL, n_cores = 1L, burnin = 1000, thin = 1, t_df = 40,
+  rw_scale = 0.25, index = NULL, frequentist = FALSE, unconditional  = FALSE,
+  mvn_method = c("mvnfast", "mgcv"), ...) {
+  # what posterior sampling are we using
+  method <- match.arg(method)
+  mvn_method <- match.arg(mvn_method)
+  betas <- switch(method,
+    "gaussian" = gaussian_draws(model = model, n = n,
+      n_cores = n_cores, index = index, frequentist = frequentist,
+      unconditional = unconditional, mvn_method = mvn_method, ...),
+    "mh" = mh_draws(n = n, model = model, burnin = burnin,
+      thin = thin, t_df = t_df, rw_scale = rw_scale, index = index),
+    "inla" = .NotYetImplemented())
+  betas
 }
 
 #' Posterior samples using a simple Metropolis Hastings sampler
@@ -137,7 +118,7 @@
     frequentist = FALSE, unconditional = FALSE, mvn_method = "mvnfast", ...) {
     mu <- coef(model)
     sigma <- get_vcov(model, frequentist = frequentist,
-        unconditional = unconditional)
+      unconditional = unconditional)
     if (!is.null(index)) {
         mu <- mu[index]
         sigma <- sigma[index, index, drop = FALSE]
