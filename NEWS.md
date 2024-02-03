@@ -1,4 +1,4 @@
-# gratia 0.8.9.1
+# gratia 0.8.9.2
 
 ## Breaking changes
 
