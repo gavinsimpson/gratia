@@ -249,12 +249,12 @@
     invisible(vars)
 }
 
-#' Evaluate estimated spline values
+#' Evaluate a spline at provided covariate values
 #'
 #' @param smooth currently an object that inherits from class `mgcv.smooth`.
 #' @param model a fitted model; currently only [mgcv::gam()] and [mgcv::bam()]
 #'   models are suported.
-#' @param data an optional data frame of values to evaluate `smooth` at.
+#' @param data a data frame of values to evaluate `smooth` at.
 #'
 #' @inheritParams eval_smooth
 #'
@@ -265,11 +265,8 @@
 #' @importFrom tidyr nest unnest
 #' @importFrom mgcv PredictMat
 #'
-#' @keywords internal
-#' @noRd
-`spline_values2` <- function(smooth, data, model, unconditional,
-                             overall_uncertainty = TRUE,
-                             frequentist = FALSE) {
+`spline_values` <- function(smooth, data, model, unconditional, 
+  overall_uncertainty = TRUE, frequentist = FALSE) {
     X <- PredictMat(smooth, data)   # prediction matrix
     start <- smooth[["first.para"]]
     end <- smooth[["last.para"]]
@@ -326,6 +323,31 @@
     tbl <- nest(tbl, data = all_of(c(".estimate", ".se", names(data))))
 
     tbl
+}
+
+#' Evaluate a spline at provided covariate values
+#'
+#' @description
+#' `r lifecycle::badge("deprecated")`
+#' 
+#' The function `spline_values2()` has been renamed to `spline_values()` as of
+#' version 0.9.0. This was allowed following the removal of `evaluate_smooth()`,
+#' which was the only function using `spline_values()`. So `spline_values2()`
+#' has been renamed to `spline_values()`.
+#'
+#' @param smooth currently an object that inherits from class `mgcv.smooth`.
+#' @param model a fitted model; currently only [mgcv::gam()] and [mgcv::bam()]
+#'   models are suported.
+#' @param data an optional data frame of values to evaluate `smooth` at.
+#'
+#' @inheritParams eval_smooth
+#' 
+#' @keywords internal
+#' @export
+`spline_values2` <- function(smooth, data, model, unconditional,
+    overall_uncertainty = TRUE, frequentist = FALSE) {
+  spline_values(smooth = smooth, data = data, model = model,
+    unconditional = unconditional, frequentist = frequentist)
 }
 
 `smooth_values` <- function(smooth, ...) {
@@ -435,7 +457,7 @@
             smooth_label(smooth)))
 
     ## values of spline at data
-    eval_sm <- spline_values2(smooth, data = data,
+    eval_sm <- spline_values(smooth, data = data,
         unconditional = unconditional,
         model = model,
         overall_uncertainty = overall_uncertainty)
@@ -569,7 +591,7 @@
         n = n, n_3d = NULL, n_4d = NULL, id = id, var_order = var_order)
 
     ## values of spline at data
-    eval_sm <- spline_values2(smooth, data = data,
+    eval_sm <- spline_values(smooth, data = data,
         unconditional = unconditional,
         model = model,
         overall_uncertainty = overall_uncertainty)
@@ -603,7 +625,7 @@
         id = id)
 
     ## values of spline at data
-    eval_sm <- spline_values2(smooth, data = data,
+    eval_sm <- spline_values(smooth, data = data,
         unconditional = unconditional,
         model = model,
         overall_uncertainty = overall_uncertainty)
@@ -635,7 +657,7 @@
                                        id = id)
 
     ## values of spline at data
-    eval_sm <- spline_values2(smooth, data = data,
+    eval_sm <- spline_values(smooth, data = data,
                               unconditional = unconditional,
                               model = model,
                               overall_uncertainty = overall_uncertainty)
@@ -685,7 +707,7 @@
         id = id, var_order = var_order)
 
     ## values of spline at data
-    eval_sm <- spline_values2(smooth, data = data,
+    eval_sm <- spline_values(smooth, data = data,
         unconditional = unconditional,
         model = model,
         overall_uncertainty = overall_uncertainty)
@@ -741,7 +763,7 @@
         id = id, var_order = var_order)
 
     ## values of spline at data
-    eval_sm <- spline_values2(smooth, data = data,
+    eval_sm <- spline_values(smooth, data = data,
         unconditional = unconditional,
         model = model,
         overall_uncertainty = overall_uncertainty)
