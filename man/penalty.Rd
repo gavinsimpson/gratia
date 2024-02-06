@@ -2,6 +2,7 @@
 % Please edit documentation in R/penalty.R
 \name{penalty}
 \alias{penalty}
+\alias{penalty.default}
 \alias{penalty.gam}
 \alias{penalty.mgcv.smooth}
 \alias{penalty.tensor.smooth}
@@ -10,6 +11,8 @@
 \title{Extract and tidy penalty matrices}
 \usage{
 penalty(object, ...)
+
+\method{penalty}{default}(object, rescale = FALSE, data, knots = NULL, constraints = FALSE, ...)
 
 \method{penalty}{gam}(object, smooth = NULL, rescale = FALSE, ...)
 
@@ -26,18 +29,25 @@ penalty(object, ...)
 
 \item{...}{additional arguments passed to methods.}
 
-\item{smooth}{character; vector of smooths to extract penalty matrices for.
-If \code{NULL}, penalty matrices for all smooths in \code{object} are extracted.}
-
 \item{rescale}{logical; by default, \emph{mgcv} will scale the penalty matrix for
 better performance in \code{\link[mgcv:gamm]{mgcv::gamm()}}. If \code{rescale} is \code{TRUE}, this scaling
 will be undone to put the penalty matrix back on the original scale.}
 
-\item{margins}{logical; extract the penalty matrices for the tensor
-product or the marginal smooths of the tensor product?}
-
 \item{data}{data frame; a data frame of values for terms mentioned in the
 smooth specification.}
+
+\item{knots}{a list or data frame with named components containing
+knots locations. Names must match the covariates for which the basis
+is required. See \code{\link[mgcv:smoothCon]{mgcv::smoothCon()}}.}
+
+\item{constraints}{logical; should identifiability constraints be applied to
+the smooth basis. See argument \code{absorb.cons} in \code{\link[mgcv:smoothCon]{mgcv::smoothCon()}}.}
+
+\item{smooth}{character; vector of smooths to extract penalty matrices for.
+If \code{NULL}, penalty matrices for all smooths in \code{object} are extracted.}
+
+\item{margins}{logical; extract the penalty matrices for the tensor
+product or the marginal smooths of the tensor product?}
 }
 \value{
 A 'tibble' (data frame) of class \code{penalty_df} inheriting from

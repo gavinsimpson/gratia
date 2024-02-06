@@ -1,4 +1,4 @@
-# gratia 0.8.9.3
+# gratia 0.8.9.4
 
 ## Breaking changes
 
@@ -219,6 +219,9 @@ eventual 1.0.0 release. These functions will become defunct by version 0.11.0 or
 
 * `smooth_label()` is a new function for extracting the labels 'mgcv' creates for
   smooths from the smooth object itself.
+
+* `penalty()` has a default method that  works with `s()`, `te()`, `t2()`, and
+  `ti()`, which create a smooth specification.
 
 ## Bug fixes
 

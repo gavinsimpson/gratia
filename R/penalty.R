@@ -58,31 +58,52 @@
 #'
 #' \dontshow{options(op)}
 `penalty` <- function(object, ...) {
-    UseMethod("penalty")
+  UseMethod("penalty")
+}
+
+#' @export
+#' @rdname penalty
+#' @inheritParams basis.default
+`penalty.default` <- function(object, rescale = FALSE, data, knots = NULL,
+  constraints = FALSE, ...) {
+  # class of object and check for ".smooth.spec"
+  cls <- class(object)
+  if (str_detect(cls, "smooth.spec", negate = TRUE)) {
+    stop("'object' doesn't appear to be a smooth created by {mgcv}.")
+  }
+  ## call smoothCon to create the basis as specified in `object`
+  sm <- smoothCon(object, data = data, knots = knots, absorb.cons = constraints)
+
+  out <- if (length(sm) == 1L) {
+    penalty(sm[[1]])
+  } else {
+    lapply(sm, penalty) |> bind_rows() # ?
+  }
+  out
 }
 
 #' @export
 #' @rdname penalty
 `penalty.gam` <- function(object, smooth = NULL, rescale = FALSE, ...) {
-    ## are particular smooths selected
-    smooth_ids <- if (!is.null(smooth)) {
-         which_smooths(object, smooth) # which smooths match 'smooth'
-    } else {
-        seq_len(n_smooths(object))
-    }
+  ## are particular smooths selected
+  smooth_ids <- if (!is.null(smooth)) {
+    which_smooths(object, smooth) # which smooths match 'smooth'
+  } else {
+    seq_len(n_smooths(object))
+  }
 
-    ## extract the mgcv.smooth objects
-    smooths <- get_smooths_by_id(object, smooth_ids)
+  ## extract the mgcv.smooth objects
+  smooths <- get_smooths_by_id(object, smooth_ids)
 
-    ## loop over the smooths applying penalty to each
-    pen <- lapply(smooths, penalty, rescale = rescale)
-    pen <- bind_rows(pen)
-    ## ensure class is right
-    ## don't think I need this; bind_rows does it, but documented?
-    if (!inherits(pen, "penalty_df")) {
-        class(pen) <- c("penalty_df", class(pen))
-    }
-    pen
+  ## loop over the smooths applying penalty to each
+  pen <- lapply(smooths, penalty, rescale = rescale)
+  pen <- bind_rows(pen)
+  ## ensure class is right
+  ## don't think I need this; bind_rows does it, but documented?
+  if (!inherits(pen, "penalty_df")) {
+    class(pen) <- c("penalty_df", class(pen))
+  }
+  pen
 }
 
 #' @export
