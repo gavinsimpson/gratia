@@ -288,3 +288,98 @@ test_that("derivative_samples works for a simple GAM", {
     skip_on_cran()
     expect_snapshot(print(sm), variant = "m_1_smooth")
 })
+
+test_that("derivative_samples works for a NB GAM", {
+    expect_silent(sm <- derivative_samples(m_nb, n = 5, seed = 42,
+        type = "forward", focal = "x0", eps = 0.01, n_sim = 10,
+        data = quick_eg1,
+        envir = teardown_env()))
+    expect_s3_class(sm, c("derivative_samples", "tbl_df",
+        "tbl", "data.frame"))
+    ## 3000 == nrow(quick_eg) * n_sim == 300 * 10
+    expect_identical(NROW(sm), 3000L)
+    expect_identical(NCOL(sm), 8L) # 5 cols
+    expect_named(sm, expected = c(".row", ".focal", ".draw", ".derivative",
+        "x0", "x1", "x2", "x3"))
+    
+    skip_on_ci()
+    skip_on_cran()
+    expect_snapshot(print(sm), variant = "m_nb forward")
+})
+
+test_that("derivative_samples works for a NB GAM, central, backward", {
+    skip_on_cran()
+
+    expect_silent(sm_1 <- derivative_samples(m_nb, n = 5, seed = 42,
+        type = "backward", focal = "x0", eps = 0.01, n_sim = 10,
+        data = quick_eg1,
+        envir = teardown_env()))
+    expect_s3_class(sm_1, c("derivative_samples", "tbl_df",
+        "tbl", "data.frame"))
+    ## 3000 == nrow(quick_eg) * n_sim == 300 * 10
+    expect_identical(NROW(sm_1), 3000L)
+    expect_identical(NCOL(sm_1), 8L) # 8 cols
+    expect_named(sm_1, expected = c(".row", ".focal", ".draw", ".derivative",
+        "x0", "x1", "x2", "x3"))
+
+    expect_silent(sm_2 <- derivative_samples(m_nb, n = 5, seed = 42,
+        type = "central", focal = "x0", eps = 0.01, n_sim = 10,
+        data = quick_eg1,
+        envir = teardown_env()))
+    expect_s3_class(sm_2, c("derivative_samples", "tbl_df",
+        "tbl", "data.frame"))
+    ## 3000 == nrow(quick_eg) * n_sim == 300 * 10
+    expect_identical(NROW(sm_2), 3000L)
+    expect_identical(NCOL(sm_2), 8L) # 8 cols
+    expect_named(sm_2, expected = c(".row", ".focal", ".draw", ".derivative",
+        "x0", "x1", "x2", "x3"))
+    
+    skip_on_ci()
+    expect_snapshot(print(sm_1), variant = "m_nb backward")
+    expect_snapshot(print(sm_2), variant = "m_nb central")
+})
+
+test_that("derivative_samples works for a NB GAM order 2", {
+    skip_on_cran()
+
+    expect_silent(sm_1 <- derivative_samples(m_nb, n = 5, seed = 42,
+        type = "forward", focal = "x0", eps = 0.01, n_sim = 10,
+        data = quick_eg1, order = 2,
+        envir = teardown_env()))
+    expect_s3_class(sm_1, c("derivative_samples", "tbl_df",
+        "tbl", "data.frame"))
+    ## 3000 == nrow(quick_eg) * n_sim == 300 * 10
+    expect_identical(NROW(sm_1), 3000L)
+    expect_identical(NCOL(sm_1), 8L) # 8 cols
+    expect_named(sm_1, expected = c(".row", ".focal", ".draw", ".derivative",
+        "x0", "x1", "x2", "x3"))
+
+    expect_silent(sm_2 <- derivative_samples(m_nb, n = 5, seed = 42,
+        type = "backward", focal = "x0", eps = 0.01, n_sim = 10,
+        data = quick_eg1, order = 2,
+        envir = teardown_env()))
+    expect_s3_class(sm_2, c("derivative_samples", "tbl_df",
+        "tbl", "data.frame"))
+    ## 3000 == nrow(quick_eg) * n_sim == 300 * 10
+    expect_identical(NROW(sm_2), 3000L)
+    expect_identical(NCOL(sm_2), 8L) # 8 cols
+    expect_named(sm_2, expected = c(".row", ".focal", ".draw", ".derivative",
+        "x0", "x1", "x2", "x3"))
+
+    expect_silent(sm_3 <- derivative_samples(m_nb, n = 5, seed = 42,
+        type = "central", focal = "x0", eps = 0.01, n_sim = 10,
+        data = quick_eg1, order = 2,
+        envir = teardown_env()))
+    expect_s3_class(sm_3, c("derivative_samples", "tbl_df",
+        "tbl", "data.frame"))
+    ## 3000 == nrow(quick_eg) * n_sim == 300 * 10
+    expect_identical(NROW(sm_3), 3000L)
+    expect_identical(NCOL(sm_3), 8L) # 8 cols
+    expect_named(sm_3, expected = c(".row", ".focal", ".draw", ".derivative",
+        "x0", "x1", "x2", "x3"))
+    
+    skip_on_ci()
+    expect_snapshot(print(sm_1), variant = "m_nb forward order 2")
+    expect_snapshot(print(sm_2), variant = "m_nb backward order 2")
+    expect_snapshot(print(sm_3), variant = "m_nb central order 2")
+})
