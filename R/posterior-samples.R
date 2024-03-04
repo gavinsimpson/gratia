@@ -905,7 +905,7 @@
     yd <- yd |>
         left_join(data, by = join_by("..orig" == ".row")) |>
         rename("{focal}" := ".x", ".derivative" = "..fd", ".row" = "..orig") |>
-        select(!matches(c("..xf", "..xb"))) |>
+        select(!matches(c("..xf", "..xb", "..x"))) |>
         add_column(.focal = rep(focal, nrow(data) * n_sim), .before = 1L) |>
         relocate(".row", .before = 1L)
 
