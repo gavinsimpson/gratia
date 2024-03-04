@@ -28,13 +28,19 @@ The main features of *gratia* are currently
 
     For example, the classic four term additive example from Gu & Wahba:
 
-    ![Estimated smooths from a
-    GAM](man/figures/README-draw-gam-figure-1.png)
+    <figure>
+    <img src="man/figures/README-draw-gam-figure-1.png"
+    alt="Estimated smooths from a GAM" />
+    <figcaption aria-hidden="true">Estimated smooths from a GAM</figcaption>
+    </figure>
 
     Or for a bivariate smooth:
 
-    ![Estimated smooths from a
-    GAM](man/figures/README-draw-gam-figure-2d-1.png)
+    <figure>
+    <img src="man/figures/README-draw-gam-figure-2d-1.png"
+    alt="Estimated smooths from a GAM" />
+    <figcaption aria-hidden="true">Estimated smooths from a GAM</figcaption>
+    </figure>
 
     Note that some specialist smoothers (`bs %in% c("mrf","sw", "sf")`)
     are not currently supported, but univariate, *factor* and
@@ -51,8 +57,11 @@ The main features of *gratia* are currently
 
 -   Model diagnostics via `appraise()`
 
-    ![Model diagnostics
-    figure](man/figures/README-appraise-figure-1.png)
+    <figure>
+    <img src="man/figures/README-appraise-figure-1.png"
+    alt="Model diagnostics figure" />
+    <figcaption aria-hidden="true">Model diagnostics figure</figcaption>
+    </figure>
 
 ## Installing *gratia*
 
