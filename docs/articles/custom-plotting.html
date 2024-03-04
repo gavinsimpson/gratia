@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.9.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.9.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -182,8 +182,8 @@ patchwork</p>
 <span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span>, select <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="va">p3</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `wrap_dims()`:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Need 3 panels, but together `nrow` and `ncol` only provide 1</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please increase `ncol` and/or `nrow`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Need 3 panels, but together `nrow` and `ncol` only provide 1.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please increase `ncol` and/or `nrow`.</span></span></code></pre></div>
 <p>To avoid the error, we need to use
 <code><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">patchwork::plot_layout()</a></code> to set the dimensions we want</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">

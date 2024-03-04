@@ -1,4 +1,4 @@
-# gratia 0.8.9.4
+# gratia 0.8.9.5
 
 ## Breaking changes
 
@@ -284,6 +284,10 @@ eventual 1.0.0 release. These functions will become defunct by version 0.11.0 or
   `"fs"` smooth. Now, this use case is identified and a message printed
   indicating that (currently) gratia doesn't know how to plot such a smooth.
   Reported by @chrisaak #249.
+
+* `derivative_samples()` would fail with `order = 2` and was only computing
+  forward finite differences, regardless of `type` for `order = 1`. Partly
+  reported by @samlipworth #251.
 
 # gratia 0.8.2
 

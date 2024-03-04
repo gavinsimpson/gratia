@@ -1061,6 +1061,18 @@
     yd
 }
 
+# The idea is that the prepare_fdiff_data_X functions compute lists of data
+# frames containing the data `x`, and shifted variants `xf` and `xb` for
+# different combinations depending on the type ond order of the finite
+# difference.
+#
+# Then these lists are joined row-wise to stack the original and shifted data
+# locations on top of one another. We need them stacked because we want to
+# get a posterior of fitted values (fitted_samples) for each of them.
+#
+# It is OK that these are stacked here. Late, in the compute_y_fdiff_X()
+# functions, we pivot these wider so that we can do vector math differencing
+# the required columns.
 `prepare_fdiff_data` <- function(data, eps = 1e-7, order, type, focal) {
     fd_fun <- if (isTRUE(identical(as.integer(order), 1L))) {
         prepare_fdiff_data_1
@@ -1082,11 +1094,11 @@
         list(xf = xf, xb = xb)
     } else if (isTRUE(identical(type, "forward"))) {
         xf <- mutate(data, .x = .data[[".x"]] + h, ..type = rep("xf", n))
-        data <- mutate(data, ..type = "xb")
+        data <- mutate(data, ..type = "x")
         list(xf = xf, xb = data)
     } else { # backward
         xb <- mutate(data, .x = .data[[".x"]] - h, ..type = rep("xb", n))
-        data <- mutate(data, ..type = "xf")
+        data <- mutate(data, ..type = "x")
         list(xf = data, xb = xb)
     }
     fd_data <- fd_data |>
@@ -1105,7 +1117,7 @@
     h <- eps
     data <- mutate(data, ..type = rep("x", n))
     fd_data <- if (isTRUE(identical(type, "central"))) {
-        h <- eps / 2
+        # h <- eps / 2 # no, not for 2nd order
         xf <- mutate(data, .x = .data[[".x"]] + h, ..type = rep("xf", n))
         xb <- mutate(data, .x = .data[[".x"]] - h, ..type = rep("xb", n))
         list(xf = xf, xb = xb, x = data)
@@ -1116,7 +1128,7 @@
     } else { # backward
         xf <- mutate(data, .x = .data[[".x"]] - h, ..type = rep("xf", n))
         xb <- mutate(data, .x = .data[[".x"]] - (2 * h), ..type = rep("xb", n))
-        list(xf = data, xb = xb, x = data)
+        list(xf = xf, xb = xb, x = data)
     }
     fd_data <- fd_data |>
         bind_rows() |>
@@ -1140,30 +1152,66 @@
 #' @importFrom tidyselect matches
 `compute_y_fdiff_1` <- function(samples, type, eps = 1e-7) {
     samples <- samples |>
-        pivot_wider(id_cols = c("..orig", ".draw"),
+        pivot_wider(id_cols = matches(c("..orig", ".draw", "..type")),
             names_from = "..type", values_from = ".fitted",
             names_prefix = "..")
-
+    fun <- switch(type,
+      "forward"  = y_forward_diff_1,
+      "backward" = y_backward_diff_1,
+      "central" = y_central_diff_1)
     samples |>
-        mutate(..fd = (.data[["..xf"]] - .data[["..xb"]]) / eps)
+      mutate(..fd = fun(.data, eps = eps))
 }
 
 #' @importFrom tidyr pivot_wider
 #' @importFrom dplyr mutate case_match
 #' @importFrom tidyselect matches
 `compute_y_fdiff_2` <- function(samples, type, eps = 1e-7) {
-    samples <- samples |>
-        pivot_wider(id_cols = !matches(".fitted", "..type"),
-            names_from = "..type", values_from = ".fitted",
-            names_prefix = "..")
+  samples <- samples |>
+    pivot_wider(id_cols = matches(c("..orig", ".draw", "..type")),
+      names_from = "..type", values_from = ".fitted",
+      names_prefix = "..")
+  fun <- switch(type,
+    "forward"  = y_forward_diff_2,
+    "backward" = y_backward_diff_2,
+    "central" = y_central_diff_2)
+  samples |>
+    mutate(..fd = fun(.data, eps = eps))
+}
 
-    samples |>
-        mutate(..fd =
-            case_match(type,
-                "forward"  ~ (.data[["..xb"]] -
-                    (2 * .data[["..xf"]]) + .data[["..x"]])  / eps^2,
-                "backward" ~ (.data[["..x"]]  -
-                    (2 * .data[["..xf"]]) + .data[["..xb"]]) / eps^2,
-                "backward" ~ (.data[["..xf"]] -
-                    (2 * .data[["..x"]])  + .data[["..xb"]]) / eps^2))
+# These come from https://en.wikipedia.org/wiki/Finite_difference
+`y_forward_diff_1` <- function(x, eps = 1e-7) {
+  # ..xf = x + h,
+  # h = eps
+  (x[["..xf"]] - x[["..x"]])  / eps
+}
+`y_backward_diff_1` <- function(x, eps = 1e-7) {
+  # ..xb = x - h,
+  # h = eps
+  (x[["..x"]] - x[["..xb"]])  / eps
+}
+`y_central_diff_1` <- function(x, eps = 1e-7) {
+  # ..xf = x + h/2,
+  # ..xb = x - h/2,
+  # h = eps
+  (x[["..xf"]] - x[["..xb"]])  / eps
+}
+
+`y_forward_diff_2` <- function(x, eps = 1e-7) {
+  # ..xf = x + h,
+  # ..xb = x + 2h,
+  # h = eps
+  (x[["..xb"]] - (2 * x[["..xf"]]) + x[["..x"]])  / eps^2
+}
+`y_backward_diff_2` <- function(x, eps = 1e-7) {
+  # ..xf = x - h,
+  # ..xb = x - 2h,
+  # h = eps
+  (x[["..x"]] - (2 * x[["..xf"]]) + x[["..xb"]])  / eps^2
+}
+`y_central_diff_2` <- function(x, eps = 1e-7) {
+  # ..xf = x + h,
+  # ..xb = x - h,
+  # h = eps
+  (x[["..xf"]] - (2 * x[["..x"]]) + x[["..xb"]])  / eps^2
 }
