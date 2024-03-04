@@ -304,7 +304,7 @@ test_that("derivative_samples works for a NB GAM", {
     
     skip_on_ci()
     skip_on_cran()
-    expect_snapshot(print(sm), variant = "m_nb forward")
+    expect_snapshot(print(sm), variant = "m_nb-forward")
 })
 
 test_that("derivative_samples works for a NB GAM, central, backward", {
@@ -335,8 +335,8 @@ test_that("derivative_samples works for a NB GAM, central, backward", {
         "x0", "x1", "x2", "x3"))
     
     skip_on_ci()
-    expect_snapshot(print(sm_1), variant = "m_nb backward")
-    expect_snapshot(print(sm_2), variant = "m_nb central")
+    expect_snapshot(print(sm_1), variant = "m_nb-backward")
+    expect_snapshot(print(sm_2), variant = "m_nb-central")
 })
 
 test_that("derivative_samples works for a NB GAM order 2", {
@@ -379,7 +379,7 @@ test_that("derivative_samples works for a NB GAM order 2", {
         "x0", "x1", "x2", "x3"))
     
     skip_on_ci()
-    expect_snapshot(print(sm_1), variant = "m_nb forward order 2")
-    expect_snapshot(print(sm_2), variant = "m_nb backward order 2")
-    expect_snapshot(print(sm_3), variant = "m_nb central order 2")
+    expect_snapshot(print(sm_1), variant = "m_nb-forward-order-2")
+    expect_snapshot(print(sm_2), variant = "m_nb-backward-order-2")
+    expect_snapshot(print(sm_3), variant = "m_nb-central-order-2")
 })
