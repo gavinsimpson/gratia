@@ -81,7 +81,7 @@ scale is used for all univariate smooths.
 Currently does not affect the y-axis scale of plots of the parametric
 terms.}
 
-\item{rug}{logical; draw a rug plot at the botom of each plot for 1-D
+\item{rug}{logical; draw a rug plot at the bottom of each plot for 1-D
 smooths or plot locations of data for higher dimensions.}
 
 \item{partial_match}{logical; should smooths be selected by partial matches

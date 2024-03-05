@@ -247,3 +247,19 @@ test_that("draw.smooth_estimates works for quadvar t2 with 2d marginals", {
     expect_doppelganger("draw.smooth_estimates su_m_quadvar_t22", plt1)
     expect_doppelganger("draw.gam for su_m_quadvar_t22", plt2)
 })
+
+test_that("draw.gam works with sos spline chlorophyll a", {
+  skip_on_cran()
+  skip_if_not_installed("gamair")
+  data(chl, package = "gamair")
+  m_chla <- bam(chl ~ s(lat, lon, bs = "sos"), data = chl, method = "fREML",
+    discrete = TRUE)
+
+  expect_silent(plt1 <- draw(m_chla, rug = FALSE, n = 25))
+  expect_silent(plt2 <- draw(m_chla, rug = FALSE, n = 25,
+    crs = "+proj=wintri"))
+
+  skip_on_ci()
+  expect_doppelganger("draw.gam sos chlorophyll", plt1)
+  expect_doppelganger("draw.gam sos chlorophyll with crs", plt2)
+})

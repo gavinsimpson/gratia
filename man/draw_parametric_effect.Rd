@@ -59,7 +59,7 @@ supplied, a suitable label will be generated from \code{object}.}
 \item{caption}{character or expression; the plot caption. See
 \code{\link[ggplot2:labs]{ggplot2::labs()}}.}
 
-\item{rug}{logical; draw a rug plot at the botom of each plot for 1-D
+\item{rug}{logical; draw a rug plot at the bottom of each plot for 1-D
 smooths or plot locations of data for higher dimensions.}
 
 \item{position}{Position adjustment, either as a string, or the result of a

@@ -55,7 +55,7 @@
 #'   The data are scaled into the unit square before deciding what to exclude,
 #'   and `dist` is a distance within the unit square. See
 #'   [mgcv::exclude.too.far()] for further details.
-#' @param rug logical; draw a rug plot at the botom of each plot for 1-D
+#' @param rug logical; draw a rug plot at the bottom of each plot for 1-D
 #'   smooths or plot locations of data for higher dimensions.
 #' @param contour logical; should contours be draw on the plot using
 #'   [ggplot2::geom_contour()].
@@ -95,15 +95,22 @@
 #'   there is more than 1 plot and `widths = NULL`, the value of `widths` will
 #'   be set internally to `widths = 1` to accommodate plots of smooths that
 #'   use a fixed aspect ratio.
-#' @param projection character; projection to use, see [ggplot2::coord_map()]
-#'   for details.
-#' @param orientation an optional vector `c(latitude, longitude, rotation)`
-#'   which describes where the "North Pole" should be when computing the
-#'   projection. The third value is a clockwise rotation (in degrees), which
-#'   defaults to the midrange of the longitude coordinates in the data. The
-#'   default values for `orientation` therefore are
-#'   `c(20, 0, mean(range(longitude))))`` if this is not specified by the user.
-#'   See links in [ggplot2::coord_map()] for more information.
+#' @param crs the coordinate reference system (CRS) to use for the plot. All
+#'   data will be projected into this CRS. See [ggplot2::coord_sf()] for
+#'   details.
+#' @param default_crs the coordinate reference system (CRS) to use for the
+#'   non-sf layers in the plot. If left at the default `NULL`, the CRS used is
+#'   4326 (WGS84), which is appropriate for spline-on-the-sphere smooths, which
+#'   are parameterized in terms of latitude and longitude as coordinates. See
+#'   [ggplot2::coord_sf()] for more details.
+#' @param lims_method character; affects how the axis limits are determined. See
+#'   [ggplot2::coord_sf()]. Be careful; in testing of some examples, changing
+#'   this to `"orthogonal"` for example with the chlorophyll-a example from
+#'   Simon Wood's GAM book quickly used up all the RAM in my test system and the
+#'   OS killed R. This could be incorrect usage on my part; right now the grid
+#'   of points at which SOS smooths are evaluated (if not supplied by the user)
+#'   can produce invalid coordinates for the corners of tiles as the grid is
+#'   generated for tile centres without respect to the spacing of those tiles.
 #' @param wrap logical; wrap plots as a patchwork? If \code{FALSE}, a list of
 #'   ggplot objects is returned, 1 per term plotted.
 #' @param envir an environment to look up the data within.
@@ -192,8 +199,9 @@
                        angle = NULL,
                        ncol = NULL, nrow = NULL,
                        guides = "keep", widths = NULL, heights = NULL,
-                       projection = "orthographic",
-                       orientation = NULL,
+                       crs = NULL,
+                       default_crs = NULL,
+                       lims_method = "cross",
                        wrap = TRUE,
                        envir = environment(formula(object)),
                        ...) {
@@ -361,8 +369,9 @@
             continuous_fill = continuous_fill,
             angle = angle,
             ylim = ylims,
-            projection = projection,
-            orientation = orientation,
+            crs = crs,
+            default_crs = default_crs,
+            lims_method = lims_method,
             tensor_term_order = tensor_term_order)
 
     } # end stuff for smooths...

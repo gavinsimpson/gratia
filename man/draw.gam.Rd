@@ -42,8 +42,9 @@
   guides = "keep",
   widths = NULL,
   heights = NULL,
-  projection = "orthographic",
-  orientation = NULL,
+  crs = NULL,
+  default_crs = NULL,
+  lims_method = "cross",
   wrap = TRUE,
   envir = environment(formula(object)),
   ...
@@ -117,7 +118,7 @@ The data are scaled into the unit square before deciding what to exclude,
 and \code{dist} is a distance within the unit square. See
 \code{\link[mgcv:exclude.too.far]{mgcv::exclude.too.far()}} for further details.}
 
-\item{rug}{logical; draw a rug plot at the botom of each plot for 1-D
+\item{rug}{logical; draw a rug plot at the bottom of each plot for 1-D
 smooths or plot locations of data for higher dimensions.}
 
 \item{contour}{logical; should contours be draw on the plot using
@@ -176,16 +177,24 @@ there is more than 1 plot and \code{widths = NULL}, the value of \code{widths} w
 be set internally to \code{widths = 1} to accommodate plots of smooths that
 use a fixed aspect ratio.}
 
-\item{projection}{character; projection to use, see \code{\link[ggplot2:coord_map]{ggplot2::coord_map()}}
-for details.}
+\item{crs}{the coordinate reference system (CRS) to use for the plot. All
+data will be projected into this CRS. See \code{\link[ggplot2:ggsf]{ggplot2::coord_sf()}} for
+details.}
 
-\item{orientation}{an optional vector \code{c(latitude, longitude, rotation)}
-which describes where the "North Pole" should be when computing the
-projection. The third value is a clockwise rotation (in degrees), which
-defaults to the midrange of the longitude coordinates in the data. The
-default values for \code{orientation} therefore are
-`c(20, 0, mean(range(longitude))))`` if this is not specified by the user.
-See links in \code{\link[ggplot2:coord_map]{ggplot2::coord_map()}} for more information.}
+\item{default_crs}{the coordinate reference system (CRS) to use for the
+non-sf layers in the plot. If left at the default \code{NULL}, the CRS used is
+4326 (WGS84), which is appropriate for spline-on-the-sphere smooths, which
+are parameterized in terms of latitude and longitude as coordinates. See
+\code{\link[ggplot2:ggsf]{ggplot2::coord_sf()}} for more details.}
+
+\item{lims_method}{character; affects how the axis limits are determined. See
+\code{\link[ggplot2:ggsf]{ggplot2::coord_sf()}}. Be careful; in testing of some examples, changing
+this to \code{"orthogonal"} for example with the chlorophyll-a example from
+Simon Wood's GAM book quickly used up all the RAM in my test system and the
+OS killed R. This could be incorrect usage on my part; right now the grid
+of points at which SOS smooths are evaluated (if not supplied by the user)
+can produce invalid coordinates for the corners of tiles as the grid is
+generated for tile centres without respect to the spacing of those tiles.}
 
 \item{wrap}{logical; wrap plots as a patchwork? If \code{FALSE}, a list of
 ggplot objects is returned, 1 per term plotted.}

@@ -801,7 +801,7 @@
 #'   `change_type = "change"`, while `col_decrease` and `col_increase` are used
 #'   when `change_type = "sizer"``.
 #' @param change_lwd numeric; the value to set the `linewidth` to in
-#'   [ggplot2::geom_line()], used to represent the perdios of change.
+#'   [ggplot2::geom_line()], used to represent the periods of change.
 #' @param ylim numeric; vector of y axis limits to use all *all* panels drawn.
 #'
 #' @inheritParams draw.gam
@@ -856,8 +856,9 @@
                                     continuous_fill = NULL,
                                     angle = NULL,
                                     ylim = NULL,
-                                    projection = "orthographic",
-                                    orientation = NULL,
+                                    crs = NULL,
+                                    default_crs = NULL,
+                                    lims_method = "cross",
                                     ...) {
     # add confidence intervals if they don't already exist
     if (!all(c(".lower_ci", ".upper_ci") %in% names(object))) {
@@ -909,8 +910,9 @@
         continuous_fill = continuous_fill,
         angle = angle,
         ylim = ylim,
-        projection = projection,
-        orientation = orientation,
+        crs = crs,
+        default_crs = default_crs,
+        lims_method = lims_method,
         tensor_term_order = tensor_term_order, # pass on tensor order info
         ...)
 
@@ -939,8 +941,9 @@
                                     continuous_fill = NULL,
                                     angle = NULL,
                                     ylim = NULL,
-                                    projection = "orthographic",
-                                    orientation = NULL,
+                                    crs = NULL,
+                                    default_crs = NULL,
+                                    lims_method = "cross",
                                     tensor_term_order = NULL,
                                     ...) {
     sm_vars <- tensor_term_order[[unique(object$.smooth)]]
@@ -1074,8 +1077,9 @@
                 continuous_fill = continuous_fill,
                 angle = angle,
                 ylim = ylim,
-                projection = projection,
-                orientation = orientation,
+                crs = crs,
+                default_crs = default_crs,
+                lims_method = lims_method,
                 ...)
 }
 
@@ -1930,7 +1934,7 @@
         # need to repeat for the rug
         if (!is.null(rug)) {
             rug <- mutate(rug,
-                ".sz_var" = interaction(object[variables[fs]], sep = ":",
+                ".sz_var" = interaction(rug[variables[fs]], sep = ":",
             lex.order = TRUE))
         }
 
@@ -2031,7 +2035,9 @@
     plt
 }
 
-#' @importFrom ggplot2 coord_map geom_tile guide_colourbar geom_contour aes
+#' @importFrom ggplot2 coord_sf geom_tile guide_colourbar geom_contour aes
+#'   expand_limits guides guide_axis geom_point theme labs
+#' @importFrom grid unit
 `plot_smooth.sos` <- function(object,
                               variables = NULL,
                               rug = NULL,
@@ -2048,130 +2054,133 @@
                               caption = NULL,
                               ylim = NULL,
                               continuous_fill = NULL,
-                              projection = "orthographic",
-                              orientation = NULL,
+                              crs = NULL,
+                              default_crs = NULL,
+                              lims_method = "cross",
                               angle = NULL,
                               ...) {
-    # handle splines on the sphere
+  # handle splines on the sphere
+  # this needs the sf pkg for coord_sf()
+  if (!requireNamespace("sf", quietly = TRUE)) {
+    message("\nPlotting SOS smooths uses `ggplot2::coord_sf()`.\n",
+            "This requires that the {sf} package be installed.\n",
+            "Run: `install.packages(\"sf\")`\n")
+    stop("Package {sf} is not available.")
+  }
+  if (is.null(variables)) {
+    variables <- vars_from_label(unique(object[[".smooth"]]))
+  }
 
-    # this currently needs the mapproj pkg for coord_map()
-    if (!requireNamespace("mapproj", quietly = TRUE)) {
-        message("\nPlotting SOS smooths uses `ggplot2::coord_map()`.\n",
-            "This requires that the {mapproj} package be installed.\n",
-            "Run: `install.packages(\"mapproj\")`\n")
-        stop("Package {mapproj} is not available.")
-    }
+  if (is.null(continuous_fill)) {
+    continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
+  }
 
-    if (is.null(variables)) {
-        variables <- vars_from_label(unique(object[[".smooth"]]))
-    }
+  # If constant supplied apply it to `est`
+  object <- add_constant(object, constant = constant)
 
-    if (is.null(continuous_fill)) {
-        continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
-    }
+  # If fun supplied, use it to transform est and the upper and lower interval
+  object <- transform_fun(object, fun = fun)
 
-    ## If constant supplied apply it to `est`
-    object <- add_constant(object, constant = constant)
-
-    ## If fun supplied, use it to transform est and the upper and lower interval
-    object <- transform_fun(object, fun = fun)
-
-    show <- match.arg(show)
-    if (isTRUE(identical(show, "estimate"))) {
-        guide_title <- "Partial\neffect"
-        plot_var <- ".estimate"
-        guide_limits <- if (is.null(ylim)) {
-            c(-1, 1) * max(abs(object[[plot_var]]), na.rm = TRUE)
-        } else {
-            ylim
-        }
+  show <- match.arg(show)
+  if (isTRUE(identical(show, "estimate"))) {
+    guide_title <- "Partial\neffect"
+    plot_var <- ".estimate"
+    guide_limits <- if (is.null(ylim)) {
+      c(-1, 1) * max(abs(object[[plot_var]]), na.rm = TRUE)
     } else {
-        guide_title <- "Std. err."
-        plot_var <- ".se"
-        guide_limits <- range(object[[".se"]])
+      ylim
     }
+  } else {
+    guide_title <- "Std. err."
+    plot_var <- ".se"
+    guide_limits <- range(object[[".se"]])
+  }
 
-    # if orientation is not specified, use c(20, 0, mean(range(longitude)))
-    if (is.null(orientation)) {
-        orientation <- c(20, 0, mean(range(object[[variables[2]]])))
+  # if crs is not specified, use orthographic, rotated to centre of data
+  # longitude
+  if (is.null(crs)) {
+    crs <- paste0("+proj=ortho +lat_0=20 +lon_0=",
+      mean(range(object[[variables[2]]])))
+  }
+  if (is.null(default_crs)) {
+    default_crs <- 4326
+  }
+
+  # base plot
+  # Simon parameterises the SOS with first argument latitude and second
+  #  argument longitude, so we need to reverse that here
+  plt <- ggplot(object, aes(x = .data[[variables[2]]],
+    y = .data[[variables[1]]])) +
+    geom_tile(mapping = aes(fill = .data[[plot_var]])) +
+    coord_sf(crs = crs, default_crs = default_crs,
+        lims_method = lims_method)
+
+  if (isTRUE(contour)) {
+    plt <- plt + geom_contour(mapping = aes(z = .data[[plot_var]]),
+      colour = contour_col,
+      bins = n_contour,
+      na.rm = TRUE)
+  }
+
+  # default axis labels if none supplied
+  if (missing(xlab)) {
+    xlab <- variables[2] ## yes, the smooth is s(lat, lon) !
+  }
+
+  if (missing(ylab)) {
+    ylab <- variables[1] ## yes, the smooth is s(lat, lon) !
+  }
+
+  if (is.null(title)) {
+    title <- unique(object[[".smooth"]])
+  }
+
+  if (is.null(caption)) {
+    caption <- paste("Basis:", object[[".type"]])
+  }
+
+  if (all(!is.na(object[[".by"]]))) {
+    # is the by variable a factor or a numeric
+    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
+    by_var <- as.character(unique(object[[".by"]]))
+    spl <- strsplit(title, split = ":")
+    title <- spl[[1L]][[1L]]
+    if (is.null(subtitle)) {
+      subtitle <- if (by_class != "factor") {
+        paste0("By: ", by_var) # continuous by
+      } else {
+        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+      }
     }
+  }
 
-    # base plot
-    # Simon parameterises the SOS with first argument latitude and second
-    #  argument longitude, so we need to reverse that here
-    plt <- ggplot(object, aes(x = .data[[variables[2]]],
-                              y = .data[[variables[1]]])) +
-        geom_tile(mapping = aes(fill = .data[[plot_var]])) +
-        coord_map(projection = projection,
-                  orientation = orientation)
+  # add labelling to plot
+  plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
+    caption = caption)
 
-    if (isTRUE(contour)) {
-        plt <- plt + geom_contour(mapping = aes(z = .data[[plot_var]]),
-                                  colour = contour_col,
-                                  bins = n_contour,
-                                  na.rm = TRUE)
-    }
+  # Set the palette
+  plt <- plt + continuous_fill
 
-    ## default axis labels if none supplied
-    if (missing(xlab)) {
-        xlab <- variables[2] ## yes, the smooth is s(lat, lon) !
-    }
+  # Set the limits for the fill
+  plt <- plt + expand_limits(fill = guide_limits)
 
-    if (missing(ylab)) {
-        ylab <- variables[1] ## yes, the smooth is s(lat, lon) !
-    }
+  # add guide
+  plt <- plt +
+    guides(fill = guide_colourbar(title = guide_title, direction = "vertical",
+      barheight = grid::unit(0.25, "npc")),
+    x = guide_axis(angle = angle))
 
-    if (is.null(title)) {
-        title <- unique(object[[".smooth"]])
-    }
+  # position legend at the
+  plt <- plt + theme(legend.position = "right")
 
-    if (is.null(caption)) {
-        caption <- paste("Basis:", object[[".type"]])
-    }
-
-    if (all(!is.na(object[[".by"]]))) {
-        # is the by variable a factor or a numeric
-        by_class <- data_class(object)[[object[[".by"]][[1L]]]]
-        by_var <- as.character(unique(object[[".by"]]))
-        spl <- strsplit(title, split = ":")
-        title <- spl[[1L]][[1L]]
-        if (is.null(subtitle)) {
-            subtitle <- if (by_class != "factor") {
-                paste0("By: ", by_var) # continuous by
-            } else {
-                paste0("By: ", by_var, "; ", unique(object[[by_var]]))
-            }
-        }
-    }
-
-    ## add labelling to plot
-    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
-                      caption = caption)
-
-    ## Set the palette
-    plt <- plt + continuous_fill
-
-    ## Set the limits for the fill
-    plt <- plt + expand_limits(fill = guide_limits)
-
-    ## add guide
+  # add rug?
+  if (!is.null(rug)) {
     plt <- plt +
-        guides(fill = guide_colourbar(title = guide_title,
-            direction = "vertical",
-            barheight = grid::unit(0.25, "npc")),
-            x = guide_axis(angle = angle))
+      geom_point(data = rug, ## yes, the smooth is s(lat, lon) !
+        mapping = aes(x = .data[[variables[2]]],
+          y = .data[[variables[1]]]),
+        inherit.aes = FALSE, alpha = 0.1)
+  }
 
-    ## position legend at the
-    plt <- plt + theme(legend.position = "right")
-
-    ## add rug?
-    if (!is.null(rug)) {
-        plt <- plt +
-          geom_point(data = rug, ## yes, the smooth is s(lat, lon) !
-                     mapping = aes(x = .data[[variables[2]]],
-                                   y = .data[[variables[1]]]),
-                     inherit.aes = FALSE, alpha = 0.1)
-    }
-
-    plt
+  plt
 }

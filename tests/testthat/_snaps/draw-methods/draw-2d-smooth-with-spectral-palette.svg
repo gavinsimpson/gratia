@@ -105,24 +105,24 @@
 <text x='564.13' y='537.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>1.00</text>
 <text x='347.41' y='549.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='5.50px' lengthAdjust='spacingAndGlyphs'>x</text>
 <rect x='599.05' y='194.83' width='48.88' height='182.17' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='604.53' y='209.02' style='font-size: 11.00px; font-family: sans;' textLength='31.18px' lengthAdjust='spacingAndGlyphs'>Partial</text>
+<text x='604.53' y='220.90' style='font-size: 11.00px; font-family: sans;' textLength='26.91px' lengthAdjust='spacingAndGlyphs'>effect</text>
 <image width='17.28' height='144.00' x='604.53' y='227.53' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAA20lEQVQ4jbWRS3KEMAxEn/pgc4WcPrcBdxbGwga7mEklG1f/1BIF368vKwT1QYEiGj2eQIi7EWl0brSqmBjBfOIWHutH93pkIsZFnTa7IKtqXz0jeu2kMdGW9KPwL+gnOS8LIhCcVCMNFMxyI10ab+f0x32POWMERnYiSGSEJ1o3waDViYlWJyYtkDv+owXGb2thG1TqjkQGlZy4utNc08q11Ivw8/JiP4XXRv6tWynIDuQSqJQ46IkOg5tRUQlUPKAa7ugwUVeWk14Qb2l7avtK21PbUtscaGvaD7arCdyrh+MAAAAAAElFTkSuQmCC'/>
+<polyline points='618.36,368.07 621.81,368.07 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='618.36,333.80 621.81,333.80 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='618.36,299.53 621.81,299.53 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='618.36,265.25 621.81,265.25 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='618.36,230.98 621.81,230.98 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='607.99,368.07 604.53,368.07 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='607.99,333.80 604.53,333.80 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='607.99,299.53 604.53,299.53 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='607.99,265.25 604.53,265.25 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='607.99,230.98 604.53,230.98 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='627.29' y='371.10' style='font-size: 8.80px; font-family: sans;' textLength='15.16px' lengthAdjust='spacingAndGlyphs'>-0.4</text>
 <text x='627.29' y='336.83' style='font-size: 8.80px; font-family: sans;' textLength='15.16px' lengthAdjust='spacingAndGlyphs'>-0.2</text>
 <text x='627.29' y='302.55' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.0</text>
 <text x='627.29' y='268.28' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.2</text>
 <text x='627.29' y='234.01' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.4</text>
-<text x='604.53' y='209.02' style='font-size: 11.00px; font-family: sans;' textLength='31.18px' lengthAdjust='spacingAndGlyphs'>Partial</text>
-<text x='604.53' y='220.90' style='font-size: 11.00px; font-family: sans;' textLength='26.91px' lengthAdjust='spacingAndGlyphs'>effect</text>
-<line x1='604.53' y1='368.07' x2='607.99' y2='368.07' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='604.53' y1='333.80' x2='607.99' y2='333.80' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='604.53' y1='299.53' x2='607.99' y2='299.53' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='604.53' y1='265.25' x2='607.99' y2='265.25' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='604.53' y1='230.98' x2='607.99' y2='230.98' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='618.36' y1='368.07' x2='621.81' y2='368.07' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='618.36' y1='333.80' x2='621.81' y2='333.80' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='618.36' y1='299.53' x2='621.81' y2='299.53' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='618.36' y1='265.25' x2='621.81' y2='265.25' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='618.36' y1='230.98' x2='621.81' y2='230.98' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='106.72' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='32.27px' lengthAdjust='spacingAndGlyphs'>s(x,z)</text>
 <text x='588.09' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='67.99px' lengthAdjust='spacingAndGlyphs'>Basis: TPRS (2d)</text>
 <text x='72.06' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='214.27px' lengthAdjust='spacingAndGlyphs'>draw 2d smooth with spectral palette</text>

@@ -14,7 +14,7 @@ is used instead."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.9.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.9.6</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -107,8 +107,9 @@ is used instead.</p>
 <span>  guides <span class="op">=</span> <span class="st">"keep"</span>,</span>
 <span>  widths <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  heights <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  projection <span class="op">=</span> <span class="st">"orthographic"</span>,</span>
-<span>  orientation <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  crs <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  default_crs <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lims_method <span class="op">=</span> <span class="st">"cross"</span>,</span>
 <span>  wrap <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -216,7 +217,7 @@ and <code>dist</code> is a distance within the unit square. See
 
 
 <dt>rug</dt>
-<dd><p>logical; draw a rug plot at the botom of each plot for 1-D
+<dd><p>logical; draw a rug plot at the bottom of each plot for 1-D
 smooths or plot locations of data for higher dimensions.</p></dd>
 
 
@@ -312,19 +313,29 @@ be set internally to <code>widths = 1</code> to accommodate plots of smooths tha
 use a fixed aspect ratio.</p></dd>
 
 
-<dt>projection</dt>
-<dd><p>character; projection to use, see <code><a href="https://ggplot2.tidyverse.org/reference/coord_map.html" class="external-link">ggplot2::coord_map()</a></code>
-for details.</p></dd>
+<dt>crs</dt>
+<dd><p>the coordinate reference system (CRS) to use for the plot. All
+data will be projected into this CRS. See <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">ggplot2::coord_sf()</a></code> for
+details.</p></dd>
 
 
-<dt>orientation</dt>
-<dd><p>an optional vector <code>c(latitude, longitude, rotation)</code>
-which describes where the "North Pole" should be when computing the
-projection. The third value is a clockwise rotation (in degrees), which
-defaults to the midrange of the longitude coordinates in the data. The
-default values for <code>orientation</code> therefore are
-`c(20, 0, mean(range(longitude))))`` if this is not specified by the user.
-See links in <code><a href="https://ggplot2.tidyverse.org/reference/coord_map.html" class="external-link">ggplot2::coord_map()</a></code> for more information.</p></dd>
+<dt>default_crs</dt>
+<dd><p>the coordinate reference system (CRS) to use for the
+non-sf layers in the plot. If left at the default <code>NULL</code>, the CRS used is
+4326 (WGS84), which is appropriate for spline-on-the-sphere smooths, which
+are parameterized in terms of latitude and longitude as coordinates. See
+<code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">ggplot2::coord_sf()</a></code> for more details.</p></dd>
+
+
+<dt>lims_method</dt>
+<dd><p>character; affects how the axis limits are determined. See
+<code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">ggplot2::coord_sf()</a></code>. Be careful; in testing of some examples, changing
+this to <code>"orthogonal"</code> for example with the chlorophyll-a example from
+Simon Wood's GAM book quickly used up all the RAM in my test system and the
+OS killed R. This could be incorrect usage on my part; right now the grid
+of points at which SOS smooths are evaluated (if not supplied by the user)
+can produce invalid coordinates for the corners of tiles as the grid is
+generated for tile centres without respect to the spacing of those tiles.</p></dd>
 
 
 <dt>wrap</dt>
