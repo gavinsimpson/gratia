@@ -104,20 +104,20 @@
 <text x='250.85' y='275.98' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='10.27px' lengthAdjust='spacingAndGlyphs'>F8</text>
 <text x='279.77' y='275.98' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='10.27px' lengthAdjust='spacingAndGlyphs'>F9</text>
 <rect x='308.09' y='98.94' width='48.88' height='112.69' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='313.56' y='113.13' style='font-size: 11.00px; font-family: sans;' textLength='36.70px' lengthAdjust='spacingAndGlyphs'>Penalty</text>
 <image width='17.28' height='86.40' x='313.56' y='119.75' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAAw0lEQVQ4jZ1SURbDIAgL2SV2h91+B5R9+GoB09b5JxBCIOL7/jjtZSBooNEwhTQQlsOzagaCzOHxKr2BpeCMMYyFFEYCzsyq1zhDioxbSK/WXO6VBQONnHIo6pencdqyggX9NfPwrcoYVtQtR64IkiMlfTY5309tVI6o9NUOoaX/zjwS2f0NsJTLWFCHcAfo7vHVRM6xiOuvFDYFwZyTOPFqVwTL+qBwz3OfR9Y9sH+Sm+sefkSWLc1t1VqcHf8OGm79APU7Kyr6dW6bAAAAAElFTkSuQmCC'/>
+<polyline points='327.39,194.43 330.84,194.43 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='327.39,170.31 330.84,170.31 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='327.39,146.19 330.84,146.19 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='327.39,122.07 330.84,122.07 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='317.02,194.43 313.56,194.43 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='317.02,170.31 313.56,170.31 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='317.02,146.19 313.56,146.19 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='317.02,122.07 313.56,122.07 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='336.32' y='197.45' style='font-size: 8.80px; font-family: sans;' textLength='15.16px' lengthAdjust='spacingAndGlyphs'>-0.5</text>
 <text x='336.32' y='173.34' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.0</text>
 <text x='336.32' y='149.22' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.5</text>
 <text x='336.32' y='125.10' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>1.0</text>
-<text x='313.56' y='113.13' style='font-size: 11.00px; font-family: sans;' textLength='36.70px' lengthAdjust='spacingAndGlyphs'>Penalty</text>
-<line x1='313.56' y1='194.43' x2='317.02' y2='194.43' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='313.56' y1='170.31' x2='317.02' y2='170.31' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='313.56' y1='146.19' x2='317.02' y2='146.19' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='313.56' y1='122.07' x2='317.02' y2='122.07' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='327.39' y1='194.43' x2='330.84' y2='194.43' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='327.39' y1='170.31' x2='330.84' y2='170.31' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='327.39' y1='146.19' x2='330.84' y2='146.19' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='327.39' y1='122.07' x2='330.84' y2='122.07' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='31.05' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='29.34px' lengthAdjust='spacingAndGlyphs'>s(x0)</text>
 <text x='297.13' y='289.35' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='18.59px' lengthAdjust='spacingAndGlyphs'>CRS</text>
 </g>
@@ -196,20 +196,20 @@
 <text x='602.93' y='275.98' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='10.27px' lengthAdjust='spacingAndGlyphs'>F8</text>
 <text x='631.85' y='275.98' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='10.27px' lengthAdjust='spacingAndGlyphs'>F9</text>
 <rect x='660.16' y='98.94' width='48.88' height='112.69' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='665.64' y='113.13' style='font-size: 11.00px; font-family: sans;' textLength='36.70px' lengthAdjust='spacingAndGlyphs'>Penalty</text>
 <image width='17.28' height='86.40' x='665.64' y='119.75' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAArUlEQVQ4jbVRQRICIQwL8RP+wd/7QOJBGKC0XXT01mzSJHTxvD/EwgLiVtAm9ukNy4DobCnzZHTTxqqzEgd64gl6ksg5zrBWDNh894Ll/C3unBY6EDeYPWEOX1vFGwc6bjewLl4aU9bsps7+IRw2NTX325oGv8ISB+Ko5JbrEduLIEmUAApCmzQmAwUKf5Es4not8et+IontR3i426fqvTJ0/jIyPycE1t/47f1eUR3+Ue+33psAAAAASUVORK5CYII='/>
+<polyline points='679.46,198.82 682.92,198.82 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='679.46,175.00 682.92,175.00 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='679.46,151.17 682.92,151.17 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='679.46,127.34 682.92,127.34 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='669.09,198.82 665.64,198.82 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='669.09,175.00 665.64,175.00 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='669.09,151.17 665.64,151.17 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='669.09,127.34 665.64,127.34 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='688.40' y='201.85' style='font-size: 8.80px; font-family: sans;' textLength='15.16px' lengthAdjust='spacingAndGlyphs'>-0.2</text>
 <text x='688.40' y='178.02' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.0</text>
 <text x='688.40' y='154.20' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.2</text>
 <text x='688.40' y='130.37' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.4</text>
-<text x='665.64' y='113.13' style='font-size: 11.00px; font-family: sans;' textLength='36.70px' lengthAdjust='spacingAndGlyphs'>Penalty</text>
-<line x1='665.64' y1='198.82' x2='669.09' y2='198.82' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='665.64' y1='175.00' x2='669.09' y2='175.00' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='665.64' y1='151.17' x2='669.09' y2='151.17' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='665.64' y1='127.34' x2='669.09' y2='127.34' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='679.46' y1='198.82' x2='682.92' y2='198.82' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='679.46' y1='175.00' x2='682.92' y2='175.00' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='679.46' y1='151.17' x2='682.92' y2='151.17' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='679.46' y1='127.34' x2='682.92' y2='127.34' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='383.13' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='29.34px' lengthAdjust='spacingAndGlyphs'>s(x1)</text>
 <text x='649.20' y='289.35' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='31.31px' lengthAdjust='spacingAndGlyphs'>B spline</text>
 </g>
@@ -318,20 +318,20 @@
 <text x='267.15' y='549.85' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='15.16px' lengthAdjust='spacingAndGlyphs'>F13</text>
 <text x='285.88' y='549.85' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='15.16px' lengthAdjust='spacingAndGlyphs'>F14</text>
 <rect x='308.33' y='372.80' width='48.40' height='112.69' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='313.81' y='387.00' style='font-size: 11.00px; font-family: sans;' textLength='36.70px' lengthAdjust='spacingAndGlyphs'>Penalty</text>
 <image width='17.28' height='86.40' x='313.81' y='393.62' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAAwUlEQVQ4jZ2TyxHDMAhEH1SRHtJ9GiSH2IwJK6zkJg37EyBej2c4brgZnCfDcfKUVXH9QAzc3E6IJdcUeIJoRhfYhrD06DHgK5VQZsoCYyAWCY7qgqZTZXqsit5nSaOr1DJfTzCYpxu3SfWMZgb1Cd1yS6X7qua0Hiy7Vhit92rIm1n+Dak2+xf5uujNd5rHvCCtQ+iC+h/KQ3VjYwrDoyeptlylTRHgQeAE12sEBy4iskDiolyTcdAKIyLlEZCS4A3ogjYj5PEpiAAAAABJRU5ErkJggg=='/>
+<polyline points='327.63,471.43 331.09,471.43 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='327.63,450.13 331.09,450.13 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='327.63,428.83 331.09,428.83 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='327.63,407.53 331.09,407.53 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='317.26,471.43 313.81,471.43 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='317.26,450.13 313.81,450.13 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='317.26,428.83 313.81,428.83 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='317.26,407.53 313.81,407.53 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='336.56' y='474.46' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>0</text>
 <text x='336.56' y='453.16' style='font-size: 8.80px; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>200</text>
 <text x='336.56' y='431.86' style='font-size: 8.80px; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>400</text>
 <text x='336.56' y='410.55' style='font-size: 8.80px; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>600</text>
-<text x='313.81' y='387.00' style='font-size: 11.00px; font-family: sans;' textLength='36.70px' lengthAdjust='spacingAndGlyphs'>Penalty</text>
-<line x1='313.81' y1='471.43' x2='317.26' y2='471.43' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='313.81' y1='450.13' x2='317.26' y2='450.13' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='313.81' y1='428.83' x2='317.26' y2='428.83' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='313.81' y1='407.53' x2='317.26' y2='407.53' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='327.63' y1='471.43' x2='331.09' y2='471.43' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='327.63' y1='450.13' x2='331.09' y2='450.13' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='327.63' y1='428.83' x2='331.09' y2='428.83' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='327.63' y1='407.53' x2='331.09' y2='407.53' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='31.05' y='311.22' style='font-size: 13.20px; font-family: sans;' textLength='29.34px' lengthAdjust='spacingAndGlyphs'>s(x2)</text>
 <text x='297.13' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='23.47px' lengthAdjust='spacingAndGlyphs'>TPRS</text>
 </g>
@@ -410,17 +410,17 @@
 <text x='602.93' y='549.85' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='10.27px' lengthAdjust='spacingAndGlyphs'>F8</text>
 <text x='631.85' y='549.85' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='10.27px' lengthAdjust='spacingAndGlyphs'>F9</text>
 <rect x='660.16' y='372.80' width='48.88' height='112.69' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='665.64' y='387.00' style='font-size: 11.00px; font-family: sans;' textLength='36.70px' lengthAdjust='spacingAndGlyphs'>Penalty</text>
 <image width='17.28' height='86.40' x='665.64' y='393.62' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAAuUlEQVQ4jZVRyxXDMAgDZYns0O07oOkhP4MFJRc/Y30QWL77x6CbCgQq0Pv4U2pSHjwlPIXjTYCTRSAojhJzySnqKSBvRKZYs1AyGSYogNKFoHBxX8kKv8tq8XsFuP2FHYR8afAAhA2FEdhYdT4h3/NYxTcy0dSNZnY90rgdhSebicDMltswE5gk6Hy7ysEopcHwBg3ZSBNI3YOgso6Q98jsT0Vv3tZiPbns+7QcmUFI1fgjatU0uNEfSwsfOtmt/W0AAAAASUVORK5CYII='/>
+<polyline points='679.46,471.29 682.92,471.29 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='679.46,445.32 682.92,445.32 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='679.46,419.34 682.92,419.34 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='669.09,471.29 665.64,471.29 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='669.09,445.32 665.64,445.32 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='669.09,419.34 665.64,419.34 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='688.40' y='474.32' style='font-size: 8.80px; font-family: sans;' textLength='15.16px' lengthAdjust='spacingAndGlyphs'>-0.2</text>
 <text x='688.40' y='448.35' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.0</text>
 <text x='688.40' y='422.37' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.2</text>
-<text x='665.64' y='387.00' style='font-size: 11.00px; font-family: sans;' textLength='36.70px' lengthAdjust='spacingAndGlyphs'>Penalty</text>
-<line x1='665.64' y1='471.29' x2='669.09' y2='471.29' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='665.64' y1='445.32' x2='669.09' y2='445.32' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='665.64' y1='419.34' x2='669.09' y2='419.34' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='679.46' y1='471.29' x2='682.92' y2='471.29' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='679.46' y1='445.32' x2='682.92' y2='445.32' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='679.46' y1='419.34' x2='682.92' y2='419.34' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='383.13' y='311.22' style='font-size: 13.20px; font-family: sans;' textLength='29.34px' lengthAdjust='spacingAndGlyphs'>s(x3)</text>
 <text x='649.20' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='31.31px' lengthAdjust='spacingAndGlyphs'>P spline</text>
 <text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='212.08px' lengthAdjust='spacingAndGlyphs'>draw penalty_df issue 95 label order</text>
