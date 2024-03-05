@@ -1,4 +1,4 @@
-# gratia 0.8.9.5
+# gratia 0.8.9.6
 
 ## Breaking changes
 
@@ -21,6 +21,27 @@
   `smooth_estimates()`; in place of the `var` and `data` columns, *gratia* now
   stores the data variables at which the derivatives were evaluated as columns
   in the object with their actual variable names.
+
+* The way spline-on-the-sphere (SOS) smooths (`bs = "sos"`) are plotted has
+  changed to use `ggplot2::coord_sf()` instead of the previously-used
+  `ggplot2::coord_map()`. This changed has been made as a result of
+  `coord_map()` being soft-deprecated ("superseded") for a few minor versions of
+  ggplot2 by now already, and changes to the guides system in version 3.5.0 of
+  ggplot2.
+  
+  The axes on plots created with `coord_map()` never really worked
+  correctly and changing the angle of the tick labels never worked. As
+  `coord_map()` is superseded, it didn't receive the updates to the guides
+  system and a side effect of these changes, the code that plotted SOS smooths
+  was producing a warning with the release of ggplot2 version 3.5.0.
+
+  The projection settings used to draw SOS smooths was previously controlled via
+  arguments `projection` and `orientation`. These arguments do not affect
+  `ggplot2::coord_sf()`, Instead the projection used is controlled through new
+  argument `crs`, which takes a PROJ string detailing the projection to use or
+  an integer that refers to a known coordinate reference system (CRS). The
+  default projection used is `+proj=ortho +lat_0=20 +lon_0=XX` where `XX` is the
+  mean of the longitude coordinates of the data points.
 
 ### Defunct and deprecated functions
 
