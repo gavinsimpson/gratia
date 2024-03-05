@@ -2060,6 +2060,13 @@
                               angle = NULL,
                               ...) {
   # handle splines on the sphere
+  # this needs the sf pkg for coord_sf()
+  if (!requireNamespace("sf", quietly = TRUE)) {
+    message("\nPlotting SOS smooths uses `ggplot2::coord_sf()`.\n",
+            "This requires that the {sf} package be installed.\n",
+            "Run: `install.packages(\"sf\")`\n")
+    stop("Package {sf} is not available.")
+  }
   if (is.null(variables)) {
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
