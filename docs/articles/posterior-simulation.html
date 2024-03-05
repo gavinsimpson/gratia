@@ -92,7 +92,8 @@ powerful way of doing inference using estimated generalized additive
 models.</p>
 <p>We’ll need the following packages for this vignette:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pkgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mgcv"</span>, <span class="st">"gratia"</span>, <span class="st">"dplyr"</span>, <span class="st">"tidyr"</span>, <span class="st">"ggplot2"</span>, <span class="st">"ggdist"</span>, <span class="st">"distributional"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">pkgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mgcv"</span>, <span class="st">"gratia"</span>, <span class="st">"dplyr"</span>, <span class="st">"tidyr"</span>, <span class="st">"ggplot2"</span>, <span class="st">"ggdist"</span>,</span>
+<span>  <span class="st">"distributional"</span>, <span class="st">"tibble"</span>, <span class="st">"withr"</span>, <span class="st">"patchwork"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">pkgs</span>, <span class="va">library</span>, <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical</a></span><span class="op">(</span><span class="fl">1L</span><span class="op">)</span>, logical.return <span class="op">=</span> <span class="cn">TRUE</span>, character.only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: nlme</span></span>
 <span><span class="co">#&gt; This is mgcv 1.9-1. For overview type 'help("mgcv-package")'.</span></span>
@@ -109,8 +110,8 @@ models.</p>
 <span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span><span class="co">#&gt;           mgcv         gratia          dplyr          tidyr        ggplot2 </span></span>
 <span><span class="co">#&gt;           TRUE           TRUE           TRUE           TRUE           TRUE </span></span>
-<span><span class="co">#&gt;         ggdist distributional </span></span>
-<span><span class="co">#&gt;           TRUE           TRUE</span></span></code></pre></div>
+<span><span class="co">#&gt;         ggdist distributional         tibble          withr      patchwork </span></span>
+<span><span class="co">#&gt;           TRUE           TRUE           TRUE           TRUE           TRUE</span></span></code></pre></div>
 <p>A generalized additive model (GAM) has the following form</p>
 <p><span class="math display">\[
 g(\mu_i) = \eta_i = A_i + \mathbf{X}_i \boldsymbol{\gamma} +
@@ -505,6 +506,125 @@ interval we created. This interval encloses, as expected, almost all of
 the observe data points. It also encloses, by design, most of the
 posterior samples, as indicated by the filled hexagonal bins, with
 warmer colours indicating larger counts of posterior draws.</p>
+</div>
+<div class="section level3">
+<h3 id="metropolis-hastings-sampler">Metropolis Hastings sampler<a class="anchor" aria-label="anchor" href="#metropolis-hastings-sampler"></a>
+</h3>
+<p>In some cases, the Gaussian approximation to the posterior
+distribution of the model coefficients can fail. Simon Wood shows an
+example of just such a failure in the <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">?gam.mh</a></code> help page,
+where the Gaussian approximation is basically useless for a binomial GAM
+with large numbers of zeroes. <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code> implements a
+simple Metropolis Hastings sampler, which alternates proposals from a
+Gaussian or <em>t</em> distribution approximation to the posterior with
+random walk proposals that are based on the shrunken approximate
+posterior covariance matrix.</p>
+<p>In this section, I rework Simon’s example of the failure of the
+Gaussian approximation from <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">?gam.mh</a></code> to show how to use
+<em>gratia</em> to generate posterior draws using the Metropolis
+Hastings sampler provided by <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">gam.mh()</a></code>.</p>
+<p>We begin by defining a function that will simulate data for the
+example.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ga_fail</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">seed</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">89</span><span class="op">)</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">13</span><span class="op">)</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span>, <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3</span><span class="op">)</span>,</span>
+<span>    <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">46</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_seed.html" class="external-link">with_seed</a></span><span class="op">(</span><span class="va">seed</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">10</span> <span class="op">*</span> <span class="fl">5</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">-</span> <span class="fl">11</span><span class="op">)</span> <span class="op">*</span> <span class="fl">20</span> <span class="op">+</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>      .row <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/relocate.html" class="external-link">relocate</a></span><span class="op">(</span><span class="va">.row</span>, .before <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span>
+<span>  <span class="va">df</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Which we use to simulate a data set and plot it</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">ga_fail</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">df</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="posterior-simulation_files/figure-html/plot-ga-fail-data-1.png" width="700">
+Note how there are very few zeroes and that for large parts of the
+covariate space the response is all zeroes.</p>
+<p>We fit a binomial (logistic) GAM to the data</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m_logit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">15</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"REML"</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></code></pre></div>
+<p>and then generate sample from the posterior distribution using the
+default Gaussian approximation and subsequently using the simpler
+Metropolis Hastings sampler.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fs_ga</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">m_logit</span>, n <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">fs_mh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">m_logit</span>, n <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">2</span>, method <span class="op">=</span> <span class="st">"mh"</span>, thin <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  rw_scale <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span></code></pre></div>
+<p>The <code>method</code> argument is used to select the Metropolis
+Hastings sampler, and we specify two additional arguments:</p>
+<ol style="list-style-type: decimal">
+<li>
+<code>thin</code>, which controls how many draws are skipped between
+each retained sample, and</li>
+<li>
+<code>rw_scale</code>, which is the scaling factor by which the
+posterior covariance matrix is shrunk for the random walk
+proposals.</li>
+</ol>
+<p>We leave the two other important arguments at their defaults:</p>
+<ol style="list-style-type: decimal">
+<li>
+<code>burnin = 1000</code>, the number of samples to discard prior
+to sampling, and</li>
+<li>
+<code>t_df = 40</code>, the degrees of freedom for the <em>t</em>
+proposals.</li>
+</ol>
+<p>Because the the degrees of freedom for the <em>t</em> proposals is
+large, we’re effectively doing Gaussian approximation with this default,
+alternating those proposals with random walk proposals.</p>
+<p>Having collected the posterior draws, we summarise each set into 50%,
+80%, and 95% intervals using <code><a href="http://mjskay.github.io/ggdist/reference/point_interval.html" class="external-link">ggdist::median_qi()</a></code>, and add
+on the data locations with a left join</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">int_ga</span> <span class="op">&lt;-</span> <span class="va">fs_ga</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">.row</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">median_qi</span><span class="op">(</span>.width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">.5</span>, <span class="fl">.8</span>, <span class="fl">.95</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">df</span>, by <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">join_by</a></span><span class="op">(</span><span class="va">.row</span> <span class="op">==</span> <span class="va">.row</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">int_mh</span> <span class="op">&lt;-</span> <span class="va">fs_mh</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">.row</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">median_qi</span><span class="op">(</span>.width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">.5</span>, <span class="fl">.8</span>, <span class="fl">.95</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">df</span>, by <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">join_by</a></span><span class="op">(</span><span class="va">.row</span> <span class="op">==</span> <span class="va">.row</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>First we plot the intervals for the Gaussian approximation to the
+posterior, and then we repeat the plot using the intervals derived from
+the Metropolis Hastings sampler, and arrange the two plots using
+<em>patchwork</em></p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">plt_ga</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_lineribbon</span><span class="op">(</span>data <span class="op">=</span> <span class="va">int_ga</span>,</span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">.fitted</span>, ymin <span class="op">=</span> <span class="va">.lower</span>, ymax <span class="op">=</span> <span class="va">.upper</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_brewer</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Gaussian approximation"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">plt_mh</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_lineribbon</span><span class="op">(</span>data <span class="op">=</span> <span class="va">int_mh</span>,</span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">.fitted</span>, ymin <span class="op">=</span> <span class="va">.lower</span>, ymax <span class="op">=</span> <span class="va">.upper</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_brewer</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Metropolis Hastings sampler"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">plt_ga</span> <span class="op">+</span> <span class="va">plt_mh</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="posterior-simulation_files/figure-html/ga-fail-plot-plus-intervals-1.png" width="700"></p>
+<p>The Gaussian approximation-based intervals are shown on the left of
+the figure, which for most of the range of <code>x</code> are largely
+useless, covering the entire range of the response, despite the fact
+that we only observed zeroes for large parts of the covariate space.
+Contrast those intervals with the ones obtained using the Metropolis
+Hastings sampler; these intervals much better reflect the uncertainty in
+the estimated response as a function of <code>x</code> where the data
+are all zeroes.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

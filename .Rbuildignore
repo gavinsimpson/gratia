@@ -38,3 +38,5 @@
 ^vignettes/articles$
 ^CRAN-SUBMISSION$
 ^docs$
+^doc$
+^Meta$

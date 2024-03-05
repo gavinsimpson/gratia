@@ -23,3 +23,5 @@ revdep/
 
 ## ignore
 CRAN-SUBMISSION
+/doc/
+/Meta/
