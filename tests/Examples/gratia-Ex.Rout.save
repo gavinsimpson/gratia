@@ -1,6 +1,6 @@
 
-R version 4.3.2 (2023-10-31) -- "Eye Holes"
-Copyright (C) 2023 The R Foundation for Statistical Computing
+R version 4.3.3 (2024-02-29) -- "Angel Food Cake"
+Copyright (C) 2024 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -1507,11 +1507,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55de4644ee88>
+<environment: 0x55fcfb64ed08>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55de4644ee88>
+<environment: 0x55fcfb64ed08>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1882,8 +1882,8 @@ detaching ‘package:mgcv’
 > 
 > ### Name: penalty
 > ### Title: Extract and tidy penalty matrices
-> ### Aliases: penalty penalty.gam penalty.mgcv.smooth penalty.tensor.smooth
-> ###   penalty.t2.smooth penalty.re.smooth.spec
+> ### Aliases: penalty penalty.default penalty.gam penalty.mgcv.smooth
+> ###   penalty.tensor.smooth penalty.t2.smooth penalty.re.smooth.spec
 > 
 > ### ** Examples
 > 
@@ -2625,7 +2625,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  33.091 0.332 32.783 0 0 
+Time elapsed:  47.804 0.443 46.928 0 0 
 > grDevices::dev.off()
 null device 
           1 
