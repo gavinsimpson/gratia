@@ -26,8 +26,9 @@
   continuous_fill = NULL,
   angle = NULL,
   ylim = NULL,
-  projection = "orthographic",
-  orientation = NULL,
+  crs = NULL,
+  default_crs = NULL,
+  lims_method = "cross",
   ...
 )
 }
@@ -71,7 +72,7 @@ indicating periods of change. \code{col_change} is used when
 when `change_type = "sizer"``.}
 
 \item{change_lwd}{numeric; the value to set the \code{linewidth} to in
-\code{\link[ggplot2:geom_path]{ggplot2::geom_line()}}, used to represent the perdios of change.}
+\code{\link[ggplot2:geom_path]{ggplot2::geom_line()}}, used to represent the periods of change.}
 
 \item{partial_match}{logical; should smooths be selected by partial matches
 with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
@@ -94,16 +95,24 @@ drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggp
 
 \item{ylim}{numeric; vector of y axis limits to use all \emph{all} panels drawn.}
 
-\item{projection}{character; projection to use, see \code{\link[ggplot2:coord_map]{ggplot2::coord_map()}}
-for details.}
+\item{crs}{the coordinate reference system (CRS) to use for the plot. All
+data will be projected into this CRS. See \code{\link[ggplot2:ggsf]{ggplot2::coord_sf()}} for
+details.}
 
-\item{orientation}{an optional vector \code{c(latitude, longitude, rotation)}
-which describes where the "North Pole" should be when computing the
-projection. The third value is a clockwise rotation (in degrees), which
-defaults to the midrange of the longitude coordinates in the data. The
-default values for \code{orientation} therefore are
-`c(20, 0, mean(range(longitude))))`` if this is not specified by the user.
-See links in \code{\link[ggplot2:coord_map]{ggplot2::coord_map()}} for more information.}
+\item{default_crs}{the coordinate reference system (CRS) to use for the
+non-sf layers in the plot. If left at the default \code{NULL}, the CRS used is
+4326 (WGS84), which is appropriate for spline-on-the-sphere smooths, which
+are parameterized in terms of latitude and longitude as coordinates. See
+\code{\link[ggplot2:ggsf]{ggplot2::coord_sf()}} for more details.}
+
+\item{lims_method}{character; affects how the axis limits are determined. See
+\code{\link[ggplot2:ggsf]{ggplot2::coord_sf()}}. Be careful; in testing of some examples, changing
+this to \code{"orthogonal"} for example with the chlorophyll-a example from
+Simon Wood's GAM book quickly used up all the RAM in my test system and the
+OS killed R. This could be incorrect usage on my part; right now the grid
+of points at which SOS smooths are evaluated (if not supplied by the user)
+can produce invalid coordinates for the corners of tiles as the grid is
+generated for tile centres without respect to the spacing of those tiles.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
