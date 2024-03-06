@@ -50,7 +50,7 @@ The main features of *gratia* are currently
     (`bs = "so"`), and bivariate, trivariate, and quadvariate TPRS and
     tensor product smooths are supported,
 
--   Estimatation of derivatives of fitted smoothers: `derivatives()`,
+-   Estimation of derivatives of fitted smoothers: `derivatives()`,
 
 -   Estimation of point-wise across-the-function confidence intervals
     and simultaneous intervals for smooths: `confint.gam()`.
@@ -67,7 +67,7 @@ The main features of *gratia* are currently
 
 *gratia* is now available on CRAN, and can be installed with
 
-    install.packages('gratia')
+    install.packages("gratia")
 
 however *gratia* is under active development and you may wish to install
 the development version from github. The easiest way to do this is via
@@ -80,8 +80,10 @@ to install the package. Alternatively, binary packages of the
 development version are available from rOpenSci’s R Universe service:
 
     # Install gratia in R
-    install.packages("gratia", repos = c("https://gavinsimpson.r-universe.dev",
-      "https://cloud.r-project.org"))
+    install.packages("gratia", repos = c(
+      "https://gavinsimpson.r-universe.dev",
+      "https://cloud.r-project.org"
+    ))
 
 ## History
 
