@@ -71,7 +71,7 @@
 <span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for gam</span></span>
-<span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span>, data <span class="op">=</span> <span class="cn">NULL</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span>, data <span class="op">=</span> <span class="cn">NULL</span>, envir <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for gamm</span></span>
 <span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -121,7 +121,21 @@ passed in <code>...</code> will be evaluated in <code>data</code>.</p></dd>
 <span class="r-in"><span><span class="co"># Default will use the observation closest to the median for unspecified</span></span></span>
 <span class="r-in"><span><span class="co"># variables.</span></span></span>
 <span class="r-in"><span><span class="va">ds</span> <span class="op">&lt;-</span> <span class="fu">data_slice</span><span class="op">(</span><span class="va">m</span>, x2 <span class="op">=</span> <span class="fu"><a href="evenly.html">evenly</a></span><span class="op">(</span><span class="va">x2</span>, n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in data[names(summ)]:</span> object of type 'closure' is not subsettable</span>
+<span class="r-in"><span><span class="va">ds</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 50 x 2</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        x2    x1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 0.022<span style="text-decoration: underline;">8</span> 0.403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 0.042<span style="text-decoration: underline;">4</span> 0.403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 0.061<span style="text-decoration: underline;">9</span> 0.403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 0.081<span style="text-decoration: underline;">5</span> 0.403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 0.101  0.403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 0.121  0.403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 0.140  0.403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 0.160  0.403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 0.179  0.403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 0.199  0.403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 40 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># for full control, specify the values you want</span></span></span>
 <span class="r-in"><span><span class="va">ds</span> <span class="op">&lt;-</span> <span class="fu">data_slice</span><span class="op">(</span><span class="va">m</span>, x2 <span class="op">=</span> <span class="fu"><a href="evenly.html">evenly</a></span><span class="op">(</span><span class="va">x2</span>, n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>, x1 <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></span>

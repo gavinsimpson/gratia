@@ -153,7 +153,8 @@ functions</p>
 <span></span>
 <span><span class="co"># fit model</span></span>
 <span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>,</span>
-<span>         data <span class="op">=</span> <span class="va">eg1</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></code></pre></div>
+<span>  data <span class="op">=</span> <span class="va">eg1</span>, method <span class="op">=</span> <span class="st">"REML"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>The default plot produced by <code><a href="../reference/draw.html">draw()</a></code> is</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
@@ -273,12 +274,15 @@ add</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">.smooth</span> <span class="op">==</span> <span class="st">"s(x2)"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_rug.html" class="external-link">geom_rug</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x2</span><span class="op">)</span>,</span>
-<span>           data <span class="op">=</span> <span class="va">eg1</span>,</span>
-<span>           sides <span class="op">=</span> <span class="st">"b"</span>, length <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.02</span>, <span class="st">"npc"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    data <span class="op">=</span> <span class="va">eg1</span>,</span>
+<span>    sides <span class="op">=</span> <span class="st">"b"</span>, length <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.02</span>, <span class="st">"npc"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">.lower_ci</span>, ymax <span class="op">=</span> <span class="va">.upper_ci</span>, x <span class="op">=</span> <span class="va">x2</span><span class="op">)</span>,</span>
-<span>              alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.2</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x2</span>, y <span class="op">=</span> <span class="va">`s(x2)`</span><span class="op">)</span>,</span>
-<span>             data <span class="op">=</span> <span class="va">eg1</span>, cex <span class="op">=</span> <span class="fl">1.5</span>, colour <span class="op">=</span> <span class="st">"steelblue3"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    data <span class="op">=</span> <span class="va">eg1</span>, cex <span class="op">=</span> <span class="fl">1.5</span>, colour <span class="op">=</span> <span class="st">"steelblue3"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x2</span>, y <span class="op">=</span> <span class="va">.estimate</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="st">"Partial effect"</span>, title <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span>
 <span><span class="va">p_sx2</span></span></code></pre></div>
@@ -309,17 +313,23 @@ residuals last</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">.smooth</span> <span class="op">==</span> <span class="st">"s(x2)"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_rug.html" class="external-link">geom_rug</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x2</span><span class="op">)</span>,</span>
-<span>           data <span class="op">=</span> <span class="va">eg1</span>,</span>
-<span>           sides <span class="op">=</span> <span class="st">"b"</span>, length <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.02</span>, <span class="st">"npc"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    data <span class="op">=</span> <span class="va">eg1</span>,</span>
+<span>    sides <span class="op">=</span> <span class="st">"b"</span>, length <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.02</span>, <span class="st">"npc"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">.lower_ci</span>, ymax <span class="op">=</span> <span class="va">.upper_ci</span>, x <span class="op">=</span> <span class="va">x2</span><span class="op">)</span>,</span>
-<span>              alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.2</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x2</span>, y <span class="op">=</span> <span class="va">.estimate</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="st">"Partial effect"</span>, title <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">plt</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x2</span>, y <span class="op">=</span> <span class="va">`s(x2)`</span>,</span>
-<span>                 colour <span class="op">=</span> <span class="va">fac</span><span class="op">)</span>, <span class="co"># &lt;-- map fac to colour aesthetic</span></span>
-<span>             data <span class="op">=</span> <span class="va">eg1</span>, cex <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
+<span>      x <span class="op">=</span> <span class="va">x2</span>, y <span class="op">=</span> <span class="va">`s(x2)`</span>,</span>
+<span>      colour <span class="op">=</span> <span class="va">fac</span></span>
+<span>    <span class="op">)</span>, <span class="co"># &lt;-- map fac to colour aesthetic</span></span>
+<span>    data <span class="op">=</span> <span class="va">eg1</span>, cex <span class="op">=</span> <span class="fl">1.5</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="custom-plotting_files/figure-html/plot-partial-resids-with-colours-by-fac-1.png" width="700"></p>
 <p>We can also do some simple model checking by plotting the smooth with
 partial residuals coloured according to one of the other covariates (we
@@ -329,9 +339,13 @@ the <em>colour</em> and <em>size</em> aesthetics (note we deleted
 <code>cex = 1.5</code> to allow the mapping to <em>size</em>)</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plt</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x2</span>, y <span class="op">=</span> <span class="va">`s(x2)`</span>,</span>
-<span>                 colour <span class="op">=</span> <span class="va">x1</span>, size <span class="op">=</span> <span class="va">x1</span><span class="op">)</span>, <span class="co"># &lt;-- map fac to colour aesthetic</span></span>
-<span>             data <span class="op">=</span> <span class="va">eg1</span>, alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span>   <span class="co"># &lt;-- deleted cex!!</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
+<span>      x <span class="op">=</span> <span class="va">x2</span>, y <span class="op">=</span> <span class="va">`s(x2)`</span>,</span>
+<span>      colour <span class="op">=</span> <span class="va">x1</span>, size <span class="op">=</span> <span class="va">x1</span></span>
+<span>    <span class="op">)</span>, <span class="co"># &lt;-- map fac to colour aesthetic</span></span>
+<span>    data <span class="op">=</span> <span class="va">eg1</span>, alpha <span class="op">=</span> <span class="fl">0.3</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span> <span class="co"># &lt;-- deleted cex!!</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_colour_viridis_c</a></span><span class="op">(</span>option <span class="op">=</span> <span class="st">"plasma"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="custom-plotting_files/figure-html/plot-partial-resids-with-colours-by-x1-1.png" width="700"></p>
 <p>The resulting plot doesn’t show any particular problems with the

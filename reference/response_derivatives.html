@@ -198,16 +198,13 @@ was eveluated.</p></li>
 <span class="r-in"><span><span class="co"># data slice through data along x2 - all other covariates will be set to</span></span></span>
 <span class="r-in"><span><span class="co"># typical values (value closest to median)</span></span></span>
 <span class="r-in"><span><span class="va">ds</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_slice.html">data_slice</a></span><span class="op">(</span><span class="va">m</span>, x2 <span class="op">=</span> <span class="fu"><a href="evenly.html">evenly</a></span><span class="op">(</span><span class="va">x2</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in data[names(summ)]:</span> object of type 'closure' is not subsettable</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># fitted values along x2</span></span></span>
 <span class="r-in"><span><span class="va">fv</span> <span class="op">&lt;-</span> <span class="fu"><a href="fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m</span>, smooth <span class="op">=</span> <span class="st">"s(x2)"</span>, data <span class="op">=</span> <span class="va">ds</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'ds' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># response derivatives - ideally n_sim = &gt;10000</span></span></span>
 <span class="r-in"><span><span class="va">y_d</span> <span class="op">&lt;-</span> <span class="fu">response_derivatives</span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">ds</span>, type <span class="op">=</span> <span class="st">"central"</span>, focal <span class="op">=</span> <span class="st">"x2"</span>,</span></span>
 <span class="r-in"><span>    eps <span class="op">=</span> <span class="fl">0.01</span>, seed <span class="op">=</span> <span class="fl">21</span>, n_sim <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'ds' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># draw fitted values along x2</span></span></span>
 <span class="r-in"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="va">fv</span> <span class="op">|&gt;</span></span></span>
@@ -217,7 +214,6 @@ was eveluated.</p></li>
 <span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Estimated count as a function of x2"</span>,</span></span>
 <span class="r-in"><span>         y <span class="op">=</span> <span class="st">"Estimated count"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'fv' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># draw response derivatives</span></span></span>
 <span class="r-in"><span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="va">y_d</span> <span class="op">|&gt;</span></span></span>
@@ -226,11 +222,10 @@ was eveluated.</p></li>
 <span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Estimated 1st derivative of estimated count"</span>,</span></span>
 <span class="r-in"><span>         y <span class="op">=</span> <span class="st">"First derivative"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'y_d' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># draw both panels</span></span></span>
 <span class="r-in"><span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'p1' not found</span>
+<span class="r-plt img"><img src="response_derivatives-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">op</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
