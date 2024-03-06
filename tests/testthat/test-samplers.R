@@ -21,6 +21,13 @@ test_that("post_draws() works for a GAM", {
   expect_true(is.matrix(drws1))
   expect_identical(dim(drws1), c(20L, 37L))
   expect_identical(drws1, drws2)
+
+  expect_silent(drws3 <- post_draws(m_gam, n = 20, method = "mh",
+    burnin = 100, thin = 2, t_df = 4, rw_scale = 0.3, seed = 2, index = 2:10))
+  expect_type(drws3, "double")
+  expect_true(is.matrix(drws3))
+  expect_identical(dim(drws3), c(20L, 9L))
+  expect_identical(drws3, drws1[, 2:10])
 })
 
 test_that("post_draws() fails for INLA", {
