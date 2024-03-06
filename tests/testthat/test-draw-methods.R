@@ -569,7 +569,7 @@ test_that("draw.gam can take user specified scales", {
 
 test_that("plotting sos smooths works", {
   skip_on_cran()
-  skip_if_not_installed("mapproj")
+  skip_if_not_installed("sf")
   skip_on_os("mac")
   expect_silent(plt <- draw(m_sos, n = 20))
 
