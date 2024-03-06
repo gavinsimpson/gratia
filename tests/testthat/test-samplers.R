@@ -90,6 +90,8 @@ test_that("user_draws() works for a GAM", {
 })
 
 test_that("user_draws() fails for incorrect matrix of draws", {
+  expect_silent(drws1 <- generate_draws(m_gam, n = 20, method = "gaussian",
+    seed = 2))
   expect_error(user_draws(m_gam, draws = drws1[, 1:10]),
     "Supplied 'draws' doesn't match number of model coefficients.
 Number of model coefs: 37
