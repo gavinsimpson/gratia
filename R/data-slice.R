@@ -72,6 +72,7 @@
 #' # Default will use the observation closest to the median for unspecified
 #' # variables.
 #' ds <- data_slice(m, x2 = evenly(x2, n = 50))
+#' ds
 #'
 #' # for full control, specify the values you want
 #' ds <- data_slice(m, x2 = evenly(x2, n = 50), x1 = 0.3)
