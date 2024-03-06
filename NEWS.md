@@ -1,4 +1,4 @@
-# gratia 0.8.9.6
+# gratia 0.8.9.7
 
 ## Breaking changes
 
@@ -309,6 +309,10 @@ eventual 1.0.0 release. These functions will become defunct by version 0.11.0 or
 * `derivative_samples()` would fail with `order = 2` and was only computing
   forward finite differences, regardless of `type` for `order = 1`. Partly
   reported by @samlipworth #251.
+
+* The `draw()` method for `penalty()` was normalizing the penalty to the range
+  0--1, not the claimed and documented -1--1 with argument `normalize = TRUE`.
+  This is now fixed.
 
 # gratia 0.8.2
 
