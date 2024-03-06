@@ -44,10 +44,10 @@
 #' df <- df[, c("y", "x0", "x1", "x2", "x3")]
 #' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 #'
-#' ##
+#' # add fitted values to our data
 #' add_fitted(df, m)
 #'
-#' ## with type = "terms" or "iterms"
+#' # with type = "terms" or "iterms"
 #' add_fitted(df, m, type = "terms")
 #' \dontshow{
 #' options(op)
