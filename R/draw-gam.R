@@ -209,7 +209,7 @@
                        wrap = TRUE,
                        envir = environment(formula(object)),
                        ...) {
-  model_name <- expr_label(substitute(object))
+  # model_name <- expr_label(substitute(object))
   # fixed or free?
   scales <- match.arg(scales)
 
