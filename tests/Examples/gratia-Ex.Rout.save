@@ -42,10 +42,10 @@ Type 'q()' to quit R.
 > op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 > ## End(Don't show)
 > df <- data_sim("eg1", seed = 1)
-> df <- df[, c("y","x0","x1","x2","x3")]
-> m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+> df <- df[, c("y", "x0", "x1", "x2", "x3")]
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 > 
-> ##
+> # add fitted values to our data
 > add_fitted(df, m)
 # A tibble: 400 x 6
          y     x0     x1     x2    x3 .fitted
@@ -62,7 +62,7 @@ Type 'q()' to quit R.
 10  3.72   0.0618 0.940  0.0317 0.677    7.04
 # i 390 more rows
 > 
-> ## with type = "terms" or "iterms"
+> # with type = "terms" or "iterms"
 > add_fitted(df, m, type = "terms")
 # A tibble: 400 x 10
          y     x0     x1     x2    x3 .constant `s(x0)` `s(x1)` `s(x2)` `s(x3)`
@@ -104,8 +104,8 @@ detaching ‘package:mgcv’
 > op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 > ## End(Don't show)
 > df <- data_sim("eg1", seed = 1)
-> df <- df[, c("y","x0","x1","x2","x3")]
-> m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+> df <- df[, c("y", "x0", "x1", "x2", "x3")]
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 > 
 > ## add partial residuals
 > add_partial_residuals(df, m)
@@ -167,8 +167,8 @@ detaching ‘package:mgcv’
 > op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 > ## End(Don't show)
 > df <- data_sim("eg1", seed = 1)
-> df <- df[, c("y","x0","x1","x2","x3")]
-> m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
+> df <- df[, c("y", "x0", "x1", "x2", "x3")]
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 > 
 > ##
 > add_residuals(df, m)
@@ -216,7 +216,7 @@ detaching ‘package:mgcv’
 > 
 > ## first derivatives of all smooths using central finite differences
 > d <- derivatives(m, type = "central") |>
-+     add_sizer()
++   add_sizer()
 > 
 > # default adds a .change column
 > names(d)
@@ -251,8 +251,10 @@ detaching ‘package:mgcv’
 > ## To change the theme for all panels use the & operator, for example to
 > ## change the ggplot theme for all panels
 > library("ggplot2")
-> appraise(mod, point_col = "steelblue", point_alpha = 0.4,
-+          line_col = "black") & theme_minimal()
+> appraise(mod,
++   point_col = "steelblue", point_alpha = 0.4,
++   line_col = "black"
++ ) & theme_minimal()
 > 
 > 
 > 
@@ -335,9 +337,10 @@ detaching ‘package:mgcv’
 > 
 > ## models to compare smooths across - artificially create differences
 > m1 <- gam(y ~ s(x0, k = 5) + s(x1, k = 5) + s(x2, k = 5) + s(x3, k = 5),
-+           data = dat, method = "REML")
-> m2 <- gam(y ~ s(x0, bs = 'ts') + s(x1, bs = 'ts') + s(x2, bs = 'ts') +
-+           s(x3, bs = 'ts'), data = dat, method = "REML")
++   data = dat, method = "REML"
++ )
+> m2 <- gam(y ~ s(x0, bs = "ts") + s(x1, bs = "ts") + s(x2, bs = "ts") +
++   s(x3, bs = "ts"), data = dat, method = "REML")
 > 
 > ## build comparisons
 > comp <- compare_smooths(m1, m2)
@@ -421,8 +424,10 @@ i Please use `derivatives()` instead.
 > ## Don't show: 
 > set.seed(42)
 > ## End(Don't show)
-> x2_sint <- confint(fd, parm = "x2", type = "simultaneous",
-+                    nsim = 10000, ncores = 2)
+> x2_sint <- confint(fd,
++   parm = "x2", type = "simultaneous",
++   nsim = 10000, ncores = 2
++ )
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -554,6 +559,9 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
+> ## Don't show: 
+> op <- options(pillar.sigfig = 3)
+> ## End(Don't show)
 > load_mgcv()
 > 
 > # simulate some Gaussian data
@@ -566,6 +574,21 @@ detaching ‘package:mgcv’
 > # Default will use the observation closest to the median for unspecified
 > # variables.
 > ds <- data_slice(m, x2 = evenly(x2, n = 50))
+> ds
+# A tibble: 50 x 2
+       x2    x1
+    <dbl> <dbl>
+ 1 0.0228 0.403
+ 2 0.0424 0.403
+ 3 0.0619 0.403
+ 4 0.0815 0.403
+ 5 0.101  0.403
+ 6 0.121  0.403
+ 7 0.140  0.403
+ 8 0.160  0.403
+ 9 0.179  0.403
+10 0.199  0.403
+# i 40 more rows
 > 
 > # for full control, specify the values you want
 > ds <- data_slice(m, x2 = evenly(x2, n = 50), x1 = 0.3)
@@ -598,23 +621,26 @@ detaching ‘package:mgcv’
 > 
 > # fit the GAM (note: for execution time reasons using bam())
 > m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-+     data = df, family = nb(), method = "fREML", discrete = TRUE)
++   data = df, family = nb(), method = "fREML", discrete = TRUE
++ )
 > 
 > # data slice through data along x2 - all other covariates will be set to
 > # typical values (value closest to median)
 > ds <- data_slice(m, x2 = evenly(x2, n = 200))
 > 
 > # samples from posterior of derivatives
-> fd_samp <- derivative_samples(m, data = ds, type = "central",
-+     focal = "x2", eps = 0.01, seed = 21, n_sim = 100)
+> fd_samp <- derivative_samples(m,
++   data = ds, type = "central",
++   focal = "x2", eps = 0.01, seed = 21, n_sim = 100
++ )
 > 
 > # plot the first 20 posterior draws
 > if (requireNamespace("ggplot2") && requireNamespace("dplyr")) {
-+     library("ggplot2")
-+     fd_samp |>
-+         dplyr::filter(.draw <= 20) |>
-+         ggplot(aes(x = x2, y = .derivative, group = .draw)) +
-+         geom_line(alpha = 0.5)
++   library("ggplot2")
++   fd_samp |>
++     dplyr::filter(.draw <= 20) |>
++     ggplot(aes(x = x2, y = .derivative, group = .draw)) +
++     geom_line(alpha = 0.5)
 + }
 > 
 > 
@@ -868,9 +894,13 @@ detaching ‘package:mgcv’
 > # change the number of contours drawn and the fill scale used for
 > # the surface
 > library("ggplot2")
-> draw(m2, n_contour = 5, n = 50,
-+      continuous_fill = scale_fill_distiller(palette = "Spectral",
-+                                             type = "div"))
+> draw(m2,
++   n_contour = 5, n = 50,
++   continuous_fill = scale_fill_distiller(
++     palette = "Spectral",
++     type = "div"
++   )
++ )
 > 
 > # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 > # for more examples and for details on how to modify the theme of all the
@@ -895,24 +925,24 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 > ### ** Examples
 > 
 > if (require("GJRM", quietly = TRUE)) {
-+     # follow example from ?GJRM::gamlss
-+     load_mgcv()
-+     suppressPackageStartupMessages(library("GJRM"))
-+     set.seed(0)
-+     n <- 100
-+     x1 <- round(runif(n))
-+     x2 <- runif(n)
-+     x3 <- runif(n)
-+     f1 <- function(x) cos(pi*2*x) + sin(pi*x)
-+     y1 <- -1.55 + 2*x1 + f1(x2) + rnorm(n)
-+     dataSim <- data.frame(y1, x1, x2, x3)
++   # follow example from ?GJRM::gamlss
++   load_mgcv()
++   suppressPackageStartupMessages(library("GJRM"))
++   set.seed(0)
++   n <- 100
++   x1 <- round(runif(n))
++   x2 <- runif(n)
++   x3 <- runif(n)
++   f1 <- function(x) cos(pi * 2 * x) + sin(pi * x)
++   y1 <- -1.55 + 2 * x1 + f1(x2) + rnorm(n)
++   dataSim <- data.frame(y1, x1, x2, x3)
 + 
-+     eq_mu <- y1 ~ x1 + s(x2)
-+     eq_s  <-    ~ s(x3, k = 6)
-+     fl    <- list(eq_mu, eq_s)
-+     m <- gamlss(fl, data = dataSim)
++   eq_mu <- y1 ~ x1 + s(x2)
++   eq_s <- ~ s(x3, k = 6)
++   fl <- list(eq_mu, eq_s)
++   m <- gamlss(fl, data = dataSim)
 + 
-+     draw(m)
++   draw(m)
 + }
 This is mgcv 1.9-1. For overview type 'help("mgcv-package")'.
 
@@ -965,8 +995,9 @@ detaching ‘package:mgcv’
 > 
 > load_mgcv()
 > dat <- data_sim("eg4", n = 400, seed = 42)
-> m <- gam(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'bs', by = fac),
-+          data = dat, method = "REML")
+> m <- gam(y ~ s(x0) + s(x1, bs = "cr") + s(x2, bs = "bs", by = fac),
++   data = dat, method = "REML"
++ )
 > 
 > ## produce a multi-panel plot of all penalties
 > draw(penalty(m))
@@ -996,7 +1027,7 @@ detaching ‘package:mgcv’
 > 
 > # A poisson example
 > m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
-+          s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
++   s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
 > rg <- rootogram(m)
 > 
 > # plot the rootogram
@@ -1045,8 +1076,8 @@ detaching ‘package:mgcv’
 > d <- derivatives(m, n = 100) # n to match smooth_estimates()
 > 
 > smooth_estimates(m) |>
-+     add_sizer(derivatives = d, type = "sizer") |>
-+     draw()
++   add_sizer(derivatives = d, type = "sizer") |>
++   draw()
 > 
 > 
 > 
@@ -1370,13 +1401,13 @@ detaching ‘package:mgcv’
 > 
 > # run example if lme4 is available
 > if (require("lme4")) {
-+ 
-+ data(sleepstudy, package = "lme4")
-+ m <- gam(Reaction ~ Days + s(Subject, bs = "re") +
-+            s(Days, Subject, bs = "re"),
-+          data = sleepstudy, method = "REML")
-+ fixef(m)
-+ 
++   data(sleepstudy, package = "lme4")
++   m <- gam(
++     Reaction ~ Days + s(Subject, bs = "re") +
++       s(Days, Subject, bs = "re"),
++     data = sleepstudy, method = "REML"
++   )
++   fixef(m)
 + }
 Loading required package: lme4
 Loading required package: Matrix
@@ -1431,9 +1462,11 @@ detaching ‘package:lme4’, ‘package:Matrix’, ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> df <- data_sim("eg1", dist = "poisson", seed = 42, scale = 1/5)
-> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML",
-+          family = nb())
+> df <- data_sim("eg1", dist = "poisson", seed = 42, scale = 1 / 5)
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
++   data = df, method = "REML",
++   family = nb()
++ )
 > has_theta(m)
 [1] TRUE
 > p <- theta(m)
@@ -1501,17 +1534,19 @@ pmax(exp(eta), .Machine$double.eps)
 <environment: namespace:stats>
 > 
 > dat <- data_sim("eg1", seed = 4234)
-> mod <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1), data = dat,
-+            family = gaulss)
+> mod <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~1),
++   data = dat,
++   family = gaulss
++ )
 > 
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55fcfb64ed08>
+<environment: 0x55ebe6e97700>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55fcfb64ed08>
+<environment: 0x55ebe6e97700>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1604,9 +1639,11 @@ detaching ‘package:mgcv’
 > load_mgcv()
 > set.seed(8)
 > n <- 200
-> df <- tibble(t = sort(runif(n)),
-+              x = gw_f2(t) + rnorm(n) * 3,
-+              y = sin(4 * pi * t) + exp(x / 20) + rnorm(n) * 0.3)
+> df <- tibble(
++   t = sort(runif(n)),
++   x = gw_f2(t) + rnorm(n) * 3,
++   y = sin(4 * pi * t) + exp(x / 20) + rnorm(n) * 0.3
++ )
 > 
 > ## fit model
 > m <- gam(y ~ s(t, k = 15) + s(x, k = 15), data = df, method = "REML")
@@ -1673,7 +1710,7 @@ detaching ‘package:mgcv’
 > df <- data_sim("eg1", n = 500, dist = "poisson", scale = 0.1, seed = 6)
 > 
 > m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
-+          s(x3, bs = "cr"), family = nb, data = df, method = "REML")
++   s(x3, bs = "cr"), family = nb, data = df, method = "REML")
 > ## IGNORE_RDIFF_BEGIN
 > nb_theta(m)
 [1] 239349
@@ -1703,7 +1740,8 @@ detaching ‘package:mgcv’
 > ## End(Don't show)
 > df <- data_sim(n = 400, seed = 2)
 > m <- gam(y ~ x3 + s(x0) + s(x1, bs = "bs") + s(x2, bs = "ts"),
-+          data = df, method = "REML")
++   data = df, method = "REML"
++ )
 > overview(m)
 
 Generalized Additive Model with 4 terms
@@ -1754,30 +1792,32 @@ detaching ‘package:mgcv’
 > 
 > # evaluate te(x,z) at values of x & z
 > sm <- smooth_estimates(m, smooth = "te(x,z)", data = ds) |>
-+     add_confint()
++   add_confint()
 > 
 > # partial derivatives
 > pd_x <- partial_derivatives(m, data = ds, type = "central", focal = "x")
 > 
 > # draw te(x,z)
 > p1 <- draw(m, rug = FALSE) &
-+     geom_hline(yintercept = 0.4, linewidth = 1)
++   geom_hline(yintercept = 0.4, linewidth = 1)
 > p1
 > 
 > # draw te(x,z) along slice
 > cap <- expression(z == 0.4)
 > p2 <- sm |>
-+     ggplot(aes(x = x, y = .estimate)) +
-+     geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
-+     geom_line() +
-+     labs(x = "x", y = "Partial effect", title = "te(x,z)",
-+         caption = cap)
++   ggplot(aes(x = x, y = .estimate)) +
++   geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
++   geom_line() +
++   labs(
++     x = "x", y = "Partial effect", title = "te(x,z)",
++     caption = cap
++   )
 > p2
 > 
 > # draw partial derivs
 > p3 <- pd_x |>
-+     draw() +
-+     labs(caption = cap)
++   draw() +
++   labs(caption = cap)
 > p3
 > 
 > # draw all three panels
@@ -1813,7 +1853,7 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
 > ## example data - Gu & Wabha four term model
 > df <- data_sim("eg1", n = 400, seed = 42)
 > ## fit the model
-> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = 'REML')
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 > 
 > ## extract partial residuals
 > partial_residuals(m)
@@ -1892,9 +1932,11 @@ detaching ‘package:mgcv’
 > ## End(Don't show)
 > load_mgcv()
 > dat <- data_sim("eg4", n = 400, seed = 42)
-> m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") +
-+            s(x2, by = fac, bs = "cr"),
-+          data = dat, method = "REML")
+> m <- gam(
++   y ~ s(x0, bs = "cr") + s(x1, bs = "cr") +
++     s(x2, by = fac, bs = "cr"),
++   data = dat, method = "REML"
++ )
 > 
 > # penalties for all smooths
 > penalty(m)
@@ -1979,8 +2021,10 @@ detaching ‘package:mgcv’
 > ## Don't show: 
 > set.seed(6791)
 > ## End(Don't show)
-> newd <- data.frame(x0 = runif(10), x1 = runif(10), x2 = runif(10),
-+                    x3 = runif(10))
+> newd <- data.frame(
++   x0 = runif(10), x1 = runif(10), x2 = runif(10),
++   x3 = runif(10)
++ )
 > 
 > ## Exclude s(x2)
 > predicted_samples(m, n = 5, newd, exclude = "s(x2)", seed = 25)
@@ -2019,8 +2063,10 @@ detaching ‘package:mgcv’
 > ## Select which terms --- result should be the same as previous
 > ## but note that we have to include any parametric terms, including the
 > ## constant term
-> predicted_samples(m, n = 5, newd, seed = 25,
-+                   terms = c("Intercept", "s(x0)", "s(x2)", "s(x3)"))
+> predicted_samples(m,
++   n = 5, newd, seed = 25,
++   terms = c("Intercept", "s(x0)", "s(x2)", "s(x3)")
++ )
 # A tibble: 50 x 3
     .row .draw .response
    <int> <int>     <dbl>
@@ -2059,20 +2105,23 @@ detaching ‘package:mgcv’
 > load_mgcv()
 > ## simulate binomial data...
 > dat <- data_sim("eg1", n = 200, dist = "binary", scale = .33, seed = 0)
-> p <- binomial()$linkinv(dat$f)               # binomial p
+> p <- binomial()$linkinv(dat$f) # binomial p
 > n <- sample(c(1, 3), 200, replace = TRUE) # binomial n
 > dat <- transform(dat, y = rbinom(n, n, p), n = n)
-> m <- gam( y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
-+          family = binomial, data = dat, weights = n,
-+          method = "REML")
+> m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
++   family = binomial, data = dat, weights = n,
++   method = "REML"
++ )
 > 
 > ## Q-Q plot; default using direct randomization of uniform quantiles
 > qq_plot(m)
 > 
 > ## Alternatively use simulate new data from the model, which
 > ## allows construction of reference intervals for the Q-Q plot
-> qq_plot(m, method = "simulate", point_col = "steelblue",
-+         point_alpha = 0.4)
+> qq_plot(m,
++   method = "simulate", point_col = "steelblue",
++   point_alpha = 0.4
++ )
 > 
 > ## ... or use the usual normality assumption
 > qq_plot(m, method = "normal")
@@ -2141,7 +2190,8 @@ Levels: a b c d e
 > 
 > # fit the GAM (note: for execution time reasons using bam())
 > m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-+     data = df, family = nb(), method = "fREML", discrete = TRUE)
++   data = df, family = nb(), method = "fREML", discrete = TRUE
++ )
 > 
 > # data slice through data along x2 - all other covariates will be set to
 > # typical values (value closest to median)
@@ -2151,25 +2201,32 @@ Levels: a b c d e
 > fv <- fitted_values(m, smooth = "s(x2)", data = ds)
 > 
 > # response derivatives - ideally n_sim = >10000
-> y_d <- response_derivatives(m, data = ds, type = "central", focal = "x2",
-+     eps = 0.01, seed = 21, n_sim = 1000)
+> y_d <- response_derivatives(m,
++   data = ds, type = "central", focal = "x2",
++   eps = 0.01, seed = 21, n_sim = 1000
++ )
 > 
 > # draw fitted values along x2
 > p1 <- fv |>
-+     ggplot(aes(x = x2, y = .fitted)) +
-+     geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci, y = NULL),
-+         alpha = 0.2) +
-+     geom_line() +
-+     labs(title = "Estimated count as a function of x2",
-+          y = "Estimated count")
++   ggplot(aes(x = x2, y = .fitted)) +
++   geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci, y = NULL),
++     alpha = 0.2
++   ) +
++   geom_line() +
++   labs(
++     title = "Estimated count as a function of x2",
++     y = "Estimated count"
++   )
 > 
 > # draw response derivatives
 > p2 <- y_d |>
-+     ggplot(aes(x = x2, y = .derivative)) +
-+     geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
-+     geom_line() +
-+     labs(title = "Estimated 1st derivative of estimated count",
-+          y = "First derivative")
++   ggplot(aes(x = x2, y = .derivative)) +
++   geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
++   geom_line() +
++   labs(
++     title = "Estimated 1st derivative of estimated count",
++     y = "First derivative"
++   )
 > 
 > # draw both panels
 > p1 + p2 + plot_layout(nrow = 2)
@@ -2202,7 +2259,7 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
 > 
 > # A poisson example
 > m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
-+          s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
++   s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
 > rg <- rootogram(m)
 > rg
 # A tibble: 21 x 3
@@ -2313,7 +2370,6 @@ detaching ‘package:mgcv’
 > ### Aliases: smooth_data
 > 
 > ### ** Examples
-> 
 > 
 > ## Don't show: 
 > op <- options(cli.unicode = FALSE, pillar.sigfig = 4)
@@ -2513,9 +2569,11 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> df <- data_sim("eg1", dist = "poisson", seed = 42, scale = 1/5)
-> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML",
-+          family = nb())
+> df <- data_sim("eg1", dist = "poisson", seed = 42, scale = 1 / 5)
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
++   data = df, method = "REML",
++   family = nb()
++ )
 > p <- theta(m)
 > 
 > 
@@ -2542,7 +2600,7 @@ detaching ‘package:mgcv’
 > df <- data_sim("eg1", n = 400, seed = 42)
 > 
 > # fit model
-> m  <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 > 
 > # tidy representaition of a basis for a smooth definition
 > # extract the smooth
@@ -2596,12 +2654,13 @@ detaching ‘package:mgcv’
 > load_mgcv()
 > ## simulate binomial data...
 > dat <- data_sim("eg1", n = 200, dist = "binary", scale = .33, seed = 0)
-> p <- binomial()$linkinv(dat$f)               # binomial p
+> p <- binomial()$linkinv(dat$f) # binomial p
 > n <- sample(c(1, 3), 200, replace = TRUE) # binomial n
 > dat <- transform(dat, y = rbinom(n, n, p), n = n)
-> m <- gam( y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
-+          family = binomial, data = dat, weights = n,
-+          method = "REML")
+> m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
++   family = binomial, data = dat, weights = n,
++   method = "REML"
++ )
 > 
 > ## Worm plot; default using direct randomization of uniform quantiles
 > ## Note no reference bands are drawn with this method.
@@ -2609,8 +2668,10 @@ detaching ‘package:mgcv’
 > 
 > ## Alternatively use simulate new data from the model, which
 > ## allows construction of reference intervals for the Q-Q plot
-> worm_plot(m, method = "simulate", point_col = "steelblue",
-+           point_alpha = 0.4)
+> worm_plot(m,
++   method = "simulate", point_col = "steelblue",
++   point_alpha = 0.4
++ )
 > 
 > ## ... or use the usual normality assumption
 > worm_plot(m, method = "normal")
@@ -2625,7 +2686,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  47.804 0.443 46.928 0 0 
+Time elapsed:  35.055 0.36 35.145 0 0 
 > grDevices::dev.off()
 null device 
           1 
