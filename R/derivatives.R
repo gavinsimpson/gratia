@@ -328,7 +328,11 @@
   fs_var <- if (is.null(fs_var)) {
     rep(NA_character_, nrow(deriv))
   } else {
-    data[[fs_var]]
+    # data[[fs_var]]
+    deriv <- add_column(deriv, {{ fs_var }} := data[[fs_var]],
+      .after = 2L
+    )
+    rep(fs_var, nrow(deriv))
   }
   deriv <- add_column(deriv, .fs = fs_var, .after = 2L)
 
@@ -556,7 +560,7 @@
   } else {
     NULL
   }
-  used_vars <- c(m_vars, by_var)
+  used_vars <- unique(c(m_vars, by_var, fs_var))
 
   ## generate covariate values for the smooth
   ## This handles terms of the form log(conc)

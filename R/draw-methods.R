@@ -83,10 +83,12 @@
     df <- object[take, ]
     xvar <- vars_from_label(unique(df[[".smooth"]])) # unique(df[['var']])
     plt <- if (!all(is.na(df$.fs))) {
+      fs_var <- xvar[2L]
+      xvar <- xvar[1L]
       ggplot(df, aes(
         x = .data[[xvar]], # .data$data,
         y = .data$.derivative,
-        group = .data$.fs
+        group = .data[[fs_var]]
       ))
     } else {
       ggplot(df, aes(

@@ -297,7 +297,7 @@
     n_cores = n_cores, model = model,
     burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
     index = NULL, frequentist = freq, unconditional = unconditional,
-    draws = draws
+    draws = draws, seed = seed
   )
   ## don't need to pass freq, unconditional here as that is done for V
   Xp <- predict(model, newdata = data, type = "lpmatrix", ...)
@@ -557,7 +557,7 @@
       n_cores = n_cores, model = model,
       burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
       index = NULL, frequentist = freq, unconditional = unconditional,
-      draws = draws, mvn_method = mvn_method
+      draws = draws, mvn_method = mvn_method, seed = seed
     )
   }
   sims <- data_names <- vector("list", length = length(S))
@@ -580,7 +580,8 @@
         n = n, method = method,
         n_cores = n_cores, model = model,
         burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-        index = idx, frequentist = freq, unconditional = unconditional
+        index = idx, frequentist = freq, unconditional = unconditional,
+        seed = seed
       )
       Xp %*% t(betas)
     } else {
@@ -741,7 +742,7 @@
       n_cores = n_cores, model = model,
       burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
       index = NULL, frequentist = freq, unconditional = unconditional,
-      draws = draws
+      draws = draws, seed = seed,
     )
   }
 
@@ -765,7 +766,8 @@
         n = n, method = method,
         n_cores = n_cores, model = model,
         burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-        index = idx, frequentist = freq, unconditional = unconditional
+        index = idx, frequentist = freq, unconditional = unconditional,
+        seed = seed
       )
       Xp %*% t(betas)
     } else {
