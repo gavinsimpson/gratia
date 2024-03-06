@@ -393,8 +393,6 @@
   if (is.null(off)) {
     off <- 0
   }
-  start <- smooth[["first.para"]]
-  end <- smooth[["last.para"]]
   para_seq <- smooth_coef_indices(smooth) # start:end
   coefs <- coef(model, parametrized = FALSE)[para_seq]
 
