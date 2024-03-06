@@ -620,7 +620,7 @@
 }
 
 `expand_ref_data` <- function(x, n, order, type, eps = 0) {
-  if (is.factor(x) | is.character(x)) {
+  if (is.factor(x) || is.character(x)) {
     out <- factor(levels(x), levels = levels(x))
   } else {
     out <- seq_min_max_eps(x[c(1, 3)],
