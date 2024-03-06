@@ -33,7 +33,8 @@ Imports:
     pillar,
     cli,
     nlme,
-    ggokabeito
+    ggokabeito,
+    withr
 Suggests:
     gamm4,
     lme4,
@@ -42,7 +43,6 @@ Suggests:
     MASS,
     scam,
     datasets,
-    withr,
     knitr,
     rmarkdown,
     forcats,

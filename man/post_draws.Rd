@@ -27,6 +27,7 @@ post_draws(model, ...)
   parametrized = TRUE,
   mvn_method = c("mvnfast", "mgcv"),
   draws = NULL,
+  seed = NULL,
   ...
 )
 
@@ -47,6 +48,7 @@ generate_draws(model, ...)
   frequentist = FALSE,
   unconditional = FALSE,
   mvn_method = c("mvnfast", "mgcv"),
+  seed = NULL,
   ...
 )
 }
@@ -114,6 +116,9 @@ to singular.}
 
 \item{draws}{matrix; user supplied posterior draws to be used when
 \code{method = "user"}.}
+
+\item{seed}{numeric; the random seed to use. If \code{NULL}, a random seed will
+be generated without affecting the current state of R's RNG.}
 }
 \description{
 Low-level Functions to generate draws from the posterior distribution of
