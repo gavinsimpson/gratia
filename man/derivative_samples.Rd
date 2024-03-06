@@ -101,23 +101,26 @@ df <- data_sim("eg1", dist = "negbin", scale = 0.25, seed = 42)
 
 # fit the GAM (note: for execution time reasons using bam())
 m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-    data = df, family = nb(), method = "fREML", discrete = TRUE)
+  data = df, family = nb(), method = "fREML", discrete = TRUE
+)
 
 # data slice through data along x2 - all other covariates will be set to
 # typical values (value closest to median)
 ds <- data_slice(m, x2 = evenly(x2, n = 200))
 
 # samples from posterior of derivatives
-fd_samp <- derivative_samples(m, data = ds, type = "central",
-    focal = "x2", eps = 0.01, seed = 21, n_sim = 100)
+fd_samp <- derivative_samples(m,
+  data = ds, type = "central",
+  focal = "x2", eps = 0.01, seed = 21, n_sim = 100
+)
 
 # plot the first 20 posterior draws
 if (requireNamespace("ggplot2") && requireNamespace("dplyr")) {
-    library("ggplot2")
-    fd_samp |>
-        dplyr::filter(.draw <= 20) |>
-        ggplot(aes(x = x2, y = .derivative, group = .draw)) +
-        geom_line(alpha = 0.5)
+  library("ggplot2")
+  fd_samp |>
+    dplyr::filter(.draw <= 20) |>
+    ggplot(aes(x = x2, y = .derivative, group = .draw)) +
+    geom_line(alpha = 0.5)
 }
 }
 \author{

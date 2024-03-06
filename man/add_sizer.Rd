@@ -39,7 +39,7 @@ m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 
 ## first derivatives of all smooths using central finite differences
 d <- derivatives(m, type = "central") |>
-    add_sizer()
+  add_sizer()
 
 # default adds a .change column
 names(d)

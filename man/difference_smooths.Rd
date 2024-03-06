@@ -71,5 +71,7 @@ draw(sm_dif)
 # include the groups means for `fac` in the difference
 sm_dif2 <- difference_smooths(m, smooth = "s(x2)", group_means = TRUE)
 draw(sm_dif2)
-\dontshow{options(op)}
+\dontshow{
+options(op)
+}
 }

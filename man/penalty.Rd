@@ -87,9 +87,11 @@ op <- options(cli.unicode = FALSE, pillar.sigfig = 3)
 }
 load_mgcv()
 dat <- data_sim("eg4", n = 400, seed = 42)
-m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") +
-           s(x2, by = fac, bs = "cr"),
-         data = dat, method = "REML")
+m <- gam(
+  y ~ s(x0, bs = "cr") + s(x1, bs = "cr") +
+    s(x2, by = fac, bs = "cr"),
+  data = dat, method = "REML"
+)
 
 # penalties for all smooths
 penalty(m)
@@ -97,7 +99,9 @@ penalty(m)
 # for a specific smooth
 penalty(m, smooth = "s(x2):fac1")
 
-\dontshow{options(op)}
+\dontshow{
+options(op)
+}
 }
 \author{
 Gavin L. Simpson

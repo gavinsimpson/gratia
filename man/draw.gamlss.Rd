@@ -50,23 +50,23 @@ they belong.
 }
 \examples{
 if (require("GJRM", quietly = TRUE)) {
-    # follow example from ?GJRM::gamlss
-    load_mgcv()
-    suppressPackageStartupMessages(library("GJRM"))
-    set.seed(0)
-    n <- 100
-    x1 <- round(runif(n))
-    x2 <- runif(n)
-    x3 <- runif(n)
-    f1 <- function(x) cos(pi*2*x) + sin(pi*x)
-    y1 <- -1.55 + 2*x1 + f1(x2) + rnorm(n)
-    dataSim <- data.frame(y1, x1, x2, x3)
+  # follow example from ?GJRM::gamlss
+  load_mgcv()
+  suppressPackageStartupMessages(library("GJRM"))
+  set.seed(0)
+  n <- 100
+  x1 <- round(runif(n))
+  x2 <- runif(n)
+  x3 <- runif(n)
+  f1 <- function(x) cos(pi * 2 * x) + sin(pi * x)
+  y1 <- -1.55 + 2 * x1 + f1(x2) + rnorm(n)
+  dataSim <- data.frame(y1, x1, x2, x3)
 
-    eq_mu <- y1 ~ x1 + s(x2)
-    eq_s  <-    ~ s(x3, k = 6)
-    fl    <- list(eq_mu, eq_s)
-    m <- gamlss(fl, data = dataSim)
+  eq_mu <- y1 ~ x1 + s(x2)
+  eq_s <- ~ s(x3, k = 6)
+  fl <- list(eq_mu, eq_s)
+  m <- gamlss(fl, data = dataSim)
 
-    draw(m)
+  draw(m)
 }
 }

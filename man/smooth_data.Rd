@@ -51,8 +51,9 @@ should be processed. Only useful for tensor products with at least one
 Generate regular data over the covariates of a smooth
 }
 \examples{
-
-\dontshow{op <- options(cli.unicode = FALSE, pillar.sigfig = 4)}
+\dontshow{
+op <- options(cli.unicode = FALSE, pillar.sigfig = 4)
+}
 load_mgcv()
 df <- data_sim("eg1", seed = 42)
 m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df)
@@ -64,5 +65,7 @@ smooth_data(m, id = 2)
 # other covariates in the model
 smooth_data(m, id = 2, include_all = TRUE)
 
-\dontshow{options(op)}
+\dontshow{
+options(op)
+}
 }

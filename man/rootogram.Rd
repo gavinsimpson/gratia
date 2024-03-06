@@ -33,12 +33,14 @@ are obtained by grouping the data into bins. The rootogram is drawn using
 }
 \examples{
 load_mgcv()
-\dontshow{op <- options(cli.unicode = FALSE, pillar.sigfig = 6)}
+\dontshow{
+op <- options(cli.unicode = FALSE, pillar.sigfig = 6)
+}
 df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
 
 # A poisson example
 m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
-         s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
+  s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
 rg <- rootogram(m)
 rg
 draw(rg) # plot the rootogram
@@ -47,7 +49,9 @@ draw(rg) # plot the rootogram
 df <- data_sim("eg1", dist = "normal", seed = 2)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 draw(rootogram(m, breaks = "FD"), type = "suspended")
-\dontshow{options(op)}
+\dontshow{
+options(op)
+}
 }
 \references{
 Kleiber, C., Zeileis, A., (2016) Visualizing Count Data

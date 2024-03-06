@@ -46,7 +46,9 @@ Returns a vector of model coefficients of the parametric terms that represent
 the supplied smooth.
 }
 \examples{
-\dontshow{op <- options(pillar.sigfig = 3, cli.unicode = FALSE)}
+\dontshow{
+op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
+}
 load_mgcv()
 df <- data_sim("eg1", seed = 2)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
@@ -54,7 +56,9 @@ m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 ## IGNORE_RDIFF_BEGIN
 smooth_coefs(m, term = "s(x2)")
 ## IGNORE_RDIFF_END
-\dontshow{options(op)}
+\dontshow{
+options(op)
+}
 }
 \seealso{
 \code{\link[=smooth_coef_indices]{smooth_coef_indices()}} for extracting the indices of the

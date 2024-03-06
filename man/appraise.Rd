@@ -93,8 +93,10 @@ appraise(mod, point_col = "steelblue", point_alpha = 0.4)
 ## To change the theme for all panels use the & operator, for example to
 ## change the ggplot theme for all panels
 library("ggplot2")
-appraise(mod, point_col = "steelblue", point_alpha = 0.4,
-         line_col = "black") & theme_minimal()
+appraise(mod,
+  point_col = "steelblue", point_alpha = 0.4,
+  line_col = "black"
+) & theme_minimal()
 }
 \seealso{
 The plots are produced by functions \code{\link[=qq_plot]{qq_plot()}},

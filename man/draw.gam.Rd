@@ -239,9 +239,13 @@ draw(m2, contour = FALSE, n = 50)
 # change the number of contours drawn and the fill scale used for
 # the surface
 library("ggplot2")
-draw(m2, n_contour = 5, n = 50,
-     continuous_fill = scale_fill_distiller(palette = "Spectral",
-                                            type = "div"))
+draw(m2,
+  n_contour = 5, n = 50,
+  continuous_fill = scale_fill_distiller(
+    palette = "Spectral",
+    type = "div"
+  )
+)
 
 # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 # for more examples and for details on how to modify the theme of all the

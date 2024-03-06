@@ -139,7 +139,9 @@ fs2 <- fitted_samples(m1, method = "user", draws = drws)
 \donttest{
 fs2
 }
-\dontshow{options(op)}
+\dontshow{
+options(op)
+}
 }
 \references{
 Wood, S.N., (2020). Simplified integrated nested Laplace approximation.

@@ -59,7 +59,7 @@ df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
 
 # A poisson example
 m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
-         s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
+  s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
 rg <- rootogram(m)
 
 # plot the rootogram

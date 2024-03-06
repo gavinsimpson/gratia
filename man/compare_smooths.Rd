@@ -40,15 +40,18 @@ the smooth?}
 Compare smooths across models
 }
 \examples{
-\dontshow{op <- options(cli.unicode = FALSE, pillar.sigfig = 5)}
+\dontshow{
+op <- options(cli.unicode = FALSE, pillar.sigfig = 5)
+}
 load_mgcv()
 dat <- data_sim("eg1", seed = 2)
 
 ## models to compare smooths across - artificially create differences
 m1 <- gam(y ~ s(x0, k = 5) + s(x1, k = 5) + s(x2, k = 5) + s(x3, k = 5),
-          data = dat, method = "REML")
-m2 <- gam(y ~ s(x0, bs = 'ts') + s(x1, bs = 'ts') + s(x2, bs = 'ts') +
-          s(x3, bs = 'ts'), data = dat, method = "REML")
+  data = dat, method = "REML"
+)
+m2 <- gam(y ~ s(x0, bs = "ts") + s(x1, bs = "ts") + s(x2, bs = "ts") +
+  s(x3, bs = "ts"), data = dat, method = "REML")
 
 ## build comparisons
 comp <- compare_smooths(m1, m2)
@@ -56,5 +59,7 @@ comp
 ## notice that the result is a nested tibble
 
 draw(comp)
-\dontshow{options(op)}
+\dontshow{
+options(op)
+}
 }

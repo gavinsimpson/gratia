@@ -135,30 +135,32 @@ ds <- data_slice(m, x = evenly(x, n = 100), z = 0.4)
 
 # evaluate te(x,z) at values of x & z
 sm <- smooth_estimates(m, smooth = "te(x,z)", data = ds) |>
-    add_confint()
+  add_confint()
 
 # partial derivatives
 pd_x <- partial_derivatives(m, data = ds, type = "central", focal = "x")
 
 # draw te(x,z)
 p1 <- draw(m, rug = FALSE) &
-    geom_hline(yintercept = 0.4, linewidth = 1)
+  geom_hline(yintercept = 0.4, linewidth = 1)
 p1
 
 # draw te(x,z) along slice
 cap <- expression(z == 0.4)
 p2 <- sm |>
-    ggplot(aes(x = x, y = .estimate)) +
-    geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
-    geom_line() +
-    labs(x = "x", y = "Partial effect", title = "te(x,z)",
-        caption = cap)
+  ggplot(aes(x = x, y = .estimate)) +
+  geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
+  geom_line() +
+  labs(
+    x = "x", y = "Partial effect", title = "te(x,z)",
+    caption = cap
+  )
 p2
 
 # draw partial derivs
 p3 <- pd_x |>
-    draw() +
-    labs(caption = cap)
+  draw() +
+  labs(caption = cap)
 p3
 
 # draw all three panels

@@ -35,7 +35,9 @@ create a sequence of \code{n} evenly-spaced values over the range \code{lower}
 \code{levels(x)}.
 }
 \examples{
-\dontshow{set.seed(1)}
+\dontshow{
+set.seed(1)
+}
 x <- rnorm(10)
 n <- 10L
 

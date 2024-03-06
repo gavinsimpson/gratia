@@ -61,8 +61,9 @@ Displays the penalty matrices of smooths as a heatmap using \code{ggplot}
 \examples{
 load_mgcv()
 dat <- data_sim("eg4", n = 400, seed = 42)
-m <- gam(y ~ s(x0) + s(x1, bs = 'cr') + s(x2, bs = 'bs', by = fac),
-         data = dat, method = "REML")
+m <- gam(y ~ s(x0) + s(x1, bs = "cr") + s(x2, bs = "bs", by = fac),
+  data = dat, method = "REML"
+)
 
 ## produce a multi-panel plot of all penalties
 draw(penalty(m))

@@ -39,7 +39,9 @@ at the respective covariates. Parametric covariates are also included.
 }
 \examples{
 load_mgcv()
-\dontshow{op <- options(pillar.sigfig = 3, cli.unicode = FALSE)}
+\dontshow{
+op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
+}
 df <- data_sim("eg1", seed = 1)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df)
 
@@ -59,5 +61,7 @@ xp <- lp_matrix(m, data = ds)
 ## IGNORE_RDIFF_BEGIN
 xp
 ## IGNORE_RDIFF_END
-\dontshow{options(op)}
+\dontshow{
+options(op)
+}
 }

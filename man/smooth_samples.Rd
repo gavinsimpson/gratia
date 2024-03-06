@@ -144,7 +144,9 @@ change in future versions. Don't rely on position.
 
 \examples{
 load_mgcv()
-\dontshow{op <- options(cli.unicode = FALSE, pillar.sigfig = 3)}
+\dontshow{
+op <- options(cli.unicode = FALSE, pillar.sigfig = 3)
+}
 dat <- data_sim("eg1", n = 400, seed = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
@@ -160,7 +162,9 @@ dat <- data_sim("eg4", n = 1000, seed = 2)
 m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
 sms <- smooth_samples(m2, n = 5, seed = 42)
 draw(sms)
-\dontshow{options(op)}
+\dontshow{
+options(op)
+}
 }
 \author{
 Gavin L. Simpson

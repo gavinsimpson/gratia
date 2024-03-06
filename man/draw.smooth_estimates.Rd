@@ -143,6 +143,6 @@ draw(sm, constant = coef(m)[1])
 d <- derivatives(m, n = 100) # n to match smooth_estimates()
 
 smooth_estimates(m) |>
-    add_sizer(derivatives = d, type = "sizer") |>
-    draw()
+  add_sizer(derivatives = d, type = "sizer") |>
+  draw()
 }

@@ -79,12 +79,16 @@ ci
 \dontshow{
 set.seed(42)
 }
-x2_sint <- confint(fd, parm = "x2", type = "simultaneous",
-                   nsim = 10000, ncores = 2)
+x2_sint <- confint(fd,
+  parm = "x2", type = "simultaneous",
+  nsim = 10000, ncores = 2
+)
 \donttest{
 x2_sint
 }
-\dontshow{options(op)}
+\dontshow{
+options(op)
+}
 }
 \author{
 Gavin L. Simpson

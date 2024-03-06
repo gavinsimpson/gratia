@@ -39,13 +39,15 @@ load_mgcv()
 op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 }
 df <- data_sim("eg1", seed = 1)
-df <- df[, c("y","x0","x1","x2","x3")]
-m <-  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+df <- df[, c("y", "x0", "x1", "x2", "x3")]
+m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 
 ## add partial residuals
 add_partial_residuals(df, m)
 
 ## add partial residuals for selected smooths
 add_partial_residuals(df, m, select = "s(x0)")
-\dontshow{options(op)}
+\dontshow{
+options(op)
+}
 }

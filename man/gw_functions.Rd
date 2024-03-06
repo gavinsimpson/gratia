@@ -23,11 +23,15 @@ gw_f3(x)
 Gu and Wabha test functions
 }
 \examples{
-\dontshow{op <- options(digits = 4)}
+\dontshow{
+op <- options(digits = 4)
+}
 x <- seq(0, 1, length = 6)
 gw_f0(x)
 gw_f1(x)
 gw_f2(x)
 gw_f3(x) # should be constant 0
-\dontshow{options(op)}
+\dontshow{
+options(op)
+}
 }

@@ -42,6 +42,9 @@ passed in \code{...} will be evaluated in \code{data}.}
 Prepare a data slice through model covariates
 }
 \examples{
+\dontshow{
+op <- options(pillar.sigfig = 3)
+}
 load_mgcv()
 
 # simulate some Gaussian data

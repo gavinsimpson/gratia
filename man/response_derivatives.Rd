@@ -104,7 +104,8 @@ df <- data_sim("eg1", dist = "negbin", scale = 0.25, seed = 42)
 
 # fit the GAM (note: for execution time reasons using bam())
 m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-    data = df, family = nb(), method = "fREML", discrete = TRUE)
+  data = df, family = nb(), method = "fREML", discrete = TRUE
+)
 
 # data slice through data along x2 - all other covariates will be set to
 # typical values (value closest to median)
@@ -114,29 +115,38 @@ ds <- data_slice(m, x2 = evenly(x2, n = 100))
 fv <- fitted_values(m, smooth = "s(x2)", data = ds)
 
 # response derivatives - ideally n_sim = >10000
-y_d <- response_derivatives(m, data = ds, type = "central", focal = "x2",
-    eps = 0.01, seed = 21, n_sim = 1000)
+y_d <- response_derivatives(m,
+  data = ds, type = "central", focal = "x2",
+  eps = 0.01, seed = 21, n_sim = 1000
+)
 
 # draw fitted values along x2
 p1 <- fv |>
-    ggplot(aes(x = x2, y = .fitted)) +
-    geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci, y = NULL),
-        alpha = 0.2) +
-    geom_line() +
-    labs(title = "Estimated count as a function of x2",
-         y = "Estimated count")
+  ggplot(aes(x = x2, y = .fitted)) +
+  geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci, y = NULL),
+    alpha = 0.2
+  ) +
+  geom_line() +
+  labs(
+    title = "Estimated count as a function of x2",
+    y = "Estimated count"
+  )
 
 # draw response derivatives
 p2 <- y_d |>
-    ggplot(aes(x = x2, y = .derivative)) +
-    geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
-    geom_line() +
-    labs(title = "Estimated 1st derivative of estimated count",
-         y = "First derivative")
+  ggplot(aes(x = x2, y = .derivative)) +
+  geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
+  geom_line() +
+  labs(
+    title = "Estimated 1st derivative of estimated count",
+    y = "First derivative"
+  )
 
 # draw both panels
 p1 + p2 + plot_layout(nrow = 2)
-\dontshow{options(op)}
+\dontshow{
+options(op)
+}
 }
 \author{
 Gavin L. Simpson

@@ -34,12 +34,12 @@ load_mgcv()
 
 # run example if lme4 is available
 if (require("lme4")) {
-
-data(sleepstudy, package = "lme4")
-m <- gam(Reaction ~ Days + s(Subject, bs = "re") +
-           s(Days, Subject, bs = "re"),
-         data = sleepstudy, method = "REML")
-fixef(m)
-
+  data(sleepstudy, package = "lme4")
+  m <- gam(
+    Reaction ~ Days + s(Subject, bs = "re") +
+      s(Days, Subject, bs = "re"),
+    data = sleepstudy, method = "REML"
+  )
+  fixef(m)
 }
 }

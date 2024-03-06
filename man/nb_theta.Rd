@@ -29,7 +29,7 @@ load_mgcv()
 df <- data_sim("eg1", n = 500, dist = "poisson", scale = 0.1, seed = 6)
 
 m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
-         s(x3, bs = "cr"), family = nb, data = df, method = "REML")
+  s(x3, bs = "cr"), family = nb, data = df, method = "REML")
 ## IGNORE_RDIFF_BEGIN
 nb_theta(m)
 ## IGNORE_RDIFF_END

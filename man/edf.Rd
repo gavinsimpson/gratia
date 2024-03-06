@@ -52,7 +52,9 @@ relevent elements of \eqn{\mathrm{diag}(2\mathbf{F} - \mathbf{FF})}.
 }
 \examples{
 load_mgcv()
-\dontshow{op <- options(cli.unicode = FALSE, pillar.sigfig = 5)}
+\dontshow{
+op <- options(cli.unicode = FALSE, pillar.sigfig = 5)
+}
 df <- data_sim("eg1", n = 400, seed = 42)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 
@@ -71,5 +73,7 @@ model_edf(m)
 # can get model EDF for multiple models
 m2 <- gam(y ~ s(x0) + s(x1) + s(x3), data = df, method = "REML")
 model_edf(m, m2)
-\dontshow{options(op)}
+\dontshow{
+options(op)
+}
 }

@@ -94,8 +94,10 @@ link(nb())
 inv_link(nb())
 
 dat <- data_sim("eg1", seed = 4234)
-mod <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~ 1), data = dat,
-           family = gaulss)
+mod <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~1),
+  data = dat,
+  family = gaulss
+)
 
 link(mod, parameter = "scale")
 inv_link(mod, parameter = "scale")

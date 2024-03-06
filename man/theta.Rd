@@ -24,8 +24,10 @@ General extractor for additional parameters in mgcv models
 }
 \examples{
 load_mgcv()
-df <- data_sim("eg1", dist = "poisson", seed = 42, scale = 1/5)
-m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML",
-         family = nb())
+df <- data_sim("eg1", dist = "poisson", seed = 42, scale = 1 / 5)
+m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+  data = df, method = "REML",
+  family = nb()
+)
 p <- theta(m)
 }

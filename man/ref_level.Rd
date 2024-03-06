@@ -24,7 +24,9 @@ Extracts the reference or a specific level the supplied factor,
 returning it as a factor with the same levels as the one supplied.
 }
 \examples{
-\dontshow{set.seed(1)}
+\dontshow{
+set.seed(1)
+}
 f <- factor(sample(letters[1:5], 100, replace = TRUE))
 
 # the reference level
