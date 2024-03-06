@@ -64,6 +64,9 @@
 #' @importFrom stats model.frame
 #'
 #' @examples
+#' \dontshow{
+#' op <- options(pillar.sigfig = 3)
+#' }
 #' load_mgcv()
 #'
 #' # simulate some Gaussian data
