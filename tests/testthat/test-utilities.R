@@ -463,3 +463,29 @@ test_that("smooth_label works for a gam object", {
     c("s(x0)", "s(x1)", "s(x2)", "s(x3)")
   )
 })
+
+test_that("norm_minus_one_to_one works", {
+  expect_silent(x <- norm_minus_one_to_one(0:10))
+  expect_equal(seq(-1, 1, by = 0.2), x)
+  expect_equal(min(x), -1.0)
+  expect_equal(max(x), 1.0)
+  expect_identical(length(x), length(0:10))
+  expect_identical(range(x), c(-1, 1))
+
+  expect_silent(x <- norm_minus_one_to_one(-10:10))
+  expect_equal(seq(-1, 1, by = 0.1), x)
+  expect_equal(min(x), -1.0)
+  expect_equal(max(x), 1.0)
+  expect_identical(length(x), length(-10:10))
+  expect_identical(range(x), c(-1, 1))
+})
+
+
+test_that("norm_minus_one_to_one works with NA", {
+  expect_silent(x <- norm_minus_one_to_one(c(0:10, NA)))
+  expect_equal(c(seq(-1, 1, by = 0.2), NA), x)
+  expect_equal(min(x, na.rm = TRUE), -1.0)
+  expect_equal(max(x, na.rm = TRUE), 1.0)
+  expect_identical(length(x), length(c(0:10, NA)))
+  expect_identical(range(x, na.rm = TRUE), c(-1, 1))
+})
