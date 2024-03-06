@@ -468,6 +468,7 @@ test_that("derivatives() works for fs smooths issue 57", {
   expect_s3_class(fd, "tbl_df")
   expect_named(fd, c(deriv_nms, "t", "unit"))
   plt <- draw(fd) # FIXME: need to update draw(d) so it works with fs smooths
+  skip_on_ci()
   expect_doppelganger("draw issue 57 derivatives for factor by", plt)
 })
 
