@@ -78,7 +78,7 @@ The main features of *gratia* are currently
 
 * Model diagnostics via `appraise()`
 
-    ![Model diagnostics figure](man/figures/README-appraise-figure-1.png)
+  ![Model diagnostics figure](man/figures/README-appraise-figure-1.png)
 
 ## Installing *gratia*
 
