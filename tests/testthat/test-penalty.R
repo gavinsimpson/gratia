@@ -50,7 +50,7 @@ test_that("draw.penalty_df works", {
   expect_doppelganger("draw penalty_df with single smooths", plt2)
 })
 
-test_that("draw.penalty_df gets labels on plot in corrcet order issue 95", {
+test_that("draw.penalty_df gets labels on plot in correct order issue 95", {
   skip_on_cran()
   skip_on_ci()
 
@@ -82,11 +82,11 @@ test_that("draw.penalty_df accepts user-specified continuous_fill", {
 
   skip_on_ci()
   expect_doppelganger(
-    "draw penalty multiple smooths user continous fill",
+    "draw penalty multiple smooths user continuous fill",
     plt1
   )
   expect_doppelganger(
-    "draw penalty single smooths user continous fill",
+    "draw penalty single smooths user continuous fill",
     plt2
   )
 })
