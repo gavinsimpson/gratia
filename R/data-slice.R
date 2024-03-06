@@ -21,27 +21,29 @@
 #' @importFrom tidyr expand_grid
 #' @importFrom rlang enquos eval_tidy
 `data_slice.data.frame` <- function(object, ...) {
-    # deal with ...
-    exprs <- rlang::enquos(...)
-    slice_vars <- purrr::map(exprs, rlang::eval_tidy, data = object)
+  # deal with ...
+  exprs <- rlang::enquos(...)
+  slice_vars <- purrr::map(exprs, rlang::eval_tidy, data = object)
 
-    # check now if there are elements of slice_vars that aren't in the object
-    vars <- names(object)
-    nms <- names(slice_vars)
-    if (any(i <- ! nms %in% vars)) {
-        message("Some specified variable(s) not used in `object``:\n",
-                paste(" * ", nms[i], collapse = "\n", sep = ""),
-                "\n")
-    }
+  # check now if there are elements of slice_vars that aren't in the object
+  vars <- names(object)
+  nms <- names(slice_vars)
+  if (any(i <- !nms %in% vars)) {
+    message("Some specified variable(s) not used in `object``:\n",
+      paste(" * ", nms[i], collapse = "\n", sep = ""),
+      "\n")
+  }
 
-    # typical values, only needed ones that aren't
-    need_tv <- setdiff(vars, names(slice_vars))
-    if (length(need_tv) > 0L) {
-        tv <- typical_values(object)
-        slice_vars <- append(slice_vars, tv[need_tv])
-    }
+  # typical values, only needed ones that aren't
+  need_tv <- setdiff(vars, names(slice_vars))
+  if (length(need_tv) > 0L) {
+    tv <- typical_values(object)
+    slice_vars <- append(slice_vars, tv[need_tv])
+  }
 
-    expand_grid(!!!{slice_vars})
+  expand_grid(!!!{
+    slice_vars
+  })
 }
 
 #' @param data an alternative data frame of values containing all the variables
@@ -78,13 +80,16 @@
 #' # data frame passed to `data` or `model.frame(object)`
 #' ds <- data_slice(m, x2 = evenly(x2, n = 50), x1 = mean(x1))
 `data_slice.gam` <- function(object, ..., data = NULL,
-                             envir = environment(formula(object))) {
+                             envir = NULL) {
+  # if envir is NULL, set it to the formula of the object
+  if (is.null(envir)) {
+    envir <- environment(formula(object))
+  }
   # prep data
   odata <- data
   data <- data_slice_data(object, data = data)
 
   # deal with ...
-  ##ellipsis::check_dots_unnamed()
   exprs <- rlang::enquos(...)
   slice_vars <- purrr::map(exprs, rlang::eval_tidy, data = data)
 
@@ -131,116 +136,116 @@
 }
 
 `data_slice_data` <- function(object, data = NULL) {
-    is_mf <- FALSE # is a data a model frame
-    if (is.null(data)) {
-        # get data from object$model
-        data <- object[["model"]]
-        is_mf <- TRUE
-    } else {
-        if (!is.null(attr(data, "terms"))) {
-            is_mf <- TRUE
-        }
+  is_mf <- FALSE # is a data a model frame
+  if (is.null(data)) {
+    # get data from object$model
+    data <- object[["model"]]
+    is_mf <- TRUE
+  } else {
+    if (!is.null(attr(data, "terms"))) {
+      is_mf <- TRUE
     }
+  }
 
-    # find the response if there
-    tt <- terms(object)
-    resp_i <- attr(tt, "response")
-    y_var <- names(attr(tt, "dataClasses"))[resp_i]
-    all_vars <- all.vars(tt)
-    data_names <- names(data)
-    # if the response variable is named in data, delete it
-    y_in_data <- data_names %in% y_var
-    if (any(y_in_data)) {
-        data <- data[!y_in_data]
+  # find the response if there
+  tt <- terms(object)
+  resp_i <- attr(tt, "response")
+  y_var <- names(attr(tt, "dataClasses"))[resp_i]
+  all_vars <- all.vars(tt)
+  data_names <- names(data)
+  # if the response variable is named in data, delete it
+  y_in_data <- data_names %in% y_var
+  if (any(y_in_data)) {
+    data <- data[!y_in_data]
+  }
+
+  # handle offsets; if we generated the data from the model, then set
+  # offset variable(s) to 1
+  # But note that this is only for the data object that we'll eval into
+  # The offset will get set to whatever is the typical value for those offset
+  # variable(s). As with any other variable you'll need to provide a value
+  # for each offset if you want to use that value
+  if (is_mf) {
+    # are there any offsets
+    offsets <- attr(tt, "offset")
+    if (length(offsets)) {
+      # when selected from data, remember we deleted the response already
+      # offsets will be shifted 1 col to left
+      data[, offsets - 1] <- 1
+      names(data)[offsets - 1] <- all_vars[offsets]
     }
+  }
 
-    # handle offsets; if we generated the data from the model, then set
-    # offset variable(s) to 1
-    # But note that this is only for the data object that we'll eval into
-    # The offset will get set to whatever is the typical value for those offset
-    # variable(s). As with any other variable you'll need to provide a value
-    # for each offset if you want to use that value
-    if (is_mf) {
-        # are there any offsets
-        offsets <- attr(tt, "offset")
-        if (length(offsets)) {
-            # when selected from data, remember we deleted the response already
-            # offsets will be shifted 1 col to left
-            data[, offsets - 1] <- 1
-            names(data)[offsets - 1] <- all_vars[offsets]
-        }
-    }
-
-    data
+  data
 }
 
 #' @importFrom stats median quantile
 `value_closest_to_median` <- function(x) {
-    ## only work on numeric or factor variables
-    is_fac <- is.factor(x)
-    is_num <- is.numeric(x)
+  ## only work on numeric or factor variables
+  is_fac <- is.factor(x)
+  is_num <- is.numeric(x)
 
-    ## if supplied something other than numeric or factor, bail
-    if(!is_fac && !is_num) {
-        stop("'x' must be a factor or numeric vector. Supplied <",
-             class(x)[[1L]], ">", call. = FALSE)
-    }
+  ## if supplied something other than numeric or factor, bail
+  if(!is_fac && !is_num) {
+    stop("'x' must be a factor or numeric vector. Supplied <",
+      class(x)[[1L]], ">", call. = FALSE)
+  }
 
-    ## if x is a factor, return the modal value as a factor with original
-    ##   levels
-    if (is_fac) {
-        tab <- tabulate(x)
-        levs <- levels(x)
-        result <- levs[which.max(tab)]
-        result <- factor(result, levels = levs)
-    }
+  ## if x is a factor, return the modal value as a factor with original
+  ##   levels
+  if (is_fac) {
+    tab <- tabulate(x)
+    levs <- levels(x)
+    result <- levs[which.max(tab)]
+    result <- factor(result, levels = levs)
+  }
 
-    ## if x is numeric, return the observation closest to median value
-    if (is_num) {
-        # mgcv prefers this to `median()` as it is a data point
-        med <- quantile(x, na.rm = TRUE, prob = 0.5, type = 3)
-        # and as a result we don't need to find the value closest to med
-        # as that's what `type` does
-        result <- unname(med)
-    }
+  ## if x is numeric, return the observation closest to median value
+  if (is_num) {
+    # mgcv prefers this to `median()` as it is a data point
+    med <- quantile(x, na.rm = TRUE, prob = 0.5, type = 3)
+    # and as a result we don't need to find the value closest to med
+    # as that's what `type` does
+    result <- unname(med)
+  }
 
-    result
+  result
 }
 
 ## if no data, set to a 0-row tibble; if data supplied, check it:
 ##   - single row df or list of length-1 elements; only variables in mf
 #' @importFrom tibble is_tibble tibble
 `process_slice_data` <- function(data) {
-    ## if NULL, bail early; return a 0-row tibble
-    if (is.null(data)) {
-        return(NULL)
+  ## if NULL, bail early; return a 0-row tibble
+  if (is.null(data)) {
+    return(NULL)
+  }
+
+  ## we were given something
+  is_tib <- is_tibble(data)
+  is_df <- is.data.frame(data)
+  is_list <- is.list(data)
+
+  if (!any(is_tib, is_df, is_list)) {
+    stop("'data' should be a tibble, data frame, or list. Supplied <",
+      class(data)[[1L]], ">", call. = FALSE)
+  }
+
+  if (is_tib || is_df) {
+    nr  <- NROW(data)
+    if (nr != 1L) {
+      stop("'data' should have 1 row only. Supplied <",
+        nr, ">", call. = FALSE)  
     }
+  }
 
-    ## we were given something
-    is_tib <- is_tibble(data)
-    is_df <- is.data.frame(data)
-    is_list <- is.list(data)
-
-    if (!any(is_tib, is_df, is_list)) {
-        stop("'data' should be a tibble, data frame, or list. Supplied <",
-             class(data)[[1L]], ">", call. = FALSE)
+  if (is_list) {
+    if (!all(lengths(data) == 1L)) {
+      stop("If 'data' is a list, it should be a list of length-1 vectors")
     }
+  }
 
-    if (is_tib || is_df) {
-        nr  <- NROW(data)
-        if (nr != 1L) {
-            stop("'data' should have 1 row only. Supplied <",
-                 nr, ">", call. = FALSE)
-        }
-    }
-
-    if (is_list) {
-        if (!all(lengths(data) == 1L)) {
-            stop("If 'data' is a list, it should be a list of length-1 vectors")
-        }
-    }
-
-    as_tibble(data)
+  as_tibble(data)
 }
 
 `process_slice_var` <- function(x, data, n) {
@@ -295,55 +300,64 @@
 #'   tidyselect principles.
 #' @param envir the environment within which to recreate the data used to fit
 #'   `object`.
-#' @param data an optional data frame of data used to fit the mdoel if
+#' @param data an optional data frame of data used to fit the model if
 #'   reconstruction of the data from the model doesn't work.
-#' 
+#'
 #' @export
 #' @importFrom rlang enquo
 #' @importFrom tidyselect eval_select
 #' @importFrom stats model.frame formula
 `typical_values.gam` <- function(object, vars = everything(),
-    envir = environment(formula(object)), data = NULL, ...) {
-    # extract the summary from the fitted GAM
-    # summ is a named list
-    summ <- object[["var.summary"]]
+  envir = environment(formula(object)), data = NULL, ...) {
+  # extract the summary from the fitted GAM
+  # summ is a named list
+  summ <- object[["var.summary"]]
 
-    # include/exclude any terms?
-    expr <- rlang::enquo(vars)
-    pos <- eval_select(expr, data = summ)
-    summ <- summ[pos]
+  # include/exclude any terms?
+  expr <- rlang::enquo(vars)
+  pos <- eval_select(expr, data = summ)
+  summ <- summ[pos]
 
-    # for numeric variables summ is a vector with 3 elements, we want element 2
-    # which contains the value of the observation closest to the median
-    # probably need to handle matrix covariates here separately from numerics
-    # logical values get stored as numeric in the summary
-    # dc <- data_class(summ) # mgcv doesn't store logicals as logicals
-    # so we need to extract the data classes ourselves
-    # try to recover the data
-    mf <- model.frame(object)
-    if (is.null(data)) {
-        data <- eval(object$call$data, envir)
+  # for numeric variables summ is a vector with 3 elements, we want element 2
+  # which contains the value of the observation closest to the median
+  # probably need to handle matrix covariates here separately from numerics
+  # logical values get stored as numeric in the summary
+  # dc <- data_class(summ) # mgcv doesn't store logicals as logicals
+  # so we need to extract the data classes ourselves
+  # try to recover the data
+  mf <- model.frame(object)
+  if (is.null(data)) {
+    # simon sets the $formula component to have env .GlobalEnv
+    # so this can fail to find the thing we want, which would be fine,
+    # but worse it can find something with the same name as data somewhere
+    # else. An example is `data = df`, which can find `df()` in some settings,
+    # like when pkgdown is running examples.
+    data <- eval(object$call$data, envir)
+    # check that `data` is a data frame or list and set it to NULL if it isn't
+    if (!(inherits(data, "data.frame") || is.list(data))) {
+      data <- NULL
     }
-    if (is.null(data)) {
-        data <- mf
-    }
-    data <- data[names(summ)] # take only vars mgcv thinks we need
-    dc <- data_class(data)
+  }
+  if (is.null(data)) {
+    data <- mf
+  }
+  data <- data[names(summ)] # take only vars mgcv thinks we need
+  dc <- data_class(data)
 
-    # if any logicals extract them as per numeric (2nd value) and convert to
-    # logical. do this before extracting the numerics
-    is_log <- dc == "logical"
-    if (any(is_log)) {
-        summ[is_log] <- lapply(summ[is_log], \(x) as.logical(x[2]))
-    }
+  # if any logicals extract them as per numeric (2nd value) and convert to
+  # logical. do this before extracting the numerics
+  is_log <- dc == "logical"
+  if (any(is_log)) {
+    summ[is_log] <- lapply(summ[is_log], \(x) as.logical(x[2]))
+  }
 
-    # now process the numerics
-    dc <- data_class(summ)
-    i <-  dc == "numeric" & lengths(summ) == 3L
-    summ[i] <- lapply(summ[i], `[`, 2)
+  # now process the numerics
+  dc <- data_class(summ)
+  i <-  dc == "numeric" & lengths(summ) == 3L
+  summ[i] <- lapply(summ[i], `[`, 2)
 
-    # return
-    as_tibble(summ)
+  # return
+  as_tibble(summ)
 }
 
 #' @export
