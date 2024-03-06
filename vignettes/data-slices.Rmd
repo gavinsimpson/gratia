@@ -45,8 +45,8 @@ plant <- CO2 |>
 ```
 
 ```{r plot-plant-data}
-plant_ylab <- expression(CO[2] ~ uptake ~ (mu * mol ~ m^{-3}))
-plant_xlab <- expression(CO[2] ~ concentration ~ (mL ~ L^{-1}))
+plant_ylab <- expression(CO[2] ~ uptake ~ (mu * mol ~ m^{-3})) # nolint: brace_linter.
+plant_xlab <- expression(CO[2] ~ concentration ~ (mL ~ L^{-1})) # nolint: brace_linter.
 
 plant |>
   ggplot(aes(x = conc, y = uptake, group = plant, colour = treatment)) +
