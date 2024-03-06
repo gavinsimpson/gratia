@@ -56,20 +56,20 @@ The main features of *gratia* are currently
 
 * A *ggplot2*-based replacement for `mgcv:::plot.gam()`: `draw.gam()`.
 
-    For example, the classic four term additive example from Gu & Wahba:
+  For example, the classic four term additive example from Gu & Wahba:
 	
-	  ![Estimated smooths from a GAM](man/figures/README-draw-gam-figure-1.png)
+	![Estimated smooths from a GAM](man/figures/README-draw-gam-figure-1.png)
 
-    Or for a bivariate smooth:
+  Or for a bivariate smooth:
     
-    ![Estimated smooths from a GAM](man/figures/README-draw-gam-figure-2d-1.png)
+  ![Estimated smooths from a GAM](man/figures/README-draw-gam-figure-2d-1.png)
 
-    Note that some specialist smoothers (`bs %in% c("mrf","sw", "sf")`) are not
-    currently supported, but univariate, *factor* and *continuous* `by`-variable
-    smooths, simple random effect smooths (`bs = 're'`), factor-smooth
-    interaction smooths (`bs = "fs"`), constrained factor smooths (`bs = "sz"`),
-    full soap film smooths (`bs = "so"`), and bivariate, trivariate, and
-    quadvariate TPRS and tensor product smooths are supported,
+  Note that some specialist smoothers (`bs %in% c("mrf","sw", "sf")`) are not
+  currently supported, but univariate, *factor* and *continuous* `by`-variable
+  smooths, simple random effect smooths (`bs = 're'`), factor-smooth
+  interaction smooths (`bs = "fs"`), constrained factor smooths (`bs = "sz"`),
+  full soap film smooths (`bs = "so"`), and bivariate, trivariate, and
+  quadvariate TPRS and tensor product smooths are supported,
 
 * Estimation of derivatives of fitted smoothers: `derivatives()`,
 
