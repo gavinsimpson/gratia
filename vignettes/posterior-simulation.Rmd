@@ -23,8 +23,10 @@ This vignette describes {gratia}'s tools for posterior simulation, a powerful wa
 
 We'll need the following packages for this vignette:
 ```{r load-packages}
-pkgs <- c("mgcv", "gratia", "dplyr", "tidyr", "ggplot2", "ggdist",
-  "distributional", "tibble", "withr", "patchwork")
+pkgs <- c(
+  "mgcv", "gratia", "dplyr", "tidyr", "ggplot2", "ggdist",
+  "distributional", "tibble", "withr", "patchwork"
+)
 vapply(pkgs, library, logical(1L), logical.return = TRUE, character.only = TRUE)
 ```
 
@@ -79,7 +81,8 @@ In the following sections we'll look at each of the four main posterior simulati
 ```{r ss-data}
 ss_df <- data_sim("eg1", seed = 21)
 m_ss <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-  data = ss_df, method = "REML")
+  data = ss_df, method = "REML"
+)
 ```
 
 ```{r ss-sm-coefs}
@@ -100,9 +103,12 @@ sm_est <- smooth_estimates(m_ss, smooth = "s(x0)") |>
 sm_est |>
   ggplot(aes(x = x0)) +
   geom_lineribbon(aes(ymin = .lower_ci, ymax = .upper_ci),
-    orientation = "vertical", fill = "#56B4E9", alpha = 0.5) +
-  geom_line(data = sm_samp,
-    aes(y = .value, group = .draw), alpha = 0.2) +
+    orientation = "vertical", fill = "#56B4E9", alpha = 0.5
+  ) +
+  geom_line(
+    data = sm_samp,
+    aes(y = .value, group = .draw), alpha = 0.2
+  ) +
   geom_line(aes(y = .estimate), linewidth = 1.25, colour = "#E69F00") +
   labs(y = smooth_label(s_x0))
 ```
@@ -159,10 +165,11 @@ We can visualise what this distribution looks like with some magic from the *ggd
 df |>
   ggplot(aes(x = x, y = y)) +
   stat_halfeye(aes(ydist = dist_normal(mean = mu, sd = sigma)),
-    x = 0.5, scale = 0.2, slab_fill = "#E69F00", slab_alpha = 0.7) +
+    x = 0.5, scale = 0.2, slab_fill = "#E69F00", slab_alpha = 0.7
+  ) +
   geom_point() +
-    geom_function(fun = gw_f2, colour = "#0072B2", linewidth = 1.5) +
-    geom_point(x = 0.5, y = mu, colour = "red")
+  geom_function(fun = gw_f2, colour = "#0072B2", linewidth = 1.5) +
+  geom_point(x = 0.5, y = mu, colour = "red")
 ```
 
 The orange region shows the expected density of response values at $x^{\ast} = 0.5$ that our model predicts we could expect to observe. This region assumes there is no uncertainty in the estimate of the mean of variance. Prediction intervals take into account the variation about the expected value, plus the uncertainty in the expected value. `fitted_values()` conveniently returns this uncertainty for us, which by default is a 95% credible interval
@@ -189,7 +196,7 @@ That step isn't required in order to do posterior simulation with gratia, but we
 We use `posterior_samples()` to generate new response data for each of the new `x` values in `ds` and use a join to add the prediction data to each draw
 ```{r posterior-samples-gaussian-gam}
 ps <- posterior_samples(m, n = 10000, data = ds, seed = 24,
-  unconditional  = TRUE) |>
+  unconditional = TRUE) |>
   left_join(ds, by = join_by(.row == .row))
 ps
 ```
@@ -198,8 +205,10 @@ Here we asked for 10000 posterior draws for each new value of `x`. Ideally we'd 
 `ps` is a tibble, with `n * nrow(ds)` rows. The `.draw` variable groups the simulated values by posterior draw, while `.row` groups posterior draws for the same value of `x`. To summarise the posterior draws using {dplyr} we need a function that will compute quantiles of the posterior distribution for each value of `x` (each `.row`). The following function is a simple wrapper around the `quantile()` function from base R, which arranges the output from `quantile()` as a data frame.
 ```{r quantile-fun}
 quantile_fun <- function(x, probs = c(0.025, 0.5, 0.975), ...) {
-  tibble::tibble(.value = quantile(x, probs = probs, ...),
-    .q = probs * 100)
+  tibble::tibble(
+    .value = quantile(x, probs = probs, ...),
+    .q = probs * 100
+  )
 }
 ```
 We apply this function to our set of posterior draws, grouping by `.row` to summarise separately the posterior distribution for each new value of `x`. `reframe()` is used to summarise the posterior using our `quantile_fun()` function. For ease of use, we pivot the resulting summary from long to wide format and add on the covariate values by joining on the `.row` variable
@@ -207,8 +216,10 @@ We apply this function to our set of posterior draws, grouping by `.row` to summ
 p_int <- ps |>
   group_by(.row) |>
   reframe(quantile_fun(.response)) |>
-  pivot_wider(id_cols = .row, names_from = .q, values_from = .value,
-    names_prefix = ".q") |>
+  pivot_wider(
+    id_cols = .row, names_from = .q, values_from = .value,
+    names_prefix = ".q"
+  ) |>
   left_join(ds, by = join_by(.row == .row))
 p_int
 ```
@@ -219,11 +230,15 @@ We can now use the various objects we have produced to plot the fitted values fr
 fv |>
   ggplot(aes(x = x, y = .fitted)) +
   # summarise the posterior samples
-  geom_hex(data = ps, aes(x = x, y = .response, fill = after_stat(count)),
-    bins = 50, alpha = 0.7) +
+  geom_hex(
+    data = ps, aes(x = x, y = .response, fill = after_stat(count)),
+    bins = 50, alpha = 0.7
+  ) +
   # add the lower and upper prediction intervals
-  geom_line(data = p_int, aes(y = .q2.5), colour = "#56B4E9", linewidth = 1.5) +
-  geom_line(data = p_int, aes(y = .q97.5), colour = "#56B4E9", linewidth = 1.5) +
+  geom_line(data = p_int, aes(y = .q2.5), colour = "#56B4E9",
+    linewidth = 1.5) +
+  geom_line(data = p_int, aes(y = .q97.5), colour = "#56B4E9",
+    linewidth = 1.5) +
   # add the lower and upper credible intervals
   geom_line(aes(y = .lower_ci), colour = "#56B4E9", linewidth = 1) +
   geom_line(aes(y = .upper_ci), colour = "#56B4E9", linewidth = 1) +
@@ -247,13 +262,19 @@ In this section, I rework Simon's example of the failure of the Gaussian approxi
 We begin by defining a function that will simulate data for the example.
 ```{r mh-gam-data}
 ga_fail <- function(seed) {
-  df <- tibble(y = c(rep(0, 89), 1, 0, 1, 0, 0, 1, rep(0, 13), 1, 0, 0, 1,
+  df <- tibble(y = c(
+    rep(0, 89), 1, 0, 1, 0, 0, 1, rep(0, 13), 1, 0, 0, 1,
     rep(0, 10), 1, 0, 0, 1, 1, 0, 1, rep(0, 4), 1, rep(0, 3),
     1, rep(0, 3), 1, rep(0, 10), 1, rep(0, 4), 1, 0, 1, 0, 0,
-    rep(1, 4), 0, rep(1, 5), rep(0, 4), 1, 1, rep(0, 46))) |>
-    mutate(x = withr::with_seed(seed,
-      sort(c(0:10 * 5, rnorm(length(y) - 11) * 20 + 100))),
-      .row = row_number()) |>
+    rep(1, 4), 0, rep(1, 5), rep(0, 4), 1, 1, rep(0, 46)
+  )) |>
+    mutate(
+      x = withr::with_seed(
+        seed,
+        sort(c(0:10 * 5, rnorm(length(y) - 11) * 20 + 100))
+      ),
+      .row = row_number()
+    ) |>
     relocate(.row, .before = 1L)
   df
 }
@@ -270,14 +291,15 @@ Note how there are very few zeroes and that for large parts of the covariate spa
 
 We fit a binomial (logistic) GAM to the data
 ```{r fit-ga-fail-gam}
-m_logit <- gam(y ~ s(x, k = 15), data = df,
-  method = "REML", family = binomial)
+m_logit <- gam(y ~ s(x, k = 15), data = df, method = "REML", family = binomial)
 ```
 and then generate sample from the posterior distribution using the default Gaussian approximation and subsequently using the simpler Metropolis Hastings sampler.
 ```{r}
 fs_ga <- fitted_samples(m_logit, n = 2000, seed = 2)
-fs_mh <- fitted_samples(m_logit, n = 2000, seed = 2, method = "mh", thin = 2,
-  rw_scale = 0.4)
+fs_mh <- fitted_samples(m_logit,
+  n = 2000, seed = 2, method = "mh", thin = 2,
+  rw_scale = 0.4
+)
 ```
 The `method` argument is used to select the Metropolis Hastings sampler, and we specify two additional arguments:
 
@@ -309,16 +331,20 @@ First we plot the intervals for the Gaussian approximation to the posterior, and
 plt_ga <- df |>
   ggplot(aes(x = x, y = y)) +
   geom_point() +
-  geom_lineribbon(data = int_ga,
-    aes(x = x, y = .fitted, ymin = .lower, ymax = .upper)) +
+  geom_lineribbon(
+    data = int_ga,
+    aes(x = x, y = .fitted, ymin = .lower, ymax = .upper)
+  ) +
   scale_fill_brewer() +
   labs(title = "Gaussian approximation")
 
 plt_mh <- df |>
   ggplot(aes(x = x, y = y)) +
   geom_point() +
-  geom_lineribbon(data = int_mh,
-    aes(x = x, y = .fitted, ymin = .lower, ymax = .upper)) +
+  geom_lineribbon(
+    data = int_mh,
+    aes(x = x, y = .fitted, ymin = .lower, ymax = .upper)
+  ) +
   scale_fill_brewer() +
   labs(title = "Metropolis Hastings sampler")
 
