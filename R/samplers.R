@@ -209,8 +209,8 @@
     b = model, ns = n * thin,
     burn = burnin, thin = thin, t.df = t_df, rw.scale = rw_scale
   ))
-  rw_acceptance <- betas[["rw.accept"]]
-  fixed_acceptance <- betas[["accept"]]
+  rw_acceptance <- attr(betas, "rw_acceptance")
+  fixed_acceptance <- attr(betas, "fixed_acceptance")
   betas <- betas[["bs"]]
   if (!is.null(index)) {
     betas <- betas[, index, drop = FALSE]
@@ -250,7 +250,13 @@
 
   # if index provided, subset the draws
   if (!is.null(index)) {
+    fx_a <- attr(draws, "fixed_acceptance")
+    rw_a <- attr(draws, "rw_acceptance")
     draws <- draws[, index, drop = FALSE]
+    if (!is.null(fx_a)) {
+      attr(draws, "fixed_acceptance") <- fx_a
+      attr(draws, "rw_acceptance") <- rw_a
+    }
   }
 
   # return the user-supplied draws
