@@ -166,9 +166,13 @@ relates to,</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 4,990 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Can pass arguments to predict.gam()</span></span></span>
+<span class="r-in"><span><span class="co"># \dontshow{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">6791</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">newd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>, x1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>, x2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   x3 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span><span class="va">newd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  x0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>, x1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>, x2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  x3 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Exclude s(x2)</span></span></span>
 <span class="r-in"><span><span class="fu">predicted_samples</span><span class="op">(</span><span class="va">m</span>, n <span class="op">=</span> <span class="fl">5</span>, <span class="va">newd</span>, exclude <span class="op">=</span> <span class="st">"s(x2)"</span>, seed <span class="op">=</span> <span class="fl">25</span><span class="op">)</span></span></span>
@@ -207,8 +211,10 @@ relates to,</p></li>
 <span class="r-in"><span><span class="co">## Select which terms --- result should be the same as previous</span></span></span>
 <span class="r-in"><span><span class="co">## but note that we have to include any parametric terms, including the</span></span></span>
 <span class="r-in"><span><span class="co">## constant term</span></span></span>
-<span class="r-in"><span><span class="fu">predicted_samples</span><span class="op">(</span><span class="va">m</span>, n <span class="op">=</span> <span class="fl">5</span>, <span class="va">newd</span>, seed <span class="op">=</span> <span class="fl">25</span>,</span></span>
-<span class="r-in"><span>                  terms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"s(x0)"</span>, <span class="st">"s(x2)"</span>, <span class="st">"s(x3)"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">predicted_samples</span><span class="op">(</span><span class="va">m</span>,</span></span>
+<span class="r-in"><span>  n <span class="op">=</span> <span class="fl">5</span>, <span class="va">newd</span>, seed <span class="op">=</span> <span class="fl">25</span>,</span></span>
+<span class="r-in"><span>  terms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"s(x0)"</span>, <span class="st">"s(x2)"</span>, <span class="st">"s(x3)"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 50 x 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     .row .draw .response</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
@@ -223,7 +229,9 @@ relates to,</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     9     1     4.65 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10     1     0.395</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 40 more rows</span></span>
+<span class="r-in"><span><span class="co"># \dontshow{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">op</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

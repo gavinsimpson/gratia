@@ -102,7 +102,7 @@
 <figcaption aria-hidden="true"><p>Estimated smooths from a GAM</p>
 </figcaption></figure><p>Note that some specialist smoothers (<code>bs %in% c("mrf","sw", "sf")</code>) are not currently supported, but univariate, <em>factor</em> and <em>continuous</em> <code>by</code>-variable smooths, simple random effect smooths (<code>bs = 're'</code>), factor-smooth interaction smooths (<code>bs = "fs"</code>), constrained factor smooths (<code>bs = "sz"</code>), full soap film smooths (<code>bs = "so"</code>), and bivariate, trivariate, and quadvariate TPRS and tensor product smooths are supported,</p>
 </li>
-<li><p>Estimatation of derivatives of fitted smoothers: <code><a href="reference/derivatives.html">derivatives()</a></code>,</p></li>
+<li><p>Estimation of derivatives of fitted smoothers: <code><a href="reference/derivatives.html">derivatives()</a></code>,</p></li>
 <li><p>Estimation of point-wise across-the-function confidence intervals and simultaneous intervals for smooths: <code><a href="reference/confint.gam.html">confint.gam()</a></code>.</p></li>
 <li>
 <p>Model diagnostics via <code><a href="reference/appraise.html">appraise()</a></code></p>
@@ -117,13 +117,15 @@
 <a class="anchor" aria-label="anchor" href="#installing-gratia"></a>
 </h2>
 <p><em>gratia</em> is now available on CRAN, and can be installed with</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">'gratia'</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"gratia"</span>)</span></code></pre></div>
 <p>however <em>gratia</em> is under active development and you may wish to install the development version from github. The easiest way to do this is via the <code>install_github()</code> function from package <em>remotes</em>. Make sure you have <em>remotes</em> installed, then run</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"gavinsimpson/gratia"</span>)</span></code></pre></div>
 <p>to install the package. Alternatively, binary packages of the development version are available from rOpenSci’s R Universe service:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Install gratia in R</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"gratia"</span>, <span class="at">repos =</span> <span class="fu">c</span>(<span class="st">"https://gavinsimpson.r-universe.dev"</span>,</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="st">"https://cloud.r-project.org"</span>))</span></code></pre></div>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"gratia"</span>, <span class="at">repos =</span> <span class="fu">c</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="st">"https://gavinsimpson.r-universe.dev"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="st">"https://cloud.r-project.org"</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>))</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="history">History<a class="anchor" aria-label="anchor" href="#history"></a>
