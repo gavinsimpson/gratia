@@ -1,5 +1,14 @@
 ## Test other scam methods
 
+test_that("smooth_estimates works for scams", {
+  expect_silent(sm1 <- smooth_estimates(sw))
+  expect_silent(sm2 <- smooth_estimates(sww_mdcx))
+  expect_silent(sm3 <- smooth_estimates(sw_mdcv))
+  expect_silent(sm4 <- smooth_estimates(m_scam))
+  expect_silent(sm5 <- smooth_estimates(m_scam_micx))
+  expect_silent(sm6 <- smooth_estimates(m_scam_micv))
+})
+
 test_that("vcov.scam works", {
   V <- vcov(sw)
   expect_identical(dim(V), c(5L, 5L))
