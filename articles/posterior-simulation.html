@@ -422,16 +422,16 @@ join to add the prediction data to each draw</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2,000,000 × 4</span></span></span>
 <span><span class="co">#&gt;     .row .draw .response       x</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1     1   -<span style="color: #BB0000;">1.34</span>   0.001<span style="text-decoration: underline;">29</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     2     1   -<span style="color: #BB0000;">0.049</span><span style="color: #BB0000; text-decoration: underline;">5</span> 0.006<span style="text-decoration: underline;">29</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     3     1    0.030<span style="text-decoration: underline;">8</span> 0.011<span style="text-decoration: underline;">3</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     4     1   -<span style="color: #BB0000;">0.783</span>  0.016<span style="text-decoration: underline;">3</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     5     1    0.861  0.021<span style="text-decoration: underline;">3</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     6     1    0.475  0.026<span style="text-decoration: underline;">3</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     7     1    0.858  0.031<span style="text-decoration: underline;">3</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     8     1    0.143  0.036<span style="text-decoration: underline;">3</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     9     1   -<span style="color: #BB0000;">0.034</span><span style="color: #BB0000; text-decoration: underline;">4</span> 0.041<span style="text-decoration: underline;">3</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    10     1    1.04   0.046<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1     1    -<span style="color: #BB0000;">0.807</span> 0.001<span style="text-decoration: underline;">29</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     2     1     0.456 0.006<span style="text-decoration: underline;">29</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     3     1     0.507 0.011<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     4     1    -<span style="color: #BB0000;">0.335</span> 0.016<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     5     1     1.28  0.021<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     6     1     0.865 0.026<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     7     1     1.22  0.031<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     8     1     0.475 0.036<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     9     1     0.267 0.041<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    10     1     1.31  0.046<span style="text-decoration: underline;">3</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,999,990 more rows</span></span></span></code></pre></div>
 <p>Here we asked for 10000 posterior draws for each new value of
 <code>x</code>. Ideally we’d generate at least three or four times this
@@ -477,16 +477,16 @@ variable</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 200 × 5</span></span></span>
 <span><span class="co">#&gt;     .row  .q2.5    .q50 .q97.5       x</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1 -<span style="color: #BB0000;">2.84</span>  -<span style="color: #BB0000;">0.847</span>    1.25 0.001<span style="text-decoration: underline;">29</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     2 -<span style="color: #BB0000;">2.70</span>  -<span style="color: #BB0000;">0.651</span>    1.41 0.006<span style="text-decoration: underline;">29</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     3 -<span style="color: #BB0000;">2.50</span>  -<span style="color: #BB0000;">0.434</span>    1.62 0.011<span style="text-decoration: underline;">3</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     4 -<span style="color: #BB0000;">2.24</span>  -<span style="color: #BB0000;">0.207</span>    1.83 0.016<span style="text-decoration: underline;">3</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     5 -<span style="color: #BB0000;">2.04</span>  -<span style="color: #BB0000;">0.019</span><span style="color: #BB0000; text-decoration: underline;">7</span>   2.01 0.021<span style="text-decoration: underline;">3</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     6 -<span style="color: #BB0000;">1.81</span>   0.191    2.25 0.026<span style="text-decoration: underline;">3</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     7 -<span style="color: #BB0000;">1.59</span>   0.391    2.41 0.031<span style="text-decoration: underline;">3</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     8 -<span style="color: #BB0000;">1.38</span>   0.594    2.60 0.036<span style="text-decoration: underline;">3</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     9 -<span style="color: #BB0000;">1.20</span>   0.831    2.84 0.041<span style="text-decoration: underline;">3</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    10 -<span style="color: #BB0000;">0.935</span>  1.06     3.04 0.046<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1 -<span style="color: #BB0000;">2.83</span>  -<span style="color: #BB0000;">0.836</span>    1.23 0.001<span style="text-decoration: underline;">29</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     2 -<span style="color: #BB0000;">2.70</span>  -<span style="color: #BB0000;">0.650</span>    1.36 0.006<span style="text-decoration: underline;">29</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     3 -<span style="color: #BB0000;">2.44</span>  -<span style="color: #BB0000;">0.434</span>    1.58 0.011<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     4 -<span style="color: #BB0000;">2.23</span>  -<span style="color: #BB0000;">0.204</span>    1.81 0.016<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     5 -<span style="color: #BB0000;">2.04</span>  -<span style="color: #BB0000;">0.027</span><span style="color: #BB0000; text-decoration: underline;">2</span>   2.05 0.021<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     6 -<span style="color: #BB0000;">1.82</span>   0.188    2.26 0.026<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     7 -<span style="color: #BB0000;">1.59</span>   0.401    2.39 0.031<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     8 -<span style="color: #BB0000;">1.36</span>   0.592    2.61 0.036<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     9 -<span style="color: #BB0000;">1.20</span>   0.832    2.83 0.041<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    10 -<span style="color: #BB0000;">0.972</span>  1.07     3.04 0.046<span style="text-decoration: underline;">3</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 190 more rows</span></span></span></code></pre></div>
 <p>The 95% prediction interval is shown for the first 10 rows of the
 prediction data. the column labelled <code>.q50</code> is the median of

@@ -91,6 +91,7 @@ model coefficients</p>
 <span>  parametrized <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  mvn_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mvnfast"</span>, <span class="st">"mgcv"</span><span class="op">)</span>,</span>
 <span>  draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -112,6 +113,7 @@ model coefficients</p>
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  mvn_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mvnfast"</span>, <span class="st">"mgcv"</span><span class="op">)</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -214,6 +216,11 @@ to singular.</p></dd>
 <dt>draws</dt>
 <dd><p>matrix; user supplied posterior draws to be used when
 <code>method = "user"</code>.</p></dd>
+
+
+<dt>seed</dt>
+<dd><p>numeric; the random seed to use. If <code>NULL</code>, a random seed will
+be generated without affecting the current state of R's RNG.</p></dd>
 
 </dl></div>
 
