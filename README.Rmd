@@ -1,7 +1,5 @@
 ---
-output:
-  github_document:
-    fig_caption: false
+output: github_document
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
