@@ -4,9 +4,13 @@ home:
   title: An R package for working with generalized additive models
   description: Graceful 'ggplot'-based graphics and utility functions for working with generalized additive models (GAMs) fitted using the 'mgcv' package.
 
+authors:
+  Gavin L. Simpson
+    href: https://fromthebottomoftheheap.net
+
 template:
-  params:
-    bootswatch: simplex
+  bootstrap: 5
+  bootswatch: flatly
   opengraph:
     image:
       src: man/figures/README-draw-gam-figure-1.png
@@ -14,3 +18,8 @@ template:
     twitter:
       creator: "@ucfagls"
       card: summary_large_image
+
+navbar:
+  structure:
+    left: [intro, articles, reference, news]
+    right: [search, github]

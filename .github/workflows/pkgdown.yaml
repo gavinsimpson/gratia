@@ -32,10 +32,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: |
-            any::pkgdown
-            local::.
-            Matrix
+          extra-packages: any::pkgdown, local::., Matrix
           pak-version: devel
           needs: website
 
@@ -50,5 +47,3 @@ jobs:
           clean: false
           branch: gh-pages
           folder: docs
-
-# or folder = docs?
