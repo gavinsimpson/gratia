@@ -16,7 +16,7 @@ data_slice(object, ...)
 
 \method{data_slice}{data.frame}(object, ...)
 
-\method{data_slice}{gam}(object, ..., data = NULL, envir = environment(formula(object)))
+\method{data_slice}{gam}(object, ..., data = NULL, envir = NULL)
 
 \method{data_slice}{gamm}(object, ...)
 
