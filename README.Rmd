@@ -12,8 +12,8 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 options(tibble.print_min = 5, tibble.print_max = 5)
-library('mgcv')
-library('gratia')
+library("mgcv")
+library("gratia")
 ```
 
 # gratia
@@ -42,7 +42,7 @@ draw(m1, residuals = TRUE)
 
 ```{r draw-gam-figure-2d, dev = "png", fig.height = 6, fig.width = 9, dpi = 120, echo = FALSE, fig.show = "hide", message = FALSE}
 df2 <- data_sim("eg2", n = 1000, seed = 42)
-m2 <- gam(y ~ s(x, z),  data = df2, method = "REML")
+m2 <- gam(y ~ s(x, z), data = df2, method = "REML")
 draw(m2)
 ```
 
@@ -69,7 +69,7 @@ The main features of *gratia* are currently
     full soap film smooths (`bs = "so"`), and bivariate, trivariate, and
     quadvariate TPRS and tensor product smooths are supported,
 
-* Estimatation of derivatives of fitted smoothers: `derivatives()`,
+* Estimation of derivatives of fitted smoothers: `derivatives()`,
 
 * Estimation of point-wise across-the-function confidence intervals and
   simultaneous intervals for smooths: `confint.gam()`.
@@ -83,7 +83,7 @@ The main features of *gratia* are currently
 *gratia* is now available on CRAN, and can be installed with
 
 ```{r install, eval = FALSE}
-install.packages('gratia')
+install.packages("gratia")
 ```
 
 however *gratia* is under active development and you may wish to install the
@@ -100,8 +100,10 @@ version are available from rOpenSci's R Universe service:
 
 ```{r install-r-universe, eval = FALSE}
 # Install gratia in R
-install.packages("gratia", repos = c("https://gavinsimpson.r-universe.dev",
-  "https://cloud.r-project.org"))
+install.packages("gratia", repos = c(
+  "https://gavinsimpson.r-universe.dev",
+  "https://cloud.r-project.org"
+))
 ```
 
 ## History
