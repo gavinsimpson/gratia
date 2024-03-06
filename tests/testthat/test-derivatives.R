@@ -463,12 +463,12 @@ test_that("derivatives() works for fs smooths issue 57", {
     data = d, method = "REML"
   )
 
-  expect_silent(d <- derivatives(m_logistic_growth))
-  expect_s3_class(d, "derivatives")
-  expect_s3_class(d, "tbl_df")
-  expect_named(d, c(deriv_nms, "t"))
-  ## plt <- draw(d) # FIXME: need to update draw(d) so it works with fs smooths
-  ## expect_doppelganger("draw issue 57 derivatives for factor by", plt)
+  expect_silent(fd <- derivatives(m_logistic_growth))
+  expect_s3_class(fd, "derivatives")
+  expect_s3_class(fd, "tbl_df")
+  expect_named(fd, c(deriv_nms, "t", "unit"))
+  plt <- draw(fd) # FIXME: need to update draw(d) so it works with fs smooths
+  expect_doppelganger("draw issue 57 derivatives for factor by", plt)
 })
 
 ## tests for by variables & simultaneous intervals #102
