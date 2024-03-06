@@ -381,24 +381,24 @@
 <text x='344.96' y='549.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='25.69px' lengthAdjust='spacingAndGlyphs'>week</text>
 <text transform='translate(18.53,294.24) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='35.47px' lengthAdjust='spacingAndGlyphs'>latitude</text>
 <rect x='662.60' y='203.16' width='46.44' height='182.17' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='668.08' y='217.35' style='font-size: 11.00px; font-family: sans;' textLength='31.18px' lengthAdjust='spacingAndGlyphs'>Partial</text>
+<text x='668.08' y='229.23' style='font-size: 11.00px; font-family: sans;' textLength='26.91px' lengthAdjust='spacingAndGlyphs'>effect</text>
 <image width='17.28' height='144.00' x='668.08' y='235.85' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAA40lEQVQ4jaWR0RHDMAhDhdIhukO3735B/UjsGILd3vWHs5B4OA7ez5doDwP5MNC2UHhJ3uXQOyTbGENkACTj6PHWKylkDfiCooG0fr8CChI0aycYa8O6m+TUKOW1qNi2zp3GVhuZVwI2EGatoDiZgaqMWfiS5xgWkVt4xQMM1C8rZzuyAVACKLQCaZQSWm4IC0Qcu+UaJe/oJ0DF8gRVsTzlFKHLL4rXcKkVj/JyPcrv4f0P8jHrRXjp7nHRPnN3qf0Z7/+ou6fRn7NLV+95AHjB84LiHgBpbCo9QYteJcfHHnsfCctVmJdPxIoAAAAASUVORK5CYII='/>
+<polyline points='681.91,376.62 685.36,376.62 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='681.91,342.24 685.36,342.24 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='681.91,307.85 685.36,307.85 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='681.91,273.46 685.36,273.46 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='681.91,239.08 685.36,239.08 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='671.54,376.62 668.08,376.62 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='671.54,342.24 668.08,342.24 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='671.54,307.85 668.08,307.85 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='671.54,273.46 668.08,273.46 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='671.54,239.08 668.08,239.08 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='690.84' y='379.65' style='font-size: 8.80px; font-family: sans;' textLength='12.72px' lengthAdjust='spacingAndGlyphs'>-40</text>
 <text x='690.84' y='345.26' style='font-size: 8.80px; font-family: sans;' textLength='12.72px' lengthAdjust='spacingAndGlyphs'>-20</text>
 <text x='690.84' y='310.88' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>0</text>
 <text x='690.84' y='276.49' style='font-size: 8.80px; font-family: sans;' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>20</text>
 <text x='690.84' y='242.11' style='font-size: 8.80px; font-family: sans;' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>40</text>
-<text x='668.08' y='217.35' style='font-size: 11.00px; font-family: sans;' textLength='31.18px' lengthAdjust='spacingAndGlyphs'>Partial</text>
-<text x='668.08' y='229.23' style='font-size: 11.00px; font-family: sans;' textLength='26.91px' lengthAdjust='spacingAndGlyphs'>effect</text>
-<line x1='668.08' y1='376.62' x2='671.54' y2='376.62' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='668.08' y1='342.24' x2='671.54' y2='342.24' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='668.08' y1='307.85' x2='671.54' y2='307.85' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='668.08' y1='273.46' x2='671.54' y2='273.46' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='668.08' y1='239.08' x2='671.54' y2='239.08' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='681.91' y1='376.62' x2='685.36' y2='376.62' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='681.91' y1='342.24' x2='685.36' y2='342.24' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='681.91' y1='307.85' x2='685.36' y2='307.85' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='681.91' y1='273.46' x2='685.36' y2='273.46' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='681.91' y1='239.08' x2='685.36' y2='239.08' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='38.27' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='145.29px' lengthAdjust='spacingAndGlyphs'>t2(week,latitude,species)</text>
 <text x='651.64' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='172.67px' lengthAdjust='spacingAndGlyphs'>Facets: species ; Basis: Tensor product (T2)</text>
 <text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='186.37px' lengthAdjust='spacingAndGlyphs'>hgam-paper-bird-move-model-4</text>
