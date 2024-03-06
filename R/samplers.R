@@ -50,29 +50,35 @@
 #' @param ... arguments passed to methods.
 #'
 #' @export
-`post_draws` <-  function(model, ...) {
-    UseMethod("post_draws")
+`post_draws` <- function(model, ...) {
+  UseMethod("post_draws")
 }
 
 #' @export
 #' @rdname post_draws
-`post_draws.default` <- function(model, n,
-  method = c("gaussian", "mh", "inla", "user"), mu = NULL, sigma = NULL,
-  n_cores = 1L, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
-  index = NULL, frequentist = FALSE, unconditional  = FALSE,
-  parametrized = TRUE, mvn_method = c("mvnfast", "mgcv"), draws = NULL, ...) {
+`post_draws.default` <- function(
+    model, n,
+    method = c("gaussian", "mh", "inla", "user"), mu = NULL, sigma = NULL,
+    n_cores = 1L, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
+    index = NULL, frequentist = FALSE, unconditional = FALSE,
+    parametrized = TRUE, mvn_method = c("mvnfast", "mgcv"), draws = NULL, ...) {
   # what posterior sampling are we using
   method <- match.arg(method)
   mvn_method <- match.arg(mvn_method)
   betas <- switch(method,
-    "gaussian" = gaussian_draws(model = model, n = n,
+    "gaussian" = gaussian_draws(
+      model = model, n = n,
       n_cores = n_cores, index = index, frequentist = frequentist,
       unconditional = unconditional, parametrized = parametrized,
-      mvn_method = mvn_method, ...),
-    "mh" = mh_draws(n = n, model = model, burnin = burnin,
-      thin = thin, t_df = t_df, rw_scale = rw_scale, index = index, ...),
+      mvn_method = mvn_method, ...
+    ),
+    "mh" = mh_draws(
+      n = n, model = model, burnin = burnin,
+      thin = thin, t_df = t_df, rw_scale = rw_scale, index = index, ...
+    ),
     "inla" = .NotYetImplemented(),
-    "user" = user_draws(model = model, draws = draws, ...))
+    "user" = user_draws(model = model, draws = draws, ...)
+  )
   betas
 }
 #' Generate posterior draws from a fitted model
@@ -80,25 +86,31 @@
 #' @export
 #' @rdname post_draws
 `generate_draws` <- function(model, ...) {
-    UseMethod("generate_draws")
+  UseMethod("generate_draws")
 }
 
 #' @export
 #' @rdname post_draws
-`generate_draws.gam` <- function(model, n, method = c("gaussian", "mh", "inla"),
-  mu = NULL, sigma = NULL, n_cores = 1L, burnin = 1000, thin = 1, t_df = 40,
-  rw_scale = 0.25, index = NULL, frequentist = FALSE, unconditional  = FALSE,
-  mvn_method = c("mvnfast", "mgcv"), ...) {
+`generate_draws.gam` <- function(
+    model, n, method = c("gaussian", "mh", "inla"),
+    mu = NULL, sigma = NULL, n_cores = 1L, burnin = 1000, thin = 1, t_df = 40,
+    rw_scale = 0.25, index = NULL, frequentist = FALSE, unconditional = FALSE,
+    mvn_method = c("mvnfast", "mgcv"), ...) {
   # what posterior sampling are we using
   method <- match.arg(method)
   mvn_method <- match.arg(mvn_method)
   betas <- switch(method,
-    "gaussian" = gaussian_draws(model = model, n = n,
+    "gaussian" = gaussian_draws(
+      model = model, n = n,
       n_cores = n_cores, index = index, frequentist = frequentist,
-      unconditional = unconditional, mvn_method = mvn_method, ...),
-    "mh" = mh_draws(n = n, model = model, burnin = burnin,
-      thin = thin, t_df = t_df, rw_scale = rw_scale, index = index),
-    "inla" = .NotYetImplemented())
+      unconditional = unconditional, mvn_method = mvn_method, ...
+    ),
+    "mh" = mh_draws(
+      n = n, model = model, burnin = burnin,
+      thin = thin, t_df = t_df, rw_scale = rw_scale, index = index
+    ),
+    "inla" = .NotYetImplemented()
+  )
   betas
 }
 
@@ -108,55 +120,59 @@
 #'
 #' @export
 `gaussian_draws` <- function(model, ...) {
-    UseMethod("gaussian_draws")
+  UseMethod("gaussian_draws")
 }
 
 #' @importFrom mvnfast rmvn
 #' @export
 #' @rdname gaussian_draws
-`gaussian_draws.gam` <- function(model, n, n_cores = 1L, index = NULL,
+`gaussian_draws.gam` <- function(
+    model, n, n_cores = 1L, index = NULL,
     frequentist = FALSE, unconditional = FALSE, mvn_method = "mvnfast", ...) {
-    mu <- coef(model)
-    sigma <- get_vcov(model, frequentist = frequentist,
-      unconditional = unconditional)
-    if (!is.null(index)) {
-        mu <- mu[index]
-        sigma <- sigma[index, index, drop = FALSE]
-    }
-    betas <- if (isTRUE(identical(mvn_method, "mvnfast"))) {
-        mvnfast::rmvn(n = n, mu = mu, sigma = sigma, ncores = n_cores)
-    } else {
-        mgcv::rmvn(n = n, mu = mu, V = sigma)
-    }
-    # if we ask for n=1 samples, we need to get back a matrix
-    if (!is.matrix(betas)) {
-        betas <- matrix(betas, nrow = n, byrow = TRUE)
-    }
+  mu <- coef(model)
+  sigma <- get_vcov(model,
+    frequentist = frequentist,
+    unconditional = unconditional
+  )
+  if (!is.null(index)) {
+    mu <- mu[index]
+    sigma <- sigma[index, index, drop = FALSE]
+  }
+  betas <- if (isTRUE(identical(mvn_method, "mvnfast"))) {
+    mvnfast::rmvn(n = n, mu = mu, sigma = sigma, ncores = n_cores)
+  } else {
+    mgcv::rmvn(n = n, mu = mu, V = sigma)
+  }
+  # if we ask for n=1 samples, we need to get back a matrix
+  if (!is.matrix(betas)) {
+    betas <- matrix(betas, nrow = n, byrow = TRUE)
+  }
 
-    betas
+  betas
 }
 
 #' @importFrom mvnfast rmvn
 #' @export
 #' @rdname gaussian_draws
-`gaussian_draws.scam` <- function(model, n, n_cores = 1L, index = NULL,
+`gaussian_draws.scam` <- function(
+    model, n, n_cores = 1L, index = NULL,
     frequentist = FALSE, parametrized = TRUE, mvn_method = "mvnfast", ...) {
-    mu <- coef(model, parametrized = parametrized)
-    sigma <- vcov(model, freq = frequentist, parametrized = parametrized)
-    if (!is.null(index)) {
-        mu <- mu[index]
-        sigma <- sigma[index, index, drop = FALSE]
-    }
-    betas <- if (isTRUE(identical(mvn_method, "mvnfast"))) {
-        mvnfast::rmvn(n = n, mu = mu, sigma = sigma, ncores = n_cores)
-    } else {
-        mgcv::rmvn(n = n, mu = mu, V = sigma)
-    }
-    # if we ask for n=1 samples, we need to get back a matrix
-    if (!is.matrix(betas)) {
-        betas <- matrix(betas, nrow = n, byrow = TRUE)
-    }
-    betas
+  mu <- coef(model, parametrized = parametrized)
+  sigma <- vcov(model, freq = frequentist, parametrized = parametrized)
+  if (!is.null(index)) {
+    mu <- mu[index]
+    sigma <- sigma[index, index, drop = FALSE]
+  }
+  betas <- if (isTRUE(identical(mvn_method, "mvnfast"))) {
+    mvnfast::rmvn(n = n, mu = mu, sigma = sigma, ncores = n_cores)
+  } else {
+    mgcv::rmvn(n = n, mu = mu, V = sigma)
+  }
+  # if we ask for n=1 samples, we need to get back a matrix
+  if (!is.matrix(betas)) {
+    betas <- matrix(betas, nrow = n, byrow = TRUE)
+  }
+  betas
 }
 
 #' Posterior samples using a Gaussian approximation to the posterior
@@ -167,25 +183,28 @@
 #' @export
 #' @rdname mh_draws
 `mh_draws` <- function(model, ...) {
-    UseMethod("mh_draws")
+  UseMethod("mh_draws")
 }
 
 #' @importFrom mgcv gam.mh
 #' @rdname mh_draws
 #' @export
-`mh_draws.gam` <- function(model, n, burnin = 1000, thin = 1,
+`mh_draws.gam` <- function(
+    model, n, burnin = 1000, thin = 1,
     t_df = 40, rw_scale = 0.25, index = NULL, ...) {
-    capture.output(betas <- mgcv::gam.mh(b = model, ns = n * thin,
-      burn = burnin, thin = thin, t.df = t_df, rw.scale = rw_scale))
-    rw_acceptance <- betas[["rw.accept"]]
-    fixed_acceptance <- betas[["accept"]]
-    betas <- betas[["bs"]]
-    if (!is.null(index)) {
-        betas <- betas[, index, drop = FALSE]
-    }
-    attr(betas, "fixed_acceptance") <- fixed_acceptance
-    attr(betas, "rw_acceptance") <- rw_acceptance
-    betas
+  capture.output(betas <- mgcv::gam.mh(
+    b = model, ns = n * thin,
+    burn = burnin, thin = thin, t.df = t_df, rw.scale = rw_scale
+  ))
+  rw_acceptance <- betas[["rw.accept"]]
+  fixed_acceptance <- betas[["accept"]]
+  betas <- betas[["bs"]]
+  if (!is.null(index)) {
+    betas <- betas[, index, drop = FALSE]
+  }
+  attr(betas, "fixed_acceptance") <- fixed_acceptance
+  attr(betas, "rw_acceptance") <- rw_acceptance
+  betas
 }
 
 #' Handle user-supplied posterior draws
@@ -193,31 +212,34 @@
 #' @inheritParams post_draws
 #' @export
 `user_draws` <- function(model, draws, ...) {
-    UseMethod("user_draws")
+  UseMethod("user_draws")
 }
 
 #' @export
 `user_draws.gam` <- function(model, draws, index = NULL, ...) {
-    # draws must be a matrix
-    if (!is.matrix(draws)) {
-        stop("Supplied 'draws' is not a matrix of coefficients.",
-            call. = FALSE)
-    }
+  # draws must be a matrix
+  if (!is.matrix(draws)) {
+    stop("Supplied 'draws' is not a matrix of coefficients.",
+      call. = FALSE
+    )
+  }
 
-    # draws must have as many columns as model coefficients
-    n_coef <- length(coef(model))
-    n_col <- ncol(draws)
-    if (isFALSE(identical(n_col, n_coef))) {
-        stop("Supplied 'draws' doesn't match number of model coefficients.\n",
-            "Number of model coefs: ", n_coef, "\n",
-            "Number of columns in 'draws': ", n_col, "\n", call. = FALSE)
-    }
+  # draws must have as many columns as model coefficients
+  n_coef <- length(coef(model))
+  n_col <- ncol(draws)
+  if (isFALSE(identical(n_col, n_coef))) {
+    stop("Supplied 'draws' doesn't match number of model coefficients.\n",
+      "Number of model coefs: ", n_coef, "\n",
+      "Number of columns in 'draws': ", n_col, "\n",
+      call. = FALSE
+    )
+  }
 
-    # if index provided, subset the draws
-    if (!is.null(index)) {
-        draws <- draws[, index, drop = FALSE]
-    }
+  # if index provided, subset the draws
+  if (!is.null(index)) {
+    draws <- draws[, index, drop = FALSE]
+  }
 
-    # return the user-supplied draws
-    draws
+  # return the user-supplied draws
+  draws
 }

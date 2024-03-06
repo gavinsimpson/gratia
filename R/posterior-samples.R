@@ -77,81 +77,88 @@
 #'
 #' @export
 `posterior_samples` <- function(model, ...) {
-    UseMethod("posterior_samples")
+  UseMethod("posterior_samples")
 }
 
 #' @export
 `posterior_samples.default` <- function(model, ...) {
-    stop("Don't know how to sample from the posterior of <",
-         class(model)[[1L]], ">", .call = FALSE)
+  stop("Don't know how to sample from the posterior of <",
+    class(model)[[1L]], ">",
+    .call = FALSE
+  )
 }
 
 #' @export
 #' @rdname posterior_samples
-`posterior_samples.gam` <- function(model, n, data = newdata, seed = NULL,
+`posterior_samples.gam` <- function(
+    model, n, data = newdata, seed = NULL,
     method = c("gaussian", "mh", "inla", "user"),
     n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
     freq = FALSE, unconditional = FALSE,
     weights = NULL, draws = NULL, ...,
     newdata = NULL,
     ncores = NULL) {
-    # generate new response data from the model including the uncertainty in
-    # the model.
+  # generate new response data from the model including the uncertainty in
+  # the model.
 
-    # start my getting draws of expectation
-    sim_eta <- fitted_samples(model, n = n, data = data, seed = seed,
-        scale = "response", method = method, n_cores = n_cores, burnin = burnin,
-        thin = thin, t_df = t_df, rw_scale = rw_scale, freq = freq,
-        unconditional = unconditional, weights = weights, newdata = newdata,
-        ncores = ncores, draws = draws, ...)
+  # start my getting draws of expectation
+  sim_eta <- fitted_samples(model,
+    n = n, data = data, seed = seed,
+    scale = "response", method = method, n_cores = n_cores, burnin = burnin,
+    thin = thin, t_df = t_df, rw_scale = rw_scale, freq = freq,
+    unconditional = unconditional, weights = weights, newdata = newdata,
+    ncores = ncores, draws = draws, ...
+  )
 
-    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-        runif(1)
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+    runif(1)
+  }
+  if (is.null(seed)) {
+    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+  } else {
+    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+    set.seed(seed)
+    RNGstate <- structure(seed, kind = as.list(RNGkind()))
+    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+  }
+
+  ## rd function if available
+  rd_fun <- get_family_rd(model)
+
+  ## dispersion or scale variable for simulation
+  scale <- model[["sig2"]]
+  if (is.null(scale)) {
+    scale <- summary(model)[["dispersion"]]
+  }
+
+  if (!is.null(newdata)) {
+    newdata_deprecated()
+  }
+
+  if (is.null(data)) {
+    # data <- model[["model"]]
+    weights <- model[["prior.weights"]]
+  } else {
+    if (is.null(weights)) {
+      weights <- rep(1, nrow(data))
     }
-    if (is.null(seed)) {
-        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-    } else {
-        R.seed <- get(".Random.seed", envir = .GlobalEnv)
-        set.seed(seed)
-        RNGstate <- structure(seed, kind = as.list(RNGkind()))
-        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-    }
+  }
 
-    ## rd function if available
-    rd_fun <- get_family_rd(model)
+  # need to extend weights by number of draws
+  weights <- rep(weights, times = n)
+  # scale <- rep(scale, times = n)
 
-    ## dispersion or scale variable for simulation
-    scale <- model[["sig2"]]
-    if (is.null(scale)) {
-        scale <- summary(model)[["dispersion"]]
-    }
+  # replace fitted with
+  sim_eta <- sim_eta |>
+    mutate(.response = rd_fun(
+      mu = .data$.fitted, wt = weights,
+      scale = scale
+    )) |>
+    select(all_of(c(".row", ".draw", ".response")))
 
-    if (!is.null(newdata)) {
-        newdata_deprecated()
-    }
-
-    if (is.null(data)) {
-        # data <- model[["model"]]
-        weights <- model[["prior.weights"]]
-    } else {
-        if (is.null(weights)) {
-            weights <- rep(1, nrow(data))
-        }
-    }
-
-    # need to extend weights by number of draws
-    weights <- rep(weights, times = n)
-    # scale <- rep(scale, times = n)
-
-    # replace fitted with
-    sim_eta <- sim_eta |>
-        mutate(.response = rd_fun(mu = .data$.fitted, wt = weights,
-            scale = scale)) |>
-        select(all_of(c(".row", ".draw", ".response")))
-
-    ## add classes
-    class(sim_eta) <- c("posterior_samples", class(sim_eta))
-    sim_eta
+  ## add classes
+  class(sim_eta) <- c("posterior_samples", class(sim_eta))
+  sim_eta
 }
 
 #' Draw fitted values from the posterior distribution
@@ -195,23 +202,25 @@
 #'
 #' @export
 `fitted_samples` <- function(model, ...) {
-    UseMethod("fitted_samples")
+  UseMethod("fitted_samples")
 }
 
 #' @export
 `fitted_samples.default` <- function(model, ...) {
-    stop("Don't know how to sample from the posterior of <",
-         class(model)[[1L]], ">", .call = FALSE)
+  stop("Don't know how to sample from the posterior of <",
+    class(model)[[1L]], ">",
+    .call = FALSE
+  )
 }
 
 #' @export
 `fitted_samples.gamm` <- function(model, ...) {
-    fitted_samples(model$gam, ...)
+  fitted_samples(model$gam, ...)
 }
 
 #' @export
 `fitted_samples.scam` <- function(model, ...) {
-    fitted_samples.gam(model, ...)
+  fitted_samples.gam(model, ...)
 }
 
 #' @export
@@ -243,72 +252,77 @@
 #' \donttest{
 #' fs2
 #' }
-#' \dontshow{options(op)}
-`fitted_samples.gam` <- function(model, n = 1, data = newdata, seed = NULL,
+#' \dontshow{
+#' options(op)
+#' }
+`fitted_samples.gam` <- function(
+    model, n = 1, data = newdata, seed = NULL,
     scale = c("response", "linear_predictor"),
     method = c("gaussian", "mh", "inla", "user"),
     n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
     freq = FALSE, unconditional = FALSE, draws = NULL,
     ..., newdata = NULL, ncores = NULL) {
-    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-        runif(1)
-    }
-    if (is.null(seed)) {
-        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-    } else {
-        R.seed <- get(".Random.seed", envir = .GlobalEnv)
-        set.seed(seed)
-        RNGstate <- structure(seed, kind = as.list(RNGkind()))
-        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-    }
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+    runif(1)
+  }
+  if (is.null(seed)) {
+    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+  } else {
+    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+    set.seed(seed)
+    RNGstate <- structure(seed, kind = as.list(RNGkind()))
+    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+  }
 
-    if (!is.null(newdata)) {
-        newdata_deprecated()
-    }
+  if (!is.null(newdata)) {
+    newdata_deprecated()
+  }
 
-    if (!is.null(ncores)) {
-        message("Argument `ncores` is deprecated. Use `n_cores` instead.")
-        n_cores <- ncores
-    }
+  if (!is.null(ncores)) {
+    message("Argument `ncores` is deprecated. Use `n_cores` instead.")
+    n_cores <- ncores
+  }
 
-    if (is.null(data)) {
-        data <- model[["model"]]
-    }
+  if (is.null(data)) {
+    data <- model[["model"]]
+  }
 
-    scale <- match.arg(scale)
+  scale <- match.arg(scale)
 
-    method <- match.arg(method)
+  method <- match.arg(method)
 
-    # get posterior draws
-    betas <- post_draws(n = n, method = method,
-        n_cores = n_cores, model = model,
-        burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-        index = NULL, frequentist = freq, unconditional = unconditional,
-        draws = draws)
-    ## don't need to pass freq, unconditional here as that is done for V
-    Xp <- predict(model, newdata = data, type = "lpmatrix", ...)
-    sims <- Xp %*% t(betas)
-    # handle the offset if present; it is an attribute on the Xp matrix
-    m_offset <- attr(Xp, "model.offset")
-    if (!is.null(m_offset)) {
-        sims <- sims + m_offset
-    }
+  # get posterior draws
+  betas <- post_draws(
+    n = n, method = method,
+    n_cores = n_cores, model = model,
+    burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
+    index = NULL, frequentist = freq, unconditional = unconditional,
+    draws = draws
+  )
+  ## don't need to pass freq, unconditional here as that is done for V
+  Xp <- predict(model, newdata = data, type = "lpmatrix", ...)
+  sims <- Xp %*% t(betas)
+  # handle the offset if present; it is an attribute on the Xp matrix
+  m_offset <- attr(Xp, "model.offset")
+  if (!is.null(m_offset)) {
+    sims <- sims + m_offset
+  }
 
-    if (isTRUE(identical(scale, "response"))) {
-        ilink <- inv_link(model, parameter = "location")
-        sims <- ilink(sims)
-    }
+  if (isTRUE(identical(scale, "response"))) {
+    ilink <- inv_link(model, parameter = "location")
+    sims <- ilink(sims)
+  }
 
-    colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
-    sims <- as_tibble(sims)
-    names(sims) <- as.character(seq_len(ncol(sims)))
-    sims <- add_column(sims, .row = seq_len(nrow(sims)))
-    sims <- gather(sims, key = ".draw", value = ".fitted", - .row) |>
-        mutate(.draw = as.integer(.data$.draw))
-    attr(sims, "seed") <- RNGstate
-    ## add classes
-    class(sims) <- c("fitted_samples", class(sims))
-    sims
+  colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
+  sims <- as_tibble(sims)
+  names(sims) <- as.character(seq_len(ncol(sims)))
+  sims <- add_column(sims, .row = seq_len(nrow(sims)))
+  sims <- gather(sims, key = ".draw", value = ".fitted", -.row) |>
+    mutate(.draw = as.integer(.data$.draw))
+  attr(sims, "seed") <- RNGstate
+  ## add classes
+  class(sims) <- c("fitted_samples", class(sims))
+  sims
 }
 
 #' Draw new response values from the conditional distribution of the response
@@ -343,9 +357,13 @@
 #' predicted_samples(m, n = 5, seed = 42)
 #'
 #' ## Can pass arguments to predict.gam()
-#' \dontshow{set.seed(6791)}
-#' newd <- data.frame(x0 = runif(10), x1 = runif(10), x2 = runif(10),
-#'                    x3 = runif(10))
+#' \dontshow{
+#' set.seed(6791)
+#' }
+#' newd <- data.frame(
+#'   x0 = runif(10), x1 = runif(10), x2 = runif(10),
+#'   x3 = runif(10)
+#' )
 #'
 #' ## Exclude s(x2)
 #' predicted_samples(m, n = 5, newd, exclude = "s(x2)", seed = 25)
@@ -356,17 +374,23 @@
 #' ## Select which terms --- result should be the same as previous
 #' ## but note that we have to include any parametric terms, including the
 #' ## constant term
-#' predicted_samples(m, n = 5, newd, seed = 25,
-#'                   terms = c("Intercept", "s(x0)", "s(x2)", "s(x3)"))
-#' \dontshow{options(op)}
+#' predicted_samples(m,
+#'   n = 5, newd, seed = 25,
+#'   terms = c("Intercept", "s(x0)", "s(x2)", "s(x3)")
+#' )
+#' \dontshow{
+#' options(op)
+#' }
 `predicted_samples` <- function(model, ...) {
-    UseMethod("predicted_samples")
+  UseMethod("predicted_samples")
 }
 
 #' @export
 `predicted_samples.default` <- function(model, ...) {
-    stop("Don't know how to sample from the posterior of <",
-         class(model)[[1L]], ">", .call = FALSE)
+  stop("Don't know how to sample from the posterior of <",
+    class(model)[[1L]], ">",
+    .call = FALSE
+  )
 }
 
 #' @export
@@ -375,23 +399,25 @@
 #' @importFrom tidyr gather
 `predicted_samples.gam` <- function(model, n = 1, data = newdata, seed = NULL,
                                     weights = NULL, ..., newdata = NULL) {
-    if (!is.null(newdata)) {
-        newdata_deprecated()
-    }
+  if (!is.null(newdata)) {
+    newdata_deprecated()
+  }
 
-    sims <- simulate(model, nsim = n, seed = seed, data = data,
-                     weights = weights, ...)
-    RNGstate <- attr(sims, "seed")
-    colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
-    sims <- as_tibble(sims)
-    names(sims) <- as.character(seq_len(ncol(sims)))
-    sims <- add_column(sims, .row = seq_len(nrow(sims)))
-    sims <- gather(sims, key = ".draw", value = ".response", - .row) |>
-        mutate(.draw = as.integer(.data$.draw))
-    attr(sims, "seed") <- RNGstate
-    ## add classes
-    class(sims) <- c("predicted_samples", class(sims))
-    sims
+  sims <- simulate(model,
+    nsim = n, seed = seed, data = data,
+    weights = weights, ...
+  )
+  RNGstate <- attr(sims, "seed")
+  colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
+  sims <- as_tibble(sims)
+  names(sims) <- as.character(seq_len(ncol(sims)))
+  sims <- add_column(sims, .row = seq_len(nrow(sims)))
+  sims <- gather(sims, key = ".draw", value = ".response", -.row) |>
+    mutate(.draw = as.integer(.data$.draw))
+  attr(sims, "seed") <- RNGstate
+  ## add classes
+  class(sims) <- c("predicted_samples", class(sims))
+  sims
 }
 
 #' Posterior draws for individual smooths
@@ -433,7 +459,9 @@
 #'
 #' @examples
 #' load_mgcv()
-#' \dontshow{op <- options(cli.unicode = FALSE, pillar.sigfig = 3)}
+#' \dontshow{
+#' op <- options(cli.unicode = FALSE, pillar.sigfig = 3)
+#' }
 #' dat <- data_sim("eg1", n = 400, seed = 2)
 #' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
@@ -449,7 +477,9 @@
 #' m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
 #' sms <- smooth_samples(m2, n = 5, seed = 42)
 #' draw(sms)
-#' \dontshow{options(op)}
+#' \dontshow{
+#' options(op)
+#' }
 `smooth_samples` <- function(model, ...) {
   UseMethod("smooth_samples")
 }
@@ -457,16 +487,19 @@
 #' @export
 `smooth_samples.default` <- function(model, ...) {
   stop("Don't know how to sample from the posterior of <",
-    class(model)[[1L]], ">", .call = FALSE)
+    class(model)[[1L]], ">",
+    .call = FALSE
+  )
 }
 
 #' @export
-`smooth_samples.scam` <- function(model, term = NULL, n = 1, data = newdata,
-  method = c("gaussian", "mh", "inla", "user"), seed = NULL,
-  freq = FALSE, unconditional = FALSE, n_cores = 1L, n_vals = 200,
-  burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25, rng_per_smooth = FALSE,
-  draws = NULL, mvn_method = c("mvnfast", "mgcv"), ...,
-  newdata = NULL, ncores = NULL) {
+`smooth_samples.scam` <- function(
+    model, term = NULL, n = 1, data = newdata,
+    method = c("gaussian", "mh", "inla", "user"), seed = NULL,
+    freq = FALSE, unconditional = FALSE, n_cores = 1L, n_vals = 200,
+    burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25, rng_per_smooth = FALSE,
+    draws = NULL, mvn_method = c("mvnfast", "mgcv"), ...,
+    newdata = NULL, ncores = NULL) {
   # smooth_samples begins
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     runif(1)
@@ -479,19 +512,23 @@
     RNGstate <- structure(seed, kind = as.list(RNGkind()))
     on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
   }
-  S <- smooths(model)             # vector of smooth labels - "s(x)"
-  take <- seq_along(S)            # in default case 1,2,3,..,n smooths
+  S <- smooths(model) # vector of smooth labels - "s(x)"
+  take <- seq_along(S) # in default case 1,2,3,..,n smooths
   if (!is.null(term)) {
     take <- which_smooths(model, term)
     S <- S[take]
   }
   # At least for now, don't work for random effect smooths
   # do we have ranef smooths?
-  re_sms <- vapply(get_smooths_by_id(model, take), FUN = is_re_smooth,
-    FUN.VALUE = logical(1L))
+  re_sms <- vapply(get_smooths_by_id(model, take),
+    FUN = is_re_smooth,
+    FUN.VALUE = logical(1L)
+  )
   if (any(re_sms)) {
-    message("\nRandom effect smooths not currently supported.\nIgnoring:",
-      " <", paste(S[re_sms], collapse = ", "), ">\n")
+    message(
+      "\nRandom effect smooths not currently supported.\nIgnoring:",
+      " <", paste(S[re_sms], collapse = ", "), ">\n"
+    )
     S <- S[!re_sms]
     take <- take[!re_sms]
   }
@@ -515,64 +552,79 @@
   mvn_method <- match.arg(mvn_method)
   # get posterior draws - call this once for all parameters
   if (isFALSE(rng_per_smooth)) {
-    betas <- post_draws(n = n, method = method,
+    betas <- post_draws(
+      n = n, method = method,
       n_cores = n_cores, model = model,
       burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
       index = NULL, frequentist = freq, unconditional = unconditional,
-      draws = draws, mvn_method = mvn_method)
+      draws = draws, mvn_method = mvn_method
+    )
   }
-  sims <- data_names <- vector('list', length = length(S))
+  sims <- data_names <- vector("list", length = length(S))
   for (i in seq_along(S)) {
     if (need_data) {
       # FIXME: should offset be NULL?
-      data <- smooth_data(model, id = take[i], n = n_vals,
-        offset = NULL)
+      data <- smooth_data(model,
+        id = take[i], n = n_vals,
+        offset = NULL
+      )
       # I don't think we need offset here as that really just shifts the
       # response around
     }
-      sm  <- get_smooths_by_id(model, take[i])[[1L]]
-      idx <- smooth_coef_indices(sm)
-      Xp <- PredictMat(sm, data = data)
-      # get posterior draws - use old behaviour? TRUE is yes
-      simu <- if (isTRUE(rng_per_smooth)) {
-          betas <- post_draws(n = n, method = method,
-              n_cores = n_cores, model = model,
-              burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-              index = idx, frequentist = freq, unconditional = unconditional)
-          Xp %*% t(betas)
+    sm <- get_smooths_by_id(model, take[i])[[1L]]
+    idx <- smooth_coef_indices(sm)
+    Xp <- PredictMat(sm, data = data)
+    # get posterior draws - use old behaviour? TRUE is yes
+    simu <- if (isTRUE(rng_per_smooth)) {
+      betas <- post_draws(
+        n = n, method = method,
+        n_cores = n_cores, model = model,
+        burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
+        index = idx, frequentist = freq, unconditional = unconditional
+      )
+      Xp %*% t(betas)
+    } else {
+      # In a scam model, the intercept seems to be parametrised into the
+      # smooth as PredictMat returns a constant column
+      if (isTRUE(length(idx) < ncol(Xp))) {
+        Xp[, -1, drop = FALSE] %*% t(betas[, idx, drop = FALSE])
       } else {
-          # In a scam model, the intercept seems to be parametrised into the
-          # smooth as PredictMat returns a constant column
-          if (isTRUE(length(idx) < ncol(Xp))) {
-              Xp[, -1, drop = FALSE] %*% t(betas[, idx, drop = FALSE])
-          } else {
-              Xp %*% t(betas[, idx, drop = FALSE])
-          }
+        Xp %*% t(betas[, idx, drop = FALSE])
       }
-      colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
-      simu <- as_tibble(simu)
-      nr_simu <- nrow(simu)
-      simu <- add_by_data(simu, by_name = by_variable(sm), by_data = data,
-        before = 1L)
-      # add on spline type info
-      sm_type <- smooth_type(sm)
-      simu <- add_column(simu,
-          .smooth = rep(unlist(lapply(strsplit(S[[i]], ":"), `[`, 1L)),
-          nr_simu),
-          .term = rep(S[[i]], each = nr_simu),
-          .type = rep(sm_type, nr_simu),
-          .row = seq_len(nr_simu),
-          .after = 0L)
-      simu <- bind_cols(simu, data[smooth_variable(sm)])
-      simu <- pivot_longer(simu, cols = dplyr::starts_with("..V"),
-          names_to = ".draw", values_to = ".value",
-          names_transform = \(x) as.integer(sub("\\.\\.V", "", x)))
-      simu <- relocate(simu, names(data), .after = last_col()) |>
-          relocate(".by", .after = 3L)
-      ## nest all columns with varying data
-      simu <- nest(simu, data = all_of(c(".row", ".draw", ".value",
-          vars_in_smooth(sm))))
-      sims[[i]] <- simu
+    }
+    colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
+    simu <- as_tibble(simu)
+    nr_simu <- nrow(simu)
+    simu <- add_by_data(simu,
+      by_name = by_variable(sm), by_data = data,
+      before = 1L
+    )
+    # add on spline type info
+    sm_type <- smooth_type(sm)
+    simu <- add_column(simu,
+      .smooth = rep(
+        unlist(lapply(strsplit(S[[i]], ":"), `[`, 1L)),
+        nr_simu
+      ),
+      .term = rep(S[[i]], each = nr_simu),
+      .type = rep(sm_type, nr_simu),
+      .row = seq_len(nr_simu),
+      .after = 0L
+    )
+    simu <- bind_cols(simu, data[smooth_variable(sm)])
+    simu <- pivot_longer(simu,
+      cols = dplyr::starts_with("..V"),
+      names_to = ".draw", values_to = ".value",
+      names_transform = \(x) as.integer(sub("\\.\\.V", "", x))
+    )
+    simu <- relocate(simu, names(data), .after = last_col()) |>
+      relocate(".by", .after = 3L)
+    ## nest all columns with varying data
+    simu <- nest(simu, data = all_of(c(
+      ".row", ".draw", ".value",
+      vars_in_smooth(sm)
+    )))
+    sims[[i]] <- simu
   }
 
   sims <- bind_rows(sims)
@@ -608,7 +660,8 @@
 #' @importFrom tibble as_tibble add_column
 #' @importFrom tidyr pivot_longer
 #' @importFrom mgcv PredictMat
-`smooth_samples.gam` <- function(model, term = NULL, n = 1, data = newdata,
+`smooth_samples.gam` <- function(
+    model, term = NULL, n = 1, data = newdata,
     method = c("gaussian", "mh", "inla", "user"),
     seed = NULL,
     freq = FALSE,
@@ -624,136 +677,155 @@
     ...,
     newdata = NULL,
     ncores = NULL) {
-    # smooth_samples begins
-    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-        runif(1)
+  # smooth_samples begins
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+    runif(1)
+  }
+  if (is.null(seed)) {
+    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+  } else {
+    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+    set.seed(seed)
+    RNGstate <- structure(seed, kind = as.list(RNGkind()))
+    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+  }
+
+  S <- smooths(model) # vector of smooth labels - "s(x)"
+  take <- seq_along(S) # in default case 1,2,3,..,n smooths
+  if (!is.null(term)) {
+    take <- which_smooths(model, term)
+    S <- S[take]
+  }
+
+  # At least for now, don't work for random effect smooths
+  # do we have ranef smooths?
+  re_sms <- vapply(get_smooths_by_id(model, take),
+    FUN = is_re_smooth,
+    FUN.VALUE = logical(1L)
+  )
+  if (any(re_sms)) {
+    message(
+      "\nRandom effect smooths not currently supported.\nIgnoring:",
+      " <", paste(S[re_sms], collapse = ", "), ">\n"
+    )
+    S <- S[!re_sms]
+    take <- take[!re_sms]
+  }
+
+  # do we have any remaining terms?
+  if (length(S) < 1L) {
+    stop("No smooths left that can be sampled from.")
+  }
+
+  if (!is.null(newdata)) {
+    newdata_deprecated()
+  }
+
+  if (!is.null(ncores)) {
+    message("Argument `ncores` is deprecated. Use `n_cores` instead.")
+    n_cores <- ncores
+  }
+
+  need_data <- FALSE
+  if (is.null(data)) {
+    need_data <- TRUE
+  }
+
+  # what posterior sampling are we using
+  method <- match.arg(method)
+
+  # get posterior draws - call this once for all parameters
+  if (isFALSE(rng_per_smooth)) {
+    betas <- post_draws(
+      n = n, method = method,
+      n_cores = n_cores, model = model,
+      burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
+      index = NULL, frequentist = freq, unconditional = unconditional,
+      draws = draws
+    )
+  }
+
+  sims <- data_names <- vector("list", length = length(S))
+  for (i in seq_along(S)) {
+    if (need_data) {
+      # FIXME: should offset be NULL?
+      data <- smooth_data(model,
+        id = take[i], n = n_vals,
+        offset = NULL
+      )
+      # I don't think we need offset here as that really just shifts the
+      # response around
     }
-    if (is.null(seed)) {
-        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+    sm <- get_smooths_by_id(model, take[i])[[1L]]
+    idx <- smooth_coef_indices(sm)
+    Xp <- PredictMat(sm, data = data)
+    # get posterior draws - use old behaviour? TRUE is yes
+    simu <- if (isTRUE(rng_per_smooth)) {
+      betas <- post_draws(
+        n = n, method = method,
+        n_cores = n_cores, model = model,
+        burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
+        index = idx, frequentist = freq, unconditional = unconditional
+      )
+      Xp %*% t(betas)
     } else {
-        R.seed <- get(".Random.seed", envir = .GlobalEnv)
-        set.seed(seed)
-        RNGstate <- structure(seed, kind = as.list(RNGkind()))
-        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+      Xp %*% t(betas[, idx, drop = FALSE])
     }
+    colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
+    simu <- as_tibble(simu)
+    nr_simu <- nrow(simu)
+    # is_fac_by <- is_factor_by_smooth(sm)
+    # if (is_fac_by)) {
+    #     simu <- add_factor_by_data(simu, n = n_vals,
+    #                                by_name = by_variable(sm),
+    #                                by_data = data, before = 1L)
+    # } else {
+    #     simu <- add_by_var_column(simu, n = nr_simu,
+    #         by_var = by_variable(sm))
+    # }
+    simu <- add_by_data(simu,
+      by_name = by_variable(sm), by_data = data,
+      before = 1L
+    )
+    # add on spline type info
+    sm_type <- smooth_type(sm)
+    simu <- add_column(simu,
+      .smooth = rep(
+        unlist(lapply(strsplit(S[[i]], ":"), `[`, 1L)),
+        nr_simu
+      ),
+      .term = rep(S[[i]], each = nr_simu),
+      .type = rep(sm_type, nr_simu),
+      .row = seq_len(nr_simu),
+      .after = 0L
+    )
+    simu <- bind_cols(simu, data[smooth_variable(sm)])
+    simu <- pivot_longer(simu,
+      cols = dplyr::starts_with("..V"),
+      names_to = ".draw", values_to = ".value",
+      names_transform = \(x) as.integer(sub("\\.\\.V", "", x))
+    )
+    simu <- relocate(simu, names(data), .after = last_col()) |>
+      relocate(".by", .after = 3L)
+    ## nest all columns with varying data
+    simu <- nest(simu, data = all_of(c(
+      ".row", ".draw", ".value",
+      vars_in_smooth(sm)
+    )))
+    sims[[i]] <- simu
+  }
 
-    S <- smooths(model)             # vector of smooth labels - "s(x)"
-    take <- seq_along(S)            # in default case 1,2,3,..,n smooths
-    if (!is.null(term)) {
-        take <- which_smooths(model, term)
-        S <- S[take]
-    }
-
-    # At least for now, don't work for random effect smooths
-    # do we have ranef smooths?
-    re_sms <- vapply(get_smooths_by_id(model, take), FUN = is_re_smooth,
-                     FUN.VALUE = logical(1L))
-    if (any(re_sms)) {
-        message("\nRandom effect smooths not currently supported.\nIgnoring:",
-                " <", paste(S[re_sms], collapse = ", "), ">\n")
-        S <- S[!re_sms]
-        take <- take[!re_sms]
-    }
-
-    # do we have any remaining terms?
-    if (length(S) < 1L) {
-        stop("No smooths left that can be sampled from.")
-    }
-
-    if (!is.null(newdata)) {
-        newdata_deprecated()
-    }
-
-    if (!is.null(ncores)) {
-        message("Argument `ncores` is deprecated. Use `n_cores` instead.")
-        n_cores <- ncores
-    }
-
-    need_data <- FALSE
-    if (is.null(data)) {
-        need_data <- TRUE
-    }
-
-    # what posterior sampling are we using
-    method <- match.arg(method)
-
-    # get posterior draws - call this once for all parameters
-    if (isFALSE(rng_per_smooth)) {
-        betas <- post_draws(n = n, method = method,
-            n_cores = n_cores, model = model,
-            burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-            index = NULL, frequentist = freq, unconditional = unconditional,
-            draws = draws)
-    }
-
-    sims <- data_names <- vector('list', length = length(S))
-    for (i in seq_along(S)) {
-        if (need_data) {
-            # FIXME: should offset be NULL?
-            data <- smooth_data(model, id = take[i], n = n_vals,
-                                offset = NULL)
-            # I don't think we need offset here as that really just shifts the
-            # response around
-        }
-        sm  <- get_smooths_by_id(model, take[i])[[1L]]
-        idx <- smooth_coef_indices(sm)
-        Xp <- PredictMat(sm, data = data)
-        # get posterior draws - use old behaviour? TRUE is yes
-        simu <- if (isTRUE(rng_per_smooth)) {
-            betas <- post_draws(n = n, method = method,
-                n_cores = n_cores, model = model,
-                burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-                index = idx, frequentist = freq, unconditional = unconditional)
-            Xp %*% t(betas)
-        } else {
-            Xp %*% t(betas[, idx, drop = FALSE])
-        }
-        colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
-        simu <- as_tibble(simu)
-        nr_simu <- nrow(simu)
-        #is_fac_by <- is_factor_by_smooth(sm)
-        # if (is_fac_by)) {
-        #     simu <- add_factor_by_data(simu, n = n_vals,
-        #                                by_name = by_variable(sm),
-        #                                by_data = data, before = 1L)
-        # } else {
-        #     simu <- add_by_var_column(simu, n = nr_simu,
-        #         by_var = by_variable(sm))
-        # }
-        simu <- add_by_data(simu, by_name = by_variable(sm), by_data = data,
-            before = 1L)
-        # add on spline type info
-        sm_type <- smooth_type(sm)
-        simu <- add_column(simu,
-            .smooth = rep(unlist(lapply(strsplit(S[[i]], ":"), `[`, 1L)),
-            nr_simu),
-            .term = rep(S[[i]], each = nr_simu),
-            .type = rep(sm_type, nr_simu),
-            .row = seq_len(nr_simu),
-            .after = 0L)
-        simu <- bind_cols(simu, data[smooth_variable(sm)])
-        simu <- pivot_longer(simu, cols = dplyr::starts_with("..V"),
-            names_to = ".draw", values_to = ".value",
-            names_transform = \(x) as.integer(sub("\\.\\.V", "", x)))
-        simu <- relocate(simu, names(data), .after = last_col()) |>
-            relocate(".by", .after = 3L)
-        ## nest all columns with varying data
-        simu <- nest(simu, data = all_of(c(".row", ".draw", ".value",
-            vars_in_smooth(sm))))
-        sims[[i]] <- simu
-    }
-
-    sims <- bind_rows(sims)
-    sims <- unnest(sims, all_of("data"))
-    attr(sims, "seed") <- RNGstate
-    ## add classes
-    class(sims) <- c("smooth_samples", class(sims))
-    sims
+  sims <- bind_rows(sims)
+  sims <- unnest(sims, all_of("data"))
+  attr(sims, "seed") <- RNGstate
+  ## add classes
+  class(sims) <- c("smooth_samples", class(sims))
+  sims
 }
 
 #' @export
 `smooth_samples.gamm` <- function(model, ...) {
-    smooth_samples(model$gam)
+  smooth_samples(model$gam)
 }
 
 #' @title Posterior expectations of derivatives from an estimated model
@@ -765,24 +837,25 @@
 #'
 #' @export
 `derivative_samples` <- function(object, ...) {
-    UseMethod("derivative_samples")
+  UseMethod("derivative_samples")
 }
 
 #' @rdname derivative_samples
 #' @export
 `derivative_samples.default` <- function(object, ...) {
-    ## want to bail with a useful error;
-    ## see Jenny Bryan's Code Smells UseR 2018 talk: rstd.io/code-smells
-    stop("Don't know how to calculate response derivatives for <",
-         class(object)[[1L]], ">",
-         call. = FALSE)           # don't show the call, simpler error
+  ## want to bail with a useful error;
+  ## see Jenny Bryan's Code Smells UseR 2018 talk: rstd.io/code-smells
+  stop("Don't know how to calculate response derivatives for <",
+    class(object)[[1L]], ">",
+    call. = FALSE
+  ) # don't show the call, simpler error
 }
 
 #' @rdname derivative_samples
 #'
 #' @export
 `derivative_samples.gamm` <- function(object, ...) {
-    derivative_samples(object[["gam"]], ...)
+  derivative_samples(object[["gam"]], ...)
 }
 
 #' @param envir the environment within which to recreate the data used to fit
@@ -808,25 +881,29 @@
 #'
 #' # fit the GAM (note: for execution time reasons using bam())
 #' m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-#'     data = df, family = nb(), method = "fREML", discrete = TRUE)
+#'   data = df, family = nb(), method = "fREML", discrete = TRUE
+#' )
 #'
 #' # data slice through data along x2 - all other covariates will be set to
 #' # typical values (value closest to median)
 #' ds <- data_slice(m, x2 = evenly(x2, n = 200))
 #'
 #' # samples from posterior of derivatives
-#' fd_samp <- derivative_samples(m, data = ds, type = "central",
-#'     focal = "x2", eps = 0.01, seed = 21, n_sim = 100)
+#' fd_samp <- derivative_samples(m,
+#'   data = ds, type = "central",
+#'   focal = "x2", eps = 0.01, seed = 21, n_sim = 100
+#' )
 #'
 #' # plot the first 20 posterior draws
 #' if (requireNamespace("ggplot2") && requireNamespace("dplyr")) {
-#'     library("ggplot2")
-#'     fd_samp |>
-#'         dplyr::filter(.draw <= 20) |>
-#'         ggplot(aes(x = x2, y = .derivative, group = .draw)) +
-#'         geom_line(alpha = 0.5)
+#'   library("ggplot2")
+#'   fd_samp |>
+#'     dplyr::filter(.draw <= 20) |>
+#'     ggplot(aes(x = x2, y = .derivative, group = .draw)) +
+#'     geom_line(alpha = 0.5)
 #' }
-`derivative_samples.gam` <- function(object,
+`derivative_samples.gam` <- function(
+    object,
     focal = NULL,
     data = NULL,
     order = 1L,
@@ -840,75 +917,84 @@
     envir = environment(formula(object)),
     draws = NULL,
     ...) {
-    ## handle seed
-    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-        runif(1)
-    }
-    if (is.null(seed)) {
-        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-    } else {
-        R.seed <- get(".Random.seed", envir = .GlobalEnv)
-        set.seed(seed)
-        RNGstate <- structure(seed, kind = as.list(RNGkind()))
-        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-    }
-    ## handle type
-    type <- match.arg(type)
-    ## handle method
-    method <- match.arg(method)
-    ## handle scale
-    scale <- match.arg(scale)
+  ## handle seed
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+    runif(1)
+  }
+  if (is.null(seed)) {
+    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+  } else {
+    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+    set.seed(seed)
+    RNGstate <- structure(seed, kind = as.list(RNGkind()))
+    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+  }
+  ## handle type
+  type <- match.arg(type)
+  ## handle method
+  method <- match.arg(method)
+  ## handle scale
+  scale <- match.arg(scale)
 
-    ## handle order
-    if (!order %in% c(1L, 2L)) {
-        stop("Only 1st or 2nd order partial derivatives are supported: ",
-            "`order %in% c(1,2)`")
-    }
+  ## handle order
+  if (!order %in% c(1L, 2L)) {
+    stop(
+      "Only 1st or 2nd order partial derivatives are supported: ",
+      "`order %in% c(1,2)`"
+    )
+  }
 
-    ## handle data
-    need_data <- is.null(data)
+  ## handle data
+  need_data <- is.null(data)
 
-    ## handle focal
-    if (is.null(focal)) {
-        stop("Argument 'focal' must be supplied.")
-    }
+  ## handle focal
+  if (is.null(focal)) {
+    stop("Argument 'focal' must be supplied.")
+  }
 
-    ## sort out data
-    if (need_data) {
-        x <- object$var.summary[[focal]]
-        x <- seq(x[1L], x[3L], length = n)
-        tv <- typical_values(object, vars = !matches(focal), data = data,
-            envir = envir)
-        data <- expand_grid(.x = x, tv)
-    } else {
-        data <- data |>
-        select(all_of(model_vars(object))) |>
-            rename(.x = all_of({{ focal }}))
-    }
+  ## sort out data
+  if (need_data) {
+    x <- object$var.summary[[focal]]
+    x <- seq(x[1L], x[3L], length = n)
+    tv <- typical_values(object,
+      vars = !matches(focal), data = data,
+      envir = envir
+    )
+    data <- expand_grid(.x = x, tv)
+  } else {
     data <- data |>
-        add_column(.row = seq_len(nrow(data)), .before = 1L)
+      select(all_of(model_vars(object))) |>
+      rename(.x = all_of({{ focal }}))
+  }
+  data <- data |>
+    add_column(.row = seq_len(nrow(data)), .before = 1L)
 
-    # now shift values depending on method
-    fd_data <- prepare_fdiff_data(data = data, eps = eps, type = type,
-        order = order, focal = focal)
+  # now shift values depending on method
+  fd_data <- prepare_fdiff_data(
+    data = data, eps = eps, type = type,
+    order = order, focal = focal
+  )
 
-    ## compute posterior draws of E(y) (on response scale)
-    fs <- fitted_samples(model = object, n = n_sim, data = fd_data,
-        method = method, seed = seed, draws = draws, ...)
+  ## compute posterior draws of E(y) (on response scale)
+  fs <- fitted_samples(
+    model = object, n = n_sim, data = fd_data,
+    method = method, seed = seed, draws = draws, ...
+  )
 
-    fs <- fs |>
-        left_join(select(fd_data, all_of(c(".row", "..type", "..orig"))),
-            by = ".row")
+  fs <- fs |>
+    left_join(select(fd_data, all_of(c(".row", "..type", "..orig"))),
+      by = ".row"
+    )
 
-    yd <- compute_y_fdiff(fs, order = order, type = type, eps = eps)
+  yd <- compute_y_fdiff(fs, order = order, type = type, eps = eps)
 
-    yd <- yd |>
-        left_join(data, by = join_by("..orig" == ".row")) |>
-        rename("{focal}" := ".x", ".derivative" = "..fd", ".row" = "..orig") |>
-        select(!matches(c("..xf", "..xb", "..x"))) |>
-        add_column(.focal = rep(focal, nrow(data) * n_sim), .before = 1L) |>
-        relocate(".row", .before = 1L)
+  yd <- yd |>
+    left_join(data, by = join_by("..orig" == ".row")) |>
+    rename("{focal}" := ".x", ".derivative" = "..fd", ".row" = "..orig") |>
+    select(!matches(c("..xf", "..xb", "..x"))) |>
+    add_column(.focal = rep(focal, nrow(data) * n_sim), .before = 1L) |>
+    relocate(".row", .before = 1L)
 
-    class(yd) <- append(class(yd), "derivative_samples", after = 0L)
-    yd
+  class(yd) <- append(class(yd), "derivative_samples", after = 0L)
+  yd
 }

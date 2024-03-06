@@ -7,24 +7,25 @@
 #'
 #' @export
 `derivatives` <- function(object, ...) {
-    UseMethod("derivatives")
+  UseMethod("derivatives")
 }
 
 #' @rdname derivatives
 #' @export
 `derivatives.default` <- function(object, ...) {
-    ## want to bail with a useful error;
-    ## see Jenny Bryan's Code Smells UseR 2018 talk: rstd.io/code-smells
-    stop("Don't know how to calculate derivatives for <",
-         class(object)[[1L]], ">",
-         call. = FALSE)           # don't show the call, simpler error
+  ## want to bail with a useful error;
+  ## see Jenny Bryan's Code Smells UseR 2018 talk: rstd.io/code-smells
+  stop("Don't know how to calculate derivatives for <",
+    class(object)[[1L]], ">",
+    call. = FALSE
+  ) # don't show the call, simpler error
 }
 
 #' @rdname derivatives
 #'
 #' @export
 `derivatives.gamm` <- function(object, ...) {
-    derivatives(object[["gam"]], ...)
+  derivatives(object[["gam"]], ...)
 }
 
 #' @param term character; vector of one or more smooth terms for which
@@ -108,371 +109,397 @@
                               unconditional = FALSE, frequentist = FALSE,
                               offset = NULL, ncores = 1,
                               partial_match = FALSE, ..., newdata = NULL) {
-    ## handle term
-    smooth_ids <- if (!missing(term)) {
-        ## which smooths match 'term'
-        sms <- check_user_select_smooths(smooths(object), term,
-                                         partial_match = partial_match)
-        ## need to skip random effect smooths
-        take <- vapply(object$smooth[sms], smooth_type , character(1)) %in%
-          "Random effect"
-        sms[take] <- FALSE
-        which(sms)
+  ## handle term
+  smooth_ids <- if (!missing(term)) {
+    ## which smooths match 'term'
+    sms <- check_user_select_smooths(smooths(object), term,
+      partial_match = partial_match
+    )
+    ## need to skip random effect smooths
+    take <- vapply(object$smooth[sms], smooth_type, character(1)) %in%
+      "Random effect"
+    sms[take] <- FALSE
+    which(sms)
+  } else {
+    s <- seq_len(n_smooths(object))
+    ## need to skip random effect smooths
+    take <- vapply(
+      object$smooth, smooth_type,
+      character(1)
+    ) %in% "Random effect"
+    s[!take]
+  }
+
+  ## handle type
+  type <- match.arg(type)
+
+  ## handle order
+  if (!order %in% c(1L, 2L)) {
+    stop("Only 1st or 2nd derivatives are supported: `order %in% c(1,2)`")
+  }
+
+  if (!is.null(newdata)) {
+    newdata_deprecated()
+  }
+
+  ## handle data
+  need_data <- FALSE
+  if (is.null(data)) {
+    need_data <- TRUE
+  }
+
+  ## handle interval
+  interval <- match.arg(interval)
+
+  ## get the required covariance matrix
+  Vb <- get_vcov(object,
+    unconditional = unconditional,
+    frequentist = frequentist
+  )
+  ## extract model coefs
+  betas <- coef(object)
+
+  ## how many smooths need working on
+  ns <- length(smooth_ids)
+  result <- vector(mode = "list", length = ns)
+
+  ## loop over the smooths and compute derivatives from finite differences
+  for (i in seq_along(smooth_ids)) {
+    ## generate data if not supplied
+    if (need_data) {
+      newd <- derivative_data(object,
+        id = smooth_ids[[i]], n = n,
+        offset = offset, order = order,
+        type = type, eps = eps
+      )
     } else {
-        s <- seq_len(n_smooths(object))
-        ## need to skip random effect smooths
-        take <- vapply(object$smooth, smooth_type,
-                         character(1)) %in% "Random effect"
-        s[!take]
+      ## assume the data are OK - mgcv::predict will catch issues
+      newd <- data
+      ## ...but we need to handle factor by
+      sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1]]
+      if (is_factor_by_smooth(sm)) {
+        newd <- filter(newd, data[[by_variable(sm)]] == by_level(sm))
+      }
     }
 
-    ## handle type
-    type <- match.arg(type)
+    # generate list of finite difference predictions for the first or second
+    #   derivatives or the required type
+    fd <- finite_diff_lpmatrix(object,
+      type = type, order = order,
+      data = newd, h = eps
+    )
 
-    ## handle order
-    if (!order %in% c(1L, 2L)) {
-        stop("Only 1st or 2nd derivatives are supported: `order %in% c(1,2)`")
+    ## compute the finite differences
+    X <- finite_difference(fd, order, type, eps)
+
+    ## compute derivatives
+    d <- compute_derivative(smooth_ids[[i]],
+      lpmatrix = X, betas = betas,
+      Vb = Vb, model = object, data = newd
+    )
+
+    ## compute intervals
+    if (identical(interval, "confidence")) {
+      result[[i]] <- derivative_pointwise_int(d[["deriv"]],
+        level = level,
+        distrib = "normal"
+      )
+    } else {
+      result[[i]] <- derivative_simultaneous_int(d[["deriv"]], d[["Xi"]],
+        level = level, Vb = Vb,
+        n_sim = n_sim,
+        ncores = ncores
+      )
     }
+  }
 
-    if (!is.null(newdata)) {
-        newdata_deprecated()
-    }
+  ## results in a list of tibbles that we need to bind row-wise
+  result <- bind_rows(result)
 
-    ## handle data
-    need_data <- FALSE
-    if (is.null(data)) {
-        need_data <- TRUE
-    }
+  ## reorder the columns
+  result <- result |>
+    relocate(any_of(c(
+      ".smooth", ".var", ".by", ".fs",
+      ".derivative", ".se", ".crit", ".lower_ci", ".upper_ci"
+    )), .before = 1) # |>
+  # relocate(all_of(c(".derivative", ".se", ".crit", ".lower_ci",
+  #    ".upper_ci")), .after = last_col())
 
-    ## handle interval
-    interval <- match.arg(interval)
-
-    ## get the required covariance matrix
-    Vb <- get_vcov(object, unconditional = unconditional,
-                   frequentist = frequentist)
-    ## extract model coefs
-    betas <- coef(object)
-
-    ## how many smooths need working on
-    ns <- length(smooth_ids)
-    result <- vector(mode = "list", length = ns)
-
-    ## loop over the smooths and compute derivatives from finite differences
-    for (i in seq_along(smooth_ids)) {
-        ## generate data if not supplied
-        if (need_data) {
-            newd <- derivative_data(object, id = smooth_ids[[i]], n = n,
-                                    offset = offset, order = order,
-                                    type = type, eps = eps)
-        } else {
-            ## assume the data are OK - mgcv::predict will catch issues
-            newd <- data
-            ## ...but we need to handle factor by
-            sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1]]
-            if (is_factor_by_smooth(sm)) {
-                newd <- filter(newd, data[[by_variable(sm)]] == by_level(sm))
-            }
-        }
-
-        # generate list of finite difference predictions for the first or second
-        #   derivatives or the required type
-        fd <- finite_diff_lpmatrix(object, type = type, order = order,
-                                   data = newd, h = eps)
-
-        ## compute the finite differences
-        X <- finite_difference(fd, order, type, eps)
-
-        ## compute derivatives
-        d <- compute_derivative(smooth_ids[[i]], lpmatrix = X, betas = betas,
-                                Vb = Vb, model = object, data = newd)
-
-        ## compute intervals
-        if (identical(interval, "confidence")) {
-            result[[i]] <- derivative_pointwise_int(d[["deriv"]], level = level,
-                                                    distrib = "normal")
-        } else {
-            result[[i]] <- derivative_simultaneous_int(d[["deriv"]], d[["Xi"]],
-                                                       level = level, Vb = Vb,
-                                                       n_sim = n_sim,
-                                                       ncores = ncores)
-        }
-    }
-
-    ## results in a list of tibbles that we need to bind row-wise
-    result <- bind_rows(result)
-
-    ## reorder the columns
-    result <- result |>
-        relocate(any_of(c(".smooth", ".var", ".by", ".fs",
-        ".derivative", ".se", ".crit", ".lower_ci", ".upper_ci")), .before = 1) # |>
-        #relocate(all_of(c(".derivative", ".se", ".crit", ".lower_ci",
-        #    ".upper_ci")), .after = last_col())
-
-    class(result) <- c("derivatives", class(result)) # add class
-    result                                           # return
+  class(result) <- c("derivatives", class(result)) # add class
+  result # return
 }
 
 #' @importFrom tibble add_column
 `derivative_pointwise_int` <- function(x, level, distrib = c("normal", "t"),
                                        df) {
-    distrib <- match.arg(distrib)
-    crit <- if (distrib == "normal") {
-        coverage_normal(level = level)
-    } else{
-        coverage_t(level = level, df = df)
-    }
-    adj <- (crit * x[[".se"]])
-    derivative <- add_column(x,
-                             .crit  = rep(crit, nrow(x)),
-                             .lower_ci = x[[".derivative"]] - adj,
-                             .upper_ci = x[[".derivative"]] + adj)
-    derivative
+  distrib <- match.arg(distrib)
+  crit <- if (distrib == "normal") {
+    coverage_normal(level = level)
+  } else {
+    coverage_t(level = level, df = df)
+  }
+  adj <- (crit * x[[".se"]])
+  derivative <- add_column(x,
+    .crit = rep(crit, nrow(x)),
+    .lower_ci = x[[".derivative"]] - adj,
+    .upper_ci = x[[".derivative"]] + adj
+  )
+  derivative
 }
 
 #' @importFrom tibble add_column
 #' @importFrom stats quantile
 #' @importFrom mvnfast rmvn
 `derivative_simultaneous_int` <- function(x, Xi, level, Vb, n_sim, ncores) {
-    ## simulate un-biased deviations given bayesian covariance matrix
-    buDiff <- mvnfast::rmvn(n = n_sim, mu = rep(0, nrow(Vb)), sigma = Vb,
-        ncores = ncores)
-    # simulate deviations from expected
-    simDev <- tcrossprod(Xi, buDiff) # Xi %*% t(bu)
-    absDev <- abs(sweep(simDev, 1L, x[[".se"]], FUN = "/")) # absolute deviations
-    masd <- apply(absDev, 2L, max)  # & max abs deviation per sim
-    ## simultaneous interval critical value
-    crit <- quantile(masd, prob = level, type = 8)
-    adj <- (crit * x[[".se"]])
-    derivative <- add_column(x,
-                             .crit  = rep(crit, nrow(x)),
-                             .lower_ci = x[[".derivative"]] - adj,
-                             .upper_ci = x[[".derivative"]] + adj)
-    derivative
+  ## simulate un-biased deviations given bayesian covariance matrix
+  buDiff <- mvnfast::rmvn(
+    n = n_sim, mu = rep(0, nrow(Vb)), sigma = Vb,
+    ncores = ncores
+  )
+  # simulate deviations from expected
+  simDev <- tcrossprod(Xi, buDiff) # Xi %*% t(bu)
+  absDev <- abs(sweep(simDev, 1L, x[[".se"]], FUN = "/")) # absolute deviations
+  masd <- apply(absDev, 2L, max) # & max abs deviation per sim
+  ## simultaneous interval critical value
+  crit <- quantile(masd, prob = level, type = 8)
+  adj <- (crit * x[[".se"]])
+  derivative <- add_column(x,
+    .crit = rep(crit, nrow(x)),
+    .lower_ci = x[[".derivative"]] - adj,
+    .upper_ci = x[[".derivative"]] + adj
+  )
+  derivative
 }
 
 ## fd is a list of predicted values returned by the various foo_finite_diffX
 ## functions below
 `finite_difference` <- function(fd, order, type, eps) {
-    if (isTRUE(order == 1L)) {
-        xf <- fd[["xf"]]
-        xb <- fd[["xb"]]
-        X  <- (xf - xb) / eps
-    } else {
-        xf <- fd[["xf"]]
-        xb <- fd[["xb"]]
-        x  <- fd[["x"]]
-        X  <- switch(type,
-                     forward  = (xb - (2*xf) + x) / eps^2,
-                     backward = (x - (2*xf) + xb) / eps^2,
-                     central  = (xf - (2*x) + xb) / eps^2)
-    }
+  if (isTRUE(order == 1L)) {
+    xf <- fd[["xf"]]
+    xb <- fd[["xb"]]
+    X <- (xf - xb) / eps
+  } else {
+    xf <- fd[["xf"]]
+    xb <- fd[["xb"]]
+    x <- fd[["x"]]
+    X <- switch(type,
+      forward  = (xb - (2 * xf) + x) / eps^2,
+      backward = (x - (2 * xf) + xb) / eps^2,
+      central  = (xf - (2 * x) + xb) / eps^2
+    )
+  }
 
-    X
+  X
 }
 
 #' @importFrom rlang eval_tidy parse_expr
 #' @importFrom tibble tibble
-`compute_derivative` <- function(id, lpmatrix, betas, Vb, model, data,
+`compute_derivative` <- function(
+    id, lpmatrix, betas, Vb, model, data,
     focal = NULL) {
+  sm <- get_smooths_by_id(model, id)[[1L]]
+  sm_var <- smooth_variable(sm)
+  if (!is.null(focal)) {
+    # fix the focal variable
+    sm_var <- sm_var[sm_var == focal]
+  }
+  by_var <- by_variable(sm)
+  ## handle fs smooths
+  fs_var <- NULL
+  if (is_fs_smooth(sm)) {
+    fs_var <- sm_var[-1L]
+    sm_var <- sm_var[1L]
+  }
+  sm_lab <- smooth_label(sm)
+  want <- grep(sm_lab, colnames(lpmatrix), fixed = TRUE)
+  Xi <- lpmatrix * 0 # zero out the Xp matrix
+  Xi[, want] <- lpmatrix[, want] # copy bits of Xp we need
+  d <- drop(Xi %*% betas) # estimate derivative
+  se <- rowSums(Xi %*% Vb * Xi)^0.5 # standard errors
+  ## build return tibble
+  deriv <- tibble(
+    .smooth = rep(sm_lab, length(d)),
+    # .var = rep(sm_var, length(d)),
+    {{ sm_var }} := eval_tidy(parse_expr(sm_var), data = data),
+    # .data = eval_tidy(parse_expr(sm_var), data = data),
+    .derivative = d,
+    .se = se
+  )
+  fs_var <- if (is.null(fs_var)) {
+    rep(NA_character_, nrow(deriv))
+  } else {
+    data[[fs_var]]
+  }
+  deriv <- add_column(deriv, .fs = fs_var, .after = 2L)
 
-    sm <- get_smooths_by_id(model, id)[[1L]]
-    sm_var <- smooth_variable(sm)
-    if (!is.null(focal)) {
-        # fix the focal variable
-        sm_var <- sm_var[sm_var == focal]
-    }
-    by_var <- by_variable(sm)
-    ## handle fs smooths
-    fs_var <- NULL
-    if (is_fs_smooth(sm)) {
-        fs_var <- sm_var[-1L]
-        sm_var <- sm_var[1L]
-    }
-    sm_lab <- smooth_label(sm)
-    want <- grep(sm_lab, colnames(lpmatrix), fixed = TRUE)
-    Xi <- lpmatrix * 0                  # zero out the Xp matrix
-    Xi[, want] <- lpmatrix[, want]      # copy bits of Xp we need
-    d <- drop(Xi %*% betas)             # estimate derivative
-    se <- rowSums(Xi %*% Vb * Xi)^0.5   # standard errors
-    ## build return tibble
-    deriv <- tibble(.smooth = rep(sm_lab, length(d)),
-                    #.var = rep(sm_var, length(d)),
-                    {{ sm_var }} := eval_tidy(parse_expr(sm_var), data = data),
-                    # .data = eval_tidy(parse_expr(sm_var), data = data),
-                    .derivative = d,
-                    .se = se)
-    fs_var <- if (is.null(fs_var)) {
-        rep(NA_character_, nrow(deriv))
-    } else {
-        data[[fs_var]]
-    }
-    deriv <- add_column(deriv, .fs = fs_var, .after = 2L)
-
-    by_var <- if (by_var == "NA"){
-        rep(NA_character_, nrow(deriv))
-    } else {
-        deriv <- add_column(deriv, {{ by_var }} := data[[by_var]],
-                            .after = 2L)
-        rep(by_var, nrow(deriv))
-    }
-    deriv <- add_column(deriv, .by = by_var, .after = 2L)
-    result <- list(deriv = deriv, Xi = Xi)
-    result
+  by_var <- if (by_var == "NA") {
+    rep(NA_character_, nrow(deriv))
+  } else {
+    deriv <- add_column(deriv, {{ by_var }} := data[[by_var]],
+      .after = 2L
+    )
+    rep(by_var, nrow(deriv))
+  }
+  deriv <- add_column(deriv, .by = by_var, .after = 2L)
+  result <- list(deriv = deriv, Xi = Xi)
+  result
 }
 
-`finite_diff_lpmatrix` <- function(object, type, order, data = NULL, h = 1e-7,
+`finite_diff_lpmatrix` <- function(
+    object, type, order, data = NULL, h = 1e-7,
     focal = NULL) {
-    result <- if (order == 1L) {
-        switch(type,
-               forward  = forward_finite_diff1(object, data, h, focal = focal),
-               backward = backward_finite_diff1(object, data, h, focal = focal),
-               central  = central_finite_diff1(object, data, h, focal = focal))
-    } else {
-        switch(type,
-               forward  = forward_finite_diff2(object, data, h, focal = focal),
-               backward = backward_finite_diff2(object, data, h, focal = focal),
-               central  = central_finite_diff2(object, data, h, focal = focal))
+  result <- if (order == 1L) {
+    switch(type,
+      forward  = forward_finite_diff1(object, data, h, focal = focal),
+      backward = backward_finite_diff1(object, data, h, focal = focal),
+      central  = central_finite_diff1(object, data, h, focal = focal)
+    )
+  } else {
+    switch(type,
+      forward  = forward_finite_diff2(object, data, h, focal = focal),
+      backward = backward_finite_diff2(object, data, h, focal = focal),
+      central  = central_finite_diff2(object, data, h, focal = focal)
+    )
+  }
 
-    }
-
-    result
+  result
 }
 
 `forward_finite_diff1` <- function(model, data, h = 1e-7, focal = NULL) {
-    ## need to exclude anything not numeric (from R's point of view)
-    ## negate result as TRUE == numeric and we want opposite
-    ind <- !is_numeric_var(data) # exclude non numerics
-    if (all(ind)) {
-        stop("Can't compute finite differences for all non-numeric data.")
-    }
+  ## need to exclude anything not numeric (from R's point of view)
+  ## negate result as TRUE == numeric and we want opposite
+  ind <- !is_numeric_var(data) # exclude non numerics
+  if (all(ind)) {
+    stop("Can't compute finite differences for all non-numeric data.")
+  }
 
-    ## create data2 as data + h - negate ind as TRUE == numeric
-    data2 <- shift_values(data, h = h, i = ind, FUN = `+`, focal = focal)
+  ## create data2 as data + h - negate ind as TRUE == numeric
+  data2 <- shift_values(data, h = h, i = ind, FUN = `+`, focal = focal)
 
-    ## predict for x
-    x0 <- predict(model, data, type = "lpmatrix")
+  ## predict for x
+  x0 <- predict(model, data, type = "lpmatrix")
 
-    ## predict for x + h
-    x1 <- predict(model, data2, type = "lpmatrix")
+  ## predict for x + h
+  x1 <- predict(model, data2, type = "lpmatrix")
 
-    list(xf = x1, xb = x0)
+  list(xf = x1, xb = x0)
 }
 
 `backward_finite_diff1` <- function(model, data, h = 1e-7, focal = NULL) {
-    ## need to exclude anything not numeric (from R's point of view)
-    ## negate result as TRUE == numeric and we want opposite
-    ind <- !is_numeric_var(data) # exclude non numerics
-    if (all(ind)) {
-        stop("Can't compute finite differences for all non-numeric data.")
-    }
+  ## need to exclude anything not numeric (from R's point of view)
+  ## negate result as TRUE == numeric and we want opposite
+  ind <- !is_numeric_var(data) # exclude non numerics
+  if (all(ind)) {
+    stop("Can't compute finite differences for all non-numeric data.")
+  }
 
-    ## create data2 as data - h
-    data2 <- shift_values(data, h = h, i = ind, FUN = `-`, focal = focal)
+  ## create data2 as data - h
+  data2 <- shift_values(data, h = h, i = ind, FUN = `-`, focal = focal)
 
-    ## predict for x
-    x0 <- predict(model, data, type = "lpmatrix")
+  ## predict for x
+  x0 <- predict(model, data, type = "lpmatrix")
 
-    ## predict for x - h
-    x1 <- predict(model, data2, type = "lpmatrix")
+  ## predict for x - h
+  x1 <- predict(model, data2, type = "lpmatrix")
 
-    list(xf = x0, xb = x1)              # intentionally flipped order
+  list(xf = x0, xb = x1) # intentionally flipped order
 }
 
 `central_finite_diff1` <- function(model, data, h = 1e-7, focal = NULL) {
-    ## need to exclude anything not numeric (from R's point of view)
-    ## negate result as TRUE == numeric and we want opposite
-    ind <- !is_numeric_var(data) # exclude non numerics
-    if (all(ind)) {
-        stop("Can't compute finite differences for all non-numeric data.")
-    }
+  ## need to exclude anything not numeric (from R's point of view)
+  ## negate result as TRUE == numeric and we want opposite
+  ind <- !is_numeric_var(data) # exclude non numerics
+  if (all(ind)) {
+    stop("Can't compute finite differences for all non-numeric data.")
+  }
 
-    ## create data as data + 0.5h
-    data1 <- shift_values(data, h = h/2, i = ind, FUN = `+`, focal = focal)
-    ## create data2 as data - 0.5h
-    data2 <- shift_values(data, h = h/2, i = ind, FUN = `-`, focal = focal)
+  ## create data as data + 0.5h
+  data1 <- shift_values(data, h = h / 2, i = ind, FUN = `+`, focal = focal)
+  ## create data2 as data - 0.5h
+  data2 <- shift_values(data, h = h / 2, i = ind, FUN = `-`, focal = focal)
 
-    ## predict for x + 0.5h
-    x0 <- predict(model, data1, type = "lpmatrix")
+  ## predict for x + 0.5h
+  x0 <- predict(model, data1, type = "lpmatrix")
 
-    ## predict for x - 0.5h
-    x1 <- predict(model, data2, type = "lpmatrix")
+  ## predict for x - 0.5h
+  x1 <- predict(model, data2, type = "lpmatrix")
 
-    list(xf = x0, xb = x1)
+  list(xf = x0, xb = x1)
 }
 
 `forward_finite_diff2` <- function(model, data, h = 1e-7, focal = NULL) {
-    ## need to exclude anything not numeric (from R's point of view)
-    ## negate result as TRUE == numeric and we want opposite
-    ind <- !is_numeric_var(data) # exclude non numerics
-    if (all(ind)) {
-        stop("Can't compute finite differences for all non-numeric data.")
-    }
+  ## need to exclude anything not numeric (from R's point of view)
+  ## negate result as TRUE == numeric and we want opposite
+  ind <- !is_numeric_var(data) # exclude non numerics
+  if (all(ind)) {
+    stop("Can't compute finite differences for all non-numeric data.")
+  }
 
-    ## create data as data + h
-    data1 <- shift_values(data, h = h, i = ind, FUN = `+`, focal = focal)
-    ## create data2 as data + 2h
-    data2 <- shift_values(data, h = 2*h, i = ind, FUN = `+`, focal = focal)
+  ## create data as data + h
+  data1 <- shift_values(data, h = h, i = ind, FUN = `+`, focal = focal)
+  ## create data2 as data + 2h
+  data2 <- shift_values(data, h = 2 * h, i = ind, FUN = `+`, focal = focal)
 
-    ## predict for x + h
-    x0 <- predict(model, data1, type = "lpmatrix")
+  ## predict for x + h
+  x0 <- predict(model, data1, type = "lpmatrix")
 
-    ## predict for x + 2h
-    x1 <- predict(model, data2, type = "lpmatrix")
+  ## predict for x + 2h
+  x1 <- predict(model, data2, type = "lpmatrix")
 
-    ## predict for x
-    x2 <- predict(model, data, type = "lpmatrix")
+  ## predict for x
+  x2 <- predict(model, data, type = "lpmatrix")
 
-    list(xf = x0, xb = x1, x = x2)
+  list(xf = x0, xb = x1, x = x2)
 }
 
 `backward_finite_diff2` <- function(model, data, h = 1e-7, focal = NULL) {
-    ## need to exclude anything not numeric (from R's point of view)
-    ## negate result as TRUE == numeric and we want opposite
-    ind <- !is_numeric_var(data) # exclude non numerics
-    if (all(ind)) {
-        stop("Can't compute finite differences for all non-numeric data.")
-    }
+  ## need to exclude anything not numeric (from R's point of view)
+  ## negate result as TRUE == numeric and we want opposite
+  ind <- !is_numeric_var(data) # exclude non numerics
+  if (all(ind)) {
+    stop("Can't compute finite differences for all non-numeric data.")
+  }
 
-    ## create data as data - h
-    data1 <- shift_values(data, h = h, i = ind, FUN = `-`, focal = focal)
-    ## create data2 as data - 2h
-    data2 <- shift_values(data, h = 2*h, i = ind, FUN = `-`, focal = focal)
+  ## create data as data - h
+  data1 <- shift_values(data, h = h, i = ind, FUN = `-`, focal = focal)
+  ## create data2 as data - 2h
+  data2 <- shift_values(data, h = 2 * h, i = ind, FUN = `-`, focal = focal)
 
-    ## predict for x - h
-    x0 <- predict(model, data1, type = "lpmatrix")
+  ## predict for x - h
+  x0 <- predict(model, data1, type = "lpmatrix")
 
-    ## predict for x - 2h
-    x1 <- predict(model, data2, type = "lpmatrix")
+  ## predict for x - 2h
+  x1 <- predict(model, data2, type = "lpmatrix")
 
-    ## predict for x
-    x2 <- predict(model, data, type = "lpmatrix")
+  ## predict for x
+  x2 <- predict(model, data, type = "lpmatrix")
 
-    list(xf = x0, xb = x1, x = x2)
+  list(xf = x0, xb = x1, x = x2)
 }
 
 `central_finite_diff2` <- function(model, data, h = 1e-7, focal = NULL) {
-    ## need to exclude anything not numeric (from R's point of view)
-    ## negate result as TRUE == numeric and we want opposite
-    ind <- !is_numeric_var(data) # exclude non numerics
-    if (all(ind)) {
-        stop("Can't compute finite differences for all non-numeric data.")
-    }
+  ## need to exclude anything not numeric (from R's point of view)
+  ## negate result as TRUE == numeric and we want opposite
+  ind <- !is_numeric_var(data) # exclude non numerics
+  if (all(ind)) {
+    stop("Can't compute finite differences for all non-numeric data.")
+  }
 
-    ## create data as data + h
-    data1 <- shift_values(data, h = h, i = ind, FUN = `+`, focal = focal)
-    ## create data2 as data - h
-    data2 <- shift_values(data, h = h, i = ind, FUN = `-`, focal = focal)
+  ## create data as data + h
+  data1 <- shift_values(data, h = h, i = ind, FUN = `+`, focal = focal)
+  ## create data2 as data - h
+  data2 <- shift_values(data, h = h, i = ind, FUN = `-`, focal = focal)
 
-    ## predict for x + h
-    x0 <- predict(model, data1, type = "lpmatrix")
+  ## predict for x + h
+  x0 <- predict(model, data1, type = "lpmatrix")
 
-    ## predict for x - h
-    x1 <- predict(model, data2, type = "lpmatrix")
+  ## predict for x - h
+  x1 <- predict(model, data2, type = "lpmatrix")
 
-    ## predict for x
-    x2 <- predict(model, data, type = "lpmatrix")
+  ## predict for x
+  x2 <- predict(model, data, type = "lpmatrix")
 
-    list(xf = x0, xb = x1, x = x2)
+  list(xf = x0, xb = x1, x = x2)
 }
 
 #' @importFrom dplyr bind_cols setdiff
@@ -483,118 +510,124 @@
 `derivative_data` <- function(model, id, n, offset = NULL,
                               order = NULL, type = NULL, eps = NULL,
                               focal = NULL) {
-    mf <- model.frame(model)           # model.frame used to fit model
+  mf <- model.frame(model) # model.frame used to fit model
 
-    ## remove response
-    respvar <- attr(model$terms, "response")
-    if (!identical(respvar, 0)) {
-        mf <- mf[, -respvar, drop = FALSE]
+  ## remove response
+  respvar <- attr(model$terms, "response")
+  if (!identical(respvar, 0)) {
+    mf <- mf[, -respvar, drop = FALSE]
+  }
+
+  # remove offset() var; model.frame returns both `offset(foo(var))` & `var`,
+  # so we can just remove the former, but we also want to set the offset
+  # variable `var` to something constant. FIXME - think this should be 0
+  if (is.null(offset)) {
+    offset <- 1L
+  }
+  mf <- fix_offset(model, mf, offset_val = offset)
+  ff <- vapply(mf, is.factor, logical(1L)) # which, if any, are factors vars
+
+  ## need a list of terms used in current smooth
+  sm <- get_smooths_by_id(model, id)[[1L]]
+  smooth_vars <- unique(smooth_variable(sm))
+
+  ## list of model terms (variable names); extract these from `var.summary`
+  ## because model.frame() on a gamm() contains extraneous variables, related
+  ## to the mixed model form for lme()
+  all_m_vars <- m_vars <- model_vars(model)
+  want <- str_detect(smooth_vars, m_vars)
+  m_vars <- m_vars[want]
+
+  # now get rid of all but the focal variable *if set* in m_vars
+  if (!is.null(focal)) {
+    m_vars <- m_vars[str_detect(focal, m_vars)]
+  }
+
+  ## Handle special smooths, like 'fs', which involves a factor
+  fs_var <- NULL
+  if (is_fs_smooth(sm)) {
+    ## second element of smooth_var will be a factor
+    fs_var <- smooth_vars[ff]
+    smooth_vars <- smooth_vars[!ff]
+  }
+  ## is smooth a factor by? If it is, extract the by variable
+  by_var <- if (is_factor_by_smooth(sm)) {
+    by_variable(sm)
+  } else {
+    NULL
+  }
+  used_vars <- c(m_vars, by_var)
+
+  ## generate covariate values for the smooth
+  ## This handles terms of the form log(conc)
+  newlist <- deriv_ref_data(m_vars,
+    model = model, n = n, order = order,
+    type = type, eps = eps
+  )
+  ## handle fs smooths? --- handled by the above now automagically
+
+  ## handle factor by --- FIXME: what about numeric by?
+  if (!is.null(by_var)) {
+    ## ordered or simple factor? Grab class as a function to apply below
+    FUN <- match.fun(data.class(mf[[by_var]]))
+    ## extract levels of factor by var,
+    levs <- levels(mf[[by_var]])
+    ## coerce level for this smooth to correct factor type with FUN
+    ##   return as a list with the correct names
+    newfac <- setNames(list(FUN(by_level(sm), levels = levs)), by_var)
+    ## append this list to the list of new smooth covariate values
+    newlist <- append(newlist, newfac)
+  }
+
+  data <- expand_grid(!!!{
+    newlist
+  }) # actually compute expand.grid-alike
+
+  ## need to provide single values for all other covariates in data
+  unused_vars <- dplyr::setdiff(all_m_vars, used_vars)
+  ## only processed unusaed_vars if length() > 0L
+  if (length(unused_vars) > 0L) {
+    unused_summ <- model[["var.summary"]][unused_vars]
+    # FIXME: put this in utils.R with a better name!
+    # this basically just reps the data (scalar) for the closest observation
+    # to the median over all observations
+    `rep_fun` <- function(x, n) {
+      ## if `x` isn't a factor, select the second element of `x` which
+      ## is the value of the observation in the data closest to median
+      ## of set of observations in data used to fit the model.
+      if (!is.factor(x)) {
+        x <- x[2L]
+      }
+      ## repeat `x` as many times as is needed
+      rep(x, times = n)
     }
+    n_new <- NROW(data)
+    unused_data <- as_tibble(lapply(unused_summ, FUN = rep_fun, n = n_new))
+    ## add unnused_data to data so we're ready to predict
+    data <- bind_cols(data, unused_data)
+  }
 
-    # remove offset() var; model.frame returns both `offset(foo(var))` & `var`,
-    # so we can just remove the former, but we also want to set the offset
-    # variable `var` to something constant. FIXME - think this should be 0
-    if (is.null(offset)) {
-        offset <- 1L
-    }
-    mf <- fix_offset(model, mf, offset_val = offset)
-    ff <- vapply(mf, is.factor, logical(1L)) # which, if any, are factors vars
-
-    ## need a list of terms used in current smooth
-    sm <- get_smooths_by_id(model, id)[[1L]]
-    smooth_vars <- unique(smooth_variable(sm))
-
-    ## list of model terms (variable names); extract these from `var.summary`
-    ## because model.frame() on a gamm() contains extraneous variables, related
-    ## to the mixed model form for lme()
-    all_m_vars <- m_vars <- model_vars(model)
-    want <- str_detect(smooth_vars, m_vars)
-    m_vars <- m_vars[want]
-
-    # now get rid of all but the focal variable *if set* in m_vars
-    if (!is.null(focal)) {
-        m_vars <- m_vars[str_detect(focal, m_vars)]
-    }
-
-    ## Handle special smooths, like 'fs', which involves a factor
-    fs_var <- NULL
-    if (is_fs_smooth(sm)) {
-        ## second element of smooth_var will be a factor
-        fs_var <- smooth_vars[ff]
-        smooth_vars <- smooth_vars[!ff]
-    }
-    ## is smooth a factor by? If it is, extract the by variable
-    by_var <- if (is_factor_by_smooth(sm)) {
-        by_variable(sm)
-    } else {
-        NULL
-    }
-    used_vars <- c(m_vars, by_var)
-
-    ## generate covariate values for the smooth
-    ## This handles terms of the form log(conc)
-    newlist <- deriv_ref_data(m_vars, model = model, n = n, order = order,
-                              type = type, eps = eps)
-    ## handle fs smooths? --- handled by the above now automagically
-
-    ## handle factor by --- FIXME: what about numeric by?
-    if (!is.null(by_var)) {
-        ## ordered or simple factor? Grab class as a function to apply below
-        FUN <- match.fun(data.class(mf[[by_var]]))
-        ## extract levels of factor by var,
-        levs <- levels(mf[[by_var]])
-        ## coerce level for this smooth to correct factor type with FUN
-        ##   return as a list with the correct names
-        newfac <- setNames(list(FUN(by_level(sm), levels = levs)), by_var)
-        ## append this list to the list of new smooth covariate values
-        newlist <- append(newlist, newfac)
-    }
-
-    data <- expand_grid(!!!{newlist}) # actually compute expand.grid-alike
-
-    ## need to provide single values for all other covariates in data
-    unused_vars <- dplyr::setdiff(all_m_vars, used_vars)
-    ## only processed unusaed_vars if length() > 0L
-    if (length(unused_vars) > 0L) {
-        unused_summ <- model[["var.summary"]][unused_vars]
-        # FIXME: put this in utils.R with a better name!
-        # this basically just reps the data (scalar) for the closest observation
-        # to the median over all observations
-        `rep_fun` <- function(x, n) {
-            ## if `x` isn't a factor, select the second element of `x` which
-            ## is the value of the observation in the data closest to median
-            ## of set of observations in data used to fit the model.
-            if (!is.factor(x)) {
-                x <- x[2L]
-            }
-            ## repeat `x` as many times as is needed
-            rep(x, times = n)
-        }
-        n_new <- NROW(data)
-        unused_data <- as_tibble(lapply(unused_summ, FUN = rep_fun, n = n_new))
-        ## add unnused_data to data so we're ready to predict
-        data <- bind_cols(data, unused_data)
-    }
-
-    data <- data[, all_m_vars, drop = FALSE] # re-arrange
-    data
+  data <- data[, all_m_vars, drop = FALSE] # re-arrange
+  data
 }
 
 `deriv_ref_data` <- function(vars, model, n, order, type, eps) {
-    var_sum <- model[["var.summary"]][vars]
-    l <- map(var_sum, expand_ref_data,
-             n = n, order = order, type = type, eps = eps)
-    l
+  var_sum <- model[["var.summary"]][vars]
+  l <- map(var_sum, expand_ref_data,
+    n = n, order = order, type = type, eps = eps
+  )
+  l
 }
 
 `expand_ref_data` <- function(x, n, order, type, eps = 0) {
-    if (is.factor(x) | is.character(x)) {
-        out <- factor(levels(x), levels = levels(x))
-    } else {
-        out <- seq_min_max_eps(x[c(1,3)],
-                               n = n, eps = eps, order = order, type = type)
-    }
-    out
+  if (is.factor(x) | is.character(x)) {
+    out <- factor(levels(x), levels = levels(x))
+  } else {
+    out <- seq_min_max_eps(x[c(1, 3)],
+      n = n, eps = eps, order = order, type = type
+    )
+  }
+  out
 }
 
 #' @title Partial derivatives of estimated multivariate smooths via finite
@@ -607,24 +640,25 @@
 #'
 #' @export
 `partial_derivatives` <- function(object, ...) {
-    UseMethod("partial_derivatives")
+  UseMethod("partial_derivatives")
 }
 
 #' @rdname partial_derivatives
 #' @export
 `partial_derivatives.default` <- function(object, ...) {
-    ## want to bail with a useful error;
-    ## see Jenny Bryan's Code Smells UseR 2018 talk: rstd.io/code-smells
-    stop("Don't know how to calculate partial derivatives for <",
-         class(object)[[1L]], ">",
-         call. = FALSE)           # don't show the call, simpler error
+  ## want to bail with a useful error;
+  ## see Jenny Bryan's Code Smells UseR 2018 talk: rstd.io/code-smells
+  stop("Don't know how to calculate partial derivatives for <",
+    class(object)[[1L]], ">",
+    call. = FALSE
+  ) # don't show the call, simpler error
 }
 
 #' @rdname partial_derivatives
 #'
 #' @export
 `partial_derivatives.gamm` <- function(object, ...) {
-    partial_derivatives(object[["gam"]], ...)
+  partial_derivatives(object[["gam"]], ...)
 }
 
 #' @param term character; vector of one or more smooth terms for which
@@ -704,30 +738,32 @@
 #'
 #' # evaluate te(x,z) at values of x & z
 #' sm <- smooth_estimates(m, smooth = "te(x,z)", data = ds) |>
-#'     add_confint()
+#'   add_confint()
 #'
 #' # partial derivatives
 #' pd_x <- partial_derivatives(m, data = ds, type = "central", focal = "x")
 #'
 #' # draw te(x,z)
 #' p1 <- draw(m, rug = FALSE) &
-#'     geom_hline(yintercept = 0.4, linewidth = 1)
+#'   geom_hline(yintercept = 0.4, linewidth = 1)
 #' p1
 #'
 #' # draw te(x,z) along slice
 #' cap <- expression(z == 0.4)
 #' p2 <- sm |>
-#'     ggplot(aes(x = x, y = .estimate)) +
-#'     geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
-#'     geom_line() +
-#'     labs(x = "x", y = "Partial effect", title = "te(x,z)",
-#'         caption = cap)
+#'   ggplot(aes(x = x, y = .estimate)) +
+#'   geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
+#'   geom_line() +
+#'   labs(
+#'     x = "x", y = "Partial effect", title = "te(x,z)",
+#'     caption = cap
+#'   )
 #' p2
 #'
 #' # draw partial derivs
 #' p3 <- pd_x |>
-#'     draw() +
-#'     labs(caption = cap)
+#'   draw() +
+#'   labs(caption = cap)
 #' p3
 #'
 #' # draw all three panels
@@ -735,7 +771,8 @@
 #' \dontshow{
 #' options(op)
 #' }
-`partial_derivatives.gam` <- function(object, term, focal = NULL,
+`partial_derivatives.gam` <- function(
+    object, term, focal = NULL,
     data = newdata,
     order = 1L,
     type = c("forward", "backward", "central"),
@@ -745,163 +782,192 @@
     unconditional = FALSE, frequentist = FALSE,
     offset = NULL, ncores = 1,
     partial_match = FALSE, seed = NULL, ..., newdata = NULL) {
+  ## handle seed
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+    runif(1)
+  }
+  if (is.null(seed)) {
+    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+  } else {
+    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+    set.seed(seed)
+    RNGstate <- structure(seed, kind = as.list(RNGkind()))
+    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+  }
 
-    ## handle seed
-    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-        runif(1)
+  ## handle term
+  smooth_ids <- if (!missing(term)) {
+    ## which smooths match 'term'
+    sms <- check_user_select_smooths(smooths(object), term,
+      partial_match = partial_match
+    )
+    ## need to skip random effect smooths
+    take <- vapply(object$smooth[sms], smooth_type, character(1)) %in%
+      "Random effect"
+    # need to check that the selected smooths are multivariate
+    mv_sm <- vapply(object$smooth[sms], smooth_dim, integer(1)) < 2L
+    sms[take | mv_sm] <- FALSE
+    which(sms)
+  } else {
+    s <- seq_len(n_smooths(object))
+    ## need to skip random effect smooths
+    take <- vapply(
+      object$smooth, smooth_type,
+      character(1)
+    ) %in% "Random effect"
+    # need to check that the selected smooths are multivariate
+    mv_sm <- vapply(object$smooth, smooth_dim, integer(1)) < 2L
+    s[!(take | mv_sm)]
+  }
+
+  # handle focal - it should be a vector as long as the number of smooths
+  # we are handling. If it is NULL, then we loop over the smooths, extract
+  # the names of the variables and set the first to be the focal variable
+  if (is.null(focal)) {
+    focal <- vapply(
+      object[["smooth"]],
+      function(s) {
+        smooth_variable(s)[1L]
+      }, character(1L)
+    )
+  } else {
+    # if not NULL then we should check that it is of the same length as the
+    # smooths we are evaluating
+    n_focal <- length(focal)
+    n_sm <- length(smooth_ids)
+    if (isFALSE(identical(n_focal, n_sm))) {
+      sm_names <- smooths(object)[smooth_ids]
+      msg <- paste(sm_names, collapse = ", ")
+      stop(
+        "'focal' should be the same length as the number of smooths",
+        "for which partial derivatives are to be evaluated.",
+        "\nThe relevant smooths are: ", msg,
+        "\nThe supplied 'focal' should be length ",
+      )
     }
-    if (is.null(seed)) {
-        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+  }
+
+  ## handle type
+  type <- match.arg(type)
+
+  ## handle order
+  if (!order %in% c(1L, 2L)) {
+    stop(
+      "Only 1st or 2nd order partial derivatives are supported: ",
+      "`order %in% c(1,2)`"
+    )
+  }
+
+  if (!is.null(newdata)) {
+    newdata_deprecated()
+  }
+
+  ## handle data
+  need_data <- is.null(data)
+
+  ## handle interval
+  interval <- match.arg(interval)
+
+  ## get the required covariance matrix
+  Vb <- get_vcov(object,
+    unconditional = unconditional,
+    frequentist = frequentist
+  )
+  ## extract model coefs
+  betas <- coef(object)
+
+  ## how many smooths need working on
+  ns <- length(smooth_ids)
+  result <- vector(mode = "list", length = ns)
+
+  ## loop over the smooths and compute derivatives from finite differences
+  for (i in seq_along(smooth_ids)) {
+    ## generate data if not supplied
+    if (need_data) {
+      newd <- derivative_data(object,
+        id = smooth_ids[[i]], n = n,
+        offset = offset, order = order,
+        type = type, eps = eps, focal = focal
+      )
     } else {
-        R.seed <- get(".Random.seed", envir = .GlobalEnv)
-        set.seed(seed)
-        RNGstate <- structure(seed, kind = as.list(RNGkind()))
-        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+      ## assume the data are OK - mgcv::predict will catch issues
+      newd <- data
+      ## ...but we need to handle factor by
+      sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1]]
+      if (is_factor_by_smooth(sm)) {
+        newd <- filter(newd, data[[by_variable(sm)]] == by_level(sm))
+      }
+      # and we need to identify which variable is the focal one
+      n_unique <- vapply(
+        newd, function(x) length(unique(x)),
+        integer(1L)
+      )
+      if (is.null(focal)) {
+        focal <- names(newd)[which(n_unique > 1L)]
+      } else {
+        # and that the others are not varying
+        bad <- n_unique[setdiff(names(newd), focal)] > 1L
+        if (any(bad)) {
+          stop(
+            "For partial derivatives only 'focal' can be varying ",
+            "in 'data'. Problematic variables:",
+            paste(n_unique[bad], collapse = ", ")
+          )
+        }
+      }
     }
 
-    ## handle term
-    smooth_ids <- if (!missing(term)) {
-        ## which smooths match 'term'
-        sms <- check_user_select_smooths(smooths(object), term,
-            partial_match = partial_match)
-        ## need to skip random effect smooths
-        take <- vapply(object$smooth[sms], smooth_type, character(1)) %in%
-            "Random effect"
-        # need to check that the selected smooths are multivariate
-        mv_sm <- vapply(object$smooth[sms], smooth_dim, integer(1)) < 2L
-        sms[take | mv_sm] <- FALSE
-        which(sms)
+    # generate list of finite difference predictions for the first or second
+    #   derivatives or the required type
+    fd <- finite_diff_lpmatrix(object,
+      type = type, order = order,
+      data = newd, h = eps, focal = focal
+    )
+
+    ## compute the finite differences
+    X <- finite_difference(fd, order, type, eps)
+
+    ## compute derivatives
+    d <- compute_derivative(smooth_ids[[i]],
+      lpmatrix = X, betas = betas,
+      Vb = Vb, model = object, data = newd, focal = focal
+    )
+
+    ## compute intervals
+    if (identical(interval, "confidence")) {
+      result[[i]] <- derivative_pointwise_int(d[["deriv"]],
+        level = level,
+        distrib = "normal"
+      )
     } else {
-        s <- seq_len(n_smooths(object))
-        ## need to skip random effect smooths
-        take <- vapply(object$smooth, smooth_type,
-            character(1)) %in% "Random effect"
-        # need to check that the selected smooths are multivariate
-        mv_sm <- vapply(object$smooth, smooth_dim, integer(1)) < 2L
-        s[!(take | mv_sm)]
+      result[[i]] <- derivative_simultaneous_int(d[["deriv"]], d[["Xi"]],
+        level = level, Vb = Vb,
+        n_sim = n_sim,
+        ncores = ncores
+      )
     }
+  }
 
-    # handle focal - it should be a vector as long as the number of smooths
-    # we are handling. If it is NULL, then we loop over the smooths, extract
-    # the names of the variables and set the first to be the focal variable
-    if (is.null(focal)) {
-        focal <- vapply(object[["smooth"]],
-            function(s) {
-                smooth_variable(s)[1L]
-            }, character(1L))
-    } else {
-        # if not NULL then we should check that it is of the same length as the
-        # smooths we are evaluating
-        n_focal <- length(focal)
-        n_sm <- length(smooth_ids)
-        if (isFALSE(identical(n_focal, n_sm))) {
-            sm_names <- smooths(object)[smooth_ids]
-            msg <- paste(sm_names, collapse = ", ")
-            stop("'focal' should be the same length as the number of smooths",
-                "for which partial derivatives are to be evaluated.",
-                "\nThe relevant smooths are: ", msg,
-            "\nThe supplied 'focal' should be length ", )
-        }
-    }
+  ## results in a list of tibbles that we need to bind row-wise
+  result <- bind_rows(result)
 
-    ## handle type
-    type <- match.arg(type)
+  ## reorder the columns
+  result <- result |>
+    rename(.partial_deriv = ".derivative") |>
+    relocate(
+      any_of(c(
+        ".smooth", ".by", ".fs",
+        ".partial_deriv", ".se", ".crit", ".lower_ci", ".upper_ci"
+      )),
+      .before = 1
+    ) |>
+    add_column(.focal = rep(focal, nrow(result)), .after = 1L)
 
-    ## handle order
-    if (!order %in% c(1L, 2L)) {
-        stop("Only 1st or 2nd order partial derivatives are supported: ",
-            "`order %in% c(1,2)`")
-    }
-
-    if (!is.null(newdata)) {
-        newdata_deprecated()
-    }
-
-    ## handle data
-    need_data <- is.null(data)
-
-    ## handle interval
-    interval <- match.arg(interval)
-
-    ## get the required covariance matrix
-    Vb <- get_vcov(object, unconditional = unconditional,
-        frequentist = frequentist)
-    ## extract model coefs
-    betas <- coef(object)
-
-    ## how many smooths need working on
-    ns <- length(smooth_ids)
-    result <- vector(mode = "list", length = ns)
-
-    ## loop over the smooths and compute derivatives from finite differences
-    for (i in seq_along(smooth_ids)) {
-        ## generate data if not supplied
-        if (need_data) {
-            newd <- derivative_data(object, id = smooth_ids[[i]], n = n,
-                offset = offset, order = order,
-                type = type, eps = eps, focal = focal)
-        } else {
-            ## assume the data are OK - mgcv::predict will catch issues
-            newd <- data
-            ## ...but we need to handle factor by
-            sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1]]
-            if (is_factor_by_smooth(sm)) {
-                newd <- filter(newd, data[[by_variable(sm)]] == by_level(sm))
-            }
-            # and we need to identify which variable is the focal one
-            n_unique <- vapply(newd, function(x) length(unique(x)),
-                integer(1L))
-            if (is.null(focal)) {
-                focal <- names(newd)[which(n_unique > 1L)]
-            } else {
-                # and that the others are not varying
-                bad <- n_unique[setdiff(names(newd), focal)] > 1L
-                if (any(bad)) {
-                    stop("For partial derivatives only 'focal' can be varying ",
-                        "in 'data'. Problematic variables:",
-                        paste(n_unique[bad], collapse = ", "))
-                }
-            }
-        }
-
-        # generate list of finite difference predictions for the first or second
-        #   derivatives or the required type
-        fd <- finite_diff_lpmatrix(object, type = type, order = order,
-            data = newd, h = eps, focal = focal)
-
-        ## compute the finite differences
-        X <- finite_difference(fd, order, type, eps)
-
-        ## compute derivatives
-        d <- compute_derivative(smooth_ids[[i]], lpmatrix = X, betas = betas,
-            Vb = Vb, model = object, data = newd, focal = focal)
-
-        ## compute intervals
-        if (identical(interval, "confidence")) {
-            result[[i]] <- derivative_pointwise_int(d[["deriv"]], level = level,
-                distrib = "normal")
-        } else {
-            result[[i]] <- derivative_simultaneous_int(d[["deriv"]], d[["Xi"]],
-                level = level, Vb = Vb,
-                n_sim = n_sim,
-                ncores = ncores)
-        }
-    }
-
-    ## results in a list of tibbles that we need to bind row-wise
-    result <- bind_rows(result)
-
-    ## reorder the columns
-    result <- result |>
-        rename(.partial_deriv = ".derivative") |>
-        relocate(any_of(c(".smooth", ".by", ".fs",
-            ".partial_deriv", ".se", ".crit", ".lower_ci", ".upper_ci")),
-        .before = 1) |>
-        add_column(.focal = rep(focal, nrow(result)), .after = 1L)
-
-    class(result) <- c("partial_derivatives", "derivatives",
-        class(result)) # add class
-    result                                           # return
+  class(result) <- c(
+    "partial_derivatives", "derivatives",
+    class(result)
+  ) # add class
+  result # return
 }
 
 #' @title Derivatives on the response scale from an estimated GAM
@@ -913,24 +979,25 @@
 #'
 #' @export
 `response_derivatives` <- function(object, ...) {
-    UseMethod("response_derivatives")
+  UseMethod("response_derivatives")
 }
 
 #' @rdname response_derivatives
 #' @export
 `response_derivatives.default` <- function(object, ...) {
-    ## want to bail with a useful error;
-    ## see Jenny Bryan's Code Smells UseR 2018 talk: rstd.io/code-smells
-    stop("Don't know how to calculate response derivatives for <",
-         class(object)[[1L]], ">",
-         call. = FALSE)           # don't show the call, simpler error
+  ## want to bail with a useful error;
+  ## see Jenny Bryan's Code Smells UseR 2018 talk: rstd.io/code-smells
+  stop("Don't know how to calculate response derivatives for <",
+    class(object)[[1L]], ">",
+    call. = FALSE
+  ) # don't show the call, simpler error
 }
 
 #' @rdname response_derivatives
 #'
 #' @export
 `response_derivatives.gamm` <- function(object, ...) {
-    response_derivatives(object[["gam"]], ...)
+  response_derivatives(object[["gam"]], ...)
 }
 
 #' @param focal character; name of the focal variable. The response derivative
@@ -993,7 +1060,8 @@
 #'
 #' # fit the GAM (note: for execution time reasons using bam())
 #' m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-#'     data = df, family = nb(), method = "fREML", discrete = TRUE)
+#'   data = df, family = nb(), method = "fREML", discrete = TRUE
+#' )
 #'
 #' # data slice through data along x2 - all other covariates will be set to
 #' # typical values (value closest to median)
@@ -1003,30 +1071,40 @@
 #' fv <- fitted_values(m, smooth = "s(x2)", data = ds)
 #'
 #' # response derivatives - ideally n_sim = >10000
-#' y_d <- response_derivatives(m, data = ds, type = "central", focal = "x2",
-#'     eps = 0.01, seed = 21, n_sim = 1000)
+#' y_d <- response_derivatives(m,
+#'   data = ds, type = "central", focal = "x2",
+#'   eps = 0.01, seed = 21, n_sim = 1000
+#' )
 #'
 #' # draw fitted values along x2
 #' p1 <- fv |>
-#'     ggplot(aes(x = x2, y = .fitted)) +
-#'     geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci, y = NULL),
-#'         alpha = 0.2) +
-#'     geom_line() +
-#'     labs(title = "Estimated count as a function of x2",
-#'          y = "Estimated count")
+#'   ggplot(aes(x = x2, y = .fitted)) +
+#'   geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci, y = NULL),
+#'     alpha = 0.2
+#'   ) +
+#'   geom_line() +
+#'   labs(
+#'     title = "Estimated count as a function of x2",
+#'     y = "Estimated count"
+#'   )
 #'
 #' # draw response derivatives
 #' p2 <- y_d |>
-#'     ggplot(aes(x = x2, y = .derivative)) +
-#'     geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
-#'     geom_line() +
-#'     labs(title = "Estimated 1st derivative of estimated count",
-#'          y = "First derivative")
+#'   ggplot(aes(x = x2, y = .derivative)) +
+#'   geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
+#'   geom_line() +
+#'   labs(
+#'     title = "Estimated 1st derivative of estimated count",
+#'     y = "First derivative"
+#'   )
 #'
 #' # draw both panels
 #' p1 + p2 + plot_layout(nrow = 2)
-#' \dontshow{options(op)}
-`response_derivatives.gam` <- function(object,
+#' \dontshow{
+#' options(op)
+#' }
+`response_derivatives.gam` <- function(
+    object,
     focal = NULL,
     data = NULL,
     order = 1L,
@@ -1037,28 +1115,35 @@
     n_sim = 10000, level = 0.95,
     seed = NULL,
     ...) {
-    yd <- derivative_samples(object, focal = focal, data = data, order = order,
-        type = type, scale = scale, method = method, n = n, eps = eps,
-        n_sim = n_sim, seed = seed, ...)
+  yd <- derivative_samples(object,
+    focal = focal, data = data, order = order,
+    type = type, scale = scale, method = method, n = n, eps = eps,
+    n_sim = n_sim, seed = seed, ...
+  )
 
-    qq <- (1 - level) / 2
+  qq <- (1 - level) / 2
 
-    yd <- yd |>
-        group_by(pick(matches(".row"))) |>
-        mutate(
-            .lower_ci = quantile(.data[[".derivative"]], probs = qq),
-            .upper_ci = quantile(.data[[".derivative"]], probs = 1 - qq),
-            .derivative = median(.data[[".derivative"]])) |>
-        distinct(pick(all_of(c(".focal", ".row", ".derivative", ".lower_ci",
-            ".upper_ci"))), .keep_all = TRUE) |>
-        select(!all_of(c(".draw"))) |>
-        relocate(all_of(c(".row", ".focal", ".derivative", ".lower_ci",
-            ".upper_ci")))
+  yd <- yd |>
+    group_by(pick(matches(".row"))) |>
+    mutate(
+      .lower_ci = quantile(.data[[".derivative"]], probs = qq),
+      .upper_ci = quantile(.data[[".derivative"]], probs = 1 - qq),
+      .derivative = median(.data[[".derivative"]])
+    ) |>
+    distinct(pick(all_of(c(
+      ".focal", ".row", ".derivative", ".lower_ci",
+      ".upper_ci"
+    ))), .keep_all = TRUE) |>
+    select(!all_of(c(".draw"))) |>
+    relocate(all_of(c(
+      ".row", ".focal", ".derivative", ".lower_ci",
+      ".upper_ci"
+    )))
 
-    cls <- class(yd)
-    cls[1] <- "response_derivatives"
-    class(yd) <- cls
-    yd
+  cls <- class(yd)
+  cls[1] <- "response_derivatives"
+  class(yd) <- cls
+  yd
 }
 
 # The idea is that the prepare_fdiff_data_X functions compute lists of data
@@ -1074,93 +1159,100 @@
 # functions, we pivot these wider so that we can do vector math differencing
 # the required columns.
 `prepare_fdiff_data` <- function(data, eps = 1e-7, order, type, focal) {
-    fd_fun <- if (isTRUE(identical(as.integer(order), 1L))) {
-        prepare_fdiff_data_1
-    } else {
-        prepare_fdiff_data_2
-    }
-    fd_fun(data = data, eps = eps, type = type, focal = focal)
+  fd_fun <- if (isTRUE(identical(as.integer(order), 1L))) {
+    prepare_fdiff_data_1
+  } else {
+    prepare_fdiff_data_2
+  }
+  fd_fun(data = data, eps = eps, type = type, focal = focal)
 }
 
 #' @importFrom dplyr mutate bind_rows rename
 #' @importFrom tibble add_column
 `prepare_fdiff_data_1` <- function(data, eps = 1e-7, type, focal) {
-    n <- nrow(data)
-    h <- eps
-    fd_data <- if (isTRUE(identical(type, "central"))) {
-        h <- eps / 2
-        xf <- mutate(data, .x = .data[[".x"]] + h, ..type = rep("xf", n))
-        xb <- mutate(data, .x = .data[[".x"]] - h, ..type = rep("xb", n))
-        list(xf = xf, xb = xb)
-    } else if (isTRUE(identical(type, "forward"))) {
-        xf <- mutate(data, .x = .data[[".x"]] + h, ..type = rep("xf", n))
-        data <- mutate(data, ..type = "x")
-        list(xf = xf, xb = data)
-    } else { # backward
-        xb <- mutate(data, .x = .data[[".x"]] - h, ..type = rep("xb", n))
-        data <- mutate(data, ..type = "x")
-        list(xf = data, xb = xb)
-    }
-    fd_data <- fd_data |>
-        bind_rows() |>
-        rename("{focal}" := ".x") |>
-        mutate(.row = seq_len(NROW(data) * 2), .before = 1L,
-            ..orig = rep(seq_len(n), times = 2))
-    fd_data
+  n <- nrow(data)
+  h <- eps
+  fd_data <- if (isTRUE(identical(type, "central"))) {
+    h <- eps / 2
+    xf <- mutate(data, .x = .data[[".x"]] + h, ..type = rep("xf", n))
+    xb <- mutate(data, .x = .data[[".x"]] - h, ..type = rep("xb", n))
+    list(xf = xf, xb = xb)
+  } else if (isTRUE(identical(type, "forward"))) {
+    xf <- mutate(data, .x = .data[[".x"]] + h, ..type = rep("xf", n))
+    data <- mutate(data, ..type = "x")
+    list(xf = xf, xb = data)
+  } else { # backward
+    xb <- mutate(data, .x = .data[[".x"]] - h, ..type = rep("xb", n))
+    data <- mutate(data, ..type = "x")
+    list(xf = data, xb = xb)
+  }
+  fd_data <- fd_data |>
+    bind_rows() |>
+    rename("{focal}" := ".x") |>
+    mutate(
+      .row = seq_len(NROW(data) * 2), .before = 1L,
+      ..orig = rep(seq_len(n), times = 2)
+    )
+  fd_data
 }
 
 
 #' @importFrom dplyr mutate bind_rows rename
 #' @importFrom tibble add_column
 `prepare_fdiff_data_2` <- function(data, eps = 1e-7, type, focal) {
-    n <- nrow(data)
-    h <- eps
-    data <- mutate(data, ..type = rep("x", n))
-    fd_data <- if (isTRUE(identical(type, "central"))) {
-        # h <- eps / 2 # no, not for 2nd order
-        xf <- mutate(data, .x = .data[[".x"]] + h, ..type = rep("xf", n))
-        xb <- mutate(data, .x = .data[[".x"]] - h, ..type = rep("xb", n))
-        list(xf = xf, xb = xb, x = data)
-    } else if (isTRUE(identical(type, "forward"))) {
-        xf <- mutate(data, .x = .data[[".x"]] + h, ..type = rep("xf", n))
-        xb <- mutate(data, .x = .data[[".x"]] + (2 * h), ..type = rep("xb", n))
-        list(xf = xf, xb = xb, x = data)
-    } else { # backward
-        xf <- mutate(data, .x = .data[[".x"]] - h, ..type = rep("xf", n))
-        xb <- mutate(data, .x = .data[[".x"]] - (2 * h), ..type = rep("xb", n))
-        list(xf = xf, xb = xb, x = data)
-    }
-    fd_data <- fd_data |>
-        bind_rows() |>
-        rename("{focal}" := ".x") |>
-        mutate(.row = seq_len(NROW(data) * 3), .before = 1L,
-            ..orig = rep(seq_len(n), times = 3))
-    fd_data
+  n <- nrow(data)
+  h <- eps
+  data <- mutate(data, ..type = rep("x", n))
+  fd_data <- if (isTRUE(identical(type, "central"))) {
+    # h <- eps / 2 # no, not for 2nd order
+    xf <- mutate(data, .x = .data[[".x"]] + h, ..type = rep("xf", n))
+    xb <- mutate(data, .x = .data[[".x"]] - h, ..type = rep("xb", n))
+    list(xf = xf, xb = xb, x = data)
+  } else if (isTRUE(identical(type, "forward"))) {
+    xf <- mutate(data, .x = .data[[".x"]] + h, ..type = rep("xf", n))
+    xb <- mutate(data, .x = .data[[".x"]] + (2 * h), ..type = rep("xb", n))
+    list(xf = xf, xb = xb, x = data)
+  } else { # backward
+    xf <- mutate(data, .x = .data[[".x"]] - h, ..type = rep("xf", n))
+    xb <- mutate(data, .x = .data[[".x"]] - (2 * h), ..type = rep("xb", n))
+    list(xf = xf, xb = xb, x = data)
+  }
+  fd_data <- fd_data |>
+    bind_rows() |>
+    rename("{focal}" := ".x") |>
+    mutate(
+      .row = seq_len(NROW(data) * 3), .before = 1L,
+      ..orig = rep(seq_len(n), times = 3)
+    )
+  fd_data
 }
 
 `compute_y_fdiff` <- function(samples, order, type, eps = 1e-7) {
-    y_fd <- if (isTRUE(identical(as.integer(order), 1L))) {
-        compute_y_fdiff_1(samples = samples, eps = eps, type = type)
-    } else {
-        compute_y_fdiff_2(samples = samples, eps = eps, type = type)
-    }
-    y_fd
+  y_fd <- if (isTRUE(identical(as.integer(order), 1L))) {
+    compute_y_fdiff_1(samples = samples, eps = eps, type = type)
+  } else {
+    compute_y_fdiff_2(samples = samples, eps = eps, type = type)
+  }
+  y_fd
 }
 
 #' @importFrom tidyr pivot_wider
 #' @importFrom dplyr mutate
 #' @importFrom tidyselect matches
 `compute_y_fdiff_1` <- function(samples, type, eps = 1e-7) {
-    samples <- samples |>
-        pivot_wider(id_cols = matches(c("..orig", ".draw", "..type")),
-            names_from = "..type", values_from = ".fitted",
-            names_prefix = "..")
-    fun <- switch(type,
-      "forward"  = y_forward_diff_1,
-      "backward" = y_backward_diff_1,
-      "central" = y_central_diff_1)
-    samples |>
-      mutate(..fd = fun(.data, eps = eps))
+  samples <- samples |>
+    pivot_wider(
+      id_cols = matches(c("..orig", ".draw", "..type")),
+      names_from = "..type", values_from = ".fitted",
+      names_prefix = ".."
+    )
+  fun <- switch(type,
+    "forward" = y_forward_diff_1,
+    "backward" = y_backward_diff_1,
+    "central" = y_central_diff_1
+  )
+  samples |>
+    mutate(..fd = fun(.data, eps = eps))
 }
 
 #' @importFrom tidyr pivot_wider
@@ -1168,13 +1260,16 @@
 #' @importFrom tidyselect matches
 `compute_y_fdiff_2` <- function(samples, type, eps = 1e-7) {
   samples <- samples |>
-    pivot_wider(id_cols = matches(c("..orig", ".draw", "..type")),
+    pivot_wider(
+      id_cols = matches(c("..orig", ".draw", "..type")),
       names_from = "..type", values_from = ".fitted",
-      names_prefix = "..")
+      names_prefix = ".."
+    )
   fun <- switch(type,
-    "forward"  = y_forward_diff_2,
+    "forward" = y_forward_diff_2,
     "backward" = y_backward_diff_2,
-    "central" = y_central_diff_2)
+    "central" = y_central_diff_2
+  )
   samples |>
     mutate(..fd = fun(.data, eps = eps))
 }
@@ -1183,35 +1278,35 @@
 `y_forward_diff_1` <- function(x, eps = 1e-7) {
   # ..xf = x + h,
   # h = eps
-  (x[["..xf"]] - x[["..x"]])  / eps
+  (x[["..xf"]] - x[["..x"]]) / eps
 }
 `y_backward_diff_1` <- function(x, eps = 1e-7) {
   # ..xb = x - h,
   # h = eps
-  (x[["..x"]] - x[["..xb"]])  / eps
+  (x[["..x"]] - x[["..xb"]]) / eps
 }
 `y_central_diff_1` <- function(x, eps = 1e-7) {
   # ..xf = x + h/2,
   # ..xb = x - h/2,
   # h = eps
-  (x[["..xf"]] - x[["..xb"]])  / eps
+  (x[["..xf"]] - x[["..xb"]]) / eps
 }
 
 `y_forward_diff_2` <- function(x, eps = 1e-7) {
   # ..xf = x + h,
   # ..xb = x + 2h,
   # h = eps
-  (x[["..xb"]] - (2 * x[["..xf"]]) + x[["..x"]])  / eps^2
+  (x[["..xb"]] - (2 * x[["..xf"]]) + x[["..x"]]) / eps^2
 }
 `y_backward_diff_2` <- function(x, eps = 1e-7) {
   # ..xf = x - h,
   # ..xb = x - 2h,
   # h = eps
-  (x[["..x"]] - (2 * x[["..xf"]]) + x[["..xb"]])  / eps^2
+  (x[["..x"]] - (2 * x[["..xf"]]) + x[["..xb"]]) / eps^2
 }
 `y_central_diff_2` <- function(x, eps = 1e-7) {
   # ..xf = x + h,
   # ..xb = x - h,
   # h = eps
-  (x[["..xf"]] - (2 * x[["..x"]]) + x[["..xb"]])  / eps^2
+  (x[["..xf"]] - (2 * x[["..x"]]) + x[["..xb"]]) / eps^2
 }

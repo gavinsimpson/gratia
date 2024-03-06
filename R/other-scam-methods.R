@@ -1,6 +1,7 @@
 #' @export
-`vcov.scam` <- function(object, freq = FALSE, dispersion = NULL,
-  parametrized = TRUE, ...)  {
+`vcov.scam` <- function(
+    object, freq = FALSE, dispersion = NULL,
+    parametrized = TRUE, ...) {
   if (freq) {
     vc <- if (parametrized) {
       object$Ve.t

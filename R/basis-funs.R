@@ -52,7 +52,7 @@
 #' options(op)
 #' }
 `basis` <- function(object, ...) {
-    UseMethod("basis")
+  UseMethod("basis")
 }
 
 #' @export
@@ -66,41 +66,47 @@
                         n = 100, n_2d = 50, n_3d = 16, n_4d = 4,
                         partial_match = FALSE,
                         ...) {
-    model_name <- expr_label(substitute(object))
-    # if particular smooths selected
-    S <- smooths(object) # vector of smooth labels - "s(x)"
+  model_name <- expr_label(substitute(object))
+  # if particular smooths selected
+  S <- smooths(object) # vector of smooth labels - "s(x)"
 
-    # select smooths
-    select <-
-        check_user_select_smooths(smooths = S, select = term,
-            partial_match = partial_match,
-            model_name = model_name)
-    smooth_ids <- which(select)
+  # select smooths
+  select <-
+    check_user_select_smooths(
+      smooths = S, select = term,
+      partial_match = partial_match,
+      model_name = model_name
+    )
+  smooth_ids <- which(select)
 
-    # extract the mgcv.smooth objects
-    smooths <- get_smooths_by_id(object, smooth_ids)
+  # extract the mgcv.smooth objects
+  smooths <- get_smooths_by_id(object, smooth_ids)
 
-    # if user data supplied, check for and remove response
-    if (!is.null(data)) {
-        if (!is.data.frame(data)) {
-            stop("'data', if supplied, must be a numeric vector or data frame.",
-                call. = FALSE)
-        }
-        check_all_vars(object, data = data, smooths = smooths)
-        data <- delete_response(object, data = data)
+  # if user data supplied, check for and remove response
+  if (!is.null(data)) {
+    if (!is.data.frame(data)) {
+      stop("'data', if supplied, must be a numeric vector or data frame.",
+        call. = FALSE
+      )
     }
+    check_all_vars(object, data = data, smooths = smooths)
+    data <- delete_response(object, data = data)
+  }
 
-    bfuns <- map(seq_along(smooths), tidy_basis_wrapper, ids = smooth_ids,
-        data = data, smooths = smooths, model = object, n = n,
-        n_3d = n_3d, n_4d = n_4d, offset = NULL)
+  bfuns <- map(seq_along(smooths), tidy_basis_wrapper,
+    ids = smooth_ids,
+    data = data, smooths = smooths, model = object, n = n,
+    n_3d = n_3d, n_4d = n_4d, offset = NULL
+  )
 
-    bfuns <- bind_rows(bfuns)
+  bfuns <- bind_rows(bfuns)
 
-    ## class this up
-    class(bfuns) <- append(class(bfuns), c("basis"),
-        after = 0L)
+  ## class this up
+  class(bfuns) <- append(class(bfuns), c("basis"),
+    after = 0L
+  )
 
-    bfuns
+  bfuns
 }
 
 #' @export
@@ -109,41 +115,47 @@
                          n = 100, n_2d = 50, n_3d = 16, n_4d = 4,
                          partial_match = FALSE,
                          ...) {
-    model_name <- expr_label(substitute(object))
-    # if particular smooths selected
-    S <- smooths(object) # vector of smooth labels - "s(x)"
+  model_name <- expr_label(substitute(object))
+  # if particular smooths selected
+  S <- smooths(object) # vector of smooth labels - "s(x)"
 
-    # select smooths
-    select <-
-        check_user_select_smooths(smooths = S, select = term,
-            partial_match = partial_match,
-            model_name = model_name)
-    smooth_ids <- which(select)
+  # select smooths
+  select <-
+    check_user_select_smooths(
+      smooths = S, select = term,
+      partial_match = partial_match,
+      model_name = model_name
+    )
+  smooth_ids <- which(select)
 
-    # extract the mgcv.smooth objects
-    smooths <- get_smooths_by_id(object, smooth_ids)
+  # extract the mgcv.smooth objects
+  smooths <- get_smooths_by_id(object, smooth_ids)
 
-    # if user data supplied, check for and remove response
-    if (!is.null(data)) {
-        if (!is.data.frame(data)) {
-            stop("'data', if supplied, must be a numeric vector or data frame.",
-                call. = FALSE)
-        }
-        check_all_vars(object, data = data, smooths = smooths)
-        data <- delete_response(object, data = data)
+  # if user data supplied, check for and remove response
+  if (!is.null(data)) {
+    if (!is.data.frame(data)) {
+      stop("'data', if supplied, must be a numeric vector or data frame.",
+        call. = FALSE
+      )
     }
+    check_all_vars(object, data = data, smooths = smooths)
+    data <- delete_response(object, data = data)
+  }
 
-    bfuns <- map(seq_along(smooths), tidy_basis_wrapper, ids = smooth_ids,
-        data = data, smooths = smooths, model = object, n = n,
-        n_3d = n_3d, n_4d = n_4d, offset = NULL)
+  bfuns <- map(seq_along(smooths), tidy_basis_wrapper,
+    ids = smooth_ids,
+    data = data, smooths = smooths, model = object, n = n,
+    n_3d = n_3d, n_4d = n_4d, offset = NULL
+  )
 
-    bfuns <- bind_rows(bfuns)
+  bfuns <- bind_rows(bfuns)
 
-    ## class this up
-    class(bfuns) <- append(class(bfuns), c("basis"),
-        after = 0L)
+  ## class this up
+  class(bfuns) <- append(class(bfuns), c("basis"),
+    after = 0L
+  )
 
-    bfuns
+  bfuns
 }
 
 #' @export
@@ -152,23 +164,27 @@
                          n = 100, n_2d = 50, n_3d = 16, n_4d = 4,
                          partial_match = FALSE,
                          ...) {
-    basis(object[["gam"]], term = term, data = data, n = n,
-        n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, partial_match = partial_match,
-        ...)
+  basis(object[["gam"]],
+    term = term, data = data, n = n,
+    n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, partial_match = partial_match,
+    ...
+  )
 }
 
 #' @export
 #' @rdname basis
 `basis.list` <- function(object, term = NULL, data = NULL,
-                          n = 100, n_2d = 50, n_3d = 16, n_4d = 4,
-                          partial_match = FALSE,
-                          ...) {
-    if (!is_gamm4(object)) {
-        stop("'object' is a list but doesn't appear to be a 'gamm4()' model.")
-    }
-    basis(object[["gam"]], term = term, data = data, n = n,
-        n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, partial_match = partial_match,
-        ...)
+                         n = 100, n_2d = 50, n_3d = 16, n_4d = 4,
+                         partial_match = FALSE,
+                         ...) {
+  if (!is_gamm4(object)) {
+    stop("'object' is a list but doesn't appear to be a 'gamm4()' model.")
+  }
+  basis(object[["gam"]],
+    term = term, data = data, n = n,
+    n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, partial_match = partial_match,
+    ...
+  )
 }
 
 # wrapper for calling tidy_basis
@@ -176,30 +192,33 @@
                                  n = 100, n_2d = NULL, n_3d = NULL,
                                  n_4d = NULL,
                                  offset = NULL) {
-    # which coefs belong to this smooth
-    take <- smooth_coef_indices(smooths[[i]])
-    betas <- coef(model)[take]
-    # handle scam models - p.ident is a logical vector with length == NCOL(Xp)
-    # where Xp is the Lp matrix of the entire model!
-    p_ident <- model$p.ident
-    if (! is.null(p_ident)) { # must be a scam model
-        # need the 1st element of p_ident == FALSE, & represents the intercept.
-        # In scam, intercept gets returned by the Predict.matrix.<basis>.smooth
-        # functions (from PredictMat() used in tidy_basis()), and we need to
-        # know this to drop it later
-        p_ident <- p_ident[c(1L, take)]
-    }
+  # which coefs belong to this smooth
+  take <- smooth_coef_indices(smooths[[i]])
+  betas <- coef(model)[take]
+  # handle scam models - p.ident is a logical vector with length == NCOL(Xp)
+  # where Xp is the Lp matrix of the entire model!
+  p_ident <- model$p.ident
+  if (!is.null(p_ident)) { # must be a scam model
+    # need the 1st element of p_ident == FALSE, & represents the intercept.
+    # In scam, intercept gets returned by the Predict.matrix.<basis>.smooth
+    # functions (from PredictMat() used in tidy_basis()), and we need to
+    # know this to drop it later
+    p_ident <- p_ident[c(1L, take)]
+  }
 
-    if (is.null(data)) {
-        data <- smooth_data(model, ids[i],
-            n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, offset = offset)
-    }
+  if (is.null(data)) {
+    data <- smooth_data(model, ids[i],
+      n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, offset = offset
+    )
+  }
 
-    tbl <- tidy_basis(smooths[[i]], at = data, coefs = betas,
-        p_ident = p_ident)
+  tbl <- tidy_basis(smooths[[i]],
+    at = data, coefs = betas,
+    p_ident = p_ident
+  )
 
-    ## return
-    tbl
+  ## return
+  tbl
 }
 
 #' @export
@@ -209,34 +228,36 @@
 #' @importFrom dplyr bind_rows
 `basis.default` <- function(object, data, knots = NULL, constraints = FALSE,
                             at = NULL, ...) {
-    # class of object and check for ".smooth.spec"
-    cls <- class(object)
-    if (str_detect(cls, "smooth.spec", negate = TRUE)) {
-        stop("'object' doesn't appear to be a smooth created by {mgcv}.")
-    }
-    ## call smoothCon to create the basis as specified in `x`
-    sm <- smoothCon(object, data = data, knots = knots,
-        absorb.cons = constraints)
+  # class of object and check for ".smooth.spec"
+  cls <- class(object)
+  if (str_detect(cls, "smooth.spec", negate = TRUE)) {
+    stop("'object' doesn't appear to be a smooth created by {mgcv}.")
+  }
+  ## call smoothCon to create the basis as specified in `x`
+  sm <- smoothCon(object,
+    data = data, knots = knots,
+    absorb.cons = constraints
+  )
 
-    ## sm will be a list, even if a single smooth, bc we could have multiple
-    ## smoothers in case of factor `by` smooths.
-    ## Need to walk the list and convert the design matrix `X` to a tidy form
-    if (is.null(at)) {
-        at <- data
-    }
-    bfuns <- map(sm, tidy_basis, data = data, at = at)
+  ## sm will be a list, even if a single smooth, bc we could have multiple
+  ## smoothers in case of factor `by` smooths.
+  ## Need to walk the list and convert the design matrix `X` to a tidy form
+  if (is.null(at)) {
+    at <- data
+  }
+  bfuns <- map(sm, tidy_basis, data = data, at = at)
 
-    ## rebind
-    bfuns <- bind_rows(bfuns)
+  ## rebind
+  bfuns <- bind_rows(bfuns)
 
-    ## class
-    class(bfuns) <- c("basis", class(bfuns))
+  ## class
+  class(bfuns) <- c("basis", class(bfuns))
 
-    ## store the basis definition as an attribute
-    attr(bfuns, "smooth_object") <- deparse(substitute(object))
+  ## store the basis definition as an attribute
+  attr(bfuns, "smooth_object") <- deparse(substitute(object))
 
-    ## return
-    bfuns
+  ## return
+  bfuns
 }
 
 #' A tidy basis representation of a smooth object
@@ -271,7 +292,7 @@
 #' df <- data_sim("eg1", n = 400, seed = 42)
 #'
 #' # fit model
-#' m  <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+#' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 #'
 #' # tidy representaition of a basis for a smooth definition
 #' # extract the smooth
@@ -286,93 +307,98 @@
 #' }
 `tidy_basis` <- function(smooth, data = NULL, at = NULL, coefs = NULL,
                          p_ident = NULL) {
-    check_is_mgcv_smooth(smooth) # check `smooth` is of the correct type
-    if (is_mgcv_smooth(smooth) && is.null(at)) {
-        if (!is.null(data)) {
-            warning("'smooth' is an \"mgcv.smooth\" but you supplied 'data'\n",
-                "'at' needs to be supplied; using 'data' as 'at'.")
-            at <- data
-        } else {
-            stop("When 'smooth' is an \"mgcv.smooth\", 'at' must be supplied.")
-        }
-    }
-    if (is.null(at)) {
-        if (is.null(data)) {
-            stop("One of 'data' or 'at' must be supplied.")
-        }
-        tbl <- smooth[["X"]]         # extract the model matrix
+  check_is_mgcv_smooth(smooth) # check `smooth` is of the correct type
+  if (is_mgcv_smooth(smooth) && is.null(at)) {
+    if (!is.null(data)) {
+      warning(
+        "'smooth' is an \"mgcv.smooth\" but you supplied 'data'\n",
+        "'at' needs to be supplied; using 'data' as 'at'."
+      )
+      at <- data
     } else {
-        tbl <- PredictMat(smooth, data = at)
-        data <- at
-        if (! is.null(coefs)) {
-            nc <- NCOL(tbl)
-            if (! is.null(p_ident)) {
-                stopifnot(identical(sum(p_ident), length(coefs)))
-                tbl <- tbl[, p_ident]
-            }
-            stopifnot(identical(NCOL(tbl), length(coefs)))
-            # weight the basis functions at supplied coefficients
-            tbl <- sweep(tbl, MARGIN = 2, STATS = coefs, FUN = "*")
-        }
+      stop("When 'smooth' is an \"mgcv.smooth\", 'at' must be supplied.")
     }
-    nfun <- NCOL(tbl)        # the number of basis functions
-    colnames(tbl) <- seq_len(nfun)
-    tbl <- as_tibble(tbl) # convert to tibbles
-    data <- as_tibble(data)
-    is_by_fac <- is_factor_by_smooth(smooth) # is this a factor by smooth?
+  }
+  if (is.null(at)) {
+    if (is.null(data)) {
+      stop("One of 'data' or 'at' must be supplied.")
+    }
+    tbl <- smooth[["X"]] # extract the model matrix
+  } else {
+    tbl <- PredictMat(smooth, data = at)
+    data <- at
+    if (!is.null(coefs)) {
+      nc <- NCOL(tbl)
+      if (!is.null(p_ident)) {
+        stopifnot(identical(sum(p_ident), length(coefs)))
+        tbl <- tbl[, p_ident]
+      }
+      stopifnot(identical(NCOL(tbl), length(coefs)))
+      # weight the basis functions at supplied coefficients
+      tbl <- sweep(tbl, MARGIN = 2, STATS = coefs, FUN = "*")
+    }
+  }
+  nfun <- NCOL(tbl) # the number of basis functions
+  colnames(tbl) <- seq_len(nfun)
+  tbl <- as_tibble(tbl) # convert to tibbles
+  data <- as_tibble(data)
+  is_by_fac <- is_factor_by_smooth(smooth) # is this a factor by smooth?
 
-    ## If we have a factor by smooth, the model matrix `X` contains 0 everywhere
-    ##   that an observation is not from the level for the selected smooth.
-    ## Here we filter out those observations from `X` and the `data`
-    by_var <- NA_character_
+  ## If we have a factor by smooth, the model matrix `X` contains 0 everywhere
+  ##   that an observation is not from the level for the selected smooth.
+  ## Here we filter out those observations from `X` and the `data`
+  by_var <- NA_character_
+  if (is_by_fac) {
+    by_var <- by_variable(smooth)
+    by_lev <- by_level(smooth)
+    take <- data[[by_var]] == by_lev
+    tbl <- tbl[take, ]
+    data <- data[take, ]
+  }
+
+  ## Add the data to `tbl`; need it later for plotting etc, but only keep
+  ##  the variables involved in this smooth
+  sm_data <- data[, smooth_variable(smooth)]
+  tbl <- bind_cols(tbl, sm_data)
+
+  ## convert to long-form; select the first nfun cols to be gathered,
+  ##   rest should be the variable(s) involved in the smooth
+  tbl <- tbl |>
+    pivot_longer(seq_len(nfun), names_to = ".bf", values_to = ".value") |>
+    mutate(.bf = factor(.data[[".bf"]], levels = seq_len(nfun)))
+
+  ## reorder cols so we have the basis function & value first, data last
+  tbl <- select(tbl, matches(".bf"), matches(".value"), everything())
+
+  ## Add on an identifier for the smooth
+  tbl <- add_column(tbl, .smooth = smooth_label(smooth), .before = 1L)
+
+  ## Need a column for by smooths; will be NA for most smooths
+  by_var_vec <- rep(NA_character_, length = nrow(tbl))
+  if (is_by_smooth(smooth)) {
+    by_var_vec <- rep(by_var, length = nrow(tbl))
+    ## If we have a factor by we need to store the factor. Not needed
+    ##   for other by variable smooths.
     if (is_by_fac) {
-        by_var <- by_variable(smooth)
-        by_lev <- by_level(smooth)
-        take <- data[[by_var]] == by_lev
-        tbl <- tbl[take, ]
-        data <- data[take, ]
+      tbl <- add_column(
+        tbl,
+        {{ by_var }} := rep(by_level(smooth), nrow(tbl))
+      )
+      names(tbl)[NCOL(tbl)] <- by_var
     }
+  }
 
-    ## Add the data to `tbl`; need it later for plotting etc, but only keep
-    ##  the variables involved in this smooth
-    sm_data <- data[, smooth_variable(smooth)]
-    tbl <- bind_cols(tbl, sm_data)
+  # add add on the by variable info
+  tbl <- add_by_var_column(tbl, by_var = by_var)
 
-    ## convert to long-form; select the first nfun cols to be gathered,
-    ##   rest should be the variable(s) involved in the smooth
-    tbl <- tbl |>
-        pivot_longer(seq_len(nfun), names_to = ".bf", values_to = ".value") |>
-        mutate(.bf = factor(.data[[".bf"]], levels = seq_len(nfun)))
+  # add on the smooth type
+  tbl <- add_smooth_type_column(tbl, sm_type = smooth_type(smooth))
 
-    ## reorder cols so we have the basis function & value first, data last
-    tbl <- select(tbl, matches(".bf"), matches(".value"), everything())
+  ## class this up
+  class(tbl) <- append(class(tbl), gsub("\\.", "_", class(smooth)),
+    after = 0L
+  )
 
-    ## Add on an identifier for the smooth
-    tbl <- add_column(tbl, .smooth = smooth_label(smooth), .before = 1L)
-
-    ## Need a column for by smooths; will be NA for most smooths
-    by_var_vec <- rep(NA_character_, length = nrow(tbl))
-    if (is_by_smooth(smooth)) {
-        by_var_vec <- rep(by_var, length = nrow(tbl))
-        ## If we have a factor by we need to store the factor. Not needed
-        ##   for other by variable smooths.
-        if (is_by_fac) {
-            tbl <- add_column(tbl,
-                {{ by_var }} := rep(by_level(smooth), nrow(tbl)))
-            names(tbl)[NCOL(tbl)] <- by_var
-        }
-    }
-
-    # add add on the by variable info
-    tbl <- add_by_var_column(tbl, by_var = by_var)
-
-    # add on the smooth type
-    tbl <- add_smooth_type_column(tbl, sm_type = smooth_type(smooth))
-
-    ## class this up
-    class(tbl) <- append(class(tbl), gsub("\\.", "_", class(smooth)),
-        after = 0L)
-
-    ## return
-    tbl
+  ## return
+  tbl
 }

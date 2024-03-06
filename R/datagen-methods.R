@@ -32,17 +32,17 @@
 #' @rdname datagen
 `datagen.mgcv.smooth` <- function(x, n = 100, data, ...) {
   lifecycle::deprecate_warn("0.9.0", "datagen()", "data_slice()")
-  d <- smooth_dim(x)                 # how many dimensions in smooth
-  term <- smooth_terms(x)            # what term are we dealing with
+  d <- smooth_dim(x) # how many dimensions in smooth
+  term <- smooth_terms(x) # what term are we dealing with
   ## some smooths can't be plotted, esp n-d ones where n > 2
   if (!x$plot.me || d > 2L) {
-    out <- data.frame()  # FIXME: or should we throw error/message
+    out <- data.frame() # FIXME: or should we throw error/message
   }
-  if (d == 1L) {                      # 1-d smooths
+  if (d == 1L) { # 1-d smooths
     xvals <- data[[term]]
     newvals <- seq_min_max(xvals, n = n)
     out <- data.frame(smooth = rep(smooth_label(x), n), x = newvals)
-  } else if (d == 2L) {                            # 2-d smooths
+  } else if (d == 2L) { # 2-d smooths
     xvals <- data[[term[1]]]
     zvals <- data[[term[2]]]
     newx <- seq_min_max(xvals, n = n)
@@ -60,14 +60,14 @@
 #' @rdname datagen
 `datagen.fs.interaction` <- function(x, n = 100, data, ...) {
   lifecycle::deprecate_warn("0.9.0", "datagen()", "data_slice()")
-  d <- smooth_dim(x)                 # how many dimensions in smooth
-  term <- smooth_variable(x)         # what term are we dealing with
+  d <- smooth_dim(x) # how many dimensions in smooth
+  term <- smooth_variable(x) # what term are we dealing with
   fterm <- smooth_factor_variable(x) # get factor associated with smooth
   ## term should be length 2, which is the smooth variable
   term <- term[term != fterm]
   ## some smooths can't be plotted, esp n-d ones where n > 2
   if (!x$plot.me || d > 2L) {
-    out <- data.frame()  # FIXME: or should we throw error/message
+    out <- data.frame() # FIXME: or should we throw error/message
   }
   ## get new values of continuous var
   xvals <- data[[term]]
@@ -76,10 +76,12 @@
   f <- data[[fterm]]
   fvals <- levels(f)
   nlevs <- nlevels(f)
-  out <- setNames(expand.grid(x = newx, f = fvals),
-    c(term, fterm))
+  out <- setNames(
+    expand.grid(x = newx, f = fvals),
+    c(term, fterm)
+  )
   out <- cbind(smooth = rep(smooth_label(x), n * nlevs), out)
-  out                                 # return
+  out # return
 }
 
 #' @export
@@ -95,7 +97,8 @@
   sm <- smooths(x)
   select <- check_user_select_smooths(sm, select = smooth)
   datagen(get_smooths_by_id(x, which(select))[[1L]],
-    n = n, data = x[["model"]])
+    n = n, data = x[["model"]]
+  )
 }
 
 #' @export
@@ -117,4 +120,3 @@
   }
   datagen(x[["gam"]], ...)
 }
-

@@ -20,51 +20,51 @@ NULL
 #'
 #' # run example if lme4 is available
 #' if (require("lme4")) {
-#'
-#' data(sleepstudy, package = "lme4")
-#' m <- gam(Reaction ~ Days + s(Subject, bs = "re") +
-#'            s(Days, Subject, bs = "re"),
-#'          data = sleepstudy, method = "REML")
-#' fixef(m)
-#'
+#'   data(sleepstudy, package = "lme4")
+#'   m <- gam(
+#'     Reaction ~ Days + s(Subject, bs = "re") +
+#'       s(Days, Subject, bs = "re"),
+#'     data = sleepstudy, method = "REML"
+#'   )
+#'   fixef(m)
 #' }
 `fixef.gam` <- function(object, ...) {
-    coefs <- coef(object)
-    nms <- names(coefs)
-    # drop everything that starts with s, te, ti, or t2 and is followed by a (
-    sm_terms <- grepl('^[s te ti t2](?=\\()', names(coef(object)), perl = TRUE)
-    nms <- nms[!sm_terms]
-    # return
-    coefs[nms]
+  coefs <- coef(object)
+  nms <- names(coefs)
+  # drop everything that starts with s, te, ti, or t2 and is followed by a (
+  sm_terms <- grepl("^[s te ti t2](?=\\()", names(coef(object)), perl = TRUE)
+  nms <- nms[!sm_terms]
+  # return
+  coefs[nms]
 }
 
 #' @rdname fixef.gam
 #' @export
 `fixef.gamm` <- function(object, ...) {
-    object <- object$gam
-    fixef(object)
+  object <- object$gam
+  fixef(object)
 }
 
 #' @rdname fixef.gam
 #' @export
 `fixef.lm` <- function(object, ...) {
-    coef(object)
+  coef(object)
 }
 
 #' @rdname fixef.gam
 #' @export
 `fixef.glm` <- function(object, ...) {
-    coef(object)
+  coef(object)
 }
 
 #' @rdname fixef.gam
 #' @export
 `fixed_effects` <- function(object, ...) {
-    UseMethod("fixed_effects")
+  UseMethod("fixed_effects")
 }
 
 #' @rdname fixef.gam
 #' @export
 `fixed_effects.default` <- function(object, ...) {
-    fixef(object, ...)
+  fixef(object, ...)
 }

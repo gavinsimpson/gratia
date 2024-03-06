@@ -25,7 +25,7 @@
 #'   same y-axis scale? If `scales = "free"`, the default, each univariate
 #'   smooth has its own y-axis scale. If `scales = "fixed"`, a common y axis
 #'   scale is used for all univariate smooths.
-#'   
+#'
 #'   Currently does not affect the y-axis scale of plots of the parametric
 #'   terms.
 #' @param constant numeric; a constant to add to the estimated values of the
@@ -157,9 +157,13 @@
 #' # change the number of contours drawn and the fill scale used for
 #' # the surface
 #' library("ggplot2")
-#' draw(m2, n_contour = 5, n = 50,
-#'      continuous_fill = scale_fill_distiller(palette = "Spectral",
-#'                                             type = "div"))
+#' draw(m2,
+#'   n_contour = 5, n = 50,
+#'   continuous_fill = scale_fill_distiller(
+#'     palette = "Spectral",
+#'     type = "div"
+#'   )
+#' )
 #'
 #' # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 #' # for more examples and for details on how to modify the theme of all the
@@ -205,267 +209,286 @@
                        wrap = TRUE,
                        envir = environment(formula(object)),
                        ...) {
-    model_name <- expr_label(substitute(object))
-    # fixed or free?
-    scales <- match.arg(scales)
+  model_name <- expr_label(substitute(object))
+  # fixed or free?
+  scales <- match.arg(scales)
 
-    # fix up default scales
-    #if (is.null(discrete_colour)) {
-    #    discrete_colour <- scale_colour_discrete()
-    #}
-    if (is.null(continuous_colour)) {
-        continuous_colour <- scale_colour_continuous()
-    }
-    if (is.null(continuous_fill)) {
-        continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
-    }
+  # fix up default scales
+  # if (is.null(discrete_colour)) {
+  #    discrete_colour <- scale_colour_discrete()
+  # }
+  if (is.null(continuous_colour)) {
+    continuous_colour <- scale_colour_continuous()
+  }
+  if (is.null(continuous_fill)) {
+    continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
+  }
 
-    # if not using select, set parametric TRUE if not set to FALSE
-    if (!is.null(select)) {
-        if (is.null(parametric)) {
-            parametric <- FALSE
-        }
+  # if not using select, set parametric TRUE if not set to FALSE
+  if (!is.null(select)) {
+    if (is.null(parametric)) {
+      parametric <- FALSE
+    }
+  } else {
+    if (is.null(parametric)) {
+      parametric <- TRUE
+    }
+  }
+
+  # sort out n_3d and n_4d. If these are `NULL` then do sensible thing at set
+  # them small. Default is 3 for n_4d and for 12 for n_3d, but if we have a kD
+  # smooth (k >= 4) we want to
+
+  S <- smooths(object) # vector of smooth labels - "s(x)"
+
+  # select smooths
+  select <-
+    check_user_select_smooths(
+      smooths = S, select = select,
+      partial_match = partial_match,
+      model_name = expr_label(substitute(object))
+    )
+
+  # this is needed for the parametric terms below
+  sm_plts <- NULL
+  ylims <- NULL
+
+  # do we have any smooths to plot?
+  if (length(select) > 0L) {
+    # evaluate all requested smooths
+    sm_eval <- smooth_estimates(object,
+      smooth = S[select],
+      n = n,
+      n_3d = n_3d,
+      n_4d = n_4d,
+      data = data,
+      unconditional = unconditional,
+      overall_uncertainty = overall_uncertainty,
+      dist = dist,
+      unnest = FALSE
+    )
+
+    # grab tensor term order if present, if not it is NULL & that's OK
+    tensor_term_order <- attr(sm_eval, "tensor_term_order")
+
+    # add confidence interval
+    sm_eval <- sm_eval %>%
+      rowwise() %>%
+      mutate(data = list(add_confint(.data$data, coverage = ci_level))) %>%
+      ungroup()
+
+    # Take the range of the smooths & their confidence intervals now
+    # before we put rug and residuals on
+    if (utils::packageVersion("dplyr") > "1.0.10") {
+      sm_rng <- sm_eval |>
+        rowwise() |>
+        utils::getFromNamespace("reframe", "dplyr")(rng =
+          range(c(data$.estimate, data$.lower_ci, data$.upper_ci))) |>
+        pluck("rng")
     } else {
-        if (is.null(parametric)) {
-            parametric <- TRUE
-        }
+      sm_rng <- sm_eval |>
+        rowwise() |>
+        summarise(rng = range(c(
+          data$.estimate, data$.lower_ci,
+          data$.upper_ci
+        ))) |>
+        pluck("rng")
     }
 
-    # sort out n_3d and n_4d. If these are `NULL` then do sensible thing at set
-    # them small. Default is 3 for n_4d and for 12 for n_3d, but if we have a kD
-    # smooth (k >= 4) we want to
+    # Add partial residuals if requested - by default they are
+    # At the end of this, sm_eval will have a new list column containing the
+    # partial residuals, `partial_residual`
+    p_resids_rng <- NULL
+    if (isTRUE(residuals)) {
+      if (is.null(residuals(object)) || is.null(weights(object))) {
+        residuals <- FALSE
+      } else {
+        # get residuals in a suitable format
+        p_resids <- nested_partial_residuals(object, terms = S[select])
 
-    S <- smooths(object) # vector of smooth labels - "s(x)"
-
-    # select smooths
-    select <-
-        check_user_select_smooths(smooths = S, select = select,
-                                  partial_match = partial_match,
-                                  model_name = expr_label(substitute(object)))
-
-    # this is needed for the parametric terms below
-    sm_plts <- NULL
-    ylims <- NULL
-
-    # do we have any smooths to plot?
-    if (length(select) > 0L) {
-        # evaluate all requested smooths
-        sm_eval <- smooth_estimates(object,
-                                    smooth = S[select],
-                                    n = n,
-                                    n_3d = n_3d,
-                                    n_4d = n_4d,
-                                    data = data,
-                                    unconditional = unconditional,
-                                    overall_uncertainty = overall_uncertainty,
-                                    dist = dist,
-                                    unnest = FALSE)
-
-         # grab tensor term order if present, if not it is NULL & that's OK
-        tensor_term_order <- attr(sm_eval, "tensor_term_order")
-
-        # add confidence interval
-        sm_eval <- sm_eval %>%
-          rowwise() %>%
-          mutate(data = list(add_confint(.data$data, coverage = ci_level))) %>%
-          ungroup()
-
-        # Take the range of the smooths & their confidence intervals now
-        # before we put rug and residuals on
+        # compute the range of residuals for each smooth
+        # p_resids_rng <- p_resids |>
+        #     rowwise() |>
+        #     dplyr::reframe(rng =
+        #         range(.data$partial_residual$partial_residual)) |>
+        #     pluck("rng")
         if (utils::packageVersion("dplyr") > "1.0.10") {
-            sm_rng <- sm_eval |>
-                rowwise() |>
-                utils::getFromNamespace("reframe", "dplyr")(rng = 
-                    range(c(data$.estimate, data$.lower_ci, data$.upper_ci))) |>
-                pluck("rng")
-        } else {sm_rng <- sm_eval |>
+          p_resids_rng <- p_resids |>
             rowwise() |>
-            summarise(rng = range(c(data$.estimate, data$.lower_ci,
-            data$.upper_ci))) |>
+            utils::getFromNamespace("reframe", "dplyr")(
+              rng = range(.data$partial_residual$partial_residual)) |>
+            pluck("rng")
+        } else {
+          p_resids_rng <- p_resids |>
+            rowwise() |>
+            summarise(
+              rng =
+                range(.data$partial_residual$partial_residual)
+            ) |>
             pluck("rng")
         }
+        # merge with the evaluated smooth
+        sm_eval <- suppress_matches_multiple_warning(
+          left_join(sm_eval, p_resids, by = ".smooth")
+        )
+      }
+    }
 
-        # Add partial residuals if requested - by default they are
-        # At the end of this, sm_eval will have a new list column containing the
-        # partial residuals, `partial_residual`
-        p_resids_rng <- NULL
-        if (isTRUE(residuals)) {
-            if (is.null(residuals(object)) || is.null(weights(object))) {
-                residuals <- FALSE
-            } else {
-                # get residuals in a suitable format
-                p_resids <- nested_partial_residuals(object, terms = S[select])
+    # add rug data?
+    if (isTRUE(rug)) {
+      # get rug data in a suitable format
+      rug_data <- nested_rug_values(object, terms = S[select])
 
-                # compute the range of residuals for each smooth
-                # p_resids_rng <- p_resids |>
-                #     rowwise() |>
-                #     dplyr::reframe(rng =
-                #         range(.data$partial_residual$partial_residual)) |>
-                #     pluck("rng")
-                if (utils::packageVersion("dplyr") > "1.0.10") {
-                    p_resids_rng <- p_resids |>
-                    rowwise() |>
-                    utils::getFromNamespace("reframe", "dplyr")(
-                        rng = range(.data$partial_residual$partial_residual)) |>
-                    pluck("rng")
-                } else {
-                    p_resids_rng <- p_resids |>
-                    rowwise() |>
-                    summarise(rng =
-                        range(.data$partial_residual$partial_residual)) |>
-                    pluck("rng")
-                }
-                # merge with the evaluated smooth
-                sm_eval <- suppress_matches_multiple_warning(
-                  left_join(sm_eval, p_resids, by = ".smooth")
-                )
-            }
-        }
+      # merge with the evaluated smooth
+      sm_eval <- suppress_matches_multiple_warning(
+        left_join(sm_eval, rug_data, by = ".smooth")
+      )
+    }
 
-        # add rug data?
-        if (isTRUE(rug)) {
-            # get rug data in a suitable format
-            rug_data <- nested_rug_values(object, terms = S[select])
+    # need to figure out scales if "fixed"
+    if (isTRUE(identical(scales, "fixed"))) {
+      ylims <- range(sm_rng, p_resids_rng)
+    }
 
-            # merge with the evaluated smooth
-            sm_eval <- suppress_matches_multiple_warning(
-              left_join(sm_eval, rug_data, by = ".smooth")
-            )
-        }
+    # draw smooths
+    sm_l <- if (isTRUE(grouped_by)) {
+      levs <- unique(str_split_fixed(sm_eval$.smooth, ":", n = 2)[, 1])
+      sm_eval |>
+        mutate(
+          smooth = factor(.data$.smooth, levels = S[select]),
+          .term = str_split_fixed(.data$.smooth, ":", n = 2)[, 1]
+        ) |>
+        arrange(.data$.smooth) |>
+        relocate(".term", .before = 1L) |>
+        group_split(factor(.data$.term, levels = levs), .data$.by)
+    } else {
+      # the factor is to reorder to way the smooths entered the model
+      group_split(sm_eval, factor(.data$.smooth, levels = S[select]))
+    }
+    sm_plts <- map(sm_l,
+      draw_smooth_estimates,
+      constant = constant,
+      fun = fun,
+      contour = contour,
+      contour_col = contour_col,
+      n_contour = n_contour,
+      ci_alpha = ci_alpha,
+      ci_col = ci_col,
+      smooth_col = smooth_col,
+      resid_col = resid_col,
+      partial_match = partial_match,
+      discrete_colour = discrete_colour,
+      discrete_fill = discrete_fill,
+      continuous_colour = continuous_colour,
+      continuous_fill = continuous_fill,
+      angle = angle,
+      ylim = ylims,
+      crs = crs,
+      default_crs = default_crs,
+      lims_method = lims_method,
+      tensor_term_order = tensor_term_order
+    )
+  } # end stuff for smooths...
 
-        # need to figure out scales if "fixed"
-        if (isTRUE(identical(scales, "fixed"))) {
-            ylims <- range(sm_rng, p_resids_rng)
-        }
+  # Are we plotting parametric effects too?
+  if (isTRUE(parametric)) {
+    if (length(parametric_terms(object)) == 0L) {
+      message("The model contains no parametric terms")
+      parametric <- FALSE
+    } else {
+      para <- parametric_effects(object,
+        term = terms, data = data,
+        unconditional = unconditional,
+        unnest = TRUE, ci_level = ci_level, envir = envir
+      )
+      # Add CI
+      # crit <- coverage_normal(ci_level)
+      # object <- mutate(para,
+      #    .lower_ci = .data$.partial - (crit * .data$.se),
+      #    .upper_ci = .data$.partial + (crit * .data$.se))
+      object <- para |> add_confint(coverage = ci_level)
+      # need to alter the ylim if scales are fixed
+      if (isTRUE(identical(scales, "fixed"))) {
+        ylims <- range(
+          ylims, object$.partial, object$.upper_ci,
+          object$.lower_ci
+        )
+      }
 
-        # draw smooths
-        sm_l <- if (isTRUE(grouped_by)) {
-            levs <- unique(str_split_fixed(sm_eval$.smooth, ":", n = 2)[, 1])
-            sm_eval |>
-                mutate(smooth = factor(.data$.smooth, levels = S[select]),
-                .term = str_split_fixed(.data$.smooth, ":", n = 2)[, 1]) |>
-                arrange(.data$.smooth) |>
-                relocate(".term", .before = 1L) |>
-                group_split(factor(.data$.term, levels = levs), .data$.by)
-        } else {
-            # the factor is to reorder to way the smooths entered the model
-            group_split(sm_eval, factor(.data$.smooth, levels = S[select]))
-        }
-        sm_plts <- map(sm_l,
-            draw_smooth_estimates,
+      para_plts <- para %>%
+        group_by(.data$term) %>%
+        group_map(
+          .keep = TRUE,
+          .f = ~ draw_parametric_effect(.x,
+            ci_level = ci_level,
+            ci_col = ci_col,
+            ci_alpha = ci_alpha,
+            line_col = smooth_col,
             constant = constant,
             fun = fun,
-            contour = contour,
-            contour_col = contour_col,
-            n_contour = n_contour,
-            ci_alpha = ci_alpha,
-            ci_col = ci_col,
-            smooth_col = smooth_col,
-            resid_col = resid_col,
-            partial_match = partial_match,
-            discrete_colour = discrete_colour,
-            discrete_fill = discrete_fill,
-            continuous_colour = continuous_colour,
-            continuous_fill = continuous_fill,
+            rug = rug,
+            position = position,
             angle = angle,
-            ylim = ylims,
-            crs = crs,
-            default_crs = default_crs,
-            lims_method = lims_method,
-            tensor_term_order = tensor_term_order)
-
-    } # end stuff for smooths...
-
-    # Are we plotting parametric effects too?
-    if (isTRUE(parametric)) {
-        if (length(parametric_terms(object)) == 0L) {
-            message("The model contains no parametric terms")
-            parametric <- FALSE
-        } else {
-            para <- parametric_effects(object, term = terms, data = data,
-                unconditional = unconditional,
-                unnest = TRUE, ci_level = ci_level, envir = envir)
-            # Add CI
-            # crit <- coverage_normal(ci_level)
-            # object <- mutate(para,
-            #    .lower_ci = .data$.partial - (crit * .data$.se),
-            #    .upper_ci = .data$.partial + (crit * .data$.se))
-            object <- para |> add_confint(coverage = ci_level)
-            # need to alter the ylim if scales are fixed
-            if (isTRUE(identical(scales, "fixed"))) {
-                ylims <- range(ylims, object$.partial, object$.upper_ci,
-                    object$.lower_ci)
-            }
-
-            para_plts <- para %>%
-                group_by(.data$term) %>%
-                group_map(.keep = TRUE,
-                    .f = ~ draw_parametric_effect(.x,
-                        ci_level = ci_level,
-                        ci_col = ci_col,
-                        ci_alpha = ci_alpha,
-                        line_col = smooth_col,
-                        constant = constant,
-                        fun = fun,
-                        rug = rug,
-                        position = position,
-                        angle = angle,
-                        ylim = ylims))
-        }
+            ylim = ylims
+          )
+        )
     }
+  }
 
-    if (isTRUE(parametric)) {
-        sm_plts <- append(sm_plts, para_plts)
-    }
+  if (isTRUE(parametric)) {
+    sm_plts <- append(sm_plts, para_plts)
+  }
 
-    # filter out NULLs as those are types of smooths we can't plot (yet)
-    no_plot <- map_lgl(sm_plts, is.null)
-    sm_plts <- sm_plts[!no_plot]
+  # filter out NULLs as those are types of smooths we can't plot (yet)
+  no_plot <- map_lgl(sm_plts, is.null)
+  sm_plts <- sm_plts[!no_plot]
 
-    if (all(no_plot)) {
-        message("Unable to draw any of the model terms.")
-        return(invisible())
-    }
+  if (all(no_plot)) {
+    message("Unable to draw any of the model terms.")
+    return(invisible())
+  }
 
-    # return
-    n_plots <- length(sm_plts)
-    if (is.null(ncol) && is.null(nrow)) {
-        ncol <- ceiling(sqrt(n_plots))
-        nrow <- ceiling(n_plots / ncol)
-    }
-    if (n_plots > 1L && is.null(widths)) {
-        # it doesn't matter about the widths if only one plot, but if we have
-        # more than one plot and the user didn't change `widths`, then we will
-        # force a value of 1 to give all plots the same relative width
-        widths <- 1
-    }
+  # return
+  n_plots <- length(sm_plts)
+  if (is.null(ncol) && is.null(nrow)) {
+    ncol <- ceiling(sqrt(n_plots))
+    nrow <- ceiling(n_plots / ncol)
+  }
+  if (n_plots > 1L && is.null(widths)) {
+    # it doesn't matter about the widths if only one plot, but if we have
+    # more than one plot and the user didn't change `widths`, then we will
+    # force a value of 1 to give all plots the same relative width
+    widths <- 1
+  }
 
-    if (wrap) {
-        sm_plts <- wrap_plots(sm_plts, byrow = TRUE, ncol = ncol, nrow = nrow,
-            guides = guides, widths = widths, heights = heights, ...)
-    }
+  if (wrap) {
+    sm_plts <- wrap_plots(sm_plts,
+      byrow = TRUE, ncol = ncol, nrow = nrow,
+      guides = guides, widths = widths, heights = heights, ...
+    )
+  }
 
-    # return
-    sm_plts
+  # return
+  sm_plts
 }
 
 #' @export
 `draw.list` <- function(object, ...) {
-    if (!is_gamm4(object)) {
-        stop("Don't know how to draw a list")
-    }
-    draw(object$gam, ...)
+  if (!is_gamm4(object)) {
+    stop("Don't know how to draw a list")
+  }
+  draw(object$gam, ...)
 }
 
 #' @export
 `draw.gamm` <- function(object, ...) {
-    draw(object$gam, ...)
+  draw(object$gam, ...)
 }
 
 #' @export
 `draw.scam` <- function(object, ..., overall_uncertainty = FALSE) {
-    class(object) <- append(class(object), "gam", after = 1)
-    draw.gam(object, overall_uncertainty = FALSE, ...)
+  class(object) <- append(class(object), "gam", after = 1)
+  draw.gam(object, overall_uncertainty = FALSE, ...)
 }
 
 # TODO: Remove after dplyr 1.1.0 is released and use `multiple = "all"` instead

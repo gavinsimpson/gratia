@@ -21,10 +21,10 @@
 #' @param coverage numeric; a value between 0 and 1 indicating the (approximate)
 #'   coverage of the confidence interval that is returned.
 #' @param ... arguments passed to other methods
-#' 
+#'
 #' @export
 `variance_comp` <- function(object, ...) {
-    UseMethod("variance_comp")
+  UseMethod("variance_comp")
 }
 
 #' @export
@@ -36,18 +36,23 @@
 #' @importFrom dplyr %>%
 #' @importFrom mgcv gam.vcomp
 `variance_comp.gam` <- function(object, rescale = TRUE, coverage = 0.95, ...) {
-    capture.output(vcomps <- gam.vcomp(object, rescale = rescale,
-                                       conf.lev = coverage))
-    if (is.list(vcomps) && !is.null(vcomps[["vc"]])) {
-        vcomps <- vcomps[["vc"]]
-    }
-    vcomps <- as.data.frame(vcomps)
-    tbl <- rownames_to_column(vcomps,
-                              var = "component") %>%
-        as_tibble() %>%
-        set_names(nm = c(".component", ".std_dev", ".lower_ci",
-                         ".upper_ci")) %>%
-        add_column(.variance = vcomps[, "std.dev"]^2, .after = 1L)
-    class(tbl) <- c("variance_comp", class(tbl))
-    tbl
+  capture.output(vcomps <- gam.vcomp(object,
+    rescale = rescale,
+    conf.lev = coverage
+  ))
+  if (is.list(vcomps) && !is.null(vcomps[["vc"]])) {
+    vcomps <- vcomps[["vc"]]
+  }
+  vcomps <- as.data.frame(vcomps)
+  tbl <- rownames_to_column(vcomps,
+    var = "component"
+  ) %>%
+    as_tibble() %>%
+    set_names(nm = c(
+      ".component", ".std_dev", ".lower_ci",
+      ".upper_ci"
+    )) %>%
+    add_column(.variance = vcomps[, "std.dev"]^2, .after = 1L)
+  class(tbl) <- c("variance_comp", class(tbl))
+  tbl
 }

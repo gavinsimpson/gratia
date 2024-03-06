@@ -46,9 +46,11 @@
 #' }
 #' load_mgcv()
 #' dat <- data_sim("eg4", n = 400, seed = 42)
-#' m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") +
-#'            s(x2, by = fac, bs = "cr"),
-#'          data = dat, method = "REML")
+#' m <- gam(
+#'   y ~ s(x0, bs = "cr") + s(x1, bs = "cr") +
+#'     s(x2, by = fac, bs = "cr"),
+#'   data = dat, method = "REML"
+#' )
 #'
 #' # penalties for all smooths
 #' penalty(m)
@@ -56,7 +58,9 @@
 #' # for a specific smooth
 #' penalty(m, smooth = "s(x2):fac1")
 #'
-#' \dontshow{options(op)}
+#' \dontshow{
+#' options(op)
+#' }
 `penalty` <- function(object, ...) {
   UseMethod("penalty")
 }
@@ -64,8 +68,9 @@
 #' @export
 #' @rdname penalty
 #' @inheritParams basis.default
-`penalty.default` <- function(object, rescale = FALSE, data, knots = NULL,
-  constraints = FALSE, ...) {
+`penalty.default` <- function(
+    object, rescale = FALSE, data, knots = NULL,
+    constraints = FALSE, ...) {
   # class of object and check for ".smooth.spec"
   cls <- class(object)
   if (str_detect(cls, "smooth.spec", negate = TRUE)) {
@@ -109,54 +114,56 @@
 #' @export
 #' @rdname penalty
 `penalty.mgcv.smooth` <- function(object, rescale = FALSE, ...) {
-    ## smooth label
-    sm_lab <- smooth_label(object)
-    ## type of smooth
-    sm_type <- smooth_type(object)
-    ## extract the set of penalty matrices
-    S <- object[["S"]] # S is a list even if length(S) == 1
-    len_S <- length(S)
-    sp_label <- if (is.null(object[["sp"]])) {
-        paste(sm_lab, seq_len(len_S), sep = ".")
-    } else {
-        names(object[["sp"]]) # penalty matrix label
-    }
-    pen <- vector("list", length = len_S)
-    ## loop over penalty matrices & tidy each of them
-    pen_seq <- seq_along(pen)
+  ## smooth label
+  sm_lab <- smooth_label(object)
+  ## type of smooth
+  sm_type <- smooth_type(object)
+  ## extract the set of penalty matrices
+  S <- object[["S"]] # S is a list even if length(S) == 1
+  len_S <- length(S)
+  sp_label <- if (is.null(object[["sp"]])) {
+    paste(sm_lab, seq_len(len_S), sep = ".")
+  } else {
+    names(object[["sp"]]) # penalty matrix label
+  }
+  pen <- vector("list", length = len_S)
+  ## loop over penalty matrices & tidy each of them
+  pen_seq <- seq_along(pen)
+  for (i in pen_seq) {
+    pen[[i]] <- tidy_penalty(S[[i]],
+      smooth = sm_lab,
+      type = sm_type,
+      label = sp_label[i]
+    )
+  }
+
+  # should the default penalty rescaling for gamm performance be reversed?
+  if (rescale) {
     for (i in pen_seq) {
-        pen[[i]] <- tidy_penalty(S[[i]], smooth = sm_lab,
-                                 type = sm_type,
-                                 label = sp_label[i])
+      S_scale <- object[["S.scale"]][i]
+      if (is.null(S_scale)) {
+        S_scale <- 1
+      }
+      pen[[i]][[".value"]] <- pen[[i]][[".value"]] * S_scale
     }
+  }
 
-    # should the default penalty rescaling for gamm performance be reversed?
-    if (rescale) {
-        for (i in pen_seq) {
-            S_scale <- object[["S.scale"]][i]
-            if (is.null(S_scale)) {
-                S_scale <- 1
-            }
-            pen[[i]][[".value"]] <- pen[[i]][[".value"]] * S_scale
-        }
-    }
-
-    # combine the tidy penalty matrices into a single tibble
-    pen <- bind_rows(pen)
-    class(pen) <- c("penalty_df", class(pen))
-    pen
+  # combine the tidy penalty matrices into a single tibble
+  pen <- bind_rows(pen)
+  class(pen) <- c("penalty_df", class(pen))
+  pen
 }
 
 #' @export
 #' @rdname penalty
 `penalty.tensor.smooth` <- function(object, margins = FALSE, ...) {
-    .NotYetImplemented()
+  .NotYetImplemented()
 }
 
 #' @export
 #' @rdname penalty
 `penalty.t2.smooth` <- function(object, margins = FALSE, ...) {
-    .NotYetImplemented()
+  .NotYetImplemented()
 }
 
 #' @export
@@ -165,10 +172,10 @@
 #'
 #' @rdname penalty
 `penalty.re.smooth.spec` <- function(object, data, ...) {
-    sm <- smoothCon(object, data, ...)
-    pen <- lapply(sm, penalty, ...)
-    pen <- bind_rows(pen)
-    pen
+  sm <- smoothCon(object, data, ...)
+  pen <- lapply(sm, penalty, ...)
+  pen <- bind_rows(pen)
+  pen
 }
 
 #' @importFrom tibble add_column as_tibble
@@ -176,27 +183,30 @@
 #' @importFrom dplyr starts_with
 #' @importFrom rlang set_names
 `tidy_penalty` <- function(s, smooth, type, label) {
-    nc <- ncol(s)
-    new_names <- formatC(seq_len(nc), width = nchar(nc), flag = "0")
-    new_names <- paste0("F", new_names)
-    s <- s |>
-        as_tibble(.name_repair = "minimal") |>
-        set_names(new_names) |>
-        add_column(.row = new_names, .before = 1L) |>
-        pivot_longer(cols = starts_with("f"), names_to = ".col",
-            values_to = ".value")
-    
-    ns <- nrow(s)
-    s <- add_column(s,
-                    .smooth  = rep(smooth, ns),
-                    .type    = rep(type, ns),
-                    .penalty = rep(label, ns), .before = 1L)
-    s
+  nc <- ncol(s)
+  new_names <- formatC(seq_len(nc), width = nchar(nc), flag = "0")
+  new_names <- paste0("F", new_names)
+  s <- s |>
+    as_tibble(.name_repair = "minimal") |>
+    set_names(new_names) |>
+    add_column(.row = new_names, .before = 1L) |>
+    pivot_longer(
+      cols = starts_with("f"), names_to = ".col",
+      values_to = ".value"
+    )
+
+  ns <- nrow(s)
+  s <- add_column(s,
+    .smooth = rep(smooth, ns),
+    .type = rep(type, ns),
+    .penalty = rep(label, ns), .before = 1L
+  )
+  s
 }
 
 #' @export
 #' @importFrom rlang .data
 `print.penalty_df` <- function(x, ...) {
-    x <- mutate(x, .value = zapsmall(.data$.value))
-    NextMethod()
+  x <- mutate(x, .value = zapsmall(.data$.value))
+  NextMethod()
 }

@@ -56,52 +56,61 @@
                                              position = "identity",
                                              response_range = NULL,
                                              ...) {
-    is_fac <- object[["type"]][1L] == "factor"
-    term_label <- object[["term"]][1L]
+  is_fac <- object[["type"]][1L] == "factor"
+  term_label <- object[["term"]][1L]
 
-    ## If constant supplied apply it to `est`
-    object <- add_constant(object, constant = constant)
+  ## If constant supplied apply it to `est`
+  object <- add_constant(object, constant = constant)
 
-    ## add a CI
-    crit <- qnorm((1 - ci_level) / 2, lower.tail = FALSE)
-    object <- mutate(object,
-                     lower = .data$partial - (crit * .data$se),
-                     upper = .data$partial + (crit * .data$se))
+  ## add a CI
+  crit <- qnorm((1 - ci_level) / 2, lower.tail = FALSE)
+  object <- mutate(object,
+    lower = .data$partial - (crit * .data$se),
+    upper = .data$partial + (crit * .data$se)
+  )
 
-    ## If fun supplied, use it to transform est and the upper and lower interval
-    object <- transform_fun(object, fun = fun)
+  ## If fun supplied, use it to transform est and the upper and lower interval
+  object <- transform_fun(object, fun = fun)
 
-    plt <- ggplot(object, aes(x = .data$value, y = .data$partial))
+  plt <- ggplot(object, aes(x = .data$value, y = .data$partial))
 
-    if (is_fac) {
-        plt <- plt + geom_pointrange(aes(ymin = .data$lower,
-                                         ymax = .data$upper))
-    } else {
-        if (isTRUE(rug)) {
-            plt <- plt + geom_rug(sides = "b", position = position, alpha = 0.5)
-        }
-        plt <- plt + geom_ribbon(aes(ymin = .data$lower,
-                                     ymax = .data$upper),
-                                 alpha = 0.3) +
-            geom_line()
+  if (is_fac) {
+    plt <- plt + geom_pointrange(aes(
+      ymin = .data$lower,
+      ymax = .data$upper
+    ))
+  } else {
+    if (isTRUE(rug)) {
+      plt <- plt + geom_rug(sides = "b", position = position, alpha = 0.5)
     }
+    plt <- plt + geom_ribbon(
+      aes(
+        ymin = .data$lower,
+        ymax = .data$upper
+      ),
+      alpha = 0.3
+    ) +
+      geom_line()
+  }
 
-    ## default axis labels if none supplied
-    if (missing(xlab)) {
-        xlab <- term_label
-    }
-    if (missing(ylab)) {
-        ylab <- sprintf("Partial effect of %s", term_label)
-    }
+  ## default axis labels if none supplied
+  if (missing(xlab)) {
+    xlab <- term_label
+  }
+  if (missing(ylab)) {
+    ylab <- sprintf("Partial effect of %s", term_label)
+  }
 
-    ## add labelling to plot
-    plt <- plt + labs(x = xlab, y = ylab, title = title, subtitle = subtitle,
-                      caption = caption)
+  ## add labelling to plot
+  plt <- plt + labs(
+    x = xlab, y = ylab, title = title, subtitle = subtitle,
+    caption = caption
+  )
 
-    ## fixing the y axis limits?
-    if (!is.null(response_range)) {
-        plt <- plt + expand_limits(y = response_range)
-    }
+  ## fixing the y axis limits?
+  if (!is.null(response_range)) {
+    plt <- plt + expand_limits(y = response_range)
+  }
 
-    plt
+  plt
 }

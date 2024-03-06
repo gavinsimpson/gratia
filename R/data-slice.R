@@ -6,14 +6,16 @@
 #'
 #' @export
 `data_slice` <- function(object, ...) {
-    UseMethod("data_slice")
+  UseMethod("data_slice")
 }
 
 #' @export
 #' @rdname data_slice
 `data_slice.default` <- function(object, ...) {
-    stop("Don't know how to create a data slice from <", class(object)[[1L]],
-         ">", call. = FALSE)
+  stop("Don't know how to create a data slice from <", class(object)[[1L]],
+    ">",
+    call. = FALSE
+  )
 }
 
 #' @export
@@ -29,9 +31,11 @@
   vars <- names(object)
   nms <- names(slice_vars)
   if (any(i <- !nms %in% vars)) {
-    message("Some specified variable(s) not used in `object``:\n",
+    message(
+      "Some specified variable(s) not used in `object``:\n",
       paste(" * ", nms[i], collapse = "\n", sep = ""),
-      "\n")
+      "\n"
+    )
   }
 
   # typical values, only needed ones that aren't
@@ -98,9 +102,11 @@
   vars <- model_vars(object)
   nms <- names(slice_vars)
   if (any(i <- !nms %in% vars)) {
-    message("Some specified variable(s) not used in model:\n",
+    message(
+      "Some specified variable(s) not used in model:\n",
       paste(" * ", nms[i], collapse = "\n", sep = ""),
-      "\n")
+      "\n"
+    )
   }
 
   # typical values, only needed ones that aren't
@@ -110,30 +116,33 @@
     slice_vars <- append(slice_vars, tv[need_tv])
   }
 
-  expand_grid(!!!{slice_vars})
+  expand_grid(!!!{
+    slice_vars
+  })
 }
 
 #' @export
 #' @rdname data_slice
 `data_slice.gamm` <- function(object, ...) { # for gamm() models
-    data_slice(object[["gam"]], ...)
+  data_slice(object[["gam"]], ...)
 }
 
 #' @export
 #' @rdname data_slice
 `data_slice.list` <- function(object, ...) { # for gamm4 lists only
-    ## Is this list likely to be a gamm4 list?
-    if (! is_gamm4(object)) {
-        stop("`object` does not appear to a `gamm4` model object",
-             call. = FALSE)
-    }
-    data_slice(object[["gam"]], ...)
+  ## Is this list likely to be a gamm4 list?
+  if (!is_gamm4(object)) {
+    stop("`object` does not appear to a `gamm4` model object",
+      call. = FALSE
+    )
+  }
+  data_slice(object[["gam"]], ...)
 }
 
 #' @export
 #' @rdname data_slice
 `data_slice.scam` <- function(object, ...) {
-    data_slice.gam(object, ...)
+  data_slice.gam(object, ...)
 }
 
 `data_slice_data` <- function(object, data = NULL) {
@@ -187,9 +196,11 @@
   is_num <- is.numeric(x)
 
   ## if supplied something other than numeric or factor, bail
-  if(!is_fac && !is_num) {
+  if (!is_fac && !is_num) {
     stop("'x' must be a factor or numeric vector. Supplied <",
-      class(x)[[1L]], ">", call. = FALSE)
+      class(x)[[1L]], ">",
+      call. = FALSE
+    )
   }
 
   ## if x is a factor, return the modal value as a factor with original
@@ -229,14 +240,18 @@
 
   if (!any(is_tib, is_df, is_list)) {
     stop("'data' should be a tibble, data frame, or list. Supplied <",
-      class(data)[[1L]], ">", call. = FALSE)
+      class(data)[[1L]], ">",
+      call. = FALSE
+    )
   }
 
   if (is_tib || is_df) {
-    nr  <- NROW(data)
+    nr <- NROW(data)
     if (nr != 1L) {
       stop("'data' should have 1 row only. Supplied <",
-        nr, ">", call. = FALSE)  
+        nr, ">",
+        call. = FALSE
+      )
     }
   }
 
@@ -250,40 +265,42 @@
 }
 
 `process_slice_var` <- function(x, data, n) {
-    ## if x is NULL bail quickly
-    if (is.null(x)) {
-        return(x)
-    }
+  ## if x is NULL bail quickly
+  if (is.null(x)) {
+    return(x)
+  }
 
-    ## x should be a character, bail otherwise
-    if (!is.character(x)) {
-        stop("Supplied 'x' is not character.")
-    }
+  ## x should be a character, bail otherwise
+  if (!is.character(x)) {
+    stop("Supplied 'x' is not character.")
+  }
 
-    ## x should be a named variable in data
-    if (!x %in% names(data)) {
-        stop("Variable <", x, "> not found in data.", call. = FALSE)
-    }
+  ## x should be a named variable in data
+  if (!x %in% names(data)) {
+    stop("Variable <", x, "> not found in data.", call. = FALSE)
+  }
 
-    values <- data[[x]]
-    is_fac <- is.factor(values)
-    is_num <- is.numeric(values)
+  values <- data[[x]]
+  is_fac <- is.factor(values)
+  is_num <- is.numeric(values)
 
-    ## if supplied something other than numeric or factor, bail
-    if(!is_fac && !is_num) {
-        stop("Variable <", x, "> must be a factor or numeric vector. Found <",
-             class(x)[[1L]], ">", call. = FALSE)
-    }
+  ## if supplied something other than numeric or factor, bail
+  if (!is_fac && !is_num) {
+    stop("Variable <", x, "> must be a factor or numeric vector. Found <",
+      class(x)[[1L]], ">",
+      call. = FALSE
+    )
+  }
 
-    if (isTRUE(is_fac)) {
-        values <- levels(values)
-    }
+  if (isTRUE(is_fac)) {
+    values <- levels(values)
+  }
 
-    if (isTRUE(is_num)) {
-        values <- seq_min_max(values, n)
-    }
+  if (isTRUE(is_num)) {
+    values <- seq_min_max(values, n)
+  }
 
-    values
+  values
 }
 
 #' Typical values of model covariates
@@ -293,7 +310,7 @@
 #'
 #' @export
 `typical_values` <- function(object, ...) {
-    UseMethod("typical_values")
+  UseMethod("typical_values")
 }
 
 #' @rdname typical_values
@@ -308,8 +325,9 @@
 #' @importFrom rlang enquo
 #' @importFrom tidyselect eval_select
 #' @importFrom stats model.frame formula
-`typical_values.gam` <- function(object, vars = everything(),
-  envir = environment(formula(object)), data = NULL, ...) {
+`typical_values.gam` <- function(
+    object, vars = everything(),
+    envir = environment(formula(object)), data = NULL, ...) {
   # extract the summary from the fitted GAM
   # summ is a named list
   summ <- object[["var.summary"]]
@@ -354,7 +372,7 @@
 
   # now process the numerics
   dc <- data_class(summ)
-  i <-  dc == "numeric" & lengths(summ) == 3L
+  i <- dc == "numeric" & lengths(summ) == 3L
   summ[i] <- lapply(summ[i], `[`, 2)
 
   # return
@@ -367,21 +385,21 @@
 #' @importFrom dplyr summarise across
 #' @importFrom tibble as_tibble
 `typical_values.data.frame` <- function(object, vars = everything(), ...) {
-    # include/exclude any terms?
-    expr <- rlang::enquo(vars)
-    pos <- eval_select(expr, data = object)
-    object <- object[pos]
+  # include/exclude any terms?
+  expr <- rlang::enquo(vars)
+  pos <- eval_select(expr, data = object)
+  object <- object[pos]
 
-    df <- object |>
-        summarise(across(everything(), .fns = value_closest_to_median))
+  df <- object |>
+    summarise(across(everything(), .fns = value_closest_to_median))
 
-    # return
-    as_tibble(df)
+  # return
+  as_tibble(df)
 }
 
 #' @export
 `typical_values.scam` <- function(object, ...) {
-    typical_values.gam(object, ...)
+  typical_values.gam(object, ...)
 }
 
 #' All combinations of factor levels
@@ -396,7 +414,7 @@
 #'
 #' @export
 `factor_combos` <- function(object, ...) {
-    UseMethod("factor_combos")
+  UseMethod("factor_combos")
 }
 
 #' @export
@@ -406,36 +424,36 @@
 #' @rdname factor_combos
 `factor_combos.gam` <- function(object, vars = everything(),
                                 complete = TRUE, ...) {
-    # extract the summary from the fitted GAM
-    # summ is a named list
-    summ <- object[["var.summary"]]
+  # extract the summary from the fitted GAM
+  # summ is a named list
+  summ <- object[["var.summary"]]
 
-    # which are factors?
-    is_fac <- vapply(summ, is.factor, logical(1L))
-    if (!any(is_fac)) {
-        # message("Model contains no factor terms")
-        return(NULL)
-    } else {
-        summ <- summ[is_fac]
-    }
+  # which are factors?
+  is_fac <- vapply(summ, is.factor, logical(1L))
+  if (!any(is_fac)) {
+    # message("Model contains no factor terms")
+    return(NULL)
+  } else {
+    summ <- summ[is_fac]
+  }
 
-    # include/exclude any terms?
-    expr <- rlang::enquo(vars)
-    pos <- eval_select(expr, data = summ)
-    summ <- summ[pos]
+  # include/exclude any terms?
+  expr <- rlang::enquo(vars)
+  pos <- eval_select(expr, data = summ)
+  summ <- summ[pos]
 
-    f <- lapply(summ, function(x) factor(levels(x), levels = levels(x)))
-    f <- exec("expand_grid", !!!f) # f <- purrr::cross_df(f)
-    if (isFALSE(complete)) {
-        mf <- model.frame(object)[names(summ)]
-        f <- expand(f, nesting(mf))
-    }
-    f
+  f <- lapply(summ, function(x) factor(levels(x), levels = levels(x)))
+  f <- exec("expand_grid", !!!f) # f <- purrr::cross_df(f)
+  if (isFALSE(complete)) {
+    mf <- model.frame(object)[names(summ)]
+    f <- expand(f, nesting(mf))
+  }
+  f
 }
 
 #' @export
 `factor_combos.scam` <- function(object, ...) {
-    factor_combos.gam(object, ...)
+  factor_combos.gam(object, ...)
 }
 
 #' All combinations of factor levels plus typical values of continuous variables
@@ -443,7 +461,7 @@
 #' @inheritParams factor_combos
 #' @export
 `data_combos` <- function(object, ...) {
-    UseMethod("data_combos")
+  UseMethod("data_combos")
 }
 
 #' @param envir the environment within which to recreate the data used to fit
@@ -458,22 +476,22 @@
                               complete = TRUE,
                               envir = environment(formula(object)),
                               data = NULL, ...) {
-    tv <- typical_values(object, envir = envir, data = data)
-    is_fac <- vapply(tv, is.factor, logical(1L))
-    if (any(is_fac)) { # drop factor from typical values
-        tv <- tv[, !is_fac]
-    }
-    fc <- factor_combos(object)
-    tbl <- expand_grid(fc, tv)
+  tv <- typical_values(object, envir = envir, data = data)
+  is_fac <- vapply(tv, is.factor, logical(1L))
+  if (any(is_fac)) { # drop factor from typical values
+    tv <- tv[, !is_fac]
+  }
+  fc <- factor_combos(object)
+  tbl <- expand_grid(fc, tv)
 
-    # include/exclude any terms?
-    expr <- rlang::enquo(vars)
-    pos <- eval_select(expr, data = tbl)
-    tbl <- tbl[pos]
-    tbl
+  # include/exclude any terms?
+  expr <- rlang::enquo(vars)
+  pos <- eval_select(expr, data = tbl)
+  tbl <- tbl[pos]
+  tbl
 }
 
 #' @export
 `data_combos.scam` <- function(object, ...) {
-    data_combos.gam(object, ...)
+  data_combos.gam(object, ...)
 }

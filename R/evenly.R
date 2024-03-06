@@ -24,7 +24,9 @@
 #' @export
 #'
 #' @examples
-#' \dontshow{set.seed(1)}
+#' \dontshow{
+#' set.seed(1)
+#' }
 #' x <- rnorm(10)
 #' n <- 10L
 #'
@@ -37,40 +39,40 @@
 #' # evenly spaced values, incrementing by 0.2, starting at -2
 #' evenly(x, by = 0.2, lower = -2)
 `evenly` <- function(x, n = 100, by = NULL, lower = NULL, upper = NULL) {
-    out <- if (is.factor(x)) {
-        ## must coerce to factor otherwise Predict.matrix will coerce
-        ## and that will end up with levels in the wrong order
-        ## need to make this ordered if `x` is ordered
-        factor(levels(x), levels = levels(x), ordered = is.ordered(x))
+  out <- if (is.factor(x)) {
+    ## must coerce to factor otherwise Predict.matrix will coerce
+    ## and that will end up with levels in the wrong order
+    ## need to make this ordered if `x` is ordered
+    factor(levels(x), levels = levels(x), ordered = is.ordered(x))
+  } else {
+    lower <- ifelse(is.null(lower), min(x, na.rm = TRUE), lower)
+    upper <- ifelse(is.null(upper), max(x, na.rm = TRUE), upper)
+    if (is.null(by)) {
+      seq(from = lower, to = upper, length.out = n)
     } else {
-        lower <- ifelse(is.null(lower), min(x, na.rm = TRUE), lower)
-        upper <- ifelse(is.null(upper), max(x, na.rm = TRUE), upper)
-        if (is.null(by)) {
-            seq(from = lower, to = upper, length.out = n)
-        } else {
-            seq(from = lower, to = upper, by = by)
-        }
+      seq(from = lower, to = upper, by = by)
     }
-    out
+  }
+  out
 }
 
 #' @rdname evenly
 `seq_min_max` <- function(x, n, by = NULL, lower = NULL, upper = NULL) {
-    out <- if (is.factor(x)) {
-        ## must coerce to factor otherwise Predict.matrix will coerce
-        ## and that will end up with levels in the wrong order
-        ## need to make this ordered if `x` is ordered
-        factor(levels(x), levels = levels(x), ordered = is.ordered(x))
+  out <- if (is.factor(x)) {
+    ## must coerce to factor otherwise Predict.matrix will coerce
+    ## and that will end up with levels in the wrong order
+    ## need to make this ordered if `x` is ordered
+    factor(levels(x), levels = levels(x), ordered = is.ordered(x))
+  } else {
+    lower <- ifelse(is.null(lower), min(x, na.rm = TRUE), lower)
+    upper <- ifelse(is.null(upper), max(x, na.rm = TRUE), upper)
+    if (is.null(by)) {
+      seq(from = lower, to = upper, length.out = n)
     } else {
-        lower <- ifelse(is.null(lower), min(x, na.rm = TRUE), lower)
-        upper <- ifelse(is.null(upper), max(x, na.rm = TRUE), upper)
-        if (is.null(by)) {
-            seq(from = lower, to = upper, length.out = n)
-        } else {
-            seq(from = lower, to = upper, by = by)
-        }
+      seq(from = lower, to = upper, by = by)
     }
-    out
+  }
+  out
 }
 
 #' @title Create a sequence of evenly-spaced values adjusted to accommodate a
@@ -95,31 +97,35 @@
 #' @return A numeric vector of length `n`.
 `seq_min_max_eps` <- function(x, n, order,
                               type = c("forward", "backward", "central"), eps) {
-    minx <- min(x, na.rm = TRUE)
-    maxx <- max(x, na.rm = TRUE)
-    heps <- eps / 2
-    deps <- eps * 2
-    type <- match.arg(type)
-    if (isTRUE(all.equal(order, 1L))) {
-        minx <- switch(type,
-            forward  = minx,
-            backward = minx + eps,
-            central  = minx + heps)
-        maxx <- switch(type,
-            forward  = maxx - eps,
-            backward = maxx,
-            central  = maxx - heps)
-    } else {
-        minx <- switch(type,
-            forward  = minx,
-            backward = minx + deps,
-            central  = minx + eps)
-        maxx <- switch(type,
-            forward  = maxx - deps,
-            backward = maxx,
-            central  = maxx - eps)
-    }
-    seq(from = minx, to = maxx, length.out = n)
+  minx <- min(x, na.rm = TRUE)
+  maxx <- max(x, na.rm = TRUE)
+  heps <- eps / 2
+  deps <- eps * 2
+  type <- match.arg(type)
+  if (isTRUE(all.equal(order, 1L))) {
+    minx <- switch(type,
+      forward  = minx,
+      backward = minx + eps,
+      central  = minx + heps
+    )
+    maxx <- switch(type,
+      forward  = maxx - eps,
+      backward = maxx,
+      central  = maxx - heps
+    )
+  } else {
+    minx <- switch(type,
+      forward  = minx,
+      backward = minx + deps,
+      central  = minx + eps
+    )
+    maxx <- switch(type,
+      forward  = maxx - deps,
+      backward = maxx,
+      central  = maxx - eps
+    )
+  }
+  seq(from = minx, to = maxx, length.out = n)
 }
 
 #' @title Return the reference or specific level of a factor
@@ -137,7 +143,9 @@
 #' @export
 #'
 #' @examples
-#' \dontshow{set.seed(1)}
+#' \dontshow{
+#' set.seed(1)
+#' }
 #' f <- factor(sample(letters[1:5], 100, replace = TRUE))
 #'
 #' # the reference level
@@ -151,21 +159,21 @@
 #' identical(levels(f), levels(level(f, "c")))
 #' @export
 `ref_level` <- function(fct) {
-    if (!is.factor(fct)) {
-        stop("'fct' must be a factor")
-    }
-    lev <- levels(fct)
-    factor(lev[1], levels = lev)
+  if (!is.factor(fct)) {
+    stop("'fct' must be a factor")
+  }
+  lev <- levels(fct)
+  factor(lev[1], levels = lev)
 }
 #' @export
 #' @rdname ref_level
 `level` <- function(fct, level) {
-    if (!is.factor(fct)) {
-        stop("'fct' must be a factor")
-    }
-    lev <- levels(fct)
-    if (!level %in% lev) {
-        stop("Level <", level, "> not a valid level of factor")
-    }
-    factor(level, levels = lev)
+  if (!is.factor(fct)) {
+    stop("'fct' must be a factor")
+  }
+  lev <- levels(fct)
+  if (!level %in% lev) {
+    stop("Level <", level, "> not a valid level of factor")
+  }
+  factor(level, levels = lev)
 }

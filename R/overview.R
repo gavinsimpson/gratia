@@ -2,10 +2,10 @@
 #'
 #' @param model a fitted model object to overview.
 #' @param ... arguments passed to other methods.
-#' 
+#'
 #' @export
 `overview` <- function(model, ...) {
-    UseMethod("overview")
+  UseMethod("overview")
 }
 
 #' @param parametric logical; include the model parametric terms in the
@@ -43,7 +43,8 @@
 #' }
 #' df <- data_sim(n = 400, seed = 2)
 #' m <- gam(y ~ x3 + s(x0) + s(x1, bs = "bs") + s(x2, bs = "ts"),
-#'          data = df, method = "REML")
+#'   data = df, method = "REML"
+#' )
 #' overview(m)
 #' \dontshow{
 #' options(op)
@@ -53,62 +54,69 @@
                            accuracy = 0.001,
                            stars = FALSE,
                            ...) {
-    smry <- summary(model, dispersion = dispersion, re.test = random_effects,
-                    freq = frequentist)
-    nms <- c("term", "type", "k", "edf", "statistic", "p.value")
+  smry <- summary(model,
+    dispersion = dispersion, re.test = random_effects,
+    freq = frequentist
+  )
+  nms <- c("term", "type", "k", "edf", "statistic", "p.value")
 
-    # smooth terms
-    types <- vapply(model$smooth, smooth_type, character(1))
-    dfs <- vapply(model$smooth, basis_size, double(1))
-    out <- as.data.frame(smry$s.table) %>%
+  # smooth terms
+  types <- vapply(model$smooth, smooth_type, character(1))
+  dfs <- vapply(model$smooth, basis_size, double(1))
+  out <- as.data.frame(smry$s.table) %>%
+    rownames_to_column() %>%
+    as_tibble() %>%
+    select(!matches("Ref.df")) %>%
+    add_column(type = types, k = dfs, .after = 1L)
+
+  # parametric terms
+  para <- NULL
+  if (isTRUE(parametric) && !is.null(smry$pTerms.table)) {
+    nr <- nrow(smry$pTerms.table)
+    para <- as.data.frame(smry$pTerms.table) %>%
       rownames_to_column() %>%
       as_tibble() %>%
-      select(!matches("Ref.df")) %>%
-      add_column(type = types, k = dfs, .after = 1L)
+      rename(edf = "df") %>%
+      add_column(
+        type = rep("parametric", nr), k = rep(NA_real_, nr),
+        .after = 1L
+      )
+    out <- bind_rows(para, out)
+  }
+  out <- set_names(out, nms)
 
-    # parametric terms
-    para <- NULL
-    if (isTRUE(parametric) && ! is.null(smry$pTerms.table)) {
-        nr <- nrow(smry$pTerms.table)
-        para <- as.data.frame(smry$pTerms.table) %>%
-          rownames_to_column() %>%
-          as_tibble() %>%
-          rename(edf = "df") %>%
-          add_column(type = rep("parametric", nr), k = rep(NA_real_, nr),
-            .after = 1L)
-        out <- bind_rows(para, out)
-    }
-    out <- set_names(out, nms)
+  if (stars) {
+    sstars <- symnum(out$p.value,
+      corr = FALSE, na = FALSE,
+      cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1),
+      symbols = c("***", "**", "*", ".", " ")
+    )
+    out <- mutate(out,
+      # p = .data$p.value,
+      p.value = format.pval(.data$p.value, eps = accuracy),
+      stars = sstars
+    ) # not sure why as.character(sstars) is wrong here "***"
+    attr(out, "legend") <- attr(sstars, "legend")
+  } else {
+    out <- mutate(out, p.value = format.pval(.data$p.value, eps = accuracy))
+  }
 
-    if (stars) {
-      sstars <- symnum(out$p.value, corr = FALSE, na = FALSE,
-        cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1),
-        symbols = c("***", "**", "*", ".", " "))
-      out <- mutate(out,
-        #p = .data$p.value,
-        p.value = format.pval(.data$p.value, eps = accuracy),
-        stars = sstars) # not sure why as.character(sstars) is wrong here "***"
-      attr(out, "legend") <- attr(sstars, "legend")
-    } else {
-      out <- mutate(out, p.value = format.pval(.data$p.value, eps = accuracy))
-    }
-
-    class(out) <- append(class(out), values = "overview", after = 0)
-    out
+  class(out) <- append(class(out), values = "overview", after = 0)
+  out
 }
 
 #' @export
 `overview.gamm` <- function(model, ...) {
-    out <- overview(model$gam)
-    class(out) <- append(class(out), values = "overview_gamm", after = 0)
-    out
+  out <- overview(model$gam)
+  class(out) <- append(class(out), values = "overview_gamm", after = 0)
+  out
 }
 
 #' @export
 `overview.bam` <- function(model, ...) {
-    out <- NextMethod()
-    class(out) <- append(class(out), values = "overview_bam", after = 0)
-    out
+  out <- NextMethod()
+  class(out) <- append(class(out), values = "overview_bam", after = 0)
+  out
 }
 
 #' @export
@@ -132,19 +140,19 @@
 #' @importFrom cli style_dim
 #' @exportS3Method tbl_format_header overview
 tbl_format_header.overview <- function(x, setup, ...) {
-    style_dim("\n", names(setup$tbl_sum), " ", setup$tbl_sum, "\n")
+  style_dim("\n", names(setup$tbl_sum), " ", setup$tbl_sum, "\n")
 }
 
 #' @importFrom pillar style_subtle tbl_format_footer
 #' @exportS3Method tbl_format_footer overview
 `tbl_format_footer.overview` <- function(x, setup, ...) {
-    default_footer <- NextMethod()
-    star_leg <- attr(x, "legend")
-    out <- if (!is.null(star_leg)) {
-      leg_footer <- style_subtle(paste0("\n# ", star_leg))
-      c(default_footer, leg_footer)
-    } else {
-      default_footer
-    }
-    out
+  default_footer <- NextMethod()
+  star_leg <- attr(x, "legend")
+  out <- if (!is.null(star_leg)) {
+    leg_footer <- style_subtle(paste0("\n# ", star_leg))
+    c(default_footer, leg_footer)
+  } else {
+    default_footer
+  }
+  out
 }

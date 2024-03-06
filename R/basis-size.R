@@ -15,26 +15,26 @@
 #'
 #' basis_size(m)
 `basis_size` <- function(object, ...) {
-    UseMethod("basis_size")
+  UseMethod("basis_size")
 }
 
 #' @export
 #' @rdname basis_size
 `basis_size.mgcv.smooth` <- function(object, ...) {
-     check_is_mgcv_smooth(object)
-     object[["df"]]
+  check_is_mgcv_smooth(object)
+  object[["df"]]
 }
 
 #' @export
 #' @rdname basis_size
 `basis_size.gam` <- function(object, ...) {
-    dims <- vapply(object$smooth, basis_size, double(1))
-    dims <- setNames(dims, smooths(object))
-    dims
+  dims <- vapply(object$smooth, basis_size, double(1))
+  dims <- setNames(dims, smooths(object))
+  dims
 }
 
 #' @export
 #' @rdname basis_size
 `basis_size.gamm` <- function(object, ...) {
-    basis_size(object$gam)
+  basis_size(object$gam)
 }

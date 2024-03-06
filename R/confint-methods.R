@@ -58,121 +58,137 @@
 #' \dontshow{
 #' set.seed(42)
 #' }
-#' x2_sint <- confint(fd, parm = "x2", type = "simultaneous",
-#'                    nsim = 10000, ncores = 2)
+#' x2_sint <- confint(fd,
+#'   parm = "x2", type = "simultaneous",
+#'   nsim = 10000, ncores = 2
+#' )
 #' \donttest{
 #' x2_sint
 #' }
-#' \dontshow{options(op)}
+#' \dontshow{
+#' options(op)
+#' }
 `confint.fderiv` <- function(object, parm, level = 0.95,
                              type = c("confidence", "simultaneous"),
                              nsim = 10000,
                              ncores = 1L, ...) {
-    ## Process arguments
-    ## parm is one of the terms in object
-    parm <- if(missing(parm)) {
-                object$terms
-            } else {
-                parm <- add_s(parm)
-                terms <- object$terms
-                want <- parm %in% terms
-                if (any(!want)) {
-                    msg <- paste("Terms:", paste(parm[!want], collapse = ", "),
-                                 "not found in `object`")
-                    stop(msg)
-                }
-                parm[want]
-            }
-    ## parm <- add_s(parm)
-
-    ## level should be length 1, numeric and 0 < level < 1
-    if ((ll <- length(level)) > 1L) {
-        warning(paste("`level` should be length 1, but supplied length: ",
-                      ll, ". Using the first only."))
-        level <- rep(level, length.out = 1L)
+  ## Process arguments
+  ## parm is one of the terms in object
+  parm <- if (missing(parm)) {
+    object$terms
+  } else {
+    parm <- add_s(parm)
+    terms <- object$terms
+    want <- parm %in% terms
+    if (any(!want)) {
+      msg <- paste(
+        "Terms:", paste(parm[!want], collapse = ", "),
+        "not found in `object`"
+      )
+      stop(msg)
     }
-    if (!is.numeric(level)) {
-        stop(paste("`level` should be numeric, but supplied:", level))
-    }
-    if (! (0 < level) && (level < 1)) {
-        stop(paste("`level` should lie in interval [0,1], but supplied:",
-             level))
-    }
+    parm[want]
+  }
+  ## parm <- add_s(parm)
 
-    ## which type of interval is required
-    type <- match.arg(type)
+  ## level should be length 1, numeric and 0 < level < 1
+  if ((ll <- length(level)) > 1L) {
+    warning(paste(
+      "`level` should be length 1, but supplied length: ",
+      ll, ". Using the first only."
+    ))
+    level <- rep(level, length.out = 1L)
+  }
+  if (!is.numeric(level)) {
+    stop(paste("`level` should be numeric, but supplied:", level))
+  }
+  if (!(0 < level) && (level < 1)) {
+    stop(paste(
+      "`level` should lie in interval [0,1], but supplied:",
+      level
+    ))
+  }
 
-    ## generate intervals
-    interval <- if (type == "confidence") {
-        confidence(object, terms = parm, level = level)
-    } else {
-        simultaneous(object, terms = parm, level = level, nsim = nsim,
-                     ncores = ncores)
-    }
+  ## which type of interval is required
+  type <- match.arg(type)
 
-    interval <- as_tibble(interval)
+  ## generate intervals
+  interval <- if (type == "confidence") {
+    confidence(object, terms = parm, level = level)
+  } else {
+    simultaneous(object,
+      terms = parm, level = level, nsim = nsim,
+      ncores = ncores
+    )
+  }
 
-    class(interval) <- c("confint.fderiv", class(interval))
+  interval <- as_tibble(interval)
 
-    ## return
-    interval
+  class(interval) <- c("confint.fderiv", class(interval))
+
+  ## return
+  interval
 }
 
 #' @importFrom stats quantile vcov
 #' @importFrom mvnfast rmvn
 `simultaneous` <- function(x, terms, level, nsim, ncores) {
-    ## wrapper the computes each interval
-    `simInt` <- function(x, Vb, bu, level, nsim) {
-        Xi <- x[["Xi"]]           # derivative Lp, zeroed except for this term
-        se <- x[["se.deriv"]]     # std err of deriv for current term
-        d  <- x[["deriv"]]        # deriv for current term
-        simDev <- Xi %*% t(bu)      # simulate deviations from expected
-        absDev <- abs(sweep(simDev, 1, se, FUN = "/")) # absolute deviations
-        masd <- apply(absDev, 2L, max)  # & maxabs deviation per sim
-        ## simultaneous interval critical value
-        crit <- quantile(masd, prob = level, type = 8)
-        ## return as data frame
-        data.frame(lower = d - (crit * se), est = d, upper = d + (crit * se))
-    }
+  ## wrapper the computes each interval
+  `simInt` <- function(x, Vb, bu, level, nsim) {
+    Xi <- x[["Xi"]] # derivative Lp, zeroed except for this term
+    se <- x[["se.deriv"]] # std err of deriv for current term
+    d <- x[["deriv"]] # deriv for current term
+    simDev <- Xi %*% t(bu) # simulate deviations from expected
+    absDev <- abs(sweep(simDev, 1, se, FUN = "/")) # absolute deviations
+    masd <- apply(absDev, 2L, max) # & maxabs deviation per sim
+    ## simultaneous interval critical value
+    crit <- quantile(masd, prob = level, type = 8)
+    ## return as data frame
+    data.frame(lower = d - (crit * se), est = d, upper = d + (crit * se))
+  }
 
-    ## bayesian covar matrix, possibly accounting for estimating smooth pars
-    Vb <- vcov(x[["model"]], unconditional = x$unconditional)
-    ## simulate un-biased deviations given bayesian covar matrix
-    buDiff <- mvnfast::rmvn(n = nsim, mu = rep(0, nrow(Vb)), sigma = Vb,
-        ncores = ncores)
-    ## apply wrapper to compute simultaneous interval critical value and
-    ## corresponding simultaneous interval for each term
-    res <- lapply(x[["derivatives"]][terms], FUN = simInt,
-                  Vb = Vb, bu = buDiff, level = level, nsim = nsim)
-    ## how many values per term - currently all equal
-    lens <- vapply(res, FUN = NROW, FUN.VALUE = integer(1))
-    res <- do.call("rbind", res)        # row-bind each component of res
-    res <- cbind(term = rep(terms, times = lens), res) # add on term ID
-    rownames(res) <- NULL                              # tidy up
-    res                                                # return
+  ## bayesian covar matrix, possibly accounting for estimating smooth pars
+  Vb <- vcov(x[["model"]], unconditional = x$unconditional)
+  ## simulate un-biased deviations given bayesian covar matrix
+  buDiff <- mvnfast::rmvn(
+    n = nsim, mu = rep(0, nrow(Vb)), sigma = Vb,
+    ncores = ncores
+  )
+  ## apply wrapper to compute simultaneous interval critical value and
+  ## corresponding simultaneous interval for each term
+  res <- lapply(x[["derivatives"]][terms],
+    FUN = simInt,
+    Vb = Vb, bu = buDiff, level = level, nsim = nsim
+  )
+  ## how many values per term - currently all equal
+  lens <- vapply(res, FUN = NROW, FUN.VALUE = integer(1))
+  res <- do.call("rbind", res) # row-bind each component of res
+  res <- cbind(term = rep(terms, times = lens), res) # add on term ID
+  rownames(res) <- NULL # tidy up
+  res # return
 }
 
 #' @importFrom stats qnorm
 `confidence` <- function(x, terms, level) {
-    ## wrapper the computes each interval
-    `confInt` <- function(x, level) {
-        se <- x[["se.deriv"]]     # std err of deriv for current term
-        d  <- x[["deriv"]]        # deriv for current term
-        ## confidence interval critical value
-        crit <- qnorm(1 - ((1 - level) / 2))
-        ## return as data frame
-        data.frame(lower = d - (crit * se), est = d, upper = d + (crit * se))
-    }
+  ## wrapper the computes each interval
+  `confInt` <- function(x, level) {
+    se <- x[["se.deriv"]] # std err of deriv for current term
+    d <- x[["deriv"]] # deriv for current term
+    ## confidence interval critical value
+    crit <- qnorm(1 - ((1 - level) / 2))
+    ## return as data frame
+    data.frame(lower = d - (crit * se), est = d, upper = d + (crit * se))
+  }
 
-    ## apply wrapper to compute confidence interval critical value and
-    ## corresponding confidence interval for each term
-    res <- lapply(x[["derivatives"]][terms], FUN = confInt, level = level)
-    ## how many values per term - currently all equal
-    lens <- vapply(res, FUN = NROW, FUN.VALUE = integer(1))
-    res <- do.call("rbind", res)        # row-bind each component of res
-    res <- cbind(term = rep(terms, times = lens), res) # add on term ID
-    rownames(res) <- NULL                              # tidy up
-    res                                                # return
+  ## apply wrapper to compute confidence interval critical value and
+  ## corresponding confidence interval for each term
+  res <- lapply(x[["derivatives"]][terms], FUN = confInt, level = level)
+  ## how many values per term - currently all equal
+  lens <- vapply(res, FUN = NROW, FUN.VALUE = integer(1))
+  res <- do.call("rbind", res) # row-bind each component of res
+  res <- cbind(term = rep(terms, times = lens), res) # add on term ID
+  rownames(res) <- NULL # tidy up
+  res # return
 }
 
 #' Point-wise and simultaneous confidence intervals for smooths
@@ -268,141 +284,157 @@
                           unconditional = FALSE,
                           ncores = 1, partial_match = FALSE,
                           ..., newdata = NULL) {
-    S <- smooths(object)
-    ## select smooths
-    select <- check_user_select_smooths(smooths = S,
-                                        select = parm,
-                                        partial_match = partial_match)
-    ## did it match anything?
-    if (!any(select)) {
-        stop("No smooths matched <", paste(parm, collapse = ", "),
-             ">. Try adding `partial_match = TRUE`?", call. = FALSE)
+  S <- smooths(object)
+  ## select smooths
+  select <- check_user_select_smooths(
+    smooths = S,
+    select = parm,
+    partial_match = partial_match
+  )
+  ## did it match anything?
+  if (!any(select)) {
+    stop("No smooths matched <", paste(parm, collapse = ", "),
+      ">. Try adding `partial_match = TRUE`?",
+      call. = FALSE
+    )
+  }
+  take <- select & (smooth_dim(object) <= 2L)
+  S <- S[take]
+
+  ## look to see if smooth is a by variable
+  by_levs <- NULL
+  is_by <- vapply(object[["smooth"]][take], is_by_smooth, logical(1L))
+  if (any(is_by)) {
+    # S <- vapply(strsplit(S, ":"), `[[`, character(1L), 1L)
+    by_levs <- vapply(object[["smooth"]][take], by_level, character(1L))
+    by_var <- vapply(object[["smooth"]][take], by_variable, character(1L))
+  }
+  ## unique smooths (counts all levels of a by factor as a single smooth)
+  uS <- unique(S)
+
+  # warn if user uses newdata
+  if (!is.null(newdata)) {
+    newdata_deprecated()
+  }
+
+  ## how many data points if data supplied
+  if (!is.null(data)) {
+    n <- NROW(data)
+  }
+
+  ilink <- if (is.logical(transform)) { # transform is logical
+    if (isTRUE(transform)) { # transform == TRUE
+      family(object)$linkinv
+    } else { # transform == FALSE
+      function(eta) {
+        eta
+      }
     }
-    take <- select & (smooth_dim(object) <= 2L)
-    S <- S[take]
+  } else if (!is.null(transform)) { # transform is a fun
+    match.fun(transform)
+  }
 
-    ## look to see if smooth is a by variable
-    by_levs <- NULL
-    is_by <- vapply(object[["smooth"]][take], is_by_smooth, logical(1L))
-    if (any(is_by)) {
-        #S <- vapply(strsplit(S, ":"), `[[`, character(1L), 1L)
-        by_levs <- vapply(object[["smooth"]][take], by_level, character(1L))
-        by_var <- vapply(object[["smooth"]][take], by_variable, character(1L))
+  ## which type of confidence interval
+  type <- match.arg(type)
+  ## list to hold results
+  out <- vector("list", length = length(uS)) # list for results
+
+  if (isTRUE(type == "confidence")) {
+    for (i in seq_along(out)) {
+      out[[i]] <- smooth_estimates(object,
+        smooth = uS[i],
+        n = n, data = data, partial_match = partial_match
+      )
+      out[[i]][[".crit"]] <- coverage_normal(level)
     }
-    ## unique smooths (counts all levels of a by factor as a single smooth)
-    uS <- unique(S)
-
-    # warn if user uses newdata
-    if (! is.null(newdata)) {
-        newdata_deprecated()
+  } else {
+    ## function to do simultaneous intervals for a smooth
+    ## this should be outlined as an actual function...
+    ## @param smooth list; the individual smooth to work on
+    ## @param level numeric; the confidence level
+    ## @param data dataframe; values to compute confidence interval at
+    sim_interval <- function(smooth, level, data) {
+      start <- smooth[["first.para"]]
+      end <- smooth[["last.para"]]
+      para.seq <- start:end
+      Cg <- PredictMat(smooth, data)
+      simDev <- Cg %*% t(buDiff[, para.seq])
+      absDev <- abs(sweep(simDev, 1L, data[[".se"]], FUN = "/"))
+      masd <- apply(absDev, 2L, max)
+      unname(quantile(masd, probs = level, type = 8))
     }
+    ## need VCOV for simultaneous intervals
+    V <- get_vcov(object, unconditional = unconditional)
+    ## simulate un-biased deviations given bayesian covar matrix
+    buDiff <- mvnfast::rmvn(
+      n = nsim, mu = rep(0, nrow(V)), sigma = V,
+      ncores = ncores
+    )
+    ## loop over smooths
+    for (i in seq_along(out)) {
+      ## evaluate smooth
+      out[[i]] <- smooth_estimates(object,
+        smooth = uS[i],
+        n = n, data = data, partial_match = partial_match
+      )
 
-    ## how many data points if data supplied
-    if (!is.null(data)) {
-        n <- NROW(data)
+      # if this is a by var smooth, we need to do this for each level of
+      # by var
+      # I think this can now be simplified to just be the code in the
+      # else branch as smooth_estimates knows how to handle very specific
+      # smooth names FIXME
+      if (is.null(by_levs)) { # not by variable smooth
+        smooth <- get_smooth(object, parm) # get the specific smooth
+        crit <- sim_interval(smooth, level = level, data = out[[i]])
+      } else { # is a by variable smooth
+        smooth <- old_get_smooth(object, uS[i])
+        crit <- sim_interval(smooth, level = level, data = out[[i]])
+      }
+      out[[i]][[".crit"]] <- crit # add on the critical value
     }
+  }
 
-    ilink <- if (is.logical(transform)) { # transform is logical
-                 if (isTRUE(transform)) { # transform == TRUE
-                     family(object)$linkinv
-                 } else {               # transform == FALSE
-                     function(eta) { eta }
-                 }
-    } else if (!is.null(transform)) {   # transform is a fun
-        match.fun(transform)
-    }
+  if (shift) {
+    const <- coef(object)
+    nms <- names(const)
+    test <- grep("Intercept", nms)
+    const <- ifelse(length(test) == 0L, 0, const[test])
+  } else {
+    const <- 0
+  }
 
-    ## which type of confidence interval
-    type <- match.arg(type)
-    ## list to hold results
-    out <- vector("list", length = length(uS)) # list for results
+  ## simplify to a data frame for return
+  out <- bind_rows(out)
 
-    if (isTRUE(type == "confidence")) {
-        for (i in seq_along(out)) {
-            out[[i]] <- smooth_estimates(object, smooth = uS[i],
-                n = n, data = data, partial_match = partial_match)
-            out[[i]][[".crit"]] <- coverage_normal(level)
-        }
-    } else {
-        ## function to do simultaneous intervals for a smooth
-        ## this should be outlined as an actual function...
-        ## @param smooth list; the individual smooth to work on
-        ## @param level numeric; the confidence level
-        ## @param data dataframe; values to compute confidence interval at
-        sim_interval <- function(smooth, level, data) {
-            start <- smooth[["first.para"]]
-            end <- smooth[["last.para"]]
-            para.seq <- start:end
-            Cg <- PredictMat(smooth, data)
-            simDev <- Cg %*% t(buDiff[, para.seq])
-            absDev <- abs(sweep(simDev, 1L, data[[".se"]], FUN = "/"))
-            masd <- apply(absDev, 2L, max)
-            unname(quantile(masd, probs = level, type = 8))
-        }
-        ## need VCOV for simultaneous intervals
-        V <- get_vcov(object, unconditional = unconditional)
-        ## simulate un-biased deviations given bayesian covar matrix
-        buDiff <- mvnfast::rmvn(n = nsim, mu = rep(0, nrow(V)), sigma = V,
-                       ncores = ncores)
-        ## loop over smooths
-        for (i in seq_along(out)) {
-            ## evaluate smooth
-            out[[i]] <- smooth_estimates(object, smooth = uS[i],
-                n = n, data = data, partial_match = partial_match)
+  # This was needed with `[.evaluated_smooth` before switching to
+  # NextMethod() to call the next S3 `[` method.
+  # See: https://github.com/tidyverse/tibble/issues/511#issuecomment-431225229
+  # Note needed, it seems now that NextMethod() is used but extending tibbles
+  # is not currently well documented.
+  # class(out) <- class(out)[-(1:2)]
 
-            # if this is a by var smooth, we need to do this for each level of
-            # by var
-            # I think this can now be simplified to just be the code in the
-            # else branch as smooth_estimates knows how to handle very specific
-            # smooth names FIXME
-            if (is.null(by_levs)) {        # not by variable smooth
-                smooth <- get_smooth(object, parm) # get the specific smooth
-                crit <- sim_interval(smooth, level = level, data = out[[i]])
-            } else {                       # is a by variable smooth
-                smooth <- old_get_smooth(object, uS[i])
-                crit <- sim_interval(smooth, level = level, data = out[[i]])
-            }
-            out[[i]][[".crit"]] <- crit # add on the critical value
-        }
-    }
+  ## using se and crit, compute the lower and upper intervals
+  out <- add_column(out,
+    .lower_ci = out$.estimate - (out$.crit * out$.se),
+    .upper_ci = out$.estimate + (out$.crit * out$.se)
+  )
 
-    if (shift) {
-        const <- coef(object)
-        nms <- names(const)
-        test <- grep("Intercept", nms)
-        const <- ifelse(length(test) == 0L, 0, const[test])
-    } else {
-        const <- 0
-    }
+  ## transform
+  out <- out |>
+    mutate(across(all_of(c(".estimate", ".lower_ci", ".upper_ci")),
+      .fns = ilink
+    ))
 
-    ## simplify to a data frame for return
-    out <- bind_rows(out)
+  # smooth_estimates has columns in different places, relocate them to match
+  # old output as much as possible
+  out <- relocate(out, all_of(c(
+    ".estimate", ".se", ".crit", ".lower_ci",
+    ".upper_ci"
+  )), .after = last_col())
 
-    # This was needed with `[.evaluated_smooth` before switching to
-    # NextMethod() to call the next S3 `[` method.
-    # See: https://github.com/tidyverse/tibble/issues/511#issuecomment-431225229
-    # Note needed, it seems now that NextMethod() is used but extending tibbles
-    # is not currently well documented.
-    # class(out) <- class(out)[-(1:2)]
-
-    ## using se and crit, compute the lower and upper intervals
-    out <- add_column(out,
-                      .lower_ci = out$.estimate - (out$.crit * out$.se),
-                      .upper_ci = out$.estimate + (out$.crit * out$.se))
-
-    ## transform
-    out <- out |>
-        mutate(across(all_of(c(".estimate", ".lower_ci", ".upper_ci")),
-            .fns = ilink))
-
-    # smooth_estimates has columns in different places, relocate them to match
-    # old output as much as possible
-    out <- relocate(out, all_of(c(".estimate", ".se", ".crit", ".lower_ci",
-        ".upper_ci")), .after = last_col())
-
-    ## prepare for return
-    class(out) <- c("confint.gam", class(out))
-    out                                 # return
+  ## prepare for return
+  class(out) <- c("confint.gam", class(out))
+  out # return
 }
 
 #' @rdname confint.gam
@@ -411,18 +443,19 @@
 #'
 #' @export
 `confint.gamm` <- function(object, ...) {
-    confint(object[["gam"]], ...)
+  confint(object[["gam"]], ...)
 }
 
 #' @rdname confint.gam
 #'
 #' @importFrom stats confint
-#' 
+#'
 #' @export
 `confint.list` <- function(object, ...) {
-    if (!is_gamm4(object)) {
-        stop("`object` does not appear to a `gamm4` model object",
-             call. = FALSE)
-    }
-    confint(object[["gam"]], ...)
+  if (!is_gamm4(object)) {
+    stop("`object` does not appear to a `gamm4` model object",
+      call. = FALSE
+    )
+  }
+  confint(object[["gam"]], ...)
 }

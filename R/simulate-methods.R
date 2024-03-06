@@ -45,44 +45,44 @@
 #' head(sims)
 `simulate.gam` <- function(object, nsim = 1, seed = NULL, data = newdata,
                            weights = NULL, ..., newdata = NULL) {
-    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-        runif(1)
-    }
-    if (is.null(seed)) {
-        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-    } else {
-        R.seed <- get(".Random.seed", envir = .GlobalEnv)
-        set.seed(seed)
-        RNGstate <- structure(seed, kind = as.list(RNGkind()))
-        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-    }
-    ## rd function if available
-    rd_fun <- get_family_rd(object)
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+    runif(1)
+  }
+  if (is.null(seed)) {
+    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+  } else {
+    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+    set.seed(seed)
+    RNGstate <- structure(seed, kind = as.list(RNGkind()))
+    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+  }
+  ## rd function if available
+  rd_fun <- get_family_rd(object)
 
-    ## dispersion or scale variable for simulation
-    scale <- object[["sig2"]]
-    if (is.null(scale)) {
-        scale <- summary(object)[["dispersion"]]
+  ## dispersion or scale variable for simulation
+  scale <- object[["sig2"]]
+  if (is.null(scale)) {
+    scale <- summary(object)[["dispersion"]]
+  }
+
+  if (!is.null(newdata)) {
+    newdata_deprecated()
+  }
+
+  if (is.null(data)) {
+    data <- object[["model"]]
+    weights <- object[["prior.weights"]]
+  } else {
+    if (is.null(weights)) {
+      weights <- rep(1, nrow(data))
     }
+  }
 
-    if (!is.null(newdata)) {
-        newdata_deprecated()
-    }
+  mu <- predict(object, newdata = data, type = "response", ...)
+  sims <- replicate(nsim, rd_fun(mu = mu, wt = weights, scale = scale))
 
-    if (is.null(data)) {
-        data <- object[["model"]]
-        weights <- object[["prior.weights"]]
-    } else {
-        if (is.null(weights)) {
-            weights <- rep(1, nrow(data))
-        }
-    }
-
-    mu <- predict(object, newdata = data, type = "response", ...)
-    sims <- replicate(nsim, rd_fun(mu = mu, wt = weights, scale = scale))
-
-    attr(sims, "seed") <- RNGstate
-    sims
+  attr(sims, "seed") <- RNGstate
+  sims
 }
 
 #' @rdname simulate
@@ -90,12 +90,14 @@
 #' @export
 `simulate.gamm` <- function(object, nsim = 1, seed = NULL, data = newdata,
                             weights = NULL, ..., newdata = NULL) {
-    if (!is.null(newdata)) {
-        newdata_deprecated()
-    }
+  if (!is.null(newdata)) {
+    newdata_deprecated()
+  }
 
-    simulate(object$gam, nsim = nsim, seed = seed, data = newdata,
-             weights = weights, ...)
+  simulate(object$gam,
+    nsim = nsim, seed = seed, data = newdata,
+    weights = weights, ...
+  )
 }
 
 #' @rdname simulate
@@ -104,43 +106,43 @@
 #' @export
 `simulate.scam` <- function(object, nsim = 1, seed = NULL, data = newdata,
                             weights = NULL, ..., newdata = NULL) {
-    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-        runif(1)
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+    runif(1)
+  }
+  if (is.null(seed)) {
+    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+  } else {
+    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+    set.seed(seed)
+    RNGstate <- structure(seed, kind = as.list(RNGkind()))
+    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+  }
+  ## rd function if available
+  rd_fun <- get_family_rd(object)
+
+  ## dispersion or scale variable for simulation
+  scale <- object[["sig2"]]
+  if (is.null(scale)) {
+    scale <- summary(object)[["dispersion"]]
+  }
+
+  if (!is.null(newdata)) {
+    newdata_deprecated()
+  }
+
+  if (is.null(data)) {
+    data <- object[["model"]]
+    weights <- object[["prior.weights"]]
+  } else {
+    if (is.null(weights)) {
+      weights <- rep(1, nrow(data))
     }
-    if (is.null(seed)) {
-        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-    } else {
-        R.seed <- get(".Random.seed", envir = .GlobalEnv)
-        set.seed(seed)
-        RNGstate <- structure(seed, kind = as.list(RNGkind()))
-        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-    }
-    ## rd function if available
-    rd_fun <- get_family_rd(object)
+  }
 
-    ## dispersion or scale variable for simulation
-    scale <- object[["sig2"]]
-    if (is.null(scale)) {
-        scale <- summary(object)[["dispersion"]]
-    }
+  mu <- predict(object, newdata = data, type = "response", ...)
 
-    if (!is.null(newdata)) {
-        newdata_deprecated()
-    }
+  sims <- replicate(nsim, rd_fun(mu = mu, wt = weights, scale = scale))
 
-    if (is.null(data)) {
-        data <- object[["model"]]
-        weights <- object[["prior.weights"]]
-    } else {
-        if (is.null(weights)) {
-            weights <- rep(1, nrow(data))
-        }
-    }
-
-    mu <- predict(object, newdata = data, type = "response", ...)
-
-    sims <- replicate(nsim, rd_fun(mu = mu, wt = weights, scale = scale))
-
-    attr(sims, "seed") <- RNGstate
-    sims
+  attr(sims, "seed") <- RNGstate
+  sims
 }
