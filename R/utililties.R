@@ -1250,12 +1250,13 @@ vars_from_label <- function(label) {
 
 ## Normalize a vector to range -1 -- 1
 `norm_minus_one_to_one` <- function(x) {
-  abs_x <- abs(x)
-  sign_x <- sign(x)
-  minx <- 0
-  maxx <- max(abs_x, na.rm = TRUE)
-  abs_x <- (abs_x - 0) / (maxx - 0)
-  abs_x * sign_x
+  #abs_x <- abs(x)
+  #sign_x <- sign(x)
+  minx <- min(x, na.rm = TRUE)
+  maxx <- max(x, na.rm = TRUE)
+  norm_x <- (2 * ((x - minx) / (maxx - minx))) - 1
+  #abs_x * sign_x
+  norm_x
 }
 
 #' Delete response from user-supplied data
