@@ -58,7 +58,7 @@ The main features of *gratia* are currently
 
     For example, the classic four term additive example from Gu & Wahba:
 	
-	![Estimated smooths from a GAM](man/figures/README-draw-gam-figure-1.png)
+	  ![Estimated smooths from a GAM](man/figures/README-draw-gam-figure-1.png)
 
     Or for a bivariate smooth:
     
