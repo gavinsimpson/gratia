@@ -58,6 +58,17 @@ test_that("generate_draws() works for a GAM", {
   expect_identical(drws1, drws2)
 })
 
+test_that("generate_draws() works for a GAM, 1 draw only", {
+  expect_silent(drws1 <- generate_draws(m_gam, n = 1, method = "gaussian",
+    seed = 2))
+  expect_silent(drws2 <- generate_draws(m_gam, n = 1, method = "gaussian",
+    seed = 2))
+  expect_type(drws1, "double")
+  expect_true(is.matrix(drws1))
+  expect_identical(dim(drws1), c(1L, 37L))
+  expect_identical(drws1, drws2)
+})
+
 test_that("generate_draws() works for a GAM with MH", {
   expect_silent(drws1 <- generate_draws(m_gam, n = 20, method = "mh",
     burnin = 100, thin = 2, t_df = 4, rw_scale = 0.3, seed = 2))
