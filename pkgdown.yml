@@ -1,8 +1,12 @@
-pandoc: 2.7.3
-pkgdown: 2.0.2.9000
-pkgdown_sha: ae7363faac9040a473a54fb3d770decdfb8dfec1
-articles: {}
-last_built: 2022-02-02T10:01Z
+pandoc: 3.1.11
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  custom-plotting: custom-plotting.html
+  data-slices: data-slices.html
+  gratia: gratia.html
+  posterior-simulation: posterior-simulation.html
+last_built: 2024-03-06T08:06Z
 urls:
   reference: https://gavinsimpson.github.io/gratia/reference
   article: https://gavinsimpson.github.io/gratia/articles
