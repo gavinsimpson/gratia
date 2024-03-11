@@ -2,15 +2,25 @@
 #'
 #' @param model Primary model for comparison.
 #' @param ... Additional models to compare smooths against those of `model`.
-#' @param smooths character; vector of smooths to compare. If not specified
-#'   comparisons will be performed for smooths common to all models supplied.
+#' @param smooths `r lifecycle::badge("deprecated")` Use `select` instead.
+#' @param select character; select which smooths to compare. The default
+#'   (`NULL`) means all smooths in `model` will be compared. Numeric `select`
+#'   indexes the smooths in the order they are specified in the formula and
+#'   stored in `model`. Character `select` matches the labels for smooths
+#'   as shown for example in the output from `summary(object)`. Logical
+#'   `select` operates as per numeric `select` in the order that smooths are
+#'   stored.
+#' @param partial_match logical; should smooths be selected by partial matches
+#'   with `select`? If `TRUE`, `select` can only be a single string to match
+#'   against.
 #'
 #' @inheritParams smooth_estimates
 #'
 #' @export
 #'
 #' @importFrom rlang dots_list
-#' @importFrom dplyr group_by %>%
+#' @importFrom dplyr group_by
+#' @importFrom lifecycle deprecated is_present
 #'
 #' @examples
 #' \dontshow{
@@ -35,11 +45,19 @@
 #' \dontshow{
 #' options(op)
 #' }
-`compare_smooths` <- function(model, ..., smooths = NULL,
-                              n = 100,
-                              data = NULL,
-                              unconditional = FALSE,
-                              overall_uncertainty = TRUE) {
+`compare_smooths` <- function(model, ...,
+    select = NULL,
+    smooths = deprecated(),
+    n = 100,
+    data = NULL,
+    unconditional = FALSE,
+    overall_uncertainty = TRUE,
+    partial_match = FALSE) {
+  if (lifecycle::is_present(smooths)) {
+    lifecycle::deprecate_warn("0.8.9.9", "compare_smooths(smooths)",
+      "compare_smooths(select)")
+    select <- smooths
+  }
   ## grab ...
   dots <- rlang::dots_list(..., .named = TRUE)
   model_names <- c(deparse(substitute(model)), names(dots))
@@ -59,12 +77,12 @@
 
   ## loop over the smooths, applying smooth_estimates to each model
   sm_est <- lapply(models, smooth_estimates,
-    smooth = smooths,
+    select = select,
     n = n,
     data = data,
     uncondtional = unconditional,
     overall_uncertainty = overall_uncertainty,
-    unnest = FALSE
+    unnest = FALSE, partial_match = partial_match
   )
 
   ## loop over list of smooth estimates and add model column
@@ -76,19 +94,19 @@
   }
 
   `unnest_nest` <- function(x) {
-    x %>%
-      group_by(.data$.smooth) %>%
-      group_split() %>%
-      purrr::map(unnest, cols = all_of("data")) %>%
+    x |>
+      group_by(.data$.smooth) |>
+      group_split() |>
+      purrr::map(unnest, cols = all_of("data")) |>
       purrr::map(nest, data = !all_of(c(
         ".model", ".smooth",
         ".type", ".by"
-      ))) %>%
+      ))) |>
       bind_rows()
   }
   sm_est <- purrr::map(sm_est, unnest_nest)
 
-  sm_est <- bind_rows(sm_est) %>%
+  sm_est <- bind_rows(sm_est) |>
     arrange(.data$.smooth)
   class(sm_est) <- c("compare_smooths", class(sm_est))
   sm_est

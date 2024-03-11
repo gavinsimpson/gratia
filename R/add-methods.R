@@ -647,7 +647,7 @@
 #'   method exists.
 #' @param n integer; the number of posterior draws to add.
 #' @param seed numeric; a value to seed the random number generator.
-#' @param term character; select which smooth's posterior to draw from. The
+#' @param select character; select which smooth's posterior to draw from. The
 #'   default, `NULL`, means the posteriors of all smooths in model wil be
 #'   sampled from individually. If supplied, a character vector of requested
 #'   smooth terms.
@@ -676,7 +676,7 @@
 #'
 #' # add posterior draws from smooth s(x2)
 #' df |>
-#'   add_smooth_samples(m, n = 2, seed = 2, term = "s(x2)")
+#'   add_smooth_samples(m, n = 2, seed = 2, select= "s(x2)")
 #' \dontshow{
 #'   options(op)
 #' }
@@ -720,10 +720,10 @@
 #' @export
 #' @importFrom dplyr mutate row_number left_join join_by
 #' @rdname add_fitted_samples
-`add_smooth_samples` <- function(object, model, n = 1, seed = NULL, term = NULL,
+`add_smooth_samples` <- function(object, model, n = 1, seed = NULL, select = NULL,
     ...) {
   # compute posterior samples
-  ss <- smooth_samples(model, data = object, n = n, seed = seed, term = term,
+  ss <- smooth_samples(model, data = object, n = n, seed = seed, select = select,
     ...) |>
     select(all_of(c(".smooth", ".term", ".row", ".draw", ".value")))
   # need to have .row in object so we can join with the fitted samples

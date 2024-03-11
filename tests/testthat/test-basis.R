@@ -31,6 +31,17 @@ test_that("basis() works with a gam", {
   expect_doppelganger("draw basis works with a gam single smooth", plt2)
 })
 
+test_that("basis() works with a gam on selected term", {
+  expect_silent(bs <- basis(m_gam, select = "s(x2)"))
+})
+
+test_that("term argument is deprecated in basis()", {
+  expect_warning(bs <- basis(m_gam, term = "s(x2)"), "deprecated")
+  expect_warning(bs <- basis(m_gamm, term = "s(x2)"), "deprecated")
+  expect_warning(bs <- basis(m_scam, term = "s(x2)"), "deprecated")
+  expect_warning(bs <- basis(m_gamm4, term = "s(x2)"), "deprecated")
+})
+
 test_that("basis() works with a scam", {
   skip(message = "This needs fixing as something in scam changed")
   skip_on_cran()

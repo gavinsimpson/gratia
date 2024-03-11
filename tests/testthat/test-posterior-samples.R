@@ -111,21 +111,31 @@ test_that("smooth_samples sets seed when seed not provided", {
 })
 
 test_that("smooth_samples works with term provided", {
-  expect_silent(sm <- smooth_samples(m_gam, term = "s(x2)", seed = 42))
+  expect_silent(sm <- smooth_samples(m_gam, select = "s(x2)", seed = 42))
 })
 
 test_that("smooth_samples errors with invalid term provided", {
-  expect_error(sm <- smooth_samples(m_gam, term = "s(x10)", seed = 42),
-    "None of the terms matched a smooth.",
+  expect_error(sm <- smooth_samples(m_gam, select = "s(x10)", seed = 42),
+    "Failed to match any smooths in model m_gam.
+Try with 'partial_match = TRUE'?",
     fixed = TRUE
   )
+})
+
+test_that("term argument to smooth_samples is deprecated", {
+  expect_warning(sm <- smooth_samples(m_gam, term = "s(x1)", seed = 42),
+    "The `term` argument of `smooth_samples()` is deprecated as of gratia 0.8.9.9.
+i Please use the `select` argument instead.",
+    fixed = TRUE
+  )
+
 })
 
 # from #121
 test_that("smooth_samples gets the right factor by smooth: #121", {
   expect_silent(sm <- smooth_samples(su_m_factor_by,
     n = 5, n_vals = 100,
-    term = "s(x2):fac2", seed = 42
+    select = "s(x2):fac2", seed = 42
   ))
   # factor level of `fac` column should be 2
   expect_identical(all(sm["fac"] == 2), TRUE)
@@ -146,7 +156,7 @@ test_that("smooth_samples ignores ranef smooths: #121", {
 test_that("smooth_samples fails if no smooths left to sample from", {
   expect_error(
     sm <- smooth_samples(rm1,
-      term = "s(fac)",
+      select = "s(fac)",
       n = 5, n_vals = 100, seed = 42
     ),
     "No smooths left that can be sampled from."
@@ -268,7 +278,7 @@ test_that("smooth_samples example output doesn't change", {
   # skip_on_os("mac")
   skip_on_ci()
 
-  samples <- smooth_samples(m_gam, term = "s(x0)", n = 5, seed = 42)
+  samples <- smooth_samples(m_gam, select = "s(x0)", n = 5, seed = 42)
   expect_snapshot(samples)
 })
 

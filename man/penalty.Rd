@@ -14,7 +14,14 @@ penalty(object, ...)
 
 \method{penalty}{default}(object, rescale = FALSE, data, knots = NULL, constraints = FALSE, ...)
 
-\method{penalty}{gam}(object, smooth = NULL, rescale = FALSE, ...)
+\method{penalty}{gam}(
+  object,
+  select = NULL,
+  smooth = deprecated(),
+  rescale = FALSE,
+  partial_match = FALSE,
+  ...
+)
 
 \method{penalty}{mgcv.smooth}(object, rescale = FALSE, ...)
 
@@ -43,8 +50,19 @@ is required. See \code{\link[mgcv:smoothCon]{mgcv::smoothCon()}}.}
 \item{constraints}{logical; should identifiability constraints be applied to
 the smooth basis. See argument \code{absorb.cons} in \code{\link[mgcv:smoothCon]{mgcv::smoothCon()}}.}
 
-\item{smooth}{character; vector of smooths to extract penalty matrices for.
-If \code{NULL}, penalty matrices for all smooths in \code{object} are extracted.}
+\item{select}{character, logical, or numeric; which smooths to extract
+penalties for. If \code{NULL}, the default, then penalties for all model
+smooths are drawn. Numeric \code{select} indexes the smooths in the order they
+are specified in the formula and stored in \code{object}. Character \code{select}
+matches the labels for smooths as shown for example in the output from
+\code{summary(object)}. Logical \code{select} operates as per numeric \code{select} in
+the order that smooths are stored.}
+
+\item{smooth}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{select} instead.}
+
+\item{partial_match}{logical; should smooths be selected by partial matches
+with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
+against.}
 
 \item{margins}{logical; extract the penalty matrices for the tensor
 product or the marginal smooths of the tensor product?}
@@ -53,17 +71,17 @@ product or the marginal smooths of the tensor product?}
 A 'tibble' (data frame) of class \code{penalty_df} inheriting from
 \code{tbl_df}, with the following components:
 \itemize{
-\item \code{smooth} - character; the label \emph{mgcv} uses to refer to the smooth,
-\item \code{type} - character; the type of smooth,
-\item \code{penalty} - character; the label for the specific penalty. Some smooths
+\item \code{.smooth} - character; the label \emph{mgcv} uses to refer to the smooth,
+\item \code{.type} - character; the type of smooth,
+\item \code{.penalty} - character; the label for the specific penalty. Some smooths
 have multiple penalty matrices, so the \code{penalty} component identifies the
 particular penalty matrix and uses the labelling that \emph{mgcv} uses
 internally,
-\item \code{row} - character; a label of the form \code{fn} where \code{n} is an integer for
+\item \code{.row} - character; a label of the form \code{fn} where \code{n} is an integer for
 the \code{n}th basis function, referencing the columns of the penalty matrix,
-\item \code{col} - character; a label of the form \code{fn} where \code{n} is an integer for
+\item \code{.col} - character; a label of the form \code{fn} where \code{n} is an integer for
 the \code{n}th basis function, referencing the columns of the penalty matrix,
-\item \code{value} - double; the value of the penalty matrix for the combination of
+\item \code{.value} - double; the value of the penalty matrix for the combination of
 \code{row} and \code{col},
 }
 }
@@ -97,7 +115,7 @@ m <- gam(
 penalty(m)
 
 # for a specific smooth
-penalty(m, smooth = "s(x2):fac1")
+penalty(m, select = "s(x2):fac1")
 
 \dontshow{
 options(op)

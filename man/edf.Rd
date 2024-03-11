@@ -10,8 +10,10 @@ edf(object, ...)
 
 \method{edf}{gam}(
   object,
-  smooth = NULL,
+  select = NULL,
+  smooth = deprecated(),
   type = c("default", "unconditional", "alternative"),
+  partial_match = FALSE,
   ...
 )
 
@@ -22,13 +24,25 @@ model_edf(object, ..., type = c("default", "unconditional", "alternative"))
 
 \item{...}{arguments passed to methods.}
 
-\item{smooth}{character; a vector of smooth terms whose EDFs will be
+\item{select}{character, logical, or numeric; which smooths to plot. If
+\code{NULL}, the default, then all model smooths are drawn. Numeric \code{select}
+indexes the smooths in the order they are specified in the formula and
+stored in \code{object}. Character \code{select} matches the labels for smooths
+as shown for example in the output from \code{summary(object)}. Logical
+\code{select} operates as per numeric \code{select} in the order that smooths are
+stored.}
+
+\item{smooth}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{select} instead.
 extracted. If \code{NULL}, the default, EDFs for all smooths will be returned.}
 
 \item{type}{character: which type of EDF to return. \code{"default"} returns the
 standard EDF; \code{"unconditional"} selects the EDF corrected for smoothness
 parameter selection, if available; \code{"alternative"} returns the alternative
 formulation for EDF from Wood (2017, pp. 252)}
+
+\item{partial_match}{logical; should smooths be selected by partial matches
+with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
+against.}
 }
 \description{
 Extracts the effective degrees of freedom (EDF) for model smooth terms or
@@ -62,7 +76,7 @@ m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 edf(m)
 
 # or selected smooths
-edf(m, smooth = c("s(x0)", "s(x2)"))
+edf(m, select = c("s(x0)", "s(x2)"))
 
 # accounting for smoothness parameter uncertainty
 edf(m, type = "unconditional")

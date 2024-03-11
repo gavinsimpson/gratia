@@ -13,7 +13,8 @@ basis(object, ...)
 
 \method{basis}{gam}(
   object,
-  term = NULL,
+  select = NULL,
+  term = deprecated(),
   data = NULL,
   n = 100,
   n_2d = 50,
@@ -25,7 +26,8 @@ basis(object, ...)
 
 \method{basis}{scam}(
   object,
-  term = NULL,
+  select = NULL,
+  term = deprecated(),
   data = NULL,
   n = 100,
   n_2d = 50,
@@ -37,7 +39,8 @@ basis(object, ...)
 
 \method{basis}{gamm}(
   object,
-  term = NULL,
+  select = NULL,
+  term = deprecated(),
   data = NULL,
   n = 100,
   n_2d = 50,
@@ -49,7 +52,8 @@ basis(object, ...)
 
 \method{basis}{list}(
   object,
-  term = NULL,
+  select = NULL,
+  term = deprecated(),
   data = NULL,
   n = 100,
   n_2d = 50,
@@ -68,7 +72,10 @@ GAM(M) model.}
 
 \item{...}{other arguments passed to \code{\link[mgcv:smoothCon]{mgcv::smoothCon()}}.}
 
-\item{term}{character; select smooths in a fitted model}
+\item{select}{character; select smooths in a fitted model}
+
+\item{term}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} This argument has been
+renamed \code{select}}
 
 \item{data}{a data frame containing the variables used in \code{smooth}.}
 

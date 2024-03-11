@@ -59,7 +59,7 @@ band. Affects the fill of the interval.}
 
 \item{smooth_col}{colour specification for the the smooth or difference line.}
 
-\item{line_col}{colour specicification for drawing reference lines}
+\item{line_col}{colour specification for drawing reference lines}
 
 \item{scales}{character; should all univariate smooths be plotted with the
 same y-axis scale? If \code{scales = "free"}, the default, each univariate
@@ -95,6 +95,6 @@ df <- data_sim("eg4", seed = 42)
 m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 
 # calculate the differences between pairs of smooths the f_j(x2) term
-diffs <- difference_smooths(m, smooth = "s(x2)")
+diffs <- difference_smooths(m, select = "s(x2)")
 draw(diffs)
 }

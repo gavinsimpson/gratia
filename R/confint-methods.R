@@ -342,7 +342,7 @@
   if (isTRUE(type == "confidence")) {
     for (i in seq_along(out)) {
       out[[i]] <- smooth_estimates(object,
-        smooth = uS[i],
+        select = uS[i],
         n = n, data = data, partial_match = partial_match
       )
       out[[i]][[".crit"]] <- coverage_normal(level)
@@ -374,7 +374,7 @@
     for (i in seq_along(out)) {
       ## evaluate smooth
       out[[i]] <- smooth_estimates(object,
-        smooth = uS[i],
+        select = uS[i],
         n = n, data = data, partial_match = partial_match
       )
 

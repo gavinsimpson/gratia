@@ -112,7 +112,7 @@ m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
 ds <- data_slice(m, x2 = evenly(x2, n = 100))
 
 # fitted values along x2
-fv <- fitted_values(m, smooth = "s(x2)", data = ds)
+fv <- fitted_values(m, data = ds)
 
 # response derivatives - ideally n_sim = >10000
 y_d <- response_derivatives(m,

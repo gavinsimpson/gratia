@@ -43,7 +43,7 @@
   default projection used is `+proj=ortho +lat_0=20 +lon_0=XX` where `XX` is the
   mean of the longitude coordinates of the data points.
 
-### Defunct and deprecated functions
+### Defunct and deprecated functions and arguments
 
 #### Defunct
 
@@ -63,6 +63,14 @@ eventual 1.0.0 release. These functions will become defunct by version 0.11.0 or
 
 * `datagen()` has been deprecated. It never really did what it was originally
   designed to do, and has been replaced by `data_slice()`.
+
+#### Deprecated arguments
+
+To make functions in the package more consistent, the arguments `select`,
+`term`, and `smooth` are all used for the same thing and hence the latter two
+have been deprecated in favour of `select`. If a deprecated argument is used, a
+warning will be issued but the value assigned to the argument will be assigned
+to `select` and the function will continue.
 
 ## User visible changes
 

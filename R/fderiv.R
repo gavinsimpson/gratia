@@ -61,7 +61,7 @@
 #' ## ...and a selected smooth
 #' fd2 <- fderiv(mod, term = "x1")
 #' ## now use -->
-#' fd2 <- derivatives(mod, term = "s(x1)")
+#' fd2 <- derivatives(mod, select = "s(x1)")
 #'
 #' ## Models with factors
 #' dat <- data_sim("eg4", n = 400, dist = "normal", scale = 2, seed = 2)
@@ -75,7 +75,7 @@
 #' ## ...and a selected smooth
 #' fd2 <- fderiv(mod, term = "x1")
 #' ## now use -->
-#' fd2 <- derivatives(mod, term = "s(x1)")
+#' fd2 <- derivatives(mod, select = "s(x1)")
 `fderiv.gam` <- function(model, newdata, term, n = 200, eps = 1e-7,
                          unconditional = FALSE, offset = NULL, ...) {
   ## where to predict/evaluate derivatives at

@@ -139,7 +139,7 @@ test_that("add_constant works for evaluate_parametric_term", {
 })
 
 test_that("add_constant works for smooth_estimates", {
-  expect_silent(sm <- smooth_estimates(m_gam, smooth = "s(x1)"))
+  expect_silent(sm <- smooth_estimates(m_gam, select = "s(x1)"))
   expect_silent(sm <- add_constant(sm, constant = 10))
   expect_error(sm <- add_constant(sm, constant = "a"),
     "'constant' must be numeric: supplied <a>",
@@ -227,7 +227,7 @@ test_that("add_smooth_samples works", {
 
 test_that("add_smooth_samples works for selected smooth", {
   expect_silent(ss <- quick_eg1 |>
-    add_smooth_samples(m_gam, seed = 2, n = 2, term = "s(x2)"))
+    add_smooth_samples(m_gam, seed = 2, n = 2, select = "s(x2)"))
   expect_identical(nrow(ss), 600L) # 300 data by 1 smooth by 2 samples
   expect_named(ss, c(names(quick_eg1), ".row", ".smooth", ".term", ".draw",
     ".value"))

@@ -9,7 +9,8 @@ difference_smooths(model, ...)
 
 \method{difference_smooths}{gam}(
   model,
-  smooth,
+  select = NULL,
+  smooth = deprecated(),
   n = 100,
   ci_level = 0.95,
   data = NULL,
@@ -25,7 +26,15 @@ difference_smooths(model, ...)
 
 \item{...}{arguments passed to other methods. Not currently used.}
 
-\item{smooth}{character; which smooth to compute differences for.}
+\item{select}{character, logical, or numeric; which smooths to plot. If
+\code{NULL}, the default, then all model smooths are drawn. Numeric \code{select}
+indexes the smooths in the order they are specified in the formula and
+stored in \code{object}. Character \code{select} matches the labels for smooths
+as shown for example in the output from \code{summary(object)}. Logical
+\code{select} operates as per numeric \code{select} in the order that smooths are
+stored.}
+
+\item{smooth}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{select} instead.}
 
 \item{n}{numeric; the number of points at which to evaluate the difference
 between pairs of smooths.}
@@ -63,13 +72,13 @@ op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 df <- data_sim("eg4", seed = 42)
 m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 
-sm_dif <- difference_smooths(m, smooth = "s(x2)")
+sm_dif <- difference_smooths(m, select = "s(x2)")
 sm_dif
 
 draw(sm_dif)
 
 # include the groups means for `fac` in the difference
-sm_dif2 <- difference_smooths(m, smooth = "s(x2)", group_means = TRUE)
+sm_dif2 <- difference_smooths(m, select = "s(x2)", group_means = TRUE)
 draw(sm_dif2)
 \dontshow{
 options(op)

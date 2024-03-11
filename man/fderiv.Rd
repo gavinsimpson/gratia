@@ -74,7 +74,7 @@ fd <- derivatives(mod)
 ## ...and a selected smooth
 fd2 <- fderiv(mod, term = "x1")
 ## now use -->
-fd2 <- derivatives(mod, term = "s(x1)")
+fd2 <- derivatives(mod, select = "s(x1)")
 
 ## Models with factors
 dat <- data_sim("eg4", n = 400, dist = "normal", scale = 2, seed = 2)
@@ -88,7 +88,7 @@ fd <- derivatives(mod)
 ## ...and a selected smooth
 fd2 <- fderiv(mod, term = "x1")
 ## now use -->
-fd2 <- derivatives(mod, term = "s(x1)")
+fd2 <- derivatives(mod, select = "s(x1)")
 }
 \author{
 Gavin L. Simpson

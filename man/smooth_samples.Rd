@@ -9,7 +9,8 @@ smooth_samples(model, ...)
 
 \method{smooth_samples}{gam}(
   model,
-  term = NULL,
+  select = NULL,
+  term = deprecated(),
   n = 1,
   data = newdata,
   method = c("gaussian", "mh", "inla", "user"),
@@ -24,6 +25,7 @@ smooth_samples(model, ...)
   rw_scale = 0.25,
   rng_per_smooth = FALSE,
   draws = NULL,
+  partial_match = NULL,
   ...,
   newdata = NULL,
   ncores = NULL
@@ -37,9 +39,11 @@ are passed on to \code{\link[=predict.gam]{predict.gam()}}. For \code{posterior_
 passed on to \code{fitted_samples()}. For \code{predicted_samples()} these are
 passed on to the relevant \code{simulate()} method.}
 
-\item{term}{character; select which smooth's posterior to draw from.
+\item{select}{character; select which smooth's posterior to draw from.
 The default (\code{NULL}) means the posteriors of all smooths in \code{model}
 wil be sampled from. If supplied, a character vector of requested terms.}
+
+\item{term}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{select} instead.}
 
 \item{n}{numeric; the number of posterior samples to return.}
 
@@ -96,6 +100,10 @@ RNG is performed for all model parameters}
 \item{draws}{matrix; user supplied posterior draws to be used when
 \code{method = "user"}.}
 
+\item{partial_match}{logical; should smooths be selected by partial matches
+with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
+against.}
+
 \item{newdata}{Deprecated: use \code{data} instead.}
 
 \item{ncores}{Deprecated; use \code{n_cores} instead. The number of cores for
@@ -150,7 +158,7 @@ op <- options(cli.unicode = FALSE, pillar.sigfig = 3)
 dat <- data_sim("eg1", n = 400, seed = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
-sms <- smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
+sms <- smooth_samples(m1, select = "s(x0)", n = 5, seed = 42)
 \donttest{
 sms
 }

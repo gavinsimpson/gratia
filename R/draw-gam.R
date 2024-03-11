@@ -256,7 +256,7 @@
   if (length(select) > 0L) {
     # evaluate all requested smooths
     sm_eval <- smooth_estimates(object,
-      smooth = S[select],
+      select = S[select],
       n = n,
       n_3d = n_3d,
       n_4d = n_4d,
@@ -396,7 +396,7 @@
       parametric <- FALSE
     } else {
       para <- parametric_effects(object,
-        term = terms, data = data,
+        select = terms, data = data,
         unconditional = unconditional,
         unnest = TRUE, ci_level = ci_level, envir = envir
       )

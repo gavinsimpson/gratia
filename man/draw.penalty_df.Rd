@@ -69,5 +69,5 @@ m <- gam(y ~ s(x0) + s(x1, bs = "cr") + s(x2, bs = "bs", by = fac),
 draw(penalty(m))
 
 # for a specific smooth
-draw(penalty(m, smooth = "s(x2):fac1"))
+draw(penalty(m, select = "s(x2):fac1"))
 }

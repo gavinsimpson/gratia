@@ -5,8 +5,9 @@
 #'
 #' @param object a fitted GAM(M) object, or, for the `"mgcv.smooth"` method,
 #'   an object that inherits from class `mgcv.smooth`.
-#' @param term character; the label of the smooth whose coefficients will be
+#' @param select character; the label of the smooth whose coefficients will be
 #'   returned.
+#' @param term `r lifecycle::badge("deprecated")` Use `select` instead.
 #' @param model a fitted GAM(M) object.
 #' @param ... arguments passed to other methods.
 #'
@@ -14,6 +15,8 @@
 #'
 #' @seealso [smooth_coef_indices()] for extracting the indices of the
 #'   coefficients for a particular smooth.
+#' 
+#' @importFrom lifecycle deprecated is_present
 #'
 #' @author Gavin L. Simpson
 #' @export
@@ -27,7 +30,7 @@
 #' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 #'
 #' ## IGNORE_RDIFF_BEGIN
-#' smooth_coefs(m, term = "s(x2)")
+#' smooth_coefs(m, select = "s(x2)")
 #' ## IGNORE_RDIFF_END
 #' \dontshow{
 #' options(op)
@@ -39,36 +42,74 @@
 #' @export
 #' @rdname smooth_coefs
 #' @importFrom stats coef
-`smooth_coefs.gam` <- function(object, term, ...) {
-  if (length(term) > 1L) {
+`smooth_coefs.gam` <- function(object,
+    select,
+    term = deprecated(),
+    ...) {
+  if (lifecycle::is_present(term)) {
+    lifecycle::deprecate_warn("0.8.9.9", "smooth_coefs(term)",
+      "smooth_coefs(select)")
+    select <- term
+  }
+  if (length(select) > 1L) {
     warning(
       "More than one smooth specified by `term`.\n",
       "Using only the first."
     )
-    term <- term[1L]
+    select <- select[1L]
   }
-  sm <- get_smooth(object, term = term)
+  sm <- get_smooth(object, term = select)
+  if (length(sm) == 0) {
+    stop("You didn't specify a smooth via 'select'")
+  }
   i <- smooth_coef_indices(sm)
   coef(object)[i]
 }
 
 #' @export
 #' @rdname smooth_coefs
-`smooth_coefs.bam` <- function(object, term, ...) {
+`smooth_coefs.bam` <- function(object,
+    select,
+    term = deprecated(),
+    ...) {
+  if (lifecycle::is_present(term)) {
+    lifecycle::deprecate_warn("0.8.9.9", "smooth_coefs(term)",
+      "smooth_coefs(select)")
+    select <- term
+  }
   NextMethod()
 }
 
 #' @export
 #' @rdname smooth_coefs
-`smooth_coefs.gamm` <- function(object, term, ...) {
-  smooth_coefs(object$gam, term = term)
+`smooth_coefs.gamm` <- function(object,
+    select,
+    term = deprecated(),
+    ...) {
+  if (lifecycle::is_present(term)) {
+    lifecycle::deprecate_warn("0.8.9.9", "smooth_coefs(term)",
+      "smooth_coefs(select)")
+    select <- term
+  }
+  smooth_coefs(object$gam, select = select, ...)
 }
 
 #' @export
 #' @rdname smooth_coefs
 #' @importFrom stats coef
-`smooth_coefs.gamm4` <- function(object, term, ...) {
-  sm <- get_smooth(object[["gam"]], term = term, ...)
+`smooth_coefs.gamm4` <- function(object,
+    select,
+    term = deprecated(),
+    ...) {
+  if (lifecycle::is_present(term)) {
+    lifecycle::deprecate_warn("0.8.9.9", "smooth_coefs(term)",
+      "smooth_coefs(select)")
+    select <- term
+  }
+  sm <- get_smooth(object[["gam"]], term = select, ...)
+  if (length(sm) == 0) {
+    stop("You didn't specify a smooth via 'select'")
+  }
   i <- smooth_coef_indices(sm)
   coef(object[["gam"]])[i]
 }
@@ -76,11 +117,22 @@
 #' @export
 #' @rdname smooth_coefs
 #' @importFrom stats coef
-`smooth_coefs.list` <- function(object, term, ...) {
+`smooth_coefs.list` <- function(object,
+    select,
+    term = deprecated(),
+    ...) {
+  if (lifecycle::is_present(term)) {
+    lifecycle::deprecate_warn("0.8.9.9", "smooth_coefs(term)",
+      "smooth_coefs(select)")
+    select <- term
+  }
   if (!is_gamm4(object)) {
     stop("'object' is a list but doesn't appear to be a 'gamm4()' model.")
   }
-  sm <- get_smooth(object[["gam"]], term = term, ...)
+  sm <- get_smooth(object[["gam"]], term = select, ...)
+  if (length(sm) == 0) {
+    stop("You didn't specify a smooth via 'select'")
+  }
   i <- smooth_coef_indices(sm)
   coef(object[["gam"]])[i]
 }
@@ -96,8 +148,19 @@
 #' @export
 #' @rdname smooth_coefs
 #' @importFrom stats coef
-`smooth_coefs.scam` <- function(object, term, ...) {
-  sm <- get_smooth(object, term = term, ...)
+`smooth_coefs.scam` <- function(object,
+    select,
+    term = deprecated(),
+    ...) {
+  if (lifecycle::is_present(term)) {
+    lifecycle::deprecate_warn("0.8.9.9", "smooth_coefs(term)",
+      "smooth_coefs(select)")
+    select <- term
+  }
+  sm <- get_smooth(object, term = select, ...)
+  if (length(sm) == 0) {
+    stop("You didn't specify a smooth via 'select'")
+  }
   i <- smooth_coef_indices(sm)
   coef(object)[i]
 }

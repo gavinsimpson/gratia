@@ -57,10 +57,14 @@ test_that("smooth_estimates works with more than one term", {
 })
 
 test_that("smooth_estimates throws error if smooth not found", {
-  expect_error(smooth_estimates(m1, smooth = "s(z)"),
+  expect_error(smooth_estimates(m1, select = "s(z)"),
     "Failed to match any smooths in model `m1`",
     fixed = TRUE
   )
+})
+
+test_that("smooth is deprecated in smooth_estimates", {
+  expect_warning(smooth_estimates(m_gam, smooth = "s(x1)"), "deprecated")
 })
 
 test_that("smooth_estimates works for a GAMM", {
@@ -149,7 +153,7 @@ test_that("smooth_estimates works with a tensor product interaction smooth", {
 })
 
 test_that("smooth_estimates works", {
-  expect_silent(sm <- smooth_estimates(rm1, smooth = "s(fac)"))
+  expect_silent(sm <- smooth_estimates(rm1, select = "s(fac)"))
   expect_s3_class(sm, "smooth_estimates")
   expect_s3_class(sm, "tbl_df")
   expect_s3_class(sm, "data.frame")
@@ -159,7 +163,7 @@ test_that("smooth_estimates works", {
 
 test_that("smooth_estimates works when passed data", {
   expect_silent(sm <- smooth_estimates(rm1,
-    smooth = "s(fac)",
+    select = "s(fac)",
     data = su_re
   ))
   expect_s3_class(sm, "smooth_estimates")

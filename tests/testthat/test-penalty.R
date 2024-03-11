@@ -21,20 +21,24 @@ test_that("penalty() resclaing works with a simple GAM", {
 })
 
 test_that("penalty() works with a factor by smooth", {
-  expect_silent(p <- penalty(su_m_su_eg4, smooth = "s(x2):fac2"))
+  expect_silent(p <- penalty(su_m_su_eg4, select = "s(x2):fac2"))
   expect_s3_class(p, "penalty_df")
   expect_named(p, pen_nms)
 })
 
 test_that("penalty() rescaling works with a factor by smooth", {
   expect_silent(p <- penalty(su_m_su_eg4,
-    smooth = "s(x2):fac2",
+    select = "s(x2):fac2",
     rescale = TRUE
   ))
   expect_s3_class(p, "penalty_df")
   expect_named(p, pen_nms)
 })
 
+test_that("smooth arg of penalty() is properly deprecated", {
+  expect_warning(p <- penalty(su_m_su_eg4, smooth = "s(x2)",
+    partial_match = TRUE), "deprecated")
+})
 
 ## draw.penalty
 test_that("draw.penalty_df works", {
