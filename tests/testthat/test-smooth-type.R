@@ -54,6 +54,21 @@ test_that("smooth_type works for t2 smooths", {
   expect_identical(st, "Tensor product (T2)")
 })
 
+test_that("smooth_type works for univariate te smooths", {
+  expect_silent(st <- smooth_type(get_smooth(m_univar_te, "te(x2)")))
+  expect_identical(st, "1d Tensor product")
+})
+
+test_that("smooth_type works for univariate ti smooths", {
+  expect_silent(st <- smooth_type(get_smooth(m_univar_ti, "ti(x2)")))
+  expect_identical(st, "1d Tensor product int.")
+})
+
+test_that("smooth_type works for univariate t2 smooths", {
+  expect_silent(st <- smooth_type(get_smooth(m_univar_t2, "t2(x2)")))
+  expect_identical(st, "1d Tensor product (T2)")
+})
+
 test_that("smooth_type works for sz smooths", {
   expect_silent(st <- smooth_type(get_smooth(m_sz, "s(fac,x2)")))
   expect_identical(st, "Constr. factor smooth")

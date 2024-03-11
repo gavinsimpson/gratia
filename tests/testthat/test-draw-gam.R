@@ -241,3 +241,15 @@ test_that("draw.gam works with grouped by option", {
   skip_on_ci()
   expect_doppelganger("grouped by gam", plt)
 })
+
+test_that("draw gam works with univar tensor products #260", {
+  expect_silent(plt_uni_te <- m_univar_te |> draw(rug = FALSE))
+  expect_silent(plt_uni_ti <- m_univar_ti |> draw(rug = FALSE))
+  expect_silent(plt_uni_t2 <- m_univar_t2 |> draw(rug = FALSE))
+
+  skip_on_cran()
+
+  expect_doppelganger("draw.gam univariate te smooth", plt_uni_te)
+  expect_doppelganger("draw.gam univariate ti smooth", plt_uni_ti)
+  expect_doppelganger("draw.gam univariate t2 smooth", plt_uni_t2)
+})
