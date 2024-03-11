@@ -634,3 +634,97 @@
     )), .before = 1L)
   object
 }
+
+#' Add posterior draws from a model to a data object
+#'
+#' Adds draws from the posterior distribution of `model` to the data `object`
+#' using one of [fitted_samples()], [predicted_samples()], or
+#' [posterior_samples()].
+#'
+#' @param object a data frame or tibble to which the posterior draws will be
+#'   added.
+#' @param model a fitted GAM (or GAM-like) object for which a posterior draw
+#'   method exists.
+#' @param n integer; the number of posterior draws to add.
+#' @param seed numeric; a value to seed the random number generator.
+#' @param ... arguments are passed to the posterior draw function, currently one
+#'   of [fitted_samples()], [predicted_samples()], or [posterior_samples()]. `n`
+#'   and `seed` are already specified here as arguments and are also passed on
+#'   to the posterior sampling function.
+#'
+#' @importFrom dplyr mutate row_number left_join join_by
+#' @export
+#'
+#' @examples
+#' \dontshow{
+#' op <- options(pillar.sigfig = 3)
+#' }
+#' load_mgcv()
+#'
+#' df <- data_sim("eg1", n = 400, seed = 42)
+#'
+#' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+#'
+#' # add fitted samples (posterior draws of the expected value of the response)
+#' # note that there are 800 rows in the output: 400 data by `n = 2` samples.
+#' df |>
+#'   add_fitted_samples(m, n = 2, seed = 84)
+#'
+#' # add posterior draws from smooth s(x2)
+#' df |>
+#'   add_smooth_samples(m_gam, n = 2, seed = 2, term = "s(x2)")
+#' \dontshow{
+#'   options(op)
+#' }
+`add_fitted_samples` <- function(object, model, n = 1, seed = NULL, ...) {
+  # compute fitted samples
+  fs <- fitted_samples(model, data = object, n = n, seed = seed, ...)
+  # need to have .row in object so we can join with the fitted samples
+  object <- object |>
+    mutate(.row = row_number())
+  object |>
+    left_join(fs, by = join_by(".row" == ".row"))
+}
+
+#' @export
+#' @importFrom dplyr mutate row_number left_join join_by
+#' @rdname add_fitted_samples
+`add_predicted_samples` <- function(object, model, n = 1, seed = NULL, ...) {
+  # compute predicted samples
+  ps <- predicted_samples(model, data = object, n = n, seed = seed, ...)
+  # need to have .row in object so we can join with the fitted samples
+  object <- object |>
+    mutate(.row = row_number())
+  object |>
+    left_join(ps, by = join_by(".row" == ".row"))
+}
+
+#' @export
+#' @importFrom dplyr mutate row_number left_join join_by
+#' @rdname add_fitted_samples
+`add_posterior_samples` <- function(object, model, n = 1, seed = NULL, ...) {
+  # compute posterior samples
+  ps <- posterior_samples(model, data = object, n = n, seed = seed, ...)
+  # need to have .row in object so we can join with the fitted samples
+  object <- object |>
+    mutate(.row = row_number())
+  object |>
+    left_join(ps, by = join_by(".row" == ".row"))
+}
+
+
+#' @export
+#' @importFrom dplyr mutate row_number left_join join_by
+#' @rdname add_fitted_samples
+`add_smooth_samples` <- function(object, model, n = 1, seed = NULL, term = NULL,
+    ...) {
+  # compute posterior samples
+  ss <- smooth_samples(model, data = object, n = n, seed = seed, term = term,
+    ...) |>
+    select(all_of(c(".smooth", ".term", ".row", ".draw", ".value")))
+  # need to have .row in object so we can join with the fitted samples
+  object <- object |>
+    mutate(.row = row_number())
+  object |>
+    left_join(ss, by = join_by(".row" == ".row"))
+}
