@@ -323,6 +323,13 @@ eventual 1.0.0 release. These functions will become defunct by version 0.11.0 or
   0--1, not the claimed and documented -1--1 with argument `normalize = TRUE`.
   This is now fixed.
 
+* `smooth_samples()` was failing when `data` was supplied that contained more
+  variables than were used in the smooth that was being sampled. Hence this
+  generally fail unless a single smooth was being sampled from or the model
+  contained only a single smooth. The function never intended to retain all the
+  variables in `data` but was written in such a way that it would fail when
+  relocating the data columns to the end of the posterior sampling object. #255
+
 # gratia 0.8.2
 
 * Small fixes for CRAN.
