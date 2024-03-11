@@ -12,17 +12,17 @@
 \usage{
 transform_fun(object, fun = NULL, ...)
 
-\method{transform_fun}{smooth_estimates}(object, fun = NULL, ...)
+\method{transform_fun}{smooth_estimates}(object, fun = NULL, constant = NULL, ...)
 
-\method{transform_fun}{smooth_samples}(object, fun = NULL, ...)
+\method{transform_fun}{smooth_samples}(object, fun = NULL, constant = NULL, ...)
 
-\method{transform_fun}{mgcv_smooth}(object, fun = NULL, ...)
+\method{transform_fun}{mgcv_smooth}(object, fun = NULL, constant = NULL, ...)
 
-\method{transform_fun}{evaluated_parametric_term}(object, fun = NULL, ...)
+\method{transform_fun}{evaluated_parametric_term}(object, fun = NULL, constant = NULL, ...)
 
-\method{transform_fun}{parametric_effects}(object, fun = NULL, ...)
+\method{transform_fun}{parametric_effects}(object, fun = NULL, constant = NULL, ...)
 
-\method{transform_fun}{tbl_df}(object, fun = NULL, column = NULL, ...)
+\method{transform_fun}{tbl_df}(object, fun = NULL, column = NULL, constant = NULL, ...)
 }
 \arguments{
 \item{object}{an object to apply the transform function to.}
@@ -30,6 +30,8 @@ transform_fun(object, fun = NULL, ...)
 \item{fun}{the function to apply.}
 
 \item{...}{additional arguments passed to methods.}
+
+\item{constant}{numeric; a constant to apply before transformation.}
 
 \item{column}{character; for the \code{"tbl_df"} method, which column to
 transform.}

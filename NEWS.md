@@ -1,4 +1,4 @@
-# gratia 0.8.9.7
+# gratia 0.8.9.8
 
 ## Breaking changes
 
@@ -243,6 +243,15 @@ eventual 1.0.0 release. These functions will become defunct by version 0.11.0 or
 
 * `penalty()` has a default method that  works with `s()`, `te()`, `t2()`, and
   `ti()`, which create a smooth specification.
+
+* `transform_fun()` gains argument `constant` to allow for the addition of a
+  constant value to objects (e.g. the estimate and confidence interval). This
+  enables a single `obj |> transform_fun(fun = exp, constant = 5)` instead of
+  separate calls to `add_constant()` and then `transform_fun()`. Part of the
+  discussion of #79
+
+* `model_constant()` is a new function that simply extracts the first
+  coefficient from the estimated model.
 
 ## Bug fixes
 
