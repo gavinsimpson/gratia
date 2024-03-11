@@ -20,7 +20,7 @@ object.
 load_mgcv()
 
 # simulate a small example
-df <- data_sim("eg1")
+df <- data_sim("eg1", seed = 42)
 
 # fit the GAM
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
