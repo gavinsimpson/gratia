@@ -618,7 +618,7 @@
     )
   }
 
-  sims <- data_names <- vector("list", length = length(S))
+  sims <- data_names <- vector("list", length = length(sms))
   for (i in seq_along(sms)) {
     if (need_data) {
       # FIXME: should offset be NULL?
