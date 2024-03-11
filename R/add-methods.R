@@ -647,6 +647,10 @@
 #'   method exists.
 #' @param n integer; the number of posterior draws to add.
 #' @param seed numeric; a value to seed the random number generator.
+#' @param term character; select which smooth's posterior to draw from. The
+#'   default, `NULL`, means the posteriors of all smooths in model wil be
+#'   sampled from individually. If supplied, a character vector of requested
+#'   smooth terms.
 #' @param ... arguments are passed to the posterior draw function, currently one
 #'   of [fitted_samples()], [predicted_samples()], or [posterior_samples()]. `n`
 #'   and `seed` are already specified here as arguments and are also passed on
@@ -672,7 +676,7 @@
 #'
 #' # add posterior draws from smooth s(x2)
 #' df |>
-#'   add_smooth_samples(m_gam, n = 2, seed = 2, term = "s(x2)")
+#'   add_smooth_samples(m, n = 2, seed = 2, term = "s(x2)")
 #' \dontshow{
 #'   options(op)
 #' }
