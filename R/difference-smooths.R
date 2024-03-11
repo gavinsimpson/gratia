@@ -6,7 +6,14 @@
 #' difference.
 #'
 #' @param model A fitted model.
-#' @param smooth character; which smooth to compute differences for.
+#' @param select character, logical, or numeric; which smooths to plot. If
+#'   `NULL`, the default, then all model smooths are drawn. Numeric `select`
+#'   indexes the smooths in the order they are specified in the formula and
+#'   stored in `object`. Character `select` matches the labels for smooths
+#'   as shown for example in the output from `summary(object)`. Logical
+#'   `select` operates as per numeric `select` in the order that smooths are
+#'   stored.
+#' @param smooth `r lifecycle::badge("deprecated")` Use `select` instead.
 #' @param n numeric; the number of points at which to evaluate the difference
 #'   between pairs of smooths.
 #' @param ci_level numeric between 0 and 1; the coverage of credible interval.
@@ -33,13 +40,13 @@
 #' df <- data_sim("eg4", seed = 42)
 #' m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 #'
-#' sm_dif <- difference_smooths(m, smooth = "s(x2)")
+#' sm_dif <- difference_smooths(m, select = "s(x2)")
 #' sm_dif
 #'
 #' draw(sm_dif)
 #'
 #' # include the groups means for `fac` in the difference
-#' sm_dif2 <- difference_smooths(m, smooth = "s(x2)", group_means = TRUE)
+#' sm_dif2 <- difference_smooths(m, select = "s(x2)", group_means = TRUE)
 #' draw(sm_dif2)
 #' \dontshow{
 #' options(op)
@@ -55,32 +62,39 @@
 #' @importFrom tibble add_column as_tibble
 #' @importFrom stats qnorm coef
 #' @importFrom utils combn
+#' @importFrom lifecycle deprecated is_present
 #'
 #' @rdname difference_smooths
 `difference_smooths.gam` <- function(model,
-                                     smooth,
-                                     n = 100,
-                                     ci_level = 0.95,
-                                     data = NULL,
-                                     group_means = FALSE,
-                                     partial_match = TRUE,
-                                     unconditional = FALSE,
-                                     frequentist = FALSE,
-                                     ...) {
-  if (missing(smooth)) {
-    stop("Must specify a smooth to difference via 'smooth'.")
+    select = NULL,
+    smooth = deprecated(),
+    n = 100,
+    ci_level = 0.95,
+    data = NULL,
+    group_means = FALSE,
+    partial_match = TRUE,
+    unconditional = FALSE,
+    frequentist = FALSE,
+    ...) {
+  if (lifecycle::is_present(smooth)) {
+    lifecycle::deprecate_warn("0.8.9.9", "difference_smooths(smooth)",
+      "difference_smooths(select)")
+    select <- smooth
+  }
+  if (is.null(select)) {
+    stop("Must specify a smooth to difference via 'select'.")
   }
 
   # smooths in model
   S <- smooths(model) # vector of smooth labels - "s(x)"
   # select smooths
-  select <-
+  take <-
     check_user_select_smooths(
-      smooths = S, select = smooth,
+      smooths = S, select = select,
       partial_match = partial_match,
       model_name = expr_label(substitute(object))
     )
-  sm_ids <- which(select)
+  sm_ids <- which(take)
   smooths <- get_smooths_by_id(model, sm_ids)
   if (is.null(data)) {
     sm_data <- map(sm_ids, smooth_data,
@@ -105,7 +119,7 @@
   coefs <- coef(model)
 
   out <- pmap(pairs, calc_difference,
-    smooth = smooth, by_var = by_var,
+    select = select, by_var = by_var,
     smooth_var = smooth_var, data = data, Xp = Xp, V = V,
     coefs = coefs, group_means = group_means
   )
@@ -139,7 +153,7 @@
 
 #' @importFrom tibble new_tibble
 #' @importFrom dplyr bind_cols
-`calc_difference` <- function(f1, f2, smooth, by_var, smooth_var, data, Xp, V,
+`calc_difference` <- function(f1, f2, select, by_var, smooth_var, data, Xp, V,
                               coefs, group_means = FALSE) {
   ## make sure f1 and f2 are characters
   f1 <- as.character(f1)
@@ -157,10 +171,10 @@
     (c0 | c1 | c2)
   } else {
     # columns of Xp associated with pair of smooths, but not
-    c1 <- grepl(mgcv_by_smooth_labels(smooth, by_var, f1), cnames,
+    c1 <- grepl(mgcv_by_smooth_labels(select, by_var, f1), cnames,
       fixed = TRUE
     )
-    c2 <- grepl(mgcv_by_smooth_labels(smooth, by_var, f2), cnames,
+    c2 <- grepl(mgcv_by_smooth_labels(select, by_var, f2), cnames,
       fixed = TRUE
     )
     (c1 | c2)
@@ -181,7 +195,7 @@
   se <- sqrt(rowSums((X %*% V) * X))
   nr <- NROW(X)
   out <- list(
-    .smooth = rep(smooth, nr), .by = rep(by_var, nr),
+    .smooth = rep(select, nr), .by = rep(by_var, nr),
     .level_1 = rep(f1, nr),
     .level_2 = rep(f2, nr),
     .diff = sm_diff, .se = se

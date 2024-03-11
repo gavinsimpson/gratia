@@ -647,7 +647,7 @@
 #'   method exists.
 #' @param n integer; the number of posterior draws to add.
 #' @param seed numeric; a value to seed the random number generator.
-#' @param term character; select which smooth's posterior to draw from. The
+#' @param select character; select which smooth's posterior to draw from. The
 #'   default, `NULL`, means the posteriors of all smooths in model wil be
 #'   sampled from individually. If supplied, a character vector of requested
 #'   smooth terms.

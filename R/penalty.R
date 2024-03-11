@@ -1,11 +1,20 @@
 #' Extract and tidy penalty matrices
 #'
 #' @param object a fitted GAM or a smooth.
-#' @param smooth character; vector of smooths to extract penalty matrices for.
-#'   If `NULL`, penalty matrices for all smooths in `object` are extracted.
+#' @param select character, logical, or numeric; which smooths to extract
+#'   penalties for. If `NULL`, the default, then penalties for all model
+#'   smooths are drawn. Numeric `select` indexes the smooths in the order they
+#'   are specified in the formula and stored in `object`. Character `select`
+#'   matches the labels for smooths as shown for example in the output from
+#'   `summary(object)`. Logical `select` operates as per numeric `select` in
+#'   the order that smooths are stored.
+#' @param smooth `r lifecycle::badge("deprecated")` Use `select` instead.
 #' @param rescale logical; by default, *mgcv* will scale the penalty matrix for
 #'   better performance in [mgcv::gamm()]. If `rescale` is `TRUE`, this scaling
 #'   will be undone to put the penalty matrix back on the original scale.
+#' @param partial_match logical; should smooths be selected by partial matches
+#'   with `select`? If `TRUE`, `select` can only be a single string to match
+#'   against.
 #' @param margins logical; extract the penalty matrices for the tensor
 #'   product or the marginal smooths of the tensor product?
 #' @param data data frame; a data frame of values for terms mentioned in the
@@ -14,17 +23,17 @@
 #'
 #' @return A 'tibble' (data frame) of class `penalty_df` inheriting from
 #'   `tbl_df`, with the following components:
-#' * `smooth` - character; the label *mgcv* uses to refer to the smooth,
-#' * `type` - character; the type of smooth,
-#' * `penalty` - character; the label for the specific penalty. Some smooths
+#' * `.smooth` - character; the label *mgcv* uses to refer to the smooth,
+#' * `.type` - character; the type of smooth,
+#' * `.penalty` - character; the label for the specific penalty. Some smooths
 #'   have multiple penalty matrices, so the `penalty` component identifies the
 #'   particular penalty matrix and uses the labelling that *mgcv* uses
 #'   internally,
-#' * `row` - character; a label of the form `fn` where `n` is an integer for
+#' * `.row` - character; a label of the form `fn` where `n` is an integer for
 #'   the `n`th basis function, referencing the columns of the penalty matrix,
-#' * `col` - character; a label of the form `fn` where `n` is an integer for
+#' * `.col` - character; a label of the form `fn` where `n` is an integer for
 #'   the `n`th basis function, referencing the columns of the penalty matrix,
-#' * `value` - double; the value of the penalty matrix for the combination of
+#' * `.value` - double; the value of the penalty matrix for the combination of
 #'   `row` and `col`,
 #'
 #' @note The `print()` method uses [base::zapsmall()] to turn very small numbers
@@ -39,6 +48,7 @@
 #'
 #' @author Gavin L. Simpson
 #' @export
+#' @importFrom lifecycle deprecated is_present
 #'
 #' @examples
 #' \dontshow{
@@ -56,7 +66,7 @@
 #' penalty(m)
 #'
 #' # for a specific smooth
-#' penalty(m, smooth = "s(x2):fac1")
+#' penalty(m, select = "s(x2):fac1")
 #'
 #' \dontshow{
 #' options(op)
@@ -89,10 +99,18 @@
 
 #' @export
 #' @rdname penalty
-`penalty.gam` <- function(object, smooth = NULL, rescale = FALSE, ...) {
+`penalty.gam` <- function(object, select = NULL, smooth = deprecated(),
+    rescale = FALSE, partial_match = FALSE, ...) {
+  if (lifecycle::is_present(smooth)) {
+    lifecycle::deprecate_warn("0.8.9.9", "penalty(term)",
+      "penalty(select)")
+    select <- smooth
+  }
   ## are particular smooths selected
-  smooth_ids <- if (!is.null(smooth)) {
-    which_smooths(object, smooth) # which smooths match 'smooth'
+  smooth_ids <- if (!is.null(select)) {
+    check_user_select_smooths(smooths = smooths(object), select = select,
+    partial_match = partial_match) |>
+      which() # which_smooths(object, smooth) # which smooths match 'smooth'
   } else {
     seq_len(n_smooths(object))
   }

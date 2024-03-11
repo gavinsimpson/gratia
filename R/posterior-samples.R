@@ -465,7 +465,7 @@
 #' dat <- data_sim("eg1", n = 400, seed = 2)
 #' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
-#' sms <- smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
+#' sms <- smooth_samples(m1, select = "s(x0)", n = 5, seed = 42)
 #' \donttest{
 #' sms
 #' }

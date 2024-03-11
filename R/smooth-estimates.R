@@ -7,13 +7,16 @@
 #' been removed from the package.
 #'
 #' @param object an object of class `"gam"` or `"gamm"`.
-#' @param smooth character; a single smooth to evaluate.
+#' @param select character; select which smooth's posterior to draw from.
+#'   The default (`NULL`) means the posteriors of all smooths in `model`
+#'   wil be sampled from. If supplied, a character vector of requested terms.
+#' @param smooth `r lifecycle::badge("deprecated")` Use `select` instead.
 #' @param n numeric; the number of points over the range of the covariate at
 #'   which to evaluate the smooth.
 #' @param n_3d,n_4d numeric; the number of points over the range of last
 #'   covariate in a 3D or 4D smooth. The default is `NULL` which achieves the
 #'   standard behaviour of using `n` points over the range of all covariate,
-#'   resulting in `n^d` evaluation pointsm, where `d` is the dimension of the
+#'   resulting in `n^d` evaluation points, where `d` is the dimension of the
 #'   smooth. For `d > 2` this can result in very many evaluation points and slow
 #'   performance. For smooths of `d > 4`, the value of `n_4d` will be used for
 #'   all dimensions `> 4`, unless this is `NULL`, in which case the default
@@ -55,7 +58,7 @@
 #' smooth_estimates(m1)
 #'
 #' ## or selected smooths
-#' smooth_estimates(m1, smooth = c("s(x0)", "s(x1)"))
+#' smooth_estimates(m1, select = c("s(x0)", "s(x1)"))
 #' \dontshow{
 #' options(op)
 #' }
@@ -68,18 +71,25 @@
 #' @importFrom dplyr bind_rows all_of
 #' @importFrom tidyr unnest
 #' @importFrom rlang expr_label
+#' @importFrom lifecycle deprecated is_present
 `smooth_estimates.gam` <- function(object,
-                                   smooth = NULL,
-                                   n = 100,
-                                   n_3d = 16,
-                                   n_4d = 4,
-                                   data = NULL,
-                                   unconditional = FALSE,
-                                   overall_uncertainty = TRUE,
-                                   dist = NULL,
-                                   unnest = TRUE,
-                                   partial_match = FALSE,
-                                   ...) {
+    select = NULL,
+    smooth = deprecated(),
+    n = 100,
+    n_3d = 16,
+    n_4d = 4,
+    data = NULL,
+    unconditional = FALSE,
+    overall_uncertainty = TRUE,
+    dist = NULL,
+    unnest = TRUE,
+    partial_match = FALSE,
+    ...) {
+  if (lifecycle::is_present(smooth)) {
+    lifecycle::deprecate_warn("0.8.9.9", "smooth_estimates(smooth)",
+      "smooth_estimates(select)")
+    select <- smooth
+  }
   model_name <- expr_label(substitute(object))
   ## if particular smooths selected
   S <- smooths(object) # vector of smooth labels - "s(x)"
@@ -87,7 +97,7 @@
   # select smooths
   select <-
     check_user_select_smooths(
-      smooths = S, select = smooth,
+      smooths = S, select = select,
       partial_match = partial_match,
       model_name = model_name
     )
@@ -886,7 +896,7 @@
 #' sm <- smooth_estimates(m)
 #' draw(sm)
 #' # evaluate smooth of `x2`
-#' sm <- smooth_estimates(m, smooth = "s(x2)")
+#' sm <- smooth_estimates(m, select = "s(x2)")
 #' # plot it
 #' draw(sm)
 #'

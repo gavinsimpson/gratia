@@ -19,15 +19,26 @@
 #'   relevent elements of \eqn{\mathrm{diag}(2\mathbf{F} - \mathbf{FF})}.
 #'
 #' @param object a fitted model from which to extract smooth-specific EDFs.
-#' @param smooth character; a vector of smooth terms whose EDFs will be
+#' @param smooth `r lifecycle::badge("deprecated")` Use `select` instead.
 #'   extracted. If `NULL`, the default, EDFs for all smooths will be returned.
+#' @param select character, logical, or numeric; which smooths to plot. If
+#'   `NULL`, the default, then all model smooths are drawn. Numeric `select`
+#'   indexes the smooths in the order they are specified in the formula and
+#'   stored in `object`. Character `select` matches the labels for smooths
+#'   as shown for example in the output from `summary(object)`. Logical
+#'   `select` operates as per numeric `select` in the order that smooths are
+#'   stored.
 #' @param type character: which type of EDF to return. `"default"` returns the
 #'   standard EDF; `"unconditional"` selects the EDF corrected for smoothness
 #'   parameter selection, if available; `"alternative"` returns the alternative
 #'   formulation for EDF from Wood (2017, pp. 252)
+#' @param partial_match logical; should smooths be selected by partial matches
+#'   with `select`? If `TRUE`, `select` can only be a single string to match
+#'   against.
 #' @param ... arguments passed to methods.
 #'
 #' @export
+#' @importFrom lifecycle deprecated is_present
 #'
 #' @examples
 #' load_mgcv()
@@ -41,7 +52,7 @@
 #' edf(m)
 #'
 #' # or selected smooths
-#' edf(m, smooth = c("s(x0)", "s(x2)"))
+#' edf(m, select = c("s(x0)", "s(x2)"))
 #'
 #' # accounting for smoothness parameter uncertainty
 #' edf(m, type = "unconditional")
@@ -62,14 +73,21 @@
 #' @export
 #' @importFrom tibble tibble
 #' @rdname edf
-`edf.gam` <- function(object, smooth = NULL,
+`edf.gam` <- function(object, select = NULL, smooth = deprecated(),
                       type = c("default", "unconditional", "alternative"),
+                      partial_match = FALSE,
                       ...) {
+  if (lifecycle::is_present(smooth)) {
+    lifecycle::deprecate_warn("0.8.9.9", "edf(smooth)",
+      "edf(select)")
+    select <- smooth
+  }
   ## which type of EDF?
   type <- match.arg(type)
   ## if particular smooths selected
-  sm_ids <- if (!is.null(smooth)) {
-    which_smooths(object, smooth) # which smooths match 'smooth'
+  sm_ids <- if (!is.null(select)) {
+    check_user_select_smooths(smooths = smooths(object), select = select,
+      partial_match = partial_match) |> which() # which_smooths(object, select) # which smooths match 'smooth'
   } else {
     seq_len(n_smooths(object))
   }

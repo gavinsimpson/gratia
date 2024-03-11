@@ -979,7 +979,7 @@
 #' @param ci_col colour specification for the confidence/credible intervals
 #'   band. Affects the fill of the interval.
 #' @param smooth_col colour specification for the the smooth or difference line.
-#' @param line_col colour specicification for drawing reference lines
+#' @param line_col colour specification for drawing reference lines
 #' @param ncol,nrow numeric; the numbers of rows and columns over which to
 #'   spread the plots
 #' @param xlab,ylab,title,subtitle,caption character; labels with which to
@@ -1002,7 +1002,7 @@
 #' m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 #'
 #' # calculate the differences between pairs of smooths the f_j(x2) term
-#' diffs <- difference_smooths(m, smooth = "s(x2)")
+#' diffs <- difference_smooths(m, select = "s(x2)")
 #' draw(diffs)
 `draw.difference_smooth` <- function(object,
                                      select = NULL,
@@ -1324,7 +1324,7 @@
 #' draw(penalty(m))
 #'
 #' # for a specific smooth
-#' draw(penalty(m, smooth = "s(x2):fac1"))
+#' draw(penalty(m, select = "s(x2):fac1"))
 `draw.penalty_df` <- function(object,
                               normalize = FALSE,
                               as_matrix = TRUE,

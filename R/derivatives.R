@@ -28,10 +28,12 @@
   derivatives(object[["gam"]], ...)
 }
 
-#' @param term character; vector of one or more smooth terms for which
-#'   derivatives are required. If missing, derivatives for all smooth terms
-#'   will be returned. Can be a partial match to a smooth term; see argument
-#'   `partial_match` below.
+#' @param select character; select which smooth's posterior to draw from.
+#'   The default (`NULL`) means the posteriors of all smooths in `model`
+#'   wil be sampled from. If supplied, a character vector of requested terms.
+#'   Can be a partial match to a smooth term; see argument `partial_match`
+#'   below.
+#' @param term `r lifecycle::badge("deprecated")` Use `select` instead.
 #' @param data a data frame containing the values of the model covariates
 #'   at which to evaluate the first derivatives of the smooths.
 #' @param order numeric; the order of derivative.
@@ -67,6 +69,7 @@
 #'
 #' @importFrom dplyr filter relocate
 #' @importFrom tidyselect last_col
+#' @importFrom lifecycle deprecated is_present
 #'
 #' @rdname derivatives
 #'
@@ -95,24 +98,38 @@
 #' derivatives(mod, type = "central")
 #'
 #' ## derivatives for a selected smooth
-#' derivatives(mod, type = "central", term = "s(x1)")
+#' derivatives(mod, type = "central", select = "s(x1)")
 #' ## or via a partial match
-#' derivatives(mod, type = "central", term = "x1", partial_match = TRUE)
+#' derivatives(mod, type = "central", select = "x1", partial_match = TRUE)
 #' \dontshow{
 #' options(op)
 #' }
-`derivatives.gam` <- function(object, term, data = newdata, order = 1L,
-                              type = c("forward", "backward", "central"),
-                              n = 100, eps = 1e-7,
-                              interval = c("confidence", "simultaneous"),
-                              n_sim = 10000, level = 0.95,
-                              unconditional = FALSE, frequentist = FALSE,
-                              offset = NULL, ncores = 1,
-                              partial_match = FALSE, ..., newdata = NULL) {
+`derivatives.gam` <- function(object,
+    select = NULL,
+    term = deprecated(),
+    data = newdata,
+    order = 1L,
+    type = c("forward", "backward", "central"),
+    n = 100,
+    eps = 1e-7,
+    interval = c("confidence", "simultaneous"),
+    n_sim = 10000,
+    level = 0.95,
+    unconditional = FALSE,
+    frequentist = FALSE,
+    offset = NULL,
+    ncores = 1,
+    partial_match = FALSE,
+    ..., newdata = NULL) {
+  if (lifecycle::is_present(term)) {
+    lifecycle::deprecate_warn("0.8.9.9", "derivatives(term)",
+      "derivativess(select)")
+    select <- term
+  }
   ## handle term
-  smooth_ids <- if (!missing(term)) {
+  smooth_ids <- if (!is.null(select)) {
     ## which smooths match 'term'
-    sms <- check_user_select_smooths(smooths(object), term,
+    sms <- check_user_select_smooths(smooths(object), select,
       partial_match = partial_match
     )
     ## need to skip random effect smooths
@@ -665,10 +682,11 @@
   partial_derivatives(object[["gam"]], ...)
 }
 
-#' @param term character; vector of one or more smooth terms for which
+#' @param select character; vector of one or more smooth terms for which
 #'   derivatives are required. If missing, derivatives for all smooth terms
 #'   will be returned. Can be a partial match to a smooth term; see argument
 #'   `partial_match` below.
+#' @param term `r lifecycle::badge("deprecated")` Use `select` instead.
 #' @param focal character; name of the focal variable. The partial derivative
 #'   of the estimated smooth with respect to this variable will be returned.
 #'   All other variables involved in the smooth will be held at constant. This
@@ -711,6 +729,7 @@
 #'
 #' @importFrom dplyr filter relocate
 #' @importFrom tidyselect last_col
+#' @importFrom lifecycle deprecated is_present
 #'
 #' @rdname partial_derivatives
 #'
@@ -741,7 +760,7 @@
 #' ds <- data_slice(m, x = evenly(x, n = 100), z = 0.4)
 #'
 #' # evaluate te(x,z) at values of x & z
-#' sm <- smooth_estimates(m, smooth = "te(x,z)", data = ds) |>
+#' sm <- smooth_estimates(m, select = "te(x,z)", data = ds) |>
 #'   add_confint()
 #'
 #' # partial derivatives
@@ -776,7 +795,10 @@
 #' options(op)
 #' }
 `partial_derivatives.gam` <- function(
-    object, term, focal = NULL,
+    object,
+    select = NULL,
+    term = deprecated(),
+    focal = NULL,
     data = newdata,
     order = 1L,
     type = c("forward", "backward", "central"),
@@ -786,6 +808,11 @@
     unconditional = FALSE, frequentist = FALSE,
     offset = NULL, ncores = 1,
     partial_match = FALSE, seed = NULL, ..., newdata = NULL) {
+  if (lifecycle::is_present(term)) {
+    lifecycle::deprecate_warn("0.8.9.9", "partial_derivatives(term)",
+      "partial_derivatives(select)")
+    select <- term
+  }
   ## handle seed
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     runif(1)
@@ -800,9 +827,9 @@
   }
 
   ## handle term
-  smooth_ids <- if (!missing(term)) {
+  smooth_ids <- if (is.null(select)) {
     ## which smooths match 'term'
-    sms <- check_user_select_smooths(smooths(object), term,
+    sms <- check_user_select_smooths(smooths(object), select,
       partial_match = partial_match
     )
     ## need to skip random effect smooths
@@ -1072,7 +1099,7 @@
 #' ds <- data_slice(m, x2 = evenly(x2, n = 100))
 #'
 #' # fitted values along x2
-#' fv <- fitted_values(m, smooth = "s(x2)", data = ds)
+#' fv <- fitted_values(m, data = ds)
 #'
 #' # response derivatives - ideally n_sim = >10000
 #' y_d <- response_derivatives(m,
