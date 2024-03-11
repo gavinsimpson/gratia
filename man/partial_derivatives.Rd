@@ -16,7 +16,8 @@ partial_derivatives(object, ...)
 
 \method{partial_derivatives}{gam}(
   object,
-  term,
+  select = NULL,
+  term = deprecated(),
   focal = NULL,
   data = newdata,
   order = 1L,
@@ -41,10 +42,12 @@ partial_derivatives(object, ...)
 
 \item{...}{arguments passed to other methods.}
 
-\item{term}{character; vector of one or more smooth terms for which
+\item{select}{character; vector of one or more smooth terms for which
 derivatives are required. If missing, derivatives for all smooth terms
 will be returned. Can be a partial match to a smooth term; see argument
 \code{partial_match} below.}
+
+\item{term}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{select} instead.}
 
 \item{focal}{character; name of the focal variable. The partial derivative
 of the estimated smooth with respect to this variable will be returned.
@@ -134,7 +137,7 @@ m <- gam(y ~ te(x, z, k = c(5, 5)), data = df, method = "REML")
 ds <- data_slice(m, x = evenly(x, n = 100), z = 0.4)
 
 # evaluate te(x,z) at values of x & z
-sm <- smooth_estimates(m, smooth = "te(x,z)", data = ds) |>
+sm <- smooth_estimates(m, select = "te(x,z)", data = ds) |>
   add_confint()
 
 # partial derivatives

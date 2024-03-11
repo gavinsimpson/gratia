@@ -129,7 +129,7 @@ m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 sm <- smooth_estimates(m)
 draw(sm)
 # evaluate smooth of `x2`
-sm <- smooth_estimates(m, smooth = "s(x2)")
+sm <- smooth_estimates(m, select = "s(x2)")
 # plot it
 draw(sm)
 

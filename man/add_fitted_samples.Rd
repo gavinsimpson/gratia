@@ -13,7 +13,7 @@ add_predicted_samples(object, model, n = 1, seed = NULL, ...)
 
 add_posterior_samples(object, model, n = 1, seed = NULL, ...)
 
-add_smooth_samples(object, model, n = 1, seed = NULL, term = NULL, ...)
+add_smooth_samples(object, model, n = 1, seed = NULL, select = NULL, ...)
 }
 \arguments{
 \item{object}{a data frame or tibble to which the posterior draws will be
@@ -31,7 +31,7 @@ of \code{\link[=fitted_samples]{fitted_samples()}}, \code{\link[=predicted_sampl
 and \code{seed} are already specified here as arguments and are also passed on
 to the posterior sampling function.}
 
-\item{term}{character; select which smooth's posterior to draw from. The
+\item{select}{character; select which smooth's posterior to draw from. The
 default, \code{NULL}, means the posteriors of all smooths in model wil be
 sampled from individually. If supplied, a character vector of requested
 smooth terms.}
@@ -58,7 +58,7 @@ df |>
 
 # add posterior draws from smooth s(x2)
 df |>
-  add_smooth_samples(m, n = 2, seed = 2, term = "s(x2)")
+  add_smooth_samples(m, n = 2, seed = 2, select= "s(x2)")
 \dontshow{
   options(op)
 }

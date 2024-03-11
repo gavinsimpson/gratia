@@ -15,7 +15,8 @@ derivatives(object, ...)
 
 \method{derivatives}{gam}(
   object,
-  term,
+  select = NULL,
+  term = deprecated(),
   data = newdata,
   order = 1L,
   type = c("forward", "backward", "central"),
@@ -38,10 +39,13 @@ derivatives(object, ...)
 
 \item{...}{arguments passed to other methods.}
 
-\item{term}{character; vector of one or more smooth terms for which
-derivatives are required. If missing, derivatives for all smooth terms
-will be returned. Can be a partial match to a smooth term; see argument
-\code{partial_match} below.}
+\item{select}{character; select which smooth's posterior to draw from.
+The default (\code{NULL}) means the posteriors of all smooths in \code{model}
+wil be sampled from. If supplied, a character vector of requested terms.
+Can be a partial match to a smooth term; see argument \code{partial_match}
+below.}
+
+\item{term}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{select} instead.}
 
 \item{data}{a data frame containing the values of the model covariates
 at which to evaluate the first derivatives of the smooths.}
@@ -119,9 +123,9 @@ mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 derivatives(mod, type = "central")
 
 ## derivatives for a selected smooth
-derivatives(mod, type = "central", term = "s(x1)")
+derivatives(mod, type = "central", select = "s(x1)")
 ## or via a partial match
-derivatives(mod, type = "central", term = "x1", partial_match = TRUE)
+derivatives(mod, type = "central", select = "x1", partial_match = TRUE)
 \dontshow{
 options(op)
 }
