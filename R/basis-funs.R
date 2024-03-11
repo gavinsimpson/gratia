@@ -7,7 +7,9 @@
 #' @param object a smooth specification, the result of a call to one of
 #'   [mgcv::s()]., [mgcv::te()], [mgcv::ti()], or [mgcv::t2()], or a fitted
 #'   GAM(M) model.
-#' @param term character; select smooths in a fitted model
+#' @param select character; select smooths in a fitted model
+#' @param term `r lifecycle::badge("deprecated")` This argument has been
+#'   renamed `select`
 #' @param data a data frame containing the variables used in `smooth`.
 #' @param n numeric; the number of points over the range of the covariate at
 #'   which to evaluate the smooth.
@@ -38,6 +40,7 @@
 #'
 #' @importFrom mgcv smoothCon
 #' @importFrom dplyr bind_rows
+#' @importFrom lifecycle deprecated is_present
 #'
 #' @examples
 #' load_mgcv()
@@ -62,18 +65,28 @@
 #' @importFrom purrr map
 #' @importFrom dplyr bind_rows
 #' @importFrom stats coef
-`basis.gam` <- function(object, term = NULL, data = NULL,
-                        n = 100, n_2d = 50, n_3d = 16, n_4d = 4,
-                        partial_match = FALSE,
-                        ...) {
+`basis.gam` <- function(object,
+    select = NULL,
+    term = deprecated(),
+    data = NULL,
+    n = 100,
+    n_2d = 50,
+    n_3d = 16,
+    n_4d = 4,
+    partial_match = FALSE,
+    ...) {
+  if (lifecycle::is_present(term)) {
+    lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
+    select <- term
+  }
   model_name <- expr_label(substitute(object))
   # if particular smooths selected
-  S <- smooths(object) # vector of smooth labels - "s(x)"
+  sms <- smooths(object) # vector of smooth labels - "s(x)"
 
   # select smooths
   select <-
     check_user_select_smooths(
-      smooths = S, select = term,
+      smooths = sms, select = select,
       partial_match = partial_match,
       model_name = model_name
     )
@@ -111,18 +124,25 @@
 
 #' @export
 #' @rdname basis
-`basis.scam` <- function(object, term = NULL, data = NULL,
-                         n = 100, n_2d = 50, n_3d = 16, n_4d = 4,
-                         partial_match = FALSE,
-                         ...) {
+`basis.scam` <- function(object,
+    select = NULL,
+    term = deprecated(),
+    data = NULL,
+    n = 100, n_2d = 50, n_3d = 16, n_4d = 4,
+    partial_match = FALSE,
+    ...) {
+  if (lifecycle::is_present(term)) {
+    lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
+    select <- term
+  }
   model_name <- expr_label(substitute(object))
   # if particular smooths selected
-  S <- smooths(object) # vector of smooth labels - "s(x)"
+  sms <- smooths(object) # vector of smooth labels - "s(x)"
 
   # select smooths
   select <-
     check_user_select_smooths(
-      smooths = S, select = term,
+      smooths = sms, select = term,
       partial_match = partial_match,
       model_name = model_name
     )
@@ -160,12 +180,22 @@
 
 #' @export
 #' @rdname basis
-`basis.gamm` <- function(object, term = NULL, data = NULL,
-                         n = 100, n_2d = 50, n_3d = 16, n_4d = 4,
-                         partial_match = FALSE,
-                         ...) {
+`basis.gamm` <- function(object,
+    select = NULL,
+    term = deprecated(),
+    data = NULL,
+    n = 100,
+    n_2d = 50,
+    n_3d = 16,
+    n_4d = 4,
+    partial_match = FALSE,
+    ...) {
+  if (lifecycle::is_present(term)) {
+    lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
+    select <- term
+  }
   basis(object[["gam"]],
-    term = term, data = data, n = n,
+    select = select, data = data, n = n,
     n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, partial_match = partial_match,
     ...
   )
@@ -173,15 +203,25 @@
 
 #' @export
 #' @rdname basis
-`basis.list` <- function(object, term = NULL, data = NULL,
-                         n = 100, n_2d = 50, n_3d = 16, n_4d = 4,
-                         partial_match = FALSE,
-                         ...) {
+`basis.list` <- function(object,
+    select = NULL,
+    term = deprecated(),
+    data = NULL,
+    n = 100,
+    n_2d = 50,
+    n_3d = 16,
+    n_4d = 4,
+    partial_match = FALSE,
+    ...) {
+  if (lifecycle::is_present(term)) {
+    lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
+    select <- term
+  }
   if (!is_gamm4(object)) {
     stop("'object' is a list but doesn't appear to be a 'gamm4()' model.")
   }
   basis(object[["gam"]],
-    term = term, data = data, n = n,
+    select = select, data = data, n = n,
     n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, partial_match = partial_match,
     ...
   )
