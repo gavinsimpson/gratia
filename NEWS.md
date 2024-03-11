@@ -1,4 +1,4 @@
-# gratia 0.8.9.9
+# gratia 0.8.9.10
 
 ## Breaking changes
 
@@ -342,6 +342,10 @@ to `select` and the function will continue.
   contained only a single smooth. The function never intended to retain all the
   variables in `data` but was written in such a way that it would fail when
   relocating the data columns to the end of the posterior sampling object. #255
+
+* `draw.gam()` and `draw.smooth_estimates()` would fail when plotting a
+  univariate tensor product smooth (e.g. `te(x)`, `ti(x)`, or `t2()`). Reported
+  by @wStockhausen #260
 
 # gratia 0.8.2
 
