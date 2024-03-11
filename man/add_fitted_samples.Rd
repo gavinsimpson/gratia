@@ -30,6 +30,11 @@ method exists.}
 of \code{\link[=fitted_samples]{fitted_samples()}}, \code{\link[=predicted_samples]{predicted_samples()}}, or \code{\link[=posterior_samples]{posterior_samples()}}. \code{n}
 and \code{seed} are already specified here as arguments and are also passed on
 to the posterior sampling function.}
+
+\item{term}{character; select which smooth's posterior to draw from. The
+default, \code{NULL}, means the posteriors of all smooths in model wil be
+sampled from individually. If supplied, a character vector of requested
+smooth terms.}
 }
 \description{
 Adds draws from the posterior distribution of \code{model} to the data \code{object}
@@ -53,7 +58,7 @@ df |>
 
 # add posterior draws from smooth s(x2)
 df |>
-  add_smooth_samples(m_gam, n = 2, seed = 2, term = "s(x2)")
+  add_smooth_samples(m, n = 2, seed = 2, term = "s(x2)")
 \dontshow{
   options(op)
 }
