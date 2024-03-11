@@ -432,6 +432,21 @@ test_that("transform_fun works for tbl", {
   expect_silent(tbl <- transform_fun(su_eg1, fun = abs, column = "y"))
 })
 
+test_that("transform_fun works for smooth_estimates with constant", {
+  expect_silent(sm <- smooth_estimates(m_gam, smooth = "s(x1)"))
+  expect_silent(sm <- transform_fun(sm, fun = exp, constant = coef(m_gam)[1]))
+})
+
+test_that("transform_fun works for smooth_samples with constant", {
+  expect_silent(sm <- smooth_samples(m_gam, term = "s(x1)", n = 5))
+  expect_silent(sm <- transform_fun(sm, fun = exp, constant = coef(m_gam)[1]))
+})
+
+test_that("transform_fun works for tbl with constant", {
+  expect_silent(tbl <- transform_fun(su_eg1, fun = abs, column = "y",
+  constant = 5))
+})
+
 test_that("involves_ranef_smooth works", {
   sm <- smooths(su_m_trivar_t2)
   expect_false(involves_ranef_smooth(get_smooth(su_m_trivar_t2, sm[1])))
@@ -480,7 +495,6 @@ test_that("norm_minus_one_to_one works", {
   expect_identical(range(x), c(-1, 1))
 })
 
-
 test_that("norm_minus_one_to_one works with NA", {
   expect_silent(x <- norm_minus_one_to_one(c(0:10, NA)))
   expect_equal(c(seq(-1, 1, by = 0.2), NA), x)
@@ -488,4 +502,11 @@ test_that("norm_minus_one_to_one works with NA", {
   expect_equal(max(x, na.rm = TRUE), 1.0)
   expect_identical(length(x), length(c(0:10, NA)))
   expect_identical(range(x, na.rm = TRUE), c(-1, 1))
+})
+
+test_that("model_constant returns the intercept estimate", {
+  expect_silent(b <- model_constant(m_gam))
+  expect_type(b, "double")
+  expect_identical(b, unname(coef(m_gam)[1L]))
+  expect_named(b, expected = NULL)
 })
