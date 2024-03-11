@@ -73,7 +73,8 @@
 <span><span class="co"># S3 method for gam</span></span>
 <span><span class="fu">derivatives</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
-<span>  <span class="va">term</span>,</span>
+<span>  select <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  term <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">newdata</span>,</span>
 <span>  order <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"forward"</span>, <span class="st">"backward"</span>, <span class="st">"central"</span><span class="op">)</span>,</span>
@@ -102,11 +103,16 @@
 <dd><p>arguments passed to other methods.</p></dd>
 
 
+<dt>select</dt>
+<dd><p>character; select which smooth's posterior to draw from.
+The default (<code>NULL</code>) means the posteriors of all smooths in <code>model</code>
+wil be sampled from. If supplied, a character vector of requested terms.
+Can be a partial match to a smooth term; see argument <code>partial_match</code>
+below.</p></dd>
+
+
 <dt>term</dt>
-<dd><p>character; vector of one or more smooth terms for which
-derivatives are required. If missing, derivatives for all smooth terms
-will be returned. Can be a partial match to a smooth term; see argument
-<code>partial_match</code> below.</p></dd>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>select</code> instead.</p></dd>
 
 
 <dt>data</dt>
@@ -232,7 +238,7 @@ interval (given <code>level</code>),</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 2 more variables: x2 &lt;dbl&gt;, x3 &lt;dbl&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## derivatives for a selected smooth</span></span></span>
-<span class="r-in"><span><span class="fu">derivatives</span><span class="op">(</span><span class="va">mod</span>, type <span class="op">=</span> <span class="st">"central"</span>, term <span class="op">=</span> <span class="st">"s(x1)"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">derivatives</span><span class="op">(</span><span class="va">mod</span>, type <span class="op">=</span> <span class="st">"central"</span>, select <span class="op">=</span> <span class="st">"s(x1)"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 100 x 9</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci       x1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
@@ -248,7 +254,7 @@ interval (given <code>level</code>),</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> s(x1)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>         -<span style="color: #BB0000;">0.436</span>  2.42  1.96     -<span style="color: #BB0000;">5.19</span>      4.32 0.090<span style="text-decoration: underline;">9</span>  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 90 more rows</span></span>
 <span class="r-in"><span><span class="co">## or via a partial match</span></span></span>
-<span class="r-in"><span><span class="fu">derivatives</span><span class="op">(</span><span class="va">mod</span>, type <span class="op">=</span> <span class="st">"central"</span>, term <span class="op">=</span> <span class="st">"x1"</span>, partial_match <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">derivatives</span><span class="op">(</span><span class="va">mod</span>, type <span class="op">=</span> <span class="st">"central"</span>, select <span class="op">=</span> <span class="st">"x1"</span>, partial_match <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 100 x 9</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci       x1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>

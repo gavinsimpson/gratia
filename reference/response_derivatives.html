@@ -201,7 +201,7 @@ was eveluated.</p></li>
 <span class="r-in"><span><span class="va">ds</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_slice.html">data_slice</a></span><span class="op">(</span><span class="va">m</span>, x2 <span class="op">=</span> <span class="fu"><a href="evenly.html">evenly</a></span><span class="op">(</span><span class="va">x2</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># fitted values along x2</span></span></span>
-<span class="r-in"><span><span class="va">fv</span> <span class="op">&lt;-</span> <span class="fu"><a href="fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m</span>, smooth <span class="op">=</span> <span class="st">"s(x2)"</span>, data <span class="op">=</span> <span class="va">ds</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fv</span> <span class="op">&lt;-</span> <span class="fu"><a href="fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">ds</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># response derivatives - ideally n_sim = &gt;10000</span></span></span>
 <span class="r-in"><span><span class="va">y_d</span> <span class="op">&lt;-</span> <span class="fu">response_derivatives</span><span class="op">(</span><span class="va">m</span>,</span></span>

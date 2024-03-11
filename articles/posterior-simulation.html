@@ -259,10 +259,21 @@ posterior simulation functions in turn.</p>
 <span><span class="fu"><a href="../reference/smooth_coef_indices.html">smooth_coef_indices</a></span><span class="op">(</span><span class="va">s_x0</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1]  2  3  4  5  6  7  8  9 10</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sm_samp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_samples.html">smooth_samples</a></span><span class="op">(</span><span class="va">m_ss</span>, term <span class="op">=</span> <span class="st">"s(x0)"</span>, n_vals <span class="op">=</span> <span class="fl">100</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sm_samp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_samples.html">smooth_samples</a></span><span class="op">(</span><span class="va">m_ss</span>, term <span class="op">=</span> <span class="st">"s(x0)"</span>, n_vals <span class="op">=</span> <span class="fl">100</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: The `term` argument of `smooth_samples()` is deprecated as of gratia 0.8.9.9.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use the `select` argument instead.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sm_est</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m_ss</span>, smooth <span class="op">=</span> <span class="st">"s(x0)"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/add_confint.html">add_confint</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/add_confint.html">add_confint</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: The `smooth` argument of `smooth_estimates()` is deprecated as of gratia</span></span>
+<span><span class="co">#&gt; 0.8.9.9.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use the `select` argument instead.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sm_est</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x0</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>

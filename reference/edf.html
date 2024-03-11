@@ -70,8 +70,10 @@ overall EDF for fitted GAMs</p>
 <span><span class="co"># S3 method for gam</span></span>
 <span><span class="fu">edf</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
-<span>  smooth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  select <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  smooth <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"default"</span>, <span class="st">"unconditional"</span>, <span class="st">"alternative"</span><span class="op">)</span>,</span>
+<span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -88,8 +90,18 @@ overall EDF for fitted GAMs</p>
 <dd><p>arguments passed to methods.</p></dd>
 
 
+<dt>select</dt>
+<dd><p>character, logical, or numeric; which smooths to plot. If
+<code>NULL</code>, the default, then all model smooths are drawn. Numeric <code>select</code>
+indexes the smooths in the order they are specified in the formula and
+stored in <code>object</code>. Character <code>select</code> matches the labels for smooths
+as shown for example in the output from <code>summary(object)</code>. Logical
+<code>select</code> operates as per numeric <code>select</code> in the order that smooths are
+stored.</p></dd>
+
+
 <dt>smooth</dt>
-<dd><p>character; a vector of smooth terms whose EDFs will be
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>select</code> instead.
 extracted. If <code>NULL</code>, the default, EDFs for all smooths will be returned.</p></dd>
 
 
@@ -98,6 +110,12 @@ extracted. If <code>NULL</code>, the default, EDFs for all smooths will be retur
 standard EDF; <code>"unconditional"</code> selects the EDF corrected for smoothness
 parameter selection, if available; <code>"alternative"</code> returns the alternative
 formulation for EDF from Wood (2017, pp. 252)</p></dd>
+
+
+<dt>partial_match</dt>
+<dd><p>logical; should smooths be selected by partial matches
+with <code>select</code>? If <code>TRUE</code>, <code>select</code> can only be a single string to match
+against.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -137,7 +155,7 @@ relevent elements of \(\mathrm{diag}(2\mathbf{F} - \mathbf{FF})\).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> s(x3)   1.884<span style="text-decoration: underline;">7</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># or selected smooths</span></span></span>
-<span class="r-in"><span><span class="fu">edf</span><span class="op">(</span><span class="va">m</span>, smooth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s(x0)"</span>, <span class="st">"s(x2)"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">edf</span><span class="op">(</span><span class="va">m</span>, select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s(x0)"</span>, <span class="st">"s(x2)"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 x 2</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .smooth   .edf</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>

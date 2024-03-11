@@ -79,7 +79,8 @@ been removed from the package.</p>
 <span><span class="co"># S3 method for gam</span></span>
 <span><span class="fu">smooth_estimates</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
-<span>  smooth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  select <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  smooth <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  n_3d <span class="op">=</span> <span class="fl">16</span>,</span>
 <span>  n_4d <span class="op">=</span> <span class="fl">4</span>,</span>
@@ -103,8 +104,14 @@ been removed from the package.</p>
 <dd><p>arguments passed to other methods.</p></dd>
 
 
+<dt>select</dt>
+<dd><p>character; select which smooth's posterior to draw from.
+The default (<code>NULL</code>) means the posteriors of all smooths in <code>model</code>
+wil be sampled from. If supplied, a character vector of requested terms.</p></dd>
+
+
 <dt>smooth</dt>
-<dd><p>character; a single smooth to evaluate.</p></dd>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>select</code> instead.</p></dd>
 
 
 <dt>n</dt>
@@ -116,7 +123,7 @@ which to evaluate the smooth.</p></dd>
 <dd><p>numeric; the number of points over the range of last
 covariate in a 3D or 4D smooth. The default is <code>NULL</code> which achieves the
 standard behaviour of using <code>n</code> points over the range of all covariate,
-resulting in <code>n^d</code> evaluation pointsm, where <code>d</code> is the dimension of the
+resulting in <code>n^d</code> evaluation points, where <code>d</code> is the dimension of the
 smooth. For <code>d &gt; 2</code> this can result in very many evaluation points and slow
 performance. For smooths of <code>d &gt; 4</code>, the value of <code>n_4d</code> will be used for
 all dimensions <code>&gt; 4</code>, unless this is <code>NULL</code>, in which case the default
@@ -192,7 +199,7 @@ and <code>dist</code> is a distance within the unit square. See
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 390 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## or selected smooths</span></span></span>
-<span class="r-in"><span><span class="fu">smooth_estimates</span><span class="op">(</span><span class="va">m1</span>, smooth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s(x0)"</span>, <span class="st">"s(x1)"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">smooth_estimates</span><span class="op">(</span><span class="va">m1</span>, select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s(x0)"</span>, <span class="st">"s(x1)"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 200 x 7</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    .smooth .type .by   .estimate      .se         x0    x1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>

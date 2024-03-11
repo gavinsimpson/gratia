@@ -73,7 +73,8 @@ of <em>mgcv</em>'s smooths via <code><a href="https://rdrr.io/pkg/mgcv/man/s.htm
 <span><span class="co"># S3 method for gam</span></span>
 <span><span class="fu">basis</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
-<span>  term <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  select <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  term <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  n_2d <span class="op">=</span> <span class="fl">50</span>,</span>
@@ -86,7 +87,8 @@ of <em>mgcv</em>'s smooths via <code><a href="https://rdrr.io/pkg/mgcv/man/s.htm
 <span><span class="co"># S3 method for scam</span></span>
 <span><span class="fu">basis</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
-<span>  term <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  select <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  term <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  n_2d <span class="op">=</span> <span class="fl">50</span>,</span>
@@ -99,7 +101,8 @@ of <em>mgcv</em>'s smooths via <code><a href="https://rdrr.io/pkg/mgcv/man/s.htm
 <span><span class="co"># S3 method for gamm</span></span>
 <span><span class="fu">basis</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
-<span>  term <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  select <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  term <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  n_2d <span class="op">=</span> <span class="fl">50</span>,</span>
@@ -112,7 +115,8 @@ of <em>mgcv</em>'s smooths via <code><a href="https://rdrr.io/pkg/mgcv/man/s.htm
 <span><span class="co"># S3 method for list</span></span>
 <span><span class="fu">basis</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
-<span>  term <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  select <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  term <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  n_2d <span class="op">=</span> <span class="fl">50</span>,</span>
@@ -138,8 +142,13 @@ GAM(M) model.</p></dd>
 <dd><p>other arguments passed to <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html" class="external-link">mgcv::smoothCon()</a></code>.</p></dd>
 
 
-<dt>term</dt>
+<dt>select</dt>
 <dd><p>character; select smooths in a fitted model</p></dd>
+
+
+<dt>term</dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> This argument has been
+renamed <code>select</code></p></dd>
 
 
 <dt>data</dt>

@@ -65,11 +65,13 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">compare_smooths</span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  smooths <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  select <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  smooths <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -83,9 +85,18 @@
 <dd><p>Additional models to compare smooths against those of <code>model</code>.</p></dd>
 
 
+<dt>select</dt>
+<dd><p>character; select which smooths to compare. The default
+(<code>NULL</code>) means all smooths in <code>model</code> will be compared. Numeric <code>select</code>
+indexes the smooths in the order they are specified in the formula and
+stored in <code>model</code>. Character <code>select</code> matches the labels for smooths
+as shown for example in the output from <code>summary(object)</code>. Logical
+<code>select</code> operates as per numeric <code>select</code> in the order that smooths are
+stored.</p></dd>
+
+
 <dt>smooths</dt>
-<dd><p>character; vector of smooths to compare. If not specified
-comparisons will be performed for smooths common to all models supplied.</p></dd>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>select</code> instead.</p></dd>
 
 
 <dt>n</dt>
@@ -108,6 +119,12 @@ covariance matrix will be used.</p></dd>
 <dd><p>logical; should the uncertainty in the model
 constant term be included in the standard error of the evaluate values of
 the smooth?</p></dd>
+
+
+<dt>partial_match</dt>
+<dd><p>logical; should smooths be selected by partial matches
+with <code>select</code>? If <code>TRUE</code>, <code>select</code> can only be a single string to match
+against.</p></dd>
 
 </dl></div>
 

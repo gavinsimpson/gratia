@@ -75,7 +75,7 @@
 <p>The projection settings used to draw SOS smooths was previously controlled via arguments <code>projection</code> and <code>orientation</code>. These arguments do not affect <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">ggplot2::coord_sf()</a></code>, Instead the projection used is controlled through new argument <code>crs</code>, which takes a PROJ string detailing the projection to use or an integer that refers to a known coordinate reference system (CRS). The default projection used is <code>+proj=ortho +lat_0=20 +lon_0=XX</code> where <code>XX</code> is the mean of the longitude coordinates of the data points.</p>
 </li>
 </ul><div class="section level4">
-<h4 id="defunct-and-deprecated-functions-0-8-9-9">Defunct and deprecated functions<a class="anchor" aria-label="anchor" href="#defunct-and-deprecated-functions-0-8-9-9"></a></h4>
+<h4 id="defunct-and-deprecated-functions-and-arguments-0-8-9-9">Defunct and deprecated functions and arguments<a class="anchor" aria-label="anchor" href="#defunct-and-deprecated-functions-and-arguments-0-8-9-9"></a></h4>
 <div class="section level5">
 <h5 id="defunct-0-8-9-9">Defunct<a class="anchor" aria-label="anchor" href="#defunct-0-8-9-9"></a></h5>
 <ul><li>
@@ -87,6 +87,10 @@
 <ul><li><p><code><a href="../reference/evaluate_parametric_term.html">evaluate_parametric_term()</a></code> has been deprecated. Use <code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> instead.</p></li>
 <li><p><code><a href="../reference/datagen.html">datagen()</a></code> has been deprecated. It never really did what it was originally designed to do, and has been replaced by <code><a href="../reference/data_slice.html">data_slice()</a></code>.</p></li>
 </ul></div>
+<div class="section level5">
+<h5 id="deprecated-arguments-0-8-9-9">Deprecated arguments<a class="anchor" aria-label="anchor" href="#deprecated-arguments-0-8-9-9"></a></h5>
+<p>To make functions in the package more consistent, the arguments <code>select</code>, <code>term</code>, and <code>smooth</code> are all used for the same thing and hence the latter two have been deprecated in favour of <code>select</code>. If a deprecated argument is used, a warning will be issued but the value assigned to the argument will be assigned to <code>select</code> and the function will continue.</p>
+</div>
 </div>
 </div>
 <div class="section level3">
