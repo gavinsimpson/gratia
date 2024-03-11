@@ -542,7 +542,7 @@
     ...,
     newdata = NULL,
     ncores = NULL) {
-  if (lifecycle::is_present(na.rm)) {
+  if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "smooth_samples(..., term)",
       "smooth_samples(..., select)")
     select <- term
@@ -707,7 +707,7 @@
     draws = NULL, mvn_method = c("mvnfast", "mgcv"),
     partial_match = NULL, ...,
     newdata = NULL, ncores = NULL) {
-  if (lifecycle::is_present(na.rm)) {
+  if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "smooth_samples(..., term)",
       "smooth_samples(..., select)")
     select <- term
