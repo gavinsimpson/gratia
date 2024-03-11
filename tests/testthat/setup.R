@@ -204,6 +204,11 @@ m_scat <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   family = scat(), method = "REML"
 )
 
+# models with univariate tensor products
+m_univar_te <- gam(y ~ te(x2), data = quick_eg1, method = "REML")
+m_univar_ti <- gam(y ~ ti(x2), data = quick_eg1, method = "REML")
+m_univar_t2 <- gam(y ~ t2(x2), data = quick_eg1, method = "REML")
+
 m_lm <- lm(y ~ x0 + x1 + x2 + x3, data = quick_eg1)
 
 m_glm <- glm(y ~ x0 + x1 + x2 + x3, data = quick_eg1)
