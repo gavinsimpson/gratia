@@ -543,8 +543,8 @@
     newdata = NULL,
     ncores = NULL) {
   if (lifecycle::is_present(term)) {
-    lifecycle::deprecate_warn("0.8.9.9", "smooth_samples(..., term)",
-      "smooth_samples(..., select)")
+    lifecycle::deprecate_warn("0.8.9.9", "smooth_samples(term)",
+      "smooth_samples(select)")
     select <- term
   }
   # smooth_samples begins
@@ -708,8 +708,8 @@
     partial_match = NULL, ...,
     newdata = NULL, ncores = NULL) {
   if (lifecycle::is_present(term)) {
-    lifecycle::deprecate_warn("0.8.9.9", "smooth_samples(..., term)",
-      "smooth_samples(..., select)")
+    lifecycle::deprecate_warn("0.8.9.9", "smooth_samples(term)",
+      "smooth_samples(select)")
     select <- term
   }
   # smooth_samples begins
