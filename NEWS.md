@@ -134,6 +134,11 @@ eventual 1.0.0 release. These functions will become defunct by version 0.11.0 or
 * `fitted_samples()` can new use a matrix of user-supplied posterior draws.
   Related to #120
 
+* `add_fitted_samples()`, `add_predicted_samples()`, `add_posterior_samples()`,
+  and `add_smooth_samples()` are new utility functions that add the respective
+  draws from the posterior distribution to an existing data object for the
+  covariate values in that object: `obj |> add_posterior_draws(model)`. #50
+
 * `basis_size()` is a new function to extract the basis dimension (number of
   basis functions) for smooths. Methods are available for objects that inherit
   from classes `"gam"`, `"gamm"`, and `"mgcv.smooth"` (for individual smooths).
@@ -322,6 +327,13 @@ eventual 1.0.0 release. These functions will become defunct by version 0.11.0 or
 * The `draw()` method for `penalty()` was normalizing the penalty to the range
   0--1, not the claimed and documented -1--1 with argument `normalize = TRUE`.
   This is now fixed.
+
+* `smooth_samples()` was failing when `data` was supplied that contained more
+  variables than were used in the smooth that was being sampled. Hence this
+  generally fail unless a single smooth was being sampled from or the model
+  contained only a single smooth. The function never intended to retain all the
+  variables in `data` but was written in such a way that it would fail when
+  relocating the data columns to the end of the posterior sampling object. #255
 
 # gratia 0.8.2
 

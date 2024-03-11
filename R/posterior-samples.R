@@ -492,7 +492,194 @@
   )
 }
 
+#' @param n_vals numeric; how many locations to evaluate the smooth at if
+#'   `data` not supplied
+#' @param term character; select which smooth's posterior to draw from.
+#'   The default (`NULL`) means the posteriors of all smooths in `model`
+#'   wil be sampled from. If supplied, a character vector of requested terms.
+#' @param rng_per_smooth logical; if TRUE, the behaviour of gratia version
+#' 0.8.1 or earlier is used, whereby a separate call the the random number
+#' generator (RNG) is performed for each smooth. If FALSE, a single call to the
+#' RNG is performed for all model parameters
+#'
+#' @section Warning:
+#' The set of variables returned and their order in the tibble is subject to
+#' change in future versions. Don't rely on position.
+#'
 #' @export
+#'
+#' @rdname smooth_samples
+#'
+#' @inheritParams posterior_samples
+#'
+#' @importFrom mvnfast rmvn
+#' @importFrom dplyr bind_rows starts_with
+#' @importFrom tibble as_tibble add_column
+#' @importFrom tidyr pivot_longer
+#' @importFrom mgcv PredictMat
+#' @importFrom tidyselect any_of
+`smooth_samples.gam` <- function(
+    model, term = NULL, n = 1, data = newdata,
+    method = c("gaussian", "mh", "inla", "user"),
+    seed = NULL,
+    freq = FALSE,
+    unconditional = FALSE,
+    n_cores = 1L,
+    n_vals = 200,
+    burnin = 1000,
+    thin = 1,
+    t_df = 40,
+    rw_scale = 0.25,
+    rng_per_smooth = FALSE,
+    draws = NULL,
+    ...,
+    newdata = NULL,
+    ncores = NULL) {
+  # smooth_samples begins
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+    runif(1)
+  }
+  if (is.null(seed)) {
+    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+  } else {
+    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+    set.seed(seed)
+    RNGstate <- structure(seed, kind = as.list(RNGkind()))
+    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+  }
+
+  S <- smooths(model) # vector of smooth labels - "s(x)"
+  take <- seq_along(S) # in default case 1,2,3,..,n smooths
+  if (!is.null(term)) {
+    take <- which_smooths(model, term)
+    S <- S[take]
+  }
+
+  # At least for now, don't work for random effect smooths
+  # do we have ranef smooths?
+  re_sms <- vapply(get_smooths_by_id(model, take),
+    FUN = is_re_smooth,
+    FUN.VALUE = logical(1L)
+  )
+  if (any(re_sms)) {
+    message(
+      "\nRandom effect smooths not currently supported.\nIgnoring:",
+      " <", paste(S[re_sms], collapse = ", "), ">\n"
+    )
+    S <- S[!re_sms]
+    take <- take[!re_sms]
+  }
+
+  # do we have any remaining terms?
+  if (length(S) < 1L) {
+    stop("No smooths left that can be sampled from.")
+  }
+
+  if (!is.null(newdata)) {
+    newdata_deprecated()
+  }
+
+  if (!is.null(ncores)) {
+    message("Argument `ncores` is deprecated. Use `n_cores` instead.")
+    n_cores <- ncores
+  }
+
+  need_data <- FALSE
+  if (is.null(data)) {
+    need_data <- TRUE
+  }
+
+  # what posterior sampling are we using
+  method <- match.arg(method)
+
+  # get posterior draws - call this once for all parameters
+  if (isFALSE(rng_per_smooth)) {
+    betas <- post_draws(
+      n = n, method = method,
+      n_cores = n_cores, model = model,
+      burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
+      index = NULL, frequentist = freq, unconditional = unconditional,
+      draws = draws, seed = seed,
+    )
+  }
+
+  sims <- data_names <- vector("list", length = length(S))
+  for (i in seq_along(S)) {
+    if (need_data) {
+      # FIXME: should offset be NULL?
+      data <- smooth_data(model,
+        id = take[i], n = n_vals,
+        offset = NULL
+      )
+      # I don't think we need offset here as that really just shifts the
+      # response around
+    }
+    sm <- get_smooths_by_id(model, take[i])[[1L]]
+    idx <- smooth_coef_indices(sm)
+    Xp <- PredictMat(sm, data = data)
+    # get posterior draws - use old behaviour? TRUE is yes
+    simu <- if (isTRUE(rng_per_smooth)) {
+      betas <- post_draws(
+        n = n, method = method,
+        n_cores = n_cores, model = model,
+        burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
+        index = idx, frequentist = freq, unconditional = unconditional,
+        seed = seed
+      )
+      Xp %*% t(betas)
+    } else {
+      Xp %*% t(betas[, idx, drop = FALSE])
+    }
+    colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
+    simu <- as_tibble(simu)
+    nr_simu <- nrow(simu)
+    simu <- add_by_data(simu,
+      by_name = by_variable(sm), by_data = data,
+      before = 1L
+    )
+    # add on spline type info
+    sm_type <- smooth_type(sm)
+    simu <- add_column(simu,
+      .smooth = rep(
+        unlist(lapply(strsplit(S[[i]], ":"), `[`, 1L)),
+        nr_simu
+      ),
+      .term = rep(S[[i]], each = nr_simu),
+      .type = rep(sm_type, nr_simu),
+      .row = seq_len(nr_simu),
+      .after = 0L
+    )
+    simu <- bind_cols(simu, data[smooth_variable(sm)])
+    simu <- pivot_longer(simu,
+      cols = dplyr::starts_with("..V"),
+      names_to = ".draw", values_to = ".value",
+      names_transform = \(x) as.integer(sub("\\.\\.V", "", x))
+    )
+    simu <- relocate(simu, any_of(names(data)), .after = last_col()) |>
+      relocate(".by", .after = 3L)
+    ## nest all columns with varying data
+    simu <- nest(simu, data = all_of(c(
+      ".row", ".draw", ".value",
+      vars_in_smooth(sm)
+    )))
+    sims[[i]] <- simu
+  }
+
+  sims <- bind_rows(sims)
+  sims <- unnest(sims, all_of("data"))
+  attr(sims, "seed") <- RNGstate
+  ## add classes
+  class(sims) <- c("smooth_samples", class(sims))
+  sims
+}
+
+#' @export
+#' @importFrom mvnfast rmvn
+#' @importFrom dplyr bind_rows starts_with
+#' @importFrom tibble as_tibble add_column
+#' @importFrom tidyr pivot_longer
+#' @importFrom mgcv PredictMat
+#' @importFrom tidyselect any_of
 `smooth_samples.scam` <- function(
     model, term = NULL, n = 1, data = newdata,
     method = c("gaussian", "mh", "inla", "user"), seed = NULL,
@@ -618,196 +805,7 @@
       names_to = ".draw", values_to = ".value",
       names_transform = \(x) as.integer(sub("\\.\\.V", "", x))
     )
-    simu <- relocate(simu, names(data), .after = last_col()) |>
-      relocate(".by", .after = 3L)
-    ## nest all columns with varying data
-    simu <- nest(simu, data = all_of(c(
-      ".row", ".draw", ".value",
-      vars_in_smooth(sm)
-    )))
-    sims[[i]] <- simu
-  }
-
-  sims <- bind_rows(sims)
-  sims <- unnest(sims, all_of("data"))
-  attr(sims, "seed") <- RNGstate
-  ## add classes
-  class(sims) <- c("smooth_samples", class(sims))
-  sims
-}
-
-#' @param n_vals numeric; how many locations to evaluate the smooth at if
-#'   `data` not supplied
-#' @param term character; select which smooth's posterior to draw from.
-#'   The default (`NULL`) means the posteriors of all smooths in `model`
-#'   wil be sampled from. If supplied, a character vector of requested terms.
-#' @param rng_per_smooth logical; if TRUE, the behaviour of gratia version
-#' 0.8.1 or earlier is used, whereby a separate call the the random number
-#' generator (RNG) is performed for each smooth. If FALSE, a single call to the
-#' RNG is performed for all model parameters
-#'
-#' @section Warning:
-#' The set of variables returned and their order in the tibble is subject to
-#' change in future versions. Don't rely on position.
-#'
-#' @export
-#'
-#' @rdname smooth_samples
-#'
-#' @inheritParams posterior_samples
-#'
-#' @importFrom mvnfast rmvn
-#' @importFrom dplyr bind_rows starts_with
-#' @importFrom tibble as_tibble add_column
-#' @importFrom tidyr pivot_longer
-#' @importFrom mgcv PredictMat
-`smooth_samples.gam` <- function(
-    model, term = NULL, n = 1, data = newdata,
-    method = c("gaussian", "mh", "inla", "user"),
-    seed = NULL,
-    freq = FALSE,
-    unconditional = FALSE,
-    n_cores = 1L,
-    n_vals = 200,
-    burnin = 1000,
-    thin = 1,
-    t_df = 40,
-    rw_scale = 0.25,
-    rng_per_smooth = FALSE,
-    draws = NULL,
-    ...,
-    newdata = NULL,
-    ncores = NULL) {
-  # smooth_samples begins
-  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-    runif(1)
-  }
-  if (is.null(seed)) {
-    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-  } else {
-    R.seed <- get(".Random.seed", envir = .GlobalEnv)
-    set.seed(seed)
-    RNGstate <- structure(seed, kind = as.list(RNGkind()))
-    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-  }
-
-  S <- smooths(model) # vector of smooth labels - "s(x)"
-  take <- seq_along(S) # in default case 1,2,3,..,n smooths
-  if (!is.null(term)) {
-    take <- which_smooths(model, term)
-    S <- S[take]
-  }
-
-  # At least for now, don't work for random effect smooths
-  # do we have ranef smooths?
-  re_sms <- vapply(get_smooths_by_id(model, take),
-    FUN = is_re_smooth,
-    FUN.VALUE = logical(1L)
-  )
-  if (any(re_sms)) {
-    message(
-      "\nRandom effect smooths not currently supported.\nIgnoring:",
-      " <", paste(S[re_sms], collapse = ", "), ">\n"
-    )
-    S <- S[!re_sms]
-    take <- take[!re_sms]
-  }
-
-  # do we have any remaining terms?
-  if (length(S) < 1L) {
-    stop("No smooths left that can be sampled from.")
-  }
-
-  if (!is.null(newdata)) {
-    newdata_deprecated()
-  }
-
-  if (!is.null(ncores)) {
-    message("Argument `ncores` is deprecated. Use `n_cores` instead.")
-    n_cores <- ncores
-  }
-
-  need_data <- FALSE
-  if (is.null(data)) {
-    need_data <- TRUE
-  }
-
-  # what posterior sampling are we using
-  method <- match.arg(method)
-
-  # get posterior draws - call this once for all parameters
-  if (isFALSE(rng_per_smooth)) {
-    betas <- post_draws(
-      n = n, method = method,
-      n_cores = n_cores, model = model,
-      burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-      index = NULL, frequentist = freq, unconditional = unconditional,
-      draws = draws, seed = seed,
-    )
-  }
-
-  sims <- data_names <- vector("list", length = length(S))
-  for (i in seq_along(S)) {
-    if (need_data) {
-      # FIXME: should offset be NULL?
-      data <- smooth_data(model,
-        id = take[i], n = n_vals,
-        offset = NULL
-      )
-      # I don't think we need offset here as that really just shifts the
-      # response around
-    }
-    sm <- get_smooths_by_id(model, take[i])[[1L]]
-    idx <- smooth_coef_indices(sm)
-    Xp <- PredictMat(sm, data = data)
-    # get posterior draws - use old behaviour? TRUE is yes
-    simu <- if (isTRUE(rng_per_smooth)) {
-      betas <- post_draws(
-        n = n, method = method,
-        n_cores = n_cores, model = model,
-        burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-        index = idx, frequentist = freq, unconditional = unconditional,
-        seed = seed
-      )
-      Xp %*% t(betas)
-    } else {
-      Xp %*% t(betas[, idx, drop = FALSE])
-    }
-    colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
-    simu <- as_tibble(simu)
-    nr_simu <- nrow(simu)
-    # is_fac_by <- is_factor_by_smooth(sm)
-    # if (is_fac_by)) {
-    #     simu <- add_factor_by_data(simu, n = n_vals,
-    #                                by_name = by_variable(sm),
-    #                                by_data = data, before = 1L)
-    # } else {
-    #     simu <- add_by_var_column(simu, n = nr_simu,
-    #         by_var = by_variable(sm))
-    # }
-    simu <- add_by_data(simu,
-      by_name = by_variable(sm), by_data = data,
-      before = 1L
-    )
-    # add on spline type info
-    sm_type <- smooth_type(sm)
-    simu <- add_column(simu,
-      .smooth = rep(
-        unlist(lapply(strsplit(S[[i]], ":"), `[`, 1L)),
-        nr_simu
-      ),
-      .term = rep(S[[i]], each = nr_simu),
-      .type = rep(sm_type, nr_simu),
-      .row = seq_len(nr_simu),
-      .after = 0L
-    )
-    simu <- bind_cols(simu, data[smooth_variable(sm)])
-    simu <- pivot_longer(simu,
-      cols = dplyr::starts_with("..V"),
-      names_to = ".draw", values_to = ".value",
-      names_transform = \(x) as.integer(sub("\\.\\.V", "", x))
-    )
-    simu <- relocate(simu, names(data), .after = last_col()) |>
+    simu <- relocate(simu, any_of(names(data)), .after = last_col()) |>
       relocate(".by", .after = 3L)
     ## nest all columns with varying data
     simu <- nest(simu, data = all_of(c(
