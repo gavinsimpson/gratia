@@ -250,6 +250,9 @@ eventual 1.0.0 release. These functions will become defunct by version 0.11.0 or
   separate calls to `add_constant()` and then `transform_fun()`. Part of the
   discussion of #79
 
+* `model_constant()` is a new function that simply extracts the first
+  coefficient from the estimated model.
+
 ## Bug fixes
 
 * `link()`, `inv_link()`, and related family functions for the `ocat()` weren't
