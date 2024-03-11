@@ -134,6 +134,11 @@ eventual 1.0.0 release. These functions will become defunct by version 0.11.0 or
 * `fitted_samples()` can new use a matrix of user-supplied posterior draws.
   Related to #120
 
+* `add_fitted_samples()`, `add_predicted_samples()`, `add_posterior_samples()`,
+  and `add_smooth_samples()` are new utility functions that add the respective
+  draws from the posterior distribution to an existing data object for the
+  covariate values in that object: `obj |> add_posterior_draws(model)`. #50
+
 * `basis_size()` is a new function to extract the basis dimension (number of
   basis functions) for smooths. Methods are available for objects that inherit
   from classes `"gam"`, `"gamm"`, and `"mgcv.smooth"` (for individual smooths).
