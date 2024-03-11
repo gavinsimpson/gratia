@@ -12,12 +12,17 @@ test_that("edf() works for a simple GAM", {
 })
 
 test_that("edf() works when selecting smooths", {
-  expect_silent(edfs <- edf(m_gam, smooth = c("s(x0)", "s(x2)")))
+  expect_silent(edfs <- edf(m_gam, select = c("s(x0)", "s(x2)")))
   expect_s3_class(edfs, c("tbl_df", "tbl", "data.frame"))
   expect_identical(nrow(edfs), 2L)
   expect_identical(ncol(edfs), 2L)
   expect_named(edfs, edf_nms)
   expect_snapshot(print(edfs))
+})
+
+test_that("smooth arg is deprecated in edf()", {
+  expect_warning(edfs <- edf(m_gam, smooth = c("s(x0)", "s(x2)")),
+    "deprecated") 
 })
 
 test_that("edf() works with type unconditional", {

@@ -326,7 +326,7 @@ test_that("draw.derivates() plots derivatives for a GAM rotated labels", {
 
 test_that("draw plots partial derivatives for a GAM", {
   d1 <- partial_derivatives(su_m_bivar_te,
-    term = "te(x,z)", focal = "z",
+    select = "te(x,z)", focal = "z",
     type = "central", n = 100
   )
   plt1 <- draw(d1)
@@ -344,7 +344,7 @@ test_that("draw plots partial derivatives for a GAM", {
 test_that("draw plots partial derivs for GAM rotated labels", {
   skip_on_cran()
   d1 <- partial_derivatives(su_m_bivar_te,
-    term = "te(x,z)", focal = "z",
+    select = "te(x,z)", focal = "z",
     type = "central", n = 100
   )
   plt1 <- draw(d1, angle = 45)

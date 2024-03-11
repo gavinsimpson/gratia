@@ -1,7 +1,7 @@
 ## Test difference_smooths()
 
 test_that("difference_smooths() works for a gam model", {
-  expect_silent(ds <- difference_smooths(su_m_factor_by, smooth = "s(x2)"))
+  expect_silent(ds <- difference_smooths(su_m_factor_by, select = "s(x2)"))
   expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
 
   ## plot
@@ -13,7 +13,7 @@ test_that("difference_smooths() works for a gam model", {
 
 test_that("difference_smooths() works for a gam model including group means", {
   expect_silent(ds <- difference_smooths(su_m_factor_by,
-    smooth = "s(x2)",
+    select = "s(x2)",
     group_means = TRUE
   ))
   expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
@@ -26,7 +26,7 @@ test_that("difference_smooths() works for a gam model including group means", {
 })
 
 test_that("difference_smooths() works for a gam model fixed scales", {
-  expect_silent(ds <- difference_smooths(su_m_factor_by, smooth = "s(x2)"))
+  expect_silent(ds <- difference_smooths(su_m_factor_by, select = "s(x2)"))
   expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
 
   ## plot
@@ -37,7 +37,7 @@ test_that("difference_smooths() works for a gam model fixed scales", {
 })
 
 test_that("difference_smooths() works for a gam model fixed scales", {
-  expect_silent(ds <- difference_smooths(su_m_factor_by, smooth = "s(x2)"))
+  expect_silent(ds <- difference_smooths(su_m_factor_by, select = "s(x2)"))
   expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
 
   ## plot
@@ -50,7 +50,7 @@ test_that("difference_smooths() works for a gam model fixed scales", {
 test_that("difference_smooths() works for a bam model", {
   skip_on_cran()
   expect_silent(ds <- difference_smooths(su_m_factor_by_bam,
-    smooth = "s(x2)"
+    select = "s(x2)"
   ))
   expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
 
@@ -65,7 +65,7 @@ test_that("difference_smooths() works for a gamm model", {
   skip_on_cran()
   skip_on_os(c("windows", "mac"))
   expect_silent(ds <- difference_smooths(su_m_factor_by_gamm,
-    smooth = "s(x2)"
+    select = "s(x2)"
   ))
   expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
 
@@ -80,7 +80,7 @@ test_that("difference_smooths() works for a gamm4 model", {
   skip_on_cran()
   skip_on_os(c("windows", "mac"))
   expect_silent(ds <- difference_smooths(su_m_factor_by_gamm4,
-    smooth = "s(x2)"
+    select = "s(x2)"
   ))
   expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
 
@@ -101,7 +101,7 @@ test_that("difference_smooths() works with user data", {
     )
   )
   expect_silent(ds <-
-    difference_smooths(su_m_factor_by, smooth = "s(x2)", data = df))
+    difference_smooths(su_m_factor_by, select = "s(x2)", data = df))
   expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
 
   ## plot
@@ -114,7 +114,7 @@ test_that("difference_smooths() works with user data", {
 test_that("difference_smooths() works for a bivariate gam", {
   skip_on_cran()
   expect_silent(ds <- difference_smooths(su_m_bivar_by_fac,
-    smooth = "s(x,z)"
+    select = "s(x,z)"
   ))
   expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
 
@@ -128,4 +128,9 @@ test_that("difference_smooths() works for a bivariate gam", {
   skip_on_ci()
   expect_doppelganger("draw difference_smooths bivariate gam", plt1)
   expect_doppelganger("draw difference_smooths bivariate gam contours", plt2)
+})
+
+test_that("smooth arg is deprecated in difference_smooths()", {
+  expect_warning(ds <- difference_smooths(su_m_factor_by, smooth = "s(x2)"),
+    "deprecated")
 })

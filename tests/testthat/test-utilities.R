@@ -424,7 +424,7 @@ test_that("transform_fun works for parametric_effects", {
 })
 
 test_that("transform_fun works for smooth_estimates", {
-  expect_silent(sm <- smooth_estimates(m_gam, smooth = "s(x1)"))
+  expect_silent(sm <- smooth_estimates(m_gam, select = "s(x1)"))
   expect_silent(sm <- transform_fun(sm, fun = exp))
 })
 
@@ -433,12 +433,12 @@ test_that("transform_fun works for tbl", {
 })
 
 test_that("transform_fun works for smooth_estimates with constant", {
-  expect_silent(sm <- smooth_estimates(m_gam, smooth = "s(x1)"))
+  expect_silent(sm <- smooth_estimates(m_gam, select = "s(x1)"))
   expect_silent(sm <- transform_fun(sm, fun = exp, constant = coef(m_gam)[1]))
 })
 
 test_that("transform_fun works for smooth_samples with constant", {
-  expect_silent(sm <- smooth_samples(m_gam, term = "s(x1)", n = 5))
+  expect_silent(sm <- smooth_samples(m_gam, select = "s(x1)", n = 5))
   expect_silent(sm <- transform_fun(sm, fun = exp, constant = coef(m_gam)[1]))
 })
 

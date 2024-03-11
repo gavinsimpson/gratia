@@ -56,7 +56,7 @@ test_that("derivatives() returns derivatives for all smooths in a GAM", {
   expect_s3_class(df, "tbl_df")
   expect_named(df, c(deriv_nms, "x1"))
 
-  expect_silent(df <- derivatives(su_m_univar_4, "x1",
+  expect_silent(df <- derivatives(su_m_univar_4, select = "x1",
     type = "forward",
     partial_match = TRUE
   ))
@@ -484,14 +484,14 @@ test_that("derivatives with simultaneous intervals works for factor by", {
   expect_message(
     d_pw <- derivatives(su_m_factor_by,
       newdata = newd,
-      term = smooths(su_m_factor_by)[1:3]
+      select = smooths(su_m_factor_by)[1:3]
     ),
     "Use of the `newdata` argument is deprecated.
 Instead, use the data argument `data`.\n"
   )
   expect_silent(d_pw <- derivatives(su_m_factor_by,
     data = newd,
-    term = smooths(su_m_factor_by)[1:3]
+    select = smooths(su_m_factor_by)[1:3]
   ))
   expect_s3_class(d_pw, "derivatives")
   expect_s3_class(d_pw, "tbl_df")
@@ -501,7 +501,7 @@ Instead, use the data argument `data`.\n"
     15,
     derivatives(su_m_factor_by,
       data = newd,
-      term = smooths(su_m_factor_by)[1:3],
+      select = smooths(su_m_factor_by)[1:3],
       interval = "simultaneous"
     )
   ))
