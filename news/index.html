@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.9.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.9.9</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,9 +56,9 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.8.9.8" id="gratia-0898">gratia 0.8.9.8<a class="anchor" aria-label="anchor" href="#gratia-0898"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.8.9.9" id="gratia-0899">gratia 0.8.9.9<a class="anchor" aria-label="anchor" href="#gratia-0899"></a></h2>
 <div class="section level3">
-<h3 id="breaking-changes-0-8-9-8">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-8-9-8"></a></h3>
+<h3 id="breaking-changes-0-8-9-9">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-8-9-9"></a></h3>
 <ul><li>
 <p>Many functions now return objects with different named variables. In order to avoid clashes with variable names used in user’s models or data, a period (<code>.</code>) is now being used as a prefix for generated variable names. The functions whose names have changed are: <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>, <code><a href="../reference/fitted_values.html">fitted_values()</a></code>, <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code>, <code><a href="../reference/posterior_samples.html">posterior_samples()</a></code>, <code><a href="../reference/derivatives.html">derivatives()</a></code>, <code><a href="../reference/partial_derivatives.html">partial_derivatives()</a></code>, and <code><a href="../reference/derivative_samples.html">derivative_samples()</a></code>. In addition, <code><a href="../reference/add_confint.html">add_confint()</a></code> also adds newly-named variables.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fl">1.</span> <span class="st">`</span><span class="at">est</span><span class="st">`</span> is now <span class="st">`</span><span class="at">.estimate</span><span class="st">`</span>,</span>
@@ -75,14 +75,14 @@
 <p>The projection settings used to draw SOS smooths was previously controlled via arguments <code>projection</code> and <code>orientation</code>. These arguments do not affect <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">ggplot2::coord_sf()</a></code>, Instead the projection used is controlled through new argument <code>crs</code>, which takes a PROJ string detailing the projection to use or an integer that refers to a known coordinate reference system (CRS). The default projection used is <code>+proj=ortho +lat_0=20 +lon_0=XX</code> where <code>XX</code> is the mean of the longitude coordinates of the data points.</p>
 </li>
 </ul><div class="section level4">
-<h4 id="defunct-and-deprecated-functions-0-8-9-8">Defunct and deprecated functions<a class="anchor" aria-label="anchor" href="#defunct-and-deprecated-functions-0-8-9-8"></a></h4>
+<h4 id="defunct-and-deprecated-functions-0-8-9-9">Defunct and deprecated functions<a class="anchor" aria-label="anchor" href="#defunct-and-deprecated-functions-0-8-9-9"></a></h4>
 <div class="section level5">
-<h5 id="defunct-0-8-9-8">Defunct<a class="anchor" aria-label="anchor" href="#defunct-0-8-9-8"></a></h5>
+<h5 id="defunct-0-8-9-9">Defunct<a class="anchor" aria-label="anchor" href="#defunct-0-8-9-9"></a></h5>
 <ul><li>
 <code><a href="../reference/evaluate_smooth.html">evaluate_smooth()</a></code> was deprecated in gratia version 0.7.0. This function and all it’s methods have been removed from the package. Use <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> instead.</li>
 </ul></div>
 <div class="section level5">
-<h5 id="deprecated-functions-0-8-9-8">Deprecated functions<a class="anchor" aria-label="anchor" href="#deprecated-functions-0-8-9-8"></a></h5>
+<h5 id="deprecated-functions-0-8-9-9">Deprecated functions<a class="anchor" aria-label="anchor" href="#deprecated-functions-0-8-9-9"></a></h5>
 <p>The following functions were deprecated in version 0.9.0 of gratia. They will eventually be removed from the package as part of a clean up ahead of an eventual 1.0.0 release. These functions will become defunct by version 0.11.0 or 1.0.0, whichever is released soonest.</p>
 <ul><li><p><code><a href="../reference/evaluate_parametric_term.html">evaluate_parametric_term()</a></code> has been deprecated. Use <code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> instead.</p></li>
 <li><p><code><a href="../reference/datagen.html">datagen()</a></code> has been deprecated. It never really did what it was originally designed to do, and has been replaced by <code><a href="../reference/data_slice.html">data_slice()</a></code>.</p></li>
@@ -90,7 +90,7 @@
 </div>
 </div>
 <div class="section level3">
-<h3 id="user-visible-changes-0-8-9-8">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-8-9-8"></a></h3>
+<h3 id="user-visible-changes-0-8-9-9">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-8-9-9"></a></h3>
 <ul><li>
 <p><code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> now uses a single call to the RNG to generate draws from the posterior of smooths. Previous to version 0.9.0, <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> would do a separate call to <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code> for each smooth. As a result, the result of a call to <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> on a model with multiple smooths will now produce different results to those generated previously. To regain the old behaviour, add <code>rng_per_smooth = TRUE</code> to the <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> call.</p>
 <p>Note, however, that using per-smooth RNG calls with <code>method = "mh"</code> will be very inefficient as, with that method, posterior draws for all coefficients in the model are sampled at once. So, only use <code>rng_per_smooth = TRUE</code> with <code>method = "gaussian"</code>.</p>
@@ -104,13 +104,14 @@
 <li><p>A new vignette <em>Posterior Simulation</em> is available, which describes how to do posterior simulation from fitted GAMs using {gratia}.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-0-8-9-8">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-9-8"></a></h3>
+<h3 id="new-features-0-8-9-9">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-9-9"></a></h3>
 <ul><li><p><code><a href="../reference/response_derivatives.html">response_derivatives()</a></code> is a new function for computing derivatives of the response with respect to a (continuous) focal variable. First or second order derivatives can be computed using forward, backward, or central finite differences. The uncertainty in the estimated derivative is determined using posterior sampling via <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code>, and hence can be derived from a Gaussian approximation to the posterior or using a Metropolis Hastings sampler (see below.)</p></li>
 <li><p><code><a href="../reference/derivative_samples.html">derivative_samples()</a></code> is the work horse function behind <code><a href="../reference/response_derivatives.html">response_derivatives()</a></code>, which computes and returns posterior draws of the derivatives of any additive combination of model terms. Requested by <a href="https://github.com/jonathanmellor" class="external-link">@jonathanmellor</a> <a href="https://github.com/gavinsimpson/gratia/issues/237" class="external-link">#237</a></p></li>
 <li><p><code><a href="../reference/data_sim.html">data_sim()</a></code> can now simulate response data from gamma, Tweedie and ordered categorical distributions.</p></li>
 <li><p><code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> and <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> can now use the Metropolis Hastings sampler from <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code>, instead of a Gaussian approximation, to sample from the posterior distribution of the model or specific smooths respectively.</p></li>
 <li><p><code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> is a new function in the family of <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> and <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code>. <code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> returns draws from the posterior distribution of the response, combining the uncertainty in the estimated expected value of the response and the dispersion of the response distribution. The difference between <code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> and <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code> is that the latter only includes variation due to drawing samples from the conditional distribution of the response (the uncertainty in the expected values is ignored), while the former includes both sources of uncertainty.</p></li>
 <li><p><code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> can new use a matrix of user-supplied posterior draws. Related to <a href="https://github.com/gavinsimpson/gratia/issues/120" class="external-link">#120</a></p></li>
+<li><p><code><a href="../reference/add_fitted_samples.html">add_fitted_samples()</a></code>, <code><a href="../reference/add_fitted_samples.html">add_predicted_samples()</a></code>, <code><a href="../reference/add_fitted_samples.html">add_posterior_samples()</a></code>, and <code><a href="../reference/add_fitted_samples.html">add_smooth_samples()</a></code> are new utility functions that add the respective draws from the posterior distribution to an existing data object for the covariate values in that object: <code>obj |&gt; add_posterior_draws(model)</code>. <a href="https://github.com/gavinsimpson/gratia/issues/50" class="external-link">#50</a></p></li>
 <li><p><code><a href="../reference/basis_size.html">basis_size()</a></code> is a new function to extract the basis dimension (number of basis functions) for smooths. Methods are available for objects that inherit from classes <code>"gam"</code>, <code>"gamm"</code>, and <code>"mgcv.smooth"</code> (for individual smooths).</p></li>
 <li><p><code><a href="../reference/data_slice.html">data_slice()</a></code> gains a method for data frames and tibbles.</p></li>
 <li><p><code><a href="../reference/typical_values.html">typical_values()</a></code> gains a method for data frames and tibbles.</p></li>
@@ -145,7 +146,7 @@
 <li><p><code><a href="../reference/model_constant.html">model_constant()</a></code> is a new function that simply extracts the first coefficient from the estimated model.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-8-9-8">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-9-8"></a></h3>
+<h3 id="bug-fixes-0-8-9-9">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-9-9"></a></h3>
 <ul><li>
 <p><code><a href="../reference/link.html">link()</a></code>, <code><a href="../reference/link.html">inv_link()</a></code>, and related family functions for the <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">ocat()</a></code> weren’t correctly identifying the family name and as a result would throw an error even when passed an object of the correct family.</p>
 <p><code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> now work correctly for the <code><a href="https://rdrr.io/pkg/mgcv/man/Beta.html" class="external-link">betar()</a></code> family in a fitted GAM.</p>
@@ -165,6 +166,7 @@
 <li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> would fail when plotting a multivariate base smoother used in an <code>"fs"</code> smooth. Now, this use case is identified and a message printed indicating that (currently) gratia doesn’t know how to plot such a smooth. Reported by <a href="https://github.com/chrisaak" class="external-link">@chrisaak</a> <a href="https://github.com/gavinsimpson/gratia/issues/249" class="external-link">#249</a>.</p></li>
 <li><p><code><a href="../reference/derivative_samples.html">derivative_samples()</a></code> would fail with <code>order = 2</code> and was only computing forward finite differences, regardless of <code>type</code> for <code>order = 1</code>. Partly reported by <a href="https://github.com/samlipworth" class="external-link">@samlipworth</a> <a href="https://github.com/gavinsimpson/gratia/issues/251" class="external-link">#251</a>.</p></li>
 <li><p>The <code><a href="../reference/draw.html">draw()</a></code> method for <code><a href="../reference/penalty.html">penalty()</a></code> was normalizing the penalty to the range 0–1, not the claimed and documented -1–1 with argument <code>normalize = TRUE</code>. This is now fixed.</p></li>
+<li><p><code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> was failing when <code>data</code> was supplied that contained more variables than were used in the smooth that was being sampled. Hence this generally fail unless a single smooth was being sampled from or the model contained only a single smooth. The function never intended to retain all the variables in <code>data</code> but was written in such a way that it would fail when relocating the data columns to the end of the posterior sampling object. <a href="https://github.com/gavinsimpson/gratia/issues/255" class="external-link">#255</a></p></li>
 </ul></div>
 </div>
     <div class="section level2">
