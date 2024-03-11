@@ -561,12 +561,12 @@
   }
 
   sms <- smooths(model) # vector of smooth labels - "s(x)"
-  take <- seq_along(S) # in default case 1,2,3,..,n smooths
+  take <- seq_along(sms) # in default case 1,2,3,..,n smooths
   if (!is.null(select)) {
     select <- check_user_select_smooths(sms, select = select,
       partial_match = partial_match, model_name = deparse(substitute(model)))
     # take <- which_smooths(model, term)
-    take <- which(take) # need this as an id vector for things later
+    take <- which(select) # need this as an id vector for things later
     sms <- sms[select] # S <- S[take]
   }
 
@@ -695,13 +695,23 @@
 #' @importFrom tidyr pivot_longer
 #' @importFrom mgcv PredictMat
 #' @importFrom tidyselect any_of
+#' @importFrom lifecucle deprecated is_present
 `smooth_samples.scam` <- function(
-    model, term = NULL, n = 1, data = newdata,
+    model,
+    select = NULL,
+    term = deprecated(),
+    n = 1, data = newdata,
     method = c("gaussian", "mh", "inla", "user"), seed = NULL,
     freq = FALSE, unconditional = FALSE, n_cores = 1L, n_vals = 200,
     burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25, rng_per_smooth = FALSE,
-    draws = NULL, mvn_method = c("mvnfast", "mgcv"), ...,
+    draws = NULL, mvn_method = c("mvnfast", "mgcv"),
+    partial_match = NULL, ...,
     newdata = NULL, ncores = NULL) {
+  if (lifecycle::is_present(na.rm)) {
+    lifecycle::deprecate_warn("0.8.9.9", "smooth_samples(..., term)",
+      "smooth_samples(..., select)")
+    select <- term
+  }
   # smooth_samples begins
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     runif(1)
@@ -714,12 +724,16 @@
     RNGstate <- structure(seed, kind = as.list(RNGkind()))
     on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
   }
-  S <- smooths(model) # vector of smooth labels - "s(x)"
-  take <- seq_along(S) # in default case 1,2,3,..,n smooths
-  if (!is.null(term)) {
-    take <- which_smooths(model, term)
-    S <- S[take]
+  sms <- smooths(model) # vector of smooth labels - "s(x)"
+  take <- seq_along(sms) # in default case 1,2,3,..,n smooths
+  if (!is.null(select)) {
+    select <- check_user_select_smooths(sms, select = select,
+      partial_match = partial_match, model_name = deparse(substitute(model)))
+    # take <- which_smooths(model, term)
+    take <- which(select) # need this as an id vector for things later
+    sms <- sms[select] # S <- S[take]
   }
+
   # At least for now, don't work for random effect smooths
   # do we have ranef smooths?
   re_sms <- vapply(get_smooths_by_id(model, take),
@@ -729,13 +743,13 @@
   if (any(re_sms)) {
     message(
       "\nRandom effect smooths not currently supported.\nIgnoring:",
-      " <", paste(S[re_sms], collapse = ", "), ">\n"
+      " <", paste(sms[re_sms], collapse = ", "), ">\n"
     )
-    S <- S[!re_sms]
+    sms <- sms[!re_sms]
     take <- take[!re_sms]
   }
   # do we have any remaining terms?
-  if (length(S) < 1L) {
+  if (length(sms) < 1L) {
     stop("No smooths left that can be sampled from.")
   }
   if (!is.null(newdata)) {
@@ -762,8 +776,8 @@
       draws = draws, mvn_method = mvn_method, seed = seed
     )
   }
-  sims <- data_names <- vector("list", length = length(S))
-  for (i in seq_along(S)) {
+  sims <- data_names <- vector("list", length = length(sms))
+  for (i in seq_along(sms)) {
     if (need_data) {
       # FIXME: should offset be NULL?
       data <- smooth_data(model,
@@ -806,10 +820,10 @@
     sm_type <- smooth_type(sm)
     simu <- add_column(simu,
       .smooth = rep(
-        unlist(lapply(strsplit(S[[i]], ":"), `[`, 1L)),
+        unlist(lapply(strsplit(sms[[i]], ":"), `[`, 1L)),
         nr_simu
       ),
-      .term = rep(S[[i]], each = nr_simu),
+      .term = rep(sms[[i]], each = nr_simu),
       .type = rep(sm_type, nr_simu),
       .row = seq_len(nr_simu),
       .after = 0L
@@ -932,18 +946,6 @@
     envir = environment(formula(object)),
     draws = NULL,
     ...) {
-  ## handle seed
-  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-    runif(1)
-  }
-  if (is.null(seed)) {
-    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-  } else {
-    R.seed <- get(".Random.seed", envir = .GlobalEnv)
-    set.seed(seed)
-    RNGstate <- structure(seed, kind = as.list(RNGkind()))
-    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-  }
   ## handle type
   type <- match.arg(type)
   ## handle method
