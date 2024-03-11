@@ -1072,7 +1072,9 @@
       "Mono inc 0 start P spline",
       "Mono inc 0 start P spline"
     )) {
-    class(object) <- c("mgcv_smooth", class(object))
+    class(object) <- append(class(object), "mgcv_smooth", after = 0L)
+  } else if (grepl("1d Tensor product", sm_type, fixed = TRUE)) {
+    class(object) <- append(class(object), "mgcv_smooth", after = 0L)
   } else if (sm_type == "Random effect") {
     class(object) <- append(class(object),
       c("random_effect", "mgcv_smooth"),
