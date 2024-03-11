@@ -519,7 +519,7 @@
 #' @importFrom tidyr pivot_longer
 #' @importFrom mgcv PredictMat
 #' @importFrom tidyselect any_of
-#' @importFrom lifecucle deprecated is_present
+#' @importFrom lifecycle deprecated is_present
 `smooth_samples.gam` <- function(
     model,
     select = NULL,
@@ -695,7 +695,7 @@
 #' @importFrom tidyr pivot_longer
 #' @importFrom mgcv PredictMat
 #' @importFrom tidyselect any_of
-#' @importFrom lifecucle deprecated is_present
+#' @importFrom lifecycle deprecated is_present
 `smooth_samples.scam` <- function(
     model,
     select = NULL,
