@@ -307,3 +307,15 @@ test_that("draw.gam works with sos spline chlorophyll a", {
   expect_doppelganger("draw.gam sos chlorophyll", plt1)
   expect_doppelganger("draw.gam sos chlorophyll with crs", plt2)
 })
+
+test_that("draw for smooth estimates works with univar tensor products #260", {
+  expect_silent(plt_uni_te <- smooth_estimates(m_univar_te) |> draw())
+  expect_silent(plt_uni_ti <- smooth_estimates(m_univar_ti) |> draw())
+  expect_silent(plt_uni_t2 <- smooth_estimates(m_univar_t2) |> draw())
+
+  skip_on_cran()
+
+  expect_doppelganger("draw.smooth_estimates univariate te smooth", plt_uni_te)
+  expect_doppelganger("draw.smooth_estimates univariate ti smooth", plt_uni_ti)
+  expect_doppelganger("draw.smooth_estimates univariate t2 smooth", plt_uni_t2)
+})

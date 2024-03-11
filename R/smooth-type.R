@@ -147,7 +147,11 @@
 #' @export
 #' @rdname smooth_type
 `smooth_type.t2.smooth` <- function(smooth) {
-  sm_type <- "Tensor product (T2)"
+  sm_type <- if (identical(smooth_dim(smooth), 1L)) {
+    "1d Tensor product (T2)"
+  } else {
+    "Tensor product (T2)"
+  }
   sm_type
 }
 
@@ -162,10 +166,14 @@
 #' @rdname smooth_type
 `smooth_type.tensor.smooth` <- function(smooth) {
   inter <- smooth[["inter"]]
+  sm_dim <- smooth_dim(smooth)
   sm_type <- if (isTRUE(inter)) {
     "Tensor product int."
   } else {
     "Tensor product"
+  }
+  if (identical(sm_dim, 1L)) {
+    sm_type <- paste("1d", sm_type)
   }
   sm_type
 }
