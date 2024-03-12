@@ -296,7 +296,7 @@
 #' @importFrom dplyr pull
 #' @importFrom tidyselect all_of
 #' @importFrom tidyr nest unnest
-#' @importFrom mgcv PredictMat
+#' @importFrom mgcv PredictMat inSide
 #' @export
 `spline_values` <- function(
     smooth, data, model, unconditional,
@@ -524,6 +524,89 @@
       dist = dist
     )
   }
+  ## return
+  eval_sm
+}
+
+#' @rdname eval_smooth
+#' @importFrom dplyr n mutate relocate bind_rows
+#' @importFrom tidyselect all_of
+#' @export
+`eval_smooth.soap.film` <- function(smooth,
+    model,
+    n = 100,
+    n_3d = NULL,
+    n_4d = NULL,
+    data = NULL,
+    unconditional = FALSE,
+    overall_uncertainty = TRUE,
+    #clip_soap = TRUE, # ?hmm thinking
+    ...) {
+  by_var <- by_variable(smooth) # even if not a by as we want NA later
+  if (by_var == "NA") {
+    by_var <- NA_character_
+  }
+
+  ## deal with data if supplied
+  data <- process_user_data_for_eval(
+    data = data, model = model,
+    n = n, n_3d = n_3d, n_4d = n_4d,
+    id = which_smooth(
+      model,
+      smooth_label(smooth)
+    )
+  )
+
+  # handle soap film smooths
+  # can use this if Simon accepts the proposed changes tin inSide()
+  is_soap_film <- inherits(smooth, "soap.film")
+  if (is_soap_film) {
+    bnd <- boundary(smooth) # smooth$xt$bnd
+    # in_side <- inSide(bnd, x = data[[smooth$vn[[1]]]],
+    #  y = data[[smooth$vn[[1]]]],
+    # xname = "v", yname = "w") # needs fixed inSide
+    # use in_side to filter the data before we evaluate the spline
+    # any point outside the domain is NA anyway
+  }
+
+  ## values of spline at data
+  eval_sm <- spline_values(smooth,
+    data = data,
+    unconditional = unconditional,
+    model = model,
+    overall_uncertainty = overall_uncertainty
+  )
+
+  ## add on info regarding by variable
+  eval_sm <- add_by_var_column(eval_sm, by_var = by_var)
+  ## add on spline type info
+  eval_sm <- add_smooth_type_column(eval_sm, sm_type = smooth_type(smooth))
+
+  ## add on the boundary info
+  if (is_soap_film) {
+    # how many points on each boundary?
+    pts <- vapply(bnd, \(x) length(x[[1]]), integer(1))
+    # capture the boundary as a tibble
+    bndry <- dplyr::bind_rows(bnd) |>
+      mutate(.smooth = rep(smooth_label(smooth), times = n()),
+        .estimate = rep(NA_real_, times = n()),
+        .se = rep(NA_real_, times = n()),
+        .bndry = rep(TRUE, times = n()),
+        .loop = rep(seq_along(pts), each = pts)) |>
+      relocate(all_of(c(".smooth", ".estimate", ".se", ".bndry", ".loop")),
+        .before = 1L)
+    bndry <- add_by_var_column(bndry, by_var = by_var)
+    bndry <- add_smooth_type_column(bndry, sm_type = smooth_type(smooth))
+
+    eval_sm <- eval_sm |>
+      unnest(cols = "data") |>
+      mutate(.bndry = rep(FALSE, times = n()),
+        .loop = rep(NA_integer_, times = n())) |>
+      relocate(all_of(c(".bndry", ".loop")), .after = 5L) |>
+      bind_rows(bndry) |>
+      nest(data = !matches(c(".smooth", ".type", ".by")))
+  }
+
   ## return
   eval_sm
 }
@@ -1110,6 +1193,9 @@
     )) {
       class(object) <- append(class(object), "isotropic_smooth",
         after = 0
+      )
+    } else if (sm_type %in% "Soap film") {
+      class(object) <- append(class(object), "soap_film", after = 0
       )
     }
   } else if (sm_dim == 3L) {
@@ -2409,6 +2495,146 @@
         inherit.aes = FALSE, alpha = 0.1
       )
   }
+
+  plt
+}
+
+#' @importFrom ggplot2 ggplot geom_point geom_raster geom_contour
+#'   expand_limits labs guides guide_colourbar theme guide_axis geom_line
+#'   geom_path scale_fill_distiller
+#' @importFrom grid unit
+#' @importFrom rlang .data
+#' @keywords internal
+#' @noRd
+`plot_smooth.soap_film` <- function(object,
+    variables = NULL,
+    rug = NULL,
+    show = c("estimate", "se"),
+    contour = TRUE,
+    contour_col = "black",
+    n_contour = NULL,
+    constant = NULL,
+    fun = NULL,
+    xlab = NULL,
+    ylab = NULL,
+    title = NULL,
+    subtitle = NULL,
+    caption = NULL,
+    ylim = NULL,
+    continuous_fill = NULL,
+    angle = NULL,
+    ...) {
+  if (is.null(variables)) {
+    variables <- vars_from_label(unique(object[[".smooth"]]))
+  }
+
+  if (is.null(continuous_fill)) {
+    continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
+  }
+
+  ## If constant supplied apply it to `.estimate`
+  object <- add_constant(object, constant = constant)
+
+  ## If fun supplied, use it to transform est and the upper and lower interval
+  object <- transform_fun(object, fun = fun)
+
+  show <- match.arg(show)
+  if (isTRUE(identical(show, "estimate"))) {
+    guide_title <- "Partial\neffect"
+    plot_var <- ".estimate"
+    guide_limits <- if (is.null(ylim)) {
+      c(-1, 1) * max(abs(object[[plot_var]]), na.rm = TRUE)
+    } else {
+      ylim
+    }
+  } else {
+    guide_title <- "Std. err."
+    plot_var <- ".se"
+    guide_limits <- range(object[[".se"]])
+  }
+
+  plt <- ggplot(object |> filter(!.data[[".bndry"]]), aes(
+    x = .data[[variables[1]]],
+    y = .data[[variables[2]]]
+  )) +
+    geom_raster(mapping = aes(fill = .data[[plot_var]]))
+
+  if (isTRUE(contour)) {
+    plt <- plt + geom_contour(
+      mapping = aes(z = .data[[plot_var]]),
+      colour = contour_col,
+      bins = n_contour,
+      na.rm = TRUE
+    )
+  }
+
+  ## default axis labels if none supplied
+  if (is.null(xlab)) {
+    xlab <- variables[1L]
+  }
+  if (is.null(ylab)) {
+    ylab <- variables[2L]
+  }
+  if (is.null(title)) {
+    title <- unique(object[[".smooth"]])
+  }
+  if (is.null(caption)) {
+    caption <- paste("Basis:", object[[".type"]])
+  }
+
+  if (all(!is.na(object[[".by"]]))) {
+    spl <- strsplit(title, split = ":")
+    title <- spl[[1L]][[1L]]
+    if (is.null(subtitle)) {
+      by_var <- as.character(unique(object[[".by"]]))
+      subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+    }
+  }
+
+  ## add labelling to plot
+  plt <- plt + labs(
+    x = xlab, y = ylab, title = title, subtitle = subtitle,
+    caption = caption
+  )
+
+  ## Set the palette
+  plt <- plt + continuous_fill
+
+  ## Set the limits for the fill
+  plt <- plt + expand_limits(fill = guide_limits)
+
+  ## add guide
+  plt <- plt +
+    guides(
+      fill = guide_colourbar(
+        title = guide_title,
+        direction = "vertical",
+        barheight = grid::unit(0.25, "npc")
+      ),
+      x = guide_axis(angle = angle)
+    )
+
+  ## position legend at the
+  plt <- plt + theme(legend.position = "right")
+
+  ## add rug?
+  if (!is.null(rug)) {
+    plt <- plt +
+      geom_point(
+        data = rug,
+        mapping = aes(
+          x = .data[[variables[1]]],
+          y = .data[[variables[2]]]
+        ),
+        inherit.aes = FALSE, alpha = 0.1
+      )
+  }
+
+  ## add the boundary
+  plt <- plt +
+    geom_path(data = object |> filter(.data[[".bndry"]]),
+      mapping = aes(x = .data[[variables[1]]],
+        y = .data[[variables[2]]]), linewidth = 2, colour = "black")
 
   plt
 }
