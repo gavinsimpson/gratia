@@ -570,4 +570,4 @@ soap_knots <- data.frame(v = rep(seq(-.5, 3, by = .5), 4),
 soap_data <- soap_fs_data(bnd = soap_fsb)
 m_soap <- gam(y ~
     s(v, w, k = 30, bs = "so", xt = list(bnd = soap_fsb, nmax = 100)),
-  data = fs_data, method = "REML", knots = soap_knots)
+  data = soap_data, method = "REML", knots = soap_knots)
