@@ -1826,7 +1826,7 @@ reclass_scam_smooth <- function(smooth) {
 #' @importFrom stats coef
 #' @examples
 #' \dontshow{
-#'   op <- options(digits = 4)
+#' op <- options(digits = 4)
 #' }
 #' load_mgcv()
 #'
@@ -1842,10 +1842,44 @@ reclass_scam_smooth <- function(smooth) {
 #' coef(m)[1L]
 #'
 #' \dontshow{
-#'   options(op)
+#' options(op)
 #' }
 `model_constant` <- function(model) {
   b <- coef(model)
   b[1L] |>
     unname()
+}
+
+#' Extract the boundary of a soap film smooth
+#'
+#' `r lifecycle::badge("experimental")`
+#'
+#' @param x an R object. Currently only objects that inherit from classes
+#' `"soap.film"` and `"gam"`.
+#' @param select character; the label of the soap film smooth from which to
+#'   extract the boundary.
+#' @param ... arguments passed to other methods.
+#'
+#' @return A list of lists or data frames specifying the loops that define the
+#'   boundary of the soap film smooth.
+#'
+#' @export
+#' @keywords utility
+#' @seealso [mgcv::soap]
+`boundary` <- function(x, ...) {
+  UseMethod("boundary")
+}
+
+#' @export
+#' @rdname boundary
+`boundary.soap.film` <- function(x, ...) {
+  stop_if_not_mgcv_smooth(x)
+  x[["xt"]][["bnd"]]
+}
+
+#' @export
+#' @rdname boundary
+`boundary.gam` <- function(x, select, ...) {
+  id <- which_smooths(x, select)
+  boundary(get_smooths_by_id(x, id)[[1L]])
 }
