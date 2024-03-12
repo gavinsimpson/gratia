@@ -15,7 +15,7 @@ object.
 }
 \examples{
 \dontshow{
-  op <- options(digits = 4)
+op <- options(digits = 4)
 }
 load_mgcv()
 
@@ -31,6 +31,6 @@ model_constant(m)
 coef(m)[1L]
 
 \dontshow{
-  options(op)
+options(op)
 }
 }
