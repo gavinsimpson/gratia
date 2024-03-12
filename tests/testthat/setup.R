@@ -236,7 +236,6 @@ m_tw <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
 ## -- fs smooths ----------------------------------------------------------------
 
 ## simulate example... from ?mgcv::factor.smooth.interaction
-# set.seed(0)
 ## simulate data...
 df_fs <- withr::with_seed(0, {
   f0 <- function(x) 2 * sin(pi * x)
@@ -287,7 +286,7 @@ rm2 <- gam(y ~ fac + s(ranef, bs = "re", by = fac) + s(x0) + s(x1) + s(x2),
   data = su_re2, method = "ML"
 )
 
-#-- A distributed lag model example --------------------------------------------
+# -- A distributed lag model example -------------------------------------------
 su_dlnm <- su_eg1 %>%
   mutate(
     f_lag = cbind(
@@ -307,10 +306,9 @@ dlnm_m <- gam(y ~ te(f_lag, lag),
   method = "REML"
 )
 
-#-- An AR(1) example using bam() with factor by --------------------------------
+#- - An AR(1) example using bam() with factor by -------------------------------
 # from ?magic
 ## simulate truth
-# set.seed(1)
 n <- 400
 sig <- 2
 df <- withr::with_seed(1, {
@@ -346,7 +344,6 @@ m_ar1_by <- bam(y ~ series + s(x, k = 20, by = series),
 )
 
 # A standard GAM with multiple factors
-# set.seed(1)
 df_2_fac <- withr::with_seed(
   1,
   add_column(su_eg4, ff = factor(sample(LETTERS[1:4],
@@ -372,7 +369,7 @@ m_poly <- gam(y ~ fac + ff + log(x0) + x1 + poly(x2, 2, raw = TRUE),
   data = df_2_fac, method = "REML"
 )
 
-## -- scam models ---------------------------------------------------------------
+# -- scam models --------------------------------------------------------------
 data(smallAges)
 smallAges$Error[1] <- 1.1
 sw <- scam(Date ~ s(Depth, k = 5, bs = "mpd"),
@@ -493,8 +490,7 @@ ziplss_data <- function(seed = 0) {
       (10 * x)^3 * (1 - x)^10
   }
   n <- 500
-  # set.seed(5)
-  df <- withr::with_seed(0, {
+  df <- withr::with_seed(seed, {
     x0 <- runif(n)
     x1 <- runif(n)
     x2 <- runif(n)
@@ -533,7 +529,7 @@ m_twlss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~1, ~1),
   family = twlss(), data = twlss_df
 )
 
-## -- Models for 2d sz and fs basis smooths #249 --------------------------------
+# -- Models for 2d sz and fs basis smooths #249 -------------------------------
 i_m <- c(1, 0.5)
 i_xt <- list(bs = "ds", m = i_m)
 i_sz <- gam(
@@ -550,3 +546,28 @@ i_fs <- gam(
   data = iris
 )
 rm(i_m, i_xt)
+
+# -- Soap films ---------------------------------------------------------------
+# soap film model from ?soap
+`soap_fs_data` <- function(n = 600, bnd, nmax = 100, seed = 0) {
+  ## Simulate some fitting data, inside boundary...
+  v <- withr::with_seed(seed, runif(n) * 5 - 1)
+  w <- withr::with_seed(seed, runif(n) * 2 - 1)
+  y <- mgcv::fs.test(v, w, b = 1)
+  ind <- mgcv::inSide(bnd, x = v, y = w) ## remove outsiders
+  y <- y + withr::with_seed(seed, rnorm(n) * .3) ## add noise
+  y <- y[ind]
+  v <- v[ind]
+  w <- w[ind]
+  n <- length(y)
+  tibble(y = y, v = v, w = w)
+}
+
+soap_fsb <- list(mgcv::fs.boundary())
+names(soap_fsb[[1]]) <- c("v", "w")
+soap_knots <- data.frame(v = rep(seq(-.5, 3, by = .5), 4),
+  w = rep(c(-.6, -.3, .3, .6), rep(8, 4)))
+soap_data <- soap_fs_data(bnd = soap_fsb)
+m_soap <- gam(y ~
+    s(v, w, k = 30, bs = "so", xt = list(bnd = soap_fsb, nmax = 100)),
+  data = fs_data, method = "REML", knots = soap_knots)
