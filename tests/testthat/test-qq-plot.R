@@ -1,7 +1,6 @@
 ## Test qq_plot() methods
 
 ## simulate binomial data...
-# set.seed(0)
 n.samp <- 200
 dat <- data_sim("eg1", n = n.samp, dist = "binary", scale = .33, seed = 0)
 p <- binomial()$linkinv(dat$f) # binomial p

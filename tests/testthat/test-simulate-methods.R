@@ -75,7 +75,6 @@ test_that("simulate() works with out a seed", {
 test_that("simulate() fails if we don't have an rd function", {
   skip_on_cran()
   ## Example from ?twlss
-  # set.seed(3)
   n <- 400
   ## Simulate data...
   dat <- data_sim("eg1", n = n, dist = "poisson", scale = 0.2, seed = 3)

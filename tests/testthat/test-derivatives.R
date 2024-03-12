@@ -443,25 +443,29 @@ test_that("derivatives() works for factor by smooths issue 47", {
 
 test_that("derivatives() works for fs smooths issue 57", {
   skip_on_cran()
-  # set.seed(1)
-  logistic.growth <- function(t, y0, K, r) {
-    return(K * (y0 / (y0 + (K - y0) * exp(-r * t))))
+  logistic.growth <- function(t, y0, k, r) {
+    return(k * (y0 / (y0 + (k - y0) * exp(-r * t))))
   }
-  N <- 16
-  n <- 12
-  y0 <- 0.5
-  r <- 0.25
-  K <- withr::with_seed(1, rnorm(N, mean = 5, sd = 1))
-  d <- data.frame(
-    unit = factor(rep(seq_len(N), each = n)),
-    t = rep(seq(0, 20, length = n), N)
-  )
-  d <- transform(d, y = logistic.growth(t, y0, K[unit], r))
-  S <- 0.25
-  d <- transform(d, y.obs = y + rnorm(nrow(d), sd = S))
-  m_logistic_growth <- gam(y.obs ~ s(t, unit, k = 5, bs = "fs", m = 2),
-    data = d, method = "REML"
-  )
+  logistic_growth_sim <- function(seed = 1) {
+    d <- withr::with_seed(seed, {
+      N <- 16
+      n <- 12
+      y0 <- 0.5
+      r <- 0.25
+      k <- rnorm(N, mean = 5, sd = 1)
+      d <- data.frame(
+        unit = factor(rep(seq_len(N), each = n)),
+        t = rep(seq(0, 20, length = n), N)
+      )
+      d <- transform(d, y = logistic.growth(t, y0, k[unit], r))
+      S <- 0.25
+      transform(d, y_obs = y + rnorm(nrow(d), sd = S))
+    })
+    d
+  }
+  logistic_growth_df <- logistic_growth_sim()
+  m_logistic_growth <- gam(y_obs ~ s(t, unit, k = 5, bs = "fs", m = 2),
+    data = logistic_growth_df, method = "REML")
 
   expect_silent(fd <- derivatives(m_logistic_growth))
   expect_s3_class(fd, "derivatives")
@@ -496,7 +500,7 @@ Instead, use the data argument `data`.\n"
   expect_s3_class(d_pw, "derivatives")
   expect_s3_class(d_pw, "tbl_df")
   expect_identical(nrow(d_pw), as.integer(N * 3L))
-  # set.seed(15)
+
   expect_silent(d_sim <- withr::with_seed(
     15,
     derivatives(su_m_factor_by,

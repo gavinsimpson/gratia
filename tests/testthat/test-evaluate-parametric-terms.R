@@ -30,8 +30,6 @@ test_that("evaluate_parametric_terms() works with factor terms", {
   )
 })
 
-
-# set.seed(0)
 ## fake some data...
 df <- withr::with_seed(0, {
   f1 <- function(x) {

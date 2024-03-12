@@ -36,7 +36,6 @@ sim_fs <- function(n = 500, nf = 10) {
   df <- data.frame(y = y, x0 = x0, x1 = x1, x2 = x2, fac = fac)
   df
 }
-# set.seed(0)
 dat_fs <- withr::with_seed(0, sim_fs())
 m_fs <- gam(y ~ s(x1, fac, bs = "fs", k = 5), method = "ML", data = dat_fs)
 

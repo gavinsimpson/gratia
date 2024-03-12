@@ -106,7 +106,6 @@ test_that("issue 45 parametric effects for lss models remains fixed", {
     df
   }
 
-  # set.seed(5)
   data_45 <- issue_45_data(n = 500, seed = 5)
 
   # Fit ZIP model...

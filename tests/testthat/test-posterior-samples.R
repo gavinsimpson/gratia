@@ -311,7 +311,6 @@ test_that("posterior sampling funs work with offsets in formula issue 233", {
   skip_on_cran()
   skip_on_ci()
 
-  # set.seed(123)
   n <- 100
   df <- withr::with_seed(123, {
     data.frame(

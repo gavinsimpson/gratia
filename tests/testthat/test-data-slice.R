@@ -78,10 +78,6 @@ test_that("process_slice_var returns NULL when `x` is NULL", {
   expect_identical(process_slice_var(NULL, dat2), NULL)
 })
 
-# set.seed(42)
-# dat <- gamSim(4, n = 400, verbose = FALSE)
-# mf <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
-
 test_that("data_slice works for a GAM with factor by", {
   expect_silent(ds <- data_slice(su_m_factor_by,
     x2 = evenly(x2),

@@ -208,9 +208,6 @@ test_that("seq_min_max works as intended", {
   expect_identical(length(s1), n)
 })
 
-# set.seed(42)
-# dat <- gamSim(4, n = 400, verbose = FALSE)
-
 test_that("factor_var_names works", {
   expect_silent(result <- factor_var_names(su_eg4))
   expect_identical("fac", result)

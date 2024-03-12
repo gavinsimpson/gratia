@@ -207,7 +207,6 @@ test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
 })
 
 test_that("draw() works with parametric terms", {
-  # set.seed(0)
   ## fake some data...
   df <- withr::with_seed(0, {
     f1 <- function(x) {
