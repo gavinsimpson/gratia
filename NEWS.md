@@ -1,4 +1,4 @@
-# gratia 0.8.9.10
+# gratia 0.8.9.11
 
 ## Breaking changes
 
@@ -107,6 +107,9 @@ to `select` and the function will continue.
   do posterior simulation from fitted GAMs using {gratia}.
 
 ## New features
+
+* Soap films smooths using basis `bs = "so"` are now handled by `draw()`,
+  `smooth_estimates()` etc. #8
 
 * `response_derivatives()` is a new function for computing derivatives of the
   response with respect to a (continuous) focal variable. First or second
