@@ -108,7 +108,7 @@ to `select` and the function will continue.
 
 ## New features
 
-* Soap films smooths using basis `bs = "so"` are now handled by `draw()`,
+* Soap film smooths using basis `bs = "so"` are now handled by `draw()`,
   `smooth_estimates()` etc. #8
 
 * `response_derivatives()` is a new function for computing derivatives of the
