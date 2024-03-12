@@ -29,7 +29,6 @@
 #'
 #' @examples
 #' \dontshow{
-#' set.seed(1)
 #' op <- options(pillar.sigfig = 4, cli.unicode = FALSE)
 #' }
 #' ## load mgcv

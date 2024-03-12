@@ -121,7 +121,6 @@
 #' @examples
 #' load_mgcv()
 #' \dontshow{
-#' set.seed(1)
 #' op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 #' }
 #' df <- data_sim("eg1", seed = 1)
