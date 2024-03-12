@@ -36,11 +36,10 @@ Type 'q()' to quit R.
 > 
 > ### ** Examples
 > 
-> 
-> load_mgcv()
 > ## Don't show: 
 > op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 > ## End(Don't show)
+> load_mgcv()
 > df <- data_sim("eg1", seed = 1)
 > df <- df[, c("y", "x0", "x1", "x2", "x3")]
 > m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
@@ -80,6 +79,75 @@ Type 'q()' to quit R.
 # i 390 more rows
 > ## Don't show: 
 > options(op)
+> ## End(Don't show)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
+> nameEx("add_fitted_samples")
+> ### * add_fitted_samples
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: add_fitted_samples
+> ### Title: Add posterior draws from a model to a data object
+> ### Aliases: add_fitted_samples add_predicted_samples add_posterior_samples
+> ###   add_smooth_samples
+> 
+> ### ** Examples
+> 
+> ## Don't show: 
+> op <- options(pillar.sigfig = 3)
+> ## End(Don't show)
+> load_mgcv()
+> 
+> df <- data_sim("eg1", n = 400, seed = 42)
+> 
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+> 
+> # add fitted samples (posterior draws of the expected value of the response)
+> # note that there are 800 rows in the output: 400 data by `n = 2` samples.
+> df |>
++   add_fitted_samples(m, n = 2, seed = 84)
+# A tibble: 800 × 13
+       y    x0     x1    x2    x3     f    f0    f1     f2    f3  .row .draw
+   <dbl> <dbl>  <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>  <dbl> <dbl> <int> <int>
+ 1  2.99 0.915 0.0227 0.909 0.402  1.62 0.529  1.05 0.0397     0     1     1
+ 2  2.99 0.915 0.0227 0.909 0.402  1.62 0.529  1.05 0.0397     0     1     2
+ 3  4.70 0.937 0.513  0.900 0.432  3.25 0.393  2.79 0.0630     0     2     1
+ 4  4.70 0.937 0.513  0.900 0.432  3.25 0.393  2.79 0.0630     0     2     2
+ 5 13.9  0.286 0.631  0.192 0.664 13.5  1.57   3.53 8.41       0     3     1
+ 6 13.9  0.286 0.631  0.192 0.664 13.5  1.57   3.53 8.41       0     3     2
+ 7  5.71 0.830 0.419  0.532 0.182  6.12 1.02   2.31 2.79       0     4     1
+ 8  5.71 0.830 0.419  0.532 0.182  6.12 1.02   2.31 2.79       0     4     2
+ 9  7.63 0.642 0.879  0.522 0.838 10.4  1.80   5.80 2.76       0     5     1
+10  7.63 0.642 0.879  0.522 0.838 10.4  1.80   5.80 2.76       0     5     2
+# ℹ 790 more rows
+# ℹ 1 more variable: .fitted <dbl>
+> 
+> # add posterior draws from smooth s(x2)
+> df |>
++   add_smooth_samples(m, n = 2, seed = 2, select= "s(x2)")
+# A tibble: 800 × 15
+       y    x0     x1    x2    x3     f    f0    f1     f2    f3  .row .smooth
+   <dbl> <dbl>  <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>  <dbl> <dbl> <int> <chr>  
+ 1  2.99 0.915 0.0227 0.909 0.402  1.62 0.529  1.05 0.0397     0     1 s(x2)  
+ 2  2.99 0.915 0.0227 0.909 0.402  1.62 0.529  1.05 0.0397     0     1 s(x2)  
+ 3  4.70 0.937 0.513  0.900 0.432  3.25 0.393  2.79 0.0630     0     2 s(x2)  
+ 4  4.70 0.937 0.513  0.900 0.432  3.25 0.393  2.79 0.0630     0     2 s(x2)  
+ 5 13.9  0.286 0.631  0.192 0.664 13.5  1.57   3.53 8.41       0     3 s(x2)  
+ 6 13.9  0.286 0.631  0.192 0.664 13.5  1.57   3.53 8.41       0     3 s(x2)  
+ 7  5.71 0.830 0.419  0.532 0.182  6.12 1.02   2.31 2.79       0     4 s(x2)  
+ 8  5.71 0.830 0.419  0.532 0.182  6.12 1.02   2.31 2.79       0     4 s(x2)  
+ 9  7.63 0.642 0.879  0.522 0.838 10.4  1.80   5.80 2.76       0     5 s(x2)  
+10  7.63 0.642 0.879  0.522 0.838 10.4  1.80   5.80 2.76       0     5 s(x2)  
+# ℹ 790 more rows
+# ℹ 3 more variables: .term <chr>, .draw <int>, .value <dbl>
+> ## Don't show: 
+>   options(op)
 > ## End(Don't show)
 > 
 > 
@@ -163,7 +231,6 @@ detaching ‘package:mgcv’
 > 
 > load_mgcv()
 > ## Don't show: 
-> set.seed(1)
 > op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 > ## End(Don't show)
 > df <- data_sim("eg1", seed = 1)
@@ -688,7 +755,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 # i 2 more variables: x2 <dbl>, x3 <dbl>
 > 
 > ## derivatives for a selected smooth
-> derivatives(mod, type = "central", term = "s(x1)")
+> derivatives(mod, type = "central", select = "s(x1)")
 # A tibble: 100 x 9
    .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci       x1
    <chr>   <chr> <chr>       <dbl> <dbl> <dbl>     <dbl>     <dbl>    <dbl>
@@ -704,7 +771,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 10 s(x1)   <NA>  <NA>       -0.436  2.42  1.96     -5.19      4.32 0.0909  
 # i 90 more rows
 > ## or via a partial match
-> derivatives(mod, type = "central", term = "x1", partial_match = TRUE)
+> derivatives(mod, type = "central", select = "x1", partial_match = TRUE)
 # A tibble: 100 x 9
    .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci       x1
    <chr>   <chr> <chr>       <dbl> <dbl> <dbl>     <dbl>     <dbl>    <dbl>
@@ -748,7 +815,7 @@ detaching ‘package:mgcv’
 > df <- data_sim("eg4", seed = 42)
 > m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 > 
-> sm_dif <- difference_smooths(m, smooth = "s(x2)")
+> sm_dif <- difference_smooths(m, select = "s(x2)")
 > sm_dif
 # A tibble: 300 x 9
    .smooth .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2
@@ -768,7 +835,7 @@ detaching ‘package:mgcv’
 > draw(sm_dif)
 > 
 > # include the groups means for `fac` in the difference
-> sm_dif2 <- difference_smooths(m, smooth = "s(x2)", group_means = TRUE)
+> sm_dif2 <- difference_smooths(m, select = "s(x2)", group_means = TRUE)
 > draw(sm_dif2)
 > ## Don't show: 
 > options(op)
@@ -854,7 +921,7 @@ detaching ‘package:mgcv’
 > m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 > 
 > # calculate the differences between pairs of smooths the f_j(x2) term
-> diffs <- difference_smooths(m, smooth = "s(x2)")
+> diffs <- difference_smooths(m, select = "s(x2)")
 > draw(diffs)
 > 
 > 
@@ -1003,7 +1070,7 @@ detaching ‘package:mgcv’
 > draw(penalty(m))
 > 
 > # for a specific smooth
-> draw(penalty(m, smooth = "s(x2):fac1"))
+> draw(penalty(m, select = "s(x2):fac1"))
 > 
 > 
 > 
@@ -1062,7 +1129,7 @@ detaching ‘package:mgcv’
 > sm <- smooth_estimates(m)
 > draw(sm)
 > # evaluate smooth of `x2`
-> sm <- smooth_estimates(m, smooth = "s(x2)")
+> sm <- smooth_estimates(m, select = "s(x2)")
 > # plot it
 > draw(sm)
 > 
@@ -1152,7 +1219,7 @@ detaching ‘package:mgcv’
 4 s(x3)   1.8847
 > 
 > # or selected smooths
-> edf(m, smooth = c("s(x0)", "s(x2)"))
+> edf(m, select = c("s(x0)", "s(x2)"))
 # A tibble: 2 x 2
   .smooth   .edf
   <chr>    <dbl>
@@ -1257,7 +1324,7 @@ detaching ‘package:mgcv’
 > ## ...and a selected smooth
 > fd2 <- fderiv(mod, term = "x1")
 > ## now use -->
-> fd2 <- derivatives(mod, term = "s(x1)")
+> fd2 <- derivatives(mod, select = "s(x1)")
 > 
 > ## Models with factors
 > dat <- data_sim("eg4", n = 400, dist = "normal", scale = 2, seed = 2)
@@ -1271,7 +1338,7 @@ detaching ‘package:mgcv’
 > ## ...and a selected smooth
 > fd2 <- fderiv(mod, term = "x1")
 > ## now use -->
-> fd2 <- derivatives(mod, term = "s(x1)")
+> fd2 <- derivatives(mod, select = "s(x1)")
 > 
 > 
 > 
@@ -1369,9 +1436,6 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> ## Don't show: 
-> set.seed(2)
-> ## End(Don't show)
 > df <- data_sim("eg1", n = 400, dist = "normal", seed = 2)
 > m <- gam(y ~ s(x0) + s(x1) + offset(x2), data = df, method = "REML")
 > names(model.frame(m))
@@ -1542,11 +1606,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55ebe6e97700>
+<environment: 0x55f6349aa3d8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55ebe6e97700>
+<environment: 0x55f6349aa3d8>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1661,6 +1725,46 @@ detaching ‘package:mgcv’
 > cleanEx()
 
 detaching ‘package:mgcv’, ‘package:tibble’
+
+> nameEx("model_constant")
+> ### * model_constant
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: model_constant
+> ### Title: Extract the model constant term
+> ### Aliases: model_constant
+> 
+> ### ** Examples
+> 
+> ## Don't show: 
+> op <- options(digits = 4)
+> ## End(Don't show)
+> load_mgcv()
+> 
+> # simulate a small example
+> df <- data_sim("eg1", seed = 42)
+> 
+> # fit the GAM
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+> 
+> # extract the estimate of the constant term
+> model_constant(m)
+[1] 7.495
+> # same as coef(m)[1L]
+> coef(m)[1L]
+(Intercept) 
+      7.495 
+> 
+> ## Don't show: 
+> options(op)
+> ## End(Don't show)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
 
 > nameEx("model_vars")
 > ### * model_vars
@@ -1791,7 +1895,7 @@ detaching ‘package:mgcv’
 > ds <- data_slice(m, x = evenly(x, n = 100), z = 0.4)
 > 
 > # evaluate te(x,z) at values of x & z
-> sm <- smooth_estimates(m, smooth = "te(x,z)", data = ds) |>
+> sm <- smooth_estimates(m, select = "te(x,z)", data = ds) |>
 +   add_confint()
 > 
 > # partial derivatives
@@ -1844,7 +1948,6 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
 > ### ** Examples
 > 
 > ## Don't show: 
-> set.seed(1)
 > op <- options(pillar.sigfig = 4, cli.unicode = FALSE)
 > ## End(Don't show)
 > ## load mgcv
@@ -1956,7 +2059,7 @@ detaching ‘package:mgcv’
 # i 395 more rows
 > 
 > # for a specific smooth
-> penalty(m, smooth = "s(x2):fac1")
+> penalty(m, select = "s(x2):fac1")
 # A tibble: 81 x 6
    .smooth    .type .penalty   .row  .col   .value
    <chr>      <chr> <chr>      <chr> <chr>   <dbl>
@@ -2198,7 +2301,7 @@ Levels: a b c d e
 > ds <- data_slice(m, x2 = evenly(x2, n = 100))
 > 
 > # fitted values along x2
-> fv <- fitted_values(m, smooth = "s(x2)", data = ds)
+> fv <- fitted_values(m, data = ds)
 > 
 > # response derivatives - ideally n_sim = >10000
 > y_d <- response_derivatives(m,
@@ -2344,7 +2447,7 @@ detaching ‘package:mgcv’
 > m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 > 
 > ## IGNORE_RDIFF_BEGIN
-> smooth_coefs(m, term = "s(x2)")
+> smooth_coefs(m, select = "s(x2)")
   s(x2).1   s(x2).2   s(x2).3   s(x2).4   s(x2).5   s(x2).6   s(x2).7   s(x2).8 
 -6.533373  9.694277  2.194078  1.967280 -2.374874  1.207638 -1.572586  9.269744 
   s(x2).9 
@@ -2459,7 +2562,7 @@ detaching ‘package:mgcv’
 # i 390 more rows
 > 
 > ## or selected smooths
-> smooth_estimates(m1, smooth = c("s(x0)", "s(x1)"))
+> smooth_estimates(m1, select = c("s(x0)", "s(x1)"))
 # A tibble: 200 x 7
    .smooth .type .by   .estimate      .se         x0    x1
    <chr>   <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl>
@@ -2538,7 +2641,7 @@ detaching ‘package:mgcv’
 > dat <- data_sim("eg1", n = 400, seed = 2)
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
-> sms <- smooth_samples(m1, term = "s(x0)", n = 5, seed = 42)
+> sms <- smooth_samples(m1, select = "s(x0)", n = 5, seed = 42)
 > 
 > ## A factor by example (with a spurious covariate x0)
 > dat <- data_sim("eg4", n = 1000, seed = 2)
@@ -2686,7 +2789,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  35.055 0.36 35.145 0 0 
+Time elapsed:  29.099 0.203 23.456 0 0 
 > grDevices::dev.off()
 null device 
           1 
