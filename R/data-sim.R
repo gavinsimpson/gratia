@@ -4,6 +4,43 @@
 #' that can be used to fit GAMs. An new feature is that the sampling
 #' distribution can be applied to all the example types.
 #'
+#' @details `data_sim()` can simulate data from several underlying models of
+#'   known true functions. The available options currently are:
+#'   
+#'   * `"eg1"`: a four term additive true model. This is the classic Gu & Wahba
+#'     four univariate term test model. See [`gw_functions`] for more details of
+#'     the underlying four functions.
+#'   * `"eg2"`: a bivariate smooth true model.
+#'   * `"eg3"`: an example containing a continuous by smooth (varying
+#'     coefficient) true model. The model is \eqn{\hat{y}_i = f_2(x_{1i})x_{2i}}{
+#' yhat = f(x1)x2} where the function \eqn{f_2()} is \eqn{f_2(x) = 0.2 * x^{11} *
+#' (10 * (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^{10}}{f(x) = 0.2 * x^11 * (10 *
+#' (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^10}.
+#'   * `"eg4"`: a factor by smooth true model. The true model contains a factor
+#'     with 3 levels, where the response for the *n*th level follows the *n*th
+#'     Gu & Wabha function (for \eqn{n \in {1, 2, 3}}{n in {1,2,3}}).
+#'   * `"eg5"`: an additive plus factor true model. The response is a linear
+#'     combination of the Gu & Wabha functions 2, 3, 4 (the latter is a null
+#'     function) plus a factor term with four levels.
+#'   * `"eg6"`: an additive plus random effect term true model.
+#'   * ´"eg7"`: a version of the model in `"eg1"`, but where the covariates are
+#'     correlated.
+#'   * `"gw_f2"`: a model where the response is Gu & Wabha's
+#'     \eqn{f_2(x_i)}{f_2(x_i)} plus noise.
+#'
+#'   The random component providing noise or sampling variation can follow one
+#'   of the distributions, specified via argument `dist`
+#'
+#'   * `"normal"`: Gaussian,
+#'   * `"poisson"`: Poisson,
+#'   * `"binary"`: Bernoulli,
+#'   * `"negbin"`: Negative binomial,
+#'   * `"tweedie"`: Tweedie,
+#'   * `"gamma"`: gamma , and
+#'   * `"ordered categorical"`: ordered categorical
+#'
+#'   Other arguments provide the parameters for the distribution.
+#'
 #' @param model character; either `"egX"` where `X` is an integer `1:7`, or
 #'   the name of a model. See Details for possible options.
 #' @param n numeric; the number of observations to simulate.
