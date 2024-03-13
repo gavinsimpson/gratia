@@ -350,6 +350,9 @@ to `select` and the function will continue.
   univariate tensor product smooth (e.g. `te(x)`, `ti(x)`, or `t2()`). Reported
   by @wStockhausen #260
 
+* `plot.smooth()` was not printing the factor level in subtitles for ordered 
+  factor by smooths.
+
 # gratia 0.8.2
 
 * Small fixes for CRAN.
