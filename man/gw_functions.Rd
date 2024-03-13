@@ -2,6 +2,7 @@
 % Please edit documentation in R/data-sim.R
 \name{gw_f0}
 \alias{gw_f0}
+\alias{gw_functions}
 \alias{gw_f1}
 \alias{gw_f2}
 \alias{gw_f3}
