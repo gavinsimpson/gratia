@@ -96,6 +96,13 @@
     )
   sm_ids <- which(take)
   smooths <- get_smooths_by_id(model, sm_ids)
+  # take only factor by smooths, as we could have a decomposed model with a
+  # main effect smooth and an interaction by smooth
+  is_by <- vapply(smooths, is_factor_by_smooth, logical(1L))
+  if (any(!is_by)) {
+    smooths <- smooths[is_by]
+    sm_ids <- sm_ids[is_by]
+  }
   if (is.null(data)) {
     sm_data <- map(sm_ids, smooth_data,
       model = model, n = n, include_all = TRUE
