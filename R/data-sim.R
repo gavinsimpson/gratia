@@ -234,6 +234,7 @@
 #'
 #' @rdname gw_functions
 #' @export
+#' @aliases gw_functions
 #'
 #' @examples
 #' \dontshow{
