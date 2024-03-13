@@ -213,6 +213,10 @@ m_lm <- lm(y ~ x0 + x1 + x2 + x3, data = quick_eg1)
 
 m_glm <- glm(y ~ x0 + x1 + x2 + x3, data = quick_eg1)
 
+data(CO2)
+m_ordered_by <- gam(uptake ~ Plant + s(conc, k = 5) +
+    s(conc, by = Plant, k = 5), data = CO2, method = "REML")
+
 ## -- rootogram models ----------------------------------------------------------
 df_pois <- data_sim("eg1", dist = "poisson", n = 500L, scale = 0.2, seed = 42)
 ## fit the model
@@ -549,24 +553,25 @@ rm(i_m, i_xt)
 
 # -- Soap films ---------------------------------------------------------------
 # soap film model from ?soap
-`soap_fs_data` <- function(n = 600, bnd, nmax = 100, seed = 0) {
-  ## Simulate some fitting data, inside boundary...
-  v <- withr::with_seed(seed, runif(n) * 5 - 1)
-  w <- withr::with_seed(seed, runif(n) * 2 - 1)
-  y <- mgcv::fs.test(v, w, b = 1)
-  ind <- mgcv::inSide(bnd, x = v, y = w) ## remove outsiders
-  y <- y + withr::with_seed(seed, rnorm(n) * .3) ## add noise
-  y <- y[ind]
-  v <- v[ind]
-  w <- w[ind]
-  n <- length(y)
-  tibble(y = y, v = v, w = w)
+`soap_fs_data` <- function(n = 600, bnd, seed = 0) {
+  df <- withr::with_seed(seed, {
+    v <- runif(n) * 5 - 1
+    w <- runif(n) * 2 - 1
+    y <- mgcv::fs.test(v, w, b = 1)
+    ind <- mgcv::inSide(bnd, x = v, y = w) ## remove outsiders
+    y <- y + rnorm(n) * 0.3 ## add noise
+    y <- y[ind]
+    v <- v[ind]
+    w <- w[ind]
+    tibble(y = y, v = v, w = w)
+  })
+  df
 }
 
 soap_fsb <- list(mgcv::fs.boundary())
 names(soap_fsb[[1]]) <- c("v", "w")
-soap_knots <- data.frame(v = rep(seq(-.5, 3, by = .5), 4),
-  w = rep(c(-.6, -.3, .3, .6), rep(8, 4)))
+soap_knots <- data.frame(v = rep(seq(-0.5, 3, by = 0.5), 4),
+  w = rep(c(-0.6, -0.3, 0.3, 0.6), rep(8, 4)))
 soap_data <- soap_fs_data(bnd = soap_fsb)
 m_soap <- gam(y ~
     s(v, w, k = 30, bs = "so", xt = list(bnd = soap_fsb, nmax = 100)),
