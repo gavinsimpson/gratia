@@ -134,3 +134,23 @@ test_that("smooth arg is deprecated in difference_smooths()", {
   expect_warning(ds <- difference_smooths(su_m_factor_by, smooth = "s(x2)"),
     "deprecated")
 })
+
+test_that("difference smooths works with a decomposed model issue 223", {
+  skip_on_cran()
+  data("iris")
+  m_223 <- gam(Petal.Width ~ Species +
+    s(Sepal.Length, k = 4) +
+    s(Sepal.Length, by = Species, k = 4) +
+    s(Sepal.Width, k = 4) +
+    s(Sepal.Width, by = Species, k = 4) +
+    ti(Sepal.Length, Sepal.Width, k = 4) +
+    ti(Sepal.Length, Sepal.Width, by = Species, k = 4),
+  method = "REML",
+  data = iris)
+  sm_take <- "ti(Sepal.Length,Sepal.Width)"
+  expect_silent(d <- difference_smooths(m_223, select = sm_take, n = 50))
+  expect_identical(nrow(d), 7500L) # 3 comparisons * 50 * 50 grid
+
+  skip_on_ci()
+  expect_snapshot(print(d))
+})
