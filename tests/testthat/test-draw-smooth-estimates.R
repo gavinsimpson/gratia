@@ -319,3 +319,10 @@ test_that("draw for smooth estimates works with univar tensor products #260", {
   expect_doppelganger("draw.smooth_estimates univariate ti smooth", plt_uni_ti)
   expect_doppelganger("draw.smooth_estimates univariate t2 smooth", plt_uni_t2)
 })
+
+test_that("plot has correct label with ordered factor by models", {
+  expect_silent(plt <- draw(m_ordered_by, rug = FALSE))
+
+  skip_on_cran()
+  expect_doppelganger("draw subtitle ordered by smooths", plt)
+})
