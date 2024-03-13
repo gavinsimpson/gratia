@@ -128,6 +128,37 @@ categories: <code>length(cuts) == n_cat - 1</code>.</p></dd>
 <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">base::set.seed()</a></code>.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p><code>data_sim()</code> can simulate data from several underlying models of
+known true functions. The available options currently are:</p><ul><li><p><code>"eg1"</code>: a four term additive true model. This is the classic Gu &amp; Wahba
+four univariate term test model. See <code>gw_functions</code> for more details of
+the underlying four functions.</p></li>
+<li><p><code>"eg2"</code>: a bivariate smooth true model.</p></li>
+<li><p><code>"eg3"</code>: an example containing a continuous by smooth (varying
+coefficient) true model. The model is \(\hat{y}_i = f_2(x_{1i})x_{2i}\) where the function \(f_2()\) is \(f_2(x) = 0.2 * x^{11} *
+(10 * (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^{10}\).</p></li>
+<li><p><code>"eg4"</code>: a factor by smooth true model. The true model contains a factor
+with 3 levels, where the response for the <em>n</em>th level follows the <em>n</em>th
+Gu &amp; Wabha function (for \(n \in {1, 2, 3}\)).</p></li>
+<li><p><code>"eg5"</code>: an additive plus factor true model. The response is a linear
+combination of the Gu &amp; Wabha functions 2, 3, 4 (the latter is a null
+function) plus a factor term with four levels.</p></li>
+<li><p><code>"eg6"</code>: an additive plus random effect term true model.</p></li>
+<li><p>´"eg7"<code>: a version of the model in </code>"eg1"`, but where the covariates are
+correlated.</p></li>
+<li><p><code>"gw_f2"</code>: a model where the response is Gu &amp; Wabha's
+\(f_2(x_i)\) plus noise.</p></li>
+</ul><p>The random component providing noise or sampling variation can follow one
+of the distributions, specified via argument <code>dist</code></p><ul><li><p><code>"normal"</code>: Gaussian,</p></li>
+<li><p><code>"poisson"</code>: Poisson,</p></li>
+<li><p><code>"binary"</code>: Bernoulli,</p></li>
+<li><p><code>"negbin"</code>: Negative binomial,</p></li>
+<li><p><code>"tweedie"</code>: Tweedie,</p></li>
+<li><p><code>"gamma"</code>: gamma , and</p></li>
+<li><p><code>"ordered categorical"</code>: ordered categorical</p></li>
+</ul><p>Other arguments provide the parameters for the distribution.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
