@@ -1322,8 +1322,8 @@
   object <- transform_fun(object, fun = fun)
 
   # base plot - need as.name to handle none standard names, like log2(x)
+  by_var <- unique(object$.by)
   plt <- if (grouped_by) {
-    by_var <- unique(object$.by)
     ggplot(object, aes(
       x = .data[[variables]], y = .data$.estimate,
       colour = .data[[by_var]], group = .data[[by_var]]
@@ -1450,10 +1450,10 @@
       spl <- strsplit(title, split = ":")
       title <- spl[[1L]][[1L]]
       if (is.null(subtitle)) {
-        subtitle <- if (by_class != "factor") {
-          paste0("By: ", by_var) # continuous by
-        } else {
+        subtitle <- if (by_class %in% c("factor", "ordered")) {
           paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+        } else {
+          paste0("By: ", by_var) # continuous by
         }
       }
     }
@@ -1566,11 +1566,17 @@
   }
 
   if (all(!is.na(object[[".by"]]))) {
+    # is the by variable a factor or a numeric
+    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
+    by_var <- as.character(unique(object[[".by"]]))
     spl <- strsplit(title, split = ":")
     title <- spl[[1L]][[1L]]
     if (is.null(subtitle)) {
-      by_var <- as.character(unique(object[[".by"]]))
-      subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+      subtitle <- if (by_class %in% c("factor", "ordered")) {
+        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+      } else {
+        paste0("By: ", by_var) # continuous by
+      }
     }
   }
 
@@ -1702,11 +1708,17 @@
   }
 
   if (all(!is.na(object[[".by"]]))) {
+    # is the by variable a factor or a numeric
+    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
+    by_var <- as.character(unique(object[[".by"]]))
     spl <- strsplit(title, split = ":")
     title <- spl[[1L]][[1L]]
     if (is.null(subtitle)) {
-      by_var <- as.character(unique(object[[".by"]]))
-      subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+      subtitle <- if (by_class %in% c("factor", "ordered")) {
+        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+      } else {
+        paste0("By: ", by_var) # continuous by
+      }
     }
   }
 
@@ -1856,11 +1868,17 @@
   }
 
   if (all(!is.na(object[[".by"]]))) {
+    # is the by variable a factor or a numeric
+    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
+    by_var <- as.character(unique(object[[".by"]]))
     spl <- strsplit(title, split = ":")
     title <- spl[[1L]][[1L]]
     if (is.null(subtitle)) {
-      by_var <- as.character(unique(object[[".by"]]))
-      subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+      subtitle <- if (by_class %in% c("factor", "ordered")) {
+        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+      } else {
+        paste0("By: ", by_var) # continuous by
+      }
     }
   }
 
@@ -1985,11 +2003,17 @@
   }
 
   if (all(!is.na(object[[".by"]]))) {
+    # is the by variable a factor or a numeric
+    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
+    by_var <- as.character(unique(object[[".by"]]))
     spl <- strsplit(title, split = ":")
     title <- spl[[1L]][[1L]]
     if (is.null(subtitle)) {
-      by_var <- as.character(unique(object[[".by"]]))
-      subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+      subtitle <- if (by_class %in% c("factor", "ordered")) {
+        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+      } else {
+        paste0("By: ", by_var) # continuous by
+      }
     }
   }
 
@@ -2074,11 +2098,17 @@
   }
 
   if (all(!is.na(object[[".by"]]))) {
+    # is the by variable a factor or a numeric
+    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
+    by_var <- as.character(unique(object[[".by"]]))
     spl <- strsplit(title, split = ":")
     title <- spl[[1L]][[1L]]
     if (is.null(subtitle)) {
-      by_var <- as.character(unique(object[[".by"]]))
-      subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+      subtitle <- if (by_class %in% c("factor", "ordered")) {
+        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+      } else {
+        paste0("By: ", by_var) # continuous by
+      }
     }
   }
 
@@ -2294,11 +2324,17 @@
   }
 
   if (all(!is.na(object[[".by"]]))) {
+    # is the by variable a factor or a numeric
+    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
+    by_var <- as.character(unique(object[[".by"]]))
     spl <- strsplit(title, split = ":")
     title <- spl[[1L]][[1L]]
     if (is.null(subtitle)) {
-      by_var <- as.character(unique(object[[".by"]]))
-      subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+      subtitle <- if (by_class %in% c("factor", "ordered")) {
+        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+      } else {
+        paste0("By: ", by_var) # continuous by
+      }
     }
   }
 
@@ -2583,11 +2619,17 @@
   }
 
   if (all(!is.na(object[[".by"]]))) {
+    # is the by variable a factor or a numeric
+    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
+    by_var <- as.character(unique(object[[".by"]]))
     spl <- strsplit(title, split = ":")
     title <- spl[[1L]][[1L]]
     if (is.null(subtitle)) {
-      by_var <- as.character(unique(object[[".by"]]))
-      subtitle <- paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+      subtitle <- if (by_class %in% c("factor", "ordered")) {
+        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
+      } else {
+        paste0("By: ", by_var) # continuous by
+      }
     }
   }
 
