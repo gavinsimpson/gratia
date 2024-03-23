@@ -32,7 +32,7 @@ jobs:
             mgcv
             remotes
             Matrix
-          pak-version: devel
+          #pak-version: devel
       
       - name: install gratia
         run: Rscript -e 'remotes::install_github("gavinsimpson/gratia", upgrade_dependencies = FALSE)'
