@@ -1,5 +1,7 @@
 ---
 title: "Posterior Simulation"
+bibliography: references.bib
+csl: methods-in-ecology-and-evolution.csl
 output: 
   rmarkdown::html_vignette:
     fig_width: 8
@@ -33,10 +35,10 @@ vapply(pkgs, library, logical(1L), logical.return = TRUE, character.only = TRUE)
 A generalized additive model (GAM) has the following form
 
 $$
-g(\mu_i) = \eta_i = A_i + \mathbf{X}_i \boldsymbol{\gamma} + \sum_{j=1}^{J} f_j(x_{ij}), \; y_i \sim EF(\mu_i, \phi)
+g(\mu_i) = \eta_i = A_i + \mathbf{X}_i \boldsymbol{\gamma} + \sum_{j=1}^{J} f_j(x_{ij}), \; y_i \sim \text{EF}(\mu_i, \phi)
 $$
 
-where $g()$ is the link function, $A$ is an offset, $\mathbf{X}_i$ is the $i$th row of a parametric model matrix, $\boldsymbol{\gamma}$ is a vector of parameters for the parametric terms, $f_j$ is a smooth function of covariate $x_j$. $y_i \sim EF(\mu_i, \phi)$ denotes that the observations $y_i$ are distributed as some member of the exponential family of distributions with mean $\mu_i$ and scale parameter $\phi$.
+where $g()$ is the link function, $A$ is an offset, $\mathbf{X}_i$ is the $i$th row of a parametric model matrix, $\boldsymbol{\gamma}$ is a vector of parameters for the parametric terms, $f_j$ is a smooth function of covariate $x_j$. $y_i \sim \text{EF}(\mu_i, \phi)$ denotes that the observations $y_i$ are distributed as some member of the exponential family of distributions with mean $\mu_i$ and scale parameter $\phi$.
 
 The smooth functions $f_j$ are represented in the model via penalised splines basis expansions of the covariates, that are a weighted sum of basis functions
 
@@ -50,9 +52,9 @@ Having fitted the GAM in mgcv using REML or ML smoothness selection we obtain a 
 
 ## What are we simulating?
 
-Posterior simulation involves randomly sampling from $\text{MVN}(\hat{\boldsymbol{\beta}}, \mathbf{V}_{\text{b}})$ or $EF(\mu_i, \phi)$, or both.
+Posterior simulation involves randomly sampling from $\text{MVN}(\hat{\boldsymbol{\beta}}, \mathbf{V}_{\text{b}})$ or $\text{EF}(\mu_i, \phi)$, or both.
 
-We might simulate from the posterior distribution of a single estimated smooth function to see the uncertainty in the estimate of that function. To do this we simulate for just a subset of $\beta_{j \cdot}$ associated with the $f_j$ of interest. Instead, we might be interested in the uncertainty in the expectation (expected value) of the model at some given values of the covariates, in which case we can simulate for all $\boldsymbol{\beta}$ to sample from the posterior of $\mathbb{E}(y_i)$, the fitted values of the model. Or we might want to generate new values of response variable via draws from the conditional distribution of the response, by simulating new response data $\mathbb{y}^{\ast}$, at either the observed $\mathbf{x}$ or new values $\mathbf{x}^{\ast}, from $y^{\ast}_i | \boldsymbol{\eta}, \mathbf{x} \sim EF(\hat{\mu_i}, \phi)$. Finally, we can combine posterior simulation from both distributions to generate posterior draws for new data $\mathbb{y}^{\ast}$ that also include the uncertainty in the expected values.
+We might simulate from the posterior distribution of a single estimated smooth function to see the uncertainty in the estimate of that function. To do this we simulate for just a subset of $\beta_{j \cdot}$ associated with the $f_j$ of interest. Instead, we might be interested in the uncertainty in the expectation (expected value) of the model at some given values of the covariates, in which case we can simulate for all $\boldsymbol{\beta}$ to sample from the posterior of $\mathbb{E}(y_i)$, the fitted values of the model. Or we might want to generate new values of response variable via draws from the conditional distribution of the response, by simulating new response data $\mathbb{y}^{\ast}$, at either the observed $\mathbf{x}$ or new values $\mathbf{x}^{\ast}, from $y^{\ast}_i | \boldsymbol{\eta}, \mathbf{x} \sim \text{EF}(\hat{\mu_i}, \phi)$. Finally, we can combine posterior simulation from both distributions to generate posterior draws for new data $\mathbb{y}^{\ast}$ that also include the uncertainty in the expected values.
 
 gratia has functionality for all these options through the following functions
 
@@ -74,32 +76,40 @@ gratia provides `simulate()` methods for models estimated using `gam()`, `bam()`
 
 In the following sections we'll look at each of the four main posterior simulation functions in turn.
 
-## `smooth_samples()`
+## Posterior smooths and `smooth_samples()`
 
+We can sample from the posterior distribution of the coefficients of a particular smooth $\hat{\beta}_j$ given the values of the smoothing parameters $\hat{\boldsymbol{\lambda}}$. We generate posterior samples of smooths by sampling $\boldsymbol{\beta}_{j\star} \sim N(\hat{\beta}_j, \mathbf{V}_{\hat{\beta}_j})$ and forming $\mathbf{X}_{\hat{\boldsymbol{\beta}}_j} \boldsymbol{\beta}_{j\star}^{\mathsf{T}}$. This sampling can be done using `smooth_samples()`.
 
-
+To illustrate this, we'll simulate data from Gu & Wabha's 4 smooth example, and fit a GAM to the simulated data
 ```{r ss-data}
-ss_df <- data_sim("eg1", seed = 21)
-m_ss <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-  data = ss_df, method = "REML"
-)
+ss_df <- data_sim("eg1", seed = 42)
+m_ss <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = ss_df, method = "REML")
 ```
-
+When we are simulating from the posterior distribution of an estimated  smooth, we are only sampling from the coefficients of the particular smooth. In this model, the coefficients for the smooth $f(x_0)$ are stored as elements 2 through 10 of the coefficients vector.
 ```{r ss-sm-coefs}
 s_x0 <- get_smooth(m_ss, "s(x0)")
 smooth_coef_indices(s_x0)
 ```
-
-```{r}
-sm_samp <- smooth_samples(m_ss, term = "s(x0)", n_vals = 100, n = 100)
+To sample from the posterior distribution of these coefficients we use `smooth_samples()` choosing the particular smooth we're interested in using the `select` argument; if we want to sample smooths from the posteriors of all smooths in a model, then `select` can be left at its default value.
+```{r sample-smooths-m-ss}
+sm_samp <- smooth_samples(m_ss, select = "s(x0)", n_vals = 100, n = 100,
+  seed = 21)
 ```
+Typically we're not too bothered about the particular values of the covariate at which we evaluate the posterior smooths; below we ask for 100 evenly spaced values of `x0` using `n_vals`, but you can provide the covariates values yourself via the `data` argument. The number of posterior smooths sampled is controlled by argument `n`; here we ask for 100 samples.
 
-```{r}
-sm_est <- smooth_estimates(m_ss, smooth = "s(x0)") |>
+Objects returned by `smooth_samples()` have a `draw()` method available for them
+```{r draw-smooth-samples-x0}
+sm_samp |>
+  draw(alpha = 0.3)
+```
+To only draw some of the posterior smooths you can set `n_samples` which will randomly select that many smooths to draw (a seed can be provided via argument `seed` to make the set of chosen smooths repeatable.)
+
+The credible interval of a smooth will contain most of these smooths. For the standard 95% credible interval, only some of the sampled smooths will exceed the limits of the interval.
+```{r plot-smooth-ci-and-posterior-smooths}
+# evaluate the fitted smooth over x0 and add on a credible interval
+sm_est <- smooth_estimates(m_ss, select = "s(x0)") |>
   add_confint()
-```
-
-```{r}
+# plot the smooth, credible interval, and posterior smooths
 sm_est |>
   ggplot(aes(x = x0)) +
   geom_lineribbon(aes(ymin = .lower_ci, ymax = .upper_ci),
@@ -109,19 +119,65 @@ sm_est |>
     data = sm_samp,
     aes(y = .value, group = .draw), alpha = 0.2
   ) +
-  geom_line(aes(y = .estimate), linewidth = 1.25, colour = "#E69F00") +
+  geom_line(aes(y = .estimate), linewidth = 1, colour = "#E69F00") +
   labs(y = smooth_label(s_x0))
 ```
 
+Following @Marra2012-bq, the blue credible interval will contain on average 95% of the grey lines (posterior smooths) at any given value of $x_0$. This _across the function_ frequentist interpretation of the credible interval implies that for some values of $x_0$ the coverage will be less than 95% and for other values greater than 95%.
 
+## Posterior fitted values via `fitted_samples()`
 
-## `fitted_samples()`
+Posterior fitted values are draws from the posterior distribution of the mean or expected value of the response. These expectations are what is returned when you use `predict()` on an estimated GAM, except `fitted_samples()` includes the uncertainty in the estimated model coefficients, whereas `predict()` just uses the estimated coefficients.
 
-## `predicted_samples()`
+In this example, using `data_sim()` we simulate data from example 6 of @Luo1997-xg
 
-## `posterior_samples()`
+$$
+\sin(2 \cdot (4x - 2)) + 2 \cdot \exp(-256 \cdot (x - 0.5)^2)
+$$
 
-## Examples
+```{r luo-wabha-function-sim-plot}
+f <- function(x) {
+  sin(2 * ((4 * x) - 2)) + (2 * exp(-256 * (x - 0.5)^2))
+}
+df <- data_sim("lwf6", dist = "normal", scale = 0.3, seed = 2)
+plt <- df |>
+  ggplot(aes(x = x, y = y)) +
+  geom_point(alpha = 0.5) +
+  geom_function(fun = f)
+plt
+```
+
+To these data we fit an adaptive smoother
+```{r luo-wabha-fit-gam}
+m <- gam(y ~ s(x, k = 25, bs = "ad"), data = df, method = "REML")
+```
+Next we create a data slice of 200 values over the interval (0,1) at which we'll predict from the model and generate posterior fitted values for
+```{r luo-wabha-new-data}
+new_df <- data_slice(m, x = evenly(x, lower = 0, upper = 1, n = 200)) |>
+  mutate(.row = row_number())
+```
+then we compute the fitted values for the new data
+```{r luo-wabha-fitted}
+fv <- fitted_values(m, data = new_df)
+```
+The posterior fitted values are drawn with `fitted_samples()` using a Gaussian approximation to the posterior. Here we just take 10 draws from the posterior for each observation in `new_df` and merge the posterior draws with the data
+```{r luo-wabha-posterior}
+fs <- fitted_samples(m, data = new_df, n = 10, seed = 4) |>
+  left_join(new_df |> select(.row, x), by = join_by(.row == .row))
+```
+Adding the posterior fitted samples to the plot of the data, superimposing the Bayesian credible interval on the fitted values
+```{r luo-wabha-plot-samples}
+plt +
+  geom_ribbon(data = fv, aes(y = .fitted, ymin = .lower_ci, ymax = .upper_ci),
+    fill = "red", alpha = 0.3) +
+  geom_line(data = fs, aes(group = .draw, x = x, y = .fitted),
+    colour = "yellow", alpha = 0.4)
+```
+we see the posterior draws are largely contained the credible interval.
+
+The difference between what we did here and what we did with `smooth_samples()` is that now we're including the effects of all the other model terms. In this simple model with a single smooth and an identity link, the only difference is that the model constant term and its uncertainty is included in the samples.
+
+## Additional examples
 
 ### Prediction intervals
 
@@ -352,3 +408,5 @@ plt_ga + plt_mh + plot_layout(guides = "collect")
 ```
 
 The Gaussian approximation-based intervals are shown on the left of the figure, which for most of the range of `x` are largely useless, covering the entire range of the response, despite the fact that we only observed zeroes for large parts of the covariate space. Contrast those intervals with the ones obtained using the Metropolis Hastings sampler; these intervals much better reflect the uncertainty in the estimated response as a function of `x` where the data are all zeroes.
+
+## References
