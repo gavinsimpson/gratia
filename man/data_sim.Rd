@@ -7,7 +7,7 @@
 data_sim(
   model = "eg1",
   n = 400,
-  scale = 2,
+  scale = NULL,
   theta = 3,
   power = 1.5,
   dist = c("normal", "poisson", "binary", "negbin", "tweedie", "gamma", "ocat",
@@ -71,8 +71,11 @@ function) plus a factor term with four levels.
 \item \code{"eg6"}: an additive plus random effect term true model.
 \item ´"eg7"\verb{: a version of the model in }"eg1"`, but where the covariates are
 correlated.
-\item \code{"gw_f2"}: a model where the response is Gu & Wabha's
+\item \code{"gwf2"}: a model where the response is Gu & Wabha's
 \eqn{f_2(x_i)}{f_2(x_i)} plus noise.
+\item \code{"lwf6"}: a model where the response is Luo & Wabha's "example 6"
+function \eqn{sin(2(4x-2)) + 2 exp(-256(x-0.5)^2)}{
+    sin(2 * ((4 * x) - 2)) + (2 * exp(-256 * (x - .5)^2))} plus noise.
 }
 
 The random component providing noise or sampling variation can follow one
@@ -100,4 +103,11 @@ data_sim("eg1", n = 100, dist = "ocat", n_cat = 4, cuts = c(-1, 0, 5))
 \dontshow{
 options(op)
 }
+}
+\references{
+Gu, C., Wahba, G., (1993). Smoothing Spline ANOVA with Component-Wise
+Bayesian "Confidence Intervals." \emph{J. Comput. Graph. Stat.} \strong{2}, 97–117.
+
+Luo, Z., Wahba, G., (1997). Hybrid adaptive splines. \emph{J. Am. Stat. Assoc.}
+\strong{92}, 107–116.
 }
