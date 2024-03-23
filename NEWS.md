@@ -1,4 +1,4 @@
-# gratia 0.8.9.11
+# gratia 0.8.9.12
 
 ## Breaking changes
 
@@ -127,6 +127,10 @@ to `select` and the function will continue.
 * `data_sim()` can now simulate response data from gamma, Tweedie and ordered
   categorical distributions.
 
+* `data_sim()` gains two new example models `"gwf2"`, simulating data only from
+  Gu & Wabha's *f2* function, and `"lwf6"`, example function 6 from Luo & Wabha
+  (1997 JASA 92(437), 107-116).
+
 * `fitted_samples()` and `smooth_samples()` can now use the Metropolis Hastings
   sampler from `mgcv::gam.mh()`, instead of a Gaussian approximation, to sample
   from the posterior distribution of the model or specific smooths
@@ -250,9 +254,6 @@ to `select` and the function will continue.
   is extensible by users. Currently provides a simple interface to a simple
   Gaussian approximation sampler (`gaussian_draws()`) and the simple Metropolis
   Hasting sample (`mh_draws()`) available via `mgcv::gam.mh()`. #211
-
-* `data_sim()` gains a new example `"gwf2"`, simulating data only from Gu &
-  Wabha's *f2* function.
 
 * `smooth_label()` is a new function for extracting the labels 'mgcv' creates for
   smooths from the smooth object itself.
