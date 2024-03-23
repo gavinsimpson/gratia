@@ -25,8 +25,11 @@
 #'   * `"eg6"`: an additive plus random effect term true model.
 #'   * ´"eg7"`: a version of the model in `"eg1"`, but where the covariates are
 #'     correlated.
-#'   * `"gw_f2"`: a model where the response is Gu & Wabha's
+#'   * `"gwf2"`: a model where the response is Gu & Wabha's
 #'     \eqn{f_2(x_i)}{f_2(x_i)} plus noise.
+#'   * `"lwf6"`: a model where the response is Luo & Wabha's "example 6"
+#'     function \eqn{sin(2(4x-2)) + 2 exp(-256(x-0.5)^2)}{
+#'     sin(2 * ((4 * x) - 2)) + (2 * exp(-256 * (x - .5)^2))} plus noise.
 #'
 #'   The random component providing noise or sampling variation can follow one
 #'   of the distributions, specified via argument `dist`
@@ -59,6 +62,13 @@
 #' @param seed numeric; the seed for the random number generator. Passed to
 #'   [base::set.seed()].
 #'
+#' @references
+#' Gu, C., Wahba, G., (1993). Smoothing Spline ANOVA with Component-Wise
+#' Bayesian "Confidence Intervals." *J. Comput. Graph. Stat.* **2**, 97–117.
+#'
+#' Luo, Z., Wahba, G., (1997). Hybrid adaptive splines. *J. Am. Stat. Assoc.*
+#' **92**, 107–116.
+#'
 #' @export
 #'
 #' @examples
@@ -73,7 +83,7 @@
 #' options(op)
 #' }
 `data_sim` <- function(model = "eg1", n = 400,
-                       scale = 2, theta = 3, power = 1.5,
+                       scale = NULL, theta = 3, power = 1.5,
                        dist = c(
                          "normal", "poisson", "binary",
                          "negbin", "tweedie", "gamma",
@@ -111,6 +121,15 @@
     ocat = sim_normal
   )
 
+  # try to choose better defaults for some functions
+  if (is.null(scale)) {
+    scale <- if (model == "lwf6") {
+      0.3
+    } else {
+      2
+    }
+  }
+
   model_fun <- switch(model,
     eg1 = four_term_additive_model,
     eg2 = bivariate_model,
@@ -119,7 +138,8 @@
     eg5 = additive_plus_factor_model,
     eg6 = four_term_plus_ranef_model,
     eg7 = correlated_four_term_additive_model,
-    gwf2 = gu_wabha_f2
+    gwf2 = gu_wabha_f2,
+    lwf6 = luo_wabha_f6
   )
 
   sim <- model_fun(
@@ -421,9 +441,25 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
     theta = 3, power = 1.5) {
   data <- tibble(x = runif(n, 0, 1))
   data <- mutate(data, f2 = gw_f2(.data$x))
-  data2 <- sim_fun(x = data$f2, scale, theta = theta, power = power)
+  data2 <- sim_fun(x = data$f2, scale = scale, theta = theta, power = power)
   data <- bind_cols(data2, data)
   data[c("y", "x", "f", "f2")]
+}
+
+#' @importFrom tibble tibble
+#' @importFrom dplyr mutate bind_cols
+#' @importFrom rlang .data
+`luo_wabha_f6` <- function(
+    n, sim_fun = sim_normal, scale = 0.3,
+    theta = 3, power = 1.5) {
+  f <- function(x) {
+    sin(2 * ((4 * x) - 2)) + (2 * exp(-256 * (x - .5)^2))
+  }
+  data <- tibble(x = runif(n, 0, 1))
+  data <- mutate(data, f6 = f(.data$x))
+  data2 <- sim_fun(x = data$f6, scale = scale, theta = theta, power = power)
+  data <- bind_cols(data2, data)
+  data[c("y", "x", "f")]
 }
 
 #' Generate reference simulations for testing
