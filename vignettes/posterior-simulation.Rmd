@@ -173,6 +173,7 @@ plt +
   geom_line(data = fs, aes(group = .draw, x = x, y = .fitted),
     colour = "yellow", alpha = 0.4)
 ```
+
 we see the posterior draws are largely contained the credible interval.
 
 The difference between what we did here and what we did with `smooth_samples()` is that now we're including the effects of all the other model terms. In this simple model with a single smooth and an identity link, the only difference is that the model constant term and its uncertainty is included in the samples.
