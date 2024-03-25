@@ -1091,7 +1091,7 @@
 #'
 #' # fit the GAM (note: for execution time reasons using bam())
 #' m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-#'   data = df, family = nb(), method = "fREML", discrete = TRUE
+#'   data = df, family = nb(), method = "fREML"
 #' )
 #'
 #' # data slice through data along x2 - all other covariates will be set to
