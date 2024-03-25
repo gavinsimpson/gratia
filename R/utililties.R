@@ -1446,6 +1446,9 @@ vars_from_label <- function(label) {
   if (inherits(smooth, what = cls)) {
     out <- TRUE
   }
+  if (inherits(smooth, what = "tprs.smooth") && smooth_dim(smooth) < 2) {
+    out <- FALSE
+  }
   out
 }
 
@@ -1573,7 +1576,8 @@ vars_from_label <- function(label) {
 #' @rdname null_deviance
 `null_deviance.default` <- function(model, ...) {
   if (is.null(model$null.deviance)) {
-    stop("The null deviance is not available for <", model, ">",
+    stop("The null deviance is not available for <",
+      deparse(substitute(model)), ">",
       call. = FALSE
     )
   }

@@ -302,8 +302,18 @@ test_that("coverage_normal works for given level", {
   expect_silent(coverage_normal(0.95))
 })
 
+test_that("coverage_normal fails level outside valid range", {
+  expect_error(coverage_normal(2),
+    "Invalid 'level': must be 0 < level < 1")
+})
+
 test_that("coverage_t works for given level", {
   expect_silent(coverage_t(0.95, df = 5))
+})
+
+test_that("coverage_t fails level outside valid range", {
+  expect_error(coverage_t(2),
+    "Invalid 'level': must be 0 < level < 1")
 })
 
 test_that("parametric_terms works for a gaulss GAM", {
@@ -459,6 +469,11 @@ test_that("null_deviance works for a gam", {
   expect_identical(null_deviance(m_gam), m_bam$null.deviance)
 })
 
+test_that("null_deviance fails for an object without a null deviance", {
+  expect_error(null_deviance(m_lm),
+  "The null deviance is not available for <m_lm>")
+})
+
 ## smooth_label
 test_that("smooth_label extracts the smooth label from a GAM", {
   expect_silent(lab <- smooth_label(m_gam$smooth[[1]]))
@@ -506,4 +521,78 @@ test_that("model_constant returns the intercept estimate", {
   expect_type(b, "double")
   expect_identical(b, unname(coef(m_gam)[1L]))
   expect_named(b, expected = NULL)
+})
+
+test_that("is bam identifies a BAM vs GAM or GAMMs", {
+  expect_true(is.bam(m_bam))
+  expect_false(is.bam(m_gam))
+  expect_false(is.bam(m_gamm))
+  expect_false(is.bam(m_gamm4))
+})
+
+test_that("get smooths by id works for gamm4", {
+  expect_silent(sm <- get_smooths_by_id(m_gamm4, 1))
+  expect_true(is_mgcv_smooth(sm[[1]]))
+  expect_identical(sm[[1]], m_gamm4$gam$smooth[[1]])
+
+  expect_error(get_smooths_by_id(list(a = 10), 1),
+    "Not a gamm4 model fit.")
+})
+
+test_that("by smooth failure throws the right error", {
+  msg <- "Hmm, something went wrong identifying the requested smooth. Found:\n s(x0), s(x1), s(x2), s(x3) \nNot all of these are 'by' variable smooths. Contact Maintainer."
+  expect_identical(by_smooth_failure(m_gam$smooth), msg)
+})
+
+test_that("rep first factor value works", {
+  expect_silent(f <- factor(letters[1:3]))
+  expect_identical(rep_first_factor_value(factor(letters[1:3]), 2),
+    factor(rep("a", 2), levels = letters[1:3]))
+})
+
+test_that("check user select smooths fails with error is some missing", {
+  expect_error(check_user_select_smooths(smooths(m_gam),
+    select = c("s(x1)", "s(x4)")),
+  "Some smooths in 'select' were not found in model :\\n\\ts\\(x4\\)")
+})
+
+test_that("check user select smooths fails with error if invalid select", {
+  expect_error(check_user_select_smooths(smooths(m_gam),
+    select = list(1:10)),
+  "'select' is not numeric, character, or logical.")
+})
+
+test_that("is factor term errors if term missing", {
+  expect_error(is_factor_term(terms(m_gam)),
+    "Argument 'term' must be provided.")
+})
+
+test_that("is factor term errors if generic list", {
+  expect_error(is_factor_term(list(1:10), "x0"),
+    "Don't know how to handle generic list objects.")
+})
+
+test_that("is factor term is FALSE with list of terms none factor", {
+  expect_false(is_factor_term(list(terms(m_gam), terms(m_bam)), "x0"))
+})
+
+test_that("term variables returns variables for term in a bam", {
+  expect_identical(term_variables(m_bam, "x0"), "x0")
+})
+
+test_that("is isotropic smooth works", {
+  expect_true(is_isotropic_smooth(get_smooths_by_id(su_m_bivar)[[1]]))
+  expect_true(is_isotropic_smooth(get_smooths_by_id(su_m_bivar_ds)[[1]]))
+  expect_false(is_isotropic_smooth(get_smooths_by_id(m_gam)[[1]]))
+})
+
+test_that("model vars works for various GAMs", {
+  expect_silent(mvars <- model_vars(m_gam))
+  expect_identical(mvars, paste0("x", 0:3))
+  expect_silent(mvars <- model_vars(m_bam))
+  expect_identical(mvars, paste0("x", 0:3))
+  expect_silent(mvars <- model_vars(m_gamm))
+  expect_identical(mvars, paste0("x", 0:3))
+  expect_silent(mvars <- model_vars(m_gamm4))
+  expect_identical(mvars, paste0("x", 0:3))
 })
