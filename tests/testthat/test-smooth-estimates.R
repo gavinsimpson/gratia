@@ -281,3 +281,17 @@ test_that("smooth_estimates works for GAM with sz smooth two factors", {
   expect_identical(nrow(sm), 600L)
   expect_named(sm, c(obj_nms, "f1", "f2", "x"))
 })
+
+test_that("check_all_vars errors if smooths not numeric or list", {
+  skip_on_cran()
+  expect_error(check_all_vars(m_gam, data = su_eg4, smooths = "a"),
+    "Do not know how to handle supplied `smooths`."
+  )
+})
+
+test_that("check_all_vars errors if smooths numeric out of bounds", {
+  skip_on_cran()
+  expect_error(check_all_vars(m_gam, data = su_eg4, smooths = 18),
+    "do not inherit from class `mgcv.smooth`."
+  )
+})
