@@ -1,4 +1,4 @@
-# gratia 0.8.9.12
+# gratia 0.8.9.13
 
 ## Breaking changes
 
@@ -130,6 +130,10 @@ to `select` and the function will continue.
 * `data_sim()` gains two new example models `"gwf2"`, simulating data only from
   Gu & Wabha's *f2* function, and `"lwf6"`, example function 6 from Luo & Wabha
   (1997 JASA 92(437), 107-116).
+
+* `data_sim()` can also simulate data for use with GAMs fitted using
+  `family = gfam()` for grouped families where different types of data in
+  the response are handled. #266 and part of #265
 
 * `fitted_samples()` and `smooth_samples()` can now use the Metropolis Hastings
   sampler from `mgcv::gam.mh()`, instead of a Gaussian approximation, to sample
