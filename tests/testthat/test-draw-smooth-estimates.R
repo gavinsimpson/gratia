@@ -326,3 +326,14 @@ test_that("plot has correct label with ordered factor by models", {
   skip_on_cran()
   expect_doppelganger("draw subtitle ordered by smooths", plt)
 })
+
+test_that("grouped_by works", {
+  sm <- smooth_estimates(su_m_factor_by)
+  expect_silent(plt1 <- draw(sm, grouped_by = TRUE))
+  sm <- smooth_estimates(m_ordered_by)
+  expect_silent(plt2 <- draw(sm, grouped_by = TRUE))
+
+  skip_on_cran()
+  expect_doppelganger("draw sm est grouped_by true", plt1)
+  expect_doppelganger("draw sm est grouped_by true ordered", plt2)
+})
