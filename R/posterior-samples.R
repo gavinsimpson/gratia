@@ -902,7 +902,7 @@
 #' @return A tibble, currently with the following variables:
 #' * `.derivative`: the estimated partial derivative,
 #' * additional columns containing the covariate values at which the derivative
-#'   was eveluated.
+#'   was evaluated.
 #'
 #' @examples
 #'

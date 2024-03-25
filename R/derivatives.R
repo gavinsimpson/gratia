@@ -1077,7 +1077,7 @@
 #' * `.lower_ci`: the lower bound of the confidence or simultaneous interval,
 #' * `.upper_ci`: the upper bound of the confidence or simultaneous interval,
 #' * additional columns containing the covariate values at which the derivative
-#'   was eveluated.
+#'   was evaluated.
 #'
 #' @examples
 #'
