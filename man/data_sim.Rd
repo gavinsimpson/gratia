@@ -14,7 +14,8 @@ data_sim(
     "ordered categorical"),
   n_cat = 4,
   cuts = c(-1, 0, 5),
-  seed = NULL
+  seed = NULL,
+  gfam_families = c("binary", "tweedie", "normal")
 )
 }
 \arguments{
@@ -43,6 +44,10 @@ categories: \code{length(cuts) == n_cat - 1}.}
 
 \item{seed}{numeric; the seed for the random number generator. Passed to
 \code{\link[base:Random]{base::set.seed()}}.}
+
+\item{gfam_families}{character; a vector of distributions to use in
+generating data with grouped families for use with \code{family = gfam()}. The
+allowed distributions as as per \code{dist}.}
 }
 \description{
 A tidy reimplementation of the functions implemented in \code{\link[mgcv:gamSim]{mgcv::gamSim()}}
@@ -76,6 +81,15 @@ correlated.
 \item \code{"lwf6"}: a model where the response is Luo & Wabha's "example 6"
 function \eqn{sin(2(4x-2)) + 2 exp(-256(x-0.5)^2)}{
     sin(2 * ((4 * x) - 2)) + (2 * exp(-256 * (x - .5)^2))} plus noise.
+\item \code{"gfam"}: simulates data for use with GAMs with
+\code{family = gfam(families)}. See example in \code{\link[mgcv:gfam]{mgcv::gfam()}}. If this model
+is specified then \code{dist} is ignored and \code{gfam_families} is used to
+specify which distributions are included in the simulated data. Can be a
+vector of any of the families allowed by \code{dist}. For
+\code{"ocat" \%in\% gfam_families} (or \code{"ordered categorical"}), 4 classes are
+assumed, which can't be changed. Link functions used are \code{"identity"}
+for \code{"normal"}, \code{"logit"} for \code{"binary"}, \code{"ocat"}, and
+\code{"ordered categorical"}, and \code{"exp"} elsewhere.
 }
 
 The random component providing noise or sampling variation can follow one

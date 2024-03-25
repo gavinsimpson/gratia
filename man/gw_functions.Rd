@@ -8,17 +8,19 @@
 \alias{gw_f3}
 \title{Gu and Wabha test functions}
 \usage{
-gw_f0(x)
+gw_f0(x, ...)
 
-gw_f1(x)
+gw_f1(x, ...)
 
-gw_f2(x)
+gw_f2(x, ...)
 
-gw_f3(x)
+gw_f3(x, ...)
 }
 \arguments{
 \item{x}{numeric; vector of points to evaluate the function at, on interval
 (0,1)}
+
+\item{...}{arguments passed to other methods, ignored.}
 }
 \description{
 Gu and Wabha test functions
