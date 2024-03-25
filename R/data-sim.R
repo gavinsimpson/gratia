@@ -30,6 +30,15 @@
 #'   * `"lwf6"`: a model where the response is Luo & Wabha's "example 6"
 #'     function \eqn{sin(2(4x-2)) + 2 exp(-256(x-0.5)^2)}{
 #'     sin(2 * ((4 * x) - 2)) + (2 * exp(-256 * (x - .5)^2))} plus noise.
+#'   * `"gfam"`: simulates data for use with GAMs with
+#'     `family = gfam(families)`. See example in [mgcv::gfam()]. If this model
+#'     is specified then `dist` is ignored and `gfam_families` is used to
+#'     specify which distributions are included in the simulated data. Can be a
+#'     vector of any of the families allowed by `dist`. For
+#'     `"ocat" %in% gfam_families` (or `"ordered categorical"`), 4 classes are
+#'     assumed, which can't be changed. Link functions used are `"identity"`
+#'     for `"normal"`, `"logit"` for `"binary"`, `"ocat"`, and
+#'     `"ordered categorical"`, and `"exp"` elsewhere.
 #'
 #'   The random component providing noise or sampling variation can follow one
 #'   of the distributions, specified via argument `dist`
@@ -61,6 +70,9 @@
 #'   categories: `length(cuts) == n_cat - 1`.
 #' @param seed numeric; the seed for the random number generator. Passed to
 #'   [base::set.seed()].
+#' @param gfam_families character; a vector of distributions to use in
+#'   generating data with grouped families for use with `family = gfam()`. The
+#'   allowed distributions as as per `dist`.
 #'
 #' @references
 #' Gu, C., Wahba, G., (1993). Smoothing Spline ANOVA with Component-Wise
@@ -83,14 +95,15 @@
 #' options(op)
 #' }
 `data_sim` <- function(model = "eg1", n = 400,
-                       scale = NULL, theta = 3, power = 1.5,
-                       dist = c(
-                         "normal", "poisson", "binary",
-                         "negbin", "tweedie", "gamma",
-                         "ocat", "ordered categorical"
-                       ),
-                       n_cat = 4, cuts = c(-1, 0, 5),
-                       seed = NULL) {
+    scale = NULL, theta = 3, power = 1.5,
+    dist = c(
+      "normal", "poisson", "binary", "negbin", "tweedie", "gamma",
+      "ocat", "ordered categorical"
+    ),
+    n_cat = 4, cuts = c(-1, 0, 5),
+    seed = NULL,
+    gfam_families = c("binary", "tweedie", "normal")
+  ) {
   ## sort out the seed
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     runif(1)
@@ -139,12 +152,13 @@
     eg6 = four_term_plus_ranef_model,
     eg7 = correlated_four_term_additive_model,
     gwf2 = gu_wabha_f2,
-    lwf6 = luo_wabha_f6
+    lwf6 = luo_wabha_f6,
+    gfam = sim_gfam
   )
 
   sim <- model_fun(
     n = n, sim_fun = sim_fun, scale = scale, theta = theta,
-    power = power
+    power = power, families = gfam_families
   )
 
   # some distributions will require post-processing, such as OCAT
@@ -251,6 +265,7 @@
 #'
 #' @param x numeric; vector of points to evaluate the function at, on interval
 #'   (0,1)
+#' @param ... arguments passed to other methods, ignored.
 #'
 #' @rdname gw_functions
 #' @export
@@ -268,30 +283,30 @@
 #' \dontshow{
 #' options(op)
 #' }
-gw_f0 <- function(x) {
+gw_f0 <- function(x, ...) {
   2 * sin(pi * x)
 }
 
 #' @rdname gw_functions
 #' @export
-gw_f1 <- function(x) {
+gw_f1 <- function(x, ...) {
   exp(2 * x)
 }
 
 #' @rdname gw_functions
 #' @export
-gw_f2 <- function(x) {
+gw_f2 <- function(x, ...) {
   0.2 * x^11 * (10 * (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^10
 }
 
 #' @rdname gw_functions
 #' @export
-gw_f3 <- function(x) { # a null function with zero effect
+gw_f3 <- function(x, ...) { # a null function with zero effect
   0 * x
 }
 
 ## bivariate function
-bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
+bivariate <- function(x, z, sx = 0.3, sz = 0.4, ...) {
   (pi^sx * sz) * (1.2 * exp(-(x - 0.2)^2 / sx^2 - (z - 0.3)^2 / sz^2) +
     0.8 * exp(-(x - 0.7)^2 / sx^2 - (z - 0.8)^2 / sz^2))
 }
@@ -300,7 +315,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom dplyr mutate bind_cols
 #' @importFrom rlang .data
 `four_term_additive_model` <- function(n, sim_fun = sim_normal, scale = 2,
-                                       theta = 3, power = 1.5) {
+                                       theta = 3, power = 1.5, ...) {
   data <- tibble(
     x0 = runif(n, 0, 1), x1 = runif(n, 0, 1),
     x2 = runif(n, 0, 1), x3 = runif(n, 0, 1)
@@ -322,7 +337,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom rlang .data
 `correlated_four_term_additive_model` <- function(n, sim_fun = sim_normal,
                                                   scale = 2, theta = 3,
-                                                  power = 1.5) {
+                                                  power = 1.5, ...) {
   data <- tibble(x0 = runif(n, 0, 1), x2 = runif(n, 0, 1))
   data <- mutate(data,
     x1 = .data$x0 * 0.7 + runif(n, 0, 0.3),
@@ -344,7 +359,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom dplyr bind_cols
 #' @importFrom rlang .data
 `bivariate_model` <- function(n, sim_fun = sim_normal, scale = 2, theta = 3,
-                              power = 1.5) {
+                              power = 1.5, ...) {
   data <- tibble(x = runif(n), z = runif(n))
   data2 <- sim_fun(
     x = bivariate(data$x, data$z), scale = scale,
@@ -357,7 +372,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom tibble tibble
 #' @importFrom dplyr bind_cols
 `continuous_by_model` <- function(n, sim_fun = sim_normal, scale = 2,
-                                  theta = 3, power = 1.5) {
+                                  theta = 3, power = 1.5, ...) {
   data <- tibble(x1 = runif(n, 0, 1), x2 = sort(runif(n, 0, 1)))
   `f_fun` <- function(x) {
     0.2 * x^11 * (10 * (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^10
@@ -374,7 +389,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom dplyr bind_cols
 #' @importFrom rlang .data
 `factor_by_model` <- function(n, sim_fun = sim_normal, scale = 2, theta = 3,
-                              power = 1.5) {
+                              power = 1.5, ...) {
   data <- tibble(
     x0 = runif(n, 0, 1), x1 = runif(n, 0, 1),
     x2 = sort(runif(n, 0, 1))
@@ -398,7 +413,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom dplyr bind_cols
 #' @importFrom rlang .data
 `additive_plus_factor_model` <- function(n, sim_fun = sim_normal, scale = 2,
-                                         theta = 3, power = 1.5) {
+                                         theta = 3, power = 1.5, ...) {
   data <- tibble(
     x0 = rep(1:4, n / 4), x1 = runif(n, 0, 1),
     x2 = runif(n, 0, 1), x3 = runif(n, 0, 1)
@@ -421,7 +436,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom dplyr bind_cols
 #' @importFrom rlang .data
 `four_term_plus_ranef_model` <- function(n, sim_fun = sim_normal, scale = 2,
-                                         theta = 3, power = 1.5) {
+                                         theta = 3, power = 1.5, ...) {
   data <- four_term_additive_model(n = n, sim_fun = sim_fun, scale = 0.01)
   data <- mutate(data, fac = rep(1:4, n / 4))
   data <- mutate(data,
@@ -438,7 +453,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom rlang .data
 `gu_wabha_f2` <- function(
     n, sim_fun = sim_normal, scale = 2,
-    theta = 3, power = 1.5) {
+    theta = 3, power = 1.5, ...) {
   data <- tibble(x = runif(n, 0, 1))
   data <- mutate(data, f2 = gw_f2(.data$x))
   data2 <- sim_fun(x = data$f2, scale = scale, theta = theta, power = power)
@@ -451,7 +466,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
 #' @importFrom rlang .data
 `luo_wabha_f6` <- function(
     n, sim_fun = sim_normal, scale = 0.3,
-    theta = 3, power = 1.5) {
+    theta = 3, power = 1.5, ...) {
   f <- function(x) {
     sin(2 * ((4 * x) - 2)) + (2 * exp(-256 * (x - .5)^2))
   }
@@ -460,6 +475,71 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4) {
   data2 <- sim_fun(x = data$f6, scale = scale, theta = theta, power = power)
   data <- bind_cols(data2, data)
   data[c("y", "x", "f")]
+}
+
+## a mixed family simulator function to play with...
+#' @importFrom mgcv rTweedie
+sim_gfam <- function(n, families, seed = NULL, ...) {
+  if (is.null(seed)) {
+    seed <- with_preserve_seed(runif(1))
+  }
+  # families can be normal, poisson, gamma, binary, negbin, tweedie,
+  # ocat, ordered categorical (R assumed 4)
+  # links used are identity, log or logit.
+
+  # simulate base data
+  df <- data_sim("eg1", n = n, seed = seed)
+  nf <- length(families) ## how many families?
+  idx <- c(seq_len(nf),
+    sample(seq_len(nf), n - nf, replace = TRUE)
+  )
+
+  # scale the function columns, add family and fix up ordered categorical
+  df <- df |>
+    mutate(
+      across(
+        matches("^f"),
+        .fns = \(x) x / 5
+      ),
+      family = families[idx],
+      family = case_when(
+        family == "ordered categorical" ~ "ocat",
+        .default = family
+      )
+    )
+
+  # function for ocat simulating locally
+  ocat_fun <- function(f) {
+    alpha <- c(-Inf, 1, 2, 2.5, Inf)
+    r <- length(alpha) - 1 # n classes
+    y <- f
+    u <- runif(f)
+    u <- y + log(u / (1 - u))
+    for (j in seq_len(r)) {
+      y[u > alpha[j] & u <= alpha[j + 1]] <- j
+    }
+    f <- y
+    f
+  }
+
+  # do the simulation per family
+  df <- df |>
+    mutate(
+      y = case_when(
+        family == "normal"  ~ f + rnorm(f) * 0.5,
+        family == "poisson" ~ rpois(f, exp(f)),
+        family == "gamma"   ~ rgamma(f, shape = 1 / 0.5,
+          scale = exp(f) * 0.5),
+        family == "negbin"  ~ rnbinom(f, size = 3, mu = exp(f)),
+        family == "binary"  ~ rbinom(f, 1, inv_link(binomial())(f)),
+        family == "tweedie" ~ rTweedie(exp(f), p = 1.5, phi = 1.5),
+        family == "ocat"    ~ ocat_fun(f)
+      ),
+      index = match(family, families)
+    ) |>
+    relocate(all_of(c("y", "index", "family")), .before = 1L)
+
+  df
 }
 
 #' Generate reference simulations for testing
