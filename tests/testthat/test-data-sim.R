@@ -19,3 +19,10 @@ test_that("test data_sim() reproduces reference output", {
     expect_equal(new_sims[[!!(i)]], ref_sims[[!!(i)]])
   }
 })
+
+test_that("data sim for gfam works", {
+  expect_silent(sim <- data_sim("gfam", n = 400, seed = 2))
+  skip_on_ci()
+  skip_on_cran()
+  expect_snapshot(print(sim))
+})
