@@ -359,7 +359,7 @@
         ) |>
         arrange(.data$.smooth) |>
         relocate(".term", .before = 1L) |>
-        group_split(factor(.data$.term, levels = levs), .data$.by)
+        group_split(factor(.data$.smooth, levels = levs), .data$.by)
     } else {
       # the factor is to reorder to way the smooths entered the model
       group_split(sm_eval, factor(.data$.smooth, levels = S[select]))

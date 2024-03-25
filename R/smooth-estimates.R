@@ -1046,7 +1046,7 @@
       arrange(.data$.smooth) |>
       relocate(".term", .before = 1L) |>
       unnest(all_of("data")) |>
-      group_split(factor(.data$.term, levels = levs), .data$.by)
+      group_split(factor(.data$.smooth, levels = levs), .data$.by)
   } else {
     # the factor is to reorder to way the smooths entered the model
     group_split(object, factor(object$.smooth, levels = sm_levs))
@@ -1360,9 +1360,16 @@
         ),
         alpha = ci_alpha, colour = NA
       ) +
-      geom_line(aes(colour = .data[[by_var]])) +
-      scale_colour_okabe_ito() +
-      scale_fill_okabe_ito()
+      geom_line(aes(colour = .data[[by_var]]))
+
+    plt <- if (nlevels(object[[by_var]]) > 9) {
+      plt + scale_colour_hue() +
+        scale_fill_hue()
+    } else {
+      plt + scale_colour_okabe_ito() +
+        scale_fill_okabe_ito()
+    }
+
     if (any(do_sizer)) {
       plt <- if (do_sizer[[1]]) {
         plt + geom_line(
