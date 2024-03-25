@@ -66,7 +66,7 @@ stored.}
 \item{parametric}{logical; plot parametric terms also? Note that \code{select} is
 used for selecting which smooths to plot. The \code{terms} argument is used to
 select which parametric effects are plotted. The default, as with
-\code{\link[mgcv:plot.gam]{mgcv::plot.gam()}}, is to not draw parametyric effects.}
+\code{\link[mgcv:plot.gam]{mgcv::plot.gam()}}, is to not draw parametric effects.}
 
 \item{terms}{character; which model parametric terms should be drawn? The
 Default of \code{NULL} will plot all parametric terms that can be drawn.}
@@ -232,20 +232,9 @@ draw(m1)
 # can add partial residuals
 draw(m1, residuals = TRUE)
 
-df2 <- data_sim(2, n = 1000, dist = "normal", scale = 1, seed = 2)
+df2 <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
 m2 <- gam(y ~ s(x, z, k = 40), data = df2, method = "REML")
 draw(m2, contour = FALSE, n = 50)
-
-# change the number of contours drawn and the fill scale used for
-# the surface
-library("ggplot2")
-draw(m2,
-  n_contour = 5, n = 50,
-  continuous_fill = scale_fill_distiller(
-    palette = "Spectral",
-    type = "div"
-  )
-)
 
 # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 # for more examples and for details on how to modify the theme of all the
