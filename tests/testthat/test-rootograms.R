@@ -19,7 +19,7 @@ test_that("rootogram works for a discrete negative binomial response", {
   skip_on_cran()
   expect_silent(rg <- rootogram(m_nb))
 
-  skip_on_ci()
+  skip_on_cran()
   expect_doppelganger("draw neg bin rootogram", draw(rg))
 })
 
