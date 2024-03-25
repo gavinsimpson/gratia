@@ -88,7 +88,7 @@ A tibble, currently with the following variables:
 \itemize{
 \item \code{.derivative}: the estimated partial derivative,
 \item additional columns containing the covariate values at which the derivative
-was eveluated.
+was evaluated.
 }
 }
 \description{
