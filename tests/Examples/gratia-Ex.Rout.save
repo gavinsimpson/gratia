@@ -1594,11 +1594,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x564620a1e3c0>
+<environment: 0x55c9bbd16380>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x564620a1e3c0>
+<environment: 0x55c9bbd16380>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2281,7 +2281,7 @@ Levels: a b c d e
 > 
 > # fit the GAM (note: for execution time reasons using bam())
 > m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-+   data = df, family = nb(), method = "fREML", discrete = TRUE
++   data = df, family = nb(), method = "fREML"
 + )
 > 
 > # data slice through data along x2 - all other covariates will be set to
@@ -2777,7 +2777,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  45.435 0.367 45.269 0 0 
+Time elapsed:  22.872 0.191 22.646 0 0 
 > grDevices::dev.off()
 null device 
           1 
