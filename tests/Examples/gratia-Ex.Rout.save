@@ -1491,7 +1491,7 @@ detaching ‘package:lme4’, ‘package:Matrix’, ‘package:mgcv’
 > 
 > ### Name: gw_f0
 > ### Title: Gu and Wabha test functions
-> ### Aliases: gw_f0 gw_f1 gw_f2 gw_f3
+> ### Aliases: gw_f0 gw_functions gw_f1 gw_f2 gw_f3
 > 
 > ### ** Examples
 > 
@@ -1606,11 +1606,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55f6349aa3d8>
+<environment: 0x558a28ffadd8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55f6349aa3d8>
+<environment: 0x558a28ffadd8>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2789,7 +2789,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  29.099 0.203 23.456 0 0 
+Time elapsed:  45.053 0.392 44.916 0 0 
 > grDevices::dev.off()
 null device 
           1 
