@@ -548,8 +548,9 @@
     object |>
       mutate(
         .change =
-          case_when(.data$.lower_ci > 0 | .data$.upper_ci < 0 ~ .data$.derivative,
-            .default = NA_real_
+          case_when(.data$.lower_ci > 0 |
+            .data$.upper_ci < 0 ~ .data$.derivative,
+          .default = NA_real_
           )
       )
   } else { # other wise we are adding a sizer-like indicator
@@ -602,28 +603,26 @@
 
   # if just doing a change indicator
   object <- if (isTRUE(identical(type, "change"))) {
-    derivatives <- derivatives |>
+    #derivatives <- derivatives |>
+    object |>
       mutate(
         .change =
-          case_when(.data$.lower_ci > 0 | .data$.upper_ci < 0 ~ .data$.derivative,
-            .default = NA_real_
+          case_when(derivatives$.lower_ci > 0 |
+            derivatives$.upper_ci < 0 ~ .data$.estimate,
+          .default = NA_real_
           )
       )
-    object |> bind_cols(.change = derivatives$.change)
   } else { # otherwise we are adding a sizer-like indicator
-    derivatives <- derivatives |>
+    #derivatives <- derivatives |>
+    object |>
       mutate(
-        .decrease = case_when(.data$.upper_ci < 0 ~ .data$.derivative,
+        .decrease = case_when(derivatives$.upper_ci < 0 ~ .data$.estimate,
           .default = NA_real_
         ),
-        .increase = case_when(.data$.lower_ci > 0 ~ .data$.derivative,
+        .increase = case_when(derivatives$.lower_ci > 0 ~ .data$.estimate,
           .default = NA_real_
         )
       )
-    object |> bind_cols(
-      .decrease = derivatives$.decrease,
-      .increase = derivatives$.increase
-    )
   }
   object <- object |>
     relocate(any_of(c(
