@@ -4,7 +4,7 @@ test_that("rootogram works for a continuous Gaussian response", {
   skip_on_cran()
   expect_silent(rg <- rootogram(m_gam))
 
-  skip_on_ci()
+  skip_on_cran()
   expect_doppelganger("draw gaussian rootogram", draw(rg))
 })
 
@@ -21,6 +21,11 @@ test_that("rootogram works for a discrete negative binomial response", {
 
   skip_on_cran()
   expect_doppelganger("draw neg bin rootogram", draw(rg))
+  expect_doppelganger("draw neg bin sqrt rootogram", draw(rg, sqrt = TRUE))
+  expect_doppelganger("draw neg bin suspended rootogram",
+    draw(rg, type = "suspended"))
+  expect_doppelganger("draw neg bin standing rootogram",
+    draw(rg, type = "standing"))
 })
 
 test_that("rootogram fails for a a non-supported response", {
