@@ -351,15 +351,27 @@
 
     # draw smooths
     sm_l <- if (isTRUE(grouped_by)) {
+      sm_levels <- unique(sm_eval$.smooth)
       levs <- unique(str_split_fixed(sm_eval$.smooth, ":", n = 2)[, 1])
-      sm_eval |>
+      sm_l <- sm_eval |>
         mutate(
-          smooth = factor(.data$.smooth, levels = S[select]),
-          .term = str_split_fixed(.data$.smooth, ":", n = 2)[, 1]
+          ..smooth.. = factor(.data$.smooth, levels = S[select]),
+          .term = str_split_fixed(.data$.smooth, ":", n = 2)[, 1],
+          ..by.. = if_else(is.na(.data$.by), "..no_level..", .data$.by)
         ) |>
-        arrange(.data$.smooth) |>
-        relocate(".term", .before = 1L) |>
-        group_split(factor(.data$.smooth, levels = levs), .data$.by)
+        relocate(".term", .before = 1L)
+      grp_by_levs <- unique(sm_l$"..by..")
+      sm_l <- sm_l |>
+        group_split(factor(.data$.term, levels = sm_levels),
+          factor(.data$"..by..", levels = grp_by_levs))
+      # sometimes the steps to get the order right above don't work
+      sm_l_levs <- vapply(sm_l, \(x) unique(x$.term), character(1L))
+      if (!identical(unique(sm_l_levs), levs)) {
+        names(sm_l) <- sm_l_levs
+        sm_l <- sm_l[levs]
+        names(sm_l) <- NULL
+      }
+      sm_l
     } else {
       # the factor is to reorder to way the smooths entered the model
       group_split(sm_eval, factor(.data$.smooth, levels = S[select]))

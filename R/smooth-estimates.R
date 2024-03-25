@@ -1034,24 +1034,25 @@
   sm_levs <- unique(object$.smooth)
 
   sm_l <- if (isTRUE(grouped_by)) {
-    # need the order of the smooths, I think
     levs <- unique(str_split_fixed(object$.smooth, ":", n = 2)[, 1])
     # nest the object so we can reuse the code/ideas from draw.gam
-    object |>
+    sm_l <- object |>
       nest(data = !all_of(c(".smooth", ".type", ".by"))) |>
-      mutate(
-        .smooth = factor(.data$.smooth, levels = sm_levs),
-        .term = str_split_fixed(.data$.smooth, ":", n = 2)[, 1]
-      ) |>
-      arrange(.data$.smooth) |>
-      relocate(".term", .before = 1L) |>
-      unnest(all_of("data")) |>
-      group_split(factor(.data$.smooth, levels = levs), .data$.by)
+        mutate(
+          ..smooth.. = factor(.data$.smooth, levels = sm_levs),
+          .term = str_split_fixed(.data$.smooth, ":", n = 2)[, 1],
+          ..by.. = if_else(is.na(.data$.by), "..no_level..", .data$.by)
+        ) |>
+        relocate(".term", .before = 1L)
+    grp_by_levs <- unique(sm_l$"..by..")
+    sm_l |>
+      group_split(factor(.data$.term, levels = sm_levs),
+        factor(.data$"..by..", levels = grp_by_levs))
   } else {
     # the factor is to reorder to way the smooths entered the model
     group_split(object, factor(object$.smooth, levels = sm_levs))
   }
-  ## sm_l <- group_split(object, factor(object$smooth, levels = sm_levs))
+  ## plot
   plts <- map(sm_l,
     draw_smooth_estimates,
     constant = constant,
