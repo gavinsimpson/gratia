@@ -140,7 +140,7 @@ stored.</p></dd>
 <dd><p>logical; plot parametric terms also? Note that <code>select</code> is
 used for selecting which smooths to plot. The <code>terms</code> argument is used to
 select which parametric effects are plotted. The default, as with
-<code><a href="https://rdrr.io/pkg/mgcv/man/plot.gam.html" class="external-link">mgcv::plot.gam()</a></code>, is to not draw parametyric effects.</p></dd>
+<code><a href="https://rdrr.io/pkg/mgcv/man/plot.gam.html" class="external-link">mgcv::plot.gam()</a></code>, is to not draw parametric effects.</p></dd>
 
 
 <dt>terms</dt>
@@ -387,22 +387,10 @@ see the examples.</p>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m1</span>, residuals <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="draw.gam-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">df2</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="fl">2</span>, n <span class="op">=</span> <span class="fl">1000</span>, dist <span class="op">=</span> <span class="st">"normal"</span>, scale <span class="op">=</span> <span class="fl">1</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">df2</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg2"</span>, n <span class="op">=</span> <span class="fl">1000</span>, dist <span class="op">=</span> <span class="st">"normal"</span>, scale <span class="op">=</span> <span class="fl">1</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x</span>, <span class="va">z</span>, k <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df2</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m2</span>, contour <span class="op">=</span> <span class="cn">FALSE</span>, n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="draw.gam-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># change the number of contours drawn and the fill scale used for</span></span></span>
-<span class="r-in"><span><span class="co"># the surface</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m2</span>,</span></span>
-<span class="r-in"><span>  n_contour <span class="op">=</span> <span class="fl">5</span>, n <span class="op">=</span> <span class="fl">50</span>,</span></span>
-<span class="r-in"><span>  continuous_fill <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_distiller</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    palette <span class="op">=</span> <span class="st">"Spectral"</span>,</span></span>
-<span class="r-in"><span>    type <span class="op">=</span> <span class="st">"div"</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="draw.gam-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html</span></span></span>
 <span class="r-in"><span><span class="co"># for more examples and for details on how to modify the theme of all the</span></span></span>
