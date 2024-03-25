@@ -78,7 +78,8 @@ distribution can be applied to all the example types.</p>
 <span>    <span class="st">"ordered categorical"</span><span class="op">)</span>,</span>
 <span>  n_cat <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  cuts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">5</span><span class="op">)</span>,</span>
-<span>  seed <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  gfam_families <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"binary"</span>, <span class="st">"tweedie"</span>, <span class="st">"normal"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -127,6 +128,12 @@ categories: <code>length(cuts) == n_cat - 1</code>.</p></dd>
 <dd><p>numeric; the seed for the random number generator. Passed to
 <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">base::set.seed()</a></code>.</p></dd>
 
+
+<dt>gfam_families</dt>
+<dd><p>character; a vector of distributions to use in
+generating data with grouped families for use with <code>family = gfam()</code>. The
+allowed distributions as as per <code>dist</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -151,6 +158,15 @@ correlated.</p></li>
 \(f_2(x_i)\) plus noise.</p></li>
 <li><p><code>"lwf6"</code>: a model where the response is Luo &amp; Wabha's "example 6"
 function \(sin(2(4x-2)) + 2 exp(-256(x-0.5)^2)\) plus noise.</p></li>
+<li><p><code>"gfam"</code>: simulates data for use with GAMs with
+<code>family = gfam(families)</code>. See example in <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code>. If this model
+is specified then <code>dist</code> is ignored and <code>gfam_families</code> is used to
+specify which distributions are included in the simulated data. Can be a
+vector of any of the families allowed by <code>dist</code>. For
+<code>"ocat" %in% gfam_families</code> (or <code>"ordered categorical"</code>), 4 classes are
+assumed, which can't be changed. Link functions used are <code>"identity"</code>
+for <code>"normal"</code>, <code>"logit"</code> for <code>"binary"</code>, <code>"ocat"</code>, and
+<code>"ordered categorical"</code>, and <code>"exp"</code> elsewhere.</p></li>
 </ul><p>The random component providing noise or sampling variation can follow one
 of the distributions, specified via argument <code>dist</code></p><ul><li><p><code>"normal"</code>: Gaussian,</p></li>
 <li><p><code>"poisson"</code>: Poisson,</p></li>
