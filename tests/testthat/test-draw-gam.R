@@ -238,7 +238,7 @@ test_that("draw.gam works for a parametric only model", {
 
 test_that("draw.gam works with grouped by option", {
   expect_silent(plt1 <- draw(su_m_factor_by, grouped_by = TRUE, rug = FALSE))
-  expect_silent(plt2 <- draw(su_m_factor_by, grouped_by = TRUE, rug = FALSE))
+  expect_silent(plt2 <- draw(m_ordered_by, grouped_by = TRUE, rug = FALSE))
   skip_on_ci()
   expect_doppelganger("grouped by gam", plt1)
   expect_doppelganger("ordered grouped by gam", plt1)
