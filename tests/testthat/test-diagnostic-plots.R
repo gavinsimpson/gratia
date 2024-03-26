@@ -1,7 +1,7 @@
 ## Test qq_plot() methods
 
 test_that("appraise() works", {
-  plt <- appraise(m_gam)
+  plt <- appraise(m_tiny_eg1)
 
   skip_on_ci()
   expect_doppelganger("appraise diagnostic plots", plt)
@@ -12,9 +12,6 @@ test_that("appraise() method direct yields a message", {
     plt <- appraise(m_gam, method = "direct"),
     "`method = \"direct\"` is deprecated, use `\"uniform\"`"
   )
-
-  skip_on_ci()
-  expect_doppelganger("appraise diagnostic plots", plt)
 })
 
 test_that("appraise() fails if n_bins not numeric or one of character options", {
@@ -44,13 +41,13 @@ test_that("residuals_hist_plot fails if non-numeric n_bins doesn't match charact
 })
 
 test_that("worm_plot works for a GAM", {
-  expect_silent(plt1 <- withr::with_seed(1, worm_plot(m_gam)))
+  expect_silent(plt1 <- withr::with_seed(1, worm_plot(m_tiny_eg1)))
 
-  expect_silent(plt2 <- withr::with_seed(1, worm_plot(m_gam,
+  expect_silent(plt2 <- withr::with_seed(1, worm_plot(m_tiny_eg1,
     method = "simulate"
   )))
 
-  expect_silent(plt3 <- withr::with_seed(1, worm_plot(m_gam,
+  expect_silent(plt3 <- withr::with_seed(1, worm_plot(m_tiny_eg1,
     method = "normal"
   )))
 
@@ -136,7 +133,7 @@ test_that("appraise works for a LM", {
 })
 
 test_that("appraise can use the worm plot", {
-  expect_silent(plt <- withr::with_seed(1, appraise(m_gam,
+  expect_silent(plt <- withr::with_seed(1, appraise(m_tiny_eg1,
     use_worm = TRUE,
     method = "simulate"
   )))

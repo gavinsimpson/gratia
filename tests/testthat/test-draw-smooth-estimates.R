@@ -341,9 +341,13 @@ test_that("grouped_by works", {
 test_that("draw smooth estimates works with sizer", {
   expect_silent(d <- derivatives(m_gam, n = 100))
   expect_silent(plt1 <- smooth_estimates(m_gam) |>
-    add_sizer(derivatives = d, type = "change"))
+    add_sizer(derivatives = d, type = "change") |>
+    draw()
+  )
   expect_silent(plt2 <- smooth_estimates(m_gam) |>
-    add_sizer(derivatives = d, type = "sizer"))
+    add_sizer(derivatives = d, type = "sizer") |>
+    draw()
+  )
 
   skip_on_cran()
   expect_doppelganger("draw smooth est works with change indicators", plt1)

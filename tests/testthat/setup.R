@@ -17,6 +17,7 @@ library("ggplot2")
 n_quick <- 300
 quick_eg1 <- data_sim("eg1", n = n_quick, seed = 21)
 quick_eg1_off <- quick_eg1 |> mutate(off = 2)
+tiny_eg1 <- data_sim("eg1", n = 100, seed = 21)
 su_eg1 <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 1)
 su_eg2 <- data_sim("eg2", n = 2000, dist = "normal", scale = 0.5, seed = 42)
 su_eg3 <- data_sim("eg3", n = 400, seed = 32)
@@ -24,6 +25,11 @@ su_eg4 <- data_sim("eg4", n = 400, dist = "normal", scale = 2, seed = 1)
 
 su_m_quick_eg1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = quick_eg1,
+  method = "REML"
+)
+
+m_tiny_eg1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+  data = tiny_eg1,
   method = "REML"
 )
 
