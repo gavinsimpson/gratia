@@ -13,7 +13,9 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  dev = "svglite",
+  fig.ext = "svgz"
 )
 ```
 
@@ -100,7 +102,7 @@ The main thing we need is to evaluate the smooths at values of their covariates.
 
 ```{r custom-plot-eval-and-add-confint}
 # evaluate the smooths
-sm <- smooth_estimates(m) %>%
+sm <- smooth_estimates(m) |>
   add_confint()
 sm
 ```
@@ -109,7 +111,7 @@ By default `draw.gam()` will add partial residuals to the partial effects plots.
 
 ```{r custom-plot-add-partial-resids}
 # add partial residuals to data
-eg1 <- eg1 %>%
+eg1 <- eg1 |>
   add_partial_residuals(m)
 ```
 
@@ -128,8 +130,8 @@ Now we have everything we need to recreate the plots created by `draw.gam()`. In
 5. some annotation
 
 ```{r custom-plot-sx2}
-p_sx2 <- sm %>%
-  filter(.smooth == "s(x2)") %>%
+p_sx2 <- sm |>
+  filter(.smooth == "s(x2)") |>
   ggplot() +
   geom_rug(aes(x = x2),
     data = eg1,
@@ -148,8 +150,8 @@ p_sx2
 
 
 ```{r custom-plot-other-smooths, echo = FALSE}
-p_sx0 <- sm %>%
-  filter(.smooth == "s(x0)") %>%
+p_sx0 <- sm |>
+  filter(.smooth == "s(x0)") |>
   ggplot() +
   geom_rug(aes(x = x0),
     data = eg1,
@@ -164,8 +166,8 @@ p_sx0 <- sm %>%
   geom_line(aes(x = x0, y = .estimate), lwd = 1.2) +
   labs(y = "Partial effect", title = "s(x0)")
 
-p_sx1 <- sm %>%
-  filter(.smooth == "s(x1)") %>%
+p_sx1 <- sm |>
+  filter(.smooth == "s(x1)") |>
   ggplot() +
   geom_rug(aes(x = x1),
     data = eg1,
@@ -180,8 +182,8 @@ p_sx1 <- sm %>%
   geom_line(aes(x = x1, y = .estimate), lwd = 1.2) +
   labs(y = "Partial effect", title = "s(x1)")
 
-p_sx3 <- sm %>%
-  filter(.smooth == "s(x3)") %>%
+p_sx3 <- sm |>
+  filter(.smooth == "s(x3)") |>
   ggplot() +
   geom_rug(aes(x = x3),
     data = eg1,
@@ -203,19 +205,19 @@ Assuming we repeat the above steps for the other smooths, creating plot objects 
 p_sx0 + p_sx1 + p_sx2 + p_sx3 + plot_layout(ncol = 2)
 ```
 
-The real benefit of having complete control over how the data are plotted is that you can use the power of {ggplot2} to map additional variables to plot aesthetics. As an example, let's assume we have a factor variable in the original data and we want to colour the partial residuals accoring to the levels of this factor. Let's create that factor
+The real benefit of having complete control over how the data are plotted is that you can use the power of {ggplot2} to map additional variables to plot aesthetics. As an example, let's assume we have a factor variable in the original data and we want to colour the partial residuals according to the levels of this factor. Let's create that factor
 
 ```{r add-factor-to-data}
 set.seed(12)
-eg1 <- eg1 %>%
-  mutate(fac = sample(letters[1:4], nrow(.), replace = TRUE))
+eg1 <- eg1 |>
+  mutate(fac = sample(letters[1:4], n(), replace = TRUE))
 ```
 
 Now we can modify our plotting code to map `fac` to the colour aesthetic when we plot the partial residuals. To save some typing, we'll reorder the layers in the plot and add the partial residuals last
 
 ```{r plot-partial-resids-with-colours-by-fac}
-plt <- sm %>%
-  filter(.smooth == "s(x2)") %>%
+plt <- sm |>
+  filter(.smooth == "s(x2)") |>
   ggplot() +
   geom_rug(aes(x = x2),
     data = eg1,
