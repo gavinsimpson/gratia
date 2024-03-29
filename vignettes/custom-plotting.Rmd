@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
   dev = "svglite",
   fig.ext = "svgz"
 )
+library("svglite")
 ```
 
 ## Background
