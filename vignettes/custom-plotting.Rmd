@@ -31,7 +31,7 @@ Having gone down the root of combining multiple `ggplot` objects into a single f
 
 We start by simulating some data and fitting a GAM with four smooth functions
 
-```{r setup}
+```{r setup-chunk}
 library("gratia")
 library("mgcv")
 library("ggplot2")
@@ -44,8 +44,7 @@ eg1 <- data_sim("eg1", n = n, seed = 1)
 
 # fit model
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-  data = eg1, method = "REML"
-)
+  data = eg1, method = "REML")
 ```
 
 The default plot produced by `draw()` is
