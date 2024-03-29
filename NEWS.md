@@ -1,5 +1,11 @@
 # gratia (development version)
 
+## Bug fixes
+
+* `partial_residuals()` was computing partial residuals from the *deviance*
+  residuals. For compatibility with `mgcv::plot.gam()`, partial residuals are
+  now computed from the *working* residuals. Reported by @wStockhausen #73
+
 # gratia 0.9.0
 
 ## Breaking changes
