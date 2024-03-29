@@ -26,6 +26,7 @@
 #'
 #' @importFrom tibble as_tibble
 #' @importFrom dplyr bind_cols arrange
+#' @importFrom rlang expr_label
 #'
 #' @examples
 #' \dontshow{
