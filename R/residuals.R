@@ -26,6 +26,7 @@
 #'
 #' @importFrom tibble as_tibble
 #' @importFrom dplyr bind_cols arrange
+#' @importFrom rlang expr_label
 #'
 #' @examples
 #' \dontshow{
@@ -97,9 +98,9 @@
 #' @importFrom stats residuals weights
 #' @importFrom tibble as_tibble
 `compute_partial_residuals` <- function(object, terms = NULL, data = NULL) {
-  ## weight residuals...
+  ## weighted working residuals..., see #273
   ## need as.numeric for gamm() objects
-  w_resid <- as.numeric(residuals(object)) * sqrt(weights(object))
+  w_resid <- as.numeric(residuals(object, "working")) * sqrt(weights(object))
 
   ## if data is null, just grab the $model out of object
   if (is.null(data)) {
