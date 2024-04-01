@@ -4,20 +4,19 @@ output:
   rmarkdown::html_vignette:
     fig_width: 8
     fig_height: 5.3333
+    dev: "svglite"
 vignette: >
   %\VignetteIndexEntry{Customizing plots}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r setup-knitr, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  dev = "svglite",
   fig.ext = "svgz"
 )
-library("svglite")
 ```
 
 ## Background
@@ -50,7 +49,7 @@ m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
 
 The default plot produced by `draw()` is
 
-```{r draw-eg1-1}
+```{r draw-eg1-}
 p <- draw(m)
 p
 ```
