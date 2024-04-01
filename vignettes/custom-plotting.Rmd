@@ -15,7 +15,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.ext = "svgz"
+  fig.ext = "svg"
 )
 ```
 
