@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,6 +57,11 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="gratia-development-version">gratia (development version)<a class="anchor" aria-label="anchor" href="#gratia-development-version"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/partial_residuals.html">partial_residuals()</a></code> was computing partial residuals from the <em>deviance</em> residuals. For compatibility with <code><a href="https://rdrr.io/pkg/mgcv/man/plot.gam.html" class="external-link">mgcv::plot.gam()</a></code>, partial residuals are now computed from the <em>working</em> residuals. Reported by <a href="https://github.com/wStockhausen" class="external-link">@wStockhausen</a> <a href="https://github.com/gavinsimpson/gratia/issues/73" class="external-link">#73</a></li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.0" id="gratia-090">gratia 0.9.0<a class="anchor" aria-label="anchor" href="#gratia-090"></a></h2><p class="text-muted">CRAN release: 2024-03-27</p>
