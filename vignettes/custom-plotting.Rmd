@@ -4,7 +4,7 @@ output:
   rmarkdown::html_vignette:
     fig_width: 8
     fig_height: 5.3333
-    dev: "svglite"
+    dev: "png"
 vignette: >
   %\VignetteIndexEntry{Customizing plots}
   %\VignetteEngine{knitr::rmarkdown}
@@ -14,8 +14,7 @@ vignette: >
 ```{r setup-knitr, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  fig.ext = "svg"
+  comment = "#>"
 )
 ```
 
