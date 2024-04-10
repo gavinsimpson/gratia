@@ -62,9 +62,8 @@ spread the plots.}
 \item{level}{numeric; the coverage level for QQ plot reference intervals.
 Must be strictly \verb{0 < level < 1}. Only used with \code{method = "simulate"}.}
 
-\item{ci_alpha, ci_col}{numeric; the level of alpha transparency for the
-QQ plot reference interval when \code{method = "simulate"}, or points drawn in
-plots.}
+\item{ci_alpha, ci_col}{colour and transparency used to draw the QQ plot
+reference interval when \code{method = "simulate"}.}
 
 \item{point_col, point_alpha}{colour and transparency used to draw points in
 the plots. See \code{\link[graphics:par]{graphics::par()}} section \strong{Color Specification}. This is
