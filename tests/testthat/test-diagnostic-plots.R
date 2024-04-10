@@ -1,7 +1,8 @@
 ## Test qq_plot() methods
 
 test_that("appraise() works", {
-  plt <- appraise(m_tiny_eg1)
+  plt <- appraise(m_tiny_eg1, method = "simulate",
+    ci_col = "red", ci_alpha = 0.3)
 
   skip_on_ci()
   expect_doppelganger("appraise diagnostic plots", plt)
