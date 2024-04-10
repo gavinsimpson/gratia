@@ -4,7 +4,10 @@
 
 * `partial_residuals()` was computing partial residuals from the *deviance*
   residuals. For compatibility with `mgcv::plot.gam()`, partial residuals are
-  now computed from the *working* residuals. Reported by @wStockhausen #73
+  now computed from the *working* residuals. Reported by @wStockhausen #273
+
+* `appraise()` was not passing the `ci_col` argument on `qq_plot()` and
+  `worm_plot()`. Reported by Sate Ahmed.
 
 # gratia 0.9.0
 
