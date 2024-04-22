@@ -9,6 +9,11 @@
 * `appraise()` was not passing the `ci_col` argument on `qq_plot()` and
   `worm_plot()`. Reported by Sate Ahmed.
 
+* Couldn't pass `mvn_method` on to posterior sampling functions from user facing
+  functions `fitted_samples()`, `posterior_samples()`, `smooth_samples()`,
+  `derivative_samples()`, and `repsonse_derivatives()`. Reported by @stefgehrig
+  #279
+
 # gratia 0.9.0
 
 ## Breaking changes
