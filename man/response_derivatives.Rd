@@ -26,6 +26,7 @@ response_derivatives(object, ...)
   n_sim = 10000,
   level = 0.95,
   seed = NULL,
+  mvn_method = c("mvnfast", "mgcv"),
   ...
 )
 }
@@ -74,6 +75,12 @@ simultaneous intervals.}
 credible interval. The default is \code{0.95} for a 95\% interval.}
 
 \item{seed}{numeric; a random seed for the simulations.}
+
+\item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
+uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
+numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
+for some marginal fits, such as those where the covariance matrix is close
+to singular.}
 }
 \value{
 A tibble, currently with the following variables:

@@ -9,7 +9,7 @@ posterior_samples(model, ...)
 
 \method{posterior_samples}{gam}(
   model,
-  n,
+  n = 1,
   data = newdata,
   seed = NULL,
   method = c("gaussian", "mh", "inla", "user"),
@@ -22,6 +22,7 @@ posterior_samples(model, ...)
   unconditional = FALSE,
   weights = NULL,
   draws = NULL,
+  mvn_method = c("mvnfast", "mgcv"),
   ...,
   newdata = NULL,
   ncores = NULL
@@ -64,7 +65,7 @@ Only used with \code{method = "mh"}.}
 Results in \code{thin * n} draws from the posterior being taken. Only used with
 \code{method = "mh"}.}
 
-\item{t_df}{numeric; degrees of freedome for t distribution proposals. Only
+\item{t_df}{numeric; degrees of freedom for t distribution proposals. Only
 used with \code{method = "mh"}.}
 
 \item{rw_scale}{numeric; Factor by which to scale posterior covariance
@@ -84,6 +85,12 @@ then defaults to \code{object[["prior.weights"]]}, otherwise a vector of ones.}
 
 \item{draws}{matrix; user supplied posterior draws to be used when
 \code{method = "user"}.}
+
+\item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
+uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
+numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
+for some marginal fits, such as those where the covariance matrix is close
+to singular.}
 
 \item{newdata}{Deprecated: use \code{data} instead.}
 

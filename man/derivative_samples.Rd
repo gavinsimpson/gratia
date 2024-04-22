@@ -28,6 +28,7 @@ derivative_samples(object, ...)
   seed = NULL,
   envir = environment(formula(object)),
   draws = NULL,
+  mvn_method = c("mvnfast", "mgcv"),
   ...
 )
 }
@@ -82,6 +83,12 @@ credible interval. The default is \code{0.95} for a 95\% interval.}
 
 \item{draws}{matrix; user supplied posterior draws to be used when
 \code{method = "user"}.}
+
+\item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
+uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
+numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
+for some marginal fits, such as those where the covariance matrix is close
+to singular.}
 }
 \value{
 A tibble, currently with the following variables:

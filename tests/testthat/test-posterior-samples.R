@@ -489,3 +489,31 @@ test_that("derivative_samples works for a NB GAM order 2", {
   expect_snapshot(print(sm_2), variant = "m_nb-backward-order-2")
   expect_snapshot(print(sm_3), variant = "m_nb-central-order-2")
 })
+
+test_that("fitted_samples can use mvn_method", {
+  skip_on_cran()
+  expect_silent(fs1 <- fitted_samples(m_tiny_eg1, n = 10, seed = 2,
+    mvn_method = "mgcv"))
+  expect_silent(fs2 <- fitted_samples(m_tiny_eg1, n = 10, seed = 2,
+    mvn_method = "mvnfast"))
+  expect_false(identical(fs1, fs2))
+})
+
+test_that("posterior samples can use mvn_method", {
+  skip_on_cran()
+  expect_silent(ps1 <- posterior_samples(m_tiny_eg1, n = 10, seed = 2,
+    mvn_method = "mgcv"))
+  expect_silent(ps2 <- posterior_samples(m_tiny_eg1, n = 10, seed = 2,
+    mvn_method = "mvnfast"))
+  expect_false(identical(ps1, ps2))
+})
+
+test_that("smooth samples can use mvn_method", {
+  skip_on_cran()
+  expect_silent(sm1 <- smooth_samples(m_tiny_eg1, n = 10, seed = 2,
+    mvn_method = "mgcv"))
+  expect_silent(sm2 <- smooth_samples(m_tiny_eg1, n = 10, seed = 2,
+    mvn_method = "mvnfast"))
+  expect_false(identical(sm1, sm2))
+})
+
