@@ -1061,6 +1061,11 @@
 #' @param level numeric; `0 < level < 1`; the coverage level of the
 #'   credible interval. The default is `0.95` for a 95% interval.
 #' @param seed numeric; a random seed for the simulations.
+#' @param mvn_method character; one of `"mvnfast"` or `"mgcv"`. The default is
+#'   uses `mvnfast::rmvn()`, which can be considerably faster at generate large
+#'   numbers of MVN random values than `mgcv::rmvn()`, but which might not work
+#'   for some marginal fits, such as those where the covariance matrix is close
+#'   to singular.
 #'
 #' @export
 #'
@@ -1145,11 +1150,15 @@
     n = 100, eps = 1e-7,
     n_sim = 10000, level = 0.95,
     seed = NULL,
+    mvn_method = c("mvnfast", "mgcv"),
     ...) {
+  method <- match.arg(method)
+  type <- match.arg(type)
+  mvn_method <- match.arg(mvn_method)
   yd <- derivative_samples(object,
     focal = focal, data = data, order = order,
     type = type, scale = scale, method = method, n = n, eps = eps,
-    n_sim = n_sim, seed = seed, ...
+    n_sim = n_sim, seed = seed, mvn_method = mvn_method, ...
   )
 
   qq <- (1 - level) / 2
