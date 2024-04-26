@@ -122,6 +122,7 @@
 #' @importFrom rlang set_names .data
 #' @importFrom dplyr bind_cols mutate across
 #' @importFrom tibble as_tibble is_tibble
+#' @importFrom tidyselect any_of
 `fit_vals_default` <- function(
     object, data, ci_level = 0.95,
     scale = "response", ...) {

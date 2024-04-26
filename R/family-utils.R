@@ -375,7 +375,8 @@ family_type.family <- function(object, ...) {
         which_eta = which_eta
       ),
       shash = shash_link(object, parameter, inverse = inverse),
-      cnorm = cnorm_link(object, parameter, inverse = inverse)
+      cnorm = cnorm_link(object, parameter, inverse = inverse),
+      elf   = elf_link(object, inverse = inverse)
     )
 
   ## return
@@ -389,6 +390,12 @@ family_type.family <- function(object, ...) {
   stop_if_not_family(family, type = "gaussian")
 
   parameter <- match.arg(parameter)
+
+  extract_link(family, inverse = inverse)
+}
+
+`elf_link` <- function(family, inverse = FALSE) {
+  stop_if_not_family(family, type = "elf")
 
   extract_link(family, inverse = inverse)
 }
