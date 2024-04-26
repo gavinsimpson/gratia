@@ -14,6 +14,8 @@
   `derivative_samples()`, and `repsonse_derivatives()`. Reported by @stefgehrig
   #279
 
+* `fitted_values()` works again for quantile GAMs fitted by `qgam()`.
+
 # gratia 0.9.0
 
 ## Breaking changes
