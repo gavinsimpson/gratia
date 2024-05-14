@@ -414,9 +414,15 @@
   # class(out) <- class(out)[-(1:2)]
 
   ## using se and crit, compute the lower and upper intervals
-  out <- add_column(out,
-    .lower_ci = out$.estimate - (out$.crit * out$.se),
-    .upper_ci = out$.estimate + (out$.crit * out$.se)
+  # out <- add_column(out,
+  #   .lower_ci = out$.estimate - (out$.crit * out$.se),
+  #   .upper_ci = out$.estimate + (out$.crit * out$.se)
+  # )
+
+  out <- mutate(out,
+    .estimate = .data$.estimate + const,
+    .lower_ci = .data$.estimate - (.data$.crit * .data$.se),
+    .upper_ci = .data$.estimate + (.data$.crit * .data$.se)
   )
 
   ## transform
@@ -428,8 +434,7 @@
   # smooth_estimates has columns in different places, relocate them to match
   # old output as much as possible
   out <- relocate(out, all_of(c(
-    ".estimate", ".se", ".crit", ".lower_ci",
-    ".upper_ci"
+    ".estimate", ".se", ".crit", ".lower_ci", ".upper_ci"
   )), .after = last_col())
 
   ## prepare for return
