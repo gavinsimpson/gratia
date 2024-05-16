@@ -27,6 +27,9 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      # Runs vdiffr test only on the latest version of R
+      VDIFFR_RUN_TESTS: ${{ matrix.config.os != 'macOS-latest'}}
+      VDIFFR_LOG_PATH: "../vdiffr.Rout.fail"
 
     steps:
       - uses: actions/checkout@v4
