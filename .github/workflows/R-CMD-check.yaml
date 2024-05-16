@@ -45,11 +45,11 @@ jobs:
       - uses: r-lib/actions/setup-tinytex@v2
       - run: tlmgr --version
       
-      - name: Install ghostscript and libcurl-devel on Linux
+      - name: Install ghostscript and libcurl dev on Linux
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get -y install ghostscript libcurl-devel
+          sudo apt-get -y install ghostscript libcurl4-openssl-dev
       
       - name: Install curl on macOS
         if: runner.os == 'macOS'
