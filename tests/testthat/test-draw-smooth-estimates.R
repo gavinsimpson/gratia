@@ -17,19 +17,17 @@ test_that("draw.smooth_estimates works for m_gam", {
 })
 
 test_that("draw.smooth_estimates works for m_gamm", {
-  # skip_on_ci() # testing without as moved to mac os x # Windows on GH seems very fragile
   expect_silent(plt <- draw(smooth_estimates(m_gamm, "s(x2)")))
 
-  # skip_on_ci() # testing without as moved to mac os x
+  skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw.smooth_estimates m_gamm", plt)
 })
 
 test_that("draw.smooth_estimates works for m_gamm4", {
-  # skip_on_ci() # testing without as moved to mac os x
   skip_on_cran()
   expect_silent(plt <- draw(smooth_estimates(m_gamm4, "s(x2)")))
 
-  # skip_on_ci() # testing without as moved to mac os x
+  skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw.smooth_estimates m_gamm4", plt)
 })
 

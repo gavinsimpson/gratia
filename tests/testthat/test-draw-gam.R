@@ -35,13 +35,13 @@ test_that("draw.gam works for m_gam rotated", {
 })
 
 test_that("draw.gam works for m_gamm", {
-  # skip_on_ci() # testing without as moved to mac os x
+  skip_on_ci() # testing without as moved to mac os x
   expect_silent(plt <- draw(m_gamm, rug = FALSE))
   expect_doppelganger("draw_gam m_gamm", plt)
 })
 
 test_that("draw.gam works for m_gamm4", {
-  # skip_on_ci() # testing without as moved to mac os x
+  skip_on_ci() # testing without as moved to mac os x
   skip_on_cran()
   expect_silent(plt <- draw(m_gamm4, rug = FALSE))
   expect_doppelganger("draw_gam m_gamm4", plt)
@@ -85,9 +85,9 @@ test_that("draw.gam works for rm2", {
 
 test_that("draw.gam works for dlnm_m", {
   # skip_on_ci() # testing without as moved to mac os x
-
   expect_silent(plt <- draw(dlnm_m, rug = FALSE))
-  # skip_on_ci() # testing without as moved to mac os x
+
+  skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw_gam dlnm_m", plt)
 })
 

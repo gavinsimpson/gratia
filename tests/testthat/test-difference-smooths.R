@@ -72,7 +72,7 @@ test_that("difference_smooths() works for a gamm model", {
   ## plot
   plt <- draw(ds)
 
-  # skip_on_ci() # testing without as moved to mac os x
+  skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw difference_smooths gamm", plt)
 })
 

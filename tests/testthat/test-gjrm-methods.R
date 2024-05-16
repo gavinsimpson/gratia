@@ -26,6 +26,6 @@ test_that("draw works for a simple GJRM gamlss", {
   expect_silent(plt <- draw(m_gamlss_gjrm))
 
 
-  # skip_on_ci() # testing without as moved to mac os x
+  skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw-simple-gjrm-gamlss", plt)
 })

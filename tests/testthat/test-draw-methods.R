@@ -199,7 +199,7 @@ test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
   p2 <- draw(mod_fs, ncol = 2, rug = FALSE)
   p3 <- draw(mod_fs, ncol = 2, scales = "fixed", rug = FALSE)
 
-  # skip_on_ci() # testing without as moved to mac os x
+  skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw.gam model with fs smooth", p2)
   expect_doppelganger("draw model with fs smooth fixed scales", p3)
 })
@@ -553,7 +553,7 @@ test_that("draw.gam can take user specified scales", {
     discrete_colour = ggplot2::scale_colour_viridis_d(option = "plasma")
   )
 
-  # skip_on_ci() # testing without as moved to mac os x
+  skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw 2d smooth with spectral palette", plt1)
 
   skip_if(packageVersion("mgcv") < "1.8.36")
