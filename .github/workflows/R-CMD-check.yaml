@@ -45,11 +45,11 @@ jobs:
       - uses: r-lib/actions/setup-tinytex@v2
       - run: tlmgr --version
       
-      - name: Install ghostscript
+      - name: Install ghostscript and libcurl-devel
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get -y install ghostscript
+          sudo apt-get -y install ghostscript libcurl-devel
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
