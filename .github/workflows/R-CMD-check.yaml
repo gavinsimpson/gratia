@@ -51,8 +51,8 @@ jobs:
           sudo apt-get update
           sudo apt-get -y install ghostscript libcurl-devel
       
-      - name: Install curll on macOS
-        if: runner.os == "macOS"
+      - name: Install curl on macOS
+        if: runner.os == 'macOS'
         run: |
           brew install curl
 
