@@ -53,7 +53,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck, Matrix
+          extra-packages: any::rcmdcheck, lme4
           pak-version: devel
           needs: check
 
