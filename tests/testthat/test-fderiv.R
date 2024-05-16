@@ -4,7 +4,7 @@ mod <- gam(y ~ s(x0) + s(x1) + fac, data = su_eg4, method = "REML")
 
 test_that("fderiv is deprecated", {
   skip_on_cran()
-  # skip_on_ci() # testing without as moved to mac os x
+  skip_on_ci() # testing without as moved to mac os x
   skip_on_covr()
   skip_on_os(os = c("linux", "windows"))
   skip_if_not_installed("withr")

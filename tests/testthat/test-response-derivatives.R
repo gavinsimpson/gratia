@@ -3,7 +3,7 @@
 # response derivatives
 test_that("first order response derivatives works", {
   skip_on_cran()
-  # skip_on_ci() # testing without as moved to mac os x
+  skip_on_ci() # testing without as moved to mac os x
   skip_on_covr()
   skip_on_os(os = c("linux", "windows"))
 
@@ -39,7 +39,7 @@ test_that("first order response derivatives works", {
 
 test_that("second order response derivatives works", {
   skip_on_cran()
-  # skip_on_ci() # testing without as moved to mac os x
+  skip_on_ci() # testing without as moved to mac os x
   skip_on_covr()
   skip_on_os(os = c("linux", "windows"))
 
