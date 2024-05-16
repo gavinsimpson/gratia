@@ -45,16 +45,16 @@ jobs:
       - uses: r-lib/actions/setup-tinytex@v2
       - run: tlmgr --version
       
-      - name: Install ghostscript and libcurl dev on Linux
+      - name: Install ghostscript on Linux
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get -y install ghostscript libcurl4-openssl-dev
+          sudo apt-get -y install ghostscript
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck, lme4
-          pak-version: devel
+          extra-packages: any::rcmdcheck, lme4=?source
+          pak-version: stable
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
