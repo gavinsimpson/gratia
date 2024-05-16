@@ -50,11 +50,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get -y install ghostscript libcurl4-openssl-dev
-      
-      - name: Install curl on macOS
-        if: runner.os == 'macOS'
-        run: |
-          brew install curl
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
