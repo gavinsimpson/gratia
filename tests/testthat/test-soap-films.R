@@ -5,7 +5,7 @@ test_that("draw for gam can plot a so soap film", {
   expect_silent(plt_so <- draw(m_soap))
 
   skip_on_cran()
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw.gam so soap film", plt_so)
 })
 
@@ -20,7 +20,7 @@ test_that("smooth estimates can evaluate a so soap film", {
   expect_identical(nrow(sm_so), as.integer((100 * 100) + n_pts[1L]))
 
   skip_on_cran()
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_snapshot(print(sm_so))
 })
 
@@ -29,6 +29,6 @@ test_that("draw for smooth estimates can plot a so soap film", {
   expect_silent(plt_so <- smooth_estimates(m_soap) |> draw())
 
   skip_on_cran()
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw.smooth_estimates so soap film", plt_so)
 })

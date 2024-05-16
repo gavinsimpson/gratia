@@ -126,6 +126,6 @@ test_that("issue 212 remains fixed", {
 
   plt <- draw(peff, rug = FALSE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("testing issue 212", plt)
 })

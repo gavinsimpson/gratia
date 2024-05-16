@@ -433,7 +433,7 @@ test_that("derivatives() works for factor by smooths issue 47", {
   expect_named(d, c(deriv_nms, "x2", "x0", "fac"))
   plt4 <- draw(d)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   skip_on_covr()
   expect_doppelganger("draw issue 47 derivatives for factor by", plt1)
   expect_doppelganger("draw issue 47 derivatives for complex factor by", plt2)
@@ -472,7 +472,7 @@ test_that("derivatives() works for fs smooths issue 57", {
   expect_s3_class(fd, "tbl_df")
   expect_named(fd, c(deriv_nms, "t", "unit"))
   plt <- draw(fd) # FIXME: need to update draw(d) so it works with fs smooths
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw issue 57 derivatives for factor by", plt)
 })
 

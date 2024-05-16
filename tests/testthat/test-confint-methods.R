@@ -167,7 +167,6 @@ test_that("Simultaneous interval for a GAMM works", {
 ## test snapshots...
 test_that("confint.fderiv example output", {
   skip_on_cran()
-  skip_on_os("mac")
   skip_on_os("win")
 
   skip_if_not_installed("withr")
@@ -195,6 +194,6 @@ test_that("confint.fderiv example output", {
     )
   )
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_snapshot_output(x2_sint)
 })

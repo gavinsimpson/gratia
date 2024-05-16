@@ -10,7 +10,7 @@ test_that("variance_comp works for a gam", {
   expect_identical(nrow(vc), 5L)
   expect_named(vc, expected = var_nms)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   skip_on_cran()
   expect_snapshot(print(vc))
 })
@@ -22,7 +22,7 @@ test_that("variance_comp works for a gam with rescaling", {
   expect_identical(nrow(vc), 5L)
   expect_named(vc, expected = var_nms)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   skip_on_cran()
   expect_snapshot(print(vc))
 })
@@ -34,7 +34,7 @@ test_that("variance_comp works for a single term gam", {
   expect_identical(nrow(vc), 2L)
   expect_named(vc, expected = var_nms)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   skip_on_cran()
   expect_snapshot(print(vc))
 })
@@ -46,7 +46,7 @@ test_that("variance_comp works for a continuous by gam", {
   expect_identical(nrow(vc), 2L)
   expect_named(vc, expected = var_nms)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   skip_on_cran()
   expect_snapshot(print(vc))
 })
@@ -58,7 +58,7 @@ test_that("variance_comp works for a factor by gam", {
   expect_identical(nrow(vc), 5L)
   expect_named(vc, expected = var_nms)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   skip_on_cran()
   expect_snapshot(print(vc))
 })

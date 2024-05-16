@@ -3,7 +3,7 @@
 test_that("draw() works with continuous by", {
   plt <- draw(su_m_cont_by)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("continuous by-variable smmoth", plt)
 })
 
@@ -57,7 +57,7 @@ test_that("draw.gam works with select and parametric = TRUE", {
     data = df_2_fac, envir = teardown_env()
   )
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger(
     "draw.gam-user-select-and-parametric-true",
     plt

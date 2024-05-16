@@ -6,7 +6,6 @@ test_that("draw works for a simple GJRM gamlss", {
   skip_if_not_installed("GJRM", minimum_version = "0.2-6")
   skip_on_cran()
   skip_on_os("win")
-  skip_on_os("mac")
 
   # follow example from ?GJRM::gamlss
   suppressPackageStartupMessages(library("GJRM"))
@@ -27,6 +26,6 @@ test_that("draw works for a simple GJRM gamlss", {
   expect_silent(plt <- draw(m_gamlss_gjrm))
 
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw-simple-gjrm-gamlss", plt)
 })

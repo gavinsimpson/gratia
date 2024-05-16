@@ -7,7 +7,7 @@ test_that("difference_smooths() works for a gam model", {
   ## plot
   plt <- draw(ds)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw difference_smooths gam", plt)
 })
 
@@ -21,7 +21,7 @@ test_that("difference_smooths() works for a gam model including group means", {
   ## plot
   plt <- draw(ds)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw difference_smooths gam inc grp means", plt)
 })
 
@@ -32,7 +32,7 @@ test_that("difference_smooths() works for a gam model fixed scales", {
   ## plot
   plt <- draw(ds, scales = "fixed")
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw difference_smooths gam fixed scales", plt)
 })
 
@@ -43,7 +43,7 @@ test_that("difference_smooths() works for a gam model fixed scales", {
   ## plot
   plt <- draw(ds, ref_line = TRUE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw difference_smooths gam ref line", plt)
 })
 
@@ -57,13 +57,13 @@ test_that("difference_smooths() works for a bam model", {
   ## plot
   plt <- draw(ds)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw difference_smooths bam", plt)
 })
 
 test_that("difference_smooths() works for a gamm model", {
   skip_on_cran()
-  skip_on_os(c("windows", "mac"))
+  skip_on_os(c("windows"))
   expect_silent(ds <- difference_smooths(su_m_factor_by_gamm,
     select = "s(x2)"
   ))
@@ -72,13 +72,13 @@ test_that("difference_smooths() works for a gamm model", {
   ## plot
   plt <- draw(ds)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw difference_smooths gamm", plt)
 })
 
 test_that("difference_smooths() works for a gamm4 model", {
   skip_on_cran()
-  skip_on_os(c("windows", "mac"))
+  skip_on_os(c("windows"))
   expect_silent(ds <- difference_smooths(su_m_factor_by_gamm4,
     select = "s(x2)"
   ))
@@ -87,7 +87,7 @@ test_that("difference_smooths() works for a gamm4 model", {
   ## plot
   plt <- draw(ds)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw difference_smooths gamm4", plt)
 })
 
@@ -107,7 +107,7 @@ test_that("difference_smooths() works with user data", {
   ## plot
   plt <- draw(ds)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw difference_smooths gam user data", plt)
 })
 
@@ -122,10 +122,9 @@ test_that("difference_smooths() works for a bivariate gam", {
   plt1 <- draw(ds)
 
   ## plot
-  skip_on_os("mac")
   plt2 <- draw(ds, contour = TRUE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw difference_smooths bivariate gam", plt1)
   expect_doppelganger("draw difference_smooths bivariate gam contours", plt2)
 })
@@ -151,6 +150,6 @@ test_that("difference smooths works with a decomposed model issue 223", {
   expect_silent(d <- difference_smooths(m_223, select = sm_take, n = 50))
   expect_identical(nrow(d), 7500L) # 3 comparisons * 50 * 50 grid
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_snapshot(print(d))
 })

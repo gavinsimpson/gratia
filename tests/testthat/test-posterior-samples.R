@@ -14,7 +14,7 @@ test_that("smooth_samples works for a continuous by GAM", {
   # 9 cols, 8 for univariate smooths + 1 for cont by var
   expect_identical(NCOL(sm), 9L)
   skip_on_cran()
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_snapshot(sm)
 })
 
@@ -31,7 +31,7 @@ test_that("smooth_samples works for a simple GAM", {
   expect_identical(NROW(sm), 500L)
   expect_identical(NCOL(sm), 8L) # 8 cols, univatiate smooths
   skip_on_cran()
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_snapshot(sm)
 })
 
@@ -48,7 +48,7 @@ test_that("smooth_samples works for a simple GAM multi rng calls", {
   expect_identical(NROW(sm), 500L)
   expect_identical(NCOL(sm), 8L) # 8 cols, univatiate smooths
   skip_on_cran()
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_snapshot(sm)
 })
 
@@ -266,8 +266,7 @@ test_that("posterior_samples() fails if no suitable method available", {
 
 test_that("fitted_samples example output doesn't change", {
   skip_on_cran()
-  # skip_on_os("mac")
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
 
   fs <- fitted_samples(m_gam, n = 5, seed = 42)
   expect_snapshot(fs)
@@ -275,8 +274,7 @@ test_that("fitted_samples example output doesn't change", {
 
 test_that("smooth_samples example output doesn't change", {
   skip_on_cran()
-  # skip_on_os("mac")
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
 
   samples <- smooth_samples(m_gam, select = "s(x0)", n = 5, seed = 42)
   expect_snapshot(samples)
@@ -309,7 +307,7 @@ test_that("posterior_samples works for a multi-smooth tweedie GAM", {
 # test for offset handling
 test_that("posterior sampling funs work with offsets in formula issue 233", {
   skip_on_cran()
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
 
   n <- 100
   df <- withr::with_seed(123, {
@@ -336,12 +334,15 @@ test_that("posterior sampling funs work with offsets in formula issue 233", {
 })
 
 test_that("derivative_samples works for a simple GAM", {
-  expect_silent(sm <- derivative_samples(m_1_smooth,
-    n = 5, seed = 42,
-    type = "central", focal = "x0", eps = 0.01, n_sim = 10,
-    data = quick_eg1,
-    envir = teardown_env()
-  ))
+  expect_silent(
+    sm <- derivative_samples(m_1_smooth,
+      n = 5,
+      seed = 42,
+      type = "central", focal = "x0", eps = 0.01, n_sim = 10,
+      data = quick_eg1,
+      envir = teardown_env()
+    )
+  )
   expect_s3_class(sm, c(
     "derivative_samples", "tbl_df",
     "tbl", "data.frame"
@@ -354,112 +355,137 @@ test_that("derivative_samples works for a simple GAM", {
     "x0"
   ))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   skip_on_cran()
   expect_snapshot(print(sm), variant = "m_1_smooth")
 })
 
 test_that("derivative_samples works for a NB GAM", {
-  expect_silent(sm <- derivative_samples(m_nb,
-    n = 5, seed = 42,
-    type = "forward", focal = "x0", eps = 0.01, n_sim = 10,
-    data = quick_eg1,
-    envir = teardown_env()
-  ))
+  expect_silent(
+    ds_m_nb <- data_slice(df_pois, x0 = evenly(x0))
+  )
+  expect_silent(
+    sm <- derivative_samples(
+      m_nb,
+      n = 5,
+      seed = 42,
+      type = "forward", focal = "x0", eps = 0.01, n_sim = 10,
+      data = ds_m_nb
+    )
+  )
   expect_s3_class(sm, c(
     "derivative_samples", "tbl_df",
     "tbl", "data.frame"
   ))
-  ## 3000 == nrow(quick_eg) * n_sim == 300 * 10
-  expect_identical(NROW(sm), 3000L)
+  ## 1000 == nrow(ds_m_nb) * n_sim == 100 * 10
+  expect_identical(NROW(sm), 1000L)
   expect_identical(NCOL(sm), 8L) # 5 cols
   expect_named(sm, expected = c(
     ".row", ".focal", ".draw", ".derivative",
     "x0", "x1", "x2", "x3"
   ))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   skip_on_cran()
   expect_snapshot(print(sm), variant = "m_nb-forward")
 })
 
 test_that("derivative_samples works for a NB GAM, central, backward", {
   skip_on_cran()
+  expect_silent(
+    ds_m_nb <- data_slice(df_pois, x0 = evenly(x0))
+  )
 
-  expect_silent(sm_1 <- derivative_samples(m_nb,
-    n = 5, seed = 42,
-    type = "backward", focal = "x0", eps = 0.01, n_sim = 10,
-    data = quick_eg1,
-    envir = teardown_env()
-  ))
+  expect_silent(
+    sm_1 <- derivative_samples(
+      m_nb,
+      n = 5,
+      seed = 42,
+      type = "backward", focal = "x0", eps = 0.01, n_sim = 10,
+      data = ds_m_nb
+    )
+  )
   expect_s3_class(sm_1, c(
     "derivative_samples", "tbl_df",
     "tbl", "data.frame"
   ))
-  ## 3000 == nrow(quick_eg) * n_sim == 300 * 10
-  expect_identical(NROW(sm_1), 3000L)
+  ## 1000 == nrow(ds_m_nb) * n_sim == 100 * 10
+  expect_identical(NROW(sm_1), 1000L)
   expect_identical(NCOL(sm_1), 8L) # 8 cols
   expect_named(sm_1, expected = c(
     ".row", ".focal", ".draw", ".derivative",
     "x0", "x1", "x2", "x3"
   ))
 
-  expect_silent(sm_2 <- derivative_samples(m_nb,
-    n = 5, seed = 42,
-    type = "central", focal = "x0", eps = 0.01, n_sim = 10,
-    data = quick_eg1,
-    envir = teardown_env()
-  ))
+  expect_silent(
+    sm_2 <- derivative_samples(
+      m_nb,
+      n = 5,
+      seed = 42,
+      type = "central", focal = "x0", eps = 0.01, n_sim = 10,
+      data = ds_m_nb
+    )
+  )
   expect_s3_class(sm_2, c(
     "derivative_samples", "tbl_df",
     "tbl", "data.frame"
   ))
-  ## 3000 == nrow(quick_eg) * n_sim == 300 * 10
-  expect_identical(NROW(sm_2), 3000L)
+  ## 1000 == nrow(ds_m_nb) * n_sim == 100 * 10
+  expect_identical(NROW(sm_2), 1000L)
   expect_identical(NCOL(sm_2), 8L) # 8 cols
   expect_named(sm_2, expected = c(
     ".row", ".focal", ".draw", ".derivative",
     "x0", "x1", "x2", "x3"
   ))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_snapshot(print(sm_1), variant = "m_nb-backward")
   expect_snapshot(print(sm_2), variant = "m_nb-central")
 })
 
 test_that("derivative_samples works for a NB GAM order 2", {
   skip_on_cran()
+  expect_silent(
+    ds_m_nb <- data_slice(df_pois, x0 = evenly(x0))
+  )
 
-  expect_silent(sm_1 <- derivative_samples(m_nb,
-    n = 5, seed = 42,
-    type = "forward", focal = "x0", eps = 0.01, n_sim = 10,
-    data = quick_eg1, order = 2,
-    envir = teardown_env()
-  ))
+  expect_silent(
+    sm_1 <- derivative_samples(m_nb,
+      n = 5,
+      seed = 42,
+      type = "forward",
+      focal = "x0", eps = 0.01, n_sim = 10,
+      data = ds_m_nb,
+      order = 2
+    )
+  )
   expect_s3_class(sm_1, c(
     "derivative_samples", "tbl_df",
     "tbl", "data.frame"
   ))
-  ## 3000 == nrow(quick_eg) * n_sim == 300 * 10
-  expect_identical(NROW(sm_1), 3000L)
+  ## 1000 == nrow(ds_m_nb) * n_sim == 100 * 10
+  expect_identical(NROW(sm_1), 1000L)
   expect_identical(NCOL(sm_1), 8L) # 8 cols
   expect_named(sm_1, expected = c(
     ".row", ".focal", ".draw", ".derivative",
     "x0", "x1", "x2", "x3"
   ))
 
-  expect_silent(sm_2 <- derivative_samples(m_nb,
-    n = 5, seed = 42,
-    type = "backward", focal = "x0", eps = 0.01, n_sim = 10,
-    data = quick_eg1, order = 2,
-    envir = teardown_env()
-  ))
+  expect_silent(
+    sm_2 <- derivative_samples(
+      m_nb,
+      n = 5,
+      seed = 42,
+      type = "backward", focal = "x0", eps = 0.01, n_sim = 10,
+      data = ds_m_nb, order = 2
+    )
+  )
   expect_s3_class(sm_2, c(
     "derivative_samples", "tbl_df",
     "tbl", "data.frame"
   ))
-  ## 3000 == nrow(quick_eg) * n_sim == 300 * 10
-  expect_identical(NROW(sm_2), 3000L)
+  ## 1000 == nrow(ds_m_nb) * n_sim == 100 * 10
+  expect_identical(NROW(sm_2), 1000L)
   expect_identical(NCOL(sm_2), 8L) # 8 cols
   expect_named(sm_2, expected = c(
     ".row", ".focal", ".draw", ".derivative",
@@ -469,22 +495,21 @@ test_that("derivative_samples works for a NB GAM order 2", {
   expect_silent(sm_3 <- derivative_samples(m_nb,
     n = 5, seed = 42,
     type = "central", focal = "x0", eps = 0.01, n_sim = 10,
-    data = quick_eg1, order = 2,
-    envir = teardown_env()
+    data = ds_m_nb, order = 2
   ))
   expect_s3_class(sm_3, c(
     "derivative_samples", "tbl_df",
     "tbl", "data.frame"
   ))
-  ## 3000 == nrow(quick_eg) * n_sim == 300 * 10
-  expect_identical(NROW(sm_3), 3000L)
+  ## 1000 == nrow(ds_m_nb) * n_sim == 100 * 10
+  expect_identical(NROW(sm_3), 1000L)
   expect_identical(NCOL(sm_3), 8L) # 8 cols
   expect_named(sm_3, expected = c(
     ".row", ".focal", ".draw", ".derivative",
     "x0", "x1", "x2", "x3"
   ))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_snapshot(print(sm_1), variant = "m_nb-forward-order-2")
   expect_snapshot(print(sm_2), variant = "m_nb-backward-order-2")
   expect_snapshot(print(sm_3), variant = "m_nb-central-order-2")

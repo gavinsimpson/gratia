@@ -3,7 +3,7 @@
 test_that("draw.gam works with numeric select", {
   plt1 <- draw(su_m_quick_eg1, select = 2, rug = FALSE)
   plt2 <- draw(su_m_quick_eg1, select = c(1, 2), rug = FALSE)
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw gam smooth for selected smooth numeric", plt1)
   expect_doppelganger("draw gam smooth for two selected smooths numeric", plt2)
 })
@@ -32,7 +32,7 @@ test_that("draw.gam works with character select", {
   plt1 <- draw(su_m_quick_eg1, select = "s(x1)", rug = FALSE)
   plt2 <- draw(su_m_quick_eg1, select = c("s(x0)", "s(x1)"), rug = FALSE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw gam smooth for selected smooth character", plt1)
   expect_doppelganger(
     "draw gam smooth for two selected smooths character",
@@ -45,7 +45,7 @@ test_that("draw.gam works with logical select single smooth", {
     select = c(TRUE, rep(FALSE, 3)),
     rug = FALSE
   )
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw gam smooth for selected smooth logical", plt)
 })
 
@@ -54,7 +54,7 @@ test_that("draw.gam works with logical select two smooths", {
     select = rep(c(TRUE, FALSE), each = 2),
     rug = FALSE
   )
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw gam smooth for two selected smooths logical", plt)
 })
 
@@ -68,7 +68,7 @@ test_that("draw.gam works with partial_match", {
     fixed = TRUE
   )
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw gam with partial match TRUE", plt)
 })
 
@@ -96,7 +96,7 @@ test_that("draw.gam works with select and parametric", {
     data = su_eg4, envir = teardown_env()
   )
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw gam with select and parametric is NULL", plt1)
   expect_doppelganger("draw gam with select and parametric is FALSE", plt2)
   expect_doppelganger("draw gam with select and parametric is TRUE", plt3)
@@ -108,7 +108,7 @@ test_that("draw.gam() plots a simple multi-smooth AM", {
   plt1 <- draw(su_m_quick_eg1, rug = FALSE)
   plt2 <- draw(su_m_quick_eg1, scales = "fixed", rug = FALSE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw simple multi-smooth AM", plt1)
   expect_doppelganger("draw simple multi-smooth AM with fixed scales", plt2)
 })
@@ -117,17 +117,16 @@ test_that("draw.gam() can draw partial residuals", {
   plt1 <- draw(m_tiny_eg1, residuals = TRUE, rug = FALSE)
   plt2 <- draw(m_tiny_eg1, residuals = TRUE, scales = "fixed", rug = FALSE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw simple partial residuals", plt1)
   expect_doppelganger("draw simple partial residuals with fixed scales", plt2)
 })
 
 test_that("draw.gam() plots an AM with a single 2d smooth", {
-  skip_on_os("mac")
   skip_on_os("windows")
   plt <- draw(su_m_bivar, n = 50, rug = FALSE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw AM with 2d smooth", plt)
 })
 
@@ -135,20 +134,20 @@ test_that("draw.gam() plots an AM with a single factor by-variable smooth", {
   plt1 <- draw(su_m_factor_by, rug = FALSE)
   plt2 <- draw(su_m_factor_by, scales = "fixed", rug = FALSE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw AM with factor by-variable smooth", plt1)
   expect_doppelganger("draw factor by-variable smooth with fixed scales", plt2)
 })
 
 test_that("draw() works with continuous by", {
   plt <- draw(su_m_cont_by, rug = FALSE, n = 50)
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw with continuous by-variable smooth", plt)
 })
 
 test_that("draw() works with continuous by and fixed scales", {
   plt <- draw(su_m_cont_by, scales = "fixed", rug = FALSE, n = 50)
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw with continuous by-var fixed scale", plt)
 })
 
@@ -156,7 +155,7 @@ test_that("draw() works with random effect smooths (bs = 're')", {
   p2 <- draw(rm1, ncol = 3, rug = FALSE)
   p3 <- draw(rm1, ncol = 3, scales = "fixed", rug = FALSE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw.gam model with ranef smooth", p2)
   expect_doppelganger("draw model with ranef smooth fixed scales", p3)
 })
@@ -165,7 +164,7 @@ test_that("draw() with random effect smooths (bs = 're') & factor by variable ",
   p2 <- draw(rm2, ncol = 3, rug = FALSE)
   p3 <- draw(rm2, ncol = 3, scales = "fixed", rug = FALSE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw.gam model with ranef smooth factor by", p2)
   expect_doppelganger("draw with ranef smooth factor by fixed scales", p3)
 })
@@ -190,18 +189,17 @@ test_that("draw() can handle non-standard names -- a function call as a name", {
   ## not the correct `log2(time)`
   fit <- gam(y ~ s(log2(time)), data = df, method = "REML")
   p1 <- draw(fit)
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw.gam model with non-standard names", p1)
 })
 
 test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
-  # skip_on_os("mac") # try without this and check on Simon's mac system
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   skip_if(packageVersion("mgcv") < "1.8.36")
   p2 <- draw(mod_fs, ncol = 2, rug = FALSE)
   p3 <- draw(mod_fs, ncol = 2, scales = "fixed", rug = FALSE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw.gam model with fs smooth", p2)
   expect_doppelganger("draw model with fs smooth fixed scales", p3)
 })
@@ -270,7 +268,7 @@ test_that("draw() works with parametric terms", {
     fixed = TRUE
   )
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw with linear parametric term", p1)
   expect_doppelganger("draw.gam with linear parametric term", p2)
   expect_doppelganger("draw.gam with factor parametric term", p3)
@@ -279,18 +277,18 @@ test_that("draw() works with parametric terms", {
 test_that("component-wise CIs work without seWithMean", {
   plt <- draw(su_m_univar_4, overall_uncertainty = FALSE, rug = FALSE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw gam with overall_uncertainty false", plt)
 })
 
 test_that("draw.derivates() plots derivatives for a GAM", {
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
 
   d1 <- derivatives(su_m_univar_4, type = "central", n = 200)
   plt1 <- draw(d1)
   plt2 <- draw(d1, scales = "fixed")
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw derivatives for a GAM", plt1)
   expect_doppelganger("draw derivatives for a GAM with fixed scales", plt2)
 })
@@ -298,13 +296,13 @@ test_that("draw.derivates() plots derivatives for a GAM", {
 test_that("draw.derivates plots derivatives with change indicators", {
   # not on CRAN
   skip_on_cran()
-  skip_on_ci() # causing trivial failures on GH
+  # skip_on_ci() # testing without as moved to mac os x # causing trivial failures on GH
 
   d1 <- derivatives(m_gam, type = "central", n = 200)
   expect_silent(plt1 <- draw(d1, add_change = TRUE))
   expect_silent(plt2 <- draw(d1, add_change = TRUE, change_type = "sizer"))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw derivatives for a GAM with default change", plt1)
   expect_doppelganger("draw derivatives for a GAM with sizer change", plt2)
 })
@@ -315,7 +313,7 @@ test_that("draw.derivates() plots derivatives for a GAM rotated labels", {
   plt1 <- draw(d1, angle = 45)
   plt2 <- draw(d1, scales = "fixed", angle = 45)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw derivatives for a GAM rotated labels", plt1)
   expect_doppelganger(
     "draw derivatives for a GAM with fixed scales rotated",
@@ -332,7 +330,7 @@ test_that("draw plots partial derivatives for a GAM", {
 
   plt2 <- draw(d1, scales = "fixed")
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw partial derivatives for a GAM", plt1)
   expect_doppelganger(
     "draw partial derivatives for a GAM with fixed scales",
@@ -349,7 +347,7 @@ test_that("draw plots partial derivs for GAM rotated labels", {
   plt1 <- draw(d1, angle = 45)
   plt2 <- draw(d1, scales = "fixed", angle = 45)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger(
     "draw partial derivatives for GAM rotated labels",
     plt1
@@ -363,27 +361,27 @@ test_that("draw plots partial derivs for GAM rotated labels", {
 ## test that issue 39 stays fixed
 test_that("draw.gam doesn't create empty plots with multiple parametric terms", {
   plt <- draw(m_2_fac, rug = FALSE)
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw issue 39 empty plots", plt)
 })
 
 test_that("draw.mgcv_smooth() can plot basic smooth bases", {
   skip_on_cran()
-  skip_on_ci() # sign differences due to eigendecomposition in TPRS
+  # skip_on_ci() # testing without as moved to mac os x # sign differences due to eigendecomposition in TPRS
 
   bs <- basis(s(x0), data = quick_eg1)
   plt <- draw(bs)
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw basic tprs basis", plt)
 })
 
 test_that("draw.mgcv_smooth() can plot basic smooth bases with rotated labels", {
   skip_on_cran()
-  skip_on_ci() # sign differences due to eigendecomposition in TPRS
+  # skip_on_ci() # testing without as moved to mac os x # sign differences due to eigendecomposition in TPRS
 
   bs <- basis(s(x0), data = quick_eg1)
   plt <- draw(bs, angle = 45)
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw basic tprs basis rotated", plt)
 })
 
@@ -391,20 +389,20 @@ test_that("draw.mgcv_smooth() can plot by factor basis smooth bases", {
   bs <- basis(s(x2, by = fac), data = su_eg4)
   plt <- draw(bs)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   skip_on_cran()
   expect_doppelganger("draw by factor basis", plt)
 })
 
 test_that("draw() works with a ziplss models; issue #45", {
   plt <- draw(m_ziplss, rug = FALSE)
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw ziplss parametric terms issue 45", plt)
 })
 
 test_that("draw works for sample_smooths objects", {
   skip_on_cran()
-  skip_on_ci() # minor statistical differences
+  # skip_on_ci() # testing without as moved to mac os x # minor statistical differences
 
   sm1 <- smooth_samples(su_m_univar_4, n = 5, seed = 23478, n_vals = 50)
   plt1 <- draw(sm1, alpha = 0.7, n_samples = 5, seed = 2635, rug = FALSE)
@@ -421,7 +419,7 @@ test_that("draw works for sample_smooths objects", {
     seed = 2635, rug = FALSE
   )
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw smooth_samples for GAM m1", plt1)
   expect_doppelganger("draw smooth_samples for GAM m2", plt2)
   expect_doppelganger("draw smooth_samples for GAM m3", plt3)
@@ -430,7 +428,7 @@ test_that("draw works for sample_smooths objects", {
 
 test_that("draw works for sample_smooths objects rotated labels", {
   skip_on_cran()
-  skip_on_ci() # minor statistical differences
+  # skip_on_ci() # testing without as moved to mac os x # minor statistical differences
 
   sm1 <- smooth_samples(su_m_univar_4, n = 5, seed = 23478, n_vals = 50)
   plt1 <- draw(sm1,
@@ -456,7 +454,7 @@ test_that("draw works for sample_smooths objects rotated labels", {
     angle = 45, rug = FALSE
   )
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw smooth_samples for GAM m1 rotated", plt1)
   expect_doppelganger("draw smooth_samples for GAM m2 rotated", plt2)
   expect_doppelganger("draw smooth_samples for GAM m3 rotated", plt3)
@@ -468,17 +466,16 @@ test_that("draw works for sample_smooths objects rotated labels", {
 
 test_that("draw works for smooth_samples objects", {
   skip_on_os("win")
-  skip_on_os("mac")
   sm2 <- smooth_samples(su_m_bivar, n = 2, seed = 23478, n_vals = 50)
   plt <- draw(sm2, alpha = 0.7, contour = TRUE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw smooth_samples for bivariate GAM contours", plt)
 })
 
 test_that("draw works for sample_smooths objects with n_samples", {
   skip_on_cran()
-  skip_on_ci() # minor statistical differences
+  # skip_on_ci() # testing without as moved to mac os x # minor statistical differences
 
   sm1 <- smooth_samples(su_m_univar_4, n = 5, seed = 23478, n_vals = 50)
   plt1 <- draw(sm1, alpha = 0.7, n_samples = 3, rug = FALSE, seed = 1)
@@ -489,7 +486,7 @@ test_that("draw works for sample_smooths objects with n_samples", {
   sm3 <- smooth_samples(su_m_factor_by, n = 5, seed = 23478, n_vals = 50)
   plt3 <- draw(sm3, alpha = 0.7, n_samples = 3, rug = FALSE, seed = 19)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw smooth_samples for m1 n_samples", plt1)
   expect_doppelganger("draw smooth_samples for m2 n_samples", plt2)
   expect_doppelganger("draw smooth_samples for GAM n_samples", plt3)
@@ -497,7 +494,7 @@ test_that("draw works for sample_smooths objects with n_samples", {
 
 test_that("draw works for sample_smooths objects with user specified smooth", {
   skip_on_cran()
-  skip_on_ci() # minor statistical differences
+  # skip_on_ci() # testing without as moved to mac os x # minor statistical differences
 
   sm3 <- smooth_samples(su_m_factor_by, n = 5, seed = 23478, n_vals = 50)
   plt1 <- draw(sm3, select = "s(x0)", alpha = 0.7, rug = FALSE)
@@ -507,7 +504,7 @@ test_that("draw works for sample_smooths objects with user specified smooth", {
     rug = FALSE
   )
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger(
     "draw selected factor by smooth_samples for GAM m3",
     plt2
@@ -521,18 +518,18 @@ test_that("draw() can handle a mixture of numeric and factor random effects", {
   m <- gam(y ~ s(x2, fac, bs = "re"), data = df, method = "REML")
   plt <- draw(m)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("issue 22 draw with mixed random effects", plt)
 })
 
 test_that("draw.gam uses fixed scales if asked for them: #73", {
   skip_on_cran()
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   df <- data_sim("eg1", n = 1000, seed = 1)
   m <- gam(y ~ s(x1) + s(x2) + ti(x1, x2), data = su_eg1, method = "REML")
   plt <- draw(m, scales = "fixed", rug = FALSE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger(
     "issue 73 draw uses fixed scales if asked for them",
     plt
@@ -541,7 +538,7 @@ test_that("draw.gam uses fixed scales if asked for them: #73", {
 
 test_that("draw.gam can take user specified scales", {
   skip_on_os(os = "win")
-  skip_on_os(os = "mac") # trivial diffs in contours
+  # skip_on_os(os = "mac") # trivial diffs in contours
   plt1 <- draw(su_m_bivar,
     rug = FALSE,
     continuous_fill = scale_fill_distiller(
@@ -556,7 +553,7 @@ test_that("draw.gam can take user specified scales", {
     discrete_colour = ggplot2::scale_colour_viridis_d(option = "plasma")
   )
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw 2d smooth with spectral palette", plt1)
 
   skip_if(packageVersion("mgcv") < "1.8.36")
@@ -569,9 +566,8 @@ test_that("draw.gam can take user specified scales", {
 test_that("plotting sos smooths works", {
   skip_on_cran()
   skip_if_not_installed("sf")
-  skip_on_os("mac")
   expect_silent(plt <- draw(m_sos, n = 20))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw works for sos smooths", plt)
 })

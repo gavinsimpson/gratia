@@ -1,10 +1,13 @@
 ## Test qq_plot() methods
 
 test_that("appraise() works", {
-  plt <- appraise(m_tiny_eg1, method = "simulate",
-    ci_col = "red", ci_alpha = 0.3)
+  plt <- with_seed(
+    3476, # seed
+    appraise(m_tiny_eg1, method = "simulate",
+      ci_col = "red", ci_alpha = 0.3)
+  )
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("appraise diagnostic plots", plt)
 })
 
@@ -52,7 +55,7 @@ test_that("worm_plot works for a GAM", {
     method = "normal"
   )))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("worm plot gam uniform", plt1)
   expect_doppelganger("worm plot gam simulate", plt2)
   expect_doppelganger("worm plot gam normal", plt3)
@@ -69,7 +72,7 @@ test_that("worm_plot works for a GLM", {
     method = "normal"
   )))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("worm plot glm uniform", plt1)
   expect_doppelganger("worm plot glm simulate", plt2)
   expect_doppelganger("worm plot glm normal", plt3)
@@ -86,7 +89,7 @@ test_that("worm_plot works for a LM", {
     method = "normal"
   )))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("worm plot lm uniform", plt1)
   expect_doppelganger("worm plot lm simulate", plt2)
   expect_doppelganger("worm plot lm normal", plt3)
@@ -103,7 +106,7 @@ test_that("qq_plot works for a GLM", {
     method = "normal"
   )))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("qq plot glm uniform", plt1)
   expect_doppelganger("qq plot glm simulate", plt2)
   expect_doppelganger("qq plot glm normal", plt3)
@@ -120,7 +123,7 @@ test_that("qq_plot works for a LM", {
     method = "normal"
   )))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("qq plot lm uniform", plt1)
   expect_doppelganger("qq plot lm simulate", plt2)
   expect_doppelganger("qq plot lm normal", plt3)
@@ -129,7 +132,7 @@ test_that("qq_plot works for a LM", {
 test_that("appraise works for a LM", {
   expect_silent(plt <- withr::with_seed(1, appraise(m_lm)))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("appraise lm ", plt)
 })
 
@@ -139,6 +142,6 @@ test_that("appraise can use the worm plot", {
     method = "simulate"
   )))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("appraise worm plot", plt)
 })

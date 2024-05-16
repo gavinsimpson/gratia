@@ -51,7 +51,7 @@ test_that("smooth_coefs() works with a mgcv.smooth", {
 })
 
 test_that("smooth-coefs print() output is as expected", {
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_snapshot({
     print(smooth_coefs(m_gam, select = "s(x0)"))
   })

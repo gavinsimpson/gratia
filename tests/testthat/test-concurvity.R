@@ -30,6 +30,6 @@ test_that("concrvity() pariwise works with a gam", {
   expect_named(con, c(".type", ".term", ".with", ".concurvity"))
   expect_silent(plt <- draw(con))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw.concurvity pairwise", plt)
 })

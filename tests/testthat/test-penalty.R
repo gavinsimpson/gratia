@@ -43,31 +43,31 @@ test_that("smooth arg of penalty() is properly deprecated", {
 ## draw.penalty
 test_that("draw.penalty_df works", {
   skip_on_cran()
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
 
   expect_silent(pen <- penalty(su_m_univar_4))
   plt1 <- draw(pen)
   plt2 <- draw(penalty(su_m_univar_4, "s(x1)"))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw penalty_df with multiple smooths", plt1)
   expect_doppelganger("draw penalty_df with single smooths", plt2)
 })
 
 test_that("draw.penalty_df gets labels on plot in correct order issue 95", {
   skip_on_cran()
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
 
   expect_silent(pen <- penalty(su_m_penalty))
   plt <- draw(pen)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw penalty_df issue 95 label order", plt)
 })
 
 test_that("draw.penalty_df accepts user-specified continuous_fill", {
   skip_on_cran()
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
 
   expect_silent(pen <- penalty(su_m_univar_4))
   plt1 <- draw(pen,
@@ -84,7 +84,7 @@ test_that("draw.penalty_df accepts user-specified continuous_fill", {
     )
   )
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger(
     "draw penalty multiple smooths user continuous fill",
     plt1
@@ -97,13 +97,13 @@ test_that("draw.penalty_df accepts user-specified continuous_fill", {
 
 test_that("draw.penalty_df works with normalization", {
   skip_on_cran()
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
 
   expect_silent(pen <- penalty(su_m_univar_4))
   plt1 <- draw(pen, normalize = TRUE)
   plt2 <- draw(penalty(su_m_univar_4, "s(x1)"), normalize = TRUE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger(
     "draw penalty_df with multiple smooths normalized",
     plt1
@@ -121,7 +121,7 @@ test_that("draw.penalty_df gets labels on plot in correct order as matrix", {
   plt1 <- draw(pen, as_matrix = TRUE)
   plt2 <- draw(pen, as_matrix = FALSE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw penalty_df as matrix true", plt1)
   expect_doppelganger("draw penalty_df as matrix false", plt2)
 })

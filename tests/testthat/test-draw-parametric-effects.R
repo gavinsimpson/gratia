@@ -10,7 +10,7 @@ test_that("draw.parametric_effects works for m_2_fac", {
   )
   expect_silent(plt <- draw(peff))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw parametric effects m_2_fac", plt)
 })
 
@@ -24,7 +24,7 @@ test_that("draw.parametric_effects works for m_para_sm", {
   )
   expect_silent(plt <- draw(peff, rug = FALSE))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw parametric effects m_para_sm", plt)
 })
 
@@ -35,7 +35,7 @@ test_that("draw.parametric_effects works for m_2_fac select term", {
   ))
   expect_silent(plt <- draw(peff))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw parametric effects m_2_fac with term", plt)
 })
 
@@ -46,7 +46,7 @@ test_that("draw.parametric_effects works for m_para_sm select term", {
   ))
   expect_silent(plt <- draw(peff, rug = FALSE))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw parametric effects m_para_sm with term", plt)
 })
 
@@ -60,7 +60,7 @@ test_that("draw.parametric_effects works with only parametric terms", {
   )
   expect_silent(plt <- draw(peff, rug = FALSE))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw parametric effects m_only_para", plt)
 })
 
@@ -147,7 +147,7 @@ test_that("issue 45 parametric effects for lss models remains fixed", {
     data = data_45, envir = teardown_env()
   ))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("ziplss with numeric para not plotted", plt1)
   expect_doppelganger("ziplss with numeric para plotted", plt2)
   expect_doppelganger("ziplss with factor para not plotted", plt3)
@@ -159,7 +159,7 @@ test_that("issue 45 parametric effects for lss models remains fixed", {
 # test #219
 test_that("parametric effects works with messing data in model fit", {
   skip_on_cran()
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   skip_if_offline()
   skip_if_not_installed("forcats")
   skip_if_not_installed("readr")
@@ -201,6 +201,6 @@ test_that("parametric effects works with messing data in model fit", {
     data = rats, envir = teardown_env()
   ))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("issue 219 parametric effects", plt)
 })

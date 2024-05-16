@@ -14,7 +14,7 @@ test_that("lp_matrix works for a GAM", {
 })
 
 test_that("print() method returns output invisibly", {
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
 
   xp <- lp_matrix(m_gam)
   expect_output(ret <- withVisible(print(xp)))
@@ -22,7 +22,7 @@ test_that("print() method returns output invisibly", {
 })
 
 test_that("print() output is as expected", {
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   skip_on_cran()
 
   expect_snapshot({

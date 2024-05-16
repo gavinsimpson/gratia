@@ -11,7 +11,7 @@ test_that("rootogram works for a continuous Gaussian response", {
 test_that("rootogram works for a discrete Poisson response", {
   expect_silent(rg <- rootogram(b_pois))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw poisson rootogram", draw(rg))
 })
 

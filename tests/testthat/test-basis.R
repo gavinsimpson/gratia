@@ -26,7 +26,7 @@ test_that("basis() works with a gam", {
 
   plt2 <- draw(bs)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw basis works with a gam multiple smooths", plt1)
   expect_doppelganger("draw basis works with a gam single smooth", plt2)
 })
@@ -51,7 +51,7 @@ test_that("basis() works with a scam", {
 
   plt <- draw(bs)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw basis works with a scam single smooth", plt)
 })
 
@@ -69,10 +69,9 @@ test_that("basis() works with bivariate tprs smooths", {
   plt1 <- draw(bs)
 
   skip_on_cran()
-  skip_on_os("mac")
   plt2 <- draw(bs, contour = TRUE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw basis works with a bivariate tprs", plt1)
   expect_doppelganger("draw basis works with a bivariate tprs contour", plt2)
 })
@@ -91,10 +90,9 @@ test_that("basis() works with bivariate te smooths", {
   plt1 <- draw(bs)
 
   skip_on_cran()
-  skip_on_os("mac")
   plt2 <- draw(bs, contour = TRUE)
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw basis works with a bivariate te", plt1)
   expect_doppelganger("draw basis works with a bivariate te contour", plt2)
 })

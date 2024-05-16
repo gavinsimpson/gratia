@@ -18,7 +18,7 @@ test_that("qq_plot() uniform method works", {
   skip_if(packageVersion("mgcv") < "1.8.36")
   plt <- withr::with_seed(42, qq_plot(m)) # randomisation of uniform quantiles
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("qq_plot uniform randomisation", plt)
 })
 
@@ -26,7 +26,7 @@ test_that("qq_plot() uniform method works with response residuals", {
   skip_if(packageVersion("mgcv") < "1.8.36")
   plt <- withr::with_seed(42, qq_plot(m, type = "response"))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("qq_plot uniform randomisation response residuals", plt)
 })
 
@@ -34,7 +34,7 @@ test_that("qq_plot() uniform method works with pearson residuals", {
   skip_if(packageVersion("mgcv") < "1.8.36")
   plt <- withr::with_seed(42, qq_plot(m, type = "pearson"))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("qq_plot uniform randomisation pearson residuals", plt)
 })
 
@@ -42,7 +42,7 @@ test_that("qq_plot() normal method works", {
   # normality assumption
   plt <- withr::with_seed(42, qq_plot(m, method = "normal"))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("qq_plot normality assumption", plt)
 })
 
@@ -52,14 +52,14 @@ test_that("qq_plot() normal method works", {
     type = "response"
   ))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("qq_plot normality assumption response residuals", plt)
 })
 
 test_that("qq_plot() normal method works", {
   plt <- withr::with_seed(42, qq_plot(m, method = "normal", type = "pearson"))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("qq_plot normality assumption pearson residuals", plt)
 })
 
@@ -67,7 +67,7 @@ test_that("qq_plot() simulate method works", {
   # simulate data to get quantiles
   plt <- withr::with_seed(42, qq_plot(m, method = "simulate"))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("qq_plot data simulation", plt)
 })
 
@@ -77,7 +77,7 @@ test_that("qq_plot() simulate method works", {
     type = "response"
   ))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("qq_plot data simulation response residuals", plt)
 })
 
@@ -87,7 +87,7 @@ test_that("qq_plot() simulate method works", {
     type = "pearson"
   ))
 
-  skip_on_ci()
+  # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("qq_plot data simulation pearson residuals", plt)
 })
 
