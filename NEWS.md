@@ -16,6 +16,9 @@
 
 * `fitted_values()` works again for quantile GAMs fitted by `qgam()`.
 
+* `confint.gam()` was not applying `shift` to the estimate and upper and lower
+  interval. #280 reported by @TIMAVID & @rbentham
+
 # gratia 0.9.0
 
 ## Breaking changes
