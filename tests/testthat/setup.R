@@ -7,28 +7,6 @@ library("tibble")
 library("nlme")
 library("ggplot2")
 
-## Need a local wrapper to allow conditional use of vdiffr
-# `expect_doppelganger` <- function(title, fig, ...) {
-#   testthat::skip_if_not_installed("vdiffr")
-#   vdiffr::expect_doppelganger(title, fig, ...)
-# }
-## Need a local wrapper to allow conditional use of vdiffr, and also
-if ((nzchar(Sys.getenv("CI")) || !nzchar(Sys.getenv("NOT_CRAN"))) &&
-  identical(Sys.getenv("VDIFFR_RUN_TESTS"), "false")) {
-  # if we are running tests remotely AND
-  # we are opting out of using vdiffr
-  # assigning a dummy function
-
-  expect_doppelganger <- function(title, fig, ...) {
-    testthat::skip("`VDIFFR_RUN_TESTS` set to false on this remote check")
-  }
-} else {
-  expect_doppelganger <- function(title, fig, ...) {
-    testthat::skip_if_not_installed("vdiffr")
-    vdiffr::expect_doppelganger(title, fig, ...)
-  }
-}
-
 ## Fit models
 n_quick <- 300
 quick_eg1 <- data_sim("eg1", n = n_quick, seed = 21)
