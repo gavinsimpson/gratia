@@ -420,10 +420,12 @@
   # )
 
   out <- mutate(out,
-    .estimate = .data$.estimate + const,
-    .lower_ci = .data$.estimate - (.data$.crit * .data$.se),
-    .upper_ci = .data$.estimate + (.data$.crit * .data$.se)
-  )
+    .estimate = .data$.estimate + const
+  ) |>
+    mutate(
+      .lower_ci = .data$.estimate - (.data$.crit * .data$.se),
+      .upper_ci = .data$.estimate + (.data$.crit * .data$.se)
+    )
 
   ## transform
   out <- out |>
