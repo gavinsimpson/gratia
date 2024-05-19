@@ -898,7 +898,7 @@
 <text x='148.55' y='537.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>1</text>
 <text x='114.13' y='549.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='93.57px' lengthAdjust='spacingAndGlyphs'>Gaussian quantiles</text>
 <text transform='translate(18.53,497.07) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='66.65px' lengthAdjust='spacingAndGlyphs'>Partial effects</text>
-<text x='48.54' y='459.65' style='font-size: 13.20px; font-family: sans;' textLength='52.11px' lengthAdjust='spacingAndGlyphs'>Plant_uo</text>
+<text x='48.54' y='459.65' style='font-size: 13.20px; font-family: sans;' textLength='67.51px' lengthAdjust='spacingAndGlyphs'>s(Plant_uo)</text>
 <text x='179.71' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='83.66px' lengthAdjust='spacingAndGlyphs'>Basis: Random effect</text>
 <text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='148.96px' lengthAdjust='spacingAndGlyphs'>hgam-paper-co2-model-5</text>
 </g>
