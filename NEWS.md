@@ -32,6 +32,9 @@
   `"factor_levels"` containing the required information and the order of levels
   is preserved when plotting. #284 Reported by @mhpob
 
+* `parametric_effects()` would fail if there were parametric terms in the model
+  but they were all interaction terms (which we don't currently handle). #282
+
 # gratia 0.9.0
 
 ## Breaking changes
