@@ -33,7 +33,7 @@ test_that("draw.compare_smooths() can plot a comparison of smooths", {
 
   expect_silent(plt3 <- draw(cs) & theme(legend.position = "bottom"))
 
-  # skip_on_ci() # testing without as moved to mac os x
+  skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("compare smooths - all smooths", plt1)
   expect_doppelganger("compare smooths - set nrow ncol", plt2)
   expect_doppelganger("compare smooths - bottom legend", plt3)
