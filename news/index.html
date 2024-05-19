@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.9006</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,6 +70,7 @@
 <li><p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> works again for quantile GAMs fitted by <code>qgam()</code>.</p></li>
 <li><p><code><a href="../reference/confint.gam.html">confint.gam()</a></code> was not applying <code>shift</code> to the estimate and upper and lower interval. <a href="https://github.com/gavinsimpson/gratia/issues/280" class="external-link">#280</a> reported by <a href="https://github.com/TIMAVID" class="external-link">@TIMAVID</a> &amp; <a href="https://github.com/rbentham" class="external-link">@rbentham</a></p></li>
 <li><p><code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> and <code><a href="../reference/draw.parametric_effects.html">draw.parametric_effects()</a></code> would forget about the levels of factors (intentionally), but this would lead to problems with ordered factors where the ordering of levels was not preserved. Now, <code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> returns a named list of factor levels as attribute <code>"factor_levels"</code> containing the required information and the order of levels is preserved when plotting. <a href="https://github.com/gavinsimpson/gratia/issues/284" class="external-link">#284</a> Reported by <a href="https://github.com/mhpob" class="external-link">@mhpob</a></p></li>
+<li><p><code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> would fail if there were parametric terms in the model but they were all interaction terms (which we don’t currently handle). <a href="https://github.com/gavinsimpson/gratia/issues/282" class="external-link">#282</a></p></li>
 </ul></div>
 </div>
     <div class="section level2">
