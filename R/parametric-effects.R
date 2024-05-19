@@ -127,11 +127,13 @@
     nr <- nrow(out)
     is_fac <- is.factor(out$.level)
     type <- "factor"
+    f_levels <- NA
     if (!is_fac) {
       type <- class(out$.level) # numeric but I presume logical too
       out <- out |>
         rename(".value" = ".level")
     } else {
+      f_levels <- levels(out$.level)
       if (is.ordered(out$.level)) {
         type <- "ordered"
       }
@@ -140,11 +142,15 @@
     }
     out <- out |>
       add_column(
-        term = rep(term, times = nr),
-        type = rep(type, times = nr),
+        .term = rep(term, times = nr),
+        .type = rep(type, times = nr),
         .before = 1L
-      ) %>%
+      ) |>
       nest(data = any_of(c(".level", ".value", ".partial", ".se")))
+
+    # set levels as an attribute
+    attr(out, "factor_levels") <- list(f_levels) |>
+      set_names(term)
     out
   }
 
@@ -154,8 +160,10 @@
   )
 
   if (unnest) {
+    f_levels <- attr(effects, "factor_levels")
     effects <- unnest(effects, cols = "data") |>
       relocate(c(".partial", ".se"), .after = last_col())
+    attr(effects, "factor_levels") <- f_levels
   }
 
   ## add confidence interval -- be consistent and don't add this, but could?
@@ -213,8 +221,10 @@ draw.parametric_effects <- function(object,
     ylim <- range(object$.partial, object$.upper_ci, object$.lower_ci)
   }
 
+  f_levels <- attr(object, "factor_levels")
+
   plts <- object %>%
-    group_by(.data$term) %>%
+    group_by(.data$.term) %>%
     group_map(
       .keep = TRUE,
       .f = ~ draw_parametric_effect(.x,
@@ -227,7 +237,8 @@ draw.parametric_effects <- function(object,
         rug = rug,
         position = position,
         ylim = ylim,
-        angle = angle
+        angle = angle,
+        factor_levels = f_levels
       )
     )
 
@@ -255,6 +266,7 @@ draw.parametric_effects <- function(object,
 #'   [ggplot2::labs()].
 #' @param caption character or expression; the plot caption. See
 #'   [ggplot2::labs()].
+#' @param factor_levels list; a named list of factor levels
 #'
 #' @inheritParams draw.gam
 #'
@@ -276,12 +288,24 @@ draw.parametric_effects <- function(object,
                                      position = "identity",
                                      ylim = NULL,
                                      angle = NULL,
+                                     factor_levels = NULL,
                                      ...) {
   # plot
-  type <- unique(object[["type"]])
+  type <- unique(object[[".type"]])
   is_fac <- type %in% c("ordered", "factor")
   x_val <- if_else(is_fac, ".level", ".value")
-  term_label <- unique(object[["term"]])
+  term_label <- unique(object[[".term"]])
+
+  # grab the factor levels
+  f_levels <- factor_levels[[term_label]]
+  if (is_fac && !is.null(f_levels)) {
+    object <- object |>
+      mutate(".level" = factor(.data[[".level"]],
+        levels = f_levels,
+        ordered = isTRUE(type == "ordered")
+      )
+    )
+  }
 
   ## If constant supplied apply it to `est`
   object <- add_constant(object, constant = constant, column = ".partial")
