@@ -4,7 +4,16 @@
 
 * `parametric_effects()` slightly escaped the great renaming that happened for
   0.9.0. Columns `type` and `term` did not gain a prefix `.`. This is now
-  rectified and these two columns are now `.type` and `.term`. 
+  rectified and these two columns are now `.type` and `.term`.
+
+## User visible changes
+
+* Plots of random effects are now labelled with their smooth label. Previously,
+  the title was taken fro the variable involved in the smooth, but this doesn't
+  work for terms like `s(subject, continuous_var, bs = "re")` for random slopes, 
+  which previsouly would have the title `"subject"`. Now such terms will have
+  title `"s(subject,continuous_var)"`. Simple random intercept terms,
+  `s(subject, bs = "re")`, are now titled `"s(subject)"`. #287
 
 ## Bug fixes
 
