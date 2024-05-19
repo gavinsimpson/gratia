@@ -417,8 +417,10 @@
         )
       }
 
+      f_levels <- attr(para, "factor_levels")
+
       para_plts <- para %>%
-        group_by(.data$term) %>%
+        group_by(.data$.term) %>%
         group_map(
           .keep = TRUE,
           .f = ~ draw_parametric_effect(.x,
@@ -431,7 +433,8 @@
             rug = rug,
             position = position,
             angle = angle,
-            ylim = ylims
+            ylim = ylims,
+            factor_levels = f_levels
           )
         )
     }
