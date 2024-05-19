@@ -1,5 +1,11 @@
 # gratia (development version)
 
+## Breaking changes
+
+* `parametric_effects()` slightly escaped the great renaming that happened for
+  0.9.0. Columns `type` and `term` did not gain a prefix `.`. This is now
+  rectified and these two columns are now `.type` and `.term`. 
+
 ## Bug fixes
 
 * `partial_residuals()` was computing partial residuals from the *deviance*
@@ -18,6 +24,13 @@
 
 * `confint.gam()` was not applying `shift` to the estimate and upper and lower
   interval. #280 reported by @TIMAVID & @rbentham
+
+* `parametric_effects()` and `draw.parametric_effects()` would forget about the
+  levels of factors (intentionally), but this would lead to problems with
+  ordered factors where the ordering of levels was not preserved. Now,
+  `parametric_effects()` returns a named list of factor levels as attribute
+  `"factor_levels"` containing the required information and the order of levels
+  is preserved when plotting. #284 Reported by @mhpob
 
 # gratia 0.9.0
 
