@@ -6,7 +6,8 @@ both_nms <- c(".level", ".value", ".partial", ".se")
 
 test_that("parametric_effects works for m_2_fac", {
   expect_message(
-    peff <- parametric_effects(m_2_fac, envir = teardown_env(), data = df_2_fac),
+    peff <- parametric_effects(m_2_fac, envir = teardown_env(),
+    data = df_2_fac),
     "Interaction terms are not currently supported."
   )
   expect_s3_class(peff, class = c(
@@ -15,12 +16,13 @@ test_that("parametric_effects works for m_2_fac", {
   ))
   expect_identical(ncol(peff), 5L)
   expect_identical(nrow(peff), 7L)
-  expect_named(peff, c("term", "type", lev_nms))
+  expect_named(peff, c(".term", ".type", lev_nms))
 })
 
 test_that("parametric_effects works for m_para_sm", {
   expect_message(
-    peff <- parametric_effects(m_para_sm, data = df_2_fac, envir = teardown_env()),
+    peff <- parametric_effects(m_para_sm, data = df_2_fac,
+    envir = teardown_env()),
     "Interaction terms are not currently supported."
   )
   expect_s3_class(peff, class = c(
@@ -29,7 +31,7 @@ test_that("parametric_effects works for m_para_sm", {
   ))
   expect_identical(ncol(peff), 6L)
   expect_identical(nrow(peff), 407L)
-  expect_named(peff, c("term", "type", both_nms))
+  expect_named(peff, c(".term", ".type", both_nms))
 })
 
 test_that("parametric_effects works for m_2_fac select term", {
@@ -43,7 +45,7 @@ test_that("parametric_effects works for m_2_fac select term", {
   ))
   expect_identical(ncol(peff), 5L)
   expect_identical(nrow(peff), 3L)
-  expect_named(peff, c("term", "type", lev_nms))
+  expect_named(peff, c(".term", ".type", lev_nms))
 })
 
 test_that("parametric_effects works for m_para_sm select term", {
@@ -57,7 +59,7 @@ test_that("parametric_effects works for m_para_sm select term", {
   ))
   expect_identical(ncol(peff), 5L)
   expect_identical(nrow(peff), 3L)
-  expect_named(peff, c("term", "type", lev_nms))
+  expect_named(peff, c(".term", ".type", lev_nms))
 })
 
 test_that("parametric_effects works with only parametric terms", {
@@ -74,7 +76,7 @@ test_that("parametric_effects works with only parametric terms", {
   ))
   expect_identical(ncol(peff), 6L)
   expect_identical(nrow(peff), 1207L)
-  expect_named(peff, c("term", "type", both_nms))
+  expect_named(peff, c(".term", ".type", both_nms))
 })
 
 test_that("parametric_effects works with weird parametric terms", {
@@ -88,7 +90,7 @@ test_that("parametric_effects works with weird parametric terms", {
   ))
   expect_identical(ncol(peff), 6L)
   expect_identical(nrow(peff), 1207L)
-  expect_named(peff, c("term", "type", both_nms))
+  expect_named(peff, c(".term", ".type", both_nms))
 
   expect_silent(peff <- parametric_effects(m_poly,
     transform = TRUE,
@@ -100,7 +102,7 @@ test_that("parametric_effects works with weird parametric terms", {
   ))
   expect_identical(ncol(peff), 6L)
   expect_identical(nrow(peff), 1207L)
-  expect_named(peff, c("term", "type", both_nms))
+  expect_named(peff, c(".term", ".type", both_nms))
 })
 
 test_that("issue 212 remains fixed", {
@@ -122,7 +124,7 @@ test_that("issue 212 remains fixed", {
   ))
   expect_identical(ncol(peff), 6L)
   expect_identical(nrow(peff), 1202L)
-  expect_named(peff, c("term", "type", both_nms))
+  expect_named(peff, c(".term", ".type", both_nms))
 
   plt <- draw(peff, rug = FALSE)
 

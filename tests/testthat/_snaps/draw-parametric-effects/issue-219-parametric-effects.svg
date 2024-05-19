@@ -609,12 +609,12 @@
 <polyline points='89.13,526.27 89.13,327.10 ' style='stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;' />
 <polyline points='177.15,526.27 177.15,327.10 ' style='stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;' />
 <polyline points='265.18,526.27 265.18,327.10 ' style='stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='265.18' y1='449.27' x2='265.18' y2='336.16' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<line x1='177.15' y1='449.27' x2='177.15' y2='336.16' style='stroke-width: 1.07; stroke-linecap: butt;' />
 <line x1='89.13' y1='407.78' x2='89.13' y2='407.78' style='stroke-width: 1.07; stroke-linecap: butt;' />
-<line x1='177.15' y1='517.22' x2='177.15' y2='402.64' style='stroke-width: 1.07; stroke-linecap: butt;' />
-<circle cx='265.18' cy='392.71' r='2.84' style='stroke-width: 1.42; fill: #000000;' />
+<line x1='265.18' y1='517.22' x2='265.18' y2='402.64' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<circle cx='177.15' cy='392.71' r='2.84' style='stroke-width: 1.42; fill: #000000;' />
 <circle cx='89.13' cy='407.78' r='2.84' style='stroke-width: 1.42; fill: #000000;' />
-<circle cx='177.15' cy='459.93' r='2.84' style='stroke-width: 1.42; fill: #000000;' />
+<circle cx='265.18' cy='459.93' r='2.84' style='stroke-width: 1.42; fill: #000000;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 <text x='31.38' y='494.07' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='7.82px' lengthAdjust='spacingAndGlyphs'>-2</text>
@@ -629,8 +629,8 @@
 <polyline points='177.15,529.01 177.15,526.27 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <polyline points='265.18,529.01 265.18,526.27 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <text x='89.13' y='537.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='28.37px' lengthAdjust='spacingAndGlyphs'>Control</text>
-<text x='177.15' y='537.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='18.10px' lengthAdjust='spacingAndGlyphs'>High</text>
-<text x='265.18' y='537.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='16.15px' lengthAdjust='spacingAndGlyphs'>Low</text>
+<text x='177.15' y='537.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='16.15px' lengthAdjust='spacingAndGlyphs'>Low</text>
+<text x='265.18' y='537.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='18.10px' lengthAdjust='spacingAndGlyphs'>High</text>
 <text x='177.15' y='549.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='46.47px' lengthAdjust='spacingAndGlyphs'>treatment</text>
 <text transform='translate(18.53,426.69) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='36.31' y='318.88' style='font-size: 13.20px; font-family: sans;' textLength='55.76px' lengthAdjust='spacingAndGlyphs'>treatment</text>

@@ -204,3 +204,13 @@ test_that("parametric effects works with messing data in model fit", {
   # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("issue 219 parametric effects", plt)
 })
+
+test_that("factor parametric effects preserve levels when plotting #284", {
+  expect_silent(pe <- parametric_effects(m_284, data = df_284,
+    envir = teardown_env()))
+
+  skip_on_cran()
+  expect_silent(plt <- draw(pe))
+
+  expect_doppelganger("draw peff preserves factor levels", plt)
+})
