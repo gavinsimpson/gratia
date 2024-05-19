@@ -21,6 +21,7 @@ draw_parametric_effect(
   position = "identity",
   ylim = NULL,
   angle = NULL,
+  factor_levels = NULL,
   ...
 )
 }
@@ -67,6 +68,8 @@ call to a position adjustment function.}
 
 \item{angle}{numeric; the angle at which the x axis tick labels are to be
 drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggplot2::guide_axis()}}.}
+
+\item{factor_levels}{list; a named list of factor levels}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
