@@ -45,7 +45,7 @@
   tt <- delete.response(tt) # remove response so easier to work with
   vars <- parametric_terms(object) # vector of names of model terms
   if (length(vars) == 0L) {
-    warning("The model doesn't contain any parametric terms")
+    warning("The model doesn't contain any parametric terms", call. = FALSE)
     return(NULL)
   }
   mgcv_names <- names(vars) # this is how mgcv refers to the terms
@@ -69,6 +69,11 @@
   if (any(int <- ord > 1)) {
     message("Interaction terms are not currently supported.")
     valid_terms <- valid_terms[!(ord > 1)]
+  }
+  # return early if no vallid terms to
+  if (length(valid_terms) == 0L) {
+    message("The model doesn't contain any non-interaction parametric terms")
+    return(NULL)
   }
 
   # try to recover the data

@@ -403,40 +403,45 @@
         unconditional = unconditional,
         unnest = TRUE, ci_level = ci_level, envir = envir
       )
-      # Add CI
-      # crit <- coverage_normal(ci_level)
-      # object <- mutate(para,
-      #    .lower_ci = .data$.partial - (crit * .data$.se),
-      #    .upper_ci = .data$.partial + (crit * .data$.se))
-      object <- para |> add_confint(coverage = ci_level)
-      # need to alter the ylim if scales are fixed
-      if (isTRUE(identical(scales, "fixed"))) {
-        ylims <- range(
-          ylims, object$.partial, object$.upper_ci,
-          object$.lower_ci
-        )
-      }
 
-      f_levels <- attr(para, "factor_levels")
-
-      para_plts <- para %>%
-        group_by(.data$.term) %>%
-        group_map(
-          .keep = TRUE,
-          .f = ~ draw_parametric_effect(.x,
-            ci_level = ci_level,
-            ci_col = ci_col,
-            ci_alpha = ci_alpha,
-            line_col = smooth_col,
-            constant = constant,
-            fun = fun,
-            rug = rug,
-            position = position,
-            angle = angle,
-            ylim = ylims,
-            factor_levels = f_levels
+      if (is.null(para)) {
+        parametric <- FALSE
+      } else {
+        # Add CI
+        # crit <- coverage_normal(ci_level)
+        # object <- mutate(para,
+        #    .lower_ci = .data$.partial - (crit * .data$.se),
+        #    .upper_ci = .data$.partial + (crit * .data$.se))
+        object <- para |> add_confint(coverage = ci_level)
+        # need to alter the ylim if scales are fixed
+        if (isTRUE(identical(scales, "fixed"))) {
+          ylims <- range(
+            ylims, object$.partial, object$.upper_ci,
+            object$.lower_ci
           )
-        )
+        }
+
+        f_levels <- attr(para, "factor_levels")
+
+        para_plts <- para %>%
+          group_by(.data$.term) %>%
+          group_map(
+            .keep = TRUE,
+            .f = ~ draw_parametric_effect(.x,
+              ci_level = ci_level,
+              ci_col = ci_col,
+              ci_alpha = ci_alpha,
+              line_col = smooth_col,
+              constant = constant,
+              fun = fun,
+              rug = rug,
+              position = position,
+              angle = angle,
+              ylim = ylims,
+              factor_levels = f_levels
+            )
+          )
+      }
     }
   }
 
