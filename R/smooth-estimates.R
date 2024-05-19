@@ -2004,7 +2004,7 @@
     ylab <- "Partial effects"
   }
   if (is.null(title)) {
-    title <- variables
+    title <- unique(object$.smooth) # variables
   }
   if (is.null(caption)) {
     caption <- paste("Basis:", object[[".type"]])
