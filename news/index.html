@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.9005</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,12 +58,18 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="gratia-development-version">gratia (development version)<a class="anchor" aria-label="anchor" href="#gratia-development-version"></a></h2>
 <div class="section level3">
+<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> slightly escaped the great renaming that happened for 0.9.0. Columns <code>type</code> and <code>term</code> did not gain a prefix <code>.</code>. This is now rectified and these two columns are now <code>.type</code> and <code>.term</code>.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li><p><code><a href="../reference/partial_residuals.html">partial_residuals()</a></code> was computing partial residuals from the <em>deviance</em> residuals. For compatibility with <code><a href="https://rdrr.io/pkg/mgcv/man/plot.gam.html" class="external-link">mgcv::plot.gam()</a></code>, partial residuals are now computed from the <em>working</em> residuals. Reported by <a href="https://github.com/wStockhausen" class="external-link">@wStockhausen</a> <a href="https://github.com/gavinsimpson/gratia/issues/273" class="external-link">#273</a></p></li>
 <li><p><code><a href="../reference/appraise.html">appraise()</a></code> was not passing the <code>ci_col</code> argument on <code><a href="../reference/qq_plot.html">qq_plot()</a></code> and <code><a href="../reference/worm_plot.html">worm_plot()</a></code>. Reported by Sate Ahmed.</p></li>
 <li><p>Couldn’t pass <code>mvn_method</code> on to posterior sampling functions from user facing functions <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code>, <code><a href="../reference/posterior_samples.html">posterior_samples()</a></code>, <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code>, <code><a href="../reference/derivative_samples.html">derivative_samples()</a></code>, and <code>repsonse_derivatives()</code>. Reported by <a href="https://github.com/stefgehrig" class="external-link">@stefgehrig</a> <a href="https://github.com/gavinsimpson/gratia/issues/279" class="external-link">#279</a></p></li>
 <li><p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> works again for quantile GAMs fitted by <code>qgam()</code>.</p></li>
 <li><p><code><a href="../reference/confint.gam.html">confint.gam()</a></code> was not applying <code>shift</code> to the estimate and upper and lower interval. <a href="https://github.com/gavinsimpson/gratia/issues/280" class="external-link">#280</a> reported by <a href="https://github.com/TIMAVID" class="external-link">@TIMAVID</a> &amp; <a href="https://github.com/rbentham" class="external-link">@rbentham</a></p></li>
+<li><p><code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> and <code><a href="../reference/draw.parametric_effects.html">draw.parametric_effects()</a></code> would forget about the levels of factors (intentionally), but this would lead to problems with ordered factors where the ordering of levels was not preserved. Now, <code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> returns a named list of factor levels as attribute <code>"factor_levels"</code> containing the required information and the order of levels is preserved when plotting. <a href="https://github.com/gavinsimpson/gratia/issues/284" class="external-link">#284</a> Reported by <a href="https://github.com/mhpob" class="external-link">@mhpob</a></p></li>
 </ul></div>
 </div>
     <div class="section level2">
