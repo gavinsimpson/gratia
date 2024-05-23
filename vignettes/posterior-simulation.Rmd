@@ -373,14 +373,15 @@ Because the the degrees of freedom for the *t* proposals is large, we're effecti
 
 Having collected the posterior draws, we summarise each set into 50%, 80%, and 95% intervals using `ggdist::median_qi()`, and add on the data locations with a left join
 ```{r ga-fail-intervals}
+excl_col <- c(".draw", ".parameter", ".row")
 int_ga <- fs_ga |>
   group_by(.row) |>
-  median_qi(.width = c(0.5, 0.8, 0.95)) |>
+  median_qi(.width = c(0.5, 0.8, 0.95), .exclude = excl_col) |>
   left_join(df, by = join_by(.row == .row))
 
 int_mh <- fs_mh |>
   group_by(.row) |>
-  median_qi(.width = c(0.5, 0.8, 0.95)) |>
+  median_qi(.width = c(0.5, 0.8, 0.95), .exclude = excl_col) |>
   left_join(df, by = join_by(.row == .row))
 ```
 
