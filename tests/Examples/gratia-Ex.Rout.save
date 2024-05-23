@@ -1,7 +1,7 @@
 
-R version 4.3.3 (2024-02-29) -- "Angel Food Cake"
+R version 4.4.0 (2024-04-24) -- "Puppy Cup"
 Copyright (C) 2024 The R Foundation for Statistical Computing
-Platform: x86_64-pc-linux-gnu (64-bit)
+Platform: aarch64-apple-darwin20
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -112,7 +112,7 @@ detaching ‘package:mgcv’
 > # note that there are 800 rows in the output: 400 data by `n = 2` samples.
 > df |>
 +   add_fitted_samples(m, n = 2, seed = 84)
-# A tibble: 800 × 13
+# A tibble: 800 × 14
        y    x0     x1    x2    x3     f    f0    f1     f2    f3  .row .draw
    <dbl> <dbl>  <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>  <dbl> <dbl> <int> <int>
  1  2.99 0.915 0.0227 0.909 0.402  1.62 0.529  1.05 0.0397     0     1     1
@@ -126,7 +126,7 @@ detaching ‘package:mgcv’
  9  7.63 0.642 0.879  0.522 0.838 10.4  1.80   5.80 2.76       0     5     1
 10  7.63 0.642 0.879  0.522 0.838 10.4  1.80   5.80 2.76       0     5     2
 # ℹ 790 more rows
-# ℹ 1 more variable: .fitted <dbl>
+# ℹ 2 more variables: .parameter <chr>, .fitted <dbl>
 > 
 > # add posterior draws from smooth s(x2)
 > df |>
@@ -1594,11 +1594,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x55c9bbd16380>
+<environment: 0x104f85268>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x55c9bbd16380>
+<environment: 0x104f85268>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1637,11 +1637,11 @@ detaching ‘package:mgcv’
 Linear prediction matrix (400 x 37)
   `(Intercept)` `s(x0).1` `s(x0).2` `s(x0).3` `s(x0).4` `s(x0).5` `s(x0).6`
           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-1             1     0.961     0.227    0.706      0.135     0.457  -0.146  
-2             1     0.651    -0.241    0.0684     0.308     0.394  -0.00994
-3             1    -0.385    -0.549    0.0660     0.204    -0.416  -0.247  
-4             1    -1.27      0.156   -1.53      -0.222    -1.60    0.198  
-5             1     1.05      0.420    1.11      -0.214     0.893   0.0351 
+1             1     0.961     0.227    0.706     -0.135     0.457  -0.146  
+2             1     0.651    -0.241    0.0684    -0.308     0.394  -0.00994
+3             1    -0.385    -0.549    0.0660    -0.204    -0.416  -0.247  
+4             1    -1.27      0.156   -1.53       0.222    -1.60    0.198  
+5             1     1.05      0.420    1.11       0.214     0.893   0.0351 
 # i 395 more rows
 > ## IGNORE_RDIFF_END
 > 
@@ -1658,11 +1658,11 @@ Linear prediction matrix (400 x 37)
 Linear prediction matrix (100 x 37)
   `(Intercept)` `s(x0).1` `s(x0).2` `s(x0).3` `s(x0).4` `s(x0).5` `s(x0).6`
           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-1             1     0.170    -0.542   -0.0371    0.0534     0.144    -0.353
-2             1     0.170    -0.542   -0.0371    0.0534     0.144    -0.353
-3             1     0.170    -0.542   -0.0371    0.0534     0.144    -0.353
-4             1     0.170    -0.542   -0.0371    0.0534     0.144    -0.353
-5             1     0.170    -0.542   -0.0371    0.0534     0.144    -0.353
+1             1     0.170    -0.542   -0.0371   -0.0534     0.144    -0.353
+2             1     0.170    -0.542   -0.0371   -0.0534     0.144    -0.353
+3             1     0.170    -0.542   -0.0371   -0.0534     0.144    -0.353
+4             1     0.170    -0.542   -0.0371   -0.0534     0.144    -0.353
+5             1     0.170    -0.542   -0.0371   -0.0534     0.144    -0.353
 # i 95 more rows
 > ## IGNORE_RDIFF_END
 > ## Don't show: 
@@ -1805,7 +1805,7 @@ detaching ‘package:mgcv’
 +   s(x3, bs = "cr"), family = nb, data = df, method = "REML")
 > ## IGNORE_RDIFF_BEGIN
 > nb_theta(m)
-[1] 239349
+[1] 239331
 > ## IGNORE_RDIFF_END
 > 
 > 
@@ -2437,7 +2437,7 @@ detaching ‘package:mgcv’
 > ## IGNORE_RDIFF_BEGIN
 > smooth_coefs(m, select = "s(x2)")
   s(x2).1   s(x2).2   s(x2).3   s(x2).4   s(x2).5   s(x2).6   s(x2).7   s(x2).8 
--6.533373  9.694277  2.194078  1.967280 -2.374874  1.207638 -1.572586  9.269744 
+-6.533373  9.694277  2.194078 -1.967280 -2.374874  1.207638 -1.572586  9.269744 
   s(x2).9 
  5.622738 
 > ## IGNORE_RDIFF_END
@@ -2777,7 +2777,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  22.872 0.191 22.646 0 0 
+Time elapsed:  8.898 0.246 9.271 0 0 
 > grDevices::dev.off()
 null device 
           1 

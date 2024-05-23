@@ -13,8 +13,8 @@ test_that("smooth_samples works for a continuous by GAM", {
   expect_identical(NROW(sm), 500L)
   # 9 cols, 8 for univariate smooths + 1 for cont by var
   expect_identical(NCOL(sm), 9L)
-  skip_on_cran()
   # skip_on_ci() # testing without as moved to mac os x
+  skip_on_cran()
   expect_snapshot(sm)
 })
 
@@ -163,6 +163,8 @@ test_that("smooth_samples fails if no smooths left to sample from", {
   )
 })
 
+fs_nams <- c(".row", ".draw", ".parameter", ".fitted")
+
 test_that("fitted_samples works for a simple GAM", {
   expect_silent(sm <- fitted_samples(m_1_smooth, n = 5, seed = 42))
   expect_s3_class(sm, c(
@@ -171,8 +173,8 @@ test_that("fitted_samples works for a simple GAM", {
   ))
   ## 1000 == 5 * 200 (nrow(dat))
   expect_identical(NROW(sm), 1500L)
-  expect_identical(NCOL(sm), 3L) # 3 cols
-  expect_named(sm, expected = c(".row", ".draw", ".fitted"))
+  expect_identical(NCOL(sm), 4L) # 4 cols
+  expect_named(sm, expected = fs_nams)
 })
 
 test_that("fitted_samples works for a multi-smooth GAM", {
@@ -183,8 +185,8 @@ test_that("fitted_samples works for a multi-smooth GAM", {
   ))
   ## 5000 == 5 draws * 1000 observations in data
   expect_identical(NROW(sm), 5000L)
-  expect_identical(NCOL(sm), 3L) # 3 cols
-  expect_named(sm, expected = c(".row", ".draw", ".fitted"))
+  expect_identical(NCOL(sm), 4L) # 4 cols
+  expect_named(sm, expected = fs_nams)
 })
 
 test_that("fitted_samples works for a multi-smooth factor by GAM", {
@@ -195,8 +197,8 @@ test_that("fitted_samples works for a multi-smooth factor by GAM", {
   ))
   ## 2000 == 5 draws * 400 observations in data
   expect_identical(NROW(sm), 2000L)
-  expect_identical(NCOL(sm), 3L) # 3 cols
-  expect_named(sm, expected = c(".row", ".draw", ".fitted"))
+  expect_identical(NCOL(sm), 4L) # 4 cols
+  expect_named(sm, expected = fs_nams)
 })
 
 test_that("fitted_samples sets seed when seed not provided", {
@@ -210,6 +212,8 @@ test_that("fitted_samples() fails if not suitable method available", {
   )
 })
 
+ps_nams <- c(".row", ".draw", ".response")
+
 test_that("predicted_samples works for a simple GAM", {
   expect_silent(sm <- predicted_samples(m_1_smooth, n = 5, seed = 42))
   expect_s3_class(sm, c(
@@ -219,7 +223,7 @@ test_that("predicted_samples works for a simple GAM", {
   ## 2000 == 5 * 100 (nrow(dat))
   expect_identical(NROW(sm), 1500L)
   expect_identical(NCOL(sm), 3L) # 3 cols
-  expect_named(sm, expected = c(".row", ".draw", ".response"))
+  expect_named(sm, expected = ps_nams)
 })
 
 test_that("predicted_samples works for a multi-smooth GAM", {
@@ -231,7 +235,7 @@ test_that("predicted_samples works for a multi-smooth GAM", {
   ## 5000 == 5 draws * 1000 observations in data
   expect_identical(NROW(sm), 5000L)
   expect_identical(NCOL(sm), 3L) # 3 cols
-  expect_named(sm, expected = c(".row", ".draw", ".response"))
+  expect_named(sm, expected = ps_nams)
 })
 
 test_that("predicted_samples works for a multi-smooth factor by GAM", {
@@ -243,7 +247,7 @@ test_that("predicted_samples works for a multi-smooth factor by GAM", {
   ## 2000 == 5 draws * 400 observations in data
   expect_identical(NROW(sm), 2000L)
   expect_identical(NCOL(sm), 3L) # 3 cols
-  expect_named(sm, expected = c(".row", ".draw", ".response"))
+  expect_named(sm, expected = ps_nams)
 })
 
 test_that("predicted_samples sets seed when seed not provided", {
@@ -289,7 +293,7 @@ test_that("posterior_samples works for a simple GAM", {
   ## 1000 == 5 * 200 (nrow(dat))
   expect_identical(NROW(sm), 1500L)
   expect_identical(NCOL(sm), 3L) # 3 cols
-  expect_named(sm, expected = c(".row", ".draw", ".response"))
+  expect_named(sm, expected = ps_nams)
 })
 
 test_that("posterior_samples works for a multi-smooth tweedie GAM", {
@@ -301,7 +305,7 @@ test_that("posterior_samples works for a multi-smooth tweedie GAM", {
   ## 2500 == 5 draws * 5000 observations in data
   expect_identical(NROW(sm), 2500L)
   expect_identical(NCOL(sm), 3L) # 3 cols
-  expect_named(sm, expected = c(".row", ".draw", ".response"))
+  expect_named(sm, expected = ps_nams)
 })
 
 # test for offset handling

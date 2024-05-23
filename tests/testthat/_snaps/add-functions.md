@@ -3,7 +3,7 @@
     Code
       print(fs)
     Output
-      # A tibble: 600 x 13
+      # A tibble: 600 x 14
              y    x0     x1    x2    x3     f    f0    f1    f2    f3  .row .draw
          <dbl> <dbl>  <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <int> <int>
        1 10.1  0.786 0.709  0.119 0.975 10.1  1.25   4.13  4.73     0     1     1
@@ -17,7 +17,7 @@
        9  7.88 0.960 0.0939 0.676 0.252  4.62 0.253  1.21  3.16     0     5     1
       10  7.88 0.960 0.0939 0.676 0.252  4.62 0.253  1.21  3.16     0     5     2
       # i 590 more rows
-      # i 1 more variable: .fitted <dbl>
+      # i 2 more variables: .parameter <chr>, .fitted <dbl>
 
 # add_predicted_samples works
 

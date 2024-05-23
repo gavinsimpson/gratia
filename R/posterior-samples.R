@@ -237,7 +237,7 @@
 #'
 #' @importFrom stats vcov coef predict
 #' @importFrom dplyr mutate
-#' @importFrom tidyr gather
+#' @importFrom tidyr pivot_longer
 #' @importFrom tibble as_tibble
 #' @importFrom mvnfast rmvn
 #'
@@ -308,11 +308,25 @@
     index = NULL, frequentist = freq, unconditional = unconditional,
     draws = draws, seed = seed, mvn_method = mvn_method
   )
+  ## betas is for *all* coefs, including distributional parameters
+  lss_idx <- lss_eta_index(model)
+  if (gen_fam <- inherits(family(model), "general.family")) {
+    warning("Currently, only for LSS families where location is the mean.")
+    lss_loc <- lss_idx[[1L]] # for now just take the location linpred
+  } else {
+    lss_loc <- lss_idx[[1L]]
+  }
+
   ## don't need to pass freq, unconditional here as that is done for V
   Xp <- predict(model, newdata = data, type = "lpmatrix", ...)
-  sims <- Xp %*% t(betas)
+  sims <- Xp[, lss_loc, drop = FALSE] %*% t(betas[, lss_loc, drop = FALSE])
   # handle the offset if present; it is an attribute on the Xp matrix
+  # it is a list - with 1 component if a normal model and `l` components if it
+  # is a model with `l` linear predictors.
   m_offset <- attr(Xp, "model.offset")
+  if (is.list(m_offset)) {
+    m_offset <- m_offset[[1L]] # only for location ?
+  }
   if (!is.null(m_offset)) {
     sims <- sims + m_offset
   }
@@ -325,9 +339,24 @@
   colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
   sims <- as_tibble(sims)
   names(sims) <- as.character(seq_len(ncol(sims)))
-  sims <- add_column(sims, .row = seq_len(nrow(sims)))
-  sims <- gather(sims, key = ".draw", value = ".fitted", -.row) |>
-    mutate(.draw = as.integer(.data$.draw))
+  sims <- sims |>
+    add_column(
+      .row = seq_len(nrow(sims)),
+      .parameter = rep("location", nrow(sims))
+    )
+  sims <- sims |>
+    pivot_longer(
+      cols = !any_of(c(".row", ".parameter")),
+      values_to = ".fitted",
+      names_to = ".draw",
+      cols_vary = "slowest",
+      names_transform = list(".draw" = as.integer)
+    ) |>
+    relocate(c(".row", ".draw", ".parameter"), .before = 1L)
+  # sims <- gather(sims, key = ".draw", value = ".fitted",
+  # -.data$.row, -.data$.parameter) |>
+  #   mutate(.draw = as.integer(.data$.draw)) |>
+  #   relocate(c(".row", ".draw", ".parameter"), .before = 1L)
   attr(sims, "seed") <- RNGstate
   ## add classes
   class(sims) <- c("fitted_samples", class(sims))

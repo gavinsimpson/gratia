@@ -15,6 +15,13 @@
   title `"s(subject,continuous_var)"`. Simple random intercept terms,
   `s(subject, bs = "re")`, are now titled `"s(subject)"`. #287
 
+## New features
+
+* `fitted_samples()` now works for `gam()` models with multiple linear
+  predictors, but currently only the location parameter is supported. The
+  parameter is indicated through a new variable `.parameter` in the returned
+  object.
+
 ## Bug fixes
 
 * `partial_residuals()` was computing partial residuals from the *deviance*
