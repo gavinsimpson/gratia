@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.9008</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,6 +65,11 @@
 <div class="section level3">
 <h3 id="user-visible-changes-development-version">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-development-version"></a></h3>
 <ul><li>Plots of random effects are now labelled with their smooth label. Previously, the title was taken fro the variable involved in the smooth, but this doesn’t work for terms like <code>s(subject, continuous_var, bs = "re")</code> for random slopes, which previsouly would have the title <code>"subject"</code>. Now such terms will have title <code>"s(subject,continuous_var)"</code>. Simple random intercept terms, <code>s(subject, bs = "re")</code>, are now titled <code>"s(subject)"</code>. <a href="https://github.com/gavinsimpson/gratia/issues/287" class="external-link">#287</a></li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> now works for <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam()</a></code> models with multiple linear predictors, but currently only the location parameter is supported. The parameter is indicated through a new variable <code>.parameter</code> in the returned object.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
