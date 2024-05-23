@@ -196,7 +196,7 @@ test_that("add_fitted_samples works", {
   expect_silent(fs <- quick_eg1 |>
     add_fitted_samples(m_gam, seed = 2, n = 2))
   expect_identical(nrow(fs), 600L) # 300 data by 2 samples
-  expect_named(fs, c(names(quick_eg1), ".row", ".draw", ".fitted"))
+  expect_named(fs, c(names(quick_eg1), ".row", ".draw", ".parameter", ".fitted"))
   expect_snapshot(print(fs))
 })
 
