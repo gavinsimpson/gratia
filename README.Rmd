@@ -46,7 +46,7 @@ m2 <- gam(y ~ s(x, z), data = df2, method = "REML")
 draw(m2)
 ```
 
-```{r appraise-figure, dev = "png", fig.height = 6, fig.width = 9, dpi = 120, echo = FALSE, fig.show = "hide", dependson = -2}
+```{r appraise-figure, dev = "png", fig.height = 6, fig.width = 9, dpi = 120, echo = FALSE, fig.show = "hide"}
 appraise(m1)
 ```
 
