@@ -17,7 +17,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Gavin L. Simpson \email{ucfagls@gmail.com} (\href{https://orcid.org/0000-0002-9084-8413}{ORCID})
+\strong{Maintainer}: Gavin L. Simpson \email{ucfagls@gmail.com} (\href{https://orcid.org/0000-0002-9084-8413}{ORCID}) [copyright holder]
 
 Other contributors:
 \itemize{
