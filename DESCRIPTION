@@ -19,7 +19,7 @@ Imports:
     dplyr (>= 1.1.0),
     tidyr,
     rlang,
-    patchwork,
+    patchwork (>= 1.2.0),
     vctrs,
     grid,
     mvnfast,
