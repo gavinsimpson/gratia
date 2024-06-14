@@ -1,4 +1,4 @@
-# gratia (development version)
+# gratia 0.9.1
 
 ## Breaking changes
 
