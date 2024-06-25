@@ -345,6 +345,7 @@ df |>
   ggplot(aes(x = x, y = y)) +
   geom_point()
 ```
+
 Note how there are very few zeroes and that for large parts of the covariate space the response is all zeroes.
 
 We fit a binomial (logistic) GAM to the data
