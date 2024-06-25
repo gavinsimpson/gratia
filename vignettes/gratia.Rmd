@@ -1,12 +1,12 @@
 ---
-title: "Get started with gratia"
+title: "Getting started with gratia"
 output: 
   rmarkdown::html_vignette:
     fig_width: 8
     fig_height: 5.3333
     dev: "png"
 vignette: >
-  %\VignetteIndexEntry{Getting Started}
+  %\VignetteIndexEntry{Getting started with gratia}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
