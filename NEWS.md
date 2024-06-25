@@ -1,16 +1,5 @@
 # gratia 0.9.2
 
-## User visible changes
-
-* The vignettes
-    1. `custom-plotting.Rmd`, and
-    2. `posterior-simulation.Rmd`
-  were moved to `vignettes/articles` and thus are no longer available as package
-  vignettes. Instead, they are accessible as Articles through the package
-  website: <https://gavinsimpson.github.io/gratia/>
-
-# gratia 0.9.1
-
 ## Breaking changes
 
 * `parametric_effects()` slightly escaped the great renaming that happened for
@@ -25,6 +14,13 @@
   which previsouly would have the title `"subject"`. Now such terms will have
   title `"s(subject,continuous_var)"`. Simple random intercept terms,
   `s(subject, bs = "re")`, are now titled `"s(subject)"`. #287
+
+* The vignettes
+    1. `custom-plotting.Rmd`, and
+    2. `posterior-simulation.Rmd`
+  were moved to `vignettes/articles` and thus are no longer available as package
+  vignettes. Instead, they are accessible as Articles through the package
+  website: <https://gavinsimpson.github.io/gratia/>
 
 ## New features
 
