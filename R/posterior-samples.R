@@ -37,7 +37,7 @@
 #'   matrix when generating random walk proposals. Negative or non finite to
 #'   skip the random walk step. Only used with `method = "mh"`.
 #' @param ... arguments passed to other methods. For `fitted_samples()`, these
-#'   are passed on to [predict.gam()]. For `posterior_samples()` these are
+#'   are passed on to [mgcv::predict.gam()]. For `posterior_samples()` these are
 #'   passed on to `fitted_samples()`. For `predicted_samples()` these are
 #'   passed on to the relevant `simulate()` method.
 #' @param newdata Deprecated: use `data` instead.
