@@ -1,6 +1,6 @@
 Package: gratia
 Version: 0.9.1
-Date: 2024-06-13
+Date: 2024-06-14
 Title: Graceful 'ggplot'-Based Graphics and Other Functions for GAMs Fitted Using 'mgcv'
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     email = "ucfagls@gmail.com",
@@ -66,3 +66,4 @@ RoxygenNote: 7.3.1
 Encoding: UTF-8
 VignetteBuilder: knitr
 Config/testthat/edition: 3
+Config/Needs/website: rmarkdown, ggdist
