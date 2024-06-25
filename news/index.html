@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,8 +58,15 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.2" id="gratia-092">gratia 0.9.2<a class="anchor" aria-label="anchor" href="#gratia-092"></a></h2>
 <div class="section level3">
+<h3 id="breaking-changes-0-9-2">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-9-2"></a></h3>
+<ul><li>
+<code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> slightly escaped the great renaming that happened for 0.9.0. Columns <code>type</code> and <code>term</code> did not gain a prefix <code>.</code>. This is now rectified and these two columns are now <code>.type</code> and <code>.term</code>.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="user-visible-changes-0-9-2">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-9-2"></a></h3>
-<ul><li>The vignettes
+<ul><li><p>Plots of random effects are now labelled with their smooth label. Previously, the title was taken fro the variable involved in the smooth, but this doesn’t work for terms like <code>s(subject, continuous_var, bs = "re")</code> for random slopes, which previsouly would have the title <code>"subject"</code>. Now such terms will have title <code>"s(subject,continuous_var)"</code>. Simple random intercept terms, <code>s(subject, bs = "re")</code>, are now titled <code>"s(subject)"</code>. <a href="https://github.com/gavinsimpson/gratia/issues/287" class="external-link">#287</a></p></li>
+<li>
+<p>The vignettes</p>
 <ol style="list-style-type: decimal"><li>
 <code>custom-plotting.Rmd</code>, and</li>
 <li>
@@ -67,25 +74,13 @@
 </li>
 </ol></li>
 </ul></div>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.9.1" id="gratia-091">gratia 0.9.1<a class="anchor" aria-label="anchor" href="#gratia-091"></a></h2>
 <div class="section level3">
-<h3 id="breaking-changes-0-9-1">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-9-1"></a></h3>
-<ul><li>
-<code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> slightly escaped the great renaming that happened for 0.9.0. Columns <code>type</code> and <code>term</code> did not gain a prefix <code>.</code>. This is now rectified and these two columns are now <code>.type</code> and <code>.term</code>.</li>
-</ul></div>
-<div class="section level3">
-<h3 id="user-visible-changes-0-9-1">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-9-1"></a></h3>
-<ul><li>Plots of random effects are now labelled with their smooth label. Previously, the title was taken fro the variable involved in the smooth, but this doesn’t work for terms like <code>s(subject, continuous_var, bs = "re")</code> for random slopes, which previsouly would have the title <code>"subject"</code>. Now such terms will have title <code>"s(subject,continuous_var)"</code>. Simple random intercept terms, <code>s(subject, bs = "re")</code>, are now titled <code>"s(subject)"</code>. <a href="https://github.com/gavinsimpson/gratia/issues/287" class="external-link">#287</a></li>
-</ul></div>
-<div class="section level3">
-<h3 id="new-features-0-9-1">New features<a class="anchor" aria-label="anchor" href="#new-features-0-9-1"></a></h3>
+<h3 id="new-features-0-9-2">New features<a class="anchor" aria-label="anchor" href="#new-features-0-9-2"></a></h3>
 <ul><li>
 <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> now works for <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam()</a></code> models with multiple linear predictors, but currently only the location parameter is supported. The parameter is indicated through a new variable <code>.parameter</code> in the returned object.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-9-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-1"></a></h3>
+<h3 id="bug-fixes-0-9-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-2"></a></h3>
 <ul><li><p><code><a href="../reference/partial_residuals.html">partial_residuals()</a></code> was computing partial residuals from the <em>deviance</em> residuals. For compatibility with <code><a href="https://rdrr.io/pkg/mgcv/man/plot.gam.html" class="external-link">mgcv::plot.gam()</a></code>, partial residuals are now computed from the <em>working</em> residuals. Reported by <a href="https://github.com/wStockhausen" class="external-link">@wStockhausen</a> <a href="https://github.com/gavinsimpson/gratia/issues/273" class="external-link">#273</a></p></li>
 <li><p><code><a href="../reference/appraise.html">appraise()</a></code> was not passing the <code>ci_col</code> argument on <code><a href="../reference/qq_plot.html">qq_plot()</a></code> and <code><a href="../reference/worm_plot.html">worm_plot()</a></code>. Reported by Sate Ahmed.</p></li>
 <li><p>Couldn’t pass <code>mvn_method</code> on to posterior sampling functions from user facing functions <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code>, <code><a href="../reference/posterior_samples.html">posterior_samples()</a></code>, <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code>, <code><a href="../reference/derivative_samples.html">derivative_samples()</a></code>, and <code>repsonse_derivatives()</code>. Reported by <a href="https://github.com/stefgehrig" class="external-link">@stefgehrig</a> <a href="https://github.com/gavinsimpson/gratia/issues/279" class="external-link">#279</a></p></li>
