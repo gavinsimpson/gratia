@@ -5,6 +5,10 @@
 * `derivative_samples()` was ignoring the `scale` argument. #293 Reported by
   @jonathonmellor
 
+* Argument `level` to `derivative_samples()` was included accidentally. As of
+  v0.9.2.9002 this argument is deprecated and using it will now generate a
+  warning. #291
+
 # gratia 0.9.2
 
 ## Breaking changes
