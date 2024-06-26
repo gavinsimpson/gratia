@@ -1043,7 +1043,7 @@
   fs <- fitted_samples(
     model = object, n = n_sim, data = fd_data,
     method = method, seed = seed, draws = draws,
-    mvn_method = mvn_method, ...
+    mvn_method = mvn_method, scale = scale, ...
   )
 
   fs <- fs |>
