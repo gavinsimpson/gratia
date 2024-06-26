@@ -546,3 +546,8 @@ test_that("smooth samples can use mvn_method", {
   expect_false(identical(sm1, sm2))
 })
 
+test_that("derivative samples level argument is deprecated", {
+  lifecycle::expect_deprecated(derivative_samples(m_gam, focal = "x1", n = 10,
+    n_sim = 10, level = 0.95, seed = 2, data = su_eg1, envir = teardown_env()))
+}
+)
