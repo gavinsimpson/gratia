@@ -937,6 +937,7 @@
 #'   numbers of MVN random values than `mgcv::rmvn()`, but which might not work
 #'   for some marginal fits, such as those where the covariance matrix is close
 #'   to singular.
+#' @param level `r lifecycle::badge("deprecated")`
 #'
 #' @inheritParams response_derivatives
 #'
@@ -977,21 +978,30 @@
 #'     geom_line(alpha = 0.5)
 #' }
 `derivative_samples.gam` <- function(
-    object,
-    focal = NULL,
-    data = NULL,
-    order = 1L,
-    type = c("forward", "backward", "central"),
-    scale = c("response", "linear_predictor"),
-    method = c("gaussian", "mh", "inla", "user"),
-    n = 100,
-    eps = 1e-7,
-    n_sim = 10000, level = 0.95,
-    seed = NULL,
-    envir = environment(formula(object)),
-    draws = NULL,
-    mvn_method = c("mvnfast", "mgcv"),
-    ...) {
+  object,
+  focal = NULL,
+  data = NULL,
+  order = 1L,
+  type = c("forward", "backward", "central"),
+  scale = c("response", "linear_predictor"),
+  method = c("gaussian", "mh", "inla", "user"),
+  n = 100,
+  eps = 1e-7,
+  n_sim = 10000,
+  level = lifecycle::deprecated(),
+  seed = NULL,
+  envir = environment(formula(object)),
+  draws = NULL,
+  mvn_method = c("mvnfast", "mgcv"),
+  ...) {
+  # deal with deprecation of level
+  if (lifecycle::is_present(level)) {
+    lifecycle::deprecate_warn(
+      when = "0.9.2.9002",
+      what = "derivative_samples(level)",
+      details = "`level` was never supported and will be removed in the next release."
+    )
+  }
   ## handle type
   type <- match.arg(type)
   ## handle method
