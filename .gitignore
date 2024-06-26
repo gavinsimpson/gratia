@@ -26,3 +26,6 @@ CRAN-SUBMISSION
 /doc/
 /Meta/
 docs
+
+# Apple stuff
+.DS_Store
