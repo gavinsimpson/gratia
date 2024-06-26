@@ -1,3 +1,10 @@
+# gratia
+
+# Bug fixes
+
+* `derivative_samples()` was ignoring the `scale` argument. #293 Reported by
+  @jonathonmellor
+
 # gratia 0.9.2
 
 ## Breaking changes
