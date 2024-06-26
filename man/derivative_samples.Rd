@@ -24,7 +24,7 @@ derivative_samples(object, ...)
   n = 100,
   eps = 1e-07,
   n_sim = 10000,
-  level = 0.95,
+  level = lifecycle::deprecated(),
   seed = NULL,
   envir = environment(formula(object)),
   draws = NULL,
@@ -73,8 +73,7 @@ implemented). \code{"user"} allows for user-supplied posterior draws
 \item{n_sim}{integer; the number of simulations used in computing the
 simultaneous intervals.}
 
-\item{level}{numeric; \verb{0 < level < 1}; the coverage level of the
-credible interval. The default is \code{0.95} for a 95\% interval.}
+\item{level}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 
 \item{seed}{numeric; a random seed for the simulations.}
 
