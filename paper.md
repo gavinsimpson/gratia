@@ -1,5 +1,5 @@
 ---
-title: 'gratia: An R package for working with generalized additive models'
+title: 'gratia: An R package for exploring generalized additive models'
 tags:
   - R
   - splines
@@ -93,9 +93,11 @@ m1 <- gam(
 
 Model diagnostic plots can be produced using `appraise()`, which by default produces four plots: i) a QQ plot of model residuals, with theoretical quantiles and reference bands generated following @Augustin2012-sc, ii) a plot of residuals (deviance residuals are the default) against linear predictor values, iii) a histogram of residuals, and iv) a plot of observed versus fitted values. Model diagnostic plots for the model, with simulated residuals-based reference bands on the QQ plot, are produced with
 
+
 ``` r
 appraise(m1, method = "simulate")
 ```
+
 which show significant heteroscedasticity and departure from the condtional distribution of the response given the model (Figure \ref{fig:m1-appraise}).
 
 ![\label{fig:m1-appraise}Model diagnostic plots for the GAM fitted to the ocean chlorophyll *a* data produced by the `appraise()` function. The four plots produced are: i) a QQ plot of model residuals, with theoretical quantiles and reference bands generated following @Augustin2012-sc (upper left), ii) a plot of residuals (deviance residuals are default) against linear predictor values (upper right), iii) a histogram of deviance residuals (lower left), and iv) a plot of observed versus fitted values (lower right)](paper_files/figure-latex/m1-appraise-1.pdf) 
