@@ -149,8 +149,7 @@ Perhaps we are interested in the average expected chlorophyll *a* between 40--50
 ``` r
 ds <- data_slice(m2,
   lat = evenly(lat, lower = 40, upper = 50, by = 0.5),
-  lon = evenly(lon, lower = -50, upper = -40, by = 0.5)
-)
+  lon = evenly(lon, lower = -50, upper = -40, by = 0.5))
 ```
 Next, `fitted_values()` returns the predicted values at the specified locations. I only include the spatial effects, excluding the effects of ocean depth and day of year:
 
@@ -197,7 +196,7 @@ fs |>                                 # take the posterior draws
 ## # A tibble: 1 x 6
 ##   chl_a .lower .upper .width .point .interval
 ##   <dbl>  <dbl>  <dbl>  <dbl> <chr>  <chr>    
-## 1  1.07  0.866   1.34   0.95 median qi
+## 1  1.07  0.870   1.33   0.95 median qi
 ```
 The posterior distribution of average chlorophyll *a* is summarised using `median_qi()` from the *ggdist* package [@Kay2024-rv; @Kay2024-uj]. While it would be a simple matter to compute the interval with base R commands, the use of `median_qi()` illustrates how *gratia* tries to interact with other packages.
 

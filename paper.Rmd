@@ -54,7 +54,7 @@ f = 0.2x^{11}\{10(1 - x)\}^6 + 10(10x)^3(1 - x)^{10} \label{gwf2}
 $$
 with additive Gaussian noise ($\mu = 0, \sigma = 1$), and the associated penalty matrix, prepared using functions from *gratia*.
 
-```{r penalised-spline-basis-and-penalty, echo = FALSE, fig.height = 4, fig.width = 10, fig.cap = "\\label{fig:basis-funs}Basis functions (a) and associated penalty matrix (b) for a penalised, low rank, thin plate regression spline. a) shows the individual basis functions (thin coloured lines), as well as the data (black points) to which the GAM was fitted. The estimated smooth is shown as the thick grey line. b) shows the penalty matrix for the basis shown in a). Note the 9th basis function (labelled 'F9', which is the linear function at the lower left to upper right in a), is not affected by the penalty as it has 0 second derivative everywhere, and hence the resulting penalty for this function is 0."}
+```{r penalised-spline-basis-and-penalty, echo = FALSE, fig.height = 4, fig.width = 10, fig.cap = "\\label{fig:basis-funs}Basis functions (a) and associated penalty matrix (b) for a penalised, low rank, thin plate regression spline. a) shows the individual basis functions (thin coloured lines), as well as the data (black points) to which the GAM was fitted. The estimated smooth is shown as the thick grey line. b) shows the penalty matrix for the basis shown in a). Note the 9th basis function (labelled 'F9', which is the linear function at the lower left to upper right in a), is not affected by the penalty as it has 0 second derivative everywhere, and hence the resulting penalty for this function is 0.", fig.pos = "t!"}
 pkgs <- c("mgcv", "gratia", "ggplot2", "dplyr", "tibble", "patchwork")
 res <- vapply(pkgs, library, logical(1), character.only = TRUE,
   logical.return = TRUE)
@@ -129,12 +129,12 @@ m1 <- gam(
 ```
 
 Model diagnostic plots can be produced using `appraise()`, which by default produces four plots: i) a QQ plot of model residuals, with theoretical quantiles and reference bands generated following @Augustin2012-sc, ii) a plot of residuals (deviance residuals are the default) against linear predictor values, iii) a histogram of residuals, and iv) a plot of observed versus fitted values. Model diagnostic plots for the model, with simulated residuals-based reference bands on the QQ plot, are produced with
-```{r m1-appraise, fig.show = "hide", dependson = "fit-chl-model", cache = FALSE, fig.height = 7, fig.width = 10}
+```{r m1-appraise, fig.show = "hide", dependson = "fit-chl-model", cache = FALSE, fig.height = 7, fig.width = 10, fig.pos = "t!"}
 appraise(m1, method = "simulate")
 ```
 which show significant heteroscedasticity and departure from the condtional distribution of the response given the model (Figure \ref{fig:m1-appraise}).
 
-```{r m1-appraise, echo = FALSE, fig.height = 7, fig.width = 10, fig.cap = "\\label{fig:m1-appraise}Model diagnostic plots for the GAM fitted to the ocean chlorophyll *a* data produced by the `appraise()` function. The four plots produced are: i) a QQ plot of model residuals, with theoretical quantiles and reference bands generated following @Augustin2012-sc (upper left), ii) a plot of residuals (deviance residuals are default) against linear predictor values (upper right), iii) a histogram of deviance residuals (lower left), and iv) a plot of observed versus fitted values (lower right)"}
+```{r m1-appraise, echo = FALSE, fig.height = 7, fig.width = 10, fig.cap = "\\label{fig:m1-appraise}Model diagnostic plots for the GAM fitted to the ocean chlorophyll *a* data produced by the `appraise()` function. The four plots produced are: i) a QQ plot of model residuals, with theoretical quantiles and reference bands generated following @Augustin2012-sc (upper left), ii) a plot of residuals (deviance residuals are default) against linear predictor values (upper right), iii) a histogram of deviance residuals (lower left), and iv) a plot of observed versus fitted values (lower right)", fig.pos = "t!"}
 ```
 
 The problems with the model aparent in the diagnostics plots are probably due to important controls on chlorophyll *a* missing from the covariates available in the example data. However, the original model assumed constant values for the scale, $\varphi$, and the power parameter $p$, which may be too inflexible given the absence of important effects in the model. A distributional GAM, where linear predictors for all distributional parameters, may improve the model diagnostics.
@@ -158,7 +158,7 @@ m2 <- gam(
 
 This model has much better model diagnostics although some large residuals remain (Figure \ref{fig:m2-appraise}). Note that the QQ plot uses theoretical quantiles from a standard normal distribution as the simulation-based values are not currently available in *mgcv* or *gratia* for some of the distributional families, including the `twlss()` family, and as such, the reference bands may not be appropriate.
 
-```{r m2-appraise, echo = FALSE, fig.height = 7, fig.width = 10, fig.cap = "\\label{fig:m2-appraise}Model diagnostic plots for the distributional GAM fitted to the ocean chlorophyll *a* data produced by the `appraise()` function. Refer to the caption for Figure \\ref{fig:m1-appraise} for a description of the plots shown.", dependson = "fit-chl-lsslmodel", cache = FALSE}
+```{r m2-appraise, echo = FALSE, fig.height = 7, fig.width = 10, fig.cap = "\\label{fig:m2-appraise}Model diagnostic plots for the distributional GAM fitted to the ocean chlorophyll *a* data produced by the `appraise()` function. Refer to the caption for Figure \\ref{fig:m1-appraise} for a description of the plots shown.", dependson = "fit-chl-lsslmodel", cache = FALSE, fig.pos = "t!"}
 appraise(m2)
 ```
 
@@ -185,8 +185,7 @@ Perhaps we are interested in the average expected chlorophyll *a* between 40--50
 ```{r avg-chl-ds, dependson = "fit-chl-lsslmodel", cache = TRUE}
 ds <- data_slice(m2,
   lat = evenly(lat, lower = 40, upper = 50, by = 0.5),
-  lon = evenly(lon, lower = -50, upper = -40, by = 0.5)
-)
+  lon = evenly(lon, lower = -50, upper = -40, by = 0.5))
 ```
 Next, `fitted_values()` returns the predicted values at the specified locations. I only include the spatial effects, excluding the effects of ocean depth and day of year:
 ```{r avg-chl-fv, dependson = c("fit-chl-lsslmodel", "avg-chl-ds"), cache = TRUE}
