@@ -40,3 +40,6 @@
 ^docs$
 ^doc$
 ^Meta$
+^paper*
+^renv.lock
+^apa\.csl
