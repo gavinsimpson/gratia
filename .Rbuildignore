@@ -43,3 +43,4 @@
 ^paper*
 ^renv.lock
 ^apa\.csl
+^paper_files/figure-latex
