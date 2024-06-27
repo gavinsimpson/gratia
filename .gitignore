@@ -29,3 +29,7 @@ docs
 
 # Apple stuff
 .DS_Store
+
+# JOSS paper stuff
+paper.log
+paper_cache/
