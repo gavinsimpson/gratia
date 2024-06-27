@@ -40,3 +40,5 @@
 ^docs$
 ^doc$
 ^Meta$
+^paper.log
+^paper_cache
