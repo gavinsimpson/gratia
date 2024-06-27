@@ -2,16 +2,26 @@
 % Please edit documentation in R/utililties.R
 \name{model_constant}
 \alias{model_constant}
+\alias{model_constant.gam}
+\alias{model_constant.gamlss}
 \title{Extract the model constant term}
 \usage{
-model_constant(model)
+model_constant(model, ...)
+
+\method{model_constant}{gam}(model, lp = NULL, ...)
+
+\method{model_constant}{gamlss}(model, ...)
 }
 \arguments{
-\item{model}{a fitted model for which a \code{coef()} method exists}
+\item{model}{a fitted model for which a \code{coef()} method exists.}
+
+\item{...}{arguments passed to other methods.}
+
+\item{lp}{numeric; which linear predictors to extract constant terms for.}
 }
 \description{
-Extracts the model constant term, the model intercept, from a fitted model
-object.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}} Extracts the model constant term(s),
+the model intercept, from a fitted model object.
 }
 \examples{
 \dontshow{
