@@ -1818,10 +1818,12 @@ reclass_scam_smooth <- function(smooth) {
 
 #' Extract the model constant term
 #'
-#' Extracts the model constant term, the model intercept, from a fitted model
-#' object.
+#' `r lifecycle::badge("experimental")` Extracts the model constant term(s),
+#' the model intercept, from a fitted model object.
 #'
-#' @param model a fitted model for which a `coef()` method exists
+#' @param model a fitted model for which a `coef()` method exists.
+#' @param lp numeric; which linear predictors to extract constant terms for.
+#' @param ... arguments passed to other methods.
 #'
 #' @export
 #' @importFrom stats coef
@@ -1845,10 +1847,36 @@ reclass_scam_smooth <- function(smooth) {
 #' \dontshow{
 #' options(op)
 #' }
-`model_constant` <- function(model) {
-  b <- coef(model)
-  b[1L] |>
+#' @export
+`model_constant` <- function(model, ...) {
+  UseMethod("model_constant")
+}
+
+#' @export
+#' @rdname model_constant
+`model_constant.gam` <- function(model, lp = NULL, ...) {
+  lss_idx <- lss_eta_index(model)
+  n_lp <- n_eta(model)
+  if (!is.null(lp)) {
+    if (any(lp > n_lp)) {
+      stop("invalid linear predictor")
+    }
+    lp <- lp[lp %in% seq_len(n_lp)]
+  } else {
+    lp <- seq_len(n_lp)
+  }
+  lss_idx <- lss_idx[lp]
+  idx <- vapply(lss_idx, FUN = `[`, FUN.VALUE = numeric(1), 1)
+  b <- coef(model)[idx] |>
     unname()
+  attr(b, "par_names") <- lss_parameters(model)
+  b
+}
+
+#' @export
+#' @rdname model_constant
+`model_constant.gamlss` <- function(model, ...) {
+  .NotYetImplemented()
 }
 
 #' Extract the boundary of a soap film smooth
@@ -1883,4 +1911,68 @@ reclass_scam_smooth <- function(smooth) {
 `boundary.gam` <- function(x, select, ...) {
   id <- which_smooths(x, select)
   boundary(get_smooths_by_id(x, id)[[1L]])
+}
+
+#' The Number of linear predictors in model
+#'
+#' `r lifecycle::badge("experimental")` Extracts the number of linear predictors
+#' from the fitted model.
+#'
+#' @param model a fitted model. Currently, only models inheriting from class
+#'   `"gam"` are supported.
+#' @param ... arguments passed to methods.
+#'
+#' @return An integer vector of length 1 containing the number of linear
+#' predictors in the model.
+#'
+#' @export
+#' @keywords utility
+`n_eta` <- function(model, ...) {
+  UseMethod("n_eta")
+}
+
+#' @export
+#' @rdname n_eta
+`n_eta.gam` <- function(model, ...) {
+  lpi <- attr(formula(model), "lpi")
+  n_eta <- if (is.null(lpi)) {
+    1L
+  } else {
+    length(lpi)
+  }
+  n_eta
+}
+
+#' Dispersion parameter for fitted model
+#'
+#' `r lifecycle::badge("experimental")`
+#'
+#' @param model a fitted model.
+#' @param ... arguments passed to other methods.
+#' @export
+`dispersion` <- function(model, ...) {
+  UseMethod("dispersion")
+}
+
+#' @export
+#' @rdname dispersion
+`dispersion.gam` <- function(model, ...) {
+  model$sig2
+}
+
+#' @export
+#' @rdname dispersion
+`dispersion.glm` <- function(model, ...) {
+  f <- family(model)
+  disp <- f$dispersion
+  if (is.null(disp) || is.na(disp)) {
+    if (family_name(f) %in% c("poisson", "binomial")) {
+      disp <- 1
+    } else {
+      w <- weights(model)
+      r <- residuals(model, type = "working")
+      disp <- sum((w * r^2)[w > 0]) / df.residual(model)
+    }
+  }
+  disp
 }
