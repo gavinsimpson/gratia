@@ -32,3 +32,5 @@ docs
 
 # joss paper stuff
 paper_cache/*
+paper.log
+paper.pdf
