@@ -205,6 +205,16 @@ m_gaulss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~1),
   family = gaulss
 )
 
+data(mcycle, package = "MASS")
+m_accel <- gam(
+  list(
+    accel ~ s(times, bs = "ad"),
+    ~ s(times)
+  ),
+  data = mcycle, method = "REML", family = gaulss(),
+  control = gam.control(nthreads = 2)
+)
+
 m_scat <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = su_eg1,
   family = scat(), method = "REML"

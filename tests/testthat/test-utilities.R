@@ -519,7 +519,9 @@ test_that("norm_minus_one_to_one works with NA", {
 test_that("model_constant returns the intercept estimate", {
   expect_silent(b <- model_constant(m_gam))
   expect_type(b, "double")
-  expect_identical(b, unname(coef(m_gam)[1L]))
+  ref <- unname(coef(m_gam)[1L])
+  attr(ref, "par_names") <- "location"
+  expect_identical(b, ref)
   expect_named(b, expected = NULL)
 })
 
