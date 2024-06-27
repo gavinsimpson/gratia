@@ -598,3 +598,21 @@ test_that("model vars works for various GAMs", {
   expect_silent(mvars <- model_vars(m_gamm4))
   expect_identical(mvars, paste0("x", 0:3))
 })
+
+test_that("dispersion works for a GAM", {
+  expect_identical(dispersion(m_gam), m_gam$sig2)
+})
+
+test_that("dispersion works for a GLM", {
+  expect_identical(dispersion(m_glm), summary(m_glm)$dispersion)
+})
+
+test_that("n_eta work", {
+  expect_identical(n_eta(m_gam), 1L)
+  expect_identical(n_eta(m_accel), 2L)
+})
+
+test_that("model_constant works for a GAMLSS", {
+  expect_length(model_constant(m_accel), 2L)
+  expect_length(model_constant(m_gam), 1L)
+})
