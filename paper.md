@@ -156,7 +156,7 @@ ds <- data_slice(m2,
 Next, `fitted_values()` returns the predicted values at the specified locations. I only include the spatial effects, excluding the effects of ocean depth and day of year:
 
 ``` r
-use <- c("(Intercept)", "s(lat,lon)") # , "s.1(lat,lon)", "s.2(lat,lon)")
+use <- c("(Intercept)", "s(lat,lon)", "s.1(lat,lon)", "s.2(lat,lon)")
 fv <- fitted_values(m2, data = ds, terms = use) # predict
 ```
 Finally, I summarise the predictions for the location parameter to yield the average of the predicted values
