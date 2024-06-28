@@ -153,10 +153,10 @@ ds <- data_slice(m2,
   lat = evenly(lat, lower = 40, upper = 50, by = 0.5),
   lon = evenly(lon, lower = -50, upper = -40, by = 0.5))
 ```
-Next, `fitted_values()` returns the predicted values at the specified locations. I only include the spatial effects, excluding the effects of ocean depth and day of year:
+Next, `fitted_values()` returns the predicted values at the specified locations. I only include the spatial effects, excluding the effects of ocean depth and day of year, and ignore terms in the other linear predictors as they do not affect the expected chlorophyll *a*:
 
 ``` r
-use <- c("(Intercept)", "s(lat,lon)", "s.1(lat,lon)", "s.2(lat,lon)")
+use <- c("(Intercpt)", "s(lat,lon)")
 fv <- fitted_values(m2, data = ds, terms = use) # predict
 ```
 Finally, I summarise the predictions for the location parameter to yield the average of the predicted values
@@ -171,7 +171,7 @@ fv |>
 ## # A tibble: 1 x 1
 ##   chl_a
 ##   <dbl>
-## 1  1.07
+## 1 0.930
 ```
 While this is an acceptable answer to the question, it lacks an uncertainty estimate. This is where posterior sampling is useful. With a small modification of the above code and a little data wrangling, we can produce an uncertainty estimate ,using `fitted_samples()` to generate posterior draws of the expected chlorophyll *a*:
 
