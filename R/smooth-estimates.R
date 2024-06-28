@@ -2545,7 +2545,7 @@
 
 #' @importFrom ggplot2 ggplot geom_point geom_raster geom_contour
 #'   expand_limits labs guides guide_colourbar theme guide_axis geom_line
-#'   geom_path scale_fill_distiller
+#'   geom_path scale_fill_distiller coord_fixed
 #' @importFrom grid unit
 #' @importFrom rlang .data
 #' @keywords internal
@@ -2601,7 +2601,8 @@
     x = .data[[variables[1]]],
     y = .data[[variables[2]]]
   )) +
-    geom_raster(mapping = aes(fill = .data[[plot_var]]))
+    geom_raster(mapping = aes(fill = .data[[plot_var]])) +
+    coord_fixed(ratio = 1)
 
   if (isTRUE(contour)) {
     plt <- plt + geom_contour(
