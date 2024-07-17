@@ -12,7 +12,15 @@
 \usage{
 penalty(object, ...)
 
-\method{penalty}{default}(object, rescale = FALSE, data, knots = NULL, constraints = FALSE, ...)
+\method{penalty}{default}(
+  object,
+  rescale = FALSE,
+  data,
+  knots = NULL,
+  constraints = FALSE,
+  diagonalize = FALSE,
+  ...
+)
 
 \method{penalty}{gam}(
   object,
@@ -49,6 +57,11 @@ is required. See \code{\link[mgcv:smoothCon]{mgcv::smoothCon()}}.}
 
 \item{constraints}{logical; should identifiability constraints be applied to
 the smooth basis. See argument \code{absorb.cons} in \code{\link[mgcv:smoothCon]{mgcv::smoothCon()}}.}
+
+\item{diagonalize}{logical; if \code{TRUE}, reparameterises the smooth such that
+the associated penalty is an identity matrix. This has the effect of
+turning the last diagonal elements of the penalty to zero, which highlights
+the penalty null space.}
 
 \item{select}{character, logical, or numeric; which smooths to extract
 penalties for. If \code{NULL}, the default, then penalties for all model

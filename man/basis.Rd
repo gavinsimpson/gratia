@@ -63,7 +63,15 @@ basis(object, ...)
   ...
 )
 
-\method{basis}{default}(object, data, knots = NULL, constraints = FALSE, at = NULL, ...)
+\method{basis}{default}(
+  object,
+  data,
+  knots = NULL,
+  constraints = FALSE,
+  at = NULL,
+  diagonalize = FALSE,
+  ...
+)
 }
 \arguments{
 \item{object}{a smooth specification, the result of a call to one of
@@ -106,6 +114,11 @@ the smooth basis. See argument \code{absorb.cons} in \code{\link[mgcv:smoothCon]
 
 \item{at}{a data frame containing values of the smooth covariate(s) at which
 the basis should be evaluated.}
+
+\item{diagonalize}{logical; if \code{TRUE}, reparameterises the smooth such that
+the associated penalty is an identity matrix. This has the effect of
+turning the last diagonal elements of the penalty to zero, which highlights
+the penalty null space.}
 }
 \value{
 A tibble.
