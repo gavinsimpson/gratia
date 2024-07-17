@@ -11,7 +11,7 @@ mgcv::t2(), or from a fitted GAM(M)."><meta property="og:image" content="https:/
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -111,7 +111,15 @@ of <em>mgcv</em>'s smooths via <code><a href="https://rdrr.io/pkg/mgcv/man/s.htm
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Default S3 method</span></span>
-<span><span class="fu">basis</span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span>, knots <span class="op">=</span> <span class="cn">NULL</span>, constraints <span class="op">=</span> <span class="cn">FALSE</span>, at <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">basis</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  <span class="va">data</span>,</span>
+<span>  knots <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  constraints <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  at <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  diagonalize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -183,6 +191,13 @@ the smooth basis. See argument <code>absorb.cons</code> in <code><a href="https:
 <dt id="arg-at">at<a class="anchor" aria-label="anchor" href="#arg-at"></a></dt>
 <dd><p>a data frame containing values of the smooth covariate(s) at which
 the basis should be evaluated.</p></dd>
+
+
+<dt id="arg-diagonalize">diagonalize<a class="anchor" aria-label="anchor" href="#arg-diagonalize"></a></dt>
+<dd><p>logical; if <code>TRUE</code>, reparameterises the smooth such that
+the associated penalty is an identity matrix. This has the effect of
+turning the last diagonal elements of the penalty to zero, which highlights
+the penalty null space.</p></dd>
 
 </dl></div>
     <div class="section level2">

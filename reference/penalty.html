@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,7 +49,15 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">penalty</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Default S3 method</span></span>
-<span><span class="fu">penalty</span><span class="op">(</span><span class="va">object</span>, rescale <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">data</span>, knots <span class="op">=</span> <span class="cn">NULL</span>, constraints <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">penalty</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  rescale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">data</span>,</span>
+<span>  knots <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  constraints <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  diagonalize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gam'</span></span>
 <span><span class="fu">penalty</span><span class="op">(</span></span>
@@ -106,6 +114,13 @@ is required. See <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html" cla
 <dt id="arg-constraints">constraints<a class="anchor" aria-label="anchor" href="#arg-constraints"></a></dt>
 <dd><p>logical; should identifiability constraints be applied to
 the smooth basis. See argument <code>absorb.cons</code> in <code><a href="https://rdrr.io/pkg/mgcv/man/smoothCon.html" class="external-link">mgcv::smoothCon()</a></code>.</p></dd>
+
+
+<dt id="arg-diagonalize">diagonalize<a class="anchor" aria-label="anchor" href="#arg-diagonalize"></a></dt>
+<dd><p>logical; if <code>TRUE</code>, reparameterises the smooth such that
+the associated penalty is an identity matrix. This has the effect of
+turning the last diagonal elements of the penalty to zero, which highlights
+the penalty null space.</p></dd>
 
 
 <dt id="arg-select">select<a class="anchor" aria-label="anchor" href="#arg-select"></a></dt>
