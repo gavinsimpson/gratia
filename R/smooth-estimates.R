@@ -547,7 +547,12 @@
     by_var <- NA_character_
   }
 
-  ## deal with data if supplied
+  # Deal with data if supplied
+  # As a special case, if no `data`, then we should generate some data here for
+  # soap film from the boundary
+  if (is.null(data)) {
+    data <- soap_film_data(smooth)
+  } 
   data <- process_user_data_for_eval(
     data = data, model = model,
     n = n, n_3d = n_3d, n_4d = n_4d,
@@ -558,7 +563,7 @@
   )
 
   # handle soap film smooths
-  # can use this if Simon accepts the proposed changes tin inSide()
+  # can use this if Simon accepts the proposed changes to inSide()
   is_soap_film <- inherits(smooth, "soap.film")
   if (is_soap_film) {
     bnd <- boundary(smooth) # smooth$xt$bnd
@@ -1143,7 +1148,7 @@
   if (sm_dim == 1L &&
     sm_type %in% c(
       "TPRS", "TPRS (shrink)", "CRS", "CRS (shrink)",
-      "Cyclic CRS", "P spline", "B spline", "Duchon spline",
+      "Cyclic CRS", "Cyclic P spline", "P spline", "B spline", "Duchon spline",
       "GP",
       "Mono inc P spline",
       "Mono dec P spline",

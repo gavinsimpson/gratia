@@ -9,7 +9,7 @@
 \alias{smooth_type.cs.smooth}
 \alias{smooth_type.cyclic.smooth}
 \alias{smooth_type.pspline.smooth}
-\alias{smooth_type.cp.smooth}
+\alias{smooth_type.cpspline.smooth}
 \alias{smooth_type.Bspline.smooth}
 \alias{smooth_type.duchon.spline}
 \alias{smooth_type.fs.interaction}
@@ -51,7 +51,7 @@ smooth_type(smooth)
 
 \method{smooth_type}{pspline.smooth}(smooth)
 
-\method{smooth_type}{cp.smooth}(smooth)
+\method{smooth_type}{cpspline.smooth}(smooth)
 
 \method{smooth_type}{Bspline.smooth}(smooth)
 

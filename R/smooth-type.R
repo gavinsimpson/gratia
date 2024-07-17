@@ -65,7 +65,7 @@
 
 #' @export
 #' @rdname smooth_type
-`smooth_type.cp.smooth` <- function(smooth) {
+`smooth_type.cpspline.smooth` <- function(smooth) {
   sm_type <- "Cyclic P spline"
   sm_type
 }
