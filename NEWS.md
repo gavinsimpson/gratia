@@ -1,6 +1,12 @@
 # gratia
 
-# Bug fixes
+## New features
+
+* `penalty()` and `basis()` can now allow the smooth to be reparameterized such
+  that the resulting basis has an identity matrix. This more clearly highlights
+  the penalty null space, the functions that the penalty has no effect on.
+
+## Bug fixes
 
 * `derivative_samples()` was ignoring the `scale` argument. #293 Reported by
   @jonathonmellor
