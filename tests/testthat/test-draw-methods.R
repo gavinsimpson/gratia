@@ -525,7 +525,7 @@ test_that("draw() can handle a mixture of numeric and factor random effects", {
 test_that("draw.gam uses fixed scales if asked for them: #73", {
   skip_on_cran()
   # skip_on_ci() # testing without as moved to mac os x
-  df <- data_sim("eg1", n = 1000, seed = 1)
+  # df <- data_sim("eg1", n = 1000, seed = 1)
   m <- gam(y ~ s(x1) + s(x2) + ti(x1, x2), data = su_eg1, method = "REML")
   plt <- draw(m, scales = "fixed", rug = FALSE)
 

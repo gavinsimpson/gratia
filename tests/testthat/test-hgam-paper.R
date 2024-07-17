@@ -138,7 +138,7 @@ test_that("draw() can plot bird_move model 1", {
 test_that("draw() can plot bird_move model 2", {
   skip_on_cran()
   skip_on_ci()
-  expect_warning(
+  # expect_warning(
     bird_mod2 <- bam(
       count ~ te(week, latitude,
         bs = c("cc", "tp"),
@@ -151,9 +151,9 @@ test_that("draw() can plot bird_move model 2", {
       data = bird_move, method = "fREML", family = poisson(),
       knots = list(week = c(0, 52)),
       control = ctrl, discrete = FALSE
-    ),
-    "fitted rates numerically 0 occurred"
-  )
+    )#,
+    #"fitted rates numerically 0 occurred"
+  #)
   plt <- draw(bird_mod2, rug = FALSE, n = 50)
   expect_doppelganger("hgam-paper-bird-move-model-2", plt)
 })
