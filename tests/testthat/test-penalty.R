@@ -14,6 +14,13 @@ test_that("penalty() works with a simple GAM", {
   expect_named(p, pen_nms)
 })
 
+test_that("penalty() works with constraints and diagonalize", {
+  expect_silent(p <- penalty(s(x, bs = "bs"), data = data_sim("gwf2", seed = 2),
+  constraints = TRUE, diagonalize = TRUE))
+  expect_s3_class(p, "penalty_df")
+  expect_named(p, pen_nms)
+})
+
 test_that("penalty() resclaing works with a simple GAM", {
   expect_silent(p <- penalty(su_m_su_eg4, rescale = TRUE))
   expect_s3_class(p, "penalty_df")

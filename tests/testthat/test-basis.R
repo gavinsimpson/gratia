@@ -8,6 +8,13 @@ test_that("basis() works with a simple smooth", {
   expect_named(bs, c(bs_nms, "x0"))
 })
 
+test_that("basis() works constraints and diagonalize", {
+  expect_silent(bs <- basis(s(x0), data = su_eg4, constraints = TRUE,
+    diagonalize = TRUE))
+  expect_s3_class(bs, "basis")
+  expect_named(bs, c(bs_nms, "x0"))
+})
+
 test_that("basis() works with a factor by smooth", {
   expect_silent(bs <- basis(s(x2, by = fac), data = su_eg4))
   expect_s3_class(bs, "basis")
