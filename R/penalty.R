@@ -80,14 +80,15 @@
 #' @inheritParams basis.default
 `penalty.default` <- function(
     object, rescale = FALSE, data, knots = NULL,
-    constraints = FALSE, ...) {
+    constraints = FALSE, diagonalize = FALSE, ...) {
   # class of object and check for ".smooth.spec"
   cls <- class(object)
   if (str_detect(cls, "smooth.spec", negate = TRUE)) {
     stop("'object' doesn't appear to be a smooth created by {mgcv}.")
   }
   ## call smoothCon to create the basis as specified in `object`
-  sm <- smoothCon(object, data = data, knots = knots, absorb.cons = constraints)
+  sm <- smoothCon(object, data = data, knots = knots, absorb.cons = constraints,
+    diagonal.penalty = diagonalize)
 
   out <- if (length(sm) == 1L) {
     penalty(sm[[1]])

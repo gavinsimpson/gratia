@@ -28,6 +28,10 @@
 #'   the smooth basis. See argument `absorb.cons` in [mgcv::smoothCon()].
 #' @param at a data frame containing values of the smooth covariate(s) at which
 #'   the basis should be evaluated.
+#' @param diagonalize logical; if `TRUE`, reparameterises the smooth such that
+#'   the associated penalty is an identity matrix. This has the effect of
+#'   turning the last diagonal elements of the penalty to zero, which highlights
+#'   the penalty null space.
 #' @param ... other arguments passed to [mgcv::smoothCon()].
 #'
 #' @inheritParams smooth_estimates
@@ -267,7 +271,7 @@
 #' @importFrom purrr map
 #' @importFrom dplyr bind_rows
 `basis.default` <- function(object, data, knots = NULL, constraints = FALSE,
-                            at = NULL, ...) {
+                            at = NULL, diagonalize = FALSE, ...) {
   # class of object and check for ".smooth.spec"
   cls <- class(object)
   if (str_detect(cls, "smooth.spec", negate = TRUE)) {
@@ -276,7 +280,8 @@
   ## call smoothCon to create the basis as specified in `x`
   sm <- smoothCon(object,
     data = data, knots = knots,
-    absorb.cons = constraints
+    absorb.cons = constraints,
+    diagonal.penalty = diagonalize
   )
 
   ## sm will be a list, even if a single smooth, bc we could have multiple
