@@ -9,6 +9,9 @@
   v0.9.2.9002 this argument is deprecated and using it will now generate a
   warning. #291
 
+* `draw()` was not plotting cyclic P spline smooths. Reported by @Zuckerbrot
+  #297
+
 # gratia 0.9.2
 
 ## Breaking changes
