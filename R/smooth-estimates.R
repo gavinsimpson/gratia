@@ -466,7 +466,7 @@
 #' @param model a fitted model; currently only [mgcv::gam()] and [mgcv::bam()]
 #'   models are suported.
 #' @param data an optional data frame of values to evaluate `smooth` at.
-#' @param ... arguments assed to other methods
+#' @param ... arguments passed to other methods
 #'
 #' @inheritParams smooth_estimates
 #'
