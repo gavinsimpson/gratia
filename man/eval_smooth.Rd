@@ -122,7 +122,7 @@ eval_smooth(smooth, ...)
 \arguments{
 \item{smooth}{currently an object that inherits from class \code{mgcv.smooth}.}
 
-\item{...}{arguments assed to other methods}
+\item{...}{arguments passed to other methods}
 
 \item{model}{a fitted model; currently only \code{\link[mgcv:gam]{mgcv::gam()}} and \code{\link[mgcv:bam]{mgcv::bam()}}
 models are suported.}
