@@ -18,6 +18,9 @@
 * `draw()` was not plotting cyclic P spline smooths. Reported by @Zuckerbrot
   #297
 
+* `derivatives()` would fail for `"fs"` smooths with other parametric effects in
+  the model. Reported by @mahonmb #301
+
 # gratia 0.9.2
 
 ## Breaking changes
