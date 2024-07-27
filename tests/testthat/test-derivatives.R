@@ -441,7 +441,7 @@ test_that("derivatives() works for factor by smooths issue 47", {
   expect_doppelganger("draw issue 47 derivatives for gamm factor by", plt4)
 })
 
-test_that("derivatives() works for fs smooths issue 57", {
+test_that("derivatives() works for fs smooths issue 57 and 301", {
   skip_on_cran()
   logistic.growth <- function(t, y0, k, r) {
     return(k * (y0 / (y0 + (k - y0) * exp(-r * t))))
@@ -472,9 +472,15 @@ test_that("derivatives() works for fs smooths issue 57", {
   expect_s3_class(fd, "tbl_df")
   expect_named(fd, c(deriv_nms, "t", "unit"))
   plt <- draw(fd) # FIXME: need to update draw(d) so it works with fs smooths
-  
+
   skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw issue 57 derivatives for factor by", plt)
+
+  # test variant in #301
+  logistic_growth_df$linearterm = runif(16)
+  m <- gam(y_obs ~ s(t, unit, k = 5, bs = "fs", m = 2) + linearterm,
+    data = logistic_growth_df, method = "REML")
+  expect_silent(m <- derivatives(m))
 })
 
 ## tests for by variables & simultaneous intervals #102
