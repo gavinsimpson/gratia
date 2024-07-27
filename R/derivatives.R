@@ -556,7 +556,8 @@
   ## because model.frame() on a gamm() contains extraneous variables, related
   ## to the mixed model form for lme()
   all_m_vars <- m_vars <- model_vars(model)
-  want <- str_detect(smooth_vars, m_vars)
+  # want <- str_detect(smooth_vars, m_vars)
+  want <- m_vars %in% smooth_vars
   m_vars <- m_vars[want]
 
   # now get rid of all but the focal variable *if set* in m_vars
