@@ -477,7 +477,7 @@ test_that("derivatives() works for fs smooths issue 57 and 301", {
   expect_doppelganger("draw issue 57 derivatives for factor by", plt)
 
   # test variant in #301
-  logistic_growth_df$linearterm = runif(16)
+  logistic_growth_df$linearterm <- runif(16)
   m_logistic_growth <- gam(y_obs ~ s(t, unit, k = 5, bs = "fs", m = 2) + linearterm,
     data = logistic_growth_df, method = "REML")
   expect_silent(fd <- derivatives(m_logistic_growth))
