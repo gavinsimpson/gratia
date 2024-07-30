@@ -178,7 +178,9 @@ test_that("confint.fderiv example output", {
     q <- quantile(x, prob = c(0 + v, 1 - v), type = 8)
     seq(q[1], q[2], length = n)
   }
-  new_data <- sapply(su_eg1[c("x0", "x1", "x2", "x3")], middle)
+  n_middle <- 25
+  new_data <- vapply(su_eg1[c("x0", "x1", "x2", "x3")], FUN = middle,
+    FUN.VALUE = numeric(n_middle), n = n_middle)
   new_data <- data.frame(new_data)
   ## first derivatives of all smooths...
   fd <- fderiv(m_gam, newdata = new_data)

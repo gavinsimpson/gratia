@@ -258,7 +258,7 @@
     }
     ## if they do all inherit from the correct class, then run term_names
     ## on each element and combine - returns $term and $by from each smooth
-    unlist(sapply(smooths, FUN = term_names))
+    unlist(lapply(smooths, FUN = term_names))
   }
 
   ## check that the vars we need are in data
