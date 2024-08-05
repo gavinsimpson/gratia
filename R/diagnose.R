@@ -1,11 +1,30 @@
 ## Functions to diagnose problems with fitted GAMs
 
-#' @title Quantile-quantile plot of model residuals
+#' Quantile-quantile plot of model residuals
 #'
-#' @param model a fitted model. Currently only class `"gam"`.
+#' Quantile-quantile plots (QQ-plots) for GAMs using the reference quantiles of
+#' Augustin *et al* (2012).
 #'
-#' @param method character; method used to generate theoretical quantiles. Note
-#'   that `method = "direct"` is deprecated in favour of `method = "uniform"`.
+#' @param model a fitted model. Currently models inheriting from class `"gam"`,
+#'   as well as classes `"glm"` and `"lm"` from calls to [stats::glm] or
+#'   [stats::lm] are supported.
+#' @param method character; method used to generate theoretical quantiles.
+#'   The default is `"uniform"`, which generates reference quantiles using
+#'   random draws from a uniform distribution and the inverse cummulative
+#'   distribution function (CDF) of the fitted values. The reference quantiles
+#'   are averaged over `n_uniform` draws. `"simulate"` generates reference
+#'   quantiles by simulating new response data from the model at the observed
+#'   values of the covariates, which are then residualised to generate reference
+#'   quantiles, using `n_simulate` simulated data sets. `"normal"` generates
+#'   reference quantiles using the standard normal distribution. `"uniform"` is
+#'   more computationally efficient, but `"simulate"` allows reference bands to
+#'   be drawn on the QQ-plot. `"normal"` should be avoided but is used as a fall
+#'   back if a random number generator (`"simulate"`) or the inverse of the CDF
+#'   are not available from the `family` used during model fitting
+#'   (`"uniform"``).
+#'
+#'   Note that `method = "direct"` is deprecated in favour of
+#'   `method = "uniform"`.
 #' @param type character; type of residuals to use. Only `"deviance"`,
 #'   `"response"`, and `"pearson"` residuals are allowed.
 #' @param n_uniform numeric; number of times to randomize uniform quantiles
@@ -36,6 +55,18 @@
 #' @note The wording used in [mgcv::qq.gam()] uses *direct* in reference to the
 #'   simulated residuals method (`method = "simulated"`). To avoid confusion,
 #'   `method = "direct"` is deprecated in favour of `method = "uniform"`.
+#'
+#' @seealso [mgcv::qq.gam] for more details on the methods used.
+#'
+#' @references
+#'
+#' The underlying methodology used when `method` is `"simulate"` or `"uniform"`
+#' is described in Augustin *et al* (2012):
+#'
+#' Augustin, N.H., Sauleau, E.-A., Wood, S.N., (2012) On quantile quantile plots
+#' for generalized linear models. *Computational Statatistics and Data Analysis*
+#' **56**, 2404-2409 \doi{doi:10.1016/j.csda.2012.01.026}.
+#'
 #'
 #' @export
 `qq_plot` <- function(model, ...) {
@@ -671,9 +702,26 @@
 
 #' @title Model diagnostic plots
 #'
-#' @param model a fitted model. Currently only class `"gam"`.
-#' @param method character; method used to generate theoretical quantiles. Note
-#'   that `method = "direct"` is deprecated in favour of `method = "uniform"`.
+#' @param model a fitted model. Currently models inheriting from class `"gam"`,
+#'   as well as classes `"glm"` and `"lm"` from calls to [stats::glm] or
+#'   [stats::lm] are supported.
+#' @param method character; method used to generate theoretical quantiles.
+#'   The default is `"uniform"`, which generates reference quantiles using
+#'   random draws from a uniform distribution and the inverse cummulative
+#'   distribution function (CDF) of the fitted values. The reference quantiles
+#'   are averaged over `n_uniform` draws. `"simulate"` generates reference
+#'   quantiles by simulating new response data from the model at the observed
+#'   values of the covariates, which are then residualised to generate reference
+#'   quantiles, using `n_simulate` simulated data sets. `"normal"` generates
+#'   reference quantiles using the standard normal distribution. `"uniform"` is
+#'   more computationally efficient, but `"simulate"` allows reference bands to
+#'   be drawn on the QQ-plot. `"normal"` should be avoided but is used as a fall
+#'   back if a random number generator (`"simulate"`) or the inverse of the CDF
+#'   (`"uniform"``) are not available from the `family` used during model
+#'   fitting.
+#'
+#'   Note that `method = "direct"` is deprecated in favour of
+#'   `method = "uniform"`.
 #' @param use_worm logical; should a worm plot be drawn in place of the QQ plot?
 #' @param n_uniform numeric; number of times to randomize uniform quantiles
 #'   in the direct computation method (`method = "direct"`) for QQ plots.

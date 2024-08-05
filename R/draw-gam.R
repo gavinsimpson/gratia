@@ -5,7 +5,10 @@
 #' is used instead.
 #'
 #' @param object a fitted GAM, the result of a call to [mgcv::gam()].
-#' @param data a optional data frame that may or may not be used? FIXME!
+#' @param data an optional data frame that is used to supply the data at which
+#'   the smooths will be evaluated and plotted. This is usually not needed, but
+#'   is an option if you need fine control over exactly what data are used for
+#'   plotting.
 #' @param select character, logical, or numeric; which smooths to plot. If
 #'   `NULL`, the default, then all model smooths are drawn. Numeric `select`
 #'   indexes the smooths in the order they are specified in the formula and
