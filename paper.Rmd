@@ -179,7 +179,7 @@ If the provided plots are insufficient for users' needs, lower-level functionali
 smooth_estimates(m2, select = "s(lat,lon)", n = 50) |>
   add_confint()
 ```
-This returns a data frame of the requested values, which is easily plotted using `ggplot()`.
+This returns a data frame of the requested values that is ammenable for plotted with `ggplot()`.
 
 ## Posterior sampling
 
