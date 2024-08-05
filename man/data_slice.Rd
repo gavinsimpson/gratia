@@ -28,7 +28,7 @@ data_slice(object, ...)
 \item{object}{an R model object.}
 
 \item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> User supplied variables
-defining the data slice. Arguments passed via \code{...} need to \emph{named}}
+defining the data slice. Arguments passed via \code{...} need to be \emph{named}.}
 
 \item{data}{an alternative data frame of values containing all the variables
 needed to fit the model. If \code{NULL}, the default, the data used to fit the
@@ -40,6 +40,36 @@ passed in \code{...} will be evaluated in \code{data}.}
 }
 \description{
 Prepare a data slice through model covariates
+}
+\details{
+A data slice is the data set that results where one (or more
+covariates) is varied systematically over some or all of its (their) range or
+at a specified subset of values of interest, while any remaining covariates
+in the model are held at fixed, representative values. This is known as a
+\emph{reference grid} in package \strong{emmeans} and a \emph{data grid} in the
+\strong{marginaleffects} package.
+
+For GAMs, any covariates not specified via \code{...} will take representative
+values determined from the data used to fit the model as follows:
+\itemize{
+\item for numeric covariates, the value in the fitting data that is closest to
+the median value is used,
+\item for factor covariates, the modal (most frequently observed) level is used,
+or the first level (sorted as per the vector returned by \code{\link[base:levels]{base::levels()}}
+if several levels are observed the same number of times.
+}
+
+These values are already computed when calling \code{gam()} or \code{bam()} for example
+and can be found in the \code{var.summary} component of the fitted model. Function
+\code{\link[=typical_values]{typical_values()}} will extract these values for you if you are interested.
+
+Convenience functions \code{\link[=evenly]{evenly()}}, \code{\link[=ref_level]{ref_level()}}, and \code{\link[=level]{level()}} are provided
+to help users specify data slices. \code{\link[=ref_level]{ref_level()}}, and \code{\link[=level]{level()}} also ensure
+that factor covariates have the correct levels, as needed by
+\code{\link[mgcv:predict.gam]{mgcv::predict.gam()}} for example.
+
+For an extended discussion of \code{\link[=data_slice]{data_slice()}} and further examples, see
+\code{vignette("data-slices", package = "gratia")}.
 }
 \examples{
 \dontshow{
@@ -65,4 +95,9 @@ ds <- data_slice(m, x2 = evenly(x2, n = 50), x1 = 0.3)
 # or provide an expression (function call) which will be evaluated in the
 # data frame passed to `data` or `model.frame(object)`
 ds <- data_slice(m, x2 = evenly(x2, n = 50), x1 = mean(x1))
+}
+\seealso{
+The convenience functions \code{\link[=evenly]{evenly()}}, \code{\link[=ref_level]{ref_level()}}, and \code{\link[=level]{level()}}.
+\code{\link[=typical_values]{typical_values()}} for extracting the representative values used for
+covariates in the model but not named in the slice.
 }

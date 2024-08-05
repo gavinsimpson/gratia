@@ -49,8 +49,8 @@ reference quantiles using the standard normal distribution. \code{"uniform"} is
 more computationally efficient, but \code{"simulate"} allows reference bands to
 be drawn on the QQ-plot. \code{"normal"} should be avoided but is used as a fall
 back if a random number generator (\code{"simulate"}) or the inverse of the CDF
-are not available from the \code{family} used during model fitting
-(`"uniform"``).
+(\verb{"uniform"``) are not available from the }family` used during model
+fitting.
 
 Note that \code{method = "direct"} is deprecated in favour of
 \code{method = "uniform"}.}
