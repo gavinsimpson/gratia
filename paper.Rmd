@@ -218,6 +218,6 @@ fs |>                                 # take the posterior draws
   summarise(chl_a = mean(.fitted)) |> # compute mean of fitted chl a
   ggdist::median_qi()                 # summarise posterior
 ```
-The posterior distribution of average chlorophyll *a* is summarised using `median_qi()` from the *ggdist* package [@Kay2024-rv; @Kay2024-uj]. While it would be a simple matter to compute the interval with base R commands, the use of `median_qi()` illustrates how *gratia* tries to interact with other packages.
+The posterior distribution of average chlorophyll *a* is summarised using `median_qi()` from the *ggdist* package [@Kay2024-rv; @Kay2024-uj]. While we could use the base R function `quantile()` to compute the interval, the use of `median_qi()` illustrates how *gratia* tries to interact with other packages.
 
 # References
