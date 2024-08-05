@@ -77,7 +77,7 @@
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>&lt;<code><a href="https://rlang.r-lib.org/reference/dyn-dots.html" class="external-link">dynamic-dots</a></code>&gt; User supplied variables
-defining the data slice. Arguments passed via <code>...</code> need to <em>named</em></p></dd>
+defining the data slice. Arguments passed via <code>...</code> need to be <em>named</em>.</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
@@ -92,6 +92,36 @@ passed in <code>...</code> will be evaluated in <code>data</code>.</p></dd>
 <code>object</code>.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>A data slice is the data set that results where one (or more
+covariates) is varied systematically over some or all of its (their) range or
+at a specified subset of values of interest, while any remaining covariates
+in the model are held at fixed, representative values. This is known as a
+<em>reference grid</em> in package <strong>emmeans</strong> and a <em>data grid</em> in the
+<strong>marginaleffects</strong> package.</p>
+<p>For GAMs, any covariates not specified via <code>...</code> will take representative
+values determined from the data used to fit the model as follows:</p><ul><li><p>for numeric covariates, the value in the fitting data that is closest to
+the median value is used,</p></li>
+<li><p>for factor covariates, the modal (most frequently observed) level is used,
+or the first level (sorted as per the vector returned by <code><a href="https://rdrr.io/r/base/levels.html" class="external-link">base::levels()</a></code>
+if several levels are observed the same number of times.</p></li>
+</ul><p>These values are already computed when calling <code>gam()</code> or <code>bam()</code> for example
+and can be found in the <code>var.summary</code> component of the fitted model. Function
+<code><a href="typical_values.html">typical_values()</a></code> will extract these values for you if you are interested.</p>
+<p>Convenience functions <code><a href="evenly.html">evenly()</a></code>, <code><a href="ref_level.html">ref_level()</a></code>, and <code><a href="ref_level.html">level()</a></code> are provided
+to help users specify data slices. <code><a href="ref_level.html">ref_level()</a></code>, and <code><a href="ref_level.html">level()</a></code> also ensure
+that factor covariates have the correct levels, as needed by
+<code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">mgcv::predict.gam()</a></code> for example.</p>
+<p>For an extended discussion of <code>data_slice()</code> and further examples, see
+<code><a href="../articles/data-slices.html">vignette("data-slices", package = "gratia")</a></code>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>The convenience functions <code><a href="evenly.html">evenly()</a></code>, <code><a href="ref_level.html">ref_level()</a></code>, and <code><a href="ref_level.html">level()</a></code>.
+<code><a href="typical_values.html">typical_values()</a></code> for extracting the representative values used for
+covariates in the model but not named in the slice.</p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
