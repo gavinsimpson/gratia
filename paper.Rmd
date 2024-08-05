@@ -183,7 +183,7 @@ This returns a data frame of the requested values that is ammenable for plotted 
 
 ## Posterior sampling
 
-Perhaps we are interested in the average expected chlorophyll *a* between 40--50 degrees N and 40--50 degrees W. It would be quite a simple matter to calculate this value from the fitted model: we first create a slice through the data for the spatial locations were are interested in using the `data_slice()` function, which ensures that `ds` contains everything we need to predict from the fitted model
+Perhaps we are interested in the average expected chlorophyll *a* between 40--50 degrees N and 40--50 degrees W. An estimate for this value can be computed directly from the fitted model as follows. First create a slice through the data for the spatial locations were are interested in using the `data_slice()` function, which ensures that `ds` contains everything we need to predict from the fitted model
 ```{r avg-chl-ds, dependson = "fit-chl-lsslmodel", cache = TRUE}
 ds <- data_slice(m2,
   lat = evenly(lat, lower = 40, upper = 50, by = 0.5),
