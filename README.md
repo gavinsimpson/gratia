@@ -14,11 +14,16 @@ Downloads](https://cranlogs.r-pkg.org/badges/grand-total/gratia)](https://cran.r
 
 ## Overview
 
-Graceful ‘ggplot’-based graphics and utility functions for working with
-generalized additive models (GAMs) fitted using the ‘mgcv’ package.
-Provides a reimplementation of the `plot()` method for GAMs that ‘mgcv’
-provides, as well as ‘tidyverse’ compatible representations of estimated
-smooths.
+Working with GAMs within the ‘tidyverse’ can be tedious and even
+difficult without a good understanding of GAMs themselves and how the
+model is returned by ‘mgcv’ and what the model objects contain. ‘gratia’
+is designed to help with this.
+
+‘gratia’ provides ‘ggplot’-based graphics and utility functions for
+working with generalized additive models (GAMs) fitted using the ‘mgcv’
+package, via a reimplementation of the `plot()` method for GAMs that
+‘mgcv’ provides, as well as ‘tidyverse’ compatible representations of
+estimated smooths.
 
 ## Features
 
