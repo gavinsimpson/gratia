@@ -717,8 +717,8 @@
 #'   more computationally efficient, but `"simulate"` allows reference bands to
 #'   be drawn on the QQ-plot. `"normal"` should be avoided but is used as a fall
 #'   back if a random number generator (`"simulate"`) or the inverse of the CDF
-#'   are not available from the `family` used during model fitting
-#'   (`"uniform"``).
+#'   (`"uniform"``) are not available from the `family` used during model
+#'   fitting.
 #'
 #'   Note that `method = "direct"` is deprecated in favour of
 #'   `method = "uniform"`.
