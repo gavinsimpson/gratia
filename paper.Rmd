@@ -200,7 +200,7 @@ fv |>
   filter(.parameter == "location") |>
   summarise(chl_a = mean(.fitted))
 ```
-While this is an acceptable answer to the question, it lacks an uncertainty estimate. This is where posterior sampling is useful. With a small modification of the above code and a little data wrangling, we can produce an uncertainty estimate ,using `fitted_samples()` to generate posterior draws of the expected chlorophyll *a*:
+While this is an acceptable answer to the question, it lacks an uncertainty estimate. This is where posterior sampling is useful. With a small modification of the above code and a little data wrangling, we can produce an uncertainty estimate, using `fitted_samples()` to generate posterior draws of the expected chlorophyll *a*:
 ```{r post-sampling-1, warning = FALSE, dependson = c("fit-chl-lsslmodel", "avg-chl-ds"), cache = TRUE}
 fs <- fitted_samples(m2,     # model
   data = ds,                 # values of covariates to predict at
