@@ -1,8 +1,40 @@
 #' Prepare a data slice through model covariates
 #'
+#' @details A data slice is the data set that results where one (or more
+#' covariates) is varied systematically over some or all of its (their) range or
+#' at a specified subset of values of interest, while any remaining covariates
+#' in the model are held at fixed, representative values. This is known as a
+#' *reference grid* in package **emmeans** and a *data grid* in the
+#' **marginaleffects** package.
+#'
+#' For GAMs, any covariates not specified via `...` will take representative
+#' values determined from the data used to fit the model as follows:
+#'
+#' * for numeric covariates, the value in the fitting data that is closest to
+#'   the median value is used,
+#' * for factor covariates, the modal (most frequently observed) level is used,
+#'   or the first level (sorted as per the vector returned by [base::levels()]
+#'   if several levels are observed the same number of times.
+#'
+#' These values are already computed when calling `gam()` or `bam()` for example
+#' and can be found in the `var.summary` component of the fitted model. Function
+#' [typical_values()] will extract these values for you if you are interested.
+#'
+#' Convenience functions [evenly()], [ref_level()], and [level()] are provided
+#' to help users specify data slices. [ref_level()], and [level()] also ensure
+#' that factor covariates have the correct levels, as needed by
+#' [mgcv::predict.gam()] for example.
+#'
+#' For an extended discussion of [data_slice()] and further examples, see
+#' \code{vignette("data-slices", package = "gratia")}.
+#'
 #' @param object an R model object.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> User supplied variables
-#'   defining the data slice. Arguments passed via `...` need to *named*
+#'   defining the data slice. Arguments passed via `...` need to be *named*.
+#'
+#' @seealso The convenience functions [evenly()], [ref_level()], and [level()].
+#' [typical_values()] for extracting the representative values used for
+#' covariates in the model but not named in the slice.
 #'
 #' @export
 `data_slice` <- function(object, ...) {
