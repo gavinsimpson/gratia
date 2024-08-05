@@ -37,12 +37,29 @@ qq_plot(model, ...)
 \method{qq_plot}{lm}(model, ...)
 }
 \arguments{
-\item{model}{a fitted model. Currently only class \code{"gam"}.}
+\item{model}{a fitted model. Currently models inheriting from class \code{"gam"},
+as well as classes \code{"glm"} and \code{"lm"} from calls to \link[stats:glm]{stats::glm} or
+\link[stats:lm]{stats::lm} are supported.}
 
 \item{...}{arguments passed ot other methods.}
 
-\item{method}{character; method used to generate theoretical quantiles. Note
-that \code{method = "direct"} is deprecated in favour of \code{method = "uniform"}.}
+\item{method}{character; method used to generate theoretical quantiles.
+The default is \code{"uniform"}, which generates reference quantiles using
+random draws from a uniform distribution and the inverse cummulative
+distribution function (CDF) of the fitted values. The reference quantiles
+are averaged over \code{n_uniform} draws. \code{"simulate"} generates reference
+quantiles by simulating new response data from the model at the observed
+values of the covariates, which are then residualised to generate reference
+quantiles, using \code{n_simulate} simulated data sets. \code{"normal"} generates
+reference quantiles using the standard normal distribution. \code{"uniform"} is
+more computationally efficient, but \code{"simulate"} allows reference bands to
+be drawn on the QQ-plot. \code{"normal"} should be avoided but is used as a fall
+back if a random number generator (\code{"simulate"}) or the inverse of the CDF
+are not available from the \code{family} used during model fitting
+(`"uniform"``).
+
+Note that \code{method = "direct"} is deprecated in favour of
+\code{method = "uniform"}.}
 
 \item{type}{character; type of residuals to use. Only \code{"deviance"},
 \code{"response"}, and \code{"pearson"} residuals are allowed.}
@@ -84,7 +101,8 @@ interval when \code{method = "simulate"}.}
 \item{line_col}{colour used to draw the reference line.}
 }
 \description{
-Quantile-quantile plot of model residuals
+Quantile-quantile plots (QQ-plots) for GAMs using the reference quantiles of
+Augustin \emph{et al} (2012).
 }
 \note{
 The wording used in \code{\link[mgcv:qq.gam]{mgcv::qq.gam()}} uses \emph{direct} in reference to the
@@ -115,4 +133,15 @@ qq_plot(m,
 
 ## ... or use the usual normality assumption
 qq_plot(m, method = "normal")
+}
+\references{
+The underlying methodology used when \code{method} is \code{"simulate"} or \code{"uniform"}
+is described in Augustin \emph{et al} (2012):
+
+Augustin, N.H., Sauleau, E.-A., Wood, S.N., (2012) On quantile quantile plots
+for generalized linear models. \emph{Computational Statatistics and Data Analysis}
+\strong{56}, 2404-2409 \doi{doi:10.1016/j.csda.2012.01.026}.
+}
+\seealso{
+\link[mgcv:qq.gam]{mgcv::qq.gam} for more details on the methods used.
 }

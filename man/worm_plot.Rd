@@ -34,12 +34,29 @@ worm_plot(model, ...)
 \method{worm_plot}{lm}(model, ...)
 }
 \arguments{
-\item{model}{a fitted model. Currently only class \code{"gam"}.}
+\item{model}{a fitted model. Currently models inheriting from class \code{"gam"},
+as well as classes \code{"glm"} and \code{"lm"} from calls to \link[stats:glm]{stats::glm} or
+\link[stats:lm]{stats::lm} are supported.}
 
 \item{...}{arguments passed ot other methods.}
 
-\item{method}{character; method used to generate theoretical quantiles. Note
-that \code{method = "direct"} is deprecated in favour of \code{method = "uniform"}.}
+\item{method}{character; method used to generate theoretical quantiles.
+The default is \code{"uniform"}, which generates reference quantiles using
+random draws from a uniform distribution and the inverse cummulative
+distribution function (CDF) of the fitted values. The reference quantiles
+are averaged over \code{n_uniform} draws. \code{"simulate"} generates reference
+quantiles by simulating new response data from the model at the observed
+values of the covariates, which are then residualised to generate reference
+quantiles, using \code{n_simulate} simulated data sets. \code{"normal"} generates
+reference quantiles using the standard normal distribution. \code{"uniform"} is
+more computationally efficient, but \code{"simulate"} allows reference bands to
+be drawn on the QQ-plot. \code{"normal"} should be avoided but is used as a fall
+back if a random number generator (\code{"simulate"}) or the inverse of the CDF
+are not available from the \code{family} used during model fitting
+(`"uniform"``).
+
+Note that \code{method = "direct"} is deprecated in favour of
+\code{method = "uniform"}.}
 
 \item{type}{character; type of residuals to use. Only \code{"deviance"},
 \code{"response"}, and \code{"pearson"} residuals are allowed.}
