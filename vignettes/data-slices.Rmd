@@ -200,7 +200,7 @@ ylab <- bquote(hat(f)(x, .(z_val)))
 
 Then we evaluate the smooth at the desired values and add a confidence interval
 ```{r smooth-estimates-bivar}
-sm <- smooth_estimates(m_biv, smooth = "te(x,z)", data = ds3) |>
+sm <- smooth_estimates(m_biv, select = "te(x,z)", data = ds3) |>
   add_confint()
 sm
 ```
@@ -226,7 +226,7 @@ ds4 <- data_slice(m_biv,
   z = round(quantile(z, probs = c(0.25, 0.5, 0.75)), 2)
 )
 
-sm <- smooth_estimates(m_biv, smooth = "te(x,z)", data = ds4) |>
+sm <- smooth_estimates(m_biv, select = "te(x,z)", data = ds4) |>
   add_confint() |>
   mutate(fz = factor(z))
 
