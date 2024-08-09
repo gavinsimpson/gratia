@@ -391,7 +391,8 @@
       crs = crs,
       default_crs = default_crs,
       lims_method = lims_method,
-      tensor_term_order = tensor_term_order
+      tensor_term_order = tensor_term_order,
+      ... # FIXME: temporary fix to allow captions to be suppressed-ish
     )
   } # end stuff for smooths...
 
