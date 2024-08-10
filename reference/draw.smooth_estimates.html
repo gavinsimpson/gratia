@@ -72,6 +72,7 @@
 <span>  crs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  default_crs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lims_method <span class="op">=</span> <span class="st">"cross"</span>,</span>
+<span>  caption <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -205,6 +206,10 @@ OS killed R. This could be incorrect usage on my part; right now the grid
 of points at which SOS smooths are evaluated (if not supplied by the user)
 can produce invalid coordinates for the corners of tiles as the grid is
 generated for tile centres without respect to the spacing of those tiles.</p></dd>
+
+
+<dt id="arg-caption">caption<a class="anchor" aria-label="anchor" href="#arg-caption"></a></dt>
+<dd><p>logical; show the smooth type in the caption of each plot?</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
