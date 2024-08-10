@@ -1024,6 +1024,7 @@
                                     crs = NULL,
                                     default_crs = NULL,
                                     lims_method = "cross",
+                                    caption = TRUE,
                                     ...) {
   # add confidence intervals if they don't already exist
   if (!all(c(".lower_ci", ".upper_ci") %in% names(object))) {
@@ -1081,7 +1082,8 @@
     crs = crs,
     default_crs = default_crs,
     lims_method = lims_method,
-    tensor_term_order = tensor_term_order, # pass on tensor order info
+    tensor_term_order = tensor_term_order, # pass on tensor order info,
+    caption = caption,
     ...
   )
 
@@ -1114,6 +1116,7 @@
                                     default_crs = NULL,
                                     lims_method = "cross",
                                     tensor_term_order = NULL,
+                                    caption = NULL,
                                     ...) {
   sm_vars <- tensor_term_order[[unique(object$.smooth)]]
   if (is.null(sm_vars)) {
@@ -1272,6 +1275,7 @@
     crs = crs,
     default_crs = default_crs,
     lims_method = lims_method,
+    caption = caption,
     ...
   )
 }
@@ -1448,8 +1452,11 @@
       as.character(unique(object$.smooth))
     )
   }
-  if (is.null(caption)) {
+  # add the basis via caption if caption is TRUE or NULL
+  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
     caption <- paste("Basis:", object[[".type"]])
+  } else {
+    caption <- NULL
   }
   if (all(!is.na(object[[".by"]]))) {
     if (grouped_by) {
@@ -1574,8 +1581,11 @@
   if (is.null(title)) {
     title <- unique(object[[".smooth"]])
   }
-  if (is.null(caption)) {
+  # add the basis via caption if caption is TRUE or NULL
+  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
     caption <- paste("Basis:", object[[".type"]])
+  } else {
+    caption <- NULL
   }
 
   if (all(!is.na(object[[".by"]]))) {
@@ -1716,8 +1726,11 @@
   if (is.null(title)) {
     title <- unique(object[[".smooth"]])
   }
-  if (is.null(caption)) {
+  # add the basis via caption if caption is TRUE or NULL
+  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
     caption <- paste("Facets:", variables[3], "; Basis:", object[[".type"]])
+  } else {
+    caption <- NULL
   }
 
   if (all(!is.na(object[[".by"]]))) {
@@ -1872,12 +1885,15 @@
   if (is.null(title)) {
     title <- unique(object[[".smooth"]])
   }
-  if (is.null(caption)) {
+  # add the basis via caption if caption is TRUE or NULL
+  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
     caption <- paste(
       "Facet rows:", variables[3],
       "; columns:", variables[4],
       "; Basis:", object[[".type"]]
     )
+  } else {
+    caption <- NULL
   }
 
   if (all(!is.na(object[[".by"]]))) {
@@ -2011,8 +2027,11 @@
   if (is.null(title)) {
     title <- unique(object$.smooth) # variables
   }
-  if (is.null(caption)) {
+  # add the basis via caption if caption is TRUE or NULL
+  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
     caption <- paste("Basis:", object[[".type"]])
+  } else {
+    caption <- NULL
   }
 
   if (all(!is.na(object[[".by"]]))) {
@@ -2106,8 +2125,11 @@
   if (is.null(title)) {
     title <- unique(object[[".smooth"]])
   }
-  if (is.null(caption)) {
+  # add the basis via caption if caption is TRUE or NULL
+  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
     caption <- paste("Basis:", object[[".type"]])
+  } else {
+    caption <- NULL
   }
 
   if (all(!is.na(object[[".by"]]))) {
@@ -2332,8 +2354,11 @@
   if (is.null(title)) {
     title <- unique(object[[".smooth"]])
   }
-  if (is.null(caption)) {
+  # add the basis via caption if caption is TRUE or NULL
+  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
     caption <- paste("Basis:", object[[".type"]])
+  } else {
+    caption <- NULL
   }
 
   if (all(!is.na(object[[".by"]]))) {
@@ -2487,9 +2512,11 @@
   if (is.null(title)) {
     title <- unique(object[[".smooth"]])
   }
-
-  if (is.null(caption)) {
+  # add the basis via caption if caption is TRUE or NULL
+  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
     caption <- paste("Basis:", object[[".type"]])
+  } else {
+    caption <- NULL
   }
 
   if (all(!is.na(object[[".by"]]))) {
@@ -2628,8 +2655,11 @@
   if (is.null(title)) {
     title <- unique(object[[".smooth"]])
   }
-  if (is.null(caption)) {
+  # add the basis via caption if caption is TRUE or NULL
+  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
     caption <- paste("Basis:", object[[".type"]])
+  } else {
+    caption <- NULL
   }
 
   if (all(!is.na(object[[".by"]]))) {
