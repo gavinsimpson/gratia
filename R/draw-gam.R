@@ -116,6 +116,7 @@
 #'   generated for tile centres without respect to the spacing of those tiles.
 #' @param wrap logical; wrap plots as a patchwork? If \code{FALSE}, a list of
 #'   ggplot objects is returned, 1 per term plotted.
+#' @param caption logical; show the smooth type in the caption of each plot?
 #' @param envir an environment to look up the data within.
 #' @param ... additional arguments passed to [patchwork::wrap_plots()].
 #'
@@ -200,11 +201,15 @@
     default_crs = NULL,
     lims_method = "cross",
     wrap = TRUE,
+    caption = TRUE,
     envir = environment(formula(object)),
     ...
   ) {
-  # fixed or free?
+  # fixed or free scale?
   scales <- match.arg(scales)
+
+  # adding a caption?
+  caption <- as.logical(caption)
 
   # fix up default scales
   # if (is.null(discrete_colour)) {
@@ -392,6 +397,7 @@
       default_crs = default_crs,
       lims_method = lims_method,
       tensor_term_order = tensor_term_order,
+      caption = caption,
       ... # FIXME: temporary fix to allow captions to be suppressed-ish
     )
   } # end stuff for smooths...

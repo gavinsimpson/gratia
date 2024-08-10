@@ -29,6 +29,7 @@
   crs = NULL,
   default_crs = NULL,
   lims_method = "cross",
+  caption = TRUE,
   ...
 )
 }
@@ -113,6 +114,8 @@ OS killed R. This could be incorrect usage on my part; right now the grid
 of points at which SOS smooths are evaluated (if not supplied by the user)
 can produce invalid coordinates for the corners of tiles as the grid is
 generated for tile centres without respect to the spacing of those tiles.}
+
+\item{caption}{logical; show the smooth type in the caption of each plot?}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
