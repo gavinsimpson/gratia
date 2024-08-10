@@ -6,6 +6,10 @@
   that the resulting basis has an identity matrix. This more clearly highlights
   the penalty null space, the functions that the penalty has no effect on.
 
+* `draw.gam()` and `draw.smooth_estimates()` gain argument `caption`, which, if
+  set to `FALSE` will not plot the smooth basis type as a caption on the plot.
+  #307
+
 ## Bug fixes
 
 * `derivative_samples()` was ignoring the `scale` argument. #293 Reported by
