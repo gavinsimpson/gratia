@@ -46,6 +46,7 @@
   default_crs = NULL,
   lims_method = "cross",
   wrap = TRUE,
+  caption = TRUE,
   envir = environment(formula(object)),
   ...
 )
@@ -201,6 +202,8 @@ generated for tile centres without respect to the spacing of those tiles.}
 
 \item{wrap}{logical; wrap plots as a patchwork? If \code{FALSE}, a list of
 ggplot objects is returned, 1 per term plotted.}
+
+\item{caption}{logical; show the smooth type in the caption of each plot?}
 
 \item{envir}{an environment to look up the data within.}
 
