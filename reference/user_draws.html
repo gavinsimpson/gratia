@@ -46,7 +46,10 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">user_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">draws</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">user_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">draws</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'gam'</span></span>
+<span><span class="fu">user_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">draws</span>, index <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -69,7 +72,21 @@ from class <code>"gam"</code> as far as <code><a href="https://rdrr.io/r/base/cl
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>arguments passed to methods.</p></dd>
 
+
+<dt id="arg-index">index<a class="anchor" aria-label="anchor" href="#arg-index"></a></dt>
+<dd><p>a vector to index (subset) the columns of <code>draws</code>.</p></dd>
+
 </dl></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The supplied <code>draws</code> must be a matrix (currently), with 1 column per
+model coefficient, and 1 row per posterior draw. The <code>"gam"</code> method has
+argument <code>index</code>, which can be used to subset (select) coefficients
+(columns) of <code>draws</code>. <code>index</code> can be any valid way of selecting (indexing)
+columns of a matrix. <code>index</code> is useful if you have a set of posterior draws
+for the entire model (say from <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code>) and you wish to use those
+draws for an individual smooth, via <code><a href="smooth_samples.html">smooth_samples()</a></code>.</p>
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
