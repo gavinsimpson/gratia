@@ -14,6 +14,7 @@ appraise(model, ...)
   use_worm = FALSE,
   n_uniform = 10,
   n_simulate = 50,
+  seed = NULL,
   type = c("deviance", "pearson", "response"),
   n_bins = c("sturges", "scott", "fd"),
   ncol = NULL,
@@ -64,6 +65,9 @@ in the direct computation method (\code{method = "direct"}) for QQ plots.}
 model when using the simulation method (\code{method = "simulate"}) for QQ
 plots.}
 
+\item{seed}{numeric; the random number seed to use for \code{method = "simulate"}
+and \code{method = "uniform"}.}
+
 \item{type}{character; type of residuals to use. Only \code{"deviance"},
 \code{"response"}, and \code{"pearson"} residuals are allowed.}
 
@@ -109,7 +113,7 @@ appraise(mod, point_col = "steelblue", point_alpha = 0.4)
 ## To change the theme for all panels use the & operator, for example to
 ## change the ggplot theme for all panels
 library("ggplot2")
-appraise(mod,
+appraise(mod, seed = 42,
   point_col = "steelblue", point_alpha = 0.4,
   line_col = "black"
 ) & theme_minimal()
