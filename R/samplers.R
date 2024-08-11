@@ -222,13 +222,24 @@
 
 #' Handle user-supplied posterior draws
 #'
+#' @details The supplied `draws` must be a matrix (currently), with 1 column per
+#'   model coefficient, and 1 row per posterior draw. The `"gam"` method has
+#'   argument `index`, which can be used to subset (select) coefficients
+#'   (columns) of `draws`. `index` can be any valid way of selecting (indexing)
+#'   columns of a matrix. `index` is useful if you have a set of posterior draws
+#'   for the entire model (say from [mgcv::gam.mh()]) and you wish to use those
+#'   draws for an individual smooth, via [smooth_samples()].
+#'
 #' @inheritParams post_draws
 #' @export
 `user_draws` <- function(model, draws, ...) {
   UseMethod("user_draws")
 }
 
+#' @param index a vector to index (subset) the columns of `draws`.
+#'
 #' @export
+#' @rdname user_draws
 `user_draws.gam` <- function(model, draws, index = NULL, ...) {
   # draws must be a matrix
   if (!is.matrix(draws)) {
