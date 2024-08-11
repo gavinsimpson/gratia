@@ -18,6 +18,7 @@ qq_plot(model, ...)
   type = c("deviance", "response", "pearson"),
   n_uniform = 10,
   n_simulate = 50,
+  seed = NULL,
   level = 0.9,
   ylab = NULL,
   xlab = NULL,
@@ -69,6 +70,9 @@ in the direct computation method (\code{method = "uniform"}).}
 
 \item{n_simulate}{numeric; number of data sets to simulate from the estimated
 model when using the simulation method (\code{method = "simulate"}).}
+
+\item{seed}{numeric; the random number seed to use for \code{method = "simulate"}
+and \code{method = "uniform"}.}
 
 \item{level}{numeric; the coverage level for reference intervals. Must be
 strictly \verb{0 < level < 1}. Only used with \code{method = "simulate"}.}
@@ -127,7 +131,9 @@ qq_plot(m)
 ## Alternatively use simulate new data from the model, which
 ## allows construction of reference intervals for the Q-Q plot
 qq_plot(m,
-  method = "simulate", point_col = "steelblue",
+  method = "simulate",
+  seed = 42,
+  point_col = "steelblue",
   point_alpha = 0.4
 )
 
