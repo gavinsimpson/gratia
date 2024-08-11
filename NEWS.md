@@ -10,6 +10,10 @@
   set to `FALSE` will not plot the smooth basis type as a caption on the plot.
   #307
 
+* `appraise()` and `qq_plot.gam()` now allow the user to set a random seed that
+  is used when generating reference quantiles with `method = "uniform"` or
+  `method = "simulate"`.
+
 ## Bug fixes
 
 * `derivative_samples()` was ignoring the `scale` argument. #293 Reported by
