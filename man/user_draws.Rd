@@ -2,9 +2,12 @@
 % Please edit documentation in R/samplers.R
 \name{user_draws}
 \alias{user_draws}
+\alias{user_draws.gam}
 \title{Handle user-supplied posterior draws}
 \usage{
 user_draws(model, draws, ...)
+
+\method{user_draws}{gam}(model, draws, index = NULL, ...)
 }
 \arguments{
 \item{model}{a fitted R model. Currently only models fitted by \code{mgcv::gam()}
@@ -17,7 +20,18 @@ from class \code{"gam"} as far as \code{inherits()} is concerned.}
 \code{method = "user"}.}
 
 \item{...}{arguments passed to methods.}
+
+\item{index}{a vector to index (subset) the columns of \code{draws}.}
 }
 \description{
 Handle user-supplied posterior draws
+}
+\details{
+The supplied \code{draws} must be a matrix (currently), with 1 column per
+model coefficient, and 1 row per posterior draw. The \code{"gam"} method has
+argument \code{index}, which can be used to subset (select) coefficients
+(columns) of \code{draws}. \code{index} can be any valid way of selecting (indexing)
+columns of a matrix. \code{index} is useful if you have a set of posterior draws
+for the entire model (say from \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}) and you wish to use those
+draws for an individual smooth, via \code{\link[=smooth_samples]{smooth_samples()}}.
 }
