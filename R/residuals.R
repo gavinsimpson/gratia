@@ -99,8 +99,10 @@
 #' @importFrom tibble as_tibble
 `compute_partial_residuals` <- function(object, terms = NULL, data = NULL) {
   ## weighted working residuals..., see #273
+  ## need the working weights too, see #273 for further discussion
+  w <- weights(object, type = "working")
   ## need as.numeric for gamm() objects
-  w_resid <- as.numeric(residuals(object, "working")) * sqrt(weights(object))
+  w_resid <- as.numeric(residuals(object, "working")) * sqrt(w)
 
   ## if data is null, just grab the $model out of object
   if (is.null(data)) {
