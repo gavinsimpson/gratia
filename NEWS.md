@@ -29,6 +29,12 @@
 * `derivatives()` would fail for `"fs"` smooths with other parametric effects in
   the model. Reported by @mahonmb #301
 
+* Partial residuals in `partial_residuals()` and `draw.gam()` were wrong for
+  GAMs fitted with `family = binomial()` where the `weights` argument contained
+  the binomial sample sizes because the prior weights were being used to form
+  weighted working residuals. Now working weights are used instead. Reported by
+  @emchuron #273
+
 # gratia 0.9.2
 
 ## Breaking changes
