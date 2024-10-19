@@ -40,6 +40,26 @@
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 </g>
 <defs>
+  <clipPath id='cpMzYxLjQ3fDcxNC41MnwyMi43OHwyOTYuNjU='>
+    <rect x='361.47' y='22.78' width='353.06' height='273.87' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzYxLjQ3fDcxNC41MnwyMi43OHwyOTYuNjU=)'>
+<rect x='361.47' y='22.78' width='353.06' height='273.87' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
+</g>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+</g>
+<defs>
+  <clipPath id='cpNS40OHwzNjEuNDd8Mjk2LjY1fDU3MC41Mg=='>
+    <rect x='5.48' y='296.65' width='355.99' height='273.87' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS40OHwzNjEuNDd8Mjk2LjY1fDU3MC41Mg==)'>
+<rect x='5.48' y='296.65' width='355.99' height='273.87' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
+</g>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+</g>
+<defs>
   <clipPath id='cpNDEuMjB8MzU1Ljk5fDQ1LjU3fDI2NS43Ng=='>
     <rect x='41.20' y='45.57' width='314.78' height='220.20' />
   </clipPath>
@@ -86,16 +106,6 @@
 <text x='198.59' y='288.89' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='11.62px' lengthAdjust='spacingAndGlyphs'>x2</text>
 <text transform='translate(18.53,155.67) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='48.91px' lengthAdjust='spacingAndGlyphs'>Derivative</text>
 <text x='41.20' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='57.97px' lengthAdjust='spacingAndGlyphs'>s(x2):fac1</text>
-</g>
-<defs>
-  <clipPath id='cpMzYxLjQ3fDcxNC41MnwyMi43OHwyOTYuNjU='>
-    <rect x='361.47' y='22.78' width='353.06' height='273.87' />
-  </clipPath>
-</defs>
-<g clip-path='url(#cpMzYxLjQ3fDcxNC41MnwyMi43OHwyOTYuNjU=)'>
-<rect x='361.47' y='22.78' width='353.06' height='273.87' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
-</g>
-<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 </g>
 <defs>
   <clipPath id='cpMzk0LjI2fDcwOS4wNHw0NS41N3wyNjUuNzY='>
@@ -145,16 +155,6 @@
 <text x='551.65' y='288.89' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='11.62px' lengthAdjust='spacingAndGlyphs'>x2</text>
 <text transform='translate(374.51,155.67) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='48.91px' lengthAdjust='spacingAndGlyphs'>Derivative</text>
 <text x='394.26' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='57.97px' lengthAdjust='spacingAndGlyphs'>s(x2):fac2</text>
-</g>
-<defs>
-  <clipPath id='cpNS40OHwzNjEuNDd8Mjk2LjY1fDU3MC41Mg=='>
-    <rect x='5.48' y='296.65' width='355.99' height='273.87' />
-  </clipPath>
-</defs>
-<g clip-path='url(#cpNS40OHwzNjEuNDd8Mjk2LjY1fDU3MC41Mg==)'>
-<rect x='5.48' y='296.65' width='355.99' height='273.87' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
-</g>
-<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 </g>
 <defs>
   <clipPath id='cpNDEuMjB8MzU1Ljk5fDMxOS40NHw1MzkuNjM='>

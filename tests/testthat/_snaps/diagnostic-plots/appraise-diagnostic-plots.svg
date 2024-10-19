@@ -40,6 +40,36 @@
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 </g>
 <defs>
+  <clipPath id='cpMzU3LjMxfDcxNC41MnwyMi43OHwzMDQuMzI='>
+    <rect x='357.31' y='22.78' width='357.21' height='281.54' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzU3LjMxfDcxNC41MnwyMi43OHwzMDQuMzI=)'>
+<rect x='357.31' y='22.78' width='357.21' height='281.54' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
+</g>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+</g>
+<defs>
+  <clipPath id='cpNS40OHwzNTcuMzF8MzA0LjMyfDU3MC41Mg=='>
+    <rect x='5.48' y='304.32' width='351.83' height='266.20' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS40OHwzNTcuMzF8MzA0LjMyfDU3MC41Mg==)'>
+<rect x='5.48' y='304.32' width='351.83' height='266.20' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
+</g>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+</g>
+<defs>
+  <clipPath id='cpMzU3LjMxfDcxNC41MnwzMDQuMzJ8NTcwLjUy'>
+    <rect x='357.31' y='304.32' width='357.21' height='266.20' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzU3LjMxfDcxNC41MnwzMDQuMzJ8NTcwLjUy)'>
+<rect x='357.31' y='304.32' width='357.21' height='266.20' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
+</g>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+</g>
+<defs>
   <clipPath id='cpMzguMjd8MzUxLjgzfDYwLjkwfDI3My40Mw=='>
     <rect x='38.27' y='60.90' width='313.56' height='212.53' />
   </clipPath>
@@ -196,16 +226,6 @@
 <text x='38.27' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='116.67px' lengthAdjust='spacingAndGlyphs'>QQ plot of residuals</text>
 </g>
 <defs>
-  <clipPath id='cpMzU3LjMxfDcxNC41MnwyMi43OHwzMDQuMzI='>
-    <rect x='357.31' y='22.78' width='357.21' height='281.54' />
-  </clipPath>
-</defs>
-<g clip-path='url(#cpMzU3LjMxfDcxNC41MnwyMi43OHwzMDQuMzI=)'>
-<rect x='357.31' y='22.78' width='357.21' height='281.54' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
-</g>
-<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
-</g>
-<defs>
   <clipPath id='cpMzk1LjQ4fDcwOS4wNHw2MC45MHwyNzMuNDM='>
     <rect x='395.48' y='60.90' width='313.56' height='212.53' />
   </clipPath>
@@ -346,16 +366,6 @@
 <text x='395.48' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='165.83px' lengthAdjust='spacingAndGlyphs'>Residuals vs linear predictor</text>
 </g>
 <defs>
-  <clipPath id='cpNS40OHwzNTcuMzF8MzA0LjMyfDU3MC41Mg=='>
-    <rect x='5.48' y='304.32' width='351.83' height='266.20' />
-  </clipPath>
-</defs>
-<g clip-path='url(#cpNS40OHwzNTcuMzF8MzA0LjMyfDU3MC41Mg==)'>
-<rect x='5.48' y='304.32' width='351.83' height='266.20' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
-</g>
-<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
-</g>
-<defs>
   <clipPath id='cpMzguMjd8MzUxLjgzfDMyNy4xMHw1MzkuNjM='>
     <rect x='38.27' y='327.10' width='313.56' height='212.53' />
   </clipPath>
@@ -413,16 +423,6 @@
 <text x='195.05' y='562.76' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='92.95px' lengthAdjust='spacingAndGlyphs'>Deviance residuals</text>
 <text transform='translate(18.53,433.37) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='51.98px' lengthAdjust='spacingAndGlyphs'>Frequency</text>
 <text x='38.27' y='318.88' style='font-size: 13.20px; font-family: sans;' textLength='131.34px' lengthAdjust='spacingAndGlyphs'>Histogram of residuals</text>
-</g>
-<defs>
-  <clipPath id='cpMzU3LjMxfDcxNC41MnwzMDQuMzJ8NTcwLjUy'>
-    <rect x='357.31' y='304.32' width='357.21' height='266.20' />
-  </clipPath>
-</defs>
-<g clip-path='url(#cpMzU3LjMxfDcxNC41MnwzMDQuMzJ8NTcwLjUy)'>
-<rect x='357.31' y='304.32' width='357.21' height='266.20' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
-</g>
-<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 </g>
 <defs>
   <clipPath id='cpMzk1LjQ4fDcwOS4wNHwzMjcuMTB8NTM5LjYz'>
