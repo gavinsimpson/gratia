@@ -35,6 +35,10 @@
   weighted working residuals. Now working weights are used instead. Reported by
   @emchuron #273
 
+* Internal function `gammals_link()` was expecting `"theta"` as a synonym for
+  the scale parameter but the master table has `"phi"` coded as the synonym.
+  Now both work as expected.
+
 # gratia 0.9.2
 
 ## Breaking changes
