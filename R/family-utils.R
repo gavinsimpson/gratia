@@ -292,7 +292,10 @@ family_type.family <- function(object, ...) {
         linfo[[3L]]
       } else {
         linfo[[2L]]
-      }, # scale parameter for twlss() gammals()
+      }, # scale parameter for twlss() gammals() - simon uses \phi in gammals.Rd
+      # but everything is in terms of \theta where \theta is the scale parameter
+      # of the model (note *not* the scale parameter of the Gamma)
+      theta = linfo[[2L]], # only for gammals
       shape = linfo[[3L]],
       power = linfo[[2L]], # power for twlss()
       xi = linfo[[3L]], # xi for gevlss()
@@ -585,9 +588,13 @@ family_type.family <- function(object, ...) {
   fun # return
 }
 
+# gammals parameters
+# * location == mu
+# * scale == theta == phi
 `gammals_link` <- function(family,
-                           parameter = c("location", "scale", "mu", "theta"),
-                           inverse = FALSE) {
+  parameter = c("location", "scale", "mu", "theta", "phi"),
+  inverse = FALSE
+) {
   stop_if_not_family(family, type = "gammals")
 
   parameter <- match.arg(parameter)
