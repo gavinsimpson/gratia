@@ -104,25 +104,25 @@
 <text x='445.94' y='425.07' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text>
 <text x='574.11' y='425.07' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>3</text>
 <text x='349.80' y='437.21' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='5.50px' lengthAdjust='spacingAndGlyphs'>v</text>
-<rect x='666.90' y='194.83' width='42.14' height='182.17' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<text x='672.38' y='209.02' style='font-size: 11.00px; font-family: sans;' textLength='31.18px' lengthAdjust='spacingAndGlyphs'>Partial</text>
-<text x='672.38' y='220.90' style='font-size: 11.00px; font-family: sans;' textLength='26.91px' lengthAdjust='spacingAndGlyphs'>effect</text>
-<image width='17.28' height='144.00' x='672.38' y='227.53' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAA40lEQVQ4jaWR0RHDMAhDhdIhukO3735B/UjsGILd3vWHs5B4OA7ez5doDwP5MNC2UHhJ3uXQOyTbGENkACTj6PHWKylkDfiCooG0fr8CChI0aycYa8O6m+TUKOW1qNi2zp3GVhuZVwI2EGatoDiZgaqMWfiS5xgWkVt4xQMM1C8rZzuyAVACKLQCaZQSWm4IC0Qcu+UaJe/oJ0DF8gRVsTzlFKHLL4rXcKkVj/JyPcrv4f0P8jHrRXjp7nHRPnN3qf0Z7/+ou6fRn7NLV+95AHjB84LiHgBpbCo9QYteJcfHHnsfCctVmJdPxIoAAAAASUVORK5CYII='/>
-<polyline points='686.21,367.18 689.66,367.18 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='686.21,333.35 689.66,333.35 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<rect x='666.90' y='223.63' width='42.14' height='124.57' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='672.38' y='237.82' style='font-size: 11.00px; font-family: sans;' textLength='31.18px' lengthAdjust='spacingAndGlyphs'>Partial</text>
+<text x='672.38' y='249.70' style='font-size: 11.00px; font-family: sans;' textLength='26.91px' lengthAdjust='spacingAndGlyphs'>effect</text>
+<image width='17.28' height='86.40' x='672.38' y='256.33' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAA40lEQVQ4jaWR0RHDMAhDhdIhukO3735B/UjsGILd3vWHs5B4OA7ez5doDwP5MNC2UHhJ3uXQOyTbGENkACTj6PHWKylkDfiCooG0fr8CChI0aycYa8O6m+TUKOW1qNi2zp3GVhuZVwI2EGatoDiZgaqMWfiS5xgWkVt4xQMM1C8rZzuyAVACKLQCaZQSWm4IC0Qcu+UaJe/oJ0DF8gRVsTzlFKHLL4rXcKkVj/JyPcrv4f0P8jHrRXjp7nHRPnN3qf0Z7/+ou6fRn7NLV+95AHjB84LiHgBpbCo9QYteJcfHHnsfCctVmJdPxIoAAAAASUVORK5CYII='/>
+<polyline points='686.21,340.12 689.66,340.12 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='686.21,319.82 689.66,319.82 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <polyline points='686.21,299.53 689.66,299.53 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='686.21,265.70 689.66,265.70 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='686.21,231.87 689.66,231.87 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='675.84,367.18 672.38,367.18 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='675.84,333.35 672.38,333.35 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='686.21,279.23 689.66,279.23 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='686.21,258.93 689.66,258.93 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='675.84,340.12 672.38,340.12 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='675.84,319.82 672.38,319.82 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <polyline points='675.84,299.53 672.38,299.53 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='675.84,265.70 672.38,265.70 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='675.84,231.87 672.38,231.87 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<text x='695.14' y='370.21' style='font-size: 8.80px; font-family: sans;' textLength='7.82px' lengthAdjust='spacingAndGlyphs'>-4</text>
-<text x='695.14' y='336.38' style='font-size: 8.80px; font-family: sans;' textLength='7.82px' lengthAdjust='spacingAndGlyphs'>-2</text>
+<polyline points='675.84,279.23 672.38,279.23 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='675.84,258.93 672.38,258.93 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<text x='695.14' y='343.14' style='font-size: 8.80px; font-family: sans;' textLength='7.82px' lengthAdjust='spacingAndGlyphs'>-4</text>
+<text x='695.14' y='322.85' style='font-size: 8.80px; font-family: sans;' textLength='7.82px' lengthAdjust='spacingAndGlyphs'>-2</text>
 <text x='695.14' y='302.55' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='695.14' y='268.73' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text x='695.14' y='234.90' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>4</text>
+<text x='695.14' y='282.26' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='695.14' y='261.96' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>4</text>
 <text x='43.65' y='149.53' style='font-size: 13.20px; font-family: sans;' textLength='35.20px' lengthAdjust='spacingAndGlyphs'>s(v,w)</text>
 <text x='655.94' y='451.03' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='63.10px' lengthAdjust='spacingAndGlyphs'>Basis: Soap film</text>
 <text x='10.96' y='126.75' style='font-size: 13.20px; font-family: sans;' textLength='213.53px' lengthAdjust='spacingAndGlyphs'>draw.smooth_estimates so soap film</text>

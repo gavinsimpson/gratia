@@ -518,19 +518,19 @@
 <polyline points='42.87,385.39 45.61,385.39 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <text x='342.45' y='549.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='11.62px' lengthAdjust='spacingAndGlyphs'>x0</text>
 <text transform='translate(18.53,294.24) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='11.62px' lengthAdjust='spacingAndGlyphs'>x1</text>
-<rect x='666.90' y='203.16' width='42.14' height='182.17' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<text x='672.38' y='217.35' style='font-size: 11.00px; font-family: sans;' textLength='31.18px' lengthAdjust='spacingAndGlyphs'>Partial</text>
-<text x='672.38' y='229.23' style='font-size: 11.00px; font-family: sans;' textLength='26.91px' lengthAdjust='spacingAndGlyphs'>effect</text>
-<image width='17.28' height='144.00' x='672.38' y='235.85' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAA40lEQVQ4jaWR0RHDMAhDhdIhukO3735B/UjsGILd3vWHs5B4OA7ez5doDwP5MNC2UHhJ3uXQOyTbGENkACTj6PHWKylkDfiCooG0fr8CChI0aycYa8O6m+TUKOW1qNi2zp3GVhuZVwI2EGatoDiZgaqMWfiS5xgWkVt4xQMM1C8rZzuyAVACKLQCaZQSWm4IC0Qcu+UaJe/oJ0DF8gRVsTzlFKHLL4rXcKkVj/JyPcrv4f0P8jHrRXjp7nHRPnN3qf0Z7/+ou6fRn7NLV+95AHjB84LiHgBpbCo9QYteJcfHHnsfCctVmJdPxIoAAAAASUVORK5CYII='/>
-<polyline points='686.21,346.31 689.66,346.31 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<rect x='666.90' y='231.96' width='42.14' height='124.57' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='672.38' y='246.15' style='font-size: 11.00px; font-family: sans;' textLength='31.18px' lengthAdjust='spacingAndGlyphs'>Partial</text>
+<text x='672.38' y='258.03' style='font-size: 11.00px; font-family: sans;' textLength='26.91px' lengthAdjust='spacingAndGlyphs'>effect</text>
+<image width='17.28' height='86.40' x='672.38' y='264.65' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAA40lEQVQ4jaWR0RHDMAhDhdIhukO3735B/UjsGILd3vWHs5B4OA7ez5doDwP5MNC2UHhJ3uXQOyTbGENkACTj6PHWKylkDfiCooG0fr8CChI0aycYa8O6m+TUKOW1qNi2zp3GVhuZVwI2EGatoDiZgaqMWfiS5xgWkVt4xQMM1C8rZzuyAVACKLQCaZQSWm4IC0Qcu+UaJe/oJ0DF8gRVsTzlFKHLL4rXcKkVj/JyPcrv4f0P8jHrRXjp7nHRPnN3qf0Z7/+ou6fRn7NLV+95AHjB84LiHgBpbCo9QYteJcfHHnsfCctVmJdPxIoAAAAASUVORK5CYII='/>
+<polyline points='686.21,330.93 689.66,330.93 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <polyline points='686.21,307.85 689.66,307.85 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='686.21,269.39 689.66,269.39 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='675.84,346.31 672.38,346.31 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='686.21,284.77 689.66,284.77 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='675.84,330.93 672.38,330.93 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <polyline points='675.84,307.85 672.38,307.85 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='675.84,269.39 672.38,269.39 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<text x='695.14' y='349.34' style='font-size: 8.80px; font-family: sans;' textLength='7.82px' lengthAdjust='spacingAndGlyphs'>-5</text>
+<polyline points='675.84,284.77 672.38,284.77 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<text x='695.14' y='333.95' style='font-size: 8.80px; font-family: sans;' textLength='7.82px' lengthAdjust='spacingAndGlyphs'>-5</text>
 <text x='695.14' y='310.88' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='695.14' y='272.42' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>5</text>
+<text x='695.14' y='287.80' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>5</text>
 <text x='45.61' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='86.59px' lengthAdjust='spacingAndGlyphs'>te(x0,x1,x2,x3)</text>
 <text x='639.29' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='204.47px' lengthAdjust='spacingAndGlyphs'>Facet rows: x2 ; columns: x3 ; Basis: Tensor product</text>
 <text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='193.74px' lengthAdjust='spacingAndGlyphs'>draw.gam for su_m_quadvar_te2</text>

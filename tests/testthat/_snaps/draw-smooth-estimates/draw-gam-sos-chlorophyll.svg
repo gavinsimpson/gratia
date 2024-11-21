@@ -729,25 +729,25 @@
 <text x='341.23' y='479.80' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='9.78px' lengthAdjust='spacingAndGlyphs'>  0</text>
 <text x='351.01' y='479.80' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='3.31px' lengthAdjust='spacingAndGlyphs'>°</text>
 <text x='351.94' y='492.02' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>lon</text>
-<rect x='666.90' y='194.75' width='42.14' height='182.17' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<text x='672.38' y='208.94' style='font-size: 11.00px; font-family: sans;' textLength='31.18px' lengthAdjust='spacingAndGlyphs'>Partial</text>
-<text x='672.38' y='220.82' style='font-size: 11.00px; font-family: sans;' textLength='26.91px' lengthAdjust='spacingAndGlyphs'>effect</text>
-<image width='17.28' height='144.00' x='672.38' y='227.44' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAA40lEQVQ4jaWR0RHDMAhDhdIhukO3735B/UjsGILd3vWHs5B4OA7ez5doDwP5MNC2UHhJ3uXQOyTbGENkACTj6PHWKylkDfiCooG0fr8CChI0aycYa8O6m+TUKOW1qNi2zp3GVhuZVwI2EGatoDiZgaqMWfiS5xgWkVt4xQMM1C8rZzuyAVACKLQCaZQSWm4IC0Qcu+UaJe/oJ0DF8gRVsTzlFKHLL4rXcKkVj/JyPcrv4f0P8jHrRXjp7nHRPnN3qf0Z7/+ou6fRn7NLV+95AHjB84LiHgBpbCo9QYteJcfHHnsfCctVmJdPxIoAAAAASUVORK5CYII='/>
-<polyline points='686.21,367.56 689.66,367.56 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='686.21,333.50 689.66,333.50 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<rect x='666.90' y='223.55' width='42.14' height='124.57' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='672.38' y='237.74' style='font-size: 11.00px; font-family: sans;' textLength='31.18px' lengthAdjust='spacingAndGlyphs'>Partial</text>
+<text x='672.38' y='249.62' style='font-size: 11.00px; font-family: sans;' textLength='26.91px' lengthAdjust='spacingAndGlyphs'>effect</text>
+<image width='17.28' height='86.40' x='672.38' y='256.24' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAA40lEQVQ4jaWR0RHDMAhDhdIhukO3735B/UjsGILd3vWHs5B4OA7ez5doDwP5MNC2UHhJ3uXQOyTbGENkACTj6PHWKylkDfiCooG0fr8CChI0aycYa8O6m+TUKOW1qNi2zp3GVhuZVwI2EGatoDiZgaqMWfiS5xgWkVt4xQMM1C8rZzuyAVACKLQCaZQSWm4IC0Qcu+UaJe/oJ0DF8gRVsTzlFKHLL4rXcKkVj/JyPcrv4f0P8jHrRXjp7nHRPnN3qf0Z7/+ou6fRn7NLV+95AHjB84LiHgBpbCo9QYteJcfHHnsfCctVmJdPxIoAAAAASUVORK5CYII='/>
+<polyline points='686.21,340.31 689.66,340.31 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='686.21,319.88 689.66,319.88 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <polyline points='686.21,299.44 689.66,299.44 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='686.21,265.38 689.66,265.38 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='686.21,231.31 689.66,231.31 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='675.84,367.56 672.38,367.56 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='675.84,333.50 672.38,333.50 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='686.21,279.00 689.66,279.00 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='686.21,258.56 689.66,258.56 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='675.84,340.31 672.38,340.31 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='675.84,319.88 672.38,319.88 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <polyline points='675.84,299.44 672.38,299.44 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='675.84,265.38 672.38,265.38 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<polyline points='675.84,231.31 672.38,231.31 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<text x='695.14' y='370.59' style='font-size: 8.80px; font-family: sans;' textLength='7.82px' lengthAdjust='spacingAndGlyphs'>-6</text>
-<text x='695.14' y='336.53' style='font-size: 8.80px; font-family: sans;' textLength='7.82px' lengthAdjust='spacingAndGlyphs'>-3</text>
+<polyline points='675.84,279.00 672.38,279.00 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='675.84,258.56 672.38,258.56 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<text x='695.14' y='343.34' style='font-size: 8.80px; font-family: sans;' textLength='7.82px' lengthAdjust='spacingAndGlyphs'>-6</text>
+<text x='695.14' y='322.90' style='font-size: 8.80px; font-family: sans;' textLength='7.82px' lengthAdjust='spacingAndGlyphs'>-3</text>
 <text x='695.14' y='302.47' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='695.14' y='268.40' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>3</text>
-<text x='695.14' y='234.34' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>6</text>
+<text x='695.14' y='282.03' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text x='695.14' y='261.59' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>6</text>
 <text x='47.94' y='94.72' style='font-size: 13.20px; font-family: sans;' textLength='50.62px' lengthAdjust='spacingAndGlyphs'>s(lat,lon)</text>
 <text x='655.94' y='505.84' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='45.01px' lengthAdjust='spacingAndGlyphs'>Basis: SOS</text>
 <text x='10.96' y='71.94' style='font-size: 13.20px; font-family: sans;' textLength='148.96px' lengthAdjust='spacingAndGlyphs'>draw.gam sos chlorophyll</text>
