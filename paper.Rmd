@@ -229,4 +229,12 @@ fs |>                                 # take the posterior draws
 ```
 The posterior distribution of average chlorophyll *a* is summarised using `median_qi()` from the *ggdist* package [@Kay2024-rv; @Kay2024-uj]. While we could use the base R function `quantile()` to compute the interval, the use of `median_qi()` illustrates how *gratia* tries to interact with other packages.
 
+# Conclusion
+
+*gratia* provides a range of functionality to make working with estimated GAMs easier for users. It is designed to take some of the pain out of working with models, simplifying plotting of smooths and related features (differences, derivatives) and exposing the powerful machinary of the *mgcv* package without the need for a deep understanding of GAMs, splines, and the inner structure of *mgcv*'s model objects. As such, it provides a useful addition for anyone wanting to use GAMs in their data analyses without requiring them to be a GAM expert.
+
+# Acknowledgements
+
+Development of *gratia* was supported by a Natural Sciences and Engineering Research Council of Canada (NSERC) Discovery Grant to the author (RGPIN-2014-04032).
+
 # References
