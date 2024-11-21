@@ -54,7 +54,7 @@ f = 0.2x^{11}\{10(1 - x)\}^6 + 10(10x)^3(1 - x)^{10} \label{gwf2}
 $$
 with additive Gaussian noise ($\mu = 0, \sigma = 1$), and the associated penalty matrix, prepared using functions from *gratia*.
 
-```{r penalised-spline-basis-and-penalty, echo = FALSE, fig.height = 4, fig.width = 10, fig.cap = "\\label{fig:basis-funs}Basis functions (a) and associated penalty matrix (b) for a penalised, low rank, thin plate regression spline. a) shows the individual basis functions (thin coloured lines; numbers indicate which basis function each line represents) multiplied by their respective model coefficients, as well as the data (black points) to which the GAM was fitted. The estimated smooth is shown as the thick grey line. b) shows the penalty matrix for the basis shown in a). Note the 9th basis function (labelled 'F9', which is the linear function at the lower left to upper right in a), is not affected by the penalty as it has 0 second derivative everywhere, and hence the resulting penalty for this function is 0.", fig.pos = "t!"}
+```{r penalised-spline-basis-and-penalty, echo = FALSE, fig.height = 5, fig.width = 10, fig.cap = "\\label{fig:basis-funs}Basis functions (a) and associated penalty matrix (b) for a penalised, low rank, thin plate regression spline. a) shows the individual basis functions (thin coloured lines; numbers indicate which basis function each line represents) multiplied by their respective model coefficients, as well as the data (black points) to which the GAM was fitted. The estimated smooth is shown as the thick grey line. b) shows the penalty matrix for the basis shown in a). Note the 9th basis function (labelled 'F9', which is the linear function at the lower left to upper right in a), is not affected by the penalty as it has 0 second derivative everywhere, and hence the resulting penalty for this function is 0.", fig.pos = "t!"}
 pkgs <- c("mgcv", "gratia", "ggplot2", "geomtextpath", "dplyr", "tibble", "patchwork")
 res <- vapply(pkgs, library, logical(1), character.only = TRUE,
   logical.return = TRUE)
@@ -81,14 +81,15 @@ f_x <- f_x |>
 # plot basis functions and fitted spline
 p_bfs <- bfs |>
   ggplot(aes(x = x, y = .value)) +
-  geom_textline(
-    aes(x = x, y = .value, colour = .bf, label = .bf),
-    hjust = 0.9,
-    size = 5
-  ) +
   geom_point(data = sim_d, aes(x = x, y = y)) +
   geom_line(data = f_x, aes(x = x, y = .spline),
     linewidth = 1.25, alpha = 0.5) +
+  geom_labelline(
+    aes(x = x, y = .value, colour = .bf, label = .bf),
+    hjust = "auto",
+    label.padding = unit(0.15, "lines"),
+    size = 3
+  ) +
   guides(colour = "none") +
   labs(x = "x", y = "y", title = "s(x)")
 # plot the penalty
