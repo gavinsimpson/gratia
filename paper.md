@@ -54,7 +54,7 @@ f = 0.2x^{11}\{10(1 - x)\}^6 + 10(10x)^3(1 - x)^{10} \label{gwf2}
 $$
 with additive Gaussian noise ($\mu = 0, \sigma = 1$), and the associated penalty matrix, prepared using functions from *gratia*.
 
-![\label{fig:basis-funs}Basis functions (a) and associated penalty matrix (b) for a penalised, low rank, thin plate regression spline. a) shows the individual basis functions (thin coloured lines) multiplied by their respective model coefficients, as well as the data (black points) to which the GAM was fitted. The estimated smooth is shown as the thick grey line. b) shows the penalty matrix for the basis shown in a). Note the 9th basis function (labelled 'F9', which is the linear function at the lower left to upper right in a), is not affected by the penalty as it has 0 second derivative everywhere, and hence the resulting penalty for this function is 0.](paper_files/figure-latex/penalised-spline-basis-and-penalty-1.pdf) 
+![\label{fig:basis-funs}Basis functions (a) and associated penalty matrix (b) for a penalised, low rank, thin plate regression spline. a) shows the individual basis functions (thin coloured lines; numbers indicate which basis function each line represents) multiplied by their respective model coefficients, as well as the data (black points) to which the GAM was fitted. The estimated smooth is shown as the thick grey line. b) shows the penalty matrix for the basis shown in a). Note the 9th basis function (labelled 'F9', which is the linear function at the lower left to upper right in a), is not affected by the penalty as it has 0 second derivative everywhere, and hence the resulting penalty for this function is 0.](paper_files/figure-latex/penalised-spline-basis-and-penalty-1.pdf) 
 
 # Statement of need
 
