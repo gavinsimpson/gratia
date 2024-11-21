@@ -36,7 +36,7 @@ A GAM has the form
 y_i &\sim    \mathcal{D}(\mu_i, \phi) \\
 g(\mu_i) &=  \mathbf{A}_i\boldsymbol{\gamma} + \sum_{j=1} f_j(x_{ji})
 \end{align*}
-where observations $y_i$ are assumed to be conditionally distributed $\mathcal{D}$ with expectation $\mathbb{E}(y_i) = \mu_i$ and dispersion $\phi$. The expectation of $y_i$ is given by a linear predictor of strictly parametric terms, whose model matrix is $\mathbf{A}_i$ with parameters $\boldsymbol{\gamma}$, plus a sum of smooth functions of $j = 1, \dots, J$ covariates $f_j()$. $g()$ is a link function mapping values on the linear predictor to the scale of the response.
+where observations $y_i$ are assumed to be conditionally distributed $\mathcal{D}$ with expectation $\mathbb{E}(y_i) = \mu_i$ and dispersion parameter $\phi$. The expectation of $y_i$ is given by a linear predictor of strictly parametric terms, whose model matrix is $\mathbf{A}_i$ with parameters $\boldsymbol{\gamma}$, plus a sum of smooth functions of $j = 1, \dots, J$ covariates $f_j()$. $g()$ is a link function mapping values on the linear predictor to the scale of the response.
 
 The smooth functions $f_j$ are represented in the GAM using penalised splines, which are themselves formed as weighted sums of basis functions, $b_k()$, [@De-Boor2001-vg] e.g.
 $$
@@ -44,9 +44,9 @@ f_j(x_{ij}) = \sum_{k=1}^{K} \beta_{jk} b_{jk}(x_{ij})
 $$
 for a univariate spline. The weights, $\beta_k$, are model coefficients to be estimated alongside $\boldsymbol{\gamma}$. To avoid overfitting, estimates $\hat{\beta}_{jk}$ and $\hat{\boldsymbol{\gamma}}$ are sought to minimise the penalised log-likelihood of the model
 $$
-\mathcal{L}(\boldsymbol{\beta}) = \ell(\boldsymbol{\beta}) - \frac{1}{2\phi} \sum_{j} \lambda_{j} \boldsymbol{\beta}^{\mathsf{T}}_j \mathbf{S}_j \boldsymbol{\beta}_j
+\ell_p(\boldsymbol{\beta}) = \ell(\boldsymbol{\beta}) - \frac{1}{2\phi} \sum_{j} \lambda_{j} \boldsymbol{\beta}^{\mathsf{T}}_j \mathbf{S}_j \boldsymbol{\beta}_j
 $$
-where $\ell$ is the log likelihood of the data at the parameter estimates, $\mathbf{S}_j$ are penalty matrices and $\lambda_{j}$ are smoothing parameters associated with each smooth. Note that $\boldsymbol{\beta}$ now contains the coefficients $\boldsymbol{\gamma}$ and $\beta_{jk}$. $\boldsymbol{\beta}^{\mathsf{T}}_j \mathbf{S}_j \boldsymbol{\beta}_j$ measures the wiggliness of $f_j$, which, with the default penalty, is the integrated squared second derivative of $f_j$. The smoothing parameters, $\boldsymbol{\lambda}$, control the trade-off between fit to the data and the complexity of the estimated functions.
+where $\ell$ and $\ell_p$ are the log likelihood and penalized log likelihood, respectively, of the data at the parameter estimates, $\mathbf{S}_j$ are penalty matrices and $\lambda_{j}$ are smoothing parameters associated with each smooth. Note that $\boldsymbol{\beta}$ now contains the coefficients $\boldsymbol{\gamma}$ and $\beta_{jk}$. $\boldsymbol{\beta}^{\mathsf{T}}_j \mathbf{S}_j \boldsymbol{\beta}_j$ measures the wiggliness of $f_j$, which, with the default penalty, is the integrated squared second derivative of $f_j$. The smoothing parameters, $\boldsymbol{\lambda}$, control the trade-off between fit to the data and the complexity of the estimated functions.
 
 The default spline created by *mgcv*'s `s()` is a low rank, thin plate regression spline [@Wood2003-qy]. Figure \ref{fig:basis-funs}, shows the basis functions for such a spline fitted to data simulated from the function
 $$
@@ -145,9 +145,16 @@ which show significant heteroscedasticity and departure from the condtional dist
 ```{r m1-appraise, echo = FALSE, fig.height = 7, fig.width = 10, fig.cap = "\\label{fig:m1-appraise}Model diagnostic plots for the GAM fitted to the ocean chlorophyll *a* data produced by the `appraise()` function. The four plots produced are: i) a QQ plot of model residuals, with theoretical quantiles and reference bands generated following @Augustin2012-sc (upper left), ii) a plot of residuals (deviance residuals are default) against linear predictor values (upper right), iii) a histogram of deviance residuals (lower left), and iv) a plot of observed versus fitted values (lower right)", fig.pos = "t!"}
 ```
 
-The problems with the model aparent in the diagnostics plots are probably due to important controls on chlorophyll *a* missing from the covariates available in the example data. However, the original model assumed constant values for the scale, $\varphi$, and the power parameter $p$, which may be too inflexible given the absence of important effects in the model. A distributional GAM, where linear predictors for all distributional parameters, may improve the model diagnostics.
+The problems with the model aparent in the diagnostics plots are probably due to important controls on chlorophyll *a* missing from the covariates available in the example data. However, the original model assumed constant values for the dispersion, $\phi$, and the power parameter $p$, which may be too inflexible given the absence of important effects in the model. A distributional GAM, containing linear predictors for all distributional parameters,
+\begin{align*}
+y_i &\sim \mathcal{D}(\mu_i, p_i, \varphi_i) \\
+g(\mu_i) &= \beta_1 + f_1(\text{lat}_i, \text{lon}_i) + f_2(\text{jul.day}_i) + f_3(\text{bath}_i) \\
+g(p_i) &= \beta_2 + f_4(\text{lat}_i, \text{lon}_i) + f_5(\text{jul.day}_i) + f_6(\text{bath}_i) \\
+g(\varphi_i) &= \beta_3 + f_7(\text{lat}_i, \text{lon}_i) + f_8(\text{jul.day}_i) + f_9(\text{bath}_i)
+\end{align*}
+may improve the model diagnostics.
 
-A distributional GAM for $\mathcal{D}$ Tweedie, with linear predictors for $\mu$, $p$, and $\varphi$ is fitted below using *mgcv*'s `twlss()` family
+A distributional GAM for $\mathcal{D}$ Tweedie with linear predictors for $\mu$, $p$, and $\varphi$ is fitted below using *mgcv*'s `twlss()` family
 ```{r fit-chl-lss-model, cache = TRUE}
 m2 <- gam(
   list(
