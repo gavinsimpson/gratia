@@ -166,14 +166,12 @@ A distributional GAM for $\mathcal{D}$ Tweedie with linear predictors for $\mu$,
 m2 <- gam(
   list(
     chl ~ s(lat, lon, bs = "sos", m = -1, k = 150) + # location
-      s(jul.day, bs = "cr", k = 20) +
-      s(bath, k = 10),
+      s(jul.day, bs = "cr", k = 20) + s(bath, k = 10),
     ~ s(lat, lon, bs = "sos", m = -1, k = 100) +     # power
-      s(jul.day, bs = "cr", k = 20) +
-      s(bath, k = 10),
+      s(jul.day, bs = "cr", k = 20) + s(bath, k = 10),
     ~ s(lat, lon, bs = "sos", m = -1, k = 100) +     # scale
-      s(jul.day, bs = "cr", k = 20) +
-      s(bath, k = 10)),
+      s(jul.day, bs = "cr", k = 20) + s(bath, k = 10)
+  ),
   data = chl, method = "REML", control = ctrl, family = twlss()
 )
 ```
