@@ -24,7 +24,7 @@ Your problem with {gratia} will hit the top of my TODO list more quickly if you 
 
 If your issue is best described as a question, or you want to know how to do something with {gratia}, or you have a cool example of using {gratia} and want to share it, please consider using the [Discussions page](https://github.com/gavinsimpson/gratia/discussions).
 
-If you're not sure, you can always ask about your issue as a Question (Use the *Q&A* category) and if it really is a bug, I can easily create an Issue from the discussion.
+If you're not sure, you can always ask about your issue as a Question (Use the *Q&A* category) and, if it really is a bug, I can easily create an Issue from the discussion.
 
 ## Code contributions
 
@@ -58,14 +58,12 @@ Please note the following when contributing code:
 
 I hate email!
 
-You can email me at my GMail address &mdash; it's not like I can stop you :-) &mdash; but unless you capture my attention immediately and label your message as {gratia}-related, it will quickly get swamped never to be seen again. Even if I do tag it, that's no guarantee that I will ever get round to replying; what usually happens is that I forget about it and don't remember to check the *gratia* label that often.
-
-The end result is that if you email me, if you get a response at all, any response from me will be tardy.
+You can email me at my GMail address &mdash; it's not like I can stop you :-) &mdash; but unless you capture my attention immediately and I label your message as {gratia}-related, it will quickly get swamped never to be seen again. Even if I do label it, that's no guarantee that I will ever get round to replying; what usually happens is that I'll forget about it and I don't remember to check the *gratia* label that often. The end result is that if you email me, if you get a response at all, it will be tardy.
 
 It is infinitely better to use the Discussions and Issues pages on Github to ask questions about the package or report problems.
 
 Please don't email my work (academic) address (or any other email address you might find for me) about {gratia}.
 
-If you have a question about GAMs, it would be much better to ask it on [CrossValidated]() or [StackOverflow]() depending on whether your question is statistical or programming related. If it relates to {gratia} you can use the [Discussions page](). Asking me a question in public allows me to reply in public and that contributes to the body of knowledge that is easily available to others.
+If you have a question about GAMs, it would be much better to ask it on [CrossValidated](https://stats.stackexchange.com/questions/tagged/generalized-additive-model) or [StackOverflow](https://stackoverflow.com/questions/tagged/gam) depending on whether your question is statistical or programming related. If it relates to {gratia} you can use the [Discussions page](https://github.com/gavinsimpson/gratia/discussions). Asking a question in public allows me and others to reply in public, and that contributes to the body of knowledge that is easily available to others.
 
-Under no circumstances should you send you me an email to multiple of my addresses; that is the quickest way to get your message in the trash.
+Under no circumstances should you send email to multiple of my addresses; that is the quickest way to get your message in the trash.
