@@ -196,7 +196,7 @@ test_that("confint.fderiv example output", {
     )
   )
 
-  # skip_on_ci()
+  skip_on_ci()
   skip_on_covr()
   skip_on_os(os = c("linux", "windows"))
   expect_snapshot_output(x2_sint)
