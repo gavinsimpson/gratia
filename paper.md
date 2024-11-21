@@ -64,10 +64,6 @@ with additive Gaussian noise ($\mu = 0, \sigma = 1$), and the associated penalty
 ```
 
 ```
-## Use suppressPackageStartupMessages() to eliminate package startup messages
-```
-
-```
 ## 
 ## Attaching package: 'dplyr'
 ```
