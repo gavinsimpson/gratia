@@ -940,8 +940,8 @@
   plt <- plt +
     guides(fill = guide_colourbar(
       title = "Partial effect",
-      direction = "vertical",
-      barheight = grid::unit(0.25, "npc")
+      direction = "vertical"#,
+      #barheight = grid::unit(0.25, "npc")
     ))
 
   # if isotropic smooth, fix aspect ratio
@@ -1254,8 +1254,8 @@
   plt <- plt +
     guides(fill = guide_colourbar(
       title = "Difference",
-      direction = "vertical",
-      barheight = grid::unit(0.25, "npc")
+      direction = "vertical"#,
+      #barheight = grid::unit(0.25, "npc")
     ))
 
   plt

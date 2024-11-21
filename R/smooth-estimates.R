@@ -1620,8 +1620,8 @@
     guides(
       fill = guide_colourbar(
         title = guide_title,
-        direction = "vertical",
-        barheight = grid::unit(5, "lines") #grid::unit(0.25, "npc")
+        direction = "vertical"#,
+        #barheight = grid::unit(5, "lines") #grid::unit(0.25, "npc")
       ),
       x = guide_axis(angle = angle)
     )
@@ -1765,8 +1765,8 @@
     guides(
       fill = guide_colourbar(
         title = guide_title,
-        direction = "vertical",
-        barheight = grid::unit(5, "lines") #grid::unit(0.25, "npc")
+        direction = "vertical"#,
+        #barheight = grid::unit(5, "lines") #grid::unit(0.25, "npc")
       ),
       x = guide_axis(angle = angle)
     )
@@ -1928,8 +1928,8 @@
     guides(
       fill = guide_colourbar(
         title = guide_title,
-        direction = "vertical",
-        barheight = grid::unit(5, "lines") #grid::unit(0.25, "npc")
+        direction = "vertical"#,
+        #barheight = grid::unit(5, "lines") #grid::unit(0.25, "npc")
       ),
       x = guide_axis(angle = angle)
     )
@@ -2550,8 +2550,8 @@
   plt <- plt +
     guides(
       fill = guide_colourbar(
-        title = guide_title, direction = "vertical",
-        barheight = grid::unit(5, "lines") #grid::unit(0.25, "npc")
+        title = guide_title, direction = "vertical"#,
+        #barheight = grid::unit(5, "lines") #grid::unit(0.25, "npc")
       ),
       x = guide_axis(angle = angle)
     )
@@ -2694,8 +2694,8 @@
     guides(
       fill = guide_colourbar(
         title = guide_title,
-        direction = "vertical",
-        barheight = grid::unit(5, "lines") #grid::unit(0.25, "npc")
+        direction = "vertical"#,
+        #barheight = grid::unit(5, "lines") #grid::unit(0.25, "npc")
       ),
       x = guide_axis(angle = angle)
     )
