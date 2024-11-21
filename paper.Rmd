@@ -166,6 +166,7 @@ appraise(m2)
 
 *gratia* can handle distributional GAMs fitted with *mgcv* and also *GJRM*'s `gamlss()`. Below, the estimated smooths from `m2` are plotted using `draw()`
 ```{r m2-draw, fig.show = "hide", dependson = "fit-chl-lsslmodel", cache = TRUE, fig.pos = "t!", out.width = ".8\\linewidth"}
+# Define the coordinate system to use for plotting on a map
 crs <- "+proj=ortho +lat_0=20 +lon_0=-40"
 draw(m2, crs = crs, default_crs = 4326, dist = 0.05, rug = FALSE)
 ```
