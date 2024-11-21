@@ -27,7 +27,7 @@ journal: JOSS
 
 Generalized additive models [GAMs, @Hastie1990-bx; @Wood2017-qi] are an extension of the generalized linear model that allows the effects of covariates to be modelled as smooth functions. GAMs are increasingly used in many areas of science [e.g. @Pedersen2019-ff; @Simpson2018-wc] because the smooth functions allow nonlinear relationships between covariates and the response to be learned from the data through the use of penalized splines. Within the R [@rcore2024] ecosystem, Simon Wood's  *mgcv* package [@Wood2017-qi] is widely used to fit GAMs and is a *Recommended* package that ships with R as part of the default install. A growing number of other R packages build upon *mgcv*, for example as an engine to fit specialised models not handled by *mgcv* itself [e.g. *GJMR*, @Marra2023-gjrm], or to make use of the wide range of splines available in *mgcv* [e.g. *brms*, @Burkner2017-ms].
 
-The *gratia* package builds upon *mgcv* by providing functions that make working with GAMs easier. *gratia* takes a *tidy* approach [@Wickham2014-ev] providing *ggplot2* [@Wickham2016-dg] replacements for *mgcv*'s base graphics-based plots, functions for model diagnostics and exploration of fitted models, and a family of functions for drawing samples from the posterior distribution of a fitted GAM. Additional functionality is provided to facilitate the teaching and understanding of GAMs.
+The *gratia* package builds upon *mgcv* by providing functions that make working with GAMs easier. *gratia* takes a *tidy* approach [@Wickham2014-ev] providing *ggplot2* [@Wickham2016-dg] replacements for *mgcv*'s base graphics-based plots, functions for model diagnostics and exploration of fitted models, and a family of functions for drawing samples from the posterior distribution of a fitted GAM. Additional functionality is provided to facilitate the teaching and understanding of GAMs. The overall aim of *gratia* is to abstract away some of the complexity of working with GAMs fitted using *mgcv* to allow researchers to focus on using and interrogating their model rather than the technical R programming needed to achieve this.
 
 # Generalized additive models
 
@@ -36,7 +36,7 @@ A GAM has the form
 y_i &\sim    \mathcal{D}(\mu_i, \phi) \\
 g(\mu_i) &=  \mathbf{A}_i\boldsymbol{\gamma} + \sum_{j=1} f_j(x_{ji})
 \end{align*}
-where observations $y_i$ are assumed to be conditionally distributed $\mathcal{D}$ with expectation $\mathbb{E}(y_i) = \mu_i$ and dispersion $\phi$. The expectation of $y_i$ is given by a linear predictor of strictly parametric terms, whose model matrix is $\mathbf{A}_i$ with parameters $\boldsymbol{\gamma}$, plus a sum of smooth functions of $j = 1, \dots, J$ covariates $f_j()$. $g()$ is a link function mapping values on the linear predictor to the scale of the response.
+where observations $y_i$ are assumed to be conditionally distributed $\mathcal{D}$ with expectation $\mathbb{E}(y_i) = \mu_i$ and dispersion parameter $\phi$. The expectation of $y_i$ is given by a linear predictor of strictly parametric terms, whose model matrix is $\mathbf{A}_i$ with parameters $\boldsymbol{\gamma}$, plus a sum of smooth functions of $j = 1, \dots, J$ covariates $f_j()$. $g()$ is a link function mapping values on the linear predictor to the scale of the response.
 
 The smooth functions $f_j$ are represented in the GAM using penalised splines, which are themselves formed as weighted sums of basis functions, $b_k()$, [@De-Boor2001-vg] e.g.
 $$
@@ -44,9 +44,9 @@ f_j(x_{ij}) = \sum_{k=1}^{K} \beta_{jk} b_{jk}(x_{ij})
 $$
 for a univariate spline. The weights, $\beta_k$, are model coefficients to be estimated alongside $\boldsymbol{\gamma}$. To avoid overfitting, estimates $\hat{\beta}_{jk}$ and $\hat{\boldsymbol{\gamma}}$ are sought to minimise the penalised log-likelihood of the model
 $$
-\mathcal{L}(\boldsymbol{\beta}) = \ell(\boldsymbol{\beta}) - \frac{1}{2\phi} \sum_{j} \lambda_{j} \boldsymbol{\beta}^{\mathsf{T}}_j \mathbf{S}_j \boldsymbol{\beta}_j
+\ell_p(\boldsymbol{\beta}) = \ell(\boldsymbol{\beta}) - \frac{1}{2\phi} \sum_{j} \lambda_{j} \boldsymbol{\beta}^{\mathsf{T}}_j \mathbf{S}_j \boldsymbol{\beta}_j
 $$
-where $\ell$ is the log likelihood of the data at the parameter estimates, $\mathbf{S}_j$ are penalty matrices and $\lambda_{j}$ are smoothing parameters associated with each smooth. Note that $\boldsymbol{\beta}$ now contains the coefficients $\boldsymbol{\gamma}$ and $\beta_{jk}$. $\boldsymbol{\beta}^{\mathsf{T}}_j \mathbf{S}_j \boldsymbol{\beta}_j$ measures the wiggliness of $f_j$, which, with the default penalty, is the integrated squared second derivative of $f_j$. The smoothing parameters, $\boldsymbol{\lambda}$, control the trade-off between fit to the data and the complexity of the estimated functions.
+where $\ell$ and $\ell_p$ are the log likelihood and penalized log likelihood, respectively, of the data at the parameter estimates, $\mathbf{S}_j$ are penalty matrices and $\lambda_{j}$ are smoothing parameters associated with each smooth. Note that $\boldsymbol{\beta}$ now contains the coefficients $\boldsymbol{\gamma}$ and $\beta_{jk}$. $\boldsymbol{\beta}^{\mathsf{T}}_j \mathbf{S}_j \boldsymbol{\beta}_j$ measures the wiggliness of $f_j$, which, with the default penalty, is the integrated squared second derivative of $f_j$. The smoothing parameters, $\boldsymbol{\lambda}$, control the trade-off between fit to the data and the complexity of the estimated functions.
 
 The default spline created by *mgcv*'s `s()` is a low rank, thin plate regression spline [@Wood2003-qy]. Figure \ref{fig:basis-funs}, shows the basis functions for such a spline fitted to data simulated from the function
 $$
@@ -58,13 +58,19 @@ with additive Gaussian noise ($\mu = 0, \sigma = 1$), and the associated penalty
 
 # Statement of need
 
-*mgcv* is state-of-the-art software for fitting GAMs and their extensions to data sets on the order of millions of observations [e.g. @Li2020-ch; @Wood2011-kn; @Wood2016-fx]. *mgcv* provides functions for plotting estimated smooth functions, as well as for producing model diagnostic plots. These functions produce plots using base graphics, the original plotting system for R. Additionally, *mgcv* returns fitted GAMs as complex list objects (see `?mgcv::gamObject`), the contents of which are not easily used for downstream analysis without careful study of *mgcv* and its help pages, plus a good understanding of GAMs themselves. One of the motivations driving the development of *gratia* was to provide equivalent plotting capabilities using the *ggplot2* package [@Wickham2016-dg]. To facilitate this, *gratia* provides functions for representing the model components as objects using *tidy* principles, which are suitable for plotting with *ggplot2* or manipulation by packages in the *tidyverse* [e.g. @Wickham2023-uj]. This functionality allows for high-level plotting using the `draw()` method, as well as easily customisable plot creation using lower-level functionality.
+*mgcv* is state-of-the-art software for fitting GAMs and their extensions to data sets on the order of millions of observations [e.g. @Li2020-ch; @Wood2011-kn; @Wood2016-fx]. *mgcv* provides functions for plotting estimated smooth functions, as well as for producing model diagnostic plots. These functions produce plots using base graphics, the original plotting system for R. Additionally, *mgcv* returns fitted GAMs as complex list objects (see `?mgcv::gamObject`), the contents of which are not easily used for downstream analysis without careful study of *mgcv* and its help pages, plus a good understanding of GAMs themselves. The overall aim of *gratia* is to abstract away some of the complexity of working with GAMs fitted using *mgcv* to allow researchers to focus on using and interrogating their model rather than the technical R programming needed to achieve this. As a result, *gratia* is also increasingly being used by researchers in many fields, and has, at the time of writing, been cited over 250 times (data from Google Scholar).
+
+One of the motivations driving the development of *gratia* was to provide equivalent plotting capabilities using the *ggplot2* package [@Wickham2016-dg]. To facilitate this, *gratia* provides functions for representing the model components as objects using *tidy* principles, which are suitable for plotting with *ggplot2* or manipulation by packages in the *tidyverse* [e.g. @Wickham2023-uj]. This functionality allows for high-level plotting using the `draw()` method, as well as easily customisable plot creation using lower-level functionality.
 
 Taking a Bayesian approach to smoothing with penalized splines [@Kimeldorf1970-cn; @Wahba1983-mi; @Silverman1985-kw; @Wahba1985-bw; see @Miller2019-nf for a summary], it can be shown that GAMs fitted by *mgcv* are an empirical Bayesian model with an improper multivariate normal prior on the basis function coeficients. Samples from the posterior distribution of these models can be used to estimate the uncertainty in quantities derived from a GAM. This can be invaluable in applied research, where, for example, a quantity of interest may arise as an operation on predictions from the model. *gratia* provides functions for sampling from the posterior distribution of estimated smooths and from the model as a whole, where sampling can include the uncertainty in the estimated coefficients (`fitted_samples()`), the sampling uncertainty of the response (`predicted_samples()`), or both (`posterior_samples()`). By default, a Gaussian approximation to the posterior distribution is used, but a simple Metropolis Hasting sampler can be substituted (using `mgcv::gam.mh()`), which has better performance when the posterior is not well approximated by a Gaussian approximation.
 
 The teaching of GAMs can benefit from visualisation of the spline basis functions and associated penalty matrices. *gratia* provides this functionality via `basis()` and `penalty()`, which can be applied either to a smooth specification (e.g. `s(x, z, bs = "ds")`) or to a fitted GAM (see Figure \ref{fig:basis-funs}). These functions expose functionality already available in *mgcv*, but supply outputs in a tidy format, which makes access to these features more intuitive than the original implementations in *mgcv*. Additional utility functions are provided, for example: `model_constant()`, `edf()`, `model_edf()`, `overview()`, and `inv_link()`, which extract the model intercept term (or terms), the effective degrees of freedom of individual smooths and the overall model, shows a summary of the fitted GAM, and extracts the inverse of the link function(s) used, respectively.
 
-The overall aim of *gratia* is to abstract away some of the complexity of working with GAMs fitted using *mgcv* to allow researchers to focus on using and interrogating their model rather than the technical R programming needed to achieve this. As a result, *gratia* is increasingly being used by researchers in many fields, and has, at the time of writing, been cited over 200 times (data from Google Scholar).
+# State of the field
+
+Several R packages provide similar functionality to that of *gratia*. Notably, the *mgcViz* package [@Fasiolo2020-nz] provides sophisticated capabilities for plotting estimated smooths for models fitted by *mgcv* and *qgam* [@], and model diagnostics plots. A particular feature of *mgcViz* is that it was designed to be scalable, easily handling models fitted to data with millions of observations, a use case not currently well handled by *gratia*. *tidymv* [@tidymv-2023] and its succesor, *tidygam* [@tidygam-2023], provide plots of estimated smooths and model predictions respectively, as well as differences of smooths, but the focus is on univariate smooths, in constrast to *gratia*'s ability to plot multivariate and specialist smooths (e.g. soap film smooths). Like *gratia*, the *itsadug* package [@itsadug-2022] is motivated to make working with estimated GAMs and related models easier. *itsadug* uses base graphics for plotting, but in place of partial effects plots, produces plots of adjusted predictions, and while useful for a broad range of models, is especially focused on GAMs fitted to longitudinal data with random effects.
+
+Areas where *gratia* stands out from these other packages are i) the consistent functionality for range of posterior simulations (*mgcViz* has some support for simulating new response values) as illustrated below, ii) support for computing derivatives of smooths, partial derivatives, and derivatives on the response scale (i.e. conditional derivatives), iii) tools for learning or teaching how GAMs work, iv) the range of utility functions that make working with GAMs easier, and v) the simple and consistent *tidy* interface to all functionality.
 
 # Example usage
 
@@ -102,9 +108,18 @@ which show significant heteroscedasticity and departure from the condtional dist
 
 ![\label{fig:m1-appraise}Model diagnostic plots for the GAM fitted to the ocean chlorophyll *a* data produced by the `appraise()` function. The four plots produced are: i) a QQ plot of model residuals, with theoretical quantiles and reference bands generated following @Augustin2012-sc (upper left), ii) a plot of residuals (deviance residuals are default) against linear predictor values (upper right), iii) a histogram of deviance residuals (lower left), and iv) a plot of observed versus fitted values (lower right)](paper_files/figure-latex/m1-appraise-1.pdf) 
 
-The problems with the model aparent in the diagnostics plots are probably due to important controls on chlorophyll *a* missing from the covariates available in the example data. However, the original model assumed constant values for the scale, $\varphi$, and the power parameter $p$, which may be too inflexible given the absence of important effects in the model. A distributional GAM, where linear predictors for all distributional parameters, may improve the model diagnostics.
+The problems with the model aparent in the diagnostics plots are probably due to important controls on chlorophyll *a* missing from the covariates available in the example data. However, the original model assumed constant values for the dispersion, $\phi$, and the power parameter $p$, which may be too inflexible given the absence of important effects in the model.
 
-A distributional GAM for $\mathcal{D}$ Tweedie, with linear predictors for $\mu$, $p$, and $\varphi$ is fitted below using *mgcv*'s `twlss()` family
+A distributional GAM, containing linear predictors for all distributional parameters,
+\begin{align*}
+y_i &\sim \mathcal{D}(\mu_i, p_i, \varphi_i) \\
+g(\mu_i) &= \beta_1 + f_1(\text{lat}_i, \text{lon}_i) + f_2(\text{jul.day}_i) + f_3(\text{bath}_i) \\
+g(p_i) &= \beta_2 + f_4(\text{lat}_i, \text{lon}_i) + f_5(\text{jul.day}_i) + f_6(\text{bath}_i) \\
+g(\varphi_i) &= \beta_3 + f_7(\text{lat}_i, \text{lon}_i) + f_8(\text{jul.day}_i) + f_9(\text{bath}_i)
+\end{align*}
+may improve the model diagnostics.
+
+A distributional GAM for $\mathcal{D}$ Tweedie with linear predictors for $\mu$, $p$, and $\varphi$ is fitted below using *mgcv*'s `twlss()` family
 
 ``` r
 m2 <- gam(
@@ -126,13 +141,16 @@ This model has much better model diagnostics although some large residuals remai
 
 ![\label{fig:m2-appraise}Model diagnostic plots for the distributional GAM fitted to the ocean chlorophyll *a* data produced by the `appraise()` function. Refer to the caption for Figure \ref{fig:m1-appraise} for a description of the plots shown.](paper_files/figure-latex/m2-appraise-1.pdf) 
 
-*gratia* can handle distributional GAMs fitted with *mgcv* and also *GJRM*'s `gamlss()`. Below, the estimated smooths from `m2` are plotted using `draw()`
+*gratia* can handle distributional GAMs fitted with *mgcv*, and also those fitted using *GJRM*'s `gamlss()`. Below, the estimated smooths from `m2` are plotted using `draw()`
 
 ``` r
+# Define the coordinate system to use for plotting on a map
 crs <- "+proj=ortho +lat_0=20 +lon_0=-40"
 draw(m2, crs = crs, default_crs = 4326, dist = 0.05, rug = FALSE)
 ```
-Here, we see a specialised plot drawn for spline-on-the-sphere smooths $f(\mathtt{lat}_i,\mathtt{lon}_i)$ (Figure \ref{fig:m2-draw}), which uses `ggplot2::coord_sf()` and functionality from the *sf* package [@Pebesma2018-ws; @Pebesma2023-fe] to visualise the smooth via an orthographic projection.
+The plots produced by `draw()` from a fitted model are known as *partial effect plots* (Figure \ref{fig:m2-draw}), which show the component contributions, on the link scale, of each model term to the linear predictor. The y axis on these plots is typically centred around 0 due to most smooths having a sum-to-zero identifiability constraint applied to them. This constraint is what allows the model to include multiple smooths and remain identifiable. These plots allow you to read off the contributions of each smooth to the fitted response (on the link scale); they show link-scale *predictions* of the response for each smooth, conditional upon all other terms in the model, including any parametric effects and the intercept, having zero contribution. In the paralance of the *marginaleffects* package [@Arel-BundockGreiferHeiss:2024], these plots show *adjusted predictions*, just where the adjustment includes setting the contribution of *all* other model terms to the predicted value to zero. For *partial derivatives* (what *marginaleffects* would call a *marginal effect* or slope), *gratia* provides the `derivatives()`.
+
+Here, we see a specialised plot drawn for spline-on-the-sphere smooths $f(\mathtt{lat}_i,\mathtt{lon}_i)$ (Figure \ref{fig:m2-draw}, left-hand column), which uses `ggplot2::coord_sf()` and functionality from the *sf* package [@Pebesma2018-ws; @Pebesma2023-fe] to visualise the smooth via an orthographic projection.
 
 ![\label{fig:m2-draw}Estimated smooth functions for the distributional GAM, `m2`, fitted to the ocean chlorophyll *a* data. The first row of plots is for the linear predictor of the conditional mean chlorophyll *a*, while the second and third rows are for the conditional power parameter and conditional scale, respectively. The shaded ribbons are 95% Bayesian credible intervals.](paper_files/figure-latex/m2-draw-1.pdf) 
 
@@ -142,11 +160,11 @@ If the provided plots are insufficient for users' needs, lower-level functionali
 smooth_estimates(m2, select = "s(lat,lon)", n = 50) |>
   add_confint()
 ```
-This returns a data frame of the requested values, which is easily plotted using `ggplot()`.
+This returns a data frame of the requested values that is ammenable for plotted with `ggplot()`.
 
 ## Posterior sampling
 
-Perhaps we are interested in the average expected chlorophyll *a* between 40--50 degrees N and 40--50 degrees W. It would be quite a simple matter to calculate this value from the fitted model: we first create a slice through the data for the spatial locations were are interested in using the `data_slice()` function, which ensures that `ds` contains everything we need to predict from the fitted model
+Perhaps we are interested in the average expected chlorophyll *a* between 40--50 degrees N and 40--50 degrees W. An estimate for this value can be computed directly from the fitted model as follows. First create a slice through the data for the spatial locations were are interested in using the `data_slice()` function, which ensures that `ds` contains everything we need to predict from the fitted model
 
 ``` r
 ds <- data_slice(m2,
@@ -173,7 +191,7 @@ fv |>
 ##   <dbl>
 ## 1 0.930
 ```
-While this is an acceptable answer to the question, it lacks an uncertainty estimate. This is where posterior sampling is useful. With a small modification of the above code and a little data wrangling, we can produce an uncertainty estimate ,using `fitted_samples()` to generate posterior draws of the expected chlorophyll *a*:
+While this is an acceptable answer to the question, it lacks an uncertainty estimate. This is where posterior sampling is useful. With a small modification of the above code and a little data wrangling, we can produce an uncertainty estimate, using `fitted_samples()` to generate posterior draws of the expected chlorophyll *a*:
 
 ``` r
 fs <- fitted_samples(m2,     # model
@@ -198,8 +216,16 @@ fs |>                                 # take the posterior draws
 ## # A tibble: 1 x 6
 ##   chl_a .lower .upper .width .point .interval
 ##   <dbl>  <dbl>  <dbl>  <dbl> <chr>  <chr>    
-## 1  1.07  0.870   1.33   0.95 median qi
+## 1 0.932  0.757   1.17   0.95 median qi
 ```
-The posterior distribution of average chlorophyll *a* is summarised using `median_qi()` from the *ggdist* package [@Kay2024-rv; @Kay2024-uj]. While it would be a simple matter to compute the interval with base R commands, the use of `median_qi()` illustrates how *gratia* tries to interact with other packages.
+The posterior distribution of average chlorophyll *a* is summarised using `median_qi()` from the *ggdist* package [@Kay2024-rv; @Kay2024-uj]. While we could use the base R function `quantile()` to compute the interval, the use of `median_qi()` illustrates how *gratia* tries to interact with other packages.
+
+# Conclusion
+
+*gratia* provides a range of functionality to make working with estimated GAMs easier for users. It is designed to take some of the pain out of working with models, simplifying plotting of smooths and related features (differences, derivatives) and exposing the powerful machinary of the *mgcv* package without the need for a deep understanding of GAMs, splines, and the inner structure of *mgcv*'s model objects. As such, it provides a useful addition for anyone wanting to use GAMs in their data analyses without requiring them to be a GAM expert.
+
+# Acknowledgements
+
+Development of *gratia* was supported by a Natural Sciences and Engineering Research Council of Canada (NSERC) Discovery Grant to the author (RGPIN-2014-04032).
 
 # References

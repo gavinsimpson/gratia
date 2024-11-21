@@ -107,7 +107,7 @@ The teaching of GAMs can benefit from visualisation of the spline basis function
 
 # State of the field
 
-Several R packages provide similar functionality to that of *gratia*. Notably, the *mgcViz* package [@Fasiolo2020-nz] provides sophisticated capabilities for plotting estimated smooths for models fitted by *mgcv* and *qgam* [@], and model diagnostics plots. A particular feature of *mgcViz* is that it was designed to be scalable, easily handling models fitted to data with millions of observations, a use case not currently well handled by *gratia*. *tidymv* [@tidymv-2023] and its succesor, *tidygam* [@tidygam-2023], provide plots of estimated smooths and model predictions respectively, as well as differences of smooths, but the focus is on univariate smooths, inconstrast to *gratia*'s ability to plot multivariate and specialist smooths (e.g. soap film smooths). Like *gratia*, the *itsadug* package [@itsadug-2022] is motivated to make working with estimated GAMs and related models easier. *itsadug* uses base graphics for plotting, but in place of partial effects plots, produces plots of adjusted predictions, and while useful for a broad range of models, is especially focused on GAMs fitted to longitudinal data with random effects.
+Several R packages provide similar functionality to that of *gratia*. Notably, the *mgcViz* package [@Fasiolo2020-nz] provides sophisticated capabilities for plotting estimated smooths for models fitted by *mgcv* and *qgam* [@], and model diagnostics plots. A particular feature of *mgcViz* is that it was designed to be scalable, easily handling models fitted to data with millions of observations, a use case not currently well handled by *gratia*. *tidymv* [@tidymv-2023] and its succesor, *tidygam* [@tidygam-2023], provide plots of estimated smooths and model predictions respectively, as well as differences of smooths, but the focus is on univariate smooths, in constrast to *gratia*'s ability to plot multivariate and specialist smooths (e.g. soap film smooths). Like *gratia*, the *itsadug* package [@itsadug-2022] is motivated to make working with estimated GAMs and related models easier. *itsadug* uses base graphics for plotting, but in place of partial effects plots, produces plots of adjusted predictions, and while useful for a broad range of models, is especially focused on GAMs fitted to longitudinal data with random effects.
 
 Areas where *gratia* stands out from these other packages are i) the consistent functionality for range of posterior simulations (*mgcViz* has some support for simulating new response values) as illustrated below, ii) support for computing derivatives of smooths, partial derivatives, and derivatives on the response scale (i.e. conditional derivatives), iii) tools for learning or teaching how GAMs work, iv) the range of utility functions that make working with GAMs easier, and v) the simple and consistent *tidy* interface to all functionality.
 
@@ -136,16 +136,18 @@ m1 <- gam(
 
 Model diagnostic plots can be produced using `appraise()`, which by default produces four plots: i) a QQ plot of model residuals, with theoretical quantiles and reference bands generated following @Augustin2012-sc, ii) a plot of residuals (deviance residuals are the default) against linear predictor values, iii) a histogram of residuals, and iv) a plot of observed versus fitted values. Model diagnostic plots for the model, with simulated residuals-based reference bands on the QQ plot, are produced with
 
-```{r m1-appraise, fig.show = "hide", dependson = "fit-chl-model", cache = FALSE, fig.height = 7, fig.width = 10, fig.pos = "t!"}
+```{r m1-appraise, fig.show = "hide", dependson = "fit-chl-model", cache = FALSE, fig.height = 6.5, fig.width = 10, fig.pos = "t!"}
 appraise(m1, method = "simulate")
 ```
 
 which show significant heteroscedasticity and departure from the condtional distribution of the response given the model (Figure \ref{fig:m1-appraise}).
 
-```{r m1-appraise, echo = FALSE, fig.height = 7, fig.width = 10, fig.cap = "\\label{fig:m1-appraise}Model diagnostic plots for the GAM fitted to the ocean chlorophyll *a* data produced by the `appraise()` function. The four plots produced are: i) a QQ plot of model residuals, with theoretical quantiles and reference bands generated following @Augustin2012-sc (upper left), ii) a plot of residuals (deviance residuals are default) against linear predictor values (upper right), iii) a histogram of deviance residuals (lower left), and iv) a plot of observed versus fitted values (lower right)", fig.pos = "t!"}
+```{r m1-appraise, echo = FALSE, fig.height = 6, fig.width = 10, fig.cap = "\\label{fig:m1-appraise}Model diagnostic plots for the GAM fitted to the ocean chlorophyll *a* data produced by the `appraise()` function. The four plots produced are: i) a QQ plot of model residuals, with theoretical quantiles and reference bands generated following @Augustin2012-sc (upper left), ii) a plot of residuals (deviance residuals are default) against linear predictor values (upper right), iii) a histogram of deviance residuals (lower left), and iv) a plot of observed versus fitted values (lower right)", fig.pos = "t!"}
 ```
 
-The problems with the model aparent in the diagnostics plots are probably due to important controls on chlorophyll *a* missing from the covariates available in the example data. However, the original model assumed constant values for the dispersion, $\phi$, and the power parameter $p$, which may be too inflexible given the absence of important effects in the model. A distributional GAM, containing linear predictors for all distributional parameters,
+The problems with the model aparent in the diagnostics plots are probably due to important controls on chlorophyll *a* missing from the covariates available in the example data. However, the original model assumed constant values for the dispersion, $\phi$, and the power parameter $p$, which may be too inflexible given the absence of important effects in the model.
+
+A distributional GAM, containing linear predictors for all distributional parameters,
 \begin{align*}
 y_i &\sim \mathcal{D}(\mu_i, p_i, \varphi_i) \\
 g(\mu_i) &= \beta_1 + f_1(\text{lat}_i, \text{lon}_i) + f_2(\text{jul.day}_i) + f_3(\text{bath}_i) \\
@@ -173,7 +175,7 @@ m2 <- gam(
 
 This model has much better model diagnostics although some large residuals remain (Figure \ref{fig:m2-appraise}). Note that the QQ plot uses theoretical quantiles from a standard normal distribution as the simulation-based values are not currently available in *mgcv* or *gratia* for some of the distributional families, including the `twlss()` family, and as such, the reference bands may not be appropriate.
 
-```{r m2-appraise, echo = FALSE, fig.height = 7, fig.width = 10, fig.cap = "\\label{fig:m2-appraise}Model diagnostic plots for the distributional GAM fitted to the ocean chlorophyll *a* data produced by the `appraise()` function. Refer to the caption for Figure \\ref{fig:m1-appraise} for a description of the plots shown.", dependson = "fit-chl-lsslmodel", cache = FALSE, fig.pos = "t!"}
+```{r m2-appraise, echo = FALSE, fig.height = 6, fig.width = 10, fig.cap = "\\label{fig:m2-appraise}Model diagnostic plots for the distributional GAM fitted to the ocean chlorophyll *a* data produced by the `appraise()` function. Refer to the caption for Figure \\ref{fig:m1-appraise} for a description of the plots shown.", dependson = "fit-chl-lsslmodel", cache = FALSE, fig.pos = "t!"}
 appraise(m2)
 ```
 
@@ -187,7 +189,7 @@ The plots produced by `draw()` from a fitted model are known as *partial effect 
 
 Here, we see a specialised plot drawn for spline-on-the-sphere smooths $f(\mathtt{lat}_i,\mathtt{lon}_i)$ (Figure \ref{fig:m2-draw}, left-hand column), which uses `ggplot2::coord_sf()` and functionality from the *sf* package [@Pebesma2018-ws; @Pebesma2023-fe] to visualise the smooth via an orthographic projection.
 
-```{r m2-draw, echo = FALSE, fig.height = 12, fig.width = 15, fig.cap = "\\label{fig:m2-draw}Estimated smooth functions for the distributional GAM, `m2`, fitted to the ocean chlorophyll *a* data. The first row of plots is for the linear predictor of the conditional mean chlorophyll *a*, while the second and third rows are for the conditional power parameter and conditional scale, respectively. The shaded ribbons are 95% Bayesian credible intervals."}
+```{r m2-draw, echo = FALSE, fig.height = 10, fig.width = 15, fig.cap = "\\label{fig:m2-draw}Estimated smooth functions for the distributional GAM, `m2`, fitted to the ocean chlorophyll *a* data. The first row of plots is for the linear predictor of the conditional mean chlorophyll *a*, while the second and third rows are for the conditional power parameter and conditional scale, respectively. The shaded ribbons are 95% Bayesian credible intervals."}
 ```
 
 If the provided plots are insufficient for users' needs, lower-level functionality is provided by *gratia* to facilitate bespoke plotting with *ggplot2*. For example, to evaluate the SOS smooth at a grid (50x50) of values over the range of the covariates, we use `smooth_estimates()` and add a Bayesian credible interval with `add_confint()`:
