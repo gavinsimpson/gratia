@@ -263,7 +263,7 @@ sim_gaulss <- predicted_samples(m_gaulss, n = n_sim, seed = 20) |>
   )
 ```
 The benefit of all that data wrangling is now realised as we can replace the data in the plot we created earlier with the simulations from the distribution GAM, and then plot it
-```{r, fig.height = 4.5}
+```{r}
 plt_gaulss <- plt_gau %+% sim_gaulss
 
 plt_gau + plt_gaulss +
