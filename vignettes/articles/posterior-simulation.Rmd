@@ -234,8 +234,7 @@ plt_gau <- sim_gau |>
   geom_point(aes(y = accel, colour = type, alpha = .alpha)) +
   plt_labs +
   scale_colour_okabe_ito(order = c(6, 5)) +
-  scale_alpha_identity() +
-  theme(legend.position = "bottom")
+  scale_alpha_identity()
 ```
 
 The resulting plot is shown in the left-hand panel of the figure below. There is clearly a problem here; the simulated data don't look much like the observations in the 15ms immediately after the impact and again at ~45ms after impact. This is due to the model we fitted only being for the conditional mean of `accel`.
@@ -264,7 +263,7 @@ sim_gaulss <- predicted_samples(m_gaulss, n = n_sim, seed = 20) |>
   )
 ```
 The benefit of all that data wrangling is now realised as we can replace the data in the plot we created earlier with the simulations from the distribution GAM, and then plot it
-```{r}
+```{r, fig.height = 4.5}
 plt_gaulss <- plt_gau %+% sim_gaulss
 
 plt_gau + plt_gaulss +
