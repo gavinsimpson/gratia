@@ -473,12 +473,12 @@ detaching ‘package:mgcv’
 > # can pass `condition` a list, allowing for greater flexibility
 > # For example, here we condition on all four variables in the model,
 > # summarising:
-> #   * `x1` at its deciles,
+> #   * `x1` at its five number summary,
 > #   * `x0  at its quartiles
 > #   * `x3` at its mean a d mean +/- sd
 > cv <- conditional_values(
 +   m1,
-+   condition = list("x2", x1 = "decile", x0 = "quartile", x3 = "threenum")
++   condition = list("x2", x1 = "fivenum", x0 = "quartile", x3 = "threenum")
 + )
 > # plot
 > cv |> draw()
@@ -1674,11 +1674,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x1113ba520>
+<environment: 0x10b485820>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x1113ba520>
+<environment: 0x10b485820>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2861,7 +2861,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  14.766 0.302 14.944 0 0 
+Time elapsed:  14.538 0.264 14.69 0 0 
 > grDevices::dev.off()
 null device 
           1 

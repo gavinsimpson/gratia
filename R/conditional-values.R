@@ -47,12 +47,12 @@
 #' # can pass `condition` a list, allowing for greater flexibility
 #' # For example, here we condition on all four variables in the model,
 #' # summarising:
-#' #   * `x1` at its deciles,
+#' #   * `x1` at its five number summary,
 #' #   * `x0  at its quartiles
 #' #   * `x3` at its mean a d mean +/- sd
 #' cv <- conditional_values(
 #'   m1,
-#'   condition = list("x2", x1 = "decile", x0 = "quartile", x3 = "threenum")
+#'   condition = list("x2", x1 = "fivenum", x0 = "quartile", x3 = "threenum")
 #' )
 #' # plot
 #' cv |> draw()
