@@ -234,9 +234,11 @@ plt_gau <- sim_gau |>
   geom_point(aes(y = accel, colour = type, alpha = .alpha)) +
   plt_labs +
   scale_colour_okabe_ito(order = c(6, 5)) +
-  scale_alpha_identity()
+  scale_alpha_identity() +
+  theme(legend.position = "bottom")
 ```
-The resulting plot is shown below in the left-hand panel of the figure below. There is clearly a problem here; the simulated data don't look much like the observations in the 15ms immediately after the impact and again at ~45ms after impact. This is due to the model we fitted only being for the conditional mean of `accel`.
+
+The resulting plot is shown in the left-hand panel of the figure below. There is clearly a problem here; the simulated data don't look much like the observations in the 15ms immediately after the impact and again at ~45ms after impact. This is due to the model we fitted only being for the conditional mean of `accel`.
 
 Instead, we model both the conditional mean *and* the conditional variance of the data, through linear predictors for both parameters of the Gaussian distribution
 ```{r}
@@ -269,6 +271,7 @@ plt_gau + plt_gaulss +
   plot_annotation(tag_levels = "a") +
   plot_layout(guides = "collect", ncol = 2)
 ```
+
 The plot of the simulated response data for the distributional GAM is shown in the right hand panel of the plot. Now, there is much less disagreement between the observed data and that which we can produce from the fitted mdoel.
 
 ### Prediction intervals
