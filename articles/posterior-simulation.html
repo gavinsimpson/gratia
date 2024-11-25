@@ -479,11 +479,12 @@ Now we can plot the observed and simulated data</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">accel</span>, colour <span class="op">=</span> <span class="va">type</span>, alpha <span class="op">=</span> <span class="va">.alpha</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="va">plt_labs</span> <span class="op">+</span></span>
 <span>  <span class="fu">scale_colour_okabe_ito</span><span class="op">(</span>order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_identity.html" class="external-link">scale_alpha_identity</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>The resulting plot is shown below in the left-hand panel of the
-figure below. There is clearly a problem here; the simulated data don’t
-look much like the observations in the 15ms immediately after the impact
-and again at ~45ms after impact. This is due to the model we fitted only
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_identity.html" class="external-link">scale_alpha_identity</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></code></pre></div>
+<p>The resulting plot is shown in the left-hand panel of the figure
+below. There is clearly a problem here; the simulated data don’t look
+much like the observations in the 15ms immediately after the impact and
+again at ~45ms after impact. This is due to the model we fitted only
 being for the conditional mean of <code>accel</code>.</p>
 <p>Instead, we model both the conditional mean <em>and</em> the
 conditional variance of the data, through linear predictors for both
@@ -517,8 +518,8 @@ from the distribution GAM, and then plot it</p>
 <span><span class="va">plt_gau</span> <span class="op">+</span> <span class="va">plt_gaulss</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>tag_levels <span class="op">=</span> <span class="st">"a"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>guides <span class="op">=</span> <span class="st">"collect"</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="posterior-simulation_files/figure-html/unnamed-chunk-7-1.png" width="700">
-The plot of the simulated response data for the distributional GAM is
+<p><img src="posterior-simulation_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<p>The plot of the simulated response data for the distributional GAM is
 shown in the right hand panel of the plot. Now, there is much less
 disagreement between the observed data and that which we can produce
 from the fitted mdoel.</p>
