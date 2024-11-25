@@ -478,10 +478,8 @@ detaching ‘package:mgcv’
 > #   * `x3` at its mean a d mean +/- sd
 > cv <- conditional_values(
 +   m1,
-+   condition = list("x2", x1 = "decile", x0 = "quartile", "threenum")
++   condition = list("x2", x1 = "decile", x0 = "quartile", x3 = "threenum")
 + )
-Warning in mean.default(x, na.rm = TRUE) :
-  argument is not numeric or logical: returning NA
 > # plot
 > cv |> draw()
 > 
@@ -1676,11 +1674,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x160e179e0>
+<environment: 0x1113ba520>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x160e179e0>
+<environment: 0x1113ba520>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2863,7 +2861,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  14.96 0.351 15.262 0 0 
+Time elapsed:  14.766 0.302 14.944 0 0 
 > grDevices::dev.off()
 null device 
           1 
