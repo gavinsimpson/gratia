@@ -172,8 +172,11 @@
     stop("'fct' must be a factor")
   }
   lev <- levels(fct)
-  if (!level %in% lev) {
-    stop("Level <", level, "> not a valid level of factor")
+  if (!all(level %in% lev)) {
+    stop("Level <",
+      paste(level, collapse = ", "),
+      "> not a valid level of factor"
+    )
   }
   factor(level, levels = lev)
 }
