@@ -33,3 +33,4 @@ docs
 # JOSS paper stuff
 paper.log
 paper_cache/
+texput.log
