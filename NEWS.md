@@ -2,6 +2,11 @@
 
 ## New features
 
+* `conditional_values()` and its `draw()` method compute and plot predictions 
+  from a fitted GAM that are conditional on one or more covariates. The 
+  function is a wrapper around `fitted_values()` but allows the user simple ways to specify which covariates to condition on and at what values those covariates should take. It provides similar functionality to
+  `marginaleffects::plot_predictions()`, but is simpler. See #300.
+
 * `penalty()` and `basis()` can now allow the smooth to be reparameterized such
   that the resulting basis has an identity matrix. This more clearly highlights
   the penalty null space, the functions that the penalty has no effect on.
@@ -38,6 +43,9 @@
 * Internal function `gammals_link()` was expecting `"theta"` as a synonym for
   the scale parameter but the master table has `"phi"` coded as the synonym.
   Now both work as expected.
+
+* `level()` assumed that `level` would have only a single value even though it
+  could handle multiple levels. #321
 
 # gratia 0.9.2
 
