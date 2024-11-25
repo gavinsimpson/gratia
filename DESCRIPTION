@@ -1,5 +1,5 @@
 Package: gratia
-Version: 0.9.2.9012
+Version: 0.9.2.9013
 Title: Graceful 'ggplot'-Based Graphics and Other Functions for GAMs Fitted Using 'mgcv'
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     email = "ucfagls@gmail.com",
@@ -54,7 +54,8 @@ Suggests:
     gamair,
     sf (>= 0.7-3),
     svglite (>= 2.0.0),
-    curl
+    curl,
+    marginaleffects
 Description: Graceful 'ggplot'-based graphics and utility functions for working with generalized additive models (GAMs) fitted using the 'mgcv' package. Provides a reimplementation of the plot() method for GAMs that 'mgcv' provides, as well as 'tidyverse' compatible representations of estimated smooths.
 License: MIT + file LICENSE
 LazyData: true
