@@ -141,12 +141,12 @@ credible intervals.</p></dd>
 <span class="r-in"><span><span class="co"># can pass `condition` a list, allowing for greater flexibility</span></span></span>
 <span class="r-in"><span><span class="co"># For example, here we condition on all four variables in the model,</span></span></span>
 <span class="r-in"><span><span class="co"># summarising:</span></span></span>
-<span class="r-in"><span><span class="co">#   * `x1` at its deciles,</span></span></span>
+<span class="r-in"><span><span class="co">#   * `x1` at its five number summary,</span></span></span>
 <span class="r-in"><span><span class="co">#   * `x0  at its quartiles</span></span></span>
 <span class="r-in"><span><span class="co">#   * `x3` at its mean a d mean +/- sd</span></span></span>
 <span class="r-in"><span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu">conditional_values</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">m1</span>,</span></span>
-<span class="r-in"><span>  condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"x2"</span>, x1 <span class="op">=</span> <span class="st">"decile"</span>, x0 <span class="op">=</span> <span class="st">"quartile"</span>, x3 <span class="op">=</span> <span class="st">"threenum"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"x2"</span>, x1 <span class="op">=</span> <span class="st">"fivenum"</span>, x0 <span class="op">=</span> <span class="st">"quartile"</span>, x3 <span class="op">=</span> <span class="st">"threenum"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># plot</span></span></span>
 <span class="r-in"><span><span class="va">cv</span> <span class="op">|&gt;</span> <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="op">)</span></span></span>
