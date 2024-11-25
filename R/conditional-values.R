@@ -1,5 +1,12 @@
-#' Generated predicted values from a GAM, conditional upon supplied values of
-#' covariates
+#' Conditional predictions from a GAM
+#'
+#' Generate predicted values from a GAM, conditional upon supplied values of
+#' covariates. [conditional_values()] is modelled after
+#' [marginaleffects::plot_predictions()], but with an intentionally simpler,
+#' more restrictive functionality. The intended use case is for quickly
+#' visualizing predicted values from a fitted GAM on the response scale. For
+#' more complex model predictions, you are strongly encouraged to use
+#' [marginaleffects::plot_predictions()].
 #'
 #' @param model a fitted GAM object.
 #' @param condition either a character vector or a list supplying the names of
@@ -18,6 +25,10 @@
 #' @param ci_level numeric; a number on interval (0,1) giving the coverage for
 #'   credible intervals.
 #' @param ... arguments passed to [fitted_values()].
+#'
+#' @author Gavin L. Simpson
+#'
+#' @return A data frame (tibble) of class `"conditional_values"`.
 #'
 #' @export
 #'

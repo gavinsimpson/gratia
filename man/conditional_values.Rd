@@ -3,8 +3,7 @@
 \name{conditional_values}
 \alias{conditional_values}
 \alias{conditional_values.gam}
-\title{Generated predicted values from a GAM, conditional upon supplied values of
-covariates}
+\title{Conditional predictions from a GAM}
 \usage{
 conditional_values(
   model,
@@ -49,9 +48,17 @@ named in \code{condition}.}
 \item{ci_level}{numeric; a number on interval (0,1) giving the coverage for
 credible intervals.}
 }
+\value{
+A data frame (tibble) of class \code{"conditional_values"}.
+}
 \description{
-Generated predicted values from a GAM, conditional upon supplied values of
-covariates
+Generate predicted values from a GAM, conditional upon supplied values of
+covariates. \code{\link[=conditional_values]{conditional_values()}} is modelled after
+\code{\link[marginaleffects:plot_predictions]{marginaleffects::plot_predictions()}}, but with an intentionally simpler,
+more restrictive functionality. The intended use case is for quickly
+visualizing predicted values from a fitted GAM on the response scale. For
+more complex model predictions, you are strongly encouraged to use
+\code{\link[marginaleffects:plot_predictions]{marginaleffects::plot_predictions()}}.
 }
 \examples{
 load_mgcv()
@@ -120,4 +127,7 @@ cv <- conditional_values(
 )
 # plot - smooths of `x2` for `fac == 2` and `fac == 3`
 cv |> draw()
+}
+\author{
+Gavin L. Simpson
 }
