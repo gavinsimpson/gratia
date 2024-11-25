@@ -1,5 +1,5 @@
 
-R version 4.4.0 (2024-04-24) -- "Puppy Cup"
+R version 4.4.2 (2024-10-31) -- "Pile of Leaves"
 Copyright (C) 2024 The R Foundation for Statistical Computing
 Platform: aarch64-apple-darwin20
 
@@ -318,7 +318,7 @@ detaching ‘package:mgcv’
 > ## To change the theme for all panels use the & operator, for example to
 > ## change the ggplot theme for all panels
 > library("ggplot2")
-> appraise(mod,
+> appraise(mod, seed = 42,
 +   point_col = "steelblue", point_alpha = 0.4,
 +   line_col = "black"
 + ) & theme_minimal()
@@ -429,6 +429,93 @@ detaching ‘package:mgcv’
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
+> nameEx("conditional_values")
+> ### * conditional_values
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: conditional_values
+> ### Title: Generated predicted values from a GAM, conditional upon supplied
+> ###   values of covariates
+> ### Aliases: conditional_values conditional_values.gam
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> df <- data_sim("eg1", seed = 2)
+> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+> 
+> # predictions conditional on values evenly spaced over x2, all other
+> # variables in model are held at representative values
+> cv <- conditional_values(
++   m1,
++   condition = "x2"
++ )
+> # plot
+> cv |> draw()
+> 
+> # as above but condition on `x1` also. When plotted, `x1` is mapped to the
+> # colour channel, noting that it has been summarised using fivenum()
+> cv <- conditional_values(
++   m1,
++   condition = c("x2", "x1")
++ )
+> # plot
+> cv |> draw()
+> 
+> # can pass `condition` a list, allowing for greater flexibility
+> # For example, here we condition on all four variables in the model,
+> # summarising:
+> #   * `x1` at its deciles,
+> #   * `x0  at its quartiles
+> #   * `x3` at its mean a d mean +/- sd
+> cv <- conditional_values(
++   m1,
++   condition = list("x2", x1 = "decile", x0 = "quartile", "threenum")
++ )
+Warning in mean.default(x, na.rm = TRUE) :
+  argument is not numeric or logical: returning NA
+> # plot
+> cv |> draw()
+> 
+> # some model terms can be exclude from the conditional predictions using the
+> # `exclude` mechanism of `predict.gam`. Here we exclude the effects of
+> # `s(x0)` and `s(x3)` from the conditional predictions. This, in effect,
+> # treats these smooths as having **0** effect on the conditional predictions
+> # of the response, even though the two smooths conditioned on (`s(x2)` and
+> # `s(x1)`) were estimated given the two excluded smooths were in the model
+> cv <- conditional_values(
++   m1,
++   condition = list("x2", x1 = "minmax"),
++   exclude = c("s(x0)", "s(x3)")
++ )
+> # plot
+> cv |> draw()
+> 
+> # categorical conditions are also handled
+> df <- data_sim("eg4", seed = 2)
+> m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+> cv <- conditional_values(
++   m2,
++   condition = list("fac", x2 = "fivenum")
++ )
+> # plot - we see a discrete x axis
+> cv |> draw()
+> 
+> # in this example we condition on `x2` and `fac %in% c(2,3)`
+> cv <- conditional_values(
++   m2,
++   condition = list("x2", fac = 2:3)
++ )
+> # plot - smooths of `x2` for `fac == 2` and `fac == 3`
+> cv |> draw()
 > 
 > 
 > 
@@ -999,17 +1086,12 @@ detaching ‘package:mgcv’
 + 
 +   draw(m)
 + }
-This is mgcv 1.9-1. For overview type 'help("mgcv-package")'.
-
-This is GJRM 0.2-6.5.
-For overview type 'help("GJRM-package")'.
-
 > 
 > 
 > 
 > cleanEx()
 
-detaching ‘package:GJRM’, ‘package:mgcv’, ‘package:nlme’
+detaching ‘package:mgcv’, ‘package:GJRM’
 
 > nameEx("draw.mgcv_smooth")
 > ### * draw.mgcv_smooth
@@ -1594,11 +1676,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x104f85268>
+<environment: 0x160e179e0>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x104f85268>
+<environment: 0x160e179e0>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1721,7 +1803,7 @@ detaching ‘package:mgcv’, ‘package:tibble’
 > 
 > ### Name: model_constant
 > ### Title: Extract the model constant term
-> ### Aliases: model_constant
+> ### Aliases: model_constant model_constant.gam model_constant.gamlss
 > 
 > ### ** Examples
 > 
@@ -1739,6 +1821,8 @@ detaching ‘package:mgcv’, ‘package:tibble’
 > # extract the estimate of the constant term
 > model_constant(m)
 [1] 7.495
+attr(,"par_names")
+[1] "location"
 > # same as coef(m)[1L]
 > coef(m)[1L]
 (Intercept) 
@@ -1805,7 +1889,7 @@ detaching ‘package:mgcv’
 +   s(x3, bs = "cr"), family = nb, data = df, method = "REML")
 > ## IGNORE_RDIFF_BEGIN
 > nb_theta(m)
-[1] 239331
+[1] 239352.7
 > ## IGNORE_RDIFF_END
 > 
 > 
@@ -2210,7 +2294,9 @@ detaching ‘package:mgcv’
 > ## Alternatively use simulate new data from the model, which
 > ## allows construction of reference intervals for the Q-Q plot
 > qq_plot(m,
-+   method = "simulate", point_col = "steelblue",
++   method = "simulate",
++   seed = 42,
++   point_col = "steelblue",
 +   point_alpha = 0.4
 + )
 > 
@@ -2777,7 +2863,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  8.898 0.246 9.271 0 0 
+Time elapsed:  14.96 0.351 15.262 0 0 
 > grDevices::dev.off()
 null device 
           1 
