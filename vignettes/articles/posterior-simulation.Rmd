@@ -181,6 +181,96 @@ The difference between what we did here and what we did with `smooth_samples()` 
 
 ## Additional examples
 
+### Distributional GAMs
+
+Where possible, `predicted_samples()` and `posterior_samples()` also work for distributional GAMs. This is possible when a suitable random number generator is available in the `family` object stored within the model. To illustrate, I reuse an example of Matteo Fasiolo, author of the *mgcViz* package, based on the classic `mcycle` data set from the *MASS* package.
+
+We being by loading the data and adding on a row number variable for use late
+```{r}
+data(mcycle, package = "MASS")
+mcycle <- mcycle |>
+  mutate(
+    .row = row_number()
+  ) |>
+  relocate(.row, .before = 1L)
+```
+
+To these data we fit a standard Gaussian GAM for the conditional mean of `accel`.
+```{r}
+m_gau <- gam(accel ~ s(times, k = 20),
+  data = mcycle, method = "REML"
+)
+```
+Next, we simulate `n_sim` new response values for each of the observed data using `predicted_samples()`
+```{r}
+n_sim <- 10
+n_data <- nrow(mcycle)
+
+sim_gau <- predicted_samples(m_gau, n = n_sim, seed = 10) |>
+  left_join(mcycle |> select(-accel), # join on the observed data for times
+    by = ".row"
+  ) |>
+  rename(accel = .response) |>        # rename
+  bind_rows(mcycle |>
+    relocate(.after = last_col())) |> # bind on observer data
+  mutate(                             # add indicator: simulated or observed
+    type = rep(c("simulated", "observed"),
+      times = c(n_sim * n_data, n_data)
+    ),
+    .alpha = rep(                     # set alpha values for sims & observed
+      c(0.2, 1), time = c(n_sim * n_data, n_data)
+    )
+  )
+```
+The comments briefly indicate what the *dplyr* code is doing. Now we can plot the observed and simulated data
+```{r}
+plt_labs <- labs(
+  x = "Time after impact [ms]",
+  y = "Acceleration [g]"
+)
+
+plt_gau <- sim_gau |>
+  ggplot(aes(x = times)) +
+  geom_point(aes(y = accel, colour = type, alpha = .alpha)) +
+  plt_labs +
+  scale_colour_okabe_ito(order = c(6, 5)) +
+  scale_alpha_identity()
+```
+The resulting plot is shown below in the left-hand panel of the figure below. There is clearly a problem here; the simulated data don't look much like the observations in the 15ms immediately after the impact and again at ~45ms after impact. This is due to the model we fitted only being for the conditional mean of `accel`.
+
+Instead, we model both the conditional mean *and* the conditional variance of the data, through linear predictors for both parameters of the Gaussian distribution
+```{r}
+m_gaulss <- gam(
+  list(accel ~ s(times, k = 20, bs = "tp"),
+    ~ s(times, bs = "tp")
+  ), data = mcycle, family = gaulss()
+)
+```
+Simulating new data follows using the same code as earlier
+```{r}
+sim_gaulss <- predicted_samples(m_gaulss, n = n_sim, seed = 20) |>
+  left_join(mcycle |> select(-accel),
+    by = ".row"
+  ) |>
+  rename(accel = .response) |>
+  bind_rows(mcycle |> relocate(.after = last_col())) |>
+  mutate(
+    type = rep(c("simulated", "observed"),
+      times = c(n_sim * n_data, n_data)
+    ),
+    .alpha = rep(c(0.2, 1), time = c(n_sim * n_data, n_data))
+  )
+```
+The benefit of all that data wrangling is now realised as we can replace the data in the plot we created earlier with the simulations from the distribution GAM, and then plot it
+```{r}
+plt_gaulss <- plt_gau %+% sim_gaulss
+
+plt_gau + plt_gaulss +
+  plot_annotation(tag_levels = "a") +
+  plot_layout(guides = "collect", ncol = 2)
+```
+The plot of the simulated response data for the distributional GAM is shown in the right hand panel of the plot. Now, there is much less disagreement between the observed data and that which we can produce from the fitted mdoel.
+
 ### Prediction intervals
 
 One use for posterior simulation is to generate *prediction* intervals for a fitted model. Prediction intervals include two sources of uncertainty; that from the estimated model itself, plus the sampling uncertainty or error that arises from drawing observations from the conditional distribution of the response.
