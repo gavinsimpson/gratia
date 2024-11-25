@@ -125,19 +125,35 @@ often used to illustrate properties of GAMs</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; R-sq.(adj) =  0.685   Deviance explained = 69.8%</span></span>
 <span><span class="co">#&gt; -REML = 886.93  Scale est. = 4.4144    n = 400</span></span></code></pre></div>
-<div class="section level2">
-<h2 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a>
-</h2>
+<div class="section level3">
+<h3 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a>
+</h3>
 <p>gratia provides the <code><a href="../reference/draw.html">draw()</a></code> function to produce plots
-using the ggplot2 📦. To draw the estimated smooths from the GAM we
+using the ggplot2 📦. To plot the estimated smooths from the GAM we
 fitted above, use</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gratia_files/figure-html/draw-gam-1.png" width="700"></p>
-<p>This is intended as reasonable overview of the estimated model, but
-it offers limited option to modify the resulting plot. If you want full
-control, you can obtain the data used to create the plot above with
-<code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code></p>
+<p>The plots produced are <em>partial effect</em> plots, which show the
+component contributions, on the link scale, of each model term to the
+linear predictor. The y axis on these plots is typically centred around
+0 due to most smooths having a sum-to-zero identifiability constraint
+applied to them. This constraint is what allows the model to include
+multiple smooths and remain identifiable. These plots allow you to read
+off the contributions of each smooth to the fitted response (on the link
+scale); they show link-scale predictions of the response for each
+smooth, conditional upon all other terms in the model, including any
+parametric effects and the intercept, having zero contribution. In the
+parlance of the marginaleffects package <span class="citation">(Arel-Bundock, Greifer, and Heiss Forthcoming)</span>,
+these plots show adjusted predictions, just where the adjustment
+includes setting the contribution of all other model terms to the
+predicted value to zero. For partial derivatives (what
+<em>marginaleffects</em> would call a marginal effect or slope), gratia
+provides <code><a href="../reference/derivatives.html">derivatives()</a></code>.</p>
+<p>The resulting plot is intended as reasonable overview of the
+estimated model, but it offers limited option to modify the resulting
+plot. If you want full control, you can obtain the data used to create
+the plot above with <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="va">sm</span></span>
@@ -155,8 +171,8 @@ control, you can obtain the data used to create the plot above with
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> s(x0)   TPRS  <span style="color: #BB0000;">NA</span>       -<span style="color: #BB0000;">0.732</span> 0.237 0.080<span style="text-decoration: underline;">7</span>      <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> s(x0)   TPRS  <span style="color: #BB0000;">NA</span>       -<span style="color: #BB0000;">0.662</span> 0.228 0.090<span style="text-decoration: underline;">8</span>      <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 390 more rows</span></span></span></code></pre></div>
-<p>which will evaluate all smooths are unevenly spaced values over the
-range of the covariate(s). If you want to evaluate only selected
+<p>which will evaluate all smooths at values that are evenly spaced over
+the range of the covariate(s). If you want to evaluate only selected
 smooths, you can specify which via the <code>smooth</code> argument.
 This takes the <em>smooth labels</em> which are the names of the smooths
 as they are known to mgcv. To list the labels for the smooths in use</p>
@@ -219,9 +235,9 @@ example</p>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="gratia_files/figure-html/ggplot-smooth-1.png" width="700"></p>
 </div>
-<div class="section level2">
-<h2 id="model-diagnostics">Model diagnostics<a class="anchor" aria-label="anchor" href="#model-diagnostics"></a>
-</h2>
+<div class="section level3">
+<h3 id="model-diagnostics">Model diagnostics<a class="anchor" aria-label="anchor" href="#model-diagnostics"></a>
+</h3>
 <p>The <code><a href="../reference/appraise.html">appraise()</a></code> function provides standard diagnostic
 plots for GAMs</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -242,14 +258,26 @@ as oversmoothing</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span>, residuals <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gratia_files/figure-html/draw-partial-residuals-1.png" width="700"></p>
 </div>
-<div class="section level2">
-<h2 id="want-to-learn-more">Want to learn more?<a class="anchor" aria-label="anchor" href="#want-to-learn-more"></a>
-</h2>
+<div class="section level3">
+<h3 id="want-to-learn-more">Want to learn more?<a class="anchor" aria-label="anchor" href="#want-to-learn-more"></a>
+</h3>
 <p><em>gratia</em> is in very active development and an area of
 development that is currently lacking is documentation. To find out more
 about the package, look at the <a href="https://gavinsimpson.github.io/gratia/reference/index.html">help
 pages for the package</a> and look at the examples for more code to help
 you get going.</p>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-Arel-BundockGreiferHeiss:2024" class="csl-entry">
+Arel-Bundock, Vincent, Noah Greifer, and Andrew Heiss. Forthcoming.
+<span>“How to Interpret Statistical Models Using <span class="nocase">marginaleffects</span> in <span>R</span> and
+<span>Python</span>.”</span> <em>Journal of Statistical Software</em>,
+Forthcoming.
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
