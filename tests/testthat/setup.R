@@ -233,7 +233,7 @@ data(CO2)
 m_ordered_by <- gam(uptake ~ Plant + s(conc, k = 5) +
     s(conc, by = Plant, k = 5), data = CO2, method = "REML")
 
-## -- rootogram models ----------------------------------------------------------
+## -- rootogram models ---------------------------------------------------------
 df_pois <- data_sim("eg1", dist = "poisson", n = 500L, scale = 0.2, seed = 42)
 ## fit the model
 b_pois <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
@@ -366,10 +366,10 @@ m_ar1_by <- bam(y ~ series + s(x, k = 20, by = series),
 # A standard GAM with multiple factors
 df_2_fac <- withr::with_seed(
   1,
-  add_column(su_eg4, ff = factor(sample(LETTERS[1:4],
-    nrow(su_eg4),
-    replace = TRUE
-  )))
+  add_column(
+    su_eg4,
+    ff = factor(sample(LETTERS[1:4], nrow(su_eg4), replace = TRUE))
+  )
 )
 # a GAM with multiple factor parametric terms
 m_2_fac <- gam(y ~ fac * ff + s(x0) + s(x1) + s(x2),
@@ -484,9 +484,9 @@ cens_df <- quick_eg1 |>
   )
 cens_df$y_cens <- with(cens_df, cbind(y, censored))
 
-m_censor <- bam(y_cens ~ s(x0) + s(x1) + s(x2) + s(x3),
+m_censor <- gam(y_cens ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = cens_df,
-  family = cnorm(), method = "fREML"
+  family = cnorm(), method = "REML"
 )
 
 # examples for logical variables - examples if from mgcViz::pterms
