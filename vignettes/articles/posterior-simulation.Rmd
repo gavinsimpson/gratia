@@ -28,7 +28,7 @@ We'll need the following packages for this vignette:
 ```{r load-packages}
 pkgs <- c(
   "mgcv", "gratia", "dplyr", "tidyr", "ggplot2", "ggdist",
-  "distributional", "tibble", "withr", "patchwork"
+  "distributional", "tibble", "withr", "patchwork", "ggokabeito"
 )
 vapply(pkgs, library, logical(1L), logical.return = TRUE, character.only = TRUE)
 ```
