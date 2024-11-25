@@ -77,3 +77,15 @@
   attr(x, "factor_levels") <- f_levels
   x
 }
+
+#' @export
+#' @importFrom rlang has_name
+`[.conditional_values` <- function(x, i, j, drop = FALSE) {
+  cls <- class(x)
+  channels <- attr(x, "channels")
+  class(x) <- class(x)[-1]
+  x <- NextMethod()
+  class(x) <- cls
+  attr(x, "channels") <- channels
+  x
+}
