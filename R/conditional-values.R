@@ -303,7 +303,7 @@ characters")
 
   # check if x is a function - need to skip all this if x is a name of a model
   # term
-  if (!x %in% variables) {
+  if (identical(length(x), 1L) || any(!x %in% variables)) {
     is_fun <- try(match.fun(x), silent = TRUE)
     is_fun <- if (inherits(is_fun, "try-error")) {
       FALSE
@@ -389,6 +389,8 @@ characters")
 #' @param facet_scales character; should facets have the same axis scales
 #'   across facets? See [ggplot2::facet_wrap()] for details. Options are:
 #'   `"fixed"` (default), `"free_x"`, `"free_y"`, and `"free"`.
+#' @param ylab character; label for the y axis of the plot.
+#' @param xlab character; label for the x axis of the plot.
 #'
 #' @inheritParams draw.smooth_estimates
 #'
