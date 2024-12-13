@@ -146,12 +146,13 @@
   # the calls below shouldn't be to evenly but to a wrapper
   # that wrapper can call other functions to create the vectors of data needed
   # for the prediction set.
-  cond_list <- process_condition(condition, data = data, n_vals = n_vals)
+  m_vars <- model_vars(model)
+  cond_list <- process_condition(condition, data = data, variables = m_vars,
+    n_vals = n_vals)
   named_cond <- names(cond_list)
 
   # which model vars were *not* included in the conditions?
   used_vars <- names(cond_list)
-  m_vars <- model_vars(model)
   not_used <- dplyr::setdiff(m_vars, used_vars)
   tv <- typical_values(model, data = data)
   tv <- tv |> select(all_of(not_used))
@@ -220,7 +221,11 @@
   range(x, na.rm = TRUE)
 }
 
-`process_condition` <- function(condition, data, n_vals = 100) {
+`process_condition` <- function(condition, data, variables, n_vals = 100) {
+  # condition: the thing passed as condition to conditional_values
+  # data: a data frame to use for evaluating the fitted values
+  # variables: the variables used in the model
+  # n_vals: how many values of the x condition to create
   c_list <- is.list(condition)
   nms <- names(condition)
   if (is.null(nms)) {
@@ -255,21 +260,21 @@ characters")
   # what is in each element
   out <- list()
   out$c1 <- condition_to_data(condition[[1]], nms[[1]], data = data,
-    n_vals = n_vals, summary = FALSE
+    variables = variables, n_vals = n_vals, summary = FALSE
   )
   if (lc > 1L) {
     out$c2 <- condition_to_data(condition[[2]], nms[[2]], data = data,
-      n_vals = n_vals, summary = TRUE
+      variables = variables, n_vals = n_vals, summary = TRUE
     )
   }
   if (lc > 2L) {
     out$c3 <- condition_to_data(condition[[3]], nms[[3]], data = data,
-      n_vals = n_vals, summary = TRUE
+      variables = variables, n_vals = n_vals, summary = TRUE
     )
   }
   if (lc > 3L) {
     out$c4 <- condition_to_data(condition[[4]], nms[[4]], data = data,
-      n_vals = n_vals, summary = TRUE
+      variables = variables, n_vals = n_vals, summary = TRUE
     )
   }
 
@@ -282,25 +287,35 @@ characters")
   out
 }
 
-`condition_to_data` <- function(x, name, data, n_vals = 100, summary = FALSE) {
+`condition_to_data` <- function(
+  x,
+  name,
+  data,
+  variables,
+  n_vals = 100,
+  summary = FALSE
+) {
   good <- FALSE # keep track of whether 'x' is valid or not
 
   # is x one of the internal function names we allow?
   FUN <- condition_helper(x)
   is_allowed <- is.function(FUN)
 
-  # check if x is a function
-  is_fun <- try(match.fun(x), silent = TRUE)
-  is_fun <- if (inherits(is_fun, "try-error")) {
-    FALSE
-  } else {
-    FUN <- is_fun
-    TRUE
-  }
+  # check if x is a function - need to skip all this if x is a name of a model
+  # term
+  if (identical(length(x), 1L) || any(!x %in% variables)) {
+    is_fun <- try(match.fun(x), silent = TRUE)
+    is_fun <- if (inherits(is_fun, "try-error")) {
+      FALSE
+    } else {
+      FUN <- is_fun
+      TRUE
+    }
 
-  if (is_allowed || is_fun) {
-    good <- TRUE
-    out <- FUN(data[[name]])
+    if (is_allowed || is_fun) {
+      good <- TRUE
+      out <- FUN(data[[name]])
+    }
   }
 
   # what is 'x' is not a function (name)?
@@ -374,6 +389,8 @@ characters")
 #' @param facet_scales character; should facets have the same axis scales
 #'   across facets? See [ggplot2::facet_wrap()] for details. Options are:
 #'   `"fixed"` (default), `"free_x"`, `"free_y"`, and `"free"`.
+#' @param ylab character; label for the y axis of the plot.
+#' @param xlab character; label for the x axis of the plot.
 #'
 #' @inheritParams draw.smooth_estimates
 #'
@@ -389,6 +406,8 @@ characters")
     facet_scales = "fixed",
     discrete_colour = NULL,
     discrete_fill = NULL,
+    xlab = NULL,
+    ylab = NULL,
     ...) {
   channels <- attr(object, "channels")
 
@@ -483,7 +502,7 @@ characters")
     # 2 faceting vars so use facet_grid
     if (!is.null(channels$f_col) && !is.null(channels$f_row)) {
       fml <- paste(channels$f_row, "~", channels$f_col) |>
-       as.formula()
+        as.formula()
       plt <- plt +
         facet_grid(
           fml,
@@ -504,8 +523,8 @@ characters")
   # labels
   plt <- plt +
     labs(
-      x = channels$x,
-      y = "Fitted value",
+      x = if (is.null(xlab)) channels$x else xlab,
+      y = if (is.null(ylab)) expression(hat(y)) else ylab,
       colour = channels$colour,
       fill = channels$colour
     )

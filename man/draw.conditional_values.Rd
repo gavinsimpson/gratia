@@ -9,6 +9,8 @@
   facet_scales = "fixed",
   discrete_colour = NULL,
   discrete_fill = NULL,
+  xlab = NULL,
+  ylab = NULL,
   ...
 )
 }
@@ -25,6 +27,10 @@ discrete variables.}
 
 \item{discrete_fill}{a suitable fill scale to be used when plotting
 discrete variables.}
+
+\item{xlab}{character; label for the x axis of the plot.}
+
+\item{ylab}{character; label for the y axis of the plot.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
