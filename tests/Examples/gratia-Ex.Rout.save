@@ -442,8 +442,7 @@ detaching ‘package:mgcv’
 > flush(stderr()); flush(stdout())
 > 
 > ### Name: conditional_values
-> ### Title: Generated predicted values from a GAM, conditional upon supplied
-> ###   values of covariates
+> ### Title: Conditional predictions from a GAM
 > ### Aliases: conditional_values conditional_values.gam
 > 
 > ### ** Examples
@@ -1674,11 +1673,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x10b485820>
+<environment: 0x131065eb0>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x10b485820>
+<environment: 0x131065eb0>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2861,7 +2860,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  14.538 0.264 14.69 0 0 
+Time elapsed:  20.848 0.332 21.343 0 0 
 > grDevices::dev.off()
 null device 
           1 
