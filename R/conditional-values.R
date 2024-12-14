@@ -221,6 +221,9 @@
   range(x, na.rm = TRUE)
 }
 
+#' @importFrom scales ordinal_format
+#' @importFrom cli format_error qty
+#' @importFrom rlang abort
 `process_condition` <- function(condition, data, variables, n_vals = 100) {
   # condition: the thing passed as condition to conditional_values
   # data: a data frame to use for evaluating the fitted values
@@ -228,6 +231,51 @@
   # n_vals: how many values of the x condition to create
   c_list <- is.list(condition)
   nms <- names(condition)
+  nms_len <- nchar(nms)
+  # check if any names are "" == 0 characters, for those elements with such
+  # names, check if that element of conditions is the name of a variable in the
+  # model. If it is we don't need to do anything. If it isn't, check if it is a
+  # helper: if it is a helper, throw an error but prompt user to check if they
+  # forgot to name that element. If it is'nt a helper, throw a less specific
+  # error
+  no_nms <- nms_len == 0
+  if (any(no_nms)) {
+    is_zero <- which(no_nms)
+    # check if the unnamed element contains the name of a variable in the model
+    nm_in_model <- condition[is_zero] %in% variables
+    # drop any that are in models
+    no_nms[is_zero[which(nm_in_model)]] <- FALSE
+    is_zero <- is_zero[!nm_in_model]
+    # check if any remaining unnamed elements contain helpers
+    allowed <- c("threenum", "fivenum", "quartile", "minmax", "decile")
+    is_allowed <- condition[is_zero] %in% allowed
+    # report this problem
+    msg_allowed <- NULL
+    if (any(is_allowed)) {
+      which_allowed <- is_zero[is_allowed]
+      n_allowed <- length(which_allowed)
+      str_allowed <- scales::ordinal_format()(which_allowed)
+      msg_allowed <- "The {str_allowed} element{?s} of {.var condition} {?is/are} unnamed, but {?contains a/contains} function name{?s}."
+    }
+    # drop any that are helpers
+    no_nms[is_zero] <- FALSE
+    is_zero <- is_zero[!is_allowed]
+    # if there are any remaining, then format a different message
+    msg_wrong <- NULL
+    if ((n_wrong <- length(is_zero)) > 0L) {
+      str_wrong <- scales::ordinal_format()(is_zero)
+      msg_wrong <- "The {str_wrong} element{?s} of {.var condition} {?is/are} unnamed but {?does/do} not refer to {?a variable/variables} in the model."
+    }
+    msg_qty <- length(c(msg_wrong, msg_allowed))
+    msg <- c("{.strong Error in the supplied {.var condition}:}",
+      "x" = msg_wrong,
+      "x" = msg_allowed,
+      "i" = "Did you forget to name {qty(msg_qty)} {?this/these} element{?s}?"
+    )
+    if (!is.null(msg_allowed) | !is.null(msg_wrong)) {
+      rlang::abort(format_error(msg))
+    }
+  }
   if (is.null(nms)) {
     nms <- rep(list(NULL), 4)
   }
