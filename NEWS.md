@@ -4,7 +4,9 @@
 
 * `conditional_values()` and its `draw()` method compute and plot predictions 
   from a fitted GAM that are conditional on one or more covariates. The 
-  function is a wrapper around `fitted_values()` but allows the user simple ways to specify which covariates to condition on and at what values those covariates should take. It provides similar functionality to
+  function is a wrapper around `fitted_values()` but allows the user simple ways
+  to specify which covariates to condition on and at what values those
+  covariates should take. It provides similar functionality to
   `marginaleffects::plot_predictions()`, but is simpler. See #300.
 
 * `penalty()` and `basis()` can now allow the smooth to be reparameterized such
