@@ -16,7 +16,7 @@
 #'   they belong.
 #'
 #' @examples
-#' if (require("GJRM", quietly = TRUE)) {
+#' if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {
 #'   # follow example from ?GJRM::gamlss
 #'   load_mgcv()
 #'   suppressPackageStartupMessages(library("GJRM"))
