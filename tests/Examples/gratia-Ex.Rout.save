@@ -1063,7 +1063,7 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> if (require("GJRM", quietly = TRUE)) {
+> if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {
 +   # follow example from ?GJRM::gamlss
 +   load_mgcv()
 +   suppressPackageStartupMessages(library("GJRM"))
@@ -1673,11 +1673,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x131065eb0>
+<environment: 0x14e0f4fd0>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x131065eb0>
+<environment: 0x14e0f4fd0>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2860,7 +2860,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  20.848 0.332 21.343 0 0 
+Time elapsed:  12.067 0.203 12.416 0 0 
 > grDevices::dev.off()
 null device 
           1 
