@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2.9014</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,16 +40,16 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="gratia-development-version">gratia (development version)<a class="anchor" aria-label="anchor" href="#gratia-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.10.0" id="gratia-0100">gratia 0.10.0<a class="anchor" aria-label="anchor" href="#gratia-0100"></a></h2>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-0-10-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-10-0"></a></h3>
 <ul><li><p><code><a href="../reference/conditional_values.html">conditional_values()</a></code> and its <code><a href="../reference/draw.html">draw()</a></code> method compute and plot predictions from a fitted GAM that are conditional on one or more covariates. The function is a wrapper around <code><a href="../reference/fitted_values.html">fitted_values()</a></code> but allows the user simple ways to specify which covariates to condition on and at what values those covariates should take. It provides similar functionality to <code><a href="https://rdrr.io/pkg/marginaleffects/man/plot_predictions.html" class="external-link">marginaleffects::plot_predictions()</a></code>, but is simpler. See <a href="https://github.com/gavinsimpson/gratia/issues/300" class="external-link">#300</a>.</p></li>
 <li><p><code><a href="../reference/penalty.html">penalty()</a></code> and <code><a href="../reference/basis.html">basis()</a></code> can now allow the smooth to be reparameterized such that the resulting basis has an identity matrix. This more clearly highlights the penalty null space, the functions that the penalty has no effect on.</p></li>
 <li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> and <code><a href="../reference/draw.smooth_estimates.html">draw.smooth_estimates()</a></code> gain argument <code>caption</code>, which, if set to <code>FALSE</code> will not plot the smooth basis type as a caption on the plot. <a href="https://github.com/gavinsimpson/gratia/issues/307" class="external-link">#307</a></p></li>
 <li><p><code><a href="../reference/appraise.html">appraise()</a></code> and <code><a href="../reference/qq_plot.html">qq_plot.gam()</a></code> now allow the user to set a random seed that is used when generating reference quantiles with <code>method = "uniform"</code> or <code>method = "simulate"</code>.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-0-10-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-10-0"></a></h3>
 <ul><li><p><code><a href="../reference/derivative_samples.html">derivative_samples()</a></code> was ignoring the <code>scale</code> argument. <a href="https://github.com/gavinsimpson/gratia/issues/293" class="external-link">#293</a> Reported by <a href="https://github.com/jonathonmellor" class="external-link">@jonathonmellor</a></p></li>
 <li><p>Argument <code>level</code> to <code><a href="../reference/derivative_samples.html">derivative_samples()</a></code> was included accidentally. As of v0.9.2.9002 this argument is deprecated and using it will now generate a warning. <a href="https://github.com/gavinsimpson/gratia/issues/291" class="external-link">#291</a></p></li>
 <li><p><code><a href="../reference/draw.html">draw()</a></code> was not plotting cyclic P spline smooths. Reported by <a href="https://github.com/Zuckerbrot" class="external-link">@Zuckerbrot</a> <a href="https://github.com/gavinsimpson/gratia/issues/297" class="external-link">#297</a></p></li>
