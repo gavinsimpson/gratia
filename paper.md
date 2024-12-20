@@ -10,7 +10,7 @@ authors:
     orcid: 0000-0002-9084-8413
     affiliation: 1
 affiliations:
- - name: Department of Animal and Veterinary Science, Aarhus University, Denmark
+ - name: Department of Animal and Veterinary Sciences, Aarhus University, Denmark
    index: 1
 date: 26 June 2024
 citation_author: Simpson
@@ -24,6 +24,8 @@ journal: JOSS
 ---
 
 # Summary
+
+
 
 Generalized additive models [GAMs, @Hastie1990-bx; @Wood2017-qi] are an extension of generalized linear models that allows the effects of covariates to be modelled as smooth functions. GAMs are increasingly used in many areas of science [e.g. @Pedersen2019-ff; @Simpson2018-wc] because the smooth functions allow nonlinear relationships between covariates and the response to be learned from the data through the use of penalized splines. Within the R [@rcore2024] ecosystem, Simon Wood's  *mgcv* package [@Wood2017-qi] is widely used to fit GAMs and is a *Recommended* package that ships with R as part of the default install. A growing number of other R packages build upon *mgcv*, for example as an engine to fit specialised models not handled by *mgcv* itself [e.g. *GJMR*, @Marra2023-gjrm], or to make use of the wide range of splines available in *mgcv* [e.g. *brms*, @Burkner2017-ms].
 
@@ -214,13 +216,13 @@ fs |>                                 # take the posterior draws
 ## # A tibble: 1 x 6
 ##   chl_a .lower .upper .width .point .interval
 ##   <dbl>  <dbl>  <dbl>  <dbl> <chr>  <chr>    
-## 1 0.932  0.757   1.17   0.95 median qi
+## 1  1.07  0.870   1.33   0.95 median qi
 ```
 The posterior distribution of average chlorophyll *a* is summarised using `median_qi()` from the *ggdist* package [@Kay2024-rv; @Kay2024-uj]. While we could use the base R function `quantile()` to compute the interval, the use of `median_qi()` illustrates how *gratia* tries to interact with other packages.
 
 # Conclusion
 
-*gratia* provides a range of functionality to make working with estimated GAMs easier for users. It is designed to take some of the pain out of working with models, simplifying plotting of smooths and related features (differences, derivatives) and exposing the powerful machinery of the *mgcv* package without the need for a deep understanding of GAMs, splines, and the inner structure of *mgcv*'s model objects. As such, it provides a useful addition for anyone wanting to use GAMs in their data analyses without requiring them to be a GAM expert.
+*gratia* provides a range of functionality to make working with estimated GAMs easier for users. It is designed to take some of the pain out of working with models, simplifying plotting of smooths and related features (differences, derivatives) and exposes the powerful machinery of the *mgcv* package without the need for a deep understanding of GAMs, splines, and the inner structure of *mgcv*'s model objects. As such, it provides a useful addition for anyone wanting to use GAMs in their data analyses without requiring them to be a GAM expert.
 
 # Acknowledgements
 

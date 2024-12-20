@@ -10,7 +10,7 @@ authors:
     orcid: 0000-0002-9084-8413
     affiliation: 1
 affiliations:
- - name: Department of Animal and Veterinary Science, Aarhus University, Denmark
+ - name: Department of Animal and Veterinary Sciences, Aarhus University, Denmark
    index: 1
 date: 26 June 2024
 citation_author: Simpson
@@ -24,6 +24,12 @@ journal: JOSS
 ---
 
 # Summary
+
+```{r, setup, echo = FALSE, cache = FALSE, results = "hide"}
+pkgs <- c("mgcv", "gratia", "ggplot2", "geomtextpath", "dplyr", "tibble", "patchwork")
+res <- vapply(pkgs, library, logical(1), character.only = TRUE,
+  logical.return = TRUE)
+```
 
 Generalized additive models [GAMs, @Hastie1990-bx; @Wood2017-qi] are an extension of generalized linear models that allows the effects of covariates to be modelled as smooth functions. GAMs are increasingly used in many areas of science [e.g. @Pedersen2019-ff; @Simpson2018-wc] because the smooth functions allow nonlinear relationships between covariates and the response to be learned from the data through the use of penalized splines. Within the R [@rcore2024] ecosystem, Simon Wood's  *mgcv* package [@Wood2017-qi] is widely used to fit GAMs and is a *Recommended* package that ships with R as part of the default install. A growing number of other R packages build upon *mgcv*, for example as an engine to fit specialised models not handled by *mgcv* itself [e.g. *GJMR*, @Marra2023-gjrm], or to make use of the wide range of splines available in *mgcv* [e.g. *brms*, @Burkner2017-ms].
 
@@ -55,9 +61,6 @@ $$
 with additive Gaussian noise ($\mu = 0, \sigma = 1$), and the associated penalty matrix, prepared using functions from *gratia*.
 
 ```{r penalised-spline-basis-and-penalty, echo = FALSE, fig.height = 5, fig.width = 10, fig.cap = "\\label{fig:basis-funs}Basis functions (a) and associated penalty matrix (b) for a penalised, low rank, thin plate regression spline. a) shows the individual basis functions (thin coloured lines; numbers indicate which basis function each line represents) multiplied by their respective model coefficients, as well as the data (black points) to which the GAM was fitted. The estimated smooth is shown as the thick grey line. b) shows the penalty matrix for the basis shown in a). Note the 9th basis function (labelled 'F9', which is the linear function at the lower left to upper right in a), is not affected by the penalty as it has 0 second derivative everywhere, and hence the resulting penalty for this function is 0.", fig.pos = "t!"}
-pkgs <- c("mgcv", "gratia", "ggplot2", "geomtextpath", "dplyr", "tibble", "patchwork")
-res <- vapply(pkgs, library, logical(1), character.only = TRUE,
-  logical.return = TRUE)
 # simulate data
 sim_d <- tibble(x = withr::with_seed(1234, runif(100))) |>
   mutate(
@@ -243,7 +246,7 @@ The posterior distribution of average chlorophyll *a* is summarised using `media
 
 # Conclusion
 
-*gratia* provides a range of functionality to make working with estimated GAMs easier for users. It is designed to take some of the pain out of working with models, simplifying plotting of smooths and related features (differences, derivatives) and exposing the powerful machinery of the *mgcv* package without the need for a deep understanding of GAMs, splines, and the inner structure of *mgcv*'s model objects. As such, it provides a useful addition for anyone wanting to use GAMs in their data analyses without requiring them to be a GAM expert.
+*gratia* provides a range of functionality to make working with estimated GAMs easier for users. It is designed to take some of the pain out of working with models, simplifying plotting of smooths and related features (differences, derivatives) and exposes the powerful machinery of the *mgcv* package without the need for a deep understanding of GAMs, splines, and the inner structure of *mgcv*'s model objects. As such, it provides a useful addition for anyone wanting to use GAMs in their data analyses without requiring them to be a GAM expert.
 
 # Acknowledgements
 
