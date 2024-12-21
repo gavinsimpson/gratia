@@ -87,10 +87,10 @@ loaded <- vapply(pkgs, library, logical(1L), logical.return = TRUE,
 data(chl, package = "gamair")
 ```
 
-A simple GAM for these data is to model the response (`chl`) with a spatial smooth of latitude (`lat`) and longitude (`lon`) as covariates. Here, I use a spline on the sphere (SOS) smoother built using a Duchon spline with second order derivative penalty [@Duchon1977-jr]. Additional terms included in the linear predictor are a smooth of the day of year of sample collection (`jul.day`) and a smooth of ocean depth (`bath`). The response is assumed to be conditionally Tweedie distributed, with the power parameter ($p$) of the distribution estimated during fitting. Model coefficients and smoothing parameters are estimated using restricted maximum likelihood [@Wood2011-kn]. To use parallel processing in some parts of the model fitting algorithm, the `nthreads` control parameter is set to 10 (set this lower if your machine doesn't have this many physical CPU cores).
+A simple GAM for these data is to model the response (`chl`) with a spatial smooth of latitude (`lat`) and longitude (`lon`) as covariates. Here, I use a spline on the sphere (SOS) smoother built using a Duchon spline with second order derivative penalty [@Duchon1977-jr]. Additional terms included in the linear predictor are a smooth of the day of year of sample collection (`jul.day`) and a smooth of ocean depth (`bath`). The response is assumed to be conditionally Tweedie distributed, with the power parameter ($p$) of the distribution estimated during fitting. Model coefficients and smoothing parameters are estimated using restricted maximum likelihood [@Wood2011-kn]. To use parallel processing in some parts of the model fitting algorithm, the `nthreads` control parameter is set to 8 (set this lower if your machine doesn't have this many physical CPU cores).
 
 ``` r
-ctrl <- gam.control(nthreads = 10)
+ctrl <- gam.control(nthreads = 8)
 m1 <- gam(
   chl ~ s(lat, lon, bs = "sos", m = -1, k = 150) +
     s(jul.day, bs = "cr", k = 20) +
@@ -216,7 +216,7 @@ fs |>                                 # take the posterior draws
 ## # A tibble: 1 x 6
 ##   chl_a .lower .upper .width .point .interval
 ##   <dbl>  <dbl>  <dbl>  <dbl> <chr>  <chr>    
-## 1  1.07  0.870   1.33   0.95 median qi
+## 1  1.07  0.866   1.34   0.95 median qi
 ```
 The posterior distribution of average chlorophyll *a* is summarised using `median_qi()` from the *ggdist* package [@Kay2024-rv; @Kay2024-uj]. While we could use the base R function `quantile()` to compute the interval, the use of `median_qi()` illustrates how *gratia* tries to interact with other packages.
 
