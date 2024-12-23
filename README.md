@@ -10,6 +10,7 @@ status](https://github.com/gavinsimpson/gratia/workflows/R-CMD-check/badge.svg)]
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/gratia)](https://cran.r-project.org/package=gratia)
 [![CRAN
 Downloads](https://cranlogs.r-pkg.org/badges/grand-total/gratia)](https://cran.r-project.org/package=gratia)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.06962/status.svg)](https://doi.org/10.21105/joss.06962)
 <!-- badges: end -->
 
 ## Overview
