@@ -351,7 +351,7 @@ characters")
 
   # check if x is a function - need to skip all this if x is a name of a model
   # term
-  if (identical(length(x), 1L) || any(!x %in% variables)) {
+  if (any(!x %in% variables) && identical(length(x), 1L)) {
     is_fun <- try(match.fun(x), silent = TRUE)
     is_fun <- if (inherits(is_fun, "try-error")) {
       FALSE
