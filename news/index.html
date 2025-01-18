@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,7 +43,7 @@
 <h2 class="pkg-version" data-toc-text="0.10.0" id="gratia-0100">gratia 0.10.0<a class="anchor" aria-label="anchor" href="#gratia-0100"></a></h2><p class="text-muted">CRAN release: 2024-12-19</p>
 <div class="section level3">
 <h3 id="new-features-0-10-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-10-0"></a></h3>
-<ul><li><p><code><a href="../reference/conditional_values.html">conditional_values()</a></code> and its <code><a href="../reference/draw.html">draw()</a></code> method compute and plot predictions from a fitted GAM that are conditional on one or more covariates. The function is a wrapper around <code><a href="../reference/fitted_values.html">fitted_values()</a></code> but allows the user simple ways to specify which covariates to condition on and at what values those covariates should take. It provides similar functionality to <code><a href="https://rdrr.io/pkg/marginaleffects/man/plot_predictions.html" class="external-link">marginaleffects::plot_predictions()</a></code>, but is simpler. See <a href="https://github.com/gavinsimpson/gratia/issues/300" class="external-link">#300</a>.</p></li>
+<ul><li><p><code><a href="../reference/conditional_values.html">conditional_values()</a></code> and its <code><a href="../reference/draw.html">draw()</a></code> method compute and plot predictions from a fitted GAM that are conditional on one or more covariates. The function is a wrapper around <code><a href="../reference/fitted_values.html">fitted_values()</a></code> but allows the user simple ways to specify which covariates to condition on and at what values those covariates should take. It provides similar functionality to <code><a href="https://marginaleffects.com/man/r/plot_predictions.html" class="external-link">marginaleffects::plot_predictions()</a></code>, but is simpler. See <a href="https://github.com/gavinsimpson/gratia/issues/300" class="external-link">#300</a>.</p></li>
 <li><p><code><a href="../reference/penalty.html">penalty()</a></code> and <code><a href="../reference/basis.html">basis()</a></code> can now allow the smooth to be reparameterized such that the resulting basis has an identity matrix. This more clearly highlights the penalty null space, the functions that the penalty has no effect on.</p></li>
 <li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> and <code><a href="../reference/draw.smooth_estimates.html">draw.smooth_estimates()</a></code> gain argument <code>caption</code>, which, if set to <code>FALSE</code> will not plot the smooth basis type as a caption on the plot. <a href="https://github.com/gavinsimpson/gratia/issues/307" class="external-link">#307</a></p></li>
 <li><p><code><a href="../reference/appraise.html">appraise()</a></code> and <code><a href="../reference/qq_plot.html">qq_plot.gam()</a></code> now allow the user to set a random seed that is used when generating reference quantiles with <code>method = "uniform"</code> or <code>method = "simulate"</code>.</p></li>
