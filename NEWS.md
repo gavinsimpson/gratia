@@ -6,6 +6,9 @@
   a name of a function. #293 (but not really fixed when this was initially
   closed)
 
+* `parametric_effects()` was only keep one set of factor levels when there were
+  multiple parametric factor terms in a model. Reported by @tamas-ferenci as part of discussion to #284
+
 # gratia 0.10.0
 
 ## New features
