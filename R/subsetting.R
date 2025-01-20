@@ -68,7 +68,7 @@
       filter(.data$.type %in% c("factor", "ordered")) |>
       reframe(f = unique(.data$.term)) |>
       pull("f")
-    if (!is.na(f_levels)) {
+    if (!is.null(f_levels)) {
       f_levels <- f_levels[f_names]
     }
   } else {

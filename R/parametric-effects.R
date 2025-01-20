@@ -26,7 +26,7 @@
 #' @importFrom stats delete.response formula model.frame
 #' @importFrom tibble as_tibble add_column
 #' @importFrom rlang .data
-#' @importFrom purrr map_df
+#' @importFrom purrr map_df map
 #' @importFrom dplyr mutate bind_cols bind_rows distinct %>% relocate rename
 #' @importFrom tidyr nest unnest
 #' @importFrom tidyselect any_of last_col
@@ -159,13 +159,24 @@
     out
   }
 
-  effects <- map_df(valid_terms,
+  # effects <- map_df(valid_terms,
+  #  .f = fun, data = data, pred = pred,
+  #  vars = vars
+  # )
+  effects <- map(valid_terms,
     .f = fun, data = data, pred = pred,
     vars = vars
   )
 
+  # capture the `factor_levels` attribute off each term's data frame
+  f_levels <- lapply(effects, \(x) attr(x, "factor_levels")) |>
+    unlist(recursive = FALSE) # peel off the outer layer of the list
+  # now we can bind the data frames together - need to do it this way to
+  # preserve the levels of all factors - see #284
+  effects <- effects |> bind_rows()
+
   if (unnest) {
-    f_levels <- attr(effects, "factor_levels")
+    # f_levels <- attr(effects, "factor_levels")
     effects <- unnest(effects, cols = "data") |>
       relocate(c(".partial", ".se"), .after = last_col())
     attr(effects, "factor_levels") <- f_levels
