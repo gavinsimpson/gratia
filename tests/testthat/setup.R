@@ -603,7 +603,11 @@ df_284 <- df_284 |>
         times = 40),
       levels = month.abb[1:10],
       ordered = TRUE
-    )
+    ),
+    var = as.factor(rep(letters[1:2], 400/2))
   )
-m_284 <- gam(y ~ month + s(x0) + s(x1) + s(x2) + s(x3),
-  data = df_284, method = "REML")
+m_284 <- gam(
+  y ~ month + var + s(x0) + s(x1) + s(x2) + s(x3),
+  data = df_284,
+  method = "REML"
+)

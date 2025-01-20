@@ -131,3 +131,17 @@ test_that("issue 212 remains fixed", {
   # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("testing issue 212", plt)
 })
+
+test_that("issue 284 remains fixed", {
+  skip_on_cran()
+
+  peff_284 <- parametric_effects(
+    m_284,
+    data = df_284,
+    envir = teardown_env()
+  )
+  expect_identical(
+    attr(peff_284, "factor_levels"),
+    list(month = month.abb[1:10], var = c("a", "b"))
+  )
+})
