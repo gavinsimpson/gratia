@@ -3,7 +3,7 @@
 ## Bug fixes
 
 * `conditional_values()` would fail if a variable it was conditioning was also
-  a name of a function. #293 (but not really fixed when this was initially
+  a name of a function. #323 (but not really fixed when this was initially
   closed)
 
 * `parametric_effects()` was only keep one set of factor levels when there were
