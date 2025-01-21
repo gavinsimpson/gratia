@@ -1,4 +1,4 @@
-# gratia (Development version)
+# gratia (development version)
 
 ## Bug fixes
 
