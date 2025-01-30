@@ -30,6 +30,14 @@ test_that("post_draws() works for a GAM", {
   expect_identical(drws3, drws1[, 2:10])
 })
 
+test_that("post_draws() works with mh and n = 1 - issue 328", {
+  expect_silent(drws1 <- post_draws(m_gam, n = 1, method = "mh",
+    burnin = 100, thin = 2, t_df = 4, rw_scale = 0.3, seed = 2))
+  expect_type(drws1, "double")
+  expect_true(is.matrix(drws1))
+  expect_identical(dim(drws1), c(1L, 37L))
+})
+
 test_that("post_draws() fails for INLA", {
   expect_error(post_draws(m_gam, method = "inla"),
     "'method = \"inla\"' is not yet implemented.")

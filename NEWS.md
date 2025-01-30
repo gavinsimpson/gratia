@@ -7,7 +7,11 @@
   closed)
 
 * `parametric_effects()` was only keep one set of factor levels when there were
-  multiple parametric factor terms in a model. Reported by @tamas-ferenci as part of discussion to #284
+  multiple parametric factor terms in a model. Reported by @tamas-ferenci as
+  part of discussion to #284
+
+* `mh_draws()` would fail in the case of drawing only `n = 1` samples. #328
+  Reported by @zsusswein
 
 # gratia 0.10.0
 
