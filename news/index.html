@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,6 +45,7 @@
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li><p><code><a href="../reference/conditional_values.html">conditional_values()</a></code> would fail if a variable it was conditioning was also a name of a function. <a href="https://github.com/gavinsimpson/gratia/issues/323" class="external-link">#323</a> (but not really fixed when this was initially closed)</p></li>
 <li><p><code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> was only keep one set of factor levels when there were multiple parametric factor terms in a model. Reported by <a href="https://github.com/tamas-ferenci" class="external-link">@tamas-ferenci</a> as part of discussion to <a href="https://github.com/gavinsimpson/gratia/issues/284" class="external-link">#284</a></p></li>
+<li><p><code><a href="../reference/mh_draws.html">mh_draws()</a></code> would fail in the case of drawing only <code>n = 1</code> samples. <a href="https://github.com/gavinsimpson/gratia/issues/328" class="external-link">#328</a> Reported by <a href="https://github.com/zsusswein" class="external-link">@zsusswein</a></p></li>
 </ul></div>
 </div>
     <div class="section level2">
