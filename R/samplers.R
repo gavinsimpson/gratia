@@ -212,6 +212,10 @@
   rw_acceptance <- attr(betas, "rw_acceptance")
   fixed_acceptance <- attr(betas, "fixed_acceptance")
   betas <- betas[["bs"]]
+  # mgcv::gam.mh returns a vector instead of a matrix in the n = 1 case #328
+  if (!is.matrix(betas)) {
+    betas <- t(as.matrix(betas))
+  }
   if (!is.null(index)) {
     betas <- betas[, index, drop = FALSE]
   }
