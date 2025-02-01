@@ -446,6 +446,7 @@
     weights = weights, ...
   )
   RNGstate <- attr(sims, "seed")
+  class(sims) <- class(sims)[-1] # remove the "simulate_gratia" class
   colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
   sims <- as_tibble(sims)
   names(sims) <- as.character(seq_len(ncol(sims)))
