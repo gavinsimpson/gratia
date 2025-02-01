@@ -78,10 +78,27 @@
     }
   }
 
-  mu <- predict(object, newdata = data, type = "response", ...)
+  # some families need link scale predictions
+  # this duplicates code from fitted_values, and is perhaps overkill, but I'll
+  # leave it in case I need something more complex for other families I haven't
+  # looked at yet
+  fam <- family_type(object)
+  fam <- case_when(
+    grepl("^ordered_categorical", fam, ignore.case = TRUE) == TRUE ~ "ocat",
+    .default = "default"
+  )
+  mu <- if (identical(fam, "default")) {
+    predict(object, newdata = data, type = "response", ...)
+  } else {
+    predict(object, newdata = data, type = "link", ...)
+  }
+
+  # call RNG function
   sims <- replicate(nsim, rd_fun(mu = mu, wt = weights, scale = scale))
 
   attr(sims, "seed") <- RNGstate
+  class(sims) <- append(class(sims), "simulate_gratia", after = 0L)
+
   sims
 }
 
@@ -144,5 +161,15 @@
   sims <- replicate(nsim, rd_fun(mu = mu, wt = weights, scale = scale))
 
   attr(sims, "seed") <- RNGstate
+  class(sims) <- append(class(sims), "simulate_gratia", after = 0L)
   sims
+}
+
+#' @export
+`print.simulate_gratia` <- function(x, ...) {
+  orig <- x
+  attr(x, "seed") <- NULL
+  class(x) <- class(x)[-1]
+  NextMethod()
+  invisible(orig)
 }
