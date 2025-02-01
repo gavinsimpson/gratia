@@ -15,9 +15,9 @@
   a name of a function. #323 (but not really fixed when this was initially
   closed)
 
-* `parametric_effects()` was only keep one set of factor levels when there were
-  multiple parametric factor terms in a model. Reported by @tamas-ferenci as
-  part of discussion to #284
+* `parametric_effects()` was only keeping one set of factor levels when there 
+  were multiple parametric factor terms in a model. Reported by @tamas-ferenci 
+  as part of discussion to #284
 
 * `mh_draws()` would fail in the case of drawing only `n = 1` samples. #328
   Reported by @zsusswein
