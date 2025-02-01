@@ -4,7 +4,7 @@
 \alias{nested_rug_values}
 \title{Values for rug plot in nested form}
 \usage{
-nested_rug_values(object, terms = NULL, data = NULL)
+nested_rug_values(object, terms = NULL, data = NULL, distinct = TRUE)
 }
 \arguments{
 \item{object}{a fitted GAM model}

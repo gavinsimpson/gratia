@@ -22,6 +22,7 @@
   fun = NULL,
   dist = 0.1,
   rug = TRUE,
+  distinct_rug = TRUE,
   contour = TRUE,
   grouped_by = FALSE,
   ci_alpha = 0.2,
@@ -124,6 +125,9 @@ and \code{dist} is a distance within the unit square. See
 
 \item{rug}{logical; draw a rug plot at the bottom of each plot for 1-D
 smooths or plot locations of data for higher dimensions.}
+
+\item{distinct_rug}{logical; should the data for the rug plots be reduced to
+the distinct values?}
 
 \item{contour}{logical; should contours be draw on the plot using
 \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
