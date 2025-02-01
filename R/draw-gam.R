@@ -60,6 +60,8 @@
 #'   [mgcv::exclude.too.far()] for further details.
 #' @param rug logical; draw a rug plot at the bottom of each plot for 1-D
 #'   smooths or plot locations of data for higher dimensions.
+#' @param distinct_rug logical; should the data for the rug plots be reduced to
+#'   the distinct values?
 #' @param contour logical; should contours be draw on the plot using
 #'   [ggplot2::geom_contour()].
 #' @param grouped_by logical; should factor by smooths be drawn as one panel
@@ -180,6 +182,7 @@
     fun = NULL,
     dist = 0.1,
     rug = TRUE,
+    distinct_rug = TRUE,
     contour = TRUE,
     grouped_by = FALSE,
     ci_alpha = 0.2,
@@ -335,7 +338,11 @@
     # add rug data?
     if (isTRUE(rug)) {
       # get rug data in a suitable format
-      rug_data <- nested_rug_values(object, terms = S[select])
+      rug_data <- nested_rug_values(
+        object,
+        terms = S[select],
+        distinct = distinct_rug
+      )
 
       # merge with the evaluated smooth
       sm_eval <- suppress_matches_multiple_warning(
