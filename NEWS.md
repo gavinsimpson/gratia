@@ -1,5 +1,11 @@
 # gratia (development version)
 
+## User visible changes
+
+* Rug plots in `draw.gam()` now only show the unique data values to avoid 
+  needless overplotting. This behaviour is controlled via new argument
+  `distinct_rug`. Setting this to `FALSE` will get the previous behaviour.
+
 ## Bug fixes
 
 * `conditional_values()` would fail if a variable it was conditioning was also
