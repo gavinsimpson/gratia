@@ -6,6 +6,9 @@
   needless overplotting. This behaviour is controlled via new argument
   `distinct_rug`. Setting this to `FALSE` will get the previous behaviour.
 
+* `simulate.gam()` gains a `print()` method and thus no longer prints its
+  attributes.
+
 ## Bug fixes
 
 * `conditional_values()` would fail if a variable it was conditioning was also
@@ -18,6 +21,9 @@
 
 * `mh_draws()` would fail in the case of drawing only `n = 1` samples. #328
   Reported by @zsusswein
+
+* `simulate.gam()` now works for the `ocat()` family, which has a non-standard
+  `rd` function in its `family()` object. Reported by @hhp94, #319
 
 # gratia 0.10.0
 
