@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,10 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="gratia-development-version">gratia (development version)<a class="anchor" aria-label="anchor" href="#gratia-development-version"></a></h2>
+<div class="section level3">
+<h3 id="user-visible-changes-development-version">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-development-version"></a></h3>
+<ul><li>Rug plots in <code><a href="../reference/draw.gam.html">draw.gam()</a></code> now only show the unique data values to avoid needless overplotting. This behaviour is controlled via new argument <code>distinct_rug</code>. Setting this to <code>FALSE</code> will get the previous behaviour.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li><p><code><a href="../reference/conditional_values.html">conditional_values()</a></code> would fail if a variable it was conditioning was also a name of a function. <a href="https://github.com/gavinsimpson/gratia/issues/323" class="external-link">#323</a> (but not really fixed when this was initially closed)</p></li>
