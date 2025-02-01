@@ -19,7 +19,7 @@
 #' @keywords internal
 #' @importFrom tidyr pivot_longer nest
 #' @importFrom tidyselect everything
-#' @importFrom dplyr %>% mutate rowwise
+#' @importFrom dplyr mutate rowwise
 `nested_partial_residuals` <- function(object, terms = NULL, data = NULL) {
   # compute partial residuals
   p_resids <- compute_partial_residuals(object,
@@ -55,15 +55,15 @@
   # This is now done in separate function that we reuse elsewhere
   # and it filters out the data for the correct level of a by variable
 
-  p_resids <- p_resids %>%
-    rowwise() %>%
+  p_resids <- p_resids |>
+    rowwise() |>
     mutate(
       partial_residual =
         list(get_obs_data_for_smooth(.data$.smooth,
           object, data,
           extra = .data$partial_residual
         ))
-    ) %>%
+    ) |>
     ungroup()
 
 
@@ -85,8 +85,13 @@
 #'
 #' @keywords internal
 #' @importFrom tibble tibble
-#' @importFrom dplyr %>% rowwise mutate ungroup
-`nested_rug_values` <- function(object, terms = NULL, data = NULL) {
+#' @importFrom dplyr rowwise mutate ungroup
+`nested_rug_values` <- function(
+  object,
+  terms = NULL,
+  data = NULL,
+  distinct = TRUE
+) {
   # if not supplied data then recover it from the model object
   if (is.null(data)) {
     data <- object$model # don't need -> model.frame(object)
@@ -101,19 +106,32 @@
     rowwise() |>
     mutate(
       rug_data =
-        list(get_obs_data_for_smooth(.data$.smooth, object, data))
+        list(
+          get_obs_data_for_smooth(
+            .data$.smooth,
+            object,
+            data,
+            distinct = distinct
+          )
+        )
     ) |>
     ungroup()
 
   rug_vals
 }
 
-#' @importFrom dplyr select bind_cols filter %>%
+#' @importFrom dplyr select bind_cols filter distinct
 #' @importFrom tidyselect all_of
 #' @importFrom tibble as_tibble
 #' @noRd
 #' @keywords internal
-`get_obs_data_for_smooth` <- function(smooth, model, data, extra = NULL) {
+`get_obs_data_for_smooth` <- function(
+  smooth,
+  model,
+  data,
+  extra = NULL,
+  distinct = FALSE
+) {
   sm <- get_smooth(model, smooth)
   sm_var <- smooth_variable(sm)
   # ====> FIXME <==== what about continuous by?
@@ -126,12 +144,12 @@
   by_lev <- by_level(sm)
 
   # retain only those columns we want
-  df <- data %>%
-    select(all_of(c(sm_var, by_var))) %>%
+  df <- data |>
+    select(all_of(c(sm_var, by_var))) |>
     as_tibble()
 
   # handle matrix covariates, which will get stacked by as.numeric
-  df <- unpack_matrix_cols(df) %>% as_tibble()
+  df <- unpack_matrix_cols(df) |> as_tibble()
 
   # do this first so we bind on all the data, then filter
   if (!is.null(extra)) {
@@ -141,9 +159,14 @@
   # if we have a by variable, filter out only those rows that pertain to
   # this smooth. Only for factor by smooths
   if (is_factor_by_smooth(sm)) {
-    df <- df %>%
-      filter(.data[[by_var]] == by_lev) %>%
+    df <- df |>
+      filter(.data[[by_var]] == by_lev) |>
       as_tibble()
+  }
+
+  # drop repeated observations?
+  if (distinct) {
+    df <- distinct(df, .keep_all = TRUE)
   }
 
   # return
