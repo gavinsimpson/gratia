@@ -159,9 +159,9 @@ if (packageVersion("mgcv") >= "1.8.41") {
   )
 }
 
-su_eg2_by <- su_eg2 %>%
-  mutate(y = y + y^2 + y^3) %>%
-  bind_rows(su_eg2) %>%
+su_eg2_by <- su_eg2 |>
+  mutate(y = y + y^2 + y^3) |>
+  bind_rows(su_eg2) |>
   mutate(fac = factor(rep(c("A", "B"), each = nrow(su_eg2))))
 su_m_bivar_by_fac <- gam(y ~ fac + s(x, z, k = 40, by = fac),
   data = su_eg2_by,
@@ -307,7 +307,7 @@ rm2 <- gam(y ~ fac + s(ranef, bs = "re", by = fac) + s(x0) + s(x1) + s(x2),
 )
 
 # -- A distributed lag model example -------------------------------------------
-su_dlnm <- su_eg1 %>%
+su_dlnm <- su_eg1 |>
   mutate(
     f_lag = cbind(
       dplyr::lag(f, 1),
@@ -317,7 +317,7 @@ su_dlnm <- su_eg1 %>%
       dplyr::lag(f, 5)
     ),
     lag = matrix(1:5, ncol = 5)
-  ) %>%
+  ) |>
   filter(!is.na(f_lag[, 5]))
 
 # fit DLNM GAM

@@ -78,7 +78,7 @@
   scale <- match.arg(scale)
 
   if (is.null(data)) {
-    data <- delete_response(object, model_frame = FALSE) %>%
+    data <- delete_response(object, model_frame = FALSE) |>
       as_tibble()
   } else if (!is_tibble(data)) {
     data <- as_tibble(data)

@@ -703,7 +703,7 @@
     ## if this is a by variable, filter the by variable for the required
     ## level now
     if (is_factor_by_smooth(smooth)) {
-      data <- data %>% filter(.data[[by_var]] == by_level(smooth))
+      data <- data |> filter(.data[[by_var]] == by_level(smooth))
     }
   }
   data

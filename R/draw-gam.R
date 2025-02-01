@@ -135,7 +135,7 @@
 #' @importFrom ggplot2 scale_colour_discrete scale_colour_continuous
 #'   scale_fill_distiller
 #' @importFrom patchwork wrap_plots
-#' @importFrom dplyr mutate rowwise %>% ungroup left_join group_split summarise
+#' @importFrom dplyr mutate rowwise ungroup left_join group_split summarise
 #' @importFrom purrr pluck map_lgl
 #' @importFrom rlang expr_label
 #' @importFrom utils packageVersion getFromNamespace
@@ -273,9 +273,9 @@
     tensor_term_order <- attr(sm_eval, "tensor_term_order")
 
     # add confidence interval
-    sm_eval <- sm_eval %>%
-      rowwise() %>%
-      mutate(data = list(add_confint(.data$data, coverage = ci_level))) %>%
+    sm_eval <- sm_eval |>
+      rowwise() |>
+      mutate(data = list(add_confint(.data$data, coverage = ci_level))) |>
       ungroup()
 
     # Take the range of the smooths & their confidence intervals now
@@ -440,8 +440,8 @@
 
         f_levels <- attr(para, "factor_levels")
 
-        para_plts <- para %>%
-          group_by(.data$.term) %>%
+        para_plts <- para |>
+          group_by(.data$.term) |>
           group_map(
             .keep = TRUE,
             .f = ~ draw_parametric_effect(.x,

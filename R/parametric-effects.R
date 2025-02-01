@@ -27,7 +27,7 @@
 #' @importFrom tibble as_tibble add_column
 #' @importFrom rlang .data
 #' @importFrom purrr map_df map
-#' @importFrom dplyr mutate bind_cols bind_rows distinct %>% relocate rename
+#' @importFrom dplyr mutate bind_cols bind_rows distinct relocate rename
 #' @importFrom tidyr nest unnest
 #' @importFrom tidyselect any_of last_col
 #'
@@ -239,8 +239,8 @@ draw.parametric_effects <- function(object,
 
   f_levels <- attr(object, "factor_levels")
 
-  plts <- object %>%
-    group_by(.data$.term) %>%
+  plts <- object |>
+    group_by(.data$.term) |>
     group_map(
       .keep = TRUE,
       .f = ~ draw_parametric_effect(.x,

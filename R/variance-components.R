@@ -33,7 +33,6 @@
 #' @importFrom tibble rownames_to_column add_column
 #' @importFrom rlang set_names
 #' @importFrom utils capture.output
-#' @importFrom dplyr %>%
 #' @importFrom mgcv gam.vcomp
 `variance_comp.gam` <- function(object, rescale = TRUE, coverage = 0.95, ...) {
   capture.output(vcomps <- gam.vcomp(object,
@@ -46,12 +45,12 @@
   vcomps <- as.data.frame(vcomps)
   tbl <- rownames_to_column(vcomps,
     var = "component"
-  ) %>%
-    as_tibble() %>%
+  ) |>
+    as_tibble() |>
     set_names(nm = c(
       ".component", ".std_dev", ".lower_ci",
       ".upper_ci"
-    )) %>%
+    )) |>
     add_column(.variance = vcomps[, "std.dev"]^2, .after = 1L)
   class(tbl) <- c("variance_comp", class(tbl))
   tbl

@@ -108,7 +108,7 @@
     con <- con |>
       filter(.data[[".type"]] == type)
   }
-  con <- con %>%
+  con <- con |>
     pivot_longer(-c(".type"),
       names_to = ".term",
       values_to = ".concurvity"

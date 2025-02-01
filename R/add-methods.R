@@ -476,7 +476,7 @@
 
 #' @rdname add_confint
 #' @importFrom rlang .data
-#' @importFrom dplyr %>% mutate relocate
+#' @importFrom dplyr mutate relocate
 #'
 #' @export
 `add_confint.default` <- function(object, coverage = 0.95, ...) {
@@ -496,7 +496,7 @@
   object <- mutate(object,
     .lower_ci = .data$.estimate - (crit * .data$.se),
     .upper_ci = .data$.estimate + (crit * .data$.se)
-  ) %>%
+  ) |>
     relocate(all_of(c(".lower_ci", ".upper_ci")),
       .after = all_of(".se")
     )

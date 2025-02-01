@@ -29,7 +29,7 @@
 #'
 #' @export
 #' @rdname overview
-#' @importFrom dplyr %>% select
+#' @importFrom dplyr select
 #' @importFrom tibble rownames_to_column as_tibble add_column
 #' @importFrom tidyselect matches
 #' @importFrom rlang set_names .data
@@ -63,20 +63,20 @@
   # smooth terms
   types <- vapply(model$smooth, smooth_type, character(1))
   dfs <- vapply(model$smooth, basis_size, double(1))
-  out <- as.data.frame(smry$s.table) %>%
-    rownames_to_column() %>%
-    as_tibble() %>%
-    select(!matches("Ref.df")) %>%
+  out <- as.data.frame(smry$s.table) |>
+    rownames_to_column() |>
+    as_tibble() |>
+    select(!matches("Ref.df")) |>
     add_column(type = types, k = dfs, .after = 1L)
 
   # parametric terms
   para <- NULL
   if (isTRUE(parametric) && !is.null(smry$pTerms.table)) {
     nr <- nrow(smry$pTerms.table)
-    para <- as.data.frame(smry$pTerms.table) %>%
-      rownames_to_column() %>%
-      as_tibble() %>%
-      rename(edf = "df") %>%
+    para <- as.data.frame(smry$pTerms.table) |>
+      rownames_to_column() |>
+      as_tibble() |>
+      rename(edf = "df") |>
       add_column(
         type = rep("parametric", nr), k = rep(NA_real_, nr),
         .after = 1L
