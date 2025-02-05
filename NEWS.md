@@ -9,6 +9,9 @@
 * `simulate.gam()` gains a `print()` method and thus no longer prints its
   attributes.
 
+* `citation("gratia")` now suggests to use Simpson (2024) *Journal of Open
+  Source Software* **9**(104), 9862, when citing the package.
+
 ## Bug fixes
 
 * `conditional_values()` would fail if a variable it was conditioning was also
