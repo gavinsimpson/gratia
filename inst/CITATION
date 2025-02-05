@@ -1,19 +1,50 @@
 if(!exists("meta") || is.null(meta)) meta <- packageDescription("gratia")
 
 year <- sub("-.*", "", meta$Date)
+if (identical(length(year), 0L)) year <- sub("-.*", "", meta$Packaged)
 note <- sprintf("R package version %s", meta$Version)
 
-bibentry(bibtype = "Manual",
-         title = "{gratia}: Graceful {ggplot}-Based Graphics and Other Functions
-                  for {GAM}s Fitted using {mgcv}",
-         author = c(person(given = "Gavin L.", family = "Simpson",
-                           comment = c(ORCID = "0000-0002-9084-8413"))
-                    ),
-         year = year,
-         abstract = "Graceful ggplot-based graphics and utility functions for
+citHeader(
+  "To cite 'gratia', please use the JOSS paper (Simpson, 2024).",
+  "If you need a citation to a specific version, use the 'Manual' entry."
+)
+
+bibentry(
+  bibtype = "Article",
+  title = "{gratia}: An {R} package for exploring generalized additive models",
+  author = c(
+    person(
+      given = "Gavin L.",
+      family = "Simpson",
+      comment = c(ORCID = "0000-0002-9084-8413")
+    )
+  ),
+  journal = "Journal of {O}pen {S}ource {S}oftware",
+  volume = 9,
+  number = 104,
+  pages = 6962,
+  year = 2024,
+  doi = "10.21105/joss.06962"
+)
+
+bibentry(
+  bibtype = "Manual",
+  title = "{gratia}: Graceful {ggplot}-Based Graphics and Other Functions for 
+          {GAM}s Fitted using {mgcv}",
+  author = c(
+    person(
+      given = "Gavin L.",
+      family = "Simpson",
+      comment = c(ORCID = "0000-0002-9084-8413")
+    )
+  ),
+  year = year,
+  abstract = "Graceful ggplot-based graphics and utility functions for
              working with generalized additive models (GAMs) fitted using the
              mgcv package. Provides a reimplementation of the plot() method for
              GAMs that mgcv provides, as well as tidyverse-compatible
              representations of estimated smooths.",
-         note = note,
-         url = "https://gavinsimpson.github.io/gratia/")
+  note = note,
+  url = "https://gavinsimpson.github.io/gratia/",
+  doi = "10.32614/CRAN.package.gratia"
+)
