@@ -159,7 +159,7 @@
   if (identical(method, "uniform") && is.null(ff_qf)) {
     method <- "simulate"
   }
-  ff_rd <- fix.family.rd(family(model))[["rd"]]
+  ff_rd <- fix_family_rd(family(model))[["rd"]]
   if (identical(method, "simulate") && is.null(ff_rd)) {
     method <- "normal"
   }
@@ -272,7 +272,7 @@
                           level = 0.9, detrend = FALSE) {
   type <- match.arg(type)
   family <- family(model)
-  family <- fix.family.rd(family)
+  family <- fix_family_rd(family)
   rd_fun <- family[["rd"]]
   alpha <- (1 - level) / 2
 
