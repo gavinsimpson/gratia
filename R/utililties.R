@@ -816,7 +816,7 @@ stop_if_not_mgcv_smooth <- function(smooth) {
     fam <- object[["family"]]
   }
   ## mgcv stores data simulation funs in `rd`
-  fam <- fix.family.rd(fam)
+  fam <- fix_family_rd(fam)
   if (is.null(fam[["rd"]])) {
     stop("Don't yet know how to simulate from family <",
       fam[["family"]], ">",
