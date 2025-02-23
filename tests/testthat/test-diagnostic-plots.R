@@ -145,3 +145,13 @@ test_that("appraise can use the worm plot", {
   # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("appraise worm plot", plt)
 })
+
+test_that("appraise handles mvn models", {
+  expect_silent(
+    plt <- withr::with_seed(1, appraise(m_mvn, method = "simulate"))
+  )
+
+  expect_doppelganger(
+    "appraise for mvn model", plt
+  )
+})
