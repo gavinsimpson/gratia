@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9006</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,6 +46,15 @@
 <ul><li><p>Rug plots in <code><a href="../reference/draw.gam.html">draw.gam()</a></code> now only show the unique data values to avoid needless overplotting. This behaviour is controlled via new argument <code>distinct_rug</code>. Setting this to <code>FALSE</code> will get the previous behaviour.</p></li>
 <li><p><code><a href="../reference/simulate.html">simulate.gam()</a></code> gains a <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method and thus no longer prints its attributes.</p></li>
 <li><p><code>citation("gratia")</code> now suggests to use Simpson (2024) <em>Journal of Open Source Software</em> <strong>9</strong>(104), 9862, when citing the package.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li><p><code><a href="../reference/appraise.html">appraise()</a></code> can now handle mgcv’s multivariate normal models fitted with <code>family = mvn()</code>.</p></li>
+<li>
+<p><code>fix_family_rd()</code> is an (currently) internal function that replaces <code><a href="https://rdrr.io/pkg/mgcv/man/fix.family.link.html" class="external-link">mgcv::fix.family.rd()</a></code>. This function adds a <code>rfoo()</code> function to the <code>$rd</code> component of the <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">family()</a></code> object stored in the model. This function is used to generate new values of the response at supplied values of the linear predictor. <code>fix_family_rd()</code> calls <code><a href="https://rdrr.io/pkg/mgcv/man/fix.family.link.html" class="external-link">mgcv::fix.family.rd()</a></code> so it should be backward compatible with <em>mgcv</em>’s behaviour, but it is designed to extend the behaviour through support for a richer set of models.</p>
+<p>Currently, <code>fix_family_rd()</code> adds support for multivariate normal models fitted with <code>family = mvn()</code>.</p>
+<p>The functionality of <code>fix_family_rd()</code> may move to another package or even to <em>mgcv</em> if suitable.</p>
+</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
