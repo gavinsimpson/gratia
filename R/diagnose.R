@@ -119,22 +119,23 @@
 #' ## ... or use the usual normality assumption
 #' qq_plot(m, method = "normal")
 `qq_plot.gam` <- function(model,
-    method = c("uniform", "simulate", "normal", "direct"),
-    type = c("deviance", "response", "pearson"),
-    n_uniform = 10,
-    n_simulate = 50,
-    seed = NULL,
-    level = 0.9,
-    ylab = NULL,
-    xlab = NULL,
-    title = NULL,
-    subtitle = NULL,
-    caption = NULL,
-    ci_col = "black",
-    ci_alpha = 0.2,
-    point_col = "black",
-    point_alpha = 1,
-    line_col = "red", ...) {
+  method = c("uniform", "simulate", "normal", "direct"),
+  type = c("deviance", "response", "pearson"),
+  n_uniform = 10,
+  n_simulate = 50,
+  seed = NULL,
+  level = 0.9,
+  ylab = NULL,
+  xlab = NULL,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  ci_col = "black",
+  ci_alpha = 0.2,
+  point_col = "black",
+  point_alpha = 1,
+  line_col = "red", ...
+) {
   # sort out seed
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     runif(1)
@@ -317,10 +318,18 @@
       model = model
     )
   )
-  n_obs <- NROW(fit)
+  n_obs <- if (is.matrix(fit)) {
+    length(as.vector(fit))
+  } else {
+    NROW(fit) # NROW(fit)
+  }
   out <- quantile(sims, probs = (seq_len(n_obs) - 0.5) / n_obs)
   int <- apply(sims, 1L, quantile, probs = c(alpha, 1 - alpha))
-  r <- sort(residuals(model, type = type))
+  r <- residuals(model, type = type)
+  if (is.matrix(r)) {
+    r <- as.vector(r)
+  }
+  r <- sort(r)
 
   ## detrend for worm plots?
   if (isTRUE(detrend)) {
@@ -348,6 +357,10 @@
     dev_resid_fun = dev_resid_fun, var_fun = var_fun,
     na_action = na_action, model = model
   )
+  # r can be a matrix for models like mvn(), so collapse to a vector
+  if (is.matrix(r)) {
+    r <- as.vector(r)
+  }
   ## sort residuals & return
   sort(r)
 }
@@ -549,15 +562,27 @@
 #' @importFrom stats napredict residuals
 #' @importFrom tools toTitleCase
 #' @importFrom ggplot2 ggplot aes geom_point geom_hline labs
-`residuals_linpred_plot` <- function(model,
-                                     type = c("deviance", "pearson", "response"),
-                                     ylab = NULL, xlab = NULL, title = NULL,
-                                     subtitle = NULL, caption = NULL,
-                                     point_col = "black", point_alpha = 1,
-                                     line_col = "red") {
+`residuals_linpred_plot` <- function(
+  model,
+  type = c("deviance", "pearson", "response"),
+  ylab = NULL,
+  xlab = NULL,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  point_col = "black",
+  point_alpha = 1,
+  line_col = "red"
+) {
   type <- match.arg(type)
   r <- residuals(model, type = type)
+  if (is.matrix(r)) { # handle mvn() like fits
+    r <- as.vector(r)
+  }
   eta <- model[["linear.predictors"]]
+  if (is.matrix(eta)) { # handle mvn() like fits
+    eta <- as.vector(eta)
+  }
 
   na_action <- na.action(model)
   if (is.matrix(eta) && !is.matrix(r)) {
@@ -604,18 +629,24 @@
 #' @export
 #'
 #' @importFrom ggplot2 ggplot aes geom_point labs
-`observed_fitted_plot` <- function(model,
-                                   ylab = NULL, xlab = NULL, title = NULL,
-                                   subtitle = NULL, caption = NULL,
-                                   point_col = "black", point_alpha = 1) {
+`observed_fitted_plot` <- function(
+  model,
+  ylab = NULL,
+  xlab = NULL,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  point_col = "black",
+  point_alpha = 1
+) {
   ## extract data for plot
   fit <- fitted(model)
   ## handle case where fitted is a matrix; extended.families
   ##   - the needs to be more involved as what about mvn or multinom familities
   if (NCOL(fit) > 1L) {
-    fit <- fit[, 1]
+    fit <- as.vector(fit) # was fit[, 1], but changed for mvn
   }
-  obs <- model[["y"]]
+  obs <- as.vector(model[["y"]]) # also for mvn
 
   df <- data.frame(observed = obs, fitted = fit)
 
@@ -670,7 +701,7 @@
                                   subtitle = NULL, caption = NULL) {
   ## extract data for plot
   type <- match.arg(type)
-  df <- data.frame(residuals = residuals(model, type = type))
+  df <- data.frame(residuals = as.vector(residuals(model, type = type)))
 
   ## work out number of bins
   if (is.character(n_bins)) {
