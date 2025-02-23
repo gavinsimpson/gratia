@@ -611,3 +611,42 @@ m_284 <- gam(
   data = df_284,
   method = "REML"
 )
+
+# multivariate normal model
+sim_mvn_data <- function(n = 300, seed) {
+  # from ?mvn
+  V <- matrix(c(2, 1, 1, 2), 2, 2)
+  withr::with_seed(seed,
+    {
+      x0 <- runif(n)
+      x1 <- runif(n)
+      x2 <- runif(n)
+      x3 <- runif(n)
+      y <- matrix(0, n, 2)
+      # think my $rd can handle this, so get rid of loop by using the $rd from
+      # fix_family_rd?
+      for (i in 1:n) {
+        mu <- c(gw_f0(x0[i]) + gw_f1(x1[i]), gw_f2(x2[i]))
+        y[i,] <- mgcv::rmvn(1, mu, V)
+      }
+    }
+  )
+  dat <- tibble(
+    y0 = y[,1],
+    y1 = y[,2],
+    x0 = x0,
+    x1 = x1,
+    x2 = x2,
+    x3 = x3
+  )
+  dat
+}
+mvn_df <- sim_mvn_data(seed = 1234)
+m_mvn <- gam(
+  list(
+    y0 ~ s(x0) + s(x1),
+    y1 ~ s(x2) + s(x3)
+  ),
+  family = mvn(d = 2),
+  data = mvn_df
+)
