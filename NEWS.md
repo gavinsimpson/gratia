@@ -12,6 +12,24 @@
 * `citation("gratia")` now suggests to use Simpson (2024) *Journal of Open
   Source Software* **9**(104), 9862, when citing the package.
 
+## New features
+
+* `appraise()` can now handle mgcv's multivariate normal models fitted with
+  `family = mvn()`.
+
+* `fix_family_rd()` is an (currently) internal function that replaces 
+  `mgcv::fix.family.rd()`. This function adds a `rfoo()` function to the `$rd` 
+  component of the `family()` object stored in the model. This function is used to generate new values of the response at supplied values of the linear
+  predictor. `fix_family_rd()` calls `mgcv::fix.family.rd()` so it should be
+  backward compatible with *mgcv*'s behaviour, but it is designed to extend the
+  behaviour through support for a richer set of models.
+
+  Currently, `fix_family_rd()` adds support for multivariate normal models 
+  fitted with `family = mvn()`.
+
+  The functionality of `fix_family_rd()` may move to another package or even 
+  to *mgcv* if suitable.
+
 ## Bug fixes
 
 * `conditional_values()` would fail if a variable it was conditioning was also
