@@ -2007,7 +2007,11 @@ multivariate_y <- function() {
 }
 
 # simulator for tweedie LSS models
-rtw <- function(mu, p, phi) {
+#' @importFrom rlang .data
+#' @importFrom dplyr group_by summarise pull
+#' @importFrom stats rpois rgamma
+#' @importFrom tibble tibble
+`rtw` <- function(mu, p, phi) {
   if (any(p <= 1 | p >= 2)) {
     stop("'p' must be in interval (1, 2)")
   }
@@ -2020,20 +2024,20 @@ rtw <- function(mu, p, phi) {
   lambda <- mu^(2 - p) / ((2 - p) * phi)
   shape <- (2 - p) / (p - 1)
   scale <- phi * (p - 1) * mu^(p - 1)
-  n.sim <- length(mu)
+  #n_sim <- length(mu)
   N <- rpois(length(lambda), lambda)
   gs <- rep(scale, N)
   #y <- rgamma(gs * 0 + 1, shape = shape, scale = gs)
   #lab <- rep(1:length(N), N)
   #out <- tapply(y, lab, sum)
-  tab <- tibble::tibble(
+  tab <- tibble(
     y = rgamma(gs * 0 + 1, shape = shape, scale = gs),
-    lab = rep(1:length(N), N)
+    lab = rep(seq_along(N), N)
   )
   out <- numeric(length(N))
   out[which(N != 0)] <- tab |>
-    group_by(lab) |>
-    summarise(summed = sum(y)) |>
-    pull(summed)
+    group_by(.data$lab) |>
+    summarise(summed = sum(.data$y)) |>
+    pull(.data$summed)
   out
 }

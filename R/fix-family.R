@@ -21,7 +21,7 @@
     # note: mgcv::mvn is documented to ignore prior weights
     # if we ever need to handle weights to scale V, see this post on CV
     # https://stats.stackexchange.com/a/162885/1390
-    rd_factory <- function(V) {
+    rd_mvn <- function(V) {
       function(mu, wt, scale) { # function needs to take wt and scale
         mgcv::rmvn(
           n = nrow(mu),
@@ -30,12 +30,12 @@
         )
       }
     }
-    fam$rd <- rd_factory(solve(crossprod(fam$data$R)))
+    fam$rd <- rd_mvn(solve(crossprod(fam$data$R)))
   }
   if (identical(fn, "twlss")) {
     # this uses some helpers to find the `a` and `b` used during fitting and
     # also to convert what `predict()` etc returns (theta) to power parameter
-    rd_factory <- function(a, b) {
+    rd_twlss <- function(a, b) {
       function(mu, wt, scale) {
         rtw(
           mu = mu[, 1], # fitted(model) for twlss is on response scale!
@@ -45,7 +45,7 @@
       }
     }
     tw_pars <- get_tw_ab(fam)
-    fam$rd <- rd_factory(a = tw_pars[1], b = tw_pars[2])
+    fam$rd <- rd_twlss(a = tw_pars[1], b = tw_pars[2])
   }
 
   # return modified family
