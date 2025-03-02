@@ -1,6 +1,6 @@
 
-R version 4.4.2 (2024-10-31) -- "Pile of Leaves"
-Copyright (C) 2024 The R Foundation for Statistical Computing
+R version 4.4.3 (2025-02-28) -- "Trophy Case"
+Copyright (C) 2025 The R Foundation for Statistical Computing
 Platform: aarch64-apple-darwin20
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -1673,11 +1673,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x14e0f4fd0>
+<environment: 0x13bf093d8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x14e0f4fd0>
+<environment: 0x13bf093d8>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2483,13 +2483,13 @@ detaching ‘package:mgcv’
 > 
 > sims <- simulate(m1, nsim = 5, seed = 42)
 > head(sims)
-          [,1]      [,2]      [,3]      [,4]      [,5]
-[1,] 11.445470 11.374304 10.098681  7.264881  8.796630
-[2,]  6.510912  5.909584  9.057362  7.698084 11.444781
-[3,]  3.837995  3.230610  3.550240  3.759380  4.774581
-[4,] 12.361830 11.209226 10.714215 11.861957 10.746417
-[5,] 14.851461 12.911440 11.356984 15.783913 15.106270
-[6,]  5.921276  4.158963  5.520856  7.973614  9.654888
+      sim_1     sim_2     sim_3     sim_4     sim_5
+1 11.445470 11.374304 10.098681  7.264881  8.796630
+2  6.510912  5.909584  9.057362  7.698084 11.444781
+3  3.837995  3.230610  3.550240  3.759380  4.774581
+4 12.361830 11.209226 10.714215 11.861957 10.746417
+5 14.851461 12.911440 11.356984 15.783913 15.106270
+6  5.921276  4.158963  5.520856  7.973614  9.654888
 > 
 > 
 > 
@@ -2860,7 +2860,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  12.067 0.203 12.416 0 0 
+Time elapsed:  14.588 0.244 14.7 0 0 
 > grDevices::dev.off()
 null device 
           1 
