@@ -318,6 +318,10 @@
       model = model
     )
   )
+  ## mv_response <- c("Multivariate normal", "multinom")
+  if ((!family_name(family) %in% multivariate_y()) && is.matrix(fit)) {
+    fit <- fit[, 1]
+  }
   n_obs <- if (is.matrix(fit)) {
     length(as.vector(fit))
   } else {
@@ -503,7 +507,7 @@
 `deviance_residuals` <- function(y, fit, weights, dev_resid_fun, model) {
   if ("object" %in% names(formals(dev_resid_fun))) {
     # have to handle families that provide a residuals function, which
-    # takes the fitted model as in put
+    # takes the fitted model as input
     model$y <- y
     model$fitted.values <- fit
     model$prior.weights <- weights
@@ -576,12 +580,13 @@
 ) {
   type <- match.arg(type)
   r <- residuals(model, type = type)
-  if (is.matrix(r)) { # handle mvn() like fits
+  mv_y <- family_name(model) %in% multivariate_y()
+  if (is.matrix(r) && mv_y) { # handle mvn() like fits
     r <- as.vector(r)
   }
   eta <- model[["linear.predictors"]]
-  if (is.matrix(eta)) { # handle mvn() like fits
-    eta <- as.vector(eta)
+  if (is.matrix(eta) && mv_y) {
+    eta <- as.vector(eta) # handle multinom(), mvn() like fits
   }
 
   na_action <- na.action(model)
@@ -642,11 +647,16 @@
   ## extract data for plot
   fit <- fitted(model)
   ## handle case where fitted is a matrix; extended.families
-  ##   - the needs to be more involved as what about mvn or multinom familities
+  ##   - the needs to be more involved as what about mvn or multinom families
+  mv_y <- family_name(model) %in% multivariate_y()
   if (NCOL(fit) > 1L) {
-    fit <- as.vector(fit) # was fit[, 1], but changed for mvn
+    fit <- if (mv_y) {
+      as.vector(fit) # was fit[, 1], but changed for mvn
+    } else {
+      fit[, 1]
+    }
   }
-  obs <- as.vector(model[["y"]]) # also for mvn
+  obs <- as.vector(model[["y"]]) # also for mvn, etc
 
   df <- data.frame(observed = obs, fitted = fit)
 
@@ -728,7 +738,8 @@
 
   ## add point layer
   plt <- plt + geom_histogram(
-    bins = n_bins, colour = "black",
+    bins = n_bins,
+    colour = "black",
     fill = "grey80"
   )
 
