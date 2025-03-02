@@ -616,3 +616,17 @@ test_that("model_constant works for a GAMLSS", {
   expect_length(model_constant(m_accel), 2L)
   expect_length(model_constant(m_gam), 1L)
 })
+
+test_that("rtw works for twlss model", {
+  fit <- fitted(m_twlss)
+  tw_pars <- get_tw_bounds(m_twlss)
+  expect_snapshot(
+    with_seed(
+      123,
+      rtw(
+        fit[, 1],
+        theta_2_power(fit[, 2], a = tw_pars[1], b = tw_pars[2]),
+        exp(fit[, 3]))
+    )
+  )
+})
