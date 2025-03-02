@@ -13,7 +13,7 @@ distribution used when fitting the model."><meta property="og:image" content="ht
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,7 +131,7 @@ for excluding the effects of random effect terms.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>(Currently) A matrix with <code>nsim</code> columns.</p>
+    <p>(Currently) A data frame with <code>nsim</code> columns.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -152,13 +152,13 @@ number generator. See <code><a href="https://rdrr.io/pkg/mgcv/man/fix.family.lin
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">sims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span><span class="va">m1</span>, nsim <span class="op">=</span> <span class="fl">5</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sims</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           [,1]      [,2]      [,3]      [,4]      [,5]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 11.445470 11.374304 10.098681  7.264881  8.796630</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]  6.510912  5.909584  9.057362  7.698084 11.444781</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  3.837995  3.230610  3.550240  3.759380  4.774581</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] 12.361830 11.209226 10.714215 11.861957 10.746417</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] 14.851461 12.911440 11.356984 15.783913 15.106270</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [6,]  5.921276  4.158963  5.520856  7.973614  9.654888</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       sim_1     sim_2     sim_3     sim_4     sim_5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 11.445470 11.374304 10.098681  7.264881  8.796630</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  6.510912  5.909584  9.057362  7.698084 11.444781</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  3.837995  3.230610  3.550240  3.759380  4.774581</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 12.361830 11.209226 10.714215 11.861957 10.746417</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 14.851461 12.911440 11.356984 15.783913 15.106270</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  5.921276  4.158963  5.520856  7.973614  9.654888</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
