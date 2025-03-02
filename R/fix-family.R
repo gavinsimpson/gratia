@@ -32,6 +32,21 @@
     }
     fam$rd <- rd_factory(solve(crossprod(fam$data$R)))
   }
+  if (identical(fn, "twlss")) {
+    # this uses some helpers to find the `a` and `b` used during fitting and
+    # also to convert what `predict()` etc returns (theta) to power parameter
+    rd_factory <- function(a, b) {
+      function(mu, wt, scale) {
+        rtw(
+          mu = mu[, 1], # fitted(model) for twlss is on response scale!
+          p = theta_2_power(theta = mu[, 2], a, b),
+          phi = exp(mu[, 3])
+        )
+      }
+    }
+    tw_pars <- get_tw_ab(fam)
+    fam$rd <- rd_factory(a = tw_pars[1], b = tw_pars[2])
+  }
 
   # return modified family
   fam
