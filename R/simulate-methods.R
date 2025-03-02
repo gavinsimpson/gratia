@@ -25,7 +25,7 @@
 #'   for excluding the effects of random effect terms.
 #' @param newdata Deprecated. Use `data` instead.
 #'
-#' @return (Currently) A matrix with `nsim` columns.
+#' @return (Currently) A data frame with `nsim` columns.
 #'
 #' @author Gavin L. Simpson
 #'

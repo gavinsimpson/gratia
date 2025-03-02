@@ -60,7 +60,7 @@ for excluding the effects of random effect terms.}
 \item{newdata}{Deprecated. Use \code{data} instead.}
 }
 \value{
-(Currently) A matrix with \code{nsim} columns.
+(Currently) A data frame with \code{nsim} columns.
 }
 \description{
 Simulations from the posterior distribution of a fitted GAM model involve
