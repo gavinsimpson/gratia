@@ -12,6 +12,9 @@
 * `citation("gratia")` now suggests to use Simpson (2024) *Journal of Open
   Source Software* **9**(104), 9862, when citing the package.
 
+* `simulate.gam()` now returns a data frame, bringing it into line with
+  `stats::simulate.lm()`.
+
 ## New features
 
 * `appraise()` with `method = "simulate"` can now handle *mgcv*'s multivariate
