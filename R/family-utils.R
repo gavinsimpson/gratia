@@ -718,6 +718,11 @@ family_type.family <- function(object, ...) {
 }
 
 #' @export
+`family_name.lm` <- function(object, ...) {
+  family(object)[["family"]]
+}
+
+#' @export
 `family_name.gam` <- function(object, ...) {
   family(object)[["family"]]
 }
