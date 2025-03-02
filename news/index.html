@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9007</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,7 +52,7 @@
 <ul><li><p><code><a href="../reference/appraise.html">appraise()</a></code> can now handle mgcv’s multivariate normal models fitted with <code>family = mvn()</code>.</p></li>
 <li>
 <p><code>fix_family_rd()</code> is an (currently) internal function that replaces <code><a href="https://rdrr.io/pkg/mgcv/man/fix.family.link.html" class="external-link">mgcv::fix.family.rd()</a></code>. This function adds a <code>rfoo()</code> function to the <code>$rd</code> component of the <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">family()</a></code> object stored in the model. This function is used to generate new values of the response at supplied values of the linear predictor. <code>fix_family_rd()</code> calls <code><a href="https://rdrr.io/pkg/mgcv/man/fix.family.link.html" class="external-link">mgcv::fix.family.rd()</a></code> so it should be backward compatible with <em>mgcv</em>’s behaviour, but it is designed to extend the behaviour through support for a richer set of models.</p>
-<p>Currently, <code>fix_family_rd()</code> adds support for multivariate normal models fitted with <code>family = mvn()</code>.</p>
+<p>Currently, <code>fix_family_rd()</code> adds support for multivariate normal models fitted with <code>family = mvn()</code> and location-scale Tweedie models fitted with <code>family = twlss()</code>.</p>
 <p>The functionality of <code>fix_family_rd()</code> may move to another package or even to <em>mgcv</em> if suitable.</p>
 </li>
 </ul></div>
