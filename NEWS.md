@@ -25,7 +25,8 @@
   behaviour through support for a richer set of models.
 
   Currently, `fix_family_rd()` adds support for multivariate normal models 
-  fitted with `family = mvn()`.
+  fitted with `family = mvn()` and location-scale Tweedie models fitted with
+  `family = twlss()`.
 
   The functionality of `fix_family_rd()` may move to another package or even 
   to *mgcv* if suitable.
