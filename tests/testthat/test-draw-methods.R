@@ -571,3 +571,19 @@ test_that("plotting sos smooths works", {
   # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw works for sos smooths", plt)
 })
+
+test_that("plotting rootograms works", {
+  expect_silent(
+    plt_hang <- rootogram(m_nb, type = "hanging") |> draw()
+  )
+  expect_silent(
+    plt_stand <- rootogram(m_nb, type = "standing") |> draw()
+  )
+  expect_silent(
+    plt_susp <- rootogram(m_nb, type = "suspended") |> draw()
+  )
+
+  expect_doppelganger("nb rootogram plot hanging", plt_hang)
+  expect_doppelganger("nb rootogram plot standing", plt_stand)
+  expect_doppelganger("nb rootogram plot suspended", plt_susp)
+})
