@@ -1976,3 +1976,64 @@ reclass_scam_smooth <- function(smooth) {
   }
   disp
 }
+
+#### helper functions for Tweedie
+# this converts from theta to power parameter `p`` given `a` and `b`
+theta_2_power <- function(theta, a, b) {
+  i <- theta > 0
+  exp_theta_pos <- exp(-theta[i])
+  exp_theta_neg <- exp(theta[!i])
+  theta[i] <- (b + a * exp_theta_pos) / (1 + exp_theta_pos)
+  theta[!i] <- (b * exp_theta_neg + a) / (1 + exp_theta_neg)
+  theta
+}
+
+# extracts the `a` and `b` parameters of the model search over which the power
+# parameter is searched for
+get_tw_ab <- function(family) {
+  if (family_name(family) != "twlss") {
+    stop("'model' wasn't fitted with 'twlss()' family.", call. = FALSE)
+  }
+  rfun <- family$residuals
+  a <- get(".a", envir = environment(rfun))
+  b <- get(".b", envir = environment(rfun))
+  c(a, b)
+}
+
+# helper for models that are truly multivariate
+# simply returns a vector of models known to be multivariate
+multivariate_y <- function() {
+  c("Multivariate normal", "multinom")
+}
+
+# simulator for tweedie LSS models
+rtw <- function(mu, p, phi) {
+  if (any(p <= 1 | p >= 2)) {
+    stop("'p' must be in interval (1, 2)")
+  }
+  if (any(phi <= 0)) {
+    stop("scale parameter 'phi' must be positive")
+  }
+  if (any(mu < 0)) {
+    stop("mean 'mu' must be non-negative")
+  }
+  lambda <- mu^(2 - p) / ((2 - p) * phi)
+  shape <- (2 - p) / (p - 1)
+  scale <- phi * (p - 1) * mu^(p - 1)
+  n.sim <- length(mu)
+  N <- rpois(length(lambda), lambda)
+  gs <- rep(scale, N)
+  #y <- rgamma(gs * 0 + 1, shape = shape, scale = gs)
+  #lab <- rep(1:length(N), N)
+  #out <- tapply(y, lab, sum)
+  tab <- tibble::tibble(
+    y = rgamma(gs * 0 + 1, shape = shape, scale = gs),
+    lab = rep(1:length(N), N)
+  )
+  out <- numeric(length(N))
+  out[which(N != 0)] <- tab |>
+    group_by(lab) |>
+    summarise(summed = sum(y)) |>
+    pull(summed)
+  out
+}
