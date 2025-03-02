@@ -94,7 +94,9 @@
   }
 
   # call RNG function
-  sims <- replicate(nsim, rd_fun(mu = mu, wt = weights, scale = scale))
+  sims <- replicate(nsim, rd_fun(mu = mu, wt = weights, scale = scale)) |>
+    as.data.frame() |>
+    setNames(nm = paste("sim", seq_len(nsim), sep = "_"))
 
   attr(sims, "seed") <- RNGstate
   class(sims) <- append(class(sims), "simulate_gratia", after = 0L)
