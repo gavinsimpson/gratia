@@ -155,3 +155,13 @@ test_that("appraise handles mvn models", {
     "appraise for mvn model", plt
   )
 })
+
+test_that("appraise handles twlss models", {
+  expect_silent(
+    plt <- withr::with_seed(1, appraise(m_twlss, method = "simulate"))
+  )
+
+  expect_doppelganger(
+    "appraise for twlss model", plt
+  )
+})
