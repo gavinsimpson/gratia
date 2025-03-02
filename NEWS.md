@@ -14,14 +14,15 @@
 
 ## New features
 
-* `appraise()` can now handle mgcv's multivariate normal models fitted with
-  `family = mvn()`.
+* `appraise()` with `method = "simulate"` can now handle *mgcv*'s multivariate
+  normal models fitted with `family = mvn()`and Tweedie location scale models fitted with `family = twlss()`.
 
-* `fix_family_rd()` is an (currently) internal function that replaces 
+* `fix_family_rd()` is an (currently) internal function that extends 
   `mgcv::fix.family.rd()`. This function adds a `rfoo()` function to the `$rd` 
-  component of the `family()` object stored in the model. This function is used to generate new values of the response at supplied values of the linear
-  predictor. `fix_family_rd()` calls `mgcv::fix.family.rd()` so it should be
-  backward compatible with *mgcv*'s behaviour, but it is designed to extend the
+  component of the `family()` object stored in the model. This function is used
+  to generate new values of the response at supplied values of the linear
+  predictor. `fix_family_rd()` calls `mgcv::fix.family.rd()` so it is backward 
+  compatible with *mgcv*'s behaviour, but it is designed to extend the
   behaviour through support for a richer set of models.
 
   Currently, `fix_family_rd()` adds support for multivariate normal models 
