@@ -80,3 +80,8 @@ test_that("conditional_values works with supplied factor levels", {
   skip_on_cran()
   expect_snapshot(print(cv))
 })
+
+test_that("format_to_signif works", {
+  x <- withr::with_seed(123, runif(5))
+  expect_snapshot(format_to_signif(x))
+})

@@ -82,3 +82,11 @@
       10    10 0.0417  3     0.472   1.56  0.476    0.632      2.50 
       # i 190 more rows
 
+# format_to_signif works
+
+    Code
+      format_to_signif(x)
+    Output
+      [1] 0.29 0.79 0.41 0.88 0.94
+      Levels: 0.29 0.41 0.79 0.88 0.94
+
