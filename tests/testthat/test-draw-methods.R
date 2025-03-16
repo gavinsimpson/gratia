@@ -313,7 +313,7 @@ test_that("draw.derivates() plots derivatives for a GAM rotated labels", {
   plt1 <- draw(d1, angle = 45)
   plt2 <- draw(d1, scales = "fixed", angle = 45)
 
-  # skip_on_ci() # testing without as moved to mac os x
+  skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw derivatives for a GAM rotated labels", plt1)
   expect_doppelganger(
     "draw derivatives for a GAM with fixed scales rotated",
