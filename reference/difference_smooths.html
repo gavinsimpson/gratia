@@ -174,9 +174,8 @@ against factor-by smooth labels.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># compare specific smooths</span></span></span>
 <span class="r-in"><span><span class="va">sm_dif3</span> <span class="op">&lt;-</span> <span class="fu">difference_smooths</span><span class="op">(</span><span class="va">m</span>,</span></span>
-<span class="r-in"><span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s(x2):fac1"</span>, <span class="st">"s(x2):fac2"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s(x2):fac1"</span>, <span class="st">"s(x2):fac2"</span><span class="op">)</span>, partial_match <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in check_user_select_smooths(smooths = S, select = select, partial_match = partial_match,     model_name = expr_label(substitute(object))):</span> When 'partial_match' is 'TRUE', 'select' must be a single string</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
