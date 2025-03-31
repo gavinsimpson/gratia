@@ -121,22 +121,28 @@
     ))
   } else {
     # check if the `select` are of the correct form
-    rg <- "^(s|[t][ei2])\\([\\w\\.\\_]*\\)(?=:)([\\w\\.\\_]*)"
+    rg <- "^(s|[t][ei2])\\([\\w\\.\\_,]*\\)(?=:)([\\w\\.\\_]*)"
     rg_test <- stringr::str_detect(select, rg)
     if (!all(rg_test)) {
       stop(
         "If naming specific factor-by smooths, all smooths in `select` must be",
-        "for the same factor-by smooth"
+        " for the same factor-by smooth"
       )
     }
     # get the smooth variable part
-    smooth_var <- vapply(smooths, smooth_variable, character(1L)) |> unique()
+    smooth_var <- lapply(
+      smooths,
+      \(x) paste(smooth_variable(x), collapse = ",")
+    ) |> unique()
     if (length(smooth_var) > 1L) {
       stop("Can't currently compare across smooths of different variables.")
+    } else {
+      # now reset smooth_var so it can be found later
+      smooth_var <- smooth_variable(smooths[[1L]])
     }
     # get the by var part
     by_var <- vapply(smooths, by_variable, character(1L)) |> unique()
-    if (length(by_var) > 1L) {
+    if (length(unique(by_var)) > 1L) {
       stop(
         "Can't currently compare factor-by smooths with different `by`",
         "variables.")
@@ -258,7 +264,7 @@
   nr <- NROW(X)
   out <- list(
     .smooth = if(length(select) >1L) {
-      stringr::str_extract(select[[1]], "^(s|[t][ei2])\\([\\w\\.\\_]*\\)") |>
+      stringr::str_extract(select[[1]], "^(s|[t][ei2])\\([\\w\\.\\_,]*\\)") |>
         rep(nr)
     } else {
       rep(select, nr)
