@@ -57,7 +57,7 @@
 #'
 #' # compare specific smooths
 #' sm_dif3 <- difference_smooths(m,
-#'   select = c("s(x2):fac1", "s(x2):fac2")
+#'   select = c("s(x2):fac1", "s(x2):fac2"), partial_match = FALSE
 #' )
 #' \dontshow{
 #' options(op)
