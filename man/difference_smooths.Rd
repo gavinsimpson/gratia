@@ -26,13 +26,19 @@ difference_smooths(model, ...)
 
 \item{...}{arguments passed to other methods. Not currently used.}
 
-\item{select}{character, logical, or numeric; which smooths to plot. If
-\code{NULL}, the default, then all model smooths are drawn. Numeric \code{select}
-indexes the smooths in the order they are specified in the formula and
-stored in \code{object}. Character \code{select} matches the labels for smooths
-as shown for example in the output from \code{summary(object)}. Logical
-\code{select} operates as per numeric \code{select} in the order that smooths are
-stored.}
+\item{select}{character, logical, or numeric; which smooths to compare. If
+\code{NULL}, the default, then all model smooths are factor-smooth interactions
+are compared. Numeric \code{select} indexes the smooths in the order they are
+specified in the formula and stored in \code{object}. Character \code{select} matches
+the labels for smooths as shown for example in the output from
+\code{summary(object)}. Logical \code{select} operates as per numeric \code{select} in the
+order that smooths are stored. Careful selection is needed because it is
+not allowed to compare smooths of different covariates or of different
+factor-by variables.
+
+For character \code{select}, specific named smooths cane be provided, in which
+case, the exact names of the smooths (as given by \code{\link[=smooths]{smooths()}}, for example,
+can be specified, and \code{partial_match} must be set to \code{FALSE}.}
 
 \item{smooth}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{select} instead.}
 
@@ -80,6 +86,11 @@ draw(sm_dif)
 # include the groups means for `fac` in the difference
 sm_dif2 <- difference_smooths(m, select = "s(x2)", group_means = TRUE)
 draw(sm_dif2)
+
+# compare specific smooths
+sm_dif3 <- difference_smooths(m,
+  select = c("s(x2):fac1", "s(x2):fac2")
+)
 \dontshow{
 options(op)
 }
