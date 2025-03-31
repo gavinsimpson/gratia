@@ -86,13 +86,18 @@ difference.</p>
 
 
 <dt id="arg-select">select<a class="anchor" aria-label="anchor" href="#arg-select"></a></dt>
-<dd><p>character, logical, or numeric; which smooths to plot. If
-<code>NULL</code>, the default, then all model smooths are drawn. Numeric <code>select</code>
-indexes the smooths in the order they are specified in the formula and
-stored in <code>object</code>. Character <code>select</code> matches the labels for smooths
-as shown for example in the output from <code>summary(object)</code>. Logical
-<code>select</code> operates as per numeric <code>select</code> in the order that smooths are
-stored.</p></dd>
+<dd><p>character, logical, or numeric; which smooths to compare. If
+<code>NULL</code>, the default, then all model smooths are factor-smooth interactions
+are compared. Numeric <code>select</code> indexes the smooths in the order they are
+specified in the formula and stored in <code>object</code>. Character <code>select</code> matches
+the labels for smooths as shown for example in the output from
+<code>summary(object)</code>. Logical <code>select</code> operates as per numeric <code>select</code> in the
+order that smooths are stored. Careful selection is needed because it is
+not allowed to compare smooths of different covariates or of different
+factor-by variables.</p>
+<p>For character <code>select</code>, specific named smooths cane be provided, in which
+case, the exact names of the smooths (as given by <code><a href="smooths.html">smooths()</a></code>, for example,
+can be specified, and <code>partial_match</code> must be set to <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-smooth">smooth<a class="anchor" aria-label="anchor" href="#arg-smooth"></a></dt>
@@ -166,6 +171,12 @@ against factor-by smooth labels.</p></dd>
 <span class="r-in"><span><span class="va">sm_dif2</span> <span class="op">&lt;-</span> <span class="fu">difference_smooths</span><span class="op">(</span><span class="va">m</span>, select <span class="op">=</span> <span class="st">"s(x2)"</span>, group_means <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">sm_dif2</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="difference_smooths-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># compare specific smooths</span></span></span>
+<span class="r-in"><span><span class="va">sm_dif3</span> <span class="op">&lt;-</span> <span class="fu">difference_smooths</span><span class="op">(</span><span class="va">m</span>,</span></span>
+<span class="r-in"><span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s(x2):fac1"</span>, <span class="st">"s(x2):fac2"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in check_user_select_smooths(smooths = S, select = select, partial_match = partial_match,     model_name = expr_label(substitute(object))):</span> When 'partial_match' is 'TRUE', 'select' must be a single string</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
