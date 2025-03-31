@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9009</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,6 +55,10 @@
 <p><code>fix_family_rd()</code> is an (currently) internal function that extends <code><a href="https://rdrr.io/pkg/mgcv/man/fix.family.link.html" class="external-link">mgcv::fix.family.rd()</a></code>. This function adds a <code>rfoo()</code> function to the <code>$rd</code> component of the <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">family()</a></code> object stored in the model. This function is used to generate new values of the response at supplied values of the linear predictor. <code>fix_family_rd()</code> calls <code><a href="https://rdrr.io/pkg/mgcv/man/fix.family.link.html" class="external-link">mgcv::fix.family.rd()</a></code> so it is backward compatible with <em>mgcv</em>’s behaviour, but it is designed to extend the behaviour through support for a richer set of models.</p>
 <p>Currently, <code>fix_family_rd()</code> adds support for multivariate normal models fitted with <code>family = mvn()</code> and location-scale Tweedie models fitted with <code>family = twlss()</code>.</p>
 <p>The functionality of <code>fix_family_rd()</code> may move to another package or even to <em>mgcv</em> if suitable.</p>
+</li>
+<li>
+<p><code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> can now be used to compare named smooths using <code>select = c("s(x):f1", "s(x):f2")</code> etc, where the vector of smooth names must match exactly something returned by <code><a href="../reference/smooths.html">smooths()</a></code>. Smooths to be compared must have the same covariate (<code>x</code> in the example) and same factor-by variable (<code>f</code> in the example). Tensor product factor-by smooths are handled likewise. This effectively handles the problem of <a href="https://github.com/gavinsimpson/gratia/issues/315" class="external-link">#315</a>, reported by <a href="https://github.com/3rd3" class="external-link">@3rd3</a>.</p>
+<p>Additionally, <code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> with <code>group_means = TRUE</code> can now include group means specified using a random effect smooth, e.g. following the above example for <code>select</code>, a random effect smooth <code>s(f, bs = "re")</code>, with name <code>s(f)</code>, is looked for in the model matrix and its effects included in the comparisons.</p>
 </li>
 </ul></div>
 <div class="section level3">
