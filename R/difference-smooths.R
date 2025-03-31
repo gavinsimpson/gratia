@@ -8,12 +8,17 @@
 #' @param model A fitted model.
 #' @param select character, logical, or numeric; which smooths to compare. If
 #'   `NULL`, the default, then all model smooths are factor-smooth interactions
-#'   are compared. Numeric `select`
-#'   indexes the smooths in the order they are specified in the formula and
-#'   stored in `object`. Character `select` matches the labels for smooths
-#'   as shown for example in the output from `summary(object)`. Logical
-#'   `select` operates as per numeric `select` in the order that smooths are
-#'   stored.
+#'   are compared. Numeric `select` indexes the smooths in the order they are
+#'   specified in the formula and stored in `object`. Character `select` matches
+#'   the labels for smooths as shown for example in the output from
+#'   `summary(object)`. Logical `select` operates as per numeric `select` in the
+#'   order that smooths are stored. Careful selection is needed because it is
+#'   not allowed to compare smooths of different covariates or of different
+#'   factor-by variables.
+#'
+#'   For character `select`, specific named smooths cane be provided, in which
+#'   case, the exact names of the smooths (as given by [smooths()], for example,
+#'   can be specified, and `partial_match` must be set to `FALSE`.
 #' @param smooth `r lifecycle::badge("deprecated")` Use `select` instead.
 #' @param n numeric; the number of points at which to evaluate the difference
 #'   between pairs of smooths.
@@ -49,6 +54,11 @@
 #' # include the groups means for `fac` in the difference
 #' sm_dif2 <- difference_smooths(m, select = "s(x2)", group_means = TRUE)
 #' draw(sm_dif2)
+#'
+#' # compare specific smooths
+#' sm_dif3 <- difference_smooths(m,
+#'   select = c("s(x2):fac1", "s(x2):fac2")
+#' )
 #' \dontshow{
 #' options(op)
 #' }
@@ -64,6 +74,7 @@
 #' @importFrom stats qnorm coef
 #' @importFrom utils combn
 #' @importFrom lifecycle deprecated is_present
+#' @importFrom stringr str_detect str_replace_all
 #'
 #' @rdname difference_smooths
 `difference_smooths.gam` <- function(model,
@@ -122,7 +133,7 @@
   } else {
     # check if the `select` are of the correct form
     rg <- "^(s|[t][ei2])\\([\\w\\.\\_,]*\\)(?=:)([\\w\\.\\_]*)"
-    rg_test <- stringr::str_detect(select, rg)
+    rg_test <- str_detect(select, rg)
     if (!all(rg_test)) {
       stop(
         "If naming specific factor-by smooths, all smooths in `select` must be",
@@ -151,9 +162,9 @@
     # now reuse the regexp to grab the bit after the :,
     # and then remove the :,
     # and then remove the name of the factor by bit
-    lvls <- stringr::str_replace_all(select, rg, "\\2") |>
-      stringr::str_replace_all(":", "") |>
-      stringr::str_replace_all(by_var, "")
+    lvls <- str_replace_all(select, rg, "\\2") |>
+      str_replace_all(":", "") |>
+      str_replace_all(by_var, "")
     # finally compute the pairs
     pairs <- as_tibble(as.data.frame(t(combn(lvls, 2)),
       stringsAsFactor = FALSE
@@ -203,6 +214,7 @@
 
 #' @importFrom tibble new_tibble
 #' @importFrom dplyr bind_cols
+#' @importFrom stringr str_extract
 `calc_difference` <- function(f1, f2, select, by_var, smooth_var, data, Xp, V,
                               coefs, group_means = FALSE) {
   ## make sure f1 and f2 are characters
@@ -264,7 +276,7 @@
   nr <- NROW(X)
   out <- list(
     .smooth = if(length(select) >1L) {
-      stringr::str_extract(select[[1]], "^(s|[t][ei2])\\([\\w\\.\\_,]*\\)") |>
+      str_extract(select[[1]], "^(s|[t][ei2])\\([\\w\\.\\_,]*\\)") |>
         rep(nr)
     } else {
       rep(select, nr)
