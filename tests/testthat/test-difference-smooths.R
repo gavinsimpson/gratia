@@ -153,3 +153,13 @@ test_that("difference smooths works with a decomposed model issue 223", {
   # skip_on_ci() # testing without as moved to mac os x
   expect_snapshot(print(d))
 })
+
+test_that("difference_smooths() works for a gam model with re for mean", {
+  expect_silent(ds <- difference_smooths(su_m_factor_by_re, select = "s(x2)"))
+  expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
+})
+
+test_that("difference_smooths() works for a gam model with re for mean", {
+  expect_silent(ds <- difference_smooths(su_m_factor_by_re, select = "s(x2)"))
+  expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
+})

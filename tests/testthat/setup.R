@@ -87,6 +87,15 @@ su_m_factor_by <- gam(y ~ fac + s(x2, by = fac) + s(x0),
   data = su_eg4, method = "REML"
 )
 
+su_m_factor_by_re <- gam(y ~ s(fac, bs = "re") + s(x2, by = fac) + s(x0),
+  data = su_eg4, method = "REML"
+)
+
+su_m_factor_by_re_decomp <- gam(
+  y ~ s(fac, bs = "re") + s(x2) + s(x2, by = fac, m = 1) + s(x0),
+  data = su_eg4, method = "REML"
+)
+
 # for issue #285
 su_m_factor_by_re <- gam(y ~ s(fac, bs = "re") + s(x2) +
     s(x2, by = fac, m = 1) + s(x0),
