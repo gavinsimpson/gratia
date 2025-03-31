@@ -18,7 +18,8 @@
 ## New features
 
 * `appraise()` with `method = "simulate"` can now handle *mgcv*'s multivariate
-  normal models fitted with `family = mvn()`and Tweedie location scale models fitted with `family = twlss()`.
+  normal models fitted with `family = mvn()`and Tweedie location scale models
+  fitted with `family = twlss()`.
 
 * `fix_family_rd()` is an (currently) internal function that extends 
   `mgcv::fix.family.rd()`. This function adds a `rfoo()` function to the `$rd` 
@@ -34,6 +35,19 @@
 
   The functionality of `fix_family_rd()` may move to another package or even 
   to *mgcv* if suitable.
+
+* `difference_smooths()` can now be used to compare named smooths using
+  `select = c("s(x):f1", "s(x):f2")` etc, where the vector of smooth names must
+  match exactly something returned by `smooths()`. Smooths to be compared must
+  have the same covariate (`x` in the example) and same factor-by variable
+  (`f` in the example). Tensor product factor-by smooths are handled likewise.
+  This effectively handles the problem of #315, reported by @3rd3.
+
+  Additionally, `difference_smooths()` with `group_means = TRUE` can now
+  include group means specified using a random effect smooth, e.g. following
+  the above example for `select`, a random effect smooth `s(f, bs = "re")`, with
+  name `s(f)`, is looked for in the model matrix and its effects included in the
+  comparisons.
 
 ## Bug fixes
 
