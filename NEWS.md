@@ -65,6 +65,10 @@
 * `simulate.gam()` now works for the `ocat()` family, which has a non-standard
   `rd` function in its `family()` object. Reported by @hhp94, #319
 
+* `gaussian_draws()` would fail in some cases with *gamm4* models because the
+  coefficients were returned as a vector, not the expect matrix. #332 reported
+  by @JaredStufft-Elion
+
 # gratia 0.10.0
 
 ## New features
