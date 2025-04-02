@@ -134,9 +134,9 @@
   rd_fun <- get_family_rd(model)
 
   ## dispersion or scale variable for simulation
-  scale <- model[["sig2"]]
+  scale_p <- model[["sig2"]]
   if (is.null(scale)) {
-    scale <- summary(model)[["dispersion"]]
+    scale_p <- summary(model)[["dispersion"]]
   }
 
   if (!is.null(newdata)) {
@@ -160,7 +160,7 @@
   sim_eta <- sim_eta |>
     mutate(.response = rd_fun(
       mu = .data$.fitted, wt = weights,
-      scale = scale
+      scale = scale_p
     )) |>
     select(all_of(c(".row", ".draw", ".response")))
 
