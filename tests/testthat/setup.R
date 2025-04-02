@@ -302,6 +302,10 @@ su_re <- withr::with_seed(42, transform(su_re, y = y + X %*% rnorm(10) * 0.5))
 rm1 <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) + s(x3),
   data = su_re, method = "ML"
 )
+# gamm4 version of a model with ranefs
+rm_gamm4 <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+  data = su_re, REML = TRUE, random = ~ (1 | fac)
+)
 
 #-- A factor by GAM with random effects ----------------------------------------
 su_re2 <- su_eg4
