@@ -142,7 +142,7 @@
 `gaussian_draws.gam` <- function(
     model, n, n_cores = 1L, index = NULL,
     frequentist = FALSE, unconditional = FALSE, mvn_method = "mvnfast", ...) {
-  mu <- coef(model)
+  mu <- coef(model) |> as.vector() # drop the empty dim if present
   sigma <- get_vcov(model,
     frequentist = frequentist,
     unconditional = unconditional
