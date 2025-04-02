@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9010</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,6 +67,7 @@
 <li><p><code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> was only keeping one set of factor levels when there were multiple parametric factor terms in a model. Reported by <a href="https://github.com/tamas-ferenci" class="external-link">@tamas-ferenci</a> as part of discussion to <a href="https://github.com/gavinsimpson/gratia/issues/284" class="external-link">#284</a></p></li>
 <li><p><code><a href="../reference/mh_draws.html">mh_draws()</a></code> would fail in the case of drawing only <code>n = 1</code> samples. <a href="https://github.com/gavinsimpson/gratia/issues/328" class="external-link">#328</a> Reported by <a href="https://github.com/zsusswein" class="external-link">@zsusswein</a></p></li>
 <li><p><code><a href="../reference/simulate.html">simulate.gam()</a></code> now works for the <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">ocat()</a></code> family, which has a non-standard <code>rd</code> function in its <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">family()</a></code> object. Reported by <a href="https://github.com/hhp94" class="external-link">@hhp94</a>, <a href="https://github.com/gavinsimpson/gratia/issues/319" class="external-link">#319</a></p></li>
+<li><p><code><a href="../reference/gaussian_draws.html">gaussian_draws()</a></code> would fail in some cases with <em>gamm4</em> models because the coefficients were returned as a vector, not the expect matrix. <a href="https://github.com/gavinsimpson/gratia/issues/332" class="external-link">#332</a> reported by <a href="https://github.com/JaredStufft-Elion" class="external-link">@JaredStufft-Elion</a></p></li>
 </ul></div>
 </div>
     <div class="section level2">
