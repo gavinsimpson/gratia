@@ -19,7 +19,7 @@ spline_values2(
 \item{data}{an optional data frame of values to evaluate \code{smooth} at.}
 
 \item{model}{a fitted model; currently only \code{\link[mgcv:gam]{mgcv::gam()}} and \code{\link[mgcv:bam]{mgcv::bam()}}
-models are suported.}
+models are supported.}
 
 \item{unconditional}{logical; should confidence intervals include the
 uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian
