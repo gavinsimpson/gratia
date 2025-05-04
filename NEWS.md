@@ -69,6 +69,13 @@
   coefficients were returned as a vector, not the expect matrix. #332 reported
   by @JaredStufft-Elion
 
+* `draw.smooth_estimates()` would generate very many warnings when plotting
+  spline on the sphere smoothers (`bs = "sos"`) because `geom_tile()` was
+  creating tiles that extended beyond valid geographical coordinates given the
+  tile centre coordinates that it was being provided. The function that creates
+  the data to evaluate the spline at now tries to avoid this. Note this fix is
+  not a complete solution. #334 Reported by @StefanoMezzini
+
 # gratia 0.10.0
 
 ## New features
