@@ -31,6 +31,13 @@
 #' @param object an R model object.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> User supplied variables
 #'   defining the data slice. Arguments passed via `...` need to be *named*.
+#' @param .observed_only logical or character; should the data slice be trimmed
+#'   to those combinations of the variables specified that are observed in
+#'   `object`. If `TRUE`, the observed combinations of variables mentioned in
+#'   `...` are matched against those in `object` and filtered to return only
+#'   those combinations. If `FALSE`, no filtering is done. If `.observed_only`
+#'   is a character vector, on those variables named in the vector are used to
+#'   in the comparison with the combinations in `object`.
 #'
 #' @seealso The convenience functions [evenly()], [ref_level()], and [level()].
 #' [typical_values()] for extracting the representative values used for
@@ -54,10 +61,15 @@
 #' @rdname data_slice
 #' @importFrom tidyr expand_grid
 #' @importFrom rlang enquos eval_tidy
-`data_slice.data.frame` <- function(object, ...) {
+#' @importFrom dplyr semi_join
+`data_slice.data.frame` <- function(
+  object,
+  ...,
+  .observed_only = FALSE
+) {
   # deal with ...
   exprs <- rlang::enquos(...)
-  slice_vars <- purrr::map(exprs, rlang::eval_tidy, data = object)
+  slice_vars <- user_vars <- purrr::map(exprs, rlang::eval_tidy, data = object)
 
   # check now if there are elements of slice_vars that aren't in the object
   vars <- names(object)
@@ -77,9 +89,30 @@
     slice_vars <- append(slice_vars, tv[need_tv])
   }
 
-  expand_grid(!!!{
+  out <- expand_grid(!!!{
     slice_vars
   })
+
+  # filter out combinations that aren't in object
+  # decide what we are doing, all or selected
+  if (
+    (is.logical(.observed_only) && isTRUE(.observed_only)) ||
+      is.character(.observed_only)
+  ) {
+    filter_vars <- if (is.logical(.observed_only)) {
+      nms
+    } else {
+      .observed_only
+    }
+    out <- out |>
+      semi_join(
+        object |> distinct(across(all_of(filter_vars))),
+        by = filter_vars
+      )
+  }
+
+  # return
+  out
 }
 
 #' @param data an alternative data frame of values containing all the variables
@@ -94,6 +127,7 @@
 #' @importFrom tidyr expand_grid
 #' @importFrom rlang enquos eval_tidy
 #' @importFrom stats model.frame
+#' @importFrom dplyr semi_join
 #'
 #' @examples
 #' \dontshow{
@@ -120,7 +154,8 @@
 #' # data frame passed to `data` or `model.frame(object)`
 #' ds <- data_slice(m, x2 = evenly(x2, n = 50), x1 = mean(x1))
 `data_slice.gam` <- function(object, ..., data = NULL,
-                             envir = NULL) {
+                             envir = NULL,
+                             .observed_only = FALSE) {
   # if envir is NULL, set it to the formula of the object
   if (is.null(envir)) {
     envir <- environment(formula(object))
@@ -151,9 +186,29 @@
     slice_vars <- append(slice_vars, tv[need_tv])
   }
 
-  expand_grid(!!!{
+  out <- expand_grid(!!!{
     slice_vars
   })
+
+  # filter out combinations that aren't in object
+  # decide what we are doing, all or selected
+  if (
+    (is.logical(.observed_only) && isTRUE(.observed_only)) ||
+      is.character(.observed_only)
+  ) {
+    filter_vars <- if (is.logical(.observed_only)) {
+      nms
+    } else {
+      .observed_only
+    }
+    out <- out |>
+      semi_join(
+        data |> distinct(across(all_of(filter_vars))),
+        by = filter_vars
+      )
+  }
+  # return
+  out
 }
 
 #' @export

@@ -14,9 +14,9 @@ data_slice(object, ...)
 
 \method{data_slice}{default}(object, ...)
 
-\method{data_slice}{data.frame}(object, ...)
+\method{data_slice}{data.frame}(object, ..., .observed_only = FALSE)
 
-\method{data_slice}{gam}(object, ..., data = NULL, envir = NULL)
+\method{data_slice}{gam}(object, ..., data = NULL, envir = NULL, .observed_only = FALSE)
 
 \method{data_slice}{gamm}(object, ...)
 
@@ -29,6 +29,14 @@ data_slice(object, ...)
 
 \item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> User supplied variables
 defining the data slice. Arguments passed via \code{...} need to be \emph{named}.}
+
+\item{.observed_only}{logical or character; should the data slice be trimmed
+to those combinations of the variables specified that are observed in
+\code{object}. If \code{TRUE}, the observed combinations of variables mentioned in
+\code{...} are matched against those in \code{object} and filtered to return only
+those combinations. If \code{FALSE}, no filtering is done. If \code{.observed_only}
+is a character vector, on those variables named in the vector are used to
+in the comparison with the combinations in \code{object}.}
 
 \item{data}{an alternative data frame of values containing all the variables
 needed to fit the model. If \code{NULL}, the default, the data used to fit the

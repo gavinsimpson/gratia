@@ -202,7 +202,7 @@ test_that("data_combos works when including terms", {
   expect_named(dc, c("fac", "x0"))
 })
 
-test_that("data_combos works when exluding terms", {
+test_that("data_combos works when excluding terms", {
   expect_silent(dc <- data_combos(m_para_sm,
     vars = !c(fac, x0),
     data = df_2_fac, envir = teardown_env()
@@ -276,4 +276,25 @@ test_that("issue 222 is fixed", {
     envir = teardown_env(),
     data = logi_df
   ))
+})
+
+test_that("data_slice .observed_only works for a data frame", {
+  expect_silent(
+    dso <- data_slice(
+      su_eg2_by,
+      x = evenly(x, n = 25),
+      .observed_only = TRUE
+    )
+  )
+  expect_snapshot(dso, cran = FALSE)
+
+  expect_silent(
+    dso <- data_slice(
+      su_eg2_by,
+      x = evenly(x, n = 25),
+      .observed_only = "fac"
+    )
+  )
+  expect_snapshot(dso, cran = FALSE)
+
 })
