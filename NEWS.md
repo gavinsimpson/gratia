@@ -49,6 +49,10 @@
   name `s(f)`, is looked for in the model matrix and its effects included in the
   comparisons.
 
+* `data_slice()` gains argument `.observed_only` which allows simple filtering
+  of the combinations of values specified in the slice to those that are in the
+  data frame supplied or in the model frame of a fitted GAM.
+
 ## Bug fixes
 
 * `conditional_values()` would fail if a variable it was conditioning was also
