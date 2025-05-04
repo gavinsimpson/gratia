@@ -202,7 +202,7 @@ test_that("data_combos works when including terms", {
   expect_named(dc, c("fac", "x0"))
 })
 
-test_that("data_combos works when exluding terms", {
+test_that("data_combos works when excluding terms", {
   expect_silent(dc <- data_combos(m_para_sm,
     vars = !c(fac, x0),
     data = df_2_fac, envir = teardown_env()
