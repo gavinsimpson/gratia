@@ -52,10 +52,10 @@
 <span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'data.frame'</span></span>
-<span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span>, .observed_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gam'</span></span>
-<span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span>, data <span class="op">=</span> <span class="cn">NULL</span>, envir <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span>, data <span class="op">=</span> <span class="cn">NULL</span>, envir <span class="op">=</span> <span class="cn">NULL</span>, .observed_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm'</span></span>
 <span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -78,6 +78,16 @@
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>&lt;<code><a href="https://rlang.r-lib.org/reference/dyn-dots.html" class="external-link">dynamic-dots</a></code>&gt; User supplied variables
 defining the data slice. Arguments passed via <code>...</code> need to be <em>named</em>.</p></dd>
+
+
+<dt id="arg--observed-only">.observed_only<a class="anchor" aria-label="anchor" href="#arg--observed-only"></a></dt>
+<dd><p>logical or character; should the data slice be trimmed
+to those combinations of the variables specified that are observed in
+<code>object</code>. If <code>TRUE</code>, the observed combinations of variables mentioned in
+<code>...</code> are matched against those in <code>object</code> and filtered to return only
+those combinations. If <code>FALSE</code>, no filtering is done. If <code>.observed_only</code>
+is a character vector, on those variables named in the vector are used to
+in the comparison with the combinations in <code>object</code>.</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
