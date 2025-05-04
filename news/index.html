@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9011</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9012</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,6 +60,7 @@
 <p><code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> can now be used to compare named smooths using <code>select = c("s(x):f1", "s(x):f2")</code> etc, where the vector of smooth names must match exactly something returned by <code><a href="../reference/smooths.html">smooths()</a></code>. Smooths to be compared must have the same covariate (<code>x</code> in the example) and same factor-by variable (<code>f</code> in the example). Tensor product factor-by smooths are handled likewise. This effectively handles the problem of <a href="https://github.com/gavinsimpson/gratia/issues/315" class="external-link">#315</a>, reported by <a href="https://github.com/3rd3" class="external-link">@3rd3</a>.</p>
 <p>Additionally, <code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> with <code>group_means = TRUE</code> can now include group means specified using a random effect smooth, e.g. following the above example for <code>select</code>, a random effect smooth <code>s(f, bs = "re")</code>, with name <code>s(f)</code>, is looked for in the model matrix and its effects included in the comparisons.</p>
 </li>
+<li><p><code><a href="../reference/data_slice.html">data_slice()</a></code> gains argument <code>.observed_only</code> which allows simple filtering of the combinations of values specified in the slice to those that are in the data frame supplied or in the model frame of a fitted GAM.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
