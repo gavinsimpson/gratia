@@ -125,10 +125,15 @@
 
   ## generate covariate values for the smooth
   # newlist <- lapply(mf[smooth_vars], seq_min_max, n = n)
-  newlist <- seq_per_dim(
-    data = mf, vars = smooth_vars, dim = sm_dim,
-    n = n, n_3d = n_3d, n_4d = n_4d
-  )
+  if (inherits(sm, "sos.smooth")) {
+    newlist <- sos_data(mf, vars = smooth_vars, n)
+  } else {
+    newlist <- seq_per_dim(
+      data = mf, vars = smooth_vars, dim = sm_dim,
+      n = n, n_3d = n_3d, n_4d = n_4d
+    )
+  }
+
   if (!is.null(by_var)) {
     if (is_factor_by_smooth(sm)) {
       ## ordered or simple factor? Grab class as a function to apply below
@@ -207,4 +212,38 @@
   # Will deal with this in eval_smooth.soap.film because mgcv::inSide has a bad
   # design
   bnd_data
+}
+
+`sos_data` <- function(
+  data,
+  n = 100,
+  vars
+) {
+  df <- data.frame(
+    X1 = evenly(data[[vars[1]]], n),
+    X2 = evenly(data[[vars[2]]], n)
+  ) |>
+    setNames(vars)
+
+  # now check what we created as inter-point diff can't be allowed to make
+  # latitude or longitude nonsensical when added/subtracted from each point
+  correct_sos_data <- function(x, max) {
+    x_diff <- diff(x) |> zapsmall() |> unique()
+    x_rng <- range(x)
+    x_lims <- x_rng + (c(-0.5, 0.5) * x_diff)
+    fail <- abs(x_lims) > max
+    if (any(fail)) {
+      x <- evenly(
+        x,
+        n = length(x),
+        lower = ifelse(fail[1], -(max - (x_diff / 2)), x_rng[1]),
+        upper = ifelse(fail[2], max - (x_diff / 2), x_rng[2])
+      )
+    }
+    x
+  }
+
+  df[[1]] <- correct_sos_data(df[[1]], max = 90)
+  df[[1]] <- correct_sos_data(df[[1]], max = 180)
+  df
 }

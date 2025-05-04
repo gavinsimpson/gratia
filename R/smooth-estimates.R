@@ -285,7 +285,7 @@
 #'
 #' @param smooth currently an object that inherits from class `mgcv.smooth`.
 #' @param model a fitted model; currently only [mgcv::gam()] and [mgcv::bam()]
-#'   models are suported.
+#'   models are supported.
 #' @param data a data frame of values to evaluate `smooth` at.
 #' @param frequentist logical; use the frequentist covariance matrix?
 #'
@@ -372,7 +372,7 @@
 #'
 #' @param smooth currently an object that inherits from class `mgcv.smooth`.
 #' @param model a fitted model; currently only [mgcv::gam()] and [mgcv::bam()]
-#'   models are suported.
+#'   models are supported.
 #' @param data an optional data frame of values to evaluate `smooth` at.
 #' @param frequentist logical; use the frequentist covariance matrix?
 #'
@@ -552,7 +552,7 @@
   # soap film from the boundary
   if (is.null(data)) {
     data <- soap_film_data(smooth)
-  } 
+  }
   data <- process_user_data_for_eval(
     data = data, model = model,
     n = n, n_3d = n_3d, n_4d = n_4d,
@@ -2490,6 +2490,22 @@
       crs = crs, default_crs = default_crs,
       lims_method = lims_method
     )
+  # foo <- object |> select(latitude, longitude, .estimate)
+  # foo_df <- as.data.frame(foo)
+  # sf <- stars::st_as_stars(foo_df) |>
+  #   sf::st_set_crs("OGC:CRS84") |>
+  #   sf::st_as_sf(points = FALSE) |>
+  #   sf::st_set_agr("constant")
+  # st_ortho_cut <- function(x, lon_0, lat_0, radius = 9800000) {
+  #   stopifnot(st_is_longlat(x))
+  #   pt <- sf::st_sfc(st_point(c(lon_0, lat_0)), crs = "OGC:CRS84")
+  #   buf <- sf::st_buffer(pt, units::set_units(radius, "m"))
+  #   ortho <- paste0("+proj=ortho +lat_0=", lat_0, " +lon_0=", lon_0)
+  #   sf::st_transform(sf::st_intersection(x, buf), sf::st_crs(ortho))
+  # }
+  # sf_o <- st_ortho_cut(sf, lat_0 = 20, lon_0 = mean(range(object[[variables[2]]])))
+  
+  # ggplot() + geom_sf(data = sf, aes(fill = .estimate))
 
   if (isTRUE(contour)) {
     plt <- plt + geom_contour(
