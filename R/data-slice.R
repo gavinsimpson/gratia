@@ -97,7 +97,7 @@
   # decide what we are doing, all or selected
   if (
     (is.logical(.observed_only) && isTRUE(.observed_only)) ||
-    is.character(.observed_only)
+      is.character(.observed_only)
   ) {
     filter_vars <- if (is.logical(.observed_only)) {
       nms
@@ -106,7 +106,8 @@
     }
     out <- out |>
       semi_join(
-        object |> distinct(across(all_of(filter_vars)))
+        object |> distinct(across(all_of(filter_vars))),
+        by = filter_vars
       )
   }
 
@@ -126,6 +127,7 @@
 #' @importFrom tidyr expand_grid
 #' @importFrom rlang enquos eval_tidy
 #' @importFrom stats model.frame
+#' @importFrom dplyr semi_join
 #'
 #' @examples
 #' \dontshow{
@@ -201,7 +203,8 @@
     }
     out <- out |>
       semi_join(
-        data |> distinct(across(all_of(filter_vars)))
+        data |> distinct(across(all_of(filter_vars))),
+        by = filter_vars
       )
   }
   # return

@@ -277,3 +277,24 @@ test_that("issue 222 is fixed", {
     data = logi_df
   ))
 })
+
+test_that("data_slice .observed_only works for a data frame", {
+  expect_silent(
+    dso <- data_slice(
+      su_eg2_by,
+      x = evenly(x, n = 25),
+      .observed_only = TRUE
+    )
+  )
+  expect_snapshot(dso, cran = FALSE)
+
+  expect_silent(
+    dso <- data_slice(
+      su_eg2_by,
+      x = evenly(x, n = 25),
+      .observed_only = "fac"
+    )
+  )
+  expect_snapshot(dso, cran = FALSE)
+
+})
