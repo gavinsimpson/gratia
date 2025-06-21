@@ -13,9 +13,9 @@ Downloads](https://cranlogs.r-pkg.org/badges/grand-total/gratia)](https://cran.r
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.06962/status.svg)](https://doi.org/10.21105/joss.06962)
 
 [![r-universe
-version](https://gavinsimpson.r-universe.dev/gratia/badges/version)](https://r-lib.r-universe.dev/gratia)
+version](https://gavinsimpson.r-universe.dev/gratia/badges/version)](https://gavinsimpson.r-universe.dev/gratia)
 [![r-universe
-status](https://gavinsimpson.r-universe.dev/gratia/badges/checks)](https://r-lib.r-universe.dev/gratia)
+status](https://gavinsimpson.r-universe.dev/gratia/badges/checks)](https://gavinsimpson.r-universe.dev/gratia)
 <!-- badges: end -->
 
 ## Overview
