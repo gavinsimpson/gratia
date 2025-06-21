@@ -80,3 +80,24 @@ test_that("simulate() fails if we don't have an rd function", {
     fixed = TRUE
   )
 })
+
+test_that("simulate() works for a mvn GAM, 1 simulation", {
+  skip_on_cran()
+
+  sims <- simulate(m_mvn, nsim = 1)
+  expect_identical(nrow(sims), 600L) # 300 data * 2 responses
+  expect_identical(ncol(sims), 2L) # .yvar + 1 simulation
+  expect_s3_class(sims, "simulate_gratia")
+  expect_s3_class(sims, "data.frame")
+})
+
+test_that("simulate() works for a mvn GAM, 5 simulations", {
+  skip_on_cran()
+
+  n_sims <- 5L
+  sims <- simulate(m_mvn, nsim = n_sims)
+  expect_identical(nrow(sims), 600L) # 300 data * 2 responses
+  expect_identical(ncol(sims), n_sims + 1L) # .yvar + 5 simulation
+  expect_s3_class(sims, "simulate_gratia")
+  expect_s3_class(sims, "data.frame")
+})

@@ -630,3 +630,8 @@ test_that("rtw works for twlss model", {
     )
   )
 })
+
+test_that("if a multivariate model is identified correctly", {
+  expect_identical(is_multivariate_y(m_mvn), TRUE)
+  expect_identical(is_multivariate_y(m_gam), FALSE)
+})

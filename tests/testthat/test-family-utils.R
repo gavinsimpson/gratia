@@ -876,11 +876,9 @@ test_that("extract_link() works on mvn() family objects", {
   expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
   expect_identical(f, fam$linfo[[1L]]$linkfun)
 
-  ## error if no `which_eta`
-  expect_error(extract_link(fam, parameter = "mu"),
-    "Which linear predictor not specified; see 'which_eta'",
-    fixed = TRUE
-  )
+  ## no error if no `which_eta` is missing, still 1 link
+  expect_silent(f <- extract_link(fam, parameter = "mu"))
+  expect_identical(length(f), 1L)
 
   ## inverse
   f <- extract_link(fam,
@@ -912,11 +910,10 @@ test_that("extract_link() works on multinom() family objects", {
   expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
   expect_identical(f, fam$linfo[[1L]]$linkfun)
 
-  ## error if no `which_eta`
-  expect_error(extract_link(fam, parameter = "mu"),
-    "Which linear predictor not specified; see 'which_eta'",
-    fixed = TRUE
-  )
+  
+  ## no error if no `which_eta` is missing, still 1 link
+  expect_silent(f <- extract_link(fam, parameter = "mu"))
+  expect_identical(length(f), 1L)
 
   ## inverse
   f <- extract_link(fam,
@@ -1098,6 +1095,13 @@ test_that("multinom_link() can extract a link function", {
   expect_type(f, "closure")
   expect_identical(f(val), fam$linfo[[1L]]$linkfun(val))
   expect_identical(f, fam$linfo[[1L]]$linkfun)
+
+  expect_silent(
+    f <- multinom_link(
+      fam,
+      parameter = "location"
+    )
+  )
 })
 
 ## tests some specific extract functions
