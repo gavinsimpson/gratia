@@ -85,3 +85,43 @@ test_that("format_to_signif works", {
   x <- withr::with_seed(123, runif(5))
   expect_snapshot(format_to_signif(x))
 })
+
+test_that("g_threenum works", {
+  x <- withr::with_seed(1234, rnorm(100))
+  expect_silent(summ <- g_threenum(x))
+
+  skip_on_cran()
+  expect_snapshot(print(summ))
+})
+
+test_that("g_fivenum works", {
+  x <- withr::with_seed(1234, rnorm(100))
+  expect_silent(summ <- g_fivenum(x))
+
+  skip_on_cran()
+  expect_snapshot(print(summ))
+})
+
+test_that("g_quartile works", {
+  x <- withr::with_seed(1234, rnorm(100))
+  expect_silent(summ <- g_quartile(x))
+
+  skip_on_cran()
+  expect_snapshot(print(summ))
+})
+
+test_that("g_decile works", {
+  x <- withr::with_seed(1234, rnorm(100))
+  expect_silent(summ <- g_decile(x))
+
+  skip_on_cran()
+  expect_snapshot(print(summ))
+})
+
+test_that("g_minmax works", {
+  x <- withr::with_seed(1234, rnorm(100))
+  expect_silent(summ <- g_minmax(x))
+
+  skip_on_cran()
+  expect_snapshot(print(summ))
+})

@@ -90,3 +90,42 @@
       [1] 0.29 0.79 0.41 0.88 0.94
       Levels: 0.29 0.41 0.79 0.88 0.94
 
+# g_threenum works
+
+    Code
+      print(summ)
+    Output
+      [1] -1.1611670 -0.1567617  0.8476436
+
+# g_fivenum works
+
+    Code
+      print(summ)
+    Output
+      [1] -2.3456977 -0.9006166 -0.3846280  0.4828227  2.5489911
+
+# g_quartile works
+
+    Code
+      print(summ)
+    Output
+             25%        50%        75% 
+      -0.8953272 -0.3846280  0.4712061 
+
+# g_decile works
+
+    Code
+      print(summ)
+    Output
+             10%        20%        30%        40%        50%        60%        70% 
+      -1.1957817 -1.0017016 -0.7385133 -0.5051586 -0.3846280 -0.1361532  0.2640120 
+             80%        90% 
+       0.6499469  1.3333910 
+
+# g_minmax works
+
+    Code
+      print(summ)
+    Output
+      [1] -2.345698  2.548991
+
