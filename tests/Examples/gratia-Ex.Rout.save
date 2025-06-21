@@ -1,5 +1,5 @@
 
-R version 4.4.3 (2025-02-28) -- "Trophy Case"
+R version 4.5.0 (2025-04-11) -- "How About a Twenty-Six"
 Copyright (C) 2025 The R Foundation for Statistical Computing
 Platform: aarch64-apple-darwin20
 
@@ -920,6 +920,11 @@ detaching ‘package:mgcv’
 > # include the groups means for `fac` in the difference
 > sm_dif2 <- difference_smooths(m, select = "s(x2)", group_means = TRUE)
 > draw(sm_dif2)
+> 
+> # compare specific smooths
+> sm_dif3 <- difference_smooths(m,
++   select = c("s(x2):fac1", "s(x2):fac2"), partial_match = FALSE
++ )
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1673,11 +1678,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x13bf093d8>
+<environment: 0x11fd21358>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x13bf093d8>
+<environment: 0x11fd21358>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1886,7 +1891,7 @@ detaching ‘package:mgcv’
 +   s(x3, bs = "cr"), family = nb, data = df, method = "REML")
 > ## IGNORE_RDIFF_BEGIN
 > nb_theta(m)
-[1] 239352.7
+[1] 239342.9
 > ## IGNORE_RDIFF_END
 > 
 > 
@@ -2860,7 +2865,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  14.588 0.244 14.7 0 0 
+Time elapsed:  14.736 0.403 15.263 0 0 
 > grDevices::dev.off()
 null device 
           1 
