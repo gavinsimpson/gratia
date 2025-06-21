@@ -24,6 +24,10 @@ library("gratia")
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/gratia)](https://cran.r-project.org/package=gratia)
 [![CRAN Downloads](https://cranlogs.r-pkg.org/badges/grand-total/gratia)](https://cran.r-project.org/package=gratia)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.06962/status.svg)](https://doi.org/10.21105/joss.06962)
+
+
+[![r-universe version](https://r-lib.r-universe.dev/gratia/badges/version)](https://r-lib.r-universe.dev/gratia)
+[![r-universe status](https://r-lib.r-universe.dev/gratia/badges/checks)](https://r-lib.r-universe.dev/gratia)
 <!-- badges: end -->
 
 ## Overview
