@@ -256,9 +256,10 @@ family_type.family <- function(object, ...) {
     fun <- extract_link.family(family, inverse = inverse)
   } else if (family[["family"]] %in% c("Multivariate normal", "multinom")) {
     if (is.null(which_eta)) {
-      stop("Which linear predictor not specified; see 'which_eta'",
-        .call. = FALSE
-      )
+      # stop("Which linear predictor not specified; see argument 'which_eta'",
+      #   call. = FALSE
+      # )
+      which_eta <- 1L
     }
     len_linfo <- length(linfo)
     if (which_eta > len_linfo || which_eta < 1) {
@@ -336,6 +337,7 @@ family_type.family <- function(object, ...) {
     grepl("^Cox PH", distr, ignore.case = TRUE) ~ "cox_ph",
     grepl("^censored normal", distr, ignore.case = TRUE) ~ "cnorm",
     grepl("^cnorm", distr, ignore.case = TRUE) ~ "cnorm",
+    grepl("^Multivariate normal", distr, ignore.case = TRUE) ~ "mvn",
     .default = as.character(distr)
   )
 
@@ -371,11 +373,11 @@ family_type.family <- function(object, ...) {
       ziplss = ziplss_link(object, parameter, inverse = inverse),
       mvn = mvn_link(object, parameter,
         inverse = inverse,
-        which_eta = which_eta
+        which_eta = ifelse(is.null(which_eta), 1, which_eta)
       ),
       multinom = multinom_link(object, parameter,
         inverse = inverse,
-        which_eta = which_eta
+        which_eta = ifelse(is.null(which_eta), 1, which_eta)
       ),
       shash = shash_link(object, parameter, inverse = inverse),
       cnorm = cnorm_link(object, parameter, inverse = inverse),
