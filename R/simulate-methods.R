@@ -57,7 +57,7 @@
     on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
   }
   ## rd function if available
-  rd_fun <- get_family_rd(object)
+  rd_fun <- choose_rd_fun(object)
 
   ## dispersion or scale variable for simulation
   scale <- object[["sig2"]]
@@ -82,9 +82,12 @@
   # this duplicates code from fitted_values, and is perhaps overkill, but I'll
   # leave it in case I need something more complex for other families I haven't
   # looked at yet
-  fam <- family_type(object)
+  fam_type <- family_type(object)
   fam <- case_when(
-    grepl("^ordered_categorical", fam, ignore.case = TRUE) == TRUE ~ "ocat",
+    grepl(
+      "^ordered_categorical",
+      fam_type, ignore.case = TRUE
+    ) == TRUE ~ "ocat",
     .default = "default"
   )
   mu <- if (identical(fam, "default")) {
@@ -100,21 +103,23 @@
     simplify = FALSE
   )
 
-  if (is_multivariate_y(object)) {
-    n_eta <- n_eta(object)
+  if (
+    is_multivariate_y(object) &&
+      identical(fam_type, "multivariate_normal")
+  ) {
+    n_lp <- n_eta(object)
     sims <- sims |>
       lapply(FUN = c) |>
       data.frame() |>
-      # as_tibble() |>
       setNames(nm = paste("sim", seq_len(nsim), sep = "_")) |>
       add_column(
         .yvar = rep(
-          paste0("response", seq_len(n_eta)),
+          paste0("response", seq_len(n_lp)),
           each = nrow(data)
         ),
         .before = 1L
       )
-    rownames(sims) <- NULL
+    #rownames(sims) <- NULL
   } else {
     sims <- sims |>
       as.data.frame() |>

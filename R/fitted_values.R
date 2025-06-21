@@ -466,7 +466,7 @@
   n_y <- n_lp + 1
 
   # as with ocat() we'll transform from response to a logit scale
-  # form se on this link scale, then bak tranform
+  # form se on this link scale, then back transform
   se_lp <- fv$se.fit / (fv$fit * (1 - fv$fit))
 
   # grab slightly better versions of plogis() & qlogis() from the binomial

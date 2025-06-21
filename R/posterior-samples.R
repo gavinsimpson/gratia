@@ -108,8 +108,11 @@
 
   method <- match.arg(method)
   mvn_method <- match.arg(mvn_method)
+  fam_type <- family_type(model)
 
-  # start my getting draws of expectation
+  # start getting draws of expectation
+  # - some families need linear predictor values/matrix, e.g., multinom(),
+  #   but we'll handle that later by not using the family()$rd
   sim_eta <- fitted_samples(model,
     n = n, data = data, seed = seed,
     scale = "response", method = method, n_cores = n_cores, burnin = burnin,
@@ -131,7 +134,7 @@
   }
 
   ## rd function if available
-  rd_fun <- get_family_rd(model)
+  rd_fun <- choose_rd_fun(model)
 
   ## dispersion or scale variable for simulation
   scale_p <- model[["sig2"]]
@@ -166,20 +169,42 @@
         values_from = ".fitted",
         names_from = ".parameter"
       )
-    sim_eta <- sim_eta_w |>
-      select(all_of(c(".row", ".draw"))) |>
-      bind_cols(
-        rd_fun(
-          mu = sim_eta_w[, -c(1, 2)] |> as.matrix(),
-          wt = weights,
-          scale = scale_p
-        ) |> as_tibble()
-      )  |>
-      pivot_longer(
-        cols = !c(".row", ".draw"),
-        values_to = ".response",
-        names_to = ".parameter"
-      )
+    # Different multivariate models need different handling because they expect
+    # (intake) and return different kinds of things. multinom() for example
+    # should return a predicted category for each sample, so the output looks
+    # more like a normal/standard family. mvn(), however, returns 1 value per
+    # response per draw
+    if (identical(fam_type, "multinom")) {
+      sim_eta <- sim_eta_w |>
+        select(all_of(c(".row", ".draw"))) |>
+        bind_cols(
+          rd_fun(
+            mu = sim_eta_w[, -c(1, 2)] |> as.matrix(),
+            wt = weights,
+            scale = scale_p
+          ) |>
+            as_tibble() |>
+            rename(".response" = "value")
+        )
+    } else if (identical(fam_type, "multivariate_normal")) {
+      sim_eta <- sim_eta_w |>
+        select(all_of(c(".row", ".draw"))) |>
+        bind_cols(
+          rd_fun(
+            mu = sim_eta_w[, -c(1, 2)] |> as.matrix(),
+            wt = weights,
+            scale = scale_p
+          ) |>
+            as_tibble()
+        ) |>
+        pivot_longer(
+          cols = !c(".row", ".draw"),
+          values_to = ".response",
+          names_to = ".parameter"
+        )
+    } else {
+      stop("Unexpected multivariate model; file a bug report please!")
+    }
   } else {
     sim_eta <- sim_eta |>
       mutate(.response = rd_fun(
@@ -340,11 +365,8 @@
     # some general families should allow all linear predictors;
     # e.g., mvn(), multinom()
     fam_nam <- family_name(model)
-    if (
-      grepl("^Multivariate normal", fam_nam) ||
-        grepl("^multinom", fam_nam)
-    ) {
-      lss_loc <- lss_idx
+    if (grepl("^Multivariate normal", fam_nam) || grepl("^multinom", fam_nam)) {
+      lss_loc <- lss_idx # for mvn we want to loop over all the linpreds
     } else {
       warning("Currently, only for LSS families where location is the mean.")
       lss_loc <- lss_idx[[1L]] # for now just take the location linpred
@@ -383,21 +405,22 @@
   ##   the linear predictors
   n_eta <- length(lss_idx) # number of linear predictors to work with
   if (n_eta > 1L) {
+    # this is where we need to handle non-standard predictions
+    fn <- family_type(model)
+    n_data <- NROW(data)
+    n_lp <- n_eta(model)
     sims <- lapply(
       seq_len(n_eta),
       FUN = \(i, Xp, betas, lss_loc, scale) {
         pred_fun(Xp, betas, lss_loc[[i]], scale)
       },
       Xp = Xp, betas = betas, lss_loc = lss_loc, scale = scale
-    ) |>
-      bind_rows() |>
-      add_column(
-        .row = rep(seq_len(nrow(data)), times = n_eta),
-        .parameter = paste0(
-          "response",
-          rep(seq_len(n_eta), each = nrow(data))
-        )
-      )
+    )
+    sims <- switch(
+      fn,
+      multivariate_normal = yhat_mvn(sims, n_data, n_lp),
+      multinom = yhat_multinom(sims, n_data, n_lp, fam = family(model))
+    )
   } else {
     sims <- pred_fun(Xp, betas, lss_loc, scale) |>
       add_column(
@@ -447,6 +470,55 @@
   ## add classes
   class(sims) <- c("fitted_samples", class(sims))
   sims
+}
+
+`yhat_mvn` <- function(sims, n_data, n_eta) {
+  sims <- sims |>
+    bind_rows() |>
+    add_column(
+      .row = rep(seq_len(n_data), times = n_eta),
+      .parameter = paste0(
+        "response",
+        rep(seq_len(n_eta), each = n_data)
+      )
+    )
+  sims
+}
+
+`yhat_multinom` <- function(sims, n_data, n_eta, fam) {
+  n_y <- n_eta + 1
+  sims <- sims |>
+    bind_rows()
+  n_sim <- NCOL(sims)
+  out <- lapply(
+    sims,
+    FUN = \(x, n_data, n_eta, fam) {
+      r <- fam$predict(fam, eta = matrix(x, ncol = n_eta, nrow = n_data))[[1]]
+      r |>
+        data.frame() |>
+        setNames(nm = paste0("response", seq_len(n_y))) |>
+        as_tibble()
+    },
+    n_data = n_data, n_eta = n_eta, fam = fam
+  ) |>
+    bind_rows() |>
+    add_column(
+      .row = rep(seq_len(n_data), times = n_sim),
+      .draw = rep(seq_len(n_sim), each = n_data),
+      .before = 1L
+    ) |>
+    pivot_longer(
+      cols = -c(".row", ".draw"),
+      cols_vary = "slowest",
+      names_to = ".parameter",
+      values_to = ".fitted"
+    ) |>
+    pivot_wider(
+      id_cols = c(".row", ".parameter"),
+      names_from = ".draw",
+      values_from = ".fitted"
+    )
+  out
 }
 
 #' Draw new response values from the conditional distribution of the response
@@ -533,7 +605,10 @@
   )
   RNGstate <- attr(sims, "seed")
   class(sims) <- class(sims)[-1] # remove the "simulate_gratia" class
-  if (is_multivariate_y(model)) {
+  if (
+    is_multivariate_y(model) &&
+      identical(family_type(model), "multivariate_normal")
+  ) {
     # first column is .response for truly multivariate Y models
     sims <- as_tibble(sims)
     names(sims)[-1] <- as.character(seq_len(ncol(sims) - 1))
