@@ -57,6 +57,9 @@
   `simulate.gam()` now simulate for all linear predictors (i.e., all responses) in `mvn()` and `multinom()` models as these are all location
   parameter linear predictors.
 
+* `fitted_values()` now works for GAMs fitted with families `mvn()` and
+  `multinom()`.
+
 ## Bug fixes
 
 * `conditional_values()` would fail if a variable it was conditioning was also
