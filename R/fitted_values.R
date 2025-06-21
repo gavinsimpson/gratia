@@ -69,7 +69,7 @@
   if (inherits(family(object), "general.family")) {
     allowed <- c(
       "gaulss", "gammals", "gumbls", "gevlss", "shash", "ziplss",
-      "twlss"
+      "twlss", "multivariate_normal", "multinom"
     )
     if (!fn %in% allowed) {
       stop("General likelihood GAMs not yet supported.")
@@ -410,11 +410,106 @@
   fit
 }
 
+`fit_vals_mvn` <- function(
+  object, data, ci_level = 0.95, scale = "response", ...
+) {
+  # scale is ignored as these are correlated Gaussians
+  # but we have multiple columns in the predictions, 1 per Y
+  # predict, can predict on link scale as link is identity
+  fv <- predict(
+    object, newdata = data, ..., type = "link", se.fit = TRUE
+  )
+  crit <- coverage_normal(ci_level)
+  n_data <- NROW(data)
+  n_y <- n_eta(object)
+
+  # fv$fit and fv$se.fit are matrices - need to stack everything
+  fit_lp  <- as.vector(fv$fit)
+  fit_se  <- as.vector(fv$se)
+  fit_lwr <- fit_lp - (crit * fit_se)
+  fit_upr <- fit_lp + (crit * fit_se)
+
+  # pull everything into a tibble for return
+  fit <- tibble(
+    .row = rep(seq_len(n_data), times = n_y),
+    .y = paste0("response", rep(seq_len(n_y), each = n_data)),
+    .fitted = as.numeric(fit_lp),
+    .se = as.numeric(fit_se),
+    .lower_ci = as.numeric(fit_lwr),
+    .upper_ci = as.numeric(fit_upr)
+  )
+
+  # expand data so it is replicated once per response & add to fitted values
+  fit <- expand_grid(..response = seq_len(n_y), data) |>
+    select(-c("..response")) |>
+    bind_cols(fit) |>
+    relocate(".row", .before = 1)
+
+  # return
+  fit
+}
+
+
+`fit_vals_multinom` <- function(
+  object, data, ci_level = 0.95, scale = "response", ...
+) {
+  if (scale %in% c("link", "linear predictor")) {
+    stop("link scale predictions not support for `multinom()`")
+  }
+  # there are only n_lp columns in these; Y_categories - 1
+  # predict on response scale
+  fv <- predict(
+    object, newdata = data, ..., type = "response", se.fit = TRUE
+  )
+  crit <- coverage_normal(ci_level)
+  n_data <- NROW(data)
+  n_lp <- n_eta(object) # number of linear predictors
+  n_y <- n_lp + 1
+
+  # as with ocat() we'll transform from response to a logit scale
+  # form se on this link scale, then bak tranform
+  se_lp <- fv$se.fit / (fv$fit * (1 - fv$fit))
+
+  # grab slightly better versions of plogis() & qlogis() from the binomial
+  # family
+  bin_fam <- binomial()
+  lfun <- link(bin_fam)
+  ifun <- inv_link(bin_fam)
+
+  # convert \hat{pi} to logit scale and form a Wald interval, then back
+  # transform the interval only (we already have \hat{pi})
+  fit_lp <- lfun(fv$fit) # logit(\hat{pi})
+  fit_lwr <- ifun(fit_lp - (crit * se_lp))
+  fit_upr <- ifun(fit_lp + (crit * se_lp))
+
+  # create the return object
+  fit <- tibble(
+    .row = rep(seq_len(n_data), times = n_y),
+    .category = factor(
+      rep(seq_len(n_y), each = n_data)
+    ),
+    .fitted = as.vector(fv$fit),
+    .se = as.vector(fv$se.fit),
+    .lower_ci = as.vector(fit_lwr),
+    .upper_ci = as.vector(fit_upr)
+  )
+
+  # expand data so it is replicated once per response & add to fitted values
+  fit <- expand_grid(..response = seq_len(n_y), data) |>
+    select(-c("..response")) |>
+    bind_cols(fit) |>
+    relocate(".row", .before = 1)
+
+  # return
+  fit
+}
+
 #' @importFrom dplyr case_when
 `get_fit_fun` <- function(fam) {
-  # family <- family_type(object)
   fam <- case_when(
     grepl("^ordered_categorical", fam, ignore.case = TRUE) == TRUE ~ "ocat",
+    grepl("^multivariate_normal", fam, ignore.case = TRUE) == TRUE ~ "mvn",
+    grepl("^multinom", fam, ignore.case = TRUE) == TRUE ~ "multinom",
     fam == "gaulss" ~ "general_lss",
     fam == "gammals" ~ "general_lss",
     fam == "gumbls" ~ "general_lss",
@@ -475,3 +570,35 @@
 #     bind_cols(fit) |>
 #     relocate(row, .before = 1)
 # fit
+
+# ## trying to do somethign for multinom
+# fv <- predict(
+#   m_multinom, newdata = head(multinom_df), se.fit = TRUE,
+#   type = "response"
+# )
+
+# se_lp <- fv$se.fit / (fv$fit * (1 - fv$fit))
+
+# # grab slightly better versions of plogis() & qlogis() from the binomial
+# # family
+# bin_fam <- binomial()
+# lfun <- link(bin_fam)
+# ifun <- inv_link(bin_fam)
+
+# # convert \hat{pi} to logit scale and form a Wald interval, then back
+# # transform the interval only (we already have \hat{pi})
+# fit_lp <- lfun(fv$fit) # logit(\hat{pi})
+# fit_lwr <- ifun(fit_lp - (crit * se_lp))
+# fit_upr <- ifun(fit_lp + (crit * se_lp))
+
+# # create the return object
+# fit <- tibble(
+#   .row = rep(seq_len(nrow(head(multinom_df))), times = n_eta(m_multinom) + 1),
+#   .category = factor(
+#     rep(seq_len(n_eta(m_multinom) + 1), each = nrow(head(multinom_df)))
+#   ),
+#   .fitted = as.vector(fv$fit),
+#   .se = as.vector(fv$se.fit),
+#   .lower_ci = as.vector(fit_lwr),
+#   .upper_ci = as.vector(fit_upr)
+# )
