@@ -94,9 +94,32 @@
   }
 
   # call RNG function
-  sims <- replicate(nsim, rd_fun(mu = mu, wt = weights, scale = scale)) |>
-    as.data.frame() |>
-    setNames(nm = paste("sim", seq_len(nsim), sep = "_"))
+  sims <- replicate(
+    nsim,
+    rd_fun(mu = mu, wt = weights, scale = scale),
+    simplify = FALSE
+  )
+
+  if (is_multivariate_y(object)) {
+    n_eta <- length(lss_eta_index(object))
+    sims <- sims |>
+      lapply(FUN = c) |>
+      data.frame() |>
+      # as_tibble() |>
+      setNames(nm = paste("sim", seq_len(nsim), sep = "_")) |>
+      add_column(
+        .yvar = rep(
+          paste0("response", seq_len(n_eta)),
+          each = nrow(data)
+        ),
+        .before = 1L
+      )
+    rownames(sims) <- NULL
+  } else {
+    sims <- sims |>
+      as.data.frame() |>
+      setNames(nm = paste("sim", seq_len(nsim), sep = "_"))
+  }
 
   attr(sims, "seed") <- RNGstate
   class(sims) <- append(class(sims), "simulate_gratia", after = 0L)

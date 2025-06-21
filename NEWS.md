@@ -31,7 +31,7 @@
 
   Currently, `fix_family_rd()` adds support for multivariate normal models 
   fitted with `family = mvn()` and location-scale Tweedie models fitted with
-  `family = twlss()`.
+  `family = twlss()`, but the latter is currently very slow.
 
   The functionality of `fix_family_rd()` may move to another package or even 
   to *mgcv* if suitable.
@@ -52,6 +52,11 @@
 * `data_slice()` gains argument `.observed_only` which allows simple filtering
   of the combinations of values specified in the slice to those that are in the
   data frame supplied or in the model frame of a fitted GAM.
+
+* `posterior_samples()`, `predicted_samples()`, `fitted_samples()`, and
+  `simulate.gam()` now simulate data for all linear predictors (i.e., all
+  responses) in `mvn()` and `multinom()` models as these are all location
+  parameter linear predictors.
 
 ## Bug fixes
 
@@ -79,6 +84,9 @@
   tile centre coordinates that it was being provided. The function that creates
   the data to evaluate the spline at now tries to avoid this. Note this fix is
   not a complete solution. #334 Reported by @StefanoMezzini
+
+* `link()` and `inv_link()` failed to extract the link an inverse link functions
+  for `mvn()` and `multinom()` models.
 
 # gratia 0.10.0
 

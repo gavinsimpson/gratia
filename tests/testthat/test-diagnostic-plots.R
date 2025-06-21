@@ -147,6 +147,7 @@ test_that("appraise can use the worm plot", {
 })
 
 test_that("appraise handles mvn models", {
+  skip_on_cran()
   expect_silent(
     plt <- withr::with_seed(1, appraise(m_mvn, method = "simulate"))
   )
@@ -157,6 +158,7 @@ test_that("appraise handles mvn models", {
 })
 
 test_that("appraise handles twlss models", {
+  skip_on_cran()
   expect_silent(
     plt <- withr::with_seed(1, appraise(m_twlss, method = "simulate"))
   )

@@ -156,13 +156,38 @@
   weights <- rep(weights, times = n)
   # scale <- rep(scale, times = n)
 
-  # replace fitted with
-  sim_eta <- sim_eta |>
-    mutate(.response = rd_fun(
-      mu = .data$.fitted, wt = weights,
-      scale = scale_p
-    )) |>
-    select(all_of(c(".row", ".draw", ".response")))
+  # replace fitted with simulated response
+  # need to handle mvn() and multinom() with multiple linear predictors that
+  # are all really just location parameters
+  if (is_multivariate_y(model)) {
+    sim_eta_w <- sim_eta |>
+      pivot_wider(
+        id_cols = all_of(c(".row", ".draw")),
+        values_from = ".fitted",
+        names_from = ".parameter"
+      )
+    sim_eta <- sim_eta_w |>
+      select(all_of(c(".row", ".draw"))) |>
+      bind_cols(
+        rd_fun(
+          mu = sim_eta_w[, -c(1, 2)] |> as.matrix(),
+          wt = weights,
+          scale = scale_p
+        ) |> as_tibble()
+      )  |>
+      pivot_longer(
+        cols = !c(".row", ".draw"),
+        values_to = ".response",
+        names_to = ".parameter"
+      )
+  } else {
+    sim_eta <- sim_eta |>
+      mutate(.response = rd_fun(
+        mu = .data$.fitted, wt = weights,
+        scale = scale_p
+      )) |>
+      select(all_of(c(".row", ".draw", ".response")))
+  }
 
   ## add classes
   class(sim_eta) <- c("posterior_samples", class(sim_eta))
@@ -310,40 +335,101 @@
   )
   ## betas is for *all* coefs, including distributional parameters
   lss_idx <- lss_eta_index(model)
-  if (gen_fam <- inherits(family(model), "general.family")) {
-    warning("Currently, only for LSS families where location is the mean.")
-    lss_loc <- lss_idx[[1L]] # for now just take the location linpred
+  gen_fam <- inherits(family(model), "general.family")
+  if (gen_fam) {
+    # some general families should allow all linear predictors;
+    # e.g., mvn(), multinom()
+    fam_nam <- family_name(model)
+    if (
+      grepl("^Multivariate normal", fam_nam) ||
+        grepl("^multinom", fam_nam)
+    ) {
+      lss_loc <- lss_idx
+    } else {
+      warning("Currently, only for LSS families where location is the mean.")
+      lss_loc <- lss_idx[[1L]] # for now just take the location linpred
+      lss_idx <- lss_idx[1L] # keep as a list
+    }
   } else {
     lss_loc <- lss_idx[[1L]]
+    lss_idx <- lss_idx[1L] # keep as a list
   }
-
+  # function to control predictions
+  pred_fun <- function(Xp, betas, lss_loc, scale) {
+    sims <- Xp[, lss_loc, drop = FALSE] %*% t(betas[, lss_loc, drop = FALSE])
+    # handle the offset if present; it is an attribute on the Xp matrix
+    # it is a list - with 1 component if a normal model and `l` components if it
+    # is a model with `l` linear predictors.
+    m_offset <- attr(Xp, "model.offset")
+    if (is.list(m_offset)) {
+      m_offset <- m_offset[[1L]] # only for location ?
+    }
+    if (!is.null(m_offset)) {
+      sims <- sims + m_offset
+    }
+    # handle transformation to response scale
+    if (isTRUE(identical(scale, "response"))) {
+      ilink <- inv_link(model, parameter = "location")
+      sims <- ilink(sims)
+    }
+    colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
+    sims <- as_tibble(sims)
+    names(sims) <- as.character(seq_len(ncol(sims)))
+    sims
+  }
   ## don't need to pass freq, unconditional here as that is done for V
   Xp <- predict(model, newdata = data, type = "lpmatrix", ...)
-  sims <- Xp[, lss_loc, drop = FALSE] %*% t(betas[, lss_loc, drop = FALSE])
-  # handle the offset if present; it is an attribute on the Xp matrix
-  # it is a list - with 1 component if a normal model and `l` components if it
-  # is a model with `l` linear predictors.
-  m_offset <- attr(Xp, "model.offset")
-  if (is.list(m_offset)) {
-    m_offset <- m_offset[[1L]] # only for location ?
+  ## predict step; for mvn() and multinom() models, we do want to loop over
+  ##   the linear predictors
+  n_eta <- length(lss_idx) # number of linear predictors to work with
+  if (n_eta > 1L) {
+    sims <- lapply(
+      seq_len(n_eta),
+      FUN = \(i, Xp, betas, lss_loc, scale) {
+        pred_fun(Xp, betas, lss_loc[[i]], scale)
+      },
+      Xp = Xp, betas = betas, lss_loc = lss_loc, scale = scale
+    ) |>
+      bind_rows() |>
+      add_column(
+        .row = rep(seq_len(nrow(data)), times = n_eta),
+        .parameter = paste0(
+          "response",
+          rep(seq_len(n_eta), each = nrow(data))
+        )
+      )
+  } else {
+    sims <- pred_fun(Xp, betas, lss_loc, scale) |>
+      add_column(
+        .row = seq_len(nrow(data)),
+        .parameter = rep("location", nrow(data))
+      )
   }
-  if (!is.null(m_offset)) {
-    sims <- sims + m_offset
-  }
+  # sims <- Xp[, lss_loc, drop = FALSE] %*% t(betas[, lss_loc, drop = FALSE])
+  # # handle the offset if present; it is an attribute on the Xp matrix
+  # # it is a list - with 1 component if a normal model and `l` components if it
+  # # is a model with `l` linear predictors.
+  # m_offset <- attr(Xp, "model.offset")
+  # if (is.list(m_offset)) {
+  #   m_offset <- m_offset[[1L]] # only for location ?
+  # }
+  # if (!is.null(m_offset)) {
+  #   sims <- sims + m_offset
+  # }
 
-  if (isTRUE(identical(scale, "response"))) {
-    ilink <- inv_link(model, parameter = "location")
-    sims <- ilink(sims)
-  }
-
-  colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
-  sims <- as_tibble(sims)
-  names(sims) <- as.character(seq_len(ncol(sims)))
-  sims <- sims |>
-    add_column(
-      .row = seq_len(nrow(sims)),
-      .parameter = rep("location", nrow(sims))
-    )
+  # if (isTRUE(identical(scale, "response"))) {
+  #   ilink <- inv_link(model, parameter = "location")
+  #   sims <- ilink(sims)
+  # }
+  #
+  # colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
+  # sims <- as_tibble(sims)
+  # names(sims) <- as.character(seq_len(ncol(sims)))
+  # sims <- sims |>
+  #  add_column(
+  #    .row = seq_len(nrow(sims)),
+  #    .parameter = rep("location", nrow(sims))
+  #  )
   sims <- sims |>
     pivot_longer(
       cols = !any_of(c(".row", ".parameter")),
@@ -447,12 +533,31 @@
   )
   RNGstate <- attr(sims, "seed")
   class(sims) <- class(sims)[-1] # remove the "simulate_gratia" class
-  colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
-  sims <- as_tibble(sims)
-  names(sims) <- as.character(seq_len(ncol(sims)))
-  sims <- add_column(sims, .row = seq_len(nrow(sims)))
-  sims <- gather(sims, key = ".draw", value = ".response", -.row) |>
-    mutate(.draw = as.integer(.data$.draw))
+  if (is_multivariate_y(model)) {
+    # first column is .response for truly multivariate Y models
+    sims <- as_tibble(sims)
+    names(sims)[-1] <- as.character(seq_len(ncol(sims) - 1))
+    n_eta <- lss_eta_index(model) |> length()
+    sims <- sims |>
+      add_column(.row = rep(seq_len(nrow(sims) / n_eta), times = n_eta)) |>
+      pivot_longer(
+        cols = !c(".row", ".yvar"),
+        names_to = ".draw",
+        values_to = ".response",
+        names_transform = list(.draw = as.integer)
+      ) |>
+      rename(.parameter = ".yvar") |>
+      relocate(all_of(c(".row", ".draw")), .before = 1L)
+  } else {
+    # rewrite this so it is more like the above with pivot_longer
+    colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
+    sims <- as_tibble(sims)
+    names(sims) <- as.character(seq_len(ncol(sims)))
+    sims <- add_column(sims, .row = seq_len(nrow(sims)))
+    sims <- gather(sims, key = ".draw", value = ".response", -.row) |>
+      mutate(.draw = as.integer(.data$.draw))
+  }
+
   attr(sims, "seed") <- RNGstate
   ## add classes
   class(sims) <- c("predicted_samples", class(sims))

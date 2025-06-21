@@ -24,7 +24,7 @@
     rd_mvn <- function(V) {
       function(mu, wt, scale) { # function needs to take wt and scale
         mgcv::rmvn(
-          n = nrow(mu),
+          n = NROW(mu),
           mu = mu,
           V = V
         )
