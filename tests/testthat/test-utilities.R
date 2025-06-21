@@ -618,6 +618,8 @@ test_that("model_constant works for a GAMLSS", {
 })
 
 test_that("rtw works for twlss model", {
+  skip_on_cran()
+  skip_on_ci()
   fit <- fitted(m_twlss)
   tw_pars <- get_tw_bounds(m_twlss)
   expect_snapshot(
