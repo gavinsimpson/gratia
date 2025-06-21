@@ -2024,12 +2024,12 @@ multivariate_y <- function() {
   lambda <- mu^(2 - p) / ((2 - p) * phi)
   shape <- (2 - p) / (p - 1)
   scale <- phi * (p - 1) * mu^(p - 1)
-  #n_sim <- length(mu)
+  # n_sim <- length(mu)
   N <- rpois(length(lambda), lambda)
   gs <- rep(scale, N)
-  #y <- rgamma(gs * 0 + 1, shape = shape, scale = gs)
-  #lab <- rep(1:length(N), N)
-  #out <- tapply(y, lab, sum)
+  # y <- rgamma(gs * 0 + 1, shape = shape, scale = gs)
+  # lab <- rep(1:length(N), N)
+  # out <- tapply(y, lab, sum)
   tab <- tibble(
     y = rgamma(gs * 0 + 1, shape = shape, scale = gs),
     lab = rep(seq_along(N), N)
@@ -2040,4 +2040,25 @@ multivariate_y <- function() {
     summarise(summed = sum(.data$y)) |>
     pull(.data$summed)
   out
+}
+
+#' Is a model multivariate
+#'
+#' Determines whether a fitted model (GAM) is truly multivariate or not.
+#'
+#' @param model a fitted model object; currently only for `"gam"` objects
+#'
+#' @return A logical vector of length 1, indicating if `model` is multivariate
+#'   (`TRUE`), or otherwise (`FALSE`).
+#' @export
+`is_multivariate_y` <- function(model) {
+  allowed <- multivariate_y()
+  fam_nam <- family_name(model)
+  out <- vapply(
+    allowed,
+    FUN = \(x, family) grepl(x, family),
+    FUN.VALUE = logical(1L),
+    family = fam_nam
+  )
+  any(out)
 }
