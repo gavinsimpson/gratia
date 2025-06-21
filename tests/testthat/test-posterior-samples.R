@@ -337,6 +337,48 @@ test_that("posterior sampling funs work with offsets in formula issue 233", {
   expect_snapshot(print(fs), variant = "fitted", cran = FALSE)
 })
 
+test_that("posterior sampling works for a mvn() model", {
+  skip_on_cran()
+
+  n_samples <- 5
+  n_data <- model.matrix(m_mvn) |> nrow()
+  n_y <- n_eta(m_mvn)
+
+  expect_silent(ps <- posterior_samples(m_mvn, n = n_samples, seed = 42))
+  expect_identical(nrow(ps), as.integer(n_data * n_y * n_samples))
+
+  expect_silent(ys <- predicted_samples(m_mvn, n = n_samples, seed = 42))
+  expect_identical(nrow(ys), as.integer(n_data * n_y * n_samples))
+
+  expect_silent(fs <- fitted_samples(m_mvn, n = n_samples, seed = 42))
+  expect_identical(nrow(fs), as.integer(n_data * n_y * n_samples))
+
+  expect_snapshot(print(ps), variant = "posterior", cran = FALSE)
+  expect_snapshot(print(ys), variant = "posterior", cran = FALSE)
+  expect_snapshot(print(fs), variant = "fitted", cran = FALSE)
+})
+
+test_that("posterior sampling works for a multinom() model", {
+  skip_on_cran()
+
+  n_samples <- 5
+  n_data <- model.matrix(m_multinom) |> nrow()
+  n_y <- n_eta(m_multinom) + 1
+
+  expect_silent(ps <- posterior_samples(m_multinom, n = n_samples, seed = 42))
+  expect_identical(nrow(ps), as.integer(n_data * n_samples))
+
+  expect_silent(ys <- predicted_samples(m_multinom, n = n_samples, seed = 42))
+  expect_identical(nrow(ys), as.integer(n_data * n_samples))
+
+  expect_silent(fs <- fitted_samples(m_multinom, n = n_samples, seed = 42))
+  expect_identical(nrow(fs), as.integer(n_data * n_samples * n_y))
+
+  expect_snapshot(print(ps), variant = "posterior", cran = FALSE)
+  expect_snapshot(print(ys), variant = "posterior", cran = FALSE)
+  expect_snapshot(print(fs), variant = "fitted", cran = FALSE)
+})
+
 test_that("derivative_samples works for a simple GAM", {
   expect_silent(
     sm <- derivative_samples(m_1_smooth,

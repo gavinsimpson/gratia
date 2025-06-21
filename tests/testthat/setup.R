@@ -663,3 +663,39 @@ m_mvn <- gam(
   family = mvn(d = 2),
   data = mvn_df
 )
+
+## Multinomial model, using example from Simon's ?mgcv::multinom
+sim_multinom_data <- function(n = 1000, seed) {
+  # from ?mgcv::multinom
+  f1 <- function(x) sin(3 * pi * x) * exp(-x)
+  f2 <- function(x) x^3
+  f3 <- function(x) 0.5 * exp(-x^2) - 0.2
+  f4 <- function(x) 1
+  withr::with_seed(seed,
+    {
+      x1 <- runif(n)
+      x2 <- runif(n)
+      eta1 <- 2 * (f1(x1) + f2(x2)) - 0.5
+      eta2 <- 2 * (f3(x1) + f4(x2)) - 1
+      p <- exp(cbind(0, eta1, eta2))
+      p <- p / rowSums(p) # prob of each category
+      cum_p <- t(apply(p, 1, cumsum)) # cumulative probability
+      y <- apply(cum_p, 1, \(x) min(which(x > runif(1)))) - 1
+    }
+  )
+  dat <- tibble(
+    y  = y,
+    x1 = x1,
+    x2 = x2
+  )
+  dat
+}
+multinom_df <- sim_multinom_data(n = 1000, seed = 12345)
+m_multinom <- gam(
+  list(
+    y ~ s(x1) + s(x2),
+      ~ s(x1) + s(x2)
+  ),
+  family = multinom(K = 2),
+  data = multinom_df
+)
