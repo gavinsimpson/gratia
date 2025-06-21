@@ -537,7 +537,7 @@
     # first column is .response for truly multivariate Y models
     sims <- as_tibble(sims)
     names(sims)[-1] <- as.character(seq_len(ncol(sims) - 1))
-    n_eta <- lss_eta_index(model) |> length()
+    n_eta <- n_eta(model)
     sims <- sims |>
       add_column(.row = rep(seq_len(nrow(sims) / n_eta), times = n_eta)) |>
       pivot_longer(
