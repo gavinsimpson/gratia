@@ -101,7 +101,7 @@
   )
 
   if (is_multivariate_y(object)) {
-    n_eta <- length(lss_eta_index(object))
+    n_eta <- n_eta(object)
     sims <- sims |>
       lapply(FUN = c) |>
       data.frame() |>
