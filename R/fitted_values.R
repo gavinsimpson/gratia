@@ -449,7 +449,6 @@
   fit
 }
 
-
 `fit_vals_multinom` <- function(
   object, data, ci_level = 0.95, scale = "response", ...
 ) {
