@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9013</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9014</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,7 +61,7 @@
 <p>Additionally, <code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> with <code>group_means = TRUE</code> can now include group means specified using a random effect smooth, e.g. following the above example for <code>select</code>, a random effect smooth <code>s(f, bs = "re")</code>, with name <code>s(f)</code>, is looked for in the model matrix and its effects included in the comparisons.</p>
 </li>
 <li><p><code><a href="../reference/data_slice.html">data_slice()</a></code> gains argument <code>.observed_only</code> which allows simple filtering of the combinations of values specified in the slice to those that are in the data frame supplied or in the model frame of a fitted GAM.</p></li>
-<li><p><code><a href="../reference/posterior_samples.html">posterior_samples()</a></code>, <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code>, <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code>, and <code><a href="../reference/simulate.html">simulate.gam()</a></code> now simulate data for all linear predictors (i.e., all responses) in <code><a href="https://rdrr.io/pkg/mgcv/man/mvn.html" class="external-link">mvn()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom()</a></code> models as these are all location parameter linear predictors.</p></li>
+<li><p><code><a href="../reference/posterior_samples.html">posterior_samples()</a></code>, <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code>, <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code>, and <code><a href="../reference/simulate.html">simulate.gam()</a></code> now simulate for all linear predictors (i.e., all responses) in <code><a href="https://rdrr.io/pkg/mgcv/man/mvn.html" class="external-link">mvn()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom()</a></code> models as these are all location parameter linear predictors.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
