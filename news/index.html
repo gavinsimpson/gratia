@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9016</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9017</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,6 +74,7 @@
 <li><p><code><a href="../reference/draw.smooth_estimates.html">draw.smooth_estimates()</a></code> would generate very many warnings when plotting spline on the sphere smoothers (<code>bs = "sos"</code>) because <code><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_tile()</a></code> was creating tiles that extended beyond valid geographical coordinates given the tile centre coordinates that it was being provided. The function that creates the data to evaluate the spline at now tries to avoid this. Note this fix is not a complete solution. <a href="https://github.com/gavinsimpson/gratia/issues/334" class="external-link">#334</a> Reported by <a href="https://github.com/StefanoMezzini" class="external-link">@StefanoMezzini</a></p></li>
 <li><p><code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> failed to extract the link an inverse link functions for <code><a href="https://rdrr.io/pkg/mgcv/man/mvn.html" class="external-link">mvn()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom()</a></code> models.</p></li>
 <li><p><code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> now work correctly for models fitted with the <code><a href="https://rdrr.io/pkg/mgcv/man/ziP.html" class="external-link">ziP()</a></code> family. <a href="https://github.com/gavinsimpson/gratia/issues/341" class="external-link">#341</a> Reported by <a href="https://github.com/rroyaute" class="external-link">@rroyaute</a></p></li>
+<li><p><code>basis.scam</code> was incorrectly trying to identify the smooths named in <code>select</code>.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
