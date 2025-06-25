@@ -30,6 +30,14 @@ package, via a reimplementation of the `plot()` method for GAMs that
 ‘mgcv’ provides, as well as ‘tidyverse’ compatible representations of
 estimated smooths.
 
+## Citation
+
+If you use *gratia* in your work, please cite the package using:
+
+Simpson, G. L., (2024). gratia: An R package for exploring generalized
+additive models. *Journal of Open Source Software*, **9**(104), 6962,
+<https://doi.org/10.21105/joss.06962>
+
 ## Features
 
 The main features of *gratia* are currently
