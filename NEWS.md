@@ -58,11 +58,9 @@
   in `mvn()` and `multinom()` models as these are all location parameter linear
   predictors.
 
-* `fitted_values()` now works for GAMs fitted with families `mvn()` and
-  `multinom()`.
-
-* `link()` and `inv_link()` now work correctly for models fitted with the
-  `ziP()` family. #341 Reported by @rroyaute
+* `fitted_values()` now works for GAMs fitted with families `ziP()`, `mvn()`,
+  and `multinom()`. The non-working of `fitted-values()` for `ziP()` models was
+  reported in #341 by @rroyaute
 
 ## Bug fixes
 
@@ -93,6 +91,9 @@
 
 * `link()` and `inv_link()` failed to extract the link an inverse link functions
   for `mvn()` and `multinom()` models.
+
+* `link()` and `inv_link()` now work correctly for models fitted with the
+  `ziP()` family. #341 Reported by @rroyaute
 
 # gratia 0.10.0
 
