@@ -54,8 +54,9 @@
   data frame supplied or in the model frame of a fitted GAM.
 
 * `posterior_samples()`, `predicted_samples()`, `fitted_samples()`, and
-  `simulate.gam()` now simulate for all linear predictors (i.e., all responses) in `mvn()` and `multinom()` models as these are all location
-  parameter linear predictors.
+  `simulate.gam()` now simulate for all linear predictors (i.e., all responses)
+  in `mvn()` and `multinom()` models as these are all location parameter linear
+  predictors.
 
 * `fitted_values()` now works for GAMs fitted with families `mvn()` and
   `multinom()`.
