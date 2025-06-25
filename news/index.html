@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9015</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9016</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,8 +62,7 @@
 </li>
 <li><p><code><a href="../reference/data_slice.html">data_slice()</a></code> gains argument <code>.observed_only</code> which allows simple filtering of the combinations of values specified in the slice to those that are in the data frame supplied or in the model frame of a fitted GAM.</p></li>
 <li><p><code><a href="../reference/posterior_samples.html">posterior_samples()</a></code>, <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code>, <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code>, and <code><a href="../reference/simulate.html">simulate.gam()</a></code> now simulate for all linear predictors (i.e., all responses) in <code><a href="https://rdrr.io/pkg/mgcv/man/mvn.html" class="external-link">mvn()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom()</a></code> models as these are all location parameter linear predictors.</p></li>
-<li><p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> now works for GAMs fitted with families <code><a href="https://rdrr.io/pkg/mgcv/man/mvn.html" class="external-link">mvn()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom()</a></code>.</p></li>
-<li><p><code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> now work correctly for models fitted with the <code><a href="https://rdrr.io/pkg/mgcv/man/ziP.html" class="external-link">ziP()</a></code> family. <a href="https://github.com/gavinsimpson/gratia/issues/341" class="external-link">#341</a> Reported by <a href="https://github.com/rroyaute" class="external-link">@rroyaute</a></p></li>
+<li><p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> now works for GAMs fitted with families <code><a href="https://rdrr.io/pkg/mgcv/man/ziP.html" class="external-link">ziP()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/mvn.html" class="external-link">mvn()</a></code>, and <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom()</a></code>. The non-working of <code>fitted-values()</code> for <code><a href="https://rdrr.io/pkg/mgcv/man/ziP.html" class="external-link">ziP()</a></code> models was reported in <a href="https://github.com/gavinsimpson/gratia/issues/341" class="external-link">#341</a> by <a href="https://github.com/rroyaute" class="external-link">@rroyaute</a></p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
@@ -74,6 +73,7 @@
 <li><p><code><a href="../reference/gaussian_draws.html">gaussian_draws()</a></code> would fail in some cases with <em>gamm4</em> models because the coefficients were returned as a vector, not the expect matrix. <a href="https://github.com/gavinsimpson/gratia/issues/332" class="external-link">#332</a> reported by <a href="https://github.com/JaredStufft-Elion" class="external-link">@JaredStufft-Elion</a></p></li>
 <li><p><code><a href="../reference/draw.smooth_estimates.html">draw.smooth_estimates()</a></code> would generate very many warnings when plotting spline on the sphere smoothers (<code>bs = "sos"</code>) because <code><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_tile()</a></code> was creating tiles that extended beyond valid geographical coordinates given the tile centre coordinates that it was being provided. The function that creates the data to evaluate the spline at now tries to avoid this. Note this fix is not a complete solution. <a href="https://github.com/gavinsimpson/gratia/issues/334" class="external-link">#334</a> Reported by <a href="https://github.com/StefanoMezzini" class="external-link">@StefanoMezzini</a></p></li>
 <li><p><code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> failed to extract the link an inverse link functions for <code><a href="https://rdrr.io/pkg/mgcv/man/mvn.html" class="external-link">mvn()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom()</a></code> models.</p></li>
+<li><p><code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> now work correctly for models fitted with the <code><a href="https://rdrr.io/pkg/mgcv/man/ziP.html" class="external-link">ziP()</a></code> family. <a href="https://github.com/gavinsimpson/gratia/issues/341" class="external-link">#341</a> Reported by <a href="https://github.com/rroyaute" class="external-link">@rroyaute</a></p></li>
 </ul></div>
 </div>
     <div class="section level2">
