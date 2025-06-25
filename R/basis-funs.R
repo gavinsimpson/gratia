@@ -146,7 +146,7 @@
   # select smooths
   select <-
     check_user_select_smooths(
-      smooths = sms, select = term,
+      smooths = sms, select = select,
       partial_match = partial_match,
       model_name = model_name
     )
