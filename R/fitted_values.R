@@ -503,12 +503,50 @@
   fit
 }
 
+`fit_vals_zip` <- function(
+  object, data, ci_level = 0.95, scale = "response", ...
+) {
+  fv <- predict(
+    object, newdata = data, ..., type = "link", se.fit = TRUE
+  )
+  crit <- coverage_normal(ci_level)
+  fam <- family(object)
+
+  # use fam$predict() to do the conversion to response scale
+  # fit_lp  <- as.vector(fv$fit)
+  fit_se  <- as.vector(fv$se)
+  fit_lwr <- as.vector(as.vector(fv$fit) - (crit * fit_se))
+  fit_upr <- as.vector(as.vector(fv$fit) + (crit * fit_se))
+
+  # pull everything into a tibble for return
+  fit <- tibble(
+    .row = seq_len(NROW(data)),
+    .fitted = as.vector(fv$fit),
+    .se = as.numeric(fit_se),
+    .lower_ci = as.numeric(fit_lwr),
+    .upper_ci = as.numeric(fit_upr)
+  )
+
+  # convert to the response scale if requested
+  if (identical(scale, "response")) {
+    fit <- fit |>
+      mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
+        .fns = \(eta, fam) fam$predict(fam, eta = eta)[[1]] |> as.vector(),
+        fam = fam
+      ))
+  }
+
+  # return
+  fit
+}
+
 #' @importFrom dplyr case_when
 `get_fit_fun` <- function(fam) {
   fam <- case_when(
     grepl("^ordered_categorical", fam, ignore.case = TRUE) == TRUE ~ "ocat",
     grepl("^multivariate_normal", fam, ignore.case = TRUE) == TRUE ~ "mvn",
     grepl("^multinom", fam, ignore.case = TRUE) == TRUE ~ "multinom",
+    grepl("^zero_inflated_poisson\\(", fam, ignore.case = TRUE) == TRUE ~ "zip",
     fam == "gaulss" ~ "general_lss",
     fam == "gammals" ~ "general_lss",
     fam == "gumbls" ~ "general_lss",
