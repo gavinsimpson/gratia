@@ -61,6 +61,9 @@
 * `fitted_values()` now works for GAMs fitted with families `mvn()` and
   `multinom()`.
 
+* `link()` and `inv_link()` now work correctly for models fitted with the
+  `ziP()` family. #341 Reported by @rroyaute
+
 ## Bug fixes
 
 * `conditional_values()` would fail if a variable it was conditioning was also
