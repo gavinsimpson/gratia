@@ -533,7 +533,19 @@ family_type.family <- function(object, ...) {
 
 `zip_link` <- function(family, parameter = c("location", "mu"),
                        inverse = FALSE) {
-  stop_if_not_family(family, type = "zero inflated Poisson")
+  # stop_if_not_family(family, type = "zero inflated Poisson")
+  # the raw family is "zero inflated Poisson", but when used on fitted model it
+  # is "Zero inflated Poisson(xxx)" with xxx being two numbers that related to
+  # the zero inflation. Note the inconsistent capitalisation.
+  if (!is_mgcv_family(family)) {
+    stop("'family' is not a family object", call. = FALSE)
+  }
+  if (!any(
+    grepl("^Zero inflated Poisson", family$family),
+    grepl("^zero inflated Poisson", family$family)
+  )) {
+    stop("'family' is not of type '\"zero inflated Poisson\"'", call. = FALSE)
+  }
 
   parameter <- match.arg(parameter)
 
@@ -673,7 +685,7 @@ family_type.family <- function(object, ...) {
 ## - only checks type if `type` is not NULL
 `stop_if_not_family` <- function(object, type = NULL) {
   ## check if object is a family; throw error if not
-  if (!inherits(object, c("family", "extended.family", "general.family"))) {
+  if (!is_mgcv_family(object)) {
     stop("'family' is not a family object", call. = FALSE)
   }
 
