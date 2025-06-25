@@ -94,16 +94,17 @@
 #' \dontshow{
 #' options(op)
 #' }
-`data_sim` <- function(model = "eg1", n = 400,
-    scale = NULL, theta = 3, power = 1.5,
-    dist = c(
-      "normal", "poisson", "binary", "negbin", "tweedie", "gamma",
-      "ocat", "ordered categorical"
-    ),
-    n_cat = 4, cuts = c(-1, 0, 5),
-    seed = NULL,
-    gfam_families = c("binary", "tweedie", "normal")
-  ) {
+`data_sim` <- function(
+  model = "eg1", n = 400,
+  scale = NULL, theta = 3, power = 1.5,
+  dist = c(
+    "normal", "poisson", "binary", "negbin", "tweedie", "gamma",
+    "ocat", "ordered categorical"
+  ),
+  n_cat = 4, cuts = c(-1, 0, 5),
+  seed = NULL,
+  gfam_families = c("binary", "tweedie", "normal")
+) {
   ## sort out the seed
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     runif(1)
