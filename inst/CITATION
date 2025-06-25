@@ -1,4 +1,4 @@
-if(!exists("meta") || is.null(meta)) meta <- packageDescription("gratia")
+if (!exists("meta") || is.null(meta)) meta <- packageDescription("gratia")
 
 year <- sub("-.*", "", meta$Date)
 if (identical(length(year), 0L)) year <- sub("-.*", "", meta$Packaged)
