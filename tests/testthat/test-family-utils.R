@@ -210,6 +210,11 @@ test_that("link() works for ziP() family objects", {
   expect_type(f, "closure")
   expect_identical(f(val), ziP()$linkfun(val))
   expect_identical(f, ziP()$linkfun)
+
+  f <- link(m_ziP)
+  expect_type(f, "closure")
+  expect_identical(f(val), ziP()$linkfun(val))
+  expect_identical(f, ziP()$linkfun)
 })
 
 test_that("link() works for cox.ph() family objects", {
@@ -340,6 +345,11 @@ test_that("inv_link() works for ziP() family objects", {
   expect_type(f, "closure")
   expect_identical(f(val), ziP()$linkinv(val))
   expect_identical(f, ziP()$linkinv)
+
+  f <- link(m_ziP)
+  expect_type(f, "closure")
+  expect_identical(f(val), ziP()$linkfun(val))
+  expect_identical(f, ziP()$linkfun)
 })
 
 test_that("inv_link() works for cox.ph() family objects", {
