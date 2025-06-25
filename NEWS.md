@@ -95,6 +95,8 @@
 * `link()` and `inv_link()` now work correctly for models fitted with the
   `ziP()` family. #341 Reported by @rroyaute
 
+* `basis.scam` was incorrectly trying to identify the smooths named in `select`.
+
 # gratia 0.10.0
 
 ## New features
