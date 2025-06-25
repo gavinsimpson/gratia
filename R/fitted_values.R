@@ -531,8 +531,7 @@
   if (identical(scale, "response")) {
     fit <- fit |>
       mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
-        .fns = \(eta, fam) fam$predict(fam, eta = eta)[[1]] |> as.vector(),
-        fam = fam
+        .fns = \(eta) fam$predict(fam, eta = eta)[[1]] |> as.vector()
       ))
   }
 
