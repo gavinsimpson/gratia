@@ -699,3 +699,31 @@ m_multinom <- gam(
   family = multinom(K = 2),
   data = multinom_df
 )
+
+# ziP() example - issue #341
+zip_data <- function(seed = 0) {
+  rzip <- function(gamma, theta = c(-2, 0.3)) {
+    ## From ?ziP (c) Simon Wood
+    ## generate zero inflated Poisson random variables, where 
+    ## lambda = exp(gamma), eta = theta[1] + exp(theta[2])*gamma
+    ## and 1-p = exp(-exp(eta)).
+    y <- gamma
+    n <- length(y)
+    lambda <- exp(gamma)
+    eta <- theta[1] + exp(theta[2])*gamma
+    p <- 1- exp(-exp(eta))
+    ind <- p > runif(n)
+    y[!ind] <- 0
+    np <- sum(ind)
+    ## generate from zero truncated Poisson, given presence...
+    y[ind] <- qpois(runif(np, dpois(0, lambda[ind]), 1), lambda[ind])
+    y
+  }
+  df <- data_sim("eg1", seed = seed, n = 400)
+  df <- transform(df, {
+    f <- f / 4 - 1
+    y <- rzip(f)
+  })
+  df
+}
+m_ziP <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), family = ziP(), data = dat)
