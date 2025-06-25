@@ -2062,3 +2062,20 @@ multivariate_y <- function() {
   )
   any(out)
 }
+
+#' Is an object one of mgcv's family objects?
+#'
+#' Checks to determine if `object` is a family object of one of the three or so
+#' types that *mgcv* produces.
+#'
+#' @param object the object to test.
+#'
+#' @return A logical vector of length 1, indicating if `object` is one of
+#'   *mgcv*'s (`TRUE`), or otherwise (`FALSE`).
+#' @export
+`is_mgcv_family` <- function(object) {
+  inherits(
+    object,
+    c("family", "extended.family", "general.family")
+  )
+}
