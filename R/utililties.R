@@ -2008,9 +2008,9 @@ multivariate_y <- function() {
 
 # simulator for tweedie LSS models
 #' @importFrom rlang .data
-#' @importFrom dplyr group_by summarise pull
 #' @importFrom stats rpois rgamma
 #' @importFrom tibble tibble
+#' @importFrom vctrs vec_group_loc vec_chop list_unchop
 `rtw` <- function(mu, p, phi) {
   if (any(p <= 1 | p >= 2)) {
     stop("'p' must be in interval (1, 2)")
@@ -2035,14 +2035,21 @@ multivariate_y <- function() {
     lab = rep(seq_along(N), N)
   )
   out <- numeric(length(N))
-  out[which(N != 0)] <- tab |>
-    group_by(.data$lab) |>
-    summarise(summed = sum(.data$y)) |>
-    pull(.data$summed)
+  #out[which(N != 0)] <- tab |>
+  #  group_by(.data$lab) |>
+  #  summarise(summed = sum(.data$y)) |>
+  #  pull(.data$summed)
+  chop_fun <- function(.x, .by) {
+    idx <- vec_group_loc(.by)$loc
+    chp <- vec_chop(.x, indices = idx)
+    out <- lapply(chp, sum)
+    unlist(out)
+  }
+  out[which(N != 0)] <- chop_fun(tab$y, tab$lab)
   out
 }
 
-#' Is a model multivariate
+#' Is a model multivariate?
 #'
 #' Determines whether a fitted model (GAM) is truly multivariate or not.
 #'
