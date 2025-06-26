@@ -155,7 +155,7 @@
   used_vars <- names(cond_list)
   not_used <- dplyr::setdiff(m_vars, used_vars)
   tv <- typical_values(model, data = data)
-  tv <- tv |> select(all_of(not_used))
+  tv <- tv[not_used] # |> select(all_of(not_used))
   cond_list <- c(cond_list, tv)
 
   # return the data for testing
