@@ -2,7 +2,7 @@
 % Please edit documentation in R/utililties.R
 \name{is_multivariate_y}
 \alias{is_multivariate_y}
-\title{Is a model multivariate}
+\title{Is a model multivariate?}
 \usage{
 is_multivariate_y(model)
 }
