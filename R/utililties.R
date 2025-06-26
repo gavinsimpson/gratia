@@ -2009,8 +2009,8 @@ multivariate_y <- function() {
 # simulator for tweedie LSS models
 #' @importFrom rlang .data
 #' @importFrom stats rpois rgamma
-#' @importFrom tibble tibble
-#' @importFrom vctrs vec_group_loc vec_chop list_unchop
+#' @importFrom tibble new_tibble
+#' @importFrom vctrs vec_group_loc vec_chop df_list
 `rtw` <- function(mu, p, phi) {
   if (any(p <= 1 | p >= 2)) {
     stop("'p' must be in interval (1, 2)")
@@ -2030,9 +2030,11 @@ multivariate_y <- function() {
   # y <- rgamma(gs * 0 + 1, shape = shape, scale = gs)
   # lab <- rep(1:length(N), N)
   # out <- tapply(y, lab, sum)
-  tab <- tibble(
-    y = rgamma(gs * 0 + 1, shape = shape, scale = gs),
-    lab = rep(seq_along(N), N)
+  tab <- new_tibble(
+    df_list(
+      y = rgamma(gs * 0 + 1, shape = shape, scale = gs),
+      lab = rep(seq_along(N), N)
+    )
   )
   out <- numeric(length(N))
   #out[which(N != 0)] <- tab |>
