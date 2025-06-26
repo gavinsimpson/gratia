@@ -718,12 +718,19 @@
 #' @export
 #' @importFrom dplyr mutate row_number left_join join_by
 #' @rdname add_fitted_samples
-`add_smooth_samples` <- function(object, model, n = 1, seed = NULL, select = NULL,
-    ...) {
+`add_smooth_samples` <- function(
+  object,
+  model,
+  n = 1,
+  seed = NULL,
+  select = NULL,
+  ...
+) {
   # compute posterior samples
-  ss <- smooth_samples(model, data = object, n = n, seed = seed, select = select,
-    ...) |>
-    select(all_of(c(".smooth", ".term", ".row", ".draw", ".value")))
+  ss <- smooth_samples(
+    model, data = object, n = n, seed = seed, select = select, ...
+  )
+  ss <- ss[c(".smooth", ".term", ".row", ".draw", ".value")]
   # need to have .row in object so we can join with the fitted samples
   object <- object |>
     mutate(.row = row_number())
