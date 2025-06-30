@@ -14,6 +14,7 @@ overview(model, ...)
   dispersion = NULL,
   frequentist = FALSE,
   accuracy = 0.001,
+  digits = 3,
   stars = FALSE,
   ...
 )
@@ -44,6 +45,8 @@ matrix of the parameter estimates is used.}
 
 \item{accuracy}{numeric; accuracy with which to report p values, with p
 values below this value displayed as \code{"< accuracy"}.}
+
+\item{digits}{numeric; the number of significant digits to be used.}
 
 \item{stars}{logical; should significance stars be added to the output?}
 }
