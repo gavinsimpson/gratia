@@ -25,6 +25,7 @@
 #'   matrix of the parameter estimates is used.
 #' @param accuracy numeric; accuracy with which to report p values, with p
 #'   values below this value displayed as `"< accuracy"`.
+#' @param digits numeric; the number of significant digits to be used.
 #' @param stars logical; should significance stars be added to the output?
 #'
 #' @export
@@ -52,6 +53,7 @@
 `overview.gam` <- function(model, parametric = TRUE, random_effects = TRUE,
                            dispersion = NULL, frequentist = FALSE,
                            accuracy = 0.001,
+                           digits = 3,
                            stars = FALSE,
                            ...) {
   smry <- summary(model,
@@ -93,12 +95,15 @@
     )
     out <- mutate(out,
       # p = .data$p.value,
-      p.value = format.pval(.data$p.value, eps = accuracy),
+      p.value = format.pval(.data$p.value, eps = accuracy, digits = digits),
       stars = sstars
     ) # not sure why as.character(sstars) is wrong here "***"
     attr(out, "legend") <- attr(sstars, "legend")
   } else {
-    out <- mutate(out, p.value = format.pval(.data$p.value, eps = accuracy))
+    out <- mutate(
+      out,
+      p.value = format.pval(.data$p.value, eps = accuracy, digits = digits)
+    )
   }
 
   class(out) <- append(class(out), values = "overview", after = 0)
