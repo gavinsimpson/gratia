@@ -8,10 +8,10 @@
       
         term  type      k   edf statistic p.value
         <chr> <chr> <dbl> <dbl>     <dbl> <chr>  
-      1 s(x0) TPRS      9  4.23    16.1   < 0.001
-      2 s(x1) TPRS      9  3.50   169.    < 0.001
-      3 s(x2) TPRS      9  8.61   201.    < 0.001
-      4 s(x3) TPRS      9  1.00     0.599 0.43875
+      1 s(x0) TPRS      9  4.23    16.1   <0.001 
+      2 s(x1) TPRS      9  3.50   169.    <0.001 
+      3 s(x2) TPRS      9  8.61   201.    <0.001 
+      4 s(x3) TPRS      9  1.00     0.599 0.439  
 
 ---
 
@@ -23,10 +23,10 @@
       
         term  type      k   edf statistic p.value stars    
         <chr> <chr> <dbl> <dbl>     <dbl> <chr>   <noquote>
-      1 s(x0) TPRS      9  4.23    16.1   < 0.001 ***      
-      2 s(x1) TPRS      9  3.50   169.    < 0.001 ***      
-      3 s(x2) TPRS      9  8.61   201.    < 0.001 ***      
-      4 s(x3) TPRS      9  1.00     0.599 0.43875          
+      1 s(x0) TPRS      9  4.23    16.1   <0.001  ***      
+      2 s(x1) TPRS      9  3.50   169.    <0.001  ***      
+      3 s(x2) TPRS      9  8.61   201.    <0.001  ***      
+      4 s(x3) TPRS      9  1.00     0.599 0.439            
       
       # 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -43,7 +43,7 @@
       1 s(x0) TPRS      9  4.23    19.4   <0.001 
       2 s(x1) TPRS      9  3.50   209.    <0.001 
       3 s(x2) TPRS      9  8.61   209.    <0.001 
-      4 s(x3) TPRS      9  1.00     0.604 0.4373 
+      4 s(x3) TPRS      9  1.00     0.604 0.437  
 
 ---
 
@@ -58,7 +58,7 @@
       1 s(x0) TPRS      9  4.23    19.4   <0.001 
       2 s(x1) TPRS      9  3.50   209.    <0.001 
       3 s(x2) TPRS      9  8.61   209.    <0.001 
-      4 s(x3) TPRS      9  1.00     0.604 0.4373 
+      4 s(x3) TPRS      9  1.00     0.604 0.437  
 
 # print() output is as expected for BAM
 
@@ -70,10 +70,10 @@
       
         term  type      k   edf statistic p.value
         <chr> <chr> <dbl> <dbl>     <dbl> <chr>  
-      1 s(x0) TPRS      9  4.23    16.1   < 0.001
-      2 s(x1) TPRS      9  3.50   169.    < 0.001
-      3 s(x2) TPRS      9  8.61   201.    < 0.001
-      4 s(x3) TPRS      9  1.00     0.604 0.43732
+      1 s(x0) TPRS      9  4.23    16.1   <0.001 
+      2 s(x1) TPRS      9  3.50   169.    <0.001 
+      3 s(x2) TPRS      9  8.61   201.    <0.001 
+      4 s(x3) TPRS      9  1.00     0.604 0.437  
 
 ---
 
@@ -85,10 +85,10 @@
       
         term  type      k   edf statistic p.value stars    
         <chr> <chr> <dbl> <dbl>     <dbl> <chr>   <noquote>
-      1 s(x0) TPRS      9  4.23    16.1   < 0.001 ***      
-      2 s(x1) TPRS      9  3.50   169.    < 0.001 ***      
-      3 s(x2) TPRS      9  8.61   201.    < 0.001 ***      
-      4 s(x3) TPRS      9  1.00     0.604 0.43732          
+      1 s(x0) TPRS      9  4.23    16.1   <0.001  ***      
+      2 s(x1) TPRS      9  3.50   169.    <0.001  ***      
+      3 s(x2) TPRS      9  8.61   201.    <0.001  ***      
+      4 s(x3) TPRS      9  1.00     0.604 0.437            
       
       # 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
