@@ -97,6 +97,11 @@
 
 * `basis.scam` was incorrectly trying to identify the smooths named in `select`.
 
+* `overview()` was displaying more significant digits in the p values than it
+  was accurate to in terms of reporting p values as "<0.001". A new argument
+  `digits` controls how many digits are used when formatting p values, with 
+  default of `3`.
+
 # gratia 0.10.0
 
 ## New features
