@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9017</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9018</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,6 +75,7 @@
 <li><p><code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> failed to extract the link an inverse link functions for <code><a href="https://rdrr.io/pkg/mgcv/man/mvn.html" class="external-link">mvn()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom()</a></code> models.</p></li>
 <li><p><code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> now work correctly for models fitted with the <code><a href="https://rdrr.io/pkg/mgcv/man/ziP.html" class="external-link">ziP()</a></code> family. <a href="https://github.com/gavinsimpson/gratia/issues/341" class="external-link">#341</a> Reported by <a href="https://github.com/rroyaute" class="external-link">@rroyaute</a></p></li>
 <li><p><code>basis.scam</code> was incorrectly trying to identify the smooths named in <code>select</code>.</p></li>
+<li><p><code><a href="../reference/overview.html">overview()</a></code> was displaying more significant digits in the p values than it was accurate to in terms of reporting p values as “&lt;0.001”. A new argument <code>digits</code> controls how many digits are used when formatting p values, with default of <code>3</code>.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
