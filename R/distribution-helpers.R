@@ -77,7 +77,14 @@
   if (is.null(theta_fun)) {
     stop("No additional parameters available for this model")
   }
-  theta_fun(trans = transform)
+  theta_args <- formals(theta_fun)
+  arg_nms <- names(theta_args)
+  theta <- if ("trans" %in% arg_nms) {
+    theta_fun(trans = transform)
+  } else {
+    theta_fun()
+  }
+  theta
 }
 
 #' Are additional parameters available for a GAM?
