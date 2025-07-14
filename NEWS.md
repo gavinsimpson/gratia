@@ -102,6 +102,10 @@
   `digits` controls how many digits are used when formatting p values, with 
   default of `3`.
 
+* `theta()` now works for models fitted with the `gfam()` family. Previously it
+  would fail because it assumes all `family()$getTheta` functions had an
+  argument `trans` to transform the theta values to the correct scale.
+
 # gratia 0.10.0
 
 ## New features
