@@ -15,6 +15,7 @@ test_that("gfam data sim and model works", {
 # test something like two species responding to same covariate, but one with
 # very different variation
 test_that("gratia can handle a two species negbin model with gfam", {
+  skip_on_cran()
   # Number of data per species
   N <- 200
   ## simulate first species
