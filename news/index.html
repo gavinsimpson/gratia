@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9018</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9019</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,6 +76,7 @@
 <li><p><code><a href="../reference/link.html">link()</a></code> and <code><a href="../reference/link.html">inv_link()</a></code> now work correctly for models fitted with the <code><a href="https://rdrr.io/pkg/mgcv/man/ziP.html" class="external-link">ziP()</a></code> family. <a href="https://github.com/gavinsimpson/gratia/issues/341" class="external-link">#341</a> Reported by <a href="https://github.com/rroyaute" class="external-link">@rroyaute</a></p></li>
 <li><p><code>basis.scam</code> was incorrectly trying to identify the smooths named in <code>select</code>.</p></li>
 <li><p><code><a href="../reference/overview.html">overview()</a></code> was displaying more significant digits in the p values than it was accurate to in terms of reporting p values as “&lt;0.001”. A new argument <code>digits</code> controls how many digits are used when formatting p values, with default of <code>3</code>.</p></li>
+<li><p><code><a href="../reference/theta.html">theta()</a></code> now works for models fitted with the <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">gfam()</a></code> family. Previously it would fail because it assumes all <code>family()$getTheta</code> functions had an argument <code>trans</code> to transform the theta values to the correct scale.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
