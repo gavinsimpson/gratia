@@ -29,7 +29,7 @@ test_that("gratia can handle a two species negbin model with gfam", {
     n = N, seed = 25, dist = "negbin"
   )
   # bind together
-  gfam_df2 <- gfam_sp1 |>
+  gfam_df <- gfam_sp1 |>
     dplyr::bind_rows(gfam_sp2) |>
     dplyr::mutate(spp = rep(c(1, 2), each = N), f_spp = factor(spp))
   # fit the model
