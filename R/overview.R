@@ -60,7 +60,7 @@
     dispersion = dispersion, re.test = random_effects,
     freq = frequentist
   )
-  nms <- c("term", "type", "k", "edf", "statistic", "p.value")
+  nms <- c("term", "type", "k", "edf", "ref.edf", "statistic", "p.value")
 
   # smooth terms
   types <- vapply(model$smooth, smooth_type, character(1))
@@ -68,21 +68,25 @@
   out <- as.data.frame(smry$s.table) |>
     rownames_to_column() |>
     as_tibble() |>
-    select(!matches("Ref.df")) |>
-    add_column(type = types, k = dfs, .after = 1L)
+    # select(!matches("Ref.df")) |>
+    add_column(type = types, k = dfs, .after = 1L) |>
+    set_names(nms)
 
   # parametric terms
   para <- NULL
-  if (isTRUE(parametric) && !is.null(smry$pTerms.table)) {
-    nr <- nrow(smry$pTerms.table)
-    para <- as.data.frame(smry$pTerms.table) |>
-      rownames_to_column() |>
-      as_tibble() |>
-      rename(edf = "df") |>
-      add_column(
-        type = rep("parametric", nr), k = rep(NA_real_, nr),
-        .after = 1L
-      )
+  if (isTRUE(parametric) && !is.null(smry$p.table)) {
+    nr <- nrow(smry$p.table)
+    para_nms <- gsub("\\((Intercept)\\)", "\\1", x = rownames(smry$p.table))
+    para <- data.frame(
+      term = para_nms,
+      type = rep("parametric", nr),
+      k    = rep(NA_real_, nr),
+      edf  = c(1, smry$pTerms.df),
+      ref.edf = c(1, smry$pTerms.df),
+      statistic = smry$p.t,
+      p.value = smry$p.pv
+    ) |>
+    as_tibble()
     out <- bind_rows(para, out)
   }
   out <- set_names(out, nms)
