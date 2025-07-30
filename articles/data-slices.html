@@ -137,18 +137,19 @@ covariates</p>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/overview.html">overview</a></span><span class="op">(</span><span class="va">m_plant</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co"><span style="font-weight: 100;">#&gt; Generalized Additive Model with 8 terms</span></span></span>
+<span><span class="co"><span style="font-weight: 100;">#&gt; Generalized Additive Model with 9 terms</span></span></span>
 <span><span class="co"><span style="font-weight: 100;">#&gt; </span></span></span>
-<span><span class="co">#&gt;   term                             type              k   edf statistic p.value</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> treatment                        parametric       <span style="color: #BB0000;">NA</span>  1         1.59 0.21249</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> type                             parametric       <span style="color: #BB0000;">NA</span>  1        11.2  0.00148</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> treatment:type                   parametric       <span style="color: #BB0000;">NA</span>  1         7.45 0.00855</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> s(conc):ttnonchilled:Quebec      TPRS              5  4.72     69.7  &lt; 0.001</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> s(conc):ttchilled:Quebec         TPRS              5  4.71     86.5  &lt; 0.001</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> s(conc):ttnonchilled:Mississippi TPRS              5  4.62     74.1  &lt; 0.001</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> s(conc):ttchilled:Mississippi    TPRS              5  4.39     25.3  &lt; 0.001</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> s(plant)                         Random effect    12  7.40     12.8  &lt; 0.001</span></span></code></pre></div>
+<span><span class="co">#&gt;   term                             type        k   edf ref.edf statistic p.value</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Intercept                        parame…    <span style="color: #BB0000;">NA</span>  1       1        53.4  &lt; 0.001</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> treatmentchilled                 parame…    <span style="color: #BB0000;">NA</span>  1       1        -<span style="color: #BB0000;">1.26</span> 0.21249</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> typeMississippi                  parame…    <span style="color: #BB0000;">NA</span>  1       1        -<span style="color: #BB0000;">3.35</span> 0.00148</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> treatmentchilled:typeMississippi parame…    <span style="color: #BB0000;">NA</span>  1       1        -<span style="color: #BB0000;">2.73</span> 0.00855</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> s(conc):ttnonchilled:Quebec      TPRS        5  4.72    4.96     69.7  &lt; 0.001</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> s(conc):ttchilled:Quebec         TPRS        5  4.71    4.95     86.5  &lt; 0.001</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> s(conc):ttnonchilled:Mississippi TPRS        5  4.62    4.92     74.1  &lt; 0.001</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> s(conc):ttchilled:Mississippi    TPRS        5  4.39    4.81     25.3  &lt; 0.001</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> s(plant)                         Random…    12  7.40    8        12.8  &lt; 0.001</span></span></code></pre></div>
 <p>We can look at the fitted smooths using <code><a href="../reference/draw.html">draw()</a></code></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m_plant</span>, residuals <span class="op">=</span> <span class="cn">TRUE</span>, scales <span class="op">=</span> <span class="st">"fixed"</span><span class="op">)</span></span></code></pre></div>
