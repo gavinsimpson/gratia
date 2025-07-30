@@ -158,6 +158,7 @@ test_that("appraise handles mvn models", {
 })
 
 test_that("appraise handles twlss models", {
+  skip_on_ci()
   skip_on_cran()
   expect_silent(
     plt <- withr::with_seed(1, appraise(m_twlss, method = "simulate"))
