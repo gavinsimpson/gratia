@@ -30,7 +30,7 @@
 #'
 #' @export
 #' @rdname overview
-#' @importFrom dplyr select
+#' @importFrom dplyr select bind_rows
 #' @importFrom tibble rownames_to_column as_tibble add_column
 #' @importFrom tidyselect matches
 #' @importFrom rlang set_names .data
@@ -92,7 +92,8 @@
   out <- set_names(out, nms)
 
   if (stars) {
-    sstars <- symnum(out$p.value,
+    sstars <- symnum(
+      out$p.value,
       corr = FALSE, na = FALSE,
       cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1),
       symbols = c("***", "**", "*", ".", " ")
