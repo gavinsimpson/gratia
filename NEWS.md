@@ -106,6 +106,9 @@
   would fail because it assumes all `family()$getTheta` functions had an
   argument `trans` to transform the theta values to the correct scale.
 
+* `overview()` was not showing the model intercept, and was displaying slightly
+  different results from those shown by `summary.gam()`.
+
 # gratia 0.10.0
 
 ## New features
