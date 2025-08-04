@@ -110,15 +110,74 @@
   mvn_method <- match.arg(mvn_method)
   fam_type <- family_type(model)
 
+  if (!is.null(newdata)) {
+    newdata_deprecated()
+  }
+
+  if (!is.null(ncores)) {
+    message("Argument `ncores` is deprecated. Use `n_cores` instead.")
+    n_cores <- ncores
+  }
+
+  do_posterior_samples(
+    model = model, n = n, data = data, seed = seed, method = method,
+    n_cores = n_cores, burnin = burnin, thin = thin, t_df = t_df,
+    rw_scale = rw_scale, freq = freq, unconditional = unconditional,
+    weights = weights, draws = draws, mvn_method = mvn_method, ...
+  )
+}
+
+#' @export
+#' @rdname posterior_samples
+`posterior_samples.scam` <- function(
+  model, n = 1, data = NULL, seed = NULL,
+  method = c("gaussian", "mh", "inla", "user"),
+  n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
+  freq = FALSE, unconditional = FALSE,
+  weights = NULL, draws = NULL, mvn_method = c("mvnfast", "mgcv"), ...
+) {
+  do_posterior_samples(
+    model = model, n = n, data = data, seed = seed, method = method,
+    n_cores = n_cores, burnin = burnin, thin = thin, t_df = t_df,
+    rw_scale = rw_scale, freq = freq, unconditional = unconditional,
+    weights = weights, draws = draws, mvn_method = mvn_method, ...
+  )
+}
+
+`do_posterior_samples` <- function(
+  model,
+  n = 1,
+  data = NULL,
+  seed = NULL,
+  method = c("gaussian", "mh", "inla", "user"),
+  n_cores = 1,
+  burnin = 1000,
+  thin = 1,
+  t_df = 40,
+  rw_scale = 0.25,
+  freq = FALSE,
+  unconditional = FALSE,
+  weights = NULL,
+  draws = NULL,
+  mvn_method = c("mvnfast", "mgcv"),
+  ...
+) {
+  # generate new response data from the model including the uncertainty in
+  # the model.
+
+  method <- match.arg(method)
+  mvn_method <- match.arg(mvn_method)
+  fam_type <- family_type(model)
+
   # start getting draws of expectation
   # - some families need linear predictor values/matrix, e.g., multinom(),
   #   but we'll handle that later by not using the family()$rd
-  sim_eta <- fitted_samples(model,
-    n = n, data = data, seed = seed,
-    scale = "response", method = method, n_cores = n_cores, burnin = burnin,
-    thin = thin, t_df = t_df, rw_scale = rw_scale, freq = freq,
-    unconditional = unconditional, weights = weights, newdata = newdata,
-    ncores = ncores, draws = draws, mvn_method = mvn_method, ...
+  sim_eta <- fitted_samples(
+    model, n = n, data = data, seed = seed, scale = "response",
+    method = method, n_cores = n_cores, burnin = burnin, thin = thin,
+    t_df = t_df, rw_scale = rw_scale, freq = freq,
+    unconditional = unconditional, weights = weights,
+    draws = draws, mvn_method = mvn_method, ...
   )
 
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
@@ -140,10 +199,6 @@
   scale_p <- model[["sig2"]]
   if (is.null(scale)) {
     scale_p <- summary(model)[["dispersion"]]
-  }
-
-  if (!is.null(newdata)) {
-    newdata_deprecated()
   }
 
   if (is.null(data)) {
@@ -277,11 +332,6 @@
 }
 
 #' @export
-`fitted_samples.scam` <- function(model, ...) {
-  fitted_samples.gam(model, ...)
-}
-
-#' @export
 #'
 #' @rdname fitted_samples
 #'
@@ -314,13 +364,70 @@
 #' options(op)
 #' }
 `fitted_samples.gam` <- function(
-    model, n = 1, data = newdata, seed = NULL,
-    scale = c("response", "linear_predictor"),
-    method = c("gaussian", "mh", "inla", "user"),
-    n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
-    freq = FALSE, unconditional = FALSE, draws = NULL,
-    mvn_method = c("mvnfast", "mgcv"),
-    ..., newdata = NULL, ncores = NULL) {
+  model, n = 1, data = newdata, seed = NULL,
+  scale = c("response", "linear_predictor"),
+  method = c("gaussian", "mh", "inla", "user"),
+  n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
+  freq = FALSE, unconditional = FALSE, draws = NULL,
+  mvn_method = c("mvnfast", "mgcv"),
+  ..., newdata = NULL, ncores = NULL
+) {
+
+  if (!is.null(newdata)) {
+    newdata_deprecated()
+  }
+
+  if (!is.null(ncores)) {
+    message("Argument `ncores` is deprecated. Use `n_cores` instead.")
+    n_cores <- ncores
+  }
+
+  do_fitted_samples(
+    model = model, n = n, data = data, seed = seed, scale = scale,
+    method = method, n_cores = n_cores, burnin = burnin, thin = thin,
+    t_df = t_df, rw_scale = rw_scale, freq = freq,
+    unconditional = unconditional, draws = draws, mvn_method = mvn_method,
+    ...
+  )
+}
+
+#' @export
+#' @rdname fitted_samples
+`fitted_samples.scam` <- function(
+  model, n = 1, data = NULL, seed = NULL,
+  scale = c("response", "linear_predictor"),
+  method = c("gaussian", "mh", "inla", "user"),
+  n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
+  freq = FALSE, unconditional = FALSE, draws = NULL,
+  mvn_method = c("mvnfast", "mgcv"), ...
+) {
+  do_fitted_samples(
+    model = model, n = n, data = data, seed = seed, scale = scale,
+    method = method, n_cores = n_cores, burnin = burnin, thin = thin,
+    t_df = t_df, rw_scale = rw_scale, freq = freq,
+    unconditional = unconditional, draws = draws, mvn_method = mvn_method,
+    ...
+  )
+}
+
+`do_fitted_samples` <- function(
+  model,
+  n = 1,
+  data = NULL,
+  seed = NULL,
+  scale = c("response", "linear_predictor"),
+  method = c("gaussian", "mh", "inla", "user"),
+  n_cores = 1,
+  burnin = 1000,
+  thin = 1,
+  t_df = 40,
+  rw_scale = 0.25,
+  freq = FALSE,
+  unconditional = FALSE,
+  draws = NULL,
+  mvn_method = c("mvnfast", "mgcv"),
+  ...
+) {
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     runif(1)
   }
@@ -331,15 +438,6 @@
     set.seed(seed)
     RNGstate <- structure(seed, kind = as.list(RNGkind()))
     on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-  }
-
-  if (!is.null(newdata)) {
-    newdata_deprecated()
-  }
-
-  if (!is.null(ncores)) {
-    message("Argument `ncores` is deprecated. Use `n_cores` instead.")
-    n_cores <- ncores
   }
 
   if (is.null(data)) {
@@ -428,31 +526,6 @@
         .parameter = rep("location", nrow(data))
       )
   }
-  # sims <- Xp[, lss_loc, drop = FALSE] %*% t(betas[, lss_loc, drop = FALSE])
-  # # handle the offset if present; it is an attribute on the Xp matrix
-  # # it is a list - with 1 component if a normal model and `l` components if it
-  # # is a model with `l` linear predictors.
-  # m_offset <- attr(Xp, "model.offset")
-  # if (is.list(m_offset)) {
-  #   m_offset <- m_offset[[1L]] # only for location ?
-  # }
-  # if (!is.null(m_offset)) {
-  #   sims <- sims + m_offset
-  # }
-
-  # if (isTRUE(identical(scale, "response"))) {
-  #   ilink <- inv_link(model, parameter = "location")
-  #   sims <- ilink(sims)
-  # }
-  #
-  # colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
-  # sims <- as_tibble(sims)
-  # names(sims) <- as.character(seq_len(ncol(sims)))
-  # sims <- sims |>
-  #  add_column(
-  #    .row = seq_len(nrow(sims)),
-  #    .parameter = rep("location", nrow(sims))
-  #  )
   sims <- sims |>
     pivot_longer(
       cols = !any_of(c(".row", ".parameter")),
@@ -462,10 +535,6 @@
       names_transform = list(".draw" = as.integer)
     ) |>
     relocate(c(".row", ".draw", ".parameter"), .before = 1L)
-  # sims <- gather(sims, key = ".draw", value = ".fitted",
-  # -.data$.row, -.data$.parameter) |>
-  #   mutate(.draw = as.integer(.data$.draw)) |>
-  #   relocate(c(".row", ".draw", ".parameter"), .before = 1L)
   attr(sims, "seed") <- RNGstate
   ## add classes
   class(sims) <- c("fitted_samples", class(sims))
@@ -582,6 +651,7 @@
 }
 
 #' @export
+#' @rdname predicted_samples
 `predicted_samples.default` <- function(model, ...) {
   stop("Don't know how to sample from the posterior of <",
     class(model)[[1L]], ">",
@@ -593,15 +663,50 @@
 #' @rdname predicted_samples
 #' @importFrom tibble as_data_frame add_column
 #' @importFrom tidyr gather
-`predicted_samples.gam` <- function(model, n = 1, data = newdata, seed = NULL,
-                                    weights = NULL, ..., newdata = NULL) {
+`predicted_samples.gam` <- function(
+  model,
+  n = 1,
+  data = newdata,
+  seed = NULL,
+  weights = NULL,
+  ...,
+  newdata = NULL
+) {
+  
   if (!is.null(newdata)) {
     newdata_deprecated()
   }
 
-  sims <- simulate(model,
-    nsim = n, seed = seed, data = data,
-    weights = weights, ...
+  do_predicted_samples(
+    model = model, n = n, data = data, seed = seed, weights = weights, ...
+  )
+}
+
+#' @export
+#' @rdname predicted_samples
+`predicted_samples.scam` <- function(
+  model,
+  n = 1,
+  data = NULL,
+  seed = NULL,
+  weights = NULL,
+  ...
+) {
+  do_predicted_samples(
+    model = model, n = n, data = data, seed = seed, weights = weights, ...
+  )
+}
+
+`do_predicted_samples` <- function(
+  model,
+  n = 1,
+  data = NULL,
+  seed = NULL,
+  weights = NULL,
+  ...
+) {
+  sims <- simulate(
+    model, nsim = n, seed = seed, data = data, weights = weights, ...
   )
   RNGstate <- attr(sims, "seed")
   class(sims) <- class(sims)[-1] # remove the "simulate_gratia" class
@@ -1174,7 +1279,8 @@
   envir = environment(formula(object)),
   draws = NULL,
   mvn_method = c("mvnfast", "mgcv"),
-  ...) {
+  ...
+) {
   # deal with deprecation of level
   if (lifecycle::is_present(level)) {
     lifecycle::deprecate_warn(
@@ -1183,6 +1289,56 @@
       details = "`level` was never supported and will be removed in the next release."
     )
   }
+  do_derivative_samples(
+    object = object, focal = focal, data = data, order = order, type = type,
+    scale = scale, method = method, n = n, eps = eps, n_sim = n_sim,
+    seed = seed, envir = envir, draws = draws, mnv_method = mvn_method
+  )
+}
+
+#' @export
+#' @rdname derivative_samples
+`derivative_samples.scam` <- function(
+  object,
+  focal = NULL,
+  data = NULL,
+  order = 1L,
+  type = c("forward", "backward", "central"),
+  scale = c("response", "linear_predictor"),
+  method = c("gaussian", "mh", "inla", "user"),
+  n = 100,
+  eps = 1e-7,
+  n_sim = 10000,
+  seed = NULL,
+  envir = environment(formula(object)),
+  draws = NULL,
+  mvn_method = c("mvnfast", "mgcv"),
+  ...
+) {
+  do_derivative_samples(
+    object = object, focal = focal, data = data, order = order, type = type,
+    scale = scale, method = method, n = n, eps = eps, n_sim = n_sim,
+    seed = seed, envir = envir, draws = draws, mnv_method = mvn_method
+  )
+}
+
+`do_derivative_samples` <- function(
+  object,
+  focal = NULL,
+  data = NULL,
+  order = 1L,
+  type = c("forward", "backward", "central"),
+  scale = c("response", "linear_predictor"),
+  method = c("gaussian", "mh", "inla", "user"),
+  n = 100,
+  eps = 1e-7,
+  n_sim = 10000,
+  seed = NULL,
+  envir = environment(formula(object)),
+  draws = NULL,
+  mvn_method = c("mvnfast", "mgcv"),
+  ...
+) {
   ## handle type
   type <- match.arg(type)
   ## handle method

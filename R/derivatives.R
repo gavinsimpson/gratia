@@ -1143,18 +1143,75 @@
 #' options(op)
 #' }
 `response_derivatives.gam` <- function(
-    object,
-    focal = NULL,
-    data = NULL,
-    order = 1L,
-    type = c("forward", "backward", "central"),
-    scale = c("response", "linear_predictor"),
-    method = c("gaussian", "mh", "inla", "user"),
-    n = 100, eps = 1e-7,
-    n_sim = 10000, level = 0.95,
-    seed = NULL,
-    mvn_method = c("mvnfast", "mgcv"),
-    ...) {
+  object,
+  focal = NULL,
+  data = NULL,
+  order = 1L,
+  type = c("forward", "backward", "central"),
+  scale = c("response", "linear_predictor"),
+  method = c("gaussian", "mh", "inla", "user"),
+  n = 100, eps = 1e-7,
+  n_sim = 10000, level = 0.95,
+  seed = NULL,
+  mvn_method = c("mvnfast", "mgcv"),
+  ...
+) {
+
+  do_response_derivatives(
+    object = object,
+    focal = focal,
+    data = data,
+    order = order,
+    type = type,
+    scale = scale,
+    method = method,
+    n = n,
+    eps = eps,
+    n_sim = n_sim,
+    level = level,
+    seed = seed,
+    mvn_method = mvn_method,
+    ...
+  )
+}
+
+#' @export
+#' @rdname response_derivatives
+`response_derivatives.scam` <- function(
+  object,
+  focal = NULL,
+  data = NULL,
+  order = 1L,
+  type = c("forward", "backward", "central"),
+  scale = c("response", "linear_predictor"),
+  method = c("gaussian", "mh", "inla", "user"),
+  n = 100, eps = 1e-7,
+  n_sim = 10000, level = 0.95,
+  seed = NULL,
+  mvn_method = c("mvnfast", "mgcv"),
+  ...
+) {
+  do_response_derivatives(
+    object = object, focal = focal, data = data, order = order, type = type,
+    scale = scale, method = method, n = n, eps = eps, n_sim = n_sim,
+    level = level, seed = seed, mvn_method = mvn_method, ...
+  )
+}
+
+`do_response_derivatives`  <- function(
+  object,
+  focal = NULL,
+  data = NULL,
+  order = 1L,
+  type = c("forward", "backward", "central"),
+  scale = c("response", "linear_predictor"),
+  method = c("gaussian", "mh", "inla", "user"),
+  n = 100, eps = 1e-7,
+  n_sim = 10000, level = 0.95,
+  seed = NULL,
+  mvn_method = c("mvnfast", "mgcv"),
+  ...
+) {
   method <- match.arg(method)
   type <- match.arg(type)
   mvn_method <- match.arg(mvn_method)
