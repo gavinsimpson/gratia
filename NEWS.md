@@ -67,6 +67,10 @@
   and `multinom()`. The non-working of `fitted-values()` for `ziP()` models was
   reported in #341 by @rroyaute
 
+* `posterior_samples()`, `fitted_samples()`, `predicted_samples()`,
+  `derivatives_samples()`, and `response_derivatives()` now all work with
+  models fitted by `scam::scam()`.
+
 ## Bug fixes
 
 * `conditional_values()` would fail if a variable it was conditioning was also
