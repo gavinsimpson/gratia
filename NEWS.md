@@ -104,9 +104,10 @@
 * `link()` and `inv_link()` now work correctly for models fitted with the
   `ziP()` family. #341 Reported by @rroyaute
 
-* `basis.scam` was incorrectly trying to identify the smooths named in `select`.
+* `basis.scam()` was incorrectly trying to identify the smooths named in 
+  `select`.
 
-* `basis.scam` would fail if the SCAM contained any non-constrained (i.e. 
+* `basis.scam()` would fail if the SCAM contained any non-constrained (i.e. 
   ordinary) smooths.
 
 * `overview()` was displaying more significant digits in the p values than it
