@@ -3,6 +3,7 @@
 \name{posterior_samples}
 \alias{posterior_samples}
 \alias{posterior_samples.gam}
+\alias{posterior_samples.scam}
 \title{Draw samples from the posterior distribution of an estimated model}
 \usage{
 posterior_samples(model, ...)
@@ -26,6 +27,25 @@ posterior_samples(model, ...)
   ...,
   newdata = NULL,
   ncores = NULL
+)
+
+\method{posterior_samples}{scam}(
+  model,
+  n = 1,
+  data = NULL,
+  seed = NULL,
+  method = c("gaussian", "mh", "inla", "user"),
+  n_cores = 1,
+  burnin = 1000,
+  thin = 1,
+  t_df = 40,
+  rw_scale = 0.25,
+  freq = FALSE,
+  unconditional = FALSE,
+  weights = NULL,
+  draws = NULL,
+  mvn_method = c("mvnfast", "mgcv"),
+  ...
 )
 }
 \arguments{

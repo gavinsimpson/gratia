@@ -3,6 +3,7 @@
 \name{fitted_samples}
 \alias{fitted_samples}
 \alias{fitted_samples.gam}
+\alias{fitted_samples.scam}
 \title{Draw fitted values from the posterior distribution}
 \usage{
 fitted_samples(model, ...)
@@ -26,6 +27,25 @@ fitted_samples(model, ...)
   ...,
   newdata = NULL,
   ncores = NULL
+)
+
+\method{fitted_samples}{scam}(
+  model,
+  n = 1,
+  data = NULL,
+  seed = NULL,
+  scale = c("response", "linear_predictor"),
+  method = c("gaussian", "mh", "inla", "user"),
+  n_cores = 1,
+  burnin = 1000,
+  thin = 1,
+  t_df = 40,
+  rw_scale = 0.25,
+  freq = FALSE,
+  unconditional = FALSE,
+  draws = NULL,
+  mvn_method = c("mvnfast", "mgcv"),
+  ...
 )
 }
 \arguments{

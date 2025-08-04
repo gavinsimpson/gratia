@@ -5,6 +5,7 @@
 \alias{response_derivatives.default}
 \alias{response_derivatives.gamm}
 \alias{response_derivatives.gam}
+\alias{response_derivatives.scam}
 \title{Derivatives on the response scale from an estimated GAM}
 \usage{
 response_derivatives(object, ...)
@@ -14,6 +15,23 @@ response_derivatives(object, ...)
 \method{response_derivatives}{gamm}(object, ...)
 
 \method{response_derivatives}{gam}(
+  object,
+  focal = NULL,
+  data = NULL,
+  order = 1L,
+  type = c("forward", "backward", "central"),
+  scale = c("response", "linear_predictor"),
+  method = c("gaussian", "mh", "inla", "user"),
+  n = 100,
+  eps = 1e-07,
+  n_sim = 10000,
+  level = 0.95,
+  seed = NULL,
+  mvn_method = c("mvnfast", "mgcv"),
+  ...
+)
+
+\method{response_derivatives}{scam}(
   object,
   focal = NULL,
   data = NULL,

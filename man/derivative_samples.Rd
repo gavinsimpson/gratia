@@ -5,6 +5,7 @@
 \alias{derivative_samples.default}
 \alias{derivative_samples.gamm}
 \alias{derivative_samples.gam}
+\alias{derivative_samples.scam}
 \title{Posterior expectations of derivatives from an estimated model}
 \usage{
 derivative_samples(object, ...)
@@ -25,6 +26,24 @@ derivative_samples(object, ...)
   eps = 1e-07,
   n_sim = 10000,
   level = lifecycle::deprecated(),
+  seed = NULL,
+  envir = environment(formula(object)),
+  draws = NULL,
+  mvn_method = c("mvnfast", "mgcv"),
+  ...
+)
+
+\method{derivative_samples}{scam}(
+  object,
+  focal = NULL,
+  data = NULL,
+  order = 1L,
+  type = c("forward", "backward", "central"),
+  scale = c("response", "linear_predictor"),
+  method = c("gaussian", "mh", "inla", "user"),
+  n = 100,
+  eps = 1e-07,
+  n_sim = 10000,
   seed = NULL,
   envir = environment(formula(object)),
   draws = NULL,

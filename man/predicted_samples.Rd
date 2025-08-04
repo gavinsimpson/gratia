@@ -2,10 +2,14 @@
 % Please edit documentation in R/posterior-samples.R
 \name{predicted_samples}
 \alias{predicted_samples}
+\alias{predicted_samples.default}
 \alias{predicted_samples.gam}
+\alias{predicted_samples.scam}
 \title{Draw new response values from the conditional distribution of the response}
 \usage{
 predicted_samples(model, ...)
+
+\method{predicted_samples}{default}(model, ...)
 
 \method{predicted_samples}{gam}(
   model,
@@ -16,6 +20,8 @@ predicted_samples(model, ...)
   ...,
   newdata = NULL
 )
+
+\method{predicted_samples}{scam}(model, n = 1, data = NULL, seed = NULL, weights = NULL, ...)
 }
 \arguments{
 \item{model}{a fitted model of the supported types}
