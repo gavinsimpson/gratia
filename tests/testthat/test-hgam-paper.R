@@ -1,18 +1,5 @@
 ## Tests for models in the HGAM paper
 
-## load packages
-# library("testthat")
-# library("gratia")
-# library("mgcv")
-# library("ggplot2")
-# library("datasets")
-
-## Need a local wrapper to allow conditional use of vdiffr
-# `expect_doppelganger` <- function(title, fig, ...) {
-#  testthat::skip_if_not_installed("vdiffr")
-#  vdiffr::expect_doppelganger(title, fig, ...)
-# }
-
 ## data load and prep
 data(CO2, package = "datasets")
 CO2 <- transform(CO2, Plant_uo = factor(Plant, ordered = FALSE))
@@ -21,7 +8,7 @@ data(zooplankton, package = "gratia")
 zooplankton <- transform(zooplankton, year_f = factor(year))
 
 ## use several threads to speed up some fits
-ctrl <- gam.control(nthreads = 3)
+ctrl <- gam.control(nthreads = 8)
 
 ## the first training and testing data set will be used to compare dynamics of
 ## plankton communities in Lake Mendota
@@ -139,20 +126,22 @@ test_that("draw() can plot bird_move model 2", {
   skip_on_cran()
   skip_on_ci()
   # expect_warning(
-    bird_mod2 <- bam(
-      count ~ te(week, latitude,
-        bs = c("cc", "tp"),
-        k = c(10, 10), m = 2
-      ) +
-        t2(week, latitude, species,
-          bs = c("cc", "tp", "re"),
-          k = c(10, 10, 6), m = 2, full = TRUE
-        ),
-      data = bird_move, method = "fREML", family = poisson(),
-      knots = list(week = c(0, 52)),
-      control = ctrl, discrete = FALSE
-    )#,
-    #"fitted rates numerically 0 occurred"
+  # `bam()` has real problems with this model, use gam() instead with loads
+  # of threads, but it doesn't need as many as 8 we use here
+  bird_mod2 <- gam(
+    count ~ te(
+      week, latitude, bs = c("cc", "tp"), k = c(10, 10), m = 2
+    ) +
+    t2(
+      week, latitude, species,
+      bs = c("cc", "tp", "re"),
+      k = c(10, 10, 6), m = 2, full = TRUE
+    ),
+    data = bird_move, method = "REML", family = poisson(),
+    knots = list(week = c(0, 52)),
+    control = ctrl,
+  )#,
+  #"fitted rates numerically 0 occurred"
   #)
   plt <- draw(bird_mod2, rug = FALSE, n = 50)
   expect_doppelganger("hgam-paper-bird-move-model-2", plt)
