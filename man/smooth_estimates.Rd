@@ -92,6 +92,13 @@ smooth_estimates(m1)
 
 ## or selected smooths
 smooth_estimates(m1, select = c("s(x0)", "s(x1)"))
+
+# parallel processing of smooths
+if (requireNamespace("mirai") && requireNamespace("carrier")) {
+  library("mirai")
+  daemons(2)                          # only low for CRAN requirements
+  smooth_estimates(m1)
+}
 \dontshow{
 options(op)
 }
