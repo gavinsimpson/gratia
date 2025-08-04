@@ -764,6 +764,7 @@ detaching ‘package:mgcv’
 > ### Title: Posterior expectations of derivatives from an estimated model
 > ### Aliases: derivative_samples derivative_samples.default
 > ###   derivative_samples.gamm derivative_samples.gam
+> ###   derivative_samples.scam
 > 
 > ### ** Examples
 > 
@@ -1426,7 +1427,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: fitted_samples
 > ### Title: Draw fitted values from the posterior distribution
-> ### Aliases: fitted_samples fitted_samples.gam
+> ### Aliases: fitted_samples fitted_samples.gam fitted_samples.scam
 > 
 > ### ** Examples
 > 
@@ -1679,11 +1680,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x12315c818>
+<environment: 0x13f78d3f8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x12315c818>
+<environment: 0x13f78d3f8>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2169,7 +2170,8 @@ detaching ‘package:mgcv’
 > ### Name: predicted_samples
 > ### Title: Draw new response values from the conditional distribution of
 > ###   the response
-> ### Aliases: predicted_samples predicted_samples.gam
+> ### Aliases: predicted_samples predicted_samples.default
+> ###   predicted_samples.gam predicted_samples.scam
 > 
 > ### ** Examples
 > 
@@ -2357,6 +2359,7 @@ Levels: a b c d e
 > ### Title: Derivatives on the response scale from an estimated GAM
 > ### Aliases: response_derivatives response_derivatives.default
 > ###   response_derivatives.gamm response_derivatives.gam
+> ###   response_derivatives.scam
 > 
 > ### ** Examples
 > 
@@ -2889,7 +2892,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  11.4 0.443 12.705 0.001 0.002 
+Time elapsed:  11.063 0.448 12.424 0.002 0.003 
 > grDevices::dev.off()
 null device 
           1 
