@@ -1,5 +1,5 @@
 
-R version 4.5.0 (2025-04-11) -- "How About a Twenty-Six"
+R version 4.5.1 (2025-06-13) -- "Great Square Root"
 Copyright (C) 2025 The R Foundation for Statistical Computing
 Platform: aarch64-apple-darwin20
 
@@ -336,7 +336,8 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 > 
 > ### Name: basis
 > ### Title: Basis expansions for smooths
-> ### Aliases: basis basis.gam basis.scam basis.gamm basis.list basis.default
+> ### Aliases: basis basis.gam basis.scam basis.gamm basis.gamm4
+> ###   basis.default
 > 
 > ### ** Examples
 > 
@@ -1678,11 +1679,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x11fd21358>
+<environment: 0x12315c818>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x11fd21358>
+<environment: 0x12315c818>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1891,7 +1892,7 @@ detaching ‘package:mgcv’
 +   s(x3, bs = "cr"), family = nb, data = df, method = "REML")
 > ## IGNORE_RDIFF_BEGIN
 > nb_theta(m)
-[1] 239342.9
+[1] 239386.4
 > ## IGNORE_RDIFF_END
 > 
 > 
@@ -1922,14 +1923,15 @@ detaching ‘package:mgcv’
 + )
 > overview(m)
 
-Generalized Additive Model with 4 terms
+Generalized Additive Model with 5 terms
 
-  term  type              k   edf statistic p.value
-  <chr> <chr>         <dbl> <dbl>     <dbl> <chr>  
-1 x3    parametric       NA  1         4.28 0.03926
-2 s(x0) TPRS              9  3.02      6.25 < 0.001
-3 s(x1) B spline          9  2.81     71.0  < 0.001
-4 s(x2) TPRS (shrink)     9  7.91     83.8  < 0.001
+  term      type              k   edf ref.edf statistic p.value
+  <chr>     <chr>         <dbl> <dbl>   <dbl>     <dbl> <chr>  
+1 Intercept parametric       NA  1       1        41.2  <0.001 
+2 x3        parametric       NA  1       1        -2.07 0.0393 
+3 s(x0)     TPRS              9  3.02    3.76      6.25 <0.001 
+4 s(x1)     B spline          9  2.81    3.47     71.0  <0.001 
+5 s(x2)     TPRS (shrink)     9  7.91    9        83.8  <0.001 
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -2653,6 +2655,28 @@ detaching ‘package:mgcv’
  9 s(x0)   TPRS  <NA>  -0.636220 0.202303 0.0871626     NA
 10 s(x0)   TPRS  <NA>  -0.594641 0.194685 0.0971693     NA
 # i 190 more rows
+> 
+> # parallel processing of smooths
+> if (requireNamespace("mirai") && requireNamespace("carrier")) {
++   library("mirai")
++   daemons(2)                          # only low for CRAN requirements
++   smooth_estimates(m1)
++ }
+Loading required namespace: carrier
+# A tibble: 400 x 9
+   .smooth .type .by   .estimate      .se         x0    x1    x2    x3
+   <chr>   <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl> <dbl> <dbl>
+ 1 s(x0)   TPRS  <NA>  -0.966542 0.316118 0.00710904    NA    NA    NA
+ 2 s(x0)   TPRS  <NA>  -0.925391 0.297170 0.0171157     NA    NA    NA
+ 3 s(x0)   TPRS  <NA>  -0.884233 0.279256 0.0271224     NA    NA    NA
+ 4 s(x0)   TPRS  <NA>  -0.843050 0.262594 0.0371291     NA    NA    NA
+ 5 s(x0)   TPRS  <NA>  -0.801824 0.247376 0.0471358     NA    NA    NA
+ 6 s(x0)   TPRS  <NA>  -0.760536 0.233728 0.0571425     NA    NA    NA
+ 7 s(x0)   TPRS  <NA>  -0.719175 0.221701 0.0671492     NA    NA    NA
+ 8 s(x0)   TPRS  <NA>  -0.677736 0.211261 0.0771559     NA    NA    NA
+ 9 s(x0)   TPRS  <NA>  -0.636220 0.202303 0.0871626     NA    NA    NA
+10 s(x0)   TPRS  <NA>  -0.594641 0.194685 0.0971693     NA    NA    NA
+# i 390 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -2661,7 +2685,7 @@ detaching ‘package:mgcv’
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’
+detaching ‘package:mirai’, ‘package:mgcv’
 
 > nameEx("smooth_label")
 > ### * smooth_label
@@ -2865,7 +2889,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  14.736 0.403 15.263 0 0 
+Time elapsed:  11.4 0.443 12.705 0.001 0.002 
 > grDevices::dev.off()
 null device 
           1 
