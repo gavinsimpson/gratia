@@ -136,7 +136,7 @@
 #'   scale_fill_distiller
 #' @importFrom patchwork wrap_plots
 #' @importFrom dplyr mutate rowwise ungroup left_join group_split summarise
-#' @importFrom purrr pluck map_lgl
+#' @importFrom purrr pluck map_lgl in_parallel map
 #' @importFrom rlang expr_label
 #' @importFrom utils packageVersion getFromNamespace
 #' @importFrom stringr str_split_fixed
@@ -289,7 +289,7 @@
     } else {
       sm_rng <- sm_eval |>
         rowwise() |>
-        summarise(rng = range(c(
+        summarise(rng = range(c( # FIXME: summarise() -> reframe()
           data$.estimate, data$.lower_ci,
           data$.upper_ci
         ))) |>
@@ -407,6 +407,39 @@
       caption = caption,
       ... # FIXME: temporary fix to allow captions to be suppressed-ish
     )
+
+    # Parallel version; currently not working for some weird ggproto thing
+    # that needs some debugging
+    # sm_plts2 <- map(
+    #   sm_l,
+    #   in_parallel(
+    #     \(sm, ...) draw_smooth_estimates(
+    #       sm,
+    #       constant = constant, fun = fun, contour = contour,
+    #       contour_col = contour_col, n_contour = n_contour,
+    #       ci_alpha = ci_alpha, ci_col = ci_col, smooth_col = smooth_col,
+    #       resid_col = resid_col, partial_match = partial_match,
+    #       discrete_colour = discrete_colour,
+    #       discrete_fill = discrete_fill,
+    #       continuous_colour = continuous_colour,
+    #       continuous_fill = continuous_fill,
+    #       angle = angle, ylim = ylims, crs = crs, default_crs = default_crs,
+    #       lims_method = lims_method, tensor_term_order = tensor_term_order,
+    #       caption = caption, ...
+    #     ),
+    #     constant = constant, fun = fun, contour = contour,
+    #     contour_col = contour_col, n_contour = n_contour,
+    #     ci_alpha = ci_alpha, ci_col = ci_col, smooth_col = smooth_col,
+    #     resid_col = resid_col, partial_match = partial_match,
+    #     discrete_colour = discrete_colour, discrete_fill = discrete_fill,
+    #     continuous_colour = continuous_colour,
+    #     continuous_fill = continuous_fill,
+    #     angle = angle, ylims = ylims, crs = crs, default_crs = default_crs,
+    #     lims_method = lims_method, tensor_term_order = tensor_term_order,
+    #     caption = caption,
+    #     draw_smooth_estimates = draw_smooth_estimates, ...
+    #   )
+    # )
   } # end stuff for smooths...
 
   # Are we plotting parametric effects too?

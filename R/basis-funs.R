@@ -1,8 +1,8 @@
 #' Basis expansions for smooths
 #'
-#' Creates a basis expansion from a definition of a smoother using the syntax
-#'   of *mgcv*'s smooths via [mgcv::s()]., [mgcv::te()], [mgcv::ti()], and
-#'   [mgcv::t2()], or from a fitted GAM(M).
+#' Basis expansions from a definition of a smoother using the syntax of *mgcv*'s
+#' smooths via [mgcv::s()]., [mgcv::te()], [mgcv::ti()], and [mgcv::t2()], or
+#' directly from a fitted GAM(M).
 #'
 #' @param object a smooth specification, the result of a call to one of
 #'   [mgcv::s()]., [mgcv::te()], [mgcv::ti()], or [mgcv::t2()], or a fitted
@@ -28,7 +28,7 @@
 #'   the smooth basis. See argument `absorb.cons` in [mgcv::smoothCon()].
 #' @param at a data frame containing values of the smooth covariate(s) at which
 #'   the basis should be evaluated.
-#' @param diagonalize logical; if `TRUE`, reparameterises the smooth such that
+#' @param diagonalize logical; if `TRUE`, reparameterizes the smooth such that
 #'   the associated penalty is an identity matrix. This has the effect of
 #'   turning the last diagonal elements of the penalty to zero, which highlights
 #'   the penalty null space.
@@ -66,19 +66,22 @@
 #'
 #' @rdname basis
 #'
-#' @importFrom purrr map
+#' @importFrom purrr map in_parallel
 #' @importFrom dplyr bind_rows
 #' @importFrom stats coef
-`basis.gam` <- function(object,
-    select = NULL,
-    term = deprecated(),
-    data = NULL,
-    n = 100,
-    n_2d = 50,
-    n_3d = 16,
-    n_4d = 4,
-    partial_match = FALSE,
-    ...) {
+#' @importFrom mirai daemons_set
+`basis.gam` <- function(
+  object,
+  select = NULL,
+  term = deprecated(),
+  data = NULL,
+  n = 100,
+  n_2d = 50,
+  n_3d = 16,
+  n_4d = 4,
+  partial_match = FALSE,
+  ...
+) {
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
     select <- term
@@ -94,10 +97,10 @@
       partial_match = partial_match,
       model_name = model_name
     )
-  smooth_ids <- which(select)
+  ids <- which(select)
 
   # extract the mgcv.smooth objects
-  smooths <- get_smooths_by_id(object, smooth_ids)
+  smooths <- get_smooths_by_id(object, ids)
 
   # if user data supplied, check for and remove response
   if (!is.null(data)) {
@@ -110,90 +113,115 @@
     data <- delete_response(object, data = data)
   }
 
-  bfuns <- map(seq_along(smooths), tidy_basis_wrapper,
-    ids = smooth_ids,
-    data = data, smooths = smooths, model = object, n = n,
-    n_3d = n_3d, n_4d = n_4d, offset = NULL
-  )
+  if (isFALSE(mirai::daemons_set())) {
+    bfuns <- map(
+      seq_along(smooths),
+      tidy_basis_wrapper,
+      ids = ids, data = data, smooths = smooths, model = object, n = n,
+      n_3d = n_3d, n_4d = n_4d, offset = NULL
+    )
+  } else {
+    # parallel version
+    bfuns <- map(
+      seq_along(smooths),
+      in_parallel(
+        \(i) {
+          tidy_basis_wrapper(
+            i, ids = ids, data = data, smooths = smooths, model = object, n = n,
+            n_3d = n_3d, n_4d = n_4d, offset = NULL
+          )
+        },
+        ids = ids, data = data, smooths = smooths, object = object,
+        n = n, n_3d = n_3d, n_4d = n_4d,
+        tidy_basis_wrapper = tidy_basis_wrapper
+      )
+    )
+  }
 
   bfuns <- bind_rows(bfuns)
 
   ## class this up
-  class(bfuns) <- append(class(bfuns), c("basis"),
-    after = 0L
-  )
+  class(bfuns) <- append(class(bfuns), c("basis"), after = 0L)
 
-  bfuns
+  bfuns # return
 }
 
 #' @export
 #' @rdname basis
-`basis.scam` <- function(object,
-    select = NULL,
-    term = deprecated(),
-    data = NULL,
-    n = 100, n_2d = 50, n_3d = 16, n_4d = 4,
-    partial_match = FALSE,
-    ...) {
+`basis.scam` <- function(
+  object,
+  select = NULL,
+  term = deprecated(),
+  data = NULL,
+  n = 100, n_2d = 50, n_3d = 16, n_4d = 4,
+  partial_match = FALSE,
+  ...
+) {
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
     select <- term
   }
-  model_name <- expr_label(substitute(object))
-  # if particular smooths selected
-  sms <- smooths(object) # vector of smooth labels - "s(x)"
+  # model_name <- expr_label(substitute(object))
+  # # if particular smooths selected
+  # sms <- smooths(object) # vector of smooth labels - "s(x)"
 
-  # select smooths
-  select <-
-    check_user_select_smooths(
-      smooths = sms, select = select,
-      partial_match = partial_match,
-      model_name = model_name
-    )
-  smooth_ids <- which(select)
+  # # select smooths
+  # select <-
+  #   check_user_select_smooths(
+  #     smooths = sms, select = select,
+  #     partial_match = partial_match,
+  #     model_name = model_name
+  #   )
+  # smooth_ids <- which(select)
 
-  # extract the mgcv.smooth objects
-  smooths <- get_smooths_by_id(object, smooth_ids)
+  # # extract the mgcv.smooth objects
+  # smooths <- get_smooths_by_id(object, smooth_ids)
 
-  # if user data supplied, check for and remove response
-  if (!is.null(data)) {
-    if (!is.data.frame(data)) {
-      stop("'data', if supplied, must be a numeric vector or data frame.",
-        call. = FALSE
-      )
-    }
-    check_all_vars(object, data = data, smooths = smooths)
-    data <- delete_response(object, data = data)
-  }
+  # # if user data supplied, check for and remove response
+  # if (!is.null(data)) {
+  #   if (!is.data.frame(data)) {
+  #     stop("'data', if supplied, must be a numeric vector or data frame.",
+  #       call. = FALSE
+  #     )
+  #   }
+  #   check_all_vars(object, data = data, smooths = smooths)
+  #   data <- delete_response(object, data = data)
+  # }
 
-  bfuns <- map(seq_along(smooths), tidy_basis_wrapper,
-    ids = smooth_ids,
-    data = data, smooths = smooths, model = object, n = n,
-    n_3d = n_3d, n_4d = n_4d, offset = NULL
+  # bfuns <- map(seq_along(smooths), tidy_basis_wrapper,
+  #   ids = smooth_ids,
+  #   data = data, smooths = smooths, model = object, n = n,
+  #   n_3d = n_3d, n_4d = n_4d, offset = NULL
+  # )
+
+  # bfuns <- bind_rows(bfuns)
+
+  # ## class this up
+  # class(bfuns) <- append(class(bfuns), c("basis"),
+  #   after = 0L
+  # )
+  bfuns <- basis.gam(
+    object, select = select, data = data, n = n,
+    n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, partial_match = partial_match,
+    ...
   )
-
-  bfuns <- bind_rows(bfuns)
-
-  ## class this up
-  class(bfuns) <- append(class(bfuns), c("basis"),
-    after = 0L
-  )
-
   bfuns
 }
 
 #' @export
 #' @rdname basis
-`basis.gamm` <- function(object,
-    select = NULL,
-    term = deprecated(),
-    data = NULL,
-    n = 100,
-    n_2d = 50,
-    n_3d = 16,
-    n_4d = 4,
-    partial_match = FALSE,
-    ...) {
+`basis.gamm` <- function(
+  object,
+  select = NULL,
+  term = deprecated(),
+  data = NULL,
+  n = 100,
+  n_2d = 50,
+  n_3d = 16,
+  n_4d = 4,
+  partial_match = FALSE,
+  ...
+) {
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
     select <- term
@@ -207,22 +235,21 @@
 
 #' @export
 #' @rdname basis
-`basis.list` <- function(object,
-    select = NULL,
-    term = deprecated(),
-    data = NULL,
-    n = 100,
-    n_2d = 50,
-    n_3d = 16,
-    n_4d = 4,
-    partial_match = FALSE,
-    ...) {
+`basis.gamm4` <- function(
+  object,
+  select = NULL,
+  term = deprecated(),
+  data = NULL,
+  n = 100,
+  n_2d = 50,
+  n_3d = 16,
+  n_4d = 4,
+  partial_match = FALSE,
+  ...
+) {
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
     select <- term
-  }
-  if (!is_gamm4(object)) {
-    stop("'object' is a list but doesn't appear to be a 'gamm4()' model.")
   }
   basis(object[["gam"]],
     select = select, data = data, n = n,
@@ -232,10 +259,10 @@
 }
 
 # wrapper for calling tidy_basis
-`tidy_basis_wrapper` <- function(i, smooths, ids, data = NULL, model,
-                                 n = 100, n_2d = NULL, n_3d = NULL,
-                                 n_4d = NULL,
-                                 offset = NULL) {
+`tidy_basis_wrapper` <- function(
+  i, smooths, ids, data = NULL, model, n = 100, n_2d = NULL, n_3d = NULL,
+  n_4d = NULL, offset = NULL
+) {
   # which coefs belong to this smooth
   take <- smooth_coef_indices(smooths[[i]])
   betas <- coef(model)[take]
@@ -251,12 +278,14 @@
   }
 
   if (is.null(data)) {
-    data <- smooth_data(model, ids[i],
+    data <- smooth_data(
+      model, ids[i],
       n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, offset = offset
     )
   }
 
-  tbl <- tidy_basis(smooths[[i]],
+  tbl <- gratia::tidy_basis(
+    smooths[[i]],
     at = data, coefs = betas,
     p_ident = p_ident
   )
@@ -270,8 +299,10 @@
 #' @importFrom stringr str_detect fixed
 #' @importFrom purrr map
 #' @importFrom dplyr bind_rows
-`basis.default` <- function(object, data, knots = NULL, constraints = FALSE,
-                            at = NULL, diagonalize = FALSE, ...) {
+`basis.default` <- function(
+  object, data, knots = NULL, constraints = FALSE, at = NULL,
+  diagonalize = FALSE, ...
+) {
   # class of object and check for ".smooth.spec"
   cls <- class(object)
   if (str_detect(cls, "smooth.spec", negate = TRUE)) {
@@ -350,8 +381,13 @@
 #' \dontshow{
 #' options(op)
 #' }
-`tidy_basis` <- function(smooth, data = NULL, at = NULL, coefs = NULL,
-                         p_ident = NULL) {
+`tidy_basis` <- function(
+  smooth,
+  data = NULL,
+  at = NULL,
+  coefs = NULL,
+  p_ident = NULL
+) {
   check_is_mgcv_smooth(smooth) # check `smooth` is of the correct type
   if (is_mgcv_smooth(smooth) && is.null(at)) {
     if (!is.null(data)) {
@@ -373,8 +409,8 @@
     tbl <- PredictMat(smooth, data = at)
     data <- at
     if (!is.null(coefs)) {
-      nc <- NCOL(tbl)
-      if (!is.null(p_ident)) {
+      # nc <- NCOL(tbl)
+      if (!is.null(p_ident) && any(p_ident)) {
         stopifnot(identical(sum(p_ident), length(coefs)))
         tbl <- tbl[, p_ident]
       }
@@ -419,9 +455,7 @@
   tbl <- add_column(tbl, .smooth = smooth_label(smooth), .before = 1L)
 
   ## Need a column for by smooths; will be NA for most smooths
-  by_var_vec <- rep(NA_character_, length = nrow(tbl))
   if (is_by_smooth(smooth)) {
-    by_var_vec <- rep(by_var, length = nrow(tbl))
     ## If we have a factor by we need to store the factor. Not needed
     ##   for other by variable smooths.
     if (is_by_fac) {

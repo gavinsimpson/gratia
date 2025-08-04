@@ -59,6 +59,13 @@
 #'
 #' ## or selected smooths
 #' smooth_estimates(m1, select = c("s(x0)", "s(x1)"))
+#'
+#' # parallel processing of smooths
+#' if (requireNamespace("mirai") && requireNamespace("carrier")) {
+#'   library("mirai")
+#'   daemons(2)                          # only low for CRAN requirements
+#'   smooth_estimates(m1)
+#' }
 #' \dontshow{
 #' options(op)
 #' }
@@ -72,6 +79,8 @@
 #' @importFrom tidyr unnest
 #' @importFrom rlang expr_label
 #' @importFrom lifecycle deprecated is_present
+#' @importFrom purrr in_parallel map
+#' @importFrom mirai daemons_set
 `smooth_estimates.gam` <- function(object,
     select = NULL,
     smooth = deprecated(),
@@ -129,16 +138,29 @@
   #     n_4d <- n
   # }
 
-  for (i in seq_along(sm_list)) {
-    sm_list[[i]] <- eval_smooth(smooths[[i]],
-      model = object,
-      n = n,
-      n_3d = n_3d,
-      n_4d = n_4d,
-      data = data,
+  # loop over selected smooths and evaluate them, now with parallel processing
+  if (isFALSE(mirai::daemons_set())) {
+    sm_list <- map(
+      smooths,
+      eval_smooth,
+      model = object, n = n, n_3d = n_3d, n_4d = n_4d, data = data,
       unconditional = unconditional,
-      overall_uncertainty = overall_uncertainty,
-      dist = dist
+      overall_uncertainty = overall_uncertainty, dist = dist,
+    )
+  } else {
+    sm_list <- map(
+      smooths,
+      in_parallel(
+        \(sm) eval_smooth(
+          sm, model = object, n = n, n_3d = n_3d, n_4d = n_4d,
+          data = data, unconditional = unconditional,
+          overall_uncertainty = overall_uncertainty, dist = dist
+        ),
+        object = object, n = n, n_3d = n_3d, n_4d = n_4d, data = data,
+        unconditional = unconditional,
+        overall_uncertainty = overall_uncertainty, dist = dist,
+        eval_smooth = gratia::eval_smooth
+      )
     )
   }
 
@@ -1249,7 +1271,8 @@
     return(NULL)
   }
 
-  plot_smooth(object,
+  plot_smooth(
+    object,
     variables = sm_vars,
     rug = rug_data,
     partial_residuals = p_residuals,
