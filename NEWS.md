@@ -2,6 +2,11 @@
 
 ## User visible changes
 
+* Experimental support for computing with parallel processes via the *purrr* 📦
+  in `smooth_estimates()` and `basis()`, though it is of limited use in the 
+  latter. Parallel processing will operate if a call to `mirai::daemons()` has
+  been issued in the current R session.
+
 * Rug plots in `draw.gam()` now only show the unique data values to avoid 
   needless overplotting. This behaviour is controlled via new argument
   `distinct_rug`. Setting this to `FALSE` will get the previous behaviour.
