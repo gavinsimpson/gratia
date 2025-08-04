@@ -71,6 +71,7 @@
 }
 
 #' @importFrom rlang .data
+#' @importFrom vctrs vec_slice
 `pairwise_concurvity` <- function(model, terms = everything(),
                                   type) {
   con <- concurvity(model, full = FALSE)
@@ -87,7 +88,7 @@
     as_tibble() |>
     add_column(.type = rep(type_nms, each = nc), .before = 1L)
   if (type != "all") {
-    con <- con |> filter(.data[[".type"]] == type)
+    con <- vec_slice(con, con[[".type"]] == type)
   }
   con <- con |>
     pivot_longer(-c(".type", ".term"),
@@ -99,14 +100,14 @@
 }
 
 #' @importFrom rlang .data
+#' @importFrom vctrs vec_slice
 `overall_concurvity` <- function(model, terms = everything(), type) {
   con <- concurvity(model, full = TRUE)
   con <- as.data.frame(con)
   con <- rownames_to_column(con, ".type")
   con <- as_tibble(con)
   if (type != "all") {
-    con <- con |>
-      filter(.data[[".type"]] == type)
+      con <- vec_slice(con, con[[".type"]] == type)
   }
   con <- con |>
     pivot_longer(-c(".type"),

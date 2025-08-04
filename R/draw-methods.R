@@ -637,6 +637,7 @@
 #' @importFrom purrr map
 #' @importFrom rlang .data
 #' @importFrom patchwork wrap_plots
+#' @importFrom vctrs vec_slice
 #'
 #' @examples
 #' load_mgcv()
@@ -693,13 +694,13 @@
     partial_match = partial_match
   )
   S <- S[select]
-  object <- filter(object, .data$.term %in% S)
+  object <- vec_slice(object, object[[".term"]] %in% S)
 
   ## can only plot 1d smooths - currently - prune S but how?
   ## FIXME
 
   do_plot_smooths <- function(i, object, ...) {
-    object <- filter(object, .data$.term == i)
+    object <- vec_slice(object, object[[".term"]] == i)
     draw_posterior_smooths(object, ...)
   }
 
@@ -733,6 +734,7 @@
   )
 }
 
+#' @importFrom vctrs vec_slice
 `draw_posterior_smooths` <- function(object, n_samples = NULL, seed = NULL,
                                      xlab = NULL, ylab = NULL,
                                      title = NULL, subtitle = NULL,
@@ -782,7 +784,7 @@
   if (n_samples < n_draws) {
     draws <- unique(object[[".draw"]])
     draws <- sample(draws, n_samples)
-    object <- filter(object, .data$.draw %in% draws)
+    object <- vec_slice(object, object[[".draw"]] %in% draws)
   }
 
   plt <- if (identical(n_xvars, 1L)) {

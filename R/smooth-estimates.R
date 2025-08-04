@@ -703,6 +703,7 @@
 #' @keywords internal
 #' @noRd
 #' @importFrom rlang .data
+#' @importFrom vctrs vec_slice
 `process_user_data_for_eval` <- function(
     data, model, n, n_3d, n_4d, id,
     var_order = NULL) {
@@ -725,7 +726,7 @@
     ## if this is a by variable, filter the by variable for the required
     ## level now
     if (is_factor_by_smooth(smooth)) {
-      data <- data |> filter(.data[[by_var]] == by_level(smooth))
+      data <- vec_slice(data, data[[by_var]] == by_level(smooth))
     }
   }
   data
@@ -2619,6 +2620,7 @@
 #'   geom_path scale_fill_distiller coord_fixed
 #' @importFrom grid unit
 #' @importFrom rlang .data
+#' @importFrom vctrs vec_slice
 #' @keywords internal
 #' @noRd
 `plot_smooth.soap_film` <- function(object,
@@ -2668,10 +2670,13 @@
     guide_limits <- range(object[[".se"]])
   }
 
-  plt <- ggplot(object |> filter(!.data[[".bndry"]]), aes(
-    x = .data[[variables[1]]],
-    y = .data[[variables[2]]]
-  )) +
+  plt <- ggplot(
+    vec_slice(object, !object[[".bndry"]]),
+    aes(
+      x = .data[[variables[1]]],
+      y = .data[[variables[2]]]
+    )
+  ) +
     geom_raster(mapping = aes(fill = .data[[plot_var]])) +
     coord_fixed(ratio = 1)
 
@@ -2757,9 +2762,13 @@
 
   ## add the boundary
   plt <- plt +
-    geom_path(data = object |> filter(.data[[".bndry"]]),
-      mapping = aes(x = .data[[variables[1]]],
-        y = .data[[variables[2]]]), linewidth = 2, colour = "black")
+    geom_path(
+      data = vec_slice(object, object[[".bndry"]]),
+      mapping = aes(
+        x = .data[[variables[1]]],
+        y = .data[[variables[2]]]),
+        linewidth = 2, colour = "black"
+      )
 
   plt
 }

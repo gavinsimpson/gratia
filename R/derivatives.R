@@ -70,6 +70,7 @@
 #' @importFrom dplyr filter relocate
 #' @importFrom tidyselect last_col
 #' @importFrom lifecycle deprecated is_present
+#' @importFrom vctrs vec_slice
 #'
 #' @rdname derivatives
 #'
@@ -195,7 +196,7 @@
       ## ...but we need to handle factor by
       sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1]]
       if (is_factor_by_smooth(sm)) {
-        newd <- filter(newd, data[[by_variable(sm)]] == by_level(sm))
+        newd <- vec_slice(newd, data[[by_variable(sm)]] == by_level(sm))
       }
     }
 
@@ -731,6 +732,7 @@
 #' @importFrom dplyr filter relocate
 #' @importFrom tidyselect last_col
 #' @importFrom lifecycle deprecated is_present
+#' @importFrom vctrs vec_slice
 #'
 #' @rdname partial_derivatives
 #'
@@ -927,7 +929,7 @@
       ## ...but we need to handle factor by
       sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1]]
       if (is_factor_by_smooth(sm)) {
-        newd <- filter(newd, data[[by_variable(sm)]] == by_level(sm))
+        newd <- vec_slice(newd, data[[by_variable(sm)]] == by_level(sm))
       }
       # and we need to identify which variable is the focal one
       n_unique <- vapply(

@@ -123,6 +123,7 @@
 #' @importFrom dplyr select bind_cols filter distinct
 #' @importFrom tidyselect all_of
 #' @importFrom tibble as_tibble
+#' @importFrom vctrs vec_slice
 #' @noRd
 #' @keywords internal
 `get_obs_data_for_smooth` <- function(
@@ -159,9 +160,7 @@
   # if we have a by variable, filter out only those rows that pertain to
   # this smooth. Only for factor by smooths
   if (is_factor_by_smooth(sm)) {
-    df <- df |>
-      filter(.data[[by_var]] == by_lev) |>
-      as_tibble()
+    df <- vec_slice(as_tibble(df), df[[by_var]] == by_lev)
   }
 
   # drop repeated observations?
