@@ -77,6 +77,10 @@
   `derivatives_samples()`, and `response_derivatives()` now all work with
   models fitted by `scam::scam()`.
 
+* `basis()` can now take a vector of coefficients for the basis functions when
+  using the default method: `basis(s(x), data = df, coefficients = rnorm(10))`.
+  Wish of #136
+
 ## Bug fixes
 
 * `conditional_values()` would fail if a variable it was conditioning was also
