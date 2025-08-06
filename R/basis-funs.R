@@ -32,6 +32,8 @@
 #'   the associated penalty is an identity matrix. This has the effect of
 #'   turning the last diagonal elements of the penalty to zero, which highlights
 #'   the penalty null space.
+#' @param coefficients numeric; vector of values for the coefficients of the
+#'   basis functions.
 #' @param ... other arguments passed to [mgcv::smoothCon()].
 #'
 #' @inheritParams smooth_estimates
@@ -161,45 +163,7 @@
     lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
     select <- term
   }
-  # model_name <- expr_label(substitute(object))
-  # # if particular smooths selected
-  # sms <- smooths(object) # vector of smooth labels - "s(x)"
 
-  # # select smooths
-  # select <-
-  #   check_user_select_smooths(
-  #     smooths = sms, select = select,
-  #     partial_match = partial_match,
-  #     model_name = model_name
-  #   )
-  # smooth_ids <- which(select)
-
-  # # extract the mgcv.smooth objects
-  # smooths <- get_smooths_by_id(object, smooth_ids)
-
-  # # if user data supplied, check for and remove response
-  # if (!is.null(data)) {
-  #   if (!is.data.frame(data)) {
-  #     stop("'data', if supplied, must be a numeric vector or data frame.",
-  #       call. = FALSE
-  #     )
-  #   }
-  #   check_all_vars(object, data = data, smooths = smooths)
-  #   data <- delete_response(object, data = data)
-  # }
-
-  # bfuns <- map(seq_along(smooths), tidy_basis_wrapper,
-  #   ids = smooth_ids,
-  #   data = data, smooths = smooths, model = object, n = n,
-  #   n_3d = n_3d, n_4d = n_4d, offset = NULL
-  # )
-
-  # bfuns <- bind_rows(bfuns)
-
-  # ## class this up
-  # class(bfuns) <- append(class(bfuns), c("basis"),
-  #   after = 0L
-  # )
   bfuns <- basis.gam(
     object, select = select, data = data, n = n,
     n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, partial_match = partial_match,
@@ -299,9 +263,16 @@
 #' @importFrom stringr str_detect fixed
 #' @importFrom purrr map
 #' @importFrom dplyr bind_rows
+#' @importFrom cli format_error
 `basis.default` <- function(
-  object, data, knots = NULL, constraints = FALSE, at = NULL,
-  diagonalize = FALSE, ...
+  object,
+  data,
+  knots = NULL,
+  constraints = FALSE,
+  at = NULL,
+  diagonalize = FALSE,
+  coefficients = NULL,
+  ...
 ) {
   # class of object and check for ".smooth.spec"
   cls <- class(object)
@@ -325,6 +296,36 @@
 
   ## rebind
   bfuns <- bind_rows(bfuns)
+
+  # if coefficients not null, then weight the respective basis functions
+  if (isFALSE(is.null(coefficients))) {
+    # check we have enough coefs
+    n_bfs <- length(unique(bfuns$.bf))
+    n_coefs <- length(coefficients)
+    if (isFALSE(identical(n_bfs, n_coefs))) {
+      msg <- c(
+        "Incorrect number of {.var coefficients} ",
+        "x" =
+          "Provided {n_coefs} coefficient{?s} for {n_bfs} basis function{?s}."
+      )
+      stop(format_error(msg), call. = FALSE)
+    }
+    # make a lookup
+    bfs <- seq_len(n_coefs)
+    lkp_up <- tibble(
+      .bf = factor(bfs, levels = bfs),
+      .coefficient = coefficients
+    )
+
+    bfuns <- bfuns |>
+      left_join(
+        lkp_up, by = join_by(".bf" == ".bf")
+      ) |>
+      mutate(
+        .value = .data$.value * .data$.coefficient
+      ) |>
+      select(!c(".coefficient"))
+  }
 
   ## class
   class(bfuns) <- c("basis", class(bfuns))
