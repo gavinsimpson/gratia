@@ -70,6 +70,7 @@ basis(object, ...)
   constraints = FALSE,
   at = NULL,
   diagonalize = FALSE,
+  coefficients = NULL,
   ...
 )
 }
@@ -119,6 +120,9 @@ the basis should be evaluated.}
 the associated penalty is an identity matrix. This has the effect of
 turning the last diagonal elements of the penalty to zero, which highlights
 the penalty null space.}
+
+\item{coefficients}{numeric; vector of values for the coefficients of the
+basis functions.}
 }
 \value{
 A tibble.
