@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9022</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9023</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li><p><code><a href="../reference/appraise.html">appraise()</a></code> with <code>method = "simulate"</code> can now handle <em>mgcv</em>’s multivariate normal models fitted with <code>family = mvn()</code>and Tweedie location scale models fitted with <code>family = twlss()</code>.</p></li>
+<ul><li><p><code><a href="../reference/assemble.html">assemble()</a></code> is a new generic function for assembling sets of plots from model objects. It is effectively <code><a href="../reference/draw.html">draw()</a></code> but without actually plotting on the current device. Instead it returns a list of <code>ggplot</code> objects. Currently, a method for <code>"gam"</code> models, <code><a href="../reference/assemble.gam.html">assemble.gam()</a></code>, is provided which <code><a href="../reference/draw.gam.html">draw.gam()</a></code> uses. Part of the wish of <a href="https://github.com/ha0ye" class="external-link">@ha0ye</a> <a href="https://github.com/gavinsimpson/gratia/issues/35" class="external-link">#35</a></p></li>
+<li><p><code><a href="../reference/appraise.html">appraise()</a></code> with <code>method = "simulate"</code> can now handle <em>mgcv</em>’s multivariate normal models fitted with <code>family = mvn()</code>and Tweedie location scale models fitted with <code>family = twlss()</code>.</p></li>
 <li>
 <p><code>fix_family_rd()</code> is an (currently) internal function that extends <code><a href="https://rdrr.io/pkg/mgcv/man/fix.family.link.html" class="external-link">mgcv::fix.family.rd()</a></code>. This function adds a <code>rfoo()</code> function to the <code>$rd</code> component of the <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">family()</a></code> object stored in the model. This function is used to generate new values of the response at supplied values of the linear predictor. <code>fix_family_rd()</code> calls <code><a href="https://rdrr.io/pkg/mgcv/man/fix.family.link.html" class="external-link">mgcv::fix.family.rd()</a></code> so it is backward compatible with <em>mgcv</em>’s behaviour, but it is designed to extend the behaviour through support for a richer set of models.</p>
 <p>Currently, <code>fix_family_rd()</code> adds support for multivariate normal models fitted with <code>family = mvn()</code> and location-scale Tweedie models fitted with <code>family = twlss()</code>, but the latter is currently very slow.</p>
