@@ -22,6 +22,12 @@
 
 ## New features
 
+* `assemble()` is a new generic function for assembling sets of plots from model
+  objects. It is effectively `draw()` but without actually plotting on the
+  current device. Instead it returns a list of `ggplot` objects. Currently, a
+  method for `"gam"` models, `assemble.gam()`, is provided which `draw.gam()`
+  uses. Part of the wish of @ha0ye #35
+
 * `appraise()` with `method = "simulate"` can now handle *mgcv*'s multivariate
   normal models fitted with `family = mvn()`and Tweedie location scale models
   fitted with `family = twlss()`.

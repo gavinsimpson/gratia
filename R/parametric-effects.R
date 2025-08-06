@@ -30,6 +30,7 @@
 #' @importFrom dplyr mutate bind_cols bind_rows distinct relocate rename
 #' @importFrom tidyr nest unnest
 #' @importFrom tidyselect any_of last_col
+#' @importFrom cli cli_alert_info
 #'
 #' @rdname parametric_effects
 #' @export
@@ -67,12 +68,14 @@
   # check order of terms; if > 1 interaction and not handled
   ord <- attr(tt, "order")[match(valid_terms, attr(tt, "term.labels"))]
   if (any(int <- ord > 1)) {
-    message("Interaction terms are not currently supported.")
+    cli_alert_info("Interaction terms are not currently supported.")
     valid_terms <- valid_terms[!(ord > 1)]
   }
-  # return early if no vallid terms to
+  # return early if no valid terms to
   if (length(valid_terms) == 0L) {
-    message("The model doesn't contain any non-interaction parametric terms")
+    cli_alert_info(
+      "The model doesn't contain any non-interaction parametric terms"
+    )
     return(NULL)
   }
 

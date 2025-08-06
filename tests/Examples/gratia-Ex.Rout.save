@@ -329,6 +329,45 @@ detaching ‘package:mgcv’
 
 detaching ‘package:ggplot2’, ‘package:mgcv’
 
+> nameEx("assemble.gam")
+> ### * assemble.gam
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: assemble.gam
+> ### Title: Plot estimated smooths from a fitted GAM
+> ### Aliases: assemble.gam
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> 
+> # simulate some data
+> df1 <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
+> # fit GAM
+> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
+> 
+> # assemble plots of all smooths
+> assemble(m1)
+
+-- Assembly of 4 plots --
+
+1. s(x0)
+2. s(x1)
+3. s(x2)
+4. s(x3)
+
+> 
+> # can be passed to patchwork::wrap_plots()
+> suppressPackageStartupMessages(library("patchwork"))
+> assemble(m1) |> wrap_plots(ncol = 2, nrow = 2)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:patchwork’, ‘package:mgcv’
+
 > nameEx("basis")
 > ### * basis
 > 
@@ -1680,11 +1719,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x13f78d3f8>
+<environment: 0x11feeb270>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x13f78d3f8>
+<environment: 0x11feeb270>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2892,7 +2931,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  11.063 0.448 12.424 0.002 0.003 
+Time elapsed:  11.566 0.447 12.971 0.002 0.003 
 > grDevices::dev.off()
 null device 
           1 

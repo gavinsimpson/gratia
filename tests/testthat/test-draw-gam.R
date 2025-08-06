@@ -216,20 +216,18 @@ test_that("draw.gam works for a quadvariate smooth", {
 # })
 
 test_that("draw.gam issues message for parametric only model", {
-  expect_message(
-    plt <- draw(m_only_para),
-    "Unable to draw any of the model terms."
+  expect_snapshot(
+    plt <- draw(m_only_para)
   )
 })
 
 test_that("draw.gam works for a parametric only model", {
   # rotated
-  expect_message(
+  expect_snapshot(
     plt <- draw(m_only_para,
       parametric = TRUE, angle = 90,
       rug = FALSE, data = df_2_fac, envir = teardown_env()
-    ),
-    "Interaction terms are not currently supported."
+    )
   )
   # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw_gam parametric only model rotated labels", plt)
