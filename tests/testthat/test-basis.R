@@ -103,3 +103,32 @@ test_that("basis() works with bivariate te smooths", {
   expect_doppelganger("draw basis works with a bivariate te", plt1)
   expect_doppelganger("draw basis works with a bivariate te contour", plt2)
 })
+
+test_that("basis() throws error if n coefs is wrong", {
+  skip_on_cran()
+  expect_snapshot(
+    basis(s(x1), data = su_eg1, coefficients = 1:3),
+    error = TRUE
+  )
+})
+
+test_that("basis() works with supplied coefs", {
+  skip_on_cran()
+  expect_snapshot(
+    withr::with_seed(
+      seed = 2,
+      basis(s(x1), data = su_eg1, coefficients = rnorm(10, sd = 4))
+    )
+  )
+})
+
+test_that("basis() works with supplied coefs", {
+  skip_on_cran()
+  expect_doppelganger(
+    "draw basis works OK with weighted basis funs",
+    withr::with_seed(
+      seed = 2,
+      basis(s(x1), data = su_eg1, coefficients = rnorm(10, sd = 4))
+    ) |> draw()
+  )
+})
