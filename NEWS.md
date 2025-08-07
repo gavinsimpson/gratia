@@ -1,5 +1,9 @@
 # gratia (development version)
 
+The *gratia* package now has a paper on it in the [Journal of Open Source Software](). If you use *gratia* in your work, please cite this paper rather than the generic citation previously created by `citation()`:
+
+> Simpson, G.L. (2024) gratia: An R package for exploring generalized additive models. *The Journal of Open Source Software* **9**, 6962.
+
 ## User visible changes
 
 * Experimental support for computing with parallel processes via the *purrr* 📦
