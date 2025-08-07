@@ -42,7 +42,7 @@ passed on to the relevant \code{simulate()} method.}
 
 \item{select}{character; select which smooth's posterior to draw from.
 The default (\code{NULL}) means the posteriors of all smooths in \code{model}
-wil be sampled from. If supplied, a character vector of requested terms.}
+will be sampled from. If supplied, a character vector of requested terms.}
 
 \item{term}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{select} instead.}
 

@@ -35,7 +35,7 @@
 #' ## load mgcv
 #' load_mgcv()
 #'
-#' ## example data - Gu & Wabha four term model
+#' ## example data - Gu & Wahba four term model
 #' df <- data_sim("eg1", n = 400, seed = 42)
 #' ## fit the model
 #' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")

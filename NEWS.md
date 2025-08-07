@@ -200,7 +200,7 @@
 * Plots of random effects are now labelled with their smooth label. Previously,
   the title was taken fro the variable involved in the smooth, but this doesn't
   work for terms like `s(subject, continuous_var, bs = "re")` for random slopes, 
-  which previsouly would have the title `"subject"`. Now such terms will have
+  which previously would have the title `"subject"`. Now such terms will have
   title `"s(subject,continuous_var)"`. Simple random intercept terms,
   `s(subject, bs = "re")`, are now titled `"s(subject)"`. #287
 
@@ -377,7 +377,7 @@ to `select` and the function will continue.
   categorical distributions.
 
 * `data_sim()` gains two new example models `"gwf2"`, simulating data only from
-  Gu & Wabha's *f2* function, and `"lwf6"`, example function 6 from Luo & Wabha
+  Gu & Wahba's *f2* function, and `"lwf6"`, example function 6 from Luo & Wahba
   (1997 JASA 92(437), 107-116).
 
 * `data_sim()` can also simulate data for use with GAMs fitted using
@@ -506,7 +506,7 @@ to `select` and the function will continue.
   from fitted model coefficients. `generate_daws()` is an S3 generic function so
   is extensible by users. Currently provides a simple interface to a simple
   Gaussian approximation sampler (`gaussian_draws()`) and the simple Metropolis
-  Hasting sample (`mh_draws()`) available via `mgcv::gam.mh()`. #211
+  Hastings sample (`mh_draws()`) available via `mgcv::gam.mh()`. #211
 
 * `smooth_label()` is a new function for extracting the labels 'mgcv' creates for
   smooths from the smooth object itself.
@@ -538,7 +538,7 @@ to `select` and the function will continue.
 
 * Constrained factor smooths (`bs = "sz"`) where the factor is not the first
   variable mentioned in the smooth (i.e. `s(x, f, bs = "sz")` for continuous
-  `x` and factor `f`) are now plotable with `draw()`. #208
+  `x` and factor `f`) are now plottable with `draw()`. #208
 
 * `parametric_effects()` was unable to handle special parametric terms like
   `poly(x)` or `log(x)` in formulas. Reported by @fhui28 #212
@@ -975,7 +975,7 @@ can handle more types of models and smooths, especially so in the case of
 
 * New helper functions `typical_values()`, `factor_combos()` and
   `data_combos()` for quickly creating data sets for producing predictions from
-  fitted models where some covariatess are fixed at come typical or
+  fitted models where some covariates are fixed at come typical or
   representative values.
 
     `typical_values()` is a new helper function to return typical values for the

@@ -1,7 +1,7 @@
 #' Tests for by variable smooths
 #'
 #' Functions to check if a smooth is a by-variable one and to test of the type
-#' of by-variable smooth is a factor-smooth or a continous-smooth interaction.
+#' of by-variable smooth is a factor-smooth or a continuous-smooth interaction.
 #'
 #' @param smooth an object of class `"mgcv.smooth"`
 #'

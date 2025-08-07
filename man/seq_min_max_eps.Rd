@@ -30,5 +30,5 @@ they are always contained within the range of \code{x} when \code{x} may be shif
 forwards or backwards by an amount related to \code{eps}. This is particularly
 useful in computing derivatives via finite differences where without this
 adjustment we may be predicting for values outside the range of the data
-and hence the conmstraints of the penalty.
+and hence the constraints of the penalty.
 }

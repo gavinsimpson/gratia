@@ -58,7 +58,7 @@ is required. See \code{\link[mgcv:smoothCon]{mgcv::smoothCon()}}.}
 \item{constraints}{logical; should identifiability constraints be applied to
 the smooth basis. See argument \code{absorb.cons} in \code{\link[mgcv:smoothCon]{mgcv::smoothCon()}}.}
 
-\item{diagonalize}{logical; if \code{TRUE}, reparameterizes the smooth such that
+\item{diagonalize}{logical; if \code{TRUE}, reparameterises the smooth such that
 the associated penalty is an identity matrix. This has the effect of
 turning the last diagonal elements of the penalty to zero, which highlights
 the penalty null space.}

@@ -40,7 +40,7 @@ as well as classes \code{"glm"} and \code{"lm"} from calls to \link[stats:glm]{s
 
 \item{method}{character; method used to generate theoretical quantiles.
 The default is \code{"uniform"}, which generates reference quantiles using
-random draws from a uniform distribution and the inverse cummulative
+random draws from a uniform distribution and the inverse cumulative
 distribution function (CDF) of the fitted values. The reference quantiles
 are averaged over \code{n_uniform} draws. \code{"simulate"} generates reference
 quantiles by simulating new response data from the model at the observed

@@ -66,7 +66,7 @@ from class \code{"gam"} as far as \code{inherits()} is concerned.}
 \item{method}{character; which algorithm to use to sample from the posterior.
 Currently implemented methods are: \code{"gaussian"} and \code{"mh"}. \code{"gaussian"}
 calls \code{gaussian_draws()} which uses a Gaussian approximation to the
-posterior distribution. \code{"mh"} uses a simple Metropolis Hasting sampler
+posterior distribution. \code{"mh"} uses a simple Metropolis Hastings sampler
 which alternates static proposals based on a Gaussian approximation to the
 posterior, with random walk proposals. Note, setting \code{t_df} to a low value
 will result in heavier-tailed statistic proposals. See \code{mgcv::gam.mh()}

@@ -11,7 +11,7 @@ get_by_smooth(object, term, level)
 
 \item{term}{character; the name of a smooth term to extract.}
 
-\item{level}{character; which level of the factor to exrtact the smooth
+\item{level}{character; which level of the factor to extract the smooth
 for.}
 }
 \value{

@@ -5,7 +5,7 @@
 #' @param terms currently ignored
 #' @param type character;
 #' @param pairwise logical; extract pairwise concurvity of model terms?
-#' @param ... arguents passed to other methods.
+#' @param ... arguments passed to other methods.
 #'
 #' @importFrom tibble as_tibble add_column rownames_to_column
 #' @importFrom mgcv concurvity

@@ -18,7 +18,7 @@ add_sizer(object, type = c("change", "sizer"), ...)
 
 \item{type}{character; \code{"change"} adds a single variable to \code{object}
 indicating where the credible interval on the derivative excludes 0.
-\code{"sizer"} adds two variables indicating whether the derivative is postive
+\code{"sizer"} adds two variables indicating whether the derivative is positive
 or negative.}
 
 \item{...}{arguments passed to other methods}

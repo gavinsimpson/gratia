@@ -6,7 +6,7 @@
 #' distribution used when fitting the model.
 #'
 #' For `simulate.gam()` to function, the `family` component of the fitted
-#' model must contain, or be updateable to contain, the required random
+#' model must contain, or be updatable to contain, the required random
 #' number generator. See [mgcv::fix.family.rd()].
 #'
 #' @param object a fitted GAM, typically the result of a call to [mgcv::gam]`

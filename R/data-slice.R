@@ -556,7 +556,7 @@
 
 #' @param envir the environment within which to recreate the data used to fit
 #'   `object`.
-#' @param data an optional data frame of data used to fit the mdoel if
+#' @param data an optional data frame of data used to fit the model if
 #'   reconstruction of the data from the model doesn't work.
 #'
 #' @inheritParams factor_combos

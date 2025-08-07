@@ -203,7 +203,7 @@
 #' @param level numeric, `0 < level < 1`; the confidence level of the point-wise
 #'   or simultaneous interval. The default is `0.95` for a 95% interval.
 #' @param data data frame; new values of the covariates used in the model fit.
-#'   The selected smooth(s) wil be evaluated at the supplied values.
+#'   The selected smooth(s) will be evaluated at the supplied values.
 #' @param n numeric; the number of points to evaluate smooths at.
 #' @param type character; the type of interval to compute. One of `"confidence"`
 #'   for point-wise intervals, or `"simultaneous"` for simultaneous intervals.
@@ -226,7 +226,7 @@
 #'   an exact match? Can only be used if `length(parm)` is `1`.
 #' @param ... additional arguments for methods
 #' @param newdata DEPRECATED! data frame; containing new values of the
-#'   covariates used in the model fit. The selected smooth(s) wil be evaluated
+#'   covariates used in the model fit. The selected smooth(s) will be evaluated
 #'   at the supplied values.
 #'
 #' @return a tibble with components:

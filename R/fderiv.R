@@ -5,7 +5,7 @@
 #'
 #' This function was deprecated because it was limited to first order forward
 #' finite differences for derivatives only, but couldn't be improved to offer
-#' the needed functionality without breaking backwards compatability with papers
+#' the needed functionality without breaking backwards compatibility with papers
 #' and blog posts that already used `fderiv()`. A replacement, [derivatives()],
 #' is now available and recommended for new analyses.
 #'

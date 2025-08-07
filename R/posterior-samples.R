@@ -820,7 +820,7 @@
 #'   `data` not supplied
 #' @param select character; select which smooth's posterior to draw from.
 #'   The default (`NULL`) means the posteriors of all smooths in `model`
-#'   wil be sampled from. If supplied, a character vector of requested terms.
+#'   will be sampled from. If supplied, a character vector of requested terms.
 #' @param term `r lifecycle::badge("deprecated")` Use `select` instead.
 #' @param rng_per_smooth logical; if TRUE, the behaviour of gratia version
 #' 0.8.1 or earlier is used, whereby a separate call the the random number

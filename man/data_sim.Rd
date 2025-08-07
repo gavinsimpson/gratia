@@ -69,16 +69,16 @@ yhat = f(x1)x2} where the function \eqn{f_2()} is \eqn{f_2(x) = 0.2 * x^{11} *
 (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^10}.
 \item \code{"eg4"}: a factor by smooth true model. The true model contains a factor
 with 3 levels, where the response for the \emph{n}th level follows the \emph{n}th
-Gu & Wabha function (for \eqn{n \in {1, 2, 3}}{n in {1,2,3}}).
+Gu & Wahba function (for \eqn{n \in {1, 2, 3}}{n in {1,2,3}}).
 \item \code{"eg5"}: an additive plus factor true model. The response is a linear
-combination of the Gu & Wabha functions 2, 3, 4 (the latter is a null
+combination of the Gu & Wahba functions 2, 3, 4 (the latter is a null
 function) plus a factor term with four levels.
 \item \code{"eg6"}: an additive plus random effect term true model.
 \item ´"eg7"\verb{: a version of the model in }"eg1"`, but where the covariates are
 correlated.
-\item \code{"gwf2"}: a model where the response is Gu & Wabha's
+\item \code{"gwf2"}: a model where the response is Gu & Wahba's
 \eqn{f_2(x_i)}{f_2(x_i)} plus noise.
-\item \code{"lwf6"}: a model where the response is Luo & Wabha's "example 6"
+\item \code{"lwf6"}: a model where the response is Luo & Wahba's "example 6"
 function \eqn{sin(2(4x-2)) + 2 exp(-256(x-0.5)^2)}{
     sin(2 * ((4 * x) - 2)) + (2 * exp(-256 * (x - .5)^2))} plus noise.
 \item \code{"gfam"}: simulates data for use with GAMs with

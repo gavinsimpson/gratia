@@ -323,7 +323,7 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 #'
 #' @param object a fitted GAM model object.
 #' @param term character; the name of a smooth term to extract.
-#' @param level character; which level of the factor to exrtact the smooth
+#' @param level character; which level of the factor to extract the smooth
 #'   for.
 #'
 #' @return A single smooth object, or a list of smooths if several match the
@@ -774,7 +774,7 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 #' @param h numeric; the amount to shift values in `df` by.
 #' @param i logical; a vector indexing columns of `df` that should not be
 #'   included in the shift.
-#' @param FUN function; a function to applut the shift. Typically `+` or `-`.
+#' @param FUN function; a function to apply the shift. Typically `+` or `-`.
 #' @param focal character; the focal variable when computing partial
 #'   derivatives. This allows shifting only the focal variable by `eps`.
 `shift_values` <- function(df, h, i, FUN = `+`, focal = NULL) {

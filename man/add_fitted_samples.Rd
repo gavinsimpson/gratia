@@ -32,7 +32,7 @@ and \code{seed} are already specified here as arguments and are also passed on
 to the posterior sampling function.}
 
 \item{select}{character; select which smooth's posterior to draw from. The
-default, \code{NULL}, means the posteriors of all smooths in model wil be
+default, \code{NULL}, means the posteriors of all smooths in model will be
 sampled from individually. If supplied, a character vector of requested
 smooth terms.}
 }

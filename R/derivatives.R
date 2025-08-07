@@ -30,7 +30,7 @@
 
 #' @param select character; select which smooth's posterior to draw from.
 #'   The default (`NULL`) means the posteriors of all smooths in `model`
-#'   wil be sampled from. If supplied, a character vector of requested terms.
+#'   will be sampled from. If supplied, a character vector of requested terms.
 #'   Can be a partial match to a smooth term; see argument `partial_match`
 #'   below.
 #' @param term `r lifecycle::badge("deprecated")` Use `select` instead.

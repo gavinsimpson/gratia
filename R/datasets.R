@@ -69,8 +69,8 @@ NULL
 #'   generalized additive models: an introduction with mgcv. *PeerJ Preprints*
 #'   **6**:e27320v1 \doi{10.7287/peerj.preprints.27320v1}.
 #'
-#' @references Lathrop RC. (2000). Madison Wisonsin Lakes Zooplankton 1976--1994.
-#'   Environmental Data Initiative.
+#' @references Lathrop RC. (2000). Madison Wisconsin Lakes Zooplankton
+#'   1976--1994. Environmental Data Initiative.
 #'
 #' @format A data frame
 #' @name zooplankton

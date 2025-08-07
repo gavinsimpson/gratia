@@ -92,7 +92,7 @@ but it is instructive to know how to combine the outputs of `draw()` should the 
 
 ## Building your own plot by hand
 
-{gratia} provides high-level functions like `draw()` to get you a good graphical overview of a fitted model, but with little option for customisation --- it isn't possible or desirable to allow all possible customisation options and fatures of {ggplot2} through a single function. Think about how many arguments that would require!
+{gratia} provides high-level functions like `draw()` to get you a good graphical overview of a fitted model, but with little option for customisation --- it isn't possible or desirable to allow all possible customisation options and features of {ggplot2} through a single function. Think about how many arguments that would require!
 
 Instead, {gratia} also exports the lower-level functions used `draw()` so that you can create your own plot using whatever {ggplot2} functions make sense. In the next few code blocks we'll see how the plot created by `draw(m)` can be recreated by hand using these lower-level building blocks.
 

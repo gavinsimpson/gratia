@@ -18,16 +18,16 @@
 #' (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^10}.
 #'   * `"eg4"`: a factor by smooth true model. The true model contains a factor
 #'     with 3 levels, where the response for the *n*th level follows the *n*th
-#'     Gu & Wabha function (for \eqn{n \in {1, 2, 3}}{n in {1,2,3}}).
+#'     Gu & Wahba function (for \eqn{n \in {1, 2, 3}}{n in {1,2,3}}).
 #'   * `"eg5"`: an additive plus factor true model. The response is a linear
-#'     combination of the Gu & Wabha functions 2, 3, 4 (the latter is a null
+#'     combination of the Gu & Wahba functions 2, 3, 4 (the latter is a null
 #'     function) plus a factor term with four levels.
 #'   * `"eg6"`: an additive plus random effect term true model.
 #'   * ´"eg7"`: a version of the model in `"eg1"`, but where the covariates are
 #'     correlated.
-#'   * `"gwf2"`: a model where the response is Gu & Wabha's
+#'   * `"gwf2"`: a model where the response is Gu & Wahba's
 #'     \eqn{f_2(x_i)}{f_2(x_i)} plus noise.
-#'   * `"lwf6"`: a model where the response is Luo & Wabha's "example 6"
+#'   * `"lwf6"`: a model where the response is Luo & Wahba's "example 6"
 #'     function \eqn{sin(2(4x-2)) + 2 exp(-256(x-0.5)^2)}{
 #'     sin(2 * ((4 * x) - 2)) + (2 * exp(-256 * (x - .5)^2))} plus noise.
 #'   * `"gfam"`: simulates data for use with GAMs with
@@ -152,8 +152,8 @@
     eg5 = additive_plus_factor_model,
     eg6 = four_term_plus_ranef_model,
     eg7 = correlated_four_term_additive_model,
-    gwf2 = gu_wabha_f2,
-    lwf6 = luo_wabha_f6,
+    gwf2 = gu_Wahba_f2,
+    lwf6 = luo_Wahba_f6,
     gfam = sim_gfam
   )
 
@@ -261,8 +261,8 @@
   x
 }
 
-## Gu Wabha functions
-#' Gu and Wabha test functions
+## Gu Wahba functions
+#' Gu and Wahba test functions
 #'
 #' @param x numeric; vector of points to evaluate the function at, on interval
 #'   (0,1)
@@ -452,7 +452,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4, ...) {
 #' @importFrom tibble tibble
 #' @importFrom dplyr mutate bind_cols
 #' @importFrom rlang .data
-`gu_wabha_f2` <- function(
+`gu_Wahba_f2` <- function(
     n, sim_fun = sim_normal, scale = 2,
     theta = 3, power = 1.5, ...) {
   data <- tibble(x = runif(n, 0, 1))
@@ -465,7 +465,7 @@ bivariate <- function(x, z, sx = 0.3, sz = 0.4, ...) {
 #' @importFrom tibble tibble
 #' @importFrom dplyr mutate bind_cols
 #' @importFrom rlang .data
-`luo_wabha_f6` <- function(
+`luo_Wahba_f6` <- function(
     n, sim_fun = sim_normal, scale = 0.3,
     theta = 3, power = 1.5, ...) {
   f <- function(x) {

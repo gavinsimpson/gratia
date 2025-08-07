@@ -10,7 +10,7 @@
 #'   [stats::lm] are supported.
 #' @param method character; method used to generate theoretical quantiles.
 #'   The default is `"uniform"`, which generates reference quantiles using
-#'   random draws from a uniform distribution and the inverse cummulative
+#'   random draws from a uniform distribution and the inverse cumulative
 #'   distribution function (CDF) of the fitted values. The reference quantiles
 #'   are averaged over `n_uniform` draws. `"simulate"` generates reference
 #'   quantiles by simulating new response data from the model at the observed
@@ -52,7 +52,7 @@
 #' @param point_col colour of points on the QQ plot.
 #' @param point_alpha alpha transparency of points on the QQ plot.
 #' @param line_col colour used to draw the reference line.
-#' @param ... arguments passed ot other methods.
+#' @param ... arguments passed to other methods.
 #'
 #' @note The wording used in [mgcv::qq.gam()] uses *direct* in reference to the
 #'   simulated residuals method (`method = "simulated"`). To avoid confusion,
@@ -66,7 +66,7 @@
 #' is described in Augustin *et al* (2012):
 #'
 #' Augustin, N.H., Sauleau, E.-A., Wood, S.N., (2012) On quantile quantile plots
-#' for generalized linear models. *Computational Statatistics and Data Analysis*
+#' for generalized linear models. *Computational Statistics and Data Analysis*
 #' **56**, 2404-2409 \doi{doi:10.1016/j.csda.2012.01.026}.
 #'
 #'
@@ -772,7 +772,7 @@
 #'   [stats::lm] are supported.
 #' @param method character; method used to generate theoretical quantiles.
 #'   The default is `"uniform"`, which generates reference quantiles using
-#'   random draws from a uniform distribution and the inverse cummulative
+#'   random draws from a uniform distribution and the inverse cumulative
 #'   distribution function (CDF) of the fitted values. The reference quantiles
 #'   are averaged over `n_uniform` draws. `"simulate"` generates reference
 #'   quantiles by simulating new response data from the model at the observed

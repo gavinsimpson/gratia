@@ -28,7 +28,7 @@
 #'   the smooth basis. See argument `absorb.cons` in [mgcv::smoothCon()].
 #' @param at a data frame containing values of the smooth covariate(s) at which
 #'   the basis should be evaluated.
-#' @param diagonalize logical; if `TRUE`, reparameterizes the smooth such that
+#' @param diagonalize logical; if `TRUE`, reparameterises the smooth such that
 #'   the associated penalty is an identity matrix. This has the effect of
 #'   turning the last diagonal elements of the penalty to zero, which highlights
 #'   the penalty null space.

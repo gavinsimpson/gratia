@@ -10,7 +10,7 @@
 #' @param method character; which algorithm to use to sample from the posterior.
 #'   Currently implemented methods are: `"gaussian"` and `"mh"`. `"gaussian"`
 #'   calls `gaussian_draws()` which uses a Gaussian approximation to the
-#'   posterior distribution. `"mh"` uses a simple Metropolis Hasting sampler
+#'   posterior distribution. `"mh"` uses a simple Metropolis Hastings sampler
 #'   which alternates static proposals based on a Gaussian approximation to the
 #'   posterior, with random walk proposals. Note, setting `t_df` to a low value
 #'   will result in heavier-tailed statistic proposals. See `mgcv::gam.mh()`

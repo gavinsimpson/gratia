@@ -9,7 +9,7 @@
 #' @param object an object of class `"gam"` or `"gamm"`.
 #' @param select character; select which smooth's posterior to draw from.
 #'   The default (`NULL`) means the posteriors of all smooths in `model`
-#'   wil be sampled from. If supplied, a character vector of requested terms.
+#'   will be sampled from. If supplied, a character vector of requested terms.
 #' @param smooth `r lifecycle::badge("deprecated")` Use `select` instead.
 #' @param n numeric; the number of points over the range of the covariate at
 #'   which to evaluate the smooth.
@@ -486,7 +486,7 @@
 #'
 #' @param smooth currently an object that inherits from class `mgcv.smooth`.
 #' @param model a fitted model; currently only [mgcv::gam()] and [mgcv::bam()]
-#'   models are suported.
+#'   models are supported.
 #' @param data an optional data frame of values to evaluate `smooth` at.
 #' @param ... arguments passed to other methods
 #'

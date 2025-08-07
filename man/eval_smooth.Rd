@@ -125,7 +125,7 @@ eval_smooth(smooth, ...)
 \item{...}{arguments passed to other methods}
 
 \item{model}{a fitted model; currently only \code{\link[mgcv:gam]{mgcv::gam()}} and \code{\link[mgcv:bam]{mgcv::bam()}}
-models are suported.}
+models are supported.}
 
 \item{n}{numeric; the number of points over the range of the covariate at
 which to evaluate the smooth.}

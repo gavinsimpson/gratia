@@ -38,7 +38,7 @@ is not currently implemented.}
 or simultaneous interval. The default is \code{0.95} for a 95\% interval.}
 
 \item{data}{data frame; new values of the covariates used in the model fit.
-The selected smooth(s) wil be evaluated at the supplied values.}
+The selected smooth(s) will be evaluated at the supplied values.}
 
 \item{n}{numeric; the number of points to evaluate smooths at.}
 
@@ -71,7 +71,7 @@ an exact match? Can only be used if \code{length(parm)} is \code{1}.}
 \item{...}{additional arguments for methods}
 
 \item{newdata}{DEPRECATED! data frame; containing new values of the
-covariates used in the model fit. The selected smooth(s) wil be evaluated
+covariates used in the model fit. The selected smooth(s) will be evaluated
 at the supplied values.}
 }
 \value{

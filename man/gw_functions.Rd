@@ -6,7 +6,7 @@
 \alias{gw_f1}
 \alias{gw_f2}
 \alias{gw_f3}
-\title{Gu and Wabha test functions}
+\title{Gu and Wahba test functions}
 \usage{
 gw_f0(x, ...)
 
@@ -23,7 +23,7 @@ gw_f3(x, ...)
 \item{...}{arguments passed to other methods, ignored.}
 }
 \description{
-Gu and Wabha test functions
+Gu and Wahba test functions
 }
 \examples{
 \dontshow{

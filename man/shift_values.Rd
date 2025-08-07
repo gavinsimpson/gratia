@@ -14,7 +14,7 @@ shift_values(df, h, i, FUN = `+`, focal = NULL)
 \item{i}{logical; a vector indexing columns of \code{df} that should not be
 included in the shift.}
 
-\item{FUN}{function; a function to applut the shift. Typically \code{+} or \code{-}.}
+\item{FUN}{function; a function to apply the shift. Typically \code{+} or \code{-}.}
 
 \item{focal}{character; the focal variable when computing partial
 derivatives. This allows shifting only the focal variable by \code{eps}.}

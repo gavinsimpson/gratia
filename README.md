@@ -142,10 +142,10 @@ was already a package named *Grace* on CRAN. So I looked elsewhere for
 inspiration.
 
 The English word “grace” derives from the Latin *gratia*, meaning
-“favor, charm, thanks” ([according to Merriam
+“favour, charm, thanks” ([according to Merriam
 Webster](https://www.merriam-webster.com/dictionary/grace)).
 
-The chair that Grace Wabha currently holds is named after [Isaac J
+The chair that Grace Wahba currently holds is named after [Isaac J
 Schoenberg](https://en.wikipedia.org/wiki/Isaac_Jacob_Schoenberg), a
 former University Madison-Wisconsin Professor of Mathematics, who in a
 1946 paper provided the first mathematical reference to “splines”.

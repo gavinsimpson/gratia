@@ -28,7 +28,7 @@ concrvity(
 \item{model}{a fitted GAM. Currently only objects of class \code{"gam"} are
 supported}
 
-\item{...}{arguents passed to other methods.}
+\item{...}{arguments passed to other methods.}
 
 \item{terms}{currently ignored}
 

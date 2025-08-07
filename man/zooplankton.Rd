@@ -30,7 +30,7 @@ of the net tow and rounded to the nearest 1000 to give estimated population
 density per m2 for each taxon at each point in time in each sampled lake.
 }
 \references{
-Lathrop RC. (2000). Madison Wisonsin Lakes Zooplankton 1976--1994.
-Environmental Data Initiative.
+Lathrop RC. (2000). Madison Wisconsin Lakes Zooplankton
+1976--1994. Environmental Data Initiative.
 }
 \keyword{data}

@@ -511,7 +511,7 @@
 #'   `"derivatives"`.
 #' @param type character; `"change"` adds a single variable to `object`
 #'   indicating where the credible interval on the derivative excludes 0.
-#'   `"sizer"` adds two variables indicating whether the derivative is postive
+#'   `"sizer"` adds two variables indicating whether the derivative is positive
 #'   or negative.
 #' @param ... arguments passed to other methods
 #'
@@ -646,7 +646,7 @@
 #' @param n integer; the number of posterior draws to add.
 #' @param seed numeric; a value to seed the random number generator.
 #' @param select character; select which smooth's posterior to draw from. The
-#'   default, `NULL`, means the posteriors of all smooths in model wil be
+#'   default, `NULL`, means the posteriors of all smooths in model will be
 #'   sampled from individually. If supplied, a character vector of requested
 #'   smooth terms.
 #' @param ... arguments are passed to the posterior draw function, currently one
