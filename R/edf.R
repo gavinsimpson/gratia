@@ -12,7 +12,7 @@
 #'   \deqn{\mathrm{EDF} = 2\mathrm{tr}(\mathbf{F}) -
 #'   \mathrm{tr}(\mathbf{FF}),}{EDF = 2 * tr(F) - tr(F),} where
 #'   \eqn{\mathrm{tr}} is the matrix trace and \eqn{\mathbf{F}}{F} is a matrix
-#'   mapping unpenalized coefficient estimates to the penalized coefficient
+#'   mapping unpenalised coefficient estimates to the penalized coefficient
 #'   estimates.  The trace of \eqn{\mathbf{F}}{F} is effectively the average
 #'   shrinkage of the coefficients multiplied by the number of coefficients
 #'   (Wood, 2017). Smooth-specific EDFs then are obtained by summing up the
