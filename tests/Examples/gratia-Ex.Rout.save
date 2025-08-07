@@ -1603,7 +1603,7 @@ detaching ‘package:lme4’, ‘package:Matrix’, ‘package:mgcv’
 > flush(stderr()); flush(stdout())
 > 
 > ### Name: gw_f0
-> ### Title: Gu and Wabha test functions
+> ### Title: Gu and Wahba test functions
 > ### Aliases: gw_f0 gw_functions gw_f1 gw_f2 gw_f3
 > 
 > ### ** Examples
@@ -1719,11 +1719,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x11feeb270>
+<environment: 0x134356020>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x11feeb270>
+<environment: 0x134356020>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2069,7 +2069,7 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
 > ## load mgcv
 > load_mgcv()
 > 
-> ## example data - Gu & Wabha four term model
+> ## example data - Gu & Wahba four term model
 > df <- data_sim("eg1", n = 400, seed = 42)
 > ## fit the model
 > m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
@@ -2931,7 +2931,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  11.566 0.447 12.971 0.002 0.003 
+Time elapsed:  11.68 0.438 13.064 0.002 0.003 
 > grDevices::dev.off()
 null device 
           1 
