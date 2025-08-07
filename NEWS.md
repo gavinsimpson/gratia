@@ -42,7 +42,7 @@
 
   Currently, `fix_family_rd()` adds support for multivariate normal models 
   fitted with `family = mvn()` and location-scale Tweedie models fitted with
-  `family = twlss()`, but the latter is currently very slow.
+  `family = twlss()`, but the latter is currently slow.
 
   The functionality of `fix_family_rd()` may move to another package or even 
   to *mgcv* if suitable.
@@ -83,8 +83,8 @@
 
 ## Bug fixes
 
-* `conditional_values()` would fail if a variable it was conditioning was also
-  a name of a function. #323 (but not really fixed when this was initially
+* `conditional_values()` would fail if a variable it was conditioning on was
+  also a name of a function. #323 (but not really fixed when this was initially
   closed)
 
 * `parametric_effects()` was only keeping one set of factor levels when there 
@@ -98,12 +98,12 @@
   `rd` function in its `family()` object. Reported by @hhp94, #319
 
 * `gaussian_draws()` would fail in some cases with *gamm4* models because the
-  coefficients were returned as a vector, not the expect matrix. #332 reported
+  coefficients were returned as a vector, not the expected matrix. #332 reported
   by @JaredStufft-Elion
 
 * `draw.smooth_estimates()` would generate very many warnings when plotting
   spline on the sphere smoothers (`bs = "sos"`) because `geom_tile()` was
-  creating tiles that extended beyond valid geographical coordinates given the
+  creating tiles that extended beyond valid geographical coordinates for the
   tile centre coordinates that it was being provided. The function that creates
   the data to evaluate the spline at now tries to avoid this. Note this fix is
   not a complete solution. #334 Reported by @StefanoMezzini
