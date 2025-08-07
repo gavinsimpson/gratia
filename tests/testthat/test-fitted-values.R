@@ -110,4 +110,30 @@ test_that("fitted values works for a ziP() model", {
   f_mgcv <- predict(m_ziP, type = "response") |> as.vector()
   f_fv   <- fitted_values(m_ziP)$.fitted
   expect_identical(f_fv, f_mgcv)
+
+  skip_on_cran()
+  skip_on_ci()
+  expect_snapshot(fitted_values(m_ziP))
+})
+
+test_that("fitted values works for a mvn() model", {
+  # compare predict(m_ziP, type = "response") with fitted_values(m_ziP)
+  f_mgcv <- predict(m_mvn, type = "response") |> as.vector()
+  f_fv   <- fitted_values(m_mvn)$.fitted
+  expect_identical(f_fv, f_mgcv)
+
+  skip_on_cran()
+  skip_on_ci()
+  expect_snapshot(fitted_values(m_mvn))
+})
+
+test_that("fitted values works for a multinom() model", {
+  # compare predict(m_ziP, type = "response") with fitted_values(m_ziP)
+  f_mgcv <- predict(m_multinom, type = "response") |> as.vector()
+  f_fv   <- fitted_values(m_multinom)$.fitted
+  expect_identical(f_fv, f_mgcv)
+
+  skip_on_cran()
+  skip_on_ci()
+  expect_snapshot(fitted_values(m_multinom))
 })
