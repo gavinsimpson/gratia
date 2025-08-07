@@ -24,16 +24,15 @@ model_edf(object, ..., type = c("default", "unconditional", "alternative"))
 
 \item{...}{arguments passed to methods.}
 
-\item{select}{character, logical, or numeric; which smooths to plot. If
-\code{NULL}, the default, then all model smooths are drawn. Numeric \code{select}
-indexes the smooths in the order they are specified in the formula and
-stored in \code{object}. Character \code{select} matches the labels for smooths
-as shown for example in the output from \code{summary(object)}. Logical
+\item{select}{character, logical, or numeric; which smooths EDF to extract.
+If \code{NULL}, the default, EDFs for all smooths will be returned. Numeric
+\code{select} indexes the smooths in the order they are specified in the
+formula and stored in \code{object}. Character \code{select} matches the labels for
+smooths as shown for example in the output from \code{summary(object)}. Logical
 \code{select} operates as per numeric \code{select} in the order that smooths are
 stored.}
 
-\item{smooth}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{select} instead.
-extracted. If \code{NULL}, the default, EDFs for all smooths will be returned.}
+\item{smooth}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{select} instead.}
 
 \item{type}{character: which type of EDF to return. \code{"default"} returns the
 standard EDF; \code{"unconditional"} selects the EDF corrected for smoothness

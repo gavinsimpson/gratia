@@ -20,12 +20,11 @@
 #'
 #' @param object a fitted model from which to extract smooth-specific EDFs.
 #' @param smooth `r lifecycle::badge("deprecated")` Use `select` instead.
-#'   extracted. If `NULL`, the default, EDFs for all smooths will be returned.
-#' @param select character, logical, or numeric; which smooths to plot. If
-#'   `NULL`, the default, then all model smooths are drawn. Numeric `select`
-#'   indexes the smooths in the order they are specified in the formula and
-#'   stored in `object`. Character `select` matches the labels for smooths
-#'   as shown for example in the output from `summary(object)`. Logical
+#' @param select character, logical, or numeric; which smooths EDF to extract.
+#'   If `NULL`, the default, EDFs for all smooths will be returned. Numeric
+#'   `select` indexes the smooths in the order they are specified in the
+#'   formula and stored in `object`. Character `select` matches the labels for
+#'   smooths as shown for example in the output from `summary(object)`. Logical
 #'   `select` operates as per numeric `select` in the order that smooths are
 #'   stored.
 #' @param type character: which type of EDF to return. `"default"` returns the
