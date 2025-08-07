@@ -5,6 +5,7 @@ output:
     fig_width: 8
     fig_height: 5.3333
     dev: "png"
+    dpi: 96
 bibliography: getting-started.bib
 vignette: >
   %\VignetteIndexEntry{Getting started with gratia}

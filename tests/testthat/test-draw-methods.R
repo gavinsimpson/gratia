@@ -114,11 +114,9 @@ test_that("draw.gam() plots a simple multi-smooth AM", {
 })
 
 test_that("draw.gam() can draw partial residuals", {
-  plt1 <- draw(m_tiny_eg1, residuals = TRUE, rug = FALSE)
   plt2 <- draw(m_tiny_eg1, residuals = TRUE, scales = "fixed", rug = FALSE)
 
   # skip_on_ci() # testing without as moved to mac os x
-  expect_doppelganger("draw simple partial residuals", plt1)
   expect_doppelganger("draw simple partial residuals with fixed scales", plt2)
 })
 

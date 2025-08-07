@@ -9,7 +9,9 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  dev = "ragg_png",
+  dpi = 96
 )
 options(tibble.print_min = 5, tibble.print_max = 5)
 library("mgcv")
@@ -50,19 +52,19 @@ models. *Journal of Open Source Software*, **9**(104), 6962,
 
 ## Features
 
-```{r draw-gam-figure, dev = "png", fig.height = 6, fig.width = 9, dpi = 120, echo = FALSE, fig.show = "hide", message = FALSE}
+```{r draw-gam-figure, fig.height = 6, fig.width = 9, echo = FALSE, fig.show = "hide", message = FALSE}
 df1 <- data_sim("eg1", n = 400, seed = 42)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
-draw(m1, residuals = TRUE)
+draw(m1, residuals = TRUE, rug = FALSE)
 ```
 
-```{r draw-gam-figure-2d, dev = "png", fig.height = 6, fig.width = 9, dpi = 120, echo = FALSE, fig.show = "hide", message = FALSE}
+```{r draw-gam-figure-2d, fig.height = 6, fig.width = 9, echo = FALSE, fig.show = "hide", message = FALSE}
 df2 <- data_sim("eg2", n = 1000, seed = 42)
 m2 <- gam(y ~ s(x, z), data = df2, method = "REML")
 draw(m2)
 ```
 
-```{r appraise-figure, dev = "png", fig.height = 6, fig.width = 9, dpi = 120, echo = FALSE, fig.show = "hide"}
+```{r appraise-figure, fig.height = 6, fig.width = 9, echo = FALSE, fig.show = "hide"}
 appraise(m1)
 ```
 
