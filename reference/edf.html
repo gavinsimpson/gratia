@@ -77,18 +77,17 @@ overall EDF for fitted GAMs</p>
 
 
 <dt id="arg-select">select<a class="anchor" aria-label="anchor" href="#arg-select"></a></dt>
-<dd><p>character, logical, or numeric; which smooths to plot. If
-<code>NULL</code>, the default, then all model smooths are drawn. Numeric <code>select</code>
-indexes the smooths in the order they are specified in the formula and
-stored in <code>object</code>. Character <code>select</code> matches the labels for smooths
-as shown for example in the output from <code>summary(object)</code>. Logical
+<dd><p>character, logical, or numeric; which smooths EDF to extract.
+If <code>NULL</code>, the default, EDFs for all smooths will be returned. Numeric
+<code>select</code> indexes the smooths in the order they are specified in the
+formula and stored in <code>object</code>. Character <code>select</code> matches the labels for
+smooths as shown for example in the output from <code>summary(object)</code>. Logical
 <code>select</code> operates as per numeric <code>select</code> in the order that smooths are
 stored.</p></dd>
 
 
 <dt id="arg-smooth">smooth<a class="anchor" aria-label="anchor" href="#arg-smooth"></a></dt>
-<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>select</code> instead.
-extracted. If <code>NULL</code>, the default, EDFs for all smooths will be returned.</p></dd>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>select</code> instead.</p></dd>
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
