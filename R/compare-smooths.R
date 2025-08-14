@@ -181,7 +181,7 @@
   plt <- plt + labs(
     colour = "Model", fill = "Model",
     title = unique(object[[".smooth"]]),
-    y = "Estimate"
+    y = "Partial effect"
   )
 
   plt
