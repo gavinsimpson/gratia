@@ -24,6 +24,13 @@
 * `simulate.gam()` now returns a data frame, bringing it into line with
   `stats::simulate.lm()`.
 
+* With soap film smooths, `draw.gam()` no longer plots points that are  deemed 
+  outside the boundary of the soap film (as determined by `mgcv::inSide()`).
+  `smooth_estimates()` continues to return these points however, because it
+  might be confusing to suddenly lose evaluation points. This behaviour can be
+  controlled by the argument `clip`, which is available to `draw.gam()` and
+  `smooth_estimates.gam()` currently.
+
 ## New features
 
 * `assemble()` is a new generic function for assembling sets of plots from model
@@ -135,6 +142,9 @@
 
 * `overview()` was not showing the model intercept, and was displaying slightly
   different results from those shown by `summary.gam()`.
+
+* `smooth_estimates()` was not adding any known boundary condition that was
+  part of a soap film smooth.
 
 # gratia 0.10.0
 
