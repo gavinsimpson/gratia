@@ -3,20 +3,20 @@
     Code
       print(sm_so)
     Output
-      # A tibble: 8,465 x 9
-         .smooth .type     .by   .estimate    .se .bndry .loop      v     w
-         <chr>   <chr>     <chr>     <dbl>  <dbl> <lgl>  <int>  <dbl> <dbl>
-       1 s(v,w)  Soap film <NA>     -0.879 0.0931 FALSE     NA 0.0121  -0.9
-       2 s(v,w)  Soap film <NA>     -0.919 0.0958 FALSE     NA 0.0555  -0.9
-       3 s(v,w)  Soap film <NA>     -0.960 0.0987 FALSE     NA 0.0989  -0.9
-       4 s(v,w)  Soap film <NA>     -1.00  0.101  FALSE     NA 0.142   -0.9
-       5 s(v,w)  Soap film <NA>     -1.04  0.103  FALSE     NA 0.186   -0.9
-       6 s(v,w)  Soap film <NA>     -1.09  0.105  FALSE     NA 0.229   -0.9
-       7 s(v,w)  Soap film <NA>     -1.13  0.105  FALSE     NA 0.273   -0.9
-       8 s(v,w)  Soap film <NA>     -1.17  0.105  FALSE     NA 0.316   -0.9
-       9 s(v,w)  Soap film <NA>     -1.22  0.104  FALSE     NA 0.360   -0.9
-      10 s(v,w)  Soap film <NA>     -1.26  0.103  FALSE     NA 0.403   -0.9
-      # i 8,455 more rows
+      # A tibble: 8,627 x 9
+         .smooth .type     .by   .estimate    .se .bndry .loop      v        w
+         <chr>   <chr>     <chr>     <dbl>  <dbl> <lgl>  <int>  <dbl>    <dbl>
+       1 s(v,w)  Soap film <NA>     0.0815 0.0901 FALSE     NA -0.886 -0.154  
+       2 s(v,w)  Soap film <NA>     0.0898 0.0904 FALSE     NA -0.886 -0.136  
+       3 s(v,w)  Soap film <NA>     0.0981 0.0907 FALSE     NA -0.886 -0.118  
+       4 s(v,w)  Soap film <NA>     0.106  0.0911 FALSE     NA -0.886 -0.0994 
+       5 s(v,w)  Soap film <NA>     0.115  0.0916 FALSE     NA -0.886 -0.0812 
+       6 s(v,w)  Soap film <NA>     0.122  0.0920 FALSE     NA -0.886 -0.0631 
+       7 s(v,w)  Soap film <NA>     0.130  0.0924 FALSE     NA -0.886 -0.0449 
+       8 s(v,w)  Soap film <NA>     0.137  0.0928 FALSE     NA -0.886 -0.0268 
+       9 s(v,w)  Soap film <NA>     0.140  0.0930 FALSE     NA -0.886 -0.00860
+      10 s(v,w)  Soap film <NA>     0.144  0.0932 FALSE     NA -0.886  0.00956
+      # i 8,617 more rows
 
 # smooth estimates can evaluate a so soap film no clipping
 
@@ -24,17 +24,17 @@
       print(sm_so)
     Output
       # A tibble: 10,160 x 9
-         .smooth .type     .by   .estimate   .se .bndry .loop      v     w
-         <chr>   <chr>     <chr>     <dbl> <dbl> <lgl>  <int>  <dbl> <dbl>
-       1 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.9    -0.9
-       2 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.857  -0.9
-       3 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.813  -0.9
-       4 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.770  -0.9
-       5 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.726  -0.9
-       6 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.683  -0.9
-       7 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.639  -0.9
-       8 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.596  -0.9
-       9 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.553  -0.9
-      10 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.509  -0.9
+         .smooth .type     .by   .estimate   .se .bndry .loop      v      w
+         <chr>   <chr>     <chr>     <dbl> <dbl> <lgl>  <int>  <dbl>  <dbl>
+       1 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.886 -0.898
+       2 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.886 -0.880
+       3 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.886 -0.862
+       4 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.886 -0.844
+       5 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.886 -0.826
+       6 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.886 -0.808
+       7 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.886 -0.789
+       8 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.886 -0.771
+       9 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.886 -0.753
+      10 s(v,w)  Soap film <NA>         NA    NA FALSE     NA -0.886 -0.735
       # i 10,150 more rows
 

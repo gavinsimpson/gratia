@@ -599,12 +599,28 @@ rm(i_m, i_xt)
 
 soap_fsb <- list(mgcv::fs.boundary())
 names(soap_fsb[[1]]) <- c("v", "w")
-soap_knots <- data.frame(v = rep(seq(-0.5, 3, by = 0.5), 4),
-  w = rep(c(-0.6, -0.3, 0.3, 0.6), rep(8, 4)))
+soap_knots <- data.frame(
+  v = rep(seq(-0.5, 3, by = 0.5), 4),
+  w = rep(c(-0.6, -0.3, 0.3, 0.6), rep(8, 4))
+)
 soap_data <- soap_fs_data(bnd = soap_fsb)
-m_soap <- gam(y ~
-    s(v, w, k = 30, bs = "so", xt = list(bnd = soap_fsb, nmax = 100)),
-  data = soap_data, method = "REML", knots = soap_knots)
+m_soap <- gam(
+  y ~ s(v, w, k = 30, bs = "so", xt = list(bnd = soap_fsb, nmax = 100)),
+  data = soap_data, method = "REML", knots = soap_knots
+)
+
+# Now add a known boundary condition
+soap_fsb2 <- soap_fsb
+soap_fsb2[[1]]$f <- mgcv::fs.test(
+  soap_fsb2[[1]]$v, soap_fsb2[[1]]$w, b = 1, exclude = FALSE
+)
+
+m_soap_bndry <- gam(
+  y ~ s(v, w, bs = "so", xt = list(bnd = soap_fsb2, nmax = 100)),
+  data = soap_data, method = "REML", knots = soap_knots
+)
+
+# -- End Soap films -----------------------------------------------------------
 
 # Issue 284
 df_284 <- data_sim("eg1", seed = 42)

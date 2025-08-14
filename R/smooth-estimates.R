@@ -584,9 +584,9 @@
   # Deal with data if supplied
   # As a special case, if no `data`, then we should generate some data here for
   # soap film from the boundary
-  if (is.null(data)) {
-    data <- soap_film_data(smooth)
-  }
+  #if (is.null(data)) {
+  #  data <- soap_film_data(smooth, n = n, n_3d = n_3d, n_4d = n_4d)
+  #}
   data <- process_user_data_for_eval(
     data = data, model = model,
     n = n, n_3d = n_3d, n_4d = n_4d,
@@ -598,8 +598,8 @@
 
   # handle soap film smooths
   # can use this if Simon accepts the proposed changes to inSide()
-  is_soap_film <- inherits(smooth, "soap.film")
-  if (is_soap_film) {
+  is_soap <- is_soap_film(smooth)
+  if (is_soap) {
     bnd <- boundary(smooth) # smooth$xt$bnd
     # in_side <- inSide(bnd, x = data[[smooth$vn[[1]]]],
     #  y = data[[smooth$vn[[1]]]],
@@ -632,7 +632,7 @@
   eval_sm <- add_smooth_type_column(eval_sm, sm_type = smooth_type(smooth))
 
   ## add on the boundary info
-  if (is_soap_film) {
+  if (is_soap) {
     # how many points on each boundary?
     pts <- vapply(bnd, \(x) length(x[[1]]), integer(1))
     # capture the boundary as a tibble
@@ -641,7 +641,7 @@
         .estimate = rep(NA_real_, times = n()),
         .se = rep(NA_real_, times = n()),
         .bndry = rep(TRUE, times = n()),
-        .loop = rep(seq_along(pts), each = pts)) |>
+        .loop = rep(seq_along(pts), times = pts)) |>
       relocate(all_of(c(".smooth", ".estimate", ".se", ".bndry", ".loop")),
         .before = 1L)
     bndry <- add_by_var_column(bndry, by_var = by_var)
@@ -649,8 +649,10 @@
 
     eval_sm <- eval_sm |>
       unnest(cols = "data") |>
-      mutate(.bndry = rep(FALSE, times = n()),
-        .loop = rep(NA_integer_, times = n())) |>
+      mutate(
+        .bndry = rep(FALSE, times = n()),
+        .loop = rep(NA_integer_, times = n())
+      ) |>
       relocate(all_of(c(".bndry", ".loop")), .after = 5L) |>
       bind_rows(bndry) |>
       nest(data = !matches(c(".smooth", ".type", ".by")))
@@ -2645,24 +2647,26 @@
 #' @importFrom vctrs vec_slice
 #' @keywords internal
 #' @noRd
-`plot_smooth.soap_film` <- function(object,
-    variables = NULL,
-    rug = NULL,
-    show = c("estimate", "se"),
-    contour = TRUE,
-    contour_col = "black",
-    n_contour = NULL,
-    constant = NULL,
-    fun = NULL,
-    xlab = NULL,
-    ylab = NULL,
-    title = NULL,
-    subtitle = NULL,
-    caption = NULL,
-    ylim = NULL,
-    continuous_fill = NULL,
-    angle = NULL,
-    ...) {
+`plot_smooth.soap_film` <- function(
+  object,
+  variables = NULL,
+  rug = NULL,
+  show = c("estimate", "se"),
+  contour = TRUE,
+  contour_col = "black",
+  n_contour = NULL,
+  constant = NULL,
+  fun = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  ylim = NULL,
+  continuous_fill = NULL,
+  angle = NULL,
+  ...
+) {
   if (is.null(variables)) {
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
@@ -2692,8 +2696,12 @@
     guide_limits <- range(object[[".se"]])
   }
 
+  # extract the boundary data
+  bndry <- vec_slice(object, object[[".bndry"]])
+  object <- vec_slice(object, !object[[".bndry"]])
+
   plt <- ggplot(
-    vec_slice(object, !object[[".bndry"]]),
+    object,
     aes(
       x = .data[[variables[1]]],
       y = .data[[variables[2]]]
@@ -2785,12 +2793,14 @@
   ## add the boundary
   plt <- plt +
     geom_path(
-      data = vec_slice(object, object[[".bndry"]]),
+      data = bndry,
       mapping = aes(
         x = .data[[variables[1]]],
-        y = .data[[variables[2]]]),
-        linewidth = 2, colour = "black"
-      )
+        y = .data[[variables[2]]],
+        group = .loop # need to group by the loops in case more than 1 loop
+      ),
+      linewidth = 2, colour = "black"
+    )
 
   plt
 }

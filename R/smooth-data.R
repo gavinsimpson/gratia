@@ -187,6 +187,8 @@
   newdata # return
 }
 
+# This is just stupid - what was I even thinking, doesn't work if there are
+# multiple boundaries for example, and I don't even think it is necessary...
 `soap_film_data` <- function(smooth,
     n = 100,
     n_2d = NULL,

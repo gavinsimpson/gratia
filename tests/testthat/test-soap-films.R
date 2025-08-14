@@ -19,7 +19,7 @@ test_that("smooth estimates can evaluate a so soap film", {
   # boundary coords, which is 160 in the example, *if* all eval points were
   # inside the boundary, but some aren't: 8465 points including the boundary
   # are inside
-  expect_identical(nrow(sm_so), as.integer(8465))
+  expect_identical(nrow(sm_so), as.integer(8627))
 
   skip_on_cran()
   # skip_on_ci() # testing without as moved to mac os x
@@ -50,4 +50,17 @@ test_that("draw for smooth estimates can plot a so soap film", {
   skip_on_cran()
   # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw.smooth_estimates so soap film", plt_so)
+})
+
+
+test_that("draw smooth estimates can plot a so soap film with known bndry", {
+  #skip("mgcv can't find the boundary")
+  expect_silent(
+    plt_so <- smooth_estimates(m_soap_bndry, clip = TRUE) |>
+      draw()
+  )
+
+  skip_on_cran()
+  # skip_on_ci() # testing without as moved to mac os x
+  expect_doppelganger("draw.smooth_estimates so soap film bndry", plt_so)
 })
