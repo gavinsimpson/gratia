@@ -92,6 +92,9 @@
   using the default method: `basis(s(x), data = df, coefficients = rnorm(10))`.
   Wish of #136
 
+* `draw.gam()` and `draw.smooth_estimates()` can now handle soap film smooths 
+  with known boundary values, and with nested boundaries.
+
 ## Bug fixes
 
 * `conditional_values()` would fail if a variable it was conditioning on was

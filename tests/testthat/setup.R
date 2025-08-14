@@ -620,6 +620,60 @@ m_soap_bndry <- gam(
   data = soap_data, method = "REML", knots = soap_knots
 )
 
+## --- Nested boundary example ------------------------------------------------
+
+`soap_nested_bndry` <- function(n = 100, a = 0.3, b = 0.3) {
+  bndry <- list(
+    list(x = 0, y = 0),
+    list(x = 0, y = 0)
+  )
+  theta <- seq(0, 2 * pi, length = n)
+  bndry[[1]]$x <- sin(theta)
+  bndry[[1]]$y <- cos(theta)
+  bndry[[2]]$x <- a + b * sin(theta)
+  bndry[[2]]$y <- a + b * cos(theta)
+  bndry
+}
+
+`soap_nested_knots` <- function(n_knots = 8, bndry) {
+  y_grid <- x_grid <- seq(-1, 1, length = n_knots)
+  x <- rep(x_grid, n_knots)
+  y <- rep(y_grid, rep(n_knots, n_knots))
+  idx <- mgcv::inSide(bndry, x, y)
+  knots <- data.frame(x = x[idx], y = y[idx])
+  knots
+}
+
+`soap_nested_data` <- function(n = 300, seed = 1, bndry) {
+  f <- function(x, y) {
+    exp(-(x - 0.3)^2 - (y - 0.3)^2)
+  }
+  df <- withr::with_seed(
+    seed, {
+      x <- runif(n) * 2 - 1
+      y <- runif(n) * 2 - 1
+      ind <- inSide(bndry, x, y)
+      x <- x[ind]
+      y <- y[ind]
+      n <- length(x)
+      z <- f(x, y) + rnorm(n) * 0.1
+      tibble(x = x, y = y, z = z, f = f(x, y))
+    }
+  )
+  df
+}
+
+sf_nested_bndry <- soap_nested_bndry()
+sf_nested_knots <- soap_nested_knots(bndry = sf_nested_bndry)
+sf_nested_df <- soap_nested_data(bndry = sf_nested_bndry)
+
+m_soap_nested <- gam(
+  z ~ s(
+    x, y, k = c(30, 15), bs = "so", xt = list(bnd = sf_nested_bndry, nmax = 60)
+  ),
+  data = sf_nested_df, method = "REML", knots = sf_nested_knots
+)
+
 # -- End Soap films -----------------------------------------------------------
 
 # Issue 284

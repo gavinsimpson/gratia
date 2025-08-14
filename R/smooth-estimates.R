@@ -2797,7 +2797,7 @@
       mapping = aes(
         x = .data[[variables[1]]],
         y = .data[[variables[2]]],
-        group = .loop # need to group by the loops in case more than 1 loop
+        group = .data[[".loop"]] # need to group by loops in case >1 loop
       ),
       linewidth = 2, colour = "black"
     )
