@@ -78,12 +78,19 @@
 
   # need to append the elements of plts to get a single list where each
   # element is a ggplot object
-  plts <- do.call("append", plts)
+  ## plts <- do.call("append", plts) # this doesn't work with more than 1 smooth
+  # We need to unlist only until we hit a ggplot object
+  # From https://stackoverflow.com/a/19737149/429846
+  renquote <- function(l) {
+    if (!inherits(l, "ggplot")) {
+      lapply(l, renquote)
+    } else {
+      enquote(l)
+    }
+  }
+  plts <- lapply(unlist(renquote(plts)), eval)
 
   if (identical(scales, "fixed")) {
-    # x_lim <- get_xlim_from_plots(plts)
-    # x_lim <- exec("range", !!!x_lim)
-
     y_lim <- get_ylim_from_plots(plts)
     y_lim <- exec("range", !!!y_lim)
     plts <- lapply(plts, \(p) p + lims(y = y_lim))
