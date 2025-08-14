@@ -31,6 +31,9 @@
   controlled by the argument `clip`, which is available to `draw.gam()` and
   `smooth_estimates.gam()` currently.
 
+* `draw.compare_smooths()` now uses "Partial effect" as the y-axis label, in
+  common with other partial effect plots in *gratia*.
+
 ## New features
 
 * `assemble()` is a new generic function for assembling sets of plots from model
