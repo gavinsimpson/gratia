@@ -1903,7 +1903,10 @@ reclass_scam_smooth <- function(smooth) {
 #' @rdname boundary
 `boundary.soap.film` <- function(x, ...) {
   stop_if_not_mgcv_smooth(x)
-  x[["xt"]][["bnd"]]
+  ## extract the boundary
+  out <- x[["xt"]][["bnd"]]
+  ## need to return only the boundary, not anythign else
+  lapply(out, `[`, smooth_variable(x))
 }
 
 #' @export
@@ -2087,4 +2090,30 @@ multivariate_y <- function() {
     object,
     c("family", "extended.family", "general.family")
   )
+}
+
+# Until Simon modifies `mgcv::inSide()` to be more programmer-friendly, this is
+# a wrapper that calls it in a way that does work
+# #' @importFrom geometry convhulln inhulln
+#' @importFrom mgcv inSide
+`inside` <- function(..data, bnd, x_var, y_var) {
+  # bnd_mat <- as.data.frame(bnd) |> as.matrix()
+  # ch <- geometry::convhulln(bnd_mat)
+  # ins <- geometry::inhulln(ch, data |> as.matrix())
+  # ins
+
+  # force eerything to have the same coord names `x` and `y`
+  bnd <- lapply(bnd, `names<-`, value = c("x", "y"))
+  ..data <- ..data[c(x_var, y_var)] |> setNames(c("x", "y"))
+  x <- ..data[["x"]]
+  y <- ..data[["y"]]
+  # call mgcv::inSide in a way that doesn't fall foul of the
+  # deparse(substitute()) shenanigans
+  mgcv::inSide(bnd = bnd, x = x, y = y)
+}
+
+# is a smooth a soap film
+`is_soap_film` <- function(object) {
+  check_is_mgcv_smooth(object)
+  inherits(object, "soap.film")
 }

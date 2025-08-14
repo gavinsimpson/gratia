@@ -187,7 +187,6 @@
   newdata # return
 }
 
-#' @importFrom mgcv inSide
 `soap_film_data` <- function(smooth,
     n = 100,
     n_2d = NULL,

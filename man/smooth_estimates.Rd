@@ -20,6 +20,7 @@ smooth_estimates(object, ...)
   dist = NULL,
   unnest = TRUE,
   partial_match = FALSE,
+  clip = FALSE,
   ...
 )
 }
@@ -68,6 +69,10 @@ and \code{dist} is a distance within the unit square. See
 \item{partial_match}{logical; in the case of character \code{select}, should
 \code{select} match partially against \code{smooths}? If \code{partial_match = TRUE},
 \code{select} must only be a single string, a character vector of length 1.}
+
+\item{clip}{logical; should evaluation points be clipped to the boundary of
+a soap film smooth? The default is \code{FALSE}, which will return \code{NA} for any
+point that is deemed to lie outside the boundary of the soap film.}
 }
 \value{
 A data frame (tibble), which is of class \code{"smooth_estimates"}.

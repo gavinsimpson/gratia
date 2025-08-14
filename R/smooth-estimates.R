@@ -38,6 +38,9 @@
 #' @param partial_match logical; in the case of character `select`, should
 #'   `select` match partially against `smooths`? If `partial_match = TRUE`,
 #'   `select` must only be a single string, a character vector of length 1.
+#' @param clip logical; should evaluation points be clipped to the boundary of
+#'   a soap film smooth? The default is `FALSE`, which will return `NA` for any
+#'   point that is deemed to lie outside the boundary of the soap film.
 #' @param ... arguments passed to other methods.
 #'
 #' @return A data frame (tibble), which is of class `"smooth_estimates"`.
@@ -93,6 +96,7 @@
     dist = NULL,
     unnest = TRUE,
     partial_match = FALSE,
+    clip = FALSE,
     ...) {
   if (lifecycle::is_present(smooth)) {
     lifecycle::deprecate_warn("0.8.9.9", "smooth_estimates(smooth)",
@@ -145,7 +149,7 @@
       eval_smooth,
       model = object, n = n, n_3d = n_3d, n_4d = n_4d, data = data,
       unconditional = unconditional,
-      overall_uncertainty = overall_uncertainty, dist = dist,
+      overall_uncertainty = overall_uncertainty, dist = dist, clip = clip
     )
   } else {
     sm_list <- map(
@@ -158,7 +162,7 @@
         ),
         object = object, n = n, n_3d = n_3d, n_4d = n_4d, data = data,
         unconditional = unconditional,
-        overall_uncertainty = overall_uncertainty, dist = dist,
+        overall_uncertainty = overall_uncertainty, dist = dist, clip = clip,
         eval_smooth = gratia::eval_smooth
       )
     )
@@ -323,13 +327,19 @@
 `spline_values` <- function(
     smooth, data, model, unconditional,
     overall_uncertainty = TRUE, frequentist = FALSE) {
+  is_soap <- is_soap_film(smooth)
   X <- PredictMat(smooth, data) # prediction matrix
+  offset <- attr(X, "offset")
   start <- smooth[["first.para"]]
   end <- smooth[["last.para"]]
   para.seq <- start:end
   coefs <- coef(model)[para.seq]
 
-  fit <- drop(X %*% coefs)
+  fit <- if (is_soap && !is.null(offset)) {
+    drop(X %*% coefs) + attr(X, "offset")
+  } else {
+    drop(X %*% coefs)
+  }
 
   label <- smooth_label(smooth)
 
@@ -554,16 +564,18 @@
 #' @importFrom dplyr n mutate relocate bind_rows
 #' @importFrom tidyselect all_of
 #' @export
-`eval_smooth.soap.film` <- function(smooth,
-    model,
-    n = 100,
-    n_3d = NULL,
-    n_4d = NULL,
-    data = NULL,
-    unconditional = FALSE,
-    overall_uncertainty = TRUE,
-    #clip_soap = TRUE, # ?hmm thinking
-    ...) {
+`eval_smooth.soap.film` <- function(
+  smooth,
+  model,
+  n = 100,
+  n_3d = NULL,
+  n_4d = NULL,
+  data = NULL,
+  unconditional = FALSE,
+  overall_uncertainty = TRUE,
+  clip = TRUE, # ?hmm thinking
+  ...
+) {
   by_var <- by_variable(smooth) # even if not a by as we want NA later
   if (by_var == "NA") {
     by_var <- NA_character_
@@ -594,6 +606,16 @@
     # xname = "v", yname = "w") # needs fixed inSide
     # use in_side to filter the data before we evaluate the spline
     # any point outside the domain is NA anyway
+    if (isTRUE(clip)) {
+      is_inside <- inside(
+        data,
+        bnd,
+        x_var = smooth$vn[[1]],
+        y_var = smooth$vn[[2]]
+      )
+
+      data <- filter(data, is_inside)
+    }
   }
 
   ## values of spline at data

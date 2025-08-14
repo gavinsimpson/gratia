@@ -37,6 +37,7 @@ eval_smooth(smooth, ...)
   data = NULL,
   unconditional = FALSE,
   overall_uncertainty = TRUE,
+  clip = TRUE,
   ...
 )
 
@@ -154,6 +155,10 @@ a location is too far from data to be plotted when plotting 2-D smooths.
 The data are scaled into the unit square before deciding what to exclude,
 and \code{dist} is a distance within the unit square. See
 \code{\link[mgcv:exclude.too.far]{mgcv::exclude.too.far()}} for further details.}
+
+\item{clip}{logical; should evaluation points be clipped to the boundary of
+a soap film smooth? The default is \code{FALSE}, which will return \code{NA} for any
+point that is deemed to lie outside the boundary of the soap film.}
 }
 \description{
 S3 methods to evaluate individual smooths

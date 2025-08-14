@@ -164,6 +164,7 @@
       unconditional = unconditional,
       overall_uncertainty = overall_uncertainty,
       dist = dist,
+      clip = TRUE,
       unnest = FALSE
     )
 
