@@ -24,7 +24,7 @@
 * `simulate.gam()` now returns a data frame, bringing it into line with
   `stats::simulate.lm()`.
 
-* With soap film smooths, `draw.gam()` no longer plots points that are  deemed 
+* With soap film smooths, `draw.gam()` no longer plots points that are deemed 
   outside the boundary of the soap film (as determined by `mgcv::inSide()`).
   `smooth_estimates()` continues to return these points however, because it
   might be confusing to suddenly lose evaluation points. This behaviour can be
