@@ -146,6 +146,9 @@
 * `smooth_estimates()` was not adding any known boundary condition that was
   part of a soap film smooth.
 
+* `draw.gamlss()` (for `GJRM::gamlss()` models) now doesn't fail with an error 
+  if there is more than a single smooth in any of the linear predictors.
+
 # gratia 0.10.0
 
 ## New features
