@@ -620,6 +620,12 @@ m_soap_bndry <- gam(
   data = soap_data, method = "REML", knots = soap_knots
 )
 
+m_soap_sep <- gam(
+  y ~ s(v, w, k = 30, bs = "sf", xt = list(bnd = soap_fsb, nmax = 100)) +
+    s(v, w, k = 30, bs = "sw", xt = list(bnd = soap_fsb, nmax = 100)),
+  data = soap_data, method = "REML", knots = soap_knots
+)
+
 ## --- Nested boundary example ------------------------------------------------
 
 `soap_nested_bndry` <- function(n = 100, a = 0.3, b = 0.3) {
