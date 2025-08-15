@@ -127,3 +127,133 @@
 
   as_tibble(p_resids)
 }
+
+# -- quantile residuals -------------------------------------------------------
+#' Randomised residuals
+#'
+#' @param model a fitted model object.
+#' @param type character; which type of randomised residual to return
+#' @param seed integer; the random seed to use when generating randomised
+#'   residuals. Can be missing, in which case the current state residuals are
+#'   computed using the current state of the random number generator.
+#' @param ... arguments passed to other methods.
+#' @export
+`quantile_residuals` <- function(
+  model, type = c("pit", "quantile"), seed = NULL, ...
+) {
+  UseMethod("quantile_residuals")
+}
+
+#' @importFrom stats qnorm
+#' @export
+#' @rdname quantile_residuals
+`quantile_residuals.gam` <- function(
+  model, type = c("pit", "quantile"), seed = NULL, ...
+) {
+  # random seed stuff
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+    runif(1)
+  }
+  if (is.null(seed)) {
+    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+  } else {
+    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+    set.seed(seed)
+    RNGstate <- structure(seed, kind = as.list(RNGkind()))
+    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+  }
+
+  r <- do_quantile_residuals(
+    y = model$y,
+    fv = model$fitted.values,
+    wt = model$prior.weights,
+    scale = model$sig2,
+    fam = family(model),
+    type = type
+  )
+
+  # return
+  r
+}
+
+#' @export
+#' @rdname quantile_residuals
+`quantile_residuals.glm` <- function(
+  model, type = c("pit", "quantile"), seed = NULL, ...
+) {
+  # random seed stuff
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+    runif(1)
+  }
+  if (is.null(seed)) {
+    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+  } else {
+    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+    set.seed(seed)
+    RNGstate <- structure(seed, kind = as.list(RNGkind()))
+    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+  }
+
+  r <- do_quantile_residuals(
+    y = model$y,
+    fv = model$fitted.values,
+    wt = model$prior.weights,
+    scale = summary(model)$dispersion,
+    fam = family(model),
+    type = type
+  )
+
+  r
+}
+
+`do_quantile_residuals` <- function(
+  y,     # observed response
+  fv,    # fitted values
+  wt,    # prior weights
+  scale, # dispersion or scale
+  fam,   # family
+  type = c("pit", "quantile") # type of residual
+) {
+  # start randomised residuals code
+  type <- match.arg(type)
+  if (is.null(fam$cdf)) {
+    fam <- fix_family_cdf(fam)
+  }
+  # is it still NULL?
+  if (is.null(fam$cdf)) {
+    stop("Quantile residuals are not available for this family.")
+  }
+
+  # for now, use the internal fitted.values but that isn't going to work in the
+  # long term as often those values are not a vector and not for mu (IIRC)
+  r <- fam$cdf(
+    q = y,
+    mu = fv,
+    wt = wt,
+    scale = scale,
+    log_p = FALSE # not log scale as 0s become -Inf on the log scale
+  )
+
+  discrete_dist <- c("poisson", "binomial")
+  if (family_name(fam) %in% discrete_dist) {
+    # residual for CDF at previous y value
+    r0 <- fam$cdf(
+      q = y - 1L,
+      mu = fv,
+      wt = wt,
+      scale = scale,
+      log_p = FALSE # not log scale as 0s become -Inf on the log scale
+    )
+    # choose a random value between r0 and r
+    r <- runif(n = length(y), min = r0, max = r)
+  }
+
+  # finish of the residuals; if PIT resids we need to undo the log probability
+  # and if quantile, we push the resids through the standard normal inv CDF
+  if (type == "quantile") {
+    r <- qnorm(r, log.p = FALSE)
+  }
+
+  # return
+  r
+}
