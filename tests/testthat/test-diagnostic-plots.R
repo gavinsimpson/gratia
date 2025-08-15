@@ -168,3 +168,29 @@ test_that("appraise handles twlss models", {
     "appraise for twlss model", plt
   )
 })
+
+test_that("residuals linpred plot works with pit residuals", {
+  skip_on_ci()
+  skip_on_cran()
+
+  expect_silent(
+    plt <- residuals_linpred_plot(b_pois, type = "pit", seed = 2)
+  )
+
+  expect_doppelganger(
+    "residuals linpred plot and pit residuals for poisson model", plt
+  )
+})
+
+test_that("residuals hist plot works with quantile residuals", {
+  skip_on_ci()
+  skip_on_cran()
+
+  expect_silent(
+    plt <- residuals_hist_plot(b_pois, type = "quantile", seed = 2)
+  )
+
+  expect_doppelganger(
+    "residuals hist plot and quantile residuals for poisson model", plt
+  )
+})

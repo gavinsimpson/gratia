@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' data-engine-version='2.0' width='720.00pt' height='576.00pt' viewBox='0 0 720.00 576.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA='>
+    <rect x='0.00' y='0.00' width='720.00' height='576.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+<rect x='0.00' y='0.00' width='720.00' height='576.00' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
+</g>
+<defs>
+  <clipPath id='cpMzcuNjl8NzE0LjUyfDM4LjEyfDU0NS4xMQ=='>
+    <rect x='37.69' y='38.12' width='676.83' height='507.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzcuNjl8NzE0LjUyfDM4LjEyfDU0NS4xMQ==)'>
+<rect x='37.69' y='38.12' width='676.83' height='507.00' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<rect x='68.45' y='518.32' width='51.28' height='3.75' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #CCCCCC;' />
+<rect x='119.73' y='507.08' width='51.28' height='14.99' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #CCCCCC;' />
+<rect x='171.00' y='477.10' width='51.28' height='44.97' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #CCCCCC;' />
+<rect x='222.28' y='409.65' width='51.28' height='112.42' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #CCCCCC;' />
+<rect x='273.55' y='312.22' width='51.28' height='209.84' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #CCCCCC;' />
+<rect x='324.83' y='211.05' width='51.28' height='311.02' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #CCCCCC;' />
+<rect x='376.10' y='61.16' width='51.28' height='460.91' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #CCCCCC;' />
+<rect x='427.38' y='181.07' width='51.28' height='340.99' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #CCCCCC;' />
+<rect x='478.65' y='315.97' width='51.28' height='206.10' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #CCCCCC;' />
+<rect x='529.93' y='390.92' width='51.28' height='131.15' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #CCCCCC;' />
+<rect x='581.21' y='492.09' width='51.28' height='29.98' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #CCCCCC;' />
+<rect x='632.48' y='514.57' width='51.28' height='7.49' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #CCCCCC;' />
+<rect x='37.69' y='38.12' width='676.83' height='507.00' style='stroke-width: 1.07; stroke: #333333;' />
+</g>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+<text x='32.76' y='525.10' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='32.76' y='431.42' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>25</text>
+<text x='32.76' y='337.74' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>50</text>
+<text x='32.76' y='244.06' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>75</text>
+<text x='32.76' y='150.38' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>100</text>
+<text x='32.76' y='56.70' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>125</text>
+<polyline points='34.95,522.07 37.69,522.07 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='34.95,428.39 37.69,428.39 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='34.95,334.71 37.69,334.71 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='34.95,241.03 37.69,241.03 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='34.95,147.35 37.69,147.35 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='34.95,53.67 37.69,53.67 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='214.83,547.85 214.83,545.11 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='401.74,547.85 401.74,545.11 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='588.66,547.85 588.66,545.11 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<text x='214.83' y='556.10' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='7.82px' lengthAdjust='spacingAndGlyphs'>-2</text>
+<text x='401.74' y='556.10' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='588.66' y='556.10' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='376.10' y='568.24' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='88.06px' lengthAdjust='spacingAndGlyphs'>Quantile residuals</text>
+<text transform='translate(13.05,291.61) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='51.98px' lengthAdjust='spacingAndGlyphs'>Frequency</text>
+<text x='37.69' y='30.35' style='font-size: 11.00px; font-family: sans;' textLength='76.43px' lengthAdjust='spacingAndGlyphs'>Family: poisson</text>
+<text x='37.69' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='131.34px' lengthAdjust='spacingAndGlyphs'>Histogram of residuals</text>
+</g>
+</svg>
