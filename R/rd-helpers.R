@@ -23,7 +23,19 @@
   fun # return
 }
 
-# simulator for tweedie LSS models
+#' Simulator for tweedie LSS models
+#'
+#' Simulate random deviates from a Tweedie distribution with given parameters
+#' \eqn{\mu}{mu}, \eqn{p}{p}, and \eqn{\phi}{phi}. Works with vector values for
+#' all parameters, unlike the version on *mgcv*.
+#'
+#' @param mu numeric vector of mean values of Tweedie distribution.
+#' @param p numeric vector of values for the power parameter of the Tweedie
+#'   distribution.
+#' @param phi numeric vector of values for the scale parameter \eqn{\phi}{phi}
+#'   of the Tweedie distribution.
+#'
+#' @export
 #' @importFrom stats rpois rgamma
 #' @importFrom tibble new_tibble
 #' @importFrom vctrs vec_group_loc vec_chop df_list
