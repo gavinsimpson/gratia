@@ -6,20 +6,29 @@
 \usage{
 residuals_hist_plot(
   model,
-  type = c("deviance", "pearson", "response"),
+  type = c("deviance", "pearson", "response", "pit", "quantile"),
   n_bins = c("sturges", "scott", "fd"),
   ylab = NULL,
   xlab = NULL,
   title = NULL,
   subtitle = NULL,
-  caption = NULL
+  caption = NULL,
+  seed = NULL
 )
 }
 \arguments{
 \item{model}{a fitted model. Currently only class \code{"gam"}.}
 
-\item{type}{character; type of residuals to use. Only \code{"deviance"},
-\code{"response"}, and \code{"pearson"} residuals are allowed.}
+\item{type}{character; type of residuals to use. One of \code{"deviance"},
+\code{"response"}, \code{"pearson"}, \code{"pit"}, and \code{"quantile"} residuals are
+allowed. \code{"pit"} uses probability integral transform (PIT) residuals,
+which, if the model is correct should be approximately uniformly
+distributed, while \code{"quantile"} transforms the PIT residuals through
+application of the inverse CDF of the standard normal, and therefore the
+quantile residuals should be approximately normally distributed (mean = 0,
+sd = 1) if the model is correct. PIT and quantile residuals are not yet
+available for most families that can be handled by \code{gam()}, but most
+standard families are supported, e.g. those used by \code{glm()}.}
 
 \item{n_bins}{character or numeric; either the number of bins or a string
 indicating how to calculate the number of bins.}
@@ -38,6 +47,8 @@ supplied, a suitable label will be generated.}
 
 \item{caption}{character or expression; the plot caption. See
 \code{\link[ggplot2:labs]{ggplot2::labs()}}.}
+
+\item{seed}{integer; random seed to use for PIT or quantile residuals.}
 }
 \description{
 Histogram of model residuals
