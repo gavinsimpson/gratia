@@ -542,8 +542,16 @@
 #' @title Plot of residuals versus linear predictor values
 #'
 #' @param model a fitted model. Currently only class `"gam"`.
-#' @param type character; type of residuals to use. Only `"deviance"`,
-#'   `"response"`, and `"pearson"` residuals are allowed.
+#' @param type character; type of residuals to use. One of `"deviance"`,
+#'   `"response"`, `"pearson"`, `"pit"`, and `"quantile"` residuals are
+#'   allowed. `"pit"` uses probability integral transform (PIT) residuals,
+#'   which, if the model is correct should be approximately uniformly
+#'   distributed, while `"quantile"` transforms the PIT residuals through
+#'   application of the inverse CDF of the standard normal, and therefore the
+#'   quantile residuals should be approximately normally distributed (mean = 0,
+#'   sd = 1) if the model is correct. PIT and quantile residuals are not yet
+#'   available for most families that can be handled by `gam()`, but most
+#'   standard families are supported, e.g. those used by `glm()`.
 #' @param xlab character or expression; the label for the y axis. If not
 #'   supplied, a suitable label will be generated.
 #' @param ylab character or expression; the label for the y axis. If not
@@ -560,6 +568,7 @@
 #'   all plots.
 #' @param point_alpha numeric; alpha transparency for points in plots.
 #' @param line_col colour specification for 1:1 line.
+#' @param seed integer; random seed to use for PIT or quantile residuals.
 #'
 #' @export
 #'
@@ -568,7 +577,7 @@
 #' @importFrom ggplot2 ggplot aes geom_point geom_hline labs
 `residuals_linpred_plot` <- function(
   model,
-  type = c("deviance", "pearson", "response"),
+  type = c("deviance", "pearson", "response", "pit", "quantile"),
   ylab = NULL,
   xlab = NULL,
   title = NULL,
@@ -576,10 +585,21 @@
   caption = NULL,
   point_col = "black",
   point_alpha = 1,
-  line_col = "red"
+  line_col = "red",
+  seed = NULL
 ) {
   type <- match.arg(type)
-  r <- residuals(model, type = type)
+  y_intercept <- 0
+  if (type %in% c("pit", "quantile")) {
+    r <- quantile_residuals(model, type = type, seed = seed)
+    if (is.null(ylab) && type == "pit") {
+      ylab <- "PIT residuals"
+      y_intercept <- 0.5
+    }
+  } else {
+    r <- residuals(model, type = type)
+    y_intercept <- 0
+  }
   mv_y <- family_name(model) %in% multivariate_y()
   if (is.matrix(r) && mv_y) { # handle mvn() like fits
     r <- as.vector(r)
@@ -600,7 +620,7 @@
     x = .data$eta,
     y = .data$residuals
   )) +
-    geom_hline(yintercept = 0, col = line_col)
+    geom_hline(yintercept = y_intercept, col = line_col)
 
   ## add point layer
   plt <- plt + geom_point(colour = point_col, alpha = point_alpha)
@@ -704,14 +724,23 @@
 #' @importFrom tools toTitleCase
 #' @importFrom stats residuals
 #' @importFrom grDevices nclass.Sturges nclass.scott nclass.FD
-`residuals_hist_plot` <- function(model,
-                                  type = c("deviance", "pearson", "response"),
-                                  n_bins = c("sturges", "scott", "fd"),
-                                  ylab = NULL, xlab = NULL, title = NULL,
-                                  subtitle = NULL, caption = NULL) {
+`residuals_hist_plot` <- function(
+  model,
+  type = c("deviance", "pearson", "response", "pit", "quantile"),
+  n_bins = c("sturges", "scott", "fd"),
+  ylab = NULL, xlab = NULL, title = NULL,
+  subtitle = NULL, caption = NULL,
+  seed = NULL
+) {
   ## extract data for plot
   type <- match.arg(type)
-  df <- data.frame(residuals = as.vector(residuals(model, type = type)))
+
+  if (type %in% c("pit", "quantile")) {
+    r <- quantile_residuals(model, type = type, seed = seed)
+  } else {
+    r <- as.vector(residuals(model, type = type))
+  }
+  df <- data.frame(residuals = r)
 
   ## work out number of bins
   if (is.character(n_bins)) {
