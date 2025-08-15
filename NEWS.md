@@ -98,6 +98,10 @@
 * `draw.gam()` and `draw.smooth_estimates()` can now handle soap film smooths 
   with known boundary values, and with nested boundaries.
 
+* `scale_fill_partial_effect()` is a *ggplot* scale function that implements
+  the default diverging red-blue gradient used by *gratia* when plotting partial
+  effect surfaces for multivariate smooths.
+
 ## Bug fixes
 
 * `conditional_values()` would fail if a variable it was conditioning on was
