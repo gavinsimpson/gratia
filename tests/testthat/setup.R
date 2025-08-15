@@ -172,9 +172,9 @@ su_eg2_by <- su_eg2 |>
   mutate(y = y + y^2 + y^3) |>
   bind_rows(su_eg2) |>
   mutate(fac = factor(rep(c("A", "B"), each = nrow(su_eg2))))
+
 su_m_bivar_by_fac <- gam(y ~ fac + s(x, z, k = 40, by = fac),
-  data = su_eg2_by,
-  method = "REML"
+  data = su_eg2_by, method = "REML"
 )
 
 su_gamm_univar_4 <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3),
@@ -240,7 +240,7 @@ m_glm <- glm(y ~ x0 + x1 + x2 + x3, data = quick_eg1)
 
 data(CO2)
 m_ordered_by <- gam(uptake ~ Plant + s(conc, k = 5) +
-    s(conc, by = Plant, k = 5), data = CO2, method = "REML")
+  s(conc, by = Plant, k = 5), data = CO2, method = "REML")
 
 ## -- rootogram models ---------------------------------------------------------
 df_pois <- data_sim("eg1", dist = "poisson", n = 500L, scale = 0.2, seed = 42)
@@ -604,8 +604,15 @@ soap_knots <- data.frame(
   w = rep(c(-0.6, -0.3, 0.3, 0.6), rep(8, 4))
 )
 soap_data <- soap_fs_data(bnd = soap_fsb)
+
 m_soap <- gam(
   y ~ s(v, w, k = 30, bs = "so", xt = list(bnd = soap_fsb, nmax = 100)),
+  data = soap_data, method = "REML", knots = soap_knots
+)
+
+m_soap_sep <- gam(
+  y ~ s(v, w, k = 30, bs = "sf", xt = list(bnd = soap_fsb, nmax = 100)) +
+    s(v, w, k = 30, bs = "sw", xt = list(bnd = soap_fsb, nmax = 100)),
   data = soap_data, method = "REML", knots = soap_knots
 )
 
@@ -617,12 +624,6 @@ soap_fsb2[[1]]$f <- mgcv::fs.test(
 
 m_soap_bndry <- gam(
   y ~ s(v, w, bs = "so", xt = list(bnd = soap_fsb2, nmax = 100)),
-  data = soap_data, method = "REML", knots = soap_knots
-)
-
-m_soap_sep <- gam(
-  y ~ s(v, w, k = 30, bs = "sf", xt = list(bnd = soap_fsb, nmax = 100)) +
-    s(v, w, k = 30, bs = "sw", xt = list(bnd = soap_fsb, nmax = 100)),
   data = soap_data, method = "REML", knots = soap_knots
 )
 
