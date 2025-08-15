@@ -22,3 +22,48 @@
   )
   fun # return
 }
+
+# simulator for tweedie LSS models
+#' @importFrom rlang .data
+#' @importFrom stats rpois rgamma
+#' @importFrom tibble new_tibble
+#' @importFrom vctrs vec_group_loc vec_chop df_list
+`rtw` <- function(mu, p, phi) {
+  if (any(p <= 1 | p >= 2)) {
+    stop("'p' must be in interval (1, 2)")
+  }
+  if (any(phi <= 0)) {
+    stop("scale parameter 'phi' must be positive")
+  }
+  if (any(mu < 0)) {
+    stop("mean 'mu' must be non-negative")
+  }
+  lambda <- mu^(2 - p) / ((2 - p) * phi)
+  shape <- (2 - p) / (p - 1)
+  scale <- phi * (p - 1) * mu^(p - 1)
+  # n_sim <- length(mu)
+  N <- rpois(length(lambda), lambda)
+  gs <- rep(scale, N)
+  # y <- rgamma(gs * 0 + 1, shape = shape, scale = gs)
+  # lab <- rep(1:length(N), N)
+  # out <- tapply(y, lab, sum)
+  tab <- new_tibble(
+    df_list(
+      y = rgamma(gs * 0 + 1, shape = shape, scale = gs),
+      lab = rep(seq_along(N), N)
+    )
+  )
+  out <- numeric(length(N))
+  #out[which(N != 0)] <- tab |>
+  #  group_by(.data$lab) |>
+  #  summarise(summed = sum(.data$y)) |>
+  #  pull(.data$summed)
+  chop_fun <- function(.x, .by) {
+    idx <- vec_group_loc(.by)$loc
+    chp <- vec_chop(.x, indices = idx)
+    out <- lapply(chp, sum)
+    unlist(out)
+  }
+  out[which(N != 0)] <- chop_fun(tab$y, tab$lab)
+  out
+}
