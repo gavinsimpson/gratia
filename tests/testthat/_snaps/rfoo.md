@@ -16,3 +16,35 @@
        [1]  1.6760667 26.0809763  3.0301311  0.7551897  7.9348421  4.8814385
        [7] 13.6470470  3.2858650  5.6785218 73.8935738
 
+# rtw fails with negative mu
+
+    Code
+      rtw(mu = -2, p = 1.1, phi = 1.1)
+    Condition
+      Error in `rtw()`:
+      ! mean 'mu' must be non-negative
+
+# rtw fails with p outside below range
+
+    Code
+      rtw(mu = 2, p = 1L, phi = 1.1)
+    Condition
+      Error in `rtw()`:
+      ! 'p' must be in interval (1, 2)
+
+# rtw fails with p outside above range
+
+    Code
+      rtw(mu = 2, p = 3L, phi = 1.1)
+    Condition
+      Error in `rtw()`:
+      ! 'p' must be in interval (1, 2)
+
+# rtw fails with phi negative
+
+    Code
+      rtw(mu = 2, p = 1.5, phi = -1)
+    Condition
+      Error in `rtw()`:
+      ! scale parameter 'phi' must be positive
+

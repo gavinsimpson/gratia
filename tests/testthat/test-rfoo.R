@@ -29,3 +29,42 @@ test_that("rtw works with vector p and phi", {
     )
   )
 })
+
+test_that("rtw fails with negative mu", {
+  skip_on_cran()
+  skip_on_ci()
+
+  expect_snapshot(
+    rtw(mu = -2, p = 1.1, phi = 1.1),
+    error = TRUE
+  )
+})
+test_that("rtw fails with p outside below range", {
+  skip_on_cran()
+  skip_on_ci()
+
+  expect_snapshot(
+    rtw(mu = 2, p = 1L, phi = 1.1),
+    error = TRUE
+  )
+})
+
+test_that("rtw fails with p outside above range", {
+  skip_on_cran()
+  skip_on_ci()
+
+  expect_snapshot(
+    rtw(mu = 2, p = 3L, phi = 1.1),
+    error = TRUE
+  )
+})
+
+test_that("rtw fails with phi negative", {
+  skip_on_cran()
+  skip_on_ci()
+
+  expect_snapshot(
+    rtw(mu = 2, p = 1.5, phi = -1),
+    error = TRUE
+  )
+})
