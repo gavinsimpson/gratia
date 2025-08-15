@@ -51,3 +51,58 @@
   # return modified family
   fam
 }
+
+`fix_family_cdf` <- function(family) {
+  # if `family` contains a NULL cdf we move on, if it is non-null return early
+  # as it doesn't need fixing
+  if (!is.null(family$cdf)) {
+    return(family)
+  }
+
+  # handle special cases
+  fn <- family_name(family)
+
+  # choose a CDF functions
+  qfun <- switch(
+    EXPR = fn,
+    "poisson"  = cdf_poisson,
+    "gaussian" = cdf_gaussian,
+    "binomial" = cdf_binomial,
+    "Gamma"    = cdf_gamma,
+    NULL
+  )
+
+  # add the CDF fun to the family
+  family$cdf <- qfun
+
+  # don't think we need to throw and error - fix.family.rd doesn't
+  #if (is.null(family$cdf)) {
+  #  stop("No CDF functions available for this family")
+  #}
+
+  # return
+  family
+}
+
+#' @importFrom stats ppois
+`cdf_poisson` <- function(q, mu, wt, scale, log_p = FALSE) {
+  ppois(q, lambda = mu, log.p = log_p)
+}
+
+#' @importFrom stats pnorm
+`cdf_gaussian` <- function(q, mu, wt, scale, log_p = FALSE) {
+  pnorm(q, mean = mu, sd = sqrt(scale / wt), log.p = log_p)
+}
+
+#' @importFrom stats pbinom
+`cdf_binomial` <- function(q, mu, wt, scale, log_p = FALSE) {
+  pbinom(
+    q * (wt + as.numeric(wt == 0)), size = wt, prob = mu, , log.p = log_p
+  )
+}
+
+#' @importFrom stats pgamma
+`cdf_gamma` <- function(q, mu, wt, scale, log_p = FALSE) {
+  # uggh this weird parameterisation in pgamma
+  pgamma(q, shape = 1 / scale, scale = mu * scale, log.p = log_p)
+}
