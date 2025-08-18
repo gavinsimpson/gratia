@@ -102,6 +102,13 @@
   the default diverging red-blue gradient used by *gratia* when plotting partial
   effect surfaces for multivariate smooths.
 
+* `quantile_residuals()` computes probability integral transform (PIT) and
+  randomised quantile residuals for some GAMs and GLMs. Currently only models fitted with a `gaussian()`, `binomial()`, `Gamma()`, or `poisson()` family
+  are supported.
+
+* `residuals_linpred_plot()` and `residuals_hist_plot()` can now use PIT or
+  randomised quantile residuals in their diagnostic plots.
+
 ## Bug fixes
 
 * `conditional_values()` would fail if a variable it was conditioning on was
