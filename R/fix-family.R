@@ -106,3 +106,24 @@
   # uggh this weird parameterisation in pgamma
   pgamma(q, shape = 1 / scale, scale = mu * scale, log.p = log_p)
 }
+
+#' @importFrom stats qnorm
+`pinvgaussian` <- function(q, mu, wt, scale, log_p = FALSE) {
+  # only for lower tail of CDF
+  # based on implementation of Giner & Smyth (2016) The R Journal **8*(1) 339
+  q <- q / mu
+  scale <- scale * mu
+  r <- sqrt(q * scale)
+  phi_m <- scale * mu
+  a <- pnorm((q - 1) / r, lower.tail = TRUE, log.p = TRUE)
+  b <- (2 / scale) + pnorm(-(q + 1) / r, lower.tail = TRUE, log.p = TRUE)
+  p <- a + log1p(exp(b - a))
+  if (isFALSE(log_p)) {
+    p <- exp(p)
+  }
+  p
+}
+
+`cdf_invgaussian` <- function(q, mu, wt, scale, log_p = FALSE) {
+  pinvgaussian(q, mu = mu, wt = wt, scale = scale, log_p = log_p)
+}
