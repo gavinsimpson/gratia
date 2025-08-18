@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9024</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,21 +40,23 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="gratia-development-version">gratia (development version)<a class="anchor" aria-label="anchor" href="#gratia-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.11.0" id="gratia-0110">gratia 0.11.0<a class="anchor" aria-label="anchor" href="#gratia-0110"></a></h2><p class="text-muted">CRAN release: 2025-08-18</p>
 <p><em>gratia</em> now has a <a href="https://doi.org/10.21105/joss.06962" class="external-link">paper</a> describing the package in the <a href="https://joss.theoj.org/" class="external-link">Journal of Open Source Software</a>. If you use <em>gratia</em> in your work, please cite this paper rather than the generic citation previously created by <code><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation()</a></code>:</p>
 <blockquote>
 <p>Simpson, G.L. (2024) gratia: An R package for exploring generalized additive models. <em>The Journal of Open Source Software</em> <strong>9</strong>, 6962.</p>
 </blockquote>
 <div class="section level3">
-<h3 id="user-visible-changes-development-version">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-development-version"></a></h3>
+<h3 id="user-visible-changes-0-11-0">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-11-0"></a></h3>
 <ul><li><p>Experimental support for computing with parallel processes via the <em>purrr</em> 📦 in <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> and <code><a href="../reference/basis.html">basis()</a></code>, though it is of limited use in the latter. Parallel processing will operate if a call to <code><a href="https://mirai.r-lib.org/reference/daemons.html" class="external-link">mirai::daemons()</a></code> has been issued in the current R session.</p></li>
 <li><p>Rug plots in <code><a href="../reference/draw.gam.html">draw.gam()</a></code> now only show the unique data values to avoid needless overplotting. This behaviour is controlled via new argument <code>distinct_rug</code>. Setting this to <code>FALSE</code> will get the previous behaviour.</p></li>
 <li><p><code><a href="../reference/simulate.html">simulate.gam()</a></code> gains a <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method and thus no longer prints its attributes.</p></li>
 <li><p><code>citation("gratia")</code> now suggests to use Simpson (2024) <em>Journal of Open Source Software</em> <strong>9</strong>(104), 9862, when citing the package.</p></li>
 <li><p><code><a href="../reference/simulate.html">simulate.gam()</a></code> now returns a data frame, bringing it into line with <code>stats::simulate.lm()</code>.</p></li>
+<li><p>With soap film smooths, <code><a href="../reference/draw.gam.html">draw.gam()</a></code> no longer plots points that are deemed outside the boundary of the soap film (as determined by <code><a href="https://rdrr.io/pkg/mgcv/man/inSide.html" class="external-link">mgcv::inSide()</a></code>). <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> continues to return these points however, because it might be confusing to suddenly lose evaluation points. This behaviour can be controlled by the argument <code>clip</code>, which is available to <code><a href="../reference/draw.gam.html">draw.gam()</a></code> and <code><a href="../reference/smooth_estimates.html">smooth_estimates.gam()</a></code> currently.</p></li>
+<li><p><code><a href="../reference/draw.compare_smooths.html">draw.compare_smooths()</a></code> now uses “Partial effect” as the y-axis label, in common with other partial effect plots in <em>gratia</em>.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-0-11-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-11-0"></a></h3>
 <ul><li><p><code><a href="../reference/assemble.html">assemble()</a></code> is a new generic function for assembling sets of plots from model objects. It is effectively <code><a href="../reference/draw.html">draw()</a></code> but without actually plotting on the current device. Instead it returns a list of <code>ggplot</code> objects. Currently, a method for <code>"gam"</code> models, <code><a href="../reference/assemble.gam.html">assemble.gam()</a></code>, is provided which <code><a href="../reference/draw.gam.html">draw.gam()</a></code> uses. Part of the wish of <a href="https://github.com/ha0ye" class="external-link">@ha0ye</a> <a href="https://github.com/gavinsimpson/gratia/issues/35" class="external-link">#35</a></p></li>
 <li><p><code><a href="../reference/appraise.html">appraise()</a></code> with <code>method = "simulate"</code> can now handle <em>mgcv</em>’s multivariate normal models fitted with <code>family = mvn()</code>and Tweedie location scale models fitted with <code>family = twlss()</code>.</p></li>
 <li>
@@ -71,9 +73,13 @@
 <li><p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> now works for GAMs fitted with families <code><a href="https://rdrr.io/pkg/mgcv/man/ziP.html" class="external-link">ziP()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/mvn.html" class="external-link">mvn()</a></code>, and <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom()</a></code>. The non-working of <code>fitted-values()</code> for <code><a href="https://rdrr.io/pkg/mgcv/man/ziP.html" class="external-link">ziP()</a></code> models was reported in <a href="https://github.com/gavinsimpson/gratia/issues/341" class="external-link">#341</a> by <a href="https://github.com/rroyaute" class="external-link">@rroyaute</a></p></li>
 <li><p><code><a href="../reference/posterior_samples.html">posterior_samples()</a></code>, <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code>, <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code>, <code>derivatives_samples()</code>, and <code><a href="../reference/response_derivatives.html">response_derivatives()</a></code> now all work with models fitted by <code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam::scam()</a></code>.</p></li>
 <li><p><code><a href="../reference/basis.html">basis()</a></code> can now take a vector of coefficients for the basis functions when using the default method: <code>basis(s(x), data = df, coefficients = rnorm(10))</code>. Wish of <a href="https://github.com/gavinsimpson/gratia/issues/136" class="external-link">#136</a></p></li>
+<li><p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> and <code><a href="../reference/draw.smooth_estimates.html">draw.smooth_estimates()</a></code> can now handle soap film smooths with known boundary values, and with nested boundaries.</p></li>
+<li><p><code><a href="../reference/scale_fill_partial_effect.html">scale_fill_partial_effect()</a></code> is a <em>ggplot</em> scale function that implements the default diverging red-blue gradient used by <em>gratia</em> when plotting partial effect surfaces for multivariate smooths.</p></li>
+<li><p><code><a href="../reference/quantile_residuals.html">quantile_residuals()</a></code> computes probability integral transform (PIT) and randomised quantile residuals for some GAMs and GLMs. Currently only models fitted with a <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian()</a></code>, <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial()</a></code>, <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">Gamma()</a></code>, or <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson()</a></code> family are supported.</p></li>
+<li><p><code><a href="../reference/residuals_linpred_plot.html">residuals_linpred_plot()</a></code> and <code><a href="../reference/residuals_hist_plot.html">residuals_hist_plot()</a></code> can now use PIT or randomised quantile residuals in their diagnostic plots.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-0-11-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-11-0"></a></h3>
 <ul><li><p><code><a href="../reference/conditional_values.html">conditional_values()</a></code> would fail if a variable it was conditioning on was also a name of a function. <a href="https://github.com/gavinsimpson/gratia/issues/323" class="external-link">#323</a> (but not really fixed when this was initially closed)</p></li>
 <li><p><code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> was only keeping one set of factor levels when there were multiple parametric factor terms in a model. Reported by <a href="https://github.com/tamas-ferenci" class="external-link">@tamas-ferenci</a> as part of discussion to <a href="https://github.com/gavinsimpson/gratia/issues/284" class="external-link">#284</a></p></li>
 <li><p><code><a href="../reference/mh_draws.html">mh_draws()</a></code> would fail in the case of drawing only <code>n = 1</code> samples. <a href="https://github.com/gavinsimpson/gratia/issues/328" class="external-link">#328</a> Reported by <a href="https://github.com/zsusswein" class="external-link">@zsusswein</a></p></li>
@@ -87,6 +93,8 @@
 <li><p><code><a href="../reference/overview.html">overview()</a></code> was displaying more significant digits in the p values than it was accurate to in terms of reporting p values as “&lt;0.001”. A new argument <code>digits</code> controls how many digits are used when formatting p values, with default of <code>3</code>.</p></li>
 <li><p><code><a href="../reference/theta.html">theta()</a></code> now works for models fitted with the <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">gfam()</a></code> family. Previously it would fail because it assumes all <code>family()$getTheta</code> functions had an argument <code>trans</code> to transform the theta values to the correct scale.</p></li>
 <li><p><code><a href="../reference/overview.html">overview()</a></code> was not showing the model intercept, and was displaying slightly different results from those shown by <code><a href="https://rdrr.io/pkg/mgcv/man/summary.gam.html" class="external-link">summary.gam()</a></code>.</p></li>
+<li><p><code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> was not adding any known boundary condition that was part of a soap film smooth.</p></li>
+<li><p><code><a href="../reference/draw.gamlss.html">draw.gamlss()</a></code> (for <code><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">GJRM::gamlss()</a></code> models) now doesn’t fail with an error if there is more than a single smooth in any of the linear predictors.</p></li>
 </ul></div>
 </div>
     <div class="section level2">

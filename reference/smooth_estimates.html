@@ -15,7 +15,7 @@ been removed from the package."><meta property="og:image" content="https://gavin
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9024</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,6 +74,7 @@ been removed from the package.</p>
 <span>  dist <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  unnest <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  clip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -149,6 +150,12 @@ and <code>dist</code> is a distance within the unit square. See
 <dd><p>logical; in the case of character <code>select</code>, should
 <code>select</code> match partially against <code>smooths</code>? If <code>partial_match = TRUE</code>,
 <code>select</code> must only be a single string, a character vector of length 1.</p></dd>
+
+
+<dt id="arg-clip">clip<a class="anchor" aria-label="anchor" href="#arg-clip"></a></dt>
+<dd><p>logical; should evaluation points be clipped to the boundary of
+a soap film smooth? The default is <code>FALSE</code>, which will return <code>NA</code> for any
+point that is deemed to lie outside the boundary of the soap film.</p></dd>
 
 </dl></div>
     <div class="section level2">
