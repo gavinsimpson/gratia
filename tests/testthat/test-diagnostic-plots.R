@@ -178,11 +178,11 @@ test_that("residuals linpred plot works with pit residuals", {
   )
 
   expect_doppelganger(
-    "residuals linpred plot and pit residuals for poisson model", plt
+    "r linpred plot pit resids poisson model", plt
   )
 })
 
-test_that("residuals hist plot works with quantile residuals", {
+test_that("r hist plot works with qresids", {
   skip_on_ci()
   skip_on_cran()
 
@@ -191,6 +191,6 @@ test_that("residuals hist plot works with quantile residuals", {
   )
 
   expect_doppelganger(
-    "residuals hist plot and quantile residuals for poisson model", plt
+    "r hist plot qresids poisson model", plt
   )
 })
