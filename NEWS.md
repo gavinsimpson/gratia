@@ -1,5 +1,15 @@
 # gratia (development version)
 
+##  New features
+
+* `quantile_residuals()` now supports a greater number of *mgcv*'s families. New
+  support for:
+    1. `inverse.gaussian()`,
+    2. `scat()`,
+    3. `nb()`
+    4. `betar()`,
+    5. `tw()`.
+
 # gratia 0.11.0
 
 *gratia* now has a [paper](https://doi.org/10.21105/joss.06962) describing the package in the [Journal of Open Source Software](https://joss.theoj.org/). If you use *gratia* in your work, please cite this paper rather than the generic citation previously created by `citation()`:
