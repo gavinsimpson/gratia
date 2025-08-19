@@ -10,9 +10,9 @@ test_that("quantile residuals works for a poisson GAM and quantile", {
   )
 })
 
-test_that("quantile residuals fails correctly for a nb GAM", {
+test_that("quantile residuals fails correctly for an unsupported GAM", {
   expect_snapshot(
-    head(quantile_residuals(m_nb, type = "quantile", seed = 1), n = 10),
+    quantile_residuals(m_twlss, type = "quantile", seed = 1),
     error = TRUE
   )
 })

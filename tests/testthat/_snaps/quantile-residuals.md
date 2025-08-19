@@ -14,11 +14,11 @@
        [1]  1.9057123 -0.8627816  0.6520413  0.9163218  0.6258978  0.9575311
        [7]  0.3101725  1.0874592 -0.3150668 -1.2923274
 
-# quantile residuals fails correctly for a nb GAM
+# quantile residuals fails correctly for an unsupported GAM
 
     Code
-      head(quantile_residuals(m_nb, type = "quantile", seed = 1), n = 10)
+      quantile_residuals(m_twlss, type = "quantile", seed = 1)
     Condition
-      Error in `h()`:
-      ! error in evaluating the argument 'x' in selecting a method for function 'head': Quantile residuals are not available for this family.
+      Error in `do_quantile_residuals()`:
+      ! Quantile residuals are not available for this family.
 
