@@ -3,11 +3,14 @@
 \name{theta}
 \alias{theta}
 \alias{theta.gam}
+\alias{theta.family}
 \title{General extractor for additional parameters in mgcv models}
 \usage{
 theta(object, ...)
 
 \method{theta}{gam}(object, transform = TRUE, ...)
+
+\method{theta}{family}(object, transform = TRUE, ...)
 }
 \arguments{
 \item{object}{a fitted model}
