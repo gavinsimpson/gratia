@@ -234,8 +234,12 @@
     log_p = FALSE # not log scale as 0s become -Inf on the log scale
   )
 
-  discrete_dist <- c("poisson", "binomial")
-  if (family_name(fam) %in% discrete_dist) {
+  discrete_dist <- c("poisson", "binomial", "negative binomial")
+  fn <- family_name(fam)
+  if (grepl("^Negative Binomial", fn)) {
+    fn <- "negative binomial"
+  }
+  if (fn %in% discrete_dist) {
     # residual for CDF at previous y value
     r0 <- fam$cdf(
       q = y - 1L,
@@ -248,7 +252,7 @@
     r <- runif(n = length(y), min = r0, max = r)
   }
 
-  # finish of the residuals; if PIT resids we need to undo the log probability
+  # finish off the residuals; if PIT resids we don't need to do anything
   # and if quantile, we push the resids through the standard normal inv CDF
   if (type == "quantile") {
     r <- qnorm(r, log.p = FALSE)

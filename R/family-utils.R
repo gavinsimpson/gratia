@@ -207,8 +207,9 @@
 #' @rdname family_type
 family_type.family <- function(object, ...) {
   fn <- family_name(object)
-  fn <- tolower(gsub("\\([[:alnum:]\\.,]+\\)", "", fn))
+  fn <- tolower(gsub("\\([[:alnum:]\\.,=]+\\)", "", fn))
   fn <- gsub("\\s", "_", fn)
+  fn <- gsub("\\.", "_", fn)
   fn
 }
 

@@ -87,6 +87,23 @@
   theta
 }
 
+#' @export
+#' @rdname theta
+`theta.family` <- function(object, transform = TRUE, ...) {
+  theta_fun <- object$getTheta
+  if (is.null(theta_fun)) {
+    stop("No additional parameters available for this model")
+  }
+  theta_args <- formals(theta_fun)
+  arg_nms <- names(theta_args)
+  theta <- if ("trans" %in% arg_nms) {
+    theta_fun(trans = transform)
+  } else {
+    theta_fun()
+  }
+  theta
+}
+
 #' Are additional parameters available for a GAM?
 #'
 #' @param object an R object, either a [family()] object or an object whose

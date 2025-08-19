@@ -1981,7 +1981,7 @@ reclass_scam_smooth <- function(smooth) {
 }
 
 #### helper functions for Tweedie
-# this converts from theta to power parameter `p`` given `a` and `b`
+# this converts from theta to power parameter `p` given `a` and `b`
 theta_2_power <- function(theta, a, b) {
   i <- theta > 0
   exp_theta_pos <- exp(-theta[i])
@@ -1994,10 +1994,15 @@ theta_2_power <- function(theta, a, b) {
 # extracts the `a` and `b` parameters of the model search over which the power
 # parameter is searched for
 get_tw_ab <- function(family) {
-  if (family_name(family) != "twlss") {
-    stop("'model' wasn't fitted with 'twlss()' family.", call. = FALSE)
+  ft <- family_type(family)
+  if (!ft %in% c("twlss", "tweedie")) {
+    stop("'model' wasn't fitted with a Tweedie family.", call. = FALSE)
   }
-  rfun <- family$residuals
+  rfun <- if (identical(ft, "twlss")) {
+    family$residuals
+  } else {
+    family$getTheta
+  }
   a <- get(".a", envir = environment(rfun))
   b <- get(".b", envir = environment(rfun))
   c(a, b)
