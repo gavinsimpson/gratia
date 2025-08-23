@@ -177,13 +177,13 @@
 <rect x='328.96' y='121.42' width='62.09' height='78.13' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
 <text x='334.44' y='135.61' style='font-size: 11.00px; font-family: sans;' textLength='46.47px' lengthAdjust='spacingAndGlyphs'>treatment</text>
 <rect x='334.44' y='142.23' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #EBEBEB;' />
-<rect x='335.14' y='142.94' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #E69F00; fill-opacity: 0.20;' />
+<rect x='335.14' y='142.94' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; fill: #E69F00; fill-opacity: 0.20;' />
 <line x1='336.16' y1='150.87' x2='349.99' y2='150.87' style='stroke-width: 1.07; stroke: #E69F00; stroke-linecap: butt;' />
 <rect x='334.44' y='159.51' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #EBEBEB;' />
-<rect x='335.14' y='160.22' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #56B4E9; fill-opacity: 0.20;' />
+<rect x='335.14' y='160.22' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; fill: #56B4E9; fill-opacity: 0.20;' />
 <line x1='336.16' y1='168.15' x2='349.99' y2='168.15' style='stroke-width: 1.07; stroke: #56B4E9; stroke-linecap: butt;' />
 <rect x='334.44' y='176.79' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #EBEBEB;' />
-<rect x='335.14' y='177.50' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #009E73; fill-opacity: 0.20;' />
+<rect x='335.14' y='177.50' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; fill: #009E73; fill-opacity: 0.20;' />
 <line x1='336.16' y1='185.43' x2='349.99' y2='185.43' style='stroke-width: 1.07; stroke: #009E73; stroke-linecap: butt;' />
 <text x='357.20' y='153.90' style='font-size: 8.80px; font-family: sans;' textLength='28.37px' lengthAdjust='spacingAndGlyphs'>Control</text>
 <text x='357.20' y='171.18' style='font-size: 8.80px; font-family: sans;' textLength='16.15px' lengthAdjust='spacingAndGlyphs'>Low</text>
@@ -566,7 +566,7 @@
 <circle cx='673.37' cy='69.95' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
 <circle cx='681.04' cy='69.95' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
 <circle cx='696.24' cy='69.95' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
-<line x1='145.66' y1='479.39' x2='990.73' y2='-193.71' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<line x1='170.97' y1='459.24' x2='921.12' y2='-138.27' style='stroke-width: 1.07; stroke-linecap: butt;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 <text x='422.42' y='231.08' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='7.82px' lengthAdjust='spacingAndGlyphs'>-4</text>
