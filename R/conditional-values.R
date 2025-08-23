@@ -573,9 +573,12 @@ characters")
     labs(
       x = if (is.null(xlab)) channels$x else xlab,
       y = if (is.null(ylab)) expression(hat(y)) else ylab,
-      colour = channels$colour,
-      fill = channels$colour
+      colour = channels$colour
     )
+
+  if (isFALSE(is.factor(object[[channels$x]]))) {
+    plt <- plt + labs(fill = channels$colour)
+  }
 
   # return
   plt
