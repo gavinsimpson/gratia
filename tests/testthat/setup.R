@@ -610,11 +610,12 @@ m_soap <- gam(
   data = soap_data, method = "REML", knots = soap_knots
 )
 
-m_soap_sep <- gam(
-  y ~ s(v, w, k = 30, bs = "sf", xt = list(bnd = soap_fsb, nmax = 100)) +
-    s(v, w, k = 30, bs = "sw", xt = list(bnd = soap_fsb, nmax = 100)),
-  data = soap_data, method = "REML", knots = soap_knots
-)
+# This dies if you load the sf package - have emailed Simon about it
+# m_soap_sep <- gam(
+#   y ~ s(v, w, k = 30, bs = "sf", xt = list(bnd = soap_fsb, nmax = 100)) +
+#     s(v, w, k = 30, bs = "sw", xt = list(bnd = soap_fsb, nmax = 100)),
+#   data = soap_data, method = "REML", knots = soap_knots
+# )
 
 # Now add a known boundary condition
 soap_fsb2 <- soap_fsb
