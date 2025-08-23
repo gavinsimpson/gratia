@@ -830,7 +830,7 @@
   }
 
   ## handle term
-  smooth_ids <- if (is.null(select)) {
+  smooth_ids <- if (!is.null(select)) {
     ## which smooths match 'term'
     sms <- check_user_select_smooths(smooths(object), select,
       partial_match = partial_match

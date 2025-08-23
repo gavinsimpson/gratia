@@ -10,6 +10,11 @@
     4. `betar()`,
     5. `tw()`.
 
+## Bug fixes
+
+* `partial_derivatives()` threw an error when the `select` argument was used.
+  #356 reported by @BenFN121
+
 # gratia 0.11.0
 
 *gratia* now has a [paper](https://doi.org/10.21105/joss.06962) describing the package in the [Journal of Open Source Software](https://joss.theoj.org/). If you use *gratia* in your work, please cite this paper rather than the generic citation previously created by `citation()`:
