@@ -469,8 +469,10 @@
   out
 }
 
-`qq_uniform_quantiles` <- function(qs, q_fun, fit, weights, sigma2, dev_resid_fun,
-                                   var_fun, type, na_action, model) {
+`qq_uniform_quantiles` <- function(
+  qs, q_fun, fit, weights, sigma2, dev_resid_fun,
+  var_fun, type, na_action, model
+) {
   ## generate quantiles for uniforms from q_fun
   qq <- q_fun(qs, fit, weights, sigma2)
   ## new residuals
@@ -769,7 +771,8 @@
   plt <- plt + geom_histogram(
     bins = n_bins,
     colour = "black",
-    fill = "grey80"
+    fill = "grey80",
+    center = 0
   )
 
   ## add labels
