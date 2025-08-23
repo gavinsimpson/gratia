@@ -296,10 +296,10 @@
 <rect x='243.24' y='536.80' width='258.87' height='28.24' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
 <text x='248.72' y='554.71' style='font-size: 11.00px; font-family: sans;' textLength='29.96px' lengthAdjust='spacingAndGlyphs'>Model</text>
 <rect x='284.16' y='542.28' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #EBEBEB;' />
-<rect x='284.87' y='542.99' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #F8766D; fill-opacity: 0.20;' />
+<rect x='284.87' y='542.99' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; fill: #F8766D; fill-opacity: 0.20;' />
 <line x1='285.89' y1='550.92' x2='299.71' y2='550.92' style='stroke-width: 1.07; stroke: #F8766D; stroke-linecap: butt;' />
 <rect x='378.95' y='542.28' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #EBEBEB;' />
-<rect x='379.66' y='542.99' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #00BFC4; fill-opacity: 0.20;' />
+<rect x='379.66' y='542.99' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; fill: #00BFC4; fill-opacity: 0.20;' />
 <line x1='380.68' y1='550.92' x2='394.50' y2='550.92' style='stroke-width: 1.07; stroke: #00BFC4; stroke-linecap: butt;' />
 <text x='306.92' y='553.95' style='font-size: 8.80px; font-family: sans;' textLength='66.55px' lengthAdjust='spacingAndGlyphs'>su_m_quick_eg1</text>
 <text x='401.71' y='553.95' style='font-size: 8.80px; font-family: sans;' textLength='94.92px' lengthAdjust='spacingAndGlyphs'>su_m_quick_eg1_shrink</text>

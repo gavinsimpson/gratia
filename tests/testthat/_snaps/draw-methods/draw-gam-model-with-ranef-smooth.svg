@@ -111,7 +111,7 @@
 <circle cx='178.81' cy='71.08' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
 <circle cx='198.60' cy='57.62' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
 <circle cx='229.92' cy='54.97' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
-<line x1='-151.50' y1='439.59' x2='433.94' y2='-185.62' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<line x1='-151.50' y1='439.59' x2='411.14' y2='-161.27' style='stroke-width: 1.07; stroke-linecap: butt;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 <text x='38.72' y='236.37' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='15.16px' lengthAdjust='spacingAndGlyphs'>-0.4</text>
