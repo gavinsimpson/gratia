@@ -10,7 +10,11 @@ The package has been checked under:
 * r-devel on Windows, Ubuntu and MacOS X via GitHub Actions, and
 * r-release on MacOS X, ubuntu, and windows
 
-No problems were observed.
+No problems were observed. I note the `INFO` from `R CMD check` regarding the
+large number of imports; gratia is designed to work within the tidyverse of
+packages, and most of the dependencies in Imports are to those packages which
+are considered (relatively) stable and dependable. This is unavoidable when
+working within the tidyverse.
 
 Reverse dependency checks were run, with no regressions.
 
