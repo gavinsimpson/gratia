@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,12 +42,15 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="gratia-development-version">gratia (development version)<a class="anchor" aria-label="anchor" href="#gratia-development-version"></a></h2>
 <div class="section level3">
+<h3 id="user-visible-changes-development-version">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/residuals_hist_plot.html">residuals_hist_plot()</a></code> and hence <code><a href="../reference/appraise.html">appraise()</a></code> now centre the middle bin of the histogram at 0. In part this was due to <em>ggplot2</em>’s new binning algorithm leading to potentially odd choices for the bin breaks in the context of model residuals.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
 <ul><li>
-<code><a href="../reference/quantile_residuals.html">quantile_residuals()</a></code> now supports a greater number of <em>mgcv</em>’s families. New support for:
+<code><a href="../reference/quantile_residuals.html">quantile_residuals()</a></code> now supports more of <em>mgcv</em>’s families:
 <ol style="list-style-type: decimal"><li>
-<code><a href="https://rdrr.io/r/stats/family.html" class="external-link">inverse.gaussian()</a></code>,</li>
-<li>
 <code><a href="https://rdrr.io/pkg/mgcv/man/scat.html" class="external-link">scat()</a></code>,</li>
 <li><code><a href="https://rdrr.io/pkg/mgcv/man/negbin.html" class="external-link">nb()</a></code></li>
 <li>
@@ -55,6 +58,18 @@
 <li>
 <code><a href="https://rdrr.io/pkg/mgcv/man/Tweedie.html" class="external-link">tw()</a></code>.</li>
 </ol></li>
+<li>Several user friendliness improvements in <code><a href="../reference/partial_derivatives.html">partial_derivatives()</a></code>:
+<ul><li>now better handles the case where there are multiple smooths for which partial derivatives are required,</li>
+<li>correctly identifies smooths that involve random effect terms (i.e. any smooth or tensor product marginal smooths with <code>bs %in% c("re", "fs")</code>) and ignores them,</li>
+<li>identifies and ignores univariate smooths, and</li>
+<li>displays more informative error messages to explain what was wrong.</li>
+</ul>
+Part of discussion with <a href="https://github.com/BenFN121" class="external-link">@BenFN121</a> in <a href="https://github.com/gavinsimpson/gratia/issues/356" class="external-link">#356</a>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<ul><li><p><code><a href="../reference/partial_derivatives.html">partial_derivatives()</a></code> threw an error when the <code>select</code> argument was used. <a href="https://github.com/gavinsimpson/gratia/issues/356" class="external-link">#356</a> reported by <a href="https://github.com/BenFN121" class="external-link">@BenFN121</a></p></li>
+<li><p><code><a href="../reference/draw.conditional_values.html">draw.conditional_values()</a></code> was setting a label on the fill aesthetic even if that aesthetic was not being used. In <em>ggplot2</em> v4.0.0 this resulted in a warning, which is fixed.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
