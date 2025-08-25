@@ -79,7 +79,7 @@
     "gamma"    = cdf_gamma,
     "scaled_t" = make_cdf_scat(nu = theta[1], sigma = theta[2]),
     "negative_binomial" = make_cdf_nb(theta),
-    "inverse_gaussian"  = cdf_invgaussian,
+    ## "inverse_gaussian"  = cdf_invgaussian, # FIXME: not sure I trust this yet
     "beta_regression"   = make_cdf_beta(theta),
     "tweedie"  = make_cdf_tw(theta, ab = get_tw_ab(family)),
     NULL
