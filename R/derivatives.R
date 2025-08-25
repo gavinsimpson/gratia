@@ -733,6 +733,7 @@
 #' @importFrom tidyselect last_col
 #' @importFrom lifecycle deprecated is_present
 #' @importFrom vctrs vec_slice
+#' @importFrom cli cli_alert_warning cli_abort
 #'
 #' @rdname partial_derivatives
 #'
@@ -843,16 +844,26 @@
     sms[take | mv_sm] <- FALSE
     which(sms)
   } else {
-    s <- seq_len(n_smooths(object))
-    ## need to skip random effect smooths
-    take <- vapply(
-      object$smooth, smooth_type,
-      character(1)
-    ) %in% "Random effect"
-    # need to check that the selected smooths are multivariate
-    mv_sm <- vapply(object$smooth, smooth_dim, integer(1)) < 2L
-    s[!(take | mv_sm)]
+    seq_len(n_smooths(object))
   }
+
+  # # need to skip random effect smooths
+  take <- vapply(
+    object$smooth[smooth_ids], is_ranef_smooth,
+    logical(1)
+  )
+  # need to check that the selected smooths are multivariate
+  mv_sm <- vapply(object$smooth[smooth_ids], smooth_dim, integer(1)) < 2L
+  # report of ignoring any smooths
+  if (any(take, mv_sm)) {
+    cat("\n")
+    cli_alert_warning(
+      "Ignoring univariate smooths & those involving random effects.\n\n",
+      wrap = TRUE
+    )
+    cat("\n")
+  }
+  smooth_ids <- smooth_ids[!(take | mv_sm)]
 
   # handle focal - it should be a vector as long as the number of smooths
   # we are handling. If it is NULL, then we loop over the smooths, extract
@@ -872,12 +883,12 @@
     if (isFALSE(identical(n_focal, n_sm))) {
       sm_names <- smooths(object)[smooth_ids]
       msg <- paste(sm_names, collapse = ", ")
-      stop(
-        "'focal' should be the same length as the number of smooths",
-        "for which partial derivatives are to be evaluated.",
-        "\nThe relevant smooths are: ", msg,
-        "\nThe supplied 'focal' should be length ",
-      )
+      cli_abort(c(
+        "!" = "{.var focal} must have same length as number of chosen smooths",
+        "i" = "The relevant smooths are: {sm_names}",
+        "i" = "The supplied {.var focal} should be length: {.strong {n_sm}}",
+        "x" = "Your supplied {.var focal} was length: {.strong {length(focal)}}"
+      ))
     }
   }
 
@@ -995,7 +1006,10 @@
       )),
       .before = 1
     ) |>
-    add_column(.focal = rep(focal, nrow(result)), .after = 1L)
+    add_column(
+      .focal = rep(focal, nrow(result) / n_sm),
+      .after = 1L
+    )
 
   class(result) <- c(
     "partial_derivatives", "derivatives",
