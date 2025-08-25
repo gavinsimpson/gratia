@@ -19,6 +19,7 @@ test_that("qq_plot() uniform method works", {
   plt <- withr::with_seed(42, qq_plot(m)) # randomisation of uniform quantiles
 
   # skip_on_ci() # testing without as moved to mac os x
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("qq_plot uniform randomisation", plt)
 })
 
@@ -27,6 +28,7 @@ test_that("qq_plot() uniform method works with response residuals", {
   plt <- withr::with_seed(42, qq_plot(m, type = "response"))
 
   # skip_on_ci() # testing without as moved to mac os x
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("qq_plot uniform randomisation response residuals", plt)
 })
 
@@ -35,6 +37,7 @@ test_that("qq_plot() uniform method works with pearson residuals", {
   plt <- withr::with_seed(42, qq_plot(m, type = "pearson"))
 
   # skip_on_ci() # testing without as moved to mac os x
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("qq_plot uniform randomisation pearson residuals", plt)
 })
 

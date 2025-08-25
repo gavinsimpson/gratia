@@ -154,6 +154,7 @@ test_that("draw() works with random effect smooths (bs = 're')", {
   p3 <- draw(rm1, ncol = 3, scales = "fixed", rug = FALSE)
 
   # skip_on_ci() # testing without as moved to mac os x
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("draw.gam model with ranef smooth", p2)
   expect_doppelganger("draw model with ranef smooth fixed scales", p3)
 })
@@ -163,6 +164,7 @@ test_that("draw() with random effect smooths (bs = 're') & factor by variable ",
   p3 <- draw(rm2, ncol = 3, scales = "fixed", rug = FALSE)
 
   # skip_on_ci() # testing without as moved to mac os x
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("draw.gam model with ranef smooth factor by", p2)
   expect_doppelganger("draw with ranef smooth factor by fixed scales", p3)
 })
@@ -517,6 +519,7 @@ test_that("draw() can handle a mixture of numeric and factor random effects", {
   plt <- draw(m)
 
   # skip_on_ci() # testing without as moved to mac os x
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("issue 22 draw with mixed random effects", plt)
 })
 
@@ -567,6 +570,7 @@ test_that("plotting sos smooths works", {
   expect_silent(plt <- draw(m_sos, n = 20))
 
   # skip_on_ci() # testing without as moved to mac os x
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("draw works for sos smooths", plt)
 })
 

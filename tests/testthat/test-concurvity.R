@@ -31,5 +31,6 @@ test_that("concrvity() pariwise works with a gam", {
   expect_silent(plt <- draw(con))
 
   # skip_on_ci() # testing without as moved to mac os x
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("draw.concurvity pairwise", plt)
 })

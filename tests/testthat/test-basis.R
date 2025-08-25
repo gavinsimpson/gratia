@@ -79,6 +79,7 @@ test_that("basis() works with bivariate tprs smooths", {
   plt2 <- draw(bs, contour = TRUE)
 
   # skip_on_ci() # testing without as moved to mac os x
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("draw basis works with a bivariate tprs", plt1)
   expect_doppelganger("draw basis works with a bivariate tprs contour", plt2)
 })
@@ -100,6 +101,7 @@ test_that("basis() works with bivariate te smooths", {
   plt2 <- draw(bs, contour = TRUE)
 
   # skip_on_ci() # testing without as moved to mac os x
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("draw basis works with a bivariate te", plt1)
   expect_doppelganger("draw basis works with a bivariate te contour", plt2)
 })

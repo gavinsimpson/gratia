@@ -162,6 +162,7 @@ test_that("draw.smooth_estimates works for sz factor smooth", {
   expect_silent(plt <- draw(smooth_estimates(m_sz)))
 
   # skip_on_ci() # testing without as moved to mac os x
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("draw.smooth_estimates sz factor smooth", plt)
 })
 
@@ -172,6 +173,7 @@ test_that("draw.smooth_estimates works for sz two factor smooth", {
   expect_silent(plt <- draw(smooth_estimates(m_sz_2f)))
 
   # skip_on_ci() # testing without as moved to mac os x
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("draw.smooth_estimates sz two factor smooth", plt)
 })
 
@@ -197,6 +199,7 @@ test_that("draw.smooth_estimates works for trivar te with a 2d marginal", {
   expect_silent(plt2 <- draw(su_m_trivar_te2, dist = 0.1, n = 20, n_3d = 5))
 
   # skip_on_ci() # testing without as moved to mac os x
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("draw.smooth_estimates su_m_trivar_te2", plt1)
   expect_doppelganger("draw.gam for su_m_trivar_te2", plt2)
 })
@@ -253,6 +256,7 @@ test_that("draw.smooth_estimates works for trivar t2 with a 2d marginal", {
   expect_silent(plt2 <- draw(su_m_trivar_t22, dist = 0.1, n = 20, n_3d = 5))
 
   # skip_on_ci() # testing without as moved to mac os x
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("draw.gam for su_m_trivar_t22", plt2)
   expect_doppelganger("draw.smooth_estimates su_m_trivar_t22", plt1)
 })
@@ -308,6 +312,7 @@ test_that("draw.gam works with sos spline chlorophyll a", {
   ))
 
   # skip_on_ci() # testing without as moved to mac os x
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("draw.gam sos chlorophyll", plt1)
   expect_doppelganger("draw.gam sos chlorophyll with crs", plt2)
 })
@@ -338,6 +343,7 @@ test_that("grouped_by works", {
   expect_silent(plt2 <- draw(sm, grouped_by = TRUE))
 
   skip_on_cran()
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("draw sm est grouped_by true", plt1)
   expect_doppelganger("draw sm est grouped_by true ordered", plt2)
 })

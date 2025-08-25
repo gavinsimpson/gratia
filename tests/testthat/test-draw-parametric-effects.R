@@ -202,6 +202,7 @@ test_that("parametric effects works with messing data in model fit", {
   ))
 
   # skip_on_ci() # testing without as moved to mac os x
+  skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("issue 219 parametric effects", plt)
 })
 
