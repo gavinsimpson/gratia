@@ -194,11 +194,11 @@ and <code><a href="observed_fitted_plot.html">observed_fitted_plot()</a></code>.
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## To change the theme for all panels use the &amp; operator, for example to</span></span></span>
 <span class="r-in"><span><span class="co">## change the ggplot theme for all panels</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="st">"ggplot2"</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="st">"3.5.2"</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="co"># Throws warning with ggplot rc 4.0.0 and patchwork 1.3.1 - will be fixed</span></span></span>
 <span class="r-in"><span>  <span class="co"># in patchwork 1.3.2 - so temporarily skipping during ggplot release</span></span></span>
 <span class="r-in"><span>  <span class="co"># process</span></span></span>
-<span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu">appraise</span><span class="op">(</span><span class="va">mod</span>, seed <span class="op">=</span> <span class="fl">42</span>,</span></span>
 <span class="r-in"><span>    point_col <span class="op">=</span> <span class="st">"steelblue"</span>, point_alpha <span class="op">=</span> <span class="fl">0.4</span>,</span></span>
 <span class="r-in"><span>    line_col <span class="op">=</span> <span class="st">"black"</span></span></span>
