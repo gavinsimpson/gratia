@@ -112,11 +112,11 @@ appraise(mod, point_col = "steelblue", point_alpha = 0.4)
 
 ## To change the theme for all panels use the & operator, for example to
 ## change the ggplot theme for all panels
+library("ggplot2")
 if (packageVersion("ggplot2") <= "3.5.2") {
   # Throws warning with ggplot rc 4.0.0 and patchwork 1.3.1 - will be fixed
   # in patchwork 1.3.2 - so temporarily skipping during ggplot release
   # process
-  library("ggplot2")
   appraise(mod, seed = 42,
     point_col = "steelblue", point_alpha = 0.4,
     line_col = "black"
