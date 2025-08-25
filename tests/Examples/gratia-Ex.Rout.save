@@ -317,11 +317,11 @@ detaching ‘package:mgcv’
 > 
 > ## To change the theme for all panels use the & operator, for example to
 > ## change the ggplot theme for all panels
+> library("ggplot2")
 > if (packageVersion("ggplot2") <= "3.5.2") {
 +   # Throws warning with ggplot rc 4.0.0 and patchwork 1.3.1 - will be fixed
 +   # in patchwork 1.3.2 - so temporarily skipping during ggplot release
 +   # process
-+   library("ggplot2")
 +   appraise(mod, seed = 42,
 +     point_col = "steelblue", point_alpha = 0.4,
 +     line_col = "black"
@@ -332,7 +332,7 @@ detaching ‘package:mgcv’
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’
+detaching ‘package:ggplot2’, ‘package:mgcv’
 
 > nameEx("assemble.gam")
 > ### * assemble.gam
@@ -1724,11 +1724,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x300891408>
+<environment: 0x1527a37c8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x300891408>
+<environment: 0x1527a37c8>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2936,7 +2936,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  14.604 0.697 16.331 0.001 0.001 
+Time elapsed:  14.504 0.696 16.269 0.002 0.002 
 > grDevices::dev.off()
 null device 
           1 
