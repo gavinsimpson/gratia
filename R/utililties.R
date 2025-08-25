@@ -70,6 +70,12 @@
   object[["dim"]]
 }
 
+#' @export
+`smooth_dim.default` <- function(object) {
+  check_is_mgcv_smooth(object)
+  object[["dim"]]
+}
+
 `select_terms` <- function(object, terms) {
   TERMS <- unlist(smooth_terms(object))
   terms <- if (missing(terms)) {
@@ -202,7 +208,10 @@
 #' @export
 #' @rdname is_mgcv_smooth
 `is_mgcv_smooth` <- function(smooth) {
-  inherits(smooth, "mgcv.smooth")
+  inherits(
+    smooth,
+    what = c("mgcv.smooth", "tensor.smooth", "tprs.smooth")
+  )
 }
 
 #' @export
@@ -2076,4 +2085,16 @@ multivariate_y <- function() {
 `is_soap_film` <- function(object) {
   check_is_mgcv_smooth(object)
   inherits(object, "soap.film")
+}
+
+# does a smooth involve random effects
+`is_ranef_smooth` <- function(object) {
+  check_is_mgcv_smooth(object)
+  is_ranef <- is_re_smooth(object) ||
+    is_fs_smooth(object)
+  if (!is_ranef) {
+    sm_typ <- vapply(object$margin, smooth_type, character(1L))
+    is_ranef <- any(sm_typ == "Random effect")
+  }
+  is_ranef
 }
