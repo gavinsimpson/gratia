@@ -1,5 +1,12 @@
 # gratia (development version)
 
+## User visible changes
+
+* `residuals_hist_plot()` and hence `appraise()` now centre the middle bin of
+  the histogram at 0. In part this was due to *ggplot2*'s new binning algorithm
+  leading to potentially odd choices for the bin breaks in the context of model
+  residuals.
+
 ##  New features
 
 * `quantile_residuals()` now supports a greater number of *mgcv*'s families. New
@@ -10,16 +17,35 @@
     4. `betar()`,
     5. `tw()`.
 
+* Several user friendliness improvements in `partial_derivatives()`:
+    * now better handles the case where there are multiple smooths for which
+      partial derivatives are required,
+    * correctly identifies smooths that involve random effect terms (i.e. any
+      smooth or tensor product marginal smooths with `bs %in% c("re", "fs")`)
+      and ignores them,
+    * identifies and ignores univariate smooths, and
+    * displays more informative error messages to explain what was wrong.
+  
+  Part of discussion with @BenFN121 in #356.
+
 ## Bug fixes
 
 * `partial_derivatives()` threw an error when the `select` argument was used.
   #356 reported by @BenFN121
 
+* `draw.conditional_values()` was setting a label on the fill aesthetic even if
+  that aesthetic was not being used. In *ggplot2* v4.0.0 this resulted in a
+  warning, which is fixed.
+
 # gratia 0.11.0
 
-*gratia* now has a [paper](https://doi.org/10.21105/joss.06962) describing the package in the [Journal of Open Source Software](https://joss.theoj.org/). If you use *gratia* in your work, please cite this paper rather than the generic citation previously created by `citation()`:
+*gratia* now has a [paper](https://doi.org/10.21105/joss.06962) describing the
+package in the [Journal of Open Source Software](https://joss.theoj.org/). If
+you use *gratia* in your work, please cite this paper rather than the generic
+citation previously created by `citation()`:
 
-> Simpson, G.L. (2024) gratia: An R package for exploring generalized additive models. *The Journal of Open Source Software* **9**, 6962.
+> Simpson, G.L. (2024) gratia: An R package for exploring generalized additive
+> models. *The Journal of Open Source Software* **9**, 6962.
 
 ## User visible changes
 
