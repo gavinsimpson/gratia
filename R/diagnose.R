@@ -869,31 +869,38 @@
 #'
 #' ## To change the theme for all panels use the & operator, for example to
 #' ## change the ggplot theme for all panels
-#' library("ggplot2")
-#' appraise(mod, seed = 42,
-#'   point_col = "steelblue", point_alpha = 0.4,
-#'   line_col = "black"
-#' ) & theme_minimal()
+#' if (packageVersion("ggplot2") <= "3.5.2") {
+#'   # Throws warning with ggplot rc 4.0.0 and patchwork 1.3.1 - will be fixed
+#'   # in patchwork 1.3.2 - so temporarily skipping during ggplot release
+#'   # process
+#'   library("ggplot2")
+#'   appraise(mod, seed = 42,
+#'     point_col = "steelblue", point_alpha = 0.4,
+#'     line_col = "black"
+#'   ) & theme_minimal()
+#' }
 `appraise` <- function(model, ...) {
   UseMethod("appraise")
 }
 
 #' @rdname appraise
 #' @export
-`appraise.gam` <- function(model,
-                           method = c("uniform", "simulate", "normal", "direct"),
-                           use_worm = FALSE,
-                           n_uniform = 10, n_simulate = 50,
-                           seed = NULL,
-                           type = c("deviance", "pearson", "response"),
-                           n_bins = c("sturges", "scott", "fd"),
-                           ncol = NULL, nrow = NULL,
-                           guides = "keep",
-                           level = 0.9,
-                           ci_col = "black", ci_alpha = 0.2,
-                           point_col = "black", point_alpha = 1,
-                           line_col = "red",
-                           ...) {
+`appraise.gam` <- function(
+  model,
+  method = c("uniform", "simulate", "normal", "direct"),
+  use_worm = FALSE,
+  n_uniform = 10, n_simulate = 50,
+  seed = NULL,
+  type = c("deviance", "pearson", "response"),
+  n_bins = c("sturges", "scott", "fd"),
+  ncol = NULL, nrow = NULL,
+  guides = "keep",
+  level = 0.9,
+  ci_col = "black", ci_alpha = 0.2,
+  point_col = "black", point_alpha = 1,
+  line_col = "red",
+  ...
+) {
   ## process args
   method <- match.arg(method)
   if (identical(method, "direct")) {
@@ -1030,18 +1037,21 @@
 #'
 #' ## ... or use the usual normality assumption
 #' worm_plot(m, method = "normal")
-`worm_plot.gam` <- function(model,
-                            method = c("uniform", "simulate", "normal", "direct"),
-                            type = c("deviance", "response", "pearson"),
-                            n_uniform = 10, n_simulate = 50,
-                            level = 0.9,
-                            ylab = NULL, xlab = NULL,
-                            title = NULL, subtitle = NULL, caption = NULL,
-                            ci_col = "black",
-                            ci_alpha = 0.2,
-                            point_col = "black",
-                            point_alpha = 1,
-                            line_col = "red", ...) {
+`worm_plot.gam` <- function(
+  model,
+  method = c("uniform", "simulate", "normal", "direct"),
+  type = c("deviance", "response", "pearson"),
+  n_uniform = 10, n_simulate = 50,
+  level = 0.9,
+  ylab = NULL, xlab = NULL,
+  title = NULL, subtitle = NULL, caption = NULL,
+  ci_col = "black",
+  ci_alpha = 0.2,
+  point_col = "black",
+  point_alpha = 1,
+  line_col = "red",
+  ...
+) {
   method <- match.arg(method) # what method for the QQ plot?
   if (identical(method, "direct")) {
     message("`method = \"direct\"` is deprecated, use `\"uniform\"`")
