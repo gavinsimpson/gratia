@@ -9,13 +9,11 @@
 
 ##  New features
 
-* `quantile_residuals()` now supports a greater number of *mgcv*'s families. New
-  support for:
-    1. `inverse.gaussian()`,
-    2. `scat()`,
-    3. `nb()`
-    4. `betar()`,
-    5. `tw()`.
+* `quantile_residuals()` now supports more of *mgcv*'s families:
+    1. `scat()`,
+    2. `nb()`
+    3. `betar()`,
+    4. `tw()`.
 
 * Several user friendliness improvements in `partial_derivatives()`:
     * now better handles the case where there are multiple smooths for which
