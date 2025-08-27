@@ -1219,7 +1219,11 @@
       c("random_effect", "mgcv_smooth"),
       after = 0
     )
-  } else if (sm_type == "Factor smooth") {
+  } else if (
+    sm_type == "Factor smooth" || (
+      sm_type == "Tensor product int." && 
+      any(map_lgl(object[[".data"]], is.factor)))
+    ) {
     class(object) <- append(class(object),
       c("factor_smooth", "mgcv_smooth"),
       after = 0
