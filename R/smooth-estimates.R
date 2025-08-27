@@ -1221,7 +1221,7 @@
     )
   } else if (
     sm_type == "Factor smooth" || (
-      sm_type == "Tensor product int." && 
+      sm_type %in% c("Tensor product int.", "Tensor product") && 
       any(map_lgl(object[sm_vars], is.factor))
     )) {
     class(object) <- append(class(object),
