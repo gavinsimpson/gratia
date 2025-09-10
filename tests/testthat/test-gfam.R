@@ -47,3 +47,33 @@ test_that("gratia can handle a two species negbin model with gfam", {
 })
 
 # needs more tests
+test_that("gratia handles a complex gfam bird move", {
+  skip_on_cran()
+  skip_on_ci()
+
+  data(bird_move, package = "gratia")
+  ctrl <- gam.control(nthreads = 8)
+  bird_move2 <- bird_move |>
+    mutate(
+      fam = as.numeric(species) |> as.integer()
+    )
+  bird_mod2_gfam <- gam(
+    cbind(count, fam) ~ te(
+      week, latitude, bs = c("cc", "tp"), k = c(10, 10), m = 2
+    ) +
+    t2(
+      week, latitude, species,
+      bs = c("cc", "tp", "re"),
+      k = c(10, 10, 6), m = 2, full = TRUE
+    ),
+    data = bird_move2,
+    method = "REML",
+    family = gfam(list(nb, nb, nb, nb, nb, nb)),
+    knots = list(week = c(0, 52)),
+    control = ctrl,
+  )
+  expect_identical(
+    family(bird_mod2_gfam)$getTheta(),
+    theta(bird_mod2_gfam)
+  )
+})
