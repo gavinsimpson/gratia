@@ -204,14 +204,30 @@ test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
   expect_doppelganger("draw model with fs smooth fixed scales", p3)
 })
 
-test_that("draw() works with factor-smooth interactions (bs = 'fs') in tensor-product interaction ti", {
+# See issue #358
+test_that("draw() works with random effect basis (bs = c('tp', 're')) in univariate tensor-product interaction ti", {
   # skip_on_ci() # testing without as moved to mac os x
   skip_if(packageVersion("mgcv") < "1.8.36")
-  p1 <- draw(mod_fs_interaction, ncol = 2, rug = FALSE)
+  p1 <- draw(mod_re_interaction, ncol = 2, rug = FALSE)
 
   skip_on_ci() # testing without as moved to mac os x
-  expect_doppelganger("draw.gam model with fs smooth interaction in ti", p1)
+  expect_doppelganger("draw.gam model with re basis in univariate ti", p1)
 })
+
+# See issue #358
+test_that("draw() does not works with random effect basis (bs = c('tp', 'tp', 're')) in multivariate tensor-product interaction ti", {
+  # skip_on_ci() # testing without as moved to mac os x
+  skip_if(packageVersion("mgcv") < "1.8.36")
+  expect_message(
+    p1 <- draw(mod_re_two_interaction, ncol = 2, rug = FALSE),
+    "Can't currently plot multivariate 'fs' smooths.\nSkipping: ti(x0,x1,fac)",
+    fixed = TRUE
+  )
+  
+  skip_on_ci() # testing without as moved to mac os x
+  expect_doppelganger("draw.gam model with re basis in multivariate ti", p1)
+})
+
 
 test_that("draw() works with parametric terms", {
   ## fake some data...

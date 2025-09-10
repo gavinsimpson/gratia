@@ -2142,8 +2142,7 @@
   # like a 2D TPRS or Duchon spline
   if ((l <- length(variables)) > 2L) {
     # warning("Can't plot ", l - 1, "D random factor smooths. Not plotting.")
-    message("Can't currently plot multivariate 'fs' smooths.")
-    message("Skipping: ", unique(object[[".smooth"]]))
+    message("Can't currently plot multivariate 'fs' smooths.\nSkipping: ", unique(object[[".smooth"]]))
     return(NULL) # returns early!
   }
 

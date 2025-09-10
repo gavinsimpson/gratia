@@ -219,6 +219,6 @@
 <text transform='translate(18.53,422.85) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='43.65' y='311.22' style='font-size: 13.20px; font-family: sans;' textLength='29.34px' lengthAdjust='spacingAndGlyphs'>s(x1)</text>
 <text x='354.52' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='49.89px' lengthAdjust='spacingAndGlyphs'>Basis: TPRS</text>
-<text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='274.41px' lengthAdjust='spacingAndGlyphs'>draw.gam model with fs smooth interaction in ti</text>
+<text x='10.96' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='259.74px' lengthAdjust='spacingAndGlyphs'>draw.gam model with re basis in univariate ti</text>
 </g>
 </svg>
