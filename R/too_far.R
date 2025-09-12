@@ -162,13 +162,17 @@
   # what variables do we need to work on
   sm_vars <- smooth_variable(smooth)
   # indicator for observations too far from grid
-  ind <- too_far(
-    x = input[[sm_vars[1L]]],
-    y = input[[sm_vars[2L]]],
-    ref_1 = reference[[sm_vars[1L]]],
-    ref_2 = reference[[sm_vars[2L]]],
-    dist = dist
-  )
+  if (is.numeric(input[[sm_vars[1L]]]) && is.numeric(input[[sm_vars[2L]]])) {
+    ind <- too_far(
+      x = input[[sm_vars[1L]]], 
+      y = input[[sm_vars[2L]]], 
+      ref_1 = reference[[sm_vars[1L]]],
+      ref_2 = reference[[sm_vars[2L]]], 
+      dist = dist
+    )
+  } else {
+    ind <- rep(FALSE, nrow(input))
+  }
   # set the indicated columns to `NA`
   input <- mutate(
     input,
