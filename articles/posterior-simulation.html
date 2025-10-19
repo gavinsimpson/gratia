@@ -70,9 +70,9 @@
     
     
 <p><introduction></introduction></p>
-<p>This vignette describes {gratia}’s tools for posterior simulation, a
-powerful way of doing inference using estimated generalized additive
-models.</p>
+<p>This vignette describes <em>gratia</em>’s tools for posterior
+simulation, a powerful way of doing inference using estimated
+generalized additive models.</p>
 <p>We’ll need the following packages for this vignette:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pkgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -80,19 +80,6 @@ models.</p>
 <span>  <span class="st">"distributional"</span>, <span class="st">"tibble"</span>, <span class="st">"withr"</span>, <span class="st">"patchwork"</span>, <span class="st">"ggokabeito"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">pkgs</span>, <span class="va">library</span>, <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical</a></span><span class="op">(</span><span class="fl">1L</span><span class="op">)</span>, logical.return <span class="op">=</span> <span class="cn">TRUE</span>, character.only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: nlme</span></span>
-<span><span class="co">#&gt; This is mgcv 1.9-3. For overview type 'help("mgcv-package")'.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:nlme':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     collapse</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     filter, lag</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span><span class="co">#&gt;           mgcv         gratia          dplyr          tidyr        ggplot2 </span></span>
 <span><span class="co">#&gt;           TRUE           TRUE           TRUE           TRUE           TRUE </span></span>
 <span><span class="co">#&gt;         ggdist distributional         tibble          withr      patchwork </span></span>
@@ -100,8 +87,8 @@ models.</p>
 <span><span class="co">#&gt;     ggokabeito </span></span>
 <span><span class="co">#&gt;           TRUE</span></span></code></pre></div>
 <p>A generalized additive model (GAM) has the following form</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>η</mi><mi>i</mi></msub><mo>=</mo><msub><mi>A</mi><mi>i</mi></msub><mo>+</mo><msub><mi>𝐗</mi><mi>i</mi></msub><mi>𝛄</mi><mo>+</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>J</mi></munderover><msub><mi>f</mi><mi>j</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mspace width="0.278em"></mspace><msub><mi>y</mi><mi>i</mi></msub><mo>∼</mo><mtext mathvariant="normal">EF</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
-g(\mu_i) = \eta_i = A_i + \mathbf{X}_i \boldsymbol{\gamma} + \sum_{j=1}^{J} f_j(x_{ij}), \; y_i \sim \text{EF}(\mu_i, \phi)
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>η</mi><mi>i</mi></msub><mo>=</mo><msub><mi>A</mi><mi>i</mi></msub><mo>+</mo><msub><mi>𝐗</mi><mi>i</mi></msub><mi>𝛄</mi><mo>+</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>J</mi></munderover><msub><mi>f</mi><mi>j</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mspace width="0.278em"></mspace><msub><mi>y</mi><mi>i</mi></msub><mo>∼</mo><mi>𝒟</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+g(\mu_i) = \eta_i = A_i + \mathbf{X}_i \boldsymbol{\gamma} + \sum_{j=1}^{J} f_j(x_{ij}), \; y_i \sim \mathcal{D}(\mu_i, \phi)
 </annotation></semantics></math></p>
 <p>where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">g()</annotation></semantics></math>
@@ -117,7 +104,7 @@ is a vector of parameters for the parametric terms,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>j</mi></msub><annotation encoding="application/x-tex">f_j</annotation></semantics></math>
 is a smooth function of covariate
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mi>j</mi></msub><annotation encoding="application/x-tex">x_j</annotation></semantics></math>.
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>∼</mo><mtext mathvariant="normal">EF</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y_i \sim \text{EF}(\mu_i, \phi)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>∼</mo><mi>𝒟</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y_i \sim \mathcal{D}(\mu_i, \phi)</annotation></semantics></math>
 denotes that the observations
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
 are distributed as some member of the exponential family of
@@ -157,30 +144,33 @@ we obtain a vector of coefficients
 convenience). The estimates of these coefficients are conditional upon
 the data and the selected values of the smoothing parameters
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\lambda_j</annotation></semantics></math>.
-Using the Bayesian view of smoothing via REML smoothness selection,
+Using the Bayesian view of smoothing <span class="citation">(Miller,
+2025)</span> via (RE)ML smoothness selection,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛃</mi><annotation encoding="application/x-tex">\boldsymbol{\beta}</annotation></semantics></math>
 has a multivariate normal posterior distribution
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝛃</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛈</mi><mo>,</mo><mi>𝛌</mi><mo>∼</mo><mtext mathvariant="normal">MVN</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>𝛃</mi><mo accent="true">̂</mo></mover><mo>,</mo><msub><mi>𝐕</mi><mtext mathvariant="normal">b</mtext></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\boldsymbol{\beta} | \boldsymbol{\eta}, \boldsymbol{\lambda} \sim \text{MVN}(\hat{\boldsymbol{\beta}}, \mathbf{V}_{\text{b}})</annotation></semantics></math>,
 where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐕</mi><mtext mathvariant="normal">b</mtext></msub><annotation encoding="application/x-tex">\mathbf{V}_{\text{b}}</annotation></semantics></math>
-is the Bayesian covariance matrix of the estimated parameters, (the
-subscript
+is the Bayesian covariance matrix of the estimated parameters
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>𝛃</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{\boldsymbol{\beta}}</annotation></semantics></math>)
+— the subscript
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext mathvariant="normal">b</mtext><annotation encoding="application/x-tex">\text{b}</annotation></semantics></math>
 is used to differentiate this Bayesian covariance matrix from the
 frequentist version which is also available in the mgcv model
-output).</p>
+output.</p>
 <div class="section level2">
 <h2 id="what-are-we-simulating">What are we simulating?<a class="anchor" aria-label="anchor" href="#what-are-we-simulating"></a>
 </h2>
 <p>Posterior simulation involves randomly sampling from
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">MVN</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>𝛃</mi><mo accent="true">̂</mo></mover><mo>,</mo><msub><mi>𝐕</mi><mtext mathvariant="normal">b</mtext></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{MVN}(\hat{\boldsymbol{\beta}}, \mathbf{V}_{\text{b}})</annotation></semantics></math>
 or
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">EF</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{EF}(\mu_i, \phi)</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝒟</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathcal{D}(\mu_i, \phi)</annotation></semantics></math>,
 or both.</p>
 <p>We might simulate from the posterior distribution of a single
 estimated smooth function to see the uncertainty in the estimate of that
 function. To do this we simulate for just a subset of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mrow><mi>j</mi><mi>⋯</mi></mrow></msub><annotation encoding="application/x-tex">\beta_{j \cdots}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛃</mi><annotation encoding="application/x-tex">\boldsymbol{\beta}</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\beta_{j}</annotation></semantics></math>,
 associated with the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>j</mi></msub><annotation encoding="application/x-tex">f_j</annotation></semantics></math>
 of interest. Instead, we might be interested in the uncertainty in the
@@ -192,11 +182,13 @@ to sample from the posterior of
 the fitted values of the model. Or we might want to generate new values
 of response variable via draws from the conditional distribution of the
 response, by simulating new response data
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>𝕪</mi><mo>*</mo></msup><annotation encoding="application/x-tex">\mathbb{y}^{\ast}</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>𝐲</mi><mo>*</mo></msup><annotation encoding="application/x-tex">\mathbf{y}^{\ast}</annotation></semantics></math>,
 at either the observed
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐱</mi><annotation encoding="application/x-tex">\mathbf{x}</annotation></semantics></math>
-or new values $^{}, from
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>y</mi><mi>i</mi><mo>*</mo></msubsup><mo stretchy="false" form="prefix">|</mo><mi>𝛈</mi><mo>,</mo><mi>𝐱</mi><mo>∼</mo><mtext mathvariant="normal">EF</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mover><msub><mi>μ</mi><mi>i</mi></msub><mo accent="true">̂</mo></mover><mo>,</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y^{\ast}_i | \boldsymbol{\eta}, \mathbf{x} \sim \text{EF}(\hat{\mu_i}, \phi)</annotation></semantics></math>.
+or new values
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>𝐱</mi><mo>*</mo></msup><annotation encoding="application/x-tex">\mathbf{x}^{\ast}</annotation></semantics></math>,
+from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>y</mi><mi>i</mi><mo>*</mo></msubsup><mo stretchy="false" form="prefix">|</mo><mi>𝛈</mi><mo>,</mo><mi>𝐱</mi><mo>∼</mo><mi>𝒟</mi><mrow><mo stretchy="true" form="prefix">(</mo><mover><msub><mi>μ</mi><mi>i</mi></msub><mo accent="true">̂</mo></mover><mo>,</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y^{\ast}_i | \boldsymbol{\eta}, \mathbf{x} \sim \mathcal{D}(\hat{\mu_i}, \phi)</annotation></semantics></math>.
 Finally, we can combine posterior simulation from both distributions to
 generate posterior draws for new data
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>𝕪</mi><mo>*</mo></msup><annotation encoding="application/x-tex">\mathbb{y}^{\ast}</annotation></semantics></math>
@@ -213,7 +205,7 @@ distribution of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>𝐗</mi><mi>i</mi></msub><mo>=</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbb{E}(y_i | \mathbf{X}_i = x_i)</annotation></semantics></math>,
 the expected value of the response,</li>
 <li>
-<code><a href="../reference/predicted_samples.html">predicted_samples()</a></code>, generates new response data given
+<code><a href="../reference/predicted_samples.html">predicted_samples()</a></code> generates new response data given
 supplied values of covariates
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>y</mi><mi>i</mi><mo>*</mo></msubsup><mo stretchy="false" form="prefix">|</mo><msub><mi>𝐗</mi><mi>i</mi></msub><mo>=</mo><msubsup><mi>x</mi><mi>i</mi><mo>*</mo></msubsup></mrow><annotation encoding="application/x-tex">y^{\ast}_i | \mathbf{X}_i = x^{\ast}_i</annotation></semantics></math>
 </li>
@@ -513,6 +505,11 @@ replace the data in the plot we created earlier with the simulations
 from the distribution GAM, and then plot it</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plt_gaulss</span> <span class="op">&lt;-</span> <span class="va">plt_gau</span> <span class="op"><a href="https://ggplot2.tidyverse.org/reference/gg-add.html" class="external-link">%+%</a></span> <span class="va">sim_gaulss</span></span>
+<span><span class="co">#&gt; Warning: &lt;ggplot&gt; %+% x was deprecated in ggplot2 4.0.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use &lt;ggplot&gt; + x instead.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
 <span></span>
 <span><span class="va">plt_gau</span> <span class="op">+</span> <span class="va">plt_gaulss</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>tag_levels <span class="op">=</span> <span class="st">"a"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -815,8 +812,9 @@ example.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="posterior-simulation_files/figure-html/plot-ga-fail-data-1.png" width="700"></p>
-<p>Note how there are very few zeroes and that for large parts of the
-covariate space the response is all zeroes.</p>
+<p>Note how there are very few ones (successes) and that for large parts
+of the covariate space the response consists of only zeroes
+(failures).</p>
 <p>We fit a binomial (logistic) GAM to the data</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m_logit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">15</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></code></pre></div>
@@ -916,6 +914,10 @@ Marra, G., &amp; Wood, S. N. (2012). Coverage properties of confidence
 intervals for generalized additive model components. <em>Scandinavian
 Journal of Statistics, Theory and Applications</em>, <em>39</em>(1),
 53–74.
+</div>
+<div id="ref-Miller2025-bd" class="csl-entry">
+Miller, D. L. (2025). Bayesian views of generalized additive modelling.
+<em>Methods Ecol. Evol.</em> <a href="https://doi.org/10.1111/2041-210x.14498" class="external-link">https://doi.org/10.1111/2041-210x.14498</a>
 </div>
 </div>
 </div>
