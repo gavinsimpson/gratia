@@ -406,7 +406,7 @@ characters")
 
     # Handle different data types
     if (is.numeric(x_data)) { # handle number x
-      if (isFALSE(identical(x_cls))) {
+      if (isFALSE(identical(x_cls, "numeric"))) {
         stop("'", name, "' is numeric but supplied condition is not.")
       }
       good <- TRUE
