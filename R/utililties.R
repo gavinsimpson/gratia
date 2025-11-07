@@ -553,6 +553,11 @@ stop_if_not_mgcv_smooth <- function(smooth) {
   inherits(smooth, "fs.interaction")
 }
 
+`is_sz_smooth` <- function(smooth) {
+  check_is_mgcv_smooth(smooth)
+  inherits(smooth, "sz.interaction")
+}
+
 #' Fix the names of a data frame containing an offset variable.
 #'
 #' Identifies which variable, if any, is the model offset, and fixed the name
