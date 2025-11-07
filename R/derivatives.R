@@ -328,6 +328,11 @@
     fs_var <- sm_var[-1L]
     sm_var <- sm_var[1L]
   }
+  ## handle sz smooths
+  if (is_sz_smooth(sm)) {
+    fs_var <- sm$fterm
+    sm_var <- sm_var[sm_var != sm$fterm]
+  }
   sm_lab <- smooth_label(sm)
   want <- grep(sm_lab, colnames(lpmatrix), fixed = TRUE)
   Xi <- lpmatrix * 0 # zero out the Xp matrix
