@@ -533,3 +533,14 @@ test_that("derivatives works with models that include random effects", {
   expect_s3_class(d, "tbl_df")
   expect_named(d, c(deriv_nms, paste0("x", 0:2)))
 })
+
+test_that("derivatives works for sz smooths", {
+  expect_silent(d <- derivatives(m_sz))
+  expect_s3_class(d, "derivatives")
+  expect_s3_class(d, "tbl_df")
+  expect_named(d, c(deriv_nms, c("x2", "fac", "x0")))
+
+  skip_on_cran()
+  skip_on_ci()
+  expect_snapshot(print(d))
+})
