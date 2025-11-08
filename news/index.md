@@ -10,6 +10,12 @@
   support reported by [@vrest-png](https://github.com/vrest-png)
   [\#362](https://github.com/gavinsimpson/gratia/issues/362)
 
+  Also handles higher order `bs = "sz"` terms.
+
+- [`draw.derivatives()`](https://gavinsimpson.github.io/gratia/reference/draw.derivatives.md)
+  can now differentiate random and constrained factor smooths through
+  the colour aesthetic via new argument `differentiate_factor_smooths`.
+
 ### Bug fixes
 
 - [`conditional_values()`](https://gavinsimpson.github.io/gratia/reference/conditional_values.md)

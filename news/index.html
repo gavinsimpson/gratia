@@ -44,7 +44,10 @@
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
 <ul><li>
-<code><a href="../reference/derivatives.html">derivatives()</a></code> now works for constrained factor smooths (<code>bs = "sz"</code>), treating them in the same way as random factor smooths (<code>bs = "fs"</code>). Lack of support reported by <a href="https://github.com/vrest-png" class="external-link">@vrest-png</a> <a href="https://github.com/gavinsimpson/gratia/issues/362" class="external-link">#362</a></li>
+<p><code><a href="../reference/derivatives.html">derivatives()</a></code> now works for constrained factor smooths (<code>bs = "sz"</code>), treating them in the same way as random factor smooths (<code>bs = "fs"</code>). Lack of support reported by <a href="https://github.com/vrest-png" class="external-link">@vrest-png</a> <a href="https://github.com/gavinsimpson/gratia/issues/362" class="external-link">#362</a></p>
+<p>Also handles higher order <code>bs = "sz"</code> terms.</p>
+</li>
+<li><p><code><a href="../reference/draw.derivatives.html">draw.derivatives()</a></code> can now differentiate random and constrained factor smooths through the colour aesthetic via new argument <code>differentiate_factor_smooths</code>.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>

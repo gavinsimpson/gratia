@@ -140,11 +140,11 @@ mod <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~1),
 link(mod, parameter = "scale")
 #> function (mu) 
 #> log(1/mu - 0.01)
-#> <environment: 0x5617a0e1aed8>
+#> <environment: 0x559dd71561e0>
 inv_link(mod, parameter = "scale")
 #> function (eta) 
 #> 1/(exp(eta) + 0.01)
-#> <environment: 0x5617a0e1aed8>
+#> <environment: 0x559dd71561e0>
 
 ## Works with `family` objects too
 link(shash(), parameter = "skewness")
