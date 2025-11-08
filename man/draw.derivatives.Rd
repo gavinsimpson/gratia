@@ -20,6 +20,7 @@
   nrow = NULL,
   guides = "keep",
   angle = NULL,
+  differentiate_factor_smooths = TRUE,
   ...
 )
 
@@ -80,6 +81,11 @@ spread the plots}
 
 \item{angle}{numeric; the angle at which the x axis tick labels are to be
 drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggplot2::guide_axis()}}.}
+
+\item{differentiate_factor_smooths}{logical; should colour be used to
+differentiate the levels of the factors involved in  random factor smooths
+(\code{bs = "fs"}) or constrained factor smooths (\code{bs = "sz"})? If \code{TRUE}, the
+factor(s) are used to define groups and mapped to the colour aesthetic.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
