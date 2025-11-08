@@ -30,10 +30,15 @@
 #'   `change_type = "change"`, while `col_decrease` and `col_increase` are used
 #'   when `change_type = "sizer"``.
 #' @param lwd_change numeric; the `linewidth` to use for the change indicators.
+#' @param differentiate_factor_smooths logical; should colour be used to
+#'   differentiate the levels of the factors involved in  random factor smooths
+#'   (`bs = "fs"`) or constrained factor smooths (`bs = "sz"`)? If `TRUE`, the
+#'   factor(s) are used to define groups and mapped to the colour aesthetic.
 #'
 #' @inheritParams draw.gam
 #'
 #' @importFrom ggplot2 ggplot geom_ribbon aes geom_line labs
+#' @importFrom stringr str_split
 #' @importFrom patchwork wrap_plots
 #' @export
 #'
@@ -48,20 +53,23 @@
 #' draw(df)
 #' ## fixed axis scales
 #' draw(df, scales = "fixed")
-`draw.derivatives` <- function(object,
-                               select = NULL,
-                               scales = c("free", "fixed"),
-                               add_change = FALSE,
-                               change_type = c("change", "sizer"),
-                               alpha = 0.2,
-                               change_col = "black",
-                               decrease_col = "#56B4E9",
-                               increase_col = "#E69F00",
-                               lwd_change = 1.5,
-                               ncol = NULL, nrow = NULL,
-                               guides = "keep",
-                               angle = NULL,
-                               ...) {
+`draw.derivatives` <- function(
+  object,
+  select = NULL,
+  scales = c("free", "fixed"),
+  add_change = FALSE,
+  change_type = c("change", "sizer"),
+  alpha = 0.2,
+  change_col = "black",
+  decrease_col = "#56B4E9",
+  increase_col = "#E69F00",
+  lwd_change = 1.5,
+  ncol = NULL, nrow = NULL,
+  guides = "keep",
+  angle = NULL,
+  differentiate_factor_smooths = TRUE,
+  ...
+) {
   scales <- match.arg(scales)
   change_type <- match.arg(change_type)
 
@@ -83,13 +91,31 @@
     df <- object[take, ]
     xvar <- vars_from_label(unique(df[[".smooth"]])) # unique(df[['var']])
     plt <- if (!all(is.na(df$.fs))) {
-      fs_var <- xvar[2L]
-      xvar <- xvar[1L]
-      ggplot(df, aes(
-        x = .data[[xvar]], # .data$data,
-        y = .data$.derivative,
-        group = .data[[fs_var]]
-      ))
+      fs_col_lab <- unique(df$.fs)
+      fs_var <- fs_col_lab |>
+        stringr::str_split(":") |> unlist()
+      xvar <- xvar[!xvar %in% fs_var] # xvar[1L]
+      if (length(fs_var) > 1L) {
+        df <- df |>
+          mutate(
+            ..fs_interact.. = do.call("interaction", args = df[fs_var])
+          )
+        fs_var <- "..fs_interact.."
+      }
+      if (differentiate_factor_smooths) {
+        ggplot(df, aes(
+          x = .data[[xvar]], # .data$data,
+          y = .data$.derivative,
+          group = .data[[fs_var]],
+          colour = .data[[fs_var]]
+        ))
+      } else {
+        ggplot(df, aes(
+          x = .data[[xvar]], # .data$data,
+          y = .data$.derivative,
+          group = .data[[fs_var]]
+        ))
+      }
     } else {
       ggplot(df, aes(
         x = .data[[xvar]], # .data$data,
@@ -103,8 +129,14 @@
     }
     plt <- plt +
       geom_line() +
-      labs(title = sm[i], x = xvar, y = "Derivative") +
       guides(x = guide_axis(angle = angle))
+    plt <- if (differentiate_factor_smooths && !all(is.na(df$.fs))) {
+      plt + labs(
+        title = sm[i], x = xvar, y = "Derivative", colour = fs_col_lab
+      )
+    } else {
+      plt + labs(title = sm[i], x = xvar, y = "Derivative")
+    }
     if (isTRUE(add_change)) {
       plt <- if (identical(change_type, "change")) {
         plt +
