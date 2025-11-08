@@ -1,0 +1,4 @@
+# License
+
+    YEAR: 2013-2024
+    COPYRIGHT HOLDER: Gavin L. Simpson
