@@ -353,7 +353,8 @@
   meanL1 <- smooth[["meanL1"]]
   eta_idx <- lss_eta_index(model)
 
-  if (isTRUE(overall_uncertainty) && attr(smooth, "nCons") > 0L) {
+  n_cons <- attr(smooth, "nCons")
+  if (isTRUE(overall_uncertainty) && !is.null(n_cons) && n_cons > 0L) {
     if (lcms < nc) {
       column_means <- c(column_means, rep(0, nc - lcms))
     }
