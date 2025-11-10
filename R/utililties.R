@@ -1893,6 +1893,13 @@ reclass_scam_smooth <- function(smooth) {
   .NotYetImplemented()
 }
 
+#' @export
+#' @rdname model_constant
+#' @importFrom stats coef
+`model_constant.glm` <- function(model, ...) {
+  coef(model)[1L]
+}
+
 #' Extract the boundary of a soap film smooth
 #'
 #' `r lifecycle::badge("experimental")`
