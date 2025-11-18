@@ -397,6 +397,7 @@
   # filter out NULLs as those are types of smooths we can't plot (yet)
   no_plot <- map_lgl(sm_plts, is.null)
   sm_plts <- sm_plts[!no_plot]
+  sm_eval <- sm_eval[!no_plot,]
 
   # set names on sm_plts
   if (length(sm_plts) > 0L) {
