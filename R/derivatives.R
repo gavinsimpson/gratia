@@ -328,6 +328,11 @@
     fs_var <- sm_var[-1L]
     sm_var <- sm_var[1L]
   }
+  ## handle sz smooths
+  if (is_sz_smooth(sm)) {
+    fs_var <- sm$fterm
+    sm_var <- sm_var[!sm_var %in% fs_var]
+  }
   sm_lab <- smooth_label(sm)
   want <- grep(sm_lab, colnames(lpmatrix), fixed = TRUE)
   Xi <- lpmatrix * 0 # zero out the Xp matrix
@@ -346,11 +351,14 @@
   fs_var <- if (is.null(fs_var)) {
     rep(NA_character_, nrow(deriv))
   } else {
-    # data[[fs_var]]
-    deriv <- add_column(deriv, {{ fs_var }} := data[[fs_var]],
-      .after = 2L
-    )
-    rep(fs_var, nrow(deriv))
+    for (i in seq_along(fs_var)) {
+      add_var <- fs_var[i]
+      deriv <- add_column(
+        deriv, {{ add_var }} := data[[add_var]],
+        .after = 2L
+      )
+    }
+    rep(paste(fs_var, collapse = ":"), nrow(deriv))
   }
   deriv <- add_column(deriv, .fs = fs_var, .after = 2L)
 
