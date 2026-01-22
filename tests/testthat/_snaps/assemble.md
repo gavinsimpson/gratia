@@ -14,7 +14,6 @@
     Code
       assemble(m_gam)
     Message
-      
       -- Assembly of 4 plots --
       
       1. s(x0)

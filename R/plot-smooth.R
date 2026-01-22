@@ -33,17 +33,20 @@
   caption = NULL,
   partial_residuals = NULL,
   ylim = NULL,
+  grouped_by = FALSE,
   ...
 ) {
   # do we have a grouped factor by?
-  grouped_by <- FALSE
-  if (".term" %in% names(object) && !all(is.na(object[[".by"]]))) {
-    if (is.null(variables)) {
+  by_var <- unique(object$.by)
+  # grouped_by can be set & TRUE even if this isn't a factor by smooth or
+  # varying coef term - this catches those cases
+  if (all(is.na(by_var)) || data_class(object)[[by_var]] == "numeric") {
+    grouped_by <- FALSE
+  }
+  if (is.null(variables)) {
+    if (isTRUE(grouped_by)) {
       variables <- vars_from_label(unique(object[[".term"]]))
-    }
-    grouped_by <- TRUE
-  } else {
-    if (is.null(variables)) {
+    } else {
       variables <- vars_from_label(unique(object[[".smooth"]]))
     }
   }
@@ -55,7 +58,6 @@
   object <- transform_fun(object, fun = fun)
 
   # base plot - need as.name to handle none standard names, like log2(x)
-  by_var <- unique(object$.by)
   plt <- if (grouped_by) {
     ggplot(object, aes(
       x = .data[[variables]], y = .data$.estimate,
@@ -826,8 +828,10 @@
   # like a 2D TPRS or Duchon spline
   if ((l <- length(variables)) > 2L) {
     # warning("Can't plot ", l - 1, "D random factor smooths. Not plotting.")
-    message("Can't currently plot multivariate 'fs' smooths.")
-    message("Skipping: ", unique(object[[".smooth"]]))
+    msg <- "Can't yet plot multivariate smooths with a 're' marginal: {unique(object[['.smooth']])}."
+    #message("Can't currently plot multivariate smooths with a 're' marginal.")
+    #message("Skipping: ", unique(object[[".smooth"]]))
+    cli_alert_info(msg, wrap = TRUE)
     return(NULL) # returns early!
   }
 

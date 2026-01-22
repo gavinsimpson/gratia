@@ -218,16 +218,15 @@ test_that("draw() works with random effect basis (bs = c('tp', 're')) in univari
 test_that("draw() does not works with random effect basis (bs = c('tp', 'tp', 're')) in multivariate tensor-product interaction ti", {
   # skip_on_ci() # testing without as moved to mac os x
   skip_if(packageVersion("mgcv") < "1.8.36")
-  expect_message(
-    p1 <- draw(mod_re_two_interaction, ncol = 2, rug = FALSE),
-    "Can't currently plot multivariate 'fs' smooths.\nSkipping: ti(x0,x1,fac)",
-    fixed = TRUE
+  expect_snapshot(
+    p1 <- draw(mod_re_two_interaction, ncol = 2, rug = FALSE)#,
+    #"ℹ Can't yet plot multivariate smooths with a 're' marginal: ti(x0,x1,fac).",
+    #fixed = TRUE
   )
-  
+
   skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw.gam model with re basis in multivariate ti", p1)
 })
-
 
 test_that("draw() works with parametric terms", {
   ## fake some data...
