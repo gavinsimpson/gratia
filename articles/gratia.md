@@ -139,7 +139,7 @@ sm <- smooth_estimates(m, smooth = "s(x2)")
 #> Warning: The `smooth` argument of `smooth_estimates()` is deprecated as of gratia
 #> 0.8.9.9.
 #> ℹ Please use the `select` argument instead.
-#> This warning is displayed once every 8 hours.
+#> This warning is displayed once per session.
 #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
 #> generated.
 sm

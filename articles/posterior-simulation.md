@@ -461,7 +461,7 @@ distribution GAM, and then plot it
 plt_gaulss <- plt_gau %+% sim_gaulss
 #> Warning: <ggplot> %+% x was deprecated in ggplot2 4.0.0.
 #> ℹ Please use <ggplot> + x instead.
-#> This warning is displayed once every 8 hours.
+#> This warning is displayed once per session.
 #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
 #> generated.
 
