@@ -279,6 +279,10 @@
       sm_l
     } else {
       # the factor is to reorder to way the smooths entered the model
+      sm_eval <- add_column(
+        sm_eval,
+        .term = str_split_fixed(sm_eval$.smooth, ":", n = 2)[, 1]
+      )
       group_split(sm_eval, factor(.data$.smooth, levels = S[select]))
     }
     sm_plts <- map(sm_l,
@@ -304,6 +308,7 @@
       lims_method = lims_method,
       tensor_term_order = tensor_term_order,
       caption = caption,
+      grouped_by = grouped_by,
       ... # FIXME: temporary fix to allow captions to be suppressed-ish
     )
 
@@ -339,6 +344,25 @@
     #     draw_smooth_estimates = draw_smooth_estimates, ...
     #   )
     # )
+
+    # filter out NULLs as those are types of smooths we can't plot (yet)
+    no_plot <- map_lgl(sm_plts, is.null)
+    sm_plts <- sm_plts[!no_plot]
+    sm_l <- sm_l[!no_plot]
+    sm_plt_nms <- map_chr(sm_l, .f = \(x) unique(x$.term))
+    #sm_eval <- sm_eval |> add_column(
+    #  .term = sm_plt_nms, .before = 1L
+    #)
+    ## sm_eval <- sm_eval[!no_plot, ]
+    # set names on sm_plts
+    if (length(sm_plts) > 0L) {
+      sm_plts <- setNames(sm_plts, sm_plt_nms)
+      #sm_plts <- if (grouped_by) {
+      #  setNames(sm_plts, sm_plt_nms)
+      #} else {
+      #  setNames(sm_plts, sm_plt_nms)
+      #}
+    }
   } # end stuff for smooths...
 
   # Are we plotting parametric effects too?
@@ -395,17 +419,21 @@
   }
 
   # filter out NULLs as those are types of smooths we can't plot (yet)
-  no_plot <- map_lgl(sm_plts, is.null)
-  sm_plts <- sm_plts[!no_plot]
+  #no_plot <- map_lgl(sm_plts, is.null)
+  #sm_plts <- sm_plts[!no_plot]
+  #sm_eval <- sm_eval[!no_plot,]
+  #sm_l <- sm_l |> bind_rows()
+  #sm_l <- sm_l[!no_plot] |> bind_rows()
 
-  # set names on sm_plts
-  if (length(sm_plts) > 0L) {
-    sm_plts <- if (grouped_by) {
-      setNames(sm_plts, map_chr(sm_l, .f = \(x) unique(x$.term)))
-    } else {
-      setNames(sm_plts, sm_eval$.smooth)
-    }
-  }
+  ## set names on sm_plts
+  #if (length(sm_plts) > 0L) {
+  #  sm_plts <- if (grouped_by) {
+  #    setNames(sm_plts, map_chr(sm_l, .f = \(x) unique(x$.term)))
+  #  } else {
+  #    # setNames(sm_plts, sm_eval$.smooth)
+  #    setNames(sm_plts, sm_l$.smooth)
+  #  }
+  #}
 
   if (isTRUE(parametric)) {
     para_nm <- unique(para$.term)

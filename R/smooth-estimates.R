@@ -353,7 +353,8 @@
   meanL1 <- smooth[["meanL1"]]
   eta_idx <- lss_eta_index(model)
 
-  if (isTRUE(overall_uncertainty) && attr(smooth, "nCons") > 0L) {
+  n_cons <- attr(smooth, "nCons")
+  if (isTRUE(overall_uncertainty) && !is.null(n_cons) && n_cons > 0L) {
     if (lcms < nc) {
       column_means <- c(column_means, rep(0, nc - lcms))
     }
@@ -1131,6 +1132,7 @@
     lims_method = lims_method,
     tensor_term_order = tensor_term_order, # pass on tensor order info,
     caption = caption,
+    grouped_by = grouped_by,
     ...
   )
 
@@ -1139,6 +1141,7 @@
 
 #' @importFrom tidyr unnest
 #' @importFrom tidyselect any_of
+#' @importFrom purrr map_lgl
 `draw_smooth_estimates` <- function(object,
                                     constant = NULL,
                                     fun = NULL,
@@ -1164,6 +1167,7 @@
                                     lims_method = "cross",
                                     tensor_term_order = NULL,
                                     caption = NULL,
+                                    grouped_by = FALSE,
                                     ...) {
   sm_vars <- tensor_term_order[[unique(object$.smooth)]]
   if (is.null(sm_vars)) {
@@ -1219,7 +1223,12 @@
       c("random_effect", "mgcv_smooth"),
       after = 0
     )
-  } else if (sm_type == "Factor smooth") {
+  } else if (
+    sm_type == "Factor smooth" || (
+      sm_type %in% c("Tensor product int.", "Tensor product") &&
+        any(map_lgl(object[sm_vars], is.factor))
+    )
+  ) {
     class(object) <- append(class(object),
       c("factor_smooth", "mgcv_smooth"),
       after = 0
@@ -1324,6 +1333,7 @@
     default_crs = default_crs,
     lims_method = lims_method,
     caption = caption,
+    grouped_by = grouped_by,
     ...
   )
 }

@@ -553,6 +553,11 @@ stop_if_not_mgcv_smooth <- function(smooth) {
   inherits(smooth, "fs.interaction")
 }
 
+`is_sz_smooth` <- function(smooth) {
+  check_is_mgcv_smooth(smooth)
+  inherits(smooth, "sz.interaction")
+}
+
 #' Fix the names of a data frame containing an offset variable.
 #'
 #' Identifies which variable, if any, is the model offset, and fixed the name
@@ -1736,8 +1741,6 @@ reclass_scam_smooth <- function(smooth) {
   list(betas = beta, se = se)
 }
 
-# p for sw [1] 113.00627  43.09450  54.19013 103.56536 149.15428
-
 #' @export
 `scam_beta_se.univariate_by_scam_smooth` <- function(smooth, X, beta, V, ...) {
   # return the coefs unmodified, so just compute se
@@ -1886,6 +1889,13 @@ reclass_scam_smooth <- function(smooth) {
 #' @rdname model_constant
 `model_constant.gamlss` <- function(model, ...) {
   .NotYetImplemented()
+}
+
+#' @export
+#' @rdname model_constant
+#' @importFrom stats coef
+`model_constant.glm` <- function(model, ...) {
+  coef(model)[1L]
 }
 
 #' Extract the boundary of a soap film smooth

@@ -1,5 +1,17 @@
 # gratia (development version)
 
+##  New features
+
+* `derivatives()` now works for constrained factor smooths (`bs = "sz"`),
+  treating them in the same way as random factor smooths (`bs = "fs"`).
+  Lack of support reported by @vrest-png #362
+
+  Also handles higher order `bs = "sz"` terms.
+
+* `draw.derivatives()` can now differentiate random and constrained factor
+  smooths through the colour aesthetic via new argument 
+  `differentiate_factor_smooths`.
+
 ## Bug fixes
 
 * `conditional_values()` would fail if supplied a numeric vector of data to 

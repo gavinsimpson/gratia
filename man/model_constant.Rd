@@ -4,6 +4,7 @@
 \alias{model_constant}
 \alias{model_constant.gam}
 \alias{model_constant.gamlss}
+\alias{model_constant.glm}
 \title{Extract the model constant term}
 \usage{
 model_constant(model, ...)
@@ -11,6 +12,8 @@ model_constant(model, ...)
 \method{model_constant}{gam}(model, lp = NULL, ...)
 
 \method{model_constant}{gamlss}(model, ...)
+
+\method{model_constant}{glm}(model, ...)
 }
 \arguments{
 \item{model}{a fitted model for which a \code{coef()} method exists.}
