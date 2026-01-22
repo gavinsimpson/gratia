@@ -23,6 +23,13 @@
   the `condition` argument.
   [\#366](https://github.com/gavinsimpson/gratia/issues/366)
 
+- *gratia* worked inconsistently with tensor product smooths containing
+  a random effect `bs = "re"` marginal. Reported
+  [\#358](https://github.com/gavinsimpson/gratia/issues/358) and fixed
+  by [@asgersvenning](https://github.com/asgersvenning)
+  [\#360](https://github.com/gavinsimpson/gratia/issues/360), with
+  additional changes by Gavin Simpson.
+
 ## gratia 0.11.1
 
 CRAN release: 2025-08-25
