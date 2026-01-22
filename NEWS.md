@@ -17,6 +17,9 @@
 * `conditional_values()` would fail if supplied a numeric vector of data to 
   condition on via the `condition` argument. #366
 
+* *gratia* worked inconsistently with tensor product smooths containing a
+  random effect `bs = "re"` marginal. Reported #358 and fixed by @asgersvenning #360, with additional changes by Gavin Simpson.
+
 # gratia 0.11.1
 
 ## User visible changes
