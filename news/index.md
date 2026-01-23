@@ -2,6 +2,12 @@
 
 ## gratia (development version)
 
+### User visible changes
+
+- *gratia* now only handles shape constrained models fitted using *scam*
+  version 1.2-21 or later. This is due to breaking changes in *scam*,
+  and new functionality in that package, which simplifies *gratia*.
+
 ### New features
 
 - [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md)

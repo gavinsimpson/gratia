@@ -32,7 +32,7 @@ additive models.” *Journal of Open Source Software*, **9**(104), 6962.
 Simpson G (????). *gratia: Graceful ggplot-Based Graphics and Other
 Functions for GAMs Fitted using mgcv*.
 [doi:10.32614/CRAN.package.gratia](https://doi.org/10.32614/CRAN.package.gratia),
-R package version 0.11.1.9005, <https://gavinsimpson.github.io/gratia/>.
+R package version 0.11.1.9006, <https://gavinsimpson.github.io/gratia/>.
 
     @Manual{,
       title = {{gratia}: Graceful {ggplot}-Based Graphics and Other Functions for
@@ -43,7 +43,7 @@ R package version 0.11.1.9005, <https://gavinsimpson.github.io/gratia/>.
                  mgcv package. Provides a reimplementation of the plot() method for
                  GAMs that mgcv provides, as well as tidyverse-compatible
                  representations of estimated smooths.},
-      note = {R package version 0.11.1.9005},
+      note = {R package version 0.11.1.9006},
       url = {https://gavinsimpson.github.io/gratia/},
       doi = {10.32614/CRAN.package.gratia},
     }
