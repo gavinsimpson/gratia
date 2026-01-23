@@ -30,6 +30,10 @@
   [\#360](https://github.com/gavinsimpson/gratia/issues/360), with
   additional changes by Gavin Simpson.
 
+- Argument `mvn_method` was not being passed on to the lower workhorse
+  functions that did the sampling.
+  [\#381](https://github.com/gavinsimpson/gratia/issues/381)
+
 ## gratia 0.11.1
 
 CRAN release: 2025-08-25
