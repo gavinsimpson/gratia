@@ -18,7 +18,8 @@
   condition on via the `condition` argument. #366
 
 * *gratia* worked inconsistently with tensor product smooths containing a
-  random effect `bs = "re"` marginal. Reported #358 and fixed by @asgersvenning #360, with additional changes by Gavin Simpson.
+  random effect `bs = "re"` marginal. Reported #358 and fixed by
+  @asgersvenning #360, with additional changes by Gavin Simpson.
 
 * Argument `mvn_method` was not being passed on to the lower workhorse functions
   that did the sampling. #381
