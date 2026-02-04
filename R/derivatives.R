@@ -1378,7 +1378,7 @@
 }
 
 #' @importFrom tidyr pivot_wider
-#' @importFrom dplyr mutate case_match
+#' @importFrom dplyr mutate
 #' @importFrom tidyselect matches
 `compute_y_fdiff_2` <- function(samples, type, eps = 1e-7) {
   samples <- samples |>

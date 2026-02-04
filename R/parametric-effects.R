@@ -289,7 +289,7 @@ draw.parametric_effects <- function(object,
 #'
 #' @inheritParams draw.gam
 #'
-#' @importFrom dplyr mutate if_else
+#' @importFrom dplyr mutate if_else recode_values
 #' @importFrom ggplot2 ggplot aes geom_pointrange geom_rug geom_ribbon
 #'   geom_line labs expand_limits
 #' @keywords internal
@@ -382,13 +382,14 @@ draw.parametric_effects <- function(object,
   }
   if (is.null(caption)) {
     # caption <- paste("Parametric term")
-    caption <- case_match(type,
+    caption <- recode_values(
+      type,
       "ordered" ~ "Ordered factor",
       "factor" ~ "Factor",
       "numeric" ~ "Numeric",
       "logical" ~ "Logical",
-      .default = "Parametric term",
-      .ptype = character()
+      default = "Parametric term",
+      ptype = character()
     )
   }
 

@@ -1640,14 +1640,16 @@ reclass_scam_smooth <- function(smooth) {
   qrA <- qr(t(A))
   R <- R[-1, ]
   RZa <- t(qr.qty(qrA, t(R)))[, seq(2, ncol(X))]
-  RZa_inv <- solve(RZa) # FIXME? can we do this & next line better, without inverting?
+  # FIXME? can we do this & next line better, without inverting?
+  RZa_inv <- solve(RZa)
   RZaR <- RZa_inv %*% R
   beta <- qr.qy(qrA, c(0, RZaR %*% beta))
-  #idx <- c(1, smooth_coef_indices(smooth))
-  idx <- smooth_coef_indices(smooth)
-  vc <- vv <- V # [idx, idx, drop = FALSE]
-  vc[, 1] <- rep(0, nrow(vv))
-  vc[1, ] <- rep(0, ncol(vv))
+  idx <- c(1, smooth_coef_indices(smooth))
+  #idx <- smooth_coef_indices(smooth)
+  vc <- vv <- V[idx, idx, drop = FALSE]
+  # vc[, 1] <- rep(0, nrow(vv))
+  # vc[1, ] <- rep(0, ncol(vv))
+  vc <- vc[-1, -1, drop = FALSE] # drop intercept
 
   XZa <- t(qr.qty(qrA, t(X)))[, seq(2, ncol(X))]
   Ga <- XZa %*% RZaR
@@ -1657,7 +1659,13 @@ reclass_scam_smooth <- function(smooth) {
 }
 
 #' @export
-`scam_beta_se.univariate_by_scam_smooth` <- function(smooth, X, beta, V, ...) {
+`scam_beta_se.univariate_by_scam_smooth` <- function(
+  smooth,
+  X,
+  beta,
+  V,
+  ...
+) {
   # return the coefs unmodified, so just compute se
   idx <- c(1, smooth_coef_indices(smooth))
   V <- V[idx, idx, drop = FALSE]

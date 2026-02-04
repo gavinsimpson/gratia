@@ -158,7 +158,7 @@
   fit
 }
 
-#' @importFrom dplyr mutate across case_match
+#' @importFrom dplyr mutate across recode_values
 #' @importFrom tidyr pivot_longer
 #' @importFrom tibble as_tibble add_column
 `fit_vals_general_lss` <- function(
@@ -206,7 +206,7 @@
 
     fit <- fit |>
       mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
-        .fns = ~ case_match(
+        .fns = ~ recode_values(
           .data$.parameter,
           "location" ~ extra_fns[["location"]](il[["location"]](.x)),
           "scale" ~ extra_fns[["scale"]](il[["scale"]](.x)),
@@ -222,7 +222,7 @@
   fit
 }
 
-#' @importFrom dplyr mutate across case_match row_number
+#' @importFrom dplyr mutate across recode_values row_number
 #' @importFrom tidyr pivot_longer
 #' @importFrom tibble as_tibble add_column
 `fit_vals_ziplss` <- function(
@@ -269,7 +269,7 @@
 
     fit <- fit |>
       mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
-        .fns = ~ case_match(
+        .fns = ~ recode_values(
           .data$.parameter,
           "location" ~ extra_fns[["location"]](ilink_loc(.x)),
           "pi" ~ extra_fns[["pi"]](ilink_pi(.x))
@@ -280,7 +280,7 @@
   fit
 }
 
-#' @importFrom dplyr mutate across case_match row_number
+#' @importFrom dplyr mutate across recode_values row_number
 #' @importFrom tidyr pivot_longer
 #' @importFrom tibble as_tibble add_column
 `fit_vals_twlss` <- function(
@@ -327,7 +327,7 @@
 
     fit <- fit |>
       mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
-        .fns = ~ case_match(
+        .fns = ~ recode_values(
           .data$.parameter,
           "location" ~ extra_fns[["location"]](il[["location"]](.x)),
           "power" ~ extra_fns[["power"]](il[["power"]](.x),
