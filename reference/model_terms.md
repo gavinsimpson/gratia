@@ -77,11 +77,15 @@ factor `fac` with three levels, there are seven terms in the model:
 ``` r
 load_mgcv()
 
+# simulate data
+df <- data_sim("eg4", n = 400, dist = "normal", scale = 2, seed = 1)
+
+# fit model
 m <- gam(y ~ fac + s(x2, by = fac) + s(x0),
-  data = su_eg4, method = "REML")
-#> Error in eval(mf, parent.frame()): object 'su_eg4' not found
+  data = df, method = "REML")
 
 # return the names of terms in this model
 model_terms(m)
-#> Error: object 'm' not found
+#> [1] "(Intercept)" "fac2"        "fac3"        "s(x2):fac1"  "s(x2):fac2" 
+#> [6] "s(x2):fac3"  "s(x0)"      
 ```
