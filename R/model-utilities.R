@@ -32,8 +32,12 @@
 #' @examples
 #' load_mgcv()
 #'
+#' # simulate data
+#' df <- data_sim("eg4", n = 400, dist = "normal", scale = 2, seed = 1)
+#'
+#' # fit model
 #' m <- gam(y ~ fac + s(x2, by = fac) + s(x0),
-#'   data = su_eg4, method = "REML")
+#'   data = df, method = "REML")
 #'
 #' # return the names of terms in this model
 #' model_terms(m)
