@@ -18,6 +18,8 @@
   smooths through the colour aesthetic via new argument 
   `differentiate_factor_smooths`.
 
+* `model_terms()` returns the names of all terms in a model.
+
 ## Bug fixes
 
 * `conditional_values()` would fail if supplied a numeric vector of data to 
