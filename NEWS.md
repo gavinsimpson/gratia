@@ -18,7 +18,7 @@
   smooths through the colour aesthetic via new argument 
   `differentiate_factor_smooths`.
 
-* `model_terms()` returns the names of all terms in a model.
+* `model_terms()` returns the names of all terms in a model. #388
 
 ## Bug fixes
 
