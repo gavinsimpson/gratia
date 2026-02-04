@@ -22,6 +22,10 @@
   can now differentiate random and constrained factor smooths through
   the colour aesthetic via new argument `differentiate_factor_smooths`.
 
+- [`model_terms()`](https://gavinsimpson.github.io/gratia/reference/model_terms.md)
+  returns the names of all terms in a model.
+  [\#388](https://github.com/gavinsimpson/gratia/issues/388)
+
 ### Bug fixes
 
 - [`conditional_values()`](https://gavinsimpson.github.io/gratia/reference/conditional_values.md)
@@ -2066,7 +2070,7 @@ CRAN release: 2020-05-30
 
 ### Bug fixes
 
-- [`dplyr::combine()`](https://dplyr.tidyverse.org/reference/combine.html)
+- [`dplyr::combine()`](https://dplyr.tidyverse.org/reference/defunct.html)
   was deprecated. Switch to
   [`vctrs::vec_c()`](https://vctrs.r-lib.org/reference/vec_c.html).
 

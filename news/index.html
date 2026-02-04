@@ -53,6 +53,7 @@
 <p>Also handles higher order <code>bs = "sz"</code> terms.</p>
 </li>
 <li><p><code><a href="../reference/draw.derivatives.html">draw.derivatives()</a></code> can now differentiate random and constrained factor smooths through the colour aesthetic via new argument <code>differentiate_factor_smooths</code>.</p></li>
+<li><p><code><a href="../reference/model_terms.html">model_terms()</a></code> returns the names of all terms in a model. <a href="https://github.com/gavinsimpson/gratia/issues/388" class="external-link">#388</a></p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
@@ -639,7 +640,7 @@ Part of discussion with <a href="https://github.com/BenFN121" class="external-li
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-4-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-4-1"></a></h3>
-<ul><li><p><code><a href="https://dplyr.tidyverse.org/reference/combine.html" class="external-link">dplyr::combine()</a></code> was deprecated. Switch to <code><a href="https://vctrs.r-lib.org/reference/vec_c.html" class="external-link">vctrs::vec_c()</a></code>.</p></li>
+<ul><li><p><code><a href="https://dplyr.tidyverse.org/reference/defunct.html" class="external-link">dplyr::combine()</a></code> was deprecated. Switch to <code><a href="https://vctrs.r-lib.org/reference/vec_c.html" class="external-link">vctrs::vec_c()</a></code>.</p></li>
 <li>
 <p><code><a href="../reference/draw.gam.html">draw.gam()</a></code> with <code>scales = "fixed"</code> wasn’t using fixed scales where 2d smooths were in the model.</p>
 <p>Reported by <a href="https://github.com/StefanoMezzini" class="external-link">@StefanoMezzini</a> <a href="https://github.com/gavinsimpson/gratia/issues/73" class="external-link">#73</a></p>

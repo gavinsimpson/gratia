@@ -419,6 +419,9 @@ former University Madison-Wisconsin Professor of Mathematics, who in a
 - [`model_constant()`](https://gavinsimpson.github.io/gratia/reference/model_constant.md)
   **\[experimental\]** : Extract the model constant term
 
+- [`model_terms()`](https://gavinsimpson.github.io/gratia/reference/model_terms.md)
+  : Find the names of model terms
+
 - [`model_vars()`](https://gavinsimpson.github.io/gratia/reference/model_vars.md)
   : List the variables involved in a model fitted with a formula
 
