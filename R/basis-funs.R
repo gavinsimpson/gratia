@@ -238,7 +238,8 @@
     # In scam, intercept gets returned by the Predict.matrix.<basis>.smooth
     # functions (from PredictMat() used in tidy_basis()), and we need to
     # know this to drop it later
-    p_ident <- p_ident[c(1L, take)]
+    # p_ident <- p_ident[c(1L, take)]
+    p_ident <- p_ident[c(take)]
   }
 
   if (is.null(data)) {
