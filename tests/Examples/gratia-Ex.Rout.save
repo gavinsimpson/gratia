@@ -1,5 +1,5 @@
 
-R version 4.5.1 (2025-06-13) -- "Great Square Root"
+R version 4.5.2 (2025-10-31) -- "[Not] Part in a Rumble"
 Copyright (C) 2025 The R Foundation for Statistical Computing
 Platform: aarch64-apple-darwin20
 
@@ -1724,11 +1724,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x1527a37c8>
+<environment: 0x1172250b8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x1527a37c8>
+<environment: 0x1172250b8>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1852,6 +1852,7 @@ detaching ‘package:mgcv’, ‘package:tibble’
 > ### Name: model_constant
 > ### Title: Extract the model constant term
 > ### Aliases: model_constant model_constant.gam model_constant.gamlss
+> ###   model_constant.glm
 > 
 > ### ** Examples
 > 
@@ -1879,6 +1880,38 @@ attr(,"par_names")
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
+> nameEx("model_terms")
+> ### * model_terms
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: model_terms
+> ### Title: Find the names of model terms
+> ### Aliases: model_terms model_terms.gam model_terms.gamm model_terms.gamm4
+> ###   model_terms.lm
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> 
+> # simulate data
+> df <- data_sim("eg4", n = 400, dist = "normal", scale = 2, seed = 1)
+> 
+> # fit model
+> m <- gam(y ~ fac + s(x2, by = fac) + s(x0),
++   data = df, method = "REML")
+> 
+> # return the names of terms in this model
+> model_terms(m)
+[1] "(Intercept)" "fac2"        "fac3"        "s(x2):fac1"  "s(x2):fac2" 
+[6] "s(x2):fac3"  "s(x0)"      
 > 
 > 
 > 
@@ -2936,7 +2969,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  14.504 0.696 16.269 0.002 0.002 
+Time elapsed:  13.874 0.453 15.305 0.004 0.004 
 > grDevices::dev.off()
 null device 
           1 
