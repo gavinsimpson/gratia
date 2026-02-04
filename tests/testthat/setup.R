@@ -1,11 +1,15 @@
 # Setup models for tests
-library("mgcv")
-library("gamm4")
-library("scam")
-library("dplyr")
-library("tibble")
-library("nlme")
-library("ggplot2")
+suppressPackageStartupMessages(
+  {
+    library("mgcv")
+    library("gamm4")
+    library("scam")
+    library("dplyr")
+    library("tibble")
+    library("nlme")
+    library("ggplot2")
+  }
+)
 
 ## Fit models
 n_quick <- 300
