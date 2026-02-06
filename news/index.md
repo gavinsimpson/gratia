@@ -11,7 +11,13 @@
 - *gratia* also now depends on *dplyr* version 1.2.0 or later.
 
 - Histogram bars drawn by
-  [`residuals_hist_plot()`](https://gavinsimpson.github.io/gratia/reference/residuals_hist_plot.md),
+  [`residuals_hist_plot()`](https://gavinsimpson.github.io/gratia/reference/residuals_hist_plot.md)
+  and points in
+  [`qq_plot()`](https://gavinsimpson.github.io/gratia/reference/qq_plot.md),
+  [`residuals_linpred_plot()`](https://gavinsimpson.github.io/gratia/reference/residuals_linpred_plot.md),
+  [`observed_fitted_plot()`](https://gavinsimpson.github.io/gratia/reference/observed_fitted_plot.md),
+  and
+  [`worm_plot()`](https://gavinsimpson.github.io/gratia/reference/worm_plot.md),
   and hence
   [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
   are now filled with a dark shade of grey and use a light colour for
