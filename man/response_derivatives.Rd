@@ -108,8 +108,8 @@ represents
 \item \code{.focal}: the name of the variable for which the partial derivative was
 evaluated,
 \item \code{.derivative}: the estimated partial derivative,
-\item \code{.lower_ci}: the lower bound of the confidence or simultaneous interval,
-\item \code{.upper_ci}: the upper bound of the confidence or simultaneous interval,
+\item \code{.lower_ci}: the lower bound of the confidence or interval,
+\item \code{.upper_ci}: the upper bound of the confidence or interval,
 \item additional columns containing the covariate values at which the derivative
 was evaluated.
 }

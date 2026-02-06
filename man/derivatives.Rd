@@ -91,16 +91,18 @@ against.}
 \value{
 A tibble, currently with the following variables:
 \itemize{
-\item \code{smooth}: the smooth each row refers to,
-\item \code{var}: the name of the variable involved in the smooth,
-\item \code{data}: values of \code{var} at which the derivative was evaluated,
-\item \code{derivative}: the estimated derivative,
-\item \code{se}: the standard error of the estimated derivative,
-\item \code{crit}: the critical value such that \code{derivative} ± \code{(crit * se)} gives
+\item \code{.smooth}: the smooth each row refers to,
+\item \code{.by}: the name of any factor by variable involved in the smooth,
+\item \code{.fs}: the name of any random factor variable involved in the smooth,
+\item \code{.derivative}: the estimated derivative,
+\item \code{.se}: the standard error of the estimated derivative,
+\item \code{.crit}: the critical value such that \code{derivative} ± \code{(crit * se)} gives
 the upper and lower bounds of the requested confidence or simultaneous
 interval (given \code{level}),
-\item \code{lower}: the lower bound of the confidence or simultaneous interval,
-\item \code{upper}: the upper bound of the confidence or simultaneous interval.
+\item \code{.lower_ci}: the lower bound of the confidence or simultaneous interval,
+\item \code{.upper_ci}: the upper bound of the confidence or simultaneous interval.
+\item plus one or more columns of data containing the values of covariates at
+which the derivative was evaluated.
 }
 }
 \description{
