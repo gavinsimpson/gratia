@@ -648,3 +648,16 @@ test_that("is_mgcv_family works", {
   expect_false(is_mgcv_family(1L))
   expect_false(is_mgcv_family(m_gam))
 })
+
+test_that("smooths() works", {
+  expect_silent(sm <- smooths(m_gam))
+  expect_equal(sm, c("s(x0)", "s(x1)", "s(x2)", "s(x3)"))
+  expect_silent(sm <- smooths(m_gamm))
+  expect_equal(sm, c("s(x0)", "s(x1)", "s(x2)", "s(x3)"))
+  expect_silent(sm <- smooths(m_gamm4))
+  expect_equal(sm, c("s(x0)", "s(x1)", "s(x2)", "s(x3)"))
+  expect_silent(sm <- smooths(m_bam))
+  expect_equal(sm, c("s(x0)", "s(x1)", "s(x2)", "s(x3)"))
+  expect_silent(sm <- smooths(m_scam))
+  expect_equal(sm, c("s(x1)", "s(x2)"))
+})
