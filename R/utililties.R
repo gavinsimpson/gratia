@@ -1517,10 +1517,10 @@ vars_from_label <- function(label) {
 }
 
 # function to return the vector of boundary points for power parameter
-get_tw_bounds <- function(model) {
-  fam <- family_name(model)
+get_twlss_bounds <- function(model) {
+  fam <- family_type(model)
   if (fam != "twlss") {
-    stop("'model' wasn't fitted with 'twlss()' family.",
+    stop("'model' wasn't fitted with the 'twlss()' family.",
       call. = FALSE
     )
   }

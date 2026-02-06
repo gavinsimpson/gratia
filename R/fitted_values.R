@@ -323,7 +323,7 @@
   # convert to the response scale if requested
   if (identical(scale, "response")) {
     il <- lss_links(object, inverse = TRUE)
-    bounds <- get_tw_bounds(object)
+    bounds <- get_twlss_bounds(object)
 
     fit <- fit |>
       mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
