@@ -172,16 +172,18 @@ against.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble, currently with the following variables:</p><ul><li><p><code>smooth</code>: the smooth each row refers to,</p></li>
-<li><p><code>var</code>: the name of the variable involved in the smooth,</p></li>
-<li><p><code>data</code>: values of <code>var</code> at which the derivative was evaluated,</p></li>
-<li><p><code>derivative</code>: the estimated derivative,</p></li>
-<li><p><code>se</code>: the standard error of the estimated derivative,</p></li>
-<li><p><code>crit</code>: the critical value such that <code>derivative</code> ± <code>(crit * se)</code> gives
+    <p>A tibble, currently with the following variables:</p><ul><li><p><code>.smooth</code>: the smooth each row refers to,</p></li>
+<li><p><code>.by</code>: the name of any factor by variable involved in the smooth,</p></li>
+<li><p><code>.fs</code>: the name of any random factor variable involved in the smooth,</p></li>
+<li><p><code>.derivative</code>: the estimated derivative,</p></li>
+<li><p><code>.se</code>: the standard error of the estimated derivative,</p></li>
+<li><p><code>.crit</code>: the critical value such that <code>derivative</code> ± <code>(crit * se)</code> gives
 the upper and lower bounds of the requested confidence or simultaneous
 interval (given <code>level</code>),</p></li>
-<li><p><code>lower</code>: the lower bound of the confidence or simultaneous interval,</p></li>
-<li><p><code>upper</code>: the upper bound of the confidence or simultaneous interval.</p></li>
+<li><p><code>.lower_ci</code>: the lower bound of the confidence or simultaneous interval,</p></li>
+<li><p><code>.upper_ci</code>: the upper bound of the confidence or simultaneous interval.</p></li>
+<li><p>plus one or more columns of data containing the values of covariates at
+which the derivative was evaluated.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>

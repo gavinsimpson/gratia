@@ -145,11 +145,9 @@ A tibble, currently with the following variables:
 
 - `.derivative`: the estimated partial derivative,
 
-- `.lower_ci`: the lower bound of the confidence or simultaneous
-  interval,
+- `.lower_ci`: the lower bound of the confidence or interval,
 
-- `.upper_ci`: the upper bound of the confidence or simultaneous
-  interval,
+- `.upper_ci`: the upper bound of the confidence or interval,
 
 - additional columns containing the covariate values at which the
   derivative was evaluated.

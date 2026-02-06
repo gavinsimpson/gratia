@@ -59,6 +59,10 @@
   functions that did the sampling.
   [\#381](https://github.com/gavinsimpson/gratia/issues/381)
 
+- [`response_derivatives()`](https://gavinsimpson.github.io/gratia/reference/response_derivatives.md)
+  would fail if there were no other terms in the model but the focal
+  term.
+
 ## gratia 0.11.1
 
 CRAN release: 2025-08-25

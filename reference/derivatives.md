@@ -129,23 +129,28 @@ derivatives(
 
 A tibble, currently with the following variables:
 
-- `smooth`: the smooth each row refers to,
+- `.smooth`: the smooth each row refers to,
 
-- `var`: the name of the variable involved in the smooth,
+- `.by`: the name of any factor by variable involved in the smooth,
 
-- `data`: values of `var` at which the derivative was evaluated,
+- `.fs`: the name of any random factor variable involved in the smooth,
 
-- `derivative`: the estimated derivative,
+- `.derivative`: the estimated derivative,
 
-- `se`: the standard error of the estimated derivative,
+- `.se`: the standard error of the estimated derivative,
 
-- `crit`: the critical value such that `derivative` ± `(crit * se)`
+- `.crit`: the critical value such that `derivative` ± `(crit * se)`
   gives the upper and lower bounds of the requested confidence or
   simultaneous interval (given `level`),
 
-- `lower`: the lower bound of the confidence or simultaneous interval,
+- `.lower_ci`: the lower bound of the confidence or simultaneous
+  interval,
 
-- `upper`: the upper bound of the confidence or simultaneous interval.
+- `.upper_ci`: the upper bound of the confidence or simultaneous
+  interval.
+
+- plus one or more columns of data containing the values of covariates
+  at which the derivative was evaluated.
 
 ## Note
 

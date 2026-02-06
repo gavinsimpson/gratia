@@ -61,6 +61,7 @@
 <ul><li><p><code><a href="../reference/conditional_values.html">conditional_values()</a></code> would fail if supplied a numeric vector of data to condition on via the <code>condition</code> argument. <a href="https://github.com/gavinsimpson/gratia/issues/366" class="external-link">#366</a></p></li>
 <li><p><em>gratia</em> worked inconsistently with tensor product smooths containing a random effect <code>bs = "re"</code> marginal. Reported <a href="https://github.com/gavinsimpson/gratia/issues/358" class="external-link">#358</a> and fixed by <a href="https://github.com/asgersvenning" class="external-link">@asgersvenning</a> <a href="https://github.com/gavinsimpson/gratia/issues/360" class="external-link">#360</a>, with additional changes by Gavin Simpson.</p></li>
 <li><p>Argument <code>mvn_method</code> was not being passed on to the lower workhorse functions that did the sampling. <a href="https://github.com/gavinsimpson/gratia/issues/381" class="external-link">#381</a></p></li>
+<li><p><code><a href="../reference/response_derivatives.html">response_derivatives()</a></code> would fail if there were no other terms in the model but the focal term.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
