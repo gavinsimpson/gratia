@@ -127,6 +127,14 @@
 #' @export
 #' @rdname smooths
 `smooths.gamm` <- function(object) {
+  stopifnot(is_gamm(object))
+  smooths(object$gam)
+}
+
+#' @export
+#' @rdname smooths
+`smooths.gamm4` <- function(object) {
+  stopifnot(is_gamm4(object))
   smooths(object$gam)
 }
 
