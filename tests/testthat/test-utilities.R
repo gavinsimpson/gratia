@@ -15,6 +15,11 @@ test_that("smooth_terms() methods work", {
   expect_type(st, "character")
   expect_length(st, 1L)
   expect_identical(st, "x0")
+
+  st <- smooth_terms(m_fs[["smooth"]][[2]])
+  expect_type(st, "character")
+  expect_length(st, 2L)
+  expect_identical(st, c("x1", "fac"))
 })
 
 test_that("smooth_dim() methods work", {

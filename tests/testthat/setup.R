@@ -291,18 +291,18 @@ df_fs <- withr::with_seed(0, {
 
   data.frame(y = y, x0 = x0, x1 = x1, x2 = x2, fac = fac)
 })
-mod_fs <- gam(y ~ s(x0) + s(x1, fac, bs = "fs", k = 5) + s(x2, k = 20),
+m_fs <- gam(y ~ s(x0) + s(x1, fac, bs = "fs", k = 5) + s(x2, k = 20),
   data = df_fs, method = "ML"
 )
 
 # Check no-error with re in ti #358
-mod_re_interaction <- gam(
+m_re_interaction <- gam(
   y ~ s(x0) + ti(x0, fac, bs = c("tp", "re"), k = 5) + s(x1, k = 20),
   data = df_fs, method = "ML"
 )
 
 # Expect error with re in ti #358
-mod_re_two_interaction <- gam(
+m_re_two_interaction <- gam(
   y ~ s(x0) + ti(x0, x1, fac, bs = c("tp", "tp", "re"), k = 5) + s(x1, k = 20),
   data = df_fs, method = "ML"
 )

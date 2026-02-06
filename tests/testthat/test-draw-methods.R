@@ -196,8 +196,8 @@ test_that("draw() can handle non-standard names -- a function call as a name", {
 test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
   # skip_on_ci() # testing without as moved to mac os x
   skip_if(packageVersion("mgcv") < "1.8.36")
-  p2 <- draw(mod_fs, ncol = 2, rug = FALSE)
-  p3 <- draw(mod_fs, ncol = 2, scales = "fixed", rug = FALSE)
+  p2 <- draw(m_fs, ncol = 2, rug = FALSE)
+  p3 <- draw(m_fs, ncol = 2, scales = "fixed", rug = FALSE)
 
   skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw.gam model with fs smooth", p2)
@@ -208,7 +208,7 @@ test_that("draw() works with factor-smooth interactions (bs = 'fs')", {
 test_that("draw() works with random effect basis (bs = c('tp', 're')) in univariate tensor-product interaction ti", {
   # skip_on_ci() # testing without as moved to mac os x
   skip_if(packageVersion("mgcv") < "1.8.36")
-  p1 <- draw(mod_re_interaction, ncol = 2, rug = FALSE)
+  p1 <- draw(m_re_interaction, ncol = 2, rug = FALSE)
 
   skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw.gam model with re basis in univariate ti", p1)
@@ -219,7 +219,7 @@ test_that("draw() does not works with random effect basis (bs = c('tp', 'tp', 'r
   # skip_on_ci() # testing without as moved to mac os x
   skip_if(packageVersion("mgcv") < "1.8.36")
   expect_snapshot(
-    p1 <- draw(mod_re_two_interaction, ncol = 2, rug = FALSE)#,
+    p1 <- draw(m_re_two_interaction, ncol = 2, rug = FALSE)#,
     #"ℹ Can't yet plot multivariate smooths with a 're' marginal: ti(x0,x1,fac).",
     #fixed = TRUE
   )
@@ -573,7 +573,7 @@ test_that("draw.gam can take user specified scales", {
   )
 
   skip_if(packageVersion("mgcv") < "1.8.36")
-  plt2 <- draw(mod_fs,
+  plt2 <- draw(m_fs,
     rug = FALSE,
     discrete_colour = ggplot2::scale_colour_viridis_d(option = "plasma")
   )
