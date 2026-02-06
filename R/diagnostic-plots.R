@@ -770,8 +770,8 @@
   ## add point layer
   plt <- plt + geom_histogram(
     bins = n_bins,
-    colour = "black",
-    fill = "grey80",
+    colour = "white",
+    fill = "grey20", #"grey80",
     center = 0
   )
 
