@@ -1372,7 +1372,12 @@
       vars = !matches(focal), data = data,
       envir = envir
     )
-    data <- expand_grid(.x = x, tv)
+    # if model only contains a single var, tv is empty
+    data <- if (ncol(tv) > 0L) {
+      expand_grid(.x = x, tv)
+    } else {
+      expand_grid(.x = x)
+    }
   } else {
     data <- data |>
       select(all_of(model_vars(object))) |>
