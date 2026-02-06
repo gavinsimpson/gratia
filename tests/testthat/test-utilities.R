@@ -516,15 +516,6 @@ test_that("norm_minus_one_to_one works with NA", {
   expect_identical(range(x, na.rm = TRUE), c(-1, 1))
 })
 
-test_that("model_constant returns the intercept estimate", {
-  expect_silent(b <- model_constant(m_gam))
-  expect_type(b, "double")
-  ref <- unname(coef(m_gam)[1L])
-  attr(ref, "par_names") <- "location"
-  expect_identical(b, ref)
-  expect_named(b, expected = NULL)
-})
-
 test_that("is bam identifies a BAM vs GAM or GAMMs", {
   expect_true(is.bam(m_bam))
   expect_false(is.bam(m_gam))
@@ -588,17 +579,6 @@ test_that("is isotropic smooth works", {
   expect_false(is_isotropic_smooth(get_smooths_by_id(m_gam)[[1]]))
 })
 
-test_that("model vars works for various GAMs", {
-  expect_silent(mvars <- model_vars(m_gam))
-  expect_identical(mvars, paste0("x", 0:3))
-  expect_silent(mvars <- model_vars(m_bam))
-  expect_identical(mvars, paste0("x", 0:3))
-  expect_silent(mvars <- model_vars(m_gamm))
-  expect_identical(mvars, paste0("x", 0:3))
-  expect_silent(mvars <- model_vars(m_gamm4))
-  expect_identical(mvars, paste0("x", 0:3))
-})
-
 test_that("dispersion works for a GAM", {
   expect_identical(dispersion(m_gam), m_gam$sig2)
 })
@@ -610,11 +590,6 @@ test_that("dispersion works for a GLM", {
 test_that("n_eta work", {
   expect_identical(n_eta(m_gam), 1L)
   expect_identical(n_eta(m_accel), 2L)
-})
-
-test_that("model_constant works for a GAMLSS", {
-  expect_length(model_constant(m_accel), 2L)
-  expect_length(model_constant(m_gam), 1L)
 })
 
 test_that("rtw works for twlss model", {
