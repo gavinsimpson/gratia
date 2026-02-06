@@ -4,6 +4,7 @@
 \alias{smooths}
 \alias{smooths.default}
 \alias{smooths.gamm}
+\alias{smooths.gamm4}
 \title{Names of smooths in a GAM}
 \usage{
 smooths(object)
@@ -11,6 +12,8 @@ smooths(object)
 \method{smooths}{default}(object)
 
 \method{smooths}{gamm}(object)
+
+\method{smooths}{gamm4}(object)
 }
 \arguments{
 \item{object}{a fitted GAM or related model. Typically the result of a call
