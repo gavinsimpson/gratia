@@ -8,6 +8,8 @@
   version 1.2-21 or later. This is due to breaking changes in *scam*,
   and new functionality in that package, which simplifies *gratia*.
 
+- *gratia* also now depends on *dplyr* version 1.2.0 or later.
+
 ### New features
 
 - [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md)
