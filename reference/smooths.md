@@ -12,6 +12,9 @@ smooths(object)
 
 # S3 method for class 'gamm'
 smooths(object)
+
+# S3 method for class 'gamm4'
+smooths(object)
 ```
 
 ## Arguments
