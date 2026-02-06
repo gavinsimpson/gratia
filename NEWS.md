@@ -8,9 +8,10 @@
 
 * *gratia* also now depends on *dplyr* version 1.2.0 or later.
 
-* Histogram bars drawn by `residuals_hist_plot()`, and hence `appraise()`, are
-  now filled with a dark shade of grey and use a light colour for the border of
-  the bars.
+* Histogram bars drawn by `residuals_hist_plot()` and points in `qq_plot()`,
+  `residuals_linpred_plot()`, `observed_fitted_plot()`, and `worm_plot()`, and
+  hence `appraise()`, are now filled with a dark shade of grey and use a light
+  colour for the border of the bars.
 
 ##  New features
 
