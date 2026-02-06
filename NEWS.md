@@ -37,7 +37,10 @@
   @asgersvenning #360, with additional changes by Gavin Simpson.
 
 * Argument `mvn_method` was not being passed on to the lower workhorse functions
-  that did the sampling. #381
+  that did the sampling. #381 
+
+* `response_derivatives()` would fail if there were no other terms in the model 
+  but the focal term.
 
 # gratia 0.11.1
 
