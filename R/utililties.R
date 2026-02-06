@@ -143,6 +143,7 @@
   smooth[["term"]]
 }
 
+# this is for fs smooths; could do with a better name
 `smooth_factor_variable` <- function(smooth) {
   check_is_mgcv_smooth(smooth)
   smooth[["fterm"]]

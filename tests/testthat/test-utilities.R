@@ -667,3 +667,18 @@ test_that("smooth_factor_variable() works", {
   expect_silent(f_var <- smooth_factor_variable(sm))
   expect_identical(f_var, "fac")
 })
+
+test_that("stop_if_not_mgcv_smooth() works", {
+  expect_error(
+    stop_if_not_mgcv_smooth(1L),
+    regexp = "'smooth' is not an 'mgcv.smooth'."
+  )
+})
+
+test_that("old_get_smooth() works", {
+  expect_silent(
+    sm <- old_get_smooth(m_gamm, "s(x1)")
+  )
+  expect_s3_class(sm, "tprs.smooth")
+  expect_s3_class(sm, "mgcv.smooth")
+})
