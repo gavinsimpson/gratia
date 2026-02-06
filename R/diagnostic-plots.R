@@ -132,7 +132,7 @@
   caption = NULL,
   ci_col = "black",
   ci_alpha = 0.2,
-  point_col = "black",
+  point_col = "grey20",
   point_alpha = 1,
   line_col = "red", ...
 ) {
@@ -585,7 +585,7 @@
   title = NULL,
   subtitle = NULL,
   caption = NULL,
-  point_col = "black",
+  point_col = "grey20",
   point_alpha = 1,
   line_col = "red",
   seed = NULL
@@ -663,7 +663,7 @@
   title = NULL,
   subtitle = NULL,
   caption = NULL,
-  point_col = "black",
+  point_col = "grey20",
   point_alpha = 1
 ) {
   ## extract data for plot
@@ -862,7 +862,7 @@
   title = NULL, subtitle = NULL, caption = NULL,
   ci_col = "black",
   ci_alpha = 0.2,
-  point_col = "black",
+  point_col = "grey20",
   point_alpha = 1,
   line_col = "red",
   ...
