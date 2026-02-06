@@ -601,7 +601,7 @@ test_that("rtw works for twlss model", {
   skip_on_cran()
   skip_on_ci()
   fit <- fitted(m_twlss)
-  tw_pars <- get_tw_bounds(m_twlss)
+  tw_pars <- get_twlss_bounds(m_twlss)
   expect_snapshot(
     with_seed(
       123,
@@ -671,7 +671,8 @@ test_that("smooth_factor_variable() works", {
 test_that("stop_if_not_mgcv_smooth() works", {
   expect_error(
     stop_if_not_mgcv_smooth(1L),
-    regexp = "'smooth' is not an 'mgcv.smooth'."
+    regexp = "'smooth' is not an 'mgcv.smooth'.",
+    fixed = TRUE
   )
 })
 
@@ -681,4 +682,41 @@ test_that("old_get_smooth() works", {
   )
   expect_s3_class(sm, "tprs.smooth")
   expect_s3_class(sm, "mgcv.smooth")
+})
+
+test_that("get_twlss_bounds() works", {
+  expect_silent(
+    bnd <- get_twlss_bounds(m_twlss)
+  )
+  expect_equal(bnd, c(1.01, 1.99))
+
+  expect_error(
+    get_twlss_bounds(m_tw),
+    regexp = "'model' wasn't fitted with the 'twlss()' family.",
+    fixed = TRUE
+  )
+})
+
+test_that("prefix_label_both works", {
+  labels <- list(var1 = letters[1:2], var2 = letters[3:4])
+  expect_identical(
+    prefix_label_both(labels),
+    list(c("var1: a", "var1: b"), c("var2: c", "var2: d"))
+  )
+  expect_identical(
+    prefix_label_both(labels, multi_line = FALSE),
+    list(c("var1, var2: a, c", "var1, var2: b, d"))
+  )
+})
+
+test_that("prefix_label_both works", {
+  labels <- list(var1 = letters[1:2], var2 = letters[3:4])
+  expect_identical(
+    label_var(labels),
+    list(c("var1", "var1"), c("var2", "var2"))
+  )
+  expect_identical(
+    label_var(labels, multi_line = FALSE),
+    list(c("var1, var2", "var1, var2"))
+  )
 })
