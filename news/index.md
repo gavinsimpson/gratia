@@ -1,6 +1,6 @@
 # Changelog
 
-## gratia (development version)
+## gratia 0.11.2
 
 ### User visible changes
 
@@ -9,6 +9,13 @@
   and new functionality in that package, which simplifies *gratia*.
 
 - *gratia* also now depends on *dplyr* version 1.2.0 or later.
+
+- Histogram bars drawn by
+  [`residuals_hist_plot()`](https://gavinsimpson.github.io/gratia/reference/residuals_hist_plot.md),
+  and hence
+  [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
+  are now filled with a dark shade of grey and use a light colour for
+  the border of the bars.
 
 ### New features
 

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1.9999</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,14 +40,15 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="gratia-development-version">gratia (development version)<a class="anchor" aria-label="anchor" href="#gratia-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.11.2" id="gratia-0112">gratia 0.11.2<a class="anchor" aria-label="anchor" href="#gratia-0112"></a></h2>
 <div class="section level3">
-<h3 id="user-visible-changes-development-version">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-development-version"></a></h3>
+<h3 id="user-visible-changes-0-11-2">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-11-2"></a></h3>
 <ul><li><p><em>gratia</em> now only handles shape constrained models fitted using <em>scam</em> version 1.2-21 or later. This is due to breaking changes in <em>scam</em>, and new functionality in that package, which simplifies <em>gratia</em>.</p></li>
 <li><p><em>gratia</em> also now depends on <em>dplyr</em> version 1.2.0 or later.</p></li>
+<li><p>Histogram bars drawn by <code><a href="../reference/residuals_hist_plot.html">residuals_hist_plot()</a></code>, and hence <code><a href="../reference/appraise.html">appraise()</a></code>, are now filled with a dark shade of grey and use a light colour for the border of the bars.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-0-11-2">New features<a class="anchor" aria-label="anchor" href="#new-features-0-11-2"></a></h3>
 <ul><li>
 <p><code><a href="../reference/derivatives.html">derivatives()</a></code> now works for constrained factor smooths (<code>bs = "sz"</code>), treating them in the same way as random factor smooths (<code>bs = "fs"</code>). Lack of support reported by <a href="https://github.com/vrest-png" class="external-link">@vrest-png</a> <a href="https://github.com/gavinsimpson/gratia/issues/362" class="external-link">#362</a></p>
 <p>Also handles higher order <code>bs = "sz"</code> terms.</p>
@@ -56,7 +57,7 @@
 <li><p><code><a href="../reference/model_terms.html">model_terms()</a></code> returns the names of all terms in a model. <a href="https://github.com/gavinsimpson/gratia/issues/388" class="external-link">#388</a></p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-0-11-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-11-2"></a></h3>
 <ul><li><p><code><a href="../reference/conditional_values.html">conditional_values()</a></code> would fail if supplied a numeric vector of data to condition on via the <code>condition</code> argument. <a href="https://github.com/gavinsimpson/gratia/issues/366" class="external-link">#366</a></p></li>
 <li><p><em>gratia</em> worked inconsistently with tensor product smooths containing a random effect <code>bs = "re"</code> marginal. Reported <a href="https://github.com/gavinsimpson/gratia/issues/358" class="external-link">#358</a> and fixed by <a href="https://github.com/asgersvenning" class="external-link">@asgersvenning</a> <a href="https://github.com/gavinsimpson/gratia/issues/360" class="external-link">#360</a>, with additional changes by Gavin Simpson.</p></li>
 <li><p>Argument <code>mvn_method</code> was not being passed on to the lower workhorse functions that did the sampling. <a href="https://github.com/gavinsimpson/gratia/issues/381" class="external-link">#381</a></p></li>
