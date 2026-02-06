@@ -11,7 +11,7 @@ observed_fitted_plot(
   title = NULL,
   subtitle = NULL,
   caption = NULL,
-  point_col = "black",
+  point_col = "grey20",
   point_alpha = 1
 )
 }
