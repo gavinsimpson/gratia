@@ -661,3 +661,9 @@ test_that("smooths() works", {
   expect_silent(sm <- smooths(m_scam))
   expect_equal(sm, c("s(x1)", "s(x2)"))
 })
+
+test_that("smooth_factor_variable() works", {
+  expect_silent(sm <- get_smooth(m_fs, term = "s(x1,fac)"))
+  expect_silent(f_var <- smooth_factor_variable(sm))
+  expect_identical(f_var, "fac")
+})
