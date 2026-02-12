@@ -2,6 +2,8 @@
 
 ## gratia 0.11.2
 
+CRAN release: 2026-02-07
+
 ### User visible changes
 
 - *gratia* now only handles shape constrained models fitted using *scam*
