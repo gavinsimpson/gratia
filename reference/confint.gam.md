@@ -146,6 +146,11 @@ a tibble with components:
 
 10. `.upper_ci`; upper limit of the confidence or simultaneous interval,
 
+## Note
+
+Currently, `overall_uncertainty` only applies to confidence intervals
+(`type = "confidence"`), not simultaneous intervals.
+
 ## Author
 
 Gavin L. Simpson

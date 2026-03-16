@@ -35,6 +35,6 @@ m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
   s(x3, bs = "cr"), family = nb, data = df, method = "REML")
 ## IGNORE_RDIFF_BEGIN
 nb_theta(m)
-#> [1] 239332.6
+#> [1] 239386
 ## IGNORE_RDIFF_END
 ```
