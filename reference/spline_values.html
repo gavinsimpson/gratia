@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,9 +74,10 @@ models are supported.</p></dd>
 
 
 <dt id="arg-unconditional">unconditional<a class="anchor" aria-label="anchor" href="#arg-unconditional"></a></dt>
-<dd><p>logical; should confidence intervals include the
-uncertainty due to smoothness selection? If <code>TRUE</code>, the corrected Bayesian
-covariance matrix will be used.</p></dd>
+<dd><p>logical; if <code>TRUE</code> (and only if <code>frequentist == FALSE</code>)
+then the bayesian smoothing parameter uncertainty-corrected covariance
+matrix is returned, if available. Whether it is available depends on which
+smoothness selection method was used to fit the model.</p></dd>
 
 
 <dt id="arg-overall-uncertainty">overall_uncertainty<a class="anchor" aria-label="anchor" href="#arg-overall-uncertainty"></a></dt>
@@ -86,7 +87,8 @@ the smooth?</p></dd>
 
 
 <dt id="arg-frequentist">frequentist<a class="anchor" aria-label="anchor" href="#arg-frequentist"></a></dt>
-<dd><p>logical; use the frequentist covariance matrix?</p></dd>
+<dd><p>logical; if <code>FALSE</code>, the default, the bayesian covariance
+matrix is returned, otherwise the frequentist covariance matrix.</p></dd>
 
 </dl></div>
 

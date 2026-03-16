@@ -43,7 +43,7 @@ functions
 library("gratia")
 library("mgcv")
 #> Loading required package: nlme
-#> This is mgcv 1.9-3. For overview type 'help("mgcv-package")'.
+#> This is mgcv 1.9-4. For overview type '?mgcv'.
 library("ggplot2")
 library("dplyr")
 #> 

@@ -22,6 +22,7 @@ smooth_estimates(
   n_4d = 4,
   data = NULL,
   unconditional = FALSE,
+  frequentist = FALSE,
   overall_uncertainty = TRUE,
   dist = NULL,
   unnest = TRUE,
@@ -73,9 +74,15 @@ smooth_estimates(
 
 - unconditional:
 
-  logical; should confidence intervals include the uncertainty due to
-  smoothness selection? If `TRUE`, the corrected Bayesian covariance
-  matrix will be used.
+  logical; if `TRUE` (and only if `frequentist == FALSE`) then the
+  bayesian smoothing parameter uncertainty-corrected covariance matrix
+  is returned, if available. Whether it is available depends on which
+  smoothness selection method was used to fit the model.
+
+- frequentist:
+
+  logical; if `FALSE`, the default, the bayesian covariance matrix is
+  returned, otherwise the frequentist covariance matrix.
 
 - overall_uncertainty:
 

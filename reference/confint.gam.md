@@ -18,6 +18,8 @@ confint(
   shift = FALSE,
   transform = FALSE,
   unconditional = FALSE,
+  frequentist = FALSE,
+  overall_uncertainty = TRUE,
   ncores = 1,
   partial_match = FALSE,
   ...,
@@ -81,9 +83,20 @@ confint(object, ...)
 
 - unconditional:
 
-  logical; if `TRUE` (and `freq == FALSE`) then the Bayesian smoothing
-  parameter uncertainty corrected covariance matrix is returned, if
-  available.
+  logical; if `TRUE` (and only if `frequentist == FALSE`) then the
+  bayesian smoothing parameter uncertainty-corrected covariance matrix
+  is returned, if available. Whether it is available depends on which
+  smoothness selection method was used to fit the model.
+
+- frequentist:
+
+  logical; if `FALSE`, the default, the bayesian covariance matrix is
+  returned, otherwise the frequentist covariance matrix.
+
+- overall_uncertainty:
+
+  logical; should the uncertainty in the model constant term be included
+  in the standard error of the evaluate values of the smooth?
 
 - ncores:
 
@@ -100,7 +113,7 @@ confint(object, ...)
 
 - ...:
 
-  additional arguments for methods
+  additional arguments for methods. Not used.
 
 - newdata:
 

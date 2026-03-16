@@ -52,9 +52,10 @@ compare_smooths(
 
 - unconditional:
 
-  logical; should confidence intervals include the uncertainty due to
-  smoothness selection? If `TRUE`, the corrected Bayesian covariance
-  matrix will be used.
+  logical; if `TRUE` (and only if `frequentist == FALSE`) then the
+  bayesian smoothing parameter uncertainty-corrected covariance matrix
+  is returned, if available. Whether it is available depends on which
+  smoothness selection method was used to fit the model.
 
 - overall_uncertainty:
 

@@ -9,7 +9,7 @@ terms of a fitted GAM."><meta property="og:image" content="https://gavinsimpson.
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,6 +61,8 @@ terms of a fitted GAM.</p>
 <span>  shift <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span>,</span>
@@ -125,9 +127,21 @@ confidence interval.</p></dd>
 
 
 <dt id="arg-unconditional">unconditional<a class="anchor" aria-label="anchor" href="#arg-unconditional"></a></dt>
-<dd><p>logical; if <code>TRUE</code> (and <code>freq == FALSE</code>) then the
-Bayesian smoothing parameter uncertainty corrected covariance matrix is
-returned, if available.</p></dd>
+<dd><p>logical; if <code>TRUE</code> (and only if <code>frequentist == FALSE</code>)
+then the bayesian smoothing parameter uncertainty-corrected covariance
+matrix is returned, if available. Whether it is available depends on which
+smoothness selection method was used to fit the model.</p></dd>
+
+
+<dt id="arg-frequentist">frequentist<a class="anchor" aria-label="anchor" href="#arg-frequentist"></a></dt>
+<dd><p>logical; if <code>FALSE</code>, the default, the bayesian covariance
+matrix is returned, otherwise the frequentist covariance matrix.</p></dd>
+
+
+<dt id="arg-overall-uncertainty">overall_uncertainty<a class="anchor" aria-label="anchor" href="#arg-overall-uncertainty"></a></dt>
+<dd><p>logical; should the uncertainty in the model
+constant term be included in the standard error of the evaluate values of
+the smooth?</p></dd>
 
 
 <dt id="arg-ncores">ncores<a class="anchor" aria-label="anchor" href="#arg-ncores"></a></dt>
@@ -143,7 +157,7 @@ an exact match? Can only be used if <code>length(parm)</code> is <code>1</code>.
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>additional arguments for methods</p></dd>
+<dd><p>additional arguments for methods. Not used.</p></dd>
 
 
 <dt id="arg-newdata">newdata<a class="anchor" aria-label="anchor" href="#arg-newdata"></a></dt>

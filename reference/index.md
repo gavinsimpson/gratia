@@ -222,6 +222,10 @@
 - [`get_smooths_by_id()`](https://gavinsimpson.github.io/gratia/reference/get_smooths_by_id.md)
   : Extract an mgcv smooth given its position in the model object
 
+- [`get_vcov()`](https://gavinsimpson.github.io/gratia/reference/get_vcov.md)
+  : Extract the covariance matrix of the model parameters or a subset of
+  these for a particular model term
+
 - [`gss_vocab`](https://gavinsimpson.github.io/gratia/reference/gss_vocab.md)
   : Data from the General Social Survey (GSS) from the National Opinion
   Research Center of the University of Chicago

@@ -1,5 +1,21 @@
 # Changelog
 
+## gratia (development version)
+
+### New features
+
+- The frequentist covariance matrix can now be selected in
+  [`confint.gam()`](https://gavinsimpson.github.io/gratia/reference/confint.gam.md)
+  and
+  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+  via argument `frequentist`. The default for this argument remains
+  `FALSE`, so behaviour is unchanged.
+
+- [`get_vcov()`](https://gavinsimpson.github.io/gratia/reference/get_vcov.md)
+  is now an exported function.
+  [`get_vcov()`](https://gavinsimpson.github.io/gratia/reference/get_vcov.md)
+  extracts the covariance matrix from a model object.
+
 ## gratia 0.11.2
 
 CRAN release: 2026-02-07
@@ -401,7 +417,7 @@ CRAN release: 2024-12-19
   but allows the user simple ways to specify which covariates to
   condition on and at what values those covariates should take. It
   provides similar functionality to
-  [`marginaleffects::plot_predictions()`](https://marginaleffects.com/man/r/plot_predictions.html),
+  [`marginaleffects::plot_predictions()`](https://rdrr.io/pkg/marginaleffects/man/plot_predictions.html),
   but is simpler. See
   [\#300](https://github.com/gavinsimpson/gratia/issues/300).
 

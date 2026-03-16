@@ -16,6 +16,7 @@ eval_smooth(
   n_4d = NULL,
   data = NULL,
   unconditional = FALSE,
+  frequentist = FALSE,
   overall_uncertainty = TRUE,
   dist = NULL,
   ...
@@ -30,6 +31,7 @@ eval_smooth(
   n_4d = NULL,
   data = NULL,
   unconditional = FALSE,
+  frequentist = FALSE,
   overall_uncertainty = TRUE,
   clip = TRUE,
   ...
@@ -44,6 +46,7 @@ eval_smooth(
   n_4d = NULL,
   data = NULL,
   unconditional = FALSE,
+  frequentist = FALSE,
   overall_uncertainty = TRUE,
   dist = NULL,
   ...
@@ -56,6 +59,7 @@ eval_smooth(
   n = 100,
   data = NULL,
   unconditional = FALSE,
+  frequentist = FALSE,
   overall_uncertainty = TRUE,
   ...
 )
@@ -67,6 +71,7 @@ eval_smooth(
   n = 100,
   data = NULL,
   unconditional = FALSE,
+  frequentist = FALSE,
   overall_uncertainty = TRUE,
   ...
 )
@@ -78,6 +83,7 @@ eval_smooth(
   n = 100,
   data = NULL,
   unconditional = FALSE,
+  frequentist = FALSE,
   overall_uncertainty = TRUE,
   ...
 )
@@ -89,6 +95,7 @@ eval_smooth(
   n = 100,
   data = NULL,
   unconditional = FALSE,
+  frequentist = FALSE,
   overall_uncertainty = TRUE,
   ...
 )
@@ -102,6 +109,7 @@ eval_smooth(
   n_4d = NULL,
   data = NULL,
   unconditional = FALSE,
+  frequentist = FALSE,
   overall_uncertainty = TRUE,
   dist = NULL,
   ...
@@ -116,6 +124,7 @@ eval_smooth(
   n_4d = NULL,
   data = NULL,
   unconditional = FALSE,
+  frequentist = FALSE,
   overall_uncertainty = TRUE,
   dist = NULL,
   ...
@@ -161,9 +170,15 @@ eval_smooth(
 
 - unconditional:
 
-  logical; should confidence intervals include the uncertainty due to
-  smoothness selection? If `TRUE`, the corrected Bayesian covariance
-  matrix will be used.
+  logical; if `TRUE` (and only if `frequentist == FALSE`) then the
+  bayesian smoothing parameter uncertainty-corrected covariance matrix
+  is returned, if available. Whether it is available depends on which
+  smoothness selection method was used to fit the model.
+
+- frequentist:
+
+  logical; if `FALSE`, the default, the bayesian covariance matrix is
+  returned, otherwise the frequentist covariance matrix.
 
 - overall_uncertainty:
 
