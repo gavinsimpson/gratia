@@ -19,6 +19,15 @@
 - The `clognorm()` family of the *mgcvUtils* 📦 is now supported by
   *gratia*.
 
+- [`derivatives.gam()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md)
+  now produces an informative message or error when some or all of the
+  smooths in a model can not be handled — essentially, multivariate
+  smooths (`s(x1, x2)`, `te(x1, x2)`, `ti(x1, x2)`, and `t2(x1, x2)` or
+  higher) and random effects smooths.
+  [\#389](https://github.com/gavinsimpson/gratia/issues/389) Reported by
+  [@mikeguggis](https://github.com/mikeguggis) in
+  [\#362](https://github.com/gavinsimpson/gratia/issues/362)
+
 ## gratia 0.11.2
 
 CRAN release: 2026-02-07
