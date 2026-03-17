@@ -28,11 +28,14 @@
   [@mikeguggis](https://github.com/mikeguggis) in
   [\#362](https://github.com/gavinsimpson/gratia/issues/362)
 
-- Support for [`cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html) and
-  [`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) families in
+- Support for [`cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html),
+  [`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html), and
+  [`bcg()`](https://rdrr.io/pkg/mgcv/man/bcg.html) families in
   [`link()`](https://gavinsimpson.github.io/gratia/reference/link.md),
   [`inv_link()`](https://gavinsimpson.github.io/gratia/reference/link.md)
-  and other family-related utilities.
+  and other family-related utilities. These all work with
+  [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
+  now too.
 
 ## gratia 0.11.2
 
