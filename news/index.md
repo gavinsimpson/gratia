@@ -28,6 +28,12 @@
   [@mikeguggis](https://github.com/mikeguggis) in
   [\#362](https://github.com/gavinsimpson/gratia/issues/362)
 
+- Support for [`cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html) and
+  [`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) families in
+  [`link()`](https://gavinsimpson.github.io/gratia/reference/link.md),
+  [`inv_link()`](https://gavinsimpson.github.io/gratia/reference/link.md)
+  and other family-related utilities.
+
 ## gratia 0.11.2
 
 CRAN release: 2026-02-07
