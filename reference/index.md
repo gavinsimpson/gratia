@@ -200,15 +200,8 @@
 - [`fix_offset()`](https://gavinsimpson.github.io/gratia/reference/fix_offset.md)
   : Fix the names of a data frame containing an offset variable.
 
-- [`fixef`](https://gavinsimpson.github.io/gratia/reference/fixef.md) :
-  Extract fixed effects estimates
-
-- [`fixef(`*`<gam>`*`)`](https://gavinsimpson.github.io/gratia/reference/fixef.gam.md)
-  [`fixef(`*`<gamm>`*`)`](https://gavinsimpson.github.io/gratia/reference/fixef.gam.md)
-  [`fixef(`*`<lm>`*`)`](https://gavinsimpson.github.io/gratia/reference/fixef.gam.md)
-  [`fixef(`*`<glm>`*`)`](https://gavinsimpson.github.io/gratia/reference/fixef.gam.md)
-  [`fixed_effects()`](https://gavinsimpson.github.io/gratia/reference/fixef.gam.md)
-  : Extract fixed effects estimates from a fitted GAM
+- [`fixed_effects()`](https://gavinsimpson.github.io/gratia/reference/fixed_effects.gam.md)
+  : Extract fixed effects estimates from a fitted model
 
 - [`gaussian_draws()`](https://gavinsimpson.github.io/gratia/reference/gaussian_draws.md)
   : Posterior samples using a simple Metropolis Hastings sampler

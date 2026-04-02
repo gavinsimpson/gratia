@@ -1796,15 +1796,14 @@ smooths, especially so in the case of
   flexible than previously, and allows for easier selection of smooths
   to evaluate.
 
-- [`fixef()`](https://gavinsimpson.github.io/gratia/reference/fixef.md)
-  is now imported (and re-exported) from the *nlme* package, with
-  methods for models fitted with
-  [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
-  [`gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html), to extract fixed
-  effects estimates from fitted models.
-  [`fixed_effects()`](https://gavinsimpson.github.io/gratia/reference/fixef.gam.md)
+- [`fixef()`](https://rdrr.io/pkg/nlme/man/fixed.effects.html) is now
+  imported (and re-exported) from the *nlme* package, with methods for
+  models fitted with [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html)
+  and [`gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html), to extract
+  fixed effects estimates from fitted models.
+  [`fixed_effects()`](https://gavinsimpson.github.io/gratia/reference/fixed_effects.gam.md)
   is an alias for
-  [`fixef()`](https://gavinsimpson.github.io/gratia/reference/fixef.md).
+  [`fixef()`](https://rdrr.io/pkg/nlme/man/fixed.effects.html).
 
 - The
   [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
