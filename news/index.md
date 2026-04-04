@@ -45,8 +45,9 @@
   [`Tweedie()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html),
   [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html),
   [`gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html),
-  [`gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html), &
-  [`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html) families in
+  [`gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html),
+  [`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html), &
+  [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) families in
   addition to those already supported by *mgcv* itself.
 
 - `fix_family_cdf()` is extended with support for
