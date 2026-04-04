@@ -37,6 +37,32 @@
   [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
   now too.
 
+- `fix_family_qf()` is now implemented as an extension of *mgcv*’s
+  [`fix.family.qf()`](https://rdrr.io/pkg/mgcv/man/fix.family.link.html),
+  with experimental support for the
+  [`scat()`](https://rdrr.io/pkg/mgcv/man/scat.html),
+  [`tw()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html),
+  [`Tweedie()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html),
+  [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html),
+  [`gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html),
+  [`gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html), &
+  [`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html) families in
+  addition to those already supported by *mgcv* itself.
+
+- `fix_family_cdf()` is extended with support for
+  [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html),
+  [`gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html),
+  [`gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html),
+  [`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html), and
+  [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) families.
+  [`quantile_residuals()`](https://gavinsimpson.github.io/gratia/reference/quantile_residuals.md)
+  are now available for these families as a result.
+
+- `fix_family_rd()` adds support for the
+  [`cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html),
+  [`cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html) and
+  [`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) families.
+
 ## gratia 0.11.2
 
 CRAN release: 2026-02-07
