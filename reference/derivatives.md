@@ -139,7 +139,7 @@ A tibble, currently with the following variables:
 
 - `.se`: the standard error of the estimated derivative,
 
-- `.crit`: the critical value such that `derivative` ± `(crit * se)`
+- `.crit`: the critical value such that `.derivative` ± `(.crit * .se)`
   gives the upper and lower bounds of the requested confidence or
   simultaneous interval (given `level`),
 
