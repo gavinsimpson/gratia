@@ -32,6 +32,26 @@
 * `fix_family_rd()` adds support for the `cnorm()`, `cpois()` and `clog()`
   families.
 
+## Bug fixes
+
+* `fix_family_qf()` now uses the fitted scale for `scat()` and the exponentiated
+  log scale for `gevlss()`. Their CDF helpers use the same corrected
+  parameterizations. GEV quantiles also handle the zero-shape limit and support
+  endpoints correctly.
+
+* Quantile helpers for `tw()`, `Tweedie()`, `gumbls()`, `gammals()`, `gevlss()`,
+  and `ziplss()` now honour `log_p`. Fixed-power `Tweedie()` families are
+  correctly distinguished from fitted `tw()` families, and endpoint-only
+  Tweedie quantile requests no longer fail.
+
+* `ziplss()` quantiles use the model's zero probability and invert the positive
+  Poisson component without clipping probabilities, including at probability
+  one.
+
+* Uniform QQ and worm plots now use *gratia*'s extended quantile helpers.
+  Simulated response and Pearson residuals for multi-parameter families use
+  the family's residual method.
+
 # gratia 0.11.2
 
 ## User visible changes

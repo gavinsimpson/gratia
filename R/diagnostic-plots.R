@@ -411,7 +411,7 @@
                          level = 0.9, detrend = FALSE) {
   type <- match.arg(type)
   family <- family(model) # extract family
-  family <- fix.family.qf(family) # add quantile fun to family
+  family <- fix_family_qf(family) # add quantile fun to family
   dev_resid_fun <- family[["residuals"]] # deviance residuals function
   # If dev_resid_fun is NULL it means it is one of the standard families so
   # copy over the the dev.resids object from the family instead
@@ -490,6 +490,13 @@
                                 type = c("deviance", "response", "pearson"),
                                 dev_resid_fun, var_fun, na_action, model) {
   type <- match.arg(type)
+
+  if ("object" %in% names(formals(dev_resid_fun))) {
+    model$y <- y
+    model$fitted.values <- fit
+    model$prior.weights <- weights
+    return(naresid(na_action, dev_resid_fun(model, type = type)))
+  }
 
   r <- switch(type,
     deviance = deviance_residuals(y, fit, weights, dev_resid_fun,
@@ -874,7 +881,7 @@
   }
   ## check if we can do the method
   if (identical(method, "uniform") &&
-    is.null(fix.family.qf(family(model))[["qf"]])) {
+    is.null(fix_family_qf(family(model))[["qf"]])) {
     method <- "simulate"
   }
   if (identical(method, "simulate") &&

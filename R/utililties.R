@@ -1903,9 +1903,10 @@ get_tw_params <- function(family) {
   if (!ft %in% c("twlss", "tweedie")) {
     stop("'model' wasn't fitted with a Tweedie family.", call. = FALSE)
   }
-  # if this is a Tweedie(x.x) return p from env of family,
-  # so we can catch this later
-  if (grepl("^ Tweedie\\(", family_name(family))) {
+  # Fixed-power Tweedie() has no getTheta(). Fitted tw() families can also
+  # be named Tweedie(x.x), so the name alone does not distinguish them.
+  if (is.null(family$getTheta) &&
+    grepl("^Tweedie\\(", family_name(family))) {
     return(get("p", envir = environment(family$rd)))
   }
   # so it is a tweedie but not Tweedie, so tw

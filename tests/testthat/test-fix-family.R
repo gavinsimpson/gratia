@@ -123,20 +123,16 @@ test_that("fix family funs work for gumbls", {
 })
 
 test_that("fix family funs work for ziplss", {
-  skip_on_ci()
-  skip_on_cran()
-
   q     <- c(1.1, 3, 2, 5, 4, 10)
   mu    <- head(fitted(m_ziplss))
   cdf <- cdf_ziplss(q = q, mu = mu)
 
-  expect_snapshot(
-    cdf |> round(4)
-  )
-  qf_fun <- fix_family_qf(ziplss())$qf # not yet implemented
-  qf <- qf_fun(cdf, mu = mu)
-  expect_snapshot(round(qf, 4))
-  expect_true(all(qf >= q)) # as cdf is discrete, so only qf >= q, I think
+  qf_fun <- fix_family_qf(ziplss())$qf
+  # Test inside each CDF jump; roundoff at the jump itself can select either
+  # neighbouring count even for otherwise accurate discrete quantiles.
+  lower <- cdf_ziplss(q = floor(q) - 1, mu = mu)
+  qf <- qf_fun((lower + cdf) / 2, mu = mu)
+  expect_equal(qf, floor(q))
 })
 
 test_that("fix family funs work for gevlss", {
@@ -144,12 +140,8 @@ test_that("fix family funs work for gevlss", {
   mu    <- head(fitted(m_gevlss))
   cdf <- cdf_gevlss(q = q, mu = mu)
 
-  expect_snapshot(
-    cdf |> round(3)
-  )
   qf_fun <- fix_family_qf(gevlss())$qf
   qf <- qf_fun(cdf, mu = mu)
-  expect_snapshot(round(qf, 3))
   expect_equal(q, qf)
 })
 
@@ -161,12 +153,10 @@ test_that("fix family funs work for scat", {
   fam <- family(m_scat) |> fix_family_cdf()
 
   cdf <- fam$cdf(q = q, mu = mu, wt = wt, scale = scale)
-  expect_snapshot(
-    cdf |> round(4)
-  )
+  pars <- theta(fam)
+  expect_equal(cdf, pt((q - mu) / pars[2], df = pars[1]))
   qf_fun <- fix_family_qf(fam)$qf
   qf <- qf_fun(cdf, mu = mu, wt = wt, scale = scale)
-  expect_snapshot(round(qf, 4))
   expect_equal(q, qf)
 })
 
