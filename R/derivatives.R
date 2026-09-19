@@ -250,9 +250,12 @@
 
     # generate list of finite difference predictions for the first or second
     #   derivatives or the required type
+    # need focal for continuous `by` and we only consider univariate smooths
+    #   so no harm in setting `focal` here.
     fd <- finite_diff_lpmatrix(object,
       type = type, order = order,
-      data = newd, h = eps
+      data = newd, h = eps,
+      focal = smooth_variable(sm)
     )
 
     ## compute the finite differences
