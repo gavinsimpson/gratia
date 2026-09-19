@@ -56,6 +56,13 @@
   an integer seed is generated without modifying the RNG state. Fixes audit
   finding GRA-002.
 
+* `derivatives()` now holds numeric `by` variables fixed when computing
+  derivatives of smooths. Previously, finite differences shifted both the
+  smooth covariate and its numeric multiplier, giving incorrect derivatives,
+  standard errors, and intervals. Only the current smooth's covariate is now
+  shifted, for supplied data and automatically generated grids. Fixes audit
+  finding GRA-003.
+
 # gratia 0.11.2
 
 ## User visible changes

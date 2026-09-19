@@ -231,6 +231,7 @@
 
   ## loop over the smooths and compute derivatives from finite differences
   for (i in seq_along(smooth_ids)) {
+    sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1]]
     ## generate data if not supplied
     if (need_data) {
       newd <- derivative_data(object,
@@ -242,7 +243,6 @@
       ## assume the data are OK - mgcv::predict will catch issues
       newd <- data
       ## ...but we need to handle factor by
-      sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1]]
       if (is_factor_by_smooth(sm)) {
         newd <- vec_slice(newd, data[[by_variable(sm)]] == by_level(sm))
       }
