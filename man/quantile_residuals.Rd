@@ -26,3 +26,24 @@ computed using the current state of the random number generator.}
 \description{
 Randomised residuals
 }
+\details{
+For \code{mgcv::cnorm()}, \code{mgcv::clog()}, and \code{mgcv::cpois()} models, censored
+observations have PIT residuals sampled uniformly between \code{F(l)} and \code{F(u)},
+where \code{l} and \code{u} bound the censoring interval and \code{F} is the fitted latent
+response CDF. Left and right censoring use probabilities zero and one,
+respectively, for the unbounded end. Quantile residuals apply \code{qnorm()} to
+these PIT values. Uncensored continuous observations use \code{F(y)}; uncensored
+Poisson observations are randomized between \code{F(y - 1)} and \code{F(y)}.
+Use non-integer censoring limits for \code{cpois()}, as recommended by mgcv.
+
+For CDF helpers with native log-tail support, quantile residuals are computed
+directly from log probabilities in the smaller tail. This avoids infinite
+residuals caused by rounding a probability to zero or one. No probability
+clipping is applied: genuine zero-probability tails still give infinite
+residuals. PIT residuals are returned as ordinary probabilities and may still
+round to zero or one in extreme tails, so applying \code{qnorm()} to the returned
+PIT values can be less accurate than requesting quantile residuals directly.
+Native log tails are available for Poisson, negative binomial, binomial,
+Gaussian, Gamma, \code{cnorm()}, \code{clog()}, \code{gaulss()}, \code{gammals()}, \code{scat()}, and
+\code{betar()} families. Other CDF helpers retain ordinary-probability evaluation.
+}

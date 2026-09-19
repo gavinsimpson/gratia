@@ -2,6 +2,12 @@
 
 ## New features
 
+* Quantile residuals use log probabilities in the smaller tail for families
+  with native log-tail CDF support, including Poisson, negative binomial, and
+  the censored families. This avoids numerical infinities without clipping
+  probabilities. Grouped-binomial residuals now randomize over one success
+  rather than one whole response proportion.
+
 * The frequentist covariance matrix can now be selected in `confint.gam()` and
   `smooth_estimates()` via argument `frequentist`. The default for this
   argument remains `FALSE`, so behaviour is unchanged.
@@ -29,8 +35,12 @@
   `gumbls()`, `gammals()`, and `ziplss()` families. `quantile_residuals()` are
   now available for these families as a result.
 
-* `fix_family_rd()` adds support for the `cnorm()`, `cpois()` and `clog()`
-  families.
+* `fix_family_rd()`, `fix_family_qf()`, and `fix_family_cdf()` add support for
+  the `cnorm()`, `cpois()`, and `clog()` families. These helpers describe the
+  latent, uncensored response distribution, using the fitted family scale and
+  prior weights for `cnorm()` and `clog()`. `quantile_residuals()` supports
+  these families by randomizing over censoring intervals for PIT and quantile
+  residuals.
 
 # gratia 0.11.2
 
