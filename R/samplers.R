@@ -67,7 +67,7 @@
     parametrized = TRUE, mvn_method = c("mvnfast", "mgcv"), draws = NULL,
     seed = NULL, ...) {
   if (is.null(seed)) {
-    seed <- with_preserve_seed(runif(1))
+    seed <- with_preserve_seed(sample.int(.Machine$integer.max, 1L))
   }
   # what posterior sampling are we using
   method <- match.arg(method)
@@ -106,7 +106,7 @@
     rw_scale = 0.25, index = NULL, frequentist = FALSE, unconditional = FALSE,
     mvn_method = c("mvnfast", "mgcv"), seed = NULL, ...) {
   if (is.null(seed)) {
-    seed <- with_preserve_seed(runif(1))
+    seed <- with_preserve_seed(sample.int(.Machine$integer.max, 1L))
   }
   # what posterior sampling are we using
   method <- match.arg(method)
