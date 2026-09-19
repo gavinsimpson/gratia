@@ -5,8 +5,13 @@
 * Quantile residuals use log probabilities in the smaller tail for families
   with native log-tail CDF support, including Poisson, negative binomial, and
   the censored families. This avoids numerical infinities without clipping
-  probabilities. Grouped-binomial residuals now randomize over one success
+  probabilities. Grouped-binomial residuals now randomise over one success
   rather than one whole response proportion.
+
+* `quantile_residuals()` supports censored `cnorm()`, `cpois()`, and `clog()`
+  models, randomising over censoring intervals for PIT and quantile residuals.
+  These families now have CDF and quantile helpers; random generation for
+  `cnorm()` and `clog()` uses the fitted family scale and prior weights.
 
 * The frequentist covariance matrix can now be selected in `confint.gam()` and
   `smooth_estimates()` via argument `frequentist`. The default for this
@@ -35,32 +40,8 @@
   `gumbls()`, `gammals()`, and `ziplss()` families. `quantile_residuals()` are
   now available for these families as a result.
 
-* `fix_family_rd()`, `fix_family_qf()`, and `fix_family_cdf()` add support for
-  the `cnorm()`, `cpois()`, and `clog()` families. These helpers describe the
-  latent, uncensored response distribution, using the fitted family scale and
-  prior weights for `cnorm()` and `clog()`. `quantile_residuals()` supports
-  these families by randomizing over censoring intervals for PIT and quantile
-  residuals.
-
-## Bug fixes
-
-* `fix_family_qf()` now uses the fitted scale for `scat()` and the exponentiated
-  log scale for `gevlss()`. Their CDF helpers use the same corrected
-  parameterizations. GEV quantiles also handle the zero-shape limit and support
-  endpoints correctly.
-
-* Quantile helpers for `tw()`, `Tweedie()`, `gumbls()`, `gammals()`, `gevlss()`,
-  and `ziplss()` now honour `log_p`. Fixed-power `Tweedie()` families are
-  correctly distinguished from fitted `tw()` families, and endpoint-only
-  Tweedie quantile requests no longer fail.
-
-* `ziplss()` quantiles use the model's zero probability and invert the positive
-  Poisson component without clipping probabilities, including at probability
-  one.
-
-* Uniform QQ and worm plots now use *gratia*'s extended quantile helpers.
-  Simulated response and Pearson residuals for multi-parameter families use
-  the family's residual method.
+* `fix_family_rd()` adds support for the `cnorm()`, `cpois()` and `clog()`
+  families.
 
 # gratia 0.11.2
 
