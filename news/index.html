@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-10</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-11</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,11 @@
 <li><p><code>fix_family_qf()</code> is now implemented as an extension of <em>mgcv</em>’s <code><a href="https://rdrr.io/pkg/mgcv/man/fix.family.link.html" class="external-link">fix.family.qf()</a></code>, with experimental support for the <code><a href="https://rdrr.io/pkg/mgcv/man/scat.html" class="external-link">scat()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/Tweedie.html" class="external-link">tw()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/Tweedie.html" class="external-link">Tweedie()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">gaulss()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/gevlss.html" class="external-link">gevlss()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/gumbls.html" class="external-link">gumbls()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/gammals.html" class="external-link">gammals()</a></code>, &amp; <code><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html" class="external-link">ziplss()</a></code> families in addition to those already supported by <em>mgcv</em> itself.</p></li>
 <li><p><code>fix_family_cdf()</code> is extended with support for <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">gaulss()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/gevlss.html" class="external-link">gevlss()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/gumbls.html" class="external-link">gumbls()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/gammals.html" class="external-link">gammals()</a></code>, and <code><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html" class="external-link">ziplss()</a></code> families. <code><a href="../reference/quantile_residuals.html">quantile_residuals()</a></code> are now available for these families as a result.</p></li>
 <li><p><code>fix_family_rd()</code> adds support for the <code><a href="https://rdrr.io/pkg/mgcv/man/cnorm.html" class="external-link">cnorm()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/cpois.html" class="external-link">cpois()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/clog.html" class="external-link">clog()</a></code> families.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/fitted_values.html">fitted_values()</a></code> now computes correctly ordered confidence bounds for location-scale-shape, zero-inflated Poisson (<code><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html" class="external-link">ziplss()</a></code>), and Tweedie location-scale-shape (<code><a href="https://rdrr.io/pkg/mgcv/man/twlss.html" class="external-link">twlss()</a></code>) models. Response-scale intervals retain ordered endpoints for decreasing inverse links, as do transformed intervals from <code><a href="../reference/confint.gam.html">confint.gam()</a></code>. Fixes audit finding GRA-001.</li>
 </ul></div>
 </div>
     <div class="section level2">

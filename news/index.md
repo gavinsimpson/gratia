@@ -81,6 +81,19 @@
   [`cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html) and
   [`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) families.
 
+### Bug Fixes
+
+- [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
+  now computes correctly ordered confidence bounds for
+  location-scale-shape, zero-inflated Poisson
+  ([`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html)), and Tweedie
+  location-scale-shape
+  ([`twlss()`](https://rdrr.io/pkg/mgcv/man/twlss.html)) models.
+  Response-scale intervals retain ordered endpoints for decreasing
+  inverse links, as do transformed intervals from
+  [`confint.gam()`](https://gavinsimpson.github.io/gratia/reference/confint.gam.md).
+  Fixes audit finding GRA-001.
+
 ## gratia 0.11.2
 
 CRAN release: 2026-02-07
