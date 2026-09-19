@@ -202,40 +202,19 @@ rd_logistic <- function(mu, wt, scale) {
 }
 
 `cdf_gevlss` <- function(q, mu, wt, scale, log_p = FALSE, tol = 1e-6) {
-  # check sigma --- doubt needed as this is deep in mgcv
-  # if (any(mu[, 2] <= 0)) {
-  #   stop("'sigma' must be positive")
-  # }
-  
-  # standardized variable
-  z <- (q - mu[, 1]) / mu[, 2] # (x - mu) / sigma
-  
-  # Allocate result
-  out <- numeric(nrow(mu))
-  
-  # any small xi
-  small <- abs(mu[, 3]) < tol
-  
-  # large xi
-  if (any(!small)) {
-    log_term <- log1p(mu[!small, 3] * z[!small])   # log(1 + xi*z)
-    a <- -log_term / mu[!small, 3]
-    
-    out[!small] <- exp(-exp(a))
-  }
-  
-  # small xi Taylor expansion around 0 for the approaching Gumble case
-  if (any(small)) {
-    a <- -z[small] + 0.5 * mu[small, 3] * z[small]^2
-    out[small] <- exp(-exp(a))
-  }
-  
-  # handle support (important for xi < 0)
-  valid <- 1 + mu[, 3] * z > 0
-  out[!valid & mu[, 3] > 0] <- 0
-  out[!valid & mu[, 3] < 0] <- 1
-  
-  out
+  n <- max(length(q), nrow(mu))
+  z <- (rep_len(q, n) - rep_len(mu[, 1], n)) / exp(rep_len(mu[, 2], n))
+  xi <- rep_len(mu[, 3], n)
+  logt <- -z
+  nonzero <- which(!is.na(xi) & xi != 0)
+  support <- 1 + xi * z
+  inside <- nonzero[which(support[nonzero] > 0)]
+  logt[inside] <- -log1p(xi[inside] * z[inside]) / xi[inside]
+  logt[which(support <= 0 & xi > 0)] <- Inf
+  logt[which(support <= 0 & xi < 0)] <- -Inf
+  logt[is.na(xi)] <- NA_real_
+  out <- -exp(logt)
+  if (log_p) out else exp(out)
 }
 
 # implementation needs checking; ChatGPT used to derive the math for the CDF
@@ -301,10 +280,8 @@ rd_logistic <- function(mu, wt, scale) {
 #' @importFrom stats pt
 `make_cdf_scat` <- function(nu, sigma) {
   function(q, mu, wt, scale, log_p = FALSE) {
-    # what to do with weights wt? I think this should be (q - mu) / sigma / wt
-    # q <- (q - mu) / sigma
     pt(
-      (q - mu) / scale, # scale the data such that q ~ t_{nu}()
+      (q - mu) / sigma, # mgcv estimates sigma separately from dispersion
       df = nu,
       lower.tail = TRUE, log.p = log_p
     )
@@ -431,49 +408,29 @@ rd_logistic <- function(mu, wt, scale) {
   )
 }
 
-`qf_gevlss` <- function(p, mu, wt, log_p = FALSE, tol = 1e-6) {
-  # checks, but I doubt these are needed as this is deep in mgcv
-  #if (any(p <= 0 | p >= 1)) {
-  #  stop("All probabilities 'p' must be in (0, 1)")
-  #}
-  #if (any(mu[, 2] <= 0)) {
-  #  stop("All 'sigma' must be positive")
-  #}
+`qf_gevlss` <- function(p, mu, wt, scale, log_p = FALSE, tol = 1e-6) {
+  logp <- quantile_log_probability(p, log_p)
+  n <- max(length(logp), nrow(mu))
+  logt <- log(-rep_len(logp, n))
+  location <- rep_len(mu[, 1], n)
+  sigma <- exp(rep_len(mu[, 2], n))
+  xi <- rep_len(mu[, 3], n)
 
-  # extract vectors --- perhaps not if data is big?
-  # sigma <- mu[, 2]
-  # xi    <- mu[, 3]
-  # mu    <- mu[, 1]
-
-  t <- -log(p)
-  logt <- log(t)
-
-  # |xi| well away from zero so use textbook formula
-  small <- abs(mu[, 3]) < tol
-  # large <- !small
-
-  out <- numeric(length(p))
-
-  # textbook formula
-  if (any(!small)) {
-    out[!small] <- mu[!small, 1] + mu[!small, 2] *
-      expm1(-mu[!small, 3] * logt[!small]) / mu[!small, 3]
-  }
-
-  # use Taylor expansion around xi = 0
-  if (any(small)) {
-    out[small] <- mu[small, 1] + mu[small, 2] * 
-      (-logt[small] + 0.5 * mu[small, 3] * logt[small]^2)
-  }
-
-  out
+  # expm1 avoids cancellation for small shape, without a tol cutoff. Handle
+  # the exact Gumbel limit separately, including p = 0 and p = 1.
+  z <- -logt
+  nonzero <- which(!is.na(xi) & xi != 0)
+  z[nonzero] <- expm1(-xi[nonzero] * logt[nonzero]) / xi[nonzero]
+  z[is.na(xi)] <- NA_real_
+  location + sigma * z
 }
 
 # mgcv uses a mean-centred parameterisation
 qf_gumbls <- function(p, mu, wt, scale, log_p = FALSE) {
   gamma <- 0.577215664901533 # euler's constant
   # mu[, 1] is mean, mu[, 2] is log(beta)
-  mu[, 1] - exp(mu[, 2]) * (gamma + log(-log(p)))
+  mu[, 1] - exp(mu[, 2]) *
+    (gamma + log(-quantile_log_probability(p, log_p)))
 }
 
 #' @importFrom stats qgamma
@@ -481,60 +438,51 @@ qf_gumbls <- function(p, mu, wt, scale, log_p = FALSE) {
   # mu[,1] is the mean, mu[,2] is log scale (dispersion)
   # exp(mu[,2]) == phi
   phi <- exp(mu[, 2])
-  qgamma(p, shape = 1 / phi, scale = mu[, 1] * phi)
+  qgamma(p, shape = 1 / phi, scale = mu[, 1] * phi, log.p = log_p)
 }
 
 #' @importFrom stats qpois
 `qf_ziplss` <- function(p, mu, wt, scale, log_p = FALSE) {
-  # gamma is log(lambda), eta is prob of >0 on a cloglog scale
-  # mu is matrix, col 1 is gamma, col 2 is eta
-  n <- nrow(mu)
-  
-  # Parameters
-  lambda <- exp(mu[,1])
-  pr <- -expm1(-exp(mu[,2]))   # stable: 1 - exp(-exp(eta))
-  
-  # Output
-  q <- numeric(n)
-  
-  # p <= 1 - pr
-  idx0 <- (p <= (1 - p))
-  q[idx0] <- 0
-  
-  # p > 1 - pr
-  idx <- !idx0
-  
-  if (any(idx)) {
-    p_i <- p[idx]
-    lam <- lambda[idx]
-    pr_i <- pr[idx]
-    
-    # log P(Y=0)
-    log_pr0 <- -lam
-    pr0 <- exp(log_pr0)
-    
-    # Stable computation of transformed probability
-    # (p - (1 - pr)) / pr
-    p_scaled <- (p_i - (1 - pr_i)) / pr_i
-    
-    # u_star = pr0 + (1 - pr0) * u_scaled
-    # use expm1/log1p for stability
-    p_star <- pr0 + (-expm1(log_pr0)) * p_scaled
-    
-    # Clamp to avoid qpois issues
-    eps <- .Machine$double.eps^0.75
-    p_star[p_star >= 1] <- 1 - eps
-    p_star[p_star <= 0] <- eps
-    
-    # Invert Poisson CDF
-    q[idx] <- qpois(p_star, lambda = lam)
+  logp <- quantile_log_probability(p, log_p)
+  n <- max(length(logp), nrow(mu))
+  logp <- rep_len(logp, n)
+  lambda <- exp(rep_len(mu[, 1], n))
+  log_zero <- -exp(rep_len(mu[, 2], n))
+  log_presence <- log1mexp(log_zero)
+  q <- rep(NA_real_, n)
+  q[which(logp <= log_zero)] <- 0
+
+  positive <- which(logp > log_zero)
+  if (length(positive)) {
+    # Invert the conditional positive Poisson distribution using its upper
+    # tail. This avoids rounding an interior transformed probability to one.
+    log_survival <- log1mexp(logp[positive]) - log_presence[positive] +
+      log1mexp(-lambda[positive])
+    q[positive] <- qpois(log_survival, lambda[positive],
+      lower.tail = FALSE, log.p = TRUE)
   }
-  
   q
 }
 
+# Validate probabilities before taking logs, retaining NA and true endpoints.
+quantile_log_probability <- function(p, log_p = FALSE) {
+  invalid <- if (log_p) which(p > 0) else which(p < 0 | p > 1)
+  if (length(invalid)) {
+    warning("NaNs produced")
+    p[invalid] <- NaN
+  }
+  if (log_p) p else log(p)
+}
 
-#' @importFrom stats pt
+# log(1 - exp(x)) for x <= 0, without cancellation near zero.
+log1mexp <- function(x) {
+  out <- log(-expm1(x))
+  small <- which(x < -log(2))
+  out[small] <- log1p(-exp(x[small]))
+  out
+}
+
+#' @importFrom stats qt
 `make_qf_scat` <- function(nu, sigma) {
   function(p, mu, wt, scale, log_p = FALSE) {
     qt(
@@ -542,39 +490,45 @@ qf_gumbls <- function(p, mu, wt, scale, log_p = FALSE) {
       df = nu,
       lower.tail = TRUE,
       log.p = log_p
-    ) * scale + mu
+    ) * sigma + mu
   }
 }
 
 #' @importFrom tweedie qtweedie
+#' @importFrom stats qgamma
 `make_qf_tw` <- function(theta, ab) {
-  fun <- if (length(ab) == 1L) {
-    # here ab is the tweedie power specified in Tweedie()
-    function(p, mu, wt, scale, log_p = FALSE){
-      tweedie::qtweedie(
-        p,
-        mu = mu,
-        phi = scale,
-        xi = ab
-      )
-    }
+  xi <- if (length(ab) == 1L) {
+    ab
   } else {
-    function(p, mu, wt, scale, log_p = FALSE) {
-      a <- ab[1] # tweedie lower and upper bounds used in fitting
-      b <- ab[2]
-      # compute tweedie power parameter xi
-      xi <- if (theta > 0) {
-        (b + a * exp(-theta)) / (1 + exp(-theta))
-      } else {
-        (b * exp(theta) + a) / (exp(theta) + 1)
-      }
-      tweedie::qtweedie(
-        p,
-        mu = mu,
-        phi = scale, # think to handle weights we need scale / wt
-        xi = xi
-      )
-    }
+    theta_2_power(theta, a = ab[1], b = ab[2])
   }
-  fun
+  force(xi)
+  function(p, mu, wt, scale, log_p = FALSE) {
+    logp <- quantile_log_probability(p, log_p)
+    n <- max(length(logp), length(mu), length(scale))
+    logp <- rep_len(logp, n)
+    mu <- rep_len(mu, n)
+    phi <- rep_len(scale, n)
+    if (xi == 2) {
+      return(qgamma(logp, shape = 1 / phi, scale = mu * phi, log.p = TRUE))
+    }
+    q <- rep(NA_real_, n)
+    q[which(logp == -Inf)] <- 0
+    q[which(logp == 0)] <- Inf
+    interior <- which(is.finite(logp) & logp < 0)
+    if (length(interior)) {
+      # qtweedie() expects ordinary probabilities and fails for endpoint-only
+      # input. Do not call it for endpoints or missing/invalid probabilities.
+      prob <- exp(logp[interior])
+      q[interior[prob == 0]] <- 0
+      q[interior[prob == 1]] <- Inf
+      keep <- which(prob > 0 & prob < 1)
+      if (length(keep)) {
+        idx <- interior[keep]
+        q[idx] <- tweedie::qtweedie(prob[keep], mu = mu[idx],
+          phi = phi[idx], xi = xi)
+      }
+    }
+    q
+  }
 }

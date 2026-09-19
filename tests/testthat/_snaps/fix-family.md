@@ -96,48 +96,6 @@
     Output
       [1] 1.1 3.2 2.3 1.3 4.5 2.2
 
-# fix family funs work for ziplss
-
-    Code
-      round(cdf, 4)
-    Output
-      [1] 0.6430 0.8787 0.5499 0.6959 0.9873 0.9919
-
----
-
-    Code
-      round(qf, 4)
-    Output
-      [1]  2  3  2  5  4 10
-
-# fix family funs work for gevlss
-
-    Code
-      round(cdf, 3)
-    Output
-      [1] 0.000 0.983 0.866 0.019 0.927 0.139
-
----
-
-    Code
-      round(qf, 3)
-    Output
-      [1] 1.1 3.2 2.3 1.3 4.5 2.2
-
-# fix family funs work for scat
-
-    Code
-      round(cdf, 4)
-    Output
-      [1] 0.1841 0.7257 0.7881
-
----
-
-    Code
-      round(qf, 4)
-    Output
-      [1] 1.1 3.2 2.3
-
 # fix family funs work for nb
 
     Code
