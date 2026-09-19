@@ -51,6 +51,11 @@
   ordered endpoints for decreasing inverse links, as do transformed intervals
   from `confint.gam()`. Fixes audit finding GRA-001.
 
+* `post_draws.default()` and `generate_draws.gam()` were always using `seed = 0`
+  if called with `seed = NULL`, due to a non-integer seed being generated. Now,
+  an integer seed is generated without modifying the RNG state. Fixes audit
+  finding GRA-002.
+
 # gratia 0.11.2
 
 ## User visible changes
