@@ -137,6 +137,27 @@
 #'   residuals. Can be missing, in which case the current state residuals are
 #'   computed using the current state of the random number generator.
 #' @param ... arguments passed to other methods.
+#' @details
+#' For `mgcv::cnorm()`, `mgcv::clog()`, and `mgcv::cpois()` models, censored
+#' observations have PIT residuals sampled uniformly between `F(l)` and `F(u)`,
+#' where `l` and `u` bound the censoring interval and `F` is the fitted latent
+#' response CDF. Left and right censoring use probabilities zero and one,
+#' respectively, for the unbounded end. Quantile residuals apply `qnorm()` to
+#' these PIT values. Uncensored continuous observations use `F(y)`; uncensored
+#' Poisson observations are randomized between `F(y - 1)` and `F(y)`.
+#' Use non-integer censoring limits for `cpois()`, as recommended by mgcv.
+#'
+#' For CDF helpers with native log-tail support, quantile residuals are computed
+#' directly from log probabilities in the smaller tail. This avoids infinite
+#' residuals caused by rounding a probability to zero or one. No probability
+#' clipping is applied: genuine zero-probability tails still give infinite
+#' residuals. PIT residuals are returned as ordinary probabilities and may still
+#' round to zero or one in extreme tails, so applying `qnorm()` to the returned
+#' PIT values can be less accurate than requesting quantile residuals directly.
+#' Native log tails are available for Poisson, negative binomial, binomial,
+#' Gaussian, Gamma, `cnorm()`, `clog()`, `gaulss()`, `gammals()`, `scat()`, and
+#' `betar()` families. Other CDF helpers retain ordinary-probability evaluation.
+#'
 #' @export
 `quantile_residuals` <- function(
   model, type = c("pit", "quantile"), seed = NULL, ...
@@ -224,40 +245,107 @@
     stop("Quantile residuals are not available for this family.")
   }
 
-  # for now, use the internal fitted.values but that isn't going to work in the
-  # long term as often those values are not a vector and not for mu (IIRC)
-  r <- fam$cdf(
-    q = y,
-    mu = fv,
-    wt = wt,
-    scale = scale,
-    log_p = FALSE # not log scale as 0s become -Inf on the log scale
-  )
-
-  discrete_dist <- c("poisson", "binomial", "negative binomial")
-  fn <- family_name(fam)
-  if (grepl("^Negative Binomial", fn)) {
-    fn <- "negative binomial"
-  }
-  if (fn %in% discrete_dist) {
-    # residual for CDF at previous y value
-    r0 <- fam$cdf(
-      q = y - 1L,
-      mu = fv,
-      wt = wt,
-      scale = scale,
-      log_p = FALSE # not log scale as 0s become -Inf on the log scale
-    )
-    # choose a random value between r0 and r
-    r <- runif(n = length(y), min = r0, max = r)
+  ft <- family_type(fam)
+  if (ft %in% c("cnorm", "clog", "cpois")) {
+    bounds <- censored_response_bounds(y, discrete = ft == "cpois")
+  } else {
+    lower <- y
+    if (ft %in% c("poisson", "negative_binomial")) {
+      lower <- y - 1
+    } else if (ft == "binomial") {
+      # The fitted response is a proportion; subtract one success, not one
+      # whole proportion. Zero-weight rows have a degenerate distribution.
+      lower <- y - 1 / pmax(wt, 1)
+    }
+    bounds <- list(lower = lower, upper = y)
   }
 
-  # finish off the residuals; if PIT resids we don't need to do anything
-  # and if quantile, we push the resids through the standard normal inv CDF
+  if ("lower_tail" %in% names(formals(fam$cdf))) {
+    return(log_tail_residuals(bounds, fv, wt, scale, fam$cdf, type))
+  }
+
+  # Preserve support for CDFs without native log-tail evaluation (including
+  # user-supplied CDFs). Their accuracy remains limited by ordinary probabilities.
+  r <- fam$cdf(bounds$upper, mu = fv, wt = wt, scale = scale, log_p = FALSE)
+  random <- which(bounds$lower != bounds$upper)
+  if (length(random)) {
+    r0 <- fam$cdf(bounds$lower, mu = fv, wt = wt, scale = scale, log_p = FALSE)
+    r[random] <- runif(length(random), min = r0[random], max = r[random])
+  }
   if (type == "quantile") {
-    r <- qnorm(r, log.p = FALSE)
+    r <- qnorm(r)
+  }
+  r
+}
+
+# Compute both tails directly, retaining tiny probabilities through the normal
+# quantile transformation. The same uniform draw must be used for both tails.
+log_tail_residuals <- function(bounds, mu, wt, scale, cdf, type) {
+  log_u <- cdf(bounds$upper, mu, wt, scale, log_p = TRUE, lower_tail = TRUE)
+  log_s <- cdf(bounds$upper, mu, wt, scale, log_p = TRUE, lower_tail = FALSE)
+  random <- which(bounds$lower != bounds$upper)
+  if (length(random)) {
+    # runif() historically returned unnamed randomized residuals.
+    log_u <- unname(log_u)
+    log_s <- unname(log_s)
+    log_f0 <- cdf(bounds$lower, mu, wt, scale, log_p = TRUE, lower_tail = TRUE)
+    log_s0 <- cdf(bounds$lower, mu, wt, scale, log_p = TRUE, lower_tail = FALSE)
+    v <- runif(length(random))
+    log_v <- log(v)
+    log_1mv <- log1p(-v)
+    log_u[random] <- logspace_add(
+      log_1mv + log_f0[random], log_v + log_u[random]
+    )
+    log_s[random] <- logspace_add(
+      log_1mv + log_s0[random], log_v + log_s[random]
+    )
   }
 
-  # return
+  # Choose the smaller tail, which avoids loss of precision near probability 1.
+  lower <- log_u <= log_s
+  if (type == "quantile") {
+    r <- log_u
+    r[] <- NA_real_
+    idx <- which(lower)
+    r[idx] <- qnorm(log_u[idx], log.p = TRUE)
+    upper <- which(!lower)
+    r[upper] <- qnorm(log_s[upper], lower.tail = FALSE, log.p = TRUE)
+  } else {
+    r <- exp(log_u)
+    upper <- which(!lower)
+    r[upper] <- -expm1(log_s[upper])
+  }
   r
+}
+
+# Vectorized log(exp(a) + exp(b)), including two zero probabilities.
+logspace_add <- function(a, b) {
+  m <- pmax(a, b)
+  out <- m + log1p(exp(pmin(a, b) - m))
+  out[which(m == -Inf)] <- -Inf
+  out
+}
+
+# Convert mgcv's response encoding to bounds for CDF evaluation. The fitted
+# response is a vector with a "censor" attribute; the original is a matrix.
+censored_response_bounds <- function(y, discrete = FALSE) {
+  censor <- attr(y, "censor")
+  if (is.matrix(y)) {
+    censor <- y[, 2L]
+    y <- y[, 1L]
+  }
+  y <- as.numeric(y)
+  if (is.null(censor)) {
+    censor <- y
+  }
+
+  lower <- pmin(y, censor)
+  upper <- pmax(y, censor)
+  # An exact count occupies the CDF jump (F(y - 1), F(y)). Censoring
+  # intervals instead use F(l) and F(u), with non-integer limits for cpois.
+  exact <- censor == y
+  if (discrete) {
+    lower[exact] <- y[exact] - 1
+  }
+  list(lower = lower, upper = upper)
 }

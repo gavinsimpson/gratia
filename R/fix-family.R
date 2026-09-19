@@ -48,16 +48,15 @@
     fam$rd <- rd_twlss(a = tw_pars[1], b = tw_pars[2])
   }
 
-  # if still null, try one of the other families that just need an rd_fun,
-  # not an rd-factory one as these don't rely on other parameters
+  # If still NULL, handle censored families using the latent distribution.
   if (is.null(fam$rd)) {
     ft <- family_type(fam)
 
     rd_fun <- switch(
       EXPR = ft,
-      "cnorm" = rd_gaussian,
+      "cnorm" = make_rd_cnorm(theta(fam)),
       "cpois" = rd_poisson,
-      "clog"  = rd_logistic,
+      "clog"  = make_rd_clog(theta(fam)),
       NULL
     )
 
@@ -67,7 +66,7 @@
 
   # return possibly modified family
   fam
-  }
+}
 
 #' @importFrom stats rnorm
 rd_gaussian <- function(mu, wt, scale) {
@@ -81,7 +80,23 @@ rd_poisson <- function(mu, wt, scale) {
 
 #' @importFrom stats rlogis
 rd_logistic <- function(mu, wt, scale) {
-  rlogis(length(mu), location = mu, scale = scale)
+  rlogis(length(mu), location = mu, scale = scale / sqrt(wt))
+}
+
+# These families estimate their own scale in theta; the model dispersion is
+# not the distribution scale. Helpers describe the latent, uncensored response.
+make_rd_cnorm <- function(sigma) {
+  force(sigma)
+  function(mu, wt, scale) {
+    rd_gaussian(mu, wt, scale = sigma^2)
+  }
+}
+
+make_rd_clog <- function(sigma) {
+  force(sigma)
+  function(mu, wt, scale) {
+    rd_logistic(mu, wt, scale = sigma)
+  }
 }
 
 `fix_family_cdf` <- function(family) {
@@ -106,6 +121,9 @@ rd_logistic <- function(mu, wt, scale) {
   cdf_fun <- switch(
     EXPR = ft,
     "poisson"  = cdf_poisson,
+    "cpois"    = cdf_poisson,
+    "cnorm"    = make_cdf_cnorm(theta),
+    "clog"     = make_cdf_clog(theta),
     "gaussian" = cdf_gaussian,
     "gaulss"   = cdf_gaulss,
     "gevlss"   = cdf_gevlss,
@@ -130,28 +148,54 @@ rd_logistic <- function(mu, wt, scale) {
 }
 
 #' @importFrom stats ppois
-`cdf_poisson` <- function(q, mu, wt, scale, log_p = FALSE) {
-  ppois(q, lambda = mu, log.p = log_p)
+`cdf_poisson` <- function(q, mu, wt, scale, log_p = FALSE,
+    lower_tail = TRUE) {
+  ppois(q, lambda = mu, lower.tail = lower_tail, log.p = log_p)
 }
 
 #' @importFrom stats pnorm
-`cdf_gaussian` <- function(q, mu, wt, scale, log_p = FALSE) {
-  pnorm(q, mean = mu, sd = sqrt(scale / wt), log.p = log_p)
+`cdf_gaussian` <- function(q, mu, wt, scale, log_p = FALSE,
+    lower_tail = TRUE) {
+  pnorm(q, mean = mu, sd = sqrt(scale / wt),
+    lower.tail = lower_tail, log.p = log_p)
+}
+
+make_cdf_cnorm <- function(sigma) {
+  force(sigma)
+  function(q, mu, wt, scale, log_p = FALSE,
+    lower_tail = TRUE) {
+    cdf_gaussian(q, mu, wt, scale = sigma^2, log_p = log_p,
+      lower_tail = lower_tail)
+  }
+}
+
+#' @importFrom stats plogis
+make_cdf_clog <- function(sigma) {
+  force(sigma)
+  function(q, mu, wt, scale, log_p = FALSE,
+    lower_tail = TRUE) {
+    plogis(q, location = mu, scale = sigma / sqrt(wt),
+      lower.tail = lower_tail, log.p = log_p)
+  }
 }
 
 #' @importFrom stats pbinom
-`cdf_binomial` <- function(q, mu, wt, scale, log_p = FALSE) {
+`cdf_binomial` <- function(q, mu, wt, scale, log_p = FALSE,
+    lower_tail = TRUE) {
   pbinom(
-    q * (wt + as.numeric(wt == 0)), size = wt, prob = mu, log.p = log_p
+    q * (wt + as.numeric(wt == 0)), size = wt, prob = mu,
+    lower.tail = lower_tail, log.p = log_p
   )
   #pbinom(floor(wt * q), wt, mu)
 }
 
 #' @importFrom stats pgamma
-`cdf_gamma` <- function(q, mu, wt, scale, log_p = FALSE) {
+`cdf_gamma` <- function(q, mu, wt, scale, log_p = FALSE,
+    lower_tail = TRUE) {
   # uggh this weird parameterisation in pgamma
   # FIXME: what about weights wt?
-  pgamma(q, shape = 1 / scale, scale = mu * scale, log.p = log_p)
+  pgamma(q, shape = 1 / scale, scale = mu * scale,
+    lower.tail = lower_tail, log.p = log_p)
 }
 
 #' @importFrom stats qnorm
@@ -179,10 +223,11 @@ rd_logistic <- function(mu, wt, scale) {
 }
 
 #' @importFrom stats pnorm
-`cdf_gaulss` <- function(q, mu, wt, scale, log_p = FALSE) {
+`cdf_gaulss` <- function(q, mu, wt, scale, log_p = FALSE,
+    lower_tail = TRUE) {
   pnorm(
     q, mean = mu[, 1, drop = TRUE],
-    sd = 1 / mu[, 2, drop = TRUE], log.p = log_p
+    sd = 1 / mu[, 2, drop = TRUE], lower.tail = lower_tail, log.p = log_p
   )
 }
 
@@ -194,11 +239,13 @@ rd_logistic <- function(mu, wt, scale) {
 }
 
 #' @importFrom stats pgamma
-`cdf_gammals` <- function(q, mu, wt, scale, log_p = FALSE) {
+`cdf_gammals` <- function(q, mu, wt, scale, log_p = FALSE,
+    lower_tail = TRUE) {
   # mu[,1] is the mean, mu[,2] is log scale (dispersion)
   # exp(mu[,2]) == phi
   phi <- exp(mu[, 2])
-  pgamma(q, shape = 1 / phi, scale = mu[, 1] * phi)
+  pgamma(q, shape = 1 / phi, scale = mu[, 1] * phi,
+    lower.tail = lower_tail, log.p = log_p)
 }
 
 `cdf_gevlss` <- function(q, mu, wt, scale, log_p = FALSE, tol = 1e-6) {
@@ -279,35 +326,38 @@ rd_logistic <- function(mu, wt, scale) {
 
 #' @importFrom stats pt
 `make_cdf_scat` <- function(nu, sigma) {
-  function(q, mu, wt, scale, log_p = FALSE) {
+  function(q, mu, wt, scale, log_p = FALSE,
+    lower_tail = TRUE) {
     pt(
       (q - mu) / sigma, # mgcv estimates sigma separately from dispersion
       df = nu,
-      lower.tail = TRUE, log.p = log_p
+      lower.tail = lower_tail, log.p = log_p
     )
   }
 }
 
 #' @importFrom stats pnbinom
 `make_cdf_nb` <- function(theta) {
-  function(q, mu, wt, scale, log_p = FALSE) {
+  function(q, mu, wt, scale, log_p = FALSE,
+    lower_tail = TRUE) {
     pnbinom(
       q,
       size = theta,
       mu = mu,
-      lower.tail = TRUE, log.p = log_p
+      lower.tail = lower_tail, log.p = log_p
     )
   }
 }
 
 #' @importFrom stats pbeta
 `make_cdf_beta` <- function(phi, eps) {
-  function(q, mu, wt, scale, log_p = FALSE) {
+  function(q, mu, wt, scale, log_p = FALSE,
+    lower_tail = TRUE) {
     p <- pbeta(
       q,
       shape1 = phi * mu,
       shape2 = phi * (1 - mu),
-      lower.tail = TRUE, log.p = log_p
+      lower.tail = lower_tail, log.p = log_p
     )
     p
   }
@@ -379,6 +429,9 @@ rd_logistic <- function(mu, wt, scale) {
   # with no extra parameters just need a qf_foo function
   qfun <- switch(
     EXPR = ft,
+    "cnorm"    = make_qf_cnorm(theta),
+    "clog"     = make_qf_clog(theta),
+    "cpois"    = qf_poisson,
     "scaled_t" = make_qf_scat(nu = theta[1], sigma = theta[2]),
     "tweedie"  = make_qf_tw(theta, ab = get_tw_params(family)),
     #"nb"       = make_qf_betar(phi = theta),
@@ -396,6 +449,27 @@ rd_logistic <- function(mu, wt, scale) {
 
   # return
   family
+}
+
+#' @importFrom stats qnorm
+make_qf_cnorm <- function(sigma) {
+  force(sigma)
+  function(p, mu, wt, scale, log_p = FALSE) {
+    qnorm(p, mean = mu, sd = sigma / sqrt(wt), log.p = log_p)
+  }
+}
+
+#' @importFrom stats qlogis
+make_qf_clog <- function(sigma) {
+  force(sigma)
+  function(p, mu, wt, scale, log_p = FALSE) {
+    qlogis(p, location = mu, scale = sigma / sqrt(wt), log.p = log_p)
+  }
+}
+
+#' @importFrom stats qpois
+qf_poisson <- function(p, mu, wt, scale, log_p = FALSE) {
+  qpois(p, lambda = mu, log.p = log_p)
 }
 
 #' @importFrom stats qnorm
