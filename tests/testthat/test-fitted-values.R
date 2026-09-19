@@ -46,7 +46,6 @@ test_that("fitted_values() works for a GAM", {
   expect_identical(nrow(new_df), nrow(fv))
 })
 
-
 test_that("fitted_values() works for an ocat GAM", {
   expect_silent(fv <- fitted_values(m_ocat))
 
@@ -136,4 +135,81 @@ test_that("fitted values works for a multinom() model", {
   skip_on_cran()
   skip_on_ci()
   expect_snapshot(fitted_values(m_multinom))
+})
+
+test_that("distributional fitted intervals match link-scale predictions", {
+  models <- list(gaulss = m_gaulss, ziplss = m_ziplss, twlss = m_twlss)
+  # Independent response transformations for these default model families.
+  transforms <- list(
+    gaulss = list(identity, function(x) 1 / (0.01 + exp(x))),
+    ziplss = list(exp, function(x) -expm1(-exp(x))),
+    twlss = list(exp, function(x) 1.01 + 0.98 * plogis(x), exp)
+  )
+  for (fam in names(models)) {
+    model <- models[[fam]]
+    nd <- model.frame(model)[seq_len(6L), , drop = FALSE]
+    prediction <- predict(model, newdata = nd, type = "link", se.fit = TRUE)
+    for (level in c(0.8, 0.95)) {
+      critical <- qnorm((1 + level) / 2)
+      lower <- prediction$fit - critical * prediction$se.fit
+      upper <- prediction$fit + critical * prediction$se.fit
+      fv <- fitted_values(model, data = nd, scale = "link", ci_level = level)
+      expect_equal(fv$.fitted, as.vector(t(prediction$fit)))
+      expect_equal(fv$.se, as.vector(t(prediction$se.fit)))
+      expect_equal(fv$.lower_ci, as.vector(t(lower)))
+      expect_equal(fv$.upper_ci, as.vector(t(upper)))
+      expect_true(all(fv$.lower_ci <= fv$.fitted & fv$.fitted <= fv$.upper_ci))
+      expect_identical(fv, fitted_values(model, data = nd,
+        scale = "linear predictor", ci_level = level))
+
+      response <- fitted_values(model, data = nd, ci_level = level)
+      parameters <- unique(response$.parameter)
+      for (j in seq_along(parameters)) {
+        rows <- response$.parameter == parameters[j]
+        transform <- transforms[[fam]][[j]]
+        # Gaussian LSS's second predictor is precision, a decreasing transform.
+        decreasing <- fam == "gaulss" && j == 2L
+        expected_lower <- transform(if (decreasing) upper[, j] else lower[, j])
+        expected_upper <- transform(if (decreasing) lower[, j] else upper[, j])
+        expect_equal(response$.fitted[rows], unname(transform(prediction$fit[, j])))
+        expect_equal(response$.lower_ci[rows], unname(expected_lower))
+        expect_equal(response$.upper_ci[rows], unname(expected_upper))
+      }
+      expect_identical(response$.se, fv$.se)
+      expect_true(all(response$.lower_ci <= response$.fitted &
+        response$.fitted <= response$.upper_ci))
+    }
+  }
+})
+
+test_that("fitted intervals respect increasing and decreasing inverse links", {
+  withr::local_seed(1001)
+  d <- data.frame(x = seq(0, 1, length.out = 100))
+  d$y <- rgamma(nrow(d), shape = 100, scale = exp(d$x) / 100)
+  for (link_name in c("log", "inverse")) {
+    model <- mgcv::gam(y ~ s(x, k = 5), data = d,
+      family = Gamma(link = link_name), method = "REML")
+    nd <- d[c(1, 50, 100), , drop = FALSE]
+    prediction <- predict(model, newdata = nd, type = "link", se.fit = TRUE)
+    for (level in c(0.8, 0.95)) {
+      critical <- qnorm((1 + level) / 2)
+      lower <- as.vector(prediction$fit - critical * prediction$se.fit)
+      upper <- as.vector(prediction$fit + critical * prediction$se.fit)
+      fv <- fitted_values(model, data = nd, scale = "link", ci_level = level)
+      expect_equal(fv$.lower_ci, lower)
+      expect_equal(fv$.upper_ci, upper)
+      response <- fitted_values(model, data = nd, ci_level = level)
+      if (link_name == "inverse") {
+        expect_true(all(lower > 0)) # stay within the monotone link domain
+        expect_equal(response$.lower_ci, 1 / upper)
+        expect_equal(response$.upper_ci, 1 / lower)
+      } else {
+        expect_equal(response$.lower_ci, exp(lower))
+        expect_equal(response$.upper_ci, exp(upper))
+      }
+      expect_identical(response$.se, fv$.se)
+      expect_true(all(response$.lower_ci <= response$.fitted &
+        response$.fitted <= response$.upper_ci))
+    }
+  }
 })

@@ -104,6 +104,9 @@
     data = data, ci_level = ci_level,
     scale = scale, extra_fns = extra_fns, ...
   )
+  if (identical(scale, "response")) {
+    fit <- order_interval_bounds(fit)
+  }
   fit
 }
 
@@ -198,8 +201,8 @@
     add_column(.se = pull(std_err, ".std_err")) |>
     # ...and compute interval
     mutate(
-      .lower_ci = .data$.fitted + (crit * .data$.se),
-      .upper_ci = .data$.fitted - (crit * .data$.se)
+      .lower_ci = .data$.fitted - (crit * .data$.se),
+      .upper_ci = .data$.fitted + (crit * .data$.se)
     )
 
   # convert to the response scale if requested
@@ -260,8 +263,8 @@
     add_column(.se = pull(std_err, ".std_err")) |>
     # ...and compute interval
     mutate(
-      .lower_ci = .data$.fitted + (crit * .data$.se),
-      .upper_ci = .data$.fitted - (crit * .data$.se)
+      .lower_ci = .data$.fitted - (crit * .data$.se),
+      .upper_ci = .data$.fitted + (crit * .data$.se)
     )
 
   # convert to the response scale if requested
@@ -318,8 +321,8 @@
     add_column(.se = pull(std_err, ".std_err")) |>
     # ...and compute interval
     mutate(
-      .lower_ci = .data$.fitted + (crit * .data$.se),
-      .upper_ci = .data$.fitted - (crit * .data$.se)
+      .lower_ci = .data$.fitted - (crit * .data$.se),
+      .upper_ci = .data$.fitted + (crit * .data$.se)
     )
 
   # convert to the response scale if requested

@@ -43,6 +43,14 @@
 * `fix_family_rd()` adds support for the `cnorm()`, `cpois()` and `clog()`
   families.
 
+## Bug Fixes
+
+* `fitted_values()` now computes correctly ordered confidence bounds for
+  location-scale-shape, zero-inflated Poisson (`ziplss()`), and Tweedie
+  location-scale-shape (`twlss()`) models. Response-scale intervals retain
+  ordered endpoints for decreasing inverse links, as do transformed intervals
+  from `confint.gam()`. Fixes audit finding GRA-001.
+
 # gratia 0.11.2
 
 ## User visible changes

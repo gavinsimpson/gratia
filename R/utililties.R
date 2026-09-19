@@ -2020,3 +2020,12 @@ multivariate_y <- function() {
   ) |> # an array is returned with 1 row per element of x
     apply(MARGIN = 1, FUN = any) # do elements of x match any of the prefixes?
 }
+
+# Decreasing transformations exchange the endpoints of an interval.
+`order_interval_bounds` <- function(object) {
+  lower <- object[[".lower_ci"]]
+  upper <- object[[".upper_ci"]]
+  object[[".lower_ci"]] <- pmin(lower, upper)
+  object[[".upper_ci"]] <- pmax(lower, upper)
+  object
+}

@@ -452,7 +452,8 @@
   out <- out |>
     mutate(across(all_of(c(".estimate", ".lower_ci", ".upper_ci")),
       .fns = ilink
-    ))
+    )) |>
+    order_interval_bounds()
 
   # smooth_estimates has columns in different places, relocate them to match
   # old output as much as possible
