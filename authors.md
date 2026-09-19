@@ -31,7 +31,7 @@ additive models.” *Journal of Open Source Software*, **9**(104), 6962.
 
 Simpson G (????). *gratia: Graceful ggplot-Based Graphics and Other
 Functions for GAMs Fitted using mgcv*.
-[doi:10.32614/CRAN.package.gratia](https://doi.org/10.32614/CRAN.package.gratia),
+[doi:10.32614/CRAN.package.gratia](https://doi.org/10.32614/CRAN.package.gratia).
 R package version 0.11.2-10, <https://gavinsimpson.github.io/gratia/>.
 
     @Manual{,

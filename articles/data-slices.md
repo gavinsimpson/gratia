@@ -6,7 +6,7 @@ covariates. For more complex models, this will typically involve holding
 some covariates at fixed, representative values while visualising the
 change in the response or effect of a smooth over supplied values of one
 or more other covariates. The values of the covariates at which we
-evaluate a smooth or a model are called a *data slice*[¹](#fn1).
+evaluate a smooth or a model are called a *data slice*[^1].
 
 This article will explain how to create data slices with {gratia} and
 its
@@ -16,6 +16,7 @@ function, and how to use them to visualise features of your fitted GAMs.
 We’ll need the following packages for this article
 
 ``` r
+
 library("mgcv")
 #> Loading required package: nlme
 #> This is mgcv 1.9-4. For overview type '?mgcv'.
@@ -45,6 +46,7 @@ data frame `CO2` and provided with the {datasets} package that ships
 with R.
 
 ``` r
+
 ## data load and prep
 data(CO2, package = "datasets")
 plant <- CO2 |>
@@ -54,6 +56,7 @@ plant <- CO2 |>
 ```
 
 ``` r
+
 plant_ylab <- expression(CO[2] ~ uptake ~ (mu * mol ~ m^{-3}))
 plant_xlab <- expression(CO[2] ~ concentration ~ (mL ~ L^{-1}))
 
@@ -71,6 +74,7 @@ One way to model these data is to allow for different smooths for all
 combinations of the `treatment` and `type` covariates
 
 ``` r
+
 plant <- plant |>
   mutate(tt = fct_cross(treatment, type))
 m_plant <- gam(uptake ~ treatment * type + s(conc, by = tt, k = 6) +
@@ -98,6 +102,7 @@ We can look at the fitted smooths using
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
 
 ``` r
+
 draw(m_plant, residuals = TRUE, scales = "fixed")
 ```
 
@@ -113,6 +118,7 @@ To create a data slice for `conc` for the `Quebec` `type` in the
 `chilled` `treatment` we would use
 
 ``` r
+
 ds1 <- data_slice(m_plant,
   conc = evenly(conc, n = 100),
   type = level(type, "Quebec"), treatment = level(treatment, "chilled")
@@ -144,6 +150,7 @@ the `tt` factor, which is not the correct choice in this case. Instead,
 we need to specify the correct level explicitly for `tt`
 
 ``` r
+
 ds1 <- data_slice(m_plant,
   conc = evenly(conc, n = 100),
   treatment = level(treatment, "chilled"), type = level(type, "Quebec"),
@@ -175,6 +182,7 @@ function in {gratia} is easier to use, especially for non-Gaussian
 models
 
 ``` r
+
 fv1 <- fitted_values(m_plant, data = ds1, scale = "response", exclude = "s(plant)")
 fv1
 #> # A tibble: 100 × 10
@@ -205,6 +213,7 @@ Plotting the fitted values for the data slice now only requires some
 simple {ggplot2} knowledge
 
 ``` r
+
 fv1 |>
   ggplot(aes(x = conc, y = .fitted)) +
   geom_point(
@@ -228,6 +237,7 @@ Next, let’s compare the fitted effects of the treatment in the
 Mississippi origin plants
 
 ``` r
+
 ds2 <- data_slice(m_plant,
   conc = evenly(conc, n = 100),
   treatment = evenly(treatment), type = level(type, "Mississippi")
@@ -261,6 +271,7 @@ and `type` factors but also that we preserve the original levels of the
 We can again visualise the fitted values for this data slice
 
 ``` r
+
 fitted_values(m_plant,
   data = ds2, scale = "response",
   exclude = "s(plant)"
@@ -306,13 +317,14 @@ helper functions:
   the factor `fct`.
 
 In all cases involving factors, the helper functions set the levels of
-the factor to match those in the original model fit[²](#fn2).
+the factor to match those in the original model fit[^2].
 
 The second argument to
 [`data_slice()`](https://gavinsimpson.github.io/gratia/reference/data_slice.md)
 is `...`
 
 ``` r
+
 args(gratia:::data_slice.gam)
 #> function (object, ..., data = NULL, envir = NULL, .observed_only = FALSE) 
 #> NULL
@@ -333,6 +345,7 @@ In the second example, I’ll use the bivariate example data set from
 {mgcv} but fit a tensor product of covariates `x` and `z`
 
 ``` r
+
 # simulate data from the bivariate surface
 df <- data_sim("eg2", n = 1000, scale = 0.25, seed = 2)
 
@@ -354,6 +367,7 @@ We begin by creating a slice through the data space. We also create a
 label at this point for a nice axis label.
 
 ``` r
+
 ds3 <- data_slice(m_biv,
   x = evenly(x, n = 100),
   z = quantile(z, probs = 0.25)
@@ -367,6 +381,7 @@ Then we evaluate the smooth at the desired values and add a confidence
 interval
 
 ``` r
+
 sm <- smooth_estimates(m_biv, select = "te(x,z)", data = ds3) |>
   add_confint()
 sm
@@ -389,6 +404,7 @@ sm
 We can plot `sm` using {ggplot2}
 
 ``` r
+
 sm |>
   ggplot(aes(x = x, y = .estimate)) +
   geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
@@ -409,6 +425,7 @@ make too much difference.
 This extends to multiple slices by asking for several discrete `z`
 
 ``` r
+
 ds4 <- data_slice(m_biv,
   x = evenly(x, n = 100),
   z = round(quantile(z, probs = c(0.25, 0.5, 0.75)), 2)
@@ -444,6 +461,7 @@ is a tidy wrapper to
 For single `z` we have
 
 ``` r
+
 fitted_values(m_biv, data = ds3) |> # default is response scale, not link
   ggplot(aes(x = x, y = .fitted)) +
   geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
@@ -459,6 +477,7 @@ fitted_values(m_biv, data = ds3) |> # default is response scale, not link
 And for the multiple `z` we have
 
 ``` r
+
 fitted_values(m_biv, data = ds4) |>
   mutate(fz = factor(z)) |>
   ggplot(aes(x = x, y = .fitted, colour = fz, group = fz)) +
@@ -476,11 +495,9 @@ fitted_values(m_biv, data = ds4) |>
 where the only difference here is that now the model constant is
 included as well as its uncertainty.
 
-------------------------------------------------------------------------
+[^1]: at least that’s what I’m calling them.
 
-1.  at least that’s what I’m calling them.
-
-2.  Depending on the value of argument `drop.unused.levels` passed to
+[^2]: Depending on the value of argument `drop.unused.levels` passed to
     [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) when you fitted the
     model. The default will drop any unused levels before fitting the
     model, and as a result the helpers will not include those levels

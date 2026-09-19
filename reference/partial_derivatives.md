@@ -172,6 +172,7 @@ Gavin L. Simpson
 ## Examples
 
 ``` r
+
 library("ggplot2")
 library("patchwork")
 load_mgcv()

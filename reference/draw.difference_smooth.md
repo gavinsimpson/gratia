@@ -127,6 +127,7 @@ draw(
 ## Examples
 
 ``` r
+
 load_mgcv()
 # simulate some data; a factor smooth example
 df <- data_sim("eg4", seed = 42)

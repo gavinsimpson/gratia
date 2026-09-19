@@ -7,6 +7,7 @@ models.
 We’ll need the following packages for this vignette:
 
 ``` r
+
 pkgs <- c(
   "mgcv", "gratia", "dplyr", "tidyr", "ggplot2", "ggdist",
   "distributional", "tibble", "withr", "patchwork", "ggokabeito"
@@ -22,63 +23,69 @@ vapply(pkgs, library, logical(1L), logical.return = TRUE, character.only = TRUE)
 
 A generalized additive model (GAM) has the following form
 
-$$g\left( \mu_{i} \right) = \eta_{i} = A_{i} + \mathbf{X}_{i}{\mathbf{γ}} + \sum\limits_{j = 1}^{J}f_{j}\left( x_{ij} \right),\; y_{i} \sim \mathcal{D}\left( \mu_{i},\phi \right)$$
+``` math
+g(\mu_i) = \eta_i = A_i + \mathbf{X}_i \boldsymbol{\gamma} + \sum_{j=1}^{J} f_j(x_{ij}), \; y_i \sim \mathcal{D}(\mu_i, \phi)
+```
 
-where $g{()}$ is the link function, $A$ is an offset, $\mathbf{X}_{i}$
-is the $i$th row of a parametric model matrix, $\mathbf{γ}$ is a vector
-of parameters for the parametric terms, $f_{j}$ is a smooth function of
-covariate $x_{j}$. $y_{i} \sim \mathcal{D}\left( \mu_{i},\phi \right)$
-denotes that the observations $y_{i}$ are distributed as some member of
-the exponential family of distributions with mean $\mu_{i}$ and scale
-parameter $\phi$.
+where $`g()`$ is the link function, $`A`$ is an offset, $`\mathbf{X}_i`$
+is the $`i`$th row of a parametric model matrix, $`\boldsymbol{\gamma}`$
+is a vector of parameters for the parametric terms, $`f_j`$ is a smooth
+function of covariate $`x_j`$. $`y_i \sim \mathcal{D}(\mu_i, \phi)`$
+denotes that the observations $`y_i`$ are distributed as some member of
+the exponential family of distributions with mean $`\mu_i`$ and scale
+parameter $`\phi`$.
 
-The smooth functions $f_{j}$ are represented in the model via penalised
+The smooth functions $`f_j`$ are represented in the model via penalised
 splines basis expansions of the covariates, that are a weighted sum of
 basis functions
 
-$$f_{j}\left( x_{ij} \right) = \sum\limits_{k = 1}^{K}\beta_{jk}b_{jk}\left( x_{ij} \right)$$
+``` math
+f_j(x_{ij}) = \sum_{k=1}^{K} \beta_{jk} b_{jk}(x_{ij})
+```
 
-where $\beta_{jk}$ is the weight (coefficient) associated with the $k$th
-basis function $b_{jk}{()}$ evaluated at the covariate value $x_{ij}$
-for the $j$th smooth function $f_{j}$. Wiggliness penalties
-$\sum_{j}\lambda_{j}{\mathbf{β}}^{\mathsf{T}}\mathbf{S}_{j}{\mathbf{β}}$
-controls the degree of smoothing applied to the $f_{j}$ through the
-smoothing parameters $\lambda_{j}$.
+where $`\beta_{jk}`$ is the weight (coefficient) associated with the
+$`k`$th basis function $`b_{jk}()`$ evaluated at the covariate value
+$`x_{ij}`$ for the $`j`$th smooth function $`f_j`$. Wiggliness penalties
+$`\sum_j \lambda_j \boldsymbol{\beta}^{\mathsf{T}} \mathbf{S}_j \boldsymbol{\beta}`$
+controls the degree of smoothing applied to the $`f_j`$ through the
+smoothing parameters $`\lambda_j`$.
 
 Having fitted the GAM in mgcv using REML or ML smoothness selection we
-obtain a vector of coefficients $\widehat{\mathbf{β}}$ (which also
+obtain a vector of coefficients $`\hat{\boldsymbol{\beta}}`$ (which also
 includes the coefficients for the parametric terms, , for convenience).
 The estimates of these coefficients are conditional upon the data and
-the selected values of the smoothing parameters $\lambda_{j}$. Using the
+the selected values of the smoothing parameters $`\lambda_j`$. Using the
 Bayesian view of smoothing (Miller, 2025) via (RE)ML smoothness
-selection, $\mathbf{β}$ has a multivariate normal posterior distribution
-${\mathbf{β}}|{\mathbf{η}},{\mathbf{λ}} \sim \text{MVN}\left( \widehat{\mathbf{β}},\mathbf{V}_{\text{b}} \right)$,
-where $\mathbf{V}_{\text{b}}$ is the Bayesian covariance matrix of the
-estimated parameters ($\widehat{\mathbf{β}}$) — the subscript $\text{b}$
-is used to differentiate this Bayesian covariance matrix from the
-frequentist version which is also available in the mgcv model output.
+selection, $`\boldsymbol{\beta}`$ has a multivariate normal posterior
+distribution
+$`\boldsymbol{\beta} | \boldsymbol{\eta}, \boldsymbol{\lambda} \sim \text{MVN}(\hat{\boldsymbol{\beta}}, \mathbf{V}_{\text{b}})`$,
+where $`\mathbf{V}_{\text{b}}`$ is the Bayesian covariance matrix of the
+estimated parameters ($`\hat{\boldsymbol{\beta}}`$) — the subscript
+$`\text{b}`$ is used to differentiate this Bayesian covariance matrix
+from the frequentist version which is also available in the mgcv model
+output.
 
 ## What are we simulating?
 
 Posterior simulation involves randomly sampling from
-$\text{MVN}\left( \widehat{\mathbf{β}},\mathbf{V}_{\text{b}} \right)$ or
-$\mathcal{D}\left( \mu_{i},\phi \right)$, or both.
+$`\text{MVN}(\hat{\boldsymbol{\beta}}, \mathbf{V}_{\text{b}})`$ or
+$`\mathcal{D}(\mu_i, \phi)`$, or both.
 
 We might simulate from the posterior distribution of a single estimated
 smooth function to see the uncertainty in the estimate of that function.
-To do this we simulate for just a subset of $\mathbf{β}$, $\beta_{j}$,
-associated with the $f_{j}$ of interest. Instead, we might be interested
-in the uncertainty in the expectation (expected value) of the model at
-some given values of the covariates, in which case we can simulate for
-all $\mathbf{β}$ to sample from the posterior of
-${\mathbb{E}}\left( y_{i} \right)$, the fitted values of the model. Or
-we might want to generate new values of response variable via draws from
+To do this we simulate for just a subset of $`\boldsymbol{\beta}`$,
+$`\beta_{j}`$, associated with the $`f_j`$ of interest. Instead, we
+might be interested in the uncertainty in the expectation (expected
+value) of the model at some given values of the covariates, in which
+case we can simulate for all $`\boldsymbol{\beta}`$ to sample from the
+posterior of $`\mathbb{E}(y_i)`$, the fitted values of the model. Or we
+might want to generate new values of response variable via draws from
 the conditional distribution of the response, by simulating new response
-data $\mathbf{y}^{*}$, at either the observed $\mathbf{x}$ or new values
-$\mathbf{x}^{*}$, from
-$y_{i}^{*}|{\mathbf{η}},\mathbf{x} \sim \mathcal{D}\left( \widehat{\mu_{i}},\phi \right)$.
+data $`\mathbf{y}^{\ast}`$, at either the observed $`\mathbf{x}`$ or new
+values $`\mathbf{x}^{\ast}`$, from
+$`y^{\ast}_i | \boldsymbol{\eta}, \mathbf{x} \sim \mathcal{D}(\hat{\mu_i}, \phi)`$.
 Finally, we can combine posterior simulation from both distributions to
-generate posterior draws for new data ${\mathbb{y}}^{*}$ that also
+generate posterior draws for new data $`\mathbb{y}^{\ast}`$ that also
 include the uncertainty in the expected values.
 
 gratia has functionality for all these options through the following
@@ -89,11 +96,11 @@ functions
     smooth functions,
 2.  [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
     generates draws from the posterior distribution of
-    ${\mathbb{E}}\left( y_{i}|\mathbf{X}_{i} = x_{i} \right)$, the
-    expected value of the response,
+    $`\mathbb{E}(y_i | \mathbf{X}_i = x_i)`$, the expected value of the
+    response,
 3.  [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md)
     generates new response data given supplied values of covariates
-    $y_{i}^{*}|\mathbf{X}_{i} = x_{i}^{*}$
+    $`y^{\ast}_i | \mathbf{X}_i = x^{\ast}_i`$
 4.  [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md),
     generates draws from the posterior distribution of the model,
     including the uncertainty in the estimated parameters of that model.
@@ -116,15 +123,15 @@ known.
 
 It is worth reminding ourselves that these posterior draws are all
 conditional upon the selected values of the smoothing parameter(s)
-$\lambda_{j}$. We act as if the wiggliness of the estimated smooths was
+$`\lambda_j`$. We act as if the wiggliness of the estimated smooths was
 known, when in actual fact we estimated (selected is perhaps a better
 description) these wiglinesses from the data during model fitting. If
 the estimated GAM has been fitted with `method` argument `"REML"`, or
-`"ML"`, then a version of $\mathbf{V}_{\text{b}}$ that is corrected for
-having selected smoothing parameters, $\mathbf{V}_{\text{c}}$, is
+`"ML"`, then a version of $`\mathbf{V}_{\text{b}}`$ that is corrected
+for having selected smoothing parameters, $`\mathbf{V}_{\text{c}}`$, is
 generally available. This allows, to an extent, for posterior simulation
 to account for the additional source of uncertainty of having chosen
-then values of $\mathbf{λ}$.
+then values of $`\boldsymbol{\lambda}`$.
 
 There are two additional functions available in gratia that do posterior
 simulation:
@@ -162,12 +169,12 @@ simulation functions in turn.
 ## Posterior smooths and `smooth_samples()`
 
 We can sample from the posterior distribution of the coefficients of a
-particular smooth ${\widehat{\beta}}_{j}$ given the values of the
-smoothing parameters $\widehat{\mathbf{λ}}$. We generate posterior
-samples of smooths by sampling
-${\mathbf{β}}_{j \star} \sim N\left( {\widehat{\beta}}_{j},\mathbf{V}_{{\widehat{\beta}}_{j}} \right)$
+particular smooth $`\hat{\beta}_j`$ given the values of the smoothing
+parameters $`\hat{\boldsymbol{\lambda}}`$. We generate posterior samples
+of smooths by sampling
+$`\boldsymbol{\beta}_{j\star} \sim N(\hat{\beta}_j, \mathbf{V}_{\hat{\beta}_j})`$
 and forming
-$\mathbf{X}_{{\widehat{\mathbf{β}}}_{j}}{\mathbf{β}}_{j \star}^{\mathsf{T}}$.
+$`\mathbf{X}_{\hat{\boldsymbol{\beta}}_j} \boldsymbol{\beta}_{j\star}^{\mathsf{T}}`$.
 This sampling can be done using
 [`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md).
 
@@ -175,17 +182,18 @@ To illustrate this, we’ll simulate data from Gu & Wahba’s 4 smooth
 example, and fit a GAM to the simulated data
 
 ``` r
+
 ss_df <- data_sim("eg1", seed = 42)
 m_ss <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = ss_df, method = "REML")
 ```
 
 When we are simulating from the posterior distribution of an estimated
 smooth, we are only sampling from the coefficients of the particular
-smooth. In this model, the coefficients for the smooth
-$f\left( x_{0} \right)$ are stored as elements 2 through 10 of the
-coefficients vector.
+smooth. In this model, the coefficients for the smooth $`f(x_0)`$ are
+stored as elements 2 through 10 of the coefficients vector.
 
 ``` r
+
 s_x0 <- get_smooth(m_ss, "s(x0)")
 smooth_coef_indices(s_x0)
 #> [1]  2  3  4  5  6  7  8  9 10
@@ -198,6 +206,7 @@ argument; if we want to sample smooths from the posteriors of all
 smooths in a model, then `select` can be left at its default value.
 
 ``` r
+
 sm_samp <- smooth_samples(m_ss, select = "s(x0)", n_vals = 100, n = 100,
   seed = 21)
 ```
@@ -216,6 +225,7 @@ have a
 method available for them
 
 ``` r
+
 sm_samp |>
   draw(alpha = 0.3)
 ```
@@ -230,6 +240,7 @@ For the standard 95% credible interval, only some of the sampled smooths
 will exceed the limits of the interval.
 
 ``` r
+
 # evaluate the fitted smooth over x0 and add on a credible interval
 sm_est <- smooth_estimates(m_ss, select = "s(x0)") |>
   add_confint()
@@ -251,8 +262,8 @@ sm_est |>
 
 Following Marra & Wood (2012), the blue credible interval will contain
 on average 95% of the grey lines (posterior smooths) at any given value
-of $x_{0}$. This *across the function* frequentist interpretation of the
-credible interval implies that for some values of $x_{0}$ the coverage
+of $`x_0`$. This *across the function* frequentist interpretation of the
+credible interval implies that for some values of $`x_0`$ the coverage
 will be less than 95% and for other values greater than 95%.
 
 ## Posterior fitted values via `fitted_samples()`
@@ -271,9 +282,12 @@ In this example, using
 [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md)
 we simulate data from example 6 of Luo & Wahba (1997)
 
-$$\sin\left( 2\cdots(4x - 2) \right) + 2\cdots\exp\left( - 256\cdots(x - 0.5)^{2} \right)$$
+``` math
+\sin(2 \cdots(4x - 2)) + 2 \cdots\exp(-256 \cdots(x - 0.5)^2)
+```
 
 ``` r
+
 f <- function(x) {
   sin(2 * ((4 * x) - 2)) + (2 * exp(-256 * (x - 0.5)^2))
 }
@@ -290,6 +304,7 @@ plt
 To these data we fit an adaptive smoother
 
 ``` r
+
 m <- gam(y ~ s(x, k = 25, bs = "ad"), data = df, method = "REML")
 ```
 
@@ -298,6 +313,7 @@ which we’ll predict from the model and generate posterior fitted values
 for
 
 ``` r
+
 new_df <- data_slice(m, x = evenly(x, lower = 0, upper = 1, n = 200)) |>
   mutate(.row = row_number())
 ```
@@ -305,6 +321,7 @@ new_df <- data_slice(m, x = evenly(x, lower = 0, upper = 1, n = 200)) |>
 then we compute the fitted values for the new data
 
 ``` r
+
 fv <- fitted_values(m, data = new_df)
 ```
 
@@ -315,6 +332,7 @@ draws from the posterior for each observation in `new_df` and merge the
 posterior draws with the data
 
 ``` r
+
 fs <- fitted_samples(m, data = new_df, n = 10, seed = 4) |>
   left_join(new_df |> select(.row, x), by = join_by(.row == .row))
 ```
@@ -323,6 +341,7 @@ Adding the posterior fitted samples to the plot of the data,
 superimposing the Bayesian credible interval on the fitted values
 
 ``` r
+
 plt +
   geom_ribbon(data = fv, aes(y = .fitted, ymin = .lower_ci, ymax = .upper_ci),
     fill = "red", alpha = 0.3) +
@@ -359,6 +378,7 @@ We being by loading the data and adding on a row number variable for use
 late
 
 ``` r
+
 data(mcycle, package = "MASS")
 mcycle <- mcycle |>
   mutate(
@@ -371,6 +391,7 @@ To these data we fit a standard Gaussian GAM for the conditional mean of
 `accel`.
 
 ``` r
+
 m_gau <- gam(accel ~ s(times, k = 20),
   data = mcycle, method = "REML"
 )
@@ -381,6 +402,7 @@ data using
 [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md)
 
 ``` r
+
 n_sim <- 10
 n_data <- nrow(mcycle)
 
@@ -405,6 +427,7 @@ The comments briefly indicate what the *dplyr* code is doing. Now we can
 plot the observed and simulated data
 
 ``` r
+
 plt_labs <- labs(
   x = "Time after impact [ms]",
   y = "Acceleration [g]"
@@ -429,6 +452,7 @@ variance of the data, through linear predictors for both parameters of
 the Gaussian distribution
 
 ``` r
+
 m_gaulss <- gam(
   list(accel ~ s(times, k = 20, bs = "tp"),
     ~ s(times, bs = "tp")
@@ -439,6 +463,7 @@ m_gaulss <- gam(
 Simulating new data follows using the same code as earlier
 
 ``` r
+
 sim_gaulss <- predicted_samples(m_gaulss, n = n_sim, seed = 20) |>
   left_join(mcycle |> select(-accel),
     by = ".row"
@@ -458,6 +483,7 @@ the data in the plot we created earlier with the simulations from the
 distribution GAM, and then plot it
 
 ``` r
+
 plt_gaulss <- plt_gau %+% sim_gaulss
 #> Warning: <ggplot> %+% x was deprecated in ggplot2 4.0.0.
 #> ℹ Please use <ggplot> + x instead.
@@ -486,21 +512,23 @@ uncertainty or error that arises from drawing observations from the
 conditional distribution of the response.
 
 For example, in a Gaussian GAM, the first source of uncertainty comes
-from the uncertainty in the estimates of $\beta_{j}$, the model
+from the uncertainty in the estimates of $`\beta_j`$, the model
 coefficients. This uncertainty is in the mean or expected value of the
 response. The second source of uncertainty stems from the error term,
 the estimated variance of the response. These two parameters define the
-conditional distribution of $Y_{i}$. For any value of the covariate(s)
-$\mathbf{X}$, our estimated model defines the entire distribution of the
-response values we might expect to observe at those covariate values.
+conditional distribution of $`Y_i`$. For any value of the covariate(s)
+$`\mathbf{X}`$, our estimated model defines the entire distribution of
+the response values we might expect to observe at those covariate
+values.
 
 To illustrate, we’ll fit a simple GAM with a single smooth function to
-data simulate from Gu & Wahba’s function $f_{2}$ using
+data simulate from Gu & Wahba’s function $`f_2`$ using
 [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md).
 We simulate 400 values from a Gaussian distribution with variance
-$\sigma^{2} = 1$.
+$`\sigma^2 = 1`$.
 
 ``` r
+
 df <- data_sim("gwf2", n = 400, scale = 1, dist = "normal", seed = 8)
 ```
 
@@ -508,6 +536,7 @@ The simulated data, and the true function from which they were generated
 are shown below
 
 ``` r
+
 df |>
   ggplot(aes(x = x, y = y)) +
   geom_point() +
@@ -519,15 +548,17 @@ df |>
 A GAM for these data contains a single smooth function of `x`
 
 ``` r
+
 m <- gam(y ~ s(x), data = df, method = "REML", family = gaussian())
 ```
 
-If we consider a new value of the covariate `x`, $x^{*} = 0.5$, the
+If we consider a new value of the covariate `x`, $`x^{\ast} = 0.5`$, the
 expected value of the response given our model,
-${\mathbb{E}}\left( y^{*}|x = x^{*} \right)$, is ~2.92, which we obtain
-using [`predict()`](https://rdrr.io/r/stats/predict.html)
+$`\mathbb{E}(y^{*} | x = x^{*})`$, is ~2.92, which we obtain using
+[`predict()`](https://rdrr.io/r/stats/predict.html)
 
 ``` r
+
 mu <- predict(m, newdata = data.frame(x = 0.5))
 mu
 #>        1 
@@ -536,16 +567,17 @@ mu
 
 This value is the *mean* of a Gaussian distribution that, if our model
 is a correct description of the data, describes the distribution of the
-values that $Y$ might take when $x = 0.5$. The Gaussian distribution is
-defined by two parameters; the mean, $\mu$, which describes the middle
-of the distribution, and the variance, $\sigma^{2}$, which describes how
-spread out the distribution is about the mean. To fully describe the
-Gaussian distribution of the response when $x = 0.5$, we need an
-estimate of the variance. We didn’t model this explicitly in the our
-GAM, but we get an estimate any from the model’s scale parameter,
-$\phi$. This is stored as the element `scale` in the model object
+values that $`Y`$ might take when $`x = 0.5`$. The Gaussian distribution
+is defined by two parameters; the mean, $`\mu`$, which describes the
+middle of the distribution, and the variance, $`\sigma^2`$, which
+describes how spread out the distribution is about the mean. To fully
+describe the Gaussian distribution of the response when $`x = 0.5`$, we
+need an estimate of the variance. We didn’t model this explicitly in the
+our GAM, but we get an estimate any from the model’s scale parameter,
+$`\phi`$. This is stored as the element `scale` in the model object
 
 ``` r
+
 sigma <- m$scale
 sigma
 #> [1] 1.019426
@@ -555,6 +587,7 @@ We can visualise what this distribution looks like with some magic from
 the *ggdist* package
 
 ``` r
+
 df |>
   ggplot(aes(x = x, y = y)) +
   stat_halfeye(aes(ydist = dist_normal(mean = mu, sd = sigma)),
@@ -568,15 +601,16 @@ df |>
 ![](posterior-simulation_files/figure-html/unnamed-chunk-9-1.png)
 
 The orange region shows the expected density of response values at
-$x^{*} = 0.5$ that our model predicts we could expect to observe. This
-region assumes there is no uncertainty in the estimate of the mean of
-variance. Prediction intervals take into account the variation about the
-expected value, plus the uncertainty in the expected value.
+$`x^{\ast} = 0.5`$ that our model predicts we could expect to observe.
+This region assumes there is no uncertainty in the estimate of the mean
+of variance. Prediction intervals take into account the variation about
+the expected value, plus the uncertainty in the expected value.
 [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
 conveniently returns this uncertainty for us, which by default is a 95%
 credible interval
 
 ``` r
+
 fitted_values(m, data = data.frame(x = 0.5))
 #> # A tibble: 1 × 6
 #>    .row     x .fitted   .se .lower_ci .upper_ci
@@ -589,8 +623,8 @@ estimated value (`.fitted`), while `.lower_ci` and `.upper_ci` are lower
 and upper uncertainty bounds (at the 95% level) on the estimated value
 respectively. With GAMs fitted through mgcv we don’t have a
 corresponding estimate of the uncertainty in the scale parameter,
-$\phi$, which for this model is the estimated standard deviation
-$\widehat{\sigma}$.
+$`\phi`$, which for this model is the estimated standard deviation
+$`\hat{\sigma}`$.
 
 While it would be pretty easy to compute upper and lower tail quantiles
 of the fitted Gaussian distribution for a range of values of `x` to get
@@ -606,6 +640,7 @@ creating a set of data evenly over the range of `x` observed in the data
 used to fit the model
 
 ``` r
+
 ds <- data_slice(m, x = evenly(x, n = 200)) |>
   mutate(.row = row_number())
 ```
@@ -616,6 +651,7 @@ compute the fitted values for these new observations using
 [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md).
 
 ``` r
+
 fv <- fitted_values(m, data = ds)
 ```
 
@@ -630,6 +666,7 @@ to generate new response data for each of the new `x` values in `ds` and
 use a join to add the prediction data to each draw
 
 ``` r
+
 ps <- posterior_samples(m, n = 10000, data = ds, seed = 24,
   unconditional = TRUE) |>
   left_join(ds, by = join_by(.row == .row))
@@ -656,8 +693,7 @@ get a more precise estimate of the prediction interval, but we keep the
 number low in this vignette to avoid excessive computation time. We’re
 also using the smoothness parameter selection corrected version of the
 Bayesian covariance matrix; this matrix has been adjusted to account for
-us not knowing the value of the smoothing parameter for
-$f\left( x_{i} \right)$.
+us not knowing the value of the smoothing parameter for $`f(x_i)`$.
 
 `ps` is a tibble, with `n * nrow(ds)` rows. The `.draw` variable groups
 the simulated values by posterior draw, while `.row` groups posterior
@@ -670,6 +706,7 @@ R, which arranges the output from
 [`quantile()`](https://rdrr.io/r/stats/quantile.html) as a data frame.
 
 ``` r
+
 quantile_fun <- function(x, probs = c(0.025, 0.5, 0.975), ...) {
   tibble::tibble(
     .value = quantile(x, probs = probs, ...),
@@ -686,6 +723,7 @@ For ease of use, we pivot the resulting summary from long to wide format
 and add on the covariate values by joining on the `.row` variable
 
 ``` r
+
 p_int <- ps |>
   group_by(.row) |>
   reframe(quantile_fun(.response)) |>
@@ -723,6 +761,7 @@ fit the model as black points, and summarise the posterior samples (from
 posterior samples)
 
 ``` r
+
 fv |>
   ggplot(aes(x = x, y = .fitted)) +
   # summarise the posterior samples
@@ -778,6 +817,7 @@ Metropolis Hastings sampler provided by
 We begin by defining a function that will simulate data for the example.
 
 ``` r
+
 ga_fail <- function(seed) {
   df <- tibble(y = c(
     rep(0, 89), 1, 0, 1, 0, 0, 1, rep(0, 13), 1, 0, 0, 1,
@@ -800,6 +840,7 @@ ga_fail <- function(seed) {
 Which we use to simulate a data set and plot it
 
 ``` r
+
 df <- ga_fail(3)
 
 df |>
@@ -815,6 +856,7 @@ the covariate space the response consists of only zeroes (failures).
 We fit a binomial (logistic) GAM to the data
 
 ``` r
+
 m_logit <- gam(y ~ s(x, k = 15), data = df, method = "REML", family = binomial)
 ```
 
@@ -823,6 +865,7 @@ default Gaussian approximation and subsequently using the simpler
 Metropolis Hastings sampler.
 
 ``` r
+
 fs_ga <- fitted_samples(m_logit, n = 2000, seed = 2)
 fs_mh <- fitted_samples(m_logit,
   n = 2000, seed = 2, method = "mh", thin = 2,
@@ -854,6 +897,7 @@ Having collected the posterior draws, we summarise each set into 50%,
 and add on the data locations with a left join
 
 ``` r
+
 excl_col <- c(".draw", ".parameter", ".row")
 int_ga <- fs_ga |>
   group_by(.row) |>
@@ -872,6 +916,7 @@ the Metropolis Hastings sampler, arranging the two plots using
 *patchwork*
 
 ``` r
+
 plt_ga <- df |>
   ggplot(aes(x = x, y = y)) +
   geom_point() +

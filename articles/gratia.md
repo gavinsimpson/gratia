@@ -1,6 +1,7 @@
 # Getting started with gratia
 
 ``` r
+
 library("gratia")
 library("mgcv")
 #> Loading required package: nlme
@@ -16,6 +17,7 @@ to get you started. We’ll work with some classic simulated data often
 used to illustrate properties of GAMs
 
 ``` r
+
 df <- data_sim("eg1", seed = 42)
 df
 #> # A tibble: 400 × 10
@@ -37,6 +39,7 @@ df
 and the following GAM
 
 ``` r
+
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 summary(m)
 #> 
@@ -73,6 +76,7 @@ function to produce plots using the ggplot2 📦. To plot the estimated
 smooths from the GAM we fitted above, use
 
 ``` r
+
 draw(m)
 ```
 
@@ -88,12 +92,11 @@ contributions of each smooth to the fitted response (on the link scale);
 they show link-scale predictions of the response for each smooth,
 conditional upon all other terms in the model, including any parametric
 effects and the intercept, having zero contribution. In the parlance of
-the marginaleffects package (Arel-Bundock, Greifer, and Heiss
-Forthcoming), these plots show adjusted predictions, just where the
-adjustment includes setting the contribution of all other model terms to
-the predicted value to zero. For partial derivatives (what
-*marginaleffects* would call a marginal effect or slope), gratia
-provides
+the marginaleffects package (Arel-Bundock et al. Forthcoming), these
+plots show adjusted predictions, just where the adjustment includes
+setting the contribution of all other model terms to the predicted value
+to zero. For partial derivatives (what *marginaleffects* would call a
+marginal effect or slope), gratia provides
 [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md).
 
 The resulting plot is intended as reasonable overview of the estimated
@@ -103,6 +106,7 @@ with
 [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
 
 ``` r
+
 sm <- smooth_estimates(m)
 sm
 #> # A tibble: 400 × 9
@@ -128,13 +132,15 @@ smooths, you can specify which via the `smooth` argument. This takes the
 mgcv. To list the labels for the smooths in use
 
 ``` r
+
 smooths(m)
 #> [1] "s(x0)" "s(x1)" "s(x2)" "s(x3)"
 ```
 
-To evaluate only $f\left( x_{2} \right)$ use
+To evaluate only $`f(x_2)`$ use
 
 ``` r
+
 sm <- smooth_estimates(m, smooth = "s(x2)")
 #> Warning: The `smooth` argument of `smooth_estimates()` is deprecated as of gratia
 #> 0.8.9.9.
@@ -163,6 +169,7 @@ Then you can generate your own plot using the ggplot2 package, for
 example
 
 ``` r
+
 library("ggplot2")
 library("dplyr")
 #> 
@@ -199,6 +206,7 @@ The
 function provides standard diagnostic plots for GAMs
 
 ``` r
+
 appraise(m)
 ```
 
@@ -216,6 +224,7 @@ Adding partial residuals to the partial effect plots produced by
 also help diagnose problems with the model, such as oversmoothing
 
 ``` r
+
 draw(m, residuals = TRUE)
 ```
 

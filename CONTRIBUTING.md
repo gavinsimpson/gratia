@@ -12,6 +12,7 @@ in-development version on Github. Install the current development
 version of {gratia} from R-universe using
 
 ``` r
+
 install.packages("gratia", repos = c(
   "https://gavinsimpson.r-universe.dev",
   "https://cloud.r-project.org"

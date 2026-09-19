@@ -73,6 +73,7 @@ overview(
 ## Examples
 
 ``` r
+
 load_mgcv()
 df <- data_sim(n = 400, seed = 2)
 m <- gam(y ~ x3 + s(x0) + s(x1, bs = "bs") + s(x2, bs = "ts"),

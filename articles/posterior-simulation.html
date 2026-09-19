@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Posterior Simulation • gratia</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Posterior Simulation">
@@ -87,11 +87,11 @@ generalized additive models.</p>
 <span><span class="co">#&gt;     ggokabeito </span></span>
 <span><span class="co">#&gt;           TRUE</span></span></code></pre></div>
 <p>A generalized additive model (GAM) has the following form</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>η</mi><mi>i</mi></msub><mo>=</mo><msub><mi>A</mi><mi>i</mi></msub><mo>+</mo><msub><mi>𝐗</mi><mi>i</mi></msub><mi>𝛄</mi><mo>+</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>J</mi></munderover><msub><mi>f</mi><mi>j</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mspace width="0.278em"></mspace><msub><mi>y</mi><mi>i</mi></msub><mo>∼</mo><mi>𝒟</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>η</mi><mi>i</mi></msub><mo>=</mo><msub><mi>A</mi><mi>i</mi></msub><mo>+</mo><msub><mi>𝐗</mi><mi>i</mi></msub><mi>𝛄</mi><mo>+</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>J</mi></munderover><msub><mi>f</mi><mi>j</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mspace width="0.278em"></mspace><msub><mi>y</mi><mi>i</mi></msub><mo>∼</mo><mi>𝒟</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">
 g(\mu_i) = \eta_i = A_i + \mathbf{X}_i \boldsymbol{\gamma} + \sum_{j=1}^{J} f_j(x_{ij}), \; y_i \sim \mathcal{D}(\mu_i, \phi)
 </annotation></semantics></math></p>
 <p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">g()</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo stretchy="false" form="prefix">(</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">g()</annotation></semantics></math>
 is the link function,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
 is an offset,
@@ -104,7 +104,7 @@ is a vector of parameters for the parametric terms,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>j</mi></msub><annotation encoding="application/x-tex">f_j</annotation></semantics></math>
 is a smooth function of covariate
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mi>j</mi></msub><annotation encoding="application/x-tex">x_j</annotation></semantics></math>.
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>∼</mo><mi>𝒟</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y_i \sim \mathcal{D}(\mu_i, \phi)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>∼</mo><mi>𝒟</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">y_i \sim \mathcal{D}(\mu_i, \phi)</annotation></semantics></math>
 denotes that the observations
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
 are distributed as some member of the exponential family of
@@ -116,7 +116,7 @@ and scale parameter
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>j</mi></msub><annotation encoding="application/x-tex">f_j</annotation></semantics></math>
 are represented in the model via penalised splines basis expansions of
 the covariates, that are a weighted sum of basis functions</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>j</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><msub><mi>β</mi><mrow><mi>j</mi><mi>k</mi></mrow></msub><msub><mi>b</mi><mrow><mi>j</mi><mi>k</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>j</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><msub><mi>β</mi><mrow><mi>j</mi><mi>k</mi></mrow></msub><msub><mi>b</mi><mrow><mi>j</mi><mi>k</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">
 f_j(x_{ij}) = \sum_{k=1}^{K} \beta_{jk} b_{jk}(x_{ij})
 </annotation></semantics></math></p>
 <p>where
@@ -124,7 +124,7 @@ f_j(x_{ij}) = \sum_{k=1}^{K} \beta_{jk} b_{jk}(x_{ij})
 is the weight (coefficient) associated with the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>th
 basis function
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>b</mi><mrow><mi>j</mi><mi>k</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">b_{jk}()</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>b</mi><mrow><mi>j</mi><mi>k</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">b_{jk}()</annotation></semantics></math>
 evaluated at the covariate value
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">x_{ij}</annotation></semantics></math>
 for the
@@ -148,7 +148,7 @@ Using the Bayesian view of smoothing <span class="citation">(Miller,
 2025)</span> via (RE)ML smoothness selection,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛃</mi><annotation encoding="application/x-tex">\boldsymbol{\beta}</annotation></semantics></math>
 has a multivariate normal posterior distribution
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝛃</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛈</mi><mo>,</mo><mi>𝛌</mi><mo>∼</mo><mtext mathvariant="normal">MVN</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>𝛃</mi><mo accent="true">̂</mo></mover><mo>,</mo><msub><mi>𝐕</mi><mtext mathvariant="normal">b</mtext></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\boldsymbol{\beta} | \boldsymbol{\eta}, \boldsymbol{\lambda} \sim \text{MVN}(\hat{\boldsymbol{\beta}}, \mathbf{V}_{\text{b}})</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝛃</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛈</mi><mo>,</mo><mi>𝛌</mi><mo>∼</mo><mtext mathvariant="normal">MVN</mtext><mo stretchy="false" form="prefix">(</mo><mover><mi>𝛃</mi><mo accent="true">̂</mo></mover><mo>,</mo><msub><mi>𝐕</mi><mtext mathvariant="normal">b</mtext></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol{\beta} | \boldsymbol{\eta}, \boldsymbol{\lambda} \sim \text{MVN}(\hat{\boldsymbol{\beta}}, \mathbf{V}_{\text{b}})</annotation></semantics></math>,
 where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐕</mi><mtext mathvariant="normal">b</mtext></msub><annotation encoding="application/x-tex">\mathbf{V}_{\text{b}}</annotation></semantics></math>
 is the Bayesian covariance matrix of the estimated parameters
@@ -162,9 +162,9 @@ output.</p>
 <h2 id="what-are-we-simulating">What are we simulating?<a class="anchor" aria-label="anchor" href="#what-are-we-simulating"></a>
 </h2>
 <p>Posterior simulation involves randomly sampling from
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">MVN</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>𝛃</mi><mo accent="true">̂</mo></mover><mo>,</mo><msub><mi>𝐕</mi><mtext mathvariant="normal">b</mtext></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{MVN}(\hat{\boldsymbol{\beta}}, \mathbf{V}_{\text{b}})</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">MVN</mtext><mo stretchy="false" form="prefix">(</mo><mover><mi>𝛃</mi><mo accent="true">̂</mo></mover><mo>,</mo><msub><mi>𝐕</mi><mtext mathvariant="normal">b</mtext></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{MVN}(\hat{\boldsymbol{\beta}}, \mathbf{V}_{\text{b}})</annotation></semantics></math>
 or
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝒟</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathcal{D}(\mu_i, \phi)</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝒟</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{D}(\mu_i, \phi)</annotation></semantics></math>,
 or both.</p>
 <p>We might simulate from the posterior distribution of a single
 estimated smooth function to see the uncertainty in the estimate of that
@@ -178,7 +178,7 @@ expectation (expected value) of the model at some given values of the
 covariates, in which case we can simulate for all
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛃</mi><annotation encoding="application/x-tex">\boldsymbol{\beta}</annotation></semantics></math>
 to sample from the posterior of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbb{E}(y_i)</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝔼</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\mathbb{E}(y_i)</annotation></semantics></math>,
 the fitted values of the model. Or we might want to generate new values
 of response variable via draws from the conditional distribution of the
 response, by simulating new response data
@@ -188,7 +188,7 @@ at either the observed
 or new values
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>𝐱</mi><mo>*</mo></msup><annotation encoding="application/x-tex">\mathbf{x}^{\ast}</annotation></semantics></math>,
 from
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>y</mi><mi>i</mi><mo>*</mo></msubsup><mo stretchy="false" form="prefix">|</mo><mi>𝛈</mi><mo>,</mo><mi>𝐱</mi><mo>∼</mo><mi>𝒟</mi><mrow><mo stretchy="true" form="prefix">(</mo><mover><msub><mi>μ</mi><mi>i</mi></msub><mo accent="true">̂</mo></mover><mo>,</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y^{\ast}_i | \boldsymbol{\eta}, \mathbf{x} \sim \mathcal{D}(\hat{\mu_i}, \phi)</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>y</mi><mi>i</mi><mo>*</mo></msubsup><mo stretchy="false" form="prefix">|</mo><mi>𝛈</mi><mo>,</mo><mi>𝐱</mi><mo>∼</mo><mi>𝒟</mi><mo stretchy="false" form="prefix">(</mo><mover><msub><mi>μ</mi><mi>i</mi></msub><mo accent="true">̂</mo></mover><mo>,</mo><mi>ϕ</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">y^{\ast}_i | \boldsymbol{\eta}, \mathbf{x} \sim \mathcal{D}(\hat{\mu_i}, \phi)</annotation></semantics></math>.
 Finally, we can combine posterior simulation from both distributions to
 generate posterior draws for new data
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>𝕪</mi><mo>*</mo></msup><annotation encoding="application/x-tex">\mathbb{y}^{\ast}</annotation></semantics></math>
@@ -202,7 +202,7 @@ distribution of single estimated smooth functions,</li>
 <li>
 <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> generates draws from the posterior
 distribution of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>𝐗</mi><mi>i</mi></msub><mo>=</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbb{E}(y_i | \mathbf{X}_i = x_i)</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝔼</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>𝐗</mi><mi>i</mi></msub><mo>=</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\mathbb{E}(y_i | \mathbf{X}_i = x_i)</annotation></semantics></math>,
 the expected value of the response,</li>
 <li>
 <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code> generates new response data given
@@ -275,7 +275,7 @@ a particular smooth
 given the values of the smoothing parameters
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>𝛌</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{\boldsymbol{\lambda}}</annotation></semantics></math>.
 We generate posterior samples of smooths by sampling
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝛃</mi><mrow><mi>j</mi><mo>⋆</mo></mrow></msub><mo>∼</mo><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>β</mi><mo accent="true">̂</mo></mover><mi>j</mi></msub><mo>,</mo><msub><mi>𝐕</mi><msub><mover><mi>β</mi><mo accent="true">̂</mo></mover><mi>j</mi></msub></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\boldsymbol{\beta}_{j\star} \sim N(\hat{\beta}_j, \mathbf{V}_{\hat{\beta}_j})</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝛃</mi><mrow><mi>j</mi><mo>⋆</mo></mrow></msub><mo>∼</mo><mi>N</mi><mo stretchy="false" form="prefix">(</mo><msub><mover><mi>β</mi><mo accent="true">̂</mo></mover><mi>j</mi></msub><mo>,</mo><msub><mi>𝐕</mi><msub><mover><mi>β</mi><mo accent="true">̂</mo></mover><mi>j</mi></msub></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol{\beta}_{j\star} \sim N(\hat{\beta}_j, \mathbf{V}_{\hat{\beta}_j})</annotation></semantics></math>
 and forming
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐗</mi><msub><mover><mi>𝛃</mi><mo accent="true">̂</mo></mover><mi>j</mi></msub></msub><msubsup><mi>𝛃</mi><mrow><mi>j</mi><mo>⋆</mo></mrow><mi>𝖳</mi></msubsup></mrow><annotation encoding="application/x-tex">\mathbf{X}_{\hat{\boldsymbol{\beta}}_j} \boldsymbol{\beta}_{j\star}^{\mathsf{T}}</annotation></semantics></math>.
 This sampling can be done using <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code>.</p>
@@ -287,7 +287,7 @@ smooth example, and fit a GAM to the simulated data</p>
 <p>When we are simulating from the posterior distribution of an
 estimated smooth, we are only sampling from the coefficients of the
 particular smooth. In this model, the coefficients for the smooth
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(x_0)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>0</mn></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">f(x_0)</annotation></semantics></math>
 are stored as elements 2 through 10 of the coefficients vector.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">s_x0</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_smooth.html">get_smooth</a></span><span class="op">(</span><span class="va">m_ss</span>, <span class="st">"s(x0)"</span><span class="op">)</span></span>
@@ -358,7 +358,7 @@ estimated model coefficients, whereas <code><a href="https://rdrr.io/r/stats/pre
 the estimated coefficients.</p>
 <p>In this example, using <code><a href="../reference/data_sim.html">data_sim()</a></code> we simulate data from
 example 6 of <span class="citation">Luo &amp; Wahba (1997)</span></p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>sin</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><mi>⋯</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>4</mn><mi>x</mi><mo>−</mo><mn>2</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>2</mn><mi>⋯</mi><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mn>256</mn><mi>⋯</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>−</mo><mn>0.5</mn><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">sin</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mi>⋯</mi><mo stretchy="false" form="prefix">(</mo><mn>4</mn><mi>x</mi><mo>−</mo><mn>2</mn><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mn>2</mn><mi>⋯</mi><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>−</mi><mn>256</mn><mi>⋯</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>−</mo><mn>0.5</mn><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">
 \sin(2 \cdots(4x - 2)) + 2 \cdots\exp(-256 \cdots(x - 0.5)^2)
 </annotation></semantics></math></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -563,7 +563,7 @@ generated are shown below</p>
 <p>If we consider a new value of the covariate <code>x</code>,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>x</mi><mo>*</mo></msup><mo>=</mo><mn>0.5</mn></mrow><annotation encoding="application/x-tex">x^{\ast} = 0.5</annotation></semantics></math>,
 the expected value of the response given our model,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>y</mi><mo>*</mo></msup><mo stretchy="false" form="prefix">|</mo><mi>x</mi><mo>=</mo><msup><mi>x</mi><mo>*</mo></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbb{E}(y^{*} | x = x^{*})</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝔼</mi><mo stretchy="false" form="prefix">(</mo><msup><mi>y</mi><mo>*</mo></msup><mo stretchy="false" form="prefix">|</mo><mi>x</mi><mo>=</mo><msup><mi>x</mi><mo>*</mo></msup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\mathbb{E}(y^{*} | x = x^{*})</annotation></semantics></math>,
 is ~2.92, which we obtain using <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code></p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">m</span>, newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
@@ -681,7 +681,7 @@ computation time. We’re also using the smoothness parameter selection
 corrected version of the Bayesian covariance matrix; this matrix has
 been adjusted to account for us not knowing the value of the smoothing
 parameter for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(x_i)</annotation></semantics></math>.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">f(x_i)</annotation></semantics></math>.</p>
 <p><code>ps</code> is a tibble, with <code>n * nrow(ds)</code> rows. The
 <code>.draw</code> variable groups the simulated values by posterior
 draw, while <code>.row</code> groups posterior draws for the same value
@@ -932,7 +932,7 @@ Miller, D. L. (2025). Bayesian views of generalized additive modelling.
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

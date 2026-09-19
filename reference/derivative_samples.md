@@ -161,6 +161,7 @@ Gavin L. Simpson
 ## Examples
 
 ``` r
+
 load_mgcv()
 df <- data_sim("eg1", dist = "negbin", scale = 0.25, seed = 42)
 

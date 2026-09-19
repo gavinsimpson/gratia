@@ -40,6 +40,7 @@ We start by simulating some data and fitting a GAM with four smooth
 functions
 
 ``` r
+
 library("gratia")
 library("mgcv")
 #> Loading required package: nlme
@@ -72,6 +73,7 @@ The default plot produced by
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) is
 
 ``` r
+
 p <- draw(m)
 p
 ```
@@ -80,9 +82,10 @@ p
 
 If we want to change the theme for the plots, we can’t append a
 [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) layer to
-`p` as this only affects the last plot in the *patchwork*[¹](#fn1)
+`p` as this only affects the last plot in the *patchwork*[^1]
 
 ``` r
+
 p + theme_bw()
 ```
 
@@ -92,6 +95,7 @@ One way to apply the theme to all plots in the patchwork is to the the
 `&` operator.
 
 ``` r
+
 p & theme_bw()
 ```
 
@@ -108,6 +112,7 @@ and as a result it isn’t straightforward to combine those objects into a
 new patchwork
 
 ``` r
+
 p1 <- draw(m, select = "s(x0)")
 p2 <- draw(m, select = "s(x1)")
 p3 <- draw(m, select = "s(x2)")
@@ -122,6 +127,7 @@ To avoid the error, we need to use
 to set the dimensions we want
 
 ``` r
+
 p1 + p2 + p3 + plot_layout(ncol = 3)
 ```
 
@@ -131,6 +137,7 @@ The above could have been achieved directly via
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
 
 ``` r
+
 draw(m, select = c("s(x0)", "s(x1)", "s(x2)"), ncol = 3)
 ```
 
@@ -165,6 +172,7 @@ done *tidyverse*-style via
 [`add_confint()`](https://gavinsimpson.github.io/gratia/reference/add_confint.md)
 
 ``` r
+
 # evaluate the smooths
 sm <- smooth_estimates(m) |>
   add_confint()
@@ -194,15 +202,17 @@ fit the model. This can be done via
 [`add_partial_residuals()`](https://gavinsimpson.github.io/gratia/reference/add_partial_residuals.md)
 
 ``` r
+
 # add partial residuals to data
 eg1 <- eg1 |>
   add_partial_residuals(m)
 ```
 
-This will[²](#fn2) add columns with names `"s(x0)"`. `"s(x1)"`, etc. to
-the data.
+This will[^2] add columns with names `"s(x0)"`. `"s(x1)"`, etc. to the
+data.
 
 ``` r
+
 names(eg1)
 #>  [1] "y"     "x0"    "x1"    "x2"    "x3"    "f"     "f0"    "f1"    "f2"   
 #> [10] "f3"    "s(x0)" "s(x1)" "s(x2)" "s(x3)"
@@ -211,7 +221,7 @@ names(eg1)
 Now we have everything we need to recreate the plots created by
 [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md).
 In the code block below we filter `sm` to focus on a specific smooth,
-here $f(x2)$ (`"s(x2)"`), then we add
+here $`f(x2)`$ (`"s(x2)"`), then we add
 
 1.  a rug plot of the observed values of `x2`,
 2.  the credible interval around the estimated smooth,
@@ -220,6 +230,7 @@ here $f(x2)$ (`"s(x2)"`), then we add
 5.  some annotation
 
 ``` r
+
 p_sx2 <- sm |>
   filter(.smooth == "s(x2)") |>
   ggplot() +
@@ -246,6 +257,7 @@ complete the plot by creating the patchwork with the desired number of
 rows and columns
 
 ``` r
+
 p_sx0 + p_sx1 + p_sx2 + p_sx3 + plot_layout(ncol = 2)
 ```
 
@@ -259,6 +271,7 @@ residuals according to the levels of this factor. Let’s create that
 factor
 
 ``` r
+
 set.seed(12)
 eg1 <- eg1 |>
   mutate(fac = sample(letters[1:4], n(), replace = TRUE))
@@ -269,6 +282,7 @@ when we plot the partial residuals. To save some typing, we’ll reorder
 the layers in the plot and add the partial residuals last
 
 ``` r
+
 plt <- sm |>
   filter(.smooth == "s(x2)") |>
   ggplot() +
@@ -302,6 +316,7 @@ and *size* aesthetics (note we deleted `cex = 1.5` to allow the mapping
 to *size*)
 
 ``` r
+
 plt +
   geom_point(
     aes(
@@ -320,14 +335,12 @@ because of the way the data were simulated, but hopefully this
 illustrates what can be possible once you use the low-level functions
 provided by {gratia}.
 
-------------------------------------------------------------------------
-
-1.  A *patchwork* is the name given to the composition of individual
+[^1]: A *patchwork* is the name given to the composition of individual
     plots created by
     [`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html)
     or the composition operators `+`, `|` and `/`.
 
-2.  currently; I’m not entirely happy with this naming convention as
+[^2]: currently; I’m not entirely happy with this naming convention as
     there’s nothing to indicate to the user that these are *partial
     residuals* for the smooth with name matching the created variable
     name.

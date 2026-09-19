@@ -4,6 +4,12 @@
 
 ### New features
 
+- Quantile residuals use log probabilities in the smaller tail for
+  families with native log-tail CDF support, including Poisson, negative
+  binomial, and the censored families. This avoids numerical infinities
+  without clipping probabilities. Grouped-binomial residuals now
+  randomize over one success rather than one whole response proportion.
+
 - The frequentist covariance matrix can now be selected in
   [`confint.gam()`](https://gavinsimpson.github.io/gratia/reference/confint.gam.md)
   and
@@ -59,10 +65,47 @@
   [`quantile_residuals()`](https://gavinsimpson.github.io/gratia/reference/quantile_residuals.md)
   are now available for these families as a result.
 
-- `fix_family_rd()` adds support for the
-  [`cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html),
-  [`cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html) and
-  [`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) families.
+- `fix_family_rd()`, `fix_family_qf()`, and `fix_family_cdf()` add
+  support for the [`cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html),
+  [`cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html), and
+  [`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) families. These
+  helpers describe the latent, uncensored response distribution, using
+  the fitted family scale and prior weights for
+  [`cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html) and
+  [`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html).
+  [`quantile_residuals()`](https://gavinsimpson.github.io/gratia/reference/quantile_residuals.md)
+  supports these families by randomizing over censoring intervals for
+  PIT and quantile residuals.
+
+### Bug fixes
+
+- `fix_family_qf()` now uses the fitted scale for
+  [`scat()`](https://rdrr.io/pkg/mgcv/man/scat.html) and the
+  exponentiated log scale for
+  [`gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html). Their CDF
+  helpers use the same corrected parameterizations. GEV quantiles also
+  handle the zero-shape limit and support endpoints correctly.
+
+- Quantile helpers for
+  [`tw()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html),
+  [`Tweedie()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html),
+  [`gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html),
+  [`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html),
+  [`gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html), and
+  [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) now honour
+  `log_p`. Fixed-power
+  [`Tweedie()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html) families are
+  correctly distinguished from fitted
+  [`tw()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html) families, and
+  endpoint-only Tweedie quantile requests no longer fail.
+
+- [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) quantiles use
+  the model’s zero probability and invert the positive Poisson component
+  without clipping probabilities, including at probability one.
+
+- Uniform QQ and worm plots now use *gratia*’s extended quantile
+  helpers. Simulated response and Pearson residuals for multi-parameter
+  families use the family’s residual method.
 
 ## gratia 0.11.2
 

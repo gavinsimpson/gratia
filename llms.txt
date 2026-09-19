@@ -71,6 +71,7 @@ The main features of *gratia* are currently
 *gratia* is now available on CRAN, and can be installed with
 
 ``` r
+
 install.packages("gratia")
 ```
 
@@ -80,6 +81,7 @@ the `install_github()` function from package *remotes*. Make sure you
 have *remotes* installed, then run
 
 ``` r
+
 remotes::install_github("gavinsimpson/gratia")
 ```
 
@@ -87,6 +89,7 @@ to install the package. Alternatively, binary packages of the
 development version are available from rOpenSci’s R Universe service:
 
 ``` r
+
 # Install gratia in R
 install.packages("gratia", repos = c(
   "https://gavinsimpson.r-universe.dev",

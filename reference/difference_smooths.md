@@ -95,6 +95,7 @@ difference_smooths(
 ## Examples
 
 ``` r
+
 load_mgcv()
 df <- data_sim("eg4", seed = 42)
 m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")

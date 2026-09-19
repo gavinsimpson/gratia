@@ -18,6 +18,7 @@ vars_from_label(label)
 ## Examples
 
 ``` r
+
 vars_from_label("s(x1)")
 #> [1] "x1"
 vars_from_label("t2(x1,x2,x3)")

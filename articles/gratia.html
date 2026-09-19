@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Getting started with gratia • gratia</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Getting started with gratia">
@@ -144,12 +144,12 @@ off the contributions of each smooth to the fitted response (on the link
 scale); they show link-scale predictions of the response for each
 smooth, conditional upon all other terms in the model, including any
 parametric effects and the intercept, having zero contribution. In the
-parlance of the marginaleffects package <span class="citation">(Arel-Bundock, Greifer, and Heiss Forthcoming)</span>,
-these plots show adjusted predictions, just where the adjustment
-includes setting the contribution of all other model terms to the
-predicted value to zero. For partial derivatives (what
-<em>marginaleffects</em> would call a marginal effect or slope), gratia
-provides <code><a href="../reference/derivatives.html">derivatives()</a></code>.</p>
+parlance of the marginaleffects package <span class="citation">(Arel-Bundock et al. Forthcoming)</span>, these plots
+show adjusted predictions, just where the adjustment includes setting
+the contribution of all other model terms to the predicted value to
+zero. For partial derivatives (what <em>marginaleffects</em> would call
+a marginal effect or slope), gratia provides
+<code><a href="../reference/derivatives.html">derivatives()</a></code>.</p>
 <p>The resulting plot is intended as reasonable overview of the
 estimated model, but it offers limited option to modify the resulting
 plot. If you want full control, you can obtain the data used to create
@@ -180,7 +180,7 @@ as they are known to mgcv. To list the labels for the smooths in use</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/smooths.html">smooths</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "s(x0)" "s(x1)" "s(x2)" "s(x3)"</span></span></code></pre></div>
 <p>To evaluate only
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(x_2)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">f(x_2)</annotation></semantics></math>
 use</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span>, smooth <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span>
@@ -270,7 +270,7 @@ you get going.</p>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Arel-BundockGreiferHeiss:2024" class="csl-entry">
 Arel-Bundock, Vincent, Noah Greifer, and Andrew Heiss. Forthcoming.
 <span>“How to Interpret Statistical Models Using <span class="nocase">marginaleffects</span> in <span>R</span> and
@@ -290,7 +290,7 @@ Forthcoming.
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>
