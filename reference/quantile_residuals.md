@@ -36,6 +36,9 @@ quantile_residuals(model, type = c("pit", "quantile"), seed = NULL, ...)
 
 ## Details
 
+With `na.exclude`, excluded observations are restored as `NA` residuals;
+with `na.omit`, only model-used observations are returned.
+
 For [`mgcv::cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html),
 [`mgcv::clog()`](https://rdrr.io/pkg/mgcv/man/clog.html), and
 [`mgcv::cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html) models,

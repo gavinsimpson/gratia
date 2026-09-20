@@ -83,6 +83,12 @@
 
 ### Bug Fixes
 
+- [`quantile_residuals()`](https://gavinsimpson.github.io/gratia/reference/quantile_residuals.md)
+  now restores excluded observations as `NA` for models fitted with
+  `na.exclude`, keeping residual diagnostics aligned with predictors.
+  Histogram bin selection now handles these missing residuals
+  ([\#402](https://github.com/gavinsimpson/gratia/issues/402)).
+
 - [`data_combos()`](https://gavinsimpson.github.io/gratia/reference/data_combos.md)
   now honours `complete = FALSE`, returning only observed combinations
   of factor levels while retaining typical continuous values and

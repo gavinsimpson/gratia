@@ -79,7 +79,9 @@ computed using the current state of the random number generator.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>For <code><a href="https://rdrr.io/pkg/mgcv/man/cnorm.html" class="external-link">mgcv::cnorm()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/clog.html" class="external-link">mgcv::clog()</a></code>, and <code><a href="https://rdrr.io/pkg/mgcv/man/cpois.html" class="external-link">mgcv::cpois()</a></code> models, censored
+    <p>With <code>na.exclude</code>, excluded observations are restored as <code>NA</code> residuals;
+with <code>na.omit</code>, only model-used observations are returned.</p>
+<p>For <code><a href="https://rdrr.io/pkg/mgcv/man/cnorm.html" class="external-link">mgcv::cnorm()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/clog.html" class="external-link">mgcv::clog()</a></code>, and <code><a href="https://rdrr.io/pkg/mgcv/man/cpois.html" class="external-link">mgcv::cpois()</a></code> models, censored
 observations have PIT residuals sampled uniformly between <code>F(l)</code> and <code>F(u)</code>,
 where <code>l</code> and <code>u</code> bound the censoring interval and <code>F</code> is the fitted latent
 response CDF. Left and right censoring use probabilities zero and one,
