@@ -117,7 +117,7 @@
 
 #' @export
 `overview.gamm` <- function(model, ...) {
-  out <- overview(model$gam)
+  out <- overview(model$gam, ...)
   class(out) <- append(class(out), values = "overview_gamm", after = 0)
   out
 }
