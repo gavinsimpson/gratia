@@ -396,7 +396,10 @@
       ## evaluate smooth
       out[[i]] <- smooth_estimates(object,
         select = uS[i],
-        n = n, data = data, partial_match = partial_match
+        n = n, data = data, partial_match = partial_match,
+        unconditional = unconditional,
+        frequentist = frequentist,
+        overall_uncertainty = FALSE
       )
 
       # if this is a by var smooth, we need to do this for each level of
