@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-21</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-22</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -109,6 +109,19 @@ of the <code>data</code> each row of the returned object belongs. Additionally, 
 will be <code>nrow(data) * n_categories</code> rows in the returned object; each row
 is the predicted probability for a single category of the response.</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>With <code>data = NULL</code>, results follow the model's <code>na.action</code>: <code>na.exclude</code>
+restores excluded observations as <code>NA</code> fitted values, standard errors and
+interval bounds; <code>na.omit</code> returns only retained observations. Covariates
+unavailable in the stored model frame are restored as typed <code>NA</code> values.
+<code>.row</code> indexes the fitting data after any <code>subset</code> was applied.</p>
+<p>Supplying <code>data</code> requests predictions at those rows, independently of training
+exclusions. Missing responses do not prevent prediction. Missing required
+predictors produce <code>NA</code> results by default. An explicit <code>na.action</code> passed
+through <code>...</code> is honoured; with <code>na.omit</code>, <code>.row</code> retains the positions in the
+supplied data, rather than numbering the remaining rows consecutively.</p>
+    </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p>For most families, regardless of the scale on which the fitted values

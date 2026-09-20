@@ -182,6 +182,13 @@ values in long format. The columns are
 - `response` (numeric) the predicted response for the indicated row of
   `data`.
 
+## Details
+
+Observation rows use the same missing-value convention as
+[`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md):
+default results restore `na.exclude` observations in every draw, while
+explicit `data` are evaluated in their own row order.
+
 ## Note
 
 Models with offset terms supplied via the `offset` argument to

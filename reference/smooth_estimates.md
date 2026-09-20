@@ -118,6 +118,13 @@ smooth_estimates(
 
 A data frame (tibble), which is of class `"smooth_estimates"`.
 
+## Details
+
+For explicit `data`, missing covariates needed by a smooth produce `NA`
+estimates and standard errors at those positions. Missing values in
+variables unrelated to that smooth do not discard its otherwise
+evaluable rows.
+
 ## Examples
 
 ``` r

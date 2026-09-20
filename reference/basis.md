@@ -170,6 +170,12 @@ basis(
 
 A tibble.
 
+## Details
+
+When evaluating a fitted smooth at explicit data, missing covariates
+required by that smooth produce `NA` basis values. Missing values in
+other model variables do not discard otherwise evaluable rows.
+
 ## Author
 
 Gavin L. Simpson

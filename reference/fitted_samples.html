@@ -11,7 +11,7 @@ posterior or a simple Metropolis Hastings sampler."><meta property="og:image" co
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-21</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-22</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -217,6 +217,12 @@ relates to,</p></li>
 <li><p><code>response</code> (numeric) the predicted response for the indicated row of
 <code>data</code>.</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Observation rows use the same missing-value convention as
+<code><a href="posterior_samples.html">posterior_samples()</a></code>: default results restore <code>na.exclude</code> observations in
+every draw, while explicit <code>data</code> are evaluated in their own row order.</p>
+    </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p>Models with offset terms supplied via the <code>offset</code> argument to

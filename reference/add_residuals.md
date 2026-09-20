@@ -13,9 +13,9 @@ add_residuals(data, model, value = ".residual", ...)
 - data:
 
   a data frame containing values for the variables used to fit the
-  model. Passed to
-  [`stats::residuals()`](https://rdrr.io/r/stats/residuals.html) as
-  `newdata`.
+  model, in fitting order. Supply either the retained fitting rows or,
+  for `na.exclude`, the original fitting rows after any `subset`. This
+  does not compute residuals for new or reordered observations.
 
 - model:
 

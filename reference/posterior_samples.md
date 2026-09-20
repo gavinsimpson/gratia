@@ -180,6 +180,17 @@ values in long format. The columns are
 - `response` (numeric) the predicted response for the indicated row of
   `data`.
 
+## Details
+
+With no explicit `data`, observation rows follow the fitted model's
+`na.action`. `na.exclude` restores excluded rows as `NA` in every draw;
+`na.omit` returns retained rows only. `.row` indexes the fitting data
+after any `subset`. With explicit `data`, `.row` indexes that data,
+missing responses do not prevent prediction, and missing required
+predictors give `NA` draws. An explicit prediction `na.action` in `...`
+is honoured without renumbering retained rows. Restoration does not
+consume random numbers.
+
 ## Note
 
 Models with offset terms supplied via the `offset` argument to

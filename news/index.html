@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-21</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-22</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,10 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="gratia-development-version">gratia (development version)<a class="anchor" aria-label="anchor" href="#gratia-development-version"></a></h2>
+<div class="section level3">
+<h3 id="user-visible-changes-development-version">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-development-version"></a></h3>
+<ul><li>For models fitted with <code>na.exclude</code>, default fitted values, partial residuals, fitted and posterior samples, and simulations now restore excluded rows as <code>NA</code>, while diagnostics correctly align the retained observations (<a href="https://github.com/gavinsimpson/gratia/issues/349" class="external-link">#349</a>). Explicit prediction data preserve row positions by default, with missing required predictors yielding <code>NA</code> results and missing responses alone not preventing prediction.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
 <ul><li><p><code><a href="../reference/draw.html">draw()</a></code> for penalty matrices now accepts <code>geom = "tile"</code> to draw individual rectangles, while retaining <code>geom = "raster"</code> as the default (<a href="https://github.com/gavinsimpson/gratia/issues/392" class="external-link">#392</a>).</p></li>

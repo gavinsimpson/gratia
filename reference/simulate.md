@@ -92,6 +92,14 @@ model must contain, or be updatable to contain, the required random
 number generator. See
 [`mgcv::fix.family.rd()`](https://rdrr.io/pkg/mgcv/man/fix.family.link.html).
 
+With `data = NULL`, `na.exclude` restores excluded observations as `NA`
+in every simulation; `na.omit` returns retained observations only.
+Positions refer to the fitting data after any `subset`. Explicit `data`
+are evaluated independently of training exclusions: missing responses do
+not prevent simulation, while missing required predictors or weights
+yield `NA`. Prediction `na.action` in `...` is honoured. Missing rows
+are never passed to the response random-number generator.
+
 ## Author
 
 Gavin L. Simpson

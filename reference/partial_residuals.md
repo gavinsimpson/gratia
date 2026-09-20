@@ -37,6 +37,14 @@ partial_residuals(object, select = NULL, partial_match = FALSE, ...)
   logical; should smooths be selected by partial matches with `select`?
   If `TRUE`, `select` can only be a single string to match against.
 
+## Details
+
+With `na.exclude`, excluded observations are restored as `NA` partial
+residuals, in fitting order after any `subset`. With `na.omit`, only
+retained observations are returned. Computation uses aligned working
+residuals, working weights and term predictions before restoring
+excluded positions.
+
 ## Examples
 
 ``` r

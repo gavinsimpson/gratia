@@ -78,6 +78,22 @@ Models fitted with certain families will include additional variables
   `nrow(data) * n_categories` rows in the returned object; each row is
   the predicted probability for a single category of the response.
 
+## Details
+
+With `data = NULL`, results follow the model's `na.action`: `na.exclude`
+restores excluded observations as `NA` fitted values, standard errors
+and interval bounds; `na.omit` returns only retained observations.
+Covariates unavailable in the stored model frame are restored as typed
+`NA` values. `.row` indexes the fitting data after any `subset` was
+applied.
+
+Supplying `data` requests predictions at those rows, independently of
+training exclusions. Missing responses do not prevent prediction.
+Missing required predictors produce `NA` results by default. An explicit
+`na.action` passed through `...` is honoured; with `na.omit`, `.row`
+retains the positions in the supplied data, rather than numbering the
+remaining rows consecutively.
+
 ## Note
 
 For most families, regardless of the scale on which the fitted values

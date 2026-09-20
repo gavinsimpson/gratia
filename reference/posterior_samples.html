@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-21</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-22</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -210,6 +210,16 @@ relates to,</p></li>
 <li><p><code>response</code> (numeric) the predicted response for the indicated row of
 <code>data</code>.</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>With no explicit <code>data</code>, observation rows follow the fitted model's
+<code>na.action</code>. <code>na.exclude</code> restores excluded rows as <code>NA</code> in every draw;
+<code>na.omit</code> returns retained rows only. <code>.row</code> indexes the fitting data after
+any <code>subset</code>. With explicit <code>data</code>, <code>.row</code> indexes that data, missing
+responses do not prevent prediction, and missing required predictors give
+<code>NA</code> draws. An explicit prediction <code>na.action</code> in <code>...</code> is honoured without
+renumbering retained rows. Restoration does not consume random numbers.</p>
+    </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p>Models with offset terms supplied via the <code>offset</code> argument to

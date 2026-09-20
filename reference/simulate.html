@@ -13,7 +13,7 @@ distribution used when fitting the model."><meta property="og:image" content="ht
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-21</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-22</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -138,6 +138,13 @@ for excluding the effects of random effect terms.</p></dd>
     <p>For <code>simulate.gam()</code> to function, the <code>family</code> component of the fitted
 model must contain, or be updatable to contain, the required random
 number generator. See <code><a href="https://rdrr.io/pkg/mgcv/man/fix.family.link.html" class="external-link">mgcv::fix.family.rd()</a></code>.</p>
+<p>With <code>data = NULL</code>, <code>na.exclude</code> restores excluded observations as <code>NA</code> in
+every simulation; <code>na.omit</code> returns retained observations only. Positions
+refer to the fitting data after any <code>subset</code>. Explicit <code>data</code> are evaluated
+independently of training exclusions: missing responses do not prevent
+simulation, while missing required predictors or weights yield <code>NA</code>.
+Prediction <code>na.action</code> in <code>...</code> is honoured. Missing rows are never passed
+to the response random-number generator.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
