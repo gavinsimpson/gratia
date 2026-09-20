@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-16</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-17</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,6 +62,7 @@
 <li><p><code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> now matches smooth covariate combinations across factor levels before computing contrasts. Previously, supplied data with different row orders could silently compare different covariate locations, giving incorrect differences, standard errors, and intervals. Duplicate combinations and mismatched prediction grids now produce informative errors; comparisons at a single location also work. Fixes audit finding GRA-004.</p></li>
 <li><p><code><a href="../reference/confint.gam.html">confint.gam()</a></code> now uses consistent covariance and standard errors when computing simultaneous intervals, respecting <code>frequentist</code> and <code>unconditional</code>. These intervals exclude overall-mean uncertainty, as documented (GRA-005).</p></li>
 <li><p><code><a href="../reference/confint.gam.html">confint.gam()</a></code> now correctly computes simultaneous intervals when multiple smooths are requested. Previously, it passed the full selection to a helper expecting a single smooth, causing an error (GRA-006).</p></li>
+<li><p>Quantile residuals for <code><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html" class="external-link">ziplss()</a></code> models are now randomised over the probability mass of each observed count. Previously, randomisation was skipped, potentially distorting residual diagnostics (GRA-007).</p></li>
 </ul></div>
 </div>
     <div class="section level2">

@@ -129,6 +129,12 @@
   are requested. Previously, it passed the full selection to a helper
   expecting a single smooth, causing an error (GRA-006).
 
+- Quantile residuals for
+  [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) models are now
+  randomised over the probability mass of each observed count.
+  Previously, randomisation was skipped, potentially distorting residual
+  diagnostics (GRA-007).
+
 ## gratia 0.11.2
 
 CRAN release: 2026-02-07
