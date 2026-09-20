@@ -173,7 +173,7 @@
   }
 
   # post process
-  sim <- post_proc_fun(sim, n_cat = n_cat)
+  sim <- post_proc_fun(sim, n_cat = n_cat, cuts = cuts)
 
   # return
   sim
@@ -236,9 +236,17 @@
 #' @importFrom tibble tibble
 #' @importFrom rlang .data
 `post_proc_ocat` <- function(x, n_cat = 4, cuts = c(-1, 0, 5), ...) {
+  if (!is.numeric(n_cat) || length(n_cat) != 1L ||
+      !is.finite(n_cat) || n_cat < 2 || n_cat != floor(n_cat)) {
+    stop("'n_cat' must be a single integer of at least 2.")
+  }
+  if (!is.numeric(cuts) || any(!is.finite(cuts)) ||
+      any(diff(cuts) <= 0)) {
+    stop("'cuts' must be finite numeric values in strictly increasing order.")
+  }
   # follows example from ?ocat
   n_cuts <- length(cuts)
-  if (!identical(as.integer(n_cat), as.integer(n_cuts + 1L))) {
+  if (n_cat != n_cuts + 1L) {
     stop("Number of cut points not equal to ", n_cat, "-1.")
   }
 

@@ -45,6 +45,10 @@
 
 ## Bug Fixes
 
+* `data_sim()` now honours custom cut points for ordinal responses and
+  validates that they are finite, strictly increasing, and consistent with
+  the requested integer number of categories (#408).
+
 * `worm_plot()` now honours `seed`, including when called through
   `appraise(use_worm = TRUE)`, and restores the caller's random-number state
   after seeded calls (#407).
