@@ -83,6 +83,11 @@
   probability mass of each observed count. Previously, randomisation was
   skipped, potentially distorting residual diagnostics (GRA-007).
 
+* `simulate.gamm()` now respects the supplied `data` argument, while
+  `smooth_samples.gamm()` and `overview.gamm()` now forward additional arguments
+  to their underlying GAM methods. Previously, these arguments were silently
+  ignored (GRA-008).
+
 # gratia 0.11.2
 
 ## User visible changes
