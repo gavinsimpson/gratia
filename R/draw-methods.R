@@ -1321,6 +1321,10 @@
 #'
 #' Displays the penalty matrices of smooths as a heatmap using `ggplot`
 #'
+#' @param geom character; either `"raster"` (the default) or `"tile"`.
+#'   Raster rendering uses an image for the matrix, which can keep large PDF
+#'   plots compact. Tile rendering uses individual rectangles, providing vector
+#'   cells in PDF and SVG output, but can increase file size for large matrices.
 #' @param normalize logical; normalize the penalty to the range -1, 1?
 #' @param as_matrix logical; how should the plotted penalty matrix be oriented?
 #'   If `TRUE` row 1, column 1 of the penalty matrix is draw in the upper left,
@@ -1359,6 +1363,9 @@
 #'
 #' # for a specific smooth
 #' draw(penalty(m, select = "s(x2):fac1"))
+#'
+#' # draw individual vector cells
+#' draw(penalty(m), geom = "tile")
 `draw.penalty_df` <- function(object,
                               normalize = FALSE,
                               as_matrix = TRUE,
@@ -1370,7 +1377,10 @@
                               caption = NULL,
                               ncol = NULL, nrow = NULL,
                               guides = "keep",
+                              geom = c("raster", "tile"),
                               ...) {
+  geom <- match.arg(geom)
+
   ## if non-specified fill set our default
   if (is.null(continuous_fill)) {
     continuous_fill <- scale_fill_gradient2(
@@ -1387,6 +1397,7 @@
     plt_list[[i]] <- plot_penalty(plt_list[[i]],
       normalize = normalize,
       as_matrix = as_matrix,
+      geom = geom,
       continuous_fill = continuous_fill,
       xlab = rep(xlab, n_plots),
       ylab = rep(ylab, n_plots),
@@ -1419,7 +1430,10 @@
                            ylab = NULL,
                            title = NULL,
                            subtitle = NULL,
-                           caption = NULL) {
+                           caption = NULL,
+                           geom = c("raster", "tile")) {
+  geom <- match.arg(geom)
+
   ## fix ordering of levels so the heatmap matches a matrix
   ## Don't reverse the cols!!
   row_levs <- if (isTRUE(as_matrix)) {
@@ -1446,7 +1460,10 @@
       fill = .data$.value
     )
   ) +
-    geom_raster()
+    switch(geom,
+      raster = ggplot2::geom_raster(interpolate = FALSE),
+      tile = ggplot2::geom_tile(width = 1, height = 1, colour = NA)
+    )
 
   ## add the scale
   plt <- plt + continuous_fill
