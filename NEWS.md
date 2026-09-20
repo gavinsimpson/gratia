@@ -63,6 +63,13 @@
   shifted, for supplied data and automatically generated grids. Fixes audit
   finding GRA-003.
 
+* `difference_smooths()` now matches smooth covariate combinations across
+  factor levels before computing contrasts. Previously, supplied data with
+  different row orders could silently compare different covariate locations,
+  giving incorrect differences, standard errors, and intervals. Duplicate
+  combinations and mismatched prediction grids now produce informative errors;
+  comparisons at a single location also work. Fixes audit finding GRA-004.
+
 # gratia 0.11.2
 
 ## User visible changes

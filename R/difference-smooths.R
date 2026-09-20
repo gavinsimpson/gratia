@@ -215,6 +215,7 @@
 #' @importFrom tibble new_tibble
 #' @importFrom dplyr bind_cols
 #' @importFrom stringr str_extract
+#' @importsFrom vctrs vec_match
 `calc_difference` <- function(f1, f2, select, by_var, smooth_var, data, Xp, V,
                               coefs, group_means = FALSE) {
   ## make sure f1 and f2 are characters
@@ -260,12 +261,26 @@
     (c1 | c2)
   }
 
-  ## rows of Xp associated with pair of smooths
-  r1 <- data[[by_var]] == f1
-  r2 <- data[[by_var]] == f2
+  ## Match covariate combinations before differencing the factor levels.
+  r1 <- which(data[[by_var]] == f1)
+  r2 <- which(data[[by_var]] == f2)
+  keys1 <- data[r1, smooth_var, drop = FALSE]
+  keys2 <- data[r2, smooth_var, drop = FALSE]
+  if (anyDuplicated(keys1) || anyDuplicated(keys2)) {
+    stop("Factor levels '", f1, "' and '", f2,
+      "' must have unique covariate combinations for the selected smooth.",
+      call. = FALSE)
+  }
+  matched <- vctrs::vec_match(keys1, keys2)
+  if (!length(r1) || length(r1) != length(r2) || anyNA(matched)) {
+    stop("Factor levels '", f1, "' and '", f2,
+      "' must use the same prediction grid for the selected smooth.",
+      call. = FALSE)
+  }
+  r2 <- r2[matched]
 
-  ## difference rows of Xp for pair of smooths
-  X <- Xp[r1, ] - Xp[r2, ]
+  ## Keep matrix dimensions for comparisons at a single covariate location.
+  X <- Xp[r1, , drop = FALSE] - Xp[r2, , drop = FALSE]
 
   ## zero the cols related to other splines and covariates
   X[, !keep] <- 0
@@ -288,7 +303,7 @@
   )
   out <- new_tibble(out, nrow = NROW(X), class = "difference_smooth")
   ## Only need rows associated with one of the levels
-  out <- bind_cols(out, data[r1, smooth_var])
+  out <- bind_cols(out, data[r1, smooth_var, drop = FALSE])
 
   out
 }
