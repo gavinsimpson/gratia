@@ -248,13 +248,16 @@
                              ylab = NULL, xlab = NULL, ...) {
   type <- match.arg(type)
 
+  if (as.logical(sqrt)) {
+    object <- mutate(object,
+      .observed = sqrt(.data$.observed),
+      .fitted = sqrt(.data$.fitted)
+    )
+  }
+
   ## Create a suitable axis label for y axis if none supplied
   if (is.null(ylab)) {
     ylab <- if (as.logical(sqrt)) {
-      object <- mutate(object,
-        .observed = sqrt(.data$.observed),
-        .fitted = sqrt(.data$.fitted)
-      )
       expression(sqrt(Frequency))
     } else {
       "Frequency"

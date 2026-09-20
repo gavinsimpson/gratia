@@ -45,6 +45,10 @@
 
 ## Bug Fixes
 
+* `draw.rootogram()` now applies the square-root transformation when a custom
+  y-axis label is supplied, keeping plotted frequencies independent of the
+  label (#406).
+
 * `overview()` now reports one degree of freedom per parametric coefficient,
   avoiding incorrect values and row-length errors for factors and models
   without an intercept (#405).
