@@ -45,6 +45,10 @@
 
 ## Bug Fixes
 
+* Gaussian rootograms now use response-scale means and standard deviations
+  adjusted for prior weights when computing expected counts. Nonpositive or
+  nonfinite prior weights are rejected (#399).
+
 * `fitted_values()` now computes correctly ordered confidence bounds for
   location-scale-shape, zero-inflated Poisson (`ziplss()`), and Tweedie
   location-scale-shape (`twlss()`) models. Response-scale intervals retain
