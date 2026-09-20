@@ -45,6 +45,10 @@
 
 ## Bug Fixes
 
+* `variance_comp()` now handles variance components without confidence
+  intervals, including default GCV fits, and returns a typed empty table when
+  `mgcv::gam.vcomp()` returns no components (#377).
+
 * `rtw()` now assigns Gamma shapes to the correct observations when Tweedie
   power varies, including in `twlss` response simulation. Scalar parameters
   are expanded consistently, and incompatible lengths or nonfinite inputs
