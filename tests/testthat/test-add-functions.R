@@ -64,8 +64,6 @@ test_that("add_residuals works for a GAM with NA in data", {
 })
 
 test_that("add_partial_residuals works for a GAM with NA in data", {
-  skip_on_cran()
-  # skip("This needs fixing")
   expect_error(add_partial_residuals(add_data, m_na),
     "Length of model residuals not equal to number of rows in 'data'",
     fixed = TRUE

@@ -1,5 +1,14 @@
 #' Draw samples from the posterior distribution of an estimated model
 #'
+#' @details
+#' With no explicit `data`, observation rows follow the fitted model's
+#' `na.action`. `na.exclude` restores excluded rows as `NA` in every draw;
+#' `na.omit` returns retained rows only. `.row` indexes the fitting data after
+#' any `subset`. With explicit `data`, `.row` indexes that data, missing
+#' responses do not prevent prediction, and missing required predictors give
+#' `NA` draws. An explicit prediction `na.action` in `...` is honoured without
+#' renumbering retained rows. Restoration does not consume random numbers.
+#'
 #' @param model a fitted model of the supported types
 #' @param data  data frame; new observations at which the posterior draws
 #'   from the model should be evaluated. If not supplied, the data used to fit
@@ -193,25 +202,34 @@
   }
 
   ## rd function if available
-  rd_fun <- choose_rd_fun(model)
+  rd_fun <- missing_safe_rd(choose_rd_fun(model),
+    n_response = if (fam_type == "multivariate_normal") n_eta(model) else 1L
+  )
 
   ## dispersion or scale variable for simulation
   scale_p <- model[["sig2"]]
-  if (is.null(scale)) {
+  if (is.null(scale_p)) {
     scale_p <- summary(model)[["dispersion"]]
   }
 
   if (is.null(data)) {
     # data <- model[["model"]]
-    weights <- model[["prior.weights"]]
+    weights <- restore_model_rows(model_used_rows(model)[["prior.weights"]], model)
   } else {
     if (is.null(weights)) {
       weights <- rep(1, nrow(data))
     }
   }
 
-  # need to extend weights by number of draws
-  weights <- rep(weights, times = n)
+  n_rows <- if (is.null(data)) length(model_row_map(model)) else NROW(data)
+  if (is.null(weights)) weights <- rep(1, n_rows)
+  if (length(weights) == 1L) weights <- rep(weights, n_rows)
+  if (length(weights) != n_rows) {
+    stop("Weights must have one value per prediction row.")
+  }
+  # Match weights to retained input positions before extending by draws.
+  row_ids <- unique(sim_eta$.row)
+  weights <- rep(weights[row_ids], times = length(unique(sim_eta$.draw)))
   # scale <- rep(scale, times = n)
 
   # replace fitted with simulated response
@@ -285,6 +303,10 @@
 #'   terminology.
 #'
 #' @details
+#' Observation rows use the same missing-value convention as
+#' [posterior_samples()]: default results restore `na.exclude` observations in
+#' every draw, while explicit `data` are evaluated in their own row order.
+#'
 #' # Note
 #'
 #' Models with offset terms supplied via the `offset` argument to
@@ -440,9 +462,9 @@
     on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
   }
 
-  if (is.null(data)) {
-    data <- model[["model"]]
-  }
+  layout <- prediction_layout(model, data, na.action = list(...)$na.action %||% stats::na.pass)
+  model <- model_used_rows(model)
+  data <- layout$data
 
   scale <- match.arg(scale)
   method <- match.arg(method)
@@ -535,6 +557,7 @@
       names_transform = list(".draw" = as.integer)
     ) |>
     relocate(c(".row", ".draw", ".parameter"), .before = 1L)
+  sims <- restore_prediction_table(sims, layout)
   attr(sims, "seed") <- RNGstate
   ## add classes
   class(sims) <- c("fitted_samples", class(sims))

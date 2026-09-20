@@ -13,6 +13,19 @@
 #'   `newdata`, and `se.fit` are already used and passed on to
 #'   [mgcv::predict.gam()].
 #'
+#' @details
+#' With `data = NULL`, results follow the model's `na.action`: `na.exclude`
+#' restores excluded observations as `NA` fitted values, standard errors and
+#' interval bounds; `na.omit` returns only retained observations. Covariates
+#' unavailable in the stored model frame are restored as typed `NA` values.
+#' `.row` indexes the fitting data after any `subset` was applied.
+#'
+#' Supplying `data` requests predictions at those rows, independently of training
+#' exclusions. Missing responses do not prevent prediction. Missing required
+#' predictors produce `NA` results by default. An explicit `na.action` passed
+#' through `...` is honoured; with `na.omit`, `.row` retains the positions in the
+#' supplied data, rather than numbering the remaining rows consecutively.
+#'
 #' @note For most families, regardless of the scale on which the fitted values
 #'   are returned, the `se` component of the returned object is on the *link*
 #'   (*linear predictor*) scale, not the response scale. An exception is the
@@ -77,12 +90,9 @@
   }
   scale <- match.arg(scale)
 
-  if (is.null(data)) {
-    data <- delete_response(object, model_frame = FALSE) |>
-      as_tibble()
-  } else if (!is_tibble(data)) {
-    data <- as_tibble(data)
-  }
+  layout <- prediction_layout(object, data, na.action = list(...)$na.action %||% stats::na.pass)
+  object <- model_used_rows(object)
+  data <- as_tibble(layout$data)
 
   # handle special distributions that return more than vector fit & std. err.
   # find the name of the function that produces fitted values for this family
@@ -107,6 +117,18 @@
   if (identical(scale, "response")) {
     fit <- order_interval_bounds(fit)
   }
+  fit <- restore_prediction_table(fit, layout, include_data = TRUE)
+  if (layout$training) {
+    f <- formula(object)
+    if (!is.list(f)) f <- list(f)
+    response <- vapply(f, function(x) if (length(x) == 3L) {
+      if (is.symbol(x[[2L]])) as.character(x[[2L]]) else paste(deparse(x[[2L]]), collapse = "")
+    } else "", character(1L))
+    covariates <- as.character(attr(attr(object$model, "terms"), "variables"))[-1L]
+    remove <- c(response, setdiff(names(layout$data), covariates), "(weights)", "(offset)")
+    fit <- fit[, !names(fit) %in% remove, drop = FALSE]
+  }
+  attr(fit, "terms") <- NULL
   fit
 }
 

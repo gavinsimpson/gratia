@@ -172,6 +172,7 @@
 #' @importFrom stats model.frame model.response df.residual
 #' @export
 `appraise.lm` <- function(model, ...) {
+  model <- model_used_rows(model)
   r <- residuals(model)
   r.df <- df.residual(model)
   model[["sig2"]] <- sum((r - mean(r))^2) / r.df

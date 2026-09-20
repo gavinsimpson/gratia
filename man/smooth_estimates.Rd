@@ -89,6 +89,11 @@ the smooth should be evaluated can be supplied. \code{smooth_estimates()} is a n
 implementation of \code{evaluate_smooth()}, and replaces that function, which has
 been removed from the package.
 }
+\details{
+For explicit \code{data}, missing covariates needed by a smooth produce \code{NA}
+estimates and standard errors at those positions. Missing values in variables
+unrelated to that smooth do not discard its otherwise evaluable rows.
+}
 \examples{
 load_mgcv()
 \dontshow{

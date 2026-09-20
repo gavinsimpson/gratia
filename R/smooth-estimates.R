@@ -42,6 +42,11 @@
 #'
 #' @return A data frame (tibble), which is of class `"smooth_estimates"`.
 #'
+#' @details
+#' For explicit `data`, missing covariates needed by a smooth produce `NA`
+#' estimates and standard errors at those positions. Missing values in variables
+#' unrelated to that smooth do not discard its otherwise evaluable rows.
+#'
 #' @export
 #'
 #' @rdname smooth_estimates
@@ -335,7 +340,7 @@
       env = environment(smooth$form)
     )
   }
-  mgcv::PredictMat(smooth, data)
+  predict_mat_rows(smooth, data)
 }
 
 #' Evaluate a spline at provided covariate values
@@ -468,7 +473,7 @@
     smooth, data, model, V,
     ...) {
   # get values of smooth
-  X <- PredictMat(smooth, data) # prediction matrix
+  X <- predict_mat_rows(smooth, data) # prediction matrix
   off <- attr(X, "offset") # offset, if any
   if (is.null(off)) {
     off <- 0
@@ -796,7 +801,7 @@
     ## if this is a by variable, filter the by variable for the required
     ## level now
     if (is_factor_by_smooth(smooth)) {
-      data <- vec_slice(data, data[[by_var]] == by_level(smooth))
+      data <- vec_slice(data, is.na(data[[by_var]]) | data[[by_var]] == by_level(smooth))
     }
   }
   data

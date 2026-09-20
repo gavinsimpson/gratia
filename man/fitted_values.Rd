@@ -62,6 +62,19 @@ is the predicted probability for a single category of the response.
 \description{
 Generate fitted values from a estimated GAM
 }
+\details{
+With \code{data = NULL}, results follow the model's \code{na.action}: \code{na.exclude}
+restores excluded observations as \code{NA} fitted values, standard errors and
+interval bounds; \code{na.omit} returns only retained observations. Covariates
+unavailable in the stored model frame are restored as typed \code{NA} values.
+\code{.row} indexes the fitting data after any \code{subset} was applied.
+
+Supplying \code{data} requests predictions at those rows, independently of training
+exclusions. Missing responses do not prevent prediction. Missing required
+predictors produce \code{NA} results by default. An explicit \code{na.action} passed
+through \code{...} is honoured; with \code{na.omit}, \code{.row} retains the positions in the
+supplied data, rather than numbering the remaining rows consecutively.
+}
 \note{
 For most families, regardless of the scale on which the fitted values
 are returned, the \code{se} component of the returned object is on the \emph{link}

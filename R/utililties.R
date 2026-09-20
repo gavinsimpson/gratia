@@ -1381,7 +1381,7 @@ vars_from_label <- function(label) {
     terms(model[["pred.formula"]])
   }
   tt <- delete.response(tt)
-  out <- model.frame(tt, data = data)
+  out <- model.frame(tt, data = data, na.action = stats::na.pass)
 
   if (identical(model_frame, FALSE)) {
     attr(out, "terms") <- NULL
@@ -1870,6 +1870,7 @@ reclass_scam_smooth <- function(smooth) {
 #' @export
 #' @rdname dispersion
 `dispersion.glm` <- function(model, ...) {
+  model <- model_used_rows(model)
   f <- family(model)
   disp <- f$dispersion
   if (is.null(disp) || is.na(disp)) {
