@@ -45,6 +45,10 @@
 
 ## Bug Fixes
 
+* `worm_plot()` now honours `seed`, including when called through
+  `appraise(use_worm = TRUE)`, and restores the caller's random-number state
+  after seeded calls (#407).
+
 * `draw.rootogram()` now applies the square-root transformation when a custom
   y-axis label is supplied, keeping plotted frequencies independent of the
   label (#406).

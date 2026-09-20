@@ -26,6 +26,7 @@ worm_plot(model, ...)
   point_col = "grey20",
   point_alpha = 1,
   line_col = "red",
+  seed = NULL,
   ...
 )
 
@@ -96,6 +97,9 @@ interval when \code{method = "simulate"}.}
 \item{point_alpha}{alpha transparency of points on the QQ plot.}
 
 \item{line_col}{colour used to draw the reference line.}
+
+\item{seed}{numeric; the random number seed to use for \code{method = "simulate"}
+and \code{method = "uniform"}.}
 }
 \description{
 Worm plot of model residuals

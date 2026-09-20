@@ -872,8 +872,24 @@
   point_col = "grey20",
   point_alpha = 1,
   line_col = "red",
+  seed = NULL,
   ...
 ) {
+  if (!is.null(seed)) {
+    had_seed <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
+    if (had_seed) {
+      old_seed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
+    }
+    on.exit({
+      if (had_seed) {
+        assign(".Random.seed", old_seed, envir = .GlobalEnv)
+      } else if (exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+        rm(".Random.seed", envir = .GlobalEnv)
+      }
+    }, add = TRUE)
+    set.seed(seed)
+  }
+
   method <- match.arg(method) # what method for the QQ plot?
   if (identical(method, "direct")) {
     message("`method = \"direct\"` is deprecated, use `\"uniform\"`")
