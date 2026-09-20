@@ -83,6 +83,12 @@
 
 ### Bug Fixes
 
+- [`data_combos()`](https://gavinsimpson.github.io/gratia/reference/data_combos.md)
+  now honours `complete = FALSE`, returning only observed combinations
+  of factor levels while retaining typical continuous values and
+  variable selection. Fixes
+  [\#400](https://github.com/gavinsimpson/gratia/issues/400).
+
 - [`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md)
   now aligns focal variables and output labels with the selected
   multivariate smooths, including when univariate smooths are skipped.
