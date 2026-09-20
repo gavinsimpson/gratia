@@ -83,6 +83,12 @@
 
 ### Bug Fixes
 
+- [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md)
+  now honours custom cut points for ordinal responses and validates that
+  they are finite, strictly increasing, and consistent with the
+  requested integer number of categories
+  ([\#408](https://github.com/gavinsimpson/gratia/issues/408)).
+
 - [`worm_plot()`](https://gavinsimpson.github.io/gratia/reference/worm_plot.md)
   now honours `seed`, including when called through
   `appraise(use_worm = TRUE)`, and restores the caller’s random-number
