@@ -45,6 +45,9 @@
 
 ## Bug Fixes
 
+* `assemble()` and `draw()` now honour `terms` when selecting parametric
+  effects, while retaining the selected smooths (#368).
+
 * `variance_comp()` now handles variance components without confidence
   intervals, including default GCV fits, and returns a typed empty table when
   `mgcv::gam.vcomp()` returns no components (#377).
