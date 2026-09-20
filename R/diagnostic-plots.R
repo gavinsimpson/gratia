@@ -298,7 +298,7 @@
   }
   var_fun <- family[["variance"]] # variance function
   fit <- fitted(model)
-  prior_w <- weights(model, type = "prior")
+  prior_w <- diagnostic_weights(model)
   sigma2 <- model[["sig2"]]
   # I don't know why this is necessary as summary() doesn't seem to change
   # sig2, but at least stop it from doing expensive ranef tests
@@ -428,7 +428,7 @@
   }
   r <- residuals(model, type = type)
   fit <- fitted(model)
-  weights <- weights(model, type = "prior")
+  weights <- diagnostic_weights(model)
   sigma2 <- model[["sig2"]]
   # I don't know why this is necessary as summary() doesn't seem to change
   # sig2, but at least stop it from doing expensive ranef tests
@@ -992,17 +992,14 @@
   worm_plot.gam(model, ...)
 }
 
-#' @export
-`weights.lm` <- function(object, type = c("prior", "working"), ...) {
-  type <- match.arg(type)
-  wts <- if (type == "prior") {
-    object$prior.weights
-  } else {
-    object$weights
+# Internal weights for diagnostics; keep base lm dispatch unchanged.
+`diagnostic_weights` <- function(model) {
+  if (inherits(model, "glm")) {
+    return(stats::weights(model, type = "prior"))
   }
-  if (is.null(object$na.action)) {
-    wts
-  } else {
-    naresid(object$na.action, wts)
+  w <- stats::weights(model)
+  if (is.null(w)) {
+    w <- stats::napredict(model$na.action, rep(1, nrow(model.frame(model))))
   }
+  w
 }
