@@ -1181,7 +1181,7 @@
 
 #' @export
 `smooth_samples.gamm` <- function(model, ...) {
-  smooth_samples(model$gam)
+  smooth_samples(model$gam, ...)
 }
 
 #' @title Posterior expectations of derivatives from an estimated model
