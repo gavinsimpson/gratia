@@ -83,6 +83,13 @@
 
 ### Bug Fixes
 
+- [`variance_comp()`](https://gavinsimpson.github.io/gratia/reference/variance_comp.md)
+  now handles variance components without confidence intervals,
+  including default GCV fits, and returns a typed empty table when
+  [`mgcv::gam.vcomp()`](https://rdrr.io/pkg/mgcv/man/gam.vcomp.html)
+  returns no components
+  ([\#377](https://github.com/gavinsimpson/gratia/issues/377)).
+
 - [`rtw()`](https://gavinsimpson.github.io/gratia/reference/rtw.md) now
   assigns Gamma shapes to the correct observations when Tweedie power
   varies, including in `twlss` response simulation. Scalar parameters
