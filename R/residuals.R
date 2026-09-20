@@ -250,7 +250,7 @@
     bounds <- censored_response_bounds(y, discrete = ft == "cpois")
   } else {
     lower <- y
-    if (ft %in% c("poisson", "negative_binomial")) {
+    if (ft %in% c("poisson", "negative_binomial", "ziplss")) {
       lower <- y - 1
     } else if (ft == "binomial") {
       # The fitted response is a proportion; subtract one success, not one
