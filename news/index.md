@@ -83,6 +83,11 @@
 
 ### Bug Fixes
 
+- [`draw.rootogram()`](https://gavinsimpson.github.io/gratia/reference/draw.rootogram.md)
+  now applies the square-root transformation when a custom y-axis label
+  is supplied, keeping plotted frequencies independent of the label
+  ([\#406](https://github.com/gavinsimpson/gratia/issues/406)).
+
 - [`overview()`](https://gavinsimpson.github.io/gratia/reference/overview.md)
   now reports one degree of freedom per parametric coefficient, avoiding
   incorrect values and row-length errors for factors and models without
