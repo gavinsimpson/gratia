@@ -326,9 +326,6 @@ draw.parametric_effects <- function(object,
     )
   }
 
-  ## If constant supplied apply it to `est`
-  object <- add_constant(object, constant = constant, column = ".partial")
-
   ## add a CI
   if (!all(c(".upper_ci", ".lower_ci") %in% names(object))) {
     crit <- coverage_normal(ci_level)
@@ -337,6 +334,12 @@ draw.parametric_effects <- function(object,
       .upper_ci = .data$.partial + (crit * .data$.se)
     )
   }
+
+  # Shift estimates and intervals together, after creating any missing CI.
+  object <- add_constant(object,
+    constant = constant,
+    column = c(".partial", ".lower_ci", ".upper_ci")
+  )
 
   ## If fun supplied, use it to transform est and the upper and lower interval
   object <- transform_fun(object,

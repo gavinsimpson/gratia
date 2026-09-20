@@ -52,6 +52,9 @@
 * `compare_smooths()` now honours `unconditional = TRUE` when computing
   standard errors. Fixes #397.
 
+* Adding a constant to parametric effects now shifts estimates and confidence
+  intervals together, including when drawing or assembling plots. Fixes #398.
+
 * `fitted_values()` now computes correctly ordered confidence bounds for
   location-scale-shape, zero-inflated Poisson (`ziplss()`), and Tweedie
   location-scale-shape (`twlss()`) models. Response-scale intervals retain
