@@ -80,7 +80,7 @@
     select = select,
     n = n,
     data = data,
-    uncondtional = unconditional,
+    unconditional = unconditional,
     overall_uncertainty = overall_uncertainty,
     unnest = FALSE, partial_match = partial_match
   )
