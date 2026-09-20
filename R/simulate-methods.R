@@ -142,7 +142,7 @@
   }
 
   simulate(object$gam,
-    nsim = nsim, seed = seed, data = newdata,
+    nsim = nsim, seed = seed, data = data,
     weights = weights, ...
   )
 }
