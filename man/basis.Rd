@@ -132,6 +132,11 @@ Basis expansions from a definition of a smoother using the syntax of \emph{mgcv}
 smooths via \code{\link[mgcv:s]{mgcv::s()}}., \code{\link[mgcv:te]{mgcv::te()}}, \code{\link[mgcv:te]{mgcv::ti()}}, and \code{\link[mgcv:t2]{mgcv::t2()}}, or
 directly from a fitted GAM(M).
 }
+\details{
+When evaluating a fitted smooth at explicit data, missing covariates required
+by that smooth produce \code{NA} basis values. Missing values in other model
+variables do not discard otherwise evaluable rows.
+}
 \examples{
 load_mgcv()
 \dontshow{

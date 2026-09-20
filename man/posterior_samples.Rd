@@ -133,6 +133,15 @@ relates to,
 \description{
 Draw samples from the posterior distribution of an estimated model
 }
+\details{
+With no explicit \code{data}, observation rows follow the fitted model's
+\code{na.action}. \code{na.exclude} restores excluded rows as \code{NA} in every draw;
+\code{na.omit} returns retained rows only. \code{.row} indexes the fitting data after
+any \code{subset}. With explicit \code{data}, \code{.row} indexes that data, missing
+responses do not prevent prediction, and missing required predictors give
+\code{NA} draws. An explicit prediction \code{na.action} in \code{...} is honoured without
+renumbering retained rows. Restoration does not consume random numbers.
+}
 \section{Note}{
 Models with offset terms supplied via the \code{offset} argument to
 \code{\link[mgcv:gam]{mgcv::gam()}} etc. are ignored by \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}. As such, this

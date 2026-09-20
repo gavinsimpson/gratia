@@ -136,6 +136,11 @@ Expectations (fitted values) of the response drawn from the posterior
 distribution of fitted model using a Gaussian approximation to the
 posterior or a simple Metropolis Hastings sampler.
 }
+\details{
+Observation rows use the same missing-value convention as
+\code{\link[=posterior_samples]{posterior_samples()}}: default results restore \code{na.exclude} observations in
+every draw, while explicit \code{data} are evaluated in their own row order.
+}
 \section{Note}{
 Models with offset terms supplied via the \code{offset} argument to
 \code{\link[mgcv:gam]{mgcv::gam()}} etc. are ignored by \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}. As such, this

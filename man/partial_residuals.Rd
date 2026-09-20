@@ -30,6 +30,12 @@ against.}
 \description{
 Partial residuals
 }
+\details{
+With \code{na.exclude}, excluded observations are restored as \code{NA} partial
+residuals, in fitting order after any \code{subset}. With \code{na.omit}, only retained
+observations are returned. Computation uses aligned working residuals,
+working weights and term predictions before restoring excluded positions.
+}
 \examples{
 \dontshow{
 op <- options(pillar.sigfig = 4, cli.unicode = FALSE)

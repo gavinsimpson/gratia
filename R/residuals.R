@@ -4,6 +4,12 @@
 #'   class `"gam"` (or that inherit from that class) are supported.
 #' @param ... arguments passed to other methods.
 #'
+#' @details
+#' With `na.exclude`, excluded observations are restored as `NA` partial
+#' residuals, in fitting order after any `subset`. With `na.omit`, only retained
+#' observations are returned. Computation uses aligned working residuals,
+#' working weights and term predictions before restoring excluded positions.
+#'
 #' @export
 `partial_residuals` <- function(object, ...) {
   UseMethod("partial_residuals")
@@ -72,7 +78,9 @@
   sms <- sms[take] # subset to selected smooths
 
   ## compute partial resids
-  p_resids <- compute_partial_residuals(object, terms = sms)
+  p_resids <- restore_model_rows(
+    compute_partial_residuals(object, terms = sms), object
+  )
 
   ## cast as a tibble --- do something with the column names?
   ##  - they are non-standard: `s(x)` for example
@@ -98,32 +106,17 @@
 #' @importFrom stats residuals weights
 #' @importFrom tibble as_tibble
 `compute_partial_residuals` <- function(object, terms = NULL, data = NULL) {
-  ## weighted working residuals..., see #273
-  ## need the working weights too, see #273 for further discussion
-  w <- weights(object, type = "working")
-  ## need as.numeric for gamm() objects
-  w_resid <- as.numeric(residuals(object, "working")) * sqrt(w)
-
-  ## if data is null, just grab the $model out of object
-  if (is.null(data)) {
-    data <- object[["model"]]
-  } else {
-    ## check size of data
-    if (nrow(data) != length(w_resid)) {
-      stop("Length of model residuals not equal to number of rows in 'data'",
-        call. = FALSE
-      )
-    }
-  }
-  ## get the contributions for each selected smooth
-  p_terms <- if (is.null(terms)) {
-    predict(object, type = "terms", newdata = data)
-  } else {
-    predict(object, type = "terms", terms = terms, newdata = data)
-  }
-  attr(p_terms, "constant") <- NULL # remove intercept attribute
-  ## and compute partial residuals
+  used <- model_used_rows(object)
+  w <- weights(used, type = "working")
+  w_resid <- as.numeric(residuals(used, "working")) * sqrt(w)
+  # Evaluate terms on the same retained observations as the residuals.
+  p_terms <- predict(used, type = "terms", terms = terms,
+                     newdata = used$model)
+  attr(p_terms, "constant") <- NULL
   p_resids <- p_terms + w_resid
+  if (!is.null(data)) {
+    p_resids <- residual_rows(p_resids, object, data, partial = TRUE)
+  }
 
   as_tibble(p_resids)
 }
@@ -187,10 +180,11 @@
     on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
   }
 
+  used <- model_used_rows(model)
   r <- do_quantile_residuals(
-    y = model$y,
-    fv = model$fitted.values,
-    wt = model$prior.weights,
+    y = used$y,
+    fv = used$fitted.values,
+    wt = used$prior.weights,
     scale = model$sig2,
     fam = family(model),
     type = type
@@ -218,10 +212,11 @@
     on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
   }
 
+  used <- model_used_rows(model)
   r <- do_quantile_residuals(
-    y = model$y,
-    fv = model$fitted.values,
-    wt = model$prior.weights,
+    y = used$y,
+    fv = used$fitted.values,
+    wt = used$prior.weights,
     scale = summary(model)$dispersion,
     fam = family(model),
     type = type

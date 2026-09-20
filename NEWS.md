@@ -1,5 +1,14 @@
 # gratia (development version)
 
+## User visible changes
+
+* For models fitted with `na.exclude`, default fitted values, partial residuals,
+  fitted and posterior samples, and simulations now restore excluded rows as
+  `NA`, while diagnostics correctly align the retained observations (#349).
+  Explicit prediction data preserve row positions by default, with missing
+  required predictors yielding `NA` results and missing responses alone not
+  preventing prediction.
+
 ## New features
 
 * `draw()` for penalty matrices now accepts `geom = "tile"` to draw individual

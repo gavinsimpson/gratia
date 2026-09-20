@@ -231,7 +231,8 @@
     )
   }
   ## add point layer
-  plt <- plt + geom_point(colour = point_col, alpha = point_alpha)
+  plt <- plt + geom_point(colour = point_col, alpha = point_alpha,
+      data = function(d) d[stats::complete.cases(d), , drop = FALSE])
   ## add labels
   plt <- plt + labs(
     title = title, subtitle = subtitle, caption = caption,
@@ -254,6 +255,7 @@
 #' @rdname qq_plot
 #' @importFrom stats df.residual
 `qq_plot.lm` <- function(model, ...) {
+  model <- model_used_rows(model)
   r <- residuals(model)
   r.df <- df.residual(model)
   model[["sig2"]] <- sum((r - mean(r))^2) / r.df
@@ -271,6 +273,7 @@
 `qq_simulate` <- function(model, n = 50,
                           type = c("deviance", "response", "pearson"),
                           level = 0.9, detrend = FALSE) {
+  model <- model_used_rows(model)
   type <- match.arg(type)
   family <- family(model)
   family <- fix_family_rd(family)
@@ -377,6 +380,7 @@
     pnorm_z <- pnorm(z)
     sqrt(pnorm_z * (1 - pnorm_z) / n) / dnorm(z)
   }
+  model <- model_used_rows(model)
   type <- match.arg(type)
   r <- residuals(model, type = type)
   nr <- length(r)
@@ -409,6 +413,7 @@
 `qq_uniform` <- function(model, n = 10,
                          type = c("deviance", "response", "pearson"),
                          level = 0.9, detrend = FALSE) {
+  model <- model_used_rows(model)
   type <- match.arg(type)
   family <- family(model) # extract family
   family <- fix_family_qf(family) # add quantile fun to family
@@ -597,6 +602,8 @@
   line_col = "red",
   seed = NULL
 ) {
+  original <- model
+  model <- model_used_rows(model)
   type <- match.arg(type)
   y_intercept <- 0
   if (type %in% c("pit", "quantile")) {
@@ -609,11 +616,12 @@
     r <- residuals(model, type = type)
     y_intercept <- 0
   }
+  r <- restore_model_rows(r, original)
   mv_y <- family_name(model) %in% multivariate_y()
   if (is.matrix(r) && mv_y) { # handle mvn() like fits
     r <- as.vector(r)
   }
-  eta <- model[["linear.predictors"]]
+  eta <- restore_model_rows(model[["linear.predictors"]], original)
   if (is.matrix(eta) && mv_y) {
     eta <- as.vector(eta) # handle multinom(), mvn() like fits
   }
@@ -632,7 +640,8 @@
     geom_hline(yintercept = y_intercept, col = line_col)
 
   ## add point layer
-  plt <- plt + geom_point(colour = point_col, alpha = point_alpha)
+  plt <- plt + geom_point(colour = point_col, alpha = point_alpha,
+      data = function(d) d[stats::complete.cases(d), , drop = FALSE])
 
   ## add labels
   if (is.null(xlab)) {
@@ -674,7 +683,9 @@
   point_alpha = 1
 ) {
   ## extract data for plot
-  fit <- fitted(model)
+  original <- model
+  model <- model_used_rows(model)
+  fit <- restore_model_rows(fitted(model), original)
   ## handle case where fitted is a matrix; extended.families
   ##   - the needs to be more involved as what about mvn or multinom families
   mv_y <- family_name(model) %in% multivariate_y()
@@ -685,7 +696,9 @@
       fit[, 1]
     }
   }
-  obs <- as.vector(model[["y"]]) # also for mvn, etc
+  obs <- model[["y"]]
+  if (is.null(obs)) obs <- stats::model.response(stats::model.frame(model))
+  obs <- as.vector(restore_model_rows(obs, original))
 
   df <- data.frame(observed = obs, fitted = fit)
 
@@ -696,7 +709,8 @@
   ))
 
   ## add point layer
-  plt <- plt + geom_point(colour = point_col, alpha = point_alpha)
+  plt <- plt + geom_point(colour = point_col, alpha = point_alpha,
+      data = function(d) d[stats::complete.cases(d), , drop = FALSE])
 
   ## add labels
   if (is.null(xlab)) {
@@ -742,13 +756,16 @@
   seed = NULL
 ) {
   ## extract data for plot
+  original <- model
+  model <- model_used_rows(model)
   type <- match.arg(type)
 
   if (type %in% c("pit", "quantile")) {
     r <- quantile_residuals(model, type = type, seed = seed)
   } else {
-    r <- as.vector(residuals(model, type = type))
+    r <- residuals(model, type = type)
   }
+  r <- as.vector(restore_model_rows(r, original))
   df <- data.frame(residuals = r)
 
   ## work out number of bins
@@ -776,6 +793,7 @@
 
   ## add point layer
   plt <- plt + geom_histogram(
+    data = function(d) d[!is.na(d$residuals), , drop = FALSE],
     bins = n_bins,
     colour = "white",
     fill = "grey20", #"grey80",
@@ -970,7 +988,8 @@
   }
 
   ## add point layer
-  plt <- plt + geom_point(colour = point_col, alpha = point_alpha)
+  plt <- plt + geom_point(colour = point_col, alpha = point_alpha,
+      data = function(d) d[stats::complete.cases(d), , drop = FALSE])
 
   ## add labels
   plt <- plt + labs(
@@ -996,6 +1015,7 @@
 #' @importFrom stats df.residual
 #' @export
 `worm_plot.lm` <- function(model, ...) {
+  model <- model_used_rows(model)
   r <- residuals(model)
   r.df <- df.residual(model)
   model[["sig2"]] <- sum((r - mean(r))^2) / r.df

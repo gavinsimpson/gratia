@@ -72,6 +72,14 @@ distribution used when fitting the model.
 For \code{simulate.gam()} to function, the \code{family} component of the fitted
 model must contain, or be updatable to contain, the required random
 number generator. See \code{\link[mgcv:fix.family.link]{mgcv::fix.family.rd()}}.
+
+With \code{data = NULL}, \code{na.exclude} restores excluded observations as \code{NA} in
+every simulation; \code{na.omit} returns retained observations only. Positions
+refer to the fitting data after any \code{subset}. Explicit \code{data} are evaluated
+independently of training exclusions: missing responses do not prevent
+simulation, while missing required predictors or weights yield \code{NA}.
+Prediction \code{na.action} in \code{...} is honoured. Missing rows are never passed
+to the response random-number generator.
 }
 \examples{
 load_mgcv()

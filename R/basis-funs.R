@@ -42,6 +42,11 @@
 #'
 #' @author Gavin L. Simpson
 #'
+#' @details
+#' When evaluating a fitted smooth at explicit data, missing covariates required
+#' by that smooth produce `NA` basis values. Missing values in other model
+#' variables do not discard otherwise evaluable rows.
+#'
 #' @export
 #'
 #' @importFrom mgcv smoothCon
@@ -409,7 +414,7 @@
     }
     tbl <- smooth[["X"]] # extract the model matrix
   } else {
-    tbl <- PredictMat(smooth, data = at)
+    tbl <- predict_mat_rows(smooth, data = at)
     data <- at
     if (!is.null(coefs)) {
       # nc <- NCOL(tbl)
@@ -435,7 +440,7 @@
   if (is_by_fac) {
     by_var <- by_variable(smooth)
     by_lev <- by_level(smooth)
-    take <- data[[by_var]] == by_lev
+    take <- is.na(data[[by_var]]) | data[[by_var]] == by_lev
     tbl <- tbl[take, ]
     data <- data[take, ]
   }

@@ -54,7 +54,8 @@
 `add_fitted.gam` <- function(data, model, value = ".fitted", type = "response",
                              ...) {
   ## coerce to tibble
-  data <- as_tibble(data)
+  layout <- prediction_layout(model, data, na.action = list(...)$na.action %||% stats::na.pass)
+  data <- as_tibble(layout$data)
 
   ## predict using the predict method
   pred_vals <- predict(model, newdata = data, type = type, ...)
@@ -81,13 +82,19 @@
     )
   }
 
+  data$.row <- seq_len(NROW(data))
+  data <- restore_prediction_table(data, layout, include_data = TRUE)
+  if (!".row" %in% names(layout$output_data)) data$.row <- NULL
+
   data
 }
 
 #' Add residuals from a model to a data frame
 #'
 #' @param data a data frame containing values for the variables used to fit the
-#'   model. Passed to [stats::residuals()] as `newdata`.
+#'   model, in fitting order. Supply either the retained fitting rows or, for
+#'   `na.exclude`, the original fitting rows after any `subset`. This does not
+#'   compute residuals for new or reordered observations.
 #' @param model a fitted model for which a [stats::residuals()] method is
 #'   available. S3 method dispatch is performed on the `model` argument.
 #' @param value character; the name of the variable in which model residuals
@@ -138,14 +145,8 @@
   data <- as_tibble(data)
 
   ## predict using the predict method
-  resid_vals <- residuals(model, type = type, ...)
-
-  ## check that the number of data rows equals length of residuals
-  if (nrow(data) != length(resid_vals)) {
-    stop("Length of model residuals does not equal number of rows in 'data'",
-      call. = FALSE
-    )
-  }
+  resid_vals <- residuals(model_used_rows(model), type = type, ...)
+  resid_vals <- residual_rows(resid_vals, model, data)
 
   data <- add_column(data, !!value := drop(resid_vals), .after = ncol(data))
 
@@ -155,7 +156,9 @@
 #' Add partial residuals
 #'
 #' @param data a data frame containing values for the variables used to fit the
-#'   model. Passed to [stats::residuals()] as `newdata`.
+#'   model, in fitting order. Supply either the retained fitting rows or, for
+#'   `na.exclude`, the original fitting rows after any `subset`. This does not
+#'   compute residuals for new or reordered observations.
 #' @param model a fitted model for which a [stats::residuals()] method is
 #'   available. S3 method dispatch is performed on the `model` argument.
 #' @param ... arguments passed to other methods.

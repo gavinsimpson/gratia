@@ -11,7 +11,9 @@ add_partial_residuals(data, model, ...)
 }
 \arguments{
 \item{data}{a data frame containing values for the variables used to fit the
-model. Passed to \code{\link[stats:residuals]{stats::residuals()}} as \code{newdata}.}
+model, in fitting order. Supply either the retained fitting rows or, for
+\code{na.exclude}, the original fitting rows after any \code{subset}. This does not
+compute residuals for new or reordered observations.}
 
 \item{model}{a fitted model for which a \code{\link[stats:residuals]{stats::residuals()}} method is
 available. S3 method dispatch is performed on the \code{model} argument.}
