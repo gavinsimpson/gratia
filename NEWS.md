@@ -45,6 +45,10 @@
 
 ## Bug Fixes
 
+* `quantile_residuals()` now restores excluded observations as `NA` for models
+  fitted with `na.exclude`, keeping residual diagnostics aligned with predictors.
+  Histogram bin selection now handles these missing residuals (#402).
+
 * `data_combos()` now honours `complete = FALSE`, returning only observed
   combinations of factor levels while retaining typical continuous values and
   variable selection. Fixes #400.

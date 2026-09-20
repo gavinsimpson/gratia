@@ -27,6 +27,9 @@ computed using the current state of the random number generator.}
 Randomised residuals
 }
 \details{
+With \code{na.exclude}, excluded observations are restored as \code{NA} residuals;
+with \code{na.omit}, only model-used observations are returned.
+
 For \code{mgcv::cnorm()}, \code{mgcv::clog()}, and \code{mgcv::cpois()} models, censored
 observations have PIT residuals sampled uniformly between \code{F(l)} and \code{F(u)},
 where \code{l} and \code{u} bound the censoring interval and \code{F} is the fitted latent

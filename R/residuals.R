@@ -138,6 +138,9 @@
 #'   computed using the current state of the random number generator.
 #' @param ... arguments passed to other methods.
 #' @details
+#' With `na.exclude`, excluded observations are restored as `NA` residuals;
+#' with `na.omit`, only model-used observations are returned.
+#'
 #' For `mgcv::cnorm()`, `mgcv::clog()`, and `mgcv::cpois()` models, censored
 #' observations have PIT residuals sampled uniformly between `F(l)` and `F(u)`,
 #' where `l` and `u` bound the censoring interval and `F` is the fitted latent
@@ -194,7 +197,7 @@
   )
 
   # return
-  r
+  stats::naresid(stats::na.action(model), r)
 }
 
 #' @export
@@ -224,7 +227,7 @@
     type = type
   )
 
-  r
+  stats::naresid(stats::na.action(model), r)
 }
 
 `do_quantile_residuals` <- function(
