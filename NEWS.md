@@ -2,6 +2,9 @@
 
 ## New features
 
+* `draw()` for penalty matrices now accepts `geom = "tile"` to draw individual
+  rectangles, while retaining `geom = "raster"` as the default (#392).
+
 * Quantile residuals use log probabilities in the smaller tail for families
   with native log-tail CDF support, including Poisson, negative binomial, and
   the censored families. This avoids numerical infinities without clipping
@@ -44,9 +47,6 @@
   families.
 
 ## Bug Fixes
-
-* `draw()` for penalty matrices now accepts `geom = "tile"` to draw individual
-  rectangles, while retaining `geom = "raster"` as the default (#392).
 
 * `assemble()` and `draw()` now honour `terms` when selecting parametric
   effects, while retaining the selected smooths (#368).
