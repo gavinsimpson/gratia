@@ -75,6 +75,10 @@
   `unconditional`. These intervals exclude overall-mean uncertainty, as
   documented (GRA-005).
 
+* `confint.gam()` now correctly computes simultaneous intervals when multiple 
+  smooths are requested. Previously, it passed the full selection to a helper 
+  expecting a single smooth, causing an error (GRA-006).
+
 # gratia 0.11.2
 
 ## User visible changes
