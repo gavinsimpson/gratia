@@ -83,6 +83,11 @@
 
 ### Bug Fixes
 
+- [`fixed_effects()`](https://gavinsimpson.github.io/gratia/reference/fixed_effects.gam.md)
+  now excludes smooth coefficients using their model indices, so
+  tensor-product smooth coefficients no longer appear as parametric
+  effects ([\#403](https://github.com/gavinsimpson/gratia/issues/403)).
+
 - [`quantile_residuals()`](https://gavinsimpson.github.io/gratia/reference/quantile_residuals.md)
   now restores excluded observations as `NA` for models fitted with
   `na.exclude`, keeping residual diagnostics aligned with predictors.
