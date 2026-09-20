@@ -83,6 +83,12 @@
 
 ### Bug Fixes
 
+- Loading *gratia* no longer changes
+  [`weights()`](https://rdrr.io/r/stats/weights.html) dispatch for
+  linear models. QQ and worm plot diagnostics now use an internal helper
+  that preserves observation weights and excluded rows
+  ([\#404](https://github.com/gavinsimpson/gratia/issues/404)).
+
 - [`fixed_effects()`](https://gavinsimpson.github.io/gratia/reference/fixed_effects.gam.md)
   now excludes smooth coefficients using their model indices, so
   tensor-product smooth coefficients no longer appear as parametric
