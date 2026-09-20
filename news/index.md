@@ -88,6 +88,11 @@
 
 ### Bug Fixes
 
+- [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+  now uses the fitted coefficient order for random-effect interactions
+  fitted with `bam(discrete = TRUE)`, correcting estimates and standard
+  errors ([\#387](https://github.com/gavinsimpson/gratia/issues/387)).
+
 - [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
   and
   [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
