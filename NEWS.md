@@ -45,6 +45,10 @@
 
 ## Bug Fixes
 
+* `fixed_effects()` now excludes smooth coefficients using their model indices,
+  so tensor-product smooth coefficients no longer appear as parametric effects
+  (#403).
+
 * `quantile_residuals()` now restores excluded observations as `NA` for models
   fitted with `na.exclude`, keeping residual diagnostics aligned with predictors.
   Histogram bin selection now handles these missing residuals (#402).
