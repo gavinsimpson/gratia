@@ -28,12 +28,10 @@
 #' }
 `fixed_effects.gam` <- function(object, ...) {
   coefs <- coef(object)
-  nms <- names(coefs)
-  # drop everything that starts with s, te, ti, or t2 and is followed by a (
-  sm_terms <- grepl("^[s te ti t2](?=\\()", names(coef(object)), perl = TRUE)
-  nms <- nms[!sm_terms]
-  # return
-  coefs[nms]
+  smooth_idx <- unlist(lapply(object$smooth, function(sm) {
+    seq.int(sm$first.para, sm$last.para)
+  }), use.names = FALSE)
+  coefs[setdiff(seq_along(coefs), smooth_idx)]
 }
 
 #' @rdname fixed_effects.gam
