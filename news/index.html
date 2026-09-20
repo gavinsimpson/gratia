@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-17</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-19</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,6 +63,8 @@
 <li><p><code><a href="../reference/confint.gam.html">confint.gam()</a></code> now uses consistent covariance and standard errors when computing simultaneous intervals, respecting <code>frequentist</code> and <code>unconditional</code>. These intervals exclude overall-mean uncertainty, as documented (GRA-005).</p></li>
 <li><p><code><a href="../reference/confint.gam.html">confint.gam()</a></code> now correctly computes simultaneous intervals when multiple smooths are requested. Previously, it passed the full selection to a helper expecting a single smooth, causing an error (GRA-006).</p></li>
 <li><p>Quantile residuals for <code><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html" class="external-link">ziplss()</a></code> models are now randomised over the probability mass of each observed count. Previously, randomisation was skipped, potentially distorting residual diagnostics (GRA-007).</p></li>
+<li><p><code><a href="../reference/simulate.html">simulate.gamm()</a></code> now respects the supplied <code>data</code> argument, while <code>smooth_samples.gamm()</code> and <code>overview.gamm()</code> now forward additional arguments to their underlying GAM methods. Previously, these arguments were silently ignored (GRA-008).</p></li>
+<li><p>Fixed smooth selection in <code><a href="../reference/derivatives.html">derivatives()</a></code> and <code><a href="../reference/partial_derivatives.html">partial_derivatives()</a></code> to avoid logical-index recycling warnings under R-devel. Excluding random-effect or unsupported smooths now preserves the correct selected smooths.</p></li>
 </ul></div>
 </div>
     <div class="section level2">

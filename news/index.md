@@ -135,6 +135,20 @@
   Previously, randomisation was skipped, potentially distorting residual
   diagnostics (GRA-007).
 
+- [`simulate.gamm()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
+  now respects the supplied `data` argument, while
+  `smooth_samples.gamm()` and `overview.gamm()` now forward additional
+  arguments to their underlying GAM methods. Previously, these arguments
+  were silently ignored (GRA-008).
+
+- Fixed smooth selection in
+  [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md)
+  and
+  [`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md)
+  to avoid logical-index recycling warnings under R-devel. Excluding
+  random-effect or unsupported smooths now preserves the correct
+  selected smooths.
+
 ## gratia 0.11.2
 
 CRAN release: 2026-02-07
