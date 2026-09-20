@@ -70,6 +70,11 @@
   combinations and mismatched prediction grids now produce informative errors;
   comparisons at a single location also work. Fixes audit finding GRA-004.
 
+* `confint.gam()` now uses consistent covariance and standard errors when
+  computing simultaneous intervals, respecting `frequentist` and
+  `unconditional`. These intervals exclude overall-mean uncertainty, as
+  documented (GRA-005).
+
 # gratia 0.11.2
 
 ## User visible changes
