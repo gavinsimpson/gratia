@@ -20,3 +20,9 @@ Simulate random deviates from a Tweedie distribution with given parameters
 \eqn{\mu}{mu}, \eqn{p}{p}, and \eqn{\phi}{phi}. Works with vector values for
 all parameters, unlike the version on \emph{mgcv}.
 }
+\details{
+Parameters must be finite numeric vectors of length one or a common nonzero
+length. Length-one parameters are expanded to the common length; partial
+recycling is not supported. If all parameters are empty, an empty numeric
+vector is returned; mixing empty and nonempty parameters is an error.
+}

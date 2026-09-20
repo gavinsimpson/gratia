@@ -45,6 +45,11 @@
 
 ## Bug Fixes
 
+* `rtw()` now assigns Gamma shapes to the correct observations when Tweedie
+  power varies, including in `twlss` response simulation. Scalar parameters
+  are expanded consistently, and incompatible lengths or nonfinite inputs
+  are rejected (#409).
+
 * `data_sim()` now honours custom cut points for ordinal responses and
   validates that they are finite, strictly increasing, and consistent with
   the requested integer number of categories (#408).

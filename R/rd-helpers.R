@@ -35,11 +35,33 @@
 #' @param phi numeric vector of values for the scale parameter \eqn{\phi}{phi}
 #'   of the Tweedie distribution.
 #'
+#' @details
+#' Parameters must be finite numeric vectors of length one or a common nonzero
+#' length. Length-one parameters are expanded to the common length; partial
+#' recycling is not supported. If all parameters are empty, an empty numeric
+#' vector is returned; mixing empty and nonempty parameters is an error.
+#'
 #' @export
 #' @importFrom stats rpois rgamma
 #' @importFrom tibble new_tibble
 #' @importFrom vctrs vec_group_loc vec_chop df_list
 `rtw` <- function(mu, p, phi) {
+  pars <- list(mu = mu, p = p, phi = phi)
+  lens <- lengths(pars)
+  size <- max(lens)
+  if (size == 0L && all(lens == 0L)) {
+    return(numeric())
+  }
+  if (any(lens == 0L) || any(!lens %in% c(1L, size))) {
+    stop("Parameters must have length 1 or a common nonzero length.")
+  }
+  if (any(!vapply(pars, function(x) is.numeric(x) && all(is.finite(x)),
+                 logical(1)))) {
+    stop("Parameters must be finite numeric vectors.")
+  }
+  mu <- rep_len(mu, size)
+  p <- rep_len(p, size)
+  phi <- rep_len(phi, size)
   if (any(p <= 1 | p >= 2)) {
     stop("'p' must be in interval (1, 2)")
   }
@@ -53,10 +75,13 @@
   shape <- (2 - p) / (p - 1)
   scale <- phi * (p - 1) * mu^(p - 1)
   n <- rpois(length(lambda), lambda)
+  if (all(n == 0)) {
+    return(numeric(length(n)))
+  }
   gs <- rep(scale, n)
   tab <- new_tibble(
     df_list(
-      y = rgamma(gs * 0 + 1, shape = shape, scale = gs),
+      y = rgamma(gs * 0 + 1, shape = rep(shape, n), scale = gs),
       lab = rep(seq_along(n), n)
     )
   )
