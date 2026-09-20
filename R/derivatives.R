@@ -949,7 +949,7 @@
   # the names of the variables and set the first to be the focal variable
   if (is.null(focal)) {
     focal <- vapply(
-      object[["smooth"]],
+      object[["smooth"]][smooth_ids],
       function(s) {
         smooth_variable(s)[1L]
       }, character(1L)
@@ -969,6 +969,19 @@
           "x" = "Your supplied {.var focal} was length: {.strong {length(focal)}}"
         )
       )
+    }
+  }
+
+  if (!is.character(focal) || anyNA(focal)) {
+    cli_abort("{.arg focal} must be a character vector without missing values.")
+  }
+  for (i in seq_along(smooth_ids)) {
+    sm <- object[["smooth"]][[smooth_ids[[i]]]]
+    if (!focal[[i]] %in% smooth_variable(sm)) {
+      cli_abort(paste0(
+        "Focal variable {.val {focal[[i]]}} is not in smooth ",
+        "{.val {smooths(object)[smooth_ids[[i]]]}}."
+      ))
     }
   }
 
@@ -1007,12 +1020,13 @@
 
   ## loop over the smooths and compute derivatives from finite differences
   for (i in seq_along(smooth_ids)) {
+    focal_i <- focal[[i]]
     ## generate data if not supplied
     if (need_data) {
       newd <- derivative_data(object,
         id = smooth_ids[[i]], n = n,
         offset = offset, order = order,
-        type = type, eps = eps, focal = focal
+        type = type, eps = eps, focal = focal_i
       )
     } else {
       ## assume the data are OK - mgcv::predict will catch issues
@@ -1027,18 +1041,13 @@
         newd, function(x) length(unique(x)),
         integer(1L)
       )
-      if (is.null(focal)) {
-        focal <- names(newd)[which(n_unique > 1L)]
-      } else {
-        # and that the others are not varying
-        bad <- n_unique[setdiff(names(newd), focal)] > 1L
-        if (any(bad)) {
-          stop(
-            "For partial derivatives only 'focal' can be varying ",
-            "in 'data'. Problematic variables:",
-            paste(n_unique[bad], collapse = ", ")
-          )
-        }
+      bad <- setdiff(names(newd)[n_unique > 1L], focal_i)
+      if (length(bad)) {
+        stop(
+          "For partial derivatives only 'focal' can be varying ",
+          "in 'data'. Problematic variables: ",
+          paste(bad, collapse = ", ")
+        )
       }
     }
 
@@ -1046,7 +1055,7 @@
     #   derivatives or the required type
     fd <- finite_diff_lpmatrix(object,
       type = type, order = order,
-      data = newd, h = eps, focal = focal
+      data = newd, h = eps, focal = focal_i
     )
 
     ## compute the finite differences
@@ -1055,7 +1064,7 @@
     ## compute derivatives
     d <- compute_derivative(smooth_ids[[i]],
       lpmatrix = X, betas = betas,
-      Vb = Vb, model = object, data = newd, focal = focal
+      Vb = Vb, model = object, data = newd, focal = focal_i
     )
 
     ## compute intervals
@@ -1071,6 +1080,7 @@
         ncores = ncores
       )
     }
+    result[[i]] <- add_column(result[[i]], .focal = focal_i, .after = 1L)
   }
 
   ## results in a list of tibbles that we need to bind row-wise
@@ -1081,14 +1091,10 @@
     rename(.partial_deriv = ".derivative") |>
     relocate(
       any_of(c(
-        ".smooth", ".by", ".fs",
+        ".smooth", ".focal", ".by", ".fs",
         ".partial_deriv", ".se", ".crit", ".lower_ci", ".upper_ci"
       )),
       .before = 1
-    ) |>
-    add_column(
-      .focal = rep(focal, nrow(result) / n_sm),
-      .after = 1L
     )
 
   class(result) <- c(

@@ -45,6 +45,10 @@
 
 ## Bug Fixes
 
+* `partial_derivatives()` now aligns focal variables and output labels with
+  the selected multivariate smooths, including when univariate smooths are
+  skipped. Fixes #396.
+
 * `fitted_values()` now computes correctly ordered confidence bounds for
   location-scale-shape, zero-inflated Poisson (`ziplss()`), and Tweedie
   location-scale-shape (`twlss()`) models. Response-scale intervals retain
