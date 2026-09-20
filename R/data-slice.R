@@ -571,7 +571,7 @@
   if (any(is_fac)) { # drop factor from typical values
     tv <- tv[, !is_fac]
   }
-  fc <- factor_combos(object)
+  fc <- factor_combos(object, complete = complete)
   tbl <- expand_grid(fc, tv)
 
   # include/exclude any terms?

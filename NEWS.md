@@ -45,6 +45,10 @@
 
 ## Bug Fixes
 
+* `data_combos()` now honours `complete = FALSE`, returning only observed
+  combinations of factor levels while retaining typical continuous values and
+  variable selection. Fixes #400.
+
 * `partial_derivatives()` now aligns focal variables and output labels with
   the selected multivariate smooths, including when univariate smooths are
   skipped. Fixes #396.
