@@ -45,6 +45,9 @@
 
 ## Bug Fixes
 
+* `draw()` for penalty matrices now accepts `geom = "tile"` to draw individual
+  rectangles, while retaining `geom = "raster"` as the default (#392).
+
 * `assemble()` and `draw()` now honour `terms` when selecting parametric
   effects, while retaining the selected smooths (#368).
 
