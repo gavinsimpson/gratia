@@ -337,7 +337,7 @@
       object,
       across(
         any_of(c(
-          "partial", "lower", "upper", ".estimate",
+          "partial", ".partial", "lower", "upper", ".estimate",
           ".lower_ci", ".upper_ci"
         )),
         .fns = ~ .x + constant
