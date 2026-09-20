@@ -755,9 +755,9 @@
   if (is.character(n_bins)) {
     n_bins <- match.arg(n_bins)
     n_bins <- switch(n_bins,
-      sturges = nclass.Sturges(df[["residuals"]]),
-      scott   = nclass.scott(df[["residuals"]]),
-      fd      = nclass.FD(df[["residuals"]])
+      sturges = nclass.Sturges(stats::na.omit(df[["residuals"]])),
+      scott   = nclass.scott(stats::na.omit(df[["residuals"]])),
+      fd      = nclass.FD(stats::na.omit(df[["residuals"]]))
     )
     n_bins <- n_bins + 2
   }
