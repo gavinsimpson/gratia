@@ -522,6 +522,15 @@ Instead, use the data argument `data`.\n"
 })
 
 ## tests for models with random effects
+test_that("derivatives preserves noncontiguous selections when excluding random effects", {
+  selected <- smooths(rm1)[c(1, 3)]
+  expected <- derivatives(rm1, select = selected[2], n = 10)
+
+  expect_silent(actual <- derivatives(rm1, select = selected, n = 10))
+  expect_identical(unique(actual$.smooth), selected[2])
+  expect_equal(actual, expected)
+})
+
 test_that("derivatives works with models that include random effects", {
   expect_silent(d <- derivatives(rm1))
   expect_s3_class(d, "derivatives")

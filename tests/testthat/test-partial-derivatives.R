@@ -21,6 +21,25 @@ m_partial_deriv <- bam(
 )
 
 # partial derivatives
+test_that("partial derivatives filters excluded smooths at their original positions", {
+  model <- gam(
+    y ~ s(x1, k = 4) + te(x1, x2, k = c(4, 4)) +
+      s(x2, k = 4) + s(z2, bs = "re"),
+    data = df, method = "REML"
+  )
+  labels <- smooths(model)
+  expected <- partial_derivatives(model, select = labels[2], focal = "x1", n = 10)
+
+  # Exclude a univariate smooth and a random effect in separate selections.
+  for (excluded in c(3, 4)) {
+    expect_silent(actual <- partial_derivatives(
+      model, select = labels[c(2, excluded)], focal = "x1", n = 10
+    ))
+    expect_identical(unique(actual$.smooth), labels[2])
+    expect_equal(actual, expected)
+  }
+})
+
 test_that("partial derivatives works with single data point", {
   # data slice through te(x,z) holding z == 0.4
   ds <- data_slice(su_m_bivar_te, x = 0.0204313075, z = 0.4)

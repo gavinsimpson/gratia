@@ -142,7 +142,7 @@
     ## need to skip random effect smooths
     take <- vapply(object$smooth[sms], smooth_type, character(1)) %in%
       "Random effect"
-    sms[take] <- FALSE
+    sms[which(sms)[take]] <- FALSE
     which(sms)
   } else {
     s <- seq_len(n_smooths(object))
@@ -900,7 +900,7 @@
       "Random effect"
     # need to check that the selected smooths are multivariate
     mv_sm <- vapply(object$smooth[sms], smooth_dim, integer(1)) < 2L
-    sms[take | mv_sm] <- FALSE
+    sms[which(sms)[take | mv_sm]] <- FALSE
     which(sms)
   } else {
     seq_len(n_smooths(object))
