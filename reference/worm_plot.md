@@ -25,6 +25,7 @@ worm_plot(
   point_col = "grey20",
   point_alpha = 1,
   line_col = "red",
+  seed = NULL,
   ...
 )
 
@@ -136,6 +137,11 @@ worm_plot(model, ...)
 - line_col:
 
   colour used to draw the reference line.
+
+- seed:
+
+  numeric; the random number seed to use for `method = "simulate"` and
+  `method = "uniform"`.
 
 ## Note
 

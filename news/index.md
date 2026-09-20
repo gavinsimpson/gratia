@@ -83,6 +83,12 @@
 
 ### Bug Fixes
 
+- [`worm_plot()`](https://gavinsimpson.github.io/gratia/reference/worm_plot.md)
+  now honours `seed`, including when called through
+  `appraise(use_worm = TRUE)`, and restores the caller’s random-number
+  state after seeded calls
+  ([\#407](https://github.com/gavinsimpson/gratia/issues/407)).
+
 - [`draw.rootogram()`](https://gavinsimpson.github.io/gratia/reference/draw.rootogram.md)
   now applies the square-root transformation when a custom y-axis label
   is supplied, keeping plotted frequencies independent of the label
