@@ -83,6 +83,13 @@
 
 ### Bug Fixes
 
+- [`rtw()`](https://gavinsimpson.github.io/gratia/reference/rtw.md) now
+  assigns Gamma shapes to the correct observations when Tweedie power
+  varies, including in `twlss` response simulation. Scalar parameters
+  are expanded consistently, and incompatible lengths or nonfinite
+  inputs are rejected
+  ([\#409](https://github.com/gavinsimpson/gratia/issues/409)).
+
 - [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md)
   now honours custom cut points for ordinal responses and validates that
   they are finite, strictly increasing, and consistent with the

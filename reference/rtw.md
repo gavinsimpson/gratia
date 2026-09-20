@@ -25,3 +25,11 @@ rtw(mu, p, phi)
 
   numeric vector of values for the scale parameter \\\phi\\ of the
   Tweedie distribution.
+
+## Details
+
+Parameters must be finite numeric vectors of length one or a common
+nonzero length. Length-one parameters are expanded to the common length;
+partial recycling is not supported. If all parameters are empty, an
+empty numeric vector is returned; mixing empty and nonempty parameters
+is an error.
