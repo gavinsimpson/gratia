@@ -243,3 +243,38 @@ test_that("confint uses ordered bounds for a decreasing family inverse link", {
   expect_equal(transformed$.upper_ci, 1 / original$.lower_ci)
   expect_identical(transformed$.se, original$.se)
 })
+
+test_that("simultaneous intervals select the current smooth in each iteration", {
+  n <- 11L
+  nsim <- 200L
+  seed <- 6006L
+  interval_columns <- c(".estimate", ".se", ".crit", ".lower_ci", ".upper_ci")
+  for (model in list(m_gam, su_m_factor_by_x2)) {
+    labels <- smooths(model)
+    selections <- list(
+      single = labels[1L],
+      multiple = labels[c(length(labels), 1L)],
+      all = labels,
+      implicit_all = NULL
+    )
+    for (selection in selections) {
+      expected_labels <- if (is.null(selection)) labels else labels[labels %in% selection]
+      actual <- withr::with_seed(seed, confint(model, parm = selection,
+        type = "simultaneous", n = n, nsim = nsim, ncores = 1))
+      expect_identical(unique(actual$.smooth), expected_labels)
+      expect_equal(nrow(actual), n * length(expected_labels))
+      expect_true(all(is.finite(as.matrix(actual[, interval_columns]))))
+      expect_true(all(actual$.lower_ci <= actual$.estimate &
+        actual$.estimate <= actual$.upper_ci))
+      for (label in expected_labels) {
+        rows <- actual[actual$.smooth == label, ]
+        expect_equal(nrow(rows), n)
+        # Resetting the seed gives the same full coefficient draws, so each
+        # jointly requested interval must match its individually requested one.
+        single <- withr::with_seed(seed, confint(model, parm = label,
+          type = "simultaneous", n = n, nsim = nsim, ncores = 1))
+        expect_equal(rows[, interval_columns], single[, interval_columns])
+      }
+    }
+  }
+})
