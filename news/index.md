@@ -83,6 +83,25 @@
 
 ### Bug Fixes
 
+- [`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md)
+  now aligns focal variables and output labels with the selected
+  multivariate smooths, including when univariate smooths are skipped.
+  Fixes [\#396](https://github.com/gavinsimpson/gratia/issues/396).
+
+- [`compare_smooths()`](https://gavinsimpson.github.io/gratia/reference/compare_smooths.md)
+  now honours `unconditional = TRUE` when computing standard errors.
+  Fixes [\#397](https://github.com/gavinsimpson/gratia/issues/397).
+
+- Adding a constant to parametric effects now shifts estimates and
+  confidence intervals together, including when drawing or assembling
+  plots. Fixes
+  [\#398](https://github.com/gavinsimpson/gratia/issues/398).
+
+- Gaussian rootograms now use response-scale means and standard
+  deviations adjusted for prior weights when computing expected counts.
+  Nonpositive or nonfinite prior weights are rejected
+  ([\#399](https://github.com/gavinsimpson/gratia/issues/399)).
+
 - [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
   now computes correctly ordered confidence bounds for
   location-scale-shape, zero-inflated Poisson
