@@ -318,6 +318,26 @@
   invisible(vars)
 }
 
+# Construct a smooth's prediction matrix in the fitted coefficient order.
+`smooth_predict_matrix` <- function(smooth, data, model) {
+  if (!is.null(model$dinfo) &&
+    inherits(smooth, "random.effect") &&
+    inherits(smooth, "tensor.smooth")) {
+    # Discrete random effects use tensor order (last margin varies fastest),
+    # whereas model.matrix() varies the first factor fastest. The stored margins
+    # already include any reordering by bam(), even when rind is NULL.
+    margin_terms <- vapply(
+      smooth$margin, function(m) m$term, character(1L)
+    )
+    smooth$form <- stats::reformulate(
+      paste(rev(margin_terms), collapse = ":"),
+      intercept = FALSE,
+      env = environment(smooth$form)
+    )
+  }
+  mgcv::PredictMat(smooth, data)
+}
+
 #' Evaluate a spline at provided covariate values
 #'
 #' @param smooth currently an object that inherits from class `mgcv.smooth`.
@@ -342,7 +362,7 @@
     overall_uncertainty = TRUE,
     frequentist = FALSE) {
   is_soap <- is_soap_film(smooth)
-  X <- PredictMat(smooth, data) # prediction matrix
+  X <- smooth_predict_matrix(smooth, data, model) # prediction matrix
   offset <- attr(X, "offset")
   start <- smooth[["first.para"]]
   end <- smooth[["last.para"]]

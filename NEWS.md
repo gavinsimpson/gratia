@@ -48,6 +48,10 @@
 
 ## Bug Fixes
 
+* `smooth_estimates()` now uses the fitted coefficient order for random-effect
+  interactions fitted with `bam(discrete = TRUE)`, correcting estimates and
+  standard errors (#387).
+
 * `assemble()` and `draw()` now honour `terms` when selecting parametric
   effects, while retaining the selected smooths (#368).
 
