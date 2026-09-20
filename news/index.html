@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-12</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-16</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,6 +58,10 @@
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li><p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> now computes correctly ordered confidence bounds for location-scale-shape, zero-inflated Poisson (<code><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html" class="external-link">ziplss()</a></code>), and Tweedie location-scale-shape (<code><a href="https://rdrr.io/pkg/mgcv/man/twlss.html" class="external-link">twlss()</a></code>) models. Response-scale intervals retain ordered endpoints for decreasing inverse links, as do transformed intervals from <code><a href="../reference/confint.gam.html">confint.gam()</a></code>. Fixes audit finding GRA-001.</p></li>
 <li><p><code><a href="../reference/post_draws.html">post_draws.default()</a></code> and <code><a href="../reference/post_draws.html">generate_draws.gam()</a></code> were always using <code>seed = 0</code> if called with <code>seed = NULL</code>, due to a non-integer seed being generated. Now, an integer seed is generated without modifying the RNG state. Fixes audit finding GRA-002.</p></li>
+<li><p><code><a href="../reference/derivatives.html">derivatives()</a></code> now holds numeric <code>by</code> variables fixed when computing derivatives of smooths. Previously, finite differences shifted both the smooth covariate and its numeric multiplier, giving incorrect derivatives, standard errors, and intervals. Only the current smooth’s covariate is now shifted, for supplied data and automatically generated grids. Fixes audit finding GRA-003.</p></li>
+<li><p><code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> now matches smooth covariate combinations across factor levels before computing contrasts. Previously, supplied data with different row orders could silently compare different covariate locations, giving incorrect differences, standard errors, and intervals. Duplicate combinations and mismatched prediction grids now produce informative errors; comparisons at a single location also work. Fixes audit finding GRA-004.</p></li>
+<li><p><code><a href="../reference/confint.gam.html">confint.gam()</a></code> now uses consistent covariance and standard errors when computing simultaneous intervals, respecting <code>frequentist</code> and <code>unconditional</code>. These intervals exclude overall-mean uncertainty, as documented (GRA-005).</p></li>
+<li><p><code><a href="../reference/confint.gam.html">confint.gam()</a></code> now correctly computes simultaneous intervals when multiple smooths are requested. Previously, it passed the full selection to a helper expecting a single smooth, causing an error (GRA-006).</p></li>
 </ul></div>
 </div>
     <div class="section level2">

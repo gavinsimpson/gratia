@@ -101,6 +101,34 @@
   non-integer seed being generated. Now, an integer seed is generated
   without modifying the RNG state. Fixes audit finding GRA-002.
 
+- [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md)
+  now holds numeric `by` variables fixed when computing derivatives of
+  smooths. Previously, finite differences shifted both the smooth
+  covariate and its numeric multiplier, giving incorrect derivatives,
+  standard errors, and intervals. Only the current smooth’s covariate is
+  now shifted, for supplied data and automatically generated grids.
+  Fixes audit finding GRA-003.
+
+- [`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md)
+  now matches smooth covariate combinations across factor levels before
+  computing contrasts. Previously, supplied data with different row
+  orders could silently compare different covariate locations, giving
+  incorrect differences, standard errors, and intervals. Duplicate
+  combinations and mismatched prediction grids now produce informative
+  errors; comparisons at a single location also work. Fixes audit
+  finding GRA-004.
+
+- [`confint.gam()`](https://gavinsimpson.github.io/gratia/reference/confint.gam.md)
+  now uses consistent covariance and standard errors when computing
+  simultaneous intervals, respecting `frequentist` and `unconditional`.
+  These intervals exclude overall-mean uncertainty, as documented
+  (GRA-005).
+
+- [`confint.gam()`](https://gavinsimpson.github.io/gratia/reference/confint.gam.md)
+  now correctly computes simultaneous intervals when multiple smooths
+  are requested. Previously, it passed the full selection to a helper
+  expecting a single smooth, causing an error (GRA-006).
+
 ## gratia 0.11.2
 
 CRAN release: 2026-02-07
