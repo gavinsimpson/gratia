@@ -144,13 +144,23 @@
   }
   mf <- model.frame(model)
   y <- model.response(mf)
-  mu <- predict(model, newdata = mf, na.action = na.omit)
+  mu <- predict(model, newdata = mf, na.action = na.omit, type = "response")
   h <- hist(y, breaks = breaks, plot = FALSE)
   bin <- h$breaks
   names(bin) <- as.character(bin)
   obs <- h$counts
   mid <- h$mids
-  sigma <- model$sig2
+  # Interpret Gaussian prior weights as relative observation precisions.
+  w <- stats::model.weights(mf)
+  if (is.null(w)) {
+    w <- rep(1, length(y))
+  }
+  if (length(w) != length(y) || any(!is.finite(w) | w <= 0)) {
+    stop("Gaussian rootograms require finite, positive prior weights.",
+      call. = FALSE
+    )
+  }
+  sigma <- sqrt(model$sig2 / w)
   pdf <- purrr::map_dfc(bin, .f = pnorm, mean = mu, sd = sigma)
   nc <- length(bin)
   fitted <- pdf[, seq(1, nc - 1, by = 1L)]
