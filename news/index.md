@@ -4,6 +4,11 @@
 
 ### New features
 
+- [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  for penalty matrices now accepts `geom = "tile"` to draw individual
+  rectangles, while retaining `geom = "raster"` as the default
+  ([\#392](https://github.com/gavinsimpson/gratia/issues/392)).
+
 - Quantile residuals use log probabilities in the smaller tail for
   families with native log-tail CDF support, including Poisson, negative
   binomial, and the censored families. This avoids numerical infinities
@@ -82,11 +87,6 @@
   [`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) families.
 
 ### Bug Fixes
-
-- [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-  for penalty matrices now accepts `geom = "tile"` to draw individual
-  rectangles, while retaining `geom = "raster"` as the default
-  ([\#392](https://github.com/gavinsimpson/gratia/issues/392)).
 
 - [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
   and

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-19</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-20</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,7 +43,8 @@
 <h2 class="pkg-version" data-toc-text="development version" id="gratia-development-version">gratia (development version)<a class="anchor" aria-label="anchor" href="#gratia-development-version"></a></h2>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li><p>Quantile residuals use log probabilities in the smaller tail for families with native log-tail CDF support, including Poisson, negative binomial, and the censored families. This avoids numerical infinities without clipping probabilities. Grouped-binomial residuals now randomise over one success rather than one whole response proportion.</p></li>
+<ul><li><p><code><a href="../reference/draw.html">draw()</a></code> for penalty matrices now accepts <code>geom = "tile"</code> to draw individual rectangles, while retaining <code>geom = "raster"</code> as the default (<a href="https://github.com/gavinsimpson/gratia/issues/392" class="external-link">#392</a>).</p></li>
+<li><p>Quantile residuals use log probabilities in the smaller tail for families with native log-tail CDF support, including Poisson, negative binomial, and the censored families. This avoids numerical infinities without clipping probabilities. Grouped-binomial residuals now randomise over one success rather than one whole response proportion.</p></li>
 <li><p><code><a href="../reference/quantile_residuals.html">quantile_residuals()</a></code> supports censored <code><a href="https://rdrr.io/pkg/mgcv/man/cnorm.html" class="external-link">cnorm()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/cpois.html" class="external-link">cpois()</a></code>, and <code><a href="https://rdrr.io/pkg/mgcv/man/clog.html" class="external-link">clog()</a></code> models, randomising over censoring intervals for PIT and quantile residuals. These families now have CDF and quantile helpers; random generation for <code><a href="https://rdrr.io/pkg/mgcv/man/cnorm.html" class="external-link">cnorm()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/clog.html" class="external-link">clog()</a></code> uses the fitted family scale and prior weights.</p></li>
 <li><p>The frequentist covariance matrix can now be selected in <code><a href="../reference/confint.gam.html">confint.gam()</a></code> and <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> via argument <code>frequentist</code>. The default for this argument remains <code>FALSE</code>, so behaviour is unchanged.</p></li>
 <li><p><code><a href="../reference/get_vcov.html">get_vcov()</a></code> is now an exported function. <code><a href="../reference/get_vcov.html">get_vcov()</a></code> extracts the covariance matrix from a model object.</p></li>
@@ -56,8 +57,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li><p><code><a href="../reference/draw.html">draw()</a></code> for penalty matrices now accepts <code>geom = "tile"</code> to draw individual rectangles, while retaining <code>geom = "raster"</code> as the default (<a href="https://github.com/gavinsimpson/gratia/issues/392" class="external-link">#392</a>).</p></li>
-<li><p><code><a href="../reference/assemble.html">assemble()</a></code> and <code><a href="../reference/draw.html">draw()</a></code> now honour <code>terms</code> when selecting parametric effects, while retaining the selected smooths (<a href="https://github.com/gavinsimpson/gratia/issues/368" class="external-link">#368</a>).</p></li>
+<ul><li><p><code><a href="../reference/assemble.html">assemble()</a></code> and <code><a href="../reference/draw.html">draw()</a></code> now honour <code>terms</code> when selecting parametric effects, while retaining the selected smooths (<a href="https://github.com/gavinsimpson/gratia/issues/368" class="external-link">#368</a>).</p></li>
 <li><p><code><a href="../reference/variance_comp.html">variance_comp()</a></code> now handles variance components without confidence intervals, including default GCV fits, and returns a typed empty table when <code><a href="https://rdrr.io/pkg/mgcv/man/gam.vcomp.html" class="external-link">mgcv::gam.vcomp()</a></code> returns no components (<a href="https://github.com/gavinsimpson/gratia/issues/377" class="external-link">#377</a>).</p></li>
 <li><p><code><a href="../reference/rtw.html">rtw()</a></code> now assigns Gamma shapes to the correct observations when Tweedie power varies, including in <code>twlss</code> response simulation. Scalar parameters are expanded consistently, and incompatible lengths or nonfinite inputs are rejected (<a href="https://github.com/gavinsimpson/gratia/issues/409" class="external-link">#409</a>).</p></li>
 <li><p><code><a href="../reference/data_sim.html">data_sim()</a></code> now honours custom cut points for ordinal responses and validates that they are finite, strictly increasing, and consistent with the requested integer number of categories (<a href="https://github.com/gavinsimpson/gratia/issues/408" class="external-link">#408</a>).</p></li>
