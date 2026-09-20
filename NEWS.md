@@ -88,6 +88,10 @@
   to their underlying GAM methods. Previously, these arguments were silently
   ignored (GRA-008).
 
+* Fixed smooth selection in `derivatives()` and `partial_derivatives()` to avoid 
+  logical-index recycling warnings under R-devel. Excluding random-effect or 
+  unsupported smooths now preserves the correct selected smooths.
+
 # gratia 0.11.2
 
 ## User visible changes
