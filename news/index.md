@@ -83,6 +83,12 @@
 
 ### Bug Fixes
 
+- [`overview()`](https://gavinsimpson.github.io/gratia/reference/overview.md)
+  now reports one degree of freedom per parametric coefficient, avoiding
+  incorrect values and row-length errors for factors and models without
+  an intercept
+  ([\#405](https://github.com/gavinsimpson/gratia/issues/405)).
+
 - Loading *gratia* no longer changes
   [`weights()`](https://rdrr.io/r/stats/weights.html) dispatch for
   linear models. QQ and worm plot diagnostics now use an internal helper
