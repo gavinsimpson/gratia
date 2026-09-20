@@ -1,20 +1,15 @@
 # gratia (development version)
 
+## User visible changes
+
+* For models fitted with `na.exclude`, default fitted values, partial residuals,
+  fitted and posterior samples, and simulations now restore excluded rows as
+  `NA`, while diagnostics correctly align the retained observations (#349).
+  Explicit prediction data preserve row positions by default, with missing
+  required predictors yielding `NA` results and missing responses alone not
+  preventing prediction.
+
 ## New features
-
-* Missing observations are handled consistently for models fitted with
-  `na.exclude` (#349). Default fitted values, partial residuals, fitted and
-  posterior samples, and simulations now restore excluded rows as `NA`.
-  Explicit prediction data retain their own row positions; missing responses
-  alone do not prevent prediction. This changes the default number of rows
-  returned by fitted-value and sampling functions for affected models.
-
-* Missing-row alignment is fixed in Q-Q and worm plots, `appraise()`, partial
-  residual plots, observed/fitted plots, multivariate residual plots and GLM
-  dispersion calculations, including mixed-model components that are already
-  partially restored. Smooth and basis evaluations retain missing evaluation
-  rows. Response simulations no longer pass missing predictions to family RNGs,
-  preventing warnings and invalid ordinal draws.
 
 * `draw()` for penalty matrices now accepts `geom = "tile"` to draw individual
   rectangles, while retaining `geom = "raster"` as the default (#392).
