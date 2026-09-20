@@ -81,8 +81,8 @@
       term = para_nms,
       type = rep("parametric", nr),
       k    = rep(NA_real_, nr),
-      edf  = c(1, smry$pTerms.df),
-      ref.edf = c(1, smry$pTerms.df),
+      edf  = rep(1, nr),
+      ref.edf = rep(1, nr),
       statistic = smry$p.t,
       p.value = smry$p.pv
     ) |>

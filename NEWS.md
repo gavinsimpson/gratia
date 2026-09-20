@@ -45,6 +45,10 @@
 
 ## Bug Fixes
 
+* `overview()` now reports one degree of freedom per parametric coefficient,
+  avoiding incorrect values and row-length errors for factors and models
+  without an intercept (#405).
+
 * Loading *gratia* no longer changes `weights()` dispatch for linear models.
   QQ and worm plot diagnostics now use an internal helper that preserves
   observation weights and excluded rows (#404).
