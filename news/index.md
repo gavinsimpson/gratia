@@ -83,6 +83,13 @@
 
 ### Bug Fixes
 
+- [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  and
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  now honour `terms` when selecting parametric effects, while retaining
+  the selected smooths
+  ([\#368](https://github.com/gavinsimpson/gratia/issues/368)).
+
 - [`variance_comp()`](https://gavinsimpson.github.io/gratia/reference/variance_comp.md)
   now handles variance components without confidence intervals,
   including default GCV fits, and returns a typed empty table when
