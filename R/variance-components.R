@@ -36,22 +36,35 @@
 #' @importFrom mgcv gam.vcomp
 `variance_comp.gam` <- function(object, rescale = TRUE, coverage = 0.95, ...) {
   capture.output(vcomps <- gam.vcomp(object,
-    rescale = rescale,
-    conf.lev = coverage
+    rescale = rescale, conf.lev = coverage
   ))
   if (is.list(vcomps) && !is.null(vcomps[["vc"]])) {
     vcomps <- vcomps[["vc"]]
   }
-  vcomps <- as.data.frame(vcomps)
-  tbl <- rownames_to_column(vcomps,
-    var = "component"
-  ) |>
-    as_tibble() |>
-    set_names(nm = c(
-      ".component", ".std_dev", ".lower_ci",
-      ".upper_ci"
-    )) |>
-    add_column(.variance = vcomps[, "std.dev"]^2, .after = 1L)
+  if (is.null(vcomps)) {
+    tbl <- tibble::tibble(
+      .component = character(), .variance = double(),
+      .std_dev = double(), .lower_ci = double(), .upper_ci = double()
+    )
+  } else if (is.matrix(vcomps)) {
+    tbl <- tibble::tibble(
+      .component = rownames(vcomps),
+      .variance = unname(vcomps[, "std.dev"])^2,
+      .std_dev = unname(vcomps[, "std.dev"]),
+      .lower_ci = unname(vcomps[, "lower"]),
+      .upper_ci = unname(vcomps[, "upper"])
+    )
+  } else if (is.numeric(vcomps) && is.null(dim(vcomps))) {
+    tbl <- tibble::tibble(
+      .component = names(vcomps),
+      .variance = as.numeric(vcomps)^2,
+      .std_dev = as.numeric(vcomps),
+      .lower_ci = rep(NA_real_, length(vcomps)),
+      .upper_ci = rep(NA_real_, length(vcomps))
+    )
+  } else {
+    stop("Unsupported return format from mgcv::gam.vcomp().", call. = FALSE)
+  }
   class(tbl) <- c("variance_comp", class(tbl))
   tbl
 }
