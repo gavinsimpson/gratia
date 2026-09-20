@@ -33,7 +33,8 @@ Imports:
     ggokabeito,
     withr,
     scales,
-    tweedie (>= 2.3.5)
+    tweedie (>= 2.3.5),
+    utils
 Suggests:
     gamm4,
     lme4,
@@ -58,8 +59,7 @@ Suggests:
     curl,
     marginaleffects,
     mirai,
-    carrier,
-    utils
+    carrier
 Description: Graceful 'ggplot'-based graphics and utility functions for working with generalized additive models (GAMs) fitted using the 'mgcv' package. Provides a reimplementation of the plot() method for GAMs that 'mgcv' provides, as well as 'tidyverse' compatible representations of estimated smooths.
 License: MIT + file LICENSE
 LazyData: true
