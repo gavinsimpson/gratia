@@ -19,6 +19,7 @@ draw(
   ncol = NULL,
   nrow = NULL,
   guides = "keep",
+  geom = c("raster", "tile"),
   ...
 )
 ```
@@ -83,6 +84,14 @@ draw(
   Passed to
   [`patchwork::plot_layout()`](https://patchwork.data-imaginist.com/reference/plot_layout.html)
 
+- geom:
+
+  character; either `"raster"` (the default) or `"tile"`. Raster
+  rendering uses an image for the matrix, which can keep large PDF plots
+  compact. Tile rendering uses individual rectangles, providing vector
+  cells in PDF and SVG output, but can increase file size for large
+  matrices.
+
 - ...:
 
   additional arguments passed to
@@ -103,4 +112,8 @@ draw(penalty(m))
 
 # for a specific smooth
 draw(penalty(m, select = "s(x2):fac1"))
+
+
+# draw individual vector cells
+draw(penalty(m), geom = "tile")
 ```

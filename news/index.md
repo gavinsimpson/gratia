@@ -83,6 +83,11 @@
 
 ### Bug Fixes
 
+- [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  for penalty matrices now accepts `geom = "tile"` to draw individual
+  rectangles, while retaining `geom = "raster"` as the default
+  ([\#392](https://github.com/gavinsimpson/gratia/issues/392)).
+
 - [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
   and
   [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
