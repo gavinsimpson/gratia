@@ -8,8 +8,11 @@
 #' @param model a fitted model. Currently models inheriting from class `"gam"`,
 #'   as well as classes `"glm"` and `"lm"` from calls to [stats::glm] or
 #'   [stats::lm] are supported.
-#' @param method character; method used to generate theoretical quantiles.
-#'   The default is `"uniform"`, which generates reference quantiles using
+#' @param method character or `NULL`; method used to generate theoretical
+#'   quantiles. The default, `NULL`, selects `"simulate"` for models fitted with
+#'   [mgcv::tw()] or [mgcv::Tweedie()] and `"uniform"` otherwise. Explicitly
+#'   supplying a method overrides this selection, subject to availability of
+#'   the required family functions. `"uniform"` generates reference quantiles using
 #'   random draws from a uniform distribution and the inverse cumulative
 #'   distribution function (CDF) of the fitted values. The reference quantiles
 #'   are averaged over `n_uniform` draws. `"simulate"` generates reference
@@ -17,11 +20,12 @@
 #'   values of the covariates, which are then residualised to generate reference
 #'   quantiles, using `n_simulate` simulated data sets. `"normal"` generates
 #'   reference quantiles using the standard normal distribution. `"uniform"` is
-#'   more computationally efficient, but `"simulate"` allows reference bands to
+#'   often more computationally efficient, but Tweedie quantiles are expensive
+#'   to compute. `"simulate"` allows reference bands to
 #'   be drawn on the QQ-plot. `"normal"` should be avoided but is used as a fall
 #'   back if a random number generator (`"simulate"`) or the inverse of the CDF
 #'   are not available from the `family` used during model fitting
-#'   (`"uniform"``).
+#'   (`"uniform"`).
 #'
 #'   Note that `method = "direct"` is deprecated in favour of
 #'   `method = "uniform"`.
@@ -75,6 +79,24 @@
   UseMethod("qq_plot")
 }
 
+# Choose the automatic method before applying family-availability fallbacks.
+# Tweedie numerical quantiles are much slower than random generation (#410).
+diagnostic_method <- function(model, method = NULL) {
+  if (is.null(method)) {
+    method <- if (identical(family_type(model), "tweedie")) {
+      "simulate"
+    } else {
+      "uniform"
+    }
+  }
+  method <- match.arg(method, c("uniform", "simulate", "normal", "direct"))
+  if (identical(method, "direct")) {
+    message("`method = \"direct\"` is deprecated, use `\"uniform\"`")
+    method <- "uniform"
+  }
+  method
+}
+
 #' @rdname qq_plot
 #' @export
 `qq_plot.default` <- function(model, ...) {
@@ -119,7 +141,7 @@
 #' ## ... or use the usual normality assumption
 #' qq_plot(m, method = "normal")
 `qq_plot.gam` <- function(model,
-  method = c("uniform", "simulate", "normal", "direct"),
+  method = NULL,
   type = c("deviance", "response", "pearson"),
   n_uniform = 10,
   n_simulate = 50,
@@ -150,11 +172,7 @@
   }
 
   # figure out method stuff
-  method <- match.arg(method) # what method for the QQ plot?
-  if (identical(method, "direct")) {
-    message("`method = \"direct\"` is deprecated, use `\"uniform\"`")
-    method <- "uniform"
-  }
+  method <- diagnostic_method(model, method)
   ## check if we can do the uniform method - needs a quantile fun
   ff_qf <- fix_family_qf(family(model))[["qf"]]
   if (identical(method, "uniform") && is.null(ff_qf)) {
@@ -879,7 +897,7 @@
 #' worm_plot(m, method = "normal")
 `worm_plot.gam` <- function(
   model,
-  method = c("uniform", "simulate", "normal", "direct"),
+  method = NULL,
   type = c("deviance", "response", "pearson"),
   n_uniform = 10, n_simulate = 50,
   level = 0.9,
@@ -908,11 +926,7 @@
     set.seed(seed)
   }
 
-  method <- match.arg(method) # what method for the QQ plot?
-  if (identical(method, "direct")) {
-    message("`method = \"direct\"` is deprecated, use `\"uniform\"`")
-    method <- "uniform"
-  }
+  method <- diagnostic_method(model, method)
   ## check if we can do the method
   if (identical(method, "uniform") &&
     is.null(fix_family_qf(family(model))[["qf"]])) {

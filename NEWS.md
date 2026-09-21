@@ -2,6 +2,12 @@
 
 ## User visible changes
 
+* `appraise()`, `qq_plot()`, and `worm_plot()` now use `method = NULL` to
+  select simulation for `tw()` and `Tweedie()` models, avoiding expensive
+  numerical quantiles (#410). Other families continue to prefer `"uniform"`,
+  with the existing availability fallbacks. Explicit methods override the
+  automatic choice.
+
 * Derivative functions now choose a finite-difference step automatically when
   `eps = NULL`, using the covariate's fitted range, derivative order, and
   difference method. This reduces rounding error in second derivatives;
