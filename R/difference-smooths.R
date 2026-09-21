@@ -87,8 +87,10 @@
   partial_match = TRUE,
   unconditional = FALSE,
   frequentist = FALSE,
+  envir = NULL,
   ...
 ) {
+  model <- with_model_envir(model, envir)
   if (lifecycle::is_present(smooth)) {
     lifecycle::deprecate_warn("0.8.9.9", "difference_smooths(smooth)",
       "difference_smooths(select)")
@@ -123,6 +125,7 @@
     data <- bind_rows(sm_data)
   } else {
     data <- as_tibble(data)
+    for (sm in smooths) data <- prepare_smooth_data(model, sm, data)
   }
   if (length(select) == 1L) {
     by_var <- by_variable(smooths[[1L]])
@@ -172,7 +175,7 @@
   }
   names(pairs) <- paste0("f", 1:2)
 
-  Xp <- predict(model, newdata = data, type = "lpmatrix")
+  Xp <- predict_model(model, newdata = data, type = "lpmatrix")
   V <- get_vcov(model,
     unconditional = unconditional,
     frequentist = frequentist

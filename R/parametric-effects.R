@@ -104,7 +104,7 @@
   data <- distinct(data)
   # Work around a bug in predict.gam() with exclude length 0 character
   # (i.e smooths(objects) when model contains only parametric terms)
-  pred <- predict(object,
+  pred <- predict_model(object,
     newdata = data, type = "terms",
     terms = mgcv_names, se.fit = TRUE,
     unconditional = unconditional

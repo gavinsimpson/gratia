@@ -160,12 +160,16 @@
   if (is.null(envir)) {
     envir <- environment(formula(object))
   }
-  # prep data
+  # Only recover raw inputs used by the slice expressions. A constant offset
+  # supplied by the caller must not require its original training vector.
   odata <- data
-  data <- data_slice_data(object, data = data)
-
-  # deal with ...
   exprs <- rlang::enquos(...)
+  needed <- unique(unlist(lapply(exprs, function(x) all.vars(rlang::get_expr(x)))))
+  needed <- intersect(needed, model_vars(object))
+  if (is.character(.observed_only)) needed <- union(needed, .observed_only)
+  if (isTRUE(.observed_only)) needed <- union(needed, names(exprs))
+  data <- data_slice_data(object, data = data, envir = envir, vars = needed)
+
   slice_vars <- purrr::map(exprs, rlang::eval_tidy, data = data)
 
   # check now if there are elements of slice_vars that aren't in the model
@@ -235,48 +239,9 @@
   data_slice.gam(object, ...)
 }
 
-`data_slice_data` <- function(object, data = NULL) {
-  is_mf <- FALSE # is a data a model frame
-  if (is.null(data)) {
-    # get data from object$model
-    data <- object[["model"]]
-    is_mf <- TRUE
-  } else {
-    if (!is.null(attr(data, "terms"))) {
-      is_mf <- TRUE
-    }
-  }
-
-  # find the response if there
-  tt <- terms(object)
-  resp_i <- attr(tt, "response")
-  y_var <- names(attr(tt, "dataClasses"))[resp_i]
-  all_vars <- all.vars(tt)
-  data_names <- names(data)
-  # if the response variable is named in data, delete it
-  y_in_data <- data_names %in% y_var
-  if (any(y_in_data)) {
-    data <- data[!y_in_data]
-  }
-
-  # handle offsets; if we generated the data from the model, then set
-  # offset variable(s) to 1
-  # But note that this is only for the data object that we'll eval into
-  # The offset will get set to whatever is the typical value for those offset
-  # variable(s). As with any other variable you'll need to provide a value
-  # for each offset if you want to use that value
-  if (is_mf) {
-    # are there any offsets
-    offsets <- attr(tt, "offset")
-    if (length(offsets)) {
-      # when selected from data, remember we deleted the response already
-      # offsets will be shifted 1 col to left
-      data[, offsets - 1] <- 1
-      names(data)[offsets - 1] <- all_vars[offsets]
-    }
-  }
-
-  data
+# Return raw covariates for user slice expressions, never renamed transforms.
+`data_slice_data` <- function(object, data = NULL, envir = NULL, vars = model_vars(object)) {
+  recover_raw_data(object, data, envir, vars)
 }
 
 #' @importFrom stats median quantile
@@ -434,24 +399,13 @@
   # dc <- data_class(summ) # mgcv doesn't store logicals as logicals
   # so we need to extract the data classes ourselves
   # try to recover the data
-  mf <- model.frame(object)
-  if (is.null(data)) {
-    # simon sets the $formula component to have env .GlobalEnv
-    # so this can fail to find the thing we want, which would be fine,
-    # but worse it can find something with the same name as data somewhere
-    # else. An example is `data = df`, which can find `df()` in some settings,
-    # like when pkgdown is running examples.
-    data <- eval(object$call$data, envir)
-    # check that `data` is a data frame or list and set it to NULL if it isn't
-    if (!(inherits(data, "data.frame") || is.list(data))) {
-      data <- NULL
-    }
-  }
-  if (is.null(data)) {
-    data <- mf
-  }
-  data <- data[names(summ)] # take only vars mgcv thinks we need
-  dc <- data_class(data)
+  # Stored summaries supply values; raw data supply their actual classes.
+  if (is.null(data)) data <- model.frame(object)
+  # Numeric summaries remain usable when only a transformed column survived.
+  # Stored raw columns retain logical and factor classes where available.
+  dc <- data_class(summ)
+  available <- intersect(names(summ), names(data))
+  dc[available] <- data_class(data[available])
 
   # if any logicals extract them as per numeric (2nd value) and convert to
   # logical. do this before extracting the numerics

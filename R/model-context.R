@@ -105,8 +105,7 @@ prepare_smooth_data <- function(model, smooth, data, envir = NULL) {
 }
 
 # Raw recovery is deliberately conservative. Never infer an inverse transform.
-recover_raw_data <- function(model, data = NULL, envir = NULL) {
-  vars <- model_vars(model)
+recover_raw_data <- function(model, data = NULL, envir = NULL, vars = model_vars(model)) {
   if (!is.null(data)) {
     if (!all(vars %in% names(data))) {
       cli::cli_abort(c("Raw model covariates are missing from {.arg data}.",

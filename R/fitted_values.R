@@ -76,7 +76,8 @@
                                   "link",
                                   "linear predictor"
                                 ),
-                                ci_level = 0.95, ...) {
+                                ci_level = 0.95, envir = NULL, ...) {
+  object <- with_model_envir(object, envir)
   # Handle everything up to and including the extended families, but not more
   fn <- family_type(object)
   if (inherits(family(object), "general.family")) {
@@ -151,7 +152,7 @@
 `fit_vals_default` <- function(
     object, data, ci_level = 0.95,
     scale = "response", ...) {
-  fit <- predict(object,
+  fit <- predict_model(object,
     newdata = data,
     ...,
     type = "link",
@@ -193,7 +194,7 @@
     scale = "response", extra_fns = post_link_funs(), ...) {
   crit <- coverage_normal(ci_level)
   # get the fitted values for data
-  fv <- predict(object,
+  fv <- predict_model(object,
     newdata = data, ..., type = "link",
     se.fit = TRUE
   )
@@ -257,7 +258,7 @@
     scale = "response", extra_fns = post_link_funs(), ...) {
   crit <- coverage_normal(ci_level)
   # get the fitted values for data
-  fv <- predict(object,
+  fv <- predict_model(object,
     newdata = data, ..., type = "link",
     se.fit = TRUE
   )
@@ -315,7 +316,7 @@
     scale = "response", extra_fns = post_link_funs(), ...) {
   crit <- coverage_normal(ci_level)
   # get the fitted values for data
-  fv <- predict(object,
+  fv <- predict_model(object,
     newdata = data, ..., type = "link",
     se.fit = TRUE
   )
@@ -381,7 +382,7 @@
     )
   } else {
     # predict, needs to be response scale for ocat!
-    fv <- predict(object,
+    fv <- predict_model(object,
       newdata = data, ..., type = "response",
       se.fit = TRUE
     )
@@ -591,7 +592,7 @@
     trans <- function(x) base^x
   }
 
-  fit <- predict(object,
+  fit <- predict_model(object,
     newdata = data,
     ...,
     type = "response",

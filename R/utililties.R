@@ -617,40 +617,32 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 #' names(model.frame(m))
 #' names(fix_offset(m, model.frame(m), offset_val = 1L))
 `fix_offset` <- function(model, newdata, offset_val = NULL) {
-  m.terms <- names(newdata)
-  p.terms <- if (inherits(model, "scam") &&
-    is.null(model[["pred.formula"]])) {
-    attr(model[["terms"]], "term.labels")
-  } else {
-    attr(terms(model[["pred.formula"]]), "term.labels")
-  }
-
-
-  ## remove repsonse from m.terms if it is in there
-  tt <- terms(model)
-  resp <- names(attr(tt, "dataClasses"))[attr(tt, "response")]
-  Y <- m.terms == resp
-  if (any(Y)) {
-    m.terms <- m.terms[!Y]
-  }
-
-  ## is there an offset?
-  off <- is_offset(m.terms)
-  if (any(off)) {
-    ## which cleaned terms not in model terms
-    ind <- m.terms %in% p.terms
-    ## for the cleaned terms not in model terms, match with the offset
-    off_var <- grep(p.terms[!ind], m.terms[off])
-    if (any(off_var)) {
-      take <- which(names(newdata) %in% m.terms)
-      names(newdata)[take][off] <- p.terms[!ind][off_var]
+  # Offset positions index the terms variables, not raw covariate names.
+  tt <- stats::terms(model)
+  positions <- attr(tt, "offset")
+  if (!length(positions)) return(newdata)
+  expressions <- as.list(attr(tt, "variables"))[-1L][positions]
+  labels <- vapply(expressions, function(x) paste(deparse(x), collapse = ""), character(1))
+  inputs <- unique(unlist(lapply(expressions, all.vars)))
+  if (!is.null(offset_val)) {
+    if (length(expressions) != 1L || length(inputs) != 1L) {
+      cli::cli_abort("Supply explicit raw {.arg data} for offsets with multiple inputs; a scalar override is ambiguous.")
     }
-
-    ## change offset?
-    if (!is.null(offset_val)) {
-      newdata[, p.terms[!ind][off_var]] <- offset_val
+    newdata[[inputs]] <- rep(offset_val, length.out = nrow(newdata))
+  } else if (!all(inputs %in% names(newdata))) {
+    # Evaluated offsets cannot be renamed to their unevaluated inputs.
+    raw <- recover_raw_data(model)
+    if (nrow(raw) != nrow(newdata) || !identical(rownames(raw), rownames(newdata))) {
+      cli::cli_abort("Supply raw offset covariates in {.arg newdata}; stored fitting rows do not match.")
     }
+    for (nm in setdiff(inputs, names(newdata))) newdata[[nm]] <- raw[[nm]]
   }
+  order <- names(newdata)
+  if (length(inputs) == 1L && length(labels) == 1L) {
+    order[order == labels] <- inputs
+  }
+  newdata <- newdata[, unique(setdiff(order, labels)), drop = FALSE]
+  attr(newdata, "terms") <- NULL
 
   newdata # return
 }
@@ -1370,18 +1362,8 @@ vars_from_label <- function(label) {
     }
   }
 
-  # some models we want to handle don't have pred.formula, e.g. scam() models
-  tt <- if (is.null(model$pred.formula)) {
-    if (!is.null(model$terms)) {
-      terms(model)
-    } else {
-      stop("`model` has no terms object to work with.", call. = FALSE)
-    }
-  } else {
-    terms(model[["pred.formula"]])
-  }
-  tt <- delete.response(tt)
-  out <- model.frame(tt, data = data, na.action = stats::na.pass)
+  # Build evaluated terms in fitted order without asking for the response.
+  out <- evaluated_model_frame(model, data)
 
   if (identical(model_frame, FALSE)) {
     attr(out, "terms") <- NULL
