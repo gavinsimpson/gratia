@@ -3,6 +3,8 @@
 #' Provides a [gratia::draw()] method for GAMLSS (distributional GAMs) fitted
 #' by [GJRM::gamlss()].
 #'
+#' @inheritParams smooth_estimates
+#'
 #' @param object a model, fitted by [GJRM::gamlss()]
 #' @param ... arguments passed to [gratia::draw.gam()]
 #'
@@ -39,7 +41,8 @@
 `draw.gamlss` <- function(object,
                           scales = c("free", "fixed"),
                           ncol = NULL, nrow = NULL, guides = "keep",
-                          widths = NULL, heights = NULL, ...) {
+                          widths = NULL, heights = NULL, ...,
+                          n = 100, envir = NULL) {
   # these models have up to 9 GAMs, one per potential parameter
   # actually I don't think gamlss models can but in general models from GJRM
   # can have this many etas
@@ -59,7 +62,7 @@
   # note this doesn't wrap the plots
   plts <- map(seq_along(models[take]),
     .f = draw_gamlss_eta,
-    model_names = models[take], eta, object
+    model_names = models[take], eta, object, n = n, envir = envir, ...
   )
 
   # return

@@ -89,6 +89,16 @@
 #' * plus one or more columns of data containing the values of covariates at
 #'   which the derivative was evaluated.
 #'
+#' @param envir optional environment for functions and constants in model
+#'   expressions; see [smooth_estimates()].
+#' @param wrt differentiation coordinate: `"smooth"` (the default) uses the
+#'   smooth expression, such as `log(x)`; `"covariate"` uses a raw covariate,
+#'   such as `x`, and reevaluates expressions at each finite-difference point.
+#' @param focal name of the differentiation coordinate, or a vector with one
+#'   name per selected smooth. For raw-covariate derivatives it must be supplied
+#'   when a smooth depends on multiple raw inputs. A single name can be used
+#'   for all selected univariate smooths.
+#'
 #' @examples
 #'
 #' load_mgcv()
@@ -129,6 +139,7 @@
   newdata = NULL, envir = NULL, wrt = c("smooth", "covariate"),
   focal = NULL
 ) {
+  object_name <- deparse(substitute(object))
   object <- with_model_envir(object, envir)
   wrt <- match.arg(wrt)
   if (lifecycle::is_present(term)) {
@@ -197,7 +208,7 @@
     if (all(chk_multivar)) {
       cli_abort(
         c(
-          "Can't compute derivatives for any smooths in {.var {deparse(substitute(object))}}.",
+          "Can't compute derivatives for any smooths in {.var {object_name}}.",
           "x" = "All smooths are either random effects or multivariate",
           "!" = "See {.fun partial_derivatives} for one solution for multivariate smooths."
         )
@@ -363,7 +374,7 @@
   ## handle fs smooths
   fs_var <- NULL
   if (is_fs_smooth(sm)) {
-    fs_var <- sm_var[-1L]
+    fs_var <- smooth_variable(sm)[-1L]
     sm_var <- sm_var[1L]
   }
   ## handle sz smooths
@@ -793,6 +804,8 @@
 #' * `.lower_ci`: the lower bound of the confidence or simultaneous interval,
 #' * `.upper_ci`: the upper bound of the confidence or simultaneous interval.
 #'
+#' @inheritParams derivatives
+#'
 #' @examples
 #'
 #' library("ggplot2")
@@ -1016,11 +1029,14 @@
       smooth_derivative_data(object, sm, n, focal_i, wrt, order, type, eps)
     } else data
     # For partial derivatives, all other independent coordinates are fixed.
-    independent <- if (wrt == "smooth") smooth_variable(sm) else
-      unique(unlist(lapply(smooth_variable(sm), function(x) all.vars(term_expression(x, object)))))
     check <- prepare_smooth_data(object, sm, newd)
-    bad <- setdiff(intersect(independent, names(check)), focal_i)
-    bad <- bad[vapply(check[bad], function(x) length(unique(x)) > 1L && !is.factor(x), logical(1))]
+    # Transformed columns derived from the focal input may vary with it;
+    # other user-supplied numeric columns must remain fixed on a slice.
+    exempt <- focal_i
+    if (wrt == "smooth") exempt <- union(exempt, all.vars(term_expression(focal_i, object)))
+    bad <- setdiff(names(newd), exempt)
+    if (wrt == "covariate") bad <- setdiff(bad, smooth_variable(sm)[smooth_variable(sm) != focal_i])
+    bad <- bad[vapply(newd[bad], function(x) length(unique(x)) > 1L && !is.factor(x), logical(1))]
     if (!need_data && length(bad)) {
       stop("For partial derivatives only 'focal' can be varying in 'data'. Problematic variables: ", paste(bad, collapse = ", "))
     }

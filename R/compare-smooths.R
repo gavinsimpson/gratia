@@ -52,7 +52,7 @@
     data = NULL,
     unconditional = FALSE,
     overall_uncertainty = TRUE,
-    partial_match = FALSE) {
+    partial_match = FALSE, envir = NULL) {
   if (lifecycle::is_present(smooths)) {
     lifecycle::deprecate_warn("0.8.9.9", "compare_smooths(smooths)",
       "compare_smooths(select)")
@@ -77,7 +77,7 @@
 
   ## loop over the smooths, applying smooth_estimates to each model
   sm_est <- lapply(models, smooth_estimates,
-    select = select,
+    select = select, envir = envir,
     n = n,
     data = data,
     unconditional = unconditional,

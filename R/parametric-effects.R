@@ -42,6 +42,7 @@
                                      envir = environment(formula(object)),
                                      transform = FALSE,
                                      ...) {
+  object <- with_model_envir(object, envir)
   tt <- object$pterms # get model terms object
   tt <- delete.response(tt) # remove response so easier to work with
   vars <- parametric_terms(object) # vector of names of model terms

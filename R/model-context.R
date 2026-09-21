@@ -4,29 +4,56 @@ model_context <- function(object, component = NULL) {
   UseMethod("model_context")
 }
 
+#' @export
 model_context.default <- function(object, component = NULL) {
   tt <- stats::terms(object)
   ff <- stats::formula(object)
   if (is.list(ff)) {
-    if (is.null(component)) component <- 1L
-    ff <- ff[[component]]
+    # An explicit component gets its own predictors and evaluation environment.
+    # Without one, retain combined terms for full-model prediction.
+    selected <- if (is.null(component)) 1L else component
+    if (is.character(selected)) selected <- match(selected, names(ff))
+    if (length(selected) != 1L || is.na(selected) || !selected %in% seq_along(ff)) {
+      cli::cli_abort("Unknown model component.")
+    }
+    ff <- ff[[selected]]
+    if (!is.null(component) && is.list(object$pterms)) {
+      pt <- stats::delete.response(object$pterms[[selected]])
+      expressions <- as.list(attr(pt, "variables"))[-1L]
+      indices <- lss_eta_index(object)[[selected]]
+      for (sm in object$smooth) {
+        if (any(smooth_coef_indices(sm) %in% indices)) {
+          expressions <- c(expressions,
+            lapply(terms_in_smooth(sm), term_expression, model = object))
+        }
+      }
+      # Build a one-sided formula from language objects, preserving offsets.
+      rhs <- Reduce(function(x, y) call("+", x, y), expressions, init = 1)
+      component_formula <- stats::as.formula(call("~", rhs), env = environment(ff))
+      tt <- stats::terms(component_formula)
+    }
   }
   list(model = object, component = component, formula = ff, terms = tt,
     data = stats::model.frame(object), provenance = "evaluated",
     call = object$call, envir = environment(ff),
     na.action = stats::na.action(object))
 }
+#' @export
 model_context.gam <- model_context.default
+#' @export
 model_context.scam <- model_context.default
+#' @export
 model_context.gamm <- function(object, component = NULL) {
   model_context(object$gam, component)
 }
+#' @export
 model_context.list <- function(object, component = NULL) {
   if (!is_gamm4(object)) {
     cli::cli_abort("No model context adapter for this list.")
   }
   model_context(object$gam, component)
 }
+#' @export
 model_context.gamlss <- function(object, component = NULL) {
   if (is.null(component)) component <- "gam1"
   if (!is.character(component) || !component %in% names(object) ||
@@ -51,7 +78,7 @@ with_model_envir <- function(model, envir = NULL) {
 }
 model_envir <- function(model, envir = NULL) {
   if (is.null(envir)) envir <- attr(model, "gratia.envir", exact = TRUE)
-  if (is.null(envir)) envir <- model_context(model)$envir
+  if (is.null(envir)) envir <- if (is.null(model)) globalenv() else model_context(model)$envir
   if (is.null(envir)) envir <- baseenv()
   if (!is.environment(envir)) cli::cli_abort("{.arg envir} must be an environment.")
   envir
@@ -74,9 +101,10 @@ expression_failure <- function(label, error) {
 # Evaluate against the original input, never sequentially against newly added
 # columns: this avoids collisions between calls and literal variable names.
 evaluate_terms <- function(data, labels, model, envir = NULL,
-                           evaluated = FALSE) {
+                           evaluated = FALSE, fallback = NULL) {
   if (!is.data.frame(data)) data <- as.data.frame(data)
   out <- data
+  recovered <- character()
   env <- model_envir(model, envir)
   for (label in unique(labels)) {
     expr <- term_expression(label, model)
@@ -86,20 +114,41 @@ evaluate_terms <- function(data, labels, model, envir = NULL,
     ans <- tryCatch({
       # Covariate vectors must come from data, not a same-named global vector.
       missing <- setdiff(intersect(deps, names(model$var.summary)), names(data))
-      if (length(missing)) stop("Missing covariate(s): ", paste(missing, collapse = ", "))
+      if (length(missing)) stop("Variable(s) ", paste0("'", missing, "'", collapse = ", "), " not found in 'data'.")
       eval(expr, envir = data, enclos = env)
     }, error = identity)
-    if (inherits(ans, "error")) expression_failure(label, ans)
+    if (inherits(ans, "error")) {
+      # Only a caller handling known training observations supplies fallback.
+      # Equal row counts alone never authorize using it for new observations.
+      can_recover <- !is.null(fallback) && label %in% names(fallback) &&
+        identical(rownames(data), rownames(fallback))
+      if (!can_recover) expression_failure(label, ans)
+      recovered <- c(recovered, paste0(label, ": ", conditionMessage(ans)))
+      ans <- fallback[[label]]
+    }
     if (is.null(ans) || NROW(ans) != NROW(data)) {
       expression_failure(label, simpleError("The expression must return one value or matrix row per observation."))
     }
     out[[label]] <- ans
   }
+  if (length(recovered)) {
+    cli::cli_inform(c("Using stored evaluated columns for fitting observations.",
+      "i" = paste(recovered, collapse = "; "),
+      "i" = "Supply {.arg envir} to evaluate these expressions from raw covariates."),
+      class = "gratia_expression_recovery")
+  }
   out
 }
 
-prepare_smooth_data <- function(model, smooth, data, envir = NULL) {
-  evaluate_terms(data, terms_in_smooth(smooth), model, envir,
+prepare_smooth_data <- function(model, smooth, data = NULL, envir = NULL) {
+  # A missing data argument denotes training data supplied by the adapter.
+  # Explicit data, including same-length new data, never get this fallback.
+  fallback <- NULL
+  if (is.null(data)) {
+    data <- model_context(model)$data
+    fallback <- stats::model.frame(model)
+  }
+  evaluate_terms(data, terms_in_smooth(smooth), model, envir, fallback = fallback,
     evaluated = !is.null(attr(data, "terms")) ||
       isTRUE(attr(data, "gratia.evaluated")))
 }
@@ -150,7 +199,7 @@ recover_raw_data <- function(model, data = NULL, envir = NULL, vars = model_vars
 # Materialize model-frame expressions without evaluating a response. Returning
 # the columns in terms order preserves positional offset and model.matrix use.
 evaluated_model_frame <- function(model, data, envir = NULL) {
-  tt <- stats::delete.response(stats::terms(model))
+  tt <- prediction_terms(model)
   exprs <- as.list(attr(tt, "variables"))[-1L]
   labels <- vapply(exprs, function(x) paste(deparse(x, width.cutoff = 500L),
     collapse = ""), character(1))
@@ -164,7 +213,12 @@ evaluated_model_frame <- function(model, data, envir = NULL) {
     label <- labels[i]
     if (label %in% names(data) && (stored || is.symbol(exprs[[i]]) ||
         !all(all.vars(exprs[[i]]) %in% names(data)))) next
-    ans <- tryCatch(eval(pred[[i]], data, env), error = identity)
+    ans <- tryCatch({
+      # Missing predictor columns must not resolve to same-named global vectors.
+      missing <- setdiff(intersect(all.vars(exprs[[i]]), model_vars(model)), names(data))
+      if (length(missing)) stop("Variable(s) ", paste0("'", missing, "'", collapse = ", "), " not found in 'data'.")
+      eval(pred[[i]], data, env)
+    }, error = identity)
     if (inherits(ans, "error")) expression_failure(label, ans)
     if (NROW(ans) != NROW(data)) expression_failure(label,
       simpleError("The expression must return one value or matrix row per observation."))
@@ -192,4 +246,20 @@ predict_model <- function(object, newdata, ..., envir = NULL) {
     dots$newdata.guaranteed <- TRUE
   }
   do.call(stats::predict, c(list(object = object, newdata = mf), dots))
+}
+
+# A multivariate model can have additional responses in the combined terms
+# object. Exclude them too, unless they are predictors in another equation.
+prediction_terms <- function(model) {
+  tt <- stats::delete.response(stats::terms(model))
+  ff <- stats::formula(model)
+  if (!is.list(ff)) ff <- list(ff)
+  responses <- unique(unlist(lapply(ff, function(f) {
+    if (length(f) == 3L) all.vars(f[[2L]]) else character()
+  })))
+  responses <- setdiff(responses, model_vars(model))
+  labels <- attr(tt, "term.labels")
+  drop <- which(labels %in% responses)
+  if (length(drop)) tt <- stats::drop.terms(tt, drop, keep.response = FALSE)
+  tt
 }

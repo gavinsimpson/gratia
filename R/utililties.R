@@ -592,9 +592,10 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 
 #' Fix the names of a data frame containing an offset variable.
 #'
-#' Identifies which variable, if any, is the model offset, and fixed the name
-#'   such that `offset(foo(var))` is converted to `var`, and possibly sets the
-#'   values of that variable to `offset_val`.
+#' Removes evaluated offset columns while retaining their raw input variables.
+#' Raw inputs are recovered from fitting data if needed; transformed offset
+#' values are never renamed as raw values. A scalar `offset_val` overrides the
+#' raw input only for a single offset with one unambiguous input variable.
 ##
 #' @param model a fitted GAM.
 #'

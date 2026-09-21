@@ -106,3 +106,16 @@ test_that("selected smooths ignore unrelated data and preserve missing rows", {
   expect_true(is.na(ans$.estimate[2]))
   expect_true(all(is.finite(ans$.estimate[c(1, 3)])))
 })
+
+test_that("standalone bases use explicit environments for local functions", {
+  d <- transformed_data()
+  fun <- function(x) log(x + 1)
+  spec <- mgcv::s(fun(x), k = 5)
+  a <- basis(spec, data = d, envir = environment())
+  evaluated <- d; evaluated[["fun(x)"]] <- fun(d$x)
+  # Supply only evaluated coordinates so the function is not needed again.
+  b <- basis(spec, data = evaluated["fun(x)"])
+  expect_equal(a, b)
+  m <- mgcv::gam(y ~ s(fun(x), k = 5), data = d)
+  expect_s3_class(tidy_basis(m$smooth[[1]], at = d, envir = environment()), "tbl_df")
+})

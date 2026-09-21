@@ -67,3 +67,27 @@ test_that("prediction metadata retains fitted polynomial transformations", {
   expect_equal(a$.fitted, as.numeric(ref$fit))
   expect_equal(a$.se, as.numeric(ref$se.fit))
 })
+
+test_that("all missing or infinite transformed predictors preserve output rows", {
+  d <- transformed_data()
+  m <- mgcv::gam(y ~ s(log(x), k = 5), data = d)
+  for (x in list(c(NA_real_, NA_real_), c(0, Inf))) {
+    nd <- data.frame(x = x)
+    a <- smooth_estimates(m, data = nd)
+    expect_equal(nrow(a), 2L)
+    expect_true(all(is.na(a$.estimate)))
+    b <- fitted_values(m, data = nd)
+    expect_equal(nrow(b), 2L)
+    expect_true(all(is.na(b$.fitted)))
+  }
+})
+
+test_that("the expression engine preserves multiple offsets in terms metadata", {
+  d <- transformed_data()
+  # stats::lm retains both offsets. Some mgcv releases discard the second
+  # during fitting; gratia must use the terms actually retained by the fitter.
+  m <- lm(y ~ x + offset(log(w)) + offset(log(z)), data = d)
+  nd <- d[1:5, ]; nd$w <- nd$w * 2
+  mf <- evaluated_model_frame(m, nd)
+  expect_equal(as.numeric(model.offset(mf)), log(nd$w) + log(nd$z))
+})

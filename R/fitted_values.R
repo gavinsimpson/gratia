@@ -49,6 +49,8 @@
 #'   will be `nrow(data) * n_categories` rows in the returned object; each row
 #'   is the predicted probability for a single category of the response.
 #'
+#' @inheritParams smooth_estimates
+#'
 #' @export
 #'
 #' @examples

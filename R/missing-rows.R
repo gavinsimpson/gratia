@@ -104,7 +104,7 @@ prediction_layout <- function(model, data = NULL, na.action = stats::na.pass) {
   } else {
     data <- as.data.frame(data)
     mf <- delete_response(model, data = data)
-    valid <- stats::complete.cases(mf)
+    valid <- finite_predictor_rows(mf)
     action <- match.fun(na.action)
     # Apply the requested action to a row index and the prediction model frame.
     acted <- action(data.frame(.index = seq_len(NROW(data)), mf))
@@ -118,9 +118,10 @@ prediction_layout <- function(model, data = NULL, na.action = stats::na.pass) {
   if (!NROW(data)) {
     template <- model$model[1L, , drop = FALSE]
     data <- data[NA_integer_, , drop = FALSE]
-    for (nm in intersect(names(data), names(template))) {
+    for (nm in names(template)) {
       data[[nm]] <- template[[nm]]
     }
+    attr(data, "gratia.evaluated") <- TRUE
   }
   # Internally .row always indexes the compact prediction data.
   data$.row <- NULL
@@ -227,7 +228,7 @@ missing_safe_rd <- function(fun, n_response = 1L) {
 # column belongs to another smooth. Keep evaluation local to this smooth.
 predict_mat_rows <- function(smooth, data) {
   vars <- term_names(smooth)
-  valid <- stats::complete.cases(data[, vars, drop = FALSE])
+  valid <- finite_predictor_rows(data[, vars, drop = FALSE])
   if (all(valid)) {
     return(mgcv::PredictMat(smooth, data))
   }
@@ -247,4 +248,19 @@ predict_mat_rows <- function(smooth, data) {
     attr(out, "offset") <- off[map]
   }
   out
+}
+
+# Nonfinite transformed predictors cannot enter native spline routines. Keep
+# their rows in the result, just as for missing predictors. Responses are not
+# included here because infinities can legitimately encode censoring.
+finite_predictor_rows <- function(data) {
+  valid <- stats::complete.cases(data)
+  for (x in data) {
+    if (is.numeric(x)) {
+      finite <- is.finite(x)
+      if (is.matrix(x)) finite <- rowSums(!finite) == 0L
+      valid <- valid & finite
+    }
+  }
+  valid
 }

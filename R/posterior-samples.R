@@ -897,6 +897,7 @@
     ...,
     newdata = NULL,
     ncores = NULL) {
+  model_name <- deparse(substitute(model))
   model <- with_model_envir(model, envir)
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "smooth_samples(term)",
@@ -920,7 +921,7 @@
   take <- seq_along(sms) # in default case 1,2,3,..,n smooths
   if (!is.null(select)) {
     select <- check_user_select_smooths(sms, select = select,
-      partial_match = partial_match, model_name = deparse(substitute(model)))
+      partial_match = partial_match, model_name = model_name)
     # take <- which_smooths(model, term)
     take <- which(select) # need this as an id vector for things later
     sms <- sms[select] # S <- S[take]
@@ -1066,6 +1067,7 @@
     draws = NULL, mvn_method = c("mvnfast", "mgcv"),
     partial_match = NULL, envir = NULL, ...,
     newdata = NULL, ncores = NULL) {
+  model_name <- deparse(substitute(model))
   model <- with_model_envir(model, envir)
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "smooth_samples(term)",
@@ -1088,7 +1090,7 @@
   take <- seq_along(sms) # in default case 1,2,3,..,n smooths
   if (!is.null(select)) {
     select <- check_user_select_smooths(sms, select = select,
-      partial_match = partial_match, model_name = deparse(substitute(model)))
+      partial_match = partial_match, model_name = model_name)
     # take <- which_smooths(model, term)
     take <- which(select) # need this as an id vector for things later
     sms <- sms[select] # S <- S[take]

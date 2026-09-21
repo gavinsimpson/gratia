@@ -89,12 +89,12 @@
   envir = NULL,
   ...
 ) {
+  model_name <- expr_label(substitute(object))
   object <- with_model_envir(object, envir)
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
     select <- term
   }
-  model_name <- expr_label(substitute(object))
   # if particular smooths selected
   sms <- smooths(object) # vector of smooth labels - "s(x)"
 
@@ -259,7 +259,7 @@
 
   tbl <- gratia::tidy_basis(
     smooths[[i]],
-    at = data, coefs = betas,
+    at = data, coefs = betas, envir = model_envir(model),
     p_ident = p_ident
   )
 
@@ -281,6 +281,7 @@
   at = NULL,
   diagonalize = FALSE,
   coefficients = NULL,
+  envir = NULL,
   ...
 ) {
   # class of object and check for ".smooth.spec"
@@ -288,6 +289,10 @@
   if (str_detect(cls, "smooth.spec", negate = TRUE)) {
     stop("'object' doesn't appear to be a smooth created by {mgcv}.")
   }
+  # A standalone smooth specification has no fitted formula environment.
+  # Evaluate its covariates explicitly before passing them to mgcv.
+  labels <- c(object$term, if (!identical(object$by, "NA")) object$by)
+  data <- evaluate_terms(data, labels, model = NULL, envir = envir)
   ## call smoothCon to create the basis as specified in `x`
   sm <- smoothCon(object,
     data = data, knots = knots,
@@ -301,7 +306,7 @@
   if (is.null(at)) {
     at <- data
   }
-  bfuns <- map(sm, tidy_basis, data = data, at = at)
+  bfuns <- map(sm, tidy_basis, data = data, at = at, envir = envir)
 
   ## rebind
   bfuns <- bind_rows(bfuns)
@@ -359,6 +364,7 @@
 #' @param at a data frame containing values of the smooth covariate(s) at which
 #'   the basis should be evaluated.
 #' @param coefs numeric; an optional vector of coefficients for the smooth
+#' @inheritParams smooth_estimates
 #' @param p_ident logical vector; only used for handling [scam::scam()] smooths.
 #'
 #' @return A tibble.
@@ -396,7 +402,8 @@
   data = NULL,
   at = NULL,
   coefs = NULL,
-  p_ident = NULL
+  p_ident = NULL,
+  envir = NULL
 ) {
   check_is_mgcv_smooth(smooth) # check `smooth` is of the correct type
   if (is_mgcv_smooth(smooth) && is.null(at)) {
@@ -416,6 +423,8 @@
     }
     tbl <- smooth[["X"]] # extract the model matrix
   } else {
+    at <- evaluate_terms(at, terms_in_smooth(smooth), model = NULL,
+      envir = envir, evaluated = isTRUE(attr(at, "gratia.evaluated")))
     tbl <- predict_mat_rows(smooth, data = at)
     data <- at
     if (!is.null(coefs)) {

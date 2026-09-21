@@ -23,6 +23,9 @@
 #'   behaviour (using `n` for all dimensions) will be observed.
 #' @param data a data frame of covariate values at which to evaluate the
 #'   smooth.
+#' @param envir an optional environment supplying functions and constants used
+#'   in model expressions. The available model formula environment is used when
+#'   `NULL`. Covariate observations should be supplied in `data`.
 #' @param overall_uncertainty logical; should the uncertainty in the model
 #'  constant term be included in the standard error of the evaluate values of
 #'  the smooth?
@@ -46,6 +49,19 @@
 #' For explicit `data`, missing covariates needed by a smooth produce `NA`
 #' estimates and standard errors at those positions. Missing values in variables
 #' unrelated to that smooth do not discard its otherwise evaluable rows.
+#'
+#' Raw `data` may contain `x` for a smooth such as `s(log(x))`; gratia evaluates
+#' the expression before constructing the prediction matrix. An evaluated
+#' column named `"log(x)"` can be supplied instead. When both are supplied,
+#' the raw inputs take precedence, except for stored model frames and grids
+#' prepared by gratia. Automatic grids are evenly spaced in the smooth
+#' coordinate (`log(x)`), and returned coordinate columns retain that name.
+#'
+#' Stored evaluated columns allow automatic plotting even when a local function
+#' used to fit the model is no longer available. Evaluating that function at new
+#' raw data requires `envir`; training values are never substituted for new
+#' observations. Arbitrary transformations are not inverted to recover raw data.
+
 #'
 #' @export
 #'
@@ -103,13 +119,13 @@
     clip = FALSE,
     envir = NULL,
     ...) {
+  model_name <- expr_label(substitute(object))
   object <- with_model_envir(object, envir)
   if (lifecycle::is_present(smooth)) {
     lifecycle::deprecate_warn("0.8.9.9", "smooth_estimates(smooth)",
       "smooth_estimates(select)")
     select <- smooth
   }
-  model_name <- expr_label(substitute(object))
   ## if particular smooths selected
   S <- smooths(object) # vector of smooth labels - "s(x)"
 
@@ -305,20 +321,8 @@
     unlist(lapply(smooths, FUN = term_names))
   }
 
-  ## check that the vars we need are in data
-  smooth_vars <- vars %in% names(data)
-  if (!all(smooth_vars)) {
-    stop(
-      paste(
-        "Variable(s)",
-        paste(paste0("'", vars[!smooth_vars], "'"),
-          collapse = ", "
-        ),
-        "not found in 'data'."
-      ),
-      call. = FALSE
-    )
-  }
+  # Validation uses the same expression rules as actual evaluation.
+  evaluate_terms(data, vars, model)
 
   ## if we get here then everything must be OK so return the required variable
   ## names invisibly in case it is useful
@@ -516,11 +520,16 @@
   ## want full vcov for component-wise CI
   V <- vcov(model, freq = frequentist, parametrized = TRUE)
 
-  # get values of smooth & std errs, modified as needed for scam smooths
-  sv <- smooth_values(smooth = smooth, data = data, model = model, V = V)
-
-  fit <- sv$fit # fitted value at data
-  se_fit <- sv$se # sqrt(pmax(0, sv$se)) # std err of fitted value
+  # SCAM reparameterization uses QR decompositions, which cannot accept
+  # missing rows. Calculate on valid observations and restore positions once.
+  valid <- finite_predictor_rows(data[, terms_in_smooth(smooth), drop = FALSE])
+  fit <- se_fit <- rep(NA_real_, nrow(data))
+  if (any(valid)) {
+    sv <- smooth_values(smooth = smooth, data = data[valid, , drop = FALSE],
+      model = model, V = V)
+    fit[valid] <- sv$fit
+    se_fit[valid] <- sv$se
+  }
 
   label <- smooth_label(smooth)
 

@@ -36,6 +36,8 @@
 #' @param frequentist logical; use the frequentist covariance matrix?
 #' @param ... arguments passed to other methods. Not currently used.
 #'
+#' @inheritParams smooth_estimates
+#'
 #' @export
 #' @examples
 #'
@@ -134,15 +136,8 @@
       stringsAsFactor = FALSE
     ))
   } else {
-    # check if the `select` are of the correct form
-    rg <- "^(s|[t][ei2])\\([\\w\\.\\_,]*\\)(?=:)([\\w\\.\\_]*)"
-    rg_test <- str_detect(select, rg)
-    if (!all(rg_test)) {
-      stop(
-        "If naming specific factor-by smooths, all smooths in `select` must be",
-        " for the same factor-by smooth"
-      )
-    }
+    # Read factor levels from smooth metadata; function calls can contain
+    # parentheses and punctuation that cannot be parsed as simple labels.
     # get the smooth variable part
     smooth_var <- lapply(
       smooths,
@@ -162,12 +157,7 @@
         "variables.")
     }
 
-    # now reuse the regexp to grab the bit after the :,
-    # and then remove the :,
-    # and then remove the name of the factor by bit
-    lvls <- str_replace_all(select, rg, "\\2") |>
-      str_replace_all(":", "") |>
-      str_replace_all(by_var, "")
+    lvls <- unique(vapply(smooths, by_level, character(1L)))
     # finally compute the pairs
     pairs <- as_tibble(as.data.frame(t(combn(lvls, 2)),
       stringsAsFactor = FALSE

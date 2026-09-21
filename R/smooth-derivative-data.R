@@ -16,7 +16,7 @@ derivative_focal <- function(model, smooth, focal = NULL, wrt = "smooth") {
     focal <- coords[1L]
   }
   if (length(focal) != 1L || is.na(focal) || !focal %in% coords) {
-    cli::cli_abort("{.arg focal} must name a {.val {wrt}} coordinate of {.val {smooth$label}}.")
+    cli::cli_abort("Focal variable {.val {focal}} is not in smooth {.val {smooth$label}} on the {.val {wrt}} scale.")
   }
   focal
 }

@@ -22,6 +22,8 @@
 #'   should be processed. Only useful for tensor products with at least one
 #'   2d marginal smooth.
 #'
+#' @inheritParams smooth_estimates
+#'
 #' @export
 #'
 #' @importFrom dplyr bind_cols setdiff
@@ -68,7 +70,7 @@
 
   ## need a list of terms used in current smooth
   sm <- get_smooths_by_id(model, id)[[1L]]
-  mf <- prepare_smooth_data(model, sm, mf)
+  mf <- prepare_smooth_data(model, sm)
   orig_order <- unique(smooth_variable(sm))
   smooth_vars <- if (is.null(var_order)) {
     orig_order
