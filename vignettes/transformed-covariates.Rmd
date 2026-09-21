@@ -156,3 +156,27 @@ inputs held fixed, as `z` is above. Raw-scale differentiation requires the raw
 focal column: stored transformed values alone are insufficient. For an
 untransformed coordinate such as `x` in `te(x, z)`, both choices of `wrt` give
 the same interpretation.
+
+### Choosing a finite-difference step
+
+The derivative functions use `eps = NULL` by default to choose a step from the
+fitted range of the differentiation coordinate. This is the range of `log(x)`
+when differentiating on that smooth coordinate, or of `x` when using
+`wrt = "covariate"`. The step therefore follows changes in the covariate's
+units and normally stays the same when prediction data are split into batches.
+
+For derivative order $d$, the range is multiplied by
+$\epsilon_{\mathrm{machine}}^{1/(d+p)}$, where $p=2$ for central differences
+and $p=1$ for forward or backward differences. This balances the orders of
+rounding and approximation error; for example, second central differences use
+the fourth root of machine precision. Constant coordinates use their magnitude
+instead of their range, with a fallback of one at zero. A lower bound and
+rounding of the step ensure representable perturbations at large coordinates.
+
+This rule does not estimate a universally optimal step: that would also need
+information about higher derivatives of the fitted function. Very small steps
+can amplify rounding errors, particularly for second derivatives, while large
+steps increase approximation error. For unusual function scales or domain
+boundaries, supply a positive absolute `eps` and check stability at nearby step
+sizes. See the [FiniteDiff step-size discussion](https://docs.sciml.ai/FiniteDiff/dev/epsilons/)
+for the error-balance principle.

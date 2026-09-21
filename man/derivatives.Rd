@@ -21,7 +21,7 @@ derivatives(object, ...)
   order = 1L,
   type = c("forward", "backward", "central"),
   n = 100,
-  eps = 1e-07,
+  eps = NULL,
   interval = c("confidence", "simultaneous"),
   n_sim = 10000,
   level = 0.95,
@@ -60,7 +60,19 @@ at which to evaluate the first derivatives of the smooths.}
 
 \item{n}{numeric; the number of points to evaluate the derivative at.}
 
-\item{eps}{numeric; the finite difference.}
+\item{eps}{a positive finite number giving the absolute finite-difference
+step, or \code{NULL} (the default) to choose it automatically. The automatic
+step is the fitted range of the differentiation coordinate multiplied by
+\code{.Machine$double.eps^(1 / (order + p))}, where \code{p = 2} for central
+differences and \code{p = 1} for forward or backward differences. A constant
+coordinate uses its absolute value (or one if zero) instead of its range.
+The step is rounded upwards and bounded below so that adding it to the
+coordinates produces a representable change. Stored transformed values
+or raw covariate summaries supply the range; supplied \code{data} are used if
+neither is available. This is a scale-aware heuristic, not an error bound;
+unusual function scales or domain boundaries may require explicit \code{eps}.
+For first central differences the two points are separated by \code{eps};
+for second central differences they are each \code{eps} from the target.}
 
 \item{interval}{character; the type of interval to compute. One of
 \code{"confidence"} for point-wise intervals, or \code{"simultaneous"} for

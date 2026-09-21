@@ -2,6 +2,11 @@
 
 ## User visible changes
 
+* Derivative functions now choose a finite-difference step automatically when
+  `eps = NULL`, using the covariate's fitted range, derivative order, and
+  difference method. This reduces rounding error in second derivatives;
+  an explicit positive `eps` still specifies an absolute step.
+
 * Smooth evaluation, plotting, bases, sampling, and prediction now support
   functions of covariates such as `s(log(x))`, with consistent handling of
   transformed offsets and an `envir` argument for local functions and constants.
