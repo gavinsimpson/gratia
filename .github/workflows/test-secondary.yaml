@@ -34,6 +34,10 @@ jobs:
         with:
           extra-packages: any::pkgload, any::vdiffr, any::svglite
           needs: check
+      # Fresh parallel workers cannot see pkgload's in-process namespace.
+      - name: Install current package for parallel workers
+        run: R CMD INSTALL .
+        shell: bash
       - name: Run tests including visual snapshots
         env:
           VDIFFR_LOG_PATH: "${{ runner.temp }}/vdiffr.log"
@@ -68,6 +72,9 @@ jobs:
         with:
           extra-packages: any::pkgload
           needs: check
+      - name: Install current package for parallel workers
+        run: R CMD INSTALL .
+        shell: bash
       - name: Run paper-sized integration examples
         run: |
           elapsed <- system.time(results <- testthat::test_local(
