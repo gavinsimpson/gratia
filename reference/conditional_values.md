@@ -28,6 +28,7 @@ conditional_values(
   scale = c("response", "link", "linear_predictor"),
   n_vals = 100,
   ci_level = 0.95,
+  complete = TRUE,
   ...
 )
 ```
@@ -74,6 +75,16 @@ conditional_values(
 
   numeric; a number on interval (0,1) giving the coverage for credible
   intervals.
+
+- complete:
+
+  logical; if `TRUE` (the default), retain all combinations of
+  conditions. If `FALSE`, retain only combinations of factor levels
+  among the variables named in `condition` that occur in the fitted
+  model's data. Numeric conditions are not filtered, and variables
+  absent from `condition` remain at their typical values. Supplied
+  `data` does not change which combinations count as observed. An error
+  is raised if no combinations remain.
 
 ## Value
 

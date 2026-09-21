@@ -81,6 +81,7 @@ more complex model predictions, you are strongly encouraged to use
 <span>  scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"response"</span>, <span class="st">"link"</span>, <span class="st">"linear_predictor"</span><span class="op">)</span>,</span>
 <span>  n_vals <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  ci_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  complete <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -125,6 +126,16 @@ named in <code>condition</code>.</p></dd>
 <dt id="arg-ci-level">ci_level<a class="anchor" aria-label="anchor" href="#arg-ci-level"></a></dt>
 <dd><p>numeric; a number on interval (0,1) giving the coverage for
 credible intervals.</p></dd>
+
+
+<dt id="arg-complete">complete<a class="anchor" aria-label="anchor" href="#arg-complete"></a></dt>
+<dd><p>logical; if <code>TRUE</code> (the default), retain all combinations of
+conditions. If <code>FALSE</code>, retain only combinations of factor levels among
+the variables named in <code>condition</code> that occur in the fitted model's data.
+Numeric conditions are not filtered, and variables absent from <code>condition</code>
+remain at their typical values. Supplied <code>data</code> does not change which
+combinations count as observed. An error is raised if no combinations
+remain.</p></dd>
 
 </dl></div>
     <div class="section level2">

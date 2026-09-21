@@ -47,6 +47,11 @@
 
 ### New features
 
+- [`conditional_values()`](https://gavinsimpson.github.io/gratia/reference/conditional_values.md)
+  now accepts `complete = FALSE` to retain only observed combinations of
+  factor conditions, while preserving numeric prediction grids
+  ([\#337](https://github.com/gavinsimpson/gratia/issues/337)).
+
 - [`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md)
   now offers simultaneous intervals for differences of smooths at the
   supplied covariate combinations, separately for each pair of factor
