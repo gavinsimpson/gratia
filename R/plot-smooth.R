@@ -835,6 +835,14 @@
     return(NULL) # returns early!
   }
 
+  # A tensor can have two factor margins, or put its factor margin first.
+  # Only continuous covariates should be connected with lines.
+  factor_vars <- vapply(object[variables], is.factor, logical(1))
+  all_factors <- all(factor_vars)
+  if (!all_factors) {
+    variables <- c(variables[!factor_vars], variables[factor_vars])
+  }
+
   if (is.null(discrete_colour)) {
     discrete_colour <- scale_colour_discrete()
   }
@@ -845,15 +853,26 @@
   ## If fun supplied, use it to transform est and the upper and lower interval
   object <- transform_fun(object, fun = fun)
 
-  plt <- ggplot(object, aes(
-    x = .data[[variables[1]]],
-    y = .data[[".estimate"]],
-    colour = .data[[variables[2]]]
-  )) +
-    geom_line() +
-    discrete_colour +
-    theme(legend.position = "none") +
-    guides(x = guide_axis(angle = angle))
+  if (all_factors) {
+    plt <- ggplot(object, aes(
+      x = .data[[variables[1]]],
+      y = .data[[".estimate"]],
+      ymin = .data[[".lower_ci"]],
+      ymax = .data[[".upper_ci"]]
+    )) +
+      ggplot2::geom_pointrange() +
+      facet_wrap(vars(.data[[variables[2]]]), labeller = ggplot2::label_both)
+  } else {
+    plt <- ggplot(object, aes(
+      x = .data[[variables[1]]],
+      y = .data[[".estimate"]],
+      colour = .data[[variables[2]]]
+    )) +
+      geom_line() +
+      discrete_colour +
+      theme(legend.position = "none")
+  }
+  plt <- plt + guides(x = guide_axis(angle = angle))
 
   ## default axis labels if none supplied
   if (missing(xlab)) {

@@ -1345,7 +1345,7 @@
     )
   } else if (
     sm_type == "Factor smooth" || (
-      sm_type %in% c("Tensor product int.", "Tensor product") &&
+      sm_type %in% c("Tensor product int.", "Tensor product", "Tensor product (T2)") &&
         any(map_lgl(object[sm_vars], is.factor))
     )
   ) {
