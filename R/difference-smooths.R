@@ -34,9 +34,33 @@
 #'   against factor-by smooth labels.
 #' @param unconditional logical; account for smoothness selection in the model?
 #' @param frequentist logical; use the frequentist covariance matrix?
+#' @param interval character; `"confidence"` (the default) gives pointwise
+#'   intervals. `"simultaneous"` gives simultaneous intervals for differences
+#'   of smooths at the supplied covariate combinations, separately for each
+#'   pair of factor levels.
+#' @inheritParams fitted_values
 #' @param ... arguments passed to other methods. Not currently used.
 #'
 #' @inheritParams smooth_estimates
+#'
+#' @details
+#' Simultaneous intervals jointly cover the underlying smooth differences at
+#' the evaluated covariate combinations for each pair of factor levels, with
+#' approximate posterior probability `ci_level` when using the Bayesian
+#' covariance. They do not provide joint coverage across all pairs, outside
+#' the evaluation set, or between its points. With `data = NULL`, the evaluation
+#' set is generated using `n`. Differences and interval limits are on the
+#' linear predictor scale, including group means when requested.
+#'
+#' The intervals use the joint coefficient covariance selected by
+#' `unconditional` and `frequentist`, retaining covariance between the two
+#' smooths. The simulation covariance must be positive definite. With
+#' `frequentist = TRUE`, simulation instead uses the frequentist covariance
+#' of the coefficient estimators. `n_sim`, `n_cores`, and `seed` are ignored for
+#' pointwise intervals. An explicit seed scopes the entire call: each pair uses
+#' a new batch of coefficient draws, and the caller's random number state is
+#' restored on exit. With `seed = NULL`, the current random number state is
+#' used and advanced.
 #'
 #' @export
 #' @examples
@@ -56,6 +80,11 @@
 #' # include the groups means for `fac` in the difference
 #' sm_dif2 <- difference_smooths(m, select = "s(x2)", group_means = TRUE)
 #' draw(sm_dif2)
+#'
+#' # simultaneous intervals, separately for each pair of factor levels
+#' sm_sim <- difference_smooths(m, select = "s(x2)",
+#'   interval = "simultaneous", n_sim = 1000, seed = 42)
+#' draw(sm_sim)
 #'
 #' # compare specific smooths
 #' sm_dif3 <- difference_smooths(m,
@@ -90,8 +119,18 @@
   unconditional = FALSE,
   frequentist = FALSE,
   envir = NULL,
-  ...
+  ...,
+  interval = c("confidence", "simultaneous"),
+  n_sim = 10000,
+  n_cores = 1,
+  seed = NULL
 ) {
+  interval <- match.arg(interval)
+  if (identical(interval, "simultaneous") && !is.null(seed) &&
+      (!is.numeric(seed) || length(seed) != 1L || !is.finite(seed) ||
+       abs(seed) > .Machine$integer.max || seed != trunc(seed))) {
+    stop("`seed` must be NULL or a single integer.", call. = FALSE)
+  }
   model <- with_model_envir(model, envir)
   if (lifecycle::is_present(smooth)) {
     lifecycle::deprecate_warn("0.8.9.9", "difference_smooths(smooth)",
@@ -172,19 +211,20 @@
   )
   coefs <- coef(model)
 
-  out <- pmap(pairs, calc_difference,
-    select = select, by_var = by_var,
-    smooth_var = smooth_var, data = data, Xp = Xp, V = V,
-    coefs = coefs, group_means = group_means
-  )
-  out <- bind_rows(out)
-  crit <- coverage_normal(ci_level)
-  out <- add_column(out,
-    .lower_ci = out$.diff - (crit * out$.se),
-    .upper_ci = out$.diff + (crit * out$.se),
-    .after = 6L
-  )
-  out
+  calculate <- function() {
+    pmap(pairs, calc_difference,
+      select = select, by_var = by_var,
+      smooth_var = smooth_var, data = data, Xp = Xp, V = V,
+      coefs = coefs, group_means = group_means,
+      interval = interval, ci_level = ci_level, n_sim = n_sim, n_cores = n_cores
+    ) |> bind_rows()
+  }
+  # Scope the seed once: do not restart the same draw sequence for every pair.
+  if (identical(interval, "simultaneous") && !is.null(seed)) {
+    withr::with_seed(seed, calculate())
+  } else {
+    calculate()
+  }
 }
 
 #' @export
@@ -210,7 +250,9 @@
 #' @importFrom stringr str_extract
 #' @importsFrom vctrs vec_match
 `calc_difference` <- function(f1, f2, select, by_var, smooth_var, data, Xp, V,
-                              coefs, group_means = FALSE) {
+                              coefs, group_means = FALSE,
+                              interval = "confidence", ci_level = 0.95,
+                              n_sim = 10000, n_cores = 1) {
   ## make sure f1 and f2 are characters
   f1 <- as.character(f1)
   f2 <- as.character(f2)
@@ -298,5 +340,17 @@
   ## Only need rows associated with one of the levels
   out <- bind_cols(out, data[r1, smooth_var, drop = FALSE])
 
-  out
+  if (identical(interval, "simultaneous")) {
+    bounds <- simultaneous_intervals(
+      estimate = sm_diff, se = se, X = X, V = V,
+      level = ci_level, n_sim = n_sim, n_cores = n_cores
+    )
+    lower <- bounds$lower
+    upper <- bounds$upper
+  } else {
+    crit <- coverage_normal(ci_level)
+    lower <- sm_diff - crit * se
+    upper <- sm_diff + crit * se
+  }
+  add_column(out, .lower_ci = lower, .upper_ci = upper, .after = 6L)
 }

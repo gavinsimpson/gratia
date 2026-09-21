@@ -19,7 +19,11 @@ difference_smooths(model, ...)
   unconditional = FALSE,
   frequentist = FALSE,
   envir = NULL,
-  ...
+  ...,
+  interval = c("confidence", "simultaneous"),
+  n_sim = 10000,
+  n_cores = 1,
+  seed = NULL
 )
 }
 \arguments{
@@ -67,12 +71,46 @@ against factor-by smooth labels.}
 \item{envir}{an optional environment supplying functions and constants used
 in model expressions. The available model formula environment is used when
 \code{NULL}. Covariate observations should be supplied in \code{data}.}
+
+\item{interval}{character; \code{"confidence"} (the default) gives pointwise
+intervals. \code{"simultaneous"} gives simultaneous intervals for differences
+of smooths at the supplied covariate combinations, separately for each
+pair of factor levels.}
+
+\item{n_sim}{positive integer; number of coefficient draws used for
+simultaneous intervals. Ignored for pointwise intervals.}
+
+\item{n_cores}{positive integer; number of cores used by \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}
+for simultaneous intervals. Parallel execution requires OpenMP support.}
+
+\item{seed}{integer or \code{NULL}; optional random seed for simultaneous
+intervals. An explicit seed preserves the caller's random number state.
+With \code{NULL}, the current random number state is used and advanced.}
 }
 \description{
 Estimates pairwise differences (comparisons) between factor smooth
 interactions (smooths with a factor \code{by} argument) for pairs of groups
 defined by the factor. The group means can be optionally included in the
 difference.
+}
+\details{
+Simultaneous intervals jointly cover the underlying smooth differences at
+the evaluated covariate combinations for each pair of factor levels, with
+approximate posterior probability \code{ci_level} when using the Bayesian
+covariance. They do not provide joint coverage across all pairs, outside
+the evaluation set, or between its points. With \code{data = NULL}, the evaluation
+set is generated using \code{n}. Differences and interval limits are on the
+linear predictor scale, including group means when requested.
+
+The intervals use the joint coefficient covariance selected by
+\code{unconditional} and \code{frequentist}, retaining covariance between the two
+smooths. The simulation covariance must be positive definite. With
+\code{frequentist = TRUE}, simulation instead uses the frequentist covariance
+of the coefficient estimators. \code{n_sim}, \code{n_cores}, and \code{seed} are ignored for
+pointwise intervals. An explicit seed scopes the entire call: each pair uses
+a new batch of coefficient draws, and the caller's random number state is
+restored on exit. With \code{seed = NULL}, the current random number state is
+used and advanced.
 }
 \examples{
 
@@ -91,6 +129,11 @@ draw(sm_dif)
 # include the groups means for `fac` in the difference
 sm_dif2 <- difference_smooths(m, select = "s(x2)", group_means = TRUE)
 draw(sm_dif2)
+
+# simultaneous intervals, separately for each pair of factor levels
+sm_sim <- difference_smooths(m, select = "s(x2)",
+  interval = "simultaneous", n_sim = 1000, seed = 42)
+draw(sm_sim)
 
 # compare specific smooths
 sm_dif3 <- difference_smooths(m,
