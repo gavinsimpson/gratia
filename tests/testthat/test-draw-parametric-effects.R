@@ -153,7 +153,7 @@ test_that("parametric effects works with messing data in model fit", {
   skip_if_not_installed("forcats")
   skip_if_not_installed("readr")
 
-  rats_url <- "https://bit.ly/rat-hormone"
+  rats_url <- "https://fromthebottomoftheheap.net/teaching/data/rats.txt"
   expect_warning(rats <- readr::read_table(rats_url,
     col_types = "dddddddddddd-"
   ))
