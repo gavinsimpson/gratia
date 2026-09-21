@@ -1309,7 +1309,7 @@
   scale = c("response", "linear_predictor"),
   method = c("gaussian", "mh", "inla", "user"),
   n = 100,
-  eps = 1e-7,
+  eps = NULL,
   n_sim = 10000,
   level = lifecycle::deprecated(),
   seed = NULL,
@@ -1344,7 +1344,7 @@
   scale = c("response", "linear_predictor"),
   method = c("gaussian", "mh", "inla", "user"),
   n = 100,
-  eps = 1e-7,
+  eps = NULL,
   n_sim = 10000,
   seed = NULL,
   envir = environment(formula(object)),
@@ -1369,7 +1369,7 @@
   scale = c("response", "linear_predictor"),
   method = c("gaussian", "mh", "inla", "user"),
   n = 100,
-  eps = 1e-7,
+  eps = NULL,
   n_sim = 10000,
   seed = NULL,
   envir = environment(formula(object)),
@@ -1422,6 +1422,11 @@
   }
   data <- data |>
     add_column(.row = seq_len(nrow(data)), .before = 1L)
+
+  # Choose the step on the raw focal scale before perturbing prediction rows.
+  step_data <- data
+  names(step_data)[names(step_data) == ".x"] <- focal
+  eps <- derivative_step(object, focal, step_data, eps, order, type)
 
   # now shift values depending on method
   fd_data <- prepare_fdiff_data(

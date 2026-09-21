@@ -40,7 +40,19 @@
 #' @param type character; the type of finite difference used. One of
 #'   `"forward"`, `"backward"`, or `"central"`.
 #' @param n numeric; the number of points to evaluate the derivative at.
-#' @param eps numeric; the finite difference.
+#' @param eps a positive finite number giving the absolute finite-difference
+#'   step, or `NULL` (the default) to choose it automatically. The automatic
+#'   step is the fitted range of the differentiation coordinate multiplied by
+#'   `.Machine$double.eps^(1 / (order + p))`, where `p = 2` for central
+#'   differences and `p = 1` for forward or backward differences. A constant
+#'   coordinate uses its absolute value (or one if zero) instead of its range.
+#'   The step is rounded upwards and bounded below so that adding it to the
+#'   coordinates produces a representable change. Stored transformed values
+#'   or raw covariate summaries supply the range; supplied `data` are used if
+#'   neither is available. This is a scale-aware heuristic, not an error bound;
+#'   unusual function scales or domain boundaries may require explicit `eps`.
+#'   For first central differences the two points are separated by `eps`;
+#'   for second central differences they are each `eps` from the target.
 #' @param interval character; the type of interval to compute. One of
 #'   `"confidence"` for point-wise intervals, or `"simultaneous"` for
 #'   simultaneous intervals.
@@ -126,7 +138,7 @@
   order = 1L,
   type = c("forward", "backward", "central"),
   n = 100,
-  eps = 1e-7,
+  eps = NULL,
   interval = c("confidence", "simultaneous"),
   n_sim = 10000,
   level = 0.95,
@@ -248,15 +260,16 @@
     sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1]]
     focal_i <- derivative_focal(object, sm,
       if (is.null(focal)) NULL else focal[[if (length(focal) == 1L) 1L else i]], wrt)
+    h <- derivative_step(object, focal_i, data, eps, order, type)
     # Prepare coordinates once, then recompute raw transformations per step.
     newd <- if (need_data) {
-      smooth_derivative_data(object, sm, n, focal_i, wrt, order, type, eps)
+      smooth_derivative_data(object, sm, n, focal_i, wrt, order, type, h)
     } else data
     newd <- prepare_smooth_data(object, sm, newd)
     if (is_factor_by_smooth(sm)) {
       newd <- vec_slice(newd, is.na(newd[[sm$by]]) | newd[[sm$by]] == by_level(sm))
     }
-    X <- smooth_finite_difference(object, sm, newd, focal_i, wrt, type, order, eps)
+    X <- smooth_finite_difference(object, sm, newd, focal_i, wrt, type, order, h)
 
     ## compute derivatives
     d <- compute_derivative(smooth_ids[[i]],
@@ -758,7 +771,6 @@
 #' @param type character; the type of finite difference used. One of
 #'   `"forward"`, `"backward"`, or `"central"`.
 #' @param n numeric; the number of points to evaluate the derivative at.
-#' @param eps numeric; the finite difference.
 #' @param interval character; the type of interval to compute. One of
 #'   `"confidence"` for point-wise intervals, or `"simultaneous"` for
 #'   simultaneous intervals.
@@ -865,7 +877,7 @@
     data = newdata,
     order = 1L,
     type = c("forward", "backward", "central"),
-    n = 100, eps = 1e-7,
+    n = 100, eps = NULL,
     interval = c("confidence", "simultaneous"),
     n_sim = 10000, level = 0.95,
     unconditional = FALSE, frequentist = FALSE,
@@ -1025,8 +1037,9 @@
   for (i in seq_along(smooth_ids)) {
     focal_i <- focal[[i]]
     sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1L]]
+    h <- derivative_step(object, focal_i, data, eps, order, type)
     newd <- if (need_data) {
-      smooth_derivative_data(object, sm, n, focal_i, wrt, order, type, eps)
+      smooth_derivative_data(object, sm, n, focal_i, wrt, order, type, h)
     } else data
     # For partial derivatives, all other independent coordinates are fixed.
     check <- prepare_smooth_data(object, sm, newd)
@@ -1044,7 +1057,7 @@
     if (is_factor_by_smooth(sm)) {
       newd <- vec_slice(newd, is.na(newd[[sm$by]]) | newd[[sm$by]] == by_level(sm))
     }
-    X <- smooth_finite_difference(object, sm, newd, focal_i, wrt, type, order, eps)
+    X <- smooth_finite_difference(object, sm, newd, focal_i, wrt, type, order, h)
 
     ## compute derivatives
     d <- compute_derivative(smooth_ids[[i]],
@@ -1144,7 +1157,7 @@
 #'   or `"linear predictor"`.
 #' @param n numeric; the number of points to evaluate the derivative at (if
 #'   `data` is not supplied).
-#' @param eps numeric; the finite difference.
+#' @inheritParams derivatives eps
 #' @param n_sim integer; the number of simulations used in computing the
 #'   simultaneous intervals.
 #' @param level numeric; `0 < level < 1`; the coverage level of the
@@ -1236,7 +1249,7 @@
   type = c("forward", "backward", "central"),
   scale = c("response", "linear_predictor"),
   method = c("gaussian", "mh", "inla", "user"),
-  n = 100, eps = 1e-7,
+  n = 100, eps = NULL,
   n_sim = 10000, level = 0.95,
   seed = NULL,
   mvn_method = c("mvnfast", "mgcv"),
@@ -1271,7 +1284,7 @@
   type = c("forward", "backward", "central"),
   scale = c("response", "linear_predictor"),
   method = c("gaussian", "mh", "inla", "user"),
-  n = 100, eps = 1e-7,
+  n = 100, eps = NULL,
   n_sim = 10000, level = 0.95,
   seed = NULL,
   mvn_method = c("mvnfast", "mgcv"),
@@ -1292,7 +1305,7 @@
   type = c("forward", "backward", "central"),
   scale = c("response", "linear_predictor"),
   method = c("gaussian", "mh", "inla", "user"),
-  n = 100, eps = 1e-7,
+  n = 100, eps = NULL,
   n_sim = 10000, level = 0.95,
   seed = NULL,
   mvn_method = c("mvnfast", "mgcv"),
