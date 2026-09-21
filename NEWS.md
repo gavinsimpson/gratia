@@ -8,11 +8,16 @@
   Stored evaluated covariates support smooth plotting when the original data or
   functions are unavailable, while failed evaluation at new data produces
   actionable errors instead of substituting training values.
+
   Automatic smooth grids retain transformed coordinates, and `derivatives()`
   and `partial_derivatives()` can differentiate with respect to raw covariates
   using `wrt = "covariate"`.
-  Parametric effects and data slices now recover raw covariates consistently, while
-  `typical_values()` and `data_combos()` no longer require an `envir` argument.
+
+  Parametric effects and data slices now recover raw covariates consistently,
+  while `typical_values()` and `data_combos()` no longer require an `envir`
+  argument.
+
+  See `vignette("transformed-covariates", package = "gratia")` for examples.
 
 * For models fitted with `na.exclude`, default fitted values, partial residuals,
   fitted and posterior samples, and simulations now restore excluded rows as
