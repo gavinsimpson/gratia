@@ -8,13 +8,7 @@
 \usage{
 typical_values(object, ...)
 
-\method{typical_values}{gam}(
-  object,
-  vars = everything(),
-  envir = environment(formula(object)),
-  data = NULL,
-  ...
-)
+\method{typical_values}{gam}(object, vars = everything(), data = NULL, ...)
 
 \method{typical_values}{data.frame}(object, vars = everything(), ...)
 }
@@ -26,11 +20,9 @@ typical_values(object, ...)
 \item{vars}{terms to include or exclude from the returned object. Uses
 tidyselect principles.}
 
-\item{envir}{the environment within which to recreate the data used to fit
-\code{object}.}
-
-\item{data}{an optional data frame of data used to fit the model if
-reconstruction of the data from the model doesn't work.}
+\item{data}{an optional data frame supplying covariate classes. By default,
+these are taken from the stored model frame; typical values come from
+the fitted model's covariate summaries.}
 }
 \description{
 Typical values of model covariates

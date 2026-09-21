@@ -181,8 +181,11 @@ recover_raw_data <- function(model, data = NULL, envir = NULL, vars = model_vars
     check <- check[, labels, drop = FALSE]
     # Match by fitting row identity, and verify evaluated values as well.
     i <- match(rownames(ctx$data), rownames(check))
+    # Subset both frames so matrix columns lose auxiliary classes (such as
+    # poly) consistently; row subsetting only the recovered frame is unequal.
+    stored <- ctx$data[seq_len(nrow(ctx$data)), labels, drop = FALSE]
     if (anyNA(i) || !isTRUE(all.equal(unname(as.list(check[i, , drop = FALSE])),
-        unname(as.list(ctx$data[, labels, drop = FALSE])), check.attributes = FALSE))) {
+        unname(as.list(stored)), check.attributes = FALSE))) {
       stop("Recovered data do not agree with the stored fitting observations.")
     }
     d[i, vars, drop = FALSE]

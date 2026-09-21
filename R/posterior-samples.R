@@ -1407,8 +1407,7 @@
     x <- object$var.summary[[focal]]
     x <- seq(x[1L], x[3L], length = n)
     tv <- typical_values(object,
-      vars = !matches(focal), data = data,
-      envir = envir
+      vars = !matches(focal), data = data
     )
     # if model only contains a single var, tv is empty
     data <- if (ncol(tv) > 0L) {

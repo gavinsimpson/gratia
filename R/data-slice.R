@@ -156,10 +156,9 @@
 `data_slice.gam` <- function(object, ..., data = NULL,
                              envir = NULL,
                              .observed_only = FALSE) {
-  # if envir is NULL, set it to the formula of the object
-  if (is.null(envir)) {
-    envir <- environment(formula(object))
-  }
+  # Share environment resolution with expression evaluation and data recovery.
+  object <- with_model_envir(object, envir)
+  envir <- model_envir(object)
   # Only recover raw inputs used by the slice expressions. A constant offset
   # supplied by the caller must not require its original training vector.
   odata <- data
@@ -186,7 +185,7 @@
   # typical values, only needed ones that aren't
   need_tv <- setdiff(vars, names(slice_vars))
   if (length(need_tv) > 0L) {
-    tv <- typical_values(object, data = odata, envir = envir)
+    tv <- typical_values(object, data = odata)
     slice_vars <- append(slice_vars, tv[need_tv])
   }
 
@@ -371,18 +370,16 @@
 #' @rdname typical_values
 #' @param vars terms to include or exclude from the returned object. Uses
 #'   tidyselect principles.
-#' @param envir the environment within which to recreate the data used to fit
-#'   `object`.
-#' @param data an optional data frame of data used to fit the model if
-#'   reconstruction of the data from the model doesn't work.
+#' @param data an optional data frame supplying covariate classes. By default,
+#'   these are taken from the stored model frame; typical values come from
+#'   the fitted model's covariate summaries.
 #'
 #' @export
 #' @importFrom rlang enquo
 #' @importFrom tidyselect eval_select
 #' @importFrom stats model.frame formula
 `typical_values.gam` <- function(
-    object, vars = everything(),
-    envir = environment(formula(object)), data = NULL, ...) {
+    object, vars = everything(), data = NULL, ...) {
   # extract the summary from the fitted GAM
   # summ is a named list
   summ <- object[["var.summary"]]
@@ -508,19 +505,15 @@
   UseMethod("data_combos")
 }
 
-#' @param envir the environment within which to recreate the data used to fit
-#'   `object`.
-#' @param data an optional data frame of data used to fit the model if
-#'   reconstruction of the data from the model doesn't work.
+#' @inheritParams typical_values
 #'
 #' @inheritParams factor_combos
 #' @export
 #' @rdname data_combos
 `data_combos.gam` <- function(object, vars = everything(),
                               complete = TRUE,
-                              envir = environment(formula(object)),
                               data = NULL, ...) {
-  tv <- typical_values(object, envir = envir, data = data)
+  tv <- typical_values(object, data = data)
   is_fac <- vapply(tv, is.factor, logical(1L))
   if (any(is_fac)) { # drop factor from typical values
     tv <- tv[, !is_fac]

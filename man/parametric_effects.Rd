@@ -14,7 +14,7 @@ parametric_effects(object, ...)
   unconditional = FALSE,
   unnest = TRUE,
   ci_level = 0.95,
-  envir = environment(formula(object)),
+  envir = NULL,
   transform = FALSE,
   ...
 )
@@ -27,7 +27,9 @@ parametric_effects(object, ...)
 \item{terms}{character; which model parametric terms should be drawn? The
 Default of \code{NULL} will plot all parametric terms that can be drawn.}
 
-\item{data}{a optional data frame that may or may not be used? FIXME!}
+\item{data}{an optional data frame containing raw model covariates at which
+to evaluate parametric effects. By default, stored raw columns are used;
+missing raw inputs are recovered from the fitting data when possible.}
 
 \item{unconditional}{logical; should confidence intervals include the
 uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian
@@ -38,7 +40,9 @@ covariance matrix will be used.}
 \item{ci_level}{numeric; the coverage required for the confidence interval.
 Currently ignored.}
 
-\item{envir}{an environment to look up the data within.}
+\item{envir}{an optional environment for local functions and constants, and
+for recovering fitting data when required raw columns are not stored in
+the model. Defaults to the model's evaluation environment.}
 
 \item{transform}{logical; if \code{TRUE}, the parametric effect will be plotted on
 its transformed scale which will result in the effect being a straight

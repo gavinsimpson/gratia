@@ -3,14 +3,18 @@
 #' @param object a fitted model object.
 #' @param terms character; which model parametric terms should be drawn? The
 #'   Default of `NULL` will plot all parametric terms that can be drawn.
-#' @param data a optional data frame that may or may not be used? FIXME!
+#' @param data an optional data frame containing raw model covariates at which
+#'   to evaluate parametric effects. By default, stored raw columns are used;
+#'   missing raw inputs are recovered from the fitting data when possible.
 #' @param unconditional logical; should confidence intervals include the
 #'   uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian
 #'   covariance matrix will be used.
 #' @param unnest logical; unnest the parametric effect objects?
 #' @param ci_level numeric; the coverage required for the confidence interval.
 #'   Currently ignored.
-#' @param envir an environment to look up the data within.
+#' @param envir an optional environment for local functions and constants, and
+#'   for recovering fitting data when required raw columns are not stored in
+#'   the model. Defaults to the model's evaluation environment.
 #' @param transform logical; if `TRUE`, the parametric effect will be plotted on
 #'   its transformed scale which will result in the effect being a straight
 #'   line. If FALSE, the effect will be plotted against the raw data (i.e. for
@@ -39,10 +43,11 @@
                                      unconditional = FALSE,
                                      unnest = TRUE,
                                      ci_level = 0.95,
-                                     envir = environment(formula(object)),
+                                     envir = NULL,
                                      transform = FALSE,
                                      ...) {
   object <- with_model_envir(object, envir)
+  envir <- model_envir(object)
   tt <- object$pterms # get model terms object
   tt <- delete.response(tt) # remove response so easier to work with
   vars <- parametric_terms(object) # vector of names of model terms
@@ -80,14 +85,9 @@
     return(NULL)
   }
 
-  # try to recover the data
-  mf <- model.frame(object)
-  if (is.null(data)) {
-    data <- eval(object$call$data, envir)
-  }
-  if (is.null(data)) {
-    data <- mf
-  }
+  # Prefer stored raw columns. Recover the fitting data only when a required
+  # input is absent, using the same checks as data_slice().
+  data <- recover_raw_data(object, data = data, envir = envir)
 
   # have to do predictions *after* we reconstruct the data otherwise we get
   # problems if there were NAs in the original data.

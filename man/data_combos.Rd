@@ -7,14 +7,7 @@
 \usage{
 data_combos(object, ...)
 
-\method{data_combos}{gam}(
-  object,
-  vars = everything(),
-  complete = TRUE,
-  envir = environment(formula(object)),
-  data = NULL,
-  ...
-)
+\method{data_combos}{gam}(object, vars = everything(), complete = TRUE, data = NULL, ...)
 }
 \arguments{
 \item{object}{a fitted model object.}
@@ -28,11 +21,9 @@ tidyselect principles.}
 returned? If \code{FALSE}, only those combinations of levels observed in the
 model are retained.}
 
-\item{envir}{the environment within which to recreate the data used to fit
-\code{object}.}
-
-\item{data}{an optional data frame of data used to fit the model if
-reconstruction of the data from the model doesn't work.}
+\item{data}{an optional data frame supplying covariate classes. By default,
+these are taken from the stored model frame; typical values come from
+the fitted model's covariate summaries.}
 }
 \description{
 All combinations of factor levels plus typical values of continuous variables
