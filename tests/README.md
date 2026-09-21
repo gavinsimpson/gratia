@@ -30,7 +30,8 @@ also includes shared setup and runner overhead.
 
 The R-CMD-check matrix runs the broader suite on all its platforms and an
 additional CRAN-core check on Linux. Coverage uses the broader suite. A separate
-macOS job runs visual comparisons with a fixed R version; image differences
+macOS job runs visual comparisons with a fixed R version and Apple Accelerate
+BLAS, matching the local baseline environment; image differences
 should be reviewed, not automatically accepted. Existing platform restrictions
 on legacy numerical snapshots remain in place.
 

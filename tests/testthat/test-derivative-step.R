@@ -16,7 +16,13 @@ test_that("automatic response differences agree with analytical derivatives", {
       ans <- response_derivatives(m, data = nd, focal = "x", order = order,
         type = type, method = "user", draws = b, n_sim = 1)
       # Compare in the original units so tolerances have the same meaning.
-      expect_equal(ans$.derivative * units^order, truth, tolerance = 5e-5)
+      # One-sided second differences divide cancellation error by h^2.
+      # With h ~ machine epsilon^(1/3), their rounding error is larger
+      # and varies across BLAS implementations. Use an absolute error bound
+      # on this fixed reference, rather than a vector-relative tolerance.
+      tolerance <- if (order == 2L && type != "central") 1e-4 else 5e-7
+      expect_lt(max(abs(ans$.derivative * units^order - truth)), tolerance,
+        label = paste("maximum error: units", units, "order", order, type))
     }
   }
 })
