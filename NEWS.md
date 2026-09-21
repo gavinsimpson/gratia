@@ -34,6 +34,11 @@
 
 ## New features
 
+* `difference_smooths()` now offers simultaneous intervals for differences of
+  smooths at the supplied covariate combinations, separately for each pair of
+  factor levels, via `interval = "simultaneous"` (#380).
+  Pointwise intervals remain the default.
+
 * `fitted_values()` now offers simultaneous intervals for predictions at the
   supplied covariate combinations via `interval = "simultaneous"` (#4).
   Pointwise intervals remain the default. Simultaneous intervals use a shared
