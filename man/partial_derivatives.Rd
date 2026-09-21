@@ -34,7 +34,9 @@ partial_derivatives(object, ...)
   partial_match = FALSE,
   seed = NULL,
   ...,
-  newdata = NULL
+  newdata = NULL,
+  envir = NULL,
+  wrt = c("smooth", "covariate")
 )
 }
 \arguments{
@@ -98,6 +100,13 @@ against.}
 \item{seed}{numeric; RNG seed to use.}
 
 \item{newdata}{Deprecated: use \code{data} instead.}
+
+\item{envir}{optional environment for functions and constants in model
+expressions; see \code{\link[=smooth_estimates]{smooth_estimates()}}.}
+
+\item{wrt}{differentiation coordinate: \code{"smooth"} (the default) uses the
+smooth expression, such as \code{log(x)}; \code{"covariate"} uses a raw covariate,
+such as \code{x}, and reevaluates expressions at each finite-difference point.}
 }
 \value{
 A tibble, currently with the following variables:

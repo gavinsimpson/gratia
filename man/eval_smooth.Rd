@@ -26,6 +26,7 @@ eval_smooth(smooth, ...)
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   dist = NULL,
+  envir = NULL,
   ...
 )
 
@@ -40,6 +41,7 @@ eval_smooth(smooth, ...)
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   clip = TRUE,
+  envir = NULL,
   ...
 )
 
@@ -54,6 +56,7 @@ eval_smooth(smooth, ...)
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   dist = NULL,
+  envir = NULL,
   ...
 )
 
@@ -65,6 +68,7 @@ eval_smooth(smooth, ...)
   unconditional = FALSE,
   frequentist = FALSE,
   overall_uncertainty = TRUE,
+  envir = NULL,
   ...
 )
 
@@ -76,6 +80,7 @@ eval_smooth(smooth, ...)
   unconditional = FALSE,
   frequentist = FALSE,
   overall_uncertainty = TRUE,
+  envir = NULL,
   ...
 )
 
@@ -87,6 +92,7 @@ eval_smooth(smooth, ...)
   unconditional = FALSE,
   frequentist = FALSE,
   overall_uncertainty = TRUE,
+  envir = NULL,
   ...
 )
 
@@ -98,6 +104,7 @@ eval_smooth(smooth, ...)
   unconditional = FALSE,
   frequentist = FALSE,
   overall_uncertainty = TRUE,
+  envir = NULL,
   ...
 )
 
@@ -112,6 +119,7 @@ eval_smooth(smooth, ...)
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   dist = NULL,
+  envir = NULL,
   ...
 )
 
@@ -126,6 +134,7 @@ eval_smooth(smooth, ...)
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   dist = NULL,
+  envir = NULL,
   ...
 )
 }
@@ -168,6 +177,10 @@ a location is too far from data to be plotted when plotting 2-D smooths.
 The data are scaled into the unit square before deciding what to exclude,
 and \code{dist} is a distance within the unit square. See
 \code{\link[mgcv:exclude.too.far]{mgcv::exclude.too.far()}} for further details.}
+
+\item{envir}{an optional environment supplying functions and constants used
+in model expressions. The available model formula environment is used when
+\code{NULL}. Covariate observations should be supplied in \code{data}.}
 
 \item{clip}{logical; should evaluation points be clipped to the boundary of
 a soap film smooth? The default is \code{FALSE}, which will return \code{NA} for any

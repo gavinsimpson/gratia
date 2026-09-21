@@ -4,7 +4,14 @@
 \alias{tidy_basis}
 \title{A tidy basis representation of a smooth object}
 \usage{
-tidy_basis(smooth, data = NULL, at = NULL, coefs = NULL, p_ident = NULL)
+tidy_basis(
+  smooth,
+  data = NULL,
+  at = NULL,
+  coefs = NULL,
+  p_ident = NULL,
+  envir = NULL
+)
 }
 \arguments{
 \item{smooth}{a smooth object of or inheriting from class \code{"mgcv.smooth"}.
@@ -20,6 +27,10 @@ the basis should be evaluated.}
 \item{coefs}{numeric; an optional vector of coefficients for the smooth}
 
 \item{p_ident}{logical vector; only used for handling \code{\link[scam:scam]{scam::scam()}} smooths.}
+
+\item{envir}{an optional environment supplying functions and constants used
+in model expressions. The available model formula environment is used when
+\code{NULL}. Covariate observations should be supplied in \code{data}.}
 }
 \value{
 A tibble.

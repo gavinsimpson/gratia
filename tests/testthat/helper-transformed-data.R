@@ -6,4 +6,3 @@ transformed_data <- function() {
     d
   })
 }
-

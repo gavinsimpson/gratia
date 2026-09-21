@@ -31,7 +31,10 @@ derivatives(object, ...)
   ncores = 1,
   partial_match = FALSE,
   ...,
-  newdata = NULL
+  newdata = NULL,
+  envir = NULL,
+  wrt = c("smooth", "covariate"),
+  focal = NULL
 )
 }
 \arguments{
@@ -87,6 +90,18 @@ with \code{term}? If \code{TRUE}, \code{term} can only be a single string to mat
 against.}
 
 \item{newdata}{Deprecated: use \code{data} instead.}
+
+\item{envir}{optional environment for functions and constants in model
+expressions; see \code{\link[=smooth_estimates]{smooth_estimates()}}.}
+
+\item{wrt}{differentiation coordinate: \code{"smooth"} (the default) uses the
+smooth expression, such as \code{log(x)}; \code{"covariate"} uses a raw covariate,
+such as \code{x}, and reevaluates expressions at each finite-difference point.}
+
+\item{focal}{name of the differentiation coordinate, or a vector with one
+name per selected smooth. For raw-covariate derivatives it must be supplied
+when a smooth depends on multiple raw inputs. A single name can be used
+for all selected univariate smooths.}
 }
 \value{
 A tibble, currently with the following variables:

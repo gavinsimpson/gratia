@@ -21,6 +21,7 @@ basis(object, ...)
   n_3d = 16,
   n_4d = 4,
   partial_match = FALSE,
+  envir = NULL,
   ...
 )
 
@@ -71,12 +72,13 @@ basis(object, ...)
   at = NULL,
   diagonalize = FALSE,
   coefficients = NULL,
+  envir = NULL,
   ...
 )
 }
 \arguments{
 \item{object}{a smooth specification, the result of a call to one of
-\code{\link[mgcv:s]{mgcv::s()}}., \code{\link[mgcv:te]{mgcv::te()}}, \code{\link[mgcv:te]{mgcv::ti()}}, or \code{\link[mgcv:t2]{mgcv::t2()}}, or a fitted
+\code{\link[mgcv:s]{mgcv::s()}}., \code{\link[mgcv:te]{mgcv::te()}}, \code{\link[mgcv:ti]{mgcv::ti()}}, or \code{\link[mgcv:t2]{mgcv::t2()}}, or a fitted
 GAM(M) model.}
 
 \item{...}{other arguments passed to \code{\link[mgcv:smoothCon]{mgcv::smoothCon()}}.}
@@ -106,6 +108,10 @@ new observations.}
 \code{select} match partially against \code{smooths}? If \code{partial_match = TRUE},
 \code{select} must only be a single string, a character vector of length 1.}
 
+\item{envir}{an optional environment supplying functions and constants used
+in model expressions. The available model formula environment is used when
+\code{NULL}. Covariate observations should be supplied in \code{data}.}
+
 \item{knots}{a list or data frame with named components containing
 knots locations. Names must match the covariates for which the basis
 is required. See \code{\link[mgcv:smoothCon]{mgcv::smoothCon()}}.}
@@ -129,7 +135,7 @@ A tibble.
 }
 \description{
 Basis expansions from a definition of a smoother using the syntax of \emph{mgcv}'s
-smooths via \code{\link[mgcv:s]{mgcv::s()}}., \code{\link[mgcv:te]{mgcv::te()}}, \code{\link[mgcv:te]{mgcv::ti()}}, and \code{\link[mgcv:t2]{mgcv::t2()}}, or
+smooths via \code{\link[mgcv:s]{mgcv::s()}}., \code{\link[mgcv:te]{mgcv::te()}}, \code{\link[mgcv:ti]{mgcv::ti()}}, and \code{\link[mgcv:t2]{mgcv::t2()}}, or
 directly from a fitted GAM(M).
 }
 \details{

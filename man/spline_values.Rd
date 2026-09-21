@@ -10,7 +10,8 @@ spline_values(
   model,
   unconditional,
   overall_uncertainty = TRUE,
-  frequentist = FALSE
+  frequentist = FALSE,
+  envir = NULL
 )
 }
 \arguments{
@@ -32,6 +33,10 @@ the smooth?}
 
 \item{frequentist}{logical; if \code{FALSE}, the default, the bayesian covariance
 matrix is returned, otherwise the frequentist covariance matrix.}
+
+\item{envir}{an optional environment supplying functions and constants used
+in model expressions. The available model formula environment is used when
+\code{NULL}. Covariate observations should be supplied in \code{data}.}
 }
 \description{
 Evaluate a spline at provided covariate values

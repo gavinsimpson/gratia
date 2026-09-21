@@ -14,6 +14,7 @@ fitted_values(object, ...)
   data = NULL,
   scale = c("response", "link", "linear predictor"),
   ci_level = 0.95,
+  envir = NULL,
   ...
 )
 
@@ -38,6 +39,10 @@ terminology.}
 
 \item{ci_level}{numeric; a value between 0 and 1 indicating the coverage of
 the credible interval.}
+
+\item{envir}{an optional environment supplying functions and constants used
+in model expressions. The available model formula environment is used when
+\code{NULL}. Covariate observations should be supplied in \code{data}.}
 }
 \value{
 A tibble (data frame) whose first \emph{m} columns contain either the data

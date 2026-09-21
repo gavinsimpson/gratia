@@ -18,6 +18,7 @@ difference_smooths(model, ...)
   partial_match = TRUE,
   unconditional = FALSE,
   frequentist = FALSE,
+  envir = NULL,
   ...
 )
 }
@@ -62,6 +63,10 @@ against factor-by smooth labels.}
 \item{unconditional}{logical; account for smoothness selection in the model?}
 
 \item{frequentist}{logical; use the frequentist covariance matrix?}
+
+\item{envir}{an optional environment supplying functions and constants used
+in model expressions. The available model formula environment is used when
+\code{NULL}. Covariate observations should be supplied in \code{data}.}
 }
 \description{
 Estimates pairwise differences (comparisons) between factor smooth

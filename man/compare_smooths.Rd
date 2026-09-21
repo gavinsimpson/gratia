@@ -13,7 +13,8 @@ compare_smooths(
   data = NULL,
   unconditional = FALSE,
   overall_uncertainty = TRUE,
-  partial_match = FALSE
+  partial_match = FALSE,
+  envir = NULL
 )
 }
 \arguments{
@@ -49,6 +50,10 @@ the smooth?}
 \item{partial_match}{logical; should smooths be selected by partial matches
 with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
 against.}
+
+\item{envir}{an optional environment supplying functions and constants used
+in model expressions. The available model formula environment is used when
+\code{NULL}. Covariate observations should be supplied in \code{data}.}
 }
 \description{
 Compare smooths across models

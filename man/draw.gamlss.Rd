@@ -12,7 +12,9 @@
   guides = "keep",
   widths = NULL,
   heights = NULL,
-  ...
+  ...,
+  n = 100,
+  envir = NULL
 )
 }
 \arguments{
@@ -39,6 +41,13 @@ be set internally to \code{widths = 1} to accommodate plots of smooths that
 use a fixed aspect ratio.}
 
 \item{...}{arguments passed to \code{\link[=draw.gam]{draw.gam()}}}
+
+\item{n}{numeric; the number of points over the range of the covariate at
+which to evaluate the smooth.}
+
+\item{envir}{an optional environment supplying functions and constants used
+in model expressions. The available model formula environment is used when
+\code{NULL}. Covariate observations should be supplied in \code{data}.}
 }
 \description{
 Provides a \code{\link[=draw]{draw()}} method for GAMLSS (distributional GAMs) fitted

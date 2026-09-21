@@ -22,6 +22,7 @@ smooth_estimates(object, ...)
   unnest = TRUE,
   partial_match = FALSE,
   clip = FALSE,
+  envir = NULL,
   ...
 )
 }
@@ -78,6 +79,10 @@ and \code{dist} is a distance within the unit square. See
 \item{clip}{logical; should evaluation points be clipped to the boundary of
 a soap film smooth? The default is \code{FALSE}, which will return \code{NA} for any
 point that is deemed to lie outside the boundary of the soap film.}
+
+\item{envir}{an optional environment supplying functions and constants used
+in model expressions. The available model formula environment is used when
+\code{NULL}. Covariate observations should be supplied in \code{data}.}
 }
 \value{
 A data frame (tibble), which is of class \code{"smooth_estimates"}.
@@ -93,6 +98,18 @@ been removed from the package.
 For explicit \code{data}, missing covariates needed by a smooth produce \code{NA}
 estimates and standard errors at those positions. Missing values in variables
 unrelated to that smooth do not discard its otherwise evaluable rows.
+
+Raw \code{data} may contain \code{x} for a smooth such as \code{s(log(x))}; gratia evaluates
+the expression before constructing the prediction matrix. An evaluated
+column named \code{"log(x)"} can be supplied instead. When both are supplied,
+the raw inputs take precedence, except for stored model frames and grids
+prepared by gratia. Automatic grids are evenly spaced in the smooth
+coordinate (\code{log(x)}), and returned coordinate columns retain that name.
+
+Stored evaluated columns allow automatic plotting even when a local function
+used to fit the model is no longer available. Evaluating that function at new
+raw data requires \code{envir}; training values are never substituted for new
+observations. Arbitrary transformations are not inverted to recover raw data.
 }
 \examples{
 load_mgcv()

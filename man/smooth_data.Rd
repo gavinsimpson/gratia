@@ -13,7 +13,8 @@ smooth_data(
   n_4d = NULL,
   offset = NULL,
   include_all = FALSE,
-  var_order = NULL
+  var_order = NULL,
+  envir = NULL
 )
 }
 \arguments{
@@ -41,11 +42,15 @@ if \code{FALSE}, only the covariates involved in the smooth will be included in
 the returned data frame. If \code{TRUE}, a representative value will be included
 for all other covariates in the model that aren't actually used in the
 smooth. This can be useful if you want to pass the returned data frame on
-to \code{\link[mgcv:smoothCon]{mgcv::PredictMat()}}.}
+to \code{\link[mgcv:PredictMat]{mgcv::PredictMat()}}.}
 
 \item{var_order}{character; the order in which the terms in the smooth
 should be processed. Only useful for tensor products with at least one
 2d marginal smooth.}
+
+\item{envir}{an optional environment supplying functions and constants used
+in model expressions. The available model formula environment is used when
+\code{NULL}. Covariate observations should be supplied in \code{data}.}
 }
 \description{
 Generate regular data over the covariates of a smooth

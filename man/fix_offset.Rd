@@ -19,9 +19,10 @@ The original \code{newdata} is returned with fixed names and possibly
 modified offset variable.
 }
 \description{
-Identifies which variable, if any, is the model offset, and fixed the name
-such that \code{offset(foo(var))} is converted to \code{var}, and possibly sets the
-values of that variable to \code{offset_val}.
+Removes evaluated offset columns while retaining their raw input variables.
+Raw inputs are recovered from fitting data if needed; transformed offset
+values are never renamed as raw values. A scalar \code{offset_val} overrides the
+raw input only for a single offset with one unambiguous input variable.
 }
 \examples{
 load_mgcv()

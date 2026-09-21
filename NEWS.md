@@ -2,6 +2,16 @@
 
 ## User visible changes
 
+* Smooth evaluation, plotting, bases, sampling, and prediction now support
+  functions of covariates such as `s(log(x))`, with consistent handling of
+  transformed offsets and an `envir` argument for local functions and constants.
+  Stored evaluated covariates support smooth plotting when the original data or
+  functions are unavailable, while failed evaluation at new data produces
+  actionable errors instead of substituting training values.
+  Automatic smooth grids retain transformed coordinates, and `derivatives()`
+  and `partial_derivatives()` can differentiate with respect to raw covariates
+  using `wrt = "covariate"`.
+
 * For models fitted with `na.exclude`, default fitted values, partial residuals,
   fitted and posterior samples, and simulations now restore excluded rows as
   `NA`, while diagnostics correctly align the retained observations (#349).

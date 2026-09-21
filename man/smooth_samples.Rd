@@ -27,6 +27,7 @@ smooth_samples(model, ...)
   draws = NULL,
   partial_match = NULL,
   mvn_method = c("mvnfast", "mgcv"),
+  envir = NULL,
   ...,
   newdata = NULL,
   ncores = NULL
@@ -110,6 +111,8 @@ uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
 numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
 for some marginal fits, such as those where the covariance matrix is close
 to singular.}
+
+\item{envir}{an environment to look up the data within.}
 
 \item{newdata}{Deprecated: use \code{data} instead.}
 
