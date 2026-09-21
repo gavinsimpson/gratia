@@ -96,6 +96,10 @@
 
 ## Bug Fixes
 
+* Posterior sampling for GAMs, including the GAM component of `gamm4` models,
+  now falls back to `mgcv::rmvn()` with a warning if the default sampler's
+  Cholesky decomposition fails (#332).
+
 * `draw()` now plots tensor products of two factors as points with confidence
   intervals, faceted by the second factor, instead of empty line plots (#395).
   Tensor products with one factor now use the continuous covariate on the x axis
