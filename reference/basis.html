@@ -11,7 +11,7 @@ directly from a fitted GAM(M)."><meta property="og:image" content="https://gavin
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-22</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-24</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,7 @@ directly from a fitted GAM(M)."><meta property="og:image" content="https://gavin
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
     <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -65,6 +66,7 @@ directly from a fitted GAM(M).</p>
 <span>  n_3d <span class="op">=</span> <span class="fl">16</span>,</span>
 <span>  n_4d <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -119,6 +121,7 @@ directly from a fitted GAM(M).</p>
 <span>  at <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  diagonalize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  coefficients <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -176,6 +179,12 @@ new observations.</p></dd>
 <dd><p>logical; in the case of character <code>select</code>, should
 <code>select</code> match partially against <code>smooths</code>? If <code>partial_match = TRUE</code>,
 <code>select</code> must only be a single string, a character vector of length 1.</p></dd>
+
+
+<dt id="arg-envir">envir<a class="anchor" aria-label="anchor" href="#arg-envir"></a></dt>
+<dd><p>an optional environment supplying functions and constants used
+in model expressions. The available model formula environment is used when
+<code>NULL</code>. Covariate observations should be supplied in <code>data</code>.</p></dd>
 
 
 <dt id="arg-knots">knots<a class="anchor" aria-label="anchor" href="#arg-knots"></a></dt>

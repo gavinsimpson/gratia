@@ -4,6 +4,38 @@
 
 ### User visible changes
 
+- Derivative functions now choose a finite-difference step automatically
+  when `eps = NULL`, using the covariate’s fitted range, derivative
+  order, and difference method. This reduces rounding error in second
+  derivatives; an explicit positive `eps` can still be used to specify
+  an absolute step size if desired.
+
+- Smooth evaluation, plotting, bases, sampling, and prediction now
+  support functions of covariates such as `s(log(x))`, with consistent
+  handling of transformed offsets and an `envir` argument for local
+  functions and constants. Stored evaluated covariates support smooth
+  plotting when the original data or functions are unavailable, while
+  failed evaluation at new data produces actionable errors instead of
+  substituting training values.
+
+  Automatic smooth grids retain transformed coordinates, and
+  [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md)
+  and
+  [`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md)
+  can differentiate with respect to raw covariates using
+  `wrt = "covariate"`.
+
+  Parametric effects and data slices now recover raw covariates
+  consistently, while
+  [`typical_values()`](https://gavinsimpson.github.io/gratia/reference/typical_values.md)
+  and
+  [`data_combos()`](https://gavinsimpson.github.io/gratia/reference/data_combos.md)
+  no longer require an `envir` argument.
+
+  See
+  [`vignette("transformed-covariates", package = "gratia")`](https://gavinsimpson.github.io/gratia/articles/transformed-covariates.md)
+  for examples.
+
 - For models fitted with `na.exclude`, default fitted values, partial
   residuals, fitted and posterior samples, and simulations now restore
   excluded rows as `NA`, while diagnostics correctly align the retained

@@ -15,7 +15,7 @@ parametric_effects(
   unconditional = FALSE,
   unnest = TRUE,
   ci_level = 0.95,
-  envir = environment(formula(object)),
+  envir = NULL,
   transform = FALSE,
   ...
 )
@@ -38,7 +38,9 @@ parametric_effects(
 
 - data:
 
-  a optional data frame that may or may not be used? FIXME!
+  an optional data frame containing raw model covariates at which to
+  evaluate parametric effects. By default, stored raw columns are used;
+  missing raw inputs are recovered from the fitting data when possible.
 
 - unconditional:
 
@@ -57,7 +59,9 @@ parametric_effects(
 
 - envir:
 
-  an environment to look up the data within.
+  an optional environment for local functions and constants, and for
+  recovering fitting data when required raw columns are not stored in
+  the model. Defaults to the model's evaluation environment.
 
 - transform:
 

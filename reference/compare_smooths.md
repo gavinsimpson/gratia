@@ -14,7 +14,8 @@ compare_smooths(
   data = NULL,
   unconditional = FALSE,
   overall_uncertainty = TRUE,
-  partial_match = FALSE
+  partial_match = FALSE,
+  envir = NULL
 )
 ```
 
@@ -66,6 +67,12 @@ compare_smooths(
 
   logical; should smooths be selected by partial matches with `select`?
   If `TRUE`, `select` can only be a single string to match against.
+
+- envir:
+
+  an optional environment supplying functions and constants used in
+  model expressions. The available model formula environment is used
+  when `NULL`. Covariate observations should be supplied in `data`.
 
 ## Examples
 

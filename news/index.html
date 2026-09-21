@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-22</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-24</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,6 +21,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
     <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -43,7 +44,14 @@
 <h2 class="pkg-version" data-toc-text="development version" id="gratia-development-version">gratia (development version)<a class="anchor" aria-label="anchor" href="#gratia-development-version"></a></h2>
 <div class="section level3">
 <h3 id="user-visible-changes-development-version">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-development-version"></a></h3>
-<ul><li>For models fitted with <code>na.exclude</code>, default fitted values, partial residuals, fitted and posterior samples, and simulations now restore excluded rows as <code>NA</code>, while diagnostics correctly align the retained observations (<a href="https://github.com/gavinsimpson/gratia/issues/349" class="external-link">#349</a>). Explicit prediction data preserve row positions by default, with missing required predictors yielding <code>NA</code> results and missing responses alone not preventing prediction.</li>
+<ul><li><p>Derivative functions now choose a finite-difference step automatically when <code>eps = NULL</code>, using the covariate’s fitted range, derivative order, and difference method. This reduces rounding error in second derivatives; an explicit positive <code>eps</code> can still be used to specify an absolute step size if desired.</p></li>
+<li>
+<p>Smooth evaluation, plotting, bases, sampling, and prediction now support functions of covariates such as <code>s(log(x))</code>, with consistent handling of transformed offsets and an <code>envir</code> argument for local functions and constants. Stored evaluated covariates support smooth plotting when the original data or functions are unavailable, while failed evaluation at new data produces actionable errors instead of substituting training values.</p>
+<p>Automatic smooth grids retain transformed coordinates, and <code><a href="../reference/derivatives.html">derivatives()</a></code> and <code><a href="../reference/partial_derivatives.html">partial_derivatives()</a></code> can differentiate with respect to raw covariates using <code>wrt = "covariate"</code>.</p>
+<p>Parametric effects and data slices now recover raw covariates consistently, while <code><a href="../reference/typical_values.html">typical_values()</a></code> and <code><a href="../reference/data_combos.html">data_combos()</a></code> no longer require an <code>envir</code> argument.</p>
+<p>See <code><a href="../articles/transformed-covariates.html">vignette("transformed-covariates", package = "gratia")</a></code> for examples.</p>
+</li>
+<li><p>For models fitted with <code>na.exclude</code>, default fitted values, partial residuals, fitted and posterior samples, and simulations now restore excluded rows as <code>NA</code>, while diagnostics correctly align the retained observations (<a href="https://github.com/gavinsimpson/gratia/issues/349" class="external-link">#349</a>). Explicit prediction data preserve row positions by default, with missing required predictors yielding <code>NA</code> results and missing responses alone not preventing prediction.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>

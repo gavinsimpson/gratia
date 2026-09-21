@@ -13,6 +13,7 @@ fitted_values(
   data = NULL,
   scale = c("response", "link", "linear predictor"),
   ci_level = 0.95,
+  envir = NULL,
   ...
 )
 
@@ -54,6 +55,12 @@ fitted_values(object, ...)
 
   numeric; a value between 0 and 1 indicating the coverage of the
   credible interval.
+
+- envir:
+
+  an optional environment supplying functions and constants used in
+  model expressions. The available model formula environment is used
+  when `NULL`. Covariate observations should be supplied in `data`.
 
 ## Value
 

@@ -9,14 +9,7 @@ variables
 data_combos(object, ...)
 
 # S3 method for class 'gam'
-data_combos(
-  object,
-  vars = everything(),
-  complete = TRUE,
-  envir = environment(formula(object)),
-  data = NULL,
-  ...
-)
+data_combos(object, vars = everything(), complete = TRUE, data = NULL, ...)
 ```
 
 ## Arguments
@@ -40,12 +33,8 @@ data_combos(
   `FALSE`, only those combinations of levels observed in the model are
   retained.
 
-- envir:
-
-  the environment within which to recreate the data used to fit
-  `object`.
-
 - data:
 
-  an optional data frame of data used to fit the model if reconstruction
-  of the data from the model doesn't work.
+  an optional data frame supplying covariate classes. By default, these
+  are taken from the stored model frame; typical values come from the
+  fitted model's covariate summaries.

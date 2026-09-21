@@ -19,6 +19,7 @@ eval_smooth(
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   dist = NULL,
+  envir = NULL,
   ...
 )
 
@@ -34,6 +35,7 @@ eval_smooth(
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   clip = TRUE,
+  envir = NULL,
   ...
 )
 
@@ -49,6 +51,7 @@ eval_smooth(
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   dist = NULL,
+  envir = NULL,
   ...
 )
 
@@ -61,6 +64,7 @@ eval_smooth(
   unconditional = FALSE,
   frequentist = FALSE,
   overall_uncertainty = TRUE,
+  envir = NULL,
   ...
 )
 
@@ -73,6 +77,7 @@ eval_smooth(
   unconditional = FALSE,
   frequentist = FALSE,
   overall_uncertainty = TRUE,
+  envir = NULL,
   ...
 )
 
@@ -85,6 +90,7 @@ eval_smooth(
   unconditional = FALSE,
   frequentist = FALSE,
   overall_uncertainty = TRUE,
+  envir = NULL,
   ...
 )
 
@@ -97,6 +103,7 @@ eval_smooth(
   unconditional = FALSE,
   frequentist = FALSE,
   overall_uncertainty = TRUE,
+  envir = NULL,
   ...
 )
 
@@ -112,6 +119,7 @@ eval_smooth(
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   dist = NULL,
+  envir = NULL,
   ...
 )
 
@@ -127,6 +135,7 @@ eval_smooth(
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   dist = NULL,
+  envir = NULL,
   ...
 )
 ```
@@ -193,6 +202,12 @@ eval_smooth(
   `dist` is a distance within the unit square. See
   [`mgcv::exclude.too.far()`](https://rdrr.io/pkg/mgcv/man/exclude.too.far.html)
   for further details.
+
+- envir:
+
+  an optional environment supplying functions and constants used in
+  model expressions. The available model formula environment is used
+  when `NULL`. Covariate observations should be supplied in `data`.
 
 - clip:
 

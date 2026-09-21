@@ -10,3 +10,5 @@
   gratia](https://gavinsimpson.github.io/gratia/articles/gratia.md):
 - [Posterior
   Simulation](https://gavinsimpson.github.io/gratia/articles/posterior-simulation.md):
+- [Functions of covariates and evaluation
+  environments](https://gavinsimpson.github.io/gratia/articles/transformed-covariates.md):

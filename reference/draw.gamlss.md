@@ -17,7 +17,9 @@ draw(
   guides = "keep",
   widths = NULL,
   heights = NULL,
-  ...
+  ...,
+  n = 100,
+  envir = NULL
 )
 ```
 
@@ -61,6 +63,17 @@ draw(
 
   arguments passed to
   [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
+
+- n:
+
+  numeric; the number of points over the range of the covariate at which
+  to evaluate the smooth.
+
+- envir:
+
+  an optional environment supplying functions and constants used in
+  model expressions. The available model formula environment is used
+  when `NULL`. Covariate observations should be supplied in `data`.
 
 ## Note
 

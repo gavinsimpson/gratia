@@ -24,7 +24,7 @@ partial_derivatives(
   order = 1L,
   type = c("forward", "backward", "central"),
   n = 100,
-  eps = 1e-07,
+  eps = NULL,
   interval = c("confidence", "simultaneous"),
   n_sim = 10000,
   level = 0.95,
@@ -35,7 +35,9 @@ partial_derivatives(
   partial_match = FALSE,
   seed = NULL,
   ...,
-  newdata = NULL
+  newdata = NULL,
+  envir = NULL,
+  wrt = c("smooth", "covariate")
 )
 ```
 
@@ -89,7 +91,20 @@ partial_derivatives(
 
 - eps:
 
-  numeric; the finite difference.
+  a positive finite number giving the absolute finite-difference step,
+  or `NULL` (the default) to choose it automatically. The automatic step
+  is the fitted range of the differentiation coordinate multiplied by
+  `.Machine$double.eps^(1 / (order + p))`, where `p = 2` for central
+  differences and `p = 1` for forward or backward differences. A
+  constant coordinate uses its absolute value (or one if zero) instead
+  of its range. The step is rounded upwards and bounded below so that
+  adding it to the coordinates produces a representable change. Stored
+  transformed values or raw covariate summaries supply the range;
+  supplied `data` are used if neither is available. This is a
+  scale-aware heuristic, not an error bound; unusual function scales or
+  domain boundaries may require explicit `eps`. For first central
+  differences the two points are separated by `eps`; for second central
+  differences they are each `eps` from the target.
 
 - interval:
 
@@ -139,6 +154,18 @@ partial_derivatives(
 - newdata:
 
   Deprecated: use `data` instead.
+
+- envir:
+
+  optional environment for functions and constants in model expressions;
+  see
+  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md).
+
+- wrt:
+
+  differentiation coordinate: `"smooth"` (the default) uses the smooth
+  expression, such as `log(x)`; `"covariate"` uses a raw covariate, such
+  as `x`, and reevaluates expressions at each finite-difference point.
 
 ## Value
 

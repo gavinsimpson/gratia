@@ -11,7 +11,8 @@ spline_values(
   model,
   unconditional,
   overall_uncertainty = TRUE,
-  frequentist = FALSE
+  frequentist = FALSE,
+  envir = NULL
 )
 ```
 
@@ -48,3 +49,9 @@ spline_values(
 
   logical; if `FALSE`, the default, the bayesian covariance matrix is
   returned, otherwise the frequentist covariance matrix.
+
+- envir:
+
+  an optional environment supplying functions and constants used in
+  model expressions. The available model formula environment is used
+  when `NULL`. Covariate observations should be supplied in `data`.

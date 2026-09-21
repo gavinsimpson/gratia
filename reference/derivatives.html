@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-22</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-24</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,6 +21,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
     <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -63,7 +64,7 @@
 <span>  order <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"forward"</span>, <span class="st">"backward"</span>, <span class="st">"central"</span><span class="op">)</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>  eps <span class="op">=</span> <span class="fl">1e-07</span>,</span>
+<span>  eps <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  interval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"confidence"</span>, <span class="st">"simultaneous"</span><span class="op">)</span>,</span>
 <span>  n_sim <span class="op">=</span> <span class="fl">10000</span>,</span>
 <span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
@@ -73,7 +74,10 @@
 <span>  ncores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  newdata <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  wrt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"smooth"</span>, <span class="st">"covariate"</span><span class="op">)</span>,</span>
+<span>  focal <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -120,7 +124,19 @@ at which to evaluate the first derivatives of the smooths.</p></dd>
 
 
 <dt id="arg-eps">eps<a class="anchor" aria-label="anchor" href="#arg-eps"></a></dt>
-<dd><p>numeric; the finite difference.</p></dd>
+<dd><p>a positive finite number giving the absolute finite-difference
+step, or <code>NULL</code> (the default) to choose it automatically. The automatic
+step is the fitted range of the differentiation coordinate multiplied by
+<code>.Machine$double.eps^(1 / (order + p))</code>, where <code>p = 2</code> for central
+differences and <code>p = 1</code> for forward or backward differences. A constant
+coordinate uses its absolute value (or one if zero) instead of its range.
+The step is rounded upwards and bounded below so that adding it to the
+coordinates produces a representable change. Stored transformed values
+or raw covariate summaries supply the range; supplied <code>data</code> are used if
+neither is available. This is a scale-aware heuristic, not an error bound;
+unusual function scales or domain boundaries may require explicit <code>eps</code>.
+For first central differences the two points are separated by <code>eps</code>;
+for second central differences they are each <code>eps</code> from the target.</p></dd>
 
 
 <dt id="arg-interval">interval<a class="anchor" aria-label="anchor" href="#arg-interval"></a></dt>
@@ -169,6 +185,24 @@ against.</p></dd>
 <dt id="arg-newdata">newdata<a class="anchor" aria-label="anchor" href="#arg-newdata"></a></dt>
 <dd><p>Deprecated: use <code>data</code> instead.</p></dd>
 
+
+<dt id="arg-envir">envir<a class="anchor" aria-label="anchor" href="#arg-envir"></a></dt>
+<dd><p>optional environment for functions and constants in model
+expressions; see <code><a href="smooth_estimates.html">smooth_estimates()</a></code>.</p></dd>
+
+
+<dt id="arg-wrt">wrt<a class="anchor" aria-label="anchor" href="#arg-wrt"></a></dt>
+<dd><p>differentiation coordinate: <code>"smooth"</code> (the default) uses the
+smooth expression, such as <code>log(x)</code>; <code>"covariate"</code> uses a raw covariate,
+such as <code>x</code>, and reevaluates expressions at each finite-difference point.</p></dd>
+
+
+<dt id="arg-focal">focal<a class="anchor" aria-label="anchor" href="#arg-focal"></a></dt>
+<dd><p>name of the differentiation coordinate, or a vector with one
+name per selected smooth. For raw-covariate derivatives it must be supplied
+when a smooth depends on multiple raw inputs. A single name can be used
+for all selected univariate smooths.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -207,7 +241,7 @@ which the derivative was evaluated.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 400 x 12</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci      x0    x1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> s(x0)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>           7.41  3.33  1.96     0.874      13.9 2.39<span style="color: #949494;">e</span><span style="color: #BB0000;">-4</span>    <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> s(x0)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>           7.41  3.33  1.96     0.874      13.9 2.42<span style="color: #949494;">e</span><span style="color: #BB0000;">-4</span>    <span style="color: #BB0000;">NA</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> s(x0)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>           7.40  3.33  1.96     0.884      13.9 1.03<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span>    <span style="color: #BB0000;">NA</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> s(x0)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>           7.39  3.30  1.96     0.929      13.8 2.04<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span>    <span style="color: #BB0000;">NA</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> s(x0)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>           7.36  3.24  1.96     1.01       13.7 3.04<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span>    <span style="color: #BB0000;">NA</span></span>
@@ -215,7 +249,7 @@ which the derivative was evaluated.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> s(x0)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>           7.26  3.04  1.96     1.30       13.2 5.06<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span>    <span style="color: #BB0000;">NA</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> s(x0)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>           7.18  2.90  1.96     1.49       12.9 6.06<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span>    <span style="color: #BB0000;">NA</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> s(x0)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>           7.09  2.76  1.96     1.69       12.5 7.07<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span>    <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> s(x0)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>           6.99  2.61  1.96     1.87       12.1 8.07<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span>    <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> s(x0)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>           6.99  2.61  1.96     1.87       12.1 8.08<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span>    <span style="color: #BB0000;">NA</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> s(x0)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>           6.87  2.47  1.96     2.03       11.7 9.08<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span>    <span style="color: #BB0000;">NA</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 390 more rows</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 2 more variables: x2 &lt;dbl&gt;, x3 &lt;dbl&gt;</span></span>
@@ -225,7 +259,7 @@ which the derivative was evaluated.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 100 x 9</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci       x1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> s(x1)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>         -<span style="color: #BB0000;">0.907</span>  3.12  1.96     -<span style="color: #BB0000;">7.02</span>      5.20 0.000<span style="text-decoration: underline;">405</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> s(x1)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>         -<span style="color: #BB0000;">0.907</span>  3.12  1.96     -<span style="color: #BB0000;">7.02</span>      5.20 0.000<span style="text-decoration: underline;">408</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> s(x1)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>         -<span style="color: #BB0000;">0.906</span>  3.11  1.96     -<span style="color: #BB0000;">7.01</span>      5.20 0.010<span style="text-decoration: underline;">5</span>  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> s(x1)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>         -<span style="color: #BB0000;">0.898</span>  3.10  1.96     -<span style="color: #BB0000;">6.97</span>      5.17 0.020<span style="text-decoration: underline;">5</span>  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> s(x1)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>         -<span style="color: #BB0000;">0.880</span>  3.06  1.96     -<span style="color: #BB0000;">6.88</span>      5.12 0.030<span style="text-decoration: underline;">6</span>  </span>
@@ -241,7 +275,7 @@ which the derivative was evaluated.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 100 x 9</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci       x1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> s(x1)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>         -<span style="color: #BB0000;">0.907</span>  3.12  1.96     -<span style="color: #BB0000;">7.02</span>      5.20 0.000<span style="text-decoration: underline;">405</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> s(x1)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>         -<span style="color: #BB0000;">0.907</span>  3.12  1.96     -<span style="color: #BB0000;">7.02</span>      5.20 0.000<span style="text-decoration: underline;">408</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> s(x1)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>         -<span style="color: #BB0000;">0.906</span>  3.11  1.96     -<span style="color: #BB0000;">7.01</span>      5.20 0.010<span style="text-decoration: underline;">5</span>  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> s(x1)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>         -<span style="color: #BB0000;">0.898</span>  3.10  1.96     -<span style="color: #BB0000;">6.97</span>      5.17 0.020<span style="text-decoration: underline;">5</span>  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> s(x1)   <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>         -<span style="color: #BB0000;">0.880</span>  3.06  1.96     -<span style="color: #BB0000;">6.88</span>      5.12 0.030<span style="text-decoration: underline;">6</span>  </span>

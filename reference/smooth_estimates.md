@@ -28,6 +28,7 @@ smooth_estimates(
   unnest = TRUE,
   partial_match = FALSE,
   clip = FALSE,
+  envir = NULL,
   ...
 )
 ```
@@ -114,6 +115,12 @@ smooth_estimates(
   film smooth? The default is `FALSE`, which will return `NA` for any
   point that is deemed to lie outside the boundary of the soap film.
 
+- envir:
+
+  an optional environment supplying functions and constants used in
+  model expressions. The available model formula environment is used
+  when `NULL`. Covariate observations should be supplied in `data`.
+
 ## Value
 
 A data frame (tibble), which is of class `"smooth_estimates"`.
@@ -124,6 +131,20 @@ For explicit `data`, missing covariates needed by a smooth produce `NA`
 estimates and standard errors at those positions. Missing values in
 variables unrelated to that smooth do not discard its otherwise
 evaluable rows.
+
+Raw `data` may contain `x` for a smooth such as `s(log(x))`; gratia
+evaluates the expression before constructing the prediction matrix. An
+evaluated column named `"log(x)"` can be supplied instead. When both are
+supplied, the raw inputs take precedence, except for stored model frames
+and grids prepared by gratia. Automatic grids are evenly spaced in the
+smooth coordinate (`log(x)`), and returned coordinate columns retain
+that name.
+
+Stored evaluated columns allow automatic plotting even when a local
+function used to fit the model is no longer available. Evaluating that
+function at new raw data requires `envir`; training values are never
+substituted for new observations. Arbitrary transformations are not
+inverted to recover raw data.
 
 ## Examples
 

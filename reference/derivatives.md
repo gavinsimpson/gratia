@@ -22,7 +22,7 @@ derivatives(
   order = 1L,
   type = c("forward", "backward", "central"),
   n = 100,
-  eps = 1e-07,
+  eps = NULL,
   interval = c("confidence", "simultaneous"),
   n_sim = 10000,
   level = 0.95,
@@ -32,7 +32,10 @@ derivatives(
   ncores = 1,
   partial_match = FALSE,
   ...,
-  newdata = NULL
+  newdata = NULL,
+  envir = NULL,
+  wrt = c("smooth", "covariate"),
+  focal = NULL
 )
 ```
 
@@ -78,7 +81,20 @@ derivatives(
 
 - eps:
 
-  numeric; the finite difference.
+  a positive finite number giving the absolute finite-difference step,
+  or `NULL` (the default) to choose it automatically. The automatic step
+  is the fitted range of the differentiation coordinate multiplied by
+  `.Machine$double.eps^(1 / (order + p))`, where `p = 2` for central
+  differences and `p = 1` for forward or backward differences. A
+  constant coordinate uses its absolute value (or one if zero) instead
+  of its range. The step is rounded upwards and bounded below so that
+  adding it to the coordinates produces a representable change. Stored
+  transformed values or raw covariate summaries supply the range;
+  supplied `data` are used if neither is available. This is a
+  scale-aware heuristic, not an error bound; unusual function scales or
+  domain boundaries may require explicit `eps`. For first central
+  differences the two points are separated by `eps`; for second central
+  differences they are each `eps` from the target.
 
 - interval:
 
@@ -124,6 +140,25 @@ derivatives(
 - newdata:
 
   Deprecated: use `data` instead.
+
+- envir:
+
+  optional environment for functions and constants in model expressions;
+  see
+  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md).
+
+- wrt:
+
+  differentiation coordinate: `"smooth"` (the default) uses the smooth
+  expression, such as `log(x)`; `"covariate"` uses a raw covariate, such
+  as `x`, and reevaluates expressions at each finite-difference point.
+
+- focal:
+
+  name of the differentiation coordinate, or a vector with one name per
+  selected smooth. For raw-covariate derivatives it must be supplied
+  when a smooth depends on multiple raw inputs. A single name can be
+  used for all selected univariate smooths.
 
 ## Value
 
@@ -174,7 +209,7 @@ derivatives(mod, type = "central")
 #> # A tibble: 400 x 12
 #>    .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci      x0    x1
 #>    <chr>   <chr> <chr>       <dbl> <dbl> <dbl>     <dbl>     <dbl>   <dbl> <dbl>
-#>  1 s(x0)   NA    NA           7.41  3.33  1.96     0.874      13.9 2.39e-4    NA
+#>  1 s(x0)   NA    NA           7.41  3.33  1.96     0.874      13.9 2.42e-4    NA
 #>  2 s(x0)   NA    NA           7.40  3.33  1.96     0.884      13.9 1.03e-2    NA
 #>  3 s(x0)   NA    NA           7.39  3.30  1.96     0.929      13.8 2.04e-2    NA
 #>  4 s(x0)   NA    NA           7.36  3.24  1.96     1.01       13.7 3.04e-2    NA
@@ -182,7 +217,7 @@ derivatives(mod, type = "central")
 #>  6 s(x0)   NA    NA           7.26  3.04  1.96     1.30       13.2 5.06e-2    NA
 #>  7 s(x0)   NA    NA           7.18  2.90  1.96     1.49       12.9 6.06e-2    NA
 #>  8 s(x0)   NA    NA           7.09  2.76  1.96     1.69       12.5 7.07e-2    NA
-#>  9 s(x0)   NA    NA           6.99  2.61  1.96     1.87       12.1 8.07e-2    NA
+#>  9 s(x0)   NA    NA           6.99  2.61  1.96     1.87       12.1 8.08e-2    NA
 #> 10 s(x0)   NA    NA           6.87  2.47  1.96     2.03       11.7 9.08e-2    NA
 #> # i 390 more rows
 #> # i 2 more variables: x2 <dbl>, x3 <dbl>
@@ -192,7 +227,7 @@ derivatives(mod, type = "central", select = "s(x1)")
 #> # A tibble: 100 x 9
 #>    .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci       x1
 #>    <chr>   <chr> <chr>       <dbl> <dbl> <dbl>     <dbl>     <dbl>    <dbl>
-#>  1 s(x1)   NA    NA         -0.907  3.12  1.96     -7.02      5.20 0.000405
+#>  1 s(x1)   NA    NA         -0.907  3.12  1.96     -7.02      5.20 0.000408
 #>  2 s(x1)   NA    NA         -0.906  3.11  1.96     -7.01      5.20 0.0105  
 #>  3 s(x1)   NA    NA         -0.898  3.10  1.96     -6.97      5.17 0.0205  
 #>  4 s(x1)   NA    NA         -0.880  3.06  1.96     -6.88      5.12 0.0306  
@@ -208,7 +243,7 @@ derivatives(mod, type = "central", select = "x1", partial_match = TRUE)
 #> # A tibble: 100 x 9
 #>    .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci       x1
 #>    <chr>   <chr> <chr>       <dbl> <dbl> <dbl>     <dbl>     <dbl>    <dbl>
-#>  1 s(x1)   NA    NA         -0.907  3.12  1.96     -7.02      5.20 0.000405
+#>  1 s(x1)   NA    NA         -0.907  3.12  1.96     -7.02      5.20 0.000408
 #>  2 s(x1)   NA    NA         -0.906  3.11  1.96     -7.01      5.20 0.0105  
 #>  3 s(x1)   NA    NA         -0.898  3.10  1.96     -6.97      5.17 0.0205  
 #>  4 s(x1)   NA    NA         -0.880  3.06  1.96     -6.88      5.12 0.0306  

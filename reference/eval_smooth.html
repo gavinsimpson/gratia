@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-22</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-24</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,6 +21,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
     <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -60,6 +61,7 @@
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  dist <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -75,6 +77,7 @@
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  clip <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -90,6 +93,7 @@
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  dist <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -102,6 +106,7 @@
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -114,6 +119,7 @@
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -126,6 +132,7 @@
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -138,6 +145,7 @@
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -153,6 +161,7 @@
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  dist <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -168,6 +177,7 @@
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  dist <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -233,6 +243,12 @@ a location is too far from data to be plotted when plotting 2-D smooths.
 The data are scaled into the unit square before deciding what to exclude,
 and <code>dist</code> is a distance within the unit square. See
 <code><a href="https://rdrr.io/pkg/mgcv/man/exclude.too.far.html" class="external-link">mgcv::exclude.too.far()</a></code> for further details.</p></dd>
+
+
+<dt id="arg-envir">envir<a class="anchor" aria-label="anchor" href="#arg-envir"></a></dt>
+<dd><p>an optional environment supplying functions and constants used
+in model expressions. The available model formula environment is used when
+<code>NULL</code>. Covariate observations should be supplied in <code>data</code>.</p></dd>
 
 
 <dt id="arg-clip">clip<a class="anchor" aria-label="anchor" href="#arg-clip"></a></dt>

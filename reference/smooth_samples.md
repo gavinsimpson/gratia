@@ -30,6 +30,7 @@ smooth_samples(
   draws = NULL,
   partial_match = NULL,
   mvn_method = c("mvnfast", "mgcv"),
+  envir = NULL,
   ...,
   newdata = NULL,
   ncores = NULL
@@ -164,6 +165,10 @@ smooth_samples(
   values than [`mgcv::rmvn()`](https://rdrr.io/pkg/mgcv/man/rmvn.html),
   but which might not work for some marginal fits, such as those where
   the covariance matrix is close to singular.
+
+- envir:
+
+  an environment to look up the data within.
 
 - newdata:
 

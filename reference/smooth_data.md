@@ -14,7 +14,8 @@ smooth_data(
   n_4d = NULL,
   offset = NULL,
   include_all = FALSE,
-  var_order = NULL
+  var_order = NULL,
+  envir = NULL
 )
 ```
 
@@ -68,6 +69,12 @@ smooth_data(
   character; the order in which the terms in the smooth should be
   processed. Only useful for tensor products with at least one 2d
   marginal smooth.
+
+- envir:
+
+  an optional environment supplying functions and constants used in
+  model expressions. The available model formula environment is used
+  when `NULL`. Covariate observations should be supplied in `data`.
 
 ## Examples
 

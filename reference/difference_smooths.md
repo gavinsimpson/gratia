@@ -22,6 +22,7 @@ difference_smooths(
   partial_match = TRUE,
   unconditional = FALSE,
   frequentist = FALSE,
+  envir = NULL,
   ...
 )
 ```
@@ -91,6 +92,12 @@ difference_smooths(
 - frequentist:
 
   logical; use the frequentist covariance matrix?
+
+- envir:
+
+  an optional environment supplying functions and constants used in
+  model expressions. The available model formula environment is used
+  when `NULL`. Covariate observations should be supplied in `data`.
 
 ## Examples
 

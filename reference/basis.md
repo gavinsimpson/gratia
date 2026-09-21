@@ -24,6 +24,7 @@ basis(
   n_3d = 16,
   n_4d = 4,
   partial_match = FALSE,
+  envir = NULL,
   ...
 )
 
@@ -78,6 +79,7 @@ basis(
   at = NULL,
   diagonalize = FALSE,
   coefficients = NULL,
+  envir = NULL,
   ...
 )
 ```
@@ -137,6 +139,12 @@ basis(
   logical; in the case of character `select`, should `select` match
   partially against `smooths`? If `partial_match = TRUE`, `select` must
   only be a single string, a character vector of length 1.
+
+- envir:
+
+  an optional environment supplying functions and constants used in
+  model expressions. The available model formula environment is used
+  when `NULL`. Covariate observations should be supplied in `data`.
 
 - knots:
 

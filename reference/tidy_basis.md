@@ -6,7 +6,14 @@ of the basis.
 ## Usage
 
 ``` r
-tidy_basis(smooth, data = NULL, at = NULL, coefs = NULL, p_ident = NULL)
+tidy_basis(
+  smooth,
+  data = NULL,
+  at = NULL,
+  coefs = NULL,
+  p_ident = NULL,
+  envir = NULL
+)
 ```
 
 ## Arguments
@@ -37,6 +44,12 @@ tidy_basis(smooth, data = NULL, at = NULL, coefs = NULL, p_ident = NULL)
 
   logical vector; only used for handling
   [`scam::scam()`](https://rdrr.io/pkg/scam/man/scam.html) smooths.
+
+- envir:
+
+  an optional environment supplying functions and constants used in
+  model expressions. The available model formula environment is used
+  when `NULL`. Covariate observations should be supplied in `data`.
 
 ## Value
 

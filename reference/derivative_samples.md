@@ -23,7 +23,7 @@ derivative_samples(
   scale = c("response", "linear_predictor"),
   method = c("gaussian", "mh", "inla", "user"),
   n = 100,
-  eps = 1e-07,
+  eps = NULL,
   n_sim = 10000,
   level = lifecycle::deprecated(),
   seed = NULL,
@@ -43,7 +43,7 @@ derivative_samples(
   scale = c("response", "linear_predictor"),
   method = c("gaussian", "mh", "inla", "user"),
   n = 100,
-  eps = 1e-07,
+  eps = NULL,
   n_sim = 10000,
   seed = NULL,
   envir = environment(formula(object)),
@@ -111,7 +111,20 @@ derivative_samples(
 
 - eps:
 
-  numeric; the finite difference.
+  a positive finite number giving the absolute finite-difference step,
+  or `NULL` (the default) to choose it automatically. The automatic step
+  is the fitted range of the differentiation coordinate multiplied by
+  `.Machine$double.eps^(1 / (order + p))`, where `p = 2` for central
+  differences and `p = 1` for forward or backward differences. A
+  constant coordinate uses its absolute value (or one if zero) instead
+  of its range. The step is rounded upwards and bounded below so that
+  adding it to the coordinates produces a representable change. Stored
+  transformed values or raw covariate summaries supply the range;
+  supplied `data` are used if neither is available. This is a
+  scale-aware heuristic, not an error bound; unusual function scales or
+  domain boundaries may require explicit `eps`. For first central
+  differences the two points are separated by `eps`; for second central
+  differences they are each `eps` from the target.
 
 - n_sim:
 
