@@ -19,7 +19,6 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       NOT_CRAN: "true"
       VDIFFR_RUN_TESTS: "true"
-      VDIFFR_LOG_PATH: "${{ runner.temp }}/vdiffr.log"
     steps:
       - uses: actions/checkout@v4
       - uses: r-lib/actions/setup-r@v2
@@ -30,6 +29,8 @@ jobs:
           extra-packages: any::pkgload, any::vdiffr, any::svglite
           needs: check
       - name: Run tests including visual snapshots
+        env:
+          VDIFFR_LOG_PATH: "${{ runner.temp }}/vdiffr.log"
         run: testthat::test_local(stop_on_failure = TRUE)
         shell: Rscript {0}
       - uses: actions/upload-artifact@v4
