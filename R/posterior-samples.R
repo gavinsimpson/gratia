@@ -1375,6 +1375,7 @@
   mvn_method = c("mvnfast", "mgcv"),
   ...
 ) {
+  object <- with_model_envir(object, envir)
   ## handle type
   type <- match.arg(type)
   ## handle method

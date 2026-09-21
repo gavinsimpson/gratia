@@ -126,8 +126,11 @@
   ncores = 1,
   partial_match = FALSE,
   ...,
-  newdata = NULL
+  newdata = NULL, envir = NULL, wrt = c("smooth", "covariate"),
+  focal = NULL
 ) {
+  object <- with_model_envir(object, envir)
+  wrt <- match.arg(wrt)
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "derivatives(term)",
       "derivativess(select)")
@@ -232,39 +235,22 @@
   ## loop over the smooths and compute derivatives from finite differences
   for (i in seq_along(smooth_ids)) {
     sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1]]
-    ## generate data if not supplied
-    if (need_data) {
-      newd <- derivative_data(object,
-        id = smooth_ids[[i]], n = n,
-        offset = offset, order = order,
-        type = type, eps = eps
-      )
-    } else {
-      ## assume the data are OK - mgcv::predict will catch issues
-      newd <- data
-      ## ...but we need to handle factor by
-      if (is_factor_by_smooth(sm)) {
-        newd <- vec_slice(newd, data[[by_variable(sm)]] == by_level(sm))
-      }
+    focal_i <- derivative_focal(object, sm,
+      if (is.null(focal)) NULL else focal[[if (length(focal) == 1L) 1L else i]], wrt)
+    # Prepare coordinates once, then recompute raw transformations per step.
+    newd <- if (need_data) {
+      smooth_derivative_data(object, sm, n, focal_i, wrt, order, type, eps)
+    } else data
+    newd <- prepare_smooth_data(object, sm, newd)
+    if (is_factor_by_smooth(sm)) {
+      newd <- vec_slice(newd, is.na(newd[[sm$by]]) | newd[[sm$by]] == by_level(sm))
     }
-
-    # generate list of finite difference predictions for the first or second
-    #   derivatives or the required type
-    # need focal for continuous `by` and we only consider univariate smooths
-    #   so no harm in setting `focal` here.
-    fd <- finite_diff_lpmatrix(object,
-      type = type, order = order,
-      data = newd, h = eps,
-      focal = smooth_variable(sm)
-    )
-
-    ## compute the finite differences
-    X <- finite_difference(fd, order, type, eps)
+    X <- smooth_finite_difference(object, sm, newd, focal_i, wrt, type, order, eps)
 
     ## compute derivatives
     d <- compute_derivative(smooth_ids[[i]],
       lpmatrix = X, betas = betas,
-      Vb = Vb, model = object, data = newd
+      Vb = Vb, model = object, data = newd, focal = focal_i
     )
 
     ## compute intervals
@@ -294,6 +280,7 @@
   # relocate(all_of(c(".derivative", ".se", ".crit", ".lower_ci",
   #    ".upper_ci")), .after = last_col())
 
+  attr(result, "wrt") <- wrt
   class(result) <- c("derivatives", class(result)) # add class
   result # return
 }
@@ -370,7 +357,7 @@
   sm_var <- smooth_variable(sm)
   if (!is.null(focal)) {
     # fix the focal variable
-    sm_var <- sm_var[sm_var == focal]
+    sm_var <- focal
   }
   by_var <- by_variable(sm)
   ## handle fs smooths
@@ -394,7 +381,7 @@
   deriv <- tibble(
     .smooth = rep(sm_lab, length(d)),
     # .var = rep(sm_var, length(d)),
-    {{ sm_var }} := eval_tidy(parse_expr(sm_var), data = data),
+    {{ sm_var }} := data[[sm_var]],
     # .data = eval_tidy(parse_expr(sm_var), data = data),
     .derivative = d,
     .se = se
@@ -870,7 +857,10 @@
     n_sim = 10000, level = 0.95,
     unconditional = FALSE, frequentist = FALSE,
     offset = NULL, ncores = 1,
-    partial_match = FALSE, seed = NULL, ..., newdata = NULL) {
+    partial_match = FALSE, seed = NULL, ..., newdata = NULL,
+    envir = NULL, wrt = c("smooth", "covariate")) {
+  object <- with_model_envir(object, envir)
+  wrt <- match.arg(wrt)
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "partial_derivatives(term)",
       "partial_derivatives(select)")
@@ -951,7 +941,7 @@
     focal <- vapply(
       object[["smooth"]][smooth_ids],
       function(s) {
-        smooth_variable(s)[1L]
+        derivative_focal(object, s, wrt = wrt)
       }, character(1L)
     )
   } else {
@@ -977,7 +967,7 @@
   }
   for (i in seq_along(smooth_ids)) {
     sm <- object[["smooth"]][[smooth_ids[[i]]]]
-    if (!focal[[i]] %in% smooth_variable(sm)) {
+    if (!identical(focal[[i]], derivative_focal(object, sm, focal[[i]], wrt))) {
       cli_abort(paste0(
         "Focal variable {.val {focal[[i]]}} is not in smooth ",
         "{.val {smooths(object)[smooth_ids[[i]]]}}."
@@ -1021,45 +1011,24 @@
   ## loop over the smooths and compute derivatives from finite differences
   for (i in seq_along(smooth_ids)) {
     focal_i <- focal[[i]]
-    ## generate data if not supplied
-    if (need_data) {
-      newd <- derivative_data(object,
-        id = smooth_ids[[i]], n = n,
-        offset = offset, order = order,
-        type = type, eps = eps, focal = focal_i
-      )
-    } else {
-      ## assume the data are OK - mgcv::predict will catch issues
-      newd <- data
-      ## ...but we need to handle factor by
-      sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1]]
-      if (is_factor_by_smooth(sm)) {
-        newd <- vec_slice(newd, data[[by_variable(sm)]] == by_level(sm))
-      }
-      # and we need to identify which variable is the focal one
-      n_unique <- vapply(
-        newd, function(x) length(unique(x)),
-        integer(1L)
-      )
-      bad <- setdiff(names(newd)[n_unique > 1L], focal_i)
-      if (length(bad)) {
-        stop(
-          "For partial derivatives only 'focal' can be varying ",
-          "in 'data'. Problematic variables: ",
-          paste(bad, collapse = ", ")
-        )
-      }
+    sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1L]]
+    newd <- if (need_data) {
+      smooth_derivative_data(object, sm, n, focal_i, wrt, order, type, eps)
+    } else data
+    # For partial derivatives, all other independent coordinates are fixed.
+    independent <- if (wrt == "smooth") smooth_variable(sm) else
+      unique(unlist(lapply(smooth_variable(sm), function(x) all.vars(term_expression(x, object)))))
+    check <- prepare_smooth_data(object, sm, newd)
+    bad <- setdiff(intersect(independent, names(check)), focal_i)
+    bad <- bad[vapply(check[bad], function(x) length(unique(x)) > 1L && !is.factor(x), logical(1))]
+    if (!need_data && length(bad)) {
+      stop("For partial derivatives only 'focal' can be varying in 'data'. Problematic variables: ", paste(bad, collapse = ", "))
     }
-
-    # generate list of finite difference predictions for the first or second
-    #   derivatives or the required type
-    fd <- finite_diff_lpmatrix(object,
-      type = type, order = order,
-      data = newd, h = eps, focal = focal_i
-    )
-
-    ## compute the finite differences
-    X <- finite_difference(fd, order, type, eps)
+    newd <- check
+    if (is_factor_by_smooth(sm)) {
+      newd <- vec_slice(newd, is.na(newd[[sm$by]]) | newd[[sm$by]] == by_level(sm))
+    }
+    X <- smooth_finite_difference(object, sm, newd, focal_i, wrt, type, order, eps)
 
     ## compute derivatives
     d <- compute_derivative(smooth_ids[[i]],
@@ -1097,6 +1066,7 @@
       .before = 1
     )
 
+  attr(result, "wrt") <- wrt
   class(result) <- c(
     "partial_derivatives", "derivatives",
     class(result)
