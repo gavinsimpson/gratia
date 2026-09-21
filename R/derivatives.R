@@ -331,24 +331,17 @@
 #' @importFrom stats quantile
 #' @importFrom mvnfast rmvn
 `derivative_simultaneous_int` <- function(x, Xi, level, Vb, n_sim, ncores) {
-  ## simulate un-biased deviations given bayesian covariance matrix
-  buDiff <- mvnfast::rmvn(
-    n = n_sim, mu = rep(0, nrow(Vb)), sigma = Vb,
-    ncores = ncores
+  intervals <- simultaneous_intervals(
+    estimate = x[[".derivative"]], se = x[[".se"]], X = Xi, V = Vb,
+    level = level, n_sim = n_sim, n_cores = ncores
   )
-  # simulate deviations from expected
-  simDev <- tcrossprod(Xi, buDiff) # Xi %*% t(bu)
-  absDev <- abs(sweep(simDev, 1L, x[[".se"]], FUN = "/")) # absolute deviations
-  masd <- apply(absDev, 2L, max) # & max abs deviation per sim
-  ## simultaneous interval critical value
-  crit <- quantile(masd, prob = level, type = 8)
-  adj <- (crit * x[[".se"]])
-  derivative <- add_column(x,
-    .crit = rep(crit, nrow(x)),
-    .lower_ci = x[[".derivative"]] - adj,
-    .upper_ci = x[[".derivative"]] + adj
+  crit <- rep(intervals$critical, nrow(x))
+  crit[is.na(intervals$lower)] <- NA_real_
+  add_column(x,
+    .crit = crit,
+    .lower_ci = intervals$lower,
+    .upper_ci = intervals$upper
   )
-  derivative
 }
 
 ## fd is a list of predicted values returned by the various foo_finite_diffX

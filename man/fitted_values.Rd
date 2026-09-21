@@ -15,7 +15,12 @@ fitted_values(object, ...)
   scale = c("response", "link", "linear predictor"),
   ci_level = 0.95,
   envir = NULL,
-  ...
+  ...,
+  interval = c("confidence", "simultaneous"),
+  n_sim = 10000,
+  n_cores = 1,
+  seed = NULL,
+  unconditional = FALSE
 )
 
 \method{fitted_values}{gamm}(object, ...)
@@ -43,21 +48,39 @@ the credible interval.}
 \item{envir}{an optional environment supplying functions and constants used
 in model expressions. The available model formula environment is used when
 \code{NULL}. Covariate observations should be supplied in \code{data}.}
+
+\item{interval}{character; \code{"confidence"} (the default) gives pointwise
+intervals. \code{"simultaneous"} gives simultaneous intervals for predictions
+at the supplied covariate combinations.}
+
+\item{n_sim}{positive integer; number of coefficient draws used for
+simultaneous intervals. Ignored for pointwise intervals.}
+
+\item{n_cores}{positive integer; number of cores used by \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}
+for simultaneous intervals. Parallel execution requires OpenMP support.}
+
+\item{seed}{integer or \code{NULL}; optional random seed for simultaneous
+intervals. An explicit seed preserves the caller's random number state.
+With \code{NULL}, the current random number state is used and advanced.}
+
+\item{unconditional}{logical; include smoothing parameter uncertainty in
+the Bayesian covariance matrix, if available. Otherwise a warning is
+issued and the uncorrected covariance is used.}
 }
 \value{
 A tibble (data frame) whose first \emph{m} columns contain either the data
 used to fit the model (if \code{data} was \code{NULL}), or the variables supplied to
 \code{data}. Four further columns are added:
 \itemize{
-\item \code{fitted}: the fitted values on the specified scale,
-\item \code{se}: the standard error of the fitted values (always on the \emph{link} scale),
-\item \code{lower}, \code{upper}: the limits of the credible interval on the fitted values,
+\item \code{.fitted}: the fitted values on the specified scale,
+\item \code{.se}: the standard error of the fitted values (always on the \emph{link} scale),
+\item \code{.lower_ci}, \code{.upper_ci}: the limits of the credible interval on the fitted values,
 on the specified scale.
 }
 
 Models fitted with certain families will include additional variables
 \itemize{
-\item \code{mgcv::ocat()} models: when \code{scale = "repsonse"}, the returned object will
+\item \code{mgcv::ocat()} models: when \code{scale = "response"}, the returned object will
 contain a \code{row} column and a \code{category} column, which indicate to which row
 of the \code{data} each row of the returned object belongs. Additionally, there
 will be \code{nrow(data) * n_categories} rows in the returned object; each row
@@ -79,6 +102,39 @@ exclusions. Missing responses do not prevent prediction. Missing required
 predictors produce \code{NA} results by default. An explicit \code{na.action} passed
 through \code{...} is honoured; with \code{na.omit}, \code{.row} retains the positions in the
 supplied data, rather than numbering the remaining rows consecutively.
+
+Simultaneous intervals jointly cover the model's underlying expected
+responses, or linear predictors on the link scale, at all valid covariate
+combinations evaluated in this call, with approximate posterior probability
+\code{ci_level}. The fitted values are estimates of these quantities. The
+combinations may include factor levels and need not form an ordered sequence,
+curve, or grid. This interpretation also applies to two predictions.
+With \code{data = NULL}, the simultaneous set comprises the retained fitting
+covariate combinations. Missing predictions do not enter this set. Coverage
+is not asserted outside this set or between its points. Separate calls
+define separate simultaneous sets. These are uncertainty intervals for model
+predictions, not prediction intervals for future observations.
+
+Simultaneous intervals use joint Gaussian coefficient draws and a critical
+value based on the maximum absolute standardized deviation over the supplied
+rows. Their limits are computed on the link scale and transformed if
+\code{scale = "response"}; \code{.se} remains on the link scale. The simulation
+covariance must be positive definite. Supported families are Gaussian,
+Poisson, binomial, Gamma, inverse Gaussian, quasi families, negative binomial,
+Tweedie, beta regression, and scaled t, fitted by \code{gam()} or \code{bam()} (including
+the \code{gam} component of a \code{gamm()} fit). Other families and \code{scam} models
+currently support pointwise intervals only.
+
+Response-scale simultaneous intervals support the identity, log, logit,
+probit, cloglog, cauchit, square-root, inverse, and inverse-squared links.
+Intervals crossing an inverse-link domain boundary are rejected; use
+\code{scale = "link"} for these intervals or for other links.
+
+\code{terms} and \code{exclude} in \code{...} retain \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}} semantics and
+apply to both prediction and interval calculation. If terms are selected or
+excluded, intervals concern that selected quantity, not necessarily the full
+expected response. Use the link scale for sums of smooth contributions, and
+consider the intercept and offset treatment when selecting terms.
 }
 \note{
 For most families, regardless of the scale on which the fitted values
@@ -96,6 +152,15 @@ sim_df <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = sim_df, method = "REML")
 fv <- fitted_values(m)
 fv
+
+# Simultaneous intervals for two arbitrary covariate combinations
+fitted_values(m, data = sim_df[c(1, 20), ], interval = "simultaneous",
+  n_sim = 1000, seed = 42)
+
+# A selected sum of smooth contributions on the link scale
+fitted_values(m, data = sim_df[c(1, 20), ], scale = "link",
+  terms = c("s(x2)", "s(x3)"), interval = "simultaneous",
+  n_sim = 1000, seed = 42)
 \dontshow{
 options(op)
 }

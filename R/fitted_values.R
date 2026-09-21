@@ -9,6 +9,19 @@
 #'   terminology.
 #' @param ci_level numeric; a value between 0 and 1 indicating the coverage of
 #'   the credible interval.
+#' @param interval character; `"confidence"` (the default) gives pointwise
+#'   intervals. `"simultaneous"` gives simultaneous intervals for predictions
+#'   at the supplied covariate combinations.
+#' @param n_sim positive integer; number of coefficient draws used for
+#'   simultaneous intervals. Ignored for pointwise intervals.
+#' @param n_cores positive integer; number of cores used by [mvnfast::rmvn()]
+#'   for simultaneous intervals. Parallel execution requires OpenMP support.
+#' @param seed integer or `NULL`; optional random seed for simultaneous
+#'   intervals. An explicit seed preserves the caller's random number state.
+#'   With `NULL`, the current random number state is used and advanced.
+#' @param unconditional logical; include smoothing parameter uncertainty in
+#'   the Bayesian covariance matrix, if available. Otherwise a warning is
+#'   issued and the uncorrected covariance is used.
 #' @param ... arguments passed to [mgcv::predict.gam()]. Note that `type`,
 #'   `newdata`, and `se.fit` are already used and passed on to
 #'   [mgcv::predict.gam()].
@@ -26,6 +39,39 @@
 #' through `...` is honoured; with `na.omit`, `.row` retains the positions in the
 #' supplied data, rather than numbering the remaining rows consecutively.
 #'
+#' Simultaneous intervals jointly cover the model's underlying expected
+#' responses, or linear predictors on the link scale, at all valid covariate
+#' combinations evaluated in this call, with approximate posterior probability
+#' `ci_level`. The fitted values are estimates of these quantities. The
+#' combinations may include factor levels and need not form an ordered sequence,
+#' curve, or grid. This interpretation also applies to two predictions.
+#' With `data = NULL`, the simultaneous set comprises the retained fitting
+#' covariate combinations. Missing predictions do not enter this set. Coverage
+#' is not asserted outside this set or between its points. Separate calls
+#' define separate simultaneous sets. These are uncertainty intervals for model
+#' predictions, not prediction intervals for future observations.
+#'
+#' Simultaneous intervals use joint Gaussian coefficient draws and a critical
+#' value based on the maximum absolute standardized deviation over the supplied
+#' rows. Their limits are computed on the link scale and transformed if
+#' `scale = "response"`; `.se` remains on the link scale. The simulation
+#' covariance must be positive definite. Supported families are Gaussian,
+#' Poisson, binomial, Gamma, inverse Gaussian, quasi families, negative binomial,
+#' Tweedie, beta regression, and scaled t, fitted by `gam()` or `bam()` (including
+#' the `gam` component of a `gamm()` fit). Other families and `scam` models
+#' currently support pointwise intervals only.
+#'
+#' Response-scale simultaneous intervals support the identity, log, logit,
+#' probit, cloglog, cauchit, square-root, inverse, and inverse-squared links.
+#' Intervals crossing an inverse-link domain boundary are rejected; use
+#' `scale = "link"` for these intervals or for other links.
+#'
+#' `terms` and `exclude` in `...` retain [mgcv::predict.gam()] semantics and
+#' apply to both prediction and interval calculation. If terms are selected or
+#' excluded, intervals concern that selected quantity, not necessarily the full
+#' expected response. Use the link scale for sums of smooth contributions, and
+#' consider the intercept and offset treatment when selecting terms.
+#'
 #' @note For most families, regardless of the scale on which the fitted values
 #'   are returned, the `se` component of the returned object is on the *link*
 #'   (*linear predictor*) scale, not the response scale. An exception is the
@@ -36,14 +82,14 @@
 #'   used to fit the model (if `data` was `NULL`), or the variables supplied to
 #'  `data`. Four further columns are added:
 #'
-#' * `fitted`: the fitted values on the specified scale,
-#' * `se`: the standard error of the fitted values (always on the *link* scale),
-#' * `lower`, `upper`: the limits of the credible interval on the fitted values,
+#' * `.fitted`: the fitted values on the specified scale,
+#' * `.se`: the standard error of the fitted values (always on the *link* scale),
+#' * `.lower_ci`, `.upper_ci`: the limits of the credible interval on the fitted values,
 #'     on the specified scale.
 #'
 #' Models fitted with certain families will include additional variables
 #'
-#' * `mgcv::ocat()` models: when `scale = "repsonse"`, the returned object will
+#' * `mgcv::ocat()` models: when `scale = "response"`, the returned object will
 #'   contain a `row` column and a `category` column, which indicate to which row
 #'   of the `data` each row of the returned object belongs. Additionally, there
 #'   will be `nrow(data) * n_categories` rows in the returned object; each row
@@ -62,6 +108,15 @@
 #' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = sim_df, method = "REML")
 #' fv <- fitted_values(m)
 #' fv
+#'
+#' # Simultaneous intervals for two arbitrary covariate combinations
+#' fitted_values(m, data = sim_df[c(1, 20), ], interval = "simultaneous",
+#'   n_sim = 1000, seed = 42)
+#'
+#' # A selected sum of smooth contributions on the link scale
+#' fitted_values(m, data = sim_df[c(1, 20), ], scale = "link",
+#'   terms = c("s(x2)", "s(x3)"), interval = "simultaneous",
+#'   n_sim = 1000, seed = 42)
 #' \dontshow{
 #' options(op)
 #' }
@@ -78,7 +133,11 @@
                                   "link",
                                   "linear predictor"
                                 ),
-                                ci_level = 0.95, envir = NULL, ...) {
+                                ci_level = 0.95, envir = NULL, ...,
+                                interval = c("confidence", "simultaneous"),
+                                n_sim = 10000, n_cores = 1, seed = NULL,
+                                unconditional = FALSE) {
+  interval <- match.arg(interval)
   object <- with_model_envir(object, envir)
   # Handle everything up to and including the extended families, but not more
   fn <- family_type(object)
@@ -113,10 +172,19 @@
     post_link_funs()
   )
   # compute fitted values
-  fit <- fit_vals_fun(object,
-    data = data, ci_level = ci_level,
-    scale = scale, extra_fns = extra_fns, ...
-  )
+  if (identical(interval, "simultaneous")) {
+    fit <- fit_vals_simultaneous(object,
+      data = data, ci_level = ci_level, scale = scale,
+      n_sim = n_sim, n_cores = n_cores, seed = seed,
+      unconditional = unconditional, empty = !any(!is.na(layout$map)), ...
+    )
+  } else {
+    fit <- fit_vals_fun(object,
+      data = data, ci_level = ci_level,
+      scale = scale, extra_fns = extra_fns,
+      unconditional = unconditional, ...
+    )
+  }
   if (identical(scale, "response")) {
     fit <- order_interval_bounds(fit)
   }
@@ -145,6 +213,80 @@
 #' @rdname fitted_values
 `fitted_values.scam` <- function(object, ...) {
   fitted_values.gam(object, ...)
+}
+
+# Single-predictor adapter: the centre includes offsets, but coefficient
+# deviations do not. Family-specific nonlinear predictions need other adapters.
+fit_vals_simultaneous <- function(
+  object, data, ci_level, scale, n_sim, n_cores, seed, unconditional,
+  empty = FALSE, ...
+) {
+  fam <- family(object)
+  supported <- c(
+    "gaussian", "poisson", "binomial", "gamma", "inverse_gaussian",
+    "quasi", "quasipoisson", "quasibinomial", "negative_binomial",
+    "tweedie", "beta_regression", "scaled_t"
+  )
+  if (inherits(object, "scam") || inherits(fam, "general.family") ||
+      !family_type(object) %in% supported) {
+    stop("Simultaneous intervals are not supported for this model family or class.",
+      call. = FALSE)
+  }
+  if (!is.logical(unconditional) || length(unconditional) != 1L ||
+      is.na(unconditional)) {
+    stop("`unconditional` must be TRUE or FALSE.", call. = FALSE)
+  }
+  if (!is.null(seed) && (!is.numeric(seed) || length(seed) != 1L ||
+      !is.finite(seed) || abs(seed) > .Machine$integer.max || seed != trunc(seed))) {
+    stop("`seed` must be NULL or a single integer.", call. = FALSE)
+  }
+  response <- identical(scale, "response")
+  if (response && !fam$link %in% c(
+    "identity", "log", "logit", "probit", "cloglog", "cauchit",
+    "sqrt", "inverse", "1/mu^2"
+  )) {
+    stop("This inverse link is not supported for simultaneous intervals; use `scale = 'link'`.",
+      call. = FALSE)
+  }
+  # Resolve the corrected-covariance fallback once, including its warning.
+  V <- get_vcov(object, unconditional = unconditional)
+  corrected <- unconditional && !is.null(object$Vc)
+  if (empty) {
+    estimate <- se <- rep(NA_real_, nrow(data))
+    X <- matrix(NA_real_, nrow(data), ncol(V))
+  } else {
+    prediction <- predict_model(object, newdata = data, ...,
+      type = "link", se.fit = TRUE, unconditional = corrected)
+    estimate <- as.vector(prediction$fit)
+    se <- as.vector(prediction$se.fit)
+    X <- predict_model(object, newdata = data, ..., type = "lpmatrix")
+  }
+  calculate <- function() simultaneous_intervals(
+    estimate, se, X, V, level = ci_level, n_sim = n_sim, n_cores = n_cores
+  )
+  intervals <- if (is.null(seed)) calculate() else withr::with_seed(seed, calculate())
+  fit <- tibble(
+    .row = seq_len(nrow(data)), .fitted = estimate, .se = se,
+    .lower_ci = intervals$lower, .upper_ci = intervals$upper
+  )
+  if (response) {
+    lower <- intervals$lower
+    upper <- intervals$upper
+    invalid <- switch(fam$link,
+      "inverse" = lower <= 0 & upper >= 0,
+      "1/mu^2" = lower <= 0,
+      "sqrt" = lower < 0,
+      FALSE
+    )
+    if (any(invalid, na.rm = TRUE)) {
+      stop("Simultaneous intervals cross the inverse-link domain boundary; use `scale = 'link'`.",
+        call. = FALSE)
+    }
+    fit <- mutate(fit, across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
+      .fns = inv_link(object)))
+  }
+  # prediction_layout() supplies compact data without an existing .row column.
+  bind_cols(data, fit) |> relocate(".row", .before = 1L)
 }
 
 #' @importFrom rlang set_names .data

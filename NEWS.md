@@ -34,6 +34,13 @@
 
 ## New features
 
+* `fitted_values()` now offers simultaneous intervals for predictions at the
+  supplied covariate combinations via `interval = "simultaneous"` (#4).
+  Pointwise intervals remain the default. Simultaneous intervals use a shared
+  internal helper also used by `derivatives()` and `partial_derivatives()`,
+  with controls for simulation size, parallel sampling, and reproducible seeds.
+  The legacy `fderiv()` implementation is unchanged.
+
 * `draw()` for penalty matrices now accepts `geom = "tile"` to draw individual
   rectangles, while retaining `geom = "raster"` as the default (#392).
 
