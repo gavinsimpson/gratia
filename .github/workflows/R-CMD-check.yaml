@@ -43,9 +43,6 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: always
 
-      - uses: r-lib/actions/setup-tinytex@v2
-      - run: tlmgr --version
-      
       - name: Install ghostscript on Linux
         if: runner.os == 'Linux'
         run: |

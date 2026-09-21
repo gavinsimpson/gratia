@@ -146,15 +146,14 @@ test_that("issue 45 parametric effects for lss models remains fixed", {
 })
 
 # test #219
-test_that("parametric effects works with messing data in model fit", {
+test_that("parametric effects works with missing data in model fit", {
   skip_on_cran()
   # skip_on_ci() # testing without as moved to mac os x
-  skip_if_offline()
   skip_if_not_installed("forcats")
   skip_if_not_installed("readr")
 
-  rats_url <- "https://fromthebottomoftheheap.net/teaching/data/rats.txt"
-  expect_warning(rats <- readr::read_table(rats_url,
+  rats_file <- testthat::test_path("fixtures", "rats.txt")
+  expect_warning(rats <- readr::read_table(rats_file,
     col_types = "dddddddddddd-"
   ))
   # ignore the warning - it"s due to trailing white space at the ends of each
