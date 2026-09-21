@@ -47,6 +47,20 @@
 
 ### New features
 
+- [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
+  now offers simultaneous intervals for predictions at the supplied
+  covariate combinations via `interval = "simultaneous"`
+  ([\#4](https://github.com/gavinsimpson/gratia/issues/4)). Pointwise
+  intervals remain the default. Simultaneous intervals use a shared
+  internal helper also used by
+  [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md)
+  and
+  [`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md),
+  with controls for simulation size, parallel sampling, and reproducible
+  seeds. The legacy
+  [`fderiv()`](https://gavinsimpson.github.io/gratia/reference/fderiv.md)
+  implementation is unchanged.
+
 - [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
   for penalty matrices now accepts `geom = "tile"` to draw individual
   rectangles, while retaining `geom = "raster"` as the default

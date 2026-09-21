@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-25</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-26</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,7 +56,12 @@
 <span>  scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"response"</span>, <span class="st">"link"</span>, <span class="st">"linear predictor"</span><span class="op">)</span>,</span>
 <span>  ci_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  interval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"confidence"</span>, <span class="st">"simultaneous"</span><span class="op">)</span>,</span>
+<span>  n_sim <span class="op">=</span> <span class="fl">10000</span>,</span>
+<span>  n_cores <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm'</span></span>
@@ -102,16 +107,44 @@ the credible interval.</p></dd>
 in model expressions. The available model formula environment is used when
 <code>NULL</code>. Covariate observations should be supplied in <code>data</code>.</p></dd>
 
+
+<dt id="arg-interval">interval<a class="anchor" aria-label="anchor" href="#arg-interval"></a></dt>
+<dd><p>character; <code>"confidence"</code> (the default) gives pointwise
+intervals. <code>"simultaneous"</code> gives simultaneous intervals for predictions
+at the supplied covariate combinations.</p></dd>
+
+
+<dt id="arg-n-sim">n_sim<a class="anchor" aria-label="anchor" href="#arg-n-sim"></a></dt>
+<dd><p>positive integer; number of coefficient draws used for
+simultaneous intervals. Ignored for pointwise intervals.</p></dd>
+
+
+<dt id="arg-n-cores">n_cores<a class="anchor" aria-label="anchor" href="#arg-n-cores"></a></dt>
+<dd><p>positive integer; number of cores used by <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code>
+for simultaneous intervals. Parallel execution requires OpenMP support.</p></dd>
+
+
+<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
+<dd><p>integer or <code>NULL</code>; optional random seed for simultaneous
+intervals. An explicit seed preserves the caller's random number state.
+With <code>NULL</code>, the current random number state is used and advanced.</p></dd>
+
+
+<dt id="arg-unconditional">unconditional<a class="anchor" aria-label="anchor" href="#arg-unconditional"></a></dt>
+<dd><p>logical; include smoothing parameter uncertainty in
+the Bayesian covariance matrix, if available. Otherwise a warning is
+issued and the uncorrected covariance is used.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble (data frame) whose first <em>m</em> columns contain either the data
 used to fit the model (if <code>data</code> was <code>NULL</code>), or the variables supplied to
-<code>data</code>. Four further columns are added:</p><ul><li><p><code>fitted</code>: the fitted values on the specified scale,</p></li>
-<li><p><code>se</code>: the standard error of the fitted values (always on the <em>link</em> scale),</p></li>
-<li><p><code>lower</code>, <code>upper</code>: the limits of the credible interval on the fitted values,
+<code>data</code>. Four further columns are added:</p><ul><li><p><code>.fitted</code>: the fitted values on the specified scale,</p></li>
+<li><p><code>.se</code>: the standard error of the fitted values (always on the <em>link</em> scale),</p></li>
+<li><p><code>.lower_ci</code>, <code>.upper_ci</code>: the limits of the credible interval on the fitted values,
 on the specified scale.</p></li>
-</ul><p>Models fitted with certain families will include additional variables</p><ul><li><p><code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code> models: when <code>scale = "repsonse"</code>, the returned object will
+</ul><p>Models fitted with certain families will include additional variables</p><ul><li><p><code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code> models: when <code>scale = "response"</code>, the returned object will
 contain a <code>row</code> column and a <code>category</code> column, which indicate to which row
 of the <code>data</code> each row of the returned object belongs. Additionally, there
 will be <code>nrow(data) * n_categories</code> rows in the returned object; each row
@@ -129,6 +162,35 @@ exclusions. Missing responses do not prevent prediction. Missing required
 predictors produce <code>NA</code> results by default. An explicit <code>na.action</code> passed
 through <code>...</code> is honoured; with <code>na.omit</code>, <code>.row</code> retains the positions in the
 supplied data, rather than numbering the remaining rows consecutively.</p>
+<p>Simultaneous intervals jointly cover the model's underlying expected
+responses, or linear predictors on the link scale, at all valid covariate
+combinations evaluated in this call, with approximate posterior probability
+<code>ci_level</code>. The fitted values are estimates of these quantities. The
+combinations may include factor levels and need not form an ordered sequence,
+curve, or grid. This interpretation also applies to two predictions.
+With <code>data = NULL</code>, the simultaneous set comprises the retained fitting
+covariate combinations. Missing predictions do not enter this set. Coverage
+is not asserted outside this set or between its points. Separate calls
+define separate simultaneous sets. These are uncertainty intervals for model
+predictions, not prediction intervals for future observations.</p>
+<p>Simultaneous intervals use joint Gaussian coefficient draws and a critical
+value based on the maximum absolute standardized deviation over the supplied
+rows. Their limits are computed on the link scale and transformed if
+<code>scale = "response"</code>; <code>.se</code> remains on the link scale. The simulation
+covariance must be positive definite. Supported families are Gaussian,
+Poisson, binomial, Gamma, inverse Gaussian, quasi families, negative binomial,
+Tweedie, beta regression, and scaled t, fitted by <code>gam()</code> or <code>bam()</code> (including
+the <code>gam</code> component of a <code>gamm()</code> fit). Other families and <code>scam</code> models
+currently support pointwise intervals only.</p>
+<p>Response-scale simultaneous intervals support the identity, log, logit,
+probit, cloglog, cauchit, square-root, inverse, and inverse-squared links.
+Intervals crossing an inverse-link domain boundary are rejected; use
+<code>scale = "link"</code> for these intervals or for other links.</p>
+<p><code>terms</code> and <code>exclude</code> in <code>...</code> retain <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">mgcv::predict.gam()</a></code> semantics and
+apply to both prediction and interval calculation. If terms are selected or
+excluded, intervals concern that selected quantity, not necessarily the full
+expected response. Use the link scale for sums of smooth contributions, and
+consider the intercept and offset treatment when selecting terms.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
@@ -161,6 +223,29 @@ are returned, the <code>se</code> component of the returned object is on the <em
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10 0.549<span style="text-decoration: underline;">984</span> 0.807<span style="text-decoration: underline;">410</span>  0.264<span style="text-decoration: underline;">717</span>   0.317<span style="text-decoration: underline;">747</span> 15.528<span style="text-decoration: underline;">3</span>  0.369<span style="text-decoration: underline;">999</span>  14.803<span style="text-decoration: underline;">1</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 390 more rows</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 1 more variable: .upper_ci &lt;dbl&gt;</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Simultaneous intervals for two arbitrary covariate combinations</span></span></span>
+<span class="r-in"><span><span class="fu">fitted_values</span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">sim_df</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">20</span><span class="op">)</span>, <span class="op">]</span>, interval <span class="op">=</span> <span class="st">"simultaneous"</span>,</span></span>
+<span class="r-in"><span>  n_sim <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 x 15</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    .row       y        x0       x1       x2       x3       f       f0      f1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     1 7.128<span style="text-decoration: underline;">34</span> 0.184<span style="text-decoration: underline;">882</span>  0.617<span style="text-decoration: underline;">142</span> 0.415<span style="text-decoration: underline;">244</span> 0.132<span style="text-decoration: underline;">410</span> 8.386<span style="text-decoration: underline;">43</span> 1.097<span style="text-decoration: underline;">43</span>  3.435<span style="text-decoration: underline;">92</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>     2 2.935<span style="text-decoration: underline;">07</span> 0.074<span style="text-decoration: underline;">979</span>4 0.797<span style="text-decoration: underline;">900</span> 0.874<span style="text-decoration: underline;">521</span> 0.203<span style="text-decoration: underline;">225</span> 5.577<span style="text-decoration: underline;">66</span> 0.466<span style="text-decoration: underline;">765</span> 4.932<span style="text-decoration: underline;">27</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 6 more variables: f2 &lt;dbl&gt;, f3 &lt;dbl&gt;, .fitted &lt;dbl&gt;, .se &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   .lower_ci &lt;dbl&gt;, .upper_ci &lt;dbl&gt;</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># A selected sum of smooth contributions on the link scale</span></span></span>
+<span class="r-in"><span><span class="fu">fitted_values</span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">sim_df</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">20</span><span class="op">)</span>, <span class="op">]</span>, scale <span class="op">=</span> <span class="st">"link"</span>,</span></span>
+<span class="r-in"><span>  terms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s(x2)"</span>, <span class="st">"s(x3)"</span><span class="op">)</span>, interval <span class="op">=</span> <span class="st">"simultaneous"</span>,</span></span>
+<span class="r-in"><span>  n_sim <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 x 15</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    .row       y        x0       x1       x2       x3       f       f0      f1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     1 7.128<span style="text-decoration: underline;">34</span> 0.184<span style="text-decoration: underline;">882</span>  0.617<span style="text-decoration: underline;">142</span> 0.415<span style="text-decoration: underline;">244</span> 0.132<span style="text-decoration: underline;">410</span> 8.386<span style="text-decoration: underline;">43</span> 1.097<span style="text-decoration: underline;">43</span>  3.435<span style="text-decoration: underline;">92</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>     2 2.935<span style="text-decoration: underline;">07</span> 0.074<span style="text-decoration: underline;">979</span>4 0.797<span style="text-decoration: underline;">900</span> 0.874<span style="text-decoration: underline;">521</span> 0.203<span style="text-decoration: underline;">225</span> 5.577<span style="text-decoration: underline;">66</span> 0.466<span style="text-decoration: underline;">765</span> 4.932<span style="text-decoration: underline;">27</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 6 more variables: f2 &lt;dbl&gt;, f3 &lt;dbl&gt;, .fitted &lt;dbl&gt;, .se &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   .lower_ci &lt;dbl&gt;, .upper_ci &lt;dbl&gt;</span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
