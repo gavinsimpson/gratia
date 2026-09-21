@@ -121,7 +121,7 @@ test_that("draw.gam works for m_2_fac", {
   expect_message(
     plt <- draw(m_2_fac,
       parametric = TRUE, rug = FALSE,
-      data = df_2_fac, envir = teardown_env()
+      data = df_2_fac
     ),
     "Interaction terms are not currently supported."
   )
@@ -133,7 +133,7 @@ test_that("draw.gam works for m_para_sm", {
   expect_message(
     plt <- draw(m_para_sm,
       parametric = TRUE, rug = FALSE,
-      data = df_2_fac, envir = teardown_env()
+      data = df_2_fac
     ),
     "Interaction terms are not currently supported."
   )
@@ -228,7 +228,7 @@ test_that("draw.gam works for a parametric only model", {
   expect_snapshot(
     plt <- draw(m_only_para,
       parametric = TRUE, angle = 90,
-      rug = FALSE, data = df_2_fac, envir = teardown_env()
+      rug = FALSE, data = df_2_fac
     )
   )
   # skip_on_ci() # testing without as moved to mac os x

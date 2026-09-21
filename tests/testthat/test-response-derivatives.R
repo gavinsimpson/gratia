@@ -9,8 +9,7 @@ test_that("first order response derivatives works", {
 
   N <- 50L
   expect_silent(ds <- data_slice(m_nb,
-    x2 = evenly(x2, n = N),
-    data = df_pois, envir = teardown_env()
+    x2 = evenly(x2, n = N)
   ))
   expect_silent(yd <- response_derivatives(m_nb,
     data = ds,
@@ -45,8 +44,7 @@ test_that("second order response derivatives works", {
 
   N <- 50L
   expect_silent(ds <- data_slice(m_nb,
-    x2 = evenly(x2, n = N),
-    data = df_pois, envir = teardown_env()
+    x2 = evenly(x2, n = N)
   ))
   expect_silent(yd <- response_derivatives(m_nb,
     data = ds,

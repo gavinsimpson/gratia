@@ -425,10 +425,7 @@ test_that("transform_fun works for parametric_effects", {
   skip_if_not_installed("withr")
   withr::local_options(lifecycle_verbosity = "quiet")
   expect_message(
-    pe <- parametric_effects(m_para_sm,
-      data = df_2_fac,
-      envir = teardown_env()
-    ),
+    pe <- parametric_effects(m_para_sm),
     "Interaction terms are not currently supported."
   )
   expect_silent(pe <- transform_fun(pe, fun = abs))

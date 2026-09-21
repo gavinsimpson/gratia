@@ -6,8 +6,7 @@ both_nms <- c(".level", ".value", ".partial", ".se")
 
 test_that("parametric_effects works for m_2_fac", {
   expect_message(
-    peff <- parametric_effects(m_2_fac, envir = teardown_env(),
-    data = df_2_fac),
+    peff <- parametric_effects(m_2_fac),
     "Interaction terms are not currently supported."
   )
   expect_s3_class(peff, class = c(
@@ -21,8 +20,7 @@ test_that("parametric_effects works for m_2_fac", {
 
 test_that("parametric_effects works for m_para_sm", {
   expect_message(
-    peff <- parametric_effects(m_para_sm, data = df_2_fac,
-    envir = teardown_env()),
+    peff <- parametric_effects(m_para_sm),
     "Interaction terms are not currently supported."
   )
   expect_s3_class(peff, class = c(
@@ -36,8 +34,7 @@ test_that("parametric_effects works for m_para_sm", {
 
 test_that("parametric_effects works for m_2_fac select term", {
   expect_silent(peff <- parametric_effects(m_2_fac,
-    term = "fac", data = df_2_fac,
-    envir = teardown_env()
+    term = "fac"
   ))
   expect_s3_class(peff, class = c(
     "parametric_effects", "tbl_df", "tbl",
@@ -50,8 +47,7 @@ test_that("parametric_effects works for m_2_fac select term", {
 
 test_that("parametric_effects works for m_para_sm select term", {
   expect_silent(peff <- parametric_effects(m_para_sm,
-    term = "fac",
-    data = df_2_fac, envir = teardown_env()
+    term = "fac"
   ))
   expect_s3_class(peff, class = c(
     "parametric_effects", "tbl_df", "tbl",
@@ -64,10 +60,7 @@ test_that("parametric_effects works for m_para_sm select term", {
 
 test_that("parametric_effects works with only parametric terms", {
   expect_message(
-    peff <- parametric_effects(m_only_para,
-      data = df_2_fac,
-      envir = teardown_env()
-    ),
+    peff <- parametric_effects(m_only_para),
     "Interaction terms are not currently supported."
   )
   expect_s3_class(peff, class = c(
@@ -81,8 +74,7 @@ test_that("parametric_effects works with only parametric terms", {
 
 test_that("parametric_effects works with weird parametric terms", {
   expect_silent(peff <- parametric_effects(m_poly,
-    data = df_2_fac,
-    envir = teardown_env()
+    data = df_2_fac
   ))
   expect_s3_class(peff, class = c(
     "parametric_effects", "tbl_df", "tbl",
@@ -94,7 +86,7 @@ test_that("parametric_effects works with weird parametric terms", {
 
   expect_silent(peff <- parametric_effects(m_poly,
     transform = TRUE,
-    data = df_2_fac, envir = teardown_env()
+    data = df_2_fac
   ))
   expect_s3_class(peff, class = c(
     "parametric_effects", "tbl_df", "tbl",
@@ -115,8 +107,7 @@ test_that("issue 212 remains fixed", {
     poly(x2, 2, raw = TRUE) +
     poly(x3, 2, raw = TRUE), data = data_212)
   expect_silent(peff <- parametric_effects(m_212,
-    data = data_212,
-    envir = teardown_env()
+    data = data_212
   ))
   expect_s3_class(peff, class = c(
     "parametric_effects", "tbl_df", "tbl",
@@ -136,9 +127,7 @@ test_that("issue 284 remains fixed", {
   skip_on_cran()
 
   peff_284 <- parametric_effects(
-    m_284,
-    data = df_284,
-    envir = teardown_env()
+    m_284
   )
   expect_identical(
     attr(peff_284, "factor_levels"),

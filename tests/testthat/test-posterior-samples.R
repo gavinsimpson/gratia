@@ -385,8 +385,7 @@ test_that("derivative_samples works for a simple GAM", {
       n = 5,
       seed = 42,
       type = "central", focal = "x0", eps = 0.01, n_sim = 10,
-      data = quick_eg1,
-      envir = teardown_env()
+      data = quick_eg1
     )
   )
   expect_s3_class(sm, c(
@@ -590,6 +589,6 @@ test_that("smooth samples can use mvn_method", {
 
 test_that("derivative samples level argument is deprecated", {
   lifecycle::expect_deprecated(derivative_samples(m_gam, focal = "x1", n = 10,
-    n_sim = 10, level = 0.95, seed = 2, data = su_eg1, envir = teardown_env()))
+    n_sim = 10, level = 0.95, seed = 2, data = su_eg1))
 }
 )

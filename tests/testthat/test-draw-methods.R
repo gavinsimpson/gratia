@@ -79,21 +79,21 @@ test_that("draw.gam works with select and parametric", {
   )
   plt2 <- draw(su_m_factor_by,
     select = "s(x2)", partial_match = TRUE,
-    parametric = FALSE, data = su_eg4, envir = teardown_env(),
+    parametric = FALSE, data = su_eg4,
     rug = FALSE
   )
   plt3 <- draw(su_m_factor_by,
     select = "s(x2)", partial_match = TRUE,
-    parametric = TRUE, data = su_eg4, envir = teardown_env(),
+    parametric = TRUE, data = su_eg4,
     rug = FALSE
   )
   plt4 <- draw(su_m_factor_by,
     parametric = TRUE, rug = FALSE,
-    data = su_eg4, envir = teardown_env()
+    data = su_eg4
   )
   plt5 <- draw(su_m_factor_by,
     parametric = FALSE, rug = FALSE,
-    data = su_eg4, envir = teardown_env()
+    data = su_eg4
   )
 
   # skip_on_ci() # testing without as moved to mac os x

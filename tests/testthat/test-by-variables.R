@@ -54,7 +54,7 @@ test_that("get_by_smooth works", {
 test_that("draw.gam works with select and parametric = TRUE", {
   plt <- draw(su_m_factor_by,
     select = "s(x2):fac1", parametric = TRUE,
-    data = df_2_fac, envir = teardown_env()
+    data = df_2_fac
   )
 
   # skip_on_ci() # testing without as moved to mac os x

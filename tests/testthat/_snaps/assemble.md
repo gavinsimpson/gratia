@@ -25,7 +25,7 @@
 # assemble.gam works for m_2_fac with angled labels
 
     Code
-      assemble(m_2_fac, parametric = TRUE, envir = teardown_env(), data = df_2_fac)
+      assemble(m_2_fac, parametric = TRUE, data = df_2_fac)
     Message
       i Interaction terms are not currently supported.
       
@@ -41,7 +41,7 @@
 # assemble.gam works for m_para_sm with angled labels
 
     Code
-      assemble(m_para_sm, parametric = TRUE, envir = teardown_env(), data = df_2_fac)
+      assemble(m_para_sm, parametric = TRUE, data = df_2_fac)
     Message
       i Interaction terms are not currently supported.
       
