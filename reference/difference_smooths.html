@@ -13,7 +13,7 @@ difference."><meta property="og:image" content="https://gavinsimpson.github.io/g
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-26</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-27</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,7 +71,11 @@ difference.</p>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  interval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"confidence"</span>, <span class="st">"simultaneous"</span><span class="op">)</span>,</span>
+<span>  n_sim <span class="op">=</span> <span class="fl">10000</span>,</span>
+<span>  n_cores <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -146,7 +150,49 @@ against factor-by smooth labels.</p></dd>
 in model expressions. The available model formula environment is used when
 <code>NULL</code>. Covariate observations should be supplied in <code>data</code>.</p></dd>
 
+
+<dt id="arg-interval">interval<a class="anchor" aria-label="anchor" href="#arg-interval"></a></dt>
+<dd><p>character; <code>"confidence"</code> (the default) gives pointwise
+intervals. <code>"simultaneous"</code> gives simultaneous intervals for differences
+of smooths at the supplied covariate combinations, separately for each
+pair of factor levels.</p></dd>
+
+
+<dt id="arg-n-sim">n_sim<a class="anchor" aria-label="anchor" href="#arg-n-sim"></a></dt>
+<dd><p>positive integer; number of coefficient draws used for
+simultaneous intervals. Ignored for pointwise intervals.</p></dd>
+
+
+<dt id="arg-n-cores">n_cores<a class="anchor" aria-label="anchor" href="#arg-n-cores"></a></dt>
+<dd><p>positive integer; number of cores used by <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code>
+for simultaneous intervals. Parallel execution requires OpenMP support.</p></dd>
+
+
+<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
+<dd><p>integer or <code>NULL</code>; optional random seed for simultaneous
+intervals. An explicit seed preserves the caller's random number state.
+With <code>NULL</code>, the current random number state is used and advanced.</p></dd>
+
 </dl></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Simultaneous intervals jointly cover the underlying smooth differences at
+the evaluated covariate combinations for each pair of factor levels, with
+approximate posterior probability <code>ci_level</code> when using the Bayesian
+covariance. They do not provide joint coverage across all pairs, outside
+the evaluation set, or between its points. With <code>data = NULL</code>, the evaluation
+set is generated using <code>n</code>. Differences and interval limits are on the
+linear predictor scale, including group means when requested.</p>
+<p>The intervals use the joint coefficient covariance selected by
+<code>unconditional</code> and <code>frequentist</code>, retaining covariance between the two
+smooths. The simulation covariance must be positive definite. With
+<code>frequentist = TRUE</code>, simulation instead uses the frequentist covariance
+of the coefficient estimators. <code>n_sim</code>, <code>n_cores</code>, and <code>seed</code> are ignored for
+pointwise intervals. An explicit seed scopes the entire call: each pair uses
+a new batch of coefficient draws, and the caller's random number state is
+restored on exit. With <code>seed = NULL</code>, the current random number state is
+used and advanced.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -179,6 +225,12 @@ in model expressions. The available model formula environment is used when
 <span class="r-in"><span><span class="va">sm_dif2</span> <span class="op">&lt;-</span> <span class="fu">difference_smooths</span><span class="op">(</span><span class="va">m</span>, select <span class="op">=</span> <span class="st">"s(x2)"</span>, group_means <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">sm_dif2</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="difference_smooths-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># simultaneous intervals, separately for each pair of factor levels</span></span></span>
+<span class="r-in"><span><span class="va">sm_sim</span> <span class="op">&lt;-</span> <span class="fu">difference_smooths</span><span class="op">(</span><span class="va">m</span>, select <span class="op">=</span> <span class="st">"s(x2)"</span>,</span></span>
+<span class="r-in"><span>  interval <span class="op">=</span> <span class="st">"simultaneous"</span>, n_sim <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">sm_sim</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="difference_smooths-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># compare specific smooths</span></span></span>
 <span class="r-in"><span><span class="va">sm_dif3</span> <span class="op">&lt;-</span> <span class="fu">difference_smooths</span><span class="op">(</span><span class="va">m</span>,</span></span>

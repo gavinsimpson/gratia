@@ -47,6 +47,13 @@
 
 ### New features
 
+- [`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md)
+  now offers simultaneous intervals for differences of smooths at the
+  supplied covariate combinations, separately for each pair of factor
+  levels, via `interval = "simultaneous"`
+  ([\#380](https://github.com/gavinsimpson/gratia/issues/380)).
+  Pointwise intervals remain the default.
+
 - [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
   now offers simultaneous intervals for predictions at the supplied
   covariate combinations via `interval = "simultaneous"`
