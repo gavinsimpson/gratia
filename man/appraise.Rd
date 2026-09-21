@@ -10,7 +10,7 @@ appraise(model, ...)
 
 \method{appraise}{gam}(
   model,
-  method = c("uniform", "simulate", "normal", "direct"),
+  method = NULL,
   use_worm = FALSE,
   n_uniform = 10,
   n_simulate = 50,
@@ -38,8 +38,11 @@ as well as classes \code{"glm"} and \code{"lm"} from calls to \link[stats:glm]{s
 
 \item{...}{arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 
-\item{method}{character; method used to generate theoretical quantiles.
-The default is \code{"uniform"}, which generates reference quantiles using
+\item{method}{character or \code{NULL}; method used to generate theoretical
+quantiles. The default, \code{NULL}, selects \code{"simulate"} for models fitted with
+\code{\link[mgcv:tw]{mgcv::tw()}} or \code{\link[mgcv:Tweedie]{mgcv::Tweedie()}} and \code{"uniform"} otherwise. Explicitly
+supplying a method overrides this selection, subject to availability of
+the required family functions. \code{"uniform"} generates reference quantiles using
 random draws from a uniform distribution and the inverse cumulative
 distribution function (CDF) of the fitted values. The reference quantiles
 are averaged over \code{n_uniform} draws. \code{"simulate"} generates reference
@@ -47,10 +50,11 @@ quantiles by simulating new response data from the model at the observed
 values of the covariates, which are then residualised to generate reference
 quantiles, using \code{n_simulate} simulated data sets. \code{"normal"} generates
 reference quantiles using the standard normal distribution. \code{"uniform"} is
-more computationally efficient, but \code{"simulate"} allows reference bands to
+often more computationally efficient, but Tweedie quantiles are expensive
+to compute. \code{"simulate"} allows reference bands to
 be drawn on the QQ-plot. \code{"normal"} should be avoided but is used as a fall
 back if a random number generator (\code{"simulate"}) or the inverse of the CDF
-(\verb{"uniform"``) are not available from the }family` used during model
+(\code{"uniform"}) are not available from the \code{family} used during model
 fitting.
 
 Note that \code{method = "direct"} is deprecated in favour of
