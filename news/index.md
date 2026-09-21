@@ -157,6 +157,12 @@
 
 ### Bug Fixes
 
+- Posterior sampling for GAMs, including the GAM component of `gamm4`
+  models, now falls back to
+  [`mgcv::rmvn()`](https://rdrr.io/pkg/mgcv/man/rmvn.html) with a
+  warning if the default sampler’s Cholesky decomposition fails
+  ([\#332](https://github.com/gavinsimpson/gratia/issues/332)).
+
 - [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
   now plots tensor products of two factors as points with confidence
   intervals, faceted by the second factor, instead of empty line plots
