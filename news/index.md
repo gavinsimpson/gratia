@@ -131,6 +131,13 @@
 
 ### Bug Fixes
 
+- [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  now plots tensor products of two factors as points with confidence
+  intervals, faceted by the second factor, instead of empty line plots
+  ([\#395](https://github.com/gavinsimpson/gratia/issues/395)). Tensor
+  products with one factor now use the continuous covariate on the x
+  axis regardless of the order of the margins.
+
 - [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
   now uses the fitted coefficient order for random-effect interactions
   fitted with `bam(discrete = TRUE)`, correcting estimates and standard
