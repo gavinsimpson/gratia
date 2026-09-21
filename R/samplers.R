@@ -152,7 +152,18 @@
     sigma <- sigma[index, index, drop = FALSE]
   }
   betas <- if (isTRUE(identical(mvn_method, "mvnfast"))) {
-    mvnfast::rmvn(n = n, mu = mu, sigma = sigma, ncores = n_cores)
+    tryCatch(
+      mvnfast::rmvn(n = n, mu = mu, sigma = sigma, ncores = n_cores),
+      error = function(e) {
+        if (!grepl("chol(): decomposition failed", conditionMessage(e),
+          fixed = TRUE)) {
+          stop(e)
+        }
+        warning("Cholesky decomposition failed; using mgcv::rmvn().",
+          call. = FALSE)
+        mgcv::rmvn(n = n, mu = mu, V = sigma)
+      }
+    )
   } else {
     mgcv::rmvn(n = n, mu = mu, V = sigma)
   }
