@@ -1,6 +1,7 @@
 # Test methods for GJRM models
 # Fit an example GJRM model using the example from ?GJRM::gamlss
-suppressPackageStartupMessages(library("GJRM"))
+skip_on_cran()
+skip_if_not_installed("GJRM", minimum_version = "0.2-6")
 
 test_that("draw works for a simple GJRM gamlss", {
   skip_if_not_installed("GJRM", minimum_version = "0.2-6")
@@ -24,8 +25,5 @@ test_that("draw works for a simple GJRM gamlss", {
   fl <- list(eq.mu, eq.s)
   m_gamlss_gjrm <- GJRM::gamlss(fl, data = dataSim)
   expect_silent(plt <- draw(m_gamlss_gjrm))
-
-
-  skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw-simple-gjrm-gamlss", plt)
 })

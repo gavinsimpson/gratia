@@ -1,3 +1,7 @@
+# Full plotting examples and snapshots run locally and on CI.
+# Small numerical/build checks live in test-draw-core.R.
+skip_on_cran()
+
 # Test draw.smooth_estimates()
 # A lot of the current tests for this are over in test-draw-methods.R
 
@@ -18,16 +22,12 @@ test_that("draw.smooth_estimates works for m_gam", {
 
 test_that("draw.smooth_estimates works for m_gamm", {
   expect_silent(plt <- draw(smooth_estimates(m_gamm, "s(x2)")))
-
-  skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw.smooth_estimates m_gamm", plt)
 })
 
 test_that("draw.smooth_estimates works for m_gamm4", {
   skip_on_cran()
   expect_silent(plt <- draw(smooth_estimates(m_gamm4, "s(x2)")))
-
-  skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw.smooth_estimates m_gamm4", plt)
 })
 
@@ -120,9 +120,10 @@ test_that("draw.smooth_estimates works for su_m_trivar_t2", {
 })
 
 test_that("draw.smooth_estimates works for su_m_quadvar", {
+  models <- secondary_models()
   skip_on_os(os = "win")
   # skip_on_os(os = "mac")
-  expect_silent(plt <- draw(smooth_estimates(su_m_quadvar,
+  expect_silent(plt <- draw(smooth_estimates(models$su_m_quadvar,
     dist = 0.1,
     n = 25, n_3d = 4, n_4d = 3
   )))
@@ -132,9 +133,10 @@ test_that("draw.smooth_estimates works for su_m_quadvar", {
 })
 
 test_that("draw.smooth_estimates works for su_m_quadvar_te", {
+  models <- secondary_models()
   skip_on_os(os = "win")
   # skip_on_os(os = "mac")
-  expect_silent(plt <- draw(smooth_estimates(su_m_quadvar_te,
+  expect_silent(plt <- draw(smooth_estimates(models$su_m_quadvar_te,
     dist = 0.1,
     n = 25, n_3d = 4, n_4d = 3
   )))
@@ -144,9 +146,10 @@ test_that("draw.smooth_estimates works for su_m_quadvar_te", {
 })
 
 test_that("draw.smooth_estimates works for su_m_quadvar_t2", {
+  models <- secondary_models()
   skip_on_os(os = "win")
   # skip_on_os(os = "mac")
-  expect_silent(plt <- draw(smooth_estimates(su_m_quadvar_t2,
+  expect_silent(plt <- draw(smooth_estimates(models$su_m_quadvar_t2,
     dist = 0.1,
     n = 25, n_3d = 4, n_4d = 3
   )))
@@ -330,16 +333,18 @@ test_that("draw for smooth estimates works with univar tensor products #260", {
 })
 
 test_that("plot has correct label with ordered factor by models", {
-  expect_silent(plt <- draw(m_ordered_by, rug = FALSE))
+  models <- secondary_models()
+  expect_silent(plt <- draw(models$m_ordered_by, rug = FALSE))
 
   skip_on_cran()
   expect_doppelganger("draw subtitle ordered by smooths", plt)
 })
 
 test_that("grouped_by works", {
+  models <- secondary_models()
   sm <- smooth_estimates(su_m_factor_by)
   expect_silent(plt1 <- draw(sm, grouped_by = TRUE))
-  sm <- smooth_estimates(m_ordered_by)
+  sm <- smooth_estimates(models$m_ordered_by)
   expect_silent(plt2 <- draw(sm, grouped_by = TRUE))
 
   skip_on_cran()

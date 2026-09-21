@@ -591,7 +591,7 @@ test_that("dispersion works for a GLM", {
 
 test_that("n_eta work", {
   expect_identical(n_eta(m_gam), 1L)
-  expect_identical(n_eta(m_accel), 2L)
+  expect_identical(n_eta(m_gaulss), 2L)
 })
 
 test_that("rtw works for twlss model", {

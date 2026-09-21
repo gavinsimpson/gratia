@@ -71,8 +71,6 @@ test_that("difference_smooths() works for a gamm model", {
 
   ## plot
   plt <- draw(ds)
-
-  skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw difference_smooths gamm", plt)
 })
 
@@ -112,8 +110,9 @@ test_that("difference_smooths() works with user data", {
 })
 
 test_that("difference_smooths() works for a bivariate gam", {
+  models <- secondary_models()
   skip_on_cran()
-  expect_silent(ds <- difference_smooths(su_m_bivar_by_fac,
+  expect_silent(ds <- difference_smooths(models$su_m_bivar_by_fac,
     select = "s(x,z)"
   ))
   expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))

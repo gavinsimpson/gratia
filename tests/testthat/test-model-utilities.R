@@ -9,7 +9,7 @@ test_that("model_constant returns the intercept estimate", {
 })
 
 test_that("model_constant works for a GAMLSS", {
-  expect_length(model_constant(m_accel), 2L)
+  expect_length(model_constant(m_gaulss), 2L)
   expect_length(model_constant(m_gam), 1L)
 })
 

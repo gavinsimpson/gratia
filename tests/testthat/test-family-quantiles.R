@@ -135,10 +135,15 @@ test_that("uniform QQ and worm plots use the extended quantile helpers", {
       qpois(runif(n, exp(-4), 1), 4)), nlp = 2)
   )
   for (case in cases) {
+    # These are routing/finite-output checks, not distributional accuracy
+    # estimates. Tweedie quantiles require costly numerical CDF inversion,
+    # so a small real fit is sufficient; keep the other family fixtures intact.
+    y <- if (family_type(case$fam) == "tweedie") head(case$y, 12L) else case$y
+    n_obs <- length(y)
     formula <- if (case$nlp == 1) y ~ 1 else {
       c(list(y ~ 1), rep(list(~1), case$nlp - 1))
     }
-    m <- mgcv::gam(formula, data = data.frame(y = case$y),
+    m <- mgcv::gam(formula, data = data.frame(y = y),
       family = case$fam, method = "REML")
     if (family_type(m) == "tweedie") {
       power <- if (is.null(m$family$getTheta)) 1.5 else m$family$getTheta(TRUE)
@@ -148,23 +153,27 @@ test_that("uniform QQ and worm plots use the extended quantile helpers", {
     }
     types <- c("deviance", "response", "pearson")
     if (family_type(m) == "ziplss") types <- types[1:2]
-    for (type in types) {
-      out <- qq_uniform(m, n = 1, type = type)
-      expect_equal(nrow(out), n)
-      expect_true(all(is.finite(out$theoretical)))
-      # Check generated residuals independently via mgcv's model method.
-      q <- fix_family_qf(family(m))$qf(ppoints(n), fitted(m), m$prior.weights, m$sig2)
+    # Only general-family residual methods use the replaced response below.
+    # Compute their reference quantiles once, independently of residual type.
+    if (case$nlp > 1) {
+      q <- fix_family_qf(family(m))$qf(ppoints(n_obs), fitted(m),
+        m$prior.weights, m$sig2)
       expected_model <- m
       expected_model$y <- q
-      expected <- residuals(expected_model, type = type)
-      actual <- compute_residuals(q, fitted(m), m$prior.weights,
-        type = type, dev_resid_fun = if (is.null(m$family$residuals)) {
-          m$family$dev.resids
-        } else m$family$residuals,
-        var_fun = m$family$variance, na_action = NULL, model = m)
+    }
+    for (type in types) {
+      out <- qq_uniform(m, n = 1, type = type)
+      expect_equal(nrow(out), n_obs)
+      expect_true(all(is.finite(out$theoretical)))
       # Standard-family residuals.gam can use stored working residuals;
       # general families compute their residuals directly from the supplied y.
-      if (case$nlp > 1) expect_equal(actual, expected)
+      if (case$nlp > 1) {
+        expected <- residuals(expected_model, type = type)
+        actual <- compute_residuals(q, fitted(m), m$prior.weights,
+          type = type, dev_resid_fun = m$family$residuals,
+          var_fun = m$family$variance, na_action = NULL, model = m)
+        expect_equal(actual, expected)
+      }
     }
     expect_equal(qq_plot(m, method = "uniform", n_uniform = 1)$labels$subtitle,
       "Method: uniform")

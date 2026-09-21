@@ -1,3 +1,7 @@
+# Full plotting examples and snapshots run locally and on CI.
+# Small numerical/build checks live in test-draw-core.R.
+skip_on_cran()
+
 # -- Soap films ---------------------------------------------------------------
 test_that("draw for gam can plot a so soap film", {
   #skip("mgcv can't find the boundary")
@@ -53,9 +57,10 @@ test_that("draw for smooth estimates can plot a so soap film", {
 })
 
 test_that("draw smooth estimates can plot a so soap film with known bndry", {
+  models <- secondary_models()
   #skip("mgcv can't find the boundary")
   expect_silent(
-    plt_so <- smooth_estimates(m_soap_bndry, clip = TRUE) |>
+    plt_so <- smooth_estimates(models$m_soap_bndry, clip = TRUE) |>
       draw()
   )
 
@@ -67,10 +72,11 @@ test_that("draw smooth estimates can plot a so soap film with known bndry", {
 test_that(
   "smooth estimates can evaluate a nested so soap film",
   {
+    models <- secondary_models()
     expect_silent(
-      sm_so <- smooth_estimates(m_soap_nested, n = 100, clip = TRUE)
+      sm_so <- smooth_estimates(models$m_soap_nested, n = 100, clip = TRUE)
     )
-    bnd <- boundary(get_smooth(m_soap_nested, "s(x,y)"))
+    bnd <- boundary(get_smooth(models$m_soap_nested, "s(x,y)"))
     n_pts <- vapply(bnd, \(x) length(x[[1]]), integer(1))
 
     # check the nrow of the object, should be 10000 (100 * 100) *plus* the
@@ -87,8 +93,9 @@ test_that(
 test_that(
   "draw smooth estimates can plot a nested so soap film",
   {
+    models <- secondary_models()
     expect_silent(
-      plt_so <- smooth_estimates(m_soap_nested, clip = TRUE) |>
+      plt_so <- smooth_estimates(models$m_soap_nested, clip = TRUE) |>
         draw()
     )
 

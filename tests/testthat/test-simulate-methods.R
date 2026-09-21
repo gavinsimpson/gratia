@@ -73,9 +73,10 @@ test_that("simulate() works with out a seed", {
 })
 
 test_that("simulate() fails if we don't have an rd function", {
+  models <- secondary_models()
   skip_on_cran()
 
-  expect_error(simulate(m_bcg),
+  expect_error(simulate(models$m_bcg),
     "^Don't yet know how to simulate from family <bcg\\(",
   )
 })

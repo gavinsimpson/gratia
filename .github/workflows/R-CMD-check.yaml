@@ -12,22 +12,23 @@ jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
 
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }}, ${{ matrix.config.tests }})
 
     strategy:
       fail-fast: false
       matrix:
         config:
-          - {os: macOS-latest,   r: 'release'}
-          - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
-          - {os: ubuntu-latest,   r: 'release'}
-          # - {os: ubuntu-latest,   r: 'oldrel-1'}
+          - {os: macOS-latest,   r: 'release', tests: 'full', not_cran: 'true'}
+          - {os: windows-latest, r: 'release', tests: 'full', not_cran: 'true'}
+          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release', tests: 'full', not_cran: 'true'}
+          - {os: ubuntu-latest,   r: 'release', tests: 'full', not_cran: 'true'}
+          - {os: ubuntu-latest,   r: 'release', tests: 'CRAN core', not_cran: 'false'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
-      # Visual snapshots are checked locally.
+      NOT_CRAN: ${{ matrix.config.not_cran }}
+      # Visual snapshots run in the separate macOS workflow.
       VDIFFR_RUN_TESTS: "false"
       VDIFFR_LOG_PATH: "../vdiffr.Rout.fail"
 

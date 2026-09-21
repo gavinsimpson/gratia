@@ -10,7 +10,6 @@ test_that("conditional_values for a GAM with vector condition", {
   expect_named(cv, c(cv_names[1], paste0("x", c(2,0,1,3)), cv_names[-1]))
 
   plt <- cv |> draw()
-  skip_on_ci()
   skip_on_cran()
   expect_doppelganger("conditional values m_gam numeric cond", plt)
 })
@@ -36,8 +35,6 @@ test_that("conditional_values works with vector condition", {
   )
   expect_s3_class(cv, "conditional_values")
   expect_named(cv, c(cv_names[1], "x2", "x1", "x0", "x3", cv_names[-1]))
-
-  skip_on_ci()
   skip_on_cran()
   expect_snapshot(print(cv))
 })
@@ -49,8 +46,6 @@ test_that("conditional_values works with complex list condition", {
   )
   expect_s3_class(cv, "conditional_values")
   expect_named(cv, c(cv_names[1], "x2", "x1", "x0", "x3", cv_names[-1]))
-
-  skip_on_ci()
   skip_on_cran()
   expect_snapshot(print(cv))
 })
@@ -62,8 +57,6 @@ test_that("conditional_values works with factor by model", {
   )
   expect_s3_class(cv, "conditional_values")
   expect_named(cv, c(cv_names[1], "fac", "x2", "x0", cv_names[-1]))
-
-  skip_on_ci()
   skip_on_cran()
   expect_snapshot(print(cv))
 })
@@ -75,8 +68,6 @@ test_that("conditional_values works with supplied factor levels", {
   )
   expect_s3_class(cv, "conditional_values")
   expect_named(cv, c(cv_names[1], "x2", "fac", "x0", cv_names[-1]))
-
-  skip_on_ci()
   skip_on_cran()
   expect_snapshot(print(cv))
 })

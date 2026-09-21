@@ -1,3 +1,8 @@
+# The paper examples need a dedicated integration job rather than every PR.
+skip_on_cran()
+skip_if(nzchar(Sys.getenv("CI")) && Sys.getenv("GRATIA_RUN_HGAM") != "true",
+  "Paper examples run in the integration workflow")
+
 ## Tests for models in the HGAM paper
 
 ## data load and prep
@@ -24,7 +29,6 @@ daphnia_test <- subset(zooplankton, year %% 2 == 1 & taxon == "D. mendotae")
 ## CO2
 test_that("draw() can plot CO2 model 1", {
   skip_on_cran()
-  skip_on_ci()
   CO2_mod1 <- bam(
     log(uptake) ~ s(log(conc), k = 5, bs = "tp") +
       s(Plant_uo, k = 12, bs = "re"),
@@ -32,14 +36,13 @@ test_that("draw() can plot CO2 model 1", {
     control = ctrl
   )
   plt <- draw(CO2_mod1, overall_uncertainty = TRUE, rug = FALSE, n = 50)
-  expect_doppelganger("hgam-paper-co2-model-1", plt)
-
   expect_silent(d <- derivatives(CO2_mod1))
+
+  expect_doppelganger("hgam-paper-co2-model-1", plt)
 })
 
 test_that("draw() can plot CO2 model 2", {
   skip_on_cran()
-  skip_on_ci()
   expect_warning(
     CO2_mod2 <- bam(
       log(uptake) ~ s(log(conc), k = 5, m = 2) +
@@ -50,15 +53,14 @@ test_that("draw() can plot CO2 model 2", {
     "model has repeated 1-d smooths of same variable."
   )
   plt <- draw(CO2_mod2, overall_uncertainty = TRUE, rug = FALSE, n = 50)
-  expect_doppelganger("hgam-paper-co2-model-2", plt)
-
   expect_silent(d <- derivatives(CO2_mod2))
+
+  expect_doppelganger("hgam-paper-co2-model-2", plt)
 })
 
 ## We show smooths 1, 14, 3, 5, 10, 13 in the paper code
 test_that("draw() can plot CO2 model 3", {
   skip_on_cran()
-  skip_on_ci()
   CO2_mod3 <- bam(
     log(uptake) ~ s(log(conc), k = 5, m = 2, bs = "tp") +
       s(log(conc), by = Plant_uo, k = 5, m = 1, bs = "tp") +
@@ -67,14 +69,13 @@ test_that("draw() can plot CO2 model 3", {
     control = ctrl
   )
   plt <- draw(CO2_mod3, overall_uncertainty = TRUE, rug = FALSE, n = 50)
-  expect_doppelganger("hgam-paper-co2-model-3", plt)
-
   expect_silent(d <- derivatives(CO2_mod3))
+
+  expect_doppelganger("hgam-paper-co2-model-3", plt)
 })
 
 test_that("draw() can plot CO2 model 4", {
   skip_on_cran()
-  skip_on_ci()
   CO2_mod4 <- bam(
     log(uptake) ~
       s(log(conc), Plant_uo, k = 5, bs = "fs", m = 2),
@@ -82,14 +83,13 @@ test_that("draw() can plot CO2 model 4", {
     control = ctrl
   )
   plt <- draw(CO2_mod4, overall_uncertainty = TRUE, rug = FALSE, n = 50)
-  expect_doppelganger("hgam-paper-co2-model-4", plt)
-
   expect_silent(d <- derivatives(CO2_mod4))
+
+  expect_doppelganger("hgam-paper-co2-model-4", plt)
 })
 
 test_that("draw() can plot CO2 model 5", {
   skip_on_cran()
-  skip_on_ci()
   CO2_mod5 <- bam(
     log(uptake) ~ s(log(conc),
       by = Plant_uo, k = 5, bs = "tp",
@@ -100,15 +100,14 @@ test_that("draw() can plot CO2 model 5", {
     control = ctrl
   )
   plt <- draw(CO2_mod5, overall_uncertainty = TRUE, rug = FALSE, n = 50)
-  expect_doppelganger("hgam-paper-co2-model-5", plt)
-
   expect_silent(d <- derivatives(CO2_mod5))
+
+  expect_doppelganger("hgam-paper-co2-model-5", plt)
 })
 
 ## bird_move
 test_that("draw() can plot bird_move model 1", {
   skip_on_cran()
-  skip_on_ci()
   bird_mod1 <- bam(
     count ~ te(week, latitude,
       bs = c("cc", "tp"),
@@ -124,7 +123,6 @@ test_that("draw() can plot bird_move model 1", {
 
 test_that("draw() can plot bird_move model 2", {
   skip_on_cran()
-  skip_on_ci()
   # expect_warning(
   # `bam()` has real problems with this model, use gam() instead with loads
   # of threads, but it doesn't need as many as 8 we use here
@@ -149,7 +147,6 @@ test_that("draw() can plot bird_move model 2", {
 
 test_that("draw() can plot bird_move model 3", {
   skip_on_cran()
-  skip_on_ci()
   bird_mod3 <- bam(
     count ~ species +
       te(week, latitude,
@@ -170,7 +167,6 @@ test_that("draw() can plot bird_move model 3", {
 
 test_that("draw() throws message with bird_move model 4", {
   skip_on_cran()
-  skip_on_ci()
   expect_warning(
     bird_mod4 <- bam(
       count ~ t2(week, latitude, species,
@@ -190,7 +186,6 @@ test_that("draw() throws message with bird_move model 4", {
 
 test_that("draw() can plot bird_move model 5", {
   skip_on_cran()
-  skip_on_ci()
   bird_mod5 <- bam(
     count ~ species +
       te(week, latitude,
@@ -207,7 +202,6 @@ test_that("draw() can plot bird_move model 5", {
 
 test_that("draw() can plot zoo_comm_mod model 4", {
   skip_on_cran()
-  skip_on_ci()
   zoo_comm_mod4 <- bam(
     density_adj ~ s(day, taxon,
       bs = "fs",
@@ -227,7 +221,6 @@ test_that("draw() can plot zoo_comm_mod model 4", {
 
 test_that("draw() can plot zoo_comm_mod model 5", {
   skip_on_cran()
-  skip_on_ci()
   zoo_comm_mod5 <- bam(
     density_adj ~ s(day,
       by = taxon,
@@ -248,7 +241,6 @@ test_that("draw() can plot zoo_comm_mod model 5", {
 ## extra HGAM data-based test - this model is slow
 test_that("gratia handles a complex gfam bird move", {
   skip_on_cran()
-  skip_on_ci()
 
   data(bird_move, package = "gratia")
   ctrl <- gam.control(nthreads = 6)

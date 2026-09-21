@@ -1,0 +1,90 @@
+name: Secondary tests
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+  schedule:
+    - cron: '17 4 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  visual:
+    runs-on: macos-26
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      NOT_CRAN: "true"
+      VDIFFR_RUN_TESTS: "true"
+      VDIFFR_LOG_PATH: "${{ runner.temp }}/vdiffr.log"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.6.1'
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::pkgload, any::vdiffr, any::svglite
+          needs: check
+      - name: Run tests including visual snapshots
+        run: testthat::test_local(stop_on_failure = TRUE)
+        shell: Rscript {0}
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: visual-test-failures
+          path: |
+            tests/testthat/_snaps
+            ${{ runner.temp }}/vdiffr.log
+
+  paper-examples:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      NOT_CRAN: "true"
+      GRATIA_RUN_HGAM: "true"
+      VDIFFR_RUN_TESTS: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::pkgload
+          needs: check
+      - name: Run paper-sized integration examples
+        run: |
+          elapsed <- system.time(results <- testthat::test_local(
+            filter = "^hgam-paper$", reporter = "summary", stop_on_failure = FALSE
+          ))
+          timings <- as.data.frame(results)
+          timings <- timings[, c("test", "real", "passed", "failed", "error", "warning", "skipped")]
+          write.csv(timings, "hgam-test-timings.csv", row.names = FALSE)
+          summary <- c(
+            "## HGAM integration timings",
+            sprintf("Total test run, including setup: %.1f seconds.", elapsed[["elapsed"]]),
+            "",
+            "Times below include work before any snapshot skip; image comparisons are disabled.",
+            "",
+            "| Test | Seconds | Failed assertions | Error |",
+            "| --- | ---: | ---: | --- |",
+            sprintf("| %s | %.2f | %d | %s |",
+              timings$test, timings$real, timings$failed, timings$error)
+          )
+          writeLines(summary, Sys.getenv("GITHUB_STEP_SUMMARY"))
+          if (any(timings$failed > 0L | timings$error)) {
+            stop("HGAM integration tests failed; see the timing report and test output.")
+          }
+        shell: Rscript {0}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hgam-test-timings
+          path: hgam-test-timings.csv
+          retention-days: 90
