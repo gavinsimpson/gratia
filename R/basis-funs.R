@@ -86,8 +86,10 @@
   n_3d = 16,
   n_4d = 4,
   partial_match = FALSE,
+  envir = NULL,
   ...
 ) {
+  object <- with_model_envir(object, envir)
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
     select <- term
@@ -115,8 +117,8 @@
         call. = FALSE
       )
     }
-    check_all_vars(object, data = data, smooths = smooths)
-    data <- delete_response(object, data = data)
+    # Basis construction needs evaluated covariates for selected smooths only.
+    for (sm in smooths) data <- prepare_smooth_data(object, sm, data)
   }
 
   if (isTRUE(requireNamespace("mirai", quietly = TRUE)) && 

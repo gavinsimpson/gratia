@@ -147,3 +147,50 @@ recover_raw_data <- function(model, data = NULL, envir = NULL) {
   }
   candidate
 }
+
+# Materialize model-frame expressions without evaluating a response. Returning
+# the columns in terms order preserves positional offset and model.matrix use.
+evaluated_model_frame <- function(model, data, envir = NULL) {
+  tt <- stats::delete.response(stats::terms(model))
+  exprs <- as.list(attr(tt, "variables"))[-1L]
+  labels <- vapply(exprs, function(x) paste(deparse(x, width.cutoff = 500L),
+    collapse = ""), character(1))
+  # Use fitted prediction expressions (e.g. poly's coefficients) when present.
+  pred <- as.list(attr(tt, "predvars"))[-1L]
+  if (length(pred) != length(exprs)) pred <- exprs
+  out <- data
+  env <- model_envir(model, envir)
+  stored <- !is.null(attr(data, "terms")) || isTRUE(attr(data, "gratia.evaluated"))
+  for (i in seq_along(exprs)) {
+    label <- labels[i]
+    if (label %in% names(data) && (stored || is.symbol(exprs[[i]]) ||
+        !all(all.vars(exprs[[i]]) %in% names(data)))) next
+    ans <- tryCatch(eval(pred[[i]], data, env), error = identity)
+    if (inherits(ans, "error")) expression_failure(label, ans)
+    if (NROW(ans) != NROW(data)) expression_failure(label,
+      simpleError("The expression must return one value or matrix row per observation."))
+    out[[label]] <- ans
+  }
+  out <- as.data.frame(out[, labels, drop = FALSE])
+  attr(out, "terms") <- tt
+  out
+}
+
+# Native GAM prediction accepts a prepared model frame. This avoids evaluating
+# local calls again inside mgcv, after their environment has been discarded.
+predict_model <- function(object, newdata, ..., envir = NULL) {
+  if (missing(newdata)) return(stats::predict(object, ...))
+  object <- with_model_envir(object, envir)
+  dots <- list(...)
+  tt <- stats::delete.response(stats::terms(object))
+  exprs <- as.list(attr(tt, "variables"))[-1L]
+  if (!any(vapply(exprs, is.call, logical(1)))) {
+    return(stats::predict(object, newdata = newdata, ...))
+  }
+  mf <- evaluated_model_frame(object, newdata)
+  # mgcv and scam perform their own class/level checks on this frame.
+  if (inherits(object, c("gam", "scam"))) {
+    dots$newdata.guaranteed <- TRUE
+  }
+  do.call(stats::predict, c(list(object = object, newdata = mf), dots))
+}

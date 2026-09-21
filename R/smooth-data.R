@@ -49,7 +49,8 @@
 #' }
 `smooth_data` <- function(model, id, n = 100, n_2d = NULL, n_3d = NULL,
                           n_4d = NULL, offset = NULL, include_all = FALSE,
-                          var_order = NULL) {
+                          var_order = NULL, envir = NULL) {
+  model <- with_model_envir(model, envir)
   mf <- model.frame(model) # model.frame used to fit model
 
   ## remove response
@@ -58,13 +59,7 @@
     mf <- mf[, -respvar, drop = FALSE]
   }
 
-  # remove offset() var; model.frame returns both `offset(foo(var))` and
-  # `var`, so we can just remove the former, but we also want to set the
-  # offset variable `var` to something constant. FIXME
-  if (is.null(offset)) {
-    offset <- 1L
-  }
-  mf <- fix_offset(model, mf, offset_val = offset)
+  # Isolated smooth grids do not need model offsets.
   ff <- vapply(mf, is.factor, logical(1L)) # which, if any, are factors vars
   ## list of model terms (variable names); extract these from `var.summary`
   ## because model.frame() on a gamm() contains extraneous variables, related
@@ -73,6 +68,7 @@
 
   ## need a list of terms used in current smooth
   sm <- get_smooths_by_id(model, id)[[1L]]
+  mf <- prepare_smooth_data(model, sm, mf)
   orig_order <- unique(smooth_variable(sm))
   smooth_vars <- if (is.null(var_order)) {
     orig_order
@@ -184,6 +180,7 @@
     }
   }
 
+  attr(newdata, "gratia.evaluated") <- TRUE
   newdata # return
 }
 

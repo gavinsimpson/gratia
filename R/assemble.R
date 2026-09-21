@@ -156,6 +156,7 @@
   if (length(select) > 0L) {
     # evaluate all requested smooths
     sm_eval <- smooth_estimates(object,
+      envir = envir,
       select = S[select],
       n = n,
       n_3d = n_3d,

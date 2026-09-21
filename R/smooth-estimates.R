@@ -101,7 +101,9 @@
     unnest = TRUE,
     partial_match = FALSE,
     clip = FALSE,
+    envir = NULL,
     ...) {
+  object <- with_model_envir(object, envir)
   if (lifecycle::is_present(smooth)) {
     lifecycle::deprecate_warn("0.8.9.9", "smooth_estimates(smooth)",
       "smooth_estimates(select)")
@@ -133,8 +135,8 @@
         call. = FALSE
       )
     }
-    check_all_vars(object, data = data, smooths = smooths)
-    data <- delete_response(object, data = data)
+    # Evaluate only selected smooths; unrelated model terms are not needed.
+    for (sm in smooths) data <- prepare_smooth_data(object, sm, data)
   }
 
   # # fix up the n, n_3d, n_4d. If `n_3d` is `NULL` set `n_3d <- n`
@@ -365,7 +367,9 @@
     model,
     unconditional,
     overall_uncertainty = TRUE,
-    frequentist = FALSE) {
+    frequentist = FALSE, envir = NULL) {
+  model <- with_model_envir(model, envir)
+  data <- prepare_smooth_data(model, smooth, data)
   is_soap <- is_soap_film(smooth)
   X <- smooth_predict_matrix(smooth, data, model) # prediction matrix
   offset <- attr(X, "offset")
@@ -457,10 +461,11 @@
 #' @export
 `spline_values2` <- function(
     smooth, data, model, unconditional,
-    overall_uncertainty = TRUE, frequentist = FALSE) {
+    overall_uncertainty = TRUE, frequentist = FALSE, envir = NULL) {
   spline_values(
     smooth = smooth, data = data, model = model,
-    unconditional = unconditional, frequentist = frequentist
+    unconditional = unconditional, frequentist = frequentist,
+    overall_uncertainty = overall_uncertainty, envir = envir
   )
 }
 
@@ -502,7 +507,9 @@
 
 `spline_values_scam` <- function(
     smooth, data, model,
-    overall_uncertainty = TRUE, frequentist = FALSE) {
+    overall_uncertainty = TRUE, frequentist = FALSE, envir = NULL) {
+  model <- with_model_envir(model, envir)
+  data <- prepare_smooth_data(model, smooth, data)
   # reclass the smooth to add classes needed for gratia's S3 methods to work
   smooth <- reclass_scam_smooth(smooth)
 
@@ -563,7 +570,9 @@
                                       frequentist = FALSE,
                                       overall_uncertainty = TRUE,
                                       dist = NULL,
+  envir = NULL,
                                       ...) {
+  model <- with_model_envir(model, envir)
   by_var <- by_variable(smooth) # even if not a by as we want NA later
   if (by_var == "NA") {
     by_var <- NA_character_
@@ -621,8 +630,10 @@
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   clip = TRUE, # ?hmm thinking
+  envir = NULL,
   ...
 ) {
+  model <- with_model_envir(model, envir)
   by_var <- by_variable(smooth) # even if not a by as we want NA later
   if (by_var == "NA") {
     by_var <- NA_character_
@@ -723,7 +734,9 @@
                                       frequentist = FALSE,
                                       overall_uncertainty = TRUE,
                                       dist = NULL,
+  envir = NULL,
                                       ...) {
+  model <- with_model_envir(model, envir)
   by_var <- by_variable(smooth) # even if not a by as we want NA later
   if (by_var == "NA") {
     by_var <- NA_character_
@@ -793,6 +806,7 @@
     )
   } else {
     smooth <- get_smooths_by_id(model, id)[[1L]]
+    data <- prepare_smooth_data(model, smooth, data)
     vars <- smooth_variable(smooth)
     by_var <- by_variable(smooth)
     if (!identical(by_var, "NA")) {
@@ -818,8 +832,10 @@
   unconditional = FALSE,
   frequentist = FALSE,
   overall_uncertainty = TRUE,
+  envir = NULL,
   ...
 ) {
+  model <- with_model_envir(model, envir)
   by_var <- by_variable(smooth) # even if not a by as we want NA later
   if (by_var == "NA") {
     by_var <- NA_character_
@@ -869,8 +885,10 @@
   unconditional = FALSE,
   frequentist = FALSE,
   overall_uncertainty = TRUE,
+  envir = NULL,
   ...
 ) {
+  model <- with_model_envir(model, envir)
   by_var <- by_variable(smooth) # even if not a by as we want NA later
   if (by_var == "NA") {
     by_var <- NA_character_
@@ -912,8 +930,10 @@
   unconditional = FALSE,
   frequentist = FALSE,
   overall_uncertainty = TRUE,
+  envir = NULL,
   ...
 ) {
+  model <- with_model_envir(model, envir)
   by_var <- by_variable(smooth) # even if not a by as we want NA later
   if (by_var == "NA") {
     by_var <- NA_character_
@@ -955,7 +975,9 @@
   unconditional = FALSE,
   frequentist = FALSE,
   overall_uncertainty = TRUE,
+  envir = NULL,
   ...) {
+  model <- with_model_envir(model, envir)
   .NotYetImplemented()
 }
 
@@ -973,8 +995,10 @@
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   dist = NULL,
+  envir = NULL,
   ...
 ) {
+  model <- with_model_envir(model, envir)
   by_var <- by_variable(smooth) # even if not a by as we want NA later
   if (by_var == "NA") {
     by_var <- NA_character_
@@ -1040,7 +1064,9 @@
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   dist = NULL,
+  envir = NULL,
   ...) {
+  model <- with_model_envir(model, envir)
   by_var <- by_variable(smooth) # even if not a by as we want NA later
   if (by_var == "NA") {
     by_var <- NA_character_

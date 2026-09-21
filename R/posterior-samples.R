@@ -169,8 +169,10 @@
   weights = NULL,
   draws = NULL,
   mvn_method = c("mvnfast", "mgcv"),
+  envir = NULL,
   ...
 ) {
+  model <- with_model_envir(model, envir)
   # generate new response data from the model including the uncertainty in
   # the model.
 
@@ -448,8 +450,10 @@
   unconditional = FALSE,
   draws = NULL,
   mvn_method = c("mvnfast", "mgcv"),
+  envir = NULL,
   ...
 ) {
+  model <- with_model_envir(model, envir)
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     runif(1)
   }
@@ -520,7 +524,7 @@
     sims
   }
   ## don't need to pass freq, unconditional here as that is done for V
-  Xp <- predict(model, newdata = data, type = "lpmatrix", ...)
+  Xp <- predict_model(model, newdata = data, type = "lpmatrix", ...)
   ## predict step; for mvn() and multinom() models, we do want to loop over
   ##   the linear predictors
   n_eta <- length(lss_idx) # number of linear predictors to work with
@@ -726,8 +730,10 @@
   data = NULL,
   seed = NULL,
   weights = NULL,
+  envir = NULL,
   ...
 ) {
+  model <- with_model_envir(model, envir)
   sims <- simulate(
     model, nsim = n, seed = seed, data = data, weights = weights, ...
   )
@@ -887,10 +893,11 @@
     rng_per_smooth = FALSE,
     draws = NULL,
     partial_match = NULL,
-    mvn_method = c("mvnfast", "mgcv"),
+    mvn_method = c("mvnfast", "mgcv"), envir = NULL,
     ...,
     newdata = NULL,
     ncores = NULL) {
+  model <- with_model_envir(model, envir)
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "smooth_samples(term)",
       "smooth_samples(select)")
@@ -981,7 +988,9 @@
     }
     sm <- get_smooths_by_id(model, take[i])[[1L]]
     idx <- smooth_coef_indices(sm)
-    Xp <- PredictMat(sm, data = data)
+    # Resolve calls before matrix construction and output-column selection.
+    data <- prepare_smooth_data(model, sm, data)
+    Xp <- smooth_predict_matrix(sm, data, model)
     # get posterior draws - use old behaviour? TRUE is yes
     simu <- if (isTRUE(rng_per_smooth)) {
       betas <- post_draws(
@@ -1055,8 +1064,9 @@
     freq = FALSE, unconditional = FALSE, n_cores = 1L, n_vals = 200,
     burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25, rng_per_smooth = FALSE,
     draws = NULL, mvn_method = c("mvnfast", "mgcv"),
-    partial_match = NULL, ...,
+    partial_match = NULL, envir = NULL, ...,
     newdata = NULL, ncores = NULL) {
+  model <- with_model_envir(model, envir)
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "smooth_samples(term)",
       "smooth_samples(select)")
@@ -1139,7 +1149,9 @@
     }
     sm <- get_smooths_by_id(model, take[i])[[1L]]
     idx <- smooth_coef_indices(sm)
-    Xp <- PredictMat(sm, data = data)
+    # Resolve calls before matrix construction and output-column selection.
+    data <- prepare_smooth_data(model, sm, data)
+    Xp <- smooth_predict_matrix(sm, data, model)
     # get posterior draws - use old behaviour? TRUE is yes
     simu <- if (isTRUE(rng_per_smooth)) {
       betas <- post_draws(
