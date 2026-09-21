@@ -52,7 +52,7 @@
 <span><span class="co"># S3 method for class 'gam'</span></span>
 <span><span class="fu">appraise</span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
-<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"uniform"</span>, <span class="st">"simulate"</span>, <span class="st">"normal"</span>, <span class="st">"direct"</span><span class="op">)</span>,</span>
+<span>  method <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  use_worm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  n_uniform <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  n_simulate <span class="op">=</span> <span class="fl">50</span>,</span>
@@ -90,8 +90,11 @@ as well as classes <code>"glm"</code> and <code>"lm"</code> from calls to <a hre
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
-<dd><p>character; method used to generate theoretical quantiles.
-The default is <code>"uniform"</code>, which generates reference quantiles using
+<dd><p>character or <code>NULL</code>; method used to generate theoretical
+quantiles. The default, <code>NULL</code>, selects <code>"simulate"</code> for models fitted with
+<code><a href="https://rdrr.io/pkg/mgcv/man/Tweedie.html" class="external-link">mgcv::tw()</a></code> or <code><a href="https://rdrr.io/pkg/mgcv/man/Tweedie.html" class="external-link">mgcv::Tweedie()</a></code> and <code>"uniform"</code> otherwise. Explicitly
+supplying a method overrides this selection, subject to availability of
+the required family functions. <code>"uniform"</code> generates reference quantiles using
 random draws from a uniform distribution and the inverse cumulative
 distribution function (CDF) of the fitted values. The reference quantiles
 are averaged over <code>n_uniform</code> draws. <code>"simulate"</code> generates reference
@@ -99,10 +102,11 @@ quantiles by simulating new response data from the model at the observed
 values of the covariates, which are then residualised to generate reference
 quantiles, using <code>n_simulate</code> simulated data sets. <code>"normal"</code> generates
 reference quantiles using the standard normal distribution. <code>"uniform"</code> is
-more computationally efficient, but <code>"simulate"</code> allows reference bands to
+often more computationally efficient, but Tweedie quantiles are expensive
+to compute. <code>"simulate"</code> allows reference bands to
 be drawn on the QQ-plot. <code>"normal"</code> should be avoided but is used as a fall
 back if a random number generator (<code>"simulate"</code>) or the inverse of the CDF
-(<code>"uniform"``) are not available from the </code>family` used during model
+(<code>"uniform"</code>) are not available from the <code>family</code> used during model
 fitting.</p>
 <p>Note that <code>method = "direct"</code> is deprecated in favour of
 <code>method = "uniform"</code>.</p></dd>

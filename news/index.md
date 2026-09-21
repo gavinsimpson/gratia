@@ -4,6 +4,19 @@
 
 ### User visible changes
 
+- [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
+  [`qq_plot()`](https://gavinsimpson.github.io/gratia/reference/qq_plot.md),
+  and
+  [`worm_plot()`](https://gavinsimpson.github.io/gratia/reference/worm_plot.md)
+  now use `method = NULL` to select simulation for
+  [`tw()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html) and
+  [`Tweedie()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html) models,
+  avoiding expensive numerical quantiles
+  ([\#410](https://github.com/gavinsimpson/gratia/issues/410)). Other
+  families continue to prefer `"uniform"`, with the existing
+  availability fallbacks. Explicit methods override the automatic
+  choice.
+
 - Derivative functions now choose a finite-difference step automatically
   when `eps = NULL`, using the covariate’s fitted range, derivative
   order, and difference method. This reduces rounding error in second
