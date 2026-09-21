@@ -24,6 +24,13 @@
 #'   named in `condition`.
 #' @param ci_level numeric; a number on interval (0,1) giving the coverage for
 #'   credible intervals.
+#' @param complete logical; if `TRUE` (the default), retain all combinations of
+#'   conditions. If `FALSE`, retain only combinations of factor levels among
+#'   the variables named in `condition` that occur in the fitted model's data.
+#'   Numeric conditions are not filtered, and variables absent from `condition`
+#'   remain at their typical values. Supplied `data` does not change which
+#'   combinations count as observed. An error is raised if no combinations
+#'   remain.
 #' @param ... arguments passed to [fitted_values()].
 #'
 #' @author Gavin L. Simpson
@@ -111,7 +118,7 @@
 
 #' @export
 #' @rdname conditional_values
-#' @importFrom dplyr setdiff
+#' @importFrom dplyr setdiff semi_join
 `conditional_values.gam` <- function(
   model,
   condition = NULL,
@@ -119,9 +126,13 @@
   scale = c("response", "link", "linear_predictor"),
   n_vals = 100,
   ci_level = 0.95,
+  complete = TRUE,
   ...
 ) {
   scale <- match.arg(scale)
+  if (!is.logical(complete) || length(complete) != 1L || is.na(complete)) {
+    stop("'complete' must be a single non-missing logical value")
+  }
   # replace this with `process_condition` to capture all possible
   if (is.null(condition)) {
     stop("'condition' must be supplied")
@@ -160,6 +171,20 @@
 
   # return the data for testing
   pred_data <- expand_grid(!!!{cond_list})
+
+  if (!complete) {
+    factor_vars <- named_cond[
+      vapply(cond_list[named_cond], is.factor, logical(1L))
+    ]
+    if (length(factor_vars) > 0L) {
+      observed <- data_combos(model, vars = all_of(factor_vars),
+        complete = FALSE, data = data)
+      pred_data <- semi_join(pred_data, observed, by = factor_vars)
+      if (nrow(pred_data) == 0L) {
+        stop("No observed combinations of the supplied factor conditions remain")
+      }
+    }
+  }
 
   pv <- fitted_values(
     model, data = pred_data, scale = scale, ci_level = ci_level, ...

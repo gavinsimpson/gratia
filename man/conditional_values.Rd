@@ -20,6 +20,7 @@ conditional_values(
   scale = c("response", "link", "linear_predictor"),
   n_vals = 100,
   ci_level = 0.95,
+  complete = TRUE,
   ...
 )
 }
@@ -47,6 +48,14 @@ named in \code{condition}.}
 
 \item{ci_level}{numeric; a number on interval (0,1) giving the coverage for
 credible intervals.}
+
+\item{complete}{logical; if \code{TRUE} (the default), retain all combinations of
+conditions. If \code{FALSE}, retain only combinations of factor levels among
+the variables named in \code{condition} that occur in the fitted model's data.
+Numeric conditions are not filtered, and variables absent from \code{condition}
+remain at their typical values. Supplied \code{data} does not change which
+combinations count as observed. An error is raised if no combinations
+remain.}
 }
 \value{
 A data frame (tibble) of class \code{"conditional_values"}.
