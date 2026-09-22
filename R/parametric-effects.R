@@ -72,7 +72,14 @@
   }
 
   # check order of terms; if > 1 interaction and not handled
-  ord <- attr(tt, "order")[match(valid_terms, attr(tt, "term.labels"))]
+  ord <- if (is.list(tt)) {
+    unlist(lapply(tt, attr, "order"), use.names = FALSE)
+  } else {
+    attr(tt, "order")
+  }
+  # Align orders with mgcv's names, including linear predictor suffixes.
+  names(ord) <- mgcv_names
+  ord <- ord[valid_terms]
   if (any(int <- ord > 1)) {
     cli_alert_info("Interaction terms are not currently supported.")
     valid_terms <- valid_terms[!(ord > 1)]

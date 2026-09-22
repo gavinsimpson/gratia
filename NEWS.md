@@ -251,6 +251,9 @@
 
 ## Bug fixes
 
+* `parametric_effects()` now excludes interactions in models with multiple linear
+  predictors, matching the existing single-predictor behaviour (#369).
+
 * `conditional_values()` would fail if supplied a numeric vector of data to 
   condition on via the `condition` argument. #366
 
