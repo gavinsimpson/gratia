@@ -1386,53 +1386,11 @@
   ## handle scale
   scale <- match.arg(scale)
 
-  ## handle order
-  if (!order %in% c(1L, 2L)) {
-    stop(
-      "Only 1st or 2nd order partial derivatives are supported: ",
-      "`order %in% c(1,2)`"
-    )
-  }
-
-  ## handle data
-  need_data <- is.null(data)
-
-  ## handle focal
-  if (is.null(focal)) {
-    stop("Argument 'focal' must be supplied.")
-  }
-
-  ## sort out data
-  if (need_data) {
-    x <- object$var.summary[[focal]]
-    x <- seq(x[1L], x[3L], length = n)
-    tv <- typical_values(object,
-      vars = !matches(focal), data = data
-    )
-    # if model only contains a single var, tv is empty
-    data <- if (ncol(tv) > 0L) {
-      expand_grid(.x = x, tv)
-    } else {
-      expand_grid(.x = x)
-    }
-  } else {
-    data <- data |>
-      select(all_of(model_vars(object))) |>
-      rename(.x = all_of({{ focal }}))
-  }
-  data <- data |>
-    add_column(.row = seq_len(nrow(data)), .before = 1L)
-
-  # Choose the step on the raw focal scale before perturbing prediction rows.
-  step_data <- data
-  names(step_data)[names(step_data) == ".x"] <- focal
-  eps <- derivative_step(object, focal, step_data, eps, order, type)
-
-  # now shift values depending on method
-  fd_data <- prepare_fdiff_data(
-    data = data, eps = eps, type = type,
-    order = order, focal = focal
-  )
+  grid <- prepare_response_derivative_data(object, focal, data, n, eps,
+    order, type)
+  data <- grid$data
+  fd_data <- grid$fd_data
+  eps <- grid$eps
 
   ## compute posterior draws of E(y) (on response scale)
   fs <- fitted_samples(
@@ -1452,7 +1410,7 @@
     left_join(data, by = join_by("..orig" == ".row")) |>
     rename("{focal}" := ".x", ".derivative" = "..fd", ".row" = "..orig") |>
     select(!matches(c("..xf", "..xb", "..x"))) |>
-    add_column(.focal = rep(focal, nrow(data) * n_sim), .before = 1L) |>
+    add_column(.focal = focal, .before = 1L) |>
     relocate(".row", .before = 1L)
 
   class(yd) <- append(class(yd), "derivative_samples", after = 0L)
