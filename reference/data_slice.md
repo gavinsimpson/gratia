@@ -11,10 +11,17 @@ data_slice(object, ...)
 data_slice(object, ...)
 
 # S3 method for class 'data.frame'
-data_slice(object, ..., .observed_only = FALSE)
+data_slice(object, ..., .observed_only = FALSE, .by = NULL)
 
 # S3 method for class 'gam'
-data_slice(object, ..., data = NULL, envir = NULL, .observed_only = FALSE)
+data_slice(
+  object,
+  ...,
+  data = NULL,
+  envir = NULL,
+  .observed_only = FALSE,
+  .by = NULL
+)
 
 # S3 method for class 'gamm'
 data_slice(object, ...)
@@ -48,6 +55,17 @@ data_slice(object, ...)
   `.observed_only` is a character vector, on those variables named in
   the vector are used to in the comparison with the combinations in
   `object`.
+
+- .by:
+
+  \<[`tidy-select`](https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html)\>
+  Optional grouping variables. With `.by = NULL` (the default),
+  expressions are evaluated over the full data set. Otherwise,
+  expressions are evaluated separately within each observed group and
+  the resulting grids are combined. Grouping variables are included
+  automatically; expressions for these variables in `...` select groups
+  and are evaluated once over the full data set. Unobserved combinations
+  are omitted, and selecting no observed groups is an error.
 
 - data:
 
@@ -103,6 +121,19 @@ for example.
 
 For an extended discussion of `data_slice()` and further examples, see
 `vignette("data-slices", package = "gratia")`.
+
+With `.by`, unspecified covariates retain their overall representative
+values. Specify an expression such as `z = mean(z)` to use a
+group-specific value instead. Factor levels and ordered status are
+preserved, and the result is an ungrouped tibble. `.observed_only`
+filters exact matches within each group; interpolated values need not
+match observed values.
+
+Grouping limits the default range of
+[`evenly()`](https://gavinsimpson.github.io/gratia/reference/evenly.md)
+to each group's marginal range. It does not ensure joint support for
+multiple continuous covariates. Explicit values or `lower` and `upper`
+bounds can still request extrapolation.
 
 ## See also
 

@@ -60,6 +60,12 @@
 
 ### New features
 
+- [`data_slice()`](https://gavinsimpson.github.io/gratia/reference/data_slice.md)
+  gains a `.by` argument to evaluate slice expressions within observed
+  groups. For example, `x = evenly(x)` now supports a separate range for
+  each level of a factor. Convenient for models with factor `by` smooths
+  ([\#196](https://github.com/gavinsimpson/gratia/issues/196)).
+
 - [`conditional_values()`](https://gavinsimpson.github.io/gratia/reference/conditional_values.md)
   now accepts `complete = FALSE` to retain only observed combinations of
   factor conditions, while preserving numeric prediction grids

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-28</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-29</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,10 +53,17 @@
 <span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'data.frame'</span></span>
-<span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span>, .observed_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span>, .observed_only <span class="op">=</span> <span class="cn">FALSE</span>, .by <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gam'</span></span>
-<span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span>, data <span class="op">=</span> <span class="cn">NULL</span>, envir <span class="op">=</span> <span class="cn">NULL</span>, .observed_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">data_slice</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .observed_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  .by <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm'</span></span>
 <span><span class="fu">data_slice</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -89,6 +96,16 @@ to those combinations of the variables specified that are observed in
 those combinations. If <code>FALSE</code>, no filtering is done. If <code>.observed_only</code>
 is a character vector, on those variables named in the vector are used to
 in the comparison with the combinations in <code>object</code>.</p></dd>
+
+
+<dt id="arg--by">.by<a class="anchor" aria-label="anchor" href="#arg--by"></a></dt>
+<dd><p>&lt;<code><a href="https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html" class="external-link">tidy-select</a></code>&gt; Optional grouping
+variables. With <code>.by = NULL</code> (the default), expressions are evaluated over
+the full data set. Otherwise, expressions are evaluated separately within
+each observed group and the resulting grids are combined. Grouping variables
+are included automatically; expressions for these variables in <code>...</code> select
+groups and are evaluated once over the full data set. Unobserved combinations
+are omitted, and selecting no observed groups is an error.</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
@@ -126,6 +143,14 @@ that factor covariates have the correct levels, as needed by
 <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">mgcv::predict.gam()</a></code> for example.</p>
 <p>For an extended discussion of <code>data_slice()</code> and further examples, see
 <code>vignette("data-slices", package = "gratia")</code>.</p>
+<p>With <code>.by</code>, unspecified covariates retain their overall representative
+values. Specify an expression such as <code>z = mean(z)</code> to use a group-specific
+value instead. Factor levels and ordered status are preserved, and the result
+is an ungrouped tibble. <code>.observed_only</code> filters exact matches within each
+group; interpolated values need not match observed values.</p>
+<p>Grouping limits the default range of <code><a href="evenly.html">evenly()</a></code> to each group's marginal
+range. It does not ensure joint support for multiple continuous covariates.
+Explicit values or <code>lower</code> and <code>upper</code> bounds can still request extrapolation.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

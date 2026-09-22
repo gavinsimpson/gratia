@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-28</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-29</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,7 +56,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li><p><code><a href="../reference/conditional_values.html">conditional_values()</a></code> now accepts <code>complete = FALSE</code> to retain only observed combinations of factor conditions, while preserving numeric prediction grids (<a href="https://github.com/gavinsimpson/gratia/issues/337" class="external-link">#337</a>).</p></li>
+<ul><li><p><code><a href="../reference/data_slice.html">data_slice()</a></code> gains a <code>.by</code> argument to evaluate slice expressions within observed groups. For example, <code>x = evenly(x)</code> now supports a separate range for each level of a factor. Convenient for models with factor <code>by</code> smooths (<a href="https://github.com/gavinsimpson/gratia/issues/196" class="external-link">#196</a>).</p></li>
+<li><p><code><a href="../reference/conditional_values.html">conditional_values()</a></code> now accepts <code>complete = FALSE</code> to retain only observed combinations of factor conditions, while preserving numeric prediction grids (<a href="https://github.com/gavinsimpson/gratia/issues/337" class="external-link">#337</a>).</p></li>
 <li><p><code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> now offers simultaneous intervals for differences of smooths at the supplied covariate combinations, separately for each pair of factor levels, via <code>interval = "simultaneous"</code> (<a href="https://github.com/gavinsimpson/gratia/issues/380" class="external-link">#380</a>). Pointwise intervals remain the default.</p></li>
 <li><p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> now offers simultaneous intervals for predictions at the supplied covariate combinations via <code>interval = "simultaneous"</code> (<a href="https://github.com/gavinsimpson/gratia/issues/4" class="external-link">#4</a>). Pointwise intervals remain the default. Simultaneous intervals use a shared internal helper also used by <code><a href="../reference/derivatives.html">derivatives()</a></code> and <code><a href="../reference/partial_derivatives.html">partial_derivatives()</a></code>, with controls for simulation size, parallel sampling, and reproducible seeds. The legacy <code><a href="../reference/fderiv.html">fderiv()</a></code> implementation is unchanged.</p></li>
 <li><p><code><a href="../reference/draw.html">draw()</a></code> for penalty matrices now accepts <code>geom = "tile"</code> to draw individual rectangles, while retaining <code>geom = "raster"</code> as the default (<a href="https://github.com/gavinsimpson/gratia/issues/392" class="external-link">#392</a>).</p></li>

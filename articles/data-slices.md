@@ -326,7 +326,8 @@ is `...`
 ``` r
 
 args(gratia:::data_slice.gam)
-#> function (object, ..., data = NULL, envir = NULL, .observed_only = FALSE) 
+#> function (object, ..., data = NULL, envir = NULL, .observed_only = FALSE, 
+#>     .by = NULL) 
 #> NULL
 ```
 
@@ -338,6 +339,95 @@ using only the helper functions provide by {gratia}; any R function
 could be used as long as it makes sense in the context of the model
 frame, and it returns something that can be combined using
 [`tidyr::expand_grid()`](https://tidyr.tidyverse.org/reference/expand_grid.html).
+
+## Slices within groups
+
+When a covariate has a different observed range in each group defined by
+a factor, a sequence over its overall range across all levels can
+extrapolate for some groups. Use `.by` to evaluate slice expressions
+separately within each observed group:
+
+``` r
+
+group_data <- data.frame(
+  x = c(0, 4, 10, 5, 12, 20),
+  fac = factor(rep(c("A", "B"), each = 3)),
+  z = c(1, 2, 3, 7, 8, 9)
+)
+data_slice(group_data, x = evenly(x, n = 5), .by = fac)
+#> # A tibble: 10 × 3
+#>        x fac       z
+#>    <dbl> <fct> <dbl>
+#>  1  0    A         3
+#>  2  2.5  A         3
+#>  3  5    A         3
+#>  4  7.5  A         3
+#>  5 10    A         3
+#>  6  5    B         3
+#>  7  8.75 B         3
+#>  8 12.5  B         3
+#>  9 16.2  B         3
+#> 10 20    B         3
+```
+
+This generates five values from 0 to 10 for A, and five from 5 to 20 for
+B. The same syntax works for a fitted GAM containing `s(x, by = fac)`.
+Grouping variables are included automatically, and only observed groups
+are used. Select multiple grouping variables with
+`.by = c(site, treatment)` to work within their observed combinations.
+
+Expressions for grouping variables select which groups to use. They are
+evaluated once, before the remaining expressions are evaluated within
+groups:
+
+``` r
+
+data_slice(group_data,
+  x = evenly(x, n = 5), fac = level(fac, "B"), .by = fac
+)
+#> # A tibble: 5 × 3
+#>       x fac       z
+#>   <dbl> <fct> <dbl>
+#> 1  5    B         3
+#> 2  8.75 B         3
+#> 3 12.5  B         3
+#> 4 16.2  B         3
+#> 5 20    B         3
+```
+
+Unspecified covariates, such as `z` above, keep their overall
+representative values. To use group-specific values, supply an
+expression explicitly:
+
+``` r
+
+data_slice(group_data, x = evenly(x, n = 5), z = mean(z), .by = fac)
+#> # A tibble: 10 × 3
+#>        x     z fac  
+#>    <dbl> <dbl> <fct>
+#>  1  0        2 A    
+#>  2  2.5      2 A    
+#>  3  5        2 A    
+#>  4  7.5      2 A    
+#>  5 10        2 A    
+#>  6  5        8 B    
+#>  7  8.75     8 B    
+#>  8 12.5      8 B    
+#>  9 16.2      8 B    
+#> 10 20        8 B
+```
+
+Factor levels and ordered status are preserved, and the result is an
+ungrouped tibble. Without `.by`, the existing full-grid behaviour is
+unchanged.
+
+Grouping constrains the default sequences to each group’s marginal
+ranges; it does not ensure joint support for multiple continuous
+covariates. Explicit values and
+[`evenly()`](https://gavinsimpson.github.io/gratia/reference/evenly.md)
+bounds can still request extrapolation. The separate `.observed_only`
+option filters exact matches within groups, so it can remove
+interpolated values that do not occur in the observed data.
 
 ## Slices through a 2D smooth
 
