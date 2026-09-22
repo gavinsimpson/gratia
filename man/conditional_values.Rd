@@ -36,8 +36,10 @@ fourth element is present}, if present, the fourth element is mapped to
 the rows and the third element is mapped to the columns of
 \code{\link[ggplot2:facet_grid]{ggplot2::facet_grid()}}.}
 
-\item{data}{data frame of values at which to predict. If supplied overrides
-values supplied through \code{condition}.}
+\item{data}{optional data frame used to generate condition values and
+determine covariate classes. Explicit values in \code{condition} take precedence.
+Other covariates use the fitted model's typical values. The rows of \code{data}
+are not used directly as a prediction grid.}
 
 \item{scale}{character; which scale should predictions be returned on?}
 
