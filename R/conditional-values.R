@@ -161,17 +161,17 @@ conditional_prediction_grid <- function(model, condition, data = NULL,
                                         n_vals = 100, complete = TRUE,
                                         by = character()) {
   if (!is.logical(complete) || length(complete) != 1L || is.na(complete)) {
-    stop("'complete' must be a single non-missing logical value")
+    cli::cli_abort("{.arg complete} must be a single non-missing logical value")
   }
   if (is.null(condition) || !length(condition)) {
-    stop("'condition' must be supplied")
+    cli::cli_abort("{.arg condition} must be supplied")
   }
   if (is.null(data)) data <- data_slice_data(model) |> as_tibble()
   m_vars <- model_vars(model)
   comparison <- list()
   if (length(by)) {
     if (!(is.character(condition) || is.list(condition))) {
-      stop("'condition' must be a list or a character vector")
+      cli::cli_abort("{.arg condition} must be a list or a character vector")
     }
     condition <- as.list(condition)
     nms <- names(condition)
@@ -183,17 +183,16 @@ conditional_prediction_grid <- function(model, condition, data = NULL,
       }
     }, character(1L))
     if (anyDuplicated(ids[nzchar(ids)])) {
-      stop("Variables in 'condition' must not be repeated.", call. = FALSE)
+      cli::cli_abort("Variables in {.arg condition} must not be repeated.")
     }
     for (nm in by) {
       lev <- levels(model$var.summary[[nm]])
       if (!nm %in% names(data)) {
-        stop("Comparison factor '", nm, "' is missing from 'data'.", call. = FALSE)
+        cli::cli_abort("Comparison factor {.var {nm}} is missing from {.arg data}.")
       }
       values <- as.character(data[[nm]])
       if (anyNA(values) || any(!values %in% lev)) {
-        stop("Comparison factor '", nm, "' has missing or unknown levels.",
-          call. = FALSE)
+        cli::cli_abort("Comparison factor {.var {nm}} has missing or unknown levels.")
       }
       available <- if (is.factor(data[[nm]])) levels(data[[nm]]) else unique(values)
       data[[nm]] <- factor(values, levels = lev[lev %in% available],
@@ -206,14 +205,14 @@ conditional_prediction_grid <- function(model, condition, data = NULL,
           if (nzchar(nms[i])) nm else NULL, data, m_vars, n_vals)
       }
       if (anyNA(selected) || any(!as.character(selected) %in% lev)) {
-        stop("Invalid comparison levels for '", nm, "'.", call. = FALSE)
+        cli::cli_abort("Invalid comparison levels for {.var {nm}}.")
       }
       comparison[[nm]] <- factor(lev[lev %in% as.character(selected)],
         levels = lev, ordered = is.ordered(data[[nm]]))
     }
     condition <- condition[!ids %in% by]
     if (!length(condition)) {
-      stop("'condition' must include a covariate other than 'by'.", call. = FALSE)
+      cli::cli_abort("{.arg condition} must include a covariate other than {.arg by}.")
     }
   }
   cond_list <- process_condition(condition, data = data, variables = m_vars,
@@ -234,7 +233,7 @@ conditional_prediction_grid <- function(model, condition, data = NULL,
         complete = FALSE, data = data)
       pred_data <- semi_join(pred_data, observed, by = factor_vars)
       if (!nrow(pred_data)) {
-        stop("No observed combinations of the supplied factor conditions remain")
+        cli::cli_abort("No observed combinations of the supplied factor conditions remain")
       }
     }
   }
@@ -284,8 +283,7 @@ conditional_prediction_grid <- function(model, condition, data = NULL,
 }
 
 #' @importFrom scales ordinal_format
-#' @importFrom cli format_error qty
-#' @importFrom rlang abort
+#' @importFrom cli qty
 `process_condition` <- function(condition, data, variables, n_vals = 100) {
   # condition: the thing passed as condition to conditional_values
   # data: a data frame to use for evaluating the fitted values
@@ -335,7 +333,7 @@ conditional_prediction_grid <- function(model, condition, data = NULL,
       "i" = "Did you forget to name {qty(msg_qty)} {?this/these} element{?s}?"
     )
     if (!is.null(msg_allowed) | !is.null(msg_wrong)) {
-      rlang::abort(format_error(msg))
+      cli::cli_abort(msg)
     }
   }
   if (is.null(nms)) {
@@ -343,12 +341,12 @@ conditional_prediction_grid <- function(model, condition, data = NULL,
   }
   c_vec <- is.character(condition)
   if (!(c_list || c_vec)) {
-    stop("'condition' must be a list or a character vector")
+    cli::cli_abort("{.arg condition} must be a list or a character vector")
   }
   # if no names on the list, then unlist(condition) must be character vector
   if (c_list && is.null(nms)) {
     if (!(cl <- unlist(condition) |> is.character())) {
-      stop("If 'condition' is an unnamed list, elements must be length 1
+      cli::cli_abort("If {.arg condition} is an unnamed list, elements must be length 1
 characters")
     }
   }
@@ -363,7 +361,7 @@ characters")
   # model at, or we have functions (or names of functions) that we can apply
   # but we should only have at most 4
   if ((lc <- length(condition)) > 4L) {
-    stop("'condition' has '", lc, "' elements; only 4 allowed")
+    cli::cli_abort("{.arg condition} has {lc} elements; only 4 allowed.")
   }
 
   # iterate over the elements of condition, creating data vectors depending on
@@ -443,7 +441,7 @@ characters")
     name <- x
     x_data <- data[[x]]
     if (is.null(x_data)) {
-      stop("'", x, "' is not a variable in '", deparse(substitute(data)), "'")
+      cli::cli_abort("{.var {x}} is not a variable in {.arg data}.")
     }
     # if this is a faceting var, we want a small set of representative values
     # to use as facet values
@@ -461,7 +459,7 @@ characters")
   if (!good) {
     # check name is in data
     if (!(name %in% names(data))) {
-      stop("'", name, "' is not in '", deparse(substitute(data)), "'")
+      cli::cli_abort("{.var {name}} is not in {.arg data}.")
     }
     # need to check what data type we are dealing with
     x_data <- data[[name]]
@@ -469,7 +467,7 @@ characters")
     # Handle different data types
     if (is.numeric(x_data)) { # handle number x
       if (isFALSE(identical(x_cls, "numeric"))) {
-        stop("'", name, "' is numeric but supplied condition is not.")
+        cli::cli_abort("{.var {name}} is numeric but the supplied condition is not.")
       }
       good <- TRUE
       out <- x

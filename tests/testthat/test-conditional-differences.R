@@ -1,31 +1,3 @@
-conditional_difference_fixture <- function(family = gaussian()) {
-  withr::local_seed(45)
-  d <- expand.grid(x = seq(0.1, 0.9, length.out = 30),
-    a = factor(c("B", "A", "C"), levels = c("B", "A", "C")),
-    b = factor(c("low", "high")))
-  d$exposure <- runif(nrow(d), 0.5, 2)
-  eta <- 0.4 + 0.3 * as.integer(d$a) + sin(d$x * 3) +
-    0.2 * (d$b == "high") * as.integer(d$a)
-  d$y <- if (family$family == "poisson") {
-    rpois(nrow(d), exp(eta) * d$exposure)
-  } else eta + rnorm(nrow(d), sd = 0.3)
-  m <- gam(y ~ a * b + s(x, by = a, k = 5) + offset(log(exposure)),
-    data = d, family = family, method = "REML")
-  list(model = with_model_envir(m, environment()), data = d)
-}
-
-# Reconstruct the two explicit prediction scenarios from returned covariates.
-conditional_difference_endpoints <- function(cd, model) {
-  covars <- setdiff(model_vars(model), attr(cd, "by"))
-  a <- b <- as.data.frame(cd[covars])
-  for (nm in attr(cd, "by")) {
-    prefix <- if (length(attr(cd, "by")) == 1) ".level" else nm
-    a[[nm]] <- cd[[paste0(prefix, "_1")]]
-    b[[nm]] <- cd[[paste0(prefix, "_2")]]
-  }
-  list(a = a, b = b)
-}
-
 test_that("link contrasts retain joint covariance, ordering and offsets", {
   f <- conditional_difference_fixture()
   m <- f$model
@@ -189,10 +161,10 @@ test_that("invalid inputs fail explicitly", {
   f <- conditional_difference_fixture()
   m <- f$model
   for (by in list(NULL, "x", "unknown", c("a", "a"), NA_character_)) {
-    expect_error(conditional_differences(m, by, "x"), "'by' must")
+    expect_error(conditional_differences(m, by, "x"), "must name one or more distinct factors")
   }
-  expect_error(conditional_differences(m, "a"), "'condition' must")
-  expect_error(conditional_differences(m, "a", "a"), "other than 'by'")
+  expect_error(conditional_differences(m, "a"), "must be supplied")
+  expect_error(conditional_differences(m, "a", "a"), "must include a covariate other than")
   expect_error(conditional_differences(m, "a", list("x", a = "A")), "At least two")
   expect_error(conditional_differences(m, "a", c("x", "x")), "must not be repeated")
   expect_error(conditional_differences(m, "a", "x", ci_level = 1), "ci_level")
