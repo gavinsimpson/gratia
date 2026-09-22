@@ -1,8 +1,13 @@
 # Experimental Tweedie mixture quantiles and CDF
 
-This branch implements an **internal, unexported experiment**, not a replacement
-of the package's family factories. `appraise()`, `qq_plot()`, and `worm_plot()`
-still default to simulation for Tweedie models. Nothing has been committed.
+The implementation is now connected to `make_qf_tw()` and `make_cdf_tw()` for
+`1 < p < 2`, with the strict settings below. The Gamma limit uses native R
+functions. `tweedie` is optional and required only if an explicitly requested
+fallback is needed. `appraise()`, `qq_plot()`, and `worm_plot()` still default to
+simulation for Tweedie models; explicit uniform diagnostics use the fast qf.
+
+The measurements below document the original experimental evaluation before
+integration. They are retained as historical evidence, not fresh timings.
 
 ## Recommendation from the measurements
 
@@ -88,7 +93,7 @@ ptweedie_mixture(1, 1, 1.5, 1, max_terms = 5, fallback = TRUE)
 
 | Profile | Absolute CDF truncation budget | Relative tail/root probability tolerance | Log-quantile root tolerance |
 |---|---:|---:|---:|
-| strict (current experimental defaults) | 1e-12 | 1e-8 | 1e-10 |
+| strict (current defaults) | 1e-12 | 1e-8 | 1e-10 |
 | diagnostic | 1e-7 | 1e-5 | 1e-6 |
 | loose | 1e-5 | 1e-3 | 1e-4 |
 
@@ -192,8 +197,8 @@ normal-score accuracy at diagnostic tolerances, and residual integration. New te
 path, verify literal capped sums and their roots, and check opt-in dispatch for
 both functions.
 
-Before promoting this into `make_qf_tw()` / `make_cdf_tw()`, review the accuracy
-budget, fallback policy, and performance on representative user models. The new opt-in fallback policy prevents silently routing pathological tails
+Following integration, continue reviewing the accuracy budget, fallback policy,
+and performance on representative user models. The new opt-in fallback policy prevents silently routing pathological tails
 to an unchecked expensive backend. Broader
 independent stress accuracy checks and profiling repeated-parameter caching are
 worth considering; moving to compiled code is not necessary to establish the

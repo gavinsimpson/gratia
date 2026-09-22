@@ -2,6 +2,9 @@
 # Writes reproducible measurements; does not change package defaults or commit.
 suppressPackageStartupMessages(library(mgcv))
 pkgload::load_all(quiet = TRUE)
+if (!requireNamespace("tweedie", quietly = TRUE)) {
+  stop('Reference benchmarks require tweedie. Run install.packages("tweedie").')
+}
 outdir <- 'notes/tweedie-mixture/results'
 dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
 profiles <- list(
@@ -125,8 +128,12 @@ dat$y<-mgcv::rTweedie(exp(1+sin(2*pi*dat$x)),p=1.5,phi=1)
 m<-mgcv::gam(y~s(x,k=8),family=mgcv::tw(),data=dat,method='REML')
 run_qq<-function(profile=NULL,seed=42) {
   model<-m
-  if(!is.null(profile)) {
-    power<-model$family$getTheta(TRUE)
+  power<-model$family$getTheta(TRUE)
+  if(is.null(profile)) {
+    model$family$qf<-function(p,mu,wt,scale,log_p=FALSE) {
+      tweedie::qtweedie(if(log_p) exp(p) else p,mu=mu,xi=power,phi=scale)
+    }
+  } else {
     model$family$qf<-function(p,mu,wt,scale,log_p=FALSE) {
       qmix(p,mu,power,scale,profile,log_p=log_p)
     }

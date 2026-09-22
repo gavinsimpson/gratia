@@ -22,6 +22,7 @@ test_that("mixture quantiles validate parameters and handle boundaries", {
 })
 
 test_that("mixture quantiles agree with independent CDF inversion", {
+  skip_if_not_installed("tweedie")
   # Ordinary cases on both sides of the median and with varying means/scales.
   for (power in c(1.1, 1.5, 1.9)) {
     mu <- c(.1, 1, 10)
@@ -118,7 +119,7 @@ test_that("mixture CDF provides stable tails and correct support", {
   expect_equal(f[c(1, 2, 3, 6)], c(0, 0, exp(-2), 1))
   expect_equal(ptweedie_mixture(c(-1, 0, 1), 0, 1.5, 1), c(0, 1, 1))
   expect_equal(ptweedie_mixture(numeric(), numeric(), 1.5, numeric()), numeric())
-  for (power in c(1.1, 1.5, 1.9)) {
+  if (requireNamespace("tweedie", quietly = TRUE)) for (power in c(1.1, 1.5, 1.9)) {
     y <- c(.01, .5, 2, 10)
     expect_equal(ptweedie_mixture(y, 1, power, 1),
       tweedie::ptweedie(y, mu = 1, xi = power, phi = 1), tolerance = 1e-7)
@@ -189,6 +190,7 @@ test_that("positive subnormal quantiles retain their logarithm", {
 })
 
 test_that("fallback limitations are explicit for unrepresentable probabilities", {
+  skip_if_not_installed("tweedie")
   expect_warning(result <- tweedie_quantile_fallback(-1e-30, 1, 1.5, 1),
     "cannot represent")
   expect_true(is.na(result))
@@ -199,6 +201,7 @@ test_that("fallback limitations are explicit for unrepresentable probabilities",
 })
 
 test_that("small-dispersion CDF agrees with the independent series evaluator", {
+  skip_if_not_installed("tweedie")
   # In tweedie 3.1.0 the inversion evaluator differs by about 6e-5 here;
   # both the package's series evaluator and an over-wide direct sum agree.
   y <- 1.7295884004568
@@ -289,7 +292,7 @@ test_that("accuracy failures retain estimates and invalid parameters cannot opt 
   expect_equal(q$quantile, 2)
   expect_equal(q$method, "approximate")
   for (bad in list(NA, 1, "TRUE", c(TRUE, FALSE), NULL)) {
-    expect_error(qtweedie_mixture(.5, 1, 1.5, 1, fallback = bad), "'fallback'")
-    expect_error(ptweedie_mixture(1, 1, 1.5, 1, fallback = bad), "'fallback'")
+    expect_error(qtweedie_mixture(.5, 1, 1.5, 1, fallback = bad), "fallback")
+    expect_error(ptweedie_mixture(1, 1, 1.5, 1, fallback = bad), "fallback")
   }
 })
