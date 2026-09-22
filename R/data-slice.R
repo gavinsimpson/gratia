@@ -39,6 +39,24 @@
 #'   is a character vector, on those variables named in the vector are used to
 #'   in the comparison with the combinations in `object`.
 #'
+#' @param .by <[`tidy-select`][dplyr::dplyr_tidy_select]> Optional grouping
+#'   variables. With `.by = NULL` (the default), expressions are evaluated over
+#'   the full data set. Otherwise, expressions are evaluated separately within
+#'   each observed group and the resulting grids are combined. Grouping variables
+#'   are included automatically; expressions for these variables in `...` select
+#'   groups and are evaluated once over the full data set. Unobserved combinations
+#'   are omitted, and selecting no observed groups is an error.
+#'
+#' @details With `.by`, unspecified covariates retain their overall representative
+#' values. Specify an expression such as `z = mean(z)` to use a group-specific
+#' value instead. Factor levels and ordered status are preserved, and the result
+#' is an ungrouped tibble. `.observed_only` filters exact matches within each
+#' group; interpolated values need not match observed values.
+#'
+#' Grouping limits the default range of `evenly()` to each group's marginal
+#' range. It does not ensure joint support for multiple continuous covariates.
+#' Explicit values or `lower` and `upper` bounds can still request extrapolation.
+#'
 #' @seealso The convenience functions [evenly()], [ref_level()], and [level()].
 #' [typical_values()] for extracting the representative values used for
 #' covariates in the model but not named in the slice.
@@ -65,54 +83,17 @@
 `data_slice.data.frame` <- function(
   object,
   ...,
-  .observed_only = FALSE
+  .observed_only = FALSE,
+  .by = NULL
 ) {
-  # deal with ...
   exprs <- rlang::enquos(...)
-  slice_vars <- user_vars <- purrr::map(exprs, rlang::eval_tidy, data = object)
-
-  # check now if there are elements of slice_vars that aren't in the object
+  by <- data_slice_by(rlang::enquo(.by), object)
   vars <- names(object)
-  nms <- names(slice_vars)
-  if (any(i <- !nms %in% vars)) {
-    message(
-      "Some specified variable(s) not used in `object``:\n",
-      paste(" * ", nms[i], collapse = "\n", sep = ""),
-      "\n"
-    )
-  }
-
-  # typical values, only needed ones that aren't
-  need_tv <- setdiff(vars, names(slice_vars))
-  if (length(need_tv) > 0L) {
-    tv <- typical_values(object)
-    slice_vars <- append(slice_vars, tv[need_tv])
-  }
-
-  out <- expand_grid(!!!{
-    slice_vars
-  })
-
-  # filter out combinations that aren't in object
-  # decide what we are doing, all or selected
-  if (
-    (is.logical(.observed_only) && isTRUE(.observed_only)) ||
-      is.character(.observed_only)
-  ) {
-    filter_vars <- if (is.logical(.observed_only)) {
-      nms
-    } else {
-      .observed_only
-    }
-    out <- out |>
-      semi_join(
-        object |> distinct(across(all_of(filter_vars))),
-        by = filter_vars
-      )
-  }
-
-  # return
-  out
+  need_tv <- setdiff(vars, union(names(exprs), by))
+  data_slice_grid(object, exprs, vars, by, .observed_only,
+    typical_values(object, vars = all_of(need_tv)),
+    source = "`object`"
+  )
 }
 
 #' @param data an alternative data frame of values containing all the variables
@@ -155,7 +136,7 @@
 #' ds <- data_slice(m, x2 = evenly(x2, n = 50), x1 = mean(x1))
 `data_slice.gam` <- function(object, ..., data = NULL,
                              envir = NULL,
-                             .observed_only = FALSE) {
+                             .observed_only = FALSE, .by = NULL) {
   # Share environment resolution with expression evaluation and data recovery.
   object <- with_model_envir(object, envir)
   envir <- model_envir(object)
@@ -163,55 +144,81 @@
   # supplied by the caller must not require its original training vector.
   odata <- data
   exprs <- rlang::enquos(...)
+  vars <- model_vars(object)
+  # Stored summaries provide names and classes without recovering unused inputs.
+  by <- data_slice_by(rlang::enquo(.by),
+    if (is.null(data)) object[["var.summary"]] else data
+  )
   needed <- unique(unlist(lapply(exprs, function(x) all.vars(rlang::get_expr(x)))))
-  needed <- intersect(needed, model_vars(object))
+  needed <- union(intersect(needed, vars), by)
   if (is.character(.observed_only)) needed <- union(needed, .observed_only)
   if (isTRUE(.observed_only)) needed <- union(needed, names(exprs))
   data <- data_slice_data(object, data = data, envir = envir, vars = needed)
 
-  slice_vars <- purrr::map(exprs, rlang::eval_tidy, data = data)
+  data_slice_grid(data, exprs, vars, by, .observed_only,
+    typical_values(object, data = odata), source = "model"
+  )
+}
 
-  # check now if there are elements of slice_vars that aren't in the model
-  vars <- model_vars(object)
-  nms <- names(slice_vars)
+# Resolve grouping selections before recovering the data needed by GAM slices.
+data_slice_by <- function(expr, data) {
+  pos <- tidyselect::eval_select(expr, data = data, allow_rename = FALSE)
+  names(pos)
+}
+
+# Evaluate and expand each group separately; the ungrouped path uses the same
+# builder and retains the original expression and column ordering.
+data_slice_grid <- function(data, exprs, vars, by, observed_only, tv, source) {
+  nms <- names(exprs)
   if (any(i <- !nms %in% vars)) {
     message(
-      "Some specified variable(s) not used in model:\n",
-      paste(" * ", nms[i], collapse = "\n", sep = ""),
-      "\n"
+      "Some specified variable(s) not used in ", source, ":\n",
+      paste(" * ", nms[i], collapse = "\n", sep = ""), "\n"
     )
   }
+  need_tv <- setdiff(vars, union(nms, by))
+  typical <- if (length(need_tv)) as.list(tv[need_tv]) else list()
+  filter_vars <- if (isTRUE(observed_only)) nms else observed_only
+  filter_observed <- isTRUE(observed_only) || is.character(observed_only)
 
-  # typical values, only needed ones that aren't
-  need_tv <- setdiff(vars, names(slice_vars))
-  if (length(need_tv) > 0L) {
-    tv <- typical_values(object, data = odata)
-    slice_vars <- append(slice_vars, tv[need_tv])
-  }
-
-  out <- expand_grid(!!!{
-    slice_vars
-  })
-
-  # filter out combinations that aren't in object
-  # decide what we are doing, all or selected
-  if (
-    (is.logical(.observed_only) && isTRUE(.observed_only)) ||
-      is.character(.observed_only)
-  ) {
-    filter_vars <- if (is.logical(.observed_only)) {
-      nms
-    } else {
-      .observed_only
+  build <- function(group, key = list()) {
+    values <- purrr::map(exprs[!nms %in% by], rlang::eval_tidy,
+      data = group
+    )
+    values <- c(values, as.list(key))
+    if (length(by)) values <- values[union(nms, by)]
+    out <- tidyr::expand_grid(!!!c(values, typical))
+    if (filter_observed) {
+      out <- dplyr::semi_join(out, group, by = union(by, filter_vars))
     }
-    out <- out |>
-      semi_join(
-        data |> distinct(across(all_of(filter_vars))),
-        by = filter_vars
-      )
+    out
   }
-  # return
-  out
+  if (!length(by)) return(build(data))
+
+  # Group expressions select levels once in the full data mask. Never evaluate
+  # evenly(fac) inside a group: it intentionally returns all declared levels.
+  selected <- purrr::map(exprs[intersect(nms, by)], rlang::eval_tidy,
+    data = data
+  )
+  rows <- rep(TRUE, nrow(data))
+  for (nm in names(selected)) rows <- rows & data[[nm]] %in% selected[[nm]]
+  data <- dplyr::ungroup(data)[rows, , drop = FALSE]
+  if (!nrow(data)) {
+    cli::cli_abort("No observed groups remain for {.arg .by}.")
+  }
+  groups <- vctrs::vec_group_loc(data[by])
+  out <- lapply(seq_len(nrow(groups)), function(i) {
+    key <- groups$key[i, , drop = FALSE]
+    group <- data[groups$loc[[i]], , drop = FALSE]
+    tryCatch(build(group, key), error = function(err) {
+      label <- paste(paste(by, vapply(key, as.character, character(1)),
+        sep = " = "), collapse = ", ")
+      cli::cli_abort("Cannot create data slice for group {.val {label}}.",
+        parent = err
+      )
+    })
+  })
+  dplyr::bind_rows(out)
 }
 
 #' @export
