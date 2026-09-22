@@ -28,7 +28,9 @@ response_derivatives(object, ...)
   level = 0.95,
   seed = NULL,
   mvn_method = c("mvnfast", "mgcv"),
-  ...
+  ...,
+  uncertainty = c("simulation", "delta"),
+  unconditional = FALSE
 )
 
 \method{response_derivatives}{scam}(
@@ -45,22 +47,26 @@ response_derivatives(object, ...)
   level = 0.95,
   seed = NULL,
   mvn_method = c("mvnfast", "mgcv"),
-  ...
+  ...,
+  uncertainty = c("simulation", "delta"),
+  unconditional = FALSE
 )
 }
 \arguments{
 \item{object}{an R object to compute derivatives for.}
 
-\item{...}{arguments passed to other methods and on to \code{fitted_samples()}}
+\item{...}{arguments passed to posterior sampling or prediction, such as
+\code{draws}, \code{envir}, and \code{exclude}. \code{freq = TRUE} selects frequentist coefficient
+covariance for delta uncertainty or Gaussian draws. For delta uncertainty,
+\code{newdata}, \code{se.fit}, and \code{terms} are not supported; use \code{data} and \code{exclude}.}
 
 \item{focal}{character; name of the focal variable. The response derivative
 of the response with respect to this variable will be returned.
 All other variables involved in the model will be held at constant values.
-This can be missing if supplying \code{data}, in which case, the focal variable
-will be identified as the one variable that is not constant.}
+This must be supplied.}
 
 \item{data}{a data frame containing the values of the model covariates
-at which to evaluate the first derivatives of the smooths. If supplied,
+at which to evaluate derivatives of fitted values. If supplied,
 all but one variable must be held at a constant value.}
 
 \item{order}{numeric; the order of derivative.}
@@ -70,7 +76,7 @@ all but one variable must be held at a constant value.}
 
 \item{scale}{character; should the derivative be estimated on the response
 or the linear predictor (link) scale? One of \code{"response"} (the default),
-or \code{"linear predictor"}.}
+or \code{"linear_predictor"}.}
 
 \item{method}{character; which method should be used to draw samples from
 the posterior distribution. \code{"gaussian"} uses a Gaussian (Laplace)
@@ -79,7 +85,7 @@ that alternates t proposals with proposals based on a shrunken version of
 the posterior covariance matrix. \code{"inla"} uses a variant of Integrated
 Nested Laplace Approximation due to Wood (2019), (currently not
 implemented). \code{"user"} allows for user-supplied posterior draws
-(currently not implemented).}
+via \code{draws} in \code{...}.}
 
 \item{n}{numeric; the number of points to evaluate the derivative at (if
 \code{data} is not supplied).}
@@ -98,8 +104,8 @@ unusual function scales or domain boundaries may require explicit \code{eps}.
 For first central differences the two points are separated by \code{eps};
 for second central differences they are each \code{eps} from the target.}
 
-\item{n_sim}{integer; the number of simulations used in computing the
-simultaneous intervals.}
+\item{n_sim}{integer; number of posterior draws. Ignored when using
+user-supplied draws.}
 
 \item{level}{numeric; \verb{0 < level < 1}; the coverage level of the
 credible interval. The default is \code{0.95} for a 95\% interval.}
@@ -111,6 +117,15 @@ uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
 numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
 for some marginal fits, such as those where the covariance matrix is close
 to singular.}
+
+\item{uncertainty}{character; \code{"simulation"} (default) uses posterior draws
+and equal-tailed intervals; \code{"delta"} uses the delta method and normal
+intervals. Both methods return pointwise intervals. Sampler controls,
+including \code{n_sim}, \code{method}, and \code{seed}, are ignored for delta uncertainty.}
+
+\item{unconditional}{logical; include smoothing-parameter uncertainty in the
+Bayesian covariance, if available, for delta intervals and Gaussian draws.
+This does not modify MH or user-supplied draws.}
 }
 \value{
 A tibble, currently with the following variables:
@@ -119,15 +134,36 @@ A tibble, currently with the following variables:
 represents
 \item \code{.focal}: the name of the variable for which the partial derivative was
 evaluated,
-\item \code{.derivative}: the estimated partial derivative,
-\item \code{.lower_ci}: the lower bound of the confidence or interval,
-\item \code{.upper_ci}: the upper bound of the confidence or interval,
+\item \code{.derivative}: the posterior median for simulation uncertainty, or the
+finite difference of fitted predictions for delta uncertainty,
+\item \code{.se}: posterior standard deviation for simulation uncertainty (\code{NA} with
+only one draw), or the delta-method standard error,
+\item \code{.lower_ci}: the lower bound of the pointwise interval,
+\item \code{.upper_ci}: the upper bound of the pointwise interval,
 \item additional columns containing the covariate values at which the derivative
 was evaluated.
 }
 }
 \description{
 Derivatives on the response scale from an estimated GAM
+}
+\details{
+Delta uncertainty uses the same shifted prediction rows and finite-difference
+formulas as simulation, for both first and second derivatives. It applies
+those formulas to the coefficient gradients of fitted means and propagates
+their full joint covariance. Formula offsets are included in predictions.
+Intervals concern derivatives of the conditional mean, not future observations.
+With Bayesian coefficient covariance, delta intervals have an approximate
+posterior interpretation. They are symmetric and may differ from simulation
+intervals when posterior transformations are strongly nonlinear; the two
+methods' point estimates can also differ.
+
+Delta uncertainty supports single-linear-predictor \code{gam} and \code{bam} models
+with an ordinary scalar inverse-link mean (including negative binomial,
+Tweedie, beta regression, and scaled t families), and \code{gamm} via its GAM
+component. It is not supported for \code{scam} or general multi-predictor families;
+their existing simulation support is unchanged.
+The \code{uncertainty} attribute records the selected method.
 }
 \examples{
 
@@ -168,6 +204,10 @@ p1 <- fv |>
     title = "Estimated count as a function of x2",
     y = "Estimated count"
   )
+
+# pointwise normal intervals from the delta method
+y_delta <- response_derivatives(m, data = ds, focal = "x2",
+  type = "central", uncertainty = "delta")
 
 # draw response derivatives
 p2 <- y_d |>

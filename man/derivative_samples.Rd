@@ -59,11 +59,10 @@ derivative_samples(object, ...)
 \item{focal}{character; name of the focal variable. The response derivative
 of the response with respect to this variable will be returned.
 All other variables involved in the model will be held at constant values.
-This can be missing if supplying \code{data}, in which case, the focal variable
-will be identified as the one variable that is not constant.}
+This must be supplied.}
 
 \item{data}{a data frame containing the values of the model covariates
-at which to evaluate the first derivatives of the smooths. If supplied,
+at which to evaluate derivatives of fitted values. If supplied,
 all but one variable must be held at a constant value.}
 
 \item{order}{numeric; the order of derivative.}
@@ -73,7 +72,7 @@ all but one variable must be held at a constant value.}
 
 \item{scale}{character; should the derivative be estimated on the response
 or the linear predictor (link) scale? One of \code{"response"} (the default),
-or \code{"linear predictor"}.}
+or \code{"linear_predictor"}.}
 
 \item{method}{character; which method should be used to draw samples from
 the posterior distribution. \code{"gaussian"} uses a Gaussian (Laplace)
@@ -82,7 +81,7 @@ that alternates t proposals with proposals based on a shrunken version of
 the posterior covariance matrix. \code{"inla"} uses a variant of Integrated
 Nested Laplace Approximation due to Wood (2019), (currently not
 implemented). \code{"user"} allows for user-supplied posterior draws
-(currently not implemented).}
+via \code{draws} in \code{...}.}
 
 \item{n}{numeric; the number of points to evaluate the derivative at (if
 \code{data} is not supplied).}
@@ -101,8 +100,8 @@ unusual function scales or domain boundaries may require explicit \code{eps}.
 For first central differences the two points are separated by \code{eps};
 for second central differences they are each \code{eps} from the target.}
 
-\item{n_sim}{integer; the number of simulations used in computing the
-simultaneous intervals.}
+\item{n_sim}{integer; number of posterior draws. Ignored when using
+user-supplied draws.}
 
 \item{level}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 

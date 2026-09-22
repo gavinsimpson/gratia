@@ -1099,7 +1099,6 @@
 #' @title Derivatives on the response scale from an estimated GAM
 #'
 #' @param object an R object to compute derivatives for.
-#' @param ... arguments passed to other methods and on to `fitted_samples()`
 #'
 #' @author Gavin L. Simpson
 #'
@@ -1129,10 +1128,9 @@
 #' @param focal character; name of the focal variable. The response derivative
 #'   of the response with respect to this variable will be returned.
 #'   All other variables involved in the model will be held at constant values.
-#'   This can be missing if supplying `data`, in which case, the focal variable
-#'   will be identified as the one variable that is not constant.
+#'   This must be supplied.
 #' @param data a data frame containing the values of the model covariates
-#'   at which to evaluate the first derivatives of the smooths. If supplied,
+#'   at which to evaluate derivatives of fitted values. If supplied,
 #'   all but one variable must be held at a constant value.
 #' @param order numeric; the order of derivative.
 #' @param type character; the type of finite difference used. One of
@@ -1144,15 +1142,26 @@
 #'   the posterior covariance matrix. `"inla"` uses a variant of Integrated
 #'   Nested Laplace Approximation due to Wood (2019), (currently not
 #'   implemented). `"user"` allows for user-supplied posterior draws
-#'   (currently not implemented).
+#'   via `draws` in `...`.
 #' @param scale character; should the derivative be estimated on the response
 #'   or the linear predictor (link) scale? One of `"response"` (the default),
-#'   or `"linear predictor"`.
+#'   or `"linear_predictor"`.
 #' @param n numeric; the number of points to evaluate the derivative at (if
 #'   `data` is not supplied).
 #' @inheritParams derivatives eps
-#' @param n_sim integer; the number of simulations used in computing the
-#'   simultaneous intervals.
+#' @param n_sim integer; number of posterior draws. Ignored when using
+#'   user-supplied draws.
+#' @param uncertainty character; `"simulation"` (default) uses posterior draws
+#'   and equal-tailed intervals; `"delta"` uses the delta method and normal
+#'   intervals. Both methods return pointwise intervals. Sampler controls,
+#'   including `n_sim`, `method`, and `seed`, are ignored for delta uncertainty.
+#' @param unconditional logical; include smoothing-parameter uncertainty in the
+#'   Bayesian covariance, if available, for delta intervals and Gaussian draws.
+#'   This does not modify MH or user-supplied draws.
+#' @param ... arguments passed to posterior sampling or prediction, such as
+#'   `draws`, `envir`, and `exclude`. `freq = TRUE` selects frequentist coefficient
+#'   covariance for delta uncertainty or Gaussian draws. For delta uncertainty,
+#'   `newdata`, `se.fit`, and `terms` are not supported; use `data` and `exclude`.
 #' @param level numeric; `0 < level < 1`; the coverage level of the
 #'   credible interval. The default is `0.95` for a 95% interval.
 #' @param seed numeric; a random seed for the simulations.
@@ -1173,11 +1182,32 @@
 #'   represents
 #' * `.focal`: the name of the variable for which the partial derivative was
 #'   evaluated,
-#' * `.derivative`: the estimated partial derivative,
-#' * `.lower_ci`: the lower bound of the confidence or interval,
-#' * `.upper_ci`: the upper bound of the confidence or interval,
+#' * `.derivative`: the posterior median for simulation uncertainty, or the
+#'   finite difference of fitted predictions for delta uncertainty,
+#' * `.se`: posterior standard deviation for simulation uncertainty (`NA` with
+#'   only one draw), or the delta-method standard error,
+#' * `.lower_ci`: the lower bound of the pointwise interval,
+#' * `.upper_ci`: the upper bound of the pointwise interval,
 #' * additional columns containing the covariate values at which the derivative
 #'   was evaluated.
+#'
+#' @details
+#' Delta uncertainty uses the same shifted prediction rows and finite-difference
+#' formulas as simulation, for both first and second derivatives. It applies
+#' those formulas to the coefficient gradients of fitted means and propagates
+#' their full joint covariance. Formula offsets are included in predictions.
+#' Intervals concern derivatives of the conditional mean, not future observations.
+#' With Bayesian coefficient covariance, delta intervals have an approximate
+#' posterior interpretation. They are symmetric and may differ from simulation
+#' intervals when posterior transformations are strongly nonlinear; the two
+#' methods' point estimates can also differ.
+#'
+#' Delta uncertainty supports single-linear-predictor `gam` and `bam` models
+#' with an ordinary scalar inverse-link mean (including negative binomial,
+#' Tweedie, beta regression, and scaled t families), and `gamm` via its GAM
+#' component. It is not supported for `scam` or general multi-predictor families;
+#' their existing simulation support is unchanged.
+#' The `uncertainty` attribute records the selected method.
 #'
 #' @examples
 #'
@@ -1219,6 +1249,10 @@
 #'     y = "Estimated count"
 #'   )
 #'
+#' # pointwise normal intervals from the delta method
+#' y_delta <- response_derivatives(m, data = ds, focal = "x2",
+#'   type = "central", uncertainty = "delta")
+#'
 #' # draw response derivatives
 #' p2 <- y_d |>
 #'   ggplot(aes(x = x2, y = .derivative)) +
@@ -1246,7 +1280,9 @@
   n_sim = 10000, level = 0.95,
   seed = NULL,
   mvn_method = c("mvnfast", "mgcv"),
-  ...
+  ...,
+  uncertainty = c("simulation", "delta"),
+  unconditional = FALSE
 ) {
 
   do_response_derivatives(
@@ -1263,6 +1299,7 @@
     level = level,
     seed = seed,
     mvn_method = mvn_method,
+    uncertainty = uncertainty, unconditional = unconditional,
     ...
   )
 }
@@ -1281,12 +1318,15 @@
   n_sim = 10000, level = 0.95,
   seed = NULL,
   mvn_method = c("mvnfast", "mgcv"),
-  ...
+  ...,
+  uncertainty = c("simulation", "delta"),
+  unconditional = FALSE
 ) {
   do_response_derivatives(
     object = object, focal = focal, data = data, order = order, type = type,
     scale = scale, method = method, n = n, eps = eps, n_sim = n_sim,
-    level = level, seed = seed, mvn_method = mvn_method, ...
+    level = level, seed = seed, mvn_method = mvn_method,
+    uncertainty = uncertainty, unconditional = unconditional, ...
   )
 }
 
@@ -1302,15 +1342,32 @@
   n_sim = 10000, level = 0.95,
   seed = NULL,
   mvn_method = c("mvnfast", "mgcv"),
-  ...
+  ...,
+  uncertainty = c("simulation", "delta"),
+  unconditional = FALSE
 ) {
-  method <- match.arg(method)
+  uncertainty <- match.arg(uncertainty)
   type <- match.arg(type)
+  scale <- match.arg(scale)
+  if (!is.numeric(level) || length(level) != 1L || !is.finite(level) ||
+      level <= 0 || level >= 1) {
+    cli::cli_abort("{.arg level} must be strictly between 0 and 1.")
+  }
+  if (!is.logical(unconditional) || length(unconditional) != 1L ||
+      is.na(unconditional)) {
+    cli::cli_abort("{.arg unconditional} must be {.val TRUE} or {.val FALSE}.")
+  }
+  if (uncertainty == "delta") {
+    return(response_derivatives_delta(object, focal, data, order, type,
+      scale, n, eps, level, unconditional, ...))
+  }
+  method <- match.arg(method)
   mvn_method <- match.arg(mvn_method)
   yd <- derivative_samples(object,
     focal = focal, data = data, order = order,
     type = type, scale = scale, method = method, n = n, eps = eps,
-    n_sim = n_sim, seed = seed, mvn_method = mvn_method, ...
+    n_sim = n_sim, seed = seed, mvn_method = mvn_method,
+    unconditional = unconditional, ...
   )
 
   qq <- (1 - level) / 2
@@ -1318,6 +1375,7 @@
   yd <- yd |>
     group_by(pick(matches(".row"))) |>
     mutate(
+      .se = stats::sd(.data[[".derivative"]]),
       .lower_ci = quantile(.data[[".derivative"]], probs = qq),
       .upper_ci = quantile(.data[[".derivative"]], probs = 1 - qq),
       .derivative = median(.data[[".derivative"]])
@@ -1328,13 +1386,14 @@
     ))), .keep_all = TRUE) |>
     select(!all_of(c(".draw"))) |>
     relocate(all_of(c(
-      ".row", ".focal", ".derivative", ".lower_ci",
+      ".row", ".focal", ".derivative", ".se", ".lower_ci",
       ".upper_ci"
     )))
 
   cls <- class(yd)
   cls[1] <- "response_derivatives"
   class(yd) <- cls
+  attr(yd, "uncertainty") <- uncertainty
   yd
 }
 
@@ -1438,11 +1497,7 @@
       names_from = "..type", values_from = ".fitted",
       names_prefix = ".."
     )
-  fun <- switch(type,
-    "forward" = y_forward_diff_1,
-    "backward" = y_backward_diff_1,
-    "central" = y_central_diff_1
-  )
+  fun <- response_fdiff_function(1L, type)
   samples |>
     mutate(..fd = fun(.data, eps = eps))
 }
@@ -1457,11 +1512,7 @@
       names_from = "..type", values_from = ".fitted",
       names_prefix = ".."
     )
-  fun <- switch(type,
-    "forward" = y_forward_diff_2,
-    "backward" = y_backward_diff_2,
-    "central" = y_central_diff_2
-  )
+  fun <- response_fdiff_function(2L, type)
   samples |>
     mutate(..fd = fun(.data, eps = eps))
 }

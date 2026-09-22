@@ -47,12 +47,18 @@
 
 ## New features
 
+* `response_derivatives()` now supports delta-method standard errors and
+  pointwise intervals via `uncertainty = "delta"`. Both uncertainty methods
+  return `.se`, with posterior simulation remaining the default.
+
 * `conditional_differences()` compares conditional fitted values between factor
   levels or joint factor combinations on the link or response scale.
   Pointwise uncertainty intervals use the delta method or shared posterior
-  simulations, and `draw()` plots the differences and their intervals (#143, #145).
+  simulations, and `draw()` plots the differences and their intervals (#143,
+  #145).
 
-* `all_levels()` is now an alias of `evenly()` with a name intended for factors (#217).
+* `all_levels()` is now an alias of `evenly()` with a name intended for factors
+  (#217).
 
 * `data_slice()` gains a `.by` argument to evaluate slice expressions within
   observed groups. For example, `x = evenly(x)` now supports a separate range
