@@ -14,7 +14,7 @@ test_that("Tweedie factories handle fixed and estimated powers and endpoints", {
   mu <- c(1, 2, 3)
   phi <- .7
   for (power in c(1.2, 1.5, 1.8)) {
-    expected <- tweedie::qtweedie(p, mu = mu, phi = phi, xi = power)
+    expected <- qtweedie_mixture(p, mu = mu, phi = phi, power = power)
     for (fam in list(mgcv::tw(theta = power), mgcv::Tweedie(p = power))) {
       fam <- fix_family_qf(fam)
       expect_equal(fam$qf(p, mu, 1, phi), expected)
@@ -149,7 +149,7 @@ test_that("uniform QQ and worm plots use the extended quantile helpers", {
       power <- if (is.null(m$family$getTheta)) 1.5 else m$family$getTheta(TRUE)
       p <- c(.2, .5, .8)
       expect_equal(fix_family_qf(m$family)$qf(p, fitted(m)[1:3], 1, m$sig2),
-        tweedie::qtweedie(p, mu = fitted(m)[1:3], phi = m$sig2, xi = power))
+        qtweedie_mixture(p, mu = fitted(m)[1:3], phi = m$sig2, power = power))
     }
     types <- c("deviance", "response", "pearson")
     if (family_type(m) == "ziplss") types <- types[1:2]

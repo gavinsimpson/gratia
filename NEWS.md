@@ -2,6 +2,13 @@
 
 ## User visible changes
 
+* Tweedie family quantile and CDF functions now use fast Poisson-Gamma mixtures
+  by default for `1 < p < 2`, including uniform QQ diagnostics and PIT/quantile
+  residuals (#410). The Gamma case (`p = 2`) uses native R distribution functions.
+  Expensive inversion remains opt-in with `fallback = TRUE`; it requires the
+  optional `tweedie` package, now in Suggests. Default mixture calculations warn
+  and return available approximations when their work/accuracy limits are reached.
+
 * `appraise()`, `qq_plot()`, and `worm_plot()` now use `method = NULL` to
   select simulation for `tw()` and `Tweedie()` models, avoiding expensive
   numerical quantiles (#410). Other families continue to prefer `"uniform"`,

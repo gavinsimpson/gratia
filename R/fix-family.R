@@ -363,37 +363,20 @@ make_cdf_clog <- function(sigma) {
   }
 }
 
-#' @importFrom tweedie ptweedie
+#' @importFrom stats pgamma
 `make_cdf_tw` <- function(theta, ab) {
-  fun <- if (length(ab) == 1L) {
-    # here ab is the tweedie power specified in Tweedie()
-    function(p, mu, wt, scale, log_p = FALSE){
-      tweedie::ptweedie(
-        p,
-        mu = mu,
-        phi = scale,
-        xi = ab
-      )
+  xi <- if (length(ab) == 1L) ab else theta_2_power(theta, a = ab[1], b = ab[2])
+  force(xi)
+  function(q, mu, wt, scale, log_p = FALSE, lower_tail = TRUE,
+      fallback = FALSE, max_terms = 10000L) {
+    if (xi == 2) {
+      return(pgamma(q, shape = 1 / scale, scale = mu * scale,
+        lower.tail = lower_tail, log.p = log_p))
     }
-  } else {
-    function(q, mu, wt, scale, log_p = FALSE) {
-      a <- ab[1] # tweedie lower and upper bounds used in fitting
-      b <- ab[2]
-      # compute tweedie power parameter xi
-      xi <- if (theta > 0) {
-        (b + a * exp(-theta)) / (1 + exp(-theta))
-      } else {
-        (b * exp(theta) + a) / (exp(theta) + 1)
-      }
-      tweedie::ptweedie(
-        q,
-        mu = mu,
-        phi = scale, # think to handle weights we need scale / wt
-        xi = xi
-      )
-    }
+    ptweedie_mixture(q, mu = mu, power = xi, phi = scale,
+      lower_tail = lower_tail, log_p = log_p, fallback = fallback,
+      max_terms = max_terms)
   }
-  fun
 }
 
 # only really need this for QQ plots
@@ -568,41 +551,16 @@ log1mexp <- function(x) {
   }
 }
 
-#' @importFrom tweedie qtweedie
 #' @importFrom stats qgamma
 `make_qf_tw` <- function(theta, ab) {
-  xi <- if (length(ab) == 1L) {
-    ab
-  } else {
-    theta_2_power(theta, a = ab[1], b = ab[2])
-  }
+  xi <- if (length(ab) == 1L) ab else theta_2_power(theta, a = ab[1], b = ab[2])
   force(xi)
-  function(p, mu, wt, scale, log_p = FALSE) {
-    logp <- quantile_log_probability(p, log_p)
-    n <- max(length(logp), length(mu), length(scale))
-    logp <- rep_len(logp, n)
-    mu <- rep_len(mu, n)
-    phi <- rep_len(scale, n)
+  function(p, mu, wt, scale, log_p = FALSE, fallback = FALSE,
+      max_terms = 10000L) {
     if (xi == 2) {
-      return(qgamma(logp, shape = 1 / phi, scale = mu * phi, log.p = TRUE))
+      return(qgamma(p, shape = 1 / scale, scale = mu * scale, log.p = log_p))
     }
-    q <- rep(NA_real_, n)
-    q[which(logp == -Inf)] <- 0
-    q[which(logp == 0)] <- Inf
-    interior <- which(is.finite(logp) & logp < 0)
-    if (length(interior)) {
-      # qtweedie() expects ordinary probabilities and fails for endpoint-only
-      # input. Do not call it for endpoints or missing/invalid probabilities.
-      prob <- exp(logp[interior])
-      q[interior[prob == 0]] <- 0
-      q[interior[prob == 1]] <- Inf
-      keep <- which(prob > 0 & prob < 1)
-      if (length(keep)) {
-        idx <- interior[keep]
-        q[idx] <- tweedie::qtweedie(prob[keep], mu = mu[idx],
-          phi = phi[idx], xi = xi)
-      }
-    }
-    q
+    qtweedie_mixture(p, mu = mu, power = xi, phi = scale, log_p = log_p,
+      fallback = fallback, max_terms = max_terms)
   }
 }

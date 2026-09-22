@@ -1,4 +1,4 @@
-# Experimental internal quantiles for the compound Poisson-Gamma Tweedie.
+# Internal quantiles for the compound Poisson-Gamma Tweedie.
 # For Y | N = k ~ Gamma(k * alpha, beta), sum Gamma probabilities weighted
 # by Poisson(lambda) probabilities. Truncation is bounded by omitted Poisson
 # mass, independently of the evaluation point. No renormalisation is applied.
@@ -15,38 +15,38 @@ qtweedie_mixture <- function(prob, mu, power, phi, log_p = FALSE,
     max_terms = 10000L, details = FALSE, fallback = FALSE) {
   if (!is.numeric(power) || length(power) != 1L || !is.finite(power) ||
       power <= 1 || power >= 2) {
-    stop("'power' must be a finite scalar in (1, 2).")
+    cli::cli_abort("{.arg power} must be a finite scalar in (1, 2).")
   }
   pars <- list(prob = prob, mu = mu, phi = phi)
   lens <- lengths(pars)
   size <- max(lens)
   if (any(!vapply(pars, is.numeric, logical(1)))) {
-    stop("'prob', 'mu', and 'phi' must be numeric vectors.")
+    cli::cli_abort("{.arg prob}, {.arg mu}, and {.arg phi} must be numeric vectors.")
   }
   if (size > 0L && (any(lens == 0L) || any(!lens %in% c(1L, size)))) {
-    stop("Parameters must have length 1 or a common nonzero length.")
+    cli::cli_abort("Parameters must have length 1 or a common nonzero length.")
   }
   for (tol in list(cdf_tol, probability_tol, quantile_tol)) {
     if (!is.numeric(tol) || length(tol) != 1L || !is.finite(tol) ||
-        tol <= 0 || tol >= 1) stop("Tolerances must be scalars in (0, 1).")
+        tol <= 0 || tol >= 1) cli::cli_abort("Tolerances must be scalars in (0, 1).")
   }
   if (length(max_terms) != 1L || !is.numeric(max_terms) ||
       !is.finite(max_terms) || max_terms < 1 || max_terms != floor(max_terms)) {
-    stop("'max_terms' must be a positive integer.")
+    cli::cli_abort("{.arg max_terms} must be a positive integer.")
   }
   if (!is.logical(log_p) || length(log_p) != 1L || is.na(log_p) ||
       !is.logical(details) || length(details) != 1L || is.na(details)) {
-    stop("'log_p' and 'details' must be TRUE or FALSE.")
+    cli::cli_abort("{.arg log_p} and {.arg details} must be TRUE or FALSE.")
   }
   if (!is.logical(fallback) || length(fallback) != 1L || is.na(fallback)) {
-    stop("'fallback' must be TRUE or FALSE.")
+    cli::cli_abort("{.arg fallback} must be TRUE or FALSE.")
   }
   prob <- rep_len(prob, size)
   mu <- rep_len(mu, size)
   phi <- rep_len(phi, size)
   if (any(!is.na(mu) & (!is.finite(mu) | mu < 0)) ||
       any(!is.na(phi) & (!is.finite(phi) | phi <= 0))) {
-    stop("Nonmissing means must be finite and nonnegative; scales finite and positive.")
+    cli::cli_abort("Nonmissing means must be finite and nonnegative; scales finite and positive.")
   }
   logu <- quantile_log_probability(prob, log_p)
   out <- rep(NA_real_, size)
@@ -97,10 +97,13 @@ qtweedie_mixture <- function(prob, mu, power, phi, log_p = FALSE,
     }
   }
   if (!fallback && any(!is.na(reason))) {
-    warning(sum(!is.na(reason)), " Tweedie quantile(s) exceeded the mixture work/accuracy ",
-      "limits; returning available approximations (NA where no estimate exists). ",
-      "Accuracy is not guaranteed. Increase 'max_terms' or set fallback = TRUE ",
-      "to permit expensive inversion.", call. = FALSE)
+    n_failed <- sum(!is.na(reason))
+    cli::cli_warn(c(
+      "{n_failed} Tweedie quantile{?s} exceeded the mixture work/accuracy limits.",
+      "i" = "Returning available approximations (NA where no estimate exists).",
+      "!" = "Accuracy is not guaranteed.",
+      "i" = "Increase {.arg max_terms} or set {.code fallback = TRUE} to permit expensive inversion."
+    ))
   }
   if (details) {
     return(data.frame(quantile = out, log_quantile, method, terms,
@@ -114,13 +117,15 @@ qtweedie_mixture <- function(prob, mu, power, phi, log_p = FALSE,
 tweedie_mixture_quantile_one <- function(logu, lambda, alpha,
     cdf_tol, probability_tol, quantile_tol, max_terms, allow_partial = TRUE) {
   result <- list(terms = 0L, log_omitted = NA_real_, log_error = NA_real_)
-  fail <- function(reason) {
+  return_incomplete <- function(reason) {
     result$reason <- reason
     result
   }
   gamma_scale <- 1 / (lambda * alpha)
   if (!is.finite(lambda) || lambda <= 0 || !is.finite(gamma_scale) ||
-      gamma_scale <= 0) return(fail("unrepresentable mixture parameters"))
+      gamma_scale <= 0) {
+    return(return_incomplete("unrepresentable mixture parameters"))
+  }
 
   # Subtract the atom stably; do not subtract two nearly equal probabilities.
   log_positive <- logu + log(-expm1(-lambda - logu))
@@ -132,17 +137,17 @@ tweedie_mixture_quantile_one <- function(logu, lambda, alpha,
     allow_partial = allow_partial)
   result$terms <- prepared$terms
   result$log_omitted <- prepared$log_omitted
-  if (is.null(prepared$evaluate)) return(fail(prepared$reason))
+  if (is.null(prepared$evaluate)) return(return_incomplete(prepared$reason))
   result$reason <- prepared$reason
   # A partial sum need not contain enough probability to bracket this target.
   # Do not manufacture a quantile by renormalising its retained weights.
   if (target >= prepared$log_mass) {
-    return(fail("target exceeds retained mixture mass"))
+    return(return_incomplete("target exceeds retained mixture mass"))
   }
   objective <- function(z) prepared$evaluate(z, lower) - target
   # Choose a bracket around the mean, doubling its log-width as needed.
   at_mean <- objective(0)
-  if (is.na(at_mean)) return(fail("nonfinite mixture evaluation"))
+  if (is.na(at_mean)) return(return_incomplete("nonfinite mixture evaluation"))
   left <- right <- 0
   fleft <- fright <- at_mean
   step <- 1
@@ -154,11 +159,15 @@ tweedie_mixture_quantile_one <- function(logu, lambda, alpha,
       if (fleft < 0) { left <- -step; fleft <- objective(left) }
       if (fright > 0) { right <- step; fright <- objective(right) }
     }
-    if (is.na(fleft) || is.na(fright)) return(fail("nonfinite mixture evaluation"))
+    if (is.na(fleft) || is.na(fright)) {
+      return(return_incomplete("nonfinite mixture evaluation"))
+    }
     if (fleft == 0 || fright == 0 || sign(fleft) != sign(fright)) break
     step <- step * 2
   }
-  if (sign(fleft) == sign(fright) && fleft != 0) return(fail("bracketing failed"))
+  if (sign(fleft) == sign(fright) && fleft != 0) {
+    return(return_incomplete("bracketing failed"))
+  }
   if (at_mean == 0) {
     root <- 0
   } else {
@@ -166,7 +175,7 @@ tweedie_mixture_quantile_one <- function(logu, lambda, alpha,
       f.lower = fleft, f.upper = fright, tol = quantile_tol,
       maxiter = 200L, check.conv = TRUE)$root, error = function(e) NA_real_)
   }
-  if (is.na(root)) return(fail("root solver failed"))
+  if (is.na(root)) return(return_incomplete("root solver failed"))
   result$root <- root
   result$log_error <- abs(objective(root))
   if (is.finite(result$log_error) && result$log_error > probability_tol) {
@@ -185,7 +194,7 @@ tweedie_mixture_quantile_one <- function(logu, lambda, alpha,
     result$log_error <- if (is.na(root)) Inf else abs(objective(root))
   }
   if (!is.finite(result$log_error) || result$log_error > probability_tol) {
-    return(fail("tail probability residual exceeds tolerance"))
+    return(return_incomplete("tail probability residual exceeds tolerance"))
   }
   result$root <- root
   result
@@ -194,14 +203,16 @@ tweedie_mixture_quantile_one <- function(logu, lambda, alpha,
 # Keep fallback separate so tests can verify dispatch without running a costly
 # inversion. Never round an interior log probability to an endpoint silently.
 tweedie_quantile_fallback <- function(logu, mu, power, phi) {
+  require_tweedie_fallback()
   u <- exp(logu)
   if (u == 0 || u == 1) {
-    warning("Tweedie fallback cannot represent this interior log probability.")
+    cli::cli_warn("Tweedie fallback cannot represent this interior log probability.")
     return(NA_real_)
   }
   tryCatch(tweedie::qtweedie(u, mu = mu, xi = power, phi = phi),
     error = function(e) {
-      warning("Tweedie inversion fallback failed: ", conditionMessage(e))
+      message <- conditionMessage(e)
+      cli::cli_warn(c("Tweedie inversion fallback failed.", "x" = "{message}"))
       NA_real_
     })
 }
@@ -211,18 +222,25 @@ tweedie_quantile_fallback <- function(logu, mu, power, phi) {
 tweedie_mixture_prepare <- function(lambda, alpha, log_eps, max_terms,
     allow_partial = TRUE) {
   result <- list(terms = 0L, log_omitted = NA_real_, log_error = NA_real_)
-  fail <- function(reason) { result$reason <- reason; result }
+  return_incomplete <- function(reason) {
+    result$reason <- reason
+    result
+  }
   gamma_scale <- 1 / (lambda * alpha)
   if (!is.finite(lambda) || lambda <= 0 || !is.finite(gamma_scale) ||
-      gamma_scale <= 0) return(fail("unrepresentable mixture parameters"))
+      gamma_scale <= 0) {
+    return(return_incomplete("unrepresentable mixture parameters"))
+  }
   lo <- max(1, stats::qpois(log_eps - log(2), lambda, log.p = TRUE))
   hi <- stats::qpois(log_eps - log(2), lambda, lower.tail = FALSE, log.p = TRUE)
   n_terms <- hi - lo + 1
   if (!is.finite(n_terms) || n_terms < 1) {
-    return(fail("unrepresentable Poisson summation range"))
+    return(return_incomplete("unrepresentable Poisson summation range"))
   }
   if (n_terms > max_terms) {
-    if (!allow_partial) return(fail("Poisson summation exceeds work limit"))
+    if (!allow_partial) {
+      return(return_incomplete("Poisson summation exceeds work limit"))
+    }
     # Retain a contiguous window around the Poisson mode, inside the desired
     # range. Starting at count one would discard almost everything at high rates.
     lo <- max(lo, min(floor(lambda) - floor((max_terms - 1) / 2),
@@ -230,7 +248,7 @@ tweedie_mixture_prepare <- function(lambda, alpha, log_eps, max_terms,
     hi <- lo + max_terms - 1
     n_terms <- hi - lo + 1
     if (hi > 2^53 - 1 || n_terms != max_terms) {
-      return(fail("unrepresentable Poisson summation range"))
+      return(return_incomplete("unrepresentable Poisson summation range"))
     }
     result$reason <- "Poisson summation exceeds work limit"
   }
@@ -246,14 +264,18 @@ tweedie_mixture_prepare <- function(lambda, alpha, log_eps, max_terms,
   }
   result$log_omitted <- logsum(c(omitted_lower, omitted_upper))
   if (result$log_omitted > log_eps && is.null(result$reason)) {
-    if (!allow_partial) return(fail("Poisson truncation bound exceeded"))
+    if (!allow_partial) {
+      return(return_incomplete("Poisson truncation bound exceeded"))
+    }
     result$reason <- "Poisson truncation bound exceeded"
   }
   counts <- seq.int(lo, hi)
   log_weights <- stats::dpois(counts, lambda, log = TRUE)
   result$log_mass <- logsum(log_weights)
   shapes <- counts * alpha
-  if (any(!is.finite(shapes))) return(fail("unrepresentable Gamma shapes"))
+  if (any(!is.finite(shapes))) {
+    return(return_incomplete("unrepresentable Gamma shapes"))
+  }
   evaluate <- function(z, lower = TRUE) {
     log_x <- z - log(gamma_scale)
     # For x below the normal floating-point range, the leading term of the
@@ -272,7 +294,7 @@ tweedie_mixture_prepare <- function(lambda, alpha, log_eps, max_terms,
   result
 }
 
-# Experimental CDF companion for evaluating PIT/normal-score residual accuracy.
+# CDF companion for PIT/normal-score residuals.
 # Refine the Poisson truncation using the smaller evaluated tail, so absolute
 # CDF accuracy does not conceal poor relative accuracy in extreme tails.
 ptweedie_mixture <- function(q, mu, power, phi, lower_tail = TRUE, log_p = FALSE,
@@ -282,10 +304,10 @@ ptweedie_mixture <- function(q, mu, power, phi, lower_tail = TRUE, log_p = FALSE
   size <- max(length(q), length(mu), length(phi))
   if (!is.numeric(q) || (size > 0 &&
       (length(q) == 0 || !length(q) %in% c(1L, size)))) {
-    stop("'q' must be numeric with length 1 or a common nonzero length.")
+    cli::cli_abort("{.arg q} must be numeric with length 1 or a common nonzero length.")
   }
   if (!is.logical(lower_tail) || length(lower_tail) != 1L || is.na(lower_tail)) {
-    stop("'lower_tail' must be TRUE or FALSE.")
+    cli::cli_abort("{.arg lower_tail} must be TRUE or FALSE.")
   }
   invisible(qtweedie_mixture(rep(0, size), mu, power, phi, log_p = log_p,
     cdf_tol = cdf_tol, probability_tol = probability_tol, max_terms = max_terms,
@@ -347,13 +369,18 @@ ptweedie_mixture <- function(q, mu, power, phi, lower_tail = TRUE, log_p = FALSE
   }
   if (any(unresolved)) {
     if (fallback) {
-      warning("Mixture CDF work/accuracy limits reached; using the requested ",
-        "ordinary-CDF fallback, which has limited log-tail accuracy.", call. = FALSE)
+      cli::cli_warn(c(
+        "Mixture CDF work/accuracy limits reached; using the requested ordinary-CDF fallback.",
+        "!" = "The fallback has limited log-tail accuracy."
+      ))
     } else {
-      warning(sum(unresolved), " Tweedie CDF value(s) exceeded the mixture work/accuracy ",
-        "limits; returning available partial sums (NA where no estimate exists). ",
-        "Accuracy is not guaranteed. Increase 'max_terms' or set fallback = TRUE ",
-        "to permit expensive inversion.", call. = FALSE)
+      n_failed <- sum(unresolved)
+      cli::cli_warn(c(
+        "{n_failed} Tweedie CDF value{?s} exceeded the mixture work/accuracy limits.",
+        "i" = "Returning available partial sums (NA where no estimate exists).",
+        "!" = "Accuracy is not guaranteed.",
+        "i" = "Increase {.arg max_terms} or set {.code fallback = TRUE} to permit expensive inversion."
+      ))
     }
   }
   out <- if (lower_tail) lower else upper
@@ -362,5 +389,15 @@ ptweedie_mixture <- function(q, mu, power, phi, lower_tail = TRUE, log_p = FALSE
 
 # Separate the expensive backend so opt-in dispatch can be tested directly.
 tweedie_cdf_fallback <- function(q, mu, power, phi) {
+  require_tweedie_fallback()
   tweedie::ptweedie(q, mu = mu, xi = power, phi = phi)
+}
+
+require_tweedie_fallback <- function() {
+  if (!requireNamespace("tweedie", quietly = TRUE)) {
+    cli::cli_abort(c(
+      "Tweedie fallback requires the {.pkg tweedie} package.",
+      "i" = 'Install it with {.code install.packages("tweedie")}.'
+    ))
+  }
 }
