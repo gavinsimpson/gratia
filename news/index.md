@@ -385,6 +385,11 @@ CRAN release: 2026-02-07
 
 ### Bug fixes
 
+- [`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
+  now excludes interactions in models with multiple linear predictors,
+  matching the existing single-predictor behaviour
+  ([\#369](https://github.com/gavinsimpson/gratia/issues/369)).
+
 - [`conditional_values()`](https://gavinsimpson.github.io/gratia/reference/conditional_values.md)
   would fail if supplied a numeric vector of data to condition on via
   the `condition` argument.
