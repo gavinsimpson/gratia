@@ -255,7 +255,7 @@ calibrate a band and cause an error. Deterministic rows agreeing with
 Simultaneous coverage is approximate posterior coverage on the finite
 evaluation grid, not between its points or outside its range, nor exact
 frequentist coverage. Increase `n_vals` to evaluate a denser grid. Bands
-are not clipped to the response-difference range (e.g. -1, 1 for
+are not clipped to the response-difference range (e.g. `[-1, 1]` for
 probabilities). They need not contain the equal-tailed pointwise
 simulation intervals.
 
