@@ -52,10 +52,12 @@
   return `.se`, with posterior simulation remaining the default.
 
 * `conditional_differences()` compares conditional fitted values between factor
-  levels or joint factor combinations on the link or response scale.
-  Pointwise uncertainty intervals use the delta method or shared posterior
-  simulations, and `draw()` plots the differences and their intervals (#143,
-  #145).
+  levels or joint factor combinations on the link or response scale, with
+  pointwise or simultaneous intervals using the delta method or shared posterior
+  simulations.
+  Simultaneous bands can cover each comparison separately or all comparisons
+  jointly via `simultaneous_scope`, and `draw()` plots the differences and their
+  intervals (#143, #145).
 
 * `all_levels()` is now an alias of `evenly()` with a name intended for factors
   (#217).

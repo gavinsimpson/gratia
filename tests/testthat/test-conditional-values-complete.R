@@ -78,6 +78,6 @@ test_that("conditional_values validates complete", {
   f <- conditional_combos_fixture()
   for (value in list(NA, NULL, logical(), c(TRUE, FALSE), 1, "FALSE")) {
     expect_error(conditional_values(f$model, "x", complete = value),
-      "'complete' must be a single non-missing logical value", fixed = TRUE)
+      "must be a single non-missing logical value", fixed = TRUE)
   }
 })

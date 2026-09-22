@@ -34,7 +34,7 @@ discrete variables.}
 \item{...}{arguments passed to \code{\link[=draw.conditional_values]{draw.conditional_values()}}.}
 }
 \description{
-Display conditional differences with pointwise uncertainty intervals and a
+Display conditional differences with pointwise or simultaneous intervals and a
 zero reference line. Each comparison is shown in a separate facet; additional
 conditioning variables use colour and facets as in \code{\link[=draw.conditional_values]{draw.conditional_values()}}.
 }

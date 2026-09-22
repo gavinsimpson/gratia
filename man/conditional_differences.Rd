@@ -36,7 +36,9 @@ conditional_differences(
   t_df = 40,
   rw_scale = 0.25,
   envir = NULL,
-  ...
+  ...,
+  interval = c("confidence", "simultaneous"),
+  simultaneous_scope = c("contrast", "all")
 )
 }
 \arguments{
@@ -81,18 +83,20 @@ This argument does not modify MH or user-supplied draws.}
 
 \item{uncertainty}{character; \code{"delta"} uses analytic link-scale or
 delta-method response-scale standard errors and normal intervals.
-\code{"simulation"} uses shared posterior coefficient draws and equal-tailed
-quantiles of the resulting differences.}
+\code{"simulation"} uses shared posterior coefficient draws, with equal-tailed
+quantiles for pointwise intervals or calibrated symmetric simultaneous bands.}
 
-\item{n_sim}{integer; number of posterior draws for simulation uncertainty.
-Ignored for \code{method = "user"}, which uses all supplied draws.}
+\item{n_sim}{integer; number of draws for posterior simulation or calibration
+of delta-method simultaneous intervals. Ignored for pointwise delta intervals
+and for simulation with \code{method = "user"}, which uses all supplied draws.}
 
-\item{seed}{integer or \code{NULL}; seed passed to \code{\link[=fitted_samples]{fitted_samples()}}. An explicit
-seed makes simulation reproducible and preserves the caller's RNG state.}
+\item{seed}{integer or \code{NULL}; seed for posterior simulation or delta-method
+simultaneous calibration. An explicit seed preserves the caller's RNG state.
+With \code{NULL}, delta-method calibration advances the current RNG state;
+posterior simulation follows \code{\link[=fitted_samples]{fitted_samples()}} seed handling.}
 
-\item{n_cores}{integer; number of CPU cores to use when generating
-multivariate normal distributed random values. Only used if
-\code{mvn_method = "mvnfast"} \strong{and} \code{method = "gaussian"}.}
+\item{n_cores}{integer; number of cores used by \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}} for
+delta-method simultaneous calibration, or passed to \code{\link[=fitted_samples]{fitted_samples()}}.}
 
 \item{method}{character; posterior sampler used by \code{\link[=fitted_samples]{fitted_samples()}}.
 \code{"gaussian"} uses the Gaussian posterior approximation; \code{"mh"} uses
@@ -122,6 +126,15 @@ matrix when generating random walk proposals. See \code{mgcv::gam.mh()}.}
 \item{envir}{an optional environment supplying functions and constants used
 in model expressions. The available model formula environment is used when
 \code{NULL}. Covariate observations should be supplied in \code{data}.}
+
+\item{interval}{character; \code{"confidence"} (the default) gives pointwise
+intervals; \code{"simultaneous"} gives simultaneous intervals over the evaluated
+covariate combinations.}
+
+\item{simultaneous_scope}{character; \code{"contrast"} calibrates a separate band
+for each pair, jointly over all its evaluation points and conditioning
+strata. \code{"all"} calibrates one band jointly over every returned comparison
+and evaluation point. Ignored for pointwise intervals.}
 }
 \value{
 A tibble of class \code{"conditional_differences"}, with \code{.contrast},
@@ -130,7 +143,9 @@ A tibble of class \code{"conditional_differences"}, with \code{.contrast},
 of difference draws. A single comparison factor has \code{.level_1} and
 \code{.level_2} columns. Multiple factors have \verb{<factor>_1} and \verb{<factor>_2}
 columns. Attributes record \code{by}, \code{condition}, \code{scale}, \code{uncertainty},
-\code{ci_level}, \code{exclude}, and plotting \code{channels}.
+\code{ci_level}, \code{exclude}, \code{interval}, \code{simultaneous_scope}, and plotting
+\code{channels}. Simultaneous results also contain \code{.crit}, the calibrated
+critical value, constant within each coverage set.
 }
 \description{
 Compare full fitted values between pairs of factor levels, conditional on
@@ -145,13 +160,33 @@ response scale the inverse link is applied to each prediction before
 subtraction. Shared terms can therefore affect response-scale differences
 even when they cancel on the link scale.
 
-Intervals are pointwise, not simultaneous across the grid or comparisons.
-They describe uncertainty in conditional mean differences, not observation
+Intervals describe uncertainty in conditional mean differences, not observation
 noise. Simulation uses \code{\link[=fitted_samples]{fitted_samples()}} once for the entire prediction
 grid, retaining dependence between predictions by subtracting within draws.
-The estimate is always the difference of fitted predictions; simulation
-intervals need not be centred on this estimate. Simulation controls are
-ignored when \code{uncertainty = "delta"}.
+The estimate is always the difference of fitted predictions. Pointwise
+simulation intervals need not be centred on this estimate.
+
+Simultaneous intervals use the \code{ci_level} quantile of the maximum absolute
+standardized deviation over the selected coverage set. They are symmetric
+about \code{.diff}, with half-width \code{.crit * .se}. For \code{uncertainty = "delta"},
+one shared batch of zero-mean Gaussian coefficient deviations is generated
+from the Bayesian covariance matrix using \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}. Response-scale
+differences use a first-order Taylor approximation. The covariance must be
+positive definite. Sampler arguments \code{method}, \code{draws}, \code{mvn_method}, \code{burnin},
+\code{thin}, \code{t_df}, and \code{rw_scale} apply only to \code{uncertainty = "simulation"}.
+
+For \code{uncertainty = "simulation"}, deviations are posterior difference draws
+minus \code{.diff}, standardized by their sample standard deviations. Draws are
+transformed to the response scale before differencing; invalid inverse-link
+domains or response means cause an error rather than discarded draws.
+Zero-variance draws that disagree with \code{.diff} cannot calibrate a band and
+cause an error. Deterministic rows agreeing with \code{.diff} have zero width.
+
+Simultaneous coverage is approximate posterior coverage on the finite
+evaluation grid, not between its points or outside its range, nor exact
+frequentist coverage. Increase \code{n_vals} to evaluate a denser grid. Bands are
+not clipped to the response-difference range (e.g. \link{-1, 1} for probabilities).
+They need not contain the equal-tailed pointwise simulation intervals.
 
 \code{exclude} sets the named term contributions to zero. In particular, excluding
 random effects does not integrate over their distribution. Offsets follow
@@ -173,4 +208,18 @@ conditional_differences(m, by = "fac",
 # Pointwise posterior bands from shared coefficient draws
 conditional_differences(m, by = "fac", condition = "x2",
   uncertainty = "simulation", n_sim = 1000, seed = 42)
+
+# Link-scale simultaneous bands, separately for each comparison
+conditional_differences(m, by = "fac", condition = "x2", scale = "link",
+  interval = "simultaneous", n_vals = 200, n_sim = 1000, seed = 42)
+
+# Nonlinear response differences: simultaneous coverage across all pairs
+set.seed(42)
+df$count <- rpois(nrow(df), exp(0.2 + sin(3 * df$x2) + as.integer(df$fac) / 3))
+mp <- gam(count ~ fac + s(x2, by = fac), family = poisson(),
+  data = df, method = "REML")
+conditional_differences(mp, by = "fac", condition = "x2", scale = "response",
+  uncertainty = "simulation", interval = "simultaneous",
+  simultaneous_scope = "all", n_vals = 200, n_sim = 1000, seed = 42) |>
+  draw()
 }
