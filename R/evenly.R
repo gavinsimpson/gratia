@@ -4,9 +4,11 @@
 #'   create a sequence of `n` evenly-spaced values over the range `lower`
 #'   -- `upper`. By default, `lower` is defined as `min(x)` and `upper` as
 #'   `max(x)`, excluding `NA`s. For a factor `x`, the function returns
-#'   `levels(x)`.
+#'   each level once as a factor, preserving its levels and ordered status.
+#'   `all_levels()` is an alias of `evenly()` with a name intended for factors.
 #'
-#' @param x numeric; vector over which evenly-spaced values are returned
+#' @param x numeric or factor; vector over which evenly-spaced values or factor
+#'   levels are returned.
 #' @param n numeric; the number of evenly-spaced values to return. A default of
 #'   `100` is used for convenience as that what is typically used when
 #'   evaluating a smooth.
@@ -16,7 +18,8 @@
 #' @param lower numeric; the lower bound of the interval.
 #' @param upper numeric; the upper bound of the interval.
 #'
-#' @return A numeric vector of length `n`.
+#' @return A numeric vector of length `n`, or a factor containing each level of
+#'   `x` once, with the same levels and ordered status as `x`.
 #'
 #' @seealso See [base::seq()] for details of the behaviour of `evenly()` when
 #'   using `by`.
@@ -55,6 +58,10 @@
   }
   out
 }
+
+#' @rdname evenly
+#' @export
+`all_levels` <- evenly
 
 #' @rdname evenly
 `seq_min_max` <- function(x, n, by = NULL, lower = NULL, upper = NULL) {

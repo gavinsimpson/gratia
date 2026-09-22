@@ -40,6 +40,8 @@
 
 ## New features
 
+* `all_levels()` is now an alias of `evenly()` with a name intended for factors (#217).
+
 * `data_slice()` gains a `.by` argument to evaluate slice expressions within
   observed groups. For example, `x = evenly(x)` now supports a separate range
   for each level of a factor. Convenient for models with factor `by` smooths

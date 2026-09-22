@@ -2,15 +2,19 @@
 % Please edit documentation in R/evenly.R
 \name{evenly}
 \alias{evenly}
+\alias{all_levels}
 \alias{seq_min_max}
 \title{Create a sequence of evenly-spaced values}
 \usage{
 evenly(x, n = 100, by = NULL, lower = NULL, upper = NULL)
 
+all_levels(x, n = 100, by = NULL, lower = NULL, upper = NULL)
+
 seq_min_max(x, n, by = NULL, lower = NULL, upper = NULL)
 }
 \arguments{
-\item{x}{numeric; vector over which evenly-spaced values are returned}
+\item{x}{numeric or factor; vector over which evenly-spaced values or factor
+levels are returned.}
 
 \item{n}{numeric; the number of evenly-spaced values to return. A default of
 \code{100} is used for convenience as that what is typically used when
@@ -25,14 +29,16 @@ increments of \code{by}.}
 \item{upper}{numeric; the upper bound of the interval.}
 }
 \value{
-A numeric vector of length \code{n}.
+A numeric vector of length \code{n}, or a factor containing each level of
+\code{x} once, with the same levels and ordered status as \code{x}.
 }
 \description{
 For a continuous vector \code{x}, \code{evenly} and \code{seq_min_max()}
 create a sequence of \code{n} evenly-spaced values over the range \code{lower}
 -- \code{upper}. By default, \code{lower} is defined as \code{min(x)} and \code{upper} as
 \code{max(x)}, excluding \code{NA}s. For a factor \code{x}, the function returns
-\code{levels(x)}.
+each level once as a factor, preserving its levels and ordered status.
+\code{all_levels()} is an alias of \code{evenly()} with a name intended for factors.
 }
 \examples{
 \dontshow{
