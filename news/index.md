@@ -60,6 +60,12 @@
 
 ### New features
 
+- [`all_levels()`](https://gavinsimpson.github.io/gratia/reference/evenly.md)
+  is now an alias of
+  [`evenly()`](https://gavinsimpson.github.io/gratia/reference/evenly.md)
+  with a name intended for factors
+  ([\#217](https://github.com/gavinsimpson/gratia/issues/217)).
+
 - [`data_slice()`](https://gavinsimpson.github.io/gratia/reference/data_slice.md)
   gains a `.by` argument to evaluate slice expressions within observed
   groups. For example, `x = evenly(x)` now supports a separate range for

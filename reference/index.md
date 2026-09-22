@@ -173,6 +173,7 @@
   **\[deprecated\]** : Evaluate a smooth
 
 - [`evenly()`](https://gavinsimpson.github.io/gratia/reference/evenly.md)
+  [`all_levels()`](https://gavinsimpson.github.io/gratia/reference/evenly.md)
   [`seq_min_max()`](https://gavinsimpson.github.io/gratia/reference/evenly.md)
   : Create a sequence of evenly-spaced values
 

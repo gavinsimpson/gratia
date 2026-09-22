@@ -309,8 +309,8 @@ helper functions:
   shown above will use the lower and upper limits of the vector `x`.
   Arguments `lower` and `upper` can be used to change one or both of the
   upper or lower bounds.
-- `evenly(fct)` — produces a new factor containing each level of the
-  specified factor `fct` just once,
+- `evenly(fct)` (alias `all_levels(fct)`) — produces a new factor
+  containing each level of the specified factor `fct` just once,
 - `ref_level(fct)` — creates a new factor containing just the reference
   level of the specified factor covariate `fct`, and
 - `level(fct, "level")` — creates a factor with requested `"level"` from

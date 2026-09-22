@@ -3,11 +3,13 @@
 create a sequence of n evenly-spaced values over the range lower
 – upper. By default, lower is defined as min(x) and upper as
 max(x), excluding NAs. For a factor x, the function returns
-levels(x)."><meta property="og:description" content="For a continuous vector x, evenly and seq_min_max()
+each level once as a factor, preserving its levels and ordered status.
+all_levels() is an alias of evenly() with a name intended for factors."><meta property="og:description" content="For a continuous vector x, evenly and seq_min_max()
 create a sequence of n evenly-spaced values over the range lower
 – upper. By default, lower is defined as min(x) and upper as
 max(x), excluding NAs. For a factor x, the function returns
-levels(x)."><meta property="og:image" content="https://gavinsimpson.github.io/gratia/reference/figures/README-draw-gam-figure-1.png"><meta property="og:image:alt" content="Plot produced by draw() of 4 smooth functions from a fitted generalized additive model"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@ucfagls"><meta name="twitter:site" content="@ucfagls"></head><body>
+each level once as a factor, preserving its levels and ordered status.
+all_levels() is an alias of evenly() with a name intended for factors."><meta property="og:image" content="https://gavinsimpson.github.io/gratia/reference/figures/README-draw-gam-figure-1.png"><meta property="og:image:alt" content="Plot produced by draw() of 4 smooth functions from a fitted generalized additive model"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:creator" content="@ucfagls"><meta name="twitter:site" content="@ucfagls"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -15,7 +17,7 @@ levels(x)."><meta property="og:image" content="https://gavinsimpson.github.io/gr
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-29</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-30</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,12 +56,15 @@ levels(x)."><meta property="og:image" content="https://gavinsimpson.github.io/gr
 create a sequence of <code>n</code> evenly-spaced values over the range <code>lower</code>
 – <code>upper</code>. By default, <code>lower</code> is defined as <code>min(x)</code> and <code>upper</code> as
 <code>max(x)</code>, excluding <code>NA</code>s. For a factor <code>x</code>, the function returns
-<code>levels(x)</code>.</p>
+each level once as a factor, preserving its levels and ordered status.
+<code>all_levels()</code> is an alias of <code>evenly()</code> with a name intended for factors.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">evenly</span><span class="op">(</span><span class="va">x</span>, n <span class="op">=</span> <span class="fl">100</span>, by <span class="op">=</span> <span class="cn">NULL</span>, lower <span class="op">=</span> <span class="cn">NULL</span>, upper <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">all_levels</span><span class="op">(</span><span class="va">x</span>, n <span class="op">=</span> <span class="fl">100</span>, by <span class="op">=</span> <span class="cn">NULL</span>, lower <span class="op">=</span> <span class="cn">NULL</span>, upper <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">seq_min_max</span><span class="op">(</span><span class="va">x</span>, <span class="va">n</span>, by <span class="op">=</span> <span class="cn">NULL</span>, lower <span class="op">=</span> <span class="cn">NULL</span>, upper <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -69,7 +74,8 @@ create a sequence of <code>n</code> evenly-spaced values over the range <code>lo
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>numeric; vector over which evenly-spaced values are returned</p></dd>
+<dd><p>numeric or factor; vector over which evenly-spaced values or factor
+levels are returned.</p></dd>
 
 
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
@@ -94,7 +100,8 @@ increments of <code>by</code>.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A numeric vector of length <code>n</code>.</p>
+    <p>A numeric vector of length <code>n</code>, or a factor containing each level of
+<code>x</code> once, with the same levels and ordered status as <code>x</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

@@ -3,12 +3,16 @@
 For a continuous vector `x`, `evenly` and `seq_min_max()` create a
 sequence of `n` evenly-spaced values over the range `lower` – `upper`.
 By default, `lower` is defined as `min(x)` and `upper` as `max(x)`,
-excluding `NA`s. For a factor `x`, the function returns `levels(x)`.
+excluding `NA`s. For a factor `x`, the function returns each level once
+as a factor, preserving its levels and ordered status. `all_levels()` is
+an alias of `evenly()` with a name intended for factors.
 
 ## Usage
 
 ``` r
 evenly(x, n = 100, by = NULL, lower = NULL, upper = NULL)
+
+all_levels(x, n = 100, by = NULL, lower = NULL, upper = NULL)
 
 seq_min_max(x, n, by = NULL, lower = NULL, upper = NULL)
 ```
@@ -17,7 +21,8 @@ seq_min_max(x, n, by = NULL, lower = NULL, upper = NULL)
 
 - x:
 
-  numeric; vector over which evenly-spaced values are returned
+  numeric or factor; vector over which evenly-spaced values or factor
+  levels are returned.
 
 - n:
 
@@ -41,7 +46,8 @@ seq_min_max(x, n, by = NULL, lower = NULL, upper = NULL)
 
 ## Value
 
-A numeric vector of length `n`.
+A numeric vector of length `n`, or a factor containing each level of `x`
+once, with the same levels and ordered status as `x`.
 
 ## See also
 
