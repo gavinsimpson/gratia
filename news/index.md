@@ -4,6 +4,16 @@
 
 ### User visible changes
 
+- Tweedie family quantile and CDF functions now use fast Poisson-Gamma
+  mixtures by default for `1 < p < 2`, including uniform QQ diagnostics
+  and PIT/quantile residuals
+  ([\#410](https://github.com/gavinsimpson/gratia/issues/410)). The
+  Gamma case (`p = 2`) uses native R distribution functions. Expensive
+  inversion remains opt-in with `fallback = TRUE`; it requires the
+  optional `tweedie` package, now in Suggests. Default mixture
+  calculations warn and return available approximations when their
+  work/accuracy limits are reached.
+
 - [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
   [`qq_plot()`](https://gavinsimpson.github.io/gratia/reference/qq_plot.md),
   and
