@@ -54,8 +54,10 @@ conditional_values(
 
 - data:
 
-  data frame of values at which to predict. If supplied overrides values
-  supplied through `condition`.
+  optional data frame used to generate condition values and determine
+  covariate classes. Explicit values in `condition` take precedence.
+  Other covariates use the fitted model's typical values. The rows of
+  `data` are not used directly as a prediction grid.
 
 - scale:
 

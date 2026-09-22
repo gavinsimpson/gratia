@@ -70,6 +70,16 @@
 
 ### New features
 
+- [`conditional_differences()`](https://gavinsimpson.github.io/gratia/reference/conditional_differences.md)
+  compares conditional fitted values between factor levels or joint
+  factor combinations on the link or response scale. Pointwise
+  uncertainty intervals use the delta method or shared posterior
+  simulations, and
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  plots the differences and their intervals
+  ([\#143](https://github.com/gavinsimpson/gratia/issues/143),
+  [\#145](https://github.com/gavinsimpson/gratia/issues/145)).
+
 - [`all_levels()`](https://gavinsimpson.github.io/gratia/reference/evenly.md)
   is now an alias of
   [`evenly()`](https://gavinsimpson.github.io/gratia/reference/evenly.md)

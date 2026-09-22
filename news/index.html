@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-31</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-32</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +57,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li><p><code><a href="../reference/evenly.html">all_levels()</a></code> is now an alias of <code><a href="../reference/evenly.html">evenly()</a></code> with a name intended for factors (<a href="https://github.com/gavinsimpson/gratia/issues/217" class="external-link">#217</a>).</p></li>
+<ul><li><p><code><a href="../reference/conditional_differences.html">conditional_differences()</a></code> compares conditional fitted values between factor levels or joint factor combinations on the link or response scale. Pointwise uncertainty intervals use the delta method or shared posterior simulations, and <code><a href="../reference/draw.html">draw()</a></code> plots the differences and their intervals (<a href="https://github.com/gavinsimpson/gratia/issues/143" class="external-link">#143</a>, <a href="https://github.com/gavinsimpson/gratia/issues/145" class="external-link">#145</a>).</p></li>
+<li><p><code><a href="../reference/evenly.html">all_levels()</a></code> is now an alias of <code><a href="../reference/evenly.html">evenly()</a></code> with a name intended for factors (<a href="https://github.com/gavinsimpson/gratia/issues/217" class="external-link">#217</a>).</p></li>
 <li><p><code><a href="../reference/data_slice.html">data_slice()</a></code> gains a <code>.by</code> argument to evaluate slice expressions within observed groups. For example, <code>x = evenly(x)</code> now supports a separate range for each level of a factor. Convenient for models with factor <code>by</code> smooths (<a href="https://github.com/gavinsimpson/gratia/issues/196" class="external-link">#196</a>).</p></li>
 <li><p><code><a href="../reference/conditional_values.html">conditional_values()</a></code> now accepts <code>complete = FALSE</code> to retain only observed combinations of factor conditions, while preserving numeric prediction grids (<a href="https://github.com/gavinsimpson/gratia/issues/337" class="external-link">#337</a>).</p></li>
 <li><p><code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> now offers simultaneous intervals for differences of smooths at the supplied covariate combinations, separately for each pair of factor levels, via <code>interval = "simultaneous"</code> (<a href="https://github.com/gavinsimpson/gratia/issues/380" class="external-link">#380</a>). Pointwise intervals remain the default.</p></li>

@@ -19,7 +19,7 @@ marginaleffects::plot_predictions()."><meta property="og:image" content="https:/
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-31</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-32</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -106,8 +106,10 @@ the rows and the third element is mapped to the columns of
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>data frame of values at which to predict. If supplied overrides
-values supplied through <code>condition</code>.</p></dd>
+<dd><p>optional data frame used to generate condition values and
+determine covariate classes. Explicit values in <code>condition</code> take precedence.
+Other covariates use the fitted model's typical values. The rows of <code>data</code>
+are not used directly as a prediction grid.</p></dd>
 
 
 <dt id="arg-scale">scale<a class="anchor" aria-label="anchor" href="#arg-scale"></a></dt>

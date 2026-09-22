@@ -66,6 +66,9 @@
 - [`compare_smooths()`](https://gavinsimpson.github.io/gratia/reference/compare_smooths.md)
   : Compare smooths across models
 
+- [`conditional_differences()`](https://gavinsimpson.github.io/gratia/reference/conditional_differences.md)
+  : Conditional differences of fitted values from a GAM
+
 - [`conditional_values()`](https://gavinsimpson.github.io/gratia/reference/conditional_values.md)
   : Conditional predictions from a GAM
 
@@ -109,6 +112,9 @@
 
 - [`draw(`*`<compare_smooths>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.compare_smooths.md)
   : Plot comparisons of smooths
+
+- [`draw(`*`<conditional_differences>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.conditional_differences.md)
+  : Plot conditional differences
 
 - [`draw(`*`<conditional_values>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.conditional_values.md)
   : Plot conditional predictions
