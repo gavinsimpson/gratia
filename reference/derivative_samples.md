@@ -69,14 +69,13 @@ derivative_samples(
   character; name of the focal variable. The response derivative of the
   response with respect to this variable will be returned. All other
   variables involved in the model will be held at constant values. This
-  can be missing if supplying `data`, in which case, the focal variable
-  will be identified as the one variable that is not constant.
+  must be supplied.
 
 - data:
 
   a data frame containing the values of the model covariates at which to
-  evaluate the first derivatives of the smooths. If supplied, all but
-  one variable must be held at a constant value.
+  evaluate derivatives of fitted values. If supplied, all but one
+  variable must be held at a constant value.
 
 - order:
 
@@ -91,7 +90,7 @@ derivative_samples(
 
   character; should the derivative be estimated on the response or the
   linear predictor (link) scale? One of `"response"` (the default), or
-  `"linear predictor"`.
+  `"linear_predictor"`.
 
 - method:
 
@@ -102,7 +101,7 @@ derivative_samples(
   version of the posterior covariance matrix. `"inla"` uses a variant of
   Integrated Nested Laplace Approximation due to Wood (2019), (currently
   not implemented). `"user"` allows for user-supplied posterior draws
-  (currently not implemented).
+  via `draws` in `...`.
 
 - n:
 
@@ -128,8 +127,8 @@ derivative_samples(
 
 - n_sim:
 
-  integer; the number of simulations used in computing the simultaneous
-  intervals.
+  integer; number of posterior draws. Ignored when using user-supplied
+  draws.
 
 - level:
 

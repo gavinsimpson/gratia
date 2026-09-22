@@ -70,11 +70,17 @@
 
 ### New features
 
+- [`response_derivatives()`](https://gavinsimpson.github.io/gratia/reference/response_derivatives.md)
+  now supports delta-method standard errors and pointwise intervals via
+  `uncertainty = "delta"`. Both uncertainty methods return `.se`, with
+  posterior simulation remaining the default.
+
 - [`conditional_differences()`](https://gavinsimpson.github.io/gratia/reference/conditional_differences.md)
   compares conditional fitted values between factor levels or joint
-  factor combinations on the link or response scale. Pointwise
-  uncertainty intervals use the delta method or shared posterior
-  simulations, and
+  factor combinations on the link or response scale, with pointwise or
+  simultaneous intervals using the delta method or shared posterior
+  simulations. Simultaneous bands can cover each comparison separately
+  or all comparisons jointly via `simultaneous_scope`, and
   [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
   plots the differences and their intervals
   ([\#143](https://github.com/gavinsimpson/gratia/issues/143),

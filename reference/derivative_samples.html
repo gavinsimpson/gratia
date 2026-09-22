@@ -111,13 +111,12 @@
 <dd><p>character; name of the focal variable. The response derivative
 of the response with respect to this variable will be returned.
 All other variables involved in the model will be held at constant values.
-This can be missing if supplying <code>data</code>, in which case, the focal variable
-will be identified as the one variable that is not constant.</p></dd>
+This must be supplied.</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>a data frame containing the values of the model covariates
-at which to evaluate the first derivatives of the smooths. If supplied,
+at which to evaluate derivatives of fitted values. If supplied,
 all but one variable must be held at a constant value.</p></dd>
 
 
@@ -133,7 +132,7 @@ all but one variable must be held at a constant value.</p></dd>
 <dt id="arg-scale">scale<a class="anchor" aria-label="anchor" href="#arg-scale"></a></dt>
 <dd><p>character; should the derivative be estimated on the response
 or the linear predictor (link) scale? One of <code>"response"</code> (the default),
-or <code>"linear predictor"</code>.</p></dd>
+or <code>"linear_predictor"</code>.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
@@ -144,7 +143,7 @@ that alternates t proposals with proposals based on a shrunken version of
 the posterior covariance matrix. <code>"inla"</code> uses a variant of Integrated
 Nested Laplace Approximation due to Wood (2019), (currently not
 implemented). <code>"user"</code> allows for user-supplied posterior draws
-(currently not implemented).</p></dd>
+via <code>draws</code> in <code>...</code>.</p></dd>
 
 
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
@@ -169,8 +168,8 @@ for second central differences they are each <code>eps</code> from the target.</
 
 
 <dt id="arg-n-sim">n_sim<a class="anchor" aria-label="anchor" href="#arg-n-sim"></a></dt>
-<dd><p>integer; the number of simulations used in computing the
-simultaneous intervals.</p></dd>
+<dd><p>integer; number of posterior draws. Ignored when using
+user-supplied draws.</p></dd>
 
 
 <dt id="arg-level">level<a class="anchor" aria-label="anchor" href="#arg-level"></a></dt>

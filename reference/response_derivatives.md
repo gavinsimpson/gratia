@@ -28,7 +28,9 @@ response_derivatives(
   level = 0.95,
   seed = NULL,
   mvn_method = c("mvnfast", "mgcv"),
-  ...
+  ...,
+  uncertainty = c("simulation", "delta"),
+  unconditional = FALSE
 )
 
 # S3 method for class 'scam'
@@ -46,7 +48,9 @@ response_derivatives(
   level = 0.95,
   seed = NULL,
   mvn_method = c("mvnfast", "mgcv"),
-  ...
+  ...,
+  uncertainty = c("simulation", "delta"),
+  unconditional = FALSE
 )
 ```
 
@@ -58,22 +62,24 @@ response_derivatives(
 
 - ...:
 
-  arguments passed to other methods and on to
-  [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
+  arguments passed to posterior sampling or prediction, such as `draws`,
+  `envir`, and `exclude`. `freq = TRUE` selects frequentist coefficient
+  covariance for delta uncertainty or Gaussian draws. For delta
+  uncertainty, `newdata`, `se.fit`, and `terms` are not supported; use
+  `data` and `exclude`.
 
 - focal:
 
   character; name of the focal variable. The response derivative of the
   response with respect to this variable will be returned. All other
   variables involved in the model will be held at constant values. This
-  can be missing if supplying `data`, in which case, the focal variable
-  will be identified as the one variable that is not constant.
+  must be supplied.
 
 - data:
 
   a data frame containing the values of the model covariates at which to
-  evaluate the first derivatives of the smooths. If supplied, all but
-  one variable must be held at a constant value.
+  evaluate derivatives of fitted values. If supplied, all but one
+  variable must be held at a constant value.
 
 - order:
 
@@ -88,7 +94,7 @@ response_derivatives(
 
   character; should the derivative be estimated on the response or the
   linear predictor (link) scale? One of `"response"` (the default), or
-  `"linear predictor"`.
+  `"linear_predictor"`.
 
 - method:
 
@@ -99,7 +105,7 @@ response_derivatives(
   version of the posterior covariance matrix. `"inla"` uses a variant of
   Integrated Nested Laplace Approximation due to Wood (2019), (currently
   not implemented). `"user"` allows for user-supplied posterior draws
-  (currently not implemented).
+  via `draws` in `...`.
 
 - n:
 
@@ -125,8 +131,8 @@ response_derivatives(
 
 - n_sim:
 
-  integer; the number of simulations used in computing the simultaneous
-  intervals.
+  integer; number of posterior draws. Ignored when using user-supplied
+  draws.
 
 - level:
 
@@ -146,6 +152,20 @@ response_derivatives(
   but which might not work for some marginal fits, such as those where
   the covariance matrix is close to singular.
 
+- uncertainty:
+
+  character; `"simulation"` (default) uses posterior draws and
+  equal-tailed intervals; `"delta"` uses the delta method and normal
+  intervals. Both methods return pointwise intervals. Sampler controls,
+  including `n_sim`, `method`, and `seed`, are ignored for delta
+  uncertainty.
+
+- unconditional:
+
+  logical; include smoothing-parameter uncertainty in the Bayesian
+  covariance, if available, for delta intervals and Gaussian draws. This
+  does not modify MH or user-supplied draws.
+
 ## Value
 
 A tibble, currently with the following variables:
@@ -156,14 +176,38 @@ A tibble, currently with the following variables:
 - `.focal`: the name of the variable for which the partial derivative
   was evaluated,
 
-- `.derivative`: the estimated partial derivative,
+- `.derivative`: the posterior median for simulation uncertainty, or the
+  finite difference of fitted predictions for delta uncertainty,
 
-- `.lower_ci`: the lower bound of the confidence or interval,
+- `.se`: posterior standard deviation for simulation uncertainty (`NA`
+  with only one draw), or the delta-method standard error,
 
-- `.upper_ci`: the upper bound of the confidence or interval,
+- `.lower_ci`: the lower bound of the pointwise interval,
+
+- `.upper_ci`: the upper bound of the pointwise interval,
 
 - additional columns containing the covariate values at which the
   derivative was evaluated.
+
+## Details
+
+Delta uncertainty uses the same shifted prediction rows and
+finite-difference formulas as simulation, for both first and second
+derivatives. It applies those formulas to the coefficient gradients of
+fitted means and propagates their full joint covariance. Formula offsets
+are included in predictions. Intervals concern derivatives of the
+conditional mean, not future observations. With Bayesian coefficient
+covariance, delta intervals have an approximate posterior
+interpretation. They are symmetric and may differ from simulation
+intervals when posterior transformations are strongly nonlinear; the two
+methods' point estimates can also differ.
+
+Delta uncertainty supports single-linear-predictor `gam` and `bam`
+models with an ordinary scalar inverse-link mean (including negative
+binomial, Tweedie, beta regression, and scaled t families), and `gamm`
+via its GAM component. It is not supported for `scam` or general
+multi-predictor families; their existing simulation support is
+unchanged. The `uncertainty` attribute records the selected method.
 
 ## Author
 
@@ -207,6 +251,10 @@ p1 <- fv |>
     title = "Estimated count as a function of x2",
     y = "Estimated count"
   )
+
+# pointwise normal intervals from the delta method
+y_delta <- response_derivatives(m, data = ds, focal = "x2",
+  type = "central", uncertainty = "delta")
 
 # draw response derivatives
 p2 <- y_d |>

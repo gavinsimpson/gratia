@@ -42,7 +42,9 @@ conditional_differences(
   t_df = 40,
   rw_scale = 0.25,
   envir = NULL,
-  ...
+  ...,
+  interval = c("confidence", "simultaneous"),
+  simultaneous_scope = c("contrast", "all")
 )
 ```
 
@@ -114,26 +116,31 @@ conditional_differences(
 
   character; `"delta"` uses analytic link-scale or delta-method
   response-scale standard errors and normal intervals. `"simulation"`
-  uses shared posterior coefficient draws and equal-tailed quantiles of
-  the resulting differences.
+  uses shared posterior coefficient draws, with equal-tailed quantiles
+  for pointwise intervals or calibrated symmetric simultaneous bands.
 
 - n_sim:
 
-  integer; number of posterior draws for simulation uncertainty. Ignored
-  for `method = "user"`, which uses all supplied draws.
+  integer; number of draws for posterior simulation or calibration of
+  delta-method simultaneous intervals. Ignored for pointwise delta
+  intervals and for simulation with `method = "user"`, which uses all
+  supplied draws.
 
 - seed:
 
-  integer or `NULL`; seed passed to
-  [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md).
-  An explicit seed makes simulation reproducible and preserves the
-  caller's RNG state.
+  integer or `NULL`; seed for posterior simulation or delta-method
+  simultaneous calibration. An explicit seed preserves the caller's RNG
+  state. With `NULL`, delta-method calibration advances the current RNG
+  state; posterior simulation follows
+  [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
+  seed handling.
 
 - n_cores:
 
-  integer; number of CPU cores to use when generating multivariate
-  normal distributed random values. Only used if
-  `mvn_method = "mvnfast"` **and** `method = "gaussian"`.
+  integer; number of cores used by
+  [`mvnfast::rmvn()`](https://rdrr.io/pkg/mvnfast/man/rmvn.html) for
+  delta-method simultaneous calibration, or passed to
+  [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md).
 
 - method:
 
@@ -185,6 +192,19 @@ conditional_differences(
   model expressions. The available model formula environment is used
   when `NULL`. Covariate observations should be supplied in `data`.
 
+- interval:
+
+  character; `"confidence"` (the default) gives pointwise intervals;
+  `"simultaneous"` gives simultaneous intervals over the evaluated
+  covariate combinations.
+
+- simultaneous_scope:
+
+  character; `"contrast"` calibrates a separate band for each pair,
+  jointly over all its evaluation points and conditioning strata.
+  `"all"` calibrates one band jointly over every returned comparison and
+  evaluation point. Ignored for pointwise intervals.
+
 ## Value
 
 A tibble of class `"conditional_differences"`, with `.contrast`,
@@ -193,7 +213,9 @@ A tibble of class `"conditional_differences"`, with `.contrast`,
 deviation of difference draws. A single comparison factor has `.level_1`
 and `.level_2` columns. Multiple factors have `<factor>_1` and
 `<factor>_2` columns. Attributes record `by`, `condition`, `scale`,
-`uncertainty`, `ci_level`, `exclude`, and plotting `channels`.
+`uncertainty`, `ci_level`, `exclude`, `interval`, `simultaneous_scope`,
+and plotting `channels`. Simultaneous results also contain `.crit`, the
+calibrated critical value, constant within each coverage set.
 
 ## Details
 
@@ -203,15 +225,39 @@ On the response scale the inverse link is applied to each prediction
 before subtraction. Shared terms can therefore affect response-scale
 differences even when they cancel on the link scale.
 
-Intervals are pointwise, not simultaneous across the grid or
-comparisons. They describe uncertainty in conditional mean differences,
-not observation noise. Simulation uses
+Intervals describe uncertainty in conditional mean differences, not
+observation noise. Simulation uses
 [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
 once for the entire prediction grid, retaining dependence between
 predictions by subtracting within draws. The estimate is always the
-difference of fitted predictions; simulation intervals need not be
-centred on this estimate. Simulation controls are ignored when
-`uncertainty = "delta"`.
+difference of fitted predictions. Pointwise simulation intervals need
+not be centred on this estimate.
+
+Simultaneous intervals use the `ci_level` quantile of the maximum
+absolute standardized deviation over the selected coverage set. They are
+symmetric about `.diff`, with half-width `.crit * .se`. For
+`uncertainty = "delta"`, one shared batch of zero-mean Gaussian
+coefficient deviations is generated from the Bayesian covariance matrix
+using [`mvnfast::rmvn()`](https://rdrr.io/pkg/mvnfast/man/rmvn.html).
+Response-scale differences use a first-order Taylor approximation. The
+covariance must be positive definite. Sampler arguments `method`,
+`draws`, `mvn_method`, `burnin`, `thin`, `t_df`, and `rw_scale` apply
+only to `uncertainty = "simulation"`.
+
+For `uncertainty = "simulation"`, deviations are posterior difference
+draws minus `.diff`, standardized by their sample standard deviations.
+Draws are transformed to the response scale before differencing; invalid
+inverse-link domains or response means cause an error rather than
+discarded draws. Zero-variance draws that disagree with `.diff` cannot
+calibrate a band and cause an error. Deterministic rows agreeing with
+`.diff` have zero width.
+
+Simultaneous coverage is approximate posterior coverage on the finite
+evaluation grid, not between its points or outside its range, nor exact
+frequentist coverage. Increase `n_vals` to evaluate a denser grid. Bands
+are not clipped to the response-difference range (e.g. -1, 1 for
+probabilities). They need not contain the equal-tailed pointwise
+simulation intervals.
 
 `exclude` sets the named term contributions to zero. In particular,
 excluding random effects does not integrate over their distribution.
@@ -266,4 +312,33 @@ conditional_differences(m, by = "fac", condition = "x2",
 #>  9         1 1        2         3.11 0.562      2.01      4.19 0.0836  0.462
 #> 10         1 1        2         3.16 0.536      2.10      4.20 0.0937  0.462
 #> # i 290 more rows
+
+# Link-scale simultaneous bands, separately for each comparison
+conditional_differences(m, by = "fac", condition = "x2", scale = "link",
+  interval = "simultaneous", n_vals = 200, n_sim = 1000, seed = 42)
+#> # A tibble: 600 x 10
+#>    .contrast .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2    x0
+#>        <int> <fct>    <fct>    <dbl> <dbl>     <dbl>     <dbl>   <dbl> <dbl>
+#>  1         1 1        2         2.76 0.859     0.338      5.18 0.00325 0.462
+#>  2         1 1        2         2.78 0.836     0.424      5.14 0.00825 0.462
+#>  3         1 1        2         2.80 0.814     0.509      5.10 0.0132  0.462
+#>  4         1 1        2         2.83 0.792     0.593      5.06 0.0182  0.462
+#>  5         1 1        2         2.85 0.770     0.675      5.02 0.0232  0.462
+#>  6         1 1        2         2.87 0.749     0.756      4.98 0.0282  0.462
+#>  7         1 1        2         2.89 0.729     0.836      4.95 0.0332  0.462
+#>  8         1 1        2         2.91 0.709     0.913      4.92 0.0382  0.462
+#>  9         1 1        2         2.94 0.690     0.989      4.88 0.0432  0.462
+#> 10         1 1        2         2.96 0.672     1.06       4.85 0.0482  0.462
+#> # i 590 more rows
+#> # i 1 more variable: .crit <dbl>
+
+# Nonlinear response differences: simultaneous coverage across all pairs
+set.seed(42)
+df$count <- rpois(nrow(df), exp(0.2 + sin(3 * df$x2) + as.integer(df$fac) / 3))
+mp <- gam(count ~ fac + s(x2, by = fac), family = poisson(),
+  data = df, method = "REML")
+conditional_differences(mp, by = "fac", condition = "x2", scale = "response",
+  uncertainty = "simulation", interval = "simultaneous",
+  simultaneous_scope = "all", n_vals = 200, n_sim = 1000, seed = 42) |>
+  draw()
 ```

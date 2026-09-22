@@ -70,7 +70,9 @@
 <span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  mvn_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mvnfast"</span>, <span class="st">"mgcv"</span><span class="op">)</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  uncertainty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"simulation"</span>, <span class="st">"delta"</span><span class="op">)</span>,</span>
+<span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'scam'</span></span>
@@ -88,7 +90,9 @@
 <span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  mvn_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mvnfast"</span>, <span class="st">"mgcv"</span><span class="op">)</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  uncertainty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"simulation"</span>, <span class="st">"delta"</span><span class="op">)</span>,</span>
+<span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -101,20 +105,22 @@
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>arguments passed to other methods and on to <code><a href="fitted_samples.html">fitted_samples()</a></code></p></dd>
+<dd><p>arguments passed to posterior sampling or prediction, such as
+<code>draws</code>, <code>envir</code>, and <code>exclude</code>. <code>freq = TRUE</code> selects frequentist coefficient
+covariance for delta uncertainty or Gaussian draws. For delta uncertainty,
+<code>newdata</code>, <code>se.fit</code>, and <code>terms</code> are not supported; use <code>data</code> and <code>exclude</code>.</p></dd>
 
 
 <dt id="arg-focal">focal<a class="anchor" aria-label="anchor" href="#arg-focal"></a></dt>
 <dd><p>character; name of the focal variable. The response derivative
 of the response with respect to this variable will be returned.
 All other variables involved in the model will be held at constant values.
-This can be missing if supplying <code>data</code>, in which case, the focal variable
-will be identified as the one variable that is not constant.</p></dd>
+This must be supplied.</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>a data frame containing the values of the model covariates
-at which to evaluate the first derivatives of the smooths. If supplied,
+at which to evaluate derivatives of fitted values. If supplied,
 all but one variable must be held at a constant value.</p></dd>
 
 
@@ -130,7 +136,7 @@ all but one variable must be held at a constant value.</p></dd>
 <dt id="arg-scale">scale<a class="anchor" aria-label="anchor" href="#arg-scale"></a></dt>
 <dd><p>character; should the derivative be estimated on the response
 or the linear predictor (link) scale? One of <code>"response"</code> (the default),
-or <code>"linear predictor"</code>.</p></dd>
+or <code>"linear_predictor"</code>.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
@@ -141,7 +147,7 @@ that alternates t proposals with proposals based on a shrunken version of
 the posterior covariance matrix. <code>"inla"</code> uses a variant of Integrated
 Nested Laplace Approximation due to Wood (2019), (currently not
 implemented). <code>"user"</code> allows for user-supplied posterior draws
-(currently not implemented).</p></dd>
+via <code>draws</code> in <code>...</code>.</p></dd>
 
 
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
@@ -166,8 +172,8 @@ for second central differences they are each <code>eps</code> from the target.</
 
 
 <dt id="arg-n-sim">n_sim<a class="anchor" aria-label="anchor" href="#arg-n-sim"></a></dt>
-<dd><p>integer; the number of simulations used in computing the
-simultaneous intervals.</p></dd>
+<dd><p>integer; number of posterior draws. Ignored when using
+user-supplied draws.</p></dd>
 
 
 <dt id="arg-level">level<a class="anchor" aria-label="anchor" href="#arg-level"></a></dt>
@@ -186,6 +192,19 @@ numbers of MVN random values than <code><a href="https://rdrr.io/pkg/mgcv/man/rm
 for some marginal fits, such as those where the covariance matrix is close
 to singular.</p></dd>
 
+
+<dt id="arg-uncertainty">uncertainty<a class="anchor" aria-label="anchor" href="#arg-uncertainty"></a></dt>
+<dd><p>character; <code>"simulation"</code> (default) uses posterior draws
+and equal-tailed intervals; <code>"delta"</code> uses the delta method and normal
+intervals. Both methods return pointwise intervals. Sampler controls,
+including <code>n_sim</code>, <code>method</code>, and <code>seed</code>, are ignored for delta uncertainty.</p></dd>
+
+
+<dt id="arg-unconditional">unconditional<a class="anchor" aria-label="anchor" href="#arg-unconditional"></a></dt>
+<dd><p>logical; include smoothing-parameter uncertainty in the
+Bayesian covariance, if available, for delta intervals and Gaussian draws.
+This does not modify MH or user-supplied draws.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -193,12 +212,33 @@ to singular.</p></dd>
 represents</p></li>
 <li><p><code>.focal</code>: the name of the variable for which the partial derivative was
 evaluated,</p></li>
-<li><p><code>.derivative</code>: the estimated partial derivative,</p></li>
-<li><p><code>.lower_ci</code>: the lower bound of the confidence or interval,</p></li>
-<li><p><code>.upper_ci</code>: the upper bound of the confidence or interval,</p></li>
+<li><p><code>.derivative</code>: the posterior median for simulation uncertainty, or the
+finite difference of fitted predictions for delta uncertainty,</p></li>
+<li><p><code>.se</code>: posterior standard deviation for simulation uncertainty (<code>NA</code> with
+only one draw), or the delta-method standard error,</p></li>
+<li><p><code>.lower_ci</code>: the lower bound of the pointwise interval,</p></li>
+<li><p><code>.upper_ci</code>: the upper bound of the pointwise interval,</p></li>
 <li><p>additional columns containing the covariate values at which the derivative
 was evaluated.</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Delta uncertainty uses the same shifted prediction rows and finite-difference
+formulas as simulation, for both first and second derivatives. It applies
+those formulas to the coefficient gradients of fitted means and propagates
+their full joint covariance. Formula offsets are included in predictions.
+Intervals concern derivatives of the conditional mean, not future observations.
+With Bayesian coefficient covariance, delta intervals have an approximate
+posterior interpretation. They are symmetric and may differ from simulation
+intervals when posterior transformations are strongly nonlinear; the two
+methods' point estimates can also differ.</p>
+<p>Delta uncertainty supports single-linear-predictor <code>gam</code> and <code>bam</code> models
+with an ordinary scalar inverse-link mean (including negative binomial,
+Tweedie, beta regression, and scaled t families), and <code>gamm</code> via its GAM
+component. It is not supported for <code>scam</code> or general multi-predictor families;
+their existing simulation support is unchanged.
+The <code>uncertainty</code> attribute records the selected method.</p>
+    </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
     <p>Gavin L. Simpson</p>
@@ -241,6 +281,10 @@ was evaluated.</p></li>
 <span class="r-in"><span>    title <span class="op">=</span> <span class="st">"Estimated count as a function of x2"</span>,</span></span>
 <span class="r-in"><span>    y <span class="op">=</span> <span class="st">"Estimated count"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># pointwise normal intervals from the delta method</span></span></span>
+<span class="r-in"><span><span class="va">y_delta</span> <span class="op">&lt;-</span> <span class="fu">response_derivatives</span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">ds</span>, focal <span class="op">=</span> <span class="st">"x2"</span>,</span></span>
+<span class="r-in"><span>  type <span class="op">=</span> <span class="st">"central"</span>, uncertainty <span class="op">=</span> <span class="st">"delta"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># draw response derivatives</span></span></span>
 <span class="r-in"><span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="va">y_d</span> <span class="op">|&gt;</span></span></span>

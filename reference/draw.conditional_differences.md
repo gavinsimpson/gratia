@@ -1,7 +1,7 @@
 # Plot conditional differences
 
-Display conditional differences with pointwise uncertainty intervals and
-a zero reference line. Each comparison is shown in a separate facet;
+Display conditional differences with pointwise or simultaneous intervals
+and a zero reference line. Each comparison is shown in a separate facet;
 additional conditioning variables use colour and facets as in
 [`draw.conditional_values()`](https://gavinsimpson.github.io/gratia/reference/draw.conditional_values.md).
 

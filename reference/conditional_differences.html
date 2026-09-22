@@ -88,7 +88,9 @@ rather than differences of selected smooth functions.</p>
 <span>  t_df <span class="op">=</span> <span class="fl">40</span>,</span>
 <span>  rw_scale <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  interval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"confidence"</span>, <span class="st">"simultaneous"</span><span class="op">)</span>,</span>
+<span>  simultaneous_scope <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"contrast"</span>, <span class="st">"all"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -158,24 +160,26 @@ This argument does not modify MH or user-supplied draws.</p></dd>
 <dt id="arg-uncertainty">uncertainty<a class="anchor" aria-label="anchor" href="#arg-uncertainty"></a></dt>
 <dd><p>character; <code>"delta"</code> uses analytic link-scale or
 delta-method response-scale standard errors and normal intervals.
-<code>"simulation"</code> uses shared posterior coefficient draws and equal-tailed
-quantiles of the resulting differences.</p></dd>
+<code>"simulation"</code> uses shared posterior coefficient draws, with equal-tailed
+quantiles for pointwise intervals or calibrated symmetric simultaneous bands.</p></dd>
 
 
 <dt id="arg-n-sim">n_sim<a class="anchor" aria-label="anchor" href="#arg-n-sim"></a></dt>
-<dd><p>integer; number of posterior draws for simulation uncertainty.
-Ignored for <code>method = "user"</code>, which uses all supplied draws.</p></dd>
+<dd><p>integer; number of draws for posterior simulation or calibration
+of delta-method simultaneous intervals. Ignored for pointwise delta intervals
+and for simulation with <code>method = "user"</code>, which uses all supplied draws.</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
-<dd><p>integer or <code>NULL</code>; seed passed to <code><a href="fitted_samples.html">fitted_samples()</a></code>. An explicit
-seed makes simulation reproducible and preserves the caller's RNG state.</p></dd>
+<dd><p>integer or <code>NULL</code>; seed for posterior simulation or delta-method
+simultaneous calibration. An explicit seed preserves the caller's RNG state.
+With <code>NULL</code>, delta-method calibration advances the current RNG state;
+posterior simulation follows <code><a href="fitted_samples.html">fitted_samples()</a></code> seed handling.</p></dd>
 
 
 <dt id="arg-n-cores">n_cores<a class="anchor" aria-label="anchor" href="#arg-n-cores"></a></dt>
-<dd><p>integer; number of CPU cores to use when generating
-multivariate normal distributed random values. Only used if
-<code>mvn_method = "mvnfast"</code> <strong>and</strong> <code>method = "gaussian"</code>.</p></dd>
+<dd><p>integer; number of cores used by <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code> for
+delta-method simultaneous calibration, or passed to <code><a href="fitted_samples.html">fitted_samples()</a></code>.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
@@ -222,6 +226,19 @@ matrix when generating random walk proposals. See <code><a href="https://rdrr.io
 in model expressions. The available model formula environment is used when
 <code>NULL</code>. Covariate observations should be supplied in <code>data</code>.</p></dd>
 
+
+<dt id="arg-interval">interval<a class="anchor" aria-label="anchor" href="#arg-interval"></a></dt>
+<dd><p>character; <code>"confidence"</code> (the default) gives pointwise
+intervals; <code>"simultaneous"</code> gives simultaneous intervals over the evaluated
+covariate combinations.</p></dd>
+
+
+<dt id="arg-simultaneous-scope">simultaneous_scope<a class="anchor" aria-label="anchor" href="#arg-simultaneous-scope"></a></dt>
+<dd><p>character; <code>"contrast"</code> calibrates a separate band
+for each pair, jointly over all its evaluation points and conditioning
+strata. <code>"all"</code> calibrates one band jointly over every returned comparison
+and evaluation point. Ignored for pointwise intervals.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -231,7 +248,9 @@ in model expressions. The available model formula environment is used when
 of difference draws. A single comparison factor has <code>.level_1</code> and
 <code>.level_2</code> columns. Multiple factors have <code>&lt;factor&gt;_1</code> and <code>&lt;factor&gt;_2</code>
 columns. Attributes record <code>by</code>, <code>condition</code>, <code>scale</code>, <code>uncertainty</code>,
-<code>ci_level</code>, <code>exclude</code>, and plotting <code>channels</code>.</p>
+<code>ci_level</code>, <code>exclude</code>, <code>interval</code>, <code>simultaneous_scope</code>, and plotting
+<code>channels</code>. Simultaneous results also contain <code>.crit</code>, the calibrated
+critical value, constant within each coverage set.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -240,13 +259,30 @@ levels. Both groups use the same values of all other covariates. On the
 response scale the inverse link is applied to each prediction before
 subtraction. Shared terms can therefore affect response-scale differences
 even when they cancel on the link scale.</p>
-<p>Intervals are pointwise, not simultaneous across the grid or comparisons.
-They describe uncertainty in conditional mean differences, not observation
+<p>Intervals describe uncertainty in conditional mean differences, not observation
 noise. Simulation uses <code><a href="fitted_samples.html">fitted_samples()</a></code> once for the entire prediction
 grid, retaining dependence between predictions by subtracting within draws.
-The estimate is always the difference of fitted predictions; simulation
-intervals need not be centred on this estimate. Simulation controls are
-ignored when <code>uncertainty = "delta"</code>.</p>
+The estimate is always the difference of fitted predictions. Pointwise
+simulation intervals need not be centred on this estimate.</p>
+<p>Simultaneous intervals use the <code>ci_level</code> quantile of the maximum absolute
+standardized deviation over the selected coverage set. They are symmetric
+about <code>.diff</code>, with half-width <code>.crit * .se</code>. For <code>uncertainty = "delta"</code>,
+one shared batch of zero-mean Gaussian coefficient deviations is generated
+from the Bayesian covariance matrix using <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code>. Response-scale
+differences use a first-order Taylor approximation. The covariance must be
+positive definite. Sampler arguments <code>method</code>, <code>draws</code>, <code>mvn_method</code>, <code>burnin</code>,
+<code>thin</code>, <code>t_df</code>, and <code>rw_scale</code> apply only to <code>uncertainty = "simulation"</code>.</p>
+<p>For <code>uncertainty = "simulation"</code>, deviations are posterior difference draws
+minus <code>.diff</code>, standardized by their sample standard deviations. Draws are
+transformed to the response scale before differencing; invalid inverse-link
+domains or response means cause an error rather than discarded draws.
+Zero-variance draws that disagree with <code>.diff</code> cannot calibrate a band and
+cause an error. Deterministic rows agreeing with <code>.diff</code> have zero width.</p>
+<p>Simultaneous coverage is approximate posterior coverage on the finite
+evaluation grid, not between its points or outside its range, nor exact
+frequentist coverage. Increase <code>n_vals</code> to evaluate a denser grid. Bands are
+not clipped to the response-difference range (e.g. -1, 1 for probabilities).
+They need not contain the equal-tailed pointwise simulation intervals.</p>
 <p><code>exclude</code> sets the named term contributions to zero. In particular, excluding
 random effects does not integrate over their distribution. Offsets follow
 <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">mgcv::predict.gam()</a></code> semantics. Supported models are <code>gam</code> and <code>bam</code> fits
@@ -298,6 +334,36 @@ with a single linear predictor and an ordinary scalar inverse-link mean
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>         1 1        2         3.11 0.562      2.01      4.19 0.083<span style="text-decoration: underline;">6</span>  0.462</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>         1 1        2         3.16 0.536      2.10      4.20 0.093<span style="text-decoration: underline;">7</span>  0.462</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 290 more rows</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Link-scale simultaneous bands, separately for each comparison</span></span></span>
+<span class="r-in"><span><span class="fu">conditional_differences</span><span class="op">(</span><span class="va">m</span>, by <span class="op">=</span> <span class="st">"fac"</span>, condition <span class="op">=</span> <span class="st">"x2"</span>, scale <span class="op">=</span> <span class="st">"link"</span>,</span></span>
+<span class="r-in"><span>  interval <span class="op">=</span> <span class="st">"simultaneous"</span>, n_vals <span class="op">=</span> <span class="fl">200</span>, n_sim <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 600 x 10</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    .contrast .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2    x0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>         1 1        2         2.76 0.859     0.338      5.18 0.003<span style="text-decoration: underline;">25</span> 0.462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>         1 1        2         2.78 0.836     0.424      5.14 0.008<span style="text-decoration: underline;">25</span> 0.462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>         1 1        2         2.80 0.814     0.509      5.10 0.013<span style="text-decoration: underline;">2</span>  0.462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>         1 1        2         2.83 0.792     0.593      5.06 0.018<span style="text-decoration: underline;">2</span>  0.462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>         1 1        2         2.85 0.770     0.675      5.02 0.023<span style="text-decoration: underline;">2</span>  0.462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>         1 1        2         2.87 0.749     0.756      4.98 0.028<span style="text-decoration: underline;">2</span>  0.462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>         1 1        2         2.89 0.729     0.836      4.95 0.033<span style="text-decoration: underline;">2</span>  0.462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>         1 1        2         2.91 0.709     0.913      4.92 0.038<span style="text-decoration: underline;">2</span>  0.462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>         1 1        2         2.94 0.690     0.989      4.88 0.043<span style="text-decoration: underline;">2</span>  0.462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>         1 1        2         2.96 0.672     1.06       4.85 0.048<span style="text-decoration: underline;">2</span>  0.462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 590 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 1 more variable: .crit &lt;dbl&gt;</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Nonlinear response differences: simultaneous coverage across all pairs</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">df</span><span class="op">$</span><span class="va">count</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">0.2</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fl">3</span> <span class="op">*</span> <span class="va">df</span><span class="op">$</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">fac</span><span class="op">)</span> <span class="op">/</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mp</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">fac</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span>, by <span class="op">=</span> <span class="va">fac</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">conditional_differences</span><span class="op">(</span><span class="va">mp</span>, by <span class="op">=</span> <span class="st">"fac"</span>, condition <span class="op">=</span> <span class="st">"x2"</span>, scale <span class="op">=</span> <span class="st">"response"</span>,</span></span>
+<span class="r-in"><span>  uncertainty <span class="op">=</span> <span class="st">"simulation"</span>, interval <span class="op">=</span> <span class="st">"simultaneous"</span>,</span></span>
+<span class="r-in"><span>  simultaneous_scope <span class="op">=</span> <span class="st">"all"</span>, n_vals <span class="op">=</span> <span class="fl">200</span>, n_sim <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="conditional_differences-2.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
