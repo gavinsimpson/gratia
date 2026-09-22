@@ -17,8 +17,10 @@
 #'   fourth element is present**, if present, the fourth element is mapped to
 #'   the rows and the third element is mapped to the columns of
 #'   [ggplot2::facet_grid()].
-#' @param data data frame of values at which to predict. If supplied overrides
-#'   values supplied through `condition`.
+#' @param data optional data frame used to generate condition values and
+#'   determine covariate classes. Explicit values in `condition` take precedence.
+#'   Other covariates use the fitted model's typical values. The rows of `data`
+#'   are not used directly as a prediction grid.
 #' @param scale character; which scale should predictions be returned on?
 #' @param n_vals numeric; number of values to generate for numeric variables
 #'   named in `condition`.
@@ -130,61 +132,9 @@
   ...
 ) {
   scale <- match.arg(scale)
-  if (!is.logical(complete) || length(complete) != 1L || is.na(complete)) {
-    stop("'complete' must be a single non-missing logical value")
-  }
-  # replace this with `process_condition` to capture all possible
-  if (is.null(condition)) {
-    stop("'condition' must be supplied")
-  }
-  c_x <- condition[1]
-  c_colour <- condition[2]
-  c_fcol <- condition[3]
-  c_frow <- condition[4]
-
-  c_cond <- c(c_x, c_colour, c_fcol, c_frow) |>
-    setNames(c("x", "colour", "fcol", "frow"))
-
-  c_miss <- is.na(c_cond)
-  c_cond <- c_cond[!c_miss]
-
-  data <- if (is.null(data)) {
-    data <- data_slice_data(model) |> as_tibble()
-  } else {
-    data # probably need some checking here but for now just pass on
-  }
-
-  # the calls below shouldn't be to evenly but to a wrapper
-  # that wrapper can call other functions to create the vectors of data needed
-  # for the prediction set.
-  m_vars <- model_vars(model)
-  cond_list <- process_condition(condition, data = data, variables = m_vars,
-    n_vals = n_vals)
-  named_cond <- names(cond_list)
-
-  # which model vars were *not* included in the conditions?
-  used_vars <- names(cond_list)
-  not_used <- dplyr::setdiff(m_vars, used_vars)
-  tv <- typical_values(model, data = data)
-  tv <- tv[not_used] # |> select(all_of(not_used))
-  cond_list <- c(cond_list, tv)
-
-  # return the data for testing
-  pred_data <- expand_grid(!!!{cond_list})
-
-  if (!complete) {
-    factor_vars <- named_cond[
-      vapply(cond_list[named_cond], is.factor, logical(1L))
-    ]
-    if (length(factor_vars) > 0L) {
-      observed <- data_combos(model, vars = all_of(factor_vars),
-        complete = FALSE, data = data)
-      pred_data <- semi_join(pred_data, observed, by = factor_vars)
-      if (nrow(pred_data) == 0L) {
-        stop("No observed combinations of the supplied factor conditions remain")
-      }
-    }
-  }
+  grid <- conditional_prediction_grid(model, condition, data, n_vals, complete)
+  pred_data <- grid$data
+  named_cond <- grid$condition
 
   pv <- fitted_values(
     model, data = pred_data, scale = scale, ci_level = ci_level, ...
@@ -202,6 +152,93 @@
 
   # return
   pv
+}
+
+# Shared grid construction for conditional predictions and differences.
+# Comparison factors are expanded separately, so they do not consume plotting
+# channels or change which numeric condition is evaluated over its full range.
+conditional_prediction_grid <- function(model, condition, data = NULL,
+                                        n_vals = 100, complete = TRUE,
+                                        by = character()) {
+  if (!is.logical(complete) || length(complete) != 1L || is.na(complete)) {
+    stop("'complete' must be a single non-missing logical value")
+  }
+  if (is.null(condition) || !length(condition)) {
+    stop("'condition' must be supplied")
+  }
+  if (is.null(data)) data <- data_slice_data(model) |> as_tibble()
+  m_vars <- model_vars(model)
+  comparison <- list()
+  if (length(by)) {
+    if (!(is.character(condition) || is.list(condition))) {
+      stop("'condition' must be a list or a character vector")
+    }
+    condition <- as.list(condition)
+    nms <- names(condition)
+    if (is.null(nms)) nms <- rep("", length(condition))
+    ids <- vapply(seq_along(condition), function(i) {
+      if (nzchar(nms[i])) nms[i] else {
+        x <- condition[[i]]
+        if (is.character(x) && length(x) == 1L) x else ""
+      }
+    }, character(1L))
+    if (anyDuplicated(ids[nzchar(ids)])) {
+      stop("Variables in 'condition' must not be repeated.", call. = FALSE)
+    }
+    for (nm in by) {
+      lev <- levels(model$var.summary[[nm]])
+      if (!nm %in% names(data)) {
+        stop("Comparison factor '", nm, "' is missing from 'data'.", call. = FALSE)
+      }
+      values <- as.character(data[[nm]])
+      if (anyNA(values) || any(!values %in% lev)) {
+        stop("Comparison factor '", nm, "' has missing or unknown levels.",
+          call. = FALSE)
+      }
+      available <- if (is.factor(data[[nm]])) levels(data[[nm]]) else unique(values)
+      data[[nm]] <- factor(values, levels = lev[lev %in% available],
+        ordered = is.ordered(model$var.summary[[nm]]))
+      i <- match(nm, ids)
+      selected <- if (is.na(i)) {
+        evenly(data[[nm]], n = n_vals)
+      } else {
+        condition_to_data(condition[[i]],
+          if (nzchar(nms[i])) nm else NULL, data, m_vars, n_vals)
+      }
+      if (anyNA(selected) || any(!as.character(selected) %in% lev)) {
+        stop("Invalid comparison levels for '", nm, "'.", call. = FALSE)
+      }
+      comparison[[nm]] <- factor(lev[lev %in% as.character(selected)],
+        levels = lev, ordered = is.ordered(data[[nm]]))
+    }
+    condition <- condition[!ids %in% by]
+    if (!length(condition)) {
+      stop("'condition' must include a covariate other than 'by'.", call. = FALSE)
+    }
+  }
+  cond_list <- process_condition(condition, data = data, variables = m_vars,
+    n_vals = n_vals)
+  named_cond <- names(cond_list)
+  used_vars <- c(named_cond, by)
+  tv <- typical_values(model, data = data)
+  tv <- tv[dplyr::setdiff(m_vars, used_vars)]
+  cond_list <- c(cond_list, comparison, tv)
+  if (length(by)) cond_list <- lapply(cond_list, unique)
+  pred_data <- expand_grid(!!!cond_list)
+  if (!complete) {
+    factor_vars <- used_vars[
+      vapply(cond_list[used_vars], is.factor, logical(1L))
+    ]
+    if (length(factor_vars)) {
+      observed <- data_combos(model, vars = all_of(factor_vars),
+        complete = FALSE, data = data)
+      pred_data <- semi_join(pred_data, observed, by = factor_vars)
+      if (!nrow(pred_data)) {
+        stop("No observed combinations of the supplied factor conditions remain")
+      }
+    }
+  }
+  list(data = pred_data, condition = named_cond)
 }
 
 `condition_helper` <- function(helper) {
