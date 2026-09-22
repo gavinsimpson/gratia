@@ -185,7 +185,7 @@ cause an error. Deterministic rows agreeing with \code{.diff} have zero width.
 Simultaneous coverage is approximate posterior coverage on the finite
 evaluation grid, not between its points or outside its range, nor exact
 frequentist coverage. Increase \code{n_vals} to evaluate a denser grid. Bands are
-not clipped to the response-difference range (e.g. \link{-1, 1} for probabilities).
+not clipped to the response-difference range (e.g. \verb{[-1, 1]} for probabilities).
 They need not contain the equal-tailed pointwise simulation intervals.
 
 \code{exclude} sets the named term contributions to zero. In particular, excluding
