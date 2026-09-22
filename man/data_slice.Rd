@@ -14,9 +14,16 @@ data_slice(object, ...)
 
 \method{data_slice}{default}(object, ...)
 
-\method{data_slice}{data.frame}(object, ..., .observed_only = FALSE)
+\method{data_slice}{data.frame}(object, ..., .observed_only = FALSE, .by = NULL)
 
-\method{data_slice}{gam}(object, ..., data = NULL, envir = NULL, .observed_only = FALSE)
+\method{data_slice}{gam}(
+  object,
+  ...,
+  data = NULL,
+  envir = NULL,
+  .observed_only = FALSE,
+  .by = NULL
+)
 
 \method{data_slice}{gamm}(object, ...)
 
@@ -37,6 +44,14 @@ to those combinations of the variables specified that are observed in
 those combinations. If \code{FALSE}, no filtering is done. If \code{.observed_only}
 is a character vector, on those variables named in the vector are used to
 in the comparison with the combinations in \code{object}.}
+
+\item{.by}{<\code{\link[dplyr:dplyr_tidy_select]{tidy-select}}> Optional grouping
+variables. With \code{.by = NULL} (the default), expressions are evaluated over
+the full data set. Otherwise, expressions are evaluated separately within
+each observed group and the resulting grids are combined. Grouping variables
+are included automatically; expressions for these variables in \code{...} select
+groups and are evaluated once over the full data set. Unobserved combinations
+are omitted, and selecting no observed groups is an error.}
 
 \item{data}{an alternative data frame of values containing all the variables
 needed to fit the model. If \code{NULL}, the default, the data used to fit the
@@ -78,6 +93,16 @@ that factor covariates have the correct levels, as needed by
 
 For an extended discussion of \code{\link[=data_slice]{data_slice()}} and further examples, see
 \code{vignette("data-slices", package = "gratia")}.
+
+With \code{.by}, unspecified covariates retain their overall representative
+values. Specify an expression such as \code{z = mean(z)} to use a group-specific
+value instead. Factor levels and ordered status are preserved, and the result
+is an ungrouped tibble. \code{.observed_only} filters exact matches within each
+group; interpolated values need not match observed values.
+
+Grouping limits the default range of \code{evenly()} to each group's marginal
+range. It does not ensure joint support for multiple continuous covariates.
+Explicit values or \code{lower} and \code{upper} bounds can still request extrapolation.
 }
 \examples{
 \dontshow{

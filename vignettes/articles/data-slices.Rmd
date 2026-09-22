@@ -173,6 +173,50 @@ args(gratia:::data_slice.gam)
 ```
 The `...` argument allows you to provide expressions to create the covariate values you want for your data slice. Expressions passed to `...` are evaluated within the model frame of the fitted model (argument `object`) or in `data` (if supplied). You are not restricted either to using only the helper functions provide by {gratia}; any R function could be used as long as it makes sense in the context of the model frame, and it returns something that can be combined using `tidyr::expand_grid()`.
 
+## Slices within groups
+
+When a covariate has a different observed range in each group defined by a factor, a sequence over its overall range across all levels can extrapolate for some groups. Use `.by` to evaluate slice expressions separately within each observed group:
+
+```{r grouped-data-slice}
+group_data <- data.frame(
+  x = c(0, 4, 10, 5, 12, 20),
+  fac = factor(rep(c("A", "B"), each = 3)),
+  z = c(1, 2, 3, 7, 8, 9)
+)
+data_slice(group_data, x = evenly(x, n = 5), .by = fac)
+```
+
+This generates five values from 0 to 10 for A, and five from 5 to 20 for B.
+The same syntax works for a fitted GAM containing `s(x, by = fac)`. Grouping
+variables are included automatically, and only observed groups are used.
+Select multiple grouping variables with `.by = c(site, treatment)` to work
+within their observed combinations.
+
+Expressions for grouping variables select which groups to use. They are
+evaluated once, before the remaining expressions are evaluated within groups:
+
+```{r selected-group-data-slice}
+data_slice(group_data,
+  x = evenly(x, n = 5), fac = level(fac, "B"), .by = fac
+)
+```
+
+Unspecified covariates, such as `z` above, keep their overall representative
+values. To use group-specific values, supply an expression explicitly:
+
+```{r group-specific-reference-value}
+data_slice(group_data, x = evenly(x, n = 5), z = mean(z), .by = fac)
+```
+
+Factor levels and ordered status are preserved, and the result is an ungrouped
+tibble. Without `.by`, the existing full-grid behaviour is unchanged.
+
+Grouping constrains the default sequences to each group's marginal ranges; it
+does not ensure joint support for multiple continuous covariates. Explicit
+values and `evenly()` bounds can still request extrapolation. The separate
+`.observed_only` option filters exact matches within groups, so it can remove
+interpolated values that do not occur in the observed data.
+
 ## Slices through a 2D smooth
 
 In the second example, I'll use the bivariate example data set from {mgcv} but fit a tensor product of covariates `x` and `z`

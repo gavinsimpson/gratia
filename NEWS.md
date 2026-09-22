@@ -40,6 +40,11 @@
 
 ## New features
 
+* `data_slice()` gains a `.by` argument to evaluate slice expressions within
+  observed groups. For example, `x = evenly(x)` now supports a separate range
+  for each level of a factor. Convenient for models with factor `by` smooths
+  (#196).
+
 * `conditional_values()` now accepts `complete = FALSE` to retain only observed
   combinations of factor conditions, while preserving numeric prediction grids
   (#337).
