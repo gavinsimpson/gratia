@@ -51,22 +51,210 @@
     }
   }
 
+  scales <- if (grouped_by) {
+    prepare_smooth_scales(nlevels(object[[by_var]]))
+  } else {
+    list(colour = NULL, fill = NULL)
+  }
+
+  if (is.null(title)) {
+    title <- ifelse(grouped_by, unique(object$.term),
+      as.character(unique(object$.smooth))
+    )
+  }
+  labels <- prepare_smooth_labels(object, x_var = variables,
+    xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
+    caption = caption, grouped_by = grouped_by
+  )
+
+  prepare_smooth_plot(object,
+    x_var = variables, colour_var = if (grouped_by) by_var else NULL,
+    group_var = if (grouped_by) by_var else NULL,
+    rug = rug, constant = constant, fun = fun,
+    ci_alpha = ci_alpha, ci_col = ci_col, smooth_col = smooth_col,
+    partial_residuals = partial_residuals, resid_col = resid_col,
+    sizer = TRUE, decrease_col = decrease_col, increase_col = increase_col,
+    change_lwd = change_lwd, angle = angle, ylim = ylim,
+    discrete_colour = scales$colour, discrete_fill = scales$fill,
+    labels = labels
+  )
+}
+
+#' Prepare common smooth plot labels
+#'
+#' Continuous-x plots use the same axis defaults for omitted and explicitly
+#' NULL labels. Legend labels can be added to the result.
+#'
+#' @param object Prepared smooth estimates with `.smooth`, `.type` and `.by`
+#'   metadata, and the by-variable column when applicable.
+#' @param x_var Character string naming the x-axis covariate, used as the
+#'   default x-axis label.
+#' @param xlab,ylab Axis labels. `NULL` uses `x_var` for x and `"Partial effect"`
+#'   for y, just as omitting these arguments does. Empty strings give blank labels.
+#' @param title Plot title, or `NULL` to use the unique `.smooth` value. Callers
+#'   plotting grouped by smooths supply the `.term` title instead.
+#' @param subtitle Plot subtitle, or `NULL` to derive it from the by variable.
+#' @param caption `NULL` or `TRUE` adds the basis caption; other values suppress
+#'   it, retaining the existing smooth plotting convention.
+#' @param grouped_by Logical; label a grouped factor by plot? Grouped plots keep
+#'   the full title and name only the by variable in the default subtitle.
+#'   Separate plots strip the title at the first colon and include the factor
+#'   level in the subtitle. Continuous by variables have no level suffix.
+#' @return A `ggplot2::labs()` object.
+#' @keywords internal
+#' @noRd
+`prepare_smooth_labels` <- function(
+  object, x_var, xlab = NULL, ylab = NULL, title = NULL, subtitle = NULL,
+  caption = NULL, grouped_by = FALSE
+) {
+  if (is.null(xlab)) {
+    xlab <- x_var
+  }
+  if (is.null(ylab)) {
+    ylab <- "Partial effect"
+  }
+  if (is.null(title)) {
+    title <- unique(object[[".smooth"]])
+  }
+  caption <- if (is.null(caption) || isTRUE(caption)) {
+    paste("Basis:", object[[".type"]])
+  } else {
+    NULL
+  }
+
+  if (all(!is.na(object[[".by"]]))) {
+    by_var <- as.character(unique(object[[".by"]]))
+    if (!grouped_by) {
+      title <- strsplit(title, split = ":")[[1L]][[1L]]
+    }
+    if (is.null(subtitle)) {
+      subtitle <- paste0("By: ", by_var)
+      if (!grouped_by && data_class(object)[[by_var]] %in% c("factor", "ordered")) {
+        subtitle <- paste0(subtitle, "; ", unique(object[[by_var]]))
+      }
+    }
+  }
+
+  labs(x = xlab, y = ylab, title = title, subtitle = subtitle, caption = caption)
+}
+
+#' Choose paired discrete smooth plot scales
+#'
+#' @param n_levels Number of factor levels, including unused levels. Up to nine
+#'   levels use Okabe-Ito scales; larger factors use hue scales.
+#' @param discrete_colour,discrete_fill Optional user-supplied ggplot2 scales.
+#'   Each `NULL` scale is replaced independently by its default.
+#' @return A list with `colour` and `fill` scale objects. The ordinary ggplot2
+#'   discrete colour default used for `fs` curves is handled by its caller.
+#' @keywords internal
+#' @noRd
+`prepare_smooth_scales` <- function(
+  n_levels, discrete_colour = NULL, discrete_fill = NULL
+) {
+  palette <- if (n_levels > 9L) {
+    list(colour = scale_colour_hue, fill = scale_fill_hue)
+  } else {
+    list(colour = scale_colour_okabe_ito, fill = scale_fill_okabe_ito)
+  }
+  list(
+    colour = if (is.null(discrete_colour)) palette$colour() else discrete_colour,
+    fill = if (is.null(discrete_fill)) palette$fill() else discrete_fill
+  )
+}
+
+#' Construct a continuous-x partial-effect plot
+#'
+#' Internal renderer: callers resolve variable names, labels, palettes and
+#' smooth-specific data preparation. No smooth classes or labels are inspected.
+#' Column arguments are strings; labels is a resolved ggplot2::labs() object.
+#' Intervals use .lower_ci and .upper_ci; curves use .estimate. Transformations
+#' apply only through the existing add_constant() and transform_fun() methods.
+#' Residuals and SiZer columns retain their existing, untransformed values.
+#' Set sizer only for callers that already support change overlays. A NULL
+#' ribbon_colour removes the inherited colour mapping (as used by sz smooths).
+#'
+#' @param object Data frame of prepared smooth estimates containing `.estimate`
+#'   and the columns named by the variable arguments. Intervals require
+#'   `.lower_ci` and `.upper_ci`. Retain the classes needed by `add_constant()`
+#'   and `transform_fun()`.
+#' @param x_var Character string naming the continuous x-axis column in `object`
+#'   and, when supplied, `rug` and `partial_residuals`.
+#' @param colour_var Character string naming the column mapped to curve colour
+#'   and interval fill, or `NULL` to use fixed colours.
+#' @param group_var Character string naming the column mapped to the `group`
+#'   aesthetic, or `NULL` to let ggplot2 infer groups from the other aesthetics.
+#' @param interval Logical; draw a ribbon using `.lower_ci` and `.upper_ci`?
+#' @param rug Optional data frame containing `x_var` for a bottom-axis rug.
+#'   `NULL` omits the rug.
+#' @param rug_colour_var Character string naming a column in `rug` to map to
+#'   rug colour, or `NULL` for an uncoloured rug. Rug layers do not inherit
+#'   the smooth's aesthetics.
+#' @param labels Resolved labels supplied as a `ggplot2::labs()` object. The
+#'   caller supplies axis, plot and legend labels as appropriate.
+#' @param discrete_colour Optional ggplot2 colour scale, added when `colour_var`
+#'   is supplied. `NULL` leaves scale selection to ggplot2.
+#' @param discrete_fill Optional ggplot2 fill scale, added when `colour_var`
+#'   is supplied. `NULL` leaves scale selection to ggplot2.
+#' @param legend Logical; `FALSE` hides the legend, while `TRUE` retains the
+#'   legend behaviour determined by the layers, scales and theme.
+#' @param ribbon_colour Fixed ribbon outline colour when `colour_var` is
+#'   supplied. The default, `NA`, suppresses the outline. `NULL` instead removes
+#'   the inherited colour mapping, preserving the behaviour of `sz` plots.
+#' @param constant Optional numeric constant added to the estimates and interval
+#'   bounds via `add_constant()`, before applying `fun`. `NULL` adds nothing.
+#' @param fun Optional function, or function name accepted by `match.fun()`,
+#'   applied to estimates and interval bounds via `transform_fun()`. `NULL`
+#'   leaves them untransformed. Neither `constant` nor `fun` modifies residuals
+#'   or SiZer columns.
+#' @param ci_alpha Numeric opacity for interval ribbons, between 0 and 1.
+#' @param ci_col Fixed interval fill colour when `colour_var` is `NULL`.
+#' @param smooth_col Fixed curve colour when `colour_var` is `NULL`. Also used
+#'   for `.change` overlays in that case.
+#' @param partial_residuals Optional data frame containing `x_var` and
+#'   `partial_residual`, drawn as points beneath the ribbons and curves.
+#'   `NULL` omits the points.
+#' @param resid_col Fixed colour for partial residual points.
+#' @param sizer Logical; add change overlays when their columns are present?
+#'   `.change` takes precedence; otherwise both `.increase` and `.decrease`
+#'   are used. With none of these columns present, no overlays are added.
+#' @param decrease_col Fixed colour for `.decrease` overlays when `colour_var`
+#'   is `NULL`; otherwise overlays use the mapped curve colours.
+#' @param increase_col Fixed colour for `.increase` overlays when `colour_var`
+#'   is `NULL`; otherwise overlays use the mapped curve colours.
+#' @param change_lwd Numeric line width for SiZer overlays, passed to the
+#'   `linewidth` argument of `ggplot2::geom_line()`.
+#' @param angle Optional x-axis tick-label angle, passed to
+#'   `ggplot2::guide_axis()`. `NULL` uses the theme's setting.
+#' @param ylim Optional numeric values to include in the y-axis range via
+#'   `ggplot2::expand_limits()`. These expand the range rather than clip it.
+#'   `NULL` leaves the range determined by the plotted data.
+#' @keywords internal
+#' @noRd
+`prepare_smooth_plot` <- function(
+  object, x_var, colour_var = NULL, group_var = NULL,
+  interval = TRUE, rug = NULL, rug_colour_var = NULL,
+  labels = labs(), discrete_colour = NULL, discrete_fill = NULL,
+  legend = TRUE, ribbon_colour = NA,
+  constant = NULL, fun = NULL, ci_alpha = 0.2, ci_col = "black",
+  smooth_col = "black", partial_residuals = NULL, resid_col = "steelblue3",
+  sizer = FALSE, decrease_col = "#56B4E9", increase_col = "#E69F00",
+  change_lwd = 1.75, angle = NULL, ylim = NULL
+) {
   # If constant supplied apply it to `.estimate`
   object <- add_constant(object, constant = constant)
 
   # If fun supplied, use it to transform est and the upper and lower interval
   object <- transform_fun(object, fun = fun)
 
-  # base plot - need as.name to handle none standard names, like log2(x)
-  plt <- if (grouped_by) {
-    ggplot(object, aes(
-      x = .data[[variables]], y = .data$.estimate,
-      colour = .data[[by_var]], group = .data[[by_var]]
-    )) +
-      guides(x = guide_axis(angle = angle))
-  } else {
-    ggplot(object, aes(x = .data[[variables]], y = .data$.estimate)) +
-      guides(x = guide_axis(angle = angle))
+  # String column names also support transformed covariates such as log2(x).
+  plt <- ggplot(object, aes(x = .data[[x_var]], y = .data$.estimate)) +
+    guides(x = guide_axis(angle = angle))
+  if (!is.null(colour_var)) {
+    plt <- plt + aes(colour = .data[[colour_var]])
+  }
+
+  if (!is.null(group_var)) {
+    plt <- plt + aes(group = .data[[group_var]])
   }
 
   # do we want partial residuals? Only for univariate smooths without by vars
@@ -74,7 +262,7 @@
     plt <- plt + geom_point(
       data = partial_residuals,
       aes(
-        x = .data[[variables]],
+        x = .data[[x_var]],
         y = .data[["partial_residual"]]
       ),
       inherit.aes = FALSE,
@@ -84,147 +272,71 @@
 
   # plot the confidence interval and smooth line
   sizer_cols <- c(".change", ".increase", ".decrease")
-  do_sizer <- sizer_cols %in% names(object)
-  if (grouped_by) {
-    plt <- plt +
-      geom_ribbon(
-        mapping = aes(
-          ymin = .data[[".lower_ci"]],
-          ymax = .data[[".upper_ci"]],
-          fill = .data[[by_var]]
-        ),
-        alpha = ci_alpha, colour = NA
-      ) +
-      geom_line(aes(colour = .data[[by_var]]))
-
-    plt <- if (nlevels(object[[by_var]]) > 9) {
-      plt + scale_colour_hue() +
-        scale_fill_hue()
-    } else {
-      plt + scale_colour_okabe_ito() +
-        scale_fill_okabe_ito()
-    }
-
-    if (any(do_sizer)) {
-      plt <- if (do_sizer[[1]]) {
-        plt + geom_line(
-          aes(
-            y = .data[[".change"]],
-            colour = .data[[by_var]]
-          ),
-          linewidth = change_lwd,
-          na.rm = TRUE
-        )
-      } else {
-        plt + geom_line(
-          aes(
-            y = .data[[".increase"]],
-            colour = .data[[by_var]]
-          ),
-          linewidth = change_lwd,
-          na.rm = TRUE,
-          show.legend = FALSE
-        ) +
-          geom_line(
-            aes(
-              y = .data[[".decrease"]],
-              colour = .data[[by_var]]
-            ),
-            linewidth = change_lwd,
-            na.rm = TRUE,
-            show.legend = FALSE
-          )
-      }
-    }
-  } else {
-    plt <- plt +
-      geom_ribbon(
-        mapping = aes(
-          ymin = .data[[".lower_ci"]],
-          ymax = .data[[".upper_ci"]]
-        ),
-        alpha = ci_alpha, colour = NA, fill = ci_col
-      ) +
-      geom_line(colour = smooth_col)
-    if (any(do_sizer)) {
-      plt <- if (do_sizer[[1]]) {
-        plt + geom_line(aes(y = .data[[".change"]]),
-          colour = smooth_col, linewidth = change_lwd, na.rm = TRUE,
-          show.legend = FALSE
-        )
-      } else {
-        plt + geom_line(aes(y = .data[[".increase"]]),
-          colour = increase_col, linewidth = change_lwd,
-          na.rm = TRUE, show.legend = FALSE
-        ) +
-          geom_line(aes(y = .data[[".decrease"]]),
-            colour = decrease_col, linewidth = change_lwd,
-            na.rm = TRUE, show.legend = FALSE
-          )
-      }
-    }
-  }
-
-  ## default axis labels if none supplied
-  if (is.null(xlab)) {
-    xlab <- variables
-  }
-  if (is.null(ylab)) {
-    ylab <- "Partial effect"
-  }
-  if (is.null(title)) {
-    title <- ifelse(grouped_by, unique(object$.term),
-      as.character(unique(object$.smooth))
-    )
-  }
-  # add the basis via caption if caption is TRUE or NULL
-  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
-    caption <- paste("Basis:", object[[".type"]])
-  } else {
-    caption <- NULL
-  }
-  if (all(!is.na(object[[".by"]]))) {
-    if (grouped_by) {
-      if (is.null(subtitle)) {
-        subtitle <- paste0("By: ", by_var)
-      }
-    } else {
-      # is the by variable a factor or a numeric
-      by_class <- data_class(object)[[object[[".by"]][[1L]]]]
-      by_var <- as.character(unique(object[[".by"]]))
-      spl <- strsplit(title, split = ":")
-      title <- spl[[1L]][[1L]]
-      if (is.null(subtitle)) {
-        subtitle <- if (by_class %in% c("factor", "ordered")) {
-          paste0("By: ", by_var, "; ", unique(object[[by_var]]))
-        } else {
-          paste0("By: ", by_var) # continuous by
-        }
-      }
-    }
-  }
-
-  ## add labelling to plot
-  plt <- plt + labs(
-    x = xlab, y = ylab, title = title, subtitle = subtitle,
-    caption = caption
-  )
-
-  ## add rug?
-  if (!is.null(rug)) {
-    plt <- plt +
-      geom_rug(
-        data = rug,
-        mapping = aes(x = .data[[variables]]),
-        inherit.aes = FALSE, sides = "b", alpha = 0.5
+  do_sizer <- sizer & sizer_cols %in% names(object)
+  if (!is.null(colour_var)) {
+    if (interval) {
+      ribbon_mapping <- aes(
+        ymin = .data[[".lower_ci"]], ymax = .data[[".upper_ci"]],
+        fill = .data[[colour_var]]
       )
+      if (is.null(ribbon_colour)) {
+        # An explicit NULL mapping removes the inherited colour for sz curves.
+        ribbon_mapping <- aes(
+          ymin = .data[[".lower_ci"]], ymax = .data[[".upper_ci"]],
+          fill = .data[[colour_var]], colour = NULL
+        )
+        plt <- plt + geom_ribbon(ribbon_mapping, alpha = ci_alpha)
+      } else {
+        plt <- plt + geom_ribbon(ribbon_mapping,
+          alpha = ci_alpha, colour = ribbon_colour)
+      }
+    }
+    plt <- plt + geom_line()
+
+    plt <- plt + discrete_colour + discrete_fill
+  } else {
+    if (interval) {
+      plt <- plt + geom_ribbon(
+        aes(ymin = .data[[".lower_ci"]], ymax = .data[[".upper_ci"]]),
+        alpha = ci_alpha, colour = NA, fill = ci_col
+      )
+    }
+    plt <- plt + geom_line(colour = smooth_col)
   }
 
-  # fix the yaxis limits?
+  if (any(do_sizer)) {
+    change_vars <- if (do_sizer[[1]]) ".change" else c(".increase", ".decrease")
+    change_cols <- if (do_sizer[[1]]) smooth_col else c(increase_col, decrease_col)
+    for (i in seq_along(change_vars)) {
+      change_var <- change_vars[[i]]
+      if (is.null(colour_var)) {
+        plt <- plt + geom_line(aes(y = .data[[change_var]]),
+          colour = change_cols[[i]], linewidth = change_lwd,
+          na.rm = TRUE, show.legend = FALSE)
+      } else {
+        plt <- plt + geom_line(
+          aes(y = .data[[change_var]], colour = .data[[colour_var]]),
+          linewidth = change_lwd, na.rm = TRUE,
+          show.legend = if (do_sizer[[1]]) NA else FALSE)
+      }
+    }
+  }
+
+  plt <- plt + labels
+  if (!legend) {
+    plt <- plt + theme(legend.position = "none")
+  }
+  if (!is.null(rug)) {
+    rug_mapping <- aes(x = .data[[x_var]])
+    if (!is.null(rug_colour_var)) {
+      rug_mapping <- aes(x = .data[[x_var]], colour = .data[[rug_colour_var]])
+    }
+    plt <- plt + geom_rug(data = rug, mapping = rug_mapping,
+      inherit.aes = FALSE, sides = "b", alpha = 0.5)
+  }
   if (!is.null(ylim)) {
     plt <- plt + expand_limits(y = ylim)
   }
-
   plt
 }
 
@@ -847,70 +959,47 @@
     discrete_colour <- scale_colour_discrete()
   }
 
+  labels <- prepare_smooth_labels(object, x_var = variables[1],
+    xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
+    caption = caption
+  )
+
+  if (!all_factors) {
+    return(prepare_smooth_plot(object,
+      x_var = variables[1], colour_var = variables[2], interval = FALSE,
+      rug = rug, constant = constant, fun = fun,
+      discrete_colour = discrete_colour, legend = FALSE,
+      angle = angle, ylim = ylim,
+      labels = labels
+    ))
+  }
+
+  # Factor-only point ranges retain their explicit-NULL label suppression.
+  if (!missing(xlab)) {
+    labels["x"] <- list(xlab)
+  }
+  if (!missing(ylab)) {
+    labels["y"] <- list(ylab)
+  }
+
   ## If constant supplied apply it to `est`
   object <- add_constant(object, constant = constant)
 
   ## If fun supplied, use it to transform est and the upper and lower interval
   object <- transform_fun(object, fun = fun)
 
-  if (all_factors) {
-    plt <- ggplot(object, aes(
-      x = .data[[variables[1]]],
-      y = .data[[".estimate"]],
-      ymin = .data[[".lower_ci"]],
-      ymax = .data[[".upper_ci"]]
-    )) +
-      ggplot2::geom_pointrange() +
-      facet_wrap(vars(.data[[variables[2]]]), labeller = ggplot2::label_both)
-  } else {
-    plt <- ggplot(object, aes(
-      x = .data[[variables[1]]],
-      y = .data[[".estimate"]],
-      colour = .data[[variables[2]]]
-    )) +
-      geom_line() +
-      discrete_colour +
-      theme(legend.position = "none")
-  }
+  plt <- ggplot(object, aes(
+    x = .data[[variables[1]]],
+    y = .data[[".estimate"]],
+    ymin = .data[[".lower_ci"]],
+    ymax = .data[[".upper_ci"]]
+  )) +
+    ggplot2::geom_pointrange() +
+    facet_wrap(vars(.data[[variables[2]]]), labeller = ggplot2::label_both)
   plt <- plt + guides(x = guide_axis(angle = angle))
 
-  ## default axis labels if none supplied
-  if (missing(xlab)) {
-    xlab <- variables[1]
-  }
-  if (missing(ylab)) {
-    ylab <- "Partial effect"
-  }
-  if (is.null(title)) {
-    title <- unique(object[[".smooth"]])
-  }
-  # add the basis via caption if caption is TRUE or NULL
-  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
-    caption <- paste("Basis:", object[[".type"]])
-  } else {
-    caption <- NULL
-  }
-
-  if (all(!is.na(object[[".by"]]))) {
-    # is the by variable a factor or a numeric
-    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
-    by_var <- as.character(unique(object[[".by"]]))
-    spl <- strsplit(title, split = ":")
-    title <- spl[[1L]][[1L]]
-    if (is.null(subtitle)) {
-      subtitle <- if (by_class %in% c("factor", "ordered")) {
-        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
-      } else {
-        paste0("By: ", by_var) # continuous by
-      }
-    }
-  }
-
   ## add labelling to plot
-  plt <- plt + labs(
-    x = xlab, y = ylab, title = title, subtitle = subtitle,
-    caption = caption
-  )
+  plt <- plt + labels
 
   ## add rug?
   if (!is.null(rug)) {
@@ -1063,107 +1152,23 @@
     }
   }
 
-  # how many levels? can't have more than 9 for okabeito
-  n_levs <- nlevels(object[[fac_var]])
-  if (is.null(discrete_colour)) {
-    discrete_colour <- if (n_levs > 9L) {
-      scale_colour_hue()
-    } else {
-      scale_colour_okabe_ito()
-    }
-  }
-
-  if (is.null(discrete_fill)) {
-    discrete_fill <- if (n_levs > 9L) {
-      scale_fill_hue()
-    } else {
-      scale_fill_okabe_ito()
-    }
-  }
-
-  ## If constant supplied apply it to `est`
-  object <- add_constant(object, constant = constant)
-
-  ## If fun supplied, use it to transform est and the upper and lower interval
-  object <- transform_fun(object, fun = fun)
-
-  # plot
-  plt <- ggplot(object, aes(
-    x = .data[[x_var]],
-    y = .data[[".estimate"]],
-    colour = .data[[fac_var]]
-  )) +
-    geom_ribbon(
-      mapping = aes(
-        ymin = .data[[".lower_ci"]],
-        ymax = .data[[".upper_ci"]],
-        fill = .data[[fac_var]],
-        colour = NULL
-      ),
-      alpha = ci_alpha
-    ) +
-    geom_line() +
-    discrete_colour +
-    discrete_fill +
-    guides(x = guide_axis(angle = angle))
-
-  ## default axis labels if none supplied
-  if (is.null(xlab)) {
-    xlab <- x_var
-  }
-  if (is.null(ylab)) {
-    ylab <- "Partial effect"
-  }
-  if (is.null(title)) {
-    title <- unique(object[[".smooth"]])
-  }
-  # add the basis via caption if caption is TRUE or NULL
-  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
-    caption <- paste("Basis:", object[[".type"]])
-  } else {
-    caption <- NULL
-  }
-
-  if (all(!is.na(object[[".by"]]))) {
-    # is the by variable a factor or a numeric
-    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
-    by_var <- as.character(unique(object[[".by"]]))
-    spl <- strsplit(title, split = ":")
-    title <- spl[[1L]][[1L]]
-    if (is.null(subtitle)) {
-      subtitle <- if (by_class %in% c("factor", "ordered")) {
-        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
-      } else {
-        paste0("By: ", by_var) # continuous by
-      }
-    }
-  }
-
-  ## add labelling to plot
-  plt <- plt + labs(
-    x = xlab, y = ylab, title = title, subtitle = subtitle,
-    caption = caption, colour = fac_var_lab, fill = fac_var_lab
+  scales <- prepare_smooth_scales(nlevels(object[[fac_var]]),
+    discrete_colour = discrete_colour, discrete_fill = discrete_fill
   )
 
-  ## add rug?
-  if (!is.null(rug)) {
-    plt <- plt + geom_rug(
-      data = rug,
-      mapping = aes(
-        x = .data[[x_var]],
-        colour = .data[[fac_var]]
-      ),
-      inherit.aes = FALSE,
-      sides = "b", alpha = 0.5
-    )
-  }
+  labels <- prepare_smooth_labels(object, x_var = x_var,
+    xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
+    caption = caption
+  )
+  labels$colour <- labels$fill <- fac_var_lab
 
-  ## fixing the y axis limits?
-  if (!is.null(ylim)) {
-    plt <- plt + expand_limits(y = ylim)
-  }
-
-  plt
+  prepare_smooth_plot(object,
+    x_var = x_var, colour_var = fac_var, rug = rug, rug_colour_var = fac_var,
+    constant = constant, fun = fun, ci_alpha = ci_alpha,
+    discrete_colour = scales$colour, discrete_fill = scales$fill,
+    ribbon_colour = NULL, angle = angle, ylim = ylim,
+    labels = labels
+  )
 }
 
 #' @importFrom ggplot2 coord_sf geom_tile guide_colourbar geom_contour aes
