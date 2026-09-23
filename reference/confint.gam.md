@@ -71,7 +71,11 @@ confint(object, ...)
 
 - shift:
 
-  logical; should the constant term be add to the smooth?
+  logical; should the model intercept be added to the smooth? Only the
+  intercept is added; other parametric effects, including factor effects
+  associated with a factor `by` smooth, are excluded. For full fitted
+  values and their confidence intervals, use
+  [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md).
 
 - transform:
 

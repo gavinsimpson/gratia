@@ -116,7 +116,10 @@ simultaneous intervals.</p></dd>
 
 
 <dt id="arg-shift">shift<a class="anchor" aria-label="anchor" href="#arg-shift"></a></dt>
-<dd><p>logical; should the constant term be add to the smooth?</p></dd>
+<dd><p>logical; should the model intercept be added to the smooth?
+Only the intercept is added; other parametric effects, including factor
+effects associated with a factor <code>by</code> smooth, are excluded. For full fitted
+values and their confidence intervals, use <code><a href="fitted_values.html">fitted_values()</a></code>.</p></dd>
 
 
 <dt id="arg-transform">transform<a class="anchor" aria-label="anchor" href="#arg-transform"></a></dt>

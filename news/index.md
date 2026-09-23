@@ -4,6 +4,15 @@
 
 ### User visible changes
 
+- Univariate smooth plots now share internal rendering, label and
+  palette helpers, reducing duplication across ordinary, `by`, `fs`, and
+  `sz` smooth plotting methods
+  ([\#308](https://github.com/gavinsimpson/gratia/issues/308)). Explicit
+  `xlab = NULL` and `ylab = NULL` now request the default axis labels
+  for continuous-x `fs` and random-effect tensor curves, consistent with
+  other univariate smooths. Previously, explicit `NULL` suppressed these
+  labels for those curves.
+
 - Tweedie family quantile and CDF functions now use fast Poisson-Gamma
   mixtures by default for `1 < p < 2`, including uniform QQ diagnostics
   and PIT/quantile residuals
