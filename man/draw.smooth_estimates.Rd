@@ -30,6 +30,7 @@
   default_crs = NULL,
   lims_method = "cross",
   caption = TRUE,
+  geom = c("raster", "tile"),
   ...
 )
 }
@@ -73,7 +74,7 @@ indicating periods of change. \code{col_change} is used when
 when `change_type = "sizer"``.}
 
 \item{change_lwd}{numeric; the value to set the \code{linewidth} to in
-\code{\link[ggplot2:geom_path]{ggplot2::geom_line()}}, used to represent the periods of change.}
+\code{\link[ggplot2:geom_line]{ggplot2::geom_line()}}, used to represent the periods of change.}
 
 \item{partial_match}{logical; should smooths be selected by partial matches
 with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
@@ -97,17 +98,17 @@ drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggp
 \item{ylim}{numeric; vector of y axis limits to use all \emph{all} panels drawn.}
 
 \item{crs}{the coordinate reference system (CRS) to use for the plot. All
-data will be projected into this CRS. See \code{\link[ggplot2:ggsf]{ggplot2::coord_sf()}} for
+data will be projected into this CRS. See \code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}} for
 details.}
 
 \item{default_crs}{the coordinate reference system (CRS) to use for the
 non-sf layers in the plot. If left at the default \code{NULL}, the CRS used is
 4326 (WGS84), which is appropriate for spline-on-the-sphere smooths, which
 are parameterized in terms of latitude and longitude as coordinates. See
-\code{\link[ggplot2:ggsf]{ggplot2::coord_sf()}} for more details.}
+\code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}} for more details.}
 
 \item{lims_method}{character; affects how the axis limits are determined. See
-\code{\link[ggplot2:ggsf]{ggplot2::coord_sf()}}. Be careful; in testing of some examples, changing
+\code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}}. Be careful; in testing of some examples, changing
 this to \code{"orthogonal"} for example with the chlorophyll-a example from
 Simon Wood's GAM book quickly used up all the RAM in my test system and the
 OS killed R. This could be incorrect usage on my part; right now the grid
@@ -116,6 +117,12 @@ can produce invalid coordinates for the corners of tiles as the grid is
 generated for tile centres without respect to the spacing of those tiles.}
 
 \item{caption}{logical; show the smooth type in the caption of each plot?}
+
+\item{geom}{character; either \code{"raster"} (the default) or \code{"tile"} for flat
+smooth surfaces, including faceted and soap-film plots. Raster rendering
+keeps large PDF plots compact; tiles are individual borderless rectangles
+that remain vector elements in PDF and SVG output, potentially increasing
+file size. Other plot types, including spherical smooths, are unchanged.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
@@ -148,4 +155,8 @@ d <- derivatives(m, n = 100) # n to match smooth_estimates()
 smooth_estimates(m) |>
   add_sizer(derivatives = d, type = "sizer") |>
   draw()
+
+# Render a bivariate smooth as vector tiles
+m_surface <- gam(y ~ s(x0, x1), data = df, method = "REML")
+draw(smooth_estimates(m_surface, n_2d = 20), geom = "tile")
 }
