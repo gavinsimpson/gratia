@@ -11,6 +11,7 @@ compare_smooths(
   select = NULL,
   smooths = deprecated(),
   n = 100,
+  n_2d = 50,
   data = NULL,
   unconditional = FALSE,
   overall_uncertainty = TRUE,
@@ -45,7 +46,16 @@ compare_smooths(
 - n:
 
   numeric; the number of points over the range of the covariate at which
-  to evaluate the smooth.
+  to evaluate a univariate smooth.
+
+- n_2d:
+
+  numeric; the number of points along each of the first two axes of a
+  smooth surface, including surface panels of higher-dimensional
+  smooths. The default is 50 in plotting and plot-preparation functions.
+  If `NULL`, use `n` instead. Ignored when evaluation `data` are
+  supplied. Factor levels are retained, and curves with only one
+  continuous covariate use `n`.
 
 - data:
 

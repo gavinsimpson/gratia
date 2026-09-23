@@ -18,6 +18,7 @@ smooth_estimates(
   select = NULL,
   smooth = deprecated(),
   n = 100,
+  n_2d = 50,
   n_3d = 16,
   n_4d = 4,
   data = NULL,
@@ -56,18 +57,23 @@ smooth_estimates(
 - n:
 
   numeric; the number of points over the range of the covariate at which
-  to evaluate the smooth.
+  to evaluate a univariate smooth.
+
+- n_2d:
+
+  numeric; the number of points along each of the first two axes of a
+  smooth surface, including surface panels of higher-dimensional
+  smooths. The default is 50 in plotting and plot-preparation functions.
+  If `NULL`, use `n` instead. Ignored when evaluation `data` are
+  supplied. Factor levels are retained, and curves with only one
+  continuous covariate use `n`.
 
 - n_3d, n_4d:
 
-  numeric; the number of points over the range of last covariate in a 3D
-  or 4D smooth. The default is `NULL` which achieves the standard
-  behaviour of using `n` points over the range of all covariate,
-  resulting in `n^d` evaluation points, where `d` is the dimension of
-  the smooth. For `d > 2` this can result in very many evaluation points
-  and slow performance. For smooths of `d > 4`, the value of `n_4d` will
-  be used for all dimensions `> 4`, unless this is `NULL`, in which case
-  the default behaviour (using `n` for all dimensions) will be observed.
+  numeric; the number of points along the third axis of a 3D smooth
+  (`n_3d`, default 16), or each axis after the first two for smooths of
+  dimension four or higher (`n_4d`, default 4). If `NULL`, use `n` for
+  those axes. The first two surface axes use `n_2d`.
 
 - data:
 

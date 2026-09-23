@@ -13,7 +13,7 @@ difference."><meta property="og:image" content="https://gavinsimpson.github.io/g
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-32</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-33</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,6 +64,7 @@ difference.</p>
 <span>  select <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  smooth <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  n_2d <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>  ci_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  group_means <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -113,6 +114,14 @@ can be specified, and <code>partial_match</code> must be set to <code>FALSE</cod
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
 <dd><p>numeric; the number of points at which to evaluate the difference
 between pairs of smooths.</p></dd>
+
+
+<dt id="arg-n-d">n_2d<a class="anchor" aria-label="anchor" href="#arg-n-d"></a></dt>
+<dd><p>numeric; the number of points along each of the first two axes
+of a smooth surface, including surface panels of higher-dimensional smooths.
+The default is 50 in plotting and plot-preparation functions. If <code>NULL</code>,
+use <code>n</code> instead. Ignored when evaluation <code>data</code> are supplied. Factor levels
+are retained, and curves with only one continuous covariate use <code>n</code>.</p></dd>
 
 
 <dt id="arg-ci-level">ci_level<a class="anchor" aria-label="anchor" href="#arg-ci-level"></a></dt>

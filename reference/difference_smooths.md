@@ -16,6 +16,7 @@ difference_smooths(
   select = NULL,
   smooth = deprecated(),
   n = 100,
+  n_2d = 50,
   ci_level = 0.95,
   data = NULL,
   group_means = FALSE,
@@ -67,6 +68,15 @@ difference_smooths(
 
   numeric; the number of points at which to evaluate the difference
   between pairs of smooths.
+
+- n_2d:
+
+  numeric; the number of points along each of the first two axes of a
+  smooth surface, including surface panels of higher-dimensional
+  smooths. The default is 50 in plotting and plot-preparation functions.
+  If `NULL`, use `n` instead. Ignored when evaluation `data` are
+  supplied. Factor levels are retained, and curves with only one
+  continuous covariate use `n`.
 
 - ci_level:
 

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-32</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-33</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,8 +78,10 @@
 
 
 <dt id="arg-n-d">n_2d<a class="anchor" aria-label="anchor" href="#arg-n-d"></a></dt>
-<dd><p>numeric; the number of new observations to generate for the
-second dimension of a 2D smooth. <em>Currently ignored</em>.</p></dd>
+<dd><p>numeric; the number of points along each of the first two axes
+of a smooth surface, including surface panels of higher-dimensional smooths.
+The default, <code>NULL</code>, uses <code>n</code> instead. Factor levels
+are retained, and curves with only one continuous covariate use <code>n</code>.</p></dd>
 
 
 <dt id="arg-n-d">n_3d<a class="anchor" aria-label="anchor" href="#arg-n-d"></a></dt>

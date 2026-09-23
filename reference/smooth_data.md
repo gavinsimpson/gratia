@@ -35,8 +35,10 @@ smooth_data(
 
 - n_2d:
 
-  numeric; the number of new observations to generate for the second
-  dimension of a 2D smooth. *Currently ignored*.
+  numeric; the number of points along each of the first two axes of a
+  smooth surface, including surface panels of higher-dimensional
+  smooths. The default, `NULL`, uses `n` instead. Factor levels are
+  retained, and curves with only one continuous covariate use `n`.
 
 - n_3d:
 

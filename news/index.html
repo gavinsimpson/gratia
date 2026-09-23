@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-32</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-33</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,7 +58,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li><p><code><a href="../reference/response_derivatives.html">response_derivatives()</a></code> now supports delta-method standard errors and pointwise intervals via <code>uncertainty = "delta"</code>. Both uncertainty methods return <code>.se</code>, with posterior simulation remaining the default.</p></li>
+<ul><li><p>Surface plotting and related evaluation functions now support <code>n_2d</code>, defaulting to 50 points along each surface axis (<a href="https://github.com/gavinsimpson/gratia/issues/153" class="external-link">#153</a>). This reduces default surface grids from 10,000 to 2,500 points per panel while allowing independent control of curve and slice resolution.</p></li>
+<li><p><code><a href="../reference/response_derivatives.html">response_derivatives()</a></code> now supports delta-method standard errors and pointwise intervals via <code>uncertainty = "delta"</code>. Both uncertainty methods return <code>.se</code>, with posterior simulation remaining the default.</p></li>
 <li><p><code><a href="../reference/conditional_differences.html">conditional_differences()</a></code> compares conditional fitted values between factor levels or joint factor combinations on the link or response scale, with pointwise or simultaneous intervals using the delta method or shared posterior simulations. Simultaneous bands can cover each comparison separately or all comparisons jointly via <code>simultaneous_scope</code>, and <code><a href="../reference/draw.html">draw()</a></code> plots the differences and their intervals (<a href="https://github.com/gavinsimpson/gratia/issues/143" class="external-link">#143</a>, <a href="https://github.com/gavinsimpson/gratia/issues/145" class="external-link">#145</a>).</p></li>
 <li><p><code><a href="../reference/evenly.html">all_levels()</a></code> is now an alias of <code><a href="../reference/evenly.html">evenly()</a></code> with a name intended for factors (<a href="https://github.com/gavinsimpson/gratia/issues/217" class="external-link">#217</a>).</p></li>
 <li><p><code><a href="../reference/data_slice.html">data_slice()</a></code> gains a <code>.by</code> argument to evaluate slice expressions within observed groups. For example, <code>x = evenly(x)</code> now supports a separate range for each level of a factor. Convenient for models with factor <code>by</code> smooths (<a href="https://github.com/gavinsimpson/gratia/issues/196" class="external-link">#196</a>).</p></li>
