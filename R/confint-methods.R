@@ -209,7 +209,10 @@
 #'   for point-wise intervals, or `"simultaneous"` for simultaneous intervals.
 #' @param nsim integer; the number of simulations used in computing the
 #'   simultaneous intervals.
-#' @param shift logical; should the constant term be add to the smooth?
+#' @param shift logical; should the model intercept be added to the smooth?
+#'   Only the intercept is added; other parametric effects, including factor
+#'   effects associated with a factor `by` smooth, are excluded. For full fitted
+#'   values and their confidence intervals, use [fitted_values()].
 #' @param transform logical; should the smooth be evaluated on a transformed
 #'   scale? For generalised models, this involves applying the inverse of the
 #'   link function used to fit the model. Alternatively, the name of, or an

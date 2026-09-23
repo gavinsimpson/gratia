@@ -133,6 +133,39 @@ test_that("Simultaneous confidence interval for a GAM with factor by variable wo
   )
 })
 
+## Issue #365
+test_that("shift adds only the intercept to factor-by tensor product smooths", {
+  withr::local_seed(1)
+  dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
+  dat$f <- factor(sample(c("A", "B"), nrow(dat), replace = TRUE))
+  fit <- mgcv::gam(y ~ te(x0, x1, by = f) + f, data = dat)
+  predgrid <- data.frame(x0 = 0.5, x1 = 0.5, f = factor(c("A", "B")))
+
+  ci <- confint(fit, "x0", partial_match = TRUE, data = predgrid)
+  shifted <- confint(fit, "x0", partial_match = TRUE, shift = TRUE,
+    data = predgrid)
+  intercept <- unname(coef(fit)["(Intercept)"])
+  expect_identical(as.character(shifted$f), c("A", "B"))
+  for (column in c(".estimate", ".lower_ci", ".upper_ci")) {
+    expect_equal(shifted[[column]], ci[[column]] + intercept)
+  }
+  expect_equal(shifted$.se, ci$.se)
+
+  # Full predictions also include the parametric factor effect.
+  pred <- predict(fit, newdata = predgrid, se.fit = TRUE)
+  factor_effect <- unname(coef(fit)["fB"])
+  expect_gt(abs(factor_effect), 0.01)
+  expect_equal(as.numeric(pred$fit) - shifted$.estimate, c(0, factor_effect))
+
+  fv <- fitted_values(fit, data = predgrid, scale = "link")
+  expect_equal(fv$.fitted, as.numeric(pred$fit))
+  expect_equal(fv$.se, as.numeric(pred$se.fit))
+  expect_equal(fv$.lower_ci,
+    as.numeric(pred$fit - qnorm(0.975) * pred$se.fit))
+  expect_equal(fv$.upper_ci,
+    as.numeric(pred$fit + qnorm(0.975) * pred$se.fit))
+})
+
 ## Part of #80
 test_that("Point-wise confidence interval for a GAM with selected factor by variable works", {
   skip_if_not_installed("withr")
