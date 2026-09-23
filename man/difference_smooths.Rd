@@ -12,6 +12,7 @@ difference_smooths(model, ...)
   select = NULL,
   smooth = deprecated(),
   n = 100,
+  n_2d = 50,
   ci_level = 0.95,
   data = NULL,
   group_means = FALSE,
@@ -49,6 +50,12 @@ can be specified, and \code{partial_match} must be set to \code{FALSE}.}
 
 \item{n}{numeric; the number of points at which to evaluate the difference
 between pairs of smooths.}
+
+\item{n_2d}{numeric; the number of points along each of the first two axes
+of a smooth surface, including surface panels of higher-dimensional smooths.
+The default is 50 in plotting and plot-preparation functions. If \code{NULL},
+use \code{n} instead. Ignored when evaluation \code{data} are supplied. Factor levels
+are retained, and curves with only one continuous covariate use \code{n}.}
 
 \item{ci_level}{numeric between 0 and 1; the coverage of credible interval.}
 

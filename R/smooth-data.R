@@ -3,8 +3,10 @@
 #' @param model a fitted model
 #' @param id the number ID of the smooth within `model` to process.
 #' @param n numeric; the number of new observations to generate.
-#' @param n_2d numeric; the number of new observations to generate for the
-#'   second dimension of a 2D smooth. *Currently ignored*.
+#' @param n_2d numeric; the number of points along each of the first two axes
+#'   of a smooth surface, including surface panels of higher-dimensional smooths.
+#'   The default, `NULL`, uses `n` instead. Factor levels
+#'   are retained, and curves with only one continuous covariate use `n`.
 #' @param n_3d numeric; the number of new observations to generate for the third
 #'   dimension of a 3D smooth.
 #' @param n_4d numeric; the number of new observations to generate for the
@@ -87,7 +89,10 @@
 
   # Figure out the n to use for each dimension
   sm_dim <- smooth_dim(sm)
-  # fix up the n, n_3d, n_4d. If `n_3d` is `NULL` set `n_3d <- n`
+  # NULL resolution controls fall back to n.
+  if (is.null(n_2d)) {
+    n_2d <- n
+  }
   if (is.null(n_3d)) {
     n_3d <- n
   }
@@ -95,8 +100,12 @@
   if (is.null(n_4d)) {
     n_4d <- n
   }
-  seq_per_dim <- function(data, vars, dim, n, n_3d, n_4d) {
+  seq_per_dim <- function(data, vars, dim, n, n_2d, n_3d, n_4d) {
     n_per_dim <- rep(n, dim)
+    # Factor levels do not turn a curve into a surface.
+    if (sum(!vapply(data[vars], is.factor, logical(1))) >= 2L) {
+      n_per_dim[1:2] <- n_2d
+    }
     if (dim == 3L) {
       n_per_dim[3] <- n_3d
     } else if (dim > 3L) {
@@ -124,11 +133,11 @@
   ## generate covariate values for the smooth
   # newlist <- lapply(mf[smooth_vars], seq_min_max, n = n)
   if (inherits(sm, "sos.smooth")) {
-    newlist <- sos_data(mf, vars = smooth_vars, n)
+    newlist <- sos_data(mf, vars = smooth_vars, n = n_2d)
   } else {
     newlist <- seq_per_dim(
       data = mf, vars = smooth_vars, dim = sm_dim,
-      n = n, n_3d = n_3d, n_4d = n_4d
+      n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d
     )
   }
 

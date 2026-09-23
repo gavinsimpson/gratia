@@ -24,8 +24,10 @@ smooth_data(
 
 \item{n}{numeric; the number of new observations to generate.}
 
-\item{n_2d}{numeric; the number of new observations to generate for the
-second dimension of a 2D smooth. \emph{Currently ignored}.}
+\item{n_2d}{numeric; the number of points along each of the first two axes
+of a smooth surface, including surface panels of higher-dimensional smooths.
+The default, \code{NULL}, uses \code{n} instead. Factor levels
+are retained, and curves with only one continuous covariate use \code{n}.}
 
 \item{n_3d}{numeric; the number of new observations to generate for the third
 dimension of a 3D smooth.}

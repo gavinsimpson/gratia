@@ -12,9 +12,12 @@
 #'   renamed `select`
 #' @param data a data frame containing the variables used in `smooth`.
 #' @param n numeric; the number of points over the range of the covariate at
-#'   which to evaluate the smooth.
-#' @param n_2d numeric; the number of new observations for each dimension of a
-#'   bivariate smooth. Not currently used; `n` is used for both dimensions.
+#'   which to evaluate a univariate smooth.
+#' @param n_2d numeric; the number of points along each of the first two axes
+#'   of a smooth surface, including surface panels of higher-dimensional smooths.
+#'   The default is 50 in plotting and plot-preparation functions. If `NULL`,
+#'   use `n` instead. Ignored when evaluation `data` are supplied. Factor levels
+#'   are retained, and curves with only one continuous covariate use `n`.
 #' @param n_3d numeric; the number of new observations to generate for the third
 #'   dimension of a 3D smooth.
 #' @param n_4d numeric; the number of new observations to generate for the
@@ -130,11 +133,11 @@
         \(i) {
           tidy_basis_wrapper(
             i, ids = ids, data = data, smooths = smooths, model = object, n = n,
-            n_3d = n_3d, n_4d = n_4d, offset = NULL
+            n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, offset = NULL
           )
         },
         ids = ids, data = data, smooths = smooths, object = object,
-        n = n, n_3d = n_3d, n_4d = n_4d,
+        n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
         tidy_basis_wrapper = tidy_basis_wrapper
       )
     )
@@ -144,7 +147,7 @@
       seq_along(smooths),
       tidy_basis_wrapper,
       ids = ids, data = data, smooths = smooths, model = object, n = n,
-      n_3d = n_3d, n_4d = n_4d, offset = NULL
+      n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, offset = NULL
     )
   }
 

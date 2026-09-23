@@ -12,15 +12,16 @@
 #'   will be sampled from. If supplied, a character vector of requested terms.
 #' @param smooth `r lifecycle::badge("deprecated")` Use `select` instead.
 #' @param n numeric; the number of points over the range of the covariate at
-#'   which to evaluate the smooth.
-#' @param n_3d,n_4d numeric; the number of points over the range of last
-#'   covariate in a 3D or 4D smooth. The default is `NULL` which achieves the
-#'   standard behaviour of using `n` points over the range of all covariate,
-#'   resulting in `n^d` evaluation points, where `d` is the dimension of the
-#'   smooth. For `d > 2` this can result in very many evaluation points and slow
-#'   performance. For smooths of `d > 4`, the value of `n_4d` will be used for
-#'   all dimensions `> 4`, unless this is `NULL`, in which case the default
-#'   behaviour (using `n` for all dimensions) will be observed.
+#'   which to evaluate a univariate smooth.
+#' @param n_2d numeric; the number of points along each of the first two axes
+#'   of a smooth surface, including surface panels of higher-dimensional smooths.
+#'   The default is 50 in plotting and plot-preparation functions. If `NULL`,
+#'   use `n` instead. Ignored when evaluation `data` are supplied. Factor levels
+#'   are retained, and curves with only one continuous covariate use `n`.
+#' @param n_3d,n_4d numeric; the number of points along the third axis of a
+#'   3D smooth (`n_3d`, default 16), or each axis after the first two for smooths
+#'   of dimension four or higher (`n_4d`, default 4). If `NULL`, use `n` for
+#'   those axes. The first two surface axes use `n_2d`.
 #' @param data a data frame of covariate values at which to evaluate the
 #'   smooth.
 #' @param envir an optional environment supplying functions and constants used
@@ -107,6 +108,7 @@
     select = NULL,
     smooth = deprecated(),
     n = 100,
+    n_2d = 50,
     n_3d = 16,
     n_4d = 4,
     data = NULL,
@@ -172,13 +174,13 @@
       smooths,
       in_parallel(
         \(sm) eval_smooth(
-          sm, model = object, n = n, n_3d = n_3d, n_4d = n_4d,
+          sm, model = object, n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
           data = data, unconditional = unconditional,
           frequentist = frequentist,
           overall_uncertainty = overall_uncertainty, dist = dist,
           clip = clip
         ),
-        object = object, n = n, n_3d = n_3d, n_4d = n_4d, data = data,
+        object = object, n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, data = data,
         unconditional = unconditional, frequentist = frequentist,
         overall_uncertainty = overall_uncertainty, dist = dist, clip = clip,
         eval_smooth = gratia::eval_smooth
@@ -191,6 +193,7 @@
       eval_smooth,
       model = object,
       n = n,
+      n_2d = n_2d,
       n_3d = n_3d,
       n_4d = n_4d,
       data = data,
@@ -572,6 +575,7 @@
 #' @export
 `eval_smooth.mgcv.smooth` <- function(smooth, model,
                                       n = 100,
+                                      n_2d = NULL,
                                       n_3d = NULL,
                                       n_4d = NULL,
                                       data = NULL,
@@ -590,7 +594,7 @@
   ## deal with data if supplied
   data <- process_user_data_for_eval(
     data = data, model = model,
-    n = n, n_3d = n_3d, n_4d = n_4d,
+    n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
     id = which_smooth(
       model,
       smooth_label(smooth)
@@ -632,6 +636,7 @@
   smooth,
   model,
   n = 100,
+  n_2d = NULL,
   n_3d = NULL,
   n_4d = NULL,
   data = NULL,
@@ -652,11 +657,11 @@
   # As a special case, if no `data`, then we should generate some data here for
   # soap film from the boundary
   #if (is.null(data)) {
-  #  data <- soap_film_data(smooth, n = n, n_3d = n_3d, n_4d = n_4d)
+  #  data <- soap_film_data(smooth, n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d)
   #}
   data <- process_user_data_for_eval(
     data = data, model = model,
-    n = n, n_3d = n_3d, n_4d = n_4d,
+    n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
     id = which_smooth(
       model,
       smooth_label(smooth)
@@ -736,6 +741,7 @@
 #' @export
 `eval_smooth.scam_smooth` <- function(smooth, model,
                                       n = 100,
+                                      n_2d = NULL,
                                       n_3d = NULL,
                                       n_4d = NULL,
                                       data = NULL,
@@ -754,7 +760,7 @@
   ## deal with data if supplied
   data <- process_user_data_for_eval(
     data = data, model = model,
-    n = n, n_3d = n_3d, n_4d = n_4d,
+    n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
     id = which_smooth(model, smooth_label(smooth))
   )
 
@@ -790,6 +796,8 @@
 #' @param model a fitted model
 #' @param n numeric; the number of new observations to generate. Passed to
 #'   [gratia::smooth_data()].
+#' @param n_2d numeric; points along each surface axis. Passed to
+#'   [gratia::smooth_data()].
 #' @param n_3d numeric; the number of new observations to generate for the third
 #'   dimension of a 3D smooth. Passed to [gratia::smooth_data()].
 #' @param n_4d numeric; the number of new observations to generate for the
@@ -802,12 +810,13 @@
 #' @importFrom rlang .data
 #' @importFrom vctrs vec_slice
 `process_user_data_for_eval` <- function(
-    data, model, n, n_3d, n_4d, id,
+    data, model, n, n_3d, n_4d, id, n_2d = NULL,
     var_order = NULL) {
   if (is.null(data)) {
     data <- smooth_data(
       model = model,
       n = n,
+      n_2d = n_2d,
       n_3d = n_3d,
       n_4d = n_4d,
       id = id,
@@ -837,6 +846,7 @@
   smooth,
   model,
   n = 100,
+  n_2d = NULL,
   data = NULL,
   unconditional = FALSE,
   frequentist = FALSE,
@@ -862,7 +872,7 @@
   id <- which_smooth(model, smooth_label(smooth))
   data <- process_user_data_for_eval(
     data = data, model = model,
-    n = n, n_3d = NULL, n_4d = NULL, id = id, var_order = var_order
+    n = n, n_2d = n_2d, n_3d = NULL, n_4d = NULL, id = id, var_order = var_order
   )
 
   ## values of spline at data
@@ -890,6 +900,7 @@
   smooth,
   model,
   n = 100,
+  n_2d = NULL,
   data = NULL,
   unconditional = FALSE,
   frequentist = FALSE,
@@ -907,7 +918,7 @@
   id <- which_smooth(model, smooth_label(smooth))
   data <- process_user_data_for_eval(
     data = data, model = model,
-    n = n, n_3d = NULL, n_4d = NULL,
+    n = n, n_2d = n_2d, n_3d = NULL, n_4d = NULL,
     id = id
   )
 
@@ -935,6 +946,7 @@
   smooth,
   model,
   n = 100,
+  n_2d = NULL,
   data = NULL,
   unconditional = FALSE,
   frequentist = FALSE,
@@ -952,7 +964,7 @@
   id <- which_smooth(model, smooth_label(smooth))
   data <- process_user_data_for_eval(
     data = data, model = model,
-    n = n, n_3d = NULL, n_4d = NULL,
+    n = n, n_2d = n_2d, n_3d = NULL, n_4d = NULL,
     id = id
   )
 
@@ -980,6 +992,7 @@
   smooth,
   model,
   n = 100,
+  n_2d = NULL,
   data = NULL,
   unconditional = FALSE,
   frequentist = FALSE,
@@ -997,6 +1010,7 @@
   smooth,
   model,
   n = 100,
+  n_2d = NULL,
   n_3d = NULL,
   n_4d = NULL,
   data = NULL,
@@ -1020,7 +1034,7 @@
   id <- which_smooth(model, smooth_label(smooth))
   data <- process_user_data_for_eval(
     data = data, model = model,
-    n = n, n_3d = n_3d, n_4d = n_4d,
+    n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
     id = id, var_order = var_order
   )
 
@@ -1066,6 +1080,7 @@
   smooth,
   model,
   n = 100,
+  n_2d = NULL,
   n_3d = NULL,
   n_4d = NULL,
   data = NULL,
@@ -1088,7 +1103,7 @@
   id <- which_smooth(model, smooth_label(smooth))
   data <- process_user_data_for_eval(
     data = data, model = model,
-    n = n, n_3d = n_3d, n_4d = n_4d,
+    n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
     id = id, var_order = var_order
   )
 

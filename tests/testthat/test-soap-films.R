@@ -15,7 +15,7 @@ test_that("draw for gam can plot a so soap film", {
 
 test_that("smooth estimates can evaluate a so soap film", {
   #skip("mgcv can't find the boundary")
-  expect_silent(sm_so <- smooth_estimates(m_soap, n = 100, clip = TRUE))
+  expect_silent(sm_so <- smooth_estimates(m_soap, n_2d = 100, clip = TRUE))
   bnd <- boundary(get_smooth(m_soap, "s(v,w)"))
   n_pts <- vapply(bnd, \(x) length(x[[1]]), integer(1))
 
@@ -33,7 +33,7 @@ test_that("smooth estimates can evaluate a so soap film", {
 
 test_that("smooth estimates can evaluate a so soap film no clipping", {
   #skip("mgcv can't find the boundary")
-  expect_silent(sm_so <- smooth_estimates(m_soap, n = 100, clip = FALSE))
+  expect_silent(sm_so <- smooth_estimates(m_soap, n_2d = 100, clip = FALSE))
   bnd <- boundary(get_smooth(m_soap, "s(v,w)"))
   n_pts <- vapply(bnd, \(x) length(x[[1]]), integer(1))
 
@@ -74,7 +74,7 @@ test_that(
   {
     models <- secondary_models()
     expect_silent(
-      sm_so <- smooth_estimates(models$m_soap_nested, n = 100, clip = TRUE)
+      sm_so <- smooth_estimates(models$m_soap_nested, n_2d = 100, clip = TRUE)
     )
     bnd <- boundary(get_smooth(models$m_soap_nested, "s(x,y)"))
     n_pts <- vapply(bnd, \(x) length(x[[1]]), integer(1))

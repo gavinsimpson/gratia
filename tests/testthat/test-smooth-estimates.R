@@ -74,7 +74,7 @@ test_that("smooth_estimates works for a GAMM", {
 })
 
 test_that("smooth_estimates works with a bivariate TPRS smooth", {
-  expect_silent(sm <- smooth_estimates(su_m_bivar, "s(x,z)", n = 50))
+  expect_silent(sm <- smooth_estimates(su_m_bivar, "s(x,z)", n_2d = 50))
   expect_s3_class(sm, "smooth_estimates")
   expect_s3_class(sm, "tbl_df")
   expect_s3_class(sm, "data.frame")
@@ -84,7 +84,7 @@ test_that("smooth_estimates works with a bivariate TPRS smooth", {
 
 test_that("smooth_estimates works with a bivariate TPRS smooth with dist", {
   expect_silent(sm <- smooth_estimates(su_m_bivar, "s(x,z)",
-    n = 50,
+    n_2d = 50,
     dist = 0.1
   ))
   expect_s3_class(sm, "smooth_estimates")
@@ -95,7 +95,7 @@ test_that("smooth_estimates works with a bivariate TPRS smooth with dist", {
 })
 
 test_that("smooth_estimates works with a bivariate te smooth", {
-  expect_silent(sm <- smooth_estimates(su_m_bivar_te, "te(x,z)", n = 50))
+  expect_silent(sm <- smooth_estimates(su_m_bivar_te, "te(x,z)", n_2d = 50))
   expect_s3_class(sm, "smooth_estimates")
   expect_s3_class(sm, "tbl_df")
   expect_s3_class(sm, "data.frame")
@@ -105,7 +105,7 @@ test_that("smooth_estimates works with a bivariate te smooth", {
 
 test_that("smooth_estimates works with a bivariate te smooth with dist", {
   expect_silent(sm <- smooth_estimates(su_m_bivar_te, "te(x,z)",
-    n = 50,
+    n_2d = 50,
     dist = 0.1
   ))
   expect_s3_class(sm, "smooth_estimates")
@@ -116,7 +116,7 @@ test_that("smooth_estimates works with a bivariate te smooth with dist", {
 })
 
 test_that("smooth_estimates works with a trivariate smooth", {
-  expect_silent(sm <- smooth_estimates(su_m_trivar, "s(x0,x1,x2)", n = 25))
+  expect_silent(sm <- smooth_estimates(su_m_trivar, "s(x0,x1,x2)", n_2d = 25))
   expect_s3_class(sm, "smooth_estimates")
   expect_s3_class(sm, "tbl_df")
   expect_s3_class(sm, "data.frame")
@@ -125,7 +125,7 @@ test_that("smooth_estimates works with a trivariate smooth", {
 })
 
 test_that("smooth_estimates works with a trivariate tensor product smooth", {
-  expect_silent(sm <- smooth_estimates(su_m_trivar_te, "te(x0,x1,x2)", n = 25))
+  expect_silent(sm <- smooth_estimates(su_m_trivar_te, "te(x0,x1,x2)", n_2d = 25))
   expect_s3_class(sm, "smooth_estimates")
   expect_s3_class(sm, "tbl_df")
   expect_s3_class(sm, "data.frame")
@@ -134,7 +134,7 @@ test_that("smooth_estimates works with a trivariate tensor product smooth", {
 })
 
 test_that("smooth_estimates works with a trivariate t2 tensor product smooth", {
-  expect_silent(sm <- smooth_estimates(m_t2, "t2(x0,x1,x2)", n = 25))
+  expect_silent(sm <- smooth_estimates(m_t2, "t2(x0,x1,x2)", n_2d = 25))
   expect_s3_class(sm, "smooth_estimates")
   expect_s3_class(sm, "tbl_df")
   expect_s3_class(sm, "data.frame")
@@ -143,7 +143,7 @@ test_that("smooth_estimates works with a trivariate t2 tensor product smooth", {
 })
 
 test_that("smooth_estimates works with a tensor product interaction smooth", {
-  expect_silent(sm <- smooth_estimates(m_ti, "ti(x0,x1)", n = 25))
+  expect_silent(sm <- smooth_estimates(m_ti, "ti(x0,x1)", n_2d = 25))
   expect_s3_class(sm, "smooth_estimates")
   expect_s3_class(sm, "tbl_df")
   expect_s3_class(sm, "data.frame")

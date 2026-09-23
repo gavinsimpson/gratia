@@ -22,6 +22,11 @@
 #' @param smooth `r lifecycle::badge("deprecated")` Use `select` instead.
 #' @param n numeric; the number of points at which to evaluate the difference
 #'   between pairs of smooths.
+#' @param n_2d numeric; the number of points along each of the first two axes
+#'   of a smooth surface, including surface panels of higher-dimensional smooths.
+#'   The default is 50 in plotting and plot-preparation functions. If `NULL`,
+#'   use `n` instead. Ignored when evaluation `data` are supplied. Factor levels
+#'   are retained, and curves with only one continuous covariate use `n`.
 #' @param ci_level numeric between 0 and 1; the coverage of credible interval.
 #' @param data data frame of locations at which to evaluate the difference
 #'   between smooths.
@@ -112,6 +117,7 @@
   select = NULL,
   smooth = deprecated(),
   n = 100,
+  n_2d = 50,
   ci_level = 0.95,
   data = NULL,
   group_means = FALSE,
@@ -161,7 +167,7 @@
   }
   if (is.null(data)) {
     sm_data <- map(sm_ids, smooth_data,
-      model = model, n = n, include_all = TRUE
+      model = model, n = n, n_2d = n_2d, include_all = TRUE
     )
     data <- bind_rows(sm_data)
   } else {

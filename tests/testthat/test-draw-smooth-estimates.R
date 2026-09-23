@@ -88,7 +88,7 @@ test_that("draw.smooth_estimates works for su_m_trivar", {
   # skip_on_os(os = "mac")
   expect_silent(plt <- draw(smooth_estimates(su_m_trivar,
     dist = 0.1,
-    n = 25, n_3d = 4
+    n_2d = 25, n_3d = 4
   )))
 
   # skip_on_ci() # testing without as moved to mac os x
@@ -100,7 +100,7 @@ test_that("draw.smooth_estimates works for su_m_trivar_te", {
   # skip_on_os(os = "mac")
   expect_silent(plt <- draw(smooth_estimates(su_m_trivar_te,
     dist = 0.1,
-    n = 25, n_3d = 4
+    n_2d = 25, n_3d = 4
   )))
 
   # skip_on_ci() # testing without as moved to mac os x
@@ -112,7 +112,7 @@ test_that("draw.smooth_estimates works for su_m_trivar_t2", {
   # skip_on_os(os = "mac")
   expect_silent(plt <- draw(smooth_estimates(su_m_trivar_t2,
     dist = 0.1,
-    n = 25, n_3d = 4
+    n_2d = 25, n_3d = 4
   )))
 
   # skip_on_ci() # testing without as moved to mac os x
@@ -125,7 +125,7 @@ test_that("draw.smooth_estimates works for su_m_quadvar", {
   # skip_on_os(os = "mac")
   expect_silent(plt <- draw(smooth_estimates(models$su_m_quadvar,
     dist = 0.1,
-    n = 25, n_3d = 4, n_4d = 3
+    n_2d = 25, n_3d = 4, n_4d = 3
   )))
 
   # skip_on_ci() # testing without as moved to mac os x
@@ -138,7 +138,7 @@ test_that("draw.smooth_estimates works for su_m_quadvar_te", {
   # skip_on_os(os = "mac")
   expect_silent(plt <- draw(smooth_estimates(models$su_m_quadvar_te,
     dist = 0.1,
-    n = 25, n_3d = 4, n_4d = 3
+    n_2d = 25, n_3d = 4, n_4d = 3
   )))
 
   # skip_on_ci() # testing without as moved to mac os x
@@ -151,7 +151,7 @@ test_that("draw.smooth_estimates works for su_m_quadvar_t2", {
   # skip_on_os(os = "mac")
   expect_silent(plt <- draw(smooth_estimates(models$su_m_quadvar_t2,
     dist = 0.1,
-    n = 25, n_3d = 4, n_4d = 3
+    n_2d = 25, n_3d = 4, n_4d = 3
   )))
 
   # skip_on_ci() # testing without as moved to mac os x
@@ -195,11 +195,11 @@ test_that("draw.smooth_estimates works for trivar te with a 2d marginal", {
   )
   expect_silent(plt1 <- draw(smooth_estimates(su_m_trivar_te2,
     dist = 0.1,
-    n = 20, n_3d = 4
+    n_2d = 20, n_3d = 4
   )))
 
   # also check that draw.gam() works for this model
-  expect_silent(plt2 <- draw(su_m_trivar_te2, dist = 0.1, n = 20, n_3d = 5))
+  expect_silent(plt2 <- draw(su_m_trivar_te2, dist = 0.1, n_2d = 20, n_3d = 5))
 
   # skip_on_ci() # testing without as moved to mac os x
   skip_if_not_installed("ggplot2", "3.5.2.9002")
@@ -224,12 +224,12 @@ test_that("draw.smooth_estimates works for quadvar te with 2d marginals", {
 
   expect_silent(plt1 <- draw(smooth_estimates(su_m_quadvar_te2,
     dist = 0.1,
-    n = 20, n_3d = 4, n_4d = 3
+    n_2d = 20, n_3d = 4, n_4d = 3
   )))
 
   # also check that draw.gam() works for this model
   expect_silent(plt2 <- draw(su_m_quadvar_te2,
-    dist = 0.1, n = 20, n_3d = 4,
+    dist = 0.1, n_2d = 20, n_3d = 4,
     n_4d = 3
   ))
 
@@ -253,10 +253,10 @@ test_that("draw.smooth_estimates works for trivar t2 with a 2d marginal", {
   )
   expect_silent(plt1 <- draw(smooth_estimates(su_m_trivar_t22,
     dist = 0.1,
-    n = 20, n_3d = 4
+    n_2d = 20, n_3d = 4
   )))
   # also check that draw.gam() works for this model
-  expect_silent(plt2 <- draw(su_m_trivar_t22, dist = 0.1, n = 20, n_3d = 5))
+  expect_silent(plt2 <- draw(su_m_trivar_t22, dist = 0.1, n_2d = 20, n_3d = 5))
 
   # skip_on_ci() # testing without as moved to mac os x
   skip_if_not_installed("ggplot2", "3.5.2.9002")
@@ -281,12 +281,12 @@ test_that("draw.smooth_estimates works for quadvar t2 with 2d marginals", {
 
   expect_silent(plt1 <- draw(smooth_estimates(su_m_quadvar_t22,
     dist = 0.1,
-    n = 20, n_3d = 4, n_4d = 3
+    n_2d = 20, n_3d = 4, n_4d = 3
   )))
 
   # also check that draw.gam() works for this model
   expect_silent(plt2 <- draw(su_m_quadvar_t22,
-    dist = 0.1, n = 20, n_3d = 4,
+    dist = 0.1, n_2d = 20, n_3d = 4,
     n_4d = 3
   ))
 
@@ -308,9 +308,9 @@ test_that("draw.gam works with sos spline chlorophyll a", {
     discrete = TRUE
   )
 
-  expect_silent(plt1 <- draw(m_chla, rug = FALSE, n = 25))
+  expect_silent(plt1 <- draw(m_chla, rug = FALSE, n_2d = 25))
   expect_silent(plt2 <- draw(m_chla,
-    rug = FALSE, n = 25,
+    rug = FALSE, n_2d = 25,
     crs = "+proj=wintri"
   ))
 
