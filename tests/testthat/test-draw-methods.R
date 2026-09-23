@@ -587,7 +587,7 @@ test_that("draw.gam can take user specified scales", {
 test_that("plotting sos smooths works", {
   skip_on_cran()
   skip_if_not_installed("sf")
-  expect_silent(plt <- draw(m_sos, n = 20))
+  expect_silent(plt <- draw(m_sos, n_2d = 20))
 
   # skip_on_ci() # testing without as moved to mac os x
   skip_if_not_installed("ggplot2", "3.5.2.9002")

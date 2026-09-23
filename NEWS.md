@@ -54,6 +54,11 @@
 
 ## New features
 
+* Surface plotting and related evaluation functions now support `n_2d`,
+  defaulting to 50 points along each surface axis (#153). This reduces default
+  surface grids from 10,000 to 2,500 points per panel while allowing independent
+  control of curve and slice resolution.
+
 * `response_derivatives()` now supports delta-method standard errors and
   pointwise intervals via `uncertainty = "delta"`. Both uncertainty methods
   return `.se`, with posterior simulation remaining the default.

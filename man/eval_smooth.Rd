@@ -19,6 +19,7 @@ eval_smooth(smooth, ...)
   smooth,
   model,
   n = 100,
+  n_2d = NULL,
   n_3d = NULL,
   n_4d = NULL,
   data = NULL,
@@ -34,6 +35,7 @@ eval_smooth(smooth, ...)
   smooth,
   model,
   n = 100,
+  n_2d = NULL,
   n_3d = NULL,
   n_4d = NULL,
   data = NULL,
@@ -49,6 +51,7 @@ eval_smooth(smooth, ...)
   smooth,
   model,
   n = 100,
+  n_2d = NULL,
   n_3d = NULL,
   n_4d = NULL,
   data = NULL,
@@ -64,6 +67,7 @@ eval_smooth(smooth, ...)
   smooth,
   model,
   n = 100,
+  n_2d = NULL,
   data = NULL,
   unconditional = FALSE,
   frequentist = FALSE,
@@ -76,6 +80,7 @@ eval_smooth(smooth, ...)
   smooth,
   model,
   n = 100,
+  n_2d = NULL,
   data = NULL,
   unconditional = FALSE,
   frequentist = FALSE,
@@ -88,6 +93,7 @@ eval_smooth(smooth, ...)
   smooth,
   model,
   n = 100,
+  n_2d = NULL,
   data = NULL,
   unconditional = FALSE,
   frequentist = FALSE,
@@ -100,6 +106,7 @@ eval_smooth(smooth, ...)
   smooth,
   model,
   n = 100,
+  n_2d = NULL,
   data = NULL,
   unconditional = FALSE,
   frequentist = FALSE,
@@ -112,6 +119,7 @@ eval_smooth(smooth, ...)
   smooth,
   model,
   n = 100,
+  n_2d = NULL,
   n_3d = NULL,
   n_4d = NULL,
   data = NULL,
@@ -127,6 +135,7 @@ eval_smooth(smooth, ...)
   smooth,
   model,
   n = 100,
+  n_2d = NULL,
   n_3d = NULL,
   n_4d = NULL,
   data = NULL,
@@ -147,16 +156,18 @@ eval_smooth(smooth, ...)
 models are supported.}
 
 \item{n}{numeric; the number of points over the range of the covariate at
-which to evaluate the smooth.}
+which to evaluate a univariate smooth.}
 
-\item{n_3d, n_4d}{numeric; the number of points over the range of last
-covariate in a 3D or 4D smooth. The default is \code{NULL} which achieves the
-standard behaviour of using \code{n} points over the range of all covariate,
-resulting in \code{n^d} evaluation points, where \code{d} is the dimension of the
-smooth. For \code{d > 2} this can result in very many evaluation points and slow
-performance. For smooths of \code{d > 4}, the value of \code{n_4d} will be used for
-all dimensions \verb{> 4}, unless this is \code{NULL}, in which case the default
-behaviour (using \code{n} for all dimensions) will be observed.}
+\item{n_2d}{numeric; the number of points along each of the first two axes
+of a smooth surface, including surface panels of higher-dimensional smooths.
+The default is 50 in plotting and plot-preparation functions. If \code{NULL},
+use \code{n} instead. Ignored when evaluation \code{data} are supplied. Factor levels
+are retained, and curves with only one continuous covariate use \code{n}.}
+
+\item{n_3d, n_4d}{numeric; the number of points along the third axis of a
+3D smooth (\code{n_3d}, default 16), or each axis after the first two for smooths
+of dimension four or higher (\code{n_4d}, default 4). If \code{NULL}, use \code{n} for
+those axes. The first two surface axes use \code{n_2d}.}
 
 \item{data}{an optional data frame of values to evaluate \code{smooth} at.}
 

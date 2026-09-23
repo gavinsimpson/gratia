@@ -14,6 +14,7 @@
   scales = c("free", "fixed"),
   ci_level = 0.95,
   n = 100,
+  n_2d = 50,
   n_3d = 16,
   n_4d = 4,
   unconditional = FALSE,
@@ -90,7 +91,13 @@ terms.}
 \item{ci_level}{numeric between 0 and 1; the coverage of credible interval.}
 
 \item{n}{numeric; the number of points over the range of the covariate at
-which to evaluate the smooth.}
+which to evaluate a univariate smooth.}
+
+\item{n_2d}{numeric; the number of points along each of the first two axes
+of a smooth surface, including surface panels of higher-dimensional smooths.
+The default is 50 in plotting and plot-preparation functions. If \code{NULL},
+use \code{n} instead. Ignored when evaluation \code{data} are supplied. Factor levels
+are retained, and curves with only one continuous covariate use \code{n}.}
 
 \item{n_3d}{numeric; the number of new observations to generate for the third
 dimension of a 3D smooth.}
@@ -244,7 +251,7 @@ draw(m1, residuals = TRUE)
 
 df2 <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
 m2 <- gam(y ~ s(x, z, k = 40), data = df2, method = "REML")
-draw(m2, contour = FALSE, n = 50)
+draw(m2, contour = FALSE, n_2d = 50)
 
 # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 # for more examples and for details on how to modify the theme of all the

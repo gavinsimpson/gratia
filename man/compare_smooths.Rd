@@ -10,6 +10,7 @@ compare_smooths(
   select = NULL,
   smooths = deprecated(),
   n = 100,
+  n_2d = 50,
   data = NULL,
   unconditional = FALSE,
   overall_uncertainty = TRUE,
@@ -33,7 +34,13 @@ stored.}
 \item{smooths}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{select} instead.}
 
 \item{n}{numeric; the number of points over the range of the covariate at
-which to evaluate the smooth.}
+which to evaluate a univariate smooth.}
+
+\item{n_2d}{numeric; the number of points along each of the first two axes
+of a smooth surface, including surface panels of higher-dimensional smooths.
+The default is 50 in plotting and plot-preparation functions. If \code{NULL},
+use \code{n} instead. Ignored when evaluation \code{data} are supplied. Factor levels
+are retained, and curves with only one continuous covariate use \code{n}.}
 
 \item{data}{a data frame of covariate values at which to evaluate the
 smooth.}

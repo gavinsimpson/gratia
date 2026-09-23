@@ -91,10 +91,13 @@ renamed \code{select}}
 \item{data}{a data frame containing the variables used in \code{smooth}.}
 
 \item{n}{numeric; the number of points over the range of the covariate at
-which to evaluate the smooth.}
+which to evaluate a univariate smooth.}
 
-\item{n_2d}{numeric; the number of new observations for each dimension of a
-bivariate smooth. Not currently used; \code{n} is used for both dimensions.}
+\item{n_2d}{numeric; the number of points along each of the first two axes
+of a smooth surface, including surface panels of higher-dimensional smooths.
+The default is 50 in plotting and plot-preparation functions. If \code{NULL},
+use \code{n} instead. Ignored when evaluation \code{data} are supplied. Factor levels
+are retained, and curves with only one continuous covariate use \code{n}.}
 
 \item{n_3d}{numeric; the number of new observations to generate for the third
 dimension of a 3D smooth.}

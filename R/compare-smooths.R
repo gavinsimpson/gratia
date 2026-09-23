@@ -49,6 +49,7 @@
     select = NULL,
     smooths = deprecated(),
     n = 100,
+    n_2d = 50,
     data = NULL,
     unconditional = FALSE,
     overall_uncertainty = TRUE,
@@ -78,7 +79,7 @@
   ## loop over the smooths, applying smooth_estimates to each model
   sm_est <- lapply(models, smooth_estimates,
     select = select, envir = envir,
-    n = n,
+    n = n, n_2d = n_2d,
     data = data,
     unconditional = unconditional,
     overall_uncertainty = overall_uncertainty,

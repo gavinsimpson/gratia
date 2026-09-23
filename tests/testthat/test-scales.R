@@ -2,7 +2,7 @@
 
 test_that("the partial effect fill scale works", {
   plt <- su_m_bivar_te |>
-    smooth_estimates(n = 30) |>
+    smooth_estimates(n_2d = 30) |>
     ggplot(
       aes(
         x = x, y = z

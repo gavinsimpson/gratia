@@ -28,7 +28,7 @@ test_that("drawing preserves selection, transformations and argument errors", {
 })
 
 test_that("drawing handles small smooth grids and derived objects", {
-  expect_draw_build(draw(smooth_estimates(su_m_bivar_te, n = 5)))
+  expect_draw_build(draw(smooth_estimates(su_m_bivar_te, n_2d = 5)))
   expect_draw_build(draw(smooth_estimates(m_univar_t2, n = 8)))
   expect_draw_build(draw(derivatives(m_1_smooth, n = 8), add_change = TRUE))
   expect_draw_build(draw(partial_derivatives(su_m_bivar_te, focal = "x", n = 8)))
@@ -74,7 +74,7 @@ test_that("small four dimensional smooths can be evaluated and drawn", {
   d <- data.frame(x = runif(100), z = runif(100), u = runif(100), v = runif(100))
   d$y <- sin(d$x * 4) + d$z + rnorm(100)
   m <- gam(y ~ te(x, z, u, v, k = c(3, 3, 3, 3)), data = d)
-  sm <- smooth_estimates(m, n = 4, n_3d = 3, n_4d = 2)
+  sm <- smooth_estimates(m, n_2d = 4, n_3d = 3, n_4d = 2)
   expect_true(all(is.finite(sm$.estimate)))
   expect_draw_build(draw(sm))
 })
@@ -110,15 +110,15 @@ test_that("small bivariate smooth differences preserve factor comparisons", {
   d <- data.frame(x = runif(80), z = runif(80), f = factor(rep(1:2, 40)))
   d$y <- sin(d$x * 4) + as.numeric(d$f) + rnorm(80)
   m <- gam(y ~ f + s(x, z, by = f, k = 8), data = d)
-  ds <- difference_smooths(m, select = "s(x,z)", n = 5)
+  ds <- difference_smooths(m, select = "s(x,z)", n_2d = 5)
   expect_equal(nrow(ds), 25L)
   expect_true(all(is.finite(ds$.diff)))
   expect_draw_build(draw(ds))
 })
 
 test_that("soap boundaries and clipping work on a small grid", {
-  uncut <- smooth_estimates(m_soap, n = 8, clip = FALSE)
-  clipped <- smooth_estimates(m_soap, n = 8, clip = TRUE)
+  uncut <- smooth_estimates(m_soap, n_2d = 8, clip = FALSE)
+  clipped <- smooth_estimates(m_soap, n_2d = 8, clip = TRUE)
   bnd <- boundary(get_smooth(m_soap, "s(v,w)"))
   n_boundary <- sum(vapply(bnd, function(x) length(x[[1]]), integer(1)))
   expect_equal(nrow(uncut), 8L * 8L + n_boundary)
