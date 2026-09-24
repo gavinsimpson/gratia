@@ -83,14 +83,8 @@
     if (isTRUE(rug)) {
       plt <- plt + geom_rug(sides = "b", position = position, alpha = 0.5)
     }
-    plt <- plt + geom_ribbon(
-      aes(
-        ymin = .data$lower,
-        ymax = .data$upper
-      ),
-      alpha = 0.3
-    ) +
-      geom_line()
+    plt <- add_curve_interval(plt, lower_var = "lower", upper_var = "upper",
+      ribbon_alpha = 0.3)
   }
 
   ## default axis labels if none supplied

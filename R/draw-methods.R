@@ -89,54 +89,27 @@
   for (i in seq_along(sm)) {
     take <- object[[".smooth"]] == sm[i]
     df <- object[take, ]
-    xvar <- vars_from_label(unique(df[[".smooth"]])) # unique(df[['var']])
-    plt <- if (!all(is.na(df$.fs))) {
+    xvar <- vars_from_label(unique(df[[".smooth"]]))
+    group_var <- colour_var <- NULL
+    if (!all(is.na(df$.fs))) {
       fs_col_lab <- unique(df$.fs)
-      fs_var <- fs_col_lab |>
-        stringr::str_split(":") |> unlist()
-      xvar <- xvar[!xvar %in% fs_var] # xvar[1L]
+      fs_var <- fs_col_lab |> stringr::str_split(":") |> unlist()
+      xvar <- xvar[!xvar %in% fs_var]
       if (length(fs_var) > 1L) {
-        df <- df |>
-          mutate(
-            ..fs_interact.. = do.call("interaction", args = df[fs_var])
-          )
+        df <- df |> mutate(
+          ..fs_interact.. = do.call("interaction", args = df[fs_var]))
         fs_var <- "..fs_interact.."
       }
+      group_var <- fs_var
       if (differentiate_factor_smooths) {
-        ggplot(df, aes(
-          x = .data[[xvar]], # .data$data,
-          y = .data$.derivative,
-          group = .data[[fs_var]],
-          colour = .data[[fs_var]]
-        ))
-      } else {
-        ggplot(df, aes(
-          x = .data[[xvar]], # .data$data,
-          y = .data$.derivative,
-          group = .data[[fs_var]]
-        ))
+        colour_var <- fs_var
       }
-    } else {
-      ggplot(df, aes(
-        x = .data[[xvar]], # .data$data,
-        y = .data$.derivative
-      )) +
-        geom_ribbon(aes(
-          ymin = .data$.lower_ci,
-          ymax = .data$.upper_ci,
-          y = NULL
-        ), alpha = alpha)
     }
-    plt <- plt +
-      geom_line() +
-      guides(x = guide_axis(angle = angle))
-    plt <- if (differentiate_factor_smooths && !all(is.na(df$.fs))) {
-      plt + labs(
-        title = sm[i], x = xvar, y = "Derivative", colour = fs_col_lab
-      )
-    } else {
-      plt + labs(title = sm[i], x = xvar, y = "Derivative")
-    }
+    labels <- labs(title = sm[i], x = xvar, y = "Derivative")
+    if (!is.null(colour_var)) labels$colour <- fs_col_lab
+    plt <- prepare_derivative_plot(df, x_var = xvar, y_var = ".derivative",
+      group_var = group_var, colour_var = colour_var, labels = labels,
+      interval = all(is.na(df$.fs)), alpha = alpha, angle = angle)
     if (isTRUE(add_change)) {
       plt <- if (identical(change_type, "change")) {
         plt +
@@ -159,23 +132,8 @@
     plotlist[[i]] <- plt
   }
 
-  if (isTRUE(identical(scales, "fixed"))) {
-    ylims <- range(object[[".lower_ci"]], object[[".upper_ci"]])
-
-    for (i in seq_along(plotlist)) {
-      plotlist[[i]] <- plotlist[[i]] + lims(y = ylims)
-    }
-  }
-  ## return
-  n_plots <- length(plotlist)
-  if (is.null(ncol) && is.null(nrow)) {
-    ncol <- ceiling(sqrt(n_plots))
-    nrow <- ceiling(n_plots / ncol)
-  }
-  wrap_plots(plotlist,
-    byrow = TRUE, ncol = ncol, nrow = nrow,
-    guides = guides, ...
-  )
+  wrap_interval_plots(plotlist, object, scales = scales,
+    ncol = ncol, nrow = nrow, guides = guides, ...)
 }
 
 #' @export
@@ -201,49 +159,16 @@
     take <- object[[".smooth"]] == sm[i]
     df <- object[take, ]
     xvar <- unique(df[[".focal"]])
-    plt <- if (!all(is.na(df$.fs))) {
-      ggplot(df, aes(
-        x = .data[[xvar]],
-        y = .data$.partial_deriv,
-        group = .data$.fs
-      ))
-    } else {
-      ggplot(df, aes(
-        x = .data[[xvar]],
-        y = .data$.partial_deriv
-      )) +
-        geom_ribbon(aes(
-          ymin = .data$.lower_ci,
-          ymax = .data$.upper_ci,
-          y = NULL
-        ), alpha = alpha)
-    }
-    plotlist[[i]] <- plt +
-      geom_line() +
-      labs(
-        title = sm[i], x = xvar,
-        y = paste("Partial derivative with respect to", xvar)
-      ) +
-      guides(x = guide_axis(angle = angle))
+    plotlist[[i]] <- prepare_derivative_plot(df,
+      x_var = xvar, y_var = ".partial_deriv",
+      group_var = if (!all(is.na(df$.fs))) ".fs" else NULL,
+      interval = all(is.na(df$.fs)), alpha = alpha, angle = angle,
+      labels = labs(title = sm[i], x = xvar,
+        y = paste("Partial derivative with respect to", xvar)))
   }
 
-  if (isTRUE(identical(scales, "fixed"))) {
-    ylims <- range(object[[".lower_ci"]], object[[".upper_ci"]])
-
-    for (i in seq_along(plotlist)) {
-      plotlist[[i]] <- plotlist[[i]] + lims(y = ylims)
-    }
-  }
-  ## return
-  n_plots <- length(plotlist)
-  if (is.null(ncol) && is.null(nrow)) {
-    ncol <- ceiling(sqrt(n_plots))
-    nrow <- ceiling(n_plots / ncol)
-  }
-  wrap_plots(plotlist,
-    byrow = TRUE, ncol = ncol, nrow = nrow,
-    guides = guides, ...
-  )
+  wrap_interval_plots(plotlist, object, scales = scales,
+    ncol = ncol, nrow = nrow, guides = guides, ...)
 }
 
 #' Plot basis functions
@@ -436,10 +361,9 @@
 
   # return
   n_plots <- length(sm_plts)
-  if (is.null(ncol) && is.null(nrow)) {
-    ncol <- ceiling(sqrt(n_plots))
-    nrow <- ceiling(n_plots / ncol)
-  }
+  layout <- prepare_plot_layout(n_plots, ncol = ncol, nrow = nrow)
+  ncol <- layout$ncol
+  nrow <- layout$nrow
   wrap_plots(sm_plts,
     byrow = TRUE, ncol = ncol, nrow = nrow,
     guides = guides, ...
@@ -489,59 +413,19 @@
                                     caption = NULL,
                                     angle = NULL,
                                     ...) {
-  sm_lab <- unique(object[[".smooth"]])
-  smooth_var <- vars_from_label(sm_lab)
-
-  ## default labeller
-  if (is.null(labeller)) {
-    labeller <- prefix_label_both
-  }
-
-  ## basis plot
-  plt <- ggplot(object, aes(
-    x = .data[[smooth_var]],
-    y = .data[[".value"]],
-    colour = .data[[".bf"]]
-  )) +
-    geom_line() +
-    guides(x = guide_axis(angle = angle))
-
-  ## default labels if none supplied
-  if (is.null(xlab)) {
-    xlab <- smooth_var
-  }
-  if (is.null(ylab)) {
-    ylab <- "Value"
-  }
-  if (is.null(title)) {
-    title <- attr(object, "smooth_object")
-    # if still null then this came from a model & we don't have the call
-    if (is.null(title)) {
-      title <- sm_lab
-    }
-  }
-
-  ## fixup for by variable smooths, facet for factor by smooths
-  if (all(!is.na(object[[".by"]]))) {
-    by_var_name <- unique(object[[".by"]])
-    by_var <- object[[by_var_name]]
-    if (is.character(by_var) || is.factor(by_var)) {
-      plt <- plt + facet_wrap(by_var_name, labeller = labeller)
-    }
-  }
-
-  ## add labelling to plot
-  plt <- plt + labs(
-    x = xlab, y = ylab, title = title, subtitle = subtitle,
-    caption = caption, colour = "Basis\nfunction"
-  )
-
-  ## draw a guide?
+  smooth_var <- vars_from_label(unique(object[[".smooth"]]))
+  plt <- add_curve_interval(ggplot(object,
+    aes(x = .data[[smooth_var]], y = .data[[".value"]],
+      colour = .data[[".bf"]]))) +
+    guides(x = guide_axis(angle = angle)) +
+    prepare_basis_facet(object, smooth_var, labeller = labeller) +
+    prepare_basis_labels(object, smooth_var, xlab = xlab, ylab = ylab,
+      title = title, subtitle = subtitle, caption = caption)
   if (!legend) {
     plt <- plt + guides(colour = "none")
   }
-
   plt
+
 }
 
 #' @importFrom ggplot2 scale_fill_distiller guides guide_axis facet_wrap vars labs geom_contour coord_equal
@@ -556,83 +440,26 @@
                                    n_contour = 10,
                                    contour_col = "black",
                                    ...) {
-  sm_lab <- unique(object[[".smooth"]])
-  smooth_var <- vars_from_label(sm_lab)
-
-  ## default labeller
-  if (is.null(labeller)) {
-    labeller <- prefix_label_both
-  }
-
-  ## basis plot
-  plt <- ggplot(object, aes(
-    x = .data[[smooth_var[1]]],
-    y = .data[[smooth_var[2]]],
-    fill = .data[[".value"]],
-    group = .data[[".bf"]]
-  )) +
-    geom_raster() +
-    guides(x = guide_axis(angle = angle, check.overlap = TRUE)) +
-    scale_fill_distiller(palette = "RdBu", type = "div")
-
-  ## default labels if none supplied
-  if (is.null(xlab)) {
-    xlab <- smooth_var[1]
-  }
-  if (is.null(ylab)) {
-    ylab <- smooth_var[2]
-  }
-  flab <- "value"
-  if (is.null(title)) {
-    title <- attr(object, "smooth_object")
-    # if still null then this came from a model & we don't have the call
-    if (is.null(title)) {
-      title <- sm_lab
-    }
-  }
-
-  ## fixup for by variable smooths, facet for factor by smooths
-  if (all(!is.na(object[[".by"]]))) {
-    by_var_name <- unique(object[[".by"]])
-    by_var <- object[[by_var_name]]
-    if (is.character(by_var) || is.factor(by_var)) {
-      # FIXME: this can't possibly work right
-      # We are plotting a surface for each function, but only facetting
-      # on the by variable here
-      plt <- plt + facet_wrap(by_var_name, labeller = labeller)
-    }
-  } else {
-    plt <- plt + facet_wrap(vars(.data[[".bf"]]), labeller = labeller)
-  }
-
-  ## add labelling to plot
-  plt <- plt + labs(
-    x = xlab, y = ylab, title = title, subtitle = subtitle,
-    caption = caption, fill = flab
-  )
-
-  ## draw a guide?
+  smooth_var <- vars_from_label(unique(object[[".smooth"]]))
+  coord <- if (str_detect(object[[".type"]][1L], "TPRS")) coord_equal() else NULL
+  plt <- prepare_surface_plot(object,
+    x_var = smooth_var[1], y_var = smooth_var[2], fill_var = ".value",
+    mapping = aes(x = .data[[smooth_var[1]]], y = .data[[smooth_var[2]]],
+      fill = .data[[".value"]], group = .data[[".bf"]]),
+    labels = prepare_basis_labels(object, smooth_var, xlab = xlab, ylab = ylab,
+      title = title, subtitle = subtitle, caption = caption),
+    facet = prepare_basis_facet(object, smooth_var, labeller = labeller),
+    coord = coord, contour = contour, contour_col = contour_col,
+    n_contour = n_contour,
+    contour_mapping = aes(z = .data[[".value"]],
+      group = .data[[".bf"]], fill = NULL),
+    axis_guide = guide_axis(angle = angle, check.overlap = TRUE),
+    fill_guide = NULL, legend_position = NULL)
   if (!legend) {
     plt <- plt + guides(fill = "none")
   }
-
-  if (isTRUE(contour)) {
-    plt <- plt + geom_contour(
-      mapping = aes(
-        z = .data[[".value"]],
-        group = .data[[".bf"]], fill = NULL
-      ),
-      colour = contour_col,
-      bins = n_contour,
-      na.rm = TRUE
-    )
-  }
-
-  if (str_detect(object[[".type"]][1L], "TPRS")) {
-    plt <- plt + coord_equal()
-  }
-
   plt
+
 }
 
 #' Plot posterior smooths
@@ -756,10 +583,9 @@
 
   ## return
   n_plots <- length(plts)
-  if (is.null(ncol) && is.null(nrow)) {
-    ncol <- ceiling(sqrt(n_plots))
-    nrow <- ceiling(n_plots / ncol)
-  }
+  layout <- prepare_plot_layout(n_plots, ncol = ncol, nrow = nrow)
+  ncol <- layout$ncol
+  nrow <- layout$nrow
   wrap_plots(plts,
     byrow = TRUE, ncol = ncol, nrow = nrow, guides = guides,
     ...
@@ -861,12 +687,10 @@
                                         colour = "black", angle = NULL) {
   smooth_var <- vars_from_label(object[1L, ".smooth"])
 
-  plt <- ggplot(object, aes(
-    x = .data[[smooth_var]],
-    y = .data[[".value"]],
-    group = .data[[".draw"]]
-  )) +
-    geom_line(alpha = alpha, colour = colour) +
+  plt <- add_curve_interval(
+    ggplot(object, aes(x = .data[[smooth_var]], y = .data[[".value"]],
+      group = .data[[".draw"]])),
+    line_alpha = alpha, line_colour = colour) +
     guides(x = guide_axis(angle = angle))
 
   ## default axis labels if none supplied
@@ -940,53 +764,18 @@
     }
   }
 
-  ## plot
-  plt <- ggplot(object, aes(
-    x = .data[[xvars[1L]]],
-    y = .data[[xvars[2L]]]
-  )) +
-    geom_raster(aes(fill = .data[[".value"]])) +
-    guides(x = guide_axis(angle = angle))
+  coord <- if (any(str_detect(unique(object$.type),
+    c("^TPRS", "^Duchon", "^GP", "^SOS")))) coord_equal() else NULL
+  prepare_surface_plot(object,
+    x_var = xvars[1], y_var = xvars[2], fill_var = ".value",
+    fill_limits = c(-1, 1) * max(abs(object[[".value"]])),
+    fill_title = "Partial effect",
+    labels = labs(title = title, x = xlab, y = ylab, subtitle = subtitle,
+      caption = caption),
+    contour = contour, contour_col = contour_col, n_contour = n_contour,
+    contour_na_rm = FALSE, angle = angle, facet = facet_wrap(~.draw),
+    coord = coord, legend_position = NULL)
 
-  if (contour) {
-    plt <- plt + geom_contour(aes(z = .data[[".value"]]),
-      bins = n_contour,
-      colour = contour_col
-    )
-  }
-
-  plt <- plt +
-    labs(
-      title = title, x = xlab, y = ylab, subtitle = subtitle,
-      caption = caption
-    )
-
-  plt <- plt + scale_fill_distiller(palette = "RdBu", type = "div")
-
-  # facet by the draw column
-  plt <- plt + facet_wrap(~.draw)
-
-  ## Set the limits for the fill
-  guide_limits <- c(-1, 1) * max(abs(object[[".value"]]))
-  plt <- plt + expand_limits(fill = guide_limits)
-
-  # add guide
-  plt <- plt +
-    guides(fill = guide_colourbar(
-      title = "Partial effect",
-      direction = "vertical"#,
-      #barheight = grid::unit(0.25, "npc")
-    ))
-
-  # if isotropic smooth, fix aspect ratio
-  if (any(str_detect(
-    unique(object$.type),
-    c("^TPRS", "^Duchon", "^GP", "^SOS")
-  ))) {
-    plt <- plt + coord_equal()
-  }
-
-  plt
 }
 
 `draw_3d_posterior_smooths` <- function(object, xvars,
@@ -1086,23 +875,8 @@
     subtitle = subtitle, caption = caption, angle = angle
   )
 
-  if (isTRUE(identical(scales, "fixed"))) {
-    ylims <- range(object[[".lower_ci"]], object[[".upper_ci"]])
-
-    for (i in seq_along(plotlist)) {
-      plotlist[[i]] <- plotlist[[i]] + lims(y = ylims)
-    }
-  }
-
-  n_plots <- length(plotlist)
-  if (is.null(ncol) && is.null(nrow)) {
-    ncol <- ceiling(sqrt(n_plots))
-    nrow <- ceiling(n_plots / ncol)
-  }
-  wrap_plots(plotlist,
-    byrow = TRUE, ncol = ncol, nrow = nrow,
-    guides = guides, ...
-  )
+  wrap_interval_plots(plotlist, object, scales = scales,
+    ncol = ncol, nrow = nrow, guides = guides, ...)
 }
 
 `draw_difference` <- function(object,
@@ -1205,16 +979,10 @@
   if (isTRUE(ref_line)) {
     plt <- plt + geom_hline(yintercept = 0, colour = line_col)
   }
-  plt <- plt +
-    geom_ribbon(
-      aes(
-        ymin = .data$.lower_ci,
-        ymax = .data$.upper_ci,
-        y = NULL
-      ),
-      alpha = ci_alpha, fill = ci_col, colour = NA
-    ) +
-    geom_line(colour = smooth_col) +
+  plt <- add_curve_interval(plt,
+    lower_var = ".lower_ci", upper_var = ".upper_ci",
+    ribbon_mapping = aes(y = NULL), ribbon_alpha = ci_alpha,
+    ribbon_fill = ci_col, ribbon_colour = NA, line_colour = smooth_col) +
     labs(
       title = plt_title, x = xvars, y = y_label,
       subtitle = plt_subtitle
@@ -1259,40 +1027,15 @@
     subtitle
   }
 
-  plt <- ggplot(object, aes(
-    x = .data[[xvars[1L]]],
-    y = .data[[xvars[2L]]]
-  )) +
-    geom_raster(aes(fill = .data$.diff)) +
-    guides(x = guide_axis(angle = angle))
+  prepare_surface_plot(object,
+    x_var = xvars[1], y_var = xvars[2], fill_var = ".diff",
+    fill_limits = c(-1, 1) * max(abs(object[[".diff"]])),
+    fill_title = "Difference",
+    labels = labs(title = plt_title, x = xlab, y = ylab,
+      subtitle = plt_subtitle, caption = caption),
+    contour = contour, contour_col = contour_col, n_contour = n_contour,
+    contour_na_rm = FALSE, angle = angle, legend_position = NULL)
 
-  if (contour) {
-    plt <- plt + geom_contour(aes(z = .data$.diff),
-      bins = n_contour,
-      colour = contour_col
-    )
-  }
-
-  plt <- plt +
-    labs(
-      title = plt_title, x = xlab, y = ylab, subtitle = plt_subtitle,
-      caption = caption
-    )
-
-  plt <- plt + scale_fill_distiller(palette = "RdBu", type = "div")
-
-  ## Set the limits for the fill
-  guide_limits <- c(-1, 1) * max(abs(object[[".diff"]]))
-  plt <- plt + expand_limits(fill = guide_limits)
-
-  plt <- plt +
-    guides(fill = guide_colourbar(
-      title = "Difference",
-      direction = "vertical"#,
-      #barheight = grid::unit(0.25, "npc")
-    ))
-
-  plt
 }
 
 `draw_3d_difference` <- function(object, xvars, contour = FALSE,
@@ -1408,10 +1151,9 @@
   }
 
   ## return
-  if (is.null(ncol) && is.null(nrow)) {
-    ncol <- ceiling(sqrt(n_plots))
-    nrow <- ceiling(n_plots / ncol)
-  }
+  layout <- prepare_plot_layout(n_plots, ncol = ncol, nrow = nrow)
+  ncol <- layout$ncol
+  nrow <- layout$nrow
   wrap_plots(plt_list,
     byrow = TRUE, ncol = ncol, nrow = nrow,
     guides = guides,

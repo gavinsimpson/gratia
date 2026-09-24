@@ -50,6 +50,7 @@
   wrap = TRUE,
   caption = TRUE,
   envir = environment(formula(object)),
+  geom = c("raster", "tile"),
   ...
 )
 }
@@ -193,17 +194,17 @@ be set internally to \code{widths = 1} to accommodate plots of smooths that
 use a fixed aspect ratio.}
 
 \item{crs}{the coordinate reference system (CRS) to use for the plot. All
-data will be projected into this CRS. See \code{\link[ggplot2:ggsf]{ggplot2::coord_sf()}} for
+data will be projected into this CRS. See \code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}} for
 details.}
 
 \item{default_crs}{the coordinate reference system (CRS) to use for the
 non-sf layers in the plot. If left at the default \code{NULL}, the CRS used is
 4326 (WGS84), which is appropriate for spline-on-the-sphere smooths, which
 are parameterized in terms of latitude and longitude as coordinates. See
-\code{\link[ggplot2:ggsf]{ggplot2::coord_sf()}} for more details.}
+\code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}} for more details.}
 
 \item{lims_method}{character; affects how the axis limits are determined. See
-\code{\link[ggplot2:ggsf]{ggplot2::coord_sf()}}. Be careful; in testing of some examples, changing
+\code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}}. Be careful; in testing of some examples, changing
 this to \code{"orthogonal"} for example with the chlorophyll-a example from
 Simon Wood's GAM book quickly used up all the RAM in my test system and the
 OS killed R. This could be incorrect usage on my part; right now the grid
@@ -217,6 +218,12 @@ ggplot objects is returned, 1 per term plotted.}
 \item{caption}{logical; show the smooth type in the caption of each plot?}
 
 \item{envir}{an environment to look up the data within.}
+
+\item{geom}{character; either \code{"raster"} (the default) or \code{"tile"} for flat
+smooth surfaces, including faceted and soap-film plots. Raster rendering
+keeps large PDF plots compact; tiles are individual borderless rectangles
+that remain vector elements in PDF and SVG output, potentially increasing
+file size. Other plot types, including spherical smooths, are unchanged.}
 
 \item{...}{Arguments to other methods; not used.}
 }

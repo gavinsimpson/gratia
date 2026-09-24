@@ -103,8 +103,11 @@
   wrap = TRUE,
   caption = TRUE,
   envir = environment(formula(object)),
+  geom = c("raster", "tile"),
   ...
 ) {
+  geom <- match.arg(geom)
+
   .call <- match.call()
 
   # fixed or free scale?
@@ -290,6 +293,7 @@
     }
     sm_plts <- map(sm_l,
       draw_smooth_estimates,
+      geom = geom,
       constant = constant,
       fun = fun,
       contour = contour,

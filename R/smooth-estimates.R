@@ -1183,6 +1183,10 @@
 #' smooth_estimates(m) |>
 #'   add_sizer(derivatives = d, type = "sizer") |>
 #'   draw()
+#'
+#' # Render a bivariate smooth as vector tiles
+#' m_surface <- gam(y ~ s(x0, x1), data = df, method = "REML")
+#' draw(smooth_estimates(m_surface, n_2d = 20), geom = "tile")
 `draw.smooth_estimates` <- function(object,
                                     constant = NULL,
                                     fun = NULL,
@@ -1208,7 +1212,10 @@
                                     default_crs = NULL,
                                     lims_method = "cross",
                                     caption = TRUE,
+                                    geom = c("raster", "tile"),
                                     ...) {
+  geom <- match.arg(geom)
+
   # add confidence intervals if they don't already exist
   if (!all(c(".lower_ci", ".upper_ci") %in% names(object))) {
     object <- object |> add_confint()
@@ -1244,6 +1251,7 @@
   ## plot
   plts <- map(sm_l,
     draw_smooth_estimates,
+    geom = geom,
     constant = constant,
     fun = fun,
     contour = contour,
@@ -1303,7 +1311,10 @@
                                     tensor_term_order = NULL,
                                     caption = NULL,
                                     grouped_by = FALSE,
+                                    geom = c("raster", "tile"),
                                     ...) {
+  geom <- match.arg(geom)
+
   sm_vars <- tensor_term_order[[unique(object$.smooth)]]
   if (is.null(sm_vars)) {
     sm_vars <- if (".term" %in% names(object)) {
@@ -1442,6 +1453,7 @@
 
   plot_smooth(
     object,
+    geom = geom,
     variables = sm_vars,
     rug = rug_data,
     partial_residuals = p_residuals,

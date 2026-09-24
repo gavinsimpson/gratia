@@ -2,6 +2,17 @@
 
 ## User visible changes
 
+* Plotting helpers are now shared by derivative, comparison, difference,
+  posterior, basis and spherical-smooth plots (#308). Curve/interval rendering
+  and automatic panel layouts are centralized while retaining existing
+  plotting defaults.
+
+* Flat smooth surfaces now share an internal renderer across bivariate,
+  trivariate, quadvariate, tensor-product and soap-film plots (#308).
+  `draw()` and `assemble()` accept `geom = "tile"` for vector rectangles;
+  the default remains `geom = "raster"`. Automatic fill ranges now ignore
+  non-finite values for both estimates and standard errors.
+
 * Univariate smooth plots now share internal rendering, label and palette
   helpers, reducing duplication across ordinary, `by`, `fs`, and `sz` smooth
   plotting methods (#308). Explicit `xlab = NULL` and `ylab = NULL` now request

@@ -89,8 +89,11 @@
 #'   metadata, and the by-variable column when applicable.
 #' @param x_var Character string naming the x-axis covariate, used as the
 #'   default x-axis label.
-#' @param xlab,ylab Axis labels. `NULL` uses `x_var` for x and `"Partial effect"`
-#'   for y, just as omitting these arguments does. Empty strings give blank labels.
+#' @param xlab,ylab Axis labels. `NULL` uses `x_var` for x and `y_var` for y
+#'   (or `"Partial effect"` when `y_var` is `NULL`). Empty strings give blank labels.
+#' @param y_var Optional y-axis covariate name for surface plots.
+#' @param default_caption Caption used when `caption` is `NULL` or `TRUE`.
+#'   Defaults to the basis caption; surface callers can include facet variables.
 #' @param title Plot title, or `NULL` to use the unique `.smooth` value. Callers
 #'   plotting grouped by smooths supply the `.term` title instead.
 #' @param subtitle Plot subtitle, or `NULL` to derive it from the by variable.
@@ -105,19 +108,20 @@
 #' @noRd
 `prepare_smooth_labels` <- function(
   object, x_var, xlab = NULL, ylab = NULL, title = NULL, subtitle = NULL,
-  caption = NULL, grouped_by = FALSE
+  caption = NULL, grouped_by = FALSE, y_var = NULL,
+  default_caption = paste("Basis:", object[[".type"]])
 ) {
   if (is.null(xlab)) {
     xlab <- x_var
   }
   if (is.null(ylab)) {
-    ylab <- "Partial effect"
+    ylab <- if (is.null(y_var)) "Partial effect" else y_var
   }
   if (is.null(title)) {
     title <- unique(object[[".smooth"]])
   }
   caption <- if (is.null(caption) || isTRUE(caption)) {
-    paste("Basis:", object[[".type"]])
+    default_caption
   } else {
     NULL
   }
@@ -273,35 +277,21 @@
   # plot the confidence interval and smooth line
   sizer_cols <- c(".change", ".increase", ".decrease")
   do_sizer <- sizer & sizer_cols %in% names(object)
+  ribbon_mapping <- if (is.null(colour_var)) aes() else {
+    aes(fill = .data[[colour_var]])
+  }
+  if (!is.null(colour_var) && is.null(ribbon_colour)) {
+    # Keep an explicit NULL mapping to suppress inherited ribbon outlines.
+    ribbon_mapping["colour"] <- list(NULL)
+  }
+  plt <- add_curve_interval(plt,
+    lower_var = if (interval) ".lower_ci" else NULL, upper_var = ".upper_ci",
+    ribbon_mapping = ribbon_mapping, ribbon_alpha = ci_alpha,
+    ribbon_colour = if (is.null(colour_var)) NA else ribbon_colour,
+    ribbon_fill = if (is.null(colour_var)) ci_col else NULL,
+    line_colour = if (is.null(colour_var)) smooth_col else NULL)
   if (!is.null(colour_var)) {
-    if (interval) {
-      ribbon_mapping <- aes(
-        ymin = .data[[".lower_ci"]], ymax = .data[[".upper_ci"]],
-        fill = .data[[colour_var]]
-      )
-      if (is.null(ribbon_colour)) {
-        # An explicit NULL mapping removes the inherited colour for sz curves.
-        ribbon_mapping <- aes(
-          ymin = .data[[".lower_ci"]], ymax = .data[[".upper_ci"]],
-          fill = .data[[colour_var]], colour = NULL
-        )
-        plt <- plt + geom_ribbon(ribbon_mapping, alpha = ci_alpha)
-      } else {
-        plt <- plt + geom_ribbon(ribbon_mapping,
-          alpha = ci_alpha, colour = ribbon_colour)
-      }
-    }
-    plt <- plt + geom_line()
-
     plt <- plt + discrete_colour + discrete_fill
-  } else {
-    if (interval) {
-      plt <- plt + geom_ribbon(
-        aes(ymin = .data[[".lower_ci"]], ymax = .data[[".upper_ci"]]),
-        alpha = ci_alpha, colour = NA, fill = ci_col
-      )
-    }
-    plt <- plt + geom_line(colour = smooth_col)
   }
 
   if (any(do_sizer)) {
@@ -340,6 +330,145 @@
   plt
 }
 
+#' Prepare values and fill ranges for a smooth surface
+#'
+#' @param object Prepared smooth estimates, retaining classes for
+#'   `add_constant()` and `transform_fun()` dispatch.
+#' @param show Character; display the estimate or its standard error.
+#' @param constant Optional numeric shift applied before `fun`.
+#' @param fun Optional transformation of estimates and interval bounds.
+#'   Standard errors are not transformed.
+#' @param ylim Optional fill-range expansion for estimates; ignored for SEs.
+#' @return A list containing `data`, `fill_var`, `fill_title` and `fill_limits`.
+#'   Automatic ranges use finite values only; with none, `fill_limits` is `NULL`.
+#' @keywords internal
+#' @noRd
+`prepare_surface_data` <- function(
+  object, show = c("estimate", "se"), constant = NULL, fun = NULL, ylim = NULL
+) {
+  show <- match.arg(show)
+  object <- add_constant(object, constant = constant)
+  object <- transform_fun(object, fun = fun)
+  fill_var <- if (show == "estimate") ".estimate" else ".se"
+  fill_title <- if (show == "estimate") "Partial\neffect" else "Std. err."
+  values <- object[[fill_var]]
+  values <- values[is.finite(values)]
+  fill_limits <- if (show == "estimate" && !is.null(ylim)) {
+    ylim
+  } else if (length(values) == 0L) {
+    NULL
+  } else if (show == "estimate") {
+    c(-1, 1) * max(abs(values))
+  } else {
+    range(values)
+  }
+  list(data = object, fill_var = fill_var, fill_title = fill_title,
+    fill_limits = fill_limits)
+}
+
+#' Construct a smooth surface plot
+#'
+#' Callers resolve smooth-specific variables, labels, facets and coordinates.
+#' The input is already transformed; this function only assembles the plot.
+#' Projected spherical callers supply their coordinates and always use tiles.
+#'
+#' @param object Data frame containing the surface coordinates and fill values.
+#' @param x_var,y_var Character strings naming the coordinate columns in
+#'   `object` and, if supplied, `rug` and `boundary`.
+#' @param fill_var Character string naming the column mapped to fill and contours.
+#' @param fill_limits Optional values to include in the fill range via
+#'   `ggplot2::expand_limits()`. `NULL` adds no expansion layer.
+#' @param fill_title Title for the vertical fill colour bar.
+#' @param labels Resolved labels as a `ggplot2::labs()` object.
+#' @param geom Character; `"raster"` (default) uses a raster image, while
+#'   `"tile"` uses borderless rectangles sized from the coordinate resolution.
+#' @param continuous_fill Optional ggplot2 fill scale. `NULL` uses the diverging
+#'   RdBu distiller scale.
+#' @param contour Logical; add contour lines for `fill_var`?
+#' @param contour_col Fixed colour for contour lines.
+#' @param n_contour Optional number of contour bins passed to `geom_contour()`.
+#' @param angle Optional x-axis tick-label angle passed to `guide_axis()`.
+#' @param facet Optional ggplot2 facet specification supplied by the caller.
+#' @param coord Optional ggplot2 coordinate system supplied by the caller.
+#' @param rug Optional observation data drawn as points with alpha 0.1.
+#'   Faceted surface callers omit these data to avoid creating extra panels.
+#' @param boundary Optional boundary coordinates, drawn last as black paths
+#'   with linewidth 2.
+#' @param boundary_group Character string naming the boundary loop column.
+#'   Required when `boundary` is supplied.
+#' @param mapping Optional plot-level mappings, replacing the default x/y
+#'   mappings. Used by basis plots to retain inherited fill and grouping.
+#' @param contour_mapping Optional contour mappings; defaults to `fill_var`
+#'   mapped to z. Can explicitly remove inherited fill or set a contour group.
+#' @param contour_na_rm Logical; remove missing contour values silently?
+#' @param axis_guide X-axis guide; defaults to `guide_axis(angle = angle)`.
+#' @param fill_guide Fill guide; `NULL` leaves ggplot2's guide unchanged.
+#' @param legend_position Legend position; `NULL` preserves the theme setting.
+#' @param tile_colour Fixed tile outline colour; `NULL` retains ggplot2's default.
+#' @return A ggplot object.
+#' @importFrom ggplot2 geom_tile
+#' @keywords internal
+#' @noRd
+`prepare_surface_plot` <- function(
+  object, x_var, y_var, fill_var, fill_limits = NULL, fill_title = NULL,
+  labels = labs(), geom = c("raster", "tile"), continuous_fill = NULL,
+  contour = TRUE, contour_col = "black", n_contour = NULL, angle = NULL,
+  facet = NULL, coord = NULL, rug = NULL, boundary = NULL, boundary_group = NULL,
+  mapping = NULL, contour_mapping = NULL, contour_na_rm = TRUE,
+  axis_guide = guide_axis(angle = angle),
+  fill_guide = guide_colourbar(title = fill_title, direction = "vertical"),
+  legend_position = "right", tile_colour = NA
+) {
+  geom <- match.arg(geom)
+  if (is.null(continuous_fill)) {
+    continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
+  }
+  if (is.null(mapping)) {
+    mapping <- aes(x = .data[[x_var]], y = .data[[y_var]])
+  }
+  plt <- ggplot(object, mapping) +
+    switch(geom,
+      raster = geom_raster(aes(fill = .data[[fill_var]]), interpolate = FALSE),
+      tile = if (is.null(tile_colour)) {
+        geom_tile(aes(fill = .data[[fill_var]]))
+      } else {
+        geom_tile(aes(fill = .data[[fill_var]]), colour = tile_colour)
+      }
+    ) + facet + coord
+
+  if (isTRUE(contour)) {
+    if (is.null(contour_mapping)) {
+      contour_mapping <- aes(z = .data[[fill_var]])
+    }
+    plt <- plt + geom_contour(contour_mapping,
+      colour = contour_col, bins = n_contour, na.rm = contour_na_rm)
+  }
+  plt <- plt + labels + continuous_fill
+  if (!is.null(fill_limits)) {
+    plt <- plt + expand_limits(fill = fill_limits)
+  }
+  plt <- plt + guides(x = axis_guide)
+  if (!is.null(fill_guide)) {
+    plt <- plt + guides(fill = fill_guide)
+  }
+  if (!is.null(legend_position)) {
+    plt <- plt + theme(legend.position = legend_position)
+  }
+
+  if (!is.null(rug)) {
+    plt <- plt + geom_point(data = rug,
+      mapping = aes(x = .data[[x_var]], y = .data[[y_var]]),
+      inherit.aes = FALSE, alpha = 0.1)
+  }
+  if (!is.null(boundary)) {
+    plt <- plt + geom_path(data = boundary,
+      mapping = aes(x = .data[[x_var]], y = .data[[y_var]],
+        group = .data[[boundary_group]]),
+      linewidth = 2, colour = "black")
+  }
+  plt
+}
+
 #' @importFrom ggplot2 ggplot geom_point geom_raster geom_contour
 #'   expand_limits labs guides guide_colourbar theme guide_axis
 #' @importFrom grid unit
@@ -364,124 +493,28 @@
   ylim = NULL,
   continuous_fill = NULL,
   angle = NULL,
+  geom = c("raster", "tile"),
   ...
 ) {
+  geom <- match.arg(geom)
   if (is.null(variables)) {
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
 
-  if (is.null(continuous_fill)) {
-    continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
-  }
-
-  ## If constant supplied apply it to `.estimate`
-  object <- add_constant(object, constant = constant)
-
-  ## If fun supplied, use it to transform est and the upper and lower interval
-  object <- transform_fun(object, fun = fun)
-
-  show <- match.arg(show)
-  if (isTRUE(identical(show, "estimate"))) {
-    guide_title <- "Partial\neffect"
-    plot_var <- ".estimate"
-    guide_limits <- if (is.null(ylim)) {
-      c(-1, 1) * max(abs(object[[plot_var]]), na.rm = TRUE)
-    } else {
-      ylim
-    }
-  } else {
-    guide_title <- "Std. err."
-    plot_var <- ".se"
-    guide_limits <- range(object[[".se"]])
-  }
-
-  plt <- ggplot(object, aes(
-    x = .data[[variables[1]]],
-    y = .data[[variables[2]]]
-  )) +
-    geom_raster(mapping = aes(fill = .data[[plot_var]]))
-
-  if (isTRUE(contour)) {
-    plt <- plt + geom_contour(
-      mapping = aes(z = .data[[plot_var]]),
-      colour = contour_col,
-      bins = n_contour,
-      na.rm = TRUE
-    )
-  }
-
-  ## default axis labels if none supplied
-  if (is.null(xlab)) {
-    xlab <- variables[1L]
-  }
-  if (is.null(ylab)) {
-    ylab <- variables[2L]
-  }
-  if (is.null(title)) {
-    title <- unique(object[[".smooth"]])
-  }
-  # add the basis via caption if caption is TRUE or NULL
-  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
-    caption <- paste("Basis:", object[[".type"]])
-  } else {
-    caption <- NULL
-  }
-
-  if (all(!is.na(object[[".by"]]))) {
-    # is the by variable a factor or a numeric
-    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
-    by_var <- as.character(unique(object[[".by"]]))
-    spl <- strsplit(title, split = ":")
-    title <- spl[[1L]][[1L]]
-    if (is.null(subtitle)) {
-      subtitle <- if (by_class %in% c("factor", "ordered")) {
-        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
-      } else {
-        paste0("By: ", by_var) # continuous by
-      }
-    }
-  }
-
-  ## add labelling to plot
-  plt <- plt + labs(
-    x = xlab, y = ylab, title = title, subtitle = subtitle,
-    caption = caption
+  surface <- prepare_surface_data(object, show = show,
+    constant = constant, fun = fun, ylim = ylim)
+  object <- surface$data
+  labels <- prepare_smooth_labels(object,
+    x_var = variables[1], y_var = variables[2], xlab = xlab, ylab = ylab,
+    title = title, subtitle = subtitle, caption = caption
   )
-
-  ## Set the palette
-  plt <- plt + continuous_fill
-
-  ## Set the limits for the fill
-  plt <- plt + expand_limits(fill = guide_limits)
-
-  ## add guide
-  plt <- plt +
-    guides(
-      fill = guide_colourbar(
-        title = guide_title,
-        direction = "vertical"#,
-        #barheight = grid::unit(5, "lines") #grid::unit(0.25, "npc")
-      ),
-      x = guide_axis(angle = angle)
-    )
-
-  ## position legend at the
-  plt <- plt + theme(legend.position = "right")
-
-  ## add rug?
-  if (!is.null(rug)) {
-    plt <- plt +
-      geom_point(
-        data = rug,
-        mapping = aes(
-          x = .data[[variables[1]]],
-          y = .data[[variables[2]]]
-        ),
-        inherit.aes = FALSE, alpha = 0.1
-      )
-  }
-
-  plt
+  prepare_surface_plot(object,
+    x_var = variables[1], y_var = variables[2], geom = geom,
+    fill_var = surface$fill_var, fill_limits = surface$fill_limits,
+    fill_title = surface$fill_title, labels = labels,
+    continuous_fill = continuous_fill, contour = contour,
+    contour_col = contour_col, n_contour = n_contour, angle = angle, rug = rug
+  )
 }
 
 #' @importFrom ggplot2 ggplot geom_point geom_raster geom_contour aes
@@ -507,8 +540,10 @@
   ylim = NULL,
   continuous_fill = NULL,
   angle = NULL,
+  geom = c("raster", "tile"),
   ...
 ) {
+  geom <- match.arg(geom)
   if (is.null(variables)) {
     variables <- attr(object, "tensor_term_order")
     if (is.null(variables)) {
@@ -516,132 +551,25 @@
     }
   }
 
-  if (is.null(continuous_fill)) {
-    continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
-  }
-
-  ## If constant supplied apply it to `estimate`
-  object <- add_constant(object, constant = constant)
-
-  ## If fun supplied, use it to transform est and the upper and lower interval
-  object <- transform_fun(object, fun = fun)
-
-  show <- match.arg(show)
-  if (isTRUE(identical(show, "estimate"))) {
-    guide_title <- "Partial\neffect"
-    plot_var <- ".estimate"
-    guide_limits <- if (is.null(ylim)) {
-      c(-1, 1) * max(abs(object[[plot_var]]), na.rm = TRUE)
-    } else {
-      ylim
-    }
-  } else {
-    guide_title <- "Std. err."
-    plot_var <- ".se"
-    guide_limits <- range(object[[".se"]])
-  }
-
-  plt <- ggplot(object, aes(
-    x = .data[[variables[1]]],
-    y = .data[[variables[2]]]
-  )) +
-    geom_raster(mapping = aes(fill = .data[[plot_var]])) +
-    facet_wrap(vars(.data[[variables[3]]]))
-
-  if (isTRUE(contour)) {
-    plt <- plt + geom_contour(
-      mapping = aes(z = .data[[plot_var]]),
-      colour = contour_col,
-      bins = n_contour,
-      na.rm = TRUE
-    )
-  }
-
-  ## default axis labels if none supplied
-  if (is.null(xlab)) {
-    xlab <- variables[1L]
-  }
-  if (is.null(ylab)) {
-    ylab <- variables[2L]
-  }
-  if (is.null(title)) {
-    title <- unique(object[[".smooth"]])
-  }
-  # add the basis via caption if caption is TRUE or NULL
-  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
-    caption <- paste("Facets:", variables[3], "; Basis:", object[[".type"]])
-  } else {
-    caption <- NULL
-  }
-
-  if (all(!is.na(object[[".by"]]))) {
-    # is the by variable a factor or a numeric
-    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
-    by_var <- as.character(unique(object[[".by"]]))
-    spl <- strsplit(title, split = ":")
-    title <- spl[[1L]][[1L]]
-    if (is.null(subtitle)) {
-      subtitle <- if (by_class %in% c("factor", "ordered")) {
-        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
-      } else {
-        paste0("By: ", by_var) # continuous by
-      }
-    }
-  }
-
-  ## add labelling to plot
-  plt <- plt + labs(
-    x = xlab, y = ylab, title = title, subtitle = subtitle,
-    caption = caption
+  surface <- prepare_surface_data(object, show = show,
+    constant = constant, fun = fun, ylim = ylim)
+  object <- surface$data
+  labels <- prepare_smooth_labels(object,
+    x_var = variables[1], y_var = variables[2], xlab = xlab, ylab = ylab,
+    title = title, subtitle = subtitle, caption = caption,
+    default_caption = paste("Facets:", variables[3], "; Basis:", object[[".type"]])
   )
-
-  ## Set the palette
-  plt <- plt + continuous_fill
-
-  ## Set the limits for the fill
-  plt <- plt + expand_limits(fill = guide_limits)
-
-  ## add guide
-  plt <- plt +
-    guides(
-      fill = guide_colourbar(
-        title = guide_title,
-        direction = "vertical"#,
-        #barheight = grid::unit(5, "lines") #grid::unit(0.25, "npc")
-      ),
-      x = guide_axis(angle = angle)
-    )
-
-  ## position legend at the
-  plt <- plt + theme(legend.position = "right")
-
-  ## add rug? -- not yet. Need a better way to select smooth_data for 3 and 4D
-  ## smooths. At the moment, we are taking a few values over the range of the
-  ## 3 or 4 d variables (only, 1 and 2 dim still get n values). But we don't
-  ## have data at those 3/4d coordinates. When we plot with a rug, we end up
-  ## introducing nrow(orig_data) new values into the object that gets plotted
-  ## and this messes up the facets at draw time.
-  ##
-  ## What we want here perhaps is to bin the data into the groups formed by
-  ## the cut points of the data that we're plotting at and only modify the
-  ## rug data so that we group the data by the cuts we're faceting by and
-  ## modify the 3/4d variable(s) to be these unique values that we're
-  ## plotting as facets.
-  # if (!is.null(rug)) {
-  #     plt <- plt +
-  #       geom_point(data = rug,
-  #                  mapping = aes(x = .data[[variables[1]]],
-  #                                y = .data[[variables[2]]]),
-  #                  inherit.aes = FALSE, alpha = 0.1)
-  # }
-
-  if (inherits(object, "isotropic_smooth")) {
-    plt <- plt + coord_equal()
-  }
-
-  plt
+  # Observations are not assigned to slices: adding them would create facets.
+  coord <- if (inherits(object, "isotropic_smooth")) coord_equal() else NULL
+  prepare_surface_plot(object,
+    x_var = variables[1], y_var = variables[2], geom = geom,
+    fill_var = surface$fill_var, fill_limits = surface$fill_limits,
+    fill_title = surface$fill_title, labels = labels,
+    continuous_fill = continuous_fill, contour = contour,
+    contour_col = contour_col, n_contour = n_contour, angle = angle,
+    facet = facet_wrap(vars(.data[[variables[3]]])), coord = coord
+  )
 }
-
 
 #' @importFrom ggplot2 ggplot geom_point geom_raster geom_contour
 #'   expand_limits labs guides guide_colourbar theme facet_grid
@@ -667,153 +595,45 @@
   ylim = NULL,
   continuous_fill = NULL,
   angle = NULL,
+  geom = c("raster", "tile"),
   ...
 ) {
+  geom <- match.arg(geom)
   if (is.null(variables)) {
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
 
-  if (is.null(continuous_fill)) {
-    continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
-  }
-
-  ## If constant supplied apply it to `estimate`
-  object <- add_constant(object, constant = constant)
-
-  ## If fun supplied, use it to transform est and the upper and lower interval
-  object <- transform_fun(object, fun = fun)
-
-  show <- match.arg(show)
-  if (isTRUE(identical(show, "estimate"))) {
-    guide_title <- "Partial\neffect"
-    plot_var <- ".estimate"
-    guide_limits <- if (is.null(ylim)) {
-      c(-1, 1) * max(abs(object[[plot_var]]), na.rm = TRUE)
-    } else {
-      ylim
-    }
-  } else {
-    guide_title <- "Std. err."
-    plot_var <- ".se"
-    guide_limits <- range(object[[".se"]])
-  }
-
-  plt <- ggplot(object, aes(
-    x = .data[[variables[1]]],
-    y = .data[[variables[2]]]
-  )) +
-    geom_raster(mapping = aes(fill = .data[[plot_var]])) +
-    facet_grid(
-      rows = vars(.data[[variables[3]]]),
-      cols = vars(.data[[variables[4]]]),
-      as.table = FALSE
-    )
-
-  if (isTRUE(contour)) {
-    plt <- plt + geom_contour(
-      mapping = aes(z = .data[[plot_var]]),
-      colour = contour_col,
-      bins = n_contour,
-      na.rm = TRUE
-    )
-  }
-
-  ## default axis labels if none supplied
-  if (is.null(xlab)) {
-    xlab <- variables[1L]
-  }
-  if (is.null(ylab)) {
-    ylab <- variables[2L]
-  }
-  if (is.null(title)) {
-    title <- unique(object[[".smooth"]])
-  }
-  # add the basis via caption if caption is TRUE or NULL
-  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
-    caption <- paste(
-      "Facet rows:", variables[3],
-      "; columns:", variables[4],
-      "; Basis:", object[[".type"]]
-    )
-  } else {
-    caption <- NULL
-  }
-
-  if (all(!is.na(object[[".by"]]))) {
-    # is the by variable a factor or a numeric
-    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
-    by_var <- as.character(unique(object[[".by"]]))
-    spl <- strsplit(title, split = ":")
-    title <- spl[[1L]][[1L]]
-    if (is.null(subtitle)) {
-      subtitle <- if (by_class %in% c("factor", "ordered")) {
-        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
-      } else {
-        paste0("By: ", by_var) # continuous by
-      }
-    }
-  }
-
-  ## add labelling to plot
-  plt <- plt + labs(
-    x = xlab, y = ylab, title = title, subtitle = subtitle,
-    caption = caption
+  surface <- prepare_surface_data(object, show = show,
+    constant = constant, fun = fun, ylim = ylim)
+  object <- surface$data
+  labels <- prepare_smooth_labels(object,
+    x_var = variables[1], y_var = variables[2], xlab = xlab, ylab = ylab,
+    title = title, subtitle = subtitle, caption = caption,
+    default_caption = paste("Facet rows:", variables[3],
+      "; columns:", variables[4], "; Basis:", object[[".type"]])
   )
-
-  ## Set the palette
-  plt <- plt + continuous_fill
-
-  ## Set the limits for the fill
-  plt <- plt + expand_limits(fill = guide_limits)
-
-  ## add guide
-  plt <- plt +
-    guides(
-      fill = guide_colourbar(
-        title = guide_title,
-        direction = "vertical"#,
-        #barheight = grid::unit(5, "lines") #grid::unit(0.25, "npc")
-      ),
-      x = guide_axis(angle = angle)
-    )
-
-  ## position legend at the
-  plt <- plt + theme(legend.position = "right")
-
-  ## add rug? -- not yet. Need a better way to select smooth_data for 3 and 4D
-  ## smooths. At the moment, we are taking a few values over the range of the
-  ## 3 or 4 d variables (only, 1 and 2 dim still get n values). But we don't
-  ## have data at those 3/4d coordinates. When we plot with a rug, we end up
-  ## introducing nrow(orig_data) new values into the object that gets plotted
-  ## and this messes up the facets at draw time.
-  ##
-  ## What we want here perhaps is to bin the data into the groups formed by
-  ## the cut points of the data that we're plotting at and only modify the
-  ## rug data so that we group the data by the cuts we're faceting by and
-  ## modify the 3/4d variable(s) to be these unique values that we're
-  ## plotting as facets.
-  # if (!is.null(rug)) {
-  #     plt <- plt +
-  #       geom_point(data = rug,
-  #                  mapping = aes(x = .data[[variables[1]]],
-  #                                y = .data[[variables[2]]]),
-  #                  inherit.aes = FALSE, alpha = 0.1)
-  # }
-
-  if (inherits(object, "isotropic_smooth")) {
-    plt <- plt + coord_equal()
-  }
-
-  plt
+  # Observations are not assigned to slices: adding them would create facets.
+  coord <- if (inherits(object, "isotropic_smooth")) coord_equal() else NULL
+  prepare_surface_plot(object,
+    x_var = variables[1], y_var = variables[2], geom = geom,
+    fill_var = surface$fill_var, fill_limits = surface$fill_limits,
+    fill_title = surface$fill_title, labels = labels,
+    continuous_fill = continuous_fill, contour = contour,
+    contour_col = contour_col, n_contour = n_contour, angle = angle,
+    facet = facet_grid(rows = vars(.data[[variables[3]]]),
+      cols = vars(.data[[variables[4]]]), as.table = FALSE), coord = coord
+  )
 }
 
 #' @importFrom ggplot2 coord_equal
 `plot_smooth.isotropic_smooth` <- function(
   object,
+  geom = c("raster", "tile"),
   ...
 ) {
+  geom <- match.arg(geom)
   # plot as per a bivariate smooth
-  plt <- plot_smooth.bivariate_smooth(object, ...)
+  plt <- plot_smooth.bivariate_smooth(object, geom = geom, ...)
 
   # but set the x/y coordinates to have aspect ratio = 1
   plt <- plt + coord_equal(ratio = 1)
@@ -865,43 +685,10 @@
     plt <- plt + geom_abline(slope = slope, intercept = intercept)
   }
 
-  ## default axis labels if none supplied
-  if (is.null(xlab)) {
-    xlab <- "Gaussian quantiles"
-  }
-  if (is.null(ylab)) {
-    ylab <- "Partial effects"
-  }
-  if (is.null(title)) {
-    title <- unique(object$.smooth) # variables
-  }
-  # add the basis via caption if caption is TRUE or NULL
-  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
-    caption <- paste("Basis:", object[[".type"]])
-  } else {
-    caption <- NULL
-  }
-
-  if (all(!is.na(object[[".by"]]))) {
-    # is the by variable a factor or a numeric
-    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
-    by_var <- as.character(unique(object[[".by"]]))
-    spl <- strsplit(title, split = ":")
-    title <- spl[[1L]][[1L]]
-    if (is.null(subtitle)) {
-      subtitle <- if (by_class %in% c("factor", "ordered")) {
-        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
-      } else {
-        paste0("By: ", by_var) # continuous by
-      }
-    }
-  }
-
-  ## add labelling to plot
-  plt <- plt + labs(
-    x = xlab, y = ylab, title = title, subtitle = subtitle,
-    caption = caption
-  )
+  plt <- plt + prepare_smooth_labels(object,
+    x_var = "Gaussian quantiles", y_var = "Partial effects",
+    xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
+    caption = caption)
 
   ## fixing the y axis limits?
   if (!is.null(ylim)) {
@@ -1211,9 +998,6 @@
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
 
-  if (is.null(continuous_fill)) {
-    continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
-  }
 
   # If constant supplied apply it to `est`
   object <- add_constant(object, constant = constant)
@@ -1248,44 +1032,6 @@
     default_crs <- 4326
   }
 
-  # base plot
-  # Simon parameterises the SOS with first argument latitude and second
-  #  argument longitude, so we need to reverse that here
-  plt <- ggplot(object, aes(
-    x = .data[[variables[2]]],
-    y = .data[[variables[1]]]
-  )) +
-    geom_tile(mapping = aes(fill = .data[[plot_var]])) +
-    coord_sf(
-      crs = crs, default_crs = default_crs,
-      lims_method = lims_method
-    )
-  # foo <- object |> select(latitude, longitude, .estimate)
-  # foo_df <- as.data.frame(foo)
-  # sf <- stars::st_as_stars(foo_df) |>
-  #   sf::st_set_crs("OGC:CRS84") |>
-  #   sf::st_as_sf(points = FALSE) |>
-  #   sf::st_set_agr("constant")
-  # st_ortho_cut <- function(x, lon_0, lat_0, radius = 9800000) {
-  #   stopifnot(st_is_longlat(x))
-  #   pt <- sf::st_sfc(st_point(c(lon_0, lat_0)), crs = "OGC:CRS84")
-  #   buf <- sf::st_buffer(pt, units::set_units(radius, "m"))
-  #   ortho <- paste0("+proj=ortho +lat_0=", lat_0, " +lon_0=", lon_0)
-  #   sf::st_transform(sf::st_intersection(x, buf), sf::st_crs(ortho))
-  # }
-  # sf_o <- st_ortho_cut(sf, lat_0 = 20, lon_0 = mean(range(object[[variables[2]]])))
-  
-  # ggplot() + geom_sf(data = sf, aes(fill = .estimate))
-
-  if (isTRUE(contour)) {
-    plt <- plt + geom_contour(
-      mapping = aes(z = .data[[plot_var]]),
-      colour = contour_col,
-      bins = n_contour,
-      na.rm = TRUE
-    )
-  }
-
   # default axis labels if none supplied
   if (missing(xlab)) {
     xlab <- variables[2] ## yes, the smooth is s(lat, lon) !
@@ -1295,70 +1041,30 @@
     ylab <- variables[1] ## yes, the smooth is s(lat, lon) !
   }
 
-  if (is.null(title)) {
-    title <- unique(object[[".smooth"]])
-  }
-  # add the basis via caption if caption is TRUE or NULL
-  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
-    caption <- paste("Basis:", object[[".type"]])
-  } else {
-    caption <- NULL
-  }
-
-  if (all(!is.na(object[[".by"]]))) {
-    # is the by variable a factor or a numeric
-    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
+  # Spherical plots historically include a level only for unordered factors.
+  if (all(!is.na(object[[".by"]])) && is.null(subtitle)) {
     by_var <- as.character(unique(object[[".by"]]))
-    spl <- strsplit(title, split = ":")
-    title <- spl[[1L]][[1L]]
-    if (is.null(subtitle)) {
-      subtitle <- if (by_class != "factor") {
-        paste0("By: ", by_var) # continuous by
-      } else {
-        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
-      }
+    subtitle <- paste0("By: ", by_var)
+    if (data_class(object)[[by_var]] == "factor") {
+      subtitle <- paste0(subtitle, "; ", unique(object[[by_var]]))
     }
   }
+  labels <- prepare_smooth_labels(object,
+    x_var = variables[2], y_var = variables[1], xlab = xlab, ylab = ylab,
+    title = title, subtitle = subtitle, caption = caption)
+  # Preserve the spherical method's omitted-versus-NULL axis convention.
+  labels[c("x", "y")] <- list(xlab, ylab)
 
-  # add labelling to plot
-  plt <- plt + labs(
-    x = xlab, y = ylab, title = title, subtitle = subtitle,
-    caption = caption
-  )
+  prepare_surface_plot(object,
+    x_var = variables[2], y_var = variables[1], fill_var = plot_var,
+    fill_limits = guide_limits, fill_title = guide_title,
+    labels = labels,
+    geom = "tile", tile_colour = NULL, continuous_fill = continuous_fill,
+    contour = contour, contour_col = contour_col, n_contour = n_contour,
+    angle = angle, rug = rug,
+    coord = coord_sf(crs = crs, default_crs = default_crs,
+      lims_method = lims_method))
 
-  # Set the palette
-  plt <- plt + continuous_fill
-
-  # Set the limits for the fill
-  plt <- plt + expand_limits(fill = guide_limits)
-
-  # add guide
-  plt <- plt +
-    guides(
-      fill = guide_colourbar(
-        title = guide_title, direction = "vertical"#,
-        #barheight = grid::unit(5, "lines") #grid::unit(0.25, "npc")
-      ),
-      x = guide_axis(angle = angle)
-    )
-
-  # position legend at the
-  plt <- plt + theme(legend.position = "right")
-
-  # add rug?
-  if (!is.null(rug)) {
-    plt <- plt +
-      geom_point(
-        data = rug, ## yes, the smooth is s(lat, lon) !
-        mapping = aes(
-          x = .data[[variables[2]]],
-          y = .data[[variables[1]]]
-        ),
-        inherit.aes = FALSE, alpha = 0.1
-      )
-  }
-
-  plt
 }
 
 #' @importFrom ggplot2 ggplot geom_point geom_raster geom_contour
@@ -1387,142 +1093,30 @@
   ylim = NULL,
   continuous_fill = NULL,
   angle = NULL,
+  geom = c("raster", "tile"),
   ...
 ) {
+  geom <- match.arg(geom)
   if (is.null(variables)) {
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
 
-  if (is.null(continuous_fill)) {
-    continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
-  }
-
-  ## If constant supplied apply it to `.estimate`
-  object <- add_constant(object, constant = constant)
-
-  ## If fun supplied, use it to transform est and the upper and lower interval
-  object <- transform_fun(object, fun = fun)
-
-  show <- match.arg(show)
-  if (isTRUE(identical(show, "estimate"))) {
-    guide_title <- "Partial\neffect"
-    plot_var <- ".estimate"
-    guide_limits <- if (is.null(ylim)) {
-      c(-1, 1) * max(abs(object[[plot_var]]), na.rm = TRUE)
-    } else {
-      ylim
-    }
-  } else {
-    guide_title <- "Std. err."
-    plot_var <- ".se"
-    guide_limits <- range(object[[".se"]])
-  }
-
-  # extract the boundary data
-  bndry <- vec_slice(object, object[[".bndry"]])
+  surface <- prepare_surface_data(object, show = show,
+    constant = constant, fun = fun, ylim = ylim)
+  object <- surface$data
+  boundary <- vec_slice(object, object[[".bndry"]])
   object <- vec_slice(object, !object[[".bndry"]])
-
-  plt <- ggplot(
-    object,
-    aes(
-      x = .data[[variables[1]]],
-      y = .data[[variables[2]]]
-    )
-  ) +
-    geom_raster(mapping = aes(fill = .data[[plot_var]])) +
-    coord_fixed(ratio = 1)
-
-  if (isTRUE(contour)) {
-    plt <- plt + geom_contour(
-      mapping = aes(z = .data[[plot_var]]),
-      colour = contour_col,
-      bins = n_contour,
-      na.rm = TRUE
-    )
-  }
-
-  ## default axis labels if none supplied
-  if (is.null(xlab)) {
-    xlab <- variables[1L]
-  }
-  if (is.null(ylab)) {
-    ylab <- variables[2L]
-  }
-  if (is.null(title)) {
-    title <- unique(object[[".smooth"]])
-  }
-  # add the basis via caption if caption is TRUE or NULL
-  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
-    caption <- paste("Basis:", object[[".type"]])
-  } else {
-    caption <- NULL
-  }
-
-  if (all(!is.na(object[[".by"]]))) {
-    # is the by variable a factor or a numeric
-    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
-    by_var <- as.character(unique(object[[".by"]]))
-    spl <- strsplit(title, split = ":")
-    title <- spl[[1L]][[1L]]
-    if (is.null(subtitle)) {
-      subtitle <- if (by_class %in% c("factor", "ordered")) {
-        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
-      } else {
-        paste0("By: ", by_var) # continuous by
-      }
-    }
-  }
-
-  ## add labelling to plot
-  plt <- plt + labs(
-    x = xlab, y = ylab, title = title, subtitle = subtitle,
-    caption = caption
+  labels <- prepare_smooth_labels(object,
+    x_var = variables[1], y_var = variables[2], xlab = xlab, ylab = ylab,
+    title = title, subtitle = subtitle, caption = caption
   )
-
-  ## Set the palette
-  plt <- plt + continuous_fill
-
-  ## Set the limits for the fill
-  plt <- plt + expand_limits(fill = guide_limits)
-
-  ## add guide
-  plt <- plt +
-    guides(
-      fill = guide_colourbar(
-        title = guide_title,
-        direction = "vertical"#,
-        #barheight = grid::unit(5, "lines") #grid::unit(0.25, "npc")
-      ),
-      x = guide_axis(angle = angle)
-    )
-
-  ## position legend at the
-  plt <- plt + theme(legend.position = "right")
-
-  ## add rug?
-  if (!is.null(rug)) {
-    plt <- plt +
-      geom_point(
-        data = rug,
-        mapping = aes(
-          x = .data[[variables[1]]],
-          y = .data[[variables[2]]]
-        ),
-        inherit.aes = FALSE, alpha = 0.1
-      )
-  }
-
-  ## add the boundary
-  plt <- plt +
-    geom_path(
-      data = bndry,
-      mapping = aes(
-        x = .data[[variables[1]]],
-        y = .data[[variables[2]]],
-        group = .data[[".loop"]] # need to group by loops in case >1 loop
-      ),
-      linewidth = 2, colour = "black"
-    )
-
-  plt
+  prepare_surface_plot(object,
+    x_var = variables[1], y_var = variables[2], geom = geom,
+    fill_var = surface$fill_var, fill_limits = surface$fill_limits,
+    fill_title = surface$fill_title, labels = labels,
+    continuous_fill = continuous_fill, contour = contour,
+    contour_col = contour_col, n_contour = n_contour, angle = angle,
+    rug = rug, coord = coord_fixed(ratio = 1), boundary = boundary,
+    boundary_group = ".loop"
+  )
 }
