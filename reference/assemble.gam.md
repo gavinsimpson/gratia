@@ -56,6 +56,7 @@ assemble(
   wrap = TRUE,
   caption = TRUE,
   envir = environment(formula(object)),
+  geom = c("raster", "tile"),
   ...
 )
 ```
@@ -315,6 +316,15 @@ assemble(
 - envir:
 
   an environment to look up the data within.
+
+- geom:
+
+  character; either `"raster"` (the default) or `"tile"` for flat smooth
+  surfaces, including faceted and soap-film plots. Raster rendering
+  keeps large PDF plots compact; tiles are individual borderless
+  rectangles that remain vector elements in PDF and SVG output,
+  potentially increasing file size. Other plot types, including
+  spherical smooths, are unchanged.
 
 - ...:
 

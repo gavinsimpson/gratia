@@ -33,6 +33,7 @@ draw(
   default_crs = NULL,
   lims_method = "cross",
   caption = TRUE,
+  geom = c("raster", "tile"),
   ...
 )
 ```
@@ -172,6 +173,15 @@ draw(
 
   logical; show the smooth type in the caption of each plot?
 
+- geom:
+
+  character; either `"raster"` (the default) or `"tile"` for flat smooth
+  surfaces, including faceted and soap-film plots. Raster rendering
+  keeps large PDF plots compact; tiles are individual borderless
+  rectangles that remain vector elements in PDF and SVG output,
+  potentially increasing file size. Other plot types, including
+  spherical smooths, are unchanged.
+
 - ...:
 
   additional arguments passed to
@@ -209,4 +219,9 @@ d <- derivatives(m, n = 100) # n to match smooth_estimates()
 smooth_estimates(m) |>
   add_sizer(derivatives = d, type = "sizer") |>
   draw()
+
+
+# Render a bivariate smooth as vector tiles
+m_surface <- gam(y ~ s(x0, x1), data = df, method = "REML")
+draw(smooth_estimates(m_surface, n_2d = 20), geom = "tile")
 ```

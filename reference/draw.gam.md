@@ -56,6 +56,7 @@ draw(
   wrap = TRUE,
   caption = TRUE,
   envir = environment(formula(object)),
+  geom = c("raster", "tile"),
   ...
 )
 ```
@@ -316,6 +317,15 @@ draw(
 
   an environment to look up the data within.
 
+- geom:
+
+  character; either `"raster"` (the default) or `"tile"` for flat smooth
+  surfaces, including faceted and soap-film plots. Raster rendering
+  keeps large PDF plots compact; tiles are individual borderless
+  rectangles that remain vector elements in PDF and SVG output,
+  potentially increasing file size. Other plot types, including
+  spherical smooths, are unchanged.
+
 - ...:
 
   additional arguments passed to
@@ -362,6 +372,8 @@ draw(m1, residuals = TRUE)
 df2 <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
 m2 <- gam(y ~ s(x, z, k = 40), data = df2, method = "REML")
 draw(m2, contour = FALSE, n_2d = 50)
+
+draw(m2, geom = "tile", n_2d = 30)
 
 
 # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
