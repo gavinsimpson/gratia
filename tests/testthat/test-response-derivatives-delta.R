@@ -146,7 +146,13 @@ test_that("delta supports BAM smooths and preserves single-row predictions", {
       type = "central", uncertainty = "delta")
     one <- response_derivatives(m, focal = "x", data = nd[1, , drop = FALSE],
       order = ord, type = "central", uncertainty = "delta")
-    expect_equal(one, out[1, ])
+    expected <- out[1, ]
+    estimates <- c(".derivative", ".se", ".lower_ci", ".upper_ci")
+    metadata <- setdiff(names(expected), estimates)
+    expect_identical(attributes(one), attributes(expected))
+    expect_identical(one[metadata], expected[metadata])
+    # Second finite differences amplify prediction roundoff across batch sizes.
+    expect_equal(one[estimates], expected[estimates], tolerance = 1e-7)
     # Removing the only varying term leaves a constant response mean.
     zero <- response_derivatives(m, focal = "x", data = nd, order = ord,
       type = "central", uncertainty = "delta", exclude = "s(x)")
