@@ -2,6 +2,11 @@
 
 ## User visible changes
 
+* Plotting helpers are now shared by derivative, comparison, difference,
+  posterior, basis and spherical-smooth plots (#308). Curve/interval rendering
+  and automatic panel layouts are centralized while retaining existing
+  plotting defaults.
+
 * Flat smooth surfaces now share an internal renderer across bivariate,
   trivariate, quadvariate, tensor-product and soap-film plots (#308).
   `draw()` and `assemble()` accept `geom = "tile"` for vector rectangles;

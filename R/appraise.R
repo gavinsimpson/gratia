@@ -157,10 +157,9 @@
   )
   ## return
   n_plots <- 4
-  if (is.null(ncol) && is.null(nrow)) {
-    ncol <- ceiling(sqrt(n_plots))
-    nrow <- ceiling(n_plots / ncol)
-  }
+  layout <- prepare_plot_layout(n_plots, ncol = ncol, nrow = nrow)
+  ncol <- layout$ncol
+  nrow <- layout$nrow
   wrap_plots(plt1, plt2, plt3, plt4,
     byrow = TRUE, ncol = ncol, nrow = nrow, guides = guides,
     ...

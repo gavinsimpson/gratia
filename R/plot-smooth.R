@@ -277,35 +277,21 @@
   # plot the confidence interval and smooth line
   sizer_cols <- c(".change", ".increase", ".decrease")
   do_sizer <- sizer & sizer_cols %in% names(object)
+  ribbon_mapping <- if (is.null(colour_var)) aes() else {
+    aes(fill = .data[[colour_var]])
+  }
+  if (!is.null(colour_var) && is.null(ribbon_colour)) {
+    # Keep an explicit NULL mapping to suppress inherited ribbon outlines.
+    ribbon_mapping["colour"] <- list(NULL)
+  }
+  plt <- add_curve_interval(plt,
+    lower_var = if (interval) ".lower_ci" else NULL, upper_var = ".upper_ci",
+    ribbon_mapping = ribbon_mapping, ribbon_alpha = ci_alpha,
+    ribbon_colour = if (is.null(colour_var)) NA else ribbon_colour,
+    ribbon_fill = if (is.null(colour_var)) ci_col else NULL,
+    line_colour = if (is.null(colour_var)) smooth_col else NULL)
   if (!is.null(colour_var)) {
-    if (interval) {
-      ribbon_mapping <- aes(
-        ymin = .data[[".lower_ci"]], ymax = .data[[".upper_ci"]],
-        fill = .data[[colour_var]]
-      )
-      if (is.null(ribbon_colour)) {
-        # An explicit NULL mapping removes the inherited colour for sz curves.
-        ribbon_mapping <- aes(
-          ymin = .data[[".lower_ci"]], ymax = .data[[".upper_ci"]],
-          fill = .data[[colour_var]], colour = NULL
-        )
-        plt <- plt + geom_ribbon(ribbon_mapping, alpha = ci_alpha)
-      } else {
-        plt <- plt + geom_ribbon(ribbon_mapping,
-          alpha = ci_alpha, colour = ribbon_colour)
-      }
-    }
-    plt <- plt + geom_line()
-
     plt <- plt + discrete_colour + discrete_fill
-  } else {
-    if (interval) {
-      plt <- plt + geom_ribbon(
-        aes(ymin = .data[[".lower_ci"]], ymax = .data[[".upper_ci"]]),
-        alpha = ci_alpha, colour = NA, fill = ci_col
-      )
-    }
-    plt <- plt + geom_line(colour = smooth_col)
   }
 
   if (any(do_sizer)) {
@@ -380,10 +366,11 @@
     fill_limits = fill_limits)
 }
 
-#' Construct a flat smooth surface plot
+#' Construct a smooth surface plot
 #'
 #' Callers resolve smooth-specific variables, labels, facets and coordinates.
 #' The input is already transformed; this function only assembles the plot.
+#' Projected spherical callers supply their coordinates and always use tiles.
 #'
 #' @param object Data frame containing the surface coordinates and fill values.
 #' @param x_var,y_var Character strings naming the coordinate columns in
@@ -409,6 +396,15 @@
 #'   with linewidth 2.
 #' @param boundary_group Character string naming the boundary loop column.
 #'   Required when `boundary` is supplied.
+#' @param mapping Optional plot-level mappings, replacing the default x/y
+#'   mappings. Used by basis plots to retain inherited fill and grouping.
+#' @param contour_mapping Optional contour mappings; defaults to `fill_var`
+#'   mapped to z. Can explicitly remove inherited fill or set a contour group.
+#' @param contour_na_rm Logical; remove missing contour values silently?
+#' @param axis_guide X-axis guide; defaults to `guide_axis(angle = angle)`.
+#' @param fill_guide Fill guide; `NULL` leaves ggplot2's guide unchanged.
+#' @param legend_position Legend position; `NULL` preserves the theme setting.
+#' @param tile_colour Fixed tile outline colour; `NULL` retains ggplot2's default.
 #' @return A ggplot object.
 #' @importFrom ggplot2 geom_tile
 #' @keywords internal
@@ -417,30 +413,47 @@
   object, x_var, y_var, fill_var, fill_limits = NULL, fill_title = NULL,
   labels = labs(), geom = c("raster", "tile"), continuous_fill = NULL,
   contour = TRUE, contour_col = "black", n_contour = NULL, angle = NULL,
-  facet = NULL, coord = NULL, rug = NULL, boundary = NULL, boundary_group = NULL
+  facet = NULL, coord = NULL, rug = NULL, boundary = NULL, boundary_group = NULL,
+  mapping = NULL, contour_mapping = NULL, contour_na_rm = TRUE,
+  axis_guide = guide_axis(angle = angle),
+  fill_guide = guide_colourbar(title = fill_title, direction = "vertical"),
+  legend_position = "right", tile_colour = NA
 ) {
   geom <- match.arg(geom)
   if (is.null(continuous_fill)) {
     continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
   }
-  plt <- ggplot(object, aes(x = .data[[x_var]], y = .data[[y_var]])) +
+  if (is.null(mapping)) {
+    mapping <- aes(x = .data[[x_var]], y = .data[[y_var]])
+  }
+  plt <- ggplot(object, mapping) +
     switch(geom,
       raster = geom_raster(aes(fill = .data[[fill_var]]), interpolate = FALSE),
-      tile = geom_tile(aes(fill = .data[[fill_var]]), colour = NA)
+      tile = if (is.null(tile_colour)) {
+        geom_tile(aes(fill = .data[[fill_var]]))
+      } else {
+        geom_tile(aes(fill = .data[[fill_var]]), colour = tile_colour)
+      }
     ) + facet + coord
 
   if (isTRUE(contour)) {
-    plt <- plt + geom_contour(aes(z = .data[[fill_var]]),
-      colour = contour_col, bins = n_contour, na.rm = TRUE)
+    if (is.null(contour_mapping)) {
+      contour_mapping <- aes(z = .data[[fill_var]])
+    }
+    plt <- plt + geom_contour(contour_mapping,
+      colour = contour_col, bins = n_contour, na.rm = contour_na_rm)
   }
   plt <- plt + labels + continuous_fill
   if (!is.null(fill_limits)) {
     plt <- plt + expand_limits(fill = fill_limits)
   }
-  plt <- plt + guides(
-    fill = guide_colourbar(title = fill_title, direction = "vertical"),
-    x = guide_axis(angle = angle)
-  ) + theme(legend.position = "right")
+  plt <- plt + guides(x = axis_guide)
+  if (!is.null(fill_guide)) {
+    plt <- plt + guides(fill = fill_guide)
+  }
+  if (!is.null(legend_position)) {
+    plt <- plt + theme(legend.position = legend_position)
+  }
 
   if (!is.null(rug)) {
     plt <- plt + geom_point(data = rug,
@@ -672,43 +685,10 @@
     plt <- plt + geom_abline(slope = slope, intercept = intercept)
   }
 
-  ## default axis labels if none supplied
-  if (is.null(xlab)) {
-    xlab <- "Gaussian quantiles"
-  }
-  if (is.null(ylab)) {
-    ylab <- "Partial effects"
-  }
-  if (is.null(title)) {
-    title <- unique(object$.smooth) # variables
-  }
-  # add the basis via caption if caption is TRUE or NULL
-  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
-    caption <- paste("Basis:", object[[".type"]])
-  } else {
-    caption <- NULL
-  }
-
-  if (all(!is.na(object[[".by"]]))) {
-    # is the by variable a factor or a numeric
-    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
-    by_var <- as.character(unique(object[[".by"]]))
-    spl <- strsplit(title, split = ":")
-    title <- spl[[1L]][[1L]]
-    if (is.null(subtitle)) {
-      subtitle <- if (by_class %in% c("factor", "ordered")) {
-        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
-      } else {
-        paste0("By: ", by_var) # continuous by
-      }
-    }
-  }
-
-  ## add labelling to plot
-  plt <- plt + labs(
-    x = xlab, y = ylab, title = title, subtitle = subtitle,
-    caption = caption
-  )
+  plt <- plt + prepare_smooth_labels(object,
+    x_var = "Gaussian quantiles", y_var = "Partial effects",
+    xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
+    caption = caption)
 
   ## fixing the y axis limits?
   if (!is.null(ylim)) {
@@ -1018,9 +998,6 @@
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
 
-  if (is.null(continuous_fill)) {
-    continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
-  }
 
   # If constant supplied apply it to `est`
   object <- add_constant(object, constant = constant)
@@ -1055,44 +1032,6 @@
     default_crs <- 4326
   }
 
-  # base plot
-  # Simon parameterises the SOS with first argument latitude and second
-  #  argument longitude, so we need to reverse that here
-  plt <- ggplot(object, aes(
-    x = .data[[variables[2]]],
-    y = .data[[variables[1]]]
-  )) +
-    geom_tile(mapping = aes(fill = .data[[plot_var]])) +
-    coord_sf(
-      crs = crs, default_crs = default_crs,
-      lims_method = lims_method
-    )
-  # foo <- object |> select(latitude, longitude, .estimate)
-  # foo_df <- as.data.frame(foo)
-  # sf <- stars::st_as_stars(foo_df) |>
-  #   sf::st_set_crs("OGC:CRS84") |>
-  #   sf::st_as_sf(points = FALSE) |>
-  #   sf::st_set_agr("constant")
-  # st_ortho_cut <- function(x, lon_0, lat_0, radius = 9800000) {
-  #   stopifnot(st_is_longlat(x))
-  #   pt <- sf::st_sfc(st_point(c(lon_0, lat_0)), crs = "OGC:CRS84")
-  #   buf <- sf::st_buffer(pt, units::set_units(radius, "m"))
-  #   ortho <- paste0("+proj=ortho +lat_0=", lat_0, " +lon_0=", lon_0)
-  #   sf::st_transform(sf::st_intersection(x, buf), sf::st_crs(ortho))
-  # }
-  # sf_o <- st_ortho_cut(sf, lat_0 = 20, lon_0 = mean(range(object[[variables[2]]])))
-  
-  # ggplot() + geom_sf(data = sf, aes(fill = .estimate))
-
-  if (isTRUE(contour)) {
-    plt <- plt + geom_contour(
-      mapping = aes(z = .data[[plot_var]]),
-      colour = contour_col,
-      bins = n_contour,
-      na.rm = TRUE
-    )
-  }
-
   # default axis labels if none supplied
   if (missing(xlab)) {
     xlab <- variables[2] ## yes, the smooth is s(lat, lon) !
@@ -1102,70 +1041,30 @@
     ylab <- variables[1] ## yes, the smooth is s(lat, lon) !
   }
 
-  if (is.null(title)) {
-    title <- unique(object[[".smooth"]])
-  }
-  # add the basis via caption if caption is TRUE or NULL
-  if ((is.logical(caption) && isTRUE(caption)) || is.null(caption)) {
-    caption <- paste("Basis:", object[[".type"]])
-  } else {
-    caption <- NULL
-  }
-
-  if (all(!is.na(object[[".by"]]))) {
-    # is the by variable a factor or a numeric
-    by_class <- data_class(object)[[object[[".by"]][[1L]]]]
+  # Spherical plots historically include a level only for unordered factors.
+  if (all(!is.na(object[[".by"]])) && is.null(subtitle)) {
     by_var <- as.character(unique(object[[".by"]]))
-    spl <- strsplit(title, split = ":")
-    title <- spl[[1L]][[1L]]
-    if (is.null(subtitle)) {
-      subtitle <- if (by_class != "factor") {
-        paste0("By: ", by_var) # continuous by
-      } else {
-        paste0("By: ", by_var, "; ", unique(object[[by_var]]))
-      }
+    subtitle <- paste0("By: ", by_var)
+    if (data_class(object)[[by_var]] == "factor") {
+      subtitle <- paste0(subtitle, "; ", unique(object[[by_var]]))
     }
   }
+  labels <- prepare_smooth_labels(object,
+    x_var = variables[2], y_var = variables[1], xlab = xlab, ylab = ylab,
+    title = title, subtitle = subtitle, caption = caption)
+  # Preserve the spherical method's omitted-versus-NULL axis convention.
+  labels[c("x", "y")] <- list(xlab, ylab)
 
-  # add labelling to plot
-  plt <- plt + labs(
-    x = xlab, y = ylab, title = title, subtitle = subtitle,
-    caption = caption
-  )
+  prepare_surface_plot(object,
+    x_var = variables[2], y_var = variables[1], fill_var = plot_var,
+    fill_limits = guide_limits, fill_title = guide_title,
+    labels = labels,
+    geom = "tile", tile_colour = NULL, continuous_fill = continuous_fill,
+    contour = contour, contour_col = contour_col, n_contour = n_contour,
+    angle = angle, rug = rug,
+    coord = coord_sf(crs = crs, default_crs = default_crs,
+      lims_method = lims_method))
 
-  # Set the palette
-  plt <- plt + continuous_fill
-
-  # Set the limits for the fill
-  plt <- plt + expand_limits(fill = guide_limits)
-
-  # add guide
-  plt <- plt +
-    guides(
-      fill = guide_colourbar(
-        title = guide_title, direction = "vertical"#,
-        #barheight = grid::unit(5, "lines") #grid::unit(0.25, "npc")
-      ),
-      x = guide_axis(angle = angle)
-    )
-
-  # position legend at the
-  plt <- plt + theme(legend.position = "right")
-
-  # add rug?
-  if (!is.null(rug)) {
-    plt <- plt +
-      geom_point(
-        data = rug, ## yes, the smooth is s(lat, lon) !
-        mapping = aes(
-          x = .data[[variables[2]]],
-          y = .data[[variables[1]]]
-        ),
-        inherit.aes = FALSE, alpha = 0.1
-      )
-  }
-
-  plt
 }
 
 #' @importFrom ggplot2 ggplot geom_point geom_raster geom_contour

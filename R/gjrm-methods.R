@@ -68,10 +68,9 @@
   # return
   n_plots <- map_dbl(object[models[take]], .f = n_smooths) |>
     sum()
-  if (is.null(ncol) && is.null(nrow)) {
-    ncol <- ceiling(sqrt(n_plots))
-    nrow <- ceiling(n_plots / ncol)
-  }
+  layout <- prepare_plot_layout(n_plots, ncol = ncol, nrow = nrow)
+  ncol <- layout$ncol
+  nrow <- layout$nrow
   if (n_plots > 1L && is.null(widths)) {
     # it doesn't matter about the widths if only one plot, but if we have
     # more than one plot and the user didn't change `widths`, then we will

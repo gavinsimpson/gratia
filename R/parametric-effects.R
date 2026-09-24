@@ -271,10 +271,9 @@ draw.parametric_effects <- function(object,
 
   # return
   n_plots <- length(plts)
-  if (is.null(ncol) && is.null(nrow)) {
-    ncol <- ceiling(sqrt(n_plots))
-    nrow <- ceiling(n_plots / ncol)
-  }
+  layout <- prepare_plot_layout(n_plots, ncol = ncol, nrow = nrow)
+  ncol <- layout$ncol
+  nrow <- layout$nrow
   wrap_plots(plts,
     byrow = TRUE, ncol = ncol, nrow = nrow,
     guides = guides, ...

@@ -133,10 +133,9 @@
 
   ## return
   n_plots <- length(plts)
-  if (is.null(ncol) && is.null(nrow)) {
-    ncol <- ceiling(sqrt(n_plots))
-    nrow <- ceiling(n_plots / ncol)
-  }
+  layout <- prepare_plot_layout(n_plots, ncol = ncol, nrow = nrow)
+  ncol <- layout$ncol
+  nrow <- layout$nrow
   wrap_plots(plts,
     byrow = TRUE, ncol = ncol, nrow = nrow, guides = guides,
     ...
@@ -165,18 +164,10 @@
     group = .data[[".model"]]
   ))
 
-  ## add uncertainty bands
-  plt <- plt + geom_ribbon(
-    aes(
-      ymin = .data[[".lower_ci"]],
-      ymax = .data[[".upper_ci"]],
-      fill = .data[[".model"]]
-    ),
-    alpha = 0.2
-  )
-
-  ## add smooth lines
-  plt <- plt + geom_line(aes(colour = .data[[".model"]]))
+  plt <- add_curve_interval(plt,
+    lower_var = ".lower_ci", upper_var = ".upper_ci",
+    ribbon_mapping = aes(fill = .data[[".model"]]),
+    line_mapping = aes(colour = .data[[".model"]]))
 
   ## Add labels
   plt <- plt + labs(
