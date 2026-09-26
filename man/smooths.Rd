@@ -7,17 +7,19 @@
 \alias{smooths.gamm4}
 \title{Names of smooths in a GAM}
 \usage{
-smooths(object)
+smooths(object, ...)
 
-\method{smooths}{default}(object)
+\method{smooths}{default}(object, ...)
 
-\method{smooths}{gamm}(object)
+\method{smooths}{gamm}(object, ...)
 
-\method{smooths}{gamm4}(object)
+\method{smooths}{gamm4}(object, ...)
 }
 \arguments{
 \item{object}{a fitted GAM or related model. Typically the result of a call
 to \code{\link[mgcv:gam]{mgcv::gam()}}, \code{\link[mgcv:bam]{mgcv::bam()}}, or \code{\link[mgcv:gamm]{mgcv::gamm()}}.}
+
+\item{...}{Arguments passed to methods.}
 }
 \description{
 Names of smooths in a GAM

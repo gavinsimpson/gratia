@@ -2,9 +2,19 @@
 
 ## User visible changes
 
+* `draw()`, `smooth_estimates()`, and smooth coefficient extraction now support
+  glmmTMB models, including conditional, zero-inflation and dispersion smooths
+  where supported by glmmTMB. All smooths are plotted by default, with
+  mgcv-style predictor labels (`s(x)`, `s.1(x)`, etc.) and model-wide `select`.
+  Smooth intervals use TMB joint covariance.
+
+  `appraise()`, `qq_plot()` and `worm_plot()` support native glmmTMB residuals,
+  with conditional response simulation for QQ reference bands. See
+  `?'glmmTMB-methods'` for supported families and current limitations.
+
 * Plotting helpers are now shared by derivative, comparison, difference,
   posterior, basis and spherical-smooth plots (#308). Curve/interval rendering
-  and automatic panel layouts are centralized while retaining existing
+  and automatic panel layouts are centralised while retaining existing
   plotting defaults.
 
 * Flat smooth surfaces now share an internal renderer across bivariate,

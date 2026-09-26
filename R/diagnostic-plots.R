@@ -174,7 +174,7 @@ diagnostic_method <- function(model, method = NULL) {
   # figure out method stuff
   method <- diagnostic_method(model, method)
   ## check if we can do the uniform method - needs a quantile fun
-  ff_qf <- fix_family_qf(family(model))[["qf"]]
+  ff_qf <- if (identical(method, "uniform")) fix_family_qf(family(model))[["qf"]] else NULL
   if (identical(method, "uniform") && is.null(ff_qf)) {
     method <- "simulate"
   }
@@ -291,6 +291,9 @@ diagnostic_method <- function(model, method = NULL) {
 `qq_simulate` <- function(model, n = 50,
                           type = c("deviance", "response", "pearson"),
                           level = 0.9, detrend = FALSE) {
+  if (inherits(model, "gratia_glmmtmb_diagnostic")) {
+    return(qq_simulate_glmmtmb(model, n, type, level, detrend))
+  }
   model <- model_used_rows(model)
   type <- match.arg(type)
   family <- family(model)
@@ -620,6 +623,10 @@ diagnostic_method <- function(model, method = NULL) {
   line_col = "red",
   seed = NULL
 ) {
+  if (inherits(model, "glmmTMB")) {
+    model <- glmmtmb_diagnostic_model(model, type = if (missing(type)) "pearson" else match.arg(type))
+    if (missing(type)) type <- "pearson"
+  }
   original <- model
   model <- model_used_rows(model)
   type <- match.arg(type)
@@ -700,6 +707,9 @@ diagnostic_method <- function(model, method = NULL) {
   point_col = "grey20",
   point_alpha = 1
 ) {
+  if (inherits(model, "glmmTMB")) {
+    model <- glmmtmb_diagnostic_model(model, type = "response")
+  }
   ## extract data for plot
   original <- model
   model <- model_used_rows(model)
@@ -773,6 +783,10 @@ diagnostic_method <- function(model, method = NULL) {
   subtitle = NULL, caption = NULL,
   seed = NULL
 ) {
+  if (inherits(model, "glmmTMB")) {
+    model <- glmmtmb_diagnostic_model(model, type = if (missing(type)) "pearson" else match.arg(type))
+    if (missing(type)) type <- "pearson"
+  }
   ## extract data for plot
   original <- model
   model <- model_used_rows(model)

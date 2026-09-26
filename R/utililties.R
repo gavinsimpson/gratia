@@ -110,30 +110,32 @@
 
 #' Names of smooths in a GAM
 #'
+#' @param ... Arguments passed to methods.
+#'
 #' @param object a fitted GAM or related model. Typically the result of a call
 #'   to [mgcv::gam()], [mgcv::bam()], or [mgcv::gamm()].
 #'
 #' @export
-`smooths` <- function(object) {
+`smooths` <- function(object, ...) {
   UseMethod("smooths")
 }
 
 #' @export
 #' @rdname smooths
-`smooths.default` <- function(object) {
+`smooths.default` <- function(object, ...) {
   vapply(object[["smooth"]], FUN = `[[`, FUN.VALUE = character(1), "label")
 }
 
 #' @export
 #' @rdname smooths
-`smooths.gamm` <- function(object) {
+`smooths.gamm` <- function(object, ...) {
   stopifnot(is_gamm(object))
   smooths(object$gam)
 }
 
 #' @export
 #' @rdname smooths
-`smooths.gamm4` <- function(object) {
+`smooths.gamm4` <- function(object, ...) {
   stopifnot(is_gamm4(object))
   smooths(object$gam)
 }
@@ -277,7 +279,11 @@ stop_if_not_mgcv_smooth <- function(smooth) {
   if (is.gamm(object) || is.gamm4(object)) {
     object <- object[["gam"]]
   }
-  smooth <- object[["smooth"]][which_smooth(object, term)]
+  smooth <- if (inherits(object, "glmmTMB")) {
+    get_smooths_by_id(object, which_smooth(object, term))
+  } else {
+    object[["smooth"]][which_smooth(object, term)]
+  }
   if (identical(length(smooth), 1L)) {
     smooth <- smooth[[1L]]
   }
@@ -299,38 +305,39 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 #' @param object a fitted GAM model object.
 #' @param id numeric; the position of the smooth in the model object.
 #'
+#' @param ... Arguments passed to methods.
 #' @export
-`get_smooths_by_id` <- function(object, id) {
+`get_smooths_by_id` <- function(object, id, ...) {
   UseMethod("get_smooths_by_id")
 }
 
 #' @export
 #' @rdname get_smooths_by_id
-`get_smooths_by_id.gam` <- function(object, id) {
+`get_smooths_by_id.gam` <- function(object, id, ...) {
   object[["smooth"]][id]
 }
 
 #' @export
 #' @rdname get_smooths_by_id
-`get_smooths_by_id.scam` <- function(object, id) {
+`get_smooths_by_id.scam` <- function(object, id, ...) {
   object[["smooth"]][id]
 }
 
 #' @export
 #' @rdname get_smooths_by_id
-`get_smooths_by_id.gamm` <- function(object, id) {
+`get_smooths_by_id.gamm` <- function(object, id, ...) {
   object[["gam"]][["smooth"]][id]
 }
 
 #' @export
 #' @rdname get_smooths_by_id
-`get_smooths_by_id.gamm4` <- function(object, id) {
+`get_smooths_by_id.gamm4` <- function(object, id, ...) {
   object[["gam"]][["smooth"]][id]
 }
 
 #' @export
 #' @rdname get_smooths_by_id
-`get_smooths_by_id.list` <- function(object, id) {
+`get_smooths_by_id.list` <- function(object, id, ...) {
   if (!is.gamm4(object)) {
     stop("Not a gamm4 model fit.", call. = FALSE)
   }
@@ -535,6 +542,12 @@ stop_if_not_mgcv_smooth <- function(smooth) {
   term = NULL,
   by_level = NULL
 ) {
+  UseMethod("get_vcov")
+}
+
+#' @export
+get_vcov.default <- function(object, unconditional = FALSE,
+    frequentist = FALSE, term = NULL, by_level = NULL) {
   V <- if (frequentist) {
     object$Ve
   } else if (unconditional) {
