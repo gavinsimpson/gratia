@@ -4,11 +4,9 @@
 
 * `parametric_effects()` and `draw()` now support parametric interactions,
   including higher-order interactions. Numeric interactions use surfaces with
-  conditioning facets, numeric-by-factor interactions use grouped curves, and
-  factor interactions use grouped estimates and intervals. Each plot shows
-  only its formula term's contribution, respecting fitted contrasts. Grid and
-  surface controls are shared with smooth plots; no adjusted predictions or
-  automatic aggregation of main effects are introduced.
+  higher order terms using conditioning facets, numeric-by-factor interactions
+  use grouped curves, and factor interactions use grouped estimates and
+  intervals.
 
 * Plotting helpers are now shared by derivative, comparison, difference,
   posterior, basis and spherical-smooth plots (#308). Curve/interval rendering
