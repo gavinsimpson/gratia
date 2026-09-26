@@ -10,7 +10,7 @@
 
 * Plotting helpers are now shared by derivative, comparison, difference,
   posterior, basis and spherical-smooth plots (#308). Curve/interval rendering
-  and automatic panel layouts are centralized while retaining existing
+  and automatic panel layouts are centralised while retaining existing
   plotting defaults.
 
 * Flat smooth surfaces now share an internal renderer across bivariate,
