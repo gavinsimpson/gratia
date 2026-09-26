@@ -23,6 +23,14 @@ draw_parametric_effect(
   ylim = NULL,
   angle = NULL,
   factor_levels = NULL,
+  term_info = NULL,
+  contour = TRUE,
+  contour_col = "black",
+  n_contour = NULL,
+  geom = "raster",
+  continuous_fill = NULL,
+  discrete_colour = NULL,
+  discrete_fill = NULL,
   ...
 )
 ```
@@ -104,6 +112,46 @@ draw_parametric_effect(
 - factor_levels:
 
   list; a named list of factor levels
+
+- term_info:
+
+  Internal per-term covariate and plotting metadata.
+
+- contour:
+
+  logical; should contours be draw on the plot using
+  [`ggplot2::geom_contour()`](https://ggplot2.tidyverse.org/reference/geom_contour.html).
+
+- contour_col:
+
+  colour specification for contour lines.
+
+- n_contour:
+
+  numeric; the number of contour bins. Will result in `n_contour - 1`
+  contour lines being drawn. See
+  [`ggplot2::geom_contour()`](https://ggplot2.tidyverse.org/reference/geom_contour.html).
+
+- geom:
+
+  character; either `"raster"` (the default) or `"tile"` for flat smooth
+  surfaces, including faceted and soap-film plots. Raster rendering
+  keeps large PDF plots compact; tiles are individual borderless
+  rectangles that remain vector elements in PDF and SVG output,
+  potentially increasing file size. Other plot types, including
+  spherical smooths, are unchanged.
+
+- continuous_fill:
+
+  a suitable fill scale to be used when plotting continuous variables.
+
+- discrete_colour:
+
+  a suitable colour scale to be used when plotting discrete variables.
+
+- discrete_fill:
+
+  a suitable fill scale to be used when plotting discrete variables.
 
 - ...:
 

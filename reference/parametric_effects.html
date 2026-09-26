@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-33</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-34</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,6 +59,11 @@
 <span>  ci_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  n_2d <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  n_3d <span class="op">=</span> <span class="fl">16</span>,</span>
+<span>  n_4d <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  dist <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -114,8 +119,70 @@ line. If FALSE, the effect will be plotted against the raw data (i.e. for
 <code>log10(x)</code>, or <code>poly(z)</code>, the x-axis of the plot will be <code>x</code> or <code>z</code>
 respectively.)</p></dd>
 
-</dl></div>
 
+<dt id="arg-n-n-d-n-d-n-d">n, n_2d, n_3d, n_4d<a class="anchor" aria-label="anchor" href="#arg-n-n-d-n-d-n-d"></a></dt>
+<dd><p>Grid resolutions for multivariate parametric terms.
+Curves use <code>n = 100</code>; the first two numeric surface axes use <code>n_2d = 50</code>.
+The third dimension of a three-variable term uses <code>n_3d = 16</code>; dimensions
+beyond the second of higher-dimensional terms use <code>n_4d = 4</code>.
+<code>NULL</code> uses <code>n</code> instead. Factors retain their levels. Ignored when <code>data</code>
+is supplied. Single-variable terms retain their observed evaluation values.</p></dd>
+
+
+<dt id="arg-dist">dist<a class="anchor" aria-label="anchor" href="#arg-dist"></a></dt>
+<dd><p>Non-negative distance for masking surface plots far from observed
+covariates, as in <code><a href="draw.gam.html">draw.gam()</a></code>. Applied to the first two numeric axes when
+drawing; returned estimates are not masked. Use zero to disable masking.</p></dd>
+
+</dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>A tibble of class <code>parametric_effects</code>, with <code>.term</code>, <code>.type</code>,
+<code>.partial</code> and <code>.se</code>. Single-variable terms retain <code>.value</code> or <code>.level</code>;
+multivariate terms contain their raw covariate columns. Names conflicting
+with reserved columns are repaired with numeric suffixes. The <code>term_info</code>
+attribute records multivariate column mappings, plotting order, factor
+levels and observation data. With <code>unnest = FALSE</code>, estimates and
+covariates are nested in a <code>data</code> list column.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Each estimate is the contribution of one formula term to its linear
+predictor. Intercepts, main effects and other terms are not added to an
+interaction. Components follow the model's contrast coding: with treatment
+contrasts, a numeric-by-factor interaction represents a departure from the
+reference-level slope, rather than a complete slope for each level.</p>
+<p>A multi-column term such as <code>poly(x, 3)</code> is one component, whereas <code>x</code> and
+<code>I(x^2)</code> remain separate components. Multivariate terms are evaluated against
+their raw covariates; <code>transform = TRUE</code> is not supported for these terms.
+Other covariates in generated prediction data are held at typical values
+solely to evaluate the model matrix; their contributions are not included.</p>
+<p>The drawing method uses the first two numeric covariates for surface axes,
+grouping curves by the first factor when there is only one numeric covariate.
+Factor-only terms use grouped points and intervals. Remaining covariates
+define facets: one wraps, two or more use the first as rows and the rest as
+columns. Formula order is retained within numeric and discrete covariates.
+Logical covariates are discrete. Surface plots show estimates; uncertainty
+is retained in the returned data rather than drawn as additional surfaces.</p>
+    </div>
+
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">200</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">d</span><span class="op">$</span><span class="va">group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x0</span> <span class="op">*</span> <span class="va">group</span> <span class="op">+</span> <span class="va">x1</span><span class="op">:</span><span class="va">x2</span><span class="op">:</span><span class="va">x3</span>, data <span class="op">=</span> <span class="va">d</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pe</span> <span class="op">&lt;-</span> <span class="fu">parametric_effects</span><span class="op">(</span><span class="va">m</span>, n_2d <span class="op">=</span> <span class="fl">20</span>, n_3d <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">pe</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>`stat_contour()`: Zero contours were generated</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>no non-missing arguments to min; returning Inf</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>no non-missing arguments to max; returning -Inf</span>
+<span class="r-plt img"><img src="parametric_effects-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m</span>, parametric <span class="op">=</span> <span class="cn">TRUE</span>, terms <span class="op">=</span> <span class="st">"x0:group"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="parametric_effects-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

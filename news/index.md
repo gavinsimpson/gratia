@@ -4,6 +4,15 @@
 
 ### User visible changes
 
+- [`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
+  and
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  now support parametric interactions, including higher-order
+  interactions. Numeric interactions use surfaces with higher order
+  terms using conditioning facets, numeric-by-factor interactions use
+  grouped curves, and factor interactions use grouped estimates and
+  intervals.
+
 - Plotting helpers are now shared by derivative, comparison, difference,
   posterior, basis and spherical-smooth plots
   ([\#308](https://github.com/gavinsimpson/gratia/issues/308)).

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-33</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-34</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,7 +63,14 @@
 <span>  <span class="va">...</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  nrow <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  guides <span class="op">=</span> <span class="st">"keep"</span></span>
+<span>  guides <span class="op">=</span> <span class="st">"keep"</span>,</span>
+<span>  contour <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  contour_col <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>  n_contour <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  geom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"raster"</span>, <span class="st">"tile"</span><span class="op">)</span>,</span>
+<span>  continuous_fill <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  discrete_colour <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  discrete_fill <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -72,16 +79,12 @@
 
 
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
-<dd><p>a fitted GAM, the result of a call to <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code>.</p></dd>
+<dd><p>A <code>parametric_effects</code> object, optionally nested.</p></dd>
 
 
 <dt id="arg-scales">scales<a class="anchor" aria-label="anchor" href="#arg-scales"></a></dt>
-<dd><p>character; should all univariate smooths be plotted with the
-same y-axis scale? If <code>scales = "free"</code>, the default, each univariate
-smooth has its own y-axis scale. If <code>scales = "fixed"</code>, a common y axis
-scale is used for all univariate smooths.</p>
-<p>Currently does not affect the y-axis scale of plots of the parametric
-terms.</p></dd>
+<dd><p>Use a common effect-axis range for curves and points (<code>fixed</code>),
+or separate ranges (<code>free</code>). Surface covariate axes are not affected.</p></dd>
 
 
 <dt id="arg-ci-level">ci_level<a class="anchor" aria-label="anchor" href="#arg-ci-level"></a></dt>
@@ -143,6 +146,43 @@ spread the plots</p></dd>
 <dt id="arg-guides">guides<a class="anchor" aria-label="anchor" href="#arg-guides"></a></dt>
 <dd><p>character; one of <code>"keep"</code> (the default), <code>"collect"</code>, or
 <code>"auto"</code>. Passed to <code><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">patchwork::plot_layout()</a></code></p></dd>
+
+
+<dt id="arg-contour">contour<a class="anchor" aria-label="anchor" href="#arg-contour"></a></dt>
+<dd><p>logical; should contours be draw on the plot using
+<code><a href="https://ggplot2.tidyverse.org/reference/geom_contour.html" class="external-link">ggplot2::geom_contour()</a></code>.</p></dd>
+
+
+<dt id="arg-contour-col">contour_col<a class="anchor" aria-label="anchor" href="#arg-contour-col"></a></dt>
+<dd><p>colour specification for contour lines.</p></dd>
+
+
+<dt id="arg-n-contour">n_contour<a class="anchor" aria-label="anchor" href="#arg-n-contour"></a></dt>
+<dd><p>numeric; the number of contour bins. Will result in
+<code>n_contour - 1</code> contour lines being drawn. See <code><a href="https://ggplot2.tidyverse.org/reference/geom_contour.html" class="external-link">ggplot2::geom_contour()</a></code>.</p></dd>
+
+
+<dt id="arg-geom">geom<a class="anchor" aria-label="anchor" href="#arg-geom"></a></dt>
+<dd><p>character; either <code>"raster"</code> (the default) or <code>"tile"</code> for flat
+smooth surfaces, including faceted and soap-film plots. Raster rendering
+keeps large PDF plots compact; tiles are individual borderless rectangles
+that remain vector elements in PDF and SVG output, potentially increasing
+file size. Other plot types, including spherical smooths, are unchanged.</p></dd>
+
+
+<dt id="arg-continuous-fill">continuous_fill<a class="anchor" aria-label="anchor" href="#arg-continuous-fill"></a></dt>
+<dd><p>a suitable fill scale to be used when plotting
+continuous variables.</p></dd>
+
+
+<dt id="arg-discrete-colour">discrete_colour<a class="anchor" aria-label="anchor" href="#arg-discrete-colour"></a></dt>
+<dd><p>a suitable colour scale to be used when plotting
+discrete variables.</p></dd>
+
+
+<dt id="arg-discrete-fill">discrete_fill<a class="anchor" aria-label="anchor" href="#arg-discrete-fill"></a></dt>
+<dd><p>a suitable fill scale to be used when plotting
+discrete variables.</p></dd>
 
 </dl></div>
 

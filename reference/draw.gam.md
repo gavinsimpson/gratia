@@ -97,6 +97,11 @@ draw(
 
   character; which model parametric terms should be drawn? The Default
   of `NULL` will plot all parametric terms that can be drawn.
+  Interactions show their individual contributions to the linear
+  predictor; main effects and intercepts are not added. Multivariate
+  parametric terms use the grid and surface controls below, as described
+  in
+  [`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md).
 
 - residuals:
 

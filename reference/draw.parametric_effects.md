@@ -21,7 +21,14 @@ draw(
   ...,
   ncol = NULL,
   nrow = NULL,
-  guides = "keep"
+  guides = "keep",
+  contour = TRUE,
+  contour_col = "black",
+  n_contour = NULL,
+  geom = c("raster", "tile"),
+  continuous_fill = NULL,
+  discrete_colour = NULL,
+  discrete_fill = NULL
 )
 ```
 
@@ -29,18 +36,12 @@ draw(
 
 - object:
 
-  a fitted GAM, the result of a call to
-  [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html).
+  A `parametric_effects` object, optionally nested.
 
 - scales:
 
-  character; should all univariate smooths be plotted with the same
-  y-axis scale? If `scales = "free"`, the default, each univariate
-  smooth has its own y-axis scale. If `scales = "fixed"`, a common y
-  axis scale is used for all univariate smooths.
-
-  Currently does not affect the y-axis scale of plots of the parametric
-  terms.
+  Use a common effect-axis range for curves and points (`fixed`), or
+  separate ranges (`free`). Surface covariate axes are not affected.
 
 - ci_level:
 
@@ -104,3 +105,39 @@ draw(
   character; one of `"keep"` (the default), `"collect"`, or `"auto"`.
   Passed to
   [`patchwork::plot_layout()`](https://patchwork.data-imaginist.com/reference/plot_layout.html)
+
+- contour:
+
+  logical; should contours be draw on the plot using
+  [`ggplot2::geom_contour()`](https://ggplot2.tidyverse.org/reference/geom_contour.html).
+
+- contour_col:
+
+  colour specification for contour lines.
+
+- n_contour:
+
+  numeric; the number of contour bins. Will result in `n_contour - 1`
+  contour lines being drawn. See
+  [`ggplot2::geom_contour()`](https://ggplot2.tidyverse.org/reference/geom_contour.html).
+
+- geom:
+
+  character; either `"raster"` (the default) or `"tile"` for flat smooth
+  surfaces, including faceted and soap-film plots. Raster rendering
+  keeps large PDF plots compact; tiles are individual borderless
+  rectangles that remain vector elements in PDF and SVG output,
+  potentially increasing file size. Other plot types, including
+  spherical smooths, are unchanged.
+
+- continuous_fill:
+
+  a suitable fill scale to be used when plotting continuous variables.
+
+- discrete_colour:
+
+  a suitable colour scale to be used when plotting discrete variables.
+
+- discrete_fill:
+
+  a suitable fill scale to be used when plotting discrete variables.

@@ -11,7 +11,7 @@ is used instead."><meta property="og:image" content="https://gavinsimpson.github
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-33</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-34</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -139,7 +139,11 @@ select which parametric effects are plotted. The default, as with
 
 <dt id="arg-terms">terms<a class="anchor" aria-label="anchor" href="#arg-terms"></a></dt>
 <dd><p>character; which model parametric terms should be drawn? The
-Default of <code>NULL</code> will plot all parametric terms that can be drawn.</p></dd>
+Default of <code>NULL</code> will plot all parametric terms that can be drawn.
+Interactions show their individual contributions to the linear predictor;
+main effects and intercepts are not added. Multivariate parametric terms
+use the grid and surface controls below, as described in
+<code><a href="parametric_effects.html">parametric_effects()</a></code>.</p></dd>
 
 
 <dt id="arg-residuals">residuals<a class="anchor" aria-label="anchor" href="#arg-residuals"></a></dt>
