@@ -20,7 +20,54 @@
 #'   line. If FALSE, the effect will be plotted against the raw data (i.e. for
 #'   `log10(x)`, or `poly(z)`, the x-axis of the plot will be `x` or `z`
 #'   respectively.)
+#' @param n,n_2d,n_3d,n_4d Grid resolutions for multivariate parametric terms.
+#'   Curves use `n = 100`; the first two numeric surface axes use `n_2d = 50`.
+#'   The third dimension of a three-variable term uses `n_3d = 16`; dimensions
+#'   beyond the second of higher-dimensional terms use `n_4d = 4`.
+#'   `NULL` uses `n` instead. Factors retain their levels. Ignored when `data`
+#'   is supplied. Single-variable terms retain their observed evaluation values.
+#' @param dist Non-negative distance for masking surface plots far from observed
+#'   covariates, as in [draw.gam()]. Applied to the first two numeric axes when
+#'   drawing; returned estimates are not masked. Use zero to disable masking.
 #' @param ... arguments passed to other methods.
+#'
+#' @details
+#' Each estimate is the contribution of one formula term to its linear
+#' predictor. Intercepts, main effects and other terms are not added to an
+#' interaction. Components follow the model's contrast coding: with treatment
+#' contrasts, a numeric-by-factor interaction represents a departure from the
+#' reference-level slope, rather than a complete slope for each level.
+#'
+#' A multi-column term such as `poly(x, 3)` is one component, whereas `x` and
+#' `I(x^2)` remain separate components. Multivariate terms are evaluated against
+#' their raw covariates; `transform = TRUE` is not supported for these terms.
+#' Other covariates in generated prediction data are held at typical values
+#' solely to evaluate the model matrix; their contributions are not included.
+#'
+#' The drawing method uses the first two numeric covariates for surface axes,
+#' grouping curves by the first factor when there is only one numeric covariate.
+#' Factor-only terms use grouped points and intervals. Remaining covariates
+#' define facets: one wraps, two or more use the first as rows and the rest as
+#' columns. Formula order is retained within numeric and discrete covariates.
+#' Logical covariates are discrete. Surface plots show estimates; uncertainty
+#' is retained in the returned data rather than drawn as additional surfaces.
+#'
+#' @return A tibble of class `parametric_effects`, with `.term`, `.type`,
+#'   `.partial` and `.se`. Single-variable terms retain `.value` or `.level`;
+#'   multivariate terms contain their raw covariate columns. Names conflicting
+#'   with reserved columns are repaired with numeric suffixes. The `term_info`
+#'   attribute records multivariate column mappings, plotting order, factor
+#'   levels and observation data. With `unnest = FALSE`, estimates and
+#'   covariates are nested in a `data` list column.
+#'
+#' @examples
+#' load_mgcv()
+#' d <- data_sim("eg1", n = 200, seed = 42)
+#' d$group <- factor(rep(c("A", "B"), length.out = nrow(d)))
+#' m <- gam(y ~ x0 * group + x1:x2:x3, data = d, method = "REML")
+#' pe <- parametric_effects(m, n_2d = 20, n_3d = 4)
+#' draw(pe)
+#' draw(m, parametric = TRUE, terms = "x0:group")
 #'
 #' @export
 `parametric_effects` <- function(object, ...) {
@@ -45,11 +92,12 @@
                                      ci_level = 0.95,
                                      envir = NULL,
                                      transform = FALSE,
-                                     ...) {
+                                     n = 100, n_2d = 50,
+                                     n_3d = 16, n_4d = 4,
+                                     dist = 0.1, ...) {
   object <- with_model_envir(object, envir)
   envir <- model_envir(object)
-  tt <- object$pterms # get model terms object
-  tt <- delete.response(tt) # remove response so easier to work with
+  supplied_data <- !is.null(data)
   vars <- parametric_terms(object) # vector of names of model terms
   if (length(vars) == 0L) {
     warning("The model doesn't contain any parametric terms", call. = FALSE)
@@ -62,34 +110,13 @@
   valid_terms <- if (is.null(terms)) {
     mgcv_names
   } else {
-    if (!any(valid_terms <- terms %in% vars)) {
+    if (!any(valid_terms <- terms %in% mgcv_names)) {
       stop(sprintf(
         "Term is not in the parametric part of model: <%s>",
         terms
       ))
     }
     terms[valid_terms]
-  }
-
-  # check order of terms; if > 1 interaction and not handled
-  ord <- if (is.list(tt)) {
-    unlist(lapply(tt, attr, "order"), use.names = FALSE)
-  } else {
-    attr(tt, "order")
-  }
-  # Align orders with mgcv's names, including linear predictor suffixes.
-  names(ord) <- mgcv_names
-  ord <- ord[valid_terms]
-  if (any(int <- ord > 1)) {
-    cli_alert_info("Interaction terms are not currently supported.")
-    valid_terms <- valid_terms[!(ord > 1)]
-  }
-  # return early if no valid terms to
-  if (length(valid_terms) == 0L) {
-    cli_alert_info(
-      "The model doesn't contain any non-interaction parametric terms"
-    )
-    return(NULL)
   }
 
   # Prefer stored raw columns. Recover the fitting data only when a required
@@ -99,12 +126,8 @@
   # have to do predictions *after* we reconstruct the data otherwise we get
   # problems if there were NAs in the original data.
 
-  # predict model contributions for the parametric terms, using only
-  # the factor combos in the data and typical values of all other terms
-  # and exclude the effects of smooths as they don't change anything in
-  # terms
-  # get the data that we need for the model; right now `data` could contain
-  # everything and be a model frame
+  # Evaluate single-variable components at observed (or supplied) values.
+  # Multivariate components below generate their own grids when needed.
   data <- model.frame(object$pred.formula, data = data)
   attr(data, "terms") <- NULL # squich this or predict.gam complains
   # can limit the data combinations we predict at now by taking the unique
@@ -118,17 +141,37 @@
     unconditional = unconditional
   )
 
+  # Keep plotting metadata outside the tabular estimates. Reserved names are
+  # escaped consistently across terms, including covariates such as `.partial`.
+  raw_vars <- lapply(vars[valid_terms], function(x) {
+    intersect(all.vars(str2lang(x)), names(data))
+  })
+  all_raw <- unique(unlist(raw_vars, use.names = FALSE))
+  reserved <- c(".term", ".type", ".level", ".value", ".partial", ".se",
+    ".lower_ci", ".upper_ci", "data")
+  columns <- setNames(utils::tail(make.unique(c(reserved, all_raw)), length(all_raw)),
+    all_raw)
+  if (transform && any(lengths(raw_vars) > 1L)) {
+    stop("'transform = TRUE' is not supported for multivariate parametric terms.",
+      call. = FALSE)
+  }
+
   # loop over the valid_terms and prepare the parametric effects
   fun <- function(term, data, pred, vars) {
     # if we are handling an lss model, we need to find the right data
+    covariates <- raw_vars[[term]]
+    if (length(covariates) > 1L) {
+      return(evaluate_parametric_component(object, term, covariates, columns,
+        data, supplied_data, n, n_2d, n_3d, n_4d, dist, unconditional))
+    }
     vars <- vars[term]
-    # term_expr <- str2expression(term)[[1L]]
     term_expr <- str2expression(vars)[[1L]]
     x_data <- if (length(term_expr) > 1L) {
       if (transform) {
         pred$fit[, term]
       } else {
-        eval(term_expr[[2L]], data, enclos = envir)
+        if (length(covariates) == 1L) data[[covariates]] else
+          eval(term_expr[[2L]], data, enclos = envir)
       }
     } else {
       eval(term_expr, data, enclos = envir)
@@ -136,8 +179,8 @@
 
     out <- bind_cols(
       .level = x_data,
-      .partial = pred[["fit"]][, term],
-      .se = pred[["se.fit"]][, term]
+      .partial = as.numeric(pred[["fit"]][, term]),
+      .se = as.numeric(pred[["se.fit"]][, term])
     ) |>
       distinct(.data$.level, .keep_all = TRUE)
     nr <- nrow(out)
@@ -170,10 +213,6 @@
     out
   }
 
-  # effects <- map_df(valid_terms,
-  #  .f = fun, data = data, pred = pred,
-  #  vars = vars
-  # )
   effects <- map(valid_terms,
     .f = fun, data = data, pred = pred,
     vars = vars
@@ -184,20 +223,18 @@
     unlist(recursive = FALSE) # peel off the outer layer of the list
   # now we can bind the data frames together - need to do it this way to
   # preserve the levels of all factors - see #284
+  term_info <- lapply(effects, function(x) attr(x, "term_info"))
+  names(term_info) <- valid_terms
+  term_info <- term_info[!vapply(term_info, is.null, logical(1))]
   effects <- effects |> bind_rows()
 
   if (unnest) {
-    # f_levels <- attr(effects, "factor_levels")
     effects <- unnest(effects, cols = "data") |>
       relocate(c(".partial", ".se"), .after = last_col())
-    attr(effects, "factor_levels") <- f_levels
   }
 
-  ## add confidence interval -- be consistent and don't add this, but could?
-  ## effects <- mutate(effects,
-  ##                     upper = .data$partial + (2 * .data$se),
-  ##                     lower = .data$partial - (2 * .data$se))
-
+  attr(effects, "factor_levels") <- f_levels
+  attr(effects, "term_info") <- term_info
   class(effects) <- c("parametric_effects", class(effects))
   effects # return
 }
@@ -210,6 +247,9 @@
 #'   continuous terms.
 #'
 #' @inheritParams draw.gam
+#' @param object A `parametric_effects` object, optionally nested.
+#' @param scales Use a common effect-axis range for curves and points (`fixed`),
+#'   or separate ranges (`free`). Surface covariate axes are not affected.
 #'
 #' @export
 #' @importFrom patchwork wrap_plots
@@ -231,7 +271,19 @@ draw.parametric_effects <- function(object,
                                     angle = NULL,
                                     ...,
                                     ncol = NULL, nrow = NULL,
-                                    guides = "keep") {
+                                    guides = "keep",
+                                    contour = TRUE, contour_col = "black",
+                                    n_contour = NULL, geom = c("raster", "tile"),
+                                    continuous_fill = NULL,
+                                    discrete_colour = NULL, discrete_fill = NULL) {
+  if ("data" %in% names(object) && !".partial" %in% names(object)) {
+    info <- attr(object, "term_info")
+    levels <- attr(object, "factor_levels")
+    object <- tidyr::unnest(object, cols = "data")
+    attr(object, "term_info") <- info
+    attr(object, "factor_levels") <- levels
+  }
+  geom <- match.arg(geom)
   # Add CI
   crit <- coverage_normal(ci_level)
   object <- mutate(object,
@@ -249,6 +301,7 @@ draw.parametric_effects <- function(object,
   }
 
   f_levels <- attr(object, "factor_levels")
+  term_info <- attr(object, "term_info")
 
   plts <- object |>
     group_by(.data$.term) |>
@@ -265,7 +318,10 @@ draw.parametric_effects <- function(object,
         position = position,
         ylim = ylim,
         angle = angle,
-        factor_levels = f_levels
+        factor_levels = f_levels, term_info = term_info,
+        contour = contour, contour_col = contour_col, n_contour = n_contour,
+        geom = geom, continuous_fill = continuous_fill,
+        discrete_colour = discrete_colour, discrete_fill = discrete_fill
       )
     )
 
@@ -292,6 +348,7 @@ draw.parametric_effects <- function(object,
 #'   [ggplot2::labs()].
 #' @param caption character or expression; the plot caption. See
 #'   [ggplot2::labs()].
+#' @param term_info Internal per-term covariate and plotting metadata.
 #' @param factor_levels list; a named list of factor levels
 #'
 #' @inheritParams draw.gam
@@ -315,7 +372,23 @@ draw.parametric_effects <- function(object,
                                      ylim = NULL,
                                      angle = NULL,
                                      factor_levels = NULL,
+                                     term_info = NULL,
+                                     contour = TRUE, contour_col = "black",
+                                     n_contour = NULL, geom = "raster",
+                                     continuous_fill = NULL,
+                                     discrete_colour = NULL, discrete_fill = NULL,
                                      ...) {
+  info <- term_info[[unique(object$.term)]]
+  if (!is.null(info)) {
+    return(draw_parametric_component(object, info,
+      ci_level = ci_level, ci_col = ci_col, ci_alpha = ci_alpha,
+      line_col = line_col, constant = constant, fun = fun,
+      xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
+      caption = caption, rug = rug, ylim = ylim, angle = angle,
+      contour = contour, contour_col = contour_col, n_contour = n_contour,
+      geom = geom, continuous_fill = continuous_fill,
+      discrete_colour = discrete_colour, discrete_fill = discrete_fill))
+  }
   # plot
   type <- unique(object[[".type"]])
   is_fac <- type %in% c("ordered", "factor")

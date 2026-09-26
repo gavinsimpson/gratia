@@ -9,6 +9,4 @@
 
     Code
       plt <- draw(m_only_para, parametric = TRUE, angle = 90, rug = FALSE, data = df_2_fac)
-    Message
-      i Interaction terms are not currently supported.
 

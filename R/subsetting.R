@@ -59,6 +59,7 @@
 #' @importFrom vctrs vec_slice
 #' @importFrom dplyr filter reframe pull
 `[.parametric_effects` <- function(x, i, j, drop = FALSE) {
+  info <- attr(x, "term_info")
   cls <- class(x)
   f_levels <- attr(x, "factor_levels")
   class(x) <- class(x)[-c(1:2)]
@@ -75,6 +76,9 @@
     f_levels <- NA
   }
   attr(x, "factor_levels") <- f_levels
+  attr(x, "term_info") <- if (".term" %in% names(x)) {
+    info[intersect(names(info), unique(x$.term))]
+  } else NULL
   x
 }
 

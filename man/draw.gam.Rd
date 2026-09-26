@@ -76,7 +76,11 @@ select which parametric effects are plotted. The default, as with
 \code{\link[mgcv:plot.gam]{mgcv::plot.gam()}}, is to not draw parametric effects.}
 
 \item{terms}{character; which model parametric terms should be drawn? The
-Default of \code{NULL} will plot all parametric terms that can be drawn.}
+Default of \code{NULL} will plot all parametric terms that can be drawn.
+Interactions show their individual contributions to the linear predictor;
+main effects and intercepts are not added. Multivariate parametric terms
+use the grid and surface controls below, as described in
+\code{\link[=parametric_effects]{parametric_effects()}}.}
 
 \item{residuals}{logical; should partial residuals for a smooth be drawn?
 Ignored for anything but a simple univariate smooth.}

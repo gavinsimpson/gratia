@@ -400,6 +400,8 @@
 #'   mappings. Used by basis plots to retain inherited fill and grouping.
 #' @param contour_mapping Optional contour mappings; defaults to `fill_var`
 #'   mapped to z. Can explicitly remove inherited fill or set a contour group.
+#' @param contour_data Optional data for contour layers only, for example to
+#'   omit constant interaction panels. `NULL` inherits the surface data.
 #' @param contour_na_rm Logical; remove missing contour values silently?
 #' @param axis_guide X-axis guide; defaults to `guide_axis(angle = angle)`.
 #' @param fill_guide Fill guide; `NULL` leaves ggplot2's guide unchanged.
@@ -415,6 +417,7 @@
   contour = TRUE, contour_col = "black", n_contour = NULL, angle = NULL,
   facet = NULL, coord = NULL, rug = NULL, boundary = NULL, boundary_group = NULL,
   mapping = NULL, contour_mapping = NULL, contour_na_rm = TRUE,
+  contour_data = NULL,
   axis_guide = guide_axis(angle = angle),
   fill_guide = guide_colourbar(title = fill_title, direction = "vertical"),
   legend_position = "right", tile_colour = NA
@@ -440,7 +443,7 @@
     if (is.null(contour_mapping)) {
       contour_mapping <- aes(z = .data[[fill_var]])
     }
-    plt <- plt + geom_contour(contour_mapping,
+    plt <- plt + geom_contour(contour_mapping, data = contour_data,
       colour = contour_col, bins = n_contour, na.rm = contour_na_rm)
   }
   plt <- plt + labels + continuous_fill

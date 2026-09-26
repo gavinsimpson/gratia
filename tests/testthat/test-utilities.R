@@ -424,10 +424,7 @@ test_that("term_variables works for a terms", {
 test_that("transform_fun works for parametric_effects", {
   skip_if_not_installed("withr")
   withr::local_options(lifecycle_verbosity = "quiet")
-  expect_message(
-    pe <- parametric_effects(m_para_sm),
-    "Interaction terms are not currently supported."
-  )
+  expect_silent(pe <- parametric_effects(m_para_sm))
   expect_silent(pe <- transform_fun(pe, fun = abs))
   expect_true(all(!pe$.partial < 0L))
 })

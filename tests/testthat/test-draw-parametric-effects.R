@@ -1,10 +1,7 @@
 # Test draw.parametric_effects() method
 
 test_that("draw.parametric_effects works for m_2_fac", {
-  expect_message(
-    peff <- parametric_effects(m_2_fac),
-    "Interaction terms are not currently supported."
-  )
+  expect_silent(peff <- parametric_effects(m_2_fac))
   expect_silent(plt <- draw(peff))
 
   # skip_on_ci() # testing without as moved to mac os x
@@ -12,10 +9,7 @@ test_that("draw.parametric_effects works for m_2_fac", {
 })
 
 test_that("draw.parametric_effects works for m_para_sm", {
-  expect_message(
-    peff <- parametric_effects(m_para_sm),
-    "Interaction terms are not currently supported."
-  )
+  expect_silent(peff <- parametric_effects(m_para_sm))
   expect_silent(plt <- draw(peff, rug = FALSE))
 
   # skip_on_ci() # testing without as moved to mac os x
@@ -43,10 +37,7 @@ test_that("draw.parametric_effects works for m_para_sm select term", {
 })
 
 test_that("draw.parametric_effects works with only parametric terms", {
-  expect_message(
-    peff <- parametric_effects(m_only_para),
-    "Interaction terms are not currently supported."
-  )
+  expect_silent(peff <- parametric_effects(m_only_para))
   expect_silent(plt <- draw(peff, rug = FALSE))
 
   # skip_on_ci() # testing without as moved to mac os x

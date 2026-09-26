@@ -381,7 +381,8 @@
       para <- parametric_effects(object,
         terms = terms, data = data,
         unconditional = unconditional,
-        unnest = TRUE, ci_level = ci_level, envir = envir
+        unnest = TRUE, ci_level = ci_level, envir = envir,
+        n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, dist = dist
       )
 
       if (is.null(para)) {
@@ -418,7 +419,10 @@
               position = position,
               angle = angle,
               ylim = ylims,
-              factor_levels = f_levels
+              factor_levels = f_levels, term_info = attr(para, "term_info"),
+              contour = contour, contour_col = contour_col, n_contour = n_contour,
+              geom = geom, continuous_fill = continuous_fill,
+              discrete_colour = discrete_colour, discrete_fill = discrete_fill
             )
           )
       }
@@ -443,7 +447,7 @@
   #}
 
   if (isTRUE(parametric)) {
-    para_nm <- unique(para$.term)
+    para_nm <- dplyr::group_keys(dplyr::group_by(para, .data$.term))$.term
     para_plts <- setNames(para_plts, para_nm)
     sm_plts <- append(sm_plts, para_plts)
   }

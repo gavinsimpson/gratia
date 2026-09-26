@@ -121,24 +121,22 @@ test_that("draw.gam works for m_para_sm", {
 })
 
 test_that("draw.gam works for m_2_fac", {
-  expect_message(
+  expect_silent(
     plt <- draw(m_2_fac,
       parametric = TRUE, rug = FALSE,
       data = df_2_fac
-    ),
-    "Interaction terms are not currently supported."
+    )
   )
   # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw_gam m_2_fac parametric", plt)
 })
 
 test_that("draw.gam works for m_para_sm", {
-  expect_message(
+  expect_silent(
     plt <- draw(m_para_sm,
       parametric = TRUE, rug = FALSE,
       data = df_2_fac
-    ),
-    "Interaction terms are not currently supported."
+    )
   )
   # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw_gam m_para_sm parametric", plt)

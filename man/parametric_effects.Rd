@@ -16,6 +16,11 @@ parametric_effects(object, ...)
   ci_level = 0.95,
   envir = NULL,
   transform = FALSE,
+  n = 100,
+  n_2d = 50,
+  n_3d = 16,
+  n_4d = 4,
+  dist = 0.1,
   ...
 )
 }
@@ -49,7 +54,58 @@ its transformed scale which will result in the effect being a straight
 line. If FALSE, the effect will be plotted against the raw data (i.e. for
 \code{log10(x)}, or \code{poly(z)}, the x-axis of the plot will be \code{x} or \code{z}
 respectively.)}
+
+\item{n, n_2d, n_3d, n_4d}{Grid resolutions for multivariate parametric terms.
+Curves use \code{n = 100}; the first two numeric surface axes use \code{n_2d = 50}.
+The third dimension of a three-variable term uses \code{n_3d = 16}; dimensions
+beyond the second of higher-dimensional terms use \code{n_4d = 4}.
+\code{NULL} uses \code{n} instead. Factors retain their levels. Ignored when \code{data}
+is supplied. Single-variable terms retain their observed evaluation values.}
+
+\item{dist}{Non-negative distance for masking surface plots far from observed
+covariates, as in \code{\link[=draw.gam]{draw.gam()}}. Applied to the first two numeric axes when
+drawing; returned estimates are not masked. Use zero to disable masking.}
+}
+\value{
+A tibble of class \code{parametric_effects}, with \code{.term}, \code{.type},
+\code{.partial} and \code{.se}. Single-variable terms retain \code{.value} or \code{.level};
+multivariate terms contain their raw covariate columns. Names conflicting
+with reserved columns are repaired with numeric suffixes. The \code{term_info}
+attribute records multivariate column mappings, plotting order, factor
+levels and observation data. With \code{unnest = FALSE}, estimates and
+covariates are nested in a \code{data} list column.
 }
 \description{
 Estimated values for parametric model terms
+}
+\details{
+Each estimate is the contribution of one formula term to its linear
+predictor. Intercepts, main effects and other terms are not added to an
+interaction. Components follow the model's contrast coding: with treatment
+contrasts, a numeric-by-factor interaction represents a departure from the
+reference-level slope, rather than a complete slope for each level.
+
+A multi-column term such as \code{poly(x, 3)} is one component, whereas \code{x} and
+\code{I(x^2)} remain separate components. Multivariate terms are evaluated against
+their raw covariates; \code{transform = TRUE} is not supported for these terms.
+Other covariates in generated prediction data are held at typical values
+solely to evaluate the model matrix; their contributions are not included.
+
+The drawing method uses the first two numeric covariates for surface axes,
+grouping curves by the first factor when there is only one numeric covariate.
+Factor-only terms use grouped points and intervals. Remaining covariates
+define facets: one wraps, two or more use the first as rows and the rest as
+columns. Formula order is retained within numeric and discrete covariates.
+Logical covariates are discrete. Surface plots show estimates; uncertainty
+is retained in the returned data rather than drawn as additional surfaces.
+}
+\examples{
+load_mgcv()
+d <- data_sim("eg1", n = 200, seed = 42)
+d$group <- factor(rep(c("A", "B"), length.out = nrow(d)))
+m <- gam(y ~ x0 * group + x1:x2:x3, data = d, method = "REML")
+pe <- parametric_effects(m, n_2d = 20, n_3d = 4)
+draw(pe)
+draw(m, parametric = TRUE, terms = "x0:group")
+
 }

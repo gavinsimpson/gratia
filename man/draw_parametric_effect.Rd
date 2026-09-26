@@ -22,6 +22,14 @@ draw_parametric_effect(
   ylim = NULL,
   angle = NULL,
   factor_levels = NULL,
+  term_info = NULL,
+  contour = TRUE,
+  contour_col = "black",
+  n_contour = NULL,
+  geom = "raster",
+  continuous_fill = NULL,
+  discrete_colour = NULL,
+  discrete_fill = NULL,
   ...
 )
 }
@@ -70,6 +78,31 @@ call to a position adjustment function.}
 drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggplot2::guide_axis()}}.}
 
 \item{factor_levels}{list; a named list of factor levels}
+
+\item{term_info}{Internal per-term covariate and plotting metadata.}
+
+\item{contour}{logical; should contours be draw on the plot using
+\code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+
+\item{contour_col}{colour specification for contour lines.}
+
+\item{n_contour}{numeric; the number of contour bins. Will result in
+\code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+
+\item{geom}{character; either \code{"raster"} (the default) or \code{"tile"} for flat
+smooth surfaces, including faceted and soap-film plots. Raster rendering
+keeps large PDF plots compact; tiles are individual borderless rectangles
+that remain vector elements in PDF and SVG output, potentially increasing
+file size. Other plot types, including spherical smooths, are unchanged.}
+
+\item{continuous_fill}{a suitable fill scale to be used when plotting
+continuous variables.}
+
+\item{discrete_colour}{a suitable colour scale to be used when plotting
+discrete variables.}
+
+\item{discrete_fill}{a suitable fill scale to be used when plotting
+discrete variables.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }

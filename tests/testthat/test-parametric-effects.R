@@ -5,31 +5,26 @@ val_nms <- c(".value", ".partial", ".se")
 both_nms <- c(".level", ".value", ".partial", ".se")
 
 test_that("parametric_effects works for m_2_fac", {
-  expect_message(
-    peff <- parametric_effects(m_2_fac),
-    "Interaction terms are not currently supported."
-  )
+  expect_silent(peff <- parametric_effects(m_2_fac))
   expect_s3_class(peff, class = c(
     "parametric_effects", "tbl_df", "tbl",
     "data.frame"
   ))
-  expect_identical(ncol(peff), 5L)
-  expect_identical(nrow(peff), 7L)
-  expect_named(peff, c(".term", ".type", lev_nms))
+  expect_identical(ncol(peff), 7L)
+  expect_identical(nrow(peff), 19L)
+  expect_named(peff, c(".term", ".type", ".level", "fac", "ff", ".partial", ".se"))
 })
 
 test_that("parametric_effects works for m_para_sm", {
-  expect_message(
-    peff <- parametric_effects(m_para_sm),
-    "Interaction terms are not currently supported."
-  )
+  expect_silent(peff <- parametric_effects(m_para_sm))
   expect_s3_class(peff, class = c(
     "parametric_effects", "tbl_df", "tbl",
     "data.frame"
   ))
-  expect_identical(ncol(peff), 6L)
-  expect_identical(nrow(peff), 407L)
-  expect_named(peff, c(".term", ".type", both_nms))
+  expect_identical(ncol(peff), 8L)
+  expect_identical(nrow(peff), 419L)
+  expect_named(peff, c(".term", ".type", ".level", ".value", "fac", "ff",
+    ".partial", ".se"))
 })
 
 test_that("parametric_effects works for m_2_fac select term", {
@@ -59,17 +54,15 @@ test_that("parametric_effects works for m_para_sm select term", {
 })
 
 test_that("parametric_effects works with only parametric terms", {
-  expect_message(
-    peff <- parametric_effects(m_only_para),
-    "Interaction terms are not currently supported."
-  )
+  expect_silent(peff <- parametric_effects(m_only_para))
   expect_s3_class(peff, class = c(
     "parametric_effects", "tbl_df", "tbl",
     "data.frame"
   ))
-  expect_identical(ncol(peff), 6L)
-  expect_identical(nrow(peff), 1207L)
-  expect_named(peff, c(".term", ".type", both_nms))
+  expect_identical(ncol(peff), 8L)
+  expect_identical(nrow(peff), 1219L)
+  expect_named(peff, c(".term", ".type", ".level", ".value", "fac", "ff",
+    ".partial", ".se"))
 })
 
 test_that("parametric_effects works with weird parametric terms", {

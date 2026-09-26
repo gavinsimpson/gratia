@@ -19,19 +19,21 @@
   ...,
   ncol = NULL,
   nrow = NULL,
-  guides = "keep"
+  guides = "keep",
+  contour = TRUE,
+  contour_col = "black",
+  n_contour = NULL,
+  geom = c("raster", "tile"),
+  continuous_fill = NULL,
+  discrete_colour = NULL,
+  discrete_fill = NULL
 )
 }
 \arguments{
-\item{object}{a fitted GAM, the result of a call to \code{\link[mgcv:gam]{mgcv::gam()}}.}
+\item{object}{A \code{parametric_effects} object, optionally nested.}
 
-\item{scales}{character; should all univariate smooths be plotted with the
-same y-axis scale? If \code{scales = "free"}, the default, each univariate
-smooth has its own y-axis scale. If \code{scales = "fixed"}, a common y axis
-scale is used for all univariate smooths.
-
-Currently does not affect the y-axis scale of plots of the parametric
-terms.}
+\item{scales}{Use a common effect-axis range for curves and points (\code{fixed}),
+or separate ranges (\code{free}). Surface covariate axes are not affected.}
 
 \item{ci_level}{numeric between 0 and 1; the coverage of credible interval.}
 
@@ -69,6 +71,29 @@ spread the plots}
 
 \item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
 \code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
+
+\item{contour}{logical; should contours be draw on the plot using
+\code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+
+\item{contour_col}{colour specification for contour lines.}
+
+\item{n_contour}{numeric; the number of contour bins. Will result in
+\code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+
+\item{geom}{character; either \code{"raster"} (the default) or \code{"tile"} for flat
+smooth surfaces, including faceted and soap-film plots. Raster rendering
+keeps large PDF plots compact; tiles are individual borderless rectangles
+that remain vector elements in PDF and SVG output, potentially increasing
+file size. Other plot types, including spherical smooths, are unchanged.}
+
+\item{continuous_fill}{a suitable fill scale to be used when plotting
+continuous variables.}
+
+\item{discrete_colour}{a suitable colour scale to be used when plotting
+discrete variables.}
+
+\item{discrete_fill}{a suitable fill scale to be used when plotting
+discrete variables.}
 }
 \description{
 Plot estimated effects for model parametric terms
