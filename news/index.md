@@ -16,7 +16,7 @@
 - Plotting helpers are now shared by derivative, comparison, difference,
   posterior, basis and spherical-smooth plots
   ([\#308](https://github.com/gavinsimpson/gratia/issues/308)).
-  Curve/interval rendering and automatic panel layouts are centralized
+  Curve/interval rendering and automatic panel layouts are centralised
   while retaining existing plotting defaults.
 
 - Flat smooth surfaces now share an internal renderer across bivariate,
