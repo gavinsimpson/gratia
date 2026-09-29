@@ -389,10 +389,13 @@
         object <- para |> add_confint(coverage = ci_level)
         # need to alter the ylim if scales are fixed
         if (isTRUE(identical(scales, "fixed"))) {
-          ylims <- range(
-            ylims, object$.partial, object$.upper_ci,
-            object$.lower_ci
-          )
+          displayed <- object |>
+            add_constant(constant = constant,
+              column = c(".partial", ".lower_ci", ".upper_ci")) |>
+            transform_fun(fun = fun,
+              column = c(".partial", ".lower_ci", ".upper_ci"))
+          ylims <- surface_fill_limits(c(ylims, displayed$.partial,
+            displayed$.upper_ci, displayed$.lower_ci), symmetric = FALSE)
         }
 
         f_levels <- attr(para, "factor_levels")

@@ -141,6 +141,9 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
         dist = info$dist)
       object$.partial[excluded] <- NA_real_
     }
+    # Use all visible facets together, after transformations and masking.
+    # A common range from scales = "fixed" also needs zero-centering.
+    fill_limits <- surface_fill_limits(c(object$.partial, ylim))
     # Treatment-coded interactions and zero-valued numeric slices can be
     # identically zero. Keep their surface, but do not ask stat_contour() to
     # contour a constant (or fully masked) panel.
@@ -150,7 +153,8 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
       dplyr::ungroup()
     contour <- isTRUE(contour) && nrow(contour_data) > 0L
     return(prepare_surface_plot(object, x_var = cols[[x]], y_var = cols[[y]],
-      fill_var = ".partial", fill_title = "Partial effect",
+      fill_var = ".partial", fill_limits = fill_limits,
+      fill_title = "Partial effect",
       labels = ggplot2::labs(x = xlab, y = ylab, title = title,
         subtitle = subtitle, caption = caption),
       geom = geom, continuous_fill = continuous_fill, contour = contour,

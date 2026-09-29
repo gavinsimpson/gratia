@@ -211,3 +211,75 @@ test_that("zero interaction slices retain surfaces without contour warnings", {
   expect_length(unique(built$data[[2]]$PANEL), 1L)
   expect_true(all(p$layers[[2]]$data$a == "A"))
 })
+
+test_that("surface fills centre zero across dimensions and effect ranges", {
+  d <- interaction_data()
+  midpoint <- ggplot2::scale_fill_distiller(palette = "RdBu", type = "div")$palette(0.5)
+  for (term in c("x:z", "x:z:w", "x:z:w:v", "x:z:a")) {
+    m <- gam(as.formula(paste("y ~", term)), data = d)
+    pe <- parametric_effects(m, n_2d = 5, n_3d = 3, n_4d = 2, dist = 0)
+    for (limits in list(c(-2, 8), c(2, 8), c(-8, -2), c(0, 0))) {
+      pe$.partial <- seq(limits[1], limits[2], length.out = nrow(pe))
+      for (geom in c("raster", "tile")) {
+        p <- draw(pe, geom = geom, contour = FALSE, rug = FALSE)[[1]]
+        scale <- ggplot_build(p)$plot$scales$get_scales("fill")
+        expect_equal(scale$get_limits(), c(-1, 1) * max(abs(limits)))
+        expect_equal(scale$map(0), midpoint)
+      }
+    }
+    p <- draw(pe, constant = 2, fun = exp, contour = FALSE)[[1]]
+    scale <- ggplot_build(p)$plot$scales$get_scales("fill")
+    expect_equal(scale$get_limits(), c(-1, 1) * exp(2))
+    expect_equal(scale$map(0), midpoint)
+  }
+})
+
+test_that("surface fill ranges use finite unmasked values and respect custom scales", {
+  d <- interaction_data()
+  d$z <- d$x
+  m <- gam(y ~ x:z, data = d)
+  pe <- parametric_effects(m, n_2d = 9)
+  # Put a large value outside the observed diagonal: it must not train fill.
+  info <- attr(pe, "term_info")[["x:z"]]
+  excluded <- mgcv::exclude.too.far(pe$x, pe$z, d$x, d$z, dist = info$dist)
+  pe$.partial[excluded] <- 1000
+  pe$.partial[which(!excluded)[1:4]] <- c(NA, NaN, Inf, -Inf)
+  p <- draw(pe, contour = FALSE)[[1]]
+  scale <- ggplot_build(p)$plot$scales$get_scales("fill")
+  finite <- p$data$.partial[is.finite(p$data$.partial)]
+  expect_equal(scale$get_limits(), c(-1, 1) * max(abs(finite)))
+  expect_true(any(pe$.partial == 1000, na.rm = TRUE))
+  p <- draw(pe, contour = FALSE,
+    continuous_fill = ggplot2::scale_fill_gradient(low = "white", high = "red",
+      limits = c(-2000, 2000)))[[1]]
+  scale <- ggplot_build(p)$plot$scales$get_scales("fill")
+  expect_equal(scale$get_limits(), c(-2000, 2000))
+  expect_equal(scale$map(2000), "#FF0000")
+  pe$.partial[] <- NA_real_
+  expect_silent(ggplot_build(draw(pe, contour = FALSE)[[1]]))
+})
+
+test_that("fixed parametric surfaces share displayed fill ranges through both entry points", {
+  d <- interaction_data()
+  m <- gam(y ~ x:z + w:v, data = d)
+  pe <- parametric_effects(m, n_2d = 5, dist = 0)
+  midpoint <- ggplot2::scale_fill_distiller(palette = "RdBu", type = "div")$palette(0.5)
+  for (fun in list(NULL, exp)) {
+    direct <- draw(pe, scales = "fixed", constant = 2, fun = fun,
+      contour = FALSE, rug = FALSE)
+    assembled <- assemble(m, scales = "fixed", constant = 2, fun = fun,
+      n_2d = 5, dist = 0, contour = FALSE, rug = FALSE)
+    displayed <- c(pe$.partial, pe$.partial - qnorm(0.975) * pe$.se,
+      pe$.partial + qnorm(0.975) * pe$.se) + 2
+    if (!is.null(fun)) displayed <- fun(displayed)
+    expected <- c(-1, 1) * max(abs(displayed))
+    for (i in seq_along(unique(pe$.term))) {
+      term <- unique(direct[[i]]$data$.term)
+      for (p in list(direct[[i]], assembled[[term]])) {
+        scale <- ggplot_build(p)$plot$scales$get_scales("fill")
+        expect_equal(scale$get_limits(), expected)
+        expect_equal(scale$map(0), midpoint)
+      }
+    }
+  }
+})

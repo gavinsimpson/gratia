@@ -351,19 +351,19 @@
   object <- transform_fun(object, fun = fun)
   fill_var <- if (show == "estimate") ".estimate" else ".se"
   fill_title <- if (show == "estimate") "Partial\neffect" else "Std. err."
-  values <- object[[fill_var]]
-  values <- values[is.finite(values)]
-  fill_limits <- if (show == "estimate" && !is.null(ylim)) {
-    ylim
-  } else if (length(values) == 0L) {
-    NULL
-  } else if (show == "estimate") {
-    c(-1, 1) * max(abs(values))
-  } else {
-    range(values)
-  }
+  fill_limits <- surface_fill_limits(object[[fill_var]],
+    symmetric = show == "estimate", ylim = if (show == "estimate") ylim)
   list(data = object, fill_var = fill_var, fill_title = fill_title,
     fill_limits = fill_limits)
+}
+
+# Shared range policy for already transformed surface values. Explicit limits
+# retain the smooth plotting API's range-expansion semantics.
+surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
+  if (!is.null(ylim)) return(ylim)
+  values <- values[is.finite(values)]
+  if (!length(values)) return(NULL)
+  if (isTRUE(symmetric)) c(-1, 1) * max(abs(values)) else range(values)
 }
 
 #' Construct a smooth surface plot

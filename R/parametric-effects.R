@@ -306,7 +306,13 @@ draw.parametric_effects <- function(object,
   # need to figure out scales if "fixed"
   ylim <- NULL
   if (isTRUE(identical(scales, "fixed"))) {
-    ylim <- range(object$.partial, object$.upper_ci, object$.lower_ci)
+    displayed <- object |>
+      add_constant(constant = constant,
+        column = c(".partial", ".lower_ci", ".upper_ci")) |>
+      transform_fun(fun = fun,
+        column = c(".partial", ".lower_ci", ".upper_ci"))
+    ylim <- surface_fill_limits(c(displayed$.partial, displayed$.upper_ci,
+      displayed$.lower_ci), symmetric = FALSE)
   }
 
   f_levels <- attr(object, "factor_levels")

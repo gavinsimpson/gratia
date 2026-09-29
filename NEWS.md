@@ -2,6 +2,10 @@
 
 ## User visible changes
 
+* Parametric interaction surfaces now share the smooth-surface fill-range
+  calculation, centring the default diverging palette at zero across all
+  facets. Fixed scales now also expand parametric surface fill ranges (#411).
+
 * **Breaking change:** `draw.gam()` and `assemble.gam()` now default to
   `parametric = NULL`, including parametric terms alongside smooths when
   `select = NULL`. Selecting smooths explicitly continues to draw only those
