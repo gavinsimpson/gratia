@@ -1,5 +1,6 @@
 # Regression tests for factor margins in tensor products (#395).
 test_that("two-factor tensors show every combination with its uncertainty", {
+  withr::local_pdf(NULL)
   withr::local_seed(395)
   d <- expand.grid(fac1 = factor(letters[1:3]),
     fac2 = ordered(LETTERS[1:4]), replicate = 1:5)
@@ -37,6 +38,7 @@ test_that("two-factor tensors show every combination with its uncertainty", {
 })
 
 test_that("mixed tensor margins use the continuous covariate on x in either order", {
+  withr::local_pdf(NULL)
   withr::local_seed(396)
   d <- data.frame(x = runif(90), f = factor(rep(letters[1:3], 30)))
   d$y <- sin(4 * d$x) + as.numeric(d$f) + rnorm(90)
@@ -58,6 +60,7 @@ test_that("mixed tensor margins use the continuous covariate on x in either orde
 })
 
 test_that("three-variable T2 terms retain surfaces faceted by a factor", {
+  withr::local_pdf(NULL)
   withr::local_seed(412)
   d <- data.frame(week = runif(180, 0, 52), latitude = runif(180),
     species = factor(rep(letters[1:3], 60)))
