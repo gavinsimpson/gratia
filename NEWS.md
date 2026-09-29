@@ -172,6 +172,10 @@
 
 ## Bug Fixes
 
+* Restored faceted surfaces for three- and four-variable `t2()` smooths with
+  factor margins. The two-variable tensor plotting fix had incorrectly routed
+  these terms to the factor-smooth renderer, which skipped them.
+
 * Posterior sampling for GAMs, including the GAM component of `gamm4` models,
   now falls back to `mgcv::rmvn()` with a warning if the default sampler's
   Cholesky decomposition fails (#332).

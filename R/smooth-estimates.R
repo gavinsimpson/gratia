@@ -1371,7 +1371,9 @@
     )
   } else if (
     sm_type == "Factor smooth" || (
-      sm_type %in% c("Tensor product int.", "Tensor product", "Tensor product (T2)") &&
+      # Higher-dimensional T2 terms retain their faceted surface renderers.
+      (sm_type %in% c("Tensor product int.", "Tensor product") ||
+        (sm_type == "Tensor product (T2)" && sm_dim == 2L)) &&
         any(map_lgl(object[sm_vars], is.factor))
     )
   ) {
