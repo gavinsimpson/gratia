@@ -21,6 +21,7 @@ parametric_effects(object, ...)
   n_3d = 16,
   n_4d = 4,
   dist = 0.1,
+  overall_uncertainty = TRUE,
   ...
 )
 }
@@ -65,6 +66,11 @@ is supplied. Single-variable terms retain their observed evaluation values.}
 \item{dist}{Non-negative distance for masking surface plots far from observed
 covariates, as in \code{\link[=draw.gam]{draw.gam()}}. Applied to the first two numeric axes when
 drawing; returned estimates are not masked. Use zero to disable masking.}
+
+\item{overall_uncertainty}{logical; include uncertainty in the intercept of
+the term's linear predictor, including its covariance with the term?
+Defaults to \code{TRUE}. Partial effect estimates are unchanged. With no
+intercept, this has no effect. Set to \code{FALSE} for term-only uncertainty.}
 }
 \value{
 A tibble of class \code{parametric_effects}, with \code{.term}, \code{.type},

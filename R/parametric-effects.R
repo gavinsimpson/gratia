@@ -9,6 +9,10 @@
 #' @param unconditional logical; should confidence intervals include the
 #'   uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian
 #'   covariance matrix will be used.
+#' @param overall_uncertainty logical; include uncertainty in the intercept of
+#'   the term's linear predictor, including its covariance with the term?
+#'   Defaults to `TRUE`. Partial effect estimates are unchanged. With no
+#'   intercept, this has no effect. Set to `FALSE` for term-only uncertainty.
 #' @param unnest logical; unnest the parametric effect objects?
 #' @param ci_level numeric; the coverage required for the confidence interval.
 #'   Currently ignored.
@@ -94,7 +98,7 @@
                                      transform = FALSE,
                                      n = 100, n_2d = 50,
                                      n_3d = 16, n_4d = 4,
-                                     dist = 0.1, ...) {
+                                     dist = 0.1, overall_uncertainty = TRUE, ...) {
   object <- with_model_envir(object, envir)
   envir <- model_envir(object)
   supplied_data <- !is.null(data)
@@ -135,9 +139,11 @@
   data <- distinct(data)
   # Work around a bug in predict.gam() with exclude length 0 character
   # (i.e smooths(objects) when model contains only parametric terms)
-  pred <- predict_model(object,
-    newdata = data, type = "terms",
-    terms = mgcv_names, se.fit = TRUE,
+  # Predict all parametric terms before selecting: requesting only a suffixed
+  # term can make mgcv zero later linear predictors in multi-predictor models.
+  pred <- predict_parametric_effects(object,
+    newdata = data,
+    terms = mgcv_names, overall_uncertainty = overall_uncertainty,
     unconditional = unconditional
   )
 
@@ -161,8 +167,11 @@
     # if we are handling an lss model, we need to find the right data
     covariates <- raw_vars[[term]]
     if (length(covariates) > 1L) {
+      # Interactions may use a generated grid rather than these observed rows,
+      # so their estimates and SEs must be recomputed on that grid together.
       return(evaluate_parametric_component(object, term, covariates, columns,
-        data, supplied_data, n, n_2d, n_3d, n_4d, dist, unconditional))
+        data, supplied_data, n, n_2d, n_3d, n_4d, dist, unconditional,
+        overall_uncertainty))
     }
     vars <- vars[term]
     term_expr <- str2expression(vars)[[1L]]

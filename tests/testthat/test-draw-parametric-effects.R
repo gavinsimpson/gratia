@@ -94,7 +94,7 @@ test_that("issue 45 parametric effects for lss models remains fixed", {
     data = data_45
   )
 
-  expect_silent(plt1 <- draw(b, rug = FALSE))
+  expect_silent(plt1 <- draw(b, parametric = FALSE, rug = FALSE))
 
   expect_silent(plt2 <- draw(b,
     parametric = TRUE, rug = FALSE,
@@ -107,7 +107,7 @@ test_that("issue 45 parametric effects for lss models remains fixed", {
     data = data_45
   )
 
-  expect_silent(plt3 <- draw(b0, rug = FALSE))
+  expect_silent(plt3 <- draw(b0, parametric = FALSE, rug = FALSE))
 
   expect_silent(plt4 <- draw(b0,
     parametric = TRUE, rug = FALSE,
@@ -120,7 +120,7 @@ test_that("issue 45 parametric effects for lss models remains fixed", {
     data = data_45
   )
 
-  expect_silent(plt5 <- draw(b1, rug = FALSE))
+  expect_silent(plt5 <- draw(b1, parametric = FALSE, rug = FALSE))
 
   expect_silent(plt6 <- draw(b1,
     parametric = TRUE, rug = FALSE,

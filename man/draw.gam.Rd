@@ -119,8 +119,10 @@ uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian
 covariance matrix will be used.}
 
 \item{overall_uncertainty}{logical; should the uncertainty in the model
-constant term be included in the standard error of the evaluate values of
-the smooth?}
+constant term be included in the standard errors of smooth and parametric
+effects? For parametric effects this includes the intercept variance and
+its covariance with the term, without changing the partial estimates.
+Each term uses the intercept of its own linear predictor.}
 
 \item{constant}{numeric; a constant to add to the estimated values of the
 smooth. \code{constant}, if supplied, will be added to the estimated value

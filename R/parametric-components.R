@@ -1,6 +1,6 @@
 # Evaluate one multivariate formula term without adding any other components.
 evaluate_parametric_component <- function(model, term, covariates, columns,
-    data, supplied_data, n, n_2d, n_3d, n_4d, dist, unconditional) {
+    data, supplied_data, n, n_2d, n_3d, n_4d, dist, unconditional, overall_uncertainty) {
   numeric <- vapply(data[covariates], is.numeric, logical(1))
   variables <- c(covariates[numeric], covariates[!numeric])
   numeric_vars <- covariates[numeric]
@@ -52,9 +52,11 @@ evaluate_parametric_component <- function(model, term, covariates, columns,
   }
   # Request every parametric term: mgcv can zero later linear predictors
   # when only a suffixed term is requested. Select the desired column below.
-  pred <- predict_model(model, newdata = grid, type = "terms",
+  # Use the same uncertainty helper as single-variable terms, evaluated at
+  # this component's grid so each SE corresponds to its returned partial effect.
+  pred <- predict_parametric_effects(model, newdata = grid,
     terms = names(parametric_terms(model)),
-    se.fit = TRUE, unconditional = unconditional)
+    overall_uncertainty = overall_uncertainty, unconditional = unconditional)
   out <- tibble::as_tibble(grid[, covariates, drop = FALSE])
   # Use the fitted levels, even when newdata has only a subset of levels.
   for (v in discrete_vars) {

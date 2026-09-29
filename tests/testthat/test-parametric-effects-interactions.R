@@ -27,7 +27,8 @@ test_that("interaction components agree with coefficient blocks and fitted contr
     m <- gam(y ~ x * z + x * a + a * b, data = d,
       contrasts = list(a = contrast, b = contrast))
     for (term in c("x:z", "x:a", "a:b")) {
-      pe <- parametric_effects(m, terms = term, data = d)
+      pe <- parametric_effects(m, terms = term, data = d,
+        overall_uncertainty = FALSE)
       info <- attr(pe, "term_info")[[term]]
       # Reconstruct rows, including factor terms deduplicated by covariates.
       nd <- d[rep(1L, nrow(pe)), ]
@@ -37,7 +38,8 @@ test_that("interaction components agree with coefficient blocks and fitted contr
   }
   d$a <- ordered(d$a)
   m <- gam(y ~ x * a, data = d)
-  pe <- parametric_effects(m, terms = "x:a", data = d)
+  pe <- parametric_effects(m, terms = "x:a", data = d,
+    overall_uncertainty = FALSE)
   check_parametric_block(m, pe, d, "x:a")
   expect_true(is.ordered(pe$a))
 })
@@ -46,7 +48,8 @@ test_that("transformed and polynomial interactions retain raw axes", {
   d <- interaction_data()
   m <- gam(y ~ poly(x, 3) * a + log(z):w + x + I(x^2), data = d)
   for (term in c("poly(x, 3):a", "log(z):w")) {
-    pe <- parametric_effects(m, terms = term, data = d)
+    pe <- parametric_effects(m, terms = term, data = d,
+      overall_uncertainty = FALSE)
     check_parametric_block(m, pe, d, term)
   }
   pe <- parametric_effects(m, terms = c("poly(x, 3)", "x", "I(x^2)"), data = d)
@@ -83,7 +86,8 @@ test_that("higher-dimensional grids allocate numeric axes and facets", {
 test_that("multiple linear predictors include and select interactions", {
   df <- data_sim("eg1", seed = 42)
   m <- gam(list(y ~ x0 * x1, ~ x0 * x1), family = gaulss(), data = df)
-  expect_silent(pe <- parametric_effects(m, data = df))
+  expect_silent(pe <- parametric_effects(m, data = df,
+    overall_uncertainty = FALSE))
   expect_setequal(unique(pe$.term), names(parametric_terms(m)))
   pred <- predict(m, newdata = df, type = "terms", se.fit = TRUE)
   for (term in colnames(pred$fit)) {
@@ -149,7 +153,8 @@ test_that("assembly and direct drawing share interaction displays and transforms
 test_that("interaction uncertainty includes smoothing selection when requested", {
   d <- interaction_data()
   m <- gam(y ~ x * a + s(z, k = 6), data = d, method = "REML")
-  pe <- parametric_effects(m, terms = "x:a", data = d, unconditional = TRUE)
+  pe <- parametric_effects(m, terms = "x:a", data = d, unconditional = TRUE,
+    overall_uncertainty = FALSE)
   X <- predict(m, newdata = d, type = "lpmatrix")
   mm <- model.matrix(m$pterms, d)
   j <- which(attr(mm, "assign") == match("x:a", attr(m$pterms, "term.labels")))

@@ -371,6 +371,7 @@
       parametric <- FALSE
     } else {
       para <- parametric_effects(object,
+        overall_uncertainty = overall_uncertainty,
         terms = terms, data = data,
         unconditional = unconditional,
         unnest = TRUE, ci_level = ci_level, envir = envir,

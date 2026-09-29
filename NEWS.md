@@ -15,6 +15,13 @@
   use grouped curves, and factor interactions use grouped estimates and
   intervals.
 
+  Parametric effects now also include intercept uncertainty by default,
+  including covariance between the intercept and the term. Partial estimates
+  are unchanged. Use `overall_uncertainty = FALSE` in `parametric_effects()`,
+  `draw()`, or `assemble()` to recover term-only intervals. Each term uses the
+  intercept of its own linear predictor; models without an intercept are
+  unaffected.
+
 * Plotting helpers are now shared by derivative, comparison, difference,
   posterior, basis and spherical-smooth plots (#308). Curve/interval rendering
   and automatic panel layouts are centralised while retaining existing

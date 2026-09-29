@@ -61,8 +61,10 @@
 #'   uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian
 #'   covariance matrix will be used.
 #' @param overall_uncertainty logical; should the uncertainty in the model
-#'  constant term be included in the standard error of the evaluate values of
-#'  the smooth?
+#'   constant term be included in the standard errors of smooth and parametric
+#'   effects? For parametric effects this includes the intercept variance and
+#'   its covariance with the term, without changing the partial estimates.
+#'   Each term uses the intercept of its own linear predictor.
 #' @param dist numeric; if greater than 0, this is used to determine when
 #'   a location is too far from data to be plotted when plotting 2-D smooths.
 #'   The data are scaled into the unit square before deciding what to exclude,
