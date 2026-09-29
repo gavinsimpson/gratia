@@ -41,7 +41,7 @@
   Prepare plots via `ggplot2` and assembles them as a list
 
 - [`assemble(`*`<gam>`*`)`](https://gavinsimpson.github.io/gratia/reference/assemble.gam.md)
-  : Plot estimated smooths from a fitted GAM
+  : Plot smooth and parametric terms from a fitted GAM
 
 - [`basis()`](https://gavinsimpson.github.io/gratia/reference/basis.md)
   : Basis expansions for smooths
@@ -130,7 +130,7 @@
   **\[deprecated\]** : Plot estimated parametric effects
 
 - [`draw(`*`<gam>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
-  : Plot estimated smooths from a fitted GAM
+  : Plot smooth and parametric terms from a fitted GAM
 
 - [`draw(`*`<gamlss>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.gamlss.md)
   :

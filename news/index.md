@@ -4,6 +4,19 @@
 
 ### User visible changes
 
+- **Breaking change:**
+  [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
+  and
+  [`assemble.gam()`](https://gavinsimpson.github.io/gratia/reference/assemble.gam.md)
+  now default to `parametric = NULL`, including parametric terms
+  alongside smooths when `select = NULL`. Selecting smooths explicitly
+  continues to draw only those smooths, unless `parametric = TRUE` is
+  supplied. Use `parametric = FALSE` to restore the previous default.
+  Additional panels can change plot layouts and the length of plot lists
+  returned by
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  or `draw(wrap = FALSE)`.
+
 - [`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
   and
   [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)

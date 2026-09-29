@@ -103,4 +103,6 @@ if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {
 
   draw(m)
 }
+#> Error in wrap_dims(length(gt), nrow = x$layout$nrow, ncol = x$layout$ncol): Need 3 panels, but together `nrow` and `ncol` only provide 2.
+#> i Please increase `ncol` and/or `nrow`.
 ```
