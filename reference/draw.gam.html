@@ -196,8 +196,10 @@ covariance matrix will be used.</p></dd>
 
 <dt id="arg-overall-uncertainty">overall_uncertainty<a class="anchor" aria-label="anchor" href="#arg-overall-uncertainty"></a></dt>
 <dd><p>logical; should the uncertainty in the model
-constant term be included in the standard error of the evaluate values of
-the smooth?</p></dd>
+constant term be included in the standard errors of smooth and parametric
+effects? For parametric effects this includes the intercept variance and
+its covariance with the term, without changing the partial estimates.
+Each term uses the intercept of its own linear predictor.</p></dd>
 
 
 <dt id="arg-constant">constant<a class="anchor" aria-label="anchor" href="#arg-constant"></a></dt>

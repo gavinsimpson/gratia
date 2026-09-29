@@ -155,7 +155,10 @@ assemble(
 - overall_uncertainty:
 
   logical; should the uncertainty in the model constant term be included
-  in the standard error of the evaluate values of the smooth?
+  in the standard errors of smooth and parametric effects? For
+  parametric effects this includes the intercept variance and its
+  covariance with the term, without changing the partial estimates. Each
+  term uses the intercept of its own linear predictor.
 
 - constant:
 

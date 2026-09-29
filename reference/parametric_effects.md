@@ -22,6 +22,7 @@ parametric_effects(
   n_3d = 16,
   n_4d = 4,
   dist = 0.1,
+  overall_uncertainty = TRUE,
   ...
 )
 ```
@@ -93,6 +94,13 @@ parametric_effects(
   [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md).
   Applied to the first two numeric axes when drawing; returned estimates
   are not masked. Use zero to disable masking.
+
+- overall_uncertainty:
+
+  logical; include uncertainty in the intercept of the term's linear
+  predictor, including its covariance with the term? Defaults to `TRUE`.
+  Partial effect estimates are unchanged. With no intercept, this has no
+  effect. Set to `FALSE` for term-only uncertainty.
 
 ## Value
 

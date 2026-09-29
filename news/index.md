@@ -26,6 +26,16 @@
   grouped curves, and factor interactions use grouped estimates and
   intervals.
 
+  Parametric effects now also include intercept uncertainty by default,
+  including covariance between the intercept and the term. Partial
+  estimates are unchanged. Use `overall_uncertainty = FALSE` in
+  [`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md),
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md),
+  or
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  to recover term-only intervals. Each term uses the intercept of its
+  own linear predictor; models without an intercept are unaffected.
+
 - Plotting helpers are now shared by derivative, comparison, difference,
   posterior, basis and spherical-smooth plots
   ([\#308](https://github.com/gavinsimpson/gratia/issues/308)).
@@ -260,6 +270,11 @@
   [`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) families.
 
 ### Bug Fixes
+
+- Restored faceted surfaces for three- and four-variable
+  [`t2()`](https://rdrr.io/pkg/mgcv/man/t2.html) smooths with factor
+  margins. The two-variable tensor plotting fix had incorrectly routed
+  these terms to the factor-smooth renderer, which skipped them.
 
 - Posterior sampling for GAMs, including the GAM component of `gamm4`
   models, now falls back to
