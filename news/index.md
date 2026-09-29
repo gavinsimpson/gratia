@@ -4,6 +4,12 @@
 
 ### User visible changes
 
+- Parametric interaction surfaces now share the smooth-surface
+  fill-range calculation, centring the default diverging palette at zero
+  across all facets. Fixed scales now also expand parametric surface
+  fill ranges
+  ([\#411](https://github.com/gavinsimpson/gratia/issues/411)).
+
 - **Breaking change:**
   [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
   and
