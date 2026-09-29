@@ -2,13 +2,13 @@
 % Please edit documentation in R/assemble.R
 \name{assemble.gam}
 \alias{assemble.gam}
-\title{Plot estimated smooths from a fitted GAM}
+\title{Plot smooth and parametric terms from a fitted GAM}
 \usage{
 \method{assemble}{gam}(
   object,
   data = NULL,
   select = NULL,
-  parametric = FALSE,
+  parametric = NULL,
   terms = NULL,
   residuals = FALSE,
   scales = c("free", "fixed"),
@@ -70,10 +70,12 @@ as shown for example in the output from \code{summary(object)}. Logical
 \code{select} operates as per numeric \code{select} in the order that smooths are
 stored.}
 
-\item{parametric}{logical; plot parametric terms also? Note that \code{select} is
-used for selecting which smooths to plot. The \code{terms} argument is used to
-select which parametric effects are plotted. The default, as with
-\code{\link[mgcv:plot.gam]{mgcv::plot.gam()}}, is to not draw parametric effects.}
+\item{parametric}{logical or \code{NULL}; plot parametric terms also? The default,
+\code{NULL}, includes parametric terms when \code{select = NULL}, but excludes them
+when smooths are selected explicitly. Use \code{TRUE} to include parametric terms
+regardless of \code{select}, or \code{FALSE} to draw only smooths (the previous
+default). The \code{terms} argument selects which parametric effects are plotted;
+\code{select} selects only smooths.}
 
 \item{terms}{character; which model parametric terms should be drawn? The
 Default of \code{NULL} will plot all parametric terms that can be drawn.
@@ -235,9 +237,8 @@ file size. Other plot types, including spherical smooths, are unchanged.}
 A list of \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} objects.
 }
 \description{
-Plots estimated smooths from a fitted GAM model in a similar way to
-\code{mgcv::plot.gam()} but instead of using base graphics, \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}
-is used instead.
+Plots smooth and parametric contributions from a fitted GAM model using
+\code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}.
 }
 \note{
 Internally, plots of each smooth are created using \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}

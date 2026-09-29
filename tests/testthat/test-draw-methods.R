@@ -1,3 +1,4 @@
+# Smooth-only visual baselines opt out of parametric panels explicitly.
 # Full plotting examples and snapshots run locally and on CI.
 # Small numerical/build checks live in test-draw-core.R.
 skip_on_cran()
@@ -133,8 +134,8 @@ test_that("draw.gam() plots an AM with a single 2d smooth", {
 })
 
 test_that("draw.gam() plots an AM with a single factor by-variable smooth", {
-  plt1 <- draw(su_m_factor_by, rug = FALSE)
-  plt2 <- draw(su_m_factor_by, scales = "fixed", rug = FALSE)
+  plt1 <- draw(su_m_factor_by, parametric = FALSE, rug = FALSE)
+  plt2 <- draw(su_m_factor_by, parametric = FALSE, scales = "fixed", rug = FALSE)
 
   # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw AM with factor by-variable smooth", plt1)
@@ -164,8 +165,8 @@ test_that("draw() works with random effect smooths (bs = 're')", {
 })
 
 test_that("draw() with random effect smooths (bs = 're') & factor by variable ", {
-  p2 <- draw(rm2, ncol = 3, rug = FALSE)
-  p3 <- draw(rm2, ncol = 3, scales = "fixed", rug = FALSE)
+  p2 <- draw(rm2, parametric = FALSE, ncol = 3, rug = FALSE)
+  p3 <- draw(rm2, parametric = FALSE, ncol = 3, scales = "fixed", rug = FALSE)
 
   # skip_on_ci() # testing without as moved to mac os x
   skip_if_not_installed("ggplot2", "3.5.2.9002")
@@ -267,7 +268,7 @@ test_that("draw() works with parametric terms", {
   p1 <- draw(e1, rug = FALSE)
 
   ## check evaluate_parametric_term works
-  p2 <- draw(mod, rug = FALSE)
+  p2 <- draw(mod, parametric = FALSE, rug = FALSE)
 
   ## factor parametric terms
   x0 <- factor(x0)
@@ -276,7 +277,7 @@ test_that("draw() works with parametric terms", {
   mod <- gam(y ~ x0 + s(x1) + s(x2) + s(x3), data = df)
 
   ## check evaluate_parametric_term works
-  p3 <- draw(mod, rug = FALSE)
+  p3 <- draw(mod, parametric = FALSE, rug = FALSE)
 
   ## evaluate parametric terms directly
   e2 <- evaluate_parametric_term(mod, term = "x0")
@@ -382,7 +383,7 @@ test_that("draw plots partial derivs for GAM rotated labels", {
 
 ## test that issue 39 stays fixed
 test_that("draw.gam doesn't create empty plots with multiple parametric terms", {
-  plt <- draw(m_2_fac, rug = FALSE)
+  plt <- draw(m_2_fac, parametric = FALSE, rug = FALSE)
   # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw issue 39 empty plots", plt)
 })
@@ -417,7 +418,7 @@ test_that("draw.mgcv_smooth() can plot by factor basis smooth bases", {
 })
 
 test_that("draw() works with a ziplss models; issue #45", {
-  plt <- draw(m_ziplss, rug = FALSE)
+  plt <- draw(m_ziplss, parametric = FALSE, rug = FALSE)
   # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw ziplss parametric terms issue 45", plt)
 })

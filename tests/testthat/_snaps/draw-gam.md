@@ -1,7 +1,7 @@
-# draw.gam issues message for parametric only model
+# draw.gam issues message when all parametric terms are excluded
 
     Code
-      plt <- draw(m_only_para)
+      plt <- draw(m_only_para, parametric = FALSE)
     Message
       i Unable to draw any of the model terms.
 

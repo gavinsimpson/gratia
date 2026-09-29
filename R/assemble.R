@@ -17,11 +17,10 @@
   UseMethod("assemble")
 }
 
-#' Plot estimated smooths from a fitted GAM
+#' Plot smooth and parametric terms from a fitted GAM
 #'
-#' Plots estimated smooths from a fitted GAM model in a similar way to
-#' `mgcv::plot.gam()` but instead of using base graphics, [ggplot2::ggplot()]
-#' is used instead.
+#' Plots smooth and parametric contributions from a fitted GAM model using
+#' [ggplot2::ggplot()].
 #'
 #' @inheritParams draw.gam
 #' @param ... Arguments to other methods; not used.
@@ -64,7 +63,7 @@
   object,
   data = NULL,
   select = NULL,
-  parametric = FALSE,
+  parametric = NULL,
   terms = NULL,
   residuals = FALSE,
   scales = c("free", "fixed"),
@@ -127,15 +126,9 @@
     continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
   }
 
-  # if not using select, set parametric TRUE if not set to FALSE
-  if (!is.null(select)) {
-    if (is.null(parametric)) {
-      parametric <- FALSE
-    }
-  } else {
-    if (is.null(parametric)) {
-      parametric <- TRUE
-    }
+  # Include parametric terms by default unless smooths were selected explicitly.
+  if (is.null(parametric)) {
+    parametric <- is.null(select)
   }
 
   # sort out n_3d and n_4d. If these are `NULL` then do sensible thing at set
@@ -375,7 +368,6 @@
   # Are we plotting parametric effects too?
   if (isTRUE(parametric)) {
     if (length(parametric_terms(object)) == 0L) {
-      message("The model contains no parametric terms")
       parametric <- FALSE
     } else {
       para <- parametric_effects(object,

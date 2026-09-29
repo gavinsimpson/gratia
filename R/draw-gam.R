@@ -1,8 +1,7 @@
-#' Plot estimated smooths from a fitted GAM
+#' Plot smooth and parametric terms from a fitted GAM
 #'
-#' Plots estimated smooths from a fitted GAM model in a similar way to
-#' `mgcv::plot.gam()` but instead of using base graphics, [ggplot2::ggplot()]
-#' is used instead.
+#' Plots smooth and parametric contributions from a fitted GAM model using
+#' [ggplot2::ggplot()].
 #'
 #' @param object a fitted GAM, the result of a call to [mgcv::gam()].
 #' @param data an optional data frame that is used to supply the data at which
@@ -16,10 +15,12 @@
 #'   as shown for example in the output from `summary(object)`. Logical
 #'   `select` operates as per numeric `select` in the order that smooths are
 #'   stored.
-#' @param parametric logical; plot parametric terms also? Note that `select` is
-#'   used for selecting which smooths to plot. The `terms` argument is used to
-#'   select which parametric effects are plotted. The default, as with
-#'   [mgcv::plot.gam()], is to not draw parametric effects.
+#' @param parametric logical or `NULL`; plot parametric terms also? The default,
+#'   `NULL`, includes parametric terms when `select = NULL`, but excludes them
+#'   when smooths are selected explicitly. Use `TRUE` to include parametric terms
+#'   regardless of `select`, or `FALSE` to draw only smooths (the previous
+#'   default). The `terms` argument selects which parametric effects are plotted;
+#'   `select` selects only smooths.
 #' @param terms character; which model parametric terms should be drawn? The
 #'   Default of `NULL` will plot all parametric terms that can be drawn.
 #'   Interactions show their individual contributions to the linear predictor;
@@ -183,7 +184,7 @@
   object,
   data = NULL,
   select = NULL,
-  parametric = FALSE,
+  parametric = NULL,
   terms = NULL,
   residuals = FALSE,
   scales = c("free", "fixed"),

@@ -2,6 +2,7 @@
 # Small numerical/build checks live in test-draw-core.R.
 skip_on_cran()
 
+# Smooth-only visual baselines opt out of parametric panels explicitly.
 # Test draw.gam()
 # A lot of the current tests for this are over in test-draw-methods.R
 
@@ -81,7 +82,7 @@ test_that("draw.gam works for rm1", {
 })
 
 test_that("draw.gam works for rm2", {
-  expect_silent(plt <- draw(rm2, rug = FALSE))
+  expect_silent(plt <- draw(rm2, parametric = FALSE, rug = FALSE))
   # skip_on_ci() # testing without as moved to mac os x
   skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("draw_gam rm2", plt)
@@ -103,19 +104,19 @@ test_that("draw.gam works for m_ar1", {
 
 test_that("draw.gam works for m_ar1_by", {
   models <- secondary_models()
-  expect_silent(plt <- draw(models$m_ar1_by, rug = FALSE, n = 50))
+  expect_silent(plt <- draw(models$m_ar1_by, parametric = FALSE, rug = FALSE, n = 50))
   # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw_gam m_ar1_by", plt)
 })
 
 test_that("draw.gam works for m_2_fac", {
-  expect_silent(plt <- draw(m_2_fac, rug = FALSE))
+  expect_silent(plt <- draw(m_2_fac, parametric = FALSE, rug = FALSE))
   # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw_gam m_2_fac", plt)
 })
 
 test_that("draw.gam works for m_para_sm", {
-  expect_silent(plt <- draw(m_para_sm, rug = FALSE))
+  expect_silent(plt <- draw(m_para_sm, parametric = FALSE, rug = FALSE))
   # skip_on_ci() # testing without as moved to mac os x
   expect_doppelganger("draw_gam m_para_sm", plt)
 })
@@ -123,7 +124,7 @@ test_that("draw.gam works for m_para_sm", {
 test_that("draw.gam works for m_2_fac", {
   expect_silent(
     plt <- draw(m_2_fac,
-      parametric = TRUE, rug = FALSE,
+      rug = FALSE,
       data = df_2_fac
     )
   )
@@ -134,7 +135,7 @@ test_that("draw.gam works for m_2_fac", {
 test_that("draw.gam works for m_para_sm", {
   expect_silent(
     plt <- draw(m_para_sm,
-      parametric = TRUE, rug = FALSE,
+      rug = FALSE,
       data = df_2_fac
     )
   )
@@ -219,9 +220,9 @@ test_that("draw.gam works for a quadvariate smooth", {
 #     expect_doppelganger("draw_gam quadvar te rotated labels", plt)
 # })
 
-test_that("draw.gam issues message for parametric only model", {
+test_that("draw.gam issues message when all parametric terms are excluded", {
   expect_snapshot(
-    plt <- draw(m_only_para)
+    plt <- draw(m_only_para, parametric = FALSE)
   )
 })
 
@@ -239,8 +240,10 @@ test_that("draw.gam works for a parametric only model", {
 
 test_that("draw.gam works with grouped by option", {
   models <- secondary_models()
-  expect_silent(plt1 <- draw(su_m_factor_by, grouped_by = TRUE, rug = FALSE))
-  expect_silent(plt2 <- draw(models$m_ordered_by, grouped_by = TRUE, rug = FALSE))
+  expect_silent(plt1 <- draw(su_m_factor_by,
+    parametric = FALSE, grouped_by = TRUE, rug = FALSE))
+  expect_silent(plt2 <- draw(models$m_ordered_by,
+    parametric = FALSE, grouped_by = TRUE, rug = FALSE))
   # skip_on_ci() # testing without as moved to mac os x
   skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("grouped by gam", plt1)

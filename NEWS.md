@@ -2,6 +2,13 @@
 
 ## User visible changes
 
+* **Breaking change:** `draw.gam()` and `assemble.gam()` now default to
+  `parametric = NULL`, including parametric terms alongside smooths when
+  `select = NULL`. Selecting smooths explicitly continues to draw only those
+  smooths, unless `parametric = TRUE` is supplied. Use `parametric = FALSE`
+  to restore the previous default. Additional panels can change plot layouts
+  and the length of plot lists returned by `assemble()` or `draw(wrap = FALSE)`.
+
 * `parametric_effects()` and `draw()` now support parametric interactions,
   including higher-order interactions. Numeric interactions use surfaces with
   higher order terms using conditioning facets, numeric-by-factor interactions

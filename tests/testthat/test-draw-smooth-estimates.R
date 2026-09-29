@@ -334,7 +334,7 @@ test_that("draw for smooth estimates works with univar tensor products #260", {
 
 test_that("plot has correct label with ordered factor by models", {
   models <- secondary_models()
-  expect_silent(plt <- draw(models$m_ordered_by, rug = FALSE))
+  expect_silent(plt <- draw(models$m_ordered_by, parametric = FALSE, rug = FALSE))
 
   skip_on_cran()
   expect_doppelganger("draw subtitle ordered by smooths", plt)
