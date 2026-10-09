@@ -23,3 +23,235 @@ navbar:
   structure:
     left: [intro, articles, reference, news]
     right: [search, github]
+
+reference:
+  - title: Plot models and effects
+    desc: >
+      Visualise fitted models with `draw()` and customise individual plots with
+      `assemble()`; see [Customizing plots](../articles/custom-plotting.html).
+  - contents:
+      - draw
+      - draw.gam
+      - draw.gamlss
+      - assemble
+      - assemble.gam
+      - scale_fill_partial_effect
+
+  - title: Estimate smooths and parametric effects
+    desc: >
+      Estimate individual model terms, add confidence intervals and partial
+      residuals, and transform effects for interpretation.
+  - contents:
+      - smooth_estimates
+      - draw.smooth_estimates
+      - parametric_effects
+      - draw.parametric_effects
+      - add_confint
+      - confint.gam
+      - add_constant
+      - transform_fun
+      - partial_residuals
+      - add_partial_residuals
+
+  - title: Predict responses
+    desc: >
+      Predict from the whole model at observed or chosen covariate values,
+      combining model terms rather than estimating individual term effects.
+  - contents:
+      - fitted_values
+      - conditional_values
+      - draw.conditional_values
+      - add_fitted
+      - add_fitted.gam
+
+  - title: Compare smooths and predictions
+    desc: >
+      Use `difference_smooths()` for differences between factor-by smooths,
+      `conditional_differences()` for contrasts of whole-model predictions,
+      and `compare_smooths()` to compare smooth estimates across models.
+  - contents:
+      - difference_smooths
+      - draw.difference_smooth
+      - conditional_differences
+      - draw.conditional_differences
+      - compare_smooths
+      - draw.compare_smooths
+
+  - title: Estimate derivatives and identify change
+    desc: >
+      Estimate rates of change in smooths or response predictions and identify
+      regions of change; use [derivative_samples()](derivative_samples.html)
+      for posterior draws of derivatives.
+  - contents:
+      - derivatives
+      - partial_derivatives
+      - draw.derivatives
+      - response_derivatives
+      - add_sizer
+
+  - title: Check model fit
+    desc: >
+      Assess model adequacy with `appraise()`, individual diagnostic plots,
+      residuals, and measures of concurvity.
+  - contents:
+      - appraise
+      - qq_plot
+      - worm_plot
+      - rootogram
+      - draw.rootogram
+      - observed_fitted_plot
+      - residuals_hist_plot
+      - residuals_linpred_plot
+      - quantile_residuals
+      - add_residuals
+      - add_residuals.gam
+      - model_concurvity
+      - draw.pairwise_concurvity
+
+  - title: Prepare data for prediction and evaluation
+    desc: >
+      Choose covariate values at which to evaluate a model and restrict
+      evaluation to regions supported by the data; see
+      [Data slices](../articles/data-slices.html).
+  - contents:
+      - data_slice
+      - data_combos
+      - factor_combos
+      - smooth_data
+      - evenly
+      - typical_values
+      - ref_level
+      - too_far
+      - too_far_to_na
+
+  - title: Sample from fitted models
+    desc: >
+      Draw individual smooths with `smooth_samples()` or expected responses
+      with `fitted_samples()`; `posterior_samples()` generates new responses
+      including model uncertainty, while `predicted_samples()` simulates
+      responses conditional on the fitted model without model uncertainty.
+      For coefficient draws, use [post_draws()](post_draws.html) in the advanced
+      helpers; see
+      [Posterior Simulation](../articles/posterior-simulation.html).
+  - contents:
+      - posterior_samples
+      - smooth_samples
+      - draw.smooth_samples
+      - fitted_samples
+      - predicted_samples
+      - derivative_samples
+      - simulate.gam
+      - add_fitted_samples
+
+  - title: Inspect models and smooths
+    desc: >
+      Discover a fitted model's structure and extract its parameters,
+      terms, smooth properties, families, and links.
+  - subtitle: Model summaries and parameters
+    desc: Summarise model complexity and extract coefficients and other parameters.
+  - contents:
+      - overview
+      - edf
+      - variance_comp
+      - fixed_effects
+      - coef.scam
+      - get_vcov
+      - model_constant
+      - dispersion
+      - theta
+      - nb_theta
+      - null_deviance
+  - subtitle: Terms and variables
+    desc: Identify the terms and covariates used in a fitted model.
+  - contents:
+      - smooths
+      - n_smooths
+      - which_smooths
+      - parametric_terms
+      - model_terms
+      - model_vars
+      - term_names
+      - term_variables
+  - subtitle: Smooth objects and properties
+    desc: Extract smooth objects and inspect their structure and coefficients.
+  - contents:
+      - get_smooth
+      - get_by_smooth
+      - get_smooths_by_id
+      - basis_size
+      - smooth_dim
+      - smooth_label
+      - smooth_type
+      - smooth_terms
+      - smooth_coefs
+      - smooth_coef_indices
+      - is_by_smooth
+  - subtitle: Families and links
+    desc: Inspect response distributions, link functions, and linear predictors.
+  - contents:
+      - family.gam
+      - family_name
+      - family_type
+      - link
+      - has_theta
+      - n_eta
+
+  - title: Explore spline bases and penalties
+    desc: Inspect and visualise the basis functions and penalties that define smooths.
+  - contents:
+      - basis
+      - draw.basis
+      - tidy_basis
+      - draw.mgcv_smooth
+      - penalty
+      - draw.penalty_df
+      - boundary
+
+  - title: Example data and simulation
+    desc: Generate example data or use bundled data sets to learn and demonstrate GAM workflows.
+  - contents:
+      - data_sim
+      - gw_functions
+      - rtw
+      - bird_move
+      - gss_vocab
+      - ref_sims
+      - smallAges
+      - zooplankton
+
+  - title: Advanced programming helpers
+    desc: Build custom computations using lower-level evaluation, sampling, and validation tools.
+  - subtitle: Model evaluation and posterior sampling
+  - contents:
+      - lp_matrix
+      - eval_smooth
+      - spline_values
+      - post_draws
+      - gaussian_draws
+      - mh_draws
+      - user_draws
+  - subtitle: Validation and data utilities
+  - contents:
+      - check_user_select_smooths
+      - is_factor_term
+      - is_mgcv_family
+      - is_mgcv_smooth
+      - is_multivariate_y
+      - is_offset
+      - fix_offset
+      - seq_min_max_eps
+      - shift_values
+      - rep_first_factor_value
+      - to_na
+      - vars_from_label
+      - load_mgcv
+
+  - title: Deprecated and legacy interfaces
+    desc: >
+      Reference for older code; use `smooth_estimates()`, `parametric_effects()`,
+      and `derivatives()` for new analyses.
+  - contents:
+      - evaluate_smooth
+      - evaluate_parametric_term
+      - draw.evaluated_parametric_term
+      - confint.fderiv
