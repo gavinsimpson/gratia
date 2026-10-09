@@ -151,6 +151,7 @@ reference:
     desc: Summarise model complexity and extract coefficients and other parameters.
   - contents:
       - overview
+      - gamm4_support
       - edf
       - variance_comp
       - fixed_effects
