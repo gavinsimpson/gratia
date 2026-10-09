@@ -40,6 +40,7 @@
 #' @importFrom rlang has_name
 `[.smooth_estimates` <- function(x, i, j, drop = FALSE) {
   cls <- class(x)
+  coordinate_info <- attr(x, "coordinate_info")
   tensor_term_order <- attr(x, "tensor_term_order")
   class(x) <- class(x)[-c(1:2)]
   x <- NextMethod()
@@ -47,10 +48,19 @@
   if (has_name(x, ".smooth")) {
     take <- unique(x[[".smooth"]])
     tensor_term_order <- tensor_term_order[take]
+    order <- attr(coordinate_info, "smooth_variables")
+    order <- order[intersect(names(order), take)]
+    if (length(order)) {
+      coordinate_info <- coordinate_info[intersect(names(coordinate_info),
+        unique(unlist(order)))]
+      attr(coordinate_info, "smooth_variables") <- order
+    } else coordinate_info <- NULL
   } else {
     tensor_term_order <- NA
+    coordinate_info <- NULL
   }
   attr(x, "tensor_term_order") <- tensor_term_order
+  attr(x, "coordinate_info") <- coordinate_info
   x
 }
 
@@ -60,6 +70,8 @@
 #' @importFrom dplyr filter reframe pull
 `[.parametric_effects` <- function(x, i, j, drop = FALSE) {
   info <- attr(x, "term_info")
+  axes <- attr(x, "axis_info")
+  back_transform <- attr(x, "back_transform")
   cls <- class(x)
   f_levels <- attr(x, "factor_levels")
   class(x) <- class(x)[-c(1:2)]
@@ -79,6 +91,10 @@
   attr(x, "term_info") <- if (".term" %in% names(x)) {
     info[intersect(names(info), unique(x$.term))]
   } else NULL
+  attr(x, "axis_info") <- if (".term" %in% names(x)) {
+    axes[intersect(names(axes), unique(x$.term))]
+  } else NULL
+  attr(x, "back_transform") <- back_transform
   x
 }
 

@@ -27,6 +27,28 @@
 #'   main effects and intercepts are not added. Multivariate parametric terms
 #'   use the grid and surface controls below, as described in
 #'   [parametric_effects()].
+#' @param back_transform logical; plot covariates on their original scale?
+#'   Defaults to `FALSE`, using model coordinates such as `log(x)` for a term
+#'   containing `log(x)`. With `TRUE`, recover the raw covariates, generate a
+#'   grid on their original scale and evaluate the model expressions forwards.
+#'   Applies to axes, rugs, partial-residual locations and conditioning facets,
+#'   including tensor products and parametric interactions. Each smooth axis
+#'   must depend on one distinct original model covariate. Functions such as
+#'   `foo(x)` are supported when their raw inputs and functions can be recovered;
+#'   no inverse function is needed. Missing raw data or unavailable functions
+#'   produce an error; supply `data` or `envir` as appropriate.
+#'   With supplied prediction `data`, unavailable raw fitting observations
+#'   omit rugs and partial residuals; prediction rows are never used as observations.
+#'   For precomputed smooth estimates, prepare raw grids with
+#'   `smooth_estimates(model, back_transform = TRUE)` before drawing with
+#'   `back_transform = TRUE`. Raw inputs supplied through `data` also retain
+#'   their coordinates. Transformed-only estimates cannot be relabelled on the
+#'   raw scale, including grids carrying typical values from `include_all = TRUE`.
+#'   Transformed soap-film boundaries lack retained raw coordinates and must
+#'   be drawn with `back_transform = FALSE`.
+#'   Parametric estimates retain both scales; multi-column basis
+#'   expansions retain raw axes on either setting. Does not transform estimated
+#'   effects or their intervals; use `fun` for that.
 #' @param residuals logical; should partial residuals for a smooth be drawn?
 #'   Ignored for anything but a simple univariate smooth.
 #' @param scales character; should all univariate smooths be plotted with the
@@ -102,6 +124,8 @@
 #'   keeps large PDF plots compact; tiles are individual borderless rectangles
 #'   that remain vector elements in PDF and SVG output, potentially increasing
 #'   file size. Other plot types, including spherical smooths, are unchanged.
+#'   Covariate scale changes that produce irregular spacing use rectangles
+#'   bounded by adjacent coordinate midpoints for either setting.
 #' @param continuous_fill a suitable fill scale to be used when plotting
 #'   continuous variables.
 #' @param position Position adjustment, either as a string, or the result of a
@@ -136,7 +160,8 @@
 #' @param wrap logical; wrap plots as a patchwork? If \code{FALSE}, a list of
 #'   ggplot objects is returned, 1 per term plotted.
 #' @param caption logical; show the smooth type in the caption of each plot?
-#' @param envir an environment to look up the data within.
+#' @param envir an optional environment for looking up data, functions and
+#'   constants. Defaults to the model's evaluation environment.
 #' @param ... additional arguments passed to [patchwork::wrap_plots()].
 #'
 #' @note Internally, plots of each smooth are created using [ggplot2::ggplot()]
@@ -224,8 +249,9 @@
   lims_method = "cross",
   wrap = TRUE,
   caption = TRUE,
-  envir = environment(formula(object)),
+  envir = NULL,
   geom = c("raster", "tile"),
+  back_transform = FALSE,
   ...
 ) {
   geom <- match.arg(geom)

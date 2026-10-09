@@ -70,7 +70,7 @@ test_that("shape constrained fits accept transformed covariates", {
     m <- scam::scam(f, data = d)
     a <- smooth_estimates(m, data = d)
     b <- smooth_estimates(m, data = data.frame(`log(x)` = log(d$x), check.names = FALSE))
-    expect_equal(a, b)
+    expect_equal(a[, names(b)], b)
     expect_true(all(is.finite(a$.estimate)))
   }
 })
@@ -84,15 +84,23 @@ test_that("local functions, basis values, sampling, and direct spline calls agre
   nd <- d[1:8, ]
   evaluated <- data.frame(`fun(x)` = fun(nd$x), check.names = FALSE)
   expect_error(smooth_estimates(m, data = nd), class = "gratia_expression_error")
-  expect_equal(smooth_estimates(m, data = nd, envir = env), smooth_estimates(m, data = evaluated))
+  raw <- smooth_estimates(m, data = nd, envir = env)
+  stored <- smooth_estimates(m, data = evaluated)
+  # Raw inputs additionally retain an exact mapping for coordinate drawing.
+  expect_equal(raw[[attr(raw, "coordinate_info")[["fun(x)"]]$column]], nd$x)
+  expect_false(attr(stored, "coordinate_info")[["fun(x)"]]$column %in% names(stored))
+  attr(raw, "coordinate_info") <- attr(stored, "coordinate_info") <- NULL
+  expect_equal(raw[, names(stored)], stored)
   expect_equal(basis(m, data = nd, envir = env), basis(m, data = evaluated))
   expect_equal(smooth_samples(m, data = nd, envir = env, seed = 4, n = 3),
     smooth_samples(m, data = evaluated, seed = 4, n = 3))
   sm <- m$smooth[[1]]
-  expect_equal(spline_values2(sm, nd, m, FALSE, overall_uncertainty = FALSE, envir = env),
-    spline_values(sm, evaluated, m, FALSE, overall_uncertainty = FALSE))
-  expect_equal(eval_smooth(sm, model = m, data = nd, envir = env),
-    eval_smooth(sm, model = m, data = evaluated))
+  a <- spline_values2(sm, nd, m, FALSE, overall_uncertainty = FALSE, envir = env)$data[[1L]]
+  b <- spline_values(sm, evaluated, m, FALSE, overall_uncertainty = FALSE)$data[[1L]]
+  expect_equal(a[, names(b)], b)
+  a <- eval_smooth(sm, model = m, data = nd, envir = env)$data[[1L]]
+  b <- eval_smooth(sm, model = m, data = evaluated)$data[[1L]]
+  expect_equal(a[, names(b)], b)
   grid <- smooth_estimates(m, n = 20)
   expect_equal(diff(grid[["fun(x)"]]), rep(diff(range(fun(d$x))) / 19, 19))
 })

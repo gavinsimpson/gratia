@@ -26,7 +26,8 @@
   geom = c("raster", "tile"),
   continuous_fill = NULL,
   discrete_colour = NULL,
-  discrete_fill = NULL
+  discrete_fill = NULL,
+  back_transform = FALSE
 )
 }
 \arguments{
@@ -84,7 +85,9 @@ spread the plots}
 smooth surfaces, including faceted and soap-film plots. Raster rendering
 keeps large PDF plots compact; tiles are individual borderless rectangles
 that remain vector elements in PDF and SVG output, potentially increasing
-file size. Other plot types, including spherical smooths, are unchanged.}
+file size. Other plot types, including spherical smooths, are unchanged.
+Covariate scale changes that produce irregular spacing use rectangles
+bounded by adjacent coordinate midpoints for either setting.}
 
 \item{continuous_fill}{a suitable fill scale to be used when plotting
 continuous variables.}
@@ -94,6 +97,29 @@ discrete variables.}
 
 \item{discrete_fill}{a suitable fill scale to be used when plotting
 discrete variables.}
+
+\item{back_transform}{logical; plot covariates on their original scale?
+Defaults to \code{FALSE}, using model coordinates such as \code{log(x)} for a term
+containing \code{log(x)}. With \code{TRUE}, recover the raw covariates, generate a
+grid on their original scale and evaluate the model expressions forwards.
+Applies to axes, rugs, partial-residual locations and conditioning facets,
+including tensor products and parametric interactions. Each smooth axis
+must depend on one distinct original model covariate. Functions such as
+\code{foo(x)} are supported when their raw inputs and functions can be recovered;
+no inverse function is needed. Missing raw data or unavailable functions
+produce an error; supply \code{data} or \code{envir} as appropriate.
+With supplied prediction \code{data}, unavailable raw fitting observations
+omit rugs and partial residuals; prediction rows are never used as observations.
+For precomputed smooth estimates, prepare raw grids with
+\code{smooth_estimates(model, back_transform = TRUE)} before drawing with
+\code{back_transform = TRUE}. Raw inputs supplied through \code{data} also retain
+their coordinates. Transformed-only estimates cannot be relabelled on the
+raw scale, including grids carrying typical values from \code{include_all = TRUE}.
+Transformed soap-film boundaries lack retained raw coordinates and must
+be drawn with \code{back_transform = FALSE}.
+Parametric estimates retain both scales; multi-column basis
+expansions retain raw axes on either setting. Does not transform estimated
+effects or their intervals; use \code{fun} for that.}
 }
 \description{
 Plot estimated effects for model parametric terms

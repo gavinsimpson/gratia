@@ -146,7 +146,8 @@
 
   # retain only those columns we want
   df <- data |>
-    select(all_of(c(sm_var, by_var))) |>
+    select(all_of(unique(c(sm_var, by_var,
+      smooth_coordinate_columns(model, sm_var, data))))) |>
     as_tibble()
 
   # handle matrix covariates, which will get stacked by as.numeric

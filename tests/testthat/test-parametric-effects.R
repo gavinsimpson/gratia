@@ -73,21 +73,23 @@ test_that("parametric_effects works with weird parametric terms", {
     "parametric_effects", "tbl_df", "tbl",
     "data.frame"
   ))
-  expect_identical(ncol(peff), 6L)
+  expect_identical(ncol(peff), 8L)
   expect_identical(nrow(peff), 1207L)
-  expect_named(peff, c(".term", ".type", both_nms))
+  expect_named(peff, c(".term", ".type", ".level", ".value",
+    ".gratia_raw_x0", ".gratia_model_x0", ".partial", ".se"))
 
   expect_silent(peff <- parametric_effects(m_poly,
-    transform = TRUE,
+    back_transform = TRUE,
     data = df_2_fac
   ))
   expect_s3_class(peff, class = c(
     "parametric_effects", "tbl_df", "tbl",
     "data.frame"
   ))
-  expect_identical(ncol(peff), 6L)
+  expect_identical(ncol(peff), 8L)
   expect_identical(nrow(peff), 1207L)
-  expect_named(peff, c(".term", ".type", both_nms))
+  expect_named(peff, c(".term", ".type", ".level", ".value",
+    ".gratia_raw_x0", ".gratia_model_x0", ".partial", ".se"))
 })
 
 test_that("issue 212 remains fixed", {

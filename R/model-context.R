@@ -103,6 +103,10 @@ evaluate_terms <- function(data, labels, model, envir = NULL,
   out <- data
   recovered <- character()
   env <- model_envir(model, envir)
+  tt <- if (!is.null(model$terms)) prediction_terms(model) else NULL
+  fitted_labels <- vapply(as.list(attr(tt, "variables"))[-1L],
+    function(x) paste(deparse(x, width.cutoff = 500L), collapse = ""), character(1))
+  pred <- as.list(attr(tt, "predvars"))[-1L]
   for (label in unique(labels)) {
     expr <- term_expression(label, model)
     deps <- all.vars(expr)
@@ -112,7 +116,9 @@ evaluate_terms <- function(data, labels, model, envir = NULL,
       # Covariate vectors must come from data, not a same-named global vector.
       missing <- setdiff(intersect(deps, names(model$var.summary)), names(data))
       if (length(missing)) stop("Variable(s) ", paste0("'", missing, "'", collapse = ", "), " not found in 'data'.")
-      eval(expr, envir = data, enclos = env)
+      j <- match(label, fitted_labels)
+      forward <- if (!is.na(j) && length(pred) == length(fitted_labels)) pred[[j]] else expr
+      eval(forward, envir = data, enclos = env)
     }, error = identity)
     if (inherits(ans, "error")) {
       # Only a caller handling known training observations supplies fallback.
@@ -145,9 +151,10 @@ prepare_smooth_data <- function(model, smooth, data = NULL, envir = NULL) {
     data <- model_context(model)$data
     fallback <- stats::model.frame(model)
   }
-  evaluate_terms(data, terms_in_smooth(smooth), model, envir, fallback = fallback,
+  out <- evaluate_terms(data, terms_in_smooth(smooth), model, envir, fallback = fallback,
     evaluated = !is.null(attr(data, "terms")) ||
       isTRUE(attr(data, "gratia.evaluated")))
+  retain_smooth_coordinates(out, terms_in_smooth(smooth), model)
 }
 
 # Raw recovery is deliberately conservative. Never infer an inverse transform.

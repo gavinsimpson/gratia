@@ -163,7 +163,7 @@
 <text x='374.24' y='263.39' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.50</text>
 <text x='419.01' y='263.39' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.75</text>
 <text x='463.78' y='263.39' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>1.00</text>
-<text x='374.14' y='275.53' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='117.69px' lengthAdjust='spacingAndGlyphs'>poly(x0, 2, raw = TRUE)</text>
+<text x='374.14' y='275.53' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='11.62px' lengthAdjust='spacingAndGlyphs'>x0</text>
 <text transform='translate(258.30,148.98) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='276.08' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='141.23px' lengthAdjust='spacingAndGlyphs'>poly(x0, 2, raw = TRUE)</text>
 <text x='472.20' y='289.35' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='32.77px' lengthAdjust='spacingAndGlyphs'>Numeric</text>
@@ -216,7 +216,7 @@
 <text x='610.89' y='263.39' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.50</text>
 <text x='655.92' y='263.39' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.75</text>
 <text x='700.96' y='263.39' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>1.00</text>
-<text x='610.98' y='275.53' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='117.69px' lengthAdjust='spacingAndGlyphs'>poly(x1, 2, raw = TRUE)</text>
+<text x='610.98' y='275.53' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='11.62px' lengthAdjust='spacingAndGlyphs'>x1</text>
 <text transform='translate(490.73,148.98) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='512.92' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='141.23px' lengthAdjust='spacingAndGlyphs'>poly(x1, 2, raw = TRUE)</text>
 <text x='709.04' y='289.35' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='32.77px' lengthAdjust='spacingAndGlyphs'>Numeric</text>
@@ -270,7 +270,7 @@
 <text x='141.70' y='537.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.50</text>
 <text x='186.42' y='537.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.75</text>
 <text x='231.13' y='537.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>1.00</text>
-<text x='141.71' y='549.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='117.69px' lengthAdjust='spacingAndGlyphs'>poly(x2, 2, raw = TRUE)</text>
+<text x='141.71' y='549.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='11.62px' lengthAdjust='spacingAndGlyphs'>x2</text>
 <text transform='translate(18.53,422.85) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='43.65' y='311.22' style='font-size: 13.20px; font-family: sans;' textLength='141.23px' lengthAdjust='spacingAndGlyphs'>poly(x2, 2, raw = TRUE)</text>
 <text x='239.77' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='32.77px' lengthAdjust='spacingAndGlyphs'>Numeric</text>
@@ -323,7 +323,7 @@
 <text x='374.31' y='537.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.50</text>
 <text x='418.99' y='537.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.75</text>
 <text x='463.68' y='537.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>1.00</text>
-<text x='374.14' y='549.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='117.69px' lengthAdjust='spacingAndGlyphs'>poly(x3, 2, raw = TRUE)</text>
+<text x='374.14' y='549.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='11.62px' lengthAdjust='spacingAndGlyphs'>x3</text>
 <text transform='translate(258.30,422.85) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
 <text x='276.08' y='311.22' style='font-size: 13.20px; font-family: sans;' textLength='141.23px' lengthAdjust='spacingAndGlyphs'>poly(x3, 2, raw = TRUE)</text>
 <text x='472.20' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='32.77px' lengthAdjust='spacingAndGlyphs'>Numeric</text>

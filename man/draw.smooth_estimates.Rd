@@ -31,6 +31,7 @@
   lims_method = "cross",
   caption = TRUE,
   geom = c("raster", "tile"),
+  back_transform = FALSE,
   ...
 )
 }
@@ -122,7 +123,32 @@ generated for tile centres without respect to the spacing of those tiles.}
 smooth surfaces, including faceted and soap-film plots. Raster rendering
 keeps large PDF plots compact; tiles are individual borderless rectangles
 that remain vector elements in PDF and SVG output, potentially increasing
-file size. Other plot types, including spherical smooths, are unchanged.}
+file size. Other plot types, including spherical smooths, are unchanged.
+Covariate scale changes that produce irregular spacing use rectangles
+bounded by adjacent coordinate midpoints for either setting.}
+
+\item{back_transform}{logical; plot covariates on their original scale?
+Defaults to \code{FALSE}, using model coordinates such as \code{log(x)} for a term
+containing \code{log(x)}. With \code{TRUE}, recover the raw covariates, generate a
+grid on their original scale and evaluate the model expressions forwards.
+Applies to axes, rugs, partial-residual locations and conditioning facets,
+including tensor products and parametric interactions. Each smooth axis
+must depend on one distinct original model covariate. Functions such as
+\code{foo(x)} are supported when their raw inputs and functions can be recovered;
+no inverse function is needed. Missing raw data or unavailable functions
+produce an error; supply \code{data} or \code{envir} as appropriate.
+With supplied prediction \code{data}, unavailable raw fitting observations
+omit rugs and partial residuals; prediction rows are never used as observations.
+For precomputed smooth estimates, prepare raw grids with
+\code{smooth_estimates(model, back_transform = TRUE)} before drawing with
+\code{back_transform = TRUE}. Raw inputs supplied through \code{data} also retain
+their coordinates. Transformed-only estimates cannot be relabelled on the
+raw scale, including grids carrying typical values from \code{include_all = TRUE}.
+Transformed soap-film boundaries lack retained raw coordinates and must
+be drawn with \code{back_transform = FALSE}.
+Parametric estimates retain both scales; multi-column basis
+expansions retain raw axes on either setting. Does not transform estimated
+effects or their intervals; use \code{fun} for that.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
@@ -138,6 +164,8 @@ m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 # plot all of the estimated smooths
 sm <- smooth_estimates(m)
 draw(sm)
+m_log <- gam(y ~ s(log(x1), k = 6), data = df)
+draw(smooth_estimates(m_log, back_transform = TRUE), back_transform = TRUE)
 # evaluate smooth of `x2`
 sm <- smooth_estimates(m, select = "s(x2)")
 # plot it

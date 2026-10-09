@@ -14,7 +14,8 @@ smooth_data(
   offset = NULL,
   include_all = FALSE,
   var_order = NULL,
-  envir = NULL
+  envir = NULL,
+  back_transform = FALSE
 )
 }
 \arguments{
@@ -53,6 +54,20 @@ should be processed. Only useful for tensor products with at least one
 \item{envir}{an optional environment supplying functions and constants used
 in model expressions. The available model formula environment is used when
 \code{NULL}. Covariate observations should be supplied in \code{data}.}
+
+\item{back_transform}{logical; generate the grid on original covariate
+scales? The default, \code{FALSE}, uses evenly spaced model coordinates. With
+\code{TRUE}, recover raw fitting rows and generate original-scale coordinates,
+then evaluate the model expressions forwards. Each axis must depend on one
+distinct original model covariate. Both raw and evaluated columns are
+returned, with auxiliary \verb{.gratia_raw_*} columns for transformed axes.
+Missing raw inputs or unavailable functions produce an error.
+Numeric \code{by} multipliers are one on automatic grids, including when a
+multiplier shares an original axis name; raw axis coordinates are retained
+separately. If the multiplier is itself an untransformed grid axis, supply
+prediction \code{data} to \code{smooth_estimates()} instead. Typical values added by
+\code{include_all = TRUE} to model-scale
+grids do not provide raw coordinates for transformed axes.}
 }
 \description{
 Generate regular data over the covariates of a smooth

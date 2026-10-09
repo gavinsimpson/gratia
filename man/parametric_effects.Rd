@@ -18,13 +18,14 @@ parametric_effects(object, ...)
   unnest = TRUE,
   ci_level = 0.95,
   envir = NULL,
-  transform = FALSE,
+  transform = lifecycle::deprecated(),
   n = 100,
   n_2d = 50,
   n_3d = 16,
   n_4d = 4,
   dist = 0.1,
   overall_uncertainty = TRUE,
+  back_transform = FALSE,
   ...
 )
 }
@@ -53,11 +54,8 @@ Currently ignored.}
 for recovering fitting data when required raw columns are not stored in
 the model. Defaults to the model's evaluation environment.}
 
-\item{transform}{logical; if \code{TRUE}, the parametric effect will be plotted on
-its transformed scale which will result in the effect being a straight
-line. If FALSE, the effect will be plotted against the raw data (i.e. for
-\code{log10(x)}, or \code{poly(z)}, the x-axis of the plot will be \code{x} or \code{z}
-respectively.)}
+\item{transform}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use
+\code{back_transform = !transform} instead.}
 
 \item{n, n_2d, n_3d, n_4d}{Grid resolutions for multivariate parametric terms.
 Curves use \code{n = 100}; the first two numeric surface axes use \code{n_2d = 50}.
@@ -74,15 +72,44 @@ drawing; returned estimates are not masked. Use zero to disable masking.}
 the term's linear predictor, including its covariance with the term?
 Defaults to \code{TRUE}. Partial effect estimates are unchanged. With no
 intercept, this has no effect. Set to \code{FALSE} for term-only uncertainty.}
+
+\item{back_transform}{logical; plot covariates on their original scale?
+Defaults to \code{FALSE}, using model coordinates such as \code{log(x)} for a term
+containing \code{log(x)}. With \code{TRUE}, recover the raw covariates, generate a
+grid on their original scale and evaluate the model expressions forwards.
+Applies to axes, rugs, partial-residual locations and conditioning facets,
+including tensor products and parametric interactions. Each smooth axis
+must depend on one distinct original model covariate. Functions such as
+\code{foo(x)} are supported when their raw inputs and functions can be recovered;
+no inverse function is needed. Missing raw data or unavailable functions
+produce an error; supply \code{data} or \code{envir} as appropriate.
+With supplied prediction \code{data}, unavailable raw fitting observations
+omit rugs and partial residuals; prediction rows are never used as observations.
+For precomputed smooth estimates, prepare raw grids with
+\code{smooth_estimates(model, back_transform = TRUE)} before drawing with
+\code{back_transform = TRUE}. Raw inputs supplied through \code{data} also retain
+their coordinates. Transformed-only estimates cannot be relabelled on the
+raw scale, including grids carrying typical values from \code{include_all = TRUE}.
+Transformed soap-film boundaries lack retained raw coordinates and must
+be drawn with \code{back_transform = FALSE}.
+Parametric estimates retain both scales; multi-column basis
+expansions retain raw axes on either setting. Does not transform estimated
+effects or their intervals; use \code{fun} for that.}
 }
 \value{
 A tibble of class \code{parametric_effects}, with \code{.term}, \code{.type},
 \code{.partial} and \code{.se}. Single-variable terms retain \code{.value} or \code{.level};
-multivariate terms contain their raw covariate columns. Names conflicting
+multivariate terms use columns named for their raw covariates, containing
+coordinates on the selected scale. Names conflicting
 with reserved columns are repaired with numeric suffixes. The \code{term_info}
 attribute records multivariate column mappings, plotting order, factor
 levels and observation data. With \code{unnest = FALSE}, estimates and
-covariates are nested in a \code{data} list column.
+covariates are nested in a \code{data} list column. The \code{axis_info} attribute
+identifies retained raw and model coordinate columns and their labels
+so the drawing method
+can select either scale. The \code{back_transform} attribute records the scale
+of the returned coordinate columns. Auxiliary \verb{.gratia_raw_*} and
+\verb{.gratia_model_*} columns retain both scales for transformed axes.
 }
 \description{
 Estimated values for parametric model terms
@@ -95,10 +122,15 @@ contrasts, a numeric-by-factor interaction represents a departure from the
 reference-level slope, rather than a complete slope for each level.
 
 A multi-column term such as \code{poly(x, 3)} is one component, whereas \code{x} and
-\code{I(x^2)} remain separate components. Multivariate terms are evaluated against
-their raw covariates; \code{transform = TRUE} is not supported for these terms.
+\code{I(x^2)} remain separate components. Scalar numeric transformations use model
+coordinates by default, including each axis of an interaction. Basis
+expansions such as \code{poly(x, 3)}, terms combining several inputs in one
+expression, and interactions containing several transformations of the same
+input retain raw axes because they have no single model coordinate per input.
 Other covariates in generated prediction data are held at typical values
 solely to evaluate the model matrix; their contributions are not included.
+Rugs show fitting observations, including when prediction \code{data} are
+supplied. If fitting observations cannot be recovered, these rugs are omitted.
 
 The drawing method uses the first two numeric covariates for surface axes,
 grouping curves by the first factor when there is only one numeric covariate.
@@ -116,6 +148,10 @@ m <- gam(y ~ x0 * group + x1:x2:x3, data = d, method = "REML")
 pe <- parametric_effects(m, n_2d = 20, n_3d = 4)
 draw(pe)
 draw(m, parametric = TRUE, terms = "x0:group")
+m_log <- gam(y ~ log(x1), data = d)
+draw(m_log) # log(x1) on the x axis
+draw(m_log, back_transform = TRUE) # x1 on the x axis
+draw(parametric_effects(m_log), back_transform = TRUE)
 
 }
 \seealso{

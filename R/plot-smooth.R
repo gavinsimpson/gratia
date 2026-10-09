@@ -382,6 +382,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #' @param labels Resolved labels as a `ggplot2::labs()` object.
 #' @param geom Character; `"raster"` (default) uses a raster image, while
 #'   `"tile"` uses borderless rectangles sized from the coordinate resolution.
+#'   Changed covariate scales with irregular spacing use rectangles bounded by
+#'   adjacent coordinate midpoints, avoiding shifted raster pixels.
 #' @param continuous_fill Optional ggplot2 fill scale. `NULL` uses the diverging
 #'   RdBu distiller scale.
 #' @param contour Logical; add contour lines for `fill_var`?
@@ -429,15 +431,45 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   if (is.null(mapping)) {
     mapping <- aes(x = .data[[x_var]], y = .data[[y_var]])
   }
-  plt <- ggplot(object, mapping) +
-    switch(geom,
+  irregular <- function(x) {
+    x <- sort(unique(x[is.finite(x)]))
+    gaps <- diff(x)
+    length(gaps) > 1L && !isTRUE(all.equal(gaps, rep(gaps[[1L]], length(gaps)),
+      tolerance = 1e-7))
+  }
+  changed <- isTRUE(attr(object, "gratia.coordinate_display"))
+  if (changed && (irregular(object[[x_var]]) || irregular(object[[y_var]]))) {
+    bounds <- function(x) {
+      values <- sort(unique(x[is.finite(x)]))
+      if (length(values) < 2L) return(cbind(x - 0.5, x + 0.5))
+      mid <- (values[-1L] + values[-length(values)]) / 2
+      edges <- c(values[[1L]] - (mid[[1L]] - values[[1L]]), mid,
+        utils::tail(values, 1L) + (utils::tail(values, 1L) - utils::tail(mid, 1L)))
+      i <- match(x, values)
+      cbind(edges[i], edges[i + 1L])
+    }
+    cells <- object
+    xb <- bounds(object[[x_var]])
+    yb <- bounds(object[[y_var]])
+    cells$.cell_xmin <- xb[, 1L]
+    cells$.cell_xmax <- xb[, 2L]
+    cells$.cell_ymin <- yb[, 1L]
+    cells$.cell_ymax <- yb[, 2L]
+    surface_geom <- ggplot2::geom_rect(data = cells, mapping = aes(
+      xmin = .data$.cell_xmin, xmax = .data$.cell_xmax,
+      ymin = .data$.cell_ymin, ymax = .data$.cell_ymax,
+      fill = .data[[fill_var]]), colour = tile_colour)
+  } else {
+    surface_geom <- switch(geom,
       raster = geom_raster(aes(fill = .data[[fill_var]]), interpolate = FALSE),
       tile = if (is.null(tile_colour)) {
         geom_tile(aes(fill = .data[[fill_var]]))
       } else {
         geom_tile(aes(fill = .data[[fill_var]]), colour = tile_colour)
-      }
-    ) + facet + coord
+      })
+  }
+  plt <- ggplot(object, mapping) +
+    surface_geom + facet + coord
 
   if (isTRUE(contour)) {
     if (is.null(contour_mapping)) {

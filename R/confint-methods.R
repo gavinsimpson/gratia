@@ -402,7 +402,7 @@
         n = n, data = data, partial_match = partial_match,
         unconditional = unconditional,
         frequentist = frequentist,
-        overall_uncertainty = FALSE
+        overall_uncertainty = FALSE, ...
       )
 
       # if this is a by var smooth, we need to do this for each level of
@@ -431,7 +431,18 @@
   }
 
   ## simplify to a data frame for return
+  metadata <- lapply(out, attr, "coordinate_info")
+  smooth_variables <- do.call("c", lapply(metadata, attr, "smooth_variables"))
+  coordinate_info <- do.call("c", metadata)
+  if (!is.null(coordinate_info)) {
+    coordinate_info <- coordinate_info[!duplicated(names(coordinate_info))]
+    attr(coordinate_info, "smooth_variables") <-
+      smooth_variables[!duplicated(names(smooth_variables))]
+  }
+  tensor_term_order <- do.call("c", lapply(out, attr, "tensor_term_order"))
   out <- bind_rows(out)
+  attr(out, "coordinate_info") <- coordinate_info
+  attr(out, "tensor_term_order") <- tensor_term_order
 
   # This was needed with `[.evaluated_smooth` before switching to
   # NextMethod() to call the next S3 `[` method.

@@ -29,3 +29,16 @@ test_that("parallel evaluation forwards local expression environments", {
   }
   expect_s3_class(basis(m, data = d, envir = environment()), "basis")
 })
+
+
+test_that("parallel automatic raw grids retain custom tensor coordinates", {
+  d <- transformed_data()
+  foo <- sqrt
+  m <- mgcv::gam(y ~ te(foo(x), sqrt(z), k = c(4, 4)), data = d)
+  sm <- smooth_estimates(m, n_2d = 6, back_transform = TRUE, envir = environment())
+  p <- draw(sm, back_transform = TRUE, contour = FALSE)[[1L]]
+  expect_equal(sort(unique(p$data$x)), seq(min(d$x), max(d$x), length.out = 6))
+  expect_equal(sort(unique(p$data$z)), seq(min(d$z), max(d$z), length.out = 6))
+  expect_equal(sm$`foo(x)`, foo(p$data$x))
+  expect_equal(sm$`sqrt(z)`, sqrt(p$data$z))
+})

@@ -1,6 +1,7 @@
 # Evaluate one multivariate formula term without adding any other components.
 evaluate_parametric_component <- function(model, term, covariates, columns,
-    data, supplied_data, n, n_2d, n_3d, n_4d, dist, unconditional, overall_uncertainty) {
+    data, supplied_data, n, n_2d, n_3d, n_4d, dist, unconditional,
+    overall_uncertainty, back_transform) {
   numeric <- vapply(data[covariates], is.numeric, logical(1))
   variables <- c(covariates[numeric], covariates[!numeric])
   numeric_vars <- covariates[numeric]
@@ -25,9 +26,9 @@ evaluate_parametric_component <- function(model, term, covariates, columns,
   }
   # Observation data are kept separate from the prediction grid. If a model's
   # fitting data cannot be recovered, supplied prediction rows are not a rug.
-  observed <- if (supplied_data) {
-    tryCatch(recover_raw_data(model), error = function(e) NULL)
-  } else data
+  observed <- tryCatch(recover_raw_data(model),
+    error = function(e) if (supplied_data) NULL else data)
+  reference <- observed
   if (!is.null(observed)) observed <- observed[, covariates, drop = FALSE]
 
   if (supplied_data) {
@@ -69,9 +70,19 @@ evaluate_parametric_component <- function(model, term, covariates, columns,
   names(out) <- unname(columns[covariates])
   out$.partial <- as.numeric(pred$fit[, term])
   out$.se <- as.numeric(pred$se.fit[, term])
-  out <- dplyr::distinct(out)
-  if (!is.null(observed)) names(observed) <- unname(columns[covariates])
+  axes <- parametric_axes(model, unname(parametric_terms(model)[[term]]), grid,
+    columns[covariates])
+  out <- retain_parametric_axes(out, axes) |> dplyr::distinct()
+  out <- display_parametric_axes(out, axes, from_raw = TRUE,
+    back_transform = back_transform)$data
+  if (!is.null(observed)) {
+    reference_axes <- parametric_axes(model,
+      unname(parametric_terms(model)[[term]]), reference, columns[covariates])
+    names(observed) <- unname(columns[covariates])
+    observed <- retain_parametric_axes(observed, reference_axes)
+  }
   result <- tibble::tibble(.term = term, .type = "interaction", data = list(out))
+  attr(result, "axis_info") <- parametric_axis_info(axes)
   attr(result, "term_info") <- list(
     variables = variables, columns = columns[variables],
     numeric = numeric_vars, discrete = discrete_vars,
@@ -81,7 +92,8 @@ evaluate_parametric_component <- function(model, term, covariates, columns,
 }
 
 # One extra dimension wraps; two or more use rows and columns, as for smooths.
-parametric_component_facets <- function(variables, columns, numeric_vars) {
+parametric_component_facets <- function(variables, columns, numeric_vars,
+    axis_labels = NULL) {
   if (!length(variables)) return(NULL)
   facets <- setNames(lapply(unname(columns[variables]), rlang::sym), variables)
   label <- function(labels) {
@@ -89,6 +101,9 @@ parametric_component_facets <- function(variables, columns, numeric_vars) {
       labels[[v]] <- format(signif(as.numeric(as.character(labels[[v]])), 3),
         trim = TRUE)
     }
+    names(labels) <- vapply(names(labels), function(v) {
+      if (v %in% names(axis_labels)) axis_labels[[v]] else v
+    }, character(1))
     ggplot2::label_both(labels)
   }
   if (length(facets) == 1L) {
@@ -127,10 +142,12 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
   if (is.null(caption)) caption <- "Parametric term contribution"
   surface <- length(numeric) >= 2L
   x <- info$variables[1L]
-  if (is.null(xlab)) xlab <- x
+  labels <- info$axis_labels
+  axis_label <- function(v) if (v %in% names(labels)) unname(labels[[v]]) else v
+  if (is.null(xlab)) xlab <- axis_label(x)
   if (surface) {
     y <- numeric[2L]
-    if (is.null(ylab)) ylab <- y
+    if (is.null(ylab)) ylab <- axis_label(y)
     extra <- info$variables[-c(1L, 2L)]
     observed <- info$observed
     if (info$dist > 0 && !is.null(observed) &&
@@ -160,7 +177,7 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
       geom = geom, continuous_fill = continuous_fill, contour = contour,
       contour_data = contour_data,
       contour_col = contour_col, n_contour = n_contour, angle = angle,
-      facet = parametric_component_facets(extra, cols, numeric),
+      facet = parametric_component_facets(extra, cols, numeric, labels),
       rug = if (isTRUE(rug) && !length(extra)) observed else NULL))
   }
   group <- if (length(numeric)) discrete[1L] else discrete[2L]
@@ -185,7 +202,7 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
       position = ggplot2::position_dodge(width = 0.5))
   }
   if (is.null(ylab)) ylab <- "Partial effect"
-  plt <- plt + parametric_component_facets(extra, cols, numeric) +
+  plt <- plt + parametric_component_facets(extra, cols, numeric, labels) +
     ggplot2::labs(x = xlab, y = ylab, colour = group,
       fill = if (length(numeric)) group else NULL,
       title = title, subtitle = subtitle, caption = caption) +

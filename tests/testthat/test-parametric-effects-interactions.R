@@ -44,19 +44,18 @@ test_that("interaction components agree with coefficient blocks and fitted contr
   expect_true(is.ordered(pe$a))
 })
 
-test_that("transformed and polynomial interactions retain raw axes", {
+test_that("transformed interactions can retain raw axes and polynomials do", {
   d <- interaction_data()
   m <- gam(y ~ poly(x, 3) * a + log(z):w + x + I(x^2), data = d)
   for (term in c("poly(x, 3):a", "log(z):w")) {
     pe <- parametric_effects(m, terms = term, data = d,
-      overall_uncertainty = FALSE)
+      overall_uncertainty = FALSE, back_transform = TRUE)
     check_parametric_block(m, pe, d, term)
   }
   pe <- parametric_effects(m, terms = c("poly(x, 3)", "x", "I(x^2)"), data = d)
   expect_identical(unique(pe$.term), c("poly(x, 3)", "x", "I(x^2)"))
-  expect_error(parametric_effects(m, terms = "poly(x, 3):a",
-    data = d, transform = TRUE),
-    "not supported for multivariate")
+  expect_silent(pe <- parametric_effects(m, terms = "poly(x, 3):a", data = d))
+  expect_equal(pe$x, d$x)
 })
 
 test_that("higher-dimensional grids allocate numeric axes and facets", {

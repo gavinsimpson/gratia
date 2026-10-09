@@ -24,6 +24,19 @@
 #'   should be processed. Only useful for tensor products with at least one
 #'   2d marginal smooth.
 #'
+#' @param back_transform logical; generate the grid on original covariate
+#'   scales? The default, `FALSE`, uses evenly spaced model coordinates. With
+#'   `TRUE`, recover raw fitting rows and generate original-scale coordinates,
+#'   then evaluate the model expressions forwards. Each axis must depend on one
+#'   distinct original model covariate. Both raw and evaluated columns are
+#'   returned, with auxiliary `.gratia_raw_*` columns for transformed axes.
+#'   Missing raw inputs or unavailable functions produce an error.
+#'   Numeric `by` multipliers are one on automatic grids, including when a
+#'   multiplier shares an original axis name; raw axis coordinates are retained
+#'   separately. If the multiplier is itself an untransformed grid axis, supply
+#'   prediction `data` to `smooth_estimates()` instead. Typical values added by
+#'   `include_all = TRUE` to model-scale
+#'   grids do not provide raw coordinates for transformed axes.
 #' @inheritParams smooth_estimates
 #'
 #' @export
@@ -53,7 +66,8 @@
 #' }
 `smooth_data` <- function(model, id, n = 100, n_2d = NULL, n_3d = NULL,
                           n_4d = NULL, offset = NULL, include_all = FALSE,
-                          var_order = NULL, envir = NULL) {
+                          var_order = NULL, envir = NULL, back_transform = FALSE) {
+  check_back_transform(back_transform)
   model <- with_model_envir(model, envir)
   mf <- model.frame(model) # model.frame used to fit model
 
@@ -85,6 +99,27 @@
   } else {
     NULL
   }
+  grid_vars <- smooth_vars
+  if (back_transform) {
+    axes <- lapply(smooth_vars, smooth_coordinate_info, model = model)
+    if (any(vapply(axes, function(x) is.null(x$original), logical(1)))) {
+      cli::cli_abort("Each raw-scale grid axis must depend on one original model covariate.")
+    }
+    grid_vars <- vapply(axes, `[[`, character(1), "original")
+    if (anyDuplicated(grid_vars)) cli::cli_abort("Original covariates for grid axes must be distinct.")
+    raw <- recover_raw_data(model, vars = unique(grid_vars))
+    # Even when raw columns are stored in the model, changed functions or
+    # constants must not silently define a different covariate transformation.
+    reference <- evaluate_terms(raw, smooth_vars, model)
+    for (label in smooth_vars) {
+      if (!isTRUE(all.equal(reference[[label]], mf[[label]],
+          check.attributes = FALSE))) {
+        cli::cli_abort(c("Cannot reproduce fitted coordinate {.val {label}} from raw covariates.",
+          "i" = "Restore the fitting functions and constants in `envir`, or supply explicit raw prediction `data`."))
+      }
+    }
+    for (v in grid_vars) mf[[v]] <- raw[[v]]
+  }
   used_vars <- c(smooth_vars, by_var)
 
   # Figure out the n to use for each dimension
@@ -100,7 +135,8 @@
   if (is.null(n_4d)) {
     n_4d <- n
   }
-  seq_per_dim <- function(data, vars, dim, n, n_2d, n_3d, n_4d) {
+  seq_per_dim <- function(data, vars, dim, n, n_2d, n_3d, n_4d,
+      round_extra = TRUE) {
     n_per_dim <- rep(n, dim)
     # Factor levels do not turn a curve into a surface.
     if (sum(!vapply(data[vars], is.factor, logical(1))) >= 2L) {
@@ -116,7 +152,7 @@
       # won't return exactly the right n
       out <- seq_min_max(data[[vars[i]]], n = n[i])
       # now that we have the ordering of vars corrected we can round here
-      if (i > 2L && !(is.factor(data[[vars[i]]]))) {
+      if (round_extra && i > 2L && !(is.factor(data[[vars[i]]]))) {
         out <- round(out, 3)
       }
       out
@@ -136,8 +172,9 @@
     newlist <- sos_data(mf, vars = smooth_vars, n = n_2d)
   } else {
     newlist <- seq_per_dim(
-      data = mf, vars = smooth_vars, dim = sm_dim,
-      n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d
+      data = mf, vars = grid_vars, dim = sm_dim,
+      n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
+      round_extra = !back_transform
     )
   }
 
@@ -157,14 +194,27 @@
       ## newby <- setNames(list(median(mf[[by_var]]), na.rm = TRUE), by_var)
       ## no, should be set to 1
       newby <- setNames(list(1L), by_var)
-      newlist <- append(newlist, newby)
+      if (back_transform && by_var %in% smooth_vars) {
+        cli::cli_abort(c("A numeric by multiplier cannot also be an untransformed automatic grid axis.",
+          "i" = "Supply prediction `data` to retain the actual by values."))
+      }
+      if (!back_transform || !by_var %in% names(newlist)) {
+        newlist <- append(newlist, newby)
+      }
     }
   }
   newdata <- exec(expand_grid, !!!newlist) # compute expand.grid-alike
 
+  if (back_transform) {
+    # The continuous by multiplier remains one on the evaluated scale.
+    newdata <- evaluate_terms(newdata, smooth_vars, model)
+    newdata <- retain_smooth_coordinates(newdata, smooth_vars, model, required = TRUE)
+    if (!is.null(by_var) && !is_factor_by_smooth(sm)) newdata[[by_var]] <- 1L
+  }
+
   if (isTRUE(include_all)) {
     ## need to provide single values for all other covariates in data
-    unused_vars <- dplyr::setdiff(m.terms, used_vars)
+    unused_vars <- dplyr::setdiff(m.terms, c(used_vars, names(newdata)))
     ## only processed unused_vars if length() > 0L
     if (length(unused_vars) > 0L) {
       unused_summ <- model[["var.summary"]][unused_vars]

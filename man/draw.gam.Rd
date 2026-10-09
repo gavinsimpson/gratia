@@ -49,8 +49,9 @@
   lims_method = "cross",
   wrap = TRUE,
   caption = TRUE,
-  envir = environment(formula(object)),
+  envir = NULL,
   geom = c("raster", "tile"),
+  back_transform = FALSE,
   ...
 )
 }
@@ -225,13 +226,39 @@ ggplot objects is returned, 1 per term plotted.}
 
 \item{caption}{logical; show the smooth type in the caption of each plot?}
 
-\item{envir}{an environment to look up the data within.}
+\item{envir}{an optional environment for looking up data, functions and
+constants. Defaults to the model's evaluation environment.}
 
 \item{geom}{character; either \code{"raster"} (the default) or \code{"tile"} for flat
 smooth surfaces, including faceted and soap-film plots. Raster rendering
 keeps large PDF plots compact; tiles are individual borderless rectangles
 that remain vector elements in PDF and SVG output, potentially increasing
-file size. Other plot types, including spherical smooths, are unchanged.}
+file size. Other plot types, including spherical smooths, are unchanged.
+Covariate scale changes that produce irregular spacing use rectangles
+bounded by adjacent coordinate midpoints for either setting.}
+
+\item{back_transform}{logical; plot covariates on their original scale?
+Defaults to \code{FALSE}, using model coordinates such as \code{log(x)} for a term
+containing \code{log(x)}. With \code{TRUE}, recover the raw covariates, generate a
+grid on their original scale and evaluate the model expressions forwards.
+Applies to axes, rugs, partial-residual locations and conditioning facets,
+including tensor products and parametric interactions. Each smooth axis
+must depend on one distinct original model covariate. Functions such as
+\code{foo(x)} are supported when their raw inputs and functions can be recovered;
+no inverse function is needed. Missing raw data or unavailable functions
+produce an error; supply \code{data} or \code{envir} as appropriate.
+With supplied prediction \code{data}, unavailable raw fitting observations
+omit rugs and partial residuals; prediction rows are never used as observations.
+For precomputed smooth estimates, prepare raw grids with
+\code{smooth_estimates(model, back_transform = TRUE)} before drawing with
+\code{back_transform = TRUE}. Raw inputs supplied through \code{data} also retain
+their coordinates. Transformed-only estimates cannot be relabelled on the
+raw scale, including grids carrying typical values from \code{include_all = TRUE}.
+Transformed soap-film boundaries lack retained raw coordinates and must
+be drawn with \code{back_transform = FALSE}.
+Parametric estimates retain both scales; multi-column basis
+expansions retain raw axes on either setting. Does not transform estimated
+effects or their intervals; use \code{fun} for that.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }

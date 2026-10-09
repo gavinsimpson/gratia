@@ -101,10 +101,12 @@
   lims_method = "cross",
   wrap = TRUE,
   caption = TRUE,
-  envir = environment(formula(object)),
+  envir = NULL,
   geom = c("raster", "tile"),
+  back_transform = FALSE,
   ...
 ) {
+  check_back_transform(back_transform)
   geom <- match.arg(geom)
 
   .call <- match.call()
@@ -144,6 +146,7 @@
       partial_match = partial_match,
       model_name = expr_label(substitute(object))
     )
+  object <- with_model_envir(object, envir)
 
   # this is needed for the parametric terms below
   sm_plts <- NULL
@@ -153,7 +156,7 @@
   if (length(select) > 0L) {
     # evaluate all requested smooths
     sm_eval <- smooth_estimates(object,
-      envir = envir,
+      envir = envir, back_transform = back_transform,
       select = S[select],
       n = n,
       n_2d = n_2d,
@@ -169,6 +172,7 @@
 
     # grab tensor term order if present, if not it is NULL & that's OK
     tensor_term_order <- attr(sm_eval, "tensor_term_order")
+    coordinate_info <- attr(sm_eval, "coordinate_info")
 
     # add confidence interval
     sm_eval <- sm_eval |>
@@ -194,6 +198,28 @@
         pluck("rng")
     }
 
+    observation_data <- NULL
+    if (back_transform && (isTRUE(rug) || isTRUE(residuals))) {
+      observation_data <- model.frame(object)
+      labels <- unique(unlist(lapply(get_smooths_by_id(object, which(select)), smooth_variable)))
+      raw_vars <- unique(unlist(lapply(labels, function(label) {
+        smooth_coordinate_info(label, object)$original
+      })))
+      raw <- tryCatch(recover_raw_data(object, vars = raw_vars),
+        gratia_data_recovery_error = function(e) {
+          if (is.null(data)) stop(e)
+          NULL
+        })
+      if (is.null(raw)) {
+        # Prediction rows are not observed data for rugs or partial residuals.
+        observation_data <- NULL
+        rug <- residuals <- FALSE
+      } else {
+        for (v in raw_vars) observation_data[[v]] <- raw[[v]]
+        observation_data <- retain_smooth_coordinates(observation_data, labels, object, required = TRUE)
+      }
+    }
+
     # Add partial residuals if requested - by default they are
     # At the end of this, sm_eval will have a new list column containing the
     # partial residuals, `partial_residual`
@@ -203,7 +229,7 @@
         residuals <- FALSE
       } else {
         # get residuals in a suitable format
-        p_resids <- nested_partial_residuals(object, terms = S[select])
+        p_resids <- nested_partial_residuals(object, terms = S[select], data = observation_data)
 
         # compute the range of residuals for each smooth
         # p_resids_rng <- p_resids |>
@@ -238,7 +264,7 @@
       # get rug data in a suitable format
       rug_data <- nested_rug_values(
         object,
-        terms = S[select],
+        terms = S[select], data = observation_data,
         distinct = distinct_rug
       )
 
@@ -307,6 +333,7 @@
       default_crs = default_crs,
       lims_method = lims_method,
       tensor_term_order = tensor_term_order,
+      coordinate_info = coordinate_info, back_transform = back_transform,
       caption = caption,
       grouped_by = grouped_by,
       ... # FIXME: temporary fix to allow captions to be suppressed-ish
@@ -375,7 +402,8 @@
         terms = terms, data = data,
         unconditional = unconditional,
         unnest = TRUE, ci_level = ci_level, envir = envir,
-        n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, dist = dist
+        n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, dist = dist,
+        back_transform = back_transform
       )
 
       if (is.null(para)) {
@@ -416,6 +444,8 @@
               angle = angle,
               ylim = ylims,
               factor_levels = f_levels, term_info = attr(para, "term_info"),
+              axis_info = attr(para, "axis_info"), from_raw = back_transform,
+              back_transform = back_transform,
               contour = contour, contour_col = contour_col, n_contour = n_contour,
               geom = geom, continuous_fill = continuous_fill,
               discrete_colour = discrete_colour, discrete_fill = discrete_fill
