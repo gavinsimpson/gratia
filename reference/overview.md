@@ -5,6 +5,9 @@ Provides an overview of a model and the terms in that model
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+overview(model, ...)
+
 overview(model, ...)
 
 # S3 method for class 'gam'
@@ -69,6 +72,10 @@ overview(
 - stars:
 
   logical; should significance stars be added to the output?
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Examples
 

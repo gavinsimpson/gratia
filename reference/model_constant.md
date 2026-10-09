@@ -6,6 +6,9 @@ intercept, from a fitted model object.
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+model_constant(model, ...)
+
 model_constant(model, ...)
 
 # S3 method for class 'gam'
@@ -32,6 +35,10 @@ model_constant(model, ...)
 - lp:
 
   numeric; which linear predictors to extract constant terms for.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Examples
 

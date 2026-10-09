@@ -7,6 +7,9 @@ returning the linear predictor matrix for the model training data (when
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+lp_matrix(model, ...)
+
 lp_matrix(model, ...)
 
 # S3 method for class 'gam'
@@ -47,6 +50,10 @@ predictor of the model \\\hat{\eta}\_p = \mathbf{X}\_p
 spline covariates have been replaced by the values of the basis
 functions evaluated at the respective covariates. Parametric covariates
 are also included.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Examples
 

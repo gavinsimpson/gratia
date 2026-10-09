@@ -34,6 +34,9 @@ worm_plot(model, ...)
 
 # S3 method for class 'lm'
 worm_plot(model, ...)
+
+# S3 method for class 'gamm4'
+worm_plot(model, ...)
 ```
 
 ## Arguments
@@ -156,6 +159,10 @@ The wording used in
 *direct* in reference to the simulated residuals method
 (`method = "simulated"`). To avoid confusion, `method = "direct"` is
 deprecated in favour of `method = "uniform"`.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Examples
 

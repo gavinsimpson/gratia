@@ -31,6 +31,9 @@ conditional_values(
   complete = TRUE,
   ...
 )
+
+# S3 method for class 'gamm4'
+conditional_values(model, ...)
 ```
 
 ## Arguments
@@ -91,6 +94,10 @@ conditional_values(
 ## Value
 
 A data frame (tibble) of class `"conditional_values"`.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Author
 

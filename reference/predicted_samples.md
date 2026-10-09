@@ -2,7 +2,8 @@
 
 Predicted values of the response (new response data) are drawn from the
 fitted model, created via
-[`simulate()`](https://rdrr.io/r/stats/simulate.html) (e.g.
+[`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
+(e.g.
 [`simulate.gam()`](https://gavinsimpson.github.io/gratia/reference/simulate.md))
 and returned in a tidy, long, format. These predicted values do not
 include the uncertainty in the estimated model; they are simply draws
@@ -11,6 +12,9 @@ from the conditional distribution of the response.
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+predicted_samples(model, ...)
+
 predicted_samples(model, ...)
 
 # Default S3 method
@@ -48,7 +52,8 @@ predicted_samples(model, n = 1, data = NULL, seed = NULL, weights = NULL, ...)
   these are passed on to
   [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md).
   For `predicted_samples()` these are passed on to the relevant
-  [`simulate()`](https://rdrr.io/r/stats/simulate.html) method.
+  [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
+  method.
 
 - n:
 
@@ -85,6 +90,10 @@ values in long format. The columns are
 
 - `response` (numeric) the predicted response for the indicated row of
   `data`.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Author
 

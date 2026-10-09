@@ -9,6 +9,9 @@ function return `TRUE`.
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+is_factor_term(object, term, ...)
+
 is_factor_term(object, term, ...)
 
 # S3 method for class 'terms'
@@ -47,3 +50,7 @@ is_factor_term(object, term, ...)
 
 A logical: `TRUE` if and only if all variables involved in the term are
 factors, otherwise `FALSE`.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)

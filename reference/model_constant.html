@@ -9,7 +9,7 @@ the model intercept, from a fitted model object."><meta property="og:image" cont
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-34</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-36</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,7 +39,7 @@ the model intercept, from a fitted model object."><meta property="og:image" cont
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Extract the model constant term</h1>
-      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/model-utilities.R" class="external-link"><code>R/model-utilities.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/gamm4-methods.R" class="external-link"><code>R/gamm4-methods.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/model-utilities.R" class="external-link"><code>R/model-utilities.R</code></a></small>
       <div class="d-none name"><code>model_constant.Rd</code></div>
     </div>
 
@@ -50,7 +50,10 @@ the model intercept, from a fitted model object.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">model_constant</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'gamm4'</span></span>
+<span><span class="fu">model_constant</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">model_constant</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gam'</span></span>
 <span><span class="fu">model_constant</span><span class="op">(</span><span class="va">model</span>, lp <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -78,6 +81,10 @@ the model intercept, from a fitted model object.</p>
 <dd><p>numeric; which linear predictors to extract constant terms for.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><a href="gamm4_support.html">gamm4_support</a></p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

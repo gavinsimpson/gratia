@@ -9,7 +9,7 @@ differences"><meta property="og:image" content="https://gavinsimpson.github.io/g
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-34</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-36</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,7 +39,7 @@ differences"><meta property="og:image" content="https://gavinsimpson.github.io/g
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Partial derivatives of estimated multivariate smooths via finite differences</h1>
-      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/derivatives.R" class="external-link"><code>R/derivatives.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/derivatives.R" class="external-link"><code>R/derivatives.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/gamm4-methods.R" class="external-link"><code>R/gamm4-methods.R</code></a></small>
       <div class="d-none name"><code>partial_derivatives.Rd</code></div>
     </div>
 
@@ -82,7 +82,10 @@ differences</p>
 <span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  wrt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"smooth"</span>, <span class="st">"covariate"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'gamm4'</span></span>
+<span><span class="fu">partial_derivatives</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -228,6 +231,10 @@ interval (given <code>level</code>),</p></li>
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p><code>partial_derivatives()</code> will ignore any random effect smooths it
 encounters in <code>object</code>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><a href="gamm4_support.html">gamm4_support</a></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>

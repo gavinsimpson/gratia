@@ -18,9 +18,6 @@ get_smooths_by_id(object, id)
 
 # S3 method for class 'gamm4'
 get_smooths_by_id(object, id)
-
-# S3 method for class 'list'
-get_smooths_by_id(object, id)
 ```
 
 ## Arguments

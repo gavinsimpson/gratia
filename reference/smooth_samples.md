@@ -7,6 +7,9 @@ estimated functions.
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+smooth_samples(model, ...)
+
 smooth_samples(model, ...)
 
 # S3 method for class 'gam'
@@ -56,7 +59,8 @@ smooth_samples(
   For
   [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md)
   these are passed on to the relevant
-  [`simulate()`](https://rdrr.io/r/stats/simulate.html) method.
+  [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
+  method.
 
 - select:
 
@@ -221,6 +225,10 @@ order) are:
 
 The set of variables returned and their order in the tibble is subject
 to change in future versions. Don't rely on position.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Author
 

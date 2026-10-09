@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-34</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-36</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +37,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Draw samples from the posterior distribution of an estimated model</h1>
-      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/posterior-samples.R" class="external-link"><code>R/posterior-samples.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/gamm4-methods.R" class="external-link"><code>R/gamm4-methods.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/posterior-samples.R" class="external-link"><code>R/posterior-samples.R</code></a></small>
       <div class="d-none name"><code>posterior_samples.Rd</code></div>
     </div>
 
@@ -47,7 +47,10 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'gamm4'</span></span>
+<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gam'</span></span>
 <span><span class="fu">posterior_samples</span><span class="op">(</span></span>
@@ -104,7 +107,7 @@
 <dd><p>arguments passed to other methods. For <code><a href="fitted_samples.html">fitted_samples()</a></code>, these
 are passed on to <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">mgcv::predict.gam()</a></code>. For <code>posterior_samples()</code> these are
 passed on to <code><a href="fitted_samples.html">fitted_samples()</a></code>. For <code><a href="predicted_samples.html">predicted_samples()</a></code> these are
-passed on to the relevant <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> method.</p></dd>
+passed on to the relevant <code><a href="simulate.html">simulate()</a></code> method.</p></dd>
 
 
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
@@ -236,6 +239,10 @@ offset variable.</p>
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Wood, S.N., (2020). Simplified integrated nested Laplace approximation.
 <em>Biometrika</em> <strong>107</strong>, 223–230. <a href="https://doi.org/10.1093/biomet/asz044" class="external-link">doi:10.1093/biomet/asz044</a></p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><a href="gamm4_support.html">gamm4_support</a></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>

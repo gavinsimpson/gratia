@@ -5,6 +5,9 @@ Draw samples from the posterior distribution of an estimated model
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+posterior_samples(model, ...)
+
 posterior_samples(model, ...)
 
 # S3 method for class 'gam'
@@ -67,7 +70,8 @@ posterior_samples(
   For
   [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md)
   these are passed on to the relevant
-  [`simulate()`](https://rdrr.io/r/stats/simulate.html) method.
+  [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
+  method.
 
 - n:
 
@@ -211,6 +215,10 @@ the offset variable.
 Wood, S.N., (2020). Simplified integrated nested Laplace approximation.
 *Biometrika* **107**, 223–230.
 [doi:10.1093/biomet/asz044](https://doi.org/10.1093/biomet/asz044)
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Author
 

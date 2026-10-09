@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-34</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-36</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,9 +40,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="plot-models-and-effects">Plot models and effects<a class="anchor" aria-label="anchor" href="#plot-models-and-effects"></a></h2>
 
-
+      <div class="section-desc"><p>Visualise fitted models with <code><a href="../reference/draw.html">draw()</a></code> and customise individual plots with <code><a href="../reference/assemble.html">assemble()</a></code>; see <a href="../articles/custom-plotting.html">Customizing plots</a>.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -51,269 +51,10 @@
 
       <dl><dt>
 
-          <code><a href="add_confint.html">add_confint()</a></code>
-
-        </dt>
-        <dd>Add a confidence interval to an existing object</dd>
-
-        <dt>
-
-          <code><a href="add_constant.html">add_constant()</a></code>
-
-        </dt>
-        <dd>Add a constant to estimated values</dd>
-
-        <dt>
-
-          <code><a href="add_fitted.html">add_fitted()</a></code>
-
-        </dt>
-        <dd>Add fitted values from a model to a data frame</dd>
-
-        <dt>
-
-          <code><a href="add_fitted.gam.html">add_fitted(<i>&lt;gam&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Add fitted values from a GAM to a data frame</dd>
-
-        <dt>
-
-          <code><a href="add_fitted_samples.html">add_fitted_samples()</a></code> <code><a href="add_fitted_samples.html">add_predicted_samples()</a></code> <code><a href="add_fitted_samples.html">add_posterior_samples()</a></code> <code><a href="add_fitted_samples.html">add_smooth_samples()</a></code>
-
-        </dt>
-        <dd>Add posterior draws from a model to a data object</dd>
-
-        <dt>
-
-          <code><a href="add_partial_residuals.html">add_partial_residuals()</a></code>
-
-        </dt>
-        <dd>Add partial residuals</dd>
-
-        <dt>
-
-          <code><a href="add_residuals.html">add_residuals()</a></code>
-
-        </dt>
-        <dd>Add residuals from a model to a data frame</dd>
-
-        <dt>
-
-          <code><a href="add_residuals.gam.html">add_residuals(<i>&lt;gam&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Add residuals from a GAM to a data frame</dd>
-
-        <dt>
-
-          <code><a href="add_sizer.html">add_sizer()</a></code>
-
-        </dt>
-        <dd>Add indicators of significant change after SiZeR</dd>
-
-        <dt>
-
-          <code><a href="appraise.html">appraise()</a></code>
-
-        </dt>
-        <dd>Model diagnostic plots</dd>
-
-        <dt>
-
-          <code><a href="assemble.html">assemble()</a></code>
-
-        </dt>
-        <dd>Prepare plots via <code>ggplot2</code> and assembles them as a list</dd>
-
-        <dt>
-
-          <code><a href="assemble.gam.html">assemble(<i>&lt;gam&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Plot smooth and parametric terms from a fitted GAM</dd>
-
-        <dt>
-
-          <code><a href="basis.html">basis()</a></code>
-
-        </dt>
-        <dd>Basis expansions for smooths</dd>
-
-        <dt>
-
-          <code><a href="basis_size.html">basis_size()</a></code>
-
-        </dt>
-        <dd>Extract basis dimension of a smooth</dd>
-
-        <dt>
-
-          <code><a href="bird_move.html">bird_move</a></code>
-
-        </dt>
-        <dd>Simulated bird migration data</dd>
-
-        <dt>
-
-          <code><a href="boundary.html">boundary()</a></code>
-          <span class="badge lifecycle lifecycle-experimental">experimental</span>
-        </dt>
-        <dd>Extract the boundary of a soap film smooth</dd>
-
-        <dt>
-
-          <code><a href="check_user_select_smooths.html">check_user_select_smooths()</a></code>
-
-        </dt>
-        <dd>Select smooths based on user's choices</dd>
-
-        <dt>
-
-          <code><a href="coef.scam.html">coef(<i>&lt;scam&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Extract coefficients from a fitted <code>scam</code> model.</dd>
-
-        <dt>
-
-          <code><a href="compare_smooths.html">compare_smooths()</a></code>
-
-        </dt>
-        <dd>Compare smooths across models</dd>
-
-        <dt>
-
-          <code><a href="conditional_differences.html">conditional_differences()</a></code>
-
-        </dt>
-        <dd>Conditional differences of fitted values from a GAM</dd>
-
-        <dt>
-
-          <code><a href="conditional_values.html">conditional_values()</a></code>
-
-        </dt>
-        <dd>Conditional predictions from a GAM</dd>
-
-        <dt>
-
-          <code><a href="confint.fderiv.html">confint(<i>&lt;fderiv&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Point-wise and simultaneous confidence intervals for derivatives of smooths</dd>
-
-        <dt>
-
-          <code><a href="confint.gam.html">confint(<i>&lt;gam&gt;</i>)</a></code> <code><a href="confint.gam.html">confint(<i>&lt;gamm&gt;</i>)</a></code> <code><a href="confint.gam.html">confint(<i>&lt;list&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Point-wise and simultaneous confidence intervals for smooths</dd>
-
-        <dt>
-
-          <code><a href="data_combos.html">data_combos()</a></code>
-
-        </dt>
-        <dd>All combinations of factor levels plus typical values of continuous variables</dd>
-
-        <dt>
-
-          <code><a href="data_sim.html">data_sim()</a></code>
-
-        </dt>
-        <dd>Simulate example data for fitting GAMs</dd>
-
-        <dt>
-
-          <code><a href="data_slice.html">data_slice()</a></code>
-
-        </dt>
-        <dd>Prepare a data slice through model covariates</dd>
-
-        <dt>
-
-          <code><a href="derivative_samples.html">derivative_samples()</a></code>
-
-        </dt>
-        <dd>Posterior expectations of derivatives from an estimated model</dd>
-
-        <dt>
-
-          <code><a href="derivatives.html">derivatives()</a></code>
-
-        </dt>
-        <dd>Derivatives of estimated smooths via finite differences</dd>
-
-        <dt>
-
-          <code><a href="difference_smooths.html">difference_smooths()</a></code>
-
-        </dt>
-        <dd>Differences of factor smooth interactions</dd>
-
-        <dt>
-
-          <code><a href="dispersion.html">dispersion()</a></code>
-          <span class="badge lifecycle lifecycle-experimental">experimental</span>
-        </dt>
-        <dd>Dispersion parameter for fitted model</dd>
-
-        <dt>
-
           <code><a href="draw.html">draw()</a></code>
 
         </dt>
         <dd>Generic plotting via <code>ggplot2</code></dd>
-
-        <dt>
-
-          <code><a href="draw.basis.html">draw(<i>&lt;basis&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Plot basis functions</dd>
-
-        <dt>
-
-          <code><a href="draw.compare_smooths.html">draw(<i>&lt;compare_smooths&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Plot comparisons of smooths</dd>
-
-        <dt>
-
-          <code><a href="draw.conditional_differences.html">draw(<i>&lt;conditional_differences&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Plot conditional differences</dd>
-
-        <dt>
-
-          <code><a href="draw.conditional_values.html">draw(<i>&lt;conditional_values&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Plot conditional predictions</dd>
-
-        <dt>
-
-          <code><a href="draw.derivatives.html">draw(<i>&lt;derivatives&gt;</i>)</a></code> <code><a href="draw.derivatives.html">draw(<i>&lt;partial_derivatives&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Plot derivatives of smooths</dd>
-
-        <dt>
-
-          <code><a href="draw.difference_smooth.html">draw(<i>&lt;difference_smooth&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Plot differences of smooths</dd>
-
-        <dt>
-
-          <code><a href="draw.evaluated_parametric_term.html">draw(<i>&lt;evaluated_parametric_term&gt;</i>)</a></code>
-          <span class="badge lifecycle lifecycle-deprecated">deprecated</span>
-        </dt>
-        <dd>Plot estimated parametric effects</dd>
 
         <dt>
 
@@ -331,38 +72,40 @@
 
         <dt>
 
-          <code><a href="draw.mgcv_smooth.html">draw(<i>&lt;mgcv_smooth&gt;</i>)</a></code>
+          <code><a href="assemble.html">assemble()</a></code>
 
         </dt>
-        <dd>Plot basis functions</dd>
+        <dd>Prepare plots via <code>ggplot2</code> and assembles them as a list</dd>
 
         <dt>
 
-          <code><a href="draw.pairwise_concurvity.html">draw(<i>&lt;pairwise_concurvity&gt;</i>)</a></code> <code><a href="draw.pairwise_concurvity.html">draw(<i>&lt;overall_concurvity&gt;</i>)</a></code>
+          <code><a href="assemble.gam.html">assemble(<i>&lt;gam&gt;</i>)</a></code>
 
         </dt>
-        <dd>Plot concurvity measures</dd>
+        <dd>Plot smooth and parametric terms from a fitted GAM</dd>
 
         <dt>
 
-          <code><a href="draw.parametric_effects.html">draw(<i>&lt;parametric_effects&gt;</i>)</a></code>
+          <code><a href="scale_fill_partial_effect.html">scale_fill_partial_effect()</a></code>
 
         </dt>
-        <dd>Plot estimated effects for model parametric terms</dd>
+        <dd>Default diverging red-blue colour palette for partial effects</dd>
+      </dl></div><div class="section level2">
+      <h2 id="estimate-smooths-and-parametric-effects">Estimate smooths and parametric effects<a class="anchor" aria-label="anchor" href="#estimate-smooths-and-parametric-effects"></a></h2>
 
-        <dt>
+      <div class="section-desc"><p>Estimate individual model terms, add confidence intervals and partial residuals, and transform effects for interpretation.</p></div>
 
-          <code><a href="draw.penalty_df.html">draw(<i>&lt;penalty_df&gt;</i>)</a></code>
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="smooth_estimates.html">smooth_estimates()</a></code>
 
         </dt>
-        <dd>Display penalty matrices of smooths using <code>ggplot</code></dd>
-
-        <dt>
-
-          <code><a href="draw.rootogram.html">draw(<i>&lt;rootogram&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Draw a rootogram</dd>
+        <dd>Evaluate smooths at covariate values</dd>
 
         <dt>
 
@@ -373,45 +116,321 @@
 
         <dt>
 
-          <code><a href="draw.smooth_samples.html">draw(<i>&lt;smooth_samples&gt;</i>)</a></code>
+          <code><a href="parametric_effects.html">parametric_effects()</a></code>
 
         </dt>
-        <dd>Plot posterior smooths</dd>
+        <dd>Estimated values for parametric model terms</dd>
 
         <dt>
 
-          <code><a href="edf.html">edf()</a></code> <code><a href="edf.html">model_edf()</a></code>
+          <code><a href="draw.parametric_effects.html">draw(<i>&lt;parametric_effects&gt;</i>)</a></code>
 
         </dt>
-        <dd>Effective degrees of freedom for smooths and GAMs</dd>
+        <dd>Plot estimated effects for model parametric terms</dd>
 
         <dt>
 
-          <code><a href="eval_smooth.html">eval_smooth()</a></code>
+          <code><a href="add_confint.html">add_confint()</a></code>
 
         </dt>
-        <dd>S3 methods to evaluate individual smooths</dd>
+        <dd>Add a confidence interval to an existing object</dd>
 
         <dt>
 
-          <code><a href="evaluate_parametric_term.html">evaluate_parametric_term()</a></code>
-          <span class="badge lifecycle lifecycle-deprecated">deprecated</span>
+          <code><a href="confint.gam.html">confint(<i>&lt;gam&gt;</i>)</a></code> <code><a href="confint.gam.html">confint(<i>&lt;gamm&gt;</i>)</a></code> <code><a href="confint.gam.html">confint(<i>&lt;gamm4&gt;</i>)</a></code>
+
         </dt>
-        <dd>Evaluate parametric model terms</dd>
+        <dd>Point-wise and simultaneous confidence intervals for smooths</dd>
 
         <dt>
 
-          <code><a href="evaluate_smooth.html">evaluate_smooth()</a></code>
-          <span class="badge lifecycle lifecycle-deprecated">deprecated</span>
+          <code><a href="add_constant.html">add_constant()</a></code>
+
         </dt>
-        <dd>Evaluate a smooth</dd>
+        <dd>Add a constant to estimated values</dd>
 
         <dt>
 
-          <code><a href="evenly.html">evenly()</a></code> <code><a href="evenly.html">all_levels()</a></code> <code><a href="evenly.html">seq_min_max()</a></code>
+          <code><a href="transform_fun.html">transform_fun()</a></code>
 
         </dt>
-        <dd>Create a sequence of evenly-spaced values</dd>
+        <dd>Transform estimated values and confidence intervals by applying a function</dd>
+
+        <dt>
+
+          <code><a href="partial_residuals.html">partial_residuals()</a></code>
+
+        </dt>
+        <dd>Partial residuals</dd>
+
+        <dt>
+
+          <code><a href="add_partial_residuals.html">add_partial_residuals()</a></code>
+
+        </dt>
+        <dd>Add partial residuals</dd>
+      </dl></div><div class="section level2">
+      <h2 id="predict-responses">Predict responses<a class="anchor" aria-label="anchor" href="#predict-responses"></a></h2>
+
+      <div class="section-desc"><p>Predict from the whole model at observed or chosen covariate values, combining model terms rather than estimating individual term effects.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="fitted_values.html">fitted_values()</a></code>
+
+        </dt>
+        <dd>Generate fitted values from a estimated GAM</dd>
+
+        <dt>
+
+          <code><a href="conditional_values.html">conditional_values()</a></code>
+
+        </dt>
+        <dd>Conditional predictions from a GAM</dd>
+
+        <dt>
+
+          <code><a href="draw.conditional_values.html">draw(<i>&lt;conditional_values&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot conditional predictions</dd>
+
+        <dt>
+
+          <code><a href="add_fitted.html">add_fitted()</a></code>
+
+        </dt>
+        <dd>Add fitted values from a model to a data frame</dd>
+
+        <dt>
+
+          <code><a href="add_fitted.gam.html">add_fitted(<i>&lt;gam&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Add fitted values from a GAM to a data frame</dd>
+      </dl></div><div class="section level2">
+      <h2 id="compare-smooths-and-predictions">Compare smooths and predictions<a class="anchor" aria-label="anchor" href="#compare-smooths-and-predictions"></a></h2>
+
+      <div class="section-desc"><p>Use <code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> for differences between factor-by smooths, <code><a href="../reference/conditional_differences.html">conditional_differences()</a></code> for contrasts of whole-model predictions, and <code><a href="../reference/compare_smooths.html">compare_smooths()</a></code> to compare smooth estimates across models.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="difference_smooths.html">difference_smooths()</a></code>
+
+        </dt>
+        <dd>Differences of factor smooth interactions</dd>
+
+        <dt>
+
+          <code><a href="draw.difference_smooth.html">draw(<i>&lt;difference_smooth&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot differences of smooths</dd>
+
+        <dt>
+
+          <code><a href="conditional_differences.html">conditional_differences()</a></code>
+
+        </dt>
+        <dd>Conditional differences of fitted values from a GAM</dd>
+
+        <dt>
+
+          <code><a href="draw.conditional_differences.html">draw(<i>&lt;conditional_differences&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot conditional differences</dd>
+
+        <dt>
+
+          <code><a href="compare_smooths.html">compare_smooths()</a></code>
+
+        </dt>
+        <dd>Compare smooths across models</dd>
+
+        <dt>
+
+          <code><a href="draw.compare_smooths.html">draw(<i>&lt;compare_smooths&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot comparisons of smooths</dd>
+      </dl></div><div class="section level2">
+      <h2 id="estimate-derivatives-and-identify-change">Estimate derivatives and identify change<a class="anchor" aria-label="anchor" href="#estimate-derivatives-and-identify-change"></a></h2>
+
+      <div class="section-desc"><p>Estimate rates of change in smooths or response predictions and identify regions of change; use <a href="derivative_samples.html">derivative_samples()</a> for posterior draws of derivatives.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="derivatives.html">derivatives()</a></code>
+
+        </dt>
+        <dd>Derivatives of estimated smooths via finite differences</dd>
+
+        <dt>
+
+          <code><a href="partial_derivatives.html">partial_derivatives()</a></code>
+
+        </dt>
+        <dd>Partial derivatives of estimated multivariate smooths via finite differences</dd>
+
+        <dt>
+
+          <code><a href="draw.derivatives.html">draw(<i>&lt;derivatives&gt;</i>)</a></code> <code><a href="draw.derivatives.html">draw(<i>&lt;partial_derivatives&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot derivatives of smooths</dd>
+
+        <dt>
+
+          <code><a href="response_derivatives.html">response_derivatives()</a></code>
+
+        </dt>
+        <dd>Derivatives on the response scale from an estimated GAM</dd>
+
+        <dt>
+
+          <code><a href="add_sizer.html">add_sizer()</a></code>
+
+        </dt>
+        <dd>Add indicators of significant change after SiZeR</dd>
+      </dl></div><div class="section level2">
+      <h2 id="check-model-fit">Check model fit<a class="anchor" aria-label="anchor" href="#check-model-fit"></a></h2>
+
+      <div class="section-desc"><p>Assess model adequacy with <code><a href="../reference/appraise.html">appraise()</a></code>, individual diagnostic plots, residuals, and measures of concurvity.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="appraise.html">appraise()</a></code>
+
+        </dt>
+        <dd>Model diagnostic plots</dd>
+
+        <dt>
+
+          <code><a href="qq_plot.html">qq_plot()</a></code>
+
+        </dt>
+        <dd>Quantile-quantile plot of model residuals</dd>
+
+        <dt>
+
+          <code><a href="worm_plot.html">worm_plot()</a></code>
+
+        </dt>
+        <dd>Worm plot of model residuals</dd>
+
+        <dt>
+
+          <code><a href="rootogram.html">rootogram()</a></code>
+
+        </dt>
+        <dd>Rootograms to assess goodness of model fit</dd>
+
+        <dt>
+
+          <code><a href="draw.rootogram.html">draw(<i>&lt;rootogram&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Draw a rootogram</dd>
+
+        <dt>
+
+          <code><a href="observed_fitted_plot.html">observed_fitted_plot()</a></code>
+
+        </dt>
+        <dd>Plot of fitted against observed response values</dd>
+
+        <dt>
+
+          <code><a href="residuals_hist_plot.html">residuals_hist_plot()</a></code>
+
+        </dt>
+        <dd>Histogram of model residuals</dd>
+
+        <dt>
+
+          <code><a href="residuals_linpred_plot.html">residuals_linpred_plot()</a></code>
+
+        </dt>
+        <dd>Plot of residuals versus linear predictor values</dd>
+
+        <dt>
+
+          <code><a href="quantile_residuals.html">quantile_residuals()</a></code>
+
+        </dt>
+        <dd>Randomised residuals</dd>
+
+        <dt>
+
+          <code><a href="add_residuals.html">add_residuals()</a></code>
+
+        </dt>
+        <dd>Add residuals from a model to a data frame</dd>
+
+        <dt>
+
+          <code><a href="add_residuals.gam.html">add_residuals(<i>&lt;gam&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Add residuals from a GAM to a data frame</dd>
+
+        <dt>
+
+          <code><a href="model_concurvity.html">model_concurvity()</a></code> <code><a href="model_concurvity.html">concrvity()</a></code>
+
+        </dt>
+        <dd>Concurvity of an estimated GAM</dd>
+
+        <dt>
+
+          <code><a href="draw.pairwise_concurvity.html">draw(<i>&lt;pairwise_concurvity&gt;</i>)</a></code> <code><a href="draw.pairwise_concurvity.html">draw(<i>&lt;overall_concurvity&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot concurvity measures</dd>
+      </dl></div><div class="section level2">
+      <h2 id="prepare-data-for-prediction-and-evaluation">Prepare data for prediction and evaluation<a class="anchor" aria-label="anchor" href="#prepare-data-for-prediction-and-evaluation"></a></h2>
+
+      <div class="section-desc"><p>Choose covariate values at which to evaluate a model and restrict evaluation to regions supported by the data; see <a href="../articles/data-slices.html">Data slices</a>.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="data_slice.html">data_slice()</a></code>
+
+        </dt>
+        <dd>Prepare a data slice through model covariates</dd>
+
+        <dt>
+
+          <code><a href="data_combos.html">data_combos()</a></code>
+
+        </dt>
+        <dd>All combinations of factor levels plus typical values of continuous variables</dd>
 
         <dt>
 
@@ -422,7 +441,372 @@
 
         <dt>
 
-          <code><a href="family.gam.html">family(<i>&lt;gam&gt;</i>)</a></code> <code><a href="family.gam.html">family(<i>&lt;gamm&gt;</i>)</a></code> <code><a href="family.gam.html">family(<i>&lt;bam&gt;</i>)</a></code> <code><a href="family.gam.html">family(<i>&lt;list&gt;</i>)</a></code>
+          <code><a href="smooth_data.html">smooth_data()</a></code>
+
+        </dt>
+        <dd>Generate regular data over the covariates of a smooth</dd>
+
+        <dt>
+
+          <code><a href="evenly.html">evenly()</a></code> <code><a href="evenly.html">all_levels()</a></code> <code><a href="evenly.html">seq_min_max()</a></code>
+
+        </dt>
+        <dd>Create a sequence of evenly-spaced values</dd>
+
+        <dt>
+
+          <code><a href="typical_values.html">typical_values()</a></code>
+
+        </dt>
+        <dd>Typical values of model covariates</dd>
+
+        <dt>
+
+          <code><a href="ref_level.html">ref_level()</a></code> <code><a href="ref_level.html">level()</a></code>
+
+        </dt>
+        <dd>Return the reference or specific level of a factor</dd>
+
+        <dt>
+
+          <code><a href="too_far.html">too_far()</a></code>
+
+        </dt>
+        <dd>Exclude values that lie too far from the support of data</dd>
+
+        <dt>
+
+          <code><a href="too_far_to_na.html">too_far_to_na()</a></code>
+
+        </dt>
+        <dd>Set rows of data to <code>NA</code> if the lie too far from a reference set of values</dd>
+      </dl></div><div class="section level2">
+      <h2 id="sample-from-fitted-models">Sample from fitted models<a class="anchor" aria-label="anchor" href="#sample-from-fitted-models"></a></h2>
+
+      <div class="section-desc"><p>Draw individual smooths with <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> or expected responses with <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code>; <code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> generates new responses including model uncertainty, while <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code> simulates responses conditional on the fitted model without model uncertainty. For coefficient draws, use <a href="post_draws.html">post_draws()</a> in the advanced helpers; see <a href="../articles/posterior-simulation.html">Posterior Simulation</a>.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="posterior_samples.html">posterior_samples()</a></code>
+
+        </dt>
+        <dd>Draw samples from the posterior distribution of an estimated model</dd>
+
+        <dt>
+
+          <code><a href="smooth_samples.html">smooth_samples()</a></code>
+
+        </dt>
+        <dd>Posterior draws for individual smooths</dd>
+
+        <dt>
+
+          <code><a href="draw.smooth_samples.html">draw(<i>&lt;smooth_samples&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot posterior smooths</dd>
+
+        <dt>
+
+          <code><a href="fitted_samples.html">fitted_samples()</a></code>
+
+        </dt>
+        <dd>Draw fitted values from the posterior distribution</dd>
+
+        <dt>
+
+          <code><a href="predicted_samples.html">predicted_samples()</a></code>
+
+        </dt>
+        <dd>Draw new response values from the conditional distribution of the response</dd>
+
+        <dt>
+
+          <code><a href="derivative_samples.html">derivative_samples()</a></code>
+
+        </dt>
+        <dd>Posterior expectations of derivatives from an estimated model</dd>
+
+        <dt>
+
+          <code><a href="simulate.html">simulate(<i>&lt;gamm4&gt;</i>)</a></code> <code><a href="simulate.html">simulate(<i>&lt;gam&gt;</i>)</a></code> <code><a href="simulate.html">simulate(<i>&lt;gamm&gt;</i>)</a></code> <code><a href="simulate.html">simulate(<i>&lt;scam&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Simulate from the posterior distribution of a GAM</dd>
+
+        <dt>
+
+          <code><a href="add_fitted_samples.html">add_fitted_samples()</a></code> <code><a href="add_fitted_samples.html">add_predicted_samples()</a></code> <code><a href="add_fitted_samples.html">add_posterior_samples()</a></code> <code><a href="add_fitted_samples.html">add_smooth_samples()</a></code>
+
+        </dt>
+        <dd>Add posterior draws from a model to a data object</dd>
+      </dl></div><div class="section level2">
+      <h2 id="inspect-models-and-smooths">Inspect models and smooths<a class="anchor" aria-label="anchor" href="#inspect-models-and-smooths"></a></h2>
+
+      <div class="section-desc"><p>Discover a fitted model’s structure and extract its parameters, terms, smooth properties, families, and links.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+      <h3 id="model-summaries-and-parameters">Model summaries and parameters<a class="anchor" aria-label="anchor" href="#model-summaries-and-parameters"></a></h3>
+      <div class="section-desc"><p>Summarise model complexity and extract coefficients and other parameters.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="overview.html">overview()</a></code>
+
+        </dt>
+        <dd>Provides an overview of a model and the terms in that model</dd>
+
+        <dt>
+
+          <code><a href="gamm4_support.html">gamm4_support</a></code>
+
+        </dt>
+        <dd>Support for models fitted by gamm4</dd>
+
+        <dt>
+
+          <code><a href="edf.html">edf()</a></code> <code><a href="edf.html">model_edf()</a></code>
+
+        </dt>
+        <dd>Effective degrees of freedom for smooths and GAMs</dd>
+
+        <dt>
+
+          <code><a href="variance_comp.html">variance_comp()</a></code>
+
+        </dt>
+        <dd>Variance components of smooths from smoothness estimates</dd>
+
+        <dt>
+
+          <code><a href="fixed_effects.gam.html">fixed_effects()</a></code>
+
+        </dt>
+        <dd>Extract fixed effects estimates from a fitted model</dd>
+
+        <dt>
+
+          <code><a href="coef.scam.html">coef(<i>&lt;scam&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Extract coefficients from a fitted <code>scam</code> model.</dd>
+
+        <dt>
+
+          <code><a href="get_vcov.html">get_vcov()</a></code>
+
+        </dt>
+        <dd>Extract the covariance matrix of the model parameters or a subset of these for a particular model term</dd>
+
+        <dt>
+
+          <code><a href="model_constant.html">model_constant()</a></code>
+          <span class="badge lifecycle lifecycle-experimental">experimental</span>
+        </dt>
+        <dd>Extract the model constant term</dd>
+
+        <dt>
+
+          <code><a href="dispersion.html">dispersion()</a></code>
+          <span class="badge lifecycle lifecycle-experimental">experimental</span>
+        </dt>
+        <dd>Dispersion parameter for fitted model</dd>
+
+        <dt>
+
+          <code><a href="theta.html">theta()</a></code>
+
+        </dt>
+        <dd>General extractor for additional parameters in mgcv models</dd>
+
+        <dt>
+
+          <code><a href="nb_theta.html">nb_theta()</a></code>
+
+        </dt>
+        <dd>Negative binomial parameter theta</dd>
+
+        <dt>
+
+          <code><a href="null_deviance.html">null_deviance()</a></code>
+
+        </dt>
+        <dd>Extract the null deviance of a fitted model</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="terms-and-variables">Terms and variables<a class="anchor" aria-label="anchor" href="#terms-and-variables"></a></h3>
+      <div class="section-desc"><p>Identify the terms and covariates used in a fitted model.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="smooths.html">smooths()</a></code>
+
+        </dt>
+        <dd>Names of smooths in a GAM</dd>
+
+        <dt>
+
+          <code><a href="n_smooths.html">n_smooths()</a></code>
+
+        </dt>
+        <dd>How many smooths in a fitted model</dd>
+
+        <dt>
+
+          <code><a href="which_smooths.html">which_smooths()</a></code>
+
+        </dt>
+        <dd>Identify a smooth term by its label</dd>
+
+        <dt>
+
+          <code><a href="parametric_terms.html">parametric_terms()</a></code>
+
+        </dt>
+        <dd>Names of any parametric terms in a GAM</dd>
+
+        <dt>
+
+          <code><a href="model_terms.html">model_terms()</a></code>
+
+        </dt>
+        <dd>Find the names of model terms</dd>
+
+        <dt>
+
+          <code><a href="model_vars.html">model_vars()</a></code>
+
+        </dt>
+        <dd>List the variables involved in a model fitted with a formula</dd>
+
+        <dt>
+
+          <code><a href="term_names.html">term_names()</a></code>
+
+        </dt>
+        <dd>Extract names of all variables needed to fit a GAM or a smooth</dd>
+
+        <dt>
+
+          <code><a href="term_variables.html">term_variables()</a></code>
+
+        </dt>
+        <dd>Names of variables involved in a specified model term</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="smooth-objects-and-properties">Smooth objects and properties<a class="anchor" aria-label="anchor" href="#smooth-objects-and-properties"></a></h3>
+      <div class="section-desc"><p>Extract smooth objects and inspect their structure and coefficients.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="get_smooth.html">get_smooth()</a></code>
+
+        </dt>
+        <dd>Extract an mgcv smooth by name</dd>
+
+        <dt>
+
+          <code><a href="get_by_smooth.html">get_by_smooth()</a></code>
+
+        </dt>
+        <dd>Extract an factor-by smooth by name</dd>
+
+        <dt>
+
+          <code><a href="get_smooths_by_id.html">get_smooths_by_id()</a></code>
+
+        </dt>
+        <dd>Extract an mgcv smooth given its position in the model object</dd>
+
+        <dt>
+
+          <code><a href="basis_size.html">basis_size()</a></code>
+
+        </dt>
+        <dd>Extract basis dimension of a smooth</dd>
+
+        <dt>
+
+          <code><a href="smooth_dim.html">smooth_dim()</a></code>
+
+        </dt>
+        <dd>Dimension of a smooth</dd>
+
+        <dt>
+
+          <code><a href="smooth_label.html">smooth_label()</a></code>
+
+        </dt>
+        <dd>Extract the label for a smooth used by 'mgcv'</dd>
+
+        <dt>
+
+          <code><a href="smooth_type.html">smooth_type()</a></code>
+
+        </dt>
+        <dd>Determine the type of smooth and return it n a human readable form</dd>
+
+        <dt>
+
+          <code><a href="smooth_terms.html">smooth_terms()</a></code>
+          <span class="badge lifecycle lifecycle-experimental">experimental</span>
+        </dt>
+        <dd>List the variables involved in smooths</dd>
+
+        <dt>
+
+          <code><a href="smooth_coefs.html">smooth_coefs()</a></code>
+
+        </dt>
+        <dd>Coefficients for a particular smooth</dd>
+
+        <dt>
+
+          <code><a href="smooth_coef_indices.html">smooth_coef_indices()</a></code>
+
+        </dt>
+        <dd>Indices of the parametric terms for a particular smooth</dd>
+
+        <dt>
+
+          <code><a href="is_by_smooth.html">is_by_smooth()</a></code> <code><a href="is_by_smooth.html">is_factor_by_smooth()</a></code> <code><a href="is_by_smooth.html">is_continuous_by_smooth()</a></code> <code><a href="is_by_smooth.html">by_variable()</a></code> <code><a href="is_by_smooth.html">by_level()</a></code>
+
+        </dt>
+        <dd>Tests for by variable smooths</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="families-and-links">Families and links<a class="anchor" aria-label="anchor" href="#families-and-links"></a></h3>
+      <div class="section-desc"><p>Inspect response distributions, link functions, and linear predictors.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="family.gam.html">family(<i>&lt;gam&gt;</i>)</a></code> <code><a href="family.gam.html">family(<i>&lt;gamm&gt;</i>)</a></code> <code><a href="family.gam.html">family(<i>&lt;bam&gt;</i>)</a></code> <code><a href="family.gam.html">family(<i>&lt;gamm4&gt;</i>)</a></code>
 
         </dt>
         <dd>Extract family objects from models</dd>
@@ -443,80 +827,10 @@
 
         <dt>
 
-          <code><a href="fitted_samples.html">fitted_samples()</a></code>
+          <code><a href="link.html">link()</a></code> <code><a href="link.html">inv_link()</a></code> <code><a href="link.html">extract_link()</a></code>
 
         </dt>
-        <dd>Draw fitted values from the posterior distribution</dd>
-
-        <dt>
-
-          <code><a href="fitted_values.html">fitted_values()</a></code>
-
-        </dt>
-        <dd>Generate fitted values from a estimated GAM</dd>
-
-        <dt>
-
-          <code><a href="fix_offset.html">fix_offset()</a></code>
-
-        </dt>
-        <dd>Fix the names of a data frame containing an offset variable.</dd>
-
-        <dt>
-
-          <code><a href="fixed_effects.gam.html">fixed_effects()</a></code>
-
-        </dt>
-        <dd>Extract fixed effects estimates from a fitted model</dd>
-
-        <dt>
-
-          <code><a href="gaussian_draws.html">gaussian_draws()</a></code>
-
-        </dt>
-        <dd>Posterior samples using a simple Metropolis Hastings sampler</dd>
-
-        <dt>
-
-          <code><a href="get_by_smooth.html">get_by_smooth()</a></code>
-
-        </dt>
-        <dd>Extract an factor-by smooth by name</dd>
-
-        <dt>
-
-          <code><a href="get_smooth.html">get_smooth()</a></code>
-
-        </dt>
-        <dd>Extract an mgcv smooth by name</dd>
-
-        <dt>
-
-          <code><a href="get_smooths_by_id.html">get_smooths_by_id()</a></code>
-
-        </dt>
-        <dd>Extract an mgcv smooth given its position in the model object</dd>
-
-        <dt>
-
-          <code><a href="get_vcov.html">get_vcov()</a></code>
-
-        </dt>
-        <dd>Extract the covariance matrix of the model parameters or a subset of these for a particular model term</dd>
-
-        <dt>
-
-          <code><a href="gss_vocab.html">gss_vocab</a></code>
-
-        </dt>
-        <dd>Data from the General Social Survey (GSS) from the National Opinion Research Center of the University of Chicago</dd>
-
-        <dt>
-
-          <code><a href="gw_functions.html">gw_f0()</a></code> <code><a href="gw_functions.html">gw_f1()</a></code> <code><a href="gw_functions.html">gw_f2()</a></code> <code><a href="gw_functions.html">gw_f3()</a></code>
-
-        </dt>
-        <dd>Gu and Wahba test functions</dd>
+        <dd>Extract link and inverse link functions from models</dd>
 
         <dt>
 
@@ -527,10 +841,212 @@
 
         <dt>
 
-          <code><a href="is_by_smooth.html">is_by_smooth()</a></code> <code><a href="is_by_smooth.html">is_factor_by_smooth()</a></code> <code><a href="is_by_smooth.html">is_continuous_by_smooth()</a></code> <code><a href="is_by_smooth.html">by_variable()</a></code> <code><a href="is_by_smooth.html">by_level()</a></code>
+          <code><a href="n_eta.html">n_eta()</a></code>
+          <span class="badge lifecycle lifecycle-experimental">experimental</span>
+        </dt>
+        <dd>The Number of linear predictors in model</dd>
+      </dl></div><div class="section level2">
+      <h2 id="explore-spline-bases-and-penalties">Explore spline bases and penalties<a class="anchor" aria-label="anchor" href="#explore-spline-bases-and-penalties"></a></h2>
+
+      <div class="section-desc"><p>Inspect and visualise the basis functions and penalties that define smooths.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="basis.html">basis()</a></code>
 
         </dt>
-        <dd>Tests for by variable smooths</dd>
+        <dd>Basis expansions for smooths</dd>
+
+        <dt>
+
+          <code><a href="draw.basis.html">draw(<i>&lt;basis&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot basis functions</dd>
+
+        <dt>
+
+          <code><a href="tidy_basis.html">tidy_basis()</a></code>
+
+        </dt>
+        <dd>A tidy basis representation of a smooth object</dd>
+
+        <dt>
+
+          <code><a href="draw.mgcv_smooth.html">draw(<i>&lt;mgcv_smooth&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot basis functions</dd>
+
+        <dt>
+
+          <code><a href="penalty.html">penalty()</a></code>
+
+        </dt>
+        <dd>Extract and tidy penalty matrices</dd>
+
+        <dt>
+
+          <code><a href="draw.penalty_df.html">draw(<i>&lt;penalty_df&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Display penalty matrices of smooths using <code>ggplot</code></dd>
+
+        <dt>
+
+          <code><a href="boundary.html">boundary()</a></code>
+          <span class="badge lifecycle lifecycle-experimental">experimental</span>
+        </dt>
+        <dd>Extract the boundary of a soap film smooth</dd>
+      </dl></div><div class="section level2">
+      <h2 id="example-data-and-simulation">Example data and simulation<a class="anchor" aria-label="anchor" href="#example-data-and-simulation"></a></h2>
+
+      <div class="section-desc"><p>Generate example data or use bundled data sets to learn and demonstrate GAM workflows.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="data_sim.html">data_sim()</a></code>
+
+        </dt>
+        <dd>Simulate example data for fitting GAMs</dd>
+
+        <dt>
+
+          <code><a href="gw_functions.html">gw_f0()</a></code> <code><a href="gw_functions.html">gw_f1()</a></code> <code><a href="gw_functions.html">gw_f2()</a></code> <code><a href="gw_functions.html">gw_f3()</a></code>
+
+        </dt>
+        <dd>Gu and Wahba test functions</dd>
+
+        <dt>
+
+          <code><a href="rtw.html">rtw()</a></code>
+
+        </dt>
+        <dd>Simulator for tweedie LSS models</dd>
+
+        <dt>
+
+          <code><a href="bird_move.html">bird_move</a></code>
+
+        </dt>
+        <dd>Simulated bird migration data</dd>
+
+        <dt>
+
+          <code><a href="gss_vocab.html">gss_vocab</a></code>
+
+        </dt>
+        <dd>Data from the General Social Survey (GSS) from the National Opinion Research Center of the University of Chicago</dd>
+
+        <dt>
+
+          <code><a href="ref_sims.html">ref_sims</a></code>
+
+        </dt>
+        <dd>Reference simulation data</dd>
+
+        <dt>
+
+          <code><a href="smallAges.html">smallAges</a></code>
+
+        </dt>
+        <dd>Lead-210 age-depth measurements for Small Water</dd>
+
+        <dt>
+
+          <code><a href="zooplankton.html">zooplankton</a></code>
+
+        </dt>
+        <dd>Madison lakes zooplankton data</dd>
+      </dl></div><div class="section level2">
+      <h2 id="advanced-programming-helpers">Advanced programming helpers<a class="anchor" aria-label="anchor" href="#advanced-programming-helpers"></a></h2>
+
+      <div class="section-desc"><p>Build custom computations using lower-level evaluation, sampling, and validation tools.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+      <h3 id="model-evaluation-and-posterior-sampling">Model evaluation and posterior sampling<a class="anchor" aria-label="anchor" href="#model-evaluation-and-posterior-sampling"></a></h3>
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="lp_matrix.html">lp_matrix()</a></code>
+
+        </dt>
+        <dd>Return the linear prediction matrix of a fitted GAM</dd>
+
+        <dt>
+
+          <code><a href="eval_smooth.html">eval_smooth()</a></code>
+
+        </dt>
+        <dd>S3 methods to evaluate individual smooths</dd>
+
+        <dt>
+
+          <code><a href="spline_values.html">spline_values()</a></code>
+
+        </dt>
+        <dd>Evaluate a spline at provided covariate values</dd>
+
+        <dt>
+
+          <code><a href="post_draws.html">post_draws()</a></code> <code><a href="post_draws.html">generate_draws()</a></code>
+
+        </dt>
+        <dd>Low-level Functions to generate draws from the posterior distribution of model coefficients</dd>
+
+        <dt>
+
+          <code><a href="gaussian_draws.html">gaussian_draws()</a></code>
+
+        </dt>
+        <dd>Posterior samples using a simple Metropolis Hastings sampler</dd>
+
+        <dt>
+
+          <code><a href="mh_draws.html">mh_draws()</a></code>
+
+        </dt>
+        <dd>Posterior samples using a Gaussian approximation to the posterior distribution</dd>
+
+        <dt>
+
+          <code><a href="user_draws.html">user_draws()</a></code>
+
+        </dt>
+        <dd>Handle user-supplied posterior draws</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="validation-and-data-utilities">Validation and data utilities<a class="anchor" aria-label="anchor" href="#validation-and-data-utilities"></a></h3>
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="check_user_select_smooths.html">check_user_select_smooths()</a></code>
+
+        </dt>
+        <dd>Select smooths based on user's choices</dd>
 
         <dt>
 
@@ -569,234 +1085,10 @@
 
         <dt>
 
-          <code><a href="link.html">link()</a></code> <code><a href="link.html">inv_link()</a></code> <code><a href="link.html">extract_link()</a></code>
+          <code><a href="fix_offset.html">fix_offset()</a></code>
 
         </dt>
-        <dd>Extract link and inverse link functions from models</dd>
-
-        <dt>
-
-          <code><a href="load_mgcv.html">load_mgcv()</a></code>
-
-        </dt>
-        <dd>Load mgcv quietly</dd>
-
-        <dt>
-
-          <code><a href="lp_matrix.html">lp_matrix()</a></code>
-
-        </dt>
-        <dd>Return the linear prediction matrix of a fitted GAM</dd>
-
-        <dt>
-
-          <code><a href="mh_draws.html">mh_draws()</a></code>
-
-        </dt>
-        <dd>Posterior samples using a Gaussian approximation to the posterior distribution</dd>
-
-        <dt>
-
-          <code><a href="model_concurvity.html">model_concurvity()</a></code> <code><a href="model_concurvity.html">concrvity()</a></code>
-
-        </dt>
-        <dd>Concurvity of an estimated GAM</dd>
-
-        <dt>
-
-          <code><a href="model_constant.html">model_constant()</a></code>
-          <span class="badge lifecycle lifecycle-experimental">experimental</span>
-        </dt>
-        <dd>Extract the model constant term</dd>
-
-        <dt>
-
-          <code><a href="model_terms.html">model_terms()</a></code>
-
-        </dt>
-        <dd>Find the names of model terms</dd>
-
-        <dt>
-
-          <code><a href="model_vars.html">model_vars()</a></code>
-
-        </dt>
-        <dd>List the variables involved in a model fitted with a formula</dd>
-
-        <dt>
-
-          <code><a href="n_eta.html">n_eta()</a></code>
-          <span class="badge lifecycle lifecycle-experimental">experimental</span>
-        </dt>
-        <dd>The Number of linear predictors in model</dd>
-
-        <dt>
-
-          <code><a href="n_smooths.html">n_smooths()</a></code>
-
-        </dt>
-        <dd>How many smooths in a fitted model</dd>
-
-        <dt>
-
-          <code><a href="nb_theta.html">nb_theta()</a></code>
-
-        </dt>
-        <dd>Negative binomial parameter theta</dd>
-
-        <dt>
-
-          <code><a href="null_deviance.html">null_deviance()</a></code>
-
-        </dt>
-        <dd>Extract the null deviance of a fitted model</dd>
-
-        <dt>
-
-          <code><a href="observed_fitted_plot.html">observed_fitted_plot()</a></code>
-
-        </dt>
-        <dd>Plot of fitted against observed response values</dd>
-
-        <dt>
-
-          <code><a href="overview.html">overview()</a></code>
-
-        </dt>
-        <dd>Provides an overview of a model and the terms in that model</dd>
-
-        <dt>
-
-          <code><a href="parametric_effects.html">parametric_effects()</a></code>
-
-        </dt>
-        <dd>Estimated values for parametric model terms</dd>
-
-        <dt>
-
-          <code><a href="parametric_terms.html">parametric_terms()</a></code>
-
-        </dt>
-        <dd>Names of any parametric terms in a GAM</dd>
-
-        <dt>
-
-          <code><a href="partial_derivatives.html">partial_derivatives()</a></code>
-
-        </dt>
-        <dd>Partial derivatives of estimated multivariate smooths via finite differences</dd>
-
-        <dt>
-
-          <code><a href="partial_residuals.html">partial_residuals()</a></code>
-
-        </dt>
-        <dd>Partial residuals</dd>
-
-        <dt>
-
-          <code><a href="penalty.html">penalty()</a></code>
-
-        </dt>
-        <dd>Extract and tidy penalty matrices</dd>
-
-        <dt>
-
-          <code><a href="post_draws.html">post_draws()</a></code> <code><a href="post_draws.html">generate_draws()</a></code>
-
-        </dt>
-        <dd>Low-level Functions to generate draws from the posterior distribution of model coefficients</dd>
-
-        <dt>
-
-          <code><a href="posterior_samples.html">posterior_samples()</a></code>
-
-        </dt>
-        <dd>Draw samples from the posterior distribution of an estimated model</dd>
-
-        <dt>
-
-          <code><a href="predicted_samples.html">predicted_samples()</a></code>
-
-        </dt>
-        <dd>Draw new response values from the conditional distribution of the response</dd>
-
-        <dt>
-
-          <code><a href="qq_plot.html">qq_plot()</a></code>
-
-        </dt>
-        <dd>Quantile-quantile plot of model residuals</dd>
-
-        <dt>
-
-          <code><a href="quantile_residuals.html">quantile_residuals()</a></code>
-
-        </dt>
-        <dd>Randomised residuals</dd>
-
-        <dt>
-
-          <code><a href="ref_level.html">ref_level()</a></code> <code><a href="ref_level.html">level()</a></code>
-
-        </dt>
-        <dd>Return the reference or specific level of a factor</dd>
-
-        <dt>
-
-          <code><a href="ref_sims.html">ref_sims</a></code>
-
-        </dt>
-        <dd>Reference simulation data</dd>
-
-        <dt>
-
-          <code><a href="rep_first_factor_value.html">rep_first_factor_value()</a></code>
-
-        </dt>
-        <dd>Repeat the first level of a factor n times</dd>
-
-        <dt>
-
-          <code><a href="residuals_hist_plot.html">residuals_hist_plot()</a></code>
-
-        </dt>
-        <dd>Histogram of model residuals</dd>
-
-        <dt>
-
-          <code><a href="residuals_linpred_plot.html">residuals_linpred_plot()</a></code>
-
-        </dt>
-        <dd>Plot of residuals versus linear predictor values</dd>
-
-        <dt>
-
-          <code><a href="response_derivatives.html">response_derivatives()</a></code>
-
-        </dt>
-        <dd>Derivatives on the response scale from an estimated GAM</dd>
-
-        <dt>
-
-          <code><a href="rootogram.html">rootogram()</a></code>
-
-        </dt>
-        <dd>Rootograms to assess goodness of model fit</dd>
-
-        <dt>
-
-          <code><a href="rtw.html">rtw()</a></code>
-
-        </dt>
-        <dd>Simulator for tweedie LSS models</dd>
-
-        <dt>
-
-          <code><a href="scale_fill_partial_effect.html">scale_fill_partial_effect()</a></code>
-
-        </dt>
-        <dd>Default diverging red-blue colour palette for partial effects</dd>
+        <dd>Fix the names of a data frame containing an offset variable.</dd>
 
         <dt>
 
@@ -814,122 +1106,10 @@
 
         <dt>
 
-          <code><a href="simulate.html">simulate(<i>&lt;gam&gt;</i>)</a></code> <code><a href="simulate.html">simulate(<i>&lt;gamm&gt;</i>)</a></code> <code><a href="simulate.html">simulate(<i>&lt;scam&gt;</i>)</a></code>
+          <code><a href="rep_first_factor_value.html">rep_first_factor_value()</a></code>
 
         </dt>
-        <dd>Simulate from the posterior distribution of a GAM</dd>
-
-        <dt>
-
-          <code><a href="smallAges.html">smallAges</a></code>
-
-        </dt>
-        <dd>Lead-210 age-depth measurements for Small Water</dd>
-
-        <dt>
-
-          <code><a href="smooth_coef_indices.html">smooth_coef_indices()</a></code>
-
-        </dt>
-        <dd>Indices of the parametric terms for a particular smooth</dd>
-
-        <dt>
-
-          <code><a href="smooth_coefs.html">smooth_coefs()</a></code>
-
-        </dt>
-        <dd>Coefficients for a particular smooth</dd>
-
-        <dt>
-
-          <code><a href="smooth_data.html">smooth_data()</a></code>
-
-        </dt>
-        <dd>Generate regular data over the covariates of a smooth</dd>
-
-        <dt>
-
-          <code><a href="smooth_dim.html">smooth_dim()</a></code>
-
-        </dt>
-        <dd>Dimension of a smooth</dd>
-
-        <dt>
-
-          <code><a href="smooth_estimates.html">smooth_estimates()</a></code>
-
-        </dt>
-        <dd>Evaluate smooths at covariate values</dd>
-
-        <dt>
-
-          <code><a href="smooth_label.html">smooth_label()</a></code>
-
-        </dt>
-        <dd>Extract the label for a smooth used by 'mgcv'</dd>
-
-        <dt>
-
-          <code><a href="smooth_samples.html">smooth_samples()</a></code>
-
-        </dt>
-        <dd>Posterior draws for individual smooths</dd>
-
-        <dt>
-
-          <code><a href="smooth_terms.html">smooth_terms()</a></code>
-          <span class="badge lifecycle lifecycle-experimental">experimental</span>
-        </dt>
-        <dd>List the variables involved in smooths</dd>
-
-        <dt>
-
-          <code><a href="smooth_type.html">smooth_type()</a></code>
-
-        </dt>
-        <dd>Determine the type of smooth and return it n a human readable form</dd>
-
-        <dt>
-
-          <code><a href="smooths.html">smooths()</a></code>
-
-        </dt>
-        <dd>Names of smooths in a GAM</dd>
-
-        <dt>
-
-          <code><a href="spline_values.html">spline_values()</a></code>
-
-        </dt>
-        <dd>Evaluate a spline at provided covariate values</dd>
-
-        <dt>
-
-          <code><a href="term_names.html">term_names()</a></code>
-
-        </dt>
-        <dd>Extract names of all variables needed to fit a GAM or a smooth</dd>
-
-        <dt>
-
-          <code><a href="term_variables.html">term_variables()</a></code>
-
-        </dt>
-        <dd>Names of variables involved in a specified model term</dd>
-
-        <dt>
-
-          <code><a href="theta.html">theta()</a></code>
-
-        </dt>
-        <dd>General extractor for additional parameters in mgcv models</dd>
-
-        <dt>
-
-          <code><a href="tidy_basis.html">tidy_basis()</a></code>
-
-        </dt>
-        <dd>A tidy basis representation of a smooth object</dd>
+        <dd>Repeat the first level of a factor n times</dd>
 
         <dt>
 
@@ -940,48 +1120,6 @@
 
         <dt>
 
-          <code><a href="too_far.html">too_far()</a></code>
-
-        </dt>
-        <dd>Exclude values that lie too far from the support of data</dd>
-
-        <dt>
-
-          <code><a href="too_far_to_na.html">too_far_to_na()</a></code>
-
-        </dt>
-        <dd>Set rows of data to <code>NA</code> if the lie too far from a reference set of values</dd>
-
-        <dt>
-
-          <code><a href="transform_fun.html">transform_fun()</a></code>
-
-        </dt>
-        <dd>Transform estimated values and confidence intervals by applying a function</dd>
-
-        <dt>
-
-          <code><a href="typical_values.html">typical_values()</a></code>
-
-        </dt>
-        <dd>Typical values of model covariates</dd>
-
-        <dt>
-
-          <code><a href="user_draws.html">user_draws()</a></code>
-
-        </dt>
-        <dd>Handle user-supplied posterior draws</dd>
-
-        <dt>
-
-          <code><a href="variance_comp.html">variance_comp()</a></code>
-
-        </dt>
-        <dd>Variance components of smooths from smoothness estimates</dd>
-
-        <dt>
-
           <code><a href="vars_from_label.html">vars_from_label()</a></code>
 
         </dt>
@@ -989,26 +1127,50 @@
 
         <dt>
 
-          <code><a href="which_smooths.html">which_smooths()</a></code>
+          <code><a href="load_mgcv.html">load_mgcv()</a></code>
 
         </dt>
-        <dd>Identify a smooth term by its label</dd>
+        <dd>Load mgcv quietly</dd>
+      </dl></div><div class="section level2">
+      <h2 id="deprecated-and-legacy-interfaces">Deprecated and legacy interfaces<a class="anchor" aria-label="anchor" href="#deprecated-and-legacy-interfaces"></a></h2>
+
+      <div class="section-desc"><p>Reference for older code; use <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>, <code><a href="../reference/parametric_effects.html">parametric_effects()</a></code>, and <code><a href="../reference/derivatives.html">derivatives()</a></code> for new analyses.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="evaluate_smooth.html">evaluate_smooth()</a></code>
+          <span class="badge lifecycle lifecycle-deprecated">deprecated</span>
+        </dt>
+        <dd>Evaluate a smooth</dd>
 
         <dt>
 
-          <code><a href="worm_plot.html">worm_plot()</a></code>
-
+          <code><a href="evaluate_parametric_term.html">evaluate_parametric_term()</a></code>
+          <span class="badge lifecycle lifecycle-deprecated">deprecated</span>
         </dt>
-        <dd>Worm plot of model residuals</dd>
+        <dd>Evaluate parametric model terms</dd>
 
         <dt>
 
-          <code><a href="zooplankton.html">zooplankton</a></code>
+          <code><a href="draw.evaluated_parametric_term.html">draw(<i>&lt;evaluated_parametric_term&gt;</i>)</a></code>
+          <span class="badge lifecycle lifecycle-deprecated">deprecated</span>
+        </dt>
+        <dd>Plot estimated parametric effects</dd>
+
+        <dt>
+
+          <code><a href="confint.fderiv.html">confint(<i>&lt;fderiv&gt;</i>)</a></code>
 
         </dt>
-        <dd>Madison lakes zooplankton data</dd>
+        <dd>Point-wise and simultaneous confidence intervals for derivatives of smooths</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

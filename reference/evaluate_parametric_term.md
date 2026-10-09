@@ -12,6 +12,9 @@ evaluate_parametric_term(object, ...)
 
 # S3 method for class 'gam'
 evaluate_parametric_term(object, term, unconditional = FALSE, ...)
+
+# S3 method for class 'gamm4'
+evaluate_parametric_term(object, ...)
 ```
 
 ## Arguments
@@ -33,3 +36,7 @@ evaluate_parametric_term(object, term, unconditional = FALSE, ...)
   logical; should confidence intervals include the uncertainty due to
   smoothness selection? If `TRUE`, the corrected Bayesian covariance
   matrix will be used.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)

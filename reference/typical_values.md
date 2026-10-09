@@ -12,6 +12,9 @@ typical_values(object, vars = everything(), data = NULL, ...)
 
 # S3 method for class 'data.frame'
 typical_values(object, vars = everything(), ...)
+
+# S3 method for class 'gamm4'
+typical_values(object, ...)
 ```
 
 ## Arguments
@@ -34,3 +37,7 @@ typical_values(object, vars = everything(), ...)
   an optional data frame supplying covariate classes. By default, these
   are taken from the stored model frame; typical values come from the
   fitted model's covariate summaries.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)

@@ -27,6 +27,9 @@ fitted_values(object, ...)
 
 # S3 method for class 'scam'
 fitted_values(object, ...)
+
+# S3 method for class 'gamm4'
+fitted_values(object, ...)
 ```
 
 ## Arguments
@@ -179,6 +182,10 @@ are returned, the `se` component of the returned object is on the *link*
 (*linear predictor*) scale, not the response scale. An exception is the
 [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) family, for
 which the `se` is on the response scale if `scale = "response"`.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Examples
 

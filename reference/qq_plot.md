@@ -38,6 +38,9 @@ qq_plot(model, ...)
 
 # S3 method for class 'lm'
 qq_plot(model, ...)
+
+# S3 method for class 'gamm4'
+qq_plot(model, ...)
 ```
 
 ## Arguments
@@ -176,6 +179,8 @@ Analysis* **56**, 2404-2409
 
 [mgcv::qq.gam](https://rdrr.io/pkg/mgcv/man/qq.gam.html) for more
 details on the methods used.
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Examples
 

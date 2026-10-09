@@ -6,6 +6,9 @@ Add fitted values from a model to a data frame
 
 ``` r
 add_fitted(data, model, value = ".value", ...)
+
+# S3 method for class 'gamm4'
+add_fitted(data, model, ...)
 ```
 
 ## Arguments
@@ -35,3 +38,7 @@ add_fitted(data, model, value = ".value", ...)
 ## Value
 
 A data frame (tibble) formed from `data` and fitted values from `model`.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)

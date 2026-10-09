@@ -6,6 +6,9 @@ Add residuals from a model to a data frame
 
 ``` r
 add_residuals(data, model, value = ".residual", ...)
+
+# S3 method for class 'gamm4'
+add_residuals(data, model, ...)
 ```
 
 ## Arguments
@@ -35,3 +38,7 @@ add_residuals(data, model, value = ".residual", ...)
 ## Value
 
 A data frame (tibble) formed from `data` and residuals from `model`.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)

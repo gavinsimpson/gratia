@@ -5,6 +5,9 @@ Identify a smooth term by its label
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+which_smooths(object, ...)
+
 which_smooths(object, ...)
 
 # Default S3 method
@@ -34,3 +37,7 @@ which_smooths(object, terms, ...)
 
   character; one or more (partial) term labels with which to identify
   required smooths.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)

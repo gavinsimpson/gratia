@@ -10,6 +10,9 @@ data_combos(object, ...)
 
 # S3 method for class 'gam'
 data_combos(object, vars = everything(), complete = TRUE, data = NULL, ...)
+
+# S3 method for class 'gamm4'
+data_combos(object, ...)
 ```
 
 ## Arguments
@@ -38,3 +41,7 @@ data_combos(object, vars = everything(), complete = TRUE, data = NULL, ...)
   an optional data frame supplying covariate classes. By default, these
   are taken from the stored model frame; typical values come from the
   fitted model's covariate summaries.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)

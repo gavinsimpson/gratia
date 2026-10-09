@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-34</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-36</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +37,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Handle user-supplied posterior draws</h1>
-      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/samplers.R" class="external-link"><code>R/samplers.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/gamm4-methods.R" class="external-link"><code>R/gamm4-methods.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/samplers.R" class="external-link"><code>R/samplers.R</code></a></small>
       <div class="d-none name"><code>user_draws.Rd</code></div>
     </div>
 
@@ -47,7 +47,10 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">user_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">draws</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'gamm4'</span></span>
+<span><span class="fu">user_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">draws</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">user_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">draws</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gam'</span></span>
 <span><span class="fu">user_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">draws</span>, index <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
@@ -58,11 +61,9 @@
 
 
 <dl><dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
-<dd><p>a fitted R model. Currently only models fitted by <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code>
-or <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">mgcv::bam()</a></code>, or return an object that <em>inherits</em> from such objects are
-supported. Here, "inherits" is used in a loose fashion; models fitted by
-<code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam::scam()</a></code> are support even though those models don't strictly inherit
-from class <code>"gam"</code> as far as <code><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits()</a></code> is concerned.</p></dd>
+<dd><p>a fitted model from <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">mgcv::bam()</a></code>,
+<code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam::scam()</a></code>, or <code><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html" class="external-link">gamm4::gamm4()</a></code>, or a model inheriting from these
+classes. See <a href="gamm4_support.html">gamm4_support</a> for sampling from gamm4 fits.</p></dd>
 
 
 <dt id="arg-draws">draws<a class="anchor" aria-label="anchor" href="#arg-draws"></a></dt>
@@ -87,6 +88,10 @@ argument <code>index</code>, which can be used to subset (select) coefficients
 columns of a matrix. <code>index</code> is useful if you have a set of posterior draws
 for the entire model (say from <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code>) and you wish to use those
 draws for an individual smooth, via <code><a href="smooth_samples.html">smooth_samples()</a></code>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><a href="gamm4_support.html">gamm4_support</a></p></div>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -7,6 +7,9 @@ posterior or a simple Metropolis Hastings sampler.
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+fitted_samples(model, ...)
+
 fitted_samples(model, ...)
 
 # S3 method for class 'gam'
@@ -68,7 +71,8 @@ fitted_samples(
   these are passed on to `fitted_samples()`. For
   [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md)
   these are passed on to the relevant
-  [`simulate()`](https://rdrr.io/r/stats/simulate.html) method.
+  [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
+  method.
 
 - n:
 
@@ -210,6 +214,10 @@ via the `data` argument must include the offset variable.
 Wood, S.N., (2020). Simplified integrated nested Laplace approximation.
 *Biometrika* **107**, 223–230.
 [doi:10.1093/biomet/asz044](https://doi.org/10.1093/biomet/asz044)
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Author
 

@@ -5,6 +5,9 @@ Handle user-supplied posterior draws
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+user_draws(model, draws, ...)
+
 user_draws(model, draws, ...)
 
 # S3 method for class 'gam'
@@ -15,14 +18,14 @@ user_draws(model, draws, index = NULL, ...)
 
 - model:
 
-  a fitted R model. Currently only models fitted by
-  [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) or
-  [`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html), or return an
-  object that *inherits* from such objects are supported. Here,
-  "inherits" is used in a loose fashion; models fitted by
-  [`scam::scam()`](https://rdrr.io/pkg/scam/man/scam.html) are support
-  even though those models don't strictly inherit from class `"gam"` as
-  far as [`inherits()`](https://rdrr.io/r/base/class.html) is concerned.
+  a fitted model from
+  [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html),
+  [`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html),
+  [`scam::scam()`](https://rdrr.io/pkg/scam/man/scam.html), or
+  [`gamm4::gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html), or a
+  model inheriting from these classes. See
+  [gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
+  for sampling from gamm4 fits.
 
 - draws:
 
@@ -48,3 +51,7 @@ posterior draws for the entire model (say from
 [`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html)) and you
 wish to use those draws for an individual smooth, via
 [`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md).
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)

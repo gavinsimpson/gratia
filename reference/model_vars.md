@@ -21,9 +21,6 @@ model_vars(model, ...)
 
 # S3 method for class 'gamm4'
 model_vars(model, ...)
-
-# S3 method for class 'list'
-model_vars(model, ...)
 ```
 
 ## Arguments

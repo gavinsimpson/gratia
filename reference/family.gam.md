@@ -15,7 +15,7 @@ family(object, ...)
 # S3 method for class 'bam'
 family(object, ...)
 
-# S3 method for class 'list'
+# S3 method for class 'gamm4'
 family(object, ...)
 ```
 

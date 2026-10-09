@@ -29,7 +29,7 @@ confint(
 # S3 method for class 'gamm'
 confint(object, ...)
 
-# S3 method for class 'list'
+# S3 method for class 'gamm4'
 confint(object, ...)
 ```
 

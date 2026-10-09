@@ -9,6 +9,9 @@ nb_theta(model)
 
 # S3 method for class 'gam'
 nb_theta(model)
+
+# S3 method for class 'gamm4'
+nb_theta(model)
 ```
 
 ## Arguments
@@ -25,6 +28,10 @@ A numeric vector of length 1 containing the estimated value of theta.
 
 - `nb_theta(gam)`: Method for class `"gam"`
 
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
+
 ## Examples
 
 ``` r
@@ -35,6 +42,6 @@ m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
   s(x3, bs = "cr"), family = nb, data = df, method = "REML")
 ## IGNORE_RDIFF_BEGIN
 nb_theta(m)
-#> [1] 239361.3
+#> [1] 239375.2
 ## IGNORE_RDIFF_END
 ```

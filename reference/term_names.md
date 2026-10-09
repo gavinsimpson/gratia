@@ -5,6 +5,9 @@ Extract names of all variables needed to fit a GAM or a smooth
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+term_names(object, ...)
+
 term_names(object, ...)
 
 # S3 method for class 'gam'
@@ -32,3 +35,7 @@ term_names(object, ...)
 ## Value
 
 A vector of variable names required for terms in the model
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)

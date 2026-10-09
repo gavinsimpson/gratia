@@ -12,6 +12,9 @@ functions.
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+smooth_label(object, id, ...)
+
 smooth_label(object, ...)
 
 # S3 method for class 'gam'
@@ -28,18 +31,22 @@ smooth_label(object, ...)
   an R object. Currently, methods for class `"gam"` and for mgcv smooth
   objects inheriting from class `"mgcv.smooth"` are supported.
 
-- ...:
-
-  arguments passed to other methods.
-
 - id:
 
   numeric; the indices of the smooths whose labels are to be extracted.
   If missing, labels for all smooths in the model are returned.
 
+- ...:
+
+  arguments passed to other methods.
+
 ## Value
 
 A character vector.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Examples
 

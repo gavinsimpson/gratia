@@ -37,6 +37,9 @@ derivatives(
   wrt = c("smooth", "covariate"),
   focal = NULL
 )
+
+# S3 method for class 'gamm4'
+derivatives(object, ...)
 ```
 
 ## Arguments
@@ -191,6 +194,10 @@ A tibble, currently with the following variables:
 
 `derivatives()` will ignore any random effect smooths it encounters in
 `object`.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Author
 

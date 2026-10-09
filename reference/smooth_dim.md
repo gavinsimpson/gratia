@@ -5,6 +5,9 @@ Extracts the dimension of an estimated smooth.
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+smooth_dim(object)
+
 smooth_dim(object)
 
 # S3 method for class 'gam'
@@ -31,6 +34,10 @@ A numeric vector of dimensions for each smooth.
 
 This is a generic function with methods for objects of class `"gam"`,
 `"gamm"`, and `"mgcv.smooth"`.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Author
 

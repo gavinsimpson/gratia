@@ -29,6 +29,9 @@ fderiv(
 
 # S3 method for class 'gamm'
 fderiv(model, ...)
+
+# S3 method for class 'gamm4'
+fderiv(model, ...)
 ```
 
 ## Arguments
@@ -79,6 +82,10 @@ fderiv(model, ...)
 ## Value
 
 An object of class `"fderiv"` is returned.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Author
 

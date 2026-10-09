@@ -39,6 +39,9 @@ partial_derivatives(
   envir = NULL,
   wrt = c("smooth", "covariate")
 )
+
+# S3 method for class 'gamm4'
+partial_derivatives(object, ...)
 ```
 
 ## Arguments
@@ -191,6 +194,10 @@ A tibble, currently with the following variables:
 
 `partial_derivatives()` will ignore any random effect smooths it
 encounters in `object`.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Author
 

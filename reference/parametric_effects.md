@@ -5,6 +5,9 @@ Estimated values for parametric model terms
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+parametric_effects(object, ...)
+
 parametric_effects(object, ...)
 
 # S3 method for class 'gam'
@@ -136,6 +139,10 @@ and the rest as columns. Formula order is retained within numeric and
 discrete covariates. Logical covariates are discrete. Surface plots show
 estimates; uncertainty is retained in the returned data rather than
 drawn as additional surfaces.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Examples
 

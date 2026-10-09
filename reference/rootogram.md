@@ -14,6 +14,9 @@ graphics. The design closely follows Kleiber & Zeileis (2016).
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+rootogram(object, ...)
+
 rootogram(object, ...)
 
 # S3 method for class 'gam'
@@ -45,6 +48,10 @@ rootogram(object, max_count = NULL, breaks = "Sturges", ...)
 Kleiber, C., Zeileis, A., (2016) Visualizing Count Data Regressions
 Using Rootograms. *Am. Stat.* **70**, 296–303.
 [doi:10.1080/00031305.2016.1173590](https://doi.org/10.1080/00031305.2016.1173590)
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Examples
 

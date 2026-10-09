@@ -8,6 +8,9 @@ probability distribution used when fitting the model.
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+simulate(object, nsim = 1, seed = NULL, ...)
+
 # S3 method for class 'gam'
 simulate(
   object,
@@ -47,8 +50,9 @@ simulate(
 - object:
 
   a fitted GAM, typically the result of a call to
-  [mgcv::gam](https://rdrr.io/pkg/mgcv/man/gam.html)\` or
-  [`mgcv::gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html).
+  [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html),
+  [`mgcv::gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html), or
+  [`gamm4::gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html).
 
 - nsim:
 
@@ -57,6 +61,14 @@ simulate(
 - seed:
 
   numeric; a random seed for the simulations.
+
+- ...:
+
+  arguments passed to methods. `simulate.gam()` and `simulate.scam()`
+  pass `...` on to `predict.gam()`. As such you can pass additional
+  arguments such as `terms`, `exclude`, to select which model terms are
+  included in the predictions. This may be useful, for example, for
+  excluding the effects of random effect terms.
 
 - data:
 
@@ -68,14 +80,6 @@ simulate(
 
   numeric; a vector of prior weights. If `newdata` is null then defaults
   to `object[["prior.weights"]]`, otherwise a vector of ones.
-
-- ...:
-
-  arguments passed to methods. `simulate.gam()` and `simulate.scam()`
-  pass `...` on to `predict.gam()`. As such you can pass additional
-  arguments such as `terms`, `exclude`, to select which model terms are
-  included in the predictions. This may be useful, for example, for
-  excluding the effects of random effect terms.
 
 - newdata:
 
@@ -99,6 +103,10 @@ are evaluated independently of training exclusions: missing responses do
 not prevent simulation, while missing required predictors or weights
 yield `NA`. Prediction `na.action` in `...` is honoured. Missing rows
 are never passed to the response random-number generator.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Author
 

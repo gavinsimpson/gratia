@@ -4,6 +4,22 @@
 
 ### User visible changes
 
+- Improved support for `gamm4` models across gratia.
+
+- Link extraction now shares parameter validation across
+  [`link()`](https://gavinsimpson.github.io/gratia/reference/link.md),
+  [`inv_link()`](https://gavinsimpson.github.io/gratia/reference/link.md),
+  and
+  [`extract_link()`](https://gavinsimpson.github.io/gratia/reference/link.md).
+  Unsupported parameters are rejected consistently, while single-link
+  families can use their supplied functions without a family-name
+  whitelist. For [`twlss()`](https://rdrr.io/pkg/mgcv/man/twlss.html),
+  `scale`, `sigma`, and `phi` select the third linear predictor, and
+  `power` selects the second. Explicit `which_eta` indices for
+  [`mvn()`](https://rdrr.io/pkg/mgcv/man/mvn.html) and
+  [`multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) are now
+  respected and validated.
+
 - Parametric interaction surfaces now share the smooth-surface
   fill-range calculation, centring the default diverging palette at zero
   across all facets. Fixed scales now also expand parametric surface

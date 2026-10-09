@@ -9,6 +9,9 @@ add_partial_residuals(data, model, ...)
 
 # S3 method for class 'gam'
 add_partial_residuals(data, model, select = NULL, partial_match = FALSE, ...)
+
+# S3 method for class 'gamm4'
+add_partial_residuals(data, model, ...)
 ```
 
 ## Arguments
@@ -44,6 +47,10 @@ add_partial_residuals(data, model, select = NULL, partial_match = FALSE, ...)
 
   logical; should smooths be selected by partial matches with `select`?
   If `TRUE`, `select` can only be a single string to match against.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Examples
 

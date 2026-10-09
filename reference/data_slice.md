@@ -26,7 +26,7 @@ data_slice(
 # S3 method for class 'gamm'
 data_slice(object, ...)
 
-# S3 method for class 'list'
+# S3 method for class 'gamm4'
 data_slice(object, ...)
 
 # S3 method for class 'scam'

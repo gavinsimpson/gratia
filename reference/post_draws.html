@@ -11,7 +11,7 @@ Generate posterior draws from a fitted model"><meta property="og:image" content=
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-34</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-36</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,7 +41,7 @@ Generate posterior draws from a fitted model"><meta property="og:image" content=
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Low-level Functions to generate draws from the posterior distribution of model coefficients</h1>
-      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/samplers.R" class="external-link"><code>R/samplers.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/gamm4-methods.R" class="external-link"><code>R/gamm4-methods.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/samplers.R" class="external-link"><code>R/samplers.R</code></a></small>
       <div class="d-none name"><code>post_draws.Rd</code></div>
     </div>
 
@@ -53,7 +53,13 @@ model coefficients</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">post_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'gamm4'</span></span>
+<span><span class="fu">generate_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'gamm4'</span></span>
+<span><span class="fu">post_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">post_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Default S3 method</span></span>
 <span><span class="fu">post_draws</span><span class="op">(</span></span>
@@ -105,11 +111,9 @@ model coefficients</p>
 
 
 <dl><dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
-<dd><p>a fitted R model. Currently only models fitted by <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code>
-or <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">mgcv::bam()</a></code>, or return an object that <em>inherits</em> from such objects are
-supported. Here, "inherits" is used in a loose fashion; models fitted by
-<code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam::scam()</a></code> are support even though those models don't strictly inherit
-from class <code>"gam"</code> as far as <code><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits()</a></code> is concerned.</p></dd>
+<dd><p>a fitted model from <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">mgcv::bam()</a></code>,
+<code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam::scam()</a></code>, or <code><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html" class="external-link">gamm4::gamm4()</a></code>, or a model inheriting from these
+classes. See <a href="gamm4_support.html">gamm4_support</a> for sampling from gamm4 fits.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -207,6 +211,10 @@ to singular.</p></dd>
 be generated without affecting the current state of R's RNG.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><a href="gamm4_support.html">gamm4_support</a></p></div>
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

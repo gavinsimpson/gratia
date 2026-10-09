@@ -52,6 +52,9 @@ response_derivatives(
   uncertainty = c("simulation", "delta"),
   unconditional = FALSE
 )
+
+# S3 method for class 'gamm4'
+response_derivatives(object, ...)
 ```
 
 ## Arguments
@@ -208,6 +211,10 @@ binomial, Tweedie, beta regression, and scaled t families), and `gamm`
 via its GAM component. It is not supported for `scam` or general
 multi-predictor families; their existing simulation support is
 unchanged. The `uncertainty` attribute records the selected method.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Author
 

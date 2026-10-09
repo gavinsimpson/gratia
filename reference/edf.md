@@ -19,6 +19,9 @@ edf(
 )
 
 model_edf(object, ..., type = c("default", "unconditional", "alternative"))
+
+# S3 method for class 'gamm4'
+edf(object, ...)
 ```
 
 ## Arguments
@@ -73,6 +76,10 @@ effectively the average shrinkage of the coefficients multiplied by the
 number of coefficients (Wood, 2017). Smooth-specific EDFs then are
 obtained by summing up the relevant elements of
 \\\mathrm{diag}(2\mathbf{F} - \mathbf{FF})\\.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Examples
 

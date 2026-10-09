@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-34</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-36</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,9 +50,14 @@
 <p>Do not branch from the current feature branch or carry unrelated work into the new branch. Preserve uncommitted changes without discarding or including them in unrelated work. If the user asks to continue an existing branch, reuse it.</p>
 <p>Before merging into <code>main</code>, inspect the commits and diff relative to <code>main</code> and verify that the merge includes only the intended work. Resolve any accidentally inherited commits before merging.</p>
 </div>
+<div class="section level2">
+<h2 id="running-tests">Running tests<a class="anchor" aria-label="anchor" href="#running-tests"></a></h2>
+<p>Run all package tests and checks outside the sandbox from the outset, including targeted tests and the full test suite. Request elevated execution with <code>sandbox_permissions="require_escalated"</code> for test commands; do not first attempt them inside the sandbox. Parallel-worker tests need local socket permissions that the sandbox blocks, so a sandboxed run can produce misleading failures and require an unnecessary rerun. This instruction does not bypass tool approval requirements.</p>
+</div>
 </div>
 
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

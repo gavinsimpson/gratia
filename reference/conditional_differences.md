@@ -46,6 +46,9 @@ conditional_differences(
   interval = c("confidence", "simultaneous"),
   simultaneous_scope = c("contrast", "all")
 )
+
+# S3 method for class 'gamm4'
+conditional_differences(model, ...)
 ```
 
 ## Arguments
@@ -266,6 +269,10 @@ Offsets follow
 semantics. Supported models are `gam` and `bam` fits with a single
 linear predictor and an ordinary scalar inverse-link mean (including
 negative binomial, Tweedie, beta regression and scaled t families).
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Examples
 

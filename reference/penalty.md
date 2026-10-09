@@ -5,6 +5,9 @@ Extract and tidy penalty matrices
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+penalty(object, ...)
+
 penalty(object, ...)
 
 # Default S3 method
@@ -144,6 +147,10 @@ thin plate regression splines, `bs = "tp"`), the signs of the
 eigenvectors are not defined and as such you can expect differences
 across systems in the penalties for such smooths that are system-, OS-,
 and CPU architecture- specific.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Author
 

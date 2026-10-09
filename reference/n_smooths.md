@@ -5,6 +5,9 @@ How many smooths in a fitted model
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+n_smooths(object)
+
 n_smooths(object)
 
 # Default S3 method
@@ -28,3 +31,7 @@ n_smooths(object)
   [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html),
   [`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html), or
   [`mgcv::gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html).
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)

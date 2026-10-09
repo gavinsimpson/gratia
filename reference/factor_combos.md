@@ -9,6 +9,9 @@ factor_combos(object, ...)
 
 # S3 method for class 'gam'
 factor_combos(object, vars = everything(), complete = TRUE, ...)
+
+# S3 method for class 'gamm4'
+factor_combos(object, ...)
 ```
 
 ## Arguments
@@ -31,3 +34,7 @@ factor_combos(object, vars = everything(), complete = TRUE, ...)
   logical; should all combinations of factor levels be returned? If
   `FALSE`, only those combinations of levels observed in the model are
   retained.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)

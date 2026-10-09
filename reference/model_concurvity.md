@@ -23,6 +23,9 @@ concrvity(
   pairwise = FALSE,
   ...
 )
+
+# S3 method for class 'gamm4'
+model_concurvity(model, ...)
 ```
 
 ## Arguments
@@ -46,6 +49,10 @@ concrvity(
 - pairwise:
 
   logical; extract pairwise concurvity of model terms?
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Examples
 

@@ -12,6 +12,9 @@ theta(object, transform = TRUE, ...)
 
 # S3 method for class 'family'
 theta(object, transform = TRUE, ...)
+
+# S3 method for class 'gamm4'
+theta(object, ...)
 ```
 
 ## Arguments
@@ -31,6 +34,10 @@ theta(object, transform = TRUE, ...)
 ## Value
 
 Returns a numeric vector of additional parameters
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Examples
 

@@ -5,6 +5,9 @@ Posterior expectations of derivatives from an estimated model
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+derivative_samples(object, ...)
+
 derivative_samples(object, ...)
 
 # Default S3 method
@@ -165,6 +168,10 @@ A tibble, currently with the following variables:
 
 - additional columns containing the covariate values at which the
   derivative was evaluated.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Author
 

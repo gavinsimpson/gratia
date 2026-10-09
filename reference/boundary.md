@@ -5,6 +5,9 @@
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+boundary(x, ...)
+
 boundary(x, ...)
 
 # S3 method for class 'soap.film'
@@ -36,5 +39,7 @@ A list of lists or data frames specifying the loops that define the
 boundary of the soap film smooth.
 
 ## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 [mgcv::soap](https://rdrr.io/pkg/mgcv/man/smooth.construct.so.smooth.spec.html)

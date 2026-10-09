@@ -6,6 +6,9 @@ fitted model.
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+n_eta(model, ...)
+
 n_eta(model, ...)
 
 # S3 method for class 'gam'
@@ -27,3 +30,7 @@ n_eta(model, ...)
 
 An integer vector of length 1 containing the number of linear predictors
 in the model.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)

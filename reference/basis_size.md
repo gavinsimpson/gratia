@@ -15,6 +15,9 @@ basis_size(object, ...)
 
 # S3 method for class 'gamm'
 basis_size(object, ...)
+
+# S3 method for class 'gamm4'
+basis_size(object, ...)
 ```
 
 ## Arguments
@@ -31,6 +34,10 @@ basis_size(object, ...)
 - ...:
 
   Arguments passed to other methods.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Examples
 

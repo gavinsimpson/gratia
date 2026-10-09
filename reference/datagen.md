@@ -25,7 +25,7 @@ datagen(x, smooth = NULL, n = 200, ...)
 # S3 method for class 'gamm'
 datagen(x, ...)
 
-# S3 method for class 'list'
+# S3 method for class 'gamm4'
 datagen(x, ...)
 ```
 

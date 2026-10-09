@@ -24,7 +24,7 @@ link(object, ...)
 # S3 method for class 'glm'
 link(object, ...)
 
-# S3 method for class 'list'
+# S3 method for class 'gamm4'
 link(object, ...)
 
 inv_link(object, ...)
@@ -41,7 +41,7 @@ inv_link(object, parameter = NULL, which_eta = NULL, ...)
 # S3 method for class 'gamm'
 inv_link(object, ...)
 
-# S3 method for class 'list'
+# S3 method for class 'gamm4'
 inv_link(object, ...)
 
 # S3 method for class 'glm'
@@ -50,10 +50,10 @@ inv_link(object, ...)
 extract_link(family, ...)
 
 # S3 method for class 'family'
-extract_link(family, inverse = FALSE, ...)
+extract_link(family, inverse = FALSE, parameter = NULL, which_eta = NULL, ...)
 
 # S3 method for class 'general.family'
-extract_link(family, parameter, inverse = FALSE, which_eta = NULL, ...)
+extract_link(family, parameter = NULL, inverse = FALSE, which_eta = NULL, ...)
 ```
 
 ## Arguments
@@ -91,13 +91,20 @@ extract_link(family, parameter, inverse = FALSE, which_eta = NULL, ...)
   [`mgcv::shash()`](https://rdrr.io/pkg/mgcv/man/shash.html), or `"phi"`
   for the scale parameter of
   [`mgcv::gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html) &
-  [`mgcv::twlss()`](https://rdrr.io/pkg/mgcv/man/twlss.html).
+  [`mgcv::twlss()`](https://rdrr.io/pkg/mgcv/man/twlss.html). `NULL`
+  selects the first parameter. Only parameters and aliases supported by
+  the supplied family are accepted. For
+  [`mgcv::twlss()`](https://rdrr.io/pkg/mgcv/man/twlss.html), `"power"`
+  selects the second linear predictor and `"scale"`, `"sigma"`, and
+  `"phi"` select the third.
 
 - which_eta:
 
-  numeric; the linear predictor to extract for families
-  [`mgcv::mvn()`](https://rdrr.io/pkg/mgcv/man/mvn.html) and
+  numeric; the integer index of the linear predictor to extract for
+  families [`mgcv::mvn()`](https://rdrr.io/pkg/mgcv/man/mvn.html) and
   [`mgcv::multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html).
+  Defaults to the first linear predictor. If multiple indices are
+  supplied, the first is used with a warning.
 
 - family:
 
@@ -140,11 +147,11 @@ mod <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~1),
 link(mod, parameter = "scale")
 #> function (mu) 
 #> log(1/mu - 0.01)
-#> <environment: 0x55eb001835c0>
+#> <environment: 0x5650c3bac430>
 inv_link(mod, parameter = "scale")
 #> function (eta) 
 #> 1/(exp(eta) + 0.01)
-#> <environment: 0x55eb001835c0>
+#> <environment: 0x5650c3bac430>
 
 ## Works with `family` objects too
 link(shash(), parameter = "skewness")

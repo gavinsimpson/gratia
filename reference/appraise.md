@@ -31,6 +31,9 @@ appraise(
 
 # S3 method for class 'lm'
 appraise(model, ...)
+
+# S3 method for class 'gamm4'
+appraise(model, ...)
 ```
 
 ## Arguments
@@ -151,6 +154,8 @@ The plots are produced by functions
 [`residuals_hist_plot()`](https://gavinsimpson.github.io/gratia/reference/residuals_hist_plot.md),
 and
 [`observed_fitted_plot()`](https://gavinsimpson.github.io/gratia/reference/observed_fitted_plot.md).
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Examples
 

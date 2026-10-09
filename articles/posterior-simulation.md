@@ -136,17 +136,19 @@ then values of $`\boldsymbol{\lambda}`$.
 There are two additional functions available in gratia that do posterior
 simulation:
 
-- [`simulate()`](https://rdrr.io/r/stats/simulate.html), and
+- [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md),
+  and
 - [`derivative_samples()`](https://gavinsimpson.github.io/gratia/reference/derivative_samples.md).
 
-gratia provides [`simulate()`](https://rdrr.io/r/stats/simulate.html)
+gratia provides
+[`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
 methods for models estimated using
 [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html),
 [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html), and
 [`gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html), as well as those
 fitted via `scam()` in the scam package.
-[`simulate()`](https://rdrr.io/r/stats/simulate.html) is a base R
-convention that does the same thing as
+[`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
+is a base R convention that does the same thing as
 [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md),
 just in a non-tidy way (that is not pejorative; it returns the simulated
 response values as a matrix, which is arguably more useful if you are

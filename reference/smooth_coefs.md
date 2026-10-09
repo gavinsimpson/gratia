@@ -20,9 +20,6 @@ smooth_coefs(object, select, term = deprecated(), ...)
 # S3 method for class 'gamm4'
 smooth_coefs(object, select, term = deprecated(), ...)
 
-# S3 method for class 'list'
-smooth_coefs(object, select, term = deprecated(), ...)
-
 # S3 method for class 'mgcv.smooth'
 smooth_coefs(object, model, ...)
 

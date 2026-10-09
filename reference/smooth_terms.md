@@ -5,6 +5,9 @@
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+smooth_terms(object, ...)
+
 smooth_terms(object, ...)
 ```
 
@@ -22,3 +25,7 @@ smooth_terms(object, ...)
 - ...:
 
   arguments passed to other methods. Currently unused.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)

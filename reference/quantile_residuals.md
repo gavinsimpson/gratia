@@ -5,6 +5,9 @@ Randomised residuals
 ## Usage
 
 ``` r
+# S3 method for class 'gamm4'
+quantile_residuals(model, type = c("pit", "quantile"), seed = NULL, ...)
+
 quantile_residuals(model, type = c("pit", "quantile"), seed = NULL, ...)
 
 # S3 method for class 'gam'
@@ -64,3 +67,7 @@ residuals directly. Native log tails are available for Poisson, negative
 binomial, binomial, Gaussian, Gamma, `cnorm()`, `clog()`, `gaulss()`,
 `gammals()`, `scat()`, and `betar()` families. Other CDF helpers retain
 ordinary-probability evaluation.
+
+## See also
+
+[gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
