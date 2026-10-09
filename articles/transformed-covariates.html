@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-36</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-37</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -89,17 +89,17 @@ unrelated predictors or the model offset.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1.2</span>, <span class="fl">4.8</span>, length.out <span class="op">=</span> <span class="fl">8</span><span class="op">)</span>, effort <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">nd</span><span class="op">[</span><span class="st">"x"</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 6</span></span></span>
-<span><span class="co">#&gt;   .smooth   .type .by   .estimate    .se `log(x)`</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.544</span>  0.107     0.182</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.323</span>  0.074<span style="text-decoration: underline;">8</span>    0.539</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.160</span>  0.054<span style="text-decoration: underline;">3</span>    0.801</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.031</span><span style="color: #BB0000; text-decoration: underline;">8</span> 0.042<span style="text-decoration: underline;">8</span>    1.01 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.074<span style="text-decoration: underline;">7</span> 0.039<span style="text-decoration: underline;">6</span>    1.18 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.166  0.042<span style="text-decoration: underline;">5</span>    1.33 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.245  0.048<span style="text-decoration: underline;">7</span>    1.46 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.315  0.056<span style="text-decoration: underline;">1</span>    1.57</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 7</span></span></span>
+<span><span class="co">#&gt;   .smooth   .type .by   .estimate    .se `log(x)` .gratia_raw_x</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.544</span>  0.107     0.182          1.2 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.323</span>  0.074<span style="text-decoration: underline;">8</span>    0.539          1.71</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.160</span>  0.054<span style="text-decoration: underline;">3</span>    0.801          2.23</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.031</span><span style="color: #BB0000; text-decoration: underline;">8</span> 0.042<span style="text-decoration: underline;">8</span>    1.01           2.74</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.074<span style="text-decoration: underline;">7</span> 0.039<span style="text-decoration: underline;">6</span>    1.18           3.26</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.166  0.042<span style="text-decoration: underline;">5</span>    1.33           3.77</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.245  0.048<span style="text-decoration: underline;">7</span>    1.46           4.29</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.315  0.056<span style="text-decoration: underline;">1</span>    1.57           4.8</span></span>
 <span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">nd</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 7</span></span></span>
 <span><span class="co">#&gt;    .row     x effort .fitted    .se .lower_ci .upper_ci</span></span>
@@ -157,13 +157,112 @@ inverted.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span>  4.96      2</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="choosing-the-plotted-covariate-scale">Choosing the plotted covariate scale<a class="anchor" aria-label="anchor" href="#choosing-the-plotted-covariate-scale"></a>
+</h2>
+<p>Drawing methods use the model’s covariate coordinates by default. For
+example, <code>log(x)</code> is plotted against <code>log(x)</code>,
+with a matching axis label, whether it is inside a smooth or a
+parametric term. Set <code>back_transform = TRUE</code> to display
+<code>x</code> instead. This changes the plotting coordinates and
+labels; the estimated partial effect and its interval keep their
+meaning. Use <code>fun</code> to transform the partial effect
+itself.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="transformed-covariates_files/figure-html/back-transform-1.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sm_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">sm_raw</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="transformed-covariates_files/figure-html/back-transform-2.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">m_parametric</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m_parametric</span><span class="op">)</span></span></code></pre></div>
+<p><img src="transformed-covariates_files/figure-html/back-transform-3.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m_parametric</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="transformed-covariates_files/figure-html/back-transform-4.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parametric_effects.html">parametric_effects</a></span><span class="op">(</span><span class="va">m_parametric</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">pe</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="transformed-covariates_files/figure-html/back-transform-5.png" class="r-plt" alt="" width="700"></p>
+<p>The same rule applies to each covariate in tensor products and
+parametric interactions, including covariates used for conditioning
+facets. Rugs and partial-residual locations follow the displayed scale.
+Surface coordinates can become irregularly spaced after changing scale;
+these plots use rectangles bounded by adjacent coordinate midpoints to
+avoid shifting raster pixels.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dat_surface</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">dat</span>, z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">m_surface</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">te</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">dat_surface</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m_surface</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span>, contour <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="transformed-covariates_files/figure-html/back-transform-surface-1.png" class="r-plt" alt="" width="700"></p>
+<p>Smooth grids are evenly spaced on the model scale by default. For
+example, three points for <code>s(log(x))</code> with <code>x</code>
+ranging from 1 to 100 correspond to raw values 1, 10, and 100. With
+<code>smooth_estimates(..., back_transform = TRUE)</code>, the grid is
+evenly spaced in raw <code>x</code>: 1, 50.5, and 100. The expressions
+are then evaluated forwards and estimates computed at those points.
+<code>draw(m, back_transform = TRUE)</code> performs this preparation
+automatically.</p>
+<p>Precomputed estimates retain their chosen evaluation points. An
+object created on a transformed-only grid cannot be drawn on the
+original scale: its raw coordinates are unavailable. Recompute it with
+<code>back_transform = TRUE</code>, or supply raw prediction rows
+through <code>data</code>. Returned estimates retain model coordinates
+and auxiliary <code>.gratia_raw_*</code> columns, so either drawing
+scale can be selected without changing the estimates. Subsets and
+confidence intervals retain these coordinates.</p>
+<p>There is no list of supported inverse functions. Each smooth axis
+must depend on one distinct original model covariate, and gratia must be
+able to recover that covariate and evaluate the expression. For
+example:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">foo</span> <span class="op">&lt;-</span> <span class="va">sqrt</span></span>
+<span><span class="va">m_foo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="fu">foo</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span>
+<span><span class="va">sm_foo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m_foo</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">sm_foo</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="transformed-covariates_files/figure-html/back-transform-alias-1.png" class="r-plt" alt="" width="700"></p>
+<p>Raw fitting rows are recovered and checked against the stored fitting
+observations. If the fitting data are unavailable, or changed functions
+or constants no longer reproduce the fit, recovery fails. Supply raw
+prediction rows in <code>data</code> and functions or constants in
+<code>envir</code> as needed. Already prepared estimates can be drawn
+without recovering data or evaluating functions again. When prediction
+<code>data</code> are supplied, unavailable raw fitting observations
+omit rugs and partial residuals. Prediction rows are not substituted for
+observed data. <code>envir</code> is used for both predictions and
+observation recovery.</p>
+<p>Typical values added by
+<code>smooth_data(..., include_all = TRUE)</code> do not identify the
+original coordinates of a model-scale grid. Prepare that grid with
+<code>back_transform = TRUE</code> to retain raw axes. For numeric
+<code>by</code> smooths, automatic grids evaluate the smooth with
+multiplier one, even for <code>s(log(x), by = x)</code>; the original
+axis is retained separately. Supplied raw prediction rows use their
+actual <code>by</code> values.</p>
+<p>Soap-film boundary coordinates are stored on the model scale. A
+transformed boundary has no retained raw coordinates, so raw-scale
+drawing raises an error. Draw these soap films with
+<code>back_transform = FALSE</code> to retain their boundaries.</p>
+<p>Parametric effects likewise retain both coordinate scales by row,
+including for many-to-one functions. Multi-column basis terms such as
+<code>poly(x, 2)</code> and parametric expressions with no single
+coordinate per input retain raw axes.</p>
+<p>The old <code>parametric_effects(transform = ...)</code> argument is
+deprecated. Replace <code>transform = TRUE</code> with
+<code>back_transform = FALSE</code>, and <code>transform = FALSE</code>
+with <code>back_transform = TRUE</code>.</p>
+</div>
+<div class="section level2">
 <h2 id="local-functions">Local functions<a class="anchor" aria-label="anchor" href="#local-functions"></a>
 </h2>
 <p>A fitted model may retain the formula expression without retaining
 the local environment in which it was evaluated. Preserve that
 environment when fitting if you will need a local function at new
 observations.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_local</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">dat</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">shift</span> <span class="op">&lt;-</span> <span class="fl">0.5</span></span>
 <span>  <span class="va">transform_x</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="va">shift</span><span class="op">)</span></span>
@@ -173,17 +272,17 @@ observations.</p>
 <span><span class="op">}</span></span>
 <span><span class="va">bundle</span> <span class="op">&lt;-</span> <span class="fu">fit_local</span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">bundle</span><span class="op">$</span><span class="va">model</span>, data <span class="op">=</span> <span class="va">nd</span>, envir <span class="op">=</span> <span class="va">bundle</span><span class="op">$</span><span class="va">envir</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 6</span></span></span>
-<span><span class="co">#&gt;   .smooth           .type .by   .estimate    .se `transform_x(x)`</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.543</span>  0.113             0.531</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.329</span>  0.077<span style="text-decoration: underline;">2</span>            0.795</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.164</span>  0.060<span style="text-decoration: underline;">7</span>            1.00 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.029</span><span style="color: #BB0000; text-decoration: underline;">5</span> 0.051<span style="text-decoration: underline;">1</span>            1.18 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.080<span style="text-decoration: underline;">2</span> 0.045<span style="text-decoration: underline;">1</span>            1.32 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.170  0.044<span style="text-decoration: underline;">0</span>            1.45 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.244  0.049<span style="text-decoration: underline;">7</span>            1.57 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.308  0.061<span style="text-decoration: underline;">9</span>            1.67</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 7</span></span></span>
+<span><span class="co">#&gt;   .smooth           .type .by   .estimate    .se `transform_x(x)` .gratia_raw_x</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.543</span>  0.113             0.531          1.2 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.329</span>  0.077<span style="text-decoration: underline;">2</span>            0.795          1.71</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.164</span>  0.060<span style="text-decoration: underline;">7</span>            1.00           2.23</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.029</span><span style="color: #BB0000; text-decoration: underline;">5</span> 0.051<span style="text-decoration: underline;">1</span>            1.18           2.74</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.080<span style="text-decoration: underline;">2</span> 0.045<span style="text-decoration: underline;">1</span>            1.32           3.26</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.170  0.044<span style="text-decoration: underline;">0</span>            1.45           3.77</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.244  0.049<span style="text-decoration: underline;">7</span>            1.57           4.29</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.308  0.061<span style="text-decoration: underline;">9</span>            1.67           4.8</span></span>
 <span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">bundle</span><span class="op">$</span><span class="va">model</span>, data <span class="op">=</span> <span class="va">nd</span>, envir <span class="op">=</span> <span class="va">bundle</span><span class="op">$</span><span class="va">envir</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 7</span></span></span>
 <span><span class="co">#&gt;    .row     x effort .fitted    .se .lower_ci .upper_ci</span></span>
@@ -216,7 +315,7 @@ instead. The latter includes the chain-rule factor
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><mi>x</mi></mrow><annotation encoding="application/x-tex">1/x</annotation></semantics></math>
 because the transformation is reevaluated after each perturbation of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/derivatives.html">derivatives</a></span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">nd</span>, type <span class="op">=</span> <span class="st">"central"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 9</span></span></span>
 <span><span class="co">#&gt;   .smooth   .by   .fs   .derivative   .se .crit .lower_ci .upper_ci `log(x)`</span></span>
@@ -282,7 +381,7 @@ fixed</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">43</span><span class="op">)</span></span>
 <span><span class="va">tensor_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">150</span>, <span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">150</span>, <span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">tensor_dat</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">tensor_dat</span><span class="op">$</span><span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">tensor_dat</span><span class="op">$</span><span class="va">z</span><span class="op">)</span> <span class="op">+</span></span>

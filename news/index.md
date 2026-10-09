@@ -20,6 +20,46 @@
   [`multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) are now
   respected and validated.
 
+- **Breaking change:** Parametric plots now use model covariate
+  coordinates by default, so `log(x)` is plotted against `log(x)` with
+  the matching axis label. Use `back_transform = TRUE` to plot against
+  the original covariates. The same option is available in
+  [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md),
+  [`assemble.gam()`](https://gavinsimpson.github.io/gratia/reference/assemble.gam.md),
+  [`draw.parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/draw.parametric_effects.md)
+  and
+  [`draw.smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/draw.smooth_estimates.md),
+  including tensor products, parametric interaction axes, rugs and
+  conditioning facets
+  ([\#412](https://github.com/gavinsimpson/gratia/issues/412)).
+  Multi-column basis expansions retain raw axes. Changed scales with
+  irregular surface spacing use rectangles rather than shifting raster
+  pixels.
+
+  The `transform` argument of
+  [`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
+  is deprecated; replace it with `back_transform = !transform`.
+  Model-scale parametric coordinates now contain the evaluated predictor
+  rather than its coefficient-weighted partial contribution. Estimated
+  effects and intervals are unaffected by the choice of coordinate
+  scale.
+
+  Smooth grids retain their existing model-scale defaults. Use
+  `smooth_estimates(..., back_transform = TRUE)` to recover raw fitting
+  data, generate original-scale grids and evaluate expressions forwards.
+  This supports custom functions such as `foo(x)` and tensor products
+  without inverse functions. Drawing precomputed estimates on the
+  original scale requires retained raw coordinates; transformed-only
+  estimates give an informative error. Confidence intervals and subsets
+  retain coordinate columns. Parametric effects retain both scales by
+  row, including for many-to-one transformations. Evaluated grids do not
+  mistake typical nuisance values for raw axes, and numeric `by`
+  multipliers can share a raw axis name. Drawing forwards `envir` to
+  observation recovery; supplied prediction data remain usable when raw
+  observations for rugs or residuals are unavailable. Transformed
+  soap-film boundaries produce an explicit raw-scale drawing error
+  instead of disappearing.
+
 - Parametric interaction surfaces now share the smooth-surface
   fill-range calculation, centring the default diverging palette at zero
   across all facets. Fixed scales now also expand parametric surface

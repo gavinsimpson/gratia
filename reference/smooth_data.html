@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-36</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-37</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +57,8 @@
 <span>  offset <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  include_all <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  var_order <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  envir <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -119,6 +120,22 @@ should be processed. Only useful for tensor products with at least one
 <dd><p>an optional environment supplying functions and constants used
 in model expressions. The available model formula environment is used when
 <code>NULL</code>. Covariate observations should be supplied in <code>data</code>.</p></dd>
+
+
+<dt id="arg-back-transform">back_transform<a class="anchor" aria-label="anchor" href="#arg-back-transform"></a></dt>
+<dd><p>logical; generate the grid on original covariate
+scales? The default, <code>FALSE</code>, uses evenly spaced model coordinates. With
+<code>TRUE</code>, recover raw fitting rows and generate original-scale coordinates,
+then evaluate the model expressions forwards. Each axis must depend on one
+distinct original model covariate. Both raw and evaluated columns are
+returned, with auxiliary <code>.gratia_raw_*</code> columns for transformed axes.
+Missing raw inputs or unavailable functions produce an error.
+Numeric <code>by</code> multipliers are one on automatic grids, including when a
+multiplier shares an original axis name; raw axis coordinates are retained
+separately. If the multiplier is itself an untransformed grid axis, supply
+prediction <code>data</code> to <code><a href="smooth_estimates.html">smooth_estimates()</a></code> instead. Typical values added by
+<code>include_all = TRUE</code> to model-scale
+grids do not provide raw coordinates for transformed axes.</p></dd>
 
 </dl></div>
 

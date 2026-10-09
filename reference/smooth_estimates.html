@@ -15,7 +15,7 @@ been removed from the package."><meta property="og:image" content="https://gavin
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-36</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-37</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,6 +79,7 @@ been removed from the package.</p>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  clip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -177,6 +178,24 @@ point that is deemed to lie outside the boundary of the soap film.</p></dd>
 in model expressions. The available model formula environment is used when
 <code>NULL</code>. Covariate observations should be supplied in <code>data</code>.</p></dd>
 
+
+<dt id="arg-back-transform">back_transform<a class="anchor" aria-label="anchor" href="#arg-back-transform"></a></dt>
+<dd><p>logical; generate automatic grids on the original
+covariate scale? The default, <code>FALSE</code>, preserves evenly spaced model-scale
+grids (e.g. in <code>log(x)</code>). With <code>TRUE</code>, recover raw fitting covariates and
+generate grids on their original scale, then evaluate the model expressions
+forwards. Each axis must depend on one distinct original model covariate.
+Functions such as <code>foo(x)</code> require no inverse. Fitted prediction parameters
+are retained where provided by the model, including for <code>scale(x)</code>.
+When <code>data</code> are supplied, use those rows without generating a grid; <code>TRUE</code>
+requires raw coordinates for each axis. Returned model-coordinate columns
+keep their usual names and raw coordinates are retained in auxiliary
+<code>.gratia_raw_*</code> columns. Draw these estimates with
+<code>draw(object, back_transform = TRUE)</code> to display the raw coordinates.
+Estimates containing only transformed coordinates give an informative error
+if drawn on the original scale. This option does not change effect values
+or their intervals at the chosen evaluation points.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -196,7 +215,19 @@ coordinate (<code>log(x)</code>), and returned coordinate columns retain that na
 <p>Stored evaluated columns allow automatic plotting even when a local function
 used to fit the model is no longer available. Evaluating that function at new
 raw data requires <code>envir</code>; training values are never substituted for new
-observations. Arbitrary transformations are not inverted to recover raw data.</p>
+observations. Arbitrary transformations are not inverted to recover raw data.
+The <code>coordinate_info</code> attribute identifies retained raw coordinate columns.
+<code><a href="draw.html">draw()</a></code> uses them for <code>back_transform = TRUE</code>; the usual coordinate
+columns remain on the model scale. Automatic raw grids require recoverable
+fitting rows and matching functions and constants. Supplied raw <code>data</code>
+instead define the prediction rows directly.
+Typical covariate values added to evaluated grids by <code>include_all = TRUE</code>
+are not raw axis coordinates. Numeric <code>by</code> multipliers are set to one on
+automatic grids, even when their name also identifies a raw axis; supplied
+prediction rows retain their actual multipliers. Soap-film boundary rows
+retain model coordinates only. If a boundary axis is transformed, draw the
+estimates with <code>back_transform = FALSE</code>; raw-scale drawing gives an error
+rather than dropping the boundary.</p>
     </div>
 
     <div class="section level2">

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-36</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-37</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,13 +61,14 @@
 <span>  unnest <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ci_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  transform <span class="op">=</span> <span class="fu">lifecycle</span><span class="fu">::</span><span class="fu"><a href="https://lifecycle.r-lib.org/reference/deprecated.html" class="external-link">deprecated</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  n_2d <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>  n_3d <span class="op">=</span> <span class="fl">16</span>,</span>
 <span>  n_4d <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  dist <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -117,11 +118,8 @@ the model. Defaults to the model's evaluation environment.</p></dd>
 
 
 <dt id="arg-transform">transform<a class="anchor" aria-label="anchor" href="#arg-transform"></a></dt>
-<dd><p>logical; if <code>TRUE</code>, the parametric effect will be plotted on
-its transformed scale which will result in the effect being a straight
-line. If FALSE, the effect will be plotted against the raw data (i.e. for
-<code>log10(x)</code>, or <code>poly(z)</code>, the x-axis of the plot will be <code>x</code> or <code>z</code>
-respectively.)</p></dd>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use
+<code>back_transform = !transform</code> instead.</p></dd>
 
 
 <dt id="arg-n-n-d-n-d-n-d">n, n_2d, n_3d, n_4d<a class="anchor" aria-label="anchor" href="#arg-n-n-d-n-d-n-d"></a></dt>
@@ -145,16 +143,47 @@ the term's linear predictor, including its covariance with the term?
 Defaults to <code>TRUE</code>. Partial effect estimates are unchanged. With no
 intercept, this has no effect. Set to <code>FALSE</code> for term-only uncertainty.</p></dd>
 
+
+<dt id="arg-back-transform">back_transform<a class="anchor" aria-label="anchor" href="#arg-back-transform"></a></dt>
+<dd><p>logical; plot covariates on their original scale?
+Defaults to <code>FALSE</code>, using model coordinates such as <code>log(x)</code> for a term
+containing <code>log(x)</code>. With <code>TRUE</code>, recover the raw covariates, generate a
+grid on their original scale and evaluate the model expressions forwards.
+Applies to axes, rugs, partial-residual locations and conditioning facets,
+including tensor products and parametric interactions. Each smooth axis
+must depend on one distinct original model covariate. Functions such as
+<code>foo(x)</code> are supported when their raw inputs and functions can be recovered;
+no inverse function is needed. Missing raw data or unavailable functions
+produce an error; supply <code>data</code> or <code>envir</code> as appropriate.
+With supplied prediction <code>data</code>, unavailable raw fitting observations
+omit rugs and partial residuals; prediction rows are never used as observations.
+For precomputed smooth estimates, prepare raw grids with
+<code>smooth_estimates(model, back_transform = TRUE)</code> before drawing with
+<code>back_transform = TRUE</code>. Raw inputs supplied through <code>data</code> also retain
+their coordinates. Transformed-only estimates cannot be relabelled on the
+raw scale, including grids carrying typical values from <code>include_all = TRUE</code>.
+Transformed soap-film boundaries lack retained raw coordinates and must
+be drawn with <code>back_transform = FALSE</code>.
+Parametric estimates retain both scales; multi-column basis
+expansions retain raw axes on either setting. Does not transform estimated
+effects or their intervals; use <code>fun</code> for that.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble of class <code>parametric_effects</code>, with <code>.term</code>, <code>.type</code>,
 <code>.partial</code> and <code>.se</code>. Single-variable terms retain <code>.value</code> or <code>.level</code>;
-multivariate terms contain their raw covariate columns. Names conflicting
+multivariate terms use columns named for their raw covariates, containing
+coordinates on the selected scale. Names conflicting
 with reserved columns are repaired with numeric suffixes. The <code>term_info</code>
 attribute records multivariate column mappings, plotting order, factor
 levels and observation data. With <code>unnest = FALSE</code>, estimates and
-covariates are nested in a <code>data</code> list column.</p>
+covariates are nested in a <code>data</code> list column. The <code>axis_info</code> attribute
+identifies retained raw and model coordinate columns and their labels
+so the drawing method
+can select either scale. The <code>back_transform</code> attribute records the scale
+of the returned coordinate columns. Auxiliary <code>.gratia_raw_*</code> and
+<code>.gratia_model_*</code> columns retain both scales for transformed axes.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -164,10 +193,15 @@ interaction. Components follow the model's contrast coding: with treatment
 contrasts, a numeric-by-factor interaction represents a departure from the
 reference-level slope, rather than a complete slope for each level.</p>
 <p>A multi-column term such as <code>poly(x, 3)</code> is one component, whereas <code>x</code> and
-<code>I(x^2)</code> remain separate components. Multivariate terms are evaluated against
-their raw covariates; <code>transform = TRUE</code> is not supported for these terms.
+<code>I(x^2)</code> remain separate components. Scalar numeric transformations use model
+coordinates by default, including each axis of an interaction. Basis
+expansions such as <code>poly(x, 3)</code>, terms combining several inputs in one
+expression, and interactions containing several transformations of the same
+input retain raw axes because they have no single model coordinate per input.
 Other covariates in generated prediction data are held at typical values
-solely to evaluate the model matrix; their contributions are not included.</p>
+solely to evaluate the model matrix; their contributions are not included.
+Rugs show fitting observations, including when prediction <code>data</code> are
+supplied. If fitting observations cannot be recovered, these rugs are omitted.</p>
 <p>The drawing method uses the first two numeric covariates for surface axes,
 grouping curves by the first factor when there is only one numeric covariate.
 Factor-only terms use grouped points and intervals. Remaining covariates
@@ -195,6 +229,28 @@ is retained in the returned data rather than drawn as additional surfaces.</p>
 <span class="r-plt img"><img src="parametric_effects-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m</span>, parametric <span class="op">=</span> <span class="cn">TRUE</span>, terms <span class="op">=</span> <span class="st">"x0:group"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="parametric_effects-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="va">m_log</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m_log</span><span class="op">)</span> <span class="co"># log(x1) on the x axis</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in recover_raw_data(object, data = data, envir = envir):</span> Cannot recover raw model covariates.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">x</span> object 'd' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">i</span> Supply reference `data` and, if needed, `envir`; stored transformed values</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   cannot be inverted automatically.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error:</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> object 'd' not found</span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m_log</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># x1 on the x axis</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in recover_raw_data(object, data = data, envir = envir):</span> Cannot recover raw model covariates.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">x</span> object 'd' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">i</span> Supply reference `data` and, if needed, `envir`; stored transformed values</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   cannot be inverted automatically.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error:</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> object 'd' not found</span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu">parametric_effects</span><span class="op">(</span><span class="va">m_log</span><span class="op">)</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in recover_raw_data(object, data = data, envir = envir):</span> Cannot recover raw model covariates.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">x</span> object 'd' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">i</span> Supply reference `data` and, if needed, `envir`; stored transformed values</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   cannot be inverted automatically.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error:</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> object 'd' not found</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

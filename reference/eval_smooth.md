@@ -21,6 +21,7 @@ eval_smooth(
   overall_uncertainty = TRUE,
   dist = NULL,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 
@@ -38,6 +39,7 @@ eval_smooth(
   overall_uncertainty = TRUE,
   clip = TRUE,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 
@@ -55,6 +57,7 @@ eval_smooth(
   overall_uncertainty = TRUE,
   dist = NULL,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 
@@ -69,6 +72,7 @@ eval_smooth(
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 
@@ -83,6 +87,7 @@ eval_smooth(
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 
@@ -97,6 +102,7 @@ eval_smooth(
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 
@@ -111,6 +117,7 @@ eval_smooth(
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 
@@ -128,6 +135,7 @@ eval_smooth(
   overall_uncertainty = TRUE,
   dist = NULL,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 
@@ -145,6 +153,7 @@ eval_smooth(
   overall_uncertainty = TRUE,
   dist = NULL,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 ```
@@ -222,6 +231,25 @@ eval_smooth(
   an optional environment supplying functions and constants used in
   model expressions. The available model formula environment is used
   when `NULL`. Covariate observations should be supplied in `data`.
+
+- back_transform:
+
+  logical; generate automatic grids on the original covariate scale? The
+  default, `FALSE`, preserves evenly spaced model-scale grids (e.g. in
+  `log(x)`). With `TRUE`, recover raw fitting covariates and generate
+  grids on their original scale, then evaluate the model expressions
+  forwards. Each axis must depend on one distinct original model
+  covariate. Functions such as `foo(x)` require no inverse. Fitted
+  prediction parameters are retained where provided by the model,
+  including for `scale(x)`. When `data` are supplied, use those rows
+  without generating a grid; `TRUE` requires raw coordinates for each
+  axis. Returned model-coordinate columns keep their usual names and raw
+  coordinates are retained in auxiliary `.gratia_raw_*` columns. Draw
+  these estimates with `draw(object, back_transform = TRUE)` to display
+  the raw coordinates. Estimates containing only transformed coordinates
+  give an informative error if drawn on the original scale. This option
+  does not change effect values or their intervals at the chosen
+  evaluation points.
 
 - clip:
 

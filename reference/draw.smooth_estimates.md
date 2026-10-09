@@ -34,6 +34,7 @@ draw(
   lims_method = "cross",
   caption = TRUE,
   geom = c("raster", "tile"),
+  back_transform = FALSE,
   ...
 )
 ```
@@ -180,7 +181,36 @@ draw(
   keeps large PDF plots compact; tiles are individual borderless
   rectangles that remain vector elements in PDF and SVG output,
   potentially increasing file size. Other plot types, including
-  spherical smooths, are unchanged.
+  spherical smooths, are unchanged. Covariate scale changes that produce
+  irregular spacing use rectangles bounded by adjacent coordinate
+  midpoints for either setting.
+
+- back_transform:
+
+  logical; plot covariates on their original scale? Defaults to `FALSE`,
+  using model coordinates such as `log(x)` for a term containing
+  `log(x)`. With `TRUE`, recover the raw covariates, generate a grid on
+  their original scale and evaluate the model expressions forwards.
+  Applies to axes, rugs, partial-residual locations and conditioning
+  facets, including tensor products and parametric interactions. Each
+  smooth axis must depend on one distinct original model covariate.
+  Functions such as `foo(x)` are supported when their raw inputs and
+  functions can be recovered; no inverse function is needed. Missing raw
+  data or unavailable functions produce an error; supply `data` or
+  `envir` as appropriate. With supplied prediction `data`, unavailable
+  raw fitting observations omit rugs and partial residuals; prediction
+  rows are never used as observations. For precomputed smooth estimates,
+  prepare raw grids with
+  `smooth_estimates(model, back_transform = TRUE)` before drawing with
+  `back_transform = TRUE`. Raw inputs supplied through `data` also
+  retain their coordinates. Transformed-only estimates cannot be
+  relabelled on the raw scale, including grids carrying typical values
+  from `include_all = TRUE`. Transformed soap-film boundaries lack
+  retained raw coordinates and must be drawn with
+  `back_transform = FALSE`. Parametric estimates retain both scales;
+  multi-column basis expansions retain raw axes on either setting. Does
+  not transform estimated effects or their intervals; use `fun` for
+  that.
 
 - ...:
 
@@ -199,6 +229,16 @@ m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 sm <- smooth_estimates(m)
 draw(sm)
 
+m_log <- gam(y ~ s(log(x1), k = 6), data = df)
+draw(smooth_estimates(m_log, back_transform = TRUE), back_transform = TRUE)
+#> Error in map(smooths, eval_smooth, model = object, n = n, n_2d = n_2d,     n_3d = n_3d, n_4d = n_4d, data = data, unconditional = unconditional,     frequentist = frequentist, overall_uncertainty = overall_uncertainty,     dist = dist, clip = clip, back_transform = back_transform): i In index: 1.
+#> Caused by error in `recover_raw_data()`:
+#> ! Cannot recover raw model covariates.
+#> x The fitting data are unavailable.
+#> i Supply reference `data` and, if needed, `envir`; stored transformed values
+#>   cannot be inverted automatically.
+#> Caused by error in `doTryCatch()`:
+#> ! The fitting data are unavailable.
 # evaluate smooth of `x2`
 sm <- smooth_estimates(m, select = "s(x2)")
 # plot it

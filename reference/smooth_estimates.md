@@ -30,6 +30,7 @@ smooth_estimates(
   partial_match = FALSE,
   clip = FALSE,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 ```
@@ -127,6 +128,25 @@ smooth_estimates(
   model expressions. The available model formula environment is used
   when `NULL`. Covariate observations should be supplied in `data`.
 
+- back_transform:
+
+  logical; generate automatic grids on the original covariate scale? The
+  default, `FALSE`, preserves evenly spaced model-scale grids (e.g. in
+  `log(x)`). With `TRUE`, recover raw fitting covariates and generate
+  grids on their original scale, then evaluate the model expressions
+  forwards. Each axis must depend on one distinct original model
+  covariate. Functions such as `foo(x)` require no inverse. Fitted
+  prediction parameters are retained where provided by the model,
+  including for `scale(x)`. When `data` are supplied, use those rows
+  without generating a grid; `TRUE` requires raw coordinates for each
+  axis. Returned model-coordinate columns keep their usual names and raw
+  coordinates are retained in auxiliary `.gratia_raw_*` columns. Draw
+  these estimates with `draw(object, back_transform = TRUE)` to display
+  the raw coordinates. Estimates containing only transformed coordinates
+  give an informative error if drawn on the original scale. This option
+  does not change effect values or their intervals at the chosen
+  evaluation points.
+
 ## Value
 
 A data frame (tibble), which is of class `"smooth_estimates"`.
@@ -150,7 +170,20 @@ Stored evaluated columns allow automatic plotting even when a local
 function used to fit the model is no longer available. Evaluating that
 function at new raw data requires `envir`; training values are never
 substituted for new observations. Arbitrary transformations are not
-inverted to recover raw data.
+inverted to recover raw data. The `coordinate_info` attribute identifies
+retained raw coordinate columns.
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) uses
+them for `back_transform = TRUE`; the usual coordinate columns remain on
+the model scale. Automatic raw grids require recoverable fitting rows
+and matching functions and constants. Supplied raw `data` instead define
+the prediction rows directly. Typical covariate values added to
+evaluated grids by `include_all = TRUE` are not raw axis coordinates.
+Numeric `by` multipliers are set to one on automatic grids, even when
+their name also identifies a raw axis; supplied prediction rows retain
+their actual multipliers. Soap-film boundary rows retain model
+coordinates only. If a boundary axis is transformed, draw the estimates
+with `back_transform = FALSE`; raw-scale drawing gives an error rather
+than dropping the boundary.
 
 ## Examples
 

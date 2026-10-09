@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-36</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-37</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,6 +75,7 @@
 <span>  lims_method <span class="op">=</span> <span class="st">"cross"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  geom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"raster"</span>, <span class="st">"tile"</span><span class="op">)</span>,</span>
+<span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -219,7 +220,34 @@ generated for tile centres without respect to the spacing of those tiles.</p></d
 smooth surfaces, including faceted and soap-film plots. Raster rendering
 keeps large PDF plots compact; tiles are individual borderless rectangles
 that remain vector elements in PDF and SVG output, potentially increasing
-file size. Other plot types, including spherical smooths, are unchanged.</p></dd>
+file size. Other plot types, including spherical smooths, are unchanged.
+Covariate scale changes that produce irregular spacing use rectangles
+bounded by adjacent coordinate midpoints for either setting.</p></dd>
+
+
+<dt id="arg-back-transform">back_transform<a class="anchor" aria-label="anchor" href="#arg-back-transform"></a></dt>
+<dd><p>logical; plot covariates on their original scale?
+Defaults to <code>FALSE</code>, using model coordinates such as <code>log(x)</code> for a term
+containing <code>log(x)</code>. With <code>TRUE</code>, recover the raw covariates, generate a
+grid on their original scale and evaluate the model expressions forwards.
+Applies to axes, rugs, partial-residual locations and conditioning facets,
+including tensor products and parametric interactions. Each smooth axis
+must depend on one distinct original model covariate. Functions such as
+<code>foo(x)</code> are supported when their raw inputs and functions can be recovered;
+no inverse function is needed. Missing raw data or unavailable functions
+produce an error; supply <code>data</code> or <code>envir</code> as appropriate.
+With supplied prediction <code>data</code>, unavailable raw fitting observations
+omit rugs and partial residuals; prediction rows are never used as observations.
+For precomputed smooth estimates, prepare raw grids with
+<code>smooth_estimates(model, back_transform = TRUE)</code> before drawing with
+<code>back_transform = TRUE</code>. Raw inputs supplied through <code>data</code> also retain
+their coordinates. Transformed-only estimates cannot be relabelled on the
+raw scale, including grids carrying typical values from <code>include_all = TRUE</code>.
+Transformed soap-film boundaries lack retained raw coordinates and must
+be drawn with <code>back_transform = FALSE</code>.
+Parametric estimates retain both scales; multi-column basis
+expansions retain raw axes on either setting. Does not transform estimated
+effects or their intervals; use <code>fun</code> for that.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -238,6 +266,16 @@ file size. Other plot types, including spherical smooths, are unchanged.</p></dd
 <span class="r-in"><span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu"><a href="smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">sm</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="draw.smooth_estimates-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="va">m_log</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m_log</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in map(smooths, eval_smooth, model = object, n = n, n_2d = n_2d,     n_3d = n_3d, n_4d = n_4d, data = data, unconditional = unconditional,     frequentist = frequentist, overall_uncertainty = overall_uncertainty,     dist = dist, clip = clip, back_transform = back_transform):</span> <span style="color: #00BBBB;">i</span> In index: 1.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error in `recover_raw_data()`:</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> Cannot recover raw model covariates.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">x</span> The fitting data are unavailable.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">i</span> Supply reference `data` and, if needed, `envir`; stored transformed values</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   cannot be inverted automatically.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error in `doTryCatch()`:</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> The fitting data are unavailable.</span>
 <span class="r-in"><span><span class="co"># evaluate smooth of `x2`</span></span></span>
 <span class="r-in"><span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu"><a href="smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span>, select <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># plot it</span></span></span>

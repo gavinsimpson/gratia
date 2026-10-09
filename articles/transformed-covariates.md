@@ -24,17 +24,17 @@ offset.
 
 nd <- data.frame(x = seq(1.2, 4.8, length.out = 8), effort = 2)
 smooth_estimates(m, data = nd["x"])
-#> # A tibble: 8 × 6
-#>   .smooth   .type .by   .estimate    .se `log(x)`
-#>   <chr>     <chr> <chr>     <dbl>  <dbl>    <dbl>
-#> 1 s(log(x)) TPRS  NA      -0.544  0.107     0.182
-#> 2 s(log(x)) TPRS  NA      -0.323  0.0748    0.539
-#> 3 s(log(x)) TPRS  NA      -0.160  0.0543    0.801
-#> 4 s(log(x)) TPRS  NA      -0.0318 0.0428    1.01 
-#> 5 s(log(x)) TPRS  NA       0.0747 0.0396    1.18 
-#> 6 s(log(x)) TPRS  NA       0.166  0.0425    1.33 
-#> 7 s(log(x)) TPRS  NA       0.245  0.0487    1.46 
-#> 8 s(log(x)) TPRS  NA       0.315  0.0561    1.57
+#> # A tibble: 8 × 7
+#>   .smooth   .type .by   .estimate    .se `log(x)` .gratia_raw_x
+#>   <chr>     <chr> <chr>     <dbl>  <dbl>    <dbl>         <dbl>
+#> 1 s(log(x)) TPRS  NA      -0.544  0.107     0.182          1.2 
+#> 2 s(log(x)) TPRS  NA      -0.323  0.0748    0.539          1.71
+#> 3 s(log(x)) TPRS  NA      -0.160  0.0543    0.801          2.23
+#> 4 s(log(x)) TPRS  NA      -0.0318 0.0428    1.01           2.74
+#> 5 s(log(x)) TPRS  NA       0.0747 0.0396    1.18           3.26
+#> 6 s(log(x)) TPRS  NA       0.166  0.0425    1.33           3.77
+#> 7 s(log(x)) TPRS  NA       0.245  0.0487    1.46           4.29
+#> 8 s(log(x)) TPRS  NA       0.315  0.0561    1.57           4.8
 fitted_values(m, data = nd)
 #> # A tibble: 8 × 7
 #>    .row     x effort .fitted    .se .lower_ci .upper_ci
@@ -106,6 +106,135 @@ data_slice(m, x = evenly(x, n = 8), effort = 2, data = dat)
 #> 8  4.96      2
 ```
 
+## Choosing the plotted covariate scale
+
+Drawing methods use the model’s covariate coordinates by default. For
+example, `log(x)` is plotted against `log(x)`, with a matching axis
+label, whether it is inside a smooth or a parametric term. Set
+`back_transform = TRUE` to display `x` instead. This changes the
+plotting coordinates and labels; the estimated partial effect and its
+interval keep their meaning. Use `fun` to transform the partial effect
+itself.
+
+``` r
+
+draw(m, back_transform = TRUE)
+```
+
+![](transformed-covariates_files/figure-html/back-transform-1.png)
+
+``` r
+
+sm_raw <- smooth_estimates(m, back_transform = TRUE)
+draw(sm_raw, back_transform = TRUE)
+```
+
+![](transformed-covariates_files/figure-html/back-transform-2.png)
+
+``` r
+
+
+m_parametric <- gam(y ~ log(x), family = poisson(), data = dat)
+draw(m_parametric)
+```
+
+![](transformed-covariates_files/figure-html/back-transform-3.png)
+
+``` r
+
+draw(m_parametric, back_transform = TRUE)
+```
+
+![](transformed-covariates_files/figure-html/back-transform-4.png)
+
+``` r
+
+pe <- parametric_effects(m_parametric)
+draw(pe, back_transform = TRUE)
+```
+
+![](transformed-covariates_files/figure-html/back-transform-5.png)
+
+The same rule applies to each covariate in tensor products and
+parametric interactions, including covariates used for conditioning
+facets. Rugs and partial-residual locations follow the displayed scale.
+Surface coordinates can become irregularly spaced after changing scale;
+these plots use rectangles bounded by adjacent coordinate midpoints to
+avoid shifting raster pixels.
+
+``` r
+
+dat_surface <- transform(dat, z = runif(nrow(dat), 1, 4))
+m_surface <- gam(y ~ te(log(x), sqrt(z)), family = poisson(),
+  data = dat_surface, method = "REML")
+draw(m_surface, back_transform = TRUE, contour = FALSE)
+```
+
+![](transformed-covariates_files/figure-html/back-transform-surface-1.png)
+
+Smooth grids are evenly spaced on the model scale by default. For
+example, three points for `s(log(x))` with `x` ranging from 1 to 100
+correspond to raw values 1, 10, and 100. With
+`smooth_estimates(..., back_transform = TRUE)`, the grid is evenly
+spaced in raw `x`: 1, 50.5, and 100. The expressions are then evaluated
+forwards and estimates computed at those points.
+`draw(m, back_transform = TRUE)` performs this preparation
+automatically.
+
+Precomputed estimates retain their chosen evaluation points. An object
+created on a transformed-only grid cannot be drawn on the original
+scale: its raw coordinates are unavailable. Recompute it with
+`back_transform = TRUE`, or supply raw prediction rows through `data`.
+Returned estimates retain model coordinates and auxiliary
+`.gratia_raw_*` columns, so either drawing scale can be selected without
+changing the estimates. Subsets and confidence intervals retain these
+coordinates.
+
+There is no list of supported inverse functions. Each smooth axis must
+depend on one distinct original model covariate, and gratia must be able
+to recover that covariate and evaluate the expression. For example:
+
+``` r
+
+foo <- sqrt
+m_foo <- gam(y ~ s(foo(x), k = 6), family = poisson(), data = dat)
+sm_foo <- smooth_estimates(m_foo, back_transform = TRUE, envir = environment())
+draw(sm_foo, back_transform = TRUE)
+```
+
+![](transformed-covariates_files/figure-html/back-transform-alias-1.png)
+
+Raw fitting rows are recovered and checked against the stored fitting
+observations. If the fitting data are unavailable, or changed functions
+or constants no longer reproduce the fit, recovery fails. Supply raw
+prediction rows in `data` and functions or constants in `envir` as
+needed. Already prepared estimates can be drawn without recovering data
+or evaluating functions again. When prediction `data` are supplied,
+unavailable raw fitting observations omit rugs and partial residuals.
+Prediction rows are not substituted for observed data. `envir` is used
+for both predictions and observation recovery.
+
+Typical values added by `smooth_data(..., include_all = TRUE)` do not
+identify the original coordinates of a model-scale grid. Prepare that
+grid with `back_transform = TRUE` to retain raw axes. For numeric `by`
+smooths, automatic grids evaluate the smooth with multiplier one, even
+for `s(log(x), by = x)`; the original axis is retained separately.
+Supplied raw prediction rows use their actual `by` values.
+
+Soap-film boundary coordinates are stored on the model scale. A
+transformed boundary has no retained raw coordinates, so raw-scale
+drawing raises an error. Draw these soap films with
+`back_transform = FALSE` to retain their boundaries.
+
+Parametric effects likewise retain both coordinate scales by row,
+including for many-to-one functions. Multi-column basis terms such as
+`poly(x, 2)` and parametric expressions with no single coordinate per
+input retain raw axes.
+
+The old `parametric_effects(transform = ...)` argument is deprecated.
+Replace `transform = TRUE` with `back_transform = FALSE`, and
+`transform = FALSE` with `back_transform = TRUE`.
+
 ## Local functions
 
 A fitted model may retain the formula expression without retaining the
@@ -123,17 +252,17 @@ fit_local <- function(dat) {
 }
 bundle <- fit_local(dat)
 smooth_estimates(bundle$model, data = nd, envir = bundle$envir)
-#> # A tibble: 8 × 6
-#>   .smooth           .type .by   .estimate    .se `transform_x(x)`
-#>   <chr>             <chr> <chr>     <dbl>  <dbl>            <dbl>
-#> 1 s(transform_x(x)) TPRS  NA      -0.543  0.113             0.531
-#> 2 s(transform_x(x)) TPRS  NA      -0.329  0.0772            0.795
-#> 3 s(transform_x(x)) TPRS  NA      -0.164  0.0607            1.00 
-#> 4 s(transform_x(x)) TPRS  NA      -0.0295 0.0511            1.18 
-#> 5 s(transform_x(x)) TPRS  NA       0.0802 0.0451            1.32 
-#> 6 s(transform_x(x)) TPRS  NA       0.170  0.0440            1.45 
-#> 7 s(transform_x(x)) TPRS  NA       0.244  0.0497            1.57 
-#> 8 s(transform_x(x)) TPRS  NA       0.308  0.0619            1.67
+#> # A tibble: 8 × 7
+#>   .smooth           .type .by   .estimate    .se `transform_x(x)` .gratia_raw_x
+#>   <chr>             <chr> <chr>     <dbl>  <dbl>            <dbl>         <dbl>
+#> 1 s(transform_x(x)) TPRS  NA      -0.543  0.113             0.531          1.2 
+#> 2 s(transform_x(x)) TPRS  NA      -0.329  0.0772            0.795          1.71
+#> 3 s(transform_x(x)) TPRS  NA      -0.164  0.0607            1.00           2.23
+#> 4 s(transform_x(x)) TPRS  NA      -0.0295 0.0511            1.18           2.74
+#> 5 s(transform_x(x)) TPRS  NA       0.0802 0.0451            1.32           3.26
+#> 6 s(transform_x(x)) TPRS  NA       0.170  0.0440            1.45           3.77
+#> 7 s(transform_x(x)) TPRS  NA       0.244  0.0497            1.57           4.29
+#> 8 s(transform_x(x)) TPRS  NA       0.308  0.0619            1.67           4.8
 fitted_values(bundle$model, data = nd, envir = bundle$envir)
 #> # A tibble: 8 × 7
 #>    .row     x effort .fitted    .se .lower_ci .upper_ci

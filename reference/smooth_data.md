@@ -15,7 +15,8 @@ smooth_data(
   offset = NULL,
   include_all = FALSE,
   var_order = NULL,
-  envir = NULL
+  envir = NULL,
+  back_transform = FALSE
 )
 ```
 
@@ -77,6 +78,23 @@ smooth_data(
   an optional environment supplying functions and constants used in
   model expressions. The available model formula environment is used
   when `NULL`. Covariate observations should be supplied in `data`.
+
+- back_transform:
+
+  logical; generate the grid on original covariate scales? The default,
+  `FALSE`, uses evenly spaced model coordinates. With `TRUE`, recover
+  raw fitting rows and generate original-scale coordinates, then
+  evaluate the model expressions forwards. Each axis must depend on one
+  distinct original model covariate. Both raw and evaluated columns are
+  returned, with auxiliary `.gratia_raw_*` columns for transformed axes.
+  Missing raw inputs or unavailable functions produce an error. Numeric
+  `by` multipliers are one on automatic grids, including when a
+  multiplier shares an original axis name; raw axis coordinates are
+  retained separately. If the multiplier is itself an untransformed grid
+  axis, supply prediction `data` to
+  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+  instead. Typical values added by `include_all = TRUE` to model-scale
+  grids do not provide raw coordinates for transformed axes.
 
 ## Examples
 

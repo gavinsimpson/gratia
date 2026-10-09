@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-36</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-37</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,6 +63,7 @@
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  dist <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -80,6 +81,7 @@
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  clip <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -97,6 +99,7 @@
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  dist <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -111,6 +114,7 @@
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -125,6 +129,7 @@
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -139,6 +144,7 @@
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -153,6 +159,7 @@
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -170,6 +177,7 @@
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  dist <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -187,6 +195,7 @@
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  dist <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -262,6 +271,24 @@ and <code>dist</code> is a distance within the unit square. See
 <dd><p>an optional environment supplying functions and constants used
 in model expressions. The available model formula environment is used when
 <code>NULL</code>. Covariate observations should be supplied in <code>data</code>.</p></dd>
+
+
+<dt id="arg-back-transform">back_transform<a class="anchor" aria-label="anchor" href="#arg-back-transform"></a></dt>
+<dd><p>logical; generate automatic grids on the original
+covariate scale? The default, <code>FALSE</code>, preserves evenly spaced model-scale
+grids (e.g. in <code>log(x)</code>). With <code>TRUE</code>, recover raw fitting covariates and
+generate grids on their original scale, then evaluate the model expressions
+forwards. Each axis must depend on one distinct original model covariate.
+Functions such as <code>foo(x)</code> require no inverse. Fitted prediction parameters
+are retained where provided by the model, including for <code>scale(x)</code>.
+When <code>data</code> are supplied, use those rows without generating a grid; <code>TRUE</code>
+requires raw coordinates for each axis. Returned model-coordinate columns
+keep their usual names and raw coordinates are retained in auxiliary
+<code>.gratia_raw_*</code> columns. Draw these estimates with
+<code>draw(object, back_transform = TRUE)</code> to display the raw coordinates.
+Estimates containing only transformed coordinates give an informative error
+if drawn on the original scale. This option does not change effect values
+or their intervals at the chosen evaluation points.</p></dd>
 
 
 <dt id="arg-clip">clip<a class="anchor" aria-label="anchor" href="#arg-clip"></a></dt>
