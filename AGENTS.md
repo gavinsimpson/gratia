@@ -19,3 +19,13 @@ in unrelated work. If the user asks to continue an existing branch, reuse it.
 Before merging into `main`, inspect the commits and diff relative to `main` and
 verify that the merge includes only the intended work. Resolve any accidentally
 inherited commits before merging.
+
+## Running tests
+
+Run all package tests and checks outside the sandbox from the outset, including
+targeted tests and the full test suite. Request elevated execution with
+`sandbox_permissions="require_escalated"` for test commands; do not first attempt
+them inside the sandbox. Parallel-worker tests need local socket permissions
+that the sandbox blocks, so a sandboxed run can produce misleading failures and
+require an unnecessary rerun. This instruction does not bypass tool approval
+requirements.
