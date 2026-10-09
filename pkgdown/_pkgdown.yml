@@ -11,6 +11,9 @@ authors:
 template:
   bootstrap: 5
   bootswatch: flatly
+  bslib:
+    # Allow for Flatly's taller navbar plus space above anchor targets.
+    pkgdown-nav-height: 80px
   opengraph:
     image:
       src: man/figures/README-draw-gam-figure-1.png
