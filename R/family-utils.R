@@ -17,9 +17,14 @@
 #'   [mgcv::gevlss()], `"epsilon"` or `"skewness"` for the skewness and
 #'   `"delta"` or `"kurtosis"` for the kurtosis parameter for
 #'   [mgcv::shash()], or `"phi"` for the scale parameter of [mgcv::gammals()] &
-#'   [mgcv::twlss()].
-#' @param which_eta numeric; the linear predictor to extract for families
-#'   [mgcv::mvn()] and [mgcv::multinom()].
+#'   [mgcv::twlss()]. `NULL` selects the first parameter. Only parameters and
+#'   aliases supported by the supplied family are accepted. For [mgcv::twlss()],
+#'   `"power"` selects the second linear predictor and `"scale"`, `"sigma"`,
+#'   and `"phi"` select the third.
+#' @param which_eta numeric; the integer index of the linear predictor to
+#'   extract for families [mgcv::mvn()] and [mgcv::multinom()]. Defaults to
+#'   the first linear predictor. If multiple indices are supplied, the first
+#'   is used with a warning.
 #' @param ... arguments passed to other methods.
 #'
 #' @author Gavin L. Simpson
@@ -52,13 +57,10 @@
 #' @rdname link
 #' @export
 `link.family` <- function(object, parameter = NULL, which_eta = NULL, ...) {
-  ## extract the link function
-  lfun <- get_link_function(object,
+  extract_link(object,
     parameter = parameter, inverse = FALSE,
     which_eta = which_eta, ...
   )
-  ## return
-  lfun
 }
 
 #' @rdname link
@@ -77,7 +79,7 @@
 #' @rdname link
 #' @export
 `link.gamm` <- function(object, ...) {
-  link(object[["gam"]])
+  link(object[["gam"]], ...)
 }
 
 #' @rdname link
@@ -96,7 +98,7 @@
       call. = FALSE
     )
   }
-  link(family(object[["gam"]], ...))
+  link(family(object[["gam"]]), ...)
 }
 
 #' @rdname link
@@ -108,14 +110,10 @@
 #' @rdname link
 #' @export
 `inv_link.family` <- function(object, parameter = NULL, which_eta = NULL, ...) {
-  ## extract the link function
-  lfun <- get_link_function(object,
+  extract_link(object,
     parameter = parameter, inverse = TRUE,
     which_eta = which_eta, ...
   )
-
-  ## return
-  lfun
 }
 
 #' @rdname link
@@ -135,7 +133,7 @@
 #' @rdname link
 #' @export
 `inv_link.gamm` <- function(object, ...) {
-  inv_link(object[["gam"]])
+  inv_link(object[["gam"]], ...)
 }
 
 #' @rdname link
@@ -147,7 +145,7 @@
       call. = FALSE
     )
   }
-  inv_link(family(object[["gam"]], ...))
+  inv_link(family(object[["gam"]]), ...)
 }
 
 #' @rdname link
@@ -231,547 +229,94 @@ family_type.family <- function(object, ...) {
 #'
 #' @param family a family object, the result of a call to [family()].
 #' @param inverse logical; return the inverse of the link function?
-`extract_link.family` <- function(family, inverse = FALSE, ...) {
-  fun <- if (isTRUE(inverse)) {
-    family[["linkinv"]]
+`extract_link.family` <- function(family, inverse = FALSE, parameter = NULL,
+                                  which_eta = NULL, ...) {
+  stop_if_not_family(family)
+  linfo <- family[["linfo"]]
+
+  if (is.null(linfo)) {
+    parameter <- match.arg(parameter, c("location", "mu"))
+    lobj <- family
+  } else if (family_name(family) %in% c("Multivariate normal", "multinom")) {
+    parameter <- match.arg(parameter, c("location", "mu"))
+    if (is.null(which_eta)) {
+      which_eta <- 1L
+    }
+    if (is.numeric(which_eta) && length(which_eta) > 1L) {
+      warning("Multiple values passed to 'which_eta'; using only the first.",
+        call. = FALSE
+      )
+      which_eta <- which_eta[[1L]]
+    }
+    if (!is.numeric(which_eta) || length(which_eta) != 1L ||
+        !is.finite(which_eta) || which_eta != trunc(which_eta) ||
+        which_eta < 1L || which_eta > length(linfo)) {
+      stop("Invalid 'which_eta': must be an integer between 1 and ",
+        length(linfo), ".", call. = FALSE
+      )
+    }
+    lobj <- linfo[[which_eta]]
   } else {
-    family[["linkfun"]]
+    parameters <- link_parameter_map(family)
+    parameter <- match.arg(parameter, names(parameters))
+    index <- parameters[[parameter]]
+    if (index > length(linfo)) {
+      stop("No link information for parameter '", parameter, "'.",
+        call. = FALSE
+      )
+    }
+    lobj <- linfo[[index]]
   }
 
-  fun # return
+  component <- if (isTRUE(inverse)) "linkinv" else "linkfun"
+  fun <- lobj[[component]]
+  if (!is.function(fun)) {
+    stop("Family does not supply a '", component, "' function",
+      if (!is.null(linfo)) paste0(" for parameter '", parameter, "'") else "",
+      ".", call. = FALSE
+    )
+  }
+  fun
 }
 
 #' @export
 #' @rdname link
-`extract_link.general.family` <- function(family, parameter, inverse = FALSE,
-                                          which_eta = NULL, ...) {
-  ## check `family`
-  ## Note: don't pass a `type` here as we only want a check for being a
-  ##       family object
-  stop_if_not_family(family)
-
-  linfo <- family[["linfo"]] # pull out linfo for easy access
-
-  ## some general families don't have $linfo
-  if (is.null(linfo)) {
-    fun <- extract_link.family(family, inverse = inverse)
-  } else if (family[["family"]] %in% c("Multivariate normal", "multinom")) {
-    if (is.null(which_eta)) {
-      # stop("Which linear predictor not specified; see argument 'which_eta'",
-      #   call. = FALSE
-      # )
-      which_eta <- 1L
-    }
-    len_linfo <- length(linfo)
-    if (which_eta > len_linfo || which_eta < 1) {
-      stop("Invalid 'which_eta': must be between 1 and ", len_linfo, ".",
-        call. = FALSE
-      )
-    }
-    if (length(which_eta) > 1L) {
-      which_eta <- rep(which_eta, length.out = 1L)
-      warning(
-        "Multiple values passed to 'which_eta';",
-        " using only the first."
-      )
-    }
-    lobj <- linfo[[which_eta]]
-    fun <- if (isTRUE(inverse)) {
-      lobj[["linkinv"]]
-    } else {
-      lobj[["linkfun"]]
-    }
-  } else {
-    # linfo is ordered; 1: location; 2: scale or sigma, 3: shape, power, etc
-    # (check pi is right greek letter for zero-inflation! - YES)
-    # but for twlss, eta2 is actually for p (power)
-    lobj <- switch(parameter,
-      location = linfo[[1L]],
-      mu = linfo[[1L]],
-      scale = linfo[[2L]],
-      sigma = linfo[[2L]],
-      phi = if (family_name(family) == "twlss") {
-        linfo[[3L]]
-      } else {
-        linfo[[2L]]
-      }, # scale parameter for twlss() gammals() - simon uses \phi in gammals.Rd
-      # but everything is in terms of \theta where \theta is the scale parameter
-      # of the model (note *not* the scale parameter of the Gamma)
-      theta = linfo[[2L]], # only for gammals
-      shape = linfo[[3L]],
-      power = linfo[[2L]], # power for twlss()
-      xi = linfo[[3L]], # xi for gevlss()
-      pi = linfo[[2L]], # pi for zero-inflation
-      epsilon = linfo[[3L]], # skewness for shash
-      skewness = linfo[[3L]], # skewness for shash
-      delta = linfo[[4L]], # kurtosis for shash
-      kurtosis = linfo[[4L]] # kurtosis for shash
-    )
-
-    fun <- if (isTRUE(inverse)) {
-      lobj[["linkinv"]]
-    } else {
-      lobj[["linkfun"]]
-    }
-  }
-  fun # return
-}
-
-## Other internal functions ---------------------------------------------------
-
-## Workhorse link extractor
-#' @importFrom dplyr case_when
-`get_link_function` <- function(object, parameter = "location",
-                                inverse = FALSE, which_eta = NULL) {
-  inverse <- as.logical(inverse)
-  linfo <- object[["linfo"]]
-  distr <- family_name(object) # object[["family"]] # name of the the family
-
-  ## process distr for some families
-  distr <- case_when(
-    grepl("^Negative Binomial", distr, ignore.case = TRUE) ~ "nb",
-    grepl("^Tweedie", distr, ignore.case = TRUE) ~ "tweedie",
-    grepl("^Beta regression", distr, ignore.case = TRUE) ~ "beta",
-    grepl("^scaled t", distr, ignore.case = TRUE) ~ "scaled_t",
-    grepl("^Ordered Categorical", distr, ignore.case = TRUE) ~ "ocat",
-    grepl("^zero inflated Poisson", distr, ignore.case = TRUE) ~ "zip",
-    grepl("^Cox PH", distr, ignore.case = TRUE) ~ "cox_ph",
-    grepl("^censored normal", distr, ignore.case = TRUE) ~ "cnorm",
-    grepl("^cnorm", distr, ignore.case = TRUE) ~ "cnorm",
-    grepl("^clog\\(", distr, ignore.case = TRUE) ~ "clog",
-    grepl("^bcg\\(", distr, ignore.case = TRUE) ~ "bcg",
-    grepl("^Multivariate normal", distr, ignore.case = TRUE) ~ "mvn",
-    grepl("^clog(e|[[:digit:]]+)norm", distr, ignore.case = TRUE) ~ "clognorm",
-    .default = as.character(distr)
+`extract_link.general.family` <- function(family, parameter = NULL,
+                                          inverse = FALSE, which_eta = NULL,
+                                          ...) {
+  extract_link.family(family, inverse = inverse, parameter = parameter,
+    which_eta = which_eta, ...
   )
-
-  ## which link function
-  lfun <-
-    switch(distr,
-      gaussian = gaussian_link(object, parameter, inverse = inverse),
-      poisson = poisson_link(object, parameter, inverse = inverse),
-      binomial = binomial_link(object, parameter, inverse = inverse),
-      Gamma = gamma_link(object, parameter, inverse = inverse),
-      inverse.gaussian = inverse_gaussian_link(object, parameter,
-        inverse = inverse
-      ),
-      quasi = quasi_link(object, parameter, inverse = inverse),
-      quasipoisson = quasi_poisson_link(object, parameter,
-        inverse = inverse
-      ),
-      quasibinomial = quasi_binomial_link(object, parameter,
-        inverse = inverse
-      ),
-      nb = nb_link(object, parameter, inverse = inverse),
-      tweedie = tw_link(object, parameter, inverse = inverse),
-      beta = beta_link(object, parameter, inverse = inverse),
-      scaled_t = scaled_t_link(object, parameter, inverse = inverse),
-      ocat = ocat_link(object, parameter, inverse = inverse),
-      zip = zip_link(object, parameter, inverse = inverse),
-      cox_ph = cox_ph_link(object, parameter, inverse = inverse),
-      gaulss = gaulss_link(object, parameter, inverse = inverse),
-      twlss = twlss_link(object, parameter, inverse = inverse),
-      gevlss = gevlss_link(object, parameter, inverse = inverse),
-      gammals = gammals_link(object, parameter, inverse = inverse),
-      gumbls = gumbls_link(object, parameter, inverse = inverse),
-      ziplss = ziplss_link(object, parameter, inverse = inverse),
-      mvn = mvn_link(object, parameter,
-        inverse = inverse,
-        which_eta = ifelse(is.null(which_eta), 1, which_eta)
-      ),
-      multinom = multinom_link(object, parameter,
-        inverse = inverse,
-        which_eta = ifelse(is.null(which_eta), 1, which_eta)
-      ),
-      shash = shash_link(object, parameter, inverse = inverse),
-      cnorm = cnorm_link(object, parameter, inverse = inverse),
-      clog = clog_link(object, parameter, inverse = inverse),
-      bcg = bcg_link(object, parameter, inverse = inverse),
-      clognorm = clognorm_link(object, parameter, inverse = inverse),
-      cpois = cpois_link(object, parameter, inverse = inverse),
-      elf   = elf_link(object, inverse = inverse)
-    )
-
-  ## return
-  lfun
 }
 
-## Internal link extractor functions
-
-`gaussian_link` <- function(family, parameter = c("location", "mu"),
-                            inverse = FALSE) {
-  stop_if_not_family(family, type = "gaussian")
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`elf_link` <- function(family, inverse = FALSE) {
-  stop_if_not_family(family, type = "elf")
-
-  extract_link(family, inverse = inverse)
-}
-
-`cnorm_link` <- function(family, parameter = c("location", "mu"),
-                         inverse = FALSE) {
-  # stop_if_not_family(family, type = "censored normal")
-  # mgcv is especially inconsistent in naming this family
-  # the raw family is "censored normal", but when used on a fitted model it
-  # is "cnorm(xxx)" with xxx being some number that is the log standard dev
-  if (!any(
-    grepl("^censored normal", family$family),
-    grepl("^cnorm", family$family)
-  )) {
-    stop("'family' is not a censored normal family", call. = FALSE)
-  }
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`clog_link` <- function(
-  family, parameter = c("location", "mu"), inverse = FALSE
-) {
-  if (grepl("^cnorm\\(", family$family)) {
-    stop("'family' is not a censored logistic family", call. = FALSE)
-  }
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`bcg_link` <- function(
-  family, parameter = c("location", "mu"), inverse = FALSE
-) {
-  if (
-    !any(
-      grepl("^bcg\\(", family$family),
-      grepl("^bcg", family$family)
-    )
-  ) {
-    stop("'family' is not a censored Box-Cox Gaussian", call. = FALSE)
-  }
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`cpois_link` <- function(
-  family, parameter = c("location", "mu"), inverse = FALSE
-) {
-  if (!grepl("^cpois$", family$family)) {
-    stop("'family' is not a censored poisson family", call. = FALSE)
-  }
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`clognorm_link` <- function(
-  family,
-  parameter = c("location", "mu"),
-  inverse = FALSE
-) {
-  if (!grepl("^clog(e|[[:digit:]]+)norm", family$family)) {
-    stop("'family' is not a censored lognormal family", call. = FALSE)
-  }
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`poisson_link` <- function(family, parameter = c("location", "mu"),
-                           inverse = FALSE) {
-  stop_if_not_family(family, type = "poisson")
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`binomial_link` <- function(family, parameter = c("location", "mu"),
-                            inverse = FALSE) {
-  stop_if_not_family(family, type = "binomial")
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`gamma_link` <- function(family, parameter = c("location", "mu"),
-                         inverse = FALSE) {
-  stop_if_not_family(family, type = "Gamma")
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`inverse_gaussian_link` <- function(family, parameter = c("location", "mu"),
-                                    inverse = FALSE) {
-  stop_if_not_family(family, type = "inverse.gaussian")
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`quasi_link` <- function(family, parameter = c("location", "mu"),
-                         inverse = FALSE) {
-  stop_if_not_family(family, type = "quasi")
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`quasi_poisson_link` <- function(family, parameter = c("location", "mu"),
-                                 inverse = FALSE) {
-  stop_if_not_family(family, type = "quasipoisson")
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`quasi_binomial_link` <- function(family, parameter = c("location", "mu"),
-                                  inverse = FALSE) {
-  stop_if_not_family(family, type = "quasibinomial")
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`nb_link` <- function(family, parameter = c("location", "mu"),
-                      inverse = FALSE) {
-  stop_if_not_family(family, type = "Negative Binomial")
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`tw_link` <- function(family, parameter = c("location", "mu"),
-                      inverse = FALSE) {
-  stop_if_not_family(family, type = "Tweedie")
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`beta_link` <- function(family, parameter = c("location", "mu"),
-                        inverse = FALSE) {
-  stop_if_not_family(family, type = "Beta regression")
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`scaled_t_link` <- function(family, parameter = c("location", "mu"),
-                            inverse = FALSE) {
-  stop_if_not_family(family, type = "scaled t")
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`ocat_link` <- function(family, parameter = c("location", "mu"),
-                        inverse = FALSE) {
-  stop_if_not_family(family, type = "Ordered Categorical")
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`zip_link` <- function(family, parameter = c("location", "mu"),
-                       inverse = FALSE) {
-  # stop_if_not_family(family, type = "zero inflated Poisson")
-  # the raw family is "zero inflated Poisson", but when used on fitted model it
-  # is "Zero inflated Poisson(xxx)" with xxx being two numbers that related to
-  # the zero inflation. Note the inconsistent capitalisation.
-  if (!is_mgcv_family(family)) {
-    stop("'family' is not a family object", call. = FALSE)
-  }
-  if (!any(
-    grepl("^Zero inflated Poisson", family$family),
-    grepl("^zero inflated Poisson", family$family)
-  )) {
-    stop("'family' is not of type '\"zero inflated Poisson\"'", call. = FALSE)
-  }
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-`cox_ph_link` <- function(family, parameter = c("location", "mu"),
-                          inverse = FALSE) {
-  stop_if_not_family(family, type = "Cox PH")
-
-  parameter <- match.arg(parameter)
-
-  extract_link(family, inverse = inverse)
-}
-
-## Location scale shape families -----------------------------------------------
-
-`gaulss_link` <- function(family,
-                          parameter = c("location", "scale", "mu", "sigma"),
-                          inverse = FALSE) {
-  stop_if_not_family(family, type = "gaulss")
-
-  parameter <- match.arg(parameter)
-
-  fun <- extract_link(family, parameter = parameter, inverse = inverse)
-  fun # return
-}
-
-`twlss_link` <- function(family,
-                         parameter = c(
-                           "location", "scale",
-                           "mu", "sigma", "power"
-                         ),
-                         inverse = FALSE) {
-  stop_if_not_family(family, type = "twlss")
-
-  parameter <- match.arg(parameter)
-
-  fun <- extract_link(family, parameter = parameter, inverse = inverse)
-  fun # return
-}
-
-`gevlss_link` <- function(family,
-                          parameter = c(
-                            "location", "scale", "shape",
-                            "mu", "sigma", "xi"
-                          ),
-                          inverse = FALSE) {
-  stop_if_not_family(family, type = "gevlss")
-
-  parameter <- match.arg(parameter)
-
-  fun <- extract_link(family, parameter = parameter, inverse = inverse)
-  fun # return
-}
-
-# gammals parameters
-# * location == mu
-# * scale == theta == phi
-`gammals_link` <- function(family,
-  parameter = c("location", "scale", "mu", "theta", "phi"),
-  inverse = FALSE
-) {
-  stop_if_not_family(family, type = "gammals")
-
-  parameter <- match.arg(parameter)
-
-  fun <- extract_link(family, parameter = parameter, inverse = inverse)
-  fun # return
-}
-
-`gumbls_link` <- function(family,
-                          parameter = c("location", "scale", "mu"),
-                          inverse = FALSE) {
-  stop_if_not_family(family, type = "gumbls")
-
-  parameter <- match.arg(parameter)
-
-  fun <- extract_link(family, parameter = parameter, inverse = inverse)
-  fun # return
-}
-
-`ziplss_link` <- function(family,
-                          parameter = c("location", "scale", "mu", "pi"),
-                          inverse = FALSE) {
-  stop_if_not_family(family, type = "ziplss")
-
-  parameter <- match.arg(parameter)
-
-  fun <- extract_link(family, parameter = parameter, inverse = inverse)
-  fun # return
-}
-
-`mvn_link` <- function(family, parameter = "location", inverse = FALSE,
-                       which_eta = NULL) {
-  stop_if_not_family(family, type = "Multivariate normal")
-
-  parameter <- match.arg(parameter)
-
-  fun <- extract_link(family,
-    parameter = parameter, inverse = inverse,
-    which_eta = which_eta
+## Parameter aliases and their linear predictor indices for multi-link families.
+## Single-link families use their supplied functions without a name whitelist.
+link_parameter_map <- function(family) {
+  parameters <- switch(family_name(family),
+    gaulss = c(location = 1L, mu = 1L, scale = 2L, sigma = 2L),
+    gammals = c(location = 1L, mu = 1L, scale = 2L, theta = 2L, phi = 2L),
+    gumbls = c(location = 1L, mu = 1L, scale = 2L),
+    gevlss = c(location = 1L, mu = 1L, scale = 2L, sigma = 2L,
+      shape = 3L, xi = 3L),
+    shash = c(location = 1L, mu = 1L, scale = 2L, sigma = 2L,
+      skewness = 3L, epsilon = 3L, kurtosis = 4L, delta = 4L),
+    ziplss = c(location = 1L, mu = 1L, scale = 2L, pi = 2L),
+    twlss = c(location = 1L, mu = 1L, power = 2L,
+      scale = 3L, sigma = 3L, phi = 3L)
   )
-  fun # return
+  if (is.null(parameters)) {
+    stop("Unknown parameter mapping for multi-link family '",
+      family_name(family), "'.", call. = FALSE
+    )
+  }
+  parameters
 }
 
-`multinom_link` <- function(family, parameter = "location", inverse = FALSE,
-                            which_eta = NULL) {
-  stop_if_not_family(family, type = "multinom")
-
-  parameter <- match.arg(parameter)
-
-  fun <- extract_link(family,
-    parameter = parameter, inverse = inverse,
-    which_eta = which_eta
-  )
-  fun # return
-}
-
-`shash_link` <- function(family,
-                         parameter = c(
-                           "location", "scale", "skewness",
-                           "kurtosis", "mu", "sigma", "epsilon",
-                           "delta"
-                         ),
-                         inverse = FALSE) {
-  stop_if_not_family(family, type = "shash")
-
-  parameter <- match.arg(parameter)
-
-  fun <- extract_link(family, parameter = parameter, inverse = inverse)
-  fun # return
-}
-
-## Utility function for consistent checks and errors
-##
-## - only checks type if `type` is not NULL
-`stop_if_not_family` <- function(object, type = NULL) {
-  ## check if object is a family; throw error if not
+## Utility function for consistent checks and errors.
+`stop_if_not_family` <- function(object) {
   if (!is_mgcv_family(object)) {
     stop("'family' is not a family object", call. = FALSE)
   }
-
-  if (!is.null(type)) {
-    fam <- object[["family"]]
-    ## check that family is of the correct type
-    ##  - need to handle a couple of special types
-    special <- c(
-      "Tweedie", "Negative Binomial", "negative binomial",
-      "Scaled t", "scaled t", "Ordered Categorical",
-      "Beta regression"
-    )
-    if (type %in% special) {
-      if (!grepl(type, fam, ignore.case = TRUE)) {
-        stop("'family' is not of type '\"", type, "\"'", call. = FALSE)
-      }
-    } else {
-      if (!identical(fam, type)) {
-        stop("'family' is not of type '\"", type, "\"'", call. = FALSE)
-      }
-    }
-  }
-
   TRUE
 }
 

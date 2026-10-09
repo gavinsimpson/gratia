@@ -1,5 +1,5 @@
 Package: gratia
-Version: 0.11.2-34
+Version: 0.11.2-35
 Title: Graceful 'ggplot'-Based Graphics and Other Functions for GAMs Fitted Using 'mgcv'
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     email = "ucfagls@gmail.com",
@@ -35,6 +35,7 @@ Imports:
     scales,
     utils
 Suggests:
+    qgam,
     tweedie (>= 2.3.5),
     gamm4,
     lme4,

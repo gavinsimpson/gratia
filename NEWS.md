@@ -2,6 +2,13 @@
 
 ## User visible changes
 
+* Link extraction now shares parameter validation across `link()`, `inv_link()`,
+  and `extract_link()`. Unsupported parameters are rejected consistently, while
+  single-link families can use their supplied functions without a family-name
+  whitelist. For `twlss()`, `scale`, `sigma`, and `phi` select the third linear
+  predictor, and `power` selects the second. Explicit `which_eta` indices for
+  `mvn()` and `multinom()` are now respected and validated.
+
 * Parametric interaction surfaces now share the smooth-surface fill-range
   calculation, centring the default diverging palette at zero across all
   facets. Fixed scales now also expand parametric surface fill ranges (#411).
