@@ -226,7 +226,7 @@
     lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
     select <- term
   }
-  basis(object[["gam"]],
+  basis(gamm4_gam(object),
     select = select, data = data, n = n,
     n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, partial_match = partial_match,
     ...

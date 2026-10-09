@@ -265,11 +265,8 @@
 }
 
 #' @export
-`draw.list` <- function(object, ...) {
-  if (!is_gamm4(object)) {
-    stop("Don't know how to draw a list")
-  }
-  draw(object$gam, ...)
+`draw.gamm4` <- function(object, ...) {
+  draw(gamm4_gam(object), ...)
 }
 
 #' @export

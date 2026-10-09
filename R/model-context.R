@@ -47,11 +47,8 @@ model_context.gamm <- function(object, component = NULL) {
   model_context(object$gam, component)
 }
 #' @export
-model_context.list <- function(object, component = NULL) {
-  if (!is_gamm4(object)) {
-    cli::cli_abort("No model context adapter for this list.")
-  }
-  model_context(object$gam, component)
+model_context.gamm4 <- function(object, component = NULL) {
+  model_context(gamm4_gam(object), component)
 }
 #' @export
 model_context.gamlss <- function(object, component = NULL) {

@@ -528,7 +528,7 @@ test_that("get smooths by id works for gamm4", {
   expect_identical(sm[[1]], m_gamm4$gam$smooth[[1]])
 
   expect_error(get_smooths_by_id(list(a = 10), 1),
-    "Not a gamm4 model fit.")
+    "no applicable method")
 })
 
 test_that("by smooth failure throws the right error", {

@@ -2,6 +2,8 @@
 
 ## User visible changes
 
+* Improved support for `gamm4` models across gratia.
+
 * Link extraction now shares parameter validation across `link()`, `inv_link()`,
   and `extract_link()`. Unsupported parameters are rejected consistently, while
   single-link families can use their supplied functions without a family-name

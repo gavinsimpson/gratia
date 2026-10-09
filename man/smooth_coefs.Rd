@@ -6,7 +6,6 @@
 \alias{smooth_coefs.bam}
 \alias{smooth_coefs.gamm}
 \alias{smooth_coefs.gamm4}
-\alias{smooth_coefs.list}
 \alias{smooth_coefs.mgcv.smooth}
 \alias{smooth_coefs.scam}
 \title{Coefficients for a particular smooth}
@@ -20,8 +19,6 @@ smooth_coefs(object, ...)
 \method{smooth_coefs}{gamm}(object, select, term = deprecated(), ...)
 
 \method{smooth_coefs}{gamm4}(object, select, term = deprecated(), ...)
-
-\method{smooth_coefs}{list}(object, select, term = deprecated(), ...)
 
 \method{smooth_coefs}{mgcv.smooth}(object, model, ...)
 

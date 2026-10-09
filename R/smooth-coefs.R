@@ -106,35 +106,12 @@
       "smooth_coefs(select)")
     select <- term
   }
-  sm <- get_smooth(object[["gam"]], term = select, ...)
+  sm <- get_smooth(gamm4_gam(object), term = select, ...)
   if (length(sm) == 0) {
     stop("You didn't specify a smooth via 'select'")
   }
   i <- smooth_coef_indices(sm)
-  coef(object[["gam"]])[i]
-}
-
-#' @export
-#' @rdname smooth_coefs
-#' @importFrom stats coef
-`smooth_coefs.list` <- function(object,
-    select,
-    term = deprecated(),
-    ...) {
-  if (lifecycle::is_present(term)) {
-    lifecycle::deprecate_warn("0.8.9.9", "smooth_coefs(term)",
-      "smooth_coefs(select)")
-    select <- term
-  }
-  if (!is_gamm4(object)) {
-    stop("'object' is a list but doesn't appear to be a 'gamm4()' model.")
-  }
-  sm <- get_smooth(object[["gam"]], term = select, ...)
-  if (length(sm) == 0) {
-    stop("You didn't specify a smooth via 'select'")
-  }
-  i <- smooth_coef_indices(sm)
-  coef(object[["gam"]])[i]
+  coef(gamm4_gam(object))[i]
 }
 
 #' @export

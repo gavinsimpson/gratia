@@ -242,11 +242,8 @@
 
 # gamm4 method
 #' @export
-`smooth_estimates.list` <- function(object, ...) {
-  if (!is_gamm4(object)) {
-    stop("'smooth_estimates()' not available for a generic list")
-  }
-  smooth_estimates(object[["gam"]], ...)
+`smooth_estimates.gamm4` <- function(object, ...) {
+  smooth_estimates(gamm4_gam(object), ...)
 }
 
 #' Check user-supplied data for suitability

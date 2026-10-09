@@ -486,11 +486,6 @@
 #' @importFrom stats confint
 #'
 #' @export
-`confint.list` <- function(object, ...) {
-  if (!is_gamm4(object)) {
-    stop("`object` does not appear to a `gamm4` model object",
-      call. = FALSE
-    )
-  }
-  confint(object[["gam"]], ...)
+`confint.gamm4` <- function(object, ...) {
+  confint(gamm4_gam(object), ...)
 }

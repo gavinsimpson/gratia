@@ -734,7 +734,8 @@
   ...
 ) {
   model <- with_model_envir(model, envir)
-  sims <- simulate(
+  simulate_fun <- if (inherits(model, "gam")) simulate.gam else simulate
+  sims <- simulate_fun(
     model, nsim = n, seed = seed, data = data, weights = weights, ...
   )
   RNGstate <- attr(sims, "seed")

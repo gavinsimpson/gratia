@@ -64,7 +64,7 @@
 #' @export
 #' @rdname model_terms
 `model_terms.gamm4` <- function(object, ...) {
-  model_terms(object$gam)
+  model_terms(gamm4_gam(object))
 }
 
 #' @export
@@ -213,23 +213,9 @@
 #' @export
 #' @rdname model_vars
 `model_vars.gamm4` <- function(model, ...) {
-  # this is here for when Simon actually classes gamm4 objects
   # want a vector of variables involved in the model formula.
   # Don't want this `attr(terms(model), "term.labels")` ! as this returns
   # model terms not variable names. Use all.vars() on `pred.formula` for
   # a GAM(M) model
-  model_vars(model[["gam"]]$pred.formula)
-}
-
-#' @export
-#' @rdname model_vars
-`model_vars.list` <- function(model, ...) {
-  # want a vector of variables involved in the model formula.
-  # Don't want this `attr(terms(model), "term.labels")` ! as this returns
-  # model terms not variable names. Use all.vars() on `pred.formula` for
-  # a GAM(M) model
-  if (!is_gamm4(model)) {
-    stop("Don't know how to handle generic list objects.")
-  }
-  model_vars(model[["gam"]]$pred.formula)
+  model_vars(gamm4_gam(model)$pred.formula)
 }

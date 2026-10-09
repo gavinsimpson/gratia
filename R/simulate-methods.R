@@ -9,8 +9,8 @@
 #' model must contain, or be updatable to contain, the required random
 #' number generator. See [mgcv::fix.family.rd()].
 #'
-#' @param object a fitted GAM, typically the result of a call to [mgcv::gam]`
-#'   or [mgcv::gamm()].
+#' @param object a fitted GAM, typically the result of a call to [mgcv::gam()],
+#'   [mgcv::gamm()], or [gamm4::gamm4()].
 #' @param nsim numeric; the number of posterior simulations to return.
 #' @param seed numeric; a random seed for the simulations.
 #' @param data data frame; new observations at which the posterior draws
@@ -165,7 +165,7 @@
     newdata_deprecated()
   }
 
-  simulate(object$gam,
+  simulate.gam(object$gam,
     nsim = nsim, seed = seed, data = data,
     weights = weights, ...
   )

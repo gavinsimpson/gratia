@@ -11,8 +11,8 @@
 #' * returns the variance of each smooth as well as the standard deviation, and
 #' * returns the variance components as a tibble.
 #'
-#' @param object an R object. Currently only models fitted by [mgcv::gam()] or
-#'   [mgcv::bam()] are supported.
+#' @param object a model fitted by [mgcv::gam()], [mgcv::bam()], or
+#'   [gamm4::gamm4()]. See [gamm4_support] for mixed-model variance components.
 #' @param rescale logical; for numerical stability reasons the penalty matrices
 #'   of smooths are rescaled before fitting. If `rescale = TRUE`, this rescaling
 #'   is undone, resulting in variance components that are on their original

@@ -27,9 +27,9 @@ test_that("link() works with a gamm4() model", {
   expect_identical(f, gaussian()$linkfun)
 })
 
-test_that("link.list() fails with a list that isn't a gamm4", {
+test_that("link() rejects an unsupported list", {
   expect_error(link(l),
-    regexp = "`object` does not appear to a `gamm4` model object",
+    regexp = "no applicable method",
     fixed = TRUE
   )
 })
@@ -76,9 +76,9 @@ test_that("inv_link() works with a bam() model", {
   expect_identical(f, gaussian()$linkinv)
 })
 
-test_that("inv_link.list() fails with a list that isn't a gamm4", {
+test_that("inv_link() rejects an unsupported list", {
   expect_error(inv_link(l),
-    regexp = "`object` does not appear to a `gamm4` model object",
+    regexp = "no applicable method",
     fixed = TRUE
   )
 })
@@ -142,6 +142,12 @@ for (family_id in c("clognorm", "elf")) {
   test_that(paste("link extraction works for optional family", family_id), {
     if (family_id == "clognorm") {
       skip_if_not_installed("mgcvUtils")
+      # Loading mgcvUtils replaces simulate.gam globally. Restore the method
+      # that was registered before this test so later simulation tests are
+      # independent of the availability/order of optional family packages.
+      original_simulate <- getS3method("simulate", "gam")
+      withr::defer(registerS3method("simulate", "gam", original_simulate,
+        envir = asNamespace("stats")))
       fam <- mgcvUtils::clognorm()
     } else {
       skip_if_not_installed("qgam")
@@ -284,7 +290,8 @@ for (family_id in c("mvn", "multinom")) {
 
 test_that("model wrappers forward parameter selection", {
   for (model in list(m_gaulss, structure(list(gam = m_gaulss), class = "gamm"),
-      list(gam = m_gaulss, mer = m_gamm4$mer))) {
+      structure(list(gam = m_gaulss, mer = m_gamm4$mer),
+        class = c("gamm4", "list")))) {
     fam <- family(m_gaulss)
     expect_identical(link(model, parameter = "scale"), fam$linfo[[2L]]$linkfun)
     expect_identical(inv_link(model, parameter = "scale"), fam$linfo[[2L]]$linkinv)
@@ -348,7 +355,7 @@ test_that("family.gamm4 works for a gamm4 object", {
 
 test_that("family.gamm4 throws an error when passed a non-gamm4 object", {
   expect_error(family(l),
-    regexp = "`object` does not appear to a `gamm4` model object",
+    regexp = "no applicable method",
     fixed = TRUE
   )
 })
@@ -391,9 +398,9 @@ test_that("family_name() works with a bam() model", {
   expect_identical(f, "gaussian")
 })
 
-test_that("family_name.list() fails with a list that isn't a gamm4", {
+test_that("family_name() rejects an unsupported list", {
   expect_error(family_name(l),
-    regexp = "`object` does not appear to a `gamm4` model object",
+    regexp = "no applicable method",
     fixed = TRUE
   )
 })

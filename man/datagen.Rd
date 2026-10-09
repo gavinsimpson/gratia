@@ -6,7 +6,7 @@
 \alias{datagen.fs.interaction}
 \alias{datagen.gam}
 \alias{datagen.gamm}
-\alias{datagen.list}
+\alias{datagen.gamm4}
 \title{Generate data over the range of variables used in smooths}
 \usage{
 datagen(x, ...)
@@ -19,7 +19,7 @@ datagen(x, ...)
 
 \method{datagen}{gamm}(x, ...)
 
-\method{datagen}{list}(x, ...)
+\method{datagen}{gamm4}(x, ...)
 }
 \arguments{
 \item{x}{an object for which new data is required. Currently objects of

@@ -92,13 +92,8 @@
 #' @rdname link
 #' @export
 #' @importFrom stats family
-`link.list` <- function(object, ...) {
-  if (!is_gamm4(object)) {
-    stop("`object` does not appear to a `gamm4` model object",
-      call. = FALSE
-    )
-  }
-  link(family(object[["gam"]]), ...)
+`link.gamm4` <- function(object, ...) {
+  link(family(gamm4_gam(object)), ...)
 }
 
 #' @rdname link
@@ -139,13 +134,8 @@
 #' @rdname link
 #' @export
 #' @importFrom stats family
-`inv_link.list` <- function(object, ...) {
-  if (!is_gamm4(object)) {
-    stop("`object` does not appear to a `gamm4` model object",
-      call. = FALSE
-    )
-  }
-  inv_link(family(object[["gam"]]), ...)
+`inv_link.gamm4` <- function(object, ...) {
+  inv_link(family(gamm4_gam(object)), ...)
 }
 
 #' @rdname link
@@ -182,13 +172,8 @@
 
 #' @export
 #' @rdname family.gam
-`family.list` <- function(object, ...) {
-  if (!is_gamm4(object)) {
-    stop("`object` does not appear to a `gamm4` model object",
-      call. = FALSE
-    )
-  }
-  family(object[["gam"]])
+`family.gamm4` <- function(object, ...) {
+  family(gamm4_gam(object))
 }
 
 #' Extracts the type of family in a consistent way
@@ -361,11 +346,6 @@ link_parameter_map <- function(family) {
 
 #' @export
 #' @importFrom stats family
-`family_name.list` <- function(object, ...) {
-  if (!is_gamm4(object)) {
-    stop("`object` does not appear to a `gamm4` model object",
-      call. = FALSE
-    )
-  }
-  family_name(object[["gam"]], ...)
+`family_name.gamm4` <- function(object, ...) {
+  family_name(gamm4_gam(object), ...)
 }

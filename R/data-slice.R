@@ -229,14 +229,8 @@ data_slice_grid <- function(data, exprs, vars, by, observed_only, tv, source) {
 
 #' @export
 #' @rdname data_slice
-`data_slice.list` <- function(object, ...) { # for gamm4 lists only
-  ## Is this list likely to be a gamm4 list?
-  if (!is_gamm4(object)) {
-    stop("`object` does not appear to a `gamm4` model object",
-      call. = FALSE
-    )
-  }
-  data_slice(object[["gam"]], ...)
+`data_slice.gamm4` <- function(object, ...) {
+  data_slice(gamm4_gam(object), ...)
 }
 
 #' @export

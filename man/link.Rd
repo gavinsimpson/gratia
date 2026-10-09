@@ -7,13 +7,13 @@
 \alias{link.bam}
 \alias{link.gamm}
 \alias{link.glm}
-\alias{link.list}
+\alias{link.gamm4}
 \alias{inv_link}
 \alias{inv_link.family}
 \alias{inv_link.gam}
 \alias{inv_link.bam}
 \alias{inv_link.gamm}
-\alias{inv_link.list}
+\alias{inv_link.gamm4}
 \alias{inv_link.glm}
 \alias{extract_link}
 \alias{extract_link.family}
@@ -32,7 +32,7 @@ link(object, ...)
 
 \method{link}{glm}(object, ...)
 
-\method{link}{list}(object, ...)
+\method{link}{gamm4}(object, ...)
 
 inv_link(object, ...)
 
@@ -44,7 +44,7 @@ inv_link(object, ...)
 
 \method{inv_link}{gamm}(object, ...)
 
-\method{inv_link}{list}(object, ...)
+\method{inv_link}{gamm4}(object, ...)
 
 \method{inv_link}{glm}(object, ...)
 

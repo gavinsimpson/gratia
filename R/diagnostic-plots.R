@@ -620,6 +620,7 @@ diagnostic_method <- function(model, method = NULL) {
   line_col = "red",
   seed = NULL
 ) {
+  if (inherits(model, "gamm4")) model <- gamm4_gam(model)
   original <- model
   model <- model_used_rows(model)
   type <- match.arg(type)
@@ -700,6 +701,7 @@ diagnostic_method <- function(model, method = NULL) {
   point_col = "grey20",
   point_alpha = 1
 ) {
+  if (inherits(model, "gamm4")) model <- gamm4_gam(model)
   ## extract data for plot
   original <- model
   model <- model_used_rows(model)
@@ -773,6 +775,7 @@ diagnostic_method <- function(model, method = NULL) {
   subtitle = NULL, caption = NULL,
   seed = NULL
 ) {
+  if (inherits(model, "gamm4")) model <- gamm4_gam(model)
   ## extract data for plot
   original <- model
   model <- model_used_rows(model)
@@ -1044,6 +1047,9 @@ diagnostic_method <- function(model, method = NULL) {
 
 # Internal weights for diagnostics; keep base lm dispatch unchanged.
 `diagnostic_weights` <- function(model) {
+  if (inherits(model, "gam")) {
+    return(stats::napredict(model$na.action, model$prior.weights))
+  }
   if (inherits(model, "glm")) {
     return(stats::weights(model, type = "prior"))
   }

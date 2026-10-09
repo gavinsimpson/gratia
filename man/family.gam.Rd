@@ -4,7 +4,7 @@
 \alias{family.gam}
 \alias{family.gamm}
 \alias{family.bam}
-\alias{family.list}
+\alias{family.gamm4}
 \title{Extract family objects from models}
 \usage{
 \method{family}{gam}(object, ...)
@@ -13,7 +13,7 @@
 
 \method{family}{bam}(object, ...)
 
-\method{family}{list}(object, ...)
+\method{family}{gamm4}(object, ...)
 }
 \arguments{
 \item{object}{a fitted model. Models fitted by \code{\link[mgcv:gam]{mgcv::gam()}}, \code{\link[mgcv:bam]{mgcv::bam()}},

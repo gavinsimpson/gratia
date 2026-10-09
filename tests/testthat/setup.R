@@ -189,7 +189,7 @@ m_gamm4 <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   REML = TRUE
 )
 m_gamm4_real <- m_gamm4
-class(m_gamm4_real) <- append("gamm4", class(m_gamm4_real[-1L]))
+
 
 m_gaulss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~1),
   data = su_eg1,
@@ -761,3 +761,36 @@ zip_df <- zip_data(seed = 1)
 
 # Secondary examples are fitted once, on demand, after the CRAN guard.
 secondary_models <- make_secondary_models(environment())
+
+# Small, shared integration fixtures use the actual upstream gamm4 class.
+# Preserve the test session's RNG while generating responses and fitting.
+withr::with_seed(11011, {
+  gamm4_data <- data.frame(
+    x = runif(180), z = runif(180),
+    fac = factor(rep(c("a", "b"), 90)),
+    group = factor(rep(seq_len(12), each = 15)),
+    off = rep(c(0.2, 0.5, 0.8), 60),
+    weight = rep(c(1, 2), 90)
+  )
+  eta <- sin(4 * gamm4_data$x) + 0.7 * gamm4_data$z +
+    0.8 * (gamm4_data$fac == "b") +
+    seq(-1.5, 1.5, length.out = 12)[gamm4_data$group]
+  gamm4_data$y <- eta + rnorm(180, sd = 0.4)
+  gamm4_data$binary <- rbinom(180, 1, plogis(eta))
+  gamm4_data$count <- rpois(180, exp(eta / 2 + gamm4_data$off))
+  gamm4_gaussian <- gamm4::gamm4(y ~ fac + z + s(x, k = 5),
+    random = ~(1 | group), data = gamm4_data)
+  gamm4_binomial <- gamm4::gamm4(binary ~ fac + z + s(x, k = 5),
+    random = ~(1 | group), data = gamm4_data, family = binomial())
+  gamm4_poisson <- gamm4::gamm4(count ~ fac + z + s(x, k = 5) + offset(off),
+    random = ~(1 | group), data = gamm4_data, family = poisson())
+  gamm4_surface <- gamm4::gamm4(y ~ fac + t2(x, z, k = c(4, 4)),
+    random = ~(1 | group), data = gamm4_data)
+  gamm4_by <- gamm4::gamm4(y ~ fac + s(x, by = fac, k = 5),
+    random = ~(1 | group), data = gamm4_data)
+  gamm4_na_data <- gamm4_data
+  gamm4_na_data$x[c(8, 14)] <- NA_real_
+  gamm4_missing <- gamm4::gamm4(y ~ fac + z + s(x, k = 5),
+    random = ~(1 | group), data = gamm4_na_data, weights = weight,
+    subset = seq_len(160), na.action = na.exclude)
+})

@@ -95,11 +95,8 @@
 }
 
 #' @export
-`partial_residuals.list` <- function(object, ...) {
-  if (!is_gamm4(object)) {
-    stop("'object' is not a `gamm4()` fit. Can't handle general lists.")
-  }
-  partial_residuals(object[["gam"]], ...)
+`partial_residuals.gamm4` <- function(object, ...) {
+  partial_residuals(gamm4_gam(object), ...)
 }
 
 ## Internal function to compute weighted residuals for use by other functions

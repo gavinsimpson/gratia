@@ -7,7 +7,6 @@
 \alias{model_vars.bam}
 \alias{model_vars.gamm}
 \alias{model_vars.gamm4}
-\alias{model_vars.list}
 \title{List the variables involved in a model fitted with a formula}
 \usage{
 model_vars(model, ...)
@@ -21,8 +20,6 @@ model_vars(model, ...)
 \method{model_vars}{gamm}(model, ...)
 
 \method{model_vars}{gamm4}(model, ...)
-
-\method{model_vars}{list}(model, ...)
 }
 \arguments{
 \item{model}{a fitted model object with a \verb{$pred.formula}, \verb{$terms}
