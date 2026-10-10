@@ -71,8 +71,8 @@
 
 * Flat smooth surfaces now share an internal renderer across bivariate,
   trivariate, quadvariate, tensor-product and soap-film plots (#308).
-  `draw()` and `assemble()` accept `geom = "tile"` for vector rectangles;
-  the default remains `geom = "raster"`. Automatic fill ranges now ignore
+  `draw()` and `assemble()` accept `surface = "tile"` for vector rectangles;
+  the default remains `surface = "raster"`. Automatic fill ranges now ignore
   non-finite values for both estimates and standard errors.
 
 * Univariate smooth plots now share internal rendering, label and palette
@@ -126,6 +126,18 @@
   preventing prediction.
 
 ## New features
+
+* Numeric smooth and parametric surfaces can now be drawn in 3D with
+  `surface = "3d"`, using the optional ggcube package. The existing RdBu fill
+  palette, theme, conditioning facets, contours, and masking are retained.
+  `surface_3d = list(...)` controls the view without applying ggcube's theme.
+  Lighting defaults to `backface_scale = 1`; supply a custom `light` through
+  `surface_3d` to override it. Opaque faces, contours, and floor observations
+  share depth ordering so hidden features are occluded.
+  Scattered evaluation data use Delaunay meshes (requiring geometry); support
+  masking and soap-domain checks also use sf. The former development
+  argument `geom` is replaced by `surface` for smooth and parametric surfaces;
+  penalty heatmaps retain their `geom` argument.
 
 * Surface plotting and related evaluation functions now support `n_2d`,
   defaulting to 50 points along each surface axis (#153). This reduces default

@@ -102,12 +102,15 @@
   wrap = TRUE,
   caption = TRUE,
   envir = NULL,
-  geom = c("raster", "tile"),
+  surface = c("raster", "tile", "3d"),
+  surface_3d = list(),
   back_transform = FALSE,
   ...
 ) {
   check_back_transform(back_transform)
-  geom <- match.arg(geom)
+  surface <- match.arg(surface)
+  validate_surface_3d(surface_3d)
+  check_surface_dots(match.call(expand.dots = FALSE))
 
   .call <- match.call()
 
@@ -173,6 +176,7 @@
     # grab tensor term order if present, if not it is NULL & that's OK
     tensor_term_order <- attr(sm_eval, "tensor_term_order")
     coordinate_info <- attr(sm_eval, "coordinate_info")
+    surface_support <- attr(sm_eval, "surface_support")
 
     # add confidence interval
     sm_eval <- sm_eval |>
@@ -196,6 +200,17 @@
           data$.upper_ci
         ))) |>
         pluck("rng")
+    }
+
+    if (surface == "3d" && scales == "fixed") {
+      sm_rng <- unlist(lapply(sm_eval$data, function(d) {
+        d <- add_constant(d, constant = constant,
+          column = c(".estimate", ".lower_ci", ".upper_ci"))
+        d <- transform_fun(d, fun = fun,
+          column = c(".estimate", ".lower_ci", ".upper_ci"))
+        c(d$.estimate, d$.lower_ci, d$.upper_ci)
+      }), use.names = FALSE)
+      sm_rng <- sm_rng[is.finite(sm_rng)]
     }
 
     observation_data <- NULL
@@ -312,7 +327,8 @@
     }
     sm_plts <- map(sm_l,
       draw_smooth_estimates,
-      geom = geom,
+      surface = surface, surface_3d = surface_3d,
+      surface_support = surface_support,
       constant = constant,
       fun = fun,
       contour = contour,
@@ -447,7 +463,8 @@
               axis_info = attr(para, "axis_info"), from_raw = back_transform,
               back_transform = back_transform,
               contour = contour, contour_col = contour_col, n_contour = n_contour,
-              geom = geom, continuous_fill = continuous_fill,
+              surface = surface, surface_3d = surface_3d,
+              continuous_fill = continuous_fill,
               discrete_colour = discrete_colour, discrete_fill = discrete_fill
             )
           )
@@ -476,6 +493,16 @@
     para_nm <- dplyr::group_keys(dplyr::group_by(para, .data$.term))$.term
     para_plts <- setNames(para_plts, para_nm)
     sm_plts <- append(sm_plts, para_plts)
+  }
+
+  if (surface == "3d" && scales == "fixed" && length(ylims)) {
+    common <- surface_fill_limits(ylims)
+    sm_plts <- lapply(sm_plts, function(p) {
+      if (!is.null(p) && inherits(p$coordinates, "Coord3D")) {
+        p <- p + ggplot2::expand_limits(z = ylims, fill = common)
+      }
+      p
+    })
   }
 
   # recheck: filter out NULLs as those are types of terms we can't plot (yet)

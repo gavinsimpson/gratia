@@ -197,8 +197,8 @@ test_that("tensor products transform all coordinates and render irregular cells"
   m <- coordinate_gam(y ~ te(log(x), sqrt(z), log(w), k = c(4, 4, 4)), data = d)
   sm <- smooth_estimates(m, n_2d = 6, n_3d = 3, dist = 0, back_transform = TRUE)
   for (geom in c("raster", "tile")) {
-    direct <- draw(sm, back_transform = TRUE, geom = geom, contour = FALSE)[[1L]]
-    model <- draw(m, back_transform = TRUE, geom = geom, contour = FALSE,
+    direct <- draw(sm, back_transform = TRUE, surface = geom, contour = FALSE)[[1L]]
+    model <- draw(m, back_transform = TRUE, surface = geom, contour = FALSE,
       n_2d = 6, n_3d = 3, dist = 0, wrap = FALSE)[[1L]]
     expect_equal(direct$data$x, model$data$x)
     expect_equal(direct$data$z, model$data$z)
@@ -286,9 +286,9 @@ test_that("original-scale irregular surfaces share rendering across drawing path
   for (geom in c("raster", "tile")) {
     for (prepared_raw in c(FALSE, TRUE)) {
       pe <- parametric_effects(m, data = nd, back_transform = prepared_raw, dist = 0)
-      direct <- draw(pe, back_transform = TRUE, geom = geom,
+      direct <- draw(pe, back_transform = TRUE, surface = geom,
         contour = FALSE, rug = FALSE)[[1L]]
-      model <- draw(m, data = nd, back_transform = TRUE, geom = geom,
+      model <- draw(m, data = nd, back_transform = TRUE, surface = geom,
         dist = 0, contour = FALSE, rug = FALSE, wrap = FALSE)[[1L]]
       expect_s3_class(direct$layers[[1L]]$geom, "GeomRect")
       expect_s3_class(model$layers[[1L]]$geom, "GeomRect")

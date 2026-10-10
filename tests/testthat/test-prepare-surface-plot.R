@@ -98,8 +98,8 @@ test_that("raster and tile surfaces share coordinates, facets and contours", {
     variables <- c("x", "y", "z", "w")[seq_len(i + 1L)]
     for (show in c("estimate", "se")) {
       default <- methods[[i]](d, variables = variables, show = show)
-      raster <- methods[[i]](d, variables = variables, show = show, geom = "raster")
-      tile <- methods[[i]](d, variables = variables, show = show, geom = "tile")
+      raster <- methods[[i]](d, variables = variables, show = show, surface = "raster")
+      tile <- methods[[i]](d, variables = variables, show = show, surface = "tile")
       expect_s3_class(default$layers[[1]]$geom, "GeomRaster")
       expect_s3_class(tile$layers[[1]]$geom, "GeomTile")
       expect_equal(tile$labels, raster$labels)
@@ -114,14 +114,14 @@ test_that("raster and tile surfaces share coordinates, facets and contours", {
       expect_equal(unique(bt$data[[1]]$ymax - bt$data[[1]]$ymin), 5)
       expect_true(all(is.na(bt$data[[1]]$colour)))
     }
-    expect_error(methods[[i]](d, variables = variables, geom = "invalid"),
+    expect_error(methods[[i]](d, variables = variables, surface = "invalid"),
       "'arg' should be one of")
   }
   expect_error(prepare_surface_plot(surface_plot_data(), "x", "y", ".estimate",
-    geom = "invalid"), "'arg' should be one of")
-  expect_error(plot_smooth.isotropic_smooth(surface_plot_data(), geom = "invalid"),
+    surface = "invalid"), "'arg' should be one of")
+  expect_error(plot_smooth.isotropic_smooth(surface_plot_data(), surface = "invalid"),
     "'arg' should be one of")
-  expect_error(plot_smooth.soap_film(surface_plot_data(), geom = "invalid"),
+  expect_error(plot_smooth.soap_film(surface_plot_data(), surface = "invalid"),
     "'arg' should be one of")
 })
 
@@ -160,7 +160,7 @@ test_that("surface faceting keeps captions, aspect ratios and tensor order", {
       plot_smooth.quadvariate_smooth
     variables <- c("x", "y", "z", "w")[seq_len(dimension)]
     for (geom in c("raster", "tile")) {
-      p <- method(d, variables = variables, geom = geom, contour = FALSE, rug = d)
+      p <- method(d, variables = variables, surface = geom, contour = FALSE, rug = d)
       expect_equal(p$coordinates$ratio, 1)
       expect_false("GeomPoint" %in% surface_plot_geoms(p))
       expected <- if (dimension == 3L) "Facets: z ; Basis: TPRS (2d)" else
@@ -170,12 +170,12 @@ test_that("surface faceting keeps captions, aspect ratios and tensor order", {
   }
   d <- surface_plot_data(3)
   attr(d, "tensor_term_order") <- c("y", "x", "z")
-  p <- plot_smooth.trivariate_smooth(d, geom = "tile", contour = FALSE)
+  p <- plot_smooth.trivariate_smooth(d, surface = "tile", contour = FALSE)
   expect_equal(p$labels$x, "y")
   expect_equal(p$labels$y, "x")
   names(d)[1] <- "log(x)"
   p <- plot_smooth.bivariate_smooth(d, variables = c("log(x)", "y"),
-    geom = "tile", contour = FALSE)
+    surface = "tile", contour = FALSE)
   expect_equal(p$labels$x, "log(x)")
   expect_silent(ggplot2::ggplot_build(p))
 })
@@ -188,9 +188,9 @@ test_that("tile selection propagates through model drawing and assembly", {
   m <- mgcv::gam(y ~ u + s(x, z, k = 8) + s(u, k = 4) + s(f, bs = "re"), data = d)
   sm <- smooth_estimates(m, n = 8, n_2d = 5)
   for (geom in c("raster", "tile")) {
-    args <- list(object = m, geom = geom, n = 8, n_2d = 5, rug = FALSE)
+    args <- list(object = m, surface = geom, n = 8, n_2d = 5, rug = FALSE)
     plots <- list(do.call(draw, args), do.call(assemble, args),
-      do.call(draw, c(args, list(wrap = FALSE))), draw(sm, geom = geom))
+      do.call(draw, c(args, list(wrap = FALSE))), draw(sm, surface = geom))
     for (p in plots) {
       expect_s3_class(p[[1]]$layers[[1]]$geom,
         if (geom == "tile") "GeomTile" else "GeomRaster")
@@ -199,20 +199,20 @@ test_that("tile selection propagates through model drawing and assembly", {
       expect_equal(nrow(p[[1]]$data), 25L)
       expect_silent(ggplot2::ggplot_build(p[[1]]))
     }
-    with_parametric <- draw(m, parametric = TRUE, geom = geom,
+    with_parametric <- draw(m, parametric = TRUE, surface = geom,
       n = 8, n_2d = 5, rug = FALSE, wrap = FALSE)
     expect_gt(length(with_parametric), 3L)
     expect_false(inherits(with_parametric[[4]]$layers[[1]]$geom, "GeomTile"))
   }
-  expect_error(draw(m, geom = "invalid"), "'arg' should be one of")
-  expect_error(assemble(m, geom = "invalid"), "'arg' should be one of")
-  expect_error(draw(sm, geom = "invalid"), "'arg' should be one of")
+  expect_error(draw(m, surface = "invalid"), "'arg' should be one of")
+  expect_error(assemble(m, surface = "invalid"), "'arg' should be one of")
+  expect_error(draw(sm, surface = "invalid"), "'arg' should be one of")
 })
 
 test_that("soap tile rendering keeps holes, observations and SE fill ranges", {
   sm <- smooth_estimates(m_soap, n_2d = 8, clip = TRUE)
   for (geom in c("raster", "tile")) {
-    p <- draw(sm, geom = geom, show = "se", contour = FALSE)[[1]]
+    p <- draw(sm, surface = geom, show = "se", contour = FALSE)[[1]]
     expect_s3_class(p$layers[[1]]$geom, if (geom == "tile") "GeomTile" else "GeomRaster")
     expect_equal(tail(surface_plot_geoms(p), 1L), "GeomPath")
     expect_false(any(p$data$.bndry))
@@ -224,7 +224,7 @@ test_that("soap tile rendering keeps holes, observations and SE fill ranges", {
 test_that("surface tiles have stable faceted and soap boundary appearances", {
   d <- surface_plot_data(3)
   faceted <- plot_smooth.trivariate_smooth(d, variables = c("x", "y", "z"),
-    geom = "tile", n_contour = 4)
+    surface = "tile", n_contour = 4)
   d <- surface_plot_data()
   d$.bndry <- FALSE
   d$.loop <- NA_integer_
@@ -233,7 +233,7 @@ test_that("surface tiles have stable faceted and soap boundary appearances", {
   boundary$.loop <- rep(1:2, each = 5)
   boundary$.estimate <- boundary$.se <- NA_real_
   soap <- plot_smooth.soap_film(dplyr::bind_rows(d, boundary),
-    variables = c("x", "y"), geom = "tile", contour = FALSE)
+    variables = c("x", "y"), surface = "tile", contour = FALSE)
   expect_doppelganger("faceted surface tiles", faceted)
   expect_doppelganger("soap surface tiles with boundary loops", soap)
 })
@@ -251,8 +251,8 @@ test_that("tensor surfaces forward geometry and retain marginal ordering", {
       sm <- smooth_estimates(m, n_2d = 4, n_3d = 2, n_4d = 2)
       variables <- attr(sm, "tensor_term_order")[[1]]
       for (geom in c("raster", "tile")) {
-        for (p in list(draw(m, geom = geom, n_2d = 4, n_3d = 2, n_4d = 2,
-          rug = FALSE, contour = FALSE), draw(sm, geom = geom, contour = FALSE))) {
+        for (p in list(draw(m, surface = geom, n_2d = 4, n_3d = 2, n_4d = 2,
+          rug = FALSE, contour = FALSE), draw(sm, surface = geom, contour = FALSE))) {
           panel <- p[[1]]
           expect_s3_class(panel$layers[[1]]$geom,
             if (geom == "tile") "GeomTile" else "GeomRaster")
@@ -274,10 +274,10 @@ test_that("GAMM and BAM drawing forward surface geometry", {
   models <- list(mgcv::gamm(y ~ s(x, z, k = 8), data = d),
     mgcv::bam(y ~ s(x, z, k = 8), data = d))
   for (m in models) {
-    p <- draw(m, geom = "tile", n_2d = 5, rug = FALSE)[[1]]
+    p <- draw(m, surface = "tile", n_2d = 5, rug = FALSE)[[1]]
     expect_s3_class(p$layers[[1]]$geom, "GeomTile")
     expect_silent(ggplot2::ggplot_build(p))
-    expect_error(draw(m, geom = "invalid"), "'arg' should be one of")
+    expect_error(draw(m, surface = "invalid"), "'arg' should be one of")
   }
 })
 
@@ -287,25 +287,25 @@ test_that("gamm4 drawing forwards surface geometry", {
   d <- data.frame(x = runif(80), z = runif(80))
   d$y <- sin(4 * d$x) + d$z + rnorm(80, sd = 0.2)
   m <- gamm4::gamm4(y ~ s(x, z, k = 8), data = d)
-  p <- draw(m, geom = "tile", n_2d = 5, rug = FALSE)[[1]]
+  p <- draw(m, surface = "tile", n_2d = 5, rug = FALSE)[[1]]
   expect_s3_class(p$layers[[1]]$geom, "GeomTile")
   expect_silent(ggplot2::ggplot_build(p))
-  expect_error(draw(m, geom = "invalid"), "'arg' should be one of")
+  expect_error(draw(m, surface = "invalid"), "'arg' should be one of")
 })
 
 test_that("SCAM accepts surface geometry without changing its univariate panels", {
   skip_if_not_installed("scam")
-  p <- draw(m_scam, geom = "tile", n = 40, rug = FALSE)
+  p <- draw(m_scam, surface = "tile", n = 40, rug = FALSE)
   expect_s3_class(p[[1]]$layers[[1]]$geom, "GeomRibbon")
   expect_silent(ggplot2::ggplot_build(p[[1]]))
-  expect_error(draw(m_scam, geom = "invalid"), "'arg' should be one of")
+  expect_error(draw(m_scam, surface = "invalid"), "'arg' should be one of")
 })
 
 test_that("spherical surfaces retain their tile geometry and projection", {
   skip_if_not_installed("sf")
   sm <- smooth_estimates(m_sos, n_2d = 5)
-  a <- draw(sm, geom = "raster", contour = FALSE)[[1]]
-  b <- draw(sm, geom = "tile", contour = FALSE)[[1]]
+  a <- draw(sm, surface = "raster", contour = FALSE)[[1]]
+  b <- draw(sm, surface = "tile", contour = FALSE)[[1]]
   expect_s3_class(a$layers[[1]]$geom, "GeomTile")
   expect_s3_class(b$layers[[1]]$geom, "GeomTile")
   expect_s3_class(a$coordinates, "CoordSf")

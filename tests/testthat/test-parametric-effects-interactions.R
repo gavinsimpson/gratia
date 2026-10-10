@@ -117,7 +117,7 @@ test_that("supplied grids, reserved names and metadata survive selection and nes
   expect_identical(names(attr(selected, "term_info")), term)
   expect_equal(nrow(selected), nrow(nd))
   expect_equal(selected[[info[[term]]$columns[[".partial"]]]], nd$.partial)
-  plt <- draw(selected, contour = FALSE, geom = "tile")[[1]]
+  plt <- draw(selected, contour = FALSE, surface = "tile")[[1]]
   expect_s3_class(ggplot_build(plt), "ggplot_built")
   nested <- parametric_effects(m, unnest = FALSE, n_2d = 5)
   expect_identical(names(attr(nested, "term_info")), names(info))
@@ -144,7 +144,7 @@ test_that("assembly and direct drawing share interaction displays and transforms
   info <- attr(pe, "term_info")
   surface <- names(info)[vapply(info, function(x) length(x$numeric) >= 2L,
     logical(1))]
-  tile <- draw(pe[pe$.term == surface, ], geom = "tile", contour = FALSE)[[1]]
+  tile <- draw(pe[pe$.term == surface, ], surface = "tile", contour = FALSE)[[1]]
   expect_true(inherits(tile$layers[[1]]$geom, "GeomTile"))
   expect_error(parametric_effects(m, n_2d = 0), "Grid resolutions")
 })
@@ -220,7 +220,7 @@ test_that("surface fills centre zero across dimensions and effect ranges", {
     for (limits in list(c(-2, 8), c(2, 8), c(-8, -2), c(0, 0))) {
       pe$.partial <- seq(limits[1], limits[2], length.out = nrow(pe))
       for (geom in c("raster", "tile")) {
-        p <- draw(pe, geom = geom, contour = FALSE, rug = FALSE)[[1]]
+        p <- draw(pe, surface = geom, contour = FALSE, rug = FALSE)[[1]]
         scale <- ggplot_build(p)$plot$scales$get_scales("fill")
         expect_equal(scale$get_limits(), c(-1, 1) * max(abs(limits)))
         expect_equal(scale$map(0), midpoint)

@@ -314,7 +314,9 @@ draw.parametric_effects <- function(object,
                                     ncol = NULL, nrow = NULL,
                                     guides = "keep",
                                     contour = TRUE, contour_col = "black",
-                                    n_contour = NULL, geom = c("raster", "tile"),
+                                    n_contour = NULL,
+                                    surface = c("raster", "tile", "3d"),
+                                    surface_3d = list(),
                                     continuous_fill = NULL,
                                     discrete_colour = NULL, discrete_fill = NULL,
                                     back_transform = FALSE) {
@@ -328,7 +330,9 @@ draw.parametric_effects <- function(object,
     attr(object, "term_info") <- info
     attr(object, "factor_levels") <- levels
   }
-  geom <- match.arg(geom)
+  surface <- match.arg(surface)
+  validate_surface_3d(surface_3d)
+  check_surface_dots(match.call(expand.dots = FALSE))
   # Add CI
   crit <- coverage_normal(ci_level)
   object <- mutate(object,
@@ -373,7 +377,8 @@ draw.parametric_effects <- function(object,
         axis_info = axis_info, from_raw = from_raw,
         back_transform = back_transform,
         contour = contour, contour_col = contour_col, n_contour = n_contour,
-        geom = geom, continuous_fill = continuous_fill,
+        surface = surface, surface_3d = surface_3d,
+        continuous_fill = continuous_fill,
         discrete_colour = discrete_colour, discrete_fill = discrete_fill
       )
     )
@@ -429,7 +434,7 @@ draw.parametric_effects <- function(object,
                                      factor_levels = NULL,
                                      term_info = NULL,
                                      contour = TRUE, contour_col = "black",
-                                     n_contour = NULL, geom = "raster",
+                                     n_contour = NULL, surface = "raster", surface_3d = list(),
                                      continuous_fill = NULL,
                                      discrete_colour = NULL, discrete_fill = NULL,
                                      axis_info = NULL, from_raw = FALSE,
@@ -450,7 +455,8 @@ draw.parametric_effects <- function(object,
       xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
       caption = caption, rug = rug, ylim = ylim, angle = angle,
       contour = contour, contour_col = contour_col, n_contour = n_contour,
-      geom = geom, continuous_fill = continuous_fill,
+      surface = surface, surface_3d = surface_3d,
+      continuous_fill = continuous_fill,
       discrete_colour = discrete_colour, discrete_fill = discrete_fill))
   }
   # plot

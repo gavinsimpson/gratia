@@ -39,6 +39,7 @@
 #' @export
 #' @importFrom rlang has_name
 `[.smooth_estimates` <- function(x, i, j, drop = FALSE) {
+  support <- attr(x, "surface_support")
   cls <- class(x)
   coordinate_info <- attr(x, "coordinate_info")
   tensor_term_order <- attr(x, "tensor_term_order")
@@ -61,6 +62,9 @@
   }
   attr(x, "tensor_term_order") <- tensor_term_order
   attr(x, "coordinate_info") <- coordinate_info
+  attr(x, "surface_support") <- if (".smooth" %in% names(x)) {
+    support[intersect(names(support), unique(x$.smooth))]
+  } else NULL
   x
 }
 

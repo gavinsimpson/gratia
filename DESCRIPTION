@@ -35,6 +35,8 @@ Imports:
     scales,
     utils
 Suggests:
+    ggcube (>= 0.3.0),
+    geometry,
     qgam,
     tweedie (>= 2.3.5),
     gamm4 (>= 0.2-7),

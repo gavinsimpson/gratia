@@ -119,7 +119,7 @@ parametric_component_facets <- function(variables, columns, numeric_vars,
 # are applied to the component and its intervals together.
 draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
     line_col, constant, fun, xlab, ylab, title, subtitle, caption, rug, ylim,
-    angle, contour, contour_col, n_contour, geom, continuous_fill,
+    angle, contour, contour_col, n_contour, surface, surface_3d, continuous_fill,
     discrete_colour, discrete_fill) {
   if (!all(c(".lower_ci", ".upper_ci") %in% names(object))) {
     crit <- coverage_normal(ci_level)
@@ -140,12 +140,12 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
   }
   if (is.null(title)) title <- unique(object$.term)
   if (is.null(caption)) caption <- "Parametric term contribution"
-  surface <- length(numeric) >= 2L
+  is_surface <- length(numeric) >= 2L
   x <- info$variables[1L]
   labels <- info$axis_labels
   axis_label <- function(v) if (v %in% names(labels)) unname(labels[[v]]) else v
   if (is.null(xlab)) xlab <- axis_label(x)
-  if (surface) {
+  if (is_surface) {
     y <- numeric[2L]
     if (is.null(ylab)) ylab <- axis_label(y)
     extra <- info$variables[-c(1L, 2L)]
@@ -171,13 +171,17 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
     contour <- isTRUE(contour) && nrow(contour_data) > 0L
     return(prepare_surface_plot(object, x_var = cols[[x]], y_var = cols[[y]],
       fill_var = ".partial", fill_limits = fill_limits,
+      z_limits = if (is.null(ylim)) fill_limits else ylim,
       fill_title = "Partial effect",
       labels = ggplot2::labs(x = xlab, y = ylab, title = title,
         subtitle = subtitle, caption = caption),
-      geom = geom, continuous_fill = continuous_fill, contour = contour,
+      surface = surface, surface_3d = surface_3d,
+      continuous_fill = continuous_fill, contour = contour,
       contour_data = contour_data,
       contour_col = contour_col, n_contour = n_contour, angle = angle,
       facet = parametric_component_facets(extra, cols, numeric, labels),
+      facet_vars = unname(cols[extra]),
+      surface_support = surface_support(object, cols[[x]], cols[[y]], observed, info$dist),
       rug = if (isTRUE(rug) && !length(extra)) observed else NULL))
   }
   group <- if (length(numeric)) discrete[1L] else discrete[2L]

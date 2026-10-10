@@ -50,7 +50,8 @@
   wrap = TRUE,
   caption = TRUE,
   envir = NULL,
-  geom = c("raster", "tile"),
+  surface = c("raster", "tile", "3d"),
+  surface_3d = list(),
   back_transform = FALSE,
   ...
 )
@@ -229,13 +230,26 @@ ggplot objects is returned, 1 per term plotted.}
 \item{envir}{an optional environment for looking up data, functions and
 constants. Defaults to the model's evaluation environment.}
 
-\item{geom}{character; either \code{"raster"} (the default) or \code{"tile"} for flat
-smooth surfaces, including faceted and soap-film plots. Raster rendering
-keeps large PDF plots compact; tiles are individual borderless rectangles
-that remain vector elements in PDF and SVG output, potentially increasing
-file size. Other plot types, including spherical smooths, are unchanged.
+\item{surface}{character; one of \code{"raster"} (the default), \code{"tile"}, or
+\code{"3d"}. Raster surfaces keep large PDF plots compact; tiles are borderless
+vector rectangles. Three-dimensional surfaces use the optional \code{ggcube}
+package, with the displayed partial effect as height and fill. Numeric
+smooth and parametric surfaces, including conditioning facets and soap
+films, are supported. Curves and factor estimates keep their usual display;
+spherical smooths retain their geographic rendering.
 Covariate scale changes that produce irregular spacing use rectangles
-bounded by adjacent coordinate midpoints for either setting.}
+bounded by adjacent coordinate midpoints for flat surfaces.}
+
+\item{surface_3d}{named list of view options passed to \code{\link[ggcube:coord_3d]{ggcube::coord_3d()}},
+for example \code{list(yaw = 45, persp = FALSE)}. The default \code{list()} uses the
+default view with \code{ggcube::light(backface_scale = 1)}, preserving equal
+horizontal units for isotropic smooths. Supply \code{light = ggcube::light(...)}
+in this list to override lighting; \code{ggcube::light(method = "none")} disables
+it. An explicitly supplied \code{light} replaces the entire default light.
+Only the coordinate system is used; ggcube's theme settings are not applied.
+These options affect all 3D panels in a call. For different views per term,
+modify individual plots returned by \code{\link[=assemble]{assemble()}}. The \code{dist} entry here
+controls perspective; the top-level \code{dist} argument controls masking.}
 
 \item{back_transform}{logical; plot covariates on their original scale?
 Defaults to \code{FALSE}, using model coordinates such as \code{log(x)} for a term

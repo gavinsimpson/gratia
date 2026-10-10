@@ -50,7 +50,8 @@
   wrap = TRUE,
   caption = TRUE,
   envir = NULL,
-  geom = c("raster", "tile"),
+  surface = c("raster", "tile", "3d"),
+  surface_3d = list(),
   back_transform = FALSE,
   ...
 )
@@ -229,13 +230,26 @@ ggplot objects is returned, 1 per term plotted.}
 \item{envir}{an optional environment for looking up data, functions and
 constants. Defaults to the model's evaluation environment.}
 
-\item{geom}{character; either \code{"raster"} (the default) or \code{"tile"} for flat
-smooth surfaces, including faceted and soap-film plots. Raster rendering
-keeps large PDF plots compact; tiles are individual borderless rectangles
-that remain vector elements in PDF and SVG output, potentially increasing
-file size. Other plot types, including spherical smooths, are unchanged.
+\item{surface}{character; one of \code{"raster"} (the default), \code{"tile"}, or
+\code{"3d"}. Raster surfaces keep large PDF plots compact; tiles are borderless
+vector rectangles. Three-dimensional surfaces use the optional \code{ggcube}
+package, with the displayed partial effect as height and fill. Numeric
+smooth and parametric surfaces, including conditioning facets and soap
+films, are supported. Curves and factor estimates keep their usual display;
+spherical smooths retain their geographic rendering.
 Covariate scale changes that produce irregular spacing use rectangles
-bounded by adjacent coordinate midpoints for either setting.}
+bounded by adjacent coordinate midpoints for flat surfaces.}
+
+\item{surface_3d}{named list of view options passed to \code{\link[ggcube:coord_3d]{ggcube::coord_3d()}},
+for example \code{list(yaw = 45, persp = FALSE)}. The default \code{list()} uses the
+default view with \code{ggcube::light(backface_scale = 1)}, preserving equal
+horizontal units for isotropic smooths. Supply \code{light = ggcube::light(...)}
+in this list to override lighting; \code{ggcube::light(method = "none")} disables
+it. An explicitly supplied \code{light} replaces the entire default light.
+Only the coordinate system is used; ggcube's theme settings are not applied.
+These options affect all 3D panels in a call. For different views per term,
+modify individual plots returned by \code{\link[=assemble]{assemble()}}. The \code{dist} entry here
+controls perspective; the top-level \code{dist} argument controls masking.}
 
 \item{back_transform}{logical; plot covariates on their original scale?
 Defaults to \code{FALSE}, using model coordinates such as \code{log(x)} for a term
@@ -269,6 +283,30 @@ The object returned is created by \code{\link[patchwork:wrap_plots]{patchwork::w
 Plots smooth and parametric contributions from a fitted GAM model using
 \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}.
 }
+\details{
+Three-dimensional faces retain the current diverging RdBu fill scale and
+effect-range rules, shared across conditioning facets. \code{continuous_fill}
+overrides the fill scale. Faces have no outlines; \code{contour_col} controls
+contour lines. Surface faces are fully opaque. Faces, contours, and floor
+observations are depth-sorted together, so nearer faces hide the parts behind
+them. The existing theme and facet styling are retained.
+
+The first two displayed covariates form the horizontal axes, and the effect
+(or standard error when requested) forms the vertical axis. Additional
+covariates retain their existing conditioning facets: \code{n_2d} controls surface
+resolution, while \code{n_3d} and \code{n_4d} control covariate slices. Fixed effect
+ranges are also used for the vertical axis. Confidence surfaces are not added.
+
+Contours follow the displayed mesh, and available observations are projected
+onto its floor. Observations are not assigned to conditioning slices. Soap
+boundary loops are also projected onto the floor.
+
+Supplied scattered evaluation data use piecewise-linear Delaunay triangles
+and require the optional \code{geometry} package. Support masking and
+soap-domain checks require \code{sf}. Faces crossing known excluded regions
+are discarded conservatively. Fully masked slices remain empty; insufficient
+non-collinear locations or conflicting heights at one location are errors.
+}
 \note{
 Internally, plots of each smooth are created using \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}
 and composed into a single plot using \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}. As a
@@ -293,7 +331,18 @@ draw(m1, residuals = TRUE)
 df2 <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
 m2 <- gam(y ~ s(x, z, k = 40), data = df2, method = "REML")
 draw(m2, contour = FALSE, n_2d = 50)
-draw(m2, geom = "tile", n_2d = 30)
+draw(m2, surface = "tile", n_2d = 30)
+
+if (requireNamespace("ggcube", quietly = TRUE)) {
+  draw(m2, surface = "3d", n_2d = 20,
+    surface_3d = list(yaw = 45, persp = FALSE))
+  panels <- assemble(m2, surface = "3d", n_2d = 20)
+  # Replace coordinates to customize a single term; retain the current theme.
+  panels[[1]] <- panels[[1]] +
+    ggcube::coord_3d(yaw = -20,
+      light = ggcube::light(backface_scale = 1))[[1]]
+  patchwork::wrap_plots(panels)
+}
 
 # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 # for more examples and for details on how to modify the theme of all the

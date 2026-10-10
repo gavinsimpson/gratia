@@ -238,6 +238,11 @@
     )
   }
 
+  surface_support <- Map(function(sm, estimates) {
+    smooth_surface_support(object, sm, estimates, dist)
+  }, smooths, sm_list)
+  names(surface_support) <- vapply(smooths, smooth_label, character(1))
+
   # see if we have any tensor term orders to collect & apply
   tensor_term_order <- lapply(sm_list, attr, "tensor_term_order")
   ## create a single df of all the smooths
@@ -256,6 +261,7 @@
   attr(coordinate_info, "smooth_variables") <- stats::setNames(
     lapply(smooths, smooth_variable), vapply(smooths, smooth_label, character(1)))
   attr(sm_list, "coordinate_info") <- coordinate_info
+  attr(sm_list, "surface_support") <- surface_support
 
   ## add a class
   class(sm_list) <- c("smooth_estimates", class(sm_list))
@@ -1237,7 +1243,7 @@
 #'
 #' # Render a bivariate smooth as vector tiles
 #' m_surface <- gam(y ~ s(x0, x1), data = df, method = "REML")
-#' draw(smooth_estimates(m_surface, n_2d = 20), geom = "tile")
+#' draw(smooth_estimates(m_surface, n_2d = 20), surface = "tile")
 `draw.smooth_estimates` <- function(object,
                                     constant = NULL,
                                     fun = NULL,
@@ -1263,11 +1269,15 @@
                                     default_crs = NULL,
                                     lims_method = "cross",
                                     caption = TRUE,
-                                    geom = c("raster", "tile"),
+                                    surface = c("raster", "tile", "3d"),
+                                    surface_3d = list(),
                                     back_transform = FALSE,
                                     ...) {
   check_back_transform(back_transform)
-  geom <- match.arg(geom)
+  surface <- match.arg(surface)
+  validate_surface_3d(surface_3d)
+  check_surface_dots(match.call(expand.dots = FALSE))
+  surface_support <- attr(object, "surface_support")
   if ("data" %in% names(object) && !".estimate" %in% names(object)) {
     coordinate_info <- attr(object, "coordinate_info")
     tensor_term_order <- attr(object, "tensor_term_order")
@@ -1311,7 +1321,8 @@
   ## plot
   plts <- map(sm_l,
     draw_smooth_estimates,
-    geom = geom,
+    surface = surface, surface_3d = surface_3d,
+    surface_support = surface_support,
     constant = constant,
     fun = fun,
     contour = contour,
@@ -1373,11 +1384,15 @@
                                     tensor_term_order = NULL,
                                     caption = NULL,
                                     grouped_by = FALSE,
-                                    geom = c("raster", "tile"),
+                                    surface = c("raster", "tile", "3d"),
+                                    surface_3d = list(),
                                     back_transform = FALSE,
                                     coordinate_info = NULL,
+                                    surface_support = NULL,
                                     ...) {
-  geom <- match.arg(geom)
+  surface <- match.arg(surface)
+  validate_surface_3d(surface_3d)
+  check_surface_dots(match.call(expand.dots = FALSE))
 
   sm_vars <- tensor_term_order[[unique(object$.smooth)[1L]]]
   if (is.null(sm_vars)) {
@@ -1527,6 +1542,16 @@
       axis$column %in% names(object)
   }, logical(1)))) attr(object, "gratia.coordinate_display") <- TRUE
 
+  support <- surface_support[[unique(object$.smooth)[1L]]]
+  if (surface == "3d" && !is.null(support) && isTRUE(back_transform)) {
+    # Domain checks use the coordinates where dist masking was calculated,
+    # even when the displayed covariates are on their original scale.
+    columns <- utils::tail(make.unique(c(names(object),
+      ".surface_support_x", ".surface_support_y")), 2L)
+    object[columns] <- object[sm_vars[1:2]]
+    support$columns <- columns
+  }
+
   if (isTRUE(back_transform)) {
     numeric_by <- intersect(unique(object$.by), names(object))
     numeric_by <- numeric_by[vapply(object[numeric_by], is.numeric, logical(1))]
@@ -1546,7 +1571,8 @@
 
   plot_smooth(
     object,
-    geom = geom,
+    surface = surface, surface_3d = surface_3d,
+    surface_support = support,
     variables = sm_vars,
     rug = rug_data,
     partial_residuals = p_residuals,
