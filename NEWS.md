@@ -214,6 +214,9 @@
 
 ## Bug Fixes
 
+* `draw.gamlss()` now sizes its plot layout using the panels actually drawn,
+  including parametric effects, avoiding rendering errors for GJRM models.
+
 * Restored faceted surfaces for three- and four-variable `t2()` smooths with
   factor margins. The two-variable tensor plotting fix had incorrectly routed
   these terms to the factor-smooth renderer, which skipped them.

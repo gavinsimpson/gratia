@@ -65,19 +65,6 @@
     model_names = models[take], eta, object, n = n, envir = envir, ...
   )
 
-  # return
-  n_plots <- map_dbl(object[models[take]], .f = n_smooths) |>
-    sum()
-  layout <- prepare_plot_layout(n_plots, ncol = ncol, nrow = nrow)
-  ncol <- layout$ncol
-  nrow <- layout$nrow
-  if (n_plots > 1L && is.null(widths)) {
-    # it doesn't matter about the widths if only one plot, but if we have
-    # more than one plot and the user didn't change `widths`, then we will
-    # force a value of 1 to give all plots the same relative width
-    widths <- 1
-  }
-
   # need to append the elements of plts to get a single list where each
   # element is a ggplot object
   ## plts <- do.call("append", plts) # this doesn't work with more than 1 smooth
@@ -91,6 +78,18 @@
     }
   }
   plts <- lapply(unlist(renquote(plts)), eval)
+
+  # Count the panels actually drawn, including any parametric effects.
+  n_plots <- length(plts)
+  layout <- prepare_plot_layout(n_plots, ncol = ncol, nrow = nrow)
+  ncol <- layout$ncol
+  nrow <- layout$nrow
+  if (n_plots > 1L && is.null(widths)) {
+    # it doesn't matter about the widths if only one plot, but if we have
+    # more than one plot and the user didn't change `widths`, then we will
+    # force a value of 1 to give all plots the same relative width
+    widths <- 1
+  }
 
   if (identical(scales, "fixed")) {
     y_lim <- get_ylim_from_plots(plts)
