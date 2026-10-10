@@ -333,6 +333,10 @@
 
 ### Bug Fixes
 
+- [`draw.gamlss()`](https://gavinsimpson.github.io/gratia/reference/draw.gamlss.md)
+  now sizes its plot layout using the panels actually drawn, including
+  parametric effects, avoiding rendering errors for GJRM models.
+
 - Restored faceted surfaces for three- and four-variable
   [`t2()`](https://rdrr.io/pkg/mgcv/man/t2.html) smooths with factor
   margins. The two-variable tensor plotting fix had incorrectly routed

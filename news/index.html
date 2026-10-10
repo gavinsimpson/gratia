@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-37</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-38</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -95,7 +95,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li><p>Restored faceted surfaces for three- and four-variable <code><a href="https://rdrr.io/pkg/mgcv/man/t2.html" class="external-link">t2()</a></code> smooths with factor margins. The two-variable tensor plotting fix had incorrectly routed these terms to the factor-smooth renderer, which skipped them.</p></li>
+<ul><li><p><code><a href="../reference/draw.gamlss.html">draw.gamlss()</a></code> now sizes its plot layout using the panels actually drawn, including parametric effects, avoiding rendering errors for GJRM models.</p></li>
+<li><p>Restored faceted surfaces for three- and four-variable <code><a href="https://rdrr.io/pkg/mgcv/man/t2.html" class="external-link">t2()</a></code> smooths with factor margins. The two-variable tensor plotting fix had incorrectly routed these terms to the factor-smooth renderer, which skipped them.</p></li>
 <li><p>Posterior sampling for GAMs, including the GAM component of <code>gamm4</code> models, now falls back to <code><a href="https://rdrr.io/pkg/mgcv/man/rmvn.html" class="external-link">mgcv::rmvn()</a></code> with a warning if the default sampler’s Cholesky decomposition fails (<a href="https://github.com/gavinsimpson/gratia/issues/332" class="external-link">#332</a>).</p></li>
 <li><p><code><a href="../reference/draw.html">draw()</a></code> now plots tensor products of two factors as points with confidence intervals, faceted by the second factor, instead of empty line plots (<a href="https://github.com/gavinsimpson/gratia/issues/395" class="external-link">#395</a>). Tensor products with one factor now use the continuous covariate on the x axis regardless of the order of the margins.</p></li>
 <li><p><code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> now uses the fitted coefficient order for random-effect interactions fitted with <code>bam(discrete = TRUE)</code>, correcting estimates and standard errors (<a href="https://github.com/gavinsimpson/gratia/issues/387" class="external-link">#387</a>).</p></li>
