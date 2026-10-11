@@ -134,3 +134,47 @@ gfam_prediction_context <- function(model, data = NULL, family_index = NULL,
   list(families = fitted_families, index = index, family_index = family_index,
     layout = layout, components = components)
 }
+
+
+# Convert every observation-by-draw entry, retaining the original dimensions.
+# A whole gfam linkinv closure is training-row specific and indexes matrices as
+# vectors. It is therefore unsuitable for either new rows or multiple draws.
+gfam_response_means <- function(eta, context) {
+  out <- eta
+  out[] <- NA_real_
+  for (i in seq_along(context$families)) {
+    rows <- which(context$index == i)
+    if (!length(rows)) next
+    family <- context$families[[i]]
+    if (startsWith(family$family, "Ordered Categorical")) {
+      stop("Grouped ordinal response-scale fitted draws are not supported; ",
+        "use 'scale = \"linear_predictor\"'.", call. = FALSE)
+    }
+    values <- as.vector(eta[rows, , drop = FALSE])
+    means <- if (is.function(family$predict)) {
+      family$predict(family, se = FALSE, eta = values)[[1L]]
+    } else family$linkinv(values)
+    if (length(means) != length(values) ||
+        (is.matrix(means) && NCOL(means) != 1L)) {
+      stop("Grouped-family fitted draws require a scalar response mean per row; ",
+        "use the linear predictor scale for this component.", call. = FALSE)
+    }
+    out[rows, ] <- means
+  }
+  out
+}
+
+
+# Link/matrix prediction does not need family response predictions. Removing
+# these hooks on a local list also avoids upstream observed-response NA checks.
+# Current discrete bam prediction is not reliable for grouped families; the
+# ordinary prediction path retains identical coefficient and offset semantics.
+gfam_predict_eta <- function(model, data, type = c("link", "lpmatrix"), ...) {
+  type <- match.arg(type)
+  model <- model_used_rows(model)
+  model$family$predict <- NULL
+  model$family$setInd <- NULL
+  dots <- list(...)
+  if (inherits(model, "bam")) dots$discrete <- FALSE
+  do.call(predict_model, c(list(object = model, newdata = data, type = type), dots))
+}

@@ -107,3 +107,21 @@ test_that("fixed parameters in native closures do not consume packed positions",
   expect_equal(result[[1L]]$theta, log(3))
   expect_equal(result[[2L]]$scale, 0.4)
 })
+
+
+test_that("discrete bam membership and eta prediction retain fitting row order", {
+  context <- gfam_prediction_context(gfam_bam)
+  membership <- model.frame(gfam_bam)[[1L]][, 2L]
+  expect_equal(context$index, membership)
+  expect_identical(context$index, gfam_data$family_id)
+  rows <- c(7, 2, 18, 2)
+  data <- gfam_data[rows, ]
+  data$y <- NA_real_
+  X <- gfam_predict_eta(gfam_bam, data, type = "lpmatrix")
+  eta <- gfam_predict_eta(gfam_bam, data, type = "link")
+  expected <- drop(X %*% coef(gfam_bam)) + data$off
+  expect_equal(as.numeric(eta), expected, ignore_attr = TRUE)
+  expect_equal(as.numeric(gfam_predict_eta(gfam_model, data, type = "link")),
+    drop(gfam_predict_eta(gfam_model, data, type = "lpmatrix") %*%
+      coef(gfam_model)) + data$off, ignore_attr = TRUE)
+})
