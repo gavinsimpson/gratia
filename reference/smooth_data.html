@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-40</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-41</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,14 +87,16 @@ are retained, and curves with only one continuous covariate use <code>n</code>.<
 
 <dt id="arg-n-d">n_3d<a class="anchor" aria-label="anchor" href="#arg-n-d"></a></dt>
 <dd><p>numeric; the number of new observations to generate for the third
-dimension of a 3D smooth.</p></dd>
+dimension of a 3D smooth. For factor conditioning dimensions, retain at most
+this many levels, taking the first in fitted order.</p></dd>
 
 
 <dt id="arg-n-d">n_4d<a class="anchor" aria-label="anchor" href="#arg-n-d"></a></dt>
 <dd><p>numeric; the number of new observations to generate for the
 dimensions higher than 2 (!) of a <em>k</em>D smooth (<em>k</em> &gt;= 4). For example, if
 the smooth is a 4D smooth, each of dimensions 3 and 4 will get <code>n_4d</code>
-new observations.</p></dd>
+new observations. For factor conditioning dimensions, retain at most this
+many levels per dimension, taking the first in fitted order.</p></dd>
 
 
 <dt id="arg-offset">offset<a class="anchor" aria-label="anchor" href="#arg-offset"></a></dt>
@@ -138,6 +140,12 @@ prediction <code>data</code> to <code><a href="smooth_estimates.html">smooth_est
 grids do not provide raw coordinates for transformed axes.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Spline-on-the-sphere grids use evenly spaced observed-range latitude and
+longitude values. Plotting constructs geographic cell edges separately,
+without moving these evaluation coordinates.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

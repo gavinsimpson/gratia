@@ -44,14 +44,16 @@ smooth_data(
 - n_3d:
 
   numeric; the number of new observations to generate for the third
-  dimension of a 3D smooth.
+  dimension of a 3D smooth. For factor conditioning dimensions, retain
+  at most this many levels, taking the first in fitted order.
 
 - n_4d:
 
   numeric; the number of new observations to generate for the dimensions
   higher than 2 (!) of a *k*D smooth (*k* \>= 4). For example, if the
   smooth is a 4D smooth, each of dimensions 3 and 4 will get `n_4d` new
-  observations.
+  observations. For factor conditioning dimensions, retain at most this
+  many levels per dimension, taking the first in fitted order.
 
 - offset:
 
@@ -95,6 +97,12 @@ smooth_data(
   [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
   instead. Typical values added by `include_all = TRUE` to model-scale
   grids do not provide raw coordinates for transformed axes.
+
+## Details
+
+Spline-on-the-sphere grids use evenly spaced observed-range latitude and
+longitude values. Plotting constructs geographic cell edges separately,
+without moving these evaluation coordinates.
 
 ## Examples
 

@@ -31,11 +31,12 @@ draw(
   ylim = NULL,
   crs = NULL,
   default_crs = NULL,
-  lims_method = "cross",
+  lims_method = "geometry_bbox",
   caption = TRUE,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
   back_transform = FALSE,
+  re_levels = NULL,
   ...
 )
 ```
@@ -151,25 +152,27 @@ draw(
 
 - default_crs:
 
-  the coordinate reference system (CRS) to use for the non-sf layers in
-  the plot. If left at the default `NULL`, the CRS used is 4326 (WGS84),
-  which is appropriate for spline-on-the-sphere smooths, which are
-  parameterized in terms of latitude and longitude as coordinates. See
+  the coordinate reference system (CRS) to use for non-sf layers added
+  to spherical plots. The default, `NULL`, uses 4326 (WGS84). Internally
+  generated surface cells, contours and observation points have their
+  own geographic CRS, with longitude on the horizontal axis and latitude
+  on the vertical axis. See
   [`ggplot2::coord_sf()`](https://ggplot2.tidyverse.org/reference/ggsf.html)
   for more details.
 
 - lims_method:
 
-  character; affects how the axis limits are determined. See
+  character; affects how spherical plot axis limits are determined. The
+  default, `"geometry_bbox"`, uses the rendered geometry. Passed to
   [`ggplot2::coord_sf()`](https://ggplot2.tidyverse.org/reference/ggsf.html).
-  Be careful; in testing of some examples, changing this to
-  `"orthogonal"` for example with the chlorophyll-a example from Simon
-  Wood's GAM book quickly used up all the RAM in my test system and the
-  OS killed R. This could be incorrect usage on my part; right now the
-  grid of points at which SOS smooths are evaluated (if not supplied by
-  the user) can produce invalid coordinates for the corners of tiles as
-  the grid is generated for tile centres without respect to the spacing
-  of those tiles.
+  Spherical surfaces use explicit geographic cells with valid polar and
+  date-line boundaries. Orthographic plots clip cells, contours and
+  observation points to the visible hemisphere before projection.
+  Explicit prediction data on a rectilinear grid retain their actual
+  spacing; scattered or singleton coordinates are drawn as points, with
+  a message, because they do not define surface cells. Incomplete
+  observation rug coordinates are omitted. Grouped factor-by spherical
+  surfaces use separate facets for each factor level.
 
 - caption:
 
@@ -231,6 +234,12 @@ draw(
   multi-column basis expansions retain raw axes on either setting. Does
   not transform estimated effects or their intervals; use `fun` for
   that.
+
+- re_levels:
+
+  named list of factor level labels to retain in tensor products with
+  random-effect margins, for example `list(species = c("a", "b"))`.
+  Fitted factor order and ordered status are retained.
 
 - ...:
 

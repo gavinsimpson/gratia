@@ -74,7 +74,9 @@ smooth_estimates(
   numeric; the number of points along the third axis of a 3D smooth
   (`n_3d`, default 16), or each axis after the first two for smooths of
   dimension four or higher (`n_4d`, default 4). If `NULL`, use `n` for
-  those axes. The first two surface axes use `n_2d`.
+  those axes. For factor conditioning dimensions, retain at most that
+  many levels, taking the first in fitted order. The first two surface
+  axes use `n_2d`. Supplied `data` are unchanged.
 
 - data:
 

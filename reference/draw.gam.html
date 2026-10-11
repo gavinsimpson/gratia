@@ -9,7 +9,7 @@ ggplot2::ggplot()."><meta property="og:image" content="https://gavinsimpson.gith
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-40</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-41</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,13 +93,14 @@ ggplot2::ggplot()."><meta property="og:image" content="https://gavinsimpson.gith
 <span>  heights <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  crs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  default_crs <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  lims_method <span class="op">=</span> <span class="st">"cross"</span>,</span>
+<span>  lims_method <span class="op">=</span> <span class="st">"geometry_bbox"</span>,</span>
 <span>  wrap <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  caption <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  surface <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"raster"</span>, <span class="st">"tile"</span>, <span class="st">"3d"</span><span class="op">)</span>,</span>
 <span>  surface_3d <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  re_levels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -180,14 +181,18 @@ are retained, and curves with only one continuous covariate use <code>n</code>.<
 
 <dt id="arg-n-d">n_3d<a class="anchor" aria-label="anchor" href="#arg-n-d"></a></dt>
 <dd><p>numeric; the number of new observations to generate for the third
-dimension of a 3D smooth.</p></dd>
+dimension of a 3D smooth. Factor conditioning dimensions retain at most
+this many levels, taking the first levels in fitted order. Explicit
+<code>re_levels</code> selections take precedence; supplied <code>data</code> are unchanged.</p></dd>
 
 
 <dt id="arg-n-d">n_4d<a class="anchor" aria-label="anchor" href="#arg-n-d"></a></dt>
 <dd><p>numeric; the number of new observations to generate for the
 dimensions higher than 2 (!) of a <em>k</em>D smooth (<em>k</em> &gt;= 4). For example, if
 the smooth is a 4D smooth, each of dimensions 3 and 4 will get <code>n_4d</code>
-new observations.</p></dd>
+new observations. For factor conditioning dimensions, this is the maximum
+number of levels retained per dimension, taking the first in fitted order.
+Explicit <code>re_levels</code> selections take precedence; supplied <code>data</code> are unchanged.</p></dd>
 
 
 <dt id="arg-unconditional">unconditional<a class="anchor" aria-label="anchor" href="#arg-unconditional"></a></dt>
@@ -334,22 +339,24 @@ details.</p></dd>
 
 
 <dt id="arg-default-crs">default_crs<a class="anchor" aria-label="anchor" href="#arg-default-crs"></a></dt>
-<dd><p>the coordinate reference system (CRS) to use for the
-non-sf layers in the plot. If left at the default <code>NULL</code>, the CRS used is
-4326 (WGS84), which is appropriate for spline-on-the-sphere smooths, which
-are parameterized in terms of latitude and longitude as coordinates. See
-<code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">ggplot2::coord_sf()</a></code> for more details.</p></dd>
+<dd><p>the coordinate reference system (CRS) to use for non-sf
+layers added to spherical plots. The default, <code>NULL</code>, uses 4326 (WGS84).
+Internally generated surface cells, contours and observation points have
+their own geographic CRS, with longitude on the horizontal axis and
+latitude on the vertical axis. See <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">ggplot2::coord_sf()</a></code> for more details.</p></dd>
 
 
 <dt id="arg-lims-method">lims_method<a class="anchor" aria-label="anchor" href="#arg-lims-method"></a></dt>
-<dd><p>character; affects how the axis limits are determined. See
-<code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">ggplot2::coord_sf()</a></code>. Be careful; in testing of some examples, changing
-this to <code>"orthogonal"</code> for example with the chlorophyll-a example from
-Simon Wood's GAM book quickly used up all the RAM in my test system and the
-OS killed R. This could be incorrect usage on my part; right now the grid
-of points at which SOS smooths are evaluated (if not supplied by the user)
-can produce invalid coordinates for the corners of tiles as the grid is
-generated for tile centres without respect to the spacing of those tiles.</p></dd>
+<dd><p>character; affects how spherical plot axis limits are
+determined. The default, <code>"geometry_bbox"</code>, uses the rendered geometry.
+Passed to <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">ggplot2::coord_sf()</a></code>. Spherical surfaces use explicit
+geographic cells with valid polar and date-line boundaries. Orthographic
+plots clip cells, contours and observation points to the visible hemisphere
+before projection. Explicit prediction data on a rectilinear grid retain
+their actual spacing; scattered or singleton coordinates are drawn as
+points, with a message, because they do not define surface cells. Incomplete
+observation rug coordinates are omitted. Grouped factor-by spherical
+surfaces use separate facets for each factor level.</p></dd>
 
 
 <dt id="arg-wrap">wrap<a class="anchor" aria-label="anchor" href="#arg-wrap"></a></dt>
@@ -416,6 +423,12 @@ expansions retain raw axes on either setting. Does not transform estimated
 effects or their intervals; use <code>fun</code> for that.</p></dd>
 
 
+<dt id="arg-re-levels">re_levels<a class="anchor" aria-label="anchor" href="#arg-re-levels"></a></dt>
+<dd><p>named list of factor level labels to retain in tensor products
+with random-effect margins, for example <code>list(species = c("a", "b"))</code>.
+Fitted factor order and ordered status are retained.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>additional arguments passed to <code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code>.</p></dd>
 
@@ -426,7 +439,18 @@ effects or their intervals; use <code>fun</code> for that.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Three-dimensional faces retain the current diverging RdBu fill scale and
+    <p>Random-effect tensor plots put continuous covariates before factors. Two
+continuous covariates form a surface, with remaining factor levels and numeric
+slices forming conditioning panels, consistently for <code>te()</code>, <code>ti()</code> and <code>t2()</code>.
+One continuous covariate gives curves for categorical combinations;
+categorical-only terms give point ranges. Up to four covariates are supported.
+Numeric conditioning slices use <code>n_3d</code> or <code>n_4d</code>. For factor conditioning
+dimensions, these controls retain at most that many levels, taking the first
+levels in fitted order. Explicit <code>re_levels</code> selections take precedence.
+Supplied <code>data</code> and precomputed estimates retain their rows; select specific
+factor levels with <code>re_levels</code>, or use <code><a href="data_slice.html">data_slice()</a></code> to fix conditioning
+covariates. Observation layers do not introduce additional surface panels.</p>
+<p>Three-dimensional faces retain the current diverging RdBu fill scale and
 effect-range rules, shared across conditioning facets. <code>continuous_fill</code>
 overrides the fill scale. Faces have no outlines; <code>contour_col</code> controls
 contour lines. Surface faces are fully opaque. Faces, contours, and floor

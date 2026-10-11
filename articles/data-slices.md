@@ -184,6 +184,10 @@ models
 ``` r
 
 fv1 <- fitted_values(m_plant, data = ds1, scale = "response", exclude = "s(plant)")
+#> Prediction data contain 100 rows with combinations of categorical predictor
+#> levels absent from the fitting data.
+#> ℹ Factors: `treatment`, `type`, `tt`, and `plant`. Input rows: 1, 2, 3, 4, 5,
+#>   6, 7, 8, 9, 10, ....
 fv1
 #> # A tibble: 100 × 10
 #>     .row  conc treatment type   tt      plant .fitted    .se .lower_ci .upper_ci
@@ -292,6 +296,10 @@ fitted_values(m_plant,
     subtitle = "Comparison of treatment in plants of the Mississippi type",
     colour = "Treatment", fill = "Treatment"
   )
+#> Prediction data contain 200 rows with combinations of categorical predictor
+#> levels absent from the fitting data.
+#> ℹ Factors: `treatment`, `type`, `tt`, and `plant`. Input rows: 1, 2, 3, 4, 5,
+#>   6, 7, 8, 9, 10, ....
 ```
 
 ![](data-slices_files/figure-html/draw-plant-fitted-values-2-1.png)

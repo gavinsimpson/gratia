@@ -49,13 +49,14 @@ draw(
   heights = NULL,
   crs = NULL,
   default_crs = NULL,
-  lims_method = "cross",
+  lims_method = "geometry_bbox",
   wrap = TRUE,
   caption = TRUE,
   envir = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
   back_transform = FALSE,
+  re_levels = NULL,
   ...
 )
 ```
@@ -139,14 +140,20 @@ draw(
 - n_3d:
 
   numeric; the number of new observations to generate for the third
-  dimension of a 3D smooth.
+  dimension of a 3D smooth. Factor conditioning dimensions retain at
+  most this many levels, taking the first levels in fitted order.
+  Explicit `re_levels` selections take precedence; supplied `data` are
+  unchanged.
 
 - n_4d:
 
   numeric; the number of new observations to generate for the dimensions
   higher than 2 (!) of a *k*D smooth (*k* \>= 4). For example, if the
   smooth is a 4D smooth, each of dimensions 3 and 4 will get `n_4d` new
-  observations.
+  observations. For factor conditioning dimensions, this is the maximum
+  number of levels retained per dimension, taking the first in fitted
+  order. Explicit `re_levels` selections take precedence; supplied
+  `data` are unchanged.
 
 - unconditional:
 
@@ -292,25 +299,27 @@ draw(
 
 - default_crs:
 
-  the coordinate reference system (CRS) to use for the non-sf layers in
-  the plot. If left at the default `NULL`, the CRS used is 4326 (WGS84),
-  which is appropriate for spline-on-the-sphere smooths, which are
-  parameterized in terms of latitude and longitude as coordinates. See
+  the coordinate reference system (CRS) to use for non-sf layers added
+  to spherical plots. The default, `NULL`, uses 4326 (WGS84). Internally
+  generated surface cells, contours and observation points have their
+  own geographic CRS, with longitude on the horizontal axis and latitude
+  on the vertical axis. See
   [`ggplot2::coord_sf()`](https://ggplot2.tidyverse.org/reference/ggsf.html)
   for more details.
 
 - lims_method:
 
-  character; affects how the axis limits are determined. See
+  character; affects how spherical plot axis limits are determined. The
+  default, `"geometry_bbox"`, uses the rendered geometry. Passed to
   [`ggplot2::coord_sf()`](https://ggplot2.tidyverse.org/reference/ggsf.html).
-  Be careful; in testing of some examples, changing this to
-  `"orthogonal"` for example with the chlorophyll-a example from Simon
-  Wood's GAM book quickly used up all the RAM in my test system and the
-  OS killed R. This could be incorrect usage on my part; right now the
-  grid of points at which SOS smooths are evaluated (if not supplied by
-  the user) can produce invalid coordinates for the corners of tiles as
-  the grid is generated for tile centres without respect to the spacing
-  of those tiles.
+  Spherical surfaces use explicit geographic cells with valid polar and
+  date-line boundaries. Orthographic plots clip cells, contours and
+  observation points to the visible hemisphere before projection.
+  Explicit prediction data on a rectilinear grid retain their actual
+  spacing; scattered or singleton coordinates are drawn as points, with
+  a message, because they do not define surface cells. Incomplete
+  observation rug coordinates are omitted. Grouped factor-by spherical
+  surfaces use separate facets for each factor level.
 
 - wrap:
 
@@ -383,6 +392,12 @@ draw(
   not transform estimated effects or their intervals; use `fun` for
   that.
 
+- re_levels:
+
+  named list of factor level labels to retain in tensor products with
+  random-effect margins, for example `list(species = c("a", "b"))`.
+  Fitted factor order and ordered status are retained.
+
 - ...:
 
   additional arguments passed to
@@ -394,6 +409,21 @@ The object returned is created by
 [`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html).
 
 ## Details
+
+Random-effect tensor plots put continuous covariates before factors. Two
+continuous covariates form a surface, with remaining factor levels and
+numeric slices forming conditioning panels, consistently for `te()`,
+`ti()` and `t2()`. One continuous covariate gives curves for categorical
+combinations; categorical-only terms give point ranges. Up to four
+covariates are supported. Numeric conditioning slices use `n_3d` or
+`n_4d`. For factor conditioning dimensions, these controls retain at
+most that many levels, taking the first levels in fitted order. Explicit
+`re_levels` selections take precedence. Supplied `data` and precomputed
+estimates retain their rows; select specific factor levels with
+`re_levels`, or use
+[`data_slice()`](https://gavinsimpson.github.io/gratia/reference/data_slice.md)
+to fix conditioning covariates. Observation layers do not introduce
+additional surface panels.
 
 Three-dimensional faces retain the current diverging RdBu fill scale and
 effect-range rules, shared across conditioning facets. `continuous_fill`

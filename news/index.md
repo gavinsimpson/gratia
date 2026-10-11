@@ -207,6 +207,11 @@
 
 ### New features
 
+- [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
+  now emits a message identifying prediction rows with unobserved
+  combinations of known categorical predictor levels
+  ([\#164](https://github.com/gavinsimpson/gratia/issues/164)).
+
 - Numeric smooth and parametric surfaces can now be drawn in 3D with
   `surface = "3d"`, using the optional ggcube package (implements
   [\#393](https://github.com/gavinsimpson/gratia/issues/393)). The
@@ -362,6 +367,19 @@
   [`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) families.
 
 ### Bug Fixes
+
+- Random-effect tensor products now plot curves, categorical estimates
+  and faceted surfaces consistently across
+  [`te()`](https://rdrr.io/pkg/mgcv/man/te.html),
+  [`ti()`](https://rdrr.io/pkg/mgcv/man/te.html) and
+  [`t2()`](https://rdrr.io/pkg/mgcv/man/t2.html)
+  ([\#169](https://github.com/gavinsimpson/gratia/issues/169)). Use
+  `re_levels` to select factor levels; `n_3d` and `n_4d` also limit
+  factor conditioning dimensions.
+
+- Spline-on-the-sphere plots now use valid cells at the poles and date
+  line, with orthographic clipping and separate factor-by panels
+  ([\#277](https://github.com/gavinsimpson/gratia/issues/277)).
 
 - [`draw.gamlss()`](https://gavinsimpson.github.io/gratia/reference/draw.gamlss.md)
   now sizes its plot layout using the panels actually drawn, including

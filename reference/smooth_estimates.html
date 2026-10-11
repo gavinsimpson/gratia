@@ -15,7 +15,7 @@ been removed from the package."><meta property="og:image" content="https://gavin
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-40</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-41</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -123,7 +123,9 @@ are retained, and curves with only one continuous covariate use <code>n</code>.<
 <dd><p>numeric; the number of points along the third axis of a
 3D smooth (<code>n_3d</code>, default 16), or each axis after the first two for smooths
 of dimension four or higher (<code>n_4d</code>, default 4). If <code>NULL</code>, use <code>n</code> for
-those axes. The first two surface axes use <code>n_2d</code>.</p></dd>
+those axes. For factor conditioning dimensions, retain at most that many
+levels, taking the first in fitted order. The first two surface axes use
+<code>n_2d</code>. Supplied <code>data</code> are unchanged.</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>

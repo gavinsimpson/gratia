@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-40</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-41</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -165,6 +165,12 @@ exclusions. Missing responses do not prevent prediction. Missing required
 predictors produce <code>NA</code> results by default. An explicit <code>na.action</code> passed
 through <code>...</code> is honoured; with <code>na.omit</code>, <code>.row</code> retains the positions in the
 supplied data, rather than numbering the remaining rows consecutively.</p>
+<p>For supplied prediction data, an informative message identifies combinations
+of categorical predictor levels absent from the retained fitting observations.
+Predictions are unchanged: an unobserved combination is not necessarily
+non-estimable, particularly in additive models. Numeric-by-factor range
+extrapolation is not checked. Missing predictors and genuinely new factor
+levels retain their usual prediction behavior.</p>
 <p>Simultaneous intervals jointly cover the model's underlying expected
 responses, or linear predictors on the link scale, at all valid covariate
 combinations evaluated in this call, with approximate posterior probability

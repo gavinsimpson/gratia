@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-40</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-41</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,7 +75,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li>
+<ul><li><p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> now emits a message identifying prediction rows with unobserved combinations of known categorical predictor levels (<a href="https://github.com/gavinsimpson/gratia/issues/164" class="external-link">#164</a>).</p></li>
+<li>
 <p>Numeric smooth and parametric surfaces can now be drawn in 3D with <code>surface = "3d"</code>, using the optional ggcube package (implements <a href="https://github.com/gavinsimpson/gratia/issues/393" class="external-link">#393</a>). The existing RdBu fill palette, theme, conditioning facets, contours, and masking are retained.</p>
 <p><code>surface_3d = list(...)</code> controls the view without applying ggcube’s theme. Lighting defaults to <code>backface_scale = 1</code>; supply a custom <code>light</code> through <code>surface_3d</code> to override it. Opaque faces, contours, and floor observations share depth ordering so hidden features are occluded.</p>
 </li>
@@ -101,7 +102,9 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li><p><code><a href="../reference/draw.gamlss.html">draw.gamlss()</a></code> now sizes its plot layout using the panels actually drawn, including parametric effects, avoiding rendering errors for GJRM models.</p></li>
+<ul><li><p>Random-effect tensor products now plot curves, categorical estimates and faceted surfaces consistently across <code><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">te()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">ti()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/t2.html" class="external-link">t2()</a></code> (<a href="https://github.com/gavinsimpson/gratia/issues/169" class="external-link">#169</a>). Use <code>re_levels</code> to select factor levels; <code>n_3d</code> and <code>n_4d</code> also limit factor conditioning dimensions.</p></li>
+<li><p>Spline-on-the-sphere plots now use valid cells at the poles and date line, with orthographic clipping and separate factor-by panels (<a href="https://github.com/gavinsimpson/gratia/issues/277" class="external-link">#277</a>).</p></li>
+<li><p><code><a href="../reference/draw.gamlss.html">draw.gamlss()</a></code> now sizes its plot layout using the panels actually drawn, including parametric effects, avoiding rendering errors for GJRM models.</p></li>
 <li><p>Restored faceted surfaces for three- and four-variable <code><a href="https://rdrr.io/pkg/mgcv/man/t2.html" class="external-link">t2()</a></code> smooths with factor margins. The two-variable tensor plotting fix had incorrectly routed these terms to the factor-smooth renderer, which skipped them.</p></li>
 <li><p>Posterior sampling for GAMs, including the GAM component of <code>gamm4</code> models, now falls back to <code><a href="https://rdrr.io/pkg/mgcv/man/rmvn.html" class="external-link">mgcv::rmvn()</a></code> with a warning if the default sampler’s Cholesky decomposition fails (<a href="https://github.com/gavinsimpson/gratia/issues/332" class="external-link">#332</a>).</p></li>
 <li><p><code><a href="../reference/draw.html">draw()</a></code> now plots tensor products of two factors as points with confidence intervals, faceted by the second factor, instead of empty line plots (<a href="https://github.com/gavinsimpson/gratia/issues/395" class="external-link">#395</a>). Tensor products with one factor now use the continuous covariate on the x axis regardless of the order of the margins.</p></li>
