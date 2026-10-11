@@ -1,0 +1,136 @@
+# Grouped families have one linear predictor, but a distinct observation model
+# for each row. Never change the fitted family's shared closure environment to
+# install prediction indices: that would also change future training results.
+is_gfam_family <- function(family) {
+  is.function(family[["getfl"]]) &&
+    startsWith(family[["family"]], "gfam{")
+}
+
+gfam_data_index <- function(model, data) {
+  response <- stats::formula(model)[[2L]]
+  label <- paste(deparse(response, width.cutoff = 500L), collapse = "")
+  if (label %in% names(data)) {
+    value <- data[[label]]
+  } else if (is.call(response) && identical(response[[1L]], as.name("cbind")) &&
+      length(response) == 3L) {
+    # Membership can be evaluated without observed response values.
+    expr <- response[[3L]]
+    if (!all(all.vars(expr) %in% names(data))) return(NULL)
+    value <- tryCatch(eval(expr, data, model_envir(model)), error = function(e) NULL)
+  } else {
+    return(NULL)
+  }
+  if (is.matrix(value)) {
+    if (NCOL(value) != 2L) {
+      stop("A grouped-family response matrix must have two columns.", call. = FALSE)
+    }
+    value <- value[, 2L]
+  }
+  value
+}
+
+gfam_validate_index <- function(index, n, n_family) {
+  if (!is.numeric(index) || !is.null(dim(index)) || length(index) != n ||
+      any(!is.na(index) & (!is.finite(index) | index != trunc(index) |
+        index < 1L | index > n_family))) {
+    stop("'family_index' must have one integer family-list position (1 to ",
+      n_family, ") per prediction row; missing values are allowed.", call. = FALSE)
+  }
+  as.integer(index)
+}
+
+# Upstream gfam versions can leave component theta closures out of sync with
+# aggregate fitted theta after an ordinary family with estimated scale. Rebuild
+# native component parameter state locally, never modifying the fitted family.
+gfam_component_family <- function(component, theta) {
+  if (!length(theta)) return(component)
+  if (!is.function(component$putTheta)) {
+    stop("Grouped-family component cannot restore its fitted parameters.",
+      call. = FALSE)
+  }
+  old <- environment(component$putTheta)
+  env <- list2env(as.list.environment(old, all.names = TRUE),
+    parent = parent.env(old))
+  for (name in names(component)) {
+    fun <- component[[name]]
+    if (is.function(fun) && identical(environment(fun), old)) {
+      environment(fun) <- env
+      component[[name]] <- fun
+    }
+  }
+  component$putTheta(theta)
+  component
+}
+
+# Packed gfam nuisance parameters contain each extended component's n.theta
+# estimated parameters, followed by log(scale) when its scale is estimated.
+# getTheta() may also return fixed parameters, so its length is not a cursor.
+gfam_components <- function(family) {
+  families <- family$getfl()
+  theta <- family$getTheta()
+  cursor <- 1L
+  out <- lapply(families, function(component) {
+    n_theta <- if (inherits(component, "extended.family")) component$n.theta else 0L
+    if (is.null(n_theta)) n_theta <- 0L
+    estimated_scale <- isTRUE(component$scale < 0)
+    n <- n_theta + as.integer(estimated_scale)
+    if (cursor + n - 1L > length(theta)) {
+      stop("Grouped-family nuisance parameters are incomplete.", call. = FALSE)
+    }
+    scale <- if (estimated_scale) exp(theta[[cursor + n_theta]]) else 1
+    theta_index <- if (n_theta) seq.int(cursor, length.out = n_theta) else integer()
+    component <- gfam_component_family(component, theta[theta_index])
+    info <- list(family = component, scale = scale,
+      theta = if (is.function(component$getTheta)) component$getTheta() else numeric(),
+      theta_index = theta_index)
+    cursor <<- cursor + n
+    info
+  })
+  if (cursor - 1L != length(theta)) {
+    stop("Grouped-family nuisance parameters are not aligned with its families.",
+      call. = FALSE)
+  }
+  out
+}
+
+gfam_prediction_context <- function(model, data = NULL, family_index = NULL,
+                                    na.action = stats::na.pass) {
+  family <- stats::family(model)
+  if (!is_gfam_family(family)) {
+    stop("Expected a model fitted with 'mgcv::gfam()'.", call. = FALSE)
+  }
+  families <- family$getfl()
+  training <- is.null(data)
+  if (training) {
+    recovered <- restore_model_rows(attr(families, "fi"), model)
+    n <- length(model_row_map(model))
+  } else {
+    data <- as.data.frame(data)
+    recovered <- gfam_data_index(model, data)
+    n <- NROW(data)
+  }
+  if (!is.null(recovered)) {
+    recovered <- gfam_validate_index(recovered, n, length(families))
+  }
+  if (!is.null(family_index)) {
+    family_index <- gfam_validate_index(family_index, n, length(families))
+    if (!is.null(recovered) && !identical(family_index, recovered)) {
+      stop("'family_index' conflicts with the family membership in 'data'.",
+        call. = FALSE)
+    }
+  } else {
+    family_index <- recovered
+  }
+  if (is.null(family_index)) {
+    stop("Grouped-family response prediction needs family membership; supply ",
+      "the response index in 'data' or use 'family_index'.", call. = FALSE)
+  }
+  layout <- prediction_layout(model, data, na.action = na.action,
+    required = if (!training) data.frame(.family_index = family_index) else NULL)
+  index <- if (training) as.integer(attr(families, "fi")) else family_index[layout$input_rows]
+  components <- gfam_components(family)
+  fitted_families <- lapply(components, `[[`, "family")
+  attributes(fitted_families) <- attributes(families)
+  list(families = fitted_families, index = index, family_index = family_index,
+    layout = layout, components = components)
+}

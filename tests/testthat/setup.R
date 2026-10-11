@@ -794,3 +794,65 @@ withr::with_seed(11011, {
     random = ~(1 | group), data = gamm4_na_data, weights = weight,
     subset = seq_len(160), na.action = na.exclude)
 })
+
+
+# Small grouped-family models shared by fitted draws and response simulation.
+# Interleaved family membership exposes accidental training-order assumptions.
+withr::with_seed(269272, {
+  gfam_data <- data.frame(
+    x = runif(180), family_id = rep(1:3, 60),
+    off = rep(c(-0.2, 0.1, 0.3), 60),
+    weight = rep(c(3, 2, 1), 60)
+  )
+  gfam_data$group <- factor(gfam_data$family_id)
+  eta <- 0.2 + sin(4 * gfam_data$x) / 2 + gfam_data$off
+  gfam_data$y <- numeric(180)
+  i <- gfam_data$family_id == 1L
+  gfam_data$y[i] <- rbinom(sum(i), gfam_data$weight[i], plogis(eta[i])) /
+    gfam_data$weight[i]
+  i <- gfam_data$family_id == 2L
+  gfam_data$y[i] <- eta[i] + rnorm(sum(i), sd = 0.4 / sqrt(gfam_data$weight[i]))
+  i <- gfam_data$family_id == 3L
+  gfam_data$y[i] <- rpois(sum(i), exp(eta[i]))
+  gfam_model <- gam(cbind(y, family_id) ~ group + s(x, k = 5) + offset(off),
+    data = gfam_data, weights = weight, method = "REML",
+    family = gfam(list(binomial(), gaussian(), poisson())))
+  gfam_bam <- bam(cbind(y, family_id) ~ group + s(x, k = 5) + offset(off),
+    data = gfam_data, weights = weight, method = "fREML", discrete = TRUE,
+    family = gfam(list(binomial(), gaussian(), poisson())))
+  gfam_matrix_data <- gfam_data
+  gfam_matrix_data$response <- cbind(gfam_data$y, gfam_data$family_id)
+  gfam_matrix_model <- gam(response ~ group + s(x, k = 5) + offset(off),
+    data = gfam_matrix_data, weights = weight, method = "REML",
+    family = gfam(list(binomial(), gaussian(), poisson())))
+  gfam_missing_data <- gfam_data
+  gfam_missing_data$x[c(7, 16)] <- NA_real_
+  gfam_missing_model <- gam(cbind(y, family_id) ~ group + s(x, k = 5) + offset(off),
+    data = gfam_missing_data, weights = weight, subset = seq_len(165),
+    na.action = na.exclude, method = "REML", optimizer = c("outer", "bfgs"),
+    family = gfam(list(binomial(), gaussian(), poisson())))
+  gfam_gaussian_data <- data.frame(x = runif(160), family_id = rep(1:2, 80))
+  gfam_gaussian_data$y <- sin(4 * gfam_gaussian_data$x) +
+    rnorm(160, sd = c(0.25, 1.2)[gfam_gaussian_data$family_id])
+  gfam_gaussian_model <- gam(cbind(y, family_id) ~ s(x, k = 5),
+    data = gfam_gaussian_data, method = "REML",
+    family = gfam(list(gaussian(), gaussian())))
+})
+
+withr::with_seed(269273, {
+  gfam_extended_data <- data.frame(x = runif(240), family_id = rep(1:4, 60))
+  gfam_extended_data$group <- factor(gfam_extended_data$family_id)
+  mu <- exp(0.5 + sin(4 * gfam_extended_data$x) / 3)
+  gfam_extended_data$y <- numeric(240)
+  i <- gfam_extended_data$family_id == 1L
+  gfam_extended_data$y[i] <- rnbinom(sum(i), mu = mu[i], size = 3)
+  i <- gfam_extended_data$family_id == 2L
+  gfam_extended_data$y[i] <- log(mu[i]) + rnorm(sum(i), sd = 0.35)
+  i <- gfam_extended_data$family_id == 3L
+  gfam_extended_data$y[i] <- rnbinom(sum(i), mu = mu[i], size = 1.5)
+  i <- gfam_extended_data$family_id == 4L
+  gfam_extended_data$y[i] <- mgcv::rTweedie(mu[i], p = 1.5, phi = 0.6)
+  gfam_extended_model <- gam(cbind(y, family_id) ~ group + s(x, k = 5),
+    data = gfam_extended_data, method = "REML",
+    family = gfam(list(nb(), gaussian(), nb(), tw())))
+})
