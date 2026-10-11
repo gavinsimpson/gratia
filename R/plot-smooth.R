@@ -820,10 +820,10 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     factors <- setdiff(variables, numeric_vars)
     group_vars <- if (length(numeric_vars)) factors else factors[-1L]
     group_column <- utils::tail(make.unique(c(names(object), ".re_group")), 1L)
-    object[[group_column]] <- interaction(object[group_vars], drop = TRUE, sep = ":")
-    if (!is.null(rug)) {
-      rug[[group_column]] <- interaction(rug[group_vars], drop = TRUE, sep = ":")
-    }
+    groups <- tensor_plot_groups(object, rug, factors, group_vars)
+    object[[group_column]] <- groups$group
+    rug <- groups$rug
+    if (!is.null(rug)) rug[[group_column]] <- groups$rug_group
     if (length(numeric_vars)) {
       curve_facet <- facet_wrap(vars(.data[[group_column]]))
     }

@@ -214,3 +214,49 @@ test_that("skipping a tensor preserves other requested smooths and the RNG state
   expect_equal(unique(p[[1]]$data$.smooth), "s(u)")
   expect_identical(.Random.seed, seed)
 })
+
+test_that("numeric random-effect margins retain the two-dimensional marginal focus", {
+  p <- assemble(tensor_re_numeric_surface, n_2d = 3, n_3d = 2,
+    max_re_combinations = 1, rug = FALSE, contour = FALSE)[[1]]
+  expect_equal(nrow(p$data), 18L)
+  b <- ggplot2::ggplot_build(p)
+  expect_equal(sort(unique(b$data[[1]]$x)), sort(unique(p$data$x)))
+  expect_equal(sort(unique(b$data[[1]]$y)), sort(unique(p$data$z)))
+  expect_equal(nrow(b$layout$layout), 2L)
+})
+
+test_that("categorical tuples remain distinct when labels contain separators", {
+  withr::local_pdf(NULL)
+  sm <- smooth_estimates(tensor_re_curves, n = 4)
+  levels(sm$f) <- c("a:b", "a", "other1", "other2")
+  levels(sm$g) <- c("c", "b:c")
+  sm <- sm[(sm$f == "a:b" & sm$g == "c") | (sm$f == "a" & sm$g == "b:c"), ]
+  p <- draw(sm)[[1]]
+  b <- ggplot2::ggplot_build(p)
+  expect_equal(nrow(b$layout$layout), 2L)
+  expect_equal(length(unique(p$data$.re_group)), 2L)
+  expect_equal(as.integer(table(b$data[[1]]$group)), c(4L, 4L))
+  expect_silent(ggplot2::ggplotGrob(p))
+
+  sm <- smooth_estimates(tensor_re_categories)
+  levels(sm$g) <- c("a:b", "a")
+  levels(sm$h) <- c("c", "b:c")
+  sm <- sm[(sm$g == "a:b" & sm$h == "c") | (sm$g == "a" & sm$h == "b:c"), ]
+  p <- draw(sm)[[1]]
+  b <- ggplot2::ggplot_build(p)
+  expect_equal(nrow(b$layout$layout), 2L)
+  expect_equal(as.integer(table(b$data[[1]]$PANEL)), c(3L, 3L))
+  expect_silent(ggplot2::ggplotGrob(p))
+})
+
+test_that("curve rugs do not create unrequested joint-factor facets", {
+  withr::local_pdf(NULL)
+  d <- expand.grid(x = seq(0.1, 1, length.out = 4), row = 1:2)
+  d$f <- factor(c("c", "a")[d$row], levels = levels(tensor_re_data$f))
+  d$g <- ordered(c("B", "A")[d$row], levels = levels(tensor_re_data$g))
+  p <- assemble(tensor_re_curves, data = d, rug = TRUE,
+    max_re_combinations = 2)[[1]]
+  b <- ggplot2::ggplot_build(p)
+  expect_equal(nrow(b$layout$layout), 2L)
+  expect_silent(ggplot2::ggplotGrob(p))
+})

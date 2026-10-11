@@ -1024,3 +1024,9 @@ withr::with_seed(1693, {
   tensor_re_many <- gam(y ~ te(x, f, bs = c("tp", "re"), k = c(3, 17)),
     data = tensor_re_many_data, method = "REML")
 })
+
+withr::with_seed(1695, {
+  tensor_re_numeric_surface <- gam(y ~ te(u, x, z,
+    bs = c("re", "tp"), d = c(1, 2), k = c(3, 6)),
+    data = tensor_re_data, method = "REML")
+})

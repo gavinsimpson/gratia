@@ -147,9 +147,28 @@ tensor_plot_info <- function(model, smooths) {
     if (is.null(sm$margin) ||
         !any(vapply(sm$margin, inherits, logical(1), "random.effect"))) return(NULL)
     data <- prepare_smooth_data(model, sm)
-    vars <- smooth_variable(sm)
+    vars <- reorder_tensor_smooth_terms(sm)
     list(variables = tensor_plot_variables(vars, data),
       factors = vars[vapply(data[vars], is.factor, logical(1))])
   })
   stats::setNames(info, vapply(smooths, smooth_label, character(1)))
+}
+
+# Match typed tuples, never concatenated labels: values may contain separators.
+# Only evaluated categorical states may contribute rugs/facets.
+tensor_plot_groups <- function(object, rug, factors, group_vars) {
+  states <- vctrs::vec_unique(object[group_vars])
+  labels <- lapply(group_vars, function(v) {
+    paste0(v, " = ", encodeString(as.character(states[[v]]), quote = '\"'))
+  })
+  labels <- do.call(paste, c(labels, sep = ", "))
+  as_group <- function(x) factor(vctrs::vec_match(x[group_vars], states),
+    levels = seq_len(nrow(states)), labels = labels)
+  if (!is.null(rug)) {
+    observed <- !is.na(vctrs::vec_match(rug[factors],
+      vctrs::vec_unique(object[factors])))
+    rug <- rug[observed, , drop = FALSE]
+  }
+  list(group = as_group(object), rug = rug,
+    rug_group = if (!is.null(rug)) as_group(rug) else NULL)
 }
