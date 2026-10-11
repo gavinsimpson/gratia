@@ -687,7 +687,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     continuous_fill = continuous_fill, contour = contour,
     contour_col = contour_col, n_contour = n_contour, angle = angle,
     facet = facet_grid(rows = vars(.data[[variables[3]]]),
-      cols = vars(.data[[variables[4]]]), as.table = FALSE), coord = coord,
+      cols = vars(.data[[variables[4]]]),
+      as.table = is.factor(object[[variables[3]]])), coord = coord,
     facet_vars = variables[3:4], surface_support = surface_support
   )
 }
@@ -796,15 +797,37 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
 
-  # throw a warning and return NULL if trying to plot a >=2d base smoother
-  # like a 2D TPRS or Duchon spline
-  if ((l <- length(variables)) > 2L) {
-    # warning("Can't plot ", l - 1, "D random factor smooths. Not plotting.")
-    msg <- "Can't yet plot multivariate smooths with a 're' marginal: {unique(object[['.smooth']])}."
-    #message("Can't currently plot multivariate smooths with a 're' marginal.")
-    #message("Skipping: ", unique(object[[".smooth"]]))
-    cli_alert_info(msg, wrap = TRUE)
-    return(NULL) # returns early!
+  numeric_vars <- variables[vapply(object[variables], is.numeric, logical(1))]
+  if (length(numeric_vars) >= 2L) {
+    variables <- tensor_plot_variables(variables, object)
+    renderer <- switch(as.character(length(variables)),
+      `2` = plot_smooth.bivariate_smooth,
+      `3` = plot_smooth.trivariate_smooth,
+      `4` = plot_smooth.quadvariate_smooth)
+    if (is.null(renderer)) {
+      cli_alert_info("Can't yet plot tensor terms with more than four covariates: {unique(object$.smooth)}.")
+      return(NULL)
+    }
+    return(renderer(object, variables = variables, rug = rug,
+      constant = constant, fun = fun, xlab = xlab, ylab = ylab,
+      title = title, subtitle = subtitle, caption = caption,
+      ylim = ylim, angle = angle, ...))
+  }
+
+  # Combine categorical margins only for grouping; fitted factor columns remain.
+  curve_facet <- NULL
+  if (length(variables) > 2L) {
+    factors <- setdiff(variables, numeric_vars)
+    group_vars <- if (length(numeric_vars)) factors else factors[-1L]
+    group_column <- utils::tail(make.unique(c(names(object), ".re_group")), 1L)
+    object[[group_column]] <- interaction(object[group_vars], drop = TRUE, sep = ":")
+    if (!is.null(rug)) {
+      rug[[group_column]] <- interaction(rug[group_vars], drop = TRUE, sep = ":")
+    }
+    if (length(numeric_vars)) {
+      curve_facet <- facet_wrap(vars(.data[[group_column]]))
+    }
+    variables <- c(if (length(numeric_vars)) numeric_vars else factors[1L], group_column)
   }
 
   # A tensor can have two factor margins, or put its factor margin first.
@@ -831,7 +854,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
       discrete_colour = discrete_colour, legend = FALSE,
       angle = angle, ylim = ylim,
       labels = labels
-    ))
+    ) + curve_facet)
   }
 
   # Factor-only point ranges retain their explicit-NULL label suppression.

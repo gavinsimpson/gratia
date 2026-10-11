@@ -217,16 +217,12 @@ test_that("draw() works with random effect basis (bs = c('tp', 're')) in univari
 })
 
 # See issue #358
-test_that("draw() does not works with random effect basis (bs = c('tp', 'tp', 're')) in multivariate tensor-product interaction ti", {
+test_that("draw() supports random effect surfaces in tensor interactions", {
   models <- secondary_models()
-  # skip_on_ci() # testing without as moved to mac os x
-  skip_if(packageVersion("mgcv") < "1.8.36")
-  expect_snapshot(
-    p1 <- draw(models$m_re_two_interaction, ncol = 2, rug = FALSE)#,
-    #"ℹ Can't yet plot multivariate smooths with a 're' marginal: ti(x0,x1,fac).",
-    #fixed = TRUE
-  )
-  expect_doppelganger("draw.gam model with re basis in multivariate ti", p1)
+  p <- draw(models$m_re_two_interaction, n_2d = 5, rug = FALSE,
+    contour = FALSE, wrap = FALSE)
+  expect_length(p, length(models$m_re_two_interaction$smooth))
+  expect_silent(ggplot2::ggplotGrob(p[[length(p)]]))
 })
 
 test_that("draw() works with parametric terms", {

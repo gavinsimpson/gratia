@@ -275,6 +275,7 @@
     lapply(smooths, smooth_variable), vapply(smooths, smooth_label, character(1)))
   attr(sm_list, "coordinate_info") <- coordinate_info
   attr(sm_list, "surface_support") <- surface_support
+  attr(sm_list, "tensor_plot_info") <- tensor_plot_info(object, smooths)
 
   ## add a class
   class(sm_list) <- c("smooth_estimates", class(sm_list))
@@ -883,10 +884,12 @@
       var_order = var_order, back_transform = back_transform
     )
   } else {
+    spec <- tensor_plot_spec(model, id)
     smooth <- get_smooths_by_id(model, id)[[1L]]
     data <- prepare_smooth_data(model, smooth, data)
     data <- retain_smooth_coordinates(data, smooth_variable(smooth), model,
       required = back_transform)
+    if (!is.null(spec)) data <- filter_tensor_levels(data, spec$levels)
     vars <- smooth_variable(smooth)
     by_var <- by_variable(smooth)
     if (!identical(by_var, "NA")) {
@@ -930,6 +933,8 @@
   # with the factor last. So use the reordering functionality in place for
   # >=3D tensor product smooths
   var_order <- reorder_tensor_smooth_terms(smooth)
+  spec <- tensor_plot_spec(model, which_smooth(model, smooth_label(smooth)))
+  if (!is.null(spec)) var_order <- spec$variables
 
   ## deal with data if supplied
   id <- which_smooth(model, smooth_label(smooth))
@@ -1096,6 +1101,8 @@
 
   # order of variables
   var_order <- reorder_tensor_smooth_terms(smooth)
+  spec <- tensor_plot_spec(model, which_smooth(model, smooth_label(smooth)))
+  if (!is.null(spec)) var_order <- spec$variables
 
   ## deal with data if supplied
   id <- which_smooth(model, smooth_label(smooth))
@@ -1166,6 +1173,8 @@
 
   # order of variables
   var_order <- reorder_tensor_smooth_terms(smooth)
+  spec <- tensor_plot_spec(model, which_smooth(model, smooth_label(smooth)))
+  if (!is.null(spec)) var_order <- spec$variables
 
   # deal with data if supplied
   id <- which_smooth(model, smooth_label(smooth))
@@ -1285,11 +1294,16 @@
                                     surface = c("raster", "tile", "3d"),
                                     surface_3d = list(),
                                     back_transform = FALSE,
+                                    re_levels = NULL,
+                                    max_re_combinations = 16L,
                                     ...) {
   check_back_transform(back_transform)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
   check_surface_dots(match.call(expand.dots = FALSE))
+  validate_tensor_plot_controls(re_levels, max_re_combinations)
+  validate_estimate_re_levels(object, re_levels)
+  plot_info <- attr(object, "tensor_plot_info")
   surface_support <- attr(object, "surface_support")
   if ("data" %in% names(object) && !".estimate" %in% names(object)) {
     coordinate_info <- attr(object, "coordinate_info")
@@ -1338,6 +1352,8 @@
   ## plot
   plts <- map(sm_l,
     draw_smooth_estimates,
+    re_levels = re_levels, max_re_combinations = max_re_combinations,
+    tensor_plot_info = plot_info,
     surface = surface, surface_3d = surface_3d,
     surface_support = surface_support,
     constant = constant,
@@ -1369,6 +1385,8 @@
     ...
   )
 
+  plts <- Filter(Negate(is.null), plts)
+  if (!length(plts)) return(invisible(NULL))
   wrap_plots(plts)
 }
 
@@ -1376,6 +1394,9 @@
 #' @importFrom tidyselect any_of
 #' @importFrom purrr map_lgl
 `draw_smooth_estimates` <- function(object,
+                                    re_levels = NULL,
+                                    max_re_combinations = Inf,
+                                    tensor_plot_info = NULL,
                                     constant = NULL,
                                     fun = NULL,
                                     contour = TRUE,
@@ -1411,7 +1432,10 @@
   validate_surface_3d(surface_3d)
   check_surface_dots(match.call(expand.dots = FALSE))
 
-  sm_vars <- tensor_term_order[[unique(object$.smooth)[1L]]]
+  plot_info <- tensor_plot_info[[unique(object$.smooth)[1L]]]
+  sm_vars <- if (!is.null(plot_info)) plot_info$variables else {
+    tensor_term_order[[unique(object$.smooth)[1L]]]
+  }
   if (is.null(sm_vars)) {
     sm_vars <- attr(coordinate_info, "smooth_variables")[[unique(object$.smooth)[1L]]]
   }
@@ -1444,6 +1468,16 @@
     object <- unnest(object, cols = "data")
   }
 
+  if ((!is.null(plot_info) || is_tensor_plot_type(sm_type)) &&
+      any(vapply(object[sm_vars], is.factor, logical(1)))) {
+    object <- filter_tensor_levels(object, re_levels)
+    if (!nrow(object)) cli::cli_abort("No tensor evaluation rows remain after selecting `re_levels`.")
+    sm_vars <- tensor_plot_variables(sm_vars, object)
+    if (!tensor_plot_allowed(unique(object$.smooth), tensor_plot_combinations(object, sm_vars),
+        max_re_combinations)) return(NULL)
+    if (!is.null(rug_data)) rug_data <- filter_tensor_levels(rug_data, re_levels)
+  }
+
   if (sm_dim == 1L &&
     sm_type %in% c(
       "TPRS", "TPRS (shrink)", "CRS", "CRS (shrink)",
@@ -1471,8 +1505,7 @@
   } else if (
     sm_type == "Factor smooth" || (
       # Higher-dimensional T2 terms retain their faceted surface renderers.
-      (sm_type %in% c("Tensor product int.", "Tensor product") ||
-        (sm_type == "Tensor product (T2)" && sm_dim == 2L)) &&
+      is_tensor_plot_type(sm_type) &&
         any(map_lgl(object[sm_vars], is.factor))
     )
   ) {

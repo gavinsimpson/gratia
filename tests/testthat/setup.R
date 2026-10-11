@@ -974,3 +974,53 @@ withr::with_seed(164, {
   factor_support_binary <- gam(binary ~ a + s(x, k = 5),
     data = factor_support_observed, family = binomial(), method = "REML")
 })
+
+# Small shared fixtures for random-effect tensor plotting (#169).
+withr::with_seed(169, {
+  tensor_re_data <- data.frame(x = runif(220, 0.1, 1), z = runif(220),
+    u = runif(220), f = factor(rep(c("c", "a", "b", "d"), 55),
+      levels = c("c", "a", "b", "d")),
+    g = ordered(rep(c("B", "A"), each = 110), levels = c("B", "A")))
+  tensor_re_data$y <- sin(4 * tensor_re_data$x) + tensor_re_data$z +
+    as.numeric(tensor_re_data$f) / 4 + rnorm(220, sd = 0.2)
+  tensor_re_models <- lapply(c("te", "ti", "t2"), function(constructor) {
+    gam(as.formula(paste0("y ~ s(u, k = 4) + ", constructor,
+      "(f, x, z, bs = c('re', 'tp', 'tp'), k = c(4, 3, 3))")),
+      data = tensor_re_data, method = "REML")
+  })
+  names(tensor_re_models) <- c("te", "ti", "t2")
+  tensor_re_four <- gam(y ~ ti(x, z, f, g,
+    bs = c("tp", "tp", "re", "re"), k = c(3, 3, 4, 3)),
+    data = tensor_re_data, method = "REML")
+  tensor_re_slices <- gam(y ~ t2(f, x, z, u,
+    bs = c("re", "tp", "tp", "tp"), k = c(4, 3, 3, 3)),
+    data = tensor_re_data, method = "REML")
+  tensor_re_curves <- gam(y ~ te(f, x, g,
+    bs = c("re", "tp", "re"), k = c(4, 3, 3)),
+    data = tensor_re_data, method = "REML")
+  tensor_re_numeric <- gam(y ~ ti(x, z, u,
+    bs = c("tp", "tp", "re"), k = c(3, 3, 3)),
+    data = tensor_re_data, method = "REML")
+  tensor_re_raw <- gam(y ~ ti(f, log(x), z,
+    bs = c("re", "tp", "tp"), k = c(4, 3, 3)),
+    data = tensor_re_data, method = "REML")
+})
+
+withr::with_seed(1691, {
+  tensor_re_category_data <- expand.grid(f = factor(c("c", "a", "b"),
+      levels = c("c", "a", "b")), g = ordered(c("B", "A"), levels = c("B", "A")),
+    h = factor(c("ii", "i"), levels = c("ii", "i")), replicate = 1:5)
+  tensor_re_category_data$y <- rnorm(nrow(tensor_re_category_data))
+  tensor_re_categories <- gam(y ~ te(f, g, h, bs = "re", k = c(3, 3, 3)),
+    data = tensor_re_category_data, method = "REML")
+})
+
+
+
+withr::with_seed(1693, {
+  tensor_re_many_data <- data.frame(x = runif(170),
+    f = factor(rep(sprintf("level%02d", 1:17), 10)))
+  tensor_re_many_data$y <- sin(4 * tensor_re_many_data$x) + rnorm(170)
+  tensor_re_many <- gam(y ~ te(x, f, bs = c("tp", "re"), k = c(3, 17)),
+    data = tensor_re_many_data, method = "REML")
+})

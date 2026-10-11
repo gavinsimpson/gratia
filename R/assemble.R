@@ -105,6 +105,8 @@
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
   back_transform = FALSE,
+  re_levels = NULL,
+  max_re_combinations = 16L,
   ...
 ) {
   check_back_transform(back_transform)
@@ -150,13 +152,17 @@
       model_name = expr_label(substitute(object))
     )
   object <- with_model_envir(object, envir)
+  planned <- plan_tensor_plots(object, which(select), data, re_levels,
+    max_re_combinations, n, n_2d, n_3d, n_4d, back_transform)
+  object <- planned$model
+  select[] <- seq_along(select) %in% planned$ids
 
   # this is needed for the parametric terms below
   sm_plts <- NULL
   ylims <- NULL
 
   # do we have any smooths to plot?
-  if (length(select) > 0L) {
+  if (any(select)) {
     # evaluate all requested smooths
     sm_eval <- smooth_estimates(object,
       envir = envir, back_transform = back_transform,
@@ -352,6 +358,8 @@
       draw_smooth_estimates,
       surface = surface, surface_3d = surface_3d,
       surface_support = surface_support,
+      tensor_plot_info = attr(sm_eval, "tensor_plot_info"),
+      re_levels = re_levels,
       constant = constant,
       fun = fun,
       contour = contour,

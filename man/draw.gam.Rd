@@ -53,6 +53,8 @@
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
   back_transform = FALSE,
+  re_levels = NULL,
+  max_re_combinations = 16L,
   ...
 )
 }
@@ -274,6 +276,18 @@ Parametric estimates retain both scales; multi-column basis
 expansions retain raw axes on either setting. Does not transform estimated
 effects or their intervals; use \code{fun} for that.}
 
+\item{re_levels}{named list of factor level labels to retain in tensor products
+with random-effect margins, for example \code{list(species = c("a", "b"))}.
+Fitted factor order and ordered status are retained.}
+
+\item{max_re_combinations}{positive integer or \code{Inf}; maximum number of
+categorical combinations and numeric conditioning slices drawn for each
+random-effect tensor term. The default is 16. Oversized terms are skipped
+with a message before automatic grids are expanded or evaluated; select
+levels, supply a smaller data slice, or increase this limit. No levels are
+sampled or silently omitted. Direct \code{smooth_estimates()} is unrestricted.
+Numeric random-effect covariates remain continuous axes or slices.}
+
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
 \value{
@@ -284,6 +298,18 @@ Plots smooth and parametric contributions from a fitted GAM model using
 \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}.
 }
 \details{
+Random-effect tensor plots put continuous covariates before factors. Two
+continuous covariates form a surface, with remaining factor levels and numeric
+slices forming conditioning panels, consistently for \code{te()}, \code{ti()} and \code{t2()}.
+One continuous covariate gives curves for categorical combinations;
+categorical-only terms give point ranges. Up to four covariates are supported.
+The combination limit counts joint categorical states, multiplied by numeric
+conditioning slices for automatically generated surfaces. Supplied \code{data}
+count only combinations present in their rows; they are never expanded into
+new combinations. Select specific factor levels with \code{re_levels}, or use
+\code{\link[=data_slice]{data_slice()}} to fix conditioning covariates. Observation layers do not
+introduce additional surface panels.
+
 Three-dimensional faces retain the current diverging RdBu fill scale and
 effect-range rules, shared across conditioning facets. \code{continuous_fill}
 overrides the fill scale. Faces have no outlines; \code{contour_col} controls

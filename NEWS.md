@@ -6,6 +6,11 @@
   combinations of known categorical predictor levels, while preserving the
   model predictions (#164).
 
+* Tensor products with random-effect margins now support consistent curves,
+  faceted surfaces and categorical plots across `te()`, `ti()` and `t2()` (#169).
+  Plotting accepts `re_levels` and `max_re_combinations` to select levels and
+  prevent oversized grids before evaluation.
+
 * Soap-film boundary (`bs = "sf"`) and wiggly (`bs = "sw"`) components are
   supported, including their distinct component types and boundary-aware plots
   (#375). gratia now requires mgcv >= 1.9-4 and R >= 4.4.0.

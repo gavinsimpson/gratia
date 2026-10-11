@@ -87,6 +87,8 @@
   ## need a list of terms used in current smooth
   sm <- get_smooths_by_id(model, id)[[1L]]
   mf <- prepare_smooth_data(model, sm)
+  plot_spec <- tensor_plot_spec(model, id)
+  if (!is.null(plot_spec)) var_order <- plot_spec$variables
   orig_order <- unique(smooth_variable(sm))
   smooth_vars <- if (is.null(var_order)) {
     orig_order
@@ -176,6 +178,13 @@
       n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
       round_extra = !back_transform
     )
+  }
+
+  if (!is.null(plot_spec)) {
+    for (v in names(plot_spec$levels)) {
+      target <- if (back_transform) grid_vars[match(v, smooth_vars)] else v
+      newlist[[target]] <- newlist[[target]][as.character(newlist[[target]]) %in% plot_spec$levels[[v]]]
+    }
   }
 
   if (!is.null(by_var)) {
