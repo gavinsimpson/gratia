@@ -2,6 +2,10 @@
 
 ## User visible changes
 
+* `fitted_values()` now informs you when prediction data contain unobserved
+  combinations of known categorical predictor levels, while preserving the
+  model predictions (#164).
+
 * Soap-film boundary (`bs = "sf"`) and wiggly (`bs = "sw"`) components are
   supported, including their distinct component types and boundary-aware plots
   (#375). gratia now requires mgcv >= 1.9-4 and R >= 4.4.0.

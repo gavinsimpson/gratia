@@ -911,3 +911,66 @@ withr::with_seed(107, {
     data = gfam_ordinal_data, family = gfam(list(ocat(R = 4), poisson())),
     method = "REML")
 })
+
+
+# Incomplete categorical support, shared by prediction-message regressions.
+withr::with_seed(164, {
+  factor_support_data <- expand.grid(
+    a = factor(c("A", "B")), b = factor(c("low", "high")), replicate = 1:30
+  )
+  factor_support_data$x <- runif(nrow(factor_support_data))
+  factor_support_data$y <- as.integer(factor_support_data$a) +
+    as.integer(factor_support_data$b) + sin(3 * factor_support_data$x) +
+    rnorm(nrow(factor_support_data), sd = 0.2)
+  factor_support_data$group <- factor(rep(1:10, length.out = nrow(factor_support_data)))
+  factor_support_group_effect <- rnorm(nlevels(factor_support_data$group), sd = 0.5)
+  factor_support_data$y <- factor_support_data$y +
+    factor_support_group_effect[as.integer(factor_support_data$group)]
+  factor_support_data$keep <- with(factor_support_data, !(a == "B" & b == "low"))
+  factor_support_observed <- subset(factor_support_data, keep)
+  factor_support_character <- factor_support_observed
+  factor_support_character$a <- as.character(factor_support_character$a)
+  factor_support_character$b <- as.character(factor_support_character$b)
+  factor_support_formula <- y ~ a + b + s(x, k = 5)
+  factor_support_models <- list(
+    gam = gam(factor_support_formula, data = factor_support_observed, method = "REML"),
+    character = gam(factor_support_formula, data = factor_support_character, method = "REML"),
+    interaction = gam(y ~ a * b + s(x, k = 5), data = factor_support_observed, method = "REML"),
+    bam = bam(factor_support_formula, data = factor_support_observed),
+    discrete = bam(factor_support_formula, data = factor_support_observed, discrete = TRUE),
+    gamm = gamm(factor_support_formula, data = factor_support_observed, method = "REML"),
+    gamm4 = gamm4(factor_support_formula, data = factor_support_observed, random = ~(1 | group))
+  )
+  factor_support_subset <- gam(factor_support_formula, data = factor_support_data,
+    subset = keep, method = "REML")
+  factor_support_missing_data <- factor_support_data
+  factor_support_missing_data$y[!factor_support_missing_data$keep] <- NA_real_
+  factor_support_missing <- gam(factor_support_formula, data = factor_support_missing_data,
+    na.action = na.exclude, method = "REML")
+  factor_support_observed$j <- as.integer(factor_support_observed$a) - 1L
+  factor_support_transformed <- gam(y ~ factor(j %% 2) + b + s(x, k = 5),
+    data = factor_support_observed, method = "REML")
+  factor_support_local <- local({
+    foo <- function(j) factor(j %% 2)
+    list(model = gam(y ~ foo(j) + b + s(x, k = 5),
+      data = factor_support_observed, method = "REML"), envir = environment())
+  })
+  factor_support_three_data <- expand.grid(
+    a = factor(c("A", "B")), b = factor(c("low", "high")),
+    c = factor(c("left", "right")), replicate = 1:15
+  )
+  factor_support_three_data <- subset(factor_support_three_data,
+    !(a == "B" & b == "high" & c == "right"))
+  factor_support_three_data$x <- runif(nrow(factor_support_three_data))
+  factor_support_three_data$y <- as.integer(factor_support_three_data$a) +
+    as.integer(factor_support_three_data$b) + as.integer(factor_support_three_data$c) +
+    sin(factor_support_three_data$x) + rnorm(nrow(factor_support_three_data), sd = 0.2)
+  factor_support_three <- gam(y ~ a + b + c + s(x, k = 5),
+    data = factor_support_three_data, method = "REML")
+  factor_support_observed$category <- sample(1:3, nrow(factor_support_observed), replace = TRUE)
+  factor_support_observed$binary <- factor(sample(0:1, nrow(factor_support_observed), replace = TRUE))
+  factor_support_response <- gam(category ~ a + b + s(x, k = 5),
+    data = factor_support_observed, family = ocat(R = 3), method = "REML")
+  factor_support_binary <- gam(binary ~ a + s(x, k = 5),
+    data = factor_support_observed, family = binomial(), method = "REML")
+})

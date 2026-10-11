@@ -39,6 +39,13 @@
 #' through `...` is honoured; with `na.omit`, `.row` retains the positions in the
 #' supplied data, rather than numbering the remaining rows consecutively.
 #'
+#' For supplied prediction data, an informative message identifies combinations
+#' of categorical predictor levels absent from the retained fitting observations.
+#' Predictions are unchanged: an unobserved combination is not necessarily
+#' non-estimable, particularly in additive models. Numeric-by-factor range
+#' extrapolation is not checked. Missing predictors and genuinely new factor
+#' levels retain their usual prediction behavior.
+#'
 #' Simultaneous intervals jointly cover the model's underlying expected
 #' responses, or linear predictors on the link scale, at all valid covariate
 #' combinations evaluated in this call, with approximate posterior probability
@@ -153,6 +160,7 @@
   scale <- match.arg(scale)
 
   layout <- prediction_layout(object, data, na.action = list(...)$na.action %||% stats::na.pass)
+  inform_unobserved_factor_combinations(object, layout)
   object <- model_used_rows(object)
   data <- as_tibble(layout$data)
 
