@@ -15,7 +15,7 @@ been removed from the package."><meta property="og:image" content="https://gavin
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-39</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-40</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -203,7 +203,11 @@ or their intervals at the chosen evaluation points.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>For explicit <code>data</code>, missing covariates needed by a smooth produce <code>NA</code>
+    <p>When distinct fitted terms share both their smooth label and type (for
+example, tensor products of soap-film components), <code>.smooth_id</code> contains
+their fitted smooth indices. This preserves their identity in saved
+estimates and plots without changing the labels supplied by mgcv.</p>
+<p>For explicit <code>data</code>, missing covariates needed by a smooth produce <code>NA</code>
 estimates and standard errors at those positions. Missing values in variables
 unrelated to that smooth do not discard its otherwise evaluable rows.</p>
 <p>Raw <code>data</code> may contain <code>x</code> for a smooth such as <code>s(log(x))</code>; gratia evaluates

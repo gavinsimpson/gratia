@@ -4,6 +4,24 @@
 
 ### User visible changes
 
+- Soap-film boundary (`bs = "sf"`) and wiggly (`bs = "sw"`) components
+  are supported, including their distinct component types and
+  boundary-aware plots
+  ([\#375](https://github.com/gavinsimpson/gratia/issues/375)). gratia
+  now requires mgcv \>= 1.9-4 and R \>= 4.4.0.
+
+- Grouped-family models fitted with
+  [`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) now support
+  response-scale
+  [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
+  with component-specific mean transforms
+  ([\#269](https://github.com/gavinsimpson/gratia/issues/269)), and
+  [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
+  with component-specific distributions and parameters
+  ([\#272](https://github.com/gavinsimpson/gratia/issues/272)). Both
+  accept `family_index` for prediction data; ordinal response-scale
+  fitted draws remain unsupported.
+
 - Improved support for `gamm4` models across gratia.
 
 - Link extraction now shares parameter validation across

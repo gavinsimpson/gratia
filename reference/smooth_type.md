@@ -52,10 +52,10 @@ smooth_type(smooth)
 # S3 method for class 'random.effect'
 smooth_type(smooth)
 
-# S3 method for class 'sw'
+# S3 method for class 'sf.wiggly'
 smooth_type(smooth)
 
-# S3 method for class 'sf'
+# S3 method for class 'sf.film'
 smooth_type(smooth)
 
 # S3 method for class 'soap.film'
@@ -106,3 +106,8 @@ smooth_type(smooth)
 - smooth:
 
   an object inheriting from class `mgcv.smooth`.
+
+## Details
+
+Soap-film boundary and wiggly components use the `sf.film` and
+`sf.wiggly` classes introduced in mgcv 1.9-4.

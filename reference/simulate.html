@@ -13,7 +13,7 @@ distribution used when fitting the model."><meta property="og:image" content="ht
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-39</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-40</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,7 +67,8 @@ distribution used when fitting the model.</p>
 <span>  data <span class="op">=</span> <span class="va">newdata</span>,</span>
 <span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  newdata <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  family_index <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm'</span></span>
@@ -132,6 +133,11 @@ then defaults to <code>object[["prior.weights"]]</code>, otherwise a vector of o
 <dt id="arg-newdata">newdata<a class="anchor" aria-label="anchor" href="#arg-newdata"></a></dt>
 <dd><p>Deprecated. Use <code>data</code> instead.</p></dd>
 
+
+<dt id="arg-family-index">family_index<a class="anchor" aria-label="anchor" href="#arg-family-index"></a></dt>
+<dd><p>numeric; for grouped-family models, one integer family
+index per requested prediction row. See Details.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -149,6 +155,22 @@ independently of training exclusions: missing responses do not prevent
 simulation, while missing required predictors or weights yield <code>NA</code>.
 Prediction <code>na.action</code> in <code>...</code> is honoured. Missing rows are never passed
 to the response random-number generator.</p>
+<p>For models fitted with <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code>, each observation is simulated from
+its component family using that component's fitted scale and distribution
+parameters. With <code>data = NULL</code>, fitted family membership is used. For explicit
+<code>data</code>, supply <code>family_index</code> or the index in the model's response expression:
+the second column of a matrix response, the second argument of <code>cbind(y, index)</code>,
+or a numeric index vector in place of a named matrix response. Actual response
+observations are not needed. Missing indices follow prediction <code>na.action</code>;
+invalid indices are errors. Explicit indices must agree with recoverable ones.</p>
+<p>Grouped simulations return one numeric response per observation: binomial
+proportions (with integer trial counts supplied in <code>weights</code>), count responses,
+or ordered-category codes, as appropriate. Component random generators retain
+their usual treatment of prior weights. Ordered-categorical and <code>ziP</code> components
+are simulated from their latent predictors. General families with multiple
+linear predictors and matrix responses encoding censoring or binomial counts
+are outside the scope supported by <code>gfam()</code>. Scalar censored-family components
+produce draws from their uncensored latent distributions.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

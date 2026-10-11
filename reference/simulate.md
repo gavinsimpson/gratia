@@ -19,7 +19,8 @@ simulate(
   data = newdata,
   weights = NULL,
   ...,
-  newdata = NULL
+  newdata = NULL,
+  family_index = NULL
 )
 
 # S3 method for class 'gamm'
@@ -85,6 +86,11 @@ simulate(
 
   Deprecated. Use `data` instead.
 
+- family_index:
+
+  numeric; for grouped-family models, one integer family index per
+  requested prediction row. See Details.
+
 ## Value
 
 (Currently) A data frame with `nsim` columns.
@@ -103,6 +109,28 @@ are evaluated independently of training exclusions: missing responses do
 not prevent simulation, while missing required predictors or weights
 yield `NA`. Prediction `na.action` in `...` is honoured. Missing rows
 are never passed to the response random-number generator.
+
+For models fitted with
+[`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html), each
+observation is simulated from its component family using that
+component's fitted scale and distribution parameters. With
+`data = NULL`, fitted family membership is used. For explicit `data`,
+supply `family_index` or the index in the model's response expression:
+the second column of a matrix response, the second argument of
+`cbind(y, index)`, or a numeric index vector in place of a named matrix
+response. Actual response observations are not needed. Missing indices
+follow prediction `na.action`; invalid indices are errors. Explicit
+indices must agree with recoverable ones.
+
+Grouped simulations return one numeric response per observation:
+binomial proportions (with integer trial counts supplied in `weights`),
+count responses, or ordered-category codes, as appropriate. Component
+random generators retain their usual treatment of prior weights.
+Ordered-categorical and `ziP` components are simulated from their latent
+predictors. General families with multiple linear predictors and matrix
+responses encoding censoring or binomial counts are outside the scope
+supported by `gfam()`. Scalar censored-family components produce draws
+from their uncensored latent distributions.
 
 ## See also
 

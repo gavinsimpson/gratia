@@ -29,6 +29,7 @@ fitted_samples(
   unconditional = FALSE,
   draws = NULL,
   mvn_method = c("mvnfast", "mgcv"),
+  family_index = NULL,
   ...,
   newdata = NULL,
   ncores = NULL
@@ -161,6 +162,16 @@ fitted_samples(
   but which might not work for some marginal fits, such as those where
   the covariance matrix is close to singular.
 
+- family_index:
+
+  numeric; optional family-list positions for grouped family
+  ([`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html)) response
+  predictions, with one integer per requested row. By default membership
+  is recovered from the response/index expression in `data`, or the
+  fitted membership when `data` is omitted. This is useful when
+  predicting without responses or with a complex response expression. An
+  explicit index must agree with membership recoverable from `data`.
+
 - newdata:
 
   Deprecated: use `data` instead.
@@ -187,6 +198,27 @@ values in long format. The columns are
   `data`.
 
 ## Details
+
+For grouped families, coefficient draws preserve the joint model
+covariance; each row is then transformed using its own fitted component
+family. Explicit prediction data must identify each row's family: no
+training-order fallback is used. A two-column response matrix supplies
+its second column; a numeric column named for the response supplies
+indices directly. For a response such as `cbind(y, index)`, the `index`
+expression can be supplied without `y`. Missing indices behave like
+missing required predictors. Link-scale draws do not require family
+membership.
+
+Grouped response-scale draws currently support scalar fitted means,
+including families with a scalar prediction transform such as
+[`mgcv::ziP()`](https://rdrr.io/pkg/mgcv/man/ziP.html). They do not
+support [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html)
+category-probability output; use the link scale for grouped ordinal
+models. Distributional nuisance parameters are held at their fitted
+values. This does not add support for general/location-scale families
+that `gfam()` itself rejects, nor repair upstream fitting failures
+(including fixed-theta negative-binomial components and some `ziP()`
+fits in some mgcv versions).
 
 Observation rows use the same missing-value convention as
 [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md):

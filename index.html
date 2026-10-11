@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-39</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-40</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,7 +92,7 @@
 </figcaption></figure><p>Or for a bivariate smooth:</p>
 <figure><p><img src="reference/figures/README-draw-gam-figure-2d-1.png" alt="Estimated smooths from a GAM"></p>
 <figcaption aria-hidden="true"><p>Estimated smooths from a GAM</p>
-</figcaption></figure><p>Note that some specialist smoothers (<code>bs %in% c("mrf","sw", "sf")</code>) are not currently supported, but univariate, <em>factor</em> and <em>continuous</em> <code>by</code>-variable smooths, simple random effect smooths (<code>bs = 're'</code>), factor-smooth interaction smooths (<code>bs = "fs"</code>), constrained factor smooths (<code>bs = "sz"</code>), full soap film smooths (<code>bs = "so"</code>), and bivariate, trivariate, and quadvariate TPRS and tensor product smooths are supported,</p>
+</figcaption></figure><p>Univariate, <em>factor</em> and <em>continuous</em> <code>by</code>-variable smooths, simple random effect smooths (<code>bs = "re"</code>), factor-smooth interaction smooths (<code>bs = "fs"</code>), constrained factor smooths (<code>bs = "sz"</code>), soap-film smooths (<code>bs = "so"</code>) and their boundary (<code>bs = "sf"</code>) and wiggly (<code>bs = "sw"</code>) components, and bivariate, trivariate, and quadvariate TPRS and tensor product smooths are supported,</p>
 </li>
 <li><p>Estimation of derivatives of fitted smoothers: <code><a href="reference/derivatives.html">derivatives()</a></code>,</p></li>
 <li><p>Estimation of point-wise across-the-function confidence intervals and simultaneous intervals for smooths: <code><a href="reference/confint.gam.html">confint.gam()</a></code>.</p></li>
