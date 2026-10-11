@@ -160,7 +160,7 @@
     # evaluate all requested smooths
     sm_eval <- smooth_estimates(object,
       envir = envir, back_transform = back_transform,
-      select = S[select],
+      select = which(select),
       n = n,
       n_2d = n_2d,
       n_3d = n_3d,
@@ -244,7 +244,12 @@
         residuals <- FALSE
       } else {
         # get residuals in a suitable format
-        p_resids <- nested_partial_residuals(object, terms = S[select], data = observation_data)
+        p_resids <- if (anyDuplicated(S)) {
+          nested_component_observations(object, which(select),
+            data = observation_data, partial = TRUE)
+        } else {
+          nested_partial_residuals(object, terms = S[select], data = observation_data)
+        }
 
         # compute the range of residuals for each smooth
         # p_resids_rng <- p_resids |>
@@ -267,9 +272,15 @@
             ) |>
             pluck("rng")
         }
+        if (".smooth_id" %in% names(sm_eval)) {
+          p_resids <- select(p_resids, all_of(c(".smooth_id", "partial_residual")))
+        } else p_resids$.smooth_id <- NULL
         # merge with the evaluated smooth
         sm_eval <- suppress_matches_multiple_warning(
-          left_join(sm_eval, p_resids, by = ".smooth")
+          left_join(sm_eval, p_resids,
+            by = if (".smooth_id" %in% names(sm_eval)) ".smooth_id" else {
+            if (anyDuplicated(S)) c(".smooth", ".type") else ".smooth"
+          })
         )
       }
     }
@@ -277,15 +288,23 @@
     # add rug data?
     if (isTRUE(rug)) {
       # get rug data in a suitable format
-      rug_data <- nested_rug_values(
-        object,
-        terms = S[select], data = observation_data,
-        distinct = distinct_rug
-      )
+      rug_data <- if (anyDuplicated(S)) {
+        nested_component_observations(object, which(select),
+          data = observation_data, distinct = distinct_rug)
+      } else {
+        nested_rug_values(object,
+          terms = S[select], data = observation_data, distinct = distinct_rug)
+      }
 
+      if (".smooth_id" %in% names(sm_eval)) {
+        rug_data <- select(rug_data, all_of(c(".smooth_id", "rug_data")))
+      } else rug_data$.smooth_id <- NULL
       # merge with the evaluated smooth
       sm_eval <- suppress_matches_multiple_warning(
-        left_join(sm_eval, rug_data, by = ".smooth")
+        left_join(sm_eval, rug_data,
+          by = if (".smooth_id" %in% names(sm_eval)) ".smooth_id" else {
+            if (anyDuplicated(S)) c(".smooth", ".type") else ".smooth"
+          })
       )
     }
 
@@ -300,15 +319,19 @@
       levs <- unique(str_split_fixed(sm_eval$.smooth, ":", n = 2)[, 1])
       sm_l <- sm_eval |>
         mutate(
-          ..smooth.. = factor(.data$.smooth, levels = S[select]),
+          ..smooth.. = factor(.data$.smooth, levels = unique(S[select])),
           .term = str_split_fixed(.data$.smooth, ":", n = 2)[, 1],
-          ..by.. = if_else(is.na(.data$.by), "..no_level..", .data$.by)
+          ..by.. = if_else(is.na(.data$.by), "..no_level..", .data$.by),
+          ..component.. = if (".smooth_id" %in% names(sm_eval)) {
+            .data$.smooth_id
+          } else match(.data$.type, unique(.data$.type))
         ) |>
         relocate(".term", .before = 1L)
       grp_by_levs <- unique(sm_l$"..by..")
       sm_l <- sm_l |>
         group_split(factor(.data$.term, levels = sm_levels),
-          factor(.data$"..by..", levels = grp_by_levs))
+          factor(.data$"..by..", levels = grp_by_levs),
+          factor(.data$..component.., levels = unique(.data$..component..)))
       # sometimes the steps to get the order right above don't work
       sm_l_levs <- vapply(sm_l, \(x) unique(x$.term), character(1L))
       if (!identical(unique(sm_l_levs), levs)) {
@@ -323,7 +346,7 @@
         sm_eval,
         .term = str_split_fixed(sm_eval$.smooth, ":", n = 2)[, 1]
       )
-      group_split(sm_eval, factor(.data$.smooth, levels = S[select]))
+      split_smooth_components(sm_eval)
     }
     sm_plts <- map(sm_l,
       draw_smooth_estimates,

@@ -115,6 +115,11 @@ implementation of \code{evaluate_smooth()}, and replaces that function, which ha
 been removed from the package.
 }
 \details{
+When distinct fitted terms share both their smooth label and type (for
+example, tensor products of soap-film components), \code{.smooth_id} contains
+their fitted smooth indices. This preserves their identity in saved
+estimates and plots without changing the labels supplied by mgcv.
+
 For explicit \code{data}, missing covariates needed by a smooth produce \code{NA}
 estimates and standard errors at those positions. Missing values in variables
 unrelated to that smooth do not discard its otherwise evaluable rows.

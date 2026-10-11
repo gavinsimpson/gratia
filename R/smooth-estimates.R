@@ -62,6 +62,11 @@
 #' @return A data frame (tibble), which is of class `"smooth_estimates"`.
 #'
 #' @details
+#' When distinct fitted terms share both their smooth label and type (for
+#' example, tensor products of soap-film components), `.smooth_id` contains
+#' their fitted smooth indices. This preserves their identity in saved
+#' estimates and plots without changing the labels supplied by mgcv.
+#'
 #' For explicit `data`, missing covariates needed by a smooth produce `NA`
 #' estimates and standard errors at those positions. Missing values in variables
 #' unrelated to that smooth do not discard its otherwise evaluable rows.
@@ -236,6 +241,14 @@
       dist = dist,
       clip = clip, back_transform = back_transform
     )
+  }
+
+  # Tensor products of the two soap components can share both label and type.
+  # Retain fitted indices only for otherwise indistinguishable output terms.
+  identities <- paste(vapply(smooths, smooth_label, character(1)),
+    vapply(smooths, smooth_type, character(1)), sep = "\r")
+  if (anyDuplicated(identities)) {
+    for (i in seq_along(sm_list)) sm_list[[i]]$.smooth_id <- smooth_ids[[i]]
   }
 
   surface_support <- Map(function(sm, estimates) {
@@ -728,8 +741,8 @@
       is_inside <- inside(
         data,
         bnd,
-        x_var = smooth$vn[[1]],
-        y_var = smooth$vn[[2]]
+        x_var = smooth_variable(smooth)[[1]],
+        y_var = smooth_variable(smooth)[[2]]
       )
 
       data <- filter(data, is_inside)
@@ -1303,20 +1316,24 @@
     levs <- unique(str_split_fixed(object$.smooth, ":", n = 2)[, 1])
     # nest the object so we can reuse the code/ideas from draw.gam
     sm_l <- object |>
-      nest(data = !all_of(c(".smooth", ".type", ".by"))) |>
+      nest(data = !any_of(c(".smooth", ".type", ".by", ".smooth_id"))) |>
         mutate(
           ..smooth.. = factor(.data$.smooth, levels = sm_levs),
           .term = str_split_fixed(.data$.smooth, ":", n = 2)[, 1],
-          ..by.. = if_else(is.na(.data$.by), "..no_level..", .data$.by)
+          ..by.. = if_else(is.na(.data$.by), "..no_level..", .data$.by),
+          ..component.. = if (".smooth_id" %in% names(object)) {
+            .data$.smooth_id
+          } else match(.data$.type, unique(.data$.type))
         ) |>
         relocate(".term", .before = 1L)
     grp_by_levs <- unique(sm_l$"..by..")
     sm_l |>
       group_split(factor(.data$.term, levels = sm_levs),
-        factor(.data$"..by..", levels = grp_by_levs))
+        factor(.data$"..by..", levels = grp_by_levs),
+        factor(.data$..component.., levels = unique(.data$..component..)))
   } else {
     # the factor is to reorder to way the smooths entered the model
-    group_split(object, factor(object$.smooth, levels = sm_levs))
+    split_smooth_components(object)
   }
   ## plot
   plts <- map(sm_l,
@@ -1489,7 +1506,9 @@
       class(object) <- append(class(object), "isotropic_smooth",
         after = 0
       )
-    } else if (sm_type %in% "Soap film") {
+    } else if (sm_type %in% c(
+      "Soap film", "Soap film (boundary)", "Soap film (wiggly)"
+    )) {
       class(object) <- append(class(object), "soap_film", after = 0
       )
     }

@@ -17,8 +17,8 @@
 \alias{smooth_type.gp.smooth}
 \alias{smooth_type.mrf.smooth}
 \alias{smooth_type.random.effect}
-\alias{smooth_type.sw}
-\alias{smooth_type.sf}
+\alias{smooth_type.sf.wiggly}
+\alias{smooth_type.sf.film}
 \alias{smooth_type.soap.film}
 \alias{smooth_type.t2.smooth}
 \alias{smooth_type.sos.smooth}
@@ -67,9 +67,9 @@ smooth_type(smooth)
 
 \method{smooth_type}{random.effect}(smooth)
 
-\method{smooth_type}{sw}(smooth)
+\method{smooth_type}{sf.wiggly}(smooth)
 
-\method{smooth_type}{sf}(smooth)
+\method{smooth_type}{sf.film}(smooth)
 
 \method{smooth_type}{soap.film}(smooth)
 
@@ -104,4 +104,8 @@ smooth_type(smooth)
 }
 \description{
 Determine the type of smooth and return it n a human readable form
+}
+\details{
+Soap-film boundary and wiggly components use the \code{sf.film} and \code{sf.wiggly}
+classes introduced in mgcv 1.9-4.
 }

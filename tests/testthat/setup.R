@@ -630,12 +630,49 @@ m_soap <- gam(
   data = soap_data, method = "REML", knots = soap_knots
 )
 
-# This dies if you load the sf package - have emailed Simon about it
-# m_soap_sep <- gam(
-#   y ~ s(v, w, k = 30, bs = "sf", xt = list(bnd = soap_fsb, nmax = 100)) +
-#     s(v, w, k = 30, bs = "sw", xt = list(bnd = soap_fsb, nmax = 100)),
-#   data = soap_data, method = "REML", knots = soap_knots
-# )
+# Shared component fixtures use a smaller PDE grid than the visual examples.
+m_soap_sep <- gam(
+  y ~ s(v, w, k = 10, bs = "sf", xt = list(bnd = soap_fsb, nmax = 40)) +
+    s(v, w, k = 10, bs = "sw", xt = list(bnd = soap_fsb, nmax = 40)),
+  data = soap_data, method = "REML", knots = soap_knots
+)
+
+# A nested domain with a known inner boundary exercises component offsets.
+soap_component_boundary <- list(
+  data.frame(v = cos(seq(0, 2 * pi, length.out = 61)),
+    w = sin(seq(0, 2 * pi, length.out = 61))),
+  data.frame(v = 0.3 * cos(seq(0, 2 * pi, length.out = 31)),
+    w = 0.3 * sin(seq(0, 2 * pi, length.out = 31)), f = 0.5)
+)
+soap_component_data <- withr::with_seed(375, {
+  d <- data.frame(v = runif(200, -1, 1), w = runif(200, -1, 1))
+  keep <- mgcv::in.out(soap_component_boundary, as.matrix(d))
+  d <- d[keep, ]
+  d$y <- d$v + d$w^2 + rnorm(nrow(d), sd = 0.1)
+  d
+})
+soap_component_knots <- expand.grid(v = seq(-0.8, 0.8, length.out = 6),
+  w = seq(-0.8, 0.8, length.out = 6))
+soap_component_knots <- soap_component_knots[
+  mgcv::in.out(soap_component_boundary, as.matrix(soap_component_knots)), ]
+m_soap_sep_known <- gam(
+  y ~ s(v, w, k = 8, bs = "sf",
+    xt = list(bnd = soap_component_boundary, nmax = 40)) +
+    s(v, w, k = 8, bs = "sw",
+      xt = list(bnd = soap_component_boundary, nmax = 40)),
+  data = soap_component_data, method = "REML", knots = soap_component_knots
+)
+
+# Soap components can also form the bivariate margins of tensor products.
+soap_tensor_data <- withr::with_seed(376,
+  transform(soap_data, time = runif(nrow(soap_data))))
+m_soap_tensor <- gam(
+  y ~ te(v, w, time, d = c(2, 1), k = c(10, 4), bs = c("sf", "cr"),
+    xt = list(list(bnd = soap_fsb, nmax = 40), NULL)) +
+    te(v, w, time, d = c(2, 1), k = c(10, 4), bs = c("sw", "cr"),
+      xt = list(list(bnd = soap_fsb, nmax = 40), NULL)),
+  data = soap_tensor_data, method = "REML", knots = soap_knots
+)
 
 # -- End Soap films -----------------------------------------------------------
 

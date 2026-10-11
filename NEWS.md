@@ -2,6 +2,10 @@
 
 ## User visible changes
 
+* Soap-film boundary (`bs = "sf"`) and wiggly (`bs = "sw"`) components are
+  supported, including their distinct labels and boundary-aware plots (#375).
+  gratia now requires mgcv >= 1.9-4 and R >= 4.4.0.
+
 * Improved support for `gamm4` models across gratia.
 
 * Link extraction now shares parameter validation across `link()`, `inv_link()`,

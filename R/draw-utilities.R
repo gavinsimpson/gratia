@@ -87,3 +87,13 @@
   f <- layer_scales(p)[["y"]][["get_limits"]]
   f()
 }
+
+# The boundary and wiggly soap components have the same mgcv smooth label.
+# Use fitted indices when labels and types both collide, retaining public labels.
+split_smooth_components <- function(data) {
+  identity <- if (".smooth_id" %in% names(data)) data$.smooth_id else {
+    paste(data$.smooth, data$.type, sep = "\r")
+  }
+  key <- match(identity, unique(identity))
+  unname(split(data, key))
+}
