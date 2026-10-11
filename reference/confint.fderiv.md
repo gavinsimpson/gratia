@@ -90,8 +90,6 @@ new_data <- sapply(dat[c("x0", "x1", "x2", "x3")], middle)
 new_data <- data.frame(new_data)
 ## first derivatives of all smooths...
 fd <- fderiv(mod, newdata = new_data)
-#> Warning: `fderiv()` was deprecated in gratia 0.7.0.
-#> i Please use `derivatives()` instead.
 
 ## point-wise interval
 ci <- confint(fd, type = "confidence")
