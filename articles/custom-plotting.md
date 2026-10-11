@@ -148,6 +148,81 @@ but it is instructive to know how to combine the outputs of
 should the need arise, such as when you want to create a patchwork of
 plots from different models.
 
+## Drawing surfaces in 3D
+
+Numeric smooth and parametric surfaces can be displayed with
+`surface = "3d"`. The default remains `surface = "raster"`;
+`surface = "tile"` draws vector rectangles. The 3D display retains the
+current diverging RdBu palette, fill ranges, theme, and facet styling.
+Use `continuous_fill` to choose another palette.
+
+``` r
+
+eg2 <- data_sim("eg2", n = 400, seed = 2)
+m_surface <- gam(y ~ te(x, z, k = c(5, 5)) + x:z,
+  data = eg2, method = "REML")
+draw(m_surface, surface = "3d", n_2d = 20,
+  surface_3d = list(yaw = 45, persp = FALSE))
+```
+
+![](custom-plotting_files/figure-html/surface-3d-1.png)
+
+`surface_3d` is a named list passed to
+[`ggcube::coord_3d()`](https://matthewkling.github.io/ggcube/reference/coord_3d.html).
+gratia uses only the coordinate system from that function, leaving its
+additional theme settings out. Options such as `yaw`, `roll`, `pitch`,
+`persp`, `ratio`, and `light` configure a shared view across all 3D
+panels. `surface_3d = list(dist = 3)` controls viewing distance; the
+top-level `dist` argument still controls exclusion far from data.
+
+Lighting defaults to `ggcube::light(backface_scale = 1)`, keeping the
+back faces lit. Supply your own light object to replace this default,
+for example
+`surface_3d = list(light = ggcube::light(backface_scale = -1))` to
+restore ggcube’s original back-face shading, or
+`surface_3d = list(light = ggcube::light(method = "none"))` to disable
+lighting. Surface faces have full opacity. Floor observations,
+boundaries, and contours share the surface’s depth ordering, so hidden
+parts are occluded by nearer faces.
+
+For a different view for each term, customize the named plots from
+[`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md):
+
+``` r
+
+panels <- assemble(m_surface, surface = "3d", n_2d = 20)
+# coord_3d() returns a coordinate and a theme; take just the coordinate.
+panels[["te(x,z)"]] <- panels[["te(x,z)"]] +
+  ggcube::coord_3d(yaw = 45, persp = FALSE,
+    light = ggcube::light(backface_scale = 1))[[1]]
+#> Coordinate system already present.
+#> ℹ Adding new coordinate system, which will replace the existing one.
+panels[["x:z"]] <- panels[["x:z"]] +
+  ggcube::coord_3d(yaw = -20, persp = FALSE,
+    light = ggcube::light(backface_scale = 1))[[1]]
+#> Coordinate system already present.
+#> ℹ Adding new coordinate system, which will replace the existing one.
+wrap_plots(panels)
+```
+
+![](custom-plotting_files/figure-html/surface-3d-per-term-1.png)
+
+The two displayed covariates form the horizontal axes, and the partial
+effect forms the vertical axis. Higher-dimensional smooths and
+interactions retain conditioning facets; `n_2d` controls surface
+resolution and `n_3d`/`n_4d` control covariate slices. Contours follow
+the surface, and available observation locations appear on the floor. No
+uncertainty surfaces are added. Direct calls to
+`draw(smooth_estimates(model), surface = "3d")` and
+`draw(parametric_effects(model), surface = "3d")` use the same renderer.
+
+Scattered evaluation data use piecewise-linear Delaunay triangles and
+require `geometry`. Support masking and soap-film domain checks also
+require `sf`. Faces crossing known excluded regions are discarded
+conservatively; a coarse mesh may therefore omit additional faces near a
+boundary. Increase the evaluation density to resolve these areas.
+Spherical smooths retain their geographic display.
+
 ## Building your own plot by hand
 
 {gratia} provides high-level functions like

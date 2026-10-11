@@ -9,7 +9,7 @@ ggplot2::ggplot()."><meta property="og:image" content="https://gavinsimpson.gith
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-38</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-39</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,7 +97,8 @@ ggplot2::ggplot()."><meta property="og:image" content="https://gavinsimpson.gith
 <span>  wrap <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  caption <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  geom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"raster"</span>, <span class="st">"tile"</span><span class="op">)</span>,</span>
+<span>  surface <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"raster"</span>, <span class="st">"tile"</span>, <span class="st">"3d"</span><span class="op">)</span>,</span>
+<span>  surface_3d <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -365,14 +366,29 @@ ggplot objects is returned, 1 per term plotted.</p></dd>
 constants. Defaults to the model's evaluation environment.</p></dd>
 
 
-<dt id="arg-geom">geom<a class="anchor" aria-label="anchor" href="#arg-geom"></a></dt>
-<dd><p>character; either <code>"raster"</code> (the default) or <code>"tile"</code> for flat
-smooth surfaces, including faceted and soap-film plots. Raster rendering
-keeps large PDF plots compact; tiles are individual borderless rectangles
-that remain vector elements in PDF and SVG output, potentially increasing
-file size. Other plot types, including spherical smooths, are unchanged.
+<dt id="arg-surface">surface<a class="anchor" aria-label="anchor" href="#arg-surface"></a></dt>
+<dd><p>character; one of <code>"raster"</code> (the default), <code>"tile"</code>, or
+<code>"3d"</code>. Raster surfaces keep large PDF plots compact; tiles are borderless
+vector rectangles. Three-dimensional surfaces use the optional <code>ggcube</code>
+package, with the displayed partial effect as height and fill. Numeric
+smooth and parametric surfaces, including conditioning facets and soap
+films, are supported. Curves and factor estimates keep their usual display;
+spherical smooths retain their geographic rendering.
 Covariate scale changes that produce irregular spacing use rectangles
-bounded by adjacent coordinate midpoints for either setting.</p></dd>
+bounded by adjacent coordinate midpoints for flat surfaces.</p></dd>
+
+
+<dt id="arg-surface-d">surface_3d<a class="anchor" aria-label="anchor" href="#arg-surface-d"></a></dt>
+<dd><p>named list of view options passed to <code><a href="https://matthewkling.github.io/ggcube/reference/coord_3d.html" class="external-link">ggcube::coord_3d()</a></code>,
+for example <code>list(yaw = 45, persp = FALSE)</code>. The default <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> uses the
+default view with <code>ggcube::light(backface_scale = 1)</code>, preserving equal
+horizontal units for isotropic smooths. Supply <code>light = ggcube::light(...)</code>
+in this list to override lighting; <code>ggcube::light(method = "none")</code> disables
+it. An explicitly supplied <code>light</code> replaces the entire default light.
+Only the coordinate system is used; ggcube's theme settings are not applied.
+These options affect all 3D panels in a call. For different views per term,
+modify individual plots returned by <code><a href="assemble.html">assemble()</a></code>. The <code>dist</code> entry here
+controls perspective; the top-level <code>dist</code> argument controls masking.</p></dd>
 
 
 <dt id="arg-back-transform">back_transform<a class="anchor" aria-label="anchor" href="#arg-back-transform"></a></dt>
@@ -409,6 +425,28 @@ effects or their intervals; use <code>fun</code> for that.</p></dd>
     <p>The object returned is created by <code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code>.</p>
     </div>
     <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Three-dimensional faces retain the current diverging RdBu fill scale and
+effect-range rules, shared across conditioning facets. <code>continuous_fill</code>
+overrides the fill scale. Faces have no outlines; <code>contour_col</code> controls
+contour lines. Surface faces are fully opaque. Faces, contours, and floor
+observations are depth-sorted together, so nearer faces hide the parts behind
+them. The existing theme and facet styling are retained.</p>
+<p>The first two displayed covariates form the horizontal axes, and the effect
+(or standard error when requested) forms the vertical axis. Additional
+covariates retain their existing conditioning facets: <code>n_2d</code> controls surface
+resolution, while <code>n_3d</code> and <code>n_4d</code> control covariate slices. Fixed effect
+ranges are also used for the vertical axis. Confidence surfaces are not added.</p>
+<p>Contours follow the displayed mesh, and available observations are projected
+onto its floor. Observations are not assigned to conditioning slices. Soap
+boundary loops are also projected onto the floor.</p>
+<p>Supplied scattered evaluation data use piecewise-linear Delaunay triangles
+and require the optional <code>geometry</code> package. Support masking and
+soap-domain checks require <code>sf</code>. Faces crossing known excluded regions
+are discarded conservatively. Fully masked slices remain empty; insufficient
+non-collinear locations or conflicting heights at one location are errors.</p>
+    </div>
+    <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p>Internally, plots of each smooth are created using <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot()</a></code>
 and composed into a single plot using <code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code>. As a
@@ -442,8 +480,22 @@ see the examples.</p>
 <span class="r-in"><span><span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x</span>, <span class="va">z</span>, k <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df2</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m2</span>, contour <span class="op">=</span> <span class="cn">FALSE</span>, n_2d <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="draw.gam-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m2</span>, geom <span class="op">=</span> <span class="st">"tile"</span>, n_2d <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m2</span>, surface <span class="op">=</span> <span class="st">"tile"</span>, n_2d <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="draw.gam-4.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"ggcube"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m2</span>, surface <span class="op">=</span> <span class="st">"3d"</span>, n_2d <span class="op">=</span> <span class="fl">20</span>,</span></span>
+<span class="r-in"><span>    surface_3d <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>yaw <span class="op">=</span> <span class="fl">45</span>, persp <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">panels</span> <span class="op">&lt;-</span> <span class="fu"><a href="assemble.html">assemble</a></span><span class="op">(</span><span class="va">m2</span>, surface <span class="op">=</span> <span class="st">"3d"</span>, n_2d <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Replace coordinates to customize a single term; retain the current theme.</span></span></span>
+<span class="r-in"><span>  <span class="va">panels</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">panels</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu">ggcube</span><span class="fu">::</span><span class="fu"><a href="https://matthewkling.github.io/ggcube/reference/coord_3d.html" class="external-link">coord_3d</a></span><span class="op">(</span>yaw <span class="op">=</span> <span class="op">-</span><span class="fl">20</span>,</span></span>
+<span class="r-in"><span>      light <span class="op">=</span> <span class="fu">ggcube</span><span class="fu">::</span><span class="fu"><a href="https://matthewkling.github.io/ggcube/reference/light.html" class="external-link">light</a></span><span class="op">(</span>backface_scale <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span>  <span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">panels</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Coordinate system already present.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">i</span> Adding new coordinate system, which will replace the existing one.</span>
+<span class="r-plt img"><img src="draw.gam-5.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html</span></span></span>
 <span class="r-in"><span><span class="co"># for more examples and for details on how to modify the theme of all the</span></span></span>

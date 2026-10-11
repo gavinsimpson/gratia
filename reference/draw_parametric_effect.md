@@ -27,7 +27,8 @@ draw_parametric_effect(
   contour = TRUE,
   contour_col = "black",
   n_contour = NULL,
-  geom = "raster",
+  surface = "raster",
+  surface_3d = list(),
   continuous_fill = NULL,
   discrete_colour = NULL,
   discrete_fill = NULL,
@@ -135,16 +136,35 @@ draw_parametric_effect(
   contour lines being drawn. See
   [`ggplot2::geom_contour()`](https://ggplot2.tidyverse.org/reference/geom_contour.html).
 
-- geom:
+- surface:
 
-  character; either `"raster"` (the default) or `"tile"` for flat smooth
-  surfaces, including faceted and soap-film plots. Raster rendering
-  keeps large PDF plots compact; tiles are individual borderless
-  rectangles that remain vector elements in PDF and SVG output,
-  potentially increasing file size. Other plot types, including
-  spherical smooths, are unchanged. Covariate scale changes that produce
-  irregular spacing use rectangles bounded by adjacent coordinate
-  midpoints for either setting.
+  character; one of `"raster"` (the default), `"tile"`, or `"3d"`.
+  Raster surfaces keep large PDF plots compact; tiles are borderless
+  vector rectangles. Three-dimensional surfaces use the optional
+  `ggcube` package, with the displayed partial effect as height and
+  fill. Numeric smooth and parametric surfaces, including conditioning
+  facets and soap films, are supported. Curves and factor estimates keep
+  their usual display; spherical smooths retain their geographic
+  rendering. Covariate scale changes that produce irregular spacing use
+  rectangles bounded by adjacent coordinate midpoints for flat surfaces.
+
+- surface_3d:
+
+  named list of view options passed to
+  [`ggcube::coord_3d()`](https://matthewkling.github.io/ggcube/reference/coord_3d.html),
+  for example `list(yaw = 45, persp = FALSE)`. The default
+  [`list()`](https://rdrr.io/r/base/list.html) uses the default view
+  with `ggcube::light(backface_scale = 1)`, preserving equal horizontal
+  units for isotropic smooths. Supply `light = ggcube::light(...)` in
+  this list to override lighting; `ggcube::light(method = "none")`
+  disables it. An explicitly supplied `light` replaces the entire
+  default light. Only the coordinate system is used; ggcube's theme
+  settings are not applied. These options affect all 3D panels in a
+  call. For different views per term, modify individual plots returned
+  by
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md).
+  The `dist` entry here controls perspective; the top-level `dist`
+  argument controls masking.
 
 - continuous_fill:
 

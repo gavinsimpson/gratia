@@ -53,7 +53,8 @@ draw(
   wrap = TRUE,
   caption = TRUE,
   envir = NULL,
-  geom = c("raster", "tile"),
+  surface = c("raster", "tile", "3d"),
+  surface_3d = list(),
   back_transform = FALSE,
   ...
 )
@@ -325,16 +326,35 @@ draw(
   an optional environment for looking up data, functions and constants.
   Defaults to the model's evaluation environment.
 
-- geom:
+- surface:
 
-  character; either `"raster"` (the default) or `"tile"` for flat smooth
-  surfaces, including faceted and soap-film plots. Raster rendering
-  keeps large PDF plots compact; tiles are individual borderless
-  rectangles that remain vector elements in PDF and SVG output,
-  potentially increasing file size. Other plot types, including
-  spherical smooths, are unchanged. Covariate scale changes that produce
-  irregular spacing use rectangles bounded by adjacent coordinate
-  midpoints for either setting.
+  character; one of `"raster"` (the default), `"tile"`, or `"3d"`.
+  Raster surfaces keep large PDF plots compact; tiles are borderless
+  vector rectangles. Three-dimensional surfaces use the optional
+  `ggcube` package, with the displayed partial effect as height and
+  fill. Numeric smooth and parametric surfaces, including conditioning
+  facets and soap films, are supported. Curves and factor estimates keep
+  their usual display; spherical smooths retain their geographic
+  rendering. Covariate scale changes that produce irregular spacing use
+  rectangles bounded by adjacent coordinate midpoints for flat surfaces.
+
+- surface_3d:
+
+  named list of view options passed to
+  [`ggcube::coord_3d()`](https://matthewkling.github.io/ggcube/reference/coord_3d.html),
+  for example `list(yaw = 45, persp = FALSE)`. The default
+  [`list()`](https://rdrr.io/r/base/list.html) uses the default view
+  with `ggcube::light(backface_scale = 1)`, preserving equal horizontal
+  units for isotropic smooths. Supply `light = ggcube::light(...)` in
+  this list to override lighting; `ggcube::light(method = "none")`
+  disables it. An explicitly supplied `light` replaces the entire
+  default light. Only the coordinate system is used; ggcube's theme
+  settings are not applied. These options affect all 3D panels in a
+  call. For different views per term, modify individual plots returned
+  by
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md).
+  The `dist` entry here controls perspective; the top-level `dist`
+  argument controls masking.
 
 - back_transform:
 
@@ -373,6 +393,33 @@ draw(
 The object returned is created by
 [`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html).
 
+## Details
+
+Three-dimensional faces retain the current diverging RdBu fill scale and
+effect-range rules, shared across conditioning facets. `continuous_fill`
+overrides the fill scale. Faces have no outlines; `contour_col` controls
+contour lines. Surface faces are fully opaque. Faces, contours, and
+floor observations are depth-sorted together, so nearer faces hide the
+parts behind them. The existing theme and facet styling are retained.
+
+The first two displayed covariates form the horizontal axes, and the
+effect (or standard error when requested) forms the vertical axis.
+Additional covariates retain their existing conditioning facets: `n_2d`
+controls surface resolution, while `n_3d` and `n_4d` control covariate
+slices. Fixed effect ranges are also used for the vertical axis.
+Confidence surfaces are not added.
+
+Contours follow the displayed mesh, and available observations are
+projected onto its floor. Observations are not assigned to conditioning
+slices. Soap boundary loops are also projected onto the floor.
+
+Supplied scattered evaluation data use piecewise-linear Delaunay
+triangles and require the optional `geometry` package. Support masking
+and soap-domain checks require `sf`. Faces crossing known excluded
+regions are discarded conservatively. Fully masked slices remain empty;
+insufficient non-collinear locations or conflicting heights at one
+location are errors.
+
 ## Note
 
 Internally, plots of each smooth are created using
@@ -410,7 +457,21 @@ df2 <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
 m2 <- gam(y ~ s(x, z, k = 40), data = df2, method = "REML")
 draw(m2, contour = FALSE, n_2d = 50)
 
-draw(m2, geom = "tile", n_2d = 30)
+draw(m2, surface = "tile", n_2d = 30)
+
+
+if (requireNamespace("ggcube", quietly = TRUE)) {
+  draw(m2, surface = "3d", n_2d = 20,
+    surface_3d = list(yaw = 45, persp = FALSE))
+  panels <- assemble(m2, surface = "3d", n_2d = 20)
+  # Replace coordinates to customize a single term; retain the current theme.
+  panels[[1]] <- panels[[1]] +
+    ggcube::coord_3d(yaw = -20,
+      light = ggcube::light(backface_scale = 1))[[1]]
+  patchwork::wrap_plots(panels)
+}
+#> Coordinate system already present.
+#> i Adding new coordinate system, which will replace the existing one.
 
 
 # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
