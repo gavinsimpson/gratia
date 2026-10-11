@@ -3,18 +3,14 @@
 ## User visible changes
 
 * Soap-film boundary (`bs = "sf"`) and wiggly (`bs = "sw"`) components are
-  supported, including their distinct labels and boundary-aware plots (#375).
-  gratia now requires mgcv >= 1.9-4 and R >= 4.4.0.
+  supported, including their distinct component types and boundary-aware plots
+  (#375). gratia now requires mgcv >= 1.9-4 and R >= 4.4.0.
 
-* `simulate()` supports grouped-family GAMs fitted with `mgcv::gfam()`,
-  including component-specific parameters and family indices for prediction data
-  (#272).
-
-* `fitted_samples()` now supports grouped-family (`gfam()`) models on the
-  response scale, applying each row's component-family mean transform to every
-  joint coefficient draw. Prediction membership can be supplied with
-  `family_index`; grouped ordinal response-scale fitted draws remain unsupported
-  (#269).
+* Grouped-family models fitted with `mgcv::gfam()` now support response-scale
+  `fitted_samples()` with component-specific mean transforms (#269), and
+  `simulate()` with component-specific distributions and parameters (#272).
+  Both accept `family_index` for prediction data; ordinal response-scale fitted
+  draws remain unsupported.
 
 * Improved support for `gamm4` models across gratia.
 
