@@ -893,3 +893,21 @@ withr::with_seed(269273, {
     data = gfam_extended_data, method = "REML",
     family = gfam(list(nb(), gaussian(), nb(), tw())))
 })
+
+
+# A scalar ordinal response is supported by gfam, while its response prediction
+# probabilities cannot be represented as one numeric fitted mean per row.
+withr::with_seed(107, {
+  gfam_ordinal_data <- data.frame(x = runif(180), family_id = rep(1:2, 90))
+  gfam_ordinal_data$group <- factor(gfam_ordinal_data$family_id)
+  eta <- -0.4 + gfam_ordinal_data$x
+  gfam_ordinal_data$y <- numeric(nrow(gfam_ordinal_data))
+  i <- which(gfam_ordinal_data$family_id == 1)
+  latent <- eta[i] + qlogis(runif(length(i)))
+  gfam_ordinal_data$y[i] <- findInterval(latent, c(-Inf, -1, -0.2, 1, Inf))
+  i <- which(gfam_ordinal_data$family_id == 2)
+  gfam_ordinal_data$y[i] <- rpois(length(i), exp(eta[i]))
+  gfam_ordinal_model <- gam(cbind(y, family_id) ~ group + s(x, k = 4),
+    data = gfam_ordinal_data, family = gfam(list(ocat(R = 4), poisson())),
+    method = "REML")
+})
