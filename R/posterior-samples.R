@@ -304,7 +304,32 @@
 #'   `"linear predictor"` is a synonym for `"link"` if you prefer that
 #'   terminology.
 #'
+#' @param family_index numeric; optional family-list positions for grouped
+#'   family ([mgcv::gfam()]) response predictions, with one integer per requested
+#'   row. By default membership is recovered from the response/index expression
+#'   in `data`, or the fitted membership when `data` is omitted. This is useful
+#'   when predicting without responses or with a complex response expression.
+#'   An explicit index must agree with membership recoverable from `data`.
+#'
 #' @details
+#' For grouped families, coefficient draws preserve the joint model covariance;
+#' each row is then transformed using its own fitted component family. Explicit
+#' prediction data must identify each row's family: no training-order fallback
+#' is used. A two-column response matrix supplies its second column; a numeric
+#' column named for the response supplies indices directly. For a response such
+#' as `cbind(y, index)`, the `index` expression can be supplied without `y`.
+#' Missing indices behave like missing required predictors. Link-scale draws
+#' do not require family membership.
+#'
+#' Grouped response-scale draws currently support scalar fitted means, including
+#' families with a scalar prediction transform such as [mgcv::ziP()]. They do
+#' not support [mgcv::ocat()] category-probability output; use the link scale
+#' for grouped ordinal models. Distributional nuisance parameters are held at
+#' their fitted values. This does not add support for general/location-scale
+#' families that `gfam()` itself rejects, nor repair upstream fitting failures
+#' (including fixed-theta negative-binomial components and some `ziP()` fits
+#' in some mgcv versions).
+#'
 #' Observation rows use the same missing-value convention as
 #' [posterior_samples()]: default results restore `na.exclude` observations in
 #' every draw, while explicit `data` are evaluated in their own row order.
@@ -393,7 +418,7 @@
   method = c("gaussian", "mh", "inla", "user"),
   n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
   freq = FALSE, unconditional = FALSE, draws = NULL,
-  mvn_method = c("mvnfast", "mgcv"),
+  mvn_method = c("mvnfast", "mgcv"), family_index = NULL,
   ..., newdata = NULL, ncores = NULL
 ) {
 
@@ -411,7 +436,7 @@
     method = method, n_cores = n_cores, burnin = burnin, thin = thin,
     t_df = t_df, rw_scale = rw_scale, freq = freq,
     unconditional = unconditional, draws = draws, mvn_method = mvn_method,
-    ...
+    family_index = family_index, ...
   )
 }
 
@@ -451,6 +476,7 @@
   draws = NULL,
   mvn_method = c("mvnfast", "mgcv"),
   envir = NULL,
+  family_index = NULL,
   ...
 ) {
   model <- with_model_envir(model, envir)
@@ -466,11 +492,20 @@
     on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
   }
 
-  layout <- prediction_layout(model, data, na.action = list(...)$na.action %||% stats::na.pass)
+  scale <- match.arg(scale)
+  grouped <- is_gfam_family(family(model))
+  if (!grouped && !is.null(family_index)) {
+    stop("'family_index' is only supported for grouped-family models.", call. = FALSE)
+  }
+  context <- if (grouped && identical(scale, "response")) {
+    gfam_prediction_context(model, data, family_index = family_index,
+      na.action = list(...)$na.action %||% stats::na.pass)
+  } else NULL
+  layout <- if (is.null(context)) {
+    prediction_layout(model, data, na.action = list(...)$na.action %||% stats::na.pass)
+  } else context$layout
   model <- model_used_rows(model)
   data <- layout$data
-
-  scale <- match.arg(scale)
   method <- match.arg(method)
   mvn_method <- match.arg(mvn_method)
 
@@ -515,8 +550,12 @@
     }
     # handle transformation to response scale
     if (isTRUE(identical(scale, "response"))) {
-      ilink <- inv_link(model, parameter = "location")
-      sims <- ilink(sims)
+      if (grouped) {
+        sims <- gfam_response_means(sims, context)
+      } else {
+        ilink <- inv_link(model, parameter = "location")
+        sims <- ilink(sims)
+      }
     }
     colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
     sims <- as_tibble(sims)
@@ -524,7 +563,9 @@
     sims
   }
   ## don't need to pass freq, unconditional here as that is done for V
-  Xp <- predict_model(model, newdata = data, type = "lpmatrix", ...)
+  Xp <- if (grouped) {
+    gfam_predict_eta(model, data, type = "lpmatrix", ...)
+  } else predict_model(model, newdata = data, type = "lpmatrix", ...)
   ## predict step; for mvn() and multinom() models, we do want to loop over
   ##   the linear predictors
   n_eta <- length(lss_idx) # number of linear predictors to work with

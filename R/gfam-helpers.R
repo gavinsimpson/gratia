@@ -49,6 +49,11 @@ gfam_component_family <- function(component, theta) {
       call. = FALSE)
   }
   old <- environment(component$putTheta)
+  if (isNamespace(old) || identical(old, globalenv()) ||
+      identical(old, baseenv()) || identical(old, emptyenv())) {
+    stop("Grouped-family parameters require a family-private environment.",
+      call. = FALSE)
+  }
   env <- list2env(as.list.environment(old, all.names = TRUE),
     parent = parent.env(old))
   for (name in names(component)) {
@@ -154,7 +159,7 @@ gfam_response_means <- function(eta, context) {
     means <- if (is.function(family$predict)) {
       family$predict(family, se = FALSE, eta = values)[[1L]]
     } else family$linkinv(values)
-    if (length(means) != length(values) ||
+    if (!is.numeric(means) || length(means) != length(values) ||
         (is.matrix(means) && NCOL(means) != 1L)) {
       stop("Grouped-family fitted draws require a scalar response mean per row; ",
         "use the linear predictor scale for this component.", call. = FALSE)

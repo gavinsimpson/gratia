@@ -10,6 +10,12 @@
   including component-specific parameters and family indices for prediction data
   (#272).
 
+* `fitted_samples()` now supports grouped-family (`gfam()`) models on the
+  response scale, applying each row's component-family mean transform to every
+  joint coefficient draw. Prediction membership can be supplied with
+  `family_index`; grouped ordinal response-scale fitted draws remain unsupported
+  (#269).
+
 * Improved support for `gamm4` models across gratia.
 
 * Link extraction now shares parameter validation across `link()`, `inv_link()`,

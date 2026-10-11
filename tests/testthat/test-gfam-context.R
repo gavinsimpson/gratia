@@ -125,3 +125,20 @@ test_that("discrete bam membership and eta prediction retain fitting row order",
     drop(gfam_predict_eta(gfam_model, data, type = "lpmatrix") %*%
       coef(gfam_model)) + data$off, ignore_attr = TRUE)
 })
+
+
+test_that("selector expressions retain nonstandard names and explicit fallback", {
+  data <- gfam_data[c(17, 3, 8), ]
+  model <- gfam_model
+  names(data)[names(data) == "family_id"] <- "family index"
+  model$formula <- stats::as.formula("cbind(y, `family index`) ~ group + s(x) + offset(off)")
+  expect_identical(gfam_data_index(model, data), data[["family index"]])
+  model$formula <- stats::as.formula(
+    "cbind(y, as.integer(`family index`)) ~ group + s(x) + offset(off)")
+  expect_identical(gfam_data_index(model, data), data[["family index"]])
+  model$formula <- stats::as.formula("cbind(y, unrecoverable(raw_index)) ~ group + s(x)")
+  expect_null(gfam_data_index(model, data))
+  expect_error(gfam_prediction_context(model, data), "needs family membership")
+  expect_identical(gfam_prediction_context(model, data,
+    family_index = data[["family index"]])$index, data[["family index"]])
+})
