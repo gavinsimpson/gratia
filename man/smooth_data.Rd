@@ -72,6 +72,11 @@ grids do not provide raw coordinates for transformed axes.}
 \description{
 Generate regular data over the covariates of a smooth
 }
+\details{
+Spline-on-the-sphere grids use evenly spaced observed-range latitude and
+longitude values. Plotting constructs geographic cell edges separately,
+without moving these evaluation coordinates.
+}
 \examples{
 \dontshow{
 op <- options(cli.unicode = FALSE, pillar.sigfig = 4)

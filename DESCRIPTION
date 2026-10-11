@@ -57,7 +57,7 @@ Suggests:
     distributional,
     hexbin,
     gamair,
-    sf (>= 0.7-3),
+    sf (>= 1.0-0),
     svglite (>= 2.0.0),
     curl,
     marginaleffects,

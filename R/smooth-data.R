@@ -13,6 +13,11 @@
 #'   dimensions higher than 2 (!) of a *k*D smooth (*k* >= 4). For example, if
 #'   the smooth is a 4D smooth, each of dimensions 3 and 4 will get `n_4d`
 #'   new observations.
+#' @details
+#' Spline-on-the-sphere grids use evenly spaced observed-range latitude and
+#' longitude values. Plotting constructs geographic cell edges separately,
+#' without moving these evaluation coordinates.
+#'
 #' @param offset numeric; value of the model offset to use.
 #' @param include_all logical; include all covariates involved in the smooth?
 #'   if `FALSE`, only the covariates involved in the smooth will be included in
@@ -293,25 +298,7 @@
   ) |>
     setNames(vars)
 
-  # now check what we created as inter-point diff can't be allowed to make
-  # latitude or longitude nonsensical when added/subtracted from each point
-  correct_sos_data <- function(x, max) {
-    x_diff <- diff(x) |> zapsmall() |> unique()
-    x_rng <- range(x)
-    x_lims <- x_rng + (c(-0.5, 0.5) * x_diff)
-    fail <- abs(x_lims) > max
-    if (any(fail)) {
-      x <- evenly(
-        x,
-        n = length(x),
-        lower = ifelse(fail[1], -(max - (x_diff / 2)), x_rng[1]),
-        upper = ifelse(fail[2], max - (x_diff / 2), x_rng[2])
-      )
-    }
-    x
-  }
-
-  df[[1]] <- correct_sos_data(df[[1]], max = 90)
-  df[[1]] <- correct_sos_data(df[[1]], max = 180)
+  # Evaluation coordinates are not tile centres. Geographic cell boundaries
+  # are constructed separately when drawing, without moving prediction rows.
   df
 }

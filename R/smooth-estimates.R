@@ -1289,7 +1289,7 @@
                                     ylim = NULL,
                                     crs = NULL,
                                     default_crs = NULL,
-                                    lims_method = "cross",
+                                    lims_method = "geometry_bbox",
                                     caption = TRUE,
                                     surface = c("raster", "tile", "3d"),
                                     surface_3d = list(),
@@ -1418,7 +1418,7 @@
                                     ylim = NULL,
                                     crs = NULL,
                                     default_crs = NULL,
-                                    lims_method = "cross",
+                                    lims_method = "geometry_bbox",
                                     tensor_term_order = NULL,
                                     caption = NULL,
                                     grouped_by = FALSE,
@@ -1457,7 +1457,9 @@
     obj_nms <- names(object)
     ## preserve partial residuals and rug data if present
     if ("rug_data" %in% obj_nms) {
-      rug_data <- object[["rug_data"]][[1L]]
+      rug_data <- if (identical(sm_type, "SOS") && isTRUE(grouped_by)) {
+        bind_rows(object[["rug_data"]])
+      } else object[["rug_data"]][[1L]]
     }
     if ("partial_residual" %in% obj_nms) {
       p_residuals <- object[["partial_residual"]][[1L]]

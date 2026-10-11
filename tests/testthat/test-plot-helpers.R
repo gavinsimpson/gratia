@@ -160,7 +160,7 @@ test_that("spherical rendering preserves axes, captions and ordered-by labels", 
   expect_equal(p$data$.estimate, exp(d$.estimate + 1))
   expect_equal(q$layers[[2]]$data$fill, c(0.2, 0.2))
   expect_s3_class(p$coordinates, "CoordSf")
-  expect_s3_class(p$layers[[1]]$geom, "GeomTile")
+  expect_s3_class(p$layers[[1]]$geom, "GeomSf")
   expect_silent(ggplot2::ggplot_build(p))
   d$.by <- "f"
   d$f <- ordered(rep("a", nrow(d)))

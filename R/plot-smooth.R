@@ -1076,9 +1076,10 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   continuous_fill = NULL,
   crs = NULL,
   default_crs = NULL,
-  lims_method = "cross",
+  lims_method = "geometry_bbox",
   angle = NULL,
   surface = "raster", surface_3d = list(),
+  grouped_by = FALSE,
   ...
 ) {
   if (surface == "3d") message("Spherical smooths retain their geographic rendering.")
@@ -1143,25 +1144,79 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   if (all(!is.na(object[[".by"]])) && is.null(subtitle)) {
     by_var <- as.character(unique(object[[".by"]]))
     subtitle <- paste0("By: ", by_var)
-    if (data_class(object)[[by_var]] == "factor") {
+    if (!isTRUE(grouped_by) && data_class(object)[[by_var]] == "factor") {
       subtitle <- paste0(subtitle, "; ", unique(object[[by_var]]))
+    }
+  }
+  panel <- NULL
+  if (isTRUE(grouped_by) && all(!is.na(object$.by))) {
+    by_var <- unique(object$.by)
+    if (length(by_var) == 1L && is.factor(object[[by_var]])) {
+      panel <- by_var
+      if (is.null(title)) title <- unique(sub(":.*$", "", object$.smooth))
     }
   }
   labels <- prepare_smooth_labels(object,
     x_var = variables[2], y_var = variables[1], xlab = xlab, ylab = ylab,
-    title = title, subtitle = subtitle, caption = caption)
+    title = title, subtitle = subtitle, caption = caption, grouped_by = grouped_by)
   # Preserve the spherical method's omitted-versus-NULL axis convention.
   labels[c("x", "y")] <- list(xlab, ylab)
 
-  prepare_surface_plot(object,
-    x_var = variables[2], y_var = variables[1], fill_var = plot_var,
-    fill_limits = guide_limits, fill_title = guide_title,
-    labels = labels,
-    surface = "tile", tile_colour = NULL, continuous_fill = continuous_fill,
-    contour = contour, contour_col = contour_col, n_contour = n_contour,
-    angle = angle, rug = rug,
-    coord = coord_sf(crs = crs, default_crs = default_crs,
-      lims_method = lims_method))
+  groups <- if (is.null(panel)) list(object) else split(object, object[[panel]], drop = TRUE)
+  prepared <- lapply(groups, sos_plot_data,
+    longitude = variables[2], latitude = variables[1])
+  object <- if (length(prepared) == 1L) prepared[[1L]]$data else {
+    dplyr::bind_rows(lapply(prepared, `[[`, "data"))
+  }
+  geometry <- lapply(prepared, function(group) {
+    if (group$rectangular) {
+      cells <- sos_cells(group$data, longitude = variables[2], latitude = variables[1])
+    } else {
+      message("Spherical surfaces require a rectilinear grid; drawing supplied coordinates as points.")
+      cells <- sos_points(group$data, longitude = variables[2], latitude = variables[1])
+    }
+    sos_project(cells, crs = crs)
+  })
+  if (is.null(continuous_fill)) {
+    continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
+  }
+  plt <- ggplot(object)
+  for (i in seq_along(geometry)) {
+    plt <- plt + ggplot2::geom_sf(data = geometry[[i]],
+      mapping = aes(fill = .data[[plot_var]]), inherit.aes = FALSE,
+      colour = if (prepared[[i]]$rectangular) NA else "black", shape = 21)
+  }
+  plt <- plt + labels + continuous_fill + expand_limits(fill = guide_limits) +
+    guides(x = guide_axis(angle = angle),
+      fill = guide_colourbar(title = guide_title, direction = "vertical")) +
+    theme(legend.position = "right")
+  if (!is.null(panel)) plt <- plt + facet_wrap(vars(!!rlang::sym(panel)))
+  if (!any(vapply(geometry, nrow, integer(1))) && !is.null(sos_ortho_view(crs))) {
+    # An entirely hidden supplied grid still needs finite panel bounds. An
+    # invisible horizon outline trains the panel without inventing estimates.
+    outline <- sf::st_sf(geometry = sos_horizon(sos_ortho_view(crs)))
+    outline <- sos_project(outline, crs)
+    plt <- plt + ggplot2::geom_sf(data = outline, inherit.aes = FALSE,
+      fill = NA, colour = NA, show.legend = FALSE)
+  }
+  if (isTRUE(contour)) {
+    for (group in prepared) {
+      if (!group$rectangular) next
+      paths <- sos_contours(group$data, variables[2], variables[1], plot_var, n_contour)
+      if (!is.null(paths)) {
+        if (!is.null(panel)) paths[[panel]] <- group$data[[panel]][rep(1L, nrow(paths))]
+        paths <- sos_project(paths, crs = crs)
+        plt <- plt + ggplot2::geom_sf(data = paths, inherit.aes = FALSE,
+          colour = contour_col, fill = NA)
+      }
+    }
+  }
+  if (!is.null(rug)) {
+    points <- sos_points(rug, longitude = variables[2], latitude = variables[1])
+    points <- sos_project(points, crs = crs)
+    plt <- plt + ggplot2::geom_sf(data = points, inherit.aes = FALSE, alpha = 0.1)
+  }
+  plt + coord_sf(crs = crs, default_crs = default_crs, lims_method = lims_method)
 
 }
 

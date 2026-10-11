@@ -526,6 +526,15 @@ sim_sos_eg_data <- function(n = 400, seed = NULL) {
 }
 sos_df <- sim_sos_eg_data(n = 400, seed = 0)
 m_sos <- gam(y ~ s(latitude, longitude, bs = "sos", k = 60), data = sos_df)
+# Arbitrary SOS coordinate names must retain latitude/longitude ordering.
+sos_named_df <- setNames(as.data.frame(sos_df), c("north", "east", "y"))
+m_sos_named <- gam(y ~ s(north, east, bs = "sos", k = 20), data = sos_named_df)
+sos_by_df <- sos_named_df
+sos_by_df$region <- factor(rep(c("a", "b"), length.out = nrow(sos_by_df)))
+m_sos_by <- gam(y ~ region + s(north, east, bs = "sos", by = region, k = 15),
+  data = sos_by_df)
+
+
 
 # censored normal
 cens_df <- quick_eg1 |>

@@ -46,7 +46,7 @@
   heights = NULL,
   crs = NULL,
   default_crs = NULL,
-  lims_method = "cross",
+  lims_method = "geometry_bbox",
   wrap = TRUE,
   caption = TRUE,
   envir = NULL,
@@ -209,20 +209,22 @@ use a fixed aspect ratio.}
 data will be projected into this CRS. See \code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}} for
 details.}
 
-\item{default_crs}{the coordinate reference system (CRS) to use for the
-non-sf layers in the plot. If left at the default \code{NULL}, the CRS used is
-4326 (WGS84), which is appropriate for spline-on-the-sphere smooths, which
-are parameterized in terms of latitude and longitude as coordinates. See
-\code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}} for more details.}
+\item{default_crs}{the coordinate reference system (CRS) to use for non-sf
+layers added to spherical plots. The default, \code{NULL}, uses 4326 (WGS84).
+Internally generated surface cells, contours and observation points have
+their own geographic CRS, with longitude on the horizontal axis and
+latitude on the vertical axis. See \code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}} for more details.}
 
-\item{lims_method}{character; affects how the axis limits are determined. See
-\code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}}. Be careful; in testing of some examples, changing
-this to \code{"orthogonal"} for example with the chlorophyll-a example from
-Simon Wood's GAM book quickly used up all the RAM in my test system and the
-OS killed R. This could be incorrect usage on my part; right now the grid
-of points at which SOS smooths are evaluated (if not supplied by the user)
-can produce invalid coordinates for the corners of tiles as the grid is
-generated for tile centres without respect to the spacing of those tiles.}
+\item{lims_method}{character; affects how spherical plot axis limits are
+determined. The default, \code{"geometry_bbox"}, uses the rendered geometry.
+Passed to \code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}}. Spherical surfaces use explicit
+geographic cells with valid polar and date-line boundaries. Orthographic
+plots clip cells, contours and observation points to the visible hemisphere
+before projection. Explicit prediction data on a rectilinear grid retain
+their actual spacing; scattered or singleton coordinates are drawn as
+points, with a message, because they do not define surface cells. Incomplete
+observation rug coordinates are omitted. Grouped factor-by spherical
+surfaces use separate facets for each factor level.}
 
 \item{wrap}{logical; wrap plots as a patchwork? If \code{FALSE}, a list of
 ggplot objects is returned, 1 per term plotted.}

@@ -301,13 +301,13 @@ test_that("SCAM accepts surface geometry without changing its univariate panels"
   expect_error(draw(m_scam, surface = "invalid"), "'arg' should be one of")
 })
 
-test_that("spherical surfaces retain their tile geometry and projection", {
+test_that("spherical surfaces retain their geographic geometry and projection", {
   skip_if_not_installed("sf")
   sm <- smooth_estimates(m_sos, n_2d = 5)
   a <- draw(sm, surface = "raster", contour = FALSE)[[1]]
   b <- draw(sm, surface = "tile", contour = FALSE)[[1]]
-  expect_s3_class(a$layers[[1]]$geom, "GeomTile")
-  expect_s3_class(b$layers[[1]]$geom, "GeomTile")
+  expect_s3_class(a$layers[[1]]$geom, "GeomSf")
+  expect_s3_class(b$layers[[1]]$geom, "GeomSf")
   expect_s3_class(a$coordinates, "CoordSf")
   expect_equal(a$data, b$data)
   expect_equal(a$labels, b$labels)

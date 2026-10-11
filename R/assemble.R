@@ -98,7 +98,7 @@
   guides = "keep", widths = NULL, heights = NULL,
   crs = NULL,
   default_crs = NULL,
-  lims_method = "cross",
+  lims_method = "geometry_bbox",
   wrap = TRUE,
   caption = TRUE,
   envir = NULL,

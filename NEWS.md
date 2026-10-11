@@ -11,6 +11,10 @@
   Plotting accepts `re_levels` and `max_re_combinations` to select levels and
   prevent oversized grids before evaluation.
 
+* Spline-on-the-sphere plots now use valid geographic cells and clip partially
+  visible cells at orthographic horizons, including near the poles and date line
+  (#277). Supplied scattered coordinates are drawn as points.
+
 * Soap-film boundary (`bs = "sf"`) and wiggly (`bs = "sw"`) components are
   supported, including their distinct component types and boundary-aware plots
   (#375). gratia now requires mgcv >= 1.9-4 and R >= 4.4.0.
