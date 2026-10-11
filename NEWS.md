@@ -128,8 +128,9 @@
 ## New features
 
 * Numeric smooth and parametric surfaces can now be drawn in 3D with
-  `surface = "3d"`, using the optional ggcube package. The existing RdBu fill
-  palette, theme, conditioning facets, contours, and masking are retained.
+  `surface = "3d"`, using the optional ggcube package (implements #393).
+  The existing RdBu fill palette, theme, conditioning facets, contours, and
+  masking are retained.
   `surface_3d = list(...)` controls the view without applying ggcube's theme.
   Lighting defaults to `backface_scale = 1`; supply a custom `light` through
   `surface_3d` to override it. Opaque faces, contours, and floor observations
