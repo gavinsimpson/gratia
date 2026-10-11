@@ -193,15 +193,13 @@
   `surface = "3d"`, using the optional ggcube package (implements
   [\#393](https://github.com/gavinsimpson/gratia/issues/393)). The
   existing RdBu fill palette, theme, conditioning facets, contours, and
-  masking are retained. `surface_3d = list(...)` controls the view
-  without applying ggcube’s theme. Lighting defaults to
-  `backface_scale = 1`; supply a custom `light` through `surface_3d` to
-  override it. Opaque faces, contours, and floor observations share
-  depth ordering so hidden features are occluded. Scattered evaluation
-  data use Delaunay meshes (requiring geometry); support masking and
-  soap-domain checks also use sf. The former development argument `geom`
-  is replaced by `surface` for smooth and parametric surfaces; penalty
-  heatmaps retain their `geom` argument.
+  masking are retained.
+
+  `surface_3d = list(...)` controls the view without applying ggcube’s
+  theme. Lighting defaults to `backface_scale = 1`; supply a custom
+  `light` through `surface_3d` to override it. Opaque faces, contours,
+  and floor observations share depth ordering so hidden features are
+  occluded.
 
 - Surface plotting and related evaluation functions now support `n_2d`,
   defaulting to 50 points along each surface axis
