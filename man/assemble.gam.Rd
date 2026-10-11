@@ -54,7 +54,6 @@
   surface_3d = list(),
   back_transform = FALSE,
   re_levels = NULL,
-  max_re_combinations = 16L,
   ...
 )
 }
@@ -111,12 +110,16 @@ use \code{n} instead. Ignored when evaluation \code{data} are supplied. Factor l
 are retained, and curves with only one continuous covariate use \code{n}.}
 
 \item{n_3d}{numeric; the number of new observations to generate for the third
-dimension of a 3D smooth.}
+dimension of a 3D smooth. Factor conditioning dimensions retain at most
+this many levels, taking the first levels in fitted order. Explicit
+\code{re_levels} selections take precedence; supplied \code{data} are unchanged.}
 
 \item{n_4d}{numeric; the number of new observations to generate for the
 dimensions higher than 2 (!) of a \emph{k}D smooth (\emph{k} >= 4). For example, if
 the smooth is a 4D smooth, each of dimensions 3 and 4 will get \code{n_4d}
-new observations.}
+new observations. For factor conditioning dimensions, this is the maximum
+number of levels retained per dimension, taking the first in fitted order.
+Explicit \code{re_levels} selections take precedence; supplied \code{data} are unchanged.}
 
 \item{unconditional}{logical; should confidence intervals include the
 uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian
@@ -281,14 +284,6 @@ effects or their intervals; use \code{fun} for that.}
 \item{re_levels}{named list of factor level labels to retain in tensor products
 with random-effect margins, for example \code{list(species = c("a", "b"))}.
 Fitted factor order and ordered status are retained.}
-
-\item{max_re_combinations}{positive integer or \code{Inf}; maximum number of
-categorical combinations and numeric conditioning slices drawn for each
-random-effect tensor term. The default is 16. Oversized terms are skipped
-with a message before automatic grids are expanded or evaluated; select
-levels, supply a smaller data slice, or increase this limit. No levels are
-sampled or silently omitted. Direct \code{smooth_estimates()} is unrestricted.
-Numeric random-effect covariates remain continuous axes or slices.}
 
 \item{...}{Arguments to other methods; not used.}
 }

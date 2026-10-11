@@ -2,19 +2,6 @@
 
 ## User visible changes
 
-* `fitted_values()` now informs you when prediction data contain unobserved
-  combinations of known categorical predictor levels, while preserving the
-  model predictions (#164).
-
-* Tensor products with random-effect margins now support consistent curves,
-  faceted surfaces and categorical plots across `te()`, `ti()` and `t2()` (#169).
-  Plotting accepts `re_levels` and `max_re_combinations` to select levels and
-  prevent oversized grids before evaluation.
-
-* Spline-on-the-sphere plots now use valid geographic cells and clip partially
-  visible cells at orthographic horizons, including near the poles and date line
-  (#277). Supplied scattered coordinates are drawn as points.
-
 * Soap-film boundary (`bs = "sf"`) and wiggly (`bs = "sw"`) components are
   supported, including their distinct component types and boundary-aware plots
   (#375). gratia now requires mgcv >= 1.9-4 and R >= 4.4.0.
@@ -150,6 +137,9 @@
 
 ## New features
 
+* `fitted_values()` now emits a message identifying prediction rows with unobserved
+  combinations of known categorical predictor levels (#164).
+
 * Numeric smooth and parametric surfaces can now be drawn in 3D with
   `surface = "3d"`, using the optional ggcube package (implements #393).
   The existing RdBu fill palette, theme, conditioning facets, contours, and
@@ -246,6 +236,14 @@
   families.
 
 ## Bug Fixes
+
+* Random-effect tensor products now plot curves, categorical estimates and
+  faceted surfaces consistently across `te()`, `ti()` and `t2()` (#169).
+  Use `re_levels` to select factor levels; `n_3d` and `n_4d` also limit factor
+  conditioning dimensions.
+
+* Spline-on-the-sphere plots now use valid cells at the poles and date line,
+  with orthographic clipping and separate factor-by panels (#277).
 
 * `draw.gamlss()` now sizes its plot layout using the panels actually drawn,
   including parametric effects, avoiding rendering errors for GJRM models.

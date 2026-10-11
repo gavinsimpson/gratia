@@ -52,13 +52,6 @@
 #' @param re_levels named list of factor level labels to retain in tensor products
 #'   with random-effect margins, for example `list(species = c("a", "b"))`.
 #'   Fitted factor order and ordered status are retained.
-#' @param max_re_combinations positive integer or `Inf`; maximum number of
-#'   categorical combinations and numeric conditioning slices drawn for each
-#'   random-effect tensor term. The default is 16. Oversized terms are skipped
-#'   with a message before automatic grids are expanded or evaluated; select
-#'   levels, supply a smaller data slice, or increase this limit. No levels are
-#'   sampled or silently omitted. Direct `smooth_estimates()` is unrestricted.
-#'   Numeric random-effect covariates remain continuous axes or slices.
 #' @param residuals logical; should partial residuals for a smooth be drawn?
 #'   Ignored for anything but a simple univariate smooth.
 #' @param scales character; should all univariate smooths be plotted with the
@@ -84,11 +77,15 @@
 #'   use `n` instead. Ignored when evaluation `data` are supplied. Factor levels
 #'   are retained, and curves with only one continuous covariate use `n`.
 #' @param n_3d numeric; the number of new observations to generate for the third
-#'   dimension of a 3D smooth.
+#'   dimension of a 3D smooth. Factor conditioning dimensions retain at most
+#'   this many levels, taking the first levels in fitted order. Explicit
+#'   `re_levels` selections take precedence; supplied `data` are unchanged.
 #' @param n_4d numeric; the number of new observations to generate for the
 #'   dimensions higher than 2 (!) of a *k*D smooth (*k* >= 4). For example, if
 #'   the smooth is a 4D smooth, each of dimensions 3 and 4 will get `n_4d`
-#'   new observations.
+#'   new observations. For factor conditioning dimensions, this is the maximum
+#'   number of levels retained per dimension, taking the first in fitted order.
+#'   Explicit `re_levels` selections take precedence; supplied `data` are unchanged.
 #' @param unconditional logical; should confidence intervals include the
 #'   uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian
 #'   covariance matrix will be used.
@@ -194,12 +191,12 @@
 #' slices forming conditioning panels, consistently for `te()`, `ti()` and `t2()`.
 #' One continuous covariate gives curves for categorical combinations;
 #' categorical-only terms give point ranges. Up to four covariates are supported.
-#' The combination limit counts joint categorical states, multiplied by numeric
-#' conditioning slices for automatically generated surfaces. Supplied `data`
-#' count only combinations present in their rows; they are never expanded into
-#' new combinations. Select specific factor levels with `re_levels`, or use
-#' [data_slice()] to fix conditioning covariates. Observation layers do not
-#' introduce additional surface panels.
+#' Numeric conditioning slices use `n_3d` or `n_4d`. For factor conditioning
+#' dimensions, these controls retain at most that many levels, taking the first
+#' levels in fitted order. Explicit `re_levels` selections take precedence.
+#' Supplied `data` and precomputed estimates retain their rows; select specific
+#' factor levels with `re_levels`, or use [data_slice()] to fix conditioning
+#' covariates. Observation layers do not introduce additional surface panels.
 #'
 #' Three-dimensional faces retain the current diverging RdBu fill scale and
 #' effect-range rules, shared across conditioning facets. `continuous_fill`
@@ -325,7 +322,6 @@
   surface_3d = list(),
   back_transform = FALSE,
   re_levels = NULL,
-  max_re_combinations = 16L,
   ...
 ) {
   surface <- match.arg(surface)

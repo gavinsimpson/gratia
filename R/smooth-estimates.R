@@ -21,7 +21,9 @@
 #' @param n_3d,n_4d numeric; the number of points along the third axis of a
 #'   3D smooth (`n_3d`, default 16), or each axis after the first two for smooths
 #'   of dimension four or higher (`n_4d`, default 4). If `NULL`, use `n` for
-#'   those axes. The first two surface axes use `n_2d`.
+#'   those axes. For factor conditioning dimensions, retain at most that many
+#'   levels, taking the first in fitted order. The first two surface axes use
+#'   `n_2d`. Supplied `data` are unchanged.
 #' @param data a data frame of covariate values at which to evaluate the
 #'   smooth.
 #' @param envir an optional environment supplying functions and constants used
@@ -1295,13 +1297,12 @@
                                     surface_3d = list(),
                                     back_transform = FALSE,
                                     re_levels = NULL,
-                                    max_re_combinations = 16L,
                                     ...) {
   check_back_transform(back_transform)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
   check_surface_dots(match.call(expand.dots = FALSE))
-  validate_tensor_plot_controls(re_levels, max_re_combinations)
+  validate_tensor_plot_controls(re_levels)
   validate_estimate_re_levels(object, re_levels)
   plot_info <- attr(object, "tensor_plot_info")
   surface_support <- attr(object, "surface_support")
@@ -1352,7 +1353,7 @@
   ## plot
   plts <- map(sm_l,
     draw_smooth_estimates,
-    re_levels = re_levels, max_re_combinations = max_re_combinations,
+    re_levels = re_levels,
     tensor_plot_info = plot_info,
     surface = surface, surface_3d = surface_3d,
     surface_support = surface_support,
@@ -1395,7 +1396,6 @@
 #' @importFrom purrr map_lgl
 `draw_smooth_estimates` <- function(object,
                                     re_levels = NULL,
-                                    max_re_combinations = Inf,
                                     tensor_plot_info = NULL,
                                     constant = NULL,
                                     fun = NULL,
@@ -1475,8 +1475,6 @@
     object <- filter_tensor_levels(object, re_levels)
     if (!nrow(object)) cli::cli_abort("No tensor evaluation rows remain after selecting `re_levels`.")
     sm_vars <- tensor_plot_variables(sm_vars, object)
-    if (!tensor_plot_allowed(unique(object$.smooth), tensor_plot_combinations(object, sm_vars),
-        max_re_combinations)) return(NULL)
     if (!is.null(rug_data)) rug_data <- filter_tensor_levels(rug_data, re_levels)
   }
 

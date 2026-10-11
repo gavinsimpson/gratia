@@ -29,6 +29,7 @@ expect_factor_support_message <- function(result, rows = "2, 4") {
   expect_match(conditionMessage(result$messages[[1L]]),
     "combinations of categorical predictor levels absent")
   expect_match(conditionMessage(result$messages[[1L]]), paste0("Input rows: ", rows), fixed = TRUE)
-  expect_match(conditionMessage(result$messages[[1L]]), "Predictions are unchanged", fixed = TRUE)
+  expect_false(grepl("Predictions are unchanged",
+    conditionMessage(result$messages[[1L]]), fixed = TRUE))
   invisible(result$value)
 }

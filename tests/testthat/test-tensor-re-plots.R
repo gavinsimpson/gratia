@@ -44,41 +44,76 @@ test_that("named level selection preserves fitted order and ordered classes", {
     p$data$.estimate)
 })
 
-test_that("joint limits prevent evaluation and never select arbitrary levels", {
-  # The mock makes reaching any prediction matrix an immediate failure.
-  testthat::local_mocked_bindings(smooth_predict_matrix = function(...) {
-    stop("prediction should not be reached")
+test_that("n_3d limits factor conditioning dimensions in fitted order", {
+  withr::local_seed(1694)
+  seed <- .Random.seed
+  m <- tensor_re_models$ti
+  p <- assemble(m, select = 2, n_2d = 3, n_3d = 2, dist = 0,
+    rug = FALSE, contour = FALSE)[[1]]
+  expect_equal(nrow(p$data), 18L)
+  expect_equal(unique(as.character(p$data$f)), c("c", "a"))
+  expect_equal(levels(p$data$f), levels(tensor_re_data$f))
+  sm <- smooth_estimates(m, select = 2, n_2d = 3, n_3d = 2, dist = 0)
+  expect_equal(nrow(sm), 18L)
+  expect_equal(unique(as.character(sm$f)), c("c", "a"))
+  expect_equal(p$data$.estimate, sm$.estimate)
+  expect_identical(.Random.seed, seed)
+  expect_silent(ggplot2::ggplotGrob(p))
+})
+
+test_that("factor resolution is applied before prediction matrices are evaluated", {
+  original <- smooth_predict_matrix
+  reached <- FALSE
+  testthat::local_mocked_bindings(smooth_predict_matrix = function(smooth, data, model) {
+    reached <<- TRUE
+    expect_equal(nrow(data), 18L)
+    expect_equal(unique(as.character(data$f)), c("c", "a"))
+    original(smooth, data, model)
   })
-  expect_message(p <- assemble(tensor_re_four, max_re_combinations = 7,
-    rug = FALSE), "8 random-effect conditioning combinations")
-  expect_null(p)
-  expect_message(p <- assemble(tensor_re_slices, n_4d = 5,
-    rug = FALSE), "20 random-effect conditioning combinations")
-  expect_null(p)
+  assemble(tensor_re_models$ti, select = 2, n_2d = 3, n_3d = 2,
+    dist = 0, rug = FALSE, contour = FALSE)
+  expect_true(reached)
 })
 
-test_that("limits have exact boundaries and explicit overrides", {
-  for (limit in c(16, 17, Inf)) {
-    expect_silent(p <- assemble(tensor_re_slices, n_2d = 3, n_4d = 4,
-      max_re_combinations = limit, rug = FALSE, contour = FALSE))
-    expect_equal(nrow(ggplot2::ggplot_build(p[[1]])$layout$layout), 16L)
+test_that("n_4d limits each factor or numeric conditioning dimension", {
+  for (count in c(1, 2)) {
+    p <- assemble(tensor_re_four, n_2d = 3, n_4d = count, dist = 0,
+      rug = FALSE, contour = FALSE)[[1]]
+    expect_equal(nrow(p$data), 9L * count^2)
+    expect_equal(unique(as.character(p$data$f)), levels(tensor_re_data$f)[seq_len(count)])
+    expect_equal(unique(as.character(p$data$g)), levels(tensor_re_data$g)[seq_len(count)])
+    expect_true(is.ordered(p$data$g))
+    expect_equal(nrow(ggplot2::ggplot_build(p)$layout$layout), count^2)
   }
-  expect_silent(p <- assemble(tensor_re_slices, n_2d = 3, n_4d = 5,
-    max_re_combinations = 20, rug = FALSE, contour = FALSE))
-  expect_equal(nrow(p[[1]]$data), 180L)
-  # Direct evaluation has no plotting cap, including for later drawing.
-  sm <- smooth_estimates(tensor_re_slices, n_2d = 3, n_4d = 5)
-  expect_equal(nrow(sm), 300L)
-  expect_message(p <- draw(sm, contour = FALSE), "20 random-effect conditioning combinations")
-  expect_null(p)
-  expect_silent(draw(sm, max_re_combinations = Inf, contour = FALSE))
+  p <- assemble(tensor_re_slices, n_2d = 3, n_4d = 5, dist = 0,
+    rug = FALSE, contour = FALSE)[[1]]
+  expect_equal(nrow(p$data), 180L) # 3 x 3 surface, four factors, five numeric slices.
+  expect_equal(length(unique(p$data$x)), 3L)
+  expect_equal(length(unique(p$data$z)), 3L)
+  expect_equal(length(unique(p$data$u)), 5L)
+  expect_equal(nrow(ggplot2::ggplot_build(p)$layout$layout), 20L)
+  sm <- smooth_estimates(tensor_re_slices, n_2d = 3, n_4d = 5, dist = 0)
+  expect_equal(nrow(sm), 180L)
+  expect_silent(q <- draw(sm, contour = FALSE)[[1]])
+  expect_equal(nrow(q$data), 180L)
 })
 
-test_that("supplied slices count actual conditioning combinations", {
+test_that("explicit level selections take precedence over automatic resolution", {
+  p <- assemble(tensor_re_four, n_2d = 3, n_4d = 1, dist = 0,
+    re_levels = list(f = c("d", "b", "c"), g = "A"),
+    rug = FALSE, contour = FALSE)[[1]]
+  expect_equal(nrow(p$data), 27L)
+  expect_equal(unique(as.character(p$data$f)), c("c", "b", "d"))
+  expect_equal(unique(as.character(p$data$g)), "A")
+  expect_equal(levels(p$data$f), levels(tensor_re_data$f))
+  expect_true(is.ordered(p$data$g))
+})
+
+test_that("supplied slices retain their rows regardless of automatic resolution", {
   d <- data_slice(tensor_re_slices, x = evenly(x, n = 3),
     z = evenly(z, n = 3), u = 0.5, f = level(f, c("c", "a")))
   expect_silent(p <- assemble(tensor_re_slices, data = d,
-    max_re_combinations = 2, rug = TRUE, contour = FALSE))
+    n_3d = 1, n_4d = 1, rug = TRUE, contour = FALSE))
   expect_equal(nrow(p[[1]]$data), 18L)
   # Correlated factors contain two joint states rather than a 2 x 2 grid.
   d <- expand.grid(x = seq(0.1, 1, length.out = 3), z = seq(0, 1, length.out = 3),
@@ -86,15 +121,16 @@ test_that("supplied slices count actual conditioning combinations", {
   d$f <- factor(c("c", "a")[d$row], levels = levels(tensor_re_data$f))
   d$g <- ordered(c("B", "A")[d$row], levels = levels(tensor_re_data$g))
   expect_silent(p <- assemble(tensor_re_four, data = d,
-    max_re_combinations = 2, rug = FALSE, contour = FALSE))
+    n_4d = 1, rug = FALSE, contour = FALSE))
   expect_equal(nrow(p[[1]]$data), 18L)
 })
 
 test_that("invalid level controls fail clearly", {
   m <- tensor_re_models$ti
-  for (limit in list(0, -1, NA_real_, NaN, -Inf, 1.5, c(1, 2), "16")) {
-    expect_error(assemble(m, max_re_combinations = limit), "positive integer or Inf")
+  for (count in list(0, -1, NA_real_, NaN, Inf, 1.5, c(1, 2), "2")) {
+    expect_error(assemble(m, select = 2, n_3d = count), "positive integer")
   }
+  expect_error(assemble(tensor_re_four, n_4d = c(1, 2)), "positive integer")
   for (levels in list(list("a"), list(f = character()), list(f = c("a", "a")),
     list(f = NA_character_))) {
     expect_error(assemble(m, re_levels = levels), "named list")
@@ -121,7 +157,7 @@ test_that("multi-factor curves and numeric random slopes use their proper axes",
   expect_silent(ggplot2::ggplotGrob(selected))
   expect_silent(ggplot2::ggplotGrob(p))
   p <- assemble(tensor_re_numeric, n_2d = 3, n_3d = 4,
-    max_re_combinations = 1, rug = FALSE, contour = FALSE)[[1]]
+    rug = FALSE, contour = FALSE)[[1]]
   expect_equal(nrow(p$data), 36L)
   expect_silent(ggplot2::ggplotGrob(p))
 })
@@ -175,49 +211,43 @@ test_that("level selection follows expression evaluation for supplied data", {
   expect_equal(nrow(prepared), 10L)
   expect_true(all(as.character(prepared[["factor(g)"]]) == "A"))
   expect_equal(prepared$x, d$x[d$g == "A"])
+  # Raw grid names differ from expression names. The explicit A selection
+  # must survive a one-level automatic limit that would otherwise choose B.
+  grid <- smooth_data(m, id = 1, n_2d = 2, n_4d = 1,
+    back_transform = TRUE)
+  expect_equal(nrow(grid), 4L)
+  expect_true(all(as.character(grid[["factor(g)"]]) == "A"))
+  expect_true(all(as.character(grid$f) == "c"))
 })
 
-test_that("seventeen levels require a deliberate selection or override", {
-  expect_message(p <- assemble(tensor_re_many, n = 4, rug = FALSE),
-    "17 random-effect conditioning combinations")
-  expect_null(p)
+test_that("curve factors and precomputed estimates have no separate panel cap", {
+  expect_silent(p <- assemble(tensor_re_many, n = 4, rug = FALSE))
+  expect_equal(nrow(p[[1]]$data), 68L)
   expect_silent(p <- assemble(tensor_re_many, n = 4, rug = FALSE,
     re_levels = list(f = levels(tensor_re_many_data$f)[1:16])))
   expect_equal(nrow(p[[1]]$data), 64L)
-  expect_silent(p <- assemble(tensor_re_many, n = 4, rug = FALSE,
-    max_re_combinations = 17))
-  expect_equal(nrow(p[[1]]$data), 68L)
   sm <- smooth_estimates(tensor_re_many, n = 4)
   expect_equal(nrow(sm), 68L)
-  expect_message(draw(sm), "17 random-effect conditioning combinations")
+  expect_silent(p <- draw(sm))
+  expect_equal(nrow(p[[1]]$data), 68L)
   expect_silent(p <- draw(sm, re_levels = list(f = "level17")))
   expect_equal(nrow(p[[1]]$data), 4L)
 })
 
-test_that("oversized terms are skipped before grid allocation without dropping other terms", {
-  # With only this tensor selected, even constructing a grid is forbidden.
-  testthat::local_mocked_bindings(smooth_data = function(...) {
-    stop("grid allocation should not be reached")
-  })
-  expect_message(p <- assemble(tensor_re_many, n = 4, rug = FALSE),
-    "17 random-effect conditioning combinations")
-  expect_null(p)
-})
-
-test_that("skipping a tensor preserves other requested smooths and the RNG state", {
+test_that("limiting tensor grids preserves other requested smooths and the RNG state", {
   withr::local_seed(1694)
   seed <- .Random.seed
-  expect_message(p <- assemble(tensor_re_models$ti, n = 4,
-    max_re_combinations = 3, rug = FALSE, contour = FALSE),
-    "4 random-effect conditioning combinations")
-  expect_length(p, 1L)
+  expect_silent(p <- assemble(tensor_re_models$ti, n = 4, n_2d = 3,
+    n_3d = 2, dist = 0, rug = FALSE, contour = FALSE))
+  expect_length(p, 2L)
   expect_equal(unique(p[[1]]$data$.smooth), "s(u)")
+  expect_equal(nrow(p[[2]]$data), 18L)
   expect_identical(.Random.seed, seed)
 })
 
 test_that("numeric random-effect margins retain the two-dimensional marginal focus", {
   p <- assemble(tensor_re_numeric_surface, n_2d = 3, n_3d = 2,
-    max_re_combinations = 1, rug = FALSE, contour = FALSE)[[1]]
+    rug = FALSE, contour = FALSE)[[1]]
   expect_equal(nrow(p$data), 18L)
   b <- ggplot2::ggplot_build(p)
   expect_equal(sort(unique(b$data[[1]]$x)), sort(unique(p$data$x)))
@@ -254,8 +284,7 @@ test_that("curve rugs do not create unrequested joint-factor facets", {
   d <- expand.grid(x = seq(0.1, 1, length.out = 4), row = 1:2)
   d$f <- factor(c("c", "a")[d$row], levels = levels(tensor_re_data$f))
   d$g <- ordered(c("B", "A")[d$row], levels = levels(tensor_re_data$g))
-  p <- assemble(tensor_re_curves, data = d, rug = TRUE,
-    max_re_combinations = 2)[[1]]
+  p <- assemble(tensor_re_curves, data = d, rug = TRUE, n_3d = 1)[[1]]
   b <- ggplot2::ggplot_build(p)
   expect_equal(nrow(b$layout$layout), 2L)
   expect_silent(ggplot2::ggplotGrob(p))

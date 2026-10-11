@@ -34,8 +34,7 @@ inform_unobserved_factor_combinations <- function(model, layout) {
   if (length(rows) > 10L) shown <- paste0(shown, ", ...")
   cli::cli_inform(c(
     "Prediction data contain {length(rows)} row{?s} with combinations of categorical predictor levels absent from the fitting data.",
-    "i" = "Factors: {.var {factors}}. Input rows: {shown}.",
-    "i" = "Predictions are unchanged; unobserved combinations are not necessarily non-estimable."
+    "i" = "Factors: {.var {factors}}. Input rows: {shown}."
   ), class = "gratia_unobserved_factor_combinations")
   invisible(rows)
 }

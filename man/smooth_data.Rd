@@ -31,12 +31,14 @@ The default, \code{NULL}, uses \code{n} instead. Factor levels
 are retained, and curves with only one continuous covariate use \code{n}.}
 
 \item{n_3d}{numeric; the number of new observations to generate for the third
-dimension of a 3D smooth.}
+dimension of a 3D smooth. For factor conditioning dimensions, retain at most
+this many levels, taking the first in fitted order.}
 
 \item{n_4d}{numeric; the number of new observations to generate for the
 dimensions higher than 2 (!) of a \emph{k}D smooth (\emph{k} >= 4). For example, if
 the smooth is a 4D smooth, each of dimensions 3 and 4 will get \code{n_4d}
-new observations.}
+new observations. For factor conditioning dimensions, retain at most this
+many levels per dimension, taking the first in fitted order.}
 
 \item{offset}{numeric; value of the model offset to use.}
 

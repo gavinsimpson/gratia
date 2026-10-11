@@ -8,11 +8,13 @@
 #'   The default, `NULL`, uses `n` instead. Factor levels
 #'   are retained, and curves with only one continuous covariate use `n`.
 #' @param n_3d numeric; the number of new observations to generate for the third
-#'   dimension of a 3D smooth.
+#'   dimension of a 3D smooth. For factor conditioning dimensions, retain at most
+#'   this many levels, taking the first in fitted order.
 #' @param n_4d numeric; the number of new observations to generate for the
 #'   dimensions higher than 2 (!) of a *k*D smooth (*k* >= 4). For example, if
 #'   the smooth is a 4D smooth, each of dimensions 3 and 4 will get `n_4d`
-#'   new observations.
+#'   new observations. For factor conditioning dimensions, retain at most this
+#'   many levels per dimension, taking the first in fitted order.
 #' @details
 #' Spline-on-the-sphere grids use evenly spaced observed-range latitude and
 #' longitude values. Plotting constructs geographic cell edges separately,
@@ -100,6 +102,11 @@
   } else {
     var_order
   }
+  # Random-effect tensor conditioning dimensions follow the continuous axes.
+  if (!is.null(sm$margin) &&
+      any(vapply(sm$margin, inherits, logical(1), "random.effect"))) {
+    smooth_vars <- tensor_plot_variables(smooth_vars, mf)
+  }
   ## is smooth a by? If it is, extract the by variable
   by_var <- if (is_by_smooth(sm)) {
     by_variable(sm)
@@ -144,6 +151,15 @@
   }
   seq_per_dim <- function(data, vars, dim, n, n_2d, n_3d, n_4d,
       round_extra = TRUE) {
+    if (dim > 2L && any(vapply(data[vars[seq.int(3L, dim)]],
+        is.factor, logical(1)))) {
+      resolution <- if (dim == 3L) n_3d else n_4d
+      if (!is.numeric(resolution) || length(resolution) != 1L ||
+          !is.finite(resolution) || resolution < 1 ||
+          resolution != floor(resolution)) {
+        cli::cli_abort("Factor conditioning resolution must be a positive integer.")
+      }
+    }
     n_per_dim <- rep(n, dim)
     # Factor levels do not turn a curve into a surface.
     if (sum(!vapply(data[vars], is.factor, logical(1))) >= 2L) {
@@ -158,6 +174,12 @@
       # if dim >= 2 we want n_3d or n_4d pretty values, but pretty()
       # won't return exactly the right n
       out <- seq_min_max(data[[vars[i]]], n = n[i])
+      # Dimension controls also bound categorical conditioning grids. Explicit
+      # level selections are authoritative; never truncate them afterwards.
+      if (is.factor(out) && i > 2L &&
+          !smooth_vars[i] %in% names(plot_spec$levels)) {
+        out <- utils::head(out, n[i])
+      }
       # now that we have the ordering of vars corrected we can round here
       if (round_extra && i > 2L && !(is.factor(data[[vars[i]]]))) {
         out <- round(out, 3)

@@ -106,7 +106,6 @@
   surface_3d = list(),
   back_transform = FALSE,
   re_levels = NULL,
-  max_re_combinations = 16L,
   ...
 ) {
   check_back_transform(back_transform)
@@ -152,10 +151,7 @@
       model_name = expr_label(substitute(object))
     )
   object <- with_model_envir(object, envir)
-  planned <- plan_tensor_plots(object, which(select), data, re_levels,
-    max_re_combinations, n, n_2d, n_3d, n_4d, back_transform)
-  object <- planned$model
-  select[] <- seq_along(select) %in% planned$ids
+  object <- plan_tensor_plots(object, which(select), data, re_levels)
 
   # this is needed for the parametric terms below
   sm_plts <- NULL

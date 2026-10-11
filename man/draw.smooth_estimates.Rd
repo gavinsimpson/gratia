@@ -34,7 +34,6 @@
   surface_3d = list(),
   back_transform = FALSE,
   re_levels = NULL,
-  max_re_combinations = 16L,
   ...
 )
 }
@@ -171,14 +170,6 @@ effects or their intervals; use \code{fun} for that.}
 \item{re_levels}{named list of factor level labels to retain in tensor products
 with random-effect margins, for example \code{list(species = c("a", "b"))}.
 Fitted factor order and ordered status are retained.}
-
-\item{max_re_combinations}{positive integer or \code{Inf}; maximum number of
-categorical combinations and numeric conditioning slices drawn for each
-random-effect tensor term. The default is 16. Oversized terms are skipped
-with a message before automatic grids are expanded or evaluated; select
-levels, supply a smaller data slice, or increase this limit. No levels are
-sampled or silently omitted. Direct \code{smooth_estimates()} is unrestricted.
-Numeric random-effect covariates remain continuous axes or slices.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }

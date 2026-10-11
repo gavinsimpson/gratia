@@ -176,7 +176,9 @@ are retained, and curves with only one continuous covariate use \code{n}.}
 \item{n_3d, n_4d}{numeric; the number of points along the third axis of a
 3D smooth (\code{n_3d}, default 16), or each axis after the first two for smooths
 of dimension four or higher (\code{n_4d}, default 4). If \code{NULL}, use \code{n} for
-those axes. The first two surface axes use \code{n_2d}.}
+those axes. For factor conditioning dimensions, retain at most that many
+levels, taking the first in fitted order. The first two surface axes use
+\code{n_2d}. Supplied \code{data} are unchanged.}
 
 \item{data}{an optional data frame of values to evaluate \code{smooth} at.}
 
