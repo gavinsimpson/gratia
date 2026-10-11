@@ -6,6 +6,10 @@
   supported, including their distinct labels and boundary-aware plots (#375).
   gratia now requires mgcv >= 1.9-4 and R >= 4.4.0.
 
+* `simulate()` supports grouped-family GAMs fitted with `mgcv::gfam()`,
+  including component-specific parameters and family indices for prediction data
+  (#272).
+
 * Improved support for `gamm4` models across gratia.
 
 * Link extraction now shares parameter validation across `link()`, `inv_link()`,

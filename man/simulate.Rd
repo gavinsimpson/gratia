@@ -17,7 +17,8 @@
   data = newdata,
   weights = NULL,
   ...,
-  newdata = NULL
+  newdata = NULL,
+  family_index = NULL
 )
 
 \method{simulate}{gamm}(
@@ -62,6 +63,9 @@ the model will be used for \code{newdata}, if available in \code{object}.}
 then defaults to \code{object[["prior.weights"]]}, otherwise a vector of ones.}
 
 \item{newdata}{Deprecated. Use \code{data} instead.}
+
+\item{family_index}{numeric; for grouped-family models, one integer family
+index per requested prediction row. See Details.}
 }
 \value{
 (Currently) A data frame with \code{nsim} columns.
@@ -84,6 +88,24 @@ independently of training exclusions: missing responses do not prevent
 simulation, while missing required predictors or weights yield \code{NA}.
 Prediction \code{na.action} in \code{...} is honoured. Missing rows are never passed
 to the response random-number generator.
+
+For models fitted with \code{\link[mgcv:gfam]{mgcv::gfam()}}, each observation is simulated from
+its component family using that component's fitted scale and distribution
+parameters. With \code{data = NULL}, fitted family membership is used. For explicit
+\code{data}, supply \code{family_index} or the index in the model's response expression:
+the second column of a matrix response, the second argument of \code{cbind(y, index)},
+or a numeric index vector in place of a named matrix response. Actual response
+observations are not needed. Missing indices follow prediction \code{na.action};
+invalid indices are errors. Explicit indices must agree with recoverable ones.
+
+Grouped simulations return one numeric response per observation: binomial
+proportions (with integer trial counts supplied in \code{weights}), count responses,
+or ordered-category codes, as appropriate. Component random generators retain
+their usual treatment of prior weights. Ordered-categorical and \code{ziP} components
+are simulated from their latent predictors. General families with multiple
+linear predictors and matrix responses encoding censoring or binomial counts
+are outside the scope supported by \code{gfam()}. Scalar censored-family components
+produce draws from their uncensored latent distributions.
 }
 \examples{
 load_mgcv()

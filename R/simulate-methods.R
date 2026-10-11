@@ -24,6 +24,8 @@
 #'   terms are included in the predictions. This may be useful, for example,
 #'   for excluding the effects of random effect terms.
 #' @param newdata Deprecated. Use `data` instead.
+#' @param family_index numeric; for grouped-family models, one integer family
+#'   index per requested prediction row. See Details.
 #'
 #' @details
 #' With `data = NULL`, `na.exclude` restores excluded observations as `NA` in
@@ -33,6 +35,24 @@
 #' simulation, while missing required predictors or weights yield `NA`.
 #' Prediction `na.action` in `...` is honoured. Missing rows are never passed
 #' to the response random-number generator.
+#'
+#' For models fitted with [mgcv::gfam()], each observation is simulated from
+#' its component family using that component's fitted scale and distribution
+#' parameters. With `data = NULL`, fitted family membership is used. For explicit
+#' `data`, supply `family_index` or the index in the model's response expression:
+#' the second column of a matrix response, the second argument of `cbind(y, index)`,
+#' or a numeric index vector in place of a named matrix response. Actual response
+#' observations are not needed. Missing indices follow prediction `na.action`;
+#' invalid indices are errors. Explicit indices must agree with recoverable ones.
+#'
+#' Grouped simulations return one numeric response per observation: binomial
+#' proportions (with integer trial counts supplied in `weights`), count responses,
+#' or ordered-category codes, as appropriate. Component random generators retain
+#' their usual treatment of prior weights. Ordered-categorical and `ziP` components
+#' are simulated from their latent predictors. General families with multiple
+#' linear predictors and matrix responses encoding censoring or binomial counts
+#' are outside the scope supported by `gfam()`. Scalar censored-family components
+#' produce draws from their uncensored latent distributions.
 #'
 #' @return (Currently) A data frame with `nsim` columns.
 #'
@@ -53,7 +73,8 @@
 #' sims <- simulate(m1, nsim = 5, seed = 42)
 #' head(sims)
 `simulate.gam` <- function(object, nsim = 1, seed = NULL, data = newdata,
-                           weights = NULL, ..., newdata = NULL) {
+                           weights = NULL, ..., newdata = NULL,
+                           family_index = NULL) {
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     runif(1)
   }
@@ -64,6 +85,17 @@
     set.seed(seed)
     RNGstate <- structure(seed, kind = as.list(RNGkind()))
     on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+  }
+  if (is_gfam_family(family(object))) {
+    if (!is.null(newdata)) newdata_deprecated()
+    sims <- simulate_gfam(object, nsim = nsim, data = data, weights = weights,
+      family_index = family_index, ...)
+    attr(sims, "seed") <- RNGstate
+    class(sims) <- c("simulate_gratia", class(sims))
+    return(sims)
+  }
+  if (!is.null(family_index)) {
+    stop("'family_index' is only available for grouped-family models.", call. = FALSE)
   }
   ## rd function if available
   rd_fun <- missing_safe_rd(choose_rd_fun(object),
