@@ -54,7 +54,10 @@ derivatives of smooth terms in a fitted GAM.
 \examples{
 load_mgcv()
 \dontshow{
-op <- options(pillar.sigfig = 2, cli.unicode = FALSE)
+op <- options(
+  pillar.sigfig = 2, cli.unicode = FALSE,
+  lifecycle_verbosity = "quiet"
+)
 }
 dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")

@@ -75,12 +75,33 @@
 #'
 #' @examples
 #' load_mgcv()
-#' d <- data_sim("eg1", n = 200, seed = 42)
-#' d$group <- factor(rep(c("A", "B"), length.out = nrow(d)))
+#'
+#' # Simulate group-specific slopes and a three-variable interaction
+#' set.seed(42)
+#' d <- data.frame(
+#'   x0 = runif(200),
+#'   x1 = runif(200),
+#'   x2 = runif(200, -1, 1),
+#'   x3 = runif(200, 1, 2),
+#'   group = factor(rep(c("A", "B"), each = 100))
+#' )
+#' d$y <- with(d, 2 * x0 + (group == "B") * (1 + x0) +
+#'   3 * x1 * x2 * x3 + rnorm(200, sd = 0.25))
 #' m <- gam(y ~ x0 * group + x1:x2:x3, data = d, method = "REML")
+#'
+#' # The interaction surface is shown at four values of x3
 #' pe <- parametric_effects(m, n_2d = 20, n_3d = 4)
 #' draw(pe)
 #' draw(m, parametric = TRUE, terms = "x0:group")
+#'
+#' # Render the same interaction as 3D surfaces
+#' if (requireNamespace("ggcube", quietly = TRUE)) {
+#'   pe_surface <- parametric_effects(m, terms = "x1:x2:x3",
+#'     n_2d = 20, n_3d = 4)
+#'   draw(pe_surface, surface = "3d")
+#' }
+#'
+#' # Draw a transformed covariate on either scale
 #' m_log <- gam(y ~ log(x1), data = d)
 #' draw(m_log) # log(x1) on the x axis
 #' draw(m_log, back_transform = TRUE) # x1 on the x axis
