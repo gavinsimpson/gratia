@@ -269,7 +269,7 @@ test_that("gamm4 simultaneous intervals and parallel smooth computations agree",
   # A real process pool exercises serialization of gamm4 model components.
   skip_if_not_installed("mirai")
   skip_if_not_installed("carrier")
-  mirai::daemons(2L)
+  mirai::daemons(2L, autoexit = NA)
   withr::defer(mirai::daemons(0L))
   actual <- smooth_estimates(m, n = 8)
   expect_equal(actual, smooth_estimates(m$gam, n = 8))

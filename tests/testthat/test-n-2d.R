@@ -83,7 +83,7 @@ test_that("parallel surface evaluation and bases agree with sequential results",
   sm <- smooth_estimates(m, n = 11, n_2d = 7)
   bf <- basis(m, n = 11, n_2d = 7)
   withr::defer(mirai::daemons(0))
-  mirai::daemons(1, dispatcher = FALSE)
+  mirai::daemons(1, dispatcher = FALSE, autoexit = NA)
   expect_equal(smooth_estimates(m, n = 11, n_2d = 7), sm)
   expect_equal(basis(m, n = 11, n_2d = 7), bf)
 })

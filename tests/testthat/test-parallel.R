@@ -3,7 +3,7 @@ skip_if_not_installed("carrier")
 
 # set up daemons
 # ensures only 1 additional process on CRAN
-mirai::daemons(1, dispatcher = FALSE)
+mirai::daemons(1, dispatcher = FALSE, autoexit = NA)
 on.exit(mirai::daemons(0), add = TRUE)
 
 test_that("parallel smooth estimates works", {

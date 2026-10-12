@@ -34,6 +34,7 @@ jobs:
         with:
           extra-packages: any::pkgload, any::vdiffr, any::svglite, glmmTMB=github::glmmTMB/glmmTMB/glmmTMB@master, TMB=?source&reinstall
           needs: check
+          install-pandoc: true
       # Fresh parallel workers cannot see pkgload's in-process namespace.
       - name: Install current package for parallel workers
         run: R CMD INSTALL .
