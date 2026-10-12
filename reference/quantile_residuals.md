@@ -53,7 +53,9 @@ Quantile residuals apply
 [`qnorm()`](https://rdrr.io/r/stats/Normal.html) to these PIT values.
 Uncensored continuous observations use `F(y)`; uncensored Poisson
 observations are randomized between `F(y - 1)` and `F(y)`. Use
-non-integer censoring limits for `cpois()`, as recommended by mgcv.
+non-integer censoring limits for
+[`cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html), as recommended by
+mgcv.
 
 For CDF helpers with native log-tail support, quantile residuals are
 computed directly from log probabilities in the smaller tail. This
@@ -64,9 +66,14 @@ probabilities and may still round to zero or one in extreme tails, so
 applying [`qnorm()`](https://rdrr.io/r/stats/Normal.html) to the
 returned PIT values can be less accurate than requesting quantile
 residuals directly. Native log tails are available for Poisson, negative
-binomial, binomial, Gaussian, Gamma, `cnorm()`, `clog()`, `gaulss()`,
-`gammals()`, `scat()`, and `betar()` families. Other CDF helpers retain
-ordinary-probability evaluation.
+binomial, binomial, Gaussian, Gamma,
+[`cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html),
+[`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html),
+[`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html),
+[`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html),
+[`scat()`](https://rdrr.io/pkg/mgcv/man/scat.html), and
+[`betar()`](https://rdrr.io/pkg/mgcv/man/Beta.html) families. Other CDF
+helpers retain ordinary-probability evaluation.
 
 ## See also
 

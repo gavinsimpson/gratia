@@ -35,7 +35,8 @@ residuals_hist_plot(
   the quantile residuals should be approximately normally distributed
   (mean = 0, sd = 1) if the model is correct. PIT and quantile residuals
   are not yet available for most families that can be handled by
-  `gam()`, but most standard families are supported, e.g. those used by
+  [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html), but most standard
+  families are supported, e.g. those used by
   [`glm()`](https://rdrr.io/r/stats/glm.html).
 
 - n_bins:

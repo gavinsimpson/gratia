@@ -1,7 +1,9 @@
 # Data from the General Social Survey (GSS) from the National Opinion Research Center of the University of Chicago
 
-A subset of the data from the `carData::GSSvocab` dataset from the
-`carData` package, containing observations from 2016 only.
+A subset of the data from the
+[`carData::GSSvocab`](https://rdrr.io/pkg/carData/man/GSSvocab.html)
+dataset from the `carData` package, containing observations from 2016
+only.
 
 ## Format
 

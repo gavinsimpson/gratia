@@ -66,10 +66,11 @@ simulate(
 - ...:
 
   arguments passed to methods. `simulate.gam()` and `simulate.scam()`
-  pass `...` on to `predict.gam()`. As such you can pass additional
-  arguments such as `terms`, `exclude`, to select which model terms are
-  included in the predictions. This may be useful, for example, for
-  excluding the effects of random effect terms.
+  pass `...` on to
+  [`predict.gam()`](https://rdrr.io/pkg/mgcv/man/predict.gam.html). As
+  such you can pass additional arguments such as `terms`, `exclude`, to
+  select which model terms are included in the predictions. This may be
+  useful, for example, for excluding the effects of random effect terms.
 
 - data:
 
@@ -129,8 +130,9 @@ random generators retain their usual treatment of prior weights.
 Ordered-categorical and `ziP` components are simulated from their latent
 predictors. General families with multiple linear predictors and matrix
 responses encoding censoring or binomial counts are outside the scope
-supported by `gfam()`. Scalar censored-family components produce draws
-from their uncensored latent distributions.
+supported by [`gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html). Scalar
+censored-family components produce draws from their uncensored latent
+distributions.
 
 ## See also
 

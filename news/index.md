@@ -4,6 +4,28 @@
 
 ### User visible changes
 
+- [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md),
+  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md),
+  and smooth coefficient extraction now support glmmTMB models,
+  including conditional, zero-inflation and dispersion smooths where
+  supported by glmmTMB. All smooths are plotted by default, with
+  mgcv-style predictor labels (`s(x)`, `s.1(x)`, etc.) and model-wide
+  `select`. Parametric effects and native random effects are also
+  plotted, including models without smooths. Native random intercepts
+  and slopes use separate Gaussian QQ panels. Set `ranef_lines = TRUE`
+  to replace a simple `(1 + x | g)` pair with lines showing its random
+  contribution only; more complex terms retain QQ panels. Effect
+  intervals use TMB joint covariance.
+
+  [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
+  [`qq_plot()`](https://gavinsimpson.github.io/gratia/reference/qq_plot.md)
+  and
+  [`worm_plot()`](https://gavinsimpson.github.io/gratia/reference/worm_plot.md)
+  support native glmmTMB residuals, with conditional response simulation
+  for QQ reference bands. See
+  [`?'glmmTMB-methods'`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
+  for supported families and current limitations.
+
 - Soap-film boundary (`bs = "sf"`) and wiggly (`bs = "sw"`) components
   are supported, including their distinct component types and
   boundary-aware plots

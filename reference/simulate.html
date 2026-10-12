@@ -13,7 +13,7 @@ distribution used when fitting the model."><meta property="og:image" content="ht
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-41</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-42</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -113,7 +113,7 @@ distribution used when fitting the model.</p>
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>arguments passed to methods. <code>simulate.gam()</code> and
-<code>simulate.scam()</code> pass <code>...</code> on to <code>predict.gam()</code>. As such you can pass
+<code>simulate.scam()</code> pass <code>...</code> on to <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">predict.gam()</a></code>. As such you can pass
 additional arguments such as <code>terms</code>, <code>exclude</code>, to select which model
 terms are included in the predictions. This may be useful, for example,
 for excluding the effects of random effect terms.</p></dd>
@@ -169,7 +169,7 @@ or ordered-category codes, as appropriate. Component random generators retain
 their usual treatment of prior weights. Ordered-categorical and <code>ziP</code> components
 are simulated from their latent predictors. General families with multiple
 linear predictors and matrix responses encoding censoring or binomial counts
-are outside the scope supported by <code>gfam()</code>. Scalar censored-family components
+are outside the scope supported by <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">gfam()</a></code>. Scalar censored-family components
 produce draws from their uncensored latent distributions.</p>
     </div>
     <div class="section level2">
@@ -185,7 +185,7 @@ produce draws from their uncensored latent distributions.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">400</span>, dist <span class="op">=</span> <span class="st">"normal"</span>, scale <span class="op">=</span> <span class="fl">2</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">sims</span> <span class="op">&lt;-</span> <span class="fu">simulate</span><span class="op">(</span><span class="va">m1</span>, nsim <span class="op">=</span> <span class="fl">5</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sims</span><span class="op">)</span></span></span>

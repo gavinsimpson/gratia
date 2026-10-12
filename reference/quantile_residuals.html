@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-41</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-42</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,7 +92,7 @@ response CDF. Left and right censoring use probabilities zero and one,
 respectively, for the unbounded end. Quantile residuals apply <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm()</a></code> to
 these PIT values. Uncensored continuous observations use <code>F(y)</code>; uncensored
 Poisson observations are randomized between <code>F(y - 1)</code> and <code>F(y)</code>.
-Use non-integer censoring limits for <code>cpois()</code>, as recommended by mgcv.</p>
+Use non-integer censoring limits for <code><a href="https://rdrr.io/pkg/mgcv/man/cpois.html" class="external-link">cpois()</a></code>, as recommended by mgcv.</p>
 <p>For CDF helpers with native log-tail support, quantile residuals are computed
 directly from log probabilities in the smaller tail. This avoids infinite
 residuals caused by rounding a probability to zero or one. No probability
@@ -101,8 +101,8 @@ residuals. PIT residuals are returned as ordinary probabilities and may still
 round to zero or one in extreme tails, so applying <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm()</a></code> to the returned
 PIT values can be less accurate than requesting quantile residuals directly.
 Native log tails are available for Poisson, negative binomial, binomial,
-Gaussian, Gamma, <code>cnorm()</code>, <code>clog()</code>, <code>gaulss()</code>, <code>gammals()</code>, <code>scat()</code>, and
-<code>betar()</code> families. Other CDF helpers retain ordinary-probability evaluation.</p>
+Gaussian, Gamma, <code><a href="https://rdrr.io/pkg/mgcv/man/cnorm.html" class="external-link">cnorm()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/clog.html" class="external-link">clog()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">gaulss()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/gammals.html" class="external-link">gammals()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/scat.html" class="external-link">scat()</a></code>, and
+<code><a href="https://rdrr.io/pkg/mgcv/man/Beta.html" class="external-link">betar()</a></code> families. Other CDF helpers retain ordinary-probability evaluation.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

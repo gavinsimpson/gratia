@@ -22,6 +22,18 @@ plots](https://gavinsimpson.github.io/gratia/articles/custom-plotting.md).
   Plot smooths of a GAMLSS model estimated by
   [`GJRM::gamlss`](https://rdrr.io/pkg/GJRM/man/gamlss.html)
 
+- [`qq_plot(`*`<glmmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
+  [`worm_plot(`*`<glmmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
+  [`appraise(`*`<glmmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
+  [`parametric_terms(`*`<glmmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
+  [`parametric_effects(`*`<glmmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
+  [`smooths(`*`<glmmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
+  [`get_smooths_by_id(`*`<glmmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
+  [`smooth_estimates(`*`<glmmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
+  [`smooth_coefs(`*`<glmmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
+  [`draw(`*`<glmmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
+  : Effects and diagnostics for glmmTMB models
+
 - [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
   :
 
