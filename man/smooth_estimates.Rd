@@ -117,6 +117,12 @@ implementation of \code{evaluate_smooth()}, and replaces that function, which ha
 been removed from the package.
 }
 \details{
+For distributional and glmmTMB models with multiple linear predictors,
+an optional \code{.model} column identifies the model part or parameter
+associated with each smooth. This display metadata is retained in nested
+output and subsets, allowing \code{\link[=draw]{draw()}} to reproduce model subtitles from saved
+estimates. Smooth labels and selection remain unchanged.
+
 When distinct fitted terms share both their smooth label and type (for
 example, tensor products of soap-film components), \code{.smooth_id} contains
 their fitted smooth indices. This preserves their identity in saved

@@ -285,7 +285,8 @@ effects or their intervals; use \code{fun} for that.}
 with random-effect margins, for example \code{list(species = c("a", "b"))}.
 Fitted factor order and ordered status are retained.}
 
-\item{...}{Arguments to other methods; not used.}
+\item{...}{Additional smooth plotting arguments, including \code{title},
+\code{subtitle}, \code{xlab} and \code{ylab}.}
 }
 \value{
 A list of \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} objects.
@@ -293,6 +294,11 @@ A list of \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} objects.
 \description{
 Plots smooth and parametric contributions from a fitted GAM model using
 \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}.
+}
+\details{
+Smooth plot subtitles identify the model part or distributional
+parameter as described in \code{\link[=draw.gam]{draw.gam()}}. Custom smooth labels, including
+\code{subtitle}, can be passed through \code{...}.
 }
 \note{
 Internally, plots of each smooth are created using \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}

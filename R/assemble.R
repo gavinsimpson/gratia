@@ -23,7 +23,11 @@
 #' [ggplot2::ggplot()].
 #'
 #' @inheritParams draw.gam
-#' @param ... Arguments to other methods; not used.
+#' @details Smooth plot subtitles identify the model part or distributional
+#'   parameter as described in [draw.gam()]. Custom smooth labels, including
+#'   `subtitle`, can be passed through `...`.
+#' @param ... Additional smooth plotting arguments, including `title`,
+#'   `subtitle`, `xlab` and `ylab`.
 #'
 #' @note Internally, plots of each smooth are created using [ggplot2::ggplot()]
 #'   and composed into a single plot using [patchwork::wrap_plots()]. As a

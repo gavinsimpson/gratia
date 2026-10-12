@@ -23,6 +23,16 @@ glmmtmb_components <- function(object) {
   components[active]
 }
 
+# Constant dispersion is a scale parameter, rather than an additional
+# predictor for display. Zero-inflation counts even when intercept-only.
+glmmtmb_predictor_count <- function(object) {
+  components <- glmmtmb_components(object)
+  if (!length(all.vars(stats::formula(object, component = "disp")))) {
+    components <- setdiff(components, "disp")
+  }
+  length(components)
+}
+
 glmmtmb_smooths <- function(object) {
   components <- glmmtmb_components(object)
   out <- list()
@@ -217,7 +227,8 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
     var.summary = lapply(frame[intersect(names(frame), all.vars(ff))],
       function(x) if (is.numeric(x))
       c(min(x), stats::median(x), max(x)) else x),
-    na.action = stats::na.action(object)), class = "gratia_glmmtmb_smooth")
+    na.action = stats::na.action(object)), class = "gratia_glmmtmb_smooth",
+    gratia.n_predictors = glmmtmb_predictor_count(object))
 }
 
 #' @export
@@ -320,7 +331,11 @@ smooth_estimates.gratia_glmmtmb_smooth <- function(object, select = NULL,
 #'   default, as for `draw.gam()`. Smooths in later
 #'   linear predictors use mgcv-style labels such as `s.1(x)` and `s.2(x)`.
 #'   Predictor order is conditional, zero-inflation (if present), then dispersion
-#'   (if present). Use `smooths(object)` and `select` to select individual smooths;
+#'   (if present). Use `smooths(object)` and `select` to select individual smooths.
+#'   For models with multiple linear predictors, smooth subtitles identify the
+#'   "Conditional model", "Zero-inflation model" or "Dispersion model",
+#'   consistently with native random-effect panels. Constant dispersion alone
+#'   does not trigger these subtitles.
 #'   `names(draw(object, wrap = FALSE, parametric = FALSE))` also lists native
 #'   random-effect coefficient panels.
 #' @name glmmTMB-methods

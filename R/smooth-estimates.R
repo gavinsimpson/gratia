@@ -64,6 +64,12 @@
 #' @return A data frame (tibble), which is of class `"smooth_estimates"`.
 #'
 #' @details
+#' For distributional and glmmTMB models with multiple linear predictors,
+#' an optional `.model` column identifies the model part or parameter
+#' associated with each smooth. This display metadata is retained in nested
+#' output and subsets, allowing [draw()] to reproduce model subtitles from saved
+#' estimates. Smooth labels and selection remain unchanged.
+#'
 #' When distinct fitted terms share both their smooth label and type (for
 #' example, tensor products of soap-film components), `.smooth_id` contains
 #' their fitted smooth indices. This preserves their identity in saved
@@ -243,6 +249,12 @@
       dist = dist,
       clip = clip, back_transform = back_transform
     )
+  }
+
+  # Retain model-part labels with the estimates, including nested output.
+  model_labels <- smooth_model_labels(object, smooths)
+  if (any(!is.na(model_labels))) {
+    for (i in seq_along(sm_list)) sm_list[[i]]$.model <- model_labels[[i]]
   }
 
   # Tensor products of the two soap components can share both label and type.

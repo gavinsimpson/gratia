@@ -2,6 +2,15 @@
 
 ## User visible changes
 
+* Smooth plots now identify their model part or distributional parameter in
+  subtitles for glmmTMB, mgcv and `GJRM::gamlss()` models with multiple linear
+  predictors. Single-predictor models omit these labels, and constant glmmTMB
+  dispersion alone does not trigger them. By-variable information is retained,
+  as are existing smooth titles, selection and the default of plotting all smooths. Saved
+  `smooth_estimates()` retain the labels in an optional `.model` column.
+  Custom smooth labels supplied through `draw(..., subtitle = ...)` and other
+  label arguments now reach the smooth renderer correctly.
+
 * `draw()`, `smooth_estimates()`, and smooth coefficient extraction now support
   glmmTMB models, including conditional, zero-inflation and dispersion smooths
   where supported by glmmTMB. All smooths are plotted by default, with

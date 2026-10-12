@@ -43,7 +43,7 @@ use a fixed aspect ratio.}
 \item{...}{arguments passed to \code{\link[=draw.gam]{draw.gam()}}}
 
 \item{n}{numeric; the number of points over the range of the covariate at
-which to evaluate the smooth.}
+which to evaluate a univariate smooth.}
 
 \item{envir}{an optional environment supplying functions and constants used
 in model expressions. The available model formula environment is used when
@@ -54,8 +54,11 @@ Provides a \code{\link[=draw]{draw()}} method for GAMLSS (distributional GAMs) f
 by \code{\link[GJRM:gamlss]{GJRM::gamlss()}}.
 }
 \note{
-Plots of smooths are not labelled with the linear predictor to which
-they belong.
+For models with multiple linear predictors, smooth plot subtitles
+identify the distributional parameter using the parent model's margin and
+equation order, rather than the working family of the embedded GAMs.
+Single-predictor models omit these automatic labels. Existing smooth labels,
+selection, by-variable information and custom subtitles are retained.
 }
 \examples{
 if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {

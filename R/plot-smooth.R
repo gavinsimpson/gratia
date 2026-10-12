@@ -96,21 +96,26 @@
 #'   Defaults to the basis caption; surface callers can include facet variables.
 #' @param title Plot title, or `NULL` to use the unique `.smooth` value. Callers
 #'   plotting grouped by smooths supply the `.term` title instead.
-#' @param subtitle Plot subtitle, or `NULL` to derive it from the by variable.
+#' @param subtitle Plot subtitle, or `NULL` to derive it from the model part
+#'   and by variable.
 #' @param caption `NULL` or `TRUE` adds the basis caption; other values suppress
 #'   it, retaining the existing smooth plotting convention.
 #' @param grouped_by Logical; label a grouped factor by plot? Grouped plots keep
 #'   the full title and name only the by variable in the default subtitle.
 #'   Separate plots strip the title at the first colon and include the factor
 #'   level in the subtitle. Continuous by variables have no level suffix.
+#' @param by_level Data classes for which an ungrouped subtitle includes the
+#'   by-variable level. Spherical plots include only unordered factors.
 #' @return A `ggplot2::labs()` object.
 #' @keywords internal
 #' @noRd
 `prepare_smooth_labels` <- function(
   object, x_var, xlab = NULL, ylab = NULL, title = NULL, subtitle = NULL,
   caption = NULL, grouped_by = FALSE, y_var = NULL,
-  default_caption = paste("Basis:", object[[".type"]])
+  default_caption = paste("Basis:", object[[".type"]]),
+  by_level = c("factor", "ordered")
 ) {
+  default_subtitle <- is.null(subtitle)
   if (is.null(xlab)) {
     xlab <- x_var
   }
@@ -133,11 +138,13 @@
     }
     if (is.null(subtitle)) {
       subtitle <- paste0("By: ", by_var)
-      if (!grouped_by && data_class(object)[[by_var]] %in% c("factor", "ordered")) {
+      if (!grouped_by && data_class(object)[[by_var]] %in% by_level) {
         subtitle <- paste0(subtitle, "; ", unique(object[[by_var]]))
       }
     }
   }
+
+  if (default_subtitle) subtitle <- smooth_plot_subtitle(object, subtitle)
 
   labs(x = xlab, y = ylab, title = title, subtitle = subtitle, caption = caption)
 }
@@ -1140,14 +1147,6 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     ylab <- variables[1] ## yes, the smooth is s(lat, lon) !
   }
 
-  # Spherical plots historically include a level only for unordered factors.
-  if (all(!is.na(object[[".by"]])) && is.null(subtitle)) {
-    by_var <- as.character(unique(object[[".by"]]))
-    subtitle <- paste0("By: ", by_var)
-    if (!isTRUE(grouped_by) && data_class(object)[[by_var]] == "factor") {
-      subtitle <- paste0(subtitle, "; ", unique(object[[by_var]]))
-    }
-  }
   panel <- NULL
   if (isTRUE(grouped_by) && all(!is.na(object$.by))) {
     by_var <- unique(object$.by)
@@ -1158,7 +1157,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   }
   labels <- prepare_smooth_labels(object,
     x_var = variables[2], y_var = variables[1], xlab = xlab, ylab = ylab,
-    title = title, subtitle = subtitle, caption = caption, grouped_by = grouped_by)
+    title = title, subtitle = subtitle, caption = caption, grouped_by = grouped_by,
+    by_level = "factor")
   # Preserve the spherical method's omitted-versus-NULL axis convention.
   labels[c("x", "y")] <- list(xlab, ylab)
 
