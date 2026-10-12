@@ -312,7 +312,8 @@ draw.glmmTMB <- function(object, ..., parametric = FALSE,
   if (!identical(parametric, FALSE) || !identical(residuals, FALSE)) {
     stop("glmmTMB parametric plots and partial residual overlays are not yet supported.")
   }
-  draw.gam(glmmtmb_smooth_model(object), ..., envir = envir)
+  draw.gam(glmmtmb_smooth_model(object), ..., parametric = FALSE,
+    envir = envir)
 }
 
 #' @export

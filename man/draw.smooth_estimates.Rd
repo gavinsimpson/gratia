@@ -28,9 +28,12 @@
   ylim = NULL,
   crs = NULL,
   default_crs = NULL,
-  lims_method = "cross",
+  lims_method = "geometry_bbox",
   caption = TRUE,
-  geom = c("raster", "tile"),
+  surface = c("raster", "tile", "3d"),
+  surface_3d = list(),
+  back_transform = FALSE,
+  re_levels = NULL,
   ...
 )
 }
@@ -101,28 +104,72 @@ drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggp
 data will be projected into this CRS. See \code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}} for
 details.}
 
-\item{default_crs}{the coordinate reference system (CRS) to use for the
-non-sf layers in the plot. If left at the default \code{NULL}, the CRS used is
-4326 (WGS84), which is appropriate for spline-on-the-sphere smooths, which
-are parameterized in terms of latitude and longitude as coordinates. See
-\code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}} for more details.}
+\item{default_crs}{the coordinate reference system (CRS) to use for non-sf
+layers added to spherical plots. The default, \code{NULL}, uses 4326 (WGS84).
+Internally generated surface cells, contours and observation points have
+their own geographic CRS, with longitude on the horizontal axis and
+latitude on the vertical axis. See \code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}} for more details.}
 
-\item{lims_method}{character; affects how the axis limits are determined. See
-\code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}}. Be careful; in testing of some examples, changing
-this to \code{"orthogonal"} for example with the chlorophyll-a example from
-Simon Wood's GAM book quickly used up all the RAM in my test system and the
-OS killed R. This could be incorrect usage on my part; right now the grid
-of points at which SOS smooths are evaluated (if not supplied by the user)
-can produce invalid coordinates for the corners of tiles as the grid is
-generated for tile centres without respect to the spacing of those tiles.}
+\item{lims_method}{character; affects how spherical plot axis limits are
+determined. The default, \code{"geometry_bbox"}, uses the rendered geometry.
+Passed to \code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}}. Spherical surfaces use explicit
+geographic cells with valid polar and date-line boundaries. Orthographic
+plots clip cells, contours and observation points to the visible hemisphere
+before projection. Explicit prediction data on a rectilinear grid retain
+their actual spacing; scattered or singleton coordinates are drawn as
+points, with a message, because they do not define surface cells. Incomplete
+observation rug coordinates are omitted. Grouped factor-by spherical
+surfaces use separate facets for each factor level.}
 
 \item{caption}{logical; show the smooth type in the caption of each plot?}
 
-\item{geom}{character; either \code{"raster"} (the default) or \code{"tile"} for flat
-smooth surfaces, including faceted and soap-film plots. Raster rendering
-keeps large PDF plots compact; tiles are individual borderless rectangles
-that remain vector elements in PDF and SVG output, potentially increasing
-file size. Other plot types, including spherical smooths, are unchanged.}
+\item{surface}{character; one of \code{"raster"} (the default), \code{"tile"}, or
+\code{"3d"}. Raster surfaces keep large PDF plots compact; tiles are borderless
+vector rectangles. Three-dimensional surfaces use the optional \code{ggcube}
+package, with the displayed partial effect as height and fill. Numeric
+smooth and parametric surfaces, including conditioning facets and soap
+films, are supported. Curves and factor estimates keep their usual display;
+spherical smooths retain their geographic rendering.
+Covariate scale changes that produce irregular spacing use rectangles
+bounded by adjacent coordinate midpoints for flat surfaces.}
+
+\item{surface_3d}{named list of view options passed to \code{\link[ggcube:coord_3d]{ggcube::coord_3d()}},
+for example \code{list(yaw = 45, persp = FALSE)}. The default \code{list()} uses the
+default view with \code{ggcube::light(backface_scale = 1)}, preserving equal
+horizontal units for isotropic smooths. Supply \code{light = ggcube::light(...)}
+in this list to override lighting; \code{ggcube::light(method = "none")} disables
+it. An explicitly supplied \code{light} replaces the entire default light.
+Only the coordinate system is used; ggcube's theme settings are not applied.
+These options affect all 3D panels in a call. For different views per term,
+modify individual plots returned by \code{\link[=assemble]{assemble()}}. The \code{dist} entry here
+controls perspective; the top-level \code{dist} argument controls masking.}
+
+\item{back_transform}{logical; plot covariates on their original scale?
+Defaults to \code{FALSE}, using model coordinates such as \code{log(x)} for a term
+containing \code{log(x)}. With \code{TRUE}, recover the raw covariates, generate a
+grid on their original scale and evaluate the model expressions forwards.
+Applies to axes, rugs, partial-residual locations and conditioning facets,
+including tensor products and parametric interactions. Each smooth axis
+must depend on one distinct original model covariate. Functions such as
+\code{foo(x)} are supported when their raw inputs and functions can be recovered;
+no inverse function is needed. Missing raw data or unavailable functions
+produce an error; supply \code{data} or \code{envir} as appropriate.
+With supplied prediction \code{data}, unavailable raw fitting observations
+omit rugs and partial residuals; prediction rows are never used as observations.
+For precomputed smooth estimates, prepare raw grids with
+\code{smooth_estimates(model, back_transform = TRUE)} before drawing with
+\code{back_transform = TRUE}. Raw inputs supplied through \code{data} also retain
+their coordinates. Transformed-only estimates cannot be relabelled on the
+raw scale, including grids carrying typical values from \code{include_all = TRUE}.
+Transformed soap-film boundaries lack retained raw coordinates and must
+be drawn with \code{back_transform = FALSE}.
+Parametric estimates retain both scales; multi-column basis
+expansions retain raw axes on either setting. Does not transform estimated
+effects or their intervals; use \code{fun} for that.}
+
+\item{re_levels}{named list of factor level labels to retain in tensor products
+with random-effect margins, for example \code{list(species = c("a", "b"))}.
+Fitted factor order and ordered status are retained.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
@@ -138,6 +185,8 @@ m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 # plot all of the estimated smooths
 sm <- smooth_estimates(m)
 draw(sm)
+m_log <- gam(y ~ s(log(x1), k = 6), data = df)
+draw(smooth_estimates(m_log, back_transform = TRUE), back_transform = TRUE)
 # evaluate smooth of `x2`
 sm <- smooth_estimates(m, select = "s(x2)")
 # plot it
@@ -158,5 +207,5 @@ smooth_estimates(m) |>
 
 # Render a bivariate smooth as vector tiles
 m_surface <- gam(y ~ s(x0, x1), data = df, method = "REML")
-draw(smooth_estimates(m_surface, n_2d = 20), geom = "tile")
+draw(smooth_estimates(m_surface, n_2d = 20), surface = "tile")
 }

@@ -143,7 +143,7 @@ test_that("bam, MH samples, and plotting are supported", {
   cd <- conditional_differences(m, "a", "x", n_vals = 3)
   expect_s3_class(cd, "conditional_differences")
   mh <- conditional_differences(f$model, "a", list(x = 0.5),
-    uncertainty = "simulation", method = "mh", n_sim = 10, burnin = 10, seed = 8)
+    uncertainty = "simulation", method = "mh", n_sim = 10, burnin = 90, seed = 8)
   expect_true(all(is.finite(mh$.se)))
   for (by in list("a", c("a", "b"))) {
     cd <- conditional_differences(f$model, by, c("x", "b")[!c("x", "b") %in% by],

@@ -7,13 +7,13 @@
 \alias{link.bam}
 \alias{link.gamm}
 \alias{link.glm}
-\alias{link.list}
+\alias{link.gamm4}
 \alias{inv_link}
 \alias{inv_link.family}
 \alias{inv_link.gam}
 \alias{inv_link.bam}
 \alias{inv_link.gamm}
-\alias{inv_link.list}
+\alias{inv_link.gamm4}
 \alias{inv_link.glm}
 \alias{extract_link}
 \alias{extract_link.family}
@@ -32,7 +32,7 @@ link(object, ...)
 
 \method{link}{glm}(object, ...)
 
-\method{link}{list}(object, ...)
+\method{link}{gamm4}(object, ...)
 
 inv_link(object, ...)
 
@@ -44,15 +44,15 @@ inv_link(object, ...)
 
 \method{inv_link}{gamm}(object, ...)
 
-\method{inv_link}{list}(object, ...)
+\method{inv_link}{gamm4}(object, ...)
 
 \method{inv_link}{glm}(object, ...)
 
 extract_link(family, ...)
 
-\method{extract_link}{family}(family, inverse = FALSE, ...)
+\method{extract_link}{family}(family, inverse = FALSE, parameter = NULL, which_eta = NULL, ...)
 
-\method{extract_link}{general.family}(family, parameter, inverse = FALSE, which_eta = NULL, ...)
+\method{extract_link}{general.family}(family, parameter = NULL, inverse = FALSE, which_eta = NULL, ...)
 }
 \arguments{
 \item{object}{a family object or a fitted model from which to extract the
@@ -71,10 +71,15 @@ zero-inflation term in \code{\link[mgcv:ziplss]{mgcv::ziplss()}}, \code{"power"}
 \code{\link[mgcv:gevlss]{mgcv::gevlss()}}, \code{"epsilon"} or \code{"skewness"} for the skewness and
 \code{"delta"} or \code{"kurtosis"} for the kurtosis parameter for
 \code{\link[mgcv:shash]{mgcv::shash()}}, or \code{"phi"} for the scale parameter of \code{\link[mgcv:gammals]{mgcv::gammals()}} &
-\code{\link[mgcv:twlss]{mgcv::twlss()}}.}
+\code{\link[mgcv:twlss]{mgcv::twlss()}}. \code{NULL} selects the first parameter. Only parameters and
+aliases supported by the supplied family are accepted. For \code{\link[mgcv:twlss]{mgcv::twlss()}},
+\code{"power"} selects the second linear predictor and \code{"scale"}, \code{"sigma"},
+and \code{"phi"} select the third.}
 
-\item{which_eta}{numeric; the linear predictor to extract for families
-\code{\link[mgcv:mvn]{mgcv::mvn()}} and \code{\link[mgcv:multinom]{mgcv::multinom()}}.}
+\item{which_eta}{numeric; the integer index of the linear predictor to
+extract for families \code{\link[mgcv:mvn]{mgcv::mvn()}} and \code{\link[mgcv:multinom]{mgcv::multinom()}}. Defaults to
+the first linear predictor. If multiple indices are supplied, the first
+is used with a warning.}
 
 \item{family}{a family object, the result of a call to \code{\link[=family]{family()}}.}
 

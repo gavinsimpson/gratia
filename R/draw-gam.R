@@ -1,8 +1,7 @@
-#' Plot estimated smooths from a fitted GAM
+#' Plot smooth and parametric terms from a fitted GAM
 #'
-#' Plots estimated smooths from a fitted GAM model in a similar way to
-#' `mgcv::plot.gam()` but instead of using base graphics, [ggplot2::ggplot()]
-#' is used instead.
+#' Plots smooth and parametric contributions from a fitted GAM model using
+#' [ggplot2::ggplot()].
 #'
 #' @param object a fitted GAM, the result of a call to [mgcv::gam()].
 #' @param data an optional data frame that is used to supply the data at which
@@ -16,12 +15,43 @@
 #'   as shown for example in the output from `summary(object)`. Logical
 #'   `select` operates as per numeric `select` in the order that smooths are
 #'   stored.
-#' @param parametric logical; plot parametric terms also? Note that `select` is
-#'   used for selecting which smooths to plot. The `terms` argument is used to
-#'   select which parametric effects are plotted. The default, as with
-#'   [mgcv::plot.gam()], is to not draw parametric effects.
+#' @param parametric logical or `NULL`; plot parametric terms also? The default,
+#'   `NULL`, includes parametric terms when `select = NULL`, but excludes them
+#'   when smooths are selected explicitly. Use `TRUE` to include parametric terms
+#'   regardless of `select`, or `FALSE` to draw only smooths (the previous
+#'   default). The `terms` argument selects which parametric effects are plotted;
+#'   `select` selects only smooths.
 #' @param terms character; which model parametric terms should be drawn? The
 #'   Default of `NULL` will plot all parametric terms that can be drawn.
+#'   Interactions show their individual contributions to the linear predictor;
+#'   main effects and intercepts are not added. Multivariate parametric terms
+#'   use the grid and surface controls below, as described in
+#'   [parametric_effects()].
+#' @param back_transform logical; plot covariates on their original scale?
+#'   Defaults to `FALSE`, using model coordinates such as `log(x)` for a term
+#'   containing `log(x)`. With `TRUE`, recover the raw covariates, generate a
+#'   grid on their original scale and evaluate the model expressions forwards.
+#'   Applies to axes, rugs, partial-residual locations and conditioning facets,
+#'   including tensor products and parametric interactions. Each smooth axis
+#'   must depend on one distinct original model covariate. Functions such as
+#'   `foo(x)` are supported when their raw inputs and functions can be recovered;
+#'   no inverse function is needed. Missing raw data or unavailable functions
+#'   produce an error; supply `data` or `envir` as appropriate.
+#'   With supplied prediction `data`, unavailable raw fitting observations
+#'   omit rugs and partial residuals; prediction rows are never used as observations.
+#'   For precomputed smooth estimates, prepare raw grids with
+#'   `smooth_estimates(model, back_transform = TRUE)` before drawing with
+#'   `back_transform = TRUE`. Raw inputs supplied through `data` also retain
+#'   their coordinates. Transformed-only estimates cannot be relabelled on the
+#'   raw scale, including grids carrying typical values from `include_all = TRUE`.
+#'   Transformed soap-film boundaries lack retained raw coordinates and must
+#'   be drawn with `back_transform = FALSE`.
+#'   Parametric estimates retain both scales; multi-column basis
+#'   expansions retain raw axes on either setting. Does not transform estimated
+#'   effects or their intervals; use `fun` for that.
+#' @param re_levels named list of factor level labels to retain in tensor products
+#'   with random-effect margins, for example `list(species = c("a", "b"))`.
+#'   Fitted factor order and ordered status are retained.
 #' @param residuals logical; should partial residuals for a smooth be drawn?
 #'   Ignored for anything but a simple univariate smooth.
 #' @param scales character; should all univariate smooths be plotted with the
@@ -47,17 +77,23 @@
 #'   use `n` instead. Ignored when evaluation `data` are supplied. Factor levels
 #'   are retained, and curves with only one continuous covariate use `n`.
 #' @param n_3d numeric; the number of new observations to generate for the third
-#'   dimension of a 3D smooth.
+#'   dimension of a 3D smooth. Factor conditioning dimensions retain at most
+#'   this many levels, taking the first levels in fitted order. Explicit
+#'   `re_levels` selections take precedence; supplied `data` are unchanged.
 #' @param n_4d numeric; the number of new observations to generate for the
 #'   dimensions higher than 2 (!) of a *k*D smooth (*k* >= 4). For example, if
 #'   the smooth is a 4D smooth, each of dimensions 3 and 4 will get `n_4d`
-#'   new observations.
+#'   new observations. For factor conditioning dimensions, this is the maximum
+#'   number of levels retained per dimension, taking the first in fitted order.
+#'   Explicit `re_levels` selections take precedence; supplied `data` are unchanged.
 #' @param unconditional logical; should confidence intervals include the
 #'   uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian
 #'   covariance matrix will be used.
 #' @param overall_uncertainty logical; should the uncertainty in the model
-#'  constant term be included in the standard error of the evaluate values of
-#'  the smooth?
+#'   constant term be included in the standard errors of smooth and parametric
+#'   effects? For parametric effects this includes the intercept variance and
+#'   its covariance with the term, without changing the partial estimates.
+#'   Each term uses the intercept of its own linear predictor.
 #' @param dist numeric; if greater than 0, this is used to determine when
 #'   a location is too far from data to be plotted when plotting 2-D smooths.
 #'   The data are scaled into the unit square before deciding what to exclude,
@@ -90,11 +126,25 @@
 #'   discrete variables.
 #' @param continuous_colour a suitable colour scale to be used when plotting
 #'   continuous variables.
-#' @param geom character; either `"raster"` (the default) or `"tile"` for flat
-#'   smooth surfaces, including faceted and soap-film plots. Raster rendering
-#'   keeps large PDF plots compact; tiles are individual borderless rectangles
-#'   that remain vector elements in PDF and SVG output, potentially increasing
-#'   file size. Other plot types, including spherical smooths, are unchanged.
+#' @param surface character; one of `"raster"` (the default), `"tile"`, or
+#'   `"3d"`. Raster surfaces keep large PDF plots compact; tiles are borderless
+#'   vector rectangles. Three-dimensional surfaces use the optional `ggcube`
+#'   package, with the displayed partial effect as height and fill. Numeric
+#'   smooth and parametric surfaces, including conditioning facets and soap
+#'   films, are supported. Curves and factor estimates keep their usual display;
+#'   spherical smooths retain their geographic rendering.
+#'   Covariate scale changes that produce irregular spacing use rectangles
+#'   bounded by adjacent coordinate midpoints for flat surfaces.
+#' @param surface_3d named list of view options passed to [ggcube::coord_3d()],
+#'   for example `list(yaw = 45, persp = FALSE)`. The default `list()` uses the
+#'   default view with `ggcube::light(backface_scale = 1)`, preserving equal
+#'   horizontal units for isotropic smooths. Supply `light = ggcube::light(...)`
+#'   in this list to override lighting; `ggcube::light(method = "none")` disables
+#'   it. An explicitly supplied `light` replaces the entire default light.
+#'   Only the coordinate system is used; ggcube's theme settings are not applied.
+#'   These options affect all 3D panels in a call. For different views per term,
+#'   modify individual plots returned by [assemble()]. The `dist` entry here
+#'   controls perspective; the top-level `dist` argument controls masking.
 #' @param continuous_fill a suitable fill scale to be used when plotting
 #'   continuous variables.
 #' @param position Position adjustment, either as a string, or the result of a
@@ -113,24 +163,63 @@
 #' @param crs the coordinate reference system (CRS) to use for the plot. All
 #'   data will be projected into this CRS. See [ggplot2::coord_sf()] for
 #'   details.
-#' @param default_crs the coordinate reference system (CRS) to use for the
-#'   non-sf layers in the plot. If left at the default `NULL`, the CRS used is
-#'   4326 (WGS84), which is appropriate for spline-on-the-sphere smooths, which
-#'   are parameterized in terms of latitude and longitude as coordinates. See
-#'   [ggplot2::coord_sf()] for more details.
-#' @param lims_method character; affects how the axis limits are determined. See
-#'   [ggplot2::coord_sf()]. Be careful; in testing of some examples, changing
-#'   this to `"orthogonal"` for example with the chlorophyll-a example from
-#'   Simon Wood's GAM book quickly used up all the RAM in my test system and the
-#'   OS killed R. This could be incorrect usage on my part; right now the grid
-#'   of points at which SOS smooths are evaluated (if not supplied by the user)
-#'   can produce invalid coordinates for the corners of tiles as the grid is
-#'   generated for tile centres without respect to the spacing of those tiles.
+#' @param default_crs the coordinate reference system (CRS) to use for non-sf
+#'   layers added to spherical plots. The default, `NULL`, uses 4326 (WGS84).
+#'   Internally generated surface cells, contours and observation points have
+#'   their own geographic CRS, with longitude on the horizontal axis and
+#'   latitude on the vertical axis. See [ggplot2::coord_sf()] for more details.
+#' @param lims_method character; affects how spherical plot axis limits are
+#'   determined. The default, `"geometry_bbox"`, uses the rendered geometry.
+#'   Passed to [ggplot2::coord_sf()]. Spherical surfaces use explicit
+#'   geographic cells with valid polar and date-line boundaries. Orthographic
+#'   plots clip cells, contours and observation points to the visible hemisphere
+#'   before projection. Explicit prediction data on a rectilinear grid retain
+#'   their actual spacing; scattered or singleton coordinates are drawn as
+#'   points, with a message, because they do not define surface cells. Incomplete
+#'   observation rug coordinates are omitted. Grouped factor-by spherical
+#'   surfaces use separate facets for each factor level.
 #' @param wrap logical; wrap plots as a patchwork? If \code{FALSE}, a list of
 #'   ggplot objects is returned, 1 per term plotted.
 #' @param caption logical; show the smooth type in the caption of each plot?
-#' @param envir an environment to look up the data within.
+#' @param envir an optional environment for looking up data, functions and
+#'   constants. Defaults to the model's evaluation environment.
 #' @param ... additional arguments passed to [patchwork::wrap_plots()].
+#'
+#' @details
+#' Random-effect tensor plots put continuous covariates before factors. Two
+#' continuous covariates form a surface, with remaining factor levels and numeric
+#' slices forming conditioning panels, consistently for `te()`, `ti()` and `t2()`.
+#' One continuous covariate gives curves for categorical combinations;
+#' categorical-only terms give point ranges. Up to four covariates are supported.
+#' Numeric conditioning slices use `n_3d` or `n_4d`. For factor conditioning
+#' dimensions, these controls retain at most that many levels, taking the first
+#' levels in fitted order. Explicit `re_levels` selections take precedence.
+#' Supplied `data` and precomputed estimates retain their rows; select specific
+#' factor levels with `re_levels`, or use [data_slice()] to fix conditioning
+#' covariates. Observation layers do not introduce additional surface panels.
+#'
+#' Three-dimensional faces retain the current diverging RdBu fill scale and
+#' effect-range rules, shared across conditioning facets. `continuous_fill`
+#' overrides the fill scale. Faces have no outlines; `contour_col` controls
+#' contour lines. Surface faces are fully opaque. Faces, contours, and floor
+#' observations are depth-sorted together, so nearer faces hide the parts behind
+#' them. The existing theme and facet styling are retained.
+#'
+#' The first two displayed covariates form the horizontal axes, and the effect
+#' (or standard error when requested) forms the vertical axis. Additional
+#' covariates retain their existing conditioning facets: `n_2d` controls surface
+#' resolution, while `n_3d` and `n_4d` control covariate slices. Fixed effect
+#' ranges are also used for the vertical axis. Confidence surfaces are not added.
+#'
+#' Contours follow the displayed mesh, and available observations are projected
+#' onto its floor. Observations are not assigned to conditioning slices. Soap
+#' boundary loops are also projected onto the floor.
+#'
+#' Supplied scattered evaluation data use piecewise-linear Delaunay triangles
+#' and require the optional `geometry` package. Support masking and
+#' soap-domain checks require `sf`. Faces crossing known excluded regions
+#' are discarded conservatively. Fully masked slices remain empty; insufficient
+#' non-collinear locations or conflicting heights at one location are errors.
 #'
 #' @note Internally, plots of each smooth are created using [ggplot2::ggplot()]
 #'   and composed into a single plot using [patchwork::wrap_plots()]. As a
@@ -169,7 +258,18 @@
 #' df2 <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
 #' m2 <- gam(y ~ s(x, z, k = 40), data = df2, method = "REML")
 #' draw(m2, contour = FALSE, n_2d = 50)
-#' draw(m2, geom = "tile", n_2d = 30)
+#' draw(m2, surface = "tile", n_2d = 30)
+#'
+#' if (requireNamespace("ggcube", quietly = TRUE)) {
+#'   draw(m2, surface = "3d", n_2d = 20,
+#'     surface_3d = list(yaw = 45, persp = FALSE))
+#'   panels <- assemble(m2, surface = "3d", n_2d = 20)
+#'   # Replace coordinates to customize a single term; retain the current theme.
+#'   panels[[1]] <- panels[[1]] +
+#'     ggcube::coord_3d(yaw = -20,
+#'       light = ggcube::light(backface_scale = 1))[[1]]
+#'   patchwork::wrap_plots(panels)
+#' }
 #'
 #' # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 #' # for more examples and for details on how to modify the theme of all the
@@ -179,7 +279,7 @@
   object,
   data = NULL,
   select = NULL,
-  parametric = FALSE,
+  parametric = NULL,
   terms = NULL,
   residuals = FALSE,
   scales = c("free", "fixed"),
@@ -214,14 +314,19 @@
   guides = "keep", widths = NULL, heights = NULL,
   crs = NULL,
   default_crs = NULL,
-  lims_method = "cross",
+  lims_method = "geometry_bbox",
   wrap = TRUE,
   caption = TRUE,
-  envir = environment(formula(object)),
-  geom = c("raster", "tile"),
+  envir = NULL,
+  surface = c("raster", "tile", "3d"),
+  surface_3d = list(),
+  back_transform = FALSE,
+  re_levels = NULL,
   ...
 ) {
-  geom <- match.arg(geom)
+  surface <- match.arg(surface)
+  validate_surface_3d(surface_3d)
+  check_surface_dots(match.call(expand.dots = FALSE))
 
 
   # run assemble() without calling it all directly
@@ -258,11 +363,8 @@
 }
 
 #' @export
-`draw.list` <- function(object, ...) {
-  if (!is_gamm4(object)) {
-    stop("Don't know how to draw a list")
-  }
-  draw(object$gam, ...)
+`draw.gamm4` <- function(object, ...) {
+  draw(gamm4_gam(object), ...)
 }
 
 #' @export

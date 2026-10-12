@@ -2,13 +2,13 @@
 % Please edit documentation in R/draw-gam.R
 \name{draw.gam}
 \alias{draw.gam}
-\title{Plot estimated smooths from a fitted GAM}
+\title{Plot smooth and parametric terms from a fitted GAM}
 \usage{
 \method{draw}{gam}(
   object,
   data = NULL,
   select = NULL,
-  parametric = FALSE,
+  parametric = NULL,
   terms = NULL,
   residuals = FALSE,
   scales = c("free", "fixed"),
@@ -46,11 +46,14 @@
   heights = NULL,
   crs = NULL,
   default_crs = NULL,
-  lims_method = "cross",
+  lims_method = "geometry_bbox",
   wrap = TRUE,
   caption = TRUE,
-  envir = environment(formula(object)),
-  geom = c("raster", "tile"),
+  envir = NULL,
+  surface = c("raster", "tile", "3d"),
+  surface_3d = list(),
+  back_transform = FALSE,
+  re_levels = NULL,
   ...
 )
 }
@@ -70,13 +73,19 @@ as shown for example in the output from \code{summary(object)}. Logical
 \code{select} operates as per numeric \code{select} in the order that smooths are
 stored.}
 
-\item{parametric}{logical; plot parametric terms also? Note that \code{select} is
-used for selecting which smooths to plot. The \code{terms} argument is used to
-select which parametric effects are plotted. The default, as with
-\code{\link[mgcv:plot.gam]{mgcv::plot.gam()}}, is to not draw parametric effects.}
+\item{parametric}{logical or \code{NULL}; plot parametric terms also? The default,
+\code{NULL}, includes parametric terms when \code{select = NULL}, but excludes them
+when smooths are selected explicitly. Use \code{TRUE} to include parametric terms
+regardless of \code{select}, or \code{FALSE} to draw only smooths (the previous
+default). The \code{terms} argument selects which parametric effects are plotted;
+\code{select} selects only smooths.}
 
 \item{terms}{character; which model parametric terms should be drawn? The
-Default of \code{NULL} will plot all parametric terms that can be drawn.}
+Default of \code{NULL} will plot all parametric terms that can be drawn.
+Interactions show their individual contributions to the linear predictor;
+main effects and intercepts are not added. Multivariate parametric terms
+use the grid and surface controls below, as described in
+\code{\link[=parametric_effects]{parametric_effects()}}.}
 
 \item{residuals}{logical; should partial residuals for a smooth be drawn?
 Ignored for anything but a simple univariate smooth.}
@@ -101,20 +110,26 @@ use \code{n} instead. Ignored when evaluation \code{data} are supplied. Factor l
 are retained, and curves with only one continuous covariate use \code{n}.}
 
 \item{n_3d}{numeric; the number of new observations to generate for the third
-dimension of a 3D smooth.}
+dimension of a 3D smooth. Factor conditioning dimensions retain at most
+this many levels, taking the first levels in fitted order. Explicit
+\code{re_levels} selections take precedence; supplied \code{data} are unchanged.}
 
 \item{n_4d}{numeric; the number of new observations to generate for the
 dimensions higher than 2 (!) of a \emph{k}D smooth (\emph{k} >= 4). For example, if
 the smooth is a 4D smooth, each of dimensions 3 and 4 will get \code{n_4d}
-new observations.}
+new observations. For factor conditioning dimensions, this is the maximum
+number of levels retained per dimension, taking the first in fitted order.
+Explicit \code{re_levels} selections take precedence; supplied \code{data} are unchanged.}
 
 \item{unconditional}{logical; should confidence intervals include the
 uncertainty due to smoothness selection? If \code{TRUE}, the corrected Bayesian
 covariance matrix will be used.}
 
 \item{overall_uncertainty}{logical; should the uncertainty in the model
-constant term be included in the standard error of the evaluate values of
-the smooth?}
+constant term be included in the standard errors of smooth and parametric
+effects? For parametric effects this includes the intercept variance and
+its covariance with the term, without changing the partial estimates.
+Each term uses the intercept of its own linear predictor.}
 
 \item{constant}{numeric; a constant to add to the estimated values of the
 smooth. \code{constant}, if supplied, will be added to the estimated value
@@ -197,33 +212,78 @@ use a fixed aspect ratio.}
 data will be projected into this CRS. See \code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}} for
 details.}
 
-\item{default_crs}{the coordinate reference system (CRS) to use for the
-non-sf layers in the plot. If left at the default \code{NULL}, the CRS used is
-4326 (WGS84), which is appropriate for spline-on-the-sphere smooths, which
-are parameterized in terms of latitude and longitude as coordinates. See
-\code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}} for more details.}
+\item{default_crs}{the coordinate reference system (CRS) to use for non-sf
+layers added to spherical plots. The default, \code{NULL}, uses 4326 (WGS84).
+Internally generated surface cells, contours and observation points have
+their own geographic CRS, with longitude on the horizontal axis and
+latitude on the vertical axis. See \code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}} for more details.}
 
-\item{lims_method}{character; affects how the axis limits are determined. See
-\code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}}. Be careful; in testing of some examples, changing
-this to \code{"orthogonal"} for example with the chlorophyll-a example from
-Simon Wood's GAM book quickly used up all the RAM in my test system and the
-OS killed R. This could be incorrect usage on my part; right now the grid
-of points at which SOS smooths are evaluated (if not supplied by the user)
-can produce invalid coordinates for the corners of tiles as the grid is
-generated for tile centres without respect to the spacing of those tiles.}
+\item{lims_method}{character; affects how spherical plot axis limits are
+determined. The default, \code{"geometry_bbox"}, uses the rendered geometry.
+Passed to \code{\link[ggplot2:coord_sf]{ggplot2::coord_sf()}}. Spherical surfaces use explicit
+geographic cells with valid polar and date-line boundaries. Orthographic
+plots clip cells, contours and observation points to the visible hemisphere
+before projection. Explicit prediction data on a rectilinear grid retain
+their actual spacing; scattered or singleton coordinates are drawn as
+points, with a message, because they do not define surface cells. Incomplete
+observation rug coordinates are omitted. Grouped factor-by spherical
+surfaces use separate facets for each factor level.}
 
 \item{wrap}{logical; wrap plots as a patchwork? If \code{FALSE}, a list of
 ggplot objects is returned, 1 per term plotted.}
 
 \item{caption}{logical; show the smooth type in the caption of each plot?}
 
-\item{envir}{an environment to look up the data within.}
+\item{envir}{an optional environment for looking up data, functions and
+constants. Defaults to the model's evaluation environment.}
 
-\item{geom}{character; either \code{"raster"} (the default) or \code{"tile"} for flat
-smooth surfaces, including faceted and soap-film plots. Raster rendering
-keeps large PDF plots compact; tiles are individual borderless rectangles
-that remain vector elements in PDF and SVG output, potentially increasing
-file size. Other plot types, including spherical smooths, are unchanged.}
+\item{surface}{character; one of \code{"raster"} (the default), \code{"tile"}, or
+\code{"3d"}. Raster surfaces keep large PDF plots compact; tiles are borderless
+vector rectangles. Three-dimensional surfaces use the optional \code{ggcube}
+package, with the displayed partial effect as height and fill. Numeric
+smooth and parametric surfaces, including conditioning facets and soap
+films, are supported. Curves and factor estimates keep their usual display;
+spherical smooths retain their geographic rendering.
+Covariate scale changes that produce irregular spacing use rectangles
+bounded by adjacent coordinate midpoints for flat surfaces.}
+
+\item{surface_3d}{named list of view options passed to \code{\link[ggcube:coord_3d]{ggcube::coord_3d()}},
+for example \code{list(yaw = 45, persp = FALSE)}. The default \code{list()} uses the
+default view with \code{ggcube::light(backface_scale = 1)}, preserving equal
+horizontal units for isotropic smooths. Supply \code{light = ggcube::light(...)}
+in this list to override lighting; \code{ggcube::light(method = "none")} disables
+it. An explicitly supplied \code{light} replaces the entire default light.
+Only the coordinate system is used; ggcube's theme settings are not applied.
+These options affect all 3D panels in a call. For different views per term,
+modify individual plots returned by \code{\link[=assemble]{assemble()}}. The \code{dist} entry here
+controls perspective; the top-level \code{dist} argument controls masking.}
+
+\item{back_transform}{logical; plot covariates on their original scale?
+Defaults to \code{FALSE}, using model coordinates such as \code{log(x)} for a term
+containing \code{log(x)}. With \code{TRUE}, recover the raw covariates, generate a
+grid on their original scale and evaluate the model expressions forwards.
+Applies to axes, rugs, partial-residual locations and conditioning facets,
+including tensor products and parametric interactions. Each smooth axis
+must depend on one distinct original model covariate. Functions such as
+\code{foo(x)} are supported when their raw inputs and functions can be recovered;
+no inverse function is needed. Missing raw data or unavailable functions
+produce an error; supply \code{data} or \code{envir} as appropriate.
+With supplied prediction \code{data}, unavailable raw fitting observations
+omit rugs and partial residuals; prediction rows are never used as observations.
+For precomputed smooth estimates, prepare raw grids with
+\code{smooth_estimates(model, back_transform = TRUE)} before drawing with
+\code{back_transform = TRUE}. Raw inputs supplied through \code{data} also retain
+their coordinates. Transformed-only estimates cannot be relabelled on the
+raw scale, including grids carrying typical values from \code{include_all = TRUE}.
+Transformed soap-film boundaries lack retained raw coordinates and must
+be drawn with \code{back_transform = FALSE}.
+Parametric estimates retain both scales; multi-column basis
+expansions retain raw axes on either setting. Does not transform estimated
+effects or their intervals; use \code{fun} for that.}
+
+\item{re_levels}{named list of factor level labels to retain in tensor products
+with random-effect margins, for example \code{list(species = c("a", "b"))}.
+Fitted factor order and ordered status are retained.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
@@ -231,9 +291,44 @@ file size. Other plot types, including spherical smooths, are unchanged.}
 The object returned is created by \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.
 }
 \description{
-Plots estimated smooths from a fitted GAM model in a similar way to
-\code{mgcv::plot.gam()} but instead of using base graphics, \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}
-is used instead.
+Plots smooth and parametric contributions from a fitted GAM model using
+\code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}.
+}
+\details{
+Random-effect tensor plots put continuous covariates before factors. Two
+continuous covariates form a surface, with remaining factor levels and numeric
+slices forming conditioning panels, consistently for \code{te()}, \code{ti()} and \code{t2()}.
+One continuous covariate gives curves for categorical combinations;
+categorical-only terms give point ranges. Up to four covariates are supported.
+Numeric conditioning slices use \code{n_3d} or \code{n_4d}. For factor conditioning
+dimensions, these controls retain at most that many levels, taking the first
+levels in fitted order. Explicit \code{re_levels} selections take precedence.
+Supplied \code{data} and precomputed estimates retain their rows; select specific
+factor levels with \code{re_levels}, or use \code{\link[=data_slice]{data_slice()}} to fix conditioning
+covariates. Observation layers do not introduce additional surface panels.
+
+Three-dimensional faces retain the current diverging RdBu fill scale and
+effect-range rules, shared across conditioning facets. \code{continuous_fill}
+overrides the fill scale. Faces have no outlines; \code{contour_col} controls
+contour lines. Surface faces are fully opaque. Faces, contours, and floor
+observations are depth-sorted together, so nearer faces hide the parts behind
+them. The existing theme and facet styling are retained.
+
+The first two displayed covariates form the horizontal axes, and the effect
+(or standard error when requested) forms the vertical axis. Additional
+covariates retain their existing conditioning facets: \code{n_2d} controls surface
+resolution, while \code{n_3d} and \code{n_4d} control covariate slices. Fixed effect
+ranges are also used for the vertical axis. Confidence surfaces are not added.
+
+Contours follow the displayed mesh, and available observations are projected
+onto its floor. Observations are not assigned to conditioning slices. Soap
+boundary loops are also projected onto the floor.
+
+Supplied scattered evaluation data use piecewise-linear Delaunay triangles
+and require the optional \code{geometry} package. Support masking and
+soap-domain checks require \code{sf}. Faces crossing known excluded regions
+are discarded conservatively. Fully masked slices remain empty; insufficient
+non-collinear locations or conflicting heights at one location are errors.
 }
 \note{
 Internally, plots of each smooth are created using \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}
@@ -259,7 +354,18 @@ draw(m1, residuals = TRUE)
 df2 <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
 m2 <- gam(y ~ s(x, z, k = 40), data = df2, method = "REML")
 draw(m2, contour = FALSE, n_2d = 50)
-draw(m2, geom = "tile", n_2d = 30)
+draw(m2, surface = "tile", n_2d = 30)
+
+if (requireNamespace("ggcube", quietly = TRUE)) {
+  draw(m2, surface = "3d", n_2d = 20,
+    surface_3d = list(yaw = 45, persp = FALSE))
+  panels <- assemble(m2, surface = "3d", n_2d = 20)
+  # Replace coordinates to customize a single term; retain the current theme.
+  panels[[1]] <- panels[[1]] +
+    ggcube::coord_3d(yaw = -20,
+      light = ggcube::light(backface_scale = 1))[[1]]
+  patchwork::wrap_plots(panels)
+}
 
 # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 # for more examples and for details on how to modify the theme of all the

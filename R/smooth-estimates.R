@@ -21,12 +21,29 @@
 #' @param n_3d,n_4d numeric; the number of points along the third axis of a
 #'   3D smooth (`n_3d`, default 16), or each axis after the first two for smooths
 #'   of dimension four or higher (`n_4d`, default 4). If `NULL`, use `n` for
-#'   those axes. The first two surface axes use `n_2d`.
+#'   those axes. For factor conditioning dimensions, retain at most that many
+#'   levels, taking the first in fitted order. The first two surface axes use
+#'   `n_2d`. Supplied `data` are unchanged.
 #' @param data a data frame of covariate values at which to evaluate the
 #'   smooth.
 #' @param envir an optional environment supplying functions and constants used
 #'   in model expressions. The available model formula environment is used when
 #'   `NULL`. Covariate observations should be supplied in `data`.
+#' @param back_transform logical; generate automatic grids on the original
+#'   covariate scale? The default, `FALSE`, preserves evenly spaced model-scale
+#'   grids (e.g. in `log(x)`). With `TRUE`, recover raw fitting covariates and
+#'   generate grids on their original scale, then evaluate the model expressions
+#'   forwards. Each axis must depend on one distinct original model covariate.
+#'   Functions such as `foo(x)` require no inverse. Fitted prediction parameters
+#'   are retained where provided by the model, including for `scale(x)`.
+#'   When `data` are supplied, use those rows without generating a grid; `TRUE`
+#'   requires raw coordinates for each axis. Returned model-coordinate columns
+#'   keep their usual names and raw coordinates are retained in auxiliary
+#'   `.gratia_raw_*` columns. Draw these estimates with
+#'   `draw(object, back_transform = TRUE)` to display the raw coordinates.
+#'   Estimates containing only transformed coordinates give an informative error
+#'   if drawn on the original scale. This option does not change effect values
+#'   or their intervals at the chosen evaluation points.
 #' @param overall_uncertainty logical; should the uncertainty in the model
 #'  constant term be included in the standard error of the evaluate values of
 #'  the smooth?
@@ -47,6 +64,11 @@
 #' @return A data frame (tibble), which is of class `"smooth_estimates"`.
 #'
 #' @details
+#' When distinct fitted terms share both their smooth label and type (for
+#' example, tensor products of soap-film components), `.smooth_id` contains
+#' their fitted smooth indices. This preserves their identity in saved
+#' estimates and plots without changing the labels supplied by mgcv.
+#'
 #' For explicit `data`, missing covariates needed by a smooth produce `NA`
 #' estimates and standard errors at those positions. Missing values in variables
 #' unrelated to that smooth do not discard its otherwise evaluable rows.
@@ -62,6 +84,18 @@
 #' used to fit the model is no longer available. Evaluating that function at new
 #' raw data requires `envir`; training values are never substituted for new
 #' observations. Arbitrary transformations are not inverted to recover raw data.
+#' The `coordinate_info` attribute identifies retained raw coordinate columns.
+#' [draw()] uses them for `back_transform = TRUE`; the usual coordinate
+#' columns remain on the model scale. Automatic raw grids require recoverable
+#' fitting rows and matching functions and constants. Supplied raw `data`
+#' instead define the prediction rows directly.
+#' Typical covariate values added to evaluated grids by `include_all = TRUE`
+#' are not raw axis coordinates. Numeric `by` multipliers are set to one on
+#' automatic grids, even when their name also identifies a raw axis; supplied
+#' prediction rows retain their actual multipliers. Soap-film boundary rows
+#' retain model coordinates only. If a boundary axis is transformed, draw the
+#' estimates with `back_transform = FALSE`; raw-scale drawing gives an error
+#' rather than dropping the boundary.
 
 #'
 #' @export
@@ -120,7 +154,9 @@
     partial_match = FALSE,
     clip = FALSE,
     envir = NULL,
+    back_transform = FALSE,
     ...) {
+  check_back_transform(back_transform)
   model_name <- expr_label(substitute(object))
   object <- with_model_envir(object, envir)
   if (lifecycle::is_present(smooth)) {
@@ -154,7 +190,11 @@
       )
     }
     # Evaluate only selected smooths; unrelated model terms are not needed.
-    for (sm in smooths) data <- prepare_smooth_data(object, sm, data)
+    for (sm in smooths) {
+      data <- prepare_smooth_data(object, sm, data)
+      data <- retain_smooth_coordinates(data, smooth_variable(sm), object,
+        required = back_transform)
+    }
   }
 
   # # fix up the n, n_3d, n_4d. If `n_3d` is `NULL` set `n_3d <- n`
@@ -178,11 +218,11 @@
           data = data, unconditional = unconditional,
           frequentist = frequentist,
           overall_uncertainty = overall_uncertainty, dist = dist,
-          clip = clip
+          clip = clip, back_transform = back_transform
         ),
         object = object, n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, data = data,
         unconditional = unconditional, frequentist = frequentist,
-        overall_uncertainty = overall_uncertainty, dist = dist, clip = clip,
+        overall_uncertainty = overall_uncertainty, dist = dist, clip = clip, back_transform = back_transform,
         eval_smooth = gratia::eval_smooth
       )
     )
@@ -201,9 +241,22 @@
       frequentist = frequentist,
       overall_uncertainty = overall_uncertainty,
       dist = dist,
-      clip = clip
+      clip = clip, back_transform = back_transform
     )
   }
+
+  # Tensor products of the two soap components can share both label and type.
+  # Retain fitted indices only for otherwise indistinguishable output terms.
+  identities <- paste(vapply(smooths, smooth_label, character(1)),
+    vapply(smooths, smooth_type, character(1)), sep = "\r")
+  if (anyDuplicated(identities)) {
+    for (i in seq_along(sm_list)) sm_list[[i]]$.smooth_id <- smooth_ids[[i]]
+  }
+
+  surface_support <- Map(function(sm, estimates) {
+    smooth_surface_support(object, sm, estimates, dist)
+  }, smooths, sm_list)
+  names(surface_support) <- vapply(smooths, smooth_label, character(1))
 
   # see if we have any tensor term orders to collect & apply
   tensor_term_order <- lapply(sm_list, attr, "tensor_term_order")
@@ -217,6 +270,14 @@
 
   # add back any special attributes
   attr(sm_list, "tensor_term_order") <- do.call("c", tensor_term_order)
+  coordinate_labels <- unique(unlist(lapply(smooths, terms_in_smooth)))
+  coordinate_info <- stats::setNames(lapply(coordinate_labels,
+    smooth_coordinate_info, model = object, data = data), coordinate_labels)
+  attr(coordinate_info, "smooth_variables") <- stats::setNames(
+    lapply(smooths, smooth_variable), vapply(smooths, smooth_label, character(1)))
+  attr(sm_list, "coordinate_info") <- coordinate_info
+  attr(sm_list, "surface_support") <- surface_support
+  attr(sm_list, "tensor_plot_info") <- tensor_plot_info(object, smooths)
 
   ## add a class
   class(sm_list) <- c("smooth_estimates", class(sm_list))
@@ -242,11 +303,8 @@
 
 # gamm4 method
 #' @export
-`smooth_estimates.list` <- function(object, ...) {
-  if (!is_gamm4(object)) {
-    stop("'smooth_estimates()' not available for a generic list")
-  }
-  smooth_estimates(object[["gam"]], ...)
+`smooth_estimates.gamm4` <- function(object, ...) {
+  smooth_estimates(gamm4_gam(object), ...)
 }
 
 #' Check user-supplied data for suitability
@@ -433,7 +491,8 @@
   se.fit <- sqrt(pmax(0, rs))
 
   ## identify which vars are needed for this smooth...
-  keep_vars <- terms_in_smooth(smooth)
+  keep_vars <- unique(c(terms_in_smooth(smooth),
+    smooth_coordinate_columns(model, terms_in_smooth(smooth), data)))
   ## ... then keep only those vars
   data <- select(data, all_of(keep_vars))
 
@@ -537,7 +596,8 @@
   label <- smooth_label(smooth)
 
   ## identify which vars are needed for this smooth...
-  keep_vars <- terms_in_smooth(smooth)
+  keep_vars <- unique(c(terms_in_smooth(smooth),
+    smooth_coordinate_columns(model, terms_in_smooth(smooth), data)))
   ## ... then keep only those vars
   data <- select(data, all_of(keep_vars))
 
@@ -584,6 +644,7 @@
                                       overall_uncertainty = TRUE,
                                       dist = NULL,
   envir = NULL,
+  back_transform = FALSE,
                                       ...) {
   model <- with_model_envir(model, envir)
   by_var <- by_variable(smooth) # even if not a by as we want NA later
@@ -593,7 +654,7 @@
 
   ## deal with data if supplied
   data <- process_user_data_for_eval(
-    data = data, model = model,
+    data = data, model = model, back_transform = back_transform,
     n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
     id = which_smooth(
       model,
@@ -645,6 +706,7 @@
   overall_uncertainty = TRUE,
   clip = TRUE, # ?hmm thinking
   envir = NULL,
+  back_transform = FALSE,
   ...
 ) {
   model <- with_model_envir(model, envir)
@@ -660,7 +722,7 @@
   #  data <- soap_film_data(smooth, n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d)
   #}
   data <- process_user_data_for_eval(
-    data = data, model = model,
+    data = data, model = model, back_transform = back_transform,
     n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
     id = which_smooth(
       model,
@@ -682,8 +744,8 @@
       is_inside <- inside(
         data,
         bnd,
-        x_var = smooth$vn[[1]],
-        y_var = smooth$vn[[2]]
+        x_var = smooth_variable(smooth)[[1]],
+        y_var = smooth_variable(smooth)[[2]]
       )
 
       data <- filter(data, is_inside)
@@ -750,6 +812,7 @@
                                       overall_uncertainty = TRUE,
                                       dist = NULL,
   envir = NULL,
+  back_transform = FALSE,
                                       ...) {
   model <- with_model_envir(model, envir)
   by_var <- by_variable(smooth) # even if not a by as we want NA later
@@ -759,7 +822,7 @@
 
   ## deal with data if supplied
   data <- process_user_data_for_eval(
-    data = data, model = model,
+    data = data, model = model, back_transform = back_transform,
     n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
     id = which_smooth(model, smooth_label(smooth))
   )
@@ -811,7 +874,7 @@
 #' @importFrom vctrs vec_slice
 `process_user_data_for_eval` <- function(
     data, model, n, n_3d, n_4d, id, n_2d = NULL,
-    var_order = NULL) {
+    var_order = NULL, back_transform = FALSE) {
   if (is.null(data)) {
     data <- smooth_data(
       model = model,
@@ -820,11 +883,15 @@
       n_3d = n_3d,
       n_4d = n_4d,
       id = id,
-      var_order = var_order
+      var_order = var_order, back_transform = back_transform
     )
   } else {
+    spec <- tensor_plot_spec(model, id)
     smooth <- get_smooths_by_id(model, id)[[1L]]
     data <- prepare_smooth_data(model, smooth, data)
+    data <- retain_smooth_coordinates(data, smooth_variable(smooth), model,
+      required = back_transform)
+    if (!is.null(spec)) data <- filter_tensor_levels(data, spec$levels)
     vars <- smooth_variable(smooth)
     by_var <- by_variable(smooth)
     if (!identical(by_var, "NA")) {
@@ -852,6 +919,7 @@
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   envir = NULL,
+  back_transform = FALSE,
   ...
 ) {
   model <- with_model_envir(model, envir)
@@ -867,11 +935,13 @@
   # with the factor last. So use the reordering functionality in place for
   # >=3D tensor product smooths
   var_order <- reorder_tensor_smooth_terms(smooth)
+  spec <- tensor_plot_spec(model, which_smooth(model, smooth_label(smooth)))
+  if (!is.null(spec)) var_order <- spec$variables
 
   ## deal with data if supplied
   id <- which_smooth(model, smooth_label(smooth))
   data <- process_user_data_for_eval(
-    data = data, model = model,
+    data = data, model = model, back_transform = back_transform,
     n = n, n_2d = n_2d, n_3d = NULL, n_4d = NULL, id = id, var_order = var_order
   )
 
@@ -906,6 +976,7 @@
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   envir = NULL,
+  back_transform = FALSE,
   ...
 ) {
   model <- with_model_envir(model, envir)
@@ -917,7 +988,7 @@
   ## deal with data if supplied
   id <- which_smooth(model, smooth_label(smooth))
   data <- process_user_data_for_eval(
-    data = data, model = model,
+    data = data, model = model, back_transform = back_transform,
     n = n, n_2d = n_2d, n_3d = NULL, n_4d = NULL,
     id = id
   )
@@ -952,6 +1023,7 @@
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   envir = NULL,
+  back_transform = FALSE,
   ...
 ) {
   model <- with_model_envir(model, envir)
@@ -963,7 +1035,7 @@
   ## deal with data if supplied
   id <- which_smooth(model, smooth_label(smooth))
   data <- process_user_data_for_eval(
-    data = data, model = model,
+    data = data, model = model, back_transform = back_transform,
     n = n, n_2d = n_2d, n_3d = NULL, n_4d = NULL,
     id = id
   )
@@ -998,6 +1070,7 @@
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   envir = NULL,
+  back_transform = FALSE,
   ...) {
   model <- with_model_envir(model, envir)
   .NotYetImplemented()
@@ -1019,6 +1092,7 @@
   overall_uncertainty = TRUE,
   dist = NULL,
   envir = NULL,
+  back_transform = FALSE,
   ...
 ) {
   model <- with_model_envir(model, envir)
@@ -1029,11 +1103,13 @@
 
   # order of variables
   var_order <- reorder_tensor_smooth_terms(smooth)
+  spec <- tensor_plot_spec(model, which_smooth(model, smooth_label(smooth)))
+  if (!is.null(spec)) var_order <- spec$variables
 
   ## deal with data if supplied
   id <- which_smooth(model, smooth_label(smooth))
   data <- process_user_data_for_eval(
-    data = data, model = model,
+    data = data, model = model, back_transform = back_transform,
     n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
     id = id, var_order = var_order
   )
@@ -1089,6 +1165,7 @@
   overall_uncertainty = TRUE,
   dist = NULL,
   envir = NULL,
+  back_transform = FALSE,
   ...) {
   model <- with_model_envir(model, envir)
   by_var <- by_variable(smooth) # even if not a by as we want NA later
@@ -1098,11 +1175,13 @@
 
   # order of variables
   var_order <- reorder_tensor_smooth_terms(smooth)
+  spec <- tensor_plot_spec(model, which_smooth(model, smooth_label(smooth)))
+  if (!is.null(spec)) var_order <- spec$variables
 
   # deal with data if supplied
   id <- which_smooth(model, smooth_label(smooth))
   data <- process_user_data_for_eval(
-    data = data, model = model,
+    data = data, model = model, back_transform = back_transform,
     n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
     id = id, var_order = var_order
   )
@@ -1166,6 +1245,8 @@
 #' # plot all of the estimated smooths
 #' sm <- smooth_estimates(m)
 #' draw(sm)
+#' m_log <- gam(y ~ s(log(x1), k = 6), data = df)
+#' draw(smooth_estimates(m_log, back_transform = TRUE), back_transform = TRUE)
 #' # evaluate smooth of `x2`
 #' sm <- smooth_estimates(m, select = "s(x2)")
 #' # plot it
@@ -1186,7 +1267,7 @@
 #'
 #' # Render a bivariate smooth as vector tiles
 #' m_surface <- gam(y ~ s(x0, x1), data = df, method = "REML")
-#' draw(smooth_estimates(m_surface, n_2d = 20), geom = "tile")
+#' draw(smooth_estimates(m_surface, n_2d = 20), surface = "tile")
 `draw.smooth_estimates` <- function(object,
                                     constant = NULL,
                                     fun = NULL,
@@ -1210,11 +1291,28 @@
                                     ylim = NULL,
                                     crs = NULL,
                                     default_crs = NULL,
-                                    lims_method = "cross",
+                                    lims_method = "geometry_bbox",
                                     caption = TRUE,
-                                    geom = c("raster", "tile"),
+                                    surface = c("raster", "tile", "3d"),
+                                    surface_3d = list(),
+                                    back_transform = FALSE,
+                                    re_levels = NULL,
                                     ...) {
-  geom <- match.arg(geom)
+  check_back_transform(back_transform)
+  surface <- match.arg(surface)
+  validate_surface_3d(surface_3d)
+  check_surface_dots(match.call(expand.dots = FALSE))
+  validate_tensor_plot_controls(re_levels)
+  validate_estimate_re_levels(object, re_levels)
+  plot_info <- attr(object, "tensor_plot_info")
+  surface_support <- attr(object, "surface_support")
+  if ("data" %in% names(object) && !".estimate" %in% names(object)) {
+    coordinate_info <- attr(object, "coordinate_info")
+    tensor_term_order <- attr(object, "tensor_term_order")
+    object <- tidyr::unnest(object, cols = "data")
+    attr(object, "coordinate_info") <- coordinate_info
+    attr(object, "tensor_term_order") <- tensor_term_order
+  }
 
   # add confidence intervals if they don't already exist
   if (!all(c(".lower_ci", ".upper_ci") %in% names(object))) {
@@ -1233,25 +1331,32 @@
     levs <- unique(str_split_fixed(object$.smooth, ":", n = 2)[, 1])
     # nest the object so we can reuse the code/ideas from draw.gam
     sm_l <- object |>
-      nest(data = !all_of(c(".smooth", ".type", ".by"))) |>
+      nest(data = !any_of(c(".smooth", ".type", ".by", ".smooth_id"))) |>
         mutate(
           ..smooth.. = factor(.data$.smooth, levels = sm_levs),
           .term = str_split_fixed(.data$.smooth, ":", n = 2)[, 1],
-          ..by.. = if_else(is.na(.data$.by), "..no_level..", .data$.by)
+          ..by.. = if_else(is.na(.data$.by), "..no_level..", .data$.by),
+          ..component.. = if (".smooth_id" %in% names(object)) {
+            .data$.smooth_id
+          } else match(.data$.type, unique(.data$.type))
         ) |>
         relocate(".term", .before = 1L)
     grp_by_levs <- unique(sm_l$"..by..")
     sm_l |>
       group_split(factor(.data$.term, levels = sm_levs),
-        factor(.data$"..by..", levels = grp_by_levs))
+        factor(.data$"..by..", levels = grp_by_levs),
+        factor(.data$..component.., levels = unique(.data$..component..)))
   } else {
     # the factor is to reorder to way the smooths entered the model
-    group_split(object, factor(object$.smooth, levels = sm_levs))
+    split_smooth_components(object)
   }
   ## plot
   plts <- map(sm_l,
     draw_smooth_estimates,
-    geom = geom,
+    re_levels = re_levels,
+    tensor_plot_info = plot_info,
+    surface = surface, surface_3d = surface_3d,
+    surface_support = surface_support,
     constant = constant,
     fun = fun,
     contour = contour,
@@ -1274,11 +1379,15 @@
     default_crs = default_crs,
     lims_method = lims_method,
     tensor_term_order = tensor_term_order, # pass on tensor order info,
+    coordinate_info = attr(object, "coordinate_info"),
+    back_transform = back_transform,
     caption = caption,
     grouped_by = grouped_by,
     ...
   )
 
+  plts <- Filter(Negate(is.null), plts)
+  if (!length(plts)) return(invisible(NULL))
   wrap_plots(plts)
 }
 
@@ -1286,6 +1395,8 @@
 #' @importFrom tidyselect any_of
 #' @importFrom purrr map_lgl
 `draw_smooth_estimates` <- function(object,
+                                    re_levels = NULL,
+                                    tensor_plot_info = NULL,
                                     constant = NULL,
                                     fun = NULL,
                                     contour = TRUE,
@@ -1307,15 +1418,27 @@
                                     ylim = NULL,
                                     crs = NULL,
                                     default_crs = NULL,
-                                    lims_method = "cross",
+                                    lims_method = "geometry_bbox",
                                     tensor_term_order = NULL,
                                     caption = NULL,
                                     grouped_by = FALSE,
-                                    geom = c("raster", "tile"),
+                                    surface = c("raster", "tile", "3d"),
+                                    surface_3d = list(),
+                                    back_transform = FALSE,
+                                    coordinate_info = NULL,
+                                    surface_support = NULL,
                                     ...) {
-  geom <- match.arg(geom)
+  surface <- match.arg(surface)
+  validate_surface_3d(surface_3d)
+  check_surface_dots(match.call(expand.dots = FALSE))
 
-  sm_vars <- tensor_term_order[[unique(object$.smooth)]]
+  plot_info <- tensor_plot_info[[unique(object$.smooth)[1L]]]
+  sm_vars <- if (!is.null(plot_info)) plot_info$variables else {
+    tensor_term_order[[unique(object$.smooth)[1L]]]
+  }
+  if (is.null(sm_vars)) {
+    sm_vars <- attr(coordinate_info, "smooth_variables")[[unique(object$.smooth)[1L]]]
+  }
   if (is.null(sm_vars)) {
     sm_vars <- if (".term" %in% names(object)) {
       vars_from_label(unique(object[[".term"]]))
@@ -1334,7 +1457,9 @@
     obj_nms <- names(object)
     ## preserve partial residuals and rug data if present
     if ("rug_data" %in% obj_nms) {
-      rug_data <- object[["rug_data"]][[1L]]
+      rug_data <- if (identical(sm_type, "SOS") && isTRUE(grouped_by)) {
+        bind_rows(object[["rug_data"]])
+      } else object[["rug_data"]][[1L]]
     }
     if ("partial_residual" %in% obj_nms) {
       p_residuals <- object[["partial_residual"]][[1L]]
@@ -1343,6 +1468,14 @@
     object <- select(object, !any_of(c("partial_residual", "rug_data")))
     ## finally unnest
     object <- unnest(object, cols = "data")
+  }
+
+  if ((!is.null(plot_info) || is_tensor_plot_type(sm_type)) &&
+      any(vapply(object[sm_vars], is.factor, logical(1)))) {
+    object <- filter_tensor_levels(object, re_levels)
+    if (!nrow(object)) cli::cli_abort("No tensor evaluation rows remain after selecting `re_levels`.")
+    sm_vars <- tensor_plot_variables(sm_vars, object)
+    if (!is.null(rug_data)) rug_data <- filter_tensor_levels(rug_data, re_levels)
   }
 
   if (sm_dim == 1L &&
@@ -1371,7 +1504,8 @@
     )
   } else if (
     sm_type == "Factor smooth" || (
-      sm_type %in% c("Tensor product int.", "Tensor product", "Tensor product (T2)") &&
+      # Higher-dimensional T2 terms retain their faceted surface renderers.
+      is_tensor_plot_type(sm_type) &&
         any(map_lgl(object[sm_vars], is.factor))
     )
   ) {
@@ -1405,7 +1539,9 @@
       class(object) <- append(class(object), "isotropic_smooth",
         after = 0
       )
-    } else if (sm_type %in% "Soap film") {
+    } else if (sm_type %in% c(
+      "Soap film", "Soap film (boundary)", "Soap film (wiggly)"
+    )) {
       class(object) <- append(class(object), "soap_film", after = 0
       )
     }
@@ -1451,9 +1587,44 @@
     return(NULL)
   }
 
+  # Raw grids can be irregular when displayed on the model scale too.
+  if (any(vapply(sm_vars, function(label) {
+    axis <- coordinate_info[[label]]
+    !is.null(axis$column) && !identical(axis$original, label) &&
+      axis$column %in% names(object)
+  }, logical(1)))) attr(object, "gratia.coordinate_display") <- TRUE
+
+  support <- surface_support[[unique(object$.smooth)[1L]]]
+  if (surface == "3d" && !is.null(support) && isTRUE(back_transform)) {
+    # Domain checks use the coordinates where dist masking was calculated,
+    # even when the displayed covariates are on their original scale.
+    columns <- utils::tail(make.unique(c(names(object),
+      ".surface_support_x", ".surface_support_y")), 2L)
+    object[columns] <- object[sm_vars[1:2]]
+    support$columns <- columns
+  }
+
+  if (isTRUE(back_transform)) {
+    numeric_by <- intersect(unique(object$.by), names(object))
+    numeric_by <- numeric_by[vapply(object[numeric_by], is.numeric, logical(1))]
+    displayed <- back_transform_smooth_coordinates(object, sm_vars, coordinate_info,
+      numeric_by = numeric_by)
+    object <- displayed$data
+    if (!is.null(rug_data)) {
+      rug_data <- back_transform_smooth_coordinates(rug_data, sm_vars,
+        coordinate_info, numeric_by = numeric_by)$data
+    }
+    if (!is.null(p_residuals)) {
+      p_residuals <- back_transform_smooth_coordinates(p_residuals, sm_vars,
+        coordinate_info, numeric_by = numeric_by)$data
+    }
+    sm_vars <- displayed$variables
+  }
+
   plot_smooth(
     object,
-    geom = geom,
+    surface = surface, surface_3d = surface_3d,
+    surface_support = support,
     variables = sm_vars,
     rug = rug_data,
     partial_residuals = p_residuals,

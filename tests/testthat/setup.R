@@ -189,7 +189,7 @@ m_gamm4 <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   REML = TRUE
 )
 m_gamm4_real <- m_gamm4
-class(m_gamm4_real) <- append("gamm4", class(m_gamm4_real[-1L]))
+
 
 m_gaulss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~1),
   data = su_eg1,
@@ -526,6 +526,15 @@ sim_sos_eg_data <- function(n = 400, seed = NULL) {
 }
 sos_df <- sim_sos_eg_data(n = 400, seed = 0)
 m_sos <- gam(y ~ s(latitude, longitude, bs = "sos", k = 60), data = sos_df)
+# Arbitrary SOS coordinate names must retain latitude/longitude ordering.
+sos_named_df <- setNames(as.data.frame(sos_df), c("north", "east", "y"))
+m_sos_named <- gam(y ~ s(north, east, bs = "sos", k = 20), data = sos_named_df)
+sos_by_df <- sos_named_df
+sos_by_df$region <- factor(rep(c("a", "b"), length.out = nrow(sos_by_df)))
+m_sos_by <- gam(y ~ region + s(north, east, bs = "sos", by = region, k = 15),
+  data = sos_by_df)
+
+
 
 # censored normal
 cens_df <- quick_eg1 |>
@@ -630,12 +639,49 @@ m_soap <- gam(
   data = soap_data, method = "REML", knots = soap_knots
 )
 
-# This dies if you load the sf package - have emailed Simon about it
-# m_soap_sep <- gam(
-#   y ~ s(v, w, k = 30, bs = "sf", xt = list(bnd = soap_fsb, nmax = 100)) +
-#     s(v, w, k = 30, bs = "sw", xt = list(bnd = soap_fsb, nmax = 100)),
-#   data = soap_data, method = "REML", knots = soap_knots
-# )
+# Shared component fixtures use a smaller PDE grid than the visual examples.
+m_soap_sep <- gam(
+  y ~ s(v, w, k = 10, bs = "sf", xt = list(bnd = soap_fsb, nmax = 40)) +
+    s(v, w, k = 10, bs = "sw", xt = list(bnd = soap_fsb, nmax = 40)),
+  data = soap_data, method = "REML", knots = soap_knots
+)
+
+# A nested domain with a known inner boundary exercises component offsets.
+soap_component_boundary <- list(
+  data.frame(v = cos(seq(0, 2 * pi, length.out = 61)),
+    w = sin(seq(0, 2 * pi, length.out = 61))),
+  data.frame(v = 0.3 * cos(seq(0, 2 * pi, length.out = 31)),
+    w = 0.3 * sin(seq(0, 2 * pi, length.out = 31)), f = 0.5)
+)
+soap_component_data <- withr::with_seed(375, {
+  d <- data.frame(v = runif(200, -1, 1), w = runif(200, -1, 1))
+  keep <- mgcv::in.out(soap_component_boundary, as.matrix(d))
+  d <- d[keep, ]
+  d$y <- d$v + d$w^2 + rnorm(nrow(d), sd = 0.1)
+  d
+})
+soap_component_knots <- expand.grid(v = seq(-0.8, 0.8, length.out = 6),
+  w = seq(-0.8, 0.8, length.out = 6))
+soap_component_knots <- soap_component_knots[
+  mgcv::in.out(soap_component_boundary, as.matrix(soap_component_knots)), ]
+m_soap_sep_known <- gam(
+  y ~ s(v, w, k = 8, bs = "sf",
+    xt = list(bnd = soap_component_boundary, nmax = 40)) +
+    s(v, w, k = 8, bs = "sw",
+      xt = list(bnd = soap_component_boundary, nmax = 40)),
+  data = soap_component_data, method = "REML", knots = soap_component_knots
+)
+
+# Soap components can also form the bivariate margins of tensor products.
+soap_tensor_data <- withr::with_seed(376,
+  transform(soap_data, time = runif(nrow(soap_data))))
+m_soap_tensor <- gam(
+  y ~ te(v, w, time, d = c(2, 1), k = c(10, 4), bs = c("sf", "cr"),
+    xt = list(list(bnd = soap_fsb, nmax = 40), NULL)) +
+    te(v, w, time, d = c(2, 1), k = c(10, 4), bs = c("sw", "cr"),
+      xt = list(list(bnd = soap_fsb, nmax = 40), NULL)),
+  data = soap_tensor_data, method = "REML", knots = soap_knots
+)
 
 # -- End Soap films -----------------------------------------------------------
 
@@ -761,3 +807,235 @@ zip_df <- zip_data(seed = 1)
 
 # Secondary examples are fitted once, on demand, after the CRAN guard.
 secondary_models <- make_secondary_models(environment())
+
+# Small, shared integration fixtures use the actual upstream gamm4 class.
+# Preserve the test session's RNG while generating responses and fitting.
+withr::with_seed(11011, {
+  gamm4_data <- data.frame(
+    x = runif(180), z = runif(180),
+    fac = factor(rep(c("a", "b"), 90)),
+    group = factor(rep(seq_len(12), each = 15)),
+    off = rep(c(0.2, 0.5, 0.8), 60),
+    weight = rep(c(1, 2), 90)
+  )
+  eta <- sin(4 * gamm4_data$x) + 0.7 * gamm4_data$z +
+    0.8 * (gamm4_data$fac == "b") +
+    seq(-1.5, 1.5, length.out = 12)[gamm4_data$group]
+  gamm4_data$y <- eta + rnorm(180, sd = 0.4)
+  gamm4_data$binary <- rbinom(180, 1, plogis(eta))
+  gamm4_data$count <- rpois(180, exp(eta / 2 + gamm4_data$off))
+  gamm4_gaussian <- gamm4::gamm4(y ~ fac + z + s(x, k = 5),
+    random = ~(1 | group), data = gamm4_data)
+  gamm4_binomial <- gamm4::gamm4(binary ~ fac + z + s(x, k = 5),
+    random = ~(1 | group), data = gamm4_data, family = binomial())
+  gamm4_poisson <- gamm4::gamm4(count ~ fac + z + s(x, k = 5) + offset(off),
+    random = ~(1 | group), data = gamm4_data, family = poisson())
+  gamm4_surface <- gamm4::gamm4(y ~ fac + t2(x, z, k = c(4, 4)),
+    random = ~(1 | group), data = gamm4_data)
+  gamm4_by <- gamm4::gamm4(y ~ fac + s(x, by = fac, k = 5),
+    random = ~(1 | group), data = gamm4_data)
+  gamm4_na_data <- gamm4_data
+  gamm4_na_data$x[c(8, 14)] <- NA_real_
+  gamm4_missing <- gamm4::gamm4(y ~ fac + z + s(x, k = 5),
+    random = ~(1 | group), data = gamm4_na_data, weights = weight,
+    subset = seq_len(160), na.action = na.exclude)
+})
+
+
+# Small grouped-family models shared by fitted draws and response simulation.
+# Interleaved family membership exposes accidental training-order assumptions.
+withr::with_seed(269272, {
+  gfam_data <- data.frame(
+    x = runif(180), family_id = rep(1:3, 60),
+    off = rep(c(-0.2, 0.1, 0.3), 60),
+    weight = rep(c(3, 2, 1), 60)
+  )
+  gfam_data$group <- factor(gfam_data$family_id)
+  eta <- 0.2 + sin(4 * gfam_data$x) / 2 + gfam_data$off
+  gfam_data$y <- numeric(180)
+  i <- gfam_data$family_id == 1L
+  gfam_data$y[i] <- rbinom(sum(i), gfam_data$weight[i], plogis(eta[i])) /
+    gfam_data$weight[i]
+  i <- gfam_data$family_id == 2L
+  gfam_data$y[i] <- eta[i] + rnorm(sum(i), sd = 0.4 / sqrt(gfam_data$weight[i]))
+  i <- gfam_data$family_id == 3L
+  gfam_data$y[i] <- rpois(sum(i), exp(eta[i]))
+  gfam_model <- gam(cbind(y, family_id) ~ group + s(x, k = 5) + offset(off),
+    data = gfam_data, weights = weight, method = "REML",
+    family = gfam(list(binomial(), gaussian(), poisson())))
+  gfam_bam <- bam(cbind(y, family_id) ~ group + s(x, k = 5) + offset(off),
+    data = gfam_data, weights = weight, method = "fREML", discrete = TRUE,
+    family = gfam(list(binomial(), gaussian(), poisson())))
+  gfam_matrix_data <- gfam_data
+  gfam_matrix_data$response <- cbind(gfam_data$y, gfam_data$family_id)
+  gfam_matrix_model <- gam(response ~ group + s(x, k = 5) + offset(off),
+    data = gfam_matrix_data, weights = weight, method = "REML",
+    family = gfam(list(binomial(), gaussian(), poisson())))
+  gfam_missing_data <- gfam_data
+  gfam_missing_data$x[c(7, 16)] <- NA_real_
+  gfam_missing_model <- gam(cbind(y, family_id) ~ group + s(x, k = 5) + offset(off),
+    data = gfam_missing_data, weights = weight, subset = seq_len(165),
+    na.action = na.exclude, method = "REML", optimizer = c("outer", "bfgs"),
+    family = gfam(list(binomial(), gaussian(), poisson())))
+  gfam_gaussian_data <- data.frame(x = runif(160), family_id = rep(1:2, 80))
+  gfam_gaussian_data$y <- sin(4 * gfam_gaussian_data$x) +
+    rnorm(160, sd = c(0.25, 1.2)[gfam_gaussian_data$family_id])
+  gfam_gaussian_model <- gam(cbind(y, family_id) ~ s(x, k = 5),
+    data = gfam_gaussian_data, method = "REML",
+    family = gfam(list(gaussian(), gaussian())))
+})
+
+withr::with_seed(269273, {
+  gfam_extended_data <- data.frame(x = runif(240), family_id = rep(1:4, 60))
+  gfam_extended_data$group <- factor(gfam_extended_data$family_id)
+  mu <- exp(0.5 + sin(4 * gfam_extended_data$x) / 3)
+  gfam_extended_data$y <- numeric(240)
+  i <- gfam_extended_data$family_id == 1L
+  gfam_extended_data$y[i] <- rnbinom(sum(i), mu = mu[i], size = 3)
+  i <- gfam_extended_data$family_id == 2L
+  gfam_extended_data$y[i] <- log(mu[i]) + rnorm(sum(i), sd = 0.35)
+  i <- gfam_extended_data$family_id == 3L
+  gfam_extended_data$y[i] <- rnbinom(sum(i), mu = mu[i], size = 1.5)
+  i <- gfam_extended_data$family_id == 4L
+  gfam_extended_data$y[i] <- mgcv::rTweedie(mu[i], p = 1.5, phi = 0.6)
+  gfam_extended_model <- gam(cbind(y, family_id) ~ group + s(x, k = 5),
+    data = gfam_extended_data, method = "REML",
+    family = gfam(list(nb(), gaussian(), nb(), tw())))
+})
+
+
+# A scalar ordinal response is supported by gfam, while its response prediction
+# probabilities cannot be represented as one numeric fitted mean per row.
+withr::with_seed(107, {
+  gfam_ordinal_data <- data.frame(x = runif(180), family_id = rep(1:2, 90))
+  gfam_ordinal_data$group <- factor(gfam_ordinal_data$family_id)
+  eta <- -0.4 + gfam_ordinal_data$x
+  gfam_ordinal_data$y <- numeric(nrow(gfam_ordinal_data))
+  i <- which(gfam_ordinal_data$family_id == 1)
+  latent <- eta[i] + qlogis(runif(length(i)))
+  gfam_ordinal_data$y[i] <- findInterval(latent, c(-Inf, -1, -0.2, 1, Inf))
+  i <- which(gfam_ordinal_data$family_id == 2)
+  gfam_ordinal_data$y[i] <- rpois(length(i), exp(eta[i]))
+  gfam_ordinal_model <- gam(cbind(y, family_id) ~ group + s(x, k = 4),
+    data = gfam_ordinal_data, family = gfam(list(ocat(R = 4), poisson())),
+    method = "REML")
+})
+
+
+# Incomplete categorical support, shared by prediction-message regressions.
+withr::with_seed(164, {
+  factor_support_data <- expand.grid(
+    a = factor(c("A", "B")), b = factor(c("low", "high")), replicate = 1:30
+  )
+  factor_support_data$x <- runif(nrow(factor_support_data))
+  factor_support_data$y <- as.integer(factor_support_data$a) +
+    as.integer(factor_support_data$b) + sin(3 * factor_support_data$x) +
+    rnorm(nrow(factor_support_data), sd = 0.2)
+  factor_support_data$group <- factor(rep(1:10, length.out = nrow(factor_support_data)))
+  factor_support_group_effect <- rnorm(nlevels(factor_support_data$group), sd = 0.5)
+  factor_support_data$y <- factor_support_data$y +
+    factor_support_group_effect[as.integer(factor_support_data$group)]
+  factor_support_data$keep <- with(factor_support_data, !(a == "B" & b == "low"))
+  factor_support_observed <- subset(factor_support_data, keep)
+  factor_support_character <- factor_support_observed
+  factor_support_character$a <- as.character(factor_support_character$a)
+  factor_support_character$b <- as.character(factor_support_character$b)
+  factor_support_formula <- y ~ a + b + s(x, k = 5)
+  factor_support_models <- list(
+    gam = gam(factor_support_formula, data = factor_support_observed, method = "REML"),
+    character = gam(factor_support_formula, data = factor_support_character, method = "REML"),
+    interaction = gam(y ~ a * b + s(x, k = 5), data = factor_support_observed, method = "REML"),
+    bam = bam(factor_support_formula, data = factor_support_observed),
+    discrete = bam(factor_support_formula, data = factor_support_observed, discrete = TRUE),
+    gamm = gamm(factor_support_formula, data = factor_support_observed, method = "REML"),
+    gamm4 = gamm4(factor_support_formula, data = factor_support_observed, random = ~(1 | group))
+  )
+  factor_support_subset <- gam(factor_support_formula, data = factor_support_data,
+    subset = keep, method = "REML")
+  factor_support_missing_data <- factor_support_data
+  factor_support_missing_data$y[!factor_support_missing_data$keep] <- NA_real_
+  factor_support_missing <- gam(factor_support_formula, data = factor_support_missing_data,
+    na.action = na.exclude, method = "REML")
+  factor_support_observed$j <- as.integer(factor_support_observed$a) - 1L
+  factor_support_transformed <- gam(y ~ factor(j %% 2) + b + s(x, k = 5),
+    data = factor_support_observed, method = "REML")
+  factor_support_local <- local({
+    foo <- function(j) factor(j %% 2)
+    list(model = gam(y ~ foo(j) + b + s(x, k = 5),
+      data = factor_support_observed, method = "REML"), envir = environment())
+  })
+  factor_support_three_data <- expand.grid(
+    a = factor(c("A", "B")), b = factor(c("low", "high")),
+    c = factor(c("left", "right")), replicate = 1:15
+  )
+  factor_support_three_data <- subset(factor_support_three_data,
+    !(a == "B" & b == "high" & c == "right"))
+  factor_support_three_data$x <- runif(nrow(factor_support_three_data))
+  factor_support_three_data$y <- as.integer(factor_support_three_data$a) +
+    as.integer(factor_support_three_data$b) + as.integer(factor_support_three_data$c) +
+    sin(factor_support_three_data$x) + rnorm(nrow(factor_support_three_data), sd = 0.2)
+  factor_support_three <- gam(y ~ a + b + c + s(x, k = 5),
+    data = factor_support_three_data, method = "REML")
+  factor_support_observed$category <- sample(1:3, nrow(factor_support_observed), replace = TRUE)
+  factor_support_observed$binary <- factor(sample(0:1, nrow(factor_support_observed), replace = TRUE))
+  factor_support_response <- gam(category ~ a + b + s(x, k = 5),
+    data = factor_support_observed, family = ocat(R = 3), method = "REML")
+  factor_support_binary <- gam(binary ~ a + s(x, k = 5),
+    data = factor_support_observed, family = binomial(), method = "REML")
+})
+
+# Small shared fixtures for random-effect tensor plotting (#169).
+withr::with_seed(169, {
+  tensor_re_data <- data.frame(x = runif(220, 0.1, 1), z = runif(220),
+    u = runif(220), f = factor(rep(c("c", "a", "b", "d"), 55),
+      levels = c("c", "a", "b", "d")),
+    g = ordered(rep(c("B", "A"), each = 110), levels = c("B", "A")))
+  tensor_re_data$y <- sin(4 * tensor_re_data$x) + tensor_re_data$z +
+    as.numeric(tensor_re_data$f) / 4 + rnorm(220, sd = 0.2)
+  tensor_re_models <- lapply(c("te", "ti", "t2"), function(constructor) {
+    gam(as.formula(paste0("y ~ s(u, k = 4) + ", constructor,
+      "(f, x, z, bs = c('re', 'tp', 'tp'), k = c(4, 3, 3))")),
+      data = tensor_re_data, method = "REML")
+  })
+  names(tensor_re_models) <- c("te", "ti", "t2")
+  tensor_re_four <- gam(y ~ ti(x, z, f, g,
+    bs = c("tp", "tp", "re", "re"), k = c(3, 3, 4, 3)),
+    data = tensor_re_data, method = "REML")
+  tensor_re_slices <- gam(y ~ t2(f, x, z, u,
+    bs = c("re", "tp", "tp", "tp"), k = c(4, 3, 3, 3)),
+    data = tensor_re_data, method = "REML")
+  tensor_re_curves <- gam(y ~ te(f, x, g,
+    bs = c("re", "tp", "re"), k = c(4, 3, 3)),
+    data = tensor_re_data, method = "REML")
+  tensor_re_numeric <- gam(y ~ ti(x, z, u,
+    bs = c("tp", "tp", "re"), k = c(3, 3, 3)),
+    data = tensor_re_data, method = "REML")
+  tensor_re_raw <- gam(y ~ ti(f, log(x), z,
+    bs = c("re", "tp", "tp"), k = c(4, 3, 3)),
+    data = tensor_re_data, method = "REML")
+})
+
+withr::with_seed(1691, {
+  tensor_re_category_data <- expand.grid(f = factor(c("c", "a", "b"),
+      levels = c("c", "a", "b")), g = ordered(c("B", "A"), levels = c("B", "A")),
+    h = factor(c("ii", "i"), levels = c("ii", "i")), replicate = 1:5)
+  tensor_re_category_data$y <- rnorm(nrow(tensor_re_category_data))
+  tensor_re_categories <- gam(y ~ te(f, g, h, bs = "re", k = c(3, 3, 3)),
+    data = tensor_re_category_data, method = "REML")
+})
+
+
+
+withr::with_seed(1693, {
+  tensor_re_many_data <- data.frame(x = runif(170),
+    f = factor(rep(sprintf("level%02d", 1:17), 10)))
+  tensor_re_many_data$y <- sin(4 * tensor_re_many_data$x) + rnorm(170)
+  tensor_re_many <- gam(y ~ te(x, f, bs = c("tp", "re"), k = c(3, 17)),
+    data = tensor_re_many_data, method = "REML")
+})
+
+withr::with_seed(1695, {
+  tensor_re_numeric_surface <- gam(y ~ te(u, x, z,
+    bs = c("re", "tp"), d = c(1, 2), k = c(3, 6)),
+    data = tensor_re_data, method = "REML")
+})

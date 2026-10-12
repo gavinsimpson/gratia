@@ -579,7 +579,10 @@ detaching ‘package:mgcv’
 > 
 > load_mgcv()
 > ## Don't show: 
-> op <- options(pillar.sigfig = 2, cli.unicode = FALSE)
+> op <- options(
++   pillar.sigfig = 2, cli.unicode = FALSE,
++   lifecycle_verbosity = "quiet"
++ )
 > ## End(Don't show)
 > dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
@@ -595,8 +598,6 @@ detaching ‘package:mgcv’
 > new_data <- data.frame(new_data)
 > ## first derivatives of all smooths...
 > fd <- fderiv(mod, newdata = new_data)
-Warning: `fderiv()` was deprecated in gratia 0.7.0.
-i Please use `derivatives()` instead.
 > 
 > ## point-wise interval
 > ci <- confint(fd, type = "confidence")

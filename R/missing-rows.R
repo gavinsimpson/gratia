@@ -91,7 +91,8 @@ residual_rows <- function(x, model, data, partial = FALSE) {
 # Prepare compact prediction data and an explicit map back to requested rows.
 # A single retained observation supplies output types when all rows are missing;
 # its calculated results are discarded, never used as predictions for those rows.
-prediction_layout <- function(model, data = NULL, na.action = stats::na.pass) {
+prediction_layout <- function(model, data = NULL, na.action = stats::na.pass,
+                              required = NULL) {
   training <- is.null(data)
   if (training) {
     data <- model$model
@@ -101,9 +102,17 @@ prediction_layout <- function(model, data = NULL, na.action = stats::na.pass) {
     map <- model_row_map(model)
     rows <- seq_along(map)
     output_data <- slice_observations(data, map)
+    input_rows <- seq_len(NROW(data))
   } else {
     data <- as.data.frame(data)
     mf <- delete_response(model, data = data)
+    if (!is.null(required)) {
+      if (NROW(required) != NROW(data)) {
+        stop("Required prediction variables must have one row per observation.",
+          call. = FALSE)
+      }
+      mf <- cbind(mf, required)
+    }
     valid <- finite_predictor_rows(mf)
     action <- match.fun(na.action)
     # Apply the requested action to a row index and the prediction model frame.
@@ -113,6 +122,7 @@ prediction_layout <- function(model, data = NULL, na.action = stats::na.pass) {
     rows <- if (drop_rows) acted$.index else seq_len(NROW(data))
     output_data <- data[rows, , drop = FALSE]
     map <- match(rows, which(valid))
+    input_rows <- which(valid)
     data <- data[valid, , drop = FALSE]
   }
   if (!NROW(data)) {
@@ -122,6 +132,7 @@ prediction_layout <- function(model, data = NULL, na.action = stats::na.pass) {
       data[[nm]] <- template[[nm]]
     }
     attr(data, "gratia.evaluated") <- TRUE
+    input_rows <- NA_integer_
   }
   # Internally .row always indexes the compact prediction data.
   data$.row <- NULL
@@ -130,7 +141,8 @@ prediction_layout <- function(model, data = NULL, na.action = stats::na.pass) {
     map = map,
     rows = rows,
     output_data = output_data,
-    training = training
+    training = training,
+    input_rows = input_rows
   )
 }
 

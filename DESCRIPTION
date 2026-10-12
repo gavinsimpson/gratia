@@ -1,5 +1,5 @@
 Package: gratia
-Version: 0.11.2-34
+Version: 0.11.2-41
 Title: Graceful 'ggplot'-Based Graphics and Other Functions for GAMs Fitted Using 'mgcv'
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     email = "ucfagls@gmail.com",
@@ -10,9 +10,9 @@ Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     comment = c(ORCID = "0000-0002-4842-3657")))
 Maintainer: Gavin L. Simpson <ucfagls@gmail.com>
 Depends:
-    R (>= 4.1.0)
+    R (>= 4.4.0)
 Imports:
-    mgcv (>= 1.9-0),
+    mgcv (>= 1.9-4),
     ggplot2 (>= 3.5.0),
     tibble (>= 3.0.0),
     dplyr (>= 1.2.0),
@@ -35,8 +35,11 @@ Imports:
     scales,
     utils
 Suggests:
+    ggcube (>= 0.3.0),
+    geometry,
+    qgam,
     tweedie (>= 2.3.5),
-    gamm4,
+    gamm4 (>= 0.2-7),
     lme4,
     nlme,
     testthat,
@@ -49,14 +52,14 @@ Suggests:
     forcats,
     GJRM,
     readr,
-    glmmTMB,
+    glmmTMB (>= 1.1.15.9000),
     TMB,
     Matrix,
     ggdist,
     distributional,
     hexbin,
     gamair,
-    sf (>= 0.7-3),
+    sf (>= 1.0-0),
     svglite (>= 2.0.0),
     curl,
     marginaleffects,

@@ -16,7 +16,7 @@ test_that("setup models supply raw columns without a teardown environment", {
 })
 
 test_that("parametric effects recover transformed inputs only when needed", {
-  expected <- parametric_effects(m_poly, data = df_2_fac)
+  expected <- parametric_effects(m_poly, data = df_2_fac, envir = environment())
   # The stored frame has log(x0) and poly(x2, ...), but lacks their raw inputs.
   # Neither helper should guess inverse transformations or search test globals.
   m <- m_poly
@@ -27,7 +27,14 @@ test_that("parametric effects recover transformed inputs only when needed", {
   expect_equal(parametric_effects(m, envir = env), expected)
   expect_equal(data_slice(m, x0 = evenly(x0, n = 8), envir = env),
     data_slice(m, x0 = evenly(x0, n = 8), data = df_2_fac))
-  expect_equal(parametric_effects(m, data = df_2_fac), expected)
+  explicit <- parametric_effects(m, data = df_2_fac)
+  expect_equal(explicit$.partial, expected$.partial)
+  expect_equal(explicit$.se, expected$.se)
+  # Supplied rows still define predictions when fitting observations are
+  # unavailable; they must not silently become observed rugs.
+  for (axes in attr(explicit, "axis_info")) {
+    expect_null(attr(axes, "observed"))
+  }
   # Matching row names do not authorize recovery from changed fitting values.
   env$missing_setup_data$x2 <- env$missing_setup_data$x2 + 1
   expect_error(parametric_effects(m, envir = env),

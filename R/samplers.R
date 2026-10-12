@@ -1,11 +1,9 @@
 #' Low-level Functions to generate draws from the posterior distribution of
 #' model coefficients
 #'
-#' @param model a fitted R model. Currently only models fitted by `mgcv::gam()`
-#'   or `mgcv::bam()`, or return an object that *inherits* from such objects are
-#'   supported. Here, "inherits" is used in a loose fashion; models fitted by
-#'   `scam::scam()` are support even though those models don't strictly inherit
-#'   from class `"gam"` as far as `inherits()` is concerned.
+#' @param model a fitted model from [mgcv::gam()], [mgcv::bam()],
+#'   [scam::scam()], or [gamm4::gamm4()], or a model inheriting from these
+#'   classes. See [gamm4_support] for sampling from gamm4 fits.
 #' @param n numeric; the number of posterior draws to take.
 #' @param method character; which algorithm to use to sample from the posterior.
 #'   Currently implemented methods are: `"gaussian"` and `"mh"`. `"gaussian"`
@@ -216,6 +214,10 @@
 `mh_draws.gam` <- function(
     model, n, burnin = 1000, thin = 1,
     t_df = 40, rw_scale = 0.25, index = NULL, ...) {
+  if (isTRUE(attr(model, "gratia.gamm4"))) {
+    stop("Metropolis-Hastings sampling is not supported for gamm4 models; ",
+      "use Gaussian or user-supplied draws.", call. = FALSE)
+  }
   capture.output(betas <- mgcv::gam.mh(
     b = model, ns = n * thin,
     burn = burnin, thin = thin, t.df = t_df, rw.scale = rw_scale

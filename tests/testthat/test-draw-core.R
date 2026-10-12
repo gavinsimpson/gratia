@@ -79,7 +79,7 @@ test_that("small four dimensional smooths can be evaluated and drawn", {
   expect_draw_build(draw(sm))
 })
 
-test_that("small tensor random effects retain supported and unsupported paths", {
+test_that("small tensor random effects retain curves and surfaces", {
   withr::local_seed(904)
   d <- data.frame(x = runif(90), z = runif(90), f = factor(rep(1:3, 30)))
   d$y <- sin(d$x * 4) + rnorm(90)
@@ -87,9 +87,8 @@ test_that("small tensor random effects retain supported and unsupported paths", 
   b <- gam(y ~ s(z, k = 4) + ti(x, z, f,
     bs = c("tp", "tp", "re"), k = c(4, 4, 3)), data = d)
   expect_draw_build(draw(a, n = 8, rug = FALSE))
-  expect_message(p <- draw(b, n = 8, rug = FALSE),
-    "Can't yet plot multivariate smooths with a 're' marginal", fixed = TRUE)
-  expect_length(p, 1L)
+  expect_silent(p <- draw(b, n = 8, n_2d = 4, rug = FALSE, contour = FALSE))
+  expect_length(p, 2L)
   expect_draw_build(p)
 })
 

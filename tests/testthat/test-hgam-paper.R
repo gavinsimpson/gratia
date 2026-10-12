@@ -165,7 +165,7 @@ test_that("draw() can plot bird_move model 3", {
   expect_doppelganger("hgam-paper-bird-move-model-3", plt)
 })
 
-test_that("draw() throws message with bird_move model 4", {
+test_that("draw() can plot bird_move model 4", {
   skip_on_cran()
   expect_warning(
     bird_mod4 <- bam(
@@ -179,7 +179,6 @@ test_that("draw() throws message with bird_move model 4", {
     ),
     "fitted rates numerically 0 occurred"
   )
-  ## There's nothing we can currently do, as
   expect_silent(plt <- draw(bird_mod4, n = 25, rug = FALSE))
   expect_doppelganger("hgam-paper-bird-move-model-4", plt)
 })

@@ -351,19 +351,19 @@
   object <- transform_fun(object, fun = fun)
   fill_var <- if (show == "estimate") ".estimate" else ".se"
   fill_title <- if (show == "estimate") "Partial\neffect" else "Std. err."
-  values <- object[[fill_var]]
-  values <- values[is.finite(values)]
-  fill_limits <- if (show == "estimate" && !is.null(ylim)) {
-    ylim
-  } else if (length(values) == 0L) {
-    NULL
-  } else if (show == "estimate") {
-    c(-1, 1) * max(abs(values))
-  } else {
-    range(values)
-  }
+  fill_limits <- surface_fill_limits(object[[fill_var]],
+    symmetric = show == "estimate", ylim = if (show == "estimate") ylim)
   list(data = object, fill_var = fill_var, fill_title = fill_title,
     fill_limits = fill_limits)
+}
+
+# Shared range policy for already transformed surface values. Explicit limits
+# retain the smooth plotting API's range-expansion semantics.
+surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
+  if (!is.null(ylim)) return(ylim)
+  values <- values[is.finite(values)]
+  if (!length(values)) return(NULL)
+  if (isTRUE(symmetric)) c(-1, 1) * max(abs(values)) else range(values)
 }
 
 #' Construct a smooth surface plot
@@ -380,8 +380,16 @@
 #'   `ggplot2::expand_limits()`. `NULL` adds no expansion layer.
 #' @param fill_title Title for the vertical fill colour bar.
 #' @param labels Resolved labels as a `ggplot2::labs()` object.
-#' @param geom Character; `"raster"` (default) uses a raster image, while
-#'   `"tile"` uses borderless rectangles sized from the coordinate resolution.
+#' @param surface Character; `"raster"` (default) uses a raster image, while
+#'   `"tile"` uses borderless rectangles sized from the coordinate resolution,
+#'   and `"3d"` uses a polygon mesh.
+#'   Changed covariate scales with irregular spacing use rectangles bounded by
+#'   adjacent coordinate midpoints for flat surfaces.
+#' @param surface_3d Named options for the 3D coordinate system.
+#' @param facet_vars Column names that identify separate mesh panels.
+#' @param surface_support Recorded support and normalization for masking.
+#' @param isotropic Preserve equal horizontal units by default.
+#' @param z_limits Optional values to include in the vertical 3D range.
 #' @param continuous_fill Optional ggplot2 fill scale. `NULL` uses the diverging
 #'   RdBu distiller scale.
 #' @param contour Logical; add contour lines for `fill_var`?
@@ -400,6 +408,8 @@
 #'   mappings. Used by basis plots to retain inherited fill and grouping.
 #' @param contour_mapping Optional contour mappings; defaults to `fill_var`
 #'   mapped to z. Can explicitly remove inherited fill or set a contour group.
+#' @param contour_data Optional data for contour layers only, for example to
+#'   omit constant interaction panels. `NULL` inherits the surface data.
 #' @param contour_na_rm Logical; remove missing contour values silently?
 #' @param axis_guide X-axis guide; defaults to `guide_axis(angle = angle)`.
 #' @param fill_guide Fill guide; `NULL` leaves ggplot2's guide unchanged.
@@ -411,36 +421,81 @@
 #' @noRd
 `prepare_surface_plot` <- function(
   object, x_var, y_var, fill_var, fill_limits = NULL, fill_title = NULL,
-  labels = labs(), geom = c("raster", "tile"), continuous_fill = NULL,
+  labels = labs(), surface = c("raster", "tile", "3d"),
+  surface_3d = list(), continuous_fill = NULL,
   contour = TRUE, contour_col = "black", n_contour = NULL, angle = NULL,
   facet = NULL, coord = NULL, rug = NULL, boundary = NULL, boundary_group = NULL,
   mapping = NULL, contour_mapping = NULL, contour_na_rm = TRUE,
+  contour_data = NULL,
   axis_guide = guide_axis(angle = angle),
   fill_guide = guide_colourbar(title = fill_title, direction = "vertical"),
-  legend_position = "right", tile_colour = NA
+  legend_position = "right", tile_colour = NA,
+  facet_vars = character(), surface_support = NULL, isotropic = FALSE,
+  z_limits = fill_limits
 ) {
-  geom <- match.arg(geom)
+  surface <- match.arg(surface)
+  validate_surface_3d(surface_3d)
+  if (surface == "3d") {
+    if (is.numeric(object[[x_var]]) && is.numeric(object[[y_var]])) {
+      return(prepare_surface_3d(object, x_var, y_var, fill_var, fill_limits,
+        fill_title, labels, continuous_fill, contour, contour_col, n_contour,
+        facet, facet_vars, rug, boundary, boundary_group, surface_3d,
+        isotropic || inherits(coord, "CoordFixed"), surface_support, z_limits))
+    }
+    message("3D surfaces require two numeric axes; retaining the flat display.")
+    surface <- "raster"
+  }
   if (is.null(continuous_fill)) {
     continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
   }
   if (is.null(mapping)) {
     mapping <- aes(x = .data[[x_var]], y = .data[[y_var]])
   }
-  plt <- ggplot(object, mapping) +
-    switch(geom,
+  irregular <- function(x) {
+    x <- sort(unique(x[is.finite(x)]))
+    gaps <- diff(x)
+    length(gaps) > 1L && !isTRUE(all.equal(gaps, rep(gaps[[1L]], length(gaps)),
+      tolerance = 1e-7))
+  }
+  changed <- isTRUE(attr(object, "gratia.coordinate_display"))
+  if (changed && (irregular(object[[x_var]]) || irregular(object[[y_var]]))) {
+    bounds <- function(x) {
+      values <- sort(unique(x[is.finite(x)]))
+      if (length(values) < 2L) return(cbind(x - 0.5, x + 0.5))
+      mid <- (values[-1L] + values[-length(values)]) / 2
+      edges <- c(values[[1L]] - (mid[[1L]] - values[[1L]]), mid,
+        utils::tail(values, 1L) + (utils::tail(values, 1L) - utils::tail(mid, 1L)))
+      i <- match(x, values)
+      cbind(edges[i], edges[i + 1L])
+    }
+    cells <- object
+    xb <- bounds(object[[x_var]])
+    yb <- bounds(object[[y_var]])
+    cells$.cell_xmin <- xb[, 1L]
+    cells$.cell_xmax <- xb[, 2L]
+    cells$.cell_ymin <- yb[, 1L]
+    cells$.cell_ymax <- yb[, 2L]
+    surface_geom <- ggplot2::geom_rect(data = cells, mapping = aes(
+      xmin = .data$.cell_xmin, xmax = .data$.cell_xmax,
+      ymin = .data$.cell_ymin, ymax = .data$.cell_ymax,
+      fill = .data[[fill_var]]), colour = tile_colour)
+  } else {
+    surface_geom <- switch(surface,
       raster = geom_raster(aes(fill = .data[[fill_var]]), interpolate = FALSE),
       tile = if (is.null(tile_colour)) {
         geom_tile(aes(fill = .data[[fill_var]]))
       } else {
         geom_tile(aes(fill = .data[[fill_var]]), colour = tile_colour)
-      }
-    ) + facet + coord
+      })
+  }
+  plt <- ggplot(object, mapping) +
+    surface_geom + facet + coord
 
   if (isTRUE(contour)) {
     if (is.null(contour_mapping)) {
       contour_mapping <- aes(z = .data[[fill_var]])
     }
-    plt <- plt + geom_contour(contour_mapping,
+    plt <- plt + geom_contour(contour_mapping, data = contour_data,
       colour = contour_col, bins = n_contour, na.rm = contour_na_rm)
   }
   plt <- plt + labels + continuous_fill
@@ -493,27 +548,31 @@
   ylim = NULL,
   continuous_fill = NULL,
   angle = NULL,
-  geom = c("raster", "tile"),
+  surface = c("raster", "tile", "3d"),
+  surface_3d = list(),
+  surface_support = NULL,
   ...
 ) {
-  geom <- match.arg(geom)
+  surface <- match.arg(surface)
+  validate_surface_3d(surface_3d)
   if (is.null(variables)) {
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
 
-  surface <- prepare_surface_data(object, show = show,
+  prepared <- prepare_surface_data(object, show = show,
     constant = constant, fun = fun, ylim = ylim)
-  object <- surface$data
+  object <- prepared$data
   labels <- prepare_smooth_labels(object,
     x_var = variables[1], y_var = variables[2], xlab = xlab, ylab = ylab,
     title = title, subtitle = subtitle, caption = caption
   )
   prepare_surface_plot(object,
-    x_var = variables[1], y_var = variables[2], geom = geom,
-    fill_var = surface$fill_var, fill_limits = surface$fill_limits,
-    fill_title = surface$fill_title, labels = labels,
+    x_var = variables[1], y_var = variables[2], surface = surface, surface_3d = surface_3d,
+    fill_var = prepared$fill_var, fill_limits = prepared$fill_limits,
+    fill_title = prepared$fill_title, labels = labels,
     continuous_fill = continuous_fill, contour = contour,
-    contour_col = contour_col, n_contour = n_contour, angle = angle, rug = rug
+    contour_col = contour_col, n_contour = n_contour, angle = angle, rug = rug,
+    surface_support = surface_support, isotropic = inherits(object, "isotropic_smooth")
   )
 }
 
@@ -540,10 +599,13 @@
   ylim = NULL,
   continuous_fill = NULL,
   angle = NULL,
-  geom = c("raster", "tile"),
+  surface = c("raster", "tile", "3d"),
+  surface_3d = list(),
+  surface_support = NULL,
   ...
 ) {
-  geom <- match.arg(geom)
+  surface <- match.arg(surface)
+  validate_surface_3d(surface_3d)
   if (is.null(variables)) {
     variables <- attr(object, "tensor_term_order")
     if (is.null(variables)) {
@@ -551,9 +613,9 @@
     }
   }
 
-  surface <- prepare_surface_data(object, show = show,
+  prepared <- prepare_surface_data(object, show = show,
     constant = constant, fun = fun, ylim = ylim)
-  object <- surface$data
+  object <- prepared$data
   labels <- prepare_smooth_labels(object,
     x_var = variables[1], y_var = variables[2], xlab = xlab, ylab = ylab,
     title = title, subtitle = subtitle, caption = caption,
@@ -562,12 +624,13 @@
   # Observations are not assigned to slices: adding them would create facets.
   coord <- if (inherits(object, "isotropic_smooth")) coord_equal() else NULL
   prepare_surface_plot(object,
-    x_var = variables[1], y_var = variables[2], geom = geom,
-    fill_var = surface$fill_var, fill_limits = surface$fill_limits,
-    fill_title = surface$fill_title, labels = labels,
+    x_var = variables[1], y_var = variables[2], surface = surface, surface_3d = surface_3d,
+    fill_var = prepared$fill_var, fill_limits = prepared$fill_limits,
+    fill_title = prepared$fill_title, labels = labels,
     continuous_fill = continuous_fill, contour = contour,
     contour_col = contour_col, n_contour = n_contour, angle = angle,
-    facet = facet_wrap(vars(.data[[variables[3]]])), coord = coord
+    facet = facet_wrap(vars(.data[[variables[3]]])), coord = coord,
+    facet_vars = variables[3], surface_support = surface_support
   )
 }
 
@@ -595,17 +658,20 @@
   ylim = NULL,
   continuous_fill = NULL,
   angle = NULL,
-  geom = c("raster", "tile"),
+  surface = c("raster", "tile", "3d"),
+  surface_3d = list(),
+  surface_support = NULL,
   ...
 ) {
-  geom <- match.arg(geom)
+  surface <- match.arg(surface)
+  validate_surface_3d(surface_3d)
   if (is.null(variables)) {
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
 
-  surface <- prepare_surface_data(object, show = show,
+  prepared <- prepare_surface_data(object, show = show,
     constant = constant, fun = fun, ylim = ylim)
-  object <- surface$data
+  object <- prepared$data
   labels <- prepare_smooth_labels(object,
     x_var = variables[1], y_var = variables[2], xlab = xlab, ylab = ylab,
     title = title, subtitle = subtitle, caption = caption,
@@ -615,28 +681,36 @@
   # Observations are not assigned to slices: adding them would create facets.
   coord <- if (inherits(object, "isotropic_smooth")) coord_equal() else NULL
   prepare_surface_plot(object,
-    x_var = variables[1], y_var = variables[2], geom = geom,
-    fill_var = surface$fill_var, fill_limits = surface$fill_limits,
-    fill_title = surface$fill_title, labels = labels,
+    x_var = variables[1], y_var = variables[2], surface = surface, surface_3d = surface_3d,
+    fill_var = prepared$fill_var, fill_limits = prepared$fill_limits,
+    fill_title = prepared$fill_title, labels = labels,
     continuous_fill = continuous_fill, contour = contour,
     contour_col = contour_col, n_contour = n_contour, angle = angle,
     facet = facet_grid(rows = vars(.data[[variables[3]]]),
-      cols = vars(.data[[variables[4]]]), as.table = FALSE), coord = coord
+      cols = vars(.data[[variables[4]]]),
+      as.table = is.factor(object[[variables[3]]])), coord = coord,
+    facet_vars = variables[3:4], surface_support = surface_support
   )
 }
 
 #' @importFrom ggplot2 coord_equal
 `plot_smooth.isotropic_smooth` <- function(
   object,
-  geom = c("raster", "tile"),
+  surface = c("raster", "tile", "3d"),
+  surface_3d = list(),
+  surface_support = NULL,
   ...
 ) {
-  geom <- match.arg(geom)
+  surface <- match.arg(surface)
+  validate_surface_3d(surface_3d)
+  # Preserve equal horizontal units even when this method is called directly.
+  class(object) <- unique(c("isotropic_smooth", class(object)))
   # plot as per a bivariate smooth
-  plt <- plot_smooth.bivariate_smooth(object, geom = geom, ...)
+  plt <- plot_smooth.bivariate_smooth(object, surface = surface,
+    surface_3d = surface_3d, surface_support = surface_support, ...)
 
   # but set the x/y coordinates to have aspect ratio = 1
-  plt <- plt + coord_equal(ratio = 1)
+  if (surface != "3d") plt <- plt + coord_equal(ratio = 1)
 
   plt # return
 }
@@ -723,15 +797,37 @@
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
 
-  # throw a warning and return NULL if trying to plot a >=2d base smoother
-  # like a 2D TPRS or Duchon spline
-  if ((l <- length(variables)) > 2L) {
-    # warning("Can't plot ", l - 1, "D random factor smooths. Not plotting.")
-    msg <- "Can't yet plot multivariate smooths with a 're' marginal: {unique(object[['.smooth']])}."
-    #message("Can't currently plot multivariate smooths with a 're' marginal.")
-    #message("Skipping: ", unique(object[[".smooth"]]))
-    cli_alert_info(msg, wrap = TRUE)
-    return(NULL) # returns early!
+  numeric_vars <- variables[vapply(object[variables], is.numeric, logical(1))]
+  if (length(numeric_vars) >= 2L) {
+    variables <- tensor_plot_variables(variables, object)
+    renderer <- switch(as.character(length(variables)),
+      `2` = plot_smooth.bivariate_smooth,
+      `3` = plot_smooth.trivariate_smooth,
+      `4` = plot_smooth.quadvariate_smooth)
+    if (is.null(renderer)) {
+      cli_alert_info("Can't yet plot tensor terms with more than four covariates: {unique(object$.smooth)}.")
+      return(NULL)
+    }
+    return(renderer(object, variables = variables, rug = rug,
+      constant = constant, fun = fun, xlab = xlab, ylab = ylab,
+      title = title, subtitle = subtitle, caption = caption,
+      ylim = ylim, angle = angle, ...))
+  }
+
+  # Combine categorical margins only for grouping; fitted factor columns remain.
+  curve_facet <- NULL
+  if (length(variables) > 2L) {
+    factors <- setdiff(variables, numeric_vars)
+    group_vars <- if (length(numeric_vars)) factors else factors[-1L]
+    group_column <- utils::tail(make.unique(c(names(object), ".re_group")), 1L)
+    groups <- tensor_plot_groups(object, rug, factors, group_vars)
+    object[[group_column]] <- groups$group
+    rug <- groups$rug
+    if (!is.null(rug)) rug[[group_column]] <- groups$rug_group
+    if (length(numeric_vars)) {
+      curve_facet <- facet_wrap(vars(.data[[group_column]]))
+    }
+    variables <- c(if (length(numeric_vars)) numeric_vars else factors[1L], group_column)
   }
 
   # A tensor can have two factor margins, or put its factor margin first.
@@ -758,7 +854,7 @@
       discrete_colour = discrete_colour, legend = FALSE,
       angle = angle, ylim = ylim,
       labels = labels
-    ))
+    ) + curve_facet)
   }
 
   # Factor-only point ranges retain their explicit-NULL label suppression.
@@ -980,10 +1076,13 @@
   continuous_fill = NULL,
   crs = NULL,
   default_crs = NULL,
-  lims_method = "cross",
+  lims_method = "geometry_bbox",
   angle = NULL,
+  surface = "raster", surface_3d = list(),
+  grouped_by = FALSE,
   ...
 ) {
+  if (surface == "3d") message("Spherical smooths retain their geographic rendering.")
   # handle splines on the sphere
   # this needs the sf pkg for coord_sf()
   if (!requireNamespace("sf", quietly = TRUE)) {
@@ -1045,25 +1144,79 @@
   if (all(!is.na(object[[".by"]])) && is.null(subtitle)) {
     by_var <- as.character(unique(object[[".by"]]))
     subtitle <- paste0("By: ", by_var)
-    if (data_class(object)[[by_var]] == "factor") {
+    if (!isTRUE(grouped_by) && data_class(object)[[by_var]] == "factor") {
       subtitle <- paste0(subtitle, "; ", unique(object[[by_var]]))
+    }
+  }
+  panel <- NULL
+  if (isTRUE(grouped_by) && all(!is.na(object$.by))) {
+    by_var <- unique(object$.by)
+    if (length(by_var) == 1L && is.factor(object[[by_var]])) {
+      panel <- by_var
+      if (is.null(title)) title <- unique(sub(":.*$", "", object$.smooth))
     }
   }
   labels <- prepare_smooth_labels(object,
     x_var = variables[2], y_var = variables[1], xlab = xlab, ylab = ylab,
-    title = title, subtitle = subtitle, caption = caption)
+    title = title, subtitle = subtitle, caption = caption, grouped_by = grouped_by)
   # Preserve the spherical method's omitted-versus-NULL axis convention.
   labels[c("x", "y")] <- list(xlab, ylab)
 
-  prepare_surface_plot(object,
-    x_var = variables[2], y_var = variables[1], fill_var = plot_var,
-    fill_limits = guide_limits, fill_title = guide_title,
-    labels = labels,
-    geom = "tile", tile_colour = NULL, continuous_fill = continuous_fill,
-    contour = contour, contour_col = contour_col, n_contour = n_contour,
-    angle = angle, rug = rug,
-    coord = coord_sf(crs = crs, default_crs = default_crs,
-      lims_method = lims_method))
+  groups <- if (is.null(panel)) list(object) else split(object, object[[panel]], drop = TRUE)
+  prepared <- lapply(groups, sos_plot_data,
+    longitude = variables[2], latitude = variables[1])
+  object <- if (length(prepared) == 1L) prepared[[1L]]$data else {
+    dplyr::bind_rows(lapply(prepared, `[[`, "data"))
+  }
+  geometry <- lapply(prepared, function(group) {
+    if (group$rectangular) {
+      cells <- sos_cells(group$data, longitude = variables[2], latitude = variables[1])
+    } else {
+      message("Spherical surfaces require a rectilinear grid; drawing supplied coordinates as points.")
+      cells <- sos_points(group$data, longitude = variables[2], latitude = variables[1])
+    }
+    sos_project(cells, crs = crs)
+  })
+  if (is.null(continuous_fill)) {
+    continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
+  }
+  plt <- ggplot(object)
+  for (i in seq_along(geometry)) {
+    plt <- plt + ggplot2::geom_sf(data = geometry[[i]],
+      mapping = aes(fill = .data[[plot_var]]), inherit.aes = FALSE,
+      colour = if (prepared[[i]]$rectangular) NA else "black", shape = 21)
+  }
+  plt <- plt + labels + continuous_fill + expand_limits(fill = guide_limits) +
+    guides(x = guide_axis(angle = angle),
+      fill = guide_colourbar(title = guide_title, direction = "vertical")) +
+    theme(legend.position = "right")
+  if (!is.null(panel)) plt <- plt + facet_wrap(vars(!!rlang::sym(panel)))
+  if (!any(vapply(geometry, nrow, integer(1))) && !is.null(sos_ortho_view(crs))) {
+    # An entirely hidden supplied grid still needs finite panel bounds. An
+    # invisible horizon outline trains the panel without inventing estimates.
+    outline <- sf::st_sf(geometry = sos_horizon(sos_ortho_view(crs)))
+    outline <- sos_project(outline, crs)
+    plt <- plt + ggplot2::geom_sf(data = outline, inherit.aes = FALSE,
+      fill = NA, colour = NA, show.legend = FALSE)
+  }
+  if (isTRUE(contour)) {
+    for (group in prepared) {
+      if (!group$rectangular) next
+      paths <- sos_contours(group$data, variables[2], variables[1], plot_var, n_contour)
+      if (!is.null(paths)) {
+        if (!is.null(panel)) paths[[panel]] <- group$data[[panel]][rep(1L, nrow(paths))]
+        paths <- sos_project(paths, crs = crs)
+        plt <- plt + ggplot2::geom_sf(data = paths, inherit.aes = FALSE,
+          colour = contour_col, fill = NA)
+      }
+    }
+  }
+  if (!is.null(rug)) {
+    points <- sos_points(rug, longitude = variables[2], latitude = variables[1])
+    points <- sos_project(points, crs = crs)
+    plt <- plt + ggplot2::geom_sf(data = points, inherit.aes = FALSE, alpha = 0.1)
+  }
+  plt + coord_sf(crs = crs, default_crs = default_crs, lims_method = lims_method)
 
 }
 
@@ -1093,17 +1246,20 @@
   ylim = NULL,
   continuous_fill = NULL,
   angle = NULL,
-  geom = c("raster", "tile"),
+  surface = c("raster", "tile", "3d"),
+  surface_3d = list(),
+  surface_support = NULL,
   ...
 ) {
-  geom <- match.arg(geom)
+  surface <- match.arg(surface)
+  validate_surface_3d(surface_3d)
   if (is.null(variables)) {
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
 
-  surface <- prepare_surface_data(object, show = show,
+  prepared <- prepare_surface_data(object, show = show,
     constant = constant, fun = fun, ylim = ylim)
-  object <- surface$data
+  object <- prepared$data
   boundary <- vec_slice(object, object[[".bndry"]])
   object <- vec_slice(object, !object[[".bndry"]])
   labels <- prepare_smooth_labels(object,
@@ -1111,9 +1267,9 @@
     title = title, subtitle = subtitle, caption = caption
   )
   prepare_surface_plot(object,
-    x_var = variables[1], y_var = variables[2], geom = geom,
-    fill_var = surface$fill_var, fill_limits = surface$fill_limits,
-    fill_title = surface$fill_title, labels = labels,
+    x_var = variables[1], y_var = variables[2], surface = surface, surface_3d = surface_3d,
+    fill_var = prepared$fill_var, fill_limits = prepared$fill_limits,
+    fill_title = prepared$fill_title, labels = labels,
     continuous_fill = continuous_fill, contour = contour,
     contour_col = contour_col, n_contour = n_contour, angle = angle,
     rug = rug, coord = coord_fixed(ratio = 1), boundary = boundary,

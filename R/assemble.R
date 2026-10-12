@@ -17,11 +17,10 @@
   UseMethod("assemble")
 }
 
-#' Plot estimated smooths from a fitted GAM
+#' Plot smooth and parametric terms from a fitted GAM
 #'
-#' Plots estimated smooths from a fitted GAM model in a similar way to
-#' `mgcv::plot.gam()` but instead of using base graphics, [ggplot2::ggplot()]
-#' is used instead.
+#' Plots smooth and parametric contributions from a fitted GAM model using
+#' [ggplot2::ggplot()].
 #'
 #' @inheritParams draw.gam
 #' @param ... Arguments to other methods; not used.
@@ -64,7 +63,7 @@
   object,
   data = NULL,
   select = NULL,
-  parametric = FALSE,
+  parametric = NULL,
   terms = NULL,
   residuals = FALSE,
   scales = c("free", "fixed"),
@@ -99,14 +98,20 @@
   guides = "keep", widths = NULL, heights = NULL,
   crs = NULL,
   default_crs = NULL,
-  lims_method = "cross",
+  lims_method = "geometry_bbox",
   wrap = TRUE,
   caption = TRUE,
-  envir = environment(formula(object)),
-  geom = c("raster", "tile"),
+  envir = NULL,
+  surface = c("raster", "tile", "3d"),
+  surface_3d = list(),
+  back_transform = FALSE,
+  re_levels = NULL,
   ...
 ) {
-  geom <- match.arg(geom)
+  check_back_transform(back_transform)
+  surface <- match.arg(surface)
+  validate_surface_3d(surface_3d)
+  check_surface_dots(match.call(expand.dots = FALSE))
 
   .call <- match.call()
 
@@ -127,15 +132,9 @@
     continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
   }
 
-  # if not using select, set parametric TRUE if not set to FALSE
-  if (!is.null(select)) {
-    if (is.null(parametric)) {
-      parametric <- FALSE
-    }
-  } else {
-    if (is.null(parametric)) {
-      parametric <- TRUE
-    }
+  # Include parametric terms by default unless smooths were selected explicitly.
+  if (is.null(parametric)) {
+    parametric <- is.null(select)
   }
 
   # sort out n_3d and n_4d. If these are `NULL` then do sensible thing at set
@@ -151,17 +150,19 @@
       partial_match = partial_match,
       model_name = expr_label(substitute(object))
     )
+  object <- with_model_envir(object, envir)
+  object <- plan_tensor_plots(object, which(select), data, re_levels)
 
   # this is needed for the parametric terms below
   sm_plts <- NULL
   ylims <- NULL
 
   # do we have any smooths to plot?
-  if (length(select) > 0L) {
+  if (any(select)) {
     # evaluate all requested smooths
     sm_eval <- smooth_estimates(object,
-      envir = envir,
-      select = S[select],
+      envir = envir, back_transform = back_transform,
+      select = which(select),
       n = n,
       n_2d = n_2d,
       n_3d = n_3d,
@@ -176,6 +177,8 @@
 
     # grab tensor term order if present, if not it is NULL & that's OK
     tensor_term_order <- attr(sm_eval, "tensor_term_order")
+    coordinate_info <- attr(sm_eval, "coordinate_info")
+    surface_support <- attr(sm_eval, "surface_support")
 
     # add confidence interval
     sm_eval <- sm_eval |>
@@ -201,6 +204,39 @@
         pluck("rng")
     }
 
+    if (surface == "3d" && scales == "fixed") {
+      sm_rng <- unlist(lapply(sm_eval$data, function(d) {
+        d <- add_constant(d, constant = constant,
+          column = c(".estimate", ".lower_ci", ".upper_ci"))
+        d <- transform_fun(d, fun = fun,
+          column = c(".estimate", ".lower_ci", ".upper_ci"))
+        c(d$.estimate, d$.lower_ci, d$.upper_ci)
+      }), use.names = FALSE)
+      sm_rng <- sm_rng[is.finite(sm_rng)]
+    }
+
+    observation_data <- NULL
+    if (back_transform && (isTRUE(rug) || isTRUE(residuals))) {
+      observation_data <- model.frame(object)
+      labels <- unique(unlist(lapply(get_smooths_by_id(object, which(select)), smooth_variable)))
+      raw_vars <- unique(unlist(lapply(labels, function(label) {
+        smooth_coordinate_info(label, object)$original
+      })))
+      raw <- tryCatch(recover_raw_data(object, vars = raw_vars),
+        gratia_data_recovery_error = function(e) {
+          if (is.null(data)) stop(e)
+          NULL
+        })
+      if (is.null(raw)) {
+        # Prediction rows are not observed data for rugs or partial residuals.
+        observation_data <- NULL
+        rug <- residuals <- FALSE
+      } else {
+        for (v in raw_vars) observation_data[[v]] <- raw[[v]]
+        observation_data <- retain_smooth_coordinates(observation_data, labels, object, required = TRUE)
+      }
+    }
+
     # Add partial residuals if requested - by default they are
     # At the end of this, sm_eval will have a new list column containing the
     # partial residuals, `partial_residual`
@@ -210,7 +246,12 @@
         residuals <- FALSE
       } else {
         # get residuals in a suitable format
-        p_resids <- nested_partial_residuals(object, terms = S[select])
+        p_resids <- if (anyDuplicated(S)) {
+          nested_component_observations(object, which(select),
+            data = observation_data, partial = TRUE)
+        } else {
+          nested_partial_residuals(object, terms = S[select], data = observation_data)
+        }
 
         # compute the range of residuals for each smooth
         # p_resids_rng <- p_resids |>
@@ -233,9 +274,15 @@
             ) |>
             pluck("rng")
         }
+        if (".smooth_id" %in% names(sm_eval)) {
+          p_resids <- select(p_resids, all_of(c(".smooth_id", "partial_residual")))
+        } else p_resids$.smooth_id <- NULL
         # merge with the evaluated smooth
         sm_eval <- suppress_matches_multiple_warning(
-          left_join(sm_eval, p_resids, by = ".smooth")
+          left_join(sm_eval, p_resids,
+            by = if (".smooth_id" %in% names(sm_eval)) ".smooth_id" else {
+            if (anyDuplicated(S)) c(".smooth", ".type") else ".smooth"
+          })
         )
       }
     }
@@ -243,15 +290,23 @@
     # add rug data?
     if (isTRUE(rug)) {
       # get rug data in a suitable format
-      rug_data <- nested_rug_values(
-        object,
-        terms = S[select],
-        distinct = distinct_rug
-      )
+      rug_data <- if (anyDuplicated(S)) {
+        nested_component_observations(object, which(select),
+          data = observation_data, distinct = distinct_rug)
+      } else {
+        nested_rug_values(object,
+          terms = S[select], data = observation_data, distinct = distinct_rug)
+      }
 
+      if (".smooth_id" %in% names(sm_eval)) {
+        rug_data <- select(rug_data, all_of(c(".smooth_id", "rug_data")))
+      } else rug_data$.smooth_id <- NULL
       # merge with the evaluated smooth
       sm_eval <- suppress_matches_multiple_warning(
-        left_join(sm_eval, rug_data, by = ".smooth")
+        left_join(sm_eval, rug_data,
+          by = if (".smooth_id" %in% names(sm_eval)) ".smooth_id" else {
+            if (anyDuplicated(S)) c(".smooth", ".type") else ".smooth"
+          })
       )
     }
 
@@ -266,15 +321,19 @@
       levs <- unique(str_split_fixed(sm_eval$.smooth, ":", n = 2)[, 1])
       sm_l <- sm_eval |>
         mutate(
-          ..smooth.. = factor(.data$.smooth, levels = S[select]),
+          ..smooth.. = factor(.data$.smooth, levels = unique(S[select])),
           .term = str_split_fixed(.data$.smooth, ":", n = 2)[, 1],
-          ..by.. = if_else(is.na(.data$.by), "..no_level..", .data$.by)
+          ..by.. = if_else(is.na(.data$.by), "..no_level..", .data$.by),
+          ..component.. = if (".smooth_id" %in% names(sm_eval)) {
+            .data$.smooth_id
+          } else match(.data$.type, unique(.data$.type))
         ) |>
         relocate(".term", .before = 1L)
       grp_by_levs <- unique(sm_l$"..by..")
       sm_l <- sm_l |>
         group_split(factor(.data$.term, levels = sm_levels),
-          factor(.data$"..by..", levels = grp_by_levs))
+          factor(.data$"..by..", levels = grp_by_levs),
+          factor(.data$..component.., levels = unique(.data$..component..)))
       # sometimes the steps to get the order right above don't work
       sm_l_levs <- vapply(sm_l, \(x) unique(x$.term), character(1L))
       if (!identical(unique(sm_l_levs), levs)) {
@@ -289,11 +348,14 @@
         sm_eval,
         .term = str_split_fixed(sm_eval$.smooth, ":", n = 2)[, 1]
       )
-      group_split(sm_eval, factor(.data$.smooth, levels = S[select]))
+      split_smooth_components(sm_eval)
     }
     sm_plts <- map(sm_l,
       draw_smooth_estimates,
-      geom = geom,
+      surface = surface, surface_3d = surface_3d,
+      surface_support = surface_support,
+      tensor_plot_info = attr(sm_eval, "tensor_plot_info"),
+      re_levels = re_levels,
       constant = constant,
       fun = fun,
       contour = contour,
@@ -314,6 +376,7 @@
       default_crs = default_crs,
       lims_method = lims_method,
       tensor_term_order = tensor_term_order,
+      coordinate_info = coordinate_info, back_transform = back_transform,
       caption = caption,
       grouped_by = grouped_by,
       ... # FIXME: temporary fix to allow captions to be suppressed-ish
@@ -375,13 +438,15 @@
   # Are we plotting parametric effects too?
   if (isTRUE(parametric)) {
     if (length(parametric_terms(object)) == 0L) {
-      message("The model contains no parametric terms")
       parametric <- FALSE
     } else {
       para <- parametric_effects(object,
+        overall_uncertainty = overall_uncertainty,
         terms = terms, data = data,
         unconditional = unconditional,
-        unnest = TRUE, ci_level = ci_level, envir = envir
+        unnest = TRUE, ci_level = ci_level, envir = envir,
+        n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, dist = dist,
+        back_transform = back_transform
       )
 
       if (is.null(para)) {
@@ -395,10 +460,13 @@
         object <- para |> add_confint(coverage = ci_level)
         # need to alter the ylim if scales are fixed
         if (isTRUE(identical(scales, "fixed"))) {
-          ylims <- range(
-            ylims, object$.partial, object$.upper_ci,
-            object$.lower_ci
-          )
+          displayed <- object |>
+            add_constant(constant = constant,
+              column = c(".partial", ".lower_ci", ".upper_ci")) |>
+            transform_fun(fun = fun,
+              column = c(".partial", ".lower_ci", ".upper_ci"))
+          ylims <- surface_fill_limits(c(ylims, displayed$.partial,
+            displayed$.upper_ci, displayed$.lower_ci), symmetric = FALSE)
         }
 
         f_levels <- attr(para, "factor_levels")
@@ -418,7 +486,13 @@
               position = position,
               angle = angle,
               ylim = ylims,
-              factor_levels = f_levels
+              factor_levels = f_levels, term_info = attr(para, "term_info"),
+              axis_info = attr(para, "axis_info"), from_raw = back_transform,
+              back_transform = back_transform,
+              contour = contour, contour_col = contour_col, n_contour = n_contour,
+              surface = surface, surface_3d = surface_3d,
+              continuous_fill = continuous_fill,
+              discrete_colour = discrete_colour, discrete_fill = discrete_fill
             )
           )
       }
@@ -443,9 +517,19 @@
   #}
 
   if (isTRUE(parametric)) {
-    para_nm <- unique(para$.term)
+    para_nm <- dplyr::group_keys(dplyr::group_by(para, .data$.term))$.term
     para_plts <- setNames(para_plts, para_nm)
     sm_plts <- append(sm_plts, para_plts)
+  }
+
+  if (surface == "3d" && scales == "fixed" && length(ylims)) {
+    common <- surface_fill_limits(ylims)
+    sm_plts <- lapply(sm_plts, function(p) {
+      if (!is.null(p) && inherits(p$coordinates, "Coord3D")) {
+        p <- p + ggplot2::expand_limits(z = ylims, fill = common)
+      }
+      p
+    })
   }
 
   # recheck: filter out NULLs as those are types of terms we can't plot (yet)

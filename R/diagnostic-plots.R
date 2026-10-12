@@ -627,6 +627,8 @@ diagnostic_method <- function(model, method = NULL) {
     model <- glmmtmb_diagnostic_model(model, type = if (missing(type)) "pearson" else match.arg(type))
     if (missing(type)) type <- "pearson"
   }
+
+  if (inherits(model, "gamm4")) model <- gamm4_gam(model)
   original <- model
   model <- model_used_rows(model)
   type <- match.arg(type)
@@ -710,6 +712,8 @@ diagnostic_method <- function(model, method = NULL) {
   if (inherits(model, "glmmTMB")) {
     model <- glmmtmb_diagnostic_model(model, type = "response")
   }
+
+  if (inherits(model, "gamm4")) model <- gamm4_gam(model)
   ## extract data for plot
   original <- model
   model <- model_used_rows(model)
@@ -787,6 +791,8 @@ diagnostic_method <- function(model, method = NULL) {
     model <- glmmtmb_diagnostic_model(model, type = if (missing(type)) "pearson" else match.arg(type))
     if (missing(type)) type <- "pearson"
   }
+
+  if (inherits(model, "gamm4")) model <- gamm4_gam(model)
   ## extract data for plot
   original <- model
   model <- model_used_rows(model)
@@ -1058,6 +1064,9 @@ diagnostic_method <- function(model, method = NULL) {
 
 # Internal weights for diagnostics; keep base lm dispatch unchanged.
 `diagnostic_weights` <- function(model) {
+  if (inherits(model, "gam")) {
+    return(stats::napredict(model$na.action, model$prior.weights))
+  }
   if (inherits(model, "glm")) {
     return(stats::weights(model, type = "prior"))
   }

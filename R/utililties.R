@@ -136,8 +136,7 @@
 #' @export
 #' @rdname smooths
 `smooths.gamm4` <- function(object, ...) {
-  stopifnot(is_gamm4(object))
-  smooths(object$gam)
+  smooths(gamm4_gam(object))
 }
 
 `smooth_variable` <- function(smooth) {
@@ -255,7 +254,7 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 }
 
 `is.gamm4` <- function(object) {
-  is.list(object) & (!is.null(object[["gam"]]))
+  is_gamm4(object)
 }
 
 `is.gam` <- function(object) {
@@ -332,16 +331,7 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 #' @export
 #' @rdname get_smooths_by_id
 `get_smooths_by_id.gamm4` <- function(object, id, ...) {
-  object[["gam"]][["smooth"]][id]
-}
-
-#' @export
-#' @rdname get_smooths_by_id
-`get_smooths_by_id.list` <- function(object, id, ...) {
-  if (!is.gamm4(object)) {
-    stop("Not a gamm4 model fit.", call. = FALSE)
-  }
-  object[["gam"]][["smooth"]][id]
+  gamm4_gam(object)[["smooth"]][id]
 }
 
 #' @title Extract an factor-by smooth by name
@@ -548,6 +538,7 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 #' @export
 get_vcov.default <- function(object, unconditional = FALSE,
     frequentist = FALSE, term = NULL, by_level = NULL) {
+  if (inherits(object, "gamm4")) object <- gamm4_gam(object)
   V <- if (frequentist) {
     object$Ve
   } else if (unconditional) {
@@ -981,21 +972,9 @@ get_vcov.default <- function(object, unconditional = FALSE,
 
 ## check if a model is a gamm4 object
 `is_gamm4` <- function(object) {
-  out <- FALSE
-  ## is object a list?
-  if (!inherits(object, "list")) {
-    return(out)
-  }
-  nms <- names(object)
-  if (!all(c("gam", "mer") %in% nms)) {
-    return(out)
-  }
-  if (!(inherits(object[["mer"]], "lmerMod") &&
-    inherits(object[["gam"]], "gam"))) {
-    return(out)
-  }
-  out <- TRUE
-  out
+  inherits(object, "gamm4") && is.list(object) &&
+    inherits(object[["gam"]], "gam") &&
+    inherits(object[["mer"]], "merMod")
 }
 
 ## check is a model is a gamm object
@@ -1066,17 +1045,10 @@ get_vcov.default <- function(object, unconditional = FALSE,
 #' @rdname is_factor_term
 #' @export
 `is_factor_term.list` <- function(object, term, ...) {
-  if (!is_gamm4(object)) {
-    if (all(vapply(object, inherits, logical(1), "terms"))) {
-      out <- any(unlist(lapply(object, is_factor_term, term)))
-    } else {
-      stop("Don't know how to handle generic list objects.")
-    }
-  } else {
-    object <- terms(object$gam)
-    out <- is_factor_term(object, term, ...)
+  if (!all(vapply(object, inherits, logical(1), "terms"))) {
+    stop("Don't know how to handle generic list objects.", call. = FALSE)
   }
-  out
+  any(vapply(object, is_factor_term, logical(1), term = term, ...))
 }
 
 #' Names of variables involved in a specified model term

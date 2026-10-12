@@ -424,10 +424,7 @@ test_that("term_variables works for a terms", {
 test_that("transform_fun works for parametric_effects", {
   skip_if_not_installed("withr")
   withr::local_options(lifecycle_verbosity = "quiet")
-  expect_message(
-    pe <- parametric_effects(m_para_sm),
-    "Interaction terms are not currently supported."
-  )
+  expect_silent(pe <- parametric_effects(m_para_sm))
   expect_silent(pe <- transform_fun(pe, fun = abs))
   expect_true(all(!pe$.partial < 0L))
 })
@@ -531,7 +528,7 @@ test_that("get smooths by id works for gamm4", {
   expect_identical(sm[[1]], m_gamm4$gam$smooth[[1]])
 
   expect_error(get_smooths_by_id(list(a = 10), 1),
-    "Not a gamm4 model fit.")
+    "no applicable method")
 })
 
 test_that("by smooth failure throws the right error", {

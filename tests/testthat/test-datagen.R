@@ -108,11 +108,11 @@ test_that("datagen gamm4 method works", {
   expect_identical(ncol(dg), 2L)
 })
 
-test_that("datagen gamm methods fails if not supplied a gamm object", {
+test_that("datagen gamm4 rejects a non-gamm4 object", {
   skip_if_not_installed("withr")
   withr::local_options(lifecycle_verbosity = "quiet")
-  expect_error(datagen.list(m_gam),
-    "Model doesn't appear to be a 'gamm4()' model object",
+  expect_error(datagen.gamm4(m_gam),
+    "Expected a gamm4 model with valid 'gam' and 'mer' components.",
     fixed = TRUE
   )
 })

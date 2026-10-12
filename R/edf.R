@@ -166,7 +166,8 @@
   if (is.null(edf_vec)) {
     edf_vec <- object[["edf"]]
     warning(
-      "Smoothness parameter uncertainty unavailable;",
+      if (type == "alternative") "Alternative effective degrees of freedom unavailable;" else
+        "Smoothness parameter uncertainty unavailable;",
       " using `type = \"default\"`"
     )
   }

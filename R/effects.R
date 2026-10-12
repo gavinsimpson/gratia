@@ -44,7 +44,7 @@
 #' @rdname fixed_effects.gam
 #' @export
 `fixed_effects.gamm4` <- function(object, ...) {
-  object <- object$gam
+  object <- gamm4_gam(object)
   fixed_effects(object)
 }
 
@@ -63,5 +63,5 @@
 #' @rdname fixed_effects.gam
 #' @export
 `fixed_effects.default` <- function(object, ...) {
-  fixed_effects(object, ...)
+  stop("No fixed-effects method for this object.", call. = FALSE)
 }

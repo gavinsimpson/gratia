@@ -22,6 +22,18 @@ draw_parametric_effect(
   ylim = NULL,
   angle = NULL,
   factor_levels = NULL,
+  term_info = NULL,
+  contour = TRUE,
+  contour_col = "black",
+  n_contour = NULL,
+  surface = "raster",
+  surface_3d = list(),
+  continuous_fill = NULL,
+  discrete_colour = NULL,
+  discrete_fill = NULL,
+  axis_info = NULL,
+  from_raw = FALSE,
+  back_transform = FALSE,
   ...
 )
 }
@@ -70,6 +82,74 @@ call to a position adjustment function.}
 drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggplot2::guide_axis()}}.}
 
 \item{factor_levels}{list; a named list of factor levels}
+
+\item{term_info}{Internal per-term covariate and plotting metadata.}
+
+\item{contour}{logical; should contours be draw on the plot using
+\code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+
+\item{contour_col}{colour specification for contour lines.}
+
+\item{n_contour}{numeric; the number of contour bins. Will result in
+\code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+
+\item{surface}{character; one of \code{"raster"} (the default), \code{"tile"}, or
+\code{"3d"}. Raster surfaces keep large PDF plots compact; tiles are borderless
+vector rectangles. Three-dimensional surfaces use the optional \code{ggcube}
+package, with the displayed partial effect as height and fill. Numeric
+smooth and parametric surfaces, including conditioning facets and soap
+films, are supported. Curves and factor estimates keep their usual display;
+spherical smooths retain their geographic rendering.
+Covariate scale changes that produce irregular spacing use rectangles
+bounded by adjacent coordinate midpoints for flat surfaces.}
+
+\item{surface_3d}{named list of view options passed to \code{\link[ggcube:coord_3d]{ggcube::coord_3d()}},
+for example \code{list(yaw = 45, persp = FALSE)}. The default \code{list()} uses the
+default view with \code{ggcube::light(backface_scale = 1)}, preserving equal
+horizontal units for isotropic smooths. Supply \code{light = ggcube::light(...)}
+in this list to override lighting; \code{ggcube::light(method = "none")} disables
+it. An explicitly supplied \code{light} replaces the entire default light.
+Only the coordinate system is used; ggcube's theme settings are not applied.
+These options affect all 3D panels in a call. For different views per term,
+modify individual plots returned by \code{\link[=assemble]{assemble()}}. The \code{dist} entry here
+controls perspective; the top-level \code{dist} argument controls masking.}
+
+
+\item{continuous_fill}{a suitable fill scale to be used when plotting
+continuous variables.}
+
+\item{discrete_colour}{a suitable colour scale to be used when plotting
+discrete variables.}
+
+\item{discrete_fill}{a suitable fill scale to be used when plotting
+discrete variables.}
+
+\item{axis_info}{Internal per-term mappings between model and raw coordinates.}
+
+\item{from_raw}{Internal logical; are the supplied coordinates on the raw scale?}
+
+\item{back_transform}{logical; plot covariates on their original scale?
+Defaults to \code{FALSE}, using model coordinates such as \code{log(x)} for a term
+containing \code{log(x)}. With \code{TRUE}, recover the raw covariates, generate a
+grid on their original scale and evaluate the model expressions forwards.
+Applies to axes, rugs, partial-residual locations and conditioning facets,
+including tensor products and parametric interactions. Each smooth axis
+must depend on one distinct original model covariate. Functions such as
+\code{foo(x)} are supported when their raw inputs and functions can be recovered;
+no inverse function is needed. Missing raw data or unavailable functions
+produce an error; supply \code{data} or \code{envir} as appropriate.
+With supplied prediction \code{data}, unavailable raw fitting observations
+omit rugs and partial residuals; prediction rows are never used as observations.
+For precomputed smooth estimates, prepare raw grids with
+\code{smooth_estimates(model, back_transform = TRUE)} before drawing with
+\code{back_transform = TRUE}. Raw inputs supplied through \code{data} also retain
+their coordinates. Transformed-only estimates cannot be relabelled on the
+raw scale, including grids carrying typical values from \code{include_all = TRUE}.
+Transformed soap-film boundaries lack retained raw coordinates and must
+be drawn with \code{back_transform = FALSE}.
+Parametric estimates retain both scales; multi-column basis
+expansions retain raw axes on either setting. Does not transform estimated
+effects or their intervals; use \code{fun} for that.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }

@@ -28,6 +28,7 @@ eval_smooth(smooth, ...)
   overall_uncertainty = TRUE,
   dist = NULL,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 
@@ -44,6 +45,7 @@ eval_smooth(smooth, ...)
   overall_uncertainty = TRUE,
   clip = TRUE,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 
@@ -60,6 +62,7 @@ eval_smooth(smooth, ...)
   overall_uncertainty = TRUE,
   dist = NULL,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 
@@ -73,6 +76,7 @@ eval_smooth(smooth, ...)
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 
@@ -86,6 +90,7 @@ eval_smooth(smooth, ...)
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 
@@ -99,6 +104,7 @@ eval_smooth(smooth, ...)
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 
@@ -112,6 +118,7 @@ eval_smooth(smooth, ...)
   frequentist = FALSE,
   overall_uncertainty = TRUE,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 
@@ -128,6 +135,7 @@ eval_smooth(smooth, ...)
   overall_uncertainty = TRUE,
   dist = NULL,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 
@@ -144,6 +152,7 @@ eval_smooth(smooth, ...)
   overall_uncertainty = TRUE,
   dist = NULL,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 }
@@ -167,7 +176,9 @@ are retained, and curves with only one continuous covariate use \code{n}.}
 \item{n_3d, n_4d}{numeric; the number of points along the third axis of a
 3D smooth (\code{n_3d}, default 16), or each axis after the first two for smooths
 of dimension four or higher (\code{n_4d}, default 4). If \code{NULL}, use \code{n} for
-those axes. The first two surface axes use \code{n_2d}.}
+those axes. For factor conditioning dimensions, retain at most that many
+levels, taking the first in fitted order. The first two surface axes use
+\code{n_2d}. Supplied \code{data} are unchanged.}
 
 \item{data}{an optional data frame of values to evaluate \code{smooth} at.}
 
@@ -192,6 +203,22 @@ and \code{dist} is a distance within the unit square. See
 \item{envir}{an optional environment supplying functions and constants used
 in model expressions. The available model formula environment is used when
 \code{NULL}. Covariate observations should be supplied in \code{data}.}
+
+\item{back_transform}{logical; generate automatic grids on the original
+covariate scale? The default, \code{FALSE}, preserves evenly spaced model-scale
+grids (e.g. in \code{log(x)}). With \code{TRUE}, recover raw fitting covariates and
+generate grids on their original scale, then evaluate the model expressions
+forwards. Each axis must depend on one distinct original model covariate.
+Functions such as \code{foo(x)} require no inverse. Fitted prediction parameters
+are retained where provided by the model, including for \code{scale(x)}.
+When \code{data} are supplied, use those rows without generating a grid; \code{TRUE}
+requires raw coordinates for each axis. Returned model-coordinate columns
+keep their usual names and raw coordinates are retained in auxiliary
+\verb{.gratia_raw_*} columns. Draw these estimates with
+\code{draw(object, back_transform = TRUE)} to display the raw coordinates.
+Estimates containing only transformed coordinates give an informative error
+if drawn on the original scale. This option does not change effect values
+or their intervals at the chosen evaluation points.}
 
 \item{clip}{logical; should evaluation points be clipped to the boundary of
 a soap film smooth? The default is \code{FALSE}, which will return \code{NA} for any

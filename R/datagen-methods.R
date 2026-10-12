@@ -113,10 +113,7 @@
 
 #' @export
 #' @rdname datagen
-`datagen.list` <- function(x, ...) {
+`datagen.gamm4` <- function(x, ...) {
   lifecycle::deprecate_warn("0.9.0", "datagen()", "data_slice()")
-  if (!is_gamm4(x)) {
-    stop("Model doesn't appear to be a 'gamm4()' model object.")
-  }
-  datagen(x[["gam"]], ...)
+  datagen(gamm4_gam(x), ...)
 }

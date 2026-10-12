@@ -24,6 +24,7 @@ smooth_estimates(object, ...)
   partial_match = FALSE,
   clip = FALSE,
   envir = NULL,
+  back_transform = FALSE,
   ...
 )
 }
@@ -50,7 +51,9 @@ are retained, and curves with only one continuous covariate use \code{n}.}
 \item{n_3d, n_4d}{numeric; the number of points along the third axis of a
 3D smooth (\code{n_3d}, default 16), or each axis after the first two for smooths
 of dimension four or higher (\code{n_4d}, default 4). If \code{NULL}, use \code{n} for
-those axes. The first two surface axes use \code{n_2d}.}
+those axes. For factor conditioning dimensions, retain at most that many
+levels, taking the first in fitted order. The first two surface axes use
+\code{n_2d}. Supplied \code{data} are unchanged.}
 
 \item{data}{a data frame of covariate values at which to evaluate the
 smooth.}
@@ -86,6 +89,22 @@ point that is deemed to lie outside the boundary of the soap film.}
 \item{envir}{an optional environment supplying functions and constants used
 in model expressions. The available model formula environment is used when
 \code{NULL}. Covariate observations should be supplied in \code{data}.}
+
+\item{back_transform}{logical; generate automatic grids on the original
+covariate scale? The default, \code{FALSE}, preserves evenly spaced model-scale
+grids (e.g. in \code{log(x)}). With \code{TRUE}, recover raw fitting covariates and
+generate grids on their original scale, then evaluate the model expressions
+forwards. Each axis must depend on one distinct original model covariate.
+Functions such as \code{foo(x)} require no inverse. Fitted prediction parameters
+are retained where provided by the model, including for \code{scale(x)}.
+When \code{data} are supplied, use those rows without generating a grid; \code{TRUE}
+requires raw coordinates for each axis. Returned model-coordinate columns
+keep their usual names and raw coordinates are retained in auxiliary
+\verb{.gratia_raw_*} columns. Draw these estimates with
+\code{draw(object, back_transform = TRUE)} to display the raw coordinates.
+Estimates containing only transformed coordinates give an informative error
+if drawn on the original scale. This option does not change effect values
+or their intervals at the chosen evaluation points.}
 }
 \value{
 A data frame (tibble), which is of class \code{"smooth_estimates"}.
@@ -98,6 +117,11 @@ implementation of \code{evaluate_smooth()}, and replaces that function, which ha
 been removed from the package.
 }
 \details{
+When distinct fitted terms share both their smooth label and type (for
+example, tensor products of soap-film components), \code{.smooth_id} contains
+their fitted smooth indices. This preserves their identity in saved
+estimates and plots without changing the labels supplied by mgcv.
+
 For explicit \code{data}, missing covariates needed by a smooth produce \code{NA}
 estimates and standard errors at those positions. Missing values in variables
 unrelated to that smooth do not discard its otherwise evaluable rows.
@@ -113,6 +137,18 @@ Stored evaluated columns allow automatic plotting even when a local function
 used to fit the model is no longer available. Evaluating that function at new
 raw data requires \code{envir}; training values are never substituted for new
 observations. Arbitrary transformations are not inverted to recover raw data.
+The \code{coordinate_info} attribute identifies retained raw coordinate columns.
+\code{\link[=draw]{draw()}} uses them for \code{back_transform = TRUE}; the usual coordinate
+columns remain on the model scale. Automatic raw grids require recoverable
+fitting rows and matching functions and constants. Supplied raw \code{data}
+instead define the prediction rows directly.
+Typical covariate values added to evaluated grids by \code{include_all = TRUE}
+are not raw axis coordinates. Numeric \code{by} multipliers are set to one on
+automatic grids, even when their name also identifies a raw axis; supplied
+prediction rows retain their actual multipliers. Soap-film boundary rows
+retain model coordinates only. If a boundary axis is transformed, draw the
+estimates with \code{back_transform = FALSE}; raw-scale drawing gives an error
+rather than dropping the boundary.
 }
 \examples{
 load_mgcv()

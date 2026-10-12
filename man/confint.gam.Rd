@@ -3,7 +3,7 @@
 \name{confint.gam}
 \alias{confint.gam}
 \alias{confint.gamm}
-\alias{confint.list}
+\alias{confint.gamm4}
 \title{Point-wise and simultaneous confidence intervals for smooths}
 \usage{
 \method{confint}{gam}(
@@ -27,7 +27,7 @@
 
 \method{confint}{gamm}(object, ...)
 
-\method{confint}{list}(object, ...)
+\method{confint}{gamm4}(object, ...)
 }
 \arguments{
 \item{object}{an object of class \code{"gam"} or \code{"gamm"}.}

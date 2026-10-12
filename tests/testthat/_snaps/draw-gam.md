@@ -1,7 +1,7 @@
-# draw.gam issues message for parametric only model
+# draw.gam issues message when all parametric terms are excluded
 
     Code
-      plt <- draw(m_only_para)
+      plt <- draw(m_only_para, parametric = FALSE)
     Message
       i Unable to draw any of the model terms.
 
@@ -9,6 +9,4 @@
 
     Code
       plt <- draw(m_only_para, parametric = TRUE, angle = 90, rug = FALSE, data = df_2_fac)
-    Message
-      i Interaction terms are not currently supported.
 

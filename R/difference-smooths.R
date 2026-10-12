@@ -244,11 +244,8 @@
 }
 
 #' @export
-`difference_smooths.list` <- function(model, ...) {
-  if (!is_gamm4(model)) {
-    stop("'object' is not a `gamm4()` fit. Can't handle general lists.")
-  }
-  difference_smooths(model$gam, ...)
+`difference_smooths.gamm4` <- function(model, ...) {
+  difference_smooths(gamm4_gam(model), ...)
 }
 
 #' @importFrom tibble new_tibble

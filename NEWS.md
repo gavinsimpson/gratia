@@ -12,6 +12,78 @@
   with conditional response simulation for QQ reference bands. See
   `?'glmmTMB-methods'` for supported families and current limitations.
 
+* Soap-film boundary (`bs = "sf"`) and wiggly (`bs = "sw"`) components are
+  supported, including their distinct component types and boundary-aware plots
+  (#375). gratia now requires mgcv >= 1.9-4 and R >= 4.4.0.
+
+* Grouped-family models fitted with `mgcv::gfam()` now support response-scale
+  `fitted_samples()` with component-specific mean transforms (#269), and
+  `simulate()` with component-specific distributions and parameters (#272).
+  Both accept `family_index` for prediction data; ordinal response-scale fitted
+  draws remain unsupported.
+
+* Improved support for `gamm4` models across gratia.
+
+* Link extraction now shares parameter validation across `link()`, `inv_link()`,
+  and `extract_link()`. Unsupported parameters are rejected consistently, while
+  single-link families can use their supplied functions without a family-name
+  whitelist. For `twlss()`, `scale`, `sigma`, and `phi` select the third linear
+  predictor, and `power` selects the second. Explicit `which_eta` indices for
+  `mvn()` and `multinom()` are now respected and validated.
+
+* **Breaking change:** Parametric plots now use model covariate coordinates by
+  default, so `log(x)` is plotted against `log(x)` with the matching axis label.
+  Use `back_transform = TRUE` to plot against the original covariates. The same
+  option is available in `draw.gam()`, `assemble.gam()`,
+  `draw.parametric_effects()` and `draw.smooth_estimates()`, including tensor
+  products, parametric interaction axes, rugs and conditioning facets (#412).
+  Multi-column basis expansions retain raw axes. Changed scales with irregular
+  surface spacing use rectangles rather than shifting raster pixels.
+
+  The `transform` argument of `parametric_effects()` is deprecated; replace it
+  with `back_transform = !transform`. Model-scale parametric coordinates now
+  contain the evaluated predictor rather than its coefficient-weighted partial
+  contribution. Estimated effects and intervals are unaffected by the choice
+  of coordinate scale.
+
+  Smooth grids retain their existing model-scale defaults. Use
+  `smooth_estimates(..., back_transform = TRUE)` to recover raw fitting data,
+  generate original-scale grids and evaluate expressions forwards. This supports
+  custom functions such as `foo(x)` and tensor products without inverse functions.
+  Drawing precomputed estimates on the original scale requires retained raw
+  coordinates; transformed-only estimates give an informative error. Confidence
+  intervals and subsets retain coordinate columns. Parametric effects retain
+  both scales by row, including for many-to-one transformations.
+  Evaluated grids do not mistake typical nuisance values for raw axes, and
+  numeric `by` multipliers can share a raw axis name. Drawing forwards `envir`
+  to observation recovery; supplied prediction data remain usable when raw
+  observations for rugs or residuals are unavailable. Transformed soap-film
+  boundaries produce an explicit raw-scale drawing error instead of disappearing.
+
+* Parametric interaction surfaces now share the smooth-surface fill-range
+  calculation, centring the default diverging palette at zero across all
+  facets. Fixed scales now also expand parametric surface fill ranges (#411).
+
+* **Breaking change:** `draw.gam()` and `assemble.gam()` now default to
+  `parametric = NULL`, including parametric terms alongside smooths when
+  `select = NULL`. Selecting smooths explicitly continues to draw only those
+  smooths, unless `parametric = TRUE` is supplied. Use `parametric = FALSE`
+  to restore the previous default. Additional panels can change plot layouts
+  and the length of plot lists returned by `assemble()` or `draw(wrap = FALSE)`.
+
+* `parametric_effects()` and `draw()` now support parametric interactions,
+  including higher-order interactions. Numeric interactions use surfaces with
+  higher order terms using conditioning facets, numeric-by-factor interactions
+  use grouped curves, and factor interactions use grouped estimates and
+  intervals.
+
+  Parametric effects now also include intercept uncertainty by default,
+  including covariance between the intercept and the term. Partial estimates
+  are unchanged. Use `overall_uncertainty = FALSE` in `parametric_effects()`,
+  `draw()`, or `assemble()` to recover term-only intervals. Each term uses the
+  intercept of its own linear predictor; models without an intercept are
+  unaffected.
+
 * Plotting helpers are now shared by derivative, comparison, difference,
   posterior, basis and spherical-smooth plots (#308). Curve/interval rendering
   and automatic panel layouts are centralised while retaining existing
@@ -19,8 +91,8 @@
 
 * Flat smooth surfaces now share an internal renderer across bivariate,
   trivariate, quadvariate, tensor-product and soap-film plots (#308).
-  `draw()` and `assemble()` accept `geom = "tile"` for vector rectangles;
-  the default remains `geom = "raster"`. Automatic fill ranges now ignore
+  `draw()` and `assemble()` accept `surface = "tile"` for vector rectangles;
+  the default remains `surface = "raster"`. Automatic fill ranges now ignore
   non-finite values for both estimates and standard errors.
 
 * Univariate smooth plots now share internal rendering, label and palette
@@ -74,6 +146,19 @@
   preventing prediction.
 
 ## New features
+
+* `fitted_values()` now emits a message identifying prediction rows with unobserved
+  combinations of known categorical predictor levels (#164).
+
+* Numeric smooth and parametric surfaces can now be drawn in 3D with
+  `surface = "3d"`, using the optional ggcube package (implements #393).
+  The existing RdBu fill palette, theme, conditioning facets, contours, and
+  masking are retained.
+  
+  `surface_3d = list(...)` controls the view without applying ggcube's theme.
+  Lighting defaults to `backface_scale = 1`; supply a custom `light` through
+  `surface_3d` to override it. Opaque faces, contours, and floor observations
+  share depth ordering so hidden features are occluded.
 
 * Surface plotting and related evaluation functions now support `n_2d`,
   defaulting to 50 points along each surface axis (#153). This reduces default
@@ -161,6 +246,21 @@
   families.
 
 ## Bug Fixes
+
+* Random-effect tensor products now plot curves, categorical estimates and
+  faceted surfaces consistently across `te()`, `ti()` and `t2()` (#169).
+  Use `re_levels` to select factor levels; `n_3d` and `n_4d` also limit factor
+  conditioning dimensions.
+
+* Spline-on-the-sphere plots now use valid cells at the poles and date line,
+  with orthographic clipping and separate factor-by panels (#277).
+
+* `draw.gamlss()` now sizes its plot layout using the panels actually drawn,
+  including parametric effects, avoiding rendering errors for GJRM models.
+
+* Restored faceted surfaces for three- and four-variable `t2()` smooths with
+  factor margins. The two-variable tensor plotting fix had incorrectly routed
+  these terms to the factor-smooth renderer, which skipped them.
 
 * Posterior sampling for GAMs, including the GAM component of `gamm4` models,
   now falls back to `mgcv::rmvn()` with a warning if the default sampler's

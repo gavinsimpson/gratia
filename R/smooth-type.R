@@ -1,5 +1,8 @@
 #' Determine the type of smooth and return it n a human readable form
 #'
+#' Soap-film boundary and wiggly components use the `sf.film` and `sf.wiggly`
+#' classes introduced in mgcv 1.9-4.
+#'
 #' @param smooth an object inheriting from class `mgcv.smooth`.
 #'
 #' @export
@@ -125,14 +128,14 @@
 
 #' @export
 #' @rdname smooth_type
-`smooth_type.sw` <- function(smooth) {
+`smooth_type.sf.wiggly` <- function(smooth) {
   sm_type <- "Soap film (wiggly)"
   sm_type
 }
 
 #' @export
 #' @rdname smooth_type
-`smooth_type.sf` <- function(smooth) {
+`smooth_type.sf.film` <- function(smooth) {
   sm_type <- "Soap film (boundary)"
   sm_type
 }

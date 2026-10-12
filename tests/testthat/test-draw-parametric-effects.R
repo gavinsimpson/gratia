@@ -1,10 +1,7 @@
 # Test draw.parametric_effects() method
 
 test_that("draw.parametric_effects works for m_2_fac", {
-  expect_message(
-    peff <- parametric_effects(m_2_fac),
-    "Interaction terms are not currently supported."
-  )
+  expect_silent(peff <- parametric_effects(m_2_fac))
   expect_silent(plt <- draw(peff))
 
   # skip_on_ci() # testing without as moved to mac os x
@@ -12,10 +9,7 @@ test_that("draw.parametric_effects works for m_2_fac", {
 })
 
 test_that("draw.parametric_effects works for m_para_sm", {
-  expect_message(
-    peff <- parametric_effects(m_para_sm),
-    "Interaction terms are not currently supported."
-  )
+  expect_silent(peff <- parametric_effects(m_para_sm))
   expect_silent(plt <- draw(peff, rug = FALSE))
 
   # skip_on_ci() # testing without as moved to mac os x
@@ -43,10 +37,7 @@ test_that("draw.parametric_effects works for m_para_sm select term", {
 })
 
 test_that("draw.parametric_effects works with only parametric terms", {
-  expect_message(
-    peff <- parametric_effects(m_only_para),
-    "Interaction terms are not currently supported."
-  )
+  expect_silent(peff <- parametric_effects(m_only_para))
   expect_silent(plt <- draw(peff, rug = FALSE))
 
   # skip_on_ci() # testing without as moved to mac os x
@@ -103,7 +94,7 @@ test_that("issue 45 parametric effects for lss models remains fixed", {
     data = data_45
   )
 
-  expect_silent(plt1 <- draw(b, rug = FALSE))
+  expect_silent(plt1 <- draw(b, parametric = FALSE, rug = FALSE))
 
   expect_silent(plt2 <- draw(b,
     parametric = TRUE, rug = FALSE,
@@ -116,7 +107,7 @@ test_that("issue 45 parametric effects for lss models remains fixed", {
     data = data_45
   )
 
-  expect_silent(plt3 <- draw(b0, rug = FALSE))
+  expect_silent(plt3 <- draw(b0, parametric = FALSE, rug = FALSE))
 
   expect_silent(plt4 <- draw(b0,
     parametric = TRUE, rug = FALSE,
@@ -129,7 +120,7 @@ test_that("issue 45 parametric effects for lss models remains fixed", {
     data = data_45
   )
 
-  expect_silent(plt5 <- draw(b1, rug = FALSE))
+  expect_silent(plt5 <- draw(b1, parametric = FALSE, rug = FALSE))
 
   expect_silent(plt6 <- draw(b1,
     parametric = TRUE, rug = FALSE,

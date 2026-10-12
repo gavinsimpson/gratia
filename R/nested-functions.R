@@ -133,7 +133,7 @@
   extra = NULL,
   distinct = FALSE
 ) {
-  sm <- get_smooth(model, smooth)
+  sm <- if (inherits(smooth, "mgcv.smooth")) smooth else get_smooth(model, smooth)
   sm_var <- smooth_variable(sm)
   # ====> FIXME <==== what about continuous by?
   # we don't need the by variable in that case. Must check this in that
@@ -146,7 +146,8 @@
 
   # retain only those columns we want
   df <- data |>
-    select(all_of(c(sm_var, by_var))) |>
+    select(all_of(unique(c(sm_var, by_var,
+      smooth_coordinate_columns(model, sm_var, data))))) |>
     as_tibble()
 
   # handle matrix covariates, which will get stacked by as.numeric
@@ -190,5 +191,31 @@
     return(x)
   }
 
+  out
+}
+
+# Observation attachments for distinct components sharing an mgcv label.
+# Resolve them by their fitted index rather than looking a label up again.
+nested_component_observations <- function(object, ids, data = NULL,
+    partial = FALSE, distinct = TRUE) {
+  if (is.null(data)) data <- model.frame(object)
+  smooths <- get_smooths_by_id(object, ids)
+  values <- NULL
+  if (partial) {
+    used <- model_used_rows(object)
+    values <- predict(used, newdata = used$model, type = "terms")
+    columns <- ncol(values) - length(object$smooth) + ids
+    values <- values[, columns, drop = FALSE] +
+      as.numeric(residuals(used, "working")) * sqrt(weights(used, "working"))
+    values <- residual_rows(values, object, data, partial = TRUE)
+  }
+  observations <- lapply(seq_along(smooths), function(i) {
+    extra <- if (partial) tibble(partial_residual = unname(values[, i])) else NULL
+    get_obs_data_for_smooth(smooths[[i]], object, data, extra = extra,
+      distinct = !partial && distinct)
+  })
+  out <- tibble(.smooth = vapply(smooths, smooth_label, character(1)),
+    .type = vapply(smooths, smooth_type, character(1)), .smooth_id = ids)
+  out[[if (partial) "partial_residual" else "rug_data"]] <- observations
   out
 }
