@@ -1,5 +1,5 @@
 # glmmTMB is an optional dependency.
-skip_if_not_installed("glmmTMB")
+skip_if_not_installed("glmmTMB", minimum_version = "1.1.15.9000")
 
 tmb_data <- function() {
   set.seed(928)
@@ -42,7 +42,7 @@ test_that("joint covariance matches native ML and REML prediction intervals", {
   d <- tmb_data()
   for (reml in c(FALSE, TRUE)) {
     m <- glmmTMB::glmmTMB(y ~ s(x, k = 6), d, REML = reml)
-    a <- glmmtmb_smooth_model(m)
+    a <- glmmtmb_smooth_model(m, "cond")
     X <- cbind(1, mgcv::PredictMat(a$smooth[[1]], d))
     se <- sqrt(rowSums((X %*% a$Vp) * X))
     expect_equal(unname(se), unname(predict(m, se.fit = TRUE)$se.fit), tolerance = 1e-7)
@@ -68,10 +68,11 @@ test_that("smooth plotting supports transformed, bivariate and numeric by smooth
   expect_true(is.na(e$.estimate[2]))
   expect_true(all(is.finite(e$.estimate[c(1, 3)])))
   expect_error(draw(m, residuals = TRUE), "partial residual")
-  expect_error(draw(m, parametric = TRUE), "parametric")
+  expect_s3_class(draw(m, parametric = TRUE), "patchwork")
   plain <- glmmTMB::glmmTMB(y ~ x, d)
   expect_length(smooths(plain), 0)
-  expect_error(draw(plain), "No smooths")
+  expect_length(draw(plain, wrap = FALSE), 1)
+  expect_error(smooth_estimates(plain), "No smooths")
 })
 
 test_that("all linear predictors share mgcv-style smooth selection and labels", {
@@ -243,7 +244,7 @@ test_that("glmmTMB plots render consistently", {
   skip_on_cran()
   d <- tmb_data()
   m <- glmmTMB::glmmTMB(y ~ s(x, k = 6) + (1 | g), d, REML = TRUE)
-  vdiffr::expect_doppelganger("glmmTMB smooth", draw(m))
+  vdiffr::expect_doppelganger("glmmTMB smooth", draw(m, select = "s(x)"))
   vdiffr::expect_doppelganger("glmmTMB appraise", appraise(m, n_simulate = 20, seed = 928))
 })
 

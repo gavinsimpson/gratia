@@ -6,7 +6,11 @@
   glmmTMB models, including conditional, zero-inflation and dispersion smooths
   where supported by glmmTMB. All smooths are plotted by default, with
   mgcv-style predictor labels (`s(x)`, `s.1(x)`, etc.) and model-wide `select`.
-  Smooth intervals use TMB joint covariance.
+  Parametric effects and native random effects are also plotted, including
+  models without smooths. Native random intercepts and slopes use separate
+  Gaussian QQ panels. Set `ranef_lines = TRUE` to replace a simple
+  `(1 + x | g)` pair with lines showing its random contribution only;
+  more complex terms retain QQ panels. Effect intervals use TMB joint covariance.
 
   `appraise()`, `qq_plot()` and `worm_plot()` support native glmmTMB residuals,
   with conditional response simulation for QQ reference bands. See

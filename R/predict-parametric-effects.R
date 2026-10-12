@@ -3,6 +3,12 @@
 # than coefficient names so contrasts and multi-column terms remain intact.
 predict_parametric_effects <- function(object, newdata, terms,
     unconditional, overall_uncertainty) {
+  UseMethod("predict_parametric_effects")
+}
+
+#' @export
+predict_parametric_effects.default <- function(object, newdata, terms,
+    unconditional, overall_uncertainty) {
   # Retain mgcv's partial estimates and its term-only SEs as the fallback.
   # Only se.fit is replaced below: adding the intercept to fit would change
   # the estimand from a term contribution to an intercept-plus-term prediction.

@@ -12,15 +12,19 @@ glmmtmb_smooth_info <- function(object, component) {
 
 # Follow mgcv's predictor order and labels, including predictors with no
 # smooths. A missing zero-inflation predictor does not consume an index.
-glmmtmb_smooths <- function(object) {
+glmmtmb_components <- function(object) {
   components <- c("cond", "zi", "disp")
   fixed <- glmmTMB::fixef(object)
   active <- vapply(components, function(component) {
     length(fixed[[component]]) > 0L ||
       length(object$modelInfo$reStruc[[paste0(component, "ReStruc")]]) > 0L
   }, logical(1))
-  active[1L] <- TRUE # The conditional predictor exists even with only an offset.
-  components <- components[active]
+  active[1L] <- TRUE
+  components[active]
+}
+
+glmmtmb_smooths <- function(object) {
+  components <- glmmtmb_components(object)
   out <- list()
   for (i in seq_along(components)) {
     component <- components[i]
@@ -50,8 +54,7 @@ get_smooths_by_id.glmmTMB <- function(object, id, ...) {
 # lpi attribute keeps overall-mean uncertainty local to each linear predictor.
 glmmtmb_all_smooths <- function(object, covariance) {
   sms <- glmmtmb_smooths(object)
-  if (!length(sms)) stop("No smooths in glmmTMB model.")
-  components <- unique(vapply(sms, attr, character(1), "gratia.component"))
+  components <- glmmtmb_components(object)
   models <- lapply(components, function(component)
     glmmtmb_smooth_model(object, component, covariance = FALSE))
   names(models) <- components
@@ -78,9 +81,17 @@ glmmtmb_all_smooths <- function(object, covariance) {
   out$coefficient_transform <- A
   out$joint_indices <- indices
   out$component <- NULL
+  out$models <- lapply(seq_along(models), function(i) {
+    local <- models[[i]]
+    columns <- seq_len(sizes[i]) + starts[i]
+    local$Vp <- if (covariance) out$Vp[columns, columns, drop = FALSE] else NULL
+    local$predictor <- match(components[i], glmmtmb_components(object))
+    local
+  })
+  names(out$models) <- components
   out$contexts <- lapply(models, function(x) list(formula = x$formula, terms = x$terms))
   attr(out$formula, "lpi") <- lapply(seq_along(models), function(i)
-    seq.int(starts[i] + 1L, starts[i + 1L]))
+    seq_len(sizes[i]) + starts[i])
   # Coefficient names also identify the predictor, just like the smooth labels.
   names(out$coefficients) <- unlist(lapply(seq_along(models), function(i) {
     nm <- names(models[[i]]$coefficients)
@@ -97,7 +108,10 @@ glmmtmb_all_smooths <- function(object, covariance) {
 # others. Subsetting the precision before solving would condition on them.
 glmmtmb_joint_covariance <- function(object, index) {
   sdr <- object$sdr
-  if (is.null(sdr$jointPrecision)) {
+  p <- object$fit$parfull
+  fixed_only <- identical(names(sdr$par.fixed), names(p)) &&
+    identical(dim(sdr$cov.fixed), c(length(p), length(p)))
+  if (is.null(sdr$jointPrecision) && !fixed_only) {
     sdr <- TMB::sdreport(object$obj, getJointPrecision = TRUE)
   }
   if (!isTRUE(sdr$pdHess)) {
@@ -105,6 +119,11 @@ glmmtmb_joint_covariance <- function(object, index) {
   }
   Q <- sdr$jointPrecision
   p <- object$fit$parfull
+  # With no random parameters TMB supplies cov.fixed, not jointPrecision.
+  if (is.null(Q) && identical(names(sdr$par.fixed), names(p)) &&
+      identical(dim(sdr$cov.fixed), c(length(p), length(p)))) {
+    return(sdr$cov.fixed[index, index, drop = FALSE])
+  }
   if (is.null(Q) || nrow(Q) != length(p) ||
       (!is.null(rownames(Q)) && !identical(rownames(Q), names(p)))) {
     stop("Cannot align glmmTMB joint precision with fitted parameters (mapped parameters are not supported).")
@@ -121,13 +140,13 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
   component <- glmmtmb_component(component)
   info <- object$modelInfo$reTrms[[component]]$smooth_info
   positions <- which(lengths(info) > 0L)
-  if (!length(positions)) stop("No smooths in glmmTMB component '", component, "'.")
   tags <- switch(component, cond = c("beta", "b"),
     zi = c("betazi", "bzi"), disp = c("betadisp", "bdisp"))
   p <- object$fit$parfull
   fixed <- which(names(p) == tags[1L])
   random <- which(names(p) == tags[2L])
   blocks <- object$modelInfo$reStruc[[paste0(component, "ReStruc")]]
+  if (is.null(info)) info <- vector("list", length(blocks))
   sizes <- vapply(blocks, function(x) x$blockSize * x$blockReps, numeric(1))
   if (sum(sizes) != length(random) || length(blocks) != length(info)) {
     stop("Cannot align glmmTMB smooths with random-effect blocks.")
@@ -189,7 +208,14 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
     cmX = unname(cm), model = frame, terms = tt, formula = ff,
     coefficient_transform = A, joint_indices = indices,
     call = object$call, component = component,
-    var.summary = lapply(frame, function(x) if (is.numeric(x))
+    pterms = tt, parametric = seq_along(parametric),
+    contrasts = object$modelInfo$contrasts,
+    xlevels = stats::.getXlevels(tt, frame),
+    pred.formula = if (length(all.vars(stats::delete.response(tt))))
+      stats::reformulate(all.vars(stats::delete.response(tt)), env = environment(ff))
+      else stats::as.formula("~1", env = environment(ff)),
+    var.summary = lapply(frame[intersect(names(frame), all.vars(ff))],
+      function(x) if (is.numeric(x))
       c(min(x), stats::median(x), max(x)) else x),
     na.action = stats::na.action(object)), class = "gratia_glmmtmb_smooth")
 }
@@ -232,10 +258,7 @@ smooth_estimates.gratia_glmmtmb_smooth <- function(object, select = NULL,
   attr(out, "tensor_term_order") <- do.call(c, lapply(results, attr, "tensor_term_order"))
   out
 }
-#' @export
-assemble.gratia_glmmtmb_smooth <- function(object, ...) assemble.gam(object, ...)
-
-#' Smooths and diagnostics for glmmTMB models
+#' Effects and diagnostics for glmmTMB models
 #'
 #' Evaluate and plot the stored mgcv smooths in a glmmTMB fit. Coefficients and
 #' their joint covariance are transformed back to the constrained mgcv basis.
@@ -243,12 +266,25 @@ assemble.gratia_glmmtmb_smooth <- function(object, ...) assemble.gam(object, ...
 #' they are not mgcv frequentist or smoothness-corrected intervals.
 #'
 #' @param object,model A fitted `glmmTMB` model.
-#' @param select Smooth selection, across all linear predictors.
+#' @param select Smooth or native random-effect coefficient selection, across
+#'   all linear predictors. Numeric indices select smooths first, then native
+#'   random coefficients. Native labels have the form `(1 | g)` and `(x | g)`;
+#'   later predictors append `.1`, `.2`, etc. `smooth_estimates()` and
+#'   `smooth_coefs()` select smooths only.
+#' @param terms Character vector selecting parametric terms, as returned by
+#'   `parametric_terms()`. Later predictors append `.1`, `.2`, etc.
 #' @param id Integer positions of smooths across all linear predictors.
 #' @param unconditional,frequentist Must be `FALSE`; mgcv-specific covariance
 #'   alternatives are not available.
-#' @param parametric,residuals Must be `FALSE`; parametric effect plots and
-#'   partial residual overlays are not yet supported.
+#' @param parametric Include parametric effect plots? `NULL` follows
+#'   `draw.gam()`: include them unless `select` is supplied. Use `terms` to
+#'   choose parametric terms, and `parametric = FALSE` to omit them.
+#' @param residuals Must be `FALSE`; partial residual overlays are not supported.
+#' @param ranef_lines Logical; replace QQ plots for a simple native random
+#'   intercept and numeric slope term, `(1 + x | g)`, with one panel of lines
+#'   showing `b[0,g] + x * b[1,g]`? Defaults to `FALSE`. Both coefficients must
+#'   be selected. Multiple slopes, interactions, factor slopes, transformed
+#'   slopes and structured covariance terms retain separate QQ plots.
 #' @param ... Arguments passed to the corresponding gratia method.
 #' @param envir Optional environment for evaluating model covariates.
 #' @details
@@ -256,6 +292,19 @@ assemble.gratia_glmmtmb_smooth <- function(object, ...) assemble.gam(object, ...
 #' multi-penalty structures, mapped joint parameters and rank-deficient smooth
 #' models give errors. Factor-by and tensor smooth availability is determined
 #' by glmmTMB; gratia does not expand the smooth types glmmTMB can fit.
+#'
+#' Parametric effects use fitted contrast coding and exclude smooth null-space
+#' coefficients. Their intervals include uncertainty in the intercept of their
+#' own linear predictor by default, as for GAMs. `overall_uncertainty = FALSE`
+#' gives term-only intervals. Models without smooths are also supported.
+#'
+#' Native random effects use one Gaussian QQ panel per coefficient type and
+#' grouping factor, matching mgcv random-effect smooth plots. The internal
+#' random effects representing smooths are excluded from these panels.
+#' With `ranef_lines = TRUE`, eligible intercept-slope pairs use a common grid
+#' over the fitting range of the numeric covariate, or its supplied `data`
+#' values. Lines show random contributions only, without population-level
+#' terms or uncertainty bands. Different formula terms are never combined.
 #'
 #' Diagnostics use native Pearson residuals by default. QQ simulations hold
 #' fitted smooths and grouping effects fixed and draw new responses; no refitting
@@ -267,20 +316,32 @@ assemble.gratia_glmmtmb_smooth <- function(object, ...) assemble.gam(object, ...
 #' explicitly. PIT and quantile residuals are not supported by these methods.
 #'
 #' @return Smooth estimates, coefficients, or plots, as for the GAM methods.
-#'   All smooths are included by default, as for `draw.gam()`. Smooths in later
+#'   All smooths, native random effects and parametric terms are plotted by
+#'   default, as for `draw.gam()`. Smooths in later
 #'   linear predictors use mgcv-style labels such as `s.1(x)` and `s.2(x)`.
 #'   Predictor order is conditional, zero-inflation (if present), then dispersion
-#'   (if present). Use `smooths(object)` and `select` to select individual smooths.
+#'   (if present). Use `smooths(object)` and `select` to select individual smooths;
+#'   `names(draw(object, wrap = FALSE, parametric = FALSE))` also lists native
+#'   random-effect coefficient panels.
 #' @name glmmTMB-methods
 #' @examples
 #' if (requireNamespace("glmmTMB", quietly = TRUE)) {
-#'   library(mgcv)
+#'   library("mgcv")
 #'   set.seed(42)
 #'   d <- data.frame(x = runif(150))
 #'   d$y <- sin(6 * d$x) + rnorm(150, sd = 0.2)
 #'   m <- glmmTMB::glmmTMB(y ~ s(x, k = 8), data = d, REML = TRUE)
 #'   draw(m)
 #'   appraise(m, seed = 42)
+#'
+#'   # Parametric terms and native random intercepts and slopes
+#'   d$z <- rnorm(150)
+#'   d$g <- factor(rep(seq_len(10), each = 15))
+#'   d$y <- d$y + 0.5 * d$z + rnorm(10)[d$g] + rnorm(10)[d$g] * d$z
+#'   mixed <- glmmTMB::glmmTMB(y ~ z + s(x, k = 8) + (1 + z | g),
+#'     data = d, REML = TRUE)
+#'   draw(mixed) # separate QQ panels for intercepts and slopes
+#'   draw(mixed, ranef_lines = TRUE) # random contributions only
 #' }
 NULL
 
@@ -295,6 +356,7 @@ glmmtmb_covariance_options <- function(unconditional, frequentist) {
 smooth_estimates.glmmTMB <- function(object, ...,
     unconditional = FALSE, frequentist = FALSE) {
   glmmtmb_covariance_options(unconditional, frequentist)
+  if (!length(glmmtmb_smooths(object))) stop("No smooths in glmmTMB model.")
   smooth_estimates(glmmtmb_smooth_model(object), ...)
 }
 
@@ -306,14 +368,25 @@ smooth_coefs.glmmTMB <- function(object, select, ...) {
 
 #' @rdname glmmTMB-methods
 #' @export
-draw.glmmTMB <- function(object, ..., parametric = FALSE,
-    residuals = FALSE, unconditional = FALSE, frequentist = FALSE, envir = NULL) {
+draw.glmmTMB <- function(object, ..., parametric = NULL,
+    residuals = FALSE, unconditional = FALSE, frequentist = FALSE,
+    ranef_lines = FALSE, envir = NULL) {
   glmmtmb_covariance_options(unconditional, frequentist)
-  if (!identical(parametric, FALSE) || !identical(residuals, FALSE)) {
-    stop("glmmTMB parametric plots and partial residual overlays are not yet supported.")
+  if (!identical(residuals, FALSE)) {
+    stop("glmmTMB partial residual overlays are not yet supported.")
   }
-  draw.gam(glmmtmb_smooth_model(object), ..., parametric = FALSE,
-    envir = envir)
+  if (!is.logical(ranef_lines) || length(ranef_lines) != 1L || is.na(ranef_lines)) {
+    stop("'ranef_lines' must be TRUE or FALSE.", call. = FALSE)
+  }
+  # ranef() also needs the report; retain a newly computed one on this local
+  # copy so smooth/fixed covariance and native effects share the same report.
+  if (is.null(object$sdr)) {
+    object$sdr <- TMB::sdreport(object$obj, getJointPrecision = TRUE)
+  }
+  model <- glmmtmb_smooth_model(object)
+  model$native_random_effects <- glmmtmb_random_effects(object)
+  model$ranef_lines <- ranef_lines
+  draw.gam(model, ..., parametric = parametric, envir = envir)
 }
 
 #' @export
