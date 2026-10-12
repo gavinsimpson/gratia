@@ -123,9 +123,11 @@ test_that("ranef_lines replaces only simple intercept-slope pairs with random co
   m <- glmmTMB::glmmTMB(y ~ x + (1 + x | g) + (1 | h), data = d, REML = TRUE)
   qq <- draw(m, parametric = FALSE, wrap = FALSE)
   expect_identical(names(qq), c("(1 | g)", "(x | g)", "(1 | h)"))
+  expect_true(all(vapply(qq, function(p) is.null(p$labels$subtitle), logical(1))))
   plots <- draw(m, ranef_lines = TRUE, parametric = FALSE, wrap = FALSE,
     select = c("(1 | g)", "(x | g)"), data = data.frame(x = c(-.8, 0, .8)))
   expect_length(plots, 1)
+  expect_null(plots[[1]]$labels$subtitle)
   lines <- plots[[1]]$data
   b <- glmmTMB::ranef(m, condVar = FALSE)$cond$g
   expect_identical(unique(lines$.group), rownames(b))
@@ -192,6 +194,9 @@ test_that("native and parametric terms are labelled across all three predictors"
   plots <- draw(m, wrap = FALSE)
   expect_identical(names(plots),
     c("(1 | g)", "(1 | g).1", "(1 | h).2", "x", "x.1", "x.2"))
+  expect_identical(vapply(plots[1:3], function(p) p$labels$subtitle, character(1)),
+    setNames(c("Conditional model", "Zero-inflation model", "Dispersion model"),
+      names(plots)[1:3]))
   re <- glmmTMB::ranef(m, condVar = FALSE)
   expect_equal(plots[["(1 | g).1"]]$data$.estimate,
     re$zi$g[["(Intercept)"]])

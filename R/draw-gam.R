@@ -186,6 +186,21 @@
 #' @param ... additional arguments passed to [patchwork::wrap_plots()].
 #'
 #' @details
+#' For models with multiple linear predictors, smooth plot subtitles identify
+#' the model part for glmmTMB models or the distributional parameter for mgcv
+#' models. Single-predictor models omit these automatic labels; by-variable
+#' information and custom subtitles are still shown. Constant glmmTMB dispersion
+#' alone does not count as an additional predictor.
+#' For example, `gaulss()` uses "Mean (mu)" and "Standard deviation (sigma)",
+#' while `twlss()` uses "Mean (mu)", "Power (p)" and "Dispersion (phi)".
+#' Shared smooths name each predictor to which they contribute. Families without
+#' a known parameter mapping use numbered linear predictors. The existing smooth
+#' titles and `select` values are unchanged, and all smooths are drawn by default.
+#' By-variable information is appended to the default subtitle. Supply `subtitle`
+#' through `...` to replace it, or `subtitle = ""` to suppress it; `NULL` uses the
+#' default. Custom `title`, `xlab` and `ylab` can also be supplied through `...`.
+#' These labels apply to smooth panels.
+#'
 #' Random-effect tensor plots put continuous covariates before factors. Two
 #' continuous covariates form a surface, with remaining factor levels and numeric
 #' slices forming conditioning panels, consistently for `te()`, `ti()` and `t2()`.
@@ -330,8 +345,7 @@
 
 
   # run assemble() without calling it all directly
-  #.call <- match.call()
-  .call <- match.call(expand.dots = FALSE)
+  .call <- match.call()
   .call[[1L]] <- quote(gratia::assemble)
   sm_plts <- eval(.call, parent.frame())
 

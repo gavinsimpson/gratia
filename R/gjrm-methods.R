@@ -14,8 +14,11 @@
 #' @importFrom patchwork plot_layout
 #' @export
 #'
-#' @note Plots of smooths are not labelled with the linear predictor to which
-#'   they belong.
+#' @note For models with multiple linear predictors, smooth plot subtitles
+#'   identify the distributional parameter using the parent model's margin and
+#'   equation order, rather than the working family of the embedded GAMs.
+#'   Single-predictor models omit these automatic labels. Existing smooth labels,
+#'   selection, by-variable information and custom subtitles are retained.
 #'
 #' @examples
 #' if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {
@@ -167,6 +170,10 @@
   gam_obj$edf <- diag(object$F)[i]
   gam_obj$scale.estimated <- FALSE
   gam_obj$call$data <- object$call$data
+  attr(gam_obj, "gratia.n_predictors") <- sum(vapply(
+    object[paste0("gam", 1:9)], inherits, logical(1), "gam"))
+  attr(gam_obj, "gratia.model_label") <- gjrm_predictor_label(object,
+    as.integer(sub("gam", "", model, fixed = TRUE)))
 
   # return the GAM
   gam_obj

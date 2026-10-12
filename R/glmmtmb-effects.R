@@ -155,7 +155,8 @@ glmmtmb_model_label <- function(component) {
 
 glmmtmb_random_lines <- function(term, data = NULL, n = 100,
     constant = NULL, fun = NULL, smooth_col = "black", rug = TRUE,
-    caption = TRUE, angle = NULL, ylim = NULL, ...) {
+    caption = TRUE, angle = NULL, ylim = NULL,
+    subtitle = glmmtmb_model_label(term$component), ...) {
   x <- if (is.null(data)) seq_min_max(term$observed, n = n) else {
     if (!term$slope %in% names(data) || !is.numeric(data[[term$slope]])) {
       stop("Supply a numeric '", term$slope, "' column in 'data' for random-effect lines.",
@@ -176,7 +177,7 @@ glmmtmb_random_lines <- function(term, data = NULL, n = 100,
     group = .data$.group)) +
     ggplot2::geom_line(colour = smooth_col) +
     ggplot2::labs(x = term$slope, y = "Partial effect", title = title,
-      subtitle = glmmtmb_model_label(term$component),
+      subtitle = subtitle,
       caption = if (isTRUE(caption)) "Random intercept and slope contributions" else NULL) +
     ggplot2::guides(x = ggplot2::guide_axis(angle = angle))
   if (isTRUE(rug)) plt <- plt + ggplot2::geom_rug(
@@ -216,10 +217,15 @@ assemble.gratia_glmmtmb_smooth <- function(object, select = NULL,
   options <- options[intersect(names(options), c("data", "n", "constant", "fun",
     "smooth_col", "rug", "caption", "angle"))]
   for (term in native) {
+    subtitle <- dots[["subtitle"]]
+    if (is.null(subtitle) && has_multiple_predictors(object)) {
+      subtitle <- glmmtmb_model_label(term$component)
+    }
     chosen <- native_take[seq_along(term$labels) + start]
     start <- start + length(term$labels)
     if (isTRUE(object$ranef_lines) && term$simple && all(chosen)) {
-      plot <- do.call(glmmtmb_random_lines, c(list(term = term), options))
+      plot <- do.call(glmmtmb_random_lines,
+        c(list(term = term, subtitle = subtitle), options))
       plots[[paste(term$labels, collapse = " + ")]] <- plot
     } else {
       for (j in which(chosen)) {
@@ -229,7 +235,7 @@ assemble.gratia_glmmtmb_smooth <- function(object, select = NULL,
         class(d) <- c("smooth_estimates", class(d))
         plots[[term$labels[j]]] <- do.call(plot_smooth.random_effect,
           c(list(object = d, variables = term$group,
-            title = term$labels[j], subtitle = glmmtmb_model_label(term$component)),
+            title = term$labels[j], subtitle = subtitle),
             options[intersect(names(options), c("constant", "fun", "angle"))],
             list(caption = if (isTRUE(options$caption)) "Random effect" else NULL)))
       }
