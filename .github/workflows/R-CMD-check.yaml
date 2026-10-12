@@ -51,7 +51,12 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck, lme4=?source, mvnfast=?source, glmmTMB=github::glmmTMB/glmmTMB/glmmTMB@master
+          extra-packages: |
+            any::rcmdcheck
+            lme4=?source
+            mvnfast=?source
+            glmmTMB=github::glmmTMB/glmmTMB/glmmTMB@master
+            ${{ runner.os == 'macOS' && 'TMB=?source' || '' }}
           pak-version: stable
           needs: check
 
