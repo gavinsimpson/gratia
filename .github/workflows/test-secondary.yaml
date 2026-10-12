@@ -32,7 +32,7 @@ jobs:
         shell: bash
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgload, any::vdiffr, any::svglite, glmmTMB=github::glmmTMB/glmmTMB/glmmTMB@master, TMB=?source
+          extra-packages: any::pkgload, any::vdiffr, any::svglite, glmmTMB=github::glmmTMB/glmmTMB/glmmTMB@master, TMB=?source&reinstall
           needs: check
       # Fresh parallel workers cannot see pkgload's in-process namespace.
       - name: Install current package for parallel workers

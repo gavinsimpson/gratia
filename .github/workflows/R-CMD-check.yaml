@@ -56,7 +56,7 @@ jobs:
             lme4=?source
             mvnfast=?source
             glmmTMB=github::glmmTMB/glmmTMB/glmmTMB@master
-            ${{ runner.os == 'macOS' && 'TMB=?source' || '' }}
+            ${{ runner.os == 'macOS' && 'TMB=?source&reinstall' || '' }}
           pak-version: stable
           needs: check
 
