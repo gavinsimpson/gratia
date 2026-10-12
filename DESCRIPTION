@@ -43,6 +43,7 @@ Suggests:
     lme4,
     nlme,
     testthat,
+    pkgload,
     vdiffr,
     MASS,
     scam (>= 1.2-21),
