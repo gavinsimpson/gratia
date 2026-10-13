@@ -13,14 +13,9 @@
   distinguishable. Both ordinary and scalable diagnostics retain common bin
   edges and component-specific density normalization.
 
-* `appraise()` automatically aggregates plots above 10,000 retained observations.
-  Use `scalable = TRUE` or `FALSE` to override this behaviour. Five standalone
-  `scalable_*_plot()` functions provide binned QQ/worm plots, conditional
-  residual-density heatmaps, precomputed histograms, and observed-versus-fitted
-  count heatmaps. Bin resolutions are configurable. QQ reference calculations
-  are unchanged, including their simulation memory requirements. Grouped-family
-  residual defaults, component references, predictor ranks and facets are
-  retained, with QQ bin limits applied per component.
+* `appraise()` now automatically uses scalable plots for 10,000 or more retained
+  fitting observations. Set `scalable = TRUE` or `FALSE` to override this
+  behaviour, or change `scalable_threshold`.
 
 * Diagnostic plots now support uncensored univariate `GJRM::gamlss()` models
   with N, LN, GA, GAi, P, NBI and NBII families, using randomized quantile
@@ -190,6 +185,10 @@
   preventing prediction.
 
 ## New features
+
+* Five new `scalable_*_plot()` functions provide binned QQ/worm plots, smoothed
+  residual-density heatmaps, histograms, and observed-versus-fitted heatmaps.
+  They use all observations while keeping plotting data compact.
 
 * `posterior_predictive_plot()` compares observed responses with posterior
   predictive distributions, using density curves for continuous responses

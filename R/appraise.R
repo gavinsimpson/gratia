@@ -116,7 +116,7 @@
 #' @param n_ppc positive integer; number of posterior predictive data sets
 #'   when `ppcheck = TRUE`. Independent of the QQ plot's `n_simulate`.
 #' @param scalable Logical or `NULL`; `NULL` automatically uses scalable plots
-#'   above `scalable_threshold` retained fitting observations. `TRUE` or `FALSE`
+#'   at or above `scalable_threshold` retained fitting observations. `TRUE` or `FALSE`
 #'   forces scalable or original rendering.
 #' @param scalable_threshold Positive integer; automatic switching threshold.
 #' @param qq_bins Maximum number of QQ/worm points per family component,

@@ -446,7 +446,7 @@ validate_diagnostic_bins <- function(x, name, length = 1L, minimum = 1L) {
 diagnostic_scalable <- function(scalable, scalable_threshold, n_obs) {
   validate_diagnostic_bins(scalable_threshold, "scalable_threshold")
   if (is.null(scalable)) {
-    return(n_obs > scalable_threshold)
+    return(n_obs >= scalable_threshold)
   }
   if (!is.logical(scalable) || length(scalable) != 1L || is.na(scalable)) {
     stop("'scalable' must be NULL, TRUE or FALSE.", call. = FALSE)

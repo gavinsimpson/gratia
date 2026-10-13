@@ -130,7 +130,7 @@ this independently of the residual type and layout. Only finite observations
 included in each component determine its ranks; average ties are used.}
 
 \item{scalable}{Logical or \code{NULL}; \code{NULL} automatically uses scalable plots
-above \code{scalable_threshold} retained fitting observations. \code{TRUE} or \code{FALSE}
+at or above \code{scalable_threshold} retained fitting observations. \code{TRUE} or \code{FALSE}
 forces scalable or original rendering.}
 
 \item{scalable_threshold}{Positive integer; automatic switching threshold.}

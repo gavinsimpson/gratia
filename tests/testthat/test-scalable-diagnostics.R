@@ -104,8 +104,11 @@ test_that("histograms retain original break selection and zero centering", {
 
 test_that("appraise switches using retained fitting rows and respects overrides", {
   n <- nrow(model.frame(m_tiny_eg1))
-  old <- appraise(m_tiny_eg1, method = "normal", scalable_threshold = n)
-  auto <- appraise(m_tiny_eg1, method = "normal", scalable_threshold = n - 1)
+  old <- appraise(m_tiny_eg1, method = "normal", scalable_threshold = n + 1)
+  auto <- appraise(m_tiny_eg1, method = "normal", scalable_threshold = n)
+  expect_false(diagnostic_scalable(NULL, 10000L, 9999L))
+  expect_true(diagnostic_scalable(NULL, 10000L, 10000L))
+  expect_true(diagnostic_scalable(NULL, 10000L, 10001L))
   forced <- appraise(
     m_tiny_eg1,
     method = "normal",
@@ -133,7 +136,7 @@ test_that("appraise switches using retained fitting rows and respects overrides"
   expect_equal(nrow(diagnostic_data(m)$data), 20L)
   expect_true(
     "eta" %in%
-      names(appraise(m, method = "normal", scalable_threshold = 20)[[2]]$data)
+      names(appraise(m, method = "normal", scalable_threshold = 21)[[2]]$data)
   )
 })
 
