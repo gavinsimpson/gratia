@@ -110,8 +110,10 @@
   surface_3d = list(),
   back_transform = FALSE,
   re_levels = NULL,
+  mrf_plot = c("effects", "qq"),
   ...
 ) {
+  mrf_plot <- match.arg(mrf_plot)
   check_back_transform(back_transform)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
@@ -360,6 +362,7 @@
       surface_support = surface_support,
       tensor_plot_info = attr(sm_eval, "tensor_plot_info"),
       re_levels = re_levels,
+      mrf_plot = mrf_plot,
       constant = constant,
       fun = fun,
       contour = contour,

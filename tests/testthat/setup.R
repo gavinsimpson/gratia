@@ -1039,3 +1039,53 @@ withr::with_seed(1695, {
     bs = c("re", "tp"), d = c(1, 2), k = c(3, 6)),
     data = tensor_re_data, method = "REML")
 })
+
+# Shared MRF fixtures: area order differs from the penalty parameterization;
+# the final fitted-domain area has no observations in one model.
+mrf_models <- local(withr::with_seed(903, {
+  areas <- c("r4", "r1", "r7", "r2", "r8", "r3", "r6", "r5")
+  nb <- stats::setNames(lapply(seq_along(areas), function(i) {
+    areas[intersect(seq_along(areas), c(i - 1L, i + 1L))]
+  }), areas)
+  d <- data.frame(area = factor(rep(areas, each = 30), levels = areas),
+    x = runif(240), fac = factor(rep(c("B", "A"), 120), levels = c("B", "A")),
+    z = runif(240, 0.5, 1.5))
+  d$y <- sin(as.integer(d$area)) + d$x + rnorm(240, sd = 0.3)
+  S <- diag(vapply(nb, length, integer(1)))
+  dimnames(S) <- list(areas, areas)
+  for (a in areas) S[a, nb[[a]]] <- -1
+  # Two components are a valid intrinsic MRF with multiple null directions.
+  disconnected <- S
+  disconnected[areas[4], areas[5]] <- disconnected[areas[5], areas[4]] <- 0
+  disconnected[cbind(4:5, 4:5)] <- disconnected[cbind(4:5, 4:5)] - 1
+  polys <- stats::setNames(lapply(seq_along(areas), function(i) {
+    cbind(c(i - 1, i, i, i - 1, i - 1), c(0, 0, 1, 1, 0))
+  }), areas)
+  xt <- list(nb = nb)
+  out <- list(data = d, areas = areas, nb = nb, penalty = S,
+    full = gam(y ~ s(area, bs = "mrf", xt = xt) + s(x, k = 5),
+      data = d, method = "REML"),
+    low = gam(y ~ s(area, bs = "mrf", k = 5, xt = xt),
+      data = d, method = "REML"),
+    penalty_model = gam(y ~ s(area, bs = "mrf", xt = list(penalty = S)),
+      data = d, method = "REML"),
+    disconnected = gam(y ~ s(area, bs = "mrf", xt = list(penalty = disconnected)),
+      data = d, method = "REML"),
+    polygon = gam(y ~ s(area, bs = "mrf", k = 5, xt = list(polys = polys)),
+      data = d, method = "REML"),
+    by = gam(y ~ fac + s(area, bs = "mrf", by = fac, xt = xt),
+      data = d, method = "REML"),
+    numeric_by = gam(y ~ s(area, bs = "mrf", by = z, xt = xt),
+      data = d, method = "REML"),
+    bam = bam(y ~ s(area, bs = "mrf", k = 5, xt = xt),
+      data = d, method = "fREML", drop.unused.levels = FALSE))
+  absent <- d[as.character(d$area) != areas[8], ]
+  absent$area <- droplevels(absent$area)
+  out$unobserved <- gam(y ~ s(area, bs = "mrf", k = 5, xt = xt),
+    data = absent, knots = list(area = factor(areas)), method = "REML")
+  out$unobserved_full <- gam(y ~ s(area, bs = "mrf", xt = xt),
+    data = absent, knots = list(area = factor(areas)), method = "REML")
+  out$transformed <- gam(y ~ s(factor(area), bs = "mrf", k = 5, xt = xt),
+    data = d, method = "REML")
+  out
+}))

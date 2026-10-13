@@ -1085,7 +1085,17 @@
   back_transform = FALSE,
   ...) {
   model <- with_model_envir(model, envir)
-  .NotYetImplemented()
+  id <- which_smooth(model, smooth_label(smooth))
+  data <- process_user_data_for_eval(data, model, n = n, n_2d = n_2d,
+    n_3d = NULL, n_4d = NULL, id = id, back_transform = back_transform)
+  data <- prepare_mrf_data(smooth, data, model)
+  eval_sm <- spline_values(smooth, data = data, model = model,
+    unconditional = unconditional, frequentist = frequentist,
+    overall_uncertainty = overall_uncertainty)
+  by_var <- by_variable(smooth)
+  if (identical(by_var, "NA")) by_var <- NA_character_
+  eval_sm <- add_by_var_column(eval_sm, by_var = by_var)
+  add_smooth_type_column(eval_sm, sm_type = smooth_type(smooth))
 }
 
 #' @rdname eval_smooth
@@ -1309,8 +1319,10 @@
                                     surface_3d = list(),
                                     back_transform = FALSE,
                                     re_levels = NULL,
+                                    mrf_plot = c("effects", "qq"),
                                     ...) {
   check_back_transform(back_transform)
+  mrf_plot <- match.arg(mrf_plot)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
   check_surface_dots(match.call(expand.dots = FALSE))
@@ -1366,6 +1378,7 @@
   plts <- map(sm_l,
     draw_smooth_estimates,
     re_levels = re_levels,
+    mrf_plot = mrf_plot,
     tensor_plot_info = plot_info,
     surface = surface, surface_3d = surface_3d,
     surface_support = surface_support,
@@ -1407,6 +1420,7 @@
 #' @importFrom tidyselect any_of
 #' @importFrom purrr map_lgl
 `draw_smooth_estimates` <- function(object,
+                                    mrf_plot = c("effects", "qq"),
                                     re_levels = NULL,
                                     tensor_plot_info = NULL,
                                     constant = NULL,
@@ -1509,6 +1523,8 @@
     class(object) <- append(class(object), "mgcv_smooth", after = 0L)
   } else if (grepl("1d Tensor product", sm_type, fixed = TRUE)) {
     class(object) <- append(class(object), "mgcv_smooth", after = 0L)
+  } else if (sm_type == "MRF") {
+    class(object) <- append(class(object), c("mrf_smooth", "mgcv_smooth"), after = 0L)
   } else if (sm_type == "Random effect") {
     class(object) <- append(class(object),
       c("random_effect", "mgcv_smooth"),
@@ -1635,6 +1651,7 @@
 
   plot_smooth(
     object,
+    mrf_plot = mrf_plot,
     surface = surface, surface_3d = surface_3d,
     surface_support = support,
     variables = sm_vars,

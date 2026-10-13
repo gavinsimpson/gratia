@@ -49,6 +49,11 @@
 #'   Parametric estimates retain both scales; multi-column basis
 #'   expansions retain raw axes on either setting. Does not transform estimated
 #'   effects or their intervals; use `fun` for that.
+#' @param mrf_plot character; display Markov random field smooths as area-labelled
+#'   estimates and intervals (`"effects"`, the default), or a descriptive Gaussian
+#'   quantile plot (`"qq"`). MRF effects are correlated and need not have equal
+#'   marginal variances; the QQ display is not a test of independent normal effects.
+#'   Specialist maps and graph plots are outside the scope of this display.
 #' @param re_levels named list of factor level labels to retain in tensor products
 #'   with random-effect margins, for example `list(species = c("a", "b"))`.
 #'   Fitted factor order and ordered status are retained.
@@ -337,6 +342,7 @@
   surface_3d = list(),
   back_transform = FALSE,
   re_levels = NULL,
+  mrf_plot = c("effects", "qq"),
   ...
 ) {
   surface <- match.arg(surface)

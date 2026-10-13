@@ -54,6 +54,7 @@
   surface_3d = list(),
   back_transform = FALSE,
   re_levels = NULL,
+  mrf_plot = c("effects", "qq"),
   ...
 )
 }
@@ -284,6 +285,12 @@ effects or their intervals; use \code{fun} for that.}
 \item{re_levels}{named list of factor level labels to retain in tensor products
 with random-effect margins, for example \code{list(species = c("a", "b"))}.
 Fitted factor order and ordered status are retained.}
+
+\item{mrf_plot}{character; display Markov random field smooths as area-labelled
+estimates and intervals (\code{"effects"}, the default), or a descriptive Gaussian
+quantile plot (\code{"qq"}). MRF effects are correlated and need not have equal
+marginal variances; the QQ display is not a test of independent normal effects.
+Specialist maps and graph plots are outside the scope of this display.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
