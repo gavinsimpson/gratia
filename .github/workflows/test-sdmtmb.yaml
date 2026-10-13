@@ -1,0 +1,49 @@
+name: sdmTMB compatibility
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  effects:
+    runs-on: ubuntu-latest
+    name: sdmTMB (${{ matrix.config.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {name: release, package: 'any::sdmTMB', backend: ''}
+          # Development version 1.1.0.9032, validated with both backends.
+          - {name: development-TMB, package: 'sdmTMB=github::sdmTMB/sdmTMB@fbe516e4486b3096d175bab880bf93d6d24eca11', backend: tmb}
+          - {name: development-RTMB, package: 'sdmTMB=github::sdmTMB/sdmTMB@fbe516e4486b3096d175bab880bf93d6d24eca11', backend: rtmb}
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      NOT_CRAN: 'true'
+      VDIFFR_RUN_TESTS: 'false'
+      GRATIA_SDMTMB_BACKEND: ${{ matrix.config.backend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::pkgload
+            glmmTMB=github::glmmTMB/glmmTMB/glmmTMB@master
+            ${{ matrix.config.package }}
+          needs: check
+      - name: Check formula effects against native predictions
+        run: |
+          pkgload::load_all()
+          print(packageVersion("sdmTMB"))
+          source("tests/testthat/helper-vdiffr.R")
+          testthat::test_file("tests/testthat/test-sdmtmb.R",
+            reporter = "summary", stop_on_failure = TRUE)
+        shell: Rscript {0}

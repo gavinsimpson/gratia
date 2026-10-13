@@ -37,6 +37,7 @@ reference:
       - draw.gam
       - draw.gamlss
       - glmmTMB-methods
+      - sdmTMB-methods
       - assemble
       - assemble.gam
       - scale_fill_partial_effect
