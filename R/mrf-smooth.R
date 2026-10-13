@@ -54,6 +54,7 @@ plot_smooth.mrf_smooth <- function(object, variables = NULL,
   } else {
     object <- add_constant(object, constant = constant)
     object <- transform_fun(object, fun = fun)
+    object <- order_interval_bounds(object)
     plt <- ggplot2::ggplot(object,
       ggplot2::aes(x = .data[[variables]], y = .data$.estimate)) +
       ggplot2::geom_linerange(ggplot2::aes(ymin = .data$.lower_ci,

@@ -758,9 +758,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 
   ## If fun supplied, use it to transform est and the upper and lower interval
   object <- transform_fun(object, fun = fun)
-  object <- order_interval_bounds(object)
-
-  # QQ panels show estimated effects only, not their interval bounds.
+  # QQ panels show estimated effects only and need no interval columns.
   attr(object, "interval_info") <- NULL
 
   ## base plot with computed QQs
