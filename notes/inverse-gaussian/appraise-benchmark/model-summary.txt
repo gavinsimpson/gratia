@@ -1,0 +1,24 @@
+
+Family: inverse.gaussian
+Link function: log
+
+Formula:
+y ~ s(x0, k = 10) + s(x1, k = 10) + s(x2, k = 10) + s(x3, k = 10)
+
+Parametric coefficients:
+            Estimate Std. Error t value Pr(>|t|)
+(Intercept) 0.067409   0.007809   8.632   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Approximate significance of smooth terms:
+        edf Ref.df       F p-value
+s(x0) 8.551  8.931 1169.00  <2e-16 ***
+s(x1) 7.403  8.370  316.47  <2e-16 ***
+s(x2) 4.355  5.359   22.48  <2e-16 ***
+s(x3) 1.004  1.009  493.45  <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+R-sq.(adj) =   0.24   Deviance explained = 60.2%
+-REML = 7198.3  Scale est. = 0.39348   n = 10000

@@ -351,8 +351,9 @@ diagnostic_method <- function(model, method = NULL) {
   } else {
     NROW(fit) # NROW(fit)
   }
-  out <- quantile(sims, probs = (seq_len(n_obs) - 0.5) / n_obs)
-  int <- apply(sims, 1L, quantile, probs = c(alpha, 1 - alpha))
+  # Percentage names are unused and expensive to format for every row.
+  out <- quantile(sims, probs = (seq_len(n_obs) - 0.5) / n_obs, names = FALSE)
+  int <- apply(sims, 1L, quantile, probs = c(alpha, 1 - alpha), names = FALSE)
   r <- residuals(model, type = type)
   if (is.matrix(r)) {
     r <- as.vector(r)

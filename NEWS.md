@@ -2,6 +2,12 @@
 
 ## User visible changes
 
+* Inverse Gaussian models now use native CDF, quantile and random deviate
+  helpers that respect prior weights, enabling PIT/quantile residuals and uniform
+  QQ/worm plots without additional dependencies. Simulation-based QQ and worm
+  plots for GAMs avoid formatting unused quantile names, improving speed without
+  changing numerical results.
+
 * Smooth plots now identify their model part or distributional parameter in
   subtitles for glmmTMB, mgcv and `GJRM::gamlss()` models with multiple linear
   predictors. Single-predictor models omit these labels, and constant glmmTMB
