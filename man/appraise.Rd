@@ -4,6 +4,8 @@
 \alias{appraise}
 \alias{appraise.gam}
 \alias{appraise.lm}
+\alias{appraise.gamlss}
+\alias{appraise.default}
 \alias{appraise.gamm4}
 \title{Model diagnostic plots}
 \usage{
@@ -29,10 +31,18 @@ appraise(model, ...)
   line_col = "red",
   by_family = NULL,
   rank = NULL,
+  scalable = NULL,
+  scalable_threshold = 10000L,
+  qq_bins = 1000L,
+  density_bins = c(50L, 50L),
   ...
 )
 
 \method{appraise}{lm}(model, ...)
+
+\method{appraise}{gamlss}(model, ..., type = "quantile", seed = NULL)
+
+\method{appraise}{default}(model, ..., type = NULL, seed = NULL)
 
 \method{appraise}{gamm4}(model, ...)
 }
@@ -111,6 +121,17 @@ axis of residual-versus-predictor plots. The default ranks pooled grouped
 plots and retains original predictors in facets. \code{TRUE} or \code{FALSE} overrides
 this independently of the residual type and layout. Only finite observations
 included in each component determine its ranks; average ties are used.}
+
+\item{scalable}{Logical or \code{NULL}; \code{NULL} automatically uses scalable plots
+above \code{scalable_threshold} retained fitting observations. \code{TRUE} or \code{FALSE}
+forces scalable or original rendering.}
+
+\item{scalable_threshold}{Positive integer; automatic switching threshold.}
+
+\item{qq_bins}{Maximum number of QQ/worm points per family component,
+including endpoints.}
+
+\item{density_bins}{Positive integer or pair giving heatmap grid dimensions.}
 }
 \description{
 Model diagnostic plots
@@ -161,6 +182,13 @@ panels and always separates observed-versus-fitted values by component,
 because response units differ. Standalone \code{\link[=observed_fitted_plot]{observed_fitted_plot()}} allows
 explicit pooling. Grouped ordinal models support traditional deviance
 QQ/worm plots, but not the observed-versus-fitted panel or full appraisal.
+
+Scalable plots aggregate all observations before rendering. Residual
+heatmaps show conditional density; observed-versus-fitted heatmaps show
+counts. Point styling applies to QQ/worm points, and heatmap fill scales can
+be changed with ggplot scales. QQ reference calculations and their simulation
+memory requirements are unchanged. Supported univariate GJRM::gamlss models
+use quantile residuals; see \code{\link[=scalable_qq_plot]{scalable_qq_plot()}} for coverage.
 }
 \note{
 The wording used in \code{\link[mgcv:qq.gam]{mgcv::qq.gam()}} uses \emph{direct} in reference to the

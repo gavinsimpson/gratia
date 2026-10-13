@@ -2,6 +2,20 @@
 
 ## User visible changes
 
+* `appraise()` automatically aggregates plots above 10,000 retained observations.
+  Use `scalable = TRUE` or `FALSE` to override this behaviour. Five standalone
+  `scalable_*_plot()` functions provide binned QQ/worm plots, conditional
+  residual-density heatmaps, precomputed histograms, and observed-versus-fitted
+  count heatmaps. Bin resolutions are configurable. QQ reference calculations
+  are unchanged, including their simulation memory requirements. Grouped-family
+  residual defaults, component references, predictor ranks and facets are
+  retained, with QQ bin limits applied per component.
+
+* Diagnostic plots now support uncensored univariate `GJRM::gamlss()` models
+  with N, LN, GA, GAi, P, NBI and NBII families, using randomized quantile
+  residuals and standard-normal reference bands. Observed-versus-fitted panels
+  use response means rather than working GAM predictions.
+
 * Inverse Gaussian models now use native CDF, quantile and random deviate
   helpers that respect prior weights, enabling PIT/quantile residuals and uniform
   QQ/worm plots without additional dependencies. Simulation-based QQ and worm

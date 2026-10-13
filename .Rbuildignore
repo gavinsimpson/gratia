@@ -44,3 +44,6 @@
 ^paper_cache
 ^texput.log
 ^AGENTS\.md$
+
+# A worktree has a .git pointer file rather than a directory.
+^\.git$
