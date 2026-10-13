@@ -110,8 +110,14 @@
   surface_3d = list(),
   back_transform = FALSE,
   re_levels = NULL,
+  mrf_plot = c("effects", "qq"),
+  interval = c("confidence", "simultaneous"),
+  n_sim = 10000, n_cores = 1, seed = NULL,
   ...
 ) {
+  mrf_plot <- match.arg(mrf_plot)
+  interval <- normalize_smooth_interval(interval)
+  validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
   check_back_transform(back_transform)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
@@ -176,7 +182,9 @@
       overall_uncertainty = overall_uncertainty,
       dist = dist,
       clip = TRUE,
-      unnest = FALSE
+      unnest = FALSE,
+      interval = interval, ci_level = ci_level,
+      n_sim = n_sim, n_cores = n_cores, seed = seed
     )
 
     # grab tensor term order if present, if not it is NULL & that's OK
@@ -184,11 +192,7 @@
     coordinate_info <- attr(sm_eval, "coordinate_info")
     surface_support <- attr(sm_eval, "surface_support")
 
-    # add confidence interval
-    sm_eval <- sm_eval |>
-      rowwise() |>
-      mutate(data = list(add_confint(.data$data, coverage = ci_level))) |>
-      ungroup()
+    interval_info <- attr(sm_eval, "interval_info")
 
     # Take the range of the smooths & their confidence intervals now
     # before we put rug and residuals on
@@ -208,7 +212,8 @@
         pluck("rng")
     }
 
-    if (surface == "3d" && scales == "fixed") {
+    if (scales == "fixed" &&
+        (surface == "3d" || interval == "simultaneous")) {
       sm_rng <- unlist(lapply(sm_eval$data, function(d) {
         d <- add_constant(d, constant = constant,
           column = c(".estimate", ".lower_ci", ".upper_ci"))
@@ -360,6 +365,7 @@
       surface_support = surface_support,
       tensor_plot_info = attr(sm_eval, "tensor_plot_info"),
       re_levels = re_levels,
+      mrf_plot = mrf_plot,
       constant = constant,
       fun = fun,
       contour = contour,
@@ -381,6 +387,7 @@
       lims_method = lims_method,
       tensor_term_order = tensor_term_order,
       coordinate_info = coordinate_info, back_transform = back_transform,
+      interval_info = interval_info,
       caption = caption,
       grouped_by = grouped_by,
       ... # FIXME: temporary fix to allow captions to be suppressed-ish
@@ -481,6 +488,9 @@
             .keep = TRUE,
             .f = ~ draw_parametric_effect(.x,
               ci_level = ci_level,
+              caption = if (isTRUE(caption) && interval == "simultaneous") {
+                paste0(format(100 * ci_level), "% pointwise intervals (parametric effect)")
+              } else NULL,
               ci_col = ci_col,
               ci_alpha = ci_alpha,
               line_col = smooth_col,

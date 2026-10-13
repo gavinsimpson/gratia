@@ -45,7 +45,9 @@ The selected smooth(s) will be evaluated at the supplied values.}
 \item{n}{numeric; the number of points to evaluate smooths at.}
 
 \item{type}{character; the type of interval to compute. One of \code{"confidence"}
-for point-wise intervals, or \code{"simultaneous"} for simultaneous intervals.}
+for point-wise intervals, or \code{"simultaneous"} for simultaneous intervals.
+\code{"credible"} aliases \code{"confidence"}, for approximate Bayesian credible
+intervals using the default covariance.}
 
 \item{nsim}{integer; the number of simulations used in computing the
 simultaneous intervals.}
@@ -108,8 +110,9 @@ Calculates point-wise confidence or simultaneous intervals for the smooth
 terms of a fitted GAM.
 }
 \note{
-Currently, \code{overall_uncertainty} only applies to confidence intervals
-(\code{type = "confidence"}), not simultaneous intervals.
+\code{overall_uncertainty} applies to both pointwise and simultaneous
+intervals. Each simultaneous band covers the evaluation points of one
+fitted smooth; separate smooths do not form a joint coverage set.
 }
 \examples{
 load_mgcv()

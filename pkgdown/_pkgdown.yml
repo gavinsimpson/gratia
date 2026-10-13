@@ -105,6 +105,7 @@ reference:
       - draw.rootogram
       - observed_fitted_plot
       - posterior_predictive_plot
+      - scalable_qq_plot
       - residuals_hist_plot
       - residuals_linpred_plot
       - quantile_residuals

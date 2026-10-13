@@ -2,6 +2,26 @@
 
 ## User visible changes
 
+* `appraise()` automatically aggregates plots above 10,000 retained observations.
+  Use `scalable = TRUE` or `FALSE` to override this behaviour. Five standalone
+  `scalable_*_plot()` functions provide binned QQ/worm plots, conditional
+  residual-density heatmaps, precomputed histograms, and observed-versus-fitted
+  count heatmaps. Bin resolutions are configurable. QQ reference calculations
+  are unchanged, including their simulation memory requirements. Grouped-family
+  residual defaults, component references, predictor ranks and facets are
+  retained, with QQ bin limits applied per component.
+
+* Diagnostic plots now support uncensored univariate `GJRM::gamlss()` models
+  with N, LN, GA, GAi, P, NBI and NBII families, using randomized quantile
+  residuals and standard-normal reference bands. Observed-versus-fitted panels
+  use response means rather than working GAM predictions.
+
+* Inverse Gaussian models now use native CDF, quantile and random deviate
+  helpers that respect prior weights, enabling PIT/quantile residuals and uniform
+  QQ/worm plots without additional dependencies. Simulation-based QQ and worm
+  plots for GAMs avoid formatting unused quantile names, improving speed without
+  changing numerical results.
+
 * Smooth plots now identify their model part or distributional parameter in
   subtitles for glmmTMB, mgcv and `GJRM::gamlss()` models with multiple linear
   predictors. Single-predictor models omit these labels, and constant glmmTMB
@@ -164,6 +184,17 @@
   predictive distributions, using density curves for continuous responses
   and points with interval bars for discrete responses. Set
   `appraise(ppcheck = TRUE)` to replace the residual histogram with this check.
+
+* Full and reduced-rank MRF smooths now support area effect estimates and
+  interval plots (#9). Use `mrf_plot = "qq"` for a descriptive QQ plot.
+
+* `draw()`, `assemble()` and `smooth_estimates()` now support simultaneous bands
+  for individual smooths (#314). `interval = "credible"` aliases pointwise
+  `"confidence"` intervals.
+
+* Diagnostics now support grouped-family models with quantile residuals,
+  calibrated normal references and consistent component colours; traditional
+  residuals use component facets (#267).
 
 * `fitted_values()` now emits a message identifying prediction rows with unobserved
   combinations of known categorical predictor levels (#164).

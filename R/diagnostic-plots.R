@@ -3,42 +3,45 @@
 #' Quantile-quantile plot of model residuals
 #'
 #' Quantile-quantile plots (QQ-plots) for GAMs using the reference quantiles of
-#' Augustin *et al* (2012).
+#' Augustin *et al* (2012), or fixed normal references for randomised quantile
+#' residuals following Dunn and Smyth (1996).
 #'
 #' @param model a fitted model. Currently models inheriting from class `"gam"`,
 #'   as well as classes `"glm"` and `"lm"` from calls to [stats::glm] or
 #'   [stats::lm] are supported.
-#' @param method character or `NULL`; method used to generate theoretical
-#'   quantiles. The default, `NULL`, selects `"simulate"` for models fitted with
-#'   [mgcv::tw()] or [mgcv::Tweedie()] and `"uniform"` otherwise. Explicitly
-#'   supplying a method overrides this selection, subject to availability of
-#'   the required family functions. `"uniform"` generates reference quantiles using
-#'   random draws from a uniform distribution and the inverse cumulative
-#'   distribution function (CDF) of the fitted values. The reference quantiles
-#'   are averaged over `n_uniform` draws. `"simulate"` generates reference
-#'   quantiles by simulating new response data from the model at the observed
-#'   values of the covariates, which are then residualised to generate reference
-#'   quantiles, using `n_simulate` simulated data sets. `"normal"` generates
-#'   reference quantiles using the standard normal distribution. `"uniform"` is
-#'   often more computationally efficient, but Tweedie quantiles are expensive
-#'   to compute. `"simulate"` allows reference bands to
-#'   be drawn on the QQ-plot. `"normal"` should be avoided but is used as a fall
-#'   back if a random number generator (`"simulate"`) or the inverse of the CDF
-#'   are not available from the `family` used during model fitting
-#'   (`"uniform"`).
+#' @param method character or `NULL`; reference-quantile method. For quantile
+#'   residuals, `NULL` and `"normal"` use a fixed standard-normal reference;
+#'   `"uniform"` and `"simulate"` require a traditional residual type instead.
+#'   For grouped-family traditional residuals, `NULL` selects `"simulate"` when
+#'   every component has a generator, or `"uniform"` with a message when every
+#'   component has an inverse CDF. An unavailable reference distribution is an
+#'   error; `"normal"` is available only as an explicit approximation.
+#'   For ordinary models, `NULL` retains the default `"simulate"` for Tweedie
+#'   families and `"uniform"` otherwise, with existing availability fallbacks.
+#'   `"uniform"` averages residual reference quantiles obtained by inverse-CDF
+#'   sampling over `n_uniform` draws. `"simulate"` uses `n_simulate` simulated
+#'   response data sets at the observed covariates and permits reference bands.
+#'   `"normal"` uses a location/scale-fitted normal approximation for traditional
+#'   residuals. `"direct"` is deprecated in favour of `"uniform"`.
 #'
-#'   Note that `method = "direct"` is deprecated in favour of
-#'   `method = "uniform"`.
-#' @param type character; type of residuals to use. Only `"deviance"`,
-#'   `"response"`, and `"pearson"` residuals are allowed.
+#' @param by_family logical or `NULL`; separate indexed grouped-family components
+#'   into facets. The default pools quantile residuals with component colours
+#'   and facets traditional residuals. `TRUE` and `FALSE` explicitly select the
+#'   layout. In `appraise()`, observed-versus-fitted values always use component
+#'   facets. Standalone `observed_fitted_plot()` facets by default and permits
+#'   explicit pooling. Ignored for ordinary models.
+#' @param type character or `NULL`; residual type: `"deviance"`, `"response"`,
+#'   `"pearson"`, or `"quantile"`. The default selects supported grouped-family
+#'   quantile residuals and ordinary-model deviance residuals.
 #' @param n_uniform numeric; number of times to randomize uniform quantiles
 #'   in the direct computation method (`method = "uniform"`).
 #' @param n_simulate numeric; number of data sets to simulate from the estimated
 #'   model when using the simulation method (`method = "simulate"`).
 #' @param seed numeric; the random number seed to use for `method = "simulate"`
-#'   and `method = "uniform"`.
+#'   and `method = "uniform"`, and for randomised quantile residuals.
 #' @param level numeric; the coverage level for reference intervals. Must be
-#'   strictly `0 < level < 1`. Only used with `method = "simulate"`.
+#'   strictly `0 < level < 1`. Used for quantile reference bands and traditional
+#'   `method = "simulate"` or `"normal"` bands.
 #' @param xlab character or expression; the label for the y axis. If not
 #'   supplied, a suitable label will be generated.
 #' @param ylab character or expression; the label for the y axis. If not
@@ -49,11 +52,11 @@
 #'   [ggplot2::labs()]. May be a vector, one per penalty.
 #' @param caption character or expression; the plot caption. See
 #'   [ggplot2::labs()]. May be a vector, one per penalty.
-#' @param ci_col fill colour for the reference interval when
-#'   `method = "simulate"`.
-#' @param ci_alpha alpha transparency for the reference
-#'   interval when `method = "simulate"`.
-#' @param point_col colour of points on the QQ plot.
+#' @param ci_col fill colour for reference intervals, including calibrated
+#'   quantile-residual bands.
+#' @param ci_alpha alpha transparency for reference intervals.
+#' @param point_col constant point colour when family components are not mapped
+#'   to colour. Pooled grouped diagnostics instead colour points by component.
 #' @param point_alpha alpha transparency of points on the QQ plot.
 #' @param line_col colour used to draw the reference line.
 #' @param ... arguments passed to other methods.
@@ -64,10 +67,21 @@
 #'
 #' @seealso [mgcv::qq.gam] for more details on the methods used.
 #'
+#' @details See [appraise()] for grouped-family defaults, distributional support,
+#'   pooling and faceting. Quantile QQ/worm plots use fixed standard-normal
+#'   reference quantiles and pointwise order-statistic bands for an ideal
+#'   independent normal sample, conditional on fitted distribution parameters;
+#'   they do not include fitting uncertainty or provide joint coverage.
+#'   Traditional residuals instead use the fitted response distributions or an
+#'   explicitly requested normal approximation.
+#'
 #' @references
 #'
 #' The underlying methodology used when `method` is `"simulate"` or `"uniform"`
 #' is described in Augustin *et al* (2012):
+#'
+#' Dunn, P.K. and Smyth, G.K. (1996) Randomized quantile residuals.
+#' *Journal of Computational and Graphical Statistics* **5**, 236--244.
 #'
 #' Augustin, N.H., Sauleau, E.-A., Wood, S.N., (2012) On quantile quantile plots
 #' for generalized linear models. *Computational Statistics and Data Analysis*
@@ -82,6 +96,7 @@
 # Choose the automatic method before applying family-availability fallbacks.
 # Tweedie numerical quantiles are much slower than random generation (#410).
 diagnostic_method <- function(model, method = NULL) {
+  if (is_gfam_family(family(model))) return(gfam_diagnostic_method(model, method))
   if (is.null(method)) {
     method <- if (identical(family_type(model), "tweedie")) {
       "simulate"
@@ -142,7 +157,7 @@ diagnostic_method <- function(model, method = NULL) {
 #' qq_plot(m, method = "normal")
 `qq_plot.gam` <- function(model,
   method = NULL,
-  type = c("deviance", "response", "pearson"),
+  type = NULL,
   n_uniform = 10,
   n_simulate = 50,
   seed = NULL,
@@ -156,30 +171,36 @@ diagnostic_method <- function(model, method = NULL) {
   ci_alpha = 0.2,
   point_col = "grey20",
   point_alpha = 1,
-  line_col = "red", ...
+  line_col = "red", by_family = NULL, ...
 ) {
-  # sort out seed
-  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-    runif(1)
-  }
-  if (is.null(seed)) {
-    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-  } else {
-    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+  if (!is.null(seed)) {
+    had_seed <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
+    if (had_seed) old_seed <- get(".Random.seed", envir = .GlobalEnv)
+    on.exit({
+      if (had_seed) assign(".Random.seed", old_seed, envir = .GlobalEnv)
+      else if (exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
+        rm(".Random.seed", envir = .GlobalEnv)
+    }, add = TRUE)
     set.seed(seed)
-    RNGstate <- structure(seed, kind = as.list(RNGkind()))
-    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
   }
 
   # figure out method stuff
+  type <- diagnostic_type(model, type)
+  by_family <- diagnostic_by_family(model, type, by_family)
+  if (type == "quantile") {
+    return(calibrated_qq_plot(model, method, level, FALSE, by_family,
+      ylab, xlab, title, subtitle, caption, ci_col, ci_alpha,
+      point_col, point_alpha, line_col))
+  }
   method <- diagnostic_method(model, method)
   ## check if we can do the uniform method - needs a quantile fun
-  ff_qf <- if (identical(method, "uniform")) fix_family_qf(family(model))[["qf"]] else NULL
-  if (identical(method, "uniform") && is.null(ff_qf)) {
+  grouped <- is_gfam_family(family(model))
+  ff_qf <- if (!grouped && identical(method, "uniform")) fix_family_qf(family(model))[["qf"]]
+  if (!grouped && identical(method, "uniform") && is.null(ff_qf)) {
     method <- "simulate"
   }
-  ff_rd <- fix_family_rd(family(model))[["rd"]]
-  if (identical(method, "simulate") && is.null(ff_rd)) {
+  ff_rd <- if (!grouped) fix_family_rd(family(model))[["rd"]]
+  if (!grouped && identical(method, "simulate") && is.null(ff_rd)) {
     method <- "normal"
   }
   if (level <= 0 || level >= 1) {
@@ -187,16 +208,16 @@ diagnostic_method <- function(model, method = NULL) {
       call. = FALSE
     )
   }
-  type <- match.arg(type) # what type of residuals
+
   ## r <- residuals(model, type = type)  # model residuals
   ## generate theoretical quantiles
   df <- switch(method,
-    uniform = qq_uniform(model, n = n_uniform, type = type),
+    uniform = qq_uniform(model, n = n_uniform, type = type, by_family = by_family),
     simulate = qq_simulate(model,
       n = n_simulate, type = type,
-      level = level
+      level = level, by_family = by_family
     ),
-    normal = qq_normal(model, type = type, level = level)
+    normal = qq_normal(model, type = type, level = level, by_family = by_family)
   )
   df <- as_tibble(df)
   ## add labels if not supplied
@@ -210,7 +231,8 @@ diagnostic_method <- function(model, method = NULL) {
     title <- "QQ plot of residuals"
   }
   if (is.null(subtitle)) {
-    subtitle <- paste("Method:", method)
+    subtitle <- if (grouped && method == "normal") "Method: normal (approximation)"
+      else paste("Method:", method)
   }
   ## base plot
   plt <- ggplot(df, aes(
@@ -232,10 +254,13 @@ diagnostic_method <- function(model, method = NULL) {
     ## qq_intercept <- qq_y[1L] - qq_slope * qq_x[1L]
   }
 
-  plt <- plt + geom_abline(
-    slope = qq_slope, intercept = qq_intercept,
-    col = line_col
-  )
+  if (method == "normal" && ".family" %in% names(df)) {
+    lines <- unique(df[c(".family", ".qq_slope", ".qq_intercept")])
+    plt <- plt + geom_abline(data = lines,
+      aes(slope = .data$.qq_slope, intercept = .data$.qq_intercept), col = line_col)
+  } else {
+    plt <- plt + geom_abline(slope = qq_slope, intercept = qq_intercept, col = line_col)
+  }
   ## add reference interval
   if (isTRUE(method %in% c("simulate", "normal"))) {
     plt <- plt + geom_ribbon(
@@ -257,7 +282,7 @@ diagnostic_method <- function(model, method = NULL) {
     y = ylab, x = xlab
   )
   ## return
-  plt
+  gfam_diagnostic_facets(plt, model, by_family)
 }
 
 #' @export
@@ -290,12 +315,15 @@ diagnostic_method <- function(model, method = NULL) {
 #' @importFrom stats weights
 `qq_simulate` <- function(model, n = 50,
                           type = c("deviance", "response", "pearson"),
-                          level = 0.9, detrend = FALSE) {
+                          level = 0.9, detrend = FALSE, by_family = TRUE) {
   if (inherits(model, "gratia_glmmtmb_diagnostic")) {
     return(qq_simulate_glmmtmb(model, n, type, level, detrend))
   }
   model <- model_used_rows(model)
   type <- match.arg(type)
+  if (is_gfam_family(family(model))) {
+    return(gfam_qq(model, n, type, "simulate", level, detrend, by_family))
+  }
   family <- family(model)
   family <- fix_family_rd(family)
   rd_fun <- family[["rd"]]
@@ -351,9 +379,10 @@ diagnostic_method <- function(model, method = NULL) {
   } else {
     NROW(fit) # NROW(fit)
   }
-  out <- quantile(sims, probs = (seq_len(n_obs) - 0.5) / n_obs)
-  int <- apply(sims, 1L, quantile, probs = c(alpha, 1 - alpha))
-  r <- residuals(model, type = type)
+  # Percentage names are unused and expensive to format for every row.
+  out <- quantile(sims, probs = (seq_len(n_obs) - 0.5) / n_obs, names = FALSE)
+  int <- apply(sims, 1L, quantile, probs = c(alpha, 1 - alpha), names = FALSE)
+  r <- diagnostic_residuals(model, type = type)
   if (is.matrix(r)) {
     r <- as.vector(r)
   }
@@ -395,7 +424,7 @@ diagnostic_method <- function(model, method = NULL) {
 
 #' @importFrom stats ppoints pnorm dnorm IQR median
 `qq_normal` <- function(model, type = c("deviance", "response", "pearson"),
-                        level = 0.9, detrend = FALSE) {
+                        level = 0.9, detrend = FALSE, by_family = TRUE) {
   se_zscore <- function(z) {
     n <- length(z)
     pnorm_z <- pnorm(z)
@@ -403,7 +432,10 @@ diagnostic_method <- function(model, method = NULL) {
   }
   model <- model_used_rows(model)
   type <- match.arg(type)
-  r <- residuals(model, type = type)
+  if (is_gfam_family(family(model))) {
+    return(gfam_qq(model, 1L, type, "normal", level, detrend, by_family))
+  }
+  r <- diagnostic_residuals(model, type = type)
   nr <- length(r)
   ord <- order(order(r))
   sd <- IQR(r) / 1.349
@@ -433,9 +465,12 @@ diagnostic_method <- function(model, method = NULL) {
 #' @importFrom stats residuals fitted family weights na.action
 `qq_uniform` <- function(model, n = 10,
                          type = c("deviance", "response", "pearson"),
-                         level = 0.9, detrend = FALSE) {
+                         level = 0.9, detrend = FALSE, by_family = TRUE) {
   model <- model_used_rows(model)
   type <- match.arg(type)
+  if (is_gfam_family(family(model))) {
+    return(gfam_qq(model, n, type, "uniform", level, detrend, by_family))
+  }
   family <- family(model) # extract family
   family <- fix_family_qf(family) # add quantile fun to family
   dev_resid_fun <- family[["residuals"]] # deviance residuals function
@@ -452,7 +487,7 @@ diagnostic_method <- function(model, method = NULL) {
       "> not available."
     )
   }
-  r <- residuals(model, type = type)
+  r <- diagnostic_residuals(model, type = type)
   fit <- fitted(model)
   weights <- diagnostic_weights(model)
   sigma2 <- model[["sig2"]]
@@ -577,16 +612,11 @@ diagnostic_method <- function(model, method = NULL) {
 #' @title Plot of residuals versus linear predictor values
 #'
 #' @param model a fitted model. Currently only class `"gam"`.
-#' @param type character; type of residuals to use. One of `"deviance"`,
-#'   `"response"`, `"pearson"`, `"pit"`, and `"quantile"` residuals are
-#'   allowed. `"pit"` uses probability integral transform (PIT) residuals,
-#'   which, if the model is correct should be approximately uniformly
-#'   distributed, while `"quantile"` transforms the PIT residuals through
-#'   application of the inverse CDF of the standard normal, and therefore the
-#'   quantile residuals should be approximately normally distributed (mean = 0,
-#'   sd = 1) if the model is correct. PIT and quantile residuals are not yet
-#'   available for most families that can be handled by `gam()`, but most
-#'   standard families are supported, e.g. those used by `glm()`.
+#' @param type character or `NULL`; residual type: `"deviance"`, `"pearson"`,
+#'   `"response"`, `"pit"`, or `"quantile"`. Grouped models automatically use
+#'   quantile residuals when all active components are supported, otherwise all
+#'   use deviance residuals with a message. Ordinary models retain deviance
+#'   residuals by default. See [appraise()] for distributional support.
 #' @param xlab character or expression; the label for the y axis. If not
 #'   supplied, a suitable label will be generated.
 #' @param ylab character or expression; the label for the y axis. If not
@@ -597,12 +627,21 @@ diagnostic_method <- function(model, method = NULL) {
 #'   [ggplot2::labs()].
 #' @param caption character or expression; the plot caption. See
 #'   [ggplot2::labs()].
-#' @param point_col colour used to draw points in the plots. See
-#'   [graphics::par()] section **Color Specification**. This is passed to
-#'   the individual plotting functions, and therefore affects the points of
-#'   all plots.
+#' @param point_col constant point colour when components are not mapped to
+#'   colour. Pooled grouped diagnostics instead colour points by component.
 #' @param point_alpha numeric; alpha transparency for points in plots.
 #' @param line_col colour specification for 1:1 line.
+#' @param by_family logical or `NULL`; separate indexed grouped-family components
+#'   into facets. The default pools quantile residuals with component colours
+#'   and facets traditional residuals. `TRUE` and `FALSE` explicitly select the
+#'   layout. In `appraise()`, observed-versus-fitted values always use component
+#'   facets. Standalone `observed_fitted_plot()` facets by default and permits
+#'   explicit pooling. Ignored for ordinary models.
+#' @param rank logical or `NULL`; use within-component ranks on the horizontal
+#'   axis of residual-versus-predictor plots. The default ranks pooled grouped
+#'   plots and retains original predictors in facets. `TRUE` or `FALSE` overrides
+#'   this independently of the residual type and layout. Only finite observations
+#'   included in each component determine its ranks; average ties are used.
 #' @param seed integer; random seed to use for PIT or quantile residuals.
 #'
 #' @export
@@ -612,7 +651,7 @@ diagnostic_method <- function(model, method = NULL) {
 #' @importFrom ggplot2 ggplot aes geom_point geom_hline labs
 `residuals_linpred_plot` <- function(
   model,
-  type = c("deviance", "pearson", "response", "pit", "quantile"),
+  type = NULL,
   ylab = NULL,
   xlab = NULL,
   title = NULL,
@@ -621,26 +660,30 @@ diagnostic_method <- function(model, method = NULL) {
   point_col = "grey20",
   point_alpha = 1,
   line_col = "red",
-  seed = NULL
+  seed = NULL,
+  by_family = NULL,
+  rank = NULL
 ) {
   if (inherits(model, "glmmTMB")) {
-    model <- glmmtmb_diagnostic_model(model, type = if (missing(type)) "pearson" else match.arg(type))
-    if (missing(type)) type <- "pearson"
+    type <- if (is.null(type)) "pearson" else
+      match.arg(type, c("deviance", "pearson", "response"))
+    model <- glmmtmb_diagnostic_model(model, type = type)
   }
 
   if (inherits(model, "gamm4")) model <- gamm4_gam(model)
   original <- model
   model <- model_used_rows(model)
-  type <- match.arg(type)
+  type <- diagnostic_type(model, type, allow_pit = TRUE)
+  by_family <- diagnostic_by_family(model, type, by_family)
   y_intercept <- 0
   if (type %in% c("pit", "quantile")) {
-    r <- quantile_residuals(model, type = type, seed = seed)
+    r <- diagnostic_residuals(model, type = type, seed = seed)
     if (is.null(ylab) && type == "pit") {
       ylab <- "PIT residuals"
       y_intercept <- 0.5
     }
   } else {
-    r <- residuals(model, type = type)
+    r <- diagnostic_residuals(model, type = type)
     y_intercept <- 0
   }
   r <- restore_model_rows(r, original)
@@ -659,7 +702,9 @@ diagnostic_method <- function(model, method = NULL) {
   }
   eta <- napredict(na_action, eta)
 
-  df <- data.frame(eta = eta, residuals = r)
+  df <- diagnostic_component_data(data.frame(eta = eta, residuals = r), original)
+  df <- diagnostic_predictor_data(df, original, by_family, rank)
+  coloured <- is_gfam_family(family(model)) && !by_family
   plt <- ggplot(df, aes(
     x = .data$eta,
     y = .data$residuals
@@ -667,12 +712,20 @@ diagnostic_method <- function(model, method = NULL) {
     geom_hline(yintercept = y_intercept, col = line_col)
 
   ## add point layer
-  plt <- plt + geom_point(colour = point_col, alpha = point_alpha,
+  if (coloured) {
+    plt <- plt + geom_point(aes(colour = .data$.family), alpha = point_alpha,
+      data = function(d) d[stats::complete.cases(d), , drop = FALSE]) +
+      ggokabeito::scale_colour_okabe_ito(limits = gfam_diagnostic_labels(original),
+        drop = FALSE)
+  } else {
+    plt <- plt + geom_point(colour = point_col, alpha = point_alpha,
       data = function(d) d[stats::complete.cases(d), , drop = FALSE])
+  }
 
   ## add labels
   if (is.null(xlab)) {
-    xlab <- "Linear predictor"
+    xlab <- if (isTRUE(attr(df, "ranked"))) "Within-component linear predictor rank"
+      else "Linear predictor"
   }
   if (is.null(ylab)) {
     ylab <- paste(str_to_title(type), "residuals")
@@ -688,8 +741,9 @@ diagnostic_method <- function(model, method = NULL) {
     x = xlab, y = ylab, title = title, subtitle = subtitle,
     caption = caption
   )
+  if (coloured) plt <- plt + labs(colour = "Family component")
 
-  plt
+  gfam_diagnostic_facets(plt, original, by_family)
 }
 
 #' @title Plot of fitted against observed response values
@@ -707,7 +761,8 @@ diagnostic_method <- function(model, method = NULL) {
   subtitle = NULL,
   caption = NULL,
   point_col = "grey20",
-  point_alpha = 1
+  point_alpha = 1,
+  by_family = NULL
 ) {
   if (inherits(model, "glmmTMB")) {
     model <- glmmtmb_diagnostic_model(model, type = "response")
@@ -717,7 +772,13 @@ diagnostic_method <- function(model, method = NULL) {
   ## extract data for plot
   original <- model
   model <- model_used_rows(model)
-  fit <- restore_model_rows(fitted(model), original)
+  check_gfam_appraise(model)
+  by_family <- diagnostic_by_family(model, "response", by_family)
+  fit <- if (is_gfam_family(family(model))) {
+    context <- gfam_diagnostic_context(model)
+    as.numeric(gfam_response_means(matrix(context$eta, ncol = 1L), context))
+  } else fitted(model)
+  fit <- restore_model_rows(fit, original)
   ## handle case where fitted is a matrix; extended.families
   ##   - the needs to be more involved as what about mvn or multinom families
   mv_y <- family_name(model) %in% multivariate_y()
@@ -763,6 +824,9 @@ diagnostic_method <- function(model, method = NULL) {
     caption = caption
   )
 
+  plt <- gfam_diagnostic_facets(plt, original, by_family)
+  if (is_gfam_family(family(model)) && by_family)
+    plt <- plt + ggplot2::scale_x_continuous(breaks = gfam_observed_breaks(plt$data))
   plt
 }
 
@@ -781,30 +845,34 @@ diagnostic_method <- function(model, method = NULL) {
 #' @importFrom grDevices nclass.Sturges nclass.scott nclass.FD
 `residuals_hist_plot` <- function(
   model,
-  type = c("deviance", "pearson", "response", "pit", "quantile"),
+  type = NULL,
   n_bins = c("sturges", "scott", "fd"),
   ylab = NULL, xlab = NULL, title = NULL,
   subtitle = NULL, caption = NULL,
-  seed = NULL
+  seed = NULL,
+  by_family = NULL
 ) {
   if (inherits(model, "glmmTMB")) {
-    model <- glmmtmb_diagnostic_model(model, type = if (missing(type)) "pearson" else match.arg(type))
-    if (missing(type)) type <- "pearson"
+    type <- if (is.null(type)) "pearson" else
+      match.arg(type, c("deviance", "pearson", "response"))
+    model <- glmmtmb_diagnostic_model(model, type = type)
   }
 
   if (inherits(model, "gamm4")) model <- gamm4_gam(model)
   ## extract data for plot
   original <- model
   model <- model_used_rows(model)
-  type <- match.arg(type)
+  type <- diagnostic_type(model, type, allow_pit = TRUE)
+  by_family <- diagnostic_by_family(model, type, by_family)
 
   if (type %in% c("pit", "quantile")) {
-    r <- quantile_residuals(model, type = type, seed = seed)
+    r <- diagnostic_residuals(model, type = type, seed = seed)
   } else {
-    r <- residuals(model, type = type)
+    r <- diagnostic_residuals(model, type = type)
   }
   r <- as.vector(restore_model_rows(r, original))
-  df <- data.frame(residuals = r)
+  df <- diagnostic_component_data(data.frame(residuals = r), original)
+  pooled <- is_gfam_family(family(model)) && !by_family
 
   ## work out number of bins
   if (is.character(n_bins)) {
@@ -830,20 +898,30 @@ diagnostic_method <- function(model, method = NULL) {
   plt <- ggplot(df, aes(x = .data$residuals))
 
   ## add point layer
-  plt <- plt + geom_histogram(
-    data = function(d) d[!is.na(d$residuals), , drop = FALSE],
-    bins = n_bins,
-    colour = "white",
-    fill = "grey20", #"grey80",
-    center = 0
-  )
+  if (pooled) {
+    valid <- df$residuals[is.finite(df$residuals)]
+    # All components use one set of bin edges; density normalization makes
+    # unequal component sizes comparable without silently changing weights.
+    limits <- range(c(valid, 0))
+    if (diff(limits) == 0) limits <- limits + c(-.5, .5)
+    breaks <- seq(limits[1L], limits[2L], length.out = max(2L, n_bins + 1L))
+    plt <- plt + geom_histogram(aes(y = ggplot2::after_stat(.data$density), fill = .data$.family),
+      data = function(d) d[is.finite(d$residuals), , drop = FALSE],
+      breaks = breaks, colour = "white", position = "identity", alpha = .45) +
+      ggokabeito::scale_fill_okabe_ito(limits = gfam_diagnostic_labels(original),
+        drop = FALSE)
+  } else {
+    plt <- plt + geom_histogram(
+      data = function(d) d[!is.na(d$residuals), , drop = FALSE], bins = n_bins,
+      colour = "white", fill = "grey20", center = 0)
+  }
 
   ## add labels
   if (is.null(xlab)) {
     xlab <- paste(str_to_title(type), "residuals")
   }
   if (is.null(ylab)) {
-    ylab <- "Frequency"
+    ylab <- if (pooled) "Density" else "Frequency"
   }
   if (missing(title)) {
     title <- "Histogram of residuals"
@@ -856,11 +934,14 @@ diagnostic_method <- function(model, method = NULL) {
     x = xlab, y = ylab, title = title, subtitle = subtitle,
     caption = caption
   )
+  if (pooled) plt <- plt + labs(fill = "Family component")
 
-  plt
+  gfam_diagnostic_facets(plt, original, by_family)
 }
 
 #' Worm plot of model residuals
+#'
+#' @inherit qq_plot details
 #'
 #' @inheritParams qq_plot
 #'
@@ -918,7 +999,7 @@ diagnostic_method <- function(model, method = NULL) {
 `worm_plot.gam` <- function(
   model,
   method = NULL,
-  type = c("deviance", "response", "pearson"),
+  type = NULL,
   n_uniform = 10, n_simulate = 50,
   level = 0.9,
   ylab = NULL, xlab = NULL,
@@ -929,6 +1010,7 @@ diagnostic_method <- function(model, method = NULL) {
   point_alpha = 1,
   line_col = "red",
   seed = NULL,
+  by_family = NULL,
   ...
 ) {
   if (!is.null(seed)) {
@@ -946,14 +1028,22 @@ diagnostic_method <- function(model, method = NULL) {
     set.seed(seed)
   }
 
+  type <- diagnostic_type(model, type)
+  by_family <- diagnostic_by_family(model, type, by_family)
+  if (type == "quantile") {
+    return(calibrated_qq_plot(model, method, level, TRUE, by_family,
+      ylab, xlab, title, subtitle, caption, ci_col, ci_alpha,
+      point_col, point_alpha, line_col))
+  }
   method <- diagnostic_method(model, method)
   ## check if we can do the method
-  if (identical(method, "uniform") &&
+  grouped <- is_gfam_family(family(model))
+  if (!grouped && identical(method, "uniform") &&
     is.null(fix_family_qf(family(model))[["qf"]])) {
     method <- "simulate"
   }
-  if (identical(method, "simulate") &&
-    is.null(fix.family.rd(family(model))[["rd"]])) {
+  if (!grouped && identical(method, "simulate") &&
+    is.null(fix_family_rd(family(model))[["rd"]])) {
     method <- "normal"
   }
 
@@ -963,21 +1053,21 @@ diagnostic_method <- function(model, method = NULL) {
     )
   }
 
-  type <- match.arg(type) # what type of residuals
+
 
   ## generate theoretical quantiles
   df <- switch(method,
     uniform = qq_uniform(model,
       n = n_uniform, type = type,
-      level = level, detrend = TRUE
+      level = level, detrend = TRUE, by_family = by_family
     ),
     simulate = qq_simulate(model,
       n = n_simulate, type = type,
-      level = level, detrend = TRUE
+      level = level, detrend = TRUE, by_family = by_family
     ),
     normal = qq_normal(model,
       type = type, level = level,
-      detrend = TRUE
+      detrend = TRUE, by_family = by_family
     )
   )
   df <- as_tibble(df)
@@ -996,7 +1086,8 @@ diagnostic_method <- function(model, method = NULL) {
   }
 
   if (is.null(subtitle)) {
-    subtitle <- paste("Method:", method)
+    subtitle <- if (grouped && method == "normal") "Method: normal (approximation)"
+      else paste("Method:", method)
   }
 
   ## base plot
@@ -1032,7 +1123,7 @@ diagnostic_method <- function(model, method = NULL) {
   )
 
   ## return
-  plt
+  gfam_diagnostic_facets(plt, model, by_family)
 }
 
 

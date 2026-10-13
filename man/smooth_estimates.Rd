@@ -25,6 +25,11 @@ smooth_estimates(object, ...)
   clip = FALSE,
   envir = NULL,
   back_transform = FALSE,
+  interval = NULL,
+  ci_level = 0.95,
+  n_sim = 10000,
+  n_cores = 1,
+  seed = NULL,
   ...
 )
 }
@@ -105,6 +110,21 @@ keep their usual names and raw coordinates are retained in auxiliary
 Estimates containing only transformed coordinates give an informative error
 if drawn on the original scale. This option does not change effect values
 or their intervals at the chosen evaluation points.}
+
+\item{interval}{character or \code{NULL}; \code{NULL} (the default) returns estimates
+and standard errors only. \code{"confidence"} adds pointwise intervals and
+\code{"simultaneous"} adds a band covering the finite evaluation grid of each
+fitted smooth. \code{"credible"} is an alias for \code{"confidence"}; the default
+Bayesian covariance gives approximate Bayesian credible intervals.}
+
+\item{ci_level}{numeric; interval coverage, strictly between zero and one.}
+
+\item{n_sim, n_cores}{positive integers; coefficient draws and simulation cores
+for simultaneous bands. Parallel simulation requires OpenMP support.}
+
+\item{seed}{integer or \code{NULL}; an explicit simulation seed preserves the
+caller's RNG state. Shared coefficient draws make results independent of
+selected smooth order and parallel evaluation scheduling.}
 }
 \value{
 A data frame (tibble), which is of class \code{"smooth_estimates"}.
@@ -127,6 +147,14 @@ When distinct fitted terms share both their smooth label and type (for
 example, tensor products of soap-film components), \code{.smooth_id} contains
 their fitted smooth indices. This preserves their identity in saved
 estimates and plots without changing the labels supplied by mgcv.
+
+Simultaneous coverage is per fitted smooth over its valid evaluation points,
+including all its slices and factor levels. Separate factor-by smooths remain
+separate coverage sets when grouped in one plot. This finite-grid band does
+not claim joint coverage across selected smooths or the full fitted model.
+Increasing grid resolution improves the approximation to whole-curve coverage.
+\code{overall_uncertainty} and covariance options apply to both interval types.
+Simultaneous intervals for SCAM models are unsupported.
 
 For explicit \code{data}, missing covariates needed by a smooth produce \code{NA}
 estimates and standard errors at those positions. Missing values in variables

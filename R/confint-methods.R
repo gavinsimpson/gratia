@@ -210,6 +210,8 @@
 #' @param n numeric; the number of points to evaluate smooths at.
 #' @param type character; the type of interval to compute. One of `"confidence"`
 #'   for point-wise intervals, or `"simultaneous"` for simultaneous intervals.
+#'   `"credible"` aliases `"confidence"`, for approximate Bayesian credible
+#'   intervals using the default covariance.
 #' @param nsim integer; the number of simulations used in computing the
 #'   simultaneous intervals.
 #' @param shift logical; should the model intercept be added to the smooth?
@@ -235,8 +237,9 @@
 #' @inheritParams get_vcov
 #' @inheritParams smooth_estimates
 #' 
-#' @note Currently, `overall_uncertainty` only applies to confidence intervals
-#'   (`type = "confidence"`), not simultaneous intervals.
+#' @note `overall_uncertainty` applies to both pointwise and simultaneous
+#'   intervals. Each simultaneous band covers the evaluation points of one
+#'   fitted smooth; separate smooths do not form a joint coverage set.
 #' 
 #' @return a tibble with components:
 #' 1. `.smooth`; character indicating to which term each row relates,
@@ -319,110 +322,17 @@
       call. = FALSE
     )
   }
-  take <- select & (smooth_dim(object) <= 2L)
-  S <- S[take]
+  if (!is.null(newdata)) newdata_deprecated()
+  type <- normalize_smooth_interval(type)
+  out <- list(smooth_estimates(object,
+    select = which(select), n = n, data = data,
+    partial_match = partial_match, unconditional = unconditional,
+    frequentist = frequentist, overall_uncertainty = overall_uncertainty,
+    interval = type, ci_level = level, n_sim = nsim, n_cores = ncores, ...))
 
-  ## look to see if smooth is a by variable
-  by_levs <- NULL
-  is_by <- vapply(object[["smooth"]][take], is_by_smooth, logical(1L))
-  if (any(is_by)) {
-    # S <- vapply(strsplit(S, ":"), `[[`, character(1L), 1L)
-    by_levs <- vapply(object[["smooth"]][take], by_level, character(1L))
-    by_var <- vapply(object[["smooth"]][take], by_variable, character(1L))
-  }
-  ## unique smooths (counts all levels of a by factor as a single smooth)
-  uS <- unique(S)
-
-  # warn if user uses newdata
-  if (!is.null(newdata)) {
-    newdata_deprecated()
-  }
-
-  ## how many data points if data supplied
-  if (!is.null(data)) {
-    n <- NROW(data)
-  }
-
-  ilink <- if (is.logical(transform)) { # transform is logical
-    if (isTRUE(transform)) { # transform == TRUE
-      family(object)$linkinv
-    } else { # transform == FALSE
-      function(eta) {
-        eta
-      }
-    }
-  } else if (!is.null(transform)) { # transform is a fun
-    match.fun(transform)
-  }
-
-  ## which type of confidence interval
-  type <- match.arg(type)
-  ## list to hold results
-  out <- vector("list", length = length(uS)) # list for results
-
-  if (isTRUE(type == "confidence")) {
-    for (i in seq_along(out)) {
-      out[[i]] <- smooth_estimates(object,
-        select = uS[i],
-        n = n,
-        data = data,
-        partial_match = partial_match,
-        unconditional = unconditional,
-        frequentist = frequentist,
-        overall_uncertainty = overall_uncertainty,
-        ...
-      )
-      out[[i]][[".crit"]] <- coverage_normal(level)
-    }
-  } else {
-    ## function to do simultaneous intervals for a smooth
-    ## this should be outlined as an actual function...
-    ## @param smooth list; the individual smooth to work on
-    ## @param level numeric; the confidence level
-    ## @param data dataframe; values to compute confidence interval at
-    sim_interval <- function(smooth, level, data) {
-      start <- smooth[["first.para"]]
-      end <- smooth[["last.para"]]
-      para.seq <- start:end
-      Cg <- PredictMat(smooth, data)
-      simDev <- Cg %*% t(buDiff[, para.seq])
-      absDev <- abs(sweep(simDev, 1L, data[[".se"]], FUN = "/"))
-      masd <- apply(absDev, 2L, max)
-      unname(quantile(masd, probs = level, type = 8))
-    }
-    ## need VCOV for simultaneous intervals
-    V <- get_vcov(object, unconditional = unconditional, frequentist = frequentist)
-    ## simulate un-biased deviations given bayesian covar matrix
-    buDiff <- mvnfast::rmvn(
-      n = nsim, mu = rep(0, nrow(V)), sigma = V,
-      ncores = ncores
-    )
-    ## loop over smooths
-    for (i in seq_along(out)) {
-      ## evaluate smooth
-      out[[i]] <- smooth_estimates(object,
-        select = uS[i],
-        n = n, data = data, partial_match = partial_match,
-        unconditional = unconditional,
-        frequentist = frequentist,
-        overall_uncertainty = FALSE, ...
-      )
-
-      # if this is a by var smooth, we need to do this for each level of
-      # by var
-      # I think this can now be simplified to just be the code in the
-      # else branch as smooth_estimates knows how to handle very specific
-      # smooth names FIXME
-      if (is.null(by_levs)) { # not by variable smooth
-        smooth <- get_smooth(object, uS[i]) # get the specific smooth
-        crit <- sim_interval(smooth, level = level, data = out[[i]])
-      } else { # is a by variable smooth
-        smooth <- old_get_smooth(object, uS[i])
-        crit <- sim_interval(smooth, level = level, data = out[[i]])
-      }
-      out[[i]][[".crit"]] <- crit # add on the critical value
-    }
-  }
+  ilink <- if (is.logical(transform)) {
+    if (isTRUE(transform)) family(object)$linkinv else identity
+  } else if (!is.null(transform)) match.fun(transform)
 
   if (shift) {
     const <- coef(object)
@@ -432,6 +342,8 @@
   } else {
     const <- 0
   }
+
+  interval_info <- attr(out[[1L]], "interval_info")
 
   ## simplify to a data frame for return
   metadata <- lapply(out, attr, "coordinate_info")
@@ -482,6 +394,7 @@
   )), .after = last_col())
 
   ## prepare for return
+  attr(out, "interval_info") <- interval_info
   class(out) <- c("confint.gam", class(out))
   out # return
 }

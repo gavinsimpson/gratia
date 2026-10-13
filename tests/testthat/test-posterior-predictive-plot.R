@@ -313,6 +313,23 @@ test_that("appraise forwards discrete posterior predictive interval settings", {
   expect_equal(p$patches$plots[[1L]]$layers[[2L]]$aes_params$alpha, 0.45)
 })
 
+test_that("posterior predictive checks replace histograms in scalable appraisals", {
+  expected <- posterior_predictive_plot(m_tiny_eg1, n = 2, seed = 12)
+  for (scalable in list(FALSE, TRUE, NULL)) {
+    p <- appraise(m_tiny_eg1, ppcheck = TRUE, n_ppc = 2, seed = 12,
+      scalable = scalable, scalable_threshold = 1, qq_bins = 20,
+      method = "normal", use_worm = TRUE)
+    expect_equal(p[[3L]]$data, expected$data)
+    if (identical(scalable, FALSE)) {
+      expect_true("eta" %in% names(p[[2L]]$data))
+    } else {
+      expect_true("value" %in% names(p[[2L]]$data))
+      expect_lte(nrow(p[[1L]]$data), 20L)
+    }
+    expect_s3_class(p, "patchwork")
+  }
+})
+
 test_that("posterior predictive plots have stable visual output", {
   expect_doppelganger(
     "posterior predictive continuous",

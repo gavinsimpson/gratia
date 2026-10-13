@@ -1039,3 +1039,124 @@ withr::with_seed(1695, {
     bs = c("re", "tp"), d = c(1, 2), k = c(3, 6)),
     data = tensor_re_data, method = "REML")
 })
+
+# Shared MRF fixtures: area order differs from the penalty parameterization;
+# the final fitted-domain area has no observations in one model.
+mrf_models <- local(withr::with_seed(903, {
+  areas <- c("r4", "r1", "r7", "r2", "r8", "r3", "r6", "r5")
+  nb <- stats::setNames(lapply(seq_along(areas), function(i) {
+    areas[intersect(seq_along(areas), c(i - 1L, i + 1L))]
+  }), areas)
+  d <- data.frame(area = factor(rep(areas, each = 30), levels = areas),
+    x = runif(240), fac = factor(rep(c("B", "A"), 120), levels = c("B", "A")),
+    z = runif(240, 0.5, 1.5))
+  d$y <- sin(as.integer(d$area)) + d$x + rnorm(240, sd = 0.3)
+  S <- diag(vapply(nb, length, integer(1)))
+  dimnames(S) <- list(areas, areas)
+  for (a in areas) S[a, nb[[a]]] <- -1
+  # Two components are a valid intrinsic MRF with multiple null directions.
+  disconnected <- S
+  disconnected[areas[4], areas[5]] <- disconnected[areas[5], areas[4]] <- 0
+  disconnected[cbind(4:5, 4:5)] <- disconnected[cbind(4:5, 4:5)] - 1
+  polys <- stats::setNames(lapply(seq_along(areas), function(i) {
+    cbind(c(i - 1, i, i, i - 1, i - 1), c(0, 0, 1, 1, 0))
+  }), areas)
+  xt <- list(nb = nb)
+  out <- list(data = d, areas = areas, nb = nb, penalty = S,
+    full = gam(y ~ s(area, bs = "mrf", xt = xt) + s(x, k = 5),
+      data = d, method = "REML"),
+    low = gam(y ~ s(area, bs = "mrf", k = 5, xt = xt),
+      data = d, method = "REML"),
+    penalty_model = gam(y ~ s(area, bs = "mrf", xt = list(penalty = S)),
+      data = d, method = "REML"),
+    disconnected = gam(y ~ s(area, bs = "mrf", xt = list(penalty = disconnected)),
+      data = d, method = "REML"),
+    polygon = gam(y ~ s(area, bs = "mrf", k = 5, xt = list(polys = polys)),
+      data = d, method = "REML"),
+    by = gam(y ~ fac + s(area, bs = "mrf", by = fac, xt = xt),
+      data = d, method = "REML"),
+    numeric_by = gam(y ~ s(area, bs = "mrf", by = z, xt = xt),
+      data = d, method = "REML"),
+    bam = bam(y ~ s(area, bs = "mrf", k = 5, xt = xt),
+      data = d, method = "fREML", drop.unused.levels = FALSE))
+  absent <- d[as.character(d$area) != areas[8], ]
+  absent$area <- droplevels(absent$area)
+  out$unobserved <- gam(y ~ s(area, bs = "mrf", k = 5, xt = xt),
+    data = absent, knots = list(area = factor(areas)), method = "REML")
+  out$unobserved_full <- gam(y ~ s(area, bs = "mrf", xt = xt),
+    data = absent, knots = list(area = factor(areas)), method = "REML")
+  out$transformed <- gam(y ~ s(factor(area), bs = "mrf", k = 5, xt = xt),
+    data = d, method = "REML")
+  out
+}))
+
+# Compact shared fixtures for smooth simultaneous-band numerical/plot tests.
+smooth_band_data <- withr::with_seed(314, local({
+  d <- data.frame(x = runif(160), z = runif(160),
+    f = factor(rep(c("b", "a"), 80), levels = c("b", "a")))
+  d$y <- sin(6 * d$x) + d$z^2 + as.numeric(d$f) + rnorm(160, sd = 0.3)
+  d
+}))
+smooth_band_model <- gam(y ~ f + s(x, k = 8) + s(z, k = 6),
+  data = smooth_band_data, method = "REML")
+smooth_band_transformed <- gam(y ~ s(log(x + 1), k = 8) + s(z, by = x, k = 6),
+  data = smooth_band_data, method = "REML")
+
+
+# Scalar, uncensored observations from families that also support censoring.
+# Shared with diagnostics tests; these references do not simulate censoring.
+withr::with_seed(26701, {
+  gfam_censored_data <- data.frame(x = runif(120), family_id = rep(1:3, 40))
+  gfam_censored_models <- lapply(c("cnorm", "clog", "cpois"), function(name) {
+    d <- gfam_censored_data
+    d$y <- rnorm(120)
+    d$y[d$family_id == 3L] <- rpois(40, 2)
+    if (name == "cpois") d$y[d$family_id == 1L] <- rpois(40, 2)
+    gam(cbind(y, family_id) ~ factor(family_id) + s(x, k = 4), data = d,
+      family = gfam(list(get(name, asNamespace("mgcv"))(), gaussian(), poisson())),
+      method = "REML")
+  })
+  names(gfam_censored_models) <- c("cnorm", "clog", "cpois")
+})
+
+
+# Extended components with fitted shape parameters and custom residual hooks.
+withr::with_seed(26702, {
+  gfam_custom_models <- lapply(c("betar", "scat"), function(name) {
+    d <- data.frame(x = runif(160), family_id = rep(1:2, 80))
+    d$y <- rnorm(160)
+    d$y[d$family_id == 1L] <- if (name == "betar") rbeta(80, 2, 3) else
+      rt(80, 5) * 0.4
+    gam(cbind(y, family_id) ~ factor(family_id) + s(x, k = 4), data = d,
+      family = gfam(list(get(name, asNamespace("mgcv"))(), gaussian())),
+      method = "REML")
+  })
+  names(gfam_custom_models) <- c("betar", "scat")
+})
+
+
+# Unequal component sizes, disjoint predictors, tied and constant predictors.
+# The formula keeps its private fitting data without leaking temporary names.
+gfam_rank_model <- local(withr::with_seed(26703, {
+  d <- data.frame(family_id = rep(1:3, c(15, 25, 9)),
+    x = c(rep(c(0, 1, 2), 5), rep(0:4, 5), rep(0, 9)))
+  d$y <- c(-7, 10, 30)[d$family_id] + .2 * d$x + rnorm(nrow(d), sd = .3)
+  d$x[c(2, 18)] <- NA_real_
+  gam(cbind(y, family_id) ~ factor(family_id) + x, data = d,
+    family = gfam(list(gaussian(), gaussian(), gaussian())), method = "REML",
+    na.action = na.exclude)
+}))
+
+gfam_gamma_model <- local(withr::with_seed(26704, {
+  d <- data.frame(family_id = rep(1:3, c(30, 35, 40)), x = runif(105))
+  mu <- exp(.2 + .4 * d$x)
+  d$y <- numeric(nrow(d))
+  i <- d$family_id == 1L
+  d$y[i] <- rgamma(sum(i), shape = 4, scale = mu[i] / 4)
+  i <- d$family_id == 2L
+  d$y[i] <- log(mu[i]) + rnorm(sum(i), sd = .35)
+  i <- d$family_id == 3L
+  d$y[i] <- rpois(sum(i), mu[i])
+  gam(cbind(y, family_id) ~ factor(family_id) + s(x, k = 4), data = d,
+    family = gfam(list(Gamma(link = "log"), gaussian(), poisson())), method = "REML")
+}))
