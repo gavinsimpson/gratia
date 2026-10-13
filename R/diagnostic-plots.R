@@ -832,6 +832,10 @@ diagnostic_method <- function(model, method = NULL) {
 
 #' @title Histogram of model residuals
 #'
+#' @details Pooled grouped-family histograms use common bin edges and
+#'   component-specific densities, with faint group-coloured fills and opaque
+#'   stepped upper boundaries. Set `by_family = TRUE` for separate panels.
+#'
 #' @param n_bins character or numeric; either the number of bins or a string
 #'   indicating how to calculate the number of bins.
 #'
@@ -907,9 +911,17 @@ diagnostic_method <- function(model, method = NULL) {
     breaks <- seq(limits[1L], limits[2L], length.out = max(2L, n_bins + 1L))
     plt <- plt + geom_histogram(aes(y = ggplot2::after_stat(.data$density), fill = .data$.family),
       data = function(d) d[is.finite(d$residuals), , drop = FALSE],
-      breaks = breaks, colour = "white", position = "identity", alpha = .45) +
+      breaks = breaks, colour = NA, position = "identity", alpha = .15) +
+      ggplot2::geom_step(
+        aes(y = ggplot2::after_stat(.data$density), colour = .data$.family),
+        data = function(d) d[is.finite(d$residuals), , drop = FALSE],
+        stat = "bin", breaks = breaks, pad = TRUE, position = "identity",
+        direction = "mid", linewidth = .6, alpha = 1) +
       ggokabeito::scale_fill_okabe_ito(limits = gfam_diagnostic_labels(original),
-        drop = FALSE)
+        drop = FALSE) +
+      ggokabeito::scale_colour_okabe_ito(limits = gfam_diagnostic_labels(original),
+        drop = FALSE) +
+      labs(fill = "Family component", colour = "Family component")
   } else {
     plt <- plt + geom_histogram(
       data = function(d) d[!is.na(d$residuals), , drop = FALSE], bins = n_bins,

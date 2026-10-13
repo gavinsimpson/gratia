@@ -12,6 +12,7 @@ Maintainer: Gavin L. Simpson <ucfagls@gmail.com>
 Depends:
     R (>= 4.4.0)
 Imports:
+    KernSmooth,
     mgcv (>= 1.9-4),
     ggplot2 (>= 3.5.0),
     tibble (>= 3.0.0),

@@ -37,6 +37,8 @@ appraise(model, ...)
   density_bins = c(50L, 50L),
   ppcheck = FALSE,
   n_ppc = 50,
+  density_method = c("kde", "histogram"),
+  bandwidth = NULL,
   ...
 )
 
@@ -147,6 +149,15 @@ overrides these defaults as well as the QQ reference interval opacity.}
 
 \item{n_ppc}{positive integer; number of posterior predictive data sets
 when \code{ppcheck = TRUE}. Independent of the QQ plot's \code{n_simulate}.}
+
+\item{density_method}{Conditional-density estimator: \code{"kde"} (the default)
+uses \code{\link[KernSmooth:bkde2D]{KernSmooth::bkde2D()}} with Gaussian kernels; \code{"histogram"} uses
+unsmoothed rectangular bins. Only affects the residual heatmap.}
+
+\item{bandwidth}{Optional pair of positive bandwidths for the predictor and
+residual axes, in their plotted units. \code{NULL} uses normal-reference
+bandwidths, adjusted for two dimensions, with a fallback for constant axes.
+Used only for \code{density_method = "kde"} and conditional density.}
 }
 \description{
 Model diagnostic plots

@@ -122,6 +122,7 @@
 #' @param qq_bins Maximum number of QQ/worm points per family component,
 #'   including endpoints.
 #' @param density_bins Positive integer or pair giving heatmap grid dimensions.
+#' @inheritParams scalable_qq_plot
 #' @param ... arguments passed to [patchwork::wrap_plots()].
 #'
 #' @importFrom patchwork wrap_plots
@@ -198,6 +199,8 @@
   density_bins = c(50L, 50L),
   ppcheck = FALSE,
   n_ppc = 50,
+  density_method = c("kde", "histogram"),
+  bandwidth = NULL,
   ...
 ) {
   if (!is.logical(ppcheck) || length(ppcheck) != 1L || is.na(ppcheck)) {
@@ -230,6 +233,8 @@
   use_scalable <- diagnostic_scalable(scalable, scalable_threshold, n_obs)
   validate_diagnostic_bins(qq_bins, "qq_bins", minimum = 3L)
   validate_diagnostic_bins(density_bins, "density_bins", length = c(1L, 2L))
+  density_method <- match.arg(density_method)
+  validate_diagnostic_bandwidth(bandwidth)
   if (is.character(n_bins)) {
     n_bins <- match.arg(n_bins)
   }
@@ -267,7 +272,9 @@
         density_bins = density_bins,
         line_col = line_col,
         by_family = by_family,
-        rank = rank
+        rank = rank,
+        density_method = density_method,
+        bandwidth = bandwidth
       )
       if (!ppcheck) {
         plt3 <- scalable_residuals_hist_plot(

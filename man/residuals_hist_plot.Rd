@@ -56,3 +56,8 @@ explicit pooling. Ignored for ordinary models.}
 \description{
 Histogram of model residuals
 }
+\details{
+Pooled grouped-family histograms use common bin edges and
+component-specific densities, with faint group-coloured fills and opaque
+stepped upper boundaries. Set \code{by_family = TRUE} for separate panels.
+}

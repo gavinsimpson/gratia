@@ -101,7 +101,10 @@ test_that("grouped diagnostics share stable Okabe-Ito component colours and fill
       expect_equal(unname(subset$plot$scales$get_scales(aesthetic)$map(labels[-1L])),
         expected[-1L])
       layer <- subset$data[[length(p$layers)]]
-      expect_true(all(unique(layer[[aesthetic]]) %in% expected[-1L]))
+      # Pooled histogram fills and outlines share the component palette.
+      layer_aesthetic <- if (inherits(p$layers[[length(p$layers)]]$geom,
+        "GeomStep")) "colour" else aesthetic
+      expect_true(all(unique(layer[[layer_aesthetic]]) %in% expected[-1L]))
     }
   }
 })

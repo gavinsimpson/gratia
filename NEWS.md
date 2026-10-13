@@ -2,6 +2,17 @@
 
 ## User visible changes
 
+* Scalable residual conditional-density plots now use `KernSmooth::bkde2D()`
+  by default, with a square-root colour scale. Use
+  `density_method = "histogram"` to restore unsmoothed bins, or `bandwidth` to
+  control smoothing on both plotted axes. `KernSmooth` is now an import.
+  Count heatmaps remain unsmoothed; plot objects retain only the compact grid.
+
+* Pooled grouped-family residual histograms now use faint component-coloured
+  fills and opaque stepped upper boundaries, making overlapping components
+  distinguishable. Both ordinary and scalable diagnostics retain common bin
+  edges and component-specific density normalization.
+
 * `appraise()` automatically aggregates plots above 10,000 retained observations.
   Use `scalable = TRUE` or `FALSE` to override this behaviour. Five standalone
   `scalable_*_plot()` functions provide binned QQ/worm plots, conditional

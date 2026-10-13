@@ -652,8 +652,16 @@ render_diagnostic_qq <- function(
 #' @param density_bins Positive integer or pair of integers giving the number
 #'   of horizontal and vertical heatmap bins.
 #' @param density One of `"conditional"` or `"count"`. Conditional density is
-#'   the count divided by the horizontal-bin total and vertical-bin width.
-#'   Empty horizontal bins are blank. No kernel smoothing is performed.
+#'   estimated using `density_method`. With `"histogram"`, it is the count
+#'   divided by the horizontal-bin total and vertical-bin width. Empty
+#'   horizontal bins are blank. Counts are always unsmoothed.
+#' @param density_method Conditional-density estimator: `"kde"` (the default)
+#'   uses [KernSmooth::bkde2D()] with Gaussian kernels; `"histogram"` uses
+#'   unsmoothed rectangular bins. Only affects the residual heatmap.
+#' @param bandwidth Optional pair of positive bandwidths for the predictor and
+#'   residual axes, in their plotted units. `NULL` uses normal-reference
+#'   bandwidths, adjusted for two dimensions, with a fallback for constant axes.
+#'   Used only for `density_method = "kde"` and conditional density.
 #' @param type Residual type; `NULL` follows [appraise()] defaults for mgcv, lm,
 #'   glm and gamm4, selects Pearson for glmmTMB, and quantile for GJRM. The residual heatmap and
 #'   histogram also accept PIT and quantile residuals where available.
@@ -684,6 +692,17 @@ render_diagnostic_qq <- function(
 #'   bin limits apply separately to each indexed component. Pooled residual
 #'   heatmaps summarize the component mixture rather than colouring individual
 #'   observations; observed-versus-fitted appraisals always separate components.
+#'   Pooled histograms use faint component-coloured fills with opaque stepped
+#'   upper boundaries, retaining common bin edges and component densities.
+#'
+#'   Kernel density estimates are calculated on a fixed grid before plotting.
+#'   Each predictor slice is normalized to integrate to one over the displayed
+#'   residual grid. Bandwidths, rather than `density_bins`, control smoothing;
+#'   increase grid resolution when using small bandwidths. A square-root fill
+#'   transformation reveals low-density regions while retaining density units
+#'   in the legend. Gaussian kernels smooth discrete residual bands, which can
+#'   exist even under a correctly specified count model; they do not calibrate
+#'   traditional residuals to a common reference distribution.
 #'
 #'   Point styling affects QQ and worm points. Heatmap fill scales can be
 #'   replaced with ggplot scales. Non-finite plotting observations are reported
@@ -864,6 +883,96 @@ diagnostic_grid <- function(x, y, density_bins, density) {
   )
 }
 
+# Keep bandwidth checks separate from estimation so appraise() can validate its
+# controls before constructing panels, including when ordinary rendering is used.
+validate_diagnostic_bandwidth <- function(bandwidth) {
+  if (!is.null(bandwidth) &&
+    (!is.numeric(bandwidth) || length(bandwidth) != 2L ||
+      any(!is.finite(bandwidth)) || any(bandwidth <= 0))) {
+    stop("'bandwidth' must be NULL or two finite positive numbers.", call. = FALSE)
+  }
+  bandwidth
+}
+
+# KernSmooth performs the linear binning and FFT convolution. Retain only its
+# small grid, normalized by the marginal predictor density, in the final plot.
+diagnostic_density_grid <- function(x, y, density_bins, bandwidth = NULL) {
+  bins <- rep(validate_diagnostic_bins(density_bins, "density_bins",
+    length = c(1L, 2L)), length.out = 2L)
+  validate_diagnostic_bandwidth(bandwidth)
+  df <- diagnostic_finite(tibble::tibble(x = x, y = y), c("x", "y"))
+  axis_range <- function(z) {
+    lim <- range(z)
+    if (diff(lim) <= sqrt(.Machine$double.eps) * max(1, abs(lim))) {
+      lim <- mean(lim) + c(-.5, .5) * max(1, abs(mean(lim)) * .01)
+    }
+    lim
+  }
+  xr <- axis_range(df$x)
+  yr <- axis_range(df$y)
+  if (is.null(bandwidth)) {
+    automatic <- function(z, lim) {
+      if (length(z) < 2L || diff(range(z)) <=
+        sqrt(.Machine$double.eps) * max(1, abs(z))) {
+        return(diff(lim) / 4)
+      }
+      # bw.nrd0 uses n^(-1/5); the two-dimensional rule uses n^(-1/6).
+      stats::bw.nrd0(z) * length(z)^(1 / 30)
+    }
+    bandwidth <- c(automatic(df$x, xr), automatic(df$y, yr))
+  }
+  yr <- yr + c(-3, 3) * bandwidth[2L]
+  if (any(!is.finite(yr))) {
+    stop("'bandwidth' produces non-finite KDE limits; use smaller bandwidths.",
+      call. = FALSE)
+  }
+  # Resolve KernSmooth's truncated Gaussian kernel even for a coarse display
+  # grid. Average its estimate into the requested plotting cells below.
+  grid <- pmax(2L, bins, ceiling(c(diff(xr), diff(yr)) / (3.4 * bandwidth)) + 2L)
+  if (any(!is.finite(grid)) || prod(grid) > 2^20) {
+    stop("The KDE grid is too large; increase 'bandwidth' or reduce 'density_bins'.",
+      call. = FALSE)
+  }
+  estimate <- KernSmooth::bkde2D(as.matrix(df), bandwidth = bandwidth,
+    gridsize = grid, range.x = list(xr, yr))
+  joint <- pmax(estimate$fhat, 0) # Remove negative FFT rounding noise.
+  xg <- estimate$x1
+  yg <- estimate$x2
+  edges <- function(z, lim) {
+    if (length(z) == 1L) return(lim)
+    delta <- diff(z)[1L]
+    c(z - delta / 2, utils::tail(z, 1L) + delta / 2)
+  }
+  if (bins[1L] != grid[1L]) {
+    xg <- if (bins[1L] == 1L) mean(xr) else
+      seq(xr[1L], xr[2L], length.out = bins[1L])
+    group <- findInterval(estimate$x1, edges(xg, xr), all.inside = TRUE)
+    joint <- rowsum(joint, group, reorder = FALSE) / tabulate(group, nbins = bins[1L])
+  }
+  if (bins[2L] != grid[2L]) {
+    yg <- if (bins[2L] == 1L) mean(yr) else
+      seq(yr[1L], yr[2L], length.out = bins[2L])
+    group <- findInterval(estimate$x2, edges(yg, yr), all.inside = TRUE)
+    joint <- t(rowsum(t(joint), group, reorder = FALSE) /
+      tabulate(group, nbins = bins[2L]))
+  }
+  xb <- edges(xg, xr)
+  yb <- edges(yg, yr)
+  xi <- findInterval(df$x, xb, all.inside = TRUE)
+  yi <- findInterval(df$y, yb, all.inside = TRUE)
+  counts <- tabulate(xi + (yi - 1L) * bins[1L], nbins = prod(as.double(bins)))
+  marginal <- as.vector(joint %*% diff(yb))
+  populated <- tabulate(xi, nbins = bins[1L]) > 0L & marginal > 0
+  value <- joint / marginal
+  value[!populated, ] <- NA_real_
+  ix <- rep(seq_len(bins[1L]), bins[2L])
+  iy <- rep(seq_len(bins[2L]), each = bins[1L])
+  out <- tibble::tibble(xmin = xb[ix], xmax = xb[ix + 1L],
+    ymin = yb[iy], ymax = yb[iy + 1L], count = counts,
+    value = as.vector(value))
+  out[is.finite(out$value), , drop = FALSE]
+}
+
 render_diagnostic_grid <- function(
   df,
   density,
@@ -873,7 +982,8 @@ render_diagnostic_grid <- function(
   subtitle,
   caption,
   intercept = NULL,
-  line_col = "red"
+  line_col = "red",
+  fill_transform = "identity"
 ) {
   plt <- ggplot2::ggplot(
     df,
@@ -887,7 +997,8 @@ render_diagnostic_grid <- function(
   ) +
     ggplot2::geom_rect(colour = NA) +
     ggplot2::scale_fill_viridis_c(
-      name = if (density == "conditional") "Conditional density" else "Count"
+      name = if (density == "conditional") "Conditional density" else "Count",
+      transform = fill_transform
     )
   if (!is.null(intercept)) {
     plt <- plt + ggplot2::geom_hline(yintercept = intercept, colour = line_col)
@@ -923,9 +1034,13 @@ scalable_residuals_linpred_plot <- function(
   caption = NULL,
   line_col = "red",
   by_family = NULL,
-  rank = NULL
+  rank = NULL,
+  density_method = c("kde", "histogram"),
+  bandwidth = NULL
 ) {
   density <- match.arg(density)
+  density_method <- match.arg(density_method)
+  validate_diagnostic_bandwidth(bandwidth)
   d <- diagnostic_data(model, type, seed)
   by_family <- diagnostic_data_by_family(d, by_family)
   dat <- d$data
@@ -955,7 +1070,9 @@ scalable_residuals_linpred_plot <- function(
     "residuals",
     density_bins,
     density,
-    by_family
+    by_family,
+    density_method,
+    bandwidth
   )
   render_diagnostic_grid(
     df,
@@ -970,7 +1087,10 @@ scalable_residuals_linpred_plot <- function(
     subtitle,
     caption,
     if (d$type == "pit") 0.5 else 0,
-    line_col
+    line_col,
+    fill_transform = if (density == "conditional" && density_method == "kde") {
+      "sqrt"
+    } else "identity"
   )
 }
 
@@ -1172,12 +1292,18 @@ diagnostic_data_by_family <- function(d, by_family = NULL) {
     if (is.null(by_family)) !d$type %in% c("quantile", "pit") else by_family
 }
 
-diagnostic_grouped_grid <- function(dat, x, y, bins, density, by_family) {
+diagnostic_grouped_grid <- function(dat, x, y, bins, density, by_family,
+  density_method = "histogram", bandwidth = NULL) {
+  aggregate <- function(x, y) {
+    if (density == "conditional" && density_method == "kde") {
+      diagnostic_density_grid(x, y, bins, bandwidth)
+    } else diagnostic_grid(x, y, bins, density)
+  }
   if (!by_family) {
-    return(diagnostic_grid(dat[[x]], dat[[y]], bins, density))
+    return(aggregate(dat[[x]], dat[[y]]))
   }
   dplyr::bind_rows(lapply(split(dat, dat$.family, drop = TRUE), function(part) {
-    out <- diagnostic_grid(part[[x]], part[[y]], bins, density)
+    out <- aggregate(part[[x]], part[[y]])
     out$.family <- part$.family[1L]
     out
   }))
@@ -1226,6 +1352,23 @@ scalable_grouped_histogram <- function(
   )
 }
 
+# Trace only the upper boundary, including vertical ends at the outer bin
+# edges. Explicit vertices also handle unequal bin widths and empty bins.
+diagnostic_histogram_outline <- function(df) {
+  dplyr::bind_rows(lapply(split(df, df$.family, drop = TRUE), function(part) {
+    part <- part[order(part$xmin), , drop = FALSE]
+    n <- nrow(part)
+    # Adjacent edges returned by stat_bin() can differ by rounding error.
+    # Use one coordinate for each shared edge to keep transitions vertical.
+    right <- c(part$xmin[-1L], part$xmax[n])
+    tibble::tibble(
+      x = c(part$xmin[1L], as.vector(rbind(part$xmin, right)), part$xmax[n]),
+      y = c(0, rep(part$value, each = 2L), 0),
+      .family = part$.family[1L]
+    )
+  }))
+}
+
 render_grouped_histogram <- function(
   df,
   by_family,
@@ -1252,14 +1395,25 @@ render_grouped_histogram <- function(
     p <- p +
       ggplot2::geom_rect(
         ggplot2::aes(fill = .data$.family),
-        colour = "white",
-        alpha = .45
+        colour = NA,
+        alpha = .15
+      ) +
+      ggplot2::geom_path(
+        data = diagnostic_histogram_outline(df),
+        ggplot2::aes(x = .data$x, y = .data$y, colour = .data$.family),
+        inherit.aes = FALSE,
+        linewidth = .6,
+        alpha = 1
       ) +
       ggokabeito::scale_fill_okabe_ito(
         limits = levels(df$.family),
         drop = FALSE
       ) +
-      ggplot2::labs(fill = "Family component")
+      ggokabeito::scale_colour_okabe_ito(
+        limits = levels(df$.family),
+        drop = FALSE
+      ) +
+      ggplot2::labs(fill = "Family component", colour = "Family component")
   }
   compact_diagnostic_plot(
     p +

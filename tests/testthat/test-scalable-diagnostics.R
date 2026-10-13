@@ -220,7 +220,8 @@ test_that("scalable plot objects contain bounded data and build without original
       scalable = TRUE,
       method = "normal",
       qq_bins = 30,
-      density_bins = c(15, 15)
+      density_bins = c(15, 15),
+      density_method = "histogram"
     )
   )
 })

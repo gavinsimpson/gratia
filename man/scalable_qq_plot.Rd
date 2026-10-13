@@ -45,7 +45,9 @@ scalable_residuals_linpred_plot(
   caption = NULL,
   line_col = "red",
   by_family = NULL,
-  rank = NULL
+  rank = NULL,
+  density_method = c("kde", "histogram"),
+  bandwidth = NULL
 )
 
 scalable_observed_fitted_plot(
@@ -142,14 +144,24 @@ explicit pooling. Ignored for ordinary models.}
 of horizontal and vertical heatmap bins.}
 
 \item{density}{One of \code{"conditional"} or \code{"count"}. Conditional density is
-the count divided by the horizontal-bin total and vertical-bin width.
-Empty horizontal bins are blank. No kernel smoothing is performed.}
+estimated using \code{density_method}. With \code{"histogram"}, it is the count
+divided by the horizontal-bin total and vertical-bin width. Empty
+horizontal bins are blank. Counts are always unsmoothed.}
 
 \item{rank}{logical or \code{NULL}; use within-component ranks on the horizontal
 axis of residual-versus-predictor plots. The default ranks pooled grouped
 plots and retains original predictors in facets. \code{TRUE} or \code{FALSE} overrides
 this independently of the residual type and layout. Only finite observations
 included in each component determine its ranks; average ties are used.}
+
+\item{density_method}{Conditional-density estimator: \code{"kde"} (the default)
+uses \code{\link[KernSmooth:bkde2D]{KernSmooth::bkde2D()}} with Gaussian kernels; \code{"histogram"} uses
+unsmoothed rectangular bins. Only affects the residual heatmap.}
+
+\item{bandwidth}{Optional pair of positive bandwidths for the predictor and
+residual axes, in their plotted units. \code{NULL} uses normal-reference
+bandwidths, adjusted for two dimensions, with a fallback for constant axes.
+Used only for \code{density_method = "kde"} and conditional density.}
 
 \item{n_bins}{character or numeric; either the number of bins or a string
 indicating how to calculate the number of bins.}
@@ -180,6 +192,17 @@ distributions, predictor ranks and layout controls of \code{\link[=appraise]{app
 bin limits apply separately to each indexed component. Pooled residual
 heatmaps summarize the component mixture rather than colouring individual
 observations; observed-versus-fitted appraisals always separate components.
+Pooled histograms use faint component-coloured fills with opaque stepped
+upper boundaries, retaining common bin edges and component densities.
+
+Kernel density estimates are calculated on a fixed grid before plotting.
+Each predictor slice is normalized to integrate to one over the displayed
+residual grid. Bandwidths, rather than \code{density_bins}, control smoothing;
+increase grid resolution when using small bandwidths. A square-root fill
+transformation reveals low-density regions while retaining density units
+in the legend. Gaussian kernels smooth discrete residual bands, which can
+exist even under a correctly specified count model; they do not calibrate
+traditional residuals to a common reference distribution.
 
 Point styling affects QQ and worm points. Heatmap fill scales can be
 replaced with ggplot scales. Non-finite plotting observations are reported

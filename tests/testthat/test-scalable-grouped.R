@@ -22,7 +22,7 @@ test_that("scalable grouped diagnostics preserve new main defaults and shared re
     ranked <- diagnostic_predictor_data(d$data, d$source, FALSE)
     expect_equal(
       scaled[[2]]$data,
-      diagnostic_grid(ranked$eta, ranked$residuals, c(50, 50), "conditional")
+      diagnostic_density_grid(ranked$eta, ranked$residuals, c(50, 50))
     )
     expect_equal(
       scaled[[4]]$data$.family,
