@@ -137,6 +137,17 @@ test_that("native residuals are preserved for observed and replaced responses", 
   expect_s3_class(residuals_linpred_plot(m), "ggplot")
   expect_s3_class(residuals_hist_plot(m), "ggplot")
   expect_s3_class(observed_fitted_plot(m), "ggplot")
+  # The grouped-family automatic default must preserve native model defaults.
+  for (fun in list(residuals_linpred_plot, residuals_hist_plot)) {
+    expect_equal(fun(m)$data$residuals, unname(residuals(m, type = "pearson")))
+    expect_equal(fun(m, type = NULL)$data$residuals,
+      unname(residuals(m, type = "pearson")))
+    for (type in c("response", "pearson", "deviance")) {
+      expect_equal(fun(m, type = type)$data$residuals,
+        unname(residuals(m, type = type)))
+    }
+  }
+  expect_equal(residuals_linpred_plot(m)$data$eta, unname(predict(m, type = "link")))
   expect_error(qq_plot(m, method = "uniform"), "simulate")
   expect_error(appraise(m, type = "quantile"), "arg")
   set.seed(4); before <- .Random.seed

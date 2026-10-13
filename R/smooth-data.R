@@ -207,6 +207,12 @@
     )
   }
 
+  if (is_mrf_smooth(sm)) {
+    # The fitted domain can include regions absent from the model frame.
+    area <- mrf_area_levels(sm, model)
+    newlist[[grid_vars]] <- factor(area, levels = area)
+  }
+
   if (!is.null(plot_spec)) {
     for (v in names(plot_spec$levels)) {
       target <- if (back_transform) grid_vars[match(v, smooth_vars)] else v

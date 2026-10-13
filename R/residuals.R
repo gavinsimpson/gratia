@@ -140,11 +140,23 @@
 #' Poisson observations are randomized between `F(y - 1)` and `F(y)`.
 #' Use non-integer censoring limits for `cpois()`, as recommended by mgcv.
 #'
+#' Grouped-family GAMs fitted with [mgcv::gfam()] dispatch CDF calculations to
+#' each indexed component, using fitted nuisance parameters, dispersion and
+#' weights, before restoring fitting-row order. All active components must have
+#' validated response-CDF and probability-bound semantics. Unsupported components
+#' are errors for this function; [appraise()] can instead select deviance
+#' residuals automatically. See [appraise()] for current support boundaries.
+#' Tweedie observations at zero are randomised over their probability atom,
+#' between `F(0-) = 0` and `F(0)`; positive observations use `F(y)`.
+#' For GAMs, a supplied seed preserves the caller's RNG state, including the
+#' absence of a previously initialised RNG state.
+#'
 #' For CDF helpers with native log-tail support, quantile residuals are computed
 #' directly from log probabilities in the smaller tail. This avoids infinite
 #' residuals caused by rounding a probability to zero or one. No probability
 #' clipping is applied: genuine zero-probability tails still give infinite
-#' residuals. PIT residuals are returned as ordinary probabilities and may still
+#' residuals for ordinary models. Grouped diagnostics instead report non-finite
+#' calculated residuals as errors. PIT residuals are returned as ordinary probabilities and may still
 #' round to zero or one in extreme tails, so applying `qnorm()` to the returned
 #' PIT values can be less accurate than requesting quantile residuals directly.
 #' Native log tails are available for Poisson, negative binomial, binomial,
@@ -164,31 +176,17 @@
 `quantile_residuals.gam` <- function(
   model, type = c("pit", "quantile"), seed = NULL, ...
 ) {
-  # random seed stuff
-  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-    runif(1)
+  type <- match.arg(type)
+  compute <- function() {
+    used <- model_used_rows(model)
+    if (is_gfam_family(family(used))) {
+      return(gfam_quantile_residuals(gfam_diagnostic_context(used), type))
+    }
+    do_quantile_residuals(y = used$y, fv = used$fitted.values,
+      wt = used$prior.weights, scale = model$sig2, fam = family(model), type = type)
   }
-  if (is.null(seed)) {
-    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-  } else {
-    R.seed <- get(".Random.seed", envir = .GlobalEnv)
-    set.seed(seed)
-    RNGstate <- structure(seed, kind = as.list(RNGkind()))
-    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-  }
-
-  used <- model_used_rows(model)
-  r <- do_quantile_residuals(
-    y = used$y,
-    fv = used$fitted.values,
-    wt = used$prior.weights,
-    scale = model$sig2,
-    fam = family(model),
-    type = type
-  )
-
-  # return
-  stats::naresid(stats::na.action(model), r)
+  r <- if (is.null(seed)) compute() else withr::with_seed(seed, compute())
+  restore_model_rows(r, model)
 }
 
 #' @export
@@ -247,6 +245,10 @@
     lower <- y
     if (ft %in% c("poisson", "negative_binomial", "ziplss")) {
       lower <- y - 1
+    } else if (ft == "tweedie") {
+      # Compound Poisson Tweedie responses have a probability atom at zero.
+      # Its left limit is F(0-) = 0, rather than F(0) used for positive values.
+      lower[which(y == 0)] <- -Inf
     } else if (ft == "binomial") {
       # The fitted response is a proportion; subtract one success, not one
       # whole proportion. Zero-weight rows have a degenerate distribution.

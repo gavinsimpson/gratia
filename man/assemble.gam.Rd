@@ -54,6 +54,11 @@
   surface_3d = list(),
   back_transform = FALSE,
   re_levels = NULL,
+  mrf_plot = c("effects", "qq"),
+  interval = c("confidence", "simultaneous"),
+  n_sim = 10000,
+  n_cores = 1,
+  seed = NULL,
   ...
 )
 }
@@ -137,7 +142,9 @@ before the confidence band is computed.}
 
 \item{fun}{function; a function that will be applied to the estimated values
 and confidence interval before plotting. Can be a function or the name of a
-function. Function \code{fun} will be applied after adding any \code{constant}, if
+function. For simultaneous bands it must be monotone over the entire band;
+endpoint transformation alone does not preserve non-monotone band coverage.
+Function \code{fun} will be applied after adding any \code{constant}, if
 provided.}
 
 \item{dist}{numeric; if greater than 0, this is used to determine when
@@ -284,6 +291,28 @@ effects or their intervals; use \code{fun} for that.}
 \item{re_levels}{named list of factor level labels to retain in tensor products
 with random-effect margins, for example \code{list(species = c("a", "b"))}.
 Fitted factor order and ordered status are retained.}
+
+\item{mrf_plot}{character; display Markov random field smooths as area-labelled
+estimates and intervals (\code{"effects"}, the default), or a descriptive Gaussian
+quantile plot (\code{"qq"}). MRF effects are correlated and need not have equal
+marginal variances; the QQ display is not a test of independent normal effects.
+Specialist maps and graph plots are outside the scope of this display.}
+
+\item{interval}{character; \code{"confidence"} (default) draws pointwise intervals;
+\code{"simultaneous"} uses a band across the finite evaluation grid of each
+smooth, including its slices and factor levels. Separate smooths are not a
+joint coverage set. \code{"credible"} aliases \code{"confidence"}, reflecting the
+approximate Bayesian credible interpretation of default-covariance bands.
+Parametric panels retain pointwise intervals and are labelled accordingly
+when simultaneous smooth bands are requested. Bands appear where the
+renderer displays interval bounds; surface and random-effect QQ plots
+retain their existing estimate or standard-error display.}
+
+\item{n_sim, n_cores}{positive integers; coefficient draws and simulation cores
+for simultaneous bands. Parallel simulation requires OpenMP support.}
+
+\item{seed}{integer or \code{NULL}; an explicit simulation seed preserves the
+caller's RNG state.}
 
 \item{...}{Additional smooth plotting arguments, including \code{title},
 \code{subtitle}, \code{xlab} and \code{ylab}.}

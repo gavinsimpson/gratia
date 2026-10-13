@@ -49,6 +49,11 @@
 #'   Parametric estimates retain both scales; multi-column basis
 #'   expansions retain raw axes on either setting. Does not transform estimated
 #'   effects or their intervals; use `fun` for that.
+#' @param mrf_plot character; display Markov random field smooths as area-labelled
+#'   estimates and intervals (`"effects"`, the default), or a descriptive Gaussian
+#'   quantile plot (`"qq"`). MRF effects are correlated and need not have equal
+#'   marginal variances; the QQ display is not a test of independent normal effects.
+#'   Specialist maps and graph plots are outside the scope of this display.
 #' @param re_levels named list of factor level labels to retain in tensor products
 #'   with random-effect margins, for example `list(species = c("a", "b"))`.
 #'   Fitted factor order and ordered status are retained.
@@ -66,7 +71,9 @@
 #'   before the confidence band is computed.
 #' @param fun function; a function that will be applied to the estimated values
 #'   and confidence interval before plotting. Can be a function or the name of a
-#'   function. Function `fun` will be applied after adding any `constant`, if
+#'   function. For simultaneous bands it must be monotone over the entire band;
+#'   endpoint transformation alone does not preserve non-monotone band coverage.
+#'   Function `fun` will be applied after adding any `constant`, if
 #'   provided.
 #' @param ci_level numeric between 0 and 1; the coverage of credible interval.
 #' @param n numeric; the number of points over the range of the covariate at
@@ -89,6 +96,19 @@
 #' @param unconditional logical; should confidence intervals include the
 #'   uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian
 #'   covariance matrix will be used.
+#' @param interval character; `"confidence"` (default) draws pointwise intervals;
+#'   `"simultaneous"` uses a band across the finite evaluation grid of each
+#'   smooth, including its slices and factor levels. Separate smooths are not a
+#'   joint coverage set. `"credible"` aliases `"confidence"`, reflecting the
+#'   approximate Bayesian credible interpretation of default-covariance bands.
+#'   Parametric panels retain pointwise intervals and are labelled accordingly
+#'   when simultaneous smooth bands are requested. Bands appear where the
+#'   renderer displays interval bounds; surface and random-effect QQ plots
+#'   retain their existing estimate or standard-error display.
+#' @param n_sim,n_cores positive integers; coefficient draws and simulation cores
+#'   for simultaneous bands. Parallel simulation requires OpenMP support.
+#' @param seed integer or `NULL`; an explicit simulation seed preserves the
+#'   caller's RNG state.
 #' @param overall_uncertainty logical; should the uncertainty in the model
 #'   constant term be included in the standard errors of smooth and parametric
 #'   effects? For parametric effects this includes the intercept variance and
@@ -337,6 +357,9 @@
   surface_3d = list(),
   back_transform = FALSE,
   re_levels = NULL,
+  mrf_plot = c("effects", "qq"),
+  interval = c("confidence", "simultaneous"),
+  n_sim = 10000, n_cores = 1, seed = NULL,
   ...
 ) {
   surface <- match.arg(surface)
