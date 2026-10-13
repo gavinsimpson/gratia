@@ -40,8 +40,9 @@
 #'   spread the plots.
 #' @param guides character; one of `"keep"` (the default), `"collect"`, or
 #'   `"auto"`. Passed to [patchwork::plot_layout()]
-#' @param level numeric; the coverage level for QQ plot reference intervals.
-#'   Must be strictly `0 < level < 1`. Only used with `method = "simulate"`.
+#' @param level numeric; the coverage level for QQ plot reference intervals
+#'   with `method = "simulate"`, and posterior predictive intervals for discrete
+#'   responses with `ppcheck = TRUE`. Must be strictly `0 < level < 1`.
 #' @param ci_alpha,ci_col colour and transparency used to draw the QQ plot
 #'   reference interval when `method = "simulate"`.
 #' @param point_col,point_alpha colour and transparency used to draw points in
@@ -49,7 +50,16 @@
 #'   passed to the individual plotting functions, and therefore affects the
 #'   points of all plots.
 #' @param line_col colour specification for the 1:1 line in the QQ plot and the
-#'   reference line in the residuals vs linear predictor plot.
+#'   reference line in the residuals vs linear predictor plot. Also used for
+#'   the observed distribution when `ppcheck = TRUE`.
+#' @param ppcheck logical; replace the residual histogram with a
+#'   [posterior_predictive_plot()]? Defaults to `FALSE`. Requires a model and
+#'   family supported by that function. Replicated distributions use `ci_col`.
+#'   Discrete posterior points and interval bars default to opacity `0.8`, while
+#'   continuous density curves use `0.2`. Explicitly supplying `ci_alpha`
+#'   overrides these defaults as well as the QQ reference interval opacity.
+#' @param n_ppc positive integer; number of posterior predictive data sets
+#'   when `ppcheck = TRUE`. Independent of the QQ plot's `n_simulate`.
 #' @param ... arguments passed to [patchwork::wrap_plots()].
 #'
 #' @importFrom patchwork wrap_plots
@@ -60,7 +70,8 @@
 #'
 #' @seealso The plots are produced by functions [gratia::qq_plot()],
 #'   [gratia::residuals_linpred_plot()], [gratia::residuals_hist_plot()],
-#'   and [gratia::observed_fitted_plot()].
+#'   [gratia::observed_fitted_plot()], and optionally
+#'   [gratia::posterior_predictive_plot()].
 #'
 #' @export
 #'
@@ -71,6 +82,8 @@
 #' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 #' ## run some basic model checks
 #' appraise(mod, point_col = "steelblue", point_alpha = 0.4)
+#' ## replace the residual histogram with a posterior predictive check
+#' appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
 #'
 #' ## To change the theme for all panels use the & operator, for example to
 #' ## change the ggplot theme for all panels
@@ -108,9 +121,21 @@
   point_col = "grey20",
   point_alpha = 1,
   line_col = "red",
+  ppcheck = FALSE,
+  n_ppc = 50,
   ...
 ) {
   ## process args
+  if (!is.logical(ppcheck) || length(ppcheck) != 1L || is.na(ppcheck)) {
+    stop("'ppcheck' must be TRUE or FALSE.", call. = FALSE)
+  }
+  # Check support and sampling arguments before generating the other panels.
+  plt3 <- if (ppcheck) {
+    posterior_predictive_plot(model, n = n_ppc, seed = seed,
+      observed_col = line_col, replicated_col = ci_col,
+      replicated_alpha = if (missing(ci_alpha)) NULL else ci_alpha,
+      level = level)
+  } else NULL
   type <- match.arg(type)
   if (is.character(n_bins)) {
     n_bins <- match.arg(n_bins)
@@ -147,10 +172,12 @@
     point_alpha = point_alpha,
     line_col = line_col
   )
-  plt3 <- residuals_hist_plot(model,
-    type = type, n_bins = n_bins,
-    subtitle = NULL
-  )
+  if (!ppcheck) {
+    plt3 <- residuals_hist_plot(model,
+      type = type, n_bins = n_bins,
+      subtitle = NULL
+    )
+  }
   plt4 <- observed_fitted_plot(model,
     subtitle = NULL, point_col = point_col,
     point_alpha = point_alpha

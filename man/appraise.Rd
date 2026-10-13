@@ -27,6 +27,8 @@ appraise(model, ...)
   point_col = "grey20",
   point_alpha = 1,
   line_col = "red",
+  ppcheck = FALSE,
+  n_ppc = 50,
   ...
 )
 
@@ -87,8 +89,9 @@ spread the plots.}
 \item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
 \code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
 
-\item{level}{numeric; the coverage level for QQ plot reference intervals.
-Must be strictly \verb{0 < level < 1}. Only used with \code{method = "simulate"}.}
+\item{level}{numeric; the coverage level for QQ plot reference intervals
+with \code{method = "simulate"}, and posterior predictive intervals for discrete
+responses with \code{ppcheck = TRUE}. Must be strictly \verb{0 < level < 1}.}
 
 \item{ci_alpha, ci_col}{colour and transparency used to draw the QQ plot
 reference interval when \code{method = "simulate"}.}
@@ -99,7 +102,18 @@ passed to the individual plotting functions, and therefore affects the
 points of all plots.}
 
 \item{line_col}{colour specification for the 1:1 line in the QQ plot and the
-reference line in the residuals vs linear predictor plot.}
+reference line in the residuals vs linear predictor plot. Also used for
+the observed distribution when \code{ppcheck = TRUE}.}
+
+\item{ppcheck}{logical; replace the residual histogram with a
+\code{\link[=posterior_predictive_plot]{posterior_predictive_plot()}}? Defaults to \code{FALSE}. Requires a model and
+family supported by that function. Replicated distributions use \code{ci_col}.
+Discrete posterior points and interval bars default to opacity \code{0.8}, while
+continuous density curves use \code{0.2}. Explicitly supplying \code{ci_alpha}
+overrides these defaults as well as the QQ reference interval opacity.}
+
+\item{n_ppc}{positive integer; number of posterior predictive data sets
+when \code{ppcheck = TRUE}. Independent of the QQ plot's \code{n_simulate}.}
 }
 \description{
 Model diagnostic plots
@@ -116,6 +130,8 @@ dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 ## run some basic model checks
 appraise(mod, point_col = "steelblue", point_alpha = 0.4)
+## replace the residual histogram with a posterior predictive check
+appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
 
 ## To change the theme for all panels use the & operator, for example to
 ## change the ggplot theme for all panels
@@ -133,7 +149,8 @@ if (packageVersion("ggplot2") <= "3.5.2") {
 \seealso{
 The plots are produced by functions \code{\link[=qq_plot]{qq_plot()}},
 \code{\link[=residuals_linpred_plot]{residuals_linpred_plot()}}, \code{\link[=residuals_hist_plot]{residuals_hist_plot()}},
-and \code{\link[=observed_fitted_plot]{observed_fitted_plot()}}.
+\code{\link[=observed_fitted_plot]{observed_fitted_plot()}}, and optionally
+\code{\link[=posterior_predictive_plot]{posterior_predictive_plot()}}.
 
 \link{gamm4_support}
 }
