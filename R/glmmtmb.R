@@ -60,58 +60,14 @@ get_smooths_by_id.glmmTMB <- function(object, id, ...) {
   glmmtmb_smooths(object)[id]
 }
 
-# Combine coefficient transformations before extracting joint covariance. The
-# lpi attribute keeps overall-mean uncertainty local to each linear predictor.
 glmmtmb_all_smooths <- function(object, covariance) {
-  sms <- glmmtmb_smooths(object)
   components <- glmmtmb_components(object)
   models <- lapply(components, function(component)
     glmmtmb_smooth_model(object, component, covariance = FALSE))
   names(models) <- components
-  out <- models[[1L]]
-  sizes <- vapply(models, function(x) length(x$coefficients), integer(1))
-  starts <- cumsum(c(0L, sizes))
-  smooths <- list()
-  for (i in seq_along(models)) {
-    for (sm in models[[i]]$smooth) {
-      sm$first.para <- sm$first.para + starts[i]
-      sm$last.para <- sm$last.para + starts[i]
-      j <- length(smooths) + 1L
-      sm$label <- sms[[j]]$label
-      attr(sm, "gratia.component") <- components[i]
-      smooths[[j]] <- sm
-    }
-  }
-  indices <- unlist(lapply(models, `[[`, "joint_indices"), use.names = FALSE)
-  A <- as.matrix(Matrix::bdiag(lapply(models, `[[`, "coefficient_transform")))
-  out$coefficients <- drop(A %*% object$fit$parfull[indices])
-  out$Vp <- if (covariance) A %*% glmmtmb_joint_covariance(object, indices) %*% t(A) else NULL
-  out$cmX <- unlist(lapply(models, `[[`, "cmX"), use.names = FALSE)
-  out$smooth <- smooths
-  out$coefficient_transform <- A
-  out$joint_indices <- indices
-  out$component <- NULL
-  out$models <- lapply(seq_along(models), function(i) {
-    local <- models[[i]]
-    columns <- seq_len(sizes[i]) + starts[i]
-    local$Vp <- if (covariance) out$Vp[columns, columns, drop = FALSE] else NULL
-    local$predictor <- match(components[i], glmmtmb_components(object))
-    local
-  })
-  names(out$models) <- components
-  out$contexts <- lapply(models, function(x) list(formula = x$formula, terms = x$terms))
-  attr(out$formula, "lpi") <- lapply(seq_along(models), function(i)
-    seq_len(sizes[i]) + starts[i])
-  # Coefficient names also identify the predictor, just like the smooth labels.
-  names(out$coefficients) <- unlist(lapply(seq_along(models), function(i) {
-    nm <- names(models[[i]]$coefficients)
-    for (sm in smooths[vapply(smooths, function(x)
-        attr(x, "gratia.component") == components[i], logical(1))]) {
-      nm[smooth_coef_indices(sm) - starts[i]] <- paste0(sm$label, ".", seq_len(sm$df))
-    }
-    nm
-  }), use.names = FALSE)
-  out
+  mixed_all_smooths(models, glmmtmb_smooths(object), object$fit$parfull,
+    if (covariance) function(index) glmmtmb_joint_covariance(object, index),
+    glmmtmb_predictor_count(object))
 }
 
 # Return the covariance of selected *joint* parameters, marginalizing all the
@@ -127,22 +83,7 @@ glmmtmb_joint_covariance <- function(object, index) {
   if (!isTRUE(sdr$pdHess)) {
     stop("glmmTMB covariance is unavailable: Hessian is not positive definite.")
   }
-  Q <- sdr$jointPrecision
-  p <- object$fit$parfull
-  # With no random parameters TMB supplies cov.fixed, not jointPrecision.
-  if (is.null(Q) && identical(names(sdr$par.fixed), names(p)) &&
-      identical(dim(sdr$cov.fixed), c(length(p), length(p)))) {
-    return(sdr$cov.fixed[index, index, drop = FALSE])
-  }
-  if (is.null(Q) || nrow(Q) != length(p) ||
-      (!is.null(rownames(Q)) && !identical(rownames(Q), names(p)))) {
-    stop("Cannot align glmmTMB joint precision with fitted parameters (mapped parameters are not supported).")
-  }
-  E <- Matrix::sparseMatrix(i = index, j = seq_along(index), x = 1,
-    dims = c(nrow(Q), length(index)))
-  V <- as.matrix(Matrix::solve(Q, E)[index, , drop = FALSE])
-  if (any(!is.finite(V))) stop("glmmTMB covariance contains non-finite values.")
-  (V + t(V)) / 2
+  mixed_joint_covariance(sdr, p, index, "glmmTMB")
 }
 
 glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
@@ -180,19 +121,7 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
       stop("Unsupported or inconsistent glmmTMB smooth coefficient mapping.")
     }
     nb <- length(re$pen.ind)
-    # Map [random coefficients, null-space coefficients] back to the original
-    # smooth basis, undoing smooth2random's permutation, scaling and rotation.
-    B <- matrix(0, nb, nb)
-    penalized <- which(re$pen.ind != 0L)
-    unpenalized <- which(re$pen.ind == 0L)
-    if (length(penalized) != nr || length(unpenalized) != nf ||
-        !setequal(re$rind, seq_len(nr))) {
-      stop("Unsupported smooth2random permutation in glmmTMB fit.")
-    }
-    B[cbind(penalized, re$rind)] <- 1
-    if (nf) B[cbind(unpenalized, nr + seq_len(nf))] <- 1
-    B <- re$trans.D * B
-    if (!is.null(re$trans.U)) B <- re$trans.U %*% B
+    B <- mixed_smooth_transform(re, "glmmTMB")
     transforms[[j]] <- B
     indices <- c(indices, random[seq.int(ends[pos] + 1L, ends[pos + 1L])],
       fixed[re$beta_ind])
@@ -217,7 +146,7 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
   structure(list(smooth = smooths, coefficients = coefficients, Vp = V,
     cmX = unname(cm), model = frame, terms = tt, formula = ff,
     coefficient_transform = A, joint_indices = indices,
-    call = object$call, component = component,
+    call = object$call, component = component, fitter = "glmmTMB",
     pterms = tt, parametric = seq_along(parametric),
     contrasts = object$modelInfo$contrasts,
     xlevels = stats::.getXlevels(tt, frame),
@@ -227,48 +156,10 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
     var.summary = lapply(frame[intersect(names(frame), all.vars(ff))],
       function(x) if (is.numeric(x))
       c(min(x), stats::median(x), max(x)) else x),
-    na.action = stats::na.action(object)), class = "gratia_glmmtmb_smooth",
+    na.action = stats::na.action(object)), class = c("gratia_glmmtmb_smooth", "gratia_mixed_smooth"),
     gratia.n_predictors = glmmtmb_predictor_count(object))
 }
 
-#' @export
-coef.gratia_glmmtmb_smooth <- function(object, ...) object$coefficients
-#' @export
-model.frame.gratia_glmmtmb_smooth <- function(formula, ...) formula$model
-#' @export
-formula.gratia_glmmtmb_smooth <- function(x, ...) x$formula
-#' @export
-terms.gratia_glmmtmb_smooth <- function(x, ...) x$terms
-#' @export
-get_smooths_by_id.gratia_glmmtmb_smooth <- function(object, id, ...) object$smooth[id]
-#' @export
-model_context.gratia_glmmtmb_smooth <- function(object, component = NULL) {
-  model_context.default(object, component = NULL)
-}
-#' @export
-smooth_estimates.gratia_glmmtmb_smooth <- function(object, select = NULL,
-    partial_match = FALSE, ...) {
-  if (is.null(object$contexts)) return(smooth_estimates.gam(object,
-    select = select, partial_match = partial_match, ...))
-  labels <- smooths(object)
-  take <- check_user_select_smooths(labels, select = select,
-    partial_match = partial_match)
-  selected <- object$smooth[which(take)]
-  components <- unique(vapply(selected, attr, character(1), "gratia.component"))
-  results <- lapply(components, function(component) {
-    local <- object
-    ctx <- object$contexts[[component]]
-    local$formula <- ctx$formula
-    attr(local$formula, "lpi") <- attr(object$formula, "lpi")
-    local$terms <- ctx$terms
-    want <- vapply(selected, function(sm) attr(sm, "gratia.component") == component, logical(1))
-    smooth_estimates.gam(local,
-      select = vapply(selected[want], `[[`, character(1), "label"), ...)
-  })
-  out <- dplyr::bind_rows(results)
-  attr(out, "tensor_term_order") <- do.call(c, lapply(results, attr, "tensor_term_order"))
-  out
-}
 #' Effects and diagnostics for glmmTMB models
 #'
 #' Evaluate and plot the stored mgcv smooths in a glmmTMB fit. Coefficients and

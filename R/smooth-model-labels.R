@@ -13,16 +13,16 @@ smooth_model_labels <- function(object, smooths) {
   }
   override <- attr(object, "gratia.model_label", exact = TRUE)
   lpi <- lss_eta_index(object)
-  labels <- if (!inherits(object, "gratia_glmmtmb_smooth") &&
+  labels <- if (!inherits(object, "gratia_mixed_smooth") &&
       is.null(override) && length(lpi) > 1L) {
     mgcv_predictor_labels(family(object), length(lpi))
   }
   vapply(smooths, function(sm) {
     component <- attr(sm, "gratia.component", exact = TRUE)
-    if (is.null(component) && inherits(object, "gratia_glmmtmb_smooth")) {
+    if (is.null(component) && inherits(object, "gratia_mixed_smooth")) {
       component <- object$component
     }
-    if (!is.null(component)) return(glmmtmb_model_label(component))
+    if (!is.null(component)) return(mixed_model_label(object, component))
     if (!is.null(override)) return(override)
     if (length(lpi) < 2L) return(NA_character_)
     belongs <- vapply(lpi, function(i) all(smooth_coef_indices(sm) %in% i),

@@ -185,6 +185,12 @@
   and points with interval bars for discrete responses. Set
   `appraise(ppcheck = TRUE)` to replace the residual histogram with this check.
 
+* `draw()` and `assemble()` now support formula smooths and parametric effects
+  from `sdmTMB` models, including both predictors of delta models. Companion
+  methods provide smooth labels, coefficients, and effect estimates. Smooths
+  use the existing mgcv plotting infrastructure and joint TMB/RTMB covariance;
+  tensor smooths with multiple penalties are supported.
+
 * Full and reduced-rank MRF smooths now support area effect estimates and
   interval plots (#9). Use `mrf_plot = "qq"` for a descriptive QQ plot.
 
