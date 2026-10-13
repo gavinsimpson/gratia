@@ -160,6 +160,11 @@
 
 ## New features
 
+* `posterior_predictive_plot()` compares observed responses with posterior
+  predictive distributions, using density curves for continuous responses
+  and points with interval bars for discrete responses. Set
+  `appraise(ppcheck = TRUE)` to replace the residual histogram with this check.
+
 * `fitted_values()` now emits a message identifying prediction rows with unobserved
   combinations of known categorical predictor levels (#164).
 
