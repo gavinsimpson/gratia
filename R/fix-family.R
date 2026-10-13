@@ -3,6 +3,14 @@
   # try to fix up the family used by mgcv to add the $rd component
   # for random deviate sampling
 
+  # Supply our weighted inverse Gaussian sampler before mgcv adds its
+  # unweighted one. A caller-supplied rd is preserved by the usual path below.
+  if (inherits(family, "family") && is.null(family$rd) &&
+      identical(family_type(family), "inverse_gaussian")) {
+    family$rd <- rd_invgaussian
+    return(family)
+  }
+
   # try the obvious thing first and see if mgcv::fix.family.rd() already handles
   # family
   fam <- mgcv::fix.family.rd(family)
@@ -134,7 +142,7 @@ make_rd_clog <- function(sigma) {
     "ziplss"    = cdf_ziplss,
     "scaled_t" = make_cdf_scat(nu = theta[1], sigma = theta[2]),
     "negative_binomial" = make_cdf_nb(theta),
-    ## "inverse_gaussian"  = cdf_invgaussian, # FIXME: not sure I trust this yet
+    "inverse_gaussian"  = cdf_invgaussian,
     "beta_regression"   = make_cdf_beta(theta, eps = betar_eps(family)),
     "tweedie"  = make_cdf_tw(theta, ab = get_tw_params(family)),
     NULL
@@ -196,30 +204,6 @@ make_cdf_clog <- function(sigma) {
   # FIXME: what about weights wt?
   pgamma(q, shape = 1 / scale, scale = mu * scale,
     lower.tail = lower_tail, log.p = log_p)
-}
-
-#' @importFrom stats qnorm
-`pinvgaussian` <- function(q, mu, wt, scale, log_p = FALSE) {
-  # only for lower tail of CDF
-  # based on implementation of Giner & Smyth (2016) The R Journal **8*(1) 339
-  q <- q / mu
-  scale <- scale * mu
-  r <- sqrt(q * scale)
-  phi_m <- scale * mu
-  a <- pnorm((q - 1) / r, lower.tail = TRUE, log.p = TRUE)
-  b <- (2 / scale) + pnorm(-(q + 1) / r, lower.tail = TRUE, log.p = TRUE)
-  p <- a + log1p(exp(b - a))
-  if (isFALSE(log_p)) {
-    p <- exp(p)
-  }
-  p
-}
-
-# FIXME: something seems off for small quantiles... statmod does something
-# different for y > mu and y < mu, using the upper and lower tail of the
-# pinvgaussian respectively.
-`cdf_invgaussian` <- function(q, mu, wt, scale, log_p = FALSE) {
-  pinvgaussian(q, mu = mu, wt = wt, scale = scale, log_p = log_p)
 }
 
 #' @importFrom stats pnorm
@@ -415,6 +399,7 @@ make_cdf_clog <- function(sigma) {
     "cnorm"    = make_qf_cnorm(theta),
     "clog"     = make_qf_clog(theta),
     "cpois"    = qf_poisson,
+    "inverse_gaussian" = qf_invgaussian,
     "scaled_t" = make_qf_scat(nu = theta[1], sigma = theta[2]),
     "tweedie"  = make_qf_tw(theta, ab = get_tw_params(family)),
     #"nb"       = make_qf_betar(phi = theta),

@@ -36,6 +36,12 @@
 #' Prediction `na.action` in `...` is honoured. Missing rows are never passed
 #' to the response random-number generator.
 #'
+#' Inverse Gaussian models use a native generator with observation dispersion
+#' equal to the model dispersion divided by the prior weight, consistently with
+#' their CDF and quantile helpers. Weights must be non-negative; a zero weight
+#' with positive dispersion uses the limiting point mass at zero. An existing
+#' random generator supplied in the family's `rd` component is preserved.
+#'
 #' For models fitted with [mgcv::gfam()], each observation is simulated from
 #' its component family using that component's fitted scale and distribution
 #' parameters. With `data = NULL`, fitted family membership is used. For explicit
