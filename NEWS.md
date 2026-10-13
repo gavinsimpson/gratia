@@ -180,6 +180,11 @@
 
 ## New features
 
+* `posterior_predictive_plot()` compares observed responses with posterior
+  predictive distributions, using density curves for continuous responses
+  and points with interval bars for discrete responses. Set
+  `appraise(ppcheck = TRUE)` to replace the residual histogram with this check.
+
 * `draw()` and `assemble()` now support formula smooths and parametric effects
   from `sdmTMB` models, including both predictors of delta models. Companion
   methods provide smooth labels, coefficients, and effect estimates. Smooths

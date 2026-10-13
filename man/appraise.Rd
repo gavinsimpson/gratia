@@ -35,6 +35,8 @@ appraise(model, ...)
   scalable_threshold = 10000L,
   qq_bins = 1000L,
   density_bins = c(50L, 50L),
+  ppcheck = FALSE,
+  n_ppc = 50,
   ...
 )
 
@@ -78,7 +80,8 @@ model when using the simulation method (\code{method = "simulate"}) for QQ
 plots.}
 
 \item{seed}{numeric; the random number seed to use for \code{method = "simulate"}
-and \code{method = "uniform"}, and for randomised quantile residuals.}
+and \code{method = "uniform"}, and for randomised quantile residuals and
+posterior predictive draws.}
 
 \item{type}{character or \code{NULL}; residual type: \code{"deviance"}, \code{"pearson"},
 \code{"response"}, or \code{"quantile"}. The default selects quantile residuals for
@@ -95,7 +98,8 @@ spread the plots.}
 
 \item{level}{numeric; the coverage level for QQ plot reference intervals.
 Must be strictly \verb{0 < level < 1}. Used for quantile reference bands and
-traditional \code{method = "simulate"} or \code{"normal"} bands.}
+traditional \code{method = "simulate"} or \code{"normal"} bands. Also controls
+posterior predictive intervals for discrete responses with \code{ppcheck = TRUE}.}
 
 \item{ci_alpha, ci_col}{colour and transparency of QQ reference intervals,
 including calibrated quantile-residual bands.}
@@ -107,7 +111,8 @@ points of all plots. Pooled grouped residual panels map component identity
 to colour instead of using the constant \code{point_col}.}
 
 \item{line_col}{colour specification for the 1:1 line in the QQ plot and the
-reference line in the residuals vs linear predictor plot.}
+reference line in the residuals vs linear predictor plot. Also used for
+the observed distribution when \code{ppcheck = TRUE}.}
 
 \item{by_family}{logical or \code{NULL}; separate indexed grouped-family components
 into facets. The default pools quantile residuals with component colours
@@ -132,6 +137,16 @@ forces scalable or original rendering.}
 including endpoints.}
 
 \item{density_bins}{Positive integer or pair giving heatmap grid dimensions.}
+
+\item{ppcheck}{logical; replace the residual histogram with a
+\code{\link[=posterior_predictive_plot]{posterior_predictive_plot()}}? Defaults to \code{FALSE}. Requires a model and
+family supported by that function. Replicated distributions use \code{ci_col}.
+Discrete posterior points and interval bars default to opacity \code{0.8}, while
+continuous density curves use \code{0.2}. Explicitly supplying \code{ci_alpha}
+overrides these defaults as well as the QQ reference interval opacity.}
+
+\item{n_ppc}{positive integer; number of posterior predictive data sets
+when \code{ppcheck = TRUE}. Independent of the QQ plot's \code{n_simulate}.}
 }
 \description{
 Model diagnostic plots
@@ -202,6 +217,8 @@ dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 ## run some basic model checks
 appraise(mod, point_col = "steelblue", point_alpha = 0.4)
+## replace the residual histogram with a posterior predictive check
+appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
 
 ## To change the theme for all panels use the & operator, for example to
 ## change the ggplot theme for all panels
@@ -219,7 +236,8 @@ if (packageVersion("ggplot2") <= "3.5.2") {
 \seealso{
 The plots are produced by functions \code{\link[=qq_plot]{qq_plot()}},
 \code{\link[=residuals_linpred_plot]{residuals_linpred_plot()}}, \code{\link[=residuals_hist_plot]{residuals_hist_plot()}},
-and \code{\link[=observed_fitted_plot]{observed_fitted_plot()}}.
+\code{\link[=observed_fitted_plot]{observed_fitted_plot()}}, and optionally
+\code{\link[=posterior_predictive_plot]{posterior_predictive_plot()}}.
 
 \link{gamm4_support}
 }

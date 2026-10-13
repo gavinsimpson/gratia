@@ -82,7 +82,8 @@
 #'   model when using the simulation method (`method = "simulate"`) for QQ
 #'   plots.
 #' @param seed numeric; the random number seed to use for `method = "simulate"`
-#'   and `method = "uniform"`, and for randomised quantile residuals.
+#'   and `method = "uniform"`, and for randomised quantile residuals and
+#'   posterior predictive draws.
 #' @param type character or `NULL`; residual type: `"deviance"`, `"pearson"`,
 #'   `"response"`, or `"quantile"`. The default selects quantile residuals for
 #'   supported grouped-family models and deviance residuals otherwise.
@@ -94,7 +95,8 @@
 #'   `"auto"`. Passed to [patchwork::plot_layout()]
 #' @param level numeric; the coverage level for QQ plot reference intervals.
 #'   Must be strictly `0 < level < 1`. Used for quantile reference bands and
-#'   traditional `method = "simulate"` or `"normal"` bands.
+#'   traditional `method = "simulate"` or `"normal"` bands. Also controls
+#'   posterior predictive intervals for discrete responses with `ppcheck = TRUE`.
 #' @param ci_alpha,ci_col colour and transparency of QQ reference intervals,
 #'   including calibrated quantile-residual bands.
 #' @param point_col,point_alpha colour and transparency used to draw points in
@@ -103,7 +105,16 @@
 #'   points of all plots. Pooled grouped residual panels map component identity
 #'   to colour instead of using the constant `point_col`.
 #' @param line_col colour specification for the 1:1 line in the QQ plot and the
-#'   reference line in the residuals vs linear predictor plot.
+#'   reference line in the residuals vs linear predictor plot. Also used for
+#'   the observed distribution when `ppcheck = TRUE`.
+#' @param ppcheck logical; replace the residual histogram with a
+#'   [posterior_predictive_plot()]? Defaults to `FALSE`. Requires a model and
+#'   family supported by that function. Replicated distributions use `ci_col`.
+#'   Discrete posterior points and interval bars default to opacity `0.8`, while
+#'   continuous density curves use `0.2`. Explicitly supplying `ci_alpha`
+#'   overrides these defaults as well as the QQ reference interval opacity.
+#' @param n_ppc positive integer; number of posterior predictive data sets
+#'   when `ppcheck = TRUE`. Independent of the QQ plot's `n_simulate`.
 #' @param scalable Logical or `NULL`; `NULL` automatically uses scalable plots
 #'   above `scalable_threshold` retained fitting observations. `TRUE` or `FALSE`
 #'   forces scalable or original rendering.
@@ -128,7 +139,8 @@
 #'
 #' @seealso The plots are produced by functions [gratia::qq_plot()],
 #'   [gratia::residuals_linpred_plot()], [gratia::residuals_hist_plot()],
-#'   and [gratia::observed_fitted_plot()].
+#'   [gratia::observed_fitted_plot()], and optionally
+#'   [gratia::posterior_predictive_plot()].
 #'
 #' @export
 #'
@@ -139,6 +151,8 @@
 #' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 #' ## run some basic model checks
 #' appraise(mod, point_col = "steelblue", point_alpha = 0.4)
+#' ## replace the residual histogram with a posterior predictive check
+#' appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
 #'
 #' ## To change the theme for all panels use the & operator, for example to
 #' ## change the ggplot theme for all panels
@@ -182,8 +196,20 @@
   scalable_threshold = 10000L,
   qq_bins = 1000L,
   density_bins = c(50L, 50L),
+  ppcheck = FALSE,
+  n_ppc = 50,
   ...
 ) {
+  if (!is.logical(ppcheck) || length(ppcheck) != 1L || is.na(ppcheck)) {
+    stop("'ppcheck' must be TRUE or FALSE.", call. = FALSE)
+  }
+  # Check posterior sampling support before preparing other diagnostic panels.
+  plt3 <- if (ppcheck) {
+    posterior_predictive_plot(model, n = n_ppc, seed = seed,
+      observed_col = line_col, replicated_col = ci_col,
+      replicated_alpha = if (missing(ci_alpha)) NULL else ci_alpha,
+      level = level)
+  } else NULL
   prepared <- inherits(model, "gratia_diagnostics")
   if (prepared) {
     if (is.null(type)) {
@@ -243,11 +269,13 @@
         by_family = by_family,
         rank = rank
       )
-      plt3 <- scalable_residuals_hist_plot(
-        d,
-        n_bins = n_bins,
-        by_family = by_family
-      )
+      if (!ppcheck) {
+        plt3 <- scalable_residuals_hist_plot(
+          d,
+          n_bins = n_bins,
+          by_family = by_family
+        )
+      }
       plt4 <- scalable_observed_fitted_plot(
         d,
         density_bins = density_bins,
@@ -265,11 +293,13 @@
         point_alpha,
         line_col
       )
-      plt3 <- scalable_residuals_hist_plot(
-        d,
-        n_bins = n_bins,
-        by_family = by_family
-      )
+      if (!ppcheck) {
+        plt3 <- scalable_residuals_hist_plot(
+          d,
+          n_bins = n_bins,
+          by_family = by_family
+        )
+      }
       plt4 <- render_diagnostic_points(
         d$data,
         "fitted",
@@ -324,13 +354,15 @@
     by_family = by_family,
     rank = rank
   )
-  plt3 <- residuals_hist_plot(
-    model,
-    type = type,
-    n_bins = n_bins,
-    subtitle = NULL,
-    by_family = by_family
-  )
+  if (!ppcheck) {
+    plt3 <- residuals_hist_plot(
+      model,
+      type = type,
+      n_bins = n_bins,
+      subtitle = NULL,
+      by_family = by_family
+    )
+  }
   plt4 <- observed_fitted_plot(
     model,
     subtitle = NULL,
