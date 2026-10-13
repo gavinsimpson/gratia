@@ -163,6 +163,10 @@
 * Full and reduced-rank MRF smooths now support area effect estimates and
   interval plots (#9). Use `mrf_plot = "qq"` for a descriptive QQ plot.
 
+* `draw()`, `assemble()` and `smooth_estimates()` now support simultaneous bands
+  for individual smooths (#314). `interval = "credible"` aliases pointwise
+  `"confidence"` intervals.
+
 * `fitted_values()` now emits a message identifying prediction rows with unobserved
   combinations of known categorical predictor levels (#164).
 

@@ -44,6 +44,17 @@
 #'   Estimates containing only transformed coordinates give an informative error
 #'   if drawn on the original scale. This option does not change effect values
 #'   or their intervals at the chosen evaluation points.
+#' @param interval character or `NULL`; `NULL` (the default) returns estimates
+#'   and standard errors only. `"confidence"` adds pointwise intervals and
+#'   `"simultaneous"` adds a band covering the finite evaluation grid of each
+#'   fitted smooth. `"credible"` is an alias for `"confidence"`; the default
+#'   Bayesian covariance gives approximate Bayesian credible intervals.
+#' @param ci_level numeric; interval coverage, strictly between zero and one.
+#' @param n_sim,n_cores positive integers; coefficient draws and simulation cores
+#'   for simultaneous bands. Parallel simulation requires OpenMP support.
+#' @param seed integer or `NULL`; an explicit simulation seed preserves the
+#'   caller's RNG state. Shared coefficient draws make results independent of
+#'   selected smooth order and parallel evaluation scheduling.
 #' @param overall_uncertainty logical; should the uncertainty in the model
 #'  constant term be included in the standard error of the evaluate values of
 #'  the smooth?
@@ -74,6 +85,14 @@
 #' example, tensor products of soap-film components), `.smooth_id` contains
 #' their fitted smooth indices. This preserves their identity in saved
 #' estimates and plots without changing the labels supplied by mgcv.
+#'
+#' Simultaneous coverage is per fitted smooth over its valid evaluation points,
+#' including all its slices and factor levels. Separate factor-by smooths remain
+#' separate coverage sets when grouped in one plot. This finite-grid band does
+#' not claim joint coverage across selected smooths or the full fitted model.
+#' Increasing grid resolution improves the approximation to whole-curve coverage.
+#' `overall_uncertainty` and covariance options apply to both interval types.
+#' Simultaneous intervals for SCAM models are unsupported.
 #'
 #' For explicit `data`, missing covariates needed by a smooth produce `NA`
 #' estimates and standard errors at those positions. Missing values in variables
@@ -161,8 +180,17 @@
     clip = FALSE,
     envir = NULL,
     back_transform = FALSE,
+    interval = NULL, ci_level = 0.95,
+    n_sim = 10000, n_cores = 1, seed = NULL,
     ...) {
   check_back_transform(back_transform)
+  interval <- normalize_smooth_interval(interval, allow_null = TRUE)
+  if (!is.null(interval)) {
+    validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
+    if (interval == "simultaneous" && inherits(object, "scam")) {
+      cli::cli_abort("Simultaneous smooth intervals are not supported for SCAM models.")
+    }
+  }
   model_name <- expr_label(substitute(object))
   object <- with_model_envir(object, envir)
   if (lifecycle::is_present(smooth)) {
@@ -257,6 +285,11 @@
     for (i in seq_along(sm_list)) sm_list[[i]]$.model <- model_labels[[i]]
   }
 
+  if (!is.null(interval)) {
+    sm_list <- add_smooth_intervals(sm_list, smooths, object, interval, ci_level,
+      unconditional, frequentist, overall_uncertainty, n_sim, n_cores, seed)
+  }
+
   # Tensor products of the two soap components can share both label and type.
   # Retain fitted indices only for otherwise indistinguishable output terms.
   identities <- paste(vapply(smooths, smooth_label, character(1)),
@@ -290,6 +323,11 @@
   attr(sm_list, "coordinate_info") <- coordinate_info
   attr(sm_list, "surface_support") <- surface_support
   attr(sm_list, "tensor_plot_info") <- tensor_plot_info(object, smooths)
+
+  if (!is.null(interval)) {
+    attr(sm_list, "interval_info") <- list(interval = interval,
+      level = ci_level, scope = "smooth")
+  }
 
   ## add a class
   class(sm_list) <- c("smooth_estimates", class(sm_list))
@@ -470,34 +508,9 @@
     frequentist = frequentist
   )
 
-  ## variables for component-wise CIs for smooths
-  column_means <- model[["cmX"]]
-  lcms <- length(column_means)
-  nc <- ncol(V)
-  meanL1 <- smooth[["meanL1"]]
-  eta_idx <- lss_eta_index(model)
-
-  n_cons <- attr(smooth, "nCons")
-  if (isTRUE(overall_uncertainty) && !is.null(n_cons) && n_cons > 0L) {
-    if (lcms < nc) {
-      column_means <- c(column_means, rep(0, nc - lcms))
-    }
-    Xcm <- matrix(column_means, nrow = nrow(X), ncol = nc, byrow = TRUE)
-    if (!is.null(meanL1)) {
-      Xcm <- Xcm / meanL1
-    }
-    Xcm[, para.seq] <- X
-    # only apply the uncertainty from linear predictors of which this smooth
-    # is a part of
-    idx <- vapply(eta_idx, function(i, beta) any(beta %in% i),
-      FUN.VALUE = logical(1L), beta = para.seq
-    )
-    idx <- unlist(eta_idx[idx])
-    rs <- rowSums((Xcm[, idx, drop = FALSE] %*%
-      V[idx, idx, drop = FALSE]) * Xcm[, idx, drop = FALSE])
-  } else {
-    rs <- rowSums((X %*% V[para.seq, para.seq, drop = FALSE]) * X)
-  }
+  design <- smooth_uncertainty_design(smooth, X, model, V,
+    overall_uncertainty = overall_uncertainty)
+  rs <- rowSums((design$X %*% V[design$cols, design$cols, drop = FALSE]) * design$X)
 
   ## standard error of the estimate
   se.fit <- sqrt(pmax(0, rs))
@@ -1254,6 +1267,10 @@
 #' @param ylim numeric; vector of y axis limits to use all *all* panels drawn.
 #'
 #' @inheritParams draw.gam
+#' @param interval character or `NULL`; the default draws stored interval bounds
+#'   unchanged, adding pointwise bounds if absent. An explicit choice validates
+#'   stored interval metadata; `"credible"` aliases `"confidence"`. Simultaneous
+#'   bands must first be computed from the fitted model by [smooth_estimates()].
 #'
 #' @export
 #' @importFrom patchwork wrap_plots
@@ -1320,6 +1337,7 @@
                                     back_transform = FALSE,
                                     re_levels = NULL,
                                     mrf_plot = c("effects", "qq"),
+                                    interval = NULL,
                                     ...) {
   check_back_transform(back_transform)
   mrf_plot <- match.arg(mrf_plot)
@@ -1328,6 +1346,7 @@
   check_surface_dots(match.call(expand.dots = FALSE))
   validate_tensor_plot_controls(re_levels)
   validate_estimate_re_levels(object, re_levels)
+  interval_info <- validate_saved_smooth_interval(object, interval)
   plot_info <- attr(object, "tensor_plot_info")
   surface_support <- attr(object, "surface_support")
   if ("data" %in% names(object) && !".estimate" %in% names(object)) {
@@ -1405,6 +1424,7 @@
     lims_method = lims_method,
     tensor_term_order = tensor_term_order, # pass on tensor order info,
     coordinate_info = attr(object, "coordinate_info"),
+    interval_info = interval_info,
     back_transform = back_transform,
     caption = caption,
     grouped_by = grouped_by,
@@ -1453,6 +1473,7 @@
                                     back_transform = FALSE,
                                     coordinate_info = NULL,
                                     surface_support = NULL,
+                                    interval_info = NULL,
                                     ...) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
@@ -1649,6 +1670,7 @@
     sm_vars <- displayed$variables
   }
 
+  attr(object, "interval_info") <- interval_info
   plot_smooth(
     object,
     mrf_plot = mrf_plot,

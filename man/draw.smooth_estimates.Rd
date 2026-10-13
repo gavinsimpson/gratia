@@ -35,6 +35,7 @@
   back_transform = FALSE,
   re_levels = NULL,
   mrf_plot = c("effects", "qq"),
+  interval = NULL,
   ...
 )
 }
@@ -47,7 +48,9 @@ before the confidence band is computed.}
 
 \item{fun}{function; a function that will be applied to the estimated values
 and confidence interval before plotting. Can be a function or the name of a
-function. Function \code{fun} will be applied after adding any \code{constant}, if
+function. For simultaneous bands it must be monotone over the entire band;
+endpoint transformation alone does not preserve non-monotone band coverage.
+Function \code{fun} will be applied after adding any \code{constant}, if
 provided.}
 
 \item{contour}{logical; should contours be draw on the plot using
@@ -177,6 +180,11 @@ estimates and intervals (\code{"effects"}, the default), or a descriptive Gaussi
 quantile plot (\code{"qq"}). MRF effects are correlated and need not have equal
 marginal variances; the QQ display is not a test of independent normal effects.
 Specialist maps and graph plots are outside the scope of this display.}
+
+\item{interval}{character or \code{NULL}; the default draws stored interval bounds
+unchanged, adding pointwise bounds if absent. An explicit choice validates
+stored interval metadata; \code{"credible"} aliases \code{"confidence"}. Simultaneous
+bands must first be computed from the fitted model by \code{\link[=smooth_estimates]{smooth_estimates()}}.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }

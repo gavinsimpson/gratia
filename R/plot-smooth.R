@@ -125,6 +125,12 @@
   if (is.null(title)) {
     title <- unique(object[[".smooth"]])
   }
+  interval_info <- attr(object, "interval_info")
+  if (!is.null(interval_info) && interval_info$interval == "simultaneous") {
+    default_caption <- paste(unique(default_caption),
+      paste0(format(100 * interval_info$level), "% simultaneous band (per smooth)"),
+      sep = "; ")
+  }
   caption <- if (is.null(caption) || isTRUE(caption)) {
     default_caption
   } else {
@@ -256,6 +262,7 @@
 
   # If fun supplied, use it to transform est and the upper and lower interval
   object <- transform_fun(object, fun = fun)
+  object <- order_interval_bounds(object)
 
   # String column names also support transformed covariates such as log2(x).
   plt <- ggplot(object, aes(x = .data[[x_var]], y = .data$.estimate)) +
@@ -356,6 +363,7 @@
   show <- match.arg(show)
   object <- add_constant(object, constant = constant)
   object <- transform_fun(object, fun = fun)
+  object <- order_interval_bounds(object)
   fill_var <- if (show == "estimate") ".estimate" else ".se"
   fill_title <- if (show == "estimate") "Partial\neffect" else "Std. err."
   fill_limits <- surface_fill_limits(object[[fill_var]],
@@ -750,6 +758,10 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 
   ## If fun supplied, use it to transform est and the upper and lower interval
   object <- transform_fun(object, fun = fun)
+  object <- order_interval_bounds(object)
+
+  # QQ panels show estimated effects only, not their interval bounds.
+  attr(object, "interval_info") <- NULL
 
   ## base plot with computed QQs
   plt <- ggplot(object, aes(sample = .data[[".estimate"]])) +
@@ -877,6 +889,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 
   ## If fun supplied, use it to transform est and the upper and lower interval
   object <- transform_fun(object, fun = fun)
+  object <- order_interval_bounds(object)
 
   plt <- ggplot(object, aes(
     x = .data[[variables[1]]],
@@ -1110,6 +1123,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 
   # If fun supplied, use it to transform est and the upper and lower interval
   object <- transform_fun(object, fun = fun)
+  object <- order_interval_bounds(object)
 
   show <- match.arg(show)
   if (isTRUE(identical(show, "estimate"))) {

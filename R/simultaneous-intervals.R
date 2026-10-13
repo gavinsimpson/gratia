@@ -3,7 +3,7 @@
 # responsibility for model preparation, RNG scoping and output classes.
 simultaneous_intervals <- function(
   estimate, se, X, V, level = 0.95,
-  n_sim = 10000, n_cores = 1, block_size = 1000
+  n_sim = 10000, n_cores = 1, block_size = 1000, deviations = NULL
 ) {
   positive_integer <- function(x) {
     is.numeric(x) && length(x) == 1L && is.finite(x) &&
@@ -38,7 +38,13 @@ simultaneous_intervals <- function(
   names(lower) <- names(upper) <- names(estimate) %||% names(se)
   critical <- if (any(valid)) 0 else NA_real_
   if (length(rows)) {
-    deviations <- simultaneous_coefficient_deviations(V, n_sim, n_cores)
+    if (is.null(deviations)) {
+      deviations <- simultaneous_coefficient_deviations(V, n_sim, n_cores)
+    } else if (!is.matrix(deviations) || !is.numeric(deviations) ||
+        !identical(dim(deviations), c(as.integer(n_sim), ncol(V))) ||
+        any(!is.finite(deviations))) {
+      cli::cli_abort("Incompatible shared coefficient deviations.")
+    }
     maxima <- numeric(n_sim)
     # Reuse the joint coefficient draws in every block to preserve dependence.
     for (start in seq.int(1L, length(rows), by = block_size)) {

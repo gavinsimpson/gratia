@@ -1089,3 +1089,15 @@ mrf_models <- local(withr::with_seed(903, {
     data = d, method = "REML")
   out
 }))
+
+# Compact shared fixtures for smooth simultaneous-band numerical/plot tests.
+smooth_band_data <- withr::with_seed(314, local({
+  d <- data.frame(x = runif(160), z = runif(160),
+    f = factor(rep(c("b", "a"), 80), levels = c("b", "a")))
+  d$y <- sin(6 * d$x) + d$z^2 + as.numeric(d$f) + rnorm(160, sd = 0.3)
+  d
+}))
+smooth_band_model <- gam(y ~ f + s(x, k = 8) + s(z, k = 6),
+  data = smooth_band_data, method = "REML")
+smooth_band_transformed <- gam(y ~ s(log(x + 1), k = 8) + s(z, by = x, k = 6),
+  data = smooth_band_data, method = "REML")
