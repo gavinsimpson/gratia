@@ -16,7 +16,7 @@ qq_plot(model, ...)
 \method{qq_plot}{gam}(
   model,
   method = NULL,
-  type = c("deviance", "response", "pearson"),
+  type = NULL,
   n_uniform = 10,
   n_simulate = 50,
   seed = NULL,
@@ -31,6 +31,7 @@ qq_plot(model, ...)
   point_col = "grey20",
   point_alpha = 1,
   line_col = "red",
+  by_family = NULL,
   ...
 )
 
@@ -47,30 +48,24 @@ as well as classes \code{"glm"} and \code{"lm"} from calls to \link[stats:glm]{s
 
 \item{...}{arguments passed to other methods.}
 
-\item{method}{character or \code{NULL}; method used to generate theoretical
-quantiles. The default, \code{NULL}, selects \code{"simulate"} for models fitted with
-\code{\link[mgcv:tw]{mgcv::tw()}} or \code{\link[mgcv:Tweedie]{mgcv::Tweedie()}} and \code{"uniform"} otherwise. Explicitly
-supplying a method overrides this selection, subject to availability of
-the required family functions. \code{"uniform"} generates reference quantiles using
-random draws from a uniform distribution and the inverse cumulative
-distribution function (CDF) of the fitted values. The reference quantiles
-are averaged over \code{n_uniform} draws. \code{"simulate"} generates reference
-quantiles by simulating new response data from the model at the observed
-values of the covariates, which are then residualised to generate reference
-quantiles, using \code{n_simulate} simulated data sets. \code{"normal"} generates
-reference quantiles using the standard normal distribution. \code{"uniform"} is
-often more computationally efficient, but Tweedie quantiles are expensive
-to compute. \code{"simulate"} allows reference bands to
-be drawn on the QQ-plot. \code{"normal"} should be avoided but is used as a fall
-back if a random number generator (\code{"simulate"}) or the inverse of the CDF
-are not available from the \code{family} used during model fitting
-(\code{"uniform"}).
+\item{method}{character or \code{NULL}; reference-quantile method. For quantile
+residuals, \code{NULL} and \code{"normal"} use a fixed standard-normal reference;
+\code{"uniform"} and \code{"simulate"} require a traditional residual type instead.
+For grouped-family traditional residuals, \code{NULL} selects \code{"simulate"} when
+every component has a generator, or \code{"uniform"} with a message when every
+component has an inverse CDF. An unavailable reference distribution is an
+error; \code{"normal"} is available only as an explicit approximation.
+For ordinary models, \code{NULL} retains the default \code{"simulate"} for Tweedie
+families and \code{"uniform"} otherwise, with existing availability fallbacks.
+\code{"uniform"} averages residual reference quantiles obtained by inverse-CDF
+sampling over \code{n_uniform} draws. \code{"simulate"} uses \code{n_simulate} simulated
+response data sets at the observed covariates and permits reference bands.
+\code{"normal"} uses a location/scale-fitted normal approximation for traditional
+residuals. \code{"direct"} is deprecated in favour of \code{"uniform"}.}
 
-Note that \code{method = "direct"} is deprecated in favour of
-\code{method = "uniform"}.}
-
-\item{type}{character; type of residuals to use. Only \code{"deviance"},
-\code{"response"}, and \code{"pearson"} residuals are allowed.}
+\item{type}{character or \code{NULL}; residual type: \code{"deviance"}, \code{"response"},
+\code{"pearson"}, or \code{"quantile"}. The default selects supported grouped-family
+quantile residuals and ordinary-model deviance residuals.}
 
 \item{n_uniform}{numeric; number of times to randomize uniform quantiles
 in the direct computation method (\code{method = "uniform"}).}
@@ -79,10 +74,11 @@ in the direct computation method (\code{method = "uniform"}).}
 model when using the simulation method (\code{method = "simulate"}).}
 
 \item{seed}{numeric; the random number seed to use for \code{method = "simulate"}
-and \code{method = "uniform"}.}
+and \code{method = "uniform"}, and for randomised quantile residuals.}
 
 \item{level}{numeric; the coverage level for reference intervals. Must be
-strictly \verb{0 < level < 1}. Only used with \code{method = "simulate"}.}
+strictly \verb{0 < level < 1}. Used for quantile reference bands and traditional
+\code{method = "simulate"} or \code{"normal"} bands.}
 
 \item{ylab}{character or expression; the label for the y axis. If not
 supplied, a suitable label will be generated.}
@@ -99,21 +95,38 @@ supplied, a suitable label will be generated.}
 \item{caption}{character or expression; the plot caption. See
 \code{\link[ggplot2:labs]{ggplot2::labs()}}. May be a vector, one per penalty.}
 
-\item{ci_col}{fill colour for the reference interval when
-\code{method = "simulate"}.}
+\item{ci_col}{fill colour for reference intervals, including calibrated
+quantile-residual bands.}
 
-\item{ci_alpha}{alpha transparency for the reference
-interval when \code{method = "simulate"}.}
+\item{ci_alpha}{alpha transparency for reference intervals.}
 
-\item{point_col}{colour of points on the QQ plot.}
+\item{point_col}{constant point colour when family components are not mapped
+to colour. Pooled grouped diagnostics instead colour points by component.}
 
 \item{point_alpha}{alpha transparency of points on the QQ plot.}
 
 \item{line_col}{colour used to draw the reference line.}
+
+\item{by_family}{logical or \code{NULL}; separate indexed grouped-family components
+into facets. The default pools quantile residuals with component colours
+and facets traditional residuals. \code{TRUE} and \code{FALSE} explicitly select the
+layout. In \code{appraise()}, observed-versus-fitted values always use component
+facets. Standalone \code{observed_fitted_plot()} facets by default and permits
+explicit pooling. Ignored for ordinary models.}
 }
 \description{
 Quantile-quantile plots (QQ-plots) for GAMs using the reference quantiles of
-Augustin \emph{et al} (2012).
+Augustin \emph{et al} (2012), or fixed normal references for randomised quantile
+residuals following Dunn and Smyth (1996).
+}
+\details{
+See \code{\link[=appraise]{appraise()}} for grouped-family defaults, distributional support,
+pooling and faceting. Quantile QQ/worm plots use fixed standard-normal
+reference quantiles and pointwise order-statistic bands for an ideal
+independent normal sample, conditional on fitted distribution parameters;
+they do not include fitting uncertainty or provide joint coverage.
+Traditional residuals instead use the fitted response distributions or an
+explicitly requested normal approximation.
 }
 \note{
 The wording used in \code{\link[mgcv:qq.gam]{mgcv::qq.gam()}} uses \emph{direct} in reference to the
@@ -150,6 +163,9 @@ qq_plot(m, method = "normal")
 \references{
 The underlying methodology used when \code{method} is \code{"simulate"} or \code{"uniform"}
 is described in Augustin \emph{et al} (2012):
+
+Dunn, P.K. and Smyth, G.K. (1996) Randomized quantile residuals.
+\emph{Journal of Computational and Graphical Statistics} \strong{5}, 236--244.
 
 Augustin, N.H., Sauleau, E.-A., Wood, S.N., (2012) On quantile quantile plots
 for generalized linear models. \emph{Computational Statistics and Data Analysis}

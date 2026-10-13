@@ -42,11 +42,23 @@ these PIT values. Uncensored continuous observations use \code{F(y)}; uncensored
 Poisson observations are randomized between \code{F(y - 1)} and \code{F(y)}.
 Use non-integer censoring limits for \code{cpois()}, as recommended by mgcv.
 
+Grouped-family GAMs fitted with \code{\link[mgcv:gfam]{mgcv::gfam()}} dispatch CDF calculations to
+each indexed component, using fitted nuisance parameters, dispersion and
+weights, before restoring fitting-row order. All active components must have
+validated response-CDF and probability-bound semantics. Unsupported components
+are errors for this function; \code{\link[=appraise]{appraise()}} can instead select deviance
+residuals automatically. See \code{\link[=appraise]{appraise()}} for current support boundaries.
+Tweedie observations at zero are randomised over their probability atom,
+between \verb{F(0-) = 0} and \code{F(0)}; positive observations use \code{F(y)}.
+For GAMs, a supplied seed preserves the caller's RNG state, including the
+absence of a previously initialised RNG state.
+
 For CDF helpers with native log-tail support, quantile residuals are computed
 directly from log probabilities in the smaller tail. This avoids infinite
 residuals caused by rounding a probability to zero or one. No probability
 clipping is applied: genuine zero-probability tails still give infinite
-residuals. PIT residuals are returned as ordinary probabilities and may still
+residuals for ordinary models. Grouped diagnostics instead report non-finite
+calculated residuals as errors. PIT residuals are returned as ordinary probabilities and may still
 round to zero or one in extreme tails, so applying \code{qnorm()} to the returned
 PIT values can be less accurate than requesting quantile residuals directly.
 Native log tails are available for Poisson, negative binomial, binomial,

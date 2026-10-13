@@ -3,27 +3,78 @@
 #' @param model a fitted model. Currently models inheriting from class `"gam"`,
 #'   as well as classes `"glm"` and `"lm"` from calls to [stats::glm] or
 #'   [stats::lm] are supported.
-#' @param method character or `NULL`; method used to generate theoretical
-#'   quantiles. The default, `NULL`, selects `"simulate"` for models fitted with
-#'   [mgcv::tw()] or [mgcv::Tweedie()] and `"uniform"` otherwise. Explicitly
-#'   supplying a method overrides this selection, subject to availability of
-#'   the required family functions. `"uniform"` generates reference quantiles using
-#'   random draws from a uniform distribution and the inverse cumulative
-#'   distribution function (CDF) of the fitted values. The reference quantiles
-#'   are averaged over `n_uniform` draws. `"simulate"` generates reference
-#'   quantiles by simulating new response data from the model at the observed
-#'   values of the covariates, which are then residualised to generate reference
-#'   quantiles, using `n_simulate` simulated data sets. `"normal"` generates
-#'   reference quantiles using the standard normal distribution. `"uniform"` is
-#'   often more computationally efficient, but Tweedie quantiles are expensive
-#'   to compute. `"simulate"` allows reference bands to
-#'   be drawn on the QQ-plot. `"normal"` should be avoided but is used as a fall
-#'   back if a random number generator (`"simulate"`) or the inverse of the CDF
-#'   (`"uniform"`) are not available from the `family` used during model
-#'   fitting.
+#' @param method character or `NULL`; reference-quantile method. For quantile
+#'   residuals, `NULL` and `"normal"` use a fixed standard-normal reference;
+#'   `"uniform"` and `"simulate"` require a traditional residual type instead.
+#'   For grouped-family traditional residuals, `NULL` selects `"simulate"` when
+#'   every component has a generator, or `"uniform"` with a message when every
+#'   component has an inverse CDF. An unavailable reference distribution is an
+#'   error; `"normal"` is available only as an explicit approximation.
+#'   For ordinary models, `NULL` retains the default `"simulate"` for Tweedie
+#'   families and `"uniform"` otherwise, with existing availability fallbacks.
+#'   `"uniform"` averages residual reference quantiles obtained by inverse-CDF
+#'   sampling over `n_uniform` draws. `"simulate"` uses `n_simulate` simulated
+#'   response data sets at the observed covariates and permits reference bands.
+#'   `"normal"` uses a location/scale-fitted normal approximation for traditional
+#'   residuals. `"direct"` is deprecated in favour of `"uniform"`.
 #'
-#'   Note that `method = "direct"` is deprecated in favour of
-#'   `method = "uniform"`.
+#' @details With `type = NULL`, ordinary models retain deviance residuals.
+#'   Models fitted with [mgcv::gfam()] use randomised quantile (Dunn--Smyth)
+#'   residuals when every active component has validated CDF and response-bound
+#'   semantics. Otherwise, a message identifies unsupported components and all
+#'   components use deviance residuals; requesting `type = "quantile"` explicitly
+#'   is an error when any component is unsupported. Components never mix
+#'   residual scales. Invalid encodings or numerical CDF failures are errors.
+#'
+#'   Quantile residuals use each component's fitted parameters, dispersion and
+#'   weights, including binomial trial counts and Gaussian precision weights.
+#'   Gamma components with unit weights, plus negative binomial, beta, scaled-t
+#'   and Tweedie components are supported. Non-unit Gamma weights, ordinal,
+#'   zero-inflated Poisson,
+#'   inverse Gaussian and unrecognised custom-family probability bounds are not
+#'   yet supported for quantile diagnostics. A custom CDF alone is insufficient
+#'   without validated response-bound and discrete-left-limit semantics.
+#'   CDF overrides for recognised families must retain their argument and
+#'   probability-bound conventions. Scalar uncensored `cnorm()`, `clog()` and
+#'   `cpois()` components are supported; genuine censoring requires recoverable,
+#'   aligned censoring bounds. Matrix censored responses rejected by `gfam()`
+#'   and upstream fitting failures are not repaired.
+#'
+#'   `by_family = NULL` pools quantile residuals with colours identifying indexed
+#'   family components, including repeated uses of the same family. Traditional
+#'   residuals use component facets with free axes by default. The pooled
+#'   residual-versus-predictor plot uses within-component predictor ranks:
+#'   `(rank(eta, ties.method = "average") - 0.5) / n`, where `n` counts the finite
+#'   observations included for that component; constants map to `0.5`.
+#'   Facets retain original linear predictors. Use `rank` to override this choice
+#'   independently of residual type or layout. The links and original predictor
+#'   values can have different meanings across components; ranks compare
+#'   positions within components, not effects on a common response scale.
+#'   Pooled histograms use common bin edges and component-specific densities.
+#'
+#'   Quantile QQ and worm plots compare to fixed standard-normal quantiles,
+#'   with an identity line or zero line. Their reference bands are exact
+#'   pointwise order-statistic bands for an ideal independent standard-normal
+#'   sample, conditional on fitted distribution parameters. They do not include
+#'   parameter-estimation uncertainty or provide joint coverage. Worm plots
+#'   subtract the same theoretical quantiles from residuals and reference bands.
+#'   `appraise()` computes one seeded residual vector shared by its residual
+#'   panels and always separates observed-versus-fitted values by component,
+#'   because response units differ. Standalone [observed_fitted_plot()] allows
+#'   explicit pooling. Grouped ordinal models support traditional deviance
+#'   QQ/worm plots, but not the observed-versus-fitted panel or full appraisal.
+#'
+#' @param by_family logical or `NULL`; separate indexed grouped-family components
+#'   into facets. The default pools quantile residuals with component colours
+#'   and facets traditional residuals. `TRUE` and `FALSE` explicitly select the
+#'   layout. In `appraise()`, observed-versus-fitted values always use component
+#'   facets. Standalone `observed_fitted_plot()` facets by default and permits
+#'   explicit pooling. Ignored for ordinary models.
+#' @param rank logical or `NULL`; use within-component ranks on the horizontal
+#'   axis of residual-versus-predictor plots. The default ranks pooled grouped
+#'   plots and retains original predictors in facets. `TRUE` or `FALSE` overrides
+#'   this independently of the residual type and layout. Only finite observations
+#'   included in each component determine its ranks; average ties are used.
 #' @param use_worm logical; should a worm plot be drawn in place of the QQ plot?
 #' @param n_uniform numeric; number of times to randomize uniform quantiles
 #'   in the direct computation method (`method = "direct"`) for QQ plots.
@@ -31,9 +82,10 @@
 #'   model when using the simulation method (`method = "simulate"`) for QQ
 #'   plots.
 #' @param seed numeric; the random number seed to use for `method = "simulate"`
-#'   and `method = "uniform"`.
-#' @param type character; type of residuals to use. Only `"deviance"`,
-#'   `"response"`, and `"pearson"` residuals are allowed.
+#'   and `method = "uniform"`, and for randomised quantile residuals.
+#' @param type character or `NULL`; residual type: `"deviance"`, `"pearson"`,
+#'   `"response"`, or `"quantile"`. The default selects quantile residuals for
+#'   supported grouped-family models and deviance residuals otherwise.
 #' @param n_bins character or numeric; either the number of bins or a string
 #'   indicating how to calculate the number of bins.
 #' @param ncol,nrow numeric; the numbers of rows and columns over which to
@@ -41,13 +93,15 @@
 #' @param guides character; one of `"keep"` (the default), `"collect"`, or
 #'   `"auto"`. Passed to [patchwork::plot_layout()]
 #' @param level numeric; the coverage level for QQ plot reference intervals.
-#'   Must be strictly `0 < level < 1`. Only used with `method = "simulate"`.
-#' @param ci_alpha,ci_col colour and transparency used to draw the QQ plot
-#'   reference interval when `method = "simulate"`.
+#'   Must be strictly `0 < level < 1`. Used for quantile reference bands and
+#'   traditional `method = "simulate"` or `"normal"` bands.
+#' @param ci_alpha,ci_col colour and transparency of QQ reference intervals,
+#'   including calibrated quantile-residual bands.
 #' @param point_col,point_alpha colour and transparency used to draw points in
 #'   the plots. See [graphics::par()] section **Color Specification**. This is
 #'   passed to the individual plotting functions, and therefore affects the
-#'   points of all plots.
+#'   points of all plots. Pooled grouped residual panels map component identity
+#'   to colour instead of using the constant `point_col`.
 #' @param line_col colour specification for the 1:1 line in the QQ plot and the
 #'   reference line in the residuals vs linear predictor plot.
 #' @param ... arguments passed to [patchwork::wrap_plots()].
@@ -97,7 +151,7 @@
   n_uniform = 10,
   n_simulate = 50,
   seed = NULL,
-  type = c("deviance", "pearson", "response"),
+  type = NULL,
   n_bins = c("sturges", "scott", "fd"),
   ncol = NULL,
   nrow = NULL,
@@ -108,10 +162,15 @@
   point_col = "grey20",
   point_alpha = 1,
   line_col = "red",
+  by_family = NULL,
+  rank = NULL,
   ...
 ) {
+  check_gfam_appraise(model)
   ## process args
-  type <- match.arg(type)
+  type <- diagnostic_type(model, type)
+  by_family <- diagnostic_by_family(model, type, by_family)
+  if (type == "quantile") model <- cache_diagnostic_residuals(model, type, seed)
   if (is.character(n_bins)) {
     n_bins <- match.arg(n_bins)
   }
@@ -140,20 +199,20 @@
     ci_alpha = ci_alpha,
     point_col = point_col,
     point_alpha = point_alpha,
-    line_col = line_col
+    line_col = line_col, by_family = by_family
   )
   plt2 <- residuals_linpred_plot(model,
     type = type, point_col = point_col,
     point_alpha = point_alpha,
-    line_col = line_col
+    line_col = line_col, by_family = by_family, rank = rank
   )
   plt3 <- residuals_hist_plot(model,
     type = type, n_bins = n_bins,
-    subtitle = NULL
+    subtitle = NULL, by_family = by_family
   )
   plt4 <- observed_fitted_plot(model,
     subtitle = NULL, point_col = point_col,
-    point_alpha = point_alpha
+    point_alpha = point_alpha, by_family = is_gfam_family(family(model))
   )
   ## return
   n_plots <- 4

@@ -1101,3 +1101,62 @@ smooth_band_model <- gam(y ~ f + s(x, k = 8) + s(z, k = 6),
   data = smooth_band_data, method = "REML")
 smooth_band_transformed <- gam(y ~ s(log(x + 1), k = 8) + s(z, by = x, k = 6),
   data = smooth_band_data, method = "REML")
+
+
+# Scalar, uncensored observations from families that also support censoring.
+# Shared with diagnostics tests; these references do not simulate censoring.
+withr::with_seed(26701, {
+  gfam_censored_data <- data.frame(x = runif(120), family_id = rep(1:3, 40))
+  gfam_censored_models <- lapply(c("cnorm", "clog", "cpois"), function(name) {
+    d <- gfam_censored_data
+    d$y <- rnorm(120)
+    d$y[d$family_id == 3L] <- rpois(40, 2)
+    if (name == "cpois") d$y[d$family_id == 1L] <- rpois(40, 2)
+    gam(cbind(y, family_id) ~ factor(family_id) + s(x, k = 4), data = d,
+      family = gfam(list(get(name, asNamespace("mgcv"))(), gaussian(), poisson())),
+      method = "REML")
+  })
+  names(gfam_censored_models) <- c("cnorm", "clog", "cpois")
+})
+
+
+# Extended components with fitted shape parameters and custom residual hooks.
+withr::with_seed(26702, {
+  gfam_custom_models <- lapply(c("betar", "scat"), function(name) {
+    d <- data.frame(x = runif(160), family_id = rep(1:2, 80))
+    d$y <- rnorm(160)
+    d$y[d$family_id == 1L] <- if (name == "betar") rbeta(80, 2, 3) else
+      rt(80, 5) * 0.4
+    gam(cbind(y, family_id) ~ factor(family_id) + s(x, k = 4), data = d,
+      family = gfam(list(get(name, asNamespace("mgcv"))(), gaussian())),
+      method = "REML")
+  })
+  names(gfam_custom_models) <- c("betar", "scat")
+})
+
+
+# Unequal component sizes, disjoint predictors, tied and constant predictors.
+# The formula keeps its private fitting data without leaking temporary names.
+gfam_rank_model <- local(withr::with_seed(26703, {
+  d <- data.frame(family_id = rep(1:3, c(15, 25, 9)),
+    x = c(rep(c(0, 1, 2), 5), rep(0:4, 5), rep(0, 9)))
+  d$y <- c(-7, 10, 30)[d$family_id] + .2 * d$x + rnorm(nrow(d), sd = .3)
+  d$x[c(2, 18)] <- NA_real_
+  gam(cbind(y, family_id) ~ factor(family_id) + x, data = d,
+    family = gfam(list(gaussian(), gaussian(), gaussian())), method = "REML",
+    na.action = na.exclude)
+}))
+
+gfam_gamma_model <- local(withr::with_seed(26704, {
+  d <- data.frame(family_id = rep(1:3, c(30, 35, 40)), x = runif(105))
+  mu <- exp(.2 + .4 * d$x)
+  d$y <- numeric(nrow(d))
+  i <- d$family_id == 1L
+  d$y[i] <- rgamma(sum(i), shape = 4, scale = mu[i] / 4)
+  i <- d$family_id == 2L
+  d$y[i] <- log(mu[i]) + rnorm(sum(i), sd = .35)
+  i <- d$family_id == 3L
+  d$y[i] <- rpois(sum(i), mu[i])
+  gam(cbind(y, family_id) ~ factor(family_id) + s(x, k = 4), data = d,
+    family = gfam(list(Gamma(link = "log"), gaussian(), poisson())), method = "REML")
+}))

@@ -167,6 +167,10 @@
   for individual smooths (#314). `interval = "credible"` aliases pointwise
   `"confidence"` intervals.
 
+* Diagnostics now support grouped-family models with quantile residuals,
+  calibrated normal references and consistent component colours; traditional
+  residuals use component facets (#267).
+
 * `fitted_values()` now emits a message identifying prediction rows with unobserved
   combinations of known categorical predictor levels (#164).
 

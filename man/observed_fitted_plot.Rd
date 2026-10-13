@@ -12,7 +12,8 @@ observed_fitted_plot(
   subtitle = NULL,
   caption = NULL,
   point_col = "grey20",
-  point_alpha = 1
+  point_alpha = 1,
+  by_family = NULL
 )
 }
 \arguments{
@@ -33,12 +34,17 @@ supplied, a suitable label will be generated.}
 \item{caption}{character or expression; the plot caption. See
 \code{\link[ggplot2:labs]{ggplot2::labs()}}.}
 
-\item{point_col}{colour used to draw points in the plots. See
-\code{\link[graphics:par]{graphics::par()}} section \strong{Color Specification}. This is passed to
-the individual plotting functions, and therefore affects the points of
-all plots.}
+\item{point_col}{constant point colour when components are not mapped to
+colour. Pooled grouped diagnostics instead colour points by component.}
 
 \item{point_alpha}{numeric; alpha transparency for points in plots.}
+
+\item{by_family}{logical or \code{NULL}; separate indexed grouped-family components
+into facets. The default pools quantile residuals with component colours
+and facets traditional residuals. \code{TRUE} and \code{FALSE} explicitly select the
+layout. In \code{appraise()}, observed-versus-fitted values always use component
+facets. Standalone \code{observed_fitted_plot()} facets by default and permits
+explicit pooling. Ignored for ordinary models.}
 }
 \description{
 Plot of fitted against observed response values

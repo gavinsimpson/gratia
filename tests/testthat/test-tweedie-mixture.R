@@ -154,14 +154,20 @@ test_that("diagnostic tolerances keep normal-score errors below 1e-4", {
 test_that("mixture CDF can serve the existing PIT and quantile residual path", {
   fam <- mgcv::Tweedie(p = 1.5)
   y <- c(0, .1, 1, 10)
-  baseline <- do_quantile_residuals(y, rep(1, 4), rep(1, 4), 1, fam, "pit")
+  baseline <- withr::with_seed(267,
+    do_quantile_residuals(y, rep(1, 4), rep(1, 4), 1, fam, "pit"))
   fam$cdf <- function(q, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
     ptweedie_mixture(q, mu, 1.5, scale, log_p = log_p, lower_tail = lower_tail,
       cdf_tol = 1e-7, probability_tol = 1e-5)
   }
-  actual <- do_quantile_residuals(y, rep(1, 4), rep(1, 4), 1, fam, "pit")
+  actual <- withr::with_seed(267,
+    do_quantile_residuals(y, rep(1, 4), rep(1, 4), 1, fam, "pit"))
   expect_equal(actual, baseline, tolerance = 1e-6)
-  z <- do_quantile_residuals(y, rep(1, 4), rep(1, 4), 1, fam, "quantile")
+  # For p = 1.5, mu = phi = 1, the Poisson rate is lambda = 2.
+  # The zero PIT must randomise across [0, exp(-lambda)].
+  expect_equal(actual[[1L]], withr::with_seed(267, runif(1)) * exp(-2))
+  z <- withr::with_seed(267,
+    do_quantile_residuals(y, rep(1, 4), rep(1, 4), 1, fam, "quantile"))
   expect_equal(z, qnorm(baseline), tolerance = 1e-5)
 })
 

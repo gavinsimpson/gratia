@@ -68,8 +68,8 @@ test_that("public diagnostics use mixtures without the optional backend", {
     expect_silent(worm_plot(m, method = "uniform", n_uniform = 1))
     expect_silent(appraise(m, method = "uniform", n_uniform = 1))
     expect_equal(qq_plot(m, n_simulate = 2)$labels$subtitle, "Method: simulate")
-    expect_silent(pit <- quantile_residuals(m, type = "pit"))
-    expect_silent(z <- quantile_residuals(m, type = "quantile"))
+    expect_silent(pit <- quantile_residuals(m, type = "pit", seed = 267))
+    expect_silent(z <- quantile_residuals(m, type = "quantile", seed = 267))
     expect_true(all(is.finite(pit) & pit >= 0 & pit <= 1))
     expect_equal(z, qnorm(pit), tolerance = 1e-8)
   }
