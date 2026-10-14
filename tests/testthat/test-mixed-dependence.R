@@ -69,10 +69,12 @@ test_that("non-Gaussian marginal mer calibration uses native joint draws", {
 test_that("correlated PQL keeps marginal families without inventing a copula", {
   skip_if_not_installed("nlme")
   set.seed(90)
-  d <- data.frame(g = factor(rep(1:10, each = 10)), time = rep(1:10, 10),
-    x = runif(100))
-  d$y <- rpois(100, exp(0.3 + d$x + rep(rnorm(10, sd = 0.4), each = 10)))
-  m <- suppressMessages(mgcv::gamm(y ~ s(x, k = 4), data = d,
+  # Clear curvature and group variation keep both fitted variances away from zero.
+  d <- data.frame(g = factor(rep(1:12, each = 12)), time = rep(1:12, 12),
+    x = rep(seq(0.05, 0.95, length.out = 12), 12))
+  d$y <- rpois(nrow(d), exp(1 + sin(2 * pi * d$x) +
+    rep(rnorm(12, sd = 0.7), each = 12)))
+  m <- suppressMessages(mgcv::gamm(y ~ s(x, k = 5), data = d,
     random = list(g = ~1), family = poisson(),
     correlation = nlme::corAR1(0.4, form = ~time | g, fixed = TRUE)))
   conditional <- gamm_diagnostic_model(m)$distribution

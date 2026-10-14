@@ -239,7 +239,8 @@ qq_disk_reference <- function(next_sample, nr, n, probabilities, level, max_cell
   wanted <- sort(unique(c(lower, upper)))
   values <- numeric(length(wanted))
   con <- file(paths, "rb")
-  on.exit(close(con), add = TRUE)
+  # Windows cannot remove the reference file while its connection is open.
+  on.exit(close(con), add = TRUE, after = FALSE)
   # Read successive blocks so each plotted quantile does not require a file seek.
   cursor <- 0
   index <- 1L
