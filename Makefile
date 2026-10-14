@@ -1,8 +1,17 @@
 # Get the version info for later
-.PHONY: docs
+.PHONY: docs test test-full
 PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
+TEST_CPUS ?= 4
 
 all: docs check clean
+
+# Routine local runs use the tests selected for CRAN, with local parallelism.
+test:
+	NOT_CRAN=false TESTTHAT_PARALLEL=true TESTTHAT_CPUS=$(TEST_CPUS) Rscript --vanilla tools/run-tests.R
+
+# Include visual snapshots and the paper-sized integration examples.
+test-full:
+	NOT_CRAN=true GRATIA_RUN_HGAM=true VDIFFR_RUN_TESTS=true TESTTHAT_PARALLEL=true TESTTHAT_CPUS=$(TEST_CPUS) Rscript --vanilla tools/run-tests.R
 
 docs:
 	R -q -e 'library("roxygen2"); roxygenise(".")'

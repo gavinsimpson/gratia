@@ -21,7 +21,8 @@ test_that("two-factor tensors show every combination with its uncertainty", {
         panel <- p[[1]]
         expect_s3_class(panel$layers[[1]]$geom, "GeomPointrange")
         # Rendering, rather than just building, triggers singleton-line messages.
-        expect_silent(ggplot2::ggplotGrob(panel))
+        expect_plot_render(panel,
+          cran = constructor == "ti" && terms == "fac1, fac2")
         b <- ggplot2::ggplot_build(panel)
         expect_equal(nrow(b$data[[1]]), 12L)
         expect_equal(b$data[[1]]$y, panel$data$.estimate)
@@ -50,7 +51,8 @@ test_that("mixed tensor margins use the continuous covariate on x in either orde
       for (p in list(draw(m, n = 8, rug = FALSE), draw(sm))) {
         panel <- p[[1]]
         expect_s3_class(panel$layers[[1]]$geom, "GeomLine")
-        expect_silent(ggplot2::ggplotGrob(panel))
+        expect_plot_render(panel,
+          cran = constructor == "ti" && term == "x, f, bs = c('tp', 're')")
         b <- ggplot2::ggplot_build(panel)
         expect_equal(sort(unique(b$data[[1]]$x)), sort(unique(sm$x)))
         expect_equal(as.integer(table(b$data[[1]]$group)), rep(8L, 3))
@@ -81,7 +83,7 @@ test_that("three-variable T2 terms retain surfaces faceted by a factor", {
     for (p in list(model_plot, estimates_plot)) {
       panel <- p[[1]]
       expect_s3_class(panel$layers[[1]]$geom, "GeomRaster")
-      expect_silent(ggplot2::ggplotGrob(panel))
+      expect_plot_render(panel, cran = !full)
       b <- ggplot2::ggplot_build(panel)
       expect_equal(as.character(b$layout$layout$species), levels(d$species))
       expect_equal(as.integer(table(b$data[[1]]$PANEL)), rep(64L, 3))

@@ -107,6 +107,7 @@ test_that("bandwidths and density estimators are validated clearly", {
 })
 
 test_that("scalable KDE appraisal has a stable visual rendering", {
+  skip_on_cran()
   vdiffr::expect_doppelganger("scalable KDE appraisal",
     appraise(m_tiny_eg1, scalable = TRUE, method = "normal", qq_bins = 30,
       density_bins = c(30, 30)))

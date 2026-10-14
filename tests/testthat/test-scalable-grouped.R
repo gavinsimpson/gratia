@@ -34,6 +34,9 @@ test_that("scalable grouped diagnostics preserve new main defaults and shared re
 })
 
 test_that("scalable grouped references retain component curves and normal reference lines", {
+  cran_cases <- list(quantile = list(normal = c(FALSE, TRUE)),
+    deviance = list(normal = TRUE), pearson = list(uniform = TRUE),
+    response = list(simulate = c(FALSE, TRUE)))
   for (type in c("quantile", "deviance", "pearson", "response")) {
     methods <- if (type == "quantile") {
       "normal"
@@ -42,6 +45,8 @@ test_that("scalable grouped references retain component curves and normal refere
     }
     for (method in methods) {
       for (by_family in c(FALSE, TRUE)) {
+        if (!full_test_run() &&
+            !(by_family %in% cran_cases[[type]][[method]])) next
         old <- qq_plot(
           gfam_model,
           type = type,
