@@ -198,10 +198,12 @@ overview(water_fit)
 smooths(water_fit)
 ```
 
-`sf` describes the surface induced by a smoothly varying boundary; `sw`
-describes additional interior variation that is zero on that boundary. Their
-sum plus the intercept gives the complete fitted mean. The boundary basis
-size is `k`; the interior basis size comes from the number of supplied knots.
+`sf` estimates a cyclic smooth around the closed boundary and extends it
+into the interior as a surface satisfying Laplace's equation. The first panel
+shows that surface, rather than just the values along the boundary. `sw`
+adds interior variation that is zero on the boundary. Both components are
+estimated jointly; their sum plus the intercept gives the complete fitted
+mean. The boundary basis size is `k`; the interior basis size comes from the number of supplied knots.
 `nmax = 100` sets the numerical solution grid, rather than the plotting grid.
 Both component types now have distinct labels in gratia.
 
@@ -214,8 +216,9 @@ draw(water_fit, n_2d = 35, surface = "tile", caption = TRUE, ncol = 1,
   xlab = "v coordinate", ylab = "w coordinate")
 ```
 
-In this simulation the estimated variation is almost entirely in the boundary
-component, with very little additional interior wiggliness. Effect colours
+In this simulation REML shrinks the interior adjustment almost to zero,
+so the second panel is nearly flat on the shared colour scale. The surface
+induced by the boundary accounts for almost all the fitted variation. Effect colours
 display each centred contribution; add them and the intercept to recover
 the fitted mean field.
 Boundary loops remain visible and predictions outside the supplied domain
