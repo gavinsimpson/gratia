@@ -2,6 +2,9 @@
 
 ## User visible changes
 
+* gratia has a new neon hex logo. The pkgdown site uses the pink
+  g from the logo as its favicon.
+
 * **Breaking change:** Parametric plots now use the covariates as evaluated in
   the model by default: `log(x)` is plotted against `log(x)`, with a matching
   axis label. Use `back_transform = TRUE` to plot against the original
