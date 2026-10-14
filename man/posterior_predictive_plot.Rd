@@ -8,8 +8,8 @@ posterior_predictive_plot(
   model,
   n = 50,
   seed = NULL,
-  observed_col = "black",
-  replicated_col = "grey60",
+  observed_col = "#D55E00",
+  replicated_col = "#0072B2",
   replicated_alpha = NULL,
   xlab = NULL,
   ylab = NULL,
@@ -33,7 +33,9 @@ posterior_predictive_plot(
 caller's random-number state is preserved.}
 
 \item{observed_col, replicated_col}{colours for the observed and replicated
-distributions, respectively.}
+distributions, respectively. Standalone plots default to orange-red
+(\code{"#D55E00"}) and blue (\code{"#0072B2"}). When called by \code{\link[=appraise]{appraise()}}, the check
+uses that function's \code{line_col} and \code{ci_col} instead.}
 
 \item{replicated_alpha}{numeric or \code{NULL}; opacity of replicated
 distributions. The default, \code{NULL}, uses \code{0.8} for discrete posterior

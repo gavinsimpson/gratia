@@ -8,7 +8,9 @@
 #' @param seed numeric; optional random seed. With an explicit seed, the
 #'   caller's random-number state is preserved.
 #' @param observed_col,replicated_col colours for the observed and replicated
-#'   distributions, respectively.
+#'   distributions, respectively. Standalone plots default to orange-red
+#'   (`"#D55E00"`) and blue (`"#0072B2"`). When called by [appraise()], the check
+#'   uses that function's `line_col` and `ci_col` instead.
 #' @param replicated_alpha numeric or `NULL`; opacity of replicated
 #'   distributions. The default, `NULL`, uses `0.8` for discrete posterior
 #'   median points and interval bars, and `0.2` for continuous density curves.
@@ -113,8 +115,8 @@ posterior_predictive_plot <- function(
   model,
   n = 50,
   seed = NULL,
-  observed_col = "black",
-  replicated_col = "grey60",
+  observed_col = "#D55E00",
+  replicated_col = "#0072B2",
   replicated_alpha = NULL,
   xlab = NULL,
   ylab = NULL,
