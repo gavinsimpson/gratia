@@ -13,6 +13,17 @@ the reader understands statistics but should not have to decode your shorthand.
 Before sending or saving text, replace any phrase that would reasonably prompt
 “What does that mean?” with a direct explanation.
 
+State what the evidence shows. Add a limitation only when it materially changes
+how the reader should interpret or use that result. Connect it to a specific
+claim or decision in the surrounding text, and explain its practical
+consequence. Do not introduce an unasked alternative claim merely to disclaim
+it. Omit generic cautions about causality, uncertainty or generalisation when
+they add no useful information.
+
+When reviewing a qualification, ask: “What misunderstanding does this sentence
+prevent, and has the surrounding text given the reader a reason to have it?”
+If there is no concrete answer, delete it.
+
 ## Starting new work
 
 Unless the user explicitly instructs otherwise, always start new work on a

@@ -116,6 +116,26 @@ test_that("component 3D plots retain soap domain boundaries", {
   }
 })
 
+test_that("fixed soap component fill ranges ignore missing boundary values", {
+  panels <- assemble(m_soap_sep, scales = "fixed", n_2d = 10, rug = FALSE)
+  limits <- lapply(panels, function(p) {
+    ggplot2::ggplot_build(p)$plot$scales$get_scales("fill")$get_limits()
+  })
+  expect_length(limits, 2L)
+  expect_true(all(is.finite(unlist(limits))))
+  expect_equal(limits[[1]], limits[[2]])
+  # Both components contain boundary metadata rows with missing effect values.
+  estimates <- smooth_estimates(m_soap_sep, n_2d = 10,
+    clip = TRUE, unnest = FALSE, interval = "confidence")
+  expect_true(all(vapply(estimates$data, function(d) {
+    any(d$.bndry & is.na(d$.estimate))
+  }, logical(1))))
+  expected <- range(unlist(lapply(estimates$data, function(d) {
+    c(d$.estimate, d$.lower_ci, d$.upper_ci)
+  })), na.rm = TRUE)
+  expect_equal(limits[[1]], expected)
+})
+
 test_that("soap component fitting is unaffected by attaching sf", {
   skip_if_not_installed("sf")
   withr::local_package("sf")

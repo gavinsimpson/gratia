@@ -27,6 +27,34 @@ navbar:
     left: [intro, articles, reference, news]
     right: [search, github]
 
+articles:
+  - title: Fit and check models
+    navbar: Models
+    desc: >
+      Choose a response model, interpret its effects and check its assumptions.
+      Start with the shared diagnostics concepts, then follow a complete workflow
+      for grouped surveys, mixed models or spatial surveys.
+    contents:
+      - articles/model-checking
+      - articles/gfam-support
+      - articles/glmmTMB-support
+      - articles/sdmTMB-support
+  - title: Predictions, effects and response distributions
+    navbar: Workflows
+    contents:
+      - articles/prediction-comparisons
+      - articles/smooth-effects
+      - articles/spatial-smooths
+      - articles/response-distributions
+      - transformed-covariates
+  - title: Getting started and customising an analysis
+    navbar: Essentials
+    contents:
+      - gratia
+      - articles/data-slices
+      - articles/custom-plotting
+      - articles/posterior-simulation
+
 reference:
   - title: Plot models and effects
     desc: >
@@ -99,6 +127,7 @@ reference:
       Assess model adequacy with `appraise()`, individual diagnostic plots,
       residuals, and measures of concurvity.
   - contents:
+      - diagnostic_support
       - appraise
       - qq_plot
       - worm_plot
@@ -110,6 +139,7 @@ reference:
       - residuals_hist_plot
       - residuals_linpred_plot
       - quantile_residuals
+      - residual_correlation
       - add_residuals
       - add_residuals.gam
       - model_concurvity

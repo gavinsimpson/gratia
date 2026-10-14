@@ -73,6 +73,31 @@ test_that("glmmTMB parametric-only models and transformed prediction data work",
   expect_error(parametric_effects(m, unconditional = TRUE), "joint covariance")
 })
 
+test_that("glmmTMB effects retain rendering metadata across model parts", {
+  d <- tmb_effect_data()
+  d$b <- factor(rep(c("cold", "warm"), each = nrow(d) / 2))
+  m <- glmmTMB::glmmTMB(y ~ a * b + log(z) + s(w, k = 5),
+    dispformula = ~a * b + log(z), data = d, REML = TRUE)
+  effects <- parametric_effects(m)
+  expect_identical(names(attr(effects, "term_info")), c("a:b", "a:b.1"))
+  expect_setequal(names(attr(effects, "factor_levels")),
+    c("a", "b", "log(z)", "a.1", "b.1", "log(z).1"))
+  expect_setequal(names(attr(effects, "axis_info")), unique(effects$.term))
+  # Build the figures: constructing a plot alone does not evaluate its rug.
+  expect_silent(ggplot2::ggplotGrob(draw(effects)))
+  panels <- draw(m, wrap = FALSE)
+  for (p in panels) expect_silent(ggplot2::ggplotGrob(p))
+  for (term in c("a:b", "a:b.1")) {
+    expect_s3_class(panels[[term]]$layers[[1]]$geom, "GeomPointrange")
+    expect_identical(panels[[term]]$labels$x, "a")
+  }
+  for (term in c("log(z)", "log(z).1")) {
+    rug <- panels[[term]]$layers[[1]]
+    expect_s3_class(rug$geom, "GeomRug")
+    expect_equal(rug$data$.value, log(d$z))
+  }
+})
+
 test_that("parametric labels and uncertainty follow each glmmTMB linear predictor", {
   d <- tmb_effect_data()
   set.seed(137)

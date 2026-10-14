@@ -9,8 +9,8 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(gratia)
-library(mgcv)
+library("gratia")
+library("mgcv")
 ```
 
 A smooth can depend on a function of a covariate rather than on the raw
