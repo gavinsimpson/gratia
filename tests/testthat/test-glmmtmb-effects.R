@@ -1,4 +1,4 @@
-skip_if_not_installed("glmmTMB", minimum_version = "1.1.15.9000")
+skip_if_not_installed("glmmTMB", minimum_version = "1.1.15.2")
 
 tmb_effect_data <- function() {
   set.seed(391)

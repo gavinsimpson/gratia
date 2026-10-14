@@ -93,6 +93,14 @@
 #' Increasing grid resolution improves the approximation to whole-curve coverage.
 #' `overall_uncertainty` and covariance options apply to both interval types.
 #' Simultaneous intervals for SCAM models are unsupported.
+#' SCAM smooth estimates retain the fitted centring and coefficient
+#' transformation when evaluation points are changed. Pointwise intervals use
+#' the covariance of the constrained coefficients. With
+#' `overall_uncertainty = TRUE`, their standard errors also include intercept
+#' uncertainty and its covariance with the smooth; estimates remain centred.
+#' Models without an intercept use smooth-only uncertainty for either setting.
+#' Smoothing-parameter uncertainty is not currently supported for SCAM models;
+#' use `unconditional = FALSE`.
 #'
 #' For explicit `data`, missing covariates needed by a smooth produce `NA`
 #' estimates and standard errors at those positions. Missing values in variables
@@ -183,6 +191,7 @@
     interval = NULL, ci_level = 0.95,
     n_sim = 10000, n_cores = 1, seed = NULL,
     ...) {
+  check_scam_unconditional(object, unconditional)
   check_back_transform(back_transform)
   interval <- normalize_smooth_interval(interval, allow_null = TRUE)
   if (!is.null(interval)) {
@@ -342,13 +351,14 @@
 }
 
 #' @export
-`smooth_estimates.scam` <- function(object, ...) {
+`smooth_estimates.scam` <- function(object, ..., unconditional = FALSE) {
+  check_scam_unconditional(object, unconditional)
   # scam has too many smooth types to write methods for all of them
   # this just adds on some classes that allows gratia to dispatch special
   # methods for their peculiarities
   object$smooth <- lapply(object$smooth, reclass_scam_smooth)
   # now just call the "gam" method
-  smooth_estimates.gam(object, ...)
+  smooth_estimates.gam(object, ..., unconditional = unconditional)
 }
 
 # gamm4 method
@@ -483,6 +493,7 @@
     unconditional,
     overall_uncertainty = TRUE,
     frequentist = FALSE, envir = NULL) {
+  check_scam_unconditional(model, unconditional)
   model <- with_model_envir(model, envir)
   data <- prepare_smooth_data(model, smooth, data)
   is_soap <- is_soap_film(smooth)
@@ -566,34 +577,36 @@
 
 #' @export
 `smooth_values.univariate_scam_smooth` <- function(
-    smooth, data, model, V,
+    smooth, data, model, V, overall_uncertainty = TRUE,
     ...) {
-  # get values of smooth
   X <- predict_mat_rows(smooth, data) # prediction matrix
-  off <- attr(X, "offset") # offset, if any
-  if (is.null(off)) {
-    off <- 0
+  off <- attr(X, "offset") %||% 0
+  X <- scam_smooth_matrix(smooth, X)
+  idx <- smooth_coef_indices(smooth)
+  fit <- drop(X %*% coef(model)[idx]) + off
+  G <- X
+  intercept <- which(names(coef(model)) == "(Intercept)")
+  if (isTRUE(overall_uncertainty) && length(intercept)) {
+    G <- cbind(1, G)
+    idx <- c(intercept, idx)
   }
-  para_seq <- smooth_coef_indices(smooth) # start:end
-  coefs <- coef(model, parametrized = FALSE)[para_seq]
-
-  # scam smooths work quite differently to mgcv smooths as X can contain
-  # constant terms, need exponentiating etc
-  which_exp <- which_exp_scam_coefs(model)[para_seq] # which betas need exp
-  idx <- seq_along(coefs)[which_exp]
-  # which exp function are we using?
-  exp_fn <- exp_fun(model)
-  # exponentiate any coefs that need it
-  coefs[idx] <- exp_fn(coefs[idx])
-  # coefs need reprarameterizing in some smooth type or padding with a 0
-  stats <- scam_beta_se(smooth,
-    beta = coefs, X = X, ndata = nrow(data),
-    V = V
-  )
-  coefs <- stats$betas
-  se_fit <- stats$se
-  fit <- drop(X %*% coefs) + off
+  se_fit <- sqrt(pmax(0, rowSums((G %*% V[idx, idx, drop = FALSE]) * G)))
   list(fit = fit, se = se_fit)
+}
+
+# Match SCAM's fitted constrained coefficient order. Some bases retain columns
+# whose coefficients were fixed to zero when the model was fitted.
+scam_smooth_matrix <- function(smooth, X) {
+  if (inherits(smooth, "po.smooth")) {
+    X <- X[, -1L, drop = FALSE]
+  } else if (inherits(smooth, "zero_point_scam_smooth")) {
+    X <- X[, -smooth$n.zero, drop = FALSE]
+  }
+  if (ncol(X) != length(smooth_coef_indices(smooth))) {
+    stop("Cannot align the SCAM smooth basis with its fitted coefficients.",
+      call. = FALSE)
+  }
+  X
 }
 
 `spline_values_scam` <- function(
@@ -605,15 +618,15 @@
   smooth <- reclass_scam_smooth(smooth)
 
   ## want full vcov for component-wise CI
-  V <- vcov(model, freq = frequentist, parametrized = TRUE)
+  V <- get_vcov(model, frequentist = frequentist)
 
-  # SCAM reparameterization uses QR decompositions, which cannot accept
-  # missing rows. Calculate on valid observations and restore positions once.
+  # Evaluate rows with complete smooth predictors, then restore missing rows
+  # at their supplied positions without changing the fitted basis.
   valid <- finite_predictor_rows(data[, terms_in_smooth(smooth), drop = FALSE])
   fit <- se_fit <- rep(NA_real_, nrow(data))
   if (any(valid)) {
     sv <- smooth_values(smooth = smooth, data = data[valid, , drop = FALSE],
-      model = model, V = V)
+      model = model, V = V, overall_uncertainty = overall_uncertainty)
     fit[valid] <- sv$fit
     se_fit[valid] <- sv$se
   }
@@ -839,6 +852,7 @@
   envir = NULL,
   back_transform = FALSE,
                                       ...) {
+  check_scam_unconditional(model, unconditional)
   model <- with_model_envir(model, envir)
   by_var <- by_variable(smooth) # even if not a by as we want NA later
   if (by_var == "NA") {

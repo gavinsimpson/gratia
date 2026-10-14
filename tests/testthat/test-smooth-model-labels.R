@@ -115,7 +115,7 @@ test_that("Tweedie and hurdle smooths identify the actual parameter order", {
 })
 
 test_that("glmmTMB smooths use the agreed component subtitles", {
-  skip_if_not_installed("glmmTMB", minimum_version = "1.1.15.9000")
+  skip_if_not_installed("glmmTMB", minimum_version = "1.1.15.2")
   d <- subtitle_data()
   m <- glmmTMB::glmmTMB(y ~ s(x, k = 5), dispformula = ~s(z, k = 4),
     data = d, REML = TRUE)
@@ -146,7 +146,7 @@ test_that("glmmTMB smooths use the agreed component subtitles", {
 })
 
 test_that("single-predictor glmmTMB smooths omit model subtitles", {
-  skip_if_not_installed("glmmTMB", minimum_version = "1.1.15.9000")
+  skip_if_not_installed("glmmTMB", minimum_version = "1.1.15.2")
   d <- subtitle_data()
   for (fam in list(gaussian(), poisson(), glmmTMB::nbinom2())) {
     if (fam$family != "gaussian") {

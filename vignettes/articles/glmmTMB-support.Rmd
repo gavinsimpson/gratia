@@ -24,7 +24,7 @@ dioxide concentration. The second example also accounts for measurements on
 the same plant.
 
 This article needs the optional package glmmTMB, with support for `mgcv::s()`
-terms; the examples were developed with glmmTMB 1.1.15.9000 and mgcv 1.9-4.
+terms; the examples require glmmTMB 1.1.15.2 or later and mgcv 1.9-4.
 Smooth fitting remains experimental in glmmTMB. Its
 [fitting documentation](https://glmmtmb.github.io/glmmTMB/reference/glmmTMB.html)
 recommends `REML = TRUE`. Use an unqualified `s()` in the formula after attaching

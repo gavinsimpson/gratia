@@ -118,7 +118,8 @@ sdmtmb_diagnostic_model <- function(model, conditioning = NULL,
   family_name <- if (fam$family == "Beta") "beta" else fam$family
   dist <- distribution_from_parameters(family_name, mu[keep],
     dispersion = phi, trials = trials[keep],
-    power = stats::plogis(pars$thetaf) + 1)
+    power = stats::plogis(pars$thetaf) + 1,
+    df = if (family_name == "student") exp(pars$ln_student_df) + 1 else NULL)
   if (delta && component == "response") {
     p <- if (coupled) delta_mean(model, 1L, pred$est1, pred$est2)[keep] else
       model$family[[1L]]$linkinv(pred$est1)[keep]
@@ -224,6 +225,11 @@ diagnostic_data.sdmTMB <- function(model, type = NULL, seed = NULL,
 #'   These approximations do not guarantee that goodness-of-fit tests have their
 #'   intended false-positive rate after parameter estimation. Posterior predictive checks separately include
 #'   coefficient and field uncertainty, as described in their plot subtitle.
+#'   Student-t responses use the fitted location, scale and fixed or estimated
+#'   degrees of freedom. The scale is not the response standard deviation.
+#'   Pearson residuals require degrees of freedom greater than two, because
+#'   their response variance is otherwise infinite. PIT, quantile residuals and
+#'   posterior predictive checks remain available when this variance is infinite.
 quantile_residuals.sdmTMB <- function(model, type = c("pit", "quantile"),
     seed = NULL, conditioning = NULL, component = "response",
     field_method = c("mle-mvn", "mle-eb", "mle-mvn-integrated"), ...) {

@@ -149,6 +149,11 @@ at fitted values; \code{field_method} does not add another draw of the fields.
 These approximations do not guarantee that goodness-of-fit tests have their
 intended false-positive rate after parameter estimation. Posterior predictive checks separately include
 coefficient and field uncertainty, as described in their plot subtitle.
+Student-t responses use the fitted location, scale and fixed or estimated
+degrees of freedom. The scale is not the response standard deviation.
+Pearson residuals require degrees of freedom greater than two, because
+their response variance is otherwise infinite. PIT, quantile residuals and
+posterior predictive checks remain available when this variance is infinite.
 }}
 }
 \description{

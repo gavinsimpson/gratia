@@ -51,19 +51,24 @@ smooth_derivative_data <- function(model, smooth, n, focal, wrt, order, type, ep
 }
 
 # Evaluate the selected smooth at each finite-difference point. This keeps
-# offsets and unrelated smooths out of the calculation, and recomputes calls
-# after raw covariates change instead of reusing stale transformed columns.
+# formula offsets and unrelated smooths out of the calculation, and recomputes
+# calls after raw covariates change. A smooth's fixed boundary contribution is
+# differentiated alongside its basis, using exactly the same points.
 smooth_finite_difference <- function(model, smooth, data, focal, wrt, type, order, h) {
   if (!is.numeric(data[[focal]]) || is.matrix(data[[focal]])) {
     cli::cli_abort("The differentiation coordinate must be a numeric vector.")
   }
+  has_offset <- FALSE
   at <- function(delta) {
     d <- data
     d[[focal]] <- d[[focal]] + delta
     attr(d, "gratia.evaluated") <- identical(wrt, "smooth")
     attr(d, "terms") <- NULL
     d <- prepare_smooth_data(model, smooth, d)
-    smooth_predict_matrix(smooth, d, model)
+    X <- smooth_predict_matrix(smooth, d, model)
+    offset <- attr(X, "offset", exact = TRUE)
+    if (!is.null(offset)) has_offset <<- TRUE
+    cbind(X, if (is.null(offset)) rep(0, nrow(X)) else offset)
   }
   # Use the same forward, backward, and central stencils as existing methods.
   if (order == 1L) {
@@ -78,6 +83,7 @@ smooth_finite_difference <- function(model, smooth, data, focal, wrt, type, orde
   # Existing interval routines consume a matrix in full coefficient order.
   out <- matrix(0, nrow(ans), length(coef(model)),
     dimnames = list(rownames(data), names(coef(model))))
-  out[, smooth_coef_indices(smooth)] <- ans
+  out[, smooth_coef_indices(smooth)] <- ans[, -ncol(ans), drop = FALSE]
+  if (has_offset) attr(out, "offset") <- ans[, ncol(ans)]
   out
 }

@@ -393,6 +393,10 @@
   Xi <- lpmatrix * 0 # zero out the Xp matrix
   Xi[, want] <- lpmatrix[, want] # copy bits of Xp we need
   d <- drop(Xi %*% betas) # estimate derivative
+  # Known soap-film boundary values contribute to the estimate, but have no
+  # fitted coefficients and therefore add no coefficient uncertainty.
+  offset <- attr(lpmatrix, "offset", exact = TRUE)
+  if (!is.null(offset)) d <- d + offset
   se <- rowSums(Xi %*% Vb * Xi)^0.5 # standard errors
   ## build return tibble
   deriv <- tibble(
@@ -788,6 +792,9 @@
 #'
 #' @note `partial_derivatives()` will ignore any random effect smooths it
 #'   encounters in `object`.
+#'   For soap-film smooths with known boundary values, derivatives include the
+#'   fixed boundary contribution. This shifts the estimates and interval limits
+#'   without adding uncertainty from fitted coefficients.
 #'
 #' @export
 #'
@@ -1322,6 +1329,7 @@
   uncertainty = c("simulation", "delta"),
   unconditional = FALSE
 ) {
+  check_scam_unconditional(object, unconditional)
   do_response_derivatives(
     object = object, focal = focal, data = data, order = order, type = type,
     scale = scale, method = method, n = n, eps = eps, n_sim = n_sim,

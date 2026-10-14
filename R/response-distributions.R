@@ -565,8 +565,11 @@ truncate_distribution <- function(distribution, lower = 0, mean = NULL,
 # mu*(1+dispersion); NB2 variance is mu+mu^2/dispersion; Tweedie variance is
 # dispersion*mu^power. Binomial responses are proportions.
 distribution_from_parameters <- function(family, mu, dispersion = 1,
-                                         trials = 1, power = NULL) {
+                                         trials = 1, power = NULL, df = NULL) {
   force(family); force(mu); force(dispersion); force(trials); force(power)
+  if (identical(family, "student")) {
+    return(student_response_distribution(mu, dispersion, df))
+  }
   if (startsWith(family, "truncated_")) {
     name <- sub("^truncated_", "", family)
     if (!name %in% c("poisson", "nbinom1", "nbinom2"))
@@ -675,6 +678,40 @@ distribution_from_parameters <- function(family, mu, dispersion = 1,
   }
   new_response_distribution(response_mean, rd, cdf, qf, bounds, variance, family,
     cdf_left = cdf_left)
+}
+
+
+# Student-t dispersion is a scale parameter. Its standard deviation also
+# depends on the degrees of freedom and does not exist when df <= 2.
+student_response_distribution <- function(location, scale, df) {
+  n <- length(location)
+  if (!is.numeric(df) || !length(df) || any(!is.finite(df) | df <= 0) ||
+      !(length(df) %in% c(1L, n)))
+    stop("Student-t degrees of freedom must be positive and finite, ",
+      "with one value or one per response.", call. = FALSE)
+  if (!is.numeric(scale) || !length(scale) || any(!is.finite(scale) | scale <= 0) ||
+      !(length(scale) %in% c(1L, n)))
+    stop("Student-t scale must be positive and finite, ",
+      "with one value or one per response.", call. = FALSE)
+  scale <- rep_len(scale, n)
+  df <- rep_len(df, n)
+  mean_available <- all(df > 1)
+  variance_available <- all(df > 2)
+  cdf <- function(q, log_p = FALSE, lower_tail = TRUE)
+    stats::pt((q - location) / scale, df, lower.tail = lower_tail, log.p = log_p)
+  qf <- function(p, log_p = FALSE, lower_tail = TRUE)
+    location + scale * stats::qt(p, df, lower.tail = lower_tail, log.p = log_p)
+  rd <- function() location + scale * stats::rt(n, df)
+  new_response_distribution(
+    mean = if (mean_available) location else NULL,
+    rd = rd, cdf = cdf, qf = qf,
+    bounds = function(y) list(lower = y, upper = y),
+    variance = if (variance_available) scale^2 * df / (df - 2) else NULL,
+    family = "student", cdf_left = cdf,
+    mean_available = mean_available, variance_available = variance_available,
+    moment_reason = paste0("Student-t degrees of freedom = ",
+      paste(signif(unique(df), 5), collapse = ", "),
+      "; a finite mean requires df > 1 and a finite variance requires df > 2."))
 }
 
 

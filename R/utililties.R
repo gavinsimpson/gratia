@@ -569,6 +569,27 @@ get_vcov.default <- function(object, unconditional = FALSE,
   V
 }
 
+# SCAM supplies covariance for its constrained coefficients, but no correction
+# for uncertainty in the estimated smoothing parameters.
+check_scam_unconditional <- function(object, unconditional = FALSE) {
+  if (inherits(object, "scam") && isTRUE(unconditional)) {
+    stop("Smoothing-parameter uncertainty is not currently supported for SCAM models. Use unconditional = FALSE.",
+      call. = FALSE)
+  }
+  invisible(NULL)
+}
+
+#' @export
+#' @rdname get_vcov
+get_vcov.scam <- function(object, unconditional = FALSE,
+                          frequentist = FALSE, term = NULL, by_level = NULL) {
+  check_scam_unconditional(object, unconditional)
+  object$Vp <- object$Vp.t
+  object$Ve <- object$Ve.t
+  get_vcov.default(object, unconditional = FALSE, frequentist = frequentist,
+    term = term, by_level = by_level)
+}
+
 `has_s` <- function(terms) {
   grepl("^s\\(.+\\)$", terms)
 }
@@ -1627,33 +1648,11 @@ reclass_scam_smooth <- function(smooth) {
   V,
   ...
 ) {
-  # extending betas with a 0 - will zero out constant column in Xp
-  # beta <- c(0, beta) # --- doesn't seem needed in scam 1.2-21 
-
-  fv_c <- X %*% beta
-
-  const_dif <- -sum(fv_c) / ndata
-  ones <- matrix(rep(1, times = ndata), nrow = 1, ncol = ndata)
-  A <- ones %*% X
-  qrX <- qr(X)
-  R <- qr.R(qrX)
-  qrA <- qr(t(A))
-  R <- R[-1, ]
-  RZa <- t(qr.qty(qrA, t(R)))[, seq(2, ncol(X))]
-  # FIXME? can we do this & next line better, without inverting?
-  RZa_inv <- solve(RZa)
-  RZaR <- RZa_inv %*% R
-  beta <- qr.qy(qrA, c(0, RZaR %*% beta))
-  idx <- c(1, smooth_coef_indices(smooth))
-  #idx <- smooth_coef_indices(smooth)
-  vc <- vv <- V[idx, idx, drop = FALSE]
-  # vc[, 1] <- rep(0, nrow(vv))
-  # vc[1, ] <- rep(0, ncol(vv))
-  vc <- vc[-1, -1, drop = FALSE] # drop intercept
-
-  XZa <- t(qr.qty(qrA, t(X)))[, seq(2, ncol(X))]
-  Ga <- XZa %*% RZaR
-  se <- sqrt(pmax(0, rowSums((Ga %*% vc) * Ga)))
+  # Current SCAM bases retain their fitted centring. Recentring the basis on
+  # evaluation rows changes the fitted function and fails on short grids.
+  idx <- smooth_coef_indices(smooth)
+  vc <- V[idx, idx, drop = FALSE]
+  se <- sqrt(pmax(0, rowSums((X %*% vc) * X)))
 
   list(betas = beta, se = se)
 }
@@ -1667,7 +1666,7 @@ reclass_scam_smooth <- function(smooth) {
   ...
 ) {
   # return the coefs unmodified, so just compute se
-  idx <- c(1, smooth_coef_indices(smooth))
+  idx <- smooth_coef_indices(smooth)
   V <- V[idx, idx, drop = FALSE]
   se <- sqrt(pmax(0, rowSums((X %*% V) * X)))
   list(betas = beta, se = se)

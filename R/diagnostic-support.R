@@ -41,6 +41,10 @@
 #'   Multivariate-normal PITs check each response separately; simulations retain
 #'   covariance between responses. Nominal multinomial models retain traditional
 #'   residual checks and PPCs. PITs would require an ordering of their categories.
+#' * SCAM models support ordinary posterior predictive plots. Scalable posterior
+#'   predictive plots are not currently available; use `scalable = FALSE`.
+#'   Smoothing-parameter uncertainty is not currently supported for SCAM models;
+#'   use `unconditional = FALSE`.
 #' * `gamm`/`gamm4` and direct `lme`/`merMod` fits use their full predictors.
 #'   Gaussian nlme variance weights and residual covariance are retained.
 #'   Non-Gaussian `gamm` fits use penalized quasi-likelihood (PQL). Without residual
@@ -63,6 +67,11 @@
 #'   and deltas with the coupled Poisson link support checks of the complete
 #'   response, occurrence and positive component. sdmTMB's transformations from
 #'   internal parameters to response parameters must be available.
+#'   Student-t checks use the fitted location, scale and fixed or estimated
+#'   degrees of freedom. Pearson residuals require degrees of freedom above two;
+#'   PIT/quantile residuals and predictive checks remain available with infinite
+#'   variance. Predictive plots also support native response families whose
+#'   analytic residual distributions are unavailable.
 #'
 #' ## Response encodings and residual definitions
 #'

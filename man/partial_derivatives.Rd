@@ -143,6 +143,9 @@ differences
 \note{
 \code{partial_derivatives()} will ignore any random effect smooths it
 encounters in \code{object}.
+For soap-film smooths with known boundary values, derivatives include the
+fixed boundary contribution. This shifts the estimates and interval limits
+without adding uncertainty from fitted coefficients.
 }
 \examples{
 

@@ -366,17 +366,33 @@ posterior_samples.glmmTMB <- function(model, n = 1L, seed = NULL,
   diagnostic_posterior_samples.default(model, n, seed, conditioning, ...)
 }
 
+# Extract fitting observations without requiring an analytic response CDF.
+# Native posterior simulations can cover more families than residual diagnostics.
+sdmtmb_posterior_observations <- function(model, component = "response") {
+  component <- match.arg(component, c("response", "binomial", "positive"))
+  delta <- isTRUE(model$family$delta)
+  if (!delta && component != "response") stop(
+    "Component posterior checks require a delta sdmTMB model.", call. = FALSE)
+  which_model <- if (delta && component != "binomial") 2L else 1L
+  fam <- if (delta) model$family[[which_model]] else stats::family(model)
+  response <- as.matrix(model$response)
+  y <- response[, which_model]
+  if (delta && component == "response")
+    y <- ifelse(response[, 1L] == 0, 0, response[, 2L])
+  keep <- which(!is.na(y))
+  binomial <- fam$family %in% c("binomial", "betabinomial")
+  trials <- if (binomial) rep_len(unname(model$tmb_data$size), NROW(response)) else 1
+  if (binomial) y <- y / (trials + as.numeric(trials == 0))
+  list(y = unname(y[keep]), rows = keep, binomial = binomial,
+    trials = trials, family = fam$family)
+}
+
 #' @export
 diagnostic_posterior_observed.sdmTMB <- function(model, conditioning = NULL,
                                                 component = "response", ...) {
-  component <- match.arg(component, c("response", "binomial", "positive"))
-  proxy <- sdmtmb_diagnostic_model(model, "conditional", component, field_method = "mle-eb")
-  out <- diagnostic_response_table(proxy$y, 0L,
-    rows = which(!is.na(model_row_map(proxy))))
-  fam <- stats::family(model)
-  name <- if (isTRUE(model$family$delta)) model$family[[if (component == "binomial")
-    1L else 2L]]$family else fam$family
-  attr(out, "discrete") <- setNames(name %in% c("poisson", "binomial", "nbinom1",
+  observed <- sdmtmb_posterior_observations(model, component)
+  out <- diagnostic_response_table(observed$y, 0L, rows = observed$rows)
+  attr(out, "discrete") <- setNames(observed$family %in% c("poisson", "binomial", "betabinomial", "nbinom1",
     "nbinom2", "truncated_poisson", "truncated_nbinom1", "truncated_nbinom2"), "response")
   attr(out, "diagnostic_description") <- if (identical(conditioning, "marginal")) paste(
     "Approximate joint parameter draws and new native spatial/temporal/group effects;",
@@ -418,17 +434,13 @@ diagnostic_posterior_sampler.sdmTMB <- function(model, n, seed = NULL,
         get("sdreport_sdmTMB", ns) else TMB::sdreport
       report(model$tmb_obj, getJointPrecision = TRUE)
     }, label = "sdmTMB")
-  observed <- as.matrix(model$response)
+  observed <- sdmtmb_posterior_observations(model, component)
   delta <- isTRUE(model$family$delta)
   component <- match.arg(component, c("response", "binomial", "positive"))
-  if (!delta && component != "response") stop(
-    "Component posterior checks require a delta sdmTMB model.", call. = FALSE)
   which_model <- if (component == "positive") 2L else 1L
-  keep <- if (component != "response") which(!is.na(observed[, which_model])) else if (delta) which(!is.na(observed[, 1L]) &
-    (observed[, 1L] == 0 | !is.na(observed[, 2L]))) else which(!is.na(observed[, 1L]))
-  binomial <- component == "binomial" || (!delta &&
-    identical(stats::family(model)$family, "binomial"))
-  trials <- if (binomial) rep_len(unname(model$tmb_data$size), nrow(observed)) else 1
+  keep <- observed$rows
+  binomial <- observed$binomial
+  trials <- observed$trials
   function(i) {
     draw_seed <- sample.int(.Machine$integer.max, 1L)
     response <- withr::with_seed(draw_seed, stats::simulate(model,
