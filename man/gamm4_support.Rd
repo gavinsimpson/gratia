@@ -18,16 +18,24 @@ group effects. Group variables occurring only in \code{random} are not required
 in prediction data, so new groups receive the same population predictions.
 Use the \code{mer} component with lme4 for predictions conditional on group
 effects and simulations including their variation. Diagnostics and response
-simulations use the GAM component by default. Set
-\code{conditioning = "conditional"} to hold all fitted smooth and additional
-random effects fixed, or \code{"marginal"} to draw new effects from their fitted
-distribution. \code{"gam_component"} explicitly selects the default behaviour.
+simulations use the full fitted mixed model by default. With
+\code{conditioning = "conditional"}, all fitted smooth and additional random
+effects are held fixed for response references. \code{"marginal"} draws new effects
+from their fitted distribution. \code{"gam_component"} explicitly selects the
+extracted GAM calculations used by earlier versions.
 Marginal GLMM checks average over random effects using lme4's joint response
 simulations. Residuals then use ranks in a shared reference sample, as
 described in \link{diagnostic_support}. Gaussian identity-link models instead
 use analytic CDFs of the marginal response distribution.
 
-Gaussian draws use the fitted GAM coefficient covariance matrix, including
+Posterior response draws also default to the full conditional model. They
+draw fixed and fitted random effects together, keeping covariance parameters
+at their fitted values. These Gaussian approximations currently use fitting
+observations only. To supply user coefficient draws or prediction data to
+\code{\link[=posterior_samples]{posterior_samples()}}, select \code{conditioning = "gam_component"} explicitly.
+
+Coefficient draws from \code{\link[=post_draws]{post_draws()}}, \code{\link[=fitted_samples]{fitted_samples()}}, \code{\link[=predicted_samples]{predicted_samples()}}
+and \code{\link[=smooth_samples]{smooth_samples()}} still use the fitted GAM covariance matrix, including
 its uncertainty due to fitting the mixed model. User draws must have one
 column per GAM coefficient. Metropolis-Hastings sampling is unsupported:
 the GAM likelihood does not include the additional random effects.

@@ -86,7 +86,7 @@ diagnostic_data.gratia_diagnostic_proxy <- function(model, type = NULL,
 
 mixed_conditioning <- function(model, conditioning = NULL) {
   if (is.null(conditioning)) {
-    conditioning <- if (is_gamm4(model)) "gam_component" else "conditional"
+    conditioning <- "conditional"
   }
   match.arg(conditioning, c("conditional", "marginal", "gam_component"))
 }

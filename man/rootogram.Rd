@@ -6,7 +6,7 @@
 \alias{rootogram.gam}
 \title{Rootograms to assess goodness of model fit}
 \usage{
-\method{rootogram}{gamm4}(object, ...)
+\method{rootogram}{gamm4}(object, ..., conditioning = NULL)
 
 rootogram(object, ...)
 
@@ -16,6 +16,10 @@ rootogram(object, ...)
 \item{object}{an R object}
 
 \item{...}{arguments passed to other methods}
+
+\item{conditioning}{for gamm4, \code{"conditional"} (default) checks the response
+distribution at all fitted effects, \code{"marginal"} averages over new effects,
+and \code{"gam_component"} checks the extracted GAM.}
 
 \item{max_count}{integer; the largest count to consider}
 

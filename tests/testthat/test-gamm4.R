@@ -108,7 +108,8 @@ test_that("Gaussian and user gamm4 posterior draws work and preserve RNG", {
     for (operation in c("posterior_samples", "fitted_samples", "predicted_samples")) {
       set.seed(112)
       old_seed <- .Random.seed
-      expect_gamm4_equivalent(m, operation, n = 3, data = nd, seed = 13)
+      expect_gamm4_equivalent(m, operation, n = 3, data = nd, seed = 13,
+        conditioning = if (operation == "posterior_samples") "gam_component" else NULL)
       expect_identical(.Random.seed, old_seed)
     }
     expect_gamm4_equivalent(m, "smooth_samples", select = "s(x)", n = 3,
@@ -134,7 +135,9 @@ test_that("Gaussian and user gamm4 posterior draws work and preserve RNG", {
     for (operation in c("post_draws", "generate_draws", "posterior_samples",
       "fitted_samples", "smooth_samples")) {
       fun <- get(operation, asNamespace("gratia"))
-      expect_error(fun(m, n = 2, method = "mh"), "not supported for gamm4")
+      expect_error(do.call(fun, c(list(m, n = 2, method = "mh"),
+        if (operation == "posterior_samples") list(conditioning = "gam_component"))),
+        "not supported for gamm4")
     }
   }
 })
@@ -148,26 +151,27 @@ test_that("actual gamm4 draws tolerate rank-deficient covariance", {
   expect_true(all(is.finite(a)))
   expect_equal(a[, ncol(a)], rep(tail(coef(m$gam), 1), 5), ignore_attr = TRUE)
   expect_equal(a, post_draws(m, n = 5, seed = 13, mvn_method = "mgcv"))
-  expect_warning(posterior_samples(m, n = 2, data = gamm4_data[1:4, ], seed = 13),
+  expect_warning(posterior_samples(m, n = 2, data = gamm4_data[1:4, ], seed = 13,
+      conditioning = "gam_component"),
     "Cholesky decomposition")
 })
 
 test_that("gamm4 diagnostics and simulations retain family-specific behavior", {
   for (m in list(gamm4_gaussian, gamm4_binomial, gamm4_poisson)) {
-    expect_equal(simulate(m, nsim = 3, seed = 14),
+    expect_equal(simulate(m, nsim = 3, seed = 14, conditioning = "gam_component"),
       simulate.gam(m$gam, nsim = 3, seed = 14))
-    expect_gamm4_equivalent(m, "quantile_residuals", seed = 14)
-    expect_s3_class(qq_plot(m, method = "simulate", n_simulate = 5, seed = 14), "ggplot")
-    expect_s3_class(worm_plot(m, method = "simulate", n_simulate = 5, seed = 14), "ggplot")
+    expect_gamm4_equivalent(m, "quantile_residuals", seed = 14, conditioning = "gam_component")
+    expect_s3_class(qq_plot(m, type = "response", method = "simulate", n_simulate = 5, seed = 14), "ggplot")
+    expect_s3_class(worm_plot(m, type = "response", method = "simulate", n_simulate = 5, seed = 14), "ggplot")
     expect_s3_class(appraise(m, method = "normal"), "patchwork")
     for (operation in c("residuals_linpred_plot", "observed_fitted_plot", "residuals_hist_plot")) {
       fun <- get(operation, asNamespace("gratia"))
-      expect_equal(fun(m)$data, fun(m$gam)$data)
+      expect_equal(fun(m, conditioning = "gam_component")$data, fun(m$gam)$data)
     }
     if (family_name(m) == "binomial") {
       expect_error(rootogram(m), "models supported")
     } else {
-      expect_equal(rootogram(m), rootogram(m$gam))
+      expect_equal(rootogram(m, conditioning = "gam_component"), rootogram(m$gam))
     }
   }
 })
@@ -204,12 +208,13 @@ test_that("weighted gamm4 fits preserve excluded and subset rows", {
   expect_equal(nrow(fitted_values(m)), 160L)
   expect_true(all(is.na(fitted_values(m)$.fitted[c(8, 14)])))
   for (operation in c("posterior_samples", "fitted_samples", "predicted_samples")) {
-    ans <- expect_gamm4_equivalent(m, operation, n = 3, seed = 14)
+    ans <- expect_gamm4_equivalent(m, operation, n = 3, seed = 14,
+      conditioning = if (operation == "posterior_samples") "gam_component" else NULL)
     expect_equal(nrow(ans), 480L)
     val <- intersect(c(".fitted", ".response"), names(ans))
     expect_true(all(is.na(ans[ans$.row %in% c(8, 14), val, drop = FALSE])))
   }
-  expect_equal(simulate(m, nsim = 3, seed = 14),
+  expect_equal(simulate(m, nsim = 3, seed = 14, conditioning = "gam_component"),
     simulate.gam(m$gam, nsim = 3, seed = 14))
   expect_equal(add_residuals(gamm4_na_data[1:160, ], m),
     add_residuals(gamm4_na_data[1:160, ], m$gam))
@@ -218,7 +223,8 @@ test_that("weighted gamm4 fits preserve excluded and subset rows", {
   for (operation in c("fitted_values", "posterior_samples", "fitted_samples", "predicted_samples")) {
     fun <- get(operation, asNamespace("gratia"))
     args <- if (operation == "fitted_values") list() else list(n = 2, seed = 14)
-    expect_equal(do.call(fun, c(list(m, data = nd), args)),
+    expect_equal(do.call(fun, c(list(m, data = nd), args,
+      if (operation == "posterior_samples") list(conditioning = "gam_component"))),
       do.call(fun, c(list(m$gam, data = nd), args)))
   }
   changed <- nd
@@ -290,7 +296,7 @@ test_that("gamm4 family-specific utilities keep useful unsupported errors", {
 test_that("generalized gamm4 simulations and QQ data remain valid", {
   for (m in list(gamm4_binomial, gamm4_poisson)) {
     expect_equal(diagnostic_weights(m$gam), m$gam$prior.weights)
-    qq <- qq_plot(m, method = "simulate", n_simulate = 5, seed = 15)
+    qq <- qq_plot(m, type = "response", method = "simulate", n_simulate = 5, seed = 15)
     expect_true(all(c("theoretical", "residuals") %in% names(qq$data)))
     expect_equal(nrow(qq$data), nrow(m$gam$model))
     expect_true(all(is.finite(qq$data$theoretical)))

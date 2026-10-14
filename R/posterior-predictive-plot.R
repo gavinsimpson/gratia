@@ -65,8 +65,9 @@
 #' the fitted response family. This is supported only when the Gaussian working
 #' residuals are uncorrelated. Correlation in those working residuals does not
 #' specify a joint distribution for responses from the fitted family.
-#' `gamm4` defaults to its existing GAM-component mode; use an explicit
-#' `conditioning = "conditional"` for full-model checks. GJRM draws the final
+#' `gamm4` defaults to `conditioning = "conditional"`, checking the full fitted
+#' mixed model while including uncertainty in fitted effects. Use the explicit
+#' `"gam_component"` option for the extracted GAM calculations. GJRM draws the final
 #' distributional coefficients jointly. These are approximate predictive checks;
 #' no refitting is performed.
 #'

@@ -115,10 +115,13 @@
 #' nonlinear response links. sdmTMB has additional field choices described below.
 #' PPCs separately include approximate uncertainty in fitted parameters.
 #'
-#' `"gam_component"` uses the extracted GAM component. Whole-gamm diagnostics
-#' default to conditional checks; gamm4 diagnostics and the existing gamm response
-#' simulation methods retain their GAM-component defaults. Specify conditional
-#' or marginal conditioning when the full mixed model is needed.
+#' `"gam_component"` explicitly uses the extracted GAM component. gamm and
+#' gamm4 diagnostics and posterior predictive checks default to the full model
+#' with conditional conditioning. gamm4 response simulations use the same default;
+#' the existing gamm response simulator retains its GAM-component default.
+#' Conditional response references hold fitted effects fixed, while conditional
+#' PPCs include uncertainty in those fitted effects. Specify `"marginal"` to
+#' simulate new effects instead.
 #'
 #' Conditional glmmTMB/lme4 response likelihoods factorize given all random
 #' effects, including temporal and spatial effects. Marginal responses may be

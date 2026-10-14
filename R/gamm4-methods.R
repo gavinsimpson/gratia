@@ -29,16 +29,24 @@ gamm4_gam <- function(object) {
 #' in prediction data, so new groups receive the same population predictions.
 #' Use the `mer` component with lme4 for predictions conditional on group
 #' effects and simulations including their variation. Diagnostics and response
-#' simulations use the GAM component by default. Set
-#' `conditioning = "conditional"` to hold all fitted smooth and additional
-#' random effects fixed, or `"marginal"` to draw new effects from their fitted
-#' distribution. `"gam_component"` explicitly selects the default behaviour.
+#' simulations use the full fitted mixed model by default. With
+#' `conditioning = "conditional"`, all fitted smooth and additional random
+#' effects are held fixed for response references. `"marginal"` draws new effects
+#' from their fitted distribution. `"gam_component"` explicitly selects the
+#' extracted GAM calculations used by earlier versions.
 #' Marginal GLMM checks average over random effects using lme4's joint response
 #' simulations. Residuals then use ranks in a shared reference sample, as
 #' described in [diagnostic_support]. Gaussian identity-link models instead
 #' use analytic CDFs of the marginal response distribution.
 #'
-#' Gaussian draws use the fitted GAM coefficient covariance matrix, including
+#' Posterior response draws also default to the full conditional model. They
+#' draw fixed and fitted random effects together, keeping covariance parameters
+#' at their fitted values. These Gaussian approximations currently use fitting
+#' observations only. To supply user coefficient draws or prediction data to
+#' [posterior_samples()], select `conditioning = "gam_component"` explicitly.
+#'
+#' Coefficient draws from [post_draws()], [fitted_samples()], [predicted_samples()]
+#' and [smooth_samples()] still use the fitted GAM covariance matrix, including
 #' its uncertainty due to fitting the mixed model. User draws must have one
 #' column per GAM coefficient. Metropolis-Hastings sampling is unsupported:
 #' the GAM likelihood does not include the additional random effects.
@@ -302,7 +310,8 @@ derivative_samples.gamm4 <- function(object, ...) {
 #' @aliases posterior_samples.gamm4
 posterior_samples.gamm4 <- function(model, n = 1L, seed = NULL, ...,
                                       conditioning = NULL) {
-  if (is.null(conditioning) || identical(conditioning, "gam_component"))
+  conditioning <- mixed_conditioning(model, conditioning)
+  if (conditioning == "gam_component")
     return(posterior_samples.gam(gamm4_gam(model), n = n, seed = seed, ...))
   diagnostic_posterior_samples.default(model, n, seed,
     conditioning = conditioning, ...)
@@ -405,8 +414,11 @@ quantile_residuals.gamm4 <- function(model, type = c("pit", "quantile"),
 #' @rdname rootogram
 #' @name rootogram
 #' @aliases rootogram.gamm4
-rootogram.gamm4 <- function(object, ...) {
-  rootogram.gam(gamm4_gam(object), ...)
+rootogram.gamm4 <- function(object, ..., conditioning = NULL) {
+  model <- mixed_diagnostic_model(object, conditioning)
+  if (inherits(model, "gam")) return(rootogram.gam(model, ...))
+  rootogram_from_distribution(response_distribution(model), model$y,
+    family_name(model), ...)
 }
 
 #' @seealso [gamm4_support]

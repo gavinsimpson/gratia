@@ -1,8 +1,9 @@
 # Compare public entry points with the underlying GAM computation. Fixtures
 # are shared through setup.R; this helper supplies only assertion machinery.
-expect_gamm4_equivalent <- function(model, operation, ...) {
+expect_gamm4_equivalent <- function(model, operation, ..., conditioning = NULL) {
   fun <- get(operation, envir = asNamespace("gratia"))
-  actual <- fun(model, ...)
+  actual <- if (is.null(conditioning)) fun(model, ...) else
+    fun(model, ..., conditioning = conditioning)
   component <- model$gam
   component$residuals <- stats::residuals(model$mer, type = "working")
   expected <- fun(component, ...)

@@ -55,8 +55,10 @@
 \item{seed}{numeric; a random seed for the simulations.}
 
 \item{conditioning}{character or \code{NULL}; optional mixed-model conditioning
-mode. Existing gamm/gamm4 simulators default to the GAM component. Explicit
-full mixed-model modes currently use fitting observations.}
+mode. gamm4 defaults to \code{"conditional"}, holding all fitted effects fixed.
+\code{"gam_component"} explicitly uses its extracted GAM. The existing gamm
+simulator retains its GAM-component default. Full mixed-model modes currently
+use fitting observations.}
 
 \item{...}{arguments passed to methods. \code{simulate.gam()} and
 \code{simulate.scam()} pass \code{...} on to \code{predict.gam()}. As such you can pass

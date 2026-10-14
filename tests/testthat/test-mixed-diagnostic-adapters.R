@@ -33,13 +33,14 @@ test_that("Gaussian gamm draws retain correlated errors in fitting order", {
   expect_lt(abs(cor(draws[1, ], draws[2, ])), 0.08)
 })
 
-test_that("gamm4 preserves component default and exposes full conditioning", {
+test_that("gamm4 defaults to the full conditional fit and keeps explicit component checks", {
   skip_if_not_installed("gamm4", minimum_version = "0.2-7")
   set.seed(107)
   d <- data.frame(x = runif(80), g = factor(rep(1:8, each = 10)))
   d$y <- sin(d$x) + rep(rnorm(8, sd = 2), each = 10) + rnorm(80)
   m <- gamm4::gamm4(y ~ s(x, k = 5), random = ~(1 | g), data = d)
-  expect_equal(mixed_diagnostic_model(m), gamm4_gam(m))
+  expect_equal(mixed_diagnostic_model(m, "gam_component"), gamm4_gam(m))
+  expect_equal(mixed_diagnostic_model(m), mixed_diagnostic_model(m, "conditional"))
   p <- mixed_diagnostic_model(m, "conditional")
   expect_equal(p$fitted.values, as.vector(fitted(m$mer)))
   marginal <- mixed_diagnostic_model(m, "marginal")

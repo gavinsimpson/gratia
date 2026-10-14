@@ -30,8 +30,10 @@
 #'   for excluding the effects of random effect terms.
 #' @param newdata Deprecated. Use `data` instead.
 #' @param conditioning character or `NULL`; optional mixed-model conditioning
-#'   mode. Existing gamm/gamm4 simulators default to the GAM component. Explicit
-#'   full mixed-model modes currently use fitting observations.
+#'   mode. gamm4 defaults to `"conditional"`, holding all fitted effects fixed.
+#'   `"gam_component"` explicitly uses its extracted GAM. The existing gamm
+#'   simulator retains its GAM-component default. Full mixed-model modes currently
+#'   use fitting observations.
 #' @param family_index numeric; for grouped-family models, one integer family
 #'   index per requested prediction row. See Details.
 #'

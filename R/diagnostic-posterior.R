@@ -452,7 +452,8 @@ posterior_samples.sdmTMB <- function(model, n = 1L, seed = NULL,
 
 #' @export
 diagnostic_posterior_observed.gamm4 <- function(model, conditioning = NULL, ...) {
-  if (is.null(conditioning) || conditioning == "gam_component") {
+  conditioning <- mixed_conditioning(model, conditioning)
+  if (conditioning == "gam_component") {
     return(diagnostic_posterior_observed.gam(gamm4_gam(model)))
   }
   mer <- model$mer
@@ -474,7 +475,8 @@ diagnostic_posterior_observed.gamm4 <- function(model, conditioning = NULL, ...)
 #' @export
 diagnostic_posterior_samples.gamm4 <- function(model, n, seed = NULL,
                                               conditioning = NULL, ...) {
-  if (is.null(conditioning) || conditioning == "gam_component") {
+  conditioning <- mixed_conditioning(model, conditioning)
+  if (conditioning == "gam_component") {
     return(diagnostic_posterior_samples.gam(gamm4_gam(model), n, seed, ...))
   }
   diagnostic_posterior_samples.default(model, n, seed, conditioning, ...)
@@ -483,7 +485,8 @@ diagnostic_posterior_samples.gamm4 <- function(model, n, seed = NULL,
 #' @export
 diagnostic_posterior_sampler.gamm4 <- function(model, n, seed = NULL,
                                               conditioning = NULL, ...) {
-  if (is.null(conditioning) || conditioning == "gam_component") {
+  conditioning <- mixed_conditioning(model, conditioning)
+  if (conditioning == "gam_component") {
     return(diagnostic_posterior_sampler.gam(gamm4_gam(model), n, seed, ...))
   }
   diagnostic_gaussian_posterior_options(list(...), "gamm4")

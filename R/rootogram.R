@@ -17,6 +17,9 @@
 #' @param breaks for continuous responses, how to group the response. Can be
 #'   anything that is acceptable as the `breaks` argument of
 #'   [graphics::hist.default()]
+#' @param conditioning for gamm4, `"conditional"` (default) checks the response
+#'   distribution at all fitted effects, `"marginal"` averages over new effects,
+#'   and `"gam_component"` checks the extracted GAM.
 #' @param ... arguments passed to other methods
 #'
 #' @references Kleiber, C., Zeileis, A., (2016) Visualizing Count Data
@@ -343,4 +346,47 @@
   plt <- plt + labs(y = ylab, x = xlab)
 
   plt
+}
+
+# Expected frequencies need only a fitted response CDF. Preserve each row's
+# parameters and sum its bin probabilities, including when effects are averaged.
+rootogram_from_distribution <- function(distribution, y, family,
+                                        max_count = NULL, breaks = "Sturges", ...) {
+  name <- if (family == "gaussian") "Gaussian" else if (family == "poisson")
+    "Poisson" else if (startsWith(family, "Negative Binomial")) "Negative Binomial" else
+      stop("Only <Poisson, Negative Binomial, Gaussian> models supported.", call. = FALSE)
+  if (name == "Gaussian") {
+    h <- graphics::hist(y, breaks = breaks, plot = FALSE)
+    lower <- utils::head(h$breaks, -1L); upper <- utils::tail(h$breaks, -1L)
+    observed <- h$counts
+  } else {
+    lower <- seq(0, max_count %||% rootogram_max_count(y), by = 1L)
+    upper <- lower
+    observed <- as.integer(table(factor(y, levels = lower)))
+    lower <- lower - 1
+  }
+  probability <- function(lo, hi) {
+    log_upper <- distribution$cdf(hi, log_p = TRUE)
+    use_upper_tail <- log_upper > log(.5)
+    a <- ifelse(use_upper_tail,
+      distribution$cdf(lo, log_p = TRUE, lower_tail = FALSE), log_upper)
+    b <- ifelse(use_upper_tail,
+      distribution$cdf(hi, log_p = TRUE, lower_tail = FALSE),
+      distribution$cdf(lo, log_p = TRUE))
+    value <- exp(a) * -expm1(b - a)
+    value[which(a == b)] <- 0
+    value
+  }
+  out <- tibble::tibble(.bin = if (name == "Gaussian") lower else upper,
+    .observed = observed,
+    .fitted = vapply(seq_along(lower), function(i)
+      sum(probability(lower[i], upper[i])), numeric(1)))
+  if (name == "Gaussian") {
+    attr(out, "sigma") <- sqrt(distribution$variance)
+    attr(out, "mid") <- h$mids
+    attr(out, "width") <- diff(h$breaks)
+  }
+  class(out) <- c("rootogram", class(out))
+  attr(out, "distribution") <- name
+  out
 }

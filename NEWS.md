@@ -2,6 +2,14 @@
 
 ## User visible changes
 
+* gamm4 diagnostics, response simulations and posterior predictive checks now
+  default to `conditioning = "conditional"`, using the full fitted mixed model.
+  Response references hold fitted smooth and grouping effects fixed; posterior
+  predictive checks include uncertainty in those fitted effects. Use
+  `conditioning = "gam_component"` explicitly for the earlier GAM-only behaviour,
+  including coefficient draws supplied by the user or predictions at new data.
+
+
 * Residual checks and posterior predictive checks now share calculations across
   lm, glm, gam/bam, gamm/gamm4, glmmTMB, univariate GJRM and sdmTMB models.
   Probability integral transform (PIT) residuals express observations as fitted
