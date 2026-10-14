@@ -224,7 +224,8 @@ test_that("parallel evaluation leaves seeded smooth calibration unchanged", {
   baseline <- smooth_estimates(smooth_band_model, interval = "simultaneous",
     n = 10, n_sim = 120, seed = 7)
   withr::defer(mirai::daemons(0))
-  mirai::daemons(1, dispatcher = FALSE)
+  # Let exit handlers finish writing worker coverage before the process exits.
+  mirai::daemons(1, dispatcher = FALSE, autoexit = NA)
   expect_identical(smooth_estimates(smooth_band_model, interval = "simultaneous",
     n = 10, n_sim = 120, seed = 7), baseline)
 })
