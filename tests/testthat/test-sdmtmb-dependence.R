@@ -90,10 +90,15 @@ test_that("native temporal simulations retain AR1 field covariance", {
   skip_if_not_installed("sdmTMB")
   withr::local_options(gratia.diagnostics.marginal_draws = 29L)
   m <- sdmtmb_dependence_state(temporal = TRUE)
-  values <- simulate(m, nsim = 600, seed = 1, re_form = NA,
+  values <- simulate(m, nsim = 2000, seed = 1, re_form = NA,
     observation_error = FALSE, silent = TRUE)
-  expect_equal(cor(values[1, ], values[5, ]), 0.7, tolerance = 0.08)
-  expect_equal(cor(values[1, ], values[9, ]), 0.7^2, tolerance = 0.08)
+  # Compare on Fisher's z scale, allowing five sampling standard errors.
+  # This retains checks for independence and for the wrong correlation at lag 2.
+  z_tolerance <- 5 / sqrt(ncol(values) - 3)
+  expect_lt(abs(atanh(cor(values[1, ], values[5, ])) - atanh(0.7)),
+    z_tolerance)
+  expect_lt(abs(atanh(cor(values[1, ], values[9, ])) - atanh(0.7^2)),
+    z_tolerance)
   for (conditioning in c("conditional", "marginal")) {
     dist <- sdmtmb_diagnostic_model(m, conditioning, field_method = "mle-mvn-integrated")$distribution
     expect_false(dist$independent)
