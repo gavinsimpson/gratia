@@ -15,7 +15,7 @@ graphics. The design closely follows Kleiber & Zeileis (2016).
 
 ``` r
 # S3 method for class 'gamm4'
-rootogram(object, ...)
+rootogram(object, ..., conditioning = NULL)
 
 rootogram(object, ...)
 
@@ -32,6 +32,12 @@ rootogram(object, max_count = NULL, breaks = "Sturges", ...)
 - ...:
 
   arguments passed to other methods
+
+- conditioning:
+
+  for gamm4, `"conditional"` (default) checks the response distribution
+  at all fitted effects, `"marginal"` averages over new effects, and
+  `"gam_component"` checks the extracted GAM.
 
 - max_count:
 

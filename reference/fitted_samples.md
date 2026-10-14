@@ -60,7 +60,8 @@ fitted_samples(
 
 - model:
 
-  a fitted model of the supported types
+  a fitted model of the supported types; see
+  [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - ...:
 
@@ -227,19 +228,15 @@ explicit `data` are evaluated in their own row order.
 
 ## Note
 
-Models with offset terms supplied via the `offset` argument to
-[`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) etc. are ignored
-by
-[`mgcv::predict.gam()`](https://rdrr.io/pkg/mgcv/man/predict.gam.html).
-As such, this kind of offset term is also ignored by
-[`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md).
-Offset terms that are included in the model formula supplied to
-[`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) etc are not
-ignored and the posterior samples produced will reflect those offset
-term values. This has the side effect of requiring any new data values
-provided to
-[`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md)
-via the `data` argument must include the offset variable.
+With `data = NULL`, fitting offsets are retained, including offsets
+supplied through the fitting function's `offset` argument. Explicit
+prediction data follow
+[`mgcv::predict.gam()`](https://rdrr.io/pkg/mgcv/man/predict.gam.html):
+offsets in formulas are evaluated from the prediction data, while
+offsets supplied through the fitting function's `offset` argument are
+not transferred to new observations. Include offsets in the formula when
+predicting at new data; the required offset variables must then be
+present in `data`.
 
 ## References
 

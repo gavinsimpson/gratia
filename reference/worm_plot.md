@@ -11,7 +11,7 @@ worm_plot(model, ...)
 worm_plot(
   model,
   method = NULL,
-  type = c("deviance", "response", "pearson"),
+  type = NULL,
   n_uniform = 10,
   n_simulate = 50,
   level = 0.9,
@@ -26,6 +26,8 @@ worm_plot(
   point_alpha = 1,
   line_col = "red",
   seed = NULL,
+  by_family = NULL,
+  conditioning = NULL,
   ...
 )
 
@@ -36,17 +38,39 @@ worm_plot(model, ...)
 worm_plot(model, ...)
 
 # S3 method for class 'gamm4'
-worm_plot(model, ...)
+worm_plot(model, conditioning = NULL, ...)
+
+# S3 method for class 'gamm'
+worm_plot(model, conditioning = NULL, ...)
+
+# S3 method for class 'gratia_diagnostic_proxy'
+worm_plot(model, type = "quantile", ...)
+
+# S3 method for class 'lme'
+worm_plot(model, conditioning = NULL, ...)
+
+# S3 method for class 'merMod'
+worm_plot(model, conditioning = NULL, ...)
+
+# S3 method for class 'gamlss'
+worm_plot(model, ..., type = "quantile", seed = NULL)
+
+# S3 method for class 'sdmTMB'
+worm_plot(
+  model,
+  conditioning = NULL,
+  component = "response",
+  field_method = c("mle-mvn", "mle-eb", "mle-mvn-integrated"),
+  ...
+)
 ```
 
 ## Arguments
 
 - model:
 
-  a fitted model. Currently models inheriting from class `"gam"`, as
-  well as classes `"glm"` and `"lm"` from calls to
-  [stats::glm](https://rdrr.io/r/stats/glm.html) or
-  [stats::lm](https://rdrr.io/r/stats/lm.html) are supported.
+  a fitted model supported by
+  [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - ...:
 
@@ -54,39 +78,59 @@ worm_plot(model, ...)
 
 - method:
 
-  character or `NULL`; method used to generate theoretical quantiles.
-  The default, `NULL`, selects `"simulate"` for models fitted with
-  [`mgcv::tw()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html) or
-  [`mgcv::Tweedie()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html) and
-  `"uniform"` otherwise. Explicitly supplying a method overrides this
-  selection, subject to availability of the required family functions.
-  `"uniform"` generates reference quantiles using random draws from a
-  uniform distribution and the inverse cumulative distribution function
-  (CDF) of the fitted values. The reference quantiles are averaged over
-  `n_uniform` draws. `"simulate"` generates reference quantiles by
-  simulating new response data from the model at the observed values of
-  the covariates, which are then residualised to generate reference
-  quantiles, using `n_simulate` simulated data sets. `"normal"`
-  generates reference quantiles using the standard normal distribution.
-  `"uniform"` is often more computationally efficient, but Tweedie
-  quantiles are expensive to compute. `"simulate"` allows reference
-  bands to be drawn on the QQ-plot. `"normal"` should be avoided but is
-  used as a fall back if a random number generator (`"simulate"`) or the
-  inverse of the CDF are not available from the `family` used during
-  model fitting (`"uniform"`).
+  character or `NULL`; how to calculate reference quantiles. Probability
+  integral transform (PIT) and quantile residuals use fixed uniform and
+  standard-normal references, respectively. For quantile residuals,
+  `"normal"` also selects that fixed reference; other named methods
+  require traditional residuals. For deviance, response and Pearson
+  residuals:
 
-  Note that `method = "direct"` is deprecated in favour of
-  `method = "uniform"`.
+  - `"uniform"` applies the fitted inverse cumulative distribution
+    function (CDF) to randomised uniform quantiles and averages the
+    resulting ordered residuals over `n_uniform` draws.
+
+  - `"simulate"` generates `n_simulate` response data sets at the
+    fitting covariates. Responses are generated together when needed to
+    preserve dependence, and their ordered residuals supply reference
+    values and bands.
+
+  - `"marginal"` approximates the pooled distribution of individual
+    residuals, without bands for dependence. This is selected for BAM
+    GEE and PQL correlations that do not define a joint response
+    distribution. Explicit joint simulation is unavailable in those
+    cases.
+
+  - `"normal"` uses a normal approximation fitted to the residual
+    location and scale. For dependent responses it omits bands based on
+    independence.
+
+  - `"direct"` is deprecated in favour of `"uniform"`.
+
+  For ordinary GAMs, `NULL` selects `"simulate"` for Tweedie and
+  `"uniform"` otherwise. Missing inverse CDFs cause a switch to
+  simulation; missing response generators can cause a switch to a normal
+  approximation for independent responses. Dependent responses use joint
+  simulation when available, or marginal checks otherwise. For grouped
+  families, `NULL` selects simulation if every component has a
+  generator, or inverse-CDF sampling with a message if every component
+  has an inverse CDF. If neither is available, it gives an error; a
+  normal approximation must be requested explicitly.
 
 - type:
 
-  character; type of residuals to use. Only `"deviance"`, `"response"`,
-  and `"pearson"` residuals are allowed.
+  character or `NULL`; residual type: `"deviance"`, `"response"`,
+  `"pearson"`, `"pit"`, or `"quantile"`. `NULL` uses the model-specific
+  default: deviance for ordinary lm/glm/GAM fits, and quantile for
+  supported grouped families, GJRM, sdmTMB and full mixed-model checks.
+  glmmTMB uses Pearson residuals conditionally and response residuals
+  marginally. Extracted GAM components follow the ordinary GAM defaults.
+  See
+  [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - n_uniform:
 
-  numeric; number of times to randomize uniform quantiles in the direct
-  computation method (`method = "uniform"`).
+  numeric; number of inverse-CDF draws to average when
+  `method = "uniform"`.
 
 - n_simulate:
 
@@ -96,7 +140,8 @@ worm_plot(model, ...)
 - level:
 
   numeric; the coverage level for reference intervals. Must be strictly
-  `0 < level < 1`. Only used with `method = "simulate"`.
+  `0 < level < 1`. Used for quantile reference bands and traditional
+  `method = "simulate"` or `"normal"` bands.
 
 - ylab:
 
@@ -105,7 +150,7 @@ worm_plot(model, ...)
 
 - xlab:
 
-  character or expression; the label for the y axis. If not supplied, a
+  character or expression; the label for the x axis. If not supplied, a
   suitable label will be generated.
 
 - title:
@@ -128,16 +173,17 @@ worm_plot(model, ...)
 
 - ci_col:
 
-  fill colour for the reference interval when `method = "simulate"`.
+  fill colour for reference intervals, including bands for quantile
+  residuals.
 
 - ci_alpha:
 
-  alpha transparency for the reference interval when
-  `method = "simulate"`.
+  alpha transparency for reference intervals.
 
 - point_col:
 
-  colour of points on the QQ plot.
+  constant point colour when family components are not mapped to colour.
+  Pooled grouped diagnostics instead colour points by component.
 
 - point_alpha:
 
@@ -150,7 +196,60 @@ worm_plot(model, ...)
 - seed:
 
   numeric; the random number seed to use for `method = "simulate"` and
-  `method = "uniform"`.
+  `method = "uniform"`, and for randomised quantile residuals.
+
+- by_family:
+
+  logical or `NULL`; separate indexed grouped-family components into
+  facets. The default pools quantile residuals with component colours
+  and facets traditional residuals. `TRUE` and `FALSE` explicitly select
+  the layout. In
+  [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
+  observed-versus-fitted values always use component facets. Standalone
+  [`observed_fitted_plot()`](https://gavinsimpson.github.io/gratia/reference/observed_fitted_plot.md)
+  facets by default and permits explicit pooling. Ignored for ordinary
+  models.
+
+- conditioning:
+
+  character or `NULL`; `"conditional"` holds fitted random effects
+  fixed, `"marginal"` averages over new effects, and `"gam_component"`
+  uses the extracted GAM. Availability and defaults depend on the model;
+  see
+  [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
+
+- component:
+
+  character; for delta sdmTMB models, select the complete `"response"`,
+  occurrence (`"binomial"`), or `"positive"` component.
+  Positive-component checks use only observations with positive
+  responses.
+
+- field_method:
+
+  how to treat fitted sdmTMB fields: hold one posterior draw fixed
+  (`"mle-mvn"`), hold estimates fixed (`"mle-eb"`), or average over
+  fitted-field uncertainty (`"mle-mvn-integrated"`). See
+  [`quantile_residuals()`](https://gavinsimpson.github.io/gratia/reference/quantile_residuals.md)
+  and
+  [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
+
+## Details
+
+See
+[`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
+for grouped-family defaults, supported distributions, pooling and
+separate component panels. PIT and quantile residuals use fixed uniform
+and standard-normal reference quantiles. For ideal independent
+responses, bands are pointwise intervals for ordered residuals. For
+dependent responses, bands use simulations that preserve dependence when
+available; otherwise they are omitted. Residuals calculated from
+simulation ranks also use simulated bands. See
+[diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md)
+for these choices and limits. Bands condition on fitted parameters and
+exclude fitting uncertainty; they do not provide simultaneous coverage.
+Traditional residuals use the fitted response distributions or a normal
+approximation.
 
 ## Note
 
@@ -178,12 +277,12 @@ m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
   method = "REML"
 )
 
-## Worm plot; default using direct randomization of uniform quantiles
+## The default uses inverse-CDF sampling of randomised uniform quantiles.
 ## Note no reference bands are drawn with this method.
 worm_plot(m)
 
 
-## Alternatively use simulate new data from the model, which
+## Alternatively simulate new data from the model, which
 ## allows construction of reference intervals for the Q-Q plot
 worm_plot(m,
   method = "simulate", point_col = "steelblue",
@@ -191,6 +290,6 @@ worm_plot(m,
 )
 
 
-## ... or use the usual normality assumption
+## ... or request a normal approximation for the residuals.
 worm_plot(m, method = "normal")
 ```

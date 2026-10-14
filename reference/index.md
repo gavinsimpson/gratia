@@ -34,6 +34,16 @@ plots](https://gavinsimpson.github.io/gratia/articles/custom-plotting.md).
   [`draw(`*`<glmmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
   : Effects and diagnostics for glmmTMB models
 
+- [`smooths(`*`<sdmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/sdmTMB-methods.md)
+  [`get_smooths_by_id(`*`<sdmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/sdmTMB-methods.md)
+  [`smooth_coefs(`*`<sdmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/sdmTMB-methods.md)
+  [`smooth_estimates(`*`<sdmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/sdmTMB-methods.md)
+  [`parametric_terms(`*`<sdmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/sdmTMB-methods.md)
+  [`parametric_effects(`*`<sdmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/sdmTMB-methods.md)
+  [`assemble(`*`<sdmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/sdmTMB-methods.md)
+  [`draw(`*`<sdmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/sdmTMB-methods.md)
+  : Formula effects for sdmTMB models
+
 - [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
   :
 
@@ -151,6 +161,8 @@ Assess model adequacy with
 [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
 individual diagnostic plots, residuals, and measures of concurvity.
 
+- [`diagnostic_support`](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md)
+  : Model diagnostic support and conventions
 - [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
   : Model diagnostic plots
 - [`qq_plot()`](https://gavinsimpson.github.io/gratia/reference/qq_plot.md)
@@ -163,12 +175,23 @@ individual diagnostic plots, residuals, and measures of concurvity.
   : Draw a rootogram
 - [`observed_fitted_plot()`](https://gavinsimpson.github.io/gratia/reference/observed_fitted_plot.md)
   : Plot of fitted against observed response values
+- [`posterior_predictive_plot()`](https://gavinsimpson.github.io/gratia/reference/posterior_predictive_plot.md)
+  : Posterior predictive check of the response distribution
+- [`scalable_qq_plot()`](https://gavinsimpson.github.io/gratia/reference/scalable_qq_plot.md)
+  [`scalable_worm_plot()`](https://gavinsimpson.github.io/gratia/reference/scalable_qq_plot.md)
+  [`scalable_residuals_linpred_plot()`](https://gavinsimpson.github.io/gratia/reference/scalable_qq_plot.md)
+  [`scalable_observed_fitted_plot()`](https://gavinsimpson.github.io/gratia/reference/scalable_qq_plot.md)
+  [`scalable_residuals_hist_plot()`](https://gavinsimpson.github.io/gratia/reference/scalable_qq_plot.md)
+  : Scalable model diagnostic plots
 - [`residuals_hist_plot()`](https://gavinsimpson.github.io/gratia/reference/residuals_hist_plot.md)
   : Histogram of model residuals
 - [`residuals_linpred_plot()`](https://gavinsimpson.github.io/gratia/reference/residuals_linpred_plot.md)
   : Plot of residuals versus linear predictor values
 - [`quantile_residuals()`](https://gavinsimpson.github.io/gratia/reference/quantile_residuals.md)
-  : Randomised residuals
+  : PIT and randomised quantile residuals
+- [`residual_correlation()`](https://gavinsimpson.github.io/gratia/reference/residual_correlation.md)
+  [`residual_correlation_plot()`](https://gavinsimpson.github.io/gratia/reference/residual_correlation.md)
+  : Ordered residual correlation diagnostics
 - [`add_residuals()`](https://gavinsimpson.github.io/gratia/reference/add_residuals.md)
   : Add residuals from a model to a data frame
 - [`add_residuals(`*`<gam>`*`)`](https://gavinsimpson.github.io/gratia/reference/add_residuals.gam.md)
@@ -249,10 +272,11 @@ Simulation](https://gavinsimpson.github.io/gratia/articles/posterior-simulation.
 - [`derivative_samples()`](https://gavinsimpson.github.io/gratia/reference/derivative_samples.md)
   : Posterior expectations of derivatives from an estimated model
 - [`simulate(`*`<gamm4>`*`)`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
+  [`simulate(`*`<gamlss>`*`)`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
   [`simulate(`*`<gam>`*`)`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
   [`simulate(`*`<gamm>`*`)`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
   [`simulate(`*`<scam>`*`)`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
-  : Simulate from the posterior distribution of a GAM
+  : Simulate responses from a fitted model
 - [`add_fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/add_fitted_samples.md)
   [`add_predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/add_fitted_samples.md)
   [`add_posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/add_fitted_samples.md)

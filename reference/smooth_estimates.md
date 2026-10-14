@@ -31,6 +31,11 @@ smooth_estimates(
   clip = FALSE,
   envir = NULL,
   back_transform = FALSE,
+  interval = NULL,
+  ci_level = 0.95,
+  n_sim = 10000,
+  n_cores = 1,
+  seed = NULL,
   ...
 )
 ```
@@ -149,16 +154,64 @@ smooth_estimates(
   does not change effect values or their intervals at the chosen
   evaluation points.
 
+- interval:
+
+  character or `NULL`; `NULL` (the default) returns estimates and
+  standard errors only. `"confidence"` adds pointwise intervals and
+  `"simultaneous"` adds a band covering the finite evaluation grid of
+  each fitted smooth. `"credible"` is an alias for `"confidence"`; the
+  default Bayesian covariance gives approximate Bayesian credible
+  intervals.
+
+- ci_level:
+
+  numeric; interval coverage, strictly between zero and one.
+
+- n_sim, n_cores:
+
+  positive integers; coefficient draws and simulation cores for
+  simultaneous bands. Parallel simulation requires OpenMP support.
+
+- seed:
+
+  integer or `NULL`; an explicit simulation seed preserves the caller's
+  RNG state. Shared coefficient draws make results independent of
+  selected smooth order and parallel evaluation scheduling.
+
 ## Value
 
 A data frame (tibble), which is of class `"smooth_estimates"`.
 
 ## Details
 
+For distributional and glmmTMB models with multiple linear predictors,
+an optional `.model` column identifies the model part or parameter
+associated with each smooth. This display metadata is retained in nested
+output and subsets, allowing
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) to
+reproduce model subtitles from saved estimates. Smooth labels and
+selection remain unchanged.
+
 When distinct fitted terms share both their smooth label and type (for
 example, tensor products of soap-film components), `.smooth_id` contains
 their fitted smooth indices. This preserves their identity in saved
 estimates and plots without changing the labels supplied by mgcv.
+
+Simultaneous coverage is per fitted smooth over its valid evaluation
+points, including all its slices and factor levels. Separate factor-by
+smooths remain separate coverage sets when grouped in one plot. This
+finite-grid band does not claim joint coverage across selected smooths
+or the full fitted model. Increasing grid resolution improves the
+approximation to whole-curve coverage. `overall_uncertainty` and
+covariance options apply to both interval types. Simultaneous intervals
+for SCAM models are unsupported. SCAM smooth estimates retain the fitted
+centring and coefficient transformation when evaluation points are
+changed. Pointwise intervals use the covariance of the constrained
+coefficients. With `overall_uncertainty = TRUE`, their standard errors
+also include intercept uncertainty and its covariance with the smooth;
+estimates remain centred. Models without an intercept use smooth-only
+uncertainty for either setting. Smoothing-parameter uncertainty is not
+currently supported for SCAM models; use `unconditional = FALSE`.
 
 For explicit `data`, missing covariates needed by a smooth produce `NA`
 estimates and standard errors at those positions. Missing values in

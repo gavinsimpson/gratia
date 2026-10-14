@@ -7,7 +7,7 @@ Plot of residuals versus linear predictor values
 ``` r
 residuals_linpred_plot(
   model,
-  type = c("deviance", "pearson", "response", "pit", "quantile"),
+  type = NULL,
   ylab = NULL,
   xlab = NULL,
   title = NULL,
@@ -16,7 +16,11 @@ residuals_linpred_plot(
   point_col = "grey20",
   point_alpha = 1,
   line_col = "red",
-  seed = NULL
+  seed = NULL,
+  by_family = NULL,
+  rank = NULL,
+  conditioning = NULL,
+  ...
 )
 ```
 
@@ -24,22 +28,18 @@ residuals_linpred_plot(
 
 - model:
 
-  a fitted model. Currently only class `"gam"`.
+  a fitted model supported by
+  [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - type:
 
-  character; type of residuals to use. One of `"deviance"`,
-  `"response"`, `"pearson"`, `"pit"`, and `"quantile"` residuals are
-  allowed. `"pit"` uses probability integral transform (PIT) residuals,
-  which, if the model is correct should be approximately uniformly
-  distributed, while `"quantile"` transforms the PIT residuals through
-  application of the inverse CDF of the standard normal, and therefore
-  the quantile residuals should be approximately normally distributed
-  (mean = 0, sd = 1) if the model is correct. PIT and quantile residuals
-  are not yet available for most families that can be handled by
-  [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html), but most standard
-  families are supported, e.g. those used by
-  [`glm()`](https://rdrr.io/r/stats/glm.html).
+  character or `NULL`; residual type: `"deviance"`, `"pearson"`,
+  `"response"`, `"pit"`, or `"quantile"`. Grouped models automatically
+  use quantile residuals when all active components are supported,
+  otherwise all use deviance residuals with a message. Ordinary models
+  retain deviance residuals by default. See
+  [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
+  for distributional support.
 
 - ylab:
 
@@ -48,7 +48,7 @@ residuals_linpred_plot(
 
 - xlab:
 
-  character or expression; the label for the y axis. If not supplied, a
+  character or expression; the label for the x axis. If not supplied, a
   suitable label will be generated.
 
 - title:
@@ -68,10 +68,8 @@ residuals_linpred_plot(
 
 - point_col:
 
-  colour used to draw points in the plots. See
-  [`graphics::par()`](https://rdrr.io/r/graphics/par.html) section
-  **Color Specification**. This is passed to the individual plotting
-  functions, and therefore affects the points of all plots.
+  constant point colour when components are not mapped to colour. Pooled
+  grouped diagnostics instead colour points by component.
 
 - point_alpha:
 
@@ -84,3 +82,37 @@ residuals_linpred_plot(
 - seed:
 
   integer; random seed to use for PIT or quantile residuals.
+
+- by_family:
+
+  logical or `NULL`; separate indexed grouped-family components into
+  facets. The default pools quantile residuals with component colours
+  and facets traditional residuals. `TRUE` and `FALSE` explicitly select
+  the layout. In
+  [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
+  observed-versus-fitted values always use component facets. Standalone
+  [`observed_fitted_plot()`](https://gavinsimpson.github.io/gratia/reference/observed_fitted_plot.md)
+  facets by default and permits explicit pooling. Ignored for ordinary
+  models.
+
+- rank:
+
+  logical or `NULL`; use within-component ranks on the horizontal axis
+  of residual-versus-predictor plots. The default ranks pooled grouped
+  plots and retains original predictors in facets. `TRUE` or `FALSE`
+  overrides this independently of the residual type and layout. Only
+  finite observations included in each component determine its ranks;
+  average ties are used.
+
+- conditioning:
+
+  character or `NULL`; `"conditional"` holds fitted random effects
+  fixed, `"marginal"` averages over new effects, and `"gam_component"`
+  uses the extracted GAM. Availability and defaults depend on the model;
+  see
+  [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
+
+- ...:
+
+  optional arguments passed to model preparation, such as the sdmTMB
+  `field_method`.

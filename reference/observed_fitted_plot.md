@@ -13,7 +13,10 @@ observed_fitted_plot(
   subtitle = NULL,
   caption = NULL,
   point_col = "grey20",
-  point_alpha = 1
+  point_alpha = 1,
+  by_family = NULL,
+  conditioning = NULL,
+  ...
 )
 ```
 
@@ -21,7 +24,8 @@ observed_fitted_plot(
 
 - model:
 
-  a fitted model. Currently only class `"gam"`.
+  a fitted model supported by
+  [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - ylab:
 
@@ -30,7 +34,7 @@ observed_fitted_plot(
 
 - xlab:
 
-  character or expression; the label for the y axis. If not supplied, a
+  character or expression; the label for the x axis. If not supplied, a
   suitable label will be generated.
 
 - title:
@@ -50,11 +54,33 @@ observed_fitted_plot(
 
 - point_col:
 
-  colour used to draw points in the plots. See
-  [`graphics::par()`](https://rdrr.io/r/graphics/par.html) section
-  **Color Specification**. This is passed to the individual plotting
-  functions, and therefore affects the points of all plots.
+  constant point colour when components are not mapped to colour. Pooled
+  grouped diagnostics instead colour points by component.
 
 - point_alpha:
 
   numeric; alpha transparency for points in plots.
+
+- by_family:
+
+  logical or `NULL`; separate indexed grouped-family components into
+  facets. The default pools quantile residuals with component colours
+  and facets traditional residuals. `TRUE` and `FALSE` explicitly select
+  the layout. In
+  [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
+  observed-versus-fitted values always use component facets. Standalone
+  `observed_fitted_plot()` facets by default and permits explicit
+  pooling. Ignored for ordinary models.
+
+- conditioning:
+
+  character or `NULL`; `"conditional"` holds fitted random effects
+  fixed, `"marginal"` averages over new effects, and `"gam_component"`
+  uses the extracted GAM. Availability and defaults depend on the model;
+  see
+  [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
+
+- ...:
+
+  optional arguments passed to model preparation, such as the sdmTMB
+  `field_method`.

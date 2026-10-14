@@ -5,8 +5,32 @@ Draw samples from the posterior distribution of an estimated model
 ## Usage
 
 ``` r
+# S3 method for class 'lm'
+posterior_samples(model, n = 1L, seed = NULL, ...)
+
+# S3 method for class 'glm'
+posterior_samples(model, n = 1L, seed = NULL, ...)
+
+# S3 method for class 'glmmTMB'
+posterior_samples(model, n = 1L, seed = NULL, conditioning = NULL, ...)
+
+# S3 method for class 'sdmTMB'
+posterior_samples(model, n = 1L, seed = NULL, conditioning = NULL, ...)
+
+# S3 method for class 'gamlss'
+posterior_samples(model, n = 1L, seed = NULL, ...)
+
+# S3 method for class 'gamm'
+posterior_samples(model, n = 1L, seed = NULL, conditioning = NULL, ...)
+
+# S3 method for class 'lme'
+posterior_samples(model, n = 1L, seed = NULL, conditioning = NULL, ...)
+
+# S3 method for class 'merMod'
+posterior_samples(model, n = 1L, seed = NULL, conditioning = NULL, ...)
+
 # S3 method for class 'gamm4'
-posterior_samples(model, ...)
+posterior_samples(model, n = 1L, seed = NULL, ..., conditioning = NULL)
 
 posterior_samples(model, ...)
 
@@ -57,7 +81,16 @@ posterior_samples(
 
 - model:
 
-  a fitted model of the supported types
+  a fitted model of the supported types; see
+  [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
+
+- n:
+
+  numeric; the number of posterior samples to return.
+
+- seed:
+
+  numeric; a random seed for the simulations.
 
 - ...:
 
@@ -73,19 +106,16 @@ posterior_samples(
   [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
   method.
 
-- n:
+- conditioning:
 
-  numeric; the number of posterior samples to return.
+  character or `NULL`; mixed-model conditioning mode; see
+  [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - data:
 
   data frame; new observations at which the posterior draws from the
   model should be evaluated. If not supplied, the data used to fit the
   model will be used for `data`, if available in `model`.
-
-- seed:
-
-  numeric; a random seed for the simulations.
 
 - method:
 
@@ -142,8 +172,16 @@ posterior_samples(
 
 - weights:
 
-  numeric; a vector of prior weights. If `data` is null then defaults to
-  `object[["prior.weights"]]`, otherwise a vector of ones.
+  numeric; response sampling weights for GAM methods. An explicit vector
+  overrides the fitting weights; a single value applies to every
+  observation. With `data = NULL`, the default is the fitted prior
+  weights, except factor-valued binomial responses retain one Bernoulli
+  trial per observation. With prediction data, the default is a vector
+  of ones. For ordinary Gaussian and Gamma responses, larger weights
+  reduce response variance (precision weights). For binomial responses,
+  weights give integer trial counts. They do not alter the fitted
+  coefficient covariance. Include positions restored by `na.exclude`
+  when supplying weights for fitting rows.
 
 - draws:
 
@@ -186,6 +224,15 @@ values in long format. The columns are
 
 ## Details
 
+The `lm`, `glm`, `glmmTMB`,
+[`GJRM::gamlss`](https://rdrr.io/pkg/GJRM/man/gamlss.html), `sdmTMB`,
+and full mixed-model diagnostic samplers currently use the fitting
+observations only. They draw coefficients together using Gaussian
+approximations. See
+[`posterior_predictive_plot()`](https://gavinsimpson.github.io/gratia/reference/posterior_predictive_plot.md)
+for which additional distribution parameters remain fixed and how random
+effects are treated for each fitter.
+
 With no explicit `data`, observation rows follow the fitted model's
 `na.action`. `na.exclude` restores excluded rows as `NA` in every draw;
 `na.omit` returns retained rows only. `.row` indexes the fitting data
@@ -195,20 +242,25 @@ predictors give `NA` draws. An explicit prediction `na.action` in `...`
 is honoured without renumbering retained rows. Restoration does not
 consume random numbers.
 
+For Gaussian identity-link `bam` fits, first-order autoregressive (AR1)
+errors make consecutive responses correlated. Responses are drawn
+together to retain this fitted correlation, restarting at each
+`AR.start` segment. These draws currently use the fitting observations
+only. For other families or links, the AR1 correction applies to working
+residuals used during fitting. It does not specify a joint distribution
+of actual responses, so sampling produces an error.
+
 ## Note
 
-Models with offset terms supplied via the `offset` argument to
-[`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) etc. are ignored
-by
-[`mgcv::predict.gam()`](https://rdrr.io/pkg/mgcv/man/predict.gam.html).
-As such, this kind of offset term is also ignored by
-`posterior_samples()`. Offset terms that are included in the model
-formula supplied to
-[`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) etc are not
-ignored and the posterior samples produced will reflect those offset
-term values. This has the side effect of requiring any new data values
-provided to `posterior_samples()` via the `data` argument must include
-the offset variable.
+With `data = NULL`, fitting offsets are retained, including offsets
+supplied through the fitting function's `offset` argument. Explicit
+prediction data follow
+[`mgcv::predict.gam()`](https://rdrr.io/pkg/mgcv/man/predict.gam.html):
+offsets in formulas are evaluated from the prediction data, while
+offsets supplied through the fitting function's `offset` argument are
+not transferred to new observations. Include offsets in the formula when
+predicting at new data; the required offset variables must then be
+present in `data`.
 
 ## References
 

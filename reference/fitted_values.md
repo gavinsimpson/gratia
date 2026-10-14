@@ -26,7 +26,7 @@ fitted_values(
 fitted_values(object, ...)
 
 # S3 method for class 'scam'
-fitted_values(object, ...)
+fitted_values(object, ..., unconditional = FALSE)
 
 # S3 method for class 'gamm4'
 fitted_values(object, ...)

@@ -19,7 +19,12 @@ draw(
   heights = NULL,
   ...,
   n = 100,
-  envir = NULL
+  envir = NULL,
+  select = NULL,
+  parametric = NULL,
+  terms = NULL,
+  partial_match = FALSE,
+  wrap = TRUE
 )
 ```
 
@@ -67,7 +72,7 @@ draw(
 - n:
 
   numeric; the number of points over the range of the covariate at which
-  to evaluate the smooth.
+  to evaluate a univariate smooth.
 
 - envir:
 
@@ -75,10 +80,52 @@ draw(
   model expressions. The available model formula environment is used
   when `NULL`. Covariate observations should be supplied in `data`.
 
+- select:
+
+  Smooth selection across all equations, using the labels from
+  [`smooths()`](https://gavinsimpson.github.io/gratia/reference/smooths.md),
+  or numeric or logical indices in equation and smooth order. Repeated
+  labels receive suffixes such as `s.1(x)`; existing distinct labels are
+  retained. `partial_match` uses these model-wide labels.
+
+- parametric:
+
+  logical or `NULL`; plot parametric terms also? The default, `NULL`,
+  includes parametric terms when `select = NULL`, but excludes them when
+  smooths are selected explicitly. Use `TRUE` to include parametric
+  terms regardless of `select`, or `FALSE` to draw only smooths (the
+  previous default). The `terms` argument selects which parametric
+  effects are plotted; `select` selects only smooths.
+
+- terms:
+
+  character; which model parametric terms should be drawn? The Default
+  of `NULL` will plot all parametric terms that can be drawn.
+  Interactions show their individual contributions to the linear
+  predictor; main effects and intercepts are not added. Multivariate
+  parametric terms use the grid and surface controls below, as described
+  in
+  [`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md).
+
+- partial_match:
+
+  logical; in the case of character `select`, should `select` match
+  partially against `smooths`? If `partial_match = TRUE`, `select` must
+  only be a single string, a character vector of length 1.
+
+- wrap:
+
+  Logical; return an assembled patchwork when `TRUE` (the default), or a
+  flat named list of plots when `FALSE`.
+
 ## Note
 
-Plots of smooths are not labelled with the linear predictor to which
-they belong.
+For models with multiple linear predictors, smooth plot subtitles
+identify the distributional parameter using the parent model's margin
+and equation order, rather than the working family of the embedded GAMs.
+Single-predictor models omit these automatic labels. Existing smooth
+labels, selection, by-variable information and custom subtitles are
+retained.
 
 ## Examples
 

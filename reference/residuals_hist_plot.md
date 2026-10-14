@@ -7,14 +7,17 @@ Histogram of model residuals
 ``` r
 residuals_hist_plot(
   model,
-  type = c("deviance", "pearson", "response", "pit", "quantile"),
+  type = NULL,
   n_bins = c("sturges", "scott", "fd"),
   ylab = NULL,
   xlab = NULL,
   title = NULL,
   subtitle = NULL,
   caption = NULL,
-  seed = NULL
+  seed = NULL,
+  by_family = NULL,
+  conditioning = NULL,
+  ...
 )
 ```
 
@@ -22,22 +25,18 @@ residuals_hist_plot(
 
 - model:
 
-  a fitted model. Currently only class `"gam"`.
+  a fitted model supported by
+  [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - type:
 
-  character; type of residuals to use. One of `"deviance"`,
-  `"response"`, `"pearson"`, `"pit"`, and `"quantile"` residuals are
-  allowed. `"pit"` uses probability integral transform (PIT) residuals,
-  which, if the model is correct should be approximately uniformly
-  distributed, while `"quantile"` transforms the PIT residuals through
-  application of the inverse CDF of the standard normal, and therefore
-  the quantile residuals should be approximately normally distributed
-  (mean = 0, sd = 1) if the model is correct. PIT and quantile residuals
-  are not yet available for most families that can be handled by
-  [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html), but most standard
-  families are supported, e.g. those used by
-  [`glm()`](https://rdrr.io/r/stats/glm.html).
+  character or `NULL`; residual type: `"deviance"`, `"pearson"`,
+  `"response"`, `"pit"`, or `"quantile"`. Grouped models automatically
+  use quantile residuals when all active components are supported,
+  otherwise all use deviance residuals with a message. Ordinary models
+  retain deviance residuals by default. See
+  [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
+  for distributional support.
 
 - n_bins:
 
@@ -51,7 +50,7 @@ residuals_hist_plot(
 
 - xlab:
 
-  character or expression; the label for the y axis. If not supplied, a
+  character or expression; the label for the x axis. If not supplied, a
   suitable label will be generated.
 
 - title:
@@ -72,3 +71,34 @@ residuals_hist_plot(
 - seed:
 
   integer; random seed to use for PIT or quantile residuals.
+
+- by_family:
+
+  logical or `NULL`; separate indexed grouped-family components into
+  facets. The default pools quantile residuals with component colours
+  and facets traditional residuals. `TRUE` and `FALSE` explicitly select
+  the layout. In
+  [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
+  observed-versus-fitted values always use component facets. Standalone
+  [`observed_fitted_plot()`](https://gavinsimpson.github.io/gratia/reference/observed_fitted_plot.md)
+  facets by default and permits explicit pooling. Ignored for ordinary
+  models.
+
+- conditioning:
+
+  character or `NULL`; `"conditional"` holds fitted random effects
+  fixed, `"marginal"` averages over new effects, and `"gam_component"`
+  uses the extracted GAM. Availability and defaults depend on the model;
+  see
+  [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
+
+- ...:
+
+  optional arguments passed to model preparation, such as the sdmTMB
+  `field_method`.
+
+## Details
+
+Pooled grouped-family histograms use common bin edges and
+component-specific densities, with faint group-coloured fills and opaque
+stepped upper boundaries. Set `by_family = TRUE` for separate panels.

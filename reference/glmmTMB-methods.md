@@ -10,13 +10,13 @@ intervals.
 
 ``` r
 # S3 method for class 'glmmTMB'
-qq_plot(model, ..., method = NULL, type = "pearson")
+qq_plot(model, ..., method = NULL, type = NULL, conditioning = NULL)
 
 # S3 method for class 'glmmTMB'
-worm_plot(model, ..., method = NULL, type = "pearson")
+worm_plot(model, ..., method = NULL, type = NULL, conditioning = NULL)
 
 # S3 method for class 'glmmTMB'
-appraise(model, ..., method = NULL, type = "pearson")
+appraise(model, ..., method = NULL, type = NULL, conditioning = NULL)
 
 # S3 method for class 'glmmTMB'
 parametric_terms(model, ...)
@@ -63,12 +63,18 @@ draw(
 
 - method:
 
-  QQ method; `NULL` selects `"simulate"`, the supported method.
+  QQ method; `NULL` selects `"simulate"` for traditional residuals.
 
 - type:
 
-  Native glmmTMB residual type: `"pearson"` (default), `"response"`, or
-  `"deviance"`, when available for the family.
+  Residual type: `"pearson"`, `"response"`, `"deviance"`, `"pit"`, or
+  `"quantile"`, when available for the family. The default is Pearson
+  for conditional checks and response residuals for marginal checks.
+
+- conditioning:
+
+  character or `NULL`; `"conditional"` (default) or `"marginal"`; see
+  [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - object, model:
 
@@ -132,9 +138,12 @@ default, as for
 Smooths in later linear predictors use mgcv-style labels such as
 `s.1(x)` and `s.2(x)`. Predictor order is conditional, zero-inflation
 (if present), then dispersion (if present). Use `smooths(object)` and
-`select` to select individual smooths;
-`names(draw(object, wrap = FALSE, parametric = FALSE))` also lists
-native random-effect coefficient panels.
+`select` to select individual smooths. For models with multiple linear
+predictors, smooth subtitles identify the "Conditional model",
+"Zero-inflation model" or "Dispersion model", consistently with native
+random-effect panels. Constant dispersion alone does not trigger these
+subtitles. `names(draw(object, wrap = FALSE, parametric = FALSE))` also
+lists native random-effect coefficient panels.
 
 ## Details
 
@@ -161,12 +170,23 @@ terms or uncertainty bands. Different formula terms are never combined.
 Diagnostics use native Pearson residuals by default. QQ simulations hold
 fitted smooths and grouping effects fixed and draw new responses; no
 refitting is performed. Supported response families are Gaussian,
-Poisson, binomial, nbinom1/2, beta, Gamma/ziGamma, Tweedie, and
-zero-truncated Poisson/nbinom1/2, including applicable zero-inflation or
-hurdle mixtures and varying dispersion. Truncated nbinom1 currently
-requires `type = "response"` because glmmTMB does not supply its Pearson
-residuals. Other unavailable residual types fail explicitly. PIT and
-quantile residuals are not supported by these methods.
+Poisson, binomial, nbinom1/2, beta, Gamma/ziGamma, Tweedie, lognormal,
+and zero-truncated Poisson/nbinom1/2, including applicable
+zero-inflation or hurdle mixtures and varying dispersion. Truncated
+nbinom1 currently requires `type = "response"` because glmmTMB does not
+supply its Pearson residuals. Other unavailable residual types fail
+explicitly. Supported fitted response distributions also provide
+randomized PIT/quantile residuals and inverse-CDF QQ references,
+including their zero-inflation and truncation probabilities. Posterior
+predictive checks draw coefficients and fitted random effects together
+from their approximate posterior. See
+[`posterior_predictive_plot()`](https://gavinsimpson.github.io/gratia/reference/posterior_predictive_plot.md)
+for how covariance and other family parameters are treated. Marginal
+checks simulate new effects using glmmTMB's response generator. If
+marginal CDFs are not analytic, residual checks use a shared sample of
+simulations to calculate moments and ranks. See
+[diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md)
+for conditioning choices and remaining limitations.
 
 ## Examples
 

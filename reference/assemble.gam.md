@@ -57,6 +57,11 @@ assemble(
   surface_3d = list(),
   back_transform = FALSE,
   re_levels = NULL,
+  mrf_plot = c("effects", "qq"),
+  interval = c("confidence", "simultaneous"),
+  n_sim = 10000,
+  n_cores = 1,
+  seed = NULL,
   ...
 )
 ```
@@ -179,7 +184,9 @@ assemble(
 
   function; a function that will be applied to the estimated values and
   confidence interval before plotting. Can be a function or the name of
-  a function. Function `fun` will be applied after adding any
+  a function. For simultaneous bands it must be monotone over the entire
+  band; endpoint transformation alone does not preserve non-monotone
+  band coverage. Function `fun` will be applied after adding any
   `constant`, if provided.
 
 - dist:
@@ -398,15 +405,55 @@ assemble(
   random-effect margins, for example `list(species = c("a", "b"))`.
   Fitted factor order and ordered status are retained.
 
+- mrf_plot:
+
+  character; display Markov random field smooths as area-labelled
+  estimates and intervals (`"effects"`, the default), or a descriptive
+  Gaussian quantile plot (`"qq"`). MRF effects are correlated and need
+  not have equal marginal variances; the QQ display is not a test of
+  independent normal effects. Specialist maps and graph plots are
+  outside the scope of this display.
+
+- interval:
+
+  character; `"confidence"` (default) draws pointwise intervals;
+  `"simultaneous"` uses a band across the finite evaluation grid of each
+  smooth, including its slices and factor levels. Separate smooths are
+  not a joint coverage set. `"credible"` aliases `"confidence"`,
+  reflecting the approximate Bayesian credible interpretation of
+  default-covariance bands. Parametric panels retain pointwise intervals
+  and are labelled accordingly when simultaneous smooth bands are
+  requested. Bands appear where the renderer displays interval bounds;
+  surface and random-effect QQ plots retain their existing estimate or
+  standard-error display.
+
+- n_sim, n_cores:
+
+  positive integers; coefficient draws and simulation cores for
+  simultaneous bands. Parallel simulation requires OpenMP support.
+
+- seed:
+
+  integer or `NULL`; an explicit simulation seed preserves the caller's
+  RNG state.
+
 - ...:
 
-  Arguments to other methods; not used.
+  Additional smooth plotting arguments, including `title`, `subtitle`,
+  `xlab` and `ylab`.
 
 ## Value
 
 A list of
 [`ggplot2::ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html)
 objects.
+
+## Details
+
+Smooth plot subtitles identify the model part or distributional
+parameter as described in
+[`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md).
+Custom smooth labels, including `subtitle`, can be passed through `...`.
 
 ## Note
 

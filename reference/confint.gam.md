@@ -63,6 +63,8 @@ confint(object, ...)
 
   character; the type of interval to compute. One of `"confidence"` for
   point-wise intervals, or `"simultaneous"` for simultaneous intervals.
+  `"credible"` aliases `"confidence"`, for approximate Bayesian credible
+  intervals using the default covariance.
 
 - nsim:
 
@@ -152,8 +154,9 @@ a tibble with components:
 
 ## Note
 
-Currently, `overall_uncertainty` only applies to confidence intervals
-(`type = "confidence"`), not simultaneous intervals.
+`overall_uncertainty` applies to both pointwise and simultaneous
+intervals. Each simultaneous band covers the evaluation points of one
+fitted smooth; separate smooths do not form a joint coverage set.
 
 ## Author
 

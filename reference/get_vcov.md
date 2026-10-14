@@ -13,6 +13,15 @@ get_vcov(
   term = NULL,
   by_level = NULL
 )
+
+# S3 method for class 'scam'
+get_vcov(
+  object,
+  unconditional = FALSE,
+  frequentist = FALSE,
+  term = NULL,
+  by_level = NULL
+)
 ```
 
 ## Arguments

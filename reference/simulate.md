@@ -1,15 +1,18 @@
-# Simulate from the posterior distribution of a GAM
+# Simulate responses from a fitted model
 
-Simulations from the posterior distribution of a fitted GAM model
-involve computing predicted values for the observation data for which
-simulated data are required, then generating random draws from the
-probability distribution used when fitting the model.
+Generate replicated responses using fitted parameter values.
+[`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md)
+also includes uncertainty in the coefficients. See
+[diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 ## Usage
 
 ``` r
 # S3 method for class 'gamm4'
-simulate(object, nsim = 1, seed = NULL, ...)
+simulate(object, nsim = 1, seed = NULL, conditioning = NULL, ...)
+
+# S3 method for class 'gamlss'
+simulate(object, nsim = 1L, seed = NULL, ...)
 
 # S3 method for class 'gam'
 simulate(
@@ -31,7 +34,8 @@ simulate(
   data = newdata,
   weights = NULL,
   ...,
-  newdata = NULL
+  newdata = NULL,
+  conditioning = NULL
 )
 
 # S3 method for class 'scam'
@@ -57,11 +61,19 @@ simulate(
 
 - nsim:
 
-  numeric; the number of posterior simulations to return.
+  numeric; number of response simulations to return.
 
 - seed:
 
   numeric; a random seed for the simulations.
+
+- conditioning:
+
+  character or `NULL`; optional mixed-model conditioning mode. gamm4
+  defaults to `"conditional"`, holding all fitted effects fixed.
+  `"gam_component"` explicitly uses its extracted GAM. The existing gamm
+  simulator retains its GAM-component default. Full mixed-model modes
+  currently use fitting observations.
 
 - ...:
 
@@ -80,8 +92,15 @@ simulate(
 
 - weights:
 
-  numeric; a vector of prior weights. If `newdata` is null then defaults
-  to `object[["prior.weights"]]`, otherwise a vector of ones.
+  numeric; response sampling weights. An explicit vector overrides the
+  fitting weights; a single value applies to every observation. With
+  `data = NULL`, the default is the fitted prior weights, except
+  factor-valued binomial responses retain one Bernoulli trial per
+  observation. With prediction data, the default is a vector of ones.
+  For ordinary Gaussian and Gamma responses, larger weights reduce
+  response variance (precision weights). For binomial responses, weights
+  give integer trial counts. Include positions restored by `na.exclude`
+  when supplying weights for fitting rows.
 
 - newdata:
 
@@ -110,6 +129,13 @@ are evaluated independently of training exclusions: missing responses do
 not prevent simulation, while missing required predictors or weights
 yield `NA`. Prediction `na.action` in `...` is honoured. Missing rows
 are never passed to the response random-number generator.
+
+Inverse Gaussian models use a native generator with observation
+dispersion equal to the model dispersion divided by the prior weight,
+consistently with their CDF and quantile helpers. Weights must be
+non-negative; a zero weight with positive dispersion uses the limiting
+point mass at zero. An existing random generator supplied in the
+family's `rd` component is preserved.
 
 For models fitted with
 [`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html), each

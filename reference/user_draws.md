@@ -12,6 +12,9 @@ user_draws(model, draws, ...)
 
 # S3 method for class 'gam'
 user_draws(model, draws, index = NULL, ...)
+
+# S3 method for class 'scam'
+user_draws(model, draws, ...)
 ```
 
 ## Arguments
@@ -51,6 +54,10 @@ posterior draws for the entire model (say from
 [`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html)) and you
 wish to use those draws for an individual smooth, via
 [`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md).
+
+User-supplied coefficient draws are not currently supported for SCAM
+models. Scalable posterior predictive plots need this sampling path; use
+`scalable = FALSE` for an ordinary SCAM posterior predictive plot.
 
 ## See also
 

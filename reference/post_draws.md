@@ -148,7 +148,8 @@ generate_draws(
 
   logical; if `TRUE` the Bayesian smoothing parameter uncertainty
   corrected covariance matrix is used, *if available* for `model`. See
-  [`mgcv::vcov.gam()`](https://rdrr.io/pkg/mgcv/man/vcov.gam.html).
+  [`mgcv::vcov.gam()`](https://rdrr.io/pkg/mgcv/man/vcov.gam.html). SCAM
+  models do not support this correction; use `unconditional = FALSE`.
 
 - parametrized:
 

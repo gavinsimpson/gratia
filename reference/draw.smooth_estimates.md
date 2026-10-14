@@ -37,6 +37,8 @@ draw(
   surface_3d = list(),
   back_transform = FALSE,
   re_levels = NULL,
+  mrf_plot = c("effects", "qq"),
+  interval = NULL,
   ...
 )
 ```
@@ -58,7 +60,9 @@ draw(
 
   function; a function that will be applied to the estimated values and
   confidence interval before plotting. Can be a function or the name of
-  a function. Function `fun` will be applied after adding any
+  a function. For simultaneous bands it must be monotone over the entire
+  band; endpoint transformation alone does not preserve non-monotone
+  band coverage. Function `fun` will be applied after adding any
   `constant`, if provided.
 
 - contour:
@@ -240,6 +244,24 @@ draw(
   named list of factor level labels to retain in tensor products with
   random-effect margins, for example `list(species = c("a", "b"))`.
   Fitted factor order and ordered status are retained.
+
+- mrf_plot:
+
+  character; display Markov random field smooths as area-labelled
+  estimates and intervals (`"effects"`, the default), or a descriptive
+  Gaussian quantile plot (`"qq"`). MRF effects are correlated and need
+  not have equal marginal variances; the QQ display is not a test of
+  independent normal effects. Specialist maps and graph plots are
+  outside the scope of this display.
+
+- interval:
+
+  character or `NULL`; the default draws stored interval bounds
+  unchanged, adding pointwise bounds if absent. An explicit choice
+  validates stored interval metadata; `"credible"` aliases
+  `"confidence"`. Simultaneous bands must first be computed from the
+  fitted model by
+  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md).
 
 - ...:
 

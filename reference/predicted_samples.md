@@ -39,7 +39,8 @@ predicted_samples(model, n = 1, data = NULL, seed = NULL, weights = NULL, ...)
 
 - model:
 
-  a fitted model of the supported types
+  a fitted model of the supported types; see
+  [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - ...:
 
@@ -71,8 +72,16 @@ predicted_samples(model, n = 1, data = NULL, seed = NULL, weights = NULL, ...)
 
 - weights:
 
-  numeric; a vector of prior weights. If `data` is null then defaults to
-  `object[["prior.weights"]]`, otherwise a vector of ones.
+  numeric; response sampling weights for GAM methods. An explicit vector
+  overrides the fitting weights; a single value applies to every
+  observation. With `data = NULL`, the default is the fitted prior
+  weights, except factor-valued binomial responses retain one Bernoulli
+  trial per observation. With prediction data, the default is a vector
+  of ones. For ordinary Gaussian and Gamma responses, larger weights
+  reduce response variance (precision weights). For binomial responses,
+  weights give integer trial counts. They do not alter the fitted
+  coefficient covariance. Include positions restored by `na.exclude`
+  when supplying weights for fitting rows.
 
 - newdata:
 
