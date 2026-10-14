@@ -1,5 +1,18 @@
 # Repository instructions
 
+## Communication
+
+Use plain English in explanations, progress updates, commit messages,
+documentation, package vignettes and articles, `NEWS.md` entries, GitHub issues
+and pull requests, and comments in code. Describe what happens, what causes it,
+and why it matters. Avoid compressed jargon and invented compound labels.
+Introduce a technical term only when it
+helps, and explain its meaning first. Preserve scientific precision through
+concrete descriptions, equations or examples—not unexplained terminology. Assume
+the reader understands statistics but should not have to decode your shorthand.
+Before sending or saving text, replace any phrase that would reasonably prompt
+“What does that mean?” with a direct explanation.
+
 ## Starting new work
 
 Unless the user explicitly instructs otherwise, always start new work on a
