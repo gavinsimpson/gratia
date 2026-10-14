@@ -510,6 +510,9 @@
 
 ### Bug fixes
 
+- Large QQ reference simulations now close their file connections before
+  removing temporary files, allowing cleanup to complete on Windows.
+
 - SCAM smooth estimates and standard errors no longer depend on the
   other rows in the evaluation grid. Single-row and short-grid
   evaluations are supported. `overall_uncertainty = TRUE` includes
