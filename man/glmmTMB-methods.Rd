@@ -56,7 +56,7 @@
 \item{method}{QQ method; \code{NULL} selects \code{"simulate"} for traditional residuals.}
 
 \item{type}{Residual type: \code{"pearson"}, \code{"response"}, \code{"deviance"}, \code{"pit"},
-or \code{"quantile"}, when available for the family. The default is Pearson for
+\code{"quantile"}, or \code{"dharma"}, when available for the family. The default is Pearson for
 conditional checks and response residuals for marginal checks.}
 
 \item{conditioning}{character or \code{NULL}; \code{"conditional"} (default) or

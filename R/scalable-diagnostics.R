@@ -8,12 +8,12 @@
 # center gives the reference value subtracted for each point in a worm plot.
 # Plotting and aggregation consume these results without inspecting model classes.
 # These S3 methods remain internal while support for additional models develops.
-diagnostic_data <- function(model, type = NULL, seed = NULL, conditioning = NULL, ...) {
+diagnostic_data <- function(model, type = NULL, seed = NULL, conditioning = NULL, ..., n_dharma = NULL) {
   UseMethod("diagnostic_data")
 }
 
 #' @export
-diagnostic_data.default <- function(model, type = NULL, seed = NULL, conditioning = NULL, ...) {
+diagnostic_data.default <- function(model, type = NULL, seed = NULL, conditioning = NULL, ..., n_dharma = NULL) {
   stop(
     "Diagnostic data are not available for <",
     class(model)[1L],
@@ -27,7 +27,7 @@ diagnostic_data.gratia_diagnostics <- function(
   model,
   type = NULL,
   seed = NULL,
-  conditioning = NULL, ...
+  conditioning = NULL, ..., n_dharma = NULL
 ) {
   if (!is.null(type) && !identical(type, model$type)) {
     stop(
@@ -37,9 +37,12 @@ diagnostic_data.gratia_diagnostics <- function(
       call. = FALSE
     )
   }
-  if (!is.null(conditioning) || length(list(...))) {
+  changed_dharma <- identical(model$type, "dharma") &&
+    ((!is.null(n_dharma) && !identical(validate_diagnostic_bins(n_dharma, "n_dharma"), model$n_dharma)) ||
+      (!is.null(seed) && !identical(seed, model$seed)))
+  if (!is.null(conditioning) || length(list(...)) || changed_dharma) {
     return(prepare_diagnostic_data(model$source, type = model$type,
-      seed = seed, conditioning = conditioning, ...))
+      seed = seed, conditioning = conditioning, n_dharma = n_dharma %||% model$n_dharma, ...))
   }
   model
 }
@@ -78,22 +81,22 @@ new_diagnostic_data <- function(
 }
 
 #' @export
-diagnostic_data.gam <- function(model, type = NULL, seed = NULL, conditioning = NULL, ...) {
+diagnostic_data.gam <- function(model, type = NULL, seed = NULL, conditioning = NULL, ..., n_dharma = NULL) {
   check_distribution_conditioning(conditioning)
   type <- diagnostic_type(model, type, allow_pit = TRUE)
   action <- stats::na.action(model)
   rows <- which(!is.na(model_row_map(model)))
   model <- model_used_rows(model)
-  r <- diagnostic_residuals(model, type = type, seed = seed)
-  if (type %in% c("pit", "quantile")) {
-    attr(model, "gratia.diagnostics") <- list(type = type, residuals = r)
+  r <- diagnostic_residuals(model, type = type, seed = seed, n_dharma = n_dharma)
+  if (type %in% c("pit", "quantile", "dharma")) {
+    attr(model, "gratia.diagnostics") <- list(type = type, residuals = r, seed = seed, n_dharma = if (type == "dharma") dharma_simulation_count(model, n_dharma) else NULL)
   }
   y <- model$y
   if (is.null(y)) {
     y <- stats::model.response(stats::model.frame(model))
   }
   grouped <- is_gfam_family(stats::family(model))
-  fit <- response_distribution(model)$mean %||% stats::fitted(model)
+  fit <- response_distribution(model)[["mean"]] %||% stats::fitted(model)
   eta <- model$linear.predictors
   if (is.null(eta)) {
     eta <- fit
@@ -134,27 +137,32 @@ diagnostic_data.gam <- function(model, type = NULL, seed = NULL, conditioning = 
   dat <- diagnostic_component_data(dat, model)
   # Restore the missing-row information so standalone plots keep fitting order.
   model$na.action <- action
-  new_diagnostic_data(dat, model, type, stats::family(model)$family, n,
+  out <- new_diagnostic_data(dat, model, type, stats::family(model)$family, n,
     eta_label = model$eta_label %||% "Linear predictor")
+  if (type == "dharma") {
+    out$n_dharma <- attr(model, "gratia.diagnostics")$n_dharma
+    out$seed <- seed
+  }
+  out
 }
 
 #' @export
-diagnostic_data.lm <- function(model, type = NULL, seed = NULL, conditioning = NULL, ...) {
-  diagnostic_data.gam(prepare_lm_diagnostics(model), type, seed, conditioning)
+diagnostic_data.lm <- function(model, type = NULL, seed = NULL, conditioning = NULL, ..., n_dharma = NULL) {
+  diagnostic_data.gam(prepare_lm_diagnostics(model), type, seed, conditioning, n_dharma = n_dharma)
 }
 
 #' @export
 diagnostic_data.glm <- diagnostic_data.lm
 
 #' @export
-diagnostic_data.gamm4 <- function(model, type = NULL, seed = NULL, conditioning = NULL, ...) {
-  diagnostic_data(mixed_diagnostic_model(model, conditioning), type, seed)
+diagnostic_data.gamm4 <- function(model, type = NULL, seed = NULL, conditioning = NULL, ..., n_dharma = NULL) {
+  diagnostic_data(mixed_diagnostic_model(model, conditioning), type, seed, n_dharma = n_dharma)
 }
 
 #' @export
-diagnostic_data.glmmTMB <- function(model, type = NULL, seed = NULL, conditioning = NULL, ...) {
+diagnostic_data.glmmTMB <- function(model, type = NULL, seed = NULL, conditioning = NULL, ..., n_dharma = NULL) {
   proxy <- glmmtmb_diagnostic_model(model, type, conditioning = conditioning)
-  diagnostic_data(proxy, proxy$residual_type, seed)
+  diagnostic_data(proxy, proxy$residual_type, seed, n_dharma = n_dharma)
 }
 
 #' @export
@@ -163,24 +171,24 @@ diagnostic_data.gratia_glmmtmb_diagnostic <- function(
   type = NULL,
   seed = NULL,
   conditioning = NULL,
-  ...
+  ..., n_dharma = NULL
 ) {
   if ((!is.null(conditioning) && !identical(conditioning, model$conditioning)) ||
       length(list(...))) {
-    source <- diagnostic_plot_source(model, type, seed, conditioning, ...)
-    return(diagnostic_data(source, type, seed))
+    source <- diagnostic_plot_source(model, type, seed, conditioning, n_dharma = n_dharma, ...)
+    return(diagnostic_data(source, type, seed, n_dharma = n_dharma))
   }
   if (is.null(type)) {
     type <- "pearson"
   }
-  diagnostic_data.gam(model, type, seed)
+  diagnostic_data.gam(model, type, seed, n_dharma = n_dharma)
 }
 
 #' @export
-diagnostic_data.gamlss <- function(model, type = NULL, seed = NULL, conditioning = NULL, ...) {
+diagnostic_data.gamlss <- function(model, type = NULL, seed = NULL, conditioning = NULL, ..., n_dharma = NULL) {
   check_distribution_conditioning(conditioning)
   proxy <- gjrm_diagnostic_model(model)
-  d <- diagnostic_data(proxy, type, seed)
+  d <- diagnostic_data(proxy, type, seed, n_dharma = n_dharma)
   d$eta_label <- "Linear predictor (mu)"
   d
 }
@@ -211,6 +219,10 @@ diagnostic_qq_data.default <- function(
   type <- diagnostics$type
   by_family <- diagnostic_data_by_family(diagnostics, by_family)
   grouped <- ".family" %in% names(diagnostics$data)
+  if (type == "dharma") {
+    if (!is.null(method)) stop("DHARMa-style residuals require method = NULL.", call. = FALSE)
+    return(dharma_qq_reference(diagnostics, level, by_family))
+  }
   if (type %in% c("pit", "quantile")) {
     if (!is.null(method) && !(type == "quantile" && method == "normal"))
       stop("Calibrated residuals use a fixed reference distribution.", call. = FALSE)
@@ -495,11 +507,10 @@ render_diagnostic_qq <- function(
     ggplot2::labs(
       x = if (is.null(xlab)) "Theoretical quantiles" else xlab,
       y = if (is.null(ylab)) {
-        paste(
-          stringr::str_to_title(type),
-          "residuals",
-          if (worm) "(Deviation)" else ""
-        )
+        if (type == "dharma") paste0(diagnostic_residual_label(type),
+          if (worm) " (Deviation)" else "") else paste(
+          stringr::str_to_title(type), "residuals",
+          if (worm) "(Deviation)" else "")
       } else {
         ylab
       },
@@ -623,7 +634,7 @@ scalable_qq_plot <- function(
   point_alpha = 1,
   line_col = "red",
   by_family = NULL,
-  conditioning = NULL, ...
+  conditioning = NULL, ..., n_dharma = 250L
 ) {
   scalable_qq(
     model,
@@ -646,14 +657,16 @@ scalable_qq_plot <- function(
     point_alpha,
     line_col,
     by_family = by_family,
-    conditioning = conditioning, ...
+    conditioning = conditioning,
+    n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...
   )
 }
 
 #' @rdname scalable_qq_plot
 #' @export
-scalable_worm_plot <- function(model, ...) {
-  scalable_qq(model, ..., worm = TRUE)
+scalable_worm_plot <- function(model, ..., n_dharma = 250L) {
+  scalable_qq(model, ..., worm = TRUE,
+    n_dharma = if (missing(n_dharma)) NULL else n_dharma)
 }
 
 scalable_qq <- function(
@@ -678,7 +691,7 @@ scalable_qq <- function(
   line_col = "red",
   aggregate = TRUE,
   by_family = NULL,
-  conditioning = NULL, ...
+  conditioning = NULL, ..., n_dharma = 250L
 ) {
   validate_diagnostic_bins(qq_bins, "qq_bins", minimum = 3L)
   validate_diagnostic_bins(n_uniform, "n_uniform")
@@ -692,7 +705,7 @@ scalable_qq <- function(
   ) {
     stop("Level must be 0 < level < 1.", call. = FALSE)
   }
-  d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning, ...)
+  d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning, n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...)
   by_family <- diagnostic_data_by_family(d, by_family)
   reference <- diagnostic_seed(
     seed,
@@ -922,12 +935,12 @@ scalable_residuals_linpred_plot <- function(
   rank = NULL,
   density_method = c("kde", "histogram"),
   bandwidth = NULL,
-  conditioning = NULL, ...
+  conditioning = NULL, ..., n_dharma = 250L
 ) {
   density <- match.arg(density)
   density_method <- match.arg(density_method)
   validate_diagnostic_bandwidth(bandwidth)
-  d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning, ...)
+  d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning, n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...)
   subtitle <- subtitle %||% diagnostic_context_label(response_distribution(d$source))
   by_family <- diagnostic_data_by_family(d, by_family)
   dat <- d$data
@@ -966,14 +979,14 @@ scalable_residuals_linpred_plot <- function(
     density,
     if (is.null(xlab)) d$eta_label else xlab,
     if (is.null(ylab)) {
-      paste(stringr::str_to_title(d$type), "residuals")
+      diagnostic_residual_label(d$type)
     } else {
       ylab
     },
     title,
     subtitle,
     caption,
-    if (d$type == "pit") 0.5 else 0,
+    if (d$type %in% c("pit", "dharma")) 0.5 else 0,
     line_col,
     fill_transform = if (density == "conditional" && density_method == "kde") {
       "sqrt"
@@ -1076,9 +1089,9 @@ scalable_residuals_hist_plot <- function(
   subtitle = NULL,
   caption = NULL,
   by_family = NULL,
-  conditioning = NULL, ...
+  conditioning = NULL, ..., n_dharma = 250L
 ) {
-  d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning, ...)
+  d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning, n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...)
   subtitle <- subtitle %||% diagnostic_context_label(response_distribution(d$source))
   by_family <- diagnostic_data_by_family(d, by_family)
   if (".family" %in% names(d$data)) {
@@ -1097,7 +1110,7 @@ scalable_residuals_hist_plot <- function(
   render_diagnostic_hist(
     df,
     if (is.null(xlab)) {
-      paste(stringr::str_to_title(d$type), "residuals")
+      diagnostic_residual_label(d$type)
     } else {
       xlab
     },
@@ -1181,7 +1194,7 @@ diagnostic_data_by_family <- function(d, by_family = NULL) {
   }
   ".family" %in%
     names(d$data) &&
-    if (is.null(by_family)) !d$type %in% c("quantile", "pit") else by_family
+    if (is.null(by_family)) !d$type %in% c("quantile", "pit", "dharma") else by_family
 }
 
 diagnostic_grouped_grid <- function(dat, x, y, bins, density, by_family,
@@ -1236,7 +1249,7 @@ scalable_grouped_histogram <- function(
   render_grouped_histogram(
     df,
     by_family,
-    xlab %||% paste(stringr::str_to_title(d$type), "residuals"),
+    xlab %||% diagnostic_residual_label(d$type),
     if (identical(ylab, "Frequency") && !by_family) "Density" else ylab,
     title,
     subtitle,

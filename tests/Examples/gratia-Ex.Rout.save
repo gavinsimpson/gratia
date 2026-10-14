@@ -1022,6 +1022,26 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
+> nameEx("dharma_residuals")
+> ### * dharma_residuals
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: dharma_residuals
+> ### Title: Simulation-based PIT residuals
+> ### Aliases: dharma_residuals
+> 
+> ### ** Examples
+> 
+> fit <- mgcv::gam(count ~ spray, family = poisson(),
++   data = InsectSprays, method = "REML")
+> head(dharma_residuals(fit, n = 250, seed = 42))
+[1] 0.11794871 0.01707461 0.92111982 0.52857546 0.50754329 0.24789548
+> appraise(fit, type = "dharma", n_dharma = 250, seed = 42)
+> 
+> 
+> 
+> cleanEx()
 > nameEx("difference_smooths")
 > ### * difference_smooths
 > 

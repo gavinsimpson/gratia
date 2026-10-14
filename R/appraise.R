@@ -31,7 +31,17 @@
 #'   if every component has an inverse CDF. If neither is available, it gives an
 #'   error; a normal approximation must be requested explicitly.
 #'
-#' @details With `type = NULL`, ordinary lm/glm/GAM fits use deviance residuals.
+#' @details Use `type = "dharma"` for simulation-based PIT residuals calculated
+#'   internally using gratia's response generators; no DHARMa or mgcViz
+#'   dependency is needed. These residuals lie in `[0, 1]`, including exact
+#'   endpoints, and do not require a response CDF. `n_dharma` controls their
+#'   simulation count. All residual panels share one calculated vector.
+#'   QQ and worm plots require `method = NULL` and use uniform reference
+#'   quantiles, with approximate pointwise bands for independent responses.
+#'   Bands are omitted for dependent responses. Censored and multivariate
+#'   outcomes are unsupported. See [dharma_residuals()] for the calculation.
+#'
+#'   With `type = NULL`, ordinary lm/glm/GAM fits use deviance residuals.
 #'   Models fitted with [mgcv::gfam()] use randomised quantile (Dunn--Smyth)
 #'   residuals when every active component supplies a supported CDF and
 #'   probability limits for discrete or censored observations. Otherwise, a
@@ -100,11 +110,14 @@
 #'   and `method = "uniform"`, and for randomised quantile residuals and
 #'   posterior predictive draws.
 #' @param type character or `NULL`; residual type: `"deviance"`, `"response"`,
-#'   `"pearson"`, `"pit"`, or `"quantile"`. `NULL` uses the model-specific default:
+#'   `"pearson"`, `"pit"`, `"quantile"`, or `"dharma"`. `NULL` uses the model-specific default:
 #'   deviance for ordinary lm/glm/GAM fits, and quantile for supported grouped
 #'   families, GJRM, sdmTMB and full mixed-model checks. glmmTMB uses Pearson
 #'   residuals conditionally and response residuals marginally. Extracted GAM
 #'   components follow the ordinary GAM defaults. See [diagnostic_support].
+#' @param n_dharma positive integer; number of response simulations for
+#'   `type = "dharma"`. This is separate from `n_simulate`, which controls
+#'   traditional QQ reference calculations. Defaults to 250.
 #' @param n_bins character or numeric; either the number of bins or a string
 #'   indicating how to calculate the number of bins.
 #' @param ncol,nrow numeric; the numbers of rows and columns over which to
@@ -241,27 +254,42 @@
   bandwidth = NULL,
   conditioning = NULL,
   ppc_batch_size = 10L,
-  ...
+  ..., n_dharma = 250L
 ) {
+  if (!is.null(type)) type <- diagnostic_type(model, type)
+  dharma_count <- if (missing(n_dharma)) NULL else n_dharma
   arguments <- list(...)
   adapter_arguments <- diagnostic_adapter_arguments(model, arguments)
+  adapter_names <- names(adapter_arguments)
+  if (identical(type, "dharma") ||
+      (inherits(model, "gratia_diagnostics") && identical(model$type, "dharma"))) {
+    if (!is.null(method)) stop("DHARMa-style residuals require method = NULL.", call. = FALSE)
+    model <- do.call(prepare_diagnostic_data, c(list(model = model,
+      type = type, seed = seed, conditioning = conditioning,
+      n_dharma = dharma_count), adapter_arguments))
+    conditioning <- NULL
+    adapter_arguments <- list()
+  }
   argument_names <- names(arguments) %||% rep("", length(arguments))
-  plot_arguments <- arguments[!argument_names %in% names(adapter_arguments)]
+  plot_arguments <- arguments[!argument_names %in% adapter_names]
   if (inherits(model, "gratia_diagnostics")) {
     if (length(adapter_arguments) || !is.null(conditioning))
       model <- do.call(prepare_diagnostic_data, c(list(model = model,
-        type = type, seed = seed, conditioning = conditioning), adapter_arguments))
+        type = type, seed = seed, conditioning = conditioning, n_dharma = dharma_count), adapter_arguments))
   } else {
     model <- do.call(diagnostic_plot_source, c(list(model = model,
-      type = type, seed = seed, conditioning = conditioning), adapter_arguments))
+      type = type, seed = seed, conditioning = conditioning, n_dharma = dharma_count), adapter_arguments))
   }
   if (!is.logical(ppcheck) || length(ppcheck) != 1L || is.na(ppcheck)) {
     stop("'ppcheck' must be TRUE or FALSE.", call. = FALSE)
   }
+  # Prepared diagnostics retain conditioning on their source model.
+  ppc_conditioning <- conditioning %||% if (inherits(model, "gratia_diagnostics"))
+    model$source$conditioning else model$conditioning
   # Check posterior sampling support before preparing other diagnostic panels.
   plt3 <- if (ppcheck) {
     posterior_predictive_plot(diagnostic_posterior_source(model), n = n_ppc, seed = seed,
-      conditioning = conditioning %||% model$conditioning, scalable = scalable,
+      conditioning = ppc_conditioning, scalable = scalable,
       scalable_threshold = scalable_threshold, batch_size = ppc_batch_size,
       observed_col = line_col, replicated_col = ci_col,
       replicated_alpha = if (missing(ci_alpha)) NULL else ci_alpha,
@@ -350,12 +378,12 @@
         "eta",
         "residuals",
         d$eta_label,
-        paste(stringr::str_to_title(type), "residuals"),
+        diagnostic_residual_label(type),
         "Residuals vs linear predictor",
         point_col,
         point_alpha,
         line_col,
-        line_intercept = if (type == "pit") 0.5 else 0
+        line_intercept = if (type %in% c("pit", "dharma")) 0.5 else 0
       )
       if (!ppcheck) {
         plt3 <- scalable_residuals_hist_plot(
@@ -467,7 +495,7 @@ appraise.gamlss <- function(model, ..., type = "quantile", seed = NULL,
 
 #' @rdname appraise
 #' @export
-appraise.default <- function(model, ..., type = NULL, seed = NULL, conditioning = NULL) {
-  d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning)
+appraise.default <- function(model, ..., type = NULL, seed = NULL, conditioning = NULL, n_dharma = 250L) {
+  d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning, n_dharma = if (missing(n_dharma)) NULL else n_dharma)
   appraise.gam(d, ..., type = d$type, seed = seed, conditioning = conditioning)
 }
