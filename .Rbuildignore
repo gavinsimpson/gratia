@@ -3,6 +3,7 @@
 \.Rproj$
 ^\.Rproj\.user$
 ^Makefile
+^tools/run-tests\.R$
 ^\.gitattributes
 ^\.gitignore
 ^docs$
