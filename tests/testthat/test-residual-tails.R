@@ -156,11 +156,11 @@ test_that("native CDF helpers forward both tails and log probabilities", {
       pbinom(q * 4, 4, 0.4, lower.tail = lower, log.p = log)
     }),
     list(cdf = cdf_gamma, mu = 2, ref = function(lower, log) {
-      pgamma(q, shape = 1 / 3, scale = 6, lower.tail = lower, log.p = log)
+      pgamma(q, shape = 4 / 3, scale = 6 / 4, lower.tail = lower, log.p = log)
     }),
     list(cdf = cdf_gaulss, mu = cbind(rep(2, 5), 0.5),
       ref = function(lower, log) {
-        pnorm(q, 2, 2, lower.tail = lower, log.p = log)
+        pnorm(q, 2, sqrt(3), lower.tail = lower, log.p = log)
       }),
     list(cdf = cdf_gammals, mu = cbind(rep(2, 5), log(3)),
       ref = function(lower, log) {

@@ -53,7 +53,7 @@ fitted_samples(model, ...)
 )
 }
 \arguments{
-\item{model}{a fitted model of the supported types}
+\item{model}{a fitted model of the supported types; see \link{diagnostic_support}.}
 
 \item{...}{arguments passed to other methods. For \code{fitted_samples()}, these
 are passed on to \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}. For \code{posterior_samples()} these are
@@ -171,14 +171,13 @@ Observation rows use the same missing-value convention as
 every draw, while explicit \code{data} are evaluated in their own row order.
 }
 \section{Note}{
-Models with offset terms supplied via the \code{offset} argument to
-\code{\link[mgcv:gam]{mgcv::gam()}} etc. are ignored by \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}. As such, this
-kind of offset term is also ignored by \code{posterior_samples()}. Offset terms
-that are included in the model formula supplied to \code{\link[mgcv:gam]{mgcv::gam()}} etc are
-not ignored and the posterior samples produced will reflect those offset
-term values. This has the side effect of requiring any new data values
-provided to \code{posterior_samples()} via the \code{data} argument must include the
-offset variable.
+With \code{data = NULL}, fitting offsets are retained, including offsets
+supplied through the fitting function's \code{offset} argument. Explicit prediction
+data follow \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}: offsets in formulas are evaluated from
+the prediction data, while offsets supplied through the fitting function's
+\code{offset} argument are not transferred to new observations. Include offsets
+in the formula when predicting at new data; the required offset variables
+must then be present in \code{data}.
 }
 
 \examples{

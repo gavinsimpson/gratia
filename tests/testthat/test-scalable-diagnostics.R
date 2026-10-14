@@ -282,7 +282,7 @@ test_that("glmmTMB scalable diagnostics use native residuals and conditional ref
     appraise(m, scalable = TRUE, n_simulate = 3, seed = 7),
     "patchwork"
   )
-  expect_error(scalable_qq_plot(m, method = "uniform"), "simulate")
+  expect_s3_class(scalable_qq_plot(m, method = "uniform"), "ggplot")
   dat$x[3] <- 0.5
   dat$n <- rep(c(4, 7), 30)
   dat$y <- withr::with_seed(7, rbinom(60, dat$n, plogis(dat$x)))

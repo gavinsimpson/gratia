@@ -138,9 +138,9 @@
   if (!identical(family_type(x), "beta_regression")) {
     stop("'x' is not a 'betar()' family.")
   }
-  # get the environment of the qf function
-  e <- environment(x$qf)
-  # get the stored value of eps from the env of the qf functions
-  eps <- get(".betaEps", envir = e)
-  eps
+  # Read epsilon from the family's parameter environment, where it is available
+  # even before an inverse CDF has been added.
+  e <- environment(x$getTheta)
+  key <- if (exists(".betarEps", envir = e, inherits = TRUE)) ".betarEps" else ".betaEps"
+  get(key, envir = e, inherits = TRUE)
 }

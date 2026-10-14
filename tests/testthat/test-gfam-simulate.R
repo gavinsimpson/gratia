@@ -24,7 +24,7 @@ test_that("grouped response draws use each component's parameters and input scal
         rnorm(length(rows), mu, sqrt(scales[i] / w)),
         rpois(length(rows), mu),
         rbinom(length(rows), w, mu) / w,
-        rgamma(length(rows), shape = 1 / scales[i], scale = mu * scales[i]),
+        rgamma(length(rows), shape = w / scales[i], scale = mu * scales[i] / w),
         rnbinom(length(rows), size = 2.3, mu = mu),
         mgcv::rTweedie(mu, p = 1.4, phi = scales[i]),
         rbeta(length(rows), 12 * mu, 12 * (1 - mu)),

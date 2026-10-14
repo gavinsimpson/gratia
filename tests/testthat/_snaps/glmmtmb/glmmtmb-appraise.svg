@@ -307,7 +307,7 @@
 <text x='335.52' y='284.42' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text>
 <text x='195.05' y='296.56' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='101.51px' lengthAdjust='spacingAndGlyphs'>Theoretical quantiles</text>
 <text transform='translate(18.53,167.17) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='88.06px' lengthAdjust='spacingAndGlyphs'>Pearson residuals</text>
-<text x='38.27' y='53.14' style='font-size: 11.00px; font-family: sans;' textLength='83.77px' lengthAdjust='spacingAndGlyphs'>Method: simulate</text>
+<text x='38.27' y='53.14' style='font-size: 11.00px; font-family: sans;' textLength='207.31px' lengthAdjust='spacingAndGlyphs'>Method: simulate; conditioning: conditional</text>
 <text x='38.27' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='116.67px' lengthAdjust='spacingAndGlyphs'>QQ plot of residuals</text>
 </g>
 <defs>
@@ -544,7 +544,7 @@
 <text x='658.57' y='284.42' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text>
 <text x='552.26' y='296.56' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='76.43px' lengthAdjust='spacingAndGlyphs'>Linear predictor</text>
 <text transform='translate(370.36,167.17) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='88.06px' lengthAdjust='spacingAndGlyphs'>Pearson residuals</text>
-<text x='395.48' y='53.14' style='font-size: 11.00px; font-family: sans;' textLength='82.55px' lengthAdjust='spacingAndGlyphs'>Family: gaussian</text>
+<text x='395.48' y='53.14' style='font-size: 11.00px; font-family: sans;' textLength='206.08px' lengthAdjust='spacingAndGlyphs'>Family: gaussian; conditioning: conditional</text>
 <text x='395.48' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='165.83px' lengthAdjust='spacingAndGlyphs'>Residuals vs linear predictor</text>
 </g>
 <defs>

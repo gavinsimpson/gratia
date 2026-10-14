@@ -220,12 +220,16 @@ test_that("inverse Gaussian fitted diagnostics use native CDF and quantiles", {
   expect_equal(qq_plot(m, method = "simulate", n_simulate = 3)$labels$subtitle,
     "Method: simulate")
 
-  eta <- fitted_samples(m, n = 2, seed = 121, scale = "response",
-    mvn_method = "mgcv")
+  # Fix coefficients so this independently checks the response law and RNG,
+  # without coupling its oracle to the coefficient sampler stream.
+  draws <- matrix(rep(coef(m), each = 2L), nrow = 2L)
+  eta <- fitted_samples(m, n = 2, method = "user", draws = draws,
+    scale = "response", mvn_method = "mgcv")
   weights <- restore_model_rows(wt, m)[eta$.row]
   expected <- withr::with_seed(121,
     rd_invgaussian(eta$.fitted, weights, m$sig2))
-  actual <- posterior_samples(m, n = 2, seed = 121, mvn_method = "mgcv")
+  actual <- posterior_samples(m, n = 2, seed = 121, method = "user",
+    draws = draws, mvn_method = "mgcv")
   expect_equal(actual$.response, expected)
 
   extreme <- do_quantile_residuals(c(.0001, 110), c(1.5, 1.5), 1, .7,

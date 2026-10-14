@@ -195,10 +195,10 @@ test_that("invalid and unsupported posterior comparisons fail clearly", {
     expect_error(posterior_predictive_plot(b_pois, level = level),
       "'level' must be a number strictly between zero and one", fixed = TRUE)
   }
-  for (m in list(m_lm, m_glm, 1)) {
+  for (m in list(1)) {
     expect_error(posterior_predictive_plot(m), "not available for")
   }
-  for (m in list(m_gaulss, m_twlss, m_censor, gfam_bam)) {
+  for (m in list(m_censor)) {
     expect_error(posterior_predictive_plot(m), "not available for family")
     expect_error(appraise(m, ppcheck = TRUE), "not available for family")
   }
@@ -278,7 +278,7 @@ test_that("appraise replaces only its histogram when ppcheck is enabled", {
     )
   }
   for (m in list(m_lm, m_glm)) {
-    expect_error(appraise(m, ppcheck = TRUE), "not available for")
+    expect_s3_class(appraise(m, ppcheck = TRUE, n_ppc = 2, seed = 1), "patchwork")
   }
   expect_error(
     appraise(m_tiny_eg1, ppcheck = TRUE, n_ppc = 0), "positive integer"
@@ -319,7 +319,9 @@ test_that("posterior predictive checks replace histograms in scalable appraisals
     p <- appraise(m_tiny_eg1, ppcheck = TRUE, n_ppc = 2, seed = 12,
       scalable = scalable, scalable_threshold = 1, qq_bins = 20,
       method = "normal", use_worm = TRUE)
-    expect_equal(p[[3L]]$data, expected$data)
+    check <- posterior_predictive_plot(m_tiny_eg1, n = 2, seed = 12,
+      scalable = scalable, scalable_threshold = 1)
+    expect_equal(p[[3L]]$data, check$data)
     if (identical(scalable, FALSE)) {
       expect_true("eta" %in% names(p[[2L]]$data))
     } else {

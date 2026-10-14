@@ -33,41 +33,30 @@ test_that("GJRM adapters use final distributional means and residuals for each f
     expect_equal(d$data$fitted, expected_mean, info = fam)
     expect_equal(d$data$eta, mu, info = fam)
     expect_equal(d$data$observed, dat$y, info = fam)
-    cdf <- as.vector(m$fit$p)
+    cdf_at <- function(q) switch(fam,
+      N = pnorm(q, mean = mu, sd = m$sigma2),
+      LN = plnorm(q, meanlog = mu, sdlog = m$sigma2),
+      GA = pgamma(q, shape = 1 / m$sigma2^2, scale = exp(mu) * m$sigma2^2),
+      GAi = pgamma(q, shape = 1 / m$sigma2^2, scale = mu * m$sigma2^2),
+      P = ppois(q, lambda = exp(mu)),
+      NBI = pnbinom(q, mu = exp(mu), size = 1 / m$sigma2),
+      NBII = pnbinom(q, mu = exp(mu), size = exp(mu) / m$sigma2))
+    cdf <- as.vector(cdf_at(dat$y))
     if (fam %in% c("P", "NBI", "NBII")) {
-      cdf <- withr::with_seed(
-        87,
-        runif(length(cdf), pmax(0, cdf - as.vector(m$fit$pdf2)), cdf)
-      )
+      cdf <- withr::with_seed(87,
+        runif(length(cdf), as.vector(cdf_at(dat$y - 1)), cdf))
     }
     expect_equal(d$data$residuals, qnorm(cdf), info = fam)
-    # Check fitted probabilities against the response distribution independently.
-    pfun <- get(
-      switch(
-        fam,
-        N = "pNO",
-        LN = "pLOGNO",
-        GA = "pGA",
-        GAi = "pGA",
-        P = "pPO",
-        NBI = "pNBI",
-        NBII = "pNBII"
-      ),
-      envir = ns
-    )
-    args <- list(
-      q = dat$y,
-      mu = if (fam %in% c("N", "LN", "GAi")) mu else exp(mu)
-    )
-    if (fam != "P") {
-      args$sigma <- as.vector(m$sigma2)
-    }
-    expect_equal(
-      as.vector(m$fit$p),
-      do.call(pfun, args),
-      tolerance = 1e-6,
-      info = fam
-    )
+    # NBII's stored CDF is Poisson in some upstream versions, despite a
+    # negative-binomial likelihood. Check the likelihood mass independently.
+    if (fam == "NBII") expect_equal(as.vector(m$fit$pdf2),
+      as.vector(dnbinom(dat$y, mu = exp(mu), size = exp(mu) / m$sigma2)),
+      tolerance = 1e-6)
+    expect_equal(quantile_residuals(m, type = "quantile", seed = 87),
+      d$data$residuals, ignore_attr = TRUE)
+    expect_equal(quantile_residuals(m, type = "pit", seed = 87),
+      cdf, tolerance = 1e-12, ignore_attr = TRUE)
+    expect_equal(nrow(simulate(m, nsim = 3, seed = 87)), nrow(dat))
     before <- get0(".Random.seed", envir = .GlobalEnv)
     a <- appraise(m, scalable = TRUE, seed = 87, qq_bins = 20)
     expect_identical(get0(".Random.seed", envir = .GlobalEnv), before)
@@ -83,11 +72,8 @@ test_that("GJRM adapters use final distributional means and residuals for each f
       worm_plot(m, seed = 87)$data$residuals,
       sort(d$data$residuals) - qnorm(ppoints(nrow(dat)))
     )
-    expect_error(scalable_qq_plot(m, method = "simulate"), "method = 'normal'")
-    expect_error(
-      scalable_residuals_hist_plot(m, type = "pearson"),
-      "type = 'quantile'"
-    )
+    expect_error(scalable_qq_plot(m, method = "simulate"), "fixed")
+    expect_s3_class(scalable_residuals_hist_plot(m, type = "pearson"), "ggplot")
   }
 })
 

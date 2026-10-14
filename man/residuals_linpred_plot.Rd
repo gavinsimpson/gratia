@@ -17,11 +17,13 @@ residuals_linpred_plot(
   line_col = "red",
   seed = NULL,
   by_family = NULL,
-  rank = NULL
+  rank = NULL,
+  conditioning = NULL,
+  ...
 )
 }
 \arguments{
-\item{model}{a fitted model. Currently only class \code{"gam"}.}
+\item{model}{a fitted model supported by \link{diagnostic_support}.}
 
 \item{type}{character or \code{NULL}; residual type: \code{"deviance"}, \code{"pearson"},
 \code{"response"}, \code{"pit"}, or \code{"quantile"}. Grouped models automatically use
@@ -32,7 +34,7 @@ residuals by default. See \code{\link[=appraise]{appraise()}} for distributional
 \item{ylab}{character or expression; the label for the y axis. If not
 supplied, a suitable label will be generated.}
 
-\item{xlab}{character or expression; the label for the y axis. If not
+\item{xlab}{character or expression; the label for the x axis. If not
 supplied, a suitable label will be generated.}
 
 \item{title}{character or expression; the title for the plot. See
@@ -65,6 +67,14 @@ axis of residual-versus-predictor plots. The default ranks pooled grouped
 plots and retains original predictors in facets. \code{TRUE} or \code{FALSE} overrides
 this independently of the residual type and layout. Only finite observations
 included in each component determine its ranks; average ties are used.}
+
+\item{conditioning}{character or \code{NULL}; \code{"conditional"} holds fitted random
+effects fixed, \code{"marginal"} averages over new effects, and \code{"gam_component"}
+uses the extracted GAM. Availability and defaults depend on the model; see
+\link{diagnostic_support}.}
+
+\item{...}{optional arguments passed to model preparation, such as the
+sdmTMB \code{field_method}.}
 }
 \description{
 Plot of residuals versus linear predictor values

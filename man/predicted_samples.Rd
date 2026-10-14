@@ -27,7 +27,7 @@ predicted_samples(model, ...)
 \method{predicted_samples}{scam}(model, n = 1, data = NULL, seed = NULL, weights = NULL, ...)
 }
 \arguments{
-\item{model}{a fitted model of the supported types}
+\item{model}{a fitted model of the supported types; see \link{diagnostic_support}.}
 
 \item{...}{arguments passed to other methods. For \code{fitted_samples()}, these
 are passed on to \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}. For \code{posterior_samples()} these are
@@ -42,8 +42,15 @@ the model will be used for \code{data}, if available in \code{model}.}
 
 \item{seed}{numeric; a random seed for the simulations.}
 
-\item{weights}{numeric; a vector of prior weights. If \code{data} is null
-then defaults to \code{object[["prior.weights"]]}, otherwise a vector of ones.}
+\item{weights}{numeric; response sampling weights for GAM methods. An
+explicit vector overrides the fitting weights; a single value applies to
+every observation. With \code{data = NULL}, the default is the fitted prior
+weights, except factor-valued binomial responses retain one Bernoulli trial
+per observation. With prediction data, the default is a vector of ones.
+For ordinary Gaussian and Gamma responses, larger weights reduce response
+variance (precision weights). For binomial responses, weights give integer
+trial counts. They do not alter the fitted coefficient covariance. Include
+positions restored by \code{na.exclude} when supplying weights for fitting rows.}
 
 \item{newdata}{Deprecated: use \code{data} instead.}
 }

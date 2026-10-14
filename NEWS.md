@@ -2,31 +2,101 @@
 
 ## User visible changes
 
-* Scalable residual conditional-density plots now use `KernSmooth::bkde2D()`
-  by default, with a square-root colour scale. Use
-  `density_method = "histogram"` to restore unsmoothed bins, or `bandwidth` to
-  control smoothing on both plotted axes. `KernSmooth` is now an import.
-  Count heatmaps remain unsmoothed; plot objects retain only the compact grid.
+* Residual checks and posterior predictive checks now share calculations across
+  lm, glm, gam/bam, gamm/gamm4, glmmTMB, univariate GJRM and sdmTMB models.
+  Probability integral transform (PIT) residuals express observations as fitted
+  probabilities. Quantile residuals transform those probabilities to
+  standard-normal scores. See
+  `?diagnostic_support` for supported families and conditioning choices.
+  mgcv's `fix_family_rd()`, `fix_family_cdf()` and `fix_family_qf()` functions
+  remain available and preserve distribution functions supplied by callers.
 
-* Pooled grouped-family residual histograms now use faint component-coloured
-  fills and opaque stepped upper boundaries, making overlapping components
-  distinguishable. Both ordinary and scalable diagnostics retain common bin
-  edges and component-specific density normalization.
+* Diagnostics distinguish holding fitted random effects fixed from averaging
+  over their distribution. Simulations retain temporal and spatial covariance
+  and shared random effects using the fitting packages' own response generators.
+  Marginal residuals can use means, variances and ranks calculated from these
+  simulations. Direct lme and merMod fits now support these checks and posterior
+  predictive checks. Non-Gaussian gamm fits estimated by penalized
+  quasi-likelihood (PQL) support approximate checks when they have no residual
+  working correlation.
 
-* `appraise()` now automatically uses scalable plots for 10,000 or more retained
-  fitting observations. Set `scalable = TRUE` or `FALSE` to override this
+* For BAM models that apply AR1 to working residuals using a generalized
+  estimating equations (GEE) approximation, marginal PIT, quantile and QQ checks
+  remain available. This correlation describes the fitting procedure but does
+  not specify a joint response distribution, so joint response
+  simulation and posterior predictive checks remain unavailable. QQ plots no
+  longer switch automatically to normal references or use bands that assume
+  independence. `residual_correlation()` and `residual_correlation_plot()`
+  provide approximate checks of serial structure without significance bands.
+  Gaussian identity-link AR1 response simulation remains supported.
+
+* sdmTMB residual diagnostics now distinguish four choices: draw fitted fields
+  once from their approximate posterior and hold them fixed (`mle-mvn`, the
+  default), hold field estimates fixed (`mle-eb`), average over fitted-field
+  uncertainty (`mle-mvn-integrated`), or simulate new fields
+  (`conditioning = "marginal"`). Plot labels describe the choice. Posterior
+  predictive checks separately include approximate parameter uncertainty.
+  See `?diagnostic_support` for what these checks assess and their limitations.
+
+* Response distributions now respect weighted Gaussian and Gamma dispersion,
+  factor-valued Bernoulli responses and numeric binomial trial counts. Gaussian
+  glmmTMB predictive draws use the package's standard-deviation parameterisation.
+  GAM sampling weights can explicitly override response precision or trial counts.
+  Beta diagnostics include the probability mass created by clipping native draws
+  at epsilon endpoints. Binomial probabilities just below an observed value and
+  variances for truncated counts with tiny means are calculated more accurately.
+
+* GEV and sinh-arcsinh residuals use stable means and correct centering and
+  signs. Undefined moments remain unavailable, and invalid sinh-arcsinh deviance
+  contrasts give an explanatory error; PIT/quantile checks remain available.
+  Extreme quantile calculations retain log probabilities where supported;
+  unsupported conversions give errors instead of false infinite quantiles.
+  More mgcv families now support distribution checks, including shash, twlss,
+  ordinal, ziP and grouped families. GJRM NBII probabilities use the fitted
+  likelihood parameters rather than inconsistent stored Poisson probabilities.
+
+* nlme diagnostics retain covariance between random effects in block designs,
+  fitted factor contrasts and observation order after subsetting or missing-value
+  removal. Prepared diagnostic objects consistently honour requested conditioning
+  and sdmTMB field choices across residual and plotting methods.
+
+* Posterior response draws retain offsets supplied as fitting arguments.
+  Coefficient and response draws use separate random-number streams. Seeded
+  results change, but remain reproducible, and an explicit seed preserves the
+  caller's random-number state.
+
+* QQ reference calculations now average draws without storing them all, or use
+  temporary files to compute exact simulated quantiles when memory use exceeds
+  the configured limit. Posterior predictive plots summarise all draws on a
+  shared grid; discrete responses with more than 512 distinct values use labelled
+  probabilities for 512 bins. QQ bands for dependent responses come from joint
+  simulations when available; otherwise the plot explains why bands are omitted.
+
+* Residual heatmaps now estimate the density at each predictor value with
+  `KernSmooth::bkde2D()` by default. A square-root colour scale makes low-density
+  regions easier to see. Use `density_method = "histogram"` for unsmoothed bins,
+  or `bandwidth` to control smoothing on both axes. Heatmaps of counts remain
+  unsmoothed. Plot objects store the grid rather than all observations, and
+  `KernSmooth` is now an import.
+
+* Histograms that pool residuals from grouped families use pale fills and
+  solid step outlines in each component's colour, so overlapping distributions
+  remain visible. Both ordinary and scalable plots use the same bin edges and
+  calculate each component's density separately.
+
+* `appraise()` now automatically uses scalable plots when at least 10,000
+  observations were used for fitting. Set `scalable = TRUE` or `FALSE` to override this
   behaviour, or change `scalable_threshold`.
 
-* Diagnostic plots now support uncensored univariate `GJRM::gamlss()` models
-  with N, LN, GA, GAi, P, NBI and NBII families, using randomized quantile
-  residuals and standard-normal reference bands. Observed-versus-fitted panels
-  use response means rather than working GAM predictions.
+* Diagnostic plots support uncensored univariate `GJRM::gamlss()` models with
+  N, LN, GA, GAi, P, NBI and NBII families. They use randomised quantile residuals
+  with a standard-normal reference. Observed-versus-fitted panels show response
+  means calculated from the final distribution parameters.
 
-* Inverse Gaussian models now use native CDF, quantile and random deviate
-  helpers that respect prior weights, enabling PIT/quantile residuals and uniform
-  QQ/worm plots without additional dependencies. Simulation-based QQ and worm
-  plots for GAMs avoid formatting unused quantile names, improving speed without
-  changing numerical results.
+* Inverse Gaussian distribution functions account for prior weights, enabling
+  PIT/quantile residuals and inverse-CDF QQ/worm plots without additional
+  dependencies. Simulated GAM QQ and worm plots are faster because they no
+  longer format unused quantile names; numerical results are unchanged.
 
 * Smooth plots now identify their model part or distributional parameter in
   subtitles for glmmTMB, mgcv and `GJRM::gamlss()` models with multiple linear

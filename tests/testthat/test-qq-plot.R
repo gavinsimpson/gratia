@@ -124,7 +124,7 @@ test_that("qq_plot() prints message if direct method requested", {
 test_that("qq_plot.default fails with error", {
   expect_error(
     qq_plot(dat),
-    "Unable to produce a Q-Q plot for <data.frame>"
+    "Diagnostic data are not available for <data.frame>"
   )
 })
 

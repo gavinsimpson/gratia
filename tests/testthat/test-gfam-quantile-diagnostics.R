@@ -181,14 +181,13 @@ test_that("pooled histograms use common bin edges and component-specific density
 })
 
 test_that("unsupported quantile configurations fallback consistently or error when requested", {
-  expect_message(expect_identical(diagnostic_type(gfam_ordinal_model), "deviance"),
-    "component 1 <Ordered Categorical")
-  expect_error(quantile_residuals(gfam_ordinal_model, type = "quantile"), "component 1")
-  expect_error(qq_plot(gfam_ordinal_model, type = "quantile"), "component 1")
+  expect_identical(diagnostic_type(gfam_ordinal_model), "quantile")
+  expect_true(all(is.finite(quantile_residuals(gfam_ordinal_model, type = "quantile"))))
+  expect_s3_class(qq_plot(gfam_ordinal_model, type = "quantile"), "ggplot")
   model <- gfam_gamma_model
   model$prior.weights[attr(model$family$getfl(), "fi") == 1L] <- 2
-  expect_message(expect_identical(diagnostic_type(model), "deviance"), "non-unit Gamma weights")
-  expect_error(quantile_residuals(model), "non-unit Gamma weights")
+  expect_identical(diagnostic_type(model), "quantile")
+  expect_true(all(is.finite(quantile_residuals(model))))
   model <- gfam_model
   model$prior.weights[1L] <- 1.5
   expect_error(qq_plot(model), "integer trial counts")

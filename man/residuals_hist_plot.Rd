@@ -14,11 +14,13 @@ residuals_hist_plot(
   subtitle = NULL,
   caption = NULL,
   seed = NULL,
-  by_family = NULL
+  by_family = NULL,
+  conditioning = NULL,
+  ...
 )
 }
 \arguments{
-\item{model}{a fitted model. Currently only class \code{"gam"}.}
+\item{model}{a fitted model supported by \link{diagnostic_support}.}
 
 \item{type}{character or \code{NULL}; residual type: \code{"deviance"}, \code{"pearson"},
 \code{"response"}, \code{"pit"}, or \code{"quantile"}. Grouped models automatically use
@@ -32,7 +34,7 @@ indicating how to calculate the number of bins.}
 \item{ylab}{character or expression; the label for the y axis. If not
 supplied, a suitable label will be generated.}
 
-\item{xlab}{character or expression; the label for the y axis. If not
+\item{xlab}{character or expression; the label for the x axis. If not
 supplied, a suitable label will be generated.}
 
 \item{title}{character or expression; the title for the plot. See
@@ -52,6 +54,14 @@ and facets traditional residuals. \code{TRUE} and \code{FALSE} explicitly select
 layout. In \code{appraise()}, observed-versus-fitted values always use component
 facets. Standalone \code{observed_fitted_plot()} facets by default and permits
 explicit pooling. Ignored for ordinary models.}
+
+\item{conditioning}{character or \code{NULL}; \code{"conditional"} holds fitted random
+effects fixed, \code{"marginal"} averages over new effects, and \code{"gam_component"}
+uses the extracted GAM. Availability and defaults depend on the model; see
+\link{diagnostic_support}.}
+
+\item{...}{optional arguments passed to model preparation, such as the
+sdmTMB \code{field_method}.}
 }
 \description{
 Histogram of model residuals

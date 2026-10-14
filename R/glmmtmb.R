@@ -211,11 +211,20 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
 #' Diagnostics use native Pearson residuals by default. QQ simulations hold
 #' fitted smooths and grouping effects fixed and draw new responses; no refitting
 #' is performed. Supported response families are Gaussian, Poisson, binomial,
-#' nbinom1/2, beta, Gamma/ziGamma, Tweedie, and zero-truncated Poisson/nbinom1/2,
+#' nbinom1/2, beta, Gamma/ziGamma, Tweedie, lognormal, and zero-truncated
+#' Poisson/nbinom1/2,
 #' including applicable zero-inflation or hurdle mixtures and varying dispersion.
 #' Truncated nbinom1 currently requires `type = "response"` because glmmTMB
 #' does not supply its Pearson residuals. Other unavailable residual types fail
-#' explicitly. PIT and quantile residuals are not supported by these methods.
+#' explicitly. Supported fitted response distributions also provide randomized
+#' PIT/quantile residuals and inverse-CDF QQ references, including their
+#' zero-inflation and truncation probabilities. Posterior predictive checks draw
+#' coefficients and fitted random effects together from their approximate
+#' posterior. See [posterior_predictive_plot()] for how covariance and other
+#' family parameters are treated. Marginal checks simulate new effects using
+#' glmmTMB's response generator. If marginal CDFs are not analytic, residual
+#' checks use a shared sample of simulations to calculate moments and ranks.
+#' See [diagnostic_support] for conditioning choices and remaining limitations.
 #'
 #' @return Smooth estimates, coefficients, or plots, as for the GAM methods.
 #'   All smooths, native random effects and parametric terms are plotted by

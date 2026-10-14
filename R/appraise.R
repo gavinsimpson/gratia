@@ -1,41 +1,54 @@
 #' @title Model diagnostic plots
 #'
-#' @param model a fitted model. Currently models inheriting from class `"gam"`,
-#'   as well as classes `"glm"` and `"lm"` from calls to [stats::glm] or
-#'   [stats::lm] are supported.
-#' @param method character or `NULL`; reference-quantile method. For quantile
-#'   residuals, `NULL` and `"normal"` use a fixed standard-normal reference;
-#'   `"uniform"` and `"simulate"` require a traditional residual type instead.
-#'   For grouped-family traditional residuals, `NULL` selects `"simulate"` when
-#'   every component has a generator, or `"uniform"` with a message when every
-#'   component has an inverse CDF. An unavailable reference distribution is an
-#'   error; `"normal"` is available only as an explicit approximation.
-#'   For ordinary models, `NULL` retains the default `"simulate"` for Tweedie
-#'   families and `"uniform"` otherwise, with existing availability fallbacks.
-#'   `"uniform"` averages residual reference quantiles obtained by inverse-CDF
-#'   sampling over `n_uniform` draws. `"simulate"` uses `n_simulate` simulated
-#'   response data sets at the observed covariates and permits reference bands.
-#'   `"normal"` uses a location/scale-fitted normal approximation for traditional
-#'   residuals. `"direct"` is deprecated in favour of `"uniform"`.
+#' @param model a fitted model supported by [diagnostic_support], including
+#'   lm, glm, gam/bam, gamm/gamm4, glmmTMB, univariate GJRM and sdmTMB.
+#' @param method character or `NULL`; how to calculate reference quantiles.
+#'   Probability integral transform (PIT) and quantile residuals use fixed
+#'   uniform and standard-normal references, respectively. For quantile residuals, `"normal"` also selects that fixed
+#'   reference; other named methods require traditional residuals.
+#'   For deviance, response and Pearson residuals:
 #'
-#' @details With `type = NULL`, ordinary models retain deviance residuals.
+#'   * `"uniform"` applies the fitted inverse cumulative distribution function
+#'     (CDF) to randomised uniform quantiles and averages the resulting ordered residuals over `n_uniform`
+#'     draws.
+#'   * `"simulate"` generates `n_simulate` response data sets at the fitting
+#'     covariates. Responses are generated together when needed to preserve
+#'     dependence, and their ordered residuals supply reference values and bands.
+#'   * `"marginal"` approximates the pooled distribution of individual residuals,
+#'     without bands for dependence. This is selected for BAM GEE and PQL
+#'     correlations that do not define a joint response distribution. Explicit
+#'     joint simulation is unavailable in those cases.
+#'   * `"normal"` uses a normal approximation fitted to the residual location
+#'     and scale. For dependent responses it omits bands based on independence.
+#'   * `"direct"` is deprecated in favour of `"uniform"`.
+#'
+#'   For ordinary GAMs, `NULL` selects `"simulate"` for Tweedie and `"uniform"`
+#'   otherwise. Missing inverse CDFs cause a switch to simulation; missing response
+#'   generators can cause a switch to a normal approximation for independent
+#'   responses. Dependent responses use joint simulation when available, or
+#'   marginal checks otherwise. For grouped families, `NULL` selects simulation
+#'   if every component has a generator, or inverse-CDF sampling with a message
+#'   if every component has an inverse CDF. If neither is available, it gives an
+#'   error; a normal approximation must be requested explicitly.
+#'
+#' @details With `type = NULL`, ordinary lm/glm/GAM fits use deviance residuals.
 #'   Models fitted with [mgcv::gfam()] use randomised quantile (Dunn--Smyth)
-#'   residuals when every active component has validated CDF and response-bound
-#'   semantics. Otherwise, a message identifies unsupported components and all
+#'   residuals when every active component supplies a supported CDF and
+#'   probability limits for discrete or censored observations. Otherwise, a
+#'   message identifies unsupported components and all
 #'   components use deviance residuals; requesting `type = "quantile"` explicitly
 #'   is an error when any component is unsupported. Components never mix
 #'   residual scales. Invalid encodings or numerical CDF failures are errors.
 #'
 #'   Quantile residuals use each component's fitted parameters, dispersion and
 #'   weights, including binomial trial counts and Gaussian precision weights.
-#'   Gamma components with unit weights, plus negative binomial, beta, scaled-t
-#'   and Tweedie components are supported. Non-unit Gamma weights, ordinal,
-#'   zero-inflated Poisson,
-#'   inverse Gaussian and unrecognised custom-family probability bounds are not
-#'   yet supported for quantile diagnostics. A custom CDF alone is insufficient
-#'   without validated response-bound and discrete-left-limit semantics.
-#'   CDF overrides for recognised families must retain their argument and
-#'   probability-bound conventions. Scalar uncensored `cnorm()`, `clog()` and
+#'   Gamma (including precision weights), negative binomial, beta, scaled-t,
+#'   Tweedie, inverse Gaussian, ordinal and zero-inflated Poisson components are
+#'   supported. Unrecognised custom-family bounds remain unsupported.
+#'   A custom CDF must also support the probabilities just below discrete
+#'   values and at censoring limits. Replacements for recognised family CDFs
+#'   must use the same arguments and probability conventions. Scalar uncensored
+#'   `cnorm()`, `clog()` and
 #'   `cpois()` components are supported; genuine censoring requires recoverable,
 #'   aligned censoring bounds. Matrix censored responses rejected by `gfam()`
 #'   and upstream fitting failures are not repaired.
@@ -53,16 +66,18 @@
 #'   Pooled histograms use common bin edges and component-specific densities.
 #'
 #'   Quantile QQ and worm plots compare to fixed standard-normal quantiles,
-#'   with an identity line or zero line. Their reference bands are exact
-#'   pointwise order-statistic bands for an ideal independent standard-normal
-#'   sample, conditional on fitted distribution parameters. They do not include
-#'   parameter-estimation uncertainty or provide joint coverage. Worm plots
+#'   with an identity line or zero line. Independent responses have exact
+#'   pointwise reference bands for ordered residuals. For dependent responses,
+#'   bands use simulations that preserve dependence when a joint generator is
+#'   available; otherwise they are omitted with an explanation. Bands condition
+#'   on fitted parameters, exclude estimation uncertainty and do not provide
+#'   simultaneous coverage. References calculated from simulation ranks also
+#'   use simulated bands; see [diagnostic_support]. Worm plots
 #'   subtract the same theoretical quantiles from residuals and reference bands.
 #'   `appraise()` computes one seeded residual vector shared by its residual
 #'   panels and always separates observed-versus-fitted values by component,
 #'   because response units differ. Standalone [observed_fitted_plot()] allows
-#'   explicit pooling. Grouped ordinal models support traditional deviance
-#'   QQ/worm plots, but not the observed-versus-fitted panel or full appraisal.
+#'   explicit pooling. Ordinal panels use expected category codes.
 #'
 #' @param by_family logical or `NULL`; separate indexed grouped-family components
 #'   into facets. The default pools quantile residuals with component colours
@@ -76,17 +91,20 @@
 #'   this independently of the residual type and layout. Only finite observations
 #'   included in each component determine its ranks; average ties are used.
 #' @param use_worm logical; should a worm plot be drawn in place of the QQ plot?
-#' @param n_uniform numeric; number of times to randomize uniform quantiles
-#'   in the direct computation method (`method = "direct"`) for QQ plots.
+#' @param n_uniform numeric; number of inverse-CDF draws to average when
+#'   `method = "uniform"`.
 #' @param n_simulate numeric; number of data sets to simulate from the estimated
 #'   model when using the simulation method (`method = "simulate"`) for QQ
 #'   plots.
 #' @param seed numeric; the random number seed to use for `method = "simulate"`
 #'   and `method = "uniform"`, and for randomised quantile residuals and
 #'   posterior predictive draws.
-#' @param type character or `NULL`; residual type: `"deviance"`, `"pearson"`,
-#'   `"response"`, or `"quantile"`. The default selects quantile residuals for
-#'   supported grouped-family models and deviance residuals otherwise.
+#' @param type character or `NULL`; residual type: `"deviance"`, `"response"`,
+#'   `"pearson"`, `"pit"`, or `"quantile"`. `NULL` uses the model-specific default:
+#'   deviance for ordinary lm/glm/GAM fits, and quantile for supported grouped
+#'   families, GJRM, sdmTMB and full mixed-model checks. glmmTMB uses Pearson
+#'   residuals conditionally and response residuals marginally. Extracted GAM
+#'   components follow the ordinary GAM defaults. See [diagnostic_support].
 #' @param n_bins character or numeric; either the number of bins or a string
 #'   indicating how to calculate the number of bins.
 #' @param ncol,nrow numeric; the numbers of rows and columns over which to
@@ -98,7 +116,7 @@
 #'   traditional `method = "simulate"` or `"normal"` bands. Also controls
 #'   posterior predictive intervals for discrete responses with `ppcheck = TRUE`.
 #' @param ci_alpha,ci_col colour and transparency of QQ reference intervals,
-#'   including calibrated quantile-residual bands.
+#'   including bands for quantile residuals.
 #' @param point_col,point_alpha colour and transparency used to draw points in
 #'   the plots. See [graphics::par()] section **Color Specification**. This is
 #'   passed to the individual plotting functions, and therefore affects the
@@ -123,6 +141,20 @@
 #'   including endpoints.
 #' @param density_bins Positive integer or pair giving heatmap grid dimensions.
 #' @inheritParams scalable_qq_plot
+#' @param conditioning character or `NULL`; `"conditional"` holds fitted random
+#'   effects fixed, `"marginal"` averages over new effects, and `"gam_component"`
+#'   uses the extracted GAM. Availability and defaults depend on the model; see
+#'   [diagnostic_support].
+#' @param component character; for delta sdmTMB models, select the complete
+#'   `"response"`, occurrence (`"binomial"`), or `"positive"` component.
+#'   Positive-component checks use only observations with positive responses.
+#' @param field_method how to treat fitted sdmTMB fields: hold one posterior
+#'   draw fixed (`"mle-mvn"`), hold estimates fixed (`"mle-eb"`), or average
+#'   over fitted-field uncertainty (`"mle-mvn-integrated"`). See
+#'   [quantile_residuals()] and [diagnostic_support].
+#' @param ppc_batch_size positive integer; number of posterior predictive
+#'   draws to process together for scalable plots. Changing the batch size does
+#'   not change results for a fixed seed.
 #' @param ... arguments passed to [patchwork::wrap_plots()].
 #'
 #' @importFrom patchwork wrap_plots
@@ -134,9 +166,15 @@
 #' @details Scalable plots aggregate all observations before rendering. Residual
 #'   heatmaps show conditional density; observed-versus-fitted heatmaps show
 #'   counts. Point styling applies to QQ/worm points, and heatmap fill scales can
-#'   be changed with ggplot scales. QQ reference calculations and their simulation
-#'   memory requirements are unchanged. Supported univariate GJRM::gamlss models
-#'   use quantile residuals; see [scalable_qq_plot()] for coverage.
+#'   be changed with ggplot scales. QQ references average draws as they are
+#'   generated or compute exact pooled quantiles using temporary files above
+#'   the configured memory threshold; see [diagnostic_support]. Supported univariate GJRM::gamlss models use quantile
+#'   residuals by default.
+#'
+#'   If the response expectation does not exist, the observed-versus-fitted
+#'   panel explains why it is unavailable. Other supported panels remain usable.
+#'   Prepared diagnostic objects can be given a new conditioning or field choice;
+#'   the model is prepared again so all panels use the requested choice.
 #'
 #' @seealso The plots are produced by functions [gratia::qq_plot()],
 #'   [gratia::residuals_linpred_plot()], [gratia::residuals_hist_plot()],
@@ -201,14 +239,30 @@
   n_ppc = 50,
   density_method = c("kde", "histogram"),
   bandwidth = NULL,
+  conditioning = NULL,
+  ppc_batch_size = 10L,
   ...
 ) {
+  arguments <- list(...)
+  adapter_arguments <- diagnostic_adapter_arguments(model, arguments)
+  argument_names <- names(arguments) %||% rep("", length(arguments))
+  plot_arguments <- arguments[!argument_names %in% names(adapter_arguments)]
+  if (inherits(model, "gratia_diagnostics")) {
+    if (length(adapter_arguments) || !is.null(conditioning))
+      model <- do.call(prepare_diagnostic_data, c(list(model = model,
+        type = type, seed = seed, conditioning = conditioning), adapter_arguments))
+  } else {
+    model <- do.call(diagnostic_plot_source, c(list(model = model,
+      type = type, seed = seed, conditioning = conditioning), adapter_arguments))
+  }
   if (!is.logical(ppcheck) || length(ppcheck) != 1L || is.na(ppcheck)) {
     stop("'ppcheck' must be TRUE or FALSE.", call. = FALSE)
   }
   # Check posterior sampling support before preparing other diagnostic panels.
   plt3 <- if (ppcheck) {
-    posterior_predictive_plot(model, n = n_ppc, seed = seed,
+    posterior_predictive_plot(diagnostic_posterior_source(model), n = n_ppc, seed = seed,
+      conditioning = conditioning %||% model$conditioning, scalable = scalable,
+      scalable_threshold = scalable_threshold, batch_size = ppc_batch_size,
       observed_col = line_col, replicated_col = ci_col,
       replicated_alpha = if (missing(ci_alpha)) NULL else ci_alpha,
       level = level)
@@ -225,11 +279,13 @@
     check_gfam_appraise(model)
     type <- diagnostic_type(model, type)
     by_family <- diagnostic_by_family(model, type, by_family)
-    if (type == "quantile") {
+    if (type %in% c("pit", "quantile")) {
       model <- cache_diagnostic_residuals(model, type, seed)
     }
     n_obs <- NROW(stats::model.frame(model))
   }
+  mean_panel <- diagnostic_mean_panel(response_distribution(
+    if (inherits(model, "gratia_diagnostics")) model$source else model))
   use_scalable <- diagnostic_scalable(scalable, scalable_threshold, n_obs)
   validate_diagnostic_bins(qq_bins, "qq_bins", minimum = 3L)
   validate_diagnostic_bins(density_bins, "density_bins", length = c(1L, 2L))
@@ -247,7 +303,7 @@
   }
 
   if (use_scalable || prepared) {
-    d <- diagnostic_data(model, type, seed)
+    d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning)
     plt1 <- scalable_qq(
       d,
       method = method,
@@ -283,7 +339,7 @@
           by_family = by_family
         )
       }
-      plt4 <- scalable_observed_fitted_plot(
+      plt4 <- mean_panel %||% scalable_observed_fitted_plot(
         d,
         density_bins = density_bins,
         by_family = TRUE
@@ -298,7 +354,8 @@
         "Residuals vs linear predictor",
         point_col,
         point_alpha,
-        line_col
+        line_col,
+        line_intercept = if (type == "pit") 0.5 else 0
       )
       if (!ppcheck) {
         plt3 <- scalable_residuals_hist_plot(
@@ -307,7 +364,7 @@
           by_family = by_family
         )
       }
-      plt4 <- render_diagnostic_points(
+      plt4 <- mean_panel %||% render_diagnostic_points(
         d$data,
         "fitted",
         "observed",
@@ -319,7 +376,7 @@
       )
     }
     layout <- prepare_plot_layout(4L, ncol = ncol, nrow = nrow)
-    return(wrap_plots(
+    return(wrap_diagnostic_appraisal(
       plt1,
       plt2,
       plt3,
@@ -328,7 +385,7 @@
       ncol = layout$ncol,
       nrow = layout$nrow,
       guides = guides,
-      ...
+      plot_args = plot_arguments
     ))
   }
 
@@ -370,7 +427,7 @@
       by_family = by_family
     )
   }
-  plt4 <- observed_fitted_plot(
+  plt4 <- mean_panel %||% observed_fitted_plot(
     model,
     subtitle = NULL,
     point_col = point_col,
@@ -382,7 +439,7 @@
   layout <- prepare_plot_layout(n_plots, ncol = ncol, nrow = nrow)
   ncol <- layout$ncol
   nrow <- layout$nrow
-  wrap_plots(
+  wrap_diagnostic_appraisal(
     plt1,
     plt2,
     plt3,
@@ -391,43 +448,26 @@
     ncol = ncol,
     nrow = nrow,
     guides = guides,
-    ...
+    plot_args = plot_arguments
   )
 }
 
 #' @rdname appraise
 #' @importFrom stats model.frame model.response df.residual
 #' @export
-`appraise.lm` <- function(model, ...) {
-  model <- model_used_rows(model)
-  r <- residuals(model)
-  r.df <- df.residual(model)
-  model[["sig2"]] <- sum((r - mean(r))^2) / r.df
-  if (is.null(weights(model))) {
-    model$prior.weights <- rep(1, nrow(model.frame(model)))
-  }
-  if (is.null(model[["linear.predictors"]])) {
-    model[["linear.predictors"]] <- model[["fitted.values"]]
-  }
-  if (is.null(model[["y"]])) {
-    model[["y"]] <- model.response(model.frame(model))
-  }
-  appraise.gam(model, ...)
+appraise.lm <- function(model, ...) {
+  appraise.gam(prepare_lm_diagnostics(model), ...)
 }
 #' @rdname appraise
 #' @export
-appraise.gamlss <- function(model, ..., type = "quantile", seed = NULL) {
-  appraise.gam(
-    diagnostic_data(model, type, seed),
-    ...,
-    type = type,
-    seed = seed
-  )
+appraise.gamlss <- function(model, ..., type = "quantile", seed = NULL,
+                            conditioning = NULL) {
+  appraise.default(model, ..., type = type, seed = seed, conditioning = conditioning)
 }
 
 #' @rdname appraise
 #' @export
-appraise.default <- function(model, ..., type = NULL, seed = NULL) {
-  d <- diagnostic_data(model, type, seed)
-  appraise.gam(d, ..., type = d$type, seed = seed)
+appraise.default <- function(model, ..., type = NULL, seed = NULL, conditioning = NULL) {
+  d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning)
+  appraise.gam(d, ..., type = d$type, seed = seed, conditioning = conditioning)
 }

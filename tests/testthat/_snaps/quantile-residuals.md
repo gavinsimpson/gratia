@@ -14,11 +14,3 @@
        [1]  1.9057123 -0.8627816  0.6520413  0.9163218  0.6258978  0.9575311
        [7]  0.3101725  1.0874592 -0.3150668 -1.2923274
 
-# quantile residuals fails correctly for an unsupported GAM
-
-    Code
-      quantile_residuals(m_twlss, type = "quantile", seed = 1)
-    Condition
-      Error in `do_quantile_residuals()`:
-      ! Quantile residuals are not available for this family.
-

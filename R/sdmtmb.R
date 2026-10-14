@@ -289,9 +289,23 @@ sdmtmb_smooth_model <- function(
 #' give errors.
 #'
 #' Support is for sdmTMB >= 1.1.0, including development fits using RTMB.
-#' Dispersion formulas, other multi-predictor families, threshold and nonlocal
-#' effects, random-effect plots, diagnostics and posterior sampling are not
-#' provided by these methods.
+#' Diagnostics use complete fitted predictors, including spatial, spatiotemporal
+#' and independent group effects and offsets. Supported single-response and standard delta
+#' families provide PIT/quantile residuals, ordinary and scalable diagnostic
+#' plots, and joint approximate posterior predictive checks. Delta diagnostics
+#' can select the complete response, occurrence or positive component. Raw
+#' posterior response draws are available through [posterior_samples()].
+#' By default, fields are drawn together once from their approximate posterior
+#' and held fixed (`mle-mvn`), following sdmTMB's recommended residual calculation.
+#' Checks can also hold estimates fixed, average over fitted-field uncertainty,
+#' or simulate new fields. Marginal simulations preserve dependence and supply
+#' residual ranks, including for nonlinear and coupled delta responses. See
+#' [diagnostic_support] for treatment of coefficients, fields and covariance,
+#' and what each check assesses.
+#'
+#' Smooth extraction and effect plots do not support dispersion formulas,
+#' other multi-predictor families, or threshold and nonlocal effects.
+#' Random-effect plots are not provided.
 #'
 #' @return Smooth labels, smooth objects, coefficients, effect estimates, or
 #'   plots, as for the corresponding GAM methods. [draw()] returns a patchwork,

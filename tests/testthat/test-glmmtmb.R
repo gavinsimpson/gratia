@@ -148,8 +148,8 @@ test_that("native residuals are preserved for observed and replaced responses", 
     }
   }
   expect_equal(residuals_linpred_plot(m)$data$eta, unname(predict(m, type = "link")))
-  expect_error(qq_plot(m, method = "uniform"), "simulate")
-  expect_error(appraise(m, type = "quantile"), "arg")
+  expect_s3_class(qq_plot(m, method = "uniform"), "ggplot")
+  expect_s3_class(appraise(m, type = "quantile"), "patchwork")
   set.seed(4); before <- .Random.seed
   a <- qq_plot(m, n_simulate = 5, seed = 42)
   expect_identical(.Random.seed, before)

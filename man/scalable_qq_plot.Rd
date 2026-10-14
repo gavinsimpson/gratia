@@ -27,7 +27,9 @@ scalable_qq_plot(
   point_col = "grey20",
   point_alpha = 1,
   line_col = "red",
-  by_family = NULL
+  by_family = NULL,
+  conditioning = NULL,
+  ...
 )
 
 scalable_worm_plot(model, ...)
@@ -47,7 +49,9 @@ scalable_residuals_linpred_plot(
   by_family = NULL,
   rank = NULL,
   density_method = c("kde", "histogram"),
-  bandwidth = NULL
+  bandwidth = NULL,
+  conditioning = NULL,
+  ...
 )
 
 scalable_observed_fitted_plot(
@@ -59,7 +63,9 @@ scalable_observed_fitted_plot(
   title = "Observed vs fitted values",
   subtitle = NULL,
   caption = NULL,
-  by_family = NULL
+  by_family = NULL,
+  conditioning = NULL,
+  ...
 )
 
 scalable_residuals_hist_plot(
@@ -72,34 +78,50 @@ scalable_residuals_hist_plot(
   title = "Histogram of residuals",
   subtitle = NULL,
   caption = NULL,
-  by_family = NULL
+  by_family = NULL,
+  conditioning = NULL,
+  ...
 )
 }
 \arguments{
-\item{model}{A fitted mgcv GAM, lm, glm, gamm4, glmmTMB, or supported
-univariate GJRM::gamlss model.}
+\item{model}{A fitted model supported by \link{diagnostic_support}.}
 
-\item{method}{character or \code{NULL}; reference-quantile method. For quantile
-residuals, \code{NULL} and \code{"normal"} use a fixed standard-normal reference;
-\code{"uniform"} and \code{"simulate"} require a traditional residual type instead.
-For grouped-family traditional residuals, \code{NULL} selects \code{"simulate"} when
-every component has a generator, or \code{"uniform"} with a message when every
-component has an inverse CDF. An unavailable reference distribution is an
-error; \code{"normal"} is available only as an explicit approximation.
-For ordinary models, \code{NULL} retains the default \code{"simulate"} for Tweedie
-families and \code{"uniform"} otherwise, with existing availability fallbacks.
-\code{"uniform"} averages residual reference quantiles obtained by inverse-CDF
-sampling over \code{n_uniform} draws. \code{"simulate"} uses \code{n_simulate} simulated
-response data sets at the observed covariates and permits reference bands.
-\code{"normal"} uses a location/scale-fitted normal approximation for traditional
-residuals. \code{"direct"} is deprecated in favour of \code{"uniform"}.}
+\item{method}{character or \code{NULL}; how to calculate reference quantiles.
+Probability integral transform (PIT) and quantile residuals use fixed
+uniform and standard-normal references, respectively. For quantile residuals, \code{"normal"} also selects that fixed
+reference; other named methods require traditional residuals.
+For deviance, response and Pearson residuals:
+\itemize{
+\item \code{"uniform"} applies the fitted inverse cumulative distribution function
+(CDF) to randomised uniform quantiles and averages the resulting ordered residuals over \code{n_uniform}
+draws.
+\item \code{"simulate"} generates \code{n_simulate} response data sets at the fitting
+covariates. Responses are generated together when needed to preserve
+dependence, and their ordered residuals supply reference values and bands.
+\item \code{"marginal"} approximates the pooled distribution of individual residuals,
+without bands for dependence. This is selected for BAM GEE and PQL
+correlations that do not define a joint response distribution. Explicit
+joint simulation is unavailable in those cases.
+\item \code{"normal"} uses a normal approximation fitted to the residual location
+and scale. For dependent responses it omits bands based on independence.
+\item \code{"direct"} is deprecated in favour of \code{"uniform"}.
+}
 
-\item{type}{Residual type; \code{NULL} follows \code{\link[=appraise]{appraise()}} defaults for mgcv, lm,
-glm and gamm4, selects Pearson for glmmTMB, and quantile for GJRM. The residual heatmap and
-histogram also accept PIT and quantile residuals where available.}
+For ordinary GAMs, \code{NULL} selects \code{"simulate"} for Tweedie and \code{"uniform"}
+otherwise. Missing inverse CDFs cause a switch to simulation; missing response
+generators can cause a switch to a normal approximation for independent
+responses. Dependent responses use joint simulation when available, or
+marginal checks otherwise. For grouped families, \code{NULL} selects simulation
+if every component has a generator, or inverse-CDF sampling with a message
+if every component has an inverse CDF. If neither is available, it gives an
+error; a normal approximation must be requested explicitly.}
 
-\item{n_uniform}{numeric; number of times to randomize uniform quantiles
-in the direct computation method (\code{method = "uniform"}).}
+\item{type}{Residual type; \code{NULL} follows the model-specific defaults in
+\code{\link[=appraise]{appraise()}}. PIT and quantile residuals are available for supported response
+distributions; see \link{diagnostic_support}.}
+
+\item{n_uniform}{numeric; number of inverse-CDF draws to average when
+\code{method = "uniform"}.}
 
 \item{n_simulate}{numeric; number of data sets to simulate from the estimated
 model when using the simulation method (\code{method = "simulate"}).}
@@ -118,8 +140,8 @@ an integer of at least three.}
 \item{title, subtitle, caption}{Plot title, subtitle and caption, passed to
 \code{\link[ggplot2:labs]{ggplot2::labs()}}.}
 
-\item{ci_col}{fill colour for reference intervals, including calibrated
-quantile-residual bands.}
+\item{ci_col}{fill colour for reference intervals, including bands for
+quantile residuals.}
 
 \item{ci_alpha}{alpha transparency for reference intervals.}
 
@@ -137,8 +159,15 @@ layout. In \code{appraise()}, observed-versus-fitted values always use component
 facets. Standalone \code{observed_fitted_plot()} facets by default and permits
 explicit pooling. Ignored for ordinary models.}
 
-\item{...}{For \code{scalable_worm_plot()}, arguments passed to
-\code{scalable_qq_plot()} (except its internal worm setting).}
+\item{conditioning}{character or \code{NULL}; \code{"conditional"} holds fitted random
+effects fixed, \code{"marginal"} averages over new effects, and \code{"gam_component"}
+uses the extracted GAM. Availability and defaults depend on the model; see
+\link{diagnostic_support}.}
+
+\item{...}{optional arguments used to prepare the model for diagnostics,
+including sdmTMB \code{field_method}.
+For \code{scalable_worm_plot()}, other arguments pass to \code{scalable_qq_plot()}
+except its internal worm setting.}
 
 \item{density_bins}{Positive integer or pair of integers giving the number
 of horizontal and vertical heatmap bins.}
@@ -171,25 +200,27 @@ A ggplot object containing aggregated plotting data.
 }
 \description{
 Aggregate all observations before drawing model diagnostic plots with ggplot.
-QQ curves use equal-arc-length bins with their endpoints preserved. Heatmaps
-and histograms contain precomputed counts, so redrawing does not re-bin the
-original data. The existing QQ reference calculations are retained: their
-simulation matrices can still require memory proportional to observations
-times simulations. Binning reduces rendering cost, not that calculation cost.
+QQ points are grouped into bins of equal distance along the curve, keeping
+both endpoints. Heatmaps and histograms contain precomputed counts, so
+redrawing does not bin the original data again. Uniform references average
+draws as they are generated. Simulated references retain exact pooled
+quantiles, using temporary files above the configured memory threshold; see
+\link{diagnostic_support}.
 }
 \details{
 GJRM support covers uncensored univariate N, LN, GA, GAi, P, NBI,
-and NBII models. Only \code{type = "quantile"} and \code{method = "normal"} are
-supported. Discrete CDF jumps are randomized; their accuracy is limited by
-GJRM's stored fitted probabilities. QQ bands are pointwise standard-normal
-order-statistic reference intervals conditional on the fitted distribution,
+and NBII models. PIT/quantile references are uniform/normal; traditional
+response/Pearson references use inverse-CDF or simulated responses.
+Probabilities are recomputed from final likelihood parameters. Quantile QQ
+bands give pointwise intervals for ordered standard-normal residuals,
+conditional on the fitted distribution,
 without accounting for parameter estimation. Observed-versus-fitted plots
 use response means, including the lognormal mean correction. Residuals are
 plotted against the first distributional linear predictor.
 
 Grouped-family models retain the residual defaults, component reference
 distributions, predictor ranks and layout controls of \code{\link[=appraise]{appraise()}}. QQ
-bin limits apply separately to each indexed component. Pooled residual
+bin limits apply separately to each component. Pooled residual
 heatmaps summarize the component mixture rather than colouring individual
 observations; observed-versus-fitted appraisals always separate components.
 Pooled histograms use faint component-coloured fills with opaque stepped
@@ -200,9 +231,9 @@ Each predictor slice is normalized to integrate to one over the displayed
 residual grid. Bandwidths, rather than \code{density_bins}, control smoothing;
 increase grid resolution when using small bandwidths. A square-root fill
 transformation reveals low-density regions while retaining density units
-in the legend. Gaussian kernels smooth discrete residual bands, which can
-exist even under a correctly specified count model; they do not calibrate
-traditional residuals to a common reference distribution.
+in the legend. Gaussian kernels smooth the bands that discrete residuals
+can form even under a correctly specified count model. Smoothing does not
+give traditional residuals a common reference distribution.
 
 Point styling affects QQ and worm points. Heatmap fill scales can be
 replaced with ggplot scales. Non-finite plotting observations are reported

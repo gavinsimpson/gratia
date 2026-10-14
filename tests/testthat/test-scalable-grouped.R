@@ -134,8 +134,8 @@ test_that("scalable grouped histograms retain component counts and densities", {
       if (by_family) 3L else 1L
     )
   }
-  expect_error(appraise(gfam_ordinal_model, scalable = TRUE), "ordinal")
-  expect_error(scalable_observed_fitted_plot(gfam_ordinal_model), "ordinal")
+  expect_s3_class(appraise(gfam_ordinal_model, scalable = TRUE), "patchwork")
+  expect_s3_class(scalable_observed_fitted_plot(gfam_ordinal_model), "ggplot")
   expect_s3_class(
     scalable_qq_plot(gfam_ordinal_model, type = "deviance", method = "normal"),
     "ggplot"

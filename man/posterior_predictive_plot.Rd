@@ -17,12 +17,15 @@ posterior_predictive_plot(
   subtitle = NULL,
   caption = NULL,
   level = 0.9,
+  conditioning = NULL,
+  scalable = NULL,
+  scalable_threshold = 10000L,
+  batch_size = 10L,
   ...
 )
 }
 \arguments{
-\item{model}{a fitted GAM supported by \code{\link[=posterior_samples]{posterior_samples()}}, including
-compatible \code{bam}, \code{scam}, and \code{gamm4} models.}
+\item{model}{a fitted model with a posterior response sampler.}
 
 \item{n}{positive integer; number of replicated data sets to draw.}
 
@@ -54,22 +57,72 @@ supplied, a suitable label will be generated.}
 intervals for discrete responses. Must be strictly between zero and one.
 Defaults to \code{0.9}. Ignored for continuous density overlays.}
 
+\item{conditioning}{character or \code{NULL}; mixed-model conditioning mode.}
+
+\item{scalable}{logical or \code{NULL}; summarize posterior response draws on a
+common grid, using temporary disk storage instead of retaining all responses
+in memory. \code{NULL} enables this at \code{scalable_threshold} observations.}
+
+\item{scalable_threshold}{positive integer; observation count for automatic
+scalable plotting.}
+
+\item{batch_size}{positive integer; number of draws per processing batch.
+Batch boundaries do not alter seeded draws. Scalable discrete comparisons
+with more than 512 distinct response values aggregate probability into
+512 shared equal-width bins to bound memory and plot size.}
+
 \item{...}{arguments passed to \code{\link[=posterior_samples]{posterior_samples()}}, such as
-\code{unconditional} or \code{mvn_method}. Prediction at new data is not supported.}
+\code{unconditional} or \code{mvn_method}. For delta sdmTMB fits,
+\code{component = "response"}, \code{"binomial"}, or \code{"positive"} selects the
+complete response or a fitted component. Prediction at new data is not supported.}
 }
 \value{
 A ggplot object. Its data contain the observed responses
 (\code{.draw = 0}) and posterior replicates (\code{.draw > 0}), indexed by \code{.row}
-and \code{.parameter}.
+and \code{.parameter}. Scalable plots instead retain density or probability
+summaries evaluated on the same grid for all draws.
 }
 \description{
 Compare the observed response distribution with replicated data sets drawn
-from the approximate posterior predictive distribution of a fitted GAM.
+from the approximate posterior predictive distribution of a fitted model.
 }
 \details{
-Each replicated data set includes both coefficient uncertainty and response
-variation, conditional on the fitting covariates. Other distributional
-parameters retain the treatment used by \code{\link[=posterior_samples]{posterior_samples()}}.
+Each replicated data set includes uncertainty in the coefficients and random
+variation in the responses, at the covariate values used to fit the model.
+Linear models and GLMs draw coefficients from a Gaussian distribution with
+the estimated coefficient covariance, keeping dispersion at its fitted value.
+For GAMs that model several distribution parameters, all their coefficients
+are drawn together. Distribution parameters outside this coefficient vector
+remain at fitted values, including additional parameters of grouped-family
+components.
+
+glmmTMB draws mean, zero-inflation and dispersion coefficients together with
+fitted random effects, using a Gaussian (Laplace) approximation to their
+posterior. Their covariance includes uncertainty from estimating the
+parameters that control random-effect covariance. For conditional checks,
+responses are generated using the drawn values of the fitted random effects.
+Given those values, their prior covariance is not needed to generate responses.
+Additional family parameters, such as Tweedie power, remain at fitted values.
+For marginal checks, coefficient draws include the same estimation uncertainty,
+but new random effects are generated using the fitted prior covariance. Thus
+these checks keep the covariance of new effects fixed while retaining its
+estimation uncertainty in the coefficient draws; they do not condition the
+coefficient posterior on fixed covariance parameters.
+sdmTMB draws parameters together from a Gaussian approximation, including
+fixed coefficients and random fields, and uses sdmTMB's response simulator
+to generate the complete response.
+Gaussian \code{gamm} and \code{gamm4} models draw fixed and random effects together,
+keeping covariance parameters at fitted values; marginal checks draw new
+effects.
+For gamm fits estimated by penalized quasi-likelihood (PQL), the sampler uses
+the Gaussian approximation used in fitting and then generates responses from
+the fitted response family. This is supported only when the Gaussian working
+residuals are uncorrelated. Correlation in those working residuals does not
+specify a joint distribution for responses from the fitted family.
+\code{gamm4} defaults to its existing GAM-component mode; use an explicit
+\code{conditioning = "conditional"} for full-model checks. GJRM draws the final
+distributional coefficients jointly. These are approximate predictive checks;
+no refitting is performed.
 
 Continuous responses use kernel density estimates with a common bandwidth
 derived from the observed responses and a shared evaluation grid. Discrete
@@ -79,16 +132,20 @@ Observed points, predicted points and intervals are placed at the actual
 response values on the horizontal axis. Binomial
 responses are compared as proportions, including models fitted to success
 and failure counts. Each fitting observation contributes equally to the
-empirical distribution; prior weights are used by the response sampler.
+empirical distribution. Response sampling follows the fitted family's
+interpretation of weights; see \code{\link[=posterior_samples]{posterior_samples()}}. Factor-valued binomial
+observations retain one Bernoulli trial per observation, and native gaulss
+fitting weights do not change its response precision. Explicit GAM sampling
+weights override the defaults.
 Multivariate normal responses are shown in separate facets.
 
 Excluded observations are omitted from both observed and replicated data.
 Responses remain on the scale used in fitting, including transformations in
-the response formula. Location-scale families other than multivariate normal
-and multinomial models, grouped families, and censored responses are not
-supported. Unsupported models or samplers produce an error; no alternative
-simulation method is substituted. Existing limitations of
-\code{\link[=posterior_samples]{posterior_samples()}}, including treatment of offsets, also apply.
+the response formula. Grouped families use separate component facets.
+Censored responses require a model of how censoring changes the generated
+observations and are not supported. Unsupported models or samplers produce
+an error; no alternative simulation method is substituted. Additional sampler limitations are
+described in \code{\link[=posterior_samples]{posterior_samples()}}.
 }
 \examples{
 load_mgcv()

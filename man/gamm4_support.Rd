@@ -17,9 +17,15 @@ variation, and uncertainty. \code{conditional_values()} and
 group effects. Group variables occurring only in \code{random} are not required
 in prediction data, so new groups receive the same population predictions.
 Use the \code{mer} component with lme4 for predictions conditional on group
-effects and simulations including their variation. Diagnostics use the
-fitted GAM component, whose working residuals reflect the conditional
-mixed-model fit; they are not a substitute for mixed-model diagnostics.
+effects and simulations including their variation. Diagnostics and response
+simulations use the GAM component by default. Set
+\code{conditioning = "conditional"} to hold all fitted smooth and additional
+random effects fixed, or \code{"marginal"} to draw new effects from their fitted
+distribution. \code{"gam_component"} explicitly selects the default behaviour.
+Marginal GLMM checks average over random effects using lme4's joint response
+simulations. Residuals then use ranks in a shared reference sample, as
+described in \link{diagnostic_support}. Gaussian identity-link models instead
+use analytic CDFs of the marginal response distribution.
 
 Gaussian draws use the fitted GAM coefficient covariance matrix, including
 its uncertainty due to fitting the mixed model. User draws must have one

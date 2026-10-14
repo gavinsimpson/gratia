@@ -1,13 +1,30 @@
 #' @importFrom mgcv fix.family.rd
 `fix_family_rd` <- function(family, ncores = 1, ...) {
+  family <- normalize_native_nb_parameters(family)
   # try to fix up the family used by mgcv to add the $rd component
   # for random deviate sampling
 
-  # Supply our weighted inverse Gaussian sampler before mgcv adds its
-  # unweighted one. A caller-supplied rd is preserved by the usual path below.
+  # Add the inverse Gaussian sampler that uses the supplied weights before
+  # mgcv adds one that ignores them. Keep a caller's existing rd function.
   if (inherits(family, "family") && is.null(family$rd) &&
       identical(family_type(family), "inverse_gaussian")) {
     family$rd <- rd_invgaussian
+    return(family)
+  }
+
+  if (is.null(family$rd) && identical(family_type(family), "gamma")) {
+    family$rd <- rd_gamma
+    return(family)
+  }
+  if (is.null(family$rd) && identical(family_type(family), "binomial")) {
+    family$rd <- rd_binomial
+    return(family)
+  }
+
+  if (is.null(family$rd) && identical(family_type(family), "negative_binomial") &&
+      has_theta(family)) {
+    size <- theta(family)
+    family$rd <- function(mu, wt, scale) stats::rnbinom(length(mu), mu = mu, size = size)
     return(family)
   }
 
@@ -91,8 +108,9 @@ rd_logistic <- function(mu, wt, scale) {
   rlogis(length(mu), location = mu, scale = scale / sqrt(wt))
 }
 
-# These families estimate their own scale in theta; the model dispersion is
-# not the distribution scale. Helpers describe the latent, uncensored response.
+# These families store their error scale in theta. Using model dispersion here
+# would change the simulated distribution. The functions describe responses
+# before censoring; censoring information supplies the observed CDF bounds.
 make_rd_cnorm <- function(sigma) {
   force(sigma)
   function(mu, wt, scale) {
@@ -108,6 +126,7 @@ make_rd_clog <- function(sigma) {
 }
 
 `fix_family_cdf` <- function(family) {
+  family <- normalize_native_nb_parameters(family)
   # if `family` contains a NULL cdf we move on, if it is non-null return early
   # as it doesn't need fixing
   if (!is.null(family$cdf)) {
@@ -139,7 +158,8 @@ make_rd_clog <- function(sigma) {
     "gammals"  = cdf_gammals,
     "binomial" = cdf_binomial,
     "gamma"    = cdf_gamma,
-    "ziplss"    = cdf_ziplss,
+    "ziplss"   = cdf_ziplss,
+    "twlss"    = make_cdf_twlss(family),
     "scaled_t" = make_cdf_scat(nu = theta[1], sigma = theta[2]),
     "negative_binomial" = make_cdf_nb(theta),
     "inverse_gaussian"  = cdf_invgaussian,
@@ -147,6 +167,11 @@ make_rd_clog <- function(sigma) {
     "tweedie"  = make_cdf_tw(theta, ab = get_tw_params(family)),
     NULL
   )
+
+  if (grepl("^ordered_categorical", ft))
+    cdf_fun <- make_cdf_ocat(family$getTheta(TRUE))
+  if (grepl("^zero_inflated_poisson", ft))
+    cdf_fun <- make_cdf_zip(family$getTheta(TRUE))
 
   # add the CDF fun to the family
   family$cdf <- cdf_fun
@@ -200,26 +225,24 @@ make_cdf_clog <- function(sigma) {
 #' @importFrom stats pgamma
 `cdf_gamma` <- function(q, mu, wt, scale, log_p = FALSE,
     lower_tail = TRUE) {
-  # uggh this weird parameterisation in pgamma
-  # FIXME: what about weights wt?
-  pgamma(q, shape = 1 / scale, scale = mu * scale,
+  pgamma(q, shape = wt / scale, scale = mu * scale / wt,
     lower.tail = lower_tail, log.p = log_p)
 }
 
 #' @importFrom stats pnorm
-`cdf_gaulss` <- function(q, mu, wt, scale, log_p = FALSE,
+`cdf_gaulss` <- function(q, mu, wt = 1, scale = 1, log_p = FALSE,
     lower_tail = TRUE) {
   pnorm(
     q, mean = mu[, 1, drop = TRUE],
-    sd = 1 / mu[, 2, drop = TRUE], lower.tail = lower_tail, log.p = log_p
+    sd = sqrt(scale / wt) / mu[, 2, drop = TRUE],
+    lower.tail = lower_tail, log.p = log_p
   )
 }
 
-`cdf_gumbls` <- function(q, mu, wt, scale, log_p = FALSE) {
-  gamma <- 0.577215664901533 # euler's constant
-  # mu[, 1] is mean, mu[, 2] is log(beta)
-  # F(x) = exp(-exp(-gamma - \frac{x-mu}{beta}))
-  exp(-exp(-gamma - ((q - mu[, 1]) / exp(mu[ ,2]))))
+`cdf_gumbls` <- function(q, mu, wt, scale, log_p = FALSE,
+                           lower_tail = TRUE) {
+  log_hazard <- -0.577215664901533 - (q - mu[, 1L]) / exp(mu[, 2L])
+  extreme_value_probability(log_hazard, log_p, lower_tail)
 }
 
 #' @importFrom stats pgamma
@@ -232,7 +255,8 @@ make_cdf_clog <- function(sigma) {
     lower.tail = lower_tail, log.p = log_p)
 }
 
-`cdf_gevlss` <- function(q, mu, wt, scale, log_p = FALSE, tol = 1e-6) {
+`cdf_gevlss` <- function(q, mu, wt, scale, log_p = FALSE, tol = 1e-6,
+                           lower_tail = TRUE) {
   n <- max(length(q), nrow(mu))
   z <- (rep_len(q, n) - rep_len(mu[, 1], n)) / exp(rep_len(mu[, 2], n))
   xi <- rep_len(mu[, 3], n)
@@ -244,63 +268,32 @@ make_cdf_clog <- function(sigma) {
   logt[which(support <= 0 & xi > 0)] <- Inf
   logt[which(support <= 0 & xi < 0)] <- -Inf
   logt[is.na(xi)] <- NA_real_
-  out <- -exp(logt)
-  if (log_p) out else exp(out)
+  extreme_value_probability(logt, log_p, lower_tail)
 }
 
-# implementation needs checking; ChatGPT used to derive the math for the CDF
+# Give zero its own probability. Positive responses follow a Poisson
+# distribution conditioned on Y > 0.
 #' @importFrom stats ppois
-`cdf_ziplss` <- function(q, mu, wt, scale, log_p = FALSE) {
-  lambda <- exp(mu[, 1])
-  p <- -expm1(-exp(mu[, 2])) # = 1 - exp(-exp(eta))
+`cdf_ziplss` <- function(q, mu, wt, scale, log_p = FALSE,
+                           lower_tail = TRUE) {
+  lambda <- exp(mu[, 1L])
+  base <- distribution_from_parameters("poisson", lambda)
+  positive <- truncate_distribution(base, mean = lambda / (-expm1(-lambda)))
+  zero_inflated_distribution(positive, exp(-exp(mu[, 2L])))$cdf(q,
+    log_p = log_p, lower_tail = lower_tail)
+}
 
-  log_cdf <- numeric(nrow(mu))
-  
-  # y < 0
-  log_cdf[q < 0] <- -Inf
-
-  # 0 <= y < 1
-  idx0 <- (q >= 0 & q < 1)
-  log_cdf[idx0] <- log1p(-p[idx0]) # log(1 - p)
-
-  # y >= 1
-  idx <- (q >= 1)
-  
-  if (any(idx)) {
-    y_i <- floor(q[idx])
-    lam <- lambda[idx]
-    p_i <- p[idx]
-    
-    # log P(Y=0)
-    log_p0 <- -lam
-    
-    # log Poisson CDF
-    log_cdfy <- ppois(y_i, lam, log.p = TRUE)
-    
-    # compute log(Fy - p0) safely
-    # log(exp(log_Fy) - exp(log_p0))
-    log_num <- log_cdfy + log1p(-exp(log_p0 - log_cdfy))
-    
-    # log(1 - p0)
-    log_denom <- log1p(-exp(log_p0))
-    
-    # log truncated CDF
-    log_trunc <- log_num - log_denom
-    
-    # combine: log((1-p) + p * trunc)
-    # Use log-sum-exp
-    a <- log1p(-p_i)        # log(1 - p)
-    b <- log(p_i) + log_trunc
-    
-    m <- pmax(a, b)
-    log_cdf[idx] <- m + log(exp(a - m) + exp(b - m))
+# Gumbel and GEV have F = exp(-exp(log_hazard)). exp(log_hazard) can round to
+# zero, so calculate log P(Y > q) directly to retain very small probabilities.
+extreme_value_probability <- function(log_hazard, log_p = FALSE,
+                                      lower_tail = TRUE) {
+  out <- -exp(log_hazard)
+  if (!lower_tail) {
+    out <- log1mexp(out)
+    tiny <- which(log_hazard < -36)
+    out[tiny] <- log_hazard[tiny]
   }
-
-  if (isFALSE(log_p)) {
-    log_cdf = exp(log_cdf) # stupid name, I know
-  }
-
-  log_cdf # may not be log_cdf but cdf, and likely won't be because log_p is FALSE
+  if (log_p) out else exp(out)
 }
 
 ## For distributions that estimate other parameters, we need to bind the values
@@ -335,7 +328,7 @@ make_cdf_clog <- function(sigma) {
 
 #' @importFrom stats pbeta
 `make_cdf_beta` <- function(phi, eps) {
-  function(q, mu, wt, scale, log_p = FALSE,
+  cdf <- function(q, mu, wt, scale, log_p = FALSE,
     lower_tail = TRUE) {
     p <- pbeta(
       q,
@@ -345,6 +338,8 @@ make_cdf_clog <- function(sigma) {
     )
     p
   }
+  attr(cdf, "gratia_beta_cdf") <- TRUE
+  cdf
 }
 
 #' @importFrom stats pgamma
@@ -363,10 +358,27 @@ make_cdf_clog <- function(sigma) {
   }
 }
 
-# only really need this for QQ plots
+# Inverse CDFs support QQ references and sampling after response transformations.
 #' @importFrom mgcv fix.family.qf
 `fix_family_qf` <- function(family) {
+  family <- normalize_native_nb_parameters(family)
 
+  # Keep a caller's inverse CDF before adding one that uses Gamma weights.
+  if (!is.null(family$qf)) return(family)
+  if (identical(family_type(family), "gamma")) {
+    family$qf <- qf_gamma
+    return(family)
+  }
+  if (identical(family_type(family), "binomial")) {
+    family$qf <- qf_binomial
+    return(family)
+  }
+  if (identical(family_type(family), "negative_binomial") && has_theta(family)) {
+    size <- theta(family)
+    family$qf <- function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE)
+      stats::qnbinom(p, mu = mu, size = size, log.p = log_p, lower.tail = lower_tail)
+    return(family)
+  }
   # try obvious thing first and see if mgcv::fix.family.qf() already handles
   # family
   family <- mgcv::fix.family.qf(family)
@@ -409,8 +421,14 @@ make_cdf_clog <- function(sigma) {
     "gumbls"   = qf_gumbls,
     "gammals"  = qf_gammals,
     "ziplss"   = qf_ziplss,
+    "twlss"    = make_qf_twlss(family),
     NULL # if don't handle family, return NULL as qfun so family unchanged
   )
+
+  if (grepl("^ordered_categorical", ft))
+    qfun <- make_qf_ocat(family$getTheta(TRUE))
+  if (grepl("^zero_inflated_poisson", ft))
+    qfun <- make_qf_zip(family$getTheta(TRUE))
 
   # add the QF fun to the family
   family$qf <- qfun
@@ -422,44 +440,45 @@ make_cdf_clog <- function(sigma) {
 #' @importFrom stats qnorm
 make_qf_cnorm <- function(sigma) {
   force(sigma)
-  function(p, mu, wt, scale, log_p = FALSE) {
-    qnorm(p, mean = mu, sd = sigma / sqrt(wt), log.p = log_p)
+  function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+    qnorm(p, mean = mu, sd = sigma / sqrt(wt), log.p = log_p, lower.tail = lower_tail)
   }
 }
 
 #' @importFrom stats qlogis
 make_qf_clog <- function(sigma) {
   force(sigma)
-  function(p, mu, wt, scale, log_p = FALSE) {
-    qlogis(p, location = mu, scale = sigma / sqrt(wt), log.p = log_p)
+  function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+    qlogis(p, location = mu, scale = sigma / sqrt(wt), log.p = log_p, lower.tail = lower_tail)
   }
 }
 
 #' @importFrom stats qpois
-qf_poisson <- function(p, mu, wt, scale, log_p = FALSE) {
-  qpois(p, lambda = mu, log.p = log_p)
+qf_poisson <- function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+  qpois(p, lambda = mu, log.p = log_p, lower.tail = lower_tail)
 }
 
 #' @importFrom stats qnorm
-`qf_gaulss` <- function(p, mu, wt, scale, log_p = FALSE) {
+`qf_gaulss` <- function(p, mu, wt = 1, scale = 1, log_p = FALSE, lower_tail = TRUE) {
   qnorm(
     p,
     mean = mu[, 1, drop = TRUE],
-    sd = 1 / mu[, 2, drop = TRUE],
-    log.p = log_p
+    sd = sqrt(scale / wt) / mu[, 2, drop = TRUE],
+    log.p = log_p, lower.tail = lower_tail
   )
 }
 
-`qf_gevlss` <- function(p, mu, wt, scale, log_p = FALSE, tol = 1e-6) {
-  logp <- quantile_log_probability(p, log_p)
-  n <- max(length(logp), nrow(mu))
-  logt <- log(-rep_len(logp, n))
+`qf_gevlss` <- function(p, mu, wt, scale, log_p = FALSE, tol = 1e-6,
+                          lower_tail = TRUE) {
+  logt <- extreme_value_quantile_log_hazard(p, log_p, lower_tail)
+  n <- max(length(logt), nrow(mu))
+  logt <- rep_len(logt, n)
   location <- rep_len(mu[, 1], n)
   sigma <- exp(rep_len(mu[, 2], n))
   xi <- rep_len(mu[, 3], n)
 
-  # expm1 avoids cancellation for small shape, without a tol cutoff. Handle
-  # the exact Gumbel limit separately, including p = 0 and p = 1.
+  # expm1 retains precision when shape is small. Calculate the exact Gumbel
+  # limit at shape 0, including the requested probability endpoints.
   z <- -logt
   nonzero <- which(!is.na(xi) & xi != 0)
   z[nonzero] <- expm1(-xi[nonzero] * logt[nonzero]) / xi[nonzero]
@@ -468,23 +487,24 @@ qf_poisson <- function(p, mu, wt, scale, log_p = FALSE) {
 }
 
 # mgcv uses a mean-centred parameterisation
-qf_gumbls <- function(p, mu, wt, scale, log_p = FALSE) {
+qf_gumbls <- function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
   gamma <- 0.577215664901533 # euler's constant
   # mu[, 1] is mean, mu[, 2] is log(beta)
   mu[, 1] - exp(mu[, 2]) *
-    (gamma + log(-quantile_log_probability(p, log_p)))
+    (gamma + extreme_value_quantile_log_hazard(p, log_p, lower_tail))
 }
 
 #' @importFrom stats qgamma
-`qf_gammals` <- function(p, mu, wt, scale, log_p = FALSE) {
+`qf_gammals` <- function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
   # mu[,1] is the mean, mu[,2] is log scale (dispersion)
   # exp(mu[,2]) == phi
   phi <- exp(mu[, 2])
-  qgamma(p, shape = 1 / phi, scale = mu[, 1] * phi, log.p = log_p)
+  qgamma(p, shape = 1 / phi, scale = mu[, 1] * phi, log.p = log_p,
+    lower.tail = lower_tail)
 }
 
 #' @importFrom stats qpois
-`qf_ziplss` <- function(p, mu, wt, scale, log_p = FALSE) {
+`qf_ziplss` <- function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
   logp <- quantile_log_probability(p, log_p)
   n <- max(length(logp), nrow(mu))
   logp <- rep_len(logp, n)
@@ -492,16 +512,13 @@ qf_gumbls <- function(p, mu, wt, scale, log_p = FALSE) {
   log_zero <- -exp(rep_len(mu[, 2], n))
   log_presence <- log1mexp(log_zero)
   q <- rep(NA_real_, n)
-  q[which(logp <= log_zero)] <- 0
-
-  positive <- which(logp > log_zero)
+  zero <- if (lower_tail) logp <= log_zero else logp >= log_presence
+  q[which(zero)] <- 0
+  positive <- which(!zero)
   if (length(positive)) {
-    # Invert the conditional positive Poisson distribution using its upper
-    # tail. This avoids rounding an interior transformed probability to one.
-    log_survival <- log1mexp(logp[positive]) - log_presence[positive] +
-      log1mexp(-lambda[positive])
-    q[positive] <- qpois(log_survival, lambda[positive],
-      lower.tail = FALSE, log.p = TRUE)
+    log_survival <- if (lower_tail) log1mexp(logp[positive]) else logp[positive]
+    log_survival <- log_survival - log_presence[positive] + log1mexp(-lambda[positive])
+    q[positive] <- qpois(log_survival, lambda[positive], lower.tail = FALSE, log.p = TRUE)
   }
   q
 }
@@ -526,11 +543,11 @@ log1mexp <- function(x) {
 
 #' @importFrom stats qt
 `make_qf_scat` <- function(nu, sigma) {
-  function(p, mu, wt, scale, log_p = FALSE) {
+  function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
     qt(
       p,
       df = nu,
-      lower.tail = TRUE,
+      lower.tail = lower_tail,
       log.p = log_p
     ) * sigma + mu
   }
@@ -541,11 +558,172 @@ log1mexp <- function(x) {
   xi <- if (length(ab) == 1L) ab else theta_2_power(theta, a = ab[1], b = ab[2])
   force(xi)
   function(p, mu, wt, scale, log_p = FALSE, fallback = FALSE,
-      max_terms = 10000L) {
+      max_terms = 10000L, lower_tail = TRUE) {
     if (xi == 2) {
-      return(qgamma(p, shape = 1 / scale, scale = mu * scale, log.p = log_p))
+      return(qgamma(p, shape = 1 / scale, scale = mu * scale, log.p = log_p,
+        lower.tail = lower_tail))
     }
-    qtweedie_mixture(p, mu = mu, power = xi, phi = scale, log_p = log_p,
+    original <- p
+    if (!lower_tail) p <- if (log_p) log1mexp(p) else 1 - p
+    value <- qtweedie_mixture(p, mu = mu, power = xi, phi = scale, log_p = log_p,
       fallback = fallback, max_terms = max_terms)
+    if (!lower_tail) check_legacy_quantile_tail(value, original, p, log_p, log_p)
+    value
   }
+}
+
+
+# Gamma shape is wt/scale and Gamma scale is mu*scale/wt. Use these parameters
+# consistently in CDF, quantile and simulation functions.
+rd_gamma <- function(mu, wt, scale) {
+  stats::rgamma(length(mu), shape = wt / scale, scale = mu * scale / wt)
+}
+qf_gamma <- function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+  stats::qgamma(p, shape = wt / scale, scale = mu * scale / wt,
+    lower.tail = lower_tail, log.p = log_p)
+}
+
+cdf_shash <- function(q, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+  delta <- exp(mu[, 4L])
+  z <- sinh(delta * asinh((q - mu[, 1L]) / (delta * exp(mu[, 2L]))) - mu[, 3L])
+  stats::pnorm(z, lower.tail = lower_tail, log.p = log_p)
+}
+
+make_cdf_twlss <- function(family) {
+  ab <- get_tw_params(family)
+  function(q, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+    fitted_tweedie_cdf(q, mu = mu[, 1L],
+      power = theta_2_power(mu[, 2L], ab[1L], ab[2L]),
+      phi = exp(mu[, 3L]), lower_tail = lower_tail, log_p = log_p)
+  }
+}
+make_qf_twlss <- function(family) {
+  ab <- get_tw_params(family)
+  function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+    fitted_tweedie_quantile(p, mu = mu[, 1L],
+      power = theta_2_power(mu[, 2L], ab[1L], ab[2L]),
+      phi = exp(mu[, 3L]), log_p = log_p, lower_tail = lower_tail)
+  }
+}
+
+# An ordered category records which interval contains a logistic latent value.
+# The category CDFs provide the probability bounds for its randomized PIT.
+make_cdf_ocat <- function(cutpoints) {
+  force(cutpoints)
+  function(q, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+    n <- max(length(q), length(mu))
+    q <- rep_len(q, n)
+    category <- floor(q)
+    cuts <- c(-Inf, cutpoints, Inf)
+    at <- pmax(0, pmin(length(cutpoints) + 1L, category)) + 1L
+    stats::plogis(cuts[at] - rep_len(mu, n),
+      lower.tail = lower_tail, log.p = log_p)
+  }
+}
+make_qf_ocat <- function(cutpoints) {
+  force(cutpoints)
+  function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+    latent <- stats::qlogis(p, location = mu,
+      lower.tail = lower_tail, log.p = log_p)
+    out <- rep(1, length(latent))
+    for (cut in cutpoints) out <- out + (latent > cut)
+    out
+  }
+}
+
+# ziP and ziplss share a positive Poisson distribution and a separate zero
+# probability. In ziP, fitted theta relates log intensity to the predictor
+# for the probability of a positive response.
+make_cdf_zip <- function(theta) {
+  force(theta)
+  function(q, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+    params <- cbind(mu, theta[1L] + theta[2L] * mu)
+    base <- distribution_from_parameters("poisson", exp(mu))
+    positive <- truncate_distribution(base, mean = exp(mu) / (-expm1(-exp(mu))))
+    zero_inflated_distribution(positive, exp(-exp(params[, 2L])))$cdf(
+      q, log_p = log_p, lower_tail = lower_tail)
+  }
+}
+make_qf_zip <- function(theta) {
+  force(theta)
+  function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+    base <- distribution_from_parameters("poisson", exp(mu))
+    positive <- truncate_distribution(base, mean = exp(mu) / (-expm1(-exp(mu))))
+    zero_inflated_distribution(positive, exp(-exp(theta[1L] + theta[2L] * mu)))$qf(
+      p, log_p = log_p, lower_tail = lower_tail)
+  }
+}
+
+
+qf_shash <- function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+  delta <- exp(mu[, 4L])
+  z <- stats::qnorm(p, lower.tail = lower_tail, log.p = log_p)
+  mu[, 1L] + delta * exp(mu[, 2L]) * sinh((asinh(z) + mu[, 3L]) / delta)
+}
+
+
+# With zero binomial trials, return the initialized zero proportion to avoid 0/0.
+rd_binomial <- function(mu, wt, scale) {
+  stats::rbinom(length(mu), size = wt, prob = mu) / (wt + as.numeric(wt == 0))
+}
+qf_binomial <- function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+  stats::qbinom(p, size = wt, prob = mu, log.p = log_p, lower.tail = lower_tail) /
+    (wt + as.numeric(wt == 0))
+}
+
+
+# Some GLM families store the negative binomial size in the environment of
+# variance(). Add a getter to the family copy so the shared helpers can read it.
+normalize_native_nb_parameters <- function(family) {
+  if (!identical(family_type(family), "negative_binomial") || has_theta(family) ||
+      !is.function(family$variance)) return(family)
+  e <- environment(family$variance)
+  if (is.null(e) || !exists(".Theta", envir = e, inherits = FALSE)) return(family)
+  size <- get(".Theta", envir = e, inherits = FALSE)
+  if (!is.numeric(size) || length(size) != 1L || !is.finite(size) || size <= 0)
+    return(family)
+  family$getTheta <- function(trans = TRUE) if (trans) size else log(size)
+  family
+}
+
+
+qf_gaussian <- function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+  stats::qnorm(p, mean = mu, sd = sqrt(scale / wt), log.p = log_p,
+    lower.tail = lower_tail)
+}
+
+make_qf_beta <- function(phi, eps) {
+  force(phi); force(eps)
+  function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+    q <- stats::qbeta(p, shape1 = phi * mu, shape2 = phi * (1 - mu),
+      log.p = log_p, lower.tail = lower_tail)
+    pmax(eps, pmin(1 - eps, q))
+  }
+}
+
+# For very small S, log(-log(1-S)) approaches log(S), while evaluating 1-S
+# loses precision. Use log(S) directly to retain finite upper quantiles.
+extreme_value_quantile_log_hazard <- function(p, log_p = FALSE, lower_tail = TRUE) {
+  logp <- quantile_log_probability(p, log_p)
+  if (lower_tail) return(log(-logp))
+  value <- log(-log1mexp(logp))
+  small <- which(logp < -36)
+  value[small] <- logp[small]
+  value
+}
+
+# Converting a log or upper probability can round an interior value to 0 or 1.
+# Reject a non-finite quantile caused by that conversion; genuine endpoint
+# requests remain valid.
+check_legacy_quantile_tail <- function(value, original, converted,
+                                       original_log, converted_log) {
+  interior <- if (original_log) is.finite(original) & original < 0 else
+    is.finite(original) & original > 0 & original < 1
+  endpoint <- if (converted_log) converted == 0 | converted == -Inf else
+    converted == 0 | converted == 1
+  lost <- rep_len(interior, length(value)) & rep_len(endpoint, length(value)) &
+    !is.finite(value)
+  if (any(lost, na.rm = TRUE)) stop("Extreme-tail quantiles are unsupported by this legacy ",
+    "inverse-CDF hook; provide native log-probability and tail support.", call. = FALSE)
+  invisible(value)
 }

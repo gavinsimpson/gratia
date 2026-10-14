@@ -67,6 +67,10 @@ model_used_rows <- function(model) {
     compact_offset(model$offset)
   }
   model$na.action <- NULL
+  # Native prediction can reinsert excluded rows using the frame's na.action.
+  # Remove it here too; public methods restore excluded positions once.
+  for (nm in c("model", "frame")) if (is.data.frame(model[[nm]]))
+    attr(model[[nm]], "na.action") <- NULL
   model
 }
 

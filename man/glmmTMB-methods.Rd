@@ -15,11 +15,11 @@
 \alias{draw.glmmTMB}
 \title{Effects and diagnostics for glmmTMB models}
 \usage{
-\method{qq_plot}{glmmTMB}(model, ..., method = NULL, type = "pearson")
+\method{qq_plot}{glmmTMB}(model, ..., method = NULL, type = NULL, conditioning = NULL)
 
-\method{worm_plot}{glmmTMB}(model, ..., method = NULL, type = "pearson")
+\method{worm_plot}{glmmTMB}(model, ..., method = NULL, type = NULL, conditioning = NULL)
 
-\method{appraise}{glmmTMB}(model, ..., method = NULL, type = "pearson")
+\method{appraise}{glmmTMB}(model, ..., method = NULL, type = NULL, conditioning = NULL)
 
 \method{parametric_terms}{glmmTMB}(model, ...)
 
@@ -53,10 +53,14 @@
 \arguments{
 \item{...}{Arguments passed to the corresponding gratia method.}
 
-\item{method}{QQ method; \code{NULL} selects \code{"simulate"}, the supported method.}
+\item{method}{QQ method; \code{NULL} selects \code{"simulate"} for traditional residuals.}
 
-\item{type}{Native glmmTMB residual type: \code{"pearson"} (default),
-\code{"response"}, or \code{"deviance"}, when available for the family.}
+\item{type}{Residual type: \code{"pearson"}, \code{"response"}, \code{"deviance"}, \code{"pit"},
+or \code{"quantile"}, when available for the family. The default is Pearson for
+conditional checks and response residuals for marginal checks.}
+
+\item{conditioning}{character or \code{NULL}; \code{"conditional"} (default) or
+\code{"marginal"}; see \link{diagnostic_support}.}
 
 \item{object, model}{A fitted \code{glmmTMB} model.}
 
@@ -130,11 +134,20 @@ terms or uncertainty bands. Different formula terms are never combined.
 Diagnostics use native Pearson residuals by default. QQ simulations hold
 fitted smooths and grouping effects fixed and draw new responses; no refitting
 is performed. Supported response families are Gaussian, Poisson, binomial,
-nbinom1/2, beta, Gamma/ziGamma, Tweedie, and zero-truncated Poisson/nbinom1/2,
+nbinom1/2, beta, Gamma/ziGamma, Tweedie, lognormal, and zero-truncated
+Poisson/nbinom1/2,
 including applicable zero-inflation or hurdle mixtures and varying dispersion.
 Truncated nbinom1 currently requires \code{type = "response"} because glmmTMB
 does not supply its Pearson residuals. Other unavailable residual types fail
-explicitly. PIT and quantile residuals are not supported by these methods.
+explicitly. Supported fitted response distributions also provide randomized
+PIT/quantile residuals and inverse-CDF QQ references, including their
+zero-inflation and truncation probabilities. Posterior predictive checks draw
+coefficients and fitted random effects together from their approximate
+posterior. See \code{\link[=posterior_predictive_plot]{posterior_predictive_plot()}} for how covariance and other
+family parameters are treated. Marginal checks simulate new effects using
+glmmTMB's response generator. If marginal CDFs are not analytic, residual
+checks use a shared sample of simulations to calculate moments and ranks.
+See \link{diagnostic_support} for conditioning choices and remaining limitations.
 }
 \examples{
 if (requireNamespace("glmmTMB", quietly = TRUE)) {

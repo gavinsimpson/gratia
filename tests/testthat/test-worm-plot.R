@@ -131,6 +131,6 @@ test_that("worm_plot() prints message if direct method requested", {
 test_that("worm_plot.default fails with error", {
   expect_error(
     worm_plot(dat),
-    "Unable to produce a worm plot for <data.frame>"
+    "Diagnostic data are not available for <data.frame>"
   )
 })

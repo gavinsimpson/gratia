@@ -10,11 +10,11 @@ test_that("quantile residuals works for a poisson GAM and quantile", {
   )
 })
 
-test_that("quantile residuals fails correctly for an unsupported GAM", {
-  expect_snapshot(
-    quantile_residuals(m_twlss, type = "quantile", seed = 1),
-    error = TRUE
-  )
+test_that("quantile residuals support Tweedie location-scale-shape GAMs", {
+  r <- quantile_residuals(m_twlss, type = "quantile", seed = 1)
+  expect_length(r, length(m_twlss$y))
+  expect_true(all(is.finite(r)))
+  expect_equal(r, quantile_residuals(m_twlss, type = "quantile", seed = 1))
 })
 
 test_that("ziplss residuals randomize within each count's probability mass", {

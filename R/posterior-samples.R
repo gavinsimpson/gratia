@@ -9,7 +9,9 @@
 #' `NA` draws. An explicit prediction `na.action` in `...` is honoured without
 #' renumbering retained rows. Restoration does not consume random numbers.
 #'
-#' @param model a fitted model of the supported types
+#' @param model a fitted model of the supported types; see [diagnostic_support].
+#' @param conditioning character or `NULL`; mixed-model conditioning mode;
+#'   see [diagnostic_support].
 #' @param data  data frame; new observations at which the posterior draws
 #'   from the model should be evaluated. If not supplied, the data used to fit
 #'   the model will be used for `data`, if available in `model`.
@@ -21,8 +23,15 @@
 #' @param unconditional logical; if `TRUE` (and `freq == FALSE`) then the
 #'   Bayesian smoothing parameter uncertainty corrected covariance matrix is
 #'   used, if available.
-#' @param weights numeric; a vector of prior weights. If `data` is null
-#'   then defaults to `object[["prior.weights"]]`, otherwise a vector of ones.
+#' @param weights numeric; response sampling weights for GAM methods. An
+#'   explicit vector overrides the fitting weights; a single value applies to
+#'   every observation. With `data = NULL`, the default is the fitted prior
+#'   weights, except factor-valued binomial responses retain one Bernoulli trial
+#'   per observation. With prediction data, the default is a vector of ones.
+#'   For ordinary Gaussian and Gamma responses, larger weights reduce response
+#'   variance (precision weights). For binomial responses, weights give integer
+#'   trial counts. They do not alter the fitted coefficient covariance. Include
+#'   positions restored by `na.exclude` when supplying weights for fitting rows.
 #' @param n_cores number of cores for generating random variables from a
 #'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
 #'   Parallelization will take place only if OpenMP is supported (but appears
@@ -63,16 +72,23 @@
 #'   to singular.
 #'
 #' @details
+#' For Gaussian identity-link `bam` fits, first-order autoregressive (AR1) errors
+#' make consecutive responses correlated. Responses are drawn together to retain
+#' this fitted correlation, restarting at each `AR.start` segment. These draws
+#' currently use the fitting observations only. For other families or links,
+#' the AR1 correction applies to working residuals used during fitting. It does
+#' not specify a joint distribution of actual responses, so sampling produces
+#' an error.
+#'
 #' # Note
 #'
-#' Models with offset terms supplied via the `offset` argument to
-#' [mgcv::gam()] etc. are ignored by [mgcv::predict.gam()]. As such, this
-#' kind of offset term is also ignored by `posterior_samples()`. Offset terms
-#' that are included in the model formula supplied to [mgcv::gam()] etc are
-#' not ignored and the posterior samples produced will reflect those offset
-#' term values. This has the side effect of requiring any new data values
-#' provided to `posterior_samples()` via the `data` argument must include the
-#' offset variable.
+#' With `data = NULL`, fitting offsets are retained, including offsets
+#' supplied through the fitting function's `offset` argument. Explicit prediction
+#' data follow [mgcv::predict.gam()]: offsets in formulas are evaluated from
+#' the prediction data, while offsets supplied through the fitting function's
+#' `offset` argument are not transferred to new observations. Include offsets
+#' in the formula when predicting at new data; the required offset variables
+#' must then be present in `data`.
 #'
 #' @return A tibble (data frame) with 3 columns containing the posterior
 #'   predicted values in long format. The columns are
@@ -179,29 +195,53 @@
   method <- match.arg(method)
   mvn_method <- match.arg(mvn_method)
   fam_type <- family_type(model)
+  fam <- stats::family(model)
+  joint_distribution <- NULL
+  correlated <- !is.null(model$AR1.rho) && model$AR1.rho != 0
+  if (correlated) {
+    if (!is.null(data)) stop("AR1 posterior response draws require fitting observations; ",
+      "a joint correlation structure for new data is not defined.", call. = FALSE)
+    if (fam_type != "gaussian" || fam$link != "identity") stop(
+      "The working AR1 correction does not define a joint response simulator ",
+      "for this family and link.", call. = FALSE)
+    joint_distribution <- response_distribution(model)
+    if (!is.function(joint_distribution$rd)) stop(
+      "A joint response generator is required for correlated posterior draws.", call. = FALSE)
+  }
+  advanced <- is_gfam_family(fam) || (inherits(fam, "general.family") &&
+    !fam_type %in% c("multivariate_normal", "multinom"))
+  if (advanced) {
+    if (!is.null(data)) stop("Distributional posterior response draws currently use the fitting observations.", call. = FALSE)
+    return(diagnostic_posterior_samples.default(model, n, seed,
+      method = method, n_cores = n_cores, burnin = burnin, thin = thin,
+      t_df = t_df, rw_scale = rw_scale, freq = freq,
+      unconditional = unconditional, weights = weights, draws = draws,
+      mvn_method = mvn_method, ...))
+  }
+  # Seed coefficient and response draws once, so the streams are independent.
+  # Restore both an existing RNG state and its absence at the public boundary.
+  if (!is.null(seed)) {
+    had_seed <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
+    if (had_seed) old_seed <- get(".Random.seed", envir = .GlobalEnv)
+    on.exit({
+      if (had_seed) assign(".Random.seed", old_seed, envir = .GlobalEnv)
+      else if (exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
+        rm(".Random.seed", envir = .GlobalEnv)
+    }, add = TRUE)
+    set.seed(seed)
+  }
 
   # start getting draws of expectation
   # - some families need linear predictor values/matrix, e.g., multinom(),
   #   but we'll handle that later by not using the family()$rd
+  coefficient_seed <- if (method == "user") NULL else sample.int(.Machine$integer.max, 1L)
   sim_eta <- fitted_samples(
-    model, n = n, data = data, seed = seed, scale = "response",
+    model, n = n, data = data, seed = coefficient_seed, scale = "response",
     method = method, n_cores = n_cores, burnin = burnin, thin = thin,
     t_df = t_df, rw_scale = rw_scale, freq = freq,
     unconditional = unconditional, weights = weights,
     draws = draws, mvn_method = mvn_method, ...
   )
-
-  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-    runif(1)
-  }
-  if (is.null(seed)) {
-    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-  } else {
-    R.seed <- get(".Random.seed", envir = .GlobalEnv)
-    set.seed(seed)
-    RNGstate <- structure(seed, kind = as.list(RNGkind()))
-    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-  }
 
   ## rd function if available
   rd_fun <- missing_safe_rd(choose_rd_fun(model),
@@ -214,9 +254,10 @@
     scale_p <- summary(model)[["dispersion"]]
   }
 
-  if (is.null(data)) {
-    # data <- model[["model"]]
-    weights <- restore_model_rows(model_used_rows(model)[["prior.weights"]], model)
+  if (is.null(data) && is.null(weights)) {
+    used <- model_used_rows(model)
+    weights <- restore_model_rows(binomial_sampling_weights(used,
+      used[["prior.weights"]]), model)
   } else {
     if (is.null(weights)) {
       weights <- rep(1, nrow(data))
@@ -229,6 +270,11 @@
   if (length(weights) != n_rows) {
     stop("Weights must have one value per prediction row.")
   }
+  if (!is.null(joint_distribution)) {
+    used <- model_used_rows(model)
+    used$prior.weights <- weights[which(!is.na(model_row_map(model)))]
+    joint_distribution <- response_distribution(used)
+  }
   # Match weights to retained input positions before extending by draws.
   row_ids <- unique(sim_eta$.row)
   weights <- rep(weights[row_ids], times = length(unique(sim_eta$.draw)))
@@ -237,7 +283,10 @@
   # replace fitted with simulated response
   # need to handle mvn() and multinom() with multiple linear predictors that
   # are all really just location parameters
-  if (is_multivariate_y(model)) {
+  if (!is.null(joint_distribution)) {
+    sim_eta <- posterior_location_response_draws(sim_eta, joint_distribution,
+      rows = which(!is.na(model_row_map(model))))
+  } else if (is_multivariate_y(model)) {
     sim_eta_w <- sim_eta |>
       pivot_wider(
         id_cols = all_of(c(".row", ".draw")),
@@ -294,6 +343,30 @@
   sim_eta
 }
 
+# For a location family, changing the mean shifts the response distribution.
+# Draw a complete response vector to retain dependence and fitted scales, then
+# shift it to the drawn mean. Match retained rows before restoring exclusions.
+posterior_location_response_draws <- function(fitted, distribution, rows) {
+  mean <- as.numeric(distribution$mean)
+  if (length(mean) != length(rows)) stop(
+    "Joint response means are not aligned with the fitting observations.", call. = FALSE)
+  response <- rep(NA_real_, nrow(fitted))
+  for (draw in unique(fitted$.draw)) {
+    positions <- which(fitted$.draw == draw)
+    index <- match(fitted$.row[positions], rows)
+    valid <- which(!is.na(index) & !is.na(fitted$.fitted[positions]))
+    values <- distribution$rd()
+    if (!is.numeric(values) || !is.null(dim(values)) || length(values) != length(mean)) {
+      stop("A joint response generator must return one value per fitting observation.",
+        call. = FALSE)
+    }
+    response[positions[valid]] <- values[index[valid]] +
+      fitted$.fitted[positions[valid]] - mean[index[valid]]
+  }
+  fitted$.response <- response
+  fitted[, c(".row", ".draw", ".response"), drop = FALSE]
+}
+
 #' Draw fitted values from the posterior distribution
 #'
 #' Expectations (fitted values) of the response drawn from the posterior
@@ -336,14 +409,13 @@
 #'
 #' # Note
 #'
-#' Models with offset terms supplied via the `offset` argument to
-#' [mgcv::gam()] etc. are ignored by [mgcv::predict.gam()]. As such, this
-#' kind of offset term is also ignored by `posterior_samples()`. Offset terms
-#' that are included in the model formula supplied to [mgcv::gam()] etc are
-#' not ignored and the posterior samples produced will reflect those offset
-#' term values. This has the side effect of requiring any new data values
-#' provided to `posterior_samples()` via the `data` argument must include the
-#' offset variable.
+#' With `data = NULL`, fitting offsets are retained, including offsets
+#' supplied through the fitting function's `offset` argument. Explicit prediction
+#' data follow [mgcv::predict.gam()]: offsets in formulas are evaluated from
+#' the prediction data, while offsets supplied through the fitting function's
+#' `offset` argument are not transferred to new observations. Include offsets
+#' in the formula when predicting at new data; the required offset variables
+#' must then be present in `data`.
 #'
 #' @return A tibble (data frame) with 3 columns containing the posterior
 #'   predicted values in long format. The columns are
@@ -479,6 +551,7 @@
   family_index = NULL,
   ...
 ) {
+  training <- is.null(data)
   model <- with_model_envir(model, envir)
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     runif(1)
@@ -536,14 +609,14 @@
     lss_idx <- lss_idx[1L] # keep as a list
   }
   # function to control predictions
-  pred_fun <- function(Xp, betas, lss_loc, scale) {
+  pred_fun <- function(Xp, betas, lss_loc, scale, lp = 1L) {
     sims <- Xp[, lss_loc, drop = FALSE] %*% t(betas[, lss_loc, drop = FALSE])
     # handle the offset if present; it is an attribute on the Xp matrix
     # it is a list - with 1 component if a normal model and `l` components if it
     # is a model with `l` linear predictors.
     m_offset <- attr(Xp, "model.offset")
     if (is.list(m_offset)) {
-      m_offset <- m_offset[[1L]] # only for location ?
+      m_offset <- m_offset[[lp]]
     }
     if (!is.null(m_offset)) {
       sims <- sims + m_offset
@@ -566,6 +639,17 @@
   Xp <- if (grouped) {
     gfam_predict_eta(model, data, type = "lpmatrix", ...)
   } else predict_model(model, newdata = data, type = "lpmatrix", ...)
+  if (training) {
+    # Native fitting predictions retain offsets supplied as fitting arguments.
+    # Apply the same term exclusions to the native predictor and design matrix.
+    eta <- matrix(predict_model(model, type = "link", ...) +
+      fitting_link_correction(model), nrow = NROW(Xp))
+    indices <- attr(Xp, "lpi") %||% lss_eta_index(model)
+    attr(Xp, "model.offset") <- lapply(seq_along(indices), function(i) {
+      j <- indices[[i]]
+      eta[, i] - drop(Xp[, j, drop = FALSE] %*% stats::coef(model)[j])
+    })
+  }
   ## predict step; for mvn() and multinom() models, we do want to loop over
   ##   the linear predictors
   n_eta <- length(lss_idx) # number of linear predictors to work with
@@ -577,7 +661,7 @@
     sims <- lapply(
       seq_len(n_eta),
       FUN = \(i, Xp, betas, lss_loc, scale) {
-        pred_fun(Xp, betas, lss_loc[[i]], scale)
+        pred_fun(Xp, betas, lss_loc[[i]], scale, lp = i)
       },
       Xp = Xp, betas = betas, lss_loc = lss_loc, scale = scale
     )

@@ -1,9 +1,8 @@
-#' Simulate from the posterior distribution of a GAM
+#' Simulate responses from a fitted model
 #'
-#' Simulations from the posterior distribution of a fitted GAM model involve
-#' computing predicted values for the observation data for which simulated
-#' data are required, then generating random draws from the probability
-#' distribution used when fitting the model.
+#' Generate replicated responses using fitted parameter values.
+#' [posterior_samples()] also includes uncertainty in the coefficients.
+#' See [diagnostic_support].
 #'
 #' For `simulate.gam()` to function, the `family` component of the fitted
 #' model must contain, or be updatable to contain, the required random
@@ -11,19 +10,28 @@
 #'
 #' @param object a fitted GAM, typically the result of a call to [mgcv::gam()],
 #'   [mgcv::gamm()], or [gamm4::gamm4()].
-#' @param nsim numeric; the number of posterior simulations to return.
+#' @param nsim numeric; number of response simulations to return.
 #' @param seed numeric; a random seed for the simulations.
 #' @param data data frame; new observations at which the posterior draws
 #'   from the model should be evaluated. If not supplied, the data used to fit
 #'   the model will be used for `newdata`, if available in `object`.
-#' @param weights numeric; a vector of prior weights. If `newdata` is null
-#'   then defaults to `object[["prior.weights"]]`, otherwise a vector of ones.
+#' @param weights numeric; response sampling weights. An explicit vector
+#'   overrides the fitting weights; a single value applies to every observation.
+#'   With `data = NULL`, the default is the fitted prior weights, except
+#'   factor-valued binomial responses retain one Bernoulli trial per observation.
+#'   With prediction data, the default is a vector of ones. For ordinary Gaussian
+#'   and Gamma responses, larger weights reduce response variance (precision
+#'   weights). For binomial responses, weights give integer trial counts. Include
+#'   positions restored by `na.exclude` when supplying weights for fitting rows.
 #' @param ... arguments passed to methods. `simulate.gam()` and
 #'   `simulate.scam()` pass `...` on to `predict.gam()`. As such you can pass
 #'   additional arguments such as `terms`, `exclude`, to select which model
 #'   terms are included in the predictions. This may be useful, for example,
 #'   for excluding the effects of random effect terms.
 #' @param newdata Deprecated. Use `data` instead.
+#' @param conditioning character or `NULL`; optional mixed-model conditioning
+#'   mode. Existing gamm/gamm4 simulators default to the GAM component. Explicit
+#'   full mixed-model modes currently use fitting observations.
 #' @param family_index numeric; for grouped-family models, one integer family
 #'   index per requested prediction row. See Details.
 #'
@@ -81,6 +89,7 @@
 `simulate.gam` <- function(object, nsim = 1, seed = NULL, data = newdata,
                            weights = NULL, ..., newdata = NULL,
                            family_index = NULL) {
+  training <- is.null(data)
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     runif(1)
   }
@@ -119,12 +128,14 @@
   }
 
   layout <- prediction_layout(object, data, na.action = list(...)$na.action %||% stats::na.pass)
-  if (is.null(data)) {
-    weights <- model_used_rows(object)[["prior.weights"]]
+  if (is.null(data) && is.null(weights)) {
+    used <- model_used_rows(object)
+    weights <- binomial_sampling_weights(used, used[["prior.weights"]])
   } else {
-    if (is.null(weights)) weights <- rep(1, NROW(data))
-    if (length(weights) == 1L) weights <- rep(weights, NROW(data))
-    if (length(weights) != NROW(data)) stop("Weights must have one value per prediction row.")
+    n_input <- if (is.null(data)) length(model_row_map(object)) else NROW(data)
+    if (is.null(weights)) weights <- rep(1, n_input)
+    if (length(weights) == 1L) weights <- rep(weights, n_input)
+    if (length(weights) != n_input) stop("Weights must have one value per prediction row.")
     valid_rows <- layout$rows[!is.na(layout$map)]
     weights <- weights[valid_rows]
   }
@@ -145,9 +156,27 @@
     .default = "default"
   )
   mu <- if (identical(fam, "default")) {
-    predict(object, newdata = data, type = "response", ...)
+    if (training) predict(object, type = "response", ...) else
+      predict(object, newdata = data, type = "response", ...)
   } else {
-    predict(object, newdata = data, type = "link", ...)
+    if (training) predict(object, type = "link", ...) else
+      predict(object, newdata = data, type = "link", ...)
+  }
+
+  if (training) {
+    correction <- fitting_link_correction(object)
+    if (any(correction != 0, na.rm = TRUE)) {
+      eta <- predict_model(object, type = "link", ...) + correction
+      mu <- if (identical(fam, "ocat")) eta else
+        family_prediction_parameters(family(object), eta)
+    }
+  }
+
+  if (training && !is.null(object$AR1.rho) && object$AR1.rho != 0) {
+    object$prior.weights <- weights
+    distribution <- response_distribution(object)
+    if (!is.function(distribution$rd)) stop("The working AR1 correction does not define a joint response simulator for this family.", call. = FALSE)
+    rd_fun <- function(mu, wt, scale) distribution$rd() - distribution$mean + mu
   }
 
   # call RNG function
@@ -197,16 +226,16 @@
 #' @rdname simulate
 #'
 #' @export
-`simulate.gamm` <- function(object, nsim = 1, seed = NULL, data = newdata,
-                            weights = NULL, ..., newdata = NULL) {
-  if (!is.null(newdata)) {
-    newdata_deprecated()
+simulate.gamm <- function(object, nsim = 1, seed = NULL, data = newdata,
+    weights = NULL, ..., newdata = NULL, conditioning = NULL) {
+  if (is.null(conditioning) || identical(conditioning, "gam_component")) {
+    if (!is.null(newdata)) newdata_deprecated()
+    return(simulate.gam(object$gam, nsim = nsim, seed = seed, data = data,
+      weights = weights, ...))
   }
-
-  simulate.gam(object$gam,
-    nsim = nsim, seed = seed, data = data,
-    weights = weights, ...
-  )
+  if (!is.null(data) || !is.null(weights) || length(list(...)))
+    stop("Full mixed-model simulation currently uses the fitting observations.", call. = FALSE)
+  simulate_gamm_response(object, nsim, seed, conditioning)
 }
 
 #' @rdname simulate

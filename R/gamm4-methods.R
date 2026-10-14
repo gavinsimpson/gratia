@@ -28,9 +28,15 @@ gamm4_gam <- function(object) {
 #' group effects. Group variables occurring only in `random` are not required
 #' in prediction data, so new groups receive the same population predictions.
 #' Use the `mer` component with lme4 for predictions conditional on group
-#' effects and simulations including their variation. Diagnostics use the
-#' fitted GAM component, whose working residuals reflect the conditional
-#' mixed-model fit; they are not a substitute for mixed-model diagnostics.
+#' effects and simulations including their variation. Diagnostics and response
+#' simulations use the GAM component by default. Set
+#' `conditioning = "conditional"` to hold all fitted smooth and additional
+#' random effects fixed, or `"marginal"` to draw new effects from their fitted
+#' distribution. `"gam_component"` explicitly selects the default behaviour.
+#' Marginal GLMM checks average over random effects using lme4's joint response
+#' simulations. Residuals then use ranks in a shared reference sample, as
+#' described in [diagnostic_support]. Gaussian identity-link models instead
+#' use analytic CDFs of the marginal response distribution.
 #'
 #' Gaussian draws use the fitted GAM coefficient covariance matrix, including
 #' its uncertainty due to fitting the mixed model. User draws must have one
@@ -294,8 +300,12 @@ derivative_samples.gamm4 <- function(object, ...) {
 #' @rdname posterior_samples
 #' @name posterior_samples
 #' @aliases posterior_samples.gamm4
-posterior_samples.gamm4 <- function(model, ...) {
-  posterior_samples.gam(gamm4_gam(model), ...)
+posterior_samples.gamm4 <- function(model, n = 1L, seed = NULL, ...,
+                                      conditioning = NULL) {
+  if (is.null(conditioning) || identical(conditioning, "gam_component"))
+    return(posterior_samples.gam(gamm4_gam(model), n = n, seed = seed, ...))
+  diagnostic_posterior_samples.default(model, n, seed,
+    conditioning = conditioning, ...)
 }
 
 #' @seealso [gamm4_support]
@@ -357,8 +367,8 @@ generate_draws.gamm4 <- function(model, ...) {
 #' @rdname appraise
 #' @name appraise
 #' @aliases appraise.gamm4
-appraise.gamm4 <- function(model, ...) {
-  appraise.gam(gamm4_gam(model), ...)
+appraise.gamm4 <- function(model, conditioning = NULL, ...) {
+  appraise(mixed_diagnostic_model(model, conditioning), ...)
 }
 
 #' @seealso [gamm4_support]
@@ -366,8 +376,8 @@ appraise.gamm4 <- function(model, ...) {
 #' @rdname qq_plot
 #' @name qq_plot
 #' @aliases qq_plot.gamm4
-qq_plot.gamm4 <- function(model, ...) {
-  qq_plot.gam(gamm4_gam(model), ...)
+qq_plot.gamm4 <- function(model, conditioning = NULL, ...) {
+  qq_plot(mixed_diagnostic_model(model, conditioning), ...)
 }
 
 #' @seealso [gamm4_support]
@@ -375,8 +385,8 @@ qq_plot.gamm4 <- function(model, ...) {
 #' @rdname worm_plot
 #' @name worm_plot
 #' @aliases worm_plot.gamm4
-worm_plot.gamm4 <- function(model, ...) {
-  worm_plot.gam(gamm4_gam(model), ...)
+worm_plot.gamm4 <- function(model, conditioning = NULL, ...) {
+  worm_plot(mixed_diagnostic_model(model, conditioning), ...)
 }
 
 #' @seealso [gamm4_support]
@@ -385,8 +395,9 @@ worm_plot.gamm4 <- function(model, ...) {
 #' @name quantile_residuals
 #' @aliases quantile_residuals.gamm4
 quantile_residuals.gamm4 <- function(model, type = c("pit", "quantile"),
-    seed = NULL, ...) {
-  quantile_residuals.gam(gamm4_gam(model), type = type, seed = seed, ...)
+    seed = NULL, conditioning = NULL, ...) {
+  quantile_residuals(mixed_diagnostic_model(model, conditioning),
+    type = type, seed = seed, ...)
 }
 
 #' @seealso [gamm4_support]
@@ -502,8 +513,18 @@ is_factor_term.gamm4 <- function(object, term, ...) {
 #' @rdname simulate
 #' @name simulate
 #' @aliases simulate.gamm4
-simulate.gamm4 <- function(object, nsim = 1, seed = NULL, ...) {
-  simulate.gam(gamm4_gam(object), nsim = nsim, seed = seed, ...)
+simulate.gamm4 <- function(object, nsim = 1, seed = NULL,
+    conditioning = NULL, ...) {
+  conditioning <- mixed_conditioning(object, conditioning)
+  if (conditioning == "gam_component") {
+    return(simulate.gam(gamm4_gam(object), nsim = nsim, seed = seed, ...))
+  }
+  if (length(list(...))) {
+    stop("Full-model gamm4 simulation uses fitting observations and does not ",
+      "accept additional prediction options; use the mer component for ",
+      "prediction at new data.", call. = FALSE)
+  }
+  simulate_gamm_response(object, nsim, seed, conditioning)
 }
 
 #' @seealso [gamm4_support]

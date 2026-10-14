@@ -158,8 +158,8 @@ test_that("ordinal deviance diagnostics retain native component signs and limita
   expect_s3_class(worm_plot(model, seed = 5, n_simulate = 4), "ggplot")
   expect_error(qq_plot(model, type = "pearson"), "only deviance")
   expect_error(qq_plot(model, type = "response"), "only deviance")
-  expect_error(appraise(model), "observed-versus-fitted")
-  expect_error(observed_fitted_plot(model), "observed-versus-fitted")
+  expect_s3_class(appraise(model), "patchwork")
+  expect_s3_class(observed_fitted_plot(model), "ggplot")
   context$families[[2]]$variance <- NULL
   context$components[[2]]$family$variance <- NULL
   expect_error(gfam_diagnostic_residuals(context, type = "pearson"), "only deviance")
@@ -221,10 +221,12 @@ test_that("single fitting rows and invalid sample counts have defined behavior",
   expect_error(qq_plot(model), "at least one fitted observation")
 })
 
-test_that("ordinal quantile fallback names the unavailable component", {
-  expect_message(p <- qq_plot(gfam_ordinal_model, method = "uniform", seed = 3,
-    n_simulate = 2), "component 1 <Ordered Categorical")
-  expect_identical(p$labels$subtitle, "Method: simulate")
+test_that("ordinal inverse-CDF references and calibrated residuals are available", {
+  p <- qq_plot(gfam_ordinal_model, type = "deviance", method = "uniform", seed = 3,
+    n_uniform = 2)
+  expect_identical(p$labels$subtitle, "Method: uniform")
+  expect_identical(qq_plot(gfam_ordinal_model, seed = 3)$labels$subtitle,
+    "Fixed standard-normal reference; pointwise intervals")
 })
 
 test_that("an explicit seed restores the absence of a caller RNG state", {

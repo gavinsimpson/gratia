@@ -1,19 +1,19 @@
-# Internal extension contract: diagnostic_data() returns gratia_diagnostics,
-# containing a compact, fitting-order table (data), the model used for QQ
-# references (source), retained observation count (n_obs), type and family.
-# data has observed, fitted, eta, residuals, .row and .response columns.
-# A new model implements diagnostic_data.<class>() and, if it cannot use the
-# existing GAM QQ calculations, diagnostic_qq_data.<source class>(). The latter
-# returns list(data, method, intercept, slope, center); data contains theoretical,
-# residuals and optional lower/upper, and center is the worm reference per row.
-# Aggregators and renderers never inspect model classes. These S3 generics are
-# deliberately internal until the extension contract has broader model coverage.
-diagnostic_data <- function(model, type = NULL, seed = NULL) {
+# Model-specific diagnostic_data() methods prepare a gratia_diagnostics object.
+# Its data table has observed, fitted, eta, residuals, .row and .response columns
+# in fitting order. The source model supplies QQ references; n_obs counts retained
+# observations, and type and family describe the residuals and response family.
+# A fitter that cannot use the shared GAM reference calculations also implements
+# diagnostic_qq_data.<source class>(). It returns list(data, method, intercept,
+# slope, center), with theoretical, residuals and optional lower/upper columns.
+# center gives the reference value subtracted for each point in a worm plot.
+# Plotting and aggregation consume these results without inspecting model classes.
+# These S3 methods remain internal while support for additional models develops.
+diagnostic_data <- function(model, type = NULL, seed = NULL, conditioning = NULL, ...) {
   UseMethod("diagnostic_data")
 }
 
 #' @export
-diagnostic_data.default <- function(model, type = NULL, seed = NULL) {
+diagnostic_data.default <- function(model, type = NULL, seed = NULL, conditioning = NULL, ...) {
   stop(
     "Diagnostic data are not available for <",
     class(model)[1L],
@@ -26,7 +26,8 @@ diagnostic_data.default <- function(model, type = NULL, seed = NULL) {
 diagnostic_data.gratia_diagnostics <- function(
   model,
   type = NULL,
-  seed = NULL
+  seed = NULL,
+  conditioning = NULL, ...
 ) {
   if (!is.null(type) && !identical(type, model$type)) {
     stop(
@@ -35,6 +36,10 @@ diagnostic_data.gratia_diagnostics <- function(
       "'.",
       call. = FALSE
     )
+  }
+  if (!is.null(conditioning) || length(list(...))) {
+    return(prepare_diagnostic_data(model$source, type = model$type,
+      seed = seed, conditioning = conditioning, ...))
   }
   model
 }
@@ -73,11 +78,14 @@ new_diagnostic_data <- function(
 }
 
 #' @export
-diagnostic_data.gam <- function(model, type = NULL, seed = NULL) {
+diagnostic_data.gam <- function(model, type = NULL, seed = NULL, conditioning = NULL, ...) {
+  check_distribution_conditioning(conditioning)
   type <- diagnostic_type(model, type, allow_pit = TRUE)
+  action <- stats::na.action(model)
+  rows <- which(!is.na(model_row_map(model)))
   model <- model_used_rows(model)
   r <- diagnostic_residuals(model, type = type, seed = seed)
-  if (type == "quantile") {
+  if (type %in% c("pit", "quantile")) {
     attr(model, "gratia.diagnostics") <- list(type = type, residuals = r)
   }
   y <- model$y
@@ -85,29 +93,14 @@ diagnostic_data.gam <- function(model, type = NULL, seed = NULL) {
     y <- stats::model.response(stats::model.frame(model))
   }
   grouped <- is_gfam_family(stats::family(model))
-  fit <- if (grouped) {
-    context <- gfam_diagnostic_context(model)
-    if (
-      any(vapply(
-        context$families,
-        function(f) startsWith(f$family, "Ordered Categorical"),
-        logical(1)
-      ))
-    ) {
-      context$mu
-    } else {
-      as.numeric(gfam_response_means(matrix(context$eta, ncol = 1L), context))
-    }
-  } else {
-    stats::fitted(model)
-  }
+  fit <- response_distribution(model)$mean %||% stats::fitted(model)
   eta <- model$linear.predictors
   if (is.null(eta)) {
     eta <- fit
   }
   n <- NROW(stats::model.frame(model))
-  # Scalar residuals in distributional models describe the response, while
-  # fitted/eta matrices also contain scale and shape predictors.
+  # One residual per observation describes the response, while fitted/eta
+  # matrices can also contain predictors for distributional scale and shape.
   nr <- if (is.matrix(r)) NCOL(r) else 1L
   first <- function(x) if (is.matrix(x) && nr == 1L) x[, 1L] else as.vector(x)
   fit <- first(fit)
@@ -135,53 +128,48 @@ diagnostic_data.gam <- function(model, type = NULL, seed = NULL) {
     fitted = fit,
     eta = eta,
     residuals = r,
-    .row = rep(seq_len(n), nr),
+    .row = rep(rows, nr),
     .response = rep(seq_len(nr), each = n)
   )
   dat <- diagnostic_component_data(dat, model)
-  new_diagnostic_data(dat, model, type, stats::family(model)$family, n)
+  # Restore the missing-row information so standalone plots keep fitting order.
+  model$na.action <- action
+  new_diagnostic_data(dat, model, type, stats::family(model)$family, n,
+    eta_label = model$eta_label %||% "Linear predictor")
 }
 
 #' @export
-diagnostic_data.lm <- function(model, type = NULL, seed = NULL) {
-  model <- model_used_rows(model)
-  if (inherits(model, "glm")) {
-    if (is.null(model$sig2)) model$sig2 <- summary(model)$dispersion
-  } else {
-    r <- stats::residuals(model)
-    model$sig2 <- sum((r - mean(r))^2) / stats::df.residual(model)
-  }
-  if (is.null(model$prior.weights)) {
-    model$prior.weights <- diagnostic_weights(model)
-  }
-  if (is.null(model$linear.predictors)) {
-    model$linear.predictors <- model$fitted.values
-  }
-  diagnostic_data.gam(model, type, seed)
+diagnostic_data.lm <- function(model, type = NULL, seed = NULL, conditioning = NULL, ...) {
+  diagnostic_data.gam(prepare_lm_diagnostics(model), type, seed, conditioning)
 }
 
 #' @export
 diagnostic_data.glm <- diagnostic_data.lm
 
 #' @export
-diagnostic_data.gamm4 <- function(model, type = NULL, seed = NULL) {
-  diagnostic_data.gam(gamm4_gam(model), type, seed)
+diagnostic_data.gamm4 <- function(model, type = NULL, seed = NULL, conditioning = NULL, ...) {
+  diagnostic_data(mixed_diagnostic_model(model, conditioning), type, seed)
 }
 
 #' @export
-diagnostic_data.glmmTMB <- function(model, type = NULL, seed = NULL) {
-  if (is.null(type)) {
-    type <- "pearson"
-  }
-  diagnostic_data(glmmtmb_diagnostic_model(model, type), type, seed)
+diagnostic_data.glmmTMB <- function(model, type = NULL, seed = NULL, conditioning = NULL, ...) {
+  proxy <- glmmtmb_diagnostic_model(model, type, conditioning = conditioning)
+  diagnostic_data(proxy, proxy$residual_type, seed)
 }
 
 #' @export
 diagnostic_data.gratia_glmmtmb_diagnostic <- function(
   model,
   type = NULL,
-  seed = NULL
+  seed = NULL,
+  conditioning = NULL,
+  ...
 ) {
+  if ((!is.null(conditioning) && !identical(conditioning, model$conditioning)) ||
+      length(list(...))) {
+    source <- diagnostic_plot_source(model, type, seed, conditioning, ...)
+    return(diagnostic_data(source, type, seed))
+  }
   if (is.null(type)) {
     type <- "pearson"
   }
@@ -189,73 +177,15 @@ diagnostic_data.gratia_glmmtmb_diagnostic <- function(
 }
 
 #' @export
-diagnostic_data.gamlss <- function(model, type = NULL, seed = NULL) {
-  if (!inherits(model, "SemiParBIV") || !isTRUE(model$univar.gamlss)) {
-    stop("Only univariate GJRM::gamlss() models are supported.", call. = FALSE)
-  }
-  fam <- model$margins[1L]
-  if (
-    !fam %in% c("N", "LN", "GA", "GAi", "P", "NBI", "NBII") ||
-      isTRUE(model$surv.flex) ||
-      isTRUE(model$VC$surv) ||
-      (!is.null(model$cens) && any(model$cens != 1))
-  ) {
-    stop(
-      "GJRM diagnostics require an uncensored N, LN, GA, GAi, P, NBI or NBII model.",
-      call. = FALSE
-    )
-  }
-  if (is.null(type)) {
-    type <- "quantile"
-  }
-  if (!identical(type, "quantile")) {
-    stop(
-      "GJRM diagnostics currently support type = 'quantile' only.",
-      call. = FALSE
-    )
-  }
-  eta <- as.vector(model$eta1)
-  fit <- switch(
-    fam,
-    N = eta,
-    GAi = eta,
-    LN = exp(eta + as.vector(model$sigma2)^2 / 2),
-    exp(eta)
-  )
-  p <- as.vector(model$fit$p)
-  if (fam %in% c("P", "NBI", "NBII")) {
-    mass <- as.vector(model$fit$pdf2)
-    if (length(mass) != length(p)) {
-      stop("GJRM fitted probability masses are unavailable.")
-    }
-    p <- diagnostic_seed(seed, stats::runif(length(p), pmax(0, p - mass), p))
-  }
-  n <- length(model$y1)
-  if (any(lengths(list(p, eta, fit)) != n)) {
-    stop(
-      "GJRM fitted distribution is not aligned with its response.",
-      call. = FALSE
-    )
-  }
-  dat <- tibble::tibble(
-    observed = as.vector(model$y1),
-    fitted = fit,
-    eta = eta,
-    residuals = stats::qnorm(p),
-    .row = seq_len(n),
-    .response = 1L
-  )
-  new_diagnostic_data(
-    dat,
-    model,
-    type,
-    fam,
-    n,
-    eta_label = "Linear predictor (mu)"
-  )
+diagnostic_data.gamlss <- function(model, type = NULL, seed = NULL, conditioning = NULL, ...) {
+  check_distribution_conditioning(conditioning)
+  proxy <- gjrm_diagnostic_model(model)
+  d <- diagnostic_data(proxy, type, seed)
+  d$eta_label <- "Linear predictor (mu)"
+  d
 }
 
-# Source-specific reference calculation. Existing numerical methods are kept.
+# Each prepared source supplies reference values using the shared methods.
 diagnostic_qq_data <- function(
   model,
   diagnostics,
@@ -281,47 +211,24 @@ diagnostic_qq_data.default <- function(
   type <- diagnostics$type
   by_family <- diagnostic_data_by_family(diagnostics, by_family)
   grouped <- ".family" %in% names(diagnostics$data)
-  if (type == "quantile") {
-    if (!is.null(method) && !identical(method, "normal")) {
-      stop(
-        "Quantile residuals use a fixed standard-normal reference.",
-        call. = FALSE
-      )
-    }
-    df <- calibrated_qq_data(model, level, FALSE, by_family)
-    return(list(
-      data = df,
-      method = "normal",
-      intercept = 0,
-      slope = 1,
-      center = df$theoretical,
-      by_family = by_family,
-      colour_family = grouped && !by_family
-    ))
+  if (type %in% c("pit", "quantile")) {
+    if (!is.null(method) && !(type == "quantile" && method == "normal"))
+      stop("Calibrated residuals use a fixed reference distribution.", call. = FALSE)
+    df <- calibrated_residual_reference(diagnostics$data[c("residuals",
+      intersect(".family", names(diagnostics$data)))], type, level, FALSE, by_family,
+      distribution = response_distribution(model), n_simulate = n_simulate)
+    return(list(data = df, method = if (type == "pit") "uniform reference" else "normal",
+      intercept = 0, slope = 1, center = df$theoretical, by_family = by_family,
+      subtitle = calibrated_reference_subtitle(type, attr(df, "band_method"), response_distribution(model)),
+      colour_family = grouped && !by_family))
   }
-  if (!type %in% c("deviance", "response", "pearson")) {
-    stop(
-      "QQ references for this model require deviance, response, pearson or quantile residuals.",
-      call. = FALSE
-    )
-  }
-  method <- diagnostic_method(model, method)
-  if (
-    !grouped &&
-      method == "uniform" &&
-      is.null(fix_family_qf(stats::family(model))$qf)
-  ) {
-    method <- "simulate"
-  }
-  if (
-    !grouped &&
-      method == "simulate" &&
-      is.null(fix_family_rd(stats::family(model))$rd)
-  ) {
-    method <- "normal"
-  }
+  if (!type %in% c("deviance", "response", "pearson"))
+    stop("Unsupported residual type for QQ references.", call. = FALSE)
+  method <- diagnostic_reference_method(model, method)
   df <- switch(
     method,
+    marginal = qq_marginal(model, n = n_simulate, type = type, level = level,
+      by_family = by_family),
     uniform = qq_uniform(
       model,
       n = n_uniform,
@@ -355,7 +262,8 @@ diagnostic_qq_data.default <- function(
     slope = slope,
     center = center,
     by_family = by_family,
-    colour_family = FALSE
+    colour_family = FALSE,
+    subtitle = diagnostic_qq_subtitle(model, method, grouped)
   )
 }
 
@@ -369,10 +277,7 @@ diagnostic_qq_data.gratia_glmmtmb_diagnostic <- function(
   level = 0.9,
   by_family = NULL
 ) {
-  method <- glmmtmb_qq_method(method)
-  if (is.null(model$family$rd)) {
-    model$family <- glmmtmb_family(model$source)
-  }
+  method <- glmmtmb_qq_method(method, diagnostics$type)
   diagnostic_qq_data.default(
     model,
     diagnostics,
@@ -385,39 +290,10 @@ diagnostic_qq_data.gratia_glmmtmb_diagnostic <- function(
 }
 
 #' @export
-diagnostic_qq_data.gamlss <- function(
-  model,
-  diagnostics,
-  method = NULL,
-  n_uniform = 10,
-  n_simulate = 50,
-  level = 0.9,
-  by_family = NULL
-) {
-  if (!is.null(method) && !identical(method, "normal")) {
-    stop(
-      "GJRM quantile residuals support method = 'normal' only.",
-      call. = FALSE
-    )
-  }
-  r <- diagnostics$data$residuals
-  r <- diagnostic_finite(tibble::tibble(residuals = r), "residuals")$residuals
-  n <- length(r)
-  i <- seq_len(n)
-  alpha <- (1 - level) / 2
-  df <- tibble::tibble(
-    theoretical = stats::qnorm(stats::ppoints(n)),
-    residuals = sort(r),
-    lower = stats::qnorm(stats::qbeta(alpha, i, n + 1 - i)),
-    upper = stats::qnorm(stats::qbeta(1 - alpha, i, n + 1 - i))
-  )
-  list(
-    data = df,
-    method = "normal",
-    intercept = 0,
-    slope = 1,
-    center = df$theoretical
-  )
+diagnostic_qq_data.gamlss <- function(model, diagnostics, method = NULL,
+    n_uniform = 10, n_simulate = 50, level = 0.9, by_family = NULL) {
+  diagnostic_qq_data.default(gjrm_diagnostic_model(model), diagnostics,
+    method, n_uniform, n_simulate, level, by_family)
 }
 
 validate_diagnostic_bins <- function(x, name, length = 1L, minimum = 1L) {
@@ -470,8 +346,9 @@ diagnostic_finite <- function(data, columns) {
   data[keep, , drop = FALSE]
 }
 
-# Bin in undetrended geometry, reserving the extreme points. Zero arc-length
-# interiors collapse to one bin; empty arc-length bins are never materialized.
+# Group QQ points before subtracting the reference, so worm and QQ plots use
+# the same bins. Keep both endpoints; use one bin if all interior points coincide.
+# Do not create empty bins.
 bin_diagnostic_qq <- function(reference, qq_bins = 1000L, worm = FALSE) {
   qq_bins <- validate_diagnostic_bins(qq_bins, "qq_bins", minimum = 3L)
   df <- reference$data
@@ -542,8 +419,8 @@ bin_diagnostic_qq <- function(reference, qq_bins = 1000L, worm = FALSE) {
   df
 }
 
-# All ggplot mappings are made in renderer environments that contain only
-# compact summaries, never the source model or an observation-level closure.
+# Create ggplot mappings in environments containing only plot summaries.
+# Otherwise a small plot could retain the whole fitted model through a closure.
 render_diagnostic_qq <- function(
   df,
   reference,
@@ -564,6 +441,7 @@ render_diagnostic_qq <- function(
   intercept <- reference$intercept
   slope <- reference$slope
   method <- reference$method
+  reference_subtitle <- reference$subtitle
   by_family <- isTRUE(reference$by_family)
   colour_family <- isTRUE(reference$colour_family)
   reference <- NULL
@@ -630,7 +508,7 @@ render_diagnostic_qq <- function(
       } else {
         title
       },
-      subtitle = if (is.null(subtitle)) paste("Method:", method) else subtitle,
+      subtitle = if (is.null(subtitle)) reference_subtitle %||% paste("Method:", method) else subtitle,
       caption = caption
     )
   compact_diagnostic_plot(plt)
@@ -639,14 +517,14 @@ render_diagnostic_qq <- function(
 #' Scalable model diagnostic plots
 #'
 #' Aggregate all observations before drawing model diagnostic plots with ggplot.
-#' QQ curves use equal-arc-length bins with their endpoints preserved. Heatmaps
-#' and histograms contain precomputed counts, so redrawing does not re-bin the
-#' original data. The existing QQ reference calculations are retained: their
-#' simulation matrices can still require memory proportional to observations
-#' times simulations. Binning reduces rendering cost, not that calculation cost.
+#' QQ points are grouped into bins of equal distance along the curve, keeping
+#' both endpoints. Heatmaps and histograms contain precomputed counts, so
+#' redrawing does not bin the original data again. Uniform references average
+#' draws as they are generated. Simulated references retain exact pooled
+#' quantiles, using temporary files above the configured memory threshold; see
+#' [diagnostic_support].
 #'
-#' @param model A fitted mgcv GAM, lm, glm, gamm4, glmmTMB, or supported
-#'   univariate GJRM::gamlss model.
+#' @param model A fitted model supported by [diagnostic_support].
 #' @param qq_bins Maximum number of QQ points per family component, including both endpoints;
 #'   an integer of at least three.
 #' @param density_bins Positive integer or pair of integers giving the number
@@ -662,10 +540,11 @@ render_diagnostic_qq <- function(
 #'   residual axes, in their plotted units. `NULL` uses normal-reference
 #'   bandwidths, adjusted for two dimensions, with a fallback for constant axes.
 #'   Used only for `density_method = "kde"` and conditional density.
-#' @param type Residual type; `NULL` follows [appraise()] defaults for mgcv, lm,
-#'   glm and gamm4, selects Pearson for glmmTMB, and quantile for GJRM. The residual heatmap and
-#'   histogram also accept PIT and quantile residuals where available.
+#' @param type Residual type; `NULL` follows the model-specific defaults in
+#'   [appraise()]. PIT and quantile residuals are available for supported response
+#'   distributions; see [diagnostic_support].
 #' @inheritParams qq_plot
+#' @inheritParams appraise
 #' @param level Coverage of pointwise QQ reference intervals, strictly between
 #'   zero and one. Used by simulation and normal-reference methods.
 #' @param xlab,ylab Axis labels; `NULL` selects suitable defaults.
@@ -675,21 +554,24 @@ render_diagnostic_qq <- function(
 #'   seeds preserve the caller's RNG state, including an absent state.
 #' @inheritParams residuals_hist_plot
 #' @inheritParams residuals_linpred_plot
-#' @param ... For `scalable_worm_plot()`, arguments passed to
-#'   `scalable_qq_plot()` (except its internal worm setting).
+#' @param ... optional arguments used to prepare the model for diagnostics,
+#'   including sdmTMB `field_method`.
+#'   For `scalable_worm_plot()`, other arguments pass to `scalable_qq_plot()`
+#'   except its internal worm setting.
 #' @return A ggplot object containing aggregated plotting data.
 #' @details GJRM support covers uncensored univariate N, LN, GA, GAi, P, NBI,
-#'   and NBII models. Only `type = "quantile"` and `method = "normal"` are
-#'   supported. Discrete CDF jumps are randomized; their accuracy is limited by
-#'   GJRM's stored fitted probabilities. QQ bands are pointwise standard-normal
-#'   order-statistic reference intervals conditional on the fitted distribution,
+#'   and NBII models. PIT/quantile references are uniform/normal; traditional
+#'   response/Pearson references use inverse-CDF or simulated responses.
+#'   Probabilities are recomputed from final likelihood parameters. Quantile QQ
+#'   bands give pointwise intervals for ordered standard-normal residuals,
+#'   conditional on the fitted distribution,
 #'   without accounting for parameter estimation. Observed-versus-fitted plots
 #'   use response means, including the lognormal mean correction. Residuals are
 #'   plotted against the first distributional linear predictor.
 #'
 #'   Grouped-family models retain the residual defaults, component reference
 #'   distributions, predictor ranks and layout controls of [appraise()]. QQ
-#'   bin limits apply separately to each indexed component. Pooled residual
+#'   bin limits apply separately to each component. Pooled residual
 #'   heatmaps summarize the component mixture rather than colouring individual
 #'   observations; observed-versus-fitted appraisals always separate components.
 #'   Pooled histograms use faint component-coloured fills with opaque stepped
@@ -700,9 +582,9 @@ render_diagnostic_qq <- function(
 #'   residual grid. Bandwidths, rather than `density_bins`, control smoothing;
 #'   increase grid resolution when using small bandwidths. A square-root fill
 #'   transformation reveals low-density regions while retaining density units
-#'   in the legend. Gaussian kernels smooth discrete residual bands, which can
-#'   exist even under a correctly specified count model; they do not calibrate
-#'   traditional residuals to a common reference distribution.
+#'   in the legend. Gaussian kernels smooth the bands that discrete residuals
+#'   can form even under a correctly specified count model. Smoothing does not
+#'   give traditional residuals a common reference distribution.
 #'
 #'   Point styling affects QQ and worm points. Heatmap fill scales can be
 #'   replaced with ggplot scales. Non-finite plotting observations are reported
@@ -740,7 +622,8 @@ scalable_qq_plot <- function(
   point_col = "grey20",
   point_alpha = 1,
   line_col = "red",
-  by_family = NULL
+  by_family = NULL,
+  conditioning = NULL, ...
 ) {
   scalable_qq(
     model,
@@ -762,7 +645,8 @@ scalable_qq_plot <- function(
     point_col,
     point_alpha,
     line_col,
-    by_family = by_family
+    by_family = by_family,
+    conditioning = conditioning, ...
   )
 }
 
@@ -793,7 +677,8 @@ scalable_qq <- function(
   point_alpha = 1,
   line_col = "red",
   aggregate = TRUE,
-  by_family = NULL
+  by_family = NULL,
+  conditioning = NULL, ...
 ) {
   validate_diagnostic_bins(qq_bins, "qq_bins", minimum = 3L)
   validate_diagnostic_bins(n_uniform, "n_uniform")
@@ -807,7 +692,7 @@ scalable_qq <- function(
   ) {
     stop("Level must be 0 < level < 1.", call. = FALSE)
   }
-  d <- diagnostic_data(model, type, seed)
+  d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning, ...)
   by_family <- diagnostic_data_by_family(d, by_family)
   reference <- diagnostic_seed(
     seed,
@@ -1036,12 +921,14 @@ scalable_residuals_linpred_plot <- function(
   by_family = NULL,
   rank = NULL,
   density_method = c("kde", "histogram"),
-  bandwidth = NULL
+  bandwidth = NULL,
+  conditioning = NULL, ...
 ) {
   density <- match.arg(density)
   density_method <- match.arg(density_method)
   validate_diagnostic_bandwidth(bandwidth)
-  d <- diagnostic_data(model, type, seed)
+  d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning, ...)
+  subtitle <- subtitle %||% diagnostic_context_label(response_distribution(d$source))
   by_family <- diagnostic_data_by_family(d, by_family)
   dat <- d$data
   if (".family" %in% names(dat)) {
@@ -1105,10 +992,12 @@ scalable_observed_fitted_plot <- function(
   title = "Observed vs fitted values",
   subtitle = NULL,
   caption = NULL,
-  by_family = NULL
+  by_family = NULL,
+  conditioning = NULL, ...
 ) {
   density <- match.arg(density)
-  d <- diagnostic_data(model)
+  d <- prepare_diagnostic_data(model, conditioning = conditioning, ...)
+  subtitle <- subtitle %||% diagnostic_context_label(response_distribution(d$source))
   if (".family" %in% names(d$data)) {
     check_gfam_appraise(d$source)
   }
@@ -1186,9 +1075,11 @@ scalable_residuals_hist_plot <- function(
   title = "Histogram of residuals",
   subtitle = NULL,
   caption = NULL,
-  by_family = NULL
+  by_family = NULL,
+  conditioning = NULL, ...
 ) {
-  d <- diagnostic_data(model, type, seed)
+  d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning, ...)
+  subtitle <- subtitle %||% diagnostic_context_label(response_distribution(d$source))
   by_family <- diagnostic_data_by_family(d, by_family)
   if (".family" %in% names(d$data)) {
     return(scalable_grouped_histogram(
@@ -1226,11 +1117,12 @@ render_diagnostic_points <- function(
   title,
   point_col,
   point_alpha,
-  line_col = NULL
+  line_col = NULL,
+  line_intercept = 0
 ) {
   plt <- ggplot2::ggplot(df, ggplot2::aes(x = .data[[x]], y = .data[[y]]))
   if (!is.null(line_col)) {
-    plt <- plt + ggplot2::geom_hline(yintercept = 0, colour = line_col)
+    plt <- plt + ggplot2::geom_hline(yintercept = line_intercept, colour = line_col)
   }
   plt +
     ggplot2::geom_point(colour = point_col, alpha = point_alpha) +
@@ -1256,8 +1148,8 @@ worm_plot.gamlss <- function(model, ..., type = "quantile", seed = NULL) {
   )
 }
 
-# Strip quosure environments too: object.size() does not count the models they
-# could otherwise keep alive through unevaluated renderer arguments.
+# Unevaluated plot arguments can also retain models through their environments.
+# Clear those environments; object.size() does not count what they retain.
 compact_diagnostic_plot <- function(plot) {
   env <- environment(compact_diagnostic_plot)
   clean <- function(mapping) {
@@ -1279,7 +1171,7 @@ compact_diagnostic_plot <- function(plot) {
   plot
 }
 
-# Grouped-family plotting policy remains shared with the ordinary diagnostics.
+# Grouped families use the same layout rules as the ordinary diagnostic plots.
 diagnostic_data_by_family <- function(d, by_family = NULL) {
   if (
     !is.null(by_family) &&
