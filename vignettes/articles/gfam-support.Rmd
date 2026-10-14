@@ -27,13 +27,11 @@ that membership. This differs from a delta model: here the two sources supply
 separate observations, rather than occurrence and positive abundance being
 parts of a single response distribution.
 
-We use simulated surveys so that the assumption connecting them is explicit.
-The log odds of detection and the log expected count have different intercepts
-but share the same smooth response to woodland cover. This is a strong
-assumption about survey protocols; neither shared habitat nor the ability to
-fit the model establishes it. In a real survey, effort and detectability also
-need attention. This example assumes fixed effort, independent sites, and no
-unmodelled differences in detectability.
+We simulate fixed-effort surveys at independent sites. The log odds of
+detection and the log expected count have different intercepts but share the
+same smooth response to woodland cover. Sharing the curve assumes that a
+change in cover has the same effect on log odds and log expected count. We
+compare this assumption with survey-specific curves below.
 
 The code needs mgcv and gratia, and uses dplyr and ggplot2 for presentation.
 All are gratia dependencies. The example has 600 observations and uses 200
@@ -69,8 +67,8 @@ ggplot(survey, aes(woodland, observed)) +
 The binary panel contains only zero and one. The count panel has a wider range
 and variance that grows with the mean. A binomial family with one trial and a
 Poisson family are appropriate for the simulated protocols. For real counts,
-extra variation may require `nb()` instead of Poisson; this should follow from
-checks of the data and model, not from the existence of a second survey.
+extra variation may require `nb()` instead of Poisson; residual checks help
+assess that choice.
 
 ## Share the smooth, retain different intercepts and links
 
@@ -89,8 +87,8 @@ A positive smooth contribution multiplies the expected count by `exp(effect)`
 and multiplies detection odds by the same quantity. It does not add the same
 amount to the detection probability and count. The fitted smooth rises toward
 intermediate cover and then declines, consistent with the generating response.
-Its centering constraint makes zero a reference for the partial effect, not an
-absence of birds. The different intercepts determine the absolute levels.
+Its centering constraint sets the reference for the partial effect. The
+different intercepts determine the absolute levels.
 
 The [mgcv grouped-family documentation](https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/gfam.html)
 explains the response encoding and sharing of terms. This example replaces
@@ -108,11 +106,11 @@ draw(separate, parametric = FALSE)
 ```
 
 Compare the shapes and their uncertainty, particularly at the ends of the cover
-range. The binary survey contains less information about the shared curve than
-the count survey. Similar shapes are compatible with sharing here, but a failure
-to distinguish curves in a small binary survey would not prove equivalence.
-Survey-specific smooths, offsets for effort, or more explicit observation
-models are alternatives when the scientific assumptions call for them.
+range. The binary survey contains less information about the curve than the
+count survey, so its wider intervals leave more uncertainty about its shape.
+The similar fitted shapes support sharing in this simulation. For your own
+surveys, use separate smooths if the protocols imply different responses to
+cover, and include offsets when survey effort varies.
 
 ## Predict the appropriate quantity for each survey
 
@@ -191,9 +189,9 @@ appraise(joint, type = "quantile", by_family = TRUE, seed = 244)
 
 Component facets help find a failure confined to one survey. Look for tail
 departures in QQ plots, changing residual spread across fitted values, or
-disagreement in the observed-versus-fitted panels. Approximate agreement in
-this correctly specified simulation is reassuring about the workflow, not
-evidence that a similar model is adequate for a real survey.
+disagreement in the observed-versus-fitted panels. Here the component scores
+show approximate agreement with their references despite the different scales
+of the original responses.
 
 Pooling standard-normal residuals is also possible. The colours retain each
 component's identity; histogram densities are calculated separately with
@@ -206,17 +204,17 @@ worm_plot(joint, type = "quantile", by_family = TRUE, seed = 244)
 ```
 
 A worm plot subtracts the reference quantile, making curvature and departures
-near zero easier to see. It checks the residual distribution, not whether
-unmodelled sites share spatial or temporal dependence.
+near zero easier to see. The separate panels show which observation process
+contributes each pattern.
 
 ```{r predictive-check}
 posterior_predictive_plot(joint, n = 50, seed = 245)
 ```
 
 The count panel has some departures at individual counts, despite reasonable
-overall shape agreement. With 50 replicates these intervals also have simulation
-error, and pointwise departures across many counts are not a global rejection
-test.
+overall shape agreement. Its intervals are pointwise and have appreciable
+simulation error with 50 replicates; increase that number before judging
+individual probability masses closely.
 
 The posterior predictive plot compares separate observed response distributions
 with replicated surveys, including approximate coefficient uncertainty. For
@@ -246,8 +244,6 @@ for Gaussian and Gamma components these weights represent response precision.
 Prediction data default to weights of one unless you supply them. These
 interpretations differ and should follow the measurement protocol.
 
-Use separate checks to decide whether the component distributions are adequate
-and whether their shared smooth is scientifically credible. This model supports
-an association between cover and survey response under those assumptions. It
-does not identify habitat causation, detection probability independently of
-abundance, or abundance at unvisited sites without further assumptions.
+Use the component diagnostics to assess the observation distributions and the
+separate-curve comparison to decide whether to share the cover response.
+Together they address both parts of the model that connect these surveys.

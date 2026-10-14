@@ -25,8 +25,9 @@ explain how the choice of interval changes the conclusion.
 
 The examples use the small `CO2` data set distributed with R, plus mgcv,
 gratia, dplyr and ggplot2. No additional modelling package is needed. We use
-2,000 coefficient draws for the illustrated bands and posterior calculations;
-increase this for a final analysis and check that interval limits are stable.
+2,000 coefficient draws for the illustrated bands and posterior calculations.
+If a conclusion depends on an interval limit, increase this count and check
+that the limit is stable.
 
 ```{r packages, message=FALSE}
 library("mgcv")
@@ -68,10 +69,11 @@ the fitted curve.
 
 All responses are positive. A Gamma distribution with a log link preserves
 positive fitted means and assumes that residual variability grows with the
-mean. This is a useful working model, rather than a biological law. It assumes
+mean. The model assumes
 that the *shape* of each treatment curve on the log scale is shared between
-origins. The origin interaction changes its height. With only three plants
-per combination, this keeps the model manageable but limits its conclusions.
+origins. The origin interaction changes its height. With three plants per
+combination, sharing those shapes lets us estimate treatment curves without
+fitting a separate shape to every origin and treatment combination.
 
 ```{r fit-model}
 m_uptake <- gam(
@@ -84,12 +86,12 @@ overview(m_uptake)
 
 `k = 5` limits each treatment curve's complexity; REML estimates the penalties
 that control its smoothness. It does not force five effective degrees of
-freedom. This model captures much of the observed variation, but the small
-number of independent plants remains the limiting source of information.
-Before treating the intervals as a final analysis, examine residuals and
-whether plant differences require more than an intercept; the
-[diagnostic workflow](model-checking.html) discusses checks with fitted
-effects and simulated effects.
+freedom. The plant intercept accounts for persistent differences in curve
+height. Residual patterns against concentration can show whether plant
+differences also involve curve shape; the
+[diagnostic workflow](model-checking.html) explains checks with fitted
+effects and simulated effects. The treatment comparison has three independent
+plants per combination, even though each plant contributes seven measurements.
 
 ## Compare expected uptake on a supported grid
 
@@ -167,8 +169,9 @@ The factor level order determines subtraction: nonchilled minus chilled here.
 A positive difference means lower uptake after chilling. The Mississippi
 difference becomes clearly positive over much of the range; the evidence for
 a difference in Quebec is weaker. The zero reference line and interval limits
-show which evaluated concentrations support a positive contrast. An interval
-containing zero does not establish that the treatments are equivalent.
+show which evaluated concentrations support a positive contrast. Where the
+interval contains zero, the direction of the treatment difference remains
+unresolved.
 
 The delta method approximates a response-scale difference by its local linear
 change with the coefficients, then propagates their joint covariance.
@@ -277,9 +280,9 @@ ggplot(rates, aes(conc, .derivative, colour = Uncertainty, fill = Uncertainty)) 
 
 For the nonchilled Quebec curve, the fastest fitted increase is at low
 concentrations; further increases have a smaller effect over much of the
-remaining range. Local fluctuations are a reminder that a spline is not
-constrained to be monotone or to approach an asymptote. Wide intervals near
-the upper range limit what can be said about small changes there.
+remaining range. The spline also has local decreases: this fit has no
+monotonicity or asymptote constraint. Near the upper end, intervals include
+zero, so the estimated small changes have no clearly supported direction.
 
 Both methods return **pointwise** derivative intervals and `.se`. Delta
 uncertainty uses the finite difference of fitted predictions and normal
@@ -301,9 +304,9 @@ to estimate curvature; the first derivative above is the rate of uptake change.
 
 An alternative model uses a smooth of log concentration. This gives more
 resolution to the lower concentrations where uptake changes quickly. It also
-assumes a common concentration shape across treatments, so it changes the
-statistical model; it is an illustration of coordinate choice, not evidence
-that this simpler model is preferable.
+assumes a common concentration shape across treatments. We use it to show
+how a transformed covariate changes the plotting coordinates and derivative
+units.
 
 ```{r transformed-model}
 m_log_conc <- gam(
@@ -346,8 +349,8 @@ draw(linear_effect, back_transform = TRUE) +
 The horizontal axis uses concentration, while the effect remains a
 contribution to log uptake. Drawing the same object with
 `back_transform = FALSE` uses log concentration without changing the estimates.
-The apparent curvature on the raw axis follows from the transformation;
-it is not evidence for a flexible concentration response.
+The straight relationship in log concentration appears curved when drawn
+against concentration in its original units.
 
 ```{r transformed-rates}
 log_coordinate_rate <- derivatives(m_log_conc,
@@ -416,9 +419,8 @@ fitted_values(m_uptake, data = hypothetical_grid, exclude = "s(Plant)")
 The message checks categorical combinations even when a responsible term is
 excluded. In the earlier treatment contrast, holding a plant
 identifier fixed while excluding `s(Plant)` is intentional: its contribution
-is zero in both scenarios. Including its random effect under an unassigned
-treatment would instead impose a hypothetical within-plant intervention that
-the observed design does not directly support.
+is zero in both scenarios. When predicting for an observed plant with its
+random effect included, use that plant's assigned origin and treatment.
 
 ### Preserve observation positions when measurements are missing
 
@@ -474,9 +476,10 @@ dim(get_vcov(m_uptake, term = "s(conc):Treatmentnonchilled"))
 
 For APIs that provide `frequentist`, including `difference_smooths()`,
 `derivatives()` and `smooth_estimates()`, setting it to `TRUE` selects the
-covariance of the penalised coefficient estimators instead. This changes the
-interpretation of their uncertainty; it is not an automatic improvement to
-Bayesian credible bands. `get_vcov(..., frequentist = TRUE)` gives that matrix,
+covariance of the penalised coefficient estimators instead. This describes
+their sampling variability, while the default covariance supplies the
+approximate posterior intervals used above.
+`get_vcov(..., frequentist = TRUE)` gives that matrix,
 and `get_vcov(..., term = "s(conc):Treatmentnonchilled")` extracts a term's
 coefficient covariance. Keeping the full matrix is essential when comparing
 two terms whose estimates are correlated.
@@ -498,10 +501,8 @@ not be labelled standard deviation without taking its reciprocal. These
 utilities do not remove the multiple-predictor restrictions of the comparison
 or delta derivative methods.
 
-The analysis supports a reduction in expected uptake for chilled Mississippi
-plants over much of the measured range, under the fitted model. It gives less
-clear evidence for the Quebec contrast, and identifies a rapid rise followed
-by slower change. It does not establish treatment equivalence, extrapolate to
-unmeasured concentrations, or account for every possible pattern of repeated
-measurement dependence. The model assumptions and the twelve independent
-plants should remain visible when applying the workflow to a larger study.
+The fitted model supports lower expected uptake for chilled Mississippi
+plants over much of the measured range. The Quebec comparison has wider
+intervals relative to its estimated difference, leaving its direction less
+clear. For nonchilled Quebec plants, uptake rises fastest at low
+concentrations and changes more slowly over the remaining range.

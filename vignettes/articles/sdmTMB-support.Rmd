@@ -36,8 +36,7 @@ The data are trawl tows in Queen Charlotte Sound, British Columbia. Biomass
 density is measured in kg/km²; `X` and `Y` are UTM coordinates in kilometres.
 We retain all survey years and the spatial and year-specific fields. Our
 adaptations add a separate mean for each survey year, use six basis functions
-for the depth smooth, and use the introduction's 10 km mesh cutoff. A finer
-mesh and larger basis should be checked before a substantive survey analysis.
+for the depth smooth, and use the introduction's 10 km mesh cutoff.
 
 You need the optional package **sdmTMB >= 1.1.0**; older fitted objects may lack
 the stored smooth information that gratia needs. mgcv supplies the smooth
@@ -113,9 +112,10 @@ catch density between surveys. It prevents the year-specific fields from being
 the only way to represent a change in the overall mean. Both components use
 the same formula and smooth basis, as required by sdmTMB for delta models with
 smooths, but their fitted curves can differ. Smoothing is estimated during
-fitting. `sanity()` checks estimation and convergence; successful convergence
-does not establish that the response distribution or spatial structure is
-adequate.
+fitting. `sanity()` checks estimation and convergence. The fitted positive-density
+field has a range of about 12 km, close to the 10 km mesh cutoff, so compare a
+finer mesh before relying on its geographical predictions. The residual checks
+below examine the response distribution and remaining spatial patterns.
 
 ## Which part of the response changes with depth?
 
@@ -124,8 +124,7 @@ smooths(cod_fit)
 ```
 
 `s(depth)` belongs to the encounter component and `s.1(depth)` to the positive
-component. The `.1` suffix identifies the second predictor; it does not mean
-that the two curves are constrained to agree.
+component. The `.1` suffix identifies the second predictor.
 
 ```{r cod-depth-effects, fig.alt = "Estimated depth smooths for encounter log odds and log positive density, with uncertainty bands and component subtitles."}
 depth_panels <- draw(cod_fit, select = smooths(cod_fit), n = 100,
@@ -162,11 +161,10 @@ depth_effects |>
   select(.smooth, .model, depth, .estimate, .se)
 ```
 
-The maximum is over this evaluation grid; it is not a precise estimate of a
-biological optimum. Sampling uncertainty, choice of mesh and basis, and
-association between depth and geographical location all affect that
-interpretation. A depth association alone does not establish a causal habitat
-preference.
+The reported peak depths locate the maxima on the 100-point evaluation grid.
+The broad intervals in deeper water reflect sparse observations there, so the
+intermediate-depth peak is better supported than the shape of the deep-water
+tail.
 
 `smooth_coefs()` returns coefficients in the constrained mgcv basis. They can
 be useful for reproducing a curve from its basis matrix, but individual
@@ -203,8 +201,7 @@ but higher for positive density. Looking at either component alone would miss
 this distinction.
 
 Here we requested term-only uncertainty. The reference year consequently has
-no uncertainty interval for its *contrast with itself*. That says nothing
-about uncertainty in the mean density in 2003. Request the default
+no uncertainty interval for its *contrast with itself*. Request the default
 `overall_uncertainty = TRUE` to include intercept uncertainty in the plotted
 parametric contributions. Use full predictions to estimate actual densities.
 
@@ -216,8 +213,8 @@ association changed through time. We now adapt the binomial encounter model
 in sdmTMB's [introduction](https://sdmtmb.github.io/sdmTMB/articles/basic-intro.html):
 replace its quadratic depth effect with a joint smooth of depth and survey
 year, while retaining the spatial and independent year-specific fields and
-every survey tow. This extension models encounter alone; it does not estimate
-positive catch density or replace the full delta analysis.
+every survey tow. This extension focuses on encounter; the delta model remains
+the analysis for combined encounter and positive catch density.
 
 A [tensor product smooth](https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/t2.html)
 combines bases for the two covariates and estimates smoothing for different
@@ -256,13 +253,10 @@ sdmTMB::tidy(cod_encounter, effects = "ran_pars") |>
 ```
 
 Two standard deviations are close to zero and their intervals are uninformative.
-Some directions of curvature are being strongly penalised; the richer surface
-does not produce clear evidence of a changing depth association. This is a
-reason to consider the simpler common-depth-curve model above, rather than
-reading a complicated formula as evidence of a complicated biological pattern.
-If you regularise these parameters with prior distributions, justify those
-assumptions and assess sensitivity. This example retains maximum likelihood
-fitting without additional priors.
+Some directions of curvature are being strongly penalised, and these data
+weakly identify the corresponding smoothing parameters. If changes in the
+depth relationship are secondary to the main survey question, the simpler
+common-depth-curve model above provides a useful starting point.
 
 ```{r cod-tensor-surface, fig.alt = "Tensor smooth contribution to encounter log odds over depth and survey year. Contours are almost vertical, with unsupported deep-water combinations masked."}
 tensor_panel <- draw(cod_encounter, n_2d = 30, dist = 0.1,
@@ -277,12 +271,12 @@ tensor_panel +
 The mostly vertical contours indicate that depth dominates the displayed
 association; the preferred intermediate-depth region changes little through
 time. The surface is a contribution to log odds, without the intercept or
-fields. It displays estimates, not uncertainty, and its colours are not
-encounter probabilities. `dist = 0.1` masks combinations far from the observed
-depth-year pairs after scaling both covariates to a unit square. It does not
-turn predictions between surveys into observed evidence. Together with the
-smoothing warning and sparse deep-water observations, this plot supports
-caution about temporal evolution, rather than a claim that evolution is absent.
+fields. Its colours show fitted contributions; standard errors are available
+from `smooth_estimates()`. `dist = 0.1` masks combinations far from the observed
+depth-year pairs after scaling both covariates to a unit square. The nearly
+stable intermediate-depth region is the main pattern here. The smoothing
+warning and sparse deep-water observations limit the temporal changes we can
+resolve in the tails.
 
 For custom calculations, `get_smooths_by_id()` retrieves the fitted mgcv smooth
 object. Its penalty list records the independently smoothed parts of the
@@ -294,13 +288,13 @@ length(encounter_smooth$S)
 length(smooth_coefs(cod_encounter, select = smooths(cod_encounter)[1]))
 ```
 
-The three penalties act on one fitted surface, represented here by nineteen
-coefficients. They are not three separate biological effects. Use
+The three penalties control different parts of one fitted surface, represented
+here by nineteen coefficients. Use
 `smooth_estimates(cod_encounter, data = ...)` to evaluate that surface and its
 standard errors at specific depth-year combinations before carrying the
 results into another calculation.
 
-## A depth effect is not a map of density
+## Map expected density with full predictions
 
 Full predictions require both components and the fields. Use sdmTMB's public
 [prediction method](https://sdmtmb.github.io/sdmTMB/reference/predict.sdmTMB.html)
@@ -336,10 +330,9 @@ ggplot(cod_map, aes(X, Y, fill = est)) +
 
 The map combines encounter probability, positive density and geographical
 variation. A location can have low expected density through either a low
-encounter probability or a low positive mean. The maps are fitted mean
-surfaces, without uncertainty bands; they are not future catches and do not
-show how certain each location is. sdmTMB's `predict(..., nsim = ...)` supplies
-joint prediction draws for carrying uncertainty into derived quantities.
+encounter probability or a low positive mean. The maps show fitted mean
+surfaces. sdmTMB's `predict(..., nsim = ...)` supplies joint prediction draws
+for estimating uncertainty at each location or in derived quantities.
 Setting `re_form = NA` removes spatial fields from predictions. That is a
 prediction with zero fields, not an average over new fields; the nonlinear
 links make these different calculations.
@@ -368,9 +361,9 @@ of the estimated field covariance. Here, the upper tail rises above the
 reference: some positive catches are larger than this fitted response
 distribution anticipates. This motivates checking the positive component and
 considering, for example, a delta-lognormal model, whose positive tail differs
-from the Gamma distribution. Such a change needs its own convergence and
-prediction checks; changing the residual conditioning alone does not repair
-a misspecified response model. Repeat with other `field_seed` values to
+from the Gamma distribution. Fit that alternative and repeat the positive-tail
+checks to assess whether it represents the large catches better. Repeat with
+other `field_seed` values to
 see whether a feature of the plot depends on one fitted-field draw; the
 `seed` argument separately controls randomisation at the zeros.
 
@@ -392,9 +385,8 @@ ggplot(cod_residuals, aes(X, Y, colour = residual)) +
 Clusters of residuals with the same sign deserve attention even if a QQ plot
 looks acceptable. Consider omitted spatial covariates, inadequate field
 resolution, or a response distribution that cannot represent the local
-variation. This map is an exploratory check, not a formal spatial-correlation
-test. Observation-order autocorrelation is usually inappropriate for tows
-whose order does not represent a regular geographical sequence.
+variation. Use geographical distances to investigate these patterns:
+observation-order lags do not describe how far apart the survey tows are.
 
 Three further choices answer different questions:
 
@@ -432,9 +424,9 @@ Independent uniform order-statistic bands would answer the wrong question.
 Compare the subtitles as well as the curves: each plot identifies its
 conditioning. In this example the integrated QQ plot describes errors around
 estimated survey fields, whereas the marginal plot also reflects the wide
-variation in density between possible geographical surfaces. Neither makes
-the observed tows independent marginally. Integration reuses the fitting data
-and can make checks conservative. All modes are approximate after estimation.
+variation in density between possible geographical surfaces. The integrated
+plot has narrower residual spread. Because integration reuses the fitting data,
+apparent agreement in that plot can be conservative.
 With 49 reference draws, tail resolution and Monte Carlo accuracy are limited.
 Increase `gratia.diagnostics.marginal_draws` and `n_simulate` to check that a
 conclusion persists; the defaults use more reference draws.
@@ -509,10 +501,10 @@ more extreme positive tail. Passing a check of the 95th percentile does not
 establish that the largest catches are well represented. Wider marginal
 variation is scientifically plausible because these summaries change when a
 large part of the area happens to have high or low density. The displayed
-intervals are descriptive 90% predictive ranges from just 25 replicates;
-they are not calibrated p-values. Increase the draw count before interpreting
-an apparent tail discrepancy. These summaries also describe the sampling
-locations, not a population biomass index.
+intervals are descriptive 90% predictive ranges from just 25 replicates.
+Increase the draw count before interpreting an apparent tail discrepancy.
+These summaries describe the sampling locations; an area-standardised biomass
+index requires predictions across the survey domain.
 
 ## Applying the workflow to another survey
 
@@ -533,10 +525,9 @@ extraction, unavailable smooth metadata, or a covariance from a
 non-positive-definite Hessian. `unconditional = TRUE` and `frequentist = TRUE`
 are mgcv covariance choices and do not apply to these joint TMB intervals.
 Use sdmTMB's prediction and plotting methods for fields and unsupported
-formula effects, and investigate the fit rather than replacing unavailable
-uncertainty with a zero-width band. Diagnostic families and additional limits
-are listed in `?diagnostic_support`; a fitting package's ability to fit a
-family does not imply that every analytic diagnostic is available.
+formula effects. If the covariance is unavailable, investigate convergence
+before interpreting intervals. Diagnostic families and additional limits
+are listed in `?diagnostic_support`.
 
 ```{r restore-options, include = FALSE}
 options(cod_field_options)

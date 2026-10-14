@@ -93,3 +93,19 @@ git diff --check passed. Temporary PDFs created by these checks were removed;
 no unrelated working-tree changes existed at the start. The work is committed
 on gls/release-workflow-articles; main is not merged and no CRAN submission or
 publication has been performed.
+
+## Editorial review of qualifications
+
+Added the requested writing instruction to AGENTS.md and reviewed all eight
+new articles. Removed unrelated cautions about causation, forecasting,
+equivalence and what simulations establish about other datasets. Replaced
+qualifications with direct result interpretations or actions tied to the
+example. Retained concrete limitations on interval scope, independent
+replication, residual dependence, mesh resolution, field conditioning and
+available APIs.
+
+All 130 executable R chunks are identical to those in commit 100749320.
+The eight articles, article index and search index rebuilt successfully from
+current source outside the sandbox. All 531 local links, anchors and image
+paths passed checks. The four main article previews were opened for review,
+and the revised diagnostic explanation was verified in the browser.

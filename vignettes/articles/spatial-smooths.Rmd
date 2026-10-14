@@ -20,8 +20,7 @@ Spatial proximity is not always a straight-line distance. Observations might
 represent adjacent districts, locations separated by a peninsula, or points
 on the globe. The appropriate smooth depends on that geometry. This article
 uses three examples to show how to fit those models and interpret gratia's
-effect displays. A spatial smooth describes a mean surface; it does not by
-itself assert that remaining response errors are spatially independent.
+effect displays.
 
 ```{r packages, message = FALSE}
 library("mgcv")
@@ -102,11 +101,11 @@ draw(district_income, select = "s(income)",
 
 Positive area effects indicate rates above the fitted intercept and income
 contribution. The income association is downward over this dataset's range,
-while individual adjusted district effects have substantial uncertainty. A
-large estimate alone is insufficient to rank districts confidently. Rates in
-neighbouring districts borrow information through the penalty, but the
-independent Gaussian response assumption does not account for unmodelled
-spatial error correlation.
+while individual adjusted district effects have substantial uncertainty. Use
+their intervals when comparing districts. Neighbouring districts borrow
+information through the penalty on the mean effects. The Gaussian response
+errors are still assumed independent, so inspect residual spatial patterns
+before relying on these intervals.
 
 To see how much the smaller spatial representation changes the fitted pattern,
 compare its area effects on the same district labels:
@@ -123,11 +122,11 @@ ggplot(rank_effects, aes(district, .estimate, colour = representation)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
-The comparison concerns the spatial-only fits. It is not a test that the two
-bases are equivalent, or evidence that income caused the difference between
-the adjusted and unadjusted surfaces. Smoothing across a neighbourhood graph
-is a modelling assumption that should match how information is expected to
-travel between areas.
+The comparison shows how reducing the basis changes the spatial-only fits.
+Use it to assess whether the smaller representation retains the district
+patterns of interest. The neighbourhood graph determines which area effects
+borrow information from each other, so check that it represents the
+connections relevant to your analysis.
 
 ```{r district-qq}
 draw(district_income, select = "s(district)", mrf_plot = "qq")
@@ -149,9 +148,9 @@ This is the penalty expressed in the fitted reduced basis; its rows are
 basis coefficients rather than districts. Larger diagonal entries indicate
 coefficient directions that are penalised more strongly. Before its basis
 transformation, the MRF penalty counts neighbours on the diagonal and uses
-negative off-diagonal entries for neighbours. The displayed matrix is not a
-map. gratia's area plots expose
-labels and intervals; specialist map plotting remains a separate choice.
+negative off-diagonal entries for neighbours. Use the area plots above to
+inspect district labels and intervals; the penalty plot explains how their
+underlying coefficients are regularised.
 
 ## How should a surface behave across a peninsula?
 
@@ -159,9 +158,8 @@ For a bounded region such as a water body, locations on opposite sides of land
 can be close in Euclidean distance and distant along the water. A soap-film
 smooth respects the supplied boundary. We use a simulation from mgcv's
 [soap-film example](https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/smooth.construct.so.smooth.spec.html),
-retaining its curved boundary, interior knots and test surface. These are
-synthetic observations, not measurements from an actual estuary. The question
-is whether a boundary-aware smoother can recover a field without joining
+retaining its curved boundary, interior knots and simulated test surface. The
+question is whether a boundary-aware smoother can recover a field without joining
 opposite sides across the excluded region. We use REML instead of the
 example's default smoothing selection.
 
@@ -187,9 +185,7 @@ ggplot(water, aes(v, w, colour = y)) +
 ```
 
 The errors were generated as independent Gaussian noise with standard
-deviation 0.3. That makes a Gaussian identity-link fit appropriate for this
-controlled example. For real data the distribution, observation error and
-boundary would require their own justification.
+deviation 0.3, matching the Gaussian identity-link model fitted below.
 
 ## Separate boundary variation from interior variation
 
@@ -219,9 +215,9 @@ draw(water_fit, n_2d = 35, surface = "tile", caption = TRUE, ncol = 1,
 ```
 
 In this simulation the estimated variation is almost entirely in the boundary
-component, with very little additional interior wiggliness. This is a result
-of this test field, not a rule that the interior component is unimportant.
-Effect colours display each centred contribution, not the total field.
+component, with very little additional interior wiggliness. Effect colours
+display each centred contribution; add them and the intercept to recover
+the fitted mean field.
 Boundary loops remain visible and predictions outside the supplied domain
 are unavailable.
 
@@ -248,12 +244,10 @@ ggplot(water, aes(truth, estimated)) +
   labs(x = "Simulated mean field", y = "Estimated mean field")
 ```
 
-Agreement supports recovery at sampled locations under the known simulation
-conditions. It does not assess extrapolation into unsampled coves, validate a
-real coastline or account for correlated sampling errors. Real applications
-should consider the placement of knots and whether the boundary captures the
-features that must prevent smoothing across land. sf/sw components can also
-form space-by-time tensor products; the flat-surface display uses numeric
+The fitted values follow the simulated mean closely at the sampled locations.
+When adapting this model to a water body, place interior knots across the
+domain and include boundary features that must prevent smoothing across land.
+sf/sw components can also form space-by-time tensor products; the flat-surface display uses numeric
 conditioning slices for time. Transformed soap-film boundaries currently
 cannot be drawn on a recovered raw covariate scale: retain the model-scale
 display rather than silently dropping the boundary.
@@ -284,9 +278,9 @@ sqrt(mean((fitted(globe_fit) - globe$truth)^2))
 ```
 
 The smooth requires latitude first and longitude second, in degrees. A
-Gaussian fit matches the generated observation errors. As in the water
-example, the recovery error assesses a known mean at sampled locations,
-not the accuracy of a real environmental map.
+Gaussian fit matches the generated observation errors. The recovery error
+summarises the difference between the fitted and simulated mean at the sampled
+locations.
 
 ```{r sphere-map, fig.height = 6}
 if (requireNamespace("sf", quietly = TRUE)) {
@@ -299,13 +293,12 @@ The orthographic view shows one hemisphere. Surface cells, contours and
 observation points are clipped to that visible hemisphere before projection,
 so locations on the far side cannot leak into the display. Cells at poles and
 the date line retain valid geographic boundaries. Changing the projection
-changes which locations are visible rather than changing the model. Factor-by
-spherical effects use separate panels for each level; they should not be
-interpreted as one averaged field. An explicit scattered prediction dataset
-does not define rectangular cells and is drawn as points.
+changes which locations are visible while retaining the fitted spherical
+surface. Factor-by spherical effects use separate panels for each level.
+Supply a regular prediction grid for a cell map; a scattered prediction
+dataset is drawn as points.
 
 Choose the geometry from the question: district neighbourhoods for aggregated
 area measurements, soap films for a bounded continuous domain, and spherical
-splines for global locations. None of these choices supplies an observation
-model automatically. Distribution checks, uncertainty and any residual
-dependence still require attention alongside an attractive spatial display.
+splines for global locations. The boundary and projection controls then let
+the displayed surface follow the geometry used in fitting.

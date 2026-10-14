@@ -20,9 +20,8 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE)
 and dependence. Here we consider measurements whose variance, zero probability,
 category or detection limit changes what a residual means. The examples use
 mgcv and gratia; the motorcycle dataset needs the optional MASS package, and
-the comparison of fitting packages needs the optional GJRM package. Simulations describe hypothetical measurement protocols explicitly.
-They illustrate how to extend an analysis, not empirical conclusions about a
-particular study.
+the comparison of fitting packages needs the optional GJRM package. Each
+simulation describes its measurement protocol and response distribution.
 
 ```{r packages}
 library("mgcv")
@@ -36,6 +35,10 @@ The `MASS::mcycle` data record acceleration at times after impact in simulated
 motorcycle accidents. The mean acceleration changes rapidly after impact, and
 its spread also appears to vary. A constant-variance Gaussian model can
 represent the mean while failing to capture that spread.
+
+The fits assume independent measurement errors. The available columns, time
+and acceleration, provide no accident identifiers for estimating correlation
+between measurements from the same accident.
 
 ```{r impact-data}
 data("mcycle", package = "MASS")
@@ -69,11 +72,8 @@ ggplot(data.frame(impact_grid, sd = 1 / precision), aes(times, sd)) +
 ```
 
 The spread increases around the period of rapid change. Modelling it reduces a
-systematic residual pattern, but observations at similar times need not represent
-one independent time series. The dataset does not identify a complete set of
-replicate trajectories here. A pooled check cannot resolve dependence or the
-experimental history. These fits describe mean acceleration and spread at the
-observed times; they do not predict injury or establish a physical crash model.
+systematic residual pattern and describes how both mean acceleration and its
+spread change with time after impact.
 
 ```{r impact-ppc}
 posterior_predictive_plot(varying, n = 50, seed = 402)
@@ -103,7 +103,7 @@ Gratia uses final fitted distribution parameters for the response mean and
 randomised quantile residuals, with a standard-normal reference. Smooths
 identify their parameter in subtitles. Agreement between diagnostic patterns
 across fits helps distinguish a modelling issue from one fitting procedure's
-choice of smoothness. It is not an independent validation dataset.
+choice of smoothness.
 
 Supported uncensored univariate GJRM distributions are N, LN, GA, GAi, P, NBI
 and NBII. Other joint, survival and censored models remain unsupported. GAi
@@ -155,10 +155,9 @@ worm_plot(ig_fit, method = "uniform", seed = 407)
 
 Inverse Gaussian CDF and quantile calculations now work without an additional
 package, including observation weights. Both models can fit similar means
-while predicting different tails. The data were generated from Gamma here, so
-apparent adequacy of the inverse Gaussian approximation would not establish
-its sampling mechanism. Compare predictive performance on independent samples
-when the practical aim is forecasting concentrations.
+while predicting different tails. The known Gamma generator provides a
+baseline for comparing those tails with the inverse Gaussian fit, whose
+variance increases more rapidly with its mean.
 
 ## Exact zeros and positive amounts
 
@@ -199,9 +198,8 @@ data.frame(observed_zero_fraction = mean(rain$amount == 0),
 ```
 
 The rank ratio stays within the zero mass. Compare observed and expected zero
-fractions as one check, and inspect the positive tail as another. Agreement in
-one does not guarantee agreement in the other. Native Gamma functions handle
-power two. Work limits can produce warnings and approximate mixture results;
+fractions as one check, and inspect the positive tail as another. Native Gamma
+functions handle power two. Work limits can produce warnings and approximate mixture results;
 expensive inversion fallback requires the optional tweedie package. Increasing
 simulation is often preferable to requesting numerical QQ quantiles on a large
 dataset.
@@ -240,8 +238,8 @@ families. Their distribution helpers and predictions are also supported.
 Censored response draws describe the latent response. A posterior predictive
 plot of the observed censored values remains unsupported: it needs an explicit
 censoring process applied to each draw. For a known fixed limit, you can draw
-latent responses and apply that threshold yourself. That additional operation
-represents the measurement mechanism and must be justified for your data.
+latent responses and apply that threshold yourself to reproduce the
+measurement mechanism.
 
 ## Binary trials and ordered categories
 
@@ -273,9 +271,8 @@ qq_plot(visit_glm, type = "quantile", seed = 414)
 ```
 
 The smooth model allows departure from that linear relationship, at the cost
-of estimating more flexibility. A small dataset need not support this added
-complexity. Similar checks across the fits are consistent with the simple
-relationship used in this simulation.
+of estimating more flexibility. Similar checks across the fits are consistent
+with the simple relationship used in this simulation.
 
 Randomisation spans one success, not a full unit of proportion. Posterior
 predictive plots display proportions at fitting observations and give each
@@ -342,8 +339,7 @@ these definitions are not comparable standardised scores across families.
 
 Stable tail calculations retain log probabilities where supported, reducing
 artificial infinite residuals in extreme count or censored observations.
-Unsupported tail conversions still produce explanatory errors. A finite score
-is numerical reliability, not evidence of good fit. The
+Unsupported tail conversions still produce explanatory errors. The
 [`diagnostic_support`](../reference/diagnostic_support.html) reference lists
 supported distributions and restrictions, including quasi families and working
 correlations without a response model. Use fitting-package methods or an

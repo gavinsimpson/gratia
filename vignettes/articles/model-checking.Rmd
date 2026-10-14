@@ -59,16 +59,17 @@ There are three distinct ways to generate a comparison:
 
 A smooth plot's interval concerns an estimated effect. A QQ reference band
 concerns ordered residuals from replicated responses. A posterior predictive
-plot concerns replicated response distributions. Their bands have different
-meanings. In particular, response simulations do not refit the model, and QQ
-bands are not calibrated hypothesis tests after parameter estimation.
+plot concerns replicated response distributions. QQ reference bands condition
+on the fitted model, without refitting it for each replicate. Use departures
+from these bands to locate discrepancies to investigate, rather than as a
+formal rejection rule.
 
 ## Count variation and mean structure
 
 Consider daily insect counts at independently sampled sites. We simulate
 12,000 sites with temperature and wind as covariates. The mean count peaks at
-intermediate temperatures and falls with wind. Sites are independent in this
-example; repeated visits would require a model for their dependence.
+intermediate temperatures and falls with wind. The simulated sites are
+independent.
 
 ```{r counts}
 set.seed(301)
@@ -95,8 +96,8 @@ plots. These use all observations, summarised on grids or into quantile bins.
 They reveal the response distribution without drawing 12,000 overlapping
 points. A straight QQ plot and residual spread that stays roughly similar
 across fitted values are consistent with the simulated Poisson model.
-Observed counts still scatter around fitted means; agreement is not a demand
-that every count equal its expected value.
+The observed-versus-fitted panel shows Poisson variation around the fitted
+means.
 
 ### Put different responses on a common diagnostic scale
 
@@ -124,8 +125,8 @@ qq_plot(count_fit, type = "deviance", method = "simulate",
 ```
 
 Here the reference comes from responses simulated at the fitting covariates.
-This preserves varying fitted means, rather than comparing all counts to one
-Poisson mean. `method = "uniform"` instead averages ordered residuals obtained
+Each observation's fitted mean enters its simulated response.
+`method = "uniform"` instead averages ordered residuals obtained
 from the fitted inverse CDF. `method = NULL` chooses this method for most
 independent GAMs and simulation for Tweedie models to avoid costly numerical
 quantile inversion. An explicit method overrides that choice where supported.
@@ -151,11 +152,10 @@ ggplot(data.frame(insects, residual = linear_r), aes(temperature, residual)) +
   labs(x = "Temperature", y = "Quantile residual", fill = "Sites")
 ```
 
-The residual pattern bends with temperature. Changing the response family alone
-would not repair that missing mean structure. Compare the same display using
-`r` from the smooth model to distinguish a curved mean from unexplained count
-variation. The count-versus-temperature association in this simulated example
-supports a nonlinear mean, not a causal claim about field insect populations.
+The curved residual pattern shows that the linear temperature effect misses
+the response shape. Changing the response family alone would not repair that
+missing mean structure. Compare the same display using `r` from the smooth
+model to see how the smooth accounts for the temperature response.
 
 ### Choose compact displays without changing the question
 
@@ -173,8 +173,8 @@ histogram option uses unsmoothed bins; `bandwidth` controls smoothing on both
 axes. Observed-versus-fitted count heatmaps remain unsmoothed. The five scalable
 functions also include `scalable_qq_plot()`; ordinary plots remain available
 with `appraise(..., scalable = FALSE)`, and `scalable_threshold` changes the
-automatic cutoff. Compact plotting does not make fitting or simulation free:
-responses are still generated for every observation. QQ calculations average
+automatic cutoff. Plot summaries are compact, but simulation still generates
+a response for every observation. QQ calculations average
 inverse-CDF draws as they are generated. When simulated references exceed
 `options(gratia.diagnostics.max_cells = 1e7)`, exact quantiles use temporary
 files, reducing memory at the cost of disk access. One response vector and the
@@ -219,9 +219,8 @@ summary(growth_fit)$tTable
 
 The age coefficient describes mean growth in the reference sex, and the
 interaction describes a difference in age slopes. The fitted random effects
-describe departures for these children. A positive age slope is evidence of
-growth over these ages; it does not establish a linear trajectory outside the
-observed period.
+describe departures for these children. The positive fitted age slopes
+describe growth between ages 8 and 14.
 
 ```{r growth-references}
 qq_plot(growth_fit, type = "quantile", conditioning = "conditional", seed = 305)
@@ -235,17 +234,17 @@ new child trajectories. All four measurements of a simulated child share its
 new intercept and slope; the simulator retains their covariance. Setting those
 effects to zero would give the mean trajectory, not this marginal distribution.
 In this fit the conditional scores have a compressed centre and one large
-positive tail departure. The marginal plot is closer to its reference, but
-that does not explain away the unusual within-child measurement. Inspect the
-corresponding observation and individual trajectories before trusting the
-conditional error distribution.
+positive tail departure. The marginal plot averages over different child
+trajectories and is closer to its reference. Investigate the observation
+responsible for the largest conditional score alongside that child's
+trajectory.
 
 The marginal QQ reference must preserve the shared effects. Gratia uses joint
 response draws for its bands, rather than bands derived for independent scores.
 
-The QQ plot still pools the ordered residuals. Inspect trajectories or residuals
-against age and child to find within-child structure; an acceptable distribution
-of residuals alone cannot establish an adequate covariance model.
+The QQ plot pools the ordered residuals. To check the shared child effects,
+also plot trajectories or residuals against age, grouped by child: systematic
+patterns within children can be hidden by pooling.
 
 ```{r growth-ppc}
 posterior_predictive_plot(growth_fit, conditioning = "conditional", n = 50,
@@ -255,12 +254,12 @@ posterior_predictive_plot(growth_fit, conditioning = "marginal", n = 50,
 ```
 
 The conditional posterior predictive check draws uncertainty in the fitted
-child effects together with fixed effects. It does not hold those estimates
-fixed as the first QQ check did. The marginal posterior predictive check draws
-new effects from their fitted population covariance as well. Covariance
-parameters remain at fitted values in these nlme approximations. Density
-agreement concerns the response distribution at these ages; it does not tell us
-whether each child's trajectory is reproduced.
+child effects together with fixed effects, allowing more response variation
+than the conditional QQ reference at fixed effect estimates. The marginal
+posterior predictive check draws new effects from their fitted population
+covariance as well. Covariance parameters remain at fitted values in these
+nlme approximations. The density overlays pool the measurements across ages
+and children; use the trajectory plots to examine where that variation occurs.
 
 ### Apply the same distinction to other mixed-model fits
 
@@ -308,9 +307,9 @@ predictions conditional on a particular child's effects.
 
 Time order carries information that a histogram discards. The following
 simulation represents regularly spaced measurements from four independent
-monitoring series with a slowly changing mean and Gaussian AR1 errors. The
-known correlation 0.6 lets us demonstrate the distinction without claiming
-that BAM estimates it: `rho` is supplied to the fitter.
+monitoring series with a slowly changing mean and Gaussian AR1 errors. We
+supply the simulation's known correlation, 0.6, through `rho`; BAM treats it
+as fixed during fitting.
 
 ```{r gaussian-series}
 set.seed(308)
@@ -339,9 +338,8 @@ fitting-package covariance model appropriate to irregular time intervals.
 For counts, BAM with `discrete = TRUE` applies nonzero `rho` to its *working
 residuals*, the quantities used during iterative fitting. This is a generalised
 estimating equations (GEE) approximation. It does not define a unique joint
-count distribution. Our next dataset is generated from a latent correlated
-process; fitting with a working correction does not recover that generative
-model automatically.
+count distribution. We generate the next dataset from a latent correlated
+process, then use BAM's working correction when fitting its mean.
 
 ```{r count-series}
 set.seed(310)
@@ -360,11 +358,12 @@ whitened working residuals at different lags is an approximate serial check.
 `type = "standardized"` instead uses mgcv's stored `std.rsd`, which is not
 necessarily the weighted working residual used during non-Gaussian fitting.
 Here the large negative lag-one correlation after whitening suggests that
-the supplied working correction may be too strong. The simulation's latent
-Gaussian correlation is not automatically the appropriate working-residual
-correlation. Both checks can reveal patterns; neither supplies a joint count
-simulator or calibrated p-values. This simulation has latent heterogeneity as well as correlation, so
-marginal Poisson adequacy can also fail.
+the supplied working correction is too strong. We supplied the latent
+Gaussian correlation, whereas the correction acts on working residuals from
+the count model. These correlations can differ. The upper-tail departure in
+the QQ plot also reflects variation from the latent process that the Poisson
+distribution omits. Use these two checks to examine the working correction
+and the response distribution separately.
 
 `qq_plot(working_fit, method = "simulate")`, joint `simulate()` and
 `posterior_predictive_plot()` are explicitly unsupported. The same restriction
@@ -373,9 +372,9 @@ and to correlated non-Gaussian PQL `gamm()` fits. Approximate PQL checks without
 residual working correlation remain available. A generative non-Gaussian
 mixed model with a justified temporal covariance, for example in glmmTMB, is
 an alternative when joint predictive simulation is the scientific aim. It
-introduces a model for dependence and must be chosen and checked explicitly.
+requires a choice of temporal covariance, such as AR1 effects on the log mean.
 
-## Reading evidence without overstating it
+## Choose checks for the part of the model you want to examine
 
 Use PIT or quantile checks for response distributions, predictor plots for
 mean and variance structure, and ordered or spatial displays for dependence.
@@ -391,6 +390,3 @@ need an observation mechanism, and a working correlation alone is insufficient
 for a joint simulator. Models with independent responses use analytic
 uniform/normal score references where available. Dependent responses use joint
 simulation for bands where possible; otherwise the plot explains their omission.
-These are diagnostic descriptions conditional on a fitted model. The fit,
-approximations and finite simulations all affect how closely its reference
-matches observations.

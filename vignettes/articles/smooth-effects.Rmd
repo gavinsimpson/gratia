@@ -53,9 +53,10 @@ The tensor product combines a cubic regression spline over concentration with
 a random-effect basis over plants. It penalises plant-specific departures and
 shares information across plants. `full = TRUE` keeps separate penalties for
 the parts of this tensor construction. With only seven observations per plant,
-the small concentration basis is deliberate. The common curve and deviations
-must be interpreted together: large positive plant deviations compensate for
-the shared curve rather than representing another response variable.
+the small concentration basis is deliberate. Each plant's concentration
+contribution is the sum of the common curve and its smooth deviation. The
+intercept, origin and treatment terms supply the remaining contributions
+to its fitted log uptake.
 
 ```{r plant-tensor-curves}
 smooths(plant_gam)
@@ -69,8 +70,8 @@ The numeric covariate is always the horizontal axis even if the factor was
 specified first in the tensor formula. `re_levels` chooses plants by name;
 it does not refit the model or remove their contributions from predictions.
 The fitted factor ordering is retained. Selecting plants of one treatment
-makes the variation among biological replicates visible, without implying
-that these three curves measure the treatment effect itself.
+makes the variation among biological replicates visible. Treatment comparisons
+require the origin and treatment terms as well as these plant deviations.
 
 ```{r plant-full-curves}
 plant$mean_uptake <- fitted(plant_gam)
@@ -84,10 +85,10 @@ ggplot(plant, aes(conc, uptake, group = Plant, colour = Treatment)) +
 
 The model explains rapid increases and subsequent flattening in these observed
 plants. This is conditional on their fitted deviations, rather than a forecast
-for a new plant. It also fits much more flexibility than straight random
-slopes. Whether that flexibility is useful depends on the question, residual
-checks, and how well the model predicts data not used to estimate a curve.
-Three replicate plants per combination limit generalisation.
+for a new plant. The smooth deviations allow each plant's curve to bend,
+whereas straight random slopes only change its tilt. For treatment comparisons,
+each plant supplies one independent curve: three replicates per origin and
+treatment combination.
 
 ```{r plant-variance-components}
 variance_comp(plant_gam)
@@ -118,15 +119,12 @@ The `airquality` data contain daily New York measurements from May to September
 1973. Ozone is in parts per billion, temperature in degrees Fahrenheit, wind
 speed in miles per hour, and solar radiation in Langleys; see
 `?datasets::airquality` for the sources. We retain complete cases, so our
-analysis concerns the days with all needed measurements. Missingness may make
-them unrepresentative of the full summer.
+analysis uses the days with all needed measurements.
 
 The question is whether ozone's association with temperature depends on wind,
 and whether that relationship is stable across summer months. We model log
 ozone with a Gaussian distribution, allow a smooth association with solar
-radiation, and use a temperature-by-wind-by-month interaction. This is an
-exploratory association model: it does not establish that changing temperature
-or wind would cause the fitted ozone changes.
+radiation, and use a temperature-by-wind-by-month interaction.
 
 ```{r ozone-fit}
 ozone <- na.omit(airquality[c("Ozone", "Solar.R", "Wind", "Temp", "Month")])
@@ -163,15 +161,15 @@ This surface shows the coefficient-weighted temperature-by-wind contribution
 for the reference month, May. Its colours are partial contributions to **log**
 ozone. They exclude the intercept, the temperature and wind main effects, the
 solar smooth, and other interaction terms. The diverging palette centres at
-zero, making the contribution's sign visible. A large positive value is not
-a claim that expected ozone is that value, nor that the overall temperature
-association is positive everywhere.
+zero, making the contribution's sign visible. To interpret the complete
+temperature association, combine this interaction with the main temperature
+effect and the monthly adjustments below.
 
 `surface = "tile"` uses vector rectangles, which can be useful in a vector
 figure. The default `"raster"` keeps large plots compact. `n_2d = 30` evaluates
 30 points along each surface axis, rather than borrowing the 100-point curve
-resolution. Higher resolution makes a smoother-looking display but does not
-increase the information in the data.
+resolution. Increase `n_2d` when you need a finer display of the same fitted
+surface.
 
 ```{r ozone-month-interactions, fig.height = 7}
 draw(parametric_effects(ozone_gam, terms = "Temp:Wind:month", n_2d = 25),
@@ -185,10 +183,10 @@ other panels are adjustments to the May interaction, not complete monthly
 surfaces. Fill limits are shared across facets and centred at zero. If a
 surface varies mainly because of poor covariate support, masking helps avoid
 giving extrapolation the same visual prominence as interpolation: `dist`
-uses distance after scaling the displayed axes into the unit square. It is
-a plotting aid, not a remedy for extrapolation or a statistical confidence
-region. Support is pooled across months, so a location left visible may still
-lie outside an individual month's observed weather conditions.
+uses distance after scaling the displayed axes into the unit square. Support
+is pooled across months, so a location left visible may still lie outside an
+individual month's observed weather conditions. Use the monthly observation
+plot above to decide which parts of each surface have local data support.
 
 Numeric-by-factor interactions are grouped curves rather than surfaces:
 
@@ -214,10 +212,10 @@ ggplot(ozone, aes(log(Ozone), fitted_log, colour = month)) +
 
 The fitted values concern mean **log** ozone. Exponentiating them gives the
 conditional median under the lognormal assumption, not the arithmetic mean
-ozone concentration. The model supports a description of weather-associated
-variation, but its monthly flexibility and daily time order require care.
-Inspect residual distribution, spread and serial dependence before making
-uncertainty statements about complete curves.
+ozone concentration. The observed-versus-fitted plot shows how the combined
+terms reproduce log ozone on the sampled days. Because these are daily
+measurements, also check residuals in time order: remaining serial dependence
+would affect uncertainty in the monthly comparisons.
 
 ## Choose a display without changing its statistical meaning
 
