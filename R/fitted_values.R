@@ -219,8 +219,9 @@
 
 #' @export
 #' @rdname fitted_values
-`fitted_values.scam` <- function(object, ...) {
-  fitted_values.gam(object, ...)
+`fitted_values.scam` <- function(object, ..., unconditional = FALSE) {
+  check_scam_unconditional(object, unconditional)
+  fitted_values.gam(object, ..., unconditional = unconditional)
 }
 
 # Single-predictor adapter: the centre includes offsets, but coefficient

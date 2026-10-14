@@ -161,6 +161,7 @@
   freq = FALSE, unconditional = FALSE,
   weights = NULL, draws = NULL, mvn_method = c("mvnfast", "mgcv"), ...
 ) {
+  check_scam_unconditional(model, unconditional)
   do_posterior_samples(
     model = model, n = n, data = data, seed = seed, method = method,
     n_cores = n_cores, burnin = burnin, thin = thin, t_df = t_df,
@@ -522,6 +523,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   freq = FALSE, unconditional = FALSE, draws = NULL,
   mvn_method = c("mvnfast", "mgcv"), ...
 ) {
+  check_scam_unconditional(model, unconditional)
   do_fitted_samples(
     model = model, n = n, data = data, seed = seed, scale = scale,
     method = method, n_cores = n_cores, burnin = burnin, thin = thin,
@@ -844,6 +846,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   weights = NULL,
   ...
 ) {
+  check_scam_unconditional(model, list(...)$unconditional %||% FALSE)
   do_predicted_samples(
     model = model, n = n, data = data, seed = seed, weights = weights, ...
   )
@@ -1193,6 +1196,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     draws = NULL, mvn_method = c("mvnfast", "mgcv"),
     partial_match = NULL, envir = NULL, ...,
     newdata = NULL, ncores = NULL) {
+  check_scam_unconditional(model, unconditional)
   model_name <- deparse(substitute(model))
   model <- with_model_envir(model, envir)
   if (lifecycle::is_present(term)) {

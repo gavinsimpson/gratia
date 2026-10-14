@@ -44,6 +44,10 @@ weighted Gamma, inverse Gaussian, \code{twlss}, ordinal and \code{ziP} distribut
 Multivariate-normal PITs check each response separately; simulations retain
 covariance between responses. Nominal multinomial models retain traditional
 residual checks and PPCs. PITs would require an ordering of their categories.
+\item SCAM models support ordinary posterior predictive plots. Scalable posterior
+predictive plots are not currently available; use \code{scalable = FALSE}.
+Smoothing-parameter uncertainty is not currently supported for SCAM models;
+use \code{unconditional = FALSE}.
 \item \code{gamm}/\code{gamm4} and direct \code{lme}/\code{merMod} fits use their full predictors.
 Gaussian nlme variance weights and residual covariance are retained.
 Non-Gaussian \code{gamm} fits use penalized quasi-likelihood (PQL). Without residual
@@ -66,6 +70,11 @@ spatiotemporal, grouping, time-varying and smooth effects. Standard deltas
 and deltas with the coupled Poisson link support checks of the complete
 response, occurrence and positive component. sdmTMB's transformations from
 internal parameters to response parameters must be available.
+Student-t checks use the fitted location, scale and fixed or estimated
+degrees of freedom. Pearson residuals require degrees of freedom above two;
+PIT/quantile residuals and predictive checks remain available with infinite
+variance. Predictive plots also support native response families whose
+analytic residual distributions are unavailable.
 }
 }
 

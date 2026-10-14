@@ -14,7 +14,12 @@
   heights = NULL,
   ...,
   n = 100,
-  envir = NULL
+  envir = NULL,
+  select = NULL,
+  parametric = NULL,
+  terms = NULL,
+  partial_match = FALSE,
+  wrap = TRUE
 )
 }
 \arguments{
@@ -48,6 +53,32 @@ which to evaluate a univariate smooth.}
 \item{envir}{an optional environment supplying functions and constants used
 in model expressions. The available model formula environment is used when
 \code{NULL}. Covariate observations should be supplied in \code{data}.}
+
+\item{select}{Smooth selection across all equations, using the labels from
+\code{\link[=smooths]{smooths()}}, or numeric or logical indices in equation and smooth order.
+Repeated labels receive suffixes such as \code{s.1(x)}; existing distinct labels
+are retained. \code{partial_match} uses these model-wide labels.}
+
+\item{parametric}{logical or \code{NULL}; plot parametric terms also? The default,
+\code{NULL}, includes parametric terms when \code{select = NULL}, but excludes them
+when smooths are selected explicitly. Use \code{TRUE} to include parametric terms
+regardless of \code{select}, or \code{FALSE} to draw only smooths (the previous
+default). The \code{terms} argument selects which parametric effects are plotted;
+\code{select} selects only smooths.}
+
+\item{terms}{character; which model parametric terms should be drawn? The
+Default of \code{NULL} will plot all parametric terms that can be drawn.
+Interactions show their individual contributions to the linear predictor;
+main effects and intercepts are not added. Multivariate parametric terms
+use the grid and surface controls below, as described in
+\code{\link[=parametric_effects]{parametric_effects()}}.}
+
+\item{partial_match}{logical; in the case of character \code{select}, should
+\code{select} match partially against \code{smooths}? If \code{partial_match = TRUE},
+\code{select} must only be a single string, a character vector of length 1.}
+
+\item{wrap}{Logical; return an assembled patchwork when \code{TRUE} (the default),
+or a flat named list of plots when \code{FALSE}.}
 }
 \description{
 Provides a \code{\link[=draw]{draw()}} method for GAMLSS (distributional GAMs) fitted

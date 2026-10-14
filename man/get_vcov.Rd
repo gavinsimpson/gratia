@@ -2,10 +2,19 @@
 % Please edit documentation in R/utililties.R
 \name{get_vcov}
 \alias{get_vcov}
+\alias{get_vcov.scam}
 \title{Extract the covariance matrix of the model parameters or a subset of these for
 a particular model term}
 \usage{
 get_vcov(
+  object,
+  unconditional = FALSE,
+  frequentist = FALSE,
+  term = NULL,
+  by_level = NULL
+)
+
+\method{get_vcov}{scam}(
   object,
   unconditional = FALSE,
   frequentist = FALSE,

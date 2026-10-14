@@ -12,7 +12,7 @@ jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
 
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }}, ${{ matrix.config.tests }})
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }}, ${{ matrix.config.tests }}, glmmTMB ${{ matrix.config.glmmtmb || 'release' }})
 
     strategy:
       fail-fast: false
@@ -23,6 +23,7 @@ jobs:
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release', tests: 'full', not_cran: 'true'}
           - {os: ubuntu-latest,   r: 'release', tests: 'full', not_cran: 'true'}
           - {os: ubuntu-latest,   r: 'release', tests: 'CRAN core', not_cran: 'false'}
+          - {os: ubuntu-latest,   r: 'release', tests: 'full', not_cran: 'true', glmmtmb: 'development'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -55,7 +56,7 @@ jobs:
             any::rcmdcheck
             lme4=?source
             mvnfast=?source
-            glmmTMB=github::glmmTMB/glmmTMB/glmmTMB@master
+            ${{ matrix.config.glmmtmb == 'development' && 'glmmTMB=github::glmmTMB/glmmTMB/glmmTMB@master' || 'any::glmmTMB' }}
             ${{ runner.os == 'macOS' && 'TMB=?source&reinstall' || '' }}
           pak-version: stable
           needs: check

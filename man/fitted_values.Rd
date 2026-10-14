@@ -26,7 +26,7 @@ fitted_values(object, ...)
 
 \method{fitted_values}{gamm}(object, ...)
 
-\method{fitted_values}{scam}(object, ...)
+\method{fitted_values}{scam}(object, ..., unconditional = FALSE)
 
 \method{fitted_values}{gamm4}(object, ...)
 }

@@ -229,27 +229,51 @@ test_that("scalable plot objects contain bounded data and build without original
   )
 })
 
-test_that("gamm4 scalable diagnostics retain conditional working residual semantics", {
+test_that("gamm4 scalable diagnostics default to full conditional quantile residuals", {
   for (m in list(
     gamm4_gaussian,
     gamm4_binomial,
     gamm4_poisson,
     gamm4_missing
   )) {
-    g <- gamm4_gam(m)
-    d <- diagnostic_data(m)
-    expect_equal(
-      d$data$residuals,
-      as.vector(residuals(model_used_rows(g), type = "deviance"))
-    )
+    native <- m$mer
+    y <- as.numeric(model.response(model.frame(native)))
+    mu <- as.numeric(na.omit(predict(native, type = "response")))
+    fam <- family(native)$family
+    reference <- if (fam == "gaussian") {
+      w <- weights(native, type = "prior")
+      (y - mu) * sqrt(w) / sigma(native)
+    } else {
+      lower <- if (fam == "binomial") pbinom(y - 1, 1, mu) else ppois(y - 1, mu)
+      upper <- if (fam == "binomial") pbinom(y, 1, mu) else ppois(y, mu)
+      qnorm(withr::with_seed(5, runif(length(y), lower, upper)))
+    }
+    d <- diagnostic_data(m, seed = 5)
+    expect_equal(d$data$residuals, reference, tolerance = 1e-8)
+    expect_identical(d$type, "quantile")
+    g <- model_used_rows(gamm4_gam(m))
     expect_equal(
       sum(scalable_observed_fitted_plot(m)$data$count),
       nrow(model.frame(g))
     )
     expect_equal(d$n_obs, nrow(model.frame(g)))
+    expect_s3_class(appraise(m, scalable = TRUE, seed = 5), "patchwork")
+  }
+})
+
+test_that("gamm4 traditional diagnostics use explicitly selected deviance residuals", {
+  for (m in list(gamm4_gaussian, gamm4_binomial, gamm4_poisson, gamm4_missing)) {
+    d <- diagnostic_data(m, type = "deviance")
+    native <- m$mer
+    y <- as.numeric(model.response(model.frame(native)))
+    mu <- as.numeric(na.omit(predict(native, type = "response")))
+    reference <- sign(y - mu) * sqrt(family(native)$dev.resids(y, mu,
+      weights(native, type = "prior")))
+    expect_equal(d$data$residuals, reference)
     expect_s3_class(
       appraise(
         m,
+        type = "deviance",
         scalable = TRUE,
         n_simulate = 3,
         method = "simulate",
@@ -260,8 +284,18 @@ test_that("gamm4 scalable diagnostics retain conditional working residual semant
   }
 })
 
+test_that("gamm4 GAM-component diagnostics retain the extracted-GAM residuals", {
+  for (m in list(gamm4_gaussian, gamm4_binomial, gamm4_poisson, gamm4_missing)) {
+    g <- model_used_rows(gamm4_gam(m))
+    d <- diagnostic_data(m, conditioning = "gam_component")
+    expect_equal(d$data$residuals, as.vector(residuals(g, type = "deviance")))
+    expect_s3_class(appraise(m, conditioning = "gam_component", scalable = TRUE,
+      method = "simulate", n_simulate = 3, seed = 5), "patchwork")
+  }
+})
+
 test_that("glmmTMB scalable diagnostics use native residuals and conditional references", {
-  skip_if_not_installed("glmmTMB", minimum_version = "1.1.15.9000")
+  skip_if_not_installed("glmmTMB", minimum_version = "1.1.15.2")
   dat <- withr::with_seed(
     3,
     data.frame(y = rnorm(60), x = runif(60), g = factor(rep(1:6, each = 10)))

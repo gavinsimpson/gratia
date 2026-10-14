@@ -70,10 +70,12 @@ test_that("Gaussian gamm posterior effects retain native joint uncertainty", {
 test_that("gamm PQL conditional calibration uses full effects and offsets", {
   skip_if_not_installed("nlme")
   set.seed(111)
-  d <- data.frame(x = runif(100), g = factor(rep(1:10, each = 10)), off = 0.2)
-  d$y <- rpois(100, exp(d$x + rep(rnorm(10, sd = 0.4), each = 10) + d$off))
-  m <- suppressMessages(mgcv::gamm(y ~ s(x, k = 5) + offset(off),
-    random = list(g = ~1), data = d, family = poisson()))
+  # Curvature and larger groups keep both variance estimates away from zero.
+  d <- data.frame(x = runif(200), g = factor(rep(1:10, each = 20)), off = 0.2)
+  d$y <- rpois(200, exp(1 + 1.2 * sin(2 * pi * d$x) +
+    rep(rnorm(10, sd = 0.6), each = 20) + d$off))
+  expect_no_warning(m <- mgcv::gamm(y ~ s(x, k = 5) + offset(off),
+    random = list(g = ~1), data = d, family = poisson(), verbosePQL = FALSE))
   p <- mixed_diagnostic_model(m)
   expected <- exp(as.vector(fitted(m$lme)) + d$off)
   expect_equal(p$fitted.values, expected)

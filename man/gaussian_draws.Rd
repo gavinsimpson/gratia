@@ -30,7 +30,8 @@ gaussian_draws(model, ...)
   frequentist = FALSE,
   parametrized = TRUE,
   mvn_method = "mvnfast",
-  ...
+  ...,
+  unconditional = FALSE
 )
 }
 \arguments{
@@ -55,7 +56,8 @@ covariance matrix of the parameters is used. See \code{mgcv::vcov.gam()}.}
 
 \item{unconditional}{logical; if \code{TRUE}  the Bayesian smoothing parameter
 uncertainty corrected covariance matrix is used, \emph{if available} for
-\code{model}. See \code{mgcv::vcov.gam()}.}
+\code{model}. See \code{mgcv::vcov.gam()}.
+SCAM models do not support this correction; use \code{unconditional = FALSE}.}
 
 \item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
 uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large

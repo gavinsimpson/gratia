@@ -155,6 +155,14 @@ not claim joint coverage across selected smooths or the full fitted model.
 Increasing grid resolution improves the approximation to whole-curve coverage.
 \code{overall_uncertainty} and covariance options apply to both interval types.
 Simultaneous intervals for SCAM models are unsupported.
+SCAM smooth estimates retain the fitted centring and coefficient
+transformation when evaluation points are changed. Pointwise intervals use
+the covariance of the constrained coefficients. With
+\code{overall_uncertainty = TRUE}, their standard errors also include intercept
+uncertainty and its covariance with the smooth; estimates remain centred.
+Models without an intercept use smooth-only uncertainty for either setting.
+Smoothing-parameter uncertainty is not currently supported for SCAM models;
+use \code{unconditional = FALSE}.
 
 For explicit \code{data}, missing covariates needed by a smooth produce \code{NA}
 estimates and standard errors at those positions. Missing values in variables

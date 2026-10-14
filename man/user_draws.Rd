@@ -4,6 +4,7 @@
 \alias{user_draws}
 \alias{user_draws.gamm4}
 \alias{user_draws.gam}
+\alias{user_draws.scam}
 \title{Handle user-supplied posterior draws}
 \usage{
 \method{user_draws}{gamm4}(model, draws, ...)
@@ -11,6 +12,8 @@
 user_draws(model, draws, ...)
 
 \method{user_draws}{gam}(model, draws, index = NULL, ...)
+
+\method{user_draws}{scam}(model, draws, ...)
 }
 \arguments{
 \item{model}{a fitted model from \code{\link[mgcv:gam]{mgcv::gam()}}, \code{\link[mgcv:bam]{mgcv::bam()}},
@@ -35,6 +38,10 @@ argument \code{index}, which can be used to subset (select) coefficients
 columns of a matrix. \code{index} is useful if you have a set of posterior draws
 for the entire model (say from \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}) and you wish to use those
 draws for an individual smooth, via \code{\link[=smooth_samples]{smooth_samples()}}.
+
+User-supplied coefficient draws are not currently supported for
+SCAM models. Scalable posterior predictive plots need this sampling path;
+use \code{scalable = FALSE} for an ordinary SCAM posterior predictive plot.
 }
 \seealso{
 \link{gamm4_support}

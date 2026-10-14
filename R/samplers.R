@@ -35,6 +35,7 @@
 #' @param unconditional logical; if `TRUE`  the Bayesian smoothing parameter
 #'   uncertainty corrected covariance matrix is used, *if available* for
 #'   `model`. See `mgcv::vcov.gam()`.
+#'   SCAM models do not support this correction; use `unconditional = FALSE`.
 #' @param parametrized logical; use parametrized coefficients and covariance
 #'   matrix, which respect the linear inequality constraints of the model. Only
 #'   for `scam::scam()` model fits.
@@ -64,6 +65,7 @@
     index = NULL, frequentist = FALSE, unconditional = FALSE,
     parametrized = TRUE, mvn_method = c("mvnfast", "mgcv"), draws = NULL,
     seed = NULL, ...) {
+  check_scam_unconditional(model, unconditional)
   if (is.null(seed)) {
     seed <- with_preserve_seed(sample.int(.Machine$integer.max, 1L))
   }
@@ -178,7 +180,9 @@
 #' @rdname gaussian_draws
 `gaussian_draws.scam` <- function(
     model, n, n_cores = 1L, index = NULL,
-    frequentist = FALSE, parametrized = TRUE, mvn_method = "mvnfast", ...) {
+    frequentist = FALSE, parametrized = TRUE, mvn_method = "mvnfast", ...,
+    unconditional = FALSE) {
+  check_scam_unconditional(model, unconditional)
   mu <- coef(model, parametrized = parametrized)
   sigma <- vcov(model, freq = frequentist, parametrized = parametrized)
   if (!is.null(index)) {
@@ -289,4 +293,15 @@
 
   # return the user-supplied draws
   draws
+}
+
+#' @details User-supplied coefficient draws are not currently supported for
+#'   SCAM models. Scalable posterior predictive plots need this sampling path;
+#'   use `scalable = FALSE` for an ordinary SCAM posterior predictive plot.
+#' @export
+#' @rdname user_draws
+user_draws.scam <- function(model, draws, ...) {
+  check_scam_unconditional(model, list(...)$unconditional %||% FALSE)
+  stop("Scalable posterior predictive plots are not currently available for SCAM models. Use scalable = FALSE.",
+    call. = FALSE)
 }

@@ -7,11 +7,16 @@
 #'
 #' @param object a model, fitted by [GJRM::gamlss()]
 #' @param ... arguments passed to [gratia::draw.gam()]
+#' @param select Smooth selection across all equations, using the labels from
+#'   [smooths()], or numeric or logical indices in equation and smooth order.
+#'   Repeated labels receive suffixes such as `s.1(x)`; existing distinct labels
+#'   are retained. `partial_match` uses these model-wide labels.
+#' @param wrap Logical; return an assembled patchwork when `TRUE` (the default),
+#'   or a flat named list of plots when `FALSE`.
 #'
 #' @inheritParams draw.gam
 #'
-#' @importFrom purrr map_dbl map
-#' @importFrom patchwork plot_layout
+#' @importFrom patchwork wrap_plots
 #' @export
 #'
 #' @note For models with multiple linear predictors, smooth plot subtitles
@@ -45,70 +50,100 @@
                           scales = c("free", "fixed"),
                           ncol = NULL, nrow = NULL, guides = "keep",
                           widths = NULL, heights = NULL, ...,
-                          n = 100, envir = NULL) {
-  # these models have up to 9 GAMs, one per potential parameter
-  # actually I don't think gamlss models can but in general models from GJRM
-  # can have this many etas
-  # these objects are standard mgcv GAMs
-  # find which gams models aren't mgcv gams
-  models <- paste0("gam", 1:9)
+                          n = 100, envir = NULL, select = NULL,
+                          parametric = NULL, terms = NULL,
+                          partial_match = FALSE, wrap = TRUE) {
+  scales <- match.arg(scales)
+  components <- gjrm_gamlss_components(object)
+  labels <- gjrm_gamlss_smooth_labels(components)
+  if (anyNA(select) || (is.numeric(select) &&
+      any(!is.finite(select) | select < 1 | select != floor(select)))) {
+    stop("Smooth indices in 'select' must be positive integers without missing values.")
+  }
+  selected <- check_user_select_smooths(labels, select,
+    partial_match = partial_match)
+  if (is.null(parametric)) parametric <- is.null(select)
+  if (isTRUE(parametric) && !is.null(terms) && !any(terms %in% unlist(lapply(components,
+      parametric_terms), use.names = FALSE))) {
+    stop("No parametric terms in 'terms' were found in the model.")
+  }
 
-  # which models are gams, so we can ignore them
-  take <- vapply(object[models],
-    FUN = inherits, FUN.VALUE = logical(1),
-    "gam"
-  )
-  eta <- which(take)
-
-  # iterate over the models as use draw.gam but we need to copy coefs and
-  # the VCOV over from object to the GAM model object first
-  # note this doesn't wrap the plots
-  plts <- map(seq_along(models[take]),
-    .f = draw_gamlss_eta,
-    model_names = models[take], eta, object, n = n, envir = envir, ...
-  )
-
-  # need to append the elements of plts to get a single list where each
-  # element is a ggplot object
-  ## plts <- do.call("append", plts) # this doesn't work with more than 1 smooth
-  # We need to unlist only until we hit a ggplot object
-  # From https://stackoverflow.com/a/19737149/429846
-  renquote <- function(l) {
-    if (!inherits(l, "ggplot")) {
-      lapply(l, renquote)
-    } else {
-      enquote(l)
+  # Resolve selection once across the model, then use local positions in each
+  # equation. An unselected equation can still supply requested parametric terms.
+  plts <- list()
+  start <- 0L
+  for (m in components) {
+    count <- length(m$smooth)
+    index <- start + seq_len(count)
+    local_select <- selected[index]
+    local_terms <- if (is.null(terms)) NULL else intersect(terms, parametric_terms(m))
+    local_parametric <- isTRUE(parametric) &&
+      (is.null(terms) || length(local_terms) > 0L)
+    if (any(local_select) || local_parametric) {
+      panels <- draw(m, select = local_select, parametric = local_parametric,
+        terms = local_terms, partial_match = FALSE, n = n, envir = envir,
+        wrap = FALSE, ...)
+      # Preserve familiar titles; names expose the unambiguous selection keys.
+      panel_names <- names(panels)
+      for (i in which(local_select)) {
+        panel_names[panel_names == m$smooth[[i]]$label] <- labels[index[i]]
+      }
+      names(panels) <- panel_names
+      plts <- c(plts, panels)
     }
+    start <- start + count
   }
-  plts <- lapply(unlist(renquote(plts)), eval)
-
-  # Count the panels actually drawn, including any parametric effects.
-  n_plots <- length(plts)
-  layout <- prepare_plot_layout(n_plots, ncol = ncol, nrow = nrow)
-  ncol <- layout$ncol
-  nrow <- layout$nrow
-  if (n_plots > 1L && is.null(widths)) {
-    # it doesn't matter about the widths if only one plot, but if we have
-    # more than one plot and the user didn't change `widths`, then we will
-    # force a value of 1 to give all plots the same relative width
-    widths <- 1
-  }
+  if (!length(plts)) return(invisible(NULL))
 
   if (identical(scales, "fixed")) {
     y_lim <- get_ylim_from_plots(plts)
     y_lim <- exec("range", !!!y_lim)
     plts <- lapply(plts, \(p) p + lims(y = y_lim))
   }
-  wrap_plots(plts,
-    byrow = TRUE, nrow = nrow, ncol = ncol, heights = heights,
-    widths = widths
-  )
+  if (!wrap) return(plts)
+
+  # Count all panels, including parametric effects, before choosing the layout.
+  layout <- prepare_plot_layout(length(plts), ncol = ncol, nrow = nrow)
+  if (length(plts) > 1L && is.null(widths)) widths <- 1
+  wrap_plots(plts, byrow = TRUE, nrow = layout$nrow, ncol = layout$ncol,
+    guides = guides, heights = heights, widths = widths)
 }
 
-`draw_gamlss_eta` <- function(j, model_names, eta, object, ...) {
-  ind <- gjrm_gamlss_ind(object, eta[j])
-  m <- modify_gamlss_gam(object, model_names[j], ind)
-  draw(m, ..., wrap = FALSE)
+# Prepare embedded GAMs with the final coefficients and covariance, in equation
+# order. Their working families are retained; parent labels identify parameters.
+gjrm_gamlss_components <- function(object) {
+  model_names <- paste0("gam", 1:9)
+  eta <- which(vapply(object[model_names], inherits, logical(1), "gam"))
+  lapply(eta, function(i) modify_gamlss_gam(object, model_names[i],
+    gjrm_gamlss_ind(object, i)))
+}
+
+gjrm_gamlss_smooth_labels <- function(components) {
+  original <- as.character(unlist(lapply(components, smooths), use.names = FALSE))
+  labels <- original
+  equations <- rep(seq_along(components), lengths(lapply(components, smooths)))
+  for (i in which(duplicated(original))) {
+    suffix <- max(1L, equations[i] - 1L)
+    repeat {
+      candidate <- if (grepl("(", original[i], fixed = TRUE)) {
+        sub("(", paste0(".", suffix, "("), original[i], fixed = TRUE)
+      } else paste0(original[i], ".", suffix)
+      if (!candidate %in% c(original, labels[seq_len(i - 1L)])) break
+      suffix <- suffix + 1L
+    }
+    labels[i] <- candidate
+  }
+  labels
+}
+
+#' @export
+#' @name smooths
+#' @rdname smooths
+#' @details For GJRM GAMLSS models, labels follow equation and smooth order.
+#'   Labels repeated in later equations receive suffixes such as `s.1(x)`.
+#'   These labels can be supplied to [draw()] to select smooths across equations.
+smooths.gamlss <- function(object, ...) {
+  gjrm_gamlss_smooth_labels(gjrm_gamlss_components(object))
 }
 
 `gjrm_gamlss_ind` <- function(object, eta) {

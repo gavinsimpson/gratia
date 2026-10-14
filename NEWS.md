@@ -61,6 +61,9 @@
 
 * gratia now requires mgcv >= 1.9-4 and R >= 4.4.0.
 
+* glmmTMB support now requires the released version 1.1.15.2 or later, so
+  the development version of glmmTMB is no longer needed.
+
 ## New features
 
 * New site articles explain model diagnostics, grouped surveys, glmmTMB and
@@ -351,6 +354,33 @@
   recognised family name.
 
 ## Bug fixes
+
+* SCAM smooth estimates and standard errors no longer depend on the other
+  rows in the evaluation grid. Single-row and short-grid evaluations are
+  supported. `overall_uncertainty = TRUE` includes intercept variance and its
+  covariance with the smooth; `FALSE` includes smooth uncertainty alone.
+  `unconditional = TRUE` now gives an explicit error because SCAM calculations
+  do not support smoothing-parameter uncertainty.
+
+* Scalable posterior predictive plots for SCAM models now give an explicit
+  error explaining that `scalable = FALSE` is required. Ordinary posterior
+  predictive plots remain available.
+
+* Partial derivatives of soap-film smooths include the contribution from known
+  boundary values. Those fixed values affect derivative estimates without
+  adding coefficient uncertainty.
+
+* GJRM smooth selection now uses one order across all model equations.
+  Character selections draw only the equations containing the selected smooths;
+  repeated labels have distinct keys returned by `smooths()`. `wrap = FALSE`
+  returns a flat list of plots.
+
+* Student-t sdmTMB models now support residual diagnostics and posterior
+  predictive plots with fixed or estimated degrees of freedom. Pearson
+  residuals require degrees of freedom above two. Quantile residuals and
+  predictive checks remain available with infinite variance. Predictive plots
+  also work for additional native sdmTMB families without requiring an analytic
+  residual distribution.
 
 * Smooth plots drawn with `scales = "fixed"` calculate their shared ranges
   from finite estimates and interval bounds. Missing soap-film boundary rows

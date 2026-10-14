@@ -36,7 +36,7 @@ jobs:
         with:
           extra-packages: |
             any::pkgload
-            glmmTMB=github::glmmTMB/glmmTMB/glmmTMB@master
+            any::glmmTMB
             ${{ matrix.config.package }}
           needs: check
       - name: Check formula effects against native predictions

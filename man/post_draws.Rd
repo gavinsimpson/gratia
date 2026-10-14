@@ -106,7 +106,8 @@ covariance matrix of the parameters is used. See \code{mgcv::vcov.gam()}.}
 
 \item{unconditional}{logical; if \code{TRUE}  the Bayesian smoothing parameter
 uncertainty corrected covariance matrix is used, \emph{if available} for
-\code{model}. See \code{mgcv::vcov.gam()}.}
+\code{model}. See \code{mgcv::vcov.gam()}.
+SCAM models do not support this correction; use \code{unconditional = FALSE}.}
 
 \item{parametrized}{logical; use parametrized coefficients and covariance
 matrix, which respect the linear inequality constraints of the model. Only

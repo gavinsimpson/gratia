@@ -248,6 +248,7 @@ S3method(get_smooths_by_id,gratia_mixed_smooth)
 S3method(get_smooths_by_id,scam)
 S3method(get_smooths_by_id,sdmTMB)
 S3method(get_vcov,default)
+S3method(get_vcov,scam)
 S3method(inv_link,bam)
 S3method(inv_link,family)
 S3method(inv_link,gam)
@@ -482,6 +483,7 @@ S3method(smooth_type,tprs.smooth)
 S3method(smooth_type,ts.smooth)
 S3method(smooth_values,univariate_scam_smooth)
 S3method(smooths,default)
+S3method(smooths,gamlss)
 S3method(smooths,gamm)
 S3method(smooths,gamm4)
 S3method(smooths,glmmTMB)
@@ -520,6 +522,7 @@ S3method(typical_values,gamm4)
 S3method(typical_values,scam)
 S3method(user_draws,gam)
 S3method(user_draws,gamm4)
+S3method(user_draws,scam)
 S3method(variance_comp,gam)
 S3method(variance_comp,gamm4)
 S3method(vcov,scam)
@@ -797,10 +800,7 @@ importFrom(mgcv,
   smoothCon
 )
 importFrom(mvnfast,rmvn)
-importFrom(patchwork,
-  plot_layout,
-  wrap_plots
-)
+importFrom(patchwork,wrap_plots)
 importFrom(pillar,
   style_subtle,
   tbl_format_footer,
@@ -811,7 +811,6 @@ importFrom(purrr,
   in_parallel,
   map,
   map_chr,
-  map_dbl,
   map_df,
   map_dfc,
   map_lgl,
