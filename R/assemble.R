@@ -196,21 +196,10 @@
 
     # Take the range of the smooths & their confidence intervals now
     # before we put rug and residuals on
-    if (utils::packageVersion("dplyr") > "1.0.10") {
-      sm_rng <- sm_eval |>
-        rowwise() |>
-        utils::getFromNamespace("reframe", "dplyr")(rng =
-          range(c(data$.estimate, data$.lower_ci, data$.upper_ci))) |>
-        pluck("rng")
-    } else {
-      sm_rng <- sm_eval |>
-        rowwise() |>
-        summarise(rng = range(c( # FIXME: summarise() -> reframe()
-          data$.estimate, data$.lower_ci,
-          data$.upper_ci
-        ))) |>
-        pluck("rng")
-    }
+    sm_rng <- unlist(lapply(sm_eval$data, function(d) {
+      surface_fill_limits(c(d$.estimate, d$.lower_ci, d$.upper_ci),
+        symmetric = FALSE)
+    }), use.names = FALSE)
 
     if (scales == "fixed" &&
         (surface == "3d" || interval == "simultaneous")) {
@@ -321,7 +310,7 @@
 
     # need to figure out scales if "fixed"
     if (isTRUE(identical(scales, "fixed"))) {
-      ylims <- range(sm_rng, p_resids_rng)
+      ylims <- surface_fill_limits(c(sm_rng, p_resids_rng), symmetric = FALSE)
     }
 
     # draw smooths

@@ -78,5 +78,6 @@ Encoding: UTF-8
 Language: en-GB
 VignetteBuilder: knitr
 Config/testthat/edition: 3
-Config/Needs/website: rmarkdown, ggdist
+Config/Needs/website: rmarkdown, ggdist, MASS, nlme, lme4, gamm4,
+    GJRM, glmmTMB, sdmTMB, sf, ggcube
 Config/roxygen2/version: 8.1.1

@@ -2,6 +2,19 @@
 
 ## User visible changes
 
+* New site articles explain model diagnostics, grouped surveys, glmmTMB and
+  sdmTMB models, prediction comparisons, response distributions, and smooth
+  effects on different spatial domains. They include fitted examples and
+  explain the assumptions behind estimates, intervals and checks.
+
+* Smooth plots drawn with `scales = "fixed"` calculate their shared ranges
+  from finite estimates and interval bounds. Missing soap-film boundary rows
+  no longer cause each component to use a separate colour scale.
+
+* Parametric interaction plots for glmmTMB and sdmTMB retain their term and
+  coordinate information across model components. This prevents factor
+  interactions from being mistaken for numeric effects when drawing rugs.
+
 * gamm4 diagnostics, response simulations and posterior predictive checks now
   default to `conditioning = "conditional"`, using the full fitted mixed model.
   Response references hold fitted smooth and grouping effects fixed; posterior

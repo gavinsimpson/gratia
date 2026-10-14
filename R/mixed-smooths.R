@@ -285,7 +285,8 @@ parametric_effects.gratia_mixed_smooth <- function(object, terms = NULL, ...) {
   results <- Filter(Negate(is.null), results)
   out <- dplyr::bind_rows(results)
   for (attribute in c("factor_levels", "term_info", "axis_info")) {
-    attr(out, attribute) <- do.call(c, lapply(results, attr, attribute))
+    # Predictor names must not prefix the term labels used by the renderer.
+    attr(out, attribute) <- do.call(c, unname(lapply(results, attr, attribute)))
   }
   attr(out, "back_transform") <- attr(results[[1L]], "back_transform")
   class(out) <- unique(c("parametric_effects", class(out)))

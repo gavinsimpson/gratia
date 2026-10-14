@@ -1,0 +1,256 @@
+---
+title: "Read smooth effects, interactions and surfaces"
+output:
+  rmarkdown::html_vignette:
+    fig_width: 8
+    fig_height: 5.3333
+    dev: "png"
+    dpi: 96
+vignette: >
+  %\VignetteIndexEntry{Read smooth effects, interactions and surfaces}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+An effect plot isolates one contribution to a model. It helps explain how the
+model works, but it need not show the expected response. This distinction
+matters especially with interactions, random effects and nonlinear links. We
+use the plant experiment from [Smooth trends and repeated measurements with
+glmmTMB](glmmTMB-support.html) to explore flexible individual curves, then daily
+air quality measurements to read interaction surfaces.
+
+```{r packages, message = FALSE}
+library("mgcv")
+library("gratia")
+library("ggplot2")
+```
+
+## Do plants need different curve shapes?
+
+The carbon dioxide experiment has seven measurements on each of twelve plants,
+with three plants in each origin-treatment combination. Positive uptake and
+increasing residual spread motivate a Gamma model with a log link. A shared
+smooth captures saturation with increasing concentration. We now allow
+plant-specific *smooth* deviations, rather than the straight-line deviations
+used in the glmmTMB article.
+
+```{r plant-flexible-fit}
+plant <- as.data.frame(CO2)
+plant$Plant <- factor(plant$Plant, ordered = FALSE)
+plant$log_conc <- log(plant$conc) - mean(log(plant$conc))
+plant_gam <- gam(
+  uptake ~ Type * Treatment + s(log_conc, k = 5) +
+    t2(log_conc, Plant, bs = c("cr", "re"), k = c(4, 12), full = TRUE),
+  data = plant, family = Gamma(link = "log"), method = "REML")
+overview(plant_gam)
+```
+
+The tensor product combines a cubic regression spline over concentration with
+a random-effect basis over plants. It penalises plant-specific departures and
+shares information across plants. `full = TRUE` keeps separate penalties for
+the parts of this tensor construction. With only seven observations per plant,
+the small concentration basis is deliberate. The common curve and deviations
+must be interpreted together: large positive plant deviations compensate for
+the shared curve rather than representing another response variable.
+
+```{r plant-tensor-curves}
+smooths(plant_gam)
+draw(plant_gam, select = "t2(log_conc,Plant)",
+  re_levels = list(Plant = c("Qn1", "Qn2", "Qn3")),
+  xlab = "Centred log concentration", ylab = "Plant contribution to log uptake") &
+  theme(legend.position = "right") & labs(colour = "Plant")
+```
+
+The numeric covariate is always the horizontal axis even if the factor was
+specified first in the tensor formula. `re_levels` chooses plants by name;
+it does not refit the model or remove their contributions from predictions.
+The fitted factor ordering is retained. Selecting plants of one treatment
+makes the variation among biological replicates visible, without implying
+that these three curves measure the treatment effect itself.
+
+```{r plant-full-curves}
+plant$mean_uptake <- fitted(plant_gam)
+ggplot(plant, aes(conc, uptake, group = Plant, colour = Treatment)) +
+  geom_point() +
+  geom_line(aes(y = mean_uptake)) +
+  facet_wrap(~ Type) +
+  labs(x = "Carbon dioxide concentration (mL/L)",
+    y = expression(CO[2] ~ uptake ~ (mu * mol ~ m^{-2} ~ s^{-1})))
+```
+
+The model explains rapid increases and subsequent flattening in these observed
+plants. This is conditional on their fitted deviations, rather than a forecast
+for a new plant. It also fits much more flexibility than straight random
+slopes. Whether that flexibility is useful depends on the question, residual
+checks, and how well the model predicts data not used to estimate a curve.
+Three replicate plants per combination limit generalisation.
+
+```{r plant-variance-components}
+variance_comp(plant_gam)
+```
+
+These are variance components in the random-effect representation of the
+penalised splines. Different tensor components can have different estimated
+variances, so one variance alone does not describe all plant-curve variation.
+The spline rows are not observation variances; the `scale` row estimates Gamma
+dispersion, which multiplies the squared mean to give response variance.
+Fits selected by GCV may lack
+confidence intervals; the estimates remain available. A model with no
+extractable variance components returns an empty table.
+
+Tensor plots follow the same principle in higher dimensions. Two continuous
+covariates make a surface; additional numerical dimensions become conditioning
+slices and factor dimensions become facets. `n_2d` controls each surface axis,
+while `n_3d` and `n_4d` limit conditioning dimensions. The latter also limit
+factor levels to the first levels in fitted order. Use named `re_levels` or
+explicit evaluation `data` to choose meaningful groups. With two factor
+margins, the display is categorical estimates and intervals, faceted by the
+second factor; there is no numeric axis to interpolate between categories.
+These rules apply to `te()`, `ti()` and `t2()` random-effect tensor terms.
+
+## Is the temperature association different on calm and windy days?
+
+The `airquality` data contain daily New York measurements from May to September
+1973. Ozone is in parts per billion, temperature in degrees Fahrenheit, wind
+speed in miles per hour, and solar radiation in Langleys; see
+`?datasets::airquality` for the sources. We retain complete cases, so our
+analysis concerns the days with all needed measurements. Missingness may make
+them unrepresentative of the full summer.
+
+The question is whether ozone's association with temperature depends on wind,
+and whether that relationship is stable across summer months. We model log
+ozone with a Gaussian distribution, allow a smooth association with solar
+radiation, and use a temperature-by-wind-by-month interaction. This is an
+exploratory association model: it does not establish that changing temperature
+or wind would cause the fitted ozone changes.
+
+```{r ozone-fit}
+ozone <- na.omit(airquality[c("Ozone", "Solar.R", "Wind", "Temp", "Month")])
+ozone$month <- factor(ozone$Month, labels = month.abb[5:9])
+ozone_gam <- gam(log(Ozone) ~ s(Solar.R, k = 6) + Temp * Wind * month,
+  data = ozone, method = "REML")
+table(ozone$month)
+overview(ozone_gam)
+```
+
+A three-way interaction gives each month its own temperature-by-wind surface.
+That flexibility makes the model useful for exploring stability, but estimates
+in sparsely sampled parts of a month's weather range may be imprecise. Inspect
+the distribution of observations before interpreting a surface:
+
+```{r ozone-support}
+ggplot(ozone, aes(Temp, Wind, colour = Ozone)) +
+  geom_point() +
+  facet_wrap(~ month) +
+  labs(x = "Temperature (degrees F)", y = "Wind speed (mph)",
+    colour = "Ozone (ppb)")
+```
+
+## Start with the interaction, then reconstruct the model
+
+```{r ozone-numeric-interaction}
+parametric_terms(ozone_gam)
+weather_effect <- parametric_effects(ozone_gam, terms = "Temp:Wind", n_2d = 30)
+draw(weather_effect, surface = "tile") &
+  labs(x = "Temperature (degrees F)", y = "Wind speed (mph)")
+```
+
+This surface shows the coefficient-weighted temperature-by-wind contribution
+for the reference month, May. Its colours are partial contributions to **log**
+ozone. They exclude the intercept, the temperature and wind main effects, the
+solar smooth, and other interaction terms. The diverging palette centres at
+zero, making the contribution's sign visible. A large positive value is not
+a claim that expected ozone is that value, nor that the overall temperature
+association is positive everywhere.
+
+`surface = "tile"` uses vector rectangles, which can be useful in a vector
+figure. The default `"raster"` keeps large plots compact. `n_2d = 30` evaluates
+30 points along each surface axis, rather than borrowing the 100-point curve
+resolution. Higher resolution makes a smoother-looking display but does not
+increase the information in the data.
+
+```{r ozone-month-interactions, fig.height = 7}
+draw(parametric_effects(ozone_gam, terms = "Temp:Wind:month", n_2d = 25),
+  surface = "tile") &
+  labs(x = "Temperature (degrees F)", y = "Wind speed (mph)")
+```
+
+The additional monthly contributions appear in conditioning facets. Under
+treatment contrast coding the reference month's contribution is zero. The
+other panels are adjustments to the May interaction, not complete monthly
+surfaces. Fill limits are shared across facets and centred at zero. If a
+surface varies mainly because of poor covariate support, masking helps avoid
+giving extrapolation the same visual prominence as interpolation: `dist`
+uses distance after scaling the displayed axes into the unit square. It is
+a plotting aid, not a remedy for extrapolation or a statistical confidence
+region. Support is pooled across months, so a location left visible may still
+lie outside an individual month's observed weather conditions.
+
+Numeric-by-factor interactions are grouped curves rather than surfaces:
+
+```{r ozone-numeric-factor}
+draw(parametric_effects(ozone_gam, terms = "Temp:month")) &
+  labs(x = "Temperature (degrees F)", y = "Additional contribution to log ozone")
+```
+
+These slopes must be combined with the reference temperature slope and the
+wind interactions to describe the model's temperature association. The
+[conditional comparisons article](prediction-comparisons.html) shows how to
+compare complete fitted values without isolating contrast-coded terms.
+
+For a direct view of the complete model, predict at observed weather conditions:
+
+```{r ozone-full-predictions}
+ozone$fitted_log <- fitted(ozone_gam)
+ggplot(ozone, aes(log(Ozone), fitted_log, colour = month)) +
+  geom_abline(slope = 1, intercept = 0, colour = "grey50") +
+  geom_point() +
+  labs(x = "Observed log ozone", y = "Fitted log ozone", colour = "Month")
+```
+
+The fitted values concern mean **log** ozone. Exponentiating them gives the
+conditional median under the lognormal assumption, not the arithmetic mean
+ozone concentration. The model supports a description of weather-associated
+variation, but its monthly flexibility and daily time order require care.
+Inspect residual distribution, spread and serial dependence before making
+uncertainty statements about complete curves.
+
+## Choose a display without changing its statistical meaning
+
+The optional ggcube package can show the same numerical surface in three
+dimensions:
+
+```{r ozone-3d}
+if (requireNamespace("ggcube", quietly = TRUE)) {
+  draw(weather_effect, surface = "3d",
+    surface_3d = list(yaw = 35, persp = FALSE)) &
+    labs(x = "Temperature (degrees F)", y = "Wind speed (mph)")
+}
+```
+
+Height and fill both represent the same partial contribution. A three-dimensional
+view can emphasise its shape, while a flat surface is often easier to compare
+across months. View settings change the rendering, not estimates or uncertainty.
+Curves, factor estimates and spherical maps retain their usual displays. The
+conditional chunk runs only when ggcube is installed; the flat plots contain
+the complete analysis.
+
+Parametric effect coordinates now use the model's covariate scale by default.
+For example, a term involving `log(x)` uses `log(x)` on the horizontal axis.
+`back_transform = TRUE` displays original covariate coordinates without
+changing effect values or intervals. With saved smooth estimates, prepare
+them using `smooth_estimates(model, back_transform = TRUE)` before asking
+`draw()` to use that scale. See [Transformed covariates](transformed-covariates.html)
+for worked examples, including functions without analytic inverses.
+
+Effect intervals include uncertainty in their model intercept by default,
+including its covariance with a parametric term. Setting
+`overall_uncertainty = FALSE` changes that uncertainty calculation without
+adding or subtracting the intercept from the displayed partial contribution.
+For contrasts between complete model predictions, use a method that includes
+all relevant terms and their covariance rather than subtracting interval
+endpoints from these plots.
