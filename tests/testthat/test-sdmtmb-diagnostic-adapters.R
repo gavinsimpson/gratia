@@ -67,6 +67,9 @@ test_that("sdmTMB binomial counts use trial-sized probability bounds", {
 
 test_that("sdmTMB diagnostics retain fitted IID effects", {
   skip_if_not_installed("sdmTMB")
+  if (!full_test_run()) {
+    withr::local_options(gratia.diagnostics.marginal_draws = 29L)
+  }
   set.seed(112)
   d <- data.frame(x = runif(80), g = factor(rep(1:8, each = 10)))
   d$y <- d$x + rep(rnorm(8, sd = 2), each = 10) + rnorm(80, sd = 0.4)

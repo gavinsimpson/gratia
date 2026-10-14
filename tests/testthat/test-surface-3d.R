@@ -34,7 +34,7 @@ test_that("grid meshes preserve holes and reject conflicting vertices", {
   )
   d$effect <- NA_real_
   expect_equal(nrow(surface_mesh(d, "x", "y", "effect")), 0L)
-  expect_silent(ggplot2::ggplotGrob(mesh_plot(d)))
+  expect_plot_render(mesh_plot(d), cran = TRUE)
   expect_error(surface_mesh(
     data.frame(x = 1:4, y = 1:4, effect = 1:4),
     "x", "y", "effect"
@@ -55,6 +55,7 @@ test_that("3D faces retain diverging fills and train the vertex range", {
   expect_equal(scale$get_limits(), c(-1, 1))
   expect_equal(b$plot$scales$get_scales("z")$get_limits(), c(-1, 1))
   expect_equal(scale$map(0), default$palette(0.5))
+  expect_plot_render(p, cran = TRUE)
   p <- mesh_plot(d, continuous_fill = ggplot2::scale_fill_viridis_c())
   expect_equal(
     ggplot2::ggplot_build(p)$plot$scales$get_scales("fill")$palette(0.5),
@@ -75,13 +76,13 @@ test_that("contours follow retained mesh faces at their true heights", {
   d$effect <- 0
   p <- mesh_plot(d)
   expect_false(any(p$layers[[1]]$data$.surface_type == "segment"))
-  expect_silent(ggplot2::ggplotGrob(p))
+  expect_plot_render(p)
   p <- mesh_plot(mesh_data(), n_contour = 4, contour_col = "red")
   scene <- p$layers[[1]]$data
   segments <- scene[scene$.surface_type == "segment", ]
   expect_gt(nrow(segments), 0L)
   expect_equal(unique(segments$.surface_colour), "red")
-  expect_silent(ggplot2::ggplotGrob(p))
+  expect_plot_render(p, cran = TRUE)
 })
 
 test_that("observation floor projections do not train the effect axis", {
@@ -92,7 +93,7 @@ test_that("observation floor projections do not train the effect axis", {
   a <- ggplot2::ggplot_build(p)$plot$scales$get_scales("z")$get_limits()
   b <- ggplot2::ggplot_build(mesh_plot(d, contour = FALSE))$plot$scales$get_scales("z")$get_limits()
   expect_equal(a, b)
-  expect_silent(ggplot2::ggplotGrob(p))
+  expect_plot_render(p)
 })
 
 test_that("facets keep separate topology, a common palette, and empty slices", {
@@ -106,8 +107,11 @@ test_that("facets keep separate topology, a common palette, and empty slices", {
   expect_equal(nrow(b$layout$layout), 3L)
   expect_length(unique(b$data[[1]]$PANEL), 2L)
   expect_equal(b$plot$scales$get_scales("fill")$get_limits(), c(-4, 4))
-  expect_silent(ggplot2::ggplotGrob(p))
-  expect_silent(patchwork::patchworkGrob(patchwork::wrap_plots(p, mesh_plot(mesh_data()))))
+  expect_plot_render(p)
+  if (full_test_run()) {
+    expect_silent(patchwork::patchworkGrob(
+      patchwork::wrap_plots(p, mesh_plot(mesh_data()))))
+  }
 })
 
 test_that("scattered meshes triangulate masked points before discarding faces", {
@@ -120,7 +124,7 @@ test_that("scattered meshes triangulate masked points before discarding faces", 
   expect_gt(nrow(mesh), 0L)
   expect_true(all(is.finite(mesh$.surface_z)))
   expect_false(any(mesh$.surface_x == 0 & mesh$.surface_y == 0))
-  expect_silent(ggplot2::ggplotGrob(mesh_plot(d)))
+  expect_plot_render(mesh_plot(d), cran = TRUE)
 })
 
 test_that("scattered surfaces cannot bridge separated support regions", {
@@ -155,7 +159,7 @@ test_that("soap domains preserve holes and floor boundary loops", {
   edges <- scene[grepl("^boundary:", scene$.surface_face), ]
   expect_gt(nrow(edges), 0L)
   expect_true(all(edges$.surface_floor))
-  expect_silent(ggplot2::ggplotGrob(p))
+  expect_plot_render(p, cran = TRUE)
 })
 
 surface_model <- function() {
@@ -178,7 +182,7 @@ test_that("all model and estimate entry points forward 3D surfaces", {
     expect_s3_class(p[[1]]$coordinates, "Coord3D")
     expect_s3_class(p[[2]]$layers[[1]]$geom, "GeomRibbon")
     expect_s3_class(p[[3]]$coordinates, "Coord3D")
-    expect_silent(ggplot2::ggplotGrob(p[[1]]))
+    expect_plot_render(p[[1]])
   }
   sm <- smooth_estimates(m, n_2d = 5, n = 8, dist = 0.1)
   expect_named(attr(sm, "surface_support"), smooths(m))
@@ -201,7 +205,7 @@ test_that("tensor types and higher dimensional slices render in 3D", {
     m <- mgcv::gam(stats::as.formula(paste("y ~", term)), data = d)
     p <- draw(m, surface = "3d", n_2d = 5, n_3d = 2, n_4d = 2, rug = FALSE)[[1]]
     expect_s3_class(p$coordinates, "Coord3D")
-    expect_silent(ggplot2::ggplotGrob(p))
+    expect_plot_render(p)
     if (grepl("x,z,w", term, fixed = TRUE)) {
       expect_equal(
         nrow(ggplot2::ggplot_build(p)$layout$layout),
@@ -279,7 +283,7 @@ test_that("named view lists are validated without changing themes or other panel
   expect_false(a$coordinates$persp)
   expect_null(a$theme$plot.margin)
   expect_equal(a$theme, mesh_plot(d)$theme)
-  expect_silent(ggplot2::ggplotGrob(a))
+  expect_plot_render(a)
   expect_equal(b$coordinates$yaw, 45)
   expect_null(view$plot_bounds)
   a$coordinates$yaw <- -15
@@ -303,10 +307,10 @@ test_that("soap model drawing and spherical fallback preserve their domains", {
   skip_if_not_installed("geometry")
   p <- draw(m_soap, surface = "3d", n_2d = 12, rug = FALSE)[[1]]
   expect_s3_class(p$coordinates, "Coord3D")
-  expect_silent(ggplot2::ggplotGrob(p))
+  expect_plot_render(p)
   sm <- smooth_estimates(m_soap, n_2d = 12, clip = FALSE)
   p <- draw(sm, surface = "3d")[[1]]
-  expect_silent(ggplot2::ggplotGrob(p))
+  expect_plot_render(p)
   sm <- smooth_estimates(m_sos, n_2d = 5)
   expect_message(
     p <- draw(sm, surface = "3d", contour = FALSE)[[1]],
@@ -326,7 +330,7 @@ test_that("scattered direct estimates and model assembly share support masking",
   expect_equal(a$layers[[1]]$data$.surface_x, b$layers[[1]]$data$.surface_x)
   expect_equal(a$layers[[1]]$data$.surface_y, b$layers[[1]]$data$.surface_y)
   expect_equal(a$layers[[1]]$data$.surface_z, b$layers[[1]]$data$.surface_z)
-  expect_silent(ggplot2::ggplotGrob(a))
+  expect_plot_render(a)
   p <- draw(mgcv::bam(y ~ te(x, z, k = c(3, 3)), data = d), surface = "3d", n_2d = 5)[[1]]
   expect_s3_class(p$coordinates, "Coord3D")
 })
@@ -376,13 +380,13 @@ test_that("default back faces stay lit and explicit lights take precedence", {
   custom <- ggcube::light(backface_scale = -1, contrast = 0.5)
   p <- mesh_plot(d, surface_3d = list(light = custom))
   expect_equal(p$coordinates$light, custom)
-  expect_silent(ggplot2::ggplotGrob(p))
+  expect_plot_render(p, cran = TRUE)
   p <- mesh_plot(d, surface_3d = list(light = ggcube::light(method = "none")))
   expect_equal(p$coordinates$light$shade, "neither")
-  expect_silent(ggplot2::ggplotGrob(p))
+  expect_plot_render(p)
   p <- mesh_plot(d, surface_3d = list(light = NULL))
   expect_null(p$coordinates$light)
-  expect_silent(ggplot2::ggplotGrob(p))
+  expect_plot_render(p)
 })
 
 test_that("coplanar contours are painted with their owning faces", {
@@ -412,7 +416,7 @@ test_that("opaque surfaces hide floor observations in the rendered scene", {
     if ("surface_type" %in% names(projected)) projection$data <- projected
     projected
   }
-  expect_silent(ggplot2::ggplotGrob(p))
+  expect_plot_render(p, cran = TRUE)
   projected <- projection$data
   expect_lt(max(which(projected$.prim == "point")),
     min(which(projected$.prim == "polygon")))
@@ -446,5 +450,5 @@ test_that("original-scale 3D smooths retain support masking and nested metadata"
   p <- draw(nested, surface = "3d", back_transform = TRUE,
     contour = FALSE)[[1]]
   expect_equal(p$layers[[1]]$data$.surface_z, mesh_b$.surface_z)
-  expect_silent(ggplot2::ggplotGrob(b))
+  expect_plot_render(b)
 })

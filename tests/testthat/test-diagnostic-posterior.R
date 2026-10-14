@@ -22,9 +22,14 @@ test_that("ordinary posterior diagnostics respect weights, trials and offsets", 
 })
 
 test_that("streamed PPC summaries equal retained draws for every batch size", {
-  for (model in list(m_lm, m_glm, m_tiny_eg1, b_pois, m_mvn, m_multinom, m_gaulss, m_twlss, gfam_bam)) {
+  models <- list(m_lm, m_glm, m_tiny_eg1, b_pois, m_mvn, m_multinom,
+    m_gaulss, m_twlss, gfam_bam)
+  for (j in seq_along(models)) {
+    model <- models[[j]]
     raw <- posterior_predictive_plot(model, n = 4, seed = 7, scalable = FALSE)
-    for (size in c(1L, 3L, 8L)) {
+    sizes <- test_cases_for_cran(c(1L, 3L, 8L),
+      if (j == 1L) c(1L, 3L, 8L) else 3L)
+    for (size in sizes) {
       streamed <- posterior_predictive_plot(model, n = 4, seed = 7,
         scalable = TRUE, batch_size = size)
       expect_equal(lapply(streamed$layers, `[[`, "data"),

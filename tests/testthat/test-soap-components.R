@@ -111,7 +111,7 @@ test_that("component 3D plots retain soap domain boundaries", {
       edges <- scene[grepl("^boundary:", scene$.surface_face), ]
       expect_gt(nrow(edges), 0L)
       expect_true(all(edges$.surface_floor))
-      expect_silent(ggplot2::ggplotGrob(p))
+      expect_plot_render(p, cran = entry == "model" && i == 1L)
     }
   }
 })

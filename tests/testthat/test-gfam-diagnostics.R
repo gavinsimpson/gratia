@@ -186,6 +186,7 @@ test_that("grouped diagnostics preserve RNG and fitted parameter closures", {
 })
 
 test_that("grouped diagnostics draw representative QQ, worm and appraisal plots", {
+  skip_on_cran()
   vdiffr::expect_doppelganger("grouped-family QQ uniform", qq_plot(gfam_model, type = "deviance", method = "uniform", seed = 267))
   vdiffr::expect_doppelganger("grouped-family worm simulation",
     worm_plot(gfam_model, type = "deviance", method = "simulate", seed = 267))
@@ -352,10 +353,16 @@ gfam_component_reference_oracle <- function(model, component, n, method, type) {
 }
 
 test_that("family-faceted QQ and worm calibrate each component independently", {
-  for (model in list(gfam_model, gfam_bam, gfam_missing_model)) {
+  models <- list(gfam_model, gfam_bam, gfam_missing_model)
+  cran_cases <- list(c("uniform:deviance", "simulate:pearson"),
+    "uniform:response", "simulate:deviance")
+  for (j in seq_along(models)) {
+    model <- models[[j]]
     compact <- model_used_rows(model)
     for (method in c("uniform", "simulate")) {
       for (type in c("deviance", "response", "pearson")) {
+        if (!full_test_run() &&
+            !(paste(method, type, sep = ":") %in% cran_cases[[j]])) next
         expected <- withr::with_seed(267, lapply(1:3, function(i)
           gfam_component_reference_oracle(compact, i, 4, method, type)))
         qq <- qq_plot(model, method = method, type = type, seed = 267,
@@ -381,11 +388,14 @@ test_that("family-faceted QQ and worm calibrate each component independently", {
 })
 
 test_that("every diagnostic facets by indexed family with free axes", {
-  for (model in list(gfam_model, gfam_missing_model, gfam_gaussian_model)) {
+  models <- list(gfam_model, gfam_missing_model, gfam_gaussian_model)
+  for (j in seq_along(models)) {
+    model <- models[[j]]
     labels <- paste0(seq_along(model$family$getfl()), ": ",
       vapply(model$family$getfl(), `[[`, character(1), "family"))
     plots <- list(qq_plot(model, type = "deviance", seed = 6), worm_plot(model, type = "deviance", seed = 6),
       residuals_linpred_plot(model, type = "deviance"), residuals_hist_plot(model, type = "deviance"), observed_fitted_plot(model))
+    if (!full_test_run() && j > 1L) plots <- plots[c(1L, 5L)]
     for (p in plots) {
       built <- ggplot2::ggplot_build(p)
       panels <- built$layout$layout
@@ -396,6 +406,7 @@ test_that("every diagnostic facets by indexed family with free axes", {
       for (layer in built$data) expect_true(all(as.integer(layer$PANEL) %in% seq_along(labels)))
     }
     # appraise propagates the selection to all four constituent plots.
+    if (!full_test_run() && j > 1L) next
     for (by_family in c(TRUE, FALSE)) {
       app <- appraise(model, seed = 6, by_family = by_family)
       for (j in 1:4) {
