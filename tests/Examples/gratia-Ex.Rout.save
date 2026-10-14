@@ -1,7 +1,7 @@
 
-R version 4.5.3 (2026-03-11) -- "Reassured Reassurer"
+R version 4.6.1 (2026-06-24) -- "Happy Hop"
 Copyright (C) 2026 The R Foundation for Statistical Computing
-Platform: aarch64-apple-darwin20
+Platform: aarch64-apple-darwin23
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -164,6 +164,7 @@ detaching ‘package:mgcv’
 > ### Name: add_partial_residuals
 > ### Title: Add partial residuals
 > ### Aliases: add_partial_residuals add_partial_residuals.gam
+> ###   add_partial_residuals.gamm4
 > 
 > ### ** Examples
 > 
@@ -304,7 +305,10 @@ detaching ‘package:mgcv’
 > 
 > ### Name: appraise
 > ### Title: Model diagnostic plots
-> ### Aliases: appraise appraise.gam appraise.lm
+> ### Aliases: appraise appraise.gam appraise.lm appraise.gamlss
+> ###   appraise.default appraise.gamm4 appraise.gamm
+> ###   appraise.gratia_diagnostic_proxy appraise.lme appraise.merMod
+> ###   appraise.sdmTMB
 > 
 > ### ** Examples
 > 
@@ -314,6 +318,8 @@ detaching ‘package:mgcv’
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 > ## run some basic model checks
 > appraise(mod, point_col = "steelblue", point_alpha = 0.4)
+> ## replace the residual histogram with a posterior predictive check
+> appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
 > 
 > ## To change the theme for all panels use the & operator, for example to
 > ## change the ggplot theme for all panels
@@ -340,7 +346,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 > flush(stderr()); flush(stdout())
 > 
 > ### Name: assemble.gam
-> ### Title: Plot estimated smooths from a fitted GAM
+> ### Title: Plot smooth and parametric terms from a fitted GAM
 > ### Aliases: assemble.gam
 > 
 > ### ** Examples
@@ -411,7 +417,7 @@ detaching ‘package:mgcv’
 > ### Name: basis_size
 > ### Title: Extract basis dimension of a smooth
 > ### Aliases: basis_size basis_size.mgcv.smooth basis_size.gam
-> ###   basis_size.gamm
+> ###   basis_size.gamm basis_size.gamm4
 > 
 > ### ** Examples
 > 
@@ -481,6 +487,95 @@ detaching ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
+> nameEx("conditional_differences")
+> ### * conditional_differences
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: conditional_differences
+> ### Title: Conditional differences of fitted values from a GAM
+> ### Aliases: conditional_differences conditional_differences.gam
+> ###   conditional_differences.gamm4
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> df <- data_sim("eg4", seed = 2)
+> m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+> cd <- conditional_differences(m, by = "fac", condition = "x2")
+> draw(cd)
+> 
+> # Restrict comparisons and fix a further covariate
+> conditional_differences(m, by = "fac",
++   condition = list("x2", fac = c("1", "3"), x0 = 0.5))
+# A tibble: 100 x 9
+   .contrast .level_1 .level_2     .diff   .se .lower_ci .upper_ci      x2    x0
+       <int> <fct>    <fct>        <dbl> <dbl>     <dbl>     <dbl>   <dbl> <dbl>
+ 1         1 1        3         0.375    0.927     -1.44    2.19   0.00325   0.5
+ 2         1 1        3         0.000823 0.834     -1.63    1.63   0.0133    0.5
+ 3         1 1        3        -0.374    0.748     -1.84    1.09   0.0233    0.5
+ 4         1 1        3        -0.752    0.673     -2.07    0.567  0.0334    0.5
+ 5         1 1        3        -1.13     0.612     -2.33    0.0656 0.0434    0.5
+ 6         1 1        3        -1.52     0.566     -2.63   -0.413  0.0535    0.5
+ 7         1 1        3        -1.92     0.536     -2.97   -0.869  0.0635    0.5
+ 8         1 1        3        -2.33     0.518     -3.34   -1.31   0.0736    0.5
+ 9         1 1        3        -2.74     0.509     -3.74   -1.74   0.0836    0.5
+10         1 1        3        -3.16     0.505     -4.15   -2.17   0.0937    0.5
+# i 90 more rows
+> 
+> # Pointwise posterior bands from shared coefficient draws
+> conditional_differences(m, by = "fac", condition = "x2",
++   uncertainty = "simulation", n_sim = 1000, seed = 42)
+# A tibble: 300 x 9
+   .contrast .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2    x0
+       <int> <fct>    <fct>    <dbl> <dbl>     <dbl>     <dbl>   <dbl> <dbl>
+ 1         1 1        2         2.76 0.878      1.05      4.51 0.00325 0.462
+ 2         1 1        2         2.80 0.830      1.15      4.45 0.0133  0.462
+ 3         1 1        2         2.85 0.784      1.29      4.42 0.0233  0.462
+ 4         1 1        2         2.89 0.741      1.43      4.34 0.0334  0.462
+ 5         1 1        2         2.94 0.699      1.55      4.32 0.0434  0.462
+ 6         1 1        2         2.98 0.660      1.67      4.25 0.0535  0.462
+ 7         1 1        2         3.03 0.625      1.81      4.23 0.0635  0.462
+ 8         1 1        2         3.07 0.592      1.93      4.19 0.0736  0.462
+ 9         1 1        2         3.11 0.562      2.01      4.19 0.0836  0.462
+10         1 1        2         3.16 0.536      2.10      4.20 0.0937  0.462
+# i 290 more rows
+> 
+> # Link-scale simultaneous bands, separately for each comparison
+> conditional_differences(m, by = "fac", condition = "x2", scale = "link",
++   interval = "simultaneous", n_vals = 200, n_sim = 1000, seed = 42)
+# A tibble: 600 x 10
+   .contrast .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2    x0
+       <int> <fct>    <fct>    <dbl> <dbl>     <dbl>     <dbl>   <dbl> <dbl>
+ 1         1 1        2         2.76 0.859     0.338      5.18 0.00325 0.462
+ 2         1 1        2         2.78 0.836     0.424      5.14 0.00825 0.462
+ 3         1 1        2         2.80 0.814     0.509      5.10 0.0132  0.462
+ 4         1 1        2         2.83 0.792     0.593      5.06 0.0182  0.462
+ 5         1 1        2         2.85 0.770     0.675      5.02 0.0232  0.462
+ 6         1 1        2         2.87 0.749     0.756      4.98 0.0282  0.462
+ 7         1 1        2         2.89 0.729     0.836      4.95 0.0332  0.462
+ 8         1 1        2         2.91 0.709     0.913      4.92 0.0382  0.462
+ 9         1 1        2         2.94 0.690     0.989      4.88 0.0432  0.462
+10         1 1        2         2.96 0.672     1.06       4.85 0.0482  0.462
+# i 590 more rows
+# i 1 more variable: .crit <dbl>
+> 
+> # Nonlinear response differences: simultaneous coverage across all pairs
+> set.seed(42)
+> df$count <- rpois(nrow(df), exp(0.2 + sin(3 * df$x2) + as.integer(df$fac) / 3))
+> mp <- gam(count ~ fac + s(x2, by = fac), family = poisson(),
++   data = df, method = "REML")
+> conditional_differences(mp, by = "fac", condition = "x2", scale = "response",
++   uncertainty = "simulation", interval = "simultaneous",
++   simultaneous_scope = "all", n_vals = 200, n_sim = 1000, seed = 42) |>
++   draw()
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("conditional_values")
 > ### * conditional_values
 > 
@@ -489,6 +584,7 @@ detaching ‘package:mgcv’
 > ### Name: conditional_values
 > ### Title: Conditional predictions from a GAM
 > ### Aliases: conditional_values conditional_values.gam
+> ###   conditional_values.gamm4
 > 
 > ### ** Examples
 > 
@@ -642,7 +738,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: confint.gam
 > ### Title: Point-wise and simultaneous confidence intervals for smooths
-> ### Aliases: confint.gam confint.gamm confint.list
+> ### Aliases: confint.gam confint.gamm confint.gamm4
 > 
 > ### ** Examples
 > 
@@ -752,7 +848,7 @@ detaching ‘package:mgcv’
 > ### Name: data_slice
 > ### Title: Prepare a data slice through model covariates
 > ### Aliases: data_slice data_slice.default data_slice.data.frame
-> ###   data_slice.gam data_slice.gamm data_slice.list data_slice.scam
+> ###   data_slice.gam data_slice.gamm data_slice.gamm4 data_slice.scam
 > 
 > ### ** Examples
 > 
@@ -807,9 +903,9 @@ detaching ‘package:mgcv’
 > 
 > ### Name: derivative_samples
 > ### Title: Posterior expectations of derivatives from an estimated model
-> ### Aliases: derivative_samples derivative_samples.default
-> ###   derivative_samples.gamm derivative_samples.gam
-> ###   derivative_samples.scam
+> ### Aliases: derivative_samples derivative_samples.gamm4
+> ###   derivative_samples.default derivative_samples.gamm
+> ###   derivative_samples.gam derivative_samples.scam
 > 
 > ### ** Examples
 > 
@@ -854,7 +950,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 > ### Name: derivatives
 > ### Title: Derivatives of estimated smooths via finite differences
 > ### Aliases: derivatives derivatives.default derivatives.gamm
-> ###   derivatives.gam
+> ###   derivatives.gam derivatives.gamm4
 > 
 > ### ** Examples
 > 
@@ -871,7 +967,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 # A tibble: 400 x 12
    .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci      x0    x1
    <chr>   <chr> <chr>       <dbl> <dbl> <dbl>     <dbl>     <dbl>   <dbl> <dbl>
- 1 s(x0)   <NA>  <NA>         7.41  3.33  1.96     0.874      13.9 2.39e-4    NA
+ 1 s(x0)   <NA>  <NA>         7.41  3.33  1.96     0.874      13.9 2.42e-4    NA
  2 s(x0)   <NA>  <NA>         7.40  3.33  1.96     0.884      13.9 1.03e-2    NA
  3 s(x0)   <NA>  <NA>         7.39  3.30  1.96     0.929      13.8 2.04e-2    NA
  4 s(x0)   <NA>  <NA>         7.36  3.24  1.96     1.01       13.7 3.04e-2    NA
@@ -879,7 +975,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
  6 s(x0)   <NA>  <NA>         7.26  3.04  1.96     1.30       13.2 5.06e-2    NA
  7 s(x0)   <NA>  <NA>         7.18  2.90  1.96     1.49       12.9 6.06e-2    NA
  8 s(x0)   <NA>  <NA>         7.09  2.76  1.96     1.69       12.5 7.07e-2    NA
- 9 s(x0)   <NA>  <NA>         6.99  2.61  1.96     1.87       12.1 8.07e-2    NA
+ 9 s(x0)   <NA>  <NA>         6.99  2.61  1.96     1.87       12.1 8.08e-2    NA
 10 s(x0)   <NA>  <NA>         6.87  2.47  1.96     2.03       11.7 9.08e-2    NA
 # i 390 more rows
 # i 2 more variables: x2 <dbl>, x3 <dbl>
@@ -889,7 +985,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 # A tibble: 100 x 9
    .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci       x1
    <chr>   <chr> <chr>       <dbl> <dbl> <dbl>     <dbl>     <dbl>    <dbl>
- 1 s(x1)   <NA>  <NA>       -0.907  3.12  1.96     -7.02      5.20 0.000405
+ 1 s(x1)   <NA>  <NA>       -0.907  3.12  1.96     -7.02      5.20 0.000408
  2 s(x1)   <NA>  <NA>       -0.906  3.11  1.96     -7.01      5.20 0.0105  
  3 s(x1)   <NA>  <NA>       -0.898  3.10  1.96     -6.97      5.17 0.0205  
  4 s(x1)   <NA>  <NA>       -0.880  3.06  1.96     -6.88      5.12 0.0306  
@@ -905,7 +1001,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 # A tibble: 100 x 9
    .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci       x1
    <chr>   <chr> <chr>       <dbl> <dbl> <dbl>     <dbl>     <dbl>    <dbl>
- 1 s(x1)   <NA>  <NA>       -0.907  3.12  1.96     -7.02      5.20 0.000405
+ 1 s(x1)   <NA>  <NA>       -0.907  3.12  1.96     -7.02      5.20 0.000408
  2 s(x1)   <NA>  <NA>       -0.906  3.11  1.96     -7.01      5.20 0.0105  
  3 s(x1)   <NA>  <NA>       -0.898  3.10  1.96     -6.97      5.17 0.0205  
  4 s(x1)   <NA>  <NA>       -0.880  3.06  1.96     -6.88      5.12 0.0306  
@@ -968,6 +1064,11 @@ detaching ‘package:mgcv’
 > sm_dif2 <- difference_smooths(m, select = "s(x2)", group_means = TRUE)
 > draw(sm_dif2)
 > 
+> # simultaneous intervals, separately for each pair of factor levels
+> sm_sim <- difference_smooths(m, select = "s(x2)",
++   interval = "simultaneous", n_sim = 1000, seed = 42)
+> draw(sm_sim)
+> 
 > # compare specific smooths
 > sm_dif3 <- difference_smooths(m,
 +   select = c("s(x2):fac1", "s(x2):fac2"), partial_match = FALSE
@@ -1002,6 +1103,28 @@ detaching ‘package:mgcv’
 > 
 > bf <- basis(m, "s(x2)")
 > draw(bf)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
+> nameEx("draw.conditional_differences")
+> ### * draw.conditional_differences
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: draw.conditional_differences
+> ### Title: Plot conditional differences
+> ### Aliases: draw.conditional_differences
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> df <- data_sim("eg4", seed = 2)
+> m <- gam(y ~ fac + s(x2, by = fac), data = df, method = "REML")
+> draw(conditional_differences(m, by = "fac", condition = "x2"))
 > 
 > 
 > 
@@ -1071,7 +1194,7 @@ detaching ‘package:mgcv’
 > flush(stderr()); flush(stdout())
 > 
 > ### Name: draw.gam
-> ### Title: Plot estimated smooths from a fitted GAM
+> ### Title: Plot smooth and parametric terms from a fitted GAM
 > ### Aliases: draw.gam
 > 
 > ### ** Examples
@@ -1091,7 +1214,21 @@ detaching ‘package:mgcv’
 > 
 > df2 <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
 > m2 <- gam(y ~ s(x, z, k = 40), data = df2, method = "REML")
-> draw(m2, contour = FALSE, n = 50)
+> draw(m2, contour = FALSE, n_2d = 50)
+> draw(m2, surface = "tile", n_2d = 30)
+> 
+> if (requireNamespace("ggcube", quietly = TRUE)) {
++   draw(m2, surface = "3d", n_2d = 20,
++     surface_3d = list(yaw = 45, persp = FALSE))
++   panels <- assemble(m2, surface = "3d", n_2d = 20)
++   # Replace coordinates to customize a single term; retain the current theme.
++   panels[[1]] <- panels[[1]] +
++     ggcube::coord_3d(yaw = -20,
++       light = ggcube::light(backface_scale = 1))[[1]]
++   patchwork::wrap_plots(panels)
++ }
+Coordinate system already present.
+i Adding new coordinate system, which will replace the existing one.
 > 
 > # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 > # for more examples and for details on how to modify the theme of all the
@@ -1191,6 +1328,9 @@ detaching ‘package:mgcv’
 > # for a specific smooth
 > draw(penalty(m, select = "s(x2):fac1"))
 > 
+> # draw individual vector cells
+> draw(penalty(m), geom = "tile")
+> 
 > 
 > 
 > cleanEx()
@@ -1247,6 +1387,8 @@ detaching ‘package:mgcv’
 > # plot all of the estimated smooths
 > sm <- smooth_estimates(m)
 > draw(sm)
+> m_log <- gam(y ~ s(log(x1), k = 6), data = df)
+> draw(smooth_estimates(m_log, back_transform = TRUE), back_transform = TRUE)
 > # evaluate smooth of `x2`
 > sm <- smooth_estimates(m, select = "s(x2)")
 > # plot it
@@ -1264,6 +1406,10 @@ detaching ‘package:mgcv’
 > smooth_estimates(m) |>
 +   add_sizer(derivatives = d, type = "sizer") |>
 +   draw()
+> 
+> # Render a bivariate smooth as vector tiles
+> m_surface <- gam(y ~ s(x0, x1), data = df, method = "REML")
+> draw(smooth_estimates(m_surface, n_2d = 20), surface = "tile")
 > 
 > 
 > 
@@ -1316,7 +1462,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: edf
 > ### Title: Effective degrees of freedom for smooths and GAMs
-> ### Aliases: edf edf.gam model_edf
+> ### Aliases: edf edf.gam model_edf edf.gamm4
 > 
 > ### ** Examples
 > 
@@ -1387,7 +1533,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: evenly
 > ### Title: Create a sequence of evenly-spaced values
-> ### Aliases: evenly seq_min_max
+> ### Aliases: evenly all_levels seq_min_max
 > 
 > ### ** Examples
 > 
@@ -1423,7 +1569,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: fderiv
 > ### Title: First derivatives of fitted GAM functions
-> ### Aliases: fderiv fderiv.gam fderiv.gamm
+> ### Aliases: fderiv fderiv.gam fderiv.gamm fderiv.gamm4
 > ### Keywords: internal
 > 
 > ### ** Examples
@@ -1472,7 +1618,8 @@ detaching ‘package:mgcv’
 > 
 > ### Name: fitted_samples
 > ### Title: Draw fitted values from the posterior distribution
-> ### Aliases: fitted_samples fitted_samples.gam fitted_samples.scam
+> ### Aliases: fitted_samples fitted_samples.gamm4 fitted_samples.gam
+> ###   fitted_samples.scam
 > 
 > ### ** Examples
 > 
@@ -1506,7 +1653,7 @@ detaching ‘package:mgcv’
 > ### Name: fitted_values
 > ### Title: Generate fitted values from a estimated GAM
 > ### Aliases: fitted_values fitted_values.gam fitted_values.gamm
-> ###   fitted_values.scam
+> ###   fitted_values.scam fitted_values.gamm4
 > 
 > ### ** Examples
 > 
@@ -1533,6 +1680,29 @@ detaching ‘package:mgcv’
 10    10 0.549984 0.807410  0.264717   0.317747 15.5283  0.369999  14.8031 
 # i 390 more rows
 # i 1 more variable: .upper_ci <dbl>
+> 
+> # Simultaneous intervals for two arbitrary covariate combinations
+> fitted_values(m, data = sim_df[c(1, 20), ], interval = "simultaneous",
++   n_sim = 1000, seed = 42)
+# A tibble: 2 x 15
+   .row       y        x0       x1       x2       x3       f       f0      f1
+  <int>   <dbl>     <dbl>    <dbl>    <dbl>    <dbl>   <dbl>    <dbl>   <dbl>
+1     1 7.12834 0.184882  0.617142 0.415244 0.132410 8.38643 1.09743  3.43592
+2     2 2.93507 0.0749794 0.797900 0.874521 0.203225 5.57766 0.466765 4.93227
+# i 6 more variables: f2 <dbl>, f3 <dbl>, .fitted <dbl>, .se <dbl>,
+#   .lower_ci <dbl>, .upper_ci <dbl>
+> 
+> # A selected sum of smooth contributions on the link scale
+> fitted_values(m, data = sim_df[c(1, 20), ], scale = "link",
++   terms = c("s(x2)", "s(x3)"), interval = "simultaneous",
++   n_sim = 1000, seed = 42)
+# A tibble: 2 x 15
+   .row       y        x0       x1       x2       x3       f       f0      f1
+  <int>   <dbl>     <dbl>    <dbl>    <dbl>    <dbl>   <dbl>    <dbl>   <dbl>
+1     1 7.12834 0.184882  0.617142 0.415244 0.132410 8.38643 1.09743  3.43592
+2     2 2.93507 0.0749794 0.797900 0.874521 0.203225 5.57766 0.466765 4.93227
+# i 6 more variables: f2 <dbl>, f3 <dbl>, .fitted <dbl>, .se <dbl>,
+#   .lower_ci <dbl>, .upper_ci <dbl>
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1603,6 +1773,47 @@ Loading required package: Matrix
 > cleanEx()
 
 detaching ‘package:lme4’, ‘package:Matrix’, ‘package:mgcv’
+
+> nameEx("glmmTMB-methods")
+> ### * glmmTMB-methods
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: qq_plot.glmmTMB
+> ### Title: Effects and diagnostics for glmmTMB models
+> ### Aliases: qq_plot.glmmTMB worm_plot.glmmTMB appraise.glmmTMB
+> ###   parametric_terms.glmmTMB parametric_effects.glmmTMB smooths.glmmTMB
+> ###   get_smooths_by_id.glmmTMB glmmTMB-methods smooth_estimates.glmmTMB
+> ###   smooth_coefs.glmmTMB draw.glmmTMB
+> 
+> ### ** Examples
+> 
+> if (requireNamespace("glmmTMB", quietly = TRUE)) {
++   library("mgcv")
++   set.seed(42)
++   d <- data.frame(x = runif(150))
++   d$y <- sin(6 * d$x) + rnorm(150, sd = 0.2)
++   m <- glmmTMB::glmmTMB(y ~ s(x, k = 8), data = d, REML = TRUE)
++   draw(m)
++   appraise(m, seed = 42)
++ 
++   # Parametric terms and native random intercepts and slopes
++   d$z <- rnorm(150)
++   d$g <- factor(rep(seq_len(10), each = 15))
++   d$y <- d$y + 0.5 * d$z + rnorm(10)[d$g] + rnorm(10)[d$g] * d$z
++   mixed <- glmmTMB::glmmTMB(y ~ z + s(x, k = 8) + (1 + z | g),
++     data = d, REML = TRUE)
++   draw(mixed) # separate QQ panels for intercepts and slopes
++   draw(mixed, ranef_lines = TRUE) # random contributions only
++ }
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
 
 > nameEx("gw_functions")
 > ### * gw_functions
@@ -1695,8 +1906,8 @@ detaching ‘package:mgcv’
 > ### Name: link
 > ### Title: Extract link and inverse link functions from models
 > ### Aliases: link link.family link.gam link.bam link.gamm link.glm
-> ###   link.list inv_link inv_link.family inv_link.gam inv_link.bam
-> ###   inv_link.gamm inv_link.list inv_link.glm extract_link
+> ###   link.gamm4 inv_link inv_link.family inv_link.gam inv_link.bam
+> ###   inv_link.gamm inv_link.gamm4 inv_link.glm extract_link
 > ###   extract_link.family extract_link.general.family
 > 
 > ### ** Examples
@@ -1726,11 +1937,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0x13c396c18>
+<environment: 0xc62a9eee8>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0x13c396c18>
+<environment: 0xc62a9eee8>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -1751,7 +1962,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: lp_matrix
 > ### Title: Return the linear prediction matrix of a fitted GAM
-> ### Aliases: lp_matrix lp_matrix.gam
+> ### Aliases: lp_matrix lp_matrix.gamm4 lp_matrix.gam
 > 
 > ### ** Examples
 > 
@@ -1815,6 +2026,7 @@ detaching ‘package:mgcv’
 > ### Name: model_concurvity
 > ### Title: Concurvity of an estimated GAM
 > ### Aliases: model_concurvity model_concurvity.gam concrvity
+> ###   model_concurvity.gamm4
 > 
 > ### ** Examples
 > 
@@ -1853,8 +2065,8 @@ detaching ‘package:mgcv’, ‘package:tibble’
 > 
 > ### Name: model_constant
 > ### Title: Extract the model constant term
-> ### Aliases: model_constant model_constant.gam model_constant.gamlss
-> ###   model_constant.glm
+> ### Aliases: model_constant model_constant.gamm4 model_constant.gam
+> ###   model_constant.gamlss model_constant.glm
 > 
 > ### ** Examples
 > 
@@ -1929,7 +2141,7 @@ detaching ‘package:mgcv’
 > ### Name: model_vars
 > ### Title: List the variables involved in a model fitted with a formula
 > ### Aliases: model_vars model_vars.gam model_vars.default model_vars.bam
-> ###   model_vars.gamm model_vars.gamm4 model_vars.list
+> ###   model_vars.gamm model_vars.gamm4
 > 
 > ### ** Examples
 > 
@@ -1961,7 +2173,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: nb_theta
 > ### Title: Negative binomial parameter theta
-> ### Aliases: nb_theta nb_theta.gam
+> ### Aliases: nb_theta nb_theta.gam nb_theta.gamm4
 > 
 > ### ** Examples
 > 
@@ -1972,7 +2184,7 @@ detaching ‘package:mgcv’
 +   s(x3, bs = "cr"), family = nb, data = df, method = "REML")
 > ## IGNORE_RDIFF_BEGIN
 > nb_theta(m)
-[1] 239342.9
+[1] 239394.6
 > ## IGNORE_RDIFF_END
 > 
 > 
@@ -1988,7 +2200,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: overview
 > ### Title: Provides an overview of a model and the terms in that model
-> ### Aliases: overview overview.gam
+> ### Aliases: overview overview.gamm4 overview.gam
 > 
 > ### ** Examples
 > 
@@ -2022,6 +2234,58 @@ Generalized Additive Model with 5 terms
 
 detaching ‘package:mgcv’
 
+> nameEx("parametric_effects")
+> ### * parametric_effects
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: parametric_effects
+> ### Title: Estimated values for parametric model terms
+> ### Aliases: parametric_effects parametric_effects.gamm4
+> ###   parametric_effects.gam
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> 
+> # Simulate group-specific slopes and a three-variable interaction
+> set.seed(42)
+> d <- data.frame(
++   x0 = runif(200),
++   x1 = runif(200),
++   x2 = runif(200, -1, 1),
++   x3 = runif(200, 1, 2),
++   group = factor(rep(c("A", "B"), each = 100))
++ )
+> d$y <- with(d, 2 * x0 + (group == "B") * (1 + x0) +
++   3 * x1 * x2 * x3 + rnorm(200, sd = 0.25))
+> m <- gam(y ~ x0 * group + x1:x2:x3, data = d, method = "REML")
+> 
+> # The interaction surface is shown at four values of x3
+> pe <- parametric_effects(m, n_2d = 20, n_3d = 4)
+> draw(pe)
+> draw(m, parametric = TRUE, terms = "x0:group")
+> 
+> # Render the same interaction as 3D surfaces
+> if (requireNamespace("ggcube", quietly = TRUE)) {
++   pe_surface <- parametric_effects(m, terms = "x1:x2:x3",
++     n_2d = 20, n_3d = 4)
++   draw(pe_surface, surface = "3d")
++ }
+> 
+> # Draw a transformed covariate on either scale
+> m_log <- gam(y ~ log(x1), data = d)
+> draw(m_log) # log(x1) on the x axis
+> draw(m_log, back_transform = TRUE) # x1 on the x axis
+> draw(parametric_effects(m_log), back_transform = TRUE)
+> 
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("partial_derivatives")
 > ### * partial_derivatives
 > 
@@ -2032,6 +2296,7 @@ detaching ‘package:mgcv’
 > ###   differences
 > ### Aliases: partial_derivatives partial_derivatives.default
 > ###   partial_derivatives.gamm partial_derivatives.gam
+> ###   partial_derivatives.gamm4
 > 
 > ### ** Examples
 > 
@@ -2181,8 +2446,9 @@ detaching ‘package:mgcv’
 > 
 > ### Name: penalty
 > ### Title: Extract and tidy penalty matrices
-> ### Aliases: penalty penalty.default penalty.gam penalty.mgcv.smooth
-> ###   penalty.tensor.smooth penalty.t2.smooth penalty.re.smooth.spec
+> ### Aliases: penalty penalty.gamm4 penalty.default penalty.gam
+> ###   penalty.mgcv.smooth penalty.tensor.smooth penalty.t2.smooth
+> ###   penalty.re.smooth.spec
 > 
 > ### ** Examples
 > 
@@ -2241,6 +2507,32 @@ detaching ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
+> nameEx("posterior_predictive_plot")
+> ### * posterior_predictive_plot
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: posterior_predictive_plot
+> ### Title: Posterior predictive check of the response distribution
+> ### Aliases: posterior_predictive_plot
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> dat <- data_sim("eg1", n = 100, seed = 2)
+> mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
++   data = dat,
++   method = "REML"
++ )
+> posterior_predictive_plot(mod, n = 20, seed = 42)
+> appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("predicted_samples")
 > ### * predicted_samples
 > 
@@ -2249,8 +2541,9 @@ detaching ‘package:mgcv’
 > ### Name: predicted_samples
 > ### Title: Draw new response values from the conditional distribution of
 > ###   the response
-> ### Aliases: predicted_samples predicted_samples.default
-> ###   predicted_samples.gam predicted_samples.scam
+> ### Aliases: predicted_samples predicted_samples.gamm4
+> ###   predicted_samples.default predicted_samples.gam
+> ###   predicted_samples.scam
 > 
 > ### ** Examples
 > 
@@ -2359,6 +2652,8 @@ detaching ‘package:mgcv’
 > ### Name: qq_plot
 > ### Title: Quantile-quantile plot of model residuals
 > ### Aliases: qq_plot qq_plot.default qq_plot.gam qq_plot.glm qq_plot.lm
+> ###   qq_plot.gamm4 qq_plot.gamm qq_plot.gratia_diagnostic_proxy
+> ###   qq_plot.lme qq_plot.merMod qq_plot.gamlss qq_plot.sdmTMB
 > 
 > ### ** Examples
 > 
@@ -2376,7 +2671,7 @@ detaching ‘package:mgcv’
 > ## Q-Q plot; default using direct randomization of uniform quantiles
 > qq_plot(m)
 > 
-> ## Alternatively use simulate new data from the model, which
+> ## Alternatively simulate new data from the model, which
 > ## allows construction of reference intervals for the Q-Q plot
 > qq_plot(m,
 +   method = "simulate",
@@ -2385,7 +2680,7 @@ detaching ‘package:mgcv’
 +   point_alpha = 0.4
 + )
 > 
-> ## ... or use the usual normality assumption
+> ## ... or request a normal approximation for the residuals.
 > qq_plot(m, method = "normal")
 > 
 > 
@@ -2438,7 +2733,7 @@ Levels: a b c d e
 > ### Title: Derivatives on the response scale from an estimated GAM
 > ### Aliases: response_derivatives response_derivatives.default
 > ###   response_derivatives.gamm response_derivatives.gam
-> ###   response_derivatives.scam
+> ###   response_derivatives.scam response_derivatives.gamm4
 > 
 > ### ** Examples
 > 
@@ -2481,6 +2776,10 @@ Levels: a b c d e
 +     y = "Estimated count"
 +   )
 > 
+> # pointwise normal intervals from the delta method
+> y_delta <- response_derivatives(m, data = ds, focal = "x2",
++   type = "central", uncertainty = "delta")
+> 
 > # draw response derivatives
 > p2 <- y_d |>
 +   ggplot(aes(x = x2, y = .derivative)) +
@@ -2510,7 +2809,7 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
 > 
 > ### Name: rootogram
 > ### Title: Rootograms to assess goodness of model fit
-> ### Aliases: rootogram rootogram.gam
+> ### Aliases: rootogram rootogram.gamm4 rootogram.gam
 > 
 > ### ** Examples
 > 
@@ -2555,14 +2854,84 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
 
 detaching ‘package:mgcv’
 
+> nameEx("scalable_qq_plot")
+> ### * scalable_qq_plot
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: scalable_qq_plot
+> ### Title: Scalable model diagnostic plots
+> ### Aliases: scalable_qq_plot scalable_worm_plot
+> ###   scalable_residuals_linpred_plot scalable_observed_fitted_plot
+> ###   scalable_residuals_hist_plot
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+> dat <- data_sim("eg1", n = 400, seed = 2)
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
+> scalable_qq_plot(m, seed = 42)
+> scalable_residuals_linpred_plot(m)
+> scalable_observed_fitted_plot(m, density_bins = c(30, 40))
+> appraise(m, scalable = TRUE, seed = 42)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
+> nameEx("sdmTMB-methods")
+> ### * sdmTMB-methods
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: sdmTMB-methods
+> ### Title: Formula effects for sdmTMB models
+> ### Aliases: sdmTMB-methods smooths.sdmTMB get_smooths_by_id.sdmTMB
+> ###   smooth_coefs.sdmTMB smooth_estimates.sdmTMB parametric_terms.sdmTMB
+> ###   parametric_effects.sdmTMB assemble.sdmTMB draw.sdmTMB
+> 
+> ### ** Examples
+> 
+> if (requireNamespace("sdmTMB", quietly = TRUE)) {
++   library("mgcv")
++   set.seed(42)
++   d <- data.frame(x = runif(150), z = runif(150))
++   d$y <- 1 + sin(6 * d$x) + 0.5 * d$z + rnorm(150, sd = 0.3)
++   m <- sdmTMB::sdmTMB(y ~ z + s(x, k = 6), data = d, spatial = "off")
++   draw(m)
++   smooth_estimates(m, select = "s(x)")
++   assemble(m)
++ 
++   d$y <- ifelse(runif(150) < 0.3, 0, exp(d$y))
++   delta <- sdmTMB::sdmTMB(y ~ z + s(x, k = 6),
++     data = d,
++     spatial = "off", family = sdmTMB::delta_gamma()
++   )
++   draw(delta)
++   draw(delta, select = "s.1(x)", parametric = TRUE, terms = "z.1")
++ }
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
 > nameEx("simulate")
 > ### * simulate
 > 
 > flush(stderr()); flush(stdout())
 > 
-> ### Name: simulate.gam
-> ### Title: Simulate from the posterior distribution of a GAM
-> ### Aliases: simulate.gam simulate.gamm simulate.scam
+> ### Name: simulate
+> ### Title: Simulate responses from a fitted model
+> ### Aliases: simulate simulate.gamm4 simulate.gamlss simulate.gam
+> ###   simulate.gamm simulate.scam
 > 
 > ### ** Examples
 > 
@@ -2594,8 +2963,8 @@ detaching ‘package:mgcv’
 > ### Name: smooth_coefs
 > ### Title: Coefficients for a particular smooth
 > ### Aliases: smooth_coefs smooth_coefs.gam smooth_coefs.bam
-> ###   smooth_coefs.gamm smooth_coefs.gamm4 smooth_coefs.list
-> ###   smooth_coefs.mgcv.smooth smooth_coefs.scam
+> ###   smooth_coefs.gamm smooth_coefs.gamm4 smooth_coefs.mgcv.smooth
+> ###   smooth_coefs.scam
 > 
 > ### ** Examples
 > 
@@ -2776,7 +3145,8 @@ detaching ‘package:mirai’, ‘package:mgcv’
 > 
 > ### Name: smooth_label
 > ### Title: Extract the label for a smooth used by 'mgcv'
-> ### Aliases: smooth_label smooth_label.gam smooth_label.mgcv.smooth
+> ### Aliases: smooth_label smooth_label.gamm4 smooth_label.gam
+> ###   smooth_label.mgcv.smooth
 > 
 > ### ** Examples
 > 
@@ -2812,7 +3182,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: smooth_samples
 > ### Title: Posterior draws for individual smooths
-> ### Aliases: smooth_samples smooth_samples.gam
+> ### Aliases: smooth_samples smooth_samples.gamm4 smooth_samples.gam
 > 
 > ### ** Examples
 > 
@@ -2849,7 +3219,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: theta
 > ### Title: General extractor for additional parameters in mgcv models
-> ### Aliases: theta theta.gam theta.family
+> ### Aliases: theta theta.gam theta.family theta.gamm4
 > 
 > ### ** Examples
 > 
@@ -2933,6 +3303,8 @@ detaching ‘package:mgcv’
 > ### Name: worm_plot
 > ### Title: Worm plot of model residuals
 > ### Aliases: worm_plot worm_plot.gam worm_plot.glm worm_plot.lm
+> ###   worm_plot.gamm4 worm_plot.gamm worm_plot.gratia_diagnostic_proxy
+> ###   worm_plot.lme worm_plot.merMod worm_plot.gamlss worm_plot.sdmTMB
 > 
 > ### ** Examples
 > 
@@ -2947,18 +3319,18 @@ detaching ‘package:mgcv’
 +   method = "REML"
 + )
 > 
-> ## Worm plot; default using direct randomization of uniform quantiles
+> ## The default uses inverse-CDF sampling of randomised uniform quantiles.
 > ## Note no reference bands are drawn with this method.
 > worm_plot(m)
 > 
-> ## Alternatively use simulate new data from the model, which
+> ## Alternatively simulate new data from the model, which
 > ## allows construction of reference intervals for the Q-Q plot
 > worm_plot(m,
 +   method = "simulate", point_col = "steelblue",
 +   point_alpha = 0.4
 + )
 > 
-> ## ... or use the usual normality assumption
+> ## ... or request a normal approximation for the residuals.
 > worm_plot(m, method = "normal")
 > 
 > 
@@ -2971,7 +3343,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  17.131 0.356 18.654 0.004 0.006 
+Time elapsed:  27.168 0.675 29.53 0.004 0.005 
 > grDevices::dev.off()
 null device 
           1 
