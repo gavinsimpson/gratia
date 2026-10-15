@@ -542,6 +542,11 @@ qq_uniform <- function(model, n = 10,
 #' @param ... optional arguments passed to model preparation, such as the
 #'   sdmTMB `field_method`.
 #'
+#' @details The default subtitle identifies the response family. Conditioning
+#'   and field choices appear in the caption where relevant. Supply `caption`
+#'   to replace this text, or `caption = ""` to omit it. The scalable version
+#'   uses the same labels.
+#'
 #' @export
 #'
 #' @importFrom stats napredict residuals
@@ -636,9 +641,9 @@ qq_uniform <- function(model, n = 10,
       "Residuals vs linear predictor"
   }
   if (missing(subtitle)) {
-    subtitle <- diagnostic_reference_description(response_distribution(model),
-      paste("Family:", family(model)[["family"]]))
+    subtitle <- paste("Family:", family(model)[["family"]])
   }
+  caption <- caption %||% diagnostic_predictor_caption(model)
 
   plt <- plt + labs(
     x = xlab, y = ylab, title = title, subtitle = subtitle,

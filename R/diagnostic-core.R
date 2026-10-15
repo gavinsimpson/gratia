@@ -171,6 +171,20 @@ diagnostic_qq_caption <- function(model, data, bands = attr(data, "band_method")
   diagnostic_caption(context)
 }
 
+diagnostic_predictor_caption <- function(model) {
+  distribution <- response_distribution(model)
+  describe <- inherits(model, c("gratia_diagnostic_proxy", "gratia_glmmtmb_diagnostic")) ||
+    !isTRUE(distribution$independent) || !is.null(distribution$dependence_reason) ||
+    !is.null(distribution$approximation) ||
+    !identical(distribution$conditioning, "conditional")
+  diagnostic_caption(c(
+    if (describe) paste("Conditioning:", distribution$conditioning %||% "conditional"),
+    if (!is.null(distribution$field_method) &&
+        !identical(distribution$conditioning, "marginal"))
+      paste("Fields:", distribution$field_method)
+  ))
+}
+
 # Average the sorted quantiles for uniform references. For simulated references,
 # keep the existing R type-7 quantiles of all draws and intervals at each rank.
 qq_reference_draws <- function(observed, draw, residual, n, method,

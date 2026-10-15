@@ -593,6 +593,10 @@ render_diagnostic_qq <- function(
 #'   Pooled histograms use faint component-coloured fills with opaque stepped
 #'   upper boundaries, retaining common bin edges and component densities.
 #'
+#'   Residual-versus-predictor plots identify the response family in the subtitle
+#'   and show conditioning and field choices in the caption where relevant,
+#'   matching [residuals_linpred_plot()]. Supply `caption = ""` to omit the caption.
+#'
 #'   Kernel density estimates are calculated on a fixed grid before plotting.
 #'   Each predictor slice is normalized to integrate to one over the displayed
 #'   residual grid. Bandwidths, rather than `density_bins`, control smoothing;
@@ -947,9 +951,9 @@ scalable_residuals_linpred_plot <- function(
   validate_diagnostic_bandwidth(bandwidth)
   d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning, n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...)
   if (missing(subtitle)) {
-    subtitle <- diagnostic_reference_description(response_distribution(d$source),
-      paste("Family:", family(d$source)[["family"]]))
+    subtitle <- paste("Family:", family(d$source)[["family"]])
   }
+  caption <- caption %||% diagnostic_predictor_caption(d$source)
   by_family <- diagnostic_data_by_family(d, by_family)
   dat <- d$data
   if (".family" %in% names(dat)) {

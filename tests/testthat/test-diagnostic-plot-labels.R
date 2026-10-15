@@ -27,6 +27,26 @@ test_that("diagnostic captions can be replaced or omitted", {
   model <- nlme::lme(distance ~ age, random = ~ 1 | Subject,
     data = nlme::Orthodont)
   for (conditioning in c("conditional", "marginal")) {
+    prepared <- diagnostic_data(model, conditioning = conditioning, seed = 31)
+    for (input in list(model, prepared)) {
+      for (fun in list(residuals_linpred_plot, scalable_residuals_linpred_plot)) {
+        args <- list(model = input, conditioning = conditioning, seed = 31,
+          type = "quantile")
+        p <- do.call(fun, args)
+        expect_identical(p$labels$subtitle, "Family: gaussian")
+        expect_identical(p$labels$caption, paste("Conditioning:", conditioning))
+        for (caption in c("Custom caption", "")) {
+          expect_identical(do.call(fun, c(args, list(caption = caption)))$labels$caption, caption)
+        }
+        expect_null(do.call(fun, c(args, list(subtitle = NULL)))$labels$subtitle)
+      }
+      for (scalable in c(FALSE, TRUE)) {
+        panel <- appraise(input, conditioning = conditioning, type = "quantile",
+          seed = 31, scalable = scalable, n_simulate = 3)[[2L]]
+        expect_identical(panel$labels$subtitle, "Family: gaussian")
+        expect_identical(panel$labels$caption, paste("Conditioning:", conditioning))
+      }
+    }
     for (fun in list(qq_plot, worm_plot, scalable_qq_plot, scalable_worm_plot)) {
       args <- list(model = model, conditioning = conditioning, seed = 31,
         type = "quantile", n_simulate = 3)

@@ -545,8 +545,9 @@
 <text x='658.57' y='277.74' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text>
 <text x='552.26' y='289.87' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='76.43px' lengthAdjust='spacingAndGlyphs'>Linear predictor</text>
 <text transform='translate(370.36,163.83) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='88.06px' lengthAdjust='spacingAndGlyphs'>Pearson residuals</text>
-<text x='395.48' y='53.14' style='font-size: 11.00px; font-family: sans;' textLength='206.08px' lengthAdjust='spacingAndGlyphs'>Family: gaussian; conditioning: conditional</text>
+<text x='395.48' y='53.14' style='font-size: 11.00px; font-family: sans;' textLength='82.55px' lengthAdjust='spacingAndGlyphs'>Family: gaussian</text>
 <text x='395.48' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='165.83px' lengthAdjust='spacingAndGlyphs'>Residuals vs linear predictor</text>
+<text x='709.04' y='303.69' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='95.89px' lengthAdjust='spacingAndGlyphs'>Conditioning: conditional</text>
 </g>
 <defs>
   <clipPath id='cpMzguMjd8MzUxLjgzfDMzMy43OHw1MzkuNjM='>
