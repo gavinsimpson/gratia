@@ -2,8 +2,8 @@
 
 A tidy reimplementation of the functions implemented in
 [`mgcv::gamSim()`](https://rdrr.io/pkg/mgcv/man/gamSim.html) that can be
-used to fit GAMs. An new feature is that the sampling distribution can
-be applied to all the example types.
+used to fit GAMs. The sampling distribution can be applied to all the
+example types.
 
 ## Usage
 
@@ -19,7 +19,11 @@ data_sim(
   n_cat = 4,
   cuts = c(-1, 0, 5),
   seed = NULL,
-  gfam_families = c("binary", "tweedie", "normal")
+  gfam_families = c("binary", "tweedie", "normal"),
+  family = NULL,
+  predictors = NULL,
+  parameters = list(),
+  observation = NULL
 )
 ```
 
@@ -36,7 +40,12 @@ data_sim(
 
 - scale:
 
-  numeric; the level of noise to use.
+  numeric; for normal responses, the standard deviation; for Poisson and
+  negative binomial responses, a multiplier of the true function; for
+  binary responses, a multiplier after subtracting 5; for Gamma and
+  Tweedie responses, the dispersion. Ignored for ordinal responses.
+  Legacy numeric vectors are recycled across observations. Use
+  `parameters` with the family-object interface.
 
 - theta:
 
@@ -56,7 +65,7 @@ data_sim(
 - n_cat:
 
   integer; the number of categories for categorical response. Currently
-  only used for `distr %in% c("ocat", "ordered categorical")`.
+  only used for `dist %in% c("ocat", "ordered categorical")`.
 
 - cuts:
 
@@ -75,6 +84,58 @@ data_sim(
   grouped families for use with `family = gfam()`. The allowed
   distributions as as per `dist`.
 
+- family:
+
+  an instantiated family object, such as
+  [`poisson()`](https://rdrr.io/r/stats/family.html) or
+  [`mgcv::gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html). Cannot
+  be combined with explicitly supplied `dist`, `scale`, `theta`,
+  `power`, `n_cat`, `cuts` or `gfam_families`. See
+  [data_sim_families](https://gavinsimpson.github.io/gratia/reference/data_sim_families.md)
+  for coverage and generating parameters.
+
+- predictors:
+
+  `NULL` or a function of the generated data, including raw
+  true-function columns. Return a finite numeric vector for one linear
+  predictor or a matrix with one row per observation and one column per
+  linear predictor, in the family's order. These values are on the link
+  scale. `NULL` uses calibrated example predictors; see
+  [data_sim_families](https://gavinsimpson.github.io/gratia/reference/data_sim_families.md).
+
+- parameters:
+
+  a named list of natural-scale generating parameters. Parameters fixed
+  in the family constructor are used directly. Fitting starting values
+  are not generating parameters: supply the corresponding entries
+  explicitly. See
+  [data_sim_families](https://gavinsimpson.github.io/gratia/reference/data_sim_families.md)
+  for names and defaults.
+
+- observation:
+
+  `NULL` or a named list with `left`, `right` and/or `interval_width`,
+  for censored families. Limits and widths have length one or `n`.
+  Complete responses are generated before censoring. See
+  [data_sim_families](https://gavinsimpson.github.io/gratia/reference/data_sim_families.md)
+  for response encodings.
+
+## Value
+
+A tibble containing responses, covariates and true-function columns.
+Legacy `f` is the predictor after its distribution-specific
+transformation; component columns retain their original function values.
+With `family`, `f` is the first linear predictor, `y` can be a matrix
+column, and the `"truth"` attribute contains `eta` (all linear
+predictors), `parameters` (natural distribution parameters), `functions`
+(the original template), `response` (complete responses before
+censoring), and `family`. Grouped families also record `index` and
+component-specific parameter lists. Binomial family objects return
+proportions and a `trials` column for fitting weights. Cox models return
+observed times and a `status` column. An explicit `seed` restores the
+caller's RNG state, including its absence; `seed = NULL` advances the
+caller's RNG normally.
+
 ## Details
 
 `data_sim()` can simulate data from several underlying models of known
@@ -89,7 +150,7 @@ true functions. The available options currently are:
 
 - `"eg3"`: an example containing a continuous by smooth (varying
   coefficient) true model. The model is \\\hat{y}\_i =
-  f_2(x\_{1i})x\_{2i}\\ where the function \\f_2()\\ is \\f_2(x) = 0.2
+  f_2(x\_{2i})x\_{1i}\\ where the function \\f_2()\\ is \\f_2(x) = 0.2
   \* x^{11} \* (10 \* (1 - x))^6 + 10 \* (10 \* x)^3 \* (1 - x)^{10}\\.
 
 - `"eg4"`: a factor by smooth true model. The true model contains a
@@ -102,7 +163,7 @@ true functions. The available options currently are:
 
 - `"eg6"`: an additive plus random effect term true model.
 
-- ´"eg7"`: a version of the model in `"eg1"\`, but where the covariates
+- `"eg7"`: a version of the model in `"eg1"`, but where the covariates
   are correlated.
 
 - `"gwf2"`: a model where the response is Gu & Wahba's \\f_2(x_i)\\ plus
@@ -116,11 +177,15 @@ true functions. The available options currently are:
   [`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html). If this
   model is specified then `dist` is ignored and `gfam_families` is used
   to specify which distributions are included in the simulated data. Can
-  be a vector of any of the families allowed by `dist`. For
-  `"ocat" %in% gfam_families` (or `"ordered categorical"`), 4 classes
-  are assumed, which can't be changed. Link functions used are
-  `"identity"` for `"normal"`, `"logit"` for `"binary"`, `"ocat"`, and
-  `"ordered categorical"`, and `"exp"` elsewhere.
+  be a vector of the distributions allowed by `dist`, including repeated
+  names. Defaults use Gaussian standard deviation 0.5, Gamma dispersion
+  0.5, Tweedie dispersion 1.5, negative binomial size 3 and Tweedie
+  power 1.5. Historical grouped ordinal cuts are `c(1, 2, 2.5)`.
+  Explicit `scale`, `theta`, `power`, `n_cat` and `cuts` override these
+  settings. A supplied `scale` is the Gaussian standard deviation and
+  the Gamma or Tweedie dispersion. Identity, logit and log links are
+  used for normal, binary and positive-mean responses, respectively.
+  Ordinal responses use a logistic latent variable.
 
 The random component providing noise or sampling variation can follow
 one of the distributions, specified via argument `dist`
@@ -141,6 +206,21 @@ one of the distributions, specified via argument `dist`
 
 Other arguments provide the parameters for the distribution.
 
+## Shape-constrained examples
+
+Models named `"sc_increasing"`, `"sc_decreasing"`, `"sc_convex"`,
+`"sc_concave"`, `"sc_positive"`, `"sc_increasing_convex"`,
+`"sc_increasing_concave"`, `"sc_decreasing_convex"` and
+`"sc_decreasing_concave"` provide univariate reference shapes on
+`[0, 1]`. `"sc_additive"` combines four terms; `"sc_tensor"` is
+increasing in two coordinates; `"sc_location_scale"` has a concave
+log-mean and increasing log dispersion. The latter defaults to
+`family = mgcv::gammals()`; other shape templates default to Gaussian
+noise with standard deviation 0.2. See
+[data_sim_shapes](https://gavinsimpson.github.io/gratia/reference/data_sim_shapes.md)
+for functions, derivatives and
+[`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) recipes.
+
 ## References
 
 Gu, C., Wahba, G., (1993). Smoothing Spline ANOVA with Component-Wise
@@ -149,6 +229,11 @@ Bayesian "Confidence Intervals." *J. Comput. Graph. Stat.* **2**,
 
 Luo, Z., Wahba, G., (1997). Hybrid adaptive splines. *J. Am. Stat.
 Assoc.* **92**, 107–116.
+
+## See also
+
+[data_sim_families](https://gavinsimpson.github.io/gratia/reference/data_sim_families.md),
+[data_sim_shapes](https://gavinsimpson.github.io/gratia/reference/data_sim_shapes.md)
 
 ## Examples
 

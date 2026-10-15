@@ -464,6 +464,10 @@ GAM workflows.
 
 - [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md)
   : Simulate example data for fitting GAMs
+- [`data_sim_families`](https://gavinsimpson.github.io/gratia/reference/data_sim_families.md)
+  : Generating responses with mgcv family objects
+- [`data_sim_shapes`](https://gavinsimpson.github.io/gratia/reference/data_sim_shapes.md)
+  : Reference functions for shape-constrained GAMs
 - [`gw_f0()`](https://gavinsimpson.github.io/gratia/reference/gw_functions.md)
   [`gw_f1()`](https://gavinsimpson.github.io/gratia/reference/gw_functions.md)
   [`gw_f2()`](https://gavinsimpson.github.io/gratia/reference/gw_functions.md)
