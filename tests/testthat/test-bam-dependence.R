@@ -39,17 +39,21 @@ test_that("discrete nonGaussian and extended-family BAM retain marginal diagnost
       expect_true(all(is.finite(residual)))
       p <- qq_plot(model, type = type, seed = 19)
       expect_false(any(c("lower", "upper") %in% names(p$data)))
-      expect_match(p$labels$subtitle, "GEE working AR1")
+      expect_identical(p$labels$subtitle,
+        if (type == "pit") "Method: uniform" else "Method: std. normal")
+      expect_identical(p$labels$caption, "bands omitted")
       expect_equal(p$data$residuals, sort(residual))
     }
     for (fun in list(qq_plot, worm_plot, scalable_qq_plot)) {
       p <- fun(model, n_simulate = 3, seed = 19)
       expect_false(any(c("lower", "upper") %in% names(p$data)))
-      expect_match(p$labels$subtitle, "Marginal distribution check")
+      expect_identical(p$labels$subtitle, "Method: marginal")
+      expect_identical(p$labels$caption, "bands omitted")
       expect_silent(ggplot2::ggplot_build(p))
     }
     p <- qq_plot(model, method = "uniform", n_simulate = 3, seed = 19)
-    expect_match(p$labels$subtitle, "Marginal distribution check")
+    expect_identical(p$labels$subtitle, "Method: marginal")
+    expect_identical(p$labels$caption, "bands omitted")
     p <- qq_plot(model, method = "normal")
     expect_false("lower" %in% names(p$data))
     expect_error(qq_plot(model, method = "simulate"), "Joint response")
@@ -82,7 +86,8 @@ test_that("BAM standardized and IRLS residual correlations are explicitly approx
   expect_equal(residual_correlation(model, type = "working.standardized", lag_max = 3),
     expected, ignore_attr = TRUE)
   p <- residual_correlation_plot(model, type = "working.standardized", lag_max = 3)
-  expect_match(p$labels$subtitle, "Approximate")
+  expect_null(p$labels$subtitle)
+  expect_match(attr(p$data, "description"), "Approximate BAM")
   expect_false(any(c("lower", "upper") %in% names(p$data)))
   expect_silent(ggplot2::ggplot_build(p))
 })
