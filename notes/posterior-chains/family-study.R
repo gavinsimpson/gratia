@@ -23,6 +23,17 @@ if (!is.null(completed)) {
 }
 rows <- if (is.null(completed)) list() else list(completed)
 coefficients <- if (file.exists(coefficient_file)) list(read.csv(coefficient_file)) else list()
+# Refresh selected families without discarding measurements for other cases.
+refresh <- strsplit(Sys.getenv("GRATIA_BENCH_REFRESH", ""), ",", fixed = TRUE)[[1L]]
+refresh <- refresh[nzchar(refresh)]
+if (length(refresh)) {
+  if (any(!refresh %in% cases$family)) stop("Unknown family in GRATIA_BENCH_REFRESH.")
+  if (!is.null(completed)) completed <- completed[!completed$family %in% refresh, ]
+  rows <- if (is.null(completed)) list() else list(completed)
+  if (length(coefficients)) coefficients <- list(coefficients[[1L]][
+    !coefficients[[1L]]$family %in% refresh, ])
+  cases <- cases[cases$family %in% refresh, ]
+}
 for (i in seq_len(nrow(cases))) {
   methods <- if (cases$family[i] %in% c("poisson", "binomial", "sparse")) {
     c("mgcv", "gratia", "family")

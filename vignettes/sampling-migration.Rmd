@@ -208,7 +208,38 @@ version rejects offsets when fitting `shash()` and drops call-level offsets
 for general-family fits; gratia cannot reconstruct offsets never applied by
 the fitter. Prefer supported formula offsets.
 
-Grouped-family posterior response draws still require fitting observations.
+## Grouped response families
+
+`posterior_samples()` also accepts fitting-data subsets and new covariates for
+`mgcv::gfam()` models. Every row must identify its component family, either
+through the response-index expression in the supplied data or through
+`family_index`. Observed response values are not needed. For example:
+
+```r
+posterior_samples(grouped_model, data = evaluation_data,
+  family_index = component_index, n_draws = 1000, chains = 4, seed = 281)
+```
+
+The same joint coefficient draw is used for every component. Component-specific
+links, fitted nuisance parameters and formula offsets are retained. New-data
+sampling weights default to one; explicit weights override them. Output retains
+`.parameter = "component1"`, `"component2"`, and so on, together with `.row`,
+`.draw` and any chain columns. Missing predictors, membership or sampling weights
+produce missing responses. Fitting rows excluded by `na.exclude` are restored.
+Smooth samples retain their predictor contributions, and response derivatives
+use each row's component mean. For derivatives, membership must be recoverable
+from `data`; `derivative_samples()` does not accept `family_index`.
+Ordinal response-scale fitted values and their
+derivatives remain unsupported; response draws and predictor-scale calculations
+remain available. Censored grouped components require an observation process
+for posterior response sampling; use `simulate()` for latent uncensored draws.
+
+MH coefficient sampling rejects BAM fits with nonzero prescribed smooth
+contributions, such as a nonzero soap-film boundary. Native fitting and
+prediction can use different offsets for those fits. Supplied coefficient
+draws can still be evaluated with the native prediction conventions.
+
+## Censoring and survival responses
 Censored-family generators return latent uncensored responses; posterior
 predictive checks need a censoring observation process. Cox survival models
 lack a response generator for this interface, and expected survival times

@@ -12,7 +12,8 @@ output <- list()
 for (name in names(fits)) {
   m <- fits[[name]]
   info <- ns$sampling_smoothing_info(m)
-  mixture <- ns$sampling_smoothing_mixture(m, n = 100, seed = 281)
+  mixture <- tryCatch(ns$sampling_smoothing_mixture(m, n = 100, seed = 281),
+    error = identity)
   fixed <- post_draws(m, n_draws = 10000, seed = 281)
   corrected <- post_draws(m, n_draws = 10000, seed = 281, unconditional = TRUE)
   output[[name]] <- list(
@@ -21,8 +22,10 @@ for (name in names(fits)) {
     db.drho.dim = dim(info$db.drho), Vc.dim = dim(info$Vc),
     mean_sd_fixed = mean(apply(fixed, 2, sd)),
     mean_sd_corrected = mean(apply(corrected, 2, sd)),
-    mixture_failures = sum(!is.na(mixture$failures)),
-    mean_sd_mixture = mean(apply(mixture$bs, 2, sd, na.rm = TRUE)))
+    mixture_status = if (inherits(mixture, "error")) conditionMessage(mixture) else "supported",
+    mixture_failures = if (inherits(mixture, "error")) NA_integer_ else sum(!is.na(mixture$failures)),
+    mean_sd_mixture = if (inherits(mixture, "error")) NA_real_ else
+      mean(apply(mixture$bs, 2, sd, na.rm = TRUE)))
 }
 # Reconstruct a discrete prediction representation once from the fitted bases.
 # This is a research adapter to mgcv internals, not a public sampling backend.

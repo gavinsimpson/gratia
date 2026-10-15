@@ -148,28 +148,43 @@ validation.
 
 ## Log-smoothing parameter uncertainty
 
-`feasibility.txt` records the retained information for Gaussian REML gam,
-fREML bam, and discrete fREML bam fits with two estimated smoothing parameters.
-All retain `db.drho` and `Vc`. The gam stores a 3-by-3 `V.sp` with `spind = 1:2`;
-the bam examples store a 2-by-2 `V.sp`, while `sp.vcov()` returns 3-by-3 matrices.
-The extra dimension in these examples concerns log dispersion. Array dimensions
-must be checked before extracting a smoothing block.
+The internal prototype uses cached Gaussian conditional distributions instead
+of refitting for every draw. It mixes those distributions over an approximate
+normal distribution of fitted log-smoothing parameters, with dispersion fixed.
+This approximation does not specify hyperpriors or sample a joint posterior
+for coefficients, smoothing parameters and dispersion.
 
-The Gaussian mixture prototype draws approximate log-smoothing parameters from
-the fitted `V.sp` block, refits the conditional coefficient mode and covariance
-at each draw with dispersion held fixed, and then draws coefficients. It records
-failed refits explicitly. The study runs 100 mixture draws and compares their
-coefficient standard deviations with fixed-smoothing Gaussian draws and the
-existing `unconditional = TRUE` correction. This establishes a route for further
-work, rather than validating a replacement for the corrected covariance.
+The audit covers shared smoothing parameters, partly fixed penalties, tensor
+products, gam ML/REML and bam fREML. It verifies the log-scale positions in
+`V.sp` and `sp.vcov()` and the expansion matrix for shared parameters. In the
+installed mgcv, fREML bam stores `db.drho` in an internal fitting basis, so the
+prototype computes derivatives directly in fitted coefficient coordinates.
+Conditional means and covariances agree with fitted models and independent
+fixed-smoothing refits. The original research entry point now uses this
+verified setup, replacing its unsafe extraction for shared parameters.
 
-This approximation uses the fitted distribution of log-smoothing estimates;
-it is not joint posterior MCMC with specified hyperpriors. Refitting for every
-smoothing draw is also costly for large bam models. A future method needs a
-validated parameter mapping and a less expensive way to update the conditional
-coefficient distribution. Changing only the MH proposal covariance would leave
-its conditional posterior target unchanged.
+Seven supported fits each used 20,000 mixture draws. Independent numerical
+integration verifies a one-parameter mixture; the law of total variance
+separates average conditional covariance from covariance of conditional means.
+A positive contribution from varying conditional means does not guarantee an
+increase over covariance evaluated at one fitted smoothing parameter value.
 
+Discrete bam remains excluded until its compressed fitting design can be
+reconstructed consistently. Non-Gaussian conditional updates, dispersion
+uncertainty, minimum smoothing parameters and edge-corrected smoothing
+covariances remain separate work. See [smoothing-report.md](smoothing-report.md)
+for evidence, restrictions and reproduction instructions.
+
+## Follow-up performance and mixing studies
+
+[response-report.md](response-report.md) compares previous and optimised LSS
+response generation, checking exact seeded output and recording allocation
+traffic. [grouped-support.md](grouped-support.md) describes supplied-data
+posterior responses for grouped families and their remaining restrictions.
+[difficult-report.md](difficult-report.md) compares longer runs of all three
+MH backends, MALA and elliptical slice sampling on sparse binomial, rare-count
+Poisson and higher-dimensional sparse-binomial posteriors. It includes
+coefficient and derived-quantity diagnostics, timings and memory measurements.
 
 ## Sampling argument migration
 

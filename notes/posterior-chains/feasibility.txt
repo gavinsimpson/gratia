@@ -1,7 +1,7 @@
 Loading required package: nlme
 This is mgcv 1.9-4. For overview type '?mgcv'.
 List of 3
- $ gam         :List of 11
+ $ gam         :List of 12
   ..$ method           : chr "REML"
   ..$ sp               : Named num [1:2] 0.0103 0.0179
   .. ..- attr(*, "names")= chr [1:2] "s(x)" "s(z)"
@@ -12,9 +12,10 @@ List of 3
   ..$ Vc.dim           : int [1:2] 10 10
   ..$ mean_sd_fixed    : num 0.282
   ..$ mean_sd_corrected: num 0.285
+  ..$ mixture_status   : chr "supported"
   ..$ mixture_failures : int 0
-  ..$ mean_sd_mixture  : num 0.278
- $ bam         :List of 11
+  ..$ mean_sd_mixture  : num 0.277
+ $ bam         :List of 12
   ..$ method           : chr "fREML"
   ..$ sp               : Named num [1:2] 0.0103 0.0179
   .. ..- attr(*, "names")= chr [1:2] "s(x)" "s(z)"
@@ -25,9 +26,10 @@ List of 3
   ..$ Vc.dim           : int [1:2] 10 10
   ..$ mean_sd_fixed    : num 0.253
   ..$ mean_sd_corrected: num 0.256
+  ..$ mixture_status   : chr "supported"
   ..$ mixture_failures : int 0
   ..$ mean_sd_mixture  : num 0.25
- $ bam_discrete:List of 11
+ $ bam_discrete:List of 12
   ..$ method           : chr "fREML"
   ..$ sp               : Named num [1:2] 0.0103 0.0179
   .. ..- attr(*, "names")= chr [1:2] "s(x)" "s(z)"
@@ -38,5 +40,6 @@ List of 3
   ..$ Vc.dim           : int [1:2] 10 10
   ..$ mean_sd_fixed    : num 0.282
   ..$ mean_sd_corrected: num 0.285
-  ..$ mixture_failures : int 0
-  ..$ mean_sd_mixture  : num 0.277
+  ..$ mixture_status   : chr "The smoothing-mixture prototype does not support discrete bam: the compressed fitting design can differ from ev"| __truncated__
+  ..$ mixture_failures : int NA
+  ..$ mean_sd_mixture  : num NA

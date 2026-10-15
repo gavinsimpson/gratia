@@ -163,14 +163,15 @@ when predicting without responses or with a complex response expression.
 An explicit index must agree with membership recoverable from \code{data}.}
 }
 \value{
-A tibble (data frame) with 3 columns containing the posterior
-predicted values in long format. The columns are
+A tibble (data frame) in long format, with columns:
 \itemize{
-\item \code{.row} (integer) the row of \code{data} that each posterior draw relates to,
-\item \code{.draw} (integer) an index, in range \code{1:n_draws}, indicating which draw each row
-relates to,
-\item \code{.response} (numeric) the predicted response for the indicated row of
-\code{data}.
+\item \code{.row}: row of the evaluation data;
+\item \code{.draw}: globally unique draw identifier;
+\item \code{.parameter}: \code{"location"} for scalar fitted values, or a response/category
+label for multivariate or multinomial models;
+\item \code{.fitted}: expected response or linear predictor, as selected by \code{scale}.
+Multiple-chain output also includes \code{.chain} and \code{.iteration}. Attached
+coefficient diagnostics are available through \code{\link[=sampling_diagnostics]{sampling_diagnostics()}}.
 }
 }
 \description{

@@ -79,30 +79,11 @@ sampling_smoothing_info <- function(model) {
 }
 
 sampling_smoothing_mixture <- function(model, n = 100L, seed = 42L) {
-  fam <- stats::family(model)
-  if (fam$family != "gaussian" || fam$link != "identity") stop(
-    "The smoothing-mixture prototype currently supports Gaussian identity fits.", call. = FALSE)
-  V <- model$V.sp
-  p <- length(model$sp)
-  if (is.null(V) || p == 0L) stop("No log-smoothing covariance is available.", call. = FALSE)
-  ind <- attr(V, "spind") %||% seq_len(p)
-  if (length(ind) != p || max(ind) > nrow(V)) stop(
-    "Cannot identify the log-smoothing covariance block.", call. = FALSE)
-  withr::with_seed(seed, {
-    rho <- mgcv::rmvn(n, log(model$sp), V[ind, ind, drop = FALSE])
-    rho <- matrix(rho, nrow = n)
-    out <- matrix(NA_real_, n, length(coef(model)))
-    failures <- rep(NA_character_, n)
-    for (i in seq_len(n)) {
-      # Refitting updates both the conditional mode and covariance. This is
-      # an approximate marginal mixture, not a joint posterior MCMC update.
-      fit <- tryCatch(stats::update(model, data = model$model, sp = exp(rho[i, ]), scale = model$sig2),
-        error = identity)
-      if (inherits(fit, "error")) {
-        failures[i] <- conditionMessage(fit)
-      } else out[i, ] <- mgcv::rmvn(1L, stats::coef(fit), stats::vcov(fit))
-    }
-    colnames(out) <- names(coef(model))
-    list(bs = out, log_sp = rho, failures = failures, info = sampling_smoothing_info(model))
-  })
+  # Keep the original research entry point, using the verified mapping and
+  # cached conditional distributions instead of re-evaluating fitting calls.
+  setup <- sampling_smoothing_setup(model)
+  out <- sampling_smoothing_draws(setup, n_draws = n, seed = seed)
+  out$failures <- rep(NA_character_, nrow(out$bs))
+  out$info <- sampling_smoothing_info(model)
+  out
 }

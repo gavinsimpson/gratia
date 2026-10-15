@@ -46,10 +46,14 @@ sampling_target <- function(model, block_size = 10000L, dense_limit = 5e6,
       type = "lpmatrix", na.action = stats::na.pass)
     if (ncol(X) != p || any(!is.finite(X))) stop(
       "The posterior design matrix does not match the fitted coefficients.", call. = FALSE)
+    sampling_check_bam_fixed(model, X, "gratia")
     X
   }
   dense <- length(y) * p <= dense_limit
-  X <- if (dense) design(seq_along(y)) else NULL
+  X <- if (dense) design(seq_along(y)) else {
+    sampling_probe_bam_fixed(model, block_size = block_size)
+    NULL
+  }
   V <- unname(stats::vcov(model))
   R <- tryCatch(chol(V), error = function(e) NULL)
   list(model = if (dense) NULL else model, X = X, blocks = blocks,
@@ -204,20 +208,23 @@ sampling_factor <- function(target) {
 sampling_target_check <- function(model, backend) {
   if (!inherits(model, "gam") || inherits(model, "scam") ||
       isTRUE(attr(model, "gratia.gamm4"))) stop(
-    "The ", backend, " MH backend requires an ordinary gam or bam fit.", call. = FALSE)
+    sampling_target_label(backend), " requires an ordinary gam or bam fit.", call. = FALSE)
+  if (has_inequality_constraints(model)) stop(
+    sampling_target_label(backend, mh = FALSE), " does not support linear inequality constraints; ",
+    "its posterior evaluator does not enforce them.", call. = FALSE)
   if (any(startsWith(model$method %||% "", "lme.")) ||
       identical(model$method, "PQL")) stop(
-    "The ", backend, " MH backend does not support GAMM components; use Gaussian sampling.",
+    sampling_target_label(backend), " does not support GAMM components; use Gaussian sampling.",
     call. = FALSE)
   if (!is.null(model$AR1.rho) && model$AR1.rho != 0) stop(
-    "The ", backend, " MH backend requires independent observations (rho = 0).", call. = FALSE)
+    sampling_target_label(backend), " requires independent observations (rho = 0).", call. = FALSE)
 }
 
 sampling_target_penalty <- function(model, backend) {
   unsupported <- c("paraPen", "H", "G")
   if (!is.null(model$paraPen) || any(vapply(unsupported, function(nm) {
     !is.null(model$call[[nm]]) && !identical(model$call[[nm]], quote(NULL))
-  }, logical(1L)))) stop("The ", backend, " MH backend does not yet support 'paraPen', 'H', or pre-fit 'G' objects.", call. = FALSE)
+  }, logical(1L)))) stop(sampling_target_label(backend), " does not yet support 'paraPen', 'H', or pre-fit 'G' objects.", call. = FALSE)
   p <- length(stats::coef(model))
   # full.sp expands shared and fixed smoothing parameters to penalty order.
   sp <- model$full.sp %||% model$sp
@@ -234,4 +241,41 @@ sampling_target_penalty <- function(model, backend) {
     }
   }
   S
+}
+
+sampling_target_label <- function(backend, mh = TRUE) {
+  if (identical(backend, "smoothing-mixture")) return("The smoothing uncertainty prototype")
+  paste0("The ", backend, if (mh) " MH backend" else " backend")
+}
+
+sampling_check_bam_fixed <- function(model, X, backend) {
+  if (inherits(model, "bam")) {
+    fixed <- attr(X, "offset", exact = TRUE)
+    if (!is.null(fixed) && any(fixed != 0, na.rm = TRUE)) stop(
+      sampling_target_label(backend), " does not support BAM fits with nonzero ",
+      "prescribed smooth contributions: mgcv fitting and prediction do not ",
+      "represent those contributions consistently.", call. = FALSE)
+  }
+  invisible(NULL)
+}
+
+# Ordinary BAM models need only one row to establish that no smooth attaches
+# a fixed contribution. If the attribute exists but its first value is zero,
+# inspect remaining fitting rows in bounded blocks before accepting the fit.
+sampling_probe_bam_fixed <- function(model, block_size) {
+  if (!inherits(model, "bam")) return(invisible(NULL))
+  n <- NROW(model$model)
+  design <- function(rows) mgcv::predict.gam(model,
+    newdata = model$model[rows, , drop = FALSE], type = "lpmatrix",
+    na.action = stats::na.pass)
+  first <- design(1L)
+  sampling_check_bam_fixed(model, first, "gratia")
+  if (is.null(attr(first, "offset", exact = TRUE)) || n == 1L) {
+    return(invisible(NULL))
+  }
+  for (start in seq.int(2L, n, by = block_size)) {
+    X <- design(seq.int(start, min(n, start + block_size - 1L)))
+    sampling_check_bam_fixed(model, X, "gratia")
+  }
+  invisible(NULL)
 }

@@ -395,3 +395,65 @@ test_that("missing explicit weights suppress LSS responses consistently", {
     expect_true(all(is.na(absent$.response)), info = name)
   }
 })
+
+test_that("response assembly preserves the original generator calls and RNG state", {
+  # Reconstruct the earlier per-draw calculation, including row restoration,
+  # without using the optimised design cache or response table assembly.
+  legacy <- function(context, b, weights) {
+    rd <- missing_safe_rd(fix_family_rd(context$family)$rd)
+    wt <- lss_sampling_weights(context, weights)
+    dplyr::bind_rows(lapply(seq_len(NROW(b)), function(i) {
+      response <- if (all(is.na(context$layout$map))) rep(NA_real_, NROW(context$X)) else {
+        mu <- family_prediction_parameters(context$family, lss_predictors(context, b[i, ]))
+        rd(mu = mu, wt = wt, scale = context$model$sig2 %||% 1)
+      }
+      restore_prediction_table(tibble::tibble(.row = seq_len(NROW(context$X)),
+        .draw = i, .parameter = "response", .response = as.numeric(response)), context$layout)
+    }))
+  }
+  for (name in c("gaulss", "gammals", "gumbls", "gevlss", "shash", "twlss", "ziplss")) {
+    m <- lss_test_models(name)
+    b <- post_draws(m, n_draws = 12, chains = 3, seed = 91)
+    nd <- data.frame(x = c(.2, NA, .7), o1 = .03, o2 = -.02, o3 = 0, o4 = 0)
+    for (data in list(NULL, nd, nd[2, , drop = FALSE])) {
+      context <- lss_prediction_context(m, data)
+      weights <- if (is.null(data)) NULL else rep(c(2, NA_real_, 1), length.out = NROW(data))
+      withr::local_seed(93)
+      expected <- legacy(context, b, weights)
+      state <- .Random.seed
+      set.seed(93)
+      actual <- lss_response_draws(context, b, weights)
+      expect_identical(actual, expected, info = name)
+      expect_identical(.Random.seed, state, info = name)
+      set.seed(93)
+      streamed <- dplyr::bind_rows(lapply(seq_len(NROW(b)), lss_response_sampler(context, b, weights)))
+      expect_identical(streamed, expected, info = name)
+      expect_identical(.Random.seed, state, info = name)
+    }
+    # Omitting invalid rows keeps their original row numbers and generator order.
+    context <- lss_prediction_context(m, nd, na.action = na.omit)
+    expect_identical(withr::with_seed(93, lss_response_draws(context, b)),
+      withr::with_seed(93, legacy(context, b, NULL)), info = name)
+  }
+})
+
+
+test_that("LSS response assembly rejects malformed family generator output", {
+  m <- lss_test_models()
+  b <- matrix(lss_test_beta("gaulss"), 1L)
+  nd <- data.frame(x = c(.2, .5, .8), o1 = .03, o2 = -.02)
+  bad_generators <- list(function(mu, wt, scale) numeric(),
+    function(mu, wt, scale) seq_len(2 * NROW(mu)),
+    function(mu, wt, scale) matrix(1, NROW(mu), 1),
+    function(mu, wt, scale) rep("response", NROW(mu)))
+  for (generator in bad_generators) {
+    m$family$rd <- generator
+    for (weights in list(rep(1, 3), c(1, NA_real_, 1))) {
+      expect_error(posterior_samples(m, data = nd, method = "user", draws = b,
+        weights = weights), "must return one numeric response per observation")
+      context <- lss_prediction_context(m, nd)
+      sampler <- lss_response_sampler(context, b, weights)
+      expect_error(sampler(1L), "must return one numeric response per observation")
+    }
+  }
+})

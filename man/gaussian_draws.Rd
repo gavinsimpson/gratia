@@ -117,6 +117,10 @@ models, GAMM components, AR1 dependence, \code{paraPen}, \code{H}, and pre-fit \
 are unsupported. The fitted coefficient covariance must be nonsingular.
 It always caches the full design matrix; \code{block_size} and \code{dense_limit} apply
 only to the gratia backend and are rejected for the family backend.
+The new MH backends reject \code{bam} fits with nonzero prescribed smooth
+contributions: mgcv fitting and prediction can use different offsets for
+those fits. Supplied coefficient draws can still be evaluated with the
+native prediction conventions.
 
 All MH backends sample the conditional coefficient posterior with fitted
 smoothing, dispersion, and additional family parameters fixed. Parameters

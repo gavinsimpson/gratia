@@ -14,6 +14,7 @@
   Gaussian threads use `n_threads`, while `n_cores` limits concurrent MH chains.
   Explicit controls that do not apply to the selected sampler are rejected.
   See `vignette("sampling-migration")`.
+
 * `fitted_samples()` rejects response-scale requests for general families
   without an expected-response adapter. Use `scale = "linear_predictor"`
   for the first predictor. Supported LSS families use their full expected
@@ -103,6 +104,8 @@
   means that depend on scale, shape or hurdle probabilities. Fixed-coefficient
   response sampling uses the same parameter transformations. Missing predictors
   or explicit sampling weights produce `NA` response draws consistently.
+  LSS response generation now reuses model-matrix blocks and constructs
+  the output table once, preserving seeded responses and chain identities.
 
 * `mh_backend = "gratia"` adds a compiled MH evaluator for common response
   families in ordinary gam and bam fits with independent observations. Large
@@ -113,6 +116,9 @@
   chains. Smoothing parameters and parameters outside the coefficient vector
   remain fixed; LSS scale and shape coefficients vary jointly with location.
   The default backend remains `mgcv::gam.mh()`.
+  The new backends reject BAM fits with nonzero prescribed smooth contributions,
+  where native fitting and prediction use different offsets.
+
 * Diagnostic plots now support native inlaws families through their supplied
   `gratia_diagnostics` functions, including grouped-family fits and models
   with multiple response columns.
@@ -285,8 +291,12 @@
 * Grouped-family models fitted with `mgcv::gfam()` now support response-scale
   `fitted_samples()` with component-specific mean transforms (#269), and
   `simulate()` with component-specific distributions and parameters (#272).
-  Both accept `family_index` for prediction data; ordinal response-scale
-  fitted draws remain unsupported.
+  These functions and `posterior_samples()` accept supplied data and
+  `family_index` for component membership without observed responses. Posterior
+  responses preserve joint coefficient draws, component labels, offsets and
+  sampling weights; ordinal response-scale fitted draws remain unsupported.
+  Derivative sampling retains family membership when shifting supplied
+  covariates.
 
 * Support for classed gamm4 models now covers smooths, parametric effects,
   predictions, derivatives, simulations, posterior draws and variance

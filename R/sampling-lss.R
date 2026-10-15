@@ -12,12 +12,7 @@ lss_prediction_context <- function(model, data = NULL, layout = NULL, ...) {
   model <- model_used_rows(model)
   X <- predict_model(model, newdata = layout$data, type = "lpmatrix", ...)
   idx <- attr(X, "lpi") %||% lss_eta_index(model)
-  offsets <- attr(X, "model.offset")
-  if (!is.list(offsets)) offsets <- list(offsets)
-  offsets <- lapply(seq_along(idx), function(i) {
-    off <- if (i <= length(offsets)) offsets[[i]] %||% 0 else 0
-    rep_len(off, NROW(X))
-  })
+  offsets <- prediction_offsets(model, X)
   if (layout$training) {
     eta <- matrix(predict_model(model, type = "link", ...) +
       fitting_link_correction(model), nrow = NROW(X))
@@ -94,22 +89,59 @@ lss_sampling_weights <- function(context, weights = NULL) {
   if (!length(weights)) 1 else weights
 }
 
-lss_response_sampler <- function(context, betas, weights = NULL) {
+# Cache design blocks once. Keep the same matrix-vector products and one family
+# generator call per draw so numerical results and RNG order remain unchanged.
+lss_response_generator <- function(context, betas, weights = NULL) {
   rd <- fix_family_rd(context$family)$rd
   if (!is.function(rd)) stop("No response generator for family <",
     family_name(context$family), ">.", call. = FALSE)
+  family_rd <- rd
+  rd <- function(mu, wt, scale) {
+    value <- family_rd(mu = mu, wt = wt, scale = scale)
+    if ((!is.numeric(value) && !is.logical(value)) || !is.null(dim(value)) ||
+        length(value) != NROW(mu)) stop("The response generator for family <",
+      family_name(context$family), "> must return one numeric response per observation.",
+      call. = FALSE)
+    value
+  }
   rd <- missing_safe_rd(rd)
   wt <- lss_sampling_weights(context, weights)
   dispersion <- context$model$sig2 %||% 1
+  design <- lapply(context$index, function(j) context$X[, j, drop = FALSE])
+  missing <- all(is.na(context$layout$map))
+  function(i) {
+    if (missing) return(rep(NA_real_, NROW(context$X)))
+    eta <- do.call(cbind, lapply(seq_along(design), function(k) {
+      drop(design[[k]] %*% betas[i, context$index[[k]]])
+    })) + context$offsets
+    mu <- family_prediction_parameters(context$family, eta)
+    as.numeric(rd(mu = mu, wt = wt, scale = dispersion))
+  }
+}
+
+# Streaming diagnostic calculations still request one draw at a time.
+lss_response_sampler <- function(context, betas, weights = NULL) {
+  generate <- lss_response_generator(context, betas, weights)
   out <- function(i) {
-    response <- if (all(is.na(context$layout$map))) rep(NA_real_, NROW(context$X)) else {
-      mu <- family_prediction_parameters(context$family, lss_predictors(context, betas[i, ]))
-      rd(mu = mu, wt = wt, scale = dispersion)
-    }
     value <- tibble::tibble(.row = seq_len(NROW(context$X)), .draw = i,
-      .parameter = "response", .response = as.numeric(response))
+      .parameter = "response", .response = generate(i))
     restore_prediction_table(value, context$layout)
   }
   attr(out, "sampling") <- attr(betas, "sampling")
   out
+}
+
+# Public output necessarily contains every response. Fill its values directly
+# and restore missing rows by position, then construct the table once.
+lss_response_draws <- function(context, betas, weights = NULL) {
+  generate <- lss_response_generator(context, betas, weights)
+  layout <- context$layout
+  n <- length(layout$map)
+  draws <- NROW(betas)
+  values <- matrix(NA_real_, n, draws)
+  for (i in seq_len(draws)) values[, i] <- generate(i)[layout$map]
+  dim(values) <- NULL
+  tibble::tibble(.row = rep(layout$rows, draws),
+    .draw = rep(seq_len(draws), each = n), .parameter = "response",
+    .response = values)
 }

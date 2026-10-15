@@ -95,6 +95,10 @@
 #' are unsupported. The fitted coefficient covariance must be nonsingular.
 #' It always caches the full design matrix; `block_size` and `dense_limit` apply
 #' only to the gratia backend and are rejected for the family backend.
+#' The new MH backends reject `bam` fits with nonzero prescribed smooth
+#' contributions: mgcv fitting and prediction can use different offsets for
+#' those fits. Supplied coefficient draws can still be evaluated with the
+#' native prediction conventions.
 #'
 #' All MH backends sample the conditional coefficient posterior with fitted
 #' smoothing, dispersion, and additional family parameters fixed. Parameters

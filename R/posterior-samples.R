@@ -24,6 +24,10 @@
 #' @param unconditional logical; if `TRUE` (and `frequentist == FALSE`) then the
 #'   Bayesian smoothing parameter uncertainty corrected covariance matrix is
 #'   used, if available.
+#' @param family_index numeric; optional family-list positions for grouped
+#'   family ([mgcv::gfam()]) response draws, one integer per evaluation row.
+#'   Membership can instead be recovered from the response-index expression
+#'   in `data`; observed response values are not required.
 #' @param weights numeric; response sampling weights for GAM methods. An
 #'   explicit vector overrides the fitting weights; a single value applies to
 #'   every observation. With `data = NULL`, the default is the fitted prior
@@ -78,7 +82,8 @@
 #' [mgcv::gumbls()], [mgcv::gevlss()], [mgcv::shash()], [mgcv::twlss()] and
 #' [mgcv::ziplss()] support fitting observations, subsets and new covariates.
 #' Every distribution parameter is computed from the same joint coefficient
-#' draw. Evaluation data need predictors and formula-offset variables, but no
+#' draw. Formula offsets and prescribed smooth contributions are retained.
+#' Evaluation data need predictors and formula-offset variables, but no
 #' observed response. In `gaulss()`, the second response parameter is inverse
 #' standard deviation: sampling uses its reciprocal, divided by the square
 #' root of the sampling weight. Other LSS generators currently ignore sampling
@@ -89,7 +94,11 @@
 #' do not have a response generator for this interface. Censored-family draws
 #' are latent, uncensored responses; reproducing observed censoring requires
 #' an observation process and remains unsupported in posterior predictive checks.
-#' Grouped-family posterior response sampling still uses fitting observations.
+#' Grouped-family posterior response draws support fitting observations and
+#' supplied data with known family membership. Component nuisance parameters
+#' remain fixed. `.parameter` identifies the component used for each row.
+#' Censored grouped components require an observation process; use `simulate()`
+#' for their latent, uncensored responses.
 #'
 #' # Note
 #'
@@ -101,13 +110,13 @@
 #' in the formula when predicting at new data; the required offset variables
 #' must then be present in `data`.
 #'
-#' @return A tibble (data frame) with 3 columns containing the posterior
-#'   predicted values in long format. The columns are
-#' * `.row` (integer) the row of `data` that each posterior draw relates to,
-#' * `.draw` (integer) an index, in range `1:n_draws`, indicating which draw each row
-#'     relates to,
-#' * `.response` (numeric) the predicted response for the indicated row of
-#'     `data`.
+#' @return A tibble (data frame) in long format, with columns:
+#' * `.row`: row of the evaluation data;
+#' * `.draw`: globally unique draw identifier;
+#' * `.response`: simulated response.
+#' Where needed, `.parameter` identifies the response or grouped component.
+#' Multiple-chain output also includes `.chain` and `.iteration`. Attached
+#' coefficient diagnostics are available through [sampling_diagnostics()].
 #'
 #' @author Gavin L. Simpson
 #'
@@ -165,7 +174,8 @@
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e6,
-  weights = NULL
+  weights = NULL,
+  family_index = NULL
 ) {
   sampling_check_names(substitute(list(...)), derivative = FALSE)
   sampling_check_extra(substitute(list(...)), prediction = TRUE)
@@ -213,6 +223,7 @@
     freq = frequentist,
     unconditional = unconditional,
     weights = weights,
+    family_index = family_index,
     draws = draws,
     mvn_method = mvn_method,
     ...
@@ -243,7 +254,8 @@
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e6,
-  weights = NULL
+  weights = NULL,
+  family_index = NULL
 ) {
   sampling_check_names(substitute(list(...)), derivative = FALSE)
   sampling_check_extra(substitute(list(...)), prediction = TRUE)
@@ -285,6 +297,7 @@
     freq = frequentist,
     unconditional = unconditional,
     weights = weights,
+    family_index = family_index,
     draws = draws,
     mvn_method = mvn_method,
     ...
@@ -306,6 +319,7 @@
   freq = FALSE,
   unconditional = FALSE,
   weights = NULL,
+  family_index = NULL,
   draws = NULL,
   mvn_method = c("mvnfast", "mgcv"),
   envir = NULL,
@@ -324,6 +338,9 @@
   mvn_method <- match.arg(mvn_method)
   fam_type <- family_type(model)
   fam <- stats::family(model)
+  grouped <- is_gfam_family(fam)
+  if (!grouped && !is.null(family_index)) stop(
+    "'family_index' is only supported for grouped-family models.", call. = FALSE)
   joint_distribution <- NULL
   correlated <- !is.null(model$AR1.rho) && model$AR1.rho != 0
   if (correlated) {
@@ -352,15 +369,11 @@
   if (fam_type == "cox_ph") stop(
     "Cox posterior response sampling requires an observation process and a response generator; ",
     "evaluation times and strata alone do not define response draws.", call. = FALSE)
-  advanced <- is_gfam_family(fam) ||
+  advanced <- !grouped &&
     (inherits(fam, "general.family") &&
       !fam_type %in% c("multivariate_normal", "multinom"))
   if (advanced && !is_lss_family(fam)) {
     if (!is.null(data)) {
-      if (is_gfam_family(fam)) {
-        stop("Grouped-family posterior response draws currently require fitting ",
-          "observations; use data = NULL.", call. = FALSE)
-      }
       stop("Posterior response sampling at supplied data is not implemented for ",
         "family <", family_name(fam), ">; a distribution-parameter adapter is required.",
         call. = FALSE)
@@ -419,6 +432,19 @@
   } else {
     sample.int(.Machine$integer.max, 1L)
   }
+  if (grouped) {
+    context <- grouped_posterior_context(model, data, family_index = family_index, ...)
+    betas <- sampling_call(post_draws, list(model = context$model,
+      n_draws = n, seed = coefficient_seed, method = method,
+      n_threads = n_threads, n_cores = n_cores, chains = chains,
+      diagnostics = diagnostics, mh_backend = mh_backend, block_size = block_size,
+      dense_limit = dense_limit, burnin = burnin, thin = thin, t_df = t_df,
+      rw_scale = rw_scale, frequentist = freq, unconditional = unconditional,
+      draws = draws, mvn_method = mvn_method))
+    out <- grouped_response_draws(context, betas, weights)
+    class(out) <- c("posterior_samples", class(out))
+    return(attach_sampling(out, betas, draw_index = TRUE))
+  }
   if (is_lss_family(fam)) {
     context <- lss_prediction_context(model, data, ...)
     betas <- sampling_call(post_draws, list(model = context$model,
@@ -428,8 +454,7 @@
       dense_limit = dense_limit, burnin = burnin, thin = thin, t_df = t_df,
       rw_scale = rw_scale, frequentist = freq, unconditional = unconditional,
       draws = draws, mvn_method = mvn_method))
-    sampler <- lss_response_sampler(context, betas, weights)
-    out <- dplyr::bind_rows(lapply(seq_len(NROW(betas)), sampler))
+    out <- lss_response_draws(context, betas, weights)
     class(out) <- c("posterior_samples", class(out))
     return(attach_sampling(out, betas, draw_index = TRUE))
   }
@@ -675,13 +700,14 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' in the formula when predicting at new data; the required offset variables
 #' must then be present in `data`.
 #'
-#' @return A tibble (data frame) with 3 columns containing the posterior
-#'   predicted values in long format. The columns are
-#' * `.row` (integer) the row of `data` that each posterior draw relates to,
-#' * `.draw` (integer) an index, in range `1:n_draws`, indicating which draw each row
-#'     relates to,
-#' * `.response` (numeric) the predicted response for the indicated row of
-#'     `data`.
+#' @return A tibble (data frame) in long format, with columns:
+#' * `.row`: row of the evaluation data;
+#' * `.draw`: globally unique draw identifier;
+#' * `.parameter`: `"location"` for scalar fitted values, or a response/category
+#'   label for multivariate or multinomial models;
+#' * `.fitted`: expected response or linear predictor, as selected by `scale`.
+#' Multiple-chain output also includes `.chain` and `.iteration`. Attached
+#' coefficient diagnostics are available through [sampling_diagnostics()].
 #'
 #' @author Gavin L. Simpson
 #'

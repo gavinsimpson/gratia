@@ -25,7 +25,13 @@ a fresh study. Run from the repository root:
 ```sh
 Rscript notes/posterior-chains/family-study.R
 Rscript notes/posterior-chains/family-summary.R
+# Refresh only the Gaussian location-scale cases:
+GRATIA_BENCH_REFRESH=gaulss Rscript notes/posterior-chains/family-study.R
 ```
+
+The six gaulss runs were refreshed after the response-allocation optimisation.
+Other family measurements remain from the earlier evaluator study. The
+longer difficult-target comparison is reported in difficult-report.md.
 
 Each model/backend/seed runs in a fresh R process with BLAS/OpenMP threads
 limited to one. All samplers retain 4,000 draws over four serial chains,
@@ -52,7 +58,7 @@ R-hat is the maximum over coefficients, seeds and backends in that model.
 | Censored normal | 2000 | 10 | 1.14 | 1.17 | 1.002 |
 | Tweedie | 1000 | 10 | 1.28 | 1.21 | 1.002 |
 | Grouped binomial/Poisson | 2000 | 10 | 0.90 | 0.87 | 1.002 |
-| Gaussian location-scale | 2000 | 20 | 1.18 | 1.33 | 1.004 |
+| Gaussian location-scale | 2000 | 20 | 1.32 | 1.43 | 1.004 |
 
 ## Family versus specialised gratia
 

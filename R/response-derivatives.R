@@ -33,8 +33,20 @@ prepare_response_derivative_data <- function(object, focal, data, n, eps,
       expand_grid(.x = x)
     }
   } else {
+    variables <- model_vars(object)
+    if (is_gfam_family(stats::family(object))) {
+      response <- stats::formula(object)[[2L]]
+      # Membership is needed for each shifted predictor row; observed y is not.
+      index_variables <- if (is.call(response) &&
+          identical(response[[1L]], as.name("cbind")) && length(response) == 3L) {
+        all.vars(response[[3L]])
+      } else {
+        paste(deparse(response, width.cutoff = 500L), collapse = "")
+      }
+      variables <- union(variables, intersect(index_variables, names(data)))
+    }
     data <- data |>
-      select(all_of(model_vars(object))) |>
+      select(all_of(variables)) |>
       rename(.x = all_of({{ focal }}))
   }
   data <- data |>

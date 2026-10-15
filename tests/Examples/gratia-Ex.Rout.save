@@ -1582,6 +1582,40 @@ detaching ‘package:mgcv’
 > 
 > 
 > cleanEx()
+> nameEx("family_diagnostics")
+> ### * family_diagnostics
+>
+> flush(stderr()); flush(stdout())
+>
+> ### Name: family_diagnostics
+> ### Title: Extend diagnostics for an mgcv-compatible family
+> ### Aliases: family_diagnostics
+>
+> ### ** Examples
+>
+> load_mgcv()
+> f <- poisson()
+> f$gratia_diagnostics <- function(mu, wt, scale, y, eta) {
++   list(mean = mu, variance = mu,
++     cdf_left = function(q, log_p = FALSE, lower_tail = TRUE) {
++       ppois(ceiling(q) - 1, lambda = mu,
++         log.p = log_p, lower.tail = lower_tail)
++     })
++ }
+> dat <- data.frame(x = seq(0, 1, length.out = 40))
+> dat$y <- rep(c(0, 1, 2, 4), 10)
+> f$rd <- function(mu, wt, scale) rpois(length(mu), mu)
+> f$qf <- function(p, mu, wt, scale) qpois(p, mu)
+> f$cdf <- function(q, mu, wt, scale) ppois(q, mu)
+> fit <- gam(y ~ x, data = dat, family = f, method = "REML")
+> qq_plot(fit, type = "quantile", seed = 1)
+>
+>
+>
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("fderiv")
 > ### * fderiv
 > 

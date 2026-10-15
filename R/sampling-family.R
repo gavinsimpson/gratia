@@ -24,6 +24,7 @@ sampling_family_target <- function(model) {
   # lpi attributes map columns to the predictors in general.family$ll().
   X <- mgcv::predict.gam(model, newdata = model$model, type = "lpmatrix",
     na.action = stats::na.pass)
+  sampling_check_bam_fixed(model, X, "family")
   # mvn() caches cross-products of the mean design before adding covariance
   # coefficients. Prediction rebuilds X without that fitting-time attribute.
   if (identical(family$family, "Multivariate normal")) {
@@ -36,11 +37,8 @@ sampling_family_target <- function(model) {
       is.null(model$y) || NROW(model$y) != n ||
       length(w) != n || any(!is.finite(w) | w < 0)) stop(
     "The fitted response, weights, and design matrix do not align.", call. = FALSE)
-  offset <- model$offset
-  offsets <- if (is.list(offset)) offset else list(offset)
-  if (any(vapply(offsets, function(x) !is.null(x) &&
-      (!length(x) %in% c(1L, n) || any(!is.finite(x))), logical(1L)))) stop(
-    "The fitted offsets do not align with the design matrix.", call. = FALSE)
+  offsets <- sampling_fitting_offsets(model, X)
+  offset <- if (general) offsets else offsets[[1L]]
   log_likelihood <- sampling_family_likelihood(X, model$y, w, offset,
     family, phi, general)
   V <- unname(stats::vcov(model))
@@ -83,4 +81,31 @@ sampling_family_value <- function(value) {
   if (!is.numeric(value) || length(value) != 1L) stop(
     "The family evaluator must return one numeric log likelihood.", call. = FALSE)
   if (is.finite(value)) as.numeric(value) else -Inf
+}
+
+# Stored offsets describe the native fitting target; prediction additions
+# must not be added twice. Prediction metadata supplies absent components only.
+# General families can ignore a call-level offset retained in the frame,
+# so the frame column cannot establish which offsets entered the likelihood.
+sampling_fitting_offsets <- function(model, X, rows = NULL) {
+  n_fit <- NROW(model$model)
+  if (is.null(rows)) rows <- seq_len(n_fit)
+  if (length(rows) != NROW(X) || anyNA(rows) ||
+      any(rows < 1L | rows > n_fit)) stop(
+    "Fitting offset rows do not align with the posterior design matrix.",
+    call. = FALSE)
+  offsets <- prediction_offsets(model, X)
+  stored <- model$offset
+  if (!is.list(stored)) stored <- list(stored)
+  for (i in seq_along(offsets)) {
+    actual <- if (i <= length(stored)) stored[[i]] else NULL
+    if (is.null(actual)) next
+    if (!length(actual) %in% c(1L, n_fit)) stop(
+      "The fitted offsets do not align with the model frame.", call. = FALSE)
+    actual <- if (length(actual) == 1L) rep(actual, length(rows)) else actual[rows]
+    offsets[[i]] <- actual
+  }
+  if (any(vapply(offsets, function(x) any(!is.finite(x)), logical(1L)))) stop(
+    "The fitted offsets must be finite.", call. = FALSE)
+  offsets
 }

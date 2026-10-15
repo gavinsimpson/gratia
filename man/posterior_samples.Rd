@@ -58,7 +58,8 @@ posterior_samples(model, ...)
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e+06,
-  weights = NULL
+  weights = NULL,
+  family_index = NULL
 )
 
 \method{posterior_samples}{scam}(
@@ -83,7 +84,8 @@ posterior_samples(model, ...)
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e+06,
-  weights = NULL
+  weights = NULL,
+  family_index = NULL
 )
 }
 \arguments{
@@ -186,16 +188,21 @@ For ordinary Gaussian and Gamma responses, larger weights reduce response
 variance (precision weights). For binomial responses, weights give integer
 trial counts. They do not alter the fitted coefficient covariance. Include
 positions restored by \code{na.exclude} when supplying weights for fitting rows.}
+
+\item{family_index}{numeric; optional family-list positions for grouped
+family (\code{\link[mgcv:gfam]{mgcv::gfam()}}) response draws, one integer per evaluation row.
+Membership can instead be recovered from the response-index expression
+in \code{data}; observed response values are not required.}
 }
 \value{
-A tibble (data frame) with 3 columns containing the posterior
-predicted values in long format. The columns are
+A tibble (data frame) in long format, with columns:
 \itemize{
-\item \code{.row} (integer) the row of \code{data} that each posterior draw relates to,
-\item \code{.draw} (integer) an index, in range \code{1:n_draws}, indicating which draw each row
-relates to,
-\item \code{.response} (numeric) the predicted response for the indicated row of
-\code{data}.
+\item \code{.row}: row of the evaluation data;
+\item \code{.draw}: globally unique draw identifier;
+\item \code{.response}: simulated response.
+Where needed, \code{.parameter} identifies the response or grouped component.
+Multiple-chain output also includes \code{.chain} and \code{.iteration}. Attached
+coefficient diagnostics are available through \code{\link[=sampling_diagnostics]{sampling_diagnostics()}}.
 }
 }
 \description{
@@ -228,7 +235,8 @@ Location-scale-shape families \code{\link[mgcv:gaulss]{mgcv::gaulss()}}, \code{\
 \code{\link[mgcv:gumbls]{mgcv::gumbls()}}, \code{\link[mgcv:gevlss]{mgcv::gevlss()}}, \code{\link[mgcv:shash]{mgcv::shash()}}, \code{\link[mgcv:twlss]{mgcv::twlss()}} and
 \code{\link[mgcv:ziplss]{mgcv::ziplss()}} support fitting observations, subsets and new covariates.
 Every distribution parameter is computed from the same joint coefficient
-draw. Evaluation data need predictors and formula-offset variables, but no
+draw. Formula offsets and prescribed smooth contributions are retained.
+Evaluation data need predictors and formula-offset variables, but no
 observed response. In \code{gaulss()}, the second response parameter is inverse
 standard deviation: sampling uses its reciprocal, divided by the square
 root of the sampling weight. Other LSS generators currently ignore sampling
@@ -239,7 +247,11 @@ Cox survival models require evaluation times and an observation process and
 do not have a response generator for this interface. Censored-family draws
 are latent, uncensored responses; reproducing observed censoring requires
 an observation process and remains unsupported in posterior predictive checks.
-Grouped-family posterior response sampling still uses fitting observations.
+Grouped-family posterior response draws support fitting observations and
+supplied data with known family membership. Component nuisance parameters
+remain fixed. \code{.parameter} identifies the component used for each row.
+Censored grouped components require an observation process; use \code{simulate()}
+for their latent, uncensored responses.
 }
 \section{Note}{
 With \code{data = NULL}, fitting offsets are retained, including offsets

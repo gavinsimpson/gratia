@@ -17,18 +17,19 @@ tables and row/chain identities are included. BLAS/OpenMP threads were limited
 to one, and validation processes had finished before timing.
 
 Fitted expectations use bounded batches of matrix products and one output
-table. Response generation retains one call per coefficient draw, preserving
+table. Responses reuse design blocks and construct one table per call,
+retaining one generator call per coefficient draw and preserving
 the random-number order of the existing fitting-observation sampler.
 
 | Family | Expected-response draws | Posterior response draws | Fixed-coefficient response draws |
 |:-------|------------------------:|-------------------------:|--------------------------------:|
-| gaulss | 0.021 | 0.476 | 0.080 |
-| gammals | 0.019 | 0.474 | 0.085 |
-| gumbls | 0.023 | 0.486 | 0.096 |
-| gevlss | 0.033 | 0.502 | 0.102 |
-| shash | 0.053 | 0.490 | 0.103 |
-| twlss | 0.019 | 0.741 | 0.294 |
-| ziplss | 0.028 | 0.529 | 0.133 |
+| gaulss | 0.021 | 0.081 | 0.085 |
+| gammals | 0.021 | 0.093 | 0.089 |
+| gumbls | 0.022 | 0.087 | 0.092 |
+| gevlss | 0.034 | 0.112 | 0.102 |
+| shash | 0.063 | 0.109 | 0.112 |
+| twlss | 0.019 | 0.318 | 0.300 |
+| ziplss | 0.029 | 0.151 | 0.129 |
 
 All 21 family/seed runs completed all three transformations without warnings or errors.
 
@@ -38,8 +39,8 @@ The family-backend study reran all six Gaussian location-scale cases: three
 seeds with mgcv and family backends, 2,000 fitting observations, 20 coefficients,
 4,000 retained draws over four serial chains and 1,000 burn-in iterations per
 chain. Prediction evaluates the first 200 rows using those retained draws.
-Median fitted transformation cost is 0.188 seconds and median posterior response cost is 2.003 seconds.
-The family/mgcv minimum-coefficient ESS/s ratios are 1.18 for bulk and 1.33 for tails; maximum R-hat is 1.004.
+Median fitted transformation cost is 0.084 seconds and median posterior response cost is 0.428 seconds.
+The family/mgcv minimum-coefficient ESS/s ratios are 1.32 for bulk and 1.43 for tails; maximum R-hat is 1.004.
 These paired ratios use the median over three seeds. The public sampling
 time includes setup and burn-in; prediction and response costs are separate.
 Process peak memory includes fitting, diagnostics and transformations.
@@ -48,7 +49,7 @@ Raw timing and diagnostic results are in family-benchmarks.csv and
 family-coefficients.csv. The LSS transformation rows are in
 lss-prediction-benchmarks.csv, with failure notes retained if a transformation
 cannot run. lss-benchmark-environment.txt records package/runtime details.
-See lss-validation.txt for the final tests and source-package check.
+See integration-validation.txt for the latest tests and source-package check.
 
 ## Reproduce
 
