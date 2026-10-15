@@ -1,0 +1,74 @@
+Internal MH covariance adjustment: validation, 15 October 2026.
+Branch gls/posterior-chains; original implementation based on commit 053628a41.
+All model fitting, simulation, tests and package checks ran outside the sandbox.
+
+Implementation:
+New unexported sampling_mh_covariance_adjust() uses the complete coefficient vector in fitted order.
+One pooled empirical covariance and transformation is used for every chain.
+The pooled coefficient mean, original row/draw/chain identities and source acceptance information are retained.
+Original diagnostics are retained in the audit; requested diagnostics are recalculated for adjusted coefficients.
+Missing Vc, incomplete coefficients, invalid layouts, singular covariance and repeated adjustment produce explicit errors.
+Existing public sampling signatures, targets, seeded outputs, exports and documentation topics were not edited.
+
+Focused tests:
+55 assertions passed, with no failures, warnings or skips.
+Tests cover direct covariance algebra, inverse transformation, RNG preservation, immutable source draws, mean preservation,
+identity adjustment, named/unnamed matrices, strict coefficient ordering, diagnostics, poorly mixing chains,
+missing or invalid covariances, duplicate adjustment, GAM/BAM and supplied-draw prediction/response/smooth/derivative workflows.
+
+Full validation:
+The full installed-package local suite passed, using tools/run-tests.R and NOT_CRAN=true.
+197 visual comparisons were skipped because VDIFFR_RUN_TESTS=false. Snapshot cleanup affected installed test copies only.
+R CMD build succeeded, including vignette construction.
+R CMD check --as-cran --no-manual: no errors or warnings; Status: 1 NOTE.
+Its full suite reported FAIL 0, WARN 0, SKIP 197, PASS 18623.
+NOT_CRAN=true exercised functional tests normally omitted on CRAN; the skipped tests were visual comparisons.
+Ordinary examples, donttest examples, vignette checks and vignette rebuilding passed.
+The sole NOTE is an existing parametric_effects example exceeding the --as-cran timing threshold:
+user 4.942 s, system 0.047 s, elapsed 5.236 s. Other simulations and local tests ran concurrently.
+This is a timing report, not changed example output; the example-reference-output comparison passed.
+--no-manual omitted the PDF reference manual.
+_R_CHECK_CRAN_INCOMING_REMOTE_=false disabled remote incoming checks; local incoming checks ran.
+pkgdown::check_pkgdown() passed configuration/reference-coverage validation. No public topic or export was added.
+Pandoc reported its existing deprecated --katex option supplied by pkgdown; this did not prevent validation.
+The initial implementation and tests matched that checked archive. Subsequent numerical guards and validation are recorded in mh-adjustment-review-validation.txt.
+
+Repeated-data comparison:
+800 original datasets, four cases, gam REML and non-discrete bam fREML: 1600 attempted fits.
+1599 complete comparisons; rare-binary BAM fREML dataset 177 retains its original native convergence exclusion.
+Primary draws: 16000 retained over four chains, 4000 burn-in iterations per chain, thin=1.
+The compiled gratia backend supplies conditional MH; adjustment reuses those exact draws; Gaussian draws use Vc.
+One rare-binary GAM (dataset 73) failed the tail-ESS threshold for original and adjusted MH.
+Both all-returned and identically matched mixing-screen cohorts are retained.
+First-five resolution study: 40 fits at 64000 draws and 16000 burn-in per chain.
+A separate post hoc longer run for dataset 73, both fitters, passes the mixing screen.
+No primary intervals, exclusions or denominators were replaced by those longer runs.
+Independent validation checked every raw interval's coverage, all summary denominators, paired differences and MCSEs,
+source hashes, draw/burn-in/thinning counts and agreement with the unchanged original fitted smoothing estimates.
+Main validation: 281424 raw pointwise intervals; 1599 original smoothing-estimate matches.
+Resolution validation: 7040 intervals; 40 original smoothing-estimate matches.
+Maximum achieved relative covariance error in primary comparisons: 1.231603e-11.
+
+Scientific limits:
+Weak-Gaussian smooth-derivative coverage remains below nominal after adjustment.
+Rare-binary adjusted MH improves coverage over conditional MH but is below unconditional Gaussian on the reported quantities.
+Exact matching of empirical covariance does not validate posterior coverage or specify an unconditional MH target.
+The transformation retains the conditional coefficient mean and depends on fitted coefficient order and finite MH covariance estimation.
+Some directions can shrink. R-hat and ESS do not account for uncertainty in the estimated transformation.
+The first-five resolution run changed adjusted endpoints by 0.66% of interval width on average and 8.9% at the worst point.
+No public method, smoothing integration, new prior, or joint nuisance-parameter draws were added.
+
+Raw archives:
+/Users/gavin/work/git/gratia/research-archives/mh-adjustment-2026-10-15-main
+/Users/gavin/work/git/gratia/research-archives/mh-adjustment-2026-10-15-resolution
+/Users/gavin/work/git/gratia/research-archives/mh-adjustment-2026-10-15-followup
+The pilot is excluded from the reported results. Source hashes prevent resuming it with the later coefficient-order validation.
+
+Logs:
+/private/tmp/gratia-mh-adjustment-tests.log
+/private/tmp/gratia-mh-adjustment-full-tests.log
+/private/tmp/gratia-mh-adjustment-package-check.log
+/private/tmp/gratia-mh-adjustment-summary-final.log
+/private/tmp/gratia-mh-adjustment-validate-final.log
+/private/tmp/gratia-mh-adjustment-resolution-validation.log
+/private/tmp/gratia-mh-adjustment-followup.log

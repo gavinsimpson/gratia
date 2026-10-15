@@ -213,3 +213,13 @@ complete mappings and examples. The benchmark scripts use the renamed
 arguments; the measurements above describe the original sampling implementation
 and were not rerun for this interface change. The subsequent validation record
 is in `harmonisation-validation.txt`.
+
+## MH covariance adjustment
+
+An internal experiment transforms complete conditional MH coefficient draws
+to match the fitted unconditional covariance Vc, using one pooled map for all
+chains. It retains the MH mean, preserves draw identities and recalculates
+requested diagnostics. It does not change the MH target or draw smoothing
+parameters. The [comparison report](mh-adjustment-report.md) and
+[protocol](mh-adjustment-protocol.md) describe the implementation, repeated-data
+comparison with conditional MH and unconditional Gaussian draws, and limitations.
