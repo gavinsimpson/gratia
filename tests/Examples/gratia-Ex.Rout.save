@@ -2993,6 +2993,36 @@ Levels: a b c d e
 > 
 > 
 > cleanEx()
+> nameEx("residuals_covariate_plot")
+> ### * residuals_covariate_plot
+>
+> flush(stderr()); flush(stdout())
+>
+> ### Name: residuals_covariate_plot
+> ### Title: Plot residuals against covariates
+> ### Aliases: residuals_covariate_plot scalable_residuals_covariate_plot
+>
+> ### ** Examples
+>
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+> dat <- data_sim("eg1", n = 400, seed = 2)
+> m <- gam(y ~ x2 + s(x0) + s(x1), data = dat, method = "REML")
+> # A curve against x2 suggests reconsidering its linear effect.
+> residuals_covariate_plot(m, covariates = "x2", type = "pearson")
+> # Check a covariate omitted from the model.
+> residuals_covariate_plot(m, covariates = "x3", data = dat)
+> # Inspect individual covariates and possible remaining interaction structure.
+> scalable_residuals_covariate_plot(m, covariates = c("x0", "x2"),
++   pairs = list(c("x0", "x2")), bins = 6, type = "quantile", seed = 42)
+>
+>
+>
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
 > nameEx("response_derivatives")
 > ### * response_derivatives
 > 

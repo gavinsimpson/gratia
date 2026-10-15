@@ -146,6 +146,8 @@ reference:
       - scalable_qq_plot
       - residuals_hist_plot
       - residuals_linpred_plot
+      - residuals_covariate_plot
+      - scalable_residuals_covariate_plot
       - quantile_residuals
       - dharma_residuals
       - residual_correlation
