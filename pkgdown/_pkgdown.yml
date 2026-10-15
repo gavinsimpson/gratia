@@ -9,6 +9,7 @@ authors:
     href: https://fromthebottomoftheheap.net
 
 template:
+  math-rendering: katex
   bootstrap: 5
   bootswatch: flatly
   bslib:
@@ -140,6 +141,7 @@ reference:
       - residuals_hist_plot
       - residuals_linpred_plot
       - quantile_residuals
+      - dharma_residuals
       - residual_correlation
       - add_residuals
       - add_residuals.gam
