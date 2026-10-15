@@ -1,0 +1,69 @@
+# Plot accumulated local effects
+
+Plot saved ALE estimates and intervals, without recomputing predictions.
+
+## Usage
+
+``` r
+# S3 method for class 'ale'
+draw(
+  object,
+  ci = TRUE,
+  ref_line = TRUE,
+  alpha = 0.2,
+  xlab = NULL,
+  ylab = NULL,
+  ...
+)
+```
+
+## Arguments
+
+- object:
+
+  a tibble of class `"ale"`, produced by
+  [`ale()`](https://gavinsimpson.github.io/gratia/reference/ale.md).
+
+- ci:
+
+  logical; show the saved interval ribbon?
+
+- ref_line:
+
+  logical; draw a horizontal reference line at zero?
+
+- alpha:
+
+  numeric; opacity of the interval ribbon.
+
+- xlab, ylab:
+
+  optional axis labels. Defaults identify the focal covariate and
+  selected parameter. The computation scale appears in the caption.
+  Titles and subtitles are omitted. Use
+  [`ggplot2::labs()`](https://ggplot2.tidyverse.org/reference/labs.html)
+  to change or remove the caption, for example
+  `+ ggplot2::labs(caption = NULL)`.
+
+- ...:
+
+  reserved for future use.
+
+## Value
+
+A
+[`ggplot2::ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html)
+object.
+
+## See also
+
+[`ale()`](https://gavinsimpson.github.io/gratia/reference/ale.md)
+
+## Examples
+
+``` r
+library("mgcv")
+df <- data_sim("eg1", n = 100, seed = 2)
+m <- gam(y ~ s(x2), data = df, method = "REML")
+ale(m, "x2") |> draw()
+```

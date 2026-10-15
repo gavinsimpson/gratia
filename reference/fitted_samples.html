@@ -11,7 +11,7 @@ posterior or a simple Metropolis Hastings sampler."><meta property="og:image" co
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-51</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-52</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -258,7 +258,7 @@ including <code><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html" class="extern
 their first parameter is not necessarily the expected response. On the
 linear predictor scale, these other families return the first predictor
 under the existing <code>location</code> label, including its offsets. The same label
-identifies the mean predictor for <code>gaulss()</code>; scale predictors are omitted.</p>
+identifies the mean predictor for <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">gaulss()</a></code>; scale predictors are omitted.</p>
 <p>For grouped families, coefficient draws preserve the joint model covariance;
 each row is then transformed using its own fitted component family. Explicit
 prediction data must identify each row's family: no training-order fallback
@@ -272,8 +272,8 @@ families with a scalar prediction transform such as <code><a href="https://rdrr.
 not support <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code> category-probability output; use the link scale
 for grouped ordinal models. Distributional nuisance parameters are held at
 their fitted values. This does not add support for general/location-scale
-families that <code>gfam()</code> itself rejects, nor repair upstream fitting failures
-(including fixed-theta negative-binomial components and some <code>ziP()</code> fits
+families that <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">gfam()</a></code> itself rejects, nor repair upstream fitting failures
+(including fixed-theta negative-binomial components and some <code><a href="https://rdrr.io/pkg/mgcv/man/ziP.html" class="external-link">ziP()</a></code> fits
 in some mgcv versions).</p>
 <p>Observation rows use the same missing-value convention as
 <code><a href="posterior_samples.html">posterior_samples()</a></code>: default results restore <code>na.exclude</code> observations in
@@ -307,7 +307,7 @@ must then be present in <code>data</code>.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">1000</span>, dist <span class="op">=</span> <span class="st">"normal"</span>, scale <span class="op">=</span> <span class="fl">2</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">fs</span> <span class="op">&lt;-</span> <span class="fu">fitted_samples</span><span class="op">(</span><span class="va">m1</span>, n <span class="op">=</span> <span class="fl">5</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>

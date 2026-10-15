@@ -349,10 +349,13 @@ components are supported. Unrecognised custom-family bounds remain
 unsupported. A custom CDF must also support the probabilities just below
 discrete values and at censoring limits. Replacements for recognised
 family CDFs must use the same arguments and probability conventions.
-Scalar uncensored `cnorm()`, `clog()` and `cpois()` components are
+Scalar uncensored [`cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html),
+[`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) and
+[`cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html) components are
 supported; genuine censoring requires recoverable, aligned censoring
-bounds. Matrix censored responses rejected by `gfam()` and upstream
-fitting failures are not repaired.
+bounds. Matrix censored responses rejected by
+[`gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) and upstream fitting
+failures are not repaired.
 
 `by_family = NULL` pools quantile residuals with colours identifying
 indexed family components, including repeated uses of the same family.

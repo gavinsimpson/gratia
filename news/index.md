@@ -109,6 +109,15 @@
 
 ### New features
 
+- [`ale()`](https://gavinsimpson.github.io/gratia/reference/ale.md)
+  computes accumulated local effects for numeric covariates in
+  [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
+  [`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits, with link
+  and response scales, distribution parameters, and pointwise or
+  simultaneous intervals.
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  plots saved results with parameter labels and a scale caption.
+
 - Optional
   [`bayesplot::pp_check()`](https://mc-stan.org/bayesplot/reference/pp_check.html)
   methods provide posterior predictive checks for supported GAMs and

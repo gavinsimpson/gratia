@@ -215,7 +215,8 @@ error on the response scale because their first parameter is not
 necessarily the expected response. On the linear predictor scale, these
 other families return the first predictor under the existing `location`
 label, including its offsets. The same label identifies the mean
-predictor for `gaulss()`; scale predictors are omitted.
+predictor for [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html);
+scale predictors are omitted.
 
 For grouped families, coefficient draws preserve the joint model
 covariance; each row is then transformed using its own fitted component
@@ -234,9 +235,11 @@ support [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html)
 category-probability output; use the link scale for grouped ordinal
 models. Distributional nuisance parameters are held at their fitted
 values. This does not add support for general/location-scale families
-that `gfam()` itself rejects, nor repair upstream fitting failures
-(including fixed-theta negative-binomial components and some `ziP()`
-fits in some mgcv versions).
+that [`gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) itself rejects,
+nor repair upstream fitting failures (including fixed-theta
+negative-binomial components and some
+[`ziP()`](https://rdrr.io/pkg/mgcv/man/ziP.html) fits in some mgcv
+versions).
 
 Observation rows use the same missing-value convention as
 [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md):

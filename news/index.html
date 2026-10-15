@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-51</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-52</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,7 +76,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li><p>Optional <code><a href="https://mc-stan.org/bayesplot/reference/pp_check.html" class="external-link">bayesplot::pp_check()</a></code> methods provide posterior predictive checks for supported GAMs and mixed models (<a href="https://github.com/gavinsimpson/gratia/issues/278" class="external-link">#278</a>, reported by <a href="https://github.com/nicholasjclark" class="external-link">@nicholasjclark</a>).</p></li>
+<ul><li><p><code><a href="../reference/ale.html">ale()</a></code> computes accumulated local effects for numeric covariates in <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">mgcv::bam()</a></code> fits, with link and response scales, distribution parameters, and pointwise or simultaneous intervals. <code><a href="../reference/draw.html">draw()</a></code> plots saved results with parameter labels and a scale caption.</p></li>
+<li><p>Optional <code><a href="https://mc-stan.org/bayesplot/reference/pp_check.html" class="external-link">bayesplot::pp_check()</a></code> methods provide posterior predictive checks for supported GAMs and mixed models (<a href="https://github.com/gavinsimpson/gratia/issues/278" class="external-link">#278</a>, reported by <a href="https://github.com/nicholasjclark" class="external-link">@nicholasjclark</a>).</p></li>
 <li><p><code><a href="../reference/log_lik.html">log_lik()</a></code> and optional <code><a href="https://mc-stan.org/loo/reference/loo.html" class="external-link">loo::loo()</a></code> and <code><a href="https://mc-stan.org/loo/reference/waic.html" class="external-link">loo::waic()</a></code> methods support approximate predictive comparisons for independent GAM/BAM fits (<a href="https://github.com/gavinsimpson/gratia/issues/278" class="external-link">#278</a>, reported by <a href="https://github.com/nicholasjclark" class="external-link">@nicholasjclark</a>).</p></li>
 <li><p>Diagnostic plots now support native inlaws families through their supplied <code>gratia_diagnostics</code> functions, including grouped-family fits and models with multiple response columns.</p></li>
 <li><p><code><a href="../reference/dharma_residuals.html">dharma_residuals()</a></code> and <code>type = "dharma"</code> in diagnostics now calculate simulation-based PIT residuals using gratia’s response generators, without requiring DHARMa or mgcViz. <code>n_dharma</code> controls the simulation count. Residuals retain zero and one endpoints and are shared across <code><a href="../reference/appraise.html">appraise()</a></code> panels. QQ and worm plots use uniform references with approximate pointwise bands for independent responses; dependent responses omit these bands.</p></li>

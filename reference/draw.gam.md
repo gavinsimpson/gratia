@@ -454,28 +454,32 @@ identify the model part for glmmTMB models or the distributional
 parameter for mgcv models. Single-predictor models omit these automatic
 labels; by-variable information and custom subtitles are still shown.
 Constant glmmTMB dispersion alone does not count as an additional
-predictor. For example, `gaulss()` uses "Mean (mu)" and "Standard
-deviation (sigma)", while `twlss()` uses "Mean (mu)", "Power (p)" and
-"Dispersion (phi)". Shared smooths name each predictor to which they
-contribute. Families without a known parameter mapping use numbered
-linear predictors. The existing smooth titles and `select` values are
-unchanged, and all smooths are drawn by default. By-variable information
-is appended to the default subtitle. Supply `subtitle` through `...` to
-replace it, or `subtitle = ""` to suppress it; `NULL` uses the default.
-Custom `title`, `xlab` and `ylab` can also be supplied through `...`.
-These labels apply to smooth panels.
+predictor. For example,
+[`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) uses "Mean (mu)"
+and "Standard deviation (sigma)", while
+[`twlss()`](https://rdrr.io/pkg/mgcv/man/twlss.html) uses "Mean (mu)",
+"Power (p)" and "Dispersion (phi)". Shared smooths name each predictor
+to which they contribute. Families without a known parameter mapping use
+numbered linear predictors. The existing smooth titles and `select`
+values are unchanged, and all smooths are drawn by default. By-variable
+information is appended to the default subtitle. Supply `subtitle`
+through `...` to replace it, or `subtitle = ""` to suppress it; `NULL`
+uses the default. Custom `title`, `xlab` and `ylab` can also be supplied
+through `...`. These labels apply to smooth panels.
 
 Random-effect tensor plots put continuous covariates before factors. Two
 continuous covariates form a surface, with remaining factor levels and
-numeric slices forming conditioning panels, consistently for `te()`,
-`ti()` and `t2()`. One continuous covariate gives curves for categorical
-combinations; categorical-only terms give point ranges. Up to four
-covariates are supported. Numeric conditioning slices use `n_3d` or
-`n_4d`. For factor conditioning dimensions, these controls retain at
-most that many levels, taking the first levels in fitted order. Explicit
-`re_levels` selections take precedence. Supplied `data` and precomputed
-estimates retain their rows; select specific factor levels with
-`re_levels`, or use
+numeric slices forming conditioning panels, consistently for
+[`te()`](https://rdrr.io/pkg/mgcv/man/te.html),
+[`ti()`](https://rdrr.io/pkg/mgcv/man/te.html) and
+[`t2()`](https://rdrr.io/pkg/mgcv/man/t2.html). One continuous covariate
+gives curves for categorical combinations; categorical-only terms give
+point ranges. Up to four covariates are supported. Numeric conditioning
+slices use `n_3d` or `n_4d`. For factor conditioning dimensions, these
+controls retain at most that many levels, taking the first levels in
+fitted order. Explicit `re_levels` selections take precedence. Supplied
+`data` and precomputed estimates retain their rows; select specific
+factor levels with `re_levels`, or use
 [`data_slice()`](https://gavinsimpson.github.io/gratia/reference/data_slice.md)
 to fix conditioning covariates. Observation layers do not introduce
 additional surface panels.

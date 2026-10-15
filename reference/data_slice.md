@@ -100,9 +100,10 @@ follows:
   [`base::levels()`](https://rdrr.io/r/base/levels.html) if several
   levels are observed the same number of times.
 
-These values are already computed when calling `gam()` or `bam()` for
-example and can be found in the `var.summary` component of the fitted
-model. Function
+These values are already computed when calling
+[`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) or
+[`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) for example and can be
+found in the `var.summary` component of the fitted model. Function
 [`typical_values()`](https://gavinsimpson.github.io/gratia/reference/typical_values.md)
 will extract these values for you if you are interested.
 

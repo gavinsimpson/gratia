@@ -174,9 +174,11 @@ transformed if `scale = "response"`; `.se` remains on the link scale.
 The simulation covariance must be positive definite. Supported families
 are Gaussian, Poisson, binomial, Gamma, inverse Gaussian, quasi
 families, negative binomial, Tweedie, beta regression, and scaled t,
-fitted by `gam()` or `bam()` (including the `gam` component of a
-`gamm()` fit). Other families and `scam` models currently support
-pointwise intervals only.
+fitted by [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) or
+[`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) (including the `gam`
+component of a [`gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html) fit).
+Other families and `scam` models currently support pointwise intervals
+only.
 
 Response-scale simultaneous intervals support the identity, log, logit,
 probit, cloglog, cauchit, square-root, inverse, and inverse-squared
