@@ -81,6 +81,8 @@ reference:
       - draw.smooth_estimates
       - parametric_effects
       - draw.parametric_effects
+      - ale
+      - draw.ale
       - add_confint
       - confint.gam
       - add_constant

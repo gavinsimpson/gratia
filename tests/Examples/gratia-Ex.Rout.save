@@ -298,6 +298,36 @@ detaching ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
+> nameEx("ale")
+> ### * ale
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: ale
+> ### Title: Accumulated local effects of a model covariate
+> ### Aliases: ale ale.default ale.gam ale.bam
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+> df <- data_sim("eg1", n = 200, seed = 42)
+> m <- gam(y ~ s(x0) + te(x1, x2, k = c(5, 5)) + s(x3),
++   data = df, method = "REML")
+> a <- ale(m, focal = "x1")
+> draw(a)
+> 
+> # Standard deviation in its natural units, rather than reciprocal SD
+> ml <- gam(list(y ~ s(x1), ~ x2), data = df, family = gaulss())
+> ale(ml, "x2", parameter = "scale", scale = "response") |> draw()
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
 > nameEx("appraise")
 > ### * appraise
 > 
@@ -1102,6 +1132,30 @@ detaching ‘package:mgcv’
 > cleanEx()
 
 detaching ‘package:mgcv’
+
+> nameEx("draw.ale")
+> ### * draw.ale
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: draw.ale
+> ### Title: Plot accumulated local effects
+> ### Aliases: draw.ale
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+> df <- data_sim("eg1", n = 100, seed = 2)
+> m <- gam(y ~ s(x2), data = df, method = "REML")
+> ale(m, "x2") |> draw()
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
 
 > nameEx("draw.basis")
 > ### * draw.basis

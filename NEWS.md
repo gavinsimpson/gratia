@@ -81,6 +81,11 @@
 
 ## New features
 
+* `ale()` computes accumulated local effects for numeric covariates in
+  `mgcv::gam()` and `mgcv::bam()` fits, with link and response scales,
+  distribution parameters, and pointwise or simultaneous intervals.
+  `draw()` plots saved results with parameter labels and a scale caption.
+
 * Optional `bayesplot::pp_check()` methods provide posterior predictive checks
   for supported GAMs and mixed models (#278, reported by @nicholasjclark).
 
