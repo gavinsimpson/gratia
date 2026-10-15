@@ -421,7 +421,7 @@ check. These responses share field contributions, so gratia generates the
 reference bands from complete simulated data sets that preserve dependence.
 Independent uniform order-statistic bands would answer the wrong question.
 
-Compare the subtitles as well as the curves: each plot identifies its
+Compare the captions as well as the curves: each plot identifies its
 conditioning. In this example the integrated QQ plot describes errors around
 estimated survey fields, whereas the marginal plot also reflects the wide
 variation in density between possible geographical surfaces. The integrated

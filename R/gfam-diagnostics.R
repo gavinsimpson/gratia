@@ -325,12 +325,12 @@ calibrated_qq_plot <- function(model, method, level, detrend, by_family,
       ggokabeito::scale_colour_okabe_ito(limits = gfam_diagnostic_labels(model),
         drop = FALSE)
   } else plt <- plt + ggplot2::geom_point(colour = point_col, alpha = point_alpha)
-  plt <- plt + ggplot2::labs(x = xlab %||% if (type == "pit") "Uniform quantiles" else "Standard normal quantiles",
+  plt <- plt + ggplot2::labs(x = xlab %||% if (type == "pit") "Uniform quantiles" else "Std. normal quantiles",
     y = ylab %||% paste0(if (type == "pit") "PIT" else "Quantile", " residuals",
       if (detrend) " (Deviation)" else ""),
     title = title %||% if (detrend) "Worm plot of residuals" else "QQ plot of residuals",
-    subtitle = subtitle %||% calibrated_reference_subtitle(type, attr(data, "band_method"), response_distribution(model)),
-    caption = caption)
+    subtitle = subtitle %||% calibrated_reference_subtitle(type),
+    caption = caption %||% diagnostic_qq_caption(model, data))
   if (".family" %in% names(data) && !by_family)
     plt <- plt + ggplot2::labs(colour = "Family component")
   gfam_diagnostic_facets(plt, model, by_family)

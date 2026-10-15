@@ -29,8 +29,8 @@ test_that("glmm posterior responses retain native dispersion parameterizations",
     })
     expect_equal(samples$.response, oracle, tolerance = 1e-8, info = name)
     small <- posterior_predictive_plot(m, n = 4L, seed = 11)
-    expect_match(gsub("\\n", " ", small$labels$subtitle),
-      "marginalize covariance-parameter estimation")
+    expect_null(small$labels$subtitle)
+    expect_identical(small$labels$caption, "Conditioning: conditional")
     marginal <- diagnostic_posterior_observed(m, conditioning = "marginal")
     expect_match(attr(marginal, "diagnostic_description"),
       "effect covariance and other family parameters plugged in")

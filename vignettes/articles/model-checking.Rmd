@@ -64,6 +64,13 @@ on the fitted model, without refitting it for each replicate. Use departures
 from these bands to locate discrepancies to investigate, rather than as a
 formal rejection rule.
 
+Plot subtitles identify the method. Short captions identify conditioning,
+field choices, joint simulation bands or omitted bands. Routine pointwise bands
+are unlabelled. Posterior predictive captions identify conditioning only.
+Use `caption = ""` to omit a caption
+or supply your own text. Scalable QQ and worm plots use the same labels as their
+ordinary counterparts.
+
 ## Count variation and mean structure
 
 Consider daily insect counts at independently sampled sites. We simulate

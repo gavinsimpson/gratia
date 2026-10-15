@@ -146,6 +146,7 @@ dharma_exact_censored_response <- function(y, label = "observations") {
 # Label this calculation consistently, including its acronym's capitalisation.
 diagnostic_residual_label <- function(type) {
   if (identical(type, "dharma")) "DHARMa-style residuals" else
+    if (identical(type, "pit")) "PIT residuals" else
     paste(stringr::str_to_title(type), "residuals")
 }
 
@@ -169,13 +170,10 @@ dharma_qq_reference <- function(diagnostics, level, by_family) {
     }
     part
   }))
-  subtitle <- if (independent)
-    "Uniform reference; approximate pointwise intervals (finite response simulations)" else
-    paste0("Marginal uniform reference; bands omitted: independence-based intervals do not apply\n",
-      distribution$dependence_reason %||% "Dependent responses")
-  subtitle <- paste0(subtitle, "; ", diagnostics$n_dharma, " response simulations")
   list(data = df, method = "uniform reference", intercept = 0, slope = 1,
     center = df$theoretical, by_family = by_family,
     colour_family = ".family" %in% names(dat) && !by_family,
-    subtitle = diagnostic_reference_description(distribution, subtitle))
+    subtitle = calibrated_reference_subtitle("dharma"),
+    caption = diagnostic_qq_caption(diagnostics$source, df,
+      bands = if (independent) "approximate" else "none"))
 }

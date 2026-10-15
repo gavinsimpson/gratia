@@ -94,6 +94,11 @@
 #'   do not provide simultaneous coverage. Traditional residuals use the fitted
 #'   response distributions or a normal approximation.
 #'
+#'   Subtitles name the method. Captions identify conditioning and field choices,
+#'   joint simulation bands or omitted bands. Routine pointwise bands are unlabelled.
+#'   Supply `caption` to replace this text, or `caption = ""` to omit it.
+#'   Ordinary and scalable QQ and worm plots use the same labels.
+#'
 #' @references
 #'
 #' The underlying methodology used when `method` is `"simulate"` or `"uniform"`
@@ -222,7 +227,6 @@ qq_plot.default <- function(model, ...) {
       point_col, point_alpha, line_col, type = type, n_simulate = n_simulate))
   }
   method <- diagnostic_reference_method(model, method)
-  grouped <- is_gfam_family(family(model))
   if (level <= 0 || level >= 1) {
     stop("Level must be 0 < level < 1. Supplied level <", level, ">",
       call. = FALSE
@@ -253,8 +257,9 @@ qq_plot.default <- function(model, ...) {
     title <- "QQ plot of residuals"
   }
   if (is.null(subtitle)) {
-    subtitle <- diagnostic_qq_subtitle(model, method, grouped)
+    subtitle <- diagnostic_qq_subtitle(method)
   }
+  caption <- caption %||% diagnostic_qq_caption(model, df)
   ## base plot
   plt <- ggplot(df, aes(
     x = .data$theoretical,
@@ -946,7 +951,6 @@ worm_plot.default <- function(model, ...) {
       point_col, point_alpha, line_col, type = type, n_simulate = n_simulate))
   }
   method <- diagnostic_reference_method(model, method)
-  grouped <- is_gfam_family(family(model))
   if (level <= 0 || level >= 1) {
     stop("Level must be 0 < level < 1. Supplied level <", level, ">",
       call. = FALSE
@@ -988,8 +992,9 @@ worm_plot.default <- function(model, ...) {
   }
 
   if (is.null(subtitle)) {
-    subtitle <- diagnostic_qq_subtitle(model, method, grouped)
+    subtitle <- diagnostic_qq_subtitle(method)
   }
+  caption <- caption %||% diagnostic_qq_caption(model, df)
 
   ## base plot
   plt <- ggplot(df, aes(

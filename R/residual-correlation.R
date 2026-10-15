@@ -88,8 +88,7 @@ residual_correlation_plot <- function(model, type = NULL, lag_max = 20L,
     ggplot2::geom_hline(yintercept = 0, colour = "grey60") +
     ggplot2::geom_segment(ggplot2::aes(xend = .data$lag, yend = 0)) +
     ggplot2::geom_point() + ggplot2::labs(x = "Observation lag",
-      y = "Residual lag correlation", title = "Ordered residual correlation",
-      subtitle = attr(data, "description"))
+      y = "Residual lag correlation", title = "Ordered residual correlation")
 }
 
 diagnostic_ordered_residuals <- function(model, type = NULL, seed = NULL, ...) {

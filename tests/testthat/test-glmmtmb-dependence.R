@@ -159,7 +159,7 @@ test_that("native nonGaussian temporal draws retain the latent correlation law",
   expect_lt(abs(cor(draws[1, ], draws[6, ])), .08)
   expect_true(response_distribution(m, "conditional")$independent)
   p <- qq_plot(m, conditioning = "marginal", type = "pit", n_simulate = 5, seed = 2)
-  expect_match(p$labels$subtitle, "simulated joint")
+  expect_identical(p$labels$subtitle, "Method: uniform")
   expect_true(all(is.finite(p$data$lower)))
   expect_silent(ggplot2::ggplot_build(p))
 })
@@ -281,5 +281,5 @@ test_that("prepared glmmTMB diagnostics honor conditioning changes", {
   expect_identical(changed$source$distribution$calibration, "simulation ranks")
   plotted <- scalable_qq_plot(prepared, conditioning = "marginal", seed = 5,
     n_simulate = 3)
-  expect_match(plotted$labels$subtitle, "conditioning: marginal")
+  expect_identical(plotted$labels$subtitle, "Method: std. normal")
 })

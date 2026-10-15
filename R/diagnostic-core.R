@@ -135,16 +135,38 @@ diagnostic_reference_description <- function(distribution, base) {
   base
 }
 
-diagnostic_qq_subtitle <- function(model, method, grouped = FALSE) {
-  d <- response_distribution(model)
-  base <- if (method == "marginal") paste0("Marginal distribution check; bands omitted:\n",
-    d$dependence_reason %||% "marginal references do not assess dependence") else
-    if (method == "normal" && !isTRUE(d$independent))
-      "Approximate normal marginal check; dependence-aware bands omitted" else
-    if (grouped && method == "normal") "Method: normal (approximation)" else
-      if (method == "simulate" && !isTRUE(d$independent))
-        "Method: simulate (joint response reference)" else paste("Method:", method)
-  diagnostic_reference_description(d, base)
+diagnostic_qq_subtitle <- function(method) {
+  paste("Method:", if (method == "normal") "std. normal" else method)
+}
+
+diagnostic_caption <- function(context) {
+  if (!length(context)) return(NULL)
+  lines <- context[1L]
+  for (item in context[-1L]) {
+    last <- length(lines)
+    if (nchar(lines[last]) + 2L + nchar(item) > 50L) {
+      lines <- c(lines, item)
+    } else {
+      lines[last] <- paste(lines[last], item, sep = "; ")
+    }
+  }
+  paste(lines, collapse = "\n")
+}
+
+diagnostic_qq_caption <- function(model, data, bands = attr(data, "band_method")) {
+  distribution <- response_distribution(model)
+  independent <- isTRUE(distribution$independent)
+  if (is.null(bands) && !independent) {
+    bands <- if (all(c("lower", "upper") %in% names(data))) "joint" else "none"
+  }
+  context <- c(
+    if (inherits(model, c("gratia_diagnostic_proxy", "gratia_glmmtmb_diagnostic")) ||
+        !identical(distribution$conditioning, "conditional"))
+      paste("Conditioning:", distribution$conditioning %||% "conditional"),
+    if (!is.null(distribution$field_method)) paste("Fields:", distribution$field_method),
+    switch(bands %||% "", joint = "joint simulation bands", none = "bands omitted")
+  )
+  diagnostic_caption(context)
 }
 
 # Average the sorted quantiles for uniform references. For simulated references,
@@ -440,13 +462,8 @@ prepare_diagnostic_data <- function(model, type = NULL, seed = NULL,
 }
 
 
-calibrated_reference_subtitle <- function(type, band_method, distribution = NULL) {
-  ref <- if (type == "pit") "uniform" else "standard-normal"
-  base <- if (band_method == "iid") paste0("Fixed ", ref, " reference; pointwise intervals") else
-    if (band_method == "joint") paste0("Marginal ", ref, " reference; simulated joint intervals") else
-      paste0("Marginal ", ref, " reference; bands omitted:\n",
-        distribution$dependence_reason %||% "joint response generator unavailable")
-  diagnostic_reference_description(distribution, base)
+calibrated_reference_subtitle <- function(type) {
+  diagnostic_qq_subtitle(if (type %in% c("pit", "dharma")) "uniform" else "normal")
 }
 
 diagnostic_posterior_source <- function(model) UseMethod("diagnostic_posterior_source")

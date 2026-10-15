@@ -35,6 +35,9 @@
 #'   complete response or a fitted component. Prediction at new data is not supported.
 #'
 #' @details
+#' Mixed-model captions name the conditioning mode. Supply `caption` to replace this text, or
+#' `caption = ""` to omit it.
+#'
 #' Each replicated data set includes uncertainty in the coefficients and random
 #' variation in the responses, at the covariate values used to fit the model.
 #' Linear models and GLMs draw coefficients from a Gaussian distribution with
@@ -157,8 +160,9 @@ posterior_predictive_plot <- function(
   }
   observed <- diagnostic_posterior_observed(model, conditioning = conditioning, ...)
   discrete <- attr(observed, "discrete")
-  subtitle <- subtitle %||% if (!is.null(attr(observed, "diagnostic_description")))
-    stringr::str_wrap(attr(observed, "diagnostic_description"), width = 100L) else NULL
+  caption <- caption %||% if (!is.null(attr(observed, "diagnostic_conditioning")))
+    paste("Conditioning:", attr(observed, "diagnostic_conditioning")) else NULL
+  attr(observed, "diagnostic_conditioning") <- NULL
   attr(observed, "diagnostic_description") <- NULL
   attr(observed, "discrete") <- NULL
   observed <- observed[!is.na(observed$.response), , drop = FALSE]

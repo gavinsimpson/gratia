@@ -56,11 +56,11 @@ test_that("prepared field diagnostics use requested conventions in every plot pa
   for (input in list(prepared, proxy)) {
     for (plot_fun in list(qq_plot, worm_plot)) {
       plot <- plot_fun(input, type = "quantile", field_method = "mle-eb", seed = 3)
-      expect_match(plot$labels$subtitle, "does not recommend")
+      expect_identical(plot$labels$subtitle, "Method: std. normal")
     }
     plot <- appraise(input, type = "quantile", field_method = "mle-eb", seed = 3,
       scalable = FALSE)
-    expect_match(plot[[1]]$labels$subtitle, "does not recommend")
+    expect_identical(plot[[1]]$labels$subtitle, "Method: std. normal")
     expected <- quantile_residuals(m, type = "quantile", field_method = "mle-eb", seed = 3)
     expect_equal(sort(plot[[1]]$data$residuals), sort(as.numeric(expected)))
   }

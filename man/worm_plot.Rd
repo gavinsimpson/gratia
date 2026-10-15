@@ -186,6 +186,11 @@ use simulated bands. See \link{diagnostic_support} for these choices and limits.
 Bands condition on fitted parameters and exclude fitting uncertainty; they
 do not provide simultaneous coverage. Traditional residuals use the fitted
 response distributions or a normal approximation.
+
+Subtitles name the method. Captions identify conditioning and field choices,
+joint simulation bands or omitted bands. Routine pointwise bands are unlabelled.
+Supply \code{caption} to replace this text, or \code{caption = ""} to omit it.
+Ordinary and scalable QQ and worm plots use the same labels.
 }
 \note{
 The wording used in \code{\link[mgcv:qq.gam]{mgcv::qq.gam()}} uses \emph{direct} in reference to the
