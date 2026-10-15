@@ -27,6 +27,13 @@
 #'   [mgcv::predict.gam()].
 #'
 #' @details
+#' Formula offsets are included in predictions. Offsets supplied only through
+#' the fitting function's `offset` argument are omitted, including when
+#' `data = NULL`: this function evaluates explicit prediction rows internally.
+#' In contrast, [fitted_samples()] retains fitting-argument offsets when its
+#' `data` argument is `NULL`. Put offsets in the formula to evaluate them at
+#' new observations.
+#'
 #' With `data = NULL`, results follow the model's `na.action`: `na.exclude`
 #' restores excluded observations as `NA` fitted values, standard errors and
 #' interval bounds; `na.omit` returns only retained observations. Covariates

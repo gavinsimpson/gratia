@@ -619,6 +619,10 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' @param scale character; `"response"` returns the expected response;
 #'   `"linear_predictor"` returns the first linear predictor. For LSS models,
 #'   this is the predictor for location, which need not be the expected response.
+#'   For multinomial models both scales return every category, labelled
+#'   `response1`, `response2`, and so on. On the linear predictor scale,
+#'   `response1` is the reference category with predictor zero; other values
+#'   are log odds relative to it. Response-scale values are probabilities.
 #'
 #' @param family_index numeric; optional family-list positions for grouped
 #'   family ([mgcv::gfam()]) response predictions, with one integer per requested
@@ -939,6 +943,14 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   }
 
   scale <- match.arg(scale)
+  fn <- family_type(model)
+  gen_fam <- inherits(family(model), "general.family")
+  if (gen_fam && scale == "response" &&
+      !is_lss_family(family(model)) && !fn %in% c("multivariate_normal", "multinom", "cox_ph")) {
+    stop("Response-scale fitted samples are not supported for general family ",
+      sQuote(family_name(model)), ". Use scale = 'linear_predictor' for ",
+      "the first linear predictor.", call. = FALSE)
+  }
   grouped <- is_gfam_family(family(model))
   if (!grouped && !is.null(family_index)) {
     stop(
@@ -1011,12 +1023,10 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   }
   ## betas is for *all* coefs, including distributional parameters
   lss_idx <- lss_eta_index(model)
-  gen_fam <- inherits(family(model), "general.family")
   if (gen_fam) {
     # some general families should allow all linear predictors;
     # e.g., mvn(), multinom()
-    fam_nam <- family_name(model)
-    if (grepl("^Multivariate normal", fam_nam) || grepl("^multinom", fam_nam)) {
+    if (fn %in% c("multivariate_normal", "multinom")) {
       lss_loc <- lss_idx # for mvn we want to loop over all the linpreds
     } else if (scale == "linear_predictor") {
       lss_loc <- lss_idx[[1L]]
@@ -1027,7 +1037,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
           "a location parameter alone does not define an expected response.",
           call. = FALSE)
       }
-      stop("The expected response is not implemented for family <", fam_nam,
+      stop("The expected response is not implemented for family <", family_name(model),
         ">; a family-specific expectation adapter is required.", call. = FALSE)
     }
   } else {
@@ -1048,7 +1058,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
       sims <- sims + m_offset
     }
     # handle transformation to response scale
-    if (isTRUE(identical(scale, "response"))) {
+    if (identical(scale, "response") && fn != "multinom") {
       if (grouped) {
         sims <- gfam_response_means(sims, context)
       } else {
@@ -1067,6 +1077,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   } else {
     predict_model(model, newdata = data, type = "lpmatrix", ...)
   }
+  attr(Xp, "model.offset") <- prediction_offsets(model, Xp)
   if (training) {
     # Native fitting predictions retain offsets supplied as fitting arguments.
     # Apply the same term exclusions to the native predictor and design matrix.
@@ -1084,9 +1095,8 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   ## predict step; for mvn() and multinom() models, we do want to loop over
   ##   the linear predictors
   n_eta <- length(lss_idx) # number of linear predictors to work with
-  if (n_eta > 1L) {
+  if (n_eta > 1L || fn == "multinom") {
     # this is where we need to handle non-standard predictions
-    fn <- family_type(model)
     n_data <- NROW(data)
     n_lp <- n_eta(model)
     sims <- lapply(
@@ -1102,7 +1112,8 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     sims <- switch(
       fn,
       multivariate_normal = yhat_mvn(sims, n_data, n_lp),
-      multinom = yhat_multinom(sims, n_data, n_lp, fam = family(model))
+      multinom = yhat_multinom(sims, n_data, n_lp, fam = family(model),
+        scale = scale)
     )
   } else {
     sims <- pred_fun(Xp, betas, lss_loc, scale) |>
@@ -1140,21 +1151,26 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   sims
 }
 
-`yhat_multinom` <- function(sims, n_data, n_eta, fam) {
+`yhat_multinom` <- function(sims, n_data, n_eta, fam, scale) {
   n_y <- n_eta + 1
   sims <- sims |>
     bind_rows()
   n_sim <- NCOL(sims)
   out <- lapply(
     sims,
-    FUN = \(x, n_data, n_eta, fam) {
-      r <- fam$predict(fam, eta = matrix(x, ncol = n_eta, nrow = n_data))[[1]]
+    FUN = \(x, n_data, n_eta, fam, scale) {
+      eta <- matrix(x, ncol = n_eta, nrow = n_data)
+      r <- if (scale == "response") {
+        fam$predict(fam, eta = eta)[[1L]]
+      } else {
+        cbind(0, eta)
+      }
       r |>
         data.frame() |>
         setNames(nm = paste0("response", seq_len(n_y))) |>
         as_tibble()
     },
-    n_data = n_data, n_eta = n_eta, fam = fam
+    n_data = n_data, n_eta = n_eta, fam = fam, scale = scale
   ) |>
     bind_rows() |>
     add_column(
@@ -1649,6 +1665,9 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     data <- prepare_smooth_data(model, sm, data)
     Xp <- smooth_predict_matrix(sm, data, model)
     simu <- Xp %*% t(betas[, idx, drop = FALSE])
+    # A prescribed boundary contributes a fixed value to every coefficient draw.
+    off <- attr(Xp, "offset", exact = TRUE)
+    if (!is.null(off)) simu <- simu + off
     colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
     simu <- as_tibble(simu)
     nr_simu <- nrow(simu)

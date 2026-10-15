@@ -71,7 +71,7 @@ model_used_rows <- function(model) {
   # Remove it here too; public methods restore excluded positions once.
   for (nm in c("model", "frame")) if (is.data.frame(model[[nm]]))
     attr(model[[nm]], "na.action") <- NULL
-  model
+  restore_fitting_predictors(model)
 }
 
 # Residual augmentation accepts the retained rows or the original fitting rows,
@@ -141,6 +141,9 @@ prediction_layout <- function(model, data = NULL, na.action = stats::na.pass,
   }
   # Internally .row always indexes the compact prediction data.
   data$.row <- NULL
+  # The row map above owns restoration. Native discrete BAM prediction must
+  # not expand compact evaluation rows using the fitting frame's na.action.
+  attr(data, "na.action") <- NULL
   list(
     data = data,
     map = map,

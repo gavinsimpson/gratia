@@ -10,6 +10,20 @@ gamm4_gam <- function(object) {
   # gamm4 stores residuals(mer), which defaults to deviance residuals for
   # glmerMod fits. mgcv expects this slot to contain working residuals.
   gam$residuals <- stats::residuals(object[["mer"]], type = "working")
+  # lme4 retains offsets supplied through ... even when the GAM frame does not.
+  # Read the known contribution directly; full mixed predictions also contain
+  # group effects and cannot supply a GAM-component offset by subtraction.
+  frame <- stats::model.frame(object[["mer"]])
+  off <- stats::model.offset(frame)
+  if (!is.null(off)) {
+    rows <- match(rownames(gam$model), rownames(frame))
+    if (anyNA(rows)) {
+      stop("GAM and mixed-model offset rows are not aligned.", call. = FALSE)
+    }
+    gam$offset <- off[rows]
+    arg <- frame[["(offset)"]]
+    if (!is.null(arg)) attr(gam, "gratia.fitting.argument.offset") <- arg[rows]
+  }
   attr(gam, "gratia.gamm4") <- TRUE
   gam
 }

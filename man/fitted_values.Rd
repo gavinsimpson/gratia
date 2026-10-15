@@ -94,6 +94,13 @@ is the predicted probability for a single category of the response.
 Generate fitted values from a estimated GAM
 }
 \details{
+Formula offsets are included in predictions. Offsets supplied only through
+the fitting function's \code{offset} argument are omitted, including when
+\code{data = NULL}: this function evaluates explicit prediction rows internally.
+In contrast, \code{\link[=fitted_samples]{fitted_samples()}} retains fitting-argument offsets when its
+\code{data} argument is \code{NULL}. Put offsets in the formula to evaluate them at
+new observations.
+
 With \code{data = NULL}, results follow the model's \code{na.action}: \code{na.exclude}
 restores excluded observations as \code{NA} fitted values, standard errors and
 interval bounds; \code{na.omit} returns only retained observations. Covariates

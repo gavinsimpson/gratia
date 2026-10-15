@@ -22,7 +22,8 @@
   weights = NULL,
   ...,
   newdata = NULL,
-  family_index = NULL
+  family_index = NULL,
+  envir = NULL
 )
 
 \method{simulate}{gamm}(
@@ -33,7 +34,8 @@
   weights = NULL,
   ...,
   newdata = NULL,
-  conditioning = NULL
+  conditioning = NULL,
+  envir = NULL
 )
 
 \method{simulate}{scam}(
@@ -43,7 +45,8 @@
   data = newdata,
   weights = NULL,
   ...,
-  newdata = NULL
+  newdata = NULL,
+  envir = NULL
 )
 }
 \arguments{
@@ -85,6 +88,10 @@ positions restored by \code{na.exclude} when supplying weights for fitting rows.
 
 \item{family_index}{numeric; for grouped-family models, one integer family
 index per requested prediction row. See Details.}
+
+\item{envir}{environment or \code{NULL}; functions and constants needed to
+evaluate model expressions in prediction data. With \code{NULL}, use the
+model's formula environment. Supply raw covariates in \code{data}.}
 }
 \value{
 (Currently) A data frame with \code{nsim} columns.

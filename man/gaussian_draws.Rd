@@ -89,6 +89,58 @@ for \code{scam::scam()} model fits.}
 \description{
 Posterior samples using a Gaussian approximation
 }
+\details{
+Sampling controls must be named. Removed arguments produce migration errors;
+see \code{vignette("sampling-migration")}. Explicit controls that the selected
+method cannot use are rejected.
+
+For multiple chains, \code{n_draws} is the total retained count and must be divisible
+by \code{chains}. Coefficient matrices carry a chain mapping; use
+\code{\link[=as_mcmc_draws]{as_mcmc_draws()}} before ordinary matrix operations remove that mapping.
+Higher-level sampling tables include \code{.chain} and \code{.iteration} for multiple
+chains, with \code{.draw} unique across chains. Default single-chain table columns
+are unchanged. Use \code{\link[=sampling_diagnostics]{sampling_diagnostics()}} to extract coefficient diagnostics
+before response simulation adds further noise.
+
+The gratia MH backend supports Gaussian identity, Poisson log, binomial
+logit, Gamma log, and negative binomial log fits. It evaluates the fitted
+bases at original covariates, including for discrete bam fits. GAMM components, AR1 dependence,
+\code{paraPen}, \code{H}, and fits made from pre-fit \code{G} objects are unsupported.
+
+The family MH backend calls the fitted family's \code{dev.resids()} and \code{linkinv()}
+functions, or \code{ll()} for families with multiple linear predictors. This
+retains response encodings and attributes such as censoring indicators and
+the mappings between coefficients and predictors. It supports compatible
+standard, extended, and general mgcv families, including multinomial, Gaussian
+location-scale, and grouped families. Quasi families, Cox proportional hazards
+models, GAMM components, AR1 dependence, \code{paraPen}, \code{H}, and pre-fit \code{G} objects
+are unsupported. The fitted coefficient covariance must be nonsingular.
+It always caches the full design matrix; \code{block_size} and \code{dense_limit} apply
+only to the gratia backend and are rejected for the family backend.
+
+All MH backends sample the conditional coefficient posterior with fitted
+smoothing, dispersion, and additional family parameters fixed. Parameters
+represented in the fitted coefficient vector are sampled, including scale
+or covariance coefficients in general families. \code{unconditional} applies
+to Gaussian draws only.
+
+GAM-class fits with linear inequality constraints, including
+\code{mgcv::scasm()} fits, store these as \code{Ain \%*\% coefficients >= bin}.
+Gaussian sampling uses the fitted covariance matrix without enforcing
+these inequalities and issues a warning. Sampled smooths can therefore
+violate the fitted shape constraints. Pointwise intervals computed from
+the same Gaussian covariance approximation also need not preserve those
+shapes. All MH backends are unavailable for these fits because
+the samplers do not enforce their inequalities.
+
+If \code{mgcv::scasm()} was fitted with \code{bs > 0}, its \code{bs} component stores
+coefficient draws from the native constrained bootstrap in columns. These
+can be supplied explicitly as \code{draws = t(model$bs)} with \code{method = "user"}.
+The result then describes bootstrap variation, rather than Gaussian
+posterior sampling. Gratia does not automatically select these draws.
+The caller is responsible for the interpretation and constraint
+feasibility of user-supplied draws.
+}
 \seealso{
 \link{gamm4_support}
 }

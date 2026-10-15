@@ -14,6 +14,15 @@
   Gaussian threads use `n_threads`, while `n_cores` limits concurrent MH chains.
   Explicit controls that do not apply to the selected sampler are rejected.
   See `vignette("sampling-migration")`.
+* `fitted_samples()` rejects response-scale requests for general families
+  without an expected-response adapter. Use `scale = "linear_predictor"`
+  for the first predictor. Supported LSS families use their full expected
+  response instead of treating location as the mean.
+
+* Gaussian coefficient sampling for `mgcv::scasm()` fits with linear inequality
+  constraints now warns that the draws need not satisfy the fitted shapes.
+  Metropolis-Hastings sampling now gives an explicit error because its
+  proposals and likelihood calculation do not enforce those constraints.
 
 * gratia has a new neon hex logo. The pkgdown site uses the pink
   g from the logo as its favicon.
@@ -312,6 +321,8 @@
   `vignette("transformed-covariates", package = "gratia")` for examples.
   Evaluation failures at new data produce actionable errors. Parametric
   effects and data slices recover raw covariates consistently.
+  `simulate()` and `add_fitted()` also accept `envir` for local functions in
+  offsets and smooth expressions.
 
 * `smooth_estimates(..., back_transform = TRUE)` now recovers raw fitting
   covariates, generates grids on their original scale and evaluates model
@@ -427,9 +438,17 @@
   error explaining that `scalable = FALSE` is required. Ordinary posterior
   predictive plots remain available.
 
-* Partial derivatives of soap-film smooths include the contribution from known
-  boundary values. Those fixed values affect derivative estimates without
-  adding coefficient uncertainty.
+* Partial derivatives, fitted samples and smooth samples of soap-film smooths
+  include the contribution from known boundary values. Complete-predictor
+  derivative samples also differentiate those fixed values, without adding
+  coefficient uncertainty. Term exclusions retain only the appropriate fixed
+  contributions. Separate sampling per smooth now correctly subsets supplied
+  coefficient draws.
+
+* Multinomial fitted samples now honour `scale = "linear_predictor"`, returning
+  log odds relative to the reference category instead of probabilities. Both
+  scales retain all category labels; the reference predictor is zero. Models
+  with one non-reference category also use this output format.
 
 * GJRM smooth selection now uses one order across all model equations.
   Character selections draw only the equations containing the selected smooths;
@@ -483,7 +502,12 @@
 * QQ bands for dependent responses now use joint simulations when available.
   Otherwise, the plot explains why the bands are omitted.
 
-* Posterior response draws now retain offsets supplied as fitting arguments.
+* Fitted and posterior response draws, response simulations and diagnostics
+  now retain offsets supplied as fitting arguments for fitting observations,
+  including ordinary `bam()` and extracted `gamm4()` GAM components. Recovery
+  keeps formula offsets, prescribed smooth boundaries and additional group
+  effects separate. Explicit prediction data still follow the fitter's
+  prediction convention and do not inherit argument-only fitting offsets.
 
 * Explicit seeds now preserve the caller's random-number state for coefficient
   and response draws. `worm_plot()` also honours `seed`, including through
@@ -496,7 +520,9 @@
   retained observations with predictors, and histogram bin selection handles
   missing residuals (#349, #402). Explicit prediction data preserve row
   positions by default: missing required predictors yield `NA`, while missing
-  responses alone do not prevent prediction.
+  responses alone do not prevent prediction. Discrete `bam()` fitted-value
+  intervals restore exclusions once and accept stored fitting frames without
+  relying on tibble subsetting in native prediction.
 
 * `link()`, `inv_link()` and `extract_link()` now reject unsupported
   parameters consistently. For `twlss()`, `scale`, `sigma` and `phi` select

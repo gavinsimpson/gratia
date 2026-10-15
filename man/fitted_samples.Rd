@@ -149,7 +149,11 @@ for the gratia MH backend. Use zero to force blockwise evaluation.}
 
 \item{scale}{character; \code{"response"} returns the expected response;
 \code{"linear_predictor"} returns the first linear predictor. For LSS models,
-this is the predictor for location, which need not be the expected response.}
+this is the predictor for location, which need not be the expected response.
+For multinomial models both scales return every category, labelled
+\code{response1}, \code{response2}, and so on. On the linear predictor scale,
+\code{response1} is the reference category with predictor zero; other values
+are log odds relative to it. Response-scale values are probabilities.}
 
 \item{family_index}{numeric; optional family-list positions for grouped
 family (\code{\link[mgcv:gfam]{mgcv::gfam()}}) response predictions, with one integer per requested

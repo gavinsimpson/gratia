@@ -21,6 +21,9 @@
 #' @param type character; the type of predictions to return. See
 #'   [mgcv::predict.gam()] for options.
 #' @param ... additional arguments passed to [mgcv::predict.gam()].
+#' @param envir environment or `NULL`; functions and constants needed to
+#'   evaluate model expressions in prediction data. With `NULL`, use the
+#'   model's formula environment. Supply raw covariates in `data`.
 #'
 #' @return A data frame (tibble) formed from `data` and predictions from
 #'   `model`.
@@ -52,13 +55,14 @@
 #' options(op)
 #' }
 `add_fitted.gam` <- function(data, model, value = ".fitted", type = "response",
-                             ...) {
+                             ..., envir = NULL) {
+  model <- with_model_envir(model, envir)
   ## coerce to tibble
   layout <- prediction_layout(model, data, na.action = list(...)$na.action %||% stats::na.pass)
   data <- as_tibble(layout$data)
 
   ## predict using the predict method
-  pred_vals <- predict(model, newdata = data, type = type, ...)
+  pred_vals <- predict_model(model, newdata = layout$data, type = type, ...)
 
   ## check if pred_vals is a list
   if (is.list(pred_vals)) {

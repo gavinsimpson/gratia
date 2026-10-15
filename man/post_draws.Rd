@@ -195,6 +195,23 @@ smoothing, dispersion, and additional family parameters fixed. Parameters
 represented in the fitted coefficient vector are sampled, including scale
 or covariance coefficients in general families. \code{unconditional} applies
 to Gaussian draws only.
+
+GAM-class fits with linear inequality constraints, including
+\code{mgcv::scasm()} fits, store these as \code{Ain \%*\% coefficients >= bin}.
+Gaussian sampling uses the fitted covariance matrix without enforcing
+these inequalities and issues a warning. Sampled smooths can therefore
+violate the fitted shape constraints. Pointwise intervals computed from
+the same Gaussian covariance approximation also need not preserve those
+shapes. All MH backends are unavailable for these fits because
+the samplers do not enforce their inequalities.
+
+If \code{mgcv::scasm()} was fitted with \code{bs > 0}, its \code{bs} component stores
+coefficient draws from the native constrained bootstrap in columns. These
+can be supplied explicitly as \code{draws = t(model$bs)} with \code{method = "user"}.
+The result then describes bootstrap variation, rather than Gaussian
+posterior sampling. Gratia does not automatically select these draws.
+The caller is responsible for the interpretation and constraint
+feasibility of user-supplied draws.
 }
 \seealso{
 \link{gamm4_support}

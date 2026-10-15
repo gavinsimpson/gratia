@@ -4,7 +4,14 @@
 \alias{add_fitted.gam}
 \title{Add fitted values from a GAM to a data frame}
 \usage{
-\method{add_fitted}{gam}(data, model, value = ".fitted", type = "response", ...)
+\method{add_fitted}{gam}(
+  data,
+  model,
+  value = ".fitted",
+  type = "response",
+  ...,
+  envir = NULL
+)
 }
 \arguments{
 \item{data}{a data frame containing values for the variables used to fit the
@@ -20,6 +27,10 @@ will be stored.}
 \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}} for options.}
 
 \item{...}{additional arguments passed to \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}.}
+
+\item{envir}{environment or \code{NULL}; functions and constants needed to
+evaluate model expressions in prediction data. With \code{NULL}, use the
+model's formula environment. Supply raw covariates in \code{data}.}
 }
 \value{
 A data frame (tibble) formed from \code{data} and predictions from
