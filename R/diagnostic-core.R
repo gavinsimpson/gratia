@@ -40,6 +40,7 @@ diagnostic_reference_residuals <- function(model, y, type) {
 diagnostic_reference_residuals.default <- function(model, y, type) {
   model <- model_used_rows(model)
   distribution <- response_distribution(model)
+  y <- observe_diagnostic_response(distribution, y)
   check_distribution_residual_moments(distribution, type)
   if (is.function(distribution$diagnostic_residuals))
     return(distribution$diagnostic_residuals(y, type))
@@ -58,6 +59,7 @@ diagnostic_reference_residuals.default <- function(model, y, type) {
 diagnostic_reference_method <- function(model, method = NULL) {
   if (!is.null(method)) method <- match.arg(method, c("uniform", "simulate", "normal", "direct", "marginal"))
   distribution <- response_distribution(model)
+  if (!identical(method, "normal")) check_distribution_reference(distribution)
   joint <- isTRUE(distribution$joint_available) && is.function(distribution$rd)
   dependent <- !isTRUE(distribution$independent)
   if (dependent && !joint) {
@@ -374,7 +376,7 @@ calibrated_residual_reference <- function(data, type, level, detrend = FALSE,
       reference <- qq_reference_draws(part$residuals,
         draw = function(p) distribution$rd(),
         residual = function(y) as.vector(distribution_quantile_residuals(
-          distribution, y, type))[part$.row],
+          distribution, observe_diagnostic_response(distribution, y), type))[part$.row],
         n = n_simulate, method = "simulate", level = level)
       part$lower <- reference$lower
       part$upper <- reference$upper

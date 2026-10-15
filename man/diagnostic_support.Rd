@@ -311,7 +311,10 @@ parameters times the number of draws.
 The internal \code{fix_family_rd()}, \code{fix_family_cdf()} and \code{fix_family_qf()}
 functions still add \verb{$rd}, \verb{$cdf} and \verb{$qf} to mgcv-compatible families while
 preserving functions supplied by callers. The fitted-distribution code adapts
-their arguments locally. Other fitting packages can use the same standard
+their arguments locally. Families can supply a \code{gratia_diagnostics} function
+for response moments, probability bounds and other distribution information;
+see \link{family_diagnostics} for the interface. Other fitting packages can use the
+same standard
 response distributions, or combine them by family index, truncate them or add
 point masses without changing the plotting calculations.
 }

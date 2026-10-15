@@ -2,6 +2,11 @@
 
 ## User visible changes
 
+* Optional inlaws integration uses native diagnostic factories. Grouped-family
+  reconstruction preserves nested fitted-parameter closures, and multivariate
+  diagnostic panels retain supplied response columns and means. The integration
+  CI job requires `INLAWS_DIAGNOSTICS_REF` to name a published native inlaws ref.
+
 * gratia has a new neon hex logo. The pkgdown site uses the pink
   g from the logo as its favicon.
 
@@ -68,6 +73,13 @@
   the development version of glmmTMB is no longer needed.
 
 ## New features
+
+* mgcv-compatible families can now supply a `gratia_diagnostics` function for
+  response means, variances, probability bounds and distribution functions.
+  This allows diagnostics for additional count, ordinal, mixture and censored
+  families without adding family-name checks to gratia. Traditional simulated
+  reference residuals can apply a supplied observation process. See
+  `?family_diagnostics` for the interface.
 
 * New site articles explain model diagnostics, grouped surveys, glmmTMB and
   sdmTMB models, prediction comparisons, response distributions, and smooth

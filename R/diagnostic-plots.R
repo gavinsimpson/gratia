@@ -318,6 +318,7 @@ qq_simulate <- function(model, n = 50,
   if (is_gfam_family(stats::family(model)))
     return(gfam_qq(model, n, type, "simulate", level, detrend, by_family))
   distribution <- response_distribution(model)
+  check_distribution_reference(distribution)
   if (!is.function(distribution$rd)) stop("Response simulation is unavailable for this family.")
   qq_reference_draws(diagnostic_residuals(model, type),
     draw = function(p) distribution$rd(),
@@ -395,6 +396,7 @@ qq_uniform <- function(model, n = 10,
   if (is_gfam_family(stats::family(model)))
     return(gfam_qq(model, n, type, "uniform", level, detrend, by_family))
   distribution <- response_distribution(model)
+  check_distribution_reference(distribution)
   if (!is.function(distribution$qf)) stop("An inverse CDF is unavailable for this family.")
   probabilities <- NULL
   draw <- function(p) {
@@ -562,11 +564,16 @@ qq_uniform <- function(model, n = 10,
     y_intercept <- 0
   }
   r <- restore_model_rows(r, original)
-  mv_y <- family_name(model) %in% multivariate_y()
+  mv_y <- is.matrix(response_distribution(model)$mean) ||
+    family_name(model) %in% multivariate_y()
   if (is.matrix(r) && mv_y) { # handle mvn() like fits
     r <- as.vector(r)
   }
-  eta <- restore_model_rows(model[["linear.predictors"]], original)
+  response_mean <- response_distribution(model)$mean
+  use_response_mean <- is.matrix(response_mean) &&
+    !family_name(model) %in% multivariate_y()
+  eta <- restore_model_rows(if (use_response_mean) response_mean else
+    model[["linear.predictors"]], original)
   if (is.matrix(eta) && mv_y) {
     eta <- as.vector(eta) # handle multinom(), mvn() like fits
   }
@@ -600,13 +607,15 @@ qq_uniform <- function(model, n = 10,
   ## add labels
   if (is.null(xlab)) {
     xlab <- if (isTRUE(attr(df, "ranked"))) "Within-component linear predictor rank"
+      else if (use_response_mean) "Fitted response mean"
       else original$eta_label %||% "Linear predictor"
   }
   if (is.null(ylab)) {
     ylab <- paste(str_to_title(type), "residuals")
   }
   if (missing(title)) {
-    title <- "Residuals vs linear predictor"
+    title <- if (use_response_mean) "Residuals vs fitted response mean" else
+      "Residuals vs linear predictor"
   }
   if (missing(subtitle)) {
     subtitle <- diagnostic_reference_description(response_distribution(model),
@@ -650,7 +659,8 @@ qq_uniform <- function(model, n = 10,
   fit <- restore_model_rows(fit, original)
   ## handle case where fitted is a matrix; extended.families
   ##   - the needs to be more involved as what about mvn or multinom families
-  mv_y <- family_name(model) %in% multivariate_y()
+  mv_y <- is.matrix(response_distribution(model)$mean) ||
+    family_name(model) %in% multivariate_y()
   if (NCOL(fit) > 1L) {
     fit <- if (mv_y) {
       as.vector(fit) # was fit[, 1], but changed for mvn

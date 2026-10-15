@@ -94,7 +94,8 @@ diagnostic_data.gam <- function(model, type = NULL, seed = NULL, conditioning = 
   }
   grouped <- is_gfam_family(stats::family(model))
   fit <- response_distribution(model)$mean %||% stats::fitted(model)
-  eta <- model$linear.predictors
+  use_response_mean <- is.matrix(fit) && !family_name(model) %in% multivariate_y()
+  eta <- if (use_response_mean) fit else model$linear.predictors
   if (is.null(eta)) {
     eta <- fit
   }
@@ -135,7 +136,8 @@ diagnostic_data.gam <- function(model, type = NULL, seed = NULL, conditioning = 
   # Restore the missing-row information so standalone plots keep fitting order.
   model$na.action <- action
   new_diagnostic_data(dat, model, type, stats::family(model)$family, n,
-    eta_label = model$eta_label %||% "Linear predictor")
+    eta_label = if (use_response_mean) "Fitted response mean" else
+      model$eta_label %||% "Linear predictor")
 }
 
 #' @export

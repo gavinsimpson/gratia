@@ -54,15 +54,9 @@ gfam_component_family <- function(component, theta) {
     stop("Grouped-family parameters require a family-private environment.",
       call. = FALSE)
   }
-  env <- list2env(as.list.environment(old, all.names = TRUE),
-    parent = parent.env(old))
-  for (name in names(component)) {
-    fun <- component[[name]]
-    if (is.function(fun) && identical(environment(fun), old)) {
-      environment(fun) <- env
-      component[[name]] <- fun
-    }
-  }
+  # Diagnostic factories can capture nested functions sharing the parameter
+  # state. Clone the complete environment graph before updating that state.
+  component <- unserialize(serialize(component, NULL))
   component$putTheta(theta)
   component
 }

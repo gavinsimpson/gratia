@@ -61,6 +61,15 @@ jobs:
           pak-version: stable
           needs: check
 
+      - name: Check optional inlaws diagnostic integration
+        if: runner.os == 'Linux' && matrix.config.r == 'release' && matrix.config.tests == 'full' && matrix.config.glmmtmb != 'development' && vars.INLAWS_DIAGNOSTICS_REF != ''
+        env:
+          INLAWS_DIAGNOSTICS_REF: ${{ vars.INLAWS_DIAGNOSTICS_REF }}
+        shell: Rscript {0}
+        run: |
+          pak::pkg_install(paste0("gam-mafia/inlaws@", Sys.getenv("INLAWS_DIAGNOSTICS_REF")))
+          source("tools/test-inlaws-diagnostics.R")
+
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true

@@ -298,7 +298,10 @@
 #' The internal `fix_family_rd()`, `fix_family_cdf()` and `fix_family_qf()`
 #' functions still add `$rd`, `$cdf` and `$qf` to mgcv-compatible families while
 #' preserving functions supplied by callers. The fitted-distribution code adapts
-#' their arguments locally. Other fitting packages can use the same standard
+#' their arguments locally. Families can supply a `gratia_diagnostics` function
+#' for response moments, probability bounds and other distribution information;
+#' see [family_diagnostics] for the interface. Other fitting packages can use the
+#' same standard
 #' response distributions, or combine them by family index, truncate them or add
 #' point masses without changing the plotting calculations.
 #'

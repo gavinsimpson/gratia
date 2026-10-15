@@ -27,6 +27,15 @@ gfam_diagnostic_context <- function(model) {
   context
 }
 
+gfam_component_distribution <- function(context, i, family = context$components[[i]]$family) {
+  rows <- which(context$index == i)
+  latent <- grepl("^ordered_categorical|^zero_inflated_poisson", family_type(family))
+  distribution_from_family(family,
+    if (latent) context$eta[rows] else context$mu[rows], context$weights[rows],
+    context$components[[i]]$scale, slice_observations(context$y, rows),
+    eta = context$eta[rows])
+}
+
 gfam_diagnostic_residuals <- function(context, y = context$y,
                                       type = "deviance") {
   out <- rep(NA_real_, length(y))
@@ -35,6 +44,14 @@ gfam_diagnostic_residuals <- function(context, y = context$y,
     if (!length(rows)) next
     component <- context$components[[i]]
     family <- component$family
+    if (is.function(family$gratia_diagnostics)) {
+      d <- gfam_component_distribution(context, i)
+      check_distribution_residual_moments(d, type)
+      if (is.function(d$diagnostic_residuals)) {
+        out[rows] <- d$diagnostic_residuals(slice_observations(y, rows), type)
+        next
+      }
+    }
     ordinal <- startsWith(family$family, "Ordered Categorical")
     if (ordinal && type != "deviance") {
       stop("Grouped ordinal diagnostics support only deviance residuals.",
@@ -103,8 +120,10 @@ gfam_diagnostic_method <- function(model, method = NULL) {
   context <- gfam_diagnostic_context(model)
   active <- sort(unique(context$index))
   families <- context$families[active]
-  qf <- vapply(families, function(f) is.function(fix_family_qf(f)$qf), logical(1))
-  rd <- vapply(families, function(f) is.function(fix_family_rd(f)$rd), logical(1))
+  distributions <- lapply(active, function(i) gfam_component_distribution(context, i))
+  qf <- vapply(distributions, function(d) is.function(d$qf), logical(1))
+  rd <- vapply(distributions, function(d) is.function(d$rd), logical(1))
+  if (!identical(method, "normal")) lapply(distributions, check_distribution_reference)
   label <- function(which) paste0(active[which], " <",
     vapply(families[which], `[[`, character(1), "family"), ">", collapse = ", ")
   if (is.null(method)) {
@@ -151,7 +170,11 @@ gfam_cdf_support <- function(context) {
     known <- ft %in% c("gaussian", "poisson", "binomial", "negative_binomial", "gamma",
       "beta_regression", "scaled_t", "tweedie", "inverse_gaussian", "cnorm", "clog", "cpois") ||
       grepl("^ordered_categorical|^zero_inflated_poisson", ft)
-    if (!known || !is.function(fix_family_cdf(f)$cdf)) unsupported <- c(unsupported,
+    supplied <- is.function(f$gratia_diagnostics)
+    d <- if (supplied) gfam_component_distribution(context, i) else NULL
+    if ((!known && !(supplied && isTRUE(d$cdf_bounds_supplied))) ||
+        !(if (supplied) is.function(d$cdf) && is.function(d$bounds)
+        else is.function(fix_family_cdf(f)$cdf))) unsupported <- c(unsupported,
       paste0(i, " <", f$family, "> (no validated response-CDF bounds)"))
   }
   unsupported
@@ -233,13 +256,12 @@ gfam_quantile_residuals <- function(context, type = "quantile") {
         (ft == "beta_regression" && any(y <= 0 | y >= 1)) ||
         (ft == "tweedie" && any(y < 0)))
       stop("Grouped-family response is outside the distribution's support.", call. = FALSE)
-    f$cdf <- gfam_checked_cdf(f$cdf, paste0(i, " <", f$family, ">"))
+    if (!is.function(f$gratia_diagnostics))
+      f$cdf <- gfam_checked_cdf(f$cdf, paste0(i, " <", f$family, ">"))
     if (grepl("^ordered_categorical", ft) &&
         any(y < 1 | y > length(f$getTheta(TRUE)) + 1 | y != floor(y)))
       stop("Ordinal components need valid integer category codes.", call. = FALSE)
-    latent <- grepl("^ordered_categorical|^zero_inflated_poisson", ft)
-    value <- distribution_quantile_residuals(distribution_from_family(f,
-      if (latent) context$eta[rows] else mu, wt, component$scale, y), y, type)
+    value <- distribution_quantile_residuals(gfam_component_distribution(context, i, f), y, type)
     if (any(!is.finite(value))) stop("Non-finite ", type,
       " residuals for grouped component ", i, " <", f$family,
       ">; check response support and CDF precision.", call. = FALSE)
@@ -324,11 +346,11 @@ gfam_qq <- function(model, n, type, method, level = 0.9, detrend = FALSE,
     rows <- which(context$index == i)
     part <- context
     for (name in c("eta", "mu", "weights", "y", "index"))
-      part[[name]] <- context[[name]][rows]
+      part[[name]] <- slice_observations(context[[name]], rows)
     part$model$model <- context$model$model[rows, , drop = FALSE]
     for (name in c("y", "linear.predictors", "fitted.values", "weights",
         "prior.weights", "residuals"))
-      part$model[[name]] <- context$model[[name]][rows]
+      part$model[[name]] <- slice_observations(context$model[[name]], rows)
     offset <- context$model$offset
     subset_offset <- function(x) if (length(x) > 1L) x[rows] else x
     part$model$offset <- if (is.list(offset)) lapply(offset, subset_offset)
@@ -357,23 +379,26 @@ gfam_qq_reference <- function(context, n, type, method, level, detrend) {
       .qq_intercept = stats::median(r), .qq_slope = sd))
   }
   probabilities <- (seq_len(nr) - 0.5) / nr
-  generators <- lapply(context$families, function(f) fix_family_rd(f)$rd)
-  quantiles <- lapply(context$families, function(f) fix_family_qf(f)$qf)
+  distributions <- lapply(seq_along(context$families), function(i) {
+    if (any(context$index == i)) gfam_component_distribution(context, i) else NULL
+  })
+  distribution <- combine_response_distributions(distributions, context$index)
+  check_distribution_reference(distribution)
   qq_reference_draws(r, draw = function(probabilities) {
     if (method == "simulate") {
-      gfam_response_draw(context$eta, context$weights, context, generators)
+      distribution$rd()
     } else {
       p <- sample(probabilities, nr)
       y <- numeric(nr)
       for (i in seq_along(context$families)) {
         rows <- which(context$index == i)
         if (!length(rows)) next
-        y[rows] <- quantiles[[i]](p[rows], context$mu[rows],
-          context$weights[rows], context$components[[i]]$scale)
+        y[rows] <- distributions[[i]]$qf(p[rows])
       }
       y
     }
-  }, residual = function(y) gfam_diagnostic_residuals(context, y, type),
+  }, residual = function(y) gfam_diagnostic_residuals(context,
+    observe_diagnostic_response(distribution, y), type),
     n = n, method = method, level = level, detrend = detrend)
 }
 
