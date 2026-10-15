@@ -449,7 +449,12 @@
 * QQ bands for dependent responses now use joint simulations when available.
   Otherwise, the plot explains why the bands are omitted.
 
-* Posterior response draws now retain offsets supplied as fitting arguments.
+* Fitted and posterior response draws, response simulations and diagnostics
+  now retain offsets supplied as fitting arguments for fitting observations,
+  including ordinary `bam()` and extracted `gamm4()` GAM components. Recovery
+  keeps formula offsets, prescribed smooth boundaries and additional group
+  effects separate. Explicit prediction data still follow the fitter's
+  prediction convention and do not inherit argument-only fitting offsets.
 
 * Explicit seeds now preserve the caller's random-number state for coefficient
   and response draws. `worm_plot()` also honours `seed`, including through

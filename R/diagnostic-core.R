@@ -404,11 +404,13 @@ calibrated_residual_reference <- function(data, type, level, detrend = FALSE,
 }
 
 # mgcv predict() omits offsets passed through the fitting call's offset argument,
-# even when newdata is absent. Recover that contribution from the stored linear
-# predictors; let predict() handle formula offsets and excluded terms.
+# even when newdata is absent. Restore its argument contribution separately;
+# let predict() handle formula offsets, fixed smooth values and excluded terms.
 fitting_link_correction <- function(model) {
-  if (is.null(model$linear.predictors)) return(0)
-  model$linear.predictors - predict_model(model, type = "link")
+  if (is.null(model$linear.predictors) && is.null(model$offset)) return(0)
+  eta <- if (needs_fitting_offset_restore(model)) fitting_linear_predictors(model) else
+    model$linear.predictors %||% fitting_linear_predictors(model)
+  eta - predict_model(model, type = "link")
 }
 
 family_prediction_parameters <- function(family, eta) {

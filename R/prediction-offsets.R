@@ -26,3 +26,61 @@ prediction_offsets <- function(model, X) {
     off
   })
 }
+
+# Native link prediction includes formula and fixed smooth contributions.
+# Remove the model-frame argument offset before prediction, then add it once.
+# This also preserves BAM's block prediction instead of allocating a full X.
+fitting_linear_predictors <- function(model) {
+  data <- model$model
+  off <- fitting_argument_offset(model)
+  data[["(offset)"]] <- NULL
+  # A prepared model frame is checked against the local object's frame names.
+  # Remove the special argument column from both, retaining evaluated formulas.
+  model$model[["(offset)"]] <- NULL
+  attr(data, "na.action") <- NULL
+  eta <- predict_model(model, newdata = data, type = "link")
+  if (is.null(off)) return(eta)
+  if (!length(off) %in% c(1L, NROW(eta))) {
+    stop("Fitting offsets are not aligned with the model frame.", call. = FALSE)
+  }
+  # A fitting offset argument belongs to the first predictor; offsets for
+  # additional predictors must be specified in their respective formulas.
+  if (is.matrix(eta)) eta[, 1L] <- eta[, 1L] + off else eta <- eta + off
+  eta
+}
+
+fitting_argument_offset <- function(model) {
+  attr(model, "gratia.fitting.argument.offset", exact = TRUE) %||%
+    model$model[["(offset)"]]
+}
+
+# This repairs only gratia's local copy. The original fitted object and the
+# fitter's own prediction methods retain their native conventions.
+restore_fitting_predictors <- function(model) {
+  if (!needs_fitting_offset_restore(model)) return(model)
+  eta <- fitting_linear_predictors(model)
+  attr(model, "gratia.fitting.predictors") <- TRUE
+  if (isTRUE(all.equal(as.vector(eta), as.vector(model$linear.predictors),
+      tolerance = 1e-10, check.attributes = FALSE))) return(model)
+  model$linear.predictors <- eta
+  f <- stats::family(model)
+  if (!inherits(f, "general.family")) {
+    model$fitted.values <- f$linkinv(eta)
+    if (is.function(f$mu.eta)) {
+      model$residuals <- (model$y - model$fitted.values) / f$mu.eta(eta)
+    }
+  } else {
+    model$fitted.values <- family_prediction_parameters(f, eta)
+  }
+  model
+}
+
+needs_fitting_offset_restore <- function(model) {
+  if (is.null(fitting_argument_offset(model)) ||
+      isTRUE(attr(model, "gratia.fitting.predictors"))) {
+    return(FALSE)
+  }
+  (inherits(model, "bam") && is.null(model$dinfo) &&
+      "(offset)" %in% names(model$model)) ||
+    !is.null(attr(model, "gratia.fitting.argument.offset", exact = TRUE))
+}

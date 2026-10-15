@@ -71,7 +71,7 @@ model_used_rows <- function(model) {
   # Remove it here too; public methods restore excluded positions once.
   for (nm in c("model", "frame")) if (is.data.frame(model[[nm]]))
     attr(model[[nm]], "na.action") <- NULL
-  model
+  restore_fitting_predictors(model)
 }
 
 # Residual augmentation accepts the retained rows or the original fitting rows,
