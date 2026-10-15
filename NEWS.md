@@ -289,6 +289,8 @@
   `vignette("transformed-covariates", package = "gratia")` for examples.
   Evaluation failures at new data produce actionable errors. Parametric
   effects and data slices recover raw covariates consistently.
+  `simulate()` and `add_fitted()` also accept `envir` for local functions in
+  offsets and smooth expressions.
 
 * `smooth_estimates(..., back_transform = TRUE)` now recovers raw fitting
   covariates, generates grids on their original scale and evaluates model

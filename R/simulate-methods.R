@@ -34,6 +34,9 @@
 #'   `"gam_component"` explicitly uses its extracted GAM. The existing gamm
 #'   simulator retains its GAM-component default. Full mixed-model modes currently
 #'   use fitting observations.
+#' @param envir environment or `NULL`; functions and constants needed to
+#'   evaluate model expressions in prediction data. With `NULL`, use the
+#'   model's formula environment. Supply raw covariates in `data`.
 #' @param family_index numeric; for grouped-family models, one integer family
 #'   index per requested prediction row. See Details.
 #'
@@ -90,7 +93,8 @@
 #' head(sims)
 `simulate.gam` <- function(object, nsim = 1, seed = NULL, data = newdata,
                            weights = NULL, ..., newdata = NULL,
-                           family_index = NULL) {
+                           family_index = NULL, envir = NULL) {
+  object <- with_model_envir(object, envir)
   training <- is.null(data)
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     runif(1)
@@ -157,12 +161,11 @@
     ) == TRUE ~ "ocat",
     .default = "default"
   )
-  mu <- if (identical(fam, "default")) {
-    if (training) predict(object, type = "response", ...) else
-      predict(object, newdata = data, type = "response", ...)
+  prediction_type <- if (identical(fam, "default")) "response" else "link"
+  mu <- if (training) {
+    predict_model(object, type = prediction_type, ...)
   } else {
-    if (training) predict(object, type = "link", ...) else
-      predict(object, newdata = data, type = "link", ...)
+    predict_model(object, newdata = data, type = prediction_type, ...)
   }
 
   if (training) {
@@ -229,13 +232,13 @@
 #'
 #' @export
 simulate.gamm <- function(object, nsim = 1, seed = NULL, data = newdata,
-    weights = NULL, ..., newdata = NULL, conditioning = NULL) {
+    weights = NULL, ..., newdata = NULL, conditioning = NULL, envir = NULL) {
   if (is.null(conditioning) || identical(conditioning, "gam_component")) {
     if (!is.null(newdata)) newdata_deprecated()
     return(simulate.gam(object$gam, nsim = nsim, seed = seed, data = data,
-      weights = weights, ...))
+      weights = weights, envir = envir, ...))
   }
-  if (!is.null(data) || !is.null(weights) || length(list(...)))
+  if (!is.null(data) || !is.null(weights) || !is.null(envir) || length(list(...)))
     stop("Full mixed-model simulation currently uses the fitting observations.", call. = FALSE)
   simulate_gamm_response(object, nsim, seed, conditioning)
 }
@@ -245,9 +248,9 @@ simulate.gamm <- function(object, nsim = 1, seed = NULL, data = newdata,
 #'
 #' @export
 `simulate.scam` <- function(object, nsim = 1, seed = NULL, data = newdata,
-                            weights = NULL, ..., newdata = NULL) {
+                            weights = NULL, ..., newdata = NULL, envir = NULL) {
   out <- simulate.gam(object, nsim = nsim, seed = seed, data = data,
-                      weights = weights, ..., newdata = newdata)
+                      weights = weights, ..., newdata = newdata, envir = envir)
   rng <- attr(out, "seed")
   out <- as.matrix(out)
   dimnames(out) <- NULL
