@@ -1,0 +1,68 @@
+Review of native MCMC diagnostic plots, 15 October 2026.
+Branch: gls/posterior-chains; implementation reviewed against 0782c9738.
+All fitting, tests and package checks ran outside the sandbox.
+
+Findings and corrections:
+- Unnamed coefficient matrices could retain meaningful names in diagnostic metadata,
+  but the plotting accessor discarded those names. It now recovers labels only
+  when they match the complete returned coefficient matrix.
+- Valid retained-iteration identifiers above the R integer limit were coerced to NA.
+  Native plots now preserve their numeric values. Ordinary integer IDs keep their type.
+- Rank-plot documentation now describes the dashed reference as the average bin count.
+  It does not claim an exact expectation for every finite bin layout.
+- Terminal blank lines were removed; unrelated roxygen regeneration edits were restored.
+
+Regression evidence:
+961 focused assertions passed, with no failures, warnings or skips.
+These cover plotting, chain conversion, LSS workflows, sampling interfaces and MH adjustment.
+18 comparisons against the pre-plotting sampling_finish() preserved exact coefficient draws,
+coefficient summaries, chain IDs, acceptance rates and caller RNG state.
+Cases included Gaussian and Poisson GAMs, BAM, gaulss, both Gaussian generators,
+and every supported MH backend among mgcv, gratia and family.
+The trace and rank plot data for both examples shown to the user are exactly unchanged.
+Large-iteration plot construction and building preserve caller RNG state and kind.
+
+Full package checks:
+The first review check, before the iteration-ID correction, completed with Status: OK.
+Its full suite had 18712 passes, 197 skips, no failures and no warnings.
+The full check on the final source completed with Status: 1 ERROR.
+It had 18714 passes, 197 skips, one failure and 248 warnings.
+The failure was the existing test-scalable-gjrm.R NBII fitted-density comparison
+(m$fit$pdf2 against the analytic negative-binomial mass). The warnings arose
+inside GJRM fitting, including replacement-length and convergence warnings.
+The same GJRM file then passed in isolation: 136 assertions, no warnings or failures.
+Its family assertions also passed under Mersenne-Twister and L'Ecuyer-CMRG.
+No GJRM source or test was changed. The full-run fitting failure remains unresolved;
+the current full check must not be described as clean.
+Installation, namespace and documentation checks, ordinary and donttest examples,
+vignette checks and vignette rebuilding passed on the final source.
+
+Chosen options and validation limits:
+R CMD build created the vignettes; R CMD check used --as-cran --no-manual.
+--no-manual omitted the PDF reference manual. Tests were not disabled.
+NOT_CRAN=true ran functional tests normally gated on CRAN.
+VDIFFR_RUN_TESTS=false skipped 197 visual comparisons. The new plots were previously
+rendered and inspected; native plot construction is exercised by the functional tests.
+_R_CHECK_CRAN_INCOMING_REMOTE_=false disabled remote incoming checks.
+The GJRM failure and warnings were not expected consequences of these options.
+
+Pkgdown:
+Built every reference page, the reference index and the sampling migration article.
+Validated 149 public topics and 203 index labels; all topic and local links resolve.
+The new draw.sampling_diagnostics topic is indexed; the print alias shares its accessor topic.
+Reference examples used examples=FALSE because the package check executed them.
+Pandoc emitted nonfatal deprecation warnings for math options supplied by pkgdown.
+
+Scope and provenance:
+Current package source, documentation and tests match the frozen final check inputs.
+Only native plot implementation, metadata, documentation and tests are committed,
+together with this review record. Earlier smoothing-reference work remains unchanged.
+
+Logs:
+/private/tmp/gratia-native-mcmc-review-targeted-final.log
+/private/tmp/gratia-native-mcmc-review-parity.log
+/private/tmp/gratia-native-mcmc-review-reference.log
+/private/tmp/gratia-native-mcmc-review-check.log
+/private/tmp/gratia-native-mcmc-review-final-check.log
+/private/tmp/gratia-native-mcmc-review-gjrm.log
+/private/tmp/gratia-native-mcmc-review-gjrm-kinds.log

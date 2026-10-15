@@ -70,13 +70,15 @@ sampling_mh_covariance_adjust <- function(model, draws,
   dimnames(out) <- dimnames(draws)
   ids <- meta$draw_ids %||% sampling_layout(nrow(draws), layout$chains)
   original_diagnostics <- if (is.null(meta)) NULL else
-    meta[c("chains", "coefficients")]
+    sampling_diagnostics(draws)
   refreshed <- sampling_finish(out, ids, info = meta$chains,
     diagnostics = diagnostics, coefficient_names = columns %||% nm)
   # Keep acceptance rates and other attributes of the source MH run.
   attributes(out) <- attributes(draws)
   if (is.null(meta)) meta <- list(draw_ids = ids, chains = NULL, coefficients = NULL)
   meta$coefficients <- attr(refreshed, "sampling")$coefficients
+  # Plots must follow the adjusted coefficients, not the source MH draws.
+  meta$coefficient_draws <- attr(refreshed, "sampling")$coefficient_draws
   dimnames(target) <- dimnames(empirical) <- list(columns %||% nm, columns %||% nm)
   meta$covariance_adjustment <- list(
     method = "pooled empirical covariance to fitted Vc using Cholesky factors",

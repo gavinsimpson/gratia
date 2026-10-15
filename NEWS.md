@@ -97,7 +97,11 @@
   separate burn-in. Chain identities are preserved through fitted, response,
   smooth, and derivative samples. `as_mcmc_draws()` converts draws for posterior,
   coda, and bayesplot; `diagnostics = TRUE` and `sampling_diagnostics()` provide
-  coefficient convergence summaries and acceptance rates (#281). LSS sampling
+  coefficient convergence summaries and acceptance rates (#281).
+  `draw(sampling_diagnostics(x))` plots native coefficient traces or pooled-rank
+  histogram outlines by chain. Sampling with `diagnostics = TRUE` retains the
+  coefficient draws for these plots through fitted, response, smooth and
+  derivative sampling. LSS sampling
   supports fitting rows, subsets and new covariates without observed responses.
   All distribution parameters use the same coefficient draw. Fitted response
   samples and their derivatives evaluate the expected response, including

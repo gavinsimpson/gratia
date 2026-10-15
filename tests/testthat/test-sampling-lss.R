@@ -285,7 +285,10 @@ test_that("LSS generated draws and selected coefficients retain joint sampling",
     if (method == "mh") expect_equal(as.vector(selected), as.vector(b[, 3:4]))
     expect_identical(dim(selected), c(8L, 2L))
     expect_equal(as.vector(user_draws(m, draws = b, index = 3:4)), as.vector(b[, 3:4]))
-    expect_identical(sampling_diagnostics(selected)$draws, sampling_diagnostics(b)$draws)
+    selected_diagnostics <- sampling_diagnostics(selected)
+    expect_identical(as.vector(selected_diagnostics$draws), as.vector(selected))
+    expect_identical(attr(selected_diagnostics$draws, "sampling")$draw_ids,
+      attr(b, "sampling")$draw_ids)
   }
 })
 

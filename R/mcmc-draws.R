@@ -44,6 +44,10 @@ sampling_finish <- function(betas, ids, info = NULL, diagnostics = FALSE,
     meta$coefficients <- posterior::summarise_draws(
       as_mcmc_draws(named), "mean", "sd", "rhat", "ess_bulk", "ess_tail",
       "mcse_mean", "mcse_sd")
+    # Retain coefficient draws for native plots after response or smooth sampling.
+    # Strip metadata so the saved matrix cannot contain another copy of itself.
+    attributes(named) <- list(dim = dim(named), dimnames = dimnames(named))
+    meta$coefficient_draws <- named
     attr(betas, "sampling") <- meta
   }
   betas
@@ -180,15 +184,56 @@ as_mcmc_draws <- function(x,
 #' coefficient chains before transformation or response simulation. Response
 #' noise can conceal poor mixing of coefficient chains. Use [as_mcmc_draws()]
 #' to examine particular derived quantities as well.
-#' @param x Output from a gratia sampling function.
-#' @return A list with `chains` (acceptance rates and elapsed seconds) and
-#'   `coefficients` (posterior summaries, or `NULL` if not requested).
+#' @param x Output from a gratia sampling function; for the print method, a
+#'   `sampling_diagnostics` object.
+#'
+#' @details
+#' Coefficient draws are retained when sampling with `diagnostics = TRUE`,
+#' allowing [draw.sampling_diagnostics()] to plot the original coefficient
+#' chains even when `x` contains response samples, fitted values, smooths or
+#' derivatives. These plots do not describe the transformed quantities.
+#' Numerical summaries require posterior, but plotting does not.
+#'
+#' @return A `sampling_diagnostics` list with `chains` (acceptance rates and
+#'   elapsed seconds), `coefficients` (posterior summaries, or `NULL` if not
+#'   requested), and `draws` (a coefficient matrix with chain identities, or
+#'   `NULL` if unavailable). Coefficient matrices provide their own draws;
+#'   other sampling outputs need `diagnostics = TRUE` to retain them.
+#' @seealso [draw.sampling_diagnostics()], [as_mcmc_draws()]
 #' @export
 sampling_diagnostics <- function(x) {
   meta <- attr(x, "sampling")
   if (is.null(meta)) stop("No sampling diagnostics are attached; request ",
     "'diagnostics = TRUE' when sampling.", call. = FALSE)
-  meta[c("chains", "coefficients")]
+  draws <- if (is.matrix(x)) x else meta$coefficient_draws
+  if (!is.null(draws)) {
+    if (is.null(colnames(draws))) {
+      # Native single-chain matrices can be unnamed even when diagnostics
+      # retain model coefficient names. Recover labels only for a full match.
+      labels <- colnames(meta$coefficient_draws) %||% meta$coefficients$variable
+      if (length(labels) == ncol(draws)) colnames(draws) <- labels
+    }
+    # Retain only the layout needed for conversion, not nested diagnostics.
+    attributes(draws) <- list(dim = dim(draws), dimnames = dimnames(draws),
+      sampling = list(draw_ids = meta$draw_ids))
+  }
+  structure(list(chains = meta$chains, coefficients = meta$coefficients,
+    draws = draws), class = c("sampling_diagnostics", "list"))
+}
+
+#' @export
+#' @rdname sampling_diagnostics
+#' @param ... Further arguments passed to the print methods for the summaries.
+print.sampling_diagnostics <- function(x, ...) {
+  cat("Coefficient sampling diagnostics\n")
+  if (!is.null(x$chains)) print(x$chains, ...)
+  if (!is.null(x$coefficients)) print(x$coefficients, ...)
+  if (!is.null(x$draws)) {
+    ids <- attr(x$draws, "sampling")$draw_ids
+    cat(nrow(x$draws), "retained draws in", length(unique(ids$.chain)),
+      "chain(s);", ncol(x$draws), "coefficient(s).\n")
+  }
+  invisible(x)
 }
 
 # Reuse the active mirai pool without changing it. A private compute profile

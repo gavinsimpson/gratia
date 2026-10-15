@@ -185,6 +185,7 @@ reference:
       - derivative_samples
       - as_mcmc_draws
       - sampling_diagnostics
+      - draw.sampling_diagnostics
       - simulate.gam
       - add_fitted_samples
 

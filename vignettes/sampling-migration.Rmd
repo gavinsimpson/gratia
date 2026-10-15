@@ -65,7 +65,11 @@ samples <- fitted_samples(
   method = "mh", burnin = 1000, thin = 1,
   diagnostics = TRUE, seed = 281
 )
-sampling_diagnostics(samples)
+diagnostics <- sampling_diagnostics(samples)
+diagnostics
+# These plots describe the coefficient chains used for the fitted samples.
+draw(diagnostics, select = 1:2)
+draw(diagnostics, type = "rank", select = 1:2)
 ```
 
 This retains 250 draws per chain. Every chain discards its own 1,000 burn-in
@@ -144,6 +148,17 @@ refer to coefficients before transformation or response simulation.
 `as_mcmc_draws()` converts coefficient matrices or sampled quantities for
 posterior or coda diagnostics. Optional packages are required only when their
 formats or diagnostics are requested.
+
+`draw(sampling_diagnostics(x))` uses native gratia plotting code. Trace plots
+show retained iteration within each chain; `type = "rank"` compares histogram
+outlines of ranks pooled across chains, with a reference line for equal counts per bin.
+Ranks use average ranks for ties and no random jitter. Use `select` to choose
+coefficient names or positions. Rank plots require at least two chains.
+Discarded burn-in is unavailable, and thinning is represented by the retained
+iteration count. Coefficient matrices provide their own draws; fitted, response,
+smooth and derivative outputs require `diagnostics = TRUE` when sampling to
+retain coefficient draws for these plots. Plotting itself needs neither
+posterior nor bayesplot. Numerical summaries still use posterior.
 
 ## Which response sampling function to use
 
