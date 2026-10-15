@@ -21,6 +21,13 @@ models <- list(
   gam_REML = gam(f, data = d, weights = w, method = "REML"),
   gam_ML = gam(f, data = d, weights = w, method = "ML"),
   bam_fREML = bam(f, data = d, weights = w, method = "fREML"),
+  bam_ML = bam(f, data = d, weights = w, method = "ML"),
+  bam_REML = bam(f, data = d, weights = w, method = "REML"),
+  linked_bam_ML = bam(y ~ s(x, k = 6, id = "shared") +
+    s(z, k = 6, id = "shared") + offset(o), data = d,
+    weights = w, method = "ML"),
+  partly_fixed_bam_ML = bam(y ~ s(x, k = 6, sp = .1) +
+    s(z, k = 6) + offset(o), data = d, weights = w, method = "ML"),
   linked_gam = gam(y ~ s(x, k = 6, id = "shared") +
     s(z, k = 6, id = "shared") + offset(o), data = d,
     weights = w, method = "REML"),
@@ -139,7 +146,7 @@ report <- c("# Internal smoothing-parameter uncertainty study", "",
   "## Covariance and coordinate audit", "",
   "For these Gaussian gam fits, V.sp contains free log-smoothing parameters first and an additional log-dispersion component last when dispersion is estimated. fREML bam's V.sp omits the log-dispersion component, although sp.vcov() includes it. The prototype uses the marginal free-log-smoothing covariance block and holds dispersion at its fitted value; it does not condition the log-smoothing approximation on a particular log-dispersion draw.", "",
   "Shared and partly fixed smoothing parameters are expanded with attr(V.sp, 'L'), with fixed multipliers retained in an additive log-scale offset. attr(V.sp, 'spind') is not used as a free-parameter index: for the shared gam example it includes a position belonging to log dispersion. The old feasibility prototype did not handle this case.", "",
-  "In the installed mgcv, fREML bam stores db.drho before transforming derivatives to the fitted coefficient basis. Those raw derivatives disagree with derivatives of fitted coefficient means. The prototype calculates derivatives in fitted coordinates from the conditional precision, independently verified by centred numerical differences. Ordinary gam derivatives agree with db.drho after the smoothing mapping is applied. Vc already uses the transformations internally and remains the reference for unconditional = TRUE.", "",
+  "In the installed mgcv, fREML bam stores db.drho before transforming derivatives to the fitted coefficient basis. Those raw derivatives disagree with derivatives of fitted coefficient means. The prototype calculates derivatives in fitted coordinates from the conditional precision, independently verified by centred numerical differences. gam and ML/REML bam derivatives agree with db.drho after the smoothing mapping is applied. Vc already uses the transformations internally and remains the reference for unconditional = TRUE.", "",
   sprintf("Across supported fits, the largest relative coefficient error at fitted sp was %.2g and the largest relative conditional covariance error was %.2g.",
     max(supported$mean_error), max(supported$covariance_error)), "",
   "## Marginal uncertainty", "",
@@ -160,7 +167,8 @@ report <- c("# Internal smoothing-parameter uncertainty study", "",
   "The prototype remains internal and supports identifiable independent Gaussian identity gam and non-discrete bam fits with ML, REML, or fREML covariance information. BAM fits with nonzero prescribed smooth contributions, additional penalties, minimum smoothing parameters, edge-corrected smoothing covariances, prefit objects, GAMM components, dependent observations, nonpositive penalty multipliers, and unsupported mappings are rejected. Numerically invalid smoothing draws fail explicitly rather than being silently discarded or clipped.", "",
   "Discrete bam is audited but not sampled: its compressed fitting design can define a different conditional target from evaluation at the original covariates. Reconstructing the compressed design and covariance consistently is required before extending this prototype. Non-Gaussian models need conditional modes and covariance updates, including family-parameter handling, beyond the Gaussian crossproduct solution.", "",
   "The log-smoothing covariance is a fitted approximation. Boundary fits and very diffuse approximations can require more careful treatment. Dispersion uncertainty and its dependence with smoothing parameters remain separate work; proposal covariance changes in conditional MH still do not integrate smoothing uncertainty.", "",
+  "See [smoothing-methods.md](smoothing-methods.md) for the actual fitting-method audit, family-parameter ordering, and separate NCV investigation. These internal draws propagate approximate estimation uncertainty; they do not perform Bayesian integration.", "",
   "Reproduce with: Rscript notes/posterior-chains/smoothing-study.R --load-all 20000",
   "", "Session details:", "", "```", capture.output(sessionInfo()), "```"
 )
-writeLines(report, "notes/posterior-chains/smoothing-report.md")
+writeLines(trimws(report, which = "right"), "notes/posterior-chains/smoothing-report.md")

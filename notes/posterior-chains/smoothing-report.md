@@ -10,7 +10,7 @@ For these Gaussian gam fits, V.sp contains free log-smoothing parameters first a
 
 Shared and partly fixed smoothing parameters are expanded with attr(V.sp, 'L'), with fixed multipliers retained in an additive log-scale offset. attr(V.sp, 'spind') is not used as a free-parameter index: for the shared gam example it includes a position belonging to log dispersion. The old feasibility prototype did not handle this case.
 
-In the installed mgcv, fREML bam stores db.drho before transforming derivatives to the fitted coefficient basis. Those raw derivatives disagree with derivatives of fitted coefficient means. The prototype calculates derivatives in fitted coordinates from the conditional precision, independently verified by centred numerical differences. Ordinary gam derivatives agree with db.drho after the smoothing mapping is applied. Vc already uses the transformations internally and remains the reference for unconditional = TRUE.
+In the installed mgcv, fREML bam stores db.drho before transforming derivatives to the fitted coefficient basis. Those raw derivatives disagree with derivatives of fitted coefficient means. The prototype calculates derivatives in fitted coordinates from the conditional precision, independently verified by centred numerical differences. gam and ML/REML bam derivatives agree with db.drho after the smoothing mapping is applied. Vc already uses the transformations internally and remains the reference for unconditional = TRUE.
 
 Across supported fits, the largest relative coefficient error at fitted sp was 2.4e-13 and the largest relative conditional covariance error was 3.5e-12.
 
@@ -20,13 +20,17 @@ The table averages marginal coefficient standard deviations. Mixture variances u
 
 | Fit | Free sp | Conditional SD | mgcv unconditional SD | Mixture SD | Variance from conditional means | Sampling seconds |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| gam_REML | 2 | 0.1486 | 0.1508 | 0.1494 | 1.7% | 1.88 |
-| gam_ML | 2 | 0.1470 | 0.1496 | 0.1483 | 1.9% | 1.85 |
-| bam_fREML | 2 | 0.1339 | 0.1354 | 0.1350 | 2.1% | 1.91 |
-| linked_gam | 1 | 0.1617 | 0.1620 | 0.1615 | 0.3% | 1.98 |
-| linked_bam | 1 | 0.1461 | 0.1464 | 0.1460 | 0.4% | 1.95 |
-| partly_fixed | 1 | 0.1430 | 0.1451 | 0.1440 | 1.5% | 1.86 |
-| tensor | 2 | 0.1076 | 0.1124 | 0.1103 | 5.1% | 2.10 |
+| gam_REML | 2 | 0.1486 | 0.1508 | 0.1494 | 1.7% | 2.96 |
+| gam_ML | 2 | 0.1470 | 0.1496 | 0.1483 | 1.9% | 2.76 |
+| bam_fREML | 2 | 0.1339 | 0.1354 | 0.1350 | 2.1% | 3.50 |
+| bam_ML | 2 | 0.1325 | 0.1350 | 0.1339 | 2.2% | 3.26 |
+| bam_REML | 2 | 0.1339 | 0.1360 | 0.1349 | 1.9% | 3.41 |
+| linked_bam_ML | 1 | 0.1460 | 0.1464 | 0.1459 | 0.4% | 2.85 |
+| partly_fixed_bam_ML | 1 | 0.1274 | 0.1297 | 0.1288 | 2.0% | 2.57 |
+| linked_gam | 1 | 0.1617 | 0.1620 | 0.1615 | 0.3% | 2.64 |
+| linked_bam | 1 | 0.1461 | 0.1464 | 0.1460 | 0.4% | 2.44 |
+| partly_fixed | 1 | 0.1430 | 0.1451 | 0.1440 | 1.5% | 2.78 |
+| tensor | 2 | 0.1076 | 0.1124 | 0.1103 | 5.1% | 3.19 |
 
 For the linked gam coefficient s(x).4, independent numerical integration gives mean 0.147033 and variance 0.079669; mixture conditional moments give 0.147032 and 0.079669, and sampled coefficients give 0.146890 and 0.079885.
 
@@ -36,7 +40,7 @@ Across supported fits, the largest relative difference between empirical coeffic
 
 The design matrix is evaluated in bounded row blocks once. Weighted crossproducts, penalty blocks, smoothing mappings, offsets, and the fitted dispersion are cached; each subsequent update solves a coefficient-sized precision system. It does not refit the model or re-evaluate model-call data or weight expressions.
 
-For 100 identical log-smoothing draws, cached conditional means took 0.002 seconds versus 0.878 seconds for fixed-sp refits; the largest coefficient difference was 2.4e-13. These are single-run local timings, not a general speed guarantee.
+For 100 identical log-smoothing draws, cached conditional means took 0.003 seconds versus 1.392 seconds for fixed-sp refits; the largest coefficient difference was 2.4e-13. These are single-run local timings, not a general speed guarantee.
 
 ## Remaining restrictions
 
@@ -45,6 +49,8 @@ The prototype remains internal and supports identifiable independent Gaussian id
 Discrete bam is audited but not sampled: its compressed fitting design can define a different conditional target from evaluation at the original covariates. Reconstructing the compressed design and covariance consistently is required before extending this prototype. Non-Gaussian models need conditional modes and covariance updates, including family-parameter handling, beyond the Gaussian crossproduct solution.
 
 The log-smoothing covariance is a fitted approximation. Boundary fits and very diffuse approximations can require more careful treatment. Dispersion uncertainty and its dependence with smoothing parameters remain separate work; proposal covariance changes in conditional MH still do not integrate smoothing uncertainty.
+
+See [smoothing-methods.md](smoothing-methods.md) for the actual fitting-method audit, family-parameter ordering, and separate NCV investigation. These internal draws propagate approximate estimation uncertainty; they do not perform Bayesian integration.
 
 Reproduce with: Rscript notes/posterior-chains/smoothing-study.R --load-all 20000
 

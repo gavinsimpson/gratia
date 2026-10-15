@@ -155,7 +155,8 @@ This approximation does not specify hyperpriors or sample a joint posterior
 for coefficients, smoothing parameters and dispersion.
 
 The audit covers shared smoothing parameters, partly fixed penalties, tensor
-products, gam ML/REML and bam fREML. It verifies the log-scale positions in
+products, gam ML/REML and non-discrete bam ML/REML/fREML. It verifies the
+log-scale positions in
 `V.sp` and `sp.vcov()` and the expansion matrix for shared parameters. In the
 installed mgcv, fREML bam stores `db.drho` in an internal fitting basis, so the
 prototype computes derivatives directly in fitted coefficient coordinates.
@@ -163,7 +164,7 @@ Conditional means and covariances agree with fitted models and independent
 fixed-smoothing refits. The original research entry point now uses this
 verified setup, replacing its unsafe extraction for shared parameters.
 
-Seven supported fits each used 20,000 mixture draws. Independent numerical
+Eleven supported fits each used 20,000 mixture draws. Independent numerical
 integration verifies a one-parameter mixture; the law of total variance
 separates average conditional covariance from covariance of conditional means.
 A positive contribution from varying conditional means does not guarantee an
@@ -174,6 +175,14 @@ reconstructed consistently. Non-Gaussian conditional updates, dispersion
 uncertainty, minimum smoothing parameters and edge-corrected smoothing
 covariances remain separate work. See [smoothing-report.md](smoothing-report.md)
 for evidence, restrictions and reproduction instructions.
+
+The extended [fitting-method audit](smoothing-methods.md) records actual
+methods, scalar family parameters and dispersion positions. It separately
+investigates NCV through gam’s estimator covariance `Vg` and a local
+delta-method contribution. It does not substitute inverse NCV curvature for
+that covariance. Discrete BAM NCV lacks `Vg`; nonzero NCV offsets and
+unidentified mappings remain excluded. All of these calculations remain
+internal research and propagate approximate estimation uncertainty.
 
 ## Follow-up performance and mixing studies
 

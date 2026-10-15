@@ -70,14 +70,6 @@ sampling_elliptical <- function(target, n, burnin = 1000L) {
   list(bs = out, evaluations = evaluations)
 }
 
-sampling_smoothing_info <- function(model) {
-  V <- model$V.sp
-  list(sp = model$sp, full.sp = model$full.sp,
-    V.sp = V, spind = attr(V, "spind"),
-    sp.vcov = mgcv::sp.vcov(model), db.drho = model$db.drho,
-    Vc = model$Vc, method = model$method)
-}
-
 sampling_smoothing_mixture <- function(model, n = 100L, seed = 42L) {
   # Keep the original research entry point, using the verified mapping and
   # cached conditional distributions instead of re-evaluating fitting calls.

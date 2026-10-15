@@ -1,0 +1,3 @@
+"method","criterion_error","gradient_sum_error","sandwich_error","Vg_inverse_hessian_difference","delta_error"
+"NCV",3.5527136788005e-14,1.41735251053127e-09,1.23817881547694e-06,21.3155713036536,0
+"QNCV",2.1316282072803e-14,1.58246525041802e-09,8.84536103029632e-07,21.3155766744841,0

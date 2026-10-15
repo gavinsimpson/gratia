@@ -1,0 +1,36 @@
+  parameter repetitions empirical_variance mean_estimated_variance
+1  log sp 1         200         0.10942898                3.059273
+2  log sp 2         200         0.08213684                5.715074
+  median_estimated_variance mean_checked_hessian_sandwich_variance
+1                  2.443903                               2.941353
+2                  5.205237                               5.236299
+  minimum_log_sp maximum_log_sp
+1      -4.522304      -2.827352
+2      -4.739911      -3.159723
+
+
+full convergence
+             200
+
+R version 4.6.1 (2026-06-24)
+Platform: aarch64-apple-darwin23
+Running under: macOS Tahoe 26.6.1
+
+Matrix products: default
+BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] C.UTF-8/C.UTF-8/C.UTF-8/C/C.UTF-8/C.UTF-8
+
+time zone: Europe/Copenhagen
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base
+
+other attached packages:
+[1] mgcv_1.9-4   nlme_3.1-171
+
+loaded via a namespace (and not attached):
+[1] compiler_4.6.1 Matrix_1.7-6   splines_4.6.1  grid_4.6.1     lattice_0.23-1

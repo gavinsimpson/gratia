@@ -1,6 +1,6 @@
 # Internal research implementation. These draws mix exact Gaussian conditional
 # coefficient distributions over a fitted log-smoothing normal approximation.
-# They do not specify hyperpriors or sample a joint posterior for beta and sp.
+# They propagate approximate estimation uncertainty, without Bayesian integration.
 sampling_smoothing_setup <- function(model, block_size = 10000L) {
   sampling_target_check(model, "smoothing-mixture")
   fam <- stats::family(model)
@@ -8,7 +8,10 @@ sampling_smoothing_setup <- function(model, block_size = 10000L) {
     stop("The smoothing-mixture prototype requires Gaussian identity fits.",
       call. = FALSE)
   }
-  if (!model$method %in% c("REML", "ML", "fREML", "P-REML", "P-ML")) {
+  if (model$method %in% c("NCV", "QNCV")) stop(
+    "NCV smoothing uncertainty is audited separately with sampling_smoothing_ncv_delta(); its inverse criterion Hessian is not a posterior covariance.",
+    call. = FALSE)
+  if (!model$method %in% c("REML", "ML", "fREML")) {
     stop("The smoothing-mixture prototype requires ML, REML, or fREML fitting.",
       call. = FALSE)
   }
@@ -32,6 +35,7 @@ sampling_smoothing_setup <- function(model, block_size = 10000L) {
   q <- length(sp)
   full_sp <- model$full.sp %||% sp
   n_pen <- length(full_sp)
+  info <- sampling_smoothing_info(model)
   V <- model$V.sp
   if (!q || any(!is.finite(sp) | sp <= 0) ||
       !is.matrix(V) || nrow(V) != ncol(V) ||
@@ -55,7 +59,10 @@ sampling_smoothing_setup <- function(model, block_size = 10000L) {
     "The smoothing-mixture prototype requires positive fitted penalty multipliers.",
     call. = FALSE)
   lsp0 <- log(full_sp) - drop(L %*% log(sp))
-  log_sp_cov <- V[seq_len(q), seq_len(q), drop = FALSE]
+  if (is.null(info$V_sp_layout)) stop(
+    "Cannot identify the parameter ordering in V.sp for this fitting method.",
+    call. = FALSE)
+  log_sp_cov <- V[info$V_sp_layout$log_sp, info$V_sp_layout$log_sp, drop = FALSE]
   if (is.null(tryCatch(chol(log_sp_cov), error = function(e) NULL))) stop(
     "The fitted log-smoothing covariance is not positive definite.", call. = FALSE)
   p <- length(stats::coef(model))
@@ -121,7 +128,10 @@ sampling_smoothing_setup <- function(model, block_size = 10000L) {
       call. = FALSE)
   }
   sp_vcov <- mgcv::sp.vcov(model, edge.correct = FALSE)
-  setup$audit <- list(method = model$method, free_sp = names(sp),
+  setup$audit <- list(method = model$method, fitting = info$fitting,
+    covariance_source = "V.sp", parameter_layout = info$V_sp_layout,
+    interpretation = "approximate estimation-uncertainty propagation",
+    free_sp = names(sp),
     full_sp = names(full_sp), V_sp_dimension = nrow(V),
     V_sp_log_scale_position = if (nrow(V) == q + 1L) q + 1L else NA_integer_,
     sp_vcov_dimension = if (is.null(sp_vcov)) NA_integer_ else nrow(sp_vcov),

@@ -18,7 +18,9 @@ smoothing_research_fixture <- function(method = "REML", bam = FALSE,
 test_that("smoothing setup preserves fitted Gaussian conditionals and mappings", {
   configurations <- list(list(), list(method = "ML"), list(bam = TRUE, method = "fREML"),
     list(linked = TRUE), list(linked = TRUE, bam = TRUE, method = "fREML"),
-    list(fixed = TRUE), list(tensor = TRUE), list(known_scale = TRUE))
+    list(fixed = TRUE), list(tensor = TRUE), list(known_scale = TRUE),
+    list(method = "ML", linked = TRUE), list(method = "ML", fixed = TRUE),
+    list(method = "ML", tensor = TRUE))
   for (configuration in configurations) {
     fit <- do.call(smoothing_research_fixture, configuration)$model
     setup <- sampling_smoothing_setup(fit, block_size = 27L)
@@ -178,4 +180,172 @@ test_that("legacy smoothing research entry point uses the verified prototype", {
   expect_identical(legacy$bs, current$bs)
   expect_identical(legacy$log_sp, current$log_sp)
   expect_identical(legacy$failures, rep(NA_character_, 12L))
+})
+
+test_that("bam ML and REML preserve conditionals and smoothing mappings", {
+  for (method in c("ML", "REML")) {
+    for (configuration in list(list(), list(linked = TRUE), list(fixed = TRUE),
+                              list(tensor = TRUE), list(known_scale = TRUE))) {
+      fixture <- do.call(smoothing_research_fixture,
+        c(list(bam = TRUE, method = method), configuration))
+      fit <- fixture$model
+      setup <- sampling_smoothing_setup(fit, block_size = 29L)
+      expect_identical(setup$audit$fitting$actual_method, method)
+      expect_false(setup$audit$fitting$discrete)
+      expect_equal(setup$audit$conditional_covariance, unname(vcov(fit)))
+      expect_lt(setup$audit$mean_error, 1e-7)
+      expect_lt(setup$audit$derivative_error, 1e-6)
+      expect_equal(unname(exp(drop(setup$L %*% setup$log_sp) + setup$lsp0)),
+        unname(fit$full.sp %||% fit$sp), tolerance = 1e-10)
+      # Refits use the same free smoothing parameters and retain fixed terms.
+      rho <- setup$log_sp + .3
+      conditional <- sampling_smoothing_conditional(setup, rho)
+      refit <- mgcv::bam(fixture$formula, data = fixture$data, weights = w,
+        method = method, sp = if (isTRUE(configuration$fixed)) c(.1, exp(rho)) else
+          exp(rho), scale = fit$sig2)
+      expect_equal(conditional$mean, unname(coef(refit)), tolerance = 1e-7)
+      expect_equal(conditional$covariance, unname(vcov(refit)), tolerance = 1e-7)
+      h <- 1e-5
+      numerical <- vapply(seq_along(rho), function(j) {
+        delta <- rep(0, length(rho)); delta[j] <- h
+        (sampling_smoothing_conditional(setup, setup$log_sp + delta)$mean -
+          sampling_smoothing_conditional(setup, setup$log_sp - delta)$mean) / (2 * h)
+      }, numeric(length(coef(fit))))
+      expect_equal(setup$audit$derivative, numerical, tolerance = 1e-6)
+    }
+  }
+})
+
+test_that("smoothing audit distinguishes actual fitting and parameter blocks", {
+  fixture <- smoothing_research_fixture()
+  d <- fixture$data
+  fit <- fixture$model
+  fit$call$method <- quote(method_no_longer_available)
+  info <- sampling_smoothing_info(fit)
+  expect_identical(info$fitting$requested_method, quote(method_no_longer_available))
+  expect_identical(info$fitting$actual_method, "REML")
+  expect_identical(info$V_sp_layout$log_sp, 1:2)
+  expect_identical(info$V_sp_layout$log_scale, 3L)
+  expect_length(info$V_sp_layout$family, 0L)
+  known <- smoothing_research_fixture(method = "ML", known_scale = TRUE)$model
+  expect_length(sampling_smoothing_info(known)$V_sp_layout$log_scale, 0L)
+  expect_length(sampling_smoothing_info(known)$sp_vcov_layout$log_scale, 0L)
+  # mgcv disables discretisation for ML instead of performing discrete ML.
+  expect_warning(bam <- mgcv::bam(fixture$formula, data = d, weights = w,
+    method = "ML", discrete = TRUE), "discretization only available")
+  expect_false(sampling_smoothing_info(bam)$fitting$discrete)
+  expect_silent(sampling_smoothing_setup(bam))
+  lss <- mgcv::gam(list(y ~ s(x, k = 5), ~s(z, k = 5)),
+    data = d, family = mgcv::gaulss(), method = "ML")
+  expect_identical(sampling_smoothing_info(lss)$fitting$actual_method, "REML")
+  expect_identical(sampling_smoothing_info(lss)$fitting$requested_method, "ML")
+  expect_error(sampling_smoothing_setup(lss), "Gaussian identity")
+  withr::local_seed(872)
+  d$count <- rnbinom(nrow(d), mu = exp(1 + sin(6 * d$x)), size = 3)
+  nb <- mgcv::gam(count ~ s(x, k = 5) + s(z, k = 5), data = d,
+    family = mgcv::nb(), method = "ML")
+  info <- sampling_smoothing_info(nb)
+  expect_identical(info$V_sp_layout$family, 1L)
+  expect_identical(info$V_sp_layout$log_sp, 2:3)
+  expect_length(info$V_sp_layout$log_scale, 0L)
+  expect_equal(exp(info$family_parameters$internal), info$family_parameters$response)
+  expect_false(info$family_parameters$sampled)
+  expect_error(sampling_smoothing_setup(nb), "Gaussian identity")
+  fixed_nb <- mgcv::gam(count ~ s(x, k = 5), data = d,
+    family = mgcv::nb(theta = 3), method = "ML")
+  expect_length(sampling_smoothing_info(fixed_nb)$V_sp_layout$family, 0L)
+  # tw estimates its transformed power parameter before log(sp), then log(scale).
+  d$positive <- exp(d$y)
+  tw <- mgcv::gam(positive ~ s(x, k = 5), data = d,
+    family = mgcv::tw(), method = "ML")
+  info <- sampling_smoothing_info(tw)
+  expect_identical(info$V_sp_layout$family, 1L)
+  expect_identical(info$V_sp_layout$log_sp, 2L)
+  expect_identical(info$V_sp_layout$log_scale, 3L)
+  expect_equal(info$family_parameters$response, tw$family$getTheta(TRUE))
+})
+
+test_that("NCV uses Vg for local estimator propagation without Hessian substitution", {
+  fixture <- smoothing_research_fixture()
+  offset_fit <- mgcv::gam(fixture$formula, data = fixture$data, weights = w,
+    method = "NCV")
+  expect_error(sampling_smoothing_ncv_delta(offset_fit), "nonzero fitting offsets")
+  fixture$formula <- y ~ s(x, k = 5) + s(z, k = 5)
+  for (method in c("NCV", "QNCV")) {
+    fit <- mgcv::gam(fixture$formula, data = fixture$data, weights = w,
+      method = method)
+    delta <- sampling_smoothing_ncv_delta(fit)
+    expect_identical(delta$covariance_source, "Vg")
+    expect_equal(delta$log_sp_covariance, fit$Vg)
+    expect_null(mgcv::sp.vcov(fit))
+    expect_null(fit$V.sp)
+    expect_equal(delta$propagated_covariance, fit$Vc)
+    expect_true(delta$coefficient_covariance_replaced)
+    expect_gt(max(abs(fit$Vg - solve(fit$outer.info$hess))), .01)
+    # Independent finite differences of each leave-one-out squared error verify
+    # the gradient contributions in mgcv's BFGS sandwich calculation.
+    X <- predict(fit, type = "lpmatrix")
+    y <- fit$y - (fit$offset %||% 0)
+    w <- fit$prior.weights
+    penalties <- lapply(seq_along(fit$smooth), function(k) {
+      sm <- fit$smooth[[k]]
+      S <- matrix(0, ncol(X), ncol(X))
+      j <- sm$first.para:sm$last.para
+      S[j, j] <- sm$S[[1L]]
+      S
+    })
+    scores <- function(rho) {
+      P <- crossprod(X, w * X)
+      for (k in seq_along(penalties)) P <- P + exp(rho[k]) * penalties[[k]]
+      inverse <- solve(P)
+      beta <- inverse %*% crossprod(X, w * y)
+      h <- w * rowSums((X %*% inverse) * X)
+      w * drop((y - X %*% beta) / (1 - h))^2
+    }
+    rho <- log(fit$sp)
+    derivative <- vapply(seq_along(rho), function(k) {
+      step <- rep(0, length(rho)); step[k] <- 1e-5
+      refit <- function(r) mgcv::gam(fixture$formula, data = fixture$data,
+        weights = w, sp = exp(r), method = "REML", scale = fit$sig2)
+      (coef(refit(rho + step)) - coef(refit(rho - step))) / 2e-5
+    }, numeric(length(coef(fit))))
+    expect_equal(unname(derivative), fit$db.drho, tolerance = 1e-6)
+    eps <- 1e-5
+    contributions <- vapply(seq_along(rho), function(k) {
+      step <- rep(0, length(rho)); step[k] <- eps
+      (scores(rho + step) - scores(rho - step)) / (2 * eps)
+    }, numeric(nrow(X)))
+    B <- solve(fit$outer.info$hess)
+    expect_equal(B %*% crossprod(contributions) %*% B, fit$Vg,
+      tolerance = 1e-5)
+    expect_error(sampling_smoothing_setup(fit), "audited separately")
+    fit$Vg <- NULL
+    expect_error(sampling_smoothing_ncv_delta(fit), "Cannot identify")
+  }
+  bam <- mgcv::bam(fixture$formula, data = fixture$data, weights = w,
+    method = "NCV", discrete = TRUE)
+  expect_null(bam$Vg)
+  expect_null(mgcv::sp.vcov(bam))
+  expect_error(sampling_smoothing_ncv_delta(bam), "does not retain Vg")
+  no_jackknife <- mgcv::gam(fixture$formula, data = fixture$data, weights = w,
+    method = "NCV", nei = list(jackknife = FALSE))
+  expect_false(sampling_smoothing_ncv_delta(no_jackknife)$coefficient_covariance_replaced)
+  no_jackknife$family <- poisson()
+  expect_error(sampling_smoothing_ncv_delta(no_jackknife), "family parameters")
+  fit <- fixture$model
+  expect_error(sampling_smoothing_ncv_delta(fit), "actual NCV")
+})
+
+test_that("NCV audit handles scalar Vg without inferring unavailable covariance", {
+  fixture <- smoothing_research_fixture()
+  fit <- mgcv::gam(y ~ s(x, k = 5), data = fixture$data, weights = w,
+    method = "NCV")
+  delta <- sampling_smoothing_ncv_delta(fit)
+  expect_identical(dim(delta$log_sp_covariance), c(1L, 1L))
+  expect_equal(drop(delta$log_sp_covariance), drop(fit$Vg))
+  expect_equal(delta$propagated_covariance, fit$Vc)
+  fit$Vg <- -1
+  expect_error(sampling_smoothing_ncv_delta(fit), "Cannot identify")
+  fit$Vg <- NULL
+  expect_error(sampling_smoothing_ncv_delta(fit), "Cannot identify")
 })
