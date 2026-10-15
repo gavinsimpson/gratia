@@ -8,3 +8,7 @@ sampling_likelihood_cpp <- function(X, beta, y, w, offset, kind, phi, theta, gra
 sampling_mh_cpp <- function(X, S, mu, R, initial, y, w, offset, family, phi, theta, n, burnin, thin, df, rw_scale) {
     .Call(`_gratia_sampling_mh_cpp`, X, S, mu, R, initial, y, w, offset, family, phi, theta, n, burnin, thin, df, rw_scale)
 }
+
+sampling_mh_family_cpp <- function(S, mu, R, initial, phi, n, burnin, thin, df, rw_scale, log_likelihood) {
+    .Call(`_gratia_sampling_mh_family_cpp`, S, mu, R, initial, phi, n, burnin, thin, df, rw_scale, log_likelihood)
+}

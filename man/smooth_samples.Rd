@@ -28,7 +28,7 @@ smooth_samples(model, ...)
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e+06,
@@ -103,8 +103,13 @@ used, if available.}
 sizes, and Monte Carlo standard errors using the optional posterior package.}
 
 \item{mh_backend}{character; \code{"mgcv"} preserves \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.
-\code{"gratia"} uses the common-family evaluator and also supports independent
-observation bam fits. Both hold smoothing, scale, and family parameters fixed.}
+\code{"gratia"} uses compiled common-family likelihoods. \code{"family"} uses a
+compiled MH loop with callbacks to the fitted family object. Both support
+independent-observation bam fits. Smoothing parameters and parameters
+outside the fitted coefficient vector remain fixed. LSS scale and shape
+coefficients are sampled jointly with location. The family backend caches
+a full design matrix,
+smoothing penalty, and proposal factorisation once for all chains.}
 
 \item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
 uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
@@ -167,6 +172,13 @@ that particular posterior draw.
 Returns draws from the posterior distributions of smooth functions in a GAM.
 Useful, for example, for visualising the uncertainty in individual estimated
 functions.
+}
+\details{
+For LSS models, each smooth is a contribution to its own linear predictor.
+Select its full smooth label to distinguish predictors, for example \code{s(x)}
+and \code{s.1(x)}. These are component draws on the predictor scale; use
+\code{\link[=fitted_samples]{fitted_samples()}} for the expected response and \code{\link[=derivative_samples]{derivative_samples()}} for
+its derivative. Coefficients are drawn jointly across all predictors.
 }
 \section{Warning}{
 

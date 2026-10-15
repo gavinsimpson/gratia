@@ -1,0 +1,141 @@
+LSS posterior prediction validation: 15 October 2026
+Branch: gls/posterior-chains
+All R tests, builds, checks and benchmark runs were outside the sandbox.
+
+240 new LSS assertions pass with no warnings, using the installed-package
+test runner. Tests cover all seven installed LSS families, analytic means,
+response properties, multiple predictor offsets, native fitting-weight
+semantics and explicit sampling weights, missing rows, supplied and generated
+draws, chains and coefficient diagnostics, shared coefficients, custom hooks,
+non-default links/bounds, derivatives, smooths and add_*() joins. A separate
+test crosses fitted-prediction batch boundaries. Diagnostic regression tests
+also pass. Existing multiple-chain and family-backend tests remain included.
+
+The full suite also passed as an installed-package test run before batching.
+The final complete suite ran through R CMD check after the batching change:
+[ FAIL 0 | WARN 0 | SKIP 198 | PASS 16690 ]
+
+Skips: 185 visual expectations because VDIFFR_RUN_TESTS=false; 12 tests marked
+to skip on CI because CI=true; one paper-example integration test assigned
+to its separate integration workflow. NOT_CRAN=true enabled CRAN-skipped
+functional tests. There were no skips for missing optional packages.
+
+Build: R CMD build <worktree>, including vignettes.
+Check: R CMD check --as-cran --no-manual gratia_0.11.2-50.tar.gz
+Environment: R_LIBS=/tmp/gratia-sampling-library, NOT_CRAN=true,
+VDIFFR_RUN_TESTS=false, CI=true, _R_CHECK_FORCE_SUGGESTS_=false,
+_R_CHECK_CRAN_INCOMING_REMOTE_=false.
+--no-manual omits the PDF reference manual. HTML help, Rd syntax, examples,
+saved example comparisons, --run-donttest examples and vignette rebuilds pass.
+Remote CRAN incoming checks were disabled; local feasibility checks ran.
+Optional Suggests were not forced; the skip list contains no missing-package
+skips. These options omitted validation steps, not package errors.
+Final check status: OK; zero errors, warnings and notes.
+
+Help regeneration emitted existing roxygen notices about an @importsFrom tag
+and missing export tags in unrelated sources. Those are not package-check
+warnings. Unrelated generated help pages were restored verbatim.
+
+444 implementation, test, help, migration and release-note files match
+the final checked source. DESCRIPTION is reformatted/stamped by R CMD build;
+compiled objects are not compared. Benchmark scripts/reports are excluded
+from the source package by .Rbuildignore.
+Archive: /tmp/gratia-lss-batched-check/gratia_0.11.2-50.tar.gz
+Check log: /tmp/gratia-lss-batched-check.log
+Test log: /tmp/gratia-lss-batched-check/gratia.Rcheck/tests/test-all.Rout
+
+Benchmarks ran after validation finished, with BLAS/OpenMP threads set to one.
+All six affected gaulss MH runs were repeated with 4,000 retained draws over
+four chains, 1,000 burn-in iterations per chain and three seeds. All supported
+LSS transformations completed in 21 additional family/seed runs, retaining
+1,000 Gaussian coefficient draws over four chains at 200 supplied covariates.
+See lss-report.md, lss-prediction-benchmarks.csv and family-benchmarks.csv.
+
+Package-check output:
+* using log directory ‘/private/tmp/gratia-lss-batched-check/gratia.Rcheck’
+* using R version 4.6.1 (2026-06-24)
+* using platform: aarch64-apple-darwin23
+* R was compiled by
+    Apple clang version 17.0.0 (clang-1700.3.19.1)
+    GNU Fortran (GCC) 14.2.0
+* running under: macOS Tahoe 26.6.1
+* using session charset: UTF-8
+* current time: 2026-10-15 09:08:48 UTC
+* using options ‘--no-manual --as-cran’
+* checking for file ‘gratia/DESCRIPTION’ ... OK
+* this is package ‘gratia’ version ‘0.11.2-50’
+* package encoding: UTF-8
+* checking CRAN incoming feasibility ... OK
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘gratia’ can be installed ... [13s/13s] OK
+* used C++ compiler: ‘Apple clang version 17.0.0 (clang-1700.6.4.2)’
+* used SDK: ‘MacOSX26.2.sdk’
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking for future file timestamps ... OK
+* checking ‘build’ directory ... OK
+* checking DESCRIPTION meta-information ... OK
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking code files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking use of S3 registration ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... [21s/22s] OK
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd line widths ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... OK
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking contents of ‘data’ directory ... OK
+* checking data for non-ASCII characters ... OK
+* checking LazyData ... OK
+* checking data for ASCII and uncompressed saves ... OK
+* checking line endings in C/C++/Fortran sources/headers ... OK
+* checking line endings in Makefiles ... OK
+* checking compilation flags in Makevars ... OK
+* checking for GNU extensions in Makefiles ... OK
+* checking for portable use of $(BLAS_LIBS) and $(LAPACK_LIBS) ... OK
+* checking use of PKG_*FLAGS in Makefiles ... OK
+* checking use of SHLIB_OPENMP_*FLAGS in Makefiles ... OK
+* checking pragmas in C/C++ headers and code ... OK
+* checking compilation flags used ... OK
+* checking compiled code ... OK
+* checking installed files from ‘inst/doc’ ... OK
+* checking files in ‘vignettes’ ... OK
+* checking examples ... [38s/39s] OK
+* checking for differences from example reference output ... OK
+* checking examples with --run-donttest ... [40s/41s] OK
+* checking for unstated dependencies in ‘tests’ ... OK
+* checking tests ...
+  Running ‘test-all.R’ [241s/257s]
+ [241s/257s] OK
+* checking for unstated dependencies in vignettes ... OK
+* checking package vignettes ... OK
+* checking re-building of vignette outputs ... OK
+* checking for non-standard things in the check directory ... OK
+* checking for detritus in the temp directory ... OK
+* DONE
+
+Status: OK

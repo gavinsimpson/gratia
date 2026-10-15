@@ -3,15 +3,7 @@
 # in particular, binomial weights already include the numbers of trials.
 sampling_target <- function(model, block_size = 10000L, dense_limit = 5e6,
                             compiled = FALSE) {
-  if (!inherits(model, "gam") || inherits(model, "scam") ||
-      isTRUE(attr(model, "gratia.gamm4"))) stop(
-    "The gratia MH backend requires an ordinary gam or bam fit.", call. = FALSE)
-  if (any(startsWith(model$method %||% "", "lme.")) ||
-      identical(model$method, "PQL")) stop(
-    "The gratia MH backend does not support GAMM components; use Gaussian sampling.",
-    call. = FALSE)
-  if (!is.null(model$AR1.rho) && model$AR1.rho != 0) stop(
-    "The gratia MH backend requires independent observations (rho = 0).", call. = FALSE)
+  sampling_target_check(model, "gratia")
   fam <- stats::family(model)
   family <- fam$family
   kind <- if (family == "gaussian" && fam$link == "identity") "gaussian" else
@@ -22,10 +14,6 @@ sampling_target <- function(model, block_size = 10000L, dense_limit = 5e6,
   if (is.null(kind)) stop("The gratia MH backend supports Gaussian identity, ",
     "Poisson log, binomial logit, Gamma log, and negative binomial log models.",
     call. = FALSE)
-  unsupported <- c("paraPen", "H", "G")
-  if (!is.null(model$paraPen) || any(vapply(unsupported, function(nm) {
-    !is.null(model$call[[nm]]) && !identical(model$call[[nm]], quote(NULL))
-  }, logical(1L)))) stop("The gratia MH backend does not yet support 'paraPen', 'H', or pre-fit 'G' objects.", call. = FALSE)
   block_size <- sampling_count(block_size, "block_size")
   beta <- as.numeric(stats::coef(model))
   p <- length(beta)
@@ -40,20 +28,7 @@ sampling_target <- function(model, block_size = 10000L, dense_limit = 5e6,
   if (kind == "nb" && (length(theta) != 1L || !is.finite(theta) || theta <= 0)) {
     stop("Cannot recover the fitted negative binomial shape.", call. = FALSE)
   }
-  # full.sp expands shared and fixed smoothing parameters to penalty order.
-  sp <- model$full.sp %||% model$sp
-  n_pen <- sum(vapply(model$smooth, function(sm) length(sm$S), integer(1L)))
-  if (length(sp) != n_pen || any(!is.finite(sp) | sp < 0)) stop(
-    "Cannot match fitted smoothing parameters to the smooth penalties.", call. = FALSE)
-  S <- matrix(0, p, p)
-  k <- 0L
-  for (sm in model$smooth) {
-    j <- sm$first.para:sm$last.para
-    for (penalty in sm$S) {
-      k <- k + 1L
-      S[j, j] <- S[j, j, drop = FALSE] + sp[k] * penalty
-    }
-  }
+  S <- sampling_target_penalty(model, "gratia")
   model <- model_used_rows(model)
   y <- as.numeric(model$y)
   w <- model$prior.weights %||% rep(1, length(y))
@@ -80,10 +55,17 @@ sampling_target <- function(model, block_size = 10000L, dense_limit = 5e6,
   list(model = if (dense) NULL else model, X = X, blocks = blocks,
     y = y, w = w, offset = offset, S = S, phi = phi, theta = theta,
     kind = kind, beta = beta, V = V, R = R,
-    names = names(stats::coef(model)), compiled = compiled)
+    names = names(stats::coef(model)), compiled = compiled, backend = "gratia")
 }
 
 sampling_target_eval <- function(target, beta, gradient = FALSE) {
+  if (identical(target$backend, "family")) {
+    if (gradient) stop("The family MH backend does not provide posterior gradients.",
+      call. = FALSE)
+    value <- target$log_likelihood(beta) -
+      sum(beta * drop(target$S %*% beta)) / (2 * target$phi)
+    return(if (is.finite(value)) value else -Inf)
+  }
   lp <- -sum(beta * drop(target$S %*% beta)) / (2 * target$phi)
   grad <- if (gradient) -drop(target$S %*% beta) / target$phi else NULL
   for (i in target$blocks) {
@@ -135,6 +117,13 @@ sampling_likelihood <- function(eta, y, w, kind, phi, theta) {
 sampling_mh <- function(target, n, burnin, thin, t_df, rw_scale,
                         batch_size = 256L, initial = NULL) {
   mu <- target$beta
+  if (identical(target$backend, "family")) {
+    out <- sampling_mh_family_cpp(target$S, mu, sampling_factor(target),
+      initial %||% mu, target$phi, n, burnin, thin, t_df, rw_scale,
+      target$log_likelihood)
+    colnames(out$bs) <- target$names
+    return(out)
+  }
   if (isTRUE(target$compiled) && !is.null(target$X)) {
     out <- sampling_mh_cpp(target$X, target$S, mu, sampling_factor(target),
       initial %||% mu, target$y, target$w, target$offset, target$kind,
@@ -206,6 +195,43 @@ sampling_mh <- function(target, n, burnin, thin, t_df, rw_scale,
 # propose moves outside those restrictions by adding covariance jitter.
 sampling_factor <- function(target) {
   if (is.null(target$R)) stop("The fitted coefficient covariance is singular; ",
-    "the gratia MH backend requires identifiable coefficient directions.", call. = FALSE)
+    "the ", target$backend %||% "gratia",
+    " MH backend requires identifiable coefficient directions.", call. = FALSE)
   target$R
+}
+
+# Shared checks and penalty setup run before any chains are started.
+sampling_target_check <- function(model, backend) {
+  if (!inherits(model, "gam") || inherits(model, "scam") ||
+      isTRUE(attr(model, "gratia.gamm4"))) stop(
+    "The ", backend, " MH backend requires an ordinary gam or bam fit.", call. = FALSE)
+  if (any(startsWith(model$method %||% "", "lme.")) ||
+      identical(model$method, "PQL")) stop(
+    "The ", backend, " MH backend does not support GAMM components; use Gaussian sampling.",
+    call. = FALSE)
+  if (!is.null(model$AR1.rho) && model$AR1.rho != 0) stop(
+    "The ", backend, " MH backend requires independent observations (rho = 0).", call. = FALSE)
+}
+
+sampling_target_penalty <- function(model, backend) {
+  unsupported <- c("paraPen", "H", "G")
+  if (!is.null(model$paraPen) || any(vapply(unsupported, function(nm) {
+    !is.null(model$call[[nm]]) && !identical(model$call[[nm]], quote(NULL))
+  }, logical(1L)))) stop("The ", backend, " MH backend does not yet support 'paraPen', 'H', or pre-fit 'G' objects.", call. = FALSE)
+  p <- length(stats::coef(model))
+  # full.sp expands shared and fixed smoothing parameters to penalty order.
+  sp <- model$full.sp %||% model$sp
+  n_pen <- sum(vapply(model$smooth, function(sm) length(sm$S), integer(1L)))
+  if (length(sp) != n_pen || any(!is.finite(sp) | sp < 0)) stop(
+    "Cannot match fitted smoothing parameters to the smooth penalties.", call. = FALSE)
+  S <- matrix(0, p, p)
+  k <- 0L
+  for (sm in model$smooth) {
+    j <- sm$first.para:sm$last.para
+    for (penalty in sm$S) {
+      k <- k + 1L
+      S[j, j] <- S[j, j, drop = FALSE] + sp[k] * penalty
+    }
+  }
+  S
 }

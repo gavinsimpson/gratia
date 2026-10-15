@@ -53,7 +53,10 @@ at the fitted parameters. Required; coefficient chains are not used.}
 explicit vector overrides the fitting weights; a single value applies to
 every observation. With \code{data = NULL}, the default is the fitted prior
 weights, except factor-valued binomial responses retain one Bernoulli trial
-per observation. With prediction data, the default is a vector of ones.
+per observation. Native \code{gaulss()} ignores fitting weights in its likelihood,
+so its default response weights are also ones; explicitly supplied sampling
+weights still override this default. With prediction data, weights default
+to a vector of ones.
 For ordinary Gaussian and Gamma responses, larger weights reduce response
 variance (precision weights). For binomial responses, weights give integer
 trial counts. They do not alter the fitted coefficient covariance. Include
@@ -76,6 +79,12 @@ fitted model, created via \code{simulate()} (e.g. \code{\link[=simulate.gam]{sim
 in a tidy, long, format. These predicted values do not include the
 uncertainty in the estimated model; they are simply draws from the
 conditional distribution of the response.
+}
+\details{
+LSS response simulation uses all fitted distribution parameters at the
+requested data, with the same parameter transformations and offset rules as
+\code{\link[=posterior_samples]{posterior_samples()}}. It holds coefficients fixed, so it has no coefficient
+chains or attached coefficient diagnostics.
 }
 \examples{
 load_mgcv()

@@ -28,7 +28,10 @@
 #'   explicit vector overrides the fitting weights; a single value applies to
 #'   every observation. With `data = NULL`, the default is the fitted prior
 #'   weights, except factor-valued binomial responses retain one Bernoulli trial
-#'   per observation. With prediction data, the default is a vector of ones.
+#'   per observation. Native `gaulss()` ignores fitting weights in its likelihood,
+#'   so its default response weights are also ones; explicitly supplied sampling
+#'   weights still override this default. With prediction data, weights default
+#'   to a vector of ones.
 #'   For ordinary Gaussian and Gamma responses, larger weights reduce response
 #'   variance (precision weights). For binomial responses, weights give integer
 #'   trial counts. They do not alter the fitted coefficient covariance. Include
@@ -70,6 +73,23 @@
 #' the AR1 correction applies to working residuals used during fitting. It does
 #' not specify a joint distribution of actual responses, so sampling produces
 #' an error.
+#'
+#' Location-scale-shape families [mgcv::gaulss()], [mgcv::gammals()],
+#' [mgcv::gumbls()], [mgcv::gevlss()], [mgcv::shash()], [mgcv::twlss()] and
+#' [mgcv::ziplss()] support fitting observations, subsets and new covariates.
+#' Every distribution parameter is computed from the same joint coefficient
+#' draw. Evaluation data need predictors and formula-offset variables, but no
+#' observed response. In `gaulss()`, the second response parameter is inverse
+#' standard deviation: sampling uses its reciprocal, divided by the square
+#' root of the sampling weight. Other LSS generators currently ignore sampling
+#' weights, following their mgcv implementations. Parameters represented by
+#' coefficients vary jointly; other family parameters remain fixed.
+#'
+#' Cox survival models require evaluation times and an observation process and
+#' do not have a response generator for this interface. Censored-family draws
+#' are latent, uncensored responses; reproducing observed censoring requires
+#' an observation process and remains unsupported in posterior predictive checks.
+#' Grouped-family posterior response sampling still uses fitting observations.
 #'
 #' # Note
 #'
@@ -141,7 +161,7 @@
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e6,
@@ -219,7 +239,7 @@
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e6,
@@ -291,7 +311,7 @@
   envir = NULL,
   chains = 1L,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   block_size = 10000L,
   dense_limit = 5e6,
   ...
@@ -329,15 +349,21 @@
       )
     }
   }
+  if (fam_type == "cox_ph") stop(
+    "Cox posterior response sampling requires an observation process and a response generator; ",
+    "evaluation times and strata alone do not define response draws.", call. = FALSE)
   advanced <- is_gfam_family(fam) ||
     (inherits(fam, "general.family") &&
       !fam_type %in% c("multivariate_normal", "multinom"))
-  if (advanced) {
+  if (advanced && !is_lss_family(fam)) {
     if (!is.null(data)) {
-      stop(
-        "Distributional posterior response draws currently use the fitting observations.",
-        call. = FALSE
-      )
+      if (is_gfam_family(fam)) {
+        stop("Grouped-family posterior response draws currently require fitting ",
+          "observations; use data = NULL.", call. = FALSE)
+      }
+      stop("Posterior response sampling at supplied data is not implemented for ",
+        "family <", family_name(fam), ">; a distribution-parameter adapter is required.",
+        call. = FALSE)
     }
     return(diagnostic_posterior_samples.default(
       model,
@@ -392,6 +418,20 @@
     NULL
   } else {
     sample.int(.Machine$integer.max, 1L)
+  }
+  if (is_lss_family(fam)) {
+    context <- lss_prediction_context(model, data, ...)
+    betas <- sampling_call(post_draws, list(model = context$model,
+      n_draws = n, seed = coefficient_seed, method = method,
+      n_threads = n_threads, n_cores = n_cores, chains = chains,
+      diagnostics = diagnostics, mh_backend = mh_backend, block_size = block_size,
+      dense_limit = dense_limit, burnin = burnin, thin = thin, t_df = t_df,
+      rw_scale = rw_scale, frequentist = freq, unconditional = unconditional,
+      draws = draws, mvn_method = mvn_method))
+    sampler <- lss_response_sampler(context, betas, weights)
+    out <- dplyr::bind_rows(lapply(seq_len(NROW(betas)), sampler))
+    class(out) <- c("posterior_samples", class(out))
+    return(attach_sampling(out, betas, draw_index = TRUE))
   }
   sim_eta <- sampling_call(
     fitted_samples,
@@ -576,9 +616,9 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' distribution of fitted model using a Gaussian approximation to the
 #' posterior or a simple Metropolis Hastings sampler.
 #'
-#' @param scale character; what scale should the fitted values be returned on?
-#'   `"linear predictor"` is a synonym for `"link"` if you prefer that
-#'   terminology.
+#' @param scale character; `"response"` returns the expected response;
+#'   `"linear_predictor"` returns the first linear predictor. For LSS models,
+#'   this is the predictor for location, which need not be the expected response.
 #'
 #' @param family_index numeric; optional family-list positions for grouped
 #'   family ([mgcv::gfam()]) response predictions, with one integer per requested
@@ -588,6 +628,17 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #'   An explicit index must agree with membership recoverable from `data`.
 #'
 #' @details
+#' For LSS models, `scale = "response"` returns the expected response, using
+#' all parameters on which it depends. This includes the mean correction for
+#' Gumbel, GEV and sinh-arcsinh distributions and the hurdle probability for
+#' `ziplss()`. The Gamma LSS mean is the exponential of its first predictor.
+#' `scale = "linear_predictor"` returns only the first predictor (location);
+#' it is not a transformation of the expectation for these multi-parameter
+#' distributions. The existing `.parameter = "location"` label is retained on
+#' both scales. A GEV expectation does not exist at shape >= 1: response-scale
+#' fitted and derivative sampling then fail explicitly, while response draws
+#' and location-predictor draws remain available.
+#'
 #' For grouped families, coefficient draws preserve the joint model covariance;
 #' each row is then transformed using its own fitted component family. Explicit
 #' prediction data must identify each row's family: no training-order fallback
@@ -722,7 +773,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e6,
@@ -795,7 +846,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e6,
@@ -868,7 +919,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   family_index = NULL,
   chains = 1L,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   block_size = 10000L,
   dense_limit = 5e6,
   ...
@@ -946,6 +997,18 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     )
   )
   sampling <- attr(betas, "sampling")
+  if (is_lss_family(stats::family(model))) {
+    context <- lss_prediction_context(model, layout = layout, ...)
+    values <- lss_fitted_values(context, betas, scale)
+    sims <- tibble::tibble(
+      .row = rep(seq_len(NROW(values)), NROW(betas)),
+      .draw = rep(seq_len(NROW(betas)), each = NROW(values)),
+      .parameter = "location", .fitted = as.numeric(values))
+    sims <- restore_prediction_table(sims, layout)
+    attr(sims, "seed") <- RNGstate
+    class(sims) <- c("fitted_samples", class(sims))
+    return(attach_sampling(sims, sampling, draw_index = TRUE))
+  }
   ## betas is for *all* coefs, including distributional parameters
   lss_idx <- lss_eta_index(model)
   gen_fam <- inherits(family(model), "general.family")
@@ -955,10 +1018,17 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     fam_nam <- family_name(model)
     if (grepl("^Multivariate normal", fam_nam) || grepl("^multinom", fam_nam)) {
       lss_loc <- lss_idx # for mvn we want to loop over all the linpreds
+    } else if (scale == "linear_predictor") {
+      lss_loc <- lss_idx[[1L]]
+      lss_idx <- lss_idx[1L]
     } else {
-      warning("Currently, only for LSS families where location is the mean.")
-      lss_loc <- lss_idx[[1L]] # for now just take the location linpred
-      lss_idx <- lss_idx[1L] # keep as a list
+      if (family_type(model) == "cox_ph") {
+        stop("Cox survival predictions require evaluation times and strata; ",
+          "a location parameter alone does not define an expected response.",
+          call. = FALSE)
+      }
+      stop("The expected response is not implemented for family <", fam_nam,
+        ">; a family-specific expectation adapter is required.", call. = FALSE)
     }
   } else {
     lss_loc <- lss_idx[[1L]]
@@ -1113,6 +1183,12 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' in a tidy, long, format. These predicted values do not include the
 #' uncertainty in the estimated model; they are simply draws from the
 #' conditional distribution of the response.
+#'
+#' @details
+#' LSS response simulation uses all fitted distribution parameters at the
+#' requested data, with the same parameter transformations and offset rules as
+#' [posterior_samples()]. It holds coefficients fixed, so it has no coefficient
+#' chains or attached coefficient diagnostics.
 #'
 #' @return A tibble (data frame) with 3 columns containing the posterior
 #'   predicted values in long format. The columns are
@@ -1270,6 +1346,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     model, nsim = n, seed = seed, data = data, weights = weights, ...
   )
   RNGstate <- attr(sims, "seed")
+  row_ids <- attr(sims, "row_ids")
   class(sims) <- class(sims)[-1] # remove the "simulate_gratia" class
   if (
     is_multivariate_y(model) &&
@@ -1294,7 +1371,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
     sims <- as_tibble(sims)
     names(sims) <- as.character(seq_len(ncol(sims)))
-    sims <- add_column(sims, .row = seq_len(nrow(sims)))
+    sims <- add_column(sims, .row = row_ids %||% seq_len(nrow(sims)))
     sims <- gather(sims, key = ".draw", value = ".response", -.row) |>
       mutate(.draw = as.integer(.data$.draw))
   }
@@ -1310,6 +1387,13 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' Returns draws from the posterior distributions of smooth functions in a GAM.
 #' Useful, for example, for visualising the uncertainty in individual estimated
 #' functions.
+#'
+#' @details
+#' For LSS models, each smooth is a contribution to its own linear predictor.
+#' Select its full smooth label to distinguish predictors, for example `s(x)`
+#' and `s.1(x)`. These are component draws on the predictor scale; use
+#' [fitted_samples()] for the expected response and [derivative_samples()] for
+#' its derivative. Coefficients are drawn jointly across all predictors.
 #'
 #' @author Gavin L. Simpson
 #'
@@ -1434,7 +1518,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e6,
@@ -1644,7 +1728,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e6,
@@ -1844,6 +1928,13 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 
 #' @title Posterior expectations of derivatives from an estimated model
 #'
+#' @details
+#' For LSS models, response-scale derivatives differentiate the expected response
+#' returned by [fitted_samples()], retaining the joint uncertainty in every
+#' parameter that affects that expectation. Predictor-scale derivatives refer
+#' to the first linear predictor. Smooth-component derivatives and derivatives
+#' of the response expectation are different quantities.
+#'
 #' @param model a fitted model to compute derivative samples for
 #' @param ... arguments passed to other methods and on to `fitted_samples()`
 #'
@@ -1958,7 +2049,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e6,
@@ -2042,7 +2133,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e6,
@@ -2124,7 +2215,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   mvn_method = c("mvnfast", "mgcv"),
   chains = 1L,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   block_size = 10000L,
   dense_limit = 5e6,
   ...

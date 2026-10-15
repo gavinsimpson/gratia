@@ -54,7 +54,7 @@ posterior_samples(model, ...)
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e+06,
@@ -79,7 +79,7 @@ posterior_samples(model, ...)
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e+06,
@@ -154,8 +154,13 @@ used, if available.}
 sizes, and Monte Carlo standard errors using the optional posterior package.}
 
 \item{mh_backend}{character; \code{"mgcv"} preserves \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.
-\code{"gratia"} uses the common-family evaluator and also supports independent
-observation bam fits. Both hold smoothing, scale, and family parameters fixed.}
+\code{"gratia"} uses compiled common-family likelihoods. \code{"family"} uses a
+compiled MH loop with callbacks to the fitted family object. Both support
+independent-observation bam fits. Smoothing parameters and parameters
+outside the fitted coefficient vector remain fixed. LSS scale and shape
+coefficients are sampled jointly with location. The family backend caches
+a full design matrix,
+smoothing penalty, and proposal factorisation once for all chains.}
 
 \item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
 uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
@@ -173,7 +178,10 @@ for the gratia MH backend. Use zero to force blockwise evaluation.}
 explicit vector overrides the fitting weights; a single value applies to
 every observation. With \code{data = NULL}, the default is the fitted prior
 weights, except factor-valued binomial responses retain one Bernoulli trial
-per observation. With prediction data, the default is a vector of ones.
+per observation. Native \code{gaulss()} ignores fitting weights in its likelihood,
+so its default response weights are also ones; explicitly supplied sampling
+weights still override this default. With prediction data, weights default
+to a vector of ones.
 For ordinary Gaussian and Gamma responses, larger weights reduce response
 variance (precision weights). For binomial responses, weights give integer
 trial counts. They do not alter the fitted coefficient covariance. Include
@@ -215,6 +223,23 @@ currently use the fitting observations only. For other families or links,
 the AR1 correction applies to working residuals used during fitting. It does
 not specify a joint distribution of actual responses, so sampling produces
 an error.
+
+Location-scale-shape families \code{\link[mgcv:gaulss]{mgcv::gaulss()}}, \code{\link[mgcv:gammals]{mgcv::gammals()}},
+\code{\link[mgcv:gumbls]{mgcv::gumbls()}}, \code{\link[mgcv:gevlss]{mgcv::gevlss()}}, \code{\link[mgcv:shash]{mgcv::shash()}}, \code{\link[mgcv:twlss]{mgcv::twlss()}} and
+\code{\link[mgcv:ziplss]{mgcv::ziplss()}} support fitting observations, subsets and new covariates.
+Every distribution parameter is computed from the same joint coefficient
+draw. Evaluation data need predictors and formula-offset variables, but no
+observed response. In \code{gaulss()}, the second response parameter is inverse
+standard deviation: sampling uses its reciprocal, divided by the square
+root of the sampling weight. Other LSS generators currently ignore sampling
+weights, following their mgcv implementations. Parameters represented by
+coefficients vary jointly; other family parameters remain fixed.
+
+Cox survival models require evaluation times and an observation process and
+do not have a response generator for this interface. Censored-family draws
+are latent, uncensored responses; reproducing observed censoring requires
+an observation process and remains unsupported in posterior predictive checks.
+Grouped-family posterior response sampling still uses fitting observations.
 }
 \section{Note}{
 With \code{data = NULL}, fitting offsets are retained, including offsets

@@ -55,10 +55,32 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// sampling_mh_family_cpp
+List sampling_mh_family_cpp(NumericMatrix S, NumericVector mu, NumericMatrix R, NumericVector initial, double phi, int n, int burnin, int thin, double df, double rw_scale, Function log_likelihood);
+RcppExport SEXP _gratia_sampling_mh_family_cpp(SEXP SSEXP, SEXP muSEXP, SEXP RSEXP, SEXP initialSEXP, SEXP phiSEXP, SEXP nSEXP, SEXP burninSEXP, SEXP thinSEXP, SEXP dfSEXP, SEXP rw_scaleSEXP, SEXP log_likelihoodSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type S(SSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type R(RSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type initial(initialSEXP);
+    Rcpp::traits::input_parameter< double >::type phi(phiSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
+    Rcpp::traits::input_parameter< int >::type thin(thinSEXP);
+    Rcpp::traits::input_parameter< double >::type df(dfSEXP);
+    Rcpp::traits::input_parameter< double >::type rw_scale(rw_scaleSEXP);
+    Rcpp::traits::input_parameter< Function >::type log_likelihood(log_likelihoodSEXP);
+    rcpp_result_gen = Rcpp::wrap(sampling_mh_family_cpp(S, mu, R, initial, phi, n, burnin, thin, df, rw_scale, log_likelihood));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_gratia_sampling_likelihood_cpp", (DL_FUNC) &_gratia_sampling_likelihood_cpp, 9},
     {"_gratia_sampling_mh_cpp", (DL_FUNC) &_gratia_sampling_mh_cpp, 16},
+    {"_gratia_sampling_mh_family_cpp", (DL_FUNC) &_gratia_sampling_mh_family_cpp, 11},
     {NULL, NULL, 0}
 };
 

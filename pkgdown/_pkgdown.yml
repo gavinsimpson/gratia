@@ -166,11 +166,13 @@ reference:
     desc: >
       Draw individual smooths with `smooth_samples()` or expected responses
       with `fitted_samples()`; `posterior_samples()` generates new responses
-      including model uncertainty, while `predicted_samples()` simulates
-      responses conditional on the fitted model without model uncertainty.
+      including coefficient uncertainty, while `predicted_samples()` simulates
+      responses conditional on the fitted coefficients. Examine chains with
+      [as_mcmc_draws()](as_mcmc_draws.html) and
+      [sampling_diagnostics()](sampling_diagnostics.html).
       For coefficient draws, use [post_draws()](post_draws.html) in the advanced
-      helpers; see
-      [Posterior Simulation](../articles/posterior-simulation.html).
+      helpers. See [Posterior Simulation](../articles/posterior-simulation.html)
+      and the [sampling migration guide](../articles/sampling-migration.html).
   - contents:
       - posterior_samples
       - smooth_samples

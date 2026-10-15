@@ -1,10 +1,35 @@
 # Posterior-chain implementation and experiments
 
+The [final family/LSS review](family-lss-review-validation.txt) records the
+regression review, full package check and pkgdown reference validation.
+Run `Rscript notes/posterior-chains/validate-reference-index.R` after
+installation to reproduce the reference coverage and link checks.
+
 The public interface extends the existing sampling functions. The default MH
-backend remains mgcv. `mh_backend = "gratia"` selects the new evaluator for the
+backend remains mgcv. The family backend uses a compiled MH loop with the
+fitted family's likelihood functions, preparing setup once for all chains.
+See [the family-backend report](family-report.md) for the implementation,
+mgcv-family validation and repeated effective-sample benchmarks. `mh_backend = "gratia"` selects the new evaluator for the
 five supported family/link combinations and for independent-observation bam
 fits. MALA, elliptical slice sampling, the compressed-design adapter, and the
 log-smoothing mixture remain internal research implementations.
+
+The [LSS support audit](lss-audit.md) records predictor and generator conventions,
+the expected responses returned by each sampling function, and remaining
+family-specific restrictions. The [LSS benchmark report](lss-report.md) and
+[validation results](lss-validation.txt) record the final measurements and
+package checks. `lss-prediction-benchmark.R` measures fitted,
+posterior-response and fixed-coefficient response costs at supplied covariates
+for all seven installed mgcv LSS families. The family-backend study also reruns
+the affected Gaussian location-scale MH cases. Run these studies after installing
+the branch and setting R_LIBS, with other validation processes idle:
+
+```sh
+Rscript notes/posterior-chains/family-study.R
+Rscript notes/posterior-chains/family-summary.R
+Rscript notes/posterior-chains/lss-prediction-benchmark.R
+Rscript notes/posterior-chains/lss-summary.R
+```
 
 ## Reproducing the studies
 

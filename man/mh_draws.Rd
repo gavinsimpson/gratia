@@ -21,7 +21,7 @@ mh_draws(model, ...)
   t_df = 40,
   rw_scale = 0.25,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   block_size = 10000L,
   dense_limit = 5e+06,
   index = NULL,
@@ -62,8 +62,13 @@ matrix when generating random walk proposals. See \code{mgcv::gam.mh()}.}
 sizes, and Monte Carlo standard errors using the optional posterior package.}
 
 \item{mh_backend}{character; \code{"mgcv"} preserves \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.
-\code{"gratia"} uses the common-family evaluator and also supports independent
-observation bam fits. Both hold smoothing, scale, and family parameters fixed.}
+\code{"gratia"} uses compiled common-family likelihoods. \code{"family"} uses a
+compiled MH loop with callbacks to the fitted family object. Both support
+independent-observation bam fits. Smoothing parameters and parameters
+outside the fitted coefficient vector remain fixed. LSS scale and shape
+coefficients are sampled jointly with location. The family backend caches
+a full design matrix,
+smoothing penalty, and proposal factorisation once for all chains.}
 
 \item{block_size}{positive integer; maximum observation rows per block in the
 gratia MH evaluator. Large designs are evaluated without storing a full matrix.}

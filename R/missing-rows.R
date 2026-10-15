@@ -98,6 +98,7 @@ residual_rows <- function(x, model, data, partial = FALSE) {
 prediction_layout <- function(model, data = NULL, na.action = stats::na.pass,
                               required = NULL) {
   training <- is.null(data)
+  n_input <- if (training) length(model_row_map(model)) else NROW(data)
   if (training) {
     data <- model$model
     if (is.null(data)) {
@@ -146,6 +147,7 @@ prediction_layout <- function(model, data = NULL, na.action = stats::na.pass,
     rows = rows,
     output_data = output_data,
     training = training,
+    n_input = n_input,
     input_rows = input_rows
   )
 }

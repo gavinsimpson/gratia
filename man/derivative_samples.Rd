@@ -35,7 +35,7 @@ derivative_samples(model, ...)
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e+06,
@@ -66,7 +66,7 @@ derivative_samples(model, ...)
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e+06,
@@ -142,8 +142,13 @@ SCAM models do not support this correction; use \code{unconditional = FALSE}.}
 sizes, and Monte Carlo standard errors using the optional posterior package.}
 
 \item{mh_backend}{character; \code{"mgcv"} preserves \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.
-\code{"gratia"} uses the common-family evaluator and also supports independent
-observation bam fits. Both hold smoothing, scale, and family parameters fixed.}
+\code{"gratia"} uses compiled common-family likelihoods. \code{"family"} uses a
+compiled MH loop with callbacks to the fitted family object. Both support
+independent-observation bam fits. Smoothing parameters and parameters
+outside the fitted coefficient vector remain fixed. LSS scale and shape
+coefficients are sampled jointly with location. The family backend caches
+a full design matrix,
+smoothing penalty, and proposal factorisation once for all chains.}
 
 \item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
 uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
@@ -201,6 +206,13 @@ was evaluated.
 }
 \description{
 Posterior expectations of derivatives from an estimated model
+}
+\details{
+For LSS models, response-scale derivatives differentiate the expected response
+returned by \code{\link[=fitted_samples]{fitted_samples()}}, retaining the joint uncertainty in every
+parameter that affects that expectation. Predictor-scale derivatives refer
+to the first linear predictor. Smooth-component derivatives and derivatives
+of the response expectation are different quantities.
 }
 \examples{
 

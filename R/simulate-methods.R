@@ -19,6 +19,8 @@
 #'   overrides the fitting weights; a single value applies to every observation.
 #'   With `data = NULL`, the default is the fitted prior weights, except
 #'   factor-valued binomial responses retain one Bernoulli trial per observation.
+#'   Native `gaulss()` ignores fitting weights in its likelihood, so its default
+#'   response weights are ones; explicit sampling weights still override this.
 #'   With prediction data, the default is a vector of ones. For ordinary Gaussian
 #'   and Gamma responses, larger weights reduce response variance (precision
 #'   weights). For binomial responses, weights give integer trial counts. Include
@@ -174,6 +176,12 @@
     }
   }
 
+  if (is_lss_family(stats::family(object))) {
+    context <- lss_prediction_context(object, layout = layout, ...)
+    mu <- family_prediction_parameters(context$family,
+      lss_predictors(context, stats::coef(object)))
+  }
+
   if (training && !is.null(object$AR1.rho) && object$AR1.rho != 0) {
     object$prior.weights <- weights
     distribution <- response_distribution(object)
@@ -219,6 +227,7 @@
       setNames(nm = paste("sim", seq_len(nsim), sep = "_"))
   }
 
+  attr(sims, "row_ids") <- layout$rows
   attr(sims, "seed") <- RNGstate
   class(sims) <- append(class(sims), "simulate_gratia", after = 0L)
 

@@ -13,8 +13,13 @@
 #' @param diagnostics logical; calculate coefficient R-hat, effective sample
 #'   sizes, and Monte Carlo standard errors using the optional posterior package.
 #' @param mh_backend character; `"mgcv"` preserves [mgcv::gam.mh()].
-#'   `"gratia"` uses the common-family evaluator and also supports independent
-#'   observation bam fits. Both hold smoothing, scale, and family parameters fixed.
+#'   `"gratia"` uses compiled common-family likelihoods. `"family"` uses a
+#'   compiled MH loop with callbacks to the fitted family object. Both support
+#'   independent-observation bam fits. Smoothing parameters and parameters
+#'   outside the fitted coefficient vector remain fixed. LSS scale and shape
+#'   coefficients are sampled jointly with location. The family backend caches
+#'   a full design matrix,
+#'   smoothing penalty, and proposal factorisation once for all chains.
 #' @param block_size positive integer; maximum observation rows per block in the
 #'   gratia MH evaluator. Large designs are evaluated without storing a full matrix.
 #' @param dense_limit numeric; maximum number of design-matrix elements to cache
@@ -78,9 +83,24 @@
 #' The gratia MH backend supports Gaussian identity, Poisson log, binomial
 #' logit, Gamma log, and negative binomial log fits. It evaluates the fitted
 #' bases at original covariates, including for discrete bam fits. GAMM components, AR1 dependence,
-#' `paraPen`, `H`, and fits made from pre-fit `G` objects are unsupported. Both MH backends sample the
-#' conditional coefficient posterior with fitted smoothing, dispersion, and
-#' family parameters fixed. `unconditional` applies to Gaussian draws only.
+#' `paraPen`, `H`, and fits made from pre-fit `G` objects are unsupported.
+#'
+#' The family MH backend calls the fitted family's `dev.resids()` and `linkinv()`
+#' functions, or `ll()` for families with multiple linear predictors. This
+#' retains response encodings and attributes such as censoring indicators and
+#' the mappings between coefficients and predictors. It supports compatible
+#' standard, extended, and general mgcv families, including multinomial, Gaussian
+#' location-scale, and grouped families. Quasi families, Cox proportional hazards
+#' models, GAMM components, AR1 dependence, `paraPen`, `H`, and pre-fit `G` objects
+#' are unsupported. The fitted coefficient covariance must be nonsingular.
+#' It always caches the full design matrix; `block_size` and `dense_limit` apply
+#' only to the gratia backend and are rejected for the family backend.
+#'
+#' All MH backends sample the conditional coefficient posterior with fitted
+#' smoothing, dispersion, and additional family parameters fixed. Parameters
+#' represented in the fitted coefficient vector are sampled, including scale
+#' or covariance coefficients in general families. `unconditional` applies
+#' to Gaussian draws only.
 #'
 #' @export
 `post_draws` <- function(
@@ -112,7 +132,7 @@
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e6,
@@ -264,7 +284,7 @@
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e6,
@@ -489,7 +509,7 @@
   t_df = 40,
   rw_scale = 0.25,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   block_size = 10000L,
   dense_limit = 5e6,
   index = NULL,
@@ -551,7 +571,7 @@
   mh_backend <- match.arg(mh_backend)
   if (mh_backend == "mgcv" && inherits(model, "bam")) {
     stop(
-      "mgcv::gam.mh() does not support bam fits; use mh_backend = 'gratia'.",
+      "mgcv::gam.mh() does not support bam fits; use mh_backend = 'gratia' or 'family'.",
       call. = FALSE
     )
   }
@@ -561,7 +581,9 @@
       call. = FALSE
     )
   }
-  target <- if (mh_backend == "gratia") {
+  target <- if (mh_backend == "family") {
+    sampling_family_target(model)
+  } else if (mh_backend == "gratia") {
     sampling_target(
       model,
       block_size = block_size,
@@ -674,7 +696,7 @@ sampling_mh_worker <- function(
         fixed_acceptance = out$accept,
         rw_acceptance = out$rw.accept,
         elapsed = proc.time()[["elapsed"]] - started,
-        backend = if (is.null(target)) "mgcv" else "gratia",
+        backend = if (is.null(target)) "mgcv" else target$backend,
         retained = n,
         burnin = burnin,
         thin = thin,

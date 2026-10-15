@@ -104,24 +104,15 @@ static void normal_step(NumericVector& out, const NumericMatrix& R,
   }
 }
 
-// The whole dense-chain loop stays in compiled code; R callbacks are reserved
-// for the blockwise path, where design matrices are produced one block at a time.
-// [[Rcpp::export]]
-List sampling_mh_cpp(NumericMatrix X, NumericMatrix S, NumericVector mu,
-                     NumericMatrix R, NumericVector initial, NumericVector y,
-                     NumericVector w, NumericVector offset, std::string family,
-                     double phi, double theta, int n, int burnin, int thin,
-                     double df, double rw_scale) {
-  int p = mu.size(), nr = X.nrow();
-  if (p < 1 || X.ncol() != p || S.nrow() != p || S.ncol() != p ||
-      R.nrow() != p || R.ncol() != p || initial.size() != p ||
-      y.size() != nr || w.size() != nr || offset.size() != nr ||
-      n < 1 || burnin < 0 || thin < 1 || !std::isfinite(df) || df <= 0)
-    stop("Invalid compiled sampler inputs.");
-  int kind = family_kind(family);
-  NumericVector beta = clone(initial), candidate(p), step(p), z(p), work(p), qwork(p), eta(nr), score(nr);
+// Both backends use the same proposals, acceptance decisions and RNG order.
+template <typename Evaluator>
+static List sampling_mh_loop(NumericVector mu, NumericMatrix R,
+    NumericVector initial, int n, int burnin, int thin, double df,
+    double rw_scale, Evaluator& evaluate) {
+  int p = mu.size();
+  NumericVector beta = clone(initial), candidate(p), step(p), z(p), qwork(p);
   NumericMatrix draws(n, p);
-  double lp = posterior_value(X, S, beta, y, w, offset, kind, phi, theta, eta, score, work);
+  double lp = evaluate(beta);
   if (!std::isfinite(lp)) stop("Non-finite posterior at the initial coefficients.");
   double lq = log_proposal(beta, mu, R, df, qwork);
   bool rw = std::isfinite(rw_scale) && rw_scale > 0;
@@ -132,7 +123,7 @@ List sampling_mh_cpp(NumericMatrix X, NumericMatrix S, NumericVector mu,
     normal_step(candidate, R, z, 1);
     double factor = std::sqrt(R::rchisq(df) / df);
     for (int j = 0; j < p; ++j) candidate[j] = mu[j] + candidate[j] / factor;
-    double next_lp = posterior_value(X, S, candidate, y, w, offset, kind, phi, theta, eta, score, work);
+    double next_lp = evaluate(candidate);
     double next_lq = log_proposal(candidate, mu, R, df, qwork);
     bool keep = std::log(R::runif(0, 1)) < next_lp - lp + lq - next_lq;
     if (keep && std::isfinite(next_lp)) { std::copy(candidate.begin(), candidate.end(), beta.begin()); lp = next_lp; lq = next_lq; }
@@ -141,7 +132,7 @@ List sampling_mh_cpp(NumericMatrix X, NumericMatrix S, NumericVector mu,
     if (rw) {
       normal_step(step, R, z, std::sqrt(rw_scale));
       for (int j = 0; j < p; ++j) candidate[j] = beta[j] + step[j];
-      next_lp = posterior_value(X, S, candidate, y, w, offset, kind, phi, theta, eta, score, work);
+      next_lp = evaluate(candidate);
       keep = std::log(R::runif(0, 1)) < next_lp - lp;
       if (keep && std::isfinite(next_lp)) {
         std::copy(candidate.begin(), candidate.end(), beta.begin()); lp = next_lp;
@@ -157,4 +148,54 @@ List sampling_mh_cpp(NumericMatrix X, NumericMatrix S, NumericVector mu,
   double attempts = static_cast<double>(n) * thin;
   return List::create(_["bs"] = draws, _["accept"] = accepted / attempts,
     _["rw.accept"] = rw ? rw_accepted / attempts : NA_REAL);
+}
+
+static void check_chain_inputs(const NumericVector& mu, const NumericMatrix& R,
+    const NumericVector& initial, int n, int burnin, int thin, double df) {
+  int p = mu.size();
+  if (p < 1 || R.nrow() != p || R.ncol() != p || initial.size() != p ||
+      n < 1 || burnin < 0 || thin < 1 || !std::isfinite(df) || df <= 0)
+    stop("Invalid compiled sampler inputs.");
+}
+
+// [[Rcpp::export]]
+List sampling_mh_cpp(NumericMatrix X, NumericMatrix S, NumericVector mu,
+                     NumericMatrix R, NumericVector initial, NumericVector y,
+                     NumericVector w, NumericVector offset, std::string family,
+                     double phi, double theta, int n, int burnin, int thin,
+                     double df, double rw_scale) {
+  check_chain_inputs(mu, R, initial, n, burnin, thin, df);
+  int p = mu.size(), nr = X.nrow();
+  if (X.ncol() != p || S.nrow() != p || S.ncol() != p ||
+      y.size() != nr || w.size() != nr || offset.size() != nr)
+    stop("Invalid compiled sampler inputs.");
+  int kind = family_kind(family);
+  NumericVector eta(nr), score(nr), work(p);
+  auto evaluate = [&](const NumericVector& beta) {
+    return posterior_value(X, S, beta, y, w, offset, kind, phi, theta, eta, score, work);
+  };
+  return sampling_mh_loop(mu, R, initial, n, burnin, thin, df, rw_scale, evaluate);
+}
+
+// Family callbacks run on the main R thread of each chain worker. The penalty
+// and proposal factorisation are prepared once and shared across chains.
+// [[Rcpp::export]]
+List sampling_mh_family_cpp(NumericMatrix S, NumericVector mu, NumericMatrix R,
+    NumericVector initial, double phi, int n, int burnin, int thin, double df,
+    double rw_scale, Function log_likelihood) {
+  check_chain_inputs(mu, R, initial, n, burnin, thin, df);
+  int p = mu.size(), inc = 1;
+  if (S.nrow() != p || S.ncol() != p || !std::isfinite(phi) || phi <= 0)
+    stop("Invalid compiled family sampler inputs.");
+  NumericVector work(p);
+  auto evaluate = [&](const NumericVector& beta) {
+    double one = 1, zero = 0;
+    F77_CALL(dgemv)("N", &p, &p, &one, S.begin(), &p, beta.begin(), &inc,
+      &zero, work.begin(), &inc FCONE);
+    double penalty = 0;
+    for (int j = 0; j < p; ++j) penalty += beta[j] * work[j];
+    double value = as<double>(log_likelihood(beta)) - penalty / (2 * phi);
+    return std::isfinite(value) ? value : R_NegInf;
+  };
+  return sampling_mh_loop(mu, R, initial, n, burnin, thin, df, rw_scale, evaluate);
 }

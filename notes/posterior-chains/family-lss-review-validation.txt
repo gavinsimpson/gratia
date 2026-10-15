@@ -1,0 +1,155 @@
+Family MH and LSS posterior sampling: final review
+15 October 2026; branch gls/posterior-chains
+
+Reviewed the pending family evaluator, shared compiled MH loop, LSS prediction
+contexts and transformations, offsets/weights/row handling, supplied draws,
+chain metadata, diagnostics, migration documentation and release entries.
+The earlier multiple-chain/harmonisation commit remains the branch parent.
+No unrelated changes were added. Main contains separate later diagnostics
+and site changes; those commits were not merged or altered in this review.
+
+Review fixes:
+- Use the existing missing-safe response wrapper for LSS posterior draws.
+  Native generators that ignore weights previously produced responses at
+  missing explicit weights. Such rows now return NA, matching fixed-parameter
+  simulation, and usable rows retain the same seeded responses as a subset.
+  Added 28 assertions across all seven LSS families, including all-missing weights.
+- Clarify that MH holds parameters outside the coefficient vector fixed;
+  LSS scale and shape coefficients are sampled jointly with location.
+- Describe coefficient uncertainty precisely in the reference index, and link
+  its sampling section directly to chain diagnostics and the migration guide.
+Amended the existing unreleased feature entry; no capability was added under
+User visible changes. No unresolved regressions were found in the reviewed work.
+
+Targeted installed-package tests: 924 assertions pass without warnings.
+Included family-mh, sampling-lss, sampling-interface, diagnostic-posterior and
+diagnostic-review tests. Tests/build/checks were run outside the sandbox.
+Full suite, run by the final R CMD check:
+[ FAIL 0 | WARN 0 | SKIP 198 | PASS 16718 ]
+
+Build: R CMD build <worktree>, including vignettes.
+Check: R CMD check --as-cran --no-manual gratia_0.11.2-50.tar.gz
+Environment: R_LIBS=/tmp/gratia-posterior-review-library, NOT_CRAN=true,
+VDIFFR_RUN_TESTS=false, CI=true, _R_CHECK_FORCE_SUGGESTS_=false,
+_R_CHECK_CRAN_INCOMING_REMOTE_=false.
+185 visual expectations skipped because VDIFFR_RUN_TESTS=false; 12 tests
+marked to skip on CI skipped because CI=true; one paper integration test
+runs in a separate workflow. No skips were caused by missing packages.
+--no-manual omitted the PDF reference manual. Remote CRAN incoming checks
+were disabled, and optional Suggests were not forced. These choices omitted
+validation steps; they did not cause package errors, warnings or notes.
+HTML help, standard and --run-donttest examples, compiled-code checks,
+vignette builds and vignette rebuilds all passed. Final check status: OK.
+
+444 implementation, test, help, migration and release-note files match
+the checked archive. DESCRIPTION receives build metadata and reformatting.
+Research notes and pkgdown configuration are excluded from source builds.
+Archive: /tmp/gratia-posterior-family-lss-review-check/gratia_0.11.2-50.tar.gz
+Check log: /tmp/gratia-posterior-family-lss-review-check.log
+
+Pkgdown validation (2.2.1):
+- check_pkgdown() reports no problems.
+- Built all reference pages and the index into a fresh temporary destination.
+- Every one of 146 public topics is indexed; 199 rendered index labels are
+  unique and every topic/local reference link resolves.
+- Checked canonical pages for generate_draws and the add_*() sampling aliases.
+- Built the sampling-migration article and checked its LSS section.
+- Checked updated family-backend choices and coefficient-uncertainty text.
+Reference examples were disabled in pkgdown because R CMD check ran both
+standard and --run-donttest examples separately. Pandoc emitted deprecated
+--mathml/--mathjax option notices from the installed rendering tools; these
+were not missing-topic or broken-link diagnostics. Roxygen emitted existing
+unrelated tag notices; unrelated generated help was restored verbatim.
+Reproduce after installation with R_LIBS set:
+Rscript notes/posterior-chains/validate-reference-index.R
+Pkgdown output: /tmp/gratia-posterior-reference-final
+Pkgdown log: /tmp/gratia-posterior-reference-final.log
+
+Final package-check output:
+* using log directory ‘/private/tmp/gratia-posterior-family-lss-review-check/gratia.Rcheck’
+* using R version 4.6.1 (2026-06-24)
+* using platform: aarch64-apple-darwin23
+* R was compiled by
+    Apple clang version 17.0.0 (clang-1700.3.19.1)
+    GNU Fortran (GCC) 14.2.0
+* running under: macOS Tahoe 26.6.1
+* using session charset: UTF-8
+* current time: 2026-10-15 09:33:52 UTC
+* using options ‘--no-manual --as-cran’
+* checking for file ‘gratia/DESCRIPTION’ ... OK
+* this is package ‘gratia’ version ‘0.11.2-50’
+* package encoding: UTF-8
+* checking CRAN incoming feasibility ... OK
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘gratia’ can be installed ... [13s/14s] OK
+* used C++ compiler: ‘Apple clang version 17.0.0 (clang-1700.6.4.2)’
+* used SDK: ‘MacOSX26.2.sdk’
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking for future file timestamps ... OK
+* checking ‘build’ directory ... OK
+* checking DESCRIPTION meta-information ... OK
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking code files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking use of S3 registration ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... [21s/22s] OK
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd line widths ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... OK
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking contents of ‘data’ directory ... OK
+* checking data for non-ASCII characters ... OK
+* checking LazyData ... OK
+* checking data for ASCII and uncompressed saves ... OK
+* checking line endings in C/C++/Fortran sources/headers ... OK
+* checking line endings in Makefiles ... OK
+* checking compilation flags in Makevars ... OK
+* checking for GNU extensions in Makefiles ... OK
+* checking for portable use of $(BLAS_LIBS) and $(LAPACK_LIBS) ... OK
+* checking use of PKG_*FLAGS in Makefiles ... OK
+* checking use of SHLIB_OPENMP_*FLAGS in Makefiles ... OK
+* checking pragmas in C/C++ headers and code ... OK
+* checking compilation flags used ... OK
+* checking compiled code ... OK
+* checking installed files from ‘inst/doc’ ... OK
+* checking files in ‘vignettes’ ... OK
+* checking examples ... [38s/39s] OK
+* checking for differences from example reference output ... OK
+* checking examples with --run-donttest ... [40s/41s] OK
+* checking for unstated dependencies in ‘tests’ ... OK
+* checking tests ...
+  Running ‘test-all.R’ [246s/264s]
+ [246s/264s] OK
+* checking for unstated dependencies in vignettes ... OK
+* checking package vignettes ... OK
+* checking re-building of vignette outputs ... OK
+* checking for non-standard things in the check directory ... OK
+* checking for detritus in the temp directory ... OK
+* DONE
+
+Status: OK

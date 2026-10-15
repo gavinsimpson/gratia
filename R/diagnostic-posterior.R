@@ -144,6 +144,17 @@ diagnostic_posterior_sampler.gam <- function(
     post_draws,
     c(list(model = model, n_draws = n, seed = coefficient_seed), args)
   )
+  if (is_lss_family(fam)) {
+    context <- lss_prediction_context(model)
+    sampler <- lss_response_sampler(context, betas, dots$weights)
+    out <- function(i) {
+      value <- sampler(i)
+      value$.row <- rows[value$.row]
+      value
+    }
+    attr(out, "sampling") <- attr(betas, "sampling")
+    return(out)
+  }
   grouped <- is_gfam_family(fam)
   advanced <- grouped ||
     (inherits(fam, "general.family") &&

@@ -407,9 +407,16 @@ family_prediction_parameters <- function(family, eta) {
   mu <- if (is.function(family$predict)) family$predict(family, eta = eta)[[1L]] else NULL
   if (ft == "multivariate_normal") return(eta)
   if (ft == "multinom") return(mu)
-  if (is.matrix(mu) && NCOL(mu) == NCOL(eta)) return(mu)
-  vapply(seq_len(NCOL(eta)), function(j) family$linfo[[j]]$linkinv(eta[, j]),
-    numeric(NROW(eta)))
+  if (is.matrix(mu) && NCOL(mu) == NCOL(eta)) {
+    if (ft == "gumbls" && (attr(family, "gratia.gumbel_mean") %||%
+        native_mgcv_hook(family$predict, mgcv::gumbls()$predict))) {
+      mu[, 1L] <- mu[, 1L] + (-digamma(1)) * exp(mu[, 2L])
+    }
+    return(mu)
+  }
+  do.call(cbind, lapply(seq_len(NCOL(eta)), function(j) {
+    family$linfo[[j]]$linkinv(eta[, j])
+  }))
 }
 
 # Older diagnostic_data() methods may not accept conditioning. Pass that

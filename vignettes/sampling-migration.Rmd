@@ -82,11 +82,42 @@ cannot use it produces an error, including MH controls for Gaussian draws or
 Gaussian covariance controls for MH. `block_size` and `dense_limit` apply only
 to `method = "mh", mh_backend = "gratia"`.
 
-The default MH backend remains `"mgcv"`. Use `mh_backend = "gratia"` for the
-compiled common-family evaluator, including independent-observation `bam`
-models. The gratia evaluator rejects GAMM components; it does not evaluate
-their fitted observation correlations. Both MH backends condition on fitted
-smoothing, dispersion, and family parameters. `unconditional = TRUE` applies to Gaussian sampling only.
+The default MH backend remains `"mgcv"`. The three options are:
+
+| `mh_backend` | Evaluation | Model support |
+|:-------------|:-----------|:--------------|
+| `"mgcv"` | `mgcv::gam.mh()` | Its existing `gam` support |
+| `"gratia"` | Compiled likelihoods and MH loop | Gaussian identity, Poisson log, binomial logit, Gamma log, and negative binomial log `gam` and independent-observation `bam` fits |
+| `"family"` | Compiled MH loop with callbacks to the fitted family | Compatible standard, extended, and general mgcv families, including independent-observation `bam` fits |
+
+For example, a multinomial fit can use the family evaluator without a separate
+compiled multinomial likelihood:
+
+```r
+samples <- posterior_samples(
+  model, n_draws = 1000, chains = 4, n_cores = 4,
+  method = "mh", mh_backend = "family",
+  burnin = 1000, diagnostics = TRUE, seed = 281
+)
+```
+
+The family backend prepares its full design matrix, fitted smoothing penalty,
+and proposal factorisation once and reuses them across chains. It calls the
+fitted family's `dev.resids()` and `linkinv()`, or `ll()` for multiple predictors,
+preserving response attributes and coefficient mappings. It retains the full
+design matrix even for `bam`: use the gratia backend's block evaluation when
+that matrix is too large and its family is supported. Both evaluate bases at
+the original covariates for discrete `bam` fits.
+
+The gratia and family evaluators reject GAMM components and AR1 dependence;
+they do not evaluate fitted observation correlations. They also reject
+`paraPen`, `H`, pre-fit `G` objects, and singular coefficient covariances.
+The family backend additionally rejects quasi families, which do not provide
+a likelihood, and Cox proportional hazards models. All three MH backends
+condition on fitted smoothing, dispersion, and any family parameters outside
+the coefficient vector. Parameters represented by coefficients are sampled,
+including scale or covariance coefficients in general families.
+`unconditional = TRUE` applies to Gaussian sampling only.
 
 ## Reusing coefficient draws
 
@@ -131,3 +162,54 @@ observations only, and reject unsupported chain controls. See
 draws, such as `response_derivatives()` and `conditional_differences()`, keep
 their existing grid and simulation-count arguments; their internal sampling
 calls use this interface.
+
+## Location-scale-shape models
+
+`posterior_samples()` now accepts evaluation data for `gaulss()`, `gammals()`,
+`gumbls()`, `gevlss()`, `shash()`, `twlss()` and `ziplss()` fits. Supply covariates
+and formula-offset variables; observed responses are unnecessary. Every
+predictor uses the same joint coefficient draw. For example:
+
+```r
+# Evaluate the first 200 observations, retaining their joint parameter draws.
+b <- post_draws(model, n_draws = 1000, chains = 4, seed = 281)
+y <- posterior_samples(model, data = evaluation_data[1:200, ],
+  method = "user", draws = b, seed = 282)
+```
+
+The functions return different quantities:
+
+| Function | Quantity for an LSS model |
+|:---------|:--------------------------|
+| `fitted_samples(scale = "response")` | Expected response, including every distribution parameter that affects it |
+| `fitted_samples(scale = "linear_predictor")` | First linear predictor, for location |
+| `posterior_samples()` | Responses conditional on each joint coefficient draw |
+| `predicted_samples()` | Responses conditional on the fixed fitted coefficients |
+| `derivative_samples(scale = "response")` | Derivative of the expected response, retaining joint coefficient uncertainty |
+| `derivative_samples(scale = "linear_predictor")` | Derivative of the first predictor |
+| `smooth_samples()` | Selected smooth contribution to its own predictor |
+
+The historical `.parameter = "location"` label in fitted samples remains on
+both scales. On the response scale, `.fitted` is E[Y]. In particular, Gumbel,
+GEV and sinh-arcsinh means generally differ from location; the Gamma LSS mean
+requires exponentiation and the hurdle Poisson mean uses both predictors.
+These calculations no longer emit the earlier warning about location needing
+to equal the mean. A GEV mean does not exist at shape >= 1; requesting that
+mean or its derivative gives an error, while response draws remain available.
+
+`gaulss()` represents its second response parameter as inverse SD. Sampling
+uses its reciprocal and divides SD by the square root of an explicit sampling
+weight. The native `gaulss()` likelihood ignores fitting weights; default response
+weights are ones, preserving the fitted likelihood and existing diagnostic rules.
+The other LSS response generators currently ignore sampling weights, as their
+mgcv implementations do. Formula offsets are evaluated at supplied covariates;
+stored fitting offsets are retained with `data = NULL`. The installed mgcv
+version rejects offsets when fitting `shash()` and drops call-level offsets
+for general-family fits; gratia cannot reconstruct offsets never applied by
+the fitter. Prefer supported formula offsets.
+
+Grouped-family posterior response draws still require fitting observations.
+Censored-family generators return latent uncensored responses; posterior
+predictive checks need a censoring observation process. Cox survival models
+lack a response generator for this interface, and expected survival times
+cannot be obtained from a location parameter alone.

@@ -1,0 +1,127 @@
+Family MH backend validation: 15 October 2026
+Branch: gls/posterior-chains
+All tests and package checks ran outside the sandbox.
+
+248 new family-backend assertions pass without warnings.
+Coverage includes standard Gaussian, Poisson, binomial, Gamma and negative
+binomial families; betar, scat, tw, ocat and cnorm extended families;
+multinomial, gaulss and mvn general families; and grouped families.
+Tests cover ordinary and discrete bam, alternative links, response encodings,
+censoring, fitting weights and offsets, shared predictors, linked smoothing
+parameters, tensor products, analytic posterior moments and unsupported models.
+Serial and mirai draws agree for the same seed. Setup is called once for all
+chains. Callback errors clean up private workers and preserve caller pools.
+Derived samples preserve chain identities and coefficient diagnostics.
+There are no new inlaws tests or dependencies.
+
+Full package test suite:
+[ FAIL 0 | WARN 0 | SKIP 198 | PASS 16450 ]
+185 visual tests skipped because VDIFFR_RUN_TESTS=false; 12 tests marked to
+skip on CI skipped because CI=true; one paper-example integration test skipped.
+NOT_CRAN=true enabled tests that would otherwise skip on CRAN.
+
+Source build with vignettes: R CMD build <worktree>
+Check: R CMD check --as-cran --no-manual gratia_0.11.2-50.tar.gz
+Environment: R_LIBS=/tmp/gratia-sampling-library, NOT_CRAN=true,
+VDIFFR_RUN_TESTS=false, CI=true, _R_CHECK_FORCE_SUGGESTS_=false,
+_R_CHECK_CRAN_INCOMING_REMOTE_=false.
+--no-manual omitted the PDF reference manual. HTML help, examples, saved
+example comparisons, --run-donttest examples and vignette rebuilds passed.
+Remote CRAN incoming checks were disabled. Optional packages were not forced;
+the skip list contains no missing-package skips. These are validation choices.
+The completed package check has no errors, warnings or notes.
+
+482 implementation, test, help, migration and release-note files match the
+checked source archive. Benchmark scripts and reports are excluded from builds.
+Archive: /tmp/gratia-family-final-check/gratia_0.11.2-50.tar.gz
+Check log: /tmp/gratia-family-final-check.log
+Test log: /tmp/gratia-family-final-check/gratia.Rcheck/tests/test-all.Rout
+
+Package-check output:
+* using log directory ‘/private/tmp/gratia-family-final-check/gratia.Rcheck’
+* using R version 4.6.1 (2026-06-24)
+* using platform: aarch64-apple-darwin23
+* R was compiled by
+    Apple clang version 17.0.0 (clang-1700.3.19.1)
+    GNU Fortran (GCC) 14.2.0
+* running under: macOS Tahoe 26.6.1
+* using session charset: UTF-8
+* current time: 2026-10-15 08:06:59 UTC
+* using options ‘--no-manual --as-cran’
+* checking for file ‘gratia/DESCRIPTION’ ... OK
+* this is package ‘gratia’ version ‘0.11.2-50’
+* package encoding: UTF-8
+* checking CRAN incoming feasibility ... OK
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘gratia’ can be installed ... [13s/13s] OK
+* used C++ compiler: ‘Apple clang version 17.0.0 (clang-1700.6.4.2)’
+* used SDK: ‘MacOSX26.2.sdk’
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking for future file timestamps ... OK
+* checking ‘build’ directory ... OK
+* checking DESCRIPTION meta-information ... OK
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking code files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking use of S3 registration ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... [22s/22s] OK
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd line widths ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... OK
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking contents of ‘data’ directory ... OK
+* checking data for non-ASCII characters ... OK
+* checking LazyData ... OK
+* checking data for ASCII and uncompressed saves ... OK
+* checking line endings in C/C++/Fortran sources/headers ... OK
+* checking line endings in Makefiles ... OK
+* checking compilation flags in Makevars ... OK
+* checking for GNU extensions in Makefiles ... OK
+* checking for portable use of $(BLAS_LIBS) and $(LAPACK_LIBS) ... OK
+* checking use of PKG_*FLAGS in Makefiles ... OK
+* checking use of SHLIB_OPENMP_*FLAGS in Makefiles ... OK
+* checking pragmas in C/C++ headers and code ... OK
+* checking compilation flags used ... OK
+* checking compiled code ... OK
+* checking installed files from ‘inst/doc’ ... OK
+* checking files in ‘vignettes’ ... OK
+* checking examples ... [39s/41s] OK
+* checking for differences from example reference output ... OK
+* checking examples with --run-donttest ... [40s/42s] OK
+* checking for unstated dependencies in ‘tests’ ... OK
+* checking tests ...
+  Running ‘test-all.R’ [241s/257s]
+ [241s/257s] OK
+* checking for unstated dependencies in vignettes ... OK
+* checking package vignettes ... OK
+* checking re-building of vignette outputs ... OK
+* checking for non-standard things in the check directory ... OK
+* checking for detritus in the temp directory ... OK
+* DONE
+
+Status: OK

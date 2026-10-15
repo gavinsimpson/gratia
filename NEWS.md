@@ -87,12 +87,23 @@
   separate burn-in. Chain identities are preserved through fitted, response,
   smooth, and derivative samples. `as_mcmc_draws()` converts draws for posterior,
   coda, and bayesplot; `diagnostics = TRUE` and `sampling_diagnostics()` provide
-  coefficient convergence summaries and acceptance rates (#281).
+  coefficient convergence summaries and acceptance rates (#281). LSS sampling
+  supports fitting rows, subsets and new covariates without observed responses.
+  All distribution parameters use the same coefficient draw. Fitted response
+  samples and their derivatives evaluate the expected response, including
+  means that depend on scale, shape or hurdle probabilities. Fixed-coefficient
+  response sampling uses the same parameter transformations. Missing predictors
+  or explicit sampling weights produce `NA` response draws consistently.
 
 * `mh_backend = "gratia"` adds a compiled MH evaluator for common response
-  families in ordinary gam and bam fits with independent observations, holding
-  smoothing, scale, and family parameters fixed. Large designs can be evaluated
-  in blocks. The default backend remains `mgcv::gam.mh()`.
+  families in ordinary gam and bam fits with independent observations. Large
+  designs can be evaluated in blocks. `mh_backend = "family"` uses the compiled
+  MH loop with the fitted family's likelihood functions, including compatible
+  extended, grouped, and multiple-predictor families. It prepares and reuses a
+  full design matrix, smoothing penalty, and proposal factorisation across
+  chains. Smoothing parameters and parameters outside the coefficient vector
+  remain fixed; LSS scale and shape coefficients vary jointly with location.
+  The default backend remains `mgcv::gam.mh()`.
 
 * New site articles explain model diagnostics, grouped surveys, glmmTMB and
   sdmTMB models, prediction comparisons, response distributions, and smooth

@@ -33,7 +33,7 @@ post_draws(model, ...)
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e+06,
@@ -60,7 +60,7 @@ generate_draws(model, ...)
   unconditional = FALSE,
   draws = NULL,
   diagnostics = FALSE,
-  mh_backend = c("mgcv", "gratia"),
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e+06,
@@ -128,8 +128,13 @@ SCAM models do not support this correction; use \code{unconditional = FALSE}.}
 sizes, and Monte Carlo standard errors using the optional posterior package.}
 
 \item{mh_backend}{character; \code{"mgcv"} preserves \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.
-\code{"gratia"} uses the common-family evaluator and also supports independent
-observation bam fits. Both hold smoothing, scale, and family parameters fixed.}
+\code{"gratia"} uses compiled common-family likelihoods. \code{"family"} uses a
+compiled MH loop with callbacks to the fitted family object. Both support
+independent-observation bam fits. Smoothing parameters and parameters
+outside the fitted coefficient vector remain fixed. LSS scale and shape
+coefficients are sampled jointly with location. The family backend caches
+a full design matrix,
+smoothing penalty, and proposal factorisation once for all chains.}
 
 \item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
 uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
@@ -172,9 +177,24 @@ before response simulation adds further noise.
 The gratia MH backend supports Gaussian identity, Poisson log, binomial
 logit, Gamma log, and negative binomial log fits. It evaluates the fitted
 bases at original covariates, including for discrete bam fits. GAMM components, AR1 dependence,
-\code{paraPen}, \code{H}, and fits made from pre-fit \code{G} objects are unsupported. Both MH backends sample the
-conditional coefficient posterior with fitted smoothing, dispersion, and
-family parameters fixed. \code{unconditional} applies to Gaussian draws only.
+\code{paraPen}, \code{H}, and fits made from pre-fit \code{G} objects are unsupported.
+
+The family MH backend calls the fitted family's \code{dev.resids()} and \code{linkinv()}
+functions, or \code{ll()} for families with multiple linear predictors. This
+retains response encodings and attributes such as censoring indicators and
+the mappings between coefficients and predictors. It supports compatible
+standard, extended, and general mgcv families, including multinomial, Gaussian
+location-scale, and grouped families. Quasi families, Cox proportional hazards
+models, GAMM components, AR1 dependence, \code{paraPen}, \code{H}, and pre-fit \code{G} objects
+are unsupported. The fitted coefficient covariance must be nonsingular.
+It always caches the full design matrix; \code{block_size} and \code{dense_limit} apply
+only to the gratia backend and are rejected for the family backend.
+
+All MH backends sample the conditional coefficient posterior with fitted
+smoothing, dispersion, and additional family parameters fixed. Parameters
+represented in the fitted coefficient vector are sampled, including scale
+or covariance coefficients in general families. \code{unconditional} applies
+to Gaussian draws only.
 }
 \seealso{
 \link{gamm4_support}

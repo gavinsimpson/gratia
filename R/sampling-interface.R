@@ -119,7 +119,7 @@ sampling_check_options <- function(
   }
   if (
     method == "mh" &&
-      mh_backend == "mgcv" &&
+      mh_backend != "gratia" &&
       any(c("block_size", "dense_limit") %in% supplied)
   ) {
     stop(
@@ -228,7 +228,7 @@ sampling_call <- function(fun, args) {
   args <- args[
     !names(args) %in% setdiff(controls, sampling_method_controls(method))
   ]
-  if (method == "mh" && (args$mh_backend %||% "mgcv")[[1L]] == "mgcv") {
+  if (method == "mh" && (args$mh_backend %||% "mgcv")[[1L]] != "gratia") {
     args$block_size <- args$dense_limit <- NULL
   }
   if (method == "gaussian" && identical(args$mvn_method, "mgcv")) {
