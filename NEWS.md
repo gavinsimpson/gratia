@@ -81,6 +81,16 @@
 
 ## New features
 
+* `log_lik()` returns posterior draws of observation log likelihoods for
+  independent GAM/BAM fits, including distributional, grouped and multivariate
+  families. Optional methods for `bayesplot::pp_check()`, `loo::loo()` and
+  `loo::waic()` provide predictive checks, approximate leave-one-out comparisons
+  and WAIC (#278). bayesplot and loo are suggested packages, required only for
+  their own operations. Coefficient draws vary jointly; additional family
+  parameters remain fitted. Custom families can supply a `log_lik` hook through
+  `gratia_diagnostics`. See the bayesplot and loo article for assumptions and
+  examples.
+
 * Diagnostic plots now support native inlaws families through their supplied
   `gratia_diagnostics` functions, including grouped-family fits and models
   with multiple response columns.

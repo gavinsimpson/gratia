@@ -36,6 +36,8 @@ Imports:
     scales,
     utils
 Suggests:
+    bayesplot,
+    loo,
     ggcube (>= 0.3.0),
     geometry,
     qgam,

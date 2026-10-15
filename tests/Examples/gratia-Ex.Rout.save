@@ -1582,6 +1582,40 @@ detaching ‘package:mgcv’
 > 
 > 
 > cleanEx()
+> nameEx("family_diagnostics")
+> ### * family_diagnostics
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: family_diagnostics
+> ### Title: Extend diagnostics for an mgcv-compatible family
+> ### Aliases: family_diagnostics
+> 
+> ### ** Examples
+> 
+> load_mgcv()
+> f <- poisson()
+> f$gratia_diagnostics <- function(mu, wt, scale, y, eta) {
++   list(mean = mu, variance = mu,
++     cdf_left = function(q, log_p = FALSE, lower_tail = TRUE) {
++       ppois(ceiling(q) - 1, lambda = mu,
++         log.p = log_p, lower.tail = lower_tail)
++     })
++ }
+> dat <- data.frame(x = seq(0, 1, length.out = 40))
+> dat$y <- rep(c(0, 1, 2, 4), 10)
+> f$rd <- function(mu, wt, scale) rpois(length(mu), mu)
+> f$qf <- function(p, mu, wt, scale) qpois(p, mu)
+> f$cdf <- function(q, mu, wt, scale) ppois(q, mu)
+> fit <- gam(y ~ x, data = dat, family = f, method = "REML")
+> qq_plot(fit, type = "quantile", seed = 1)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("fderiv")
 > ### * fderiv
 > 
@@ -1974,6 +2008,85 @@ mu
 > cleanEx()
 
 detaching ‘package:mgcv’
+
+> nameEx("log_lik")
+> ### * log_lik
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: log_lik
+> ### Title: Posterior draws of pointwise log likelihoods
+> ### Aliases: log_lik log_lik.gam log_lik.bam
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+> m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
+> ll <- log_lik(m, n = 500, seed = 42)
+> dim(ll)
+[1] 500  32
+> if (requireNamespace("loo", quietly = TRUE)) {
++   loo::loo(ll, r_eff = 1)
++ }
+
+Computed from 500 by 32 log-likelihood matrix.
+
+         Estimate  SE
+elpd_loo    -78.5 3.8
+p_loo         2.9 0.8
+looic       156.9 7.5
+------
+MCSE of elpd_loo is 0.1.
+MCSE and ESS estimates assume independent draws (r_eff=1).
+
+All Pareto k estimates are good (k < 0.63).
+See help('pareto-k-diagnostic') for details.
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
+> nameEx("loo.gam")
+> ### * loo.gam
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: loo.gam
+> ### Title: Leave-one-out validation and WAIC for GAMs
+> ### Aliases: loo.gam loo.bam waic.gam waic.bam
+> 
+> ### ** Examples
+> 
+> if (requireNamespace("loo", quietly = TRUE)) {
++   library("mgcv")
++   m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
++   loo::loo(m, n = 500, seed = 42)
++ }
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+
+Computed from 500 by 32 log-likelihood matrix.
+
+         Estimate  SE
+elpd_loo    -78.5 3.8
+p_loo         2.9 0.8
+looic       156.9 7.5
+------
+MCSE of elpd_loo is 0.1.
+MCSE and ESS estimates assume independent draws (r_eff=1).
+
+All Pareto k estimates are good (k < 0.63).
+See help('pareto-k-diagnostic') for details.
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
 
 > nameEx("lp_matrix")
 > ### * lp_matrix
@@ -2546,6 +2659,31 @@ detaching ‘package:mgcv’
 + )
 > posterior_predictive_plot(mod, n = 20, seed = 42)
 > appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
+> nameEx("pp_check")
+> ### * pp_check
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: pp_check
+> ### Title: Posterior checks with bayesplot
+> ### Aliases: pp_check pp_check.gam pp_check.bam pp_check.gamm
+> ###   pp_check.gamm4
+> 
+> ### ** Examples
+> 
+> if (requireNamespace("bayesplot", quietly = TRUE)) {
++   load_mgcv()
++   dat <- data_sim("eg1", n = 100, seed = 2)
++   fit <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
++   bayesplot::pp_check(fit, n = 10, seed = 42)
++ }
 > 
 > 
 > 

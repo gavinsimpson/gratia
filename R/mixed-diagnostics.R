@@ -472,7 +472,8 @@ diagnostic_posterior_sampler.gamm <- function(model, n, seed = NULL,
   }
   proxy <- gamm_diagnostic_model(model, conditioning)
   joint <- lme_joint_diagnostic_draws(model$lme, n)
-  sampling_weights <- binomial_sampling_weights(proxy, proxy$prior.weights)
+  sampling_weights <- list(...)$.response_weights %||%
+    binomial_sampling_weights(proxy, proxy$prior.weights)
   idx <- match(rownames(proxy$model), rownames(lme_fitting_data(model$lme)))
   rows <- which(!is.na(model_row_map(proxy)))
   function(i) {

@@ -514,7 +514,7 @@ diagnostic_posterior_sampler.gamm4 <- function(model, n, seed = NULL,
     fam <- stats::family(mer)
     rd <- fix_family_rd(fam)$rd
     if (!is.function(rd)) stop("No gamm4 response sampler for family <", fam$family, ">.", call. = FALSE)
-    wt <- binomial_sampling_weights(mer,
+    wt <- list(...)$.response_weights %||% binomial_sampling_weights(mer,
       stats::weights(mer, type = "prior") %||% rep(1, nrow(X)))
     scale <- if (fam$family == "gaussian") stats::sigma(mer)^2 else 1
     return(function(i) {
@@ -536,7 +536,7 @@ diagnostic_posterior_sampler.gamm4 <- function(model, n, seed = NULL,
   fam <- stats::family(mer)
   rd <- fix_family_rd(fam)$rd
   if (!is.function(rd)) stop("No gamm4 response sampler for family <", fam$family, ">.", call. = FALSE)
-  wt <- binomial_sampling_weights(mer,
+  wt <- list(...)$.response_weights %||% binomial_sampling_weights(mer,
     stats::weights(mer, type = "prior") %||% rep(1, nrow(X)))
   scale <- if (fam$family == "gaussian") stats::sigma(mer)^2 else 1
   function(i) {

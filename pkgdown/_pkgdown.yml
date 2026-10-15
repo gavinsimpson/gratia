@@ -37,6 +37,7 @@ articles:
       for grouped surveys, mixed models or spatial surveys.
     contents:
       - articles/model-checking
+      - articles/bayesplot-loo
       - articles/gfam-support
       - articles/glmmTMB-support
       - articles/sdmTMB-support
@@ -137,6 +138,9 @@ reference:
       - draw.rootogram
       - observed_fitted_plot
       - posterior_predictive_plot
+      - pp_check
+      - log_lik
+      - loo.gam
       - scalable_qq_plot
       - residuals_hist_plot
       - residuals_linpred_plot
