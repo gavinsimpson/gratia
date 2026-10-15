@@ -46,21 +46,36 @@ test_that("scasm reference recipes fit and enforce the requested shapes", {
   }
 })
 
-test_that("additive, tensor and location-scale scasm recipes are usable", {
+test_that("documented univariate scasm recipes fit and enforce their shapes", {
+  skip_if_not(exists("scasm", asNamespace("mgcv")))
+  d <- data_sim("sc_increasing", n = 200, seed = 2)
+  m <- mgcv::scasm(y ~ s(x, bs = "sc", xt = "m+", k = 8), data = d)
+  expect_true(all(is.finite(stats::predict(m))))
+  expect_true(all(drop(m$Ain %*% stats::coef(m)) >= m$bin - 1e-7))
+
+  d <- data_sim("sc_positive", n = 200, seed = 2)
+  m <- mgcv::scasm(y ~ s(x, bs = "sc", xt = "+", k = 8) - 1, data = d)
+  expect_true(all(is.finite(stats::predict(m))))
+  expect_true(all(stats::predict(m) >= -1e-7))
+  expect_true(all(drop(m$Ain %*% stats::coef(m)) >= m$bin - 1e-7))
+})
+
+test_that("documented additive, tensor and location-scale scasm recipes are usable", {
   skip_if_not(exists("scasm", asNamespace("mgcv")))
   d <- data_sim("sc_additive", n = 240, family = stats::poisson(),
     predictors = function(d) d$f, seed = 2)
   m <- mgcv::scasm(y ~ s(x0, k = 6) + s(x1, bs = "sc", xt = "m+", k = 6) +
     s(x2, k = 6) + s(x3, bs = "sc", xt = "c+", k = 6), family = stats::poisson(), data = d)
+  expect_true(all(is.finite(stats::predict(m))))
   expect_true(all(drop(m$Ain %*% stats::coef(m)) >= m$bin - 1e-7))
-  d <- data_sim("sc_tensor", n = 160, seed = 2)
+  d <- data_sim("sc_tensor", seed = 2)
   m <- mgcv::scasm(y ~ te(x, z, bs = c("sc", "sc"), xt = list("m+", "m+"),
-    k = c(5, 5)), data = d)
+    k = c(6, 6)), data = d)
   expect_true(all(drop(m$Ain %*% stats::coef(m)) >= m$bin - 1e-7))
   expect_true(all(is.finite(smooth_estimates(m, n_2d = 10)$.estimate)))
-  d <- data_sim("sc_location_scale", n = 300, seed = 3)
-  m <- mgcv::scasm(list(y ~ s(x, bs = "sc", xt = "c-", k = 6),
-    ~s(z, bs = "sc", xt = "m+", k = 6)), family = mgcv::gammals(), data = d)
+  d <- data_sim("sc_location_scale", seed = 2)
+  m <- mgcv::scasm(list(y ~ s(x, bs = "sc", xt = "c-"),
+    ~s(z, bs = "sc", xt = "m+")), family = mgcv::gammals(), data = d)
   expect_true(all(drop(m$Ain %*% stats::coef(m)) >= m$bin - 1e-7))
   expect_true(all(is.finite(smooth_estimates(m)$.estimate)))
   expect_true(all(is.finite(derivatives(m)$.derivative)))

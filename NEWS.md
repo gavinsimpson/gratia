@@ -100,6 +100,8 @@
 * `data_sim()` gains analytic shape reference functions and fitting recipes
   for `mgcv::scasm()`, including combined shape constraints, tensor surfaces
   and Gamma models with constraints on the log mean and log dispersion.
+  The additive Poisson recipe uses 240 observations and `k = 6` for each
+  smooth to avoid fitting errors with mgcv 1.9-4.
 
 * `residuals_covariate_plot()` and `scalable_residuals_covariate_plot()`
   plot complete-model residuals against numeric or categorical covariates and
