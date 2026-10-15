@@ -143,7 +143,7 @@ test_that("native mixed posterior draws and PPCs reuse joint kernels and rows", 
   mer <- lme4::lmer(y ~ x + (1 | g), data = d, weights = 1 / v,
     na.action = na.exclude)
   for (m in list(lme, mer)) for (conditioning in c("conditional", "marginal")) {
-    raw <- posterior_samples(m, n = 3L, seed = 18, conditioning = conditioning)
+    raw <- posterior_samples(m, n_draws = 3L, seed = 18, conditioning = conditioning)
     expect_equal(nrow(raw), 237L)
     expect_true(all(is.finite(raw$.response)))
     expect_setequal(raw$.row, setdiff(seq_len(80), 2L))
@@ -205,7 +205,7 @@ test_that("uncorrelated PQL PPC draws use the approximate family response law", 
     data = d, family = poisson()))
   expect_error(lme_diagnostic_components(m$lme), "working lme component")
   for (conditioning in c("conditional", "marginal")) {
-    raw <- posterior_samples(m, n = 3L, seed = 10, conditioning = conditioning)
+    raw <- posterior_samples(m, n_draws = 3L, seed = 10, conditioning = conditioning)
     expect_equal(nrow(raw), 300L)
     expect_true(all(raw$.response >= 0 & raw$.response == floor(raw$.response)))
     observed <- diagnostic_posterior_observed(m, conditioning)
@@ -216,7 +216,7 @@ test_that("uncorrelated PQL PPC draws use the approximate family response law", 
   correlated <- suppressMessages(mgcv::gamm(y ~ x + offset(off),
     random = list(g = ~1), data = d, family = poisson(),
     correlation = nlme::corAR1(.4, form = ~time | g, fixed = TRUE)))
-  expect_error(posterior_samples(correlated, n = 2L, conditioning = "conditional"),
+  expect_error(posterior_samples(correlated, n_draws = 2L, conditioning = "conditional"),
     "working correlation")
 })
 
@@ -235,7 +235,7 @@ test_that("native grouped-binomial posterior draws preserve the trial scale", {
     proxy <- mer_diagnostic_model(m, conditioning)
     expect_equal(unname(proxy$y[1L]), 0)
     expect_true(all(is.finite(quantile_residuals(proxy, seed = 19))))
-    raw <- posterior_samples(m, n = 2L, seed = 19, conditioning = conditioning)
+    raw <- posterior_samples(m, n_draws = 2L, seed = 19, conditioning = conditioning)
     counts <- raw$.response * d$n[raw$.row]
     expect_true(all(raw$.response >= 0 & raw$.response <= 1))
     expect_equal(counts, round(counts), tolerance = 1e-10)

@@ -2,6 +2,19 @@
 
 ## User visible changes
 
+* **Breaking change:** Sampling functions now use `n_draws` for the total
+  retained draw count and `n_grid` for automatically constructed evaluation
+  grids. Sampling controls must be named. Obsolete names, including `n`,
+  `n_sim`, `n_vals`, `freq`, `newdata`, and `ncores`, produce migration errors.
+  `derivative_samples()` takes `model` rather than `object`; `add_*()` sampling
+  helpers take `data` rather than `object`. Generating draws requires an explicit
+  `n_draws`; supplied coefficient draws determine their own count and chains.
+  Derivative sampling now defaults to a grid resolution of 200, matching smooth
+  sampling; supply `n_grid = 100` for the previous derivative resolution.
+  Gaussian threads use `n_threads`, while `n_cores` limits concurrent MH chains.
+  Explicit controls that do not apply to the selected sampler are rejected.
+  See `vignette("sampling-migration")`.
+
 * gratia has a new neon hex logo. The pkgdown site uses the pink
   g from the logo as its favicon.
 
@@ -68,6 +81,18 @@
   the development version of glmmTMB is no longer needed.
 
 ## New features
+
+* Posterior sampling supports multiple chains, including parallel MH chains
+  using mirai. `n_draws = 1000, chains = 4` retains 250 draws per chain after
+  separate burn-in. Chain identities are preserved through fitted, response,
+  smooth, and derivative samples. `as_mcmc_draws()` converts draws for posterior,
+  coda, and bayesplot; `diagnostics = TRUE` and `sampling_diagnostics()` provide
+  coefficient convergence summaries and acceptance rates (#281).
+
+* `mh_backend = "gratia"` adds a compiled MH evaluator for common response
+  families in ordinary gam and bam fits with independent observations, holding
+  smoothing, scale, and family parameters fixed. Large designs can be evaluated
+  in blocks. The default backend remains `mgcv::gam.mh()`.
 
 * New site articles explain model diagnostics, grouped surveys, glmmTMB and
   sdmTMB models, prediction comparisons, response distributions, and smooth
@@ -357,6 +382,8 @@
   recognised family name.
 
 ## Bug fixes
+
+* MH acceptance rates are extracted from the correct mgcv return components.
 
 * Large QQ reference simulations now close their file connections before
   removing temporary files, allowing cleanup to complete on Windows.

@@ -7,7 +7,7 @@ test_that("Gaussian GAM draws fall back for singular covariance matrices", {
   withr::local_seed(42)
 
   for (n in c(1L, 8L)) {
-    expect_warning(draws <- gaussian_draws(model, n = n),
+    expect_warning(draws <- gaussian_draws(model, n_draws = n),
       "Cholesky decomposition failed; using mgcv::rmvn().", fixed = TRUE)
     expect_identical(dim(draws), c(n, 2L))
     expect_true(all(is.finite(draws)))
@@ -15,13 +15,13 @@ test_that("Gaussian GAM draws fall back for singular covariance matrices", {
   }
 
   set.seed(42)
-  expect_warning(first <- gaussian_draws(model, n = 8), "Cholesky")
+  expect_warning(first <- gaussian_draws(model, n_draws = 8), "Cholesky")
   set.seed(42)
-  expect_warning(second <- gaussian_draws(model, n = 8), "Cholesky")
+  expect_warning(second <- gaussian_draws(model, n_draws = 8), "Cholesky")
   expect_identical(first, second)
 
   # Selecting the nonsingular part must not trigger fallback.
-  expect_silent(selected <- gaussian_draws(model, n = 8, index = 1))
+  expect_silent(selected <- gaussian_draws(model, n_draws = 8, index = 1))
   expect_identical(dim(selected), c(8L, 1L))
 })
 
@@ -33,7 +33,7 @@ test_that("Successful mvnfast draws retain their seeded results", {
   withr::local_seed(42)
   expected <- mvnfast::rmvn(8, model$coefficients, model$Vp, ncores = 1)
   set.seed(42)
-  expect_silent(actual <- gaussian_draws(model, n = 8))
+  expect_silent(actual <- gaussian_draws(model, n_draws = 8))
   expect_identical(actual, expected)
 })
 
@@ -46,7 +46,7 @@ test_that("Unrelated mvnfast errors propagate unchanged", {
   local_mocked_bindings(rmvn = function(...) stop("Unexpected fallback"),
     .package = "mgcv")
   expect_identical(
-    tryCatch(gaussian_draws(model, n = 8), error = identity), original)
+    tryCatch(gaussian_draws(model, n_draws = 8), error = identity), original)
 })
 
 test_that("Errors from the fallback sampler propagate unchanged", {
@@ -56,7 +56,7 @@ test_that("Errors from the fallback sampler propagate unchanged", {
   local_mocked_bindings(rmvn = function(...) stop(original),
     .package = "mgcv")
   expect_warning(
-    error <- tryCatch(gaussian_draws(model, n = 8), error = identity),
+    error <- tryCatch(gaussian_draws(model, n_draws = 8), error = identity),
     "Cholesky decomposition failed; using mgcv::rmvn().", fixed = TRUE)
   expect_identical(error, original)
 })
@@ -67,7 +67,7 @@ test_that("Explicit mgcv sampling bypasses mvnfast", {
   local_mocked_bindings(rmvn = function(...) stop("Unexpected mvnfast call"),
     .package = "mvnfast")
   withr::local_seed(42)
-  expect_silent(draws <- gaussian_draws(model, n = 8, mvn_method = "mgcv"))
+  expect_silent(draws <- gaussian_draws(model, n_draws = 8, mvn_method = "mgcv"))
   expect_identical(dim(draws), c(8L, 2L))
   expect_equal(draws[, 2], rep(4, 8))
 })

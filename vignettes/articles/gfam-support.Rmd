@@ -125,7 +125,7 @@ grid <- expand.grid(woodland = seq(0, 1, length.out = 80),
 grid$source <- factor(grid$source, levels = levels(survey$source))
 index <- as.integer(grid$source)
 means <- fitted_samples(joint, data = grid, family_index = index,
-  n = 200, seed = 242)
+  n_draws = 200, seed = 242)
 intervals <- means |>
   group_by(.row) |>
   summarise(estimate = median(.fitted), lower = quantile(.fitted, 0.025),

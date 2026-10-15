@@ -17,7 +17,7 @@ test_that("glmm posterior responses retain native dispersion parameterizations",
     m <- glmmTMB::glmmTMB(y ~ x, dispformula = ~x, family = family, data = d)
     mu <- as.numeric(predict(m, type = "conditional"))
     phi <- as.numeric(predict(m, type = "disp"))
-    samples <- posterior_samples(m, n = 4L, seed = 11)
+    samples <- posterior_samples(m, n_draws = 4L, seed = 11)
     oracle <- withr::with_seed(11, {
       unlist(lapply(seq_len(4L), function(i) switch(name,
         gaussian = rnorm(nrow(d), mean = mu, sd = phi),
@@ -48,7 +48,7 @@ test_that("weighted factor binomial PPC retains Bernoulli observation encoding",
   testthat::local_mocked_bindings(diagnostic_gaussian_draws = function(n, mu, V) {
     matrix(rep(mu, n), nrow = n, byrow = TRUE)
   })
-  raw <- posterior_samples(m, n = 4L, seed = 9)
+  raw <- posterior_samples(m, n_draws = 4L, seed = 9)
   # Native simulation returns factor labels; compare their numeric 0/1 codes.
   expected <- as.numeric(as.matrix(simulate(m, nsim = 4L, seed = 9)))
   expect_equal(raw$.response, expected)
@@ -56,7 +56,7 @@ test_that("weighted factor binomial PPC retains Bernoulli observation encoding",
 
   g <- mgcv::gam(y ~ s(x, k = 4), data = d, weights = weights, family = binomial())
   beta <- matrix(rep(coef(g), 4), nrow = 4L, byrow = TRUE)
-  raw <- posterior_samples(g, n = 4L, seed = 9, method = "user", draws = beta)
+  raw <- posterior_samples(g, n_draws = 4L, seed = 9, method = "user", draws = beta)
   native <- withr::with_seed(9, rbinom(4L * nrow(d), 1, rep(fitted(g), 4L)))
   expect_equal(raw$.response, unname(native))
   expect_equal(as.numeric(as.matrix(simulate(g, nsim = 4L, seed = 9))), unname(native))
@@ -70,7 +70,7 @@ test_that("explicit GAM sampling weights override fitted trial counts and retain
   g <- mgcv::gam(y ~ s(x, k = 4), data = d, weights = trials,
     family = binomial(), na.action = na.exclude)
   beta <- matrix(rep(coef(g), 2), nrow = 2L, byrow = TRUE)
-  actual <- posterior_samples(g, n = 2L, seed = 9, weights = 9,
+  actual <- posterior_samples(g, n_draws = 2L, seed = 9, weights = 9,
     method = "user", draws = beta)
   mu <- fitted(g)[!is.na(fitted(g))]
   expected <- withr::with_seed(9, {
@@ -96,7 +96,7 @@ test_that("AR1 GAM draws honour explicit precision weights without losing correl
       error[i] <- .4 * error[i - 1L] + sqrt(1 - .4^2) * error[i]
     as.numeric(fitted(b)) + sqrt(b$sig2 / 9) * error
   })
-  actual <- posterior_samples(b, n = 1L, seed = 9, weights = 9,
+  actual <- posterior_samples(b, n_draws = 1L, seed = 9, weights = 9,
     method = "user", draws = beta)
   expect_equal(actual$.response, expected, tolerance = 1e-8)
   expect_equal(as.numeric(simulate(b, nsim = 1L, seed = 9, weights = 9)[[1]]), expected)

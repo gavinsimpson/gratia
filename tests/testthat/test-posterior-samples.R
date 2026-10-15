@@ -2,7 +2,7 @@
 
 test_that("smooth_samples works for a continuous by GAM", {
   expect_silent(sm <- smooth_samples(su_m_cont_by,
-    n = 5, n_vals = 100,
+    n_draws = 5, n_grid = 100,
     seed = 42
   ))
   expect_s3_class(sm, c(
@@ -20,7 +20,7 @@ test_that("smooth_samples works for a continuous by GAM", {
 
 test_that("smooth_samples works for a simple GAM", {
   expect_silent(sm <- smooth_samples(m_1_smooth,
-    n = 5, n_vals = 100,
+    n_draws = 5, n_grid = 100,
     seed = 42
   ))
   expect_s3_class(sm, c(
@@ -35,26 +35,14 @@ test_that("smooth_samples works for a simple GAM", {
   expect_snapshot(sm)
 })
 
-test_that("smooth_samples works for a simple GAM multi rng calls", {
-  expect_silent(sm <- smooth_samples(m_1_smooth,
-    n = 5, n_vals = 100,
-    seed = 42, rng_per_smooth = TRUE
-  ))
-  expect_s3_class(sm, c(
-    "smooth_samples", "tbl_df",
-    "tbl", "data.frame"
-  ))
-  ## 500 == 1 smooth * 5 * 100
-  expect_identical(NROW(sm), 500L)
-  expect_identical(NCOL(sm), 8L) # 8 cols, univatiate smooths
-  skip_on_cran()
-  # skip_on_ci() # testing without as moved to mac os x
-  expect_snapshot(sm)
+test_that("independent redraws per smooth are rejected", {
+  expect_error(smooth_samples(m_1_smooth, n_draws = 5, rng_per_smooth = TRUE),
+    "rng_per_smooth.*no longer supported")
 })
 
 test_that("smooth_samples works for a simple GAM MH sampling", {
   expect_silent(sm <- smooth_samples(m_1_smooth,
-    n = 5, n_vals = 100,
+    n_draws = 5, n_grid = 100,
     method = "mh", seed = 42
   ))
   expect_s3_class(sm, c(
@@ -67,7 +55,7 @@ test_that("smooth_samples works for a simple GAM MH sampling", {
 })
 
 test_that("smooth_samples works for a multi-smooth GAM", {
-  expect_silent(sm <- smooth_samples(m_gam, n = 5, n_vals = 100, seed = 42))
+  expect_silent(sm <- smooth_samples(m_gam, n_draws = 5, n_grid = 100, seed = 42))
   expect_s3_class(sm, c(
     "smooth_samples", "tbl_df",
     "tbl", "data.frame"
@@ -79,7 +67,7 @@ test_that("smooth_samples works for a multi-smooth GAM", {
 
 test_that("smooth_samples works for a multi-smooth factor by GAM", {
   expect_silent(sm <- smooth_samples(su_m_factor_by,
-    n = 5, n_vals = 50,
+    n_draws = 5, n_grid = 50,
     seed = 42
   ))
   expect_s3_class(sm, c(
@@ -92,7 +80,7 @@ test_that("smooth_samples works for a multi-smooth factor by GAM", {
 })
 
 test_that("smooth_samples works for a multi-smooth SCAM", {
-  expect_silent(sm <- smooth_samples(m_scam, n = 5, n_vals = 50, seed = 42))
+  expect_silent(sm <- smooth_samples(m_scam, n_draws = 5, n_grid = 50, seed = 42))
   expect_s3_class(sm, c("smooth_samples", "tbl_df", "tbl", "data.frame"))
   ## 500 == 2 smooths * 5 * 50
   expect_identical(NROW(sm), 500L)
@@ -100,41 +88,37 @@ test_that("smooth_samples works for a multi-smooth SCAM", {
 })
 
 test_that("smooth_samples() fails if not suitable method available", {
-  expect_error(smooth_samples(1:10),
+  expect_error(smooth_samples(1:10, n_draws = 1L),
     "Don't know how to sample from the posterior of <integer>",
     fixed = TRUE
   )
 })
 
 test_that("smooth_samples sets seed when seed not provided", {
-  expect_silent(smooth_samples(m_gam, seed = NULL))
+  expect_silent(smooth_samples(m_gam, seed = NULL, n_draws = 1L))
 })
 
 test_that("smooth_samples works with term provided", {
-  expect_silent(sm <- smooth_samples(m_gam, select = "s(x2)", seed = 42))
+  expect_silent(sm <- smooth_samples(m_gam, select = "s(x2)", seed = 42, n_draws = 1L))
 })
 
 test_that("smooth_samples errors with invalid term provided", {
-  expect_error(sm <- smooth_samples(m_gam, select = "s(x10)", seed = 42),
+  expect_error(sm <- smooth_samples(m_gam, select = "s(x10)", seed = 42, n_draws = 1L),
     "Failed to match any smooths in model m_gam.
 Try with 'partial_match = TRUE'?",
     fixed = TRUE
   )
 })
 
-test_that("term argument to smooth_samples is deprecated", {
-  expect_warning(sm <- smooth_samples(m_gam, term = "s(x1)", seed = 42),
-    "The `term` argument of `smooth_samples()` is deprecated as of gratia 0.8.9.9.
-i Please use the `select` argument instead.",
-    fixed = TRUE
-  )
-
+test_that("term argument to smooth_samples has an informative migration error", {
+  expect_error(smooth_samples(m_gam, term = "s(x1)", n_draws = 1),
+    "Argument 'term' has been removed. Use select", fixed = TRUE)
 })
 
 # from #121
 test_that("smooth_samples gets the right factor by smooth: #121", {
   expect_silent(sm <- smooth_samples(su_m_factor_by,
-    n = 5, n_vals = 100,
+    n_draws = 5, n_grid = 100,
     select = "s(x2):fac2", seed = 42
   ))
   # factor level of `fac` column should be 2
@@ -144,7 +128,7 @@ test_that("smooth_samples gets the right factor by smooth: #121", {
 # from #121 - problems when model contains ranef smooths
 test_that("smooth_samples ignores ranef smooths: #121", {
   expect_message(
-    sm <- smooth_samples(rm1, n = 5, n_vals = 100, seed = 42),
+    sm <- smooth_samples(rm1, n_draws = 5, n_grid = 100, seed = 42),
     "Random effect smooths not currently supported."
   )
   # given n and n_vals and 4 smooths, nrow == 2000L
@@ -157,7 +141,7 @@ test_that("smooth_samples fails if no smooths left to sample from", {
   expect_error(
     sm <- smooth_samples(rm1,
       select = "s(fac)",
-      n = 5, n_vals = 100, seed = 42
+      n_draws = 5, n_grid = 100, seed = 42
     ),
     "No smooths left that can be sampled from."
   )
@@ -166,7 +150,7 @@ test_that("smooth_samples fails if no smooths left to sample from", {
 fs_nams <- c(".row", ".draw", ".parameter", ".fitted")
 
 test_that("fitted_samples works for a simple GAM", {
-  expect_silent(sm <- fitted_samples(m_1_smooth, n = 5, seed = 42))
+  expect_silent(sm <- fitted_samples(m_1_smooth, n_draws = 5, seed = 42))
   expect_s3_class(sm, c(
     "fitted_samples", "tbl_df",
     "tbl", "data.frame"
@@ -178,7 +162,7 @@ test_that("fitted_samples works for a simple GAM", {
 })
 
 test_that("fitted_samples works for a multi-smooth GAM", {
-  expect_silent(sm <- fitted_samples(m_gam, n = 5, seed = 42))
+  expect_silent(sm <- fitted_samples(m_gam, n_draws = 5, seed = 42))
   expect_s3_class(sm, c(
     "fitted_samples", "tbl_df",
     "tbl", "data.frame"
@@ -190,7 +174,7 @@ test_that("fitted_samples works for a multi-smooth GAM", {
 })
 
 test_that("fitted_samples works for a multi-smooth factor by GAM", {
-  expect_silent(sm <- fitted_samples(su_m_factor_by, n = 5, seed = 42))
+  expect_silent(sm <- fitted_samples(su_m_factor_by, n_draws = 5, seed = 42))
   expect_s3_class(sm, c(
     "fitted_samples", "tbl_df",
     "tbl", "data.frame"
@@ -202,11 +186,11 @@ test_that("fitted_samples works for a multi-smooth factor by GAM", {
 })
 
 test_that("fitted_samples sets seed when seed not provided", {
-  expect_silent(fitted_samples(m_gam, seed = NULL))
+  expect_silent(fitted_samples(m_gam, seed = NULL, n_draws = 1L))
 })
 
 test_that("fitted_samples() fails if not suitable method available", {
-  expect_error(fitted_samples(1:10),
+  expect_error(fitted_samples(1:10, n_draws = 1L),
     "Don't know how to sample from the posterior of <integer>",
     fixed = TRUE
   )
@@ -215,7 +199,7 @@ test_that("fitted_samples() fails if not suitable method available", {
 ps_nams <- c(".row", ".draw", ".response")
 
 test_that("predicted_samples works for a simple GAM", {
-  expect_silent(sm <- predicted_samples(m_1_smooth, n = 5, seed = 42))
+  expect_silent(sm <- predicted_samples(m_1_smooth, n_draws = 5, seed = 42))
   expect_s3_class(sm, c(
     "predicted_samples", "tbl_df",
     "tbl", "data.frame"
@@ -227,7 +211,7 @@ test_that("predicted_samples works for a simple GAM", {
 })
 
 test_that("predicted_samples works for a multi-smooth GAM", {
-  expect_silent(sm <- predicted_samples(m_gam, n = 5, seed = 42))
+  expect_silent(sm <- predicted_samples(m_gam, n_draws = 5, seed = 42))
   expect_s3_class(sm, c(
     "predicted_samples", "tbl_df",
     "tbl", "data.frame"
@@ -239,7 +223,7 @@ test_that("predicted_samples works for a multi-smooth GAM", {
 })
 
 test_that("predicted_samples works for a multi-smooth factor by GAM", {
-  expect_silent(sm <- predicted_samples(su_m_factor_by, n = 5, seed = 42))
+  expect_silent(sm <- predicted_samples(su_m_factor_by, n_draws = 5, seed = 42))
   expect_s3_class(sm, c(
     "predicted_samples", "tbl_df",
     "tbl", "data.frame"
@@ -251,18 +235,18 @@ test_that("predicted_samples works for a multi-smooth factor by GAM", {
 })
 
 test_that("predicted_samples sets seed when seed not provided", {
-  expect_silent(predicted_samples(m_gam, seed = NULL))
+  expect_silent(predicted_samples(m_gam, seed = NULL, n_draws = 1L))
 })
 
 test_that("predicted_samples() fails if not suitable method available", {
-  expect_error(predicted_samples(1:10),
+  expect_error(predicted_samples(1:10, n_draws = 1L),
     "Don't know how to sample from the posterior of <integer>",
     fixed = TRUE
   )
 })
 
 test_that("posterior_samples() fails if no suitable method available", {
-  expect_error(posterior_samples(1:10),
+  expect_error(posterior_samples(1:10, n_draws = 1L),
     "Don't know how to sample from the posterior of <integer>",
     fixed = TRUE
   )
@@ -272,7 +256,7 @@ test_that("fitted_samples example output doesn't change", {
   skip_on_cran()
   # skip_on_ci() # testing without as moved to mac os x
 
-  fs <- fitted_samples(m_gam, n = 5, seed = 42)
+  fs <- fitted_samples(m_gam, n_draws = 5, seed = 42)
   expect_snapshot(fs)
 })
 
@@ -280,12 +264,12 @@ test_that("smooth_samples example output doesn't change", {
   skip_on_cran()
   # skip_on_ci() # testing without as moved to mac os x
 
-  samples <- smooth_samples(m_gam, select = "s(x0)", n = 5, seed = 42)
+  samples <- smooth_samples(m_gam, select = "s(x0)", n_draws = 5, seed = 42)
   expect_snapshot(samples)
 })
 
 test_that("posterior_samples works for a simple GAM", {
-  expect_silent(sm <- posterior_samples(m_1_smooth, n = 5, seed = 42))
+  expect_silent(sm <- posterior_samples(m_1_smooth, n_draws = 5, seed = 42))
   expect_s3_class(sm, c(
     "posterior_samples", "tbl_df",
     "tbl", "data.frame"
@@ -297,7 +281,7 @@ test_that("posterior_samples works for a simple GAM", {
 })
 
 test_that("posterior_samples works for a multi-smooth tweedie GAM", {
-  expect_silent(sm <- posterior_samples(m_tw, n = 5, seed = 42))
+  expect_silent(sm <- posterior_samples(m_tw, n_draws = 5, seed = 42))
   expect_s3_class(sm, c(
     "posterior_samples", "tbl_df",
     "tbl", "data.frame"
@@ -327,10 +311,10 @@ test_that("posterior sampling funs work with offsets in formula issue 233", {
   )
 
   n_samples <- 5
-  expect_silent(ps <- posterior_samples(mod, n = n_samples, seed = 42))
+  expect_silent(ps <- posterior_samples(mod, n_draws = n_samples, seed = 42))
   expect_identical(nrow(ps), as.integer(n * n_samples))
 
-  expect_silent(fs <- fitted_samples(mod, n = n_samples, seed = 42))
+  expect_silent(fs <- fitted_samples(mod, n_draws = n_samples, seed = 42))
   expect_identical(nrow(fs), as.integer(n * n_samples))
 
   expect_snapshot(print(ps), variant = "posterior", cran = FALSE)
@@ -344,13 +328,13 @@ test_that("posterior sampling works for a mvn() model", {
   n_data <- model.matrix(m_mvn) |> nrow()
   n_y <- n_eta(m_mvn)
 
-  expect_silent(ps <- posterior_samples(m_mvn, n = n_samples, seed = 42))
+  expect_silent(ps <- posterior_samples(m_mvn, n_draws = n_samples, seed = 42))
   expect_identical(nrow(ps), as.integer(n_data * n_y * n_samples))
 
-  expect_silent(ys <- predicted_samples(m_mvn, n = n_samples, seed = 42))
+  expect_silent(ys <- predicted_samples(m_mvn, n_draws = n_samples, seed = 42))
   expect_identical(nrow(ys), as.integer(n_data * n_y * n_samples))
 
-  expect_silent(fs <- fitted_samples(m_mvn, n = n_samples, seed = 42))
+  expect_silent(fs <- fitted_samples(m_mvn, n_draws = n_samples, seed = 42))
   expect_identical(nrow(fs), as.integer(n_data * n_y * n_samples))
 
   expect_snapshot(print(ps), variant = "posterior", cran = FALSE)
@@ -365,13 +349,13 @@ test_that("posterior sampling works for a multinom() model", {
   n_data <- model.matrix(m_multinom) |> nrow()
   n_y <- n_eta(m_multinom) + 1
 
-  expect_silent(ps <- posterior_samples(m_multinom, n = n_samples, seed = 42))
+  expect_silent(ps <- posterior_samples(m_multinom, n_draws = n_samples, seed = 42))
   expect_identical(nrow(ps), as.integer(n_data * n_samples))
 
-  expect_silent(ys <- predicted_samples(m_multinom, n = n_samples, seed = 42))
+  expect_silent(ys <- predicted_samples(m_multinom, n_draws = n_samples, seed = 42))
   expect_identical(nrow(ys), as.integer(n_data * n_samples))
 
-  expect_silent(fs <- fitted_samples(m_multinom, n = n_samples, seed = 42))
+  expect_silent(fs <- fitted_samples(m_multinom, n_draws = n_samples, seed = 42))
   expect_identical(nrow(fs), as.integer(n_data * n_samples * n_y))
 
   expect_snapshot(print(ps), variant = "posterior", cran = FALSE)
@@ -382,9 +366,9 @@ test_that("posterior sampling works for a multinom() model", {
 test_that("derivative_samples works for a simple GAM", {
   expect_silent(
     sm <- derivative_samples(m_1_smooth,
-      n = 5,
+      n_grid = 5,
       seed = 42,
-      type = "central", focal = "x0", eps = 0.01, n_sim = 10,
+      type = "central", focal = "x0", eps = 0.01, n_draws = 10,
       data = quick_eg1
     )
   )
@@ -412,9 +396,9 @@ test_that("derivative_samples works for a NB GAM", {
   expect_silent(
     sm <- derivative_samples(
       m_nb,
-      n = 5,
+      n_grid = 5,
       seed = 42,
-      type = "forward", focal = "x0", eps = 0.01, n_sim = 10,
+      type = "forward", focal = "x0", eps = 0.01, n_draws = 10,
       data = ds_m_nb
     )
   )
@@ -444,9 +428,9 @@ test_that("derivative_samples works for a NB GAM, central, backward", {
   expect_silent(
     sm_1 <- derivative_samples(
       m_nb,
-      n = 5,
+      n_grid = 5,
       seed = 42,
-      type = "backward", focal = "x0", eps = 0.01, n_sim = 10,
+      type = "backward", focal = "x0", eps = 0.01, n_draws = 10,
       data = ds_m_nb
     )
   )
@@ -465,9 +449,9 @@ test_that("derivative_samples works for a NB GAM, central, backward", {
   expect_silent(
     sm_2 <- derivative_samples(
       m_nb,
-      n = 5,
+      n_grid = 5,
       seed = 42,
-      type = "central", focal = "x0", eps = 0.01, n_sim = 10,
+      type = "central", focal = "x0", eps = 0.01, n_draws = 10,
       data = ds_m_nb
     )
   )
@@ -496,10 +480,10 @@ test_that("derivative_samples works for a NB GAM order 2", {
 
   expect_silent(
     sm_1 <- derivative_samples(m_nb,
-      n = 5,
+      n_grid = 5,
       seed = 42,
       type = "forward",
-      focal = "x0", eps = 0.01, n_sim = 10,
+      focal = "x0", eps = 0.01, n_draws = 10,
       data = ds_m_nb,
       order = 2
     )
@@ -519,9 +503,9 @@ test_that("derivative_samples works for a NB GAM order 2", {
   expect_silent(
     sm_2 <- derivative_samples(
       m_nb,
-      n = 5,
+      n_grid = 5,
       seed = 42,
-      type = "backward", focal = "x0", eps = 0.01, n_sim = 10,
+      type = "backward", focal = "x0", eps = 0.01, n_draws = 10,
       data = ds_m_nb, order = 2
     )
   )
@@ -538,8 +522,8 @@ test_that("derivative_samples works for a NB GAM order 2", {
   ))
 
   expect_silent(sm_3 <- derivative_samples(m_nb,
-    n = 5, seed = 42,
-    type = "central", focal = "x0", eps = 0.01, n_sim = 10,
+    n_grid = 5, seed = 42,
+    type = "central", focal = "x0", eps = 0.01, n_draws = 10,
     data = ds_m_nb, order = 2
   ))
   expect_s3_class(sm_3, c(
@@ -562,33 +546,32 @@ test_that("derivative_samples works for a NB GAM order 2", {
 
 test_that("fitted_samples can use mvn_method", {
   skip_on_cran()
-  expect_silent(fs1 <- fitted_samples(m_tiny_eg1, n = 10, seed = 2,
+  expect_silent(fs1 <- fitted_samples(m_tiny_eg1, n_draws = 10, seed = 2,
     mvn_method = "mgcv"))
-  expect_silent(fs2 <- fitted_samples(m_tiny_eg1, n = 10, seed = 2,
+  expect_silent(fs2 <- fitted_samples(m_tiny_eg1, n_draws = 10, seed = 2,
     mvn_method = "mvnfast"))
   expect_false(identical(fs1, fs2))
 })
 
 test_that("posterior samples can use mvn_method", {
   skip_on_cran()
-  expect_silent(ps1 <- posterior_samples(m_tiny_eg1, n = 10, seed = 2,
+  expect_silent(ps1 <- posterior_samples(m_tiny_eg1, n_draws = 10, seed = 2,
     mvn_method = "mgcv"))
-  expect_silent(ps2 <- posterior_samples(m_tiny_eg1, n = 10, seed = 2,
+  expect_silent(ps2 <- posterior_samples(m_tiny_eg1, n_draws = 10, seed = 2,
     mvn_method = "mvnfast"))
   expect_false(identical(ps1, ps2))
 })
 
 test_that("smooth samples can use mvn_method", {
   skip_on_cran()
-  expect_silent(sm1 <- smooth_samples(m_tiny_eg1, n = 10, seed = 2,
+  expect_silent(sm1 <- smooth_samples(m_tiny_eg1, n_draws = 10, seed = 2,
     mvn_method = "mgcv"))
-  expect_silent(sm2 <- smooth_samples(m_tiny_eg1, n = 10, seed = 2,
+  expect_silent(sm2 <- smooth_samples(m_tiny_eg1, n_draws = 10, seed = 2,
     mvn_method = "mvnfast"))
   expect_false(identical(sm1, sm2))
 })
 
-test_that("derivative samples level argument is deprecated", {
-  lifecycle::expect_deprecated(derivative_samples(m_gam, focal = "x1", n = 10,
-    n_sim = 10, level = 0.95, seed = 2, data = su_eg1))
-}
-)
+test_that("derivative samples reject the unused level argument", {
+  expect_error(derivative_samples(m_gam, focal = "x1", n_grid = 10,
+    n_draws = 10, level = 0.95), "level.*no longer supported")
+})

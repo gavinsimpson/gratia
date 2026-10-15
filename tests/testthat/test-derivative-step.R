@@ -61,7 +61,7 @@ test_that("explicit steps retain their absolute meaning", {
   f <- function(x) exp(1 + .7 * x - .2 * x^2)
   h <- .01
   ans <- derivative_samples(m, data = nd, focal = "x", order = 2,
-    type = "central", eps = h, method = "user", draws = b, n_sim = 1)
+    type = "central", eps = h, method = "user", draws = b, n_draws = 1)
   expect_equal(ans$.derivative, (f(nd$x + h) - 2 * f(nd$x) + f(nd$x - h)) / h^2,
     tolerance = 1e-9)
   for (bad in list(0, -1, NA_real_, Inf, c(.01, .02), "small")) {

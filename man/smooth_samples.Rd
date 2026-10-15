@@ -12,49 +12,53 @@ smooth_samples(model, ...)
 
 \method{smooth_samples}{gam}(
   model,
-  select = NULL,
-  term = deprecated(),
-  n = 1,
-  data = newdata,
-  method = c("gaussian", "mh", "inla", "user"),
+  ...,
+  data = NULL,
+  n_draws = NULL,
+  chains = NULL,
   seed = NULL,
-  freq = FALSE,
-  unconditional = FALSE,
+  method = c("gaussian", "mh", "inla", "user"),
   n_cores = 1L,
-  n_vals = 200,
+  n_threads = 1L,
   burnin = 1000,
-  thin = 1,
+  thin = 1L,
   t_df = 40,
   rw_scale = 0.25,
-  rng_per_smooth = FALSE,
+  frequentist = FALSE,
+  unconditional = FALSE,
   draws = NULL,
-  partial_match = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia"),
   mvn_method = c("mvnfast", "mgcv"),
-  envir = NULL,
-  ...,
-  newdata = NULL,
-  ncores = NULL
+  block_size = 10000L,
+  dense_limit = 5e+06,
+  select = NULL,
+  n_grid = 200L,
+  partial_match = NULL,
+  envir = NULL
 )
 }
 \arguments{
-\item{model}{a fitted model of the supported types}
+\item{model}{a fitted model of the supported types; see \link{diagnostic_support}.}
 
 \item{...}{arguments passed to other methods. For \code{fitted_samples()}, these
 are passed on to \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}. For \code{posterior_samples()} these are
 passed on to \code{fitted_samples()}. For \code{predicted_samples()} these are
 passed on to the relevant \code{simulate()} method.}
 
-\item{select}{character; select which smooth's posterior to draw from.
-The default (\code{NULL}) means the posteriors of all smooths in \code{model}
-will be sampled from. If supplied, a character vector of requested terms.}
-
-\item{term}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{select} instead.}
-
-\item{n}{numeric; the number of posterior samples to return.}
-
 \item{data}{data frame; new observations at which the posterior draws
 from the model should be evaluated. If not supplied, the data used to fit
 the model will be used for \code{data}, if available in \code{model}.}
+
+\item{n_draws}{positive integer; total retained draws across all chains.
+Required when generating draws. With \code{method = "user"}, the supplied
+matrix determines the count; an explicit count must agree with its rows.}
+
+\item{chains}{positive integer or \code{NULL}; number of chains. \code{NULL} uses one
+chain, or the chain mapping in supplied draws. \code{n_draws} must be divisible by
+\code{chains}. Burn-in is applied separately to each MH chain.}
+
+\item{seed}{numeric; a random seed for the simulations.}
 
 \item{method}{character; which method should be used to draw samples from
 the posterior distribution. \code{"gaussian"} uses a Gaussian (Laplace)
@@ -63,32 +67,19 @@ that alternates t proposals with proposals based on a shrunken version of
 the posterior covariance matrix. \code{"inla"} uses a variant of Integrated
 Nested Laplace Approximation due to Wood (2019), (currently not
 implemented). \code{"user"} allows for user-supplied posterior draws
-(currently not implemented).}
+as a coefficient matrix.}
 
-\item{seed}{numeric; a random seed for the simulations.}
+\item{n_cores}{positive integer; maximum concurrent MH chains using mirai,
+capped at \code{chains}. Existing workers are reused; otherwise temporary workers
+are created and cleaned up. Only used by \code{method = "mh"}.}
 
-\item{freq}{logical; \code{TRUE} to use the frequentist covariance matrix of
-the parameter estimators, \code{FALSE} to use the Bayesian posterior
-covariance matrix of the parameters.}
-
-\item{unconditional}{logical; if \code{TRUE} (and \code{freq == FALSE}) then the
-Bayesian smoothing parameter uncertainty corrected covariance matrix is
-used, if available.}
-
-\item{n_cores}{number of cores for generating random variables from a
-multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
-Parallelization will take place only if OpenMP is supported (but appears
-to work on Windows with current \code{R}).}
-
-\item{n_vals}{numeric; how many locations to evaluate the smooth at if
-\code{data} not supplied}
+\item{n_threads}{positive integer; threads within Gaussian sampling using
+mvnfast. Defaults to one. This is separate from concurrent MH chains.}
 
 \item{burnin}{numeric; number of samples to discard as the burnin draws.
 Only used with \code{method = "mh"}.}
 
-\item{thin}{numeric; the number of samples to skip when taking \code{n} draws.
-Results in \code{thin * n} draws from the posterior being taken. Only used with
-\code{method = "mh"}.}
+\item{thin}{positive integer; retain every \code{thin} iterations after burn-in.}
 
 \item{t_df}{numeric; degrees of freedom for t distribution proposals. Only
 used with \code{method = "mh"}.}
@@ -97,17 +88,23 @@ used with \code{method = "mh"}.}
 matrix when generating random walk proposals. Negative or non finite to
 skip the random walk step. Only used with \code{method = "mh"}.}
 
-\item{rng_per_smooth}{logical; if TRUE, the behaviour of gratia version
-0.8.1 or earlier is used, whereby a separate call the the random number
-generator (RNG) is performed for each smooth. If FALSE, a single call to the
-RNG is performed for all model parameters}
+\item{frequentist}{logical; \code{TRUE} to use the frequentist covariance matrix of
+the parameter estimators, \code{FALSE} to use the Bayesian posterior
+covariance matrix of the parameters.}
+
+\item{unconditional}{logical; if \code{TRUE} (and \code{frequentist == FALSE}) then the
+Bayesian smoothing parameter uncertainty corrected covariance matrix is
+used, if available.}
 
 \item{draws}{matrix; user supplied posterior draws to be used when
 \code{method = "user"}.}
 
-\item{partial_match}{logical; should smooths be selected by partial matches
-with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
-against.}
+\item{diagnostics}{logical; calculate coefficient R-hat, effective sample
+sizes, and Monte Carlo standard errors using the optional posterior package.}
+
+\item{mh_backend}{character; \code{"mgcv"} preserves \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.
+\code{"gratia"} uses the common-family evaluator and also supports independent
+observation bam fits. Both hold smoothing, scale, and family parameters fixed.}
 
 \item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
 uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
@@ -115,14 +112,28 @@ numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
 for some marginal fits, such as those where the covariance matrix is close
 to singular.}
 
-\item{envir}{an environment to look up the data within.}
+\item{block_size}{positive integer; maximum observation rows per block in the
+gratia MH evaluator. Large designs are evaluated without storing a full matrix.}
 
-\item{newdata}{Deprecated: use \code{data} instead.}
+\item{dense_limit}{numeric; maximum number of design-matrix elements to cache
+for the gratia MH backend. Use zero to force blockwise evaluation.}
 
-\item{ncores}{Deprecated; use \code{n_cores} instead. The number of cores for
-generating random variables from a multivariate normal distribution.
-Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}. Parallelization will take place only if
-OpenMP is supported (but appears to work on Windows with current \code{R}).}
+\item{select}{character; select which smooth's posterior to draw from.
+The default (\code{NULL}) means the posteriors of all smooths in \code{model}
+will be sampled from. If supplied, a character vector of requested terms.
+0.8.1 or earlier is used, whereby a separate call the the random number
+generator (RNG) is performed for each smooth. If FALSE, a single call to the
+RNG is performed for all model parameters}
+
+\item{n_grid}{positive integer; resolution for constructing evaluation data if
+\code{data} not supplied}
+
+\item{partial_match}{logical; should smooths be selected by partial matches
+with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
+against.}
+
+\item{envir}{an optional environment for looking up data, functions and
+constants. Defaults to the model's evaluation environment.}
 }
 \value{
 A tibble with additional classes \code{"smooth_samples"} and
@@ -138,8 +149,8 @@ full label for the smooth, to differentiate factor-by smooths for
 example.
 \item \code{.by}; character vector. If the smooth involves a \code{by} term, the
 by variable will be named here, \code{NA_character_} otherwise.
-\item \code{.row}; integer. A vector of values \code{seq_len(n_vals)}, repeated if
-\code{n > 1L}. Indexes the row in \code{data} for that particular draw.
+\item \code{.row}; integer. A vector of values \code{seq_len(nrow(data))}, repeated if
+\code{n_draws > 1L}. Indexes the row in \code{data} for that particular draw.
 \item \code{.draw}; integer. A vector of integer values indexing the particular
 posterior draw that each row belongs to.
 \item \code{.value}; numeric. The value of smooth function for this posterior draw
@@ -171,7 +182,7 @@ op <- options(cli.unicode = FALSE, pillar.sigfig = 3)
 dat <- data_sim("eg1", n = 400, seed = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
-sms <- smooth_samples(m1, select = "s(x0)", n = 5, seed = 42)
+sms <- smooth_samples(m1, select = "s(x0)", n_draws = 5, seed = 42)
 \donttest{
 sms
 }
@@ -181,7 +192,7 @@ dat <- data_sim("eg4", n = 1000, seed = 2)
 
 ## fit model...
 m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
-sms <- smooth_samples(m2, n = 5, seed = 42)
+sms <- smooth_samples(m2, n_draws = 5, seed = 42)
 draw(sms)
 \dontshow{
 options(op)

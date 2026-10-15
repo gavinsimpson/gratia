@@ -1,0 +1,133 @@
+---
+title: "Migrating posterior sampling calls"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Migrating posterior sampling calls}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+The multiple-chain release gives sampling arguments the same meaning across
+`posterior_samples()`, `fitted_samples()`, `smooth_samples()`,
+`derivative_samples()`, their `add_*()` helpers, and coefficient draw functions.
+Obsolete arguments now produce errors with migration guidance. Controls must
+be named; only the model, or the data and model in `add_*()` helpers, can be
+passed by position. This prevents old positional calls from changing meaning.
+
+## Draw counts and evaluation points
+
+`n_draws` always means the total retained draws across all chains. It must be
+divisible by `chains`. Generating draws requires an explicit count: the previous
+defaults ranged from one draw to 10,000 draws. `chains = NULL` uses one chain,
+or infers the chains from supplied coefficient draws.
+
+| Previous argument | Replacement |
+|:------------------|:------------|
+| `n` in fitted, posterior, predicted, smooth and coefficient sampling | `n_draws` |
+| `n_sim` in derivative sampling | `n_draws` |
+| `n` in derivative sampling | `n_grid` |
+| `n_vals` in smooth sampling | `n_grid` |
+| `object` in derivative sampling | `model` |
+| `object` in `add_*()` sampling helpers | `data` |
+| `freq` | `frequentist` |
+| `newdata` | `data` |
+| `ncores` | `n_cores` for MH chains; `n_threads` for Gaussian draws |
+| `n_cores` for Gaussian sampling | `n_threads` |
+| `term` in smooth sampling | `select` |
+
+For example, the previous derivative call
+
+```r
+# Previous interface; now produces an informative error.
+derivative_samples(model, focal = "x", n = 100, n_sim = 1000)
+```
+
+becomes
+
+```r
+# 1,000 retained coefficient draws, evaluated at 100 points.
+derivative_samples(model, focal = "x", n_draws = 1000, n_grid = 100)
+```
+
+`n_grid = 200` is the common default for smooth and derivative sampling.
+For smooths, it supplies the resolution to `smooth_data()`; multidimensional
+smooths can contain more rows than `n_grid`. Derivative sampling constructs a
+slice along `focal`, holding other variables at representative values. Explicit
+`data` determine the evaluation locations instead of `n_grid`. Use explicit
+`data` when the exact grid matters. Fitted and response sampling use fitting
+observations when `data = NULL` and do not construct a grid.
+
+## Multiple chains and parallel work
+
+```r
+samples <- fitted_samples(
+  model, n_draws = 1000, chains = 4, n_cores = 4,
+  method = "mh", burnin = 1000, thin = 1,
+  diagnostics = TRUE, seed = 281
+)
+sampling_diagnostics(samples)
+```
+
+This retains 250 draws per chain. Every chain discards its own 1,000 burn-in
+iterations; parallel chains repeat this warmup work. `thin = 2` retains every
+second iteration after burn-in and still returns `n_draws` draws in total.
+`n_cores` limits concurrent MH chains using mirai, capped at `chains`. An
+existing worker pool is reused; otherwise temporary workers are cleaned up
+automatically. Given the same seed and sampler backend, retained draws agree
+between serial and parallel runs.
+
+Gaussian sampling uses `n_threads` to control threads inside mvnfast. It does
+not run concurrent MH chains. A control explicitly supplied to a method that
+cannot use it produces an error, including MH controls for Gaussian draws or
+Gaussian covariance controls for MH. `block_size` and `dense_limit` apply only
+to `method = "mh", mh_backend = "gratia"`.
+
+The default MH backend remains `"mgcv"`. Use `mh_backend = "gratia"` for the
+compiled common-family evaluator, including independent-observation `bam`
+models. The gratia evaluator rejects GAMM components; it does not evaluate
+their fitted observation correlations. Both MH backends condition on fitted
+smoothing, dispersion, and family parameters. `unconditional = TRUE` applies to Gaussian sampling only.
+
+## Reusing coefficient draws
+
+```r
+betas <- post_draws(model, n_draws = 1000, chains = 4, seed = 281)
+fitted <- fitted_samples(model, method = "user", draws = betas)
+smooth <- smooth_samples(model, method = "user", draws = betas)
+derivative <- derivative_samples(
+  model, focal = "x", method = "user", draws = betas
+)
+```
+
+The coefficient matrix determines the count and chain layout. Explicit
+`n_draws` or `chains` must agree with it. A plain matrix without chain metadata
+represents one chain; chain boundaries are never guessed from the row count.
+Smooths always transform the same joint coefficient draws. The old
+`rng_per_smooth` option is removed because independently redrawing each smooth
+loses their posterior dependence. The previously ignored `mu`, `sigma`, and
+derivative `level` arguments are also rejected.
+
+Multiple-chain tables retain `.chain`, `.iteration`, and globally unique `.draw`
+columns. Single-chain tables keep their previous columns. Attached diagnostics
+refer to coefficients before transformation or response simulation.
+`as_mcmc_draws()` converts coefficient matrices or sampled quantities for
+posterior or coda diagnostics. Optional packages are required only when their
+formats or diagnostics are requested.
+
+## Which response sampling function to use
+
+`fitted_samples()` draws the expected response, `smooth_samples()` draws
+individual smooth contributions, and `derivative_samples()` draws derivatives.
+`posterior_samples()` also simulates response variation for each coefficient
+draw. `predicted_samples()` simulates responses with fitted parameters held
+fixed. It uses `n_draws` for the number of response replicates and rejects
+coefficient-chain controls; use `posterior_samples()` to include coefficient
+uncertainty.
+
+Model-specific capabilities still apply. For example, the native diagnostic
+samplers for `lm` and mixed models support Gaussian approximations and fitting
+observations only, and reject unsupported chain controls. See
+`help("diagnostic_support")` for model-specific support. Functions that summarise
+draws, such as `response_derivatives()` and `conditional_differences()`, keep
+their existing grid and simulation-count arguments; their internal sampling
+calls use this interface.

@@ -1,0 +1,42 @@
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+List of 3
+ $ gam         :List of 11
+  ..$ method           : chr "REML"
+  ..$ sp               : Named num [1:2] 0.0103 0.0179
+  .. ..- attr(*, "names")= chr [1:2] "s(x)" "s(z)"
+  ..$ V.sp.dim         : int [1:2] 3 3
+  ..$ spind            : int [1:2] 1 2
+  ..$ sp.vcov.dim      : int [1:2] 3 3
+  ..$ db.drho.dim      : int [1:2] 10 2
+  ..$ Vc.dim           : int [1:2] 10 10
+  ..$ mean_sd_fixed    : num 0.282
+  ..$ mean_sd_corrected: num 0.285
+  ..$ mixture_failures : int 0
+  ..$ mean_sd_mixture  : num 0.278
+ $ bam         :List of 11
+  ..$ method           : chr "fREML"
+  ..$ sp               : Named num [1:2] 0.0103 0.0179
+  .. ..- attr(*, "names")= chr [1:2] "s(x)" "s(z)"
+  ..$ V.sp.dim         : int [1:2] 2 2
+  ..$ spind            : NULL
+  ..$ sp.vcov.dim      : int [1:2] 3 3
+  ..$ db.drho.dim      : int [1:2] 10 2
+  ..$ Vc.dim           : int [1:2] 10 10
+  ..$ mean_sd_fixed    : num 0.253
+  ..$ mean_sd_corrected: num 0.256
+  ..$ mixture_failures : int 0
+  ..$ mean_sd_mixture  : num 0.25
+ $ bam_discrete:List of 11
+  ..$ method           : chr "fREML"
+  ..$ sp               : Named num [1:2] 0.0103 0.0179
+  .. ..- attr(*, "names")= chr [1:2] "s(x)" "s(z)"
+  ..$ V.sp.dim         : int [1:2] 2 2
+  ..$ spind            : NULL
+  ..$ sp.vcov.dim      : int [1:2] 3 3
+  ..$ db.drho.dim      : int [1:2] 10 2
+  ..$ Vc.dim           : int [1:2] 10 10
+  ..$ mean_sd_fixed    : num 0.282
+  ..$ mean_sd_corrected: num 0.285
+  ..$ mixture_failures : int 0
+  ..$ mean_sd_mixture  : num 0.277

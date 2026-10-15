@@ -148,8 +148,8 @@ test_that("default fitted values and draws follow fitted's row convention", {
   expect_true(all(is.na(fv$x[!f$keep])))
   expect_equal(fv$.se[f$keep], fitted_values(b)$.se)
   for (fun in list(fitted_samples, posterior_samples)) {
-    expect_silent(x <- fun(a, n = 3, seed = 21))
-    y <- fun(b, n = 3, seed = 21)
+    expect_silent(x <- fun(a, n_draws = 3, seed = 21))
+    y <- fun(b, n_draws = 3, seed = 21)
     value <- if (".fitted" %in% names(x)) ".fitted" else ".response"
     expect_equal(NROW(x), 3 * NROW(f$data))
     expect_true(all(is.na(x[[value]][!f$keep[x$.row]])))
@@ -179,7 +179,7 @@ test_that("explicit data retain prediction rows independently of training NAs", 
     expect_equal(fv$.fitted, as.numeric(expected[rows]))
     expect_equal(add_fitted(d, m, na.action = action)$.fitted, fv$.fitted)
     for (fun in list(fitted_samples, posterior_samples)) {
-      expect_silent(x <- fun(m, data = d, n = 2, seed = 1, na.action = action))
+      expect_silent(x <- fun(m, data = d, n_draws = 2, seed = 1, na.action = action))
       expect_identical(x$.row, rep(rows, 2))
     }
     expect_silent(x <- simulate(m, data = d, nsim = 2, na.action = action))
@@ -194,7 +194,7 @@ test_that("explicit data retain prediction rows independently of training NAs", 
     data.frame(x = c(NA, 0.5), z = c(NA, 0.5))
   )) {
     for (fun in list(fitted_values, fitted_samples, posterior_samples)) {
-      expect_silent(x <- fun(m, data = d))
+      expect_silent(x <- if (identical(fun, fitted_values)) fun(m, data = d) else fun(m, data = d, n_draws = 1))
       value <- if (".fitted" %in% names(x)) ".fitted" else ".response"
       expect_true(is.na(x[[value]][1]))
     }
@@ -216,7 +216,7 @@ test_that("ordinal simulation never invents values for missing predictors", {
   for (data in list(NULL, d)) {
     expect_silent(x <- simulate(m, data = data, nsim = 2, seed = 2))
     expect_true(all(is.na(as.matrix(x[c(1, 20, 60), ]))))
-    expect_silent(p <- posterior_samples(m, data = data, n = 2, seed = 2))
+    expect_silent(p <- posterior_samples(m, data = data, n_draws = 2, seed = 2))
     expect_true(all(is.na(p$.response[p$.row %in% c(1, 20, 60)])))
   }
 })
@@ -296,13 +296,13 @@ test_that("multi-parameter and multivariate restoration uses the row dimension",
     expect_silent(ggplot2::ggplot_build(residuals_hist_plot(m)))
     expect_silent(observed_fitted_plot(m))
     if (is_multivariate_y(m)) {
-      expect_silent(x <- posterior_samples(m, n = 2, seed = 3))
+      expect_silent(x <- posterior_samples(m, n_draws = 2, seed = 3))
       expect_equal(NROW(x), 320)
       expect_true(all(is.na(x$.response[x$.row %in% c(1, 30, 80)])))
       expect_silent(x <- simulate(m, nsim = 2, seed = 3))
       expect_equal(NROW(x), 160)
       expect_silent(
-        p <- posterior_samples(m, n = 2, data = data.frame(x = NA_real_))
+        p <- posterior_samples(m, n_draws = 2, data = data.frame(x = NA_real_))
       )
       expect_equal(NROW(p), 4)
       expect_true(all(is.na(p$.response)))
@@ -368,7 +368,7 @@ test_that("binomial trials, supplied weights and RNG state stay aligned", {
     ignore_attr = TRUE
   )
   for (fun in list(fitted_samples, posterior_samples)) {
-    fun(a, n = 3, seed = 5)
+    fun(a, n_draws = 3, seed = 5)
     expect_identical(.Random.seed, before)
   }
   d$trials[10] <- NA
@@ -379,7 +379,7 @@ test_that("binomial trials, supplied weights and RNG state stay aligned", {
     "one value per prediction row"
   )
   expect_error(
-    posterior_samples(a, data = d, weights = c(1, 2)),
+    posterior_samples(a, data = d, weights = c(1, 2), n_draws = 1L),
     "one value per prediction row"
   )
 })
@@ -412,7 +412,7 @@ test_that("scam missing rows follow its supported NA option", {
   expect_silent(x <- simulate(m, nsim = 2, seed = 1))
   expect_equal(NROW(x), 60)
   expect_true(all(is.na(as.matrix(x[c(1, 30, 60), ]))))
-  expect_silent(x <- fitted_samples(m, n = 2, seed = 1))
+  expect_silent(x <- fitted_samples(m, n_draws = 2, seed = 1))
   expect_equal(NROW(x), 120)
 })
 
@@ -423,16 +423,16 @@ test_that("one evaluable row does not change draw ordering or weight alignment",
   m <- gam(y ~ s(x, k = 5), data = d)
   nd <- data.frame(x = c(NA, 0.5, NA))
   for (fun in list(fitted_samples, posterior_samples)) {
-    expect_silent(x <- fun(m, data = nd, n = 3, seed = 3))
+    expect_silent(x <- fun(m, data = nd, n_draws = 3, seed = 3))
     expect_identical(x$.row, rep(1:3, 3))
     expect_identical(x$.draw, rep(1:3, each = 3))
   }
-  x <- posterior_samples(m, data = nd, weights = c(1, 4, 9), n = 3, seed = 3)
+  x <- posterior_samples(m, data = nd, weights = c(1, 4, 9), n_draws = 3, seed = 3)
   y <- posterior_samples(
     m,
     data = nd[2, , drop = FALSE],
     weights = 4,
-    n = 3,
+    n_draws = 3,
     seed = 3
   )
   expect_equal(x$.response[x$.row == 2], y$.response)

@@ -18,44 +18,53 @@ post_draws(model, ...)
 
 \method{post_draws}{default}(
   model,
-  n,
+  ...,
+  n_draws = NULL,
+  chains = NULL,
+  seed = NULL,
   method = c("gaussian", "mh", "inla", "user"),
-  mu = NULL,
-  sigma = NULL,
   n_cores = 1L,
+  n_threads = 1L,
   burnin = 1000,
-  thin = 1,
+  thin = 1L,
   t_df = 40,
   rw_scale = 0.25,
-  index = NULL,
   frequentist = FALSE,
   unconditional = FALSE,
-  parametrized = TRUE,
-  mvn_method = c("mvnfast", "mgcv"),
   draws = NULL,
-  seed = NULL,
-  ...
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia"),
+  mvn_method = c("mvnfast", "mgcv"),
+  block_size = 10000L,
+  dense_limit = 5e+06,
+  index = NULL,
+  parametrized = TRUE
 )
 
 generate_draws(model, ...)
 
 \method{generate_draws}{gam}(
   model,
-  n,
-  method = c("gaussian", "mh", "inla"),
-  mu = NULL,
-  sigma = NULL,
+  ...,
+  n_draws = NULL,
+  chains = NULL,
+  seed = NULL,
+  method = c("gaussian", "mh", "inla", "user"),
   n_cores = 1L,
+  n_threads = 1L,
   burnin = 1000,
-  thin = 1,
+  thin = 1L,
   t_df = 40,
   rw_scale = 0.25,
-  index = NULL,
   frequentist = FALSE,
   unconditional = FALSE,
+  draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia"),
   mvn_method = c("mvnfast", "mgcv"),
-  seed = NULL,
-  ...
+  block_size = 10000L,
+  dense_limit = 5e+06,
+  index = NULL
 )
 }
 \arguments{
@@ -65,7 +74,16 @@ classes. See \link{gamm4_support} for sampling from gamm4 fits.}
 
 \item{...}{arguments passed to methods.}
 
-\item{n}{numeric; the number of posterior draws to take.}
+\item{n_draws}{positive integer; total retained draws across all chains.
+Required when generating draws. With \code{method = "user"}, the supplied
+matrix determines the count; an explicit count must agree with its rows.}
+
+\item{chains}{positive integer or \code{NULL}; number of chains. \code{NULL} uses one
+chain, or the chain mapping in supplied draws. \code{n_draws} must be divisible by
+\code{chains}. Burn-in is applied separately to each MH chain.}
+
+\item{seed}{numeric or \code{NULL}; seed for the complete sampling operation.
+An explicit seed restores the caller's random-number state on exit.}
 
 \item{method}{character; which algorithm to use to sample from the posterior.
 Currently implemented methods are: \code{"gaussian"} and \code{"mh"}. \code{"gaussian"}
@@ -76,29 +94,23 @@ posterior, with random walk proposals. Note, setting \code{t_df} to a low value
 will result in heavier-tailed statistic proposals. See \code{mgcv::gam.mh()}
 for more details.}
 
-\item{mu}{numeric; user-supplied mean vector (vector of model coefficients).
-Currently ignored.}
+\item{n_cores}{positive integer; maximum concurrent MH chains using mirai,
+capped at \code{chains}. Existing workers are reused; otherwise temporary workers
+are created and cleaned up. Only used by \code{method = "mh"}.}
 
-\item{sigma}{matrix; user-supplied covariance matrix for \code{mu}. Currently
-ignored.}
-
-\item{n_cores}{integer; number of CPU cores to use when generating
-multivariate normal distributed random values. Only used if
-\code{mvn_method = "mvnfast"} \strong{and} \code{method = "gaussian"}.}
+\item{n_threads}{positive integer; threads within Gaussian sampling using
+mvnfast. Defaults to one. This is separate from concurrent MH chains.}
 
 \item{burnin}{numeric; the length of any initial burn in period to discard.
 See \code{mgcv::gam.mh()}.}
 
-\item{thin}{numeric; retain only \code{thin} samples. See \code{mgcv::gam.mh()}.}
+\item{thin}{positive integer; retain every \code{thin} iterations after burn-in.}
 
 \item{t_df}{numeric; degrees of freedom for static multivariate \emph{t} proposal.
 See \code{mgcv::gam.mh()}.}
 
 \item{rw_scale}{numeric; factor by which to scale posterior covariance
 matrix when generating random walk proposals. See \code{mgcv::gam.mh()}.}
-
-\item{index}{numeric; vector of indices of coefficients to use. Can be used
-to subset the mean vector and covariance matrix extracted from \code{model}.}
 
 \item{frequentist}{logical; if \code{TRUE}, the frequentist covariance matrix of
 the parameter estimates is used. If \code{FALSE}, the Bayesian posterior
@@ -109,9 +121,15 @@ uncertainty corrected covariance matrix is used, \emph{if available} for
 \code{model}. See \code{mgcv::vcov.gam()}.
 SCAM models do not support this correction; use \code{unconditional = FALSE}.}
 
-\item{parametrized}{logical; use parametrized coefficients and covariance
-matrix, which respect the linear inequality constraints of the model. Only
-for \code{scam::scam()} model fits.}
+\item{draws}{matrix; user supplied posterior draws to be used when
+\code{method = "user"}.}
+
+\item{diagnostics}{logical; calculate coefficient R-hat, effective sample
+sizes, and Monte Carlo standard errors using the optional posterior package.}
+
+\item{mh_backend}{character; \code{"mgcv"} preserves \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.
+\code{"gratia"} uses the common-family evaluator and also supports independent
+observation bam fits. Both hold smoothing, scale, and family parameters fixed.}
 
 \item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
 uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
@@ -119,17 +137,44 @@ numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
 for some marginal fits, such as those where the covariance matrix is close
 to singular.}
 
-\item{draws}{matrix; user supplied posterior draws to be used when
-\code{method = "user"}.}
+\item{block_size}{positive integer; maximum observation rows per block in the
+gratia MH evaluator. Large designs are evaluated without storing a full matrix.}
 
-\item{seed}{numeric; the random seed to use. If \code{NULL}, a random seed will
-be generated without affecting the current state of R's RNG.}
+\item{dense_limit}{numeric; maximum number of design-matrix elements to cache
+for the gratia MH backend. Use zero to force blockwise evaluation.}
+
+\item{index}{numeric; vector of indices of coefficients to use. Can be used
+to subset the mean vector and covariance matrix extracted from \code{model}.}
+
+\item{parametrized}{logical; use parametrized coefficients and covariance
+matrix, which respect the linear inequality constraints of the model. Only
+for \code{scam::scam()} model fits.}
 }
 \description{
 Low-level Functions to generate draws from the posterior distribution of
 model coefficients
 
 Generate posterior draws from a fitted model
+}
+\details{
+Sampling controls must be named. Removed arguments produce migration errors;
+see \code{vignette("sampling-migration")}. Explicit controls that the selected
+method cannot use are rejected.
+
+For multiple chains, \code{n_draws} is the total retained count and must be divisible
+by \code{chains}. Coefficient matrices carry a chain mapping; use
+\code{\link[=as_mcmc_draws]{as_mcmc_draws()}} before ordinary matrix operations remove that mapping.
+Higher-level sampling tables include \code{.chain} and \code{.iteration} for multiple
+chains, with \code{.draw} unique across chains. Default single-chain table columns
+are unchanged. Use \code{\link[=sampling_diagnostics]{sampling_diagnostics()}} to extract coefficient diagnostics
+before response simulation adds further noise.
+
+The gratia MH backend supports Gaussian identity, Poisson log, binomial
+logit, Gamma log, and negative binomial log fits. It evaluates the fitted
+bases at original covariates, including for discrete bam fits. GAMM components, AR1 dependence,
+\code{paraPen}, \code{H}, and fits made from pre-fit \code{G} objects are unsupported. Both MH backends sample the
+conditional coefficient posterior with fitted smoothing, dispersion, and
+family parameters fixed. \code{unconditional} applies to Gaussian draws only.
 }
 \seealso{
 \link{gamm4_support}

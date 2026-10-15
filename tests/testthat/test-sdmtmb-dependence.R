@@ -171,12 +171,12 @@ test_that("PPC parameter draws do not add a second fitted-field draw", {
     matrix(rep(p, n), nrow = n, byrow = TRUE)
   })
   for (conditioning in c("conditional", "marginal")) {
-    samples <- posterior_samples(m, n = 1, seed = 7, conditioning = conditioning)
+    samples <- posterior_samples(m, n_draws = 1, seed = 7, conditioning = conditioning)
     plugin <- sdmtmb_diagnostic_model(m, conditioning, field_method = "mle-eb")
     expected <- withr::with_seed(7, plugin$distribution$rd())
     expect_equal(samples$.response, expected)
   }
-  expect_error(posterior_samples(m, n = 1, field_method = "mle-mvn"),
+  expect_error(posterior_samples(m, n_draws = 1, field_method = "mle-mvn"),
     "selects residual diagnostics")
 })
 
@@ -213,6 +213,6 @@ test_that("marginal PPC rejects latent blocks outside verified native simulation
   skip_if_not_installed("sdmTMB")
   m <- sdmtmb_dependence_state(iid = TRUE)
   testthat::local_mocked_bindings(sdmtmb_random_tags = function(model) "unverified_effect")
-  expect_error(posterior_samples(m, n = 1, conditioning = "marginal"),
+  expect_error(posterior_samples(m, n_draws = 1, conditioning = "marginal"),
     "Marginal posterior predictive simulation is unavailable:.*unverified_effect")
 })

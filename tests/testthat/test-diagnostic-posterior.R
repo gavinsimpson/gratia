@@ -3,7 +3,7 @@ test_that("ordinary posterior diagnostics respect weights, trials and offsets", 
   d <- data.frame(x = runif(120), wt = rep(c(1, 4), 60), off = runif(120))
   d$y <- 2 + d$x + d$off + rnorm(120, sd = 0.5 / sqrt(d$wt))
   m <- lm(y ~ x + offset(off), data = d, weights = wt)
-  sims <- posterior_samples(m, n = 400, seed = 3)
+  sims <- posterior_samples(m, n_draws = 400, seed = 3)
   values <- matrix(sims$.response, nrow = nrow(d))
   expect_lt(max(abs(rowMeans(values) - fitted(m))), 0.2)
   deviations <- sweep(values, 1L, fitted(m))
@@ -45,7 +45,7 @@ test_that("streamed PPC summaries equal retained draws for every batch size", {
 test_that("new coefficient adapters preserve absent and existing RNG state", {
   withr::local_seed(33)
   before <- .Random.seed
-  posterior_samples(m_lm, n = 3, seed = 2)
+  posterior_samples(m_lm, n_draws = 3, seed = 2)
   expect_identical(.Random.seed, before)
   posterior_predictive_plot(m_lm, n = 3, seed = 2, scalable = TRUE)
   expect_identical(.Random.seed, before)
@@ -150,7 +150,7 @@ test_that("GAM posterior checks retain fitting-argument offsets", {
   d$y <- 1 + d$x + d$off + rnorm(80, sd = 0.3)
   m <- mgcv::gam(y ~ s(x, k = 5), data = d, offset = off)
   m$Vp[] <- 0
-  samples <- posterior_samples(m, n = 1, seed = 11, mvn_method = "mgcv")
+  samples <- posterior_samples(m, n_draws = 1, seed = 11, mvn_method = "mgcv")
   expected <- withr::with_seed(11, {
     sample.int(.Machine$integer.max, 1L)
     rnorm(nrow(d), mean = fitted(m), sd = sqrt(m$sig2))
@@ -184,7 +184,7 @@ test_that("streamed discrete summaries bound very large response support", {
 
 test_that("new posterior samplers retain matrix dimensions for one draw", {
   for (m in list(m_lm, m_glm)) {
-    samples <- posterior_samples(m, n = 1L, seed = 2)
+    samples <- posterior_samples(m, n_draws = 1L, seed = 2)
     expect_equal(nrow(samples), nrow(model.frame(m)))
     expect_equal(unique(samples$.draw), 1L)
     expect_silent(ggplot2::ggplot_build(posterior_predictive_plot(m, n = 1, seed = 2)))
@@ -194,12 +194,12 @@ test_that("new posterior samplers retain matrix dimensions for one draw", {
 
 test_that("new Gaussian posterior adapters reject unsupported requests", {
   for (m in list(m_lm, m_glm)) {
-    expect_error(posterior_samples(m, data = data.frame(x = 1)), "fitting observations")
-    expect_error(posterior_samples(m, newdata = data.frame(x = 1)), "fitting observations")
+    expect_error(posterior_samples(m, data = data.frame(x = 1), n_draws = 1L), "fitting observations")
+    expect_error(posterior_samples(m, newdata = data.frame(x = 1), n_draws = 1L), "has been removed")
     for (method in c("mh", "inla", "user")) {
-      expect_error(posterior_samples(m, method = method), "only method = 'gaussian'", fixed = TRUE)
+      expect_error(posterior_samples(m, method = method, n_draws = 1L), "only method = 'gaussian'", fixed = TRUE)
     }
-    expect_error(posterior_samples(m, draws = matrix(1)), "User coefficient draws")
+    expect_error(posterior_samples(m, n_draws = 1, draws = matrix(1)), "User coefficient draws")
   }
 })
 

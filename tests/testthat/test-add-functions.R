@@ -184,7 +184,7 @@ test_that("add_sizer smooth_estimates method works", {
 ## add  methods for posterior samplers
 test_that("add_fitted_samples works", {
   expect_silent(fs <- quick_eg1 |>
-    add_fitted_samples(m_gam, seed = 2, n = 2))
+    add_fitted_samples(m_gam, seed = 2, n_draws = 2))
   expect_identical(nrow(fs), 600L) # 300 data by 2 samples
   expect_named(fs, c(names(quick_eg1), ".row", ".draw", ".parameter", ".fitted"))
   expect_snapshot(print(fs))
@@ -192,7 +192,7 @@ test_that("add_fitted_samples works", {
 
 test_that("add_predicted_samples works", {
   expect_silent(ps <- quick_eg1 |>
-    add_predicted_samples(m_gam, seed = 2, n = 2))
+    add_predicted_samples(m_gam, seed = 2, n_draws = 2))
   expect_identical(nrow(ps), 600L) # 300 data by 2 samples
   expect_named(ps, c(names(quick_eg1), ".row", ".draw", ".response"))
   expect_snapshot(print(ps))
@@ -200,7 +200,7 @@ test_that("add_predicted_samples works", {
 
 test_that("add_posterior_samples works", {
   expect_silent(ps <- quick_eg1 |>
-    add_posterior_samples(m_gam, seed = 2, n = 2))
+    add_posterior_samples(m_gam, seed = 2, n_draws = 2))
   expect_identical(nrow(ps), 600L) # 300 data by 2 samples
   expect_named(ps, c(names(quick_eg1), ".row", ".draw", ".response"))
   expect_snapshot(print(ps))
@@ -208,7 +208,7 @@ test_that("add_posterior_samples works", {
 
 test_that("add_smooth_samples works", {
   expect_silent(ss <- quick_eg1 |>
-    add_smooth_samples(m_gam, seed = 2, n = 2))
+    add_smooth_samples(m_gam, seed = 2, n_draws = 2))
   expect_identical(nrow(ss), 2400L) # 300 data by 4 smooths by 2 samples
   expect_named(ss, c(names(quick_eg1), ".row", ".smooth", ".term", ".draw",
     ".value"))
@@ -217,7 +217,7 @@ test_that("add_smooth_samples works", {
 
 test_that("add_smooth_samples works for selected smooth", {
   expect_silent(ss <- quick_eg1 |>
-    add_smooth_samples(m_gam, seed = 2, n = 2, select = "s(x2)"))
+    add_smooth_samples(m_gam, seed = 2, n_draws = 2, select = "s(x2)"))
   expect_identical(nrow(ss), 600L) # 300 data by 1 smooth by 2 samples
   expect_named(ss, c(names(quick_eg1), ".row", ".smooth", ".term", ".draw",
     ".value"))

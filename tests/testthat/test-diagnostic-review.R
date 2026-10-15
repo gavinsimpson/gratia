@@ -82,7 +82,7 @@ test_that("gaulss diagnostic references follow the fitted likelihood weight sema
   expect_equal(quantile_residuals(m, type = "quantile", seed = 3), (m$y - mu) / sd)
   expect_equal(withr::with_seed(3, law$rd()), withr::with_seed(3, rnorm(100, mu, sd)))
   beta <- matrix(coef(m), nrow = 1)
-  raw <- posterior_samples(m, n = 1, method = "user", draws = beta, seed = 3)
+  raw <- posterior_samples(m, n_draws = 1, method = "user", draws = beta, seed = 3)
   streamed <- withr::with_seed(3, diagnostic_posterior_sampler(m, n = 1,
     method = "user", draws = beta)(1))
   expect_equal(raw$.response, streamed$.response)

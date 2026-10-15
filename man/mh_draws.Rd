@@ -4,8 +4,7 @@
 \alias{mh_draws}
 \alias{mh_draws.gamm4}
 \alias{mh_draws.gam}
-\title{Posterior samples using a Gaussian approximation to the posterior
-distribution}
+\title{Posterior samples using Metropolis Hastings}
 \usage{
 \method{mh_draws}{gamm4}(model, ...)
 
@@ -13,13 +12,20 @@ mh_draws(model, ...)
 
 \method{mh_draws}{gam}(
   model,
-  n,
+  ...,
+  n_draws = NULL,
+  chains = NULL,
+  n_cores = 1L,
   burnin = 1000,
-  thin = 1,
+  thin = 1L,
   t_df = 40,
   rw_scale = 0.25,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia"),
+  block_size = 10000L,
+  dense_limit = 5e+06,
   index = NULL,
-  ...
+  seed = NULL
 )
 }
 \arguments{
@@ -29,12 +35,22 @@ classes. See \link{gamm4_support} for sampling from gamm4 fits.}
 
 \item{...}{arguments passed to methods.}
 
-\item{n}{numeric; the number of posterior draws to take.}
+\item{n_draws}{positive integer; total retained draws across all chains.
+Required when generating draws. With \code{method = "user"}, the supplied
+matrix determines the count; an explicit count must agree with its rows.}
+
+\item{chains}{positive integer or \code{NULL}; number of chains. \code{NULL} uses one
+chain, or the chain mapping in supplied draws. \code{n_draws} must be divisible by
+\code{chains}. Burn-in is applied separately to each MH chain.}
+
+\item{n_cores}{positive integer; maximum concurrent MH chains using mirai,
+capped at \code{chains}. Existing workers are reused; otherwise temporary workers
+are created and cleaned up. Only used by \code{method = "mh"}.}
 
 \item{burnin}{numeric; the length of any initial burn in period to discard.
 See \code{mgcv::gam.mh()}.}
 
-\item{thin}{numeric; retain only \code{thin} samples. See \code{mgcv::gam.mh()}.}
+\item{thin}{positive integer; retain every \code{thin} iterations after burn-in.}
 
 \item{t_df}{numeric; degrees of freedom for static multivariate \emph{t} proposal.
 See \code{mgcv::gam.mh()}.}
@@ -42,12 +58,27 @@ See \code{mgcv::gam.mh()}.}
 \item{rw_scale}{numeric; factor by which to scale posterior covariance
 matrix when generating random walk proposals. See \code{mgcv::gam.mh()}.}
 
+\item{diagnostics}{logical; calculate coefficient R-hat, effective sample
+sizes, and Monte Carlo standard errors using the optional posterior package.}
+
+\item{mh_backend}{character; \code{"mgcv"} preserves \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.
+\code{"gratia"} uses the common-family evaluator and also supports independent
+observation bam fits. Both hold smoothing, scale, and family parameters fixed.}
+
+\item{block_size}{positive integer; maximum observation rows per block in the
+gratia MH evaluator. Large designs are evaluated without storing a full matrix.}
+
+\item{dense_limit}{numeric; maximum number of design-matrix elements to cache
+for the gratia MH backend. Use zero to force blockwise evaluation.}
+
 \item{index}{numeric; vector of indices of coefficients to use. Can be used
 to subset the mean vector and covariance matrix extracted from \code{model}.}
+
+\item{seed}{numeric or \code{NULL}; seed for the complete sampling operation.
+An explicit seed restores the caller's random-number state on exit.}
 }
 \description{
-Posterior samples using a Gaussian approximation to the posterior
-distribution
+Posterior samples using Metropolis Hastings
 }
 \seealso{
 \link{gamm4_support}

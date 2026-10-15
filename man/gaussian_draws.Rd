@@ -5,7 +5,7 @@
 \alias{gaussian_draws.gamm4}
 \alias{gaussian_draws.gam}
 \alias{gaussian_draws.scam}
-\title{Posterior samples using a simple Metropolis Hastings sampler}
+\title{Posterior samples using a Gaussian approximation}
 \usage{
 \method{gaussian_draws}{gamm4}(model, ...)
 
@@ -13,25 +13,31 @@ gaussian_draws(model, ...)
 
 \method{gaussian_draws}{gam}(
   model,
-  n,
-  n_cores = 1L,
-  index = NULL,
+  ...,
+  n_draws = NULL,
+  n_threads = 1L,
   frequentist = FALSE,
   unconditional = FALSE,
   mvn_method = "mvnfast",
-  ...
+  index = NULL,
+  seed = NULL,
+  chains = NULL,
+  diagnostics = FALSE
 )
 
 \method{gaussian_draws}{scam}(
   model,
-  n,
-  n_cores = 1L,
-  index = NULL,
-  frequentist = FALSE,
-  parametrized = TRUE,
-  mvn_method = "mvnfast",
   ...,
-  unconditional = FALSE
+  n_draws = NULL,
+  n_threads = 1L,
+  frequentist = FALSE,
+  unconditional = FALSE,
+  mvn_method = "mvnfast",
+  index = NULL,
+  parametrized = TRUE,
+  seed = NULL,
+  chains = NULL,
+  diagnostics = FALSE
 )
 }
 \arguments{
@@ -41,14 +47,12 @@ classes. See \link{gamm4_support} for sampling from gamm4 fits.}
 
 \item{...}{arguments passed to methods.}
 
-\item{n}{numeric; the number of posterior draws to take.}
+\item{n_draws}{positive integer; total retained draws across all chains.
+Required when generating draws. With \code{method = "user"}, the supplied
+matrix determines the count; an explicit count must agree with its rows.}
 
-\item{n_cores}{integer; number of CPU cores to use when generating
-multivariate normal distributed random values. Only used if
-\code{mvn_method = "mvnfast"} \strong{and} \code{method = "gaussian"}.}
-
-\item{index}{numeric; vector of indices of coefficients to use. Can be used
-to subset the mean vector and covariance matrix extracted from \code{model}.}
+\item{n_threads}{positive integer; threads within Gaussian sampling using
+mvnfast. Defaults to one. This is separate from concurrent MH chains.}
 
 \item{frequentist}{logical; if \code{TRUE}, the frequentist covariance matrix of
 the parameter estimates is used. If \code{FALSE}, the Bayesian posterior
@@ -65,12 +69,25 @@ numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
 for some marginal fits, such as those where the covariance matrix is close
 to singular.}
 
+\item{index}{numeric; vector of indices of coefficients to use. Can be used
+to subset the mean vector and covariance matrix extracted from \code{model}.}
+
+\item{seed}{numeric or \code{NULL}; seed for the complete sampling operation.
+An explicit seed restores the caller's random-number state on exit.}
+
+\item{chains}{positive integer or \code{NULL}; number of chains. \code{NULL} uses one
+chain, or the chain mapping in supplied draws. \code{n_draws} must be divisible by
+\code{chains}. Burn-in is applied separately to each MH chain.}
+
+\item{diagnostics}{logical; calculate coefficient R-hat, effective sample
+sizes, and Monte Carlo standard errors using the optional posterior package.}
+
 \item{parametrized}{logical; use parametrized coefficients and covariance
 matrix, which respect the linear inequality constraints of the model. Only
 for \code{scam::scam()} model fits.}
 }
 \description{
-Posterior samples using a simple Metropolis Hastings sampler
+Posterior samples using a Gaussian approximation
 }
 \seealso{
 \link{gamm4_support}

@@ -80,7 +80,7 @@ test_that("gamm4 predictions and derivatives describe the population GAM", {
     expect_gamm4_equivalent(m, "response_derivatives", focal = "x", data = nd,
       n_sim = 5, seed = 11)
     expect_gamm4_equivalent(m, "derivative_samples", focal = "x", data = nd,
-      n_sim = 5, seed = 11)
+      n_draws = 5, seed = 11)
     expect_equal(add_fitted(nd, m), add_fitted(nd, m$gam))
     expect_equal(add_residuals(gamm4_data, m), add_residuals(gamm4_data, m$gam))
     component <- m$gam
@@ -108,34 +108,34 @@ test_that("Gaussian and user gamm4 posterior draws work and preserve RNG", {
     for (operation in c("posterior_samples", "fitted_samples", "predicted_samples")) {
       set.seed(112)
       old_seed <- .Random.seed
-      expect_gamm4_equivalent(m, operation, n = 3, data = nd, seed = 13,
+      expect_gamm4_equivalent(m, operation, n_draws = 3, data = nd, seed = 13,
         conditioning = if (operation == "posterior_samples") "gam_component" else NULL)
       expect_identical(.Random.seed, old_seed)
     }
-    expect_gamm4_equivalent(m, "smooth_samples", select = "s(x)", n = 3,
-      n_vals = 8, seed = 13)
-    expect_gamm4_equivalent(m, "post_draws", n = 3, seed = 13)
-    expect_gamm4_equivalent(m, "generate_draws", n = 3, seed = 13)
+    expect_gamm4_equivalent(m, "smooth_samples", select = "s(x)", n_draws = 3,
+      n_grid = 8, seed = 13)
+    expect_gamm4_equivalent(m, "post_draws", n_draws = 3, seed = 13)
+    expect_gamm4_equivalent(m, "generate_draws", n_draws = 3, seed = 13)
     for (engine in c("mgcv", "mvnfast")) {
-      a <- withr::with_seed(14, gaussian_draws(m, n = 3, mvn_method = engine))
-      b <- withr::with_seed(14, gaussian_draws(m$gam, n = 3, mvn_method = engine))
+      a <- withr::with_seed(14, gaussian_draws(m, n_draws = 3, mvn_method = engine))
+      b <- withr::with_seed(14, gaussian_draws(m$gam, n_draws = 3, mvn_method = engine))
       expect_equal(a, b)
       expect_equal(dim(a), c(3L, length(coef(m$gam))))
     }
     draws <- rbind(coef(m$gam), coef(m$gam) + 0.01)
-    expect_equal(user_draws(m, draws, index = 1:2), draws[, 1:2])
-    expect_equal(post_draws(m, n = 2, method = "user", draws = draws), draws)
-    expect_gamm4_equivalent(m, "fitted_samples", n = 2, data = nd,
+    expect_equal(user_draws(m, draws = draws, index = 1:2), draws[, 1:2])
+    expect_equal(post_draws(m, n_draws = 2, method = "user", draws = draws), draws)
+    expect_gamm4_equivalent(m, "fitted_samples", n_draws = 2, data = nd,
       method = "user", draws = draws)
-    expect_gamm4_equivalent(m, "smooth_samples", n = 2, n_vals = 8,
+    expect_gamm4_equivalent(m, "smooth_samples", n_draws = 2, n_grid = 8,
       method = "user", draws = draws)
-    expect_error(user_draws(m, draws[, 1:2]), "number of model coefficients")
-    expect_error(user_draws(m, as.vector(draws)), "not a matrix")
-    expect_error(mh_draws(m, n = 2), "not supported for gamm4")
+    expect_error(user_draws(m, draws = draws[, 1:2]), "number of model coefficients")
+    expect_error(user_draws(m, draws = as.vector(draws)), "not a matrix")
+    expect_error(mh_draws(m, n_draws = 2), "not supported for gamm4")
     for (operation in c("post_draws", "generate_draws", "posterior_samples",
       "fitted_samples", "smooth_samples")) {
       fun <- get(operation, asNamespace("gratia"))
-      expect_error(do.call(fun, c(list(m, n = 2, method = "mh"),
+      expect_error(do.call(fun, c(list(m, n_draws = 2, method = "mh"),
         if (operation == "posterior_samples") list(conditioning = "gam_component"))),
         "not supported for gamm4")
     }
@@ -147,11 +147,11 @@ test_that("actual gamm4 draws tolerate rank-deficient covariance", {
   # Retain a fitted gamm4 model; make one covariance direction exactly null.
   m$gam$Vp[nrow(m$gam$Vp), ] <- 0
   m$gam$Vp[, ncol(m$gam$Vp)] <- 0
-  expect_warning(a <- post_draws(m, n = 5, seed = 13), "Cholesky decomposition")
+  expect_warning(a <- post_draws(m, n_draws = 5, seed = 13), "Cholesky decomposition")
   expect_true(all(is.finite(a)))
   expect_equal(a[, ncol(a)], rep(tail(coef(m$gam), 1), 5), ignore_attr = TRUE)
-  expect_equal(a, post_draws(m, n = 5, seed = 13, mvn_method = "mgcv"))
-  expect_warning(posterior_samples(m, n = 2, data = gamm4_data[1:4, ], seed = 13,
+  expect_equal(a, post_draws(m, n_draws = 5, seed = 13, mvn_method = "mgcv"))
+  expect_warning(posterior_samples(m, n_draws = 2, data = gamm4_data[1:4, ], seed = 13,
       conditioning = "gam_component"),
     "Cholesky decomposition")
 })
@@ -208,7 +208,7 @@ test_that("weighted gamm4 fits preserve excluded and subset rows", {
   expect_equal(nrow(fitted_values(m)), 160L)
   expect_true(all(is.na(fitted_values(m)$.fitted[c(8, 14)])))
   for (operation in c("posterior_samples", "fitted_samples", "predicted_samples")) {
-    ans <- expect_gamm4_equivalent(m, operation, n = 3, seed = 14,
+    ans <- expect_gamm4_equivalent(m, operation, n_draws = 3, seed = 14,
       conditioning = if (operation == "posterior_samples") "gam_component" else NULL)
     expect_equal(nrow(ans), 480L)
     val <- intersect(c(".fitted", ".response"), names(ans))
@@ -222,7 +222,7 @@ test_that("weighted gamm4 fits preserve excluded and subset rows", {
   nd$x[3] <- NA_real_
   for (operation in c("fitted_values", "posterior_samples", "fitted_samples", "predicted_samples")) {
     fun <- get(operation, asNamespace("gratia"))
-    args <- if (operation == "fitted_values") list() else list(n = 2, seed = 14)
+    args <- if (operation == "fitted_values") list() else list(n_draws = 2, seed = 14)
     expect_equal(do.call(fun, c(list(m, data = nd), args,
       if (operation == "posterior_samples") list(conditioning = "gam_component"))),
       do.call(fun, c(list(m$gam, data = nd), args)))
@@ -246,7 +246,7 @@ test_that("gamm4 estimates and user draws agree with prediction algebra", {
     expect_equal(fit$.fitted, eta, ignore_attr = TRUE)
     expect_equal(fit$.se, sqrt(rowSums((X %*% m$gam$Vp) * X)), ignore_attr = TRUE)
     draws <- rbind(beta, beta + 0.05)
-    sample <- fitted_samples(m, n = 2, data = nd, method = "user", draws = draws)
+    sample <- fitted_samples(m, n_draws = 2, data = nd, method = "user", draws = draws)
     expected <- family(m)$linkinv(sweep(X %*% t(draws), 1L, offset, "+"))
     expect_equal(sample$.fitted, as.vector(expected))
     d <- derivatives(m, select = "s(x)", data = nd, type = "central", eps = 1e-5)
@@ -288,7 +288,7 @@ test_that("gamm4 family-specific utilities keep useful unsupported errors", {
     expect_error(theta(m), "No additional parameters")
     expect_error(nb_theta(m), "Only negative binomial")
   }
-  expect_error(posterior_samples(unclass(gamm4_gaussian)), "Don't know how to sample")
+  expect_error(posterior_samples(unclass(gamm4_gaussian), n_draws = 1L), "Don't know how to sample")
   expect_error(fitted_values(unclass(gamm4_gaussian)), "no applicable method")
 })
 

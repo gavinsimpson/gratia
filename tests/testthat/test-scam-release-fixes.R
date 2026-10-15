@@ -145,14 +145,12 @@ test_that("SCAM smoothing-parameter uncertainty is rejected consistently", {
     function() smooth_estimates(model, unconditional = TRUE),
     function() draw(model, unconditional = TRUE),
     function() fitted_values(model, data = nd, unconditional = TRUE),
-    function() gaussian_draws(model, n = 2, unconditional = TRUE),
-    function() post_draws(model, n = 2, unconditional = TRUE),
-    function() post_draws(model, n = 2, method = "user", unconditional = TRUE),
-    function() fitted_samples(model, n = 2, unconditional = TRUE),
-    function() predicted_samples(model, n = 2, unconditional = TRUE),
-    function() posterior_samples(model, n = 2, unconditional = TRUE),
-    function() smooth_samples(model, n = 2, unconditional = TRUE),
-    function() derivative_samples(model, focal = "x", n_sim = 2, unconditional = TRUE),
+    function() gaussian_draws(model, n_draws = 2, unconditional = TRUE),
+    function() post_draws(model, n_draws = 2, unconditional = TRUE),
+    function() fitted_samples(model, n_draws = 2, unconditional = TRUE),
+    function() posterior_samples(model, n_draws = 2, unconditional = TRUE),
+    function() smooth_samples(model, n_draws = 2, unconditional = TRUE),
+    function() derivative_samples(model, focal = "x", n_draws = 2, unconditional = TRUE),
     function() response_derivatives(model, focal = "x", n_sim = 2, unconditional = TRUE),
     function() response_derivatives(model, focal = "x", uncertainty = "delta",
       unconditional = TRUE),
@@ -162,6 +160,10 @@ test_that("SCAM smoothing-parameter uncertainty is rejected consistently", {
       unconditional = TRUE)
   )
   for (operation in operations) expect_error(operation(), message, fixed = TRUE)
+  expect_error(post_draws(model, n_draws = 2, method = "user", unconditional = TRUE),
+    "unconditional.*not used")
+  expect_error(predicted_samples(model, n_draws = 2, unconditional = TRUE),
+    "fitted parameters")
 })
 
 test_that("SCAM posterior predictive plots report the scalable limitation", {

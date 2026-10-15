@@ -556,6 +556,7 @@ export(add_sizer)
 export(add_smooth_samples)
 export(all_levels)
 export(appraise)
+export(as_mcmc_draws)
 export(assemble)
 export(basis)
 export(basis_size)
@@ -645,6 +646,7 @@ export(residuals_linpred_plot)
 export(response_derivatives)
 export(rootogram)
 export(rtw)
+export(sampling_diagnostics)
 export(scalable_observed_fitted_plot)
 export(scalable_qq_plot)
 export(scalable_residuals_hist_plot)
@@ -678,6 +680,7 @@ export(variance_comp)
 export(vars_from_label)
 export(which_smooths)
 export(worm_plot)
+importFrom(Rcpp,evalCpp)
 importFrom(cli,
   cli_abort,
   cli_alert_info,
@@ -952,3 +955,4 @@ importFrom(withr,
   with_preserve_seed,
   with_seed
 )
+useDynLib(gratia, .registration = TRUE)

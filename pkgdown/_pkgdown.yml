@@ -54,6 +54,7 @@ articles:
       - articles/data-slices
       - articles/custom-plotting
       - articles/posterior-simulation
+      - sampling-migration
 
 reference:
   - title: Plot models and effects
@@ -177,6 +178,8 @@ reference:
       - fitted_samples
       - predicted_samples
       - derivative_samples
+      - as_mcmc_draws
+      - sampling_diagnostics
       - simulate.gam
       - add_fitted_samples
 

@@ -444,7 +444,7 @@ test_that("transform_fun works for smooth_estimates with constant", {
 })
 
 test_that("transform_fun works for smooth_samples with constant", {
-  expect_silent(sm <- smooth_samples(m_gam, select = "s(x1)", n = 5))
+  expect_silent(sm <- smooth_samples(m_gam, select = "s(x1)", n_draws = 5))
   expect_silent(sm <- transform_fun(sm, fun = exp, constant = coef(m_gam)[1]))
 })
 

@@ -40,7 +40,7 @@ test_that("response simulation calibrates paired draws about the fitted differen
   f <- conditional_difference_fixture(poisson())
   m <- f$model
   # Shift the supplied draws to distinguish the fitted centre from their mean.
-  betas <- generate_draws(m, n = 501, seed = 4, mvn_method = "mgcv")
+  betas <- generate_draws(m, n_draws = 501, seed = 4, mvn_method = "mgcv")
   betas[, 1] <- betas[, 1] + 0.3
   for (scale in c("link", "response")) {
     cd <- conditional_differences(m, "a", c("x", "b"), scale = scale,
@@ -209,7 +209,7 @@ test_that("response bands cover an independent batch of posterior curves", {
       uncertainty = "simulation", interval = "simultaneous",
       simultaneous_scope = scope, n_sim = 4000, seed = 21, mvn_method = "mgcv")
     ep <- conditional_difference_endpoints(cd, m)
-    betas <- generate_draws(m, n = 4000, seed = 98, mvn_method = "mgcv")
+    betas <- generate_draws(m, n_draws = 4000, seed = 98, mvn_method = "mgcv")
     ds <- exp(predict(m, ep$a, type = "lpmatrix") %*% t(betas) + log(ep$a$exposure)) -
       exp(predict(m, ep$b, type = "lpmatrix") %*% t(betas) + log(ep$b$exposure))
     groups <- if (scope == "all") list(seq_len(nrow(cd))) else split(seq_len(nrow(cd)), cd$.contrast)

@@ -7,23 +7,38 @@
 \alias{user_draws.scam}
 \title{Handle user-supplied posterior draws}
 \usage{
-\method{user_draws}{gamm4}(model, draws, ...)
+\method{user_draws}{gamm4}(model, ..., draws, n_draws = NULL, chains = NULL)
 
-user_draws(model, draws, ...)
+user_draws(model, ..., draws)
 
-\method{user_draws}{gam}(model, draws, index = NULL, ...)
+\method{user_draws}{gam}(model, ..., n_draws = NULL, chains = NULL, draws, index = NULL)
 
-\method{user_draws}{scam}(model, draws, ...)
+\method{user_draws}{scam}(
+  model,
+  ...,
+  draws = NULL,
+  n_draws = NULL,
+  chains = NULL,
+  index = NULL
+)
 }
 \arguments{
 \item{model}{a fitted model from \code{\link[mgcv:gam]{mgcv::gam()}}, \code{\link[mgcv:bam]{mgcv::bam()}},
 \code{\link[scam:scam]{scam::scam()}}, or \code{\link[gamm4:gamm4]{gamm4::gamm4()}}, or a model inheriting from these
 classes. See \link{gamm4_support} for sampling from gamm4 fits.}
 
+\item{...}{arguments passed to methods.}
+
 \item{draws}{matrix; user supplied posterior draws to be used when
 \code{method = "user"}.}
 
-\item{...}{arguments passed to methods.}
+\item{n_draws}{positive integer; total retained draws across all chains.
+Required when generating draws. With \code{method = "user"}, the supplied
+matrix determines the count; an explicit count must agree with its rows.}
+
+\item{chains}{positive integer or \code{NULL}; number of chains. \code{NULL} uses one
+chain, or the chain mapping in supplied draws. \code{n_draws} must be divisible by
+\code{chains}. Burn-in is applied separately to each MH chain.}
 
 \item{index}{a vector to index (subset) the columns of \code{draws}.}
 }

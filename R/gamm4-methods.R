@@ -299,8 +299,12 @@ response_derivatives.gamm4 <- function(object, ...) {
 #' @rdname derivative_samples
 #' @name derivative_samples
 #' @aliases derivative_samples.gamm4
-derivative_samples.gamm4 <- function(object, ...) {
-  derivative_samples.gam(gamm4_gam(object), ...)
+derivative_samples.gamm4 <- function(
+    model,
+    ...) {
+  sampling_check_names(substitute(list(...)), derivative = TRUE)
+
+  derivative_samples.gam(gamm4_gam(model), ...)
 }
 
 #' @seealso [gamm4_support]
@@ -308,12 +312,19 @@ derivative_samples.gamm4 <- function(object, ...) {
 #' @rdname posterior_samples
 #' @name posterior_samples
 #' @aliases posterior_samples.gamm4
-posterior_samples.gamm4 <- function(model, n = 1L, seed = NULL, ...,
-                                      conditioning = NULL) {
+posterior_samples.gamm4 <- function(
+    model,
+    ...,
+    n_draws = NULL,
+    seed = NULL,
+    conditioning = NULL) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
   conditioning <- mixed_conditioning(model, conditioning)
   if (conditioning == "gam_component")
-    return(posterior_samples.gam(gamm4_gam(model), n = n, seed = seed, ...))
-  diagnostic_posterior_samples.default(model, n, seed,
+    return(posterior_samples.gam(gamm4_gam(model), n_draws = n_draws, seed = seed, ...))
+  layout <- sampling_resolve(n_draws, NULL, NULL, method = "gaussian")
+  n_draws <- layout$n_draws
+  diagnostic_posterior_samples.default(model, n_draws, seed,
     conditioning = conditioning, ...)
 }
 
@@ -322,7 +333,11 @@ posterior_samples.gamm4 <- function(model, n = 1L, seed = NULL, ...,
 #' @rdname fitted_samples
 #' @name fitted_samples
 #' @aliases fitted_samples.gamm4
-fitted_samples.gamm4 <- function(model, ...) {
+fitted_samples.gamm4 <- function(
+    model,
+    ...) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+
   fitted_samples.gam(gamm4_gam(model), ...)
 }
 
@@ -331,7 +346,11 @@ fitted_samples.gamm4 <- function(model, ...) {
 #' @rdname predicted_samples
 #' @name predicted_samples
 #' @aliases predicted_samples.gamm4
-predicted_samples.gamm4 <- function(model, ...) {
+predicted_samples.gamm4 <- function(
+    model,
+    ...) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+
   predicted_samples.gam(gamm4_gam(model), ...)
 }
 
@@ -340,7 +359,11 @@ predicted_samples.gamm4 <- function(model, ...) {
 #' @rdname smooth_samples
 #' @name smooth_samples
 #' @aliases smooth_samples.gamm4
-smooth_samples.gamm4 <- function(model, ...) {
+smooth_samples.gamm4 <- function(
+    model,
+    ...) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+
   smooth_samples.gam(gamm4_gam(model), ...)
 }
 
@@ -349,7 +372,11 @@ smooth_samples.gamm4 <- function(model, ...) {
 #' @rdname gaussian_draws
 #' @name gaussian_draws
 #' @aliases gaussian_draws.gamm4
-gaussian_draws.gamm4 <- function(model, ...) {
+gaussian_draws.gamm4 <- function(
+    model,
+    ...) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE, gaussian = TRUE)
+
   gaussian_draws.gam(gamm4_gam(model), ...)
 }
 
@@ -358,7 +385,17 @@ gaussian_draws.gamm4 <- function(model, ...) {
 #' @rdname user_draws
 #' @name user_draws
 #' @aliases user_draws.gamm4
-user_draws.gamm4 <- function(model, draws, ...) {
+user_draws.gamm4 <- function(
+    model,
+    ...,
+    draws,
+    n_draws = NULL,
+    chains = NULL) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  layout <- sampling_resolve(n_draws, chains, draws, method = "user")
+  n_draws <- layout$n_draws
+  chains <- layout$chains
+
   user_draws.gam(gamm4_gam(model), draws = draws, ...)
 }
 
@@ -367,7 +404,11 @@ user_draws.gamm4 <- function(model, draws, ...) {
 #' @rdname post_draws
 #' @name post_draws
 #' @aliases generate_draws.gamm4
-generate_draws.gamm4 <- function(model, ...) {
+generate_draws.gamm4 <- function(
+    model,
+    ...) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+
   generate_draws.gam(gamm4_gam(model), ...)
 }
 
@@ -480,7 +521,11 @@ nb_theta.gamm4 <- function(model) {
 #' @rdname post_draws
 #' @name post_draws
 #' @aliases post_draws.gamm4
-post_draws.gamm4 <- function(model, ...) {
+post_draws.gamm4 <- function(
+    model,
+    ...) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+
   post_draws.default(gamm4_gam(model), ...)
 }
 
@@ -544,7 +589,11 @@ simulate.gamm4 <- function(object, nsim = 1, seed = NULL,
 #' @rdname mh_draws
 #' @name mh_draws
 #' @aliases mh_draws.gamm4
-mh_draws.gamm4 <- function(model, ...) {
+mh_draws.gamm4 <- function(
+    model,
+    ...) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+
   mh_draws.gam(gamm4_gam(model), ...)
 }
 

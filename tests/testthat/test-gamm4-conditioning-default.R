@@ -27,8 +27,8 @@ test_that("gamm4 diagnostic defaults use the full conditional response law", {
 
 test_that("gamm4 posterior defaults preserve fitted-effect uncertainty across plot modes", {
   for (model in list(gamm4_gaussian, gamm4_binomial, gamm4_poisson, gamm4_missing)) {
-    raw <- posterior_samples(model, n = 3L, seed = 17)
-    expect_equal(raw, posterior_samples(model, n = 3L, seed = 17,
+    raw <- posterior_samples(model, n_draws = 3L, seed = 17)
+    expect_equal(raw, posterior_samples(model, n_draws = 3L, seed = 17,
       conditioning = "conditional"))
     observed <- diagnostic_posterior_observed(model)
     expect_equal(observed, diagnostic_posterior_observed(model, conditioning = "conditional"))
@@ -46,15 +46,15 @@ test_that("gamm4 posterior defaults preserve fitted-effect uncertainty across pl
       expect_equal(appraisal$data, default$data)
       expect_equal(lapply(appraisal$layers, `[[`, "data"), lapply(default$layers, `[[`, "data"))
     }
-    expect_equal(posterior_samples(model, n = 3L, seed = 17, conditioning = "gam_component"),
-      posterior_samples(gamm4_gam(model), n = 3L, seed = 17))
+    expect_equal(posterior_samples(model, n_draws = 3L, seed = 17, conditioning = "gam_component"),
+      posterior_samples(gamm4_gam(model), n_draws = 3L, seed = 17))
     expect_equal(posterior_predictive_plot(model, n = 3L, seed = 17,
       conditioning = "gam_component")$data,
       posterior_predictive_plot(gamm4_gam(model), n = 3L, seed = 17)$data)
-    expect_error(posterior_samples(model, data = gamm4_data[1:3, ]), "fitting observations")
+    expect_error(posterior_samples(model, data = gamm4_data[1:3, ], n_draws = 1L), "fitting observations")
     beta <- matrix(coef(model$gam), nrow = 1)
-    expect_equal(posterior_samples(model, n = 1L, seed = 17, method = "user", draws = beta,
-      conditioning = "gam_component"), posterior_samples(gamm4_gam(model), n = 1L,
+    expect_equal(posterior_samples(model, n_draws = 1L, seed = 17, method = "user", draws = beta,
+      conditioning = "gam_component"), posterior_samples(gamm4_gam(model), n_draws = 1L,
         seed = 17, method = "user", draws = beta))
   }
 })

@@ -466,8 +466,8 @@ cod_summaries <- function(x) {
   c(proportion_zero = mean(x == 0), density_95th = unname(quantile(x, 0.95)))
 }
 observed_summary <- cod_summaries(cod$density)
-conditional_draws <- posterior_samples(cod_fit, n = 25, seed = 1405)
-marginal_draws <- posterior_samples(cod_fit, n = 25,
+conditional_draws <- posterior_samples(cod_fit, n_draws = 25, seed = 1405)
+marginal_draws <- posterior_samples(cod_fit, n_draws = 25,
   conditioning = "marginal", seed = 1405)
 
 summarise_draws <- function(x, description) {

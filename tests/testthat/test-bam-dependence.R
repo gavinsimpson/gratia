@@ -54,7 +54,7 @@ test_that("discrete nonGaussian and extended-family BAM retain marginal diagnost
     expect_false("lower" %in% names(p$data))
     expect_error(qq_plot(model, method = "simulate"), "Joint response")
     expect_error(simulate(model, nsim = 2), "does not define a joint")
-    expect_error(posterior_samples(model, n = 2), "does not define a joint")
+    expect_error(posterior_samples(model, n_draws = 2), "does not define a joint")
     expect_error(posterior_predictive_plot(model, n = 2, scalable = TRUE), "does not define a joint")
     # Family augmentation remains independently useful for the marginal law.
     family <- fix_family_rd(fix_family_cdf(fix_family_qf(family(model))))

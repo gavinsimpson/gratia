@@ -25,8 +25,8 @@ test_that("smooth_samples.gamm forwards sampling and grid options", {
   withr::local_seed(8010)
   nd <- su_eg1[c(3, 8, 20), c("x0", "x1", "x2", "x3")]
   for (prediction_data in list(NULL, nd)) {
-    args <- list(select = "s(x1)", n = 3, n_vals = 5, data = prediction_data,
-      seed = 8011, freq = TRUE, mvn_method = "mgcv")
+    args <- list(select = "s(x1)", n_draws = 3, n_grid = 5, data = prediction_data,
+      seed = 8011, frequentist = TRUE, mvn_method = "mgcv")
     actual <- do.call(smooth_samples, c(list(model = m_gamm), args))
     expected <- do.call(smooth_samples, c(list(model = m_gamm$gam), args))
     expect_identical(actual, expected)

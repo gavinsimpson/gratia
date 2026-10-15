@@ -38,26 +38,6 @@
       10 s(x0)   s(x0) TPRS  <NA>      2     5 -1.76  0.0117 
       # i 490 more rows
 
-# smooth_samples works for a simple GAM multi rng calls
-
-    Code
-      sm
-    Output
-      # A tibble: 500 x 8
-         .smooth .term .type .by    .row .draw .value      x0
-         <chr>   <chr> <chr> <chr> <int> <int>  <dbl>   <dbl>
-       1 s(x0)   s(x0) TPRS  <NA>      1     1  -1.85 0.00162
-       2 s(x0)   s(x0) TPRS  <NA>      1     2  -2.36 0.00162
-       3 s(x0)   s(x0) TPRS  <NA>      1     3  -2.14 0.00162
-       4 s(x0)   s(x0) TPRS  <NA>      1     4  -2.28 0.00162
-       5 s(x0)   s(x0) TPRS  <NA>      1     5  -1.93 0.00162
-       6 s(x0)   s(x0) TPRS  <NA>      2     1  -1.73 0.0117 
-       7 s(x0)   s(x0) TPRS  <NA>      2     2  -2.22 0.0117 
-       8 s(x0)   s(x0) TPRS  <NA>      2     3  -2.08 0.0117 
-       9 s(x0)   s(x0) TPRS  <NA>      2     4  -2.19 0.0117 
-      10 s(x0)   s(x0) TPRS  <NA>      2     5  -1.82 0.0117 
-      # i 490 more rows
-
 # fitted_samples example output doesn't change
 
     Code

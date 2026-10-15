@@ -15,12 +15,13 @@
 #' @param data  data frame; new observations at which the posterior draws
 #'   from the model should be evaluated. If not supplied, the data used to fit
 #'   the model will be used for `data`, if available in `model`.
-#' @param n numeric; the number of posterior samples to return.
+#' @inheritParams post_draws n_draws
+#' @inheritParams post_draws
 #' @param seed numeric; a random seed for the simulations.
-#' @param freq logical; `TRUE` to use the frequentist covariance matrix of
+#' @param frequentist logical; `TRUE` to use the frequentist covariance matrix of
 #'   the parameter estimators, `FALSE` to use the Bayesian posterior
 #'   covariance matrix of the parameters.
-#' @param unconditional logical; if `TRUE` (and `freq == FALSE`) then the
+#' @param unconditional logical; if `TRUE` (and `frequentist == FALSE`) then the
 #'   Bayesian smoothing parameter uncertainty corrected covariance matrix is
 #'   used, if available.
 #' @param weights numeric; response sampling weights for GAM methods. An
@@ -32,10 +33,7 @@
 #'   variance (precision weights). For binomial responses, weights give integer
 #'   trial counts. They do not alter the fitted coefficient covariance. Include
 #'   positions restored by `na.exclude` when supplying weights for fitting rows.
-#' @param n_cores number of cores for generating random variables from a
-#'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
-#'   Parallelization will take place only if OpenMP is supported (but appears
-#'   to work on Windows with current `R`).
+#' @inheritParams post_draws n_cores n_threads
 #' @param method character; which method should be used to draw samples from
 #'   the posterior distribution. `"gaussian"` uses a Gaussian (Laplace)
 #'   approximation to the posterior. `"mh"` uses a Metropolis Hastings sampler
@@ -43,12 +41,10 @@
 #'   the posterior covariance matrix. `"inla"` uses a variant of Integrated
 #'   Nested Laplace Approximation due to Wood (2019), (currently not
 #'   implemented). `"user"` allows for user-supplied posterior draws
-#'   (currently not implemented).
+#'   as a coefficient matrix.
 #' @param burnin numeric; number of samples to discard as the burnin draws.
 #'   Only used with `method = "mh"`.
-#' @param thin numeric; the number of samples to skip when taking `n` draws.
-#'   Results in `thin * n` draws from the posterior being taken. Only used with
-#'   `method = "mh"`.
+#' @inheritParams post_draws thin
 #' @param t_df numeric; degrees of freedom for t distribution proposals. Only
 #'   used with `method = "mh"`.
 #' @param rw_scale numeric; Factor by which to scale posterior covariance
@@ -58,11 +54,6 @@
 #'   are passed on to [mgcv::predict.gam()]. For `posterior_samples()` these are
 #'   passed on to `fitted_samples()`. For `predicted_samples()` these are
 #'   passed on to the relevant `simulate()` method.
-#' @param newdata Deprecated: use `data` instead.
-#' @param ncores Deprecated; use `n_cores` instead. The number of cores for
-#'   generating random variables from a multivariate normal distribution.
-#'   Passed to [mvnfast::rmvn()]. Parallelization will take place only if
-#'   OpenMP is supported (but appears to work on Windows with current `R`).
 #' @param draws matrix; user supplied posterior draws to be used when
 #'   `method = "user"`.
 #' @param mvn_method character; one of `"mvnfast"` or `"mgcv"`. The default is
@@ -92,10 +83,10 @@
 #'
 #' @return A tibble (data frame) with 3 columns containing the posterior
 #'   predicted values in long format. The columns are
-#' * `row` (integer) the row of `data` that each posterior draw relates to,
-#' * `draw` (integer) an index, in range `1:n`, indicating which draw each row
+#' * `.row` (integer) the row of `data` that each posterior draw relates to,
+#' * `.draw` (integer) an index, in range `1:n_draws`, indicating which draw each row
 #'     relates to,
-#' * `response` (numeric) the predicted response for the indicated row of
+#' * `.response` (numeric) the predicted response for the indicated row of
 #'     `data`.
 #'
 #' @author Gavin L. Simpson
@@ -106,14 +97,26 @@
 #'   *Biometrika* **107**, 223--230. \doi{10.1093/biomet/asz044}
 #'
 #' @export
-`posterior_samples` <- function(model, ...) {
+`posterior_samples` <- function(
+  model,
+  ...
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+
   UseMethod("posterior_samples")
 }
 
 #' @export
-`posterior_samples.default` <- function(model, ...) {
-  stop("Don't know how to sample from the posterior of <",
-    class(model)[[1L]], ">",
+`posterior_samples.default` <- function(
+  model,
+  ...
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+
+  stop(
+    "Don't know how to sample from the posterior of <",
+    class(model)[[1L]],
+    ">",
     .call = FALSE
   )
 }
@@ -121,13 +124,48 @@
 #' @export
 #' @rdname posterior_samples
 `posterior_samples.gam` <- function(
-    model, n = 1, data = newdata, seed = NULL,
-    method = c("gaussian", "mh", "inla", "user"),
-    n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
-    freq = FALSE, unconditional = FALSE,
-    weights = NULL, draws = NULL, mvn_method = c("mvnfast", "mgcv"), ...,
-    newdata = NULL,
-    ncores = NULL) {
+  model,
+  ...,
+  data = NULL,
+  n_draws = NULL,
+  chains = NULL,
+  seed = NULL,
+  method = c("gaussian", "mh", "inla", "user"),
+  n_cores = 1L,
+  n_threads = 1L,
+  burnin = 1000,
+  thin = 1L,
+  t_df = 40,
+  rw_scale = 0.25,
+  frequentist = FALSE,
+  unconditional = FALSE,
+  draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia"),
+  mvn_method = c("mvnfast", "mgcv"),
+  block_size = 10000L,
+  dense_limit = 5e6,
+  weights = NULL
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  sampling_check_extra(substitute(list(...)), prediction = TRUE)
+  sampling_check_options(
+    match.arg(method),
+    names(match.call(expand.dots = FALSE))[-1L],
+    mh_backend = match.arg(mh_backend),
+    mvn_method = match.arg(mvn_method)
+  )
+  layout <- sampling_resolve(n_draws, chains, draws, method = match.arg(method))
+  n_draws <- layout$n_draws
+  chains <- layout$chains
+  if (!is.null(data) && !is.data.frame(data)) {
+    stop(
+      "'data' must be a data frame; name the draw count with n_draws = ... .",
+      call. = FALSE
+    )
+  }
+  n_threads <- sampling_count(n_threads, "n_threads")
+
   # generate new response data from the model including the uncertainty in
   # the model.
 
@@ -135,42 +173,106 @@
   mvn_method <- match.arg(mvn_method)
   fam_type <- family_type(model)
 
-  if (!is.null(newdata)) {
-    newdata_deprecated()
-  }
-
-  if (!is.null(ncores)) {
-    message("Argument `ncores` is deprecated. Use `n_cores` instead.")
-    n_cores <- ncores
-  }
-
   do_posterior_samples(
-    model = model, n = n, data = data, seed = seed, method = method,
-    n_cores = n_cores, burnin = burnin, thin = thin, t_df = t_df,
-    rw_scale = rw_scale, freq = freq, unconditional = unconditional,
-    weights = weights, draws = draws, mvn_method = mvn_method, ...
+    model = model,
+    n = n_draws,
+    data = data,
+    seed = seed,
+    method = method,
+    n_threads = n_threads,
+    n_cores = n_cores,
+    chains = chains,
+    diagnostics = diagnostics,
+    mh_backend = mh_backend,
+    block_size = block_size,
+    dense_limit = dense_limit,
+    burnin = burnin,
+    thin = thin,
+    t_df = t_df,
+    rw_scale = rw_scale,
+    freq = frequentist,
+    unconditional = unconditional,
+    weights = weights,
+    draws = draws,
+    mvn_method = mvn_method,
+    ...
   )
 }
 
 #' @export
 #' @rdname posterior_samples
 `posterior_samples.scam` <- function(
-  model, n = 1, data = NULL, seed = NULL,
+  model,
+  ...,
+  data = NULL,
+  n_draws = NULL,
+  chains = NULL,
+  seed = NULL,
   method = c("gaussian", "mh", "inla", "user"),
-  n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
-  freq = FALSE, unconditional = FALSE,
-  weights = NULL, draws = NULL, mvn_method = c("mvnfast", "mgcv"), ...
+  n_cores = 1L,
+  n_threads = 1L,
+  burnin = 1000,
+  thin = 1L,
+  t_df = 40,
+  rw_scale = 0.25,
+  frequentist = FALSE,
+  unconditional = FALSE,
+  draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia"),
+  mvn_method = c("mvnfast", "mgcv"),
+  block_size = 10000L,
+  dense_limit = 5e6,
+  weights = NULL
 ) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  sampling_check_extra(substitute(list(...)), prediction = TRUE)
+  sampling_check_options(
+    match.arg(method),
+    names(match.call(expand.dots = FALSE))[-1L],
+    mh_backend = match.arg(mh_backend),
+    mvn_method = match.arg(mvn_method)
+  )
+  layout <- sampling_resolve(n_draws, chains, draws, method = match.arg(method))
+  n_draws <- layout$n_draws
+  chains <- layout$chains
+  if (!is.null(data) && !is.data.frame(data)) {
+    stop(
+      "'data' must be a data frame; name the draw count with n_draws = ... .",
+      call. = FALSE
+    )
+  }
+  n_threads <- sampling_count(n_threads, "n_threads")
+
   check_scam_unconditional(model, unconditional)
   do_posterior_samples(
-    model = model, n = n, data = data, seed = seed, method = method,
-    n_cores = n_cores, burnin = burnin, thin = thin, t_df = t_df,
-    rw_scale = rw_scale, freq = freq, unconditional = unconditional,
-    weights = weights, draws = draws, mvn_method = mvn_method, ...
+    model = model,
+    n = n_draws,
+    data = data,
+    seed = seed,
+    method = method,
+    n_threads = n_threads,
+    n_cores = n_cores,
+    chains = chains,
+    diagnostics = diagnostics,
+    mh_backend = mh_backend,
+    block_size = block_size,
+    dense_limit = dense_limit,
+    burnin = burnin,
+    thin = thin,
+    t_df = t_df,
+    rw_scale = rw_scale,
+    freq = frequentist,
+    unconditional = unconditional,
+    weights = weights,
+    draws = draws,
+    mvn_method = mvn_method,
+    ...
   )
 }
 
 `do_posterior_samples` <- function(
+  n_threads = 1L,
   model,
   n = 1,
   data = NULL,
@@ -187,6 +289,11 @@
   draws = NULL,
   mvn_method = c("mvnfast", "mgcv"),
   envir = NULL,
+  chains = 1L,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia"),
+  block_size = 10000L,
+  dense_limit = 5e6,
   ...
 ) {
   model <- with_model_envir(model, envir)
@@ -200,52 +307,124 @@
   joint_distribution <- NULL
   correlated <- !is.null(model$AR1.rho) && model$AR1.rho != 0
   if (correlated) {
-    if (!is.null(data)) stop("AR1 posterior response draws require fitting observations; ",
-      "a joint correlation structure for new data is not defined.", call. = FALSE)
-    if (fam_type != "gaussian" || fam$link != "identity") stop(
-      "The working AR1 correction does not define a joint response simulator ",
-      "for this family and link.", call. = FALSE)
+    if (!is.null(data)) {
+      stop(
+        "AR1 posterior response draws require fitting observations; ",
+        "a joint correlation structure for new data is not defined.",
+        call. = FALSE
+      )
+    }
+    if (fam_type != "gaussian" || fam$link != "identity") {
+      stop(
+        "The working AR1 correction does not define a joint response simulator ",
+        "for this family and link.",
+        call. = FALSE
+      )
+    }
     joint_distribution <- response_distribution(model)
-    if (!is.function(joint_distribution$rd)) stop(
-      "A joint response generator is required for correlated posterior draws.", call. = FALSE)
+    if (!is.function(joint_distribution$rd)) {
+      stop(
+        "A joint response generator is required for correlated posterior draws.",
+        call. = FALSE
+      )
+    }
   }
-  advanced <- is_gfam_family(fam) || (inherits(fam, "general.family") &&
-    !fam_type %in% c("multivariate_normal", "multinom"))
+  advanced <- is_gfam_family(fam) ||
+    (inherits(fam, "general.family") &&
+      !fam_type %in% c("multivariate_normal", "multinom"))
   if (advanced) {
-    if (!is.null(data)) stop("Distributional posterior response draws currently use the fitting observations.", call. = FALSE)
-    return(diagnostic_posterior_samples.default(model, n, seed,
-      method = method, n_cores = n_cores, burnin = burnin, thin = thin,
-      t_df = t_df, rw_scale = rw_scale, freq = freq,
-      unconditional = unconditional, weights = weights, draws = draws,
-      mvn_method = mvn_method, ...))
+    if (!is.null(data)) {
+      stop(
+        "Distributional posterior response draws currently use the fitting observations.",
+        call. = FALSE
+      )
+    }
+    return(diagnostic_posterior_samples.default(
+      model,
+      n,
+      seed,
+      method = method,
+      n_threads = n_threads,
+      n_cores = n_cores,
+      chains = chains,
+      diagnostics = diagnostics,
+      mh_backend = mh_backend,
+      block_size = block_size,
+      dense_limit = dense_limit,
+      burnin = burnin,
+      thin = thin,
+      t_df = t_df,
+      rw_scale = rw_scale,
+      frequentist = freq,
+      unconditional = unconditional,
+      weights = weights,
+      draws = draws,
+      mvn_method = mvn_method,
+      ...
+    ))
   }
   # Seed coefficient and response draws once, so the streams are independent.
   # Restore both an existing RNG state and its absence at the public boundary.
   if (!is.null(seed)) {
     had_seed <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
-    if (had_seed) old_seed <- get(".Random.seed", envir = .GlobalEnv)
-    on.exit({
-      if (had_seed) assign(".Random.seed", old_seed, envir = .GlobalEnv)
-      else if (exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
-        rm(".Random.seed", envir = .GlobalEnv)
-    }, add = TRUE)
+    if (had_seed) {
+      old_seed <- get(".Random.seed", envir = .GlobalEnv)
+    }
+    on.exit(
+      {
+        if (had_seed) {
+          assign(".Random.seed", old_seed, envir = .GlobalEnv)
+        } else if (
+          exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
+        ) {
+          rm(".Random.seed", envir = .GlobalEnv)
+        }
+      },
+      add = TRUE
+    )
     set.seed(seed)
   }
 
   # start getting draws of expectation
   # - some families need linear predictor values/matrix, e.g., multinom(),
   #   but we'll handle that later by not using the family()$rd
-  coefficient_seed <- if (method == "user") NULL else sample.int(.Machine$integer.max, 1L)
-  sim_eta <- fitted_samples(
-    model, n = n, data = data, seed = coefficient_seed, scale = "response",
-    method = method, n_cores = n_cores, burnin = burnin, thin = thin,
-    t_df = t_df, rw_scale = rw_scale, freq = freq,
-    unconditional = unconditional, weights = weights,
-    draws = draws, mvn_method = mvn_method, ...
+  coefficient_seed <- if (method == "user") {
+    NULL
+  } else {
+    sample.int(.Machine$integer.max, 1L)
+  }
+  sim_eta <- sampling_call(
+    fitted_samples,
+    list(
+      model,
+      n_draws = n,
+      data = data,
+      seed = coefficient_seed,
+      scale = "response",
+      method = method,
+      n_threads = n_threads,
+      n_cores = n_cores,
+      chains = chains,
+      diagnostics = diagnostics,
+      mh_backend = mh_backend,
+      block_size = block_size,
+      dense_limit = dense_limit,
+      burnin = burnin,
+      thin = thin,
+      t_df = t_df,
+      rw_scale = rw_scale,
+      frequentist = freq,
+      unconditional = unconditional,
+      draws = draws,
+      mvn_method = mvn_method,
+      ...
+    )
   )
 
+  sampling <- attr(sim_eta, "sampling")
   ## rd function if available
-  rd_fun <- missing_safe_rd(choose_rd_fun(model),
+  rd_fun <- missing_safe_rd(
+    choose_rd_fun(model),
     n_response = if (fam_type == "multivariate_normal") n_eta(model) else 1L
   )
 
@@ -257,8 +436,10 @@
 
   if (is.null(data) && is.null(weights)) {
     used <- model_used_rows(model)
-    weights <- restore_model_rows(binomial_sampling_weights(used,
-      used[["prior.weights"]]), model)
+    weights <- restore_model_rows(
+      binomial_sampling_weights(used, used[["prior.weights"]]),
+      model
+    )
   } else {
     if (is.null(weights)) {
       weights <- rep(1, nrow(data))
@@ -266,8 +447,12 @@
   }
 
   n_rows <- if (is.null(data)) length(model_row_map(model)) else NROW(data)
-  if (is.null(weights)) weights <- rep(1, n_rows)
-  if (length(weights) == 1L) weights <- rep(weights, n_rows)
+  if (is.null(weights)) {
+    weights <- rep(1, n_rows)
+  }
+  if (length(weights) == 1L) {
+    weights <- rep(weights, n_rows)
+  }
   if (length(weights) != n_rows) {
     stop("Weights must have one value per prediction row.")
   }
@@ -285,8 +470,11 @@
   # need to handle mvn() and multinom() with multiple linear predictors that
   # are all really just location parameters
   if (!is.null(joint_distribution)) {
-    sim_eta <- posterior_location_response_draws(sim_eta, joint_distribution,
-      rows = which(!is.na(model_row_map(model))))
+    sim_eta <- posterior_location_response_draws(
+      sim_eta,
+      joint_distribution,
+      rows = which(!is.na(model_row_map(model)))
+    )
   } else if (is_multivariate_y(model)) {
     sim_eta_w <- sim_eta |>
       pivot_wider(
@@ -332,16 +520,19 @@
     }
   } else {
     sim_eta <- sim_eta |>
-      mutate(.response = rd_fun(
-        mu = .data$.fitted, wt = weights,
-        scale = scale_p
-      )) |>
+      mutate(
+        .response = rd_fun(
+          mu = .data$.fitted,
+          wt = weights,
+          scale = scale_p
+        )
+      ) |>
       select(all_of(c(".row", ".draw", ".response")))
   }
 
   ## add classes
   class(sim_eta) <- c("posterior_samples", class(sim_eta))
-  sim_eta
+  attach_sampling(sim_eta, sampling)
 }
 
 # For a location family, changing the mean shifts the response distribution.
@@ -349,20 +540,31 @@
 # shift it to the drawn mean. Match retained rows before restoring exclusions.
 posterior_location_response_draws <- function(fitted, distribution, rows) {
   mean <- as.numeric(distribution$mean)
-  if (length(mean) != length(rows)) stop(
-    "Joint response means are not aligned with the fitting observations.", call. = FALSE)
+  if (length(mean) != length(rows)) {
+    stop(
+      "Joint response means are not aligned with the fitting observations.",
+      call. = FALSE
+    )
+  }
   response <- rep(NA_real_, nrow(fitted))
   for (draw in unique(fitted$.draw)) {
     positions <- which(fitted$.draw == draw)
     index <- match(fitted$.row[positions], rows)
     valid <- which(!is.na(index) & !is.na(fitted$.fitted[positions]))
     values <- distribution$rd()
-    if (!is.numeric(values) || !is.null(dim(values)) || length(values) != length(mean)) {
-      stop("A joint response generator must return one value per fitting observation.",
-        call. = FALSE)
+    if (
+      !is.numeric(values) ||
+        !is.null(dim(values)) ||
+        length(values) != length(mean)
+    ) {
+      stop(
+        "A joint response generator must return one value per fitting observation.",
+        call. = FALSE
+      )
     }
     response[positions[valid]] <- values[index[valid]] +
-      fitted$.fitted[positions[valid]] - mean[index[valid]]
+      fitted$.fitted[positions[valid]] -
+      mean[index[valid]]
   }
   fitted$.response <- response
   fitted[, c(".row", ".draw", ".response"), drop = FALSE]
@@ -420,10 +622,10 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #'
 #' @return A tibble (data frame) with 3 columns containing the posterior
 #'   predicted values in long format. The columns are
-#' * `row` (integer) the row of `data` that each posterior draw relates to,
-#' * `draw` (integer) an index, in range `1:n`, indicating which draw each row
+#' * `.row` (integer) the row of `data` that each posterior draw relates to,
+#' * `.draw` (integer) an index, in range `1:n_draws`, indicating which draw each row
 #'     relates to,
-#' * `response` (numeric) the predicted response for the indicated row of
+#' * `.response` (numeric) the predicted response for the indicated row of
 #'     `data`.
 #'
 #' @author Gavin L. Simpson
@@ -436,20 +638,37 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #'   *Biometrika* **107**, 223--230. \doi{10.1093/biomet/asz044}
 #'
 #' @export
-`fitted_samples` <- function(model, ...) {
+`fitted_samples` <- function(
+  model,
+  ...
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+
   UseMethod("fitted_samples")
 }
 
 #' @export
-`fitted_samples.default` <- function(model, ...) {
-  stop("Don't know how to sample from the posterior of <",
-    class(model)[[1L]], ">",
+`fitted_samples.default` <- function(
+  model,
+  ...
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+
+  stop(
+    "Don't know how to sample from the posterior of <",
+    class(model)[[1L]],
+    ">",
     .call = FALSE
   )
 }
 
 #' @export
-`fitted_samples.gamm` <- function(model, ...) {
+`fitted_samples.gamm` <- function(
+  model,
+  ...
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+
   fitted_samples(model$gam, ...)
 }
 
@@ -471,13 +690,13 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 #' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
-#' fs <- fitted_samples(m1, n = 5, seed = 42)
+#' fs <- fitted_samples(m1, n_draws = 5, seed = 42)
 #' \donttest{
 #' fs
 #' }
 #'
 #' # can generate own set of draws and use them
-#' drws <- generate_draws(m1, n = 2, seed = 24)
+#' drws <- generate_draws(m1, n_draws = 2, seed = 24)
 #' fs2 <- fitted_samples(m1, method = "user", draws = drws)
 #' \donttest{
 #' fs2
@@ -486,54 +705,150 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' options(op)
 #' }
 `fitted_samples.gam` <- function(
-  model, n = 1, data = newdata, seed = NULL,
-  scale = c("response", "linear_predictor"),
+  model,
+  ...,
+  data = NULL,
+  n_draws = NULL,
+  chains = NULL,
+  seed = NULL,
   method = c("gaussian", "mh", "inla", "user"),
-  n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
-  freq = FALSE, unconditional = FALSE, draws = NULL,
-  mvn_method = c("mvnfast", "mgcv"), family_index = NULL,
-  ..., newdata = NULL, ncores = NULL
+  n_cores = 1L,
+  n_threads = 1L,
+  burnin = 1000,
+  thin = 1L,
+  t_df = 40,
+  rw_scale = 0.25,
+  frequentist = FALSE,
+  unconditional = FALSE,
+  draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia"),
+  mvn_method = c("mvnfast", "mgcv"),
+  block_size = 10000L,
+  dense_limit = 5e6,
+  scale = c("response", "linear_predictor"),
+  family_index = NULL
 ) {
-
-  if (!is.null(newdata)) {
-    newdata_deprecated()
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  sampling_check_extra(substitute(list(...)), prediction = TRUE)
+  sampling_check_options(
+    match.arg(method),
+    names(match.call(expand.dots = FALSE))[-1L],
+    mh_backend = match.arg(mh_backend),
+    mvn_method = match.arg(mvn_method)
+  )
+  layout <- sampling_resolve(n_draws, chains, draws, method = match.arg(method))
+  n_draws <- layout$n_draws
+  chains <- layout$chains
+  if (!is.null(data) && !is.data.frame(data)) {
+    stop(
+      "'data' must be a data frame; name the draw count with n_draws = ... .",
+      call. = FALSE
+    )
   }
-
-  if (!is.null(ncores)) {
-    message("Argument `ncores` is deprecated. Use `n_cores` instead.")
-    n_cores <- ncores
-  }
+  n_threads <- sampling_count(n_threads, "n_threads")
 
   do_fitted_samples(
-    model = model, n = n, data = data, seed = seed, scale = scale,
-    method = method, n_cores = n_cores, burnin = burnin, thin = thin,
-    t_df = t_df, rw_scale = rw_scale, freq = freq,
-    unconditional = unconditional, draws = draws, mvn_method = mvn_method,
-    family_index = family_index, ...
+    model = model,
+    n = n_draws,
+    data = data,
+    seed = seed,
+    scale = scale,
+    method = method,
+    n_threads = n_threads,
+    n_cores = n_cores,
+    chains = chains,
+    diagnostics = diagnostics,
+    mh_backend = mh_backend,
+    block_size = block_size,
+    dense_limit = dense_limit,
+    burnin = burnin,
+    thin = thin,
+    t_df = t_df,
+    rw_scale = rw_scale,
+    freq = frequentist,
+    unconditional = unconditional,
+    draws = draws,
+    mvn_method = mvn_method,
+    family_index = family_index,
+    ...
   )
 }
 
 #' @export
 #' @rdname fitted_samples
 `fitted_samples.scam` <- function(
-  model, n = 1, data = NULL, seed = NULL,
-  scale = c("response", "linear_predictor"),
+  model,
+  ...,
+  data = NULL,
+  n_draws = NULL,
+  chains = NULL,
+  seed = NULL,
   method = c("gaussian", "mh", "inla", "user"),
-  n_cores = 1, burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25,
-  freq = FALSE, unconditional = FALSE, draws = NULL,
-  mvn_method = c("mvnfast", "mgcv"), ...
+  n_cores = 1L,
+  n_threads = 1L,
+  burnin = 1000,
+  thin = 1L,
+  t_df = 40,
+  rw_scale = 0.25,
+  frequentist = FALSE,
+  unconditional = FALSE,
+  draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia"),
+  mvn_method = c("mvnfast", "mgcv"),
+  block_size = 10000L,
+  dense_limit = 5e6,
+  scale = c("response", "linear_predictor")
 ) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  sampling_check_extra(substitute(list(...)), prediction = TRUE)
+  sampling_check_options(
+    match.arg(method),
+    names(match.call(expand.dots = FALSE))[-1L],
+    mh_backend = match.arg(mh_backend),
+    mvn_method = match.arg(mvn_method)
+  )
+  layout <- sampling_resolve(n_draws, chains, draws, method = match.arg(method))
+  n_draws <- layout$n_draws
+  chains <- layout$chains
+  if (!is.null(data) && !is.data.frame(data)) {
+    stop(
+      "'data' must be a data frame; name the draw count with n_draws = ... .",
+      call. = FALSE
+    )
+  }
+  n_threads <- sampling_count(n_threads, "n_threads")
+
   check_scam_unconditional(model, unconditional)
   do_fitted_samples(
-    model = model, n = n, data = data, seed = seed, scale = scale,
-    method = method, n_cores = n_cores, burnin = burnin, thin = thin,
-    t_df = t_df, rw_scale = rw_scale, freq = freq,
-    unconditional = unconditional, draws = draws, mvn_method = mvn_method,
+    model = model,
+    n = n_draws,
+    data = data,
+    seed = seed,
+    scale = scale,
+    method = method,
+    n_threads = n_threads,
+    n_cores = n_cores,
+    chains = chains,
+    diagnostics = diagnostics,
+    mh_backend = mh_backend,
+    block_size = block_size,
+    dense_limit = dense_limit,
+    burnin = burnin,
+    thin = thin,
+    t_df = t_df,
+    rw_scale = rw_scale,
+    freq = frequentist,
+    unconditional = unconditional,
+    draws = draws,
+    mvn_method = mvn_method,
     ...
   )
 }
 
 `do_fitted_samples` <- function(
+  n_threads = 1L,
   model,
   n = 1,
   data = NULL,
@@ -551,6 +866,11 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   mvn_method = c("mvnfast", "mgcv"),
   envir = NULL,
   family_index = NULL,
+  chains = 1L,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia"),
+  block_size = 10000L,
+  dense_limit = 5e6,
   ...
 ) {
   training <- is.null(data)
@@ -570,28 +890,62 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   scale <- match.arg(scale)
   grouped <- is_gfam_family(family(model))
   if (!grouped && !is.null(family_index)) {
-    stop("'family_index' is only supported for grouped-family models.", call. = FALSE)
+    stop(
+      "'family_index' is only supported for grouped-family models.",
+      call. = FALSE
+    )
   }
   context <- if (grouped && identical(scale, "response")) {
-    gfam_prediction_context(model, data, family_index = family_index,
-      na.action = list(...)$na.action %||% stats::na.pass)
-  } else NULL
+    gfam_prediction_context(
+      model,
+      data,
+      family_index = family_index,
+      na.action = list(...)$na.action %||% stats::na.pass
+    )
+  } else {
+    NULL
+  }
   layout <- if (is.null(context)) {
-    prediction_layout(model, data, na.action = list(...)$na.action %||% stats::na.pass)
-  } else context$layout
+    prediction_layout(
+      model,
+      data,
+      na.action = list(...)$na.action %||% stats::na.pass
+    )
+  } else {
+    context$layout
+  }
   model <- model_used_rows(model)
   data <- layout$data
   method <- match.arg(method)
   mvn_method <- match.arg(mvn_method)
 
   # get posterior draws
-  betas <- post_draws(
-    n = n, method = method,
-    n_cores = n_cores, model = model,
-    burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-    index = NULL, frequentist = freq, unconditional = unconditional,
-    draws = draws, seed = seed, mvn_method = mvn_method
+  betas <- sampling_call(
+    post_draws,
+    list(
+      n_draws = n,
+      method = method,
+      n_threads = n_threads,
+      n_cores = n_cores,
+      chains = chains,
+      diagnostics = diagnostics,
+      mh_backend = mh_backend,
+      block_size = block_size,
+      dense_limit = dense_limit,
+      model = model,
+      burnin = burnin,
+      thin = thin,
+      t_df = t_df,
+      rw_scale = rw_scale,
+      index = NULL,
+      frequentist = freq,
+      unconditional = unconditional,
+      draws = draws,
+      seed = seed,
+      mvn_method = mvn_method
+    )
   )
+  sampling <- attr(betas, "sampling")
   ## betas is for *all* coefs, including distributional parameters
   lss_idx <- lss_eta_index(model)
   gen_fam <- inherits(family(model), "general.family")
@@ -640,12 +994,17 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   ## don't need to pass freq, unconditional here as that is done for V
   Xp <- if (grouped) {
     gfam_predict_eta(model, data, type = "lpmatrix", ...)
-  } else predict_model(model, newdata = data, type = "lpmatrix", ...)
+  } else {
+    predict_model(model, newdata = data, type = "lpmatrix", ...)
+  }
   if (training) {
     # Native fitting predictions retain offsets supplied as fitting arguments.
     # Apply the same term exclusions to the native predictor and design matrix.
-    eta <- matrix(predict_model(model, type = "link", ...) +
-      fitting_link_correction(model), nrow = NROW(Xp))
+    eta <- matrix(
+      predict_model(model, type = "link", ...) +
+        fitting_link_correction(model),
+      nrow = NROW(Xp)
+    )
     indices <- attr(Xp, "lpi") %||% lss_eta_index(model)
     attr(Xp, "model.offset") <- lapply(seq_along(indices), function(i) {
       j <- indices[[i]]
@@ -665,7 +1024,10 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
       FUN = \(i, Xp, betas, lss_loc, scale) {
         pred_fun(Xp, betas, lss_loc[[i]], scale, lp = i)
       },
-      Xp = Xp, betas = betas, lss_loc = lss_loc, scale = scale
+      Xp = Xp,
+      betas = betas,
+      lss_loc = lss_loc,
+      scale = scale
     )
     sims <- switch(
       fn,
@@ -692,7 +1054,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   attr(sims, "seed") <- RNGstate
   ## add classes
   class(sims) <- c("fitted_samples", class(sims))
-  sims
+  attach_sampling(sims, sampling, draw_index = TRUE)
 }
 
 `yhat_mvn` <- function(sims, n_data, n_eta) {
@@ -754,14 +1116,16 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #'
 #' @return A tibble (data frame) with 3 columns containing the posterior
 #'   predicted values in long format. The columns are
-#' * `row` (integer) the row of `data` that each posterior draw relates to,
-#' * `draw` (integer) an index, in range `1:n`, indicating which draw each row
+#' * `.row` (integer) the row of `data` that each posterior draw relates to,
+#' * `.draw` (integer) an index, in range `1:n_draws`, indicating which draw each row
 #'     relates to,
-#' * `response` (numeric) the predicted response for the indicated row of
+#' * `.response` (numeric) the predicted response for the indicated row of
 #'     `data`.
 #'
 #' @author Gavin L. Simpson
 #'
+#' @param n_draws positive integer; number of response replicates to generate
+#'   at the fitted parameters. Required; coefficient chains are not used.
 #' @inheritParams posterior_samples
 #' @export
 #'
@@ -773,7 +1137,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 #' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
-#' predicted_samples(m, n = 5, seed = 42)
+#' predicted_samples(m, n_draws = 5, seed = 42)
 #'
 #' ## Can pass arguments to predict.gam()
 #' \dontshow{
@@ -785,30 +1149,43 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' )
 #'
 #' ## Exclude s(x2)
-#' predicted_samples(m, n = 5, newd, exclude = "s(x2)", seed = 25)
+#' predicted_samples(m, n_draws = 5, data = newd, exclude = "s(x2)", seed = 25)
 #'
 #' ## Exclude s(x1)
-#' predicted_samples(m, n = 5, newd, exclude = "s(x1)", seed = 25)
+#' predicted_samples(m, n_draws = 5, data = newd, exclude = "s(x1)", seed = 25)
 #'
 #' ## Select which terms --- result should be the same as previous
 #' ## but note that we have to include any parametric terms, including the
 #' ## constant term
 #' predicted_samples(m,
-#'   n = 5, newd, seed = 25,
+#'   n_draws = 5, data = newd, seed = 25,
 #'   terms = c("Intercept", "s(x0)", "s(x2)", "s(x3)")
 #' )
 #' \dontshow{
 #' options(op)
 #' }
-`predicted_samples` <- function(model, ...) {
+`predicted_samples` <- function(
+  model,
+  ...
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+
+  sampling_check_prediction(substitute(list(...)))
   UseMethod("predicted_samples")
 }
 
 #' @export
 #' @rdname predicted_samples
-`predicted_samples.default` <- function(model, ...) {
-  stop("Don't know how to sample from the posterior of <",
-    class(model)[[1L]], ">",
+`predicted_samples.default` <- function(
+  model,
+  ...
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+
+  stop(
+    "Don't know how to sample from the posterior of <",
+    class(model)[[1L]],
+    ">",
     .call = FALSE
   )
 }
@@ -819,20 +1196,30 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' @importFrom tidyr gather
 `predicted_samples.gam` <- function(
   model,
-  n = 1,
-  data = newdata,
-  seed = NULL,
-  weights = NULL,
   ...,
-  newdata = NULL
+  data = NULL,
+  n_draws = NULL,
+  seed = NULL,
+  weights = NULL
 ) {
-  
-  if (!is.null(newdata)) {
-    newdata_deprecated()
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  sampling_check_extra(substitute(list(...)), prediction = TRUE)
+  layout <- sampling_resolve(n_draws, NULL, NULL, method = "gaussian")
+  n_draws <- layout$n_draws
+  if (!is.null(data) && !is.data.frame(data)) {
+    stop(
+      "'data' must be a data frame; name the draw count with n_draws = ... .",
+      call. = FALSE
+    )
   }
 
   do_predicted_samples(
-    model = model, n = n, data = data, seed = seed, weights = weights, ...
+    model = model,
+    n = n_draws,
+    data = data,
+    seed = seed,
+    weights = weights,
+    ...
   )
 }
 
@@ -840,15 +1227,31 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' @rdname predicted_samples
 `predicted_samples.scam` <- function(
   model,
-  n = 1,
+  ...,
   data = NULL,
+  n_draws = NULL,
   seed = NULL,
-  weights = NULL,
-  ...
+  weights = NULL
 ) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  sampling_check_extra(substitute(list(...)), prediction = TRUE)
+  layout <- sampling_resolve(n_draws, NULL, NULL, method = "gaussian")
+  n_draws <- layout$n_draws
+  if (!is.null(data) && !is.data.frame(data)) {
+    stop(
+      "'data' must be a data frame; name the draw count with n_draws = ... .",
+      call. = FALSE
+    )
+  }
+
   check_scam_unconditional(model, list(...)$unconditional %||% FALSE)
   do_predicted_samples(
-    model = model, n = n, data = data, seed = seed, weights = weights, ...
+    model = model,
+    n = n_draws,
+    data = data,
+    seed = seed,
+    weights = weights,
+    ...
   )
 }
 
@@ -923,8 +1326,8 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #'     example.
 #' * `.by`; character vector. If the smooth involves a `by` term, the
 #'     by variable will be named here, `NA_character_` otherwise.
-#' * `.row`; integer. A vector of values `seq_len(n_vals)`, repeated if
-#'     `n > 1L`. Indexes the row in `data` for that particular draw.
+#' * `.row`; integer. A vector of values `seq_len(nrow(data))`, repeated if
+#'     `n_draws > 1L`. Indexes the row in `data` for that particular draw.
 #' * `.draw`; integer. A vector of integer values indexing the particular
 #'     posterior draw that each row belongs to.
 #' * `.value`; numeric. The value of smooth function for this posterior draw
@@ -947,7 +1350,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' dat <- data_sim("eg1", n = 400, seed = 2)
 #' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
-#' sms <- smooth_samples(m1, select = "s(x0)", n = 5, seed = 42)
+#' sms <- smooth_samples(m1, select = "s(x0)", n_draws = 5, seed = 42)
 #' \donttest{
 #' sms
 #' }
@@ -957,30 +1360,40 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #'
 #' ## fit model...
 #' m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
-#' sms <- smooth_samples(m2, n = 5, seed = 42)
+#' sms <- smooth_samples(m2, n_draws = 5, seed = 42)
 #' draw(sms)
 #' \dontshow{
 #' options(op)
 #' }
-`smooth_samples` <- function(model, ...) {
+`smooth_samples` <- function(
+  model,
+  ...
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+
   UseMethod("smooth_samples")
 }
 
 #' @export
-`smooth_samples.default` <- function(model, ...) {
-  stop("Don't know how to sample from the posterior of <",
-    class(model)[[1L]], ">",
+`smooth_samples.default` <- function(
+  model,
+  ...
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+
+  stop(
+    "Don't know how to sample from the posterior of <",
+    class(model)[[1L]],
+    ">",
     .call = FALSE
   )
 }
 
-#' @param n_vals numeric; how many locations to evaluate the smooth at if
+#' @param n_grid positive integer; resolution for constructing evaluation data if
 #'   `data` not supplied
 #' @param select character; select which smooth's posterior to draw from.
 #'   The default (`NULL`) means the posteriors of all smooths in `model`
 #'   will be sampled from. If supplied, a character vector of requested terms.
-#' @param term `r lifecycle::badge("deprecated")` Use `select` instead.
-#' @param rng_per_smooth logical; if TRUE, the behaviour of gratia version
 #' 0.8.1 or earlier is used, whereby a separate call the the random number
 #' generator (RNG) is performed for each smooth. If FALSE, a single call to the
 #' RNG is performed for all model parameters
@@ -1004,35 +1417,54 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' @importFrom tidyselect any_of
 #' @importFrom lifecycle deprecated is_present
 `smooth_samples.gam` <- function(
-    model,
-    select = NULL,
-    term = deprecated(),
-    n = 1,
-    data = newdata,
-    method = c("gaussian", "mh", "inla", "user"),
-    seed = NULL,
-    freq = FALSE,
-    unconditional = FALSE,
-    n_cores = 1L,
-    n_vals = 200,
-    burnin = 1000,
-    thin = 1,
-    t_df = 40,
-    rw_scale = 0.25,
-    rng_per_smooth = FALSE,
-    draws = NULL,
-    partial_match = NULL,
-    mvn_method = c("mvnfast", "mgcv"), envir = NULL,
-    ...,
-    newdata = NULL,
-    ncores = NULL) {
+  model,
+  ...,
+  data = NULL,
+  n_draws = NULL,
+  chains = NULL,
+  seed = NULL,
+  method = c("gaussian", "mh", "inla", "user"),
+  n_cores = 1L,
+  n_threads = 1L,
+  burnin = 1000,
+  thin = 1L,
+  t_df = 40,
+  rw_scale = 0.25,
+  frequentist = FALSE,
+  unconditional = FALSE,
+  draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia"),
+  mvn_method = c("mvnfast", "mgcv"),
+  block_size = 10000L,
+  dense_limit = 5e6,
+  select = NULL,
+  n_grid = 200L,
+  partial_match = NULL,
+  envir = NULL
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  sampling_check_extra(substitute(list(...)), prediction = FALSE)
+  sampling_check_options(
+    match.arg(method),
+    names(match.call(expand.dots = FALSE))[-1L],
+    mh_backend = match.arg(mh_backend),
+    mvn_method = match.arg(mvn_method)
+  )
+  layout <- sampling_resolve(n_draws, chains, draws, method = match.arg(method))
+  n_draws <- layout$n_draws
+  chains <- layout$chains
+  if (!is.null(data) && !is.data.frame(data)) {
+    stop(
+      "'data' must be a data frame; name the draw count with n_draws = ... .",
+      call. = FALSE
+    )
+  }
+  n_grid <- sampling_count(n_grid, "n_grid")
+  n_threads <- sampling_count(n_threads, "n_threads")
+
   model_name <- deparse(substitute(model))
   model <- with_model_envir(model, envir)
-  if (lifecycle::is_present(term)) {
-    lifecycle::deprecate_warn("0.8.9.9", "smooth_samples(term)",
-      "smooth_samples(select)")
-    select <- term
-  }
   # smooth_samples begins
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     runif(1)
@@ -1049,8 +1481,12 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   sms <- smooths(model) # vector of smooth labels - "s(x)"
   take <- seq_along(sms) # in default case 1,2,3,..,n smooths
   if (!is.null(select)) {
-    select <- check_user_select_smooths(sms, select = select,
-      partial_match = partial_match, model_name = model_name)
+    select <- check_user_select_smooths(
+      sms,
+      select = select,
+      partial_match = partial_match,
+      model_name = model_name
+    )
     # take <- which_smooths(model, term)
     take <- which(select) # need this as an id vector for things later
     sms <- sms[select] # S <- S[take]
@@ -1058,14 +1494,17 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 
   # At least for now, don't work for random effect smooths
   # do we have ranef smooths?
-  re_sms <- vapply(get_smooths_by_id(model, take),
+  re_sms <- vapply(
+    get_smooths_by_id(model, take),
     FUN = is_re_smooth,
     FUN.VALUE = logical(1L)
   )
   if (any(re_sms)) {
     message(
       "\nRandom effect smooths not currently supported.\nIgnoring:",
-      " <", paste(sms[re_sms], collapse = ", "), ">\n"
+      " <",
+      paste(sms[re_sms], collapse = ", "),
+      ">\n"
     )
     sms <- sms[!re_sms]
     take <- take[!re_sms]
@@ -1074,15 +1513,6 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   # do we have any remaining terms?
   if (length(sms) < 1L) {
     stop("No smooths left that can be sampled from.")
-  }
-
-  if (!is.null(newdata)) {
-    newdata_deprecated()
-  }
-
-  if (!is.null(ncores)) {
-    message("Argument `ncores` is deprecated. Use `n_cores` instead.")
-    n_cores <- ncores
   }
 
   need_data <- FALSE
@@ -1095,24 +1525,37 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   mvn_method <- match.arg(mvn_method)
 
   # get posterior draws - call this once for all parameters
-  if (isFALSE(rng_per_smooth)) {
-    betas <- post_draws(
-      n = n, method = method,
-      n_cores = n_cores, model = model,
-      burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-      index = NULL, frequentist = freq, unconditional = unconditional,
-      draws = draws, seed = seed, mvn_method = mvn_method
+  betas <- sampling_call(
+    post_draws,
+    list(
+      n_draws = n_draws,
+      method = method,
+      n_threads = n_threads,
+      n_cores = n_cores,
+      chains = chains,
+      diagnostics = diagnostics,
+      mh_backend = mh_backend,
+      block_size = block_size,
+      dense_limit = dense_limit,
+      model = model,
+      burnin = burnin,
+      thin = thin,
+      t_df = t_df,
+      rw_scale = rw_scale,
+      index = NULL,
+      frequentist = frequentist,
+      unconditional = unconditional,
+      draws = draws,
+      seed = seed,
+      mvn_method = mvn_method
     )
-  }
+  )
 
   sims <- data_names <- vector("list", length = length(sms))
   for (i in seq_along(sms)) {
     if (need_data) {
       # FIXME: should offset be NULL?
-      data <- smooth_data(model,
-        id = take[i], n = n_vals,
-        offset = NULL
-      )
+      data <- smooth_data(model, id = take[i], n = n_grid, offset = NULL)
       # I don't think we need offset here as that really just shifts the
       # response around
     }
@@ -1121,29 +1564,20 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     # Resolve calls before matrix construction and output-column selection.
     data <- prepare_smooth_data(model, sm, data)
     Xp <- smooth_predict_matrix(sm, data, model)
-    # get posterior draws - use old behaviour? TRUE is yes
-    simu <- if (isTRUE(rng_per_smooth)) {
-      betas <- post_draws(
-        n = n, method = method,
-        n_cores = n_cores, model = model,
-        burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-        index = idx, frequentist = freq, unconditional = unconditional,
-        seed = seed
-      )
-      Xp %*% t(betas)
-    } else {
-      Xp %*% t(betas[, idx, drop = FALSE])
-    }
+    simu <- Xp %*% t(betas[, idx, drop = FALSE])
     colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
     simu <- as_tibble(simu)
     nr_simu <- nrow(simu)
-    simu <- add_by_data(simu,
-      by_name = by_variable(sm), by_data = data,
+    simu <- add_by_data(
+      simu,
+      by_name = by_variable(sm),
+      by_data = data,
       before = 1L
     )
     # add on spline type info
     sm_type <- smooth_type(sm)
-    simu <- add_column(simu,
+    simu <- add_column(
+      simu,
       .smooth = rep(
         unlist(lapply(strsplit(sms[[i]], ":"), `[`, 1L)),
         nr_simu
@@ -1154,18 +1588,25 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
       .after = 0L
     )
     simu <- bind_cols(simu, data[smooth_variable(sm)])
-    simu <- pivot_longer(simu,
+    simu <- pivot_longer(
+      simu,
       cols = dplyr::starts_with("..V"),
-      names_to = ".draw", values_to = ".value",
+      names_to = ".draw",
+      values_to = ".value",
       names_transform = \(x) as.integer(sub("\\.\\.V", "", x))
     )
     simu <- relocate(simu, any_of(names(data)), .after = last_col()) |>
       relocate(".by", .after = 3L)
     ## nest all columns with varying data
-    simu <- nest(simu, data = all_of(c(
-      ".row", ".draw", ".value",
-      vars_in_smooth(sm)
-    )))
+    simu <- nest(
+      simu,
+      data = all_of(c(
+        ".row",
+        ".draw",
+        ".value",
+        vars_in_smooth(sm)
+      ))
+    )
     sims[[i]] <- simu
   }
 
@@ -1174,7 +1615,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   attr(sims, "seed") <- RNGstate
   ## add classes
   class(sims) <- c("smooth_samples", class(sims))
-  sims
+  attach_sampling(sims, betas, draw_index = TRUE)
 }
 
 #' @export
@@ -1186,24 +1627,55 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' @importFrom tidyselect any_of
 #' @importFrom lifecycle deprecated is_present
 `smooth_samples.scam` <- function(
-    model,
-    select = NULL,
-    term = deprecated(),
-    n = 1, data = newdata,
-    method = c("gaussian", "mh", "inla", "user"), seed = NULL,
-    freq = FALSE, unconditional = FALSE, n_cores = 1L, n_vals = 200,
-    burnin = 1000, thin = 1, t_df = 40, rw_scale = 0.25, rng_per_smooth = FALSE,
-    draws = NULL, mvn_method = c("mvnfast", "mgcv"),
-    partial_match = NULL, envir = NULL, ...,
-    newdata = NULL, ncores = NULL) {
+  model,
+  ...,
+  data = NULL,
+  n_draws = NULL,
+  chains = NULL,
+  seed = NULL,
+  method = c("gaussian", "mh", "inla", "user"),
+  n_cores = 1L,
+  n_threads = 1L,
+  burnin = 1000,
+  thin = 1L,
+  t_df = 40,
+  rw_scale = 0.25,
+  frequentist = FALSE,
+  unconditional = FALSE,
+  draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia"),
+  mvn_method = c("mvnfast", "mgcv"),
+  block_size = 10000L,
+  dense_limit = 5e6,
+  select = NULL,
+  n_grid = 200L,
+  partial_match = NULL,
+  envir = NULL
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  sampling_check_extra(substitute(list(...)), prediction = FALSE)
+  sampling_check_options(
+    match.arg(method),
+    names(match.call(expand.dots = FALSE))[-1L],
+    mh_backend = match.arg(mh_backend),
+    mvn_method = match.arg(mvn_method)
+  )
+  layout <- sampling_resolve(n_draws, chains, draws, method = match.arg(method))
+  n_draws <- layout$n_draws
+  chains <- layout$chains
+  if (!is.null(data) && !is.data.frame(data)) {
+    stop(
+      "'data' must be a data frame; name the draw count with n_draws = ... .",
+      call. = FALSE
+    )
+  }
+  n_grid <- sampling_count(n_grid, "n_grid")
+  n_threads <- sampling_count(n_threads, "n_threads")
+
   check_scam_unconditional(model, unconditional)
   model_name <- deparse(substitute(model))
   model <- with_model_envir(model, envir)
-  if (lifecycle::is_present(term)) {
-    lifecycle::deprecate_warn("0.8.9.9", "smooth_samples(term)",
-      "smooth_samples(select)")
-    select <- term
-  }
   # smooth_samples begins
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     runif(1)
@@ -1219,8 +1691,12 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   sms <- smooths(model) # vector of smooth labels - "s(x)"
   take <- seq_along(sms) # in default case 1,2,3,..,n smooths
   if (!is.null(select)) {
-    select <- check_user_select_smooths(sms, select = select,
-      partial_match = partial_match, model_name = model_name)
+    select <- check_user_select_smooths(
+      sms,
+      select = select,
+      partial_match = partial_match,
+      model_name = model_name
+    )
     # take <- which_smooths(model, term)
     take <- which(select) # need this as an id vector for things later
     sms <- sms[select] # S <- S[take]
@@ -1228,14 +1704,17 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 
   # At least for now, don't work for random effect smooths
   # do we have ranef smooths?
-  re_sms <- vapply(get_smooths_by_id(model, take),
+  re_sms <- vapply(
+    get_smooths_by_id(model, take),
     FUN = is_re_smooth,
     FUN.VALUE = logical(1L)
   )
   if (any(re_sms)) {
     message(
       "\nRandom effect smooths not currently supported.\nIgnoring:",
-      " <", paste(sms[re_sms], collapse = ", "), ">\n"
+      " <",
+      paste(sms[re_sms], collapse = ", "),
+      ">\n"
     )
     sms <- sms[!re_sms]
     take <- take[!re_sms]
@@ -1243,13 +1722,6 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   # do we have any remaining terms?
   if (length(sms) < 1L) {
     stop("No smooths left that can be sampled from.")
-  }
-  if (!is.null(newdata)) {
-    newdata_deprecated()
-  }
-  if (!is.null(ncores)) {
-    message("Argument `ncores` is deprecated. Use `n_cores` instead.")
-    n_cores <- ncores
   }
   need_data <- FALSE
   if (is.null(data)) {
@@ -1259,23 +1731,37 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   method <- match.arg(method)
   mvn_method <- match.arg(mvn_method)
   # get posterior draws - call this once for all parameters
-  if (isFALSE(rng_per_smooth)) {
-    betas <- post_draws(
-      n = n, method = method,
-      n_cores = n_cores, model = model,
-      burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-      index = NULL, frequentist = freq, unconditional = unconditional,
-      draws = draws, mvn_method = mvn_method, seed = seed
+  betas <- sampling_call(
+    post_draws,
+    list(
+      n_draws = n_draws,
+      method = method,
+      n_threads = n_threads,
+      n_cores = n_cores,
+      chains = chains,
+      diagnostics = diagnostics,
+      mh_backend = mh_backend,
+      block_size = block_size,
+      dense_limit = dense_limit,
+      model = model,
+      burnin = burnin,
+      thin = thin,
+      t_df = t_df,
+      rw_scale = rw_scale,
+      index = NULL,
+      frequentist = frequentist,
+      unconditional = unconditional,
+      draws = draws,
+      mvn_method = mvn_method,
+      seed = seed
     )
-  }
+  )
+
   sims <- data_names <- vector("list", length = length(sms))
   for (i in seq_along(sms)) {
     if (need_data) {
       # FIXME: should offset be NULL?
-      data <- smooth_data(model,
-        id = take[i], n = n_vals,
-        offset = NULL
-      )
+      data <- smooth_data(model, id = take[i], n = n_grid, offset = NULL)
       # I don't think we need offset here as that really just shifts the
       # response around
     }
@@ -1284,17 +1770,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     # Resolve calls before matrix construction and output-column selection.
     data <- prepare_smooth_data(model, sm, data)
     Xp <- smooth_predict_matrix(sm, data, model)
-    # get posterior draws - use old behaviour? TRUE is yes
-    simu <- if (isTRUE(rng_per_smooth)) {
-      betas <- post_draws(
-        n = n, method = method,
-        n_cores = n_cores, model = model,
-        burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
-        index = idx, frequentist = freq, unconditional = unconditional,
-        seed = seed
-      )
-      Xp %*% t(betas)
-    } else {
+    simu <- {
       # In a scam model, the intercept seems to be parametrised into the
       # smooth as PredictMat returns a constant column
       if (isTRUE(length(idx) < ncol(Xp))) {
@@ -1306,13 +1782,16 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
     simu <- as_tibble(simu)
     nr_simu <- nrow(simu)
-    simu <- add_by_data(simu,
-      by_name = by_variable(sm), by_data = data,
+    simu <- add_by_data(
+      simu,
+      by_name = by_variable(sm),
+      by_data = data,
       before = 1L
     )
     # add on spline type info
     sm_type <- smooth_type(sm)
-    simu <- add_column(simu,
+    simu <- add_column(
+      simu,
       .smooth = rep(
         unlist(lapply(strsplit(sms[[i]], ":"), `[`, 1L)),
         nr_simu
@@ -1323,18 +1802,25 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
       .after = 0L
     )
     simu <- bind_cols(simu, data[smooth_variable(sm)])
-    simu <- pivot_longer(simu,
+    simu <- pivot_longer(
+      simu,
       cols = dplyr::starts_with("..V"),
-      names_to = ".draw", values_to = ".value",
+      names_to = ".draw",
+      values_to = ".value",
       names_transform = \(x) as.integer(sub("\\.\\.V", "", x))
     )
     simu <- relocate(simu, any_of(names(data)), .after = last_col()) |>
       relocate(".by", .after = 3L)
     ## nest all columns with varying data
-    simu <- nest(simu, data = all_of(c(
-      ".row", ".draw", ".value",
-      vars_in_smooth(sm)
-    )))
+    simu <- nest(
+      simu,
+      data = all_of(c(
+        ".row",
+        ".draw",
+        ".value",
+        vars_in_smooth(sm)
+      ))
+    )
     sims[[i]] <- simu
   }
 
@@ -1343,33 +1829,50 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   attr(sims, "seed") <- RNGstate
   ## add classes
   class(sims) <- c("smooth_samples", class(sims))
-  sims
+  attach_sampling(sims, betas, draw_index = TRUE)
 }
 
 #' @export
-`smooth_samples.gamm` <- function(model, ...) {
+`smooth_samples.gamm` <- function(
+  model,
+  ...
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+
   smooth_samples(model$gam, ...)
 }
 
 #' @title Posterior expectations of derivatives from an estimated model
 #'
-#' @param object an R object to compute derivatives for
+#' @param model a fitted model to compute derivative samples for
 #' @param ... arguments passed to other methods and on to `fitted_samples()`
 #'
 #' @author Gavin L. Simpson
 #'
 #' @export
-`derivative_samples` <- function(object, ...) {
+`derivative_samples` <- function(
+  model,
+  ...
+) {
+  sampling_check_names(substitute(list(...)), derivative = TRUE)
+
   UseMethod("derivative_samples")
 }
 
 #' @rdname derivative_samples
 #' @export
-`derivative_samples.default` <- function(object, ...) {
+`derivative_samples.default` <- function(
+  model,
+  ...
+) {
+  sampling_check_names(substitute(list(...)), derivative = TRUE)
+
   ## want to bail with a useful error;
   ## see Jenny Bryan's Code Smells UseR 2018 talk: rstd.io/code-smells
-  stop("Don't know how to calculate response derivatives for <",
-    class(object)[[1L]], ">",
+  stop(
+    "Don't know how to calculate response derivatives for <",
+    class(model)[[1L]],
+    ">",
     call. = FALSE
   ) # don't show the call, simpler error
 }
@@ -1377,12 +1880,17 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' @rdname derivative_samples
 #'
 #' @export
-`derivative_samples.gamm` <- function(object, ...) {
-  derivative_samples(object[["gam"]], ...)
+`derivative_samples.gamm` <- function(
+  model,
+  ...
+) {
+  sampling_check_names(substitute(list(...)), derivative = TRUE)
+
+  derivative_samples(model[["gam"]], ...)
 }
 
 #' @param envir the environment within which to recreate the data used to fit
-#'   `object`.
+#'   `model`.
 #' @param draws matrix; user supplied posterior draws to be used when
 #'   `method = "user"`.
 #' @param mvn_method character; one of `"mvnfast"` or `"mgcv"`. The default is
@@ -1390,9 +1898,11 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #'   numbers of MVN random values than `mgcv::rmvn()`, but which might not work
 #'   for some marginal fits, such as those where the covariance matrix is close
 #'   to singular.
-#' @param level `r lifecycle::badge("deprecated")`
 #'
-#' @inheritParams response_derivatives
+#' @inheritParams response_derivatives focal data order type scale eps
+#' @inheritParams smooth_samples n_grid
+#' @inheritParams post_draws n_draws n_cores n_threads burnin thin t_df rw_scale frequentist unconditional seed method
+#' @inheritParams post_draws chains diagnostics mh_backend block_size dense_limit
 #'
 #' @export
 #'
@@ -1419,7 +1929,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' # samples from posterior of derivatives
 #' fd_samp <- derivative_samples(m,
 #'   data = ds, type = "central",
-#'   focal = "x2", eps = 0.01, seed = 21, n_sim = 100
+#'   focal = "x2", eps = 0.01, seed = 21, n_draws = 100
 #' )
 #'
 #' # plot the first 20 posterior draws
@@ -1431,66 +1941,173 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #'     geom_line(alpha = 0.5)
 #' }
 `derivative_samples.gam` <- function(
-  object,
-  focal = NULL,
+  model,
+  ...,
   data = NULL,
+  n_draws = NULL,
+  chains = NULL,
+  seed = NULL,
+  method = c("gaussian", "mh", "inla", "user"),
+  n_cores = 1L,
+  n_threads = 1L,
+  burnin = 1000,
+  thin = 1L,
+  t_df = 40,
+  rw_scale = 0.25,
+  frequentist = FALSE,
+  unconditional = FALSE,
+  draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia"),
+  mvn_method = c("mvnfast", "mgcv"),
+  block_size = 10000L,
+  dense_limit = 5e6,
+  focal = NULL,
   order = 1L,
   type = c("forward", "backward", "central"),
   scale = c("response", "linear_predictor"),
-  method = c("gaussian", "mh", "inla", "user"),
-  n = 100,
+  n_grid = 200L,
   eps = NULL,
-  n_sim = 10000,
-  level = lifecycle::deprecated(),
-  seed = NULL,
-  envir = environment(formula(object)),
-  draws = NULL,
-  mvn_method = c("mvnfast", "mgcv"),
-  ...
+  envir = environment(formula(model))
 ) {
-  # deal with deprecation of level
-  if (lifecycle::is_present(level)) {
-    lifecycle::deprecate_warn(
-      when = "0.9.2.9002",
-      what = "derivative_samples(level)",
-      details = "`level` was never supported and will be removed in the next release."
+  sampling_check_names(substitute(list(...)), derivative = TRUE)
+  sampling_check_extra(substitute(list(...)), prediction = TRUE)
+  sampling_check_options(
+    match.arg(method),
+    names(match.call(expand.dots = FALSE))[-1L],
+    mh_backend = match.arg(mh_backend),
+    mvn_method = match.arg(mvn_method)
+  )
+  layout <- sampling_resolve(n_draws, chains, draws, method = match.arg(method))
+  n_draws <- layout$n_draws
+  chains <- layout$chains
+  if (!is.null(data) && !is.data.frame(data)) {
+    stop(
+      "'data' must be a data frame; name the draw count with n_draws = ... .",
+      call. = FALSE
     )
   }
+  n_grid <- sampling_count(n_grid, "n_grid")
+  n_threads <- sampling_count(n_threads, "n_threads")
+
   do_derivative_samples(
-    object = object, focal = focal, data = data, order = order, type = type,
-    scale = scale, method = method, n = n, eps = eps, n_sim = n_sim,
-    seed = seed, envir = envir, draws = draws, mvn_method = mvn_method, ...
+    n_cores = n_cores,
+    burnin = burnin,
+    thin = thin,
+    t_df = t_df,
+    rw_scale = rw_scale,
+    frequentist = frequentist,
+    unconditional = unconditional,
+    n_threads = n_threads,
+    object = model,
+    focal = focal,
+    data = data,
+    order = order,
+    type = type,
+    scale = scale,
+    method = method,
+    n = n_grid,
+    eps = eps,
+    n_sim = n_draws,
+    seed = seed,
+    envir = envir,
+    draws = draws,
+    mvn_method = mvn_method,
+    chains = chains,
+    diagnostics = diagnostics,
+    mh_backend = mh_backend,
+    block_size = block_size,
+    dense_limit = dense_limit,
+    ...
   )
 }
 
 #' @export
 #' @rdname derivative_samples
 `derivative_samples.scam` <- function(
-  object,
-  focal = NULL,
+  model,
+  ...,
   data = NULL,
+  n_draws = NULL,
+  chains = NULL,
+  seed = NULL,
+  method = c("gaussian", "mh", "inla", "user"),
+  n_cores = 1L,
+  n_threads = 1L,
+  burnin = 1000,
+  thin = 1L,
+  t_df = 40,
+  rw_scale = 0.25,
+  frequentist = FALSE,
+  unconditional = FALSE,
+  draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia"),
+  mvn_method = c("mvnfast", "mgcv"),
+  block_size = 10000L,
+  dense_limit = 5e6,
+  focal = NULL,
   order = 1L,
   type = c("forward", "backward", "central"),
   scale = c("response", "linear_predictor"),
-  method = c("gaussian", "mh", "inla", "user"),
-  n = 100,
+  n_grid = 200L,
   eps = NULL,
-  n_sim = 10000,
-  seed = NULL,
-  envir = environment(formula(object)),
-  draws = NULL,
-  mvn_method = c("mvnfast", "mgcv"),
-  ...
+  envir = environment(formula(model))
 ) {
+  sampling_check_names(substitute(list(...)), derivative = TRUE)
+  sampling_check_extra(substitute(list(...)), prediction = TRUE)
+  sampling_check_options(
+    match.arg(method),
+    names(match.call(expand.dots = FALSE))[-1L],
+    mh_backend = match.arg(mh_backend),
+    mvn_method = match.arg(mvn_method)
+  )
+  layout <- sampling_resolve(n_draws, chains, draws, method = match.arg(method))
+  n_draws <- layout$n_draws
+  chains <- layout$chains
+  if (!is.null(data) && !is.data.frame(data)) {
+    stop(
+      "'data' must be a data frame; name the draw count with n_draws = ... .",
+      call. = FALSE
+    )
+  }
+  n_grid <- sampling_count(n_grid, "n_grid")
+  n_threads <- sampling_count(n_threads, "n_threads")
+
   do_derivative_samples(
-    object = object, focal = focal, data = data, order = order, type = type,
-    scale = scale, method = method, n = n, eps = eps, n_sim = n_sim,
-    seed = seed, envir = envir, draws = draws, mvn_method = mvn_method,
+    n_cores = n_cores,
+    burnin = burnin,
+    thin = thin,
+    t_df = t_df,
+    rw_scale = rw_scale,
+    frequentist = frequentist,
+    unconditional = unconditional,
+    n_threads = n_threads,
+    object = model,
+    focal = focal,
+    data = data,
+    order = order,
+    type = type,
+    scale = scale,
+    method = method,
+    n = n_grid,
+    eps = eps,
+    n_sim = n_draws,
+    seed = seed,
+    envir = envir,
+    draws = draws,
+    mvn_method = mvn_method,
+    chains = chains,
+    diagnostics = diagnostics,
+    mh_backend = mh_backend,
+    block_size = block_size,
+    dense_limit = dense_limit,
     ...
   )
 }
 
 `do_derivative_samples` <- function(
+  n_threads = 1L,
   object,
   focal = NULL,
   data = NULL,
@@ -1505,6 +2122,11 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   envir = environment(formula(object)),
   draws = NULL,
   mvn_method = c("mvnfast", "mgcv"),
+  chains = 1L,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia"),
+  block_size = 10000L,
+  dense_limit = 5e6,
   ...
 ) {
   object <- with_model_envir(object, envir)
@@ -1516,21 +2138,45 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   ## handle scale
   scale <- match.arg(scale)
 
-  grid <- prepare_response_derivative_data(object, focal, data, n, eps,
-    order, type)
+  grid <- prepare_response_derivative_data(
+    object,
+    focal,
+    data,
+    n,
+    eps,
+    order,
+    type
+  )
   data <- grid$data
   fd_data <- grid$fd_data
   eps <- grid$eps
 
   ## compute posterior draws of E(y) (on response scale)
-  fs <- fitted_samples(
-    model = object, n = n_sim, data = fd_data,
-    method = method, seed = seed, draws = draws,
-    mvn_method = mvn_method, scale = scale, ...
+  fs <- sampling_call(
+    fitted_samples,
+    list(
+      n_threads = n_threads,
+      model = object,
+      n_draws = n_sim,
+      data = fd_data,
+      method = method,
+      seed = seed,
+      draws = draws,
+      mvn_method = mvn_method,
+      scale = scale,
+      chains = chains,
+      diagnostics = diagnostics,
+      mh_backend = mh_backend,
+      block_size = block_size,
+      dense_limit = dense_limit,
+      ...
+    )
   )
 
+  sampling <- attr(fs, "sampling")
   fs <- fs |>
-    left_join(select(fd_data, all_of(c(".row", "..type", "..orig"))),
+    left_join(
+      select(fd_data, all_of(c(".row", "..type", "..orig"))),
       by = ".row"
     )
 
@@ -1544,5 +2190,5 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     relocate(".row", .before = 1L)
 
   class(yd) <- append(class(yd), "derivative_samples", after = 0L)
-  yd
+  attach_sampling(yd, sampling)
 }

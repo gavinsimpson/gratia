@@ -423,16 +423,16 @@ test_that("draw works for sample_smooths objects", {
   skip_on_cran()
   # skip_on_ci() # testing without as moved to mac os x # minor statistical differences
 
-  sm1 <- smooth_samples(su_m_univar_4, n = 5, seed = 23478, n_vals = 50)
+  sm1 <- smooth_samples(su_m_univar_4, n_draws = 5, seed = 23478, n_grid = 50)
   plt1 <- draw(sm1, alpha = 0.7, n_samples = 5, seed = 2635, rug = FALSE)
 
-  sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478, n_vals = 50)
+  sm2 <- smooth_samples(su_m_bivar, n_draws = 4, seed = 23478, n_grid = 50)
   plt2 <- draw(sm2, alpha = 0.7, n_samples = 4, seed = 2635)
 
-  sm3 <- smooth_samples(su_m_factor_by, n = 5, seed = 23478, n_vals = 50)
+  sm3 <- smooth_samples(su_m_factor_by, n_draws = 5, seed = 23478, n_grid = 50)
   plt3 <- draw(sm3, alpha = 0.7, n_samples = 5, seed = 2635, rug = FALSE)
 
-  sm3 <- smooth_samples(su_m_factor_by, n = 5, seed = 23478, n_vals = 50)
+  sm3 <- smooth_samples(su_m_factor_by, n_draws = 5, seed = 23478, n_grid = 50)
   plt4 <- draw(sm3,
     alpha = 0.7, scales = "fixed", n_samples = 10,
     seed = 2635, rug = FALSE
@@ -449,25 +449,25 @@ test_that("draw works for sample_smooths objects rotated labels", {
   skip_on_cran()
   # skip_on_ci() # testing without as moved to mac os x # minor statistical differences
 
-  sm1 <- smooth_samples(su_m_univar_4, n = 5, seed = 23478, n_vals = 50)
+  sm1 <- smooth_samples(su_m_univar_4, n_draws = 5, seed = 23478, n_grid = 50)
   plt1 <- draw(sm1,
     alpha = 0.7, n_samples = 5, seed = 2635, angle = 45,
     rug = FALSE
   )
 
-  sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478, n_vals = 50)
+  sm2 <- smooth_samples(su_m_bivar, n_draws = 4, seed = 23478, n_grid = 50)
   plt2 <- draw(sm2,
     alpha = 0.7, n_samples = 4, seed = 2635, angle = 45,
     rug = FALSE
   )
 
-  sm3 <- smooth_samples(su_m_factor_by, n = 5, seed = 23478, n_vals = 50)
+  sm3 <- smooth_samples(su_m_factor_by, n_draws = 5, seed = 23478, n_grid = 50)
   plt3 <- draw(sm3,
     alpha = 0.7, n_samples = 5, seed = 2635, angle = 45,
     rug = FALSE
   )
 
-  sm3 <- smooth_samples(su_m_factor_by, n = 5, seed = 23478, n_vals = 50)
+  sm3 <- smooth_samples(su_m_factor_by, n_draws = 5, seed = 23478, n_grid = 50)
   plt4 <- draw(sm3,
     alpha = 0.7, scales = "fixed", n_samples = 5, seed = 2635,
     angle = 45, rug = FALSE
@@ -485,7 +485,7 @@ test_that("draw works for sample_smooths objects rotated labels", {
 
 test_that("draw works for smooth_samples objects", {
   skip_on_os("win")
-  sm2 <- smooth_samples(su_m_bivar, n = 2, seed = 23478, n_vals = 50)
+  sm2 <- smooth_samples(su_m_bivar, n_draws = 2, seed = 23478, n_grid = 50)
   plt <- draw(sm2, alpha = 0.7, contour = TRUE)
 
   # skip_on_ci() # testing without as moved to mac os x
@@ -496,13 +496,13 @@ test_that("draw works for sample_smooths objects with n_samples", {
   skip_on_cran()
   # skip_on_ci() # testing without as moved to mac os x # minor statistical differences
 
-  sm1 <- smooth_samples(su_m_univar_4, n = 5, seed = 23478, n_vals = 50)
+  sm1 <- smooth_samples(su_m_univar_4, n_draws = 5, seed = 23478, n_grid = 50)
   plt1 <- draw(sm1, alpha = 0.7, n_samples = 3, rug = FALSE, seed = 1)
 
-  sm2 <- smooth_samples(su_m_bivar, n = 4, seed = 23478, n_vals = 50)
+  sm2 <- smooth_samples(su_m_bivar, n_draws = 4, seed = 23478, n_grid = 50)
   plt2 <- draw(sm2, alpha = 0.7, n_samples = 2, rug = FALSE, seed = 14)
 
-  sm3 <- smooth_samples(su_m_factor_by, n = 5, seed = 23478, n_vals = 50)
+  sm3 <- smooth_samples(su_m_factor_by, n_draws = 5, seed = 23478, n_grid = 50)
   plt3 <- draw(sm3, alpha = 0.7, n_samples = 3, rug = FALSE, seed = 19)
 
   # skip_on_ci() # testing without as moved to mac os x
@@ -515,7 +515,7 @@ test_that("draw works for sample_smooths objects with user specified smooth", {
   skip_on_cran()
   # skip_on_ci() # testing without as moved to mac os x # minor statistical differences
 
-  sm3 <- smooth_samples(su_m_factor_by, n = 5, seed = 23478, n_vals = 50)
+  sm3 <- smooth_samples(su_m_factor_by, n_draws = 5, seed = 23478, n_grid = 50)
   plt1 <- draw(sm3, select = "s(x0)", alpha = 0.7, rug = FALSE)
 
   plt2 <- draw(sm3,

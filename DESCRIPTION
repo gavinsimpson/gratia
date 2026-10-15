@@ -12,6 +12,8 @@ Maintainer: Gavin L. Simpson <ucfagls@gmail.com>
 Depends:
     R (>= 4.4.0)
 Imports:
+    Rcpp,
+    parallel,
     KernSmooth,
     mgcv (>= 1.9-4),
     ggplot2 (>= 3.5.0),
@@ -36,6 +38,8 @@ Imports:
     scales,
     utils
 Suggests:
+    posterior,
+    coda,
     ggcube (>= 0.3.0),
     geometry,
     qgam,
@@ -73,6 +77,7 @@ License: MIT + file LICENSE
 LazyData: true
 URL: https://gavinsimpson.github.io/gratia/
 BugReports: https://github.com/gavinsimpson/gratia/issues
+LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
 Language: en-GB
