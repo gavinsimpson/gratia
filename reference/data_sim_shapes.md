@@ -69,7 +69,7 @@ d <- data_sim("sc_additive", family = poisson(), seed = 2,
   predictors = function(d) d$f)
 m <- scasm(y ~ s(x0) + s(x1, bs = "sc", xt = "m+") + s(x2) +
   s(x3, bs = "sc", xt = "c+"), family = poisson(), data = d)
-#> Error in if (Rcond * tol < 1) ok <- FALSE else rank <- rank - 1: missing value where TRUE/FALSE needed
+#> Error in H[jj, ]: subscript out of bounds
 
 d <- data_sim("sc_tensor", seed = 2)
 m <- scasm(y ~ te(x, z, bs = c("sc", "sc"), xt = list("m+", "m+"),

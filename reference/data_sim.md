@@ -31,8 +31,8 @@ data_sim(
 
 - model:
 
-  character; either `"egX"` where `X` is an integer `1:7`, or the name
-  of a model. See Details for possible options.
+  character; the name of a model, such as `"additive"` or its original
+  name `"eg1"`. See Details for all names and aliases.
 
 - n:
 
@@ -139,38 +139,43 @@ caller's RNG normally.
 ## Details
 
 `data_sim()` can simulate data from several underlying models of known
-true functions. The available options currently are:
+true functions. Descriptive names and their original short names are
+interchangeable, giving identical output for the same arguments and
+seed. The available options currently are:
 
-- `"eg1"`: a four term additive true model. This is the classic Gu &
-  Wahba four univariate term test model. See
+- `"additive"` or `"eg1"`: a four term additive true model. This is the
+  classic Gu & Wahba four univariate term test model. See
   [`gw_functions`](https://gavinsimpson.github.io/gratia/reference/gw_functions.md)
   for more details of the underlying four functions.
 
-- `"eg2"`: a bivariate smooth true model.
+- `"bivariate_surface"` or `"eg2"`: a bivariate smooth true model.
 
-- `"eg3"`: an example containing a continuous by smooth (varying
-  coefficient) true model. The model is \\\hat{y}\_i =
-  f_2(x\_{2i})x\_{1i}\\ where the function \\f_2()\\ is \\f_2(x) = 0.2
+- `"varying_coefficient"` or `"eg3"`: an example containing a continuous
+  by smooth (varying coefficient) true model. The model is \\\hat{y}\_i
+  = f_2(x\_{2i})x\_{1i}\\ where the function \\f_2()\\ is \\f_2(x) = 0.2
   \* x^{11} \* (10 \* (1 - x))^6 + 10 \* (10 \* x)^3 \* (1 - x)^{10}\\.
 
-- `"eg4"`: a factor by smooth true model. The true model contains a
-  factor with 3 levels, where the response for the *n*th level follows
-  the *n*th Gu & Wahba function (for \\n \in {1, 2, 3}\\).
+- `"factor_by"` or `"eg4"`: a factor by smooth true model. The true
+  model contains a factor with 3 levels, where the response for the
+  *n*th level follows the *n*th Gu & Wahba function (for \\n \in {1, 2,
+  3}\\).
 
-- `"eg5"`: an additive plus factor true model. The response is a linear
-  combination of the Gu & Wahba functions 2, 3, 4 (the latter is a null
-  function) plus a factor term with four levels.
+- `"additive_factor"` or `"eg5"`: an additive plus factor true model.
+  The response is a linear combination of the Gu & Wahba functions 2, 3,
+  4 (the latter is a null function) plus a factor term with four levels.
 
-- `"eg6"`: an additive plus random effect term true model.
+- `"additive_group_effects"` or `"eg6"`: an additive model plus four
+  group intercepts with fixed realised values `3, 6, 9, 12`.
 
-- `"eg7"`: a version of the model in `"eg1"`, but where the covariates
-  are correlated.
+- `"additive_correlated"` or `"eg7"`: a version of the model in `"eg1"`,
+  but where the covariates are correlated.
 
-- `"gwf2"`: a model where the response is Gu & Wahba's \\f_2(x_i)\\ plus
-  noise.
+- `"gu_wahba_f2"` or `"gwf2"`: a model where the response is Gu &
+  Wahba's \\f_2(x_i)\\ plus noise.
 
-- `"lwf6"`: a model where the response is Luo & Wahba's "example 6"
-  function \\sin(2(4x-2)) + 2 exp(-256(x-0.5)^2)\\ plus noise.
+- `"luo_wahba_f6"` or `"lwf6"`: a model where the response is Luo &
+  Wahba's "example 6" function \\sin(2(4x-2)) + 2 exp(-256(x-0.5)^2)\\
+  plus noise.
 
 - `"gfam"`: simulates data for use with GAMs with
   `family = gfam(families)`. See example in
@@ -238,7 +243,7 @@ Assoc.* **92**, 107–116.
 ## Examples
 
 ``` r
-data_sim("eg1", n = 100, seed = 1)
+data_sim("additive", n = 100, seed = 1)
 #> # A tibble: 100 x 10
 #>          y       x0      x1      x2       x3       f      f0     f1     f2    f3
 #>      <dbl>    <dbl>   <dbl>   <dbl>    <dbl>   <dbl>   <dbl>  <dbl>  <dbl> <dbl>
@@ -255,7 +260,7 @@ data_sim("eg1", n = 100, seed = 1)
 #> # i 90 more rows
 
 # an ordered categorical response
-data_sim("eg1", n = 100, dist = "ocat", n_cat = 4, cuts = c(-1, 0, 5))
+data_sim("additive", n = 100, dist = "ocat", n_cat = 4, cuts = c(-1, 0, 5))
 #> # A tibble: 100 x 11
 #>        y      x0        x1      x2       x3         f      f0     f1         f2
 #>    <int>   <dbl>     <dbl>   <dbl>    <dbl>     <dbl>   <dbl>  <dbl>      <dbl>

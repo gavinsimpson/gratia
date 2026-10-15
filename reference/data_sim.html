@@ -91,8 +91,8 @@ distribution can be applied to all the example types.</p>
 
 
 <dl><dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
-<dd><p>character; either <code>"egX"</code> where <code>X</code> is an integer <code>1:7</code>, or
-the name of a model. See Details for possible options.</p></dd>
+<dd><p>character; the name of a model, such as <code>"additive"</code> or its
+original name <code>"eg1"</code>. See Details for all names and aliases.</p></dd>
 
 
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
@@ -192,25 +192,34 @@ An explicit <code>seed</code> restores the caller's RNG state, including its abs
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p><code>data_sim()</code> can simulate data from several underlying models of
-known true functions. The available options currently are:</p><ul><li><p><code>"eg1"</code>: a four term additive true model. This is the classic Gu &amp; Wahba
+known true functions. Descriptive names and their original short names
+are interchangeable, giving identical output for the same arguments and
+seed. The available options currently are:</p><ul><li><p><code>"additive"</code> or <code>"eg1"</code>: a four term additive true model. This is the
+classic Gu &amp; Wahba
 four univariate term test model. See <code><a href="gw_functions.html">gw_functions</a></code> for more details of
 the underlying four functions.</p></li>
-<li><p><code>"eg2"</code>: a bivariate smooth true model.</p></li>
-<li><p><code>"eg3"</code>: an example containing a continuous by smooth (varying
+<li><p><code>"bivariate_surface"</code> or <code>"eg2"</code>: a bivariate smooth true model.</p></li>
+<li><p><code>"varying_coefficient"</code> or <code>"eg3"</code>: an example containing a continuous
+by smooth (varying
 coefficient) true model. The model is \(\hat{y}_i = f_2(x_{2i})x_{1i}\) where the function \(f_2()\) is \(f_2(x) = 0.2 * x^{11} *
 (10 * (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^{10}\).</p></li>
-<li><p><code>"eg4"</code>: a factor by smooth true model. The true model contains a factor
+<li><p><code>"factor_by"</code> or <code>"eg4"</code>: a factor by smooth true model. The true model
+contains a factor
 with 3 levels, where the response for the <em>n</em>th level follows the <em>n</em>th
 Gu &amp; Wahba function (for \(n \in {1, 2, 3}\)).</p></li>
-<li><p><code>"eg5"</code>: an additive plus factor true model. The response is a linear
+<li><p><code>"additive_factor"</code> or <code>"eg5"</code>: an additive plus factor true model. The
+response is a linear
 combination of the Gu &amp; Wahba functions 2, 3, 4 (the latter is a null
 function) plus a factor term with four levels.</p></li>
-<li><p><code>"eg6"</code>: an additive plus random effect term true model.</p></li>
-<li><p><code>"eg7"</code>: a version of the model in <code>"eg1"</code>, but where the covariates are
+<li><p><code>"additive_group_effects"</code> or <code>"eg6"</code>: an additive model plus four
+group intercepts with fixed realised values <code>3, 6, 9, 12</code>.</p></li>
+<li><p><code>"additive_correlated"</code> or <code>"eg7"</code>: a version of the model in <code>"eg1"</code>,
+but where the covariates are
 correlated.</p></li>
-<li><p><code>"gwf2"</code>: a model where the response is Gu &amp; Wahba's
+<li><p><code>"gu_wahba_f2"</code> or <code>"gwf2"</code>: a model where the response is Gu &amp; Wahba's
 \(f_2(x_i)\) plus noise.</p></li>
-<li><p><code>"lwf6"</code>: a model where the response is Luo &amp; Wahba's "example 6"
+<li><p><code>"luo_wahba_f6"</code> or <code>"lwf6"</code>: a model where the response is Luo &amp;
+Wahba's "example 6"
 function \(sin(2(4x-2)) + 2 exp(-256(x-0.5)^2)\) plus noise.</p></li>
 <li><p><code>"gfam"</code>: simulates data for use with GAMs with
 <code>family = gfam(families)</code>. See example in <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code>. If this model
@@ -263,7 +272,7 @@ Bayesian "Confidence Intervals." <em>J. Comput. Graph. Stat.</em> <strong>2</str
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">data_sim</span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">100</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">data_sim</span><span class="op">(</span><span class="st">"additive"</span>, n <span class="op">=</span> <span class="fl">100</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 100 x 10</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          y       x0      x1      x2       x3       f      f0     f1     f2    f3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
@@ -280,7 +289,7 @@ Bayesian "Confidence Intervals." <em>J. Comput. Graph. Stat.</em> <strong>2</str
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 90 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># an ordered categorical response</span></span></span>
-<span class="r-in"><span><span class="fu">data_sim</span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">100</span>, dist <span class="op">=</span> <span class="st">"ocat"</span>, n_cat <span class="op">=</span> <span class="fl">4</span>, cuts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">data_sim</span><span class="op">(</span><span class="st">"additive"</span>, n <span class="op">=</span> <span class="fl">100</span>, dist <span class="op">=</span> <span class="st">"ocat"</span>, n_cat <span class="op">=</span> <span class="fl">4</span>, cuts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 100 x 11</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        y      x0        x1      x2       x3         f      f0     f1         f2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>

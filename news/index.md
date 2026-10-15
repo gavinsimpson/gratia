@@ -109,6 +109,12 @@
 
 ### New features
 
+- [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md)
+  accepts descriptive aliases for the original example models, including
+  `"additive"`, `"bivariate_surface"`, `"gu_wahba_f2"` and
+  `"luo_wahba_f6"`. All existing names remain supported and produce
+  identical seeded output.
+
 - [`ale()`](https://gavinsimpson.github.io/gratia/reference/ale.md)
   computes accumulated local effects for numeric covariates in
   [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
