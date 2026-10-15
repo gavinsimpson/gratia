@@ -148,7 +148,7 @@ validation.
 
 ## Log-smoothing parameter uncertainty
 
-The internal prototype uses cached Gaussian conditional distributions instead
+The Gaussian identity prototype uses cached conditional distributions instead
 of refitting for every draw. It mixes those distributions over an approximate
 normal distribution of fitted log-smoothing parameters, with dispersion fixed.
 This approximation does not specify hyperpriors or sample a joint posterior
@@ -171,7 +171,9 @@ A positive contribution from varying conditional means does not guarantee an
 increase over covariance evaluated at one fitted smoothing parameter value.
 
 Discrete bam remains excluded until its compressed fitting design can be
-reconstructed consistently. Non-Gaussian conditional updates, dispersion
+reconstructed consistently. Native conditional updates now cover ordinary and
+extended families; see [the family inventory](smoothing-families.md) for validated
+combinations, parameter ordering and precise remaining restrictions. Dispersion
 uncertainty, minimum smoothing parameters and edge-corrected smoothing
 covariances remain separate work. See [smoothing-report.md](smoothing-report.md)
 for evidence, restrictions and reproduction instructions.
@@ -179,7 +181,7 @@ for evidence, restrictions and reproduction instructions.
 The extended [fitting-method audit](smoothing-methods.md) records actual
 ML/REML/fREML fitting methods, scalar family parameters and dispersion
 positions. Smoothing uncertainty excludes NCV and QNCV. The next step is
-repeated-simulation validation of interval coverage for the retained Gaussian
+repeated-simulation validation of interval coverage for the retained conditional
 mixture before adding a public sampling option.
 
 ## Follow-up performance and mixing studies

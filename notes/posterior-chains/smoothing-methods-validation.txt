@@ -95,22 +95,22 @@ R 4.6.1 ; mgcv 1.9.4
     family=1; log(sp)=2; log(scale)=3    family=1; log(sp)=2; log(scale)=3
  family=1,2; log(sp)=3,4; log(scale)= family=1,2; log(sp)=3,4; log(scale)=
     family=; log(sp)=1,2; log(scale)=    family=; log(sp)=1,2; log(scale)=
-                                                       research_calculation
-                                    Gaussian estimation-uncertainty mixture
-                                    Gaussian estimation-uncertainty mixture
-                                                                       <NA>
-                                    Gaussian estimation-uncertainty mixture
-                                    Gaussian estimation-uncertainty mixture
-                                    Gaussian estimation-uncertainty mixture
-                                    Gaussian estimation-uncertainty mixture
-                                    Gaussian estimation-uncertainty mixture
- Cannot identify a finite covariance for the free log-smoothing parameters.
-                                    Gaussian estimation-uncertainty mixture
- Cannot identify a finite covariance for the free log-smoothing parameters.
-           The smoothing-mixture prototype requires Gaussian identity fits.
-           The smoothing-mixture prototype requires Gaussian identity fits.
-           The smoothing-mixture prototype requires Gaussian identity fits.
-           The smoothing-mixture prototype requires Gaussian identity fits.
+                                                                                research_calculation
+                                                             Gaussian estimation-uncertainty mixture
+                                                             Gaussian estimation-uncertainty mixture
+                                                                                                <NA>
+                                                             Gaussian estimation-uncertainty mixture
+                                                             Gaussian estimation-uncertainty mixture
+                                                             Gaussian estimation-uncertainty mixture
+                                                             Gaussian estimation-uncertainty mixture
+                                                             Gaussian estimation-uncertainty mixture
+                          Cannot identify a finite covariance for the free log-smoothing parameters.
+                                                             Gaussian estimation-uncertainty mixture
+                          Cannot identify a finite covariance for the free log-smoothing parameters.
+                                            Native conditional normal estimation-uncertainty mixture
+                                            Native conditional normal estimation-uncertainty mixture
+                                            Native conditional normal estimation-uncertainty mixture
+ The smoothing-mixture prototype supports ordinary and extended families, not general.family models.
 
 R version 4.6.1 (2026-06-24)
 Platform: aarch64-apple-darwin23

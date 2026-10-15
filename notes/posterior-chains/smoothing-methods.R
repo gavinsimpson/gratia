@@ -69,7 +69,9 @@ rows <- lapply(names(cases), function(nm) {
     db_drho = dimension(info$db.drho), Vc = dimension(info$Vc),
     V_sp_order = indices(info$V_sp_layout), sp_vcov_order = indices(info$sp_vcov_layout),
     research_calculation = if (inherits(probe, "error")) conditionMessage(probe) else
-        "Gaussian estimation-uncertainty mixture"))
+        if (identical(probe$conditional_backend, "family"))
+          "Native conditional normal estimation-uncertainty mixture" else
+          "Gaussian estimation-uncertainty mixture"))
 })
 fields <- unique(unlist(lapply(rows, names)))
 rows <- do.call(rbind, lapply(rows, function(x) {

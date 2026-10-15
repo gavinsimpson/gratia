@@ -1,7 +1,7 @@
-# Internal research implementation. These draws mix exact Gaussian conditional
-# coefficient distributions over a fitted log-smoothing normal approximation.
-# They propagate approximate estimation uncertainty, without Bayesian integration.
-sampling_smoothing_setup <- function(model, block_size = 10000L) {
+# Internal research implementation. Conditional coefficient distributions
+# are exact for Gaussian identity fits and normal approximations otherwise.
+# The mixture propagates estimation uncertainty, without Bayesian integration.
+sampling_smoothing_setup <- function(model, block_size = 10000L, dense_limit = 2e7) {
   sampling_target_check(model, "smoothing-mixture")
   method <- model$method
   if (length(method) != 1L || is.na(method) ||
@@ -11,8 +11,8 @@ sampling_smoothing_setup <- function(model, block_size = 10000L) {
       "the actual fitted method is %s."), actual), call. = FALSE)
   }
   fam <- stats::family(model)
-  if (!identical(fam$family, "gaussian") || !identical(fam$link, "identity")) {
-    stop("The smoothing-mixture prototype requires Gaussian identity fits.",
+  if (!inherits(fam, "family") || inherits(fam, "general.family")) {
+    stop("The smoothing-mixture prototype supports ordinary and extended families, not general.family models.",
       call. = FALSE)
   }
   if (inherits(model, "bam") && !is.null(model$dinfo)) stop(
@@ -27,6 +27,8 @@ sampling_smoothing_setup <- function(model, block_size = 10000L) {
   # This also checks additional penalties and the fitted penalty ordering.
   sampling_target_penalty(model, "smoothing-mixture")
   block_size <- sampling_count(block_size, "block_size")
+  if (!identical(fam$family, "gaussian") || !identical(fam$link, "identity"))
+    return(sampling_smoothing_family_setup(model, block_size = block_size, dense_limit = dense_limit))
   model <- model_used_rows(model)
   phi <- model$sig2
   if (length(phi) != 1L || !is.finite(phi) || phi <= 0) stop(
@@ -155,6 +157,8 @@ sampling_smoothing_conditional <- function(setup, log_sp) {
   if (any(!is.finite(multiplier) | multiplier <= 0)) stop(
     "A sampled smoothing parameter is outside the numerically supported range.",
     call. = FALSE)
+  if (identical(setup$conditional_backend, "family"))
+    return(sampling_smoothing_family_conditional(setup, multiplier))
   P <- setup$XtWX
   for (k in seq_along(setup$penalties)) {
     block <- setup$penalties[[k]]
@@ -183,12 +187,14 @@ sampling_smoothing_draws <- function(setup, n_draws = 1000L, seed = NULL,
   }
   draw <- function() {
     rho <- matrix(mgcv::rmvn(n_draws, setup$log_sp, log_sp_cov), nrow = n_draws)
-    p <- ncol(setup$XtWX)
+    p <- length(setup$names)
     beta <- means <- matrix(NA_real_, n_draws, p,
       dimnames = list(NULL, setup$names))
     average_covariance <- matrix(0, p, p)
     for (i in seq_len(n_draws)) {
-      conditional <- sampling_smoothing_conditional(setup, rho[i, ])
+      conditional <- tryCatch(sampling_smoothing_conditional(setup, rho[i, ]),
+        error = function(e) stop(sprintf("Smoothing draw %d failed: %s", i,
+          conditionMessage(e)), call. = FALSE))
       means[i, ] <- conditional$mean
       average_covariance <- average_covariance + conditional$covariance / n_draws
       beta[i, ] <- mgcv::rmvn(1L, conditional$mean, conditional$covariance)

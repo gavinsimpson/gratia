@@ -130,8 +130,8 @@ test_that("smoothing setup uses retained fitting rows and call-level offsets", {
 test_that("smoothing prototype rejects unsupported targets precisely", {
   d <- smoothing_research_fixture()$data
   fit <- mgcv::gam(y ~ s(x, k = 5), data = d, method = "REML")
-  fit$family <- poisson()
-  expect_error(sampling_smoothing_setup(fit), "Gaussian identity")
+  fit$family <- mgcv::gaulss()
+  expect_error(sampling_smoothing_setup(fit), "general.family")
   fit$family <- gaussian()
   fit$method <- "GCV.Cp"
   expect_error(sampling_smoothing_setup(fit), "ML, REML, or fREML")
@@ -239,7 +239,7 @@ test_that("smoothing audit distinguishes actual fitting and parameter blocks", {
     data = d, family = mgcv::gaulss(), method = "ML")
   expect_identical(sampling_smoothing_info(lss)$fitting$actual_method, "REML")
   expect_identical(sampling_smoothing_info(lss)$fitting$requested_method, "ML")
-  expect_error(sampling_smoothing_setup(lss), "Gaussian identity")
+  expect_error(sampling_smoothing_setup(lss), "general.family")
   withr::local_seed(872)
   d$count <- rnbinom(nrow(d), mu = exp(1 + sin(6 * d$x)), size = 3)
   nb <- mgcv::gam(count ~ s(x, k = 5) + s(z, k = 5), data = d,
@@ -250,7 +250,7 @@ test_that("smoothing audit distinguishes actual fitting and parameter blocks", {
   expect_length(info$V_sp_layout$log_scale, 0L)
   expect_equal(exp(info$family_parameters$internal), info$family_parameters$response)
   expect_false(info$family_parameters$sampled)
-  expect_error(sampling_smoothing_setup(nb), "Gaussian identity")
+  expect_silent(sampling_smoothing_setup(nb))
   fixed_nb <- mgcv::gam(count ~ s(x, k = 5), data = d,
     family = mgcv::nb(theta = 3), method = "ML")
   expect_length(sampling_smoothing_info(fixed_nb)$V_sp_layout$family, 0L)

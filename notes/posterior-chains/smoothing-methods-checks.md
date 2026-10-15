@@ -1,5 +1,9 @@
 # ML/REML/fREML smoothing uncertainty: validation
 
+This record covers the NCV removal committed as `cacdf9e62`. The subsequent
+[ordinary and extended-family extension](smoothing-families-checks.md) has its
+own validation record.
+
 Validated on 15 October 2026 with R 4.6.1 and mgcv 1.9-4. All model-fitting
 investigations, tests and package checks run outside the sandbox.
 

@@ -1,9 +1,11 @@
 # Smoothing uncertainty: ML, REML and fREML
 
 This is an internal research extension, investigated with R 4.6.1 and mgcv
-1.9-4. It does not add a public sampling method. The Gaussian prototype
+1.9-4. It does not add a public sampling method. The internal prototype
 propagates an approximate distribution of smoothing parameter estimates through
-conditional coefficient distributions. It does not specify hyperpriors or
+conditional coefficient distributions. Gaussian identity conditionals are exact;
+other ordinary and extended families use native coefficient normal approximations.
+It does not specify hyperpriors or
 integrate a joint Bayesian posterior.
 
 ## Supported combinations
@@ -14,7 +16,9 @@ integrate a joint Bayesian posterior.
 | Gaussian identity non-discrete `bam()`, ML or REML | Same quantities as ordinary `gam()` | Same mixture; stored derivatives use fitted coefficient coordinates |
 | Gaussian identity non-discrete `bam()`, fREML | `V.sp` for log smoothing parameters; `sp.vcov()` can also include log dispersion | Same mixture; derivatives are reconstructed in fitted coefficient coordinates |
 | Discrete `bam()`, fREML | Smoothing covariance and derivatives are available | Audit only; compressed fitting design has not been reconstructed for conditional updates |
-| Non-Gaussian or LSS models | Depends on family and fitter | Parameter-order audit only; no conditional mixture updates |
+| Other ordinary and extended-family `gam()`, ML or REML | Family parameters can precede log smoothing parameters; dispersion can follow | Native conditional normal updates at fixed fitted nuisance parameters |
+| Other ordinary and extended-family non-discrete `bam()`, ML, REML or fREML | Family parameters updated separately, absent from smoothing covariance | Native normal updates; must reproduce the original coefficients and covariance |
+| General families, including LSS | Depends on family and fitter | Audit only; no conditional mixture updates |
 
 ML/REML tests include shared parameters, partly fixed penalties, tensor
 products, known and estimated dispersion, unequal weights, offsets, and bounded
@@ -30,7 +34,7 @@ establish repeated-sampling coverage or accuracy of the fitted normal
 approximation for every model.
 
 The same restrictions as the earlier prototype remain: identifiable independent
-Gaussian identity fits, positive fitted penalty multipliers, supported penalty
+fits, positive fitted penalty multipliers, supported penalty
 mappings and a finite positive definite covariance for the free log smoothing
 parameters. Extra penalties, nonzero prescribed smooth contributions in BAM,
 minimum smoothing parameters, edge correction, dependent observations and
@@ -108,17 +112,24 @@ comes last. Examples are:
 The audit records `family$n.theta`, internal values from `getTheta()`, and
 response-scale values from `getTheta(TRUE)` where available. Its explicit
 matrix positions prevent treating family parameters as log smoothing parameters.
-It leaves extended-family BAM scalar ordering unclassified: these fitters
-update family parameters separately, and that ordering has not been validated
-here. Every non-Gaussian conditional mixture remains rejected, including LSS
-models with scale coefficients. Dispersion and additional family parameters
-are never silently sampled by the Gaussian prototype.
+Non-discrete BAM omits separately updated family parameters from these matrices.
+For extended families, a separate dispersion is estimated only when `family$scale`
+is negative; fixed global scale overrides the scale.estimated flag in bam.
+Component scales in gfam belong to its family-parameter vector. The native
+conditional extension holds all these nuisance parameters fixed and propagates
+only the retained free log-smoothing covariance. In gam this is a marginal block
+of the joint covariance; BAM omits the joint family-parameter block, so that
+dependence cannot be recovered from it. See [the family inventory and
+validation](smoothing-families.md), including the rejected censored-Poisson bam
+examples and the dense-design requirement for non-Gaussian updates.
 
 `db.drho` also needs a coordinate check. Ordinary `gam()` and ML/REML `bam()`
 derivatives agree with conditional mean derivatives after applying the
 smoothing mapping. Non-discrete fREML BAM retains raw derivatives in an
 internal fitting basis. Setup therefore reconstructs derivatives from the
-Gaussian precision for all supported fits. ML/REML `Vc` includes the native
+Gaussian precision for the exact Gaussian identity path. Other families use
+native conditional fits and do not apply those Gaussian derivative formulae.
+ML/REML `Vc` includes the native
 coefficient covariance correction; fREML BAM uses transformed derivatives
 internally when constructing its `Vc`. Neither matrix is evidence that a
 coefficient sampler has integrated smoothing uncertainty.
@@ -130,17 +141,19 @@ fits. NCV and QNCV are excluded because their uncertainty approximations
 have not been validated sufficiently for this feature. Their research
 implementations and results are archived separately from the package work.
 
-The next step is repeated-simulation validation of the retained Gaussian
+The next step is repeated-simulation validation of the retained conditional
 mixture. Conditional reconstruction, mappings and mixture moments have been
 checked; calibration of the resulting intervals has not. Compare conditional
-Gaussian draws, mgcv's `unconditional = TRUE` correction and the internal
+coefficient draws, mgcv's `unconditional = TRUE` correction and the internal
 mixture across ML/REML gam and ML/REML/fREML non-discrete bam fits.
+Include ordinary and extended families as well as the original Gaussian cases.
 Include small samples, weakly identified smooths, shared and fixed penalties,
 tensor products, and known versus fitted dispersion. Assess bias and interval
 coverage for smooth values, derivatives and predictions, reporting Monte Carlo
 uncertainty in coverage estimates.
 
-Keep fitted dispersion fixed in the initial comparison and label the result
+Keep fitted dispersion and family parameters fixed in the initial comparison
+and label the result
 as approximate estimation-uncertainty propagation. The comparison should
 determine whether the approximation is adequate before adding a public
 sampling option. Public integration would then need consistent chains, seeds,
@@ -154,4 +167,5 @@ Reproduce from this checkout:
 ```sh
 Rscript notes/posterior-chains/smoothing-methods.R --load-all
 Rscript notes/posterior-chains/smoothing-study.R --load-all 20000
+Rscript notes/posterior-chains/smoothing-families.R --load-all
 ```
