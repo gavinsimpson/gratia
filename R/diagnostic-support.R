@@ -247,6 +247,24 @@
 #' unavailable where the integrated likelihood has no defined deviance; use
 #' response, Pearson or quantile residuals instead.
 #'
+#' ## DHARMa-style residuals
+#'
+#' [dharma_residuals()] and `type = "dharma"` implement simulation-based PIT
+#' residuals using gratia's existing generators, without requiring DHARMa or
+#' mgcViz. Responses are ranked against `n_dharma` simulated datasets (default
+#' 250), with randomisation within ties and exact zero and one endpoints.
+#' This calculation differs from the existing simulation-rank formula above:
+#' it uses the empirical fractions below and below or equal to the observation,
+#' without an extra rank position. Existing PIT and quantile residuals retain
+#' their current definitions.
+#'
+#' The calculation needs comparable scalar response draws, but no CDF or finite
+#' response moments. Existing model adapters retain their conditioning defaults.
+#' Marginal-only generators provide marginal distribution checks. Censored and
+#' multivariate observations are unsupported. Independent responses use uniform
+#' QQ references with approximate pointwise bands because the simulation count
+#' is finite; dependent responses omit independence-based bands.
+#'
 #' ## Remaining limitations and extensions
 #'
 #' Inverse CDFs with direct lower/upper and log-probability arguments preserve

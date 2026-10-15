@@ -40,7 +40,8 @@ qq_plot(model, ...)
   line_col = "red",
   by_family = NULL,
   conditioning = NULL,
-  ...
+  ...,
+  n_dharma = 250L
 )
 
 \method{qq_plot}{glm}(model, ...)
@@ -103,7 +104,7 @@ if every component has an inverse CDF. If neither is available, it gives an
 error; a normal approximation must be requested explicitly.}
 
 \item{type}{character or \code{NULL}; residual type: \code{"deviance"}, \code{"response"},
-\code{"pearson"}, \code{"pit"}, or \code{"quantile"}. \code{NULL} uses the model-specific default:
+\code{"pearson"}, \code{"pit"}, \code{"quantile"}, or \code{"dharma"}. \code{NULL} uses the model-specific default:
 deviance for ordinary lm/glm/GAM fits, and quantile for supported grouped
 families, GJRM, sdmTMB and full mixed-model checks. glmmTMB uses Pearson
 residuals conditionally and response residuals marginally. Extracted GAM
@@ -160,6 +161,10 @@ explicit pooling. Ignored for ordinary models.}
 effects fixed, \code{"marginal"} averages over new effects, and \code{"gam_component"}
 uses the extracted GAM. Availability and defaults depend on the model; see
 \link{diagnostic_support}.}
+
+\item{n_dharma}{positive integer; number of response simulations for
+\code{type = "dharma"}. This is separate from \code{n_simulate}, which controls
+traditional QQ reference calculations. Defaults to 250.}
 
 \item{component}{character; for delta sdmTMB models, select the complete
 \code{"response"}, occurrence (\code{"binomial"}), or \code{"positive"} component.

@@ -11,7 +11,8 @@ residual_correlation(
   lag_max = 20L,
   series = NULL,
   seed = NULL,
-  ...
+  ...,
+  n_dharma = 250L
 )
 
 residual_correlation_plot(
@@ -20,7 +21,8 @@ residual_correlation_plot(
   lag_max = 20L,
   series = NULL,
   seed = NULL,
-  ...
+  ...,
+  n_dharma = 250L
 )
 }
 \arguments{
@@ -45,6 +47,10 @@ and appropriately ordered fitting data when separate time series are present.}
 
 \item{...}{arguments used to prepare the model for diagnostics, including
 \code{conditioning} and, for sdmTMB, \code{field_method}.}
+
+\item{n_dharma}{positive integer; number of response simulations for
+\code{type = "dharma"}. This is separate from \code{n_simulate}, which controls
+traditional QQ reference calculations. Defaults to 250.}
 }
 \value{
 \code{residual_correlation()} returns a tibble with lag, correlation and
@@ -56,6 +62,9 @@ checks of ordered residual structure, with no independence-based confidence
 bands or significance tests.
 }
 \details{
+Use \code{type = "dharma"} and \code{n_dharma} for simulation-based PIT residuals
+on the uniform scale; see \code{\link[=dharma_residuals]{dharma_residuals()}}.
+
 BAM's generalized estimating equations (GEE) AR1 correction acts on the
 weighted working response used for fitting. Whitening
 these working residuals can reveal remaining serial structure. The stored

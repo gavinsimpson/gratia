@@ -94,10 +94,19 @@ gfam_diagnostic_residuals <- function(context, y = context$y,
   out
 }
 
-diagnostic_residuals <- function(model, type, seed = NULL) {
+diagnostic_residuals <- function(model, type, seed = NULL, n_dharma = NULL) {
   if (type %in% c("response", "pearson"))
     check_distribution_residual_moments(response_distribution(model), type)
   cached <- attr(model, "gratia.diagnostics")
+  if (identical(type, "dharma")) {
+    n <- dharma_simulation_count(model, n_dharma)
+    if (!is.null(cached) && identical(cached$type, type) &&
+        identical(cached$n_dharma, n) &&
+        (is.null(seed) || identical(seed, cached$seed)))
+      return(restore_model_rows(cached$residuals, model))
+    used <- model_used_rows(model)
+    return(restore_model_rows(model_dharma_residuals(used, n, seed), model))
+  }
   if (!is.null(cached) && identical(cached$type, type)) {
     return(restore_model_rows(cached$residuals, model))
   }
@@ -191,8 +200,8 @@ diagnostic_type <- function(model, type = NULL, allow_pit = TRUE) {
       "grouped component ", paste(unsupported, collapse = ", "), ".")
     return("deviance")
   }
-  choices <- if (allow_pit) c("deviance", "response", "pearson", "pit", "quantile")
-    else c("deviance", "response", "pearson", "quantile")
+  choices <- if (allow_pit) c("deviance", "response", "pearson", "pit", "quantile", "dharma")
+    else c("deviance", "response", "pearson", "quantile", "dharma")
   match.arg(type, choices)
 }
 
@@ -200,7 +209,7 @@ diagnostic_by_family <- function(model, type, by_family = NULL) {
   if (!is.null(by_family) && (!is.logical(by_family) || length(by_family) != 1L ||
       is.na(by_family))) stop("'by_family' must be TRUE, FALSE, or NULL.", call. = FALSE)
   is_gfam_family(family(model)) &&
-    if (is.null(by_family)) !type %in% c("quantile", "pit") else by_family
+    if (is.null(by_family)) !type %in% c("quantile", "pit", "dharma") else by_family
 }
 
 gfam_checked_cdf <- function(cdf, component = NULL) {

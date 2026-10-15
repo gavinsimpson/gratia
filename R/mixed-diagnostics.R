@@ -75,13 +75,13 @@ residuals.gratia_diagnostic_proxy <- function(object, type = "deviance", ...) {
 
 #' @export
 diagnostic_data.gratia_diagnostic_proxy <- function(model, type = NULL,
-    seed = NULL, conditioning = NULL, ...) {
+    seed = NULL, conditioning = NULL, ..., n_dharma = NULL) {
   prepared <- diagnostic_plot_source(model, type = type, seed = seed,
-    conditioning = conditioning, ...)
+    conditioning = conditioning, n_dharma = n_dharma, ...)
   if (!inherits(prepared, "gratia_diagnostic_proxy"))
-    return(diagnostic_data(prepared, type, seed))
+    return(diagnostic_data(prepared, type, seed, n_dharma = n_dharma))
   if (is.null(type)) type <- "quantile"
-  diagnostic_data.gam(prepared, type, seed)
+  diagnostic_data.gam(prepared, type, seed, n_dharma = n_dharma)
 }
 
 mixed_conditioning <- function(model, conditioning = NULL) {
@@ -312,8 +312,8 @@ quantile_residuals.gamm <- function(model, type = c("pit", "quantile"),
 
 #' @export
 diagnostic_data.gamm <- function(model, type = NULL, seed = NULL,
-    conditioning = NULL, ...) {
-  diagnostic_data(mixed_diagnostic_model(model, conditioning), type, seed)
+    conditioning = NULL, ..., n_dharma = NULL) {
+  diagnostic_data(mixed_diagnostic_model(model, conditioning), type, seed, n_dharma = n_dharma)
 }
 
 #' @export
@@ -587,8 +587,8 @@ lme_diagnostic_model <- function(model, conditioning = NULL) {
 
 #' @export
 diagnostic_data.lme <- function(model, type = NULL, seed = NULL,
-    conditioning = NULL, ...) {
-  diagnostic_data(lme_diagnostic_model(model, conditioning), type, seed)
+    conditioning = NULL, ..., n_dharma = NULL) {
+  diagnostic_data(lme_diagnostic_model(model, conditioning), type, seed, n_dharma = n_dharma)
 }
 #' @export
 response_distribution.lme <- function(model, conditioning = NULL, ...) {
@@ -619,10 +619,10 @@ worm_plot.lme <- function(model, conditioning = NULL, ...) {
 
 #' @export
 diagnostic_data.merMod <- function(model, type = NULL, seed = NULL,
-    conditioning = NULL, ...) {
+    conditioning = NULL, ..., n_dharma = NULL) {
   diagnostic_data(mer_diagnostic_model(model,
     match.arg(conditioning %||% "conditional", c("conditional", "marginal"))),
-    type, seed)
+    type, seed, n_dharma = n_dharma)
 }
 #' @export
 response_distribution.merMod <- function(model, conditioning = NULL, ...) {

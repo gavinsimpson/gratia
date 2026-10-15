@@ -18,11 +18,15 @@
 #'   retained, even if `series` is supplied. Other fitters need an explicit series
 #'   and appropriately ordered fitting data when separate time series are present.
 #' @param seed optional seed for randomized residuals.
+#' @inheritParams appraise
 #' @param ... arguments used to prepare the model for diagnostics, including
 #'   `conditioning` and, for sdmTMB, `field_method`.
 #' @return `residual_correlation()` returns a tibble with lag, correlation and
 #'   the number of finite observation pairs used at each lag. `residual_correlation_plot()` returns a ggplot.
 #' @details
+#' Use `type = "dharma"` and `n_dharma` for simulation-based PIT residuals
+#' on the uniform scale; see [dharma_residuals()].
+#'
 #' BAM's generalized estimating equations (GEE) AR1 correction acts on the
 #' weighted working response used for fitting. Whitening
 #' these working residuals can reveal remaining serial structure. The stored
@@ -46,9 +50,15 @@
 #' @seealso [diagnostic_support], [qq_plot()]
 #' @export
 residual_correlation <- function(model, type = NULL, lag_max = 20L,
-                                 series = NULL, seed = NULL, ...) {
+                                 series = NULL, seed = NULL, ..., n_dharma = 250L) {
+  if (is.null(type) && inherits(model, "gratia_diagnostics")) type <- model$type
+  if (!is.null(type) && !type %in% c("standardized", "working", "working.standardized"))
+    type <- diagnostic_type(model, type)
   lag_max <- validate_diagnostic_bins(lag_max, "lag_max")
-  prepared <- diagnostic_ordered_residuals(model, type, seed, ...)
+  prepared <- if (identical(type, "dharma"))
+    diagnostic_ordered_residuals(model, type, seed,
+      n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...) else
+    diagnostic_ordered_residuals(model, type, seed, ...)
   data <- prepared$data
   full_series <- NULL
   if (!is.null(series)) {
@@ -72,8 +82,8 @@ residual_correlation <- function(model, type = NULL, lag_max = 20L,
 #' @rdname residual_correlation
 #' @export
 residual_correlation_plot <- function(model, type = NULL, lag_max = 20L,
-                                      series = NULL, seed = NULL, ...) {
-  data <- residual_correlation(model, type, lag_max, series, seed, ...)
+                                      series = NULL, seed = NULL, ..., n_dharma = 250L) {
+  data <- residual_correlation(model, type, lag_max, series, seed, n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...)
   ggplot2::ggplot(data, ggplot2::aes(x = .data$lag, y = .data$correlation)) +
     ggplot2::geom_hline(yintercept = 0, colour = "grey60") +
     ggplot2::geom_segment(ggplot2::aes(xend = .data$lag, yend = 0)) +
@@ -87,7 +97,7 @@ diagnostic_ordered_residuals <- function(model, type = NULL, seed = NULL, ...) {
 }
 #' @export
 diagnostic_ordered_residuals.default <- function(model, type = NULL, seed = NULL, ...) {
-  type <- type %||% "quantile"
+  type <- type %||% if (inherits(model, "gratia_diagnostics")) model$type else "quantile"
   prepared <- diagnostic_data(model, type = type, seed = seed, ...)
   data <- prepared$data
   compact_rows <- unique(data$.row)
@@ -96,7 +106,8 @@ diagnostic_ordered_residuals.default <- function(model, type = NULL, seed = NULL
   data$.series <- data$.response
   list(data = data, type = type, n_original = rows$n_original,
     description = diagnostic_reference_description(response_distribution(prepared$source),
-      paste(type, "residuals; descriptive correlation; no significance bands")))
+      paste(if (type == "dharma") "DHARMa-style" else type,
+        "residuals; descriptive correlation; no significance bands")))
 }
 #' @export
 diagnostic_ordered_residuals.gam <- function(model, type = NULL, seed = NULL, ...) {
