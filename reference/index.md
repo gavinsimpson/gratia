@@ -179,6 +179,18 @@ individual diagnostic plots, residuals, and measures of concurvity.
   : Plot of fitted against observed response values
 - [`posterior_predictive_plot()`](https://gavinsimpson.github.io/gratia/reference/posterior_predictive_plot.md)
   : Posterior predictive check of the response distribution
+- [`pp_check.gam()`](https://gavinsimpson.github.io/gratia/reference/pp_check.md)
+  [`pp_check.bam()`](https://gavinsimpson.github.io/gratia/reference/pp_check.md)
+  [`pp_check.gamm()`](https://gavinsimpson.github.io/gratia/reference/pp_check.md)
+  [`pp_check.gamm4()`](https://gavinsimpson.github.io/gratia/reference/pp_check.md)
+  : Posterior checks with bayesplot
+- [`log_lik()`](https://gavinsimpson.github.io/gratia/reference/log_lik.md)
+  : Posterior draws of pointwise log likelihoods
+- [`loo.gam()`](https://gavinsimpson.github.io/gratia/reference/loo.gam.md)
+  [`loo.bam()`](https://gavinsimpson.github.io/gratia/reference/loo.gam.md)
+  [`waic.gam()`](https://gavinsimpson.github.io/gratia/reference/loo.gam.md)
+  [`waic.bam()`](https://gavinsimpson.github.io/gratia/reference/loo.gam.md)
+  : Leave-one-out validation and WAIC for GAMs
 - [`scalable_qq_plot()`](https://gavinsimpson.github.io/gratia/reference/scalable_qq_plot.md)
   [`scalable_worm_plot()`](https://gavinsimpson.github.io/gratia/reference/scalable_qq_plot.md)
   [`scalable_residuals_linpred_plot()`](https://gavinsimpson.github.io/gratia/reference/scalable_qq_plot.md)

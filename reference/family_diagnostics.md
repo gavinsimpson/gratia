@@ -3,11 +3,14 @@
 A family can supply a `gratia_diagnostics` function to describe its
 response distribution without adding family-name checks to gratia. The
 function is called with named arguments `mu`, `wt`, `scale`, `y` and
-`eta`. These contain fitted values, diagnostic sampling weights, fitted
-scale, the fitting response and linear predictors, respectively. Missing
-fitting rows have been removed; grouped families receive only their own
-rows. `eta` can be `NULL` when a distribution is constructed without a
-fitted model.
+`eta`. These contain response parameters, weights, fitted scale, the
+fitting response and linear predictors, respectively. Diagnostics use
+fitted parameters and sampling weights;
+[`log_lik()`](https://gavinsimpson.github.io/gratia/reference/log_lik.md)
+uses draw-specific parameters and likelihood weights. Missing fitting
+rows have been removed; grouped families receive only their own rows.
+`eta` can be `NULL` when a distribution is constructed without a fitted
+model.
 
 ## Details
 
@@ -32,6 +35,18 @@ list instead capture fitted parameters and use the following interface:
 - `rd`: a function with no arguments that draws a complete response
   vector (or response matrix), retaining any dependence between
   observations.
+
+- `log_lik`: a function `(y)` returning one normalised log density or
+  log probability mass per observation, including fitting weights. A
+  response vector contributes one value; a multivariate response
+  contributes one joint value per row.
+  [`log_lik()`](https://gavinsimpson.github.io/gratia/reference/log_lik.md)
+  calls the factory at each coefficient draw with likelihood weights,
+  which can differ from diagnostic sampling weights. Parameters
+  represented by `mu` and `eta` vary with that draw; the hook must
+  exclude smoothing penalties and priors. Finite positive log densities
+  and `-Inf` for impossible observations are allowed; missing values and
+  `Inf` are invalid.
 
 - `bounds`: a function `(y)` returning a list with numeric `lower` and
   `upper` response bounds. Censoring intervals use their endpoints.
@@ -86,8 +101,8 @@ numbers in the factory itself.
 
 Adding this function does not extend a family's supported fitting
 methods. Posterior predictive sampling still uses the fitting package's
-parameter and response sampling methods; this interface describes checks
-at fitted parameters.
+parameter and response sampling methods. The likelihood hook also
+operates at supplied coefficient draws.
 
 ## See also
 

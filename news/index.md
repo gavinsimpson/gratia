@@ -109,6 +109,21 @@
 
 ### New features
 
+- Optional
+  [`bayesplot::pp_check()`](https://mc-stan.org/bayesplot/reference/pp_check.html)
+  methods provide posterior predictive checks for supported GAMs and
+  mixed models
+  ([\#278](https://github.com/gavinsimpson/gratia/issues/278), reported
+  by [@nicholasjclark](https://github.com/nicholasjclark)).
+
+- [`log_lik()`](https://gavinsimpson.github.io/gratia/reference/log_lik.md)
+  and optional
+  [`loo::loo()`](https://mc-stan.org/loo/reference/loo.html) and
+  [`loo::waic()`](https://mc-stan.org/loo/reference/waic.html) methods
+  support approximate predictive comparisons for independent GAM/BAM
+  fits ([\#278](https://github.com/gavinsimpson/gratia/issues/278),
+  reported by [@nicholasjclark](https://github.com/nicholasjclark)).
+
 - Diagnostic plots now support native inlaws families through their
   supplied `gratia_diagnostics` functions, including grouped-family fits
   and models with multiple response columns.

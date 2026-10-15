@@ -8,6 +8,8 @@ complete workflow for grouped surveys, mixed models or spatial surveys.
 
 - [Model diagnostics: distributions, uncertainty and
   dependence](https://gavinsimpson.github.io/gratia/articles/model-checking.md):
+- [Posterior predictive checks and approximate leave-one-out
+  comparisons](https://gavinsimpson.github.io/gratia/articles/bayesplot-loo.md):
 - [Combining surveys with different response
   distributions](https://gavinsimpson.github.io/gratia/articles/gfam-support.md):
 - [Smooth trends and repeated measurements with

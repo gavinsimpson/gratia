@@ -5,6 +5,7 @@
 <url><loc>https://gavinsimpson.github.io/gratia/CONTRIBUTING.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/LICENSE-text.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/LICENSE.html</loc></url>
+<url><loc>https://gavinsimpson.github.io/gratia/articles/bayesplot-loo.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/articles/custom-plotting.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/articles/data-slices.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/articles/gfam-support.html</loc></url>
@@ -108,6 +109,8 @@
 <url><loc>https://gavinsimpson.github.io/gratia/reference/is_offset.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/link.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/load_mgcv.html</loc></url>
+<url><loc>https://gavinsimpson.github.io/gratia/reference/log_lik.html</loc></url>
+<url><loc>https://gavinsimpson.github.io/gratia/reference/loo.gam.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/lp_matrix.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/lss_parameters.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/mh_draws.html</loc></url>
@@ -132,6 +135,7 @@
 <url><loc>https://gavinsimpson.github.io/gratia/reference/post_link_funs.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/posterior_predictive_plot.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/posterior_samples.html</loc></url>
+<url><loc>https://gavinsimpson.github.io/gratia/reference/pp_check.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/predicted_samples.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/qq_plot.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/quantile_residuals.html</loc></url>
