@@ -5,6 +5,15 @@ bayesplot_test_prepare <- function(model, type = "dens_overlay", prefix = "ppc",
     conditioning, sampling_args, dots)
 }
 
+bayesplot_test_zip_fit <- function() {
+  dat <- withr::with_seed(123, {
+    d <- data.frame(x = seq(-1, 1, length.out = 120))
+    d$y <- rpois(nrow(d), exp(d$x))
+    d
+  })
+  mgcv::gam(y ~ x, data = dat, family = mgcv::ziP(), method = "REML")
+}
+
 test_that("bayesplot receives fitting responses and complete replicated datasets", {
   skip_if_not_installed("bayesplot")
   p <- bayesplot_test_prepare(m_tiny_eg1)
@@ -178,12 +187,7 @@ test_that("Gumbel binned errors use the response mean and preserve custom means"
 
 test_that("hurdle Poisson binned errors retain a scalar response", {
   skip_if_not_installed("bayesplot")
-  dat <- withr::with_seed(123, {
-    d <- data.frame(x = seq(-1, 1, length.out = 120))
-    d$y <- rpois(nrow(d), exp(d$x))
-    d
-  })
-  fit <- mgcv::gam(y ~ x, data = dat, family = mgcv::ziP(), method = "REML")
+  fit <- bayesplot_test_zip_fit()
   draws <- matrix(coef(fit), nrow = 1L)
   p <- bayesplot_test_prepare(fit, type = "error_binned", n = 1,
     sampling_args = list(method = "user", draws = draws))
@@ -193,6 +197,12 @@ test_that("hurdle Poisson binned errors retain a scalar response", {
   expected <- -expm1(-exp(theta[1L] + theta[2L] * eta)) *
     lambda / -expm1(-lambda)
   expect_equal(as.numeric(p$args$yrep), expected)
+})
+
+test_that("bayesplot renders hurdle Poisson binned errors with rstantools", {
+  skip_if_not_installed("bayesplot")
+  skip_if_not_installed("rstantools")
+  fit <- bayesplot_test_zip_fit()
   expect_s3_class(bayesplot::pp_check(fit, type = "error_binned", n = 2, seed = 42),
     "ggplot")
 })
@@ -226,6 +236,12 @@ test_that("leave-one-out checks share coefficient draws with likelihood weights"
     method = "user", draws = prep$betas)
   expect_equal(p$args$yrep,
     matrix(replicated$.response[order(replicated$.draw, replicated$.row)], 100, byrow = TRUE))
+})
+
+test_that("bayesplot renders LOO-PIT checks with rstantools", {
+  skip_if_not_installed("bayesplot")
+  skip_if_not_installed("loo")
+  skip_if_not_installed("rstantools")
   expect_s3_class(suppressWarnings(pp_check.gam(m_tiny_eg1, type = "loo_pit_overlay",
     n = 100, seed = 42)), "ggplot")
 })

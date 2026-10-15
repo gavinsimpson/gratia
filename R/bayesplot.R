@@ -33,6 +33,10 @@
 #' multivariate response, the weights leave out the entire response vector.
 #' Grouped-family checks use only the selected component's observations.
 #'
+#' Some bayesplot plotting functions, including `error_binned` and LOO-PIT
+#' plots, also require bayesplot's optional rstantools package. Install it with
+#' `install.packages("rstantools")` to use those plots.
+#'
 #' Binomial observations and replicated responses are shown as numbers of
 #' successes with fitted trial counts. Other gratia predictive plots use
 #' proportions. The `error_binned` plot uses expected responses rather than

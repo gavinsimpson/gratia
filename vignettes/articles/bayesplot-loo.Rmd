@@ -19,6 +19,10 @@ log likelihoods for loo. Both packages are optional: install them to use their
 methods. `log_lik()` itself needs neither package. The existing `appraise()` and
 `posterior_predictive_plot()` functions also work without them.
 
+Some bayesplot plots, including `error_binned` and the LOO-PIT plots, also
+require bayesplot's optional rstantools package; install it with
+`install.packages("rstantools")` to use those plots.
+
 ```{r models}
 library("mgcv")
 library("gratia")
@@ -111,7 +115,7 @@ automatically refit models or perform moment matching.
 LOO predictive plots use response simulations and importance weights from the
 same coefficient draws:
 
-```{r loo-plot}
+```{r loo-plot, eval=requireNamespace("bayesplot", quietly = TRUE) && requireNamespace("loo", quietly = TRUE) && requireNamespace("rstantools", quietly = TRUE)}
 bayesplot::pp_check(smooth, type = "loo_pit_overlay", n = 2000, seed = 42)
 ```
 

@@ -112,6 +112,10 @@ likelihood calculations use exactly the same coefficient draws. For a
 multivariate response, the weights leave out the entire response vector.
 Grouped-family checks use only the selected component's observations.
 
+Some bayesplot plotting functions, including \code{error_binned} and LOO-PIT
+plots, also require bayesplot's optional rstantools package. Install it with
+\code{install.packages("rstantools")} to use those plots.
+
 Binomial observations and replicated responses are shown as numbers of
 successes with fitted trial counts. Other gratia predictive plots use
 proportions. The \code{error_binned} plot uses expected responses rather than

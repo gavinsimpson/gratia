@@ -1,6 +1,5 @@
 test_that("GJRM adapters use final distributional means and residuals for each family", {
   skip_if_not_installed("GJRM")
-  ns <- asNamespace("GJRM")
   set.seed(27)
   dat <- data.frame(x = runif(200, -1, 1))
   for (fam in c("N", "LN", "GA", "GAi", "P", "NBI", "NBII")) {
@@ -47,11 +46,6 @@ test_that("GJRM adapters use final distributional means and residuals for each f
         runif(length(cdf), as.vector(cdf_at(dat$y - 1)), cdf))
     }
     expect_equal(d$data$residuals, qnorm(cdf), info = fam)
-    # NBII's stored CDF is Poisson in some upstream versions, despite a
-    # negative-binomial likelihood. Check the likelihood mass independently.
-    if (fam == "NBII") expect_equal(as.vector(m$fit$pdf2),
-      as.vector(dnbinom(dat$y, mu = exp(mu), size = exp(mu) / m$sigma2)),
-      tolerance = 1e-6)
     expect_equal(quantile_residuals(m, type = "quantile", seed = 87),
       d$data$residuals, ignore_attr = TRUE)
     expect_equal(quantile_residuals(m, type = "pit", seed = 87),
@@ -75,6 +69,20 @@ test_that("GJRM adapters use final distributional means and residuals for each f
     expect_error(scalable_qq_plot(m, method = "simulate"), "fixed")
     expect_s3_class(scalable_residuals_hist_plot(m, type = "pearson"), "ggplot")
   }
+})
+
+test_that("GJRM NBII uses the expected negative-binomial parameterization", {
+  skip_if_not_installed("GJRM")
+  # Some upstream versions replace small-dispersion masses with Poisson
+  # probabilities and assign the wrong rows when only part of a vector needs
+  # replacement. Check the parameterization at a fixed moderate dispersion;
+  # the adapter tests above use independent CDFs for the actual fitted values.
+  y <- 0:8
+  mu <- seq(.5, 3, length.out = length(y))
+  sigma <- .5
+  density <- get("dNBII", asNamespace("GJRM"))
+  expect_equal(density(y, mu = mu, sigma = sigma),
+    dnbinom(y, mu = mu, size = mu / sigma))
 })
 
 test_that("GJRM class collisions and unsupported fits are rejected", {

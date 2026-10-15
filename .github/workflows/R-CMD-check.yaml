@@ -54,6 +54,7 @@ jobs:
         with:
           extra-packages: |
             any::rcmdcheck
+            any::rstantools
             lme4=?source
             mvnfast=?source
             ${{ matrix.config.glmmtmb == 'development' && 'glmmTMB=github::glmmTMB/glmmTMB/glmmTMB@master' || 'any::glmmTMB' }}
@@ -67,6 +68,11 @@ jobs:
         run: |
           pak::pkg_install("gam-mafia/inlaws")
           source("tools/test-inlaws-diagnostics.R")
+
+      - name: Check optional bayesplot and loo integration
+        if: runner.os == 'Linux' && matrix.config.r == 'release' && matrix.config.tests == 'full' && matrix.config.glmmtmb != 'development'
+        run: Rscript --vanilla inst/validation/optional-bayesplot-loo.R
+        shell: bash
 
       - uses: r-lib/actions/check-r-package@v2
         with:
