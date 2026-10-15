@@ -258,6 +258,12 @@ exclude fitting uncertainty; they do not provide simultaneous coverage.
 Traditional residuals use the fitted response distributions or a normal
 approximation.
 
+Subtitles name the method. Captions identify conditioning and field
+choices, joint simulation bands or omitted bands. Routine pointwise
+bands are unlabelled. Supply `caption` to replace this text, or
+`caption = ""` to omit it. Ordinary and scalable QQ and worm plots use
+the same labels.
+
 ## Note
 
 The wording used in

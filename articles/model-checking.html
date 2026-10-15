@@ -160,6 +160,12 @@ predictive plot concerns replicated response distributions. QQ reference
 bands condition on the fitted model, without refitting it for each
 replicate. Use departures from these bands to locate discrepancies to
 investigate, rather than as a formal rejection rule.</p>
+<p>Plot subtitles identify the method. Short captions identify
+conditioning, field choices, joint simulation bands or omitted bands.
+Routine pointwise bands are unlabelled. Posterior predictive captions
+identify conditioning only. Use <code>caption = ""</code> to omit a
+caption or supply your own text. Scalable QQ and worm plots use the same
+labels as their ordinary counterparts.</p>
 </div>
 <div class="section level2">
 <h2 id="count-variation-and-mean-structure">Count variation and mean structure<a class="anchor" aria-label="anchor" href="#count-variation-and-mean-structure"></a>
@@ -327,9 +333,9 @@ child, very detailed individual curves are not supported.</p>
 <span>  data <span class="op">=</span> <span class="va">growth</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">growth_fit</span><span class="op">)</span><span class="op">$</span><span class="va">tTable</span></span>
 <span><span class="co">#&gt;                      Value  Std.Error DF   t-value      p-value</span></span>
-<span><span class="co">#&gt; (Intercept)     24.9687500 0.48600071 79 51.375954 1.812711e-62</span></span>
-<span><span class="co">#&gt; SexFemale       -2.3210227 0.76141677 25 -3.048295 5.375052e-03</span></span>
-<span><span class="co">#&gt; age_c            0.7843750 0.08599951 79  9.120691 5.654752e-14</span></span>
+<span><span class="co">#&gt; (Intercept)     24.9687500 0.48600069 79 51.375956 1.812707e-62</span></span>
+<span><span class="co">#&gt; SexFemale       -2.3210227 0.76141675 25 -3.048295 5.375051e-03</span></span>
+<span><span class="co">#&gt; age_c            0.7843750 0.08599951 79  9.120692 5.654744e-14</span></span>
 <span><span class="co">#&gt; SexFemale:age_c -0.3048295 0.13473534 79 -2.262432 2.641752e-02</span></span></code></pre></div>
 <p>The age coefficient describes mean growth in the reference sex, and
 the interaction describes a difference in age slopes. The fitted random

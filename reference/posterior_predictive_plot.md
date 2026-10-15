@@ -126,6 +126,9 @@ summaries evaluated on the same grid for all draws.
 
 ## Details
 
+Mixed-model captions name the conditioning mode. Supply `caption` to
+replace this text, or `caption = ""` to omit it.
+
 Each replicated data set includes uncertainty in the coefficients and
 random variation in the responses, at the covariate values used to fit
 the model. Linear models and GLMs draw coefficients from a Gaussian
