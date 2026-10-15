@@ -2,6 +2,13 @@
 
 ## User visible changes
 
+* `fitted_samples()` now rejects response-scale requests for general families
+  whose first predictor is not a supported response mean. Use
+  `scale = "linear_predictor"` for the first predictor; `gaulss()` means,
+  multivariate normal means and multinomial probabilities remain supported.
+  Previously these unsupported requests could return a distribution parameter
+  as though it were an expected response.
+
 * Gaussian coefficient sampling for `mgcv::scasm()` fits with linear inequality
   constraints now warns that the draws need not satisfy the fitted shapes.
   Metropolis-Hastings sampling now gives an explicit error because its
@@ -401,6 +408,11 @@
   coefficient uncertainty. Term exclusions retain only the appropriate fixed
   contributions. Separate sampling per smooth now correctly subsets supplied
   coefficient draws.
+
+* Multinomial fitted samples now honour `scale = "linear_predictor"`, returning
+  log odds relative to the reference category instead of probabilities. Both
+  scales retain all category labels; the reference predictor is zero. Models
+  with one non-reference category also use this output format.
 
 * GJRM smooth selection now uses one order across all model equations.
   Character selections draw only the equations containing the selected smooths;

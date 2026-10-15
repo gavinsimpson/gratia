@@ -68,9 +68,13 @@ the model will be used for \code{data}, if available in \code{model}.}
 
 \item{seed}{numeric; a random seed for the simulations.}
 
-\item{scale}{character; what scale should the fitted values be returned on?
-\code{"linear predictor"} is a synonym for \code{"link"} if you prefer that
-terminology.}
+\item{scale}{character; either \code{"response"} for expectations of the response
+or \code{"linear_predictor"} for values before the inverse link transformation.
+For multinomial models both scales return all categories, labelled
+\code{response1}, \code{response2}, and so on. On the linear predictor scale,
+\code{response1} is the reference category with predictor zero; the other
+values are log odds relative to it. On the response scale, the values
+are category probabilities.}
 
 \item{method}{character; which method should be used to draw samples from
 the posterior distribution. \code{"gaussian"} uses a Gaussian (Laplace)
@@ -148,6 +152,15 @@ distribution of fitted model using a Gaussian approximation to the
 posterior or a simple Metropolis Hastings sampler.
 }
 \details{
+For general families with several distributional parameters, response-scale
+draws currently support \code{\link[mgcv:gaulss]{mgcv::gaulss()}} means, \code{\link[mgcv:mvn]{mgcv::mvn()}} response means,
+and \code{\link[mgcv:multinom]{mgcv::multinom()}} category probabilities. Other general families,
+including \code{\link[mgcv:ziplss]{mgcv::ziplss()}}, produce an error on the response scale because
+their first parameter is not necessarily the expected response. On the
+linear predictor scale, these other families return the first predictor
+under the existing \code{location} label, including its offsets. The same label
+identifies the mean predictor for \code{gaulss()}; scale predictors are omitted.
+
 For grouped families, coefficient draws preserve the joint model covariance;
 each row is then transformed using its own fitted component family. Explicit
 prediction data must identify each row's family: no training-order fallback
