@@ -58,7 +58,7 @@
   data <- as_tibble(layout$data)
 
   ## predict using the predict method
-  pred_vals <- predict(model, newdata = data, type = type, ...)
+  pred_vals <- predict_model(model, newdata = layout$data, type = type, ...)
 
   ## check if pred_vals is a list
   if (is.list(pred_vals)) {

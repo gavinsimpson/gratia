@@ -140,6 +140,9 @@ prediction_layout <- function(model, data = NULL, na.action = stats::na.pass,
   }
   # Internally .row always indexes the compact prediction data.
   data$.row <- NULL
+  # The row map above owns restoration. Native discrete BAM prediction must
+  # not expand compact evaluation rows using the fitting frame's na.action.
+  attr(data, "na.action") <- NULL
   list(
     data = data,
     map = map,

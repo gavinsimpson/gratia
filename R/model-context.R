@@ -241,6 +241,9 @@ evaluated_model_frame <- function(model, data, envir = NULL) {
 predict_model <- function(object, newdata, ..., envir = NULL) {
   if (missing(newdata)) return(stats::predict(object, ...))
   object <- with_model_envir(object, envir)
+  # Native BAM code relies on base data-frame subsetting, including for an
+  # already evaluated fitting frame containing a fitting-argument offset.
+  if (is.data.frame(newdata)) newdata <- as.data.frame(newdata)
   dots <- list(...)
   tt <- stats::delete.response(stats::terms(object))
   exprs <- as.list(attr(tt, "variables"))[-1L]

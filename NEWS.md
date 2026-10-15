@@ -467,7 +467,9 @@
   retained observations with predictors, and histogram bin selection handles
   missing residuals (#349, #402). Explicit prediction data preserve row
   positions by default: missing required predictors yield `NA`, while missing
-  responses alone do not prevent prediction.
+  responses alone do not prevent prediction. Discrete `bam()` fitted-value
+  intervals restore exclusions once and accept stored fitting frames without
+  relying on tibble subsetting in native prediction.
 
 * `link()`, `inv_link()` and `extract_link()` now reject unsupported
   parameters consistently. For `twlss()`, `scale`, `sigma` and `phi` select
