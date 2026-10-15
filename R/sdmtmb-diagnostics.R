@@ -198,8 +198,8 @@ response_distribution.sdmTMB <- function(model, conditioning = NULL,
 
 #' @export
 diagnostic_data.sdmTMB <- function(model, type = NULL, seed = NULL,
-    conditioning = NULL, component = "response", field_method = c("mle-mvn", "mle-eb", "mle-mvn-integrated"), ...) {
-  diagnostic_data(sdmtmb_diagnostic_model(model, conditioning, component, field_method), type, seed)
+    conditioning = NULL, component = "response", field_method = c("mle-mvn", "mle-eb", "mle-mvn-integrated"), ..., n_dharma = NULL) {
+  diagnostic_data(sdmtmb_diagnostic_model(model, conditioning, component, field_method), type, seed, n_dharma = n_dharma)
 }
 
 #' @export

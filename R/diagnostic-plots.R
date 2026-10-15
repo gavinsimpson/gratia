@@ -44,7 +44,7 @@
 #'   facets. Standalone `observed_fitted_plot()` facets by default and permits
 #'   explicit pooling. Ignored for ordinary models.
 #' @param type character or `NULL`; residual type: `"deviance"`, `"response"`,
-#'   `"pearson"`, `"pit"`, or `"quantile"`. `NULL` uses the model-specific default:
+#'   `"pearson"`, `"pit"`, `"quantile"`, or `"dharma"`. `NULL` uses the model-specific default:
 #'   deviance for ordinary lm/glm/GAM fits, and quantile for supported grouped
 #'   families, GJRM, sdmTMB and full mixed-model checks. glmmTMB uses Pearson
 #'   residuals conditionally and response residuals marginally. Extracted GAM
@@ -187,8 +187,19 @@ qq_plot.default <- function(model, ...) {
   ci_alpha = 0.2,
   point_col = "grey20",
   point_alpha = 1,
-  line_col = "red", by_family = NULL, conditioning = NULL, ...
+  line_col = "red", by_family = NULL, conditioning = NULL, ..., n_dharma = 250L
 ) {
+  if (!is.null(type)) type <- diagnostic_type(model, type)
+  if (identical(type, "dharma") ||
+      (is.null(type) && identical(attr(model, "gratia.default_residual_type"), "dharma"))) {
+    return(scalable_qq(model, method = method, type = "dharma", seed = seed,
+      level = level, xlab = xlab, ylab = ylab, title = title,
+      subtitle = subtitle, caption = caption, ci_col = ci_col, ci_alpha = ci_alpha,
+      point_col = point_col, point_alpha = point_alpha, line_col = line_col,
+      by_family = by_family, conditioning = conditioning,
+      n_dharma = if (missing(n_dharma)) NULL else n_dharma,
+      aggregate = FALSE, worm = FALSE, ...))
+  }
   model <- diagnostic_plot_source(model, type, seed, conditioning, ...)
 
   if (!is.null(seed)) {
@@ -318,6 +329,7 @@ qq_simulate <- function(model, n = 50,
   if (is_gfam_family(stats::family(model)))
     return(gfam_qq(model, n, type, "simulate", level, detrend, by_family))
   distribution <- response_distribution(model)
+  check_distribution_reference(distribution)
   if (!is.function(distribution$rd)) stop("Response simulation is unavailable for this family.")
   qq_reference_draws(diagnostic_residuals(model, type),
     draw = function(p) distribution$rd(),
@@ -395,6 +407,7 @@ qq_uniform <- function(model, n = 10,
   if (is_gfam_family(stats::family(model)))
     return(gfam_qq(model, n, type, "uniform", level, detrend, by_family))
   distribution <- response_distribution(model)
+  check_distribution_reference(distribution)
   if (!is.function(distribution$qf)) stop("An inverse CDF is unavailable for this family.")
   probabilities <- NULL
   draw <- function(p) {
@@ -491,7 +504,7 @@ qq_uniform <- function(model, n = 10,
 #' @param model a fitted model supported by [diagnostic_support].
 #' @inheritParams appraise
 #' @param type character or `NULL`; residual type: `"deviance"`, `"pearson"`,
-#'   `"response"`, `"pit"`, or `"quantile"`. Grouped models automatically use
+#'   `"response"`, `"pit"`, `"quantile"`, or `"dharma"`. Grouped models automatically use
 #'   quantile residuals when all active components are supported, otherwise all
 #'   use deviance residuals with a message. Ordinary models retain deviance
 #'   residuals by default. See [appraise()] for distributional support.
@@ -520,7 +533,7 @@ qq_uniform <- function(model, n = 10,
 #'   plots and retains original predictors in facets. `TRUE` or `FALSE` overrides
 #'   this independently of the residual type and layout. Only finite observations
 #'   included in each component determine its ranks; average ties are used.
-#' @param seed integer; random seed to use for PIT or quantile residuals.
+#' @param seed integer; random seed to use for PIT, quantile or DHARMa-style residuals.
 #' @param ... optional arguments passed to model preparation, such as the
 #'   sdmTMB `field_method`.
 #'
@@ -543,16 +556,18 @@ qq_uniform <- function(model, n = 10,
   seed = NULL,
   by_family = NULL,
   rank = NULL,
-  conditioning = NULL, ...
+  conditioning = NULL, ..., n_dharma = 250L
 ) {
-  model <- diagnostic_plot_source(model, type = type, seed = seed, conditioning = conditioning, ...)
+  model <- diagnostic_plot_source(model, type = type, seed = seed, conditioning = conditioning, n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...)
   original <- model
   model <- model_used_rows(model)
   type <- diagnostic_type(model, type, allow_pit = TRUE)
   by_family <- diagnostic_by_family(model, type, by_family)
   y_intercept <- 0
-  if (type %in% c("pit", "quantile")) {
+  if (type %in% c("pit", "quantile", "dharma")) {
     r <- diagnostic_residuals(model, type = type, seed = seed)
+    if (type %in% c("pit", "dharma")) y_intercept <- 0.5
+    if (is.null(ylab) && type == "dharma") ylab <- diagnostic_residual_label(type)
     if (is.null(ylab) && type == "pit") {
       ylab <- "PIT residuals"
       y_intercept <- 0.5
@@ -562,11 +577,16 @@ qq_uniform <- function(model, n = 10,
     y_intercept <- 0
   }
   r <- restore_model_rows(r, original)
-  mv_y <- family_name(model) %in% multivariate_y()
+  mv_y <- is.matrix(response_distribution(model)$mean) ||
+    family_name(model) %in% multivariate_y()
   if (is.matrix(r) && mv_y) { # handle mvn() like fits
     r <- as.vector(r)
   }
-  eta <- restore_model_rows(model[["linear.predictors"]], original)
+  response_mean <- response_distribution(model)$mean
+  use_response_mean <- is.matrix(response_mean) &&
+    !family_name(model) %in% multivariate_y()
+  eta <- restore_model_rows(if (use_response_mean) response_mean else
+    model[["linear.predictors"]], original)
   if (is.matrix(eta) && mv_y) {
     eta <- as.vector(eta) # handle multinom(), mvn() like fits
   }
@@ -600,13 +620,15 @@ qq_uniform <- function(model, n = 10,
   ## add labels
   if (is.null(xlab)) {
     xlab <- if (isTRUE(attr(df, "ranked"))) "Within-component linear predictor rank"
+      else if (use_response_mean) "Fitted response mean"
       else original$eta_label %||% "Linear predictor"
   }
   if (is.null(ylab)) {
-    ylab <- paste(str_to_title(type), "residuals")
+    ylab <- diagnostic_residual_label(type)
   }
   if (missing(title)) {
-    title <- "Residuals vs linear predictor"
+    title <- if (use_response_mean) "Residuals vs fitted response mean" else
+      "Residuals vs linear predictor"
   }
   if (missing(subtitle)) {
     subtitle <- diagnostic_reference_description(response_distribution(model),
@@ -650,7 +672,8 @@ qq_uniform <- function(model, n = 10,
   fit <- restore_model_rows(fit, original)
   ## handle case where fitted is a matrix; extended.families
   ##   - the needs to be more involved as what about mvn or multinom families
-  mv_y <- family_name(model) %in% multivariate_y()
+  mv_y <- is.matrix(response_distribution(model)$mean) ||
+    family_name(model) %in% multivariate_y()
   if (NCOL(fit) > 1L) {
     fit <- if (mv_y) {
       as.vector(fit) # was fit[, 1], but changed for mvn
@@ -725,15 +748,15 @@ qq_uniform <- function(model, n = 10,
   subtitle = NULL, caption = NULL,
   seed = NULL,
   by_family = NULL,
-  conditioning = NULL, ...
+  conditioning = NULL, ..., n_dharma = 250L
 ) {
-  model <- diagnostic_plot_source(model, type = type, seed = seed, conditioning = conditioning, ...)
+  model <- diagnostic_plot_source(model, type = type, seed = seed, conditioning = conditioning, n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...)
   original <- model
   model <- model_used_rows(model)
   type <- diagnostic_type(model, type, allow_pit = TRUE)
   by_family <- diagnostic_by_family(model, type, by_family)
 
-  if (type %in% c("pit", "quantile")) {
+  if (type %in% c("pit", "quantile", "dharma")) {
     r <- diagnostic_residuals(model, type = type, seed = seed)
   } else {
     r <- diagnostic_residuals(model, type = type)
@@ -794,7 +817,7 @@ qq_uniform <- function(model, n = 10,
 
   ## add labels
   if (is.null(xlab)) {
-    xlab <- paste(str_to_title(type), "residuals")
+    xlab <- diagnostic_residual_label(type)
   }
   if (is.null(ylab)) {
     ylab <- if (pooled) "Density" else "Frequency"
@@ -885,8 +908,19 @@ worm_plot.default <- function(model, ...) {
   line_col = "red",
   seed = NULL,
   by_family = NULL,
-  conditioning = NULL, ...
+  conditioning = NULL, ..., n_dharma = 250L
 ) {
+  if (!is.null(type)) type <- diagnostic_type(model, type)
+  if (identical(type, "dharma") ||
+      (is.null(type) && identical(attr(model, "gratia.default_residual_type"), "dharma"))) {
+    return(scalable_qq(model, method = method, type = "dharma", seed = seed,
+      level = level, xlab = xlab, ylab = ylab, title = title,
+      subtitle = subtitle, caption = caption, ci_col = ci_col, ci_alpha = ci_alpha,
+      point_col = point_col, point_alpha = point_alpha, line_col = line_col,
+      by_family = by_family, conditioning = conditioning,
+      n_dharma = if (missing(n_dharma)) NULL else n_dharma,
+      aggregate = FALSE, worm = TRUE, ...))
+  }
   model <- diagnostic_plot_source(model, type, seed, conditioning, ...)
 
   if (!is.null(seed)) {

@@ -259,6 +259,25 @@ unavailable where the integrated likelihood has no defined deviance; use
 response, Pearson or quantile residuals instead.
 }
 
+\subsection{DHARMa-style residuals}{
+
+\code{\link[=dharma_residuals]{dharma_residuals()}} and \code{type = "dharma"} implement simulation-based PIT
+residuals using gratia's existing generators, without requiring DHARMa or
+mgcViz. Responses are ranked against \code{n_dharma} simulated datasets (default
+250), with randomisation within ties and exact zero and one endpoints.
+This calculation differs from the existing simulation-rank formula above:
+it uses the empirical fractions below and below or equal to the observation,
+without an extra rank position. Existing PIT and quantile residuals retain
+their current definitions.
+
+The calculation needs comparable scalar response draws, but no CDF or finite
+response moments. Existing model adapters retain their conditioning defaults.
+Marginal-only generators provide marginal distribution checks. Censored and
+multivariate observations are unsupported. Independent responses use uniform
+QQ references with approximate pointwise bands because the simulation count
+is finite; dependent responses omit independence-based bands.
+}
+
 \subsection{Remaining limitations and extensions}{
 
 Inverse CDFs with direct lower/upper and log-probability arguments preserve
@@ -311,7 +330,10 @@ parameters times the number of draws.
 The internal \code{fix_family_rd()}, \code{fix_family_cdf()} and \code{fix_family_qf()}
 functions still add \verb{$rd}, \verb{$cdf} and \verb{$qf} to mgcv-compatible families while
 preserving functions supplied by callers. The fitted-distribution code adapts
-their arguments locally. Other fitting packages can use the same standard
+their arguments locally. Families can supply a \code{gratia_diagnostics} function
+for response moments, probability bounds and other distribution information;
+see \link{family_diagnostics} for the interface. Other fitting packages can use the
+same standard
 response distributions, or combine them by family index, truncate them or add
 point masses without changing the plotting calculations.
 }

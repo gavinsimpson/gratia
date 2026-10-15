@@ -40,6 +40,7 @@ diagnostic_reference_residuals <- function(model, y, type) {
 diagnostic_reference_residuals.default <- function(model, y, type) {
   model <- model_used_rows(model)
   distribution <- response_distribution(model)
+  y <- observe_diagnostic_response(distribution, y)
   check_distribution_residual_moments(distribution, type)
   if (is.function(distribution$diagnostic_residuals))
     return(distribution$diagnostic_residuals(y, type))
@@ -58,6 +59,7 @@ diagnostic_reference_residuals.default <- function(model, y, type) {
 diagnostic_reference_method <- function(model, method = NULL) {
   if (!is.null(method)) method <- match.arg(method, c("uniform", "simulate", "normal", "direct", "marginal"))
   distribution <- response_distribution(model)
+  if (!identical(method, "normal")) check_distribution_reference(distribution)
   joint <- isTRUE(distribution$joint_available) && is.function(distribution$rd)
   dependent <- !isTRUE(distribution$independent)
   if (dependent && !joint) {
@@ -294,17 +296,23 @@ qq_merge_files <- function(left, right, output, block) {
 # diagnostics need. Shared diagnostic methods work with this prepared object;
 # the original fitted object remains available for the package's own methods.
 diagnostic_plot_source <- function(model, type = NULL, seed = NULL,
-                                    conditioning = NULL, ...) {
+                                    conditioning = NULL, ..., n_dharma = NULL) {
   UseMethod("diagnostic_plot_source")
 }
 #' @export
 diagnostic_plot_source.default <- function(model, type = NULL, seed = NULL,
-                                            conditioning = NULL, ...) {
-  prepare_diagnostic_data(model, type = type, seed = seed, conditioning = conditioning, ...)$source
+                                            conditioning = NULL, ..., n_dharma = NULL) {
+  prepare_diagnostic_data(model, type = type, seed = seed, conditioning = conditioning, n_dharma = n_dharma, ...)$source
 }
 #' @export
 diagnostic_plot_source.gratia_diagnostics <- function(model, type = NULL,
-    seed = NULL, conditioning = NULL, ...) {
+    seed = NULL, conditioning = NULL, ..., n_dharma = NULL) {
+  if (identical(model$type, "dharma")) {
+    model <- diagnostic_data(model, type, seed, conditioning, n_dharma = n_dharma, ...)
+    source <- model$source
+    attr(source, "gratia.default_residual_type") <- model$type
+    return(source)
+  }
   source <- model$source
   if (!is.null(conditioning) || length(list(...)))
     source <- diagnostic_plot_source(source, type, seed, conditioning, ...)
@@ -313,25 +321,28 @@ diagnostic_plot_source.gratia_diagnostics <- function(model, type = NULL,
 }
 #' @export
 diagnostic_plot_source.gam <- function(model, type = NULL, seed = NULL,
-                                       conditioning = NULL, ...) {
+                                       conditioning = NULL, ..., n_dharma = NULL) {
+  if (!is.null(type)) type <- diagnostic_type(model, type)
   check_distribution_conditioning(conditioning)
+  if (identical(type, "dharma")) return(cache_dharma_residuals(model, n_dharma, seed))
   model
 }
 #' @export
 diagnostic_plot_source.lm <- function(model, type = NULL, seed = NULL,
-                                      conditioning = NULL, ...) {
+                                      conditioning = NULL, ..., n_dharma = NULL) {
   check_distribution_conditioning(conditioning)
-  prepare_lm_diagnostics(model)
+  diagnostic_plot_source.gam(prepare_lm_diagnostics(model), type, seed, conditioning, n_dharma = n_dharma)
 }
 #' @export
 diagnostic_plot_source.gratia_diagnostic_proxy <- function(model, type = NULL,
-    seed = NULL, conditioning = NULL, ...) {
+    seed = NULL, conditioning = NULL, ..., n_dharma = NULL) {
+  if (!is.null(type)) type <- diagnostic_type(model, type)
   if ((is.null(conditioning) || identical(conditioning, model$conditioning)) &&
-      !length(list(...))) return(model)
+      !length(list(...))) return(if (identical(type, "dharma")) cache_dharma_residuals(model, n_dharma, seed) else model)
   original <- diagnostic_original(model)
   if (is.null(original)) stop("Cannot change conditioning on a proxy without its fitted model.", call. = FALSE)
   diagnostic_plot_source(original, type, seed,
-    conditioning = conditioning %||% model$conditioning, ...)
+    conditioning = conditioning %||% model$conditioning, n_dharma = n_dharma, ...)
 }
 #' @export
 diagnostic_plot_source.gratia_glmmtmb_diagnostic <-
@@ -374,7 +385,7 @@ calibrated_residual_reference <- function(data, type, level, detrend = FALSE,
       reference <- qq_reference_draws(part$residuals,
         draw = function(p) distribution$rd(),
         residual = function(y) as.vector(distribution_quantile_residuals(
-          distribution, y, type))[part$.row],
+          distribution, observe_diagnostic_response(distribution, y), type))[part$.row],
         n = n_simulate, method = "simulate", level = level)
       part$lower <- reference$lower
       part$upper <- reference$upper
@@ -422,7 +433,13 @@ family_prediction_parameters <- function(family, eta) {
 # Older diagnostic_data() methods may not accept conditioning. Pass that
 # argument only when the caller explicitly selects how to handle random effects.
 prepare_diagnostic_data <- function(model, type = NULL, seed = NULL,
-                                    conditioning = NULL, ...) {
+                                    conditioning = NULL, ..., n_dharma = NULL) {
+  if (!is.null(type)) type <- diagnostic_type(model, type)
+  if (identical(type, "dharma") ||
+      (inherits(model, "gratia_diagnostics") && identical(model$type, "dharma"))) {
+    return(diagnostic_data(model, type, seed, conditioning = conditioning,
+      n_dharma = n_dharma, ...))
+  }
   if (is.null(conditioning)) diagnostic_data(model, type, seed, ...) else
     diagnostic_data(model, type, seed, conditioning = conditioning, ...)
 }

@@ -233,6 +233,7 @@ glmmtmb_marginal_residuals <- function(distribution, y, type) {
 
 glmmtmb_diagnostic_model <- function(object, type = NULL, simulation = FALSE,
                                       conditioning = NULL) {
+  if (!is.null(type)) type <- diagnostic_type(object, type)
   used <- glmmtmb_used_fit(object)
   conditioning <- match.arg(conditioning %||% "conditional", c("conditional", "marginal"))
   type <- type %||% if (conditioning == "marginal") "response" else "pearson"
@@ -250,7 +251,7 @@ glmmtmb_diagnostic_model <- function(object, type = NULL, simulation = FALSE,
       distribution$mean %||% rep(NA_real_, length(y)) else
       unname(stats::predict(used, type = "response", re.form = re)),
     linear.predictors = unname(stats::predict(used, type = "link", re.form = re)),
-    residuals = if (type %in% c("pit", "quantile")) NULL else
+    residuals = if (type %in% c("pit", "quantile", "dharma")) NULL else
       if (conditioning == "marginal") glmmtmb_marginal_residuals(distribution, y, type) else
         glmmtmb_residuals(used, type), residual_type = type,
     source = used, distribution = distribution, conditioning = conditioning, na.action = attr(object$frame, "na.action")),
@@ -284,7 +285,7 @@ qq_simulate_glmmtmb <- function(model, n, type, level, detrend) {
 }
 
 glmmtmb_qq_method <- function(method, type = "pearson") {
-  if (type %in% c("pit", "quantile")) return(method)
+  if (type %in% c("pit", "quantile", "dharma")) return(method)
   method %||% "simulate"
 }
 
@@ -293,7 +294,7 @@ glmmtmb_qq_method <- function(method, type = "pearson") {
 #'   `"marginal"`; see [diagnostic_support].
 #' @param method QQ method; `NULL` selects `"simulate"` for traditional residuals.
 #' @param type Residual type: `"pearson"`, `"response"`, `"deviance"`, `"pit"`,
-#'   or `"quantile"`, when available for the family. The default is Pearson for
+#'   `"quantile"`, or `"dharma"`, when available for the family. The default is Pearson for
 #'   conditional checks and response residuals for marginal checks.
 #' @export
 qq_plot.glmmTMB <- function(model, ..., method = NULL, type = NULL,

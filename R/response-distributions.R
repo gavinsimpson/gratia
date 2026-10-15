@@ -73,7 +73,8 @@ response_distribution.glm <- function(model, conditioning = NULL, ...) {
   check_distribution_conditioning(conditioning)
   model <- model_used_rows(model)
   distribution_from_family(stats::family(model), model$fitted.values,
-    binomial_sampling_weights(model, model$prior.weights), summary(model)$dispersion, y = model$y)
+    binomial_sampling_weights(model, model$prior.weights), summary(model)$dispersion,
+    y = model$y, eta = model$linear.predictors)
 }
 
 #' @export
@@ -82,13 +83,8 @@ response_distribution.gam <- function(model, conditioning = NULL, ...) {
   model <- model_used_rows(model)
   if (is_gfam_family(stats::family(model))) {
     context <- gfam_diagnostic_context(model)
-    components <- lapply(seq_along(context$components), function(i) {
-      rows <- which(context$index == i)
-      component <- context$components[[i]]
-      distribution_from_family(component$family, context$mu[rows],
-        context$weights[rows], component$scale,
-        y = slice_observations(context$y, rows))
-    })
+    components <- lapply(seq_along(context$components), function(i)
+      gfam_component_distribution(context, i))
     return(bam_response_dependence(model,
       combine_response_distributions(components, context$index), stats::family(model)))
   }
@@ -99,7 +95,7 @@ response_distribution.gam <- function(model, conditioning = NULL, ...) {
   latent <- grepl("^ordered_categorical|^zero_inflated_poisson", ft)
   mu <- if (latent) model$linear.predictors else model$fitted.values
   d <- distribution_from_family(f, mu, binomial_sampling_weights(model, model$prior.weights),
-    model$sig2, y = model$y)
+    model$sig2, y = model$y, eta = model$linear.predictors)
   bam_response_dependence(model, d, f)
 }
 
@@ -138,7 +134,7 @@ bam_response_dependence <- function(model, d, f) {
 
 # Keep existing family functions and caller replacements unchanged. These
 # wrappers supply their fitted parameters before shared diagnostics call them.
-distribution_from_family <- function(family, mu, wt, scale, y = NULL) {
+distribution_from_family <- function(family, mu, wt, scale, y = NULL, eta = NULL) {
   if (is.null(wt)) wt <- rep(1, NROW(mu))
   if (length(wt) == 1L) wt <- rep(wt, NROW(mu))
   ft <- family_type(family)
@@ -255,7 +251,7 @@ distribution_from_family <- function(family, mu, wt, scale, y = NULL) {
   if (ft %in% c("shash", "gevlss") && native_mgcv_hook(family$residuals,
       if (ft == "shash") mgcv::shash()$residuals else mgcv::gevlss()$residuals))
     d$diagnostic_residuals <- normalized_general_residuals(d, mu, ft)
-  d
+  extend_family_distribution(d, family, mu, wt, scale, y, eta)
 }
 
 distribution_bounds <- function(y, family, wt = 1) {
@@ -393,6 +389,29 @@ combine_response_distributions <- function(distributions, index) {
   counts <- unique(unlist(lapply(distributions[active], `[[`, "n_reference"),
     use.names = FALSE))
   if (length(counts)) d$n_reference <- counts
+  d$reference_available <- !any(vapply(distributions[active], function(d)
+    identical(d$reference_available, FALSE), logical(1)))
+  d$reference_reason <- collapse_distribution_metadata(distributions[active], "reference_reason")
+  d$moment_reason <- collapse_distribution_metadata(distributions[active], "moment_reason")
+  if (any(vapply(distributions[active], function(d) is.function(d$observe), logical(1)))) {
+    d$observe <- function(y) {
+      out <- numeric(length(index))
+      censor <- rep(NA_real_, length(index))
+      for (i in active) {
+        rows <- which(index == i)
+        value <- observe_diagnostic_response(distributions[[i]], slice_observations(y, rows))
+        if (is.matrix(value)) {
+          if (NCOL(value) != 2L) stop("Grouped observation processes require a scalar ",
+            "response or a two-column censoring matrix.", call. = FALSE)
+          censor[rows] <- value[, 2L]
+          value <- value[, 1L]
+        } else censor[rows] <- attr(value, "censor") %||% value
+        out[rows] <- value
+      }
+      attr(out, "censor") <- censor
+      out
+    }
+  }
   d
 }
 

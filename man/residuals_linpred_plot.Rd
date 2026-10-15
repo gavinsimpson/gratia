@@ -19,14 +19,15 @@ residuals_linpred_plot(
   by_family = NULL,
   rank = NULL,
   conditioning = NULL,
-  ...
+  ...,
+  n_dharma = 250L
 )
 }
 \arguments{
 \item{model}{a fitted model supported by \link{diagnostic_support}.}
 
 \item{type}{character or \code{NULL}; residual type: \code{"deviance"}, \code{"pearson"},
-\code{"response"}, \code{"pit"}, or \code{"quantile"}. Grouped models automatically use
+\code{"response"}, \code{"pit"}, \code{"quantile"}, or \code{"dharma"}. Grouped models automatically use
 quantile residuals when all active components are supported, otherwise all
 use deviance residuals with a message. Ordinary models retain deviance
 residuals by default. See \code{\link[=appraise]{appraise()}} for distributional support.}
@@ -53,7 +54,7 @@ colour. Pooled grouped diagnostics instead colour points by component.}
 
 \item{line_col}{colour specification for 1:1 line.}
 
-\item{seed}{integer; random seed to use for PIT or quantile residuals.}
+\item{seed}{integer; random seed to use for PIT, quantile or DHARMa-style residuals.}
 
 \item{by_family}{logical or \code{NULL}; separate indexed grouped-family components
 into facets. The default pools quantile residuals with component colours
@@ -75,6 +76,10 @@ uses the extracted GAM. Availability and defaults depend on the model; see
 
 \item{...}{optional arguments passed to model preparation, such as the
 sdmTMB \code{field_method}.}
+
+\item{n_dharma}{positive integer; number of response simulations for
+\code{type = "dharma"}. This is separate from \code{n_simulate}, which controls
+traditional QQ reference calculations. Defaults to 250.}
 }
 \description{
 Plot of residuals versus linear predictor values

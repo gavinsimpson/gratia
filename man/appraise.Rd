@@ -47,14 +47,22 @@ appraise(model, ...)
   bandwidth = NULL,
   conditioning = NULL,
   ppc_batch_size = 10L,
-  ...
+  ...,
+  n_dharma = 250L
 )
 
 \method{appraise}{lm}(model, ...)
 
 \method{appraise}{gamlss}(model, ..., type = "quantile", seed = NULL, conditioning = NULL)
 
-\method{appraise}{default}(model, ..., type = NULL, seed = NULL, conditioning = NULL)
+\method{appraise}{default}(
+  model,
+  ...,
+  type = NULL,
+  seed = NULL,
+  conditioning = NULL,
+  n_dharma = 250L
+)
 
 \method{appraise}{gamm4}(model, conditioning = NULL, ...)
 
@@ -124,7 +132,7 @@ and \code{method = "uniform"}, and for randomised quantile residuals and
 posterior predictive draws.}
 
 \item{type}{character or \code{NULL}; residual type: \code{"deviance"}, \code{"response"},
-\code{"pearson"}, \code{"pit"}, or \code{"quantile"}. \code{NULL} uses the model-specific default:
+\code{"pearson"}, \code{"pit"}, \code{"quantile"}, or \code{"dharma"}. \code{NULL} uses the model-specific default:
 deviance for ordinary lm/glm/GAM fits, and quantile for supported grouped
 families, GJRM, sdmTMB and full mixed-model checks. glmmTMB uses Pearson
 residuals conditionally and response residuals marginally. Extracted GAM
@@ -209,6 +217,10 @@ uses the extracted GAM. Availability and defaults depend on the model; see
 draws to process together for scalable plots. Changing the batch size does
 not change results for a fixed seed.}
 
+\item{n_dharma}{positive integer; number of response simulations for
+\code{type = "dharma"}. This is separate from \code{n_simulate}, which controls
+traditional QQ reference calculations. Defaults to 250.}
+
 \item{component}{character; for delta sdmTMB models, select the complete
 \code{"response"}, occurrence (\code{"binomial"}), or \code{"positive"} component.
 Positive-component checks use only observations with positive responses.}
@@ -222,6 +234,16 @@ over fitted-field uncertainty (\code{"mle-mvn-integrated"}). See
 Model diagnostic plots
 }
 \details{
+Use \code{type = "dharma"} for simulation-based PIT residuals calculated
+internally using gratia's response generators; no DHARMa or mgcViz
+dependency is needed. These residuals lie in \verb{[0, 1]}, including exact
+endpoints, and do not require a response CDF. \code{n_dharma} controls their
+simulation count. All residual panels share one calculated vector.
+QQ and worm plots require \code{method = NULL} and use uniform reference
+quantiles, with approximate pointwise bands for independent responses.
+Bands are omitted for dependent responses. Censored and multivariate
+outcomes are unsupported. See \code{\link[=dharma_residuals]{dharma_residuals()}} for the calculation.
+
 With \code{type = NULL}, ordinary lm/glm/GAM fits use deviance residuals.
 Models fitted with \code{\link[mgcv:gfam]{mgcv::gfam()}} use randomised quantile (Dunn--Smyth)
 residuals when every active component supplies a supported CDF and
