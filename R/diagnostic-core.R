@@ -163,7 +163,9 @@ diagnostic_qq_caption <- function(model, data, bands = attr(data, "band_method")
     if (inherits(model, c("gratia_diagnostic_proxy", "gratia_glmmtmb_diagnostic")) ||
         !identical(distribution$conditioning, "conditional"))
       paste("Conditioning:", distribution$conditioning %||% "conditional"),
-    if (!is.null(distribution$field_method)) paste("Fields:", distribution$field_method),
+    if (!is.null(distribution$field_method) &&
+        !identical(distribution$conditioning, "marginal"))
+      paste("Fields:", distribution$field_method),
     switch(bands %||% "", joint = "joint simulation bands", none = "bands omitted")
   )
   diagnostic_caption(context)
