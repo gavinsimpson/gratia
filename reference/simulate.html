@@ -81,7 +81,8 @@ See <a href="diagnostic_support.html">diagnostic_support</a>.</p>
 <span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  family_index <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  family_index <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm'</span></span>
@@ -93,7 +94,8 @@ See <a href="diagnostic_support.html">diagnostic_support</a>.</p>
 <span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  conditioning <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  conditioning <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'scam'</span></span>
@@ -104,7 +106,8 @@ See <a href="diagnostic_support.html">diagnostic_support</a>.</p>
 <span>  data <span class="op">=</span> <span class="va">newdata</span>,</span>
 <span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  newdata <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -165,6 +168,12 @@ positions restored by <code>na.exclude</code> when supplying weights for fitting
 <dt id="arg-family-index">family_index<a class="anchor" aria-label="anchor" href="#arg-family-index"></a></dt>
 <dd><p>numeric; for grouped-family models, one integer family
 index per requested prediction row. See Details.</p></dd>
+
+
+<dt id="arg-envir">envir<a class="anchor" aria-label="anchor" href="#arg-envir"></a></dt>
+<dd><p>environment or <code>NULL</code>; functions and constants needed to
+evaluate model expressions in prediction data. With <code>NULL</code>, use the
+model's formula environment. Supply raw covariates in <code>data</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

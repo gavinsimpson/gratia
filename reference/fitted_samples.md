@@ -92,9 +92,13 @@ fitted_samples(
 
 - scale:
 
-  character; what scale should the fitted values be returned on?
-  `"linear predictor"` is a synonym for `"link"` if you prefer that
-  terminology.
+  character; either `"response"` for expectations of the response or
+  `"linear_predictor"` for values before the inverse link
+  transformation. For multinomial models both scales return all
+  categories, labelled `response1`, `response2`, and so on. On the
+  linear predictor scale, `response1` is the reference category with
+  predictor zero; the other values are log odds relative to it. On the
+  response scale, the values are category probabilities.
 
 - method:
 
@@ -199,6 +203,19 @@ values in long format. The columns are
   `data`.
 
 ## Details
+
+For general families with several distributional parameters,
+response-scale draws currently support
+[`mgcv::gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) means,
+[`mgcv::mvn()`](https://rdrr.io/pkg/mgcv/man/mvn.html) response means,
+and [`mgcv::multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html)
+category probabilities. Other general families, including
+[`mgcv::ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html), produce an
+error on the response scale because their first parameter is not
+necessarily the expected response. On the linear predictor scale, these
+other families return the first predictor under the existing `location`
+label, including its offsets. The same label identifies the mean
+predictor for `gaulss()`; scale predictors are omitted.
 
 For grouped families, coefficient draws preserve the joint model
 covariance; each row is then transformed using its own fitted component

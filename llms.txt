@@ -622,10 +622,10 @@ validation tools.
   : Low-level Functions to generate draws from the posterior
   distribution of model coefficients
 - [`gaussian_draws()`](https://gavinsimpson.github.io/gratia/reference/gaussian_draws.md)
-  : Posterior samples using a simple Metropolis Hastings sampler
-- [`mh_draws()`](https://gavinsimpson.github.io/gratia/reference/mh_draws.md)
   : Posterior samples using a Gaussian approximation to the posterior
   distribution
+- [`mh_draws()`](https://gavinsimpson.github.io/gratia/reference/mh_draws.md)
+  : Posterior samples using a simple Metropolis Hastings sampler
 - [`user_draws()`](https://gavinsimpson.github.io/gratia/reference/user_draws.md)
   : Handle user-supplied posterior draws
 

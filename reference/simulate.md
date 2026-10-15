@@ -23,7 +23,8 @@ simulate(
   weights = NULL,
   ...,
   newdata = NULL,
-  family_index = NULL
+  family_index = NULL,
+  envir = NULL
 )
 
 # S3 method for class 'gamm'
@@ -35,7 +36,8 @@ simulate(
   weights = NULL,
   ...,
   newdata = NULL,
-  conditioning = NULL
+  conditioning = NULL,
+  envir = NULL
 )
 
 # S3 method for class 'scam'
@@ -46,7 +48,8 @@ simulate(
   data = newdata,
   weights = NULL,
   ...,
-  newdata = NULL
+  newdata = NULL,
+  envir = NULL
 )
 ```
 
@@ -110,6 +113,12 @@ simulate(
 
   numeric; for grouped-family models, one integer family index per
   requested prediction row. See Details.
+
+- envir:
+
+  environment or `NULL`; functions and constants needed to evaluate
+  model expressions in prediction data. With `NULL`, use the model's
+  formula environment. Supply raw covariates in `data`.
 
 ## Value
 

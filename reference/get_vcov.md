@@ -55,6 +55,15 @@ get_vcov(
 
 a matrix containing the selected covariance matrix.
 
+## Details
+
+For [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) fits with
+linear inequality constraints, the Gaussian covariance approximation
+does not enforce the fitted shapes. Pointwise intervals calculated from
+this matrix can extend outside those constraints. See
+[`post_draws()`](https://gavinsimpson.github.io/gratia/reference/post_draws.md)
+for sampling and native-bootstrap details.
+
 ## Author
 
 Gavin L. Simpson

@@ -6,7 +6,14 @@ Add fitted values from a GAM to a data frame
 
 ``` r
 # S3 method for class 'gam'
-add_fitted(data, model, value = ".fitted", type = "response", ...)
+add_fitted(
+  data,
+  model,
+  value = ".fitted",
+  type = "response",
+  ...,
+  envir = NULL
+)
 ```
 
 ## Arguments
@@ -39,6 +46,12 @@ add_fitted(data, model, value = ".fitted", type = "response", ...)
 
   additional arguments passed to
   [`mgcv::predict.gam()`](https://rdrr.io/pkg/mgcv/man/predict.gam.html).
+
+- envir:
+
+  environment or `NULL`; functions and constants needed to evaluate
+  model expressions in prediction data. With `NULL`, use the model's
+  formula environment. Supply raw covariates in `data`.
 
 ## Value
 

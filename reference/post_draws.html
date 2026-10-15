@@ -226,6 +226,24 @@ be generated without affecting the current state of R's RNG.</p></dd>
 
 </dl></div>
     <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>GAM-class fits with linear inequality constraints, including
+<code><a href="https://rdrr.io/pkg/mgcv/man/scasm.html" class="external-link">mgcv::scasm()</a></code> fits, store these as <code>Ain %*% coefficients &gt;= bin</code>.
+Gaussian sampling uses the fitted covariance matrix without enforcing
+these inequalities and issues a warning. Sampled smooths can therefore
+violate the fitted shape constraints. Pointwise intervals computed from
+the same Gaussian covariance approximation also need not preserve those
+shapes. Metropolis-Hastings sampling is unavailable for these fits because
+<code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code> does not enforce their inequalities.</p>
+<p>If <code><a href="https://rdrr.io/pkg/mgcv/man/scasm.html" class="external-link">mgcv::scasm()</a></code> was fitted with <code>bs &gt; 0</code>, its <code>bs</code> component stores
+coefficient draws from the native constrained bootstrap in columns. These
+can be supplied explicitly as <code>draws = t(model$bs)</code> with <code>method = "user"</code>.
+The result then describes bootstrap variation, rather than Gaussian
+posterior sampling. Gratia does not automatically select these draws.
+The caller is responsible for the interpretation and constraint
+feasibility of user-supplied draws.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><a href="gamm4_support.html">gamm4_support</a></p></div>
     </div>

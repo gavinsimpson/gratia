@@ -4,6 +4,22 @@
 
 ### User visible changes
 
+- [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
+  now rejects response-scale requests for general families whose first
+  predictor is not a supported response mean. Use
+  `scale = "linear_predictor"` for the first predictor;
+  [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) means,
+  multivariate normal means and multinomial probabilities remain
+  supported. Previously these unsupported requests could return a
+  distribution parameter as though it were an expected response.
+
+- Gaussian coefficient sampling for
+  [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) fits with
+  linear inequality constraints now warns that the draws need not
+  satisfy the fitted shapes. Metropolis-Hastings sampling now gives an
+  explicit error because its proposals and likelihood calculation do not
+  enforce those constraints.
+
 - gratia has a new neon hex logo. The pkgdown site uses the pink g from
   the logo as its favicon.
 
@@ -386,6 +402,11 @@
   for examples. Evaluation failures at new data produce actionable
   errors. Parametric effects and data slices recover raw covariates
   consistently.
+  [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
+  and
+  [`add_fitted()`](https://gavinsimpson.github.io/gratia/reference/add_fitted.md)
+  also accept `envir` for local functions in offsets and smooth
+  expressions.
 
 - `smooth_estimates(..., back_transform = TRUE)` now recovers raw
   fitting covariates, generates grids on their original scale and
@@ -548,9 +569,18 @@
   explicit error explaining that `scalable = FALSE` is required.
   Ordinary posterior predictive plots remain available.
 
-- Partial derivatives of soap-film smooths include the contribution from
-  known boundary values. Those fixed values affect derivative estimates
-  without adding coefficient uncertainty.
+- Partial derivatives, fitted samples and smooth samples of soap-film
+  smooths include the contribution from known boundary values.
+  Complete-predictor derivative samples also differentiate those fixed
+  values, without adding coefficient uncertainty. Term exclusions retain
+  only the appropriate fixed contributions. Separate sampling per smooth
+  now correctly subsets supplied coefficient draws.
+
+- Multinomial fitted samples now honour `scale = "linear_predictor"`,
+  returning log odds relative to the reference category instead of
+  probabilities. Both scales retain all category labels; the reference
+  predictor is zero. Models with one non-reference category also use
+  this output format.
 
 - GJRM smooth selection now uses one order across all model equations.
   Character selections draw only the equations containing the selected
@@ -607,8 +637,15 @@
 - QQ bands for dependent responses now use joint simulations when
   available. Otherwise, the plot explains why the bands are omitted.
 
-- Posterior response draws now retain offsets supplied as fitting
-  arguments.
+- Fitted and posterior response draws, response simulations and
+  diagnostics now retain offsets supplied as fitting arguments for
+  fitting observations, including ordinary
+  [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) and extracted
+  [`gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html) GAM components.
+  Recovery keeps formula offsets, prescribed smooth boundaries and
+  additional group effects separate. Explicit prediction data still
+  follow the fitter’s prediction convention and do not inherit
+  argument-only fitting offsets.
 
 - Explicit seeds now preserve the caller’s random-number state for
   coefficient and response draws.
@@ -627,6 +664,9 @@
   [\#402](https://github.com/gavinsimpson/gratia/issues/402)). Explicit
   prediction data preserve row positions by default: missing required
   predictors yield `NA`, while missing responses alone do not prevent
+  prediction. Discrete [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html)
+  fitted-value intervals restore exclusions once and accept stored
+  fitting frames without relying on tibble subsetting in native
   prediction.
 
 - [`link()`](https://gavinsimpson.github.io/gratia/reference/link.md),

@@ -145,9 +145,13 @@ the model will be used for <code>data</code>, if available in <code>model</code>
 
 
 <dt id="arg-scale">scale<a class="anchor" aria-label="anchor" href="#arg-scale"></a></dt>
-<dd><p>character; what scale should the fitted values be returned on?
-<code>"linear predictor"</code> is a synonym for <code>"link"</code> if you prefer that
-terminology.</p></dd>
+<dd><p>character; either <code>"response"</code> for expectations of the response
+or <code>"linear_predictor"</code> for values before the inverse link transformation.
+For multinomial models both scales return all categories, labelled
+<code>response1</code>, <code>response2</code>, and so on. On the linear predictor scale,
+<code>response1</code> is the reference category with predictor zero; the other
+values are log odds relative to it. On the response scale, the values
+are category probabilities.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
@@ -246,7 +250,15 @@ relates to,</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>For grouped families, coefficient draws preserve the joint model covariance;
+    <p>For general families with several distributional parameters, response-scale
+draws currently support <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">mgcv::gaulss()</a></code> means, <code><a href="https://rdrr.io/pkg/mgcv/man/mvn.html" class="external-link">mgcv::mvn()</a></code> response means,
+and <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">mgcv::multinom()</a></code> category probabilities. Other general families,
+including <code><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html" class="external-link">mgcv::ziplss()</a></code>, produce an error on the response scale because
+their first parameter is not necessarily the expected response. On the
+linear predictor scale, these other families return the first predictor
+under the existing <code>location</code> label, including its offsets. The same label
+identifies the mean predictor for <code>gaulss()</code>; scale predictors are omitted.</p>
+<p>For grouped families, coefficient draws preserve the joint model covariance;
 each row is then transformed using its own fitted component family. Explicit
 prediction data must identify each row's family: no training-order fallback
 is used. A two-column response matrix supplies its second column; a numeric

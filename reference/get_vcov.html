@@ -115,6 +115,13 @@ for a particular <strong>smooth</strong> term. Only a single term can be selecte
     <p>a matrix containing the selected covariance matrix.</p>
     </div>
     <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>For <code><a href="https://rdrr.io/pkg/mgcv/man/scasm.html" class="external-link">mgcv::scasm()</a></code> fits with linear inequality constraints,
+the Gaussian covariance approximation does not enforce the fitted shapes.
+Pointwise intervals calculated from this matrix can extend outside those
+constraints. See <code><a href="post_draws.html">post_draws()</a></code> for sampling and native-bootstrap details.</p>
+    </div>
+    <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
     <p>Gavin L. Simpson</p>
     </div>
