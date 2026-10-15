@@ -124,3 +124,10 @@ residuals_linpred_plot(
   positive integer; number of response simulations for
   `type = "dharma"`. This is separate from `n_simulate`, which controls
   traditional QQ reference calculations. Defaults to 250.
+
+## Details
+
+The default subtitle identifies the response family. Conditioning and
+field choices appear in the caption where relevant. Supply `caption` to
+replace this text, or `caption = ""` to omit it. The scalable version
+uses the same labels.

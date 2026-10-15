@@ -250,42 +250,97 @@ Remove the curved relationship to temperature to see this:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">linear_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">temperature</span> <span class="op">+</span> <span class="va">wind</span>, data <span class="op">=</span> <span class="va">insects</span>,</span>
 <span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">linear_r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/quantile_residuals.html">quantile_residuals</a></span><span class="op">(</span><span class="va">linear_fit</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="fl">302</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">insects</span>, residual <span class="op">=</span> <span class="va">linear_r</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">temperature</span>, <span class="va">residual</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bin_2d.html" class="external-link">geom_bin_2d</a></span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">40</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_c</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"sqrt"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Temperature"</span>, y <span class="op">=</span> <span class="st">"Quantile residual"</span>, fill <span class="op">=</span> <span class="st">"Sites"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/residuals_covariate_plot.html">scalable_residuals_covariate_plot</a></span><span class="op">(</span><span class="va">linear_fit</span>,</span>
+<span>  covariates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"temperature"</span>, <span class="st">"wind"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"pearson"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/omitted-curve-1.png" class="r-plt" alt="" width="700"></p>
-<p>The curved residual pattern shows that the linear temperature effect
-misses the response shape. Changing the response family alone would not
-repair that missing mean structure. Compare the same display using
-<code>r</code> from the smooth model to see how the smooth accounts for
-the temperature response.</p>
+<p>The curved residual mean against temperature shows where the linear
+effect misses the response shape. Pearson residuals account for the
+Poisson mean–variance relationship. Response residuals also target the
+mean but retain the count units. For a broader distributional check, use
+<code>type = "quantile"</code> or <code>type = "pit"</code> to examine
+location, spread and tails against each covariate. Non-Gaussian deviance
+residuals need not have zero conditional mean, so their mean curve need
+not lie on zero even when the model fits.</p>
+<p>Both versions default to <code>smooth = NULL</code>, which fits the
+residual mean trend only for groups with at most 20,000 eligible
+observations. Use <code>smooth = TRUE</code> to fit trends for larger
+groups, or <code>smooth = FALSE</code> to omit them. The threshold is
+applied separately within each response, family component and
+<code>by</code> group.</p>
+<p>The ordinary version shows individual residuals. It is useful for
+smaller teaching examples; both versions use all eligible
+observations:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">small_insects</span> <span class="op">&lt;-</span> <span class="va">insects</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">500</span><span class="op">)</span>, <span class="op">]</span></span>
+<span><span class="va">small_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">temperature</span> <span class="op">+</span> <span class="va">wind</span>, data <span class="op">=</span> <span class="va">small_insects</span>,</span>
+<span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/residuals_covariate_plot.html">residuals_covariate_plot</a></span><span class="op">(</span><span class="va">small_fit</span>, covariates <span class="op">=</span> <span class="st">"temperature"</span>, type <span class="op">=</span> <span class="st">"pearson"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="model-checking_files/figure-html/ordinary-covariates-1.png" class="r-plt" alt="" width="700"></p>
+<p>By default each distinct model covariate gets one panel. To select
+covariates through a smooth, supply its exact label from
+<code>smooths(count_fit)</code>:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/smooths.html">smooths</a></span><span class="op">(</span><span class="va">count_fit</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "s(temperature)"</span></span>
+<span><span class="fu"><a href="../reference/residuals_covariate_plot.html">scalable_residuals_covariate_plot</a></span><span class="op">(</span><span class="va">count_fit</span>, terms <span class="op">=</span> <span class="st">"s(temperature)"</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="fl">302</span><span class="op">)</span></span></code></pre></div>
+<p><img src="model-checking_files/figure-html/smooth-covariates-1.png" class="r-plt" alt="" width="700"></p>
+<p>For tensor products use labels such as
+<code>"te(temperature,wind)"</code>, without adding spaces.
+<code>terms</code> accepts smooth labels only, while
+<code>covariates</code> can also select linear predictors or covariates
+absent from the model. Supply the original fitting <code>data</code> for
+omitted covariates or when raw transformed covariates are unavailable.
+For a categorical covariate, the functions show residual boxplots and
+group means; <code>by = "group"</code> separates patterns into group
+facets.</p>
+<p>Separate panels can miss a remaining interaction. Here the mean
+contains a product of two independent, centred covariates. Averaging
+over either covariate hides the interaction in the other covariate’s
+residual mean:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">306</span><span class="op">)</span></span>
+<span><span class="va">interaction_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">4000</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">4000</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">interaction_data</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">4</span> <span class="op">*</span> <span class="va">interaction_data</span><span class="op">$</span><span class="va">x</span> <span class="op">*</span> <span class="va">interaction_data</span><span class="op">$</span><span class="va">z</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">4000</span><span class="op">)</span></span>
+<span><span class="va">additive_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">interaction_data</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/residuals_covariate_plot.html">scalable_residuals_covariate_plot</a></span><span class="op">(</span><span class="va">additive_fit</span>, covariates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"z"</span><span class="op">)</span>,</span>
+<span>  pairs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"z"</span><span class="op">)</span><span class="op">)</span>, bins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"pearson"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="model-checking_files/figure-html/omitted-interaction-1.png" class="r-plt" alt="" width="700"></p>
+<p>The joint map shows the mean residual within each occupied covariate
+cell. Opposite corners have residuals with the same sign, suggesting
+that the two covariates need to enter the mean together. Cells with
+fewer than <code>min_n</code> observations are blank. Use
+<code>statistic = "sd"</code> to inspect changes in spread instead; this
+is particularly useful with quantile or PIT residuals. Joint maps are
+descriptive summaries, without significance tests. Correlated covariates
+can share residual patterns, so check a revised model before attributing
+the pattern to one particular effect. For a fitted smooth, a remaining
+curve can also motivate increasing its basis dimension <code>k</code>
+and checking the refitted model.</p>
 </div>
 <div class="section level3">
 <h3 id="choose-compact-displays-without-changing-the-question">Choose compact displays without changing the question<a class="anchor" aria-label="anchor" href="#choose-compact-displays-without-changing-the-question"></a>
 </h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/scalable_qq_plot.html">scalable_residuals_linpred_plot</a></span><span class="op">(</span><span class="va">count_fit</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="fl">302</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/scalable-controls-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/scalable_qq_plot.html">scalable_residuals_linpred_plot</a></span><span class="op">(</span><span class="va">count_fit</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="fl">302</span>,</span>
 <span>  density_method <span class="op">=</span> <span class="st">"histogram"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/scalable-controls-2.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/scalable_qq_plot.html">scalable_observed_fitted_plot</a></span><span class="op">(</span><span class="va">count_fit</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/scalable-controls-3.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/scalable_qq_plot.html">scalable_residuals_hist_plot</a></span><span class="op">(</span><span class="va">count_fit</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="fl">302</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/scalable-controls-4.png" class="r-plt" alt="" width="700"></p>
 <p>The default residual heatmap uses a kernel estimate of density at
 each predictor value. Its square-root colour scale keeps low-density
 regions visible. The histogram option uses unsmoothed bins;
 <code>bandwidth</code> controls smoothing on both axes.
-Observed-versus-fitted count heatmaps remain unsmoothed. The five
-scalable functions also include <code><a href="../reference/scalable_qq_plot.html">scalable_qq_plot()</a></code>;
-ordinary plots remain available with
-<code>appraise(..., scalable = FALSE)</code>, and
+Observed-versus-fitted count heatmaps remain unsmoothed. The scalable
+functions also include <code><a href="../reference/scalable_qq_plot.html">scalable_qq_plot()</a></code>; ordinary plots
+remain available with <code>appraise(..., scalable = FALSE)</code>, and
 <code>scalable_threshold</code> changes the automatic cutoff. Plot
 summaries are compact, but simulation still generates a response for
 every observation. QQ calculations average inverse-CDF draws as they are
@@ -296,7 +351,7 @@ access. One response vector and the reference output still need to fit
 in memory. Marginal simulation ranks use
 <code>gratia.diagnostics.marginal_draws</code> (default 249, minimum
 19); increase it and check stability, especially in the tails.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/posterior_predictive_plot.html">posterior_predictive_plot</a></span><span class="op">(</span><span class="va">count_fit</span>, n <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">304</span>, scalable <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/count-ppc-1.png" class="r-plt" alt="" width="700"></p>
 <p>The discrete posterior predictive check shows observed probabilities
@@ -323,7 +378,7 @@ values can share an individual growth trajectory. A Gaussian linear
 mixed model with sex-specific age slopes and correlated child intercepts
 and slopes is a useful starting point. With only four occasions per
 child, very detailed individual curves are not supported.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://svn.r-project.org/R-packages/trunk/nlme/" class="external-link">"nlme"</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/lme4/lme4/" class="external-link">"lme4"</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"gamm4"</span><span class="op">)</span></span>
@@ -333,18 +388,18 @@ child, very detailed individual curves are not supported.</p>
 <span>  data <span class="op">=</span> <span class="va">growth</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">growth_fit</span><span class="op">)</span><span class="op">$</span><span class="va">tTable</span></span>
 <span><span class="co">#&gt;                      Value  Std.Error DF   t-value      p-value</span></span>
-<span><span class="co">#&gt; (Intercept)     24.9687500 0.48600069 79 51.375956 1.812707e-62</span></span>
-<span><span class="co">#&gt; SexFemale       -2.3210227 0.76141675 25 -3.048295 5.375051e-03</span></span>
-<span><span class="co">#&gt; age_c            0.7843750 0.08599951 79  9.120692 5.654744e-14</span></span>
+<span><span class="co">#&gt; (Intercept)     24.9687500 0.48600071 79 51.375954 1.812711e-62</span></span>
+<span><span class="co">#&gt; SexFemale       -2.3210227 0.76141677 25 -3.048295 5.375052e-03</span></span>
+<span><span class="co">#&gt; age_c            0.7843750 0.08599951 79  9.120691 5.654752e-14</span></span>
 <span><span class="co">#&gt; SexFemale:age_c -0.3048295 0.13473534 79 -2.262432 2.641752e-02</span></span></code></pre></div>
 <p>The age coefficient describes mean growth in the reference sex, and
 the interaction describes a difference in age slopes. The fitted random
 effects describe departures for these children. The positive fitted age
 slopes describe growth between ages 8 and 14.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/qq_plot.html">qq_plot</a></span><span class="op">(</span><span class="va">growth_fit</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, conditioning <span class="op">=</span> <span class="st">"conditional"</span>, seed <span class="op">=</span> <span class="fl">305</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/growth-references-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/qq_plot.html">qq_plot</a></span><span class="op">(</span><span class="va">growth_fit</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, conditioning <span class="op">=</span> <span class="st">"marginal"</span>,</span>
 <span>  n_simulate <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">305</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/growth-references-2.png" class="r-plt" alt="" width="700"></p>
@@ -364,11 +419,11 @@ independent scores.</p>
 <p>The QQ plot pools the ordered residuals. To check the shared child
 effects, also plot trajectories or residuals against age, grouped by
 child: systematic patterns within children can be hidden by pooling.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/posterior_predictive_plot.html">posterior_predictive_plot</a></span><span class="op">(</span><span class="va">growth_fit</span>, conditioning <span class="op">=</span> <span class="st">"conditional"</span>, n <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">306</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/growth-ppc-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/posterior_predictive_plot.html">posterior_predictive_plot</a></span><span class="op">(</span><span class="va">growth_fit</span>, conditioning <span class="op">=</span> <span class="st">"marginal"</span>, n <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">306</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/growth-ppc-2.png" class="r-plt" alt="" width="700"></p>
@@ -383,17 +438,17 @@ examine where that variation occurs.</p>
 <div class="section level3">
 <h3 id="apply-the-same-distinction-to-other-mixed-model-fits">Apply the same distinction to other mixed-model fits<a class="anchor" aria-label="anchor" href="#apply-the-same-distinction-to-other-mixed-model-fits"></a>
 </h3>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">growth_lmer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">distance</span> <span class="op">~</span> <span class="va">Sex</span> <span class="op">*</span> <span class="va">age_c</span> <span class="op">+</span> <span class="op">(</span><span class="va">age_c</span> <span class="op">|</span> <span class="va">Subject</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">growth</span>, REML <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/appraise.html">appraise</a></span><span class="op">(</span><span class="va">growth_lmer</span>, conditioning <span class="op">=</span> <span class="st">"conditional"</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="fl">305</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/other-growth-fit-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">growth_smooth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html" class="external-link">gamm4</a></span><span class="op">(</span><span class="va">distance</span> <span class="op">~</span> <span class="va">Sex</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">age</span>, k <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,</span>
 <span>  random <span class="op">=</span> <span class="op">~</span><span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">Subject</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">growth</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">growth_smooth</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/other-growth-fit-2.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/variance_comp.html">variance_comp</a></span><span class="op">(</span><span class="va">growth_smooth</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 5</span></span></span>
 <span><span class="co">#&gt;   .component          .variance .std_dev .lower_ci .upper_ci</span></span>
@@ -410,13 +465,13 @@ describe its population GAM component; group terms specified in
 <code>random</code> are excluded from those calculations. Variance
 components include both smooth penalties and native group effects, with
 missing interval bounds where the fit provides none.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/appraise.html">appraise</a></span><span class="op">(</span><span class="va">growth_smooth</span>, conditioning <span class="op">=</span> <span class="st">"conditional"</span>, seed <span class="op">=</span> <span class="fl">307</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/gamm4-checks-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/posterior_predictive_plot.html">posterior_predictive_plot</a></span><span class="op">(</span><span class="va">growth_smooth</span>, n <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">307</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/gamm4-checks-2.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">population_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">14</span>, length.out <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
 <span>  Sex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="st">"Female"</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">growth</span><span class="op">$</span><span class="va">Sex</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">growth_smooth</span>, data <span class="op">=</span> <span class="va">population_grid</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -454,7 +509,7 @@ following simulation represents regularly spaced measurements from four
 independent monitoring series with a slowly changing mean and Gaussian
 AR1 errors. We supply the simulation’s known correlation, 0.6, through
 <code>rho</code>; BAM treats it as fixed during fitting.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">308</span><span class="op">)</span></span>
 <span><span class="va">monitor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">120</span><span class="op">)</span>, station <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">monitor</span><span class="op">$</span><span class="va">start</span> <span class="op">&lt;-</span> <span class="va">monitor</span><span class="op">$</span><span class="va">time</span> <span class="op">==</span> <span class="fl">1</span></span>
@@ -465,10 +520,10 @@ AR1 errors. We supply the simulation’s known correlation, 0.6, through
 <span>  rho <span class="op">=</span> <span class="fl">0.6</span>, AR.start <span class="op">=</span> <span class="va">start</span>, discrete <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/qq_plot.html">qq_plot</a></span><span class="op">(</span><span class="va">serial_fit</span>, method <span class="op">=</span> <span class="st">"simulate"</span>, n_simulate <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">309</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/gaussian-series-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/residual_correlation.html">residual_correlation_plot</a></span><span class="op">(</span><span class="va">serial_fit</span>, lag_max <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/gaussian-series-2.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/residual_correlation.html">residual_correlation</a></span><span class="op">(</span><span class="va">serial_fit</span>, lag_max <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 3</span></span></span>
 <span><span class="co">#&gt;     lag correlation n_pairs</span></span>
@@ -493,14 +548,14 @@ during iterative fitting. This is a generalised estimating equations
 (GEE) approximation. It does not define a unique joint count
 distribution. We generate the next dataset from a latent correlated
 process, then use BAM’s working correction when fitting its mean.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">310</span><span class="op">)</span></span>
 <span><span class="va">monitor</span><span class="op">$</span><span class="va">count</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">monitor</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="va">monitor</span><span class="op">$</span><span class="va">measurement</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">working_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">bam</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">time</span>, bs <span class="op">=</span> <span class="st">"cr"</span>, k <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">monitor</span>,</span>
 <span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>, discrete <span class="op">=</span> <span class="cn">TRUE</span>, rho <span class="op">=</span> <span class="fl">0.6</span>, AR.start <span class="op">=</span> <span class="va">start</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/qq_plot.html">qq_plot</a></span><span class="op">(</span><span class="va">working_fit</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="fl">311</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/count-series-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/residual_correlation.html">residual_correlation_plot</a></span><span class="op">(</span><span class="va">working_fit</span>, type <span class="op">=</span> <span class="st">"working.standardized"</span>, lag_max <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-checking_files/figure-html/count-series-2.png" class="r-plt" alt="" width="700"></p>
 <p>The marginal Poisson probabilities still locate each count in its

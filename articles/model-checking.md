@@ -165,20 +165,89 @@ the curved relationship to temperature to see this:
 
 linear_fit <- glm(count ~ temperature + wind, data = insects,
   family = poisson())
-linear_r <- quantile_residuals(linear_fit, type = "quantile", seed = 302)
-ggplot(data.frame(insects, residual = linear_r), aes(temperature, residual)) +
-  geom_bin_2d(bins = 40) +
-  scale_fill_viridis_c(trans = "sqrt") +
-  labs(x = "Temperature", y = "Quantile residual", fill = "Sites")
+scalable_residuals_covariate_plot(linear_fit,
+  covariates = c("temperature", "wind"), type = "pearson")
 ```
 
 ![](model-checking_files/figure-html/omitted-curve-1.png)
 
-The curved residual pattern shows that the linear temperature effect
-misses the response shape. Changing the response family alone would not
-repair that missing mean structure. Compare the same display using `r`
-from the smooth model to see how the smooth accounts for the temperature
-response.
+The curved residual mean against temperature shows where the linear
+effect misses the response shape. Pearson residuals account for the
+Poisson mean–variance relationship. Response residuals also target the
+mean but retain the count units. For a broader distributional check, use
+`type = "quantile"` or `type = "pit"` to examine location, spread and
+tails against each covariate. Non-Gaussian deviance residuals need not
+have zero conditional mean, so their mean curve need not lie on zero
+even when the model fits.
+
+Both versions default to `smooth = NULL`, which fits the residual mean
+trend only for groups with at most 20,000 eligible observations. Use
+`smooth = TRUE` to fit trends for larger groups, or `smooth = FALSE` to
+omit them. The threshold is applied separately within each response,
+family component and `by` group.
+
+The ordinary version shows individual residuals. It is useful for
+smaller teaching examples; both versions use all eligible observations:
+
+``` r
+
+small_insects <- insects[seq_len(500), ]
+small_fit <- gam(count ~ temperature + wind, data = small_insects,
+  family = poisson(), method = "REML")
+residuals_covariate_plot(small_fit, covariates = "temperature", type = "pearson")
+```
+
+![](model-checking_files/figure-html/ordinary-covariates-1.png)
+
+By default each distinct model covariate gets one panel. To select
+covariates through a smooth, supply its exact label from
+`smooths(count_fit)`:
+
+``` r
+
+smooths(count_fit)
+#> [1] "s(temperature)"
+scalable_residuals_covariate_plot(count_fit, terms = "s(temperature)",
+  type = "quantile", seed = 302)
+```
+
+![](model-checking_files/figure-html/smooth-covariates-1.png)
+
+For tensor products use labels such as `"te(temperature,wind)"`, without
+adding spaces. `terms` accepts smooth labels only, while `covariates`
+can also select linear predictors or covariates absent from the model.
+Supply the original fitting `data` for omitted covariates or when raw
+transformed covariates are unavailable. For a categorical covariate, the
+functions show residual boxplots and group means; `by = "group"`
+separates patterns into group facets.
+
+Separate panels can miss a remaining interaction. Here the mean contains
+a product of two independent, centred covariates. Averaging over either
+covariate hides the interaction in the other covariate’s residual mean:
+
+``` r
+
+set.seed(306)
+interaction_data <- data.frame(x = runif(4000, -1, 1), z = runif(4000, -1, 1))
+interaction_data$y <- 4 * interaction_data$x * interaction_data$z + rnorm(4000)
+additive_fit <- gam(y ~ s(x) + s(z), data = interaction_data, method = "REML")
+scalable_residuals_covariate_plot(additive_fit, covariates = c("x", "z"),
+  pairs = list(c("x", "z")), bins = c(10, 10), type = "pearson")
+```
+
+![](model-checking_files/figure-html/omitted-interaction-1.png)
+
+The joint map shows the mean residual within each occupied covariate
+cell. Opposite corners have residuals with the same sign, suggesting
+that the two covariates need to enter the mean together. Cells with
+fewer than `min_n` observations are blank. Use `statistic = "sd"` to
+inspect changes in spread instead; this is particularly useful with
+quantile or PIT residuals. Joint maps are descriptive summaries, without
+significance tests. Correlated covariates can share residual patterns,
+so check a revised model before attributing the pattern to one
+particular effect. For a fitted smooth, a remaining curve can also
+motivate increasing its basis dimension `k` and checking the refitted
+model.
 
 ### Choose compact displays without changing the question
 
@@ -215,7 +284,7 @@ The default residual heatmap uses a kernel estimate of density at each
 predictor value. Its square-root colour scale keeps low-density regions
 visible. The histogram option uses unsmoothed bins; `bandwidth` controls
 smoothing on both axes. Observed-versus-fitted count heatmaps remain
-unsmoothed. The five scalable functions also include
+unsmoothed. The scalable functions also include
 [`scalable_qq_plot()`](https://gavinsimpson.github.io/gratia/reference/scalable_qq_plot.md);
 ordinary plots remain available with `appraise(..., scalable = FALSE)`,
 and `scalable_threshold` changes the automatic cutoff. Plot summaries
@@ -268,9 +337,9 @@ growth_fit <- lme(distance ~ Sex * age_c, random = ~ age_c | Subject,
   data = growth, method = "REML")
 summary(growth_fit)$tTable
 #>                      Value  Std.Error DF   t-value      p-value
-#> (Intercept)     24.9687500 0.48600069 79 51.375956 1.812707e-62
-#> SexFemale       -2.3210227 0.76141675 25 -3.048295 5.375051e-03
-#> age_c            0.7843750 0.08599951 79  9.120692 5.654744e-14
+#> (Intercept)     24.9687500 0.48600071 79 51.375954 1.812711e-62
+#> SexFemale       -2.3210227 0.76141677 25 -3.048295 5.375052e-03
+#> age_c            0.7843750 0.08599951 79  9.120691 5.654752e-14
 #> SexFemale:age_c -0.3048295 0.13473534 79 -2.262432 2.641752e-02
 ```
 

@@ -345,6 +345,9 @@ heatmaps summarize the component mixture rather than colouring individual
 observations; observed-versus-fitted appraisals always separate components.
 Pooled histograms use faint component-coloured fills with opaque stepped
 upper boundaries, retaining common bin edges and component densities.</p>
+<p>Residual-versus-predictor plots identify the response family in the subtitle
+and show conditioning and field choices in the caption where relevant,
+matching <code><a href="residuals_linpred_plot.html">residuals_linpred_plot()</a></code>. Supply <code>caption = ""</code> to omit the caption.</p>
 <p>Kernel density estimates are calculated on a fixed grid before plotting.
 Each predictor slice is normalized to integrate to one over the displayed
 residual grid. Bandwidths, rather than <code>density_bins</code>, control smoothing;

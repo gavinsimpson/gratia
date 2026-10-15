@@ -346,6 +346,9 @@ individual diagnostic plots, residuals, and measures of concurvity.
   : Histogram of model residuals
 - [`residuals_linpred_plot()`](https://gavinsimpson.github.io/gratia/reference/residuals_linpred_plot.md)
   : Plot of residuals versus linear predictor values
+- [`residuals_covariate_plot()`](https://gavinsimpson.github.io/gratia/reference/residuals_covariate_plot.md)
+  [`scalable_residuals_covariate_plot()`](https://gavinsimpson.github.io/gratia/reference/residuals_covariate_plot.md)
+  : Plot residuals against covariates
 - [`quantile_residuals()`](https://gavinsimpson.github.io/gratia/reference/quantile_residuals.md)
   : PIT and randomised quantile residuals
 - [`dharma_residuals()`](https://gavinsimpson.github.io/gratia/reference/dharma_residuals.md)
