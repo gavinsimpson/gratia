@@ -50,7 +50,7 @@ Discrete bam is audited but not sampled: its compressed fitting design can defin
 
 The log-smoothing covariance is a fitted approximation. Boundary fits and very diffuse approximations can require more careful treatment. Dispersion uncertainty and its dependence with smoothing parameters remain separate work; proposal covariance changes in conditional MH still do not integrate smoothing uncertainty.
 
-See [smoothing-methods.md](smoothing-methods.md) for the actual fitting-method audit, family-parameter ordering, and separate NCV investigation. These internal draws propagate approximate estimation uncertainty; they do not perform Bayesian integration.
+See [smoothing-methods.md](smoothing-methods.md) for the ML/REML/fREML fitting-method audit and family-parameter ordering. These internal draws propagate approximate estimation uncertainty; they do not perform Bayesian integration.
 
 Reproduce with: Rscript notes/posterior-chains/smoothing-study.R --load-all 20000
 

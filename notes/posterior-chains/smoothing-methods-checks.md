@@ -1,82 +1,70 @@
-# Smoothing-method extension: validation
+# ML/REML/fREML smoothing uncertainty: validation
 
-Validated with R 4.6.1 and mgcv 1.9-4. Every fitting investigation, test and
-package check ran outside the sandbox. The final archive and checked source
-hashes match the worktree. All 302 tracked visual snapshot references are
-preserved unchanged.
+Validated on 15 October 2026 with R 4.6.1 and mgcv 1.9-4. All model-fitting
+investigations, tests and package checks run outside the sandbox.
 
-## Results
+## Scope and preserved research
 
-* Focused smoothing and fixed-contribution tests: 310 passing assertions;
-  no failures, warnings or skips.
-* Final installed-archive full suite: `[ FAIL 0 | WARN 0 | SKIP 197 | PASS 17806 ]`.
-* Final `R CMD build` and `R CMD check --as-cran --no-manual`: Status OK,
-  with no errors, warnings or notes. Vignettes were built and rebuilt;
-  ordinary examples and `--run-donttest` examples passed.
-* Eleven Gaussian fits each used 20,000 mixture draws. Independent
-  conditional refits, finite differences, numerical integration and the
-  total-variance calculation passed. All previously recorded non-timing
-  study results are identical, including seeded sampling summaries.
-* The fitting-method inventory and independent NCV loss/sandwich checks
-  passed. The separate 200-repetition NCV experiment retained every fit;
-  all reported full convergence. Its poor covariance calibration remains
-  a limitation of using native Vg, as described in smoothing-methods.md.
+The feature retains the internal Gaussian identity prototype for gam ML/REML
+and non-discrete bam ML/REML/fREML. Dispersion remains fixed within a fit.
+NCV and QNCV uncertainty propagation, their dedicated tests, study scripts
+and results have been removed from this work. Their research is preserved in
+`/Users/gavin/work/git/gratia/research-archives/ncv-uncertainty-2026-10-15.tar.gz`
+with a separate manifest. The archive contents and copied-file checksum were
+verified before removing the dedicated files.
 
-## Options and skipped validation
+The retained rejection tests use actual NCV/QNCV gam and discrete NCV bam
+fits. Changing the stored call or supplying V.sp cannot bypass the fitted
+method restriction. The conditional evaluator and Gaussian draw algorithm
+are unchanged.
 
-`VDIFFR_RUN_TESTS=false` deliberately skipped 197 visual comparison tests.
-Every skip in the final suite has that reason. `NOT_CRAN=true` and an unset
-`CI` allowed the other guarded tests to run. All required suggested packages
-were available; `_R_CHECK_FORCE_SUGGESTS_=true` did not skip dependencies.
+## Completed validation
 
-`--no-manual` omitted PDF reference-manual compilation. It did not skip
-vignettes, examples or tests. `_R_CHECK_CRAN_INCOMING_REMOTE_=false` disabled
-remote CRAN incoming checks; local incoming checks still ran. The final
-archive check ran the complete non-visual test suite; `--no-tests` was not
-used.
+* Focused smoothing and prescribed-contribution tests: 285 assertions pass
+  without failures, warnings or skips, including nine NCV exclusion checks.
+* The supported fitting-method inventory has been regenerated without NCV
+  cases or Vg metadata.
+* Eleven supported Gaussian fits each used 20,000 mixture draws. All saved
+  non-timing values in the mixture and quadrature tables agree exactly with
+  the previous results. Conditional refits, finite differences, numerical
+  integration and the law of total variance remain verified.
+* The existing benchmark timings were retained to keep this change focused
+  on scope; the validation rerun is logged separately.
+* Review before commit found no regression or unrelated edit. The retained
+  conditional evaluator and draw algorithm are unchanged.
+* The full pkgdown reference and migration article build passes: all 148
+  public topics and 201 index labels resolve, including sampling aliases.
+  Reference examples were omitted with `examples = FALSE` because package
+  checks already ran them. Pandoc reports deprecation warnings for pkgdown's
+  `--katex` and `--mathjax` options; rendering and index checks pass.
 
-## Earlier validation runs
+## Full package check
 
-An earlier archive check passed 17,801 assertions before the final five
-scalar-Vg assertions were added. It had one timing NOTE: the existing
-parametric_effects example took 5.64 seconds, exceeding the five-second
-threshold reported by --as-cran. The final archive reported no timing NOTE.
+`R CMD build` and `R CMD check --as-cran --no-manual` completed with
+**Status: OK**, with no errors, warnings or notes. The installed-archive
+suite passed 17,781 assertions with no failures or warnings. Ordinary examples,
+`--run-donttest` examples and vignette building/rebuilding passed.
 
-A separate source-suite attempt used the wrong installed library in mirai
-workers and failed because that older gratia lacked sampling_mh_worker.
-This was a validation library-path error. The final archive check installed
-the matching package and passed the parallel-chain tests. The source-suite
-snapshot cleanup also removed skipped visual references; these were restored
-from the clean starting revision and verified before building the final
-archive. No snapshot-reference changes are part of this work.
+`VDIFFR_RUN_TESTS=false` deliberately skipped 197 visual tests. Visual
+comparisons were not performed, and source snapshots remain unchanged.
+`--no-manual` skipped PDF reference-manual compilation.
+`_R_CHECK_CRAN_INCOMING_REMOTE_=false` disabled remote incoming checks.
+These options did not skip non-visual tests, examples or vignettes.
 
-## Reproduction
+Package source and test hashes match the checked archive. Subsequent edits
+only update research notes, which are excluded from the package archive.
+Final check directory:
+`/private/tmp/gratia-smoothing-likelihood-only-check-124c365b71b40`.
+
+## Reproduction and next step
 
 ```sh
 Rscript notes/posterior-chains/smoothing-methods.R --load-all
 Rscript notes/posterior-chains/smoothing-study.R --load-all 20000
-Rscript notes/posterior-chains/smoothing-ncv-study.R 200
 ```
 
-For parallel tests, use a matching installed checkout or run R CMD check on
-the built archive. A source namespace loaded by pkgload does not replace an
-older package on a worker's library search path.
-
-Final check directory: `/private/tmp/gratia-smoothing-final-check-d4601fea688a`.
-
-## Review before commit
-
-The regression review found no unintended edits. Package source hashes still
-match the successful final archive check. All previously saved non-timing
-Gaussian study results and the repeated-sampling NCV summaries were verified.
-The new helpers remain unexported, and no public Rd topics were added.
-
-Pkgdown reference validation passed for all 148 public topics and 201 index
-labels. Every indexed topic and local reference link resolves, sampling aliases
-point to their canonical pages, and the sampling migration article builds.
-The reference configuration required no changes.
-
-Reference pages were built with examples = FALSE because the package check
-already ran the examples. This choice omits example execution from the
-pkgdown build only. Pandoc reported deprecation warnings for the --katex and
---mathjax options supplied by pkgdown; rendering and index validation passed.
+The next work is repeated-simulation interval-coverage validation of the
+Gaussian approximation across supported fitting methods. Conditional moments
+alone do not validate coverage. See [smoothing-methods.md](smoothing-methods.md)
+for the proposed comparison and remaining restrictions. The prototype remains
+internal and propagates approximate estimation uncertainty.

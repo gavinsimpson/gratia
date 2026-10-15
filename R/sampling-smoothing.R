@@ -3,16 +3,16 @@
 # They propagate approximate estimation uncertainty, without Bayesian integration.
 sampling_smoothing_setup <- function(model, block_size = 10000L) {
   sampling_target_check(model, "smoothing-mixture")
+  method <- model$method
+  if (length(method) != 1L || is.na(method) ||
+      !method %in% c("ML", "REML", "fREML")) {
+    actual <- if (length(method) == 1L && !is.na(method)) method else "unknown"
+    stop(sprintf(paste0("The smoothing-mixture prototype requires ML, REML, or fREML fitting; ",
+      "the actual fitted method is %s."), actual), call. = FALSE)
+  }
   fam <- stats::family(model)
   if (!identical(fam$family, "gaussian") || !identical(fam$link, "identity")) {
     stop("The smoothing-mixture prototype requires Gaussian identity fits.",
-      call. = FALSE)
-  }
-  if (model$method %in% c("NCV", "QNCV")) stop(
-    "NCV smoothing uncertainty is audited separately with sampling_smoothing_ncv_delta(); its inverse criterion Hessian is not a posterior covariance.",
-    call. = FALSE)
-  if (!model$method %in% c("REML", "ML", "fREML")) {
-    stop("The smoothing-mixture prototype requires ML, REML, or fREML fitting.",
       call. = FALSE)
   }
   if (inherits(model, "bam") && !is.null(model$dinfo)) stop(

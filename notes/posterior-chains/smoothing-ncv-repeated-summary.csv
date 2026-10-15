@@ -1,3 +1,0 @@
-"parameter","repetitions","empirical_variance","mean_estimated_variance","median_estimated_variance","mean_checked_hessian_sandwich_variance","minimum_log_sp","maximum_log_sp"
-"log sp 1",200,0.10942898329525,3.05927314485916,2.44390320597404,2.94135301154252,-4.52230373156065,-2.82735204879627
-"log sp 2",200,0.0821368383567739,5.7150738275137,5.205236854773,5.23629894117335,-4.73991106874755,-3.15972268488056

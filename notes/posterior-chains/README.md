@@ -177,18 +177,10 @@ covariances remain separate work. See [smoothing-report.md](smoothing-report.md)
 for evidence, restrictions and reproduction instructions.
 
 The extended [fitting-method audit](smoothing-methods.md) records actual
-methods, scalar family parameters and dispersion positions. It separately
-investigates NCV through gam’s estimator covariance `Vg` and a local
-delta-method contribution. It does not substitute inverse NCV curvature for
-that covariance. Discrete BAM NCV lacks `Vg`; nonzero NCV offsets and
-unidentified mappings remain excluded. All of these calculations remain
-internal research and propagate approximate estimation uncertainty.
-
-The [NCV covariance follow-up](ncv-covariance-report.md) explains the large
-native variance proxy through omitted negative covariance between fitted
-criterion contributions. An internal Gaussian prototype includes those terms;
-independent response simulations, scaling checks and 400 smoothing refits
-verify the calculation and show the remaining approximation error.
+ML/REML/fREML fitting methods, scalar family parameters and dispersion
+positions. Smoothing uncertainty excludes NCV and QNCV. The next step is
+repeated-simulation validation of interval coverage for the retained Gaussian
+mixture before adding a public sampling option.
 
 ## Follow-up performance and mixing studies
 

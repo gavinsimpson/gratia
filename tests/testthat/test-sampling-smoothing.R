@@ -265,87 +265,25 @@ test_that("smoothing audit distinguishes actual fitting and parameter blocks", {
   expect_equal(info$family_parameters$response, tw$family$getTheta(TRUE))
 })
 
-test_that("NCV uses Vg for local estimator propagation without Hessian substitution", {
+test_that("smoothing uncertainty excludes NCV and QNCV using the actual fit", {
   fixture <- smoothing_research_fixture()
-  offset_fit <- mgcv::gam(fixture$formula, data = fixture$data, weights = w,
-    method = "NCV")
-  expect_error(sampling_smoothing_ncv_delta(offset_fit), "nonzero fitting offsets")
-  fixture$formula <- y ~ s(x, k = 5) + s(z, k = 5)
-  for (method in c("NCV", "QNCV")) {
-    fit <- mgcv::gam(fixture$formula, data = fixture$data, weights = w,
-      method = method)
-    delta <- sampling_smoothing_ncv_delta(fit)
-    expect_identical(delta$covariance_source, "Vg")
-    expect_equal(delta$log_sp_covariance, fit$Vg)
-    expect_null(mgcv::sp.vcov(fit))
-    expect_null(fit$V.sp)
-    expect_equal(delta$propagated_covariance, fit$Vc)
-    expect_true(delta$coefficient_covariance_replaced)
-    expect_gt(max(abs(fit$Vg - solve(fit$outer.info$hess))), .01)
-    # Independent finite differences of each leave-one-out squared error verify
-    # the gradient contributions in mgcv's BFGS sandwich calculation.
-    X <- predict(fit, type = "lpmatrix")
-    y <- fit$y - (fit$offset %||% 0)
-    w <- fit$prior.weights
-    penalties <- lapply(seq_along(fit$smooth), function(k) {
-      sm <- fit$smooth[[k]]
-      S <- matrix(0, ncol(X), ncol(X))
-      j <- sm$first.para:sm$last.para
-      S[j, j] <- sm$S[[1L]]
-      S
-    })
-    scores <- function(rho) {
-      P <- crossprod(X, w * X)
-      for (k in seq_along(penalties)) P <- P + exp(rho[k]) * penalties[[k]]
-      inverse <- solve(P)
-      beta <- inverse %*% crossprod(X, w * y)
-      h <- w * rowSums((X %*% inverse) * X)
-      w * drop((y - X %*% beta) / (1 - h))^2
-    }
-    rho <- log(fit$sp)
-    derivative <- vapply(seq_along(rho), function(k) {
-      step <- rep(0, length(rho)); step[k] <- 1e-5
-      refit <- function(r) mgcv::gam(fixture$formula, data = fixture$data,
-        weights = w, sp = exp(r), method = "REML", scale = fit$sig2)
-      (coef(refit(rho + step)) - coef(refit(rho - step))) / 2e-5
-    }, numeric(length(coef(fit))))
-    expect_equal(unname(derivative), fit$db.drho, tolerance = 1e-6)
-    eps <- 1e-5
-    contributions <- vapply(seq_along(rho), function(k) {
-      step <- rep(0, length(rho)); step[k] <- eps
-      (scores(rho + step) - scores(rho - step)) / (2 * eps)
-    }, numeric(nrow(X)))
-    B <- solve(fit$outer.info$hess)
-    expect_equal(B %*% crossprod(contributions) %*% B, fit$Vg,
-      tolerance = 1e-5)
-    expect_error(sampling_smoothing_setup(fit), "audited separately")
-    fit$Vg <- NULL
-    expect_error(sampling_smoothing_ncv_delta(fit), "Cannot identify")
-  }
-  bam <- mgcv::bam(fixture$formula, data = fixture$data, weights = w,
+  formula <- y ~ s(x, k = 5) + s(z, k = 5)
+  fits <- lapply(c("NCV", "QNCV"), function(method)
+    mgcv::gam(formula, data = fixture$data, weights = w, method = method,
+      nei = list(jackknife = FALSE)))
+  fits[[3L]] <- mgcv::bam(formula, data = fixture$data, weights = w,
     method = "NCV", discrete = TRUE)
-  expect_null(bam$Vg)
-  expect_null(mgcv::sp.vcov(bam))
-  expect_error(sampling_smoothing_ncv_delta(bam), "does not retain Vg")
-  no_jackknife <- mgcv::gam(fixture$formula, data = fixture$data, weights = w,
-    method = "NCV", nei = list(jackknife = FALSE))
-  expect_false(sampling_smoothing_ncv_delta(no_jackknife)$coefficient_covariance_replaced)
-  no_jackknife$family <- poisson()
-  expect_error(sampling_smoothing_ncv_delta(no_jackknife), "family parameters")
-  fit <- fixture$model
-  expect_error(sampling_smoothing_ncv_delta(fit), "actual NCV")
-})
-
-test_that("NCV audit handles scalar Vg without inferring unavailable covariance", {
-  fixture <- smoothing_research_fixture()
-  fit <- mgcv::gam(y ~ s(x, k = 5), data = fixture$data, weights = w,
-    method = "NCV")
-  delta <- sampling_smoothing_ncv_delta(fit)
-  expect_identical(dim(delta$log_sp_covariance), c(1L, 1L))
-  expect_equal(drop(delta$log_sp_covariance), drop(fit$Vg))
-  expect_equal(delta$propagated_covariance, fit$Vc)
-  fit$Vg <- -1
-  expect_error(sampling_smoothing_ncv_delta(fit), "Cannot identify")
-  fit$Vg <- NULL
-  expect_error(sampling_smoothing_ncv_delta(fit), "Cannot identify")
+  for (fit in fits) {
+    actual <- fit$method
+    # A misleading stored call or a supplied covariance cannot enable a fit
+    # whose smoothing parameters were selected by an excluded criterion.
+    fit$call$method <- "REML"
+    fit$V.sp <- diag(length(fit$sp))
+    message <- paste0("requires ML, REML, or fREML fitting; the actual fitted method is ",
+      actual, "[.]")
+    expect_error(sampling_smoothing_setup(fit), message)
+    expect_error(sampling_smoothing_mixture(fit, n = 4L), message)
+    fit$family <- poisson()
+    expect_error(sampling_smoothing_setup(fit), message)
+  }
 })

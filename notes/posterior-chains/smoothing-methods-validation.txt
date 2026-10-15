@@ -11,15 +11,6 @@ R 4.6.1 ; mgcv 1.9.4
        bam_fREML_all_fixed            fREML
  bam_ML_discrete_requested               ML
                 gam_ML_efs               ML
-                   gam_NCV              NCV
-            gam_NCV_one_sp              NCV
-                  gam_QNCV             QNCV
-            gam_NCV_offset              NCV
-      gam_NCV_no_jackknife              NCV
-            gam_NCV_linked              NCV
-             gam_NCV_fixed              NCV
-                   bam_NCV              NCV
-    bam_NCV_discrete_reset              NCV
                  gam_ML_nb               ML
                  gam_ML_tw               ML
                gam_ML_scat               ML
@@ -40,40 +31,22 @@ R 4.6.1 ; mgcv 1.9.4
 
 
 
-
-                subscript out of bounds
-                subscript out of bounds
-
-
-
-
-
-
-                                          warnings actual_method
-                                                              ML
-                                                            REML
-                                                            <NA>
-                                                              ML
-                                                            REML
-                                                           fREML
-                                                              ML
-                                                              ML
-                                                            REML
-   discretization only available with fREML or NCV            ML
-                                                            REML
-                                                             NCV
-                                                             NCV
-                                                            QNCV
-                                                             NCV
-                                                             NCV
-                                                            <NA>
-                                                            <NA>
-                                                             NCV
- NCV only available with discrete=TRUE - resetting           NCV
-                                                              ML
-                                                              ML
-                                                              ML
-                                                            REML
+                                        warnings actual_method
+                                                            ML
+                                                          REML
+                                                          <NA>
+                                                            ML
+                                                          REML
+                                                         fREML
+                                                            ML
+                                                            ML
+                                                          REML
+ discretization only available with fREML or NCV            ML
+                                                          REML
+                                                            ML
+                                                            ML
+                                                            ML
+                                                          REML
  stored_score_label discrete stored_optimizer estimated_family_parameters
                  ML    FALSE     outer,newton                           0
                REML    FALSE     outer,newton                           0
@@ -86,15 +59,6 @@ R 4.6.1 ; mgcv 1.9.4
                REML    FALSE     outer,newton                           0
                  ML    FALSE     outer,newton                           0
                  ML    FALSE              efs                           0
-                NCV    FALSE            magic                           0
-                NCV    FALSE            magic                           0
-               QNCV    FALSE            magic                           0
-                NCV    FALSE            magic                           0
-                NCV    FALSE            magic                           0
-               <NA>       NA             <NA>                          NA
-               <NA>       NA             <NA>                          NA
-                NCV     TRUE        perf,chol                           0
-                NCV     TRUE        perf,chol                           0
                  ML    FALSE     outer,newton                           1
                  ML    FALSE     outer,newton                           1
                  ML    FALSE     outer,newton                           2
@@ -111,106 +75,42 @@ R 4.6.1 ; mgcv 1.9.4
             TRUE       0       2    1x1     1x1     9x2    9x9
             TRUE       2       2    3x3     3x3     9x2    9x9
             TRUE       2       2 absent  absent  absent absent
-            TRUE       2       2 absent  absent     9x2    9x9
-            TRUE       1       1 absent  absent     5x1    5x5
-            TRUE       2       2 absent  absent     9x2    9x9
-            TRUE       2       2 absent  absent     9x2    9x9
-            TRUE       2       2 absent  absent     9x2    9x9
-              NA      NA      NA   <NA>    <NA>    <NA>   <NA>
-              NA      NA      NA   <NA>    <NA>    <NA>   <NA>
-            TRUE       2       2 absent  absent     9x2    9x9
-            TRUE       2       2 absent  absent     9x2    9x9
            FALSE       2       2    3x3     3x3     9x3    9x9
             TRUE       1       1    3x3     3x3     5x2    5x5
            FALSE       2       2    4x4     4x4     9x4    9x9
            FALSE       2       2    2x2     2x2    10x2  10x10
-                Vg                           V_sp_order
-            absent   family=; log(sp)=1,2; log(scale)=3
-            absent   family=; log(sp)=1,2; log(scale)=3
-              <NA>                                 <NA>
-            absent   family=; log(sp)=1,2; log(scale)=3
-            absent   family=; log(sp)=1,2; log(scale)=3
-            absent    family=; log(sp)=1,2; log(scale)=
-            absent    family=; log(sp)=1,2; log(scale)=
-            absent    family=; log(sp)=1,2; log(scale)=
-            absent      family=; log(sp)=; log(scale)=1
-            absent   family=; log(sp)=1,2; log(scale)=3
-            absent                              unknown
-               2x2                              unknown
- scalar (length 1)                              unknown
-               2x2                              unknown
-               2x2                              unknown
-               2x2                              unknown
-              <NA>                                 <NA>
-              <NA>                                 <NA>
-            absent                              unknown
-            absent                              unknown
-            absent   family=1; log(sp)=2,3; log(scale)=
-            absent    family=1; log(sp)=2; log(scale)=3
-            absent family=1,2; log(sp)=3,4; log(scale)=
-            absent    family=; log(sp)=1,2; log(scale)=
-                        sp_vcov_order
-   family=; log(sp)=1,2; log(scale)=3
-   family=; log(sp)=1,2; log(scale)=3
-                                 <NA>
-   family=; log(sp)=1,2; log(scale)=3
-   family=; log(sp)=1,2; log(scale)=3
-   family=; log(sp)=1,2; log(scale)=3
-    family=; log(sp)=1,2; log(scale)=
-    family=; log(sp)=1,2; log(scale)=
-      family=; log(sp)=; log(scale)=1
-   family=; log(sp)=1,2; log(scale)=3
-                              unknown
-                              unknown
-                              unknown
-                              unknown
-                              unknown
-                              unknown
-                                 <NA>
-                                 <NA>
-                              unknown
-                              unknown
-   family=1; log(sp)=2,3; log(scale)=
-    family=1; log(sp)=2; log(scale)=3
- family=1,2; log(sp)=3,4; log(scale)=
-    family=; log(sp)=1,2; log(scale)=
-                                                                                                                                  research_calculation
-                                                                                                               Gaussian estimation-uncertainty mixture
-                                                                                                               Gaussian estimation-uncertainty mixture
-                                                                                                                                                  <NA>
-                                                                                                               Gaussian estimation-uncertainty mixture
-                                                                                                               Gaussian estimation-uncertainty mixture
-                                                                                                               Gaussian estimation-uncertainty mixture
-                                                                                                               Gaussian estimation-uncertainty mixture
-                                                                                                               Gaussian estimation-uncertainty mixture
-                                                                            Cannot identify a finite covariance for the free log-smoothing parameters.
-                                                                                                               Gaussian estimation-uncertainty mixture
-                                                                            Cannot identify a finite covariance for the free log-smoothing parameters.
-                                                                                                                         local delta contribution only
-                                                                                                                         local delta contribution only
-                                                                                                                         local delta contribution only
- The NCV delta-method research calculation does not support nonzero fitting offsets: the native NCV prediction convention needs separate verification.
-                                                                                                                         local delta contribution only
-                                                                                                                                                  <NA>
-                                                                                                                                                  <NA>
-                                          Discrete bam NCV does not retain Vg: an inverse NCV Hessian cannot replace a smoothing-estimator covariance.
-                                          Discrete bam NCV does not retain Vg: an inverse NCV Hessian cannot replace a smoothing-estimator covariance.
-                                                                                      The smoothing-mixture prototype requires Gaussian identity fits.
-                                                                                      The smoothing-mixture prototype requires Gaussian identity fits.
-                                                                                      The smoothing-mixture prototype requires Gaussian identity fits.
-                                                                                      The smoothing-mixture prototype requires Gaussian identity fits.
-
-         method criterion_error gradient_sum_error sandwich_error
-gam_NCV     NCV    3.552714e-14       1.417353e-09   1.238179e-06
-gam_QNCV   QNCV    2.131628e-14       1.582465e-09   8.845361e-07
-         Vg_inverse_hessian_difference delta_error
-gam_NCV                       21.31557           0
-gam_QNCV                      21.31558           0
-
-  predictor_error_with_offset predictor_error_after_removing_offset
-1                   0.4994726                          1.554312e-15
-  correct_leave_one_out_loss native_reported_loss
-1                    22.6556             52.74686
+                           V_sp_order                        sp_vcov_order
+   family=; log(sp)=1,2; log(scale)=3   family=; log(sp)=1,2; log(scale)=3
+   family=; log(sp)=1,2; log(scale)=3   family=; log(sp)=1,2; log(scale)=3
+                                 <NA>                                 <NA>
+   family=; log(sp)=1,2; log(scale)=3   family=; log(sp)=1,2; log(scale)=3
+   family=; log(sp)=1,2; log(scale)=3   family=; log(sp)=1,2; log(scale)=3
+    family=; log(sp)=1,2; log(scale)=   family=; log(sp)=1,2; log(scale)=3
+    family=; log(sp)=1,2; log(scale)=    family=; log(sp)=1,2; log(scale)=
+    family=; log(sp)=1,2; log(scale)=    family=; log(sp)=1,2; log(scale)=
+      family=; log(sp)=; log(scale)=1      family=; log(sp)=; log(scale)=1
+   family=; log(sp)=1,2; log(scale)=3   family=; log(sp)=1,2; log(scale)=3
+                              unknown                              unknown
+   family=1; log(sp)=2,3; log(scale)=   family=1; log(sp)=2,3; log(scale)=
+    family=1; log(sp)=2; log(scale)=3    family=1; log(sp)=2; log(scale)=3
+ family=1,2; log(sp)=3,4; log(scale)= family=1,2; log(sp)=3,4; log(scale)=
+    family=; log(sp)=1,2; log(scale)=    family=; log(sp)=1,2; log(scale)=
+                                                       research_calculation
+                                    Gaussian estimation-uncertainty mixture
+                                    Gaussian estimation-uncertainty mixture
+                                                                       <NA>
+                                    Gaussian estimation-uncertainty mixture
+                                    Gaussian estimation-uncertainty mixture
+                                    Gaussian estimation-uncertainty mixture
+                                    Gaussian estimation-uncertainty mixture
+                                    Gaussian estimation-uncertainty mixture
+ Cannot identify a finite covariance for the free log-smoothing parameters.
+                                    Gaussian estimation-uncertainty mixture
+ Cannot identify a finite covariance for the free log-smoothing parameters.
+           The smoothing-mixture prototype requires Gaussian identity fits.
+           The smoothing-mixture prototype requires Gaussian identity fits.
+           The smoothing-mixture prototype requires Gaussian identity fits.
+           The smoothing-mixture prototype requires Gaussian identity fits.
 
 R version 4.6.1 (2026-06-24)
 Platform: aarch64-apple-darwin23
