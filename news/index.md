@@ -135,7 +135,9 @@
   gains analytic shape reference functions and fitting recipes for
   [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html), including
   combined shape constraints, tensor surfaces and Gamma models with
-  constraints on the log mean and log dispersion.
+  constraints on the log mean and log dispersion. The additive Poisson
+  recipe uses 240 observations and `k = 6` for each smooth to avoid
+  fitting errors with mgcv 1.9-4.
 
 - [`residuals_covariate_plot()`](https://gavinsimpson.github.io/gratia/reference/residuals_covariate_plot.md)
   and
