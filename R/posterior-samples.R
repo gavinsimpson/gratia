@@ -641,6 +641,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   Xp <- if (grouped) {
     gfam_predict_eta(model, data, type = "lpmatrix", ...)
   } else predict_model(model, newdata = data, type = "lpmatrix", ...)
+  attr(Xp, "model.offset") <- prediction_offsets(model, Xp)
   if (training) {
     # Native fitting predictions retain offsets supplied as fitting arguments.
     # Apply the same term exclusions to the native predictor and design matrix.
@@ -1128,12 +1129,15 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
         n_cores = n_cores, model = model,
         burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale,
         index = idx, frequentist = freq, unconditional = unconditional,
-        seed = seed
+        seed = seed, draws = draws, mvn_method = mvn_method
       )
       Xp %*% t(betas)
     } else {
       Xp %*% t(betas[, idx, drop = FALSE])
     }
+    # A prescribed boundary is part of the smooth, with no coefficient variance.
+    off <- attr(Xp, "offset", exact = TRUE)
+    if (!is.null(off)) simu <- simu + off
     colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
     simu <- as_tibble(simu)
     nr_simu <- nrow(simu)

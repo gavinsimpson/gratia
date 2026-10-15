@@ -390,9 +390,12 @@
   error explaining that `scalable = FALSE` is required. Ordinary posterior
   predictive plots remain available.
 
-* Partial derivatives of soap-film smooths include the contribution from known
-  boundary values. Those fixed values affect derivative estimates without
-  adding coefficient uncertainty.
+* Partial derivatives, fitted samples and smooth samples of soap-film smooths
+  include the contribution from known boundary values. Complete-predictor
+  derivative samples also differentiate those fixed values, without adding
+  coefficient uncertainty. Term exclusions retain only the appropriate fixed
+  contributions. Separate sampling per smooth now correctly subsets supplied
+  coefficient draws.
 
 * GJRM smooth selection now uses one order across all model equations.
   Character selections draw only the equations containing the selected smooths;

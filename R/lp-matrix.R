@@ -15,7 +15,13 @@
 #' The linear prediction matrix \eqn{\mathbf{X}_p} is a matrix that maps values
 #' of parameters \eqn{\hat{\mathbf{\beta}}_p} to values on the linear
 #' predictor of the model \eqn{\hat{\eta}_p = \mathbf{X}_p
-#' \hat{\mathbf{\beta}}_p}. \eqn{\mathbf{X}_p} is the model matrix where spline
+#' \hat{\mathbf{\beta}}_p + \mathbf{o}_p}, where \eqn{\mathbf{o}_p} contains
+#' known additive contributions such as formula offsets and prescribed smooth
+#' boundary values. These contributions are not coefficient columns of
+#' \eqn{\mathbf{X}_p}. Native prediction may attach them as `model.offset`
+#' (formula offsets, by linear predictor) or `offset` (fixed smooth
+#' contributions, by smooth) attributes. Matrix multiplication alone does not
+#' add these attributes. \eqn{\mathbf{X}_p} is the model matrix where spline
 #' covariates have been replaced by the values of the basis functions evaluated
 #' at the respective covariates. Parametric covariates are also included.
 #'

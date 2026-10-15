@@ -85,7 +85,7 @@
     )),
     "inla" = stop("'method = \"inla\"' is not yet implemented.",
     call. = FALSE),
-    "user" = user_draws(model = model, draws = draws, ...)
+    "user" = user_draws(model = model, draws = draws, index = index, ...)
   )
   betas
 }
