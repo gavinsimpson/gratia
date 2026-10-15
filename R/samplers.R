@@ -50,6 +50,23 @@
 #'   be generated without affecting the current state of R's RNG.
 #' @param ... arguments passed to methods.
 #'
+#' @details GAM-class fits with linear inequality constraints, including
+#'   `mgcv::scasm()` fits, store these as `Ain %*% coefficients >= bin`.
+#'   Gaussian sampling uses the fitted covariance matrix without enforcing
+#'   these inequalities and issues a warning. Sampled smooths can therefore
+#'   violate the fitted shape constraints. Pointwise intervals computed from
+#'   the same Gaussian covariance approximation also need not preserve those
+#'   shapes. Metropolis-Hastings sampling is unavailable for these fits because
+#'   [mgcv::gam.mh()] does not enforce their inequalities.
+#'
+#'   If `mgcv::scasm()` was fitted with `bs > 0`, its `bs` component stores
+#'   coefficient draws from the native constrained bootstrap in columns. These
+#'   can be supplied explicitly as `draws = t(model$bs)` with `method = "user"`.
+#'   The result then describes bootstrap variation, rather than Gaussian
+#'   posterior sampling. Gratia does not automatically select these draws.
+#'   The caller is responsible for the interpretation and constraint
+#'   feasibility of user-supplied draws.
+#'
 #' @export
 `post_draws` <- function(model, ...) {
   UseMethod("post_draws")
@@ -127,9 +144,11 @@
   betas
 }
 
-#' Posterior samples using a simple Metropolis Hastings sampler
+#' Posterior samples using a Gaussian approximation to the posterior
+#' distribution
 #'
 #' @inheritParams post_draws
+#' @inherit post_draws details
 #'
 #' @export
 `gaussian_draws` <- function(model, ...) {
@@ -142,6 +161,11 @@
 `gaussian_draws.gam` <- function(
     model, n, n_cores = 1L, index = NULL,
     frequentist = FALSE, unconditional = FALSE, mvn_method = "mvnfast", ...) {
+  if (has_inequality_constraints(model)) {
+    warning("Gaussian draws do not enforce the fitted linear inequality ",
+      "constraints; sampled smooths can violate the fitted shapes.",
+      call. = FALSE)
+  }
   mu <- coef(model) |> as.vector() # drop the empty dim if present
   sigma <- get_vcov(model,
     frequentist = frequentist,
@@ -201,10 +225,10 @@
   betas
 }
 
-#' Posterior samples using a Gaussian approximation to the posterior
-#' distribution
+#' Posterior samples using a simple Metropolis Hastings sampler
 #'
 #' @inheritParams post_draws
+#' @inherit post_draws details
 #'
 #' @export
 #' @rdname mh_draws
@@ -218,6 +242,12 @@
 `mh_draws.gam` <- function(
     model, n, burnin = 1000, thin = 1,
     t_df = 40, rw_scale = 0.25, index = NULL, ...) {
+  if (has_inequality_constraints(model)) {
+    stop("Metropolis-Hastings sampling is not supported for models with ",
+      "linear inequality constraints because mgcv::gam.mh() does not enforce ",
+      "them. Gaussian draws are an unconstrained approximation.",
+      call. = FALSE)
+  }
   if (isTRUE(attr(model, "gratia.gamm4"))) {
     stop("Metropolis-Hastings sampling is not supported for gamm4 models; ",
       "use Gaussian or user-supplied draws.", call. = FALSE)
@@ -304,4 +334,15 @@ user_draws.scam <- function(model, draws, ...) {
   check_scam_unconditional(model, list(...)$unconditional %||% FALSE)
   stop("Scalable posterior predictive plots are not currently available for SCAM models. Use scalable = FALSE.",
     call. = FALSE)
+}
+
+# Detect inequalities on the fitted coefficients, rather than a model class: one
+# GAM class covers both ordinary gam() and constrained scasm() fits.
+has_inequality_constraints <- function(model) {
+  A <- model$Ain
+  b <- model$bin
+  is.matrix(A) && is.numeric(A) && nrow(A) > 0L &&
+    ncol(A) == length(coef(model)) && is.numeric(b) &&
+    length(b) == nrow(A) && all(is.finite(A)) && all(is.finite(b)) &&
+    any(A != 0)
 }

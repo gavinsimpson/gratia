@@ -2,6 +2,11 @@
 
 ## User visible changes
 
+* Gaussian coefficient sampling for `mgcv::scasm()` fits with linear inequality
+  constraints now warns that the draws need not satisfy the fitted shapes.
+  Metropolis-Hastings sampling now gives an explicit error because its
+  proposals and likelihood calculation do not enforce those constraints.
+
 * gratia has a new neon hex logo. The pkgdown site uses the pink
   g from the logo as its favicon.
 

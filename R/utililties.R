@@ -521,6 +521,11 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 #'   for a particular **smooth** term. Only a single term can be selected.
 #' @param by_level character; currently unsued.
 #'
+#' @details For `mgcv::scasm()` fits with linear inequality constraints,
+#'   the Gaussian covariance approximation does not enforce the fitted shapes.
+#'   Pointwise intervals calculated from this matrix can extend outside those
+#'   constraints. See [post_draws()] for sampling and native-bootstrap details.
+#'
 #' @return a matrix containing the selected covariance matrix.
 #' @author Gavin L. Simpson
 #'

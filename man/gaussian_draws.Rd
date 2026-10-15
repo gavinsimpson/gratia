@@ -5,7 +5,8 @@
 \alias{gaussian_draws.gamm4}
 \alias{gaussian_draws.gam}
 \alias{gaussian_draws.scam}
-\title{Posterior samples using a simple Metropolis Hastings sampler}
+\title{Posterior samples using a Gaussian approximation to the posterior
+distribution}
 \usage{
 \method{gaussian_draws}{gamm4}(model, ...)
 
@@ -70,7 +71,26 @@ matrix, which respect the linear inequality constraints of the model. Only
 for \code{scam::scam()} model fits.}
 }
 \description{
-Posterior samples using a simple Metropolis Hastings sampler
+Posterior samples using a Gaussian approximation to the posterior
+distribution
+}
+\details{
+GAM-class fits with linear inequality constraints, including
+\code{mgcv::scasm()} fits, store these as \code{Ain \%*\% coefficients >= bin}.
+Gaussian sampling uses the fitted covariance matrix without enforcing
+these inequalities and issues a warning. Sampled smooths can therefore
+violate the fitted shape constraints. Pointwise intervals computed from
+the same Gaussian covariance approximation also need not preserve those
+shapes. Metropolis-Hastings sampling is unavailable for these fits because
+\code{\link[mgcv:gam.mh]{mgcv::gam.mh()}} does not enforce their inequalities.
+
+If \code{mgcv::scasm()} was fitted with \code{bs > 0}, its \code{bs} component stores
+coefficient draws from the native constrained bootstrap in columns. These
+can be supplied explicitly as \code{draws = t(model$bs)} with \code{method = "user"}.
+The result then describes bootstrap variation, rather than Gaussian
+posterior sampling. Gratia does not automatically select these draws.
+The caller is responsible for the interpretation and constraint
+feasibility of user-supplied draws.
 }
 \seealso{
 \link{gamm4_support}
