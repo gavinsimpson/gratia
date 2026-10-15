@@ -184,6 +184,12 @@ that covariance. Discrete BAM NCV lacks `Vg`; nonzero NCV offsets and
 unidentified mappings remain excluded. All of these calculations remain
 internal research and propagate approximate estimation uncertainty.
 
+The [NCV covariance follow-up](ncv-covariance-report.md) explains the large
+native variance proxy through omitted negative covariance between fitted
+criterion contributions. An internal Gaussian prototype includes those terms;
+independent response simulations, scaling checks and 400 smoothing refits
+verify the calculation and show the remaining approximation error.
+
 ## Follow-up performance and mixing studies
 
 [response-report.md](response-report.md) compares previous and optimised LSS

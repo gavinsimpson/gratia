@@ -175,6 +175,13 @@ support attributing the discrepancy primarily to the BFGS curvature
 approximation. The native sandwich construction agreed with independently
 calculated contributions within 1.3e-11 over these repetitions.
 
+The [follow-up covariance investigation](ncv-covariance-report.md) identifies
+the dominant missing term: large negative covariance between the fitted
+leave-one-out gradient contributions. An exact Gaussian calculation at fixed
+smoothing parameters includes this dependence. Across 400 refits, its
+fitted-mean approximation reduces the variance ratios to 1.2–1.4, while
+remaining internal because calibration is incomplete.
+
 This experiment does not validate native `Vg` as the covariance for a useful
 normal uncertainty sampler in this setting. It is a reason to retain only the
 internal local sensitivity audit and to investigate calibration before
