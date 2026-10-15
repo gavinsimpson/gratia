@@ -5,29 +5,38 @@
 #' distribution can be applied to all the example types.
 #'
 #' @details `data_sim()` can simulate data from several underlying models of
-#'   known true functions. The available options currently are:
+#'   known true functions. Descriptive names and their original short names
+#'   are interchangeable, giving identical output for the same arguments and
+#'   seed. The available options currently are:
 #'   
-#'   * `"eg1"`: a four term additive true model. This is the classic Gu & Wahba
+#'   * `"additive"` or `"eg1"`: a four term additive true model. This is the
+#'     classic Gu & Wahba
 #'     four univariate term test model. See [`gw_functions`] for more details of
 #'     the underlying four functions.
-#'   * `"eg2"`: a bivariate smooth true model.
-#'   * `"eg3"`: an example containing a continuous by smooth (varying
+#'   * `"bivariate_surface"` or `"eg2"`: a bivariate smooth true model.
+#'   * `"varying_coefficient"` or `"eg3"`: an example containing a continuous
+#'     by smooth (varying
 #'     coefficient) true model. The model is \eqn{\hat{y}_i = f_2(x_{2i})x_{1i}}{
 #' yhat = f(x2)x1} where the function \eqn{f_2()} is \eqn{f_2(x) = 0.2 * x^{11} *
 #' (10 * (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^{10}}{f(x) = 0.2 * x^11 * (10 *
 #' (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^10}.
-#'   * `"eg4"`: a factor by smooth true model. The true model contains a factor
+#'   * `"factor_by"` or `"eg4"`: a factor by smooth true model. The true model
+#'     contains a factor
 #'     with 3 levels, where the response for the *n*th level follows the *n*th
 #'     Gu & Wahba function (for \eqn{n \in {1, 2, 3}}{n in {1,2,3}}).
-#'   * `"eg5"`: an additive plus factor true model. The response is a linear
+#'   * `"additive_factor"` or `"eg5"`: an additive plus factor true model. The
+#'     response is a linear
 #'     combination of the Gu & Wahba functions 2, 3, 4 (the latter is a null
 #'     function) plus a factor term with four levels.
-#'   * `"eg6"`: an additive plus random effect term true model.
-#'   * `"eg7"`: a version of the model in `"eg1"`, but where the covariates are
+#'   * `"additive_group_effects"` or `"eg6"`: an additive model plus four
+#'     group intercepts with fixed realised values `3, 6, 9, 12`.
+#'   * `"additive_correlated"` or `"eg7"`: a version of the model in `"eg1"`,
+#'     but where the covariates are
 #'     correlated.
-#'   * `"gwf2"`: a model where the response is Gu & Wahba's
+#'   * `"gu_wahba_f2"` or `"gwf2"`: a model where the response is Gu & Wahba's
 #'     \eqn{f_2(x_i)}{f_2(x_i)} plus noise.
-#'   * `"lwf6"`: a model where the response is Luo & Wahba's "example 6"
+#'   * `"luo_wahba_f6"` or `"lwf6"`: a model where the response is Luo &
+#'     Wahba's "example 6"
 #'     function \eqn{sin(2(4x-2)) + 2 exp(-256(x-0.5)^2)}{
 #'     sin(2 * ((4 * x) - 2)) + (2 * exp(-256 * (x - .5)^2))} plus noise.
 #'   * `"gfam"`: simulates data for use with GAMs with
@@ -57,8 +66,8 @@
 #'
 #'   Other arguments provide the parameters for the distribution.
 #'
-#' @param model character; either `"egX"` where `X` is an integer `1:7`, or
-#'   the name of a model. See Details for possible options.
+#' @param model character; the name of a model, such as `"additive"` or its
+#'   original name `"eg1"`. See Details for all names and aliases.
 #' @param n numeric; the number of observations to simulate.
 #' @param dist character; a sampling distribution for the response
 #'   variable. `"ordered categorical"` is a synonym of `"ocat"`.
@@ -140,10 +149,10 @@
 #' \dontshow{
 #' op <- options(pillar.sigfig = 5, cli.unicode = FALSE)
 #' }
-#' data_sim("eg1", n = 100, seed = 1)
+#' data_sim("additive", n = 100, seed = 1)
 #'
 #' # an ordered categorical response
-#' data_sim("eg1", n = 100, dist = "ocat", n_cat = 4, cuts = c(-1, 0, 5))
+#' data_sim("additive", n = 100, dist = "ocat", n_cat = 4, cuts = c(-1, 0, 5))
 #' \dontshow{
 #' options(op)
 #' }
@@ -157,10 +166,17 @@
   family = NULL, predictors = NULL, parameters = list(), observation = NULL
 ) {
   sim_number(n, "n", integer = TRUE)
+  model_aliases <- c(
+    additive = "eg1", bivariate_surface = "eg2", varying_coefficient = "eg3",
+    factor_by = "eg4", additive_factor = "eg5", additive_group_effects = "eg6",
+    additive_correlated = "eg7", gu_wahba_f2 = "gwf2", luo_wahba_f6 = "lwf6"
+  )
   if (!is.character(model) || length(model) != 1L || is.na(model) ||
-      !model %in% c(names(data_sim_models()), data_sim_shapes(), "gfam")) {
+      !model %in% c(names(data_sim_models()), names(model_aliases),
+        data_sim_shapes(), "gfam")) {
     stop("Unknown 'model'. See ?data_sim for available models.", call. = FALSE)
   }
+  if (model %in% names(model_aliases)) model <- model_aliases[[model]]
   if (!is.null(seed)) sim_number(seed, "seed", lower = -.Machine$integer.max,
     upper = .Machine$integer.max + 1, inclusive = TRUE)
   if (model == "sc_location_scale" && is.null(family) && missing(dist)) {

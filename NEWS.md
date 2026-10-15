@@ -81,6 +81,11 @@
 
 ## New features
 
+* `data_sim()` accepts descriptive aliases for the original example models,
+  including `"additive"`, `"bivariate_surface"`, `"gu_wahba_f2"` and
+  `"luo_wahba_f6"`. All existing names remain supported and produce identical
+  seeded output.
+
 * `ale()` computes accumulated local effects for numeric covariates in
   `mgcv::gam()` and `mgcv::bam()` fits, with link and response scales,
   distribution parameters, and pointwise or simultaneous intervals.

@@ -23,8 +23,8 @@ data_sim(
 )
 }
 \arguments{
-\item{model}{character; either \code{"egX"} where \code{X} is an integer \code{1:7}, or
-the name of a model. See Details for possible options.}
+\item{model}{character; the name of a model, such as \code{"additive"} or its
+original name \code{"eg1"}. See Details for all names and aliases.}
 
 \item{n}{numeric; the number of observations to simulate.}
 
@@ -100,29 +100,38 @@ distribution can be applied to all the example types.
 }
 \details{
 \code{data_sim()} can simulate data from several underlying models of
-known true functions. The available options currently are:
+known true functions. Descriptive names and their original short names
+are interchangeable, giving identical output for the same arguments and
+seed. The available options currently are:
 \itemize{
-\item \code{"eg1"}: a four term additive true model. This is the classic Gu & Wahba
+\item \code{"additive"} or \code{"eg1"}: a four term additive true model. This is the
+classic Gu & Wahba
 four univariate term test model. See \code{\link{gw_functions}} for more details of
 the underlying four functions.
-\item \code{"eg2"}: a bivariate smooth true model.
-\item \code{"eg3"}: an example containing a continuous by smooth (varying
+\item \code{"bivariate_surface"} or \code{"eg2"}: a bivariate smooth true model.
+\item \code{"varying_coefficient"} or \code{"eg3"}: an example containing a continuous
+by smooth (varying
 coefficient) true model. The model is \eqn{\hat{y}_i = f_2(x_{2i})x_{1i}}{
 yhat = f(x2)x1} where the function \eqn{f_2()} is \eqn{f_2(x) = 0.2 * x^{11} *
 (10 * (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^{10}}{f(x) = 0.2 * x^11 * (10 *
 (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^10}.
-\item \code{"eg4"}: a factor by smooth true model. The true model contains a factor
+\item \code{"factor_by"} or \code{"eg4"}: a factor by smooth true model. The true model
+contains a factor
 with 3 levels, where the response for the \emph{n}th level follows the \emph{n}th
 Gu & Wahba function (for \eqn{n \in {1, 2, 3}}{n in {1,2,3}}).
-\item \code{"eg5"}: an additive plus factor true model. The response is a linear
+\item \code{"additive_factor"} or \code{"eg5"}: an additive plus factor true model. The
+response is a linear
 combination of the Gu & Wahba functions 2, 3, 4 (the latter is a null
 function) plus a factor term with four levels.
-\item \code{"eg6"}: an additive plus random effect term true model.
-\item \code{"eg7"}: a version of the model in \code{"eg1"}, but where the covariates are
+\item \code{"additive_group_effects"} or \code{"eg6"}: an additive model plus four
+group intercepts with fixed realised values \verb{3, 6, 9, 12}.
+\item \code{"additive_correlated"} or \code{"eg7"}: a version of the model in \code{"eg1"},
+but where the covariates are
 correlated.
-\item \code{"gwf2"}: a model where the response is Gu & Wahba's
+\item \code{"gu_wahba_f2"} or \code{"gwf2"}: a model where the response is Gu & Wahba's
 \eqn{f_2(x_i)}{f_2(x_i)} plus noise.
-\item \code{"lwf6"}: a model where the response is Luo & Wahba's "example 6"
+\item \code{"luo_wahba_f6"} or \code{"lwf6"}: a model where the response is Luo &
+Wahba's "example 6"
 function \eqn{sin(2(4x-2)) + 2 exp(-256(x-0.5)^2)}{
     sin(2 * ((4 * x) - 2)) + (2 * exp(-256 * (x - .5)^2))} plus noise.
 \item \code{"gfam"}: simulates data for use with GAMs with
@@ -171,10 +180,10 @@ See \link{data_sim_shapes} for functions, derivatives and \code{mgcv::scasm()} r
 \dontshow{
 op <- options(pillar.sigfig = 5, cli.unicode = FALSE)
 }
-data_sim("eg1", n = 100, seed = 1)
+data_sim("additive", n = 100, seed = 1)
 
 # an ordered categorical response
-data_sim("eg1", n = 100, dist = "ocat", n_cat = 4, cuts = c(-1, 0, 5))
+data_sim("additive", n = 100, dist = "ocat", n_cat = 4, cuts = c(-1, 0, 5))
 \dontshow{
 options(op)
 }
