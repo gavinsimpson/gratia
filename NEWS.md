@@ -86,6 +86,16 @@
   distribution parameters, and pointwise or simultaneous intervals.
   `draw()` plots saved results with parameter labels and a scale caption.
 
+* `data_sim()` now accepts family objects, explicit predictors and generating
+  parameters for scalar, location-scale, categorical, multivariate and Cox
+  models. Censored families can return observed intervals while retaining
+  complete responses and true distribution parameters. Grouped families can
+  use repeated distributions with separate parameters.
+
+* `data_sim()` gains analytic shape reference functions and fitting recipes
+  for `mgcv::scasm()`, including combined shape constraints, tensor surfaces
+  and Gamma models with constraints on the log mean and log dispersion.
+
 * Optional `bayesplot::pp_check()` methods provide posterior predictive checks
   for supported GAMs and mixed models (#278, reported by @nicholasjclark).
 
@@ -401,6 +411,14 @@
   recognised family name.
 
 ## Bug fixes
+
+* `data_sim()` now transforms the `eg6` predictor once and returns the
+  predictor used for sampling. Grouped-family simulations respect seeds,
+  parameters, ordinal aliases and repeated family positions; `dist` is
+  ignored throughout that legacy example. The `eg5` and `eg6` examples accept
+  sample sizes not divisible by four. Explicit seeds restore an absent RNG
+  state, and reference generation forwards the requested Tweedie power.
+  Vector Tweedie parameters now use the correct compound Poisson-Gamma law.
 
 * Large QQ reference simulations now close their file connections before
   removing temporary files, allowing cleanup to complete on Windows.

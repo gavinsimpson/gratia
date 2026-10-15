@@ -870,6 +870,63 @@ detaching ‘package:mgcv’
 > 
 > 
 > cleanEx()
+> nameEx("data_sim_families")
+> ### * data_sim_families
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: data_sim_families
+> ### Title: Generating responses with mgcv family objects
+> ### Aliases: data_sim_families
+> 
+> ### ** Examples
+> 
+> # A beta response: precision is explicitly chosen, rather than estimated.
+> d <- data_sim(family = mgcv::betar(theta = 12), seed = 2)
+> attr(d, "truth")$parameters$precision
+[1] 12
+> 
+> # Binomial proportions: use trials as the fitting weights.
+> d <- data_sim(family = binomial(), parameters = list(trials = 10), seed = 2)
+> 
+> # Mean and standard deviation have separate predictors.
+> d <- data_sim("gwf2", family = mgcv::gaulss(), seed = 2,
++   predictors = function(d) cbind(d$f, log(0.2 + d$x)))
+> 
+> # Fit a censored normal model to the matrix response.
+> d <- data_sim("sc_increasing", family = mgcv::cnorm(theta = 0.2), seed = 2,
++   observation = list(left = 0.1, right = 0.9))
+> 
+> 
+> 
+> cleanEx()
+> nameEx("data_sim_shapes")
+> ### * data_sim_shapes
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: data_sim_shapes
+> ### Title: Reference functions for shape-constrained GAMs
+> ### Aliases: data_sim_shapes
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+> d <- data_sim("sc_increasing", n = 200, seed = 2)
+> m <- scasm(y ~ s(x, bs = "sc", xt = "m+", k = 8), data = d)
+> 
+> d <- data_sim("sc_positive", n = 200, seed = 2)
+> m <- scasm(y ~ s(x, bs = "sc", xt = "+", k = 8) - 1, data = d)
+> 
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
 > nameEx("data_slice")
 > ### * data_slice
 > 
