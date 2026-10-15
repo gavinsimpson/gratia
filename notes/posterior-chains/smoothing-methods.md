@@ -20,6 +20,15 @@ integrate a joint Bayesian posterior.
 | Other ordinary and extended-family non-discrete `bam()`, ML, REML or fREML | Family parameters updated separately, absent from smoothing covariance | Native normal updates; must reproduce the original coefficients and covariance |
 | General families, including LSS | Depends on family and fitter | Audit only; no conditional mixture updates |
 
+For Gaussian identity bam fREML fits with partly fixed penalties and estimated
+dispersion, bam$sig2 stores profiled REML dispersion, while the retained
+coefficient covariance uses Pearson dispersion. The prototype reconstructs
+that Pearson estimate from weighted residuals and effective degrees of freedom
+and holds it fixed for conditional coefficient updates. Its audit records both
+estimates and their roles. The covariance check remains in place. All 200
+previously rejected coverage fits now pass; see the [correction and affected
+coverage rerun](smoothing-coverage-fixed-report.md).
+
 ML/REML tests include shared parameters, partly fixed penalties, tensor
 products, known and estimated dispersion, unequal weights, offsets, and bounded
 model-matrix blocks. For ML/REML `bam()`, conditionals at perturbed smoothing
@@ -32,6 +41,11 @@ of 11 fits. Its largest relative errors at fitted smoothing parameters are
 checks validate the conditional calculations and mixture moments. They do not
 establish repeated-sampling coverage or accuracy of the fitted normal
 approximation for every model.
+
+The separate [coverage study](smoothing-coverage-report.md) compares conditional
+intervals, the unconditional correction and the mixture over repeated datasets
+using all five supported combinations of fitting function and method. It reports numerical
+availability alongside interval coverage.
 
 The same restrictions as the earlier prototype remain: identifiable independent
 fits, positive fitted penalty multipliers, supported penalty

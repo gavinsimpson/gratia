@@ -77,6 +77,16 @@ sampling_smoothing_setup <- function(model, block_size = 10000L, dense_limit = 2
       any(!is.finite(w) | w < 0) || any(!is.finite(offset))) stop(
     "The fitted response, weights, offsets, and model rows do not align.",
     call. = FALSE)
+  # bam.fit stores the profiled REML scale in sig2, but Sl.postproc
+  # uses weighted RSS / (n - sum(edf)) for Vp when scale is estimated.
+  # With fixed smoothing parameters those estimates need not coincide.
+  # Keep existing scale handling for other fitting configurations.
+  pearson_scale <- inherits(model, "bam") && identical(method, "fREML") &&
+    isTRUE(model$scale.estimated) && any(rowSums(abs(L)) == 0)
+  reported_dispersion <- phi
+  dispersion_source <- "fitted sig2"
+  rss <- 0
+  beta <- unname(stats::coef(model))
   XtWX <- matrix(0, p, p)
   XtWy <- numeric(p)
   blocks <- split(seq_along(y), ceiling(seq_along(y) / block_size))
@@ -87,8 +97,20 @@ sampling_smoothing_setup <- function(model, block_size = 10000L, dense_limit = 2
       "The smoothing-mixture design does not match the fitted coefficients.",
       call. = FALSE)
     sampling_check_bam_fixed(model, X, "smoothing-mixture")
+    if (pearson_scale) {
+      residual <- y[i] - offset[i] - drop(X %*% beta)
+      rss <- rss + sum(w[i] * residual^2)
+    }
     XtWX <- XtWX + crossprod(X, X * w[i])
     XtWy <- XtWy + drop(crossprod(X, w[i] * (y[i] - offset[i])))
+  }
+  if (pearson_scale) {
+    residual_df <- length(y) - sum(model$edf)
+    phi <- rss / residual_df
+    if (!is.finite(residual_df) || residual_df <= 0 || !is.finite(phi) || phi <= 0)
+      stop("Cannot reconstruct a positive Pearson dispersion for this partly fixed bam fREML fit.",
+        call. = FALSE)
+    dispersion_source <- "Pearson: weighted RSS / (n - sum(edf))"
   }
   penalties <- list()
   for (sm in model$smooth) for (S in sm$S) {
@@ -99,7 +121,6 @@ sampling_smoothing_setup <- function(model, block_size = 10000L, dense_limit = 2
     log_sp = log(sp), log_sp_cov = log_sp_cov, L = L, lsp0 = lsp0,
     names = names(stats::coef(model)))
   conditional <- sampling_smoothing_conditional(setup, log(sp))
-  beta <- unname(stats::coef(model))
   Vp <- unname(stats::vcov(model, unconditional = FALSE))
   mean_error <- max(abs(conditional$mean - beta)) / max(1, max(abs(beta)))
   covariance_error <- max(abs(conditional$covariance - Vp)) /
@@ -145,7 +166,8 @@ sampling_smoothing_setup <- function(model, block_size = 10000L, dense_limit = 2
     fitted_derivative_coordinates = if (inherits(model, "bam") &&
       identical(model$method, "fREML")) "internal fitting basis" else "fitted coefficients",
     conditional_covariance = Vp, corrected_covariance = model$Vc,
-    dispersion = phi, dispersion_sampled = FALSE)
+    dispersion = phi, reported_dispersion = reported_dispersion,
+    dispersion_source = dispersion_source, dispersion_sampled = FALSE)
   setup
 }
 

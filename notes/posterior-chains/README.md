@@ -180,9 +180,14 @@ for evidence, restrictions and reproduction instructions.
 
 The extended [fitting-method audit](smoothing-methods.md) records actual
 ML/REML/fREML fitting methods, scalar family parameters and dispersion
-positions. Smoothing uncertainty excludes NCV and QNCV. The next step is
-repeated-simulation validation of interval coverage for the retained conditional
-mixture before adding a public sampling option.
+positions. Smoothing uncertainty excludes NCV and QNCV. The internal
+[coverage study](smoothing-coverage-report.md) compares conditional intervals,
+mgcv's unconditional correction and the mixture across ML/REML/fREML fits.
+Its availability and calibration results guide further work before a public option.
+
+The [partly fixed fREML follow-up](smoothing-coverage-fixed-report.md) resolves
+the difference between reported REML dispersion and the Pearson dispersion
+used for coefficient covariance, with regression tests and a 200-dataset rerun.
 
 ## Follow-up performance and mixing studies
 

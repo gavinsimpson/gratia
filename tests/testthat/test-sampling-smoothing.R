@@ -287,3 +287,94 @@ test_that("smoothing uncertainty excludes NCV and QNCV using the actual fit", {
     expect_error(sampling_smoothing_setup(fit), message)
   }
 })
+
+test_that("partly fixed bam fREML uses the dispersion retained in Vp", {
+  fixture <- smoothing_research_fixture(bam = TRUE, method = "fREML", fixed = TRUE)
+  fit <- fixture$model
+  original <- fit
+  setup <- sampling_smoothing_setup(fit, block_size = 19L)
+  X <- predict(fit, type = "lpmatrix")
+  w <- fixture$data$w
+  residual <- fixture$data$y - fixture$data$o - drop(X %*% coef(fit))
+  pearson <- sum(w * residual^2) / (nrow(X) - sum(fit$edf))
+  expect_gt(abs(pearson / fit$sig2 - 1), .001)
+  expect_equal(setup$phi, pearson, tolerance = 1e-12)
+  expect_equal(setup$audit$reported_dispersion, fit$sig2)
+  expect_identical(setup$audit$dispersion_source,
+    "Pearson: weighted RSS / (n - sum(edf))")
+  expect_false(setup$audit$dispersion_sampled)
+  expect_identical(fit, original)
+  expect_equal(setup$log_sp_cov, fit$V.sp[1L, 1L, drop = FALSE], ignore_attr = TRUE)
+  expect_equal(drop(setup$L), c(0, 1))
+  conditional <- sampling_smoothing_conditional(setup, setup$log_sp)
+  expect_equal(conditional$mean, unname(coef(fit)), tolerance = 1e-7)
+  expect_equal(conditional$covariance, unname(vcov(fit)), tolerance = 1e-7)
+  # The profile REML dispersion is a different, independently calculable value.
+  penalty <- matrix(0, ncol(X), ncol(X))
+  for (k in seq_along(fit$smooth)) {
+    sm <- fit$smooth[[k]]; j <- sm$first.para:sm$last.para
+    penalty[j, j] <- fit$full.sp[k] * sm$S[[1L]]
+  }
+  nullity <- ncol(X) - sum(vapply(fit$smooth, function(sm) sum(sm$rank), numeric(1)))
+  profile <- (sum(w * residual^2) + drop(crossprod(coef(fit), penalty %*% coef(fit)))) /
+    (nrow(X) - nullity)
+  expect_equal(profile, fit$sig2, tolerance = 1e-6)
+  for (rho in c(setup$log_sp, setup$log_sp + .6)) {
+    conditional <- sampling_smoothing_conditional(setup, rho)
+    reference <- mgcv::gam(fixture$formula, data = fixture$data, weights = w,
+      sp = c(.1, exp(rho)), method = "REML", scale = pearson)
+    XR <- predict(reference, type = "lpmatrix")
+    expect_equal(drop(X %*% conditional$mean), drop(XR %*% coef(reference)),
+      tolerance = 1e-7)
+    expect_equal(X %*% conditional$covariance %*% t(X),
+      XR %*% vcov(reference) %*% t(XR), tolerance = 1e-7)
+  }
+  h <- 1e-5
+  numerical <- (sampling_smoothing_conditional(setup, setup$log_sp + h)$mean -
+    sampling_smoothing_conditional(setup, setup$log_sp - h)$mean) / (2 * h)
+  expect_equal(drop(setup$audit$derivative), numerical, tolerance = 1e-6)
+  withr::local_seed(27)
+  rng <- .Random.seed
+  draws <- sampling_smoothing_draws(setup, n_draws = 12L, seed = 901L)
+  expect_identical(.Random.seed, rng)
+  expect_identical(draws, sampling_smoothing_draws(setup, n_draws = 12L, seed = 901L))
+  zero <- sampling_smoothing_draws(setup, n_draws = 12L, seed = 901L,
+    log_sp_cov = matrix(0, 1L, 1L))
+  expect_equal(zero$mean_conditional_covariance, unname(vcov(fit)), tolerance = 1e-7)
+  expect_equal(zero$covariance_conditional_means, matrix(0, ncol(X), ncol(X)),
+    ignore_attr = TRUE, tolerance = 1e-12)
+})
+
+test_that("partly fixed fREML dispersion respects fitting rows and fixed scale", {
+  d <- smoothing_research_fixture()$data
+  d$x[c(5, 13)] <- NA_real_
+  for (scale in c(0, .09)) {
+    fit <- mgcv::bam(y ~ s(x, k = 5, sp = 1) + s(z, k = 5), data = d,
+      weights = w, offset = o, na.action = na.exclude, method = "fREML", scale = scale)
+    # Setup must use retained rows and offsets without evaluating the call.
+    fit$call$data <- quote(unavailable_data)
+    fit$call$weights <- quote(unavailable_weights)
+    fit$call$offset <- quote(unavailable_offset)
+    setup <- sampling_smoothing_setup(fit, block_size = 17L)
+    expect_equal(sampling_smoothing_conditional(setup, setup$log_sp)$covariance,
+      unname(vcov(fit)), tolerance = 1e-7)
+    if (scale > 0) {
+      expect_identical(setup$phi, scale)
+      expect_identical(setup$audit$dispersion_source, "fitted sig2")
+    } else {
+      expect_equal(setup$phi, sum(fit$prior.weights *
+        (fit$y - fit$offset - fit$fitted.values)^2) / (length(fit$y) - sum(fit$edf)), tolerance = 1e-12)
+      expect_identical(setup$audit$dispersion_source,
+        "Pearson: weighted RSS / (n - sum(edf))")
+    }
+  }
+})
+
+test_that("Pearson reconstruction does not absorb corrupt fitted covariances", {
+  fit <- smoothing_research_fixture(bam = TRUE, method = "fREML", fixed = TRUE)$model
+  fit$Vp <- fit$Vp * 1.1
+  expect_error(sampling_smoothing_setup(fit), "does not agree.*covariance")
+  fit <- smoothing_research_fixture(bam = TRUE, method = "fREML", fixed = TRUE)$model
+  fit$edf[] <- NA_real_
+  expect_error(sampling_smoothing_setup(fit), "positive Pearson dispersion")
+})

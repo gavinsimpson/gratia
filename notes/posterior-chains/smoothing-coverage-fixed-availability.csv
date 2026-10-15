@@ -1,0 +1,16 @@
+"case","engine","method","sampler","returned","attempted"
+"normal_fixed","bam","fREML","conditional",200,200
+"normal_fixed","bam","ML","conditional",200,200
+"normal_fixed","gam","ML","conditional",200,200
+"normal_fixed","bam","REML","conditional",200,200
+"normal_fixed","gam","REML","conditional",200,200
+"normal_fixed","bam","fREML","mixture",200,200
+"normal_fixed","bam","ML","mixture",200,200
+"normal_fixed","gam","ML","mixture",200,200
+"normal_fixed","bam","REML","mixture",200,200
+"normal_fixed","gam","REML","mixture",200,200
+"normal_fixed","bam","fREML","unconditional",200,200
+"normal_fixed","bam","ML","unconditional",200,200
+"normal_fixed","gam","ML","unconditional",200,200
+"normal_fixed","bam","REML","unconditional",200,200
+"normal_fixed","gam","REML","unconditional",200,200

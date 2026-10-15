@@ -1,0 +1,98 @@
+Original-study validation at commit 739b44eddf197502c8561240ae9671c63089f5c1.
+This record predates the partly fixed fREML correction; see smoothing-coverage-fixed-report.md for the follow-up.
+
+Package source hashes match previously checked archive: 838 files.
+Frozen evaluator and runner match the main-study protocol source hashes.
+Complete main study: 16 cases, 200 datasets per case, five fitting configurations.
+Validated 1,920 summary rows, 1,280 paired rows, 10,560 pointwise rows and 48,000 status rows.
+       sampler returned attempted
+   conditional    15995     16000
+       mixture    15488     16000
+ unconditional    15995     16000
+Five failed native model fits; 200 rejected setups and 307 failed smoothing components retained.
+Expected-response and linear-predictor coverage coincide; availability agrees across every quantity and stratum.
+Resolution checks: 140 quantity/configuration rows; availability identical at 256/1024 components.
+Largest absolute interior coverage change: 0.01234568
+Largest group-specific 95th percentile endpoint change/width: 0.06048256
+All 24 actual-draw distribution checks completed; largest absolute CDF discrepancy: 0.016
+Maximum truth reconstruction error, across both bases: 4.286086e-09
+Focused standalone research assertions: 99 passed.
+Generator: L'Ecuyer-CMRG Inversion Rejection mirai: 2.7.3
+[1] TRUE
+normal_weak replicate 1 : identical main, direct serial and parallel results including failure statuses.
+[1] TRUE
+normal_null replicate 3 : identical main, direct serial and parallel results including failure statuses.
+
+Fixed-penalty independent checks:
+                                          quantity        value
+                 relative_coefficient_disagreement 1.743496e-15
+                  relative_covariance_disagreement 3.089211e-02
+                 maximum_native_penalised_gradient 1.065814e-13
+            maximum_direct_vs_gam_prediction_error 2.553513e-15
+ maximum_direct_vs_gam_prediction_covariance_error 7.632783e-17
+               maximum_bam_vs_gam_prediction_error 1.110223e-15
+                               reported_dispersion 2.207051e-01
+              native_covariance_implied_dispersion 2.277405e-01
+               native_over_direct_covariance_scale 1.031877e+00
+                           profile_REML_dispersion 2.207051e-01
+                                Pearson_dispersion 2.277405e-01
+          fixed_smoothing_gam_estimated_dispersion 2.277405e-01
+           known_dispersion_setup_covariance_error 2.361424e-15
+
+All research R scripts parse.
+Study RNG: L'Ecuyer-CMRG / Inversion / Rejection; mirai 2.7.3
+Full package tests/checks were not rerun: only build-excluded notes changed; package source hashes match the previously checked archive.
+Intentional protocol mismatch and interrupted/resumed resolution-run logs are expected validation events, not simulation failures.
+
+Research R source hashes:
+      notes/posterior-chains/smoothing-coverage-draws.R
+                     "19763e53324f59a1fee336dc77d83a25"
+    notes/posterior-chains/smoothing-coverage-figures.R
+                     "e2c39485a7c243a77d3832b31282d788"
+notes/posterior-chains/smoothing-coverage-fixed-check.R
+                     "344dc2ff029e01996fb6c00ba0f83f91"
+  notes/posterior-chains/smoothing-coverage-functions.R
+                     "7d9fb52631b4303564016c3fcab1173e"
+ notes/posterior-chains/smoothing-coverage-resolution.R
+                     "6b844495a9143e1b0f9b8e49401d4ea3"
+        notes/posterior-chains/smoothing-coverage-run.R
+                     "fe892fff58543a2ff85a860b37ab5b82"
+    notes/posterior-chains/smoothing-coverage-summary.R
+                     "fe43df52381ae77b9364d1245439b0da"
+      notes/posterior-chains/smoothing-coverage-tests.R
+                     "b13971fb55e79cbe5787f0b987054c41"
+
+R version 4.6.1 (2026-06-24)
+Platform: aarch64-apple-darwin23
+Running under: macOS Tahoe 26.6.1
+
+Matrix products: default
+BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] C.UTF-8/C.UTF-8/C.UTF-8/C/C.UTF-8/C.UTF-8
+
+time zone: Europe/Copenhagen
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base
+
+other attached packages:
+[1] gratia_0.11.2-50
+
+loaded via a namespace (and not attached):
+ [1] patchwork_1.3.2    vctrs_0.7.3        nlme_3.1-171       cli_3.6.6
+ [5] rlang_1.3.0        stringi_1.8.9      purrr_1.2.2        generics_0.1.4
+ [9] S7_0.2.2           glue_1.8.1         scales_1.4.0       grid_4.6.1
+[13] tibble_3.3.1       ggokabeito_0.1.0   lifecycle_1.0.5    stringr_1.6.0
+[17] compiler_4.6.1     mvnfast_0.2.8      dplyr_1.2.1        RColorBrewer_1.1-3
+[21] Rcpp_1.1.2         pkgconfig_2.0.3    tidyr_1.3.2        mgcv_1.9-4
+[25] farver_2.1.2       lattice_0.23-1     R6_2.6.1           tidyselect_1.2.1
+[29] pillar_1.11.1      splines_4.6.1      magrittr_2.0.5     Matrix_1.7-6
+[33] withr_3.0.3        tools_4.6.1        gtable_0.3.6       ggplot2_4.0.3
+
+Local Markdown references checked: 38 all exist.
+Changed and new files are confined to notes/posterior-chains.
+Research text files have no trailing whitespace; session-info padding was removed from the validation log.

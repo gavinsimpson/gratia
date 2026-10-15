@@ -1,0 +1,7 @@
+"case","engine","method","sampler","status","maximum_cdf_error","median_cdf_error","maximum_endpoint_error_in_sd"
+"normal_fixed","gam","REML","conditional","OK",0.00840000000000002,0.0016,0.0794112914121361
+"normal_fixed","gam","REML","unconditional","OK",0.00890000000000002,0.00159999999999993,0.0675811665317318
+"normal_fixed","gam","REML","mixture","OK",0.0105,0.0014,0.0548289106604981
+"normal_fixed","bam","fREML","conditional","OK",0.014,0.00150000000000006,0.0940342060099385
+"normal_fixed","bam","fREML","unconditional","OK",0.0139,0.00180000000000002,0.0922384967963519
+"normal_fixed","bam","fREML","mixture","OK",0.0146,0.00129999999999997,0.0573966756142998
