@@ -93,6 +93,29 @@
 
 ### New features
 
+- Diagnostic plots now support native inlaws families through their
+  supplied `gratia_diagnostics` functions, including grouped-family fits
+  and models with multiple response columns.
+
+- [`dharma_residuals()`](https://gavinsimpson.github.io/gratia/reference/dharma_residuals.md)
+  and `type = "dharma"` in diagnostics now calculate simulation-based
+  PIT residuals using gratia’s response generators, without requiring
+  DHARMa or mgcViz. `n_dharma` controls the simulation count. Residuals
+  retain zero and one endpoints and are shared across
+  [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
+  panels. QQ and worm plots use uniform references with approximate
+  pointwise bands for independent responses; dependent responses omit
+  these bands.
+
+- mgcv-compatible families can now supply a `gratia_diagnostics`
+  function for response means, variances, probability bounds and
+  distribution functions. This allows diagnostics for additional count,
+  ordinal, mixture and censored families without adding family-name
+  checks to gratia. Traditional simulated reference residuals can apply
+  a supplied observation process. See
+  [`?family_diagnostics`](https://gavinsimpson.github.io/gratia/reference/family_diagnostics.md)
+  for the interface.
+
 - New site articles explain model diagnostics, grouped surveys, glmmTMB
   and sdmTMB models, prediction comparisons, response distributions, and
   smooth effects on different spatial domains. They include fitted

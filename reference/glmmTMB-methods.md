@@ -67,9 +67,10 @@ draw(
 
 - type:
 
-  Residual type: `"pearson"`, `"response"`, `"deviance"`, `"pit"`, or
-  `"quantile"`, when available for the family. The default is Pearson
-  for conditional checks and response residuals for marginal checks.
+  Residual type: `"pearson"`, `"response"`, `"deviance"`, `"pit"`,
+  `"quantile"`, or `"dharma"`, when available for the family. The
+  default is Pearson for conditional checks and response residuals for
+  marginal checks.
 
 - conditioning:
 

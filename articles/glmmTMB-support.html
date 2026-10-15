@@ -11,7 +11,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -112,13 +113,11 @@ smoothing penalty is estimated during fitting.</p>
 </h2>
 <p>The <a href="https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/Nile.html" class="external-link">Nile
 data</a> contain 100 annual flow measurements at Aswan from 1871 to
-1970, measured in units of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mn>8</mn></msup><annotation encoding="application/x-tex">10^8</annotation></semantics></math>
-cubic metres. The question here is descriptive: what broad change in
-mean flow is supported by these observations? We adapt the smooth
-example in the glmmTMB documentation, name the variables
-<code>year</code> and <code>flow</code>, and fit the same spline with
-mgcv for comparison.</p>
+1970, measured in units of <span class="math inline">10^8</span> cubic
+metres. The question here is descriptive: what broad change in mean flow
+is supported by these observations? We adapt the smooth example in the
+glmmTMB documentation, name the variables <code>year</code> and
+<code>flow</code>, and fit the same spline with mgcv for comparison.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">Nile</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -386,13 +385,11 @@ unless <code>parametric = TRUE</code> is also supplied.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">plant_tmb</span>, select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"(1 | Plant)"</span>, <span class="st">"(log_conc | Plant)"</span><span class="op">)</span>,</span>
 <span>  ranef_lines <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="glmmTMB-support_files/figure-html/plant-random-lines-1.png" class="r-plt" alt="" width="700"></p>
-<p>These lines are each plant’s random contribution
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>b</mi><mrow><mn>0</mn><mi>j</mi></mrow></msub><mo>+</mo><mi>x</mi><msub><mi>b</mi><mrow><mn>1</mn><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">b_{0j} + x b_{1j}</annotation></semantics></math>
-on the log scale. They do not include the shared curve or treatment
-means and have no uncertainty bands. This display requires a simple
-numeric intercept-slope pair from the same formula term. Multiple
-slopes, transformed or factor slopes, and structured covariance terms
-retain separate QQ panels.</p>
+<p>These lines are each plant’s random contribution <span class="math inline">b_{0j} + x b_{1j}</span> on the log scale. They do
+not include the shared curve or treatment means and have no uncertainty
+bands. This display requires a simple numeric intercept-slope pair from
+the same formula term. Multiple slopes, transformed or factor slopes,
+and structured covariance terms retain separate QQ panels.</p>
 <p>The interaction deserves a focused view rather than interpreting two
 main effects separately:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">

@@ -11,7 +11,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -323,16 +324,13 @@ observations.</p>
 <div class="section level2">
 <h2 id="which-derivative">Which derivative?<a class="anchor" aria-label="anchor" href="#which-derivative"></a>
 </h2>
-<p>For a contribution
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mi>x</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">f(\log x)</annotation></semantics></math>,
-the default derivative is with respect to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">\log x</annotation></semantics></math>.
-Set <code>wrt = "covariate"</code> to differentiate with respect to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
-instead. The latter includes the chain-rule factor
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><mi>x</mi></mrow><annotation encoding="application/x-tex">1/x</annotation></semantics></math>
+<p>For a contribution <span class="math inline">f(\log x)</span>, the
+default derivative is with respect to <span class="math inline">\log
+x</span>. Set <code>wrt = "covariate"</code> to differentiate with
+respect to <span class="math inline">x</span> instead. The latter
+includes the chain-rule factor <span class="math inline">1/x</span>
 because the transformation is reevaluated after each perturbation of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>.</p>
+<span class="math inline">x</span>.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/derivatives.html">derivatives</a></span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">nd</span>, type <span class="op">=</span> <span class="st">"central"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 9</span></span></span>
@@ -368,9 +366,8 @@ coordinate consistently with <code>wrt</code>: <strong><code>wrt</code>
 chooses the differentiation scale, and <code>focal</code> names the
 coordinate to differentiate along on that scale</strong>.</p>
 <p>For example, <code>te(log(x), sqrt(z))</code> represents a
-contribution
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mi>x</mi><mo>,</mo><msqrt><mi>z</mi></msqrt><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">f(\log x, \sqrt z)</annotation></semantics></math>.
-The two choices have the following meanings:</p>
+contribution <span class="math inline">f(\log x, \sqrt z)</span>. The
+two choices have the following meanings:</p>
 <table class="table">
 <colgroup>
 <col width="47%">
@@ -383,19 +380,13 @@ The two choices have the following meanings:</p>
 <tbody>
 <tr class="odd">
 <td align="left"><code>wrt = "smooth", focal = "log(x)"</code></td>
-<td align="left">With respect to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">\log x</annotation></semantics></math>,
-holding
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msqrt><mi>z</mi></msqrt><annotation encoding="application/x-tex">\sqrt z</annotation></semantics></math>
-fixed</td>
+<td align="left">With respect to <span class="math inline">\log
+x</span>, holding <span class="math inline">\sqrt z</span> fixed</td>
 </tr>
 <tr class="even">
 <td align="left"><code>wrt = "covariate", focal = "x"</code></td>
-<td align="left">With respect to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>,
-holding
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>z</mi><annotation encoding="application/x-tex">z</annotation></semantics></math>
-fixed</td>
+<td align="left">With respect to <span class="math inline">x</span>,
+holding <span class="math inline">z</span> fixed</td>
 </tr>
 </tbody>
 </table>
@@ -430,9 +421,9 @@ fixed</td>
 <p>The first call perturbs <code>log(x)</code> directly. The second
 perturbs <code>x</code> and recomputes the smooth expressions,
 incorporating the chain rule numerically. Thus, for these first
-derivatives,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>∂</mi><mi>f</mi><mi>/</mi><mi>∂</mi><mi>x</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>∂</mi><mi>f</mi><mi>/</mi><mi>∂</mi><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mi>/</mi><mi>x</mi></mrow><annotation encoding="application/x-tex">\partial f / \partial x = (\partial f / \partial \log x) / x</annotation></semantics></math>,
-up to finite-difference approximation error.</p>
+derivatives, <span class="math inline">\partial f / \partial x =
+(\partial f / \partial \log x) / x</span>, up to finite-difference
+approximation error.</p>
 <p>In <code><a href="../reference/partial_derivatives.html">partial_derivatives()</a></code>, <code>wrt = "smooth"</code> is
 the default, and omitting <code>focal</code> selects the first
 non-factor smooth coordinate. With <code>wrt = "covariate"</code>,
@@ -457,19 +448,13 @@ smooth coordinate, or of <code>x</code> when using
 <code>wrt = "covariate"</code>. The step therefore follows changes in
 the covariate’s units and normally stays the same when prediction data
 are split into batches.</p>
-<p>For derivative order
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>,
-the range is multiplied by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>ϵ</mi><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">h</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">e</mi></mrow><mrow><mn>1</mn><mi>/</mi><mo stretchy="false" form="prefix">(</mo><mi>d</mi><mo>+</mo><mi>p</mi><mo stretchy="false" form="postfix">)</mo></mrow></msubsup><annotation encoding="application/x-tex">\epsilon_{\mathrm{machine}}^{1/(d+p)}</annotation></semantics></math>,
-where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">p=2</annotation></semantics></math>
-for central differences and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">p=1</annotation></semantics></math>
-for forward or backward differences. This balances the orders of
-rounding and approximation error; for example, second central
-differences use the fourth root of machine precision. Constant
-coordinates use their magnitude instead of their range, with a fallback
-of one at zero. A lower bound and rounding of the step ensure
+<p>For derivative order <span class="math inline">d</span>, the range is
+multiplied by <span class="math inline">\epsilon_{\mathrm{machine}}^{1/(d+p)}</span>, where
+<span class="math inline">p=2</span> for central differences and <span class="math inline">p=1</span> for forward or backward differences. This
+balances the orders of rounding and approximation error; for example,
+second central differences use the fourth root of machine precision.
+Constant coordinates use their magnitude instead of their range, with a
+fallback of one at zero. A lower bound and rounding of the step ensure
 representable perturbations at large coordinates.</p>
 <p>This rule does not estimate a universally optimal step: that would
 also need information about higher derivatives of the fitted function.

@@ -176,13 +176,12 @@ appraise(gamma_fit, type = "quantile", seed = 406)
 
 The diagnostics compare each observation with its own precision.
 Response simulation also respects those fitted weights. The expected
-variance is $`\phi\mu_i^2/w_i`$, where $`w_i`$ is precision and $`\phi`$
-is estimated dispersion. A larger weight narrows the response
-distribution. Explicit sampling weights in gratia replace these
-defaults; they should represent a different measurement protocol, not a
-cosmetic adjustment.
+variance is \phi\mu_i^2/w_i, where w_i is precision and \phi is
+estimated dispersion. A larger weight narrows the response distribution.
+Explicit sampling weights in gratia replace these defaults; they should
+represent a different measurement protocol, not a cosmetic adjustment.
 
-An inverse Gaussian alternative uses variance $`\phi\mu_i^3/w_i`$. It
+An inverse Gaussian alternative uses variance \phi\mu_i^3/w_i. It
 therefore allows variability to increase more rapidly with the mean. Fit
 it when that relationship is plausible and examine the tails, rather
 than selecting it because both families have positive support.

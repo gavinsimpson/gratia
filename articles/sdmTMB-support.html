@@ -11,7 +11,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -163,9 +164,9 @@ model</strong> makes the encounter and positive-density questions
 explicit. Its first component models whether density is positive using a
 logit link; its second models positive density using a Gamma
 distribution and log link. Thus</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>Y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mrow><mi mathvariant="normal">Pr</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>Y</mi><mi>i</mi></msub><mo>&gt;</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo><mspace width="0.167em"></mspace><mi>E</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>Y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>Y</mi><mi>i</mi></msub><mo>&gt;</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
- E(Y_i) = \Pr(Y_i &gt; 0)\,E(Y_i\mid Y_i&gt;0).
-</annotation></semantics></math></p>
+<p><span class="math display">
+E(Y_i) = \Pr(Y_i &gt; 0)\,E(Y_i\mid Y_i&gt;0).
+</span></p>
 <p>Depth need not have the same effect on both components. Each has its
 own smooth coefficients and spatial fields. A persistent field
 represents geographical variation shared across survey years; an
@@ -611,8 +612,8 @@ frequency and a positive-tail summary:</p>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> New fields              density_95th    180.    149.    241.     157.   </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> New fields              proportion_zero   0.494   0.412   0.614    0.538</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Uncertain fitted fields density_95th    158.    140.    181.     157.   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Uncertain fitted fields proportion_zero   0.538   0.526   0.551    0.538</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Uncertain fitted fields density_95th    157.    141.    176.     157.   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Uncertain fitted fields proportion_zero   0.542   0.527   0.556    0.538</span></span></code></pre></div>
 <p>The conditional comparison asks whether new responses around the
 inferred survey fields reproduce these summaries. The marginal
 comparison asks whether new field realisations at the survey locations

@@ -285,10 +285,10 @@ arbitrary new observations.
 
 ## Which derivative?
 
-For a contribution $`f(\log x)`$, the default derivative is with respect
-to $`\log x`$. Set `wrt = "covariate"` to differentiate with respect to
-$`x`$ instead. The latter includes the chain-rule factor $`1/x`$ because
-the transformation is reevaluated after each perturbation of $`x`$.
+For a contribution f(\log x), the default derivative is with respect to
+\log x. Set `wrt = "covariate"` to differentiate with respect to x
+instead. The latter includes the chain-rule factor 1/x because the
+transformation is reevaluated after each perturbation of x.
 
 ``` r
 
@@ -328,13 +328,13 @@ and specify the smooth or raw focal coordinate consistently with `wrt`:
 **`wrt` chooses the differentiation scale, and `focal` names the
 coordinate to differentiate along on that scale**.
 
-For example, `te(log(x), sqrt(z))` represents a contribution
-$`f(\log x, \sqrt z)`$. The two choices have the following meanings:
+For example, `te(log(x), sqrt(z))` represents a contribution f(\log x,
+\sqrt z). The two choices have the following meanings:
 
 | Arguments | Derivative |
 |:---|:---|
-| `wrt = "smooth", focal = "log(x)"` | With respect to $`\log x`$, holding $`\sqrt z`$ fixed |
-| `wrt = "covariate", focal = "x"` | With respect to $`x`$, holding $`z`$ fixed |
+| `wrt = "smooth", focal = "log(x)"` | With respect to \log x, holding \sqrt z fixed |
+| `wrt = "covariate", focal = "x"` | With respect to x, holding z fixed |
 
 ``` r
 
@@ -369,9 +369,9 @@ data.frame(x = tensor_nd$x,
 
 The first call perturbs `log(x)` directly. The second perturbs `x` and
 recomputes the smooth expressions, incorporating the chain rule
-numerically. Thus, for these first derivatives,
-$`\partial f / \partial x = (\partial f / \partial \log x) / x`$, up to
-finite-difference approximation error.
+numerically. Thus, for these first derivatives, \partial f / \partial x
+= (\partial f / \partial \log x) / x, up to finite-difference
+approximation error.
 
 In
 [`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md),
@@ -397,13 +397,13 @@ range of `log(x)` when differentiating on that smooth coordinate, or of
 in the covariate’s units and normally stays the same when prediction
 data are split into batches.
 
-For derivative order $`d`$, the range is multiplied by
-$`\epsilon_{\mathrm{machine}}^{1/(d+p)}`$, where $`p=2`$ for central
-differences and $`p=1`$ for forward or backward differences. This
-balances the orders of rounding and approximation error; for example,
-second central differences use the fourth root of machine precision.
-Constant coordinates use their magnitude instead of their range, with a
-fallback of one at zero. A lower bound and rounding of the step ensure
+For derivative order d, the range is multiplied by
+\epsilon\_{\mathrm{machine}}^{1/(d+p)}, where p=2 for central
+differences and p=1 for forward or backward differences. This balances
+the orders of rounding and approximation error; for example, second
+central differences use the fourth root of machine precision. Constant
+coordinates use their magnitude instead of their range, with a fallback
+of one at zero. A lower bound and rounding of the step ensure
 representable perturbations at large coordinates.
 
 This rule does not estimate a universally optimal step: that would also

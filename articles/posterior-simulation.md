@@ -23,70 +23,66 @@ vapply(pkgs, library, logical(1L), logical.return = TRUE, character.only = TRUE)
 
 A generalized additive model (GAM) has the following form
 
-``` math
-g(\mu_i) = \eta_i = A_i + \mathbf{X}_i \boldsymbol{\gamma} + \sum_{j=1}^{J} f_j(x_{ij}), \; y_i \sim \mathcal{D}(\mu_i, \phi)
-```
+g(\mu_i) = \eta_i = A_i + \mathbf{X}\_i \boldsymbol{\gamma} +
+\sum\_{j=1}^{J} f_j(x\_{ij}), \\ y_i \sim \mathcal{D}(\mu_i, \phi)
 
-where $`g()`$ is the link function, $`A`$ is an offset, $`\mathbf{X}_i`$
-is the $`i`$th row of a parametric model matrix, $`\boldsymbol{\gamma}`$
-is a vector of parameters for the parametric terms, $`f_j`$ is a smooth
-function of covariate $`x_j`$. $`y_i \sim \mathcal{D}(\mu_i, \phi)`$
-denotes that the observations $`y_i`$ are distributed as some member of
-the exponential family of distributions with mean $`\mu_i`$ and scale
-parameter $`\phi`$.
+where g() is the link function, A is an offset, \mathbf{X}\_i is the ith
+row of a parametric model matrix, \boldsymbol{\gamma} is a vector of
+parameters for the parametric terms, f_j is a smooth function of
+covariate x_j. y_i \sim \mathcal{D}(\mu_i, \phi) denotes that the
+observations y_i are distributed as some member of the exponential
+family of distributions with mean \mu_i and scale parameter \phi.
 
-The smooth functions $`f_j`$ are represented in the model via penalised
+The smooth functions f_j are represented in the model via penalised
 splines basis expansions of the covariates, that are a weighted sum of
 basis functions
 
-``` math
-f_j(x_{ij}) = \sum_{k=1}^{K} \beta_{jk} b_{jk}(x_{ij})
-```
+f_j(x\_{ij}) = \sum\_{k=1}^{K} \beta\_{jk} b\_{jk}(x\_{ij})
 
-where $`\beta_{jk}`$ is the weight (coefficient) associated with the
-$`k`$th basis function $`b_{jk}()`$ evaluated at the covariate value
-$`x_{ij}`$ for the $`j`$th smooth function $`f_j`$. Wiggliness penalties
-$`\sum_j \lambda_j \boldsymbol{\beta}^{\mathsf{T}} \mathbf{S}_j \boldsymbol{\beta}`$
-controls the degree of smoothing applied to the $`f_j`$ through the
-smoothing parameters $`\lambda_j`$.
+where \beta\_{jk} is the weight (coefficient) associated with the kth
+basis function b\_{jk}() evaluated at the covariate value x\_{ij} for
+the jth smooth function f_j. Wiggliness penalties \sum_j \lambda_j
+\boldsymbol{\beta}^{\mathsf{T}} \mathbf{S}\_j \boldsymbol{\beta}
+controls the degree of smoothing applied to the f_j through the
+smoothing parameters \lambda_j.
 
 Having fitted the GAM in mgcv using REML or ML smoothness selection we
-obtain a vector of coefficients $`\hat{\boldsymbol{\beta}}`$ (which also
+obtain a vector of coefficients \hat{\boldsymbol{\beta}} (which also
 includes the coefficients for the parametric terms, , for convenience).
 The estimates of these coefficients are conditional upon the data and
-the selected values of the smoothing parameters $`\lambda_j`$. Using the
+the selected values of the smoothing parameters \lambda_j. Using the
 Bayesian view of smoothing (Miller, 2025) via (RE)ML smoothness
-selection, $`\boldsymbol{\beta}`$ has a multivariate normal posterior
-distribution
-$`\boldsymbol{\beta} | \boldsymbol{\eta}, \boldsymbol{\lambda} \sim \text{MVN}(\hat{\boldsymbol{\beta}}, \mathbf{V}_{\text{b}})`$,
-where $`\mathbf{V}_{\text{b}}`$ is the Bayesian covariance matrix of the
-estimated parameters ($`\hat{\boldsymbol{\beta}}`$) — the subscript
-$`\text{b}`$ is used to differentiate this Bayesian covariance matrix
-from the frequentist version which is also available in the mgcv model
-output.
+selection, \boldsymbol{\beta} has a multivariate normal posterior
+distribution \boldsymbol{\beta} \| \boldsymbol{\eta},
+\boldsymbol{\lambda} \sim \text{MVN}(\hat{\boldsymbol{\beta}},
+\mathbf{V}\_{\text{b}}), where \mathbf{V}\_{\text{b}} is the Bayesian
+covariance matrix of the estimated parameters (\hat{\boldsymbol{\beta}})
+— the subscript \text{b} is used to differentiate this Bayesian
+covariance matrix from the frequentist version which is also available
+in the mgcv model output.
 
 ## What are we simulating?
 
 Posterior simulation involves randomly sampling from
-$`\text{MVN}(\hat{\boldsymbol{\beta}}, \mathbf{V}_{\text{b}})`$ or
-$`\mathcal{D}(\mu_i, \phi)`$, or both.
+\text{MVN}(\hat{\boldsymbol{\beta}}, \mathbf{V}\_{\text{b}}) or
+\mathcal{D}(\mu_i, \phi), or both.
 
 We might simulate from the posterior distribution of a single estimated
 smooth function to see the uncertainty in the estimate of that function.
-To do this we simulate for just a subset of $`\boldsymbol{\beta}`$,
-$`\beta_{j}`$, associated with the $`f_j`$ of interest. Instead, we
-might be interested in the uncertainty in the expectation (expected
-value) of the model at some given values of the covariates, in which
-case we can simulate for all $`\boldsymbol{\beta}`$ to sample from the
-posterior of $`\mathbb{E}(y_i)`$, the fitted values of the model. Or we
-might want to generate new values of response variable via draws from
-the conditional distribution of the response, by simulating new response
-data $`\mathbf{y}^{\ast}`$, at either the observed $`\mathbf{x}`$ or new
-values $`\mathbf{x}^{\ast}`$, from
-$`y^{\ast}_i | \boldsymbol{\eta}, \mathbf{x} \sim \mathcal{D}(\hat{\mu_i}, \phi)`$.
-Finally, we can combine posterior simulation from both distributions to
-generate posterior draws for new data $`\mathbb{y}^{\ast}`$ that also
-include the uncertainty in the expected values.
+To do this we simulate for just a subset of \boldsymbol{\beta},
+\beta\_{j}, associated with the f_j of interest. Instead, we might be
+interested in the uncertainty in the expectation (expected value) of the
+model at some given values of the covariates, in which case we can
+simulate for all \boldsymbol{\beta} to sample from the posterior of
+\mathbb{E}(y_i), the fitted values of the model. Or we might want to
+generate new values of response variable via draws from the conditional
+distribution of the response, by simulating new response data
+\mathbf{y}^{\ast}, at either the observed \mathbf{x} or new values
+\mathbf{x}^{\ast}, from y^{\ast}\_i \| \boldsymbol{\eta}, \mathbf{x}
+\sim \mathcal{D}(\hat{\mu_i}, \phi). Finally, we can combine posterior
+simulation from both distributions to generate posterior draws for new
+data \mathbb{y}^{\ast} that also include the uncertainty in the expected
+values.
 
 gratia has functionality for all these options through the following
 functions
@@ -95,12 +91,11 @@ functions
     generates draws from the posterior distribution of single estimated
     smooth functions,
 2.  [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
-    generates draws from the posterior distribution of
-    $`\mathbb{E}(y_i | \mathbf{X}_i = x_i)`$, the expected value of the
-    response,
+    generates draws from the posterior distribution of \mathbb{E}(y_i \|
+    \mathbf{X}\_i = x_i), the expected value of the response,
 3.  [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md)
     generates new response data given supplied values of covariates
-    $`y^{\ast}_i | \mathbf{X}_i = x^{\ast}_i`$
+    y^{\ast}\_i \| \mathbf{X}\_i = x^{\ast}\_i
 4.  [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md),
     generates draws from the posterior distribution of the model,
     including the uncertainty in the estimated parameters of that model.
@@ -123,15 +118,15 @@ known.
 
 It is worth reminding ourselves that these posterior draws are all
 conditional upon the selected values of the smoothing parameter(s)
-$`\lambda_j`$. We act as if the wiggliness of the estimated smooths was
+\lambda_j. We act as if the wiggliness of the estimated smooths was
 known, when in actual fact we estimated (selected is perhaps a better
 description) these wiglinesses from the data during model fitting. If
 the estimated GAM has been fitted with `method` argument `"REML"`, or
-`"ML"`, then a version of $`\mathbf{V}_{\text{b}}`$ that is corrected
-for having selected smoothing parameters, $`\mathbf{V}_{\text{c}}`$, is
+`"ML"`, then a version of \mathbf{V}\_{\text{b}} that is corrected for
+having selected smoothing parameters, \mathbf{V}\_{\text{c}}, is
 generally available. This allows, to an extent, for posterior simulation
 to account for the additional source of uncertainty of having chosen
-then values of $`\boldsymbol{\lambda}`$.
+then values of \boldsymbol{\lambda}.
 
 There are two additional functions available in gratia that do posterior
 simulation:
@@ -171,13 +166,13 @@ simulation functions in turn.
 ## Posterior smooths and `smooth_samples()`
 
 We can sample from the posterior distribution of the coefficients of a
-particular smooth $`\hat{\beta}_j`$ given the values of the smoothing
-parameters $`\hat{\boldsymbol{\lambda}}`$. We generate posterior samples
-of smooths by sampling
-$`\boldsymbol{\beta}_{j\star} \sim N(\hat{\beta}_j, \mathbf{V}_{\hat{\beta}_j})`$
-and forming
-$`\mathbf{X}_{\hat{\boldsymbol{\beta}}_j} \boldsymbol{\beta}_{j\star}^{\mathsf{T}}`$.
-This sampling can be done using
+particular smooth \hat{\beta}\_j given the values of the smoothing
+parameters \hat{\boldsymbol{\lambda}}. We generate posterior samples of
+smooths by sampling \boldsymbol{\beta}\_{j\star} \sim N(\hat{\beta}\_j,
+\mathbf{V}\_{\hat{\beta}\_j}) and forming
+\mathbf{X}\_{\hat{\boldsymbol{\beta}}\_j}
+\boldsymbol{\beta}\_{j\star}^{\mathsf{T}}. This sampling can be done
+using
 [`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md).
 
 To illustrate this, we’ll simulate data from Gu & Wahba’s 4 smooth
@@ -191,8 +186,8 @@ m_ss <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = ss_df, method = "REML")
 
 When we are simulating from the posterior distribution of an estimated
 smooth, we are only sampling from the coefficients of the particular
-smooth. In this model, the coefficients for the smooth $`f(x_0)`$ are
-stored as elements 2 through 10 of the coefficients vector.
+smooth. In this model, the coefficients for the smooth f(x_0) are stored
+as elements 2 through 10 of the coefficients vector.
 
 ``` r
 
@@ -264,9 +259,9 @@ sm_est |>
 
 Following Marra & Wood (2012), the blue credible interval will contain
 on average 95% of the grey lines (posterior smooths) at any given value
-of $`x_0`$. This *across the function* frequentist interpretation of the
-credible interval implies that for some values of $`x_0`$ the coverage
-will be less than 95% and for other values greater than 95%.
+of x_0. This *across the function* frequentist interpretation of the
+credible interval implies that for some values of x_0 the coverage will
+be less than 95% and for other values greater than 95%.
 
 ## Posterior fitted values via `fitted_samples()`
 
@@ -284,9 +279,7 @@ In this example, using
 [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md)
 we simulate data from example 6 of Luo & Wahba (1997)
 
-``` math
 \sin(2 \cdots(4x - 2)) + 2 \cdots\exp(-256 \cdots(x - 0.5)^2)
-```
 
 ``` r
 
@@ -514,20 +507,19 @@ uncertainty or error that arises from drawing observations from the
 conditional distribution of the response.
 
 For example, in a Gaussian GAM, the first source of uncertainty comes
-from the uncertainty in the estimates of $`\beta_j`$, the model
+from the uncertainty in the estimates of \beta_j, the model
 coefficients. This uncertainty is in the mean or expected value of the
 response. The second source of uncertainty stems from the error term,
 the estimated variance of the response. These two parameters define the
-conditional distribution of $`Y_i`$. For any value of the covariate(s)
-$`\mathbf{X}`$, our estimated model defines the entire distribution of
-the response values we might expect to observe at those covariate
-values.
+conditional distribution of Y_i. For any value of the covariate(s)
+\mathbf{X}, our estimated model defines the entire distribution of the
+response values we might expect to observe at those covariate values.
 
 To illustrate, we’ll fit a simple GAM with a single smooth function to
-data simulate from Gu & Wahba’s function $`f_2`$ using
+data simulate from Gu & Wahba’s function f_2 using
 [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md).
 We simulate 400 values from a Gaussian distribution with variance
-$`\sigma^2 = 1`$.
+\sigma^2 = 1.
 
 ``` r
 
@@ -554,9 +546,9 @@ A GAM for these data contains a single smooth function of `x`
 m <- gam(y ~ s(x), data = df, method = "REML", family = gaussian())
 ```
 
-If we consider a new value of the covariate `x`, $`x^{\ast} = 0.5`$, the
-expected value of the response given our model,
-$`\mathbb{E}(y^{*} | x = x^{*})`$, is ~2.92, which we obtain using
+If we consider a new value of the covariate `x`, x^{\ast} = 0.5, the
+expected value of the response given our model, \mathbb{E}(y^{\*} \| x =
+x^{\*}), is ~2.92, which we obtain using
 [`predict()`](https://rdrr.io/r/stats/predict.html)
 
 ``` r
@@ -569,14 +561,14 @@ mu
 
 This value is the *mean* of a Gaussian distribution that, if our model
 is a correct description of the data, describes the distribution of the
-values that $`Y`$ might take when $`x = 0.5`$. The Gaussian distribution
-is defined by two parameters; the mean, $`\mu`$, which describes the
-middle of the distribution, and the variance, $`\sigma^2`$, which
-describes how spread out the distribution is about the mean. To fully
-describe the Gaussian distribution of the response when $`x = 0.5`$, we
-need an estimate of the variance. We didn’t model this explicitly in the
-our GAM, but we get an estimate any from the model’s scale parameter,
-$`\phi`$. This is stored as the element `scale` in the model object
+values that Y might take when x = 0.5. The Gaussian distribution is
+defined by two parameters; the mean, \mu, which describes the middle of
+the distribution, and the variance, \sigma^2, which describes how spread
+out the distribution is about the mean. To fully describe the Gaussian
+distribution of the response when x = 0.5, we need an estimate of the
+variance. We didn’t model this explicitly in the our GAM, but we get an
+estimate any from the model’s scale parameter, \phi. This is stored as
+the element `scale` in the model object
 
 ``` r
 
@@ -603,10 +595,10 @@ df |>
 ![](posterior-simulation_files/figure-html/unnamed-chunk-9-1.png)
 
 The orange region shows the expected density of response values at
-$`x^{\ast} = 0.5`$ that our model predicts we could expect to observe.
-This region assumes there is no uncertainty in the estimate of the mean
-of variance. Prediction intervals take into account the variation about
-the expected value, plus the uncertainty in the expected value.
+x^{\ast} = 0.5 that our model predicts we could expect to observe. This
+region assumes there is no uncertainty in the estimate of the mean of
+variance. Prediction intervals take into account the variation about the
+expected value, plus the uncertainty in the expected value.
 [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
 conveniently returns this uncertainty for us, which by default is a 95%
 credible interval
@@ -624,9 +616,8 @@ The `.se` column is the standard error (standard deviation) of the
 estimated value (`.fitted`), while `.lower_ci` and `.upper_ci` are lower
 and upper uncertainty bounds (at the 95% level) on the estimated value
 respectively. With GAMs fitted through mgcv we don’t have a
-corresponding estimate of the uncertainty in the scale parameter,
-$`\phi`$, which for this model is the estimated standard deviation
-$`\hat{\sigma}`$.
+corresponding estimate of the uncertainty in the scale parameter, \phi,
+which for this model is the estimated standard deviation \hat{\sigma}.
 
 While it would be pretty easy to compute upper and lower tail quantiles
 of the fitted Gaussian distribution for a range of values of `x` to get
@@ -695,7 +686,7 @@ get a more precise estimate of the prediction interval, but we keep the
 number low in this vignette to avoid excessive computation time. We’re
 also using the smoothness parameter selection corrected version of the
 Bayesian covariance matrix; this matrix has been adjusted to account for
-us not knowing the value of the smoothing parameter for $`f(x_i)`$.
+us not knowing the value of the smoothing parameter for f(x_i).
 
 `ps` is a tibble, with `n * nrow(ds)` rows. The `.draw` variable groups
 the simulated values by posterior draw, while `.row` groups posterior

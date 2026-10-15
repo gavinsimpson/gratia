@@ -91,9 +91,7 @@ encounter and positive-density questions explicit. Its first component
 models whether density is positive using a logit link; its second models
 positive density using a Gamma distribution and log link. Thus
 
-``` math
- E(Y_i) = \Pr(Y_i > 0)\,E(Y_i\mid Y_i>0).
-```
+E(Y_i) = \Pr(Y_i \> 0)\\E(Y_i\mid Y_i\>0).
 
 Depth need not have the same effect on both components. Each has its own
 smooth coefficients and spatial fields. A persistent field represents
@@ -616,8 +614,8 @@ summary_draws |>
 #>   <chr>                   <chr>             <dbl>   <dbl>   <dbl>    <dbl>
 #> 1 New fields              density_95th    180.    149.    241.     157.   
 #> 2 New fields              proportion_zero   0.494   0.412   0.614    0.538
-#> 3 Uncertain fitted fields density_95th    158.    140.    181.     157.   
-#> 4 Uncertain fitted fields proportion_zero   0.538   0.526   0.551    0.538
+#> 3 Uncertain fitted fields density_95th    157.    141.    176.     157.   
+#> 4 Uncertain fitted fields proportion_zero   0.542   0.527   0.556    0.538
 ```
 
 The conditional comparison asks whether new responses around the

@@ -11,7 +11,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -192,18 +193,13 @@ panel shows Poisson variation around the fitted means.</p>
 <div class="section level3">
 <h3 id="put-different-responses-on-a-common-diagnostic-scale">Put different responses on a common diagnostic scale<a class="anchor" aria-label="anchor" href="#put-different-responses-on-a-common-diagnostic-scale"></a>
 </h3>
-<p>For a count
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
-with fitted cumulative distribution function
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math>,
-a PIT residual is a random draw between
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo stretchy="false" form="prefix">(</mo><mi>y</mi><mo>−</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">F(y-1)</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo stretchy="false" form="prefix">(</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">F(y)</annotation></semantics></math>.
-Quantile residuals apply the standard-normal quantile function to that
-probability. This randomisation avoids artificial steps caused by
-integer responses. For continuous outcomes the probability is simply
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo stretchy="false" form="prefix">(</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">F(y)</annotation></semantics></math>.</p>
+<p>For a count <span class="math inline">y</span> with fitted cumulative
+distribution function <span class="math inline">F</span>, a PIT residual
+is a random draw between <span class="math inline">F(y-1)</span> and
+<span class="math inline">F(y)</span>. Quantile residuals apply the
+standard-normal quantile function to that probability. This
+randomisation avoids artificial steps caused by integer responses. For
+continuous outcomes the probability is simply <span class="math inline">F(y)</span>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">u</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/quantile_residuals.html">quantile_residuals</a></span><span class="op">(</span><span class="va">count_fit</span>, type <span class="op">=</span> <span class="st">"pit"</span>, seed <span class="op">=</span> <span class="fl">302</span><span class="op">)</span></span>
 <span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/quantile_residuals.html">quantile_residuals</a></span><span class="op">(</span><span class="va">count_fit</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="fl">302</span><span class="op">)</span></span>
@@ -330,9 +326,9 @@ child, very detailed individual curves are not supported.</p>
 <span>  data <span class="op">=</span> <span class="va">growth</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">growth_fit</span><span class="op">)</span><span class="op">$</span><span class="va">tTable</span></span>
 <span><span class="co">#&gt;                      Value  Std.Error DF   t-value      p-value</span></span>
-<span><span class="co">#&gt; (Intercept)     24.9687500 0.48600071 79 51.375954 1.812711e-62</span></span>
-<span><span class="co">#&gt; SexFemale       -2.3210227 0.76141677 25 -3.048295 5.375052e-03</span></span>
-<span><span class="co">#&gt; age_c            0.7843750 0.08599951 79  9.120691 5.654752e-14</span></span>
+<span><span class="co">#&gt; (Intercept)     24.9687500 0.48600069 79 51.375956 1.812707e-62</span></span>
+<span><span class="co">#&gt; SexFemale       -2.3210227 0.76141675 25 -3.048295 5.375051e-03</span></span>
+<span><span class="co">#&gt; age_c            0.7843750 0.08599951 79  9.120692 5.654744e-14</span></span>
 <span><span class="co">#&gt; SexFemale:age_c -0.3048295 0.13473534 79 -2.262432 2.641752e-02</span></span></code></pre></div>
 <p>The age coefficient describes mean growth in the reference sex, and
 the interaction describes a difference in age slopes. The fitted random

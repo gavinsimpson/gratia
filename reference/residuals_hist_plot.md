@@ -17,7 +17,8 @@ residuals_hist_plot(
   seed = NULL,
   by_family = NULL,
   conditioning = NULL,
-  ...
+  ...,
+  n_dharma = 250L
 )
 ```
 
@@ -31,10 +32,10 @@ residuals_hist_plot(
 - type:
 
   character or `NULL`; residual type: `"deviance"`, `"pearson"`,
-  `"response"`, `"pit"`, or `"quantile"`. Grouped models automatically
-  use quantile residuals when all active components are supported,
-  otherwise all use deviance residuals with a message. Ordinary models
-  retain deviance residuals by default. See
+  `"response"`, `"pit"`, `"quantile"`, or `"dharma"`. Grouped models
+  automatically use quantile residuals when all active components are
+  supported, otherwise all use deviance residuals with a message.
+  Ordinary models retain deviance residuals by default. See
   [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
   for distributional support.
 
@@ -70,7 +71,8 @@ residuals_hist_plot(
 
 - seed:
 
-  integer; random seed to use for PIT or quantile residuals.
+  integer; random seed to use for PIT, quantile or DHARMa-style
+  residuals.
 
 - by_family:
 
@@ -96,6 +98,12 @@ residuals_hist_plot(
 
   optional arguments passed to model preparation, such as the sdmTMB
   `field_method`.
+
+- n_dharma:
+
+  positive integer; number of response simulations for
+  `type = "dharma"`. This is separate from `n_simulate`, which controls
+  traditional QQ reference calculations. Defaults to 250.
 
 ## Details
 

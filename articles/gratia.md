@@ -137,7 +137,7 @@ smooths(m)
 #> [1] "s(x0)" "s(x1)" "s(x2)" "s(x3)"
 ```
 
-To evaluate only $`f(x_2)`$ use
+To evaluate only f(x_2) use
 
 ``` r
 

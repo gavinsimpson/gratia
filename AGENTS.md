@@ -47,6 +47,18 @@ Before merging into `main`, inspect the commits and diff relative to
 `main` and verify that the merge includes only the intended work.
 Resolve any accidentally inherited commits before merging.
 
+## Documentation topics and the pkgdown reference index
+
+When adding a documentation topic, update the reference index in
+`pkgdown/_pkgdown.yml` in the same change. Place each public topic in
+the appropriate reference section. For a topic intended only for
+internal use, mark it with `@keywords internal` in its roxygen source
+instead.
+
+Before committing, check that every new public topic is included in the
+index and validate the reference index with pkgdown. A missing topic
+causes the website build to fail.
+
 ## Running tests
 
 Run all package tests and checks outside the sandbox from the outset,

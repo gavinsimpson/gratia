@@ -33,10 +33,11 @@ scalable_qq_plot(
   line_col = "red",
   by_family = NULL,
   conditioning = NULL,
-  ...
+  ...,
+  n_dharma = 250L
 )
 
-scalable_worm_plot(model, ...)
+scalable_worm_plot(model, ..., n_dharma = 250L)
 
 scalable_residuals_linpred_plot(
   model,
@@ -55,7 +56,8 @@ scalable_residuals_linpred_plot(
   density_method = c("kde", "histogram"),
   bandwidth = NULL,
   conditioning = NULL,
-  ...
+  ...,
+  n_dharma = 250L
 )
 
 scalable_observed_fitted_plot(
@@ -84,7 +86,8 @@ scalable_residuals_hist_plot(
   caption = NULL,
   by_family = NULL,
   conditioning = NULL,
-  ...
+  ...,
+  n_dharma = 250L
 )
 ```
 
@@ -225,6 +228,12 @@ scalable_residuals_hist_plot(
   including sdmTMB `field_method`. For `scalable_worm_plot()`, other
   arguments pass to `scalable_qq_plot()` except its internal worm
   setting.
+
+- n_dharma:
+
+  positive integer; number of response simulations for
+  `type = "dharma"`. This is separate from `n_simulate`, which controls
+  traditional QQ reference calculations. Defaults to 250.
 
 - density_bins:
 

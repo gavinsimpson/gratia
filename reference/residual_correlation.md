@@ -13,7 +13,8 @@ residual_correlation(
   lag_max = 20L,
   series = NULL,
   seed = NULL,
-  ...
+  ...,
+  n_dharma = 250L
 )
 
 residual_correlation_plot(
@@ -22,7 +23,8 @@ residual_correlation_plot(
   lag_max = 20L,
   series = NULL,
   seed = NULL,
-  ...
+  ...,
+  n_dharma = 250L
 )
 ```
 
@@ -64,6 +66,12 @@ residual_correlation_plot(
   arguments used to prepare the model for diagnostics, including
   `conditioning` and, for sdmTMB, `field_method`.
 
+- n_dharma:
+
+  positive integer; number of response simulations for
+  `type = "dharma"`. This is separate from `n_simulate`, which controls
+  traditional QQ reference calculations. Defaults to 250.
+
 ## Value
 
 `residual_correlation()` returns a tibble with lag, correlation and the
@@ -71,6 +79,10 @@ number of finite observation pairs used at each lag.
 `residual_correlation_plot()` returns a ggplot.
 
 ## Details
+
+Use `type = "dharma"` and `n_dharma` for simulation-based PIT residuals
+on the uniform scale; see
+[`dharma_residuals()`](https://gavinsimpson.github.io/gratia/reference/dharma_residuals.md).
 
 BAM's generalized estimating equations (GEE) AR1 correction acts on the
 weighted working response used for fitting. Whitening these working

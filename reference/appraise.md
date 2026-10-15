@@ -38,7 +38,8 @@ appraise(
   bandwidth = NULL,
   conditioning = NULL,
   ppc_batch_size = 10L,
-  ...
+  ...,
+  n_dharma = 250L
 )
 
 # S3 method for class 'lm'
@@ -48,7 +49,14 @@ appraise(model, ...)
 appraise(model, ..., type = "quantile", seed = NULL, conditioning = NULL)
 
 # Default S3 method
-appraise(model, ..., type = NULL, seed = NULL, conditioning = NULL)
+appraise(
+  model,
+  ...,
+  type = NULL,
+  seed = NULL,
+  conditioning = NULL,
+  n_dharma = 250L
+)
 
 # S3 method for class 'gamm4'
 appraise(model, conditioning = NULL, ...)
@@ -152,12 +160,12 @@ appraise(
 - type:
 
   character or `NULL`; residual type: `"deviance"`, `"response"`,
-  `"pearson"`, `"pit"`, or `"quantile"`. `NULL` uses the model-specific
-  default: deviance for ordinary lm/glm/GAM fits, and quantile for
-  supported grouped families, GJRM, sdmTMB and full mixed-model checks.
-  glmmTMB uses Pearson residuals conditionally and response residuals
-  marginally. Extracted GAM components follow the ordinary GAM defaults.
-  See
+  `"pearson"`, `"pit"`, `"quantile"`, or `"dharma"`. `NULL` uses the
+  model-specific default: deviance for ordinary lm/glm/GAM fits, and
+  quantile for supported grouped families, GJRM, sdmTMB and full
+  mixed-model checks. glmmTMB uses Pearson residuals conditionally and
+  response residuals marginally. Extracted GAM components follow the
+  ordinary GAM defaults. See
   [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - n_bins:
@@ -286,6 +294,12 @@ appraise(
   together for scalable plots. Changing the batch size does not change
   results for a fixed seed.
 
+- n_dharma:
+
+  positive integer; number of response simulations for
+  `type = "dharma"`. This is separate from `n_simulate`, which controls
+  traditional QQ reference calculations. Defaults to 250.
+
 - component:
 
   character; for delta sdmTMB models, select the complete `"response"`,
@@ -303,6 +317,18 @@ appraise(
   [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 ## Details
+
+Use `type = "dharma"` for simulation-based PIT residuals calculated
+internally using gratia's response generators; no DHARMa or mgcViz
+dependency is needed. These residuals lie in `[0, 1]`, including exact
+endpoints, and do not require a response CDF. `n_dharma` controls their
+simulation count. All residual panels share one calculated vector. QQ
+and worm plots require `method = NULL` and use uniform reference
+quantiles, with approximate pointwise bands for independent responses.
+Bands are omitted for dependent responses. Censored and multivariate
+outcomes are unsupported. See
+[`dharma_residuals()`](https://gavinsimpson.github.io/gratia/reference/dharma_residuals.md)
+for the calculation.
 
 With `type = NULL`, ordinary lm/glm/GAM fits use deviance residuals.
 Models fitted with

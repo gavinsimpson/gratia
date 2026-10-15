@@ -30,7 +30,7 @@ library("ggplot2")
 The [Nile
 data](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/Nile.html)
 contain 100 annual flow measurements at Aswan from 1871 to 1970,
-measured in units of $`10^8`$ cubic metres. The question here is
+measured in units of 10^8 cubic metres. The question here is
 descriptive: what broad change in mean flow is supported by these
 observations? We adapt the smooth example in the glmmTMB documentation,
 name the variables `year` and `flow`, and fit the same spline with mgcv
@@ -349,12 +349,12 @@ draw(plant_tmb, select = c("(1 | Plant)", "(log_conc | Plant)"),
 
 ![](glmmTMB-support_files/figure-html/plant-random-lines-1.png)
 
-These lines are each plant’s random contribution $`b_{0j} + x b_{1j}`$
-on the log scale. They do not include the shared curve or treatment
-means and have no uncertainty bands. This display requires a simple
-numeric intercept-slope pair from the same formula term. Multiple
-slopes, transformed or factor slopes, and structured covariance terms
-retain separate QQ panels.
+These lines are each plant’s random contribution b\_{0j} + x b\_{1j} on
+the log scale. They do not include the shared curve or treatment means
+and have no uncertainty bands. This display requires a simple numeric
+intercept-slope pair from the same formula term. Multiple slopes,
+transformed or factor slopes, and structured covariance terms retain
+separate QQ panels.
 
 The interaction deserves a focused view rather than interpreting two
 main effects separately:

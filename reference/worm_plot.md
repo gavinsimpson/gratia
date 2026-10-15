@@ -28,7 +28,8 @@ worm_plot(
   seed = NULL,
   by_family = NULL,
   conditioning = NULL,
-  ...
+  ...,
+  n_dharma = 250L
 )
 
 # S3 method for class 'glm'
@@ -119,12 +120,12 @@ worm_plot(
 - type:
 
   character or `NULL`; residual type: `"deviance"`, `"response"`,
-  `"pearson"`, `"pit"`, or `"quantile"`. `NULL` uses the model-specific
-  default: deviance for ordinary lm/glm/GAM fits, and quantile for
-  supported grouped families, GJRM, sdmTMB and full mixed-model checks.
-  glmmTMB uses Pearson residuals conditionally and response residuals
-  marginally. Extracted GAM components follow the ordinary GAM defaults.
-  See
+  `"pearson"`, `"pit"`, `"quantile"`, or `"dharma"`. `NULL` uses the
+  model-specific default: deviance for ordinary lm/glm/GAM fits, and
+  quantile for supported grouped families, GJRM, sdmTMB and full
+  mixed-model checks. glmmTMB uses Pearson residuals conditionally and
+  response residuals marginally. Extracted GAM components follow the
+  ordinary GAM defaults. See
   [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - n_uniform:
@@ -217,6 +218,12 @@ worm_plot(
   uses the extracted GAM. Availability and defaults depend on the model;
   see
   [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
+
+- n_dharma:
+
+  positive integer; number of response simulations for
+  `type = "dharma"`. This is separate from `n_simulate`, which controls
+  traditional QQ reference calculations. Defaults to 250.
 
 - component:
 

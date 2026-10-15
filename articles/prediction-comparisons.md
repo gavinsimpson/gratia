@@ -441,12 +441,12 @@ data.frame(conc = rate_grid$conc,
 #> 60                                     0.0001294328
 ```
 
-For a smooth contribution $`f(\log c)`$ the chain rule gives
-$`df/dc = (df/d\log c)/c`$. The two columns agree up to numerical
-approximation. Both concern the smooth’s contribution to **log uptake**,
-not uptake itself. `response_derivatives(..., focal = "conc")`
-differentiates complete fitted responses in raw concentration units
-instead. For tensor smooths such as `te(log(conc), temperature)`, use
+For a smooth contribution f(\log c) the chain rule gives df/dc =
+(df/d\log c)/c. The two columns agree up to numerical approximation.
+Both concern the smooth’s contribution to **log uptake**, not uptake
+itself. `response_derivatives(..., focal = "conc")` differentiates
+complete fitted responses in raw concentration units instead. For tensor
+smooths such as `te(log(conc), temperature)`, use
 [`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md)
 with `wrt = "covariate", focal = "conc"` while holding temperature
 fixed. See [Functions of covariates and evaluation

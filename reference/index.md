@@ -163,6 +163,8 @@ individual diagnostic plots, residuals, and measures of concurvity.
 
 - [`diagnostic_support`](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md)
   : Model diagnostic support and conventions
+- [`family_diagnostics`](https://gavinsimpson.github.io/gratia/reference/family_diagnostics.md)
+  : Extend diagnostics for an mgcv-compatible family
 - [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
   : Model diagnostic plots
 - [`qq_plot()`](https://gavinsimpson.github.io/gratia/reference/qq_plot.md)
@@ -189,6 +191,8 @@ individual diagnostic plots, residuals, and measures of concurvity.
   : Plot of residuals versus linear predictor values
 - [`quantile_residuals()`](https://gavinsimpson.github.io/gratia/reference/quantile_residuals.md)
   : PIT and randomised quantile residuals
+- [`dharma_residuals()`](https://gavinsimpson.github.io/gratia/reference/dharma_residuals.md)
+  : Simulation-based PIT residuals
 - [`residual_correlation()`](https://gavinsimpson.github.io/gratia/reference/residual_correlation.md)
   [`residual_correlation_plot()`](https://gavinsimpson.github.io/gratia/reference/residual_correlation.md)
   : Ordered residual correlation diagnostics

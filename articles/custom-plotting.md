@@ -296,7 +296,7 @@ names(eg1)
 Now we have everything we need to recreate the plots created by
 [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md).
 In the code block below we filter `sm` to focus on a specific smooth,
-here $`f(x2)`$ (`"s(x2)"`), then we add
+here f(x2) (`"s(x2)"`), then we add
 
 1.  a rug plot of the observed values of `x2`,
 2.  the credible interval around the estimated smooth,
