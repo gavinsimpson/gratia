@@ -6,8 +6,8 @@ the fitted parameters. The complete contract is documented in
 `?gratia::family_diagnostics`. Existing `$rd`, `$cdf` and `$qf` functions remain
 unchanged. This interface requires no dependency between the two packages.
 
-The native implementation is on inlaws branch `gls/native-gratia-diagnostics`,
-created from main (`aba60178a01b31b703603c47db6ed185b2592ad3`). Every constructor
+The native implementation is published on
+[inlaws main](https://github.com/gam-mafia/inlaws/tree/main). Every constructor
 now creates its factory, including constructors used during fitted-family
 reconstruction. The optional tests use native constructors and fitted families
 without attaching adapters. The prototype helper has been removed.
@@ -16,15 +16,8 @@ The ordinary gratia test suite exercises the interface with custom families and
 does not require inlaws. Run the optional native suite with an installed copy of
 the new inlaws revision using `Rscript tools/test-inlaws-diagnostics.R`.
 
-### Publish inlaws before enabling CI
-
-The previous CI pin, `aba60178a01b31b703603c47db6ed185b2592ad3`, lacks the native
-factories. A new inlaws commit must first be published to `gam-mafia/inlaws`.
-Then set the gratia repository variable `INLAWS_DIAGNOSTICS_REF` to that published
-commit SHA or tag. The Linux native integration job installs exactly that ref.
-Until the variable is set, the optional job is skipped; gratia's ordinary tests
-continue to run. The runner rejects an older inlaws installation explicitly.
-Do not set the variable to a local or unpublished commit.
+The Linux release job with full tests installs `gam-mafia/inlaws` from GitHub
+and runs the native integration suite against its current default branch.
 
 ## Family additions
 

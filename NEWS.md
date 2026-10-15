@@ -2,18 +2,6 @@
 
 ## User visible changes
 
-* Optional inlaws integration uses native diagnostic factories. Grouped-family
-  reconstruction preserves nested fitted-parameter closures, and multivariate
-  diagnostic panels retain supplied response columns and means. The integration
-  CI job requires `INLAWS_DIAGNOSTICS_REF` to name a published native inlaws ref.
-
-* `dharma_residuals()` and `type = "dharma"` in diagnostics now calculate
-  simulation-based PIT residuals using gratia's response generators, without
-  requiring DHARMa or mgcViz. `n_dharma` controls the simulation count. Residuals
-  retain zero and one endpoints and are shared across `appraise()` panels.
-  QQ and worm plots use uniform references with approximate pointwise bands
-  for independent responses; dependent responses omit these bands.
-
 * gratia has a new neon hex logo. The pkgdown site uses the pink
   g from the logo as its favicon.
 
@@ -80,6 +68,17 @@
   the development version of glmmTMB is no longer needed.
 
 ## New features
+
+* Diagnostic plots now support native inlaws families through their supplied
+  `gratia_diagnostics` functions, including grouped-family fits and models
+  with multiple response columns.
+
+* `dharma_residuals()` and `type = "dharma"` in diagnostics now calculate
+  simulation-based PIT residuals using gratia's response generators, without
+  requiring DHARMa or mgcViz. `n_dharma` controls the simulation count. Residuals
+  retain zero and one endpoints and are shared across `appraise()` panels.
+  QQ and worm plots use uniform references with approximate pointwise bands
+  for independent responses; dependent responses omit these bands.
 
 * mgcv-compatible families can now supply a `gratia_diagnostics` function for
   response means, variances, probability bounds and distribution functions.
