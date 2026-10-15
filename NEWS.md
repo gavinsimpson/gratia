@@ -101,6 +101,14 @@
   for `mgcv::scasm()`, including combined shape constraints, tensor surfaces
   and Gamma models with constraints on the log mean and log dispersion.
 
+* `residuals_covariate_plot()` and `scalable_residuals_covariate_plot()`
+  plot complete-model residuals against numeric or categorical covariates and
+  pairs of numeric covariates. Exact mgcv smooth labels can select their
+  constituent covariates. Grouped displays, mean trends and joint maps help
+  identify remaining mean structure or changes in residual spread. By default,
+  mean trends are fitted only for groups with at most 20,000 observations;
+  `smooth = TRUE` or `FALSE` overrides this limit.
+
 * Optional `bayesplot::pp_check()` methods provide posterior predictive checks
   for supported GAMs and mixed models (#278, reported by @nicholasjclark).
 
