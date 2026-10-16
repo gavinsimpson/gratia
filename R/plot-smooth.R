@@ -127,7 +127,15 @@
   }
   default_caption <- scasm_shape_plot_caption(object, default_caption)
   interval_info <- attr(object, "interval_info")
-  if (!is.null(interval_info) && interval_info$interval == "simultaneous") {
+  if (identical(interval_info$method, "shape")) {
+    input <- if (interval_info$interval == "simultaneous") {
+      "grid band (model coordinates)"
+    } else "pointwise limits (uncalibrated)"
+    source <- if (interval_info$source == "gaussian") "Gaussian" else "bootstrap"
+    default_caption <- scasm_caption_append(default_caption,
+      paste0("Shape-enforced ", source, "; initial ",
+        format(100 * interval_info$level), "% ", input))
+  } else if (!is.null(interval_info) && interval_info$interval == "simultaneous") {
     source <- if (identical(interval_info$method, "gaussian") &&
       length(attr(object, "shape_constraints"))) "Gaussian " else ""
     default_caption <- scasm_caption_append(default_caption,

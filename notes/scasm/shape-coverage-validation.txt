@@ -1,0 +1,193 @@
+Finite-grid shape-interval simulation
+
+R: 4.6.1
+mgcv: 1.9.4
+Seed: 20261016
+Level: 0.95
+Exactly binding truth scenarios only: FALSE
+Known-Gaussian repetitions per scenario: 2000
+scasm repetitions attempted per scenario: 400
+Native bootstrap draws: 399
+Gaussian simultaneous calibration draws: 1999
+Lost originally covering whole-grid events: 0
+Unordered transformed intervals: 0
+Increases in maximum interval width: 0
+Maximum discrepancy against independent one-dimensional operators: 2.220446049250313e-16
+Recorded upstream fit failures: 106
+
+Recorded upstream fit warnings: 90
+
+The known-Gaussian experiment starts with exact pointwise or exact whole-grid
+coverage under independent normal errors with known, unequal variances.
+The whole-grid critical value is the exact Sidak value for the listed points.
+Coverage probabilities and Monte Carlo standard errors concern repeated
+independent datasets, not independent locations within a dataset.
+At 95% coverage the Monte Carlo SE is approximately 0.0049 for 2,000
+replications and 0.0109 for 400 replications. Worst-case SE is 0.0112 and
+0.0250 respectively. The CSV reports actual SEs and successful counts.
+
+The scasm experiment uses 148 independent uniform design points and fixed
+endpoints 0 and 1 (n = 150), Gaussian noise SD 0.2, a cubic B-spline basis
+with k = 8, and smoothing selected by
+scasm. The fitted response includes its intercept, so monotonicity and
+convexity restrictions remain appropriate on the response scale.
+Vp denotes approximate Bayesian covariance conditional on fitted smoothing
+parameters; Ve denotes frequentist covariance. The 1,999 fixed normal draws
+are reused to approximate each Gaussian whole-grid critical value. That error is
+additional to the reported binomial Monte Carlo errors for coverage.
+Neither covariance is assumed to yield exact frequentist coverage at a
+binding inequality. Native percentile limits are evaluated with and without
+mgcv's svar.only endpoint correction, using the same bootstrap coefficients.
+A covariance with an eigenvalue below the package's numerical tolerance is
+recorded as a covariance failure and excluded from Gaussian summaries.
+Only negative eigenvalues within rounding tolerance are replaced by zero.
+The low-penalty estimate uses the same model basis and sp = 1e-8. Comparing
+its empirical bias with selected-penalty bias investigates sensitivity to
+smoothing; boundary constraints and finite-basis approximation still apply.
+Its zero-width records are for bias and RMSE only, not interval inference.
+
+The bindings CSV records active fitted inequalities, counted when slack is
+at most 1e-7 times max(1, max(abs(slack))), and the fitted smoothing parameter.
+Shape transformation preserves a simultaneously covering initial band
+sample by sample when the truth obeys the fitted restrictions. It does not
+establish nominal simultaneous coverage for an initially pointwise interval.
+The minimum pointwise coverage is reported because marginal coverage at each
+fixed location need not survive operators that combine locations.
+All evaluations concern finite grids. No result here checks the fitted
+spline between evaluation points or the full continuous domain.
+Failed fits are retained in the failure CSV and omitted from interval
+summaries; the reported scasm coverage is conditional on a fitted model
+being returned without an R error. Returned models with warnings remain
+included, including any convergence warning recorded in the warning CSV.
+The successful-fit counts below refer to this same returned-model event.
+
+Exact fitting counts:
+                   scenario successful_fits attempted_fits failed_fits
+          curved_increasing             400            400           0
+ increasing_convex_boundary             342            400          58
+     nearly_flat_increasing             379            400          21
+       nearly_linear_convex             373            400          27
+
+Binding constraints among successful fits:
+                   scenario fraction_with_active_inequalities
+          curved_increasing                         0.1250000
+ increasing_convex_boundary                         0.9883041
+     nearly_flat_increasing                         0.3324538
+       nearly_linear_convex                         0.9758713
+
+Selected transformed-interval results (source-specific successful counts):
+                   scenario                     source     interval repetitions
+          curved_increasing                gaussian_Vp simultaneous         400
+          curved_increasing native_bootstrap_corrected    pointwise         400
+ increasing_convex_boundary                gaussian_Vp simultaneous         342
+ increasing_convex_boundary native_bootstrap_corrected    pointwise         342
+     nearly_flat_increasing                gaussian_Vp simultaneous         379
+     nearly_flat_increasing native_bootstrap_corrected    pointwise         379
+       nearly_linear_convex                gaussian_Vp simultaneous         373
+       nearly_linear_convex native_bootstrap_corrected    pointwise         373
+ simultaneous_coverage simultaneous_mc_se mean_pointwise_coverage
+               0.95000          0.0108972                 0.99744
+               0.46750          0.0249471                 0.94396
+               0.91520          0.0150637                 0.92569
+               0.90058          0.0161799                 0.96819
+               0.97889          0.0073837                 0.99067
+               0.83113          0.0192436                 0.94762
+               0.98391          0.0065140                 0.99758
+               0.82574          0.0196412                 0.96377
+ minimum_pointwise_coverage maximum_pointwise_mc_se mean_width
+                    0.98500               0.0060776   0.236947
+                    0.77250               0.0209609   0.156244
+                    0.92105               0.0145814   0.126380
+                    0.95029               0.0117524   0.094798
+                    0.98681               0.0058609   0.119000
+                    0.93404               0.0127501   0.080289
+                    0.99196               0.0046249   0.147538
+                    0.91689               0.0142932   0.107334
+
+Known-Gaussian results (including the initial simultaneous-band comparison):
+                   scenario     interval enforced repetitions
+ increasing_convex_positive    pointwise     TRUE        2000
+ increasing_convex_positive simultaneous    FALSE        2000
+ increasing_convex_positive simultaneous     TRUE        2000
+          increasing_tensor    pointwise     TRUE        2000
+          increasing_tensor simultaneous    FALSE        2000
+          increasing_tensor simultaneous     TRUE        2000
+     nearly_flat_decreasing    pointwise     TRUE        2000
+     nearly_flat_decreasing simultaneous    FALSE        2000
+     nearly_flat_decreasing simultaneous     TRUE        2000
+     nearly_flat_increasing    pointwise     TRUE        2000
+     nearly_flat_increasing simultaneous    FALSE        2000
+     nearly_flat_increasing simultaneous     TRUE        2000
+      nearly_linear_concave    pointwise     TRUE        2000
+      nearly_linear_concave simultaneous    FALSE        2000
+      nearly_linear_concave simultaneous     TRUE        2000
+       nearly_linear_convex    pointwise     TRUE        2000
+       nearly_linear_convex simultaneous    FALSE        2000
+       nearly_linear_convex simultaneous     TRUE        2000
+       nearly_zero_positive    pointwise     TRUE        2000
+       nearly_zero_positive simultaneous    FALSE        2000
+       nearly_zero_positive simultaneous     TRUE        2000
+ simultaneous_coverage simultaneous_mc_se mean_pointwise_coverage
+                0.1405          0.0077704                 0.95637
+                0.9585          0.0044597                 0.99895
+                0.9675          0.0039651                 0.99918
+                0.1750          0.0084963                 0.96279
+                0.9495          0.0048964                 0.99895
+                0.9690          0.0038755                 0.99936
+                0.1505          0.0079953                 0.95473
+                0.9550          0.0046355                 0.99889
+                0.9620          0.0042753                 0.99906
+                0.1480          0.0079403                 0.95545
+                0.9485          0.0049421                 0.99874
+                0.9575          0.0045108                 0.99896
+                0.3215          0.0104436                 0.72038
+                0.9460          0.0050539                 0.99865
+                0.9750          0.0034911                 0.99679
+                0.3370          0.0105696                 0.73015
+                0.9475          0.0049872                 0.99870
+                0.9760          0.0034223                 0.99700
+                0.1150          0.0071335                 0.94904
+                0.9385          0.0053720                 0.99848
+                0.9385          0.0053720                 0.99848
+ minimum_pointwise_coverage maximum_pointwise_mc_se mean_width
+                     0.3850               0.0109310    0.35025
+                     0.9970               0.0012229    1.22632
+                     0.9835               0.0028485    0.58288
+                     0.4175               0.0110381    0.74479
+                     0.9965               0.0013206    1.24556
+                     0.9835               0.0028485    1.24556
+                     0.3760               0.0109936    0.74479
+                     0.9970               0.0012229    1.22632
+                     0.9775               0.0033162    1.22632
+                     0.3800               0.0109767    0.74479
+                     0.9975               0.0011166    1.22632
+                     0.9785               0.0032433    1.22632
+                     0.5615               0.0110954    0.63580
+                     0.9975               0.0011166    1.04686
+                     0.9930               0.0018643    1.04686
+                     0.5730               0.0110605    0.63580
+                     0.9970               0.0012229    1.04686
+                     0.9935               0.0017969    1.04686
+                     0.9380               0.0053924    0.37447
+                     0.9940               0.0017268    1.22632
+                     0.9940               0.0017268    0.61538
+
+Failure messages and counts:
+
+      missing value where TRUE/FALSE needed subscript out of bounds
+  fit                                    55                      51
+
+Warning messages and counts:
+
+ min(redf)= -0.0043475777126096 min(redf)= -0.00590610814213268
+                              1                               1
+ min(redf)= -0.0171392428390655   min(redf)= -0.114334964452473
+                              1                               1
+  min(redf)= -0.714573574433538    min(redf)= -1.20981964712853
+                              1                               1
+                  NaNs produced       scasm.pirls not converged
+                             81                               3
+
+The summary, failure, warning and binding CSVs and this script are the
+versioned numerical record. Full replication CSVs remain local generated
+files, ignored by Git, and can be reproduced with the two commands above.

@@ -1,0 +1,209 @@
+Shape-constrained interval implementation and validation
+16 October 2026
+
+Environment: macOS, Apple silicon, R 4.6.1, mgcv 1.9-4.
+Branch: gls/scasm-shape-intervals.
+
+Prerequisite
+
+The worktree was clean and detached at main, 8583e8a13. This feature branch
+was created explicitly from main. The prerequisite 7bb9dfbf1 was absent from
+main and was applied as the separate commit 4617619f8. That commit contains
+the completed scasm audit and native-bootstrap support. Its earlier test
+counts in validation.txt describe that prerequisite, not these changes.
+Neither main nor the original scasm-support checkout was modified.
+
+API and implementation
+
+shape_intervals() accepts estimates, existing endpoints, numeric evaluation
+coordinates and named shape restrictions independently of a fitted model.
+It applies nonnegative range enforcement, directional rearrangement, then
+one directional convex minorant or concave majorant. Curvature uses actual
+coordinate distances. The operators preserve order and fix targets in the
+named shape class; maximum absolute distances cannot increase. Therefore an
+initial band covering the whole evaluation grid continues to cover that
+target after transformation. Maximum width cannot increase, although width
+or marginal coverage at an individual point may change.
+
+This finite-grid argument follows the operators studied by Chernozhukov,
+Fernandez-Val and Galichon (2009) and Chen et al. (2021). The independent
+review in shape-method-review.txt gives proofs and counterexamples for the
+precise finite-grid choices used here. On irregular grids rearrangement
+assigns equal mass to coordinate values, rather than approximating a uniform
+measure on the continuous domain. Endpoint interpolation preserves the
+named directional shapes but does not extend coverage between nodes.
+
+shape_confidence_set() explicitly represents
+  {b: lower <= X b <= upper, Ain b >= bin, C b = d}.
+in_shape_set() checks candidate coefficients. These functions retain coupled
+restrictions and equalities instead of assigning them to endpoint curves.
+They do not optimize over the set, test emptiness, or sample a posterior.
+Intersection preserves the initial whole-grid coverage event exactly for
+feasible truths. A posterior-probability interpretation requires a posterior
+supported on the stated restrictions.
+
+smooth_estimates(), confint(), draw() and assemble() expose the operators
+through interval_method = "shape". shape_source = "gaussian" is the new
+method's default initial source; "bootstrap" uses stored native pointwise
+limits and their existing svar.only correction. Existing interval defaults
+are unchanged. Source, correction, shape, coordinate scale, SE covariance
+and coverage metadata are retained. Saved, nested and subset estimates draw
+their stored endpoints; add_confint() replaces them with Gaussian pointwise
+limits and removes the shape-enforcement metadata.
+
+The default Gaussian covariance is an approximate Bayesian covariance, not
+a posterior restricted to feasible functions. frequentist selects Ve, and
+unconditional retains the existing Gaussian covariance selection. Plotting
+now forwards frequentist for smooth components. Parametric intervals retain
+their existing covariance calculation. Native bootstrap shape limits reject
+frequentist or unconditional requests, since stored draws hold smoothing
+fixed and the native endpoint correction uses the Bayesian/frequentist SE gap.
+
+Eligibility and explicit omissions
+
+Automatic model integration requires retained named scasm restrictions for
+every selected component. Univariate B-splines and safe te() tensors are
+supported, including factor-by components and separate linear predictors.
+Tensors require np = FALSE and univariate nonnegative B-spline margins;
+curvature requires regular fitted knots and degree at least two. Evaluation
+must remain inside their basis domains, on complete finite product grids.
+Use dist = 0 for tensors. Missing rows and duplicate grid rows are rejected.
+Transformed covariates are evaluated normally; shape concerns model coordinates.
+
+The stricter tensor rule matters: installed mgcv 1.9-4 can retain coefficient
+inequalities while its default normal reparameterisation permits decreasing
+function slices. Irregular fitted knots can likewise invalidate a named
+curvature restriction. Independently verified numerical counterexamples are
+recorded in shape-method-review.txt. The engine rejects these automatic uses
+instead of inferring function shapes from inequality retention alone.
+
+Monotonicity may be enforced in several directions; curvature is limited to
+one direction. A second directional convexification can destroy the first.
+General coupled inequalities and equalities use the explicit set API.
+Numeric by variables, overall mean uncertainty, effect shifts and effect
+transformations are unsupported for automatic shape intervals. Full fitted
+values and derivatives retain their existing interval methods; their shapes
+need separate derivations before automatic integration. Several extreme
+numeric ranges are rejected when reliable slope comparisons or interpolation
+cannot be performed in double precision.
+
+No nominal coverage is established by endpoint enforcement itself. Pointwise
+sources warn because marginal coverage can fall after the transformation.
+Smoothing bias and inaccurate uncertainty near binding constraints remain
+properties of the initial calculation. Feasible native bootstrap draws alone
+do not establish coverage. A constrained Bayesian sampler, ellipsoidal initial
+regions, bound optimization and feasibility optimization are separate future
+work. The sampler would need an explicitly restricted posterior, as in the
+approach of Hazelton and Turlach (2011). Dümbgen's (2003) multiscale calibration
+for a Gaussian white-noise experiment does not directly supply calibration
+for these penalized GAMs. Andrews (2000) explains the bootstrap boundary issue.
+
+Reproducible simulation
+
+Rscript notes/scasm/shape-coverage.R
+SHAPE_BOUNDARY_ONLY=1 Rscript notes/scasm/shape-coverage.R
+
+The fixed seed is 20261016. There are 2,000 repetitions for each of nine
+known-Gaussian truths (18,000 total), and 400 attempted scasm fits for each
+of six truths (2,400 total). The latter include nearly and exactly binding
+monotonicity/curvature restrictions. Known-Gaussian simultaneous bands use
+exact Sidak calibration on the listed grids. scasm bands compare Gaussian
+Vp/Ve calculations, native corrected and raw bootstrap percentiles, and a
+small fixed penalty for examining smoothing sensitivity. Gaussian scasm
+critical values use 1,999 normal draws; native bootstrap uses 399 draws.
+The scasm experiment applies the low-level operator to fitted response curves
+including their intercepts, giving each simulated truth a fixed reference
+level. Automatic integration returns smooth components as described above.
+
+At 95% coverage, binomial Monte Carlo SE is about 0.49 percentage points for
+2,000 repetitions and 1.09 for 400 successful fits. Worst-case SE is 1.12
+and 2.50 respectively. CSVs record actual source-specific SEs and counts;
+critical-value simulation error is additional. Across 49,182 paired interval
+transformations, using 1e-10 tolerance for numerical comparisons, no originally
+covering whole-grid band lost coverage, no
+maximum width increased, and no limits became unordered. Independent
+all-bracketing-chord convex calculations agreed within 2.22e-16.
+
+This does not rescue pointwise calibration. With known independent normal
+errors and a nearly flat increasing truth, minimum marginal coverage changed
+from 93.65% to 38.00% after transforming pointwise limits. With an initially
+simultaneous band, whole-grid coverage changed from 94.85% to 95.75%. For a
+nearly linear convex truth, mean marginal coverage of transformed pointwise
+limits was 73.01%, with minimum 57.30%.
+
+For the nearly binding increasing-convex scasm truth, transformed Gaussian
+simultaneous coverage was 313/342 = 91.52%, Monte Carlo SE 1.51 percentage
+points. The other 58 fit attempts raised an error. Exactly flat and exactly
+linear truths gave corresponding coverage of 332/342 = 97.08% (SE 0.91) and
+344/361 = 95.29% (SE 1.11). These estimates are conditional on a returned
+model. Returned models with warnings remain in summaries. Across the six
+scenarios there were 203 upstream fitting errors and 156 fitting warnings;
+the CSVs preserve all messages, including a convergence warning. No fitting
+error was patched or replaced with a successful result.
+
+For the curved increasing example, maximum absolute empirical bias changed
+from 0.0656 with selected smoothing to 0.0277 with sp = 1e-8, while RMSE changed
+from 0.0416 to 0.0466. This compares bias/variance within the same basis;
+constraints and finite-basis approximation still contribute.
+
+Full simulation tables, source counts, binding frequencies and qualifications
+are in shape-coverage-validation.txt and shape-coverage-boundary-validation.txt,
+with matching summary/failure/warning/binding CSVs. Raw replication CSVs remain
+available locally and are ignored by Git; the script reproduces them.
+
+Package validation
+
+All tests, simulation and package checks were run outside the sandbox under
+the repository's socket-permission instructions. Public topics were added to
+the pkgdown reference index. The article's runnable univariate/tensor examples
+and HTML rendering passed. The generated plots were inspected visually.
+Pandoc emitted deprecation messages for rmarkdown/pkgdown's --mathjax/--katex
+options; they do not indicate failed examples or malformed output.
+
+Final full suite:
+  NOT_CRAN=true Rscript tools/run-tests.R
+  22,697 expectations across 1,831 cases passed, with no failures, errors,
+  warnings or skips. The runner installed this checkout into a temporary
+  library and set R_LIBS so parallel workers loaded the same implementation.
+  NOT_CRAN=true enabled the larger models and visual comparisons, including
+  the slow hierarchical GAM paper examples. The focused mathematical test
+  file also passed 976 expectations across 18 cases, including integer and
+  double-precision regression cases and plotting covariance selection.
+
+Final package check:
+  rcmdcheck::rcmdcheck(".", args = "--no-tests", build_args = character())
+  Status: OK; 0 errors, 0 warnings, 0 notes.
+  --no-tests deliberately produced "checking tests ... SKIPPED" because the
+  full installed-copy suite ran separately. This expected message is a
+  consequence of the chosen option, not a package problem. Examples and
+  their saved reference output, vignette builds/rebuilds and the PDF manual
+  were enabled and passed. No vignette or manual check was disabled.
+
+Additional validation:
+  pkgdown::build_reference_index(pkgdown::as_pkgdown(".")) passed with every
+  new public topic included. The final article rendered successfully with
+  both scasm examples. Initial example-reference differences were resolved
+  by adding the two new public examples to the saved output; tools::Rdiff()
+  and the final package check confirmed that the reference output matches.
+  git diff --check and the staged diff check passed. Review against main
+  confirmed that the branch contains only the separate prerequisite and
+  this implementation. The prerequisite and original commit have identical
+  stable patch IDs. Neither upstream mgcv nor other checkouts were changed.
+
+Windows and Linux validation remains with the existing CI jobs; it was not
+performed on this macOS host.
+
+References
+
+Chernozhukov, Fernandez-Val and Galichon (2009):
+  https://doi.org/10.1093/biomet/asp030
+  Author manuscript: https://arxiv.org/abs/0806.4730
+Chen et al. (2021), Sections 2--4 and Corollary 32:
+  https://www.jmlr.org/papers/v22/20-513.html
+Dümbgen (2003): https://arxiv.org/abs/1312.6466
+Andrews (2000): https://doi.org/10.1111/1468-0262.00114
+Hazelton and Turlach (2011): https://doi.org/10.1016/j.csda.2011.04.018
+Installed mgcv 1.9-4 namespace functions inspected:
+  scasm, scasm.fit, smooth.construct.sc.smooth.spec,
+  smooth.construct.tensor.smooth.spec, predict.gam and ZHZtproj.
+Issues #372 and #373 and the prerequisite source were also inspected.

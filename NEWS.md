@@ -98,6 +98,18 @@
 
 ## New features
 
+* `shape_intervals()` applies monotone rearrangement and convex or concave
+  envelopes to existing interval endpoints on a finite grid. Supported scasm
+  smooths expose this through `interval_method = "shape"` and an explicit
+  Gaussian or stored-bootstrap initial source. The transformation preserves
+  whole-grid containment events; it does not establish nominal coverage or
+  preserve marginal coverage of pointwise limits. `shape_confidence_set()`
+  and `in_shape_set()` represent and inspect intersections with coefficient
+  inequalities and equalities. See the shape-constrained intervals article
+  for supported combinations, tensor requirements and examples (#372, #373).
+  `draw()` and `assemble()` also accept `frequentist` for the initial smooth
+  covariance calculation.
+
 * `interval_method` selects native scasm bootstrap or Gaussian pointwise
   intervals for smooths, fitted values, smooth derivatives and `confint()`.
   Shifting or transforming smooth confidence intervals retains asymmetric limits.

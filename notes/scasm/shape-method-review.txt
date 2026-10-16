@@ -1,0 +1,185 @@
+Independent mathematical and numerical review
+2026-10-16; mgcv 1.9-4
+
+Recommendation
+
+Use an explicit transformation of initial endpoints on a finite evaluation
+set. Keep initial uncertainty calibration and shape enforcement separate.
+For automatic use of fitted shape descriptions, require restrictions that
+actually imply the named function shape. Retention of a coefficient inequality
+is necessary but is not sufficient for that implication in all mgcv models.
+The two numerical counterexamples below demonstrate this distinction.
+
+Primary literature
+
+Chen, Chernozhukov, Fernandez-Val, Kostyshak and Luo (2021), JMLR 22(220),
+https://www.jmlr.org/papers/v22/20-513.html
+https://www.jmlr.org/papers/volume22/20-513/20-513.pdf
+Sections 2.2--2.5 and 2.8 describe range, convexity, monotonicity and their
+compositions. Corollary 32 gives containment of the original whole-function
+coverage event. Section 4 gives finite-grid algorithms. Remark 9 explains why
+shifting a convex minorant to adjust bias loses order preservation; Remark 3
+identifies the same problem with normalization to integrate to one.
+
+Chernozhukov, Fernandez-Val and Galichon (2009), Biometrika 96, 559--575,
+https://doi.org/10.1093/biomet/asp030
+Author manuscript: https://arxiv.org/abs/0806.4730
+The rearrangement results concern whole-function bands. They do not imply
+preservation of coverage at each individual coordinate when only marginal
+coverage was available initially.
+
+The following finite-grid conclusions are direct derivations, and distinguish
+finite-grid operators from continuum versions in the papers.
+
+Finite-grid guarantees
+
+Let T be a transformation of vectors indexed by the evaluation points. Suppose
+T is order preserving, fixes every target vector in the named shape class,
+and maps every vector into that class. If L <= f <= U at every evaluation
+point and f has the named shape, then T(L) <= T(f) = f <= T(U). Thus the
+original simultaneous coverage event is contained in the transformed event.
+This implication holds for every realization, independent of Gaussian or
+bootstrap assumptions. It does not calibrate an initially invalid interval.
+If T is also nonexpansive in maximum absolute difference, then maximum band
+width cannot increase. Width at a particular point may increase.
+
+For distinct ordered x coordinates, sorting the values into increasing order
+is an order preserving operation: coordinatewise L <= U implies their kth
+order statistics satisfy L_(k) <= U_(k). It fixes increasing vectors and is
+nonexpansive in maximum absolute difference. None of these arguments requires
+regular coordinate spacing. On an irregular grid it is a rearrangement for
+an empirical measure assigning equal mass to each evaluation coordinate.
+It should not be described as an approximation that preserves Lebesgue Lp
+properties without additional quadrature or weighting arguments.
+
+For convexity on a one-dimensional grid, use the greatest convex minorant
+through the supplied values with slopes computed using actual coordinate
+differences. It is order preserving because every convex minorant of a lower
+vector remains a minorant of an upper vector. It fixes vectors with ordered
+successive slopes. Translation equivariance plus order preservation gives
+maximum-norm contraction: v-eps <= w <= v+eps implies
+T(v)-eps <= T(w) <= T(v)+eps. Concavity uses -T(-v).
+
+The named nonnegative range operation is a justified threshold at zero. Apply
+range first, monotonicity second, then convexity or concavity. A constant lower
+or upper bound remains a bound through the later operations. Sorting after
+convexification need not preserve convexity. Shifting or normalizing the result
+is not justified by this order argument.
+
+Pointwise counterexample
+
+Take increasing truth f=c(0,1) at two ordered points, L=c(0,-2), U=c(0,-1).
+The original interval covers the first coordinate exactly. Sorting both limits
+gives L=c(-2,0), U=c(-1,0), which fails at the first coordinate. Thus marginal
+coverage at that coordinate can fall from one to zero. This does not contradict
+the simultaneous guarantee because the original interval did not cover f at
+both coordinates. Report the source calibration as pointwise when applicable,
+and describe only simultaneous-event inclusion as the transformation guarantee.
+
+Product grids and directional restrictions
+
+A complete Cartesian product permits sorting along each selected dimension.
+After a slice has been made increasing in one direction, sorting in another
+direction preserves the first restriction: the order-preserving sorting map
+acts on the corresponding ordered slices. Coordinate reversals give decreasing
+restrictions without changing this reasoning.
+
+One subsequent curvature operation along a selected direction preserves all
+other directional monotonicities by order preservation across slices. In its
+own direction, the convex minorant of monotone values remains monotone. Thus
+range, then any selected monotone directions, then at most one curvature
+direction is a coherent supported composition. These are directional properties;
+separate linearity of f(x,z)=xz does not imply joint convexity.
+
+Do not claim that a single sequential pass enforces two curvature directions.
+On x=z=1:3, take F=matrix(c(2,1,0, 0,1,2, 2,1,0),3,3), with x in rows.
+Each column is linear in x, so a first convex-minorant operation in x leaves F
+fixed. The convex minorant in z changes the middle column from c(0,1,2) to
+c(0,1,0), which is nonconvex in x. Any additional curvature directions need
+a different proved operator or an explicit admissible-set representation.
+
+Evaluation points and interpolation
+
+Check complete product structure rather than silently interpolating missing
+slices. Duplicate evaluation coordinates need an explicit error or documented
+aggregation rule, since sorting assigns separate ranks to duplicate x values.
+All interval-event guarantees are at the supplied evaluation points. Even
+linear interpolation does not extend coverage to the continuum: the exact
+node intervals for f(x)=x^2 at x=0,1 interpolate to x, above f in the interior.
+The endpoint interpolants can obey the named shapes while failing to cover the
+true curve between nodes. Do not infer spline coefficient feasibility from
+endpoint shape: the transformed grid values need not lie in the fitted spline
+space or satisfy a whole-function equality.
+
+mgcv irregular-knot curvature counterexample
+
+The installed namespace mgcv:::smooth.construct.sc.smooth.spec in 1.9-4 uses
+raw diff(diag(p), differences=2) for c+; it does not account for irregular
+B-spline knots in those second differences. The following numerical check was
+run outside the sandbox under the repository instructions:
+
+library("mgcv")
+d <- data.frame(x=seq(0,1,length.out=101))
+knt <- list(x=c(-3,-2,-1,0,.05,.1,.5,.9,1,2,3,4))
+sm <- smoothCon(s(x,bs="sc",xt="c+",k=8),d,knots=knt,
+                absorb.cons=FALSE)[[1]]
+sm$deriv <- 2
+D2 <- Predict.matrix(sm,d)
+beta <- seq_len(ncol(D2))
+min(sm$Ain %*% beta)  # 0: all fitted inequalities satisfied
+range(D2 %*% beta)   # -10.98039, 65.45455: function not convex
+
+For automatic named curvature require regular knots (with a numerical tolerance)
+and a B-spline degree supporting the derivative, or independently certify the
+actual function's curvature. A dense-grid derivative check alone is not a proof
+over the entire domain. This does not prevent an explicit low-level user from
+imposing a scientifically justified shape independently of the fitted basis.
+
+mgcv tensor reparameterization counterexample
+
+The installed tensor constructor propagates marginal inequalities for te and
+transforms a constrained margin's inequality matrix by that margin's XP.
+It does not thereby ensure that complementary marginal basis functions are
+nonnegative. Its automatic np=FALSE switch uses a margin$mono field; ordinary
+sc smooths do not trigger that switch. With np=TRUE, the interpolation basis
+can be negative. A sum of increasing coefficient curves weighted by negative
+basis values need not increase.
+
+library("mgcv")
+d <- expand.grid(x=seq(0,1,length.out=8),z=seq(0,1,length.out=8))
+sm <- smoothCon(te(x,z,bs=c("sc","sc"),k=c(6,6),
+                   xt=list("m+",NULL)),d,absorb.cons=FALSE)[[1]]
+# sm$np is TRUE; both sm$XP matrices are non-null.
+# The smallest entry of each marginal design matrix is -0.4102198.
+B <- matrix(0,6,6)
+B[,1] <- solve(sm$XP[[1]],seq_len(6))
+beta <- as.vector(t(B))
+min(sm$Ain %*% beta)  # 0
+sm$margin[[1]]$deriv <- 1
+pd <- expand.grid(x=seq(.01,.99,length.out=31),
+                  z=seq(.01,.99,length.out=31))
+range(Predict.matrix(sm,pd) %*% beta)  # -0.0930198, 2.697085
+
+A straightforward sufficient initial support rule is te with np=FALSE and
+ordinary univariate B-spline complementary margins, evaluated inside their
+basis domains. Nonnegative P-spline bases could be added after checking their
+specific construction and any centering transformations. For arbitrary
+complementary bases or effective reparameterization matrices, refuse automatic
+shape inference rather than equating retained coefficient inequalities with
+retained named function shapes. The retained inequality metadata remains useful,
+but the interval engine needs a stricter eligibility check.
+
+Equality and coupled restrictions
+
+An admissible coefficient set can be represented explicitly as
+{beta: Ain beta >= bin, C beta = d, L <= X beta <= U}.
+Intersecting this with a calibrated initial confidence region retains that
+region's coverage for a feasible true coefficient. Its coordinatewise extrema
+need not themselves form feasible whole functions. Ordered lower and upper
+functions both having the same positive weighted integral must coincide when
+the weights are positive; endpoint normalization cannot represent a useful
+band for an integral equality. Keep a set representation distinct from endpoint
+transformations, and report an empty set explicitly instead of substituting the
+point estimate. Covariance ellipsoids require a separate initial-region and
+optimization implementation; a box of pointwise limits is not automatically
+a simultaneous region.

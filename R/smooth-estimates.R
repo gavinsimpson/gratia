@@ -54,6 +54,12 @@
 #'   for pointwise intervals when available, and Gaussian intervals otherwise.
 #'   Use "gaussian" to request covariance-based limits or "bootstrap" to
 #'   require stored draws. Simultaneous bootstrap bands are not supported.
+#'   `"shape"` applies [shape_intervals()] to supported scasm smooth components,
+#'   using the initial limits chosen by `shape_source`.
+#' @param shape_source character; initial uncertainty for `interval_method =
+#'   "shape"`: `"gaussian"` (the default) or stored `"bootstrap"` pointwise
+#'   limits. Bootstrap sources require `frequentist = FALSE` and
+#'   `unconditional = FALSE` because the stored draws hold smoothing fixed.
 #' @param n_sim,n_cores positive integers; coefficient draws and simulation cores
 #'   for simultaneous bands. Parallel simulation requires OpenMP support.
 #' @param seed integer or `NULL`; an explicit simulation seed preserves the
@@ -121,6 +127,37 @@
 #' plotmath arrows for increasing and decreasing constraints while `.type`
 #' and [smooth_type()] keep their existing basis names. Unsupported tensor
 #' requests produce a warning and are labelled as not retained.
+#'
+#' Shape enforcement is explicit and leaves the existing interval defaults
+#' unchanged. It preserves containment of a shape-restricted target whenever
+#' the entire initial band contains that target on the evaluation grid. This
+#' does not establish nominal coverage of the initial band, or preserve
+#' marginal coverage of transformed pointwise limits. The default Gaussian
+#' source uses approximate Bayesian covariance and does not construct a
+#' constrained posterior. Standard errors describe the initial calculation;
+#' `.crit` is `NA` after shape enforcement. Metadata records the initial source,
+#' correction, named shapes, model coordinates and whole-grid guarantee.
+#'
+#' Every selected term must have retained named scasm restrictions. Supported
+#' combinations are positivity, monotonicity in any directions and curvature
+#' in at most one direction. Tensor smooths require `te(..., np = FALSE)` with
+#' univariate B-spline margins (`"sc"` or `"bs"`). Normal reparameterisation
+#' and other complementary bases can invalidate the named surface shape even
+#' when coefficient inequalities were retained. Curvature additionally
+#' requires regular fitted knots and degree at least two. Irregular evaluation
+#' coordinates are supported. Complete product grids, finite endpoints and
+#' evaluation inside the fitted B-spline domains are required; use `dist = 0`
+#' for tensors. Numeric `by` variables are unsupported; factor-by components
+#' and separate linear predictors are treated separately.
+#'
+#' Shape intervals use component-only uncertainty: explicit
+#' `overall_uncertainty = TRUE`, effect shifts and effect transformations are
+#' rejected. Coordinate transformations used in the model remain supported;
+#' their named shapes concern model coordinates. The transformed endpoints
+#' need not belong to the fitted spline space or obey centring equalities.
+#' See [shape_confidence_set()] for explicit coefficient restrictions and the
+#' [shape-constrained intervals article](https://gavinsimpson.github.io/gratia/articles/shape-constrained-intervals.html)
+#' for examples.
 #'
 #' Smoothing-parameter uncertainty is not currently supported for SCAM models;
 #' use `unconditional = FALSE`.
@@ -213,7 +250,8 @@
     back_transform = FALSE,
     interval = NULL, ci_level = 0.95,
     n_sim = 10000, n_cores = 1, seed = NULL,
-    interval_method = c("auto", "gaussian", "bootstrap"),
+    interval_method = c("auto", "gaussian", "bootstrap", "shape"),
+    shape_source = c("gaussian", "bootstrap"),
     ...) {
   overall_supplied <- !missing(overall_uncertainty)
   check_scam_unconditional(object, unconditional)
@@ -246,10 +284,30 @@
 
   ## extract the mgcv.smooth objects
   smooths <- get_smooths_by_id(object, smooth_ids)
+  interval_method <- match.arg(interval_method)
+  shape_source <- match.arg(shape_source)
+  enforce_shape <- interval_method == "shape"
+  if (enforce_shape && is.null(interval)) {
+    cli::cli_abort("Request an interval when using interval_method = 'shape'.")
+  }
+  if (enforce_shape && overall_supplied && isTRUE(overall_uncertainty)) {
+    cli::cli_abort("Shape intervals use component-only uncertainty; set overall_uncertainty = FALSE.")
+  }
+  if (enforce_shape && shape_source == "bootstrap" &&
+      (isTRUE(frequentist) || isTRUE(unconditional))) {
+    cli::cli_abort("Stored bootstrap shape intervals require frequentist = FALSE and unconditional = FALSE.")
+  }
   overall_uncertainty <- scasm_overall_uncertainty(object,
     overall_uncertainty, overall_supplied, smooths)
   shape_constraints <- smooth_shape_constraints(object, smooths, smooth_ids)
-  resolved_method <- scasm_interval_method(object, interval_method,
+  shape_specs <- if (enforce_shape) Map(function(sm, id) {
+    scasm_shape_spec(object, sm, shape_constraints[[as.character(id)]])
+  }, smooths, smooth_ids) else NULL
+  if (enforce_shape && interval == "confidence") {
+    cli::cli_warn("Shape enforcement preserves whole-grid containment; transformed pointwise limits have no guaranteed pointwise calibration.")
+  }
+  resolved_method <- scasm_interval_method(object,
+    if (enforce_shape) shape_source else interval_method,
     interval = interval %||% "confidence")
 
   ## loop over the smooths and evaluate them
@@ -327,7 +385,7 @@
   if (!is.null(interval)) {
     sm_list <- add_smooth_intervals(sm_list, smooths, object, interval, ci_level,
       unconditional, frequentist, overall_uncertainty, n_sim, n_cores, seed,
-      interval_method = resolved_method)
+      interval_method = resolved_method, shape_specs = shape_specs)
   }
 
   # Tensor products of the two soap components can share both label and type.
@@ -368,6 +426,11 @@
   if (!is.null(interval)) {
     attr(sm_list, "interval_info") <- scasm_interval_info(object,
       resolved_method, interval, ci_level)
+    if (enforce_shape) {
+      names(shape_specs) <- as.character(smooth_ids)
+      attr(sm_list, "interval_info") <- scasm_shape_interval_info(
+        attr(sm_list, "interval_info"), shape_specs, object, frequentist, unconditional)
+    }
     attr(sm_list, "interval_info")$scope <- "smooth"
     attr(sm_list, "interval_info")$overall_uncertainty <- overall_uncertainty &&
       all(vapply(smooths, function(sm) isTRUE(attr(sm, "nCons") > 0L), logical(1)))
@@ -1386,6 +1449,7 @@ scam_smooth_matrix <- function(smooth, X) {
   validate_tensor_plot_controls(re_levels)
   validate_estimate_re_levels(object, re_levels)
   interval_info <- validate_saved_smooth_interval(object, interval)
+  check_shape_effect_transform(interval_info, constant, fun)
   shape_constraints <- attr(object, "shape_constraints")
   plot_info <- attr(object, "tensor_plot_info")
   surface_support <- attr(object, "surface_support")
@@ -1517,6 +1581,7 @@ scam_smooth_matrix <- function(smooth, X) {
                                     interval_info = NULL,
                                     shape_constraints = NULL,
                                     ...) {
+  check_shape_effect_transform(interval_info, constant, fun)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
   check_surface_dots(match.call(expand.dots = FALSE))

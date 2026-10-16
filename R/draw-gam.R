@@ -66,6 +66,9 @@
 #'
 #'   Currently does not affect the y-axis scale of plots of the parametric
 #'   terms.
+#' @param frequentist logical; use frequentist covariance for smooth-component
+#'   intervals? The default uses approximate Bayesian covariance. Parametric
+#'   effect intervals retain their existing Bayesian covariance calculation.
 #' @param constant numeric; a constant to add to the estimated values of the
 #'   smooth. `constant`, if supplied, will be added to the estimated value
 #'   before the confidence band is computed.
@@ -364,7 +367,9 @@
   mrf_plot = c("effects", "qq"),
   interval = c("confidence", "simultaneous"),
   n_sim = 10000, n_cores = 1, seed = NULL,
-  interval_method = c("auto", "gaussian", "bootstrap"),
+  interval_method = c("auto", "gaussian", "bootstrap", "shape"),
+  frequentist = FALSE,
+  shape_source = c("gaussian", "bootstrap"),
   ...
 ) {
   .call <- match.call()
@@ -422,7 +427,9 @@ draw_gam_impl <- function(
   mrf_plot = c("effects", "qq"),
   interval = c("confidence", "simultaneous"),
   n_sim = 10000, n_cores = 1, seed = NULL,
-  interval_method = c("auto", "gaussian", "bootstrap"),
+  interval_method = c("auto", "gaussian", "bootstrap", "shape"),
+  frequentist = FALSE,
+  shape_source = c("gaussian", "bootstrap"),
   ...
 ) {
   surface <- match.arg(surface)

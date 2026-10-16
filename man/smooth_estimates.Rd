@@ -30,7 +30,8 @@ smooth_estimates(object, ...)
   n_sim = 10000,
   n_cores = 1,
   seed = NULL,
-  interval_method = c("auto", "gaussian", "bootstrap"),
+  interval_method = c("auto", "gaussian", "bootstrap", "shape"),
+  shape_source = c("gaussian", "bootstrap"),
   ...
 )
 }
@@ -130,7 +131,13 @@ selected smooth order and parallel evaluation scheduling.}
 \item{interval_method}{character; "auto" uses stored scasm bootstrap draws
 for pointwise intervals when available, and Gaussian intervals otherwise.
 Use "gaussian" to request covariance-based limits or "bootstrap" to
-require stored draws. Simultaneous bootstrap bands are not supported.}
+require stored draws. Simultaneous bootstrap bands are not supported.
+\code{"shape"} applies \code{\link[=shape_intervals]{shape_intervals()}} to supported scasm smooth components,
+using the initial limits chosen by \code{shape_source}.}
+
+\item{shape_source}{character; initial uncertainty for \code{interval_method = "shape"}: \code{"gaussian"} (the default) or stored \code{"bootstrap"} pointwise
+limits. Bootstrap sources require \code{frequentist = FALSE} and
+\code{unconditional = FALSE} because the stored draws hold smoothing fixed.}
 }
 \value{
 A data frame (tibble), which is of class \code{"smooth_estimates"}.
@@ -185,6 +192,37 @@ inequalities for each fitted smooth and tensor margin. Captions use
 plotmath arrows for increasing and decreasing constraints while \code{.type}
 and \code{\link[=smooth_type]{smooth_type()}} keep their existing basis names. Unsupported tensor
 requests produce a warning and are labelled as not retained.
+
+Shape enforcement is explicit and leaves the existing interval defaults
+unchanged. It preserves containment of a shape-restricted target whenever
+the entire initial band contains that target on the evaluation grid. This
+does not establish nominal coverage of the initial band, or preserve
+marginal coverage of transformed pointwise limits. The default Gaussian
+source uses approximate Bayesian covariance and does not construct a
+constrained posterior. Standard errors describe the initial calculation;
+\code{.crit} is \code{NA} after shape enforcement. Metadata records the initial source,
+correction, named shapes, model coordinates and whole-grid guarantee.
+
+Every selected term must have retained named scasm restrictions. Supported
+combinations are positivity, monotonicity in any directions and curvature
+in at most one direction. Tensor smooths require \code{te(..., np = FALSE)} with
+univariate B-spline margins (\code{"sc"} or \code{"bs"}). Normal reparameterisation
+and other complementary bases can invalidate the named surface shape even
+when coefficient inequalities were retained. Curvature additionally
+requires regular fitted knots and degree at least two. Irregular evaluation
+coordinates are supported. Complete product grids, finite endpoints and
+evaluation inside the fitted B-spline domains are required; use \code{dist = 0}
+for tensors. Numeric \code{by} variables are unsupported; factor-by components
+and separate linear predictors are treated separately.
+
+Shape intervals use component-only uncertainty: explicit
+\code{overall_uncertainty = TRUE}, effect shifts and effect transformations are
+rejected. Coordinate transformations used in the model remain supported;
+their named shapes concern model coordinates. The transformed endpoints
+need not belong to the fitted spline space or obey centring equalities.
+See \code{\link[=shape_confidence_set]{shape_confidence_set()}} for explicit coefficient restrictions and the
+\href{https://gavinsimpson.github.io/gratia/articles/shape-constrained-intervals.html}{shape-constrained intervals article}
+for examples.
 
 Smoothing-parameter uncertainty is not currently supported for SCAM models;
 use \code{unconditional = FALSE}.

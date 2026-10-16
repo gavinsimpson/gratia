@@ -53,7 +53,8 @@ smooth_uncertainty_design <- function(smooth, X, model, V,
 # and higher-dimensional slices are identical to the eventual plotting grids.
 add_smooth_intervals <- function(estimates, smooths, model, interval, ci_level,
                                  unconditional, frequentist, overall_uncertainty,
-                                 n_sim, n_cores, seed, interval_method = "gaussian") {
+                                 n_sim, n_cores, seed, interval_method = "gaussian",
+                                 shape_specs = NULL) {
   interval <- normalize_smooth_interval(interval)
   validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
   if (interval == "simultaneous" && inherits(model, "scam")) {
@@ -105,6 +106,10 @@ add_smooth_intervals <- function(estimates, smooths, model, interval, ci_level,
       d$.crit <- rep(unname(critical), nrow(d))
       d$.lower_ci <- lower
       d$.upper_ci <- upper
+      if (!is.null(shape_specs)) {
+        d <- scasm_enforce_smooth_band(d, smooths[[i]], shape_specs[[i]],
+          interval, ci_level)
+      }
       start <- 0L
       for (j in seq_along(pieces)) {
         estimates[[i]]$data[[j]] <- d[start + seq_len(sizes[j]), , drop = FALSE]
