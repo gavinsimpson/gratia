@@ -1,0 +1,49 @@
+"model","term","n","error","predict_error","fit_difference","se_difference"
+"single","s(x)",1,"","",0,0
+"single","s(x)",2,"","",0,0
+"single","s(x)",100,"","",0,0
+"multi","s(x)",1,"","",0,0
+"multi","s(x)",2,"","",0,0
+"multi","s(x)",100,"","",0,0
+"factor","s(x):faca",1,"","",0,0
+"factor","s(x):faca",2,"","",0,0
+"factor","s(x):faca",100,"","",0,3.46944695195361e-18
+"factor","s(x):facb",1,"","",NA,NA
+"factor","s(x):facb",2,"","",0,0
+"factor","s(x):facb",100,"","",0,0
+"bivariate","s(x,z)",1,"ℹ In index: 1.
+Caused by error in `UseMethod()`:
+! no applicable method for 'smooth_values' applied to an object of class ""c('tedmi.smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'mgcv.smooth')""","argument of length 0",NA,NA
+"bivariate","s(x,z)",2,"ℹ In index: 1.
+Caused by error in `UseMethod()`:
+! no applicable method for 'smooth_values' applied to an object of class ""c('tedmi.smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'mgcv.smooth')""","",NA,NA
+"bivariate","s(x,z)",100,"ℹ In index: 1.
+Caused by error in `UseMethod()`:
+! no applicable method for 'smooth_values' applied to an object of class ""c('tedmi.smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'mgcv.smooth')""","",NA,NA
+"numeric_by","s(x):w",1,"","",0,0
+"numeric_by","s(x):w",2,"","",0,0
+"numeric_by","s(x):w",100,"","",0,0
+"without_intercept","s(x)",1,"","",0,0
+"without_intercept","s(x)",2,"","",0,0
+"without_intercept","s(x)",100,"","",0,0
+"not_exp","s(x)",1,"","",0,0
+"not_exp","s(x)",2,"","",0,0
+"not_exp","s(x)",100,"","",0,0
+"mixed","s(x)",1,"","",0,0
+"mixed","s(x)",2,"","",0,0
+"mixed","s(x)",100,"","",0,0
+"mixed","s(z)",1,"","",0,0
+"mixed","s(z)",2,"","",0,0
+"mixed","s(z)",100,"","",0,0
+"transformed","s(log(x))",1,"","",0,0
+"transformed","s(log(x))",2,"","",0,0
+"transformed","s(log(x))",100,"","",0,0
+"poisson","s(x)",1,"","",0,0
+"poisson","s(x)",2,"","",0,0
+"poisson","s(x)",100,"","",0,0
+"binomial","s(x)",1,"","",0,0
+"binomial","s(x)",2,"","",0,0
+"binomial","s(x)",100,"","",0,0
+"gamma","s(x)",1,"","",0,0
+"gamma","s(x)",2,"","",0,0
+"gamma","s(x)",100,"","",0,0

@@ -1,0 +1,5 @@
+audit.html
+results/*.rds
+results/*.pdf
+results/*.log
+results/*.sample

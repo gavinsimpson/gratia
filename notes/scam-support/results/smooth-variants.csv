@@ -1,0 +1,18 @@
+"case","fit_error","predict_error","plot_error","gratia_error"
+"tesmi1_cc","","","","$ operator is invalid for atomic vectors"
+"tesmi2_cc","","","","$ operator is invalid for atomic vectors"
+"tesmd1_cc","","","","$ operator is invalid for atomic vectors"
+"tesmd2_cc","","","","$ operator is invalid for atomic vectors"
+"tescx_cc","","","","ℹ In index: 1.
+Caused by error in `UseMethod()`:
+! no applicable method for 'smooth_values' applied to an object of class ""c('tescx.smooth', 'single_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'single_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'mgcv.smooth')"""
+"tescv_cc","","","","ℹ In index: 1.
+Caused by error in `UseMethod()`:
+! no applicable method for 'smooth_values' applied to an object of class ""c('tescv.smooth', 'single_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'single_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'mgcv.smooth')"""
+"tismi_cc","","non-conformable arguments","","$ operator is invalid for atomic vectors"
+"tismd_cc","","non-conformable arguments","","$ operator is invalid for atomic vectors"
+"tismi_main_effects","","non-conformable arguments","","$ operator is invalid for atomic vectors"
+"tismd_main_effects","","non-conformable arguments","","$ operator is invalid for atomic vectors"
+"linear_functional_mpiBy","","","","ℹ In index: 1.
+Caused by error in `smooth_type.default()`:
+! Unknown type of smooth"
