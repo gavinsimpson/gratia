@@ -127,8 +127,11 @@ returned fits: 91.52%, with Monte Carlo standard error 1.51 percentage points.
 The other 58 attempts raised upstream fitting errors, so this estimate is
 conditional on a model being returned. The saved reports record all errors
 and warnings and distinguish them from interval calculations. Comparing
-selected smoothing with a small fixed penalty also changed local bias and
-width; enforcing shape supplies no additional correction for smoothing bias.
+selected smoothing with a small fixed penalty also changed local bias. The
+small-penalty comparison records estimates only; it does not assess interval
+width or separate smoothing bias from the effects of a finite spline basis
+and binding restrictions. Enforcing shape supplies no additional correction
+for smoothing bias.
 
 ## An increasing, convex scasm smooth
 
@@ -178,6 +181,13 @@ retained by the fitted model. General coefficient constraints belong in an
 explicit set, as described below. Numeric `by` variables are unsupported,
 because multiplying a component by a varying value changes its shape.
 
+General `pc` inequalities can replace the named coefficient restrictions in
+mgcv while leaving the original `xt` request in the fitted object. Captions
+identify that request as not retained, and automatic shape intervals reject
+it. Ordinary point equalities that leave the named inequalities intact are
+supported. Derivative-valued bases are rejected: their values do not inherit
+the named shape of the original spline.
+
 For transformed covariates, shape is asserted in the coordinates used by the
 model. For example, a restriction on `s(log(x), ...)` concerns `log(x)`;
 curvature in that coordinate need not be curvature in `x`.
@@ -217,7 +227,9 @@ slices. Evaluation outside the fitted B-spline domains is rejected.
 Automatic curvature inference additionally requires regular knots and a
 sufficient spline degree. In mgcv 1.9-4, the raw second coefficient differences
 used by `"c+"` and `"c-"` do not ensure spline curvature with arbitrary irregular
-knots. Requests with those knots are rejected. The low-level operator can
+knots. Equal spacing is checked to rounding precision, because even small
+departures can reverse curvature when a coefficient restriction binds.
+Requests with those knots are rejected. The low-level operator can
 still enforce a justified shape directly on an irregular evaluation grid;
 that is a separate statement from the shape implied by fitted inequalities.
 Requests for multiple curvature directions are also rejected because a later
@@ -258,9 +270,10 @@ description instead retains a set of whole functions.
 \quad Cb=d\}.
 \]
 
-Here is a three-coefficient example in which positive integration weights
-require the represented function to integrate to one. A real spline analysis
-would supply its own prediction matrix and integrals of basis functions.
+Here is a three-coefficient example representing the values of a piecewise
+linear curve at `x = c(0, 0.5, 1)`. The positive weights below give its exact
+integral over `[0, 1]`, which is required to equal one. A spline analysis would
+supply its own prediction matrix and integrals of basis functions.
 
 ```{r equality-set}
 weights <- c(0.25, 0.5, 0.25)

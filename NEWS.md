@@ -109,6 +109,11 @@
   for supported combinations, tensor requirements and examples (#372, #373).
   `draw()` and `assemble()` also accept `frequentist` for the initial smooth
   covariance calculation.
+  General `pc` replacements and derivative bases are rejected when they do
+  not justify the named function shape. Curvature requires equally spaced
+  fitted knots to rounding precision, and extrapolation is rejected.
+  Convex envelope interpolation preserves exactly flat segments. Saved
+  estimates reject interval computation controls that require the fitted model.
 
 * `interval_method` selects native scasm bootstrap or Gaussian pointwise
   intervals for smooths, fitted values, smooth derivatives and `confint()`.
@@ -120,6 +125,7 @@
 * Scasm captions show retained shape constraints with portable mathematical
   arrows. Saved estimates retain constraint metadata for each tensor margin;
   ignored requests are labelled and produce a warning (#373).
+  This includes named requests replaced by general `pc` inequalities.
 
 * Gaussian simultaneous bands now support positive-semidefinite coefficient
   covariance matrices, including scasm fits with exact equality constraints.

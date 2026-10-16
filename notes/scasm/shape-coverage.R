@@ -274,7 +274,8 @@ write.csv(summary, output_path("summary.csv"), row.names = FALSE)
 failure_data <- if (length(errors)) do.call(rbind, errors) else
   data.frame(scenario = character(), replication = integer(), stage = character(), message = character())
 write.csv(failure_data, output_path("failures.csv"), row.names = FALSE)
-warning_data <- if (length(warnings_log)) do.call(rbind, warnings_log) else failure_data
+warning_data <- if (length(warnings_log)) do.call(rbind, warnings_log) else
+  data.frame(scenario = character(), replication = integer(), stage = character(), message = character())
 write.csv(warning_data, output_path("warnings.csv"), row.names = FALSE)
 binding_data <- do.call(rbind, bindings)
 write.csv(binding_data, output_path("bindings.csv"), row.names = FALSE)
@@ -291,8 +292,8 @@ report <- c("Finite-grid shape-interval simulation", "",
   paste("Increases in maximum interval width:", maximum_width_increases),
   paste("Maximum discrepancy against independent one-dimensional operators:",
     format(reference_error, digits = 16)),
-  paste("Recorded upstream fit failures:", nrow(failure_data)), "",
-  paste("Recorded upstream fit warnings:", nrow(warning_data)), "",
+  paste("Recorded fit or interval failures:", nrow(failure_data)), "",
+  paste("Recorded fitting warnings:", nrow(warning_data)), "",
   "The known-Gaussian experiment starts with exact pointwise or exact whole-grid",
   "coverage under independent normal errors with known, unequal variances.",
   "The whole-grid critical value is the exact Sidak value for the listed points.",
@@ -319,6 +320,8 @@ report <- c("Finite-grid shape-interval simulation", "",
   "The low-penalty estimate uses the same model basis and sp = 1e-8. Comparing",
   "its empirical bias with selected-penalty bias investigates sensitivity to",
   "smoothing; boundary constraints and finite-basis approximation still apply.",
+  "This comparison does not isolate smoothing bias from those other sources",
+  "of estimation error, and no low-penalty interval widths are calculated.",
   "Its zero-width records are for bias and RMSE only, not interval inference.", "",
   "The bindings CSV records active fitted inequalities, counted when slack is",
   "at most 1e-7 times max(1, max(abs(slack))), and the fitted smoothing parameter.",

@@ -144,11 +144,18 @@
 #' univariate B-spline margins (`"sc"` or `"bs"`). Normal reparameterisation
 #' and other complementary bases can invalidate the named surface shape even
 #' when coefficient inequalities were retained. Curvature additionally
-#' requires regular fitted knots and degree at least two. Irregular evaluation
+#' requires equally spaced fitted knots to rounding precision and degree at
+#' least two. Irregular evaluation
 #' coordinates are supported. Complete product grids, finite endpoints and
 #' evaluation inside the fitted B-spline domains are required; use `dist = 0`
 #' for tensors. Numeric `by` variables are unsupported; factor-by components
 #' and separate linear predictors are treated separately.
+#' Function-valued bases are required; derivative bases are unsupported.
+#' General `pc` inequalities can replace the named coefficient restrictions
+#' while leaving their original `xt` request in the fitted object. These
+#' replacements are labelled as general constraints and rejected for automatic
+#' shape intervals. Point equalities that retain the named inequalities are
+#' supported.
 #'
 #' Shape intervals use component-only uncertainty: explicit
 #' `overall_uncertainty = TRUE`, effect shifts and effect transformations are
@@ -287,6 +294,11 @@
   interval_method <- match.arg(interval_method)
   shape_source <- match.arg(shape_source)
   enforce_shape <- interval_method == "shape"
+  if (enforce_shape) {
+    validate_shape_flag(overall_uncertainty, "overall_uncertainty")
+    validate_shape_flag(frequentist, "frequentist")
+    validate_shape_flag(unconditional, "unconditional")
+  }
   if (enforce_shape && is.null(interval)) {
     cli::cli_abort("Request an interval when using interval_method = 'shape'.")
   }
@@ -1373,6 +1385,9 @@ scam_smooth_matrix <- function(smooth, X) {
 #'   unchanged, adding pointwise bounds if absent. An explicit choice validates
 #'   stored interval metadata; `"credible"` aliases `"confidence"`. Simultaneous
 #'   bands must first be computed from the fitted model by [smooth_estimates()].
+#'   Method and uncertainty controls such as `interval_method`, `shape_source`,
+#'   `frequentist`, and `unconditional` also require the fitted model; they
+#'   cannot change intervals when drawing saved estimates.
 #'
 #' @export
 #' @importFrom patchwork wrap_plots
@@ -1441,6 +1456,13 @@ scam_smooth_matrix <- function(smooth, X) {
                                     mrf_plot = c("effects", "qq"),
                                     interval = NULL,
                                     ...) {
+  dots <- names(match.call(expand.dots = FALSE)$...)
+  controls <- intersect(dots, c("interval_method", "shape_source", "frequentist",
+    "unconditional", "overall_uncertainty", "ci_level", "n_sim", "n_cores", "seed"))
+  if (length(controls)) {
+    cli::cli_abort(c("Interval computation controls require the fitted model: {paste(controls, collapse = ', ')}.",
+      "i" = "Compute intervals with smooth_estimates(model, ...) before drawing saved estimates."))
+  }
   check_back_transform(back_transform)
   mrf_plot <- match.arg(mrf_plot)
   surface <- match.arg(surface)

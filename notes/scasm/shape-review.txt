@@ -1,0 +1,147 @@
+Statistical and numerical review of gls/scasm-shape-intervals
+16 October 2026
+
+Scope
+
+Reviewed the finite-grid shape operators, automatic scasm integration,
+coefficient-set representation, saved interval plotting, coverage experiment,
+tests and article. Three independent reviewers examined the operators, model
+restrictions and coverage evidence. This review continues the existing branch;
+main and the other checkouts were not changed.
+
+Findings and fixes
+
+1. General pc inequalities replace named inequalities in mgcv 1.9-4.
+   The fitted object can retain xt = "m+" while its actual Ain contains only
+   a loose point inequality. A regression example fits a decreasing component
+   in exactly this situation. Automatic intervals now reject these replacements
+   for both individual smooths and tensor margins. Metadata and captions label
+   the named request as not retained and describe the general inequalities
+   separately. Ordinary point equalities and general equalities that preserve
+   the named inequalities remain supported.
+
+2. The previous 1e-7 tolerance for equal knot spacing admitted changes that
+   reverse curvature when second coefficient differences are zero. A 1e-9
+   perturbation of one knot produces a feasible coefficient vector with
+   negative second derivative. Eligibility now checks spacing to rounding
+   precision (100 times machine epsilon). This conservative check can reject
+   a numerically irregular grid even if regular spacing was intended.
+
+3. Domain tolerance depended on the absolute coordinate value. Translating
+   a width-one domain to 1e12 allowed points up to 100 units outside it.
+   Prediction extrapolates there, potentially losing positivity. Automatic
+   intervals now require coordinates within the actual boundary knots.
+   Function-valued bases are required; derivative-valued bases are rejected
+   because their values do not inherit the original function's restrictions.
+
+4. Convex-hull interpolation could move a flat segment by one floating-point
+   unit. For example, coordinates c(0, .3, 1) and values c(.1, .2, .1)
+   produced a slightly nonflat lower hull. Interpolated values are now clamped
+   to their segment endpoints' range. This leaves the mathematical operator
+   unchanged, preserves exact flat segments, and avoids an interpolation
+   overshoot. Regression tests span tiny, ordinary and large value scales;
+   a separate 50,000-band stress test checked endpoint ordering.
+
+5. Numeric flags such as frequentist = 1 bypassed logical safeguards while
+   downstream covariance selection treated them as true. Shape intervals now
+   require single nonmissing logical values for frequentist, unconditional
+   and overall_uncertainty, and confint() requires a logical shift flag.
+   Drawing saved estimates now rejects computation controls that require the
+   fitted model, instead of silently ignoring interval_method = "shape".
+
+6. A simulation logging fallback copied fitting failures into an empty warning
+   log. The warning log is now independently empty when no warnings occurred.
+   Article wording no longer claims a width comparison from the small-penalty
+   experiment, which saved estimates only. The integration-weights example
+   now specifies its piecewise linear basis.
+
+Statistical conclusions
+
+The finite-grid event-inclusion claim is correct. Each component operator
+preserves order and fixes a target satisfying the requested grid shape.
+An initial whole-grid containment event is therefore retained after applying
+that same operator to both endpoints. Maximum width over the grid cannot
+increase; width at a particular point can increase. Floating-point arithmetic
+implements these statements to numerical precision.
+
+This does not calibrate the initial uncertainty calculation. In particular,
+transformed pointwise limits can have much worse marginal coverage. It does
+not establish coverage between evaluation points or make the Gaussian
+approximation a posterior supported on the restrictions. The article states
+these distinctions and includes counterexamples and simulation evidence.
+
+Recomputing the saved replication summaries reproduced repetition counts,
+whole-grid coverage, mean marginal coverage and mean width exactly. Across
+36,964 ordinary and 12,218 boundary paired transformations (49,182 total),
+no initially covering whole-grid band lost coverage at the recorded numerical
+tolerance. The simulations were not rerun: the fixes do not alter their saved
+inputs or the arithmetic of their reported summary estimates.
+
+The nearly binding increasing-convex scasm case covered in 313 of 342
+returned fits (91.52%; Monte Carlo standard error 1.51 percentage points).
+The 58 upstream fitting failures mean this coverage estimate is conditional
+on a model being returned. The reports correctly retain that qualification
+and all recorded fitting warnings. Shape enforcement supplies no correction
+for inadequate initial uncertainty or smoothing bias.
+
+The coefficient-set API correctly represents simultaneous grid inequalities
+intersected with coefficient inequalities and equalities. For a feasible
+truth it preserves the initial band's membership event. Tests cover singular
+and rectangular designs. It does not optimize bounds, determine
+whether the set is empty, or construct a constrained posterior.
+
+Supported automatic restrictions
+
+Positivity and directional monotonicity, optionally with convexity or
+concavity in one coordinate, are supported on complete finite Cartesian
+grids. Irregular evaluation spacing is allowed. Tensor products require
+univariate B-spline function margins, np = FALSE and evaluation inside the
+basis domains. Curvature additionally requires degree at least two and
+equally spaced fitted knots to rounding precision. Factor-by components
+and separate linear predictors are handled separately. Coordinate
+transformations concern the model coordinates.
+
+Multiple curvature coordinates, numeric by variables, general pc replacements,
+derivative bases, unsupported tensor reparameterizations/bases, missing grid
+points, effect transformations and added mean uncertainty remain excluded.
+General coefficient restrictions can instead be represented explicitly with
+shape_confidence_set().
+
+Examples
+
+Rscript notes/scasm/shape-examples.R
+
+The script fits an increasing curve, a convex curve, and a safe tensor
+surface increasing in x. It compares initial and enforced bands using the
+same 5,000 Gaussian draws and seed. curves.png shows visible changes to
+nonmonotone and nonconvex bounds. surface-slices.png displays three slices
+from the full 101 by 21 grid; calibration was computed jointly on that full
+grid. CSV files retain all plotted values. These examples illustrate the
+operation, rather than measuring repeated-sampling coverage.
+
+Validation
+
+R CMD check completed with 0 errors, 0 warnings and 0 notes. The command used
+rcmdcheck::rcmdcheck(".", args = "--no-tests", build_args = character()).
+The --no-tests option deliberately produced "checking tests ... SKIPPED":
+tests were run separately in an installed copy, with NOT_CRAN=true and local
+socket permissions, rather than being omitted from validation. Examples,
+vignettes, vignette rebuilds and the PDF manual were enabled and passed.
+
+The pkgdown reference index passed. The revised article executed and rendered
+successfully. Its Pandoc output included deprecation messages for the --katex
+and --mathjax flags supplied by the installed rendering tools; no rendering
+was skipped. Documentation regeneration also printed the existing unknown
+@importsFrom tag and unexported plot_smooth method diagnostics. Unrelated
+generated-document changes were restored; these diagnostics did not produce
+R CMD check warnings. The two example figures were inspected visually.
+
+The full installed-copy test suite passed 23,029 expectations across 1,842
+test cases, with 0 failures, 0 errors, 0 warnings and 0 skips. This includes
+332 new regression expectations. The slow hierarchical-model integration
+examples were included. All test commands ran outside the sandbox from the
+outset, as required by the repository instructions.
+
+git diff --check and the staged diff check passed. The final review commit
+contains only the fixes, tests, related documentation, coverage-report
+clarifications and requested reproducible examples described above.

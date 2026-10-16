@@ -7,7 +7,14 @@ scasm_shape_spec <- function(model, smooth, info) {
   if (!identical(smooth$by, "NA") && is.null(smooth$by.level)) {
     cli::cli_abort("Shape intervals for numeric by variables are unsupported; evaluate the unmultiplied component separately.")
   }
+  # In mgcv 1.9-4, the general inequality part of pc replaces Ain after
+  # construction of the named constraints, but leaves xt unchanged. A retained
+  # inequality matrix therefore need not contain the named restrictions.
   margins <- if (length(smooth$margin)) smooth$margin else list(smooth)
+  if (any(vapply(c(list(smooth), margins),
+      scasm_pc_replaces_named_constraints, logical(1)))) {
+    cli::cli_abort("General pc inequalities can replace named scasm restrictions; automatic shape intervals are unsupported. Use shape_confidence_set() with the fitted restrictions.")
+  }
   if (length(smooth$margin) &&
       (any(vapply(smooth$XP, Negate(is.null), logical(1))) ||
        !all(vapply(margins, inherits, logical(1), "Bspline.smooth")))) {
@@ -20,6 +27,11 @@ scasm_shape_spec <- function(model, smooth, info) {
     restriction <- info$margins[[i]]
     if (length(margin$term) != 1L || !inherits(margin, "Bspline.smooth")) {
       cli::cli_abort("Shape intervals currently require univariate B-spline margins.")
+    }
+    if (!is.null(margin$deriv) &&
+        (!is.numeric(margin$deriv) || length(margin$deriv) != 1L ||
+         !is.finite(margin$deriv) || margin$deriv != 0)) {
+      cli::cli_abort("Automatic shape intervals require function-valued B-spline margins; derivative bases are unsupported.")
     }
     codes <- restriction$codes
     if (all(c("m+", "m-") %in% codes) || all(c("c+", "c-") %in% codes)) {
@@ -34,8 +46,10 @@ scasm_shape_spec <- function(model, smooth, info) {
         cli::cli_abort("Named curvature intervals require a B-spline degree of at least two.")
       }
       spacing <- diff(margin$knots)
+      # A nearly linear coefficient vector can have either curvature sign
+      # under nonuniform knots. Permit rounding, not a statistical tolerance.
       if (any(!is.finite(spacing)) || any(spacing <= 0) ||
-          max(abs(spacing / mean(spacing) - 1)) > 1e-7) {
+          max(abs(spacing / mean(spacing) - 1)) > 100 * .Machine$double.eps) {
         cli::cli_abort("Named scasm curvature restrictions with irregular knots do not ensure spline curvature; shape intervals are unsupported.")
       }
     }
@@ -63,8 +77,9 @@ scasm_enforce_smooth_band <- function(d, smooth, constraints, interval, level) {
     x <- d[[margin$term]]
     knots <- margin$knots
     domain <- knots[c(margin$m[1L] + 1L, length(knots) - margin$m[1L])]
-    tol <- 1e-10 * max(1, abs(domain))
-    if (any(!is.finite(x)) || any(x < domain[1L] - tol | x > domain[2L] + tol)) {
+    # Linear extrapolation can lose positivity outside the boundary knots,
+    # even when an evaluation coordinate is only slightly outside the domain.
+    if (any(!is.finite(x)) || any(x < domain[1L] | x > domain[2L])) {
       cli::cli_abort("Shape intervals require finite coordinates inside the fitted B-spline domain.")
     }
   }

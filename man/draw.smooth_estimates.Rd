@@ -184,7 +184,10 @@ Specialist maps and graph plots are outside the scope of this display.}
 \item{interval}{character or \code{NULL}; the default draws stored interval bounds
 unchanged, adding pointwise bounds if absent. An explicit choice validates
 stored interval metadata; \code{"credible"} aliases \code{"confidence"}. Simultaneous
-bands must first be computed from the fitted model by \code{\link[=smooth_estimates]{smooth_estimates()}}.}
+bands must first be computed from the fitted model by \code{\link[=smooth_estimates]{smooth_estimates()}}.
+Method and uncertainty controls such as \code{interval_method}, \code{shape_source},
+\code{frequentist}, and \code{unconditional} also require the fitted model; they
+cannot change intervals when drawing saved estimates.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }

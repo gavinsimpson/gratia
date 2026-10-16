@@ -13,9 +13,9 @@ Lost originally covering whole-grid events: 0
 Unordered transformed intervals: 0
 Increases in maximum interval width: 0
 Maximum discrepancy against independent one-dimensional operators: 2.220446049250313e-16
-Recorded upstream fit failures: 97
+Recorded fit or interval failures: 97
 
-Recorded upstream fit warnings: 66
+Recorded fitting warnings: 66
 
 The known-Gaussian experiment starts with exact pointwise or exact whole-grid
 coverage under independent normal errors with known, unequal variances.
@@ -44,6 +44,8 @@ Only negative eigenvalues within rounding tolerance are replaced by zero.
 The low-penalty estimate uses the same model basis and sp = 1e-8. Comparing
 its empirical bias with selected-penalty bias investigates sensitivity to
 smoothing; boundary constraints and finite-basis approximation still apply.
+This comparison does not isolate smoothing bias from those other sources
+of estimation error, and no low-penalty interval widths are calculated.
 Its zero-width records are for bias and RMSE only, not interval inference.
 
 The bindings CSV records active fitted inequalities, counted when slack is

@@ -1,5 +1,10 @@
 # Keep shape information separate from smooth classes: sc smooths use the
 # ordinary B-spline prediction methods after construction.
+scasm_pc_replaces_named_constraints <- function(smooth) {
+  pc <- smooth$point.con
+  length(pc) > 1L && is.list(pc[[1L]]) && length(pc[[2L]]) > 0L
+}
+
 smooth_shape_constraints <- function(model, smooths = model$smooth,
   ids = seq_along(smooths), warn = TRUE) {
   A <- model$Ain
@@ -14,6 +19,7 @@ smooth_shape_constraints <- function(model, smooths = model$smooth,
       any(A[, indices, drop = FALSE] != 0) &&
       is.matrix(sm$Ain) && nrow(sm$Ain) > 0L
     fitted_margins <- margins
+    replaced <- scasm_pc_replaces_named_constraints(sm)
     margins <- lapply(margins, function(margin) {
       codes <- character()
       if (inherits(margin, "Bspline.smooth")) {
@@ -26,10 +32,13 @@ smooth_shape_constraints <- function(model, smooths = model$smooth,
       linear <- is.matrix(margin$Ain) && nrow(margin$Ain) > 0L
       list(variables = margin$term, codes = codes,
         requested = length(codes) > 0L || linear,
-        retained = retained && linear)
+        retained = retained && linear && !replaced &&
+          !scasm_pc_replaces_named_constraints(margin))
     })
     named_shapes <- any(vapply(margins, function(x) x$requested, logical(1)))
-    linear_constraints <- !named_shapes && is.matrix(sm$Ain) && nrow(sm$Ain) > 0L
+    linear_constraints <- (!named_shapes || replaced ||
+      any(vapply(fitted_margins, scasm_pc_replaces_named_constraints, logical(1)))) &&
+      is.matrix(sm$Ain) && nrow(sm$Ain) > 0L
     if (!named_shapes && !linear_constraints) return(NULL)
     margins <- lapply(seq_along(margins), function(j) {
       # Multivariate tensor margins can omit the mgcv.smooth superclass.
@@ -104,6 +113,11 @@ scasm_shape_caption <- function(info, plotmath = TRUE) {
     }
     if (!margin$retained) add("; requested, not retained")
     add(")")
+  }
+  if (!isTRUE(info$tensor) && isTRUE(info$linear_constraints) &&
+      any(vapply(info$margins, function(m) length(m$codes) > 0L, logical(1)))) {
+    add(if (info$retained) "; general linear constraints retained" else
+      "; general linear constraints requested, not retained")
   }
   if (!isTRUE(plotmath)) return(paste0(unlist(tokens), collapse = ""))
   as.expression(list(Reduce(function(x, y) call("*", x, y), tokens)))

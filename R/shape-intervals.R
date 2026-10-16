@@ -220,7 +220,11 @@ shape_convex_minorant <- function(x, y) {
       cli::cli_abort("The coordinate or value range is too large for reliable convexification in double precision.")
     }
     weight <- (x[idx] - x[a]) / span
-    out[idx] <- (1 - weight) * y[a] + weight * y[b]
+    interpolated <- (1 - weight) * y[a] + weight * y[b]
+    # Roundoff can take the weighted sum outside the endpoints' range, even
+    # when both endpoints are equal. Clamping retains exact flat segments.
+    # Each operation remains increasing in both endpoint values.
+    out[idx] <- pmin(max(y[a], y[b]), pmax(min(y[a], y[b]), interpolated))
   }
   out[hull] <- y[hull]
   out

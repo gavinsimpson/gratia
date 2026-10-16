@@ -342,6 +342,14 @@
     frequentist = frequentist, overall_uncertainty = overall_uncertainty,
     interval = type, ci_level = level, n_sim = nsim, n_cores = ncores, ...))
 
+  interval_info <- attr(out[[1L]], "interval_info")
+  if (identical(interval_info$method, "shape")) {
+    validate_shape_flag(shift, "shift")
+    if (shift || !identical(transform, FALSE)) {
+      cli::cli_abort("Shape intervals describe the unshifted smooth on the model scale; shift and transform are unsupported.")
+    }
+  }
+
   ilink <- if (is.logical(transform)) {
     if (isTRUE(transform)) family(object)$linkinv else identity
   } else if (!is.null(transform)) match.fun(transform)
@@ -353,12 +361,6 @@
     const <- ifelse(length(test) == 0L, 0, const[test])
   } else {
     const <- 0
-  }
-
-  interval_info <- attr(out[[1L]], "interval_info")
-  if (identical(interval_info$method, "shape") &&
-      (isTRUE(shift) || !identical(transform, FALSE))) {
-    cli::cli_abort("Shape intervals describe the unshifted smooth on the model scale; shift and transform are unsupported.")
   }
 
   ## simplify to a data frame for return

@@ -209,11 +209,18 @@ in at most one direction. Tensor smooths require \code{te(..., np = FALSE)} with
 univariate B-spline margins (\code{"sc"} or \code{"bs"}). Normal reparameterisation
 and other complementary bases can invalidate the named surface shape even
 when coefficient inequalities were retained. Curvature additionally
-requires regular fitted knots and degree at least two. Irregular evaluation
+requires equally spaced fitted knots to rounding precision and degree at
+least two. Irregular evaluation
 coordinates are supported. Complete product grids, finite endpoints and
 evaluation inside the fitted B-spline domains are required; use \code{dist = 0}
 for tensors. Numeric \code{by} variables are unsupported; factor-by components
 and separate linear predictors are treated separately.
+Function-valued bases are required; derivative bases are unsupported.
+General \code{pc} inequalities can replace the named coefficient restrictions
+while leaving their original \code{xt} request in the fitted object. These
+replacements are labelled as general constraints and rejected for automatic
+shape intervals. Point equalities that retain the named inequalities are
+supported.
 
 Shape intervals use component-only uncertainty: explicit
 \code{overall_uncertainty = TRUE}, effect shifts and effect transformations are

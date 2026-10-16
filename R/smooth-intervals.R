@@ -25,6 +25,13 @@ validate_smooth_interval <- function(interval, level, n_sim, n_cores, seed) {
   }
 }
 
+validate_shape_flag <- function(value, name) {
+  if (!is.logical(value) || length(value) != 1L || is.na(value)) {
+    cli::cli_abort("{.arg {name}} must be a single TRUE or FALSE for shape intervals.")
+  }
+  invisible(NULL)
+}
+
 # Use precisely the design that supplies component-wise smooth uncertainty.
 # Keep the fitted effect centre separate: overall mean uncertainty need not
 # change the centre. Returning active columns preserves existing SE arithmetic.
