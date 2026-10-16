@@ -132,7 +132,9 @@ serial. These functions leave the caller's worker pool running.
 
 Model selection, evaluation of model expressions and random draws are
 prepared in the caller. Workers receive the coordinates and coefficient
-columns needed for their calculation. Simultaneous intervals use successive
+columns needed for their calculation. Custom prediction methods are evaluated
+in the caller, including custom tensor margins and factor-smooth bases;
+workers receive their prediction matrices. Simultaneous intervals use successive
 draws in selection order, so \code{set.seed()} gives the same results with or
 without workers, independently of their number or completion order.
 \code{derivatives()} uses \code{set.seed()}; the other functions also accept \code{seed},

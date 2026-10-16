@@ -92,6 +92,85 @@ test_that("parallel calculations evaluate local expressions in the caller", {
   ))
 })
 
+test_that("fresh workers preserve custom prediction methods and tensor margins", {
+  # Both methods are absent from fresh workers. The prediction method also uses
+  # a caller function and NextMethod(), so copying just its body is insufficient.
+  rlang::local_bindings(.env = .GlobalEnv,
+    smooth.construct.gratia_worker.smooth.spec = function(object, data, knots) {
+      out <- mgcv::smooth.construct.tp.smooth.spec(object, data, knots)
+      out$X <- 2 * out$X
+      out$S <- lapply(out$S, function(S) 4 * S)
+      class(out) <- c("gratia_worker.smooth", class(out))
+      out
+    },
+    gratia_worker_scale = function(x) 2 * x,
+    Predict.matrix.gratia_worker.smooth = function(object, data) {
+      gratia_worker_scale(NextMethod())
+    })
+  withr::local_seed(350)
+  data <- data.frame(x = runif(120), z = runif(120), w = runif(120))
+  data$y <- sin(5 * data$x) + data$z + rnorm(120, sd = .2)
+  model <- mgcv::gam(y ~ s(x, bs = "gratia_worker", k = 5) + s(z, k = 5),
+    data = data)
+  tensor <- mgcv::gam(y ~ te(x, z, bs = c("gratia_worker", "tp"), k = c(4, 4)) +
+    te(x, w, k = c(4, 4)), data = data)
+  data$fac <- factor(rep(letters[1:3], length.out = nrow(data)))
+  factor_model <- mgcv::gam(y ~ s(x, fac, bs = "fs",
+    xt = list(bs = "gratia_worker"), k = 5) + s(z, k = 5), data = data)
+  expect_true(smooth_task_predict_in_caller(model$smooth[[1]]))
+  expect_false(smooth_task_predict_in_caller(model$smooth[[2]]))
+  expect_true(smooth_task_predict_in_caller(tensor$smooth[[1]]))
+  expect_false(smooth_task_predict_in_caller(tensor$smooth[[2]]))
+  expect_true(smooth_task_predict_in_caller(factor_model$smooth[[1]]))
+  nd <- data[c(7, 2, 7, 10), ]
+  partial_data <- data.frame(x = nd$x, z = .3, w = .5)
+  reference <- expect_smooth_workers(function() list(
+    derivatives(model, data = nd),
+    derivatives(model, data = nd, interval = "simultaneous", n_sim = 50),
+    partial_derivatives(tensor, data = partial_data, focal = c("x", "x"),
+      interval = "simultaneous", n_sim = 50, seed = 24),
+    smooth_samples(model, data = nd, n_draws = 4, seed = 24),
+    smooth_samples(tensor, data = nd, n_draws = 4, seed = 24),
+    derivatives(factor_model, data = nd),
+    smooth_samples(factor_model, data = nd, n_draws = 4, seed = 24)
+  ))
+  # Verify the custom sample values against the caller's prediction method,
+  # rather than relying only on agreement between the two execution paths.
+  draws <- post_draws(model, n_draws = 4, seed = 24)
+  sm <- model$smooth[[1]]
+  expected <- mgcv::PredictMat(sm, nd) %*% t(draws[, smooth_coef_indices(sm)])
+  actual <- reference[[4]]$.value[reference[[4]]$.term == sm$label]
+  expect_equal(actual, as.vector(t(expected)), tolerance = 1e-12)
+
+  withr::defer(mirai::daemons(0))
+  gratia_test_workers(1L)
+  absent <- mirai::mirai(c(
+    exists("Predict.matrix.gratia_worker.smooth", .GlobalEnv, inherits = FALSE),
+    exists("gratia_worker_scale", .GlobalEnv, inherits = FALSE)))[]
+  expect_identical(absent, c(FALSE, FALSE))
+})
+
+test_that("fresh workers preserve optional prediction methods in gam fits", {
+  skip_if_not_installed("scam")
+  loadNamespace("scam")
+  model <- mgcv::gam(y ~ s(x0, bs = "mpi", k = 5) + s(x1, k = 5),
+    data = quick_eg1)
+  expect_false(inherits(model, "scam"))
+  expect_true(smooth_task_predict_in_caller(model$smooth[[1]], model))
+  expect_false(smooth_task_predict_in_caller(model$smooth[[1]],
+    structure(list(), class = "scam")))
+  expect_smooth_workers(function() {
+    if (isTRUE(mirai::daemons_set())) {
+      expect_false(mirai::mirai("scam" %in% loadedNamespaces())[])
+    }
+    list(
+      derivatives(model, n = 4),
+      derivatives(model, n = 4, interval = "simultaneous", n_sim = 50),
+      smooth_samples(model, n_grid = 4, n_draws = 4, seed = 24)
+    )
+  })
+})
+
 test_that("smooth workers reuse joint draws and preserve chain diagnostics", {
   skip_if_not_installed("posterior")
   withr::local_seed(350)

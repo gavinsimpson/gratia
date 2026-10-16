@@ -1690,7 +1690,10 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     tasks[[i]] <- list(sm = smooth_task_smooth(sm),
       data = smooth_task_data(data[, intersect(names(data), terms_in_smooth(sm)), drop = FALSE]),
       model = smooth_matrix_model(model), betas = betas[, idx, drop = FALSE],
-      label = sms[[i]])
+      label = sms[[i]],
+      Xp = if (smooth_task_predict_in_caller(sm, model)) {
+        smooth_predict_matrix(sm, data, model)
+      } else NULL)
   }
   sims <- smooth_task_map(tasks, "calculate_smooth_samples")
 
@@ -1703,8 +1706,8 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 }
 
 # All terms use columns of the same joint posterior draws.
-calculate_smooth_samples <- function(sm, data, model, betas, label) {
-  Xp <- smooth_predict_matrix(sm, data, model)
+calculate_smooth_samples <- function(sm, data, model, betas, label, Xp = NULL) {
+  if (is.null(Xp)) Xp <- smooth_predict_matrix(sm, data, model)
   simu <- Xp %*% t(betas)
   # A prescribed boundary contributes a fixed value to every coefficient draw.
   off <- attr(Xp, "offset", exact = TRUE)
@@ -1904,7 +1907,10 @@ calculate_smooth_samples <- function(sm, data, model, betas, label) {
     tasks[[i]] <- list(sm = smooth_task_smooth(sm),
       data = smooth_task_data(data[, intersect(names(data), terms_in_smooth(sm)), drop = FALSE]),
       model = smooth_matrix_model(model), betas = betas[, idx, drop = FALSE],
-      label = sms[[i]])
+      label = sms[[i]],
+      Xp = if (smooth_task_predict_in_caller(sm, model)) {
+        smooth_predict_matrix(sm, data, model)
+      } else NULL)
   }
   sims <- smooth_task_map(tasks, "calculate_smooth_samples")
 

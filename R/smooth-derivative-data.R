@@ -61,6 +61,10 @@ prepare_derivative_task <- function(model, sm, data, focal, wrt, type, order,
   }
   stencil <- smooth_derivative_stencil(model, sm, data, focal, wrt, type, order, h)
   idx <- smooth_coef_indices(sm)
+  X <- if (smooth_task_predict_in_caller(sm, model)) {
+    smooth_derivative_matrix(sm, stencil, model, h, order,
+      rownames(data), names(betas)[idx])
+  } else NULL
   if (interval == "simultaneous" || interval_method == "bootstrap") {
     validate_smooth_interval(interval, level, n_sim, ncores, NULL)
   }
@@ -73,7 +77,8 @@ prepare_derivative_task <- function(model, sm, data, focal, wrt, type, order,
   } else NULL
   list(sm = smooth_task_smooth(sm),
     data = smooth_task_data(data[, unique(c(terms_in_smooth(sm), focal)), drop = FALSE]),
-    stencil = stencil, model = smooth_matrix_model(model),
+    stencil = if (is.null(X)) stencil else NULL,
+    model = smooth_matrix_model(model), X = X,
     betas = betas[idx], V = V[idx, idx, drop = FALSE],
     h = h, order = order, focal = focal, interval = interval,
     level = level, bootstrap = bootstrap)
@@ -81,8 +86,11 @@ prepare_derivative_task <- function(model, sm, data, focal, wrt, type, order,
 
 calculate_smooth_derivative <- function(sm, data, stencil, model, betas, V,
                                         h, order, focal, interval, level,
-                                        bootstrap) {
-  X <- smooth_derivative_matrix(sm, stencil, model, h, order, rownames(data), names(betas))
+                                        bootstrap, X = NULL) {
+  if (is.null(X)) {
+    X <- smooth_derivative_matrix(sm, stencil, model, h, order,
+      rownames(data), names(betas))
+  }
   d <- compute_derivative(sm, X, betas, V, data, focal)
   if (!is.null(bootstrap)) {
     band <- scasm_bootstrap_limits(X, d$deriv$.derivative, d$deriv$.se,

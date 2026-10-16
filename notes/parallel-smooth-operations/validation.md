@@ -6,8 +6,8 @@ The implementation was developed in the isolated worktree on
 outside the sandbox. Development builds were installed in private temporary
 libraries; fresh mirai workers loaded the same package path as their caller.
 
-The final installed build passed the standard CI suite: **26,698 assertions in
-1,928 tests, with no failures, errors or warnings**. The results recorded 188
+The final installed build passed the standard CI suite: **26,728 assertions in
+1,931 tests, with no failures, errors or warnings**. The results recorded 188
 skipped test cases. The configuration used `NOT_CRAN=true`, `CI=true` and
 `VDIFFR_RUN_TESTS=false`: broader numerical and integration tests ran, while
 visual comparisons, the separate large HGAM paper examples and existing
@@ -49,6 +49,17 @@ Input tests verify that prepared frames retain factor contrasts and matrix
 column attributes, grouped and rowwise inputs work, ordinary random-effect
 formulas shed fitting environments, custom formulas retain theirs, and SCAM's
 numeric margin metadata remains unchanged. No plot annotations were changed.
+
+The custom-prediction regression tests use fresh one- and two-worker pools whose
+global environments contain neither the custom prediction method nor its helper.
+Serial and worker results, including the caller's final RNG state, agree for
+univariate smooths, tensor margins and factor-smooth bases. The custom method
+uses a caller function and `NextMethod()`, and posterior values are also checked
+against direct caller prediction matrices. Method detection covers aliases of
+package functions and factor-smooth basis classes. A separate test fits a scam
+basis with `mgcv::gam()` and verifies agreement while scam remains unloaded in
+the workers. Custom matrices are prepared in the caller; worker S3 registrations
+are unchanged.
 
 The final source package was built with `R CMD build --no-build-vignettes` and
 checked with:

@@ -92,3 +92,20 @@ test_that("smooth metadata preserves atomic margin descriptions", {
   expect_identical(smooth_task_smooth(smooth), smooth)
   expect_identical(smooth_task_smooth(c(2L, 3L)), c(2L, 3L))
 })
+
+test_that("custom method detection includes aliases and factor-smooth bases", {
+  # Aliasing a package function retains its namespace environment, but the
+  # alias itself will not exist in a fresh worker.
+  rlang::local_bindings(.env = .GlobalEnv,
+    Predict.matrix.gratia_alias.smooth = mgcv::Predict.matrix.tprs.smooth)
+  custom <- structure(list(), class = c("gratia_alias.smooth", "tprs.smooth"))
+  ordinary <- structure(list(), class = "tprs.smooth")
+  expect_true(smooth_task_predict_in_caller(custom))
+  expect_false(smooth_task_predict_in_caller(ordinary))
+  for (class in c("fs.interaction", "sz.interaction")) {
+    smooth <- structure(list(base = list(bs = class(custom))), class = class)
+    expect_true(smooth_task_predict_in_caller(smooth))
+    smooth$base$bs <- class(ordinary)
+    expect_false(smooth_task_predict_in_caller(smooth))
+  }
+})

@@ -22,6 +22,40 @@ smooth_matrix_model <- function(model) {
   out
 }
 
+# Custom prediction methods can depend on caller functions, data or S3
+# registrations. Evaluate those bases in the caller and send their matrices.
+# Only methods in namespaces loaded by smooth_predict_matrix() are safe on
+# fresh workers. A gam fit can use scam bases without having the scam class.
+smooth_task_predict_in_caller <- function(smooth, model = NULL) {
+  lookup <- new.env(parent = globalenv())
+  lookup$Predict.matrix <- mgcv::Predict.matrix
+  packages <- c("mgcv", if (inherits(model, "scam")) "scam")
+  needs_caller <- function(classes) {
+    for (class in classes) {
+      method <- utils::getS3method("Predict.matrix", class,
+        optional = TRUE, envir = lookup)
+      if (is.null(method)) next
+      env <- environment(method)
+      name <- paste0("Predict.matrix.", class)
+      if (!isNamespace(env) ||
+          !getNamespaceName(env) %in% packages ||
+          !identical(method, get0(name, envir = env, inherits = FALSE))) {
+        return(TRUE)
+      }
+    }
+    FALSE
+  }
+  if (needs_caller(c(class(smooth), "default"))) return(TRUE)
+  # Factor-smooth methods dispatch again using their original basis class.
+  if (is.list(smooth[["base"]]) &&
+      needs_caller(smooth[["base"]][["bs"]])) return(TRUE)
+  # Tensor products dispatch separately for each marginal basis.
+  margins <- smooth[["margin"]]
+  is.list(margins) && any(vapply(margins, function(margin) {
+    is.list(margin) && smooth_task_predict_in_caller(margin, model)
+  }, logical(1L)))
+}
+
 # Prepared coordinates no longer need model-frame terms or their fitting
 # environment. Keep column attributes, including factor contrasts and matrix
 # columns. Normalize the outer class as grouped or spatial frames need

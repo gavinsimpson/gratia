@@ -112,7 +112,8 @@
   `difference_smooths()` now use workers configured by `mirai::daemons()`
   for independent smooth or comparison calculations (#348). Serial execution
   remains available without workers. Joint posterior draws, seeded simulation
-  results and result order are preserved across worker counts.
+  results and result order are preserved across worker counts. Custom smooth
+  prediction methods are evaluated in the caller so workers use the same bases.
 
 * Plots now support native ggplot2 theme settings for smooths, intervals,
   residuals, diagnostics and other components, including completed patchwork

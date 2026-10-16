@@ -22,6 +22,15 @@ environments are detached; custom random-effect formulas containing function
 calls retain their environment for prediction compatibility and can still carry
 large payloads.
 
+Custom prediction methods are evaluated in the caller, including methods used
+by tensor margins and factor-smooth bases. The resulting matrices are sent to
+workers for derivative and posterior calculations. This preserves methods that
+use local functions, data stored with a function or inherited S3 methods without
+changing the caller's worker registrations. Prediction methods supplied by mgcv
+continue to run in workers, as do scam methods for models fitted by scam. A gam
+fit using a scam basis prepares its matrix in the caller because its workers do
+not otherwise load scam.
+
 Simultaneous intervals use two worker passes. The first returns compact design
 matrices, estimates and standard errors. The caller generates coefficient
 deviations in the established order, only for results that need them, and the
