@@ -152,6 +152,7 @@ make_rd_clog <- function(sigma) {
     "cnorm"    = make_cdf_cnorm(theta),
     "clog"     = make_cdf_clog(theta),
     "gaussian" = cdf_gaussian,
+    "multivariate_normal" = make_cdf_mvn(family),
     "gaulss"   = cdf_gaulss,
     "gevlss"   = cdf_gevlss,
     "gumbls"   = cdf_gumbls,
@@ -191,6 +192,24 @@ make_rd_clog <- function(sigma) {
     lower_tail = TRUE) {
   pnorm(q, mean = mu, sd = sqrt(scale / wt),
     lower.tail = lower_tail, log.p = log_p)
+}
+
+# MVN probabilities describe each response separately. Its fitted covariance
+# supplies the marginal variances; mgcv's mvn family ignores prior weights.
+make_cdf_mvn <- function(family) {
+  sigma <- sqrt(diag(solve(crossprod(family$data$R))))
+  function(q, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+    stats::pnorm(q, mean = mu, sd = rep(sigma, each = NROW(mu)),
+      lower.tail = lower_tail, log.p = log_p)
+  }
+}
+
+make_qf_mvn <- function(family) {
+  sigma <- sqrt(diag(solve(crossprod(family$data$R))))
+  function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+    matrix(stats::qnorm(p, mean = mu, sd = rep(sigma, each = NROW(mu)),
+      lower.tail = lower_tail, log.p = log_p), nrow = NROW(mu))
+  }
 }
 
 make_cdf_cnorm <- function(sigma) {
@@ -411,6 +430,7 @@ extreme_value_probability <- function(log_hazard, log_p = FALSE,
     "cnorm"    = make_qf_cnorm(theta),
     "clog"     = make_qf_clog(theta),
     "cpois"    = qf_poisson,
+    "multivariate_normal" = make_qf_mvn(family),
     "inverse_gaussian" = qf_invgaussian,
     "scaled_t" = make_qf_scat(nu = theta[1], sigma = theta[2]),
     "tweedie"  = make_qf_tw(theta, ab = get_tw_params(family)),

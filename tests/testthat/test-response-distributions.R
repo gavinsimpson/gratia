@@ -205,10 +205,30 @@ test_that("multivariate normal CDFs are marginal and simulation retains covarian
   mu <- cbind(c(0, 1, 2), c(1, 0, -1))
   d <- distribution_from_family(family, mu, 1, 1)
   y <- mu + cbind(c(-1, 0, 1), c(-2, 0, 2))
+  expect_true(is.function(d$family$cdf))
+  expect_true(is.function(d$family$qf))
   expect_equal(unname(d$cdf(y)), unname(matrix(pnorm(c(-1, 0, 1, -1, 0, 1)), 3)))
+  expect_equal(d$qf(c(.1, .5, .9)), mu + outer(qnorm(c(.1, .5, .9)), c(1, 2)))
   expect_equal(distribution_quantile_residuals(d, y, "quantile"),
     matrix(c(-1, 0, 1, -1, 0, 1), 3))
   expect_equal(dim(d$rd()), c(3L, 2L))
+})
+
+test_that("MVN response distributions preserve supplied family functions", {
+  family <- mgcv::mvn(d = 2)
+  family$data$R <- diag(2)
+  family$cdf <- function(q, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+    p <- mu * 0 + if (lower_tail) .25 else .75
+    if (log_p) log(p) else p
+  }
+  family$qf <- function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) mu + 7
+  mu <- matrix(1:6, 3, 2)
+  d <- distribution_from_family(family, mu, 1, 1)
+  expect_identical(d$family$cdf, family$cdf)
+  expect_identical(d$family$qf, family$qf)
+  expect_equal(d$cdf(mu), matrix(.25, 3, 2))
+  expect_equal(d$cdf(mu, log_p = TRUE, lower_tail = FALSE), matrix(log(.75), 3, 2))
+  expect_equal(d$qf(.5), mu + 7)
 })
 
 test_that("glmmTMB proxy preserves conditioning and native residual definitions", {

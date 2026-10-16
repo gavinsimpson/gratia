@@ -331,10 +331,12 @@
   `twlss()`, ordinal, `ziP()` and grouped families. The internal
   `fix_family_qf()` extends mgcv's `fix.family.qf()` with experimental support
   for `scat()`, `tw()`, `Tweedie()`, `gaulss()`, `gevlss()`, `gumbls()`,
-  `gammals()` and `ziplss()`. `fix_family_cdf()` adds cumulative distribution
-  functions for `gaulss()`, `gevlss()`, `gumbls()`, `gammals()` and
-  `ziplss()`, making quantile residuals available. These helpers and
-  `fix_family_rd()` preserve distribution functions supplied by callers.
+  `gammals()`, `ziplss()` and `mvn()`. `fix_family_cdf()` adds cumulative
+  distribution functions for `gaulss()`, `gevlss()`, `gumbls()`, `gammals()`,
+  `ziplss()` and `mvn()`, making quantile residuals available. For `mvn()`,
+  both helpers use each response's marginal Gaussian distribution with its
+  fitted variance (#183). These helpers and `fix_family_rd()` preserve
+  distribution functions supplied by callers.
   `ziplss()` quantile residuals randomise over the probability mass of each
   observed count (GRA-007). Quantile helpers retain log probabilities where
   supported; conversions that cannot represent an extreme probability give an

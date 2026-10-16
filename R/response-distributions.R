@@ -210,18 +210,6 @@ distribution_from_family <- function(family, mu, wt, scale, y = NULL, eta = NULL
   if (ft == "shash" && native_mgcv_hook(family$qf, mgcv::shash()$qf) &&
       !"log_p" %in% names(formals(family$qf))) qf <- bind_qf(qf_shash)
   bounds <- function(y) distribution_bounds(y, family, wt)
-  # Evaluate a separate CDF for each response column. Simulate columns together
-  # to retain their covariance; their PIT residuals can therefore be correlated.
-  if (ft == "multivariate_normal") {
-    V <- solve(crossprod(family$data$R))
-    cdf <- function(q, log_p = FALSE, lower_tail = TRUE)
-      stats::pnorm(q, mean = mu, sd = rep(sqrt(diag(V)), each = NROW(mu)),
-        lower.tail = lower_tail, log.p = log_p)
-    qf <- function(p, log_p = FALSE, lower_tail = TRUE)
-      matrix(stats::qnorm(p, mean = mu,
-        sd = rep(sqrt(diag(V)), each = NROW(mu)),
-        lower.tail = lower_tail, log.p = log_p), nrow = NROW(mu))
-  }
   cdf_left <- if (is.function(cdf)) function(q, log_p = FALSE, lower_tail = TRUE) {
     at <- q
     if (ft %in% c("poisson", "negative_binomial", "ziplss", "cpois") ||
