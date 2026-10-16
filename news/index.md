@@ -813,6 +813,12 @@
 
 ### Bug fixes
 
+- [`n_smooths()`](https://gavinsimpson.github.io/gratia/reference/n_smooths.md)
+  now counts smooth terms in glmmTMB models across the conditional,
+  zero-inflation and dispersion predictors, excluding native random
+  effects. Models without smooths return zero
+  ([\#240](https://github.com/gavinsimpson/gratia/issues/240)).
+
 - Direct calls to
   [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
   now work for

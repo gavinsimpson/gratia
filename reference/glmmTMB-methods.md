@@ -201,6 +201,7 @@ if (requireNamespace("glmmTMB", quietly = TRUE)) {
   d <- data.frame(x = runif(150))
   d$y <- sin(6 * d$x) + rnorm(150, sd = 0.2)
   m <- glmmTMB::glmmTMB(y ~ s(x, k = 8), data = d, REML = TRUE)
+  n_smooths(m) # one smooth term
   draw(m)
   appraise(m, seed = 42)
 
