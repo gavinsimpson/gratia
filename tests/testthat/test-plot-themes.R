@@ -285,3 +285,28 @@ test_that("surface legend defaults respect captured package settings", {
     expect_equal(p$theme$legend.position, "bottom")
   }
 })
+
+
+test_that("independent fixed-colour layers do not join a mapped colour legend", {
+  d <- data.frame(x = rep(1:3, 2), y = 1:6,
+    f = factor(rep(c("a", "b"), each = 3)))
+  points <- data.frame(x = 1:3, y = 2:4, f = factor(c("a", "b", "a")))
+  for (mapping in list(ggplot2::aes(x, y), ggplot2::aes(x, y, colour = f))) {
+    p <- gratia_plot(d, ggplot2::aes(x, y, colour = f)) +
+      ggplot2::geom_line() + geom_gratia_partial_residual_point(
+        data = points, mapping = mapping, inherit.aes = FALSE,
+        colour = "steelblue3", alpha = .5)
+    for (style in list(ggplot2::theme(), ggplot2::theme(
+      geom.gratia.partial.residual = ggplot2::element_geom(colour = "purple"),
+      gratia.alpha.partial.residual = .7))) {
+      b <- ggplot2::ggplot_build(p + style)
+      expect_length(b$plot$guides$params, 1L)
+      expect_length(b$plot$guides$params[[1L]]$decor, 1L)
+      expected_colour <- if (is.null(style$geom.gratia.partial.residual)) "steelblue3" else "purple"
+      expected_alpha <- if (is.null(style$gratia.alpha.partial.residual)) .5 else .7
+      expect_equal(unique(b$data[[2L]]$colour), expected_colour)
+      expect_equal(unique(b$data[[2L]]$alpha), expected_alpha)
+      expect_equal(b$data[[2L]]$y, points$y)
+    }
+  }
+})

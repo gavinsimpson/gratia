@@ -257,8 +257,9 @@ gratia_geom <- function(role, layer) {
       ae[name] <- list(gratia_unmark(value))
       fixed_defaults <- c(fixed_defaults, name)
       layer$aes_params[name] <- NULL
-      # A formerly fixed default must not inherit a mapping from the plot.
-      layer$mapping[name] <- list(NULL)
+      # Suppress inherited mappings only when the layer can inherit them.
+      # On independent layers, named NULL mappings would match legend keys.
+      layer$mapping[name] <- if (layer$inherit.aes) list(NULL) else NULL
     }
   }
   class_name <- paste0("GeomGratia", paste0(
