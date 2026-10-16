@@ -264,6 +264,8 @@
   ppc_batch_size = 10L,
   ..., n_dharma = 250L
 ) {
+  # Keep ggplot object creation serial: trials with mirai workers did not
+  # improve performance.
   line_col_supplied <- !missing(line_col)
   ci_col_supplied <- !missing(ci_col)
   ci_alpha_supplied <- !missing(ci_alpha)
