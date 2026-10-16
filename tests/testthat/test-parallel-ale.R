@@ -380,3 +380,114 @@ test_that("fresh ALE workers retain caller prediction methods and formula depend
     expect_setequal(unlist(mirai::collect_mirai(after, options = ".stop")), pids)
   }
 })
+
+test_that("ALE retains S3 transformations in the caller with fresh workers", {
+  withr::local_seed(8410)
+  mirai::daemons(0)
+  withr::defer(mirai::daemons(0))
+  d <- parallel_ale_fixture()$data
+  d$z <- d$z + 1
+  rlang::local_bindings(.env = .GlobalEnv,
+    gratia_ale_math_helper = function(x) x * 2,
+    Math.AsIs = function(x, ...) gratia_ale_math_helper(NextMethod()))
+  nested <- mgcv::gam(y ~ s(x, k = 5) + x:log(I(z)), data = d)
+  classed <- d
+  classed$z <- I(classed$z)
+  direct <- mgcv::gam(y ~ s(x, k = 5) + x:log(z), data = classed)
+  cases <- list(nested = list(object = nested, data = d),
+    classed = list(object = direct, data = classed))
+  # A stochastic method must consume the same caller draws during prediction,
+  # even when interval simulation has its own explicit seed.
+  .GlobalEnv$Math.AsIs <- function(x, ...) {
+    gratia_ale_math_helper(NextMethod()) + rnorm(length(x), sd = .001)
+  }
+  for (name in names(cases)) {
+    cases[[name]] <- c(cases[[name]], list(focal = "x", block_size = 17L,
+      n_bins = 8L, interval = "simultaneous", n_sim = 80L, seed = 43L))
+  }
+  expected <- lapply(cases, function(args) {
+    set.seed(8411)
+    before <- .Random.seed
+    value <- do.call(ale, args)
+    expect_false(identical(.Random.seed, before))
+    list(value = value, seed = .Random.seed)
+  })
+  check_route <- function(route) {
+    if (route == "registered") {
+      method <- .GlobalEnv$Math.AsIs
+      rlang::local_bindings(.env = .GlobalEnv, Math.AsIs = NULL)
+      rm("Math.AsIs", envir = .GlobalEnv)
+      table <- get(".__S3MethodsTable__.", envir = baseenv())
+      rlang::local_bindings(.env = table, Math.AsIs = method)
+    }
+    for (name in names(cases)) {
+      set.seed(8411)
+      expect_identical(do.call(ale, cases[[name]]), expected[[name]]$value,
+        info = paste(route, name))
+      expect_identical(.Random.seed, expected[[name]]$seed)
+      expect_length(parallel_ale_called_pids(parallel_ale_worker_calls(reset = TRUE)), 0L)
+    }
+  }
+  for (n in parallel_ale_worker_counts()) {
+    parallel_ale_workers(n)
+    absent <- mirai::everywhere(c(
+      exists("Math.AsIs", .GlobalEnv, inherits = FALSE),
+      exists("gratia_ale_math_helper", .GlobalEnv, inherits = FALSE)))
+    expect_false(any(unlist(mirai::collect_mirai(absent, options = ".stop"))))
+    check_route("visible")
+    check_route("registered")
+  }
+})
+
+test_that("ALE does not force active or lazy prediction method bindings", {
+  withr::local_seed(8412)
+  mirai::daemons(0)
+  withr::defer(mirai::daemons(0))
+  f <- parallel_ale_fixture()
+  cases <- list(confidence = list(),
+    seeded = list(interval = "simultaneous", n_sim = 80L, seed = 43L),
+    unseeded = list(interval = "simultaneous", n_sim = 80L))
+  cases <- lapply(cases, function(args) c(list(object = f$smooth, focal = "x",
+    data = f$data, block_size = 17L, n_bins = 8L), args))
+  expected <- lapply(cases, function(args) {
+    set.seed(8413)
+    value <- do.call(ale, args)
+    list(value = value, seed = .Random.seed)
+  })
+  check_binding <- function(name, method, kind) {
+    rlang::local_bindings(.env = .GlobalEnv, !!!setNames(list(NULL), name))
+    rm(list = name, envir = .GlobalEnv)
+    counter <- new.env(parent = emptyenv())
+    counter$reads <- 0L
+    if (kind == "active") {
+      makeActiveBinding(name, function(value) {
+        counter$reads <- counter$reads + 1L
+        runif(1)
+        method
+      }, .GlobalEnv)
+    } else {
+      delayedAssign(name, {
+        counter$reads <- counter$reads + 1L
+        runif(1)
+        method
+      }, assign.env = .GlobalEnv)
+    }
+    for (case in names(cases)) {
+      set.seed(8413)
+      expect_identical(do.call(ale, cases[[case]]), expected[[case]]$value,
+        info = paste(name, kind, case))
+      expect_identical(.Random.seed, expected[[case]]$seed)
+      expect_identical(counter$reads, 0L)
+      expect_length(parallel_ale_called_pids(parallel_ale_worker_calls(reset = TRUE)), 0L)
+    }
+    # Discard the binding before deferred cleanup restores its original value.
+    rm(list = name, envir = .GlobalEnv)
+  }
+  for (n in parallel_ale_worker_counts()) {
+    parallel_ale_workers(n)
+    for (kind in c("active", "lazy")) {
+      check_binding("predict.gam", mgcv::predict.gam, kind)
+      check_binding("Predict.matrix.tprs.smooth", mgcv::Predict.matrix.tprs.smooth, kind)
+    }
+  }
+})

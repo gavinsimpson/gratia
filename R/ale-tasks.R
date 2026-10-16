@@ -94,6 +94,83 @@ ale_lookup_function <- function(name, envir) {
   NULL
 }
 
+# Check visible and registered methods before getS3method() can force a binding.
+ale_registered_binding_safe <- function(name, table) {
+  if (bindingIsActive(name, table)) return(FALSE)
+  if (!rlang::env_binding_are_lazy(table, name)) return(TRUE)
+  # R defers some native registrations using a direct namespace lookup. Other
+  # promises can run caller code and must remain unforced.
+  expression <- eval(substitute(substitute(METHOD, TABLE),
+    list(METHOD = as.name(name), TABLE = table)))
+  identical(expression, quote(get(method, envir = home))) ||
+    (is.call(expression) && identical(expression[[1L]], as.name("lazyLoadDBfetch")))
+}
+
+ale_method_bindings_safe <- function(generic, classes, envir, package) {
+  table <- get(".__S3MethodsTable__.", envir = asNamespace(package))
+  names <- paste(generic, classes, sep = ".")
+  all(vapply(names, function(name) {
+    (!exists(name, envir = envir, inherits = TRUE) ||
+      !is.null(ale_lookup_function(name, envir))) &&
+      (!exists(name, envir = table, inherits = FALSE) ||
+        ale_registered_binding_safe(name, table))
+  }, logical(1L)))
+}
+
+ale_smooth_bindings_safe <- function(smooth) {
+  base <- .subset2(smooth, "base")
+  classes <- c(class(smooth), "default", if (is.list(base)) .subset2(base, "bs"))
+  if (!ale_method_bindings_safe("Predict.matrix", classes, globalenv(), "mgcv")) {
+    return(FALSE)
+  }
+  margins <- .subset2(smooth, "margin")
+  !is.list(margins) || all(vapply(margins, function(margin) {
+    !is.list(margin) || ale_smooth_bindings_safe(margin)
+  }, logical(1L)))
+}
+
+# Arithmetic and transformations can dispatch on classed columns or on values
+# created by I(). Fresh workers must have the same individual and group methods.
+ale_transform_methods_safe <- function(envir) {
+  generics <- unique(c(unlist(ale_formula_functions(), use.names = FALSE),
+    "Math", "Ops", "Summary", "[", "[<-", "[[", "[[<-", "as.vector",
+    "as.numeric", "as.double", "as.character", "length", "rep", "is.na",
+    "is.finite", "is.infinite"))
+  classes <- c("numeric", "integer", "logical", "character", "factor",
+    "ordered", "AsIs", "matrix", "array", "default")
+  methods <- as.vector(outer(generics, classes, paste, sep = "."))
+  safe <- function(env, registered = FALSE) {
+    if (identical(env, baseenv()) || identical(env, asNamespace("stats"))) {
+      return(TRUE)
+    }
+    names <- intersect(methods, ls(envir = env, all.names = TRUE))
+    all(vapply(names, function(name) {
+      method <- if (registered && ale_registered_binding_safe(name, env)) {
+        get0(name, envir = env, inherits = FALSE)
+      } else ale_lookup_function(name, env)
+      if (is.null(method)) return(FALSE)
+      any(vapply(c("base", "stats"), function(package) {
+        identical(method, get0(name, envir = asNamespace(package), inherits = FALSE))
+      }, logical(1L)))
+    }, logical(1L)))
+  }
+  # S3 methods can also be registered without a visible function binding.
+  for (package in c("base", "stats")) {
+    table <- get(".__S3MethodsTable__.", envir = asNamespace(package))
+    if (!safe(table, registered = TRUE)) return(FALSE)
+  }
+  # A formula can have a private environment; S3 dispatch can also find methods
+  # in the global environment even when it is outside that formula's parents.
+  for (start in list(envir, globalenv())) {
+    env <- start
+    while (!identical(env, emptyenv())) {
+      if (!safe(env)) return(FALSE)
+      env <- parent.env(env)
+    }
+  }
+  TRUE
+}
+
 ale_safe_expression <- function(expr, envir, variables) {
   if (missing(expr)) return(FALSE)
   if (is.symbol(expr)) return(as.character(expr) %in% variables)
@@ -143,6 +220,7 @@ ale_predict_in_caller <- function(object, reference, target = NULL, dots = list(
   lookup <- new.env(parent = globalenv())
   lookup$predict <- stats::predict
   for (cl in class(object)) {
+    if (!ale_method_bindings_safe("predict", cl, lookup, "stats")) return(TRUE)
     method <- utils::getS3method("predict", cl, optional = TRUE, envir = lookup)
     if (is.null(method)) next
     env <- environment(method)
@@ -151,7 +229,8 @@ ale_predict_in_caller <- function(object, reference, target = NULL, dots = list(
           inherits = FALSE))) return(TRUE)
     break
   }
-  if (any(vapply(object$smooth, smooth_task_predict_in_caller, logical(1L),
+  if (!all(vapply(object$smooth, ale_smooth_bindings_safe, logical(1L))) ||
+      any(vapply(object$smooth, smooth_task_predict_in_caller, logical(1L),
     model = object))) return(TRUE)
   # Native prediction can invoke this callback even for link-scale requests.
   if (!is.null(object$family$predict)) return(TRUE)
@@ -173,6 +252,7 @@ ale_predict_in_caller <- function(object, reference, target = NULL, dots = list(
   if (!all(vapply(predictors, ale_plain_column, logical(1L))) ||
       !all(vapply(dots, ale_plain_column, logical(1L)))) return(TRUE)
   env <- model_envir(object)
+  if (!ale_transform_methods_safe(env)) return(TRUE)
   contrasts <- c(object$contrasts, lapply(predictors, attr, which = "contrasts"))
   if (!all(vapply(contrasts, ale_safe_contrast, logical(1L), envir = env))) return(TRUE)
   pred <- as.list(attr(tt, "predvars"))[-1L]

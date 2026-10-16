@@ -175,7 +175,9 @@ caller's random-number state across worker counts. Models requiring custom
 prediction methods, family callbacks, contrasts or formula functions that
 workers cannot safely evaluate retain serial prediction. Standard arithmetic
 and common base and stats transformations can run on workers; local helpers,
-stochastic expressions and other package functions retain serial prediction.
+stochastic expressions, custom S3 transformation methods and other package
+functions retain serial prediction. Method checks do not invoke active or
+lazy caller bindings.
 
 This implementation is written independently from the published ALE
 definition, without using code from mgcViz or ALEPlot.

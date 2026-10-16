@@ -89,3 +89,29 @@ test_that("ALE worker models release fitting environments without changing predi
   expect_identical(predict_model(worker, nd, type = "lpmatrix"),
     predict_model(m, nd, type = "lpmatrix"))
 })
+
+test_that("ALE inspects S3 transformation bindings without running caller code", {
+  withr::local_seed(8414)
+  for (kind in c("active", "lazy")) {
+    env <- new.env(parent = asNamespace("stats"))
+    counter <- new.env(parent = emptyenv())
+    counter$reads <- 0L
+    if (kind == "active") {
+      makeActiveBinding("Math.AsIs", function(value) {
+        counter$reads <- counter$reads + 1L
+        runif(1)
+        function(x, ...) NextMethod()
+      }, env)
+    } else {
+      delayedAssign("Math.AsIs", {
+        counter$reads <- counter$reads + 1L
+        runif(1)
+        function(x, ...) NextMethod()
+      }, assign.env = env)
+    }
+    before <- .Random.seed
+    expect_false(ale_transform_methods_safe(env))
+    expect_identical(counter$reads, 0L)
+    expect_identical(.Random.seed, before)
+  }
+})

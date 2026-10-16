@@ -237,8 +237,9 @@
   `draw()` plots saved results with parameter labels and a scale caption.
   Prediction blocks can use workers configured by `mirai::daemons()`. Block
   accumulation order, shared interval draws and caller RNG handling are
-  preserved. Custom prediction methods and expressions that require the
-  caller retain serial prediction.
+  preserved. Custom prediction methods and transformations that require caller
+  functions or S3 methods retain serial prediction. Method checks do not invoke
+  active or lazy caller bindings.
 
 * `data_sim()` now accepts family objects, explicit predictors and generating
   parameters for scalar, location-scale, categorical, multivariate and Cox
