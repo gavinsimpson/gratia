@@ -125,11 +125,12 @@ qq_plot(
 - type:
 
   character or `NULL`; residual type: `"deviance"`, `"response"`,
-  `"pearson"`, `"pit"`, `"quantile"`, or `"dharma"`. `NULL` uses the
-  model-specific default: deviance for ordinary lm/glm/GAM fits, and
-  quantile for supported grouped families, GJRM, sdmTMB and full
-  mixed-model checks. glmmTMB uses Pearson residuals conditionally and
-  response residuals marginally. Extracted GAM components follow the
+  `"pearson"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
+  [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) models). `NULL`
+  uses the model-specific default: deviance for ordinary lm/glm/GAM
+  fits, and quantile for supported grouped families, GJRM, sdmTMB and
+  full mixed-model checks. glmmTMB uses Pearson residuals conditionally
+  and response residuals marginally. Extracted GAM components follow the
   ordinary GAM defaults. See
   [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
@@ -273,6 +274,16 @@ for these choices and limits. Bands condition on fitted parameters and
 exclude fitting uncertainty; they do not provide simultaneous coverage.
 Traditional residuals use the fitted response distributions or a normal
 approximation.
+
+For [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) fits,
+`type = "surrogate"` uses logistic reference quantiles with location
+zero and scale one. Set `method = NULL`. Independent observations have
+approximate pointwise bands obtained by applying
+[`qlogis()`](https://rdrr.io/r/stats/Logistic.html) to beta
+order-statistic limits. Worm plots subtract the same logistic reference
+quantiles from residuals and bands. These references treat fitted
+parameters as fixed. See
+[`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md).
 
 Subtitles name the method. Captions identify conditioning and field
 choices, joint simulation bands or omitted bands. Routine pointwise

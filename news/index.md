@@ -147,6 +147,17 @@
 
 ### New features
 
+- Surrogate residuals are available for
+  [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) models
+  through
+  [`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md)
+  and `type = "surrogate"` in residual diagnostic plots and
+  [`add_residuals()`](https://gavinsimpson.github.io/gratia/reference/add_residuals.md).
+  QQ and worm plots use logistic reference quantiles. The calculation
+  follows Liu and Zhang (2018), requires no additional package, and
+  preserves accuracy in extreme tails
+  ([\#359](https://github.com/gavinsimpson/gratia/issues/359)).
+
 - Plots now support native ggplot2 theme settings for smooths,
   intervals, residuals, diagnostics and other components, including
   completed patchwork figures.

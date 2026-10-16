@@ -200,7 +200,9 @@ error; a normal approximation must be requested explicitly.</p></dd>
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
 <dd><p>Residual type; <code>NULL</code> follows the model-specific defaults in
 <code><a href="appraise.html">appraise()</a></code>. PIT and quantile residuals are available for supported response
-distributions; see <a href="diagnostic_support.html">diagnostic_support</a>.</p></dd>
+distributions. <code>"surrogate"</code> is available for <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">ocat()</a></code> models and uses
+logistic QQ references with <code>method = NULL</code>; see <code><a href="surrogate_residuals.html">surrogate_residuals()</a></code>
+and <a href="diagnostic_support.html">diagnostic_support</a>.</p></dd>
 
 
 <dt id="arg-n-uniform">n_uniform<a class="anchor" aria-label="anchor" href="#arg-n-uniform"></a></dt>

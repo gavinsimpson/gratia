@@ -33,12 +33,16 @@ add_residuals(data, model, value = ".residual", type = "deviance", ...)
 
   character; the type of residuals to return. See
   [`mgcv::residuals.gam()`](https://rdrr.io/pkg/mgcv/man/residuals.gam.html)
-  for options.
+  for options, or use `"surrogate"` for models fitted with
+  [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html).
 
 - ...:
 
   additional arguments passed to
-  [`mgcv::residuals.gam()`](https://rdrr.io/pkg/mgcv/man/residuals.gam.html).
+  [`mgcv::residuals.gam()`](https://rdrr.io/pkg/mgcv/man/residuals.gam.html)
+  or, for `type = "surrogate"`, to
+  [`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md),
+  including `seed`.
 
 ## Value
 

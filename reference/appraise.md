@@ -160,11 +160,12 @@ appraise(
 - type:
 
   character or `NULL`; residual type: `"deviance"`, `"response"`,
-  `"pearson"`, `"pit"`, `"quantile"`, or `"dharma"`. `NULL` uses the
-  model-specific default: deviance for ordinary lm/glm/GAM fits, and
-  quantile for supported grouped families, GJRM, sdmTMB and full
-  mixed-model checks. glmmTMB uses Pearson residuals conditionally and
-  response residuals marginally. Extracted GAM components follow the
+  `"pearson"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
+  [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) models). `NULL`
+  uses the model-specific default: deviance for ordinary lm/glm/GAM
+  fits, and quantile for supported grouped families, GJRM, sdmTMB and
+  full mixed-model checks. glmmTMB uses Pearson residuals conditionally
+  and response residuals marginally. Extracted GAM components follow the
   ordinary GAM defaults. See
   [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
@@ -336,6 +337,14 @@ Bands are omitted for dependent responses. Censored and multivariate
 outcomes are unsupported. See
 [`dharma_residuals()`](https://gavinsimpson.github.io/gratia/reference/dharma_residuals.md)
 for the calculation.
+
+Use `type = "surrogate"` for
+[`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) models. These
+residuals are continuous draws on the latent logistic scale, centred at
+the fitted latent mean. QQ and worm plots require `method = NULL` and
+compare to a logistic distribution with location zero and scale one.
+Each appraisal shares one residual vector across panels. See
+[`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md).
 
 With `type = NULL`, ordinary lm/glm/GAM fits use deviance residuals.
 Models fitted with

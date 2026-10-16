@@ -143,7 +143,11 @@ scalable_residuals_hist_plot(
   Residual type; `NULL` follows the model-specific defaults in
   [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md).
   PIT and quantile residuals are available for supported response
-  distributions; see
+  distributions. `"surrogate"` is available for
+  [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) models and uses
+  logistic QQ references with `method = NULL`; see
+  [`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md)
+  and
   [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - n_uniform:

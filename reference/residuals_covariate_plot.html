@@ -168,7 +168,8 @@ fitting call only when needed and verifying them in the same way.</p></dd>
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
 <dd><p>character or <code>NULL</code>; residual type: <code>"deviance"</code>, <code>"pearson"</code>,
-<code>"response"</code>, <code>"pit"</code>, <code>"quantile"</code>, or <code>"dharma"</code>. Grouped models automatically use
+<code>"response"</code>, <code>"pit"</code>, <code>"quantile"</code>, <code>"dharma"</code>, or <code>"surrogate"</code> (for
+<code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">ocat()</a></code> models). Grouped models automatically use
 quantile residuals when all active components are supported, otherwise all
 use deviance residuals with a message. Ordinary models retain deviance
 residuals by default. See <code><a href="appraise.html">appraise()</a></code> for distributional support.</p></dd>
@@ -198,7 +199,8 @@ blank. Counts for occupied cells are retained in the plotting data.</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
-<dd><p>integer; random seed to use for PIT, quantile or DHARMa-style residuals.</p></dd>
+<dd><p>integer; random seed to use for PIT, quantile, surrogate or
+DHARMa-style residuals.</p></dd>
 
 
 <dt id="arg-conditioning">conditioning<a class="anchor" aria-label="anchor" href="#arg-conditioning"></a></dt>

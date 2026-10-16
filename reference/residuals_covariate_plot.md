@@ -112,9 +112,10 @@ scalable_residuals_covariate_plot(
 - type:
 
   character or `NULL`; residual type: `"deviance"`, `"pearson"`,
-  `"response"`, `"pit"`, `"quantile"`, or `"dharma"`. Grouped models
-  automatically use quantile residuals when all active components are
-  supported, otherwise all use deviance residuals with a message.
+  `"response"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
+  [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) models). Grouped
+  models automatically use quantile residuals when all active components
+  are supported, otherwise all use deviance residuals with a message.
   Ordinary models retain deviance residuals by default. See
   [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
   for distributional support.
@@ -144,8 +145,8 @@ scalable_residuals_covariate_plot(
 
 - seed:
 
-  integer; random seed to use for PIT, quantile or DHARMa-style
-  residuals.
+  integer; random seed to use for PIT, quantile, surrogate or
+  DHARMa-style residuals.
 
 - conditioning:
 
