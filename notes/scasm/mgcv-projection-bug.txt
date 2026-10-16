@@ -1,0 +1,25 @@
+Subject: scasm() errors when increasing constraints leave a constant smooth
+
+Hi Simon,
+
+With mgcv 1.9-4, the example below fails with "subscript out of bounds" in
+ZHZtproj(), called by getVb() from scasm.fit(). I expected an intercept and
+a constant (centred to zero) smooth: a constant satisfies the requested
+increasing constraint.
+
+library("mgcv")
+set.seed(1)
+d <- data.frame(x = runif(80))
+d$y <- -d$x + rnorm(80, sd = 0.01)
+scasm(y ~ s(x, bs = "sc", xt = "m+", k = 6), data = d)
+
+In ZHZtproj(), removing the constrained coefficients can leave ii empty.
+Then 1:length(ii) is 1:0, so H[jj, ] indexes a nonexistent row. The same
+indexing is present in both block-copy loops. I also reproduced the error
+with the ZHZtproj() function from the development source labelled 1.9-5,
+inspected on 16 October 2026; I have not run the complete development build.
+
+Source: https://svn.r-project.org/R-packages/trunk/mgcv/R/scasm.r
+
+Best,
+Gavin

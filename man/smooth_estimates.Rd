@@ -30,6 +30,7 @@ smooth_estimates(object, ...)
   n_sim = 10000,
   n_cores = 1,
   seed = NULL,
+  interval_method = c("auto", "gaussian", "bootstrap"),
   ...
 )
 }
@@ -125,6 +126,11 @@ for simultaneous bands. Parallel simulation requires OpenMP support.}
 \item{seed}{integer or \code{NULL}; an explicit simulation seed preserves the
 caller's RNG state. Shared coefficient draws make results independent of
 selected smooth order and parallel evaluation scheduling.}
+
+\item{interval_method}{character; "auto" uses stored scasm bootstrap draws
+for pointwise intervals when available, and Gaussian intervals otherwise.
+Use "gaussian" to request covariance-based limits or "bootstrap" to
+require stored draws. Simultaneous bootstrap bands are not supported.}
 }
 \value{
 A data frame (tibble), which is of class \code{"smooth_estimates"}.
@@ -161,6 +167,25 @@ the covariance of the constrained coefficients. With
 \code{overall_uncertainty = TRUE}, their standard errors also include intercept
 uncertainty and its covariance with the smooth; estimates remain centred.
 Models without an intercept use smooth-only uncertainty for either setting.
+Native scasm fits use component-only uncertainty by default. Explicitly
+requesting \code{overall_uncertainty = TRUE} warns once if selected smooths lack
+the centring information needed to add mean uncertainty. Ordinary GAM
+defaults are unchanged.
+
+Bootstrap pointwise limits follow mgcv's percentiles and its \code{svar.only}
+correction for smoothing bias. The correction can move limits beyond the
+fitted shape constraints. Estimates and covariance-based standard errors
+are unchanged; \code{.crit} is \code{NA} for asymmetric bootstrap limits. No new
+replicates are generated. Simultaneous intervals use Gaussian draws and
+warn if automatic selection leaves stored bootstrap draws unused.
+
+The \code{interval_info} attribute records the interval source and correction.
+The \code{shape_constraints} attribute identifies requests and retained
+inequalities for each fitted smooth and tensor margin. Captions use
+plotmath arrows for increasing and decreasing constraints while \code{.type}
+and \code{\link[=smooth_type]{smooth_type()}} keep their existing basis names. Unsupported tensor
+requests produce a warning and are labelled as not retained.
+
 Smoothing-parameter uncertainty is not currently supported for SCAM models;
 use \code{unconditional = FALSE}.
 

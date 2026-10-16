@@ -1326,7 +1326,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: draw.gam
 > ### Title: Plot smooth and parametric terms from a fitted GAM
-> ### Aliases: draw.gam
+> ### Aliases: draw.gam draw.scasm
 > 
 > ### ** Examples
 > 

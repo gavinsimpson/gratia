@@ -229,7 +229,8 @@
 #'   to work on Windows with current `R`).
 #' @param partial_match logical; should matching `parm` use a partial match or
 #'   an exact match? Can only be used if `length(parm)` is `1`.
-#' @param ... additional arguments for methods. Not used.
+#' @param ... additional arguments passed to [smooth_estimates()], including
+#'   `interval_method` to select Gaussian or stored scasm bootstrap intervals.
 #' @param newdata DEPRECATED! data frame; containing new values of the
 #'   covariates used in the model fit. The selected smooth(s) will be evaluated
 #'   at the supplied values.
@@ -240,6 +241,10 @@
 #' @note `overall_uncertainty` applies to both pointwise and simultaneous
 #'   intervals. Each simultaneous band covers the evaluation points of one
 #'   fitted smooth; separate smooths do not form a joint coverage set.
+#'   Native scasm fits default to `overall_uncertainty = FALSE` and use stored
+#'   bootstrap draws for pointwise intervals when available, as in
+#'   [smooth_estimates()]. Shifting and transforming a smooth preserves its
+#'   interval limits, including asymmetric bootstrap limits.
 #' 
 #' @return a tibble with components:
 #' 1. `.smooth`; character indicating to which term each row relates,
@@ -250,7 +255,8 @@
 #' 5. zero or more variables containing values of the by variable,
 #' 6. `.estimate`; estimated value of the smooth,
 #' 7. `.se`; standard error of the estimated value of the smooth,
-#' 8. `.crit`; critical value for the `100 * level`% confidence interval.
+#' 8. `.crit`; critical value for the `100 * level`% confidence interval;
+#'    `NA` for bootstrap limits.
 #' 9. `.lower_ci`; lower limit of the confidence or simultaneous interval,
 #' 10. `.upper_ci`; upper limit of the confidence or simultaneous interval,
 #'
@@ -308,6 +314,9 @@
   ...,
   newdata = NULL
 ) {
+  if (missing(overall_uncertainty) && is_scasm_model(object)) {
+    overall_uncertainty <- FALSE
+  }
   S <- smooths(object)
   ## select smooths
   select <- check_user_select_smooths(
@@ -366,19 +375,10 @@
   # is not currently well documented.
   # class(out) <- class(out)[-(1:2)]
 
-  ## using se and crit, compute the lower and upper intervals
-  # out <- add_column(out,
-  #   .lower_ci = out$.estimate - (out$.crit * out$.se),
-  #   .upper_ci = out$.estimate + (out$.crit * out$.se)
-  # )
-
+  # Shift the stored limits directly: bootstrap limits need not be symmetric.
   out <- mutate(out,
-    .estimate = .data$.estimate + const
-  ) |>
-    mutate(
-      .lower_ci = .data$.estimate - (.data$.crit * .data$.se),
-      .upper_ci = .data$.estimate + (.data$.crit * .data$.se)
-    )
+    across(all_of(c(".estimate", ".lower_ci", ".upper_ci")), ~ .x + const)
+  )
 
   ## transform
   out <- out |>

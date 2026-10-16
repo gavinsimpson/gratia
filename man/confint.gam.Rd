@@ -83,7 +83,8 @@ to work on Windows with current \code{R}).}
 \item{partial_match}{logical; should matching \code{parm} use a partial match or
 an exact match? Can only be used if \code{length(parm)} is \code{1}.}
 
-\item{...}{additional arguments for methods. Not used.}
+\item{...}{additional arguments passed to \code{\link[=smooth_estimates]{smooth_estimates()}}, including
+\code{interval_method} to select Gaussian or stored scasm bootstrap intervals.}
 
 \item{newdata}{DEPRECATED! data frame; containing new values of the
 covariates used in the model fit. The selected smooth(s) will be evaluated
@@ -100,7 +101,8 @@ per the variables in the smooth,
 \item zero or more variables containing values of the by variable,
 \item \code{.estimate}; estimated value of the smooth,
 \item \code{.se}; standard error of the estimated value of the smooth,
-\item \code{.crit}; critical value for the \code{100 * level}\% confidence interval.
+\item \code{.crit}; critical value for the \code{100 * level}\% confidence interval;
+\code{NA} for bootstrap limits.
 \item \code{.lower_ci}; lower limit of the confidence or simultaneous interval,
 \item \code{.upper_ci}; upper limit of the confidence or simultaneous interval,
 }
@@ -113,6 +115,10 @@ terms of a fitted GAM.
 \code{overall_uncertainty} applies to both pointwise and simultaneous
 intervals. Each simultaneous band covers the evaluation points of one
 fitted smooth; separate smooths do not form a joint coverage set.
+Native scasm fits default to \code{overall_uncertainty = FALSE} and use stored
+bootstrap draws for pointwise intervals when available, as in
+\code{\link[=smooth_estimates]{smooth_estimates()}}. Shifting and transforming a smooth preserves its
+interval limits, including asymmetric bootstrap limits.
 }
 \examples{
 load_mgcv()

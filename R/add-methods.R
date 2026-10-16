@@ -416,6 +416,12 @@
 #'   0 < `coverage` < 1.
 #' @param ... arguments passed to other methods.
 #'
+#' @details For smooth estimates, this function computes Gaussian pointwise
+#'   intervals from the saved estimates and standard errors. It replaces any
+#'   existing limits and updates their interval metadata. To retain stored
+#'   bootstrap or simultaneous limits, draw the estimates directly with
+#'   [draw()] without calling `add_confint()`.
+#'
 #' @export
 `add_confint` <- function(object, coverage = 0.95, ...) {
   UseMethod("add_confint")
@@ -446,6 +452,15 @@
     .lower_ci = .data$.estimate - (crit * .data$.se),
     .upper_ci = .data$.estimate + (crit * .data$.se)
   )
+  if (".crit" %in% names(object)) object$.crit <- rep(crit, nrow(object))
+  info <- attr(object, "interval_info")
+  if (!is.null(info)) {
+    info$interval <- "confidence"
+    info$level <- coverage
+    info$method <- "gaussian"
+    info$correction <- "none"
+    attr(object, "interval_info") <- info
+  }
 
   ## return
   object

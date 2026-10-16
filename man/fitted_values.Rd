@@ -21,7 +21,8 @@ fitted_values(object, ...)
   n_sim = 10000,
   n_cores = 1,
   seed = NULL,
-  unconditional = FALSE
+  unconditional = FALSE,
+  interval_method = c("auto", "gaussian", "bootstrap")
 )
 
 \method{fitted_values}{gamm}(object, ...)
@@ -69,6 +70,11 @@ With \code{NULL}, the current random number state is used and advanced.}
 \item{unconditional}{logical; include smoothing parameter uncertainty in
 the Bayesian covariance matrix, if available. Otherwise a warning is
 issued and the uncorrected covariance is used.}
+
+\item{interval_method}{character; "auto" uses stored scasm bootstrap draws
+for pointwise intervals when available, and Gaussian intervals otherwise.
+Use "gaussian" to request covariance-based limits or "bootstrap" to
+require stored draws. Simultaneous bootstrap bands are not supported.}
 }
 \value{
 A tibble (data frame) whose first \emph{m} columns contain either the data
@@ -94,6 +100,17 @@ is the predicted probability for a single category of the response.
 Generate fitted values from a estimated GAM
 }
 \details{
+Native scasm fits with stored bootstrap draws use mgcv's pointwise limits
+by default, including its \code{svar.only} correction for smoothing bias.
+\code{interval_method = "gaussian"} restores covariance-based limits. \code{.se}
+retains its existing covariance-based meaning. No replicates are generated.
+Bootstrap limits use existing scalar and location-scale parameter
+transformations. Unsupported nonlinear family outputs give an error for
+an explicit bootstrap request; automatic selection warns and uses Gaussian
+limits. Simultaneous bootstrap bands are not supported. Automatic
+simultaneous intervals warn when stored bootstrap draws are left unused.
+The \code{interval_info} attribute records the method and correction.
+
 Formula offsets are included in predictions. Offsets supplied only through
 the fitting function's \code{offset} argument are omitted, including when
 \code{data = NULL}: this function evaluates explicit prediction rows internally.
@@ -136,7 +153,7 @@ Simultaneous intervals use joint Gaussian coefficient draws and a critical
 value based on the maximum absolute standardized deviation over the supplied
 rows. Their limits are computed on the link scale and transformed if
 \code{scale = "response"}; \code{.se} remains on the link scale. The simulation
-covariance must be positive definite. Supported families are Gaussian,
+covariance may be positive semidefinite. Supported families are Gaussian,
 Poisson, binomial, Gamma, inverse Gaussian, quasi families, negative binomial,
 Tweedie, beta regression, and scaled t, fitted by \code{gam()} or \code{bam()} (including
 the \code{gam} component of a \code{gamm()} fit). Other families and \code{scam} models

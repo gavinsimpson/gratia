@@ -25,9 +25,7 @@ simultaneous_intervals <- function(
       !identical(dim(V), rep(ncol(X), 2L))) {
     cli::cli_abort("Incompatible estimates, standard errors, X and V.")
   }
-  if (any(!is.finite(V)) || !isSymmetric(unname(V))) {
-    cli::cli_abort("{.arg V} must be finite and symmetric.")
-  }
+  V <- simultaneous_covariance(V)
   if (any(is.infinite(estimate)) || any(is.infinite(se)) ||
       any(is.infinite(X)) || any(se < 0, na.rm = TRUE)) {
     cli::cli_abort("Estimates and X must not be infinite; SEs must be non-negative and not infinite.")
@@ -59,16 +57,36 @@ simultaneous_intervals <- function(
   list(critical = critical, lower = lower, upper = upper)
 }
 
-# Generate once per coverage family so row blocks and comparisons share draws.
-simultaneous_coefficient_deviations <- function(V, n_sim, n_cores) {
-  if (any(!is.finite(V)) || !isSymmetric(unname(V))) {
+# Remove numerical asymmetry before validating or factoring the covariance.
+simultaneous_covariance <- function(V) {
+  if (!is.matrix(V) || !is.numeric(V) || nrow(V) != ncol(V) ||
+      any(!is.finite(V))) {
     cli::cli_abort("{.arg V} must be finite and symmetric.")
   }
-  # Do not silently regularise the covariance: that changes the uncertainty.
-  if (inherits(tryCatch(chol(V), error = identity), "error")) {
-    cli::cli_abort("Simultaneous intervals require a positive-definite covariance matrix.")
+  tolerance <- 100 * ncol(V) * .Machine$double.eps * max(abs(V))
+  if (max(abs(V - t(V))) > tolerance) {
+    cli::cli_abort("{.arg V} must be finite and symmetric.")
   }
-  mvnfast::rmvn(n = n_sim, mu = rep(0, ncol(V)), sigma = V, ncores = n_cores)
+  if (isSymmetric(unname(V), tol = 0)) V else (V + t(V)) / 2
+}
+
+# Generate once per coverage family so row blocks and comparisons share draws.
+simultaneous_coefficient_deviations <- function(V, n_sim, n_cores) {
+  V <- simultaneous_covariance(V)
+  # Preserve the existing draws when the ordinary Cholesky factor exists.
+  if (!inherits(tryCatch(chol(V), error = identity), "error")) {
+    return(mvnfast::rmvn(n = n_sim, mu = rep(0, ncol(V)), sigma = V, ncores = n_cores))
+  }
+  eig <- eigen(V, symmetric = TRUE)
+  tolerance <- 100 * ncol(V) * .Machine$double.eps * max(abs(V))
+  if (any(eig$values < -tolerance)) {
+    cli::cli_abort("Simultaneous intervals require a positive-semidefinite covariance matrix.")
+  }
+  keep <- eig$values > 0
+  if (!any(keep)) return(matrix(0, n_sim, ncol(V)))
+  root <- sweep(eig$vectors[, keep, drop = FALSE], 2L,
+    sqrt(pmax(0, eig$values[keep])), FUN = "*")
+  matrix(stats::rnorm(n_sim * sum(keep)), n_sim, sum(keep)) %*% t(root)
 }
 
 # Shared calibration kernel for linear coefficient deviations and nonlinear

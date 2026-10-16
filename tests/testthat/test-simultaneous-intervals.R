@@ -56,8 +56,8 @@ test_that("joint interval inputs and covariance are validated", {
   expect_error(simultaneous_intervals(1, 1, matrix(1), matrix(NA_real_)), "symmetric")
   expect_error(simultaneous_intervals(1, 1, matrix(1, 1, 2),
     matrix(c(1, 0, 1, 1), 2)), "symmetric")
-  expect_error(simultaneous_intervals(1, 1, matrix(1, 1, 2), matrix(1, 2, 2)),
-    "positive-definite")
+  expect_error(simultaneous_intervals(1, 1, matrix(1, 1, 2), diag(c(1, -1))),
+    "positive-semidefinite")
 })
 
 test_that("modern derivative adapters preserve the original joint calculation", {

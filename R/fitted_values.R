@@ -7,6 +7,7 @@
 #' @param scale character; what scale should the fitted values be returned on?
 #'   `"linear predictor"` is a synonym for `"link"` if you prefer that
 #'   terminology.
+#' @inheritParams smooth_estimates
 #' @param ci_level numeric; a value between 0 and 1 indicating the coverage of
 #'   the credible interval.
 #' @param interval character; `"confidence"` (the default) gives pointwise
@@ -27,6 +28,17 @@
 #'   [mgcv::predict.gam()].
 #'
 #' @details
+#' Native scasm fits with stored bootstrap draws use mgcv's pointwise limits
+#' by default, including its `svar.only` correction for smoothing bias.
+#' `interval_method = "gaussian"` restores covariance-based limits. `.se`
+#' retains its existing covariance-based meaning. No replicates are generated.
+#' Bootstrap limits use existing scalar and location-scale parameter
+#' transformations. Unsupported nonlinear family outputs give an error for
+#' an explicit bootstrap request; automatic selection warns and uses Gaussian
+#' limits. Simultaneous bootstrap bands are not supported. Automatic
+#' simultaneous intervals warn when stored bootstrap draws are left unused.
+#' The `interval_info` attribute records the method and correction.
+#'
 #' Formula offsets are included in predictions. Offsets supplied only through
 #' the fitting function's `offset` argument are omitted, including when
 #' `data = NULL`: this function evaluates explicit prediction rows internally.
@@ -69,7 +81,7 @@
 #' value based on the maximum absolute standardized deviation over the supplied
 #' rows. Their limits are computed on the link scale and transformed if
 #' `scale = "response"`; `.se` remains on the link scale. The simulation
-#' covariance must be positive definite. Supported families are Gaussian,
+#' covariance may be positive semidefinite. Supported families are Gaussian,
 #' Poisson, binomial, Gamma, inverse Gaussian, quasi families, negative binomial,
 #' Tweedie, beta regression, and scaled t, fitted by `gam()` or `bam()` (including
 #' the `gam` component of a `gamm()` fit). Other families and `scam` models
@@ -150,7 +162,8 @@
                                 ci_level = 0.95, envir = NULL, ...,
                                 interval = c("confidence", "simultaneous"),
                                 n_sim = 10000, n_cores = 1, seed = NULL,
-                                unconditional = FALSE) {
+                                unconditional = FALSE,
+                                interval_method = c("auto", "gaussian", "bootstrap")) {
   interval <- match.arg(interval)
   object <- with_model_envir(object, envir)
   # Handle everything up to and including the extended families, but not more
@@ -174,6 +187,8 @@
   # handle special distributions that return more than vector fit & std. err.
   # find the name of the function that produces fitted values for this family
   fit_vals_fun <- get_fit_fun(fn)
+  resolved_method <- scasm_interval_method(object, interval_method, interval,
+    supported = scasm_fitted_bootstrap_supported(fit_vals_fun, scale))
   extra_fns <- switch(fn,
     "gumbls" = post_link_funs(location = exp, scale = exp),
     "gammals" = post_link_funs(location = exp, scale = exp),
@@ -200,6 +215,10 @@
       unconditional = unconditional, ...
     )
   }
+  if (resolved_method == "bootstrap") {
+    fit <- scasm_fitted_bootstrap(object, data, fit, scale, ci_level,
+      extra_fns, unconditional, ...)
+  }
   if (identical(scale, "response")) {
     fit <- order_interval_bounds(fit)
   }
@@ -215,6 +234,8 @@
     fit <- fit[, !names(fit) %in% remove, drop = FALSE]
   }
   attr(fit, "terms") <- NULL
+  attr(fit, "interval_info") <- scasm_interval_info(object, resolved_method,
+    interval, ci_level)
   fit
 }
 

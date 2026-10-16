@@ -31,6 +31,7 @@ validate_smooth_interval <- function(interval, level, n_sim, n_cores, seed) {
 smooth_uncertainty_design <- function(smooth, X, model, V,
                                       overall_uncertainty = TRUE) {
   cols <- smooth$first.para:smooth$last.para
+  if (nrow(X) == 0L) return(list(X = X, cols = cols))
   n_cons <- attr(smooth, "nCons")
   if (isTRUE(overall_uncertainty) && !is.null(n_cons) && n_cons > 0L) {
     column_means <- model$cmX
@@ -52,7 +53,7 @@ smooth_uncertainty_design <- function(smooth, X, model, V,
 # and higher-dimensional slices are identical to the eventual plotting grids.
 add_smooth_intervals <- function(estimates, smooths, model, interval, ci_level,
                                  unconditional, frequentist, overall_uncertainty,
-                                 n_sim, n_cores, seed) {
+                                 n_sim, n_cores, seed, interval_method = "gaussian") {
   interval <- normalize_smooth_interval(interval)
   validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
   if (interval == "simultaneous" && inherits(model, "scam")) {
@@ -64,6 +65,7 @@ add_smooth_intervals <- function(estimates, smooths, model, interval, ci_level,
       V <- get_vcov(model, unconditional = unconditional, frequentist = frequentist)
       valid <- any(vapply(estimates, function(x) {
         d <- dplyr::bind_rows(x$data)
+        if (!nrow(d)) return(FALSE)
         any(is.finite(d$.estimate) & is.finite(d$.se) & d$.se > 0)
       }, logical(1)))
       if (valid) deviations <- simultaneous_coefficient_deviations(V, n_sim, n_cores)
@@ -72,7 +74,16 @@ add_smooth_intervals <- function(estimates, smooths, model, interval, ci_level,
       pieces <- estimates[[i]]$data
       sizes <- vapply(pieces, nrow, integer(1))
       d <- dplyr::bind_rows(pieces)
-      if (interval == "confidence") {
+      if (!nrow(d)) next
+      if (interval == "confidence" && interval_method == "bootstrap") {
+        X <- smooth_predict_matrix(smooths[[i]], d, model)
+        cols <- smooths[[i]]$first.para:smooths[[i]]$last.para
+        band <- scasm_bootstrap_intervals(model, X, d$.estimate, d$.se,
+          level = ci_level, cols = cols)
+        critical <- band$critical
+        lower <- band$lower
+        upper <- band$upper
+      } else if (interval == "confidence") {
         critical <- coverage_normal(ci_level)
         lower <- d$.estimate - critical * d$.se
         upper <- d$.estimate + critical * d$.se

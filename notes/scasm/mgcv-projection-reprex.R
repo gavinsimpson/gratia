@@ -1,0 +1,5 @@
+library("mgcv")
+set.seed(1)
+d <- data.frame(x = runif(80))
+d$y <- -d$x + rnorm(80, sd = 0.01)
+scasm(y ~ s(x, bs = "sc", xt = "m+", k = 6), data = d)

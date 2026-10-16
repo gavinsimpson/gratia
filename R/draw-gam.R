@@ -105,6 +105,7 @@
 #'   when simultaneous smooth bands are requested. Bands appear where the
 #'   renderer displays interval bounds; surface and random-effect QQ plots
 #'   retain their existing estimate or standard-error display.
+#' @inheritParams smooth_estimates
 #' @param n_sim,n_cores positive integers; coefficient draws and simulation cores
 #'   for simultaneous bands. Parallel simulation requires OpenMP support.
 #' @param seed integer or `NULL`; an explicit simulation seed preserves the
@@ -114,6 +115,9 @@
 #'   effects? For parametric effects this includes the intercept variance and
 #'   its covariance with the term, without changing the partial estimates.
 #'   Each term uses the intercept of its own linear predictor.
+#'   Native scasm models are routed to `draw.scasm()` with
+#'   `overall_uncertainty = FALSE`. An explicit request for unavailable mean
+#'   uncertainty warns once. The stored model class is unchanged.
 #' @param dist numeric; if greater than 0, this is used to determine when
 #'   a location is too far from data to be plotted when plotting 2-D smooths.
 #'   The data are scaled into the unit square before deciding what to exclude,
@@ -360,6 +364,65 @@
   mrf_plot = c("effects", "qq"),
   interval = c("confidence", "simultaneous"),
   n_sim = 10000, n_cores = 1, seed = NULL,
+  interval_method = c("auto", "gaussian", "bootstrap"),
+  ...
+) {
+  .call <- match.call()
+  .call[[1L]] <- if (is_scasm_model(object)) draw.scasm else draw_gam_impl
+  eval(.call, parent.frame())
+}
+
+draw_gam_impl <- function(
+  object,
+  data = NULL,
+  select = NULL,
+  parametric = NULL,
+  terms = NULL,
+  residuals = FALSE,
+  scales = c("free", "fixed"),
+  ci_level = 0.95,
+  n = 100,
+  n_2d = 50,
+  n_3d = 16,
+  n_4d = 4,
+  unconditional = FALSE,
+  overall_uncertainty = TRUE,
+  constant = NULL,
+  fun = NULL,
+  dist = 0.1,
+  rug = TRUE,
+  distinct_rug = TRUE,
+  contour = TRUE,
+  grouped_by = FALSE,
+  ci_alpha = 0.2,
+  ci_col = "black",
+  smooth_col = "black",
+  resid_col = "steelblue3",
+  contour_col = "black",
+  n_contour = NULL,
+  partial_match = FALSE,
+  discrete_colour = NULL,
+  discrete_fill = NULL,
+  continuous_colour = NULL,
+  continuous_fill = NULL,
+  position = "identity",
+  angle = NULL,
+  ncol = NULL, nrow = NULL,
+  guides = "keep", widths = NULL, heights = NULL,
+  crs = NULL,
+  default_crs = NULL,
+  lims_method = "geometry_bbox",
+  wrap = TRUE,
+  caption = TRUE,
+  envir = NULL,
+  surface = c("raster", "tile", "3d"),
+  surface_3d = list(),
+  back_transform = FALSE,
+  re_levels = NULL,
+  mrf_plot = c("effects", "qq"),
+  interval = c("confidence", "simultaneous"),
+  n_sim = 10000, n_cores = 1, seed = NULL,
+  interval_method = c("auto", "gaussian", "bootstrap"),
   ...
 ) {
   surface <- match.arg(surface)

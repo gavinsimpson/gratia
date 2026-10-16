@@ -15,8 +15,10 @@
 #' @param partial_match logical; should smooths be selected by partial matches
 #'   with `select`? If `TRUE`, `select` can only be a single string to match
 #'   against.
-#' @param margins logical; extract the penalty matrices for the tensor
-#'   product or the marginal smooths of the tensor product?
+#' @param margins logical; if `FALSE`, extract the stored tensor product
+#'   penalty matrices. If `TRUE`, extract the stored marginal penalties instead,
+#'   with labels identifying the parent tensor and each margin. Marginal
+#'   penalties need not use the parameterisation of the fitted tensor product.
 #' @param data data frame; a data frame of values for terms mentioned in the
 #'   smooth specification.
 #' @param ... additional arguments passed to methods.
@@ -80,7 +82,7 @@
 #' @inheritParams basis.default
 `penalty.default` <- function(
     object, rescale = FALSE, data, knots = NULL,
-    constraints = FALSE, diagonalize = FALSE, ...) {
+    constraints = FALSE, diagonalize = FALSE, margins = FALSE, ...) {
   # class of object and check for ".smooth.spec"
   cls <- class(object)
   if (str_detect(cls, "smooth.spec", negate = TRUE)) {
@@ -91,9 +93,9 @@
     diagonal.penalty = diagonalize)
 
   out <- if (length(sm) == 1L) {
-    penalty(sm[[1]])
+    penalty(sm[[1]], rescale = rescale, margins = margins)
   } else {
-    lapply(sm, penalty) |> bind_rows() # ?
+    lapply(sm, penalty, rescale = rescale, margins = margins) |> bind_rows()
   }
   out
 }
@@ -101,7 +103,7 @@
 #' @export
 #' @rdname penalty
 `penalty.gam` <- function(object, select = NULL, smooth = deprecated(),
-    rescale = FALSE, partial_match = FALSE, ...) {
+    rescale = FALSE, partial_match = FALSE, margins = FALSE, ...) {
   if (lifecycle::is_present(smooth)) {
     lifecycle::deprecate_warn("0.8.9.9", "penalty(term)",
       "penalty(select)")
@@ -120,7 +122,7 @@
   smooths <- get_smooths_by_id(object, smooth_ids)
 
   ## loop over the smooths applying penalty to each
-  pen <- lapply(smooths, penalty, rescale = rescale)
+  pen <- lapply(smooths, penalty, rescale = rescale, margins = margins)
   pen <- bind_rows(pen)
   ## ensure class is right
   ## don't think I need this; bind_rows does it, but documented?
@@ -140,11 +142,14 @@
   ## extract the set of penalty matrices
   S <- object[["S"]] # S is a list even if length(S) == 1
   len_S <- length(S)
-  sp_label <- if (is.null(object[["sp"]])) {
-    paste(sm_lab, seq_len(len_S), sep = ".")
-  } else {
-    names(object[["sp"]]) # penalty matrix label
+  if (!len_S) {
+    return(empty_penalty())
   }
+  sp_label <- names(object[["sp"]])
+  if (length(sp_label) != len_S) sp_label <- names(S)
+  if (length(sp_label) != len_S) sp_label <- rep(NA_character_, len_S)
+  missing_label <- is.na(sp_label) | !nzchar(sp_label)
+  sp_label[missing_label] <- paste(sm_lab, seq_len(len_S), sep = ".")[missing_label]
   pen <- vector("list", length = len_S)
   ## loop over penalty matrices & tidy each of them
   pen_seq <- seq_along(pen)
@@ -160,7 +165,7 @@
   if (rescale) {
     for (i in pen_seq) {
       S_scale <- object[["S.scale"]][i]
-      if (is.null(S_scale)) {
+      if (!length(S_scale) || is.na(S_scale)) {
         S_scale <- 1
       }
       pen[[i]][[".value"]] <- pen[[i]][[".value"]] * S_scale
@@ -175,14 +180,32 @@
 
 #' @export
 #' @rdname penalty
-`penalty.tensor.smooth` <- function(object, margins = FALSE, ...) {
-  .NotYetImplemented()
+`penalty.tensor.smooth` <- function(object, margins = FALSE,
+    rescale = FALSE, ...) {
+  if (!margins) {
+    return(penalty.mgcv.smooth(object, rescale = rescale, ...))
+  }
+  parent_label <- smooth_label(object)
+  pen <- lapply(seq_along(object$margin), function(i) {
+    margin <- object$margin[[i]]
+    # Stored margins can omit the common class used by the tidy methods.
+    class(margin) <- unique(c(class(margin), "mgcv.smooth"))
+    margin$label <- paste0(parent_label, ": margin ", i,
+      " (", smooth_label(margin), ")")
+    out <- penalty(margin, rescale = rescale, ...)
+    native <- !startsWith(out$.penalty, margin$label)
+    out$.penalty[native] <- paste(margin$label, out$.penalty[native], sep = ": ")
+    out
+  })
+  if (!length(pen)) return(empty_penalty())
+  bind_rows(pen)
 }
 
 #' @export
 #' @rdname penalty
-`penalty.t2.smooth` <- function(object, margins = FALSE, ...) {
-  .NotYetImplemented()
+`penalty.t2.smooth` <- function(object, margins = FALSE,
+    rescale = FALSE, ...) {
+  penalty.tensor.smooth(object, margins = margins, rescale = rescale, ...)
 }
 
 #' @export
@@ -190,9 +213,10 @@
 #' @importFrom dplyr bind_rows
 #'
 #' @rdname penalty
-`penalty.re.smooth.spec` <- function(object, data, ...) {
+`penalty.re.smooth.spec` <- function(object, data, rescale = FALSE,
+    margins = FALSE, ...) {
   sm <- smoothCon(object, data, ...)
-  pen <- lapply(sm, penalty, ...)
+  pen <- lapply(sm, penalty, rescale = rescale, margins = margins)
   pen <- bind_rows(pen)
   pen
 }
@@ -203,6 +227,7 @@
 #' @importFrom rlang set_names
 `tidy_penalty` <- function(s, smooth, type, label) {
   nc <- ncol(s)
+  if (!nc) return(empty_penalty())
   new_names <- formatC(seq_len(nc), width = nchar(nc), flag = "0")
   new_names <- paste0("F", new_names)
   s <- s |>
@@ -221,6 +246,14 @@
     .penalty = rep(label, ns), .before = 1L
   )
   s
+}
+
+empty_penalty <- function() {
+  out <- tibble::tibble(.smooth = character(), .type = character(),
+    .penalty = character(), .row = character(), .col = character(),
+    .value = double())
+  class(out) <- c("penalty_df", class(out))
+  out
 }
 
 #' @export

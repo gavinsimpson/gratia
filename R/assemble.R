@@ -113,8 +113,12 @@
   mrf_plot = c("effects", "qq"),
   interval = c("confidence", "simultaneous"),
   n_sim = 10000, n_cores = 1, seed = NULL,
+  interval_method = c("auto", "gaussian", "bootstrap"),
   ...
 ) {
+  if (missing(overall_uncertainty) && is_scasm_model(object)) {
+    overall_uncertainty <- FALSE
+  }
   mrf_plot <- match.arg(mrf_plot)
   interval <- normalize_smooth_interval(interval)
   validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
@@ -184,6 +188,7 @@
       clip = TRUE,
       unnest = FALSE,
       interval = interval, ci_level = ci_level,
+      interval_method = interval_method,
       n_sim = n_sim, n_cores = n_cores, seed = seed
     )
 
@@ -193,6 +198,7 @@
     surface_support <- attr(sm_eval, "surface_support")
 
     interval_info <- attr(sm_eval, "interval_info")
+    shape_constraints <- attr(sm_eval, "shape_constraints")
 
     # Take the range of the smooths & their confidence intervals now
     # before we put rug and residuals on
@@ -377,6 +383,7 @@
       tensor_term_order = tensor_term_order,
       coordinate_info = coordinate_info, back_transform = back_transform,
       interval_info = interval_info,
+      shape_constraints = shape_constraints,
       caption = caption,
       grouped_by = grouped_by,
       ... # FIXME: temporary fix to allow captions to be suppressed-ish

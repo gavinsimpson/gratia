@@ -56,6 +56,9 @@
 #' @param interval character; the type of interval to compute. One of
 #'   `"confidence"` for point-wise intervals, or `"simultaneous"` for
 #'   simultaneous intervals.
+#' @param interval_method character; use stored scasm bootstrap draws for
+#'   pointwise intervals with `"auto"` (the default), or explicitly select
+#'   `"gaussian"` or `"bootstrap"`. Bootstrap simultaneous bands are unavailable.
 #' @param n_sim integer; the number of simulations used in computing the
 #'   simultaneous intervals.
 #' @param level numeric; `0 < level < 1`; the confidence level of the
@@ -95,7 +98,7 @@
 #' * `.se`: the standard error of the estimated derivative,
 #' * `.crit`: the critical value such that `.derivative` ± `(.crit * .se)` gives
 #'   the upper and lower bounds of the requested confidence or simultaneous
-#'   interval (given `level`),
+#'   interval (given `level`); `NA` for bootstrap limits,
 #' * `.lower_ci`: the lower bound of the confidence or simultaneous interval,
 #' * `.upper_ci`: the upper bound of the confidence or simultaneous interval.
 #' * plus one or more columns of data containing the values of covariates at
@@ -149,7 +152,7 @@
   partial_match = FALSE,
   ...,
   newdata = NULL, envir = NULL, wrt = c("smooth", "covariate"),
-  focal = NULL
+  focal = NULL, interval_method = c("auto", "gaussian", "bootstrap")
 ) {
   object_name <- deparse(substitute(object))
   object <- with_model_envir(object, envir)
@@ -200,6 +203,7 @@
 
   ## handle interval
   interval <- match.arg(interval)
+  interval_method <- scasm_interval_method(object, interval_method, interval)
 
   # we only do derivatives with this function for univariate smooths
   # check the dimensionality here, drop any sm with dim > 1,
@@ -278,7 +282,13 @@
     )
 
     ## compute intervals
-    if (identical(interval, "confidence")) {
+    if (interval_method == "bootstrap") {
+      band <- scasm_bootstrap_intervals(object, d[["Xi"]],
+        d[["deriv"]]$.derivative, d[["deriv"]]$.se, level = level)
+      result[[i]] <- add_column(d[["deriv"]],
+        .crit = rep(NA_real_, nrow(d[["deriv"]])),
+        .lower_ci = band$lower, .upper_ci = band$upper)
+    } else if (identical(interval, "confidence")) {
       result[[i]] <- derivative_pointwise_int(d[["deriv"]],
         level = level,
         distrib = "normal"
@@ -305,6 +315,7 @@
   #    ".upper_ci")), .after = last_col())
 
   attr(result, "wrt") <- wrt
+  attr(result, "interval_info") <- scasm_interval_info(object, interval_method, interval, level)
   class(result) <- c("derivatives", class(result)) # add class
   result # return
 }
@@ -771,6 +782,9 @@
 #' @param interval character; the type of interval to compute. One of
 #'   `"confidence"` for point-wise intervals, or `"simultaneous"` for
 #'   simultaneous intervals.
+#' @param interval_method character; use stored scasm bootstrap draws for
+#'   pointwise intervals with `"auto"` (the default), or explicitly select
+#'   `"gaussian"` or `"bootstrap"`. Bootstrap simultaneous bands are unavailable.
 #' @param n_sim integer; the number of simulations used in computing the
 #'   simultaneous intervals.
 #' @param level numeric; `0 < level < 1`; the confidence level of the
@@ -812,7 +826,7 @@
 #' * `.se`: the standard error of the estimated partial derivative,
 #' * `.crit`: the critical value such that `derivative` ± `(crit * se)` gives
 #'   the upper and lower bounds of the requested confidence or simultaneous
-#'   interval (given `level`),
+#'   interval (given `level`); `NA` for bootstrap limits,
 #' * `.lower_ci`: the lower bound of the confidence or simultaneous interval,
 #' * `.upper_ci`: the upper bound of the confidence or simultaneous interval.
 #'
@@ -883,7 +897,8 @@
     unconditional = FALSE, frequentist = FALSE,
     offset = NULL, ncores = 1,
     partial_match = FALSE, seed = NULL, ..., newdata = NULL,
-    envir = NULL, wrt = c("smooth", "covariate")) {
+    envir = NULL, wrt = c("smooth", "covariate"),
+    interval_method = c("auto", "gaussian", "bootstrap")) {
   object <- with_model_envir(object, envir)
   wrt <- match.arg(wrt)
   if (lifecycle::is_present(term)) {
@@ -1020,6 +1035,7 @@
 
   ## handle interval
   interval <- match.arg(interval)
+  interval_method <- scasm_interval_method(object, interval_method, interval)
 
   ## get the required covariance matrix
   Vb <- get_vcov(object,
@@ -1066,7 +1082,13 @@
     )
 
     ## compute intervals
-    if (identical(interval, "confidence")) {
+    if (interval_method == "bootstrap") {
+      band <- scasm_bootstrap_intervals(object, d[["Xi"]],
+        d[["deriv"]]$.derivative, d[["deriv"]]$.se, level = level)
+      result[[i]] <- add_column(d[["deriv"]],
+        .crit = rep(NA_real_, nrow(d[["deriv"]])),
+        .lower_ci = band$lower, .upper_ci = band$upper)
+    } else if (identical(interval, "confidence")) {
       result[[i]] <- derivative_pointwise_int(d[["deriv"]],
         level = level,
         distrib = "normal"
@@ -1096,6 +1118,7 @@
     )
 
   attr(result, "wrt") <- wrt
+  attr(result, "interval_info") <- scasm_interval_info(object, interval_method, interval, level)
   class(result) <- c(
     "partial_derivatives", "derivatives",
     class(result)

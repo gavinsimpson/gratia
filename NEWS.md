@@ -2,6 +2,10 @@
 
 ## User visible changes
 
+* Native `mgcv::scasm()` smooth estimation, drawing and `confint()` now default to
+  `overall_uncertainty = FALSE`. An explicit request for unavailable overall
+  mean uncertainty warns once (#372, #373).
+
 * **Breaking change:** Sampling functions now use `n_draws` for the total
   retained draw count and `n_grid` for automatically constructed evaluation
   grids. Sampling controls must be named. Obsolete names, including `n`,
@@ -93,6 +97,23 @@
   the development version of glmmTMB is no longer needed.
 
 ## New features
+
+* `interval_method` selects native scasm bootstrap or Gaussian pointwise
+  intervals for smooths, fitted values, smooth derivatives and `confint()`.
+  Shifting or transforming smooth confidence intervals retains asymmetric limits.
+  Replacing saved intervals with `add_confint()` records their Gaussian source.
+  Automatic selection uses stored bootstrap draws, including mgcv's smoothing-bias
+  correction. Simultaneous bootstrap bands remain unsupported (#372, #373).
+
+* Scasm captions show retained shape constraints with portable mathematical
+  arrows. Saved estimates retain constraint metadata for each tensor margin;
+  ignored requests are labelled and produce a warning (#373).
+
+* Gaussian simultaneous bands now support positive-semidefinite coefficient
+  covariance matrices, including scasm fits with exact equality constraints.
+
+* `penalty()` extracts stored tensor and `t2()` penalty matrices, including
+  marginal penalties via `margins = TRUE` and their original scaling.
 
 * Posterior sampling supports multiple chains, including parallel MH chains
   using mirai. Workers started for sampling exit cleanly so coverage data can
@@ -482,6 +503,9 @@
   recognised family name.
 
 ## Bug fixes
+
+* B-spline evaluation handles empty data and factor-by calls whose evaluation
+  data omit fitted levels, including constrained tensor products.
 
 * MH acceptance rates are extracted from the correct mgcv return components.
 

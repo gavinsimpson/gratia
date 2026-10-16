@@ -1,0 +1,54 @@
+Scasm support validation
+16 October 2026
+
+Environment: macOS Tahoe 26.6.1, Apple silicon, R 4.6.1, mgcv 1.9-4.
+Branch: gls/scasm-support, based on main at 8583e8a13.
+
+Full source test suite
+  testthat::test_local(reporter = "summary")
+  21,531 expectations across 1,801 test cases passed after the review fixes.
+  No failures, errors, warnings or skips.
+  NOT_CRAN=true enabled the larger model examples and visual comparisons.
+  A temporary installation and R_LIBS ensured that parallel workers loaded
+  this implementation rather than the previously installed gratia version.
+
+Package check
+  rcmdcheck::rcmdcheck(".", args = "--no-tests", build_args = character())
+  Status: OK; no errors, warnings or notes.
+  --no-tests deliberately skipped the check's test step because the complete
+  source suite ran separately. Examples, vignette builds and rebuilds, and
+  the PDF manual were enabled and passed.
+
+Additional checks
+  Native mgcv comparisons passed for bootstrap percentiles and the
+  svar.only correction, scalar and location-scale predictions, smooth
+  components, and derivative projections.
+  Constraint metadata, captions, tensor penalties and empty evaluations
+  passed their targeted tests and the complete suite.
+  Plotmath captions rendered on local PDF, SVG and PNG devices without
+  warnings; the integrated PNG plot was inspected visually.
+  pkgdown::build_reference_index(pkgdown::as_pkgdown(".")) passed.
+  git diff --check passed. The diff against main contains only this work.
+
+Review against main
+  confint() previously rebuilt bootstrap limits from their missing critical
+  values. It now shifts and transforms the stored limits directly, and uses
+  the scasm default for overall uncertainty. Regression tests cover native
+  limits, a decreasing transformation, the Gaussian override and warnings.
+  add_confint() previously replaced bootstrap limits with Gaussian limits but
+  kept their bootstrap metadata. It now updates the critical values, source,
+  correction and coverage. Tests also cover replacing simultaneous bands.
+  Formula offsets, locally supplied drawing arguments, and empty or omitted
+  factor-level derivative evaluations passed focused review reproductions.
+
+Windows and Linux were not available locally. Their existing CI jobs will
+exercise the new tests when the branch is submitted.
+
+Upstream reproductions
+  mgcv-projection-reprex.R reproduced the empty-block indexing error in
+  installed mgcv 1.9-4. The inspected development ZHZtproj() function labelled
+  1.9-5 also reproduced it; the full development package was not built.
+  mgcv-tensor-reprex.R showed no fitted inequalities for increasing ti()
+  and t2() margins, with fitted decreases of about -0.00043 and -0.50.
+  The corresponding email drafts explain the confirmed indexing bug and
+  the silently accepted unsupported tensor requests. Neither was sent.

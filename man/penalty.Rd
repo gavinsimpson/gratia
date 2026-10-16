@@ -22,6 +22,7 @@ penalty(object, ...)
   knots = NULL,
   constraints = FALSE,
   diagonalize = FALSE,
+  margins = FALSE,
   ...
 )
 
@@ -31,16 +32,17 @@ penalty(object, ...)
   smooth = deprecated(),
   rescale = FALSE,
   partial_match = FALSE,
+  margins = FALSE,
   ...
 )
 
 \method{penalty}{mgcv.smooth}(object, rescale = FALSE, ...)
 
-\method{penalty}{tensor.smooth}(object, margins = FALSE, ...)
+\method{penalty}{tensor.smooth}(object, margins = FALSE, rescale = FALSE, ...)
 
-\method{penalty}{t2.smooth}(object, margins = FALSE, ...)
+\method{penalty}{t2.smooth}(object, margins = FALSE, rescale = FALSE, ...)
 
-\method{penalty}{re.smooth.spec}(object, data, ...)
+\method{penalty}{re.smooth.spec}(object, data, rescale = FALSE, margins = FALSE, ...)
 }
 \arguments{
 \item{object}{a fitted GAM or a smooth.}
@@ -66,6 +68,11 @@ the associated penalty is an identity matrix. This has the effect of
 turning the last diagonal elements of the penalty to zero, which highlights
 the penalty null space.}
 
+\item{margins}{logical; if \code{FALSE}, extract the stored tensor product
+penalty matrices. If \code{TRUE}, extract the stored marginal penalties instead,
+with labels identifying the parent tensor and each margin. Marginal
+penalties need not use the parameterisation of the fitted tensor product.}
+
 \item{select}{character, logical, or numeric; which smooths to extract
 penalties for. If \code{NULL}, the default, then penalties for all model
 smooths are drawn. Numeric \code{select} indexes the smooths in the order they
@@ -79,9 +86,6 @@ the order that smooths are stored.}
 \item{partial_match}{logical; should smooths be selected by partial matches
 with \code{select}? If \code{TRUE}, \code{select} can only be a single string to match
 against.}
-
-\item{margins}{logical; extract the penalty matrices for the tensor
-product or the marginal smooths of the tensor product?}
 }
 \value{
 A 'tibble' (data frame) of class \code{penalty_df} inheriting from

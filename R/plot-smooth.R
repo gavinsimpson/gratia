@@ -125,11 +125,17 @@
   if (is.null(title)) {
     title <- unique(object[[".smooth"]])
   }
+  default_caption <- scasm_shape_plot_caption(object, default_caption)
   interval_info <- attr(object, "interval_info")
   if (!is.null(interval_info) && interval_info$interval == "simultaneous") {
-    default_caption <- paste(unique(default_caption),
-      paste0(format(100 * interval_info$level), "% simultaneous band (per smooth)"),
-      sep = "; ")
+    source <- if (identical(interval_info$method, "gaussian") &&
+      length(attr(object, "shape_constraints"))) "Gaussian " else ""
+    default_caption <- scasm_caption_append(default_caption,
+      paste0(format(100 * interval_info$level), "% ", source,
+        "simultaneous band (per smooth)"), sep = "; ")
+  } else if (identical(interval_info$method, "bootstrap")) {
+    default_caption <- scasm_caption_append(default_caption,
+      paste0(format(100 * interval_info$level), "% bootstrap pointwise interval"))
   }
   caption <- if (is.null(caption) || isTRUE(caption)) {
     default_caption

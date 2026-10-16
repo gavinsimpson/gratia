@@ -37,7 +37,8 @@ partial_derivatives(object, ...)
   ...,
   newdata = NULL,
   envir = NULL,
-  wrt = c("smooth", "covariate")
+  wrt = c("smooth", "covariate"),
+  interval_method = c("auto", "gaussian", "bootstrap")
 )
 
 \method{partial_derivatives}{gamm4}(object, ...)
@@ -122,6 +123,10 @@ expressions; see \code{\link[=smooth_estimates]{smooth_estimates()}}.}
 \item{wrt}{differentiation coordinate: \code{"smooth"} (the default) uses the
 smooth expression, such as \code{log(x)}; \code{"covariate"} uses a raw covariate,
 such as \code{x}, and reevaluates expressions at each finite-difference point.}
+
+\item{interval_method}{character; use stored scasm bootstrap draws for
+pointwise intervals with \code{"auto"} (the default), or explicitly select
+\code{"gaussian"} or \code{"bootstrap"}. Bootstrap simultaneous bands are unavailable.}
 }
 \value{
 A tibble, currently with the following variables:
@@ -131,7 +136,7 @@ A tibble, currently with the following variables:
 \item \code{.se}: the standard error of the estimated partial derivative,
 \item \code{.crit}: the critical value such that \code{derivative} ± \code{(crit * se)} gives
 the upper and lower bounds of the requested confidence or simultaneous
-interval (given \code{level}),
+interval (given \code{level}); \code{NA} for bootstrap limits,
 \item \code{.lower_ci}: the lower bound of the confidence or simultaneous interval,
 \item \code{.upper_ci}: the upper bound of the confidence or simultaneous interval.
 }

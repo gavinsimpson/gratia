@@ -248,6 +248,15 @@ missing_safe_rd <- function(fun, n_response = 1L) {
 # Native spline routines generally cannot accept NAs, even when the missing
 # column belongs to another smooth. Keep evaluation local to this smooth.
 predict_mat_rows <- function(smooth, data) {
+  # all(logical(0)) is TRUE, but native spline routines cannot evaluate no rows.
+  if (!NROW(data)) {
+    nc <- if (!is.null(smooth$last.para)) {
+      smooth$last.para - smooth$first.para + 1L
+    } else {
+      smooth$df
+    }
+    return(matrix(numeric(), 0L, nc))
+  }
   vars <- term_names(smooth)
   valid <- finite_predictor_rows(data[, vars, drop = FALSE])
   if (all(valid)) {

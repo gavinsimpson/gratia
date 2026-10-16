@@ -39,6 +39,8 @@
 #' @export
 #' @importFrom rlang has_name
 `[.smooth_estimates` <- function(x, i, j, drop = FALSE) {
+  shape_constraints <- attr(x, "shape_constraints")
+  interval_info <- attr(x, "interval_info")
   plot_info <- attr(x, "tensor_plot_info")
   support <- attr(x, "surface_support")
   cls <- class(x)
@@ -68,6 +70,11 @@
   } else NULL
   attr(x, "surface_support") <- if (".smooth" %in% names(x)) {
     support[intersect(names(support), unique(x$.smooth))]
+  } else NULL
+  attr(x, "interval_info") <- interval_info
+  attr(x, "shape_constraints") <- if (!is.null(shape_constraints) &&
+    ".smooth" %in% names(x)) {
+    scasm_shape_subset(shape_constraints, x)
   } else NULL
   x
 }

@@ -50,6 +50,10 @@
 #'   fitted smooth. `"credible"` is an alias for `"confidence"`; the default
 #'   Bayesian covariance gives approximate Bayesian credible intervals.
 #' @param ci_level numeric; interval coverage, strictly between zero and one.
+#' @param interval_method character; "auto" uses stored scasm bootstrap draws
+#'   for pointwise intervals when available, and Gaussian intervals otherwise.
+#'   Use "gaussian" to request covariance-based limits or "bootstrap" to
+#'   require stored draws. Simultaneous bootstrap bands are not supported.
 #' @param n_sim,n_cores positive integers; coefficient draws and simulation cores
 #'   for simultaneous bands. Parallel simulation requires OpenMP support.
 #' @param seed integer or `NULL`; an explicit simulation seed preserves the
@@ -99,6 +103,25 @@
 #' `overall_uncertainty = TRUE`, their standard errors also include intercept
 #' uncertainty and its covariance with the smooth; estimates remain centred.
 #' Models without an intercept use smooth-only uncertainty for either setting.
+#' Native scasm fits use component-only uncertainty by default. Explicitly
+#' requesting `overall_uncertainty = TRUE` warns once if selected smooths lack
+#' the centring information needed to add mean uncertainty. Ordinary GAM
+#' defaults are unchanged.
+#'
+#' Bootstrap pointwise limits follow mgcv's percentiles and its `svar.only`
+#' correction for smoothing bias. The correction can move limits beyond the
+#' fitted shape constraints. Estimates and covariance-based standard errors
+#' are unchanged; `.crit` is `NA` for asymmetric bootstrap limits. No new
+#' replicates are generated. Simultaneous intervals use Gaussian draws and
+#' warn if automatic selection leaves stored bootstrap draws unused.
+#'
+#' The `interval_info` attribute records the interval source and correction.
+#' The `shape_constraints` attribute identifies requests and retained
+#' inequalities for each fitted smooth and tensor margin. Captions use
+#' plotmath arrows for increasing and decreasing constraints while `.type`
+#' and [smooth_type()] keep their existing basis names. Unsupported tensor
+#' requests produce a warning and are labelled as not retained.
+#'
 #' Smoothing-parameter uncertainty is not currently supported for SCAM models;
 #' use `unconditional = FALSE`.
 #'
@@ -190,7 +213,9 @@
     back_transform = FALSE,
     interval = NULL, ci_level = 0.95,
     n_sim = 10000, n_cores = 1, seed = NULL,
+    interval_method = c("auto", "gaussian", "bootstrap"),
     ...) {
+  overall_supplied <- !missing(overall_uncertainty)
   check_scam_unconditional(object, unconditional)
   check_back_transform(back_transform)
   interval <- normalize_smooth_interval(interval, allow_null = TRUE)
@@ -221,6 +246,11 @@
 
   ## extract the mgcv.smooth objects
   smooths <- get_smooths_by_id(object, smooth_ids)
+  overall_uncertainty <- scasm_overall_uncertainty(object,
+    overall_uncertainty, overall_supplied, smooths)
+  shape_constraints <- smooth_shape_constraints(object, smooths, smooth_ids)
+  resolved_method <- scasm_interval_method(object, interval_method,
+    interval = interval %||% "confidence")
 
   ## loop over the smooths and evaluate them
   sm_list <- vector(mode = "list", length = length(smooths))
@@ -296,7 +326,8 @@
 
   if (!is.null(interval)) {
     sm_list <- add_smooth_intervals(sm_list, smooths, object, interval, ci_level,
-      unconditional, frequentist, overall_uncertainty, n_sim, n_cores, seed)
+      unconditional, frequentist, overall_uncertainty, n_sim, n_cores, seed,
+      interval_method = resolved_method)
   }
 
   # Tensor products of the two soap components can share both label and type.
@@ -332,10 +363,14 @@
   attr(sm_list, "coordinate_info") <- coordinate_info
   attr(sm_list, "surface_support") <- surface_support
   attr(sm_list, "tensor_plot_info") <- tensor_plot_info(object, smooths)
+  if (length(shape_constraints)) attr(sm_list, "shape_constraints") <- shape_constraints
 
   if (!is.null(interval)) {
-    attr(sm_list, "interval_info") <- list(interval = interval,
-      level = ci_level, scope = "smooth")
+    attr(sm_list, "interval_info") <- scasm_interval_info(object,
+      resolved_method, interval, ci_level)
+    attr(sm_list, "interval_info")$scope <- "smooth"
+    attr(sm_list, "interval_info")$overall_uncertainty <- overall_uncertainty &&
+      all(vapply(smooths, function(sm) isTRUE(attr(sm, "nCons") > 0L), logical(1)))
   }
 
   ## add a class
@@ -1351,6 +1386,7 @@ scam_smooth_matrix <- function(smooth, X) {
   validate_tensor_plot_controls(re_levels)
   validate_estimate_re_levels(object, re_levels)
   interval_info <- validate_saved_smooth_interval(object, interval)
+  shape_constraints <- attr(object, "shape_constraints")
   plot_info <- attr(object, "tensor_plot_info")
   surface_support <- attr(object, "surface_support")
   if ("data" %in% names(object) && !".estimate" %in% names(object)) {
@@ -1429,6 +1465,7 @@ scam_smooth_matrix <- function(smooth, X) {
     tensor_term_order = tensor_term_order, # pass on tensor order info,
     coordinate_info = attr(object, "coordinate_info"),
     interval_info = interval_info,
+    shape_constraints = shape_constraints,
     back_transform = back_transform,
     caption = caption,
     grouped_by = grouped_by,
@@ -1478,6 +1515,7 @@ scam_smooth_matrix <- function(smooth, X) {
                                     coordinate_info = NULL,
                                     surface_support = NULL,
                                     interval_info = NULL,
+                                    shape_constraints = NULL,
                                     ...) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
@@ -1675,6 +1713,7 @@ scam_smooth_matrix <- function(smooth, X) {
   }
 
   attr(object, "interval_info") <- interval_info
+  attr(object, "shape_constraints") <- shape_constraints
   plot_smooth(
     object,
     mrf_plot = mrf_plot,
