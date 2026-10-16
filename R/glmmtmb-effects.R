@@ -96,14 +96,14 @@ glmmtmb_random_lines <- function(term, data = NULL, n = 100,
   d <- add_constant(d, constant = constant, column = ".estimate")
   d <- transform_fun(d, fun = fun, column = ".estimate")
   title <- paste0("(1 + ", term$slope, " | ", term$group, ")")
-  plt <- ggplot2::ggplot(d, ggplot2::aes(x = .data$.x, y = .data$.estimate,
+  plt <- gratia_plot(d, ggplot2::aes(x = .data$.x, y = .data$.estimate,
     group = .data$.group)) +
-    ggplot2::geom_line(colour = smooth_col) +
+    geom_gratia_smooth_line(colour = smooth_col) +
     ggplot2::labs(x = term$slope, y = "Partial effect", title = title,
       subtitle = subtitle,
       caption = if (isTRUE(caption)) "Random intercept and slope contributions" else NULL) +
     ggplot2::guides(x = ggplot2::guide_axis(angle = angle))
-  if (isTRUE(rug)) plt <- plt + ggplot2::geom_rug(
+  if (isTRUE(rug)) plt <- plt + geom_gratia_rug(
     data = data.frame(.x = term$observed), ggplot2::aes(x = .data$.x),
     inherit.aes = FALSE, sides = "b", alpha = 0.5)
   if (!is.null(ylim)) plt <- plt + ggplot2::expand_limits(y = ylim)

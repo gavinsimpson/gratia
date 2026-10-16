@@ -128,14 +128,17 @@
 #'   Must be strictly `0 < level < 1`. Used for quantile reference bands and
 #'   traditional `method = "simulate"` or `"normal"` bands. Also controls
 #'   posterior predictive intervals for discrete responses with `ppcheck = TRUE`.
-#' @param ci_alpha,ci_col colour and transparency of QQ reference intervals,
+#' @param ci_alpha,ci_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour and transparency of QQ reference intervals,
 #'   including bands for quantile residuals.
-#' @param point_col,point_alpha colour and transparency used to draw points in
+#' @param point_col,point_alpha Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour and transparency used to draw points in
 #'   the plots. See [graphics::par()] section **Color Specification**. This is
 #'   passed to the individual plotting functions, and therefore affects the
 #'   points of all plots. Pooled grouped residual panels map component identity
 #'   to colour instead of using the constant `point_col`.
-#' @param line_col colour specification for the 1:1 line in the QQ plot and the
+#' @param line_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour specification for the 1:1 line in the QQ plot and the
 #'   reference line in the residuals vs linear predictor plot. Also used for
 #'   the observed distribution when `ppcheck = TRUE`.
 #' @param ppcheck logical; replace the residual histogram with a
@@ -202,22 +205,16 @@
 #' dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 #' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 #' ## run some basic model checks
-#' appraise(mod, point_col = "steelblue", point_alpha = 0.4)
+#' appraise(mod) & ggplot2::theme(
+#'   geom.gratia.diagnostic.point = ggplot2::element_geom(colour = "steelblue"),
+#'   gratia.alpha.diagnostic.point = 0.4)
 #' ## replace the residual histogram with a posterior predictive check
 #' appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
 #'
 #' ## To change the theme for all panels use the & operator, for example to
 #' ## change the ggplot theme for all panels
 #' library("ggplot2")
-#' if (packageVersion("ggplot2") <= "3.5.2") {
-#'   # Throws warning with ggplot rc 4.0.0 and patchwork 1.3.1 - will be fixed
-#'   # in patchwork 1.3.2 - so temporarily skipping during ggplot release
-#'   # process
-#'   appraise(mod, seed = 42,
-#'     point_col = "steelblue", point_alpha = 0.4,
-#'     line_col = "black"
-#'   ) & theme_minimal()
-#' }
+#' appraise(mod, seed = 42) & theme_minimal()
 `appraise` <- function(model, ...) {
   UseMethod("appraise")
 }
@@ -256,6 +253,10 @@
   ppc_batch_size = 10L,
   ..., n_dharma = 250L
 ) {
+  line_col_supplied <- !missing(line_col)
+  ci_col_supplied <- !missing(ci_col)
+  ci_alpha_supplied <- !missing(ci_alpha)
+  gratia_plot_arguments(c("ci_col", "ci_alpha", "point_col", "point_alpha", "line_col"), environment())
   if (!is.null(type)) type <- diagnostic_type(model, type)
   dharma_count <- if (missing(n_dharma)) NULL else n_dharma
   arguments <- list(...)
@@ -288,12 +289,14 @@
     model$source$conditioning else model$conditioning
   # Check posterior sampling support before preparing other diagnostic panels.
   plt3 <- if (ppcheck) {
-    posterior_predictive_plot(diagnostic_posterior_source(model), n = n_ppc, seed = seed,
+    ppc_args <- list(model = diagnostic_posterior_source(model), n = n_ppc, seed = seed,
       conditioning = ppc_conditioning, scalable = scalable,
       scalable_threshold = scalable_threshold, batch_size = ppc_batch_size,
-      observed_col = line_col, replicated_col = ci_col,
-      replicated_alpha = if (missing(ci_alpha)) NULL else ci_alpha,
+      observed_col = if (!line_col_supplied) gratia_plot_default(line_col) else line_col,
+      replicated_col = if (!ci_col_supplied) gratia_plot_default(ci_col) else ci_col,
       level = level)
+    if (ci_alpha_supplied) ppc_args$replicated_alpha <- ci_alpha
+    do.call(posterior_predictive_plot, ppc_args)
   } else NULL
   prepared <- inherits(model, "gratia_diagnostics")
   if (prepared) {

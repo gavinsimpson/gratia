@@ -310,7 +310,8 @@
 #'
 #' @param position Position adjustment, either as a string, or the result of a
 #'   call to a position adjustment function.
-#' @param line_col colour specification used for regression lines of linear
+#' @param line_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour specification used for regression lines of linear
 #'   continuous terms.
 #'
 #' @inheritParams draw.gam
@@ -348,6 +349,7 @@ draw.parametric_effects <- function(object,
                                     continuous_fill = NULL,
                                     discrete_colour = NULL, discrete_fill = NULL,
                                     back_transform = FALSE) {
+  gratia_plot_arguments(c("ci_col", "ci_alpha", "line_col", "contour_col", "ci_3d_alpha", "ci_3d_col"), environment())
   check_back_transform(back_transform)
   axis_info <- attr(object, "axis_info")
   from_raw <- isTRUE(attr(object, "back_transform"))
@@ -531,14 +533,14 @@ draw.parametric_effects <- function(object,
   )
 
   # base plot
-  plt <- ggplot(
+  plt <- gratia_plot(
     object,
     aes(x = .data[[x_val]], y = .data$.partial)
   ) +
     guides(x = guide_axis(angle = angle))
 
   if (is_fac) {
-    plt <- plt + geom_pointrange(aes(
+    plt <- plt + geom_gratia_effect_pointrange(aes(
       ymin = .data$.lower_ci,
       ymax = .data$.upper_ci
     ))
@@ -548,21 +550,21 @@ draw.parametric_effects <- function(object,
         observed <- display_parametric_axes(attr(axes, "observed"), axes,
           from_raw = TRUE, back_transform = back_transform)$data
         if (!is.null(observed)) {
-          plt <- plt + geom_rug(data = observed, inherit.aes = FALSE,
+          plt <- plt + geom_gratia_rug(data = observed, inherit.aes = FALSE,
             aes(x = .data$.value), sides = "b", position = position, alpha = 0.5)
         }
       } else {
-        plt <- plt + geom_rug(sides = "b", position = position, alpha = 0.5)
+        plt <- plt + geom_gratia_rug(sides = "b", position = position, alpha = 0.5)
       }
     }
-    plt <- plt + geom_ribbon(
+    plt <- plt + geom_gratia_interval_ribbon(
       aes(
         ymin = .data$.lower_ci,
         ymax = .data$.upper_ci
       ),
       alpha = ci_alpha, fill = ci_col, colour = NA
     ) +
-      geom_line(colour = line_col)
+      geom_gratia_effect_line(colour = line_col)
   }
 
   ## default axis labels if none supplied

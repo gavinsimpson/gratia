@@ -124,7 +124,7 @@ test_that("MRF plots show labelled area effects and existing interval semantics"
   expect_true(all(p$data$.type == "MRF"))
   expect_s3_class(p$data, "mrf_smooth")
   expect_false(inherits(p$data, "random_effect"))
-  expect_identical(unname(vapply(p$layers, function(l) class(l$geom)[1], character(1))),
+  expect_identical(unname(vapply(p$layers, function(l) class(l$geom)[!grepl("^GeomGratia", class(l$geom))][1], character(1))),
     c("GeomLinerange", "GeomPoint"))
   built <- ggplot_build(p)
   expect_equal(built$data[[1]]$ymin, unname(sm$.lower_ci))
@@ -169,8 +169,8 @@ test_that("MRF descriptive QQ plots retain identity and expected quantiles", {
   a <- assemble(mrf_models$full, select = 2, rug = FALSE, mrf_plot = "qq")[[1]]
   z <- assemble(mrf_models$full, select = 2, rug = FALSE)[[1]]
   expect_equal(a$data, z$data)
-  expect_identical(vapply(a$layers, function(l) class(l$geom)[1], character(1)),
-    vapply(z$layers, function(l) class(l$geom)[1], character(1)))
+  expect_identical(vapply(a$layers, function(l) class(l$geom)[!grepl("^GeomGratia", class(l$geom))][1], character(1)),
+    vapply(z$layers, function(l) class(l$geom)[!grepl("^GeomGratia", class(l$geom))][1], character(1)))
 })
 
 test_that("grouped MRF panels keep area effects and QQ groups separate", {

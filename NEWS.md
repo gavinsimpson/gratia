@@ -2,6 +2,11 @@
 
 ## User visible changes
 
+* Plot aesthetic arguments for colours, opacity and line widths are deprecated.
+  Explicit values remain supported and override themes during migration.
+  Use the component settings documented in `gratia_theme_get()` instead.
+  gratia now requires ggplot2 >= 4.0.3 and patchwork >= 1.3.2.
+
 * Native `mgcv::scasm()` smooth estimation, drawing and `confint()` now default to
   `overall_uncertainty = FALSE`. An explicit request for unavailable overall
   mean uncertainty warns once (#372, #373).
@@ -97,6 +102,13 @@
   the development version of glmmTMB is no longer needed.
 
 ## New features
+
+* Plots now support native ggplot2 theme settings for smooths, intervals,
+  residuals, diagnostics and other components, including completed patchwork
+  figures. `gratia_theme_get()`, `gratia_theme_set()` and
+  `gratia_theme_update()` manage the optional `gratia.plot.theme` override.
+  `gratia_palette()` provides optional Paul Tol palettes. Current default
+  appearances are retained (#215).
 
 * `shape_intervals()` applies monotone rearrangement and convex or concave
   envelopes to existing interval endpoints on a finite grid. Supported scasm

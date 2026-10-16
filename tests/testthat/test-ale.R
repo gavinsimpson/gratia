@@ -480,6 +480,7 @@ test_that("ALE labels describe the selected distribution parameter", {
 })
 
 test_that("draw.ale uses saved values and computation labels", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   d <- ale_test_data()
   m <- mgcv::gam(y ~ x + z, data = d)
   a <- ale(m, "x", scale = "response", n_bins = 5)

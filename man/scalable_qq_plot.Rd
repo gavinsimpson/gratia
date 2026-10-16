@@ -143,17 +143,22 @@ an integer of at least three.}
 \item{title, subtitle, caption}{Plot title, subtitle and caption, passed to
 \code{\link[ggplot2:labs]{ggplot2::labs()}}.}
 
-\item{ci_col}{fill colour for reference intervals, including bands for
+\item{ci_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Fill colour for reference intervals, including bands for
 quantile residuals.}
 
-\item{ci_alpha}{alpha transparency for reference intervals.}
+\item{ci_alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Alpha transparency for reference intervals.}
 
-\item{point_col}{constant point colour when family components are not mapped
+\item{point_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Constant point colour when family components are not mapped
 to colour. Pooled grouped diagnostics instead colour points by component.}
 
-\item{point_alpha}{alpha transparency of points on the QQ plot.}
+\item{point_alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Alpha transparency of points on the QQ plot.}
 
-\item{line_col}{colour used to draw the reference line.}
+\item{line_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour used to draw the reference line.}
 
 \item{by_family}{logical or \code{NULL}; separate indexed grouped-family components
 into facets. The default pools quantile residuals with component colours

@@ -120,6 +120,7 @@
   shape_source = c("gaussian", "bootstrap"),
   ...
 ) {
+  gratia_plot_arguments(c("ci_alpha", "ci_col", "smooth_col", "resid_col", "contour_col", "ci_3d_alpha", "ci_3d_col"), environment())
   if (missing(overall_uncertainty) && is_scasm_model(object)) {
     overall_uncertainty <- FALSE
   }
@@ -145,10 +146,10 @@
   #    discrete_colour <- scale_colour_discrete()
   # }
   if (is.null(continuous_colour)) {
-    continuous_colour <- scale_colour_continuous()
+    continuous_colour <- gratia_default_scale(scale_colour_continuous())
   }
   if (is.null(continuous_fill)) {
-    continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
+    continuous_fill <- gratia_default_scale(scale_fill_distiller(palette = "RdBu", type = "div"))
   }
 
   # Include parametric terms by default unless smooths were selected explicitly.

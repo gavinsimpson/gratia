@@ -175,17 +175,22 @@ the distinct values?}
 per level of the factor (\code{FALSE}, the default), or should the individual
 smooths be combined into a single panel containing all levels (\code{TRUE})?}
 
-\item{ci_alpha}{numeric; alpha transparency for confidence or simultaneous
+\item{ci_alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Numeric; alpha transparency for confidence or simultaneous
 interval.}
 
-\item{ci_col}{colour specification for the confidence/credible intervals
+\item{ci_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for the confidence/credible intervals
 band. Affects the fill of the interval.}
 
-\item{smooth_col}{colour specification for the smooth line.}
+\item{smooth_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for the smooth line.}
 
-\item{resid_col}{colour specification for the partial residuals.}
+\item{resid_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for the partial residuals.}
 
-\item{contour_col}{colour specification for contour lines.}
+\item{contour_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for contour lines.}
 
 \item{n_contour}{numeric; the number of contour bins. Will result in
 \code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
@@ -280,10 +285,12 @@ smooth and parametric effect panels when \code{surface = "3d"}? Defaults to
 Other panel types, including standard errors, retain their usual display.
 Smooth bounds follow \code{interval}; parametric bounds remain pointwise.}
 
-\item{ci_3d_alpha}{numeric between 0 and 1; opacity of both interval
+\item{ci_3d_alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Numeric between 0 and 1; opacity of both interval
 surfaces, independent of \code{ci_alpha}. Defaults to \code{0.15}.}
 
-\item{ci_3d_col}{one R colour; fill of both interval surfaces, independent
+\item{ci_3d_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. One R colour; fill of both interval surfaces, independent
 of \code{ci_col} and the estimate's continuous fill scale. Defaults to \code{"grey60"}.}
 
 \item{back_transform}{logical; plot covariates on their original scale?

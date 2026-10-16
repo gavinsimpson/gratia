@@ -7,11 +7,13 @@
 #' @param n positive integer; number of replicated data sets to draw.
 #' @param seed numeric; optional random seed. With an explicit seed, the
 #'   caller's random-number state is preserved.
-#' @param observed_col,replicated_col colours for the observed and replicated
+#' @param observed_col,replicated_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colours for the observed and replicated
 #'   distributions, respectively. Standalone plots default to orange-red
 #'   (`"#D55E00"`) and blue (`"#0072B2"`). When called by [appraise()], the check
 #'   uses that function's `line_col` and `ci_col` instead.
-#' @param replicated_alpha numeric or `NULL`; opacity of replicated
+#' @param replicated_alpha Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Numeric or `NULL`; opacity of replicated
 #'   distributions. The default, `NULL`, uses `0.8` for discrete posterior
 #'   median points and interval bars, and `0.2` for continuous density curves.
 #' @param level numeric; coverage of the equal-tailed posterior predictive
@@ -137,6 +139,7 @@ posterior_predictive_plot <- function(
   batch_size = 10L,
   ...
 ) {
+  gratia_plot_arguments(c("observed_col", "replicated_col", "replicated_alpha"), environment())
   diagnostic_posterior_count(n)
   if (!is.numeric(level) || length(level) != 1L || !is.finite(level) ||
     level <= 0 || level >= 1) {
@@ -200,28 +203,28 @@ posterior_predictive_plot <- function(
   curves <- prepared$curves
   replicated <- curves[curves$.draw > 0L, , drop = FALSE]
   observed_curves <- curves[curves$.draw == 0L, , drop = FALSE]
-  plt <- ggplot2::ggplot(data, ggplot2::aes(
+  plt <- gratia_plot(data, ggplot2::aes(
     x = .data$.response, y = .data$.density, group = .data$.draw
   ))
   if (any(discrete)) {
     discrete_names <- names(discrete)[discrete]
     intervals <- posterior_predictive_intervals(
       replicated[replicated$.parameter %in% discrete_names, ], level)
-    plt <- plt + ggplot2::geom_pointrange(
+    plt <- plt + geom_gratia_replicated_pointrange(
       data = intervals,
       mapping = ggplot2::aes(x = .data$.response, y = .data$.density,
         ymin = .data$.lower, ymax = .data$.upper),
       inherit.aes = FALSE, colour = replicated_col, alpha = replicated_alpha
-    ) + ggplot2::geom_point(
+    ) + geom_gratia_observed_point(
       data = observed_curves[observed_curves$.parameter %in% discrete_names, ],
       colour = observed_col)
   }
   if (any(!discrete)) {
     continuous_names <- names(discrete)[!discrete]
-    plt <- plt + ggplot2::geom_line(
+    plt <- plt + geom_gratia_replicated_line(
       data = replicated[replicated$.parameter %in% continuous_names, ],
       colour = replicated_col, alpha = replicated_alpha
-    ) + ggplot2::geom_line(
+    ) + geom_gratia_observed_line(
       data = observed_curves[observed_curves$.parameter %in% continuous_names, ],
       colour = observed_col)
   }

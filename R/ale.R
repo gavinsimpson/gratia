@@ -637,7 +637,8 @@ ale_endpoint <- function(data, target, p, predict_at) {
 #' @param object a tibble of class `"ale"`, produced by [ale()].
 #' @param ci logical; show the saved interval ribbon?
 #' @param ref_line logical; draw a horizontal reference line at zero?
-#' @param alpha numeric; opacity of the interval ribbon.
+#' @param alpha Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Numeric; opacity of the interval ribbon.
 #' @param xlab,ylab optional axis labels. Defaults identify the focal covariate
 #'   and selected parameter. The computation scale appears in the caption.
 #'   Titles and subtitles are omitted. Use [ggplot2::labs()] to change or remove
@@ -660,6 +661,7 @@ draw.ale <- function(
   ylab = NULL,
   ...
 ) {
+  gratia_plot_arguments(c("alpha"), environment())
   rlang::check_dots_empty()
   for (nm in c("ci", "ref_line")) {
     value <- get(nm)
@@ -695,15 +697,15 @@ draw.ale <- function(
     cli::cli_abort("Missing ALE settings; recompute with {.fun ale}.")
   }
   object <- object[order(object$.value), ]
-  plt <- ggplot2::ggplot(object, ggplot2::aes(x = .data$.value, y = .data$.ale))
+  plt <- gratia_plot(object, ggplot2::aes(x = .data$.value, y = .data$.ale))
   if (ref_line) {
-    plt <- plt + ggplot2::geom_hline(yintercept = 0, linetype = "dashed")
+    plt <- plt + geom_gratia_reference_hline(yintercept = 0, linetype = "dashed")
   }
   plt <- add_curve_interval(
     plt,
     lower_var = if (ci) ".lower_ci" else NULL,
     upper_var = ".upper_ci",
-    ribbon_alpha = alpha
+    curve_role = "effect", ribbon_alpha = alpha
   )
   plt +
     ggplot2::labs(

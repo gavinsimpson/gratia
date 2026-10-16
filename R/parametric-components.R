@@ -191,21 +191,21 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
   group <- if (length(numeric)) discrete[1L] else discrete[2L]
   extra <- if (length(numeric)) discrete[-1L] else discrete[-c(1L, 2L)]
   group_col <- cols[[group]]
-  plt <- ggplot2::ggplot(object, ggplot2::aes(
+  plt <- gratia_plot(object, ggplot2::aes(
     x = .data[[cols[[x]]]], y = .data$.partial,
     colour = .data[[group_col]], group = .data[[group_col]]))
   if (length(numeric)) {
-    plt <- plt + ggplot2::geom_ribbon(ggplot2::aes(
+    plt <- plt + geom_gratia_interval_ribbon(ggplot2::aes(
       ymin = .data$.lower_ci, ymax = .data$.upper_ci,
       fill = .data[[group_col]]), alpha = ci_alpha, colour = NA) +
-      ggplot2::geom_line()
+      geom_gratia_effect_line()
     if (isTRUE(rug) && !is.null(info$observed)) {
-      plt <- plt + ggplot2::geom_rug(data = info$observed,
+      plt <- plt + geom_gratia_rug(data = info$observed,
         mapping = ggplot2::aes(x = .data[[cols[[x]]]]),
         inherit.aes = FALSE, sides = "b", alpha = 0.5)
     }
   } else {
-    plt <- plt + ggplot2::geom_pointrange(ggplot2::aes(
+    plt <- plt + geom_gratia_effect_pointrange(ggplot2::aes(
       ymin = .data$.lower_ci, ymax = .data$.upper_ci),
       position = ggplot2::position_dodge(width = 0.5))
   }

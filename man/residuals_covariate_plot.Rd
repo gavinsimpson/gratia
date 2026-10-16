@@ -118,11 +118,14 @@ uses the extracted GAM. Availability and defaults depend on the model; see
 
 \item{n_dharma}{positive integer; number of simulations for DHARMa residuals.}
 
-\item{point_col}{colour for individual residual points or observation locations.}
+\item{point_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour for individual residual points or observation locations.}
 
-\item{point_alpha}{numeric; alpha transparency for points in plots.}
+\item{point_alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Numeric; alpha transparency for points in plots.}
 
-\item{line_col}{colour for reference lines and categorical group means.}
+\item{line_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour for reference lines and categorical group means.}
 
 \item{xlab}{character or expression; the label for the x axis. If not
 supplied, a suitable label will be generated.}

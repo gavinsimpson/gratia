@@ -1372,11 +1372,13 @@ scam_smooth_matrix <- function(smooth, X) {
 
 #' Plot the result of a call to `smooth_estimates()`
 #'
-#' @param decrease_col,increase_col colour specifications to use for
+#' @param decrease_col,increase_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour specifications to use for
 #'   indicating periods of change. `col_change` is used when
 #'   `change_type = "change"`, while `col_decrease` and `col_increase` are used
 #'   when `change_type = "sizer"``.
-#' @param change_lwd numeric; the value to set the `linewidth` to in
+#' @param change_lwd Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Numeric; the value to set the `linewidth` to in
 #'   [ggplot2::geom_line()], used to represent the periods of change.
 #' @param ylim numeric; vector of y axis limits to use all *all* panels drawn.
 #'
@@ -1409,7 +1411,10 @@ scam_smooth_matrix <- function(smooth, X) {
 #' draw(sm)
 #'
 #' # customising some plot elements
-#' draw(sm, ci_col = "steelblue", smooth_col = "forestgreen", ci_alpha = 0.3)
+#' draw(sm) & ggplot2::theme(
+#'   geom.gratia.interval = ggplot2::element_geom(fill = "steelblue"),
+#'   geom.gratia.smooth = ggplot2::element_geom(colour = "forestgreen"),
+#'   gratia.alpha.interval = 0.3)
 #'
 #' # Add a constant to the plotted smooth
 #' draw(sm, constant = coef(m)[1])
@@ -1458,6 +1463,7 @@ scam_smooth_matrix <- function(smooth, X) {
                                     mrf_plot = c("effects", "qq"),
                                     interval = NULL,
                                     ...) {
+  gratia_plot_arguments(c("contour_col", "ci_alpha", "ci_col", "smooth_col", "resid_col", "decrease_col", "increase_col", "change_lwd", "ci_3d_alpha", "ci_3d_col"), environment())
   dots <- names(match.call(expand.dots = FALSE)$...)
   controls <- intersect(dots, c("interval_method", "shape_source", "frequentist",
     "unconditional", "overall_uncertainty", "ci_level", "n_sim", "n_cores", "seed"))

@@ -63,15 +63,18 @@ no differentiation is made between periods of significant increase or
 decrease. If \code{"sizer"}, the periods of increase and decrease are
 differentiated in the resulting plot.}
 
-\item{alpha}{numeric; alpha transparency for confidence or simultaneous
+\item{alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Numeric; alpha transparency for confidence or simultaneous
 interval.}
 
-\item{change_col, decrease_col, increase_col}{colour specifications to use for
+\item{change_col, decrease_col, increase_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specifications to use for
 indicating periods of change. \code{col_change} is used when
 \code{change_type = "change"}, while \code{col_decrease} and \code{col_increase} are used
 when `change_type = "sizer"``.}
 
-\item{lwd_change}{numeric; the \code{linewidth} to use for the change indicators.}
+\item{lwd_change}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Numeric; the \code{linewidth} to use for the change indicators.}
 
 \item{ncol, nrow}{numeric; the numbers of rows and columns over which to
 spread the plots}

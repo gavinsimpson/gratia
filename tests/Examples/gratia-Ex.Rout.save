@@ -330,42 +330,36 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > nameEx("appraise")
 > ### * appraise
-> 
+>
 > flush(stderr()); flush(stdout())
-> 
+>
 > ### Name: appraise
 > ### Title: Model diagnostic plots
 > ### Aliases: appraise appraise.gam appraise.lm appraise.gamlss
 > ###   appraise.default appraise.gamm4 appraise.gamm
 > ###   appraise.gratia_diagnostic_proxy appraise.lme appraise.merMod
 > ###   appraise.sdmTMB
-> 
+>
 > ### ** Examples
-> 
+>
 > load_mgcv()
 > ## simulate some data...
 > dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 > ## run some basic model checks
-> appraise(mod, point_col = "steelblue", point_alpha = 0.4)
+> appraise(mod) & ggplot2::theme(
++   geom.gratia.diagnostic.point = ggplot2::element_geom(colour = "steelblue"),
++   gratia.alpha.diagnostic.point = 0.4)
 > ## replace the residual histogram with a posterior predictive check
 > appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
-> 
+>
 > ## To change the theme for all panels use the & operator, for example to
 > ## change the ggplot theme for all panels
 > library("ggplot2")
-> if (packageVersion("ggplot2") <= "3.5.2") {
-+   # Throws warning with ggplot rc 4.0.0 and patchwork 1.3.1 - will be fixed
-+   # in patchwork 1.3.2 - so temporarily skipping during ggplot release
-+   # process
-+   appraise(mod, seed = 42,
-+     point_col = "steelblue", point_alpha = 0.4,
-+     line_col = "black"
-+   ) & theme_minimal()
-+ }
-> 
-> 
-> 
+> appraise(mod, seed = 42) & theme_minimal()
+>
+>
+>
 > cleanEx()
 
 detaching ‘package:ggplot2’, ‘package:mgcv’
@@ -1321,38 +1315,38 @@ detaching ‘package:mgcv’
 
 > nameEx("draw.gam")
 > ### * draw.gam
-> 
+>
 > flush(stderr()); flush(stdout())
-> 
+>
 > ### Name: draw.gam
 > ### Title: Plot smooth and parametric terms from a fitted GAM
 > ### Aliases: draw.gam draw.scasm
-> 
+>
 > ### ** Examples
-> 
+>
 > load_mgcv()
-> 
+>
 > # simulate some data
 > df1 <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 > # fit GAM
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
-> 
+>
 > # plot all smooths
 > draw(m1)
-> 
+>
 > # can add partial residuals
 > draw(m1, residuals = TRUE)
-> 
+>
 > df2 <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
 > m2 <- gam(y ~ s(x, z, k = 40), data = df2, method = "REML")
 > draw(m2, contour = FALSE, n_2d = 50)
 > draw(m2, surface = "tile", n_2d = 30)
-> 
+>
 > if (requireNamespace("ggcube", quietly = TRUE)) {
 +   draw(m2, surface = "3d", n_2d = 20,
 +     surface_3d = list(yaw = 45, persp = FALSE))
-+   draw(m2, surface = "3d", ci_3d = TRUE, ci_3d_alpha = 0.12,
-+     n_2d = 20)
++   draw(m2, surface = "3d", ci_3d = TRUE, n_2d = 20) &
++     ggplot2::theme(gratia.alpha.surface.interval = 0.12)
 +   panels <- assemble(m2, surface = "3d", n_2d = 20)
 +   # Replace coordinates to customize a single term; retain the current theme.
 +   panels[[1]] <- panels[[1]] +
@@ -1362,14 +1356,14 @@ detaching ‘package:mgcv’
 + }
 Coordinate system already present.
 i Adding new coordinate system, which will replace the existing one.
-> 
+>
 > # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 > # for more examples and for details on how to modify the theme of all the
 > # plots produced by draw(). To modify all panels, for example to change the
 > # theme, use the & operator
-> 
-> 
-> 
+>
+>
+>
 > cleanEx()
 
 detaching ‘package:mgcv’
@@ -1534,15 +1528,15 @@ detaching ‘package:mgcv’
 
 > nameEx("draw.smooth_estimates")
 > ### * draw.smooth_estimates
-> 
+>
 > flush(stderr()); flush(stdout())
-> 
+>
 > ### Name: draw.smooth_estimates
 > ### Title: Plot the result of a call to 'smooth_estimates()'
 > ### Aliases: draw.smooth_estimates
-> 
+>
 > ### ** Examples
-> 
+>
 > load_mgcv()
 > # example data
 > df <- data_sim("eg1", seed = 21)
@@ -1557,41 +1551,44 @@ detaching ‘package:mgcv’
 > sm <- smooth_estimates(m, select = "s(x2)")
 > # plot it
 > draw(sm)
-> 
+>
 > # customising some plot elements
-> draw(sm, ci_col = "steelblue", smooth_col = "forestgreen", ci_alpha = 0.3)
-> 
+> draw(sm) & ggplot2::theme(
++   geom.gratia.interval = ggplot2::element_geom(fill = "steelblue"),
++   geom.gratia.smooth = ggplot2::element_geom(colour = "forestgreen"),
++   gratia.alpha.interval = 0.3)
+>
 > # Add a constant to the plotted smooth
 > draw(sm, constant = coef(m)[1])
-> 
+>
 > # Adding change indicators to smooths based on derivatives of the smooth
 > d <- derivatives(m, n = 100) # n to match smooth_estimates()
-> 
+>
 > smooth_estimates(m) |>
 +   add_sizer(derivatives = d, type = "sizer") |>
 +   draw()
-> 
+>
 > # Render a bivariate smooth as vector tiles
 > m_surface <- gam(y ~ s(x0, x1), data = df, method = "REML")
 > draw(smooth_estimates(m_surface, n_2d = 20), surface = "tile")
-> 
-> 
-> 
+>
+>
+>
 > cleanEx()
 
 detaching ‘package:mgcv’
 
 > nameEx("draw.smooth_samples")
 > ### * draw.smooth_samples
-> 
+>
 > flush(stderr()); flush(stdout())
-> 
+>
 > ### Name: draw.smooth_samples
 > ### Title: Plot posterior smooths
 > ### Aliases: draw.smooth_samples
-> 
+>
 > ### ** Examples
-> 
+>
 > load_mgcv()
 > dat1 <- data_sim("eg1", n = 400, dist = "normal", scale = 1, seed = 1)
 > ## a single smooth GAM
@@ -1599,10 +1596,10 @@ detaching ‘package:mgcv’
 > ## posterior smooths from m1
 > sm1 <- smooth_samples(m1, n_draws = 15, seed = 23478)
 > ## plot
-> draw(sm1, alpha = 0.7)
+> draw(sm1) & ggplot2::theme(gratia.alpha.sample = 0.7)
 > ## plot only 5 randomly smapled draws
-> draw(sm1, n_samples = 5, alpha = 0.7)
-> 
+> draw(sm1, n_samples = 5) & ggplot2::theme(gratia.alpha.sample = 0.7)
+>
 > ## A factor-by smooth example
 > dat2 <- data_sim("eg4", n = 400, dist = "normal", scale = 1, seed = 1)
 > ## a multi-smooth GAM with a factor-by smooth
@@ -1610,11 +1607,12 @@ detaching ‘package:mgcv’
 > ## posterior smooths from m1
 > sm2 <- smooth_samples(m2, n_draws = 15, seed = 23478)
 > ## plot, this time selecting only the factor-by smooth
-> draw(sm2, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
-> 
-> 
-> 
-> 
+> draw(sm2, select = "s(x2)", partial_match = TRUE) &
++   ggplot2::theme(gratia.alpha.sample = 0.7)
+>
+>
+>
+>
 > cleanEx()
 
 detaching ‘package:mgcv’
@@ -2016,6 +2014,66 @@ This is mgcv 1.9-4. For overview type '?mgcv'.
 > cleanEx()
 
 detaching ‘package:mgcv’, ‘package:nlme’
+
+> nameEx("gratia_palette")
+> ### * gratia_palette
+>
+> flush(stderr()); flush(stdout())
+>
+> ### Name: gratia_palette
+> ### Title: Discrete palettes for gratia plots
+> ### Aliases: gratia_palette
+>
+> ### ** Examples
+>
+> pal <- gratia_palette("tol_muted")
+> pal(5)
+[1] "#CC6677" "#332288" "#DDCC77" "#117733" "#88CCEE"
+> ggplot2::theme(
++   palette.colour.discrete = pal,
++   palette.fill.discrete = pal
++ )
+<theme> List of 2
+ $ palette.colour.discrete:function (n)
+ $ palette.fill.discrete  :function (n)
+ @ complete: logi FALSE
+ @ validate: logi TRUE
+>
+>
+>
+> cleanEx()
+> nameEx("gratia_theme_get")
+> ### * gratia_theme_get
+>
+> flush(stderr()); flush(stdout())
+>
+> ### Name: gratia_theme_get
+> ### Title: Native themes for gratia plots
+> ### Aliases: gratia_theme_get gratia_theme_set gratia_theme_update
+>
+> ### ** Examples
+>
+> library("ggplot2")
+> old <- gratia_theme_set(theme(
++   geom.gratia.smooth = element_geom(colour = "navy"),
++   gratia.alpha.interval = 0.15
++ ))
+> gratia_theme_update(geom.gratia.contour = element_geom(colour = "grey40"))
+> gratia_theme_set(old)
+>
+> pal <- gratia_palette("tol_banded_16")
+> theme(palette.colour.discrete = pal, palette.fill.discrete = pal)
+<theme> List of 2
+ $ palette.colour.discrete:function (n)
+ $ palette.fill.discrete  :function (n)
+ @ complete: logi FALSE
+ @ validate: logi TRUE
+>
+>
+>
+> cleanEx()
+
+detaching ‘package:ggplot2’
 
 > nameEx("gw_functions")
 > ### * gw_functions

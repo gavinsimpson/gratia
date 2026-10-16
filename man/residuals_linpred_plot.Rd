@@ -47,12 +47,15 @@ supplied, a suitable label will be generated.}
 \item{caption}{character or expression; the plot caption. See
 \code{\link[ggplot2:labs]{ggplot2::labs()}}.}
 
-\item{point_col}{constant point colour when components are not mapped to
+\item{point_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Constant point colour when components are not mapped to
 colour. Pooled grouped diagnostics instead colour points by component.}
 
-\item{point_alpha}{numeric; alpha transparency for points in plots.}
+\item{point_alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Numeric; alpha transparency for points in plots.}
 
-\item{line_col}{colour specification for 1:1 line.}
+\item{line_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for 1:1 line.}
 
 \item{seed}{integer; random seed to use for PIT, quantile or DHARMa-style residuals.}
 

@@ -239,6 +239,7 @@ test_that("invalid posterior draws cannot silently change the compared rows", {
 })
 
 test_that("appraise replaces only its histogram when ppcheck is enabled", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   defaults <- appraise(m_tiny_eg1, seed = 4)
   explicit <- appraise(m_tiny_eg1, ppcheck = FALSE, seed = 4, n_ppc = 0)
   for (i in 1:4) {
@@ -299,6 +300,7 @@ test_that("posterior predictive plot labels are customizable", {
 })
 
 test_that("appraise forwards discrete posterior predictive interval settings", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   p <- appraise(b_pois, ppcheck = TRUE, n_ppc = 20, seed = 12, level = 0.5)
   check <- posterior_predictive_plot(b_pois, n = 20, seed = 12, level = 0.5)
   expect_equal(p$patches$plots[[3L]]$layers[[1L]]$data, check$layers[[1L]]$data)

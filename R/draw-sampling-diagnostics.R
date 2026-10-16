@@ -18,8 +18,10 @@
 #' @param scales Facet scales, either `"fixed"` or `"free"`. By default trace
 #'   plots have separate coefficient scales and rank plots share a count scale.
 #' @param ncol,nrow Number of columns or rows in the panel layout.
-#' @param alpha Transparency of the chain lines.
-#' @param linewidth Width of the chain lines.
+#' @param alpha Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Transparency of the chain lines.
+#' @param linewidth Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Width of the chain lines.
 #' @param discrete_colour An optional ggplot2 discrete colour scale. Defaults
 #'   follow gratia's smooth plots: Okabe-Ito for up to nine chains, then hue.
 #' @param ... Additional arguments passed to [ggplot2::facet_wrap()].
@@ -59,6 +61,7 @@
 draw.sampling_diagnostics <- function(object, type = c("trace", "rank"),
     select = NULL, n_bins = 20L, scales = NULL, ncol = NULL, nrow = NULL,
     alpha = 0.7, linewidth = 0.4, discrete_colour = NULL, ...) {
+  gratia_plot_arguments(c("alpha", "linewidth"), environment())
   type <- match.arg(type)
   if (is.null(object$draws)) stop(
     "Coefficient draws are unavailable; rerun sampling with diagnostics = TRUE, ",
@@ -86,9 +89,9 @@ draw.sampling_diagnostics <- function(object, type = c("trace", "rank"),
   data$.variable <- factor(data$.variable, levels = dimnames(values)[[3L]])
   data$.value <- as.vector(values)
   if (type == "trace") {
-    plt <- ggplot2::ggplot(data, ggplot2::aes(x = .data$.iteration,
+    plt <- gratia_plot(data, ggplot2::aes(x = .data$.iteration,
       y = .data$.value, colour = .data$.chain, group = .data$.chain)) +
-      ggplot2::geom_line(alpha = alpha, linewidth = linewidth) +
+      geom_gratia_chain_line(alpha = alpha, linewidth = linewidth) +
       ggplot2::labs(x = "Retained iteration", y = "Coefficient")
   } else {
     n_bins <- sampling_count(n_bins, "n_bins")
@@ -109,11 +112,11 @@ draw.sampling_diagnostics <- function(object, type = c("trace", "rank"),
     counts <- do.call(rbind, counts)
     counts$.variable <- factor(counts$.variable, levels = levels(data$.variable))
     counts$.chain <- factor(counts$.chain, levels = levels(data$.chain))
-    plt <- ggplot2::ggplot(counts, ggplot2::aes(x = .data$.rank,
+    plt <- gratia_plot(counts, ggplot2::aes(x = .data$.rank,
       y = .data$.count, colour = .data$.chain, group = .data$.chain)) +
-      ggplot2::geom_hline(yintercept = dimensions[1L] / n_bins,
+      geom_gratia_chain_reference_hline(yintercept = dimensions[1L] / n_bins,
         linetype = "dashed", colour = "grey50") +
-      ggplot2::geom_step(alpha = alpha, linewidth = linewidth, direction = "hv") +
+      geom_gratia_chain_step(alpha = alpha, linewidth = linewidth, direction = "hv") +
       ggplot2::labs(x = "Pooled rank", y = "Draws per bin")
   }
   palette <- prepare_smooth_scales(dimensions[2L], discrete_colour = discrete_colour)

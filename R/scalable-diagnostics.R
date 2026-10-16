@@ -462,21 +462,21 @@ render_diagnostic_qq <- function(
   by_family <- isTRUE(reference$by_family)
   colour_family <- isTRUE(reference$colour_family)
   reference <- NULL
-  plt <- ggplot2::ggplot(
+  plt <- gratia_plot(
     df,
     ggplot2::aes(x = .data$theoretical, y = .data$residuals)
   )
   plt <- plt +
     if (worm) {
-      ggplot2::geom_hline(yintercept = 0, colour = line_col)
+      geom_gratia_diagnostic_reference_hline(yintercept = 0, colour = line_col)
     } else if (by_family && ".qq_slope" %in% names(df)) {
-      ggplot2::geom_abline(
+      geom_gratia_diagnostic_reference_abline(
         data = unique(df[c(".family", ".qq_slope", ".qq_intercept")]),
         ggplot2::aes(slope = .data$.qq_slope, intercept = .data$.qq_intercept),
         colour = line_col
       )
     } else {
-      ggplot2::geom_abline(
+      geom_gratia_diagnostic_reference_abline(
         intercept = intercept,
         slope = slope,
         colour = line_col
@@ -484,7 +484,7 @@ render_diagnostic_qq <- function(
     }
   if ("lower" %in% names(df)) {
     plt <- plt +
-      ggplot2::geom_ribbon(
+      geom_gratia_diagnostic_interval_ribbon(
         ggplot2::aes(ymin = .data$lower, ymax = .data$upper),
         fill = ci_col,
         alpha = ci_alpha
@@ -492,17 +492,17 @@ render_diagnostic_qq <- function(
   }
   if (colour_family) {
     plt <- plt +
-      ggplot2::geom_point(
+      geom_gratia_diagnostic_point(
         ggplot2::aes(colour = .data$.family),
         alpha = point_alpha
       ) +
-      ggokabeito::scale_colour_okabe_ito(
+      gratia_default_scale(ggokabeito::scale_colour_okabe_ito(
         limits = levels(df$.family),
         drop = FALSE
-      ) +
+      )) +
       ggplot2::labs(colour = "Family component")
   } else {
-    plt <- plt + ggplot2::geom_point(colour = point_col, alpha = point_alpha)
+    plt <- plt + geom_gratia_diagnostic_point(colour = point_col, alpha = point_alpha)
   }
   if (by_family) {
     plt <- plt +
@@ -645,6 +645,7 @@ scalable_qq_plot <- function(
   by_family = NULL,
   conditioning = NULL, ..., n_dharma = 250L
 ) {
+  gratia_plot_arguments(c("ci_col", "ci_alpha", "point_col", "point_alpha", "line_col"), environment())
   scalable_qq(
     model,
     method,
@@ -892,7 +893,7 @@ render_diagnostic_grid <- function(
   line_col = "red",
   fill_transform = "identity"
 ) {
-  plt <- ggplot2::ggplot(
+  plt <- gratia_plot(
     df,
     ggplot2::aes(
       xmin = .data$xmin,
@@ -902,13 +903,13 @@ render_diagnostic_grid <- function(
       fill = .data$value
     )
   ) +
-    ggplot2::geom_rect(colour = NA) +
-    ggplot2::scale_fill_viridis_c(
+    geom_gratia_surface_rect(colour = NA) +
+    gratia_default_scale(ggplot2::scale_fill_viridis_c(
       name = if (density == "conditional") "Conditional\ndensity" else "Count",
       transform = fill_transform
-    )
+    ))
   if (!is.null(intercept)) {
-    plt <- plt + ggplot2::geom_hline(yintercept = intercept, colour = line_col)
+    plt <- plt + geom_gratia_diagnostic_reference_hline(yintercept = intercept, colour = line_col)
   }
   if (".family" %in% names(df)) {
     plt <- plt +
@@ -946,6 +947,7 @@ scalable_residuals_linpred_plot <- function(
   bandwidth = NULL,
   conditioning = NULL, ..., n_dharma = 250L
 ) {
+  gratia_plot_arguments(c("line_col"), environment())
   density <- match.arg(density)
   density_method <- match.arg(density_method)
   validate_diagnostic_bandwidth(bandwidth)
@@ -1057,18 +1059,18 @@ diagnostic_histogram <- function(r, n_bins) {
   n_bins <- validate_diagnostic_bins(n_bins, "n_bins")
   # Use ggplot's public statistic to retain its exact break, centering and
   # boundary conventions. The temporary observation plot is discarded here.
-  tmp <- ggplot2::ggplot(
+  tmp <- gratia_plot(
     tibble::tibble(residuals = r),
     ggplot2::aes(x = .data$residuals)
   ) +
-    ggplot2::geom_histogram(bins = n_bins, center = 0)
+    geom_gratia_histogram(bins = n_bins, center = 0)
   bins <- ggplot2::ggplot_build(tmp)$data[[1L]]
   tibble::tibble(xmin = bins$xmin, xmax = bins$xmax, count = bins$count)
 }
 
 render_diagnostic_hist <- function(df, xlab, ylab, title, subtitle, caption) {
   compact_diagnostic_plot(
-    ggplot2::ggplot(
+    gratia_plot(
       df,
       ggplot2::aes(
         xmin = .data$xmin,
@@ -1077,7 +1079,7 @@ render_diagnostic_hist <- function(df, xlab, ylab, title, subtitle, caption) {
         ymax = .data$count
       )
     ) +
-      ggplot2::geom_rect(colour = "white", fill = "grey20") +
+      geom_gratia_histogram_rect(colour = "white", fill = "grey20") +
       ggplot2::labs(
         x = xlab,
         y = ylab,
@@ -1145,12 +1147,12 @@ render_diagnostic_points <- function(
   line_col = NULL,
   line_intercept = 0
 ) {
-  plt <- ggplot2::ggplot(df, ggplot2::aes(x = .data[[x]], y = .data[[y]]))
+  plt <- gratia_plot(df, ggplot2::aes(x = .data[[x]], y = .data[[y]]))
   if (!is.null(line_col)) {
-    plt <- plt + ggplot2::geom_hline(yintercept = line_intercept, colour = line_col)
+    plt <- plt + geom_gratia_diagnostic_reference_hline(yintercept = line_intercept, colour = line_col)
   }
   plt +
-    ggplot2::geom_point(colour = point_col, alpha = point_alpha) +
+    geom_gratia_diagnostic_point(colour = point_col, alpha = point_alpha) +
     ggplot2::labs(x = xlab, y = ylab, title = title)
 }
 
@@ -1295,7 +1297,7 @@ render_grouped_histogram <- function(
   subtitle,
   caption
 ) {
-  p <- ggplot2::ggplot(
+  p <- gratia_plot(
     df,
     ggplot2::aes(
       xmin = .data$xmin,
@@ -1306,30 +1308,30 @@ render_grouped_histogram <- function(
   )
   if (by_family) {
     p <- p +
-      ggplot2::geom_rect(fill = "grey20", colour = "white") +
+      geom_gratia_histogram_rect(fill = "grey20", colour = "white") +
       ggplot2::facet_wrap(ggplot2::vars(.data$.family), scales = "free")
   } else {
     p <- p +
-      ggplot2::geom_rect(
+      geom_gratia_histogram_rect(
         ggplot2::aes(fill = .data$.family),
         colour = NA,
         alpha = .15
       ) +
-      ggplot2::geom_path(
+      geom_gratia_histogram_outline_path(
         data = diagnostic_histogram_outline(df),
         ggplot2::aes(x = .data$x, y = .data$y, colour = .data$.family),
         inherit.aes = FALSE,
         linewidth = .6,
         alpha = 1
       ) +
-      ggokabeito::scale_fill_okabe_ito(
+      gratia_default_scale(ggokabeito::scale_fill_okabe_ito(
         limits = levels(df$.family),
         drop = FALSE
-      ) +
-      ggokabeito::scale_colour_okabe_ito(
+      )) +
+      gratia_default_scale(ggokabeito::scale_colour_okabe_ito(
         limits = levels(df$.family),
         drop = FALSE
-      ) +
+      )) +
       ggplot2::labs(fill = "Family component", colour = "Family component")
   }
   compact_diagnostic_plot(

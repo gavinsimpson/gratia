@@ -15,7 +15,7 @@ surface_plot_data <- function(dimension = 2L) {
 }
 
 surface_plot_geoms <- function(p) {
-  unname(vapply(p$layers, function(l) class(l$geom)[1L], character(1)))
+  unname(vapply(p$layers, function(l) class(l$geom)[!grepl("^GeomGratia", class(l$geom))][1L], character(1)))
 }
 
 test_that("surface methods preserve facets, fill values and observations", {
@@ -62,7 +62,7 @@ test_that("surface contours, labels and explicit range expansion are preserved",
   expect_equal(p$labels$x, "X")
   expect_equal(p$labels$y, "Y")
   expect_equal(p$layers[[2]]$stat_params$bins, 4)
-  expect_equal(p$layers[[2]]$aes_params$colour, "red")
+  expect_equal(unique(ggplot2::ggplot_build(p)$data[[2]]$colour), "red")
   expect_equal(p$layers[[3]]$data$fill, c(-10, 10))
   expect_silent(ggplot2::ggplot_build(p))
 })

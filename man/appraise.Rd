@@ -152,16 +152,19 @@ Must be strictly \verb{0 < level < 1}. Used for quantile reference bands and
 traditional \code{method = "simulate"} or \code{"normal"} bands. Also controls
 posterior predictive intervals for discrete responses with \code{ppcheck = TRUE}.}
 
-\item{ci_alpha, ci_col}{colour and transparency of QQ reference intervals,
+\item{ci_alpha, ci_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour and transparency of QQ reference intervals,
 including bands for quantile residuals.}
 
-\item{point_col, point_alpha}{colour and transparency used to draw points in
+\item{point_col, point_alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour and transparency used to draw points in
 the plots. See \code{\link[graphics:par]{graphics::par()}} section \strong{Color Specification}. This is
 passed to the individual plotting functions, and therefore affects the
 points of all plots. Pooled grouped residual panels map component identity
 to colour instead of using the constant \code{point_col}.}
 
-\item{line_col}{colour specification for the 1:1 line in the QQ plot and the
+\item{line_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for the 1:1 line in the QQ plot and the
 reference line in the residuals vs linear predictor plot. Also used for
 the observed distribution when \code{ppcheck = TRUE}.}
 
@@ -316,22 +319,16 @@ load_mgcv()
 dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 ## run some basic model checks
-appraise(mod, point_col = "steelblue", point_alpha = 0.4)
+appraise(mod) & ggplot2::theme(
+  geom.gratia.diagnostic.point = ggplot2::element_geom(colour = "steelblue"),
+  gratia.alpha.diagnostic.point = 0.4)
 ## replace the residual histogram with a posterior predictive check
 appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
 
 ## To change the theme for all panels use the & operator, for example to
 ## change the ggplot theme for all panels
 library("ggplot2")
-if (packageVersion("ggplot2") <= "3.5.2") {
-  # Throws warning with ggplot rc 4.0.0 and patchwork 1.3.1 - will be fixed
-  # in patchwork 1.3.2 - so temporarily skipping during ggplot release
-  # process
-  appraise(mod, seed = 42,
-    point_col = "steelblue", point_alpha = 0.4,
-    line_col = "black"
-  ) & theme_minimal()
-}
+appraise(mod, seed = 42) & theme_minimal()
 }
 \seealso{
 The plots are produced by functions \code{\link[=qq_plot]{qq_plot()}},

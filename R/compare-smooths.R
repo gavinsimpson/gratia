@@ -158,7 +158,7 @@
   object <- object |> add_confint(coverage = coverage)
 
   ## basic plot
-  plt <- ggplot(object, aes(
+  plt <- gratia_plot(object, aes(
     x = .data[[sm_vars[1L]]],
     y = .data[[".estimate"]],
     group = .data[[".model"]]

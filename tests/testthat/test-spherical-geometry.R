@@ -207,3 +207,26 @@ test_that("SOS factor-by panels keep distinct estimates, contours and observatio
   expect_silent(draw(m_sos_by, grouped_by = FALSE, parametric = FALSE,
     n_2d = 5, crs = 4326, contour = FALSE))
 })
+
+
+test_that("spherical rugs have their own theme and hidden bounds stay invisible", {
+  skip_if_not_installed("sf")
+  p <- spherical_plot(contour = FALSE, rug = spherical_test_grid(), crs = 4326) +
+    ggplot2::theme(geom.gratia.surface = ggplot2::element_geom(colour = "red"),
+      geom.gratia.surface.rug = ggplot2::element_geom(colour = "blue"),
+      gratia.alpha.surface.rug = .6)
+  b <- ggplot2::ggplot_build(p)$data
+  expect_equal(unique(b[[1]]$colour), "red")
+  expect_equal(unique(b[[length(b)]]$colour), "blue")
+  expect_equal(unique(b[[length(b)]]$alpha), .6)
+  d <- spherical_test_grid(c(-10, 10), c(150, 170))
+  p <- spherical_plot(d, contour = FALSE, crs = "+proj=ortho +lat_0=0 +lon_0=0") +
+    ggplot2::theme(geom.gratia.surface = ggplot2::element_geom(colour = "red", fill = "red"))
+  b <- ggplot2::ggplot_build(p)$data
+  nonempty <- b[vapply(b, function(x) nrow(x) > 0L && "geometry" %in% names(x), logical(1))]
+  expect_true(length(nonempty) > 0L)
+  expect_true(all(vapply(nonempty, function(x) {
+    all(is.na(x$colour)) && all(is.na(x$fill))
+  }, logical(1))))
+  expect_silent(ggplot2::ggplotGrob(p))
+})

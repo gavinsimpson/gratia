@@ -378,10 +378,12 @@ surface_scene_layer <- function(scene) {
   prototype <- ggcube::geom_polygon_3d()
   parent <- prototype$geom
   geom <- ggplot2::ggproto("GeomGratiaSurface3D", parent,
+    gratia_scene_parent = parent, use_defaults = gratia_surface_defaults,
     optional_aes = c(
       parent$optional_aes, "surface_owner", "surface_type",
       "surface_floor", "surface_colour", "surface_alpha", "surface_linewidth",
-      "surface_fixed_fill"
+      "surface_fixed_fill", "surface_role", "surface_colour_explicit",
+      "surface_fill_explicit", "surface_alpha_explicit"
     ),
     draw_panel = function(data, panel_params, coord, sort_method = "auto",
                           scale_depth = TRUE, force_convex = FALSE,
@@ -389,12 +391,12 @@ surface_scene_layer <- function(scene) {
       data$.prim <- as.character(data$surface_type)
       data$z[data$surface_floor] <- min(panel_params$scale_info$z$limits)
       data$colour <- data$surface_colour
-      fixed <- !is.na(data$surface_fixed_fill)
+      fixed <- data$surface_fill_fixed
       data$fill[fixed] <- data$surface_fixed_fill[fixed]
       data$alpha <- data$surface_alpha
       data$linewidth <- data$surface_linewidth
-      data$size <- 1.5
-      data$shape <- 19
+      data$size <- data$surface_size
+      data$shape <- data$surface_shape
       data$stroke <- 0.5
       scene_coord <- ggplot2::ggproto(NULL, coord,
         transform = function(data, panel_params) {
@@ -419,6 +421,10 @@ surface_scene_layer <- function(scene) {
       surface_floor = I(.data$.surface_floor),
       surface_colour = I(.data$.surface_colour),
       surface_fixed_fill = I(.data$.surface_fixed_fill),
+      surface_role = I(.data$.surface_role),
+      surface_colour_explicit = I(.data$.surface_colour_explicit),
+      surface_fill_explicit = I(.data$.surface_fill_explicit),
+      surface_alpha_explicit = I(.data$.surface_alpha_explicit),
       surface_alpha = I(.data$.surface_alpha),
       surface_linewidth = I(.data$.surface_linewidth)
     )
@@ -438,6 +444,10 @@ surface_scene_data <- function(
   scene$.surface_linewidth <- rep(0.1, nrow(scene))
   scene$.surface_fixed_fill <- rep(NA_character_, nrow(scene))
   scene$.surface_role <- rep("estimate", nrow(scene))
+  for (key in c(".surface_colour_explicit", ".surface_fill_explicit", ".surface_alpha_explicit")) {
+    if (is.null(scene[[key]])) scene[[key]] <- rep(FALSE, nrow(scene))
+    scene[[key]][is.na(scene[[key]])] <- FALSE
+  }
   if (!is.null(segments) && nrow(segments)) {
     a <- segments[names(mesh)]
     b <- a
@@ -451,7 +461,9 @@ surface_scene_data <- function(
     contours$.surface_fill <- NA_real_
     contours$.surface_type <- "segment"
     contours$.surface_floor <- FALSE
-    contours$.surface_colour <- contour_col
+    contours$.surface_colour <- gratia_unmark(contour_col)
+    contours$.surface_colour_explicit <- gratia_explicit(contour_col)
+    contours$.surface_role <- "contour"
     contours$.surface_alpha <- 1
     contours$.surface_linewidth <- 0.5
     scene <- dplyr::bind_rows(scene, contours)
@@ -466,6 +478,7 @@ surface_scene_data <- function(
     points$.surface_owner <- NA_character_
     points$.surface_type <- "point"
     points$.surface_floor <- TRUE
+    points$.surface_role <- "surface.rug"
     points$.surface_colour <- "black"
     points$.surface_alpha <- 0.1
     points$.surface_linewidth <- 0.5
@@ -490,6 +503,7 @@ surface_scene_data <- function(
       edges$.surface_owner <- NA_character_
       edges$.surface_type <- "segment"
       edges$.surface_floor <- TRUE
+      edges$.surface_role <- "boundary"
       edges$.surface_colour <- "black"
       edges$.surface_alpha <- 1
       edges$.surface_linewidth <- 2
@@ -518,8 +532,10 @@ surface_interval_faces <- function(mesh, alpha, colour) {
       bound$.surface_owner <- as.character(bound$.surface_face)
       bound$.surface_role <- rep(role, nrow(bound))
       bound$.surface_fill <- rep(NA_real_, nrow(bound))
-      bound$.surface_alpha <- rep(alpha, nrow(bound))
-      bound$.surface_fixed_fill <- rep(colour, nrow(bound))
+      bound$.surface_alpha <- rep(gratia_unmark(alpha), nrow(bound))
+      bound$.surface_alpha_explicit <- rep(gratia_explicit(alpha), nrow(bound))
+      bound$.surface_fill_explicit <- rep(gratia_explicit(colour), nrow(bound))
+      bound$.surface_fixed_fill <- rep(gratia_unmark(colour), nrow(bound))
       bound
     }))
 }
@@ -556,9 +572,9 @@ prepare_surface_3d <- function(
     meshes[[i]]
   }))
   if (is.null(continuous_fill)) {
-    continuous_fill <- ggplot2::scale_fill_distiller(
+    continuous_fill <- gratia_default_scale(ggplot2::scale_fill_distiller(
       palette = "RdBu", type = "div"
-    )
+    ))
   }
   segments <- if (isTRUE(contour)) {
     breaks <- surface_contour_breaks(object[[fill_var]], n_contour)
@@ -579,7 +595,7 @@ prepare_surface_3d <- function(
     )
     scene <- dplyr::bind_rows(scene, bounds)
   }
-  plt <- ggplot2::ggplot(object) +
+  plt <- gratia_plot(object) +
     surface_scene_layer(scene) +
     facet +
     surface_view(surface_3d, object, x_var, y_var, isotropic) +
@@ -608,6 +624,6 @@ prepare_surface_3d <- function(
   if (!is.null(z_limits)) {
     plt <- plt + ggplot2::expand_limits(z = z_limits)
   }
-  plt + ggplot2::guides(fill = ggplot2::guide_colourbar(title = fill_title)) +
-    ggplot2::theme(legend.position = "right")
+  plt <- plt + ggplot2::guides(fill = ggplot2::guide_colourbar(title = fill_title))
+  gratia_plot_theme_defaults(plt, legend.position = "right")
 }

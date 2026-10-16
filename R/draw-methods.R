@@ -17,7 +17,8 @@
 
 #' Plot derivatives of smooths
 #'
-#' @param alpha numeric; alpha transparency for confidence or simultaneous
+#' @param alpha Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Numeric; alpha transparency for confidence or simultaneous
 #'   interval.
 #' @param add_change logical; should the periods of significant change be
 #'   highlighted on the plot?
@@ -25,11 +26,13 @@
 #'   no differentiation is made between periods of significant increase or
 #'   decrease. If `"sizer"`, the periods of increase and decrease are
 #'   differentiated in the resulting plot.
-#' @param change_col,decrease_col,increase_col colour specifications to use for
+#' @param change_col,decrease_col,increase_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour specifications to use for
 #'   indicating periods of change. `col_change` is used when
 #'   `change_type = "change"`, while `col_decrease` and `col_increase` are used
 #'   when `change_type = "sizer"``.
-#' @param lwd_change numeric; the `linewidth` to use for the change indicators.
+#' @param lwd_change Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Numeric; the `linewidth` to use for the change indicators.
 #' @param differentiate_factor_smooths logical; should colour be used to
 #'   differentiate the levels of the factors involved in  random factor smooths
 #'   (`bs = "fs"`) or constrained factor smooths (`bs = "sz"`)? If `TRUE`, the
@@ -70,6 +73,7 @@
   differentiate_factor_smooths = TRUE,
   ...
 ) {
+  gratia_plot_arguments(c("change_col", "decrease_col", "increase_col", "lwd_change", "alpha"), environment())
   scales <- match.arg(scales)
   change_type <- match.arg(change_type)
 
@@ -113,17 +117,17 @@
     if (isTRUE(add_change)) {
       plt <- if (identical(change_type, "change")) {
         plt +
-          geom_line(aes(x = .data[[xvar]], y = .data$.change),
+          geom_gratia_change_line(aes(x = .data[[xvar]], y = .data$.change),
             linewidth = lwd_change, na.rm = TRUE,
             colour = change_col
           )
       } else {
         plt +
-          geom_line(aes(x = .data[[xvar]], y = .data$.increase),
+          geom_gratia_increase_line(aes(x = .data[[xvar]], y = .data$.increase),
             colour = increase_col, linewidth = lwd_change,
             na.rm = TRUE
           ) +
-          geom_line(aes(x = .data[[xvar]], y = .data$.decrease),
+          geom_gratia_decrease_line(aes(x = .data[[xvar]], y = .data$.decrease),
             colour = decrease_col, linewidth = lwd_change,
             na.rm = TRUE
           )
@@ -145,6 +149,7 @@
                                        guides = "keep",
                                        angle = NULL,
                                        ...) {
+  gratia_plot_arguments(c("alpha"), environment())
   scales <- match.arg(scales)
 
   ## how many smooths
@@ -232,12 +237,12 @@
   }
 
   ## basis plot
-  plt <- ggplot(object, aes(
+  plt <- gratia_plot(object, aes(
     x = .data[[smooth_var]],
     y = .data[["value"]],
     colour = .data[["bf"]]
   )) +
-    geom_line() +
+    geom_gratia_basis_line() +
     guides(x = guide_axis(angle = angle))
 
   ## default labels if none supplied
@@ -333,6 +338,7 @@
                          n_contour = 10,
                          contour_col = "black",
                          ...) {
+  gratia_plot_arguments(c("contour_col"), environment())
   sm <- unique(object[[".smooth"]])
   sm_l <- group_split(object, factor(.data$.smooth, levels = sm))
   sm_plts <- map(sm_l,
@@ -414,7 +420,7 @@
                                     angle = NULL,
                                     ...) {
   smooth_var <- vars_from_label(unique(object[[".smooth"]]))
-  plt <- add_curve_interval(ggplot(object,
+  plt <- add_curve_interval(gratia_plot(object,
     aes(x = .data[[smooth_var]], y = .data[[".value"]],
       colour = .data[[".bf"]]))) +
     guides(x = guide_axis(angle = angle)) +
@@ -467,9 +473,11 @@
 #' @param n_samples numeric; if not `NULL`, sample `n_samples` from the
 #'   posterior draws for plotting.
 #' @param seed numeric; random seed to be used to if sampling draws.
-#' @param alpha numeric; alpha transparency for confidence or simultaneous
+#' @param alpha Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Numeric; alpha transparency for confidence or simultaneous
 #'   interval.
-#' @param colour The colour to use to draw the posterior smooths. Passed to
+#' @param colour Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. The colour to use to draw the posterior smooths. Passed to
 #'   [ggplot2::geom_line()] as argument `colour`.
 #' @param contour logical; should contour lines be added to smooth surfaces?
 #' @param xlab character or expression; the label for the x axis. If not
@@ -506,9 +514,9 @@
 #' ## posterior smooths from m1
 #' sm1 <- smooth_samples(m1, n_draws = 15, seed = 23478)
 #' ## plot
-#' draw(sm1, alpha = 0.7)
+#' draw(sm1) & ggplot2::theme(gratia.alpha.sample = 0.7)
 #' ## plot only 5 randomly smapled draws
-#' draw(sm1, n_samples = 5, alpha = 0.7)
+#' draw(sm1, n_samples = 5) & ggplot2::theme(gratia.alpha.sample = 0.7)
 #'
 #' ## A factor-by smooth example
 #' dat2 <- data_sim("eg4", n = 400, dist = "normal", scale = 1, seed = 1)
@@ -517,7 +525,8 @@
 #' ## posterior smooths from m1
 #' sm2 <- smooth_samples(m2, n_draws = 15, seed = 23478)
 #' ## plot, this time selecting only the factor-by smooth
-#' draw(sm2, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
+#' draw(sm2, select = "s(x2)", partial_match = TRUE) &
+#'   ggplot2::theme(gratia.alpha.sample = 0.7)
 #'
 #' \donttest{
 #' ## A 2D smooth example
@@ -544,6 +553,7 @@
                                   angle = NULL,
                                   ncol = NULL, nrow = NULL,
                                   guides = "keep", ...) {
+  gratia_plot_arguments(c("contour_col", "alpha", "colour"), environment())
   scales <- match.arg(scales)
 
   ## select smooths
@@ -688,9 +698,9 @@
   smooth_var <- vars_from_label(object[1L, ".smooth"])
 
   plt <- add_curve_interval(
-    ggplot(object, aes(x = .data[[smooth_var]], y = .data[[".value"]],
+    gratia_plot(object, aes(x = .data[[smooth_var]], y = .data[[".value"]],
       group = .data[[".draw"]])),
-    line_alpha = alpha, line_colour = colour) +
+    line_alpha = alpha, line_colour = colour, curve_role = "sample") +
     guides(x = guide_axis(angle = angle))
 
   ## default axis labels if none supplied
@@ -720,7 +730,7 @@
 
   ## add rug?
   if (isTRUE(rug)) {
-    plt <- plt + geom_rug(
+    plt <- plt + geom_gratia_rug(
       data = distinct(object, .data[[smooth_var]]),
       mapping = aes(x = .data[[smooth_var]]),
       inherit.aes = FALSE, sides = "b", alpha = 0.5
@@ -797,12 +807,16 @@
 #' @param rug logical;
 #' @param ref_line logical;
 #' @param contour logical; should contour lines be added to smooth surfaces?
-#' @param ci_alpha numeric; alpha transparency for confidence or simultaneous
+#' @param ci_alpha Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Numeric; alpha transparency for confidence or simultaneous
 #'   interval.
-#' @param ci_col colour specification for the confidence/credible intervals
+#' @param ci_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour specification for the confidence/credible intervals
 #'   band. Affects the fill of the interval.
-#' @param smooth_col colour specification for the the smooth or difference line.
-#' @param line_col colour specification for drawing reference lines
+#' @param smooth_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour specification for the the smooth or difference line.
+#' @param line_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour specification for drawing reference lines
 #' @param ncol,nrow numeric; the numbers of rows and columns over which to
 #'   spread the plots
 #' @param xlab,ylab,title,subtitle,caption character; labels with which to
@@ -847,6 +861,7 @@
                                      subtitle = NULL,
                                      caption = NULL,
                                      angle = NULL, ...) {
+  gratia_plot_arguments(c("contour_col", "ci_alpha", "ci_col", "smooth_col", "line_col"), environment())
   scales <- match.arg(scales)
 
   ## how many smooths
@@ -970,14 +985,14 @@
     title
   }
 
-  plt <- ggplot(object, aes(
+  plt <- gratia_plot(object, aes(
     x = .data[[xvars[1L]]],
     y = .data$.diff
   )) +
     guides(x = guide_axis(angle = angle))
 
   if (isTRUE(ref_line)) {
-    plt <- plt + geom_hline(yintercept = 0, colour = line_col)
+    plt <- plt + geom_gratia_reference_hline(yintercept = 0, colour = line_col)
   }
   plt <- add_curve_interval(plt,
     lower_var = ".lower_ci", upper_var = ".upper_ci",
@@ -989,7 +1004,7 @@
     )
 
   if (isTRUE(rug)) {
-    plt <- plt + geom_rug(sides = "b", alpha = 0.5)
+    plt <- plt + geom_gratia_rug(sides = "b", alpha = 0.5)
   }
   plt
 }
@@ -1126,12 +1141,12 @@
 
   ## if non-specified fill set our default
   if (is.null(continuous_fill)) {
-    continuous_fill <- scale_fill_gradient2(
+    continuous_fill <- gratia_default_scale(scale_fill_gradient2(
       low = "#2166AC",
       high = "#B2182B",
       mid = "white",
       midpoint = 0
-    )
+    ))
   }
 
   plt_list <- split(object, f = object[[".penalty"]])
@@ -1194,7 +1209,7 @@
   }
 
   ## base plot
-  plt <- ggplot(
+  plt <- gratia_plot(
     object,
     aes(
       x = .data$.col,
@@ -1203,8 +1218,8 @@
     )
   ) +
     switch(geom,
-      raster = ggplot2::geom_raster(interpolate = FALSE),
-      tile = ggplot2::geom_tile(width = 1, height = 1, colour = NA)
+      raster = geom_gratia_surface_raster(interpolate = FALSE),
+      tile = geom_gratia_surface_tile(width = 1, height = 1, colour = NA)
     )
 
   ## add the scale

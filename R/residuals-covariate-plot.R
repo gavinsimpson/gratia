@@ -37,8 +37,10 @@
 #' @param ncol optional number of columns when composing several panels.
 #' @inheritParams residuals_linpred_plot
 #' @inheritParams scalable_qq_plot
-#' @param point_col colour for individual residual points or observation locations.
-#' @param line_col colour for reference lines and categorical group means.
+#' @param point_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour for individual residual points or observation locations.
+#' @param line_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour for reference lines and categorical group means.
 #' @param n_dharma positive integer; number of simulations for DHARMa residuals.
 #' @param ... arguments used to prepare model diagnostics, such as sdmTMB
 #'   `component` and `field_method`.
@@ -101,6 +103,7 @@ residuals_covariate_plot <- function(model, covariates = NULL, terms = NULL,
     point_col = "grey20", point_alpha = 0.5, line_col = "red",
     xlab = NULL, ylab = NULL, title = NULL, subtitle = NULL, caption = NULL,
     ncol = NULL, ...) {
+  gratia_plot_arguments(c("point_col", "point_alpha", "line_col"), environment())
   residual_covariate_plots(model, covariates, terms, pairs, data, by, type,
     smooth, bins, min_n, match.arg(statistic), seed, conditioning,
     if (missing(n_dharma)) NULL else n_dharma, FALSE,
@@ -119,6 +122,7 @@ scalable_residuals_covariate_plot <- function(model, covariates = NULL,
     density = c("conditional", "count"), density_method = c("kde", "histogram"),
     bandwidth = NULL, line_col = "red", xlab = NULL, ylab = NULL,
     title = NULL, subtitle = NULL, caption = NULL, ncol = NULL, ...) {
+  gratia_plot_arguments(c("line_col"), environment())
   residual_covariate_plots(model, covariates, terms, pairs, data, by, type,
     smooth, bins, min_n, match.arg(statistic), seed, conditioning,
     if (missing(n_dharma)) NULL else n_dharma, TRUE,
@@ -461,26 +465,26 @@ residual_covariate_plots <- function(model, covariates, terms, pairs, data, by,
     if (joint) {
       summary <- residual_covariate_groups(dat, function(z)
         residual_covariate_surface(z, bins, min_n, statistic))
-      p <- ggplot2::ggplot(summary, ggplot2::aes(xmin = .data$xmin,
+      p <- gratia_plot(summary, ggplot2::aes(xmin = .data$xmin,
         xmax = .data$xmax, ymin = .data$ymin, ymax = .data$ymax, fill = .data$value)) +
-        ggplot2::geom_rect(colour = NA)
+        geom_gratia_surface_rect(colour = NA)
       label <- if (statistic == "mean") "Mean residual" else "Residual SD"
-      p <- if (statistic == "mean") p + ggplot2::scale_fill_gradient2(
+      p <- if (statistic == "mean") p + gratia_default_scale(ggplot2::scale_fill_gradient2(
         name = label, midpoint = reference, low = "#2166AC", mid = "white",
-        high = "#B2182B", na.value = "transparent") else
-        p + ggplot2::scale_fill_viridis_c(name = label, na.value = "transparent")
-      if (!scalable) p <- p + ggplot2::geom_point(data = dat,
+        high = "#B2182B", na.value = "transparent")) else
+        p + gratia_default_scale(ggplot2::scale_fill_viridis_c(name = label, na.value = "transparent"))
+      if (!scalable) p <- p + geom_gratia_residual_covariate_point(data = dat,
         ggplot2::aes(x = .data$x, y = .data$y), inherit.aes = FALSE,
         colour = point_col, alpha = point_alpha, size = .5)
     } else if (categorical) {
       summary <- residual_covariate_groups(dat, residual_covariate_boxes)
-      p <- ggplot2::ggplot(summary, ggplot2::aes(x = .data$x)) +
-        ggplot2::geom_hline(yintercept = reference, colour = line_col) +
-        ggplot2::geom_boxplot(ggplot2::aes(ymin = .data$ymin, lower = .data$lower,
+      p <- gratia_plot(summary, ggplot2::aes(x = .data$x)) +
+        geom_gratia_diagnostic_reference_hline(yintercept = reference, colour = line_col) +
+        geom_gratia_diagnostic_boxplot(ggplot2::aes(ymin = .data$ymin, lower = .data$lower,
           middle = .data$middle, upper = .data$upper, ymax = .data$ymax), stat = "identity")
-      if (!scalable) p <- p + ggplot2::geom_point(data = dat,
+      if (!scalable) p <- p + geom_gratia_residual_covariate_point(data = dat,
         ggplot2::aes(y = .data$residuals), colour = point_col, alpha = point_alpha)
-      p <- p + ggplot2::geom_point(ggplot2::aes(y = .data$mean),
+      p <- p + geom_gratia_residual_covariate_point(ggplot2::aes(y = .data$mean),
         shape = 18L, colour = line_col, size = 2)
     } else {
       trend <- if (!isFALSE(smooth)) residual_covariate_groups(dat,
@@ -495,11 +499,11 @@ residual_covariate_plots <- function(model, covariates, terms, pairs, data, by,
           NULL, intercept = reference, line_col = line_col,
           fill_transform = if (density == "conditional" && density_method == "kde") "sqrt" else "identity")
       } else {
-        p <- ggplot2::ggplot(dat, ggplot2::aes(x = .data$x, y = .data$residuals)) +
-          ggplot2::geom_hline(yintercept = reference, colour = line_col) +
-          ggplot2::geom_point(colour = point_col, alpha = point_alpha)
+        p <- gratia_plot(dat, ggplot2::aes(x = .data$x, y = .data$residuals)) +
+          geom_gratia_diagnostic_reference_hline(yintercept = reference, colour = line_col) +
+          geom_gratia_residual_covariate_point(colour = point_col, alpha = point_alpha)
       }
-      if (!is.null(trend) && nrow(trend)) p <- p + ggplot2::geom_line(data = trend,
+      if (!is.null(trend) && nrow(trend)) p <- p + geom_gratia_trend_line(data = trend,
         ggplot2::aes(x = .data$x, y = .data$residuals), inherit.aes = FALSE,
         colour = "#0072B2", linewidth = .7)
     }

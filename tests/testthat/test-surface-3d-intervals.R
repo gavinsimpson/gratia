@@ -49,6 +49,7 @@ expect_ci3d <- function(p, alpha = 0.15, colour = "grey60") {
 }
 
 test_that("3D interval controls are validated even for flat plots", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   m <- mgcv::gam(y ~ s(x, z, k = 10), data = ci3d_data())
   for (flag in list(NA, NULL, 1, c(TRUE, FALSE))) {
     expect_error(draw(m, ci_3d = flag), "'ci_3d'")
@@ -270,6 +271,7 @@ test_that("GJRM shares vertical ranges across equations without changing covaria
 })
 
 test_that("glmmTMB forwards bounds for smooth and parametric distributional effects", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   skip_if_not_installed("glmmTMB", "1.1.15.2")
   d <- ci3d_data()
   m <- glmmTMB::glmmTMB(y ~ s(x, z, k = 10) + x:w,

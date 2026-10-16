@@ -73,6 +73,8 @@ reference:
       - assemble
       - assemble.gam
       - scale_fill_partial_effect
+      - gratia_theme_get
+      - gratia_palette
 
   - title: Estimate smooths and parametric effects
     desc: >

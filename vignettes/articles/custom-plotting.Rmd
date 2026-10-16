@@ -65,6 +65,85 @@ One way to apply the theme to all plots in the patchwork is to the the `&` opera
 p & theme_bw()
 ```
 
+## Styling gratia components
+
+Gratia uses ggplot2 themes for its plot components. Defaults retain the
+existing appearance. Change an existing figure with `&` so every panel
+receives the settings:
+
+```{r native-component-theme}
+p & theme(
+  geom.gratia.smooth = element_geom(colour = "navy", linewidth = 0.8),
+  geom.gratia.interval = element_geom(fill = "navy"),
+  gratia.alpha.interval = 0.15
+)
+```
+
+Use `geom.gratia.partial.residual` for partial residuals,
+`geom.gratia.diagnostic.point` for diagnostic points, and
+`geom.gratia.reference` for reference lines. Opacity uses numeric settings
+such as `gratia.alpha.interval` and `gratia.alpha.diagnostic.point`.
+More specific settings, such as `geom.gratia.smooth.interval`, override
+the general interval setting. See `?gratia_theme_get` for the component list.
+
+Set a package override for subsequent plots without changing other ggplot2
+plots. The override is attached when the plot is created:
+
+```{r native-package-theme}
+old_theme <- gratia_theme_set(theme(gratia.alpha.interval = 0.1))
+draw(m)
+gratia_theme_set(old_theme)
+```
+
+For temporary settings, use `withr::with_options()` with the option
+`gratia.plot.theme`. Settings added to an existing plot follow normal
+ggplot2 theme merging. Explicit deprecated aesthetic arguments remain fixed
+overrides, even when they equal the old defaults. For example, replace
+`draw(m, smooth_col = "navy", ci_alpha = 0.15)` with the component theme above.
+
+Common replacements for deprecated arguments are:
+
+| Previous argument | Theme setting |
+|:--|:--|
+| `smooth_col` | `geom.gratia.smooth = element_geom(colour = ...)` |
+| `ci_col`, `ci_alpha` | `geom.gratia.interval = element_geom(fill = ...)`, `gratia.alpha.interval` |
+| `resid_col` | `geom.gratia.partial.residual = element_geom(colour = ...)` |
+| `contour_col` | `geom.gratia.contour = element_geom(colour = ...)` |
+| `point_col`, `point_alpha` in diagnostics | `geom.gratia.diagnostic.point = element_geom(colour = ...)`, `gratia.alpha.diagnostic.point` |
+| `line_col` in diagnostics | `geom.gratia.diagnostic.reference = element_geom(colour = ...)` |
+| `colour`, `alpha` in smooth samples | `geom.gratia.sample = element_geom(colour = ...)`, `gratia.alpha.sample` |
+| `ci_3d_col`, `ci_3d_alpha` | `geom.gratia.surface.interval = element_geom(fill = ...)`, `gratia.alpha.surface.interval` |
+| `alpha`, `linewidth` in chain diagnostics | `gratia.alpha.chain`, `geom.gratia.chain = element_geom(linewidth = ...)` |
+
+For parametric curves use `geom.gratia.effect`; for derivatives use
+`geom.gratia.derivative`. Rootograms have separate `rootogram.bar`,
+`rootogram.fitted`, `rootogram.reference` and `rootogram.warning` elements.
+MRF interval lines use `geom.gratia.smooth.interval`, independently of the
+points controlled by `geom.gratia.smooth`. Diagnostic boxplots use
+`geom.gratia.diagnostic.boxplot`.
+
+## Optional discrete palettes
+
+Grouped curves and ribbons retain the current Okabe–Ito palette and hue
+fallback unless another palette is requested. Use the same function for
+colour and fill to keep groups paired:
+
+```{r native-tol-palette}
+tol <- gratia_palette("tol_banded_16")
+theme(palette.colour.discrete = tol, palette.fill.discrete = tol)
+```
+
+Paul Tol choices include bright and vibrant (7 colours), muted (9),
+dark (11), and banded schemes (12, 16 or 20). Dark favours visibility against
+white; colours within larger banded schemes are less distinct. Finite
+palettes error when their capacity is exceeded and do not interpolate or
+recycle colours. See `?gratia_palette` for attribution and available names.
+
+Continuous palettes can also be changed through
+`palette.fill.continuous` and `palette.colour.continuous`. Existing scale
+arguments still accept complete scales when custom transformations,
+breaks or guides are needed.
+
 ## Combining individual plots produced by `draw()`
 
 `draw()` methods like `draw.gam()` return an object created by `patchwork::wrap_plots()`, and as a result it isn't straightforward to combine those objects into a new patchwork
