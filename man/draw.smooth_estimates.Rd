@@ -32,6 +32,9 @@
   caption = TRUE,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15,
+  ci_3d_col = "grey60",
   back_transform = FALSE,
   re_levels = NULL,
   mrf_plot = c("effects", "qq"),
@@ -147,6 +150,18 @@ Only the coordinate system is used; ggcube's theme settings are not applied.
 These options affect all 3D panels in a call. For different views per term,
 modify individual plots returned by \code{\link[=assemble]{assemble()}}. The \code{dist} entry here
 controls perspective; the top-level \code{dist} argument controls masking.}
+
+\item{ci_3d}{logical; add lower and upper interval surfaces to numeric
+smooth and parametric effect panels when \code{surface = "3d"}? Defaults to
+\code{FALSE}. Applies across supported model classes and conditioning facets.
+Other panel types, including standard errors, retain their usual display.
+Smooth bounds follow \code{interval}; parametric bounds remain pointwise.}
+
+\item{ci_3d_alpha}{numeric between 0 and 1; opacity of both interval
+surfaces, independent of \code{ci_alpha}. Defaults to \code{0.15}.}
+
+\item{ci_3d_col}{one R colour; fill of both interval surfaces, independent
+of \code{ci_col} and the estimate's continuous fill scale. Defaults to \code{"grey60"}.}
 
 \item{back_transform}{logical; plot covariates on their original scale?
 Defaults to \code{FALSE}, using model coordinates such as \code{log(x)} for a term

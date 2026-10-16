@@ -53,6 +53,9 @@
   envir = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15,
+  ci_3d_col = "grey60",
   back_transform = FALSE,
   re_levels = NULL,
   mrf_plot = c("effects", "qq"),
@@ -279,6 +282,18 @@ These options affect all 3D panels in a call. For different views per term,
 modify individual plots returned by \code{\link[=assemble]{assemble()}}. The \code{dist} entry here
 controls perspective; the top-level \code{dist} argument controls masking.}
 
+\item{ci_3d}{logical; add lower and upper interval surfaces to numeric
+smooth and parametric effect panels when \code{surface = "3d"}? Defaults to
+\code{FALSE}. Applies across supported model classes and conditioning facets.
+Other panel types, including standard errors, retain their usual display.
+Smooth bounds follow \code{interval}; parametric bounds remain pointwise.}
+
+\item{ci_3d_alpha}{numeric between 0 and 1; opacity of both interval
+surfaces, independent of \code{ci_alpha}. Defaults to \code{0.15}.}
+
+\item{ci_3d_col}{one R colour; fill of both interval surfaces, independent
+of \code{ci_col} and the estimate's continuous fill scale. Defaults to \code{"grey60"}.}
+
 \item{back_transform}{logical; plot covariates on their original scale?
 Defaults to \code{FALSE}, using model coordinates such as \code{log(x)} for a term
 containing \code{log(x)}. With \code{TRUE}, recover the raw covariates, generate a
@@ -319,8 +334,8 @@ joint coverage set. \code{"credible"} aliases \code{"confidence"}, reflecting th
 approximate Bayesian credible interpretation of default-covariance bands.
 Parametric panels retain pointwise intervals and are labelled accordingly
 when simultaneous smooth bands are requested. Bands appear where the
-renderer displays interval bounds; surface and random-effect QQ plots
-retain their existing estimate or standard-error display.}
+renderer displays interval bounds, including 3D effect surfaces when
+\code{ci_3d = TRUE}. Random-effect QQ plots retain their usual display.}
 
 \item{n_sim, n_cores}{positive integers; coefficient draws and simulation cores
 for simultaneous bands. Parallel simulation requires OpenMP support.}
@@ -383,7 +398,7 @@ covariates. Observation layers do not introduce additional surface panels.
 Three-dimensional faces retain the current diverging RdBu fill scale and
 effect-range rules, shared across conditioning facets. \code{continuous_fill}
 overrides the fill scale. Faces have no outlines; \code{contour_col} controls
-contour lines. Surface faces are fully opaque. Faces, contours, and floor
+contour lines. Estimate faces are fully opaque. Faces, contours, and floor
 observations are depth-sorted together, so nearer faces hide the parts behind
 them. The existing theme and facet styling are retained.
 
@@ -391,7 +406,11 @@ The first two displayed covariates form the horizontal axes, and the effect
 (or standard error when requested) forms the vertical axis. Additional
 covariates retain their existing conditioning facets: \code{n_2d} controls surface
 resolution, while \code{n_3d} and \code{n_4d} control covariate slices. Fixed effect
-ranges are also used for the vertical axis. Confidence surfaces are not added.
+ranges are also used for the vertical axis. With \code{ci_3d = TRUE}, translucent
+lower and upper interval surfaces use the same mesh and masking as the
+estimate. Their heights expand the vertical range, while the continuous
+fill scale retains its existing range rules. \code{ci_3d_alpha} and \code{ci_3d_col}
+style these surfaces separately from univariate interval ribbons.
 
 Contours follow the displayed mesh, and available observations are projected
 onto its floor. Observations are not assigned to conditioning slices. Soap
@@ -432,6 +451,8 @@ draw(m2, surface = "tile", n_2d = 30)
 if (requireNamespace("ggcube", quietly = TRUE)) {
   draw(m2, surface = "3d", n_2d = 20,
     surface_3d = list(yaw = 45, persp = FALSE))
+  draw(m2, surface = "3d", ci_3d = TRUE, ci_3d_alpha = 0.12,
+    n_2d = 20)
   panels <- assemble(m2, surface = "3d", n_2d = 20)
   # Replace coordinates to customize a single term; retain the current theme.
   panels[[1]] <- panels[[1]] +

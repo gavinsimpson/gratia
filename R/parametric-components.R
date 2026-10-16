@@ -119,7 +119,8 @@ parametric_component_facets <- function(variables, columns, numeric_vars,
 # are applied to the component and its intervals together.
 draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
     line_col, constant, fun, xlab, ylab, title, subtitle, caption, rug, ylim,
-    angle, contour, contour_col, n_contour, surface, surface_3d, continuous_fill,
+    angle, contour, contour_col, n_contour, surface, surface_3d,
+    ci_3d, ci_3d_alpha, ci_3d_col, continuous_fill,
     discrete_colour, discrete_fill) {
   if (!all(c(".lower_ci", ".upper_ci") %in% names(object))) {
     crit <- coverage_normal(ci_level)
@@ -130,6 +131,7 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
     column = c(".partial", ".lower_ci", ".upper_ci"))
   object <- transform_fun(object, fun = fun,
     column = c(".partial", ".lower_ci", ".upper_ci"))
+  object <- order_interval_bounds(object)
   cols <- info$columns
   numeric <- info$numeric
   discrete <- info$discrete
@@ -140,6 +142,7 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
   }
   if (is.null(title)) title <- unique(object$.term)
   if (is.null(caption)) caption <- "Parametric term contribution"
+  if (identical(caption, FALSE)) caption <- NULL
   is_surface <- length(numeric) >= 2L
   x <- info$variables[1L]
   labels <- info$axis_labels
@@ -176,6 +179,7 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
       labels = ggplot2::labs(x = xlab, y = ylab, title = title,
         subtitle = subtitle, caption = caption),
       surface = surface, surface_3d = surface_3d,
+      ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
       continuous_fill = continuous_fill, contour = contour,
       contour_data = contour_data,
       contour_col = contour_col, n_contour = n_contour, angle = angle,

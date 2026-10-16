@@ -194,6 +194,9 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
 #' multi-penalty structures, mapped joint parameters and rank-deficient smooth
 #' models give errors. Factor-by and tensor smooth availability is determined
 #' by glmmTMB; gratia does not expand the smooth types glmmTMB can fit.
+#' Use `draw(model, surface = "3d", ci_3d = TRUE)` for interval surfaces on
+#' smooths and numeric parametric interactions in any linear predictor.
+#' `ci_3d_alpha` and `ci_3d_col` control their opacity and fill colour.
 #'
 #' Parametric effects use fitted contrast coding and exclude smooth null-space
 #' coefficients. Their intervals include uncertainty in the intercept of their
@@ -257,6 +260,10 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
 #'     data = d, REML = TRUE)
 #'   draw(mixed) # separate QQ panels for intercepts and slopes
 #'   draw(mixed, ranef_lines = TRUE) # random contributions only
+#'   if (requireNamespace("ggcube", quietly = TRUE)) {
+#'     interaction <- glmmTMB::glmmTMB(y ~ x:z, data = d)
+#'     draw(interaction, surface = "3d", ci_3d = TRUE, n_2d = 15)
+#'   }
 #' }
 NULL
 

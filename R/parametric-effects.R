@@ -136,6 +136,11 @@
                                      back_transform = FALSE, ...) {
   back_transform <- parametric_back_transform(back_transform, transform,
     supplied = !missing(back_transform))
+  # SCAM retains prediction variables in its terms, without pred.formula.
+  # Data recovery and prediction must use the same variables.
+  if (is.null(object$pred.formula)) {
+    object$pred.formula <- stats::delete.response(stats::terms(object))
+  }
   object <- with_model_envir(object, envir)
   envir <- model_envir(object)
   supplied_data <- !is.null(data)
@@ -338,6 +343,8 @@ draw.parametric_effects <- function(object,
                                     n_contour = NULL,
                                     surface = c("raster", "tile", "3d"),
                                     surface_3d = list(),
+                                    ci_3d = FALSE,
+                                    ci_3d_alpha = 0.15, ci_3d_col = "grey60",
                                     continuous_fill = NULL,
                                     discrete_colour = NULL, discrete_fill = NULL,
                                     back_transform = FALSE) {
@@ -353,6 +360,7 @@ draw.parametric_effects <- function(object,
   }
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   check_surface_dots(match.call(expand.dots = FALSE))
   # Add CI
   crit <- coverage_normal(ci_level)
@@ -399,6 +407,7 @@ draw.parametric_effects <- function(object,
         back_transform = back_transform,
         contour = contour, contour_col = contour_col, n_contour = n_contour,
         surface = surface, surface_3d = surface_3d,
+        ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
         continuous_fill = continuous_fill,
         discrete_colour = discrete_colour, discrete_fill = discrete_fill
       )
@@ -456,6 +465,8 @@ draw.parametric_effects <- function(object,
                                      term_info = NULL,
                                      contour = TRUE, contour_col = "black",
                                      n_contour = NULL, surface = "raster", surface_3d = list(),
+                                     ci_3d = FALSE,
+                                     ci_3d_alpha = 0.15, ci_3d_col = "grey60",
                                      continuous_fill = NULL,
                                      discrete_colour = NULL, discrete_fill = NULL,
                                      axis_info = NULL, from_raw = FALSE,
@@ -477,6 +488,7 @@ draw.parametric_effects <- function(object,
       caption = caption, rug = rug, ylim = ylim, angle = angle,
       contour = contour, contour_col = contour_col, n_contour = n_contour,
       surface = surface, surface_3d = surface_3d,
+      ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
       continuous_fill = continuous_fill,
       discrete_colour = discrete_colour, discrete_fill = discrete_fill))
   }

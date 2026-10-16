@@ -25,6 +25,9 @@
   n_contour = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15,
+  ci_3d_col = "grey60",
   continuous_fill = NULL,
   discrete_colour = NULL,
   discrete_fill = NULL,
@@ -54,7 +57,9 @@ before the confidence band is computed.}
 
 \item{fun}{function; a function that will be applied to the estimated values
 and confidence interval before plotting. Can be a function or the name of a
-function. Function \code{fun} will be applied after adding any \code{constant}, if
+function. For simultaneous bands it must be monotone over the entire band;
+endpoint transformation alone does not preserve non-monotone band coverage.
+Function \code{fun} will be applied after adding any \code{constant}, if
 provided.}
 
 \item{rug}{logical; draw a rug plot at the bottom of each plot for 1-D
@@ -103,6 +108,17 @@ These options affect all 3D panels in a call. For different views per term,
 modify individual plots returned by \code{\link[=assemble]{assemble()}}. The \code{dist} entry here
 controls perspective; the top-level \code{dist} argument controls masking.}
 
+\item{ci_3d}{logical; add lower and upper interval surfaces to numeric
+smooth and parametric effect panels when \code{surface = "3d"}? Defaults to
+\code{FALSE}. Applies across supported model classes and conditioning facets.
+Other panel types, including standard errors, retain their usual display.
+Smooth bounds follow \code{interval}; parametric bounds remain pointwise.}
+
+\item{ci_3d_alpha}{numeric between 0 and 1; opacity of both interval
+surfaces, independent of \code{ci_alpha}. Defaults to \code{0.15}.}
+
+\item{ci_3d_col}{one R colour; fill of both interval surfaces, independent
+of \code{ci_col} and the estimate's continuous fill scale. Defaults to \code{"grey60"}.}
 
 \item{continuous_fill}{a suitable fill scale to be used when plotting
 continuous variables.}

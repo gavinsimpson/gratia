@@ -25,6 +25,25 @@ validate_surface_3d <- function(view) {
   invisible(NULL)
 }
 
+validate_ci_3d <- function(ci_3d, ci_3d_alpha, ci_3d_col) {
+  if (!is.logical(ci_3d) || length(ci_3d) != 1L || is.na(ci_3d)) {
+    stop("'ci_3d' must be TRUE or FALSE.", call. = FALSE)
+  }
+  if (!is.numeric(ci_3d_alpha) || length(ci_3d_alpha) != 1L ||
+      !is.finite(ci_3d_alpha) || ci_3d_alpha < 0 || ci_3d_alpha > 1) {
+    stop("'ci_3d_alpha' must be a finite number between 0 and 1.", call. = FALSE)
+  }
+  valid_colour <- is.character(ci_3d_col) && length(ci_3d_col) == 1L &&
+    !is.na(ci_3d_col) && tryCatch({
+      grDevices::col2rgb(ci_3d_col)
+      TRUE
+    }, error = function(e) FALSE)
+  if (!valid_colour) {
+    stop("'ci_3d_col' must be a single valid R colour.", call. = FALSE)
+  }
+  invisible(NULL)
+}
+
 check_surface_dots <- function(call) {
   if ("geom" %in% names(call[["..."]])) {
     stop("'geom' has been replaced by 'surface'; ",
@@ -162,7 +181,7 @@ surface_faces_inside <- function(vertices, faces, support = NULL,
 
 # Return triangles, retaining masked vertices until AFTER topology is built.
 surface_mesh <- function(data, x_var, y_var, z_var, support = NULL,
-                         domain = NULL) {
+                         domain = NULL, height_vars = z_var) {
   empty <- data[FALSE, , drop = FALSE]
   empty$.surface_x <- empty$.surface_y <- empty$.surface_z <- numeric()
   empty$.surface_fill <- numeric()
@@ -179,9 +198,12 @@ surface_mesh <- function(data, x_var, y_var, z_var, support = NULL,
   repeated <- duplicated(key)
   if (any(repeated)) {
     first <- match(key, key)
-    same <- (is.na(xyz$z) & is.na(xyz$z[first])) |
-      (!is.na(xyz$z) & !is.na(xyz$z[first]) & xyz$z == xyz$z[first])
-    if (any(!same)) {
+    same <- vapply(height_vars, function(v) {
+      z <- data[[v]]
+      all((is.na(z) & is.na(z[first])) |
+        (!is.na(z) & !is.na(z[first]) & z == z[first]))
+    }, logical(1))
+    if (!all(same)) {
       stop("Conflicting heights at the same 3D surface location.",
         call. = FALSE
       )
@@ -358,7 +380,8 @@ surface_scene_layer <- function(scene) {
   geom <- ggplot2::ggproto("GeomGratiaSurface3D", parent,
     optional_aes = c(
       parent$optional_aes, "surface_owner", "surface_type",
-      "surface_floor", "surface_colour", "surface_alpha", "surface_linewidth"
+      "surface_floor", "surface_colour", "surface_alpha", "surface_linewidth",
+      "surface_fixed_fill"
     ),
     draw_panel = function(data, panel_params, coord, sort_method = "auto",
                           scale_depth = TRUE, force_convex = FALSE,
@@ -366,6 +389,8 @@ surface_scene_layer <- function(scene) {
       data$.prim <- as.character(data$surface_type)
       data$z[data$surface_floor] <- min(panel_params$scale_info$z$limits)
       data$colour <- data$surface_colour
+      fixed <- !is.na(data$surface_fixed_fill)
+      data$fill[fixed] <- data$surface_fixed_fill[fixed]
       data$alpha <- data$surface_alpha
       data$linewidth <- data$surface_linewidth
       data$size <- 1.5
@@ -393,6 +418,7 @@ surface_scene_layer <- function(scene) {
       surface_type = I(.data$.surface_type),
       surface_floor = I(.data$.surface_floor),
       surface_colour = I(.data$.surface_colour),
+      surface_fixed_fill = I(.data$.surface_fixed_fill),
       surface_alpha = I(.data$.surface_alpha),
       surface_linewidth = I(.data$.surface_linewidth)
     )
@@ -410,6 +436,8 @@ surface_scene_data <- function(
   scene$.surface_colour <- rep(NA_character_, nrow(scene))
   scene$.surface_alpha <- rep(1, nrow(scene))
   scene$.surface_linewidth <- rep(0.1, nrow(scene))
+  scene$.surface_fixed_fill <- rep(NA_character_, nrow(scene))
+  scene$.surface_role <- rep("estimate", nrow(scene))
   if (!is.null(segments) && nrow(segments)) {
     a <- segments[names(mesh)]
     b <- a
@@ -471,11 +499,36 @@ surface_scene_data <- function(
   scene
 }
 
+# Bounds use the estimate's retained faces, so they cannot bridge a masked gap
+# or choose a different diagonal. Missing bound vertices remove only that face.
+surface_interval_faces <- function(mesh, alpha, colour) {
+  if (!nrow(mesh)) return(mesh)
+  dplyr::bind_rows(lapply(c(lower = ".lower_ci", upper = ".upper_ci"),
+    function(column) {
+      bound <- mesh
+      z <- bound[[column]]
+      complete <- rep(colSums(matrix(is.finite(z), nrow = 3L)) == 3L,
+        each = 3L)
+      bound <- bound[complete, , drop = FALSE]
+      bound$.surface_z <- z[complete]
+      role <- if (column == ".lower_ci") "lower" else "upper"
+      bound$.surface_face <- if (nrow(bound)) {
+        paste(role, bound$.surface_face, sep = ":")
+      } else character()
+      bound$.surface_owner <- as.character(bound$.surface_face)
+      bound$.surface_role <- rep(role, nrow(bound))
+      bound$.surface_fill <- rep(NA_real_, nrow(bound))
+      bound$.surface_alpha <- rep(alpha, nrow(bound))
+      bound$.surface_fixed_fill <- rep(colour, nrow(bound))
+      bound
+    }))
+}
+
 prepare_surface_3d <- function(
   object, x_var, y_var, fill_var, fill_limits,
   fill_title, labels, continuous_fill, contour, contour_col, n_contour,
   facet, facet_vars, rug, boundary, boundary_group, surface_3d, isotropic,
-  support, z_limits
+  support, z_limits, ci_3d = FALSE, ci_3d_alpha = 0.15, ci_3d_col = "grey60"
 ) {
   surface_dependency("ggcube", "3D surface plotting")
   if (utils::packageVersion("ggcube") < "0.3.0") {
@@ -492,7 +545,8 @@ prepare_surface_3d <- function(
   }
   meshes <- lapply(groups, surface_mesh,
     x_var = x_var, y_var = y_var,
-    z_var = fill_var, support = support, domain = domain
+    z_var = fill_var, support = support, domain = domain,
+    height_vars = if (ci_3d) c(fill_var, ".lower_ci", ".upper_ci") else fill_var
   )
   mesh <- dplyr::bind_rows(lapply(seq_along(meshes), function(i) {
     if (nrow(meshes[[i]])) {
@@ -518,6 +572,13 @@ prepare_surface_3d <- function(
     floor_height = if (length(heights)) heights[1L] else 0,
     contour_col = contour_col
   )
+  if (ci_3d) {
+    bounds <- surface_interval_faces(
+      scene[scene$.surface_type == "polygon", , drop = FALSE],
+      ci_3d_alpha, ci_3d_col
+    )
+    scene <- dplyr::bind_rows(scene, bounds)
+  }
   plt <- ggplot2::ggplot(object) +
     surface_scene_layer(scene) +
     facet +

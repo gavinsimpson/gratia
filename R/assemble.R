@@ -108,6 +108,8 @@
   envir = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
   back_transform = FALSE,
   re_levels = NULL,
   mrf_plot = c("effects", "qq"),
@@ -127,6 +129,7 @@
   check_back_transform(back_transform)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   check_surface_dots(match.call(expand.dots = FALSE))
 
   .call <- match.call()
@@ -361,6 +364,7 @@
     sm_plts <- map(sm_l,
       draw_smooth_estimates,
       surface = surface, surface_3d = surface_3d,
+      ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
       surface_support = surface_support,
       tensor_plot_info = attr(sm_eval, "tensor_plot_info"),
       re_levels = re_levels,
@@ -490,7 +494,7 @@
               ci_level = ci_level,
               caption = if (isTRUE(caption) && interval == "simultaneous") {
                 paste0(format(100 * ci_level), "% pointwise intervals (parametric effect)")
-              } else NULL,
+              } else if (identical(caption, FALSE)) FALSE else NULL,
               ci_col = ci_col,
               ci_alpha = ci_alpha,
               line_col = smooth_col,
@@ -505,6 +509,7 @@
               back_transform = back_transform,
               contour = contour, contour_col = contour_col, n_contour = n_contour,
               surface = surface, surface_3d = surface_3d,
+              ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
               continuous_fill = continuous_fill,
               discrete_colour = discrete_colour, discrete_fill = discrete_fill
             )

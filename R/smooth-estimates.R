@@ -1451,6 +1451,8 @@ scam_smooth_matrix <- function(smooth, X) {
                                     caption = TRUE,
                                     surface = c("raster", "tile", "3d"),
                                     surface_3d = list(),
+                                    ci_3d = FALSE,
+                                    ci_3d_alpha = 0.15, ci_3d_col = "grey60",
                                     back_transform = FALSE,
                                     re_levels = NULL,
                                     mrf_plot = c("effects", "qq"),
@@ -1467,6 +1469,7 @@ scam_smooth_matrix <- function(smooth, X) {
   mrf_plot <- match.arg(mrf_plot)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   check_surface_dots(match.call(expand.dots = FALSE))
   validate_tensor_plot_controls(re_levels)
   validate_estimate_re_levels(object, re_levels)
@@ -1526,6 +1529,7 @@ scam_smooth_matrix <- function(smooth, X) {
     mrf_plot = mrf_plot,
     tensor_plot_info = plot_info,
     surface = surface, surface_3d = surface_3d,
+    ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
     surface_support = surface_support,
     constant = constant,
     fun = fun,
@@ -1597,6 +1601,8 @@ scam_smooth_matrix <- function(smooth, X) {
                                     grouped_by = FALSE,
                                     surface = c("raster", "tile", "3d"),
                                     surface_3d = list(),
+                                    ci_3d = FALSE,
+                                    ci_3d_alpha = 0.15, ci_3d_col = "grey60",
                                     back_transform = FALSE,
                                     coordinate_info = NULL,
                                     surface_support = NULL,
@@ -1606,6 +1612,7 @@ scam_smooth_matrix <- function(smooth, X) {
   check_shape_effect_transform(interval_info, constant, fun)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   check_surface_dots(match.call(expand.dots = FALSE))
 
   plot_info <- tensor_plot_info[[unique(object$.smooth)[1L]]]
@@ -1805,6 +1812,7 @@ scam_smooth_matrix <- function(smooth, X) {
     object,
     mrf_plot = mrf_plot,
     surface = surface, surface_3d = surface_3d,
+    ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
     surface_support = support,
     variables = sm_vars,
     rug = rug_data,
