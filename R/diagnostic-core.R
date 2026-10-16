@@ -345,6 +345,10 @@ diagnostic_plot_source.default <- function(model, type = NULL, seed = NULL,
 #' @export
 diagnostic_plot_source.gratia_diagnostics <- function(model, type = NULL,
     seed = NULL, conditioning = NULL, ..., n_dharma = NULL) {
+  if (is_multinom_diagnostics(model)) {
+    check_distribution_conditioning(conditioning)
+    return(diagnostic_data(model, type, seed, ..., n_dharma = n_dharma))
+  }
   if (identical(model$type, "dharma")) {
     model <- diagnostic_data(model, type, seed, conditioning, n_dharma = n_dharma, ...)
     source <- model$source

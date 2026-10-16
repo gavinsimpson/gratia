@@ -331,6 +331,38 @@ These residuals transform cumulative category probabilities; they are distinct
 from the latent-utility surrogate residuals for nominal models studied by
 [Cheng, Wang and Zhang (2021)](https://pmc.ncbi.nlm.nih.gov/articles/PMC8018589/).
 
+Use `surrogate_residuals()` or `appraise(fit, type = "surrogate", seed = 417)`
+for a GAM fitted with `multinom()`.
+These residuals draw continuous utilities conditional on the observed choice,
+then subtract each fitted location and the Gumbel mean. The result is a matrix
+with columns labelled `0`, ..., `K`, including the reference category. Every
+component has a centred Gumbel reference, with mean zero and variance
+`pi^2 / 6`. Even binary `multinom(K = 1)` fits retain two utility components;
+the difference between them has a logistic reference. This construction uses
+the whole utility vector and does not assign an order to the nominal outcomes.
+
+```{r nominal-surrogate}
+set.seed(417)
+nominal_data <- data.frame(x = runif(400, -2, 2))
+locations <- cbind(0, nominal_data$x, -.5 - nominal_data$x)
+utilities <- locations - log(-log(matrix(runif(1200), nrow = 400)))
+nominal_data$y <- max.col(utilities) - 1L
+nominal_fit <- gam(list(y ~ s(x, k = 6), ~ s(x, k = 6)),
+  data = nominal_data, family = multinom(K = 2), method = "REML")
+head(surrogate_residuals(nominal_fit, seed = 418))
+appraise(nominal_fit, type = "surrogate", seed = 418)
+```
+
+QQ and worm plots show each category separately against centred Gumbel
+quantiles. Their pointwise bands treat fitted parameters as fixed and apply
+separately to each component. Residual-versus-fitted panels use each category's
+fitted probability, including category 0. Observed-versus-fitted panels compare
+category indicators with those probabilities. All panels share a single draw.
+For larger data, `scalable = TRUE` summarises each category separately while
+retaining the same underlying draws for the same seed. Automatic dispatch
+counts observations. See `surrogate_residuals()` for the sampling identity and
+reference distributions.
+
 ## Other distributions and limits to interpretation
 
 The same public diagnostics cover the following additions. Choose a family

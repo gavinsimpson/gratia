@@ -434,6 +434,20 @@ residual_covariate_plots <- function(model, covariates, terms, pairs, data, by,
     density_method = "kde", bandwidth = NULL, point_col = "grey20",
     point_alpha = .5, line_col = "red", xlab = NULL, ylab = NULL,
     title = NULL, subtitle = NULL, caption = NULL, ncol = NULL, ...) {
+  if (is_multinom_surrogate(model, type)) {
+    nominal <- prepare_diagnostic_data(model, type, seed,
+      conditioning = conditioning, n_dharma = n_dharma, ...)
+    plots <- lapply(seq_len(ncol(nominal$residuals)), function(j) {
+      component <- multinom_diagnostic_component(nominal, j)
+      component$data$.family <- factor(rep(paste("Category", colnames(nominal$residuals)[j]), nominal$n_obs))
+      residual_covariate_plots(component, covariates, terms, pairs, data, by,
+        type, smooth, bins, min_n, statistic, NULL, NULL, n_dharma,
+        scalable, density_bins, density, density_method, bandwidth,
+        point_col, point_alpha, line_col, xlab, ylab, title, subtitle,
+        caption, ncol)
+    })
+    return(patchwork::wrap_plots(plots, ncol = 1L, guides = "keep"))
+  }
   if (!is.null(smooth) &&
       (!is.logical(smooth) || length(smooth) != 1L || is.na(smooth))) {
     stop("'smooth' must be NULL, TRUE or FALSE.", call. = FALSE)
