@@ -15,28 +15,30 @@ smooth_samples(model, ...)
 # S3 method for class 'gam'
 smooth_samples(
   model,
-  select = NULL,
-  term = deprecated(),
-  n = 1,
-  data = newdata,
-  method = c("gaussian", "mh", "inla", "user"),
+  ...,
+  data = NULL,
+  n_draws = NULL,
+  chains = NULL,
   seed = NULL,
-  freq = FALSE,
-  unconditional = FALSE,
+  method = c("gaussian", "mh", "inla", "user"),
   n_cores = 1L,
-  n_vals = 200,
+  n_threads = 1L,
   burnin = 1000,
-  thin = 1,
+  thin = 1L,
   t_df = 40,
   rw_scale = 0.25,
-  rng_per_smooth = FALSE,
+  frequentist = FALSE,
+  unconditional = FALSE,
   draws = NULL,
-  partial_match = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
-  envir = NULL,
-  ...,
-  newdata = NULL,
-  ncores = NULL
+  block_size = 10000L,
+  dense_limit = 5e+06,
+  select = NULL,
+  n_grid = 200L,
+  partial_match = NULL,
+  envir = NULL
 )
 ```
 
@@ -44,7 +46,8 @@ smooth_samples(
 
 - model:
 
-  a fitted model of the supported types
+  a fitted model of the supported types; see
+  [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - ...:
 
@@ -62,25 +65,27 @@ smooth_samples(
   [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
   method.
 
-- select:
-
-  character; select which smooth's posterior to draw from. The default
-  (`NULL`) means the posteriors of all smooths in `model` will be
-  sampled from. If supplied, a character vector of requested terms.
-
-- term:
-
-  **\[deprecated\]** Use `select` instead.
-
-- n:
-
-  numeric; the number of posterior samples to return.
-
 - data:
 
   data frame; new observations at which the posterior draws from the
   model should be evaluated. If not supplied, the data used to fit the
   model will be used for `data`, if available in `model`.
+
+- n_draws:
+
+  positive integer; total retained draws across all chains. Required
+  when generating draws. With `method = "user"`, the supplied matrix
+  determines the count; an explicit count must agree with its rows.
+
+- chains:
+
+  positive integer or `NULL`; number of chains. `NULL` uses one chain,
+  or the chain mapping in supplied draws. `n_draws` must be divisible by
+  `chains`. Burn-in is applied separately to each MH chain.
+
+- seed:
+
+  numeric; a random seed for the simulations.
 
 - method:
 
@@ -90,37 +95,19 @@ smooth_samples(
   sampler that alternates t proposals with proposals based on a shrunken
   version of the posterior covariance matrix. `"inla"` uses a variant of
   Integrated Nested Laplace Approximation due to Wood (2019), (currently
-  not implemented). `"user"` allows for user-supplied posterior draws
-  (currently not implemented).
-
-- seed:
-
-  numeric; a random seed for the simulations.
-
-- freq:
-
-  logical; `TRUE` to use the frequentist covariance matrix of the
-  parameter estimators, `FALSE` to use the Bayesian posterior covariance
-  matrix of the parameters.
-
-- unconditional:
-
-  logical; if `TRUE` (and `freq == FALSE`) then the Bayesian smoothing
-  parameter uncertainty corrected covariance matrix is used, if
-  available.
+  not implemented). `"user"` allows for user-supplied posterior draws as
+  a coefficient matrix.
 
 - n_cores:
 
-  number of cores for generating random variables from a multivariate
-  normal distribution. Passed to
-  [`mvnfast::rmvn()`](https://rdrr.io/pkg/mvnfast/man/rmvn.html).
-  Parallelization will take place only if OpenMP is supported (but
-  appears to work on Windows with current `R`).
+  positive integer; maximum concurrent MH chains using mirai, capped at
+  `chains`. Existing workers are reused; otherwise temporary workers are
+  created and cleaned up. Only used by `method = "mh"`.
 
-- n_vals:
+- n_threads:
 
-  numeric; how many locations to evaluate the smooth at if `data` not
-  supplied
+  positive integer; threads within Gaussian sampling using mvnfast.
+  Defaults to one. This is separate from concurrent MH chains.
 
 - burnin:
 
@@ -129,9 +116,7 @@ smooth_samples(
 
 - thin:
 
-  numeric; the number of samples to skip when taking `n` draws. Results
-  in `thin * n` draws from the posterior being taken. Only used with
-  `method = "mh"`.
+  positive integer; retain every `thin` iterations after burn-in.
 
 - t_df:
 
@@ -144,22 +129,39 @@ smooth_samples(
   generating random walk proposals. Negative or non finite to skip the
   random walk step. Only used with `method = "mh"`.
 
-- rng_per_smooth:
+- frequentist:
 
-  logical; if TRUE, the behaviour of gratia version 0.8.1 or earlier is
-  used, whereby a separate call the the random number generator (RNG) is
-  performed for each smooth. If FALSE, a single call to the RNG is
-  performed for all model parameters
+  logical; `TRUE` to use the frequentist covariance matrix of the
+  parameter estimators, `FALSE` to use the Bayesian posterior covariance
+  matrix of the parameters.
+
+- unconditional:
+
+  logical; if `TRUE` (and `frequentist == FALSE`) then the Bayesian
+  smoothing parameter uncertainty corrected covariance matrix is used,
+  if available.
 
 - draws:
 
   matrix; user supplied posterior draws to be used when
   `method = "user"`.
 
-- partial_match:
+- diagnostics:
 
-  logical; should smooths be selected by partial matches with `select`?
-  If `TRUE`, `select` can only be a single string to match against.
+  logical; calculate coefficient R-hat, effective sample sizes, and
+  Monte Carlo standard errors using the optional posterior package.
+
+- mh_backend:
+
+  character; `"mgcv"` preserves
+  [`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html).
+  `"gratia"` uses compiled common-family likelihoods. `"family"` uses a
+  compiled MH loop with callbacks to the fitted family object. Both
+  support independent-observation bam fits. Smoothing parameters and
+  parameters outside the fitted coefficient vector remain fixed. LSS
+  scale and shape coefficients are sampled jointly with location. The
+  family backend caches a full design matrix, smoothing penalty, and
+  proposal factorisation once for all chains.
 
 - mvn_method:
 
@@ -170,21 +172,39 @@ smooth_samples(
   but which might not work for some marginal fits, such as those where
   the covariance matrix is close to singular.
 
+- block_size:
+
+  positive integer; maximum observation rows per block in the gratia MH
+  evaluator. Large designs are evaluated without storing a full matrix.
+
+- dense_limit:
+
+  numeric; maximum number of design-matrix elements to cache for the
+  gratia MH backend. Use zero to force blockwise evaluation.
+
+- select:
+
+  character; select which smooth's posterior to draw from. The default
+  (`NULL`) means the posteriors of all smooths in `model` will be
+  sampled from. If supplied, a character vector of requested terms.
+  0.8.1 or earlier is used, whereby a separate call the the random
+  number generator (RNG) is performed for each smooth. If FALSE, a
+  single call to the RNG is performed for all model parameters
+
+- n_grid:
+
+  positive integer; resolution for constructing evaluation data if
+  `data` not supplied
+
+- partial_match:
+
+  logical; should smooths be selected by partial matches with `select`?
+  If `TRUE`, `select` can only be a single string to match against.
+
 - envir:
 
-  an environment to look up the data within.
-
-- newdata:
-
-  Deprecated: use `data` instead.
-
-- ncores:
-
-  Deprecated; use `n_cores` instead. The number of cores for generating
-  random variables from a multivariate normal distribution. Passed to
-  [`mvnfast::rmvn()`](https://rdrr.io/pkg/mvnfast/man/rmvn.html).
-  Parallelization will take place only if OpenMP is supported (but
-  appears to work on Windows with current `R`).
+  an optional environment for looking up data, functions and constants.
+  Defaults to the model's evaluation environment.
 
 ## Value
 
@@ -204,8 +224,8 @@ order) are:
 - `.by`; character vector. If the smooth involves a `by` term, the by
   variable will be named here, `NA_character_` otherwise.
 
-- `.row`; integer. A vector of values `seq_len(n_vals)`, repeated if
-  `n > 1L`. Indexes the row in `data` for that particular draw.
+- `.row`; integer. A vector of values `seq_len(nrow(data))`, repeated if
+  `n_draws > 1L`. Indexes the row in `data` for that particular draw.
 
 - `.draw`; integer. A vector of integer values indexing the particular
   posterior draw that each row belongs to.
@@ -220,6 +240,18 @@ order) are:
 - Additional columns will be present in the case of factor by smooths,
   which will contain the level for the factor named in `by_variable` for
   that particular posterior draw.
+
+## Details
+
+For LSS models, each smooth is a contribution to its own linear
+predictor. Select its full smooth label to distinguish predictors, for
+example `s(x)` and `s.1(x)`. These are component draws on the predictor
+scale; use
+[`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
+for the expected response and
+[`derivative_samples()`](https://gavinsimpson.github.io/gratia/reference/derivative_samples.md)
+for its derivative. Coefficients are drawn jointly across all
+predictors.
 
 ## Warning
 
@@ -241,7 +273,7 @@ load_mgcv()
 dat <- data_sim("eg1", n = 400, seed = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
-sms <- smooth_samples(m1, select = "s(x0)", n = 5, seed = 42)
+sms <- smooth_samples(m1, select = "s(x0)", n_draws = 5, seed = 42)
 # \donttest{
 sms
 #> # A tibble: 1,000 x 8
@@ -265,6 +297,6 @@ dat <- data_sim("eg4", n = 1000, seed = 2)
 
 ## fit model...
 m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
-sms <- smooth_samples(m2, n = 5, seed = 42)
+sms <- smooth_samples(m2, n_draws = 5, seed = 42)
 draw(sms)
 ```

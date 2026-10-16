@@ -13,23 +13,27 @@ log_lik(model, ...)
 # S3 method for class 'gam'
 log_lik(
   model,
-  n = 4000,
+  ...,
+  n_draws = NULL,
+  chains = NULL,
+  diagnostics = FALSE,
   seed = NULL,
   method = c("gaussian", "mh", "user"),
   draws = NULL,
-  unconditional = FALSE,
-  ...
+  unconditional = FALSE
 )
 
 # S3 method for class 'bam'
 log_lik(
   model,
-  n = 4000,
+  ...,
+  n_draws = NULL,
+  chains = NULL,
+  diagnostics = FALSE,
   seed = NULL,
   method = c("gaussian", "mh", "user"),
   draws = NULL,
-  unconditional = FALSE,
-  ...
+  unconditional = FALSE
 )
 ```
 
@@ -46,10 +50,22 @@ log_lik(
   such as `burnin`, `thin` or `mvn_method`. Prediction at new
   observations and frequentist covariance matrices are not supported.
 
-- n:
+- n_draws:
 
-  Positive integer; number of coefficient draws. Ignored for
-  `method = "user"`, which uses every row of `draws`.
+  Positive integer; total coefficient draws across chains. Defaults to
+  4000 when generating draws. Supplied draws determine their own count;
+  an explicit count must agree.
+
+- chains:
+
+  positive integer or `NULL`; number of chains. `NULL` uses one chain,
+  or the chain mapping in supplied draws. `n_draws` must be divisible by
+  `chains`. Burn-in is applied separately to each MH chain.
+
+- diagnostics:
+
+  logical; calculate coefficient R-hat, effective sample sizes, and
+  Monte Carlo standard errors using the optional posterior package.
 
 - seed:
 
@@ -77,9 +93,12 @@ log_lik(
 A numeric matrix with draws in rows and retained fitting observations in
 columns. Attribute `observation` gives their original fitting-row
 indices after any fitting subset; `gratia` describes the sampling
-assumptions. Impossible observations may have log likelihood `-Inf`;
-invalid numerical calculations produce an error. LOO and WAIC require
-finite log likelihoods.
+assumptions. The `sampling` attribute retains chain identities and
+requested coefficient diagnostics;
+[`as_mcmc_draws()`](https://gavinsimpson.github.io/gratia/reference/as_mcmc_draws.md)
+converts the likelihood matrix by chain. Impossible observations may
+have log likelihood `-Inf`; invalid numerical calculations produce an
+error. LOO and WAIC require finite log likelihoods.
 
 ## Details
 
@@ -122,7 +141,7 @@ for optional loo methods.
 ``` r
 library("mgcv")
 m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
-ll <- log_lik(m, n = 500, seed = 42)
+ll <- log_lik(m, n_draws = 500, seed = 42)
 dim(ll)
 #> [1] 500  32
 if (requireNamespace("loo", quietly = TRUE)) {

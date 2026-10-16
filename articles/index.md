@@ -40,3 +40,5 @@ complete workflow for grouped surveys, mixed models or spatial surveys.
   plots](https://gavinsimpson.github.io/gratia/articles/custom-plotting.md):
 - [Posterior
   Simulation](https://gavinsimpson.github.io/gratia/articles/posterior-simulation.md):
+- [Migrating posterior sampling
+  calls](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md):

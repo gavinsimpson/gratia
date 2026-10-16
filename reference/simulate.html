@@ -41,6 +41,7 @@ See diagnostic_support."><meta property="og:image" content="https://gavinsimpson
     <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
     <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -156,6 +157,8 @@ the model will be used for <code>newdata</code>, if available in <code>object</c
 overrides the fitting weights; a single value applies to every observation.
 With <code>data = NULL</code>, the default is the fitted prior weights, except
 factor-valued binomial responses retain one Bernoulli trial per observation.
+Native <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">gaulss()</a></code> ignores fitting weights in its likelihood, so its default
+response weights are ones; explicit sampling weights still override this.
 With prediction data, the default is a vector of ones. For ordinary Gaussian
 and Gamma responses, larger weights reduce response variance (precision
 weights). For binomial responses, weights give integer trial counts. Include

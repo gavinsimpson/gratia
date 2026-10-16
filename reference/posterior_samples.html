@@ -37,6 +37,7 @@
     <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
     <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -62,74 +63,86 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'lm'</span></span>
-<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, n <span class="op">=</span> <span class="fl">1L</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span>, n_draws <span class="op">=</span> <span class="cn">NULL</span>, seed <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'glm'</span></span>
-<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, n <span class="op">=</span> <span class="fl">1L</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span>, n_draws <span class="op">=</span> <span class="cn">NULL</span>, seed <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'glmmTMB'</span></span>
-<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, n <span class="op">=</span> <span class="fl">1L</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, conditioning <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span>, n_draws <span class="op">=</span> <span class="cn">NULL</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, conditioning <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'sdmTMB'</span></span>
-<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, n <span class="op">=</span> <span class="fl">1L</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, conditioning <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span>, n_draws <span class="op">=</span> <span class="cn">NULL</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, conditioning <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamlss'</span></span>
-<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, n <span class="op">=</span> <span class="fl">1L</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span>, n_draws <span class="op">=</span> <span class="cn">NULL</span>, seed <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm'</span></span>
-<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, n <span class="op">=</span> <span class="fl">1L</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, conditioning <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span>, n_draws <span class="op">=</span> <span class="cn">NULL</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, conditioning <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'lme'</span></span>
-<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, n <span class="op">=</span> <span class="fl">1L</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, conditioning <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span>, n_draws <span class="op">=</span> <span class="cn">NULL</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, conditioning <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'merMod'</span></span>
-<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, n <span class="op">=</span> <span class="fl">1L</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, conditioning <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span>, n_draws <span class="op">=</span> <span class="cn">NULL</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, conditioning <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm4'</span></span>
-<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, n <span class="op">=</span> <span class="fl">1L</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, conditioning <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span>, n_draws <span class="op">=</span> <span class="cn">NULL</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, conditioning <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">posterior_samples</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gam'</span></span>
 <span><span class="fu">posterior_samples</span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
-<span>  n <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">newdata</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n_draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  chains <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"mh"</span>, <span class="st">"inla"</span>, <span class="st">"user"</span><span class="op">)</span>,</span>
-<span>  n_cores <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  n_cores <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  n_threads <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  burnin <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  thin <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  thin <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  t_df <span class="op">=</span> <span class="fl">40</span>,</span>
 <span>  rw_scale <span class="op">=</span> <span class="fl">0.25</span>,</span>
-<span>  freq <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  diagnostics <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  mh_backend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mgcv"</span>, <span class="st">"gratia"</span>, <span class="st">"family"</span><span class="op">)</span>,</span>
 <span>  mvn_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mvnfast"</span>, <span class="st">"mgcv"</span><span class="op">)</span>,</span>
-<span>  <span class="va">...</span>,</span>
-<span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  ncores <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  block_size <span class="op">=</span> <span class="fl">10000L</span>,</span>
+<span>  dense_limit <span class="op">=</span> <span class="fl">5e+06</span>,</span>
+<span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  family_index <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'scam'</span></span>
 <span><span class="fu">posterior_samples</span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
-<span>  n <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n_draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  chains <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"mh"</span>, <span class="st">"inla"</span>, <span class="st">"user"</span><span class="op">)</span>,</span>
-<span>  n_cores <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  n_cores <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  n_threads <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  burnin <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  thin <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  thin <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  t_df <span class="op">=</span> <span class="fl">40</span>,</span>
 <span>  rw_scale <span class="op">=</span> <span class="fl">0.25</span>,</span>
-<span>  freq <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  diagnostics <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  mh_backend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mgcv"</span>, <span class="st">"gratia"</span>, <span class="st">"family"</span><span class="op">)</span>,</span>
 <span>  mvn_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mvnfast"</span>, <span class="st">"mgcv"</span><span class="op">)</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  block_size <span class="op">=</span> <span class="fl">10000L</span>,</span>
+<span>  dense_limit <span class="op">=</span> <span class="fl">5e+06</span>,</span>
+<span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  family_index <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -141,19 +154,21 @@
 <dd><p>a fitted model of the supported types; see <a href="diagnostic_support.html">diagnostic_support</a>.</p></dd>
 
 
-<dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
-<dd><p>numeric; the number of posterior samples to return.</p></dd>
-
-
-<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
-<dd><p>numeric; a random seed for the simulations.</p></dd>
-
-
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>arguments passed to other methods. For <code><a href="fitted_samples.html">fitted_samples()</a></code>, these
 are passed on to <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">mgcv::predict.gam()</a></code>. For <code>posterior_samples()</code> these are
 passed on to <code><a href="fitted_samples.html">fitted_samples()</a></code>. For <code><a href="predicted_samples.html">predicted_samples()</a></code> these are
 passed on to the relevant <code><a href="simulate.html">simulate()</a></code> method.</p></dd>
+
+
+<dt id="arg-n-draws">n_draws<a class="anchor" aria-label="anchor" href="#arg-n-draws"></a></dt>
+<dd><p>positive integer; total retained draws across all chains.
+Required when generating draws. With <code>method = "user"</code>, the supplied
+matrix determines the count; an explicit count must agree with its rows.</p></dd>
+
+
+<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
+<dd><p>numeric; a random seed for the simulations.</p></dd>
 
 
 <dt id="arg-conditioning">conditioning<a class="anchor" aria-label="anchor" href="#arg-conditioning"></a></dt>
@@ -167,6 +182,12 @@ from the model should be evaluated. If not supplied, the data used to fit
 the model will be used for <code>data</code>, if available in <code>model</code>.</p></dd>
 
 
+<dt id="arg-chains">chains<a class="anchor" aria-label="anchor" href="#arg-chains"></a></dt>
+<dd><p>positive integer or <code>NULL</code>; number of chains. <code>NULL</code> uses one
+chain, or the chain mapping in supplied draws. <code>n_draws</code> must be divisible by
+<code>chains</code>. Burn-in is applied separately to each MH chain.</p></dd>
+
+
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
 <dd><p>character; which method should be used to draw samples from
 the posterior distribution. <code>"gaussian"</code> uses a Gaussian (Laplace)
@@ -175,14 +196,18 @@ that alternates t proposals with proposals based on a shrunken version of
 the posterior covariance matrix. <code>"inla"</code> uses a variant of Integrated
 Nested Laplace Approximation due to Wood (2019), (currently not
 implemented). <code>"user"</code> allows for user-supplied posterior draws
-(currently not implemented).</p></dd>
+as a coefficient matrix.</p></dd>
 
 
 <dt id="arg-n-cores">n_cores<a class="anchor" aria-label="anchor" href="#arg-n-cores"></a></dt>
-<dd><p>number of cores for generating random variables from a
-multivariate normal distribution. Passed to <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code>.
-Parallelization will take place only if OpenMP is supported (but appears
-to work on Windows with current <code>R</code>).</p></dd>
+<dd><p>positive integer; maximum concurrent MH chains using mirai,
+capped at <code>chains</code>. Existing workers are reused; otherwise temporary workers
+are created and cleaned up. Only used by <code>method = "mh"</code>.</p></dd>
+
+
+<dt id="arg-n-threads">n_threads<a class="anchor" aria-label="anchor" href="#arg-n-threads"></a></dt>
+<dd><p>positive integer; threads within Gaussian sampling using
+mvnfast. Defaults to one. This is separate from concurrent MH chains.</p></dd>
 
 
 <dt id="arg-burnin">burnin<a class="anchor" aria-label="anchor" href="#arg-burnin"></a></dt>
@@ -191,9 +216,7 @@ Only used with <code>method = "mh"</code>.</p></dd>
 
 
 <dt id="arg-thin">thin<a class="anchor" aria-label="anchor" href="#arg-thin"></a></dt>
-<dd><p>numeric; the number of samples to skip when taking <code>n</code> draws.
-Results in <code>thin * n</code> draws from the posterior being taken. Only used with
-<code>method = "mh"</code>.</p></dd>
+<dd><p>positive integer; retain every <code>thin</code> iterations after burn-in.</p></dd>
 
 
 <dt id="arg-t-df">t_df<a class="anchor" aria-label="anchor" href="#arg-t-df"></a></dt>
@@ -207,33 +230,37 @@ matrix when generating random walk proposals. Negative or non finite to
 skip the random walk step. Only used with <code>method = "mh"</code>.</p></dd>
 
 
-<dt id="arg-freq">freq<a class="anchor" aria-label="anchor" href="#arg-freq"></a></dt>
+<dt id="arg-frequentist">frequentist<a class="anchor" aria-label="anchor" href="#arg-frequentist"></a></dt>
 <dd><p>logical; <code>TRUE</code> to use the frequentist covariance matrix of
 the parameter estimators, <code>FALSE</code> to use the Bayesian posterior
 covariance matrix of the parameters.</p></dd>
 
 
 <dt id="arg-unconditional">unconditional<a class="anchor" aria-label="anchor" href="#arg-unconditional"></a></dt>
-<dd><p>logical; if <code>TRUE</code> (and <code>freq == FALSE</code>) then the
+<dd><p>logical; if <code>TRUE</code> (and <code>frequentist == FALSE</code>) then the
 Bayesian smoothing parameter uncertainty corrected covariance matrix is
 used, if available.</p></dd>
-
-
-<dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>numeric; response sampling weights for GAM methods. An
-explicit vector overrides the fitting weights; a single value applies to
-every observation. With <code>data = NULL</code>, the default is the fitted prior
-weights, except factor-valued binomial responses retain one Bernoulli trial
-per observation. With prediction data, the default is a vector of ones.
-For ordinary Gaussian and Gamma responses, larger weights reduce response
-variance (precision weights). For binomial responses, weights give integer
-trial counts. They do not alter the fitted coefficient covariance. Include
-positions restored by <code>na.exclude</code> when supplying weights for fitting rows.</p></dd>
 
 
 <dt id="arg-draws">draws<a class="anchor" aria-label="anchor" href="#arg-draws"></a></dt>
 <dd><p>matrix; user supplied posterior draws to be used when
 <code>method = "user"</code>.</p></dd>
+
+
+<dt id="arg-diagnostics">diagnostics<a class="anchor" aria-label="anchor" href="#arg-diagnostics"></a></dt>
+<dd><p>logical; calculate coefficient R-hat, effective sample
+sizes, and Monte Carlo standard errors using the optional posterior package.</p></dd>
+
+
+<dt id="arg-mh-backend">mh_backend<a class="anchor" aria-label="anchor" href="#arg-mh-backend"></a></dt>
+<dd><p>character; <code>"mgcv"</code> preserves <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code>.
+<code>"gratia"</code> uses compiled common-family likelihoods. <code>"family"</code> uses a
+compiled MH loop with callbacks to the fitted family object. Both support
+independent-observation bam fits. Smoothing parameters and parameters
+outside the fitted coefficient vector remain fixed. LSS scale and shape
+coefficients are sampled jointly with location. The family backend caches
+a full design matrix,
+smoothing penalty, and proposal factorisation once for all chains.</p></dd>
 
 
 <dt id="arg-mvn-method">mvn_method<a class="anchor" aria-label="anchor" href="#arg-mvn-method"></a></dt>
@@ -244,25 +271,46 @@ for some marginal fits, such as those where the covariance matrix is close
 to singular.</p></dd>
 
 
-<dt id="arg-newdata">newdata<a class="anchor" aria-label="anchor" href="#arg-newdata"></a></dt>
-<dd><p>Deprecated: use <code>data</code> instead.</p></dd>
+<dt id="arg-block-size">block_size<a class="anchor" aria-label="anchor" href="#arg-block-size"></a></dt>
+<dd><p>positive integer; maximum observation rows per block in the
+gratia MH evaluator. Large designs are evaluated without storing a full matrix.</p></dd>
 
 
-<dt id="arg-ncores">ncores<a class="anchor" aria-label="anchor" href="#arg-ncores"></a></dt>
-<dd><p>Deprecated; use <code>n_cores</code> instead. The number of cores for
-generating random variables from a multivariate normal distribution.
-Passed to <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code>. Parallelization will take place only if
-OpenMP is supported (but appears to work on Windows with current <code>R</code>).</p></dd>
+<dt id="arg-dense-limit">dense_limit<a class="anchor" aria-label="anchor" href="#arg-dense-limit"></a></dt>
+<dd><p>numeric; maximum number of design-matrix elements to cache
+for the gratia MH backend. Use zero to force blockwise evaluation.</p></dd>
+
+
+<dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
+<dd><p>numeric; response sampling weights for GAM methods. An
+explicit vector overrides the fitting weights; a single value applies to
+every observation. With <code>data = NULL</code>, the default is the fitted prior
+weights, except factor-valued binomial responses retain one Bernoulli trial
+per observation. Native <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">gaulss()</a></code> ignores fitting weights in its likelihood,
+so its default response weights are also ones; explicitly supplied sampling
+weights still override this default. With prediction data, weights default
+to a vector of ones.
+For ordinary Gaussian and Gamma responses, larger weights reduce response
+variance (precision weights). For binomial responses, weights give integer
+trial counts. They do not alter the fitted coefficient covariance. Include
+positions restored by <code>na.exclude</code> when supplying weights for fitting rows.</p></dd>
+
+
+<dt id="arg-family-index">family_index<a class="anchor" aria-label="anchor" href="#arg-family-index"></a></dt>
+<dd><p>numeric; optional family-list positions for grouped
+family (<code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code>) response draws, one integer per evaluation row.
+Membership can instead be recovered from the response-index expression
+in <code>data</code>; observed response values are not required.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble (data frame) with 3 columns containing the posterior
-predicted values in long format. The columns are</p><ul><li><p><code>row</code> (integer) the row of <code>data</code> that each posterior draw relates to,</p></li>
-<li><p><code>draw</code> (integer) an index, in range <code>1:n</code>, indicating which draw each row
-relates to,</p></li>
-<li><p><code>response</code> (numeric) the predicted response for the indicated row of
-<code>data</code>.</p></li>
+    <p>A tibble (data frame) in long format, with columns:</p><ul><li><p><code>.row</code>: row of the evaluation data;</p></li>
+<li><p><code>.draw</code>: globally unique draw identifier;</p></li>
+<li><p><code>.response</code>: simulated response.
+Where needed, <code>.parameter</code> identifies the response or grouped component.
+Multiple-chain output also includes <code>.chain</code> and <code>.iteration</code>. Attached
+coefficient diagnostics are available through <code><a href="sampling_diagnostics.html">sampling_diagnostics()</a></code>.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -285,6 +333,26 @@ currently use the fitting observations only. For other families or links,
 the AR1 correction applies to working residuals used during fitting. It does
 not specify a joint distribution of actual responses, so sampling produces
 an error.</p>
+<p>Location-scale-shape families <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">mgcv::gaulss()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/gammals.html" class="external-link">mgcv::gammals()</a></code>,
+<code><a href="https://rdrr.io/pkg/mgcv/man/gumbls.html" class="external-link">mgcv::gumbls()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/gevlss.html" class="external-link">mgcv::gevlss()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/shash.html" class="external-link">mgcv::shash()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/twlss.html" class="external-link">mgcv::twlss()</a></code> and
+<code><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html" class="external-link">mgcv::ziplss()</a></code> support fitting observations, subsets and new covariates.
+Every distribution parameter is computed from the same joint coefficient
+draw. Formula offsets and prescribed smooth contributions are retained.
+Evaluation data need predictors and formula-offset variables, but no
+observed response. In <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">gaulss()</a></code>, the second response parameter is inverse
+standard deviation: sampling uses its reciprocal, divided by the square
+root of the sampling weight. Other LSS generators currently ignore sampling
+weights, following their mgcv implementations. Parameters represented by
+coefficients vary jointly; other family parameters remain fixed.</p>
+<p>Cox survival models require evaluation times and an observation process and
+do not have a response generator for this interface. Censored-family draws
+are latent, uncensored responses; reproducing observed censoring requires
+an observation process and remains unsupported in posterior predictive checks.
+Grouped-family posterior response draws support fitting observations and
+supplied data with known family membership. Component nuisance parameters
+remain fixed. <code>.parameter</code> identifies the component used for each row.
+Censored grouped components require an observation process; use <code><a href="simulate.html">simulate()</a></code>
+for their latent, uncensored responses.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>

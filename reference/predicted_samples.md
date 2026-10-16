@@ -23,16 +23,22 @@ predicted_samples(model, ...)
 # S3 method for class 'gam'
 predicted_samples(
   model,
-  n = 1,
-  data = newdata,
-  seed = NULL,
-  weights = NULL,
   ...,
-  newdata = NULL
+  data = NULL,
+  n_draws = NULL,
+  seed = NULL,
+  weights = NULL
 )
 
 # S3 method for class 'scam'
-predicted_samples(model, n = 1, data = NULL, seed = NULL, weights = NULL, ...)
+predicted_samples(
+  model,
+  ...,
+  data = NULL,
+  n_draws = NULL,
+  seed = NULL,
+  weights = NULL
+)
 ```
 
 ## Arguments
@@ -56,15 +62,16 @@ predicted_samples(model, n = 1, data = NULL, seed = NULL, weights = NULL, ...)
   [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
   method.
 
-- n:
-
-  numeric; the number of posterior samples to return.
-
 - data:
 
   data frame; new observations at which the posterior draws from the
   model should be evaluated. If not supplied, the data used to fit the
   model will be used for `data`, if available in `model`.
+
+- n_draws:
+
+  positive integer; number of response replicates to generate at the
+  fitted parameters. Required; coefficient chains are not used.
 
 - seed:
 
@@ -76,29 +83,39 @@ predicted_samples(model, n = 1, data = NULL, seed = NULL, weights = NULL, ...)
   overrides the fitting weights; a single value applies to every
   observation. With `data = NULL`, the default is the fitted prior
   weights, except factor-valued binomial responses retain one Bernoulli
-  trial per observation. With prediction data, the default is a vector
-  of ones. For ordinary Gaussian and Gamma responses, larger weights
-  reduce response variance (precision weights). For binomial responses,
-  weights give integer trial counts. They do not alter the fitted
-  coefficient covariance. Include positions restored by `na.exclude`
-  when supplying weights for fitting rows.
-
-- newdata:
-
-  Deprecated: use `data` instead.
+  trial per observation. Native
+  [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) ignores fitting
+  weights in its likelihood, so its default response weights are also
+  ones; explicitly supplied sampling weights still override this
+  default. With prediction data, weights default to a vector of ones.
+  For ordinary Gaussian and Gamma responses, larger weights reduce
+  response variance (precision weights). For binomial responses, weights
+  give integer trial counts. They do not alter the fitted coefficient
+  covariance. Include positions restored by `na.exclude` when supplying
+  weights for fitting rows.
 
 ## Value
 
 A tibble (data frame) with 3 columns containing the posterior predicted
 values in long format. The columns are
 
-- `row` (integer) the row of `data` that each posterior draw relates to,
+- `.row` (integer) the row of `data` that each posterior draw relates
+  to,
 
-- `draw` (integer) an index, in range `1:n`, indicating which draw each
-  row relates to,
+- `.draw` (integer) an index, in range `1:n_draws`, indicating which
+  draw each row relates to,
 
-- `response` (numeric) the predicted response for the indicated row of
+- `.response` (numeric) the predicted response for the indicated row of
   `data`.
+
+## Details
+
+LSS response simulation uses all fitted distribution parameters at the
+requested data, with the same parameter transformations and offset rules
+as
+[`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md).
+It holds coefficients fixed, so it has no coefficient chains or attached
+coefficient diagnostics.
 
 ## See also
 
@@ -115,7 +132,7 @@ load_mgcv()
 dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
-predicted_samples(m, n = 5, seed = 42)
+predicted_samples(m, n_draws = 5, seed = 42)
 #> # A tibble: 5,000 x 3
 #>     .row .draw .response
 #>    <int> <int>     <dbl>
@@ -138,7 +155,7 @@ newd <- data.frame(
 )
 
 ## Exclude s(x2)
-predicted_samples(m, n = 5, newd, exclude = "s(x2)", seed = 25)
+predicted_samples(m, n_draws = 5, data = newd, exclude = "s(x2)", seed = 25)
 #> # A tibble: 50 x 3
 #>     .row .draw .response
 #>    <int> <int>     <dbl>
@@ -155,7 +172,7 @@ predicted_samples(m, n = 5, newd, exclude = "s(x2)", seed = 25)
 #> # i 40 more rows
 
 ## Exclude s(x1)
-predicted_samples(m, n = 5, newd, exclude = "s(x1)", seed = 25)
+predicted_samples(m, n_draws = 5, data = newd, exclude = "s(x1)", seed = 25)
 #> # A tibble: 50 x 3
 #>     .row .draw .response
 #>    <int> <int>     <dbl>
@@ -175,7 +192,7 @@ predicted_samples(m, n = 5, newd, exclude = "s(x1)", seed = 25)
 ## but note that we have to include any parametric terms, including the
 ## constant term
 predicted_samples(m,
-  n = 5, newd, seed = 25,
+  n_draws = 5, data = newd, seed = 25,
   terms = c("Intercept", "s(x0)", "s(x2)", "s(x3)")
 )
 #> # A tibble: 50 x 3

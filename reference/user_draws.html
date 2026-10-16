@@ -37,6 +37,7 @@
     <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
     <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -62,15 +63,22 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'gamm4'</span></span>
-<span><span class="fu">user_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">draws</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">user_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span>, <span class="va">draws</span>, n_draws <span class="op">=</span> <span class="cn">NULL</span>, chains <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">user_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">draws</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">user_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span>, <span class="va">draws</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gam'</span></span>
-<span><span class="fu">user_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">draws</span>, index <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">user_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span>, n_draws <span class="op">=</span> <span class="cn">NULL</span>, chains <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">draws</span>, index <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'scam'</span></span>
-<span><span class="fu">user_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">draws</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">user_draws</span><span class="op">(</span></span>
+<span>  <span class="va">model</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n_draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  chains <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  index <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -83,13 +91,25 @@
 classes. See <a href="gamm4_support.html">gamm4_support</a> for sampling from gamm4 fits.</p></dd>
 
 
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>arguments passed to methods.</p></dd>
+
+
 <dt id="arg-draws">draws<a class="anchor" aria-label="anchor" href="#arg-draws"></a></dt>
 <dd><p>matrix; user supplied posterior draws to be used when
 <code>method = "user"</code>.</p></dd>
 
 
-<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>arguments passed to methods.</p></dd>
+<dt id="arg-n-draws">n_draws<a class="anchor" aria-label="anchor" href="#arg-n-draws"></a></dt>
+<dd><p>positive integer; total retained draws across all chains.
+Required when generating draws. With <code>method = "user"</code>, the supplied
+matrix determines the count; an explicit count must agree with its rows.</p></dd>
+
+
+<dt id="arg-chains">chains<a class="anchor" aria-label="anchor" href="#arg-chains"></a></dt>
+<dd><p>positive integer or <code>NULL</code>; number of chains. <code>NULL</code> uses one
+chain, or the chain mapping in supplied draws. <code>n_draws</code> must be divisible by
+<code>chains</code>. Burn-in is applied separately to each MH chain.</p></dd>
 
 
 <dt id="arg-index">index<a class="anchor" aria-label="anchor" href="#arg-index"></a></dt>

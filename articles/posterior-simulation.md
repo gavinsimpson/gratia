@@ -204,7 +204,7 @@ smooths in a model, then `select` can be left at its default value.
 
 ``` r
 
-sm_samp <- smooth_samples(m_ss, select = "s(x0)", n_vals = 100, n = 100,
+sm_samp <- smooth_samples(m_ss, select = "s(x0)", n_grid = 100, n_draws = 100,
   seed = 21)
 ```
 
@@ -328,7 +328,7 @@ posterior draws with the data
 
 ``` r
 
-fs <- fitted_samples(m, data = new_df, n = 10, seed = 4) |>
+fs <- fitted_samples(m, data = new_df, n_draws = 10, seed = 4) |>
   left_join(new_df |> select(.row, x), by = join_by(.row == .row))
 ```
 
@@ -401,7 +401,7 @@ data using
 n_sim <- 10
 n_data <- nrow(mcycle)
 
-sim_gau <- predicted_samples(m_gau, n = n_sim, seed = 10) |>
+sim_gau <- predicted_samples(m_gau, n_draws = n_sim, seed = 10) |>
   left_join(mcycle |> select(-accel), # join on the observed data for times
     by = ".row"
   ) |>
@@ -459,7 +459,7 @@ Simulating new data follows using the same code as earlier
 
 ``` r
 
-sim_gaulss <- predicted_samples(m_gaulss, n = n_sim, seed = 20) |>
+sim_gaulss <- predicted_samples(m_gaulss, n_draws = n_sim, seed = 20) |>
   left_join(mcycle |> select(-accel),
     by = ".row"
   ) |>
@@ -660,7 +660,7 @@ use a join to add the prediction data to each draw
 
 ``` r
 
-ps <- posterior_samples(m, n = 10000, data = ds, seed = 24,
+ps <- posterior_samples(m, n_draws = 10000, data = ds, seed = 24,
   unconditional = TRUE) |>
   left_join(ds, by = join_by(.row == .row))
 ps
@@ -859,9 +859,9 @@ Metropolis Hastings sampler.
 
 ``` r
 
-fs_ga <- fitted_samples(m_logit, n = 2000, seed = 2)
+fs_ga <- fitted_samples(m_logit, n_draws = 2000, seed = 2)
 fs_mh <- fitted_samples(m_logit,
-  n = 2000, seed = 2, method = "mh", thin = 2,
+  n_draws = 2000, seed = 2, method = "mh", thin = 2,
   rw_scale = 0.4
 )
 ```
@@ -944,6 +944,108 @@ intervals much better reflect the uncertainty in the estimated response
 as a function of `x` where the data are all zeroes.
 
 ## References
+
+## Multiple chains and sampling diagnostics
+
+`n` is the total number of retained draws. For example, four chains with
+`n_draws = 1000` retain 250 draws each. Each MH chain has its own
+burn-in period. Use `n_cores` to run chains concurrently with mirai.
+gratia reuses an active mirai pool; if none is available, it creates and
+removes a separate temporary pool. An existing pool is never resized or
+stopped by the sampler.
+
+``` r
+
+response_draws <- posterior_samples(
+  m_ss, n_draws = 1000, chains = 4, n_cores = 4,
+  method = "mh", burnin = 1000, seed = 281,
+  diagnostics = TRUE
+)
+sampling_diagnostics(response_draws)
+```
+
+The returned table includes `.chain` and `.iteration`. `.draw`
+identifies a draw across all chains. `diagnostics = TRUE` requires the
+posterior package and attaches coefficient summaries, including R-hat,
+bulk and tail effective sample sizes, and Monte Carlo standard errors.
+The effective sample sizes measure how much information remains after
+allowing for correlation between successive draws. A total of 1,000
+retained draws need not provide the information of 1,000 independent
+draws.
+
+These summaries describe the coefficient chains before response
+simulation. Response noise can conceal poor mixing of the coefficient
+chains. To examine coefficient trace plots and then reuse the same draws
+for response sampling, generate the coefficients once:
+
+``` r
+
+coefficients <- post_draws(
+  m_ss, n_draws = 1000, chains = 4, n_cores = 4,
+  method = "mh", burnin = 1000, seed = 281,
+  diagnostics = TRUE
+)
+bayesplot::mcmc_trace(as_mcmc_draws(coefficients, format = "array"))
+response_draws <- posterior_samples(
+  m_ss, method = "user", draws = coefficients, seed = 282
+)
+```
+
+[`as_mcmc_draws()`](https://gavinsimpson.github.io/gratia/reference/as_mcmc_draws.md)
+also converts fitted values, smooths, derivatives, and response samples.
+Select the observations or smooths of interest before converting a large
+table: each sampled quantity becomes one variable. Choose
+`"draws_array"` or `"draws_df"` for posterior, `"mcmc.list"` for coda,
+or `"array"` for an ordinary iteration by chain by variable array
+accepted by bayesplot. Conversions require the same consecutive retained
+iterations in each chain. Keep the chain columns when manipulating
+sampled tables; ordinary matrix subsetting can remove the chain mapping
+attached to coefficient matrices.
+
+With four available workers, elapsed sampling time is approximately the
+time for one chain’s burn-in plus 250 retained iterations, rather than
+burn-in plus 1,000 iterations. Worker startup, model transfer, and
+prediction also take time. If burn-in is 1,000 iterations, the
+corresponding iteration counts are 1,250 and 2,000, so the ideal
+sampling speedup is about 1.6 times.
+
+### Sampling coefficients from bam fits
+
+[`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html) does not
+support bam fits. Use `mh_backend = "gratia"` for
+independent-observation bam fits, or to use the compiled evaluator for a
+gam:
+
+``` r
+
+bam_data <- data_sim("eg1", n = 1000, dist = "poisson", seed = 281)
+b <- mgcv::bam(y ~ s(x0) + s(x1), data = bam_data, family = poisson())
+response_draws <- posterior_samples(
+  b, n_draws = 1000, chains = 4, n_cores = 4, method = "mh",
+  mh_backend = "gratia", diagnostics = TRUE, seed = 281
+)
+```
+
+This backend currently supports Gaussian identity, Poisson log, binomial
+logit, Gamma log, and negative binomial log models. It holds smoothing
+parameters, dispersion, and any negative binomial shape at their fitted
+values. It rejects AR1 dependence, additional penalties specified
+through `paraPen` or `H`, and fits made from pre-fit `G` objects. For
+discrete bam fits it evaluates the fitted bases at the original
+covariates; it does not use a compressed, discretised likelihood.
+
+Small model matrices are cached. Large designs are evaluated in blocks,
+controlled by `block_size`, without retaining the full matrix. This
+reduces memory use but repeatedly constructs the basis matrices. The
+`dense_limit` argument sets the maximum number of elements in a cached
+design matrix; zero forces blockwise evaluation.
+
+For Gaussian models with fixed dispersion and smoothing parameters, the
+coefficient posterior is Gaussian, so the existing `method = "gaussian"`
+provides direct independent draws. Its `unconditional = TRUE` covariance
+correction can include an approximation to smoothing-parameter
+uncertainty when mgcv supplies it. Neither MH backend samples smoothing
+parameters.
 
 Luo, Z., & Wahba, G. (1997). Hybrid adaptive splines. *Journal of the
 American Statistical Association*, *92*(437), 107–116.

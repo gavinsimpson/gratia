@@ -6,74 +6,86 @@ Draw samples from the posterior distribution of an estimated model
 
 ``` r
 # S3 method for class 'lm'
-posterior_samples(model, n = 1L, seed = NULL, ...)
+posterior_samples(model, ..., n_draws = NULL, seed = NULL)
 
 # S3 method for class 'glm'
-posterior_samples(model, n = 1L, seed = NULL, ...)
+posterior_samples(model, ..., n_draws = NULL, seed = NULL)
 
 # S3 method for class 'glmmTMB'
-posterior_samples(model, n = 1L, seed = NULL, conditioning = NULL, ...)
+posterior_samples(model, ..., n_draws = NULL, seed = NULL, conditioning = NULL)
 
 # S3 method for class 'sdmTMB'
-posterior_samples(model, n = 1L, seed = NULL, conditioning = NULL, ...)
+posterior_samples(model, ..., n_draws = NULL, seed = NULL, conditioning = NULL)
 
 # S3 method for class 'gamlss'
-posterior_samples(model, n = 1L, seed = NULL, ...)
+posterior_samples(model, ..., n_draws = NULL, seed = NULL)
 
 # S3 method for class 'gamm'
-posterior_samples(model, n = 1L, seed = NULL, conditioning = NULL, ...)
+posterior_samples(model, ..., n_draws = NULL, seed = NULL, conditioning = NULL)
 
 # S3 method for class 'lme'
-posterior_samples(model, n = 1L, seed = NULL, conditioning = NULL, ...)
+posterior_samples(model, ..., n_draws = NULL, seed = NULL, conditioning = NULL)
 
 # S3 method for class 'merMod'
-posterior_samples(model, n = 1L, seed = NULL, conditioning = NULL, ...)
+posterior_samples(model, ..., n_draws = NULL, seed = NULL, conditioning = NULL)
 
 # S3 method for class 'gamm4'
-posterior_samples(model, n = 1L, seed = NULL, ..., conditioning = NULL)
+posterior_samples(model, ..., n_draws = NULL, seed = NULL, conditioning = NULL)
 
 posterior_samples(model, ...)
 
 # S3 method for class 'gam'
 posterior_samples(
   model,
-  n = 1,
-  data = newdata,
+  ...,
+  data = NULL,
+  n_draws = NULL,
+  chains = NULL,
   seed = NULL,
   method = c("gaussian", "mh", "inla", "user"),
-  n_cores = 1,
+  n_cores = 1L,
+  n_threads = 1L,
   burnin = 1000,
-  thin = 1,
+  thin = 1L,
   t_df = 40,
   rw_scale = 0.25,
-  freq = FALSE,
+  frequentist = FALSE,
   unconditional = FALSE,
-  weights = NULL,
   draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
-  ...,
-  newdata = NULL,
-  ncores = NULL
+  block_size = 10000L,
+  dense_limit = 5e+06,
+  weights = NULL,
+  family_index = NULL
 )
 
 # S3 method for class 'scam'
 posterior_samples(
   model,
-  n = 1,
+  ...,
   data = NULL,
+  n_draws = NULL,
+  chains = NULL,
   seed = NULL,
   method = c("gaussian", "mh", "inla", "user"),
-  n_cores = 1,
+  n_cores = 1L,
+  n_threads = 1L,
   burnin = 1000,
-  thin = 1,
+  thin = 1L,
   t_df = 40,
   rw_scale = 0.25,
-  freq = FALSE,
+  frequentist = FALSE,
   unconditional = FALSE,
-  weights = NULL,
   draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
-  ...
+  block_size = 10000L,
+  dense_limit = 5e+06,
+  weights = NULL,
+  family_index = NULL
 )
 ```
 
@@ -83,14 +95,6 @@ posterior_samples(
 
   a fitted model of the supported types; see
   [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
-
-- n:
-
-  numeric; the number of posterior samples to return.
-
-- seed:
-
-  numeric; a random seed for the simulations.
 
 - ...:
 
@@ -106,6 +110,16 @@ posterior_samples(
   [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
   method.
 
+- n_draws:
+
+  positive integer; total retained draws across all chains. Required
+  when generating draws. With `method = "user"`, the supplied matrix
+  determines the count; an explicit count must agree with its rows.
+
+- seed:
+
+  numeric; a random seed for the simulations.
+
 - conditioning:
 
   character or `NULL`; mixed-model conditioning mode; see
@@ -117,6 +131,12 @@ posterior_samples(
   model should be evaluated. If not supplied, the data used to fit the
   model will be used for `data`, if available in `model`.
 
+- chains:
+
+  positive integer or `NULL`; number of chains. `NULL` uses one chain,
+  or the chain mapping in supplied draws. `n_draws` must be divisible by
+  `chains`. Burn-in is applied separately to each MH chain.
+
 - method:
 
   character; which method should be used to draw samples from the
@@ -125,16 +145,19 @@ posterior_samples(
   sampler that alternates t proposals with proposals based on a shrunken
   version of the posterior covariance matrix. `"inla"` uses a variant of
   Integrated Nested Laplace Approximation due to Wood (2019), (currently
-  not implemented). `"user"` allows for user-supplied posterior draws
-  (currently not implemented).
+  not implemented). `"user"` allows for user-supplied posterior draws as
+  a coefficient matrix.
 
 - n_cores:
 
-  number of cores for generating random variables from a multivariate
-  normal distribution. Passed to
-  [`mvnfast::rmvn()`](https://rdrr.io/pkg/mvnfast/man/rmvn.html).
-  Parallelization will take place only if OpenMP is supported (but
-  appears to work on Windows with current `R`).
+  positive integer; maximum concurrent MH chains using mirai, capped at
+  `chains`. Existing workers are reused; otherwise temporary workers are
+  created and cleaned up. Only used by `method = "mh"`.
+
+- n_threads:
+
+  positive integer; threads within Gaussian sampling using mvnfast.
+  Defaults to one. This is separate from concurrent MH chains.
 
 - burnin:
 
@@ -143,9 +166,7 @@ posterior_samples(
 
 - thin:
 
-  numeric; the number of samples to skip when taking `n` draws. Results
-  in `thin * n` draws from the posterior being taken. Only used with
-  `method = "mh"`.
+  positive integer; retain every `thin` iterations after burn-in.
 
 - t_df:
 
@@ -158,7 +179,7 @@ posterior_samples(
   generating random walk proposals. Negative or non finite to skip the
   random walk step. Only used with `method = "mh"`.
 
-- freq:
+- frequentist:
 
   logical; `TRUE` to use the frequentist covariance matrix of the
   parameter estimators, `FALSE` to use the Bayesian posterior covariance
@@ -166,27 +187,31 @@ posterior_samples(
 
 - unconditional:
 
-  logical; if `TRUE` (and `freq == FALSE`) then the Bayesian smoothing
-  parameter uncertainty corrected covariance matrix is used, if
-  available.
-
-- weights:
-
-  numeric; response sampling weights for GAM methods. An explicit vector
-  overrides the fitting weights; a single value applies to every
-  observation. With `data = NULL`, the default is the fitted prior
-  weights, except factor-valued binomial responses retain one Bernoulli
-  trial per observation. With prediction data, the default is a vector
-  of ones. For ordinary Gaussian and Gamma responses, larger weights
-  reduce response variance (precision weights). For binomial responses,
-  weights give integer trial counts. They do not alter the fitted
-  coefficient covariance. Include positions restored by `na.exclude`
-  when supplying weights for fitting rows.
+  logical; if `TRUE` (and `frequentist == FALSE`) then the Bayesian
+  smoothing parameter uncertainty corrected covariance matrix is used,
+  if available.
 
 - draws:
 
   matrix; user supplied posterior draws to be used when
   `method = "user"`.
+
+- diagnostics:
+
+  logical; calculate coefficient R-hat, effective sample sizes, and
+  Monte Carlo standard errors using the optional posterior package.
+
+- mh_backend:
+
+  character; `"mgcv"` preserves
+  [`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html).
+  `"gratia"` uses compiled common-family likelihoods. `"family"` uses a
+  compiled MH loop with callbacks to the fitted family object. Both
+  support independent-observation bam fits. Smoothing parameters and
+  parameters outside the fitted coefficient vector remain fixed. LSS
+  scale and shape coefficients are sampled jointly with location. The
+  family backend caches a full design matrix, smoothing penalty, and
+  proposal factorisation once for all chains.
 
 - mvn_method:
 
@@ -197,30 +222,54 @@ posterior_samples(
   but which might not work for some marginal fits, such as those where
   the covariance matrix is close to singular.
 
-- newdata:
+- block_size:
 
-  Deprecated: use `data` instead.
+  positive integer; maximum observation rows per block in the gratia MH
+  evaluator. Large designs are evaluated without storing a full matrix.
 
-- ncores:
+- dense_limit:
 
-  Deprecated; use `n_cores` instead. The number of cores for generating
-  random variables from a multivariate normal distribution. Passed to
-  [`mvnfast::rmvn()`](https://rdrr.io/pkg/mvnfast/man/rmvn.html).
-  Parallelization will take place only if OpenMP is supported (but
-  appears to work on Windows with current `R`).
+  numeric; maximum number of design-matrix elements to cache for the
+  gratia MH backend. Use zero to force blockwise evaluation.
+
+- weights:
+
+  numeric; response sampling weights for GAM methods. An explicit vector
+  overrides the fitting weights; a single value applies to every
+  observation. With `data = NULL`, the default is the fitted prior
+  weights, except factor-valued binomial responses retain one Bernoulli
+  trial per observation. Native
+  [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) ignores fitting
+  weights in its likelihood, so its default response weights are also
+  ones; explicitly supplied sampling weights still override this
+  default. With prediction data, weights default to a vector of ones.
+  For ordinary Gaussian and Gamma responses, larger weights reduce
+  response variance (precision weights). For binomial responses, weights
+  give integer trial counts. They do not alter the fitted coefficient
+  covariance. Include positions restored by `na.exclude` when supplying
+  weights for fitting rows.
+
+- family_index:
+
+  numeric; optional family-list positions for grouped family
+  ([`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html)) response
+  draws, one integer per evaluation row. Membership can instead be
+  recovered from the response-index expression in `data`; observed
+  response values are not required.
 
 ## Value
 
-A tibble (data frame) with 3 columns containing the posterior predicted
-values in long format. The columns are
+A tibble (data frame) in long format, with columns:
 
-- `row` (integer) the row of `data` that each posterior draw relates to,
+- `.row`: row of the evaluation data;
 
-- `draw` (integer) an index, in range `1:n`, indicating which draw each
-  row relates to,
+- `.draw`: globally unique draw identifier;
 
-- `response` (numeric) the predicted response for the indicated row of
-  `data`.
+- `.response`: simulated response. Where needed, `.parameter` identifies
+  the response or grouped component. Multiple-chain output also includes
+  `.chain` and `.iteration`. Attached coefficient diagnostics are
+  available through
+  [`sampling_diagnostics()`](https://gavinsimpson.github.io/gratia/reference/sampling_diagnostics.md).
 
 ## Details
 
@@ -249,6 +298,37 @@ together to retain this fitted correlation, restarting at each
 only. For other families or links, the AR1 correction applies to working
 residuals used during fitting. It does not specify a joint distribution
 of actual responses, so sampling produces an error.
+
+Location-scale-shape families
+[`mgcv::gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html),
+[`mgcv::gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html),
+[`mgcv::gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html),
+[`mgcv::gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html),
+[`mgcv::shash()`](https://rdrr.io/pkg/mgcv/man/shash.html),
+[`mgcv::twlss()`](https://rdrr.io/pkg/mgcv/man/twlss.html) and
+[`mgcv::ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) support
+fitting observations, subsets and new covariates. Every distribution
+parameter is computed from the same joint coefficient draw. Formula
+offsets and prescribed smooth contributions are retained. Evaluation
+data need predictors and formula-offset variables, but no observed
+response. In [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html), the
+second response parameter is inverse standard deviation: sampling uses
+its reciprocal, divided by the square root of the sampling weight. Other
+LSS generators currently ignore sampling weights, following their mgcv
+implementations. Parameters represented by coefficients vary jointly;
+other family parameters remain fixed.
+
+Cox survival models require evaluation times and an observation process
+and do not have a response generator for this interface. Censored-family
+draws are latent, uncensored responses; reproducing observed censoring
+requires an observation process and remains unsupported in posterior
+predictive checks. Grouped-family posterior response draws support
+fitting observations and supplied data with known family membership.
+Component nuisance parameters remain fixed. `.parameter` identifies the
+component used for each row. Censored grouped components require an
+observation process; use
+[`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
+for their latent, uncensored responses.
 
 ## Note
 

@@ -45,6 +45,7 @@ conditional distribution of the response."><meta property="og:image" content="ht
     <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
     <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -84,16 +85,22 @@ conditional distribution of the response.</p>
 <span><span class="co"># S3 method for class 'gam'</span></span>
 <span><span class="fu">predicted_samples</span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
-<span>  n <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">newdata</span>,</span>
-<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  newdata <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n_draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  weights <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'scam'</span></span>
-<span><span class="fu">predicted_samples</span><span class="op">(</span><span class="va">model</span>, n <span class="op">=</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="cn">NULL</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">predicted_samples</span><span class="op">(</span></span>
+<span>  <span class="va">model</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n_draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  weights <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -111,14 +118,15 @@ passed on to <code><a href="fitted_samples.html">fitted_samples()</a></code>. Fo
 passed on to the relevant <code><a href="simulate.html">simulate()</a></code> method.</p></dd>
 
 
-<dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
-<dd><p>numeric; the number of posterior samples to return.</p></dd>
-
-
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>data frame; new observations at which the posterior draws
 from the model should be evaluated. If not supplied, the data used to fit
 the model will be used for <code>data</code>, if available in <code>model</code>.</p></dd>
+
+
+<dt id="arg-n-draws">n_draws<a class="anchor" aria-label="anchor" href="#arg-n-draws"></a></dt>
+<dd><p>positive integer; number of response replicates to generate
+at the fitted parameters. Required; coefficient chains are not used.</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
@@ -130,26 +138,32 @@ the model will be used for <code>data</code>, if available in <code>model</code>
 explicit vector overrides the fitting weights; a single value applies to
 every observation. With <code>data = NULL</code>, the default is the fitted prior
 weights, except factor-valued binomial responses retain one Bernoulli trial
-per observation. With prediction data, the default is a vector of ones.
+per observation. Native <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">gaulss()</a></code> ignores fitting weights in its likelihood,
+so its default response weights are also ones; explicitly supplied sampling
+weights still override this default. With prediction data, weights default
+to a vector of ones.
 For ordinary Gaussian and Gamma responses, larger weights reduce response
 variance (precision weights). For binomial responses, weights give integer
 trial counts. They do not alter the fitted coefficient covariance. Include
 positions restored by <code>na.exclude</code> when supplying weights for fitting rows.</p></dd>
 
-
-<dt id="arg-newdata">newdata<a class="anchor" aria-label="anchor" href="#arg-newdata"></a></dt>
-<dd><p>Deprecated: use <code>data</code> instead.</p></dd>
-
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble (data frame) with 3 columns containing the posterior
-predicted values in long format. The columns are</p><ul><li><p><code>row</code> (integer) the row of <code>data</code> that each posterior draw relates to,</p></li>
-<li><p><code>draw</code> (integer) an index, in range <code>1:n</code>, indicating which draw each row
+predicted values in long format. The columns are</p><ul><li><p><code>.row</code> (integer) the row of <code>data</code> that each posterior draw relates to,</p></li>
+<li><p><code>.draw</code> (integer) an index, in range <code>1:n_draws</code>, indicating which draw each row
 relates to,</p></li>
-<li><p><code>response</code> (numeric) the predicted response for the indicated row of
+<li><p><code>.response</code> (numeric) the predicted response for the indicated row of
 <code>data</code>.</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>LSS response simulation uses all fitted distribution parameters at the
+requested data, with the same parameter transformations and offset rules as
+<code><a href="posterior_samples.html">posterior_samples()</a></code>. It holds coefficients fixed, so it has no coefficient
+chains or attached coefficient diagnostics.</p>
+    </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><a href="gamm4_support.html">gamm4_support</a></p></div>
@@ -165,7 +179,7 @@ relates to,</p></li>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">1000</span>, dist <span class="op">=</span> <span class="st">"normal"</span>, scale <span class="op">=</span> <span class="fl">2</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">predicted_samples</span><span class="op">(</span><span class="va">m</span>, n <span class="op">=</span> <span class="fl">5</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">predicted_samples</span><span class="op">(</span><span class="va">m</span>, n_draws <span class="op">=</span> <span class="fl">5</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5,000 x 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     .row .draw .response</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
@@ -188,7 +202,7 @@ relates to,</p></li>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Exclude s(x2)</span></span></span>
-<span class="r-in"><span><span class="fu">predicted_samples</span><span class="op">(</span><span class="va">m</span>, n <span class="op">=</span> <span class="fl">5</span>, <span class="va">newd</span>, exclude <span class="op">=</span> <span class="st">"s(x2)"</span>, seed <span class="op">=</span> <span class="fl">25</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">predicted_samples</span><span class="op">(</span><span class="va">m</span>, n_draws <span class="op">=</span> <span class="fl">5</span>, data <span class="op">=</span> <span class="va">newd</span>, exclude <span class="op">=</span> <span class="st">"s(x2)"</span>, seed <span class="op">=</span> <span class="fl">25</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 50 x 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     .row .draw .response</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
@@ -205,7 +219,7 @@ relates to,</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 40 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Exclude s(x1)</span></span></span>
-<span class="r-in"><span><span class="fu">predicted_samples</span><span class="op">(</span><span class="va">m</span>, n <span class="op">=</span> <span class="fl">5</span>, <span class="va">newd</span>, exclude <span class="op">=</span> <span class="st">"s(x1)"</span>, seed <span class="op">=</span> <span class="fl">25</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">predicted_samples</span><span class="op">(</span><span class="va">m</span>, n_draws <span class="op">=</span> <span class="fl">5</span>, data <span class="op">=</span> <span class="va">newd</span>, exclude <span class="op">=</span> <span class="st">"s(x1)"</span>, seed <span class="op">=</span> <span class="fl">25</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 50 x 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     .row .draw .response</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
@@ -225,7 +239,7 @@ relates to,</p></li>
 <span class="r-in"><span><span class="co">## but note that we have to include any parametric terms, including the</span></span></span>
 <span class="r-in"><span><span class="co">## constant term</span></span></span>
 <span class="r-in"><span><span class="fu">predicted_samples</span><span class="op">(</span><span class="va">m</span>,</span></span>
-<span class="r-in"><span>  n <span class="op">=</span> <span class="fl">5</span>, <span class="va">newd</span>, seed <span class="op">=</span> <span class="fl">25</span>,</span></span>
+<span class="r-in"><span>  n_draws <span class="op">=</span> <span class="fl">5</span>, data <span class="op">=</span> <span class="va">newd</span>, seed <span class="op">=</span> <span class="fl">25</span>,</span></span>
 <span class="r-in"><span>  terms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"s(x0)"</span>, <span class="st">"s(x2)"</span>, <span class="st">"s(x3)"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 50 x 3</span></span>

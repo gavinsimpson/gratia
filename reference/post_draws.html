@@ -41,6 +41,7 @@ Generate posterior draws from a fitted model"><meta property="og:image" content=
     <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
     <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -78,23 +79,27 @@ model coefficients</p>
 <span><span class="co"># Default S3 method</span></span>
 <span><span class="fu">post_draws</span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
-<span>  <span class="va">n</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  n_draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  chains <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"mh"</span>, <span class="st">"inla"</span>, <span class="st">"user"</span><span class="op">)</span>,</span>
-<span>  mu <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  sigma <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n_cores <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  n_threads <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  burnin <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  thin <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  thin <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  t_df <span class="op">=</span> <span class="fl">40</span>,</span>
 <span>  rw_scale <span class="op">=</span> <span class="fl">0.25</span>,</span>
-<span>  index <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  parametrized <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  mvn_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mvnfast"</span>, <span class="st">"mgcv"</span><span class="op">)</span>,</span>
 <span>  draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  diagnostics <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  mh_backend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mgcv"</span>, <span class="st">"gratia"</span>, <span class="st">"family"</span><span class="op">)</span>,</span>
+<span>  mvn_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mvnfast"</span>, <span class="st">"mgcv"</span><span class="op">)</span>,</span>
+<span>  block_size <span class="op">=</span> <span class="fl">10000L</span>,</span>
+<span>  dense_limit <span class="op">=</span> <span class="fl">5e+06</span>,</span>
+<span>  index <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  parametrized <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">generate_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -102,21 +107,26 @@ model coefficients</p>
 <span><span class="co"># S3 method for class 'gam'</span></span>
 <span><span class="fu">generate_draws</span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
-<span>  <span class="va">n</span>,</span>
-<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"mh"</span>, <span class="st">"inla"</span><span class="op">)</span>,</span>
-<span>  mu <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  sigma <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  n_draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  chains <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"mh"</span>, <span class="st">"inla"</span>, <span class="st">"user"</span><span class="op">)</span>,</span>
 <span>  n_cores <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  n_threads <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  burnin <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  thin <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  thin <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  t_df <span class="op">=</span> <span class="fl">40</span>,</span>
 <span>  rw_scale <span class="op">=</span> <span class="fl">0.25</span>,</span>
-<span>  index <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  diagnostics <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  mh_backend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mgcv"</span>, <span class="st">"gratia"</span>, <span class="st">"family"</span><span class="op">)</span>,</span>
 <span>  mvn_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mvnfast"</span>, <span class="st">"mgcv"</span><span class="op">)</span>,</span>
-<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  block_size <span class="op">=</span> <span class="fl">10000L</span>,</span>
+<span>  dense_limit <span class="op">=</span> <span class="fl">5e+06</span>,</span>
+<span>  index <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -134,8 +144,21 @@ classes. See <a href="gamm4_support.html">gamm4_support</a> for sampling from ga
 <dd><p>arguments passed to methods.</p></dd>
 
 
-<dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
-<dd><p>numeric; the number of posterior draws to take.</p></dd>
+<dt id="arg-n-draws">n_draws<a class="anchor" aria-label="anchor" href="#arg-n-draws"></a></dt>
+<dd><p>positive integer; total retained draws across all chains.
+Required when generating draws. With <code>method = "user"</code>, the supplied
+matrix determines the count; an explicit count must agree with its rows.</p></dd>
+
+
+<dt id="arg-chains">chains<a class="anchor" aria-label="anchor" href="#arg-chains"></a></dt>
+<dd><p>positive integer or <code>NULL</code>; number of chains. <code>NULL</code> uses one
+chain, or the chain mapping in supplied draws. <code>n_draws</code> must be divisible by
+<code>chains</code>. Burn-in is applied separately to each MH chain.</p></dd>
+
+
+<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
+<dd><p>numeric or <code>NULL</code>; seed for the complete sampling operation.
+An explicit seed restores the caller's random-number state on exit.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
@@ -149,20 +172,15 @@ will result in heavier-tailed statistic proposals. See <code><a href="https://rd
 for more details.</p></dd>
 
 
-<dt id="arg-mu">mu<a class="anchor" aria-label="anchor" href="#arg-mu"></a></dt>
-<dd><p>numeric; user-supplied mean vector (vector of model coefficients).
-Currently ignored.</p></dd>
-
-
-<dt id="arg-sigma">sigma<a class="anchor" aria-label="anchor" href="#arg-sigma"></a></dt>
-<dd><p>matrix; user-supplied covariance matrix for <code>mu</code>. Currently
-ignored.</p></dd>
-
-
 <dt id="arg-n-cores">n_cores<a class="anchor" aria-label="anchor" href="#arg-n-cores"></a></dt>
-<dd><p>integer; number of CPU cores to use when generating
-multivariate normal distributed random values. Only used if
-<code>mvn_method = "mvnfast"</code> <strong>and</strong> <code>method = "gaussian"</code>.</p></dd>
+<dd><p>positive integer; maximum concurrent MH chains using mirai,
+capped at <code>chains</code>. Existing workers are reused; otherwise temporary workers
+are created and cleaned up. Only used by <code>method = "mh"</code>.</p></dd>
+
+
+<dt id="arg-n-threads">n_threads<a class="anchor" aria-label="anchor" href="#arg-n-threads"></a></dt>
+<dd><p>positive integer; threads within Gaussian sampling using
+mvnfast. Defaults to one. This is separate from concurrent MH chains.</p></dd>
 
 
 <dt id="arg-burnin">burnin<a class="anchor" aria-label="anchor" href="#arg-burnin"></a></dt>
@@ -171,7 +189,7 @@ See <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-lin
 
 
 <dt id="arg-thin">thin<a class="anchor" aria-label="anchor" href="#arg-thin"></a></dt>
-<dd><p>numeric; retain only <code>thin</code> samples. See <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code>.</p></dd>
+<dd><p>positive integer; retain every <code>thin</code> iterations after burn-in.</p></dd>
 
 
 <dt id="arg-t-df">t_df<a class="anchor" aria-label="anchor" href="#arg-t-df"></a></dt>
@@ -182,11 +200,6 @@ See <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-lin
 <dt id="arg-rw-scale">rw_scale<a class="anchor" aria-label="anchor" href="#arg-rw-scale"></a></dt>
 <dd><p>numeric; factor by which to scale posterior covariance
 matrix when generating random walk proposals. See <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code>.</p></dd>
-
-
-<dt id="arg-index">index<a class="anchor" aria-label="anchor" href="#arg-index"></a></dt>
-<dd><p>numeric; vector of indices of coefficients to use. Can be used
-to subset the mean vector and covariance matrix extracted from <code>model</code>.</p></dd>
 
 
 <dt id="arg-frequentist">frequentist<a class="anchor" aria-label="anchor" href="#arg-frequentist"></a></dt>
@@ -202,10 +215,25 @@ uncertainty corrected covariance matrix is used, <em>if available</em> for
 SCAM models do not support this correction; use <code>unconditional = FALSE</code>.</p></dd>
 
 
-<dt id="arg-parametrized">parametrized<a class="anchor" aria-label="anchor" href="#arg-parametrized"></a></dt>
-<dd><p>logical; use parametrized coefficients and covariance
-matrix, which respect the linear inequality constraints of the model. Only
-for <code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam::scam()</a></code> model fits.</p></dd>
+<dt id="arg-draws">draws<a class="anchor" aria-label="anchor" href="#arg-draws"></a></dt>
+<dd><p>matrix; user supplied posterior draws to be used when
+<code>method = "user"</code>.</p></dd>
+
+
+<dt id="arg-diagnostics">diagnostics<a class="anchor" aria-label="anchor" href="#arg-diagnostics"></a></dt>
+<dd><p>logical; calculate coefficient R-hat, effective sample
+sizes, and Monte Carlo standard errors using the optional posterior package.</p></dd>
+
+
+<dt id="arg-mh-backend">mh_backend<a class="anchor" aria-label="anchor" href="#arg-mh-backend"></a></dt>
+<dd><p>character; <code>"mgcv"</code> preserves <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code>.
+<code>"gratia"</code> uses compiled common-family likelihoods. <code>"family"</code> uses a
+compiled MH loop with callbacks to the fitted family object. Both support
+independent-observation bam fits. Smoothing parameters and parameters
+outside the fitted coefficient vector remain fixed. LSS scale and shape
+coefficients are sampled jointly with location. The family backend caches
+a full design matrix,
+smoothing penalty, and proposal factorisation once for all chains.</p></dd>
 
 
 <dt id="arg-mvn-method">mvn_method<a class="anchor" aria-label="anchor" href="#arg-mvn-method"></a></dt>
@@ -216,26 +244,70 @@ for some marginal fits, such as those where the covariance matrix is close
 to singular.</p></dd>
 
 
-<dt id="arg-draws">draws<a class="anchor" aria-label="anchor" href="#arg-draws"></a></dt>
-<dd><p>matrix; user supplied posterior draws to be used when
-<code>method = "user"</code>.</p></dd>
+<dt id="arg-block-size">block_size<a class="anchor" aria-label="anchor" href="#arg-block-size"></a></dt>
+<dd><p>positive integer; maximum observation rows per block in the
+gratia MH evaluator. Large designs are evaluated without storing a full matrix.</p></dd>
 
 
-<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
-<dd><p>numeric; the random seed to use. If <code>NULL</code>, a random seed will
-be generated without affecting the current state of R's RNG.</p></dd>
+<dt id="arg-dense-limit">dense_limit<a class="anchor" aria-label="anchor" href="#arg-dense-limit"></a></dt>
+<dd><p>numeric; maximum number of design-matrix elements to cache
+for the gratia MH backend. Use zero to force blockwise evaluation.</p></dd>
+
+
+<dt id="arg-index">index<a class="anchor" aria-label="anchor" href="#arg-index"></a></dt>
+<dd><p>numeric; vector of indices of coefficients to use. Can be used
+to subset the mean vector and covariance matrix extracted from <code>model</code>.</p></dd>
+
+
+<dt id="arg-parametrized">parametrized<a class="anchor" aria-label="anchor" href="#arg-parametrized"></a></dt>
+<dd><p>logical; use parametrized coefficients and covariance
+matrix, which respect the linear inequality constraints of the model. Only
+for <code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam::scam()</a></code> model fits.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>GAM-class fits with linear inequality constraints, including
+    <p>Sampling controls must be named. Removed arguments produce migration errors;
+see <code><a href="../articles/sampling-migration.html">vignette("sampling-migration")</a></code>. Explicit controls that the selected
+method cannot use are rejected.</p>
+<p>For multiple chains, <code>n_draws</code> is the total retained count and must be divisible
+by <code>chains</code>. Coefficient matrices carry a chain mapping; use
+<code><a href="as_mcmc_draws.html">as_mcmc_draws()</a></code> before ordinary matrix operations remove that mapping.
+Higher-level sampling tables include <code>.chain</code> and <code>.iteration</code> for multiple
+chains, with <code>.draw</code> unique across chains. Default single-chain table columns
+are unchanged. Use <code><a href="sampling_diagnostics.html">sampling_diagnostics()</a></code> to extract coefficient diagnostics
+before response simulation adds further noise.</p>
+<p>The gratia MH backend supports Gaussian identity, Poisson log, binomial
+logit, Gamma log, and negative binomial log fits. It evaluates the fitted
+bases at original covariates, including for discrete bam fits. GAMM components, AR1 dependence,
+<code>paraPen</code>, <code>H</code>, and fits made from pre-fit <code>G</code> objects are unsupported.</p>
+<p>The family MH backend calls the fitted family's <code>dev.resids()</code> and <code>linkinv()</code>
+functions, or <code>ll()</code> for families with multiple linear predictors. This
+retains response encodings and attributes such as censoring indicators and
+the mappings between coefficients and predictors. It supports compatible
+standard, extended, and general mgcv families, including multinomial, Gaussian
+location-scale, and grouped families. Quasi families, Cox proportional hazards
+models, GAMM components, AR1 dependence, <code>paraPen</code>, <code>H</code>, and pre-fit <code>G</code> objects
+are unsupported. The fitted coefficient covariance must be nonsingular.
+It always caches the full design matrix; <code>block_size</code> and <code>dense_limit</code> apply
+only to the gratia backend and are rejected for the family backend.
+The new MH backends reject <code>bam</code> fits with nonzero prescribed smooth
+contributions: mgcv fitting and prediction can use different offsets for
+those fits. Supplied coefficient draws can still be evaluated with the
+native prediction conventions.</p>
+<p>All MH backends sample the conditional coefficient posterior with fitted
+smoothing, dispersion, and additional family parameters fixed. Parameters
+represented in the fitted coefficient vector are sampled, including scale
+or covariance coefficients in general families. <code>unconditional</code> applies
+to Gaussian draws only.</p>
+<p>GAM-class fits with linear inequality constraints, including
 <code><a href="https://rdrr.io/pkg/mgcv/man/scasm.html" class="external-link">mgcv::scasm()</a></code> fits, store these as <code>Ain %*% coefficients &gt;= bin</code>.
 Gaussian sampling uses the fitted covariance matrix without enforcing
 these inequalities and issues a warning. Sampled smooths can therefore
 violate the fitted shape constraints. Pointwise intervals computed from
 the same Gaussian covariance approximation also need not preserve those
-shapes. Metropolis-Hastings sampling is unavailable for these fits because
-<code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code> does not enforce their inequalities.</p>
+shapes. All MH backends are unavailable for these fits because
+the samplers do not enforce their inequalities.</p>
 <p>If <code><a href="https://rdrr.io/pkg/mgcv/man/scasm.html" class="external-link">mgcv::scasm()</a></code> was fitted with <code>bs &gt; 0</code>, its <code>bs</code> component stores
 coefficient draws from the native constrained bootstrap in columns. These
 can be supplied explicitly as <code>draws = t(model$bs)</code> with <code>method = "user"</code>.

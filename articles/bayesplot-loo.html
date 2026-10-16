@@ -59,6 +59,7 @@
     <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
     <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -120,10 +121,10 @@ another response at every fitting observation. The variation between
 these replicated data sets includes coefficient uncertainty and response
 variation.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">bayesplot</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/pp_check.html" class="external-link">pp_check</a></span><span class="op">(</span><span class="va">smooth</span>, type <span class="op">=</span> <span class="st">"dens_overlay"</span>, n <span class="op">=</span> <span class="fl">20</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">bayesplot</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/pp_check.html" class="external-link">pp_check</a></span><span class="op">(</span><span class="va">smooth</span>, type <span class="op">=</span> <span class="st">"dens_overlay"</span>, n_draws <span class="op">=</span> <span class="fl">20</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></code></pre></div>
 <p><img src="bayesplot-loo_files/figure-html/predictive-checks-1.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">bayesplot</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/pp_check.html" class="external-link">pp_check</a></span><span class="op">(</span><span class="va">smooth</span>, type <span class="op">=</span> <span class="st">"stat"</span>, stat <span class="op">=</span> <span class="st">"sd"</span>, n <span class="op">=</span> <span class="fl">500</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">bayesplot</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/pp_check.html" class="external-link">pp_check</a></span><span class="op">(</span><span class="va">smooth</span>, type <span class="op">=</span> <span class="st">"stat"</span>, stat <span class="op">=</span> <span class="st">"sd"</span>, n_draws <span class="op">=</span> <span class="fl">500</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
 <span><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span></span></code></pre></div>
 <p><img src="bayesplot-loo_files/figure-html/predictive-checks-2.png" class="r-plt" alt="" width="672"></p>
 <p>The first plot compares the observed response distribution with
@@ -137,7 +138,7 @@ proportion of zeroes. To display predictions alone, use
 fitting-row order. A vector is useful when the grouping variable was not
 used in the model.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">bayesplot</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/pp_check.html" class="external-link">pp_check</a></span><span class="op">(</span><span class="va">smooth</span>, type <span class="op">=</span> <span class="st">"stat_grouped"</span>, stat <span class="op">=</span> <span class="st">"mean"</span>, n <span class="op">=</span> <span class="fl">500</span>,</span>
+<code class="sourceCode R"><span><span class="fu">bayesplot</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/pp_check.html" class="external-link">pp_check</a></span><span class="op">(</span><span class="va">smooth</span>, type <span class="op">=</span> <span class="st">"stat_grouped"</span>, stat <span class="op">=</span> <span class="st">"mean"</span>, n_draws <span class="op">=</span> <span class="fl">500</span>,</span>
 <span>  group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">x</span> <span class="op">&gt;</span> <span class="fl">0</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"negative x"</span>, <span class="st">"positive x"</span><span class="op">)</span><span class="op">)</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Note: in most cases the default test statistic 'mean' is too weak to detect anything of interest.</span></span>
 <span><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span></span></code></pre></div>
@@ -160,7 +161,7 @@ draw. Rows are posterior draws and columns are retained fitting
 observations. For example, a Poisson entry is
 <code>dpois(y[i], lambda = mu[s, i], log = TRUE)</code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ll</span> <span class="op">&lt;-</span> <span class="fu">gratia</span><span class="fu">::</span><span class="fu"><a href="../reference/log_lik.html">log_lik</a></span><span class="op">(</span><span class="va">smooth</span>, n <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">ll</span> <span class="op">&lt;-</span> <span class="fu">gratia</span><span class="fu">::</span><span class="fu"><a href="../reference/log_lik.html">log_lik</a></span><span class="op">(</span><span class="va">smooth</span>, n_draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">ll</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 2000  100</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">ll</span>, <span class="st">"observation"</span><span class="op">)</span><span class="op">)</span></span>
@@ -168,6 +169,12 @@ observations. For example, a Poisson entry is
 <span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">ll</span>, <span class="st">"gratia"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $method</span></span>
 <span><span class="co">#&gt; [1] "gaussian"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $n_draws</span></span>
+<span><span class="co">#&gt; [1] 2000</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $chains</span></span>
+<span><span class="co">#&gt; [1] 1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $approximation</span></span>
 <span><span class="co">#&gt; [1] "Gaussian coefficient posterior approximation"</span></span>
@@ -197,8 +204,8 @@ summarises expected log predictive density: larger values indicate
 better predictions on the same response scale and the same
 observations.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">loo_linear</span> <span class="op">&lt;-</span> <span class="fu">loo</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/loo/reference/loo.html" class="external-link">loo</a></span><span class="op">(</span><span class="va">linear</span>, n <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
-<span><span class="va">loo_smooth</span> <span class="op">&lt;-</span> <span class="fu">loo</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/loo/reference/loo.html" class="external-link">loo</a></span><span class="op">(</span><span class="va">smooth</span>, n <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">loo_linear</span> <span class="op">&lt;-</span> <span class="fu">loo</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/loo/reference/loo.html" class="external-link">loo</a></span><span class="op">(</span><span class="va">linear</span>, n_draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
+<span><span class="va">loo_smooth</span> <span class="op">&lt;-</span> <span class="fu">loo</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/loo/reference/loo.html" class="external-link">loo</a></span><span class="op">(</span><span class="va">smooth</span>, n_draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
 <span><span class="fu">loo</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/loo/reference/loo_compare.html" class="external-link">loo_compare</a></span><span class="op">(</span><span class="va">loo_linear</span>, <span class="va">loo_smooth</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   model elpd_diff se_diff p_worse diag_diff diag_elpd</span></span>
 <span><span class="co">#&gt;  model2       0.0     0.0      NA                    </span></span>
@@ -210,9 +217,9 @@ observations.</p>
 model-comparison and weighting tools are available. For an already
 extracted matrix of independent Gaussian coefficient draws, the
 equivalent calculation is <code>loo::loo(ll, r_eff = 1)</code>.
-<code>loo::waic(smooth, n = 2000, seed = 42)</code> also works. Model
-methods evaluate likelihoods one observation at a time, avoiding a full
-draws-by-observations matrix unless saved PSIS weights are
+<code>loo::waic(smooth, n_draws = 2000, seed = 42)</code> also works.
+Model methods evaluate likelihoods one observation at a time, avoiding a
+full draws-by-observations matrix unless saved PSIS weights are
 requested.</p>
 <p>Large Pareto-k values identify observations whose omission is
 difficult to approximate by reweighting the existing draws. Inspect
@@ -223,7 +230,7 @@ models or perform moment matching.</p>
 <p>LOO predictive plots use response simulations and importance weights
 from the same coefficient draws:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">bayesplot</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/pp_check.html" class="external-link">pp_check</a></span><span class="op">(</span><span class="va">smooth</span>, type <span class="op">=</span> <span class="st">"loo_pit_overlay"</span>, n <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">bayesplot</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/pp_check.html" class="external-link">pp_check</a></span><span class="op">(</span><span class="va">smooth</span>, type <span class="op">=</span> <span class="st">"loo_pit_overlay"</span>, n_draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
 <span><span class="co">#&gt; NOTE: The kernel density estimate assumes continuous observations and is not</span></span>
 <span><span class="co">#&gt; optimal for discrete observations.</span></span></code></pre></div>
 <p><img src="bayesplot-loo_files/figure-html/loo-plot-1.png" class="r-plt" alt="" width="672"></p>
@@ -245,21 +252,34 @@ jointly. PSIS calculations do not correct the Gaussian approximation,
 and small Pareto-k values do not establish its accuracy.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Extra sampler arguments are kept separate from loo and plotting arguments.</span></span>
-<span><span class="fu">loo</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/loo/reference/loo.html" class="external-link">loo</a></span><span class="op">(</span><span class="va">smooth</span>, n <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">42</span>,</span>
+<span><span class="fu">loo</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/loo/reference/loo.html" class="external-link">loo</a></span><span class="op">(</span><span class="va">smooth</span>, n_draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">42</span>,</span>
 <span>  sampling_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>unconditional <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">bayesplot</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/pp_check.html" class="external-link">pp_check</a></span><span class="op">(</span><span class="va">smooth</span>, n <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">42</span>,</span>
+<span><span class="fu">bayesplot</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/pp_check.html" class="external-link">pp_check</a></span><span class="op">(</span><span class="va">smooth</span>, n_draws <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">42</span>,</span>
 <span>  sampling_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>unconditional <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># A single supported Metropolis-Hastings chain retains its draw order.</span></span>
-<span><span class="fu">loo</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/loo/reference/loo.html" class="external-link">loo</a></span><span class="op">(</span><span class="va">smooth</span>, n <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">42</span>,</span>
-<span>  sampling_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"mh"</span>, burnin <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Four chains share the total retained count, with separate burn-in.</span></span>
+<span><span class="fu">loo</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/loo/reference/loo.html" class="external-link">loo</a></span><span class="op">(</span><span class="va">smooth</span>, n_draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">42</span>,</span>
+<span>  sampling_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"mh"</span>, chains <span class="op">=</span> <span class="fl">4</span>, burnin <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>For supplied coefficient draws, use
 <code>method = "user", draws = B</code> in <code><a href="../reference/log_lik.html">log_lik()</a></code>, or
 place those arguments in <code>sampling_args</code> for loo and
-bayesplot. Loo additionally needs <code>chain_id</code> or an explicit
-<code>r_eff</code>; gratia cannot infer autocorrelation from the origin
-of an arbitrary matrix. Bootstrap coefficient samples do not become
-posterior draws by passing them to this interface.</p>
+bayesplot. LOO uses the chain and iteration mapping stored by gratia’s
+samplers. For an unlabelled matrix, supply <code>chain_id</code> or an
+explicit <code>r_eff</code>; gratia cannot infer chain boundaries from
+its dimensions. A supplied <code>chain_id</code> must agree with stored
+metadata. Bootstrap coefficient samples do not become posterior draws by
+passing them to this interface.</p>
+<p><code>n_draws</code> is the total retained count, so 2,000 draws over
+four chains retains 500 draws per chain. Likelihood and LOO/WAIC
+wrappers default to 4,000 draws; bayesplot uses 50 for ordinary checks
+and 4,000 for leave-one-out plots. Supplied matrices determine their own
+count and chains. These wrappers reject the obsolete <code>n</code>
+argument, and inactive sampler controls produce errors. Use
+<code>diagnostics = TRUE</code> directly in <code><a href="../reference/log_lik.html">log_lik()</a></code>, or
+in <code>sampling_args</code> for LOO and bayesplot, to retain
+coefficient diagnostics. The likelihood matrix also supports
+<code><a href="../reference/as_mcmc_draws.html">as_mcmc_draws()</a></code> for diagnostics of its observation-wise log
+densities.</p>
 <p>Likelihood and LOO methods initially cover independent GAM/BAM
 responses. They exclude residual-correlated BAMs, full gamm/gamm4 fits,
 quasi families, Cox partial likelihoods and censored observation

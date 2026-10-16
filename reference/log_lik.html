@@ -39,6 +39,7 @@ This leaves the scalar stats::logLik() method supplied by mgcv unchanged."><meta
     <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
     <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -69,23 +70,27 @@ This leaves the scalar <code><a href="https://rdrr.io/r/stats/logLik.html" class
 <span><span class="co"># S3 method for class 'gam'</span></span>
 <span><span class="fu">log_lik</span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
-<span>  n <span class="op">=</span> <span class="fl">4000</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  n_draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  chains <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  diagnostics <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"mh"</span>, <span class="st">"user"</span><span class="op">)</span>,</span>
 <span>  draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'bam'</span></span>
 <span><span class="fu">log_lik</span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
-<span>  n <span class="op">=</span> <span class="fl">4000</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  n_draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  chains <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  diagnostics <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"mh"</span>, <span class="st">"user"</span><span class="op">)</span>,</span>
 <span>  draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -103,9 +108,21 @@ or <code>mvn_method</code>. Prediction at new observations and frequentist covar
 matrices are not supported.</p></dd>
 
 
-<dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
-<dd><p>Positive integer; number of coefficient draws. Ignored for
-<code>method = "user"</code>, which uses every row of <code>draws</code>.</p></dd>
+<dt id="arg-n-draws">n_draws<a class="anchor" aria-label="anchor" href="#arg-n-draws"></a></dt>
+<dd><p>Positive integer; total coefficient draws across chains.
+Defaults to 4000 when generating draws. Supplied draws determine their own
+count; an explicit count must agree.</p></dd>
+
+
+<dt id="arg-chains">chains<a class="anchor" aria-label="anchor" href="#arg-chains"></a></dt>
+<dd><p>positive integer or <code>NULL</code>; number of chains. <code>NULL</code> uses one
+chain, or the chain mapping in supplied draws. <code>n_draws</code> must be divisible by
+<code>chains</code>. Burn-in is applied separately to each MH chain.</p></dd>
+
+
+<dt id="arg-diagnostics">diagnostics<a class="anchor" aria-label="anchor" href="#arg-diagnostics"></a></dt>
+<dd><p>logical; calculate coefficient R-hat, effective sample
+sizes, and Monte Carlo standard errors using the optional posterior package.</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
@@ -131,6 +148,8 @@ when available, using <code><a href="https://rdrr.io/pkg/mgcv/man/vcov.gam.html"
     <p>A numeric matrix with draws in rows and retained fitting observations
 in columns. Attribute <code>observation</code> gives their original fitting-row indices
 after any fitting subset; <code>gratia</code> describes the sampling assumptions.
+The <code>sampling</code> attribute retains chain identities and requested coefficient
+diagnostics; <code><a href="as_mcmc_draws.html">as_mcmc_draws()</a></code> converts the likelihood matrix by chain.
 Impossible observations may have log likelihood <code>-Inf</code>; invalid numerical
 calculations produce an error. LOO and WAIC require finite log likelihoods.</p>
     </div>
@@ -164,7 +183,7 @@ accuracy of the Gaussian approximation. See <a href="loo.gam.html">loo.gam</a> f
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"mgcv"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">wt</span>, k <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">mtcars</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">ll</span> <span class="op">&lt;-</span> <span class="fu">log_lik</span><span class="op">(</span><span class="va">m</span>, n <span class="op">=</span> <span class="fl">500</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ll</span> <span class="op">&lt;-</span> <span class="fu">log_lik</span><span class="op">(</span><span class="va">m</span>, n_draws <span class="op">=</span> <span class="fl">500</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">ll</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 500  32</span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"loo"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>

@@ -59,6 +59,7 @@
     <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
     <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -585,8 +586,8 @@ frequency and a positive-tail summary:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>proportion_zero <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span>, density_95th <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">0.95</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="va">observed_summary</span> <span class="op">&lt;-</span> <span class="fu">cod_summaries</span><span class="op">(</span><span class="va">cod</span><span class="op">$</span><span class="va">density</span><span class="op">)</span></span>
-<span><span class="va">conditional_draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_samples.html">posterior_samples</a></span><span class="op">(</span><span class="va">cod_fit</span>, n <span class="op">=</span> <span class="fl">25</span>, seed <span class="op">=</span> <span class="fl">1405</span><span class="op">)</span></span>
-<span><span class="va">marginal_draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_samples.html">posterior_samples</a></span><span class="op">(</span><span class="va">cod_fit</span>, n <span class="op">=</span> <span class="fl">25</span>,</span>
+<span><span class="va">conditional_draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_samples.html">posterior_samples</a></span><span class="op">(</span><span class="va">cod_fit</span>, n_draws <span class="op">=</span> <span class="fl">25</span>, seed <span class="op">=</span> <span class="fl">1405</span><span class="op">)</span></span>
+<span><span class="va">marginal_draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_samples.html">posterior_samples</a></span><span class="op">(</span><span class="va">cod_fit</span>, n_draws <span class="op">=</span> <span class="fl">25</span>,</span>
 <span>  conditioning <span class="op">=</span> <span class="st">"marginal"</span>, seed <span class="op">=</span> <span class="fl">1405</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">summarise_draws</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">description</span><span class="op">)</span> <span class="op">{</span></span>

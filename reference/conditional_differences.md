@@ -175,8 +175,7 @@ conditional_differences(model, ...)
 
 - thin:
 
-  numeric; retain only `thin` samples. See
-  [`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html).
+  positive integer; retain every `thin` iterations after burn-in.
 
 - t_df:
 

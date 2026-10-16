@@ -161,7 +161,7 @@ dat1 <- data_sim("eg1", n = 400, dist = "normal", scale = 1, seed = 1)
 ## a single smooth GAM
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "REML")
 ## posterior smooths from m1
-sm1 <- smooth_samples(m1, n = 15, seed = 23478)
+sm1 <- smooth_samples(m1, n_draws = 15, seed = 23478)
 ## plot
 draw(sm1, alpha = 0.7)
 
@@ -174,7 +174,7 @@ dat2 <- data_sim("eg4", n = 400, dist = "normal", scale = 1, seed = 1)
 ## a multi-smooth GAM with a factor-by smooth
 m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat2, method = "REML")
 ## posterior smooths from m1
-sm2 <- smooth_samples(m2, n = 15, seed = 23478)
+sm2 <- smooth_samples(m2, n_draws = 15, seed = 23478)
 ## plot, this time selecting only the factor-by smooth
 draw(sm2, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
 
@@ -185,7 +185,7 @@ dat3 <- data_sim("eg2", n = 400, dist = "normal", scale = 1, seed = 1)
 ## fit a 2D smooth
 m3 <- gam(y ~ te(x, z), data = dat3, method = "REML")
 ## get samples
-sm3 <- smooth_samples(m3, n = 10)
+sm3 <- smooth_samples(m3, n_draws = 10)
 ## plot just 6 of the draws, with contour line overlays
 draw(sm3, n_samples = 6, contour = TRUE, seed = 42)
 

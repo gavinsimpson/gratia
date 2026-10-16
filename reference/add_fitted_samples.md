@@ -10,18 +10,40 @@ or
 ## Usage
 
 ``` r
-add_fitted_samples(object, model, n = 1, seed = NULL, ...)
+add_fitted_samples(
+  data,
+  model,
+  ...,
+  n_draws = NULL,
+  seed = NULL,
+  chains = NULL
+)
 
-add_predicted_samples(object, model, n = 1, seed = NULL, ...)
+add_predicted_samples(data, model, ..., n_draws = NULL, seed = NULL)
 
-add_posterior_samples(object, model, n = 1, seed = NULL, ...)
+add_posterior_samples(
+  data,
+  model,
+  ...,
+  n_draws = NULL,
+  seed = NULL,
+  chains = NULL
+)
 
-add_smooth_samples(object, model, n = 1, seed = NULL, select = NULL, ...)
+add_smooth_samples(
+  data,
+  model,
+  ...,
+  n_draws = NULL,
+  seed = NULL,
+  select = NULL,
+  chains = NULL
+)
 ```
 
 ## Arguments
 
-- object:
+- data:
 
   a data frame or tibble to which the posterior draws will be added.
 
@@ -30,14 +52,6 @@ add_smooth_samples(object, model, n = 1, seed = NULL, select = NULL, ...)
   a fitted GAM (or GAM-like) object for which a posterior draw method
   exists.
 
-- n:
-
-  integer; the number of posterior draws to add.
-
-- seed:
-
-  numeric; a value to seed the random number generator.
-
 - ...:
 
   arguments are passed to the posterior draw function, currently one of
@@ -45,15 +59,31 @@ add_smooth_samples(object, model, n = 1, seed = NULL, select = NULL, ...)
   [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md),
   or
   [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md).
-  `n` and `seed` are already specified here as arguments and are also
-  passed on to the posterior sampling function.
+  `n_draws` and `seed` are already specified here as arguments and are
+  also passed on to the posterior sampling function.
+
+- n_draws:
+
+  positive integer; total retained draws across all chains. Required
+  when generating draws. With `method = "user"`, the supplied matrix
+  determines the count; an explicit count must agree with its rows.
+
+- seed:
+
+  numeric; a value to seed the random number generator.
+
+- chains:
+
+  positive integer or `NULL`; number of chains. `NULL` uses one chain,
+  or the chain mapping in supplied draws. `n_draws` must be divisible by
+  `chains`. Burn-in is applied separately to each MH chain.
 
 - select:
 
   character; select which smooth's posterior to draw from. The default,
-  `NULL`, means the posteriors of all smooths in model will be sampled
-  from individually. If supplied, a character vector of requested smooth
-  terms.
+  `NULL`, means the posteriors of all smooths in model will be returned
+  using the same joint coefficient draws. If supplied, a vector of
+  smooth terms.
 
 ## Examples
 
@@ -65,9 +95,9 @@ df <- data_sim("eg1", n = 400, seed = 42)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 
 # add fitted samples (posterior draws of the expected value of the response)
-# note that there are 800 rows in the output: 400 data by `n = 2` samples.
+# note that there are 800 rows in the output: 400 data by `n_draws = 2` samples.
 df |>
-  add_fitted_samples(m, n = 2, seed = 84)
+  add_fitted_samples(m, n_draws = 2, seed = 84)
 #> # A tibble: 800 × 14
 #>        y    x0     x1    x2    x3     f    f0    f1     f2    f3  .row .draw
 #>    <dbl> <dbl>  <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>  <dbl> <dbl> <int> <int>
@@ -86,7 +116,7 @@ df |>
 
 # add posterior draws from smooth s(x2)
 df |>
-  add_smooth_samples(m, n = 2, seed = 2, select= "s(x2)")
+  add_smooth_samples(m, n_draws = 2, seed = 2, select= "s(x2)")
 #> # A tibble: 800 × 15
 #>        y    x0     x1    x2    x3     f    f0    f1     f2    f3  .row .smooth
 #>    <dbl> <dbl>  <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>  <dbl> <dbl> <int> <chr>  

@@ -59,6 +59,7 @@
     <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
     <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -267,7 +268,7 @@ interested in using the <code>select</code> argument; if we want to
 sample smooths from the posteriors of all smooths in a model, then
 <code>select</code> can be left at its default value.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sm_samp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_samples.html">smooth_samples</a></span><span class="op">(</span><span class="va">m_ss</span>, select <span class="op">=</span> <span class="st">"s(x0)"</span>, n_vals <span class="op">=</span> <span class="fl">100</span>, n <span class="op">=</span> <span class="fl">100</span>,</span>
+<code class="sourceCode R"><span><span class="va">sm_samp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_samples.html">smooth_samples</a></span><span class="op">(</span><span class="va">m_ss</span>, select <span class="op">=</span> <span class="st">"s(x0)"</span>, n_grid <span class="op">=</span> <span class="fl">100</span>, n_draws <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">21</span><span class="op">)</span></span></code></pre></div>
 <p>Typically we’re not too bothered about the particular values of the
 covariate at which we evaluate the posterior smooths; below we ask for
@@ -355,7 +356,7 @@ posterior. Here we just take 10 draws from the posterior for each
 observation in <code>new_df</code> and merge the posterior draws with
 the data</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">new_df</span>, n <span class="op">=</span> <span class="fl">10</span>, seed <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="va">fs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">new_df</span>, n_draws <span class="op">=</span> <span class="fl">10</span>, seed <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">new_df</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.row</span>, <span class="va">x</span><span class="op">)</span>, by <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">join_by</a></span><span class="op">(</span><span class="va">.row</span> <span class="op">==</span> <span class="va">.row</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Adding the posterior fitted samples to the plot of the data,
 superimposing the Bayesian credible interval on the fitted values</p>
@@ -408,7 +409,7 @@ the observed data using <code><a href="../reference/predicted_samples.html">pred
 <code class="sourceCode R"><span><span class="va">n_sim</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
 <span><span class="va">n_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mcycle</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">sim_gau</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/predicted_samples.html">predicted_samples</a></span><span class="op">(</span><span class="va">m_gau</span>, n <span class="op">=</span> <span class="va">n_sim</span>, seed <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="va">sim_gau</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/predicted_samples.html">predicted_samples</a></span><span class="op">(</span><span class="va">m_gau</span>, n_draws <span class="op">=</span> <span class="va">n_sim</span>, seed <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">mcycle</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">accel</span><span class="op">)</span>, <span class="co"># join on the observed data for times</span></span>
 <span>    by <span class="op">=</span> <span class="st">".row"</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -453,7 +454,7 @@ parameters of the Gaussian distribution</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Simulating new data follows using the same code as earlier</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sim_gaulss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/predicted_samples.html">predicted_samples</a></span><span class="op">(</span><span class="va">m_gaulss</span>, n <span class="op">=</span> <span class="va">n_sim</span>, seed <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="va">sim_gaulss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/predicted_samples.html">predicted_samples</a></span><span class="op">(</span><span class="va">m_gaulss</span>, n_draws <span class="op">=</span> <span class="va">n_sim</span>, seed <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">mcycle</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">accel</span><span class="op">)</span>,</span>
 <span>    by <span class="op">=</span> <span class="st">".row"</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -604,7 +605,7 @@ interval.</p>
 for each of the new <code>x</code> values in <code>ds</code> and use a
 join to add the prediction data to each draw</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_samples.html">posterior_samples</a></span><span class="op">(</span><span class="va">m</span>, n <span class="op">=</span> <span class="fl">10000</span>, data <span class="op">=</span> <span class="va">ds</span>, seed <span class="op">=</span> <span class="fl">24</span>,</span>
+<code class="sourceCode R"><span><span class="va">ps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_samples.html">posterior_samples</a></span><span class="op">(</span><span class="va">m</span>, n_draws <span class="op">=</span> <span class="fl">10000</span>, data <span class="op">=</span> <span class="va">ds</span>, seed <span class="op">=</span> <span class="fl">24</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">ds</span>, by <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">join_by</a></span><span class="op">(</span><span class="va">.row</span> <span class="op">==</span> <span class="va">.row</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">ps</span></span>
@@ -770,9 +771,9 @@ of the covariate space the response consists of only zeroes
 default Gaussian approximation and subsequently using the simpler
 Metropolis Hastings sampler.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fs_ga</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">m_logit</span>, n <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">fs_ga</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">m_logit</span>, n_draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">fs_mh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">m_logit</span>,</span>
-<span>  n <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">2</span>, method <span class="op">=</span> <span class="st">"mh"</span>, thin <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  n_draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">2</span>, method <span class="op">=</span> <span class="st">"mh"</span>, thin <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  rw_scale <span class="op">=</span> <span class="fl">0.4</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>The <code>method</code> argument is used to select the Metropolis
@@ -849,9 +850,97 @@ the estimated response as a function of <code>x</code> where the data
 are all zeroes.</p>
 </div>
 </div>
-<div class="section level2 unnumbered">
-<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
+</div>
+<div class="section level2">
+<h2 id="multiple-chains-and-sampling-diagnostics">Multiple chains and sampling diagnostics<a class="anchor" aria-label="anchor" href="#multiple-chains-and-sampling-diagnostics"></a>
+</h2>
+<p><code>n</code> is the total number of retained draws. For example,
+four chains with <code>n_draws = 1000</code> retain 250 draws each. Each
+MH chain has its own burn-in period. Use <code>n_cores</code> to run
+chains concurrently with mirai. gratia reuses an active mirai pool; if
+none is available, it creates and removes a separate temporary pool. An
+existing pool is never resized or stopped by the sampler.</p>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">response_draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_samples.html">posterior_samples</a></span><span class="op">(</span></span>
+<span>  <span class="va">m_ss</span>, n_draws <span class="op">=</span> <span class="fl">1000</span>, chains <span class="op">=</span> <span class="fl">4</span>, n_cores <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"mh"</span>, burnin <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">281</span>,</span>
+<span>  diagnostics <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/sampling_diagnostics.html">sampling_diagnostics</a></span><span class="op">(</span><span class="va">response_draws</span><span class="op">)</span></span></code></pre></div>
+<p>The returned table includes <code>.chain</code> and
+<code>.iteration</code>. <code>.draw</code> identifies a draw across all
+chains. <code>diagnostics = TRUE</code> requires the posterior package
+and attaches coefficient summaries, including R-hat, bulk and tail
+effective sample sizes, and Monte Carlo standard errors. The effective
+sample sizes measure how much information remains after allowing for
+correlation between successive draws. A total of 1,000 retained draws
+need not provide the information of 1,000 independent draws.</p>
+<p>These summaries describe the coefficient chains before response
+simulation. Response noise can conceal poor mixing of the coefficient
+chains. To examine coefficient trace plots and then reuse the same draws
+for response sampling, generate the coefficients once:</p>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">coefficients</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/post_draws.html">post_draws</a></span><span class="op">(</span></span>
+<span>  <span class="va">m_ss</span>, n_draws <span class="op">=</span> <span class="fl">1000</span>, chains <span class="op">=</span> <span class="fl">4</span>, n_cores <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"mh"</span>, burnin <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">281</span>,</span>
+<span>  diagnostics <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">bayesplot</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/MCMC-traces.html" class="external-link">mcmc_trace</a></span><span class="op">(</span><span class="fu"><a href="../reference/as_mcmc_draws.html">as_mcmc_draws</a></span><span class="op">(</span><span class="va">coefficients</span>, format <span class="op">=</span> <span class="st">"array"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">response_draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_samples.html">posterior_samples</a></span><span class="op">(</span></span>
+<span>  <span class="va">m_ss</span>, method <span class="op">=</span> <span class="st">"user"</span>, draws <span class="op">=</span> <span class="va">coefficients</span>, seed <span class="op">=</span> <span class="fl">282</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="../reference/as_mcmc_draws.html">as_mcmc_draws()</a></code> also converts fitted values, smooths,
+derivatives, and response samples. Select the observations or smooths of
+interest before converting a large table: each sampled quantity becomes
+one variable. Choose <code>"draws_array"</code> or
+<code>"draws_df"</code> for posterior, <code>"mcmc.list"</code> for
+coda, or <code>"array"</code> for an ordinary iteration by chain by
+variable array accepted by bayesplot. Conversions require the same
+consecutive retained iterations in each chain. Keep the chain columns
+when manipulating sampled tables; ordinary matrix subsetting can remove
+the chain mapping attached to coefficient matrices.</p>
+<p>With four available workers, elapsed sampling time is approximately
+the time for one chain’s burn-in plus 250 retained iterations, rather
+than burn-in plus 1,000 iterations. Worker startup, model transfer, and
+prediction also take time. If burn-in is 1,000 iterations, the
+corresponding iteration counts are 1,250 and 2,000, so the ideal
+sampling speedup is about 1.6 times.</p>
+<div class="section level3">
+<h3 id="sampling-coefficients-from-bam-fits">Sampling coefficients from bam fits<a class="anchor" aria-label="anchor" href="#sampling-coefficients-from-bam-fits"></a>
+</h3>
+<p><code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code> does not support bam fits. Use
+<code>mh_backend = "gratia"</code> for independent-observation bam fits,
+or to use the compiled evaluator for a gam:</p>
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bam_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">1000</span>, dist <span class="op">=</span> <span class="st">"poisson"</span>, seed <span class="op">=</span> <span class="fl">281</span><span class="op">)</span></span>
+<span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu">mgcv</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">bam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">bam_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">response_draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_samples.html">posterior_samples</a></span><span class="op">(</span></span>
+<span>  <span class="va">b</span>, n_draws <span class="op">=</span> <span class="fl">1000</span>, chains <span class="op">=</span> <span class="fl">4</span>, n_cores <span class="op">=</span> <span class="fl">4</span>, method <span class="op">=</span> <span class="st">"mh"</span>,</span>
+<span>  mh_backend <span class="op">=</span> <span class="st">"gratia"</span>, diagnostics <span class="op">=</span> <span class="cn">TRUE</span>, seed <span class="op">=</span> <span class="fl">281</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>This backend currently supports Gaussian identity, Poisson log,
+binomial logit, Gamma log, and negative binomial log models. It holds
+smoothing parameters, dispersion, and any negative binomial shape at
+their fitted values. It rejects AR1 dependence, additional penalties
+specified through <code>paraPen</code> or <code>H</code>, and fits made
+from pre-fit <code>G</code> objects. For discrete bam fits it evaluates
+the fitted bases at the original covariates; it does not use a
+compressed, discretised likelihood.</p>
+<p>Small model matrices are cached. Large designs are evaluated in
+blocks, controlled by <code>block_size</code>, without retaining the
+full matrix. This reduces memory use but repeatedly constructs the basis
+matrices. The <code>dense_limit</code> argument sets the maximum number
+of elements in a cached design matrix; zero forces blockwise
+evaluation.</p>
+<p>For Gaussian models with fixed dispersion and smoothing parameters,
+the coefficient posterior is Gaussian, so the existing
+<code>method = "gaussian"</code> provides direct independent draws. Its
+<code>unconditional = TRUE</code> covariance correction can include an
+approximation to smoothing-parameter uncertainty when mgcv supplies it.
+Neither MH backend samples smoothing parameters.</p>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0" line-spacing="2">
 <div id="ref-Luo1997-xg" class="csl-entry">
 Luo, Z., &amp; Wahba, G. (1997). Hybrid adaptive splines. <em>Journal of
@@ -866,6 +955,7 @@ Journal of Statistics, Theory and Applications</em>, <em>39</em>(1),
 <div id="ref-Miller2025-bd" class="csl-entry">
 Miller, D. L. (2025). Bayesian views of generalized additive modelling.
 <em>Methods Ecol. Evol.</em> <a href="https://doi.org/10.1111/2041-210x.14498" class="external-link">https://doi.org/10.1111/2041-210x.14498</a>
+</div>
 </div>
 </div>
 </div>

@@ -11,31 +11,31 @@ GAMs.
 ``` r
 loo.gam(
   x,
-  n = 4000,
+  ...,
+  n_draws = NULL,
   seed = NULL,
   sampling_args = list(),
   r_eff = NULL,
   chain_id = NULL,
   save_psis = FALSE,
-  cores = 1,
-  ...
+  cores = 1
 )
 
 loo.bam(
   x,
-  n = 4000,
+  ...,
+  n_draws = NULL,
   seed = NULL,
   sampling_args = list(),
   r_eff = NULL,
   chain_id = NULL,
   save_psis = FALSE,
-  cores = 1,
-  ...
+  cores = 1
 )
 
-waic.gam(x, n = 4000, seed = NULL, sampling_args = list(), ...)
+waic.gam(x, ..., n_draws = NULL, seed = NULL, sampling_args = list())
 
-waic.bam(x, n = 4000, seed = NULL, sampling_args = list(), ...)
+waic.bam(x, ..., n_draws = NULL, seed = NULL, sampling_args = list())
 ```
 
 ## Arguments
@@ -44,9 +44,16 @@ waic.bam(x, n = 4000, seed = NULL, sampling_args = list(), ...)
 
   a GAM or BAM fitted by mgcv.
 
-- n:
+- ...:
 
-  number of posterior coefficient draws.
+  additional arguments passed to
+  [`loo::loo()`](https://mc-stan.org/loo/reference/loo.html) or
+  [`loo::waic()`](https://mc-stan.org/loo/reference/waic.html).
+
+- n_draws:
+
+  total posterior coefficient draws across all chains. Defaults to 4000
+  when generating draws; supplied draws determine their own count.
 
 - seed:
 
@@ -54,7 +61,9 @@ waic.bam(x, n = 4000, seed = NULL, sampling_args = list(), ...)
 
 - sampling_args:
 
-  named list of arguments passed to the coefficient sampler; see
+  named list of arguments passed to the coefficient sampler, including
+  `chains`, `diagnostics`, `method`, `mh_backend` and method-specific
+  controls; see
   [`log_lik()`](https://gavinsimpson.github.io/gratia/reference/log_lik.md).
 
 - r_eff:
@@ -62,13 +71,17 @@ waic.bam(x, n = 4000, seed = NULL, sampling_args = list(), ...)
   optional relative effective sample sizes, either one value or one per
   observation. Independent Gaussian draws use `1` by default. For
   Metropolis–Hastings draws this is estimated from the likelihoods.
-  Supplied draws require `r_eff` or `chain_id`.
+  Supplied draws use their stored chain mapping when available;
+  otherwise supply `r_eff` or `chain_id`.
 
 - chain_id:
 
   integer chain identifier for each coefficient draw, in draw order.
   Identifiers must be consecutive starting at one, and chains must
-  contain equal numbers of draws. MH sampling defaults to one chain.
+  contain equal numbers of draws. A supplied mapping must agree with the
+  coefficient draws' stored mapping. Stored iterations determine
+  temporal order for relative efficiency without reordering response or
+  likelihood rows.
 
 - save_psis:
 
@@ -77,12 +90,6 @@ waic.bam(x, n = 4000, seed = NULL, sampling_args = list(), ...)
 - cores:
 
   number of cores used by loo.
-
-- ...:
-
-  additional arguments passed to
-  [`loo::loo()`](https://mc-stan.org/loo/reference/loo.html) or
-  [`loo::waic()`](https://mc-stan.org/loo/reference/waic.html).
 
 ## Value
 
@@ -110,7 +117,7 @@ proportional to the number of observations times the number of draws.
 if (requireNamespace("loo", quietly = TRUE)) {
   library("mgcv")
   m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
-  loo::loo(m, n = 500, seed = 42)
+  loo::loo(m, n_draws = 500, seed = 42)
 }
 #> 
 #> Computed from 500 by 32 log-likelihood matrix.

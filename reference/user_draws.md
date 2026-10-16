@@ -6,15 +6,22 @@ Handle user-supplied posterior draws
 
 ``` r
 # S3 method for class 'gamm4'
-user_draws(model, draws, ...)
+user_draws(model, ..., draws, n_draws = NULL, chains = NULL)
 
-user_draws(model, draws, ...)
+user_draws(model, ..., draws)
 
 # S3 method for class 'gam'
-user_draws(model, draws, index = NULL, ...)
+user_draws(model, ..., n_draws = NULL, chains = NULL, draws, index = NULL)
 
 # S3 method for class 'scam'
-user_draws(model, draws, ...)
+user_draws(
+  model,
+  ...,
+  draws = NULL,
+  n_draws = NULL,
+  chains = NULL,
+  index = NULL
+)
 ```
 
 ## Arguments
@@ -30,14 +37,26 @@ user_draws(model, draws, ...)
   [gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
   for sampling from gamm4 fits.
 
+- ...:
+
+  arguments passed to methods.
+
 - draws:
 
   matrix; user supplied posterior draws to be used when
   `method = "user"`.
 
-- ...:
+- n_draws:
 
-  arguments passed to methods.
+  positive integer; total retained draws across all chains. Required
+  when generating draws. With `method = "user"`, the supplied matrix
+  determines the count; an explicit count must agree with its rows.
+
+- chains:
+
+  positive integer or `NULL`; number of chains. `NULL` uses one chain,
+  or the chain mapping in supplied draws. `n_draws` must be divisible by
+  `chains`. Burn-in is applied separately to each MH chain.
 
 - index:
 

@@ -10,58 +10,58 @@ after loading gratia.
 ``` r
 pp_check.gam(
   object,
+  ...,
   type = "dens_overlay",
   prefix = c("ppc", "ppd"),
-  n = NULL,
+  n_draws = NULL,
   seed = NULL,
   group = NULL,
   x = NULL,
   response = NULL,
   conditioning = NULL,
-  sampling_args = list(),
-  ...
+  sampling_args = list()
 )
 
 pp_check.bam(
   object,
+  ...,
   type = "dens_overlay",
   prefix = c("ppc", "ppd"),
-  n = NULL,
+  n_draws = NULL,
   seed = NULL,
   group = NULL,
   x = NULL,
   response = NULL,
   conditioning = NULL,
-  sampling_args = list(),
-  ...
+  sampling_args = list()
 )
 
 pp_check.gamm(
   object,
+  ...,
   type = "dens_overlay",
   prefix = c("ppc", "ppd"),
-  n = NULL,
+  n_draws = NULL,
   seed = NULL,
   group = NULL,
   x = NULL,
   response = NULL,
   conditioning = NULL,
-  sampling_args = list(),
-  ...
+  sampling_args = list()
 )
 
 pp_check.gamm4(
   object,
+  ...,
   type = "dens_overlay",
   prefix = c("ppc", "ppd"),
-  n = NULL,
+  n_draws = NULL,
   seed = NULL,
   group = NULL,
   x = NULL,
   response = NULL,
   conditioning = NULL,
-  sampling_args = list(),
-  ...
+  sampling_args = list()
 )
 ```
 
@@ -70,6 +70,10 @@ pp_check.gamm4(
 - object:
 
   a fitted GAM, BAM, gamm, or gamm4 model.
+
+- ...:
+
+  arguments passed only to the selected bayesplot plotting function.
 
 - type:
 
@@ -81,11 +85,11 @@ pp_check.gamm4(
   character; `"ppc"` compares responses with observations; `"ppd"` shows
   replicated responses alone.
 
-- n:
+- n_draws:
 
-  positive integer; number of coefficient and response draws. Defaults
-  to 50 for ordinary plots and 4000 for leave-one-out plots. With
-  supplied coefficient draws, defaults to their number of rows.
+  positive integer; total coefficient and response draws. Defaults to 50
+  for ordinary plots and 4000 for leave-one-out plots. With supplied
+  coefficient draws, defaults to their number of rows.
 
 - seed:
 
@@ -112,13 +116,11 @@ pp_check.gamm4(
 
   named list; arguments for the posterior sampler, including `method`,
   `draws`, `unconditional`, and `mvn_method`. Prediction at new data is
-  not supported. Fitted binomial trials must be retained. For
-  leave-one-out plots, supply `r_eff` or `chain_id` here when using
-  coefficient draws supplied by the user.
-
-- ...:
-
-  arguments passed only to the selected bayesplot plotting function.
+  not supported. Fitted binomial trials must be retained. Use `chains`
+  for multiple coefficient chains and `diagnostics = TRUE` for
+  coefficient diagnostics. Leave-one-out plots use stored chain
+  identities; for unlabelled supplied draws, include `r_eff` or
+  `chain_id` here.
 
 ## Value
 
@@ -166,6 +168,6 @@ if (requireNamespace("bayesplot", quietly = TRUE)) {
   load_mgcv()
   dat <- data_sim("eg1", n = 100, seed = 2)
   fit <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
-  bayesplot::pp_check(fit, n = 10, seed = 42)
+  bayesplot::pp_check(fit, n_draws = 10, seed = 42)
 }
 ```

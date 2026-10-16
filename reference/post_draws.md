@@ -19,23 +19,27 @@ post_draws(model, ...)
 # Default S3 method
 post_draws(
   model,
-  n,
+  ...,
+  n_draws = NULL,
+  chains = NULL,
+  seed = NULL,
   method = c("gaussian", "mh", "inla", "user"),
-  mu = NULL,
-  sigma = NULL,
   n_cores = 1L,
+  n_threads = 1L,
   burnin = 1000,
-  thin = 1,
+  thin = 1L,
   t_df = 40,
   rw_scale = 0.25,
-  index = NULL,
   frequentist = FALSE,
   unconditional = FALSE,
-  parametrized = TRUE,
-  mvn_method = c("mvnfast", "mgcv"),
   draws = NULL,
-  seed = NULL,
-  ...
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia", "family"),
+  mvn_method = c("mvnfast", "mgcv"),
+  block_size = 10000L,
+  dense_limit = 5e+06,
+  index = NULL,
+  parametrized = TRUE
 )
 
 generate_draws(model, ...)
@@ -43,21 +47,26 @@ generate_draws(model, ...)
 # S3 method for class 'gam'
 generate_draws(
   model,
-  n,
-  method = c("gaussian", "mh", "inla"),
-  mu = NULL,
-  sigma = NULL,
+  ...,
+  n_draws = NULL,
+  chains = NULL,
+  seed = NULL,
+  method = c("gaussian", "mh", "inla", "user"),
   n_cores = 1L,
+  n_threads = 1L,
   burnin = 1000,
-  thin = 1,
+  thin = 1L,
   t_df = 40,
   rw_scale = 0.25,
-  index = NULL,
   frequentist = FALSE,
   unconditional = FALSE,
+  draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
-  seed = NULL,
-  ...
+  block_size = 10000L,
+  dense_limit = 5e+06,
+  index = NULL
 )
 ```
 
@@ -78,9 +87,22 @@ generate_draws(
 
   arguments passed to methods.
 
-- n:
+- n_draws:
 
-  numeric; the number of posterior draws to take.
+  positive integer; total retained draws across all chains. Required
+  when generating draws. With `method = "user"`, the supplied matrix
+  determines the count; an explicit count must agree with its rows.
+
+- chains:
+
+  positive integer or `NULL`; number of chains. `NULL` uses one chain,
+  or the chain mapping in supplied draws. `n_draws` must be divisible by
+  `chains`. Burn-in is applied separately to each MH chain.
+
+- seed:
+
+  numeric or `NULL`; seed for the complete sampling operation. An
+  explicit seed restores the caller's random-number state on exit.
 
 - method:
 
@@ -96,20 +118,16 @@ generate_draws(
   [`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html) for more
   details.
 
-- mu:
-
-  numeric; user-supplied mean vector (vector of model coefficients).
-  Currently ignored.
-
-- sigma:
-
-  matrix; user-supplied covariance matrix for `mu`. Currently ignored.
-
 - n_cores:
 
-  integer; number of CPU cores to use when generating multivariate
-  normal distributed random values. Only used if
-  `mvn_method = "mvnfast"` **and** `method = "gaussian"`.
+  positive integer; maximum concurrent MH chains using mirai, capped at
+  `chains`. Existing workers are reused; otherwise temporary workers are
+  created and cleaned up. Only used by `method = "mh"`.
+
+- n_threads:
+
+  positive integer; threads within Gaussian sampling using mvnfast.
+  Defaults to one. This is separate from concurrent MH chains.
 
 - burnin:
 
@@ -118,8 +136,7 @@ generate_draws(
 
 - thin:
 
-  numeric; retain only `thin` samples. See
-  [`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html).
+  positive integer; retain every `thin` iterations after burn-in.
 
 - t_df:
 
@@ -131,11 +148,6 @@ generate_draws(
   numeric; factor by which to scale posterior covariance matrix when
   generating random walk proposals. See
   [`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html).
-
-- index:
-
-  numeric; vector of indices of coefficients to use. Can be used to
-  subset the mean vector and covariance matrix extracted from `model`.
 
 - frequentist:
 
@@ -151,11 +163,27 @@ generate_draws(
   [`mgcv::vcov.gam()`](https://rdrr.io/pkg/mgcv/man/vcov.gam.html). SCAM
   models do not support this correction; use `unconditional = FALSE`.
 
-- parametrized:
+- draws:
 
-  logical; use parametrized coefficients and covariance matrix, which
-  respect the linear inequality constraints of the model. Only for
-  [`scam::scam()`](https://rdrr.io/pkg/scam/man/scam.html) model fits.
+  matrix; user supplied posterior draws to be used when
+  `method = "user"`.
+
+- diagnostics:
+
+  logical; calculate coefficient R-hat, effective sample sizes, and
+  Monte Carlo standard errors using the optional posterior package.
+
+- mh_backend:
+
+  character; `"mgcv"` preserves
+  [`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html).
+  `"gratia"` uses compiled common-family likelihoods. `"family"` uses a
+  compiled MH loop with callbacks to the fitted family object. Both
+  support independent-observation bam fits. Smoothing parameters and
+  parameters outside the fitted coefficient vector remain fixed. LSS
+  scale and shape coefficients are sampled jointly with location. The
+  family backend caches a full design matrix, smoothing penalty, and
+  proposal factorisation once for all chains.
 
 - mvn_method:
 
@@ -166,17 +194,72 @@ generate_draws(
   but which might not work for some marginal fits, such as those where
   the covariance matrix is close to singular.
 
-- draws:
+- block_size:
 
-  matrix; user supplied posterior draws to be used when
-  `method = "user"`.
+  positive integer; maximum observation rows per block in the gratia MH
+  evaluator. Large designs are evaluated without storing a full matrix.
 
-- seed:
+- dense_limit:
 
-  numeric; the random seed to use. If `NULL`, a random seed will be
-  generated without affecting the current state of R's RNG.
+  numeric; maximum number of design-matrix elements to cache for the
+  gratia MH backend. Use zero to force blockwise evaluation.
+
+- index:
+
+  numeric; vector of indices of coefficients to use. Can be used to
+  subset the mean vector and covariance matrix extracted from `model`.
+
+- parametrized:
+
+  logical; use parametrized coefficients and covariance matrix, which
+  respect the linear inequality constraints of the model. Only for
+  [`scam::scam()`](https://rdrr.io/pkg/scam/man/scam.html) model fits.
 
 ## Details
+
+Sampling controls must be named. Removed arguments produce migration
+errors; see
+[`vignette("sampling-migration")`](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md).
+Explicit controls that the selected method cannot use are rejected.
+
+For multiple chains, `n_draws` is the total retained count and must be
+divisible by `chains`. Coefficient matrices carry a chain mapping; use
+[`as_mcmc_draws()`](https://gavinsimpson.github.io/gratia/reference/as_mcmc_draws.md)
+before ordinary matrix operations remove that mapping. Higher-level
+sampling tables include `.chain` and `.iteration` for multiple chains,
+with `.draw` unique across chains. Default single-chain table columns
+are unchanged. Use
+[`sampling_diagnostics()`](https://gavinsimpson.github.io/gratia/reference/sampling_diagnostics.md)
+to extract coefficient diagnostics before response simulation adds
+further noise.
+
+The gratia MH backend supports Gaussian identity, Poisson log, binomial
+logit, Gamma log, and negative binomial log fits. It evaluates the
+fitted bases at original covariates, including for discrete bam fits.
+GAMM components, AR1 dependence, `paraPen`, `H`, and fits made from
+pre-fit `G` objects are unsupported.
+
+The family MH backend calls the fitted family's `dev.resids()` and
+`linkinv()` functions, or `ll()` for families with multiple linear
+predictors. This retains response encodings and attributes such as
+censoring indicators and the mappings between coefficients and
+predictors. It supports compatible standard, extended, and general mgcv
+families, including multinomial, Gaussian location-scale, and grouped
+families. Quasi families, Cox proportional hazards models, GAMM
+components, AR1 dependence, `paraPen`, `H`, and pre-fit `G` objects are
+unsupported. The fitted coefficient covariance must be nonsingular. It
+always caches the full design matrix; `block_size` and `dense_limit`
+apply only to the gratia backend and are rejected for the family
+backend. The new MH backends reject `bam` fits with nonzero prescribed
+smooth contributions: mgcv fitting and prediction can use different
+offsets for those fits. Supplied coefficient draws can still be
+evaluated with the native prediction conventions.
+
+All MH backends sample the conditional coefficient posterior with fitted
+smoothing, dispersion, and additional family parameters fixed.
+Parameters represented in the fitted coefficient vector are sampled,
+including scale or covariance coefficients in general families.
+`unconditional` applies to Gaussian draws only.
 
 GAM-class fits with linear inequality constraints, including
 [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) fits, store
@@ -184,9 +267,8 @@ these as `Ain %*% coefficients >= bin`. Gaussian sampling uses the
 fitted covariance matrix without enforcing these inequalities and issues
 a warning. Sampled smooths can therefore violate the fitted shape
 constraints. Pointwise intervals computed from the same Gaussian
-covariance approximation also need not preserve those shapes.
-Metropolis-Hastings sampling is unavailable for these fits because
-[`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html) does not
+covariance approximation also need not preserve those shapes. All MH
+backends are unavailable for these fits because the samplers do not
 enforce their inequalities.
 
 If [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) was fitted

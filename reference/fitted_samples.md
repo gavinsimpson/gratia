@@ -15,44 +15,54 @@ fitted_samples(model, ...)
 # S3 method for class 'gam'
 fitted_samples(
   model,
-  n = 1,
-  data = newdata,
+  ...,
+  data = NULL,
+  n_draws = NULL,
+  chains = NULL,
   seed = NULL,
-  scale = c("response", "linear_predictor"),
   method = c("gaussian", "mh", "inla", "user"),
-  n_cores = 1,
+  n_cores = 1L,
+  n_threads = 1L,
   burnin = 1000,
-  thin = 1,
+  thin = 1L,
   t_df = 40,
   rw_scale = 0.25,
-  freq = FALSE,
+  frequentist = FALSE,
   unconditional = FALSE,
   draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
-  family_index = NULL,
-  ...,
-  newdata = NULL,
-  ncores = NULL
+  block_size = 10000L,
+  dense_limit = 5e+06,
+  scale = c("response", "linear_predictor"),
+  family_index = NULL
 )
 
 # S3 method for class 'scam'
 fitted_samples(
   model,
-  n = 1,
+  ...,
   data = NULL,
+  n_draws = NULL,
+  chains = NULL,
   seed = NULL,
-  scale = c("response", "linear_predictor"),
   method = c("gaussian", "mh", "inla", "user"),
-  n_cores = 1,
+  n_cores = 1L,
+  n_threads = 1L,
   burnin = 1000,
-  thin = 1,
+  thin = 1L,
   t_df = 40,
   rw_scale = 0.25,
-  freq = FALSE,
+  frequentist = FALSE,
   unconditional = FALSE,
   draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
-  ...
+  block_size = 10000L,
+  dense_limit = 5e+06,
+  scale = c("response", "linear_predictor")
 )
 ```
 
@@ -76,29 +86,27 @@ fitted_samples(
   [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
   method.
 
-- n:
-
-  numeric; the number of posterior samples to return.
-
 - data:
 
   data frame; new observations at which the posterior draws from the
   model should be evaluated. If not supplied, the data used to fit the
   model will be used for `data`, if available in `model`.
 
+- n_draws:
+
+  positive integer; total retained draws across all chains. Required
+  when generating draws. With `method = "user"`, the supplied matrix
+  determines the count; an explicit count must agree with its rows.
+
+- chains:
+
+  positive integer or `NULL`; number of chains. `NULL` uses one chain,
+  or the chain mapping in supplied draws. `n_draws` must be divisible by
+  `chains`. Burn-in is applied separately to each MH chain.
+
 - seed:
 
   numeric; a random seed for the simulations.
-
-- scale:
-
-  character; either `"response"` for expectations of the response or
-  `"linear_predictor"` for values before the inverse link
-  transformation. For multinomial models both scales return all
-  categories, labelled `response1`, `response2`, and so on. On the
-  linear predictor scale, `response1` is the reference category with
-  predictor zero; the other values are log odds relative to it. On the
-  response scale, the values are category probabilities.
 
 - method:
 
@@ -108,16 +116,19 @@ fitted_samples(
   sampler that alternates t proposals with proposals based on a shrunken
   version of the posterior covariance matrix. `"inla"` uses a variant of
   Integrated Nested Laplace Approximation due to Wood (2019), (currently
-  not implemented). `"user"` allows for user-supplied posterior draws
-  (currently not implemented).
+  not implemented). `"user"` allows for user-supplied posterior draws as
+  a coefficient matrix.
 
 - n_cores:
 
-  number of cores for generating random variables from a multivariate
-  normal distribution. Passed to
-  [`mvnfast::rmvn()`](https://rdrr.io/pkg/mvnfast/man/rmvn.html).
-  Parallelization will take place only if OpenMP is supported (but
-  appears to work on Windows with current `R`).
+  positive integer; maximum concurrent MH chains using mirai, capped at
+  `chains`. Existing workers are reused; otherwise temporary workers are
+  created and cleaned up. Only used by `method = "mh"`.
+
+- n_threads:
+
+  positive integer; threads within Gaussian sampling using mvnfast.
+  Defaults to one. This is separate from concurrent MH chains.
 
 - burnin:
 
@@ -126,9 +137,7 @@ fitted_samples(
 
 - thin:
 
-  numeric; the number of samples to skip when taking `n` draws. Results
-  in `thin * n` draws from the posterior being taken. Only used with
-  `method = "mh"`.
+  positive integer; retain every `thin` iterations after burn-in.
 
 - t_df:
 
@@ -141,7 +150,7 @@ fitted_samples(
   generating random walk proposals. Negative or non finite to skip the
   random walk step. Only used with `method = "mh"`.
 
-- freq:
+- frequentist:
 
   logical; `TRUE` to use the frequentist covariance matrix of the
   parameter estimators, `FALSE` to use the Bayesian posterior covariance
@@ -149,14 +158,31 @@ fitted_samples(
 
 - unconditional:
 
-  logical; if `TRUE` (and `freq == FALSE`) then the Bayesian smoothing
-  parameter uncertainty corrected covariance matrix is used, if
-  available.
+  logical; if `TRUE` (and `frequentist == FALSE`) then the Bayesian
+  smoothing parameter uncertainty corrected covariance matrix is used,
+  if available.
 
 - draws:
 
   matrix; user supplied posterior draws to be used when
   `method = "user"`.
+
+- diagnostics:
+
+  logical; calculate coefficient R-hat, effective sample sizes, and
+  Monte Carlo standard errors using the optional posterior package.
+
+- mh_backend:
+
+  character; `"mgcv"` preserves
+  [`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html).
+  `"gratia"` uses compiled common-family likelihoods. `"family"` uses a
+  compiled MH loop with callbacks to the fitted family object. Both
+  support independent-observation bam fits. Smoothing parameters and
+  parameters outside the fitted coefficient vector remain fixed. LSS
+  scale and shape coefficients are sampled jointly with location. The
+  family backend caches a full design matrix, smoothing penalty, and
+  proposal factorisation once for all chains.
 
 - mvn_method:
 
@@ -166,6 +192,27 @@ fitted_samples(
   values than [`mgcv::rmvn()`](https://rdrr.io/pkg/mgcv/man/rmvn.html),
   but which might not work for some marginal fits, such as those where
   the covariance matrix is close to singular.
+
+- block_size:
+
+  positive integer; maximum observation rows per block in the gratia MH
+  evaluator. Large designs are evaluated without storing a full matrix.
+
+- dense_limit:
+
+  numeric; maximum number of design-matrix elements to cache for the
+  gratia MH backend. Use zero to force blockwise evaluation.
+
+- scale:
+
+  character; `"response"` returns the expected response;
+  `"linear_predictor"` returns the first linear predictor. For LSS
+  models, this is the predictor for location, which need not be the
+  expected response. For multinomial models both scales return every
+  category, labelled `response1`, `response2`, and so on. On the linear
+  predictor scale, `response1` is the reference category with predictor
+  zero; other values are log odds relative to it. Response-scale values
+  are probabilities.
 
 - family_index:
 
@@ -177,46 +224,36 @@ fitted_samples(
   predicting without responses or with a complex response expression. An
   explicit index must agree with membership recoverable from `data`.
 
-- newdata:
-
-  Deprecated: use `data` instead.
-
-- ncores:
-
-  Deprecated; use `n_cores` instead. The number of cores for generating
-  random variables from a multivariate normal distribution. Passed to
-  [`mvnfast::rmvn()`](https://rdrr.io/pkg/mvnfast/man/rmvn.html).
-  Parallelization will take place only if OpenMP is supported (but
-  appears to work on Windows with current `R`).
-
 ## Value
 
-A tibble (data frame) with 3 columns containing the posterior predicted
-values in long format. The columns are
+A tibble (data frame) in long format, with columns:
 
-- `row` (integer) the row of `data` that each posterior draw relates to,
+- `.row`: row of the evaluation data;
 
-- `draw` (integer) an index, in range `1:n`, indicating which draw each
-  row relates to,
+- `.draw`: globally unique draw identifier;
 
-- `response` (numeric) the predicted response for the indicated row of
-  `data`.
+- `.parameter`: `"location"` for scalar fitted values, or a
+  response/category label for multivariate or multinomial models;
+
+- `.fitted`: expected response or linear predictor, as selected by
+  `scale`. Multiple-chain output also includes `.chain` and
+  `.iteration`. Attached coefficient diagnostics are available through
+  [`sampling_diagnostics()`](https://gavinsimpson.github.io/gratia/reference/sampling_diagnostics.md).
 
 ## Details
 
-For general families with several distributional parameters,
-response-scale draws currently support
-[`mgcv::gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) means,
-[`mgcv::mvn()`](https://rdrr.io/pkg/mgcv/man/mvn.html) response means,
-and [`mgcv::multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html)
-category probabilities. Other general families, including
-[`mgcv::ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html), produce an
-error on the response scale because their first parameter is not
-necessarily the expected response. On the linear predictor scale, these
-other families return the first predictor under the existing `location`
-label, including its offsets. The same label identifies the mean
-predictor for [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html);
-scale predictors are omitted.
+For LSS models, `scale = "response"` returns the expected response,
+using all parameters on which it depends. This includes the mean
+correction for Gumbel, GEV and sinh-arcsinh distributions and the hurdle
+probability for [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html).
+The Gamma LSS mean is the exponential of its first predictor.
+`scale = "linear_predictor"` returns only the first predictor
+(location); it is not a transformation of the expectation for these
+multi-parameter distributions. The existing `.parameter = "location"`
+label is retained on both scales. A GEV expectation does not exist at
+shape \>= 1: response-scale fitted and derivative sampling then fail
+explicitly, while response draws and location-predictor draws remain
+available.
 
 For grouped families, coefficient draws preserve the joint model
 covariance; each row is then transformed using its own fitted component
@@ -279,7 +316,7 @@ load_mgcv()
 dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
-fs <- fitted_samples(m1, n = 5, seed = 42)
+fs <- fitted_samples(m1, n_draws = 5, seed = 42)
 # \donttest{
 fs
 #> # A tibble: 5,000 x 4
@@ -299,7 +336,7 @@ fs
 # }
 
 # can generate own set of draws and use them
-drws <- generate_draws(m1, n = 2, seed = 24)
+drws <- generate_draws(m1, n_draws = 2, seed = 24)
 fs2 <- fitted_samples(m1, method = "user", draws = drws)
 # \donttest{
 fs2

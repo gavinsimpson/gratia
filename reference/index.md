@@ -275,13 +275,19 @@ Draw individual smooths with
 or expected responses with
 [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md);
 [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md)
-generates new responses including model uncertainty, while
+generates new responses including coefficient uncertainty, while
 [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md)
-simulates responses conditional on the fitted model without model
-uncertainty. For coefficient draws, use
+simulates responses conditional on the fitted coefficients. Examine
+chains with
+[as_mcmc_draws()](https://gavinsimpson.github.io/gratia/reference/as_mcmc_draws.md)
+and
+[sampling_diagnostics()](https://gavinsimpson.github.io/gratia/reference/sampling_diagnostics.md).
+For coefficient draws, use
 [post_draws()](https://gavinsimpson.github.io/gratia/reference/post_draws.md)
-in the advanced helpers; see [Posterior
-Simulation](https://gavinsimpson.github.io/gratia/articles/posterior-simulation.md).
+in the advanced helpers. See [Posterior
+Simulation](https://gavinsimpson.github.io/gratia/articles/posterior-simulation.md)
+and the [sampling migration
+guide](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md).
 
 - [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md)
   : Draw samples from the posterior distribution of an estimated model
@@ -296,6 +302,13 @@ Simulation](https://gavinsimpson.github.io/gratia/articles/posterior-simulation.
   response
 - [`derivative_samples()`](https://gavinsimpson.github.io/gratia/reference/derivative_samples.md)
   : Posterior expectations of derivatives from an estimated model
+- [`as_mcmc_draws()`](https://gavinsimpson.github.io/gratia/reference/as_mcmc_draws.md)
+  : Convert posterior samples for MCMC diagnostics
+- [`sampling_diagnostics()`](https://gavinsimpson.github.io/gratia/reference/sampling_diagnostics.md)
+  [`print(`*`<sampling_diagnostics>`*`)`](https://gavinsimpson.github.io/gratia/reference/sampling_diagnostics.md)
+  : Extract coefficient-sampler diagnostics
+- [`draw(`*`<sampling_diagnostics>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.sampling_diagnostics.md)
+  : Plot coefficient-chain diagnostics
 - [`simulate(`*`<gamm4>`*`)`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
   [`simulate(`*`<gamlss>`*`)`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
   [`simulate(`*`<gam>`*`)`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
@@ -508,10 +521,9 @@ validation tools.
   : Low-level Functions to generate draws from the posterior
   distribution of model coefficients
 - [`gaussian_draws()`](https://gavinsimpson.github.io/gratia/reference/gaussian_draws.md)
-  : Posterior samples using a Gaussian approximation to the posterior
-  distribution
+  : Posterior samples using a Gaussian approximation
 - [`mh_draws()`](https://gavinsimpson.github.io/gratia/reference/mh_draws.md)
-  : Posterior samples using a simple Metropolis Hastings sampler
+  : Posterior samples using Metropolis Hastings
 - [`user_draws()`](https://gavinsimpson.github.io/gratia/reference/user_draws.md)
   : Handle user-supplied posterior draws
 

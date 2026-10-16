@@ -37,6 +37,7 @@
     <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
     <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -595,7 +596,7 @@
       </dl></div><div class="section level2">
       <h2 id="sample-from-fitted-models">Sample from fitted models<a class="anchor" aria-label="anchor" href="#sample-from-fitted-models"></a></h2>
 
-      <div class="section-desc"><p>Draw individual smooths with <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> or expected responses with <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code>; <code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> generates new responses including model uncertainty, while <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code> simulates responses conditional on the fitted model without model uncertainty. For coefficient draws, use <a href="post_draws.html">post_draws()</a> in the advanced helpers; see <a href="../articles/posterior-simulation.html">Posterior Simulation</a>.</p></div>
+      <div class="section-desc"><p>Draw individual smooths with <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> or expected responses with <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code>; <code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> generates new responses including coefficient uncertainty, while <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code> simulates responses conditional on the fitted coefficients. Examine chains with <a href="as_mcmc_draws.html">as_mcmc_draws()</a> and <a href="sampling_diagnostics.html">sampling_diagnostics()</a>. For coefficient draws, use <a href="post_draws.html">post_draws()</a> in the advanced helpers. See <a href="../articles/posterior-simulation.html">Posterior Simulation</a> and the <a href="../articles/sampling-migration.html">sampling migration guide</a>.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -643,6 +644,27 @@
 
         </dt>
         <dd>Posterior expectations of derivatives from an estimated model</dd>
+
+        <dt>
+
+          <code><a href="as_mcmc_draws.html">as_mcmc_draws()</a></code>
+
+        </dt>
+        <dd>Convert posterior samples for MCMC diagnostics</dd>
+
+        <dt>
+
+          <code><a href="sampling_diagnostics.html">sampling_diagnostics()</a></code> <code><a href="sampling_diagnostics.html">print(<i>&lt;sampling_diagnostics&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Extract coefficient-sampler diagnostics</dd>
+
+        <dt>
+
+          <code><a href="draw.sampling_diagnostics.html">draw(<i>&lt;sampling_diagnostics&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot coefficient-chain diagnostics</dd>
 
         <dt>
 
@@ -1142,14 +1164,14 @@
           <code><a href="gaussian_draws.html">gaussian_draws()</a></code>
 
         </dt>
-        <dd>Posterior samples using a Gaussian approximation to the posterior distribution</dd>
+        <dd>Posterior samples using a Gaussian approximation</dd>
 
         <dt>
 
           <code><a href="mh_draws.html">mh_draws()</a></code>
 
         </dt>
-        <dd>Posterior samples using a simple Metropolis Hastings sampler</dd>
+        <dd>Posterior samples using Metropolis Hastings</dd>
 
         <dt>
 

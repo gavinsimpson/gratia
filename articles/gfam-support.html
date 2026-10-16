@@ -59,6 +59,7 @@
     <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
     <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -198,7 +199,7 @@ link to every shared coefficient draw.</p>
 <span><span class="va">grid</span><span class="op">$</span><span class="va">source</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">grid</span><span class="op">$</span><span class="va">source</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">survey</span><span class="op">$</span><span class="va">source</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">grid</span><span class="op">$</span><span class="va">source</span><span class="op">)</span></span>
 <span><span class="va">means</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">joint</span>, data <span class="op">=</span> <span class="va">grid</span>, family_index <span class="op">=</span> <span class="va">index</span>,</span>
-<span>  n <span class="op">=</span> <span class="fl">200</span>, seed <span class="op">=</span> <span class="fl">242</span><span class="op">)</span></span>
+<span>  n_draws <span class="op">=</span> <span class="fl">200</span>, seed <span class="op">=</span> <span class="fl">242</span><span class="op">)</span></span>
 <span><span class="va">intervals</span> <span class="op">&lt;-</span> <span class="va">means</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">.row</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>estimate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">.fitted</span><span class="op">)</span>, lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">.fitted</span>, <span class="fl">0.025</span><span class="op">)</span>,</span>
