@@ -126,6 +126,8 @@
   arrows. Saved estimates retain constraint metadata for each tensor margin;
   ignored requests are labelled and produce a warning (#373).
   This includes named requests replaced by general `pc` inequalities.
+  Shape-enforced intervals keep the basis and constraint caption without
+  adding interval details; those remain in the documentation and metadata.
 
 * Gaussian simultaneous bands now support positive-semidefinite coefficient
   covariance matrices, including scasm fits with exact equality constraints.

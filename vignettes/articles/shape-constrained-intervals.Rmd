@@ -163,6 +163,10 @@ can change the asserted shape. Standard errors retained in the result describe
 the initial uncertainty calculation; transformed endpoints are not reconstructed
 from a standard error and a Gaussian critical value.
 
+Default plot captions show the basis and named shapes. The interval source,
+level and coverage information remain in the result's `interval_info`
+attribute and in this documentation.
+
 By default the Gaussian source uses the model's approximate Bayesian
 covariance. `frequentist = TRUE` instead requests the frequentist covariance.
 Neither choice constructs a posterior restricted to the feasible coefficient

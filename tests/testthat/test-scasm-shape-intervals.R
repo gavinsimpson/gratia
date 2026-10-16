@@ -65,6 +65,24 @@ test_that("simultaneous shape intervals retain reproducibility and source option
     "require frequentist = FALSE")
 })
 
+test_that("shape captions omit interval details and retain their metadata", {
+  object <- data.frame(.smooth = "s(x)", .type = "B spline", .by = NA_character_)
+  attr(object, "shape_constraints") <- list(list(label = "s(x)", tensor = FALSE,
+    margins = list(list(variables = "x", basis = "B spline", codes = "m+",
+      requested = TRUE, retained = TRUE))))
+  basis_caption <- prepare_smooth_labels(object, x_var = "x")$caption
+  for (source in c("gaussian", "bootstrap")) {
+    for (interval in c("confidence", "simultaneous")) {
+      info <- list(method = "shape", source = source, interval = interval,
+        level = 0.95, domain = "evaluation grid")
+      attr(object, "interval_info") <- info
+      expect_identical(prepare_smooth_labels(object, x_var = "x")$caption,
+        basis_caption)
+      expect_identical(attr(object, "interval_info"), info)
+    }
+  }
+})
+
 test_that("safe tensor shape intervals use the complete rectangular grid", {
   m <- scasm_shape_fixture(TRUE)
   a <- smooth_estimates(m, n_2d = 7, interval = "simultaneous",
@@ -80,7 +98,8 @@ test_that("safe tensor shape intervals use the complete rectangular grid", {
   expect_silent(p <- draw(m, n_2d = 6, interval = "simultaneous",
     interval_method = "shape", n_sim = 50, seed = 2, dist = 0, rug = FALSE))
   expect_s3_class(p, "ggplot")
-  expect_match(paste(deparse(p[[1]]$labels$caption), collapse = " "), "Shape-enforced")
+  expect_identical(p[[1]]$labels$caption,
+    scasm_shape_plot_caption(a, "Basis: Tensor product"))
   expect_error(smooth_estimates(m, data = m$model[1:20, ],
     interval = "simultaneous", interval_method = "shape", n_sim = 20),
     "complete Cartesian grid")
@@ -112,7 +131,8 @@ test_that("saved nested and subset shape intervals are drawn without reconstruct
   plots <- assemble(m, n = 15, interval = "simultaneous",
     interval_method = "shape", n_sim = 50, seed = 7, rug = FALSE)
   expect_length(plots, 1)
-  expect_match(paste(deparse(plots[[1]]$labels$caption), collapse = " "), "Shape-enforced")
+  expect_identical(plots[[1]]$labels$caption,
+    scasm_shape_plot_caption(a, "Basis: B spline"))
   replaced <- add_confint(a)
   expect_identical(attr(replaced, "interval_info")$method, "gaussian")
   expect_null(attr(replaced, "interval_info")$shape)
