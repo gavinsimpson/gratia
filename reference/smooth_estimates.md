@@ -40,13 +40,24 @@ smooth_estimates(
   shape_source = c("gaussian", "bootstrap"),
   ...
 )
+
+# S3 method for class 'gamlss'
+smooth_estimates(
+  object,
+  select = NULL,
+  smooth = deprecated(),
+  ...,
+  partial_match = FALSE
+)
 ```
 
 ## Arguments
 
 - object:
 
-  an object of class `"gam"` or `"gamm"`.
+  a fitted model, including objects of class `"gam"`, `"gamm"` or models
+  fitted by
+  [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html).
 
 - ...:
 
@@ -54,9 +65,10 @@ smooth_estimates(
 
 - select:
 
-  character; select which smooth's posterior to draw from. The default
-  (`NULL`) means the posteriors of all smooths in `model` will be
-  sampled from. If supplied, a character vector of requested terms.
+  character, numeric or logical; smooths to evaluate, using labels from
+  [`smooths()`](https://gavinsimpson.github.io/gratia/reference/smooths.md)
+  or indices in fitted smooth order. The default (`NULL`) evaluates all
+  smooths.
 
 - smooth:
 
@@ -203,6 +215,20 @@ smooth_estimates(
 A data frame (tibble), which is of class `"smooth_estimates"`.
 
 ## Details
+
+For [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) models,
+smooths are evaluated in equation and smooth order using the final
+fitted GJRM coefficients and covariance matrices. Selection uses the
+model-wide labels returned by
+[`smooths()`](https://gavinsimpson.github.io/gratia/reference/smooths.md),
+including suffixes such as `s.1(x)` for repeated labels. Equations
+without smooths are skipped; a model without any smooths gives an error.
+All grid, data, environment, coordinate transformation and interval
+controls are passed to the GAM method for each selected equation.
+`frequentist = TRUE` uses the final GJRM frequentist covariance. A
+smoothing-parameter uncertainty correction is unavailable:
+`unconditional = TRUE` warns and uses the uncorrected final covariance,
+as for GAMs without that correction.
 
 For distributional and glmmTMB models with multiple linear predictors,
 an optional `.model` column identifies the model part or parameter
@@ -375,6 +401,17 @@ smooth_estimates(m1, select = c("s(x0)", "s(x1)"))
 #>  9 s(x0)   TPRS  NA    -0.636220 0.202303 0.0871626     NA
 #> 10 s(x0)   TPRS  NA    -0.594641 0.194685 0.0971693     NA
 #> # i 190 more rows
+
+# Direct evaluation of a GJRM distributional model
+if (requireNamespace("GJRM", quietly = TRUE)) {
+  set.seed(82)
+  d <- data.frame(x = runif(100), z = runif(100))
+  d$y <- sin(6 * d$x) + rnorm(100, sd = exp(0.3 * d$z))
+  m <- GJRM::gamlss(list(y ~ s(x, k = 4), ~ s(z, k = 4)), data = d)
+  estimates <- smooth_estimates(m, n = 50)
+  draw(estimates)
+}
+
 
 # parallel processing of smooths
 if (requireNamespace("mirai") && requireNamespace("carrier")) {

@@ -38,5 +38,6 @@ smooths(object, ...)
 For GJRM GAMLSS models, labels follow equation and smooth order. Labels
 repeated in later equations receive suffixes such as `s.1(x)`. These
 labels can be supplied to
-[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) to
-select smooths across equations.
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) or
+[`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+to select smooths across equations.

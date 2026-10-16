@@ -105,6 +105,15 @@ been removed from the package.</p>
 <span>  interval_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"gaussian"</span>, <span class="st">"bootstrap"</span>, <span class="st">"shape"</span><span class="op">)</span>,</span>
 <span>  shape_source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"bootstrap"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'gamlss'</span></span>
+<span><span class="fu">smooth_estimates</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  select <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  smooth <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -113,7 +122,8 @@ been removed from the package.</p>
 
 
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
-<dd><p>an object of class <code>"gam"</code> or <code>"gamm"</code>.</p></dd>
+<dd><p>a fitted model, including objects of class <code>"gam"</code>, <code>"gamm"</code>
+or models fitted by <code><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">GJRM::gamlss()</a></code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -121,9 +131,9 @@ been removed from the package.</p>
 
 
 <dt id="arg-select">select<a class="anchor" aria-label="anchor" href="#arg-select"></a></dt>
-<dd><p>character; select which smooth's posterior to draw from.
-The default (<code>NULL</code>) means the posteriors of all smooths in <code>model</code>
-will be sampled from. If supplied, a character vector of requested terms.</p></dd>
+<dd><p>character, numeric or logical; smooths to evaluate, using labels
+from <code><a href="smooths.html">smooths()</a></code> or indices in fitted smooth order. The default (<code>NULL</code>)
+evaluates all smooths.</p></dd>
 
 
 <dt id="arg-smooth">smooth<a class="anchor" aria-label="anchor" href="#arg-smooth"></a></dt>
@@ -267,7 +277,17 @@ limits. Bootstrap sources require <code>frequentist = FALSE</code> and
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>For distributional and glmmTMB models with multiple linear predictors,
+    <p>For <code><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">GJRM::gamlss()</a></code> models, smooths are evaluated in equation and smooth
+order using the final fitted GJRM coefficients and covariance matrices.
+Selection uses the model-wide labels returned by <code><a href="smooths.html">smooths()</a></code>, including
+suffixes such as <code>s.1(x)</code> for repeated labels. Equations without smooths
+are skipped; a model without any smooths gives an error. All grid, data,
+environment, coordinate transformation and interval controls are passed to
+the GAM method for each selected equation. <code>frequentist = TRUE</code> uses the
+final GJRM frequentist covariance. A smoothing-parameter uncertainty
+correction is unavailable: <code>unconditional = TRUE</code> warns and uses the
+uncorrected final covariance, as for GAMs without that correction.</p>
+<p>For distributional and glmmTMB models with multiple linear predictors,
 an optional <code>.model</code> column identifies the model part or parameter
 associated with each smooth. This display metadata is retained in nested
 output and subsets, allowing <code><a href="draw.html">draw()</a></code> to reproduce model subtitles from saved
@@ -412,6 +432,17 @@ rather than dropping the boundary.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> s(x0)   TPRS  <span style="color: #BB0000;">NA</span>    -<span style="color: #BB0000;">0.636</span><span style="color: #BB0000; text-decoration: underline;">220</span> 0.202<span style="text-decoration: underline;">303</span> 0.087<span style="text-decoration: underline;">162</span>6     <span style="color: #BB0000;">NA</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> s(x0)   TPRS  <span style="color: #BB0000;">NA</span>    -<span style="color: #BB0000;">0.594</span><span style="color: #BB0000; text-decoration: underline;">641</span> 0.194<span style="text-decoration: underline;">685</span> 0.097<span style="text-decoration: underline;">169</span>3     <span style="color: #BB0000;">NA</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 190 more rows</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Direct evaluation of a GJRM distributional model</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"GJRM"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">82</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>, z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">d</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fl">6</span> <span class="op">*</span> <span class="va">d</span><span class="op">$</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">0.3</span> <span class="op">*</span> <span class="va">d</span><span class="op">$</span><span class="va">z</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">GJRM</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">gamlss</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">z</span>, k <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">estimates</span> <span class="op">&lt;-</span> <span class="fu">smooth_estimates</span><span class="op">(</span><span class="va">m</span>, n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">estimates</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-plt img"><img src="smooth_estimates-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># parallel processing of smooths</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"mirai"</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"carrier"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
