@@ -107,7 +107,7 @@
   w <- weights(used, type = "working")
   w_resid <- as.numeric(residuals(used, "working")) * sqrt(w)
   # Evaluate terms on the same retained observations as the residuals.
-  p_terms <- predict(used, type = "terms", terms = terms,
+  p_terms <- predict_model(used, type = "terms", terms = terms,
                      newdata = used$model)
   attr(p_terms, "constant") <- NULL
   p_resids <- p_terms + w_resid

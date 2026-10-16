@@ -2,6 +2,7 @@
 % Please edit documentation in R/draw-gam.R, R/scasm-methods.R
 \name{draw.gam}
 \alias{draw.gam}
+\alias{draw.scam}
 \alias{draw.scasm}
 \title{Plot smooth and parametric terms from a fitted GAM}
 \usage{
@@ -68,6 +69,8 @@
   shape_source = c("gaussian", "bootstrap"),
   ...
 )
+
+\method{draw}{scam}(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
 
 \method{draw}{scasm}(
   object,
@@ -366,6 +369,12 @@ limits. Bootstrap sources require \code{frequentist = FALSE} and
 \code{unconditional = FALSE} because the stored draws hold smoothing fixed.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
+
+\item{centre}{character; for SCAM models, \code{"model"} retains each fitted
+smooth contribution. \code{"plot"} subtracts the evaluation-grid mean from
+each bivariate smooth to match \code{\link[scam:plot.scam]{scam::plot.scam()}}. The same linear
+transformation is applied to its covariance. Univariate curves and
+\code{\link[=smooth_estimates]{smooth_estimates()}} retain the fitted centring for either setting.}
 }
 \value{
 The object returned is created by \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.

@@ -507,9 +507,17 @@ draw_gam_impl <- function(
 }
 
 #' @export
-`draw.scam` <- function(object, ..., overall_uncertainty = FALSE) {
-  class(object) <- append(class(object), "gam", after = 1)
-  draw.gam(object, overall_uncertainty = overall_uncertainty, ...)
+#' @rdname draw.gam
+#' @param centre character; for SCAM models, `"model"` retains each fitted
+#'   smooth contribution. `"plot"` subtracts the evaluation-grid mean from
+#'   each bivariate smooth to match [scam::plot.scam()]. The same linear
+#'   transformation is applied to its covariance. Univariate curves and
+#'   [smooth_estimates()] retain the fitted centring for either setting.
+`draw.scam` <- function(object, ..., overall_uncertainty = FALSE,
+  centre = c("model", "plot")) {
+  object <- scam_gam_adapter(object)
+  draw.gam(object, overall_uncertainty = overall_uncertainty,
+    centre = match.arg(centre), ...)
 }
 
 # TODO: Remove after dplyr 1.1.0 is released and use `multiple = "all"` instead

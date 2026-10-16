@@ -241,18 +241,6 @@
   # which coefs belong to this smooth
   take <- smooth_coef_indices(smooths[[i]])
   betas <- coef(model)[take]
-  # handle scam models - p.ident is a logical vector with length == NCOL(Xp)
-  # where Xp is the Lp matrix of the entire model!
-  p_ident <- model$p.ident
-  if (!is.null(p_ident)) { # must be a scam model
-    # need the 1st element of p_ident == FALSE, & represents the intercept.
-    # In scam, intercept gets returned by the Predict.matrix.<basis>.smooth
-    # functions (from PredictMat() used in tidy_basis()), and we need to
-    # know this to drop it later
-    # p_ident <- p_ident[c(1L, take)]
-    p_ident <- p_ident[c(take)]
-  }
-
   if (is.null(data)) {
     data <- smooth_data(
       model, ids[i],
@@ -260,10 +248,11 @@
     )
   }
 
+  data <- prepare_smooth_data(model, smooths[[i]], data)
+  attr(data, "gratia.evaluated") <- TRUE
   tbl <- gratia::tidy_basis(
     smooths[[i]],
-    at = data, coefs = betas, envir = model_envir(model),
-    p_ident = p_ident
+    at = data, coefs = betas, envir = model_envir(model)
   )
 
   ## return
@@ -368,7 +357,8 @@
 #'   the basis should be evaluated.
 #' @param coefs numeric; an optional vector of coefficients for the smooth
 #' @inheritParams smooth_estimates
-#' @param p_ident logical vector; only used for handling [scam::scam()] smooths.
+#' @param p_ident retained for compatibility. Fitted SCAM smooths use their
+#'   stored coefficient constraints to match basis columns to coefficients.
 #'
 #' @return A tibble.
 #' @author Gavin L. Simpson
@@ -429,13 +419,11 @@
     at <- evaluate_terms(at, terms_in_smooth(smooth), model = NULL,
       envir = envir, evaluated = isTRUE(attr(at, "gratia.evaluated")))
     tbl <- predict_mat_rows(smooth, data = at)
+    if (is_scam_smooth(smooth)) {
+      tbl <- scam_smooth_matrix(smooth, tbl)
+    }
     data <- at
     if (!is.null(coefs)) {
-      # nc <- NCOL(tbl)
-      if (!is.null(p_ident) && any(p_ident)) {
-        stopifnot(identical(sum(p_ident), length(coefs)))
-        tbl <- tbl[, p_ident]
-      }
       stopifnot(identical(NCOL(tbl), length(coefs)))
       # weight the basis functions at supplied coefficients
       tbl <- sweep(tbl, MARGIN = 2, STATS = coefs, FUN = "*")

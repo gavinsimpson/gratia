@@ -583,3 +583,13 @@
   cli_par()
   cli_end()
 }
+
+#' @export
+#' @rdname assemble.gam
+#' @inheritParams draw.gam
+`assemble.scam` <- function(object, ..., overall_uncertainty = FALSE,
+  centre = c("model", "plot")) {
+  object <- scam_gam_adapter(object)
+  attr(object, "gratia.scam.centre") <- match.arg(centre)
+  assemble.gam(object, overall_uncertainty = overall_uncertainty, ...)
+}

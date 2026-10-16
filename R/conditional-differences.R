@@ -160,7 +160,7 @@ conditional_differences.gam <- function(model, by, condition = NULL, data = NULL
   supported <- c("gaussian", "poisson", "binomial", "gamma",
     "inverse_gaussian", "quasi", "quasipoisson", "quasibinomial",
     "negative_binomial", "tweedie", "beta_regression", "scaled_t")
-  if (inherits(model, "scam") || inherits(fam, "general.family") ||
+  if (inherits(fam, "general.family") ||
       !family_type(model) %in% supported) {
     cli::cli_abort("Conditional differences are not supported for this model family or class.")
   }

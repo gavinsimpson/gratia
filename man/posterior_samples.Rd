@@ -223,7 +223,7 @@ responses do not prevent prediction, and missing required predictors give
 \code{NA} draws. An explicit prediction \code{na.action} in \code{...} is honoured without
 renumbering retained rows. Restoration does not consume random numbers.
 
-For Gaussian identity-link \code{bam} fits, first-order autoregressive (AR1) errors
+For Gaussian identity-link \code{bam} and \code{scam} fits, first-order autoregressive (AR1) errors
 make consecutive responses correlated. Responses are drawn together to retain
 this fitted correlation, restarting at each \code{AR.start} segment. These draws
 currently use the fitting observations only. For other families or links,

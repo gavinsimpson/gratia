@@ -26,7 +26,8 @@ the basis should be evaluated.}
 
 \item{coefs}{numeric; an optional vector of coefficients for the smooth}
 
-\item{p_ident}{logical vector; only used for handling \code{\link[scam:scam]{scam::scam()}} smooths.}
+\item{p_ident}{retained for compatibility. Fitted SCAM smooths use their
+stored coefficient constraints to match basis columns to coefficients.}
 
 \item{envir}{an optional environment supplying functions and constants used
 in model expressions. The available model formula environment is used when

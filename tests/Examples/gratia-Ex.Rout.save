@@ -164,7 +164,7 @@ detaching ‘package:mgcv’
 > ### Name: add_partial_residuals
 > ### Title: Add partial residuals
 > ### Aliases: add_partial_residuals add_partial_residuals.gam
-> ###   add_partial_residuals.gamm4
+> ###   add_partial_residuals.gamm4 add_partial_residuals.scam
 > 
 > ### ** Examples
 > 
@@ -305,7 +305,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: ale
 > ### Title: Accumulated local effects of a model covariate
-> ### Aliases: ale ale.default ale.gam ale.bam
+> ### Aliases: ale ale.default ale.gam ale.bam ale.scam
 > 
 > ### ** Examples
 > 
@@ -371,7 +371,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 > 
 > ### Name: assemble.gam
 > ### Title: Plot smooth and parametric terms from a fitted GAM
-> ### Aliases: assemble.gam
+> ### Aliases: assemble.gam assemble.scam
 > 
 > ### ** Examples
 > 
@@ -441,7 +441,7 @@ detaching ‘package:mgcv’
 > ### Name: basis_size
 > ### Title: Extract basis dimension of a smooth
 > ### Aliases: basis_size basis_size.mgcv.smooth basis_size.gam
-> ###   basis_size.gamm basis_size.gamm4
+> ###   basis_size.gamm basis_size.gamm4 basis_size.scam
 > 
 > ### ** Examples
 > 
@@ -519,7 +519,7 @@ detaching ‘package:mgcv’
 > ### Name: conditional_differences
 > ### Title: Conditional differences of fitted values from a GAM
 > ### Aliases: conditional_differences conditional_differences.gam
-> ###   conditional_differences.gamm4
+> ###   conditional_differences.gamm4 conditional_differences.scam
 > 
 > ### ** Examples
 > 
@@ -608,7 +608,7 @@ detaching ‘package:mgcv’
 > ### Name: conditional_values
 > ### Title: Conditional predictions from a GAM
 > ### Aliases: conditional_values conditional_values.gam
-> ###   conditional_values.gamm4
+> ###   conditional_values.gamm4 conditional_values.scam
 > 
 > ### ** Examples
 > 
@@ -762,7 +762,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: confint.gam
 > ### Title: Point-wise and simultaneous confidence intervals for smooths
-> ### Aliases: confint.gam confint.gamm confint.gamm4
+> ### Aliases: confint.gam confint.gamm confint.gamm4 confint.scam
 > 
 > ### ** Examples
 > 
@@ -1031,7 +1031,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 > ### Name: derivatives
 > ### Title: Derivatives of estimated smooths via finite differences
 > ### Aliases: derivatives derivatives.default derivatives.gamm
-> ###   derivatives.gam derivatives.gamm4
+> ###   derivatives.gam derivatives.gamm4 derivatives.scam
 > 
 > ### ** Examples
 > 
@@ -1131,6 +1131,7 @@ detaching ‘package:mgcv’
 > ### Name: difference_smooths
 > ### Title: Differences of factor smooth interactions
 > ### Aliases: difference_smooths difference_smooths.gam
+> ###   difference_smooths.scam
 > 
 > ### ** Examples
 > 
@@ -1320,7 +1321,7 @@ detaching ‘package:mgcv’
 >
 > ### Name: draw.gam
 > ### Title: Plot smooth and parametric terms from a fitted GAM
-> ### Aliases: draw.gam draw.scasm
+> ### Aliases: draw.gam draw.scam draw.scasm
 >
 > ### ** Examples
 >
@@ -1624,7 +1625,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: edf
 > ### Title: Effective degrees of freedom for smooths and GAMs
-> ### Aliases: edf edf.gam model_edf edf.gamm4
+> ### Aliases: edf edf.gam model_edf edf.gamm4 edf.scam
 > 
 > ### ** Examples
 > 
@@ -1943,7 +1944,7 @@ detaching ‘package:mgcv’
 > ### Title: Extract fixed effects estimates from a fitted model
 > ### Aliases: fixed_effects fixed_effects.gam fixed_effects.gamm
 > ###   fixed_effects.gamm4 fixed_effects.lm fixed_effects.glm
-> ###   fixed_effects.default
+> ###   fixed_effects.default fixed_effects.scam
 > 
 > ### ** Examples
 > 
@@ -2222,7 +2223,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: log_lik
 > ### Title: Posterior draws of pointwise log likelihoods
-> ### Aliases: log_lik log_lik.gam log_lik.bam
+> ### Aliases: log_lik log_lik.gam log_lik.bam log_lik.scam
 > 
 > ### ** Examples
 > 
@@ -2263,7 +2264,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### Name: loo.gam
 > ### Title: Leave-one-out validation and WAIC for GAMs
-> ### Aliases: loo.gam loo.bam waic.gam waic.bam
+> ### Aliases: loo.gam loo.bam waic.gam waic.bam loo.scam waic.scam
 > 
 > ### ** Examples
 > 
@@ -2301,7 +2302,8 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### Name: lp_matrix
 > ### Title: Return the linear prediction matrix of a fitted GAM
-> ### Aliases: lp_matrix lp_matrix.gamm4 lp_matrix.gam
+> ### Aliases: lp_matrix lp_matrix.gamm4 lp_matrix.gam lp_matrix.scam
+> ###   model.matrix.scam
 > 
 > ### ** Examples
 > 
@@ -2365,7 +2367,7 @@ detaching ‘package:mgcv’
 > ### Name: model_concurvity
 > ### Title: Concurvity of an estimated GAM
 > ### Aliases: model_concurvity model_concurvity.gam concrvity
-> ###   model_concurvity.gamm4
+> ###   model_concurvity.gamm4 model_concurvity.scam
 > 
 > ### ** Examples
 > 
@@ -2405,7 +2407,7 @@ detaching ‘package:mgcv’, ‘package:tibble’
 > ### Name: model_constant
 > ### Title: Extract the model constant term
 > ### Aliases: model_constant model_constant.gamm4 model_constant.gam
-> ###   model_constant.gamlss model_constant.glm
+> ###   model_constant.gamlss model_constant.glm model_constant.scam
 > 
 > ### ** Examples
 > 
@@ -2448,7 +2450,7 @@ detaching ‘package:mgcv’
 > ### Name: model_terms
 > ### Title: Find the names of model terms
 > ### Aliases: model_terms model_terms.gam model_terms.gamm model_terms.gamm4
-> ###   model_terms.lm
+> ###   model_terms.lm model_terms.scam
 > 
 > ### ** Examples
 > 
@@ -2480,7 +2482,7 @@ detaching ‘package:mgcv’
 > ### Name: model_vars
 > ### Title: List the variables involved in a model fitted with a formula
 > ### Aliases: model_vars model_vars.gam model_vars.default model_vars.bam
-> ###   model_vars.gamm model_vars.gamm4
+> ###   model_vars.gamm model_vars.gamm4 model_vars.scam
 > 
 > ### ** Examples
 > 
@@ -2539,7 +2541,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: overview
 > ### Title: Provides an overview of a model and the terms in that model
-> ### Aliases: overview overview.gamm4 overview.gam
+> ### Aliases: overview overview.gamm4 overview.gam overview.scam
 > 
 > ### ** Examples
 > 
@@ -2581,7 +2583,7 @@ detaching ‘package:mgcv’
 > ### Name: parametric_effects
 > ### Title: Estimated values for parametric model terms
 > ### Aliases: parametric_effects parametric_effects.gamm4
-> ###   parametric_effects.gam
+> ###   parametric_effects.gam parametric_effects.scam
 > 
 > ### ** Examples
 > 
@@ -2635,7 +2637,7 @@ detaching ‘package:mgcv’
 > ###   differences
 > ### Aliases: partial_derivatives partial_derivatives.default
 > ###   partial_derivatives.gamm partial_derivatives.gam
-> ###   partial_derivatives.gamm4
+> ###   partial_derivatives.gamm4 partial_derivatives.scam
 > 
 > ### ** Examples
 > 
@@ -2703,7 +2705,7 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
 > 
 > ### Name: partial_residuals
 > ### Title: Partial residuals
-> ### Aliases: partial_residuals partial_residuals.gam
+> ### Aliases: partial_residuals partial_residuals.gam partial_residuals.scam
 > 
 > ### ** Examples
 > 
@@ -2787,7 +2789,7 @@ detaching ‘package:mgcv’
 > ### Title: Extract and tidy penalty matrices
 > ### Aliases: penalty penalty.gamm4 penalty.default penalty.gam
 > ###   penalty.mgcv.smooth penalty.tensor.smooth penalty.t2.smooth
-> ###   penalty.re.smooth.spec
+> ###   penalty.re.smooth.spec penalty.scam
 > 
 > ### ** Examples
 > 
@@ -2880,7 +2882,7 @@ detaching ‘package:mgcv’
 > ### Name: pp_check
 > ### Title: Posterior checks with bayesplot
 > ### Aliases: pp_check pp_check.gam pp_check.bam pp_check.gamm
-> ###   pp_check.gamm4
+> ###   pp_check.gamm4 pp_check.scam
 > 
 > ### ** Examples
 > 
@@ -3203,7 +3205,7 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
 > 
 > ### Name: rootogram
 > ### Title: Rootograms to assess goodness of model fit
-> ### Aliases: rootogram rootogram.gamm4 rootogram.gam
+> ### Aliases: rootogram rootogram.gamm4 rootogram.gam rootogram.scam
 > 
 > ### ** Examples
 > 

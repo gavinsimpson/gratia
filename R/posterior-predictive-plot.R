@@ -66,8 +66,9 @@
 #' to generate the complete response. These plots do not require an analytic
 #' residual distribution, so native simulated families such as Student-t and
 #' beta-binomial are available.
-#' SCAM models currently require `scalable = FALSE`; explicit or automatic
-#' scalable selection gives an error explaining this restriction.
+#' SCAM models support ordinary and scalable predictive checks using transformed
+#' coefficient draws. Gaussian identity-link AR1 fits retain the fitted response
+#' correlation and the series boundaries stored in `AR.start`.
 #' Gaussian `gamm` and `gamm4` models draw fixed and random effects together,
 #' keeping covariance parameters at fitted values; marginal checks draw new
 #' effects.

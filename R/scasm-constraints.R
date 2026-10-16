@@ -12,8 +12,8 @@ smooth_shape_constraints <- function(model, smooths = model$smooth,
     ncol(A) == length(stats::coef(model)) && all(is.finite(A))
   info <- lapply(seq_along(smooths), function(i) {
     sm <- smooths[[i]]
-    tensor <- length(sm$margin) > 0L
-    margins <- if (tensor) sm$margin else list(sm)
+    tensor <- length(sm[["margin"]]) > 0L
+    margins <- if (tensor) sm[["margin"]] else list(sm)
     indices <- seq.int(sm$first.para, sm$last.para)
     retained <- fitted_constraints && nrow(A) > 0L &&
       any(A[, indices, drop = FALSE] != 0) &&

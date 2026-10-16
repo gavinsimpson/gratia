@@ -2,6 +2,7 @@
 % Please edit documentation in R/assemble.R
 \name{assemble.gam}
 \alias{assemble.gam}
+\alias{assemble.scam}
 \title{Plot smooth and parametric terms from a fitted GAM}
 \usage{
 \method{assemble}{gam}(
@@ -67,6 +68,8 @@
   shape_source = c("gaussian", "bootstrap"),
   ...
 )
+
+\method{assemble}{scam}(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
 }
 \arguments{
 \item{object}{a fitted GAM, the result of a call to \code{\link[mgcv:gam]{mgcv::gam()}}.}
@@ -359,6 +362,12 @@ limits. Bootstrap sources require \code{frequentist = FALSE} and
 
 \item{...}{Additional smooth plotting arguments, including \code{title},
 \code{subtitle}, \code{xlab} and \code{ylab}.}
+
+\item{centre}{character; for SCAM models, \code{"model"} retains each fitted
+smooth contribution. \code{"plot"} subtracts the evaluation-grid mean from
+each bivariate smooth to match \code{\link[scam:plot.scam]{scam::plot.scam()}}. The same linear
+transformation is applied to its covariance. Univariate curves and
+\code{\link[=smooth_estimates]{smooth_estimates()}} retain the fitted centring for either setting.}
 }
 \value{
 A list of \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} objects.

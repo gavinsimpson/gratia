@@ -167,7 +167,6 @@ separate coverage sets when grouped in one plot. This finite-grid band does
 not claim joint coverage across selected smooths or the full fitted model.
 Increasing grid resolution improves the approximation to whole-curve coverage.
 \code{overall_uncertainty} and covariance options apply to both interval types.
-Simultaneous intervals for SCAM models are unsupported.
 SCAM smooth estimates retain the fitted centring and coefficient
 transformation when evaluation points are changed. Pointwise intervals use
 the covariance of the constrained coefficients. With

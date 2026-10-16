@@ -3,7 +3,7 @@
 #' Evaluate each fitting observation at draws from the coefficient posterior.
 #' This leaves the scalar [stats::logLik()] method supplied by mgcv unchanged.
 #'
-#' @param model A fitted independent-response `gam` or `bam` model.
+#' @param model A fitted independent-response `gam`, `bam`, or `scam` model.
 #' @param n_draws Positive integer; total coefficient draws across chains.
 #'   Defaults to 4000 when generating draws. Supplied draws determine their own
 #'   count; an explicit count must agree.
@@ -39,6 +39,11 @@
 #' not jointly sampled. Ordinary PSIS-LOO uses these draws without correcting
 #' their Gaussian approximation. Pareto diagnostics assess reweighting, not the
 #' accuracy of the Gaussian approximation. See [loo.gam] for optional loo methods.
+#'
+#' Independent-response SCAM fits are supported using the coefficient
+#' approximation selected by [post_draws()]. The prediction matrix multiplies
+#' transformed coefficients. Smoothing parameters and response scale remain at
+#' their fitted values; smoothing-parameter uncertainty is unavailable.
 #'
 #' @return A numeric matrix with draws in rows and retained fitting observations
 #'   in columns. Attribute `observation` gives their original fitting-row indices
@@ -91,12 +96,12 @@ log_lik.bam <- log_lik.gam
 
 posterior_likelihood_prepare <- function(model, n = NULL, seed = NULL,
                                          sampling_args = list()) {
-  if (!inherits(model, "gam") || inherits(model, c("scam", "gamm", "gamm4")) ||
+  if (!inherits(model, "gam") || inherits(model, c("gamm", "gamm4")) ||
       isTRUE(attr(model, "gratia.gamm4"))) {
-    stop("Pointwise likelihoods require an independent gam or bam fit.", call. = FALSE)
+    stop("Pointwise likelihoods require an independent gam, bam or scam fit.", call. = FALSE)
   }
   if (!is.null(model$AR1.rho) && model$AR1.rho != 0) stop(
-    "Pointwise likelihoods do not support residual-correlated BAM fits.", call. = FALSE)
+    "Pointwise likelihoods do not support residual-correlated fits.", call. = FALSE)
   sampling_args <- posterior_adapter_sampling_args(sampling_args, likelihood = TRUE)
   method <- sampling_args$method
   layout <- sampling_resolve(n %||% if (method != "user") 4000L,
@@ -128,7 +133,9 @@ posterior_likelihood_prepare <- function(model, n = NULL, seed = NULL,
   ids <- attr(betas, "sampling")$draw_ids %||% sampling_layout(nrow(betas), 1L)
   metadata <- list(method = method, n_draws = nrow(betas),
     chains = length(unique(ids$.chain)),
-    approximation = if (method == "gaussian") "Gaussian coefficient posterior approximation" else
+    approximation = if (method == "gaussian" && inherits(used, "scam"))
+      "Gaussian approximation in unrestricted fitting coordinates, followed by the fitted positivity transformation" else
+      if (method == "gaussian") "Gaussian coefficient posterior approximation" else
       if (method == "mh") "Metropolis-Hastings coefficient posterior" else "User-supplied coefficient draws",
     fixed_parameters = "Smoothing parameters and family parameters outside the coefficient vector remain at fitted values.",
     unconditional = isTRUE(sampling_args$unconditional),

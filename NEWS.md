@@ -114,6 +114,20 @@
   `gratia_theme_update()` manage the optional `gratia.plot.theme` override.
   `gratia_palette()` provides optional Paul Tol palettes. Current default
   appearances are retained (#215).
+* All 41 smooth constructors in scam 1.2-22 are supported for smooth estimates,
+  bases, sampling and plots, including bivariate smooths, cyclic margins,
+  interactions and explicit `By` classes. `draw()` and `assemble()` accept
+  `centre = "plot"` to match scam's centring of bivariate displays; the default
+  retains the fitted function. SCAM `smooth_type()` labels use compact
+  descriptions such as `P spline (inc)` and `Tensor (inc, free)`.
+  Saved estimates with earlier type labels remain drawable.
+
+* SCAM models gain conditional simultaneous smooth bands, derivatives,
+  contrasts, conditional predictions, parametric effects, residual helpers,
+  model summaries, concurvity, penalties and variance-component ratios.
+  Independent-response likelihoods, LOO/WAIC, supplied coefficient draws and
+  scalable posterior predictive plots are also supported. See the SCAM
+  support article for supported combinations and uncertainty calculations.
 
 * `shape_intervals()` applies monotone rearrangement and convex or concave
   envelopes to existing interval endpoints on a finite grid. Supported scasm
@@ -568,10 +582,16 @@
   covariance with the smooth; `FALSE` includes smooth uncertainty alone.
   `unconditional = TRUE` now gives an explicit error because SCAM calculations
   do not support smoothing-parameter uncertainty.
+  Smooth and full-model predictions now share coefficient mappings, including
+  endpoint and local constraints. Formula transformations, offsets and missing
+  training rows retain their fitted meaning. The `mifo` smooth is rendered.
 
-* Scalable posterior predictive plots for SCAM models now give an explicit
-  error explaining that `scalable = FALSE` is required. Ordinary posterior
-  predictive plots remain available.
+* SCAM coefficient draws now sample unrestricted fitting parameters and apply
+  the fitted positivity transformation, preserving the smooth constraints.
+  Singular positive semidefinite covariance matrices are supported; invalid
+  covariance matrices and non-finite transformed draws give explicit errors.
+  Gaussian AR1 response simulation now uses fitted correlation and series
+  boundaries instead of drawing independent responses.
 
 * Partial derivatives, fitted samples and smooth samples of soap-film smooths
   include the contribution from known boundary values. Complete-predictor

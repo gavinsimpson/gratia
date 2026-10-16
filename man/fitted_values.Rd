@@ -157,8 +157,10 @@ rows. Their limits are computed on the link scale and transformed if
 covariance may be positive semidefinite. Supported families are Gaussian,
 Poisson, binomial, Gamma, inverse Gaussian, quasi families, negative binomial,
 Tweedie, beta regression, and scaled t, fitted by \code{gam()} or \code{bam()} (including
-the \code{gam} component of a \code{gamm()} fit). Other families and \code{scam} models
-currently support pointwise intervals only.
+the \code{gam} component of a \code{gamm()} fit), and by \code{scam()}. For SCAM models,
+the Gaussian approximation uses transformed coefficients conditional on
+the fitted smoothing parameters. Other families support pointwise intervals
+only.
 
 Response-scale simultaneous intervals support the identity, log, logit,
 probit, cloglog, cauchit, square-root, inverse, and inverse-squared links.

@@ -33,7 +33,38 @@
 \alias{smooth_type.mdcv.smooth}
 \alias{smooth_type.miso.smooth}
 \alias{smooth_type.mifo.smooth}
-\title{Determine the type of smooth and return it n a human readable form}
+\alias{smooth_type.po.smooth}
+\alias{smooth_type.ipo.smooth}
+\alias{smooth_type.dpo.smooth}
+\alias{smooth_type.cpopspline.smooth}
+\alias{smooth_type.lmpi.smooth}
+\alias{smooth_type.lipl.smooth}
+\alias{smooth_type.tedmi.smooth}
+\alias{smooth_type.tedmd.smooth}
+\alias{smooth_type.temicx.smooth}
+\alias{smooth_type.temicv.smooth}
+\alias{smooth_type.tedecx.smooth}
+\alias{smooth_type.tedecv.smooth}
+\alias{smooth_type.tecxcx.smooth}
+\alias{smooth_type.tecvcv.smooth}
+\alias{smooth_type.tecxcv.smooth}
+\alias{smooth_type.tesmi1.smooth}
+\alias{smooth_type.tesmi2.smooth}
+\alias{smooth_type.tesmd1.smooth}
+\alias{smooth_type.tesmd2.smooth}
+\alias{smooth_type.tescx.smooth}
+\alias{smooth_type.tescv.smooth}
+\alias{smooth_type.tismi.smooth}
+\alias{smooth_type.tismd.smooth}
+\alias{smooth_type.mpiBy.smooth}
+\alias{smooth_type.mpdBy.smooth}
+\alias{smooth_type.cxBy.smooth}
+\alias{smooth_type.cvBy.smooth}
+\alias{smooth_type.micxBy.smooth}
+\alias{smooth_type.micvBy.smooth}
+\alias{smooth_type.mdcxBy.smooth}
+\alias{smooth_type.mdcvBy.smooth}
+\title{Determine the type of smooth and return it in a human readable form}
 \usage{
 smooth_type(smooth)
 
@@ -98,14 +129,81 @@ smooth_type(smooth)
 \method{smooth_type}{miso.smooth}(smooth)
 
 \method{smooth_type}{mifo.smooth}(smooth)
+
+\method{smooth_type}{po.smooth}(smooth)
+
+\method{smooth_type}{ipo.smooth}(smooth)
+
+\method{smooth_type}{dpo.smooth}(smooth)
+
+\method{smooth_type}{cpopspline.smooth}(smooth)
+
+\method{smooth_type}{lmpi.smooth}(smooth)
+
+\method{smooth_type}{lipl.smooth}(smooth)
+
+\method{smooth_type}{tedmi.smooth}(smooth)
+
+\method{smooth_type}{tedmd.smooth}(smooth)
+
+\method{smooth_type}{temicx.smooth}(smooth)
+
+\method{smooth_type}{temicv.smooth}(smooth)
+
+\method{smooth_type}{tedecx.smooth}(smooth)
+
+\method{smooth_type}{tedecv.smooth}(smooth)
+
+\method{smooth_type}{tecxcx.smooth}(smooth)
+
+\method{smooth_type}{tecvcv.smooth}(smooth)
+
+\method{smooth_type}{tecxcv.smooth}(smooth)
+
+\method{smooth_type}{tesmi1.smooth}(smooth)
+
+\method{smooth_type}{tesmi2.smooth}(smooth)
+
+\method{smooth_type}{tesmd1.smooth}(smooth)
+
+\method{smooth_type}{tesmd2.smooth}(smooth)
+
+\method{smooth_type}{tescx.smooth}(smooth)
+
+\method{smooth_type}{tescv.smooth}(smooth)
+
+\method{smooth_type}{tismi.smooth}(smooth)
+
+\method{smooth_type}{tismd.smooth}(smooth)
+
+\method{smooth_type}{mpiBy.smooth}(smooth)
+
+\method{smooth_type}{mpdBy.smooth}(smooth)
+
+\method{smooth_type}{cxBy.smooth}(smooth)
+
+\method{smooth_type}{cvBy.smooth}(smooth)
+
+\method{smooth_type}{micxBy.smooth}(smooth)
+
+\method{smooth_type}{micvBy.smooth}(smooth)
+
+\method{smooth_type}{mdcxBy.smooth}(smooth)
+
+\method{smooth_type}{mdcvBy.smooth}(smooth)
 }
 \arguments{
 \item{smooth}{an object inheriting from class \code{mgcv.smooth}.}
 }
 \description{
-Determine the type of smooth and return it n a human readable form
-}
-\details{
 Soap-film boundary and wiggly components use the \code{sf.film} and \code{sf.wiggly}
 classes introduced in mgcv 1.9-4.
+}
+\details{
+SCAM smooth types use compact constraint descriptions: \code{inc} for
+increasing, \code{dec} for decreasing, and \code{pos} for positive. For tensor
+smooths, the two descriptions follow the covariate order in the smooth
+specification; \code{free} denotes an unconstrained direction. \verb{Tensor int.}
+identifies an interaction. Explicit \code{By} bases share the type label of
+the corresponding ordinary basis.
 }

@@ -152,9 +152,6 @@ ale.gam <- function(
   envir = NULL,
   ...
 ) {
-  if (inherits(object, "scam")) {
-    ale.default(object)
-  }
   scale <- match.arg(scale)
   if (scale == "linear_predictor") {
     scale <- "link"

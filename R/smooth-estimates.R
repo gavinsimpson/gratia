@@ -102,7 +102,6 @@
 #' not claim joint coverage across selected smooths or the full fitted model.
 #' Increasing grid resolution improves the approximation to whole-curve coverage.
 #' `overall_uncertainty` and covariance options apply to both interval types.
-#' Simultaneous intervals for SCAM models are unsupported.
 #' SCAM smooth estimates retain the fitted centring and coefficient
 #' transformation when evaluation points are changed. Pointwise intervals use
 #' the covariance of the constrained coefficients. With
@@ -266,9 +265,6 @@
   interval <- normalize_smooth_interval(interval, allow_null = TRUE)
   if (!is.null(interval)) {
     validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
-    if (interval == "simultaneous" && inherits(object, "scam")) {
-      cli::cli_abort("Simultaneous smooth intervals are not supported for SCAM models.")
-    }
   }
   model_name <- expr_label(substitute(object))
   object <- with_model_envir(object, envir)
@@ -577,7 +573,17 @@
       env = environment(smooth$form)
     )
   }
-  predict_mat_rows(smooth, data)
+  X <- predict_mat_rows(smooth, data)
+  if (inherits(model, "scam") && is_scam_smooth(smooth)) {
+    X <- scam_smooth_matrix(smooth, X)
+    if (smooth_dim(smooth) == 2L &&
+        identical(attr(model, "gratia.scam.centre"), "plot")) {
+      offset <- attr(X, "offset")
+      X <- sweep(X, 2L, colMeans(X, na.rm = TRUE), FUN = "-")
+      if (!is.null(offset)) attr(X, "offset") <- offset - mean(offset, na.rm = TRUE)
+    }
+  }
+  X
 }
 
 #' Evaluate a spline at provided covariate values
@@ -604,6 +610,12 @@
     overall_uncertainty = TRUE,
     frequentist = FALSE, envir = NULL) {
   check_scam_unconditional(model, unconditional)
+  if (inherits(model, "scam") &&
+      inherits(reclass_scam_smooth(smooth), "scam_smooth")) {
+    return(spline_values_scam(smooth, data, model,
+      overall_uncertainty = overall_uncertainty, frequentist = frequentist,
+      envir = envir))
+  }
   model <- with_model_envir(model, envir)
   data <- prepare_smooth_data(model, smooth, data)
   is_soap <- is_soap_film(smooth)
@@ -686,37 +698,19 @@
 }
 
 #' @export
-`smooth_values.univariate_scam_smooth` <- function(
+`smooth_values.scam_smooth` <- function(
     smooth, data, model, V, overall_uncertainty = TRUE,
     ...) {
-  X <- predict_mat_rows(smooth, data) # prediction matrix
+  X <- smooth_predict_matrix(smooth, data, model)
   off <- attr(X, "offset") %||% 0
-  X <- scam_smooth_matrix(smooth, X)
   idx <- smooth_coef_indices(smooth)
   fit <- drop(X %*% coef(model)[idx]) + off
-  G <- X
-  intercept <- which(names(coef(model)) == "(Intercept)")
-  if (isTRUE(overall_uncertainty) && length(intercept)) {
-    G <- cbind(1, G)
-    idx <- c(intercept, idx)
-  }
+  design <- smooth_uncertainty_design(smooth, X, model, V,
+    overall_uncertainty = overall_uncertainty)
+  G <- design$X
+  idx <- design$cols
   se_fit <- sqrt(pmax(0, rowSums((G %*% V[idx, idx, drop = FALSE]) * G)))
   list(fit = fit, se = se_fit)
-}
-
-# Match SCAM's fitted constrained coefficient order. Some bases retain columns
-# whose coefficients were fixed to zero when the model was fitted.
-scam_smooth_matrix <- function(smooth, X) {
-  if (inherits(smooth, "po.smooth")) {
-    X <- X[, -1L, drop = FALSE]
-  } else if (inherits(smooth, "zero_point_scam_smooth")) {
-    X <- X[, -smooth$n.zero, drop = FALSE]
-  }
-  if (ncol(X) != length(smooth_coef_indices(smooth))) {
-    stop("Cannot align the SCAM smooth basis with its fitted coefficients.",
-      call. = FALSE)
-  }
-  X
 }
 
 `spline_values_scam` <- function(
@@ -1672,16 +1666,28 @@ scam_smooth_matrix <- function(smooth, X) {
       "TPRS", "TPRS (shrink)", "CRS", "CRS (shrink)",
       "Cyclic CRS", "Cyclic P spline", "P spline", "B spline", "Duchon spline",
       "GP",
-      "Mono inc P spline",
-      "Mono dec P spline",
-      "Convex P spline",
-      "Concave P spline",
-      "Mono dec conv P spline",
-      "Mono dec conc P spline",
-      "Mono inc conv P spline",
-      "Mono inc conc P spline",
-      "Mono inc 0 start P spline",
-      "Mono inc 0 start P spline"
+      "P spline (inc)",
+      "P spline (dec)",
+      "P spline (convex)",
+      "P spline (concave)",
+      "P spline (dec, convex)",
+      "P spline (dec, concave)",
+      "P spline (inc, convex)",
+      "P spline (inc, concave)",
+      "P spline (inc, left=0)",
+      "P spline (inc, right=0)",
+      "P spline (pos)", "P spline (pos, inc)",
+      "P spline (pos, dec)", "Cyclic P spline (pos)",
+      "P spline (local inc)", "P spline (inc then flat)",
+      # Retain rendering for estimates saved before the compact type labels.
+      "Mono inc P spline", "Mono dec P spline",
+      "Convex P spline", "Concave P spline",
+      "Mono dec conv P spline", "Mono dec conc P spline",
+      "Mono inc conv P spline", "Mono inc conc P spline",
+      "Mono inc 0 start P spline", "Mono inc 0 end P spline",
+      "Positive P spline", "Positive increasing P spline",
+      "Positive decreasing P spline", "Positive cyclic P spline",
+      "Locally increasing P spline", "Increasing then level P spline"
     )) {
     class(object) <- append(class(object), "mgcv_smooth", after = 0L)
   } else if (grepl("1d Tensor product", sm_type, fixed = TRUE)) {

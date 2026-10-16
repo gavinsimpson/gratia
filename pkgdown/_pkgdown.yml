@@ -39,6 +39,7 @@ articles:
       - articles/model-checking
       - articles/bayesplot-loo
       - articles/gfam-support
+      - articles/scam-support
       - articles/glmmTMB-support
       - articles/sdmTMB-support
   - title: Predictions, effects and response distributions
